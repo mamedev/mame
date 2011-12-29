@@ -584,18 +584,18 @@ static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangl
 }
 
 
-void st0016_draw_screen(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+void st0016_draw_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	draw_bgmap(screen->machine(), bitmap,cliprect,0);
-	draw_sprites(screen->machine(), bitmap,cliprect);
-	draw_bgmap(screen->machine(), bitmap,cliprect,1);
+	draw_bgmap(screen.machine(), bitmap,cliprect,0);
+	draw_sprites(screen.machine(), bitmap,cliprect);
+	draw_bgmap(screen.machine(), bitmap,cliprect,1);
 }
 
 SCREEN_UPDATE( st0016 )
 {
 
 #ifdef MAME_DEBUG
-	if(screen->machine().input().code_pressed_once(KEYCODE_Z))
+	if(screen.machine().input().code_pressed_once(KEYCODE_Z))
 	{
 		int h,j;
 		FILE *p=fopen("vram.bin","wb");

@@ -162,18 +162,18 @@ VIDEO_START( tigeroad )
 
 SCREEN_UPDATE( tigeroad )
 {
-	tigeroad_state *state = screen->machine().driver_data<tigeroad_state>();
+	tigeroad_state *state = screen.machine().driver_data<tigeroad_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 1);
-	//draw_sprites(screen->machine(), bitmap, cliprect, 1); draw priority sprites?
+	//draw_sprites(screen.machine(), bitmap, cliprect, 1); draw priority sprites?
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
 	return 0;
 }
 
 SCREEN_EOF( tigeroad )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }

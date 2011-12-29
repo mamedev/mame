@@ -250,13 +250,13 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( tecmo )
 {
-	tecmo_state *state = screen->machine().driver_data<tecmo_state>();
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	tecmo_state *state = screen.machine().driver_data<tecmo_state>();
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x100);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,2);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,4);
 
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

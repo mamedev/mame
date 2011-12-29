@@ -136,10 +136,10 @@ static INTERRUPT_GEN( sandscrp_interrupt )
 
 static SCREEN_EOF( sandscrp )
 {
-	sandscrp_state *state = machine.driver_data<sandscrp_state>();
-	device_t *pandora = machine.device("pandora");
+	sandscrp_state *state = screen.machine().driver_data<sandscrp_state>();
+	device_t *pandora = screen.machine().device("pandora");
 	state->m_sprite_irq = 1;
-	update_irq_state(machine);
+	update_irq_state(screen.machine());
 	pandora_eof(pandora);
 }
 

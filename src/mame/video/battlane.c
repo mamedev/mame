@@ -236,12 +236,12 @@ static void draw_fg_bitmap( running_machine &machine, bitmap_t *bitmap )
 
 SCREEN_UPDATE( battlane )
 {
-	battlane_state *state = screen->machine().driver_data<battlane_state>();
+	battlane_state *state = screen.machine().driver_data<battlane_state>();
 
 	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap); // HACK
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
-	draw_fg_bitmap(screen->machine(), bitmap);
+	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_fg_bitmap(screen.machine(), bitmap);
 	return 0;
 }

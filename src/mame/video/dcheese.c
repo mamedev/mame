@@ -118,7 +118,7 @@ VIDEO_START( dcheese )
 
 SCREEN_UPDATE( dcheese )
 {
-	dcheese_state *state = screen->machine().driver_data<dcheese_state>();
+	dcheese_state *state = screen.machine().driver_data<dcheese_state>();
 	int x, y;
 
 	/* update the pixels */

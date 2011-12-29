@@ -331,7 +331,7 @@ VIDEO_START(martchmp)
 
 SCREEN_UPDATE(mystwarr)
 {
-	mystwarr_state *state = screen->machine().driver_data<mystwarr_state>();
+	mystwarr_state *state = screen.machine().driver_data<mystwarr_state>();
 	int i, old, blendmode=0;
 
 	if (state->m_cbparam<0) state->m_cbparam=0; else if (state->m_cbparam>=32) blendmode=(1<<16|GXMIX_BLEND_FORCE)<<2; //* water hack (TEMPORARY)
@@ -345,13 +345,13 @@ SCREEN_UPDATE(mystwarr)
 
 	state->m_sprite_colorbase = K055555_get_palette_index(4)<<5;
 
-	konamigx_mixer(screen->machine(), bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
+	konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE(metamrph)
 {
-	mystwarr_state *state = screen->machine().driver_data<mystwarr_state>();
+	mystwarr_state *state = screen.machine().driver_data<mystwarr_state>();
 	int i, old;
 
 	for (i = 0; i < 4; i++)
@@ -363,13 +363,13 @@ SCREEN_UPDATE(metamrph)
 
 	state->m_sprite_colorbase = K055555_get_palette_index(4)<<4;
 
-	konamigx_mixer(screen->machine(), bitmap, cliprect, 0, GXSUB_K053250 | GXSUB_4BPP, 0, 0, 0, 0, 0);
+	konamigx_mixer(screen.machine(), bitmap, cliprect, 0, GXSUB_K053250 | GXSUB_4BPP, 0, 0, 0, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE(martchmp)
 {
-	mystwarr_state *state = screen->machine().driver_data<mystwarr_state>();
+	mystwarr_state *state = screen.machine().driver_data<mystwarr_state>();
 	int i, old, blendmode;
 
 	for (i = 0; i < 4; i++)
@@ -387,7 +387,7 @@ SCREEN_UPDATE(martchmp)
 	// not quite right
 	blendmode = (state->m_oinprion==0xef && K054338_read_register(K338_REG_PBLEND)) ? ((1<<16|GXMIX_BLEND_FORCE)<<2) : 0;
 
-	konamigx_mixer(screen->machine(), bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
+	konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
 	return 0;
 }
 
@@ -501,7 +501,7 @@ READ16_HANDLER(ddd_053936_tilerom_2_r)
 
 SCREEN_UPDATE(dadandrn) /* and gaiapols */
 {
-	mystwarr_state *state = screen->machine().driver_data<mystwarr_state>();
+	mystwarr_state *state = screen.machine().driver_data<mystwarr_state>();
 	int i, newbase, dirty, rozmode;
 
 	if (state->m_gametype == 0)
@@ -553,6 +553,6 @@ SCREEN_UPDATE(dadandrn) /* and gaiapols */
 			popmessage("K053936: PSAC colorbase changed");
 	}
 
-	konamigx_mixer(screen->machine(), bitmap, cliprect, (state->m_roz_enable) ? state->m_ult_936_tilemap : 0, rozmode, 0, 0, 0, 0, 0);
+	konamigx_mixer(screen.machine(), bitmap, cliprect, (state->m_roz_enable) ? state->m_ult_936_tilemap : 0, rozmode, 0, 0, 0, 0, 0);
 	return 0;
 }

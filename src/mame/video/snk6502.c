@@ -205,7 +205,7 @@ VIDEO_START( pballoon )
 
 SCREEN_UPDATE( snk6502 )
 {
-	snk6502_state *state = screen->machine().driver_data<snk6502_state>();
+	snk6502_state *state = screen.machine().driver_data<snk6502_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

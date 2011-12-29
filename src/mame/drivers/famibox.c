@@ -526,7 +526,7 @@ static VIDEO_START( famibox )
 static SCREEN_UPDATE( famibox )
 {
 	/* render the ppu */
-	ppu2c0x_render(screen->machine().device("ppu"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_render(screen.machine().device("ppu"), bitmap, 0, 0, 0, 0);
 	return 0;
 }
 

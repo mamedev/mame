@@ -258,7 +258,7 @@ static VIDEO_START( goldngam )
 
 static SCREEN_UPDATE( goldngam )
 {
-	goldngam_state *state = screen->machine().driver_data<goldngam_state>();
+	goldngam_state *state = screen.machine().driver_data<goldngam_state>();
 
 	int x, y;
 

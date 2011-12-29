@@ -520,26 +520,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 }
 
 
-SCREEN_UPDATE( tceptor )
+SCREEN_UPDATE( tceptor_2d )
 {
-	tceptor_state *state = screen->machine().driver_data<tceptor_state>();
+	tceptor_state *state = screen.machine().driver_data<tceptor_state>();
 	rectangle rect;
 	int pri;
 	int bg_center = 144 - ((((state->m_bg1_scroll_x + state->m_bg2_scroll_x ) & 0x1ff) - 288) / 2);
-
-	device_t *_2d_screen       = screen->machine().device("2dscreen");
-	device_t *_3d_left_screen  = screen->machine().device("3dleft");
-	device_t *_3d_right_screen = screen->machine().device("3dright");
-
-	if (screen != _2d_screen)
-	{
-		int frame = screen->frame_number();
-
-		if ((frame & 1) == 1 && screen == _3d_left_screen)
-			return UPDATE_HAS_NOT_CHANGED;
-		if ((frame & 1) == 0 && screen == _3d_right_screen)
-			return UPDATE_HAS_NOT_CHANGED;
-	}
 
 	// left background
 	rect = *cliprect;
@@ -557,18 +543,32 @@ SCREEN_UPDATE( tceptor )
 
 	for (pri = 0; pri < 8; pri++)
 	{
-		namco_road_draw(screen->machine(), bitmap, cliprect, pri * 2);
-		namco_road_draw(screen->machine(), bitmap, cliprect, pri * 2 + 1);
-		draw_sprites(screen->machine(), bitmap, cliprect, pri);
+		namco_road_draw(screen.machine(), bitmap, cliprect, pri * 2);
+		namco_road_draw(screen.machine(), bitmap, cliprect, pri * 2 + 1);
+		draw_sprites(screen.machine(), bitmap, cliprect, pri);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 	return 0;
 }
 
+SCREEN_UPDATE( tceptor_3d_left )
+{
+	if ((screen.frame_number() & 1) == 1)
+		return UPDATE_HAS_NOT_CHANGED;
+	return SCREEN_UPDATE_CALL( tceptor_2d );
+}
+
+SCREEN_UPDATE( tceptor_3d_right )
+{
+	if ((screen.frame_number() & 1) == 0)
+		return UPDATE_HAS_NOT_CHANGED;
+	return SCREEN_UPDATE_CALL( tceptor_2d );
+}
+
 
 SCREEN_EOF( tceptor )
 {
-	tceptor_state *state = machine.driver_data<tceptor_state>();
+	tceptor_state *state = screen.machine().driver_data<tceptor_state>();
 	memcpy(state->m_sprite_ram_buffered, state->m_sprite_ram, 0x200);
 }

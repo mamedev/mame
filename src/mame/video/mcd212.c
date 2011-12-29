@@ -1663,13 +1663,13 @@ VIDEO_START( cdimono1 )
 
 SCREEN_UPDATE( cdimono1 )
 {
-    copybitmap(bitmap, screen->machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, screen.machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }
 
 SCREEN_UPDATE( cdimono1_lcd )
 {
-    cdi_state *state = screen->machine().driver_data<cdi_state>();
+    cdi_state *state = screen.machine().driver_data<cdi_state>();
     copybitmap(bitmap, state->m_lcdbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }

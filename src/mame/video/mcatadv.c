@@ -202,11 +202,11 @@ static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_v
 
 SCREEN_UPDATE( mcatadv )
 {
-	mcatadv_state *state = screen->machine().driver_data<mcatadv_state>();
+	mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
 	int i;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	if (state->m_scroll1[2] != state->m_palette_bank1)
 	{
@@ -231,21 +231,21 @@ SCREEN_UPDATE( mcatadv )
 	for (i = 0; i <= 3; i++)
 	{
 	#ifdef MAME_DEBUG
-			if (!screen->machine().input().code_pressed(KEYCODE_Q))
+			if (!screen.machine().input().code_pressed(KEYCODE_Q))
 	#endif
 			mcatadv_draw_tilemap_part(state->m_scroll1,  state->m_videoram1, i, state->m_tilemap1, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
-			if (!screen->machine().input().code_pressed(KEYCODE_W))
+			if (!screen.machine().input().code_pressed(KEYCODE_W))
 	#endif
 				mcatadv_draw_tilemap_part(state->m_scroll2, state->m_videoram2, i, state->m_tilemap2, bitmap, cliprect);
 	}
 
 	g_profiler.start(PROFILER_USER1);
 #ifdef MAME_DEBUG
-	if (!screen->machine().input().code_pressed(KEYCODE_E))
+	if (!screen.machine().input().code_pressed(KEYCODE_E))
 #endif
-		draw_sprites (screen->machine(), bitmap, cliprect);
+		draw_sprites (screen.machine(), bitmap, cliprect);
 	g_profiler.stop();
 	return 0;
 }
@@ -271,7 +271,7 @@ VIDEO_START( mcatadv )
 
 SCREEN_EOF( mcatadv )
 {
-	mcatadv_state *state = machine.driver_data<mcatadv_state>();
+	mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
 	memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram_size);
 	memcpy(state->m_vidregs_old, state->m_vidregs, 0xf);
 }

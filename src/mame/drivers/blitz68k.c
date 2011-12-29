@@ -92,7 +92,7 @@ static VIDEO_START(blitz68k_addr_factor1)
 
 static SCREEN_UPDATE(blitz68k)
 {
-	blitz68k_state *state = screen->machine().driver_data<blitz68k_state>();
+	blitz68k_state *state = screen.machine().driver_data<blitz68k_state>();
 	int x,y;
 
 	UINT8 *src = state->m_blit_buffer;
@@ -101,7 +101,7 @@ static SCREEN_UPDATE(blitz68k)
 	{
 		for(x = 0; x < 512; x++)
 		{
-			*BITMAP_ADDR32(bitmap, y, x) = screen->machine().pens[*src++];
+			*BITMAP_ADDR32(bitmap, y, x) = screen.machine().pens[*src++];
 		}
 	}
 
@@ -113,7 +113,7 @@ static SCREEN_UPDATE(blitz68k)
 
 static SCREEN_UPDATE(blitz68k_noblit)
 {
-	blitz68k_state *state = screen->machine().driver_data<blitz68k_state>();
+	blitz68k_state *state = screen.machine().driver_data<blitz68k_state>();
 	int x,y;
 
 	UINT16 *src = state->m_frame_buffer;
@@ -123,10 +123,10 @@ static SCREEN_UPDATE(blitz68k_noblit)
 		for(x = 0; x < 512; )
 		{
 			UINT16 pen = *src++;
-			*BITMAP_ADDR32(bitmap, y, x++) = screen->machine().pens[(pen >>  8) & 0xf];
-			*BITMAP_ADDR32(bitmap, y, x++) = screen->machine().pens[(pen >> 12) & 0xf];
-			*BITMAP_ADDR32(bitmap, y, x++) = screen->machine().pens[(pen >>  0) & 0xf];
-			*BITMAP_ADDR32(bitmap, y, x++) = screen->machine().pens[(pen >>  4) & 0xf];
+			*BITMAP_ADDR32(bitmap, y, x++) = screen.machine().pens[(pen >>  8) & 0xf];
+			*BITMAP_ADDR32(bitmap, y, x++) = screen.machine().pens[(pen >> 12) & 0xf];
+			*BITMAP_ADDR32(bitmap, y, x++) = screen.machine().pens[(pen >>  0) & 0xf];
+			*BITMAP_ADDR32(bitmap, y, x++) = screen.machine().pens[(pen >>  4) & 0xf];
 		}
 	}
 

@@ -126,7 +126,7 @@ VIDEO_START(ksayakyu)
 
 SCREEN_UPDATE(ksayakyu)
 {
-	ksayakyu_state *state = screen->machine().driver_data<ksayakyu_state>();
+	ksayakyu_state *state = screen.machine().driver_data<ksayakyu_state>();
 
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -134,6 +134,6 @@ SCREEN_UPDATE(ksayakyu)
 		tilemap_draw(bitmap, cliprect,state->m_tilemap, 0, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_textmap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

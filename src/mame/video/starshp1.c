@@ -358,24 +358,24 @@ static int circle_collision(starshp1_state *state, const rectangle *rect)
 
 SCREEN_UPDATE( starshp1 )
 {
-	starshp1_state *state = screen->machine().driver_data<starshp1_state>();
-	set_pens(state, screen->machine().colortable);
+	starshp1_state *state = screen.machine().driver_data<starshp1_state>();
+	set_pens(state, screen.machine().colortable);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	if (state->m_starfield_kill == 0)
 		draw_starfield(state, bitmap);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	if (state->m_circle_kill == 0 && state->m_circle_mod != 0)
-		draw_circle(screen->machine(), bitmap);
+		draw_circle(screen.machine(), bitmap);
 
 	if (state->m_attract == 0)
-		draw_spaceship(screen->machine(), bitmap, cliprect);
+		draw_spaceship(screen.machine(), bitmap, cliprect);
 
 	if (state->m_circle_kill == 0 && state->m_circle_mod == 0)
-		draw_circle(screen->machine(), bitmap);
+		draw_circle(screen.machine(), bitmap);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
@@ -388,14 +388,14 @@ SCREEN_UPDATE( starshp1 )
 
 SCREEN_EOF( starshp1 )
 {
-	starshp1_state *state = machine.driver_data<starshp1_state>();
+	starshp1_state *state = screen.machine().driver_data<starshp1_state>();
 	rectangle rect;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
 	rect.min_x = get_sprite_hpos(state, 13);
 	rect.min_y = get_sprite_vpos(state, 13);
-	rect.max_x = rect.min_x + machine.gfx[1]->width - 1;
-	rect.max_y = rect.min_y + machine.gfx[1]->height - 1;
+	rect.max_x = rect.min_x + screen.machine().gfx[1]->width - 1;
+	rect.max_y = rect.min_y + screen.machine().gfx[1]->height - 1;
 
 	if (rect.min_x < 0)
 		rect.min_x = 0;
@@ -409,7 +409,7 @@ SCREEN_EOF( starshp1 )
 	bitmap_fill(state->m_helper, &visarea, 0);
 
 	if (state->m_attract == 0)
-		draw_spaceship(machine, state->m_helper, &visarea);
+		draw_spaceship(screen.machine(), state->m_helper, &visarea);
 
 	if (circle_collision(state, &visarea))
 		state->m_collision_latch |= 1;
@@ -417,9 +417,9 @@ SCREEN_EOF( starshp1 )
 	if (circle_collision(state, &rect))
 		state->m_collision_latch |= 2;
 
-	if (spaceship_collision(machine, state->m_helper, &rect))
+	if (spaceship_collision(screen.machine(), state->m_helper, &rect))
 		state->m_collision_latch |= 4;
 
-	if (spaceship_collision(machine, state->m_helper, &visarea))
+	if (spaceship_collision(screen.machine(), state->m_helper, &visarea))
 		state->m_collision_latch |= 8;
 }

@@ -499,26 +499,26 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( toaplan0 )
 {
-	twincobr_state *state = screen->machine().driver_data<twincobr_state>();
-	twincobr_log_vram(screen->machine());
+	twincobr_state *state = screen.machine().driver_data<twincobr_state>();
+	twincobr_log_vram(screen.machine());
 
-	if (state->m_wardner_sprite_hack) wardner_sprite_priority_hack(screen->machine());
+	if (state->m_wardner_sprite_hack) wardner_sprite_priority_hack(screen.machine());
 
 	bitmap_fill(bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(screen->machine(), bitmap,cliprect,0x0400);
+	draw_sprites(screen.machine(), bitmap,cliprect,0x0400);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect,0x0800);
+	draw_sprites(screen.machine(), bitmap,cliprect,0x0800);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect,0x0c00);
+	draw_sprites(screen.machine(), bitmap,cliprect,0x0c00);
 	return 0;
 }
 
 
 SCREEN_EOF( toaplan0 )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Spriteram is always 1 frame ahead, suggesting spriteram buffering.
         There are no CPU output registers that control this so we

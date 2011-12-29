@@ -173,7 +173,7 @@ static VIDEO_START( mazerbla )
 
 SCREEN_UPDATE( test_vcu )
 {
-	mazerbla_state *state = screen->machine().driver_data<mazerbla_state>();
+	mazerbla_state *state = screen.machine().driver_data<mazerbla_state>();
 	int *planes_enabled = state->m_planes_enabled;
 	char buf[128];
 
@@ -206,38 +206,38 @@ SCREEN_UPDATE( test_vcu )
 
 	bitmap_fill(state->m_tmpbitmaps[0], NULL, color_base);
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_1))	/* plane 1 */
+	if (screen.machine().input().code_pressed_once(KEYCODE_1))	/* plane 1 */
 		planes_enabled[0] ^= 1;
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_2))	/* plane 2 */
+	if (screen.machine().input().code_pressed_once(KEYCODE_2))	/* plane 2 */
 		planes_enabled[1] ^= 1;
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_3))	/* plane 3 */
+	if (screen.machine().input().code_pressed_once(KEYCODE_3))	/* plane 3 */
 		planes_enabled[2] ^= 1;
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_4))	/* plane 4 */
+	if (screen.machine().input().code_pressed_once(KEYCODE_4))	/* plane 4 */
 		planes_enabled[3] ^= 1;
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_I))	/* show/hide debug info */
+	if (screen.machine().input().code_pressed_once(KEYCODE_I))	/* show/hide debug info */
 		state->m_dbg_info = !state->m_dbg_info;
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_G))	/* enable gfx area handling */
+	if (screen.machine().input().code_pressed_once(KEYCODE_G))	/* enable gfx area handling */
 		state->m_dbg_gfx_e = !state->m_dbg_gfx_e;
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_C))	/* enable color area handling */
+	if (screen.machine().input().code_pressed_once(KEYCODE_C))	/* enable color area handling */
 		state->m_dbg_clr_e = !state->m_dbg_clr_e;
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_V))	/* draw only when vbank==dbg_vbank */
+	if (screen.machine().input().code_pressed_once(KEYCODE_V))	/* draw only when vbank==dbg_vbank */
 		state->m_dbg_vbank ^= 1;
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_L))	/* showlookup ram */
+	if (screen.machine().input().code_pressed_once(KEYCODE_L))	/* showlookup ram */
 		state->m_dbg_lookup = (state->m_dbg_lookup + 1) % 5;	//0,1,2,3, 4-off
 
 
 	if (state->m_dbg_info)
 	{
 		sprintf(buf,"I-info, G-gfx, C-color, V-vbank, 1-4 enable planes");
-		ui_draw_text(buf, 10, 0 * ui_get_line_height(screen->machine()));
+		ui_draw_text(buf, 10, 0 * ui_get_line_height(screen.machine()));
 
 		sprintf(buf,"g:%1i c:%1i v:%1i vbk=%1i  planes=%1i%1i%1i%1i  ", state->m_dbg_gfx_e&1, state->m_dbg_clr_e&1, state->m_dbg_vbank, vbank&1,
 			planes_enabled[0],
@@ -245,7 +245,7 @@ SCREEN_UPDATE( test_vcu )
 			planes_enabled[2],
 			planes_enabled[3] );
 
-		ui_draw_text(buf, 10, 1 * ui_get_line_height(screen->machine()));
+		ui_draw_text(buf, 10, 1 * ui_get_line_height(screen.machine()));
 
 		if (state->m_dbg_lookup!=4)
 		{
@@ -260,7 +260,7 @@ SCREEN_UPDATE( test_vcu )
 				{
 					sprintf(buf + strlen(buf), "%02x ", lookup_ram[lookup_offs + x + y * 16]);
 				}
-				ui_draw_text(buf, 0, (2 + y) * ui_get_line_height(screen->machine()));
+				ui_draw_text(buf, 0, (2 + y) * ui_get_line_height(screen.machine()));
 			}
 		}
 	}
@@ -272,7 +272,7 @@ SCREEN_UPDATE( test_vcu )
 
 static SCREEN_UPDATE( mazerbla )
 {
-	mazerbla_state *state = screen->machine().driver_data<mazerbla_state>();
+	mazerbla_state *state = screen.machine().driver_data<mazerbla_state>();
 //  UINT32 color_base = 0;
 
 	if (state->m_game_id == MAZERBLA)

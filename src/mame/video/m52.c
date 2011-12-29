@@ -362,7 +362,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( m52 )
 {
-	m52_state *state = screen->machine().driver_data<m52_state>();
+	m52_state *state = screen.machine().driver_data<m52_state>();
 	int offs;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -370,16 +370,16 @@ SCREEN_UPDATE( m52 )
 	if (!(state->m_bgcontrol & 0x20))
 	{
 		if (!(state->m_bgcontrol & 0x10))
-			draw_background(screen->machine(), bitmap, cliprect, state->m_bg2xpos, state->m_bg2ypos, 2); /* distant mountains */
+			draw_background(screen.machine(), bitmap, cliprect, state->m_bg2xpos, state->m_bg2ypos, 2); /* distant mountains */
 
 		if (!(state->m_bgcontrol & 0x02))
-			draw_background(screen->machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 3); /* hills */
+			draw_background(screen.machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 3); /* hills */
 
 		if (!(state->m_bgcontrol & 0x04))
-			draw_background(screen->machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 4); /* cityscape */
+			draw_background(screen.machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 4); /* cityscape */
 	}
 
-	tilemap_set_flip(state->m_bg_tilemap, flip_screen_get(screen->machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip(state->m_bg_tilemap, flip_screen_get(screen.machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
@@ -403,7 +403,7 @@ SCREEN_UPDATE( m52 )
 			clip.min_y = 128, clip.max_y = 255;
 
 		/* adjust for flipping */
-		if (flip_screen_get(screen->machine()))
+		if (flip_screen_get(screen.machine()))
 		{
 			int temp = clip.min_y;
 			clip.min_y = 255 - clip.max_y;
@@ -423,9 +423,9 @@ SCREEN_UPDATE( m52 )
 		clip = *cliprect;
 #endif
 
-		drawgfx_transmask(bitmap, &clip, screen->machine().gfx[1],
+		drawgfx_transmask(bitmap, &clip, screen.machine().gfx[1],
 			code, color, flipx, flipy, sx, sy,
-			colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color, 512 + 32));
+			colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color, 512 + 32));
 	}
 	return 0;
 }

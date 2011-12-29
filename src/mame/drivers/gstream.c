@@ -489,7 +489,7 @@ static SCREEN_UPDATE(gstream)
        are being set ?!
    */
 
-	gstream_state *state = screen->machine().driver_data<gstream_state>();
+	gstream_state *state = screen.machine().driver_data<gstream_state>();
 	int i;
 
 	//popmessage("(1) %08x %08x (2) %08x %08x (3) %08x %08x", state->m_tmap1_scrollx, state->m_tmap1_scrolly, state->m_tmap2_scrollx, state->m_tmap2_scrolly, state->m_tmap3_scrollx, state->m_tmap3_scrolly );
@@ -519,7 +519,7 @@ static SCREEN_UPDATE(gstream)
 		if (x & 0x8000) x -= 0x10000;
 		if (y & 0x8000) y -= 0x10000;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],code,col,0,0,x-2,y,0);
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],code,col,0,0,x-2,y,0);
 	}
 
 	return 0;

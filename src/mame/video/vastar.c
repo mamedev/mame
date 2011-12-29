@@ -198,7 +198,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( vastar )
 {
-	vastar_state *state = screen->machine().driver_data<vastar_state>();
+	vastar_state *state = screen.machine().driver_data<vastar_state>();
 	int i;
 
 
@@ -212,14 +212,14 @@ SCREEN_UPDATE( vastar )
 	{
 	case 0:
 		tilemap_draw(bitmap,cliprect, state->m_bg1_tilemap, TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(screen->machine(), bitmap,cliprect);
+		draw_sprites(screen.machine(), bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect, state->m_bg2_tilemap, 0,0);
 		tilemap_draw(bitmap,cliprect, state->m_fg_tilemap, 0,0);
 		break;
 
 	case 2:
 		tilemap_draw(bitmap,cliprect, state->m_bg1_tilemap, TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(screen->machine(), bitmap,cliprect);
+		draw_sprites(screen.machine(), bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect, state->m_bg1_tilemap, 0,0);
 		tilemap_draw(bitmap,cliprect, state->m_bg2_tilemap, 0,0);
 		tilemap_draw(bitmap,cliprect, state->m_fg_tilemap, 0,0);
@@ -229,7 +229,7 @@ SCREEN_UPDATE( vastar )
 		tilemap_draw(bitmap,cliprect, state->m_bg1_tilemap, TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect, state->m_bg2_tilemap, 0,0);
 		tilemap_draw(bitmap,cliprect, state->m_fg_tilemap, 0,0);
-		draw_sprites(screen->machine(), bitmap,cliprect);
+		draw_sprites(screen.machine(), bitmap,cliprect);
 		break;
 
 	default:

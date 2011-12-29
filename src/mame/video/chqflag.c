@@ -73,7 +73,7 @@ VIDEO_START( chqflag )
 
 SCREEN_UPDATE( chqflag )
 {
-	chqflag_state *state = screen->machine().driver_data<chqflag_state>();
+	chqflag_state *state = screen.machine().driver_data<chqflag_state>();
 
 	bitmap_fill(bitmap, cliprect, 0);
 

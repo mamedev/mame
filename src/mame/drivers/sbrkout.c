@@ -323,7 +323,7 @@ static WRITE8_HANDLER( sbrkout_videoram_w )
 
 static SCREEN_UPDATE( sbrkout )
 {
-	sbrkout_state *state = screen->machine().driver_data<sbrkout_state>();
+	sbrkout_state *state = screen.machine().driver_data<sbrkout_state>();
 	UINT8 *videoram = state->m_videoram;
 	int ball;
 
@@ -335,7 +335,7 @@ static SCREEN_UPDATE( sbrkout )
 		int sx = 31 * 8 - videoram[0x380 + 0x10 + ball * 2];
 		int sy = 30 * 8 - videoram[0x380 + 0x18 + ball * 2];
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], code, 0, 0, 0, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], code, 0, 0, 0, sx, sy, 0);
 	}
 	return 0;
 }

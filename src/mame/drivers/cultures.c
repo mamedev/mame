@@ -87,7 +87,7 @@ static VIDEO_START( cultures )
 
 static SCREEN_UPDATE( cultures )
 {
-	cultures_state *state = screen->machine().driver_data<cultures_state>();
+	cultures_state *state = screen.machine().driver_data<cultures_state>();
 	int attr;
 
 	// tilemaps attributes

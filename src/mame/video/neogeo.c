@@ -922,14 +922,14 @@ VIDEO_RESET( neogeo )
 
 SCREEN_UPDATE( neogeo )
 {
-	neogeo_state *state = screen->machine().driver_data<neogeo_state>();
+	neogeo_state *state = screen.machine().driver_data<neogeo_state>();
 
 	/* fill with background color first */
 	bitmap_fill(bitmap, cliprect, state->m_pens[0x0fff]);
 
-	draw_sprites(screen->machine(), bitmap, cliprect->min_y);
+	draw_sprites(screen.machine(), bitmap, cliprect->min_y);
 
-	draw_fixed_layer(screen->machine(), bitmap, cliprect->min_y);
+	draw_fixed_layer(screen.machine(), bitmap, cliprect->min_y);
 
 	return 0;
 }

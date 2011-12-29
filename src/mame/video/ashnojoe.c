@@ -226,11 +226,11 @@ VIDEO_START( ashnojoe )
 
 SCREEN_UPDATE( ashnojoe )
 {
-	ashnojoe_state *state = screen->machine().driver_data<ashnojoe_state>();
+	ashnojoe_state *state = screen.machine().driver_data<ashnojoe_state>();
 
 	//state->m_tilemap_reg[0] & 0x10 // ?? on coin insertion
 
-	flip_screen_set(screen->machine(), state->m_tilemap_reg[0] & 1);
+	flip_screen_set(screen.machine(), state->m_tilemap_reg[0] & 1);
 
 	if(state->m_tilemap_reg[0] & 0x02)
 		tilemap_draw(bitmap, cliprect, state->m_joetilemap7, 0, 0);

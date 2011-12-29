@@ -189,7 +189,7 @@ VIDEO_START( apple10 )
 
 SCREEN_UPDATE( snookr10 )
 {
-	snookr10_state *state = screen->machine().driver_data<snookr10_state>();
+	snookr10_state *state = screen.machine().driver_data<snookr10_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

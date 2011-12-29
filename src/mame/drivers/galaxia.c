@@ -43,16 +43,16 @@ public:
 
 static SCREEN_UPDATE( galaxia )
 {
-	galaxia_state *state = screen->machine().driver_data<galaxia_state>();
+	galaxia_state *state = screen.machine().driver_data<galaxia_state>();
 	int x,y, count;
 
 	bitmap_t *s2636_0_bitmap;
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
 
-	device_t *s2636_0 = screen->machine().device("s2636_0");
-	device_t *s2636_1 = screen->machine().device("s2636_1");
-	device_t *s2636_2 = screen->machine().device("s2636_2");
+	device_t *s2636_0 = screen.machine().device("s2636_0");
+	device_t *s2636_1 = screen.machine().device("s2636_1");
+	device_t *s2636_2 = screen.machine().device("s2636_2");
 
 	count = 0;
 
@@ -61,7 +61,7 @@ static SCREEN_UPDATE( galaxia )
 		for (x=0;x<256/8;x++)
 		{
 			int tile = state->m_video[count];
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,0,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,0,0,0,x*8,y*8);
 			count++;
 		}
 	}

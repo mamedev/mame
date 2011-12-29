@@ -122,7 +122,7 @@ static VIDEO_START( jangou )
 
 static SCREEN_UPDATE( jangou )
 {
-	jangou_state *state = screen->machine().driver_data<jangou_state>();
+	jangou_state *state = screen.machine().driver_data<jangou_state>();
 	int x, y;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
@@ -133,8 +133,8 @@ static SCREEN_UPDATE( jangou )
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
 		{
 			UINT32 srcpix = *src++;
-			*dst++ = screen->machine().pens[srcpix & 0xf];
-			*dst++ = screen->machine().pens[(srcpix >> 4) & 0xf];
+			*dst++ = screen.machine().pens[srcpix & 0xf];
+			*dst++ = screen.machine().pens[(srcpix >> 4) & 0xf];
 		}
 	}
 

@@ -159,7 +159,7 @@ static VIDEO_START( igs011 )
 
 static SCREEN_UPDATE( igs011 )
 {
-	igs011_state *state = screen->machine().driver_data<igs011_state>();
+	igs011_state *state = screen.machine().driver_data<igs011_state>();
 #ifdef MAME_DEBUG
 	int layer_enable = -1;
 #endif
@@ -168,17 +168,17 @@ static SCREEN_UPDATE( igs011 )
 	UINT16 *pri_ram;
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed(KEYCODE_Z))
+	if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (screen->machine().input().code_pressed(KEYCODE_Q))	mask |= 0x01;
-		if (screen->machine().input().code_pressed(KEYCODE_W))	mask |= 0x02;
-		if (screen->machine().input().code_pressed(KEYCODE_E))	mask |= 0x04;
-		if (screen->machine().input().code_pressed(KEYCODE_R))	mask |= 0x08;
-		if (screen->machine().input().code_pressed(KEYCODE_A))	mask |= 0x10;
-		if (screen->machine().input().code_pressed(KEYCODE_S))	mask |= 0x20;
-		if (screen->machine().input().code_pressed(KEYCODE_D))	mask |= 0x40;
-		if (screen->machine().input().code_pressed(KEYCODE_F))	mask |= 0x80;
+		if (screen.machine().input().code_pressed(KEYCODE_Q))	mask |= 0x01;
+		if (screen.machine().input().code_pressed(KEYCODE_W))	mask |= 0x02;
+		if (screen.machine().input().code_pressed(KEYCODE_E))	mask |= 0x04;
+		if (screen.machine().input().code_pressed(KEYCODE_R))	mask |= 0x08;
+		if (screen.machine().input().code_pressed(KEYCODE_A))	mask |= 0x10;
+		if (screen.machine().input().code_pressed(KEYCODE_S))	mask |= 0x20;
+		if (screen.machine().input().code_pressed(KEYCODE_D))	mask |= 0x40;
+		if (screen.machine().input().code_pressed(KEYCODE_F))	mask |= 0x80;
 		if (mask)	layer_enable &= mask;
 	}
 #endif
@@ -207,7 +207,7 @@ static SCREEN_UPDATE( igs011 )
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				*BITMAP_ADDR16(bitmap, y, x) = get_black_pen(screen->machine());
+				*BITMAP_ADDR16(bitmap, y, x) = get_black_pen(screen.machine());
 			else
 #endif
 				*BITMAP_ADDR16(bitmap, y, x) = state->m_layer[l][scr_addr] | (l << 8);
@@ -2390,9 +2390,9 @@ static READ16_HANDLER( vbowl_unk_r )
 
 static SCREEN_EOF( vbowl )
 {
-	igs011_state *state = machine.driver_data<igs011_state>();
+	igs011_state *state = screen.machine().driver_data<igs011_state>();
 	state->m_vbowl_trackball[0] = state->m_vbowl_trackball[1];
-	state->m_vbowl_trackball[1] = (input_port_read(machine, "AN1") << 8) | input_port_read(machine, "AN0");
+	state->m_vbowl_trackball[1] = (input_port_read(screen.machine(), "AN1") << 8) | input_port_read(screen.machine(), "AN0");
 }
 
 static WRITE16_HANDLER( vbowl_pen_hi_w )

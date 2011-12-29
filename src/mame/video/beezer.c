@@ -21,7 +21,7 @@ TIMER_DEVICE_CALLBACK( beezer_interrupt )
 
 SCREEN_UPDATE( beezer )
 {
-	beezer_state *state = screen->machine().driver_data<beezer_state>();
+	beezer_state *state = screen.machine().driver_data<beezer_state>();
 	UINT8 *videoram = state->m_videoram;
 	int x,y;
 

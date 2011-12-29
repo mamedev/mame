@@ -93,7 +93,8 @@ WRITE16_HANDLER( arescue_dsp_w );
 VIDEO_START(system32);
 VIDEO_START(multi32);
 SCREEN_UPDATE(system32);
-SCREEN_UPDATE(multi32);
+SCREEN_UPDATE(multi32_left);
+SCREEN_UPDATE(multi32_right);
 void system32_set_vblank(running_machine &machine, int state);
 
 READ16_HANDLER( system32_videoram_r );

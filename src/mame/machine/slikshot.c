@@ -551,7 +551,7 @@ VIDEO_START( slikshot )
 
 SCREEN_UPDATE( slikshot )
 {
-	itech8_state *state = screen->machine().driver_data<itech8_state>();
+	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	int totaldy, totaldx;
 	int temp, i;
 
@@ -559,8 +559,8 @@ SCREEN_UPDATE( slikshot )
 	SCREEN_UPDATE_CALL(itech8_2page);
 
 	/* add the current X,Y positions to the list */
-	state->m_xbuffer[state->m_ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine(), "FAKEX", 0);
-	state->m_ybuffer[state->m_ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine(), "FAKEY", 0);
+	state->m_xbuffer[state->m_ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen.machine(), "FAKEX", 0);
+	state->m_ybuffer[state->m_ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen.machine(), "FAKEY", 0);
 	state->m_ybuffer_next++;
 
 	/* determine where to draw the starting point */
@@ -595,7 +595,7 @@ SCREEN_UPDATE( slikshot )
 		if (temp >=  0x90) temp =  0x90;
 		state->m_curx = temp;
 
-		compute_sensors(screen->machine());
+		compute_sensors(screen.machine());
 //      popmessage("V=%02x,%02x  X=%02x", state->m_curvx, state->m_curvy, state->m_curx);
 		state->m_crosshair_vis = 0;
 	}

@@ -67,7 +67,7 @@ WRITE8_HANDLER( usgames_charram_w )
 
 SCREEN_UPDATE(usgames)
 {
-	usgames_state *state = screen->machine().driver_data<usgames_state>();
+	usgames_state *state = screen.machine().driver_data<usgames_state>();
 	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
 	return 0;
 }

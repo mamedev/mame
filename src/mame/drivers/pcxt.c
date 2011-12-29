@@ -95,14 +95,14 @@ public:
 
 static SCREEN_UPDATE( tetriskr )
 {
-	pcxt_state *state = screen->machine().driver_data<pcxt_state>();
+	pcxt_state *state = screen.machine().driver_data<pcxt_state>();
 	int x,y;
 	int yi;
-	const UINT8 *bg_rom = screen->machine().region("gfx2")->base();
+	const UINT8 *bg_rom = screen.machine().region("gfx2")->base();
 
 	//popmessage("%04x",m_start_offs);
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	for(y=0;y<200/8;y++)
 	{
@@ -120,8 +120,8 @@ static SCREEN_UPDATE( tetriskr )
 					for(pen_i = 0;pen_i<4;pen_i++)
 						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+state->m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
 
-					if((x+xi)<screen->visible_area().max_x && ((y)+yi)<screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine().pens[color];
+					if((x+xi)<screen.visible_area().max_x && ((y)+yi)<screen.visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen.machine().pens[color];
 				}
 			}
 		}

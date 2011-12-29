@@ -282,7 +282,7 @@ static void mcr3_update_sprites(running_machine &machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( mcr3 )
 {
-	mcr3_state *state = screen->machine().driver_data<mcr3_state>();
+	mcr3_state *state = screen.machine().driver_data<mcr3_state>();
 	/* update the flip state */
 	tilemap_set_flip(state->m_bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
@@ -290,14 +290,14 @@ SCREEN_UPDATE( mcr3 )
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(screen->machine(), bitmap, cliprect, 0x03, 0, 0, 0);
+	mcr3_update_sprites(screen.machine(), bitmap, cliprect, 0x03, 0, 0, 0);
 	return 0;
 }
 
 
 SCREEN_UPDATE( spyhunt )
 {
-	mcr3_state *state = screen->machine().driver_data<mcr3_state>();
+	mcr3_state *state = screen.machine().driver_data<mcr3_state>();
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_spyhunt_scrollx * 2 + state->m_spyhunt_scroll_offset);
@@ -305,7 +305,7 @@ SCREEN_UPDATE( spyhunt )
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(screen->machine(), bitmap, cliprect, state->m_spyhunt_sprite_color_mask, 0, -12, 0);
+	mcr3_update_sprites(screen.machine(), bitmap, cliprect, state->m_spyhunt_sprite_color_mask, 0, -12, 0);
 
 	/* render any characters on top */
 	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);

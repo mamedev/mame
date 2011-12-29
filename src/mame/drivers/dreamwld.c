@@ -274,7 +274,7 @@ static VIDEO_START( dreamwld )
 
 SCREEN_EOF( dreamwld )
 {
-	dreamwld_state *state = machine.driver_data<dreamwld_state>();
+	dreamwld_state *state = screen.machine().driver_data<dreamwld_state>();
 	memcpy(state->m_spritebuf2, state->m_spritebuf1, 0x2000);
 	memcpy(state->m_spritebuf1, state->m_spriteram, 0x2000);
 }
@@ -282,7 +282,7 @@ SCREEN_EOF( dreamwld )
 
 static SCREEN_UPDATE( dreamwld )
 {
-	dreamwld_state *state = screen->machine().driver_data<dreamwld_state>();
+	dreamwld_state *state = screen.machine().driver_data<dreamwld_state>();
 //  int tm0size, tm1size;
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
@@ -378,7 +378,7 @@ static SCREEN_UPDATE( dreamwld )
 	tilemap_draw(bitmap, cliprect, tmptilemap0, 0, 0);
 	tilemap_draw(bitmap, cliprect, tmptilemap1, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }

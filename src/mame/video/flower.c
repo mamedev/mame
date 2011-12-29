@@ -165,7 +165,7 @@ VIDEO_START(flower)
 
 SCREEN_UPDATE( flower )
 {
-	flower_state *state = screen->machine().driver_data<flower_state>();
+	flower_state *state = screen.machine().driver_data<flower_state>();
 	rectangle myclip = *cliprect;
 
 	tilemap_set_scrolly(state->m_bg0_tilemap,0, state->m_bg0_scroll[0]+16);
@@ -174,9 +174,9 @@ SCREEN_UPDATE( flower )
 	tilemap_draw(bitmap,cliprect,state->m_bg0_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_bg1_tilemap,0,0);
 
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 
-	if(flip_screen_get(screen->machine()))
+	if(flip_screen_get(screen.machine()))
 	{
 		myclip.min_x = cliprect->min_x;
 		myclip.max_x = cliprect->min_x + 15;

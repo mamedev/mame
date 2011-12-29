@@ -29,7 +29,7 @@ VIDEO_START( poolshrk )
 
 SCREEN_UPDATE( poolshrk )
 {
-	poolshrk_state *state = screen->machine().driver_data<poolshrk_state>();
+	poolshrk_state *state = screen.machine().driver_data<poolshrk_state>();
 	int i;
 
 	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
@@ -43,7 +43,7 @@ SCREEN_UPDATE( poolshrk )
 		int hpos = state->m_hpos_ram[i];
 		int vpos = state->m_vpos_ram[i];
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], i, (i == 0) ? 0 : 1, 0, 0,
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], i, (i == 0) ? 0 : 1, 0, 0,
 			248 - hpos, vpos - 15, 0);
 	}
 

@@ -166,7 +166,7 @@ static MACHINE_RESET( beaminv )
 
 static SCREEN_UPDATE( beaminv )
 {
-	beaminv_state *state = screen->machine().driver_data<beaminv_state>();
+	beaminv_state *state = screen.machine().driver_data<beaminv_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->m_videoram_size; offs++)

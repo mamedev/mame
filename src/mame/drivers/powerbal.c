@@ -430,10 +430,10 @@ static VIDEO_START( powerbal )
 
 static SCREEN_UPDATE( powerbal )
 {
-	playmark_state *state = screen->machine().driver_data<playmark_state>();
+	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 

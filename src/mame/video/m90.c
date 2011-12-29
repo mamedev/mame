@@ -299,7 +299,7 @@ WRITE16_HANDLER( m90_video_w )
 
 SCREEN_UPDATE( m90 )
 {
-	m90_state *state = screen->machine().driver_data<m90_state>();
+	m90_state *state = screen.machine().driver_data<m90_state>();
 	UINT8 pf1_base = state->m_video_control_data[5] & 0x3;
 	UINT8 pf2_base = state->m_video_control_data[6] & 0x3;
 	int i,pf1_enable,pf2_enable, video_enable;
@@ -363,7 +363,7 @@ SCREEN_UPDATE( m90 )
 		tilemap_set_scrollx( state->m_pf2_wide_layer,0, state->m_video_control_data[3]+256-2 );
 	}
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
 	if (video_enable)
 	{
@@ -454,10 +454,10 @@ SCREEN_UPDATE( m90 )
 			}
 		}
 
-		draw_sprites(screen->machine(),bitmap,cliprect);
+		draw_sprites(screen.machine(),bitmap,cliprect);
 
 	} else {
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 	}
 
 	return 0;
@@ -465,10 +465,10 @@ SCREEN_UPDATE( m90 )
 
 SCREEN_UPDATE( bomblord )
 {
-	m90_state *state = screen->machine().driver_data<m90_state>();
+	m90_state *state = screen.machine().driver_data<m90_state>();
 	int i;
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	/* Setup scrolling */
 	if (state->m_video_control_data[6]&0x20) {
@@ -511,16 +511,16 @@ SCREEN_UPDATE( bomblord )
 		tilemap_draw(bitmap,cliprect,state->m_pf1_layer,1,1);
 	}
 
-	bomblord_draw_sprites(screen->machine(),bitmap,cliprect);
+	bomblord_draw_sprites(screen.machine(),bitmap,cliprect);
 
 	return 0;
 }
 
 SCREEN_UPDATE( dynablsb )
 {
-	m90_state *state = screen->machine().driver_data<m90_state>();
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	m90_state *state = screen.machine().driver_data<m90_state>();
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	if (!(state->m_video_data[0xf008/2] & 0x4000)) {
 		tilemap_mark_all_tiles_dirty(state->m_pf1_wide_layer);
@@ -554,7 +554,7 @@ SCREEN_UPDATE( dynablsb )
 		tilemap_draw(bitmap,cliprect,state->m_pf2_layer,1,1);
 	}
 
-	dynablsb_draw_sprites(screen->machine(),bitmap,cliprect);
+	dynablsb_draw_sprites(screen.machine(),bitmap,cliprect);
 
 	return 0;
 }

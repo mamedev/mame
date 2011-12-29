@@ -182,14 +182,14 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( othldrby )
 {
-	othldrby_state *state = screen->machine().driver_data<othldrby_state>();
+	othldrby_state *state = screen.machine().driver_data<othldrby_state>();
 	int layer;
 
-	flip_screen_set(screen->machine(), state->m_vreg[0x0f] & 0x80);
+	flip_screen_set(screen.machine(), state->m_vreg[0x0f] & 0x80);
 
 	for (layer = 0; layer < 3; layer++)
 	{
-		if (flip_screen_get(screen->machine()))
+		if (flip_screen_get(screen.machine()))
 		{
 			tilemap_set_scrollx(state->m_bg_tilemap[layer], 0, state->m_vreg[2 * layer] + 59);
 			tilemap_set_scrolly(state->m_bg_tilemap[layer], 0, state->m_vreg[2 * layer + 1] + 248);
@@ -201,32 +201,32 @@ SCREEN_UPDATE( othldrby )
 		}
 	}
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 1, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 2, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 2);
+	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 3, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 3);
+	draw_sprites(screen.machine(), bitmap, cliprect, 3);
 
 	return 0;
 }
 
 SCREEN_EOF( othldrby )
 {
-	othldrby_state *state = machine.driver_data<othldrby_state>();
+	othldrby_state *state = screen.machine().driver_data<othldrby_state>();
 
 	/* sprites need to be delayed two frames */
 	memcpy(state->m_buf_spriteram, state->m_buf_spriteram2, SPRITERAM_SIZE * sizeof(state->m_buf_spriteram[0]));

@@ -75,9 +75,9 @@ static void draw_roadway( running_machine &machine, bitmap_t *bitmap )
 
 SCREEN_UPDATE( nitedrvr )
 {
-	nitedrvr_state *state = screen->machine().driver_data<nitedrvr_state>();
+	nitedrvr_state *state = screen.machine().driver_data<nitedrvr_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_roadway(screen->machine(), bitmap);
+	draw_roadway(screen.machine(), bitmap);
 	return 0;
 }

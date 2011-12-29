@@ -46,7 +46,7 @@ public:
 
 static SCREEN_UPDATE( cardline )
 {
-	cardline_state *state = screen->machine().driver_data<cardline_state>();
+	cardline_state *state = screen.machine().driver_data<cardline_state>();
 	int x,y;
 	bitmap_fill(bitmap,cliprect,0);
 	for(y=0;y<32;y++)
@@ -56,14 +56,14 @@ static SCREEN_UPDATE( cardline )
 			int index=y*64+x;
 			if(state->m_video&1)
 			{
-				DRAW_TILE(screen->machine(),0,0);
-				DRAW_TILE(screen->machine(),0x800,1);
+				DRAW_TILE(screen.machine(),0,0);
+				DRAW_TILE(screen.machine(),0x800,1);
 			}
 
 			if(state->m_video&2)
 			{
-				DRAW_TILE(screen->machine(),0x1000,0);
-				DRAW_TILE(screen->machine(),0x1800,1);
+				DRAW_TILE(screen.machine(),0x1000,0);
+				DRAW_TILE(screen.machine(),0x1800,1);
 			}
 		}
 	}

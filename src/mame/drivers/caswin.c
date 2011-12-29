@@ -81,7 +81,7 @@ static VIDEO_START(vvillage)
 
 static SCREEN_UPDATE(vvillage)
 {
-	caswin_state *state = screen->machine().driver_data<caswin_state>();
+	caswin_state *state = screen.machine().driver_data<caswin_state>();
 	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
 	return 0;
 }

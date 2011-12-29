@@ -95,7 +95,7 @@ static VIDEO_START( good )
 
 static SCREEN_UPDATE( good )
 {
-	good_state *state = screen->machine().driver_data<good_state>();
+	good_state *state = screen.machine().driver_data<good_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;

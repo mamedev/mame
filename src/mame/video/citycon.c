@@ -142,7 +142,7 @@ INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, int color, i
 
 SCREEN_UPDATE( citycon )
 {
-	citycon_state *state = screen->machine().driver_data<citycon_state>();
+	citycon_state *state = screen.machine().driver_data<citycon_state>();
 	int offs, scroll;
 
 	/* Update the virtual palette to support text color code changing on every scanline. */
@@ -152,7 +152,7 @@ SCREEN_UPDATE( citycon )
 		int i;
 
 		for (i = 0; i < 4; i++)
-			changecolor_RRRRGGGGBBBBxxxx(screen->machine(), 640 + 4 * offs + i, 512 + 4 * indx + i);
+			changecolor_RRRRGGGGBBBBxxxx(screen.machine(), 640 + 4 * offs + i, 512 + 4 * indx + i);
 	}
 
 
@@ -163,6 +163,6 @@ SCREEN_UPDATE( citycon )
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

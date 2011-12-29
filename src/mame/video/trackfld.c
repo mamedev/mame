@@ -250,18 +250,18 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( trackfld )
 {
-	trackfld_state *state = screen->machine().driver_data<trackfld_state>();
+	trackfld_state *state = screen.machine().driver_data<trackfld_state>();
 	int row, scrollx;
 
 	for (row = 0; row < 32; row++)
 	{
 		scrollx = state->m_scroll[row] + 256 * (state->m_scroll2[row] & 0x01);
-		if (flip_screen_get(screen->machine())) scrollx = -scrollx;
+		if (flip_screen_get(screen.machine())) scrollx = -scrollx;
 		tilemap_set_scrollx(state->m_bg_tilemap, row, scrollx);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 

@@ -130,15 +130,15 @@ static void draw_main(running_machine &machine, bitmap_t *bitmap, const rectangl
 
 static SCREEN_UPDATE( blackt96 )
 {
-	blackt96_state *state = screen->machine().driver_data<blackt96_state>();
+	blackt96_state *state = screen.machine().driver_data<blackt96_state>();
 	int count;
 	int x,y;
-	const gfx_element *gfx = screen->machine().gfx[2];
+	const gfx_element *gfx = screen.machine().gfx[2];
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
-	draw_main(screen->machine(),bitmap,cliprect,1);
-	draw_main(screen->machine(),bitmap,cliprect,0);
+	draw_main(screen.machine(),bitmap,cliprect,1);
+	draw_main(screen.machine(),bitmap,cliprect,0);
 
 	/* Text Layer */
 	count = 0;

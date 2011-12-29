@@ -129,19 +129,19 @@ VIDEO_START(darkmist)
 
 SCREEN_UPDATE( darkmist)
 {
-	darkmist_state *state = screen->machine().driver_data<darkmist_state>();
+	darkmist_state *state = screen.machine().driver_data<darkmist_state>();
 	UINT8 *spriteram = state->m_spriteram;
 
 #define DM_GETSCROLL(n) (((state->m_scroll[(n)]<<1)&0xff) + ((state->m_scroll[(n)]&0x80)?1:0) +( ((state->m_scroll[(n)-1]<<4) | (state->m_scroll[(n)-1]<<12) )&0xff00))
 
-	set_pens(screen->machine());
+	set_pens(screen.machine());
 
 	tilemap_set_scrollx(state->m_bgtilemap, 0, DM_GETSCROLL(0x2));
 	tilemap_set_scrolly(state->m_bgtilemap, 0, DM_GETSCROLL(0x6));
 	tilemap_set_scrollx(state->m_fgtilemap, 0, DM_GETSCROLL(0xa));
 	tilemap_set_scrolly(state->m_fgtilemap, 0, DM_GETSCROLL(0xe));
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	if(state->m_hw & DISPLAY_BG)
 		tilemap_draw(bitmap,cliprect,state->m_bgtilemap, 0,0);
@@ -176,13 +176,13 @@ SCREEN_UPDATE( darkmist)
 			palette=((spriteram[i+1])>>1)&0xf;
 
 			if(spriteram[i+1]&0x1)
-				palette=screen->machine().rand()&15;
+				palette=screen.machine().rand()&15;
 
 			palette+=32;
 
 			drawgfx_transpen(
 				bitmap,cliprect,
-				screen->machine().gfx[2],
+				screen.machine().gfx[2],
 				tile,
 				palette,
 				fx,fy,

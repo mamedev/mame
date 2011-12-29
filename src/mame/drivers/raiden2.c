@@ -888,34 +888,34 @@ static VIDEO_START( raiden2 )
 
 static SCREEN_UPDATE( raiden2 )
 {
-	raiden2_state *state = screen->machine().driver_data<raiden2_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	raiden2_state *state = screen.machine().driver_data<raiden2_state>();
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
-	//if (!screen->machine().input().code_pressed(KEYCODE_Q))
+	//if (!screen.machine().input().code_pressed(KEYCODE_Q))
 	{
 		if (!(state->raiden2_tilemap_enable & 1))
 			tilemap_draw(bitmap, cliprect, state->background_layer, 0, 0);
 	}
 
-	//if (!screen->machine().input().code_pressed(KEYCODE_W))
+	//if (!screen.machine().input().code_pressed(KEYCODE_W))
 	{
 		if (!(state->raiden2_tilemap_enable & 2))
 			tilemap_draw(bitmap, cliprect, state->midground_layer, 0, 0);
 	}
 
-	//if (!screen->machine().input().code_pressed(KEYCODE_E))
+	//if (!screen.machine().input().code_pressed(KEYCODE_E))
 	{
 		if (!(state->raiden2_tilemap_enable & 4))
 			tilemap_draw(bitmap, cliprect, state->foreground_layer, 0, 0);
 	}
 
-	//if (!screen->machine().input().code_pressed(KEYCODE_S))
+	//if (!screen.machine().input().code_pressed(KEYCODE_S))
 	{
 		//if (!(raiden2_tilemap_enable & 0x10))
-			state->draw_sprites(screen->machine(), bitmap, cliprect, 0);
+			state->draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	}
 
-	//if (!screen->machine().input().code_pressed(KEYCODE_A))
+	//if (!screen.machine().input().code_pressed(KEYCODE_A))
 	{
 		if (!(state->raiden2_tilemap_enable & 8))
 			tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0);

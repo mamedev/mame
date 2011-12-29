@@ -261,11 +261,11 @@ static void voodoo_vblank_0(device_t *device, int param)
 
 static SCREEN_UPDATE( nwktr )
 {
-	nwktr_state *state = screen->machine().driver_data<nwktr_state>();
-	device_t *voodoo = screen->machine().device("voodoo");
-	device_t *k001604 = screen->machine().device("k001604");
+	nwktr_state *state = screen.machine().driver_data<nwktr_state>();
+	device_t *voodoo = screen.machine().device("voodoo");
+	device_t *k001604 = screen.machine().device("k001604");
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 
 	voodoo_update(voodoo, bitmap, cliprect);
 

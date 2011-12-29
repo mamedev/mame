@@ -134,8 +134,8 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 
 SCREEN_UPDATE( gridlee )
 {
-	gridlee_state *state = screen->machine().driver_data<gridlee_state>();
-	const pen_t *pens = &screen->machine().pens[state->m_palettebank_vis * 32];
+	gridlee_state *state = screen.machine().driver_data<gridlee_state>();
+	const pen_t *pens = &screen.machine().pens[state->m_palettebank_vis * 32];
 	UINT8 *gfx;
 	int x, y, i;
 
@@ -160,7 +160,7 @@ SCREEN_UPDATE( gridlee )
 	}
 
 	/* draw the sprite images */
-	gfx = screen->machine().region("gfx1")->base();
+	gfx = screen.machine().region("gfx1")->base();
 	for (i = 0; i < 32; i++)
 	{
 		UINT8 *sprite = state->m_spriteram + i * 4;

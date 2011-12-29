@@ -160,26 +160,26 @@ static TIMER_CALLBACK( sprint8_collision_callback )
 
 SCREEN_UPDATE( sprint8 )
 {
-	sprint8_state *state = screen->machine().driver_data<sprint8_state>();
-	set_pens(state, screen->machine().colortable);
+	sprint8_state *state = screen.machine().driver_data<sprint8_state>();
+	set_pens(state, screen.machine().colortable);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap1, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 
 SCREEN_EOF( sprint8 )
 {
-	sprint8_state *state = machine.driver_data<sprint8_state>();
+	sprint8_state *state = screen.machine().driver_data<sprint8_state>();
 	int x;
 	int y;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
 	tilemap_draw(state->m_helper2, &visarea, state->m_tilemap2, 0, 0);
 
 	bitmap_fill(state->m_helper1, &visarea, 0x20);
 
-	draw_sprites(machine, state->m_helper1, &visarea);
+	draw_sprites(screen.machine(), state->m_helper1, &visarea);
 
 	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{
@@ -188,8 +188,8 @@ SCREEN_EOF( sprint8 )
 
 		for (x = visarea.min_x; x <= visarea.max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)
-				machine.scheduler().timer_set(machine.primary_screen->time_until_pos(y + 24, x),
+				screen.machine().scheduler().timer_set(screen.machine().primary_screen->time_until_pos(y + 24, x),
 						FUNC(sprint8_collision_callback),
-						colortable_entry_get_value(machine.colortable, p1[x]));
+						colortable_entry_get_value(screen.machine().colortable, p1[x]));
 	}
 }

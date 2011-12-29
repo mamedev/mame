@@ -480,20 +480,20 @@ VIDEO_START( seta2_yoffset )
 
 SCREEN_UPDATE( seta2 )
 {
-	seta2_state *state = screen->machine().driver_data<seta2_state>();
+	seta2_state *state = screen.machine().driver_data<seta2_state>();
 
 	// Black or pen 0?
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 
 	if ( (state->m_vregs[0x30/2] & 1) == 0 )	// 1 = BLANK SCREEN
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }
 
 SCREEN_EOF( seta2 )
 {
-	seta2_state *state = machine.driver_data<seta2_state>();
+	seta2_state *state = screen.machine().driver_data<seta2_state>();
 
 	// Buffer sprites by 1 frame
 	memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);

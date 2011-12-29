@@ -149,7 +149,7 @@ static VIDEO_START( wallc )
 
 static SCREEN_UPDATE( wallc )
 {
-	wallc_state *state = screen->machine().driver_data<wallc_state>();
+	wallc_state *state = screen.machine().driver_data<wallc_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

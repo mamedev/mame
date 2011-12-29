@@ -640,7 +640,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( namcona1 )
 {
-	namcona1_state *state = screen->machine().driver_data<namcona1_state>();
+	namcona1_state *state = screen.machine().driver_data<namcona1_state>();
 	int which;
 	int priority;
 
@@ -653,11 +653,11 @@ SCREEN_UPDATE( namcona1 )
 			/* palette updates are delayed when graphics are disabled */
 			for( which=0; which<0x1000; which++ )
 			{
-				UpdatePalette(screen->machine(), which );
+				UpdatePalette(screen.machine(), which );
 			}
 			state->m_palette_is_dirty = 0;
 		}
-		UpdateGfx(screen->machine());
+		UpdateGfx(screen.machine());
 		for( which=0; which<NAMCONA1_NUM_TILEMAPS; which++ )
 		{
 			int tilemap_color = state->m_vreg[0xb0/2+(which&3)]&0xf;
@@ -677,7 +677,7 @@ SCREEN_UPDATE( namcona1 )
 			}
 		}
 
-		bitmap_fill( screen->machine().priority_bitmap,cliprect ,0);
+		bitmap_fill( screen.machine().priority_bitmap,cliprect ,0);
 
 		bitmap_fill( bitmap, cliprect , 0xff); /* background color? */
 
@@ -696,12 +696,12 @@ SCREEN_UPDATE( namcona1 )
 				}
 				if( pri == priority )
 				{
-					draw_background(screen->machine(),bitmap,cliprect,which,priority);
+					draw_background(screen.machine(),bitmap,cliprect,which,priority);
 				}
 			} /* next tilemap */
 		} /* next priority level */
 
-		draw_sprites(screen->machine(),bitmap,cliprect);
+		draw_sprites(screen.machine(),bitmap,cliprect);
 	} /* gfx enabled */
 	return 0;
 }

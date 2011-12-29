@@ -46,14 +46,14 @@ SCREEN_UPDATE( tnzs )
 {
 	bitmap_fill(bitmap, cliprect, 0x1f0);
 
-	screen->machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
-	screen->machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
+	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
 
-	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(), bitmap, cliprect, 0x800, 0 );
+	screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(), bitmap, cliprect, 0x800, 0 );
 	return 0;
 }
 
 SCREEN_EOF( tnzs )
 {
-	machine.device<seta001_device>("spritegen")->tnzs_eof();
+	screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
 }

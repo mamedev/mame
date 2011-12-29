@@ -329,7 +329,7 @@ static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_t *
 
 static SCREEN_UPDATE( jedi )
 {
-	jedi_state *state = screen->machine().driver_data<jedi_state>();
+	jedi_state *state = screen.machine().driver_data<jedi_state>();
 
 	/* if no video, clear it all to black */
 	if (*state->m_video_off & 0x01)
@@ -338,8 +338,8 @@ static SCREEN_UPDATE( jedi )
 	{
 		/* draw the background/text layers, followed by the sprites
            - it needs to be done in this order*/
-		draw_background_and_text(screen->machine(), state, bitmap, cliprect);
-		draw_sprites(screen->machine(), state, bitmap, cliprect);
+		draw_background_and_text(screen.machine(), state, bitmap, cliprect);
+		draw_sprites(screen.machine(), state, bitmap, cliprect);
 		do_pen_lookup(state, bitmap, cliprect);
 	}
 

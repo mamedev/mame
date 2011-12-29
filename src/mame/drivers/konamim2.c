@@ -235,7 +235,7 @@ static VIDEO_START( m2 )
 
 static SCREEN_UPDATE( m2 )
 {
-	konamim2_state *state = screen->machine().driver_data<konamim2_state>();
+	konamim2_state *state = screen.machine().driver_data<konamim2_state>();
 	int i, j;
 
 	UINT32 fb_start = 0xffffffff;

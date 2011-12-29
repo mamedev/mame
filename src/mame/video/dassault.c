@@ -175,19 +175,19 @@ static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( dassault )
 {
-	dassault_state *state = screen->machine().driver_data<dassault_state>();
+	dassault_state *state = screen.machine().driver_data<dassault_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
 	/* Update tilemaps */
-	flip_screen_set(screen->machine(), BIT(flip, 7));
+	flip_screen_set(screen.machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, 0, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, 0, state->m_pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
 	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[3072]);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[3072]);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */
@@ -212,7 +212,7 @@ SCREEN_UPDATE( dassault )
 	}
 
 	/* Draw sprites - two sprite generators, with selectable priority */
-	draw_sprites(screen->machine(), bitmap, cliprect, priority);
+	draw_sprites(screen.machine(), bitmap, cliprect, priority);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

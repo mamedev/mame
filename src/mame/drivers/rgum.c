@@ -37,9 +37,9 @@ static VIDEO_START(royalgum)
 
 static SCREEN_UPDATE(royalgum)
 {
-	rgum_state *state = screen->machine().driver_data<rgum_state>();
+	rgum_state *state = screen.machine().driver_data<rgum_state>();
 	int x,y,count;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 
 	count = 0;
 

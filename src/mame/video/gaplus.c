@@ -309,18 +309,18 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( gaplus )
 {
-	gaplus_state *state = screen->machine().driver_data<gaplus_state>();
+	gaplus_state *state = screen.machine().driver_data<gaplus_state>();
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(screen->machine(), state->m_spriteram[0x1f7f-0x800] & 1);
+	flip_screen_set(screen.machine(), state->m_spriteram[0x1f7f-0x800] & 1);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	starfield_render(screen->machine(), bitmap);
+	starfield_render(screen.machine(), bitmap);
 
 	/* draw the low priority characters */
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */
@@ -331,12 +331,12 @@ SCREEN_UPDATE( gaplus )
 
 SCREEN_EOF( gaplus )	/* update starfields */
 {
-	gaplus_state *state = machine.driver_data<gaplus_state>();
+	gaplus_state *state = screen.machine().driver_data<gaplus_state>();
 	struct star *stars = state->m_stars;
 	int i;
 
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = screen.machine().primary_screen->width();
+	int height = screen.machine().primary_screen->height();
 
 	/* check if we're running */
 	if ( ( state->m_starfield_control[0] & 1 ) == 0 )

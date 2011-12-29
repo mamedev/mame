@@ -88,7 +88,7 @@ WRITE8_HANDLER( wiping_flipscreen_w )
 
 SCREEN_UPDATE( wiping )
 {
-	wiping_state *state = screen->machine().driver_data<wiping_state>();
+	wiping_state *state = screen.machine().driver_data<wiping_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
@@ -121,7 +121,7 @@ SCREEN_UPDATE( wiping )
 			sy = 27 - sy;
 		}
 
-		drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
+		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
 				state->m_videoram[offs],
 				state->m_colorram[offs] & 0x3f,
 				state->m_flipscreen,state->m_flipscreen,
@@ -149,12 +149,12 @@ SCREEN_UPDATE( wiping )
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap,cliprect,screen->machine().gfx[1],
+		drawgfx_transmask(bitmap,cliprect,screen.machine().gfx[1],
 			(spriteram[offs] & 0x3f) + 64 * otherbank,
 			color,
 			flipx,flipy,
 			sx,sy,
-			colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color, 0x1f));
+			colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color, 0x1f));
 	}
 
 	/* redraw high priority chars */
@@ -189,7 +189,7 @@ SCREEN_UPDATE( wiping )
 				sy = 27 - sy;
 			}
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
 					state->m_videoram[offs],
 					state->m_colorram[offs] & 0x3f,
 					state->m_flipscreen,state->m_flipscreen,

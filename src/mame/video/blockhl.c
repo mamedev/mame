@@ -57,9 +57,9 @@ VIDEO_START( blockhl )
 
 SCREEN_UPDATE( blockhl )
 {
-	blockhl_state *state = screen->machine().driver_data<blockhl_state>();
+	blockhl_state *state = screen.machine().driver_data<blockhl_state>();
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	k052109_tilemap_update(state->m_k052109);
 

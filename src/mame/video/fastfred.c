@@ -309,10 +309,10 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( fastfred )
 {
-	fastfred_state *state = screen->machine().driver_data<fastfred_state>();
+	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
 	bitmap_fill(bitmap, cliprect, *state->m_background_color);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -379,11 +379,11 @@ VIDEO_START( imago )
 
 SCREEN_UPDATE( imago )
 {
-	fastfred_state *state = screen->machine().driver_data<fastfred_state>();
+	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
 	tilemap_draw(bitmap,cliprect,state->m_web_tilemap,0,0);
-	galaxold_draw_stars(screen->machine(), bitmap, cliprect);
+	galaxold_draw_stars(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 
 	return 0;

@@ -189,7 +189,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( perfrman )
 {
-	slapfght_state *state = screen->machine().driver_data<slapfght_state>();
+	slapfght_state *state = screen.machine().driver_data<slapfght_state>();
 	tilemap_set_flip( state->m_pf1_tilemap, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	tilemap_set_scrolly( state->m_pf1_tilemap ,0 , 0 );
 	if (state->m_flipscreen) {
@@ -200,22 +200,22 @@ SCREEN_UPDATE( perfrman )
 	}
 
 	tilemap_draw(bitmap,cliprect,state->m_pf1_tilemap,TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(screen->machine(), bitmap,cliprect,0);
+	draw_sprites(screen.machine(), bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,state->m_pf1_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect,0x80);
+	draw_sprites(screen.machine(), bitmap,cliprect,0x80);
 
-	slapfght_log_vram(screen->machine());
+	slapfght_log_vram(screen.machine());
 	return 0;
 }
 
 
 SCREEN_UPDATE( slapfight )
 {
-	slapfght_state *state = screen->machine().driver_data<slapfght_state>();
-	UINT8 *buffered_spriteram = screen->machine().generic.buffered_spriteram.u8;
+	slapfght_state *state = screen.machine().driver_data<slapfght_state>();
+	UINT8 *buffered_spriteram = screen.machine().generic.buffered_spriteram.u8;
 	int offs;
 
-	tilemap_set_flip_all(screen->machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (state->m_flipscreen) {
 		tilemap_set_scrollx( state->m_fix_tilemap,0,296);
 		tilemap_set_scrollx( state->m_pf1_tilemap,0,(*state->m_slapfight_scrollx_lo + 256 * *state->m_slapfight_scrollx_hi)+296 );
@@ -232,16 +232,16 @@ SCREEN_UPDATE( slapfight )
 	tilemap_draw(bitmap,cliprect,state->m_pf1_tilemap,0,0);
 
 	/* Draw the sprites */
-	for (offs = 0;offs < screen->machine().generic.spriteram_size;offs += 4)
+	for (offs = 0;offs < screen.machine().generic.spriteram_size;offs += 4)
 	{
 		if (state->m_flipscreen)
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[2],
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				1,1,
 				288-(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) +18,240-buffered_spriteram[offs+3],0);
 		else
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[2],
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				0,0,
@@ -250,6 +250,6 @@ SCREEN_UPDATE( slapfight )
 
 	tilemap_draw(bitmap,cliprect,state->m_fix_tilemap,0,0);
 
-	slapfght_log_vram(screen->machine());
+	slapfght_log_vram(screen.machine());
 	return 0;
 }

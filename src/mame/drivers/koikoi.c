@@ -134,7 +134,7 @@ static VIDEO_START(koikoi)
 
 static SCREEN_UPDATE(koikoi)
 {
-	koikoi_state *state = screen->machine().driver_data<koikoi_state>();
+	koikoi_state *state = screen.machine().driver_data<koikoi_state>();
 	tilemap_draw(bitmap, cliprect, state->m_tmap, 0, 0);
 	return 0;
 }

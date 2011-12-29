@@ -542,15 +542,15 @@ static void nmk16_draw_sprites_flipsupported(running_machine &machine, bitmap_t 
 
 SCREEN_UPDATE( macross )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrollx(state->m_tx_tilemap,0,-state->m_videoshift);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
@@ -558,17 +558,17 @@ SCREEN_UPDATE( macross )
 
 SCREEN_UPDATE( tdragon )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
-//  mcu_run(screen->machine(), 1);
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
+//  mcu_run(screen.machine(), 1);
 
 	tilemap_set_scrollx(state->m_tx_tilemap,0,-state->m_videoshift);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
@@ -576,17 +576,17 @@ SCREEN_UPDATE( tdragon )
 
 SCREEN_UPDATE( hachamf )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
-//  mcu_run(screen->machine(), 0);
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
+//  mcu_run(screen.machine(), 0);
 
 	tilemap_set_scrollx(state->m_tx_tilemap,0,-state->m_videoshift);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
@@ -594,15 +594,15 @@ SCREEN_UPDATE( hachamf )
 
 SCREEN_UPDATE( manybloc )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrollx(state->m_tx_tilemap,0,-state->m_videoshift);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
@@ -610,7 +610,7 @@ SCREEN_UPDATE( manybloc )
 
 SCREEN_UPDATE( tharrier )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	/* I think the protection device probably copies this to the regs... */
 	UINT16 tharrier_scroll = state->m_mainram[0x9f00/2];
 
@@ -618,10 +618,10 @@ SCREEN_UPDATE( tharrier )
 	tilemap_set_scrollx(state->m_bg_tilemap0,0,tharrier_scroll);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
@@ -629,7 +629,7 @@ SCREEN_UPDATE( tharrier )
 
 SCREEN_UPDATE( gunnail )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	int y1;
 	int i=16;
 	rectangle bgclip = *cliprect;
@@ -696,10 +696,10 @@ SCREEN_UPDATE( gunnail )
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	}
 
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
 
 	tilemap_set_scrollx(state->m_tx_tilemap,0,-state->m_videoshift);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
@@ -708,8 +708,8 @@ SCREEN_UPDATE( gunnail )
 
 SCREEN_UPDATE( bioship )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
-	UINT16 *tilerom = (UINT16 *)screen->machine().region("gfx5")->base();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
+	UINT16 *tilerom = (UINT16 *)screen.machine().region("gfx5")->base();
 	int scrollx=-(state->m_bioship_scroll[1] + state->m_bioship_scroll[0]*256);
 	int scrolly=-(state->m_bioship_scroll[3] + state->m_bioship_scroll[2]*256);
 
@@ -727,7 +727,7 @@ SCREEN_UPDATE( bioship )
 				int numtile = data&0xfff;
 				int color = (data&0xf000)>>12;
 
-				drawgfx_opaque(state->m_background_bitmap,0,screen->machine().gfx[3],
+				drawgfx_opaque(state->m_background_bitmap,0,screen.machine().gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */
@@ -736,7 +736,7 @@ SCREEN_UPDATE( bioship )
 				data = tilerom[offs+0x1000+bank];
 				numtile = data&0xfff;
 				color = (data&0xf000)>>12;
-				drawgfx_opaque(state->m_background_bitmap,0,screen->machine().gfx[3],
+				drawgfx_opaque(state->m_background_bitmap,0,screen.machine().gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */
@@ -750,10 +750,10 @@ SCREEN_UPDATE( bioship )
 	copyscrollbitmap(bitmap,state->m_background_bitmap,1,&scrollx,1,&scrolly,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
@@ -761,16 +761,16 @@ SCREEN_UPDATE( bioship )
 
 SCREEN_UPDATE( strahl )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrollx(state->m_tx_tilemap,0,-state->m_videoshift);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
@@ -778,22 +778,22 @@ SCREEN_UPDATE( strahl )
 
 SCREEN_UPDATE( bjtwin )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap0,0,-state->m_videoshift);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
 
 	return 0;
 }
 
 SCREEN_EOF( nmk )
 {
-	nmk16_state *state = machine.driver_data<nmk16_state>();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	/* sprites are DMA'd from Main RAM to a private buffer automatically
        (or at least this is how I interpret the datasheet) */
 
@@ -806,7 +806,7 @@ SCREEN_EOF( nmk )
 
 SCREEN_EOF( strahl )
 {
-	nmk16_state *state = machine.driver_data<nmk16_state>();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	/* sprites are DMA'd from Main RAM to a private buffer automatically
        (or at least this is how I interpret the datasheet) */
 
@@ -949,23 +949,23 @@ static void redhawki_video_update(running_machine &machine, bitmap_t *bitmap, co
 	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,0);
 }
 
-SCREEN_UPDATE( afega )		{	video_update(screen->machine(),bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
-SCREEN_UPDATE( bubl2000 )	{	video_update(screen->machine(),bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
-SCREEN_UPDATE( redhawkb )	{	video_update(screen->machine(),bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
-SCREEN_UPDATE( redhawki )	{	redhawki_video_update(screen->machine(),bitmap,cliprect); return 0;} // strange scroll regs
+SCREEN_UPDATE( afega )		{	video_update(screen.machine(),bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
+SCREEN_UPDATE( bubl2000 )	{	video_update(screen.machine(),bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
+SCREEN_UPDATE( redhawkb )	{	video_update(screen.machine(),bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
+SCREEN_UPDATE( redhawki )	{	redhawki_video_update(screen.machine(),bitmap,cliprect); return 0;} // strange scroll regs
 
 SCREEN_UPDATE( firehawk )
 {
-	nmk16_state *state = screen->machine().driver_data<nmk16_state>();
+	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrolly(state->m_bg_tilemap0, 0, state->m_afega_scroll_1[1] + 0x100);
 	tilemap_set_scrollx(state->m_bg_tilemap0, 0, state->m_afega_scroll_1[0]);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(screen->machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,3);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,2);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,1);
+	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;

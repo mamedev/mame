@@ -46,7 +46,7 @@ static VIDEO_START( timetrv )
 
 static SCREEN_UPDATE( timetrv )
 {
-	timetrv_state *state = screen->machine().driver_data<timetrv_state>();
+	timetrv_state *state = screen.machine().driver_data<timetrv_state>();
 	popmessage("%s%s",state->m_led_vram_lo,state->m_led_vram_hi);
 	return 0;
 }

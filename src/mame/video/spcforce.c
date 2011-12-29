@@ -18,9 +18,9 @@ WRITE8_HANDLER( spcforce_flip_screen_w )
 
 SCREEN_UPDATE( spcforce )
 {
-	spcforce_state *state = screen->machine().driver_data<spcforce_state>();
+	spcforce_state *state = screen.machine().driver_data<spcforce_state>();
 	int offs;
-	int flip = flip_screen_get(screen->machine());
+	int flip = flip_screen_get(screen.machine());
 
 	/* draw the characters as sprites because they could be overlapping */
 	bitmap_fill(bitmap,cliprect,0);
@@ -40,7 +40,7 @@ SCREEN_UPDATE( spcforce )
 			sy = 248 - sy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
 				code, col,
 				flip, flip,
 				sx, sy,0);

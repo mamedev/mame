@@ -75,11 +75,11 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE(funybubl)
 {
-	funybubl_state *state = screen->machine().driver_data<funybubl_state>();
+	funybubl_state *state = screen.machine().driver_data<funybubl_state>();
 	int x, y, offs;
 	offs = 0;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */
 	for (y = 0; y < 32; y++)
@@ -89,15 +89,15 @@ SCREEN_UPDATE(funybubl)
 			int data;
 
 			data = state->m_banked_vram[offs] | (state->m_banked_vram[offs + 1] << 8);
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], data & 0x7fff, (data & 0x8000) ? 2 : 1, 0, 0, x*8, y*8, 0);
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], data & 0x7fff, (data & 0x8000) ? 2 : 1, 0, 0, x*8, y*8, 0);
 			offs += 2;
 		}
 	}
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 #if 0
-	if ( screen->machine().input().code_pressed_once(KEYCODE_W) )
+	if ( screen.machine().input().code_pressed_once(KEYCODE_W) )
 	{
 		FILE *fp;
 

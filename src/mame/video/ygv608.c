@@ -744,13 +744,13 @@ SCREEN_UPDATE( ygv608 )
     double r, alpha, sin_theta, cos_theta;
 #endif
 	rectangle finalclip;
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 
 	// clip to the current bitmap
 	finalclip.min_x = 0;
-	finalclip.max_x = screen->width() - 1;
+	finalclip.max_x = screen.width() - 1;
 	finalclip.min_y = 0;
-	finalclip.max_y = screen->height() - 1;
+	finalclip.max_y = screen.height() - 1;
 	sect_rect(&finalclip, cliprect);
 	cliprect = &finalclip;
 
@@ -766,12 +766,12 @@ SCREEN_UPDATE( ygv608 )
 #ifdef _ENABLE_SCREEN_RESIZE
 		// hdw should be scaled by 16, not 8
 		// - is it something to do with double dot-clocks???
-		screen->set_visible_area(0, ((int)(ygv608.regs.s.hdw)<<3/*4*/)-1,
+		screen.set_visible_area(0, ((int)(ygv608.regs.s.hdw)<<3/*4*/)-1,
 						  0, ((int)(ygv608.regs.s.vdw)<<3)-1 );
 #endif
 
-		auto_free( screen->machine(), work_bitmap );
-		work_bitmap = screen->alloc_compatible_bitmap();
+		auto_free( screen.machine(), work_bitmap );
+		work_bitmap = screen.alloc_compatible_bitmap();
 
 		// reset resize flag
 		ygv608.screen_resize = 0;
@@ -902,7 +902,7 @@ SCREEN_UPDATE( ygv608 )
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_ASBDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_ASEBDX )
-		draw_sprites(screen->machine(), bitmap,cliprect );
+		draw_sprites(screen.machine(), bitmap,cliprect );
 
 	tilemap_draw( work_bitmap,cliprect, tilemap_A, 0, 0 );
 
@@ -919,7 +919,7 @@ SCREEN_UPDATE( ygv608 )
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_SABDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_SEABDX)
-		draw_sprites(screen->machine(), bitmap,cliprect );
+		draw_sprites(screen.machine(), bitmap,cliprect );
 
 
 #ifdef _SHOW_VIDEO_DEBUG

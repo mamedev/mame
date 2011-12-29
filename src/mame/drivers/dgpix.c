@@ -287,7 +287,7 @@ static VIDEO_START( dgpix )
 
 static SCREEN_UPDATE( dgpix )
 {
-	dgpix_state *state = screen->machine().driver_data<dgpix_state>();
+	dgpix_state *state = screen.machine().driver_data<dgpix_state>();
 	int y;
 
 	for (y = 0; y < 240; y++)

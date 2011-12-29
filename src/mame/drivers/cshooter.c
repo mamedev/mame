@@ -137,8 +137,8 @@ static VIDEO_START(cshooter)
 
 static SCREEN_UPDATE(cshooter)
 {
-	cshooter_state *state = screen->machine().driver_data<cshooter_state>();
-	bitmap_fill(bitmap, cliprect, 0/*get_black_pen(screen->screen->machine())*/);
+	cshooter_state *state = screen.machine().driver_data<cshooter_state>();
+	bitmap_fill(bitmap, cliprect, 0/*get_black_pen(screen.screen.machine())*/);
 	tilemap_mark_all_tiles_dirty(state->m_txtilemap);
 
 	//sprites
@@ -151,25 +151,25 @@ static SCREEN_UPDATE(cshooter)
 			{
 				int tile=0x30+((spriteram[i]>>2)&0x1f);
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3],spriteram[i+2],3);
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2],3);
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2]+8,3);
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,

@@ -52,51 +52,51 @@ int srmp3_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
 
 SCREEN_UPDATE( srmp2 )
 {
-	srmp2_state *state = screen->machine().driver_data<srmp2_state>();
+	srmp2_state *state = screen.machine().driver_data<srmp2_state>();
 	bitmap_fill(bitmap, cliprect, 0x1ff);
 
-	screen->machine().device<seta001_device>("spritegen")->set_transpen(15);
+	screen.machine().device<seta001_device>("spritegen")->set_transpen(15);
 
-	screen->machine().device<seta001_device>("spritegen")->set_colorbase((state->m_color_bank)?0x20:0x00);
+	screen.machine().device<seta001_device>("spritegen")->set_colorbase((state->m_color_bank)?0x20:0x00);
 
-	screen->machine().device<seta001_device>("spritegen")->set_fg_xoffsets( 0x10, 0x10 );
-	screen->machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x05, 0x07 );
-	screen->machine().device<seta001_device>("spritegen")->set_bg_xoffsets( 0x00, 0x00 ); // bg not used?
-	screen->machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x00, 0x00 ); // bg not used?
+	screen.machine().device<seta001_device>("spritegen")->set_fg_xoffsets( 0x10, 0x10 );
+	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x05, 0x07 );
+	screen.machine().device<seta001_device>("spritegen")->set_bg_xoffsets( 0x00, 0x00 ); // bg not used?
+	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x00, 0x00 ); // bg not used?
 
-	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
+	screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
 }
 
 SCREEN_UPDATE( srmp3 )
 {
-	//srmp2_state *state = screen->machine().driver_data<srmp2_state>();
+	//srmp2_state *state = screen.machine().driver_data<srmp2_state>();
 	bitmap_fill(bitmap, cliprect, 0x1f0);
 
-	screen->machine().device<seta001_device>("spritegen")->set_fg_xoffsets( 0x10, 0x10 );
-	screen->machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x06, 0x06 );
-	screen->machine().device<seta001_device>("spritegen")->set_bg_xoffsets( -0x01, 0x10 );
-	screen->machine().device<seta001_device>("spritegen")->set_bg_yoffsets( -0x06, 0x06 );
+	screen.machine().device<seta001_device>("spritegen")->set_fg_xoffsets( 0x10, 0x10 );
+	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x06, 0x06 );
+	screen.machine().device<seta001_device>("spritegen")->set_bg_xoffsets( -0x01, 0x10 );
+	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( -0x06, 0x06 );
 
-	screen->machine().device<seta001_device>("spritegen")->set_gfxbank_callback( srmp3_gfxbank_callback );
+	screen.machine().device<seta001_device>("spritegen")->set_gfxbank_callback( srmp3_gfxbank_callback );
 
-	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
+	screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
 }
 
 SCREEN_UPDATE( mjyuugi )
 {
-	//srmp2_state *state = screen->machine().driver_data<srmp2_state>();
+	//srmp2_state *state = screen.machine().driver_data<srmp2_state>();
 	bitmap_fill(bitmap, cliprect, 0x1f0);
 
-	screen->machine().device<seta001_device>("spritegen")->set_fg_xoffsets( 0x10, 0x10 );
-	screen->machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x06, 0x06 );
-	screen->machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x09, 0x07 );
+	screen.machine().device<seta001_device>("spritegen")->set_fg_xoffsets( 0x10, 0x10 );
+	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x06, 0x06 );
+	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x09, 0x07 );
 
-	screen->machine().device<seta001_device>("spritegen")->set_spritelimit( 0x1ff-6 );
+	screen.machine().device<seta001_device>("spritegen")->set_spritelimit( 0x1ff-6 );
 
-	screen->machine().device<seta001_device>("spritegen")->set_gfxbank_callback( srmp3_gfxbank_callback );
+	screen.machine().device<seta001_device>("spritegen")->set_gfxbank_callback( srmp3_gfxbank_callback );
 
-	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
+	screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
 }

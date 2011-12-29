@@ -308,7 +308,7 @@ static void fuuki32_draw_layer( running_machine &machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( fuuki32 )
 {
-	fuuki32_state *state = screen->machine().driver_data<fuuki32_state>();
+	fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 	UINT16 layer0_scrollx, layer0_scrolly;
 	UINT16 layer1_scrollx, layer1_scrolly;
 	UINT16 layer2_scrollx, layer2_scrolly;
@@ -330,12 +330,12 @@ SCREEN_UPDATE( fuuki32 )
 	int tm_middle = pri_table[(state->m_priority[0] >> 16) & 0x0f][1];
 	int tm_back   = pri_table[(state->m_priority[0] >> 16) & 0x0f][2];
 
-	flip_screen_set(screen->machine(), (state->m_vregs[0x1e / 4] & 0x0000ffff) & 1);
+	flip_screen_set(screen.machine(), (state->m_vregs[0x1e / 4] & 0x0000ffff) & 1);
 
 	/* Layers scrolling */
 
-	scrolly_offs = ((state->m_vregs[0xc / 4] & 0xffff0000) >> 16) - (flip_screen_get(screen->machine()) ? 0x103 : 0x1f3);
-	scrollx_offs =  (state->m_vregs[0xc / 4] & 0x0000ffff) - (flip_screen_get(screen->machine()) ? 0x2c7 : 0x3f6);
+	scrolly_offs = ((state->m_vregs[0xc / 4] & 0xffff0000) >> 16) - (flip_screen_get(screen.machine()) ? 0x103 : 0x1f3);
+	scrollx_offs =  (state->m_vregs[0xc / 4] & 0x0000ffff) - (flip_screen_get(screen.machine()) ? 0x2c7 : 0x3f6);
 
 	layer0_scrolly = ((state->m_vregs[0x0 / 4] & 0xffff0000) >> 16) + scrolly_offs;
 	layer0_scrollx = ((state->m_vregs[0x0 / 4] & 0x0000ffff)) + scrollx_offs;
@@ -357,19 +357,19 @@ SCREEN_UPDATE( fuuki32 )
 
 	/* The bg colour is the last pen i.e. 0x1fff */
 	bitmap_fill(bitmap, cliprect, (0x800 * 4) - 1);
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
-	fuuki32_draw_layer(screen->machine(), bitmap, cliprect, tm_back,   0, 1);
-	fuuki32_draw_layer(screen->machine(), bitmap, cliprect, tm_middle, 0, 2);
-	fuuki32_draw_layer(screen->machine(), bitmap, cliprect, tm_front,  0, 4);
+	fuuki32_draw_layer(screen.machine(), bitmap, cliprect, tm_back,   0, 1);
+	fuuki32_draw_layer(screen.machine(), bitmap, cliprect, tm_middle, 0, 2);
+	fuuki32_draw_layer(screen.machine(), bitmap, cliprect, tm_front,  0, 4);
 
-	draw_sprites(*screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_EOF( fuuki32 )
 {
-	fuuki32_state *state = machine.driver_data<fuuki32_state>();
+	fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 
 	/* Buffer sprites and tilebank by 2 frames */
 	state->m_spr_buffered_tilebank[1] = state->m_spr_buffered_tilebank[0];

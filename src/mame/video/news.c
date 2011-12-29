@@ -99,7 +99,7 @@ WRITE8_HANDLER( news_bgpic_w )
 
 SCREEN_UPDATE( news )
 {
-	news_state *state = screen->machine().driver_data<news_state>();
+	news_state *state = screen.machine().driver_data<news_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;

@@ -182,9 +182,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( atarifb )
 {
-	draw_playfield_and_alpha(screen->machine(), bitmap, cliprect, 0, 0);
+	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect, 1, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1, 0);
 
 	return 0;
 }
@@ -192,9 +192,9 @@ SCREEN_UPDATE( atarifb )
 
 SCREEN_UPDATE( abaseb )
 {
-	draw_playfield_and_alpha(screen->machine(), bitmap, cliprect, -8, 0);
+	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, -8, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect, 1, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1, 0);
 
 	return 0;
 }
@@ -202,9 +202,9 @@ SCREEN_UPDATE( abaseb )
 
 SCREEN_UPDATE( soccer )
 {
-	draw_playfield_and_alpha(screen->machine(), bitmap, cliprect, 0, 8);
+	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, 0, 8);
 
-	draw_sprites(screen->machine(), bitmap, cliprect, 2, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, 2, 1);
 
 	return 0;
 }

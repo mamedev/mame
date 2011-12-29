@@ -263,7 +263,7 @@ else
 
 SCREEN_UPDATE( shangha3 )
 {
-	shangha3_state *state = screen->machine().driver_data<shangha3_state>();
+	shangha3_state *state = screen.machine().driver_data<shangha3_state>();
 
 	copybitmap(bitmap, state->m_rawbitmap, 0, 0, 0, 0, cliprect);
 	return 0;

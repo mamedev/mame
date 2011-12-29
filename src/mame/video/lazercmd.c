@@ -52,10 +52,10 @@ static void plot_pattern( running_machine &machine, bitmap_t *bitmap, int x, int
 
 SCREEN_UPDATE( lazercmd )
 {
-	lazercmd_state *state = screen->machine().driver_data<lazercmd_state>();
+	lazercmd_state *state = screen.machine().driver_data<lazercmd_state>();
 	int i, x, y;
 
-	int video_inverted = input_port_read(screen->machine(), "DSW") & 0x20;
+	int video_inverted = input_port_read(screen.machine(), "DSW") & 0x20;
 
 	/* The first row of characters are invisible */
 	for (i = 0; i < (VERT_RES - 1) * HORZ_RES; i++)
@@ -68,7 +68,7 @@ SCREEN_UPDATE( lazercmd )
 		sx *= HORZ_CHR;
 		sy *= VERT_CHR;
 
-		drawgfx_opaque(bitmap, cliprect,screen->machine().gfx[0],
+		drawgfx_opaque(bitmap, cliprect,screen.machine().gfx[0],
 				state->m_videoram[i], video_inverted ? 1 : 0,
 				0,0,
 				sx,sy);
@@ -76,7 +76,7 @@ SCREEN_UPDATE( lazercmd )
 
 	x = state->m_marker_x - 1;             /* normal video lags marker by 1 pixel */
 	y = vert_scale(state->m_marker_y) - VERT_CHR; /* first line used as scratch pad */
-	plot_pattern(screen->machine(), bitmap, x, y);
+	plot_pattern(screen.machine(), bitmap, x, y);
 
 	return 0;
 }

@@ -431,10 +431,10 @@ static void rabbit_drawtilemap( running_machine &machine, bitmap_t *bitmap, cons
 
 static SCREEN_UPDATE(rabbit)
 {
-	rabbit_state *state = screen->machine().driver_data<rabbit_state>();
+	rabbit_state *state = screen.machine().driver_data<rabbit_state>();
 	int prilevel;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 //  popmessage("%08x %08x", state->m_viewregs0[0], state->m_viewregs0[1]);
 //  popmessage("%08x %08x %08x %08x %08x %08x", state->m_tilemap_regs[0][0],state->m_tilemap_regs[0][1],state->m_tilemap_regs[0][2],state->m_tilemap_regs[0][3],state->m_tilemap_regs[0][4],state->m_tilemap_regs[0][5]);
@@ -452,16 +452,16 @@ static SCREEN_UPDATE(rabbit)
 	/* prio isnt certain but seems to work.. */
 	for (prilevel = 0xf; prilevel >0; prilevel--)
 	{
-		if (prilevel == ((state->m_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine(),bitmap,cliprect, 3);
-		if (prilevel == ((state->m_tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine(),bitmap,cliprect, 2);
-		if (prilevel == ((state->m_tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine(),bitmap,cliprect, 1);
-		if (prilevel == ((state->m_tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen->machine(),bitmap,cliprect, 0);
+		if (prilevel == ((state->m_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen.machine(),bitmap,cliprect, 3);
+		if (prilevel == ((state->m_tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen.machine(),bitmap,cliprect, 2);
+		if (prilevel == ((state->m_tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen.machine(),bitmap,cliprect, 1);
+		if (prilevel == ((state->m_tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(screen.machine(),bitmap,cliprect, 0);
 
 		if (prilevel == 0x09) // should it be selectable?
 		{
-			rabbit_clearspritebitmap(screen->machine(),bitmap,cliprect);
-			draw_sprites(screen->machine(),bitmap,cliprect);  // render to bitmap
-			draw_sprite_bitmap(screen->machine(),bitmap,cliprect); // copy bitmap to screen
+			rabbit_clearspritebitmap(screen.machine(),bitmap,cliprect);
+			draw_sprites(screen.machine(),bitmap,cliprect);  // render to bitmap
+			draw_sprite_bitmap(screen.machine(),bitmap,cliprect); // copy bitmap to screen
 		}
 	}
 	return 0;

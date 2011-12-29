@@ -844,7 +844,7 @@ WRITE16_HANDLER( contcirc_out_w )
 
 SCREEN_UPDATE( contcirc )
 {
-	taitoz_state *state = screen->machine().driver_data<taitoz_state>();
+	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
@@ -853,7 +853,7 @@ SCREEN_UPDATE( contcirc )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -862,7 +862,7 @@ SCREEN_UPDATE( contcirc )
 	tc0150rod_draw(state->m_tc0150rod, bitmap, cliprect, -3, state->m_road_palbank << 6, 1, 0, 1, 2);	// -6
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
-	contcirc_draw_sprites_16x8(screen->machine(), bitmap, cliprect, 5);	// 7
+	contcirc_draw_sprites_16x8(screen.machine(), bitmap, cliprect, 5);	// 7
 	return 0;
 }
 
@@ -871,7 +871,7 @@ SCREEN_UPDATE( contcirc )
 
 SCREEN_UPDATE( chasehq )
 {
-	taitoz_state *state = screen->machine().driver_data<taitoz_state>();
+	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
@@ -880,7 +880,7 @@ SCREEN_UPDATE( chasehq )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -890,14 +890,14 @@ SCREEN_UPDATE( chasehq )
 	tc0150rod_draw(state->m_tc0150rod, bitmap, cliprect, -1, 0xc0, 0, 0, 1, 2);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
-	chasehq_draw_sprites_16x16(screen->machine(), bitmap, cliprect, 7);
+	chasehq_draw_sprites_16x16(screen.machine(), bitmap, cliprect, 7);
 	return 0;
 }
 
 
 SCREEN_UPDATE( bshark )
 {
-	taitoz_state *state = screen->machine().driver_data<taitoz_state>();
+	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
@@ -906,7 +906,7 @@ SCREEN_UPDATE( bshark )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -916,14 +916,14 @@ SCREEN_UPDATE( bshark )
 	tc0150rod_draw(state->m_tc0150rod, bitmap, cliprect, -1, 0xc0, 0, 1, 1, 2);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
-	bshark_draw_sprites_16x8(screen->machine(), bitmap, cliprect, 8);
+	bshark_draw_sprites_16x8(screen.machine(), bitmap, cliprect, 8);
 	return 0;
 }
 
 
 SCREEN_UPDATE( sci )
 {
-	taitoz_state *state = screen->machine().driver_data<taitoz_state>();
+	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
@@ -932,7 +932,7 @@ SCREEN_UPDATE( sci )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -942,14 +942,14 @@ SCREEN_UPDATE( sci )
 	tc0150rod_draw(state->m_tc0150rod, bitmap, cliprect, -1, 0xc0, 0, 0, 1, 2);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
-	sci_draw_sprites_16x8(screen->machine(), bitmap, cliprect, 6);
+	sci_draw_sprites_16x8(screen.machine(), bitmap, cliprect, 6);
 	return 0;
 }
 
 
 SCREEN_UPDATE( aquajack )
 {
-	taitoz_state *state = screen->machine().driver_data<taitoz_state>();
+	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
@@ -958,7 +958,7 @@ SCREEN_UPDATE( aquajack )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -968,14 +968,14 @@ SCREEN_UPDATE( aquajack )
 	tc0150rod_draw(state->m_tc0150rod, bitmap, cliprect, -1, 0, 2, 1, 1, 2);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
-	aquajack_draw_sprites_16x8(screen->machine(), bitmap, cliprect, 3);
+	aquajack_draw_sprites_16x8(screen.machine(), bitmap, cliprect, 3);
 	return 0;
 }
 
 
 SCREEN_UPDATE( spacegun )
 {
-	taitoz_state *state = screen->machine().driver_data<taitoz_state>();
+	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
@@ -984,7 +984,7 @@ SCREEN_UPDATE( spacegun )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -993,7 +993,7 @@ SCREEN_UPDATE( spacegun )
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
-	spacegun_draw_sprites_16x8(screen->machine(), bitmap, cliprect, 4);
+	spacegun_draw_sprites_16x8(screen.machine(), bitmap, cliprect, 4);
 
 	return 0;
 }
@@ -1001,7 +1001,7 @@ SCREEN_UPDATE( spacegun )
 
 SCREEN_UPDATE( dblaxle )
 {
-	taitoz_state *state = screen->machine().driver_data<taitoz_state>();
+	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[5];
 	UINT16 priority;
 
@@ -1015,7 +1015,7 @@ SCREEN_UPDATE( dblaxle )
 	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked - this shouldn't be necessary! */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -1025,7 +1025,7 @@ SCREEN_UPDATE( dblaxle )
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[2], 0, 1);
 
 	tc0150rod_draw(state->m_tc0150rod, bitmap, cliprect, -1, 0xc0, 0, 0, 1, 2);
-	bshark_draw_sprites_16x8(screen->machine(), bitmap, cliprect, 7);
+	bshark_draw_sprites_16x8(screen.machine(), bitmap, cliprect, 7);
 
 	/* This layer used for the big numeric displays */
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[3], 0, 4);

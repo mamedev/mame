@@ -221,7 +221,8 @@ SCREEN_UPDATE( hanamai );
 SCREEN_UPDATE( hnoridur );
 SCREEN_UPDATE( sprtmtch );
 SCREEN_UPDATE( mjdialq2 );
-SCREEN_UPDATE( jantouki );
+SCREEN_UPDATE( jantouki_top );
+SCREEN_UPDATE( jantouki_bottom );
 SCREEN_UPDATE( htengoku );
 
 PALETTE_INIT( sprtmtch );

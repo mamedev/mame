@@ -140,18 +140,18 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( boogwing )
 {
-	boogwing_state *state = screen->machine().driver_data<boogwing_state>();
+	boogwing_state *state = screen.machine().driver_data<boogwing_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
-	flip_screen_set(screen->machine(), BIT(flip, 7));
+	flip_screen_set(screen.machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	/* Draw playfields */
 	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0x400]); /* pen not confirmed */
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0x400]); /* pen not confirmed */
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
 
 	// bit&0x8 is definitely some kind of palette effect
 	// bit&0x4 combines playfields
@@ -182,8 +182,8 @@ SCREEN_UPDATE( boogwing )
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 32);
 	}
 
-	draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram.u16, 3);
-	draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram2.u16, 4);
+	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 3);
+	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u16, 4);
 
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;

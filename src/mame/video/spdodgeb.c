@@ -210,9 +210,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( spdodgeb )
 {
-	spdodgeb_state *state = screen->machine().driver_data<spdodgeb_state>();
+	spdodgeb_state *state = screen.machine().driver_data<spdodgeb_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_lastscroll+5);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

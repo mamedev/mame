@@ -62,7 +62,7 @@ static VIDEO_START(laserbas)
 
 static SCREEN_UPDATE(laserbas)
 {
-	laserbas_state *state = screen->machine().driver_data<laserbas_state>();
+	laserbas_state *state = screen.machine().driver_data<laserbas_state>();
 	int x, y;
 
 	for (y = 0; y < 256; y++)

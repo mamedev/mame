@@ -465,12 +465,12 @@ static void splndrbt_copy_bg( running_machine &machine, bitmap_t *dst_bitmap, co
 
 SCREEN_UPDATE( equites )
 {
-	equites_state *state = screen->machine().driver_data<equites_state>();
+	equites_state *state = screen.machine().driver_data<equites_state>();
 	bitmap_fill(bitmap, cliprect, state->m_bgcolor);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	equites_draw_sprites(screen->machine(), bitmap, cliprect);
+	equites_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
@@ -479,15 +479,15 @@ SCREEN_UPDATE( equites )
 
 SCREEN_UPDATE( splndrbt )
 {
-	equites_state *state = screen->machine().driver_data<equites_state>();
+	equites_state *state = screen.machine().driver_data<equites_state>();
 	bitmap_fill(bitmap, cliprect, state->m_bgcolor);
 
-	splndrbt_copy_bg(screen->machine(), bitmap, cliprect);
+	splndrbt_copy_bg(screen.machine(), bitmap, cliprect);
 
 	if (state->m_fg_char_bank)
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
-	splndrbt_draw_sprites(screen->machine(), bitmap, cliprect);
+	splndrbt_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	if (!state->m_fg_char_bank)
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

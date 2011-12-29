@@ -447,25 +447,25 @@ VIDEO_START( nbmj9195_nb22090 )
 ******************************************************************************/
 SCREEN_UPDATE( nbmj9195 )
 {
-	nbmj9195_state *state = screen->machine().driver_data<nbmj9195_state>();
+	nbmj9195_state *state = screen.machine().driver_data<nbmj9195_state>();
 	int i;
 	int x, y;
 	int scrolly[2];
 
 	if (state->m_screen_refresh)
 	{
-		int width = screen->width();
-		int height = screen->height();
+		int width = screen.width();
+		int height = screen.height();
 
 		state->m_screen_refresh = 0;
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 			{
-				update_pixel(screen->machine(), 0, x, y);
+				update_pixel(screen.machine(), 0, x, y);
 
 				if (state->m_gfxdraw_mode)
-					update_pixel(screen->machine(), 1, x, y);
+					update_pixel(screen.machine(), 1, x, y);
 			}
 	}
 

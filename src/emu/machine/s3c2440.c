@@ -39,7 +39,7 @@ VIDEO_START( s3c2440 )
 
 SCREEN_UPDATE( s3c2440 )
 {
-	device_t *device = screen->machine().device( S3C2440_TAG);
+	device_t *device = screen.machine().device( S3C2440_TAG);
 	return s3c24xx_video_update( device, screen, bitmap, cliprect);
 }
 

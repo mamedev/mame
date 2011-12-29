@@ -87,7 +87,7 @@ WRITE8_HANDLER( finalizr_videoctrl_w )
 
 SCREEN_UPDATE( finalizr )
 {
-	finalizr_state *state = screen->machine().driver_data<finalizr_state>();
+	finalizr_state *state = screen.machine().driver_data<finalizr_state>();
 	int offs;
 
 	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
@@ -98,8 +98,8 @@ SCREEN_UPDATE( finalizr )
 
 	/* Draw the sprites. */
 	{
-		const gfx_element *gfx1 = screen->machine().gfx[1];
-		const gfx_element *gfx2 = screen->machine().gfx[2];
+		const gfx_element *gfx1 = screen.machine().gfx[1];
+		const gfx_element *gfx2 = screen.machine().gfx[2];
 
 		UINT8 *sr = state->m_spriterambank ? state->m_spriteram_2 : state->m_spriteram;
 
@@ -122,7 +122,7 @@ SCREEN_UPDATE( finalizr )
 
 			if (size >= 0x10)	/* 32x32 */
 			{
-				if (flip_screen_get(screen->machine()))
+				if (flip_screen_get(screen.machine()))
 				{
 					sx = 256 - sx;
 					sy = 224 - sy;
@@ -153,7 +153,7 @@ SCREEN_UPDATE( finalizr )
 			}
 			else
 			{
-				if (flip_screen_get(screen->machine()))
+				if (flip_screen_get(screen.machine()))
 				{
 					sx = ((size & 0x08) ? 280:272) - sx;
 					sy = ((size & 0x04) ? 248:240) - sy;
@@ -213,7 +213,7 @@ SCREEN_UPDATE( finalizr )
 	}
 
 	{
-		const rectangle &visarea = screen->visible_area();
+		const rectangle &visarea = screen.visible_area();
 		rectangle clip = *cliprect;
 
 		/* draw top status region */

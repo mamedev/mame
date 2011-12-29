@@ -136,8 +136,8 @@ SCREEN_UPDATE( namconb1 )
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a 016a 0021 0101 0144 0020 (nebulas ray)
-	UINT32 xclip = screen->machine().generic.paletteram.u32[0x1800/4];
-	UINT32 yclip = screen->machine().generic.paletteram.u32[0x1804/4];
+	UINT32 xclip = screen.machine().generic.paletteram.u32[0x1800/4];
+	UINT32 yclip = screen.machine().generic.paletteram.u32[0x1804/4];
 	clip.min_x = (xclip>>16)    - 0x4a;
 	clip.max_x = (xclip&0xffff) - 0x4a - 1;
 	clip.min_y = (yclip>>16)    - 0x21;
@@ -148,9 +148,9 @@ SCREEN_UPDATE( namconb1 )
 	if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
 	if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
 
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
 
-	video_update_common( screen->machine(), bitmap, &clip, 0 );
+	video_update_common( screen.machine(), bitmap, &clip, 0 );
 
 	return 0;
 }
@@ -173,12 +173,12 @@ VIDEO_START( namconb1 )
 
 SCREEN_UPDATE( namconb2 )
 {
-	namconb1_state *state = screen->machine().driver_data<namconb1_state>();
+	namconb1_state *state = screen.machine().driver_data<namconb1_state>();
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a016a 00210101 01440020
-	UINT32 xclip = screen->machine().generic.paletteram.u32[0x1800/4];
-	UINT32 yclip = screen->machine().generic.paletteram.u32[0x1804/4];
+	UINT32 xclip = screen.machine().generic.paletteram.u32[0x1800/4];
+	UINT32 yclip = screen.machine().generic.paletteram.u32[0x1804/4];
 	clip.min_x = (xclip>>16)    - 0x4b;
 	clip.max_x = (xclip&0xffff) - 0x4b - 1;
 	clip.min_y = (yclip>>16)    - 0x21;
@@ -189,14 +189,14 @@ SCREEN_UPDATE( namconb2 )
 	if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
 	if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
 
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
 
 	if( memcmp(state->m_tilemap_tile_bank,state->m_tilebank32,sizeof(state->m_tilemap_tile_bank))!=0 )
 	{
 		namco_tilemap_invalidate();
 		memcpy(state->m_tilemap_tile_bank,state->m_tilebank32,sizeof(state->m_tilemap_tile_bank));
 	}
-	video_update_common( screen->machine(), bitmap, &clip, 1 );
+	video_update_common( screen.machine(), bitmap, &clip, 1 );
 	return 0;
 }
 

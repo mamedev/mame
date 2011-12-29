@@ -236,18 +236,18 @@ void eprom_scanline_update(screen_device &screen, int scanline)
 
 SCREEN_UPDATE( eprom )
 {
-	eprom_state *state = screen->machine().driver_data<eprom_state>();
+	eprom_state *state = screen.machine().driver_data<eprom_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	if (state->m_video_disable)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 		return 0;
 	}
 
-	update_palette(screen->machine());
+	update_palette(screen.machine());
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
@@ -391,18 +391,18 @@ SCREEN_UPDATE( eprom )
 
 SCREEN_UPDATE( guts )
 {
-	eprom_state *state = screen->machine().driver_data<eprom_state>();
+	eprom_state *state = screen.machine().driver_data<eprom_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	if (state->m_video_disable)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 		return 0;
 	}
 
-	update_palette(screen->machine());
+	update_palette(screen.machine());
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);

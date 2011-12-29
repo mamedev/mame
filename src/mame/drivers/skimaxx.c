@@ -139,7 +139,7 @@ static VIDEO_START( skimaxx )
 
 static SCREEN_UPDATE( skimaxx )
 {
-//  popmessage("%02x %02x", input_port_read(screen->machine(), "X"), input_port_read(screen->machine(), "Y") );
+//  popmessage("%02x %02x", input_port_read(screen.machine(), "X"), input_port_read(screen.machine(), "Y") );
 
 	SCREEN_UPDATE_CALL(tms340x0);
 

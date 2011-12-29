@@ -178,7 +178,7 @@ WRITE16_HANDLER( gauntlet_yscroll_w )
 
 SCREEN_UPDATE( gauntlet )
 {
-	gauntlet_state *state = screen->machine().driver_data<gauntlet_state>();
+	gauntlet_state *state = screen.machine().driver_data<gauntlet_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

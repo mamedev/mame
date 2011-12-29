@@ -259,7 +259,7 @@ static VIDEO_START( tmspoker )
 
 static SCREEN_UPDATE( tmspoker )
 {
-	tmspoker_state *state = screen->machine().driver_data<tmspoker_state>();
+	tmspoker_state *state = screen.machine().driver_data<tmspoker_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

@@ -86,7 +86,7 @@ static VIDEO_START( chinsan )
 
 static SCREEN_UPDATE( chinsan )
 {
-	chinsan_state *state = screen->machine().driver_data<chinsan_state>();
+	chinsan_state *state = screen.machine().driver_data<chinsan_state>();
 	int y, x, count;
 	count = 0;
 	for (y = 0; y < 32; y++)
@@ -96,7 +96,7 @@ static SCREEN_UPDATE( chinsan )
 			int tileno, colour;
 			tileno = state->m_video[count] | (state->m_video[count + 0x800] << 8);
 			colour = state->m_video[count + 0x1000] >> 3;
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tileno,colour,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tileno,colour,0,0,x*8,y*8);
 			count++;
 		}
 	}

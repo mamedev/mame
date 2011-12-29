@@ -163,7 +163,7 @@ VIDEO_START(sigma2k)
 
 SCREEN_UPDATE(ampoker2)
 {
-	ampoker2_state *state = screen->machine().driver_data<ampoker2_state>();
+	ampoker2_state *state = screen.machine().driver_data<ampoker2_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

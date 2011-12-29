@@ -387,8 +387,8 @@ static VIDEO_START( pc_cga32k )
 
 SCREEN_UPDATE( mc6845_cga )
 {
-	UINT8 *gfx = screen->machine().region("gfx1")->base();
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(CGA_MC6845_NAME);
+	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	mc6845->update( bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
@@ -413,8 +413,8 @@ static VIDEO_START( cga_poisk2 )
 
 static SCREEN_UPDATE( cga_poisk2 )
 {
-	UINT8 *gfx = screen->machine().region("gfx1")->base();
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(CGA_MC6845_NAME);
+	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	mc6845->update( bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
@@ -1619,8 +1619,8 @@ static VIDEO_START( pc1512 )
 
 static SCREEN_UPDATE( mc6845_pc1512 )
 {
-	UINT8 *gfx = screen->machine().region("gfx1")->base();
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(CGA_MC6845_NAME);
+	UINT8 *gfx = screen.machine().region("gfx1")->base();
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
 	mc6845->update(bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */

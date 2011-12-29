@@ -122,7 +122,7 @@ static WRITE8_HANDLER( mole_flipscreen_w )
 
 static SCREEN_UPDATE( mole )
 {
-	mole_state *state = screen->machine().driver_data<mole_state>();
+	mole_state *state = screen.machine().driver_data<mole_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;

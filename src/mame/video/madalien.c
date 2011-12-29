@@ -253,8 +253,8 @@ WRITE8_HANDLER( madalien_charram_w )
 
 static SCREEN_UPDATE( madalien )
 {
-	madalien_state *state = screen->machine().driver_data<madalien_state>();
-	int flip = BIT(input_port_read(screen->machine(), "DSW"), 6) && BIT(*state->m_video_control, 0);
+	madalien_state *state = screen.machine().driver_data<madalien_state>();
+	int flip = BIT(input_port_read(screen.machine(), "DSW"), 6) && BIT(*state->m_video_control, 0);
 
 	// bits #0 and #1 define scrolling mode
 	//
@@ -266,8 +266,8 @@ static SCREEN_UPDATE( madalien )
 	int scroll_mode = *state->m_scroll & 3;
 
 	bitmap_fill(bitmap, cliprect, 0);
-	draw_edges(screen->machine(), bitmap, cliprect, flip, scroll_mode);
-	draw_foreground(screen->machine(), bitmap, cliprect, flip);
+	draw_edges(screen.machine(), bitmap, cliprect, flip, scroll_mode);
+	draw_foreground(screen.machine(), bitmap, cliprect, flip);
 
 	/* highlight section A (outside of tunnels).
      * also, bit 1 of the video_flags register (6A) is
@@ -301,7 +301,7 @@ static SCREEN_UPDATE( madalien )
 					*BITMAP_ADDR16(bitmap, y, x) |= 8;
 	}
 
-	draw_headlight(screen->machine(), bitmap, cliprect, flip);
+	draw_headlight(screen.machine(), bitmap, cliprect, flip);
 
 	return 0;
 }

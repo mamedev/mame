@@ -116,17 +116,17 @@ VIDEO_START( gamtor )
 
 SCREEN_UPDATE(gamtor)
 {
-	gaminator_state *state = screen->machine().driver_data<gaminator_state>();
+	gaminator_state *state = screen.machine().driver_data<gaminator_state>();
 
 	int tile_base = 0x00000;
 
 	// where does the base address come from?
-	if (!strcmp(screen->machine().system().name,"g4u5"))	tile_base = 0x31BE4 - 2;
-	if (!strcmp(screen->machine().system().name,"llcharm"))	tile_base = 0x2f58d - 2;
+	if (!strcmp(screen.machine().system().name,"g4u5"))	tile_base = 0x31BE4 - 2;
+	if (!strcmp(screen.machine().system().name,"llcharm"))	tile_base = 0x2f58d - 2;
 
 
 
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0;
 	for (int y=0;y<32;y++)
 	{

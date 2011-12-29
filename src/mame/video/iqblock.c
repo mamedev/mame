@@ -92,7 +92,7 @@ WRITE8_HANDLER( iqblock_fgscroll_w )
 
 SCREEN_UPDATE( iqblock )
 {
-	iqblock_state *state = screen->machine().driver_data<iqblock_state>();
+	iqblock_state *state = screen.machine().driver_data<iqblock_state>();
 	if (!state->m_videoenable) return 0;
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);

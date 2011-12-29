@@ -294,7 +294,7 @@ static READ8_HANDLER(spaceg_colorram_r)
 
 static SCREEN_UPDATE( spaceg )
 {
-	spaceg_state *state = screen->machine().driver_data<spaceg_state>();
+	spaceg_state *state = screen.machine().driver_data<spaceg_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)

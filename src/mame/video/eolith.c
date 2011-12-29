@@ -40,7 +40,7 @@ VIDEO_START( eolith )
 
 SCREEN_UPDATE( eolith )
 {
-	eolith_state *state = screen->machine().driver_data<eolith_state>();
+	eolith_state *state = screen.machine().driver_data<eolith_state>();
 	int y;
 
 	for (y = 0; y < 240; y++)

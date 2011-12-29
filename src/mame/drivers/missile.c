@@ -666,7 +666,7 @@ static UINT8 read_vram(address_space *space, offs_t address)
 
 static SCREEN_UPDATE( missile )
 {
-	missile_state *state = screen->machine().driver_data<missile_state>();
+	missile_state *state = screen.machine().driver_data<missile_state>();
 	UINT8 *videoram = state->m_videoram;
 	int x, y;
 

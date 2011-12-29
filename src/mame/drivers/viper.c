@@ -373,7 +373,7 @@ static timer_device *ds2430_bit_timer;
 
 static SCREEN_UPDATE(viper)
 {
-	device_t *device = screen->machine().device("voodoo");
+	device_t *device = screen.machine().device("voodoo");
 	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 

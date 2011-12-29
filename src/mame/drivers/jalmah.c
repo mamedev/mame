@@ -397,10 +397,10 @@ static void draw_sc3_layer(running_machine &machine, bitmap_t *bitmap, const rec
 
 static SCREEN_UPDATE( jalmah )
 {
-	jalmah_state *state = screen->machine().driver_data<jalmah_state>();
+	jalmah_state *state = screen.machine().driver_data<jalmah_state>();
 	UINT16 *jm_scrollram = state->m_jm_scrollram;
 	UINT8 cur_prin;
-	jalmah_priority_system(screen->machine());
+	jalmah_priority_system(screen.machine());
 
 	tilemap_set_scrollx(state->m_sc0_tilemap_0, 0, jm_scrollram[0] & 0xfff);
 	tilemap_set_scrollx(state->m_sc0_tilemap_1, 0, jm_scrollram[0] & 0x7ff);
@@ -443,14 +443,14 @@ static SCREEN_UPDATE( jalmah )
 	tilemap_set_scrolly(state->m_sc3_tilemap_2, 0, jm_scrollram[7] & 0x1ff);
 	tilemap_set_scrolly(state->m_sc3_tilemap_3, 0, jm_scrollram[7] & 0x3ff);
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0xff]); //selectable by a ram address?
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0xff]); //selectable by a ram address?
 
 	for(cur_prin=1;cur_prin<=0x8;cur_prin<<=1)
 	{
-		if(cur_prin==state->m_sc0_prin) { draw_sc0_layer(screen->machine(),bitmap,cliprect); }
-		if(cur_prin==state->m_sc1_prin) { draw_sc1_layer(screen->machine(),bitmap,cliprect); }
-		if(cur_prin==state->m_sc2_prin) { draw_sc2_layer(screen->machine(),bitmap,cliprect); }
-		if(cur_prin==state->m_sc3_prin) { draw_sc3_layer(screen->machine(),bitmap,cliprect); }
+		if(cur_prin==state->m_sc0_prin) { draw_sc0_layer(screen.machine(),bitmap,cliprect); }
+		if(cur_prin==state->m_sc1_prin) { draw_sc1_layer(screen.machine(),bitmap,cliprect); }
+		if(cur_prin==state->m_sc2_prin) { draw_sc2_layer(screen.machine(),bitmap,cliprect); }
+		if(cur_prin==state->m_sc3_prin) { draw_sc3_layer(screen.machine(),bitmap,cliprect); }
 	}
 
 	return 0;
@@ -458,7 +458,7 @@ static SCREEN_UPDATE( jalmah )
 
 static SCREEN_UPDATE( urashima )
 {
-	jalmah_state *state = screen->machine().driver_data<jalmah_state>();
+	jalmah_state *state = screen.machine().driver_data<jalmah_state>();
 	UINT16 *jm_scrollram = state->m_jm_scrollram;
 	/*this game doesn't use the RANGE register at all.*/
 	tilemap_set_scrollx(state->m_sc0_tilemap_0, 0, jm_scrollram[0]);
@@ -466,7 +466,7 @@ static SCREEN_UPDATE( urashima )
 	tilemap_set_scrolly(state->m_sc0_tilemap_0, 0, jm_scrollram[4]);
 	tilemap_set_scrolly(state->m_sc3_tilemap_0, 0, jm_scrollram[7]);
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0x1ff]);//selectable by a ram address?
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0x1ff]);//selectable by a ram address?
 	if(state->m_jm_vregs[0] & 1) { tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap_0,0,0); }
 	if(state->m_jm_vregs[3] & 1) { tilemap_draw(bitmap,cliprect,state->m_sc3_tilemap_0,0,0); }
 	return 0;

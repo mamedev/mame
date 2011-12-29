@@ -328,9 +328,9 @@ static const rectangle visible3 = { 0*8, (14+48)*8-1, 17*8, (17+7)*8-1 };
 
 static SCREEN_UPDATE(cb2001)
 {
-	cb2001_state *state = screen->machine().driver_data<cb2001_state>();
+	cb2001_state *state = screen.machine().driver_data<cb2001_state>();
 	int count,x,y;
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	count = 0x0000;
 
@@ -351,7 +351,7 @@ static SCREEN_UPDATE(cb2001)
 					tile += state->m_videobank*0x2000;
 
 
-					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,colour,0,0,x*8,y*8);
+					drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,colour,0,0,x*8,y*8);
 
 					count++;
 				}
@@ -412,7 +412,7 @@ static SCREEN_UPDATE(cb2001)
 				tile += 0x1000;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],tile,colour,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],tile,colour,0,0,x*8,y*8,0);
 			count++;
 		}
 	}

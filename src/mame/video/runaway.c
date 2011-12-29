@@ -91,7 +91,7 @@ VIDEO_START( qwak )
 
 SCREEN_UPDATE( runaway )
 {
-	runaway_state *state = screen->machine().driver_data<runaway_state>();
+	runaway_state *state = screen.machine().driver_data<runaway_state>();
 	int i;
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -108,13 +108,13 @@ SCREEN_UPDATE( runaway )
 
 		code |= (state->m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			code,
 			0,
 			flipx, flipy,
 			x, 240 - y, 0);
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			code,
 			0,
 			flipx, flipy,
@@ -126,7 +126,7 @@ SCREEN_UPDATE( runaway )
 
 SCREEN_UPDATE( qwak )
 {
-	runaway_state *state = screen->machine().driver_data<runaway_state>();
+	runaway_state *state = screen.machine().driver_data<runaway_state>();
 	int i;
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -143,13 +143,13 @@ SCREEN_UPDATE( qwak )
 
 		code |= (state->m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			code,
 			0,
 			flipx, flipy,
 			x, 240 - y, 0);
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			code,
 			0,
 			flipx, flipy,

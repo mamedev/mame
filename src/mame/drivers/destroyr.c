@@ -44,7 +44,7 @@ public:
 
 static SCREEN_UPDATE( destroyr )
 {
-	destroyr_state *state = screen->machine().driver_data<destroyr_state>();
+	destroyr_state *state = screen.machine().driver_data<destroyr_state>();
 	int i, j;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -70,7 +70,7 @@ static SCREEN_UPDATE( destroyr )
 				continue;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[2], num, 0, flipx, 0, horz, 16 * i, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], num, 0, flipx, 0, horz, 16 * i, 0);
 	}
 
 	/* draw alpha numerics */
@@ -80,7 +80,7 @@ static SCREEN_UPDATE( destroyr )
 		{
 			int num = state->m_alpha_num_ram[32 * i + j];
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
 		}
 	}
 
@@ -91,13 +91,13 @@ static SCREEN_UPDATE( destroyr )
 		int horz = 256 - state->m_minor_obj_ram[i + 2];
 		int vert = 256 - state->m_minor_obj_ram[i + 4];
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], num, 0, 0, 0, horz, vert, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], num, 0, 0, 0, horz, vert, 0);
 	}
 
 	/* draw waves */
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[3], state->m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3], state->m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
 	}
 
 	/* draw cursor */

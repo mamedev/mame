@@ -474,7 +474,7 @@ VIDEO_START( kungfum )
 
 SCREEN_UPDATE( kungfum )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	int i;
 	for (i = 0; i < 6; i++)
 	{
@@ -485,7 +485,7 @@ SCREEN_UPDATE( kungfum )
 		tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_m62_background_hscroll);
 	}
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
 	return 0;
 }
@@ -523,14 +523,14 @@ VIDEO_START( ldrun )
 
 SCREEN_UPDATE( ldrun )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
 	return 0;
 }
 
@@ -571,7 +571,7 @@ WRITE8_HANDLER( ldrun3_topbottom_mask_w )
 
 SCREEN_UPDATE( ldrun3 )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	SCREEN_UPDATE_CALL(ldrun);
 
 	if (state->m_ldrun3_topbottom_mask)
@@ -580,11 +580,11 @@ SCREEN_UPDATE( ldrun3 )
 
 		my_cliprect.min_y = 0 * 8;
 		my_cliprect.max_y = 1 * 8 - 1;
-		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen.machine()));
 
 		my_cliprect.min_y = 31 * 8;
 		my_cliprect.max_y = 32 * 8 - 1;
-		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen.machine()));
 	}
 
 	return 0;
@@ -632,7 +632,7 @@ VIDEO_START( battroad )
 
 SCREEN_UPDATE( battroad )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll);
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, 128);
@@ -640,9 +640,9 @@ SCREEN_UPDATE( battroad )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
@@ -667,11 +667,11 @@ VIDEO_START( ldrun4 )
 
 SCREEN_UPDATE( ldrun4 )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll - 2);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	return 0;
 }
 
@@ -710,7 +710,7 @@ VIDEO_START( lotlot )
 
 SCREEN_UPDATE( lotlot )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll - 64);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll + 32);
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, -64);
@@ -719,7 +719,7 @@ SCREEN_UPDATE( lotlot )
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	return 0;
 }
 
@@ -782,14 +782,14 @@ VIDEO_START( kidniki )
 
 SCREEN_UPDATE( kidniki )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, -64);
 	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_kidniki_text_vscroll + 128);
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
@@ -836,7 +836,7 @@ VIDEO_START( spelunkr )
 
 SCREEN_UPDATE( spelunkr )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll + 128);
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, -64);
@@ -844,7 +844,7 @@ SCREEN_UPDATE( spelunkr )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
@@ -881,7 +881,7 @@ VIDEO_START( spelunk2 )
 
 SCREEN_UPDATE( spelunk2 )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll - 1);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll + 128);
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, -65);
@@ -889,7 +889,7 @@ SCREEN_UPDATE( spelunk2 )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
@@ -930,14 +930,14 @@ VIDEO_START( youjyudn )
 
 SCREEN_UPDATE( youjyudn )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, -64);
 	tilemap_set_scrolly(state->m_fg_tilemap, 0, 0);
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
@@ -975,14 +975,14 @@ VIDEO_START( horizon )
 
 SCREEN_UPDATE( horizon )
 {
-	m62_state *state = screen->machine().driver_data<m62_state>();
+	m62_state *state = screen.machine().driver_data<m62_state>();
 	int i;
 	for (i = 0; i < 32; i++)
 	{
 		tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_scrollram[i << 1] | (state->m_scrollram[(i << 1) | 1] << 8));
 	}
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

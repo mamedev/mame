@@ -181,7 +181,7 @@ static VIDEO_START(mil4000)
 
 static SCREEN_UPDATE(mil4000)
 {
-	mil4000_state *state = screen->machine().driver_data<mil4000_state>();
+	mil4000_state *state = screen.machine().driver_data<mil4000_state>();
 	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_sc1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_sc2_tilemap,0,0);

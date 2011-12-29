@@ -118,7 +118,7 @@ static PALETTE_INIT( othello )
 
 static SCREEN_UPDATE( othello )
 {
-	othello_state *state = screen->machine().driver_data<othello_state>();
+	othello_state *state = screen.machine().driver_data<othello_state>();
 
 	state->m_mc6845->update(bitmap, cliprect);
 	return 0;

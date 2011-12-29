@@ -77,11 +77,11 @@ VIDEO_START( aliens )
 
 SCREEN_UPDATE( aliens )
 {
-	aliens_state *state = screen->machine().driver_data<aliens_state>();
+	aliens_state *state = screen.machine().driver_data<aliens_state>();
 
 	k052109_tilemap_update(state->m_k052109);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, state->m_layer_colorbase[1] * 16);
 
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 1);

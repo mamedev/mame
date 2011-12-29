@@ -916,7 +916,7 @@ static VIDEO_START( coinmstr )
 
 static SCREEN_UPDATE( coinmstr )
 {
-	coinmstr_state *state = screen->machine().driver_data<coinmstr_state>();
+	coinmstr_state *state = screen.machine().driver_data<coinmstr_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

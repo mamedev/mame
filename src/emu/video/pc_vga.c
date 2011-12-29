@@ -83,14 +83,14 @@ SCREEN_UPDATE( pc_video )
 {
 	UINT32 rc = 0;
 	int w = 0, h = 0;
-	pc_video_update_proc video_update = pc_choosevideomode(screen->machine(), &w, &h);
+	pc_video_update_proc video_update = pc_choosevideomode(screen.machine(), &w, &h);
 
 	if (video_update)
 	{
 		if ((pc_current_width != w) || (pc_current_height != h))
 		{
-			int width = screen->width();
-			int height = screen->height();
+			int width = screen.width();
+			int height = screen.height();
 
 			pc_current_width = w;
 			pc_current_height = h;
@@ -101,7 +101,7 @@ SCREEN_UPDATE( pc_video )
 				pc_current_height = height;
 
 			if ((pc_current_width > 100) && (pc_current_height > 100))
-				screen->set_visible_area(0, pc_current_width-1, 0, pc_current_height-1);
+				screen.set_visible_area(0, pc_current_width-1, 0, pc_current_height-1);
 
 			bitmap_fill(bitmap, cliprect, 0);
 		}

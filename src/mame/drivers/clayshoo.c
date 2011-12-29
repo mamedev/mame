@@ -185,7 +185,7 @@ static MACHINE_START( clayshoo )
 
 static SCREEN_UPDATE( clayshoo )
 {
-	clayshoo_state *state = screen->machine().driver_data<clayshoo_state>();
+	clayshoo_state *state = screen.machine().driver_data<clayshoo_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->m_videoram_size; offs++)

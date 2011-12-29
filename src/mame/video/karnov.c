@@ -125,9 +125,9 @@ static void draw_background( running_machine &machine, bitmap_t *bitmap, const r
 
 SCREEN_UPDATE( karnov )
 {
-	karnov_state *state = screen->machine().driver_data<karnov_state>();
-	draw_background(screen->machine(), bitmap, cliprect);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect,  screen->machine().generic.buffered_spriteram.u16, 0x800, 0);
+	karnov_state *state = screen.machine().driver_data<karnov_state>();
+	draw_background(screen.machine(), bitmap, cliprect);
+	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect,  screen.machine().generic.buffered_spriteram.u16, 0x800, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }

@@ -272,7 +272,7 @@ static void robowres_draw_sprites( bitmap_t *dest_bmp, const rectangle *cliprect
 
 SCREEN_UPDATE( appoooh )
 {
-	appoooh_state *state = screen->machine().driver_data<appoooh_state>();
+	appoooh_state *state = screen.machine().driver_data<appoooh_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	if (state->m_priority == 0)	/* fg behind sprites */
@@ -282,16 +282,16 @@ SCREEN_UPDATE( appoooh )
 	if (state->m_priority == 1)
 	{
 		/* sprite set #1 */
-		appoooh_draw_sprites(bitmap, cliprect, screen->machine().gfx[2], state->m_spriteram);
+		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], state->m_spriteram);
 		/* sprite set #2 */
-		appoooh_draw_sprites(bitmap, cliprect, screen->machine().gfx[3], state->m_spriteram_2);
+		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], state->m_spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		appoooh_draw_sprites(bitmap, cliprect, screen->machine().gfx[3], state->m_spriteram_2);
+		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], state->m_spriteram_2);
 		/* sprite set #1 */
-		appoooh_draw_sprites(bitmap, cliprect, screen->machine().gfx[2], state->m_spriteram);
+		appoooh_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], state->m_spriteram);
 	}
 
 	if (state->m_priority != 0)	/* fg in front of sprites */
@@ -302,7 +302,7 @@ SCREEN_UPDATE( appoooh )
 
 SCREEN_UPDATE( robowres )
 {
-	appoooh_state *state = screen->machine().driver_data<appoooh_state>();
+	appoooh_state *state = screen.machine().driver_data<appoooh_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	if (state->m_priority == 0)	/* fg behind sprites */
@@ -312,16 +312,16 @@ SCREEN_UPDATE( robowres )
 	if (state->m_priority == 1)
 	{
 		/* sprite set #1 */
-		robowres_draw_sprites(bitmap, cliprect, screen->machine().gfx[2], state->m_spriteram);
+		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], state->m_spriteram);
 		/* sprite set #2 */
-		robowres_draw_sprites(bitmap, cliprect, screen->machine().gfx[3], state->m_spriteram_2);
+		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], state->m_spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		robowres_draw_sprites(bitmap, cliprect, screen->machine().gfx[3], state->m_spriteram_2);
+		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[3], state->m_spriteram_2);
 		/* sprite set #1 */
-		robowres_draw_sprites(bitmap, cliprect, screen->machine().gfx[2], state->m_spriteram);
+		robowres_draw_sprites(bitmap, cliprect, screen.machine().gfx[2], state->m_spriteram);
 	}
 
 	if (state->m_priority != 0)	/* fg in front of sprites */

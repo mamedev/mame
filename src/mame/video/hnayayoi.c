@@ -265,7 +265,7 @@ static void draw_layer_interleaved( running_machine &machine, bitmap_t *bitmap, 
 
 SCREEN_UPDATE( hnayayoi )
 {
-	hnayayoi_state *state = screen->machine().driver_data<hnayayoi_state>();
+	hnayayoi_state *state = screen.machine().driver_data<hnayayoi_state>();
 	int col0 = (state->m_palbank >>  0) & 0x0f;
 	int col1 = (state->m_palbank >>  4) & 0x0f;
 	int col2 = (state->m_palbank >>  8) & 0x0f;
@@ -273,15 +273,15 @@ SCREEN_UPDATE( hnayayoi )
 
 	if (state->m_total_pixmaps == 4)
 	{
-		draw_layer_interleaved(screen->machine(), bitmap, cliprect, 3, 2, col1, 0);
-		draw_layer_interleaved(screen->machine(), bitmap, cliprect, 1, 0, col0, 1);
+		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 3, 2, col1, 0);
+		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 1, 0, col0, 1);
 	}
 	else	/* total_pixmaps == 8 */
 	{
-		draw_layer_interleaved(screen->machine(), bitmap, cliprect, 7, 6, col3, 0);
-		draw_layer_interleaved(screen->machine(), bitmap, cliprect, 5, 4, col2, 1);
-		draw_layer_interleaved(screen->machine(), bitmap, cliprect, 3, 2, col1, 1);
-		draw_layer_interleaved(screen->machine(), bitmap, cliprect, 1, 0, col0, 1);
+		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 7, 6, col3, 0);
+		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 5, 4, col2, 1);
+		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 3, 2, col1, 1);
+		draw_layer_interleaved(screen.machine(), bitmap, cliprect, 1, 0, col0, 1);
 	}
 	return 0;
 }

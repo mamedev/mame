@@ -120,14 +120,14 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 
 SCREEN_UPDATE( triplhnt )
 {
-	triplhnt_state *state = screen->machine().driver_data<triplhnt_state>();
-	device_t *discrete = screen->machine().device("discrete");
+	triplhnt_state *state = screen.machine().driver_data<triplhnt_state>();
+	device_t *discrete = screen.machine().device("discrete");
 
 	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	discrete_sound_w(discrete, TRIPLHNT_BEAR_ROAR_DATA, state->m_playfield_ram[0xfa] & 15);
 	discrete_sound_w(discrete, TRIPLHNT_SHOT_DATA, state->m_playfield_ram[0xfc] & 15);

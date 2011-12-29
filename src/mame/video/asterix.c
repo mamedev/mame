@@ -48,7 +48,7 @@ void asterix_tile_callback( running_machine &machine, int layer, int *code, int 
 
 SCREEN_UPDATE( asterix )
 {
-	asterix_state *state = screen->machine().driver_data<asterix_state>();
+	asterix_state *state = screen.machine().driver_data<asterix_state>();
 	static const int K053251_CI[4] = { K053251_CI0, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[3], plane, new_colorbase;
 
@@ -96,7 +96,7 @@ SCREEN_UPDATE( asterix )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);

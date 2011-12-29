@@ -61,7 +61,7 @@ static VIDEO_START( jongkyo )
 
 static SCREEN_UPDATE( jongkyo )
 {
-	jongkyo_state *state = screen->machine().driver_data<jongkyo_state>();
+	jongkyo_state *state = screen.machine().driver_data<jongkyo_state>();
 	int y;
 
 	for (y = 0; y < 256; ++y)

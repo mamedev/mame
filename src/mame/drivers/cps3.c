@@ -959,10 +959,10 @@ static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, in
 
 static SCREEN_UPDATE(cps3)
 {
-	cps3_state *state = screen->machine().driver_data<cps3_state>();
+	cps3_state *state = screen.machine().driver_data<cps3_state>();
 	int y,x, count;
-	attoseconds_t period = screen->frame_period().attoseconds;
-	rectangle visarea = screen->visible_area();
+	attoseconds_t period = screen.frame_period().attoseconds;
+	rectangle visarea = screen.visible_area();
 
 	int bg_drawn[4] = { 0, 0, 0, 0 };
 
@@ -982,7 +982,7 @@ static SCREEN_UPDATE(cps3)
 			state->m_screenwidth = 496;
 			visarea.min_x = 0; visarea.max_x = 496-1;
 			visarea.min_y = 0; visarea.max_y = 224-1;
-			screen->configure(496, 224, visarea, period);
+			screen.configure(496, 224, visarea, period);
 		}
 	}
 	else
@@ -992,7 +992,7 @@ static SCREEN_UPDATE(cps3)
 			state->m_screenwidth = 384;
 			visarea.min_x = 0; visarea.max_x = 384-1;
 			visarea.min_y = 0; visarea.max_y = 224-1;
-			screen->configure(384, 224, visarea, period);
+			screen.configure(384, 224, visarea, period);
 		}
 	}
 
@@ -1109,7 +1109,7 @@ static SCREEN_UPDATE(cps3)
 					{
 						for (uu=0;uu<1023;uu++)
 						{
-							cps3_draw_tilemapsprite_line(screen->machine(), tilemapnum, uu, state->m_renderbuffer_bitmap, &state->m_renderbuffer_clip );
+							cps3_draw_tilemapsprite_line(screen.machine(), tilemapnum, uu, state->m_renderbuffer_bitmap, &state->m_renderbuffer_clip );
 						}
 					}
 					bg_drawn[tilemapnum] = 1;
@@ -1182,13 +1182,13 @@ static SCREEN_UPDATE(cps3)
 								/* use the bpp value from the main list or the sublists? */
 								if (whichbpp)
 								{
-									if (!global_bpp) screen->machine().gfx[1]->color_granularity=256;
-									else screen->machine().gfx[1]->color_granularity=64;
+									if (!global_bpp) screen.machine().gfx[1]->color_granularity=256;
+									else screen.machine().gfx[1]->color_granularity=64;
 								}
 								else
 								{
-									if (!bpp) screen->machine().gfx[1]->color_granularity=256;
-									else screen->machine().gfx[1]->color_granularity=64;
+									if (!bpp) screen.machine().gfx[1]->color_granularity=256;
+									else screen.machine().gfx[1]->color_granularity=64;
 								}
 
 								{
@@ -1196,11 +1196,11 @@ static SCREEN_UPDATE(cps3)
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,&state->m_renderbuffer_clip,screen->machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,&state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,&state->m_renderbuffer_clip,screen->machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,&state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
 									}
 									count++;
 								}
@@ -1266,7 +1266,7 @@ static SCREEN_UPDATE(cps3)
 				pal += state->m_ss_pal_base << 5;
 				tile+=0x200;
 
-				cps3_drawgfxzoom(bitmap, cliprect, screen->machine().gfx[0],tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
+				cps3_drawgfxzoom(bitmap, cliprect, screen.machine().gfx[0],tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
 				count++;
 			}
 		}

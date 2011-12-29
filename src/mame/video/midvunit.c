@@ -527,7 +527,7 @@ READ32_HANDLER( midvunit_textureram_r )
 
 SCREEN_UPDATE( midvunit )
 {
-	midvunit_state *state = screen->machine().driver_data<midvunit_state>();
+	midvunit_state *state = screen.machine().driver_data<midvunit_state>();
 	int x, y, width, xoffs;
 	UINT32 offset;
 
@@ -551,7 +551,7 @@ SCREEN_UPDATE( midvunit )
 
 	/* adjust the offset */
 	offset += xoffs;
-	offset += 512 * (cliprect->min_y - screen->visible_area().min_y);
+	offset += 512 * (cliprect->min_y - screen.visible_area().min_y);
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)

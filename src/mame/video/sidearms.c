@@ -348,9 +348,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( sidearms )
 {
-	sidearms_state *state = screen->machine().driver_data<sidearms_state>();
+	sidearms_state *state = screen.machine().driver_data<sidearms_state>();
 
-	sidearms_draw_starfield(screen->machine(), bitmap);
+	sidearms_draw_starfield(screen.machine(), bitmap);
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bg_scrollx[0] + (state->m_bg_scrollx[1] << 8 & 0xf00));
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_bg_scrolly[0] + (state->m_bg_scrolly[1] << 8 & 0xf00));
@@ -359,7 +359,7 @@ SCREEN_UPDATE( sidearms )
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	if (state->m_objon)
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 
 	if (state->m_charon)
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
@@ -368,7 +368,7 @@ SCREEN_UPDATE( sidearms )
 
 SCREEN_EOF( sidearms )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram_w(space, 0, 0);
 }

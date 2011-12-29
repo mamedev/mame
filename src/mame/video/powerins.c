@@ -342,7 +342,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( powerins )
 {
-	powerins_state *state = screen->machine().driver_data<powerins_state>();
+	powerins_state *state = screen.machine().driver_data<powerins_state>();
 	int layers_ctrl = -1;
 
 	int scrollx = (state->m_vctrl_0[2/2]&0xff) + (state->m_vctrl_0[0/2]&0xff)*256;
@@ -355,21 +355,21 @@ SCREEN_UPDATE( powerins )
 	tilemap_set_scrolly( state->m_tilemap_1, 0,  0x00);
 
 #ifdef MAME_DEBUG
-if (screen->machine().input().code_pressed(KEYCODE_Z))
+if (screen.machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
 
-	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-//  if (screen->machine().input().code_pressed(KEYCODE_E))    msk |= 4;
-	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+//  if (screen.machine().input().code_pressed(KEYCODE_E))    msk |= 4;
+	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
 	if (layers_ctrl&1)		tilemap_draw(bitmap,cliprect, state->m_tilemap_0, 0, 0);
 	else					bitmap_fill(bitmap,cliprect,0);
-	if (layers_ctrl&8)		draw_sprites(screen->machine(),bitmap,cliprect);
+	if (layers_ctrl&8)		draw_sprites(screen.machine(),bitmap,cliprect);
 	if (layers_ctrl&2)		tilemap_draw(bitmap,cliprect, state->m_tilemap_1, 0, 0);
 	return 0;
 }

@@ -472,7 +472,7 @@ static VIDEO_START(mastboy)
 
 static SCREEN_UPDATE(mastboy)
 {
-	mastboy_state *state = screen->machine().driver_data<mastboy_state>();
+	mastboy_state *state = screen.machine().driver_data<mastboy_state>();
 	int y,x,i;
 	int count = 0x000;
 
@@ -480,7 +480,7 @@ static SCREEN_UPDATE(mastboy)
 	{
 		int coldat = state->m_colram[i+1] |  (state->m_colram[i+0]<<8);
 
-		palette_set_color_rgb(screen->machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
+		palette_set_color_rgb(screen.machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
 
 	for (y=0;y<32;y++)
@@ -494,12 +494,12 @@ static SCREEN_UPDATE(mastboy)
 
 			if (tileno&0x800)
 			{
-				gfx = screen->machine().gfx[1];
+				gfx = screen.machine().gfx[1];
 				tileno &=0x7ff;
 			}
 			else
 			{
-				gfx = screen->machine().gfx[0];
+				gfx = screen.machine().gfx[0];
 			}
 
 

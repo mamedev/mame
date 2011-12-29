@@ -605,11 +605,11 @@ VIDEO_START( suprtrio )
 
 SCREEN_UPDATE( tumblepb )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -635,17 +635,17 @@ SCREEN_UPDATE( tumblepb )
 	else
 		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	tumblepb_draw_sprites(screen->machine(), bitmap, cliprect);
+	tumblepb_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( jumpkids )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -671,17 +671,17 @@ SCREEN_UPDATE( jumpkids )
 	else
 		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	jumpkids_draw_sprites(screen->machine(), bitmap, cliprect);
+	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( semicom )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -707,13 +707,13 @@ SCREEN_UPDATE( semicom )
 	else
 		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	jumpkids_draw_sprites(screen->machine(), bitmap, cliprect);
+	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( semicom_altoffsets )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offsx, offsy, offsx2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
@@ -736,17 +736,17 @@ SCREEN_UPDATE( semicom_altoffsets )
 	else
 		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	jumpkids_draw_sprites(screen->machine(), bitmap, cliprect);
+	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( bcstory )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* not sure of this */
 	if (state->m_flipscreen)
@@ -774,17 +774,17 @@ SCREEN_UPDATE( bcstory )
 	else
 		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	jumpkids_draw_sprites(screen->machine(), bitmap, cliprect);
+	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( semibase )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	offs = -1;
 	offs2 = -2;
 
@@ -803,17 +803,17 @@ SCREEN_UPDATE( semibase )
 	else
 		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	jumpkids_draw_sprites(screen->machine(), bitmap, cliprect);
+	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( sdfight )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	offs = -1;
 	offs2 = -5; // foreground scroll..
 
@@ -831,7 +831,7 @@ SCREEN_UPDATE( sdfight )
 	else
 		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	jumpkids_draw_sprites(screen->machine(), bitmap, cliprect);
+	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -839,11 +839,11 @@ SCREEN_UPDATE( sdfight )
 
 SCREEN_UPDATE( fncywld )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -869,16 +869,16 @@ SCREEN_UPDATE( fncywld )
 	else
 		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	fncywld_draw_sprites(screen->machine(), bitmap, cliprect);
+	fncywld_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 
 SCREEN_UPDATE( jumppop )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 
-	//  bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	//  bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	tilemap_set_scrollx(state->m_pf1_tilemap, 0, state->m_control[2] - 0x3a0);
 	tilemap_set_scrolly(state->m_pf1_tilemap, 0, state->m_control[3]);
@@ -901,14 +901,14 @@ SCREEN_UPDATE( jumppop )
 
 //popmessage("%04x %04x %04x %04x %04x %04x %04x %04x", state->m_control[0],state->m_control[1],state->m_control[2],state->m_control[3],state->m_control[4],state->m_control[5],state->m_control[6],state->m_control[7]);
 
-	jumpkids_draw_sprites(screen->machine(), bitmap, cliprect);
+	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 
 SCREEN_UPDATE( suprtrio )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 
 	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, -state->m_control[1] - 6);
 	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, -state->m_control[2]);
@@ -918,7 +918,7 @@ SCREEN_UPDATE( suprtrio )
 	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	jumpkids_draw_sprites(screen->machine(), bitmap, cliprect);
+	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 #if 0
 popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
  state->m_control[0],
@@ -936,11 +936,11 @@ popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
 
 SCREEN_UPDATE( pangpang )
 {
-	tumbleb_state *state = screen->machine().driver_data<tumbleb_state>();
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -966,6 +966,6 @@ SCREEN_UPDATE( pangpang )
 	else
 		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
 
-	jumpkids_draw_sprites(screen->machine(), bitmap, cliprect);
+	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

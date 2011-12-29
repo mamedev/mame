@@ -372,7 +372,7 @@ static TMS9928A_INTERFACE(re900_tms9928a_interface)
 
 static SCREEN_UPDATE( re900 )
 {
-	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9128" );
+	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9128" );
 
 	tms9928a->update( bitmap, cliprect );
 	return 0;

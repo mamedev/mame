@@ -104,8 +104,8 @@ static VIDEO_START( superwng )
 
 static SCREEN_UPDATE( superwng )
 {
-	superwng_state *state = screen->machine().driver_data<superwng_state>();
-	int flip=flip_screen_get(screen->machine());
+	superwng_state *state = screen.machine().driver_data<superwng_state>();
+	int flip=flip_screen_get(screen.machine());
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	rectangle tmp=*cliprect;
@@ -140,7 +140,7 @@ static SCREEN_UPDATE( superwng )
 			if(state->m_videoram_bg[i+1] | state->m_colorram_bg[i])
 			{
 
-				drawgfx_transpen(bitmap, cliprect,screen->machine().gfx[1],
+				drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[1],
 								code,
 								attr,
 								flip, flip,

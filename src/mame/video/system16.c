@@ -631,7 +631,7 @@ VIDEO_START( s16a_bootleg_passsht )
 // Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3
 SCREEN_UPDATE( s16a_bootleg )
 {
-	segas1x_bootleg_state *state = screen->machine().driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = screen.machine().driver_data<segas1x_bootleg_state>();
 
 	// passing shot
 	int offset_txtx = 192;
@@ -641,7 +641,7 @@ SCREEN_UPDATE( s16a_bootleg )
 	int offset_bg0x = 187;
 	int offset_bg0y = 0;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
 	tilemap_mark_all_tiles_dirty(state->m_bg_tilemaps[0]);
@@ -689,7 +689,7 @@ SCREEN_UPDATE( s16a_bootleg )
 /* The Passing Shot 4 Player bootleg has weird scroll registers (different offsets, ^0x7 xor) */
 SCREEN_UPDATE( s16a_bootleg_passht4b )
 {
-	segas1x_bootleg_state *state = screen->machine().driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = screen.machine().driver_data<segas1x_bootleg_state>();
 
 	// passing shot
 	int offset_txtx = 192;
@@ -699,7 +699,7 @@ SCREEN_UPDATE( s16a_bootleg_passht4b )
 	int offset_bg0x = 5;
 	int offset_bg0y = 32;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
 	tilemap_mark_all_tiles_dirty(state->m_bg_tilemaps[0]);
@@ -732,7 +732,7 @@ SCREEN_UPDATE( s16a_bootleg_passht4b )
 
 SCREEN_UPDATE( system16 )
 {
-	segas1x_bootleg_state *state = screen->machine().driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = screen.machine().driver_data<segas1x_bootleg_state>();
 
 	if (!state->m_refreshenable)
 	{
@@ -740,9 +740,9 @@ SCREEN_UPDATE( system16 )
 		return 0;
 	}
 
-	update_page(screen->machine());
+	update_page(screen.machine());
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	tilemap_set_scrollx(state->m_background, 0, -320 - state->m_bg_scrollx);
 	tilemap_set_scrolly(state->m_background, 0, -256 + state->m_bg_scrolly + state->m_back_yscroll);
@@ -768,7 +768,7 @@ SCREEN_UPDATE( system16 )
 
 	tilemap_draw(bitmap, cliprect, state->m_text_layer, 0, 0xf);
 
-	//draw_sprites(screen->machine(), bitmap, cliprect,0);
+	//draw_sprites(screen.machine(), bitmap, cliprect,0);
 
 	/* draw the sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
@@ -778,17 +778,17 @@ SCREEN_UPDATE( system16 )
 
 SCREEN_UPDATE( system18old )
 {
-	segas1x_bootleg_state *state = screen->machine().driver_data<segas1x_bootleg_state>();
+	segas1x_bootleg_state *state = screen.machine().driver_data<segas1x_bootleg_state>();
 
 	if (!state->m_refreshenable)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
-	update_page(screen->machine());
+	update_page(screen.machine());
 
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
 
 	bitmap_fill(bitmap,cliprect,0);
 

@@ -68,6 +68,7 @@ VIDEO_START( rockntread );
 SCREEN_UPDATE( rockntread );
 
 VIDEO_START( rocknms );
-SCREEN_UPDATE( rocknms );
+SCREEN_UPDATE( rocknms_left );
+SCREEN_UPDATE( rocknms_right );
 
 VIDEO_START( nndmseal );

@@ -32,7 +32,7 @@ public:
 
 static SCREEN_UPDATE( ultrsprt )
 {
-	ultrsprt_state *state = screen->machine().driver_data<ultrsprt_state>();
+	ultrsprt_state *state = screen.machine().driver_data<ultrsprt_state>();
 	int i, j;
 
 	UINT8 *ram = (UINT8 *)state->m_vram;

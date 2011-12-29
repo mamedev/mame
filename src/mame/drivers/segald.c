@@ -93,8 +93,8 @@ static SCREEN_UPDATE( astron )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	astron_draw_characters(screen->machine(), bitmap, cliprect);
-	astron_draw_sprites(screen->machine(), bitmap, cliprect);
+	astron_draw_characters(screen.machine(), bitmap, cliprect);
+	astron_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }

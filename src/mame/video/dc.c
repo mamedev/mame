@@ -2643,7 +2643,7 @@ VIDEO_START(dc)
 
 SCREEN_UPDATE(dc)
 {
-	dc_state *state = screen->machine().driver_data<dc_state>();
+	dc_state *state = screen.machine().driver_data<dc_state>();
 
 	/******************
       MAME note
@@ -2659,11 +2659,11 @@ SCREEN_UPDATE(dc)
     ******************/
 
 //  static int useframebuffer=1;
-//  const rectangle &visarea = screen->visible_area();
+//  const rectangle &visarea = screen.visible_area();
 //  int y,x;
 
 #if DEBUG_PALRAM
-	debug_paletteram(screen->machine());
+	debug_paletteram(screen.machine());
 #endif
 
 	// copy our fake framebuffer bitmap (where things have been rendered) to the screen
@@ -2682,10 +2682,10 @@ SCREEN_UPDATE(dc)
 	bitmap_fill(bitmap,cliprect,MAKE_ARGB(0xff,vo_border_R,vo_border_G,vo_border_B)); //FIXME: Chroma bit?
 
 	if(!spg_blank_video)
-		pvr_drawframebuffer(screen->machine(),bitmap,cliprect);
+		pvr_drawframebuffer(screen.machine(),bitmap,cliprect);
 
 	// update this here so we only do string lookup once per frame
-	state->debug_dip_status = input_port_read(screen->machine(), "MAMEDEBUG");
+	state->debug_dip_status = input_port_read(screen.machine(), "MAMEDEBUG");
 
 	return 0;
 }

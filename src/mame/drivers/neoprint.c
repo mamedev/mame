@@ -95,8 +95,8 @@ SCREEN_UPDATE(neoprint)
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_layer(screen->machine(),bitmap,cliprect,1,2);
-	draw_layer(screen->machine(),bitmap,cliprect,0,2);
+	draw_layer(screen.machine(),bitmap,cliprect,1,2);
+	draw_layer(screen.machine(),bitmap,cliprect,0,2);
 
 	return 0;
 }
@@ -105,9 +105,9 @@ SCREEN_UPDATE(nprsp)
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_layer(screen->machine(),bitmap,cliprect,1,0);
-	draw_layer(screen->machine(),bitmap,cliprect,2,0);
-	draw_layer(screen->machine(),bitmap,cliprect,0,0);
+	draw_layer(screen.machine(),bitmap,cliprect,1,0);
+	draw_layer(screen.machine(),bitmap,cliprect,2,0);
+	draw_layer(screen.machine(),bitmap,cliprect,0,0);
 
 	return 0;
 }

@@ -693,9 +693,9 @@ static void scanline_update_bootleg(screen_device &screen, int scanline)
 {
 	/* sound IRQ is on 32V */
 //  if (scanline & 32)
-//      atarigen_6502_irq_ack_r(screen->machine(), 0);
+//      atarigen_6502_irq_ack_r(screen.machine(), 0);
 //  else if (!(input_port_read(machine, "FE4000") & 0x40))
-//      atarigen_6502_irq_gen(screen->machine().device("audiocpu"));
+//      atarigen_6502_irq_gen(screen.machine().device("audiocpu"));
 }
 
 

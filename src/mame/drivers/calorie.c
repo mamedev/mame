@@ -141,7 +141,7 @@ static VIDEO_START( calorie )
 
 static SCREEN_UPDATE( calorie )
 {
-	calorie_state *state = screen->machine().driver_data<calorie_state>();
+	calorie_state *state = screen.machine().driver_data<calorie_state>();
 	int x;
 
 	if (state->m_bg_bank & 0x10)
@@ -166,7 +166,7 @@ static SCREEN_UPDATE( calorie )
 		ypos = 0xff - state->m_sprites[x + 2];
 		xpos = state->m_sprites[x + 3];
 
-		if (flip_screen_get(screen->machine()))
+		if (flip_screen_get(screen.machine()))
 		{
 			if (state->m_sprites[x + 1] & 0x10)
 				ypos = 0xff - ypos + 32;
@@ -181,12 +181,12 @@ static SCREEN_UPDATE( calorie )
 		if (state->m_sprites[x + 1] & 0x10)
 		{
 			 /* 32x32 sprites */
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
 		}
 		else
 		{
 			/* 16x16 sprites */
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[2], tileno, color, flipx, flipy, xpos, ypos - 15, 0);
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], tileno, color, flipx, flipy, xpos, ypos - 15, 0);
 		}
 	}
 	return 0;

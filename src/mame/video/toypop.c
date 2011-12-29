@@ -277,9 +277,9 @@ void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *c
 
 SCREEN_UPDATE( toypop )
 {
-	toypop_state *state = screen->machine().driver_data<toypop_state>();
-	draw_background(screen->machine(), bitmap);
+	toypop_state *state = screen.machine().driver_data<toypop_state>();
+	draw_background(screen.machine(), bitmap);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram);
 	return 0;
 }

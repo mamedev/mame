@@ -152,10 +152,10 @@ VIDEO_START( gomoku )
 
 SCREEN_UPDATE( gomoku )
 {
-	gomoku_state *state = screen->machine().driver_data<gomoku_state>();
-	UINT8 *GOMOKU_BG_X = screen->machine().region( "user1" )->base();
-	UINT8 *GOMOKU_BG_Y = screen->machine().region( "user2" )->base();
-	UINT8 *GOMOKU_BG_D = screen->machine().region( "user3" )->base();
+	gomoku_state *state = screen.machine().driver_data<gomoku_state>();
+	UINT8 *GOMOKU_BG_X = screen.machine().region( "user1" )->base();
+	UINT8 *GOMOKU_BG_Y = screen.machine().region( "user2" )->base();
+	UINT8 *GOMOKU_BG_D = screen.machine().region( "user3" )->base();
 	int x, y;
 	int bgram;
 	int bgoffs;

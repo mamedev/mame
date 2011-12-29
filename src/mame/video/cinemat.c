@@ -218,7 +218,7 @@ SCREEN_UPDATE( cinemat )
 	SCREEN_UPDATE_CALL(vector);
 	vector_clear_list();
 
-	ccpu_wdt_timer_trigger(screen->machine().device("maincpu"));
+	ccpu_wdt_timer_trigger(screen.machine().device("maincpu"));
 
 	return 0;
 }
@@ -233,7 +233,7 @@ SCREEN_UPDATE( cinemat )
 
 SCREEN_UPDATE( spacewar )
 {
-	int sw_option = input_port_read(screen->machine(), "INPUTS");
+	int sw_option = input_port_read(screen.machine(), "INPUTS");
 
 	SCREEN_UPDATE_CALL(cinemat);
 

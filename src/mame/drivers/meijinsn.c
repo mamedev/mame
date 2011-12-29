@@ -285,7 +285,7 @@ static PALETTE_INIT( meijinsn )
 
 static SCREEN_UPDATE(meijinsn)
 {
-	meijinsn_state *state = screen->machine().driver_data<meijinsn_state>();
+	meijinsn_state *state = screen.machine().driver_data<meijinsn_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x4000; offs++)

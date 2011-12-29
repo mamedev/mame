@@ -38,7 +38,7 @@ WRITE16_HANDLER( opwolf_spritectrl_w )
 
 SCREEN_UPDATE( opwolf )
 {
-	opwolf_state *state = screen->machine().driver_data<opwolf_state>();
+	opwolf_state *state = screen.machine().driver_data<opwolf_state>();
 	int layer[2];
 
 	pc080sn_tilemap_update(state->m_pc080sn);
@@ -46,7 +46,7 @@ SCREEN_UPDATE( opwolf )
 	layer[0] = 0;
 	layer[1] = 1;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[1], 0, 2);

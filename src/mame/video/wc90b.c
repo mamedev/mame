@@ -134,7 +134,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( wc90b )
 {
-	wc90b_state *state = screen->machine().driver_data<wc90b_state>();
+	wc90b_state *state = screen.machine().driver_data<wc90b_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap,0,8 * (state->m_scroll2x[0] & 0x7f) + 256 - 4 + (state->m_scroll_x_lo[0] & 0x07));
 	tilemap_set_scrolly(state->m_bg_tilemap,0,state->m_scroll2y[0] + 1 + ((state->m_scroll2x[0] & 0x80) ? 256 : 0));
 	tilemap_set_scrollx(state->m_fg_tilemap,0,8 * (state->m_scroll1x[0] & 0x7f) + 256 - 6 + ((state->m_scroll_x_lo[0] & 0x38) >> 3));
@@ -142,8 +142,8 @@ SCREEN_UPDATE( wc90b )
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect, 1 );
+	draw_sprites(screen.machine(), bitmap,cliprect, 1 );
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect, 0 );
+	draw_sprites(screen.machine(), bitmap,cliprect, 0 );
 	return 0;
 }

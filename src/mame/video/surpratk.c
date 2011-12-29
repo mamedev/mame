@@ -48,7 +48,7 @@ void surpratk_sprite_callback( running_machine &machine, int *code, int *color, 
 
 SCREEN_UPDATE( surpratk )
 {
-	surpratk_state *state = screen->machine().driver_data<surpratk_state>();
+	surpratk_state *state = screen.machine().driver_data<surpratk_state>();
 	int layer[3], bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
@@ -68,7 +68,7 @@ SCREEN_UPDATE( surpratk )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[0], 0, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[1], 0, 2);

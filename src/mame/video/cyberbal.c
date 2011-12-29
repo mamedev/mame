@@ -332,7 +332,7 @@ void cyberbal_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-static void update_one_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
+static UINT32 update_one_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int index)
 {
 	cyberbal_state *state = screen.machine().driver_data<cyberbal_state>();
 	atarimo_rect_list rectlist;
@@ -341,13 +341,8 @@ static void update_one_screen(screen_device &screen, bitmap_t *bitmap, const rec
 	int x, y, r, mooffset, temp;
 	rectangle visarea = screen.visible_area();
 
-	/* for 2p games, the left screen is the main screen */
-	device_t *left_screen = screen.machine().device("lscreen");
-	if (left_screen == NULL)
-		left_screen = screen.machine().device("screen");
-
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, (&screen == left_screen) ? state->m_playfield_tilemap : state->m_playfield2_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, (index == 0) ? state->m_playfield_tilemap : state->m_playfield2_tilemap, 0, 0);
 
 	/* draw the MOs -- note some kludging to get this to work correctly for 2 screens */
 	mooffset = 0;
@@ -356,7 +351,7 @@ static void update_one_screen(screen_device &screen, bitmap_t *bitmap, const rec
 	temp = visarea.max_x;
 	if (temp > SCREEN_WIDTH)
 		visarea.max_x /= 2;
-	mobitmap = atarimo_render((&screen == left_screen) ? 0 : 1, cliprect, &rectlist);
+	mobitmap = atarimo_render((index == 0) ? 0 : 1, cliprect, &rectlist);
 	tempclip.min_x += mooffset;
 	tempclip.max_x += mooffset;
 	visarea.max_x = temp;
@@ -380,12 +375,22 @@ static void update_one_screen(screen_device &screen, bitmap_t *bitmap, const rec
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, (&screen == left_screen) ? state->m_alpha_tilemap : state->m_alpha2_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, (index == 0) ? state->m_alpha_tilemap : state->m_alpha2_tilemap, 0, 0);
+	return 0;
 }
 
 
-SCREEN_UPDATE( cyberbal )
+SCREEN_UPDATE( cyberbal_left )
 {
-	update_one_screen(*screen, bitmap, cliprect);
-	return 0;
+	return update_one_screen(screen, bitmap, cliprect, 0);
+}
+
+SCREEN_UPDATE( cyberbal_right )
+{
+	return update_one_screen(screen, bitmap, cliprect, 1);
+}
+
+SCREEN_UPDATE( cyberbal2p )
+{
+	return update_one_screen(screen, bitmap, cliprect, 0);
 }

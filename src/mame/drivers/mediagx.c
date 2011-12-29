@@ -346,14 +346,14 @@ static void draw_cga(running_machine &machine, bitmap_t *bitmap, const rectangle
 
 static SCREEN_UPDATE(mediagx)
 {
-	mediagx_state *state = screen->machine().driver_data<mediagx_state>();
+	mediagx_state *state = screen.machine().driver_data<mediagx_state>();
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_framebuffer(screen->machine(), bitmap, cliprect);
+	draw_framebuffer(screen.machine(), bitmap, cliprect);
 
 	if (state->m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
-		draw_cga(screen->machine(), bitmap, cliprect);
+		draw_cga(screen.machine(), bitmap, cliprect);
 	}
 	return 0;
 }

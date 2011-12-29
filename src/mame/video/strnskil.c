@@ -125,9 +125,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( strnskil )
 {
-	strnskil_state *state = screen->machine().driver_data<strnskil_state>();
+	strnskil_state *state = screen.machine().driver_data<strnskil_state>();
 	int row;
-	const UINT8 *usr1 = screen->machine().region("user1")->base();
+	const UINT8 *usr1 = screen.machine().region("user1")->base();
 
 	for (row = 0; row < 32; row++)
 	{
@@ -146,6 +146,6 @@ SCREEN_UPDATE( strnskil )
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

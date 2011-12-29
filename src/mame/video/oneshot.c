@@ -158,33 +158,33 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( oneshot )
 {
-	oneshot_state *state = screen->machine().driver_data<oneshot_state>();
+	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	tilemap_set_scrollx(state->m_mid_tilemap, 0, state->m_scroll[0] - 0x1f5);
 	tilemap_set_scrolly(state->m_mid_tilemap, 0, state->m_scroll[1]);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_mid_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	draw_crosshairs(screen->machine(), bitmap, cliprect);
+	draw_crosshairs(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( maddonna )
 {
-	oneshot_state *state = screen->machine().driver_data<oneshot_state>();
+	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	tilemap_set_scrolly(state->m_mid_tilemap, 0, state->m_scroll[1]); // other registers aren't used so we don't know which layers they relate to
 
 	tilemap_draw(bitmap, cliprect, state->m_mid_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 //  popmessage ("%04x %04x %04x %04x %04x %04x %04x %04x", state->m_scroll[0], state->m_scroll[1], state->m_scroll[2], state->m_scroll[3], state->m_scroll[4], state->m_scroll[5], state->m_scroll[6], state->m_scroll[7]);
 	return 0;

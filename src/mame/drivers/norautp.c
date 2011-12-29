@@ -566,12 +566,12 @@ static VIDEO_START( norautp )
 
 static SCREEN_UPDATE( norautp )
 {
-	norautp_state *state = screen->machine().driver_data<norautp_state>();
+	norautp_state *state = screen.machine().driver_data<norautp_state>();
 	int x, y, count;
 
 	count = 0;
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]); //black pen
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]); //black pen
 
 	for(y = 0; y < 8; y++)
 	{
@@ -583,7 +583,7 @@ static SCREEN_UPDATE( norautp )
 				int tile = state->m_np_vram[count] & 0x3f;
 				int colour = (state->m_np_vram[count] & 0xc0) >> 6;
 
-				drawgfx_opaque(bitmap,cliprect, screen->machine().gfx[1], tile, colour, 0, 0, (x * 32) + 8, y * 32);
+				drawgfx_opaque(bitmap,cliprect, screen.machine().gfx[1], tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
 				count+=2;
 			}
@@ -595,7 +595,7 @@ static SCREEN_UPDATE( norautp )
 				int tile = state->m_np_vram[count] & 0x3f;
 				int colour = (state->m_np_vram[count] & 0xc0) >> 6;
 
-				drawgfx_opaque(bitmap,cliprect, screen->machine().gfx[0], tile, colour, 0, 0, x * 16, y * 32);
+				drawgfx_opaque(bitmap,cliprect, screen.machine().gfx[0], tile, colour, 0, 0, x * 16, y * 32);
 
 				count++;
 			}

@@ -252,8 +252,8 @@ static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( ddribble )
 {
-	ddribble_state *state = screen->machine().driver_data<ddribble_state>();
-	set_pens(screen->machine());
+	ddribble_state *state = screen.machine().driver_data<ddribble_state>();
+	set_pens(screen.machine());
 
 	tilemap_set_flip(state->m_fg_tilemap, (state->m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	tilemap_set_flip(state->m_bg_tilemap, (state->m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -265,8 +265,8 @@ SCREEN_UPDATE( ddribble )
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_vregs[1][0]);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram_1, 0x07d, 2, state->m_vregs[0][4] & 0x08);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram_2, 0x140, 3, state->m_vregs[1][4] & 0x08);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram_1, 0x07d, 2, state->m_vregs[0][4] & 0x08);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram_2, 0x140, 3, state->m_vregs[1][4] & 0x08);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

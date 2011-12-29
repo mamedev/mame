@@ -314,16 +314,16 @@ static void set_scroll(running_machine &machine, int layer)
 
 SCREEN_UPDATE( baraduke )
 {
-	baraduke_state *state = screen->machine().driver_data<baraduke_state>();
+	baraduke_state *state = screen.machine().driver_data<baraduke_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x1800;
 	int back;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use flip_screen_set(screen->machine(), ) because the visible area is asymmetrical */
-	flip_screen_set_no_update(screen->machine(), spriteram[0x07f6] & 0x01);
-	tilemap_set_flip_all(screen->machine(),flip_screen_get(screen->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-	set_scroll(screen->machine(), 0);
-	set_scroll(screen->machine(), 1);
+	/* can't use flip_screen_set(screen.machine(), ) because the visible area is asymmetrical */
+	flip_screen_set_no_update(screen.machine(), spriteram[0x07f6] & 0x01);
+	tilemap_set_flip_all(screen.machine(),flip_screen_get(screen.machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	set_scroll(screen.machine(), 0);
+	set_scroll(screen.machine(), 1);
 
 	if (((state->m_xscroll[0] & 0x0e00) >> 9) == 6)
 		back = 1;
@@ -331,9 +331,9 @@ SCREEN_UPDATE( baraduke )
 		back = 0;
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap[back],TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(screen->machine(), bitmap,cliprect,0);
+	draw_sprites(screen.machine(), bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap[back ^ 1],0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect,1);
+	draw_sprites(screen.machine(), bitmap,cliprect,1);
 
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
@@ -342,7 +342,7 @@ SCREEN_UPDATE( baraduke )
 
 SCREEN_EOF( baraduke )
 {
-	baraduke_state *state = machine.driver_data<baraduke_state>();
+	baraduke_state *state = screen.machine().driver_data<baraduke_state>();
 	if (state->m_copy_sprites)
 	{
 		UINT8 *spriteram = state->m_spriteram + 0x1800;

@@ -134,20 +134,20 @@ static VIDEO_START(dunhuang)
 
 static SCREEN_UPDATE( dunhuang )
 {
-	dunhuang_state *state = screen->machine().driver_data<dunhuang_state>();
+	dunhuang_state *state = screen.machine().driver_data<dunhuang_state>();
 	int layers_ctrl = -1;
 
 #if DUNHUANG_DEBUG
-if (screen->machine().input().code_pressed(KEYCODE_Z))
+if (screen.machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	switch (state->m_layers)
 	{

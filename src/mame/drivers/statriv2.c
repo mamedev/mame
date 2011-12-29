@@ -179,9 +179,9 @@ static WRITE8_HANDLER( statriv2_videoram_w )
 
 static SCREEN_UPDATE( statriv2 )
 {
-	statriv2_state *state = screen->machine().driver_data<statriv2_state>();
-	if (tms9927_screen_reset(screen->machine().device("tms")))
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	statriv2_state *state = screen.machine().driver_data<statriv2_state>();
+	if (tms9927_screen_reset(screen.machine().device("tms")))
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 	else
 		tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 	return 0;

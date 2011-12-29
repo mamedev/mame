@@ -444,12 +444,12 @@ static void draw_sprite(running_machine &machine, bitmap_t *bitmap, int xsize,in
 /* sprite format / offset could be completely wrong, this is just based on our (currently incorrect) vram access */
 static SCREEN_UPDATE(littlerb)
 {
-	littlerb_state *state = screen->machine().driver_data<littlerb_state>();
+	littlerb_state *state = screen.machine().driver_data<littlerb_state>();
 	int x,y,offs, code;
 	int xsize,ysize;
 	int pal;
 	UINT16* spriteregion = &state->m_region4[0x400];
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 	//printf("frame\n");
 	/* the spriteram format is something like this .. */
 	for (offs=0x26/2;offs<0xc00;offs+=6) // start at 00x26?
@@ -468,7 +468,7 @@ static SCREEN_UPDATE(littlerb)
 
 		//if (code!=0) printf("%04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
 
-		draw_sprite(screen->machine(),bitmap,xsize,ysize,code,x-8,y-16, pal);
+		draw_sprite(screen.machine(),bitmap,xsize,ysize,code,x-8,y-16, pal);
 	}
 
 	return 0;

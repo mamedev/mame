@@ -126,7 +126,7 @@ static VIDEO_START ( pipeline )
 
 static SCREEN_UPDATE( pipeline )
 {
-	pipeline_state *state = screen->machine().driver_data<pipeline_state>();
+	pipeline_state *state = screen.machine().driver_data<pipeline_state>();
 	tilemap_draw(bitmap,cliprect,state->m_tilemap1, 0,0);
 	tilemap_draw(bitmap,cliprect,state->m_tilemap2, 0,0);
 	return 0;

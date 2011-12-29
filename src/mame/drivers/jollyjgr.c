@@ -484,7 +484,7 @@ static void draw_bitmap( running_machine &machine, bitmap_t *bitmap )
 
 static SCREEN_UPDATE( jollyjgr )
 {
-	jollyjgr_state *state = screen->machine().driver_data<jollyjgr_state>();
+	jollyjgr_state *state = screen.machine().driver_data<jollyjgr_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
@@ -493,7 +493,7 @@ static SCREEN_UPDATE( jollyjgr )
 	if(state->m_pri) //used in Frog & Spiders level 3
 	{
 		if(!(state->m_bitmap_disable))
-			draw_bitmap(screen->machine(), bitmap);
+			draw_bitmap(screen.machine(), bitmap);
 
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	}
@@ -502,7 +502,7 @@ static SCREEN_UPDATE( jollyjgr )
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 		if(!(state->m_bitmap_disable))
-			draw_bitmap(screen->machine(), bitmap);
+			draw_bitmap(screen.machine(), bitmap);
 	}
 
 	/* Sprites are the same as in Galaxian */
@@ -529,7 +529,7 @@ static SCREEN_UPDATE( jollyjgr )
 		if (offs < 3 * 4)
 			sy++;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
 				code,color,
 				flipx,flipy,
 				sx,sy,0);
@@ -540,7 +540,7 @@ static SCREEN_UPDATE( jollyjgr )
 
 static SCREEN_UPDATE( fspider )
 {
-	jollyjgr_state *state = screen->machine().driver_data<jollyjgr_state>();
+	jollyjgr_state *state = screen.machine().driver_data<jollyjgr_state>();
 
 	// Draw bg and sprites
 	SCREEN_UPDATE_CALL(jollyjgr);

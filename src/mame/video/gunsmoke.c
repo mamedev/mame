@@ -176,17 +176,17 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( gunsmoke )
 {
-	gunsmoke_state *state = screen->machine().driver_data<gunsmoke_state>();
+	gunsmoke_state *state = screen.machine().driver_data<gunsmoke_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[0]);
 
 	if (state->m_bgon)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	if (state->m_objon)
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 
 	if (state->m_chon)
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

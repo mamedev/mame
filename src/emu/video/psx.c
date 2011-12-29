@@ -3690,7 +3690,7 @@ PALETTE_INIT( psx )
 
 SCREEN_UPDATE( psx )
 {
-	psxgpu_device *gpu = downcast<psxgpu_device *>(screen->owner());
+	psxgpu_device *gpu = downcast<psxgpu_device *>(screen.owner());
 	gpu->update_screen( bitmap, cliprect );
 	return 0;
 }

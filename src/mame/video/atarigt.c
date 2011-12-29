@@ -508,7 +508,7 @@ PrimRage GALs:
 
 SCREEN_UPDATE( atarigt )
 {
-	atarigt_state *state = screen->machine().driver_data<atarigt_state>();
+	atarigt_state *state = screen.machine().driver_data<atarigt_state>();
 	bitmap_t *mo_bitmap = atarirle_get_vram(state->m_rle, 0);
 	bitmap_t *tm_bitmap = atarirle_get_vram(state->m_rle, 1);
 	UINT16 *cram, *tram;
@@ -634,7 +634,7 @@ SCREEN_UPDATE( atarigt )
 
 SCREEN_EOF( atarigt )
 {
-	atarigt_state *state = machine.driver_data<atarigt_state>();
+	atarigt_state *state = screen.machine().driver_data<atarigt_state>();
 
 	atarirle_eof(state->m_rle);
 }

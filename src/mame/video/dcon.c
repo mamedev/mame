@@ -279,8 +279,8 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( dcon )
 {
-	dcon_state *state = screen->machine().driver_data<dcon_state>();
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	dcon_state *state = screen.machine().driver_data<dcon_state>();
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
 	/* Setup the tilemaps */
 	tilemap_set_scrollx( state->m_background_layer,0, state->m_scroll_ram[0] );
@@ -299,15 +299,15 @@ SCREEN_UPDATE( dcon )
 	tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,2);
 	tilemap_draw(bitmap,cliprect,state->m_text_layer,0,4);
 
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( sdgndmps )
 {
-	dcon_state *state = screen->machine().driver_data<dcon_state>();
+	dcon_state *state = screen.machine().driver_data<dcon_state>();
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
 	/* Gfx banking */
 	if (state->m_last_gfx_bank!=state->m_gfx_bank_select)
@@ -335,6 +335,6 @@ SCREEN_UPDATE( sdgndmps )
 	tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,2);
 	tilemap_draw(bitmap,cliprect,state->m_text_layer,0,4);
 
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

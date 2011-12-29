@@ -56,7 +56,7 @@ static VIDEO_START( mgolf )
 
 static SCREEN_UPDATE( mgolf )
 {
-	mgolf_state *state = screen->machine().driver_data<mgolf_state>();
+	mgolf_state *state = screen.machine().driver_data<mgolf_state>();
 	int i;
 
 	/* draw playfield */
@@ -65,14 +65,14 @@ static SCREEN_UPDATE( mgolf )
 	/* draw sprites */
 	for (i = 0; i < 2; i++)
 	{
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			state->m_video_ram[0x399 + 4 * i],
 			i,
 			0, 0,
 			state->m_video_ram[0x390 + 2 * i] - 7,
 			state->m_video_ram[0x398 + 4 * i] - 16, 0);
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			state->m_video_ram[0x39b + 4 * i],
 			i,
 			0, 0,

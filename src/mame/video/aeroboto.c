@@ -156,7 +156,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( aeroboto )
 {
-	aeroboto_state *state = screen->machine().driver_data<aeroboto_state>();
+	aeroboto_state *state = screen.machine().driver_data<aeroboto_state>();
 
 	static const rectangle splitrect1 = { 0, 255, 0, 39 };
 	static const rectangle splitrect2 = { 0, 255, 40, 255 };
@@ -220,7 +220,7 @@ SCREEN_UPDATE( aeroboto )
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_vscroll);
 	tilemap_draw(bitmap, &splitrect2, state->m_bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);

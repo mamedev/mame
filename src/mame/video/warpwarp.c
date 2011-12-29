@@ -245,9 +245,9 @@ static void draw_ball(running_machine &machine, bitmap_t *bitmap, const rectangl
 
 SCREEN_UPDATE( geebee )
 {
-	warpwarp_state *state = screen->machine().driver_data<warpwarp_state>();
+	warpwarp_state *state = screen.machine().driver_data<warpwarp_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 
-	draw_ball(screen->machine(), bitmap, cliprect, state->m_ball_pen);
+	draw_ball(screen.machine(), bitmap, cliprect, state->m_ball_pen);
 	return 0;
 }

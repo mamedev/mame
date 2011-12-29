@@ -93,9 +93,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( bigevglf )
 {
-	bigevglf_state *state = screen->machine().driver_data<bigevglf_state>();
+	bigevglf_state *state = screen.machine().driver_data<bigevglf_state>();
 
 	copybitmap(bitmap, state->m_tmp_bitmap[state->m_plane_visible], 0, 0, 0, 0, cliprect);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

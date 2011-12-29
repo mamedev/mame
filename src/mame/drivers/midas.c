@@ -177,22 +177,22 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 static SCREEN_UPDATE( midas )
 {
-	midas_state *state = screen->machine().driver_data<midas_state>();
+	midas_state *state = screen.machine().driver_data<midas_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if ( screen->machine().input().code_pressed(KEYCODE_Z) )
+	if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 	{
 		int msk = 0;
-		if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for state->m_tmap
-		if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
+		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for state->m_tmap
+		if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	bitmap_fill(bitmap,cliprect,4095);
 
-	if (layers_ctrl & 2)	draw_sprites(screen->machine(), bitmap,cliprect);
+	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap,cliprect);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);
 
 	return 0;

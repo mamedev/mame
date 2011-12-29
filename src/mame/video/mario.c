@@ -210,21 +210,21 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( mario )
 {
-	mario_state	*state = screen->machine().driver_data<mario_state>();
+	mario_state	*state = screen.machine().driver_data<mario_state>();
 	int t;
 
-	t = input_port_read(screen->machine(), "MONITOR");
+	t = input_port_read(screen.machine(), "MONITOR");
 	if (t != state->m_monitor)
 	{
 		state->m_monitor = t;
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
 	}
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_flip ? (HTOTAL-HBSTART) : 0);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_gfx_scroll - (state->m_flip ? 8 : 0));
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }

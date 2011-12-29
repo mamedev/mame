@@ -130,20 +130,20 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( alpha68k_II )
 {
-	alpha68k_state *state = screen->machine().driver_data<alpha68k_state>();
+	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 
 	if (state->m_last_bank != state->m_bank_base)
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
 
 	state->m_last_bank = state->m_bank_base;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap_fill(bitmap, cliprect, 2047);
 //AT
-	draw_sprites(screen->machine(), bitmap, cliprect, 0, 0x07c0, 0x0800);
-	draw_sprites(screen->machine(), bitmap, cliprect, 1, 0x0000, 0x0800);
-	draw_sprites(screen->machine(), bitmap, cliprect, 2, 0x0000, 0x0800);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0, 0x0000, 0x07c0);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0, 0x07c0, 0x0800);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1, 0x0000, 0x0800);
+	draw_sprites(screen.machine(), bitmap, cliprect, 2, 0x0000, 0x0800);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0, 0x0000, 0x07c0);
 //ZT
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
@@ -277,39 +277,39 @@ static void draw_sprites_V( running_machine &machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( alpha68k_V )
 {
-	alpha68k_state *state = screen->machine().driver_data<alpha68k_state>();
+	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->m_spriteram;
 
 	if (state->m_last_bank != state->m_bank_base)
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
 
 	state->m_last_bank = state->m_bank_base;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap_fill(bitmap, cliprect, 4095);
 
 	/* This appears to be correct priority */
 	if (state->m_microcontroller_id == 0x8814) /* Sky Adventure */
 	{
-		draw_sprites_V(screen->machine(), bitmap, cliprect, 0, 0x07c0, 0x0800, 0, 0x8000, 0x7fff);
-		draw_sprites_V(screen->machine(), bitmap, cliprect, 1, 0x0000, 0x0800, 0, 0x8000, 0x7fff);
+		draw_sprites_V(screen.machine(), bitmap, cliprect, 0, 0x07c0, 0x0800, 0, 0x8000, 0x7fff);
+		draw_sprites_V(screen.machine(), bitmap, cliprect, 1, 0x0000, 0x0800, 0, 0x8000, 0x7fff);
 		//AT: *KLUDGE* fixes priest priority in level 1(could be a game bug)
 		if (spriteram[0x1bde] == 0x24 && (spriteram[0x1bdf] >> 8) == 0x3b)
 		{
-			draw_sprites_V(screen->machine(), bitmap, cliprect, 2, 0x03c0, 0x0800, 0, 0x8000, 0x7fff);
-			draw_sprites_V(screen->machine(), bitmap, cliprect, 2, 0x0000, 0x03c0, 0, 0x8000, 0x7fff);
+			draw_sprites_V(screen.machine(), bitmap, cliprect, 2, 0x03c0, 0x0800, 0, 0x8000, 0x7fff);
+			draw_sprites_V(screen.machine(), bitmap, cliprect, 2, 0x0000, 0x03c0, 0, 0x8000, 0x7fff);
 		}
 		else
-			draw_sprites_V(screen->machine(), bitmap, cliprect, 2, 0x0000, 0x0800, 0, 0x8000, 0x7fff);
+			draw_sprites_V(screen.machine(), bitmap, cliprect, 2, 0x0000, 0x0800, 0, 0x8000, 0x7fff);
 
-		draw_sprites_V(screen->machine(), bitmap, cliprect, 0, 0x0000, 0x07c0, 0, 0x8000, 0x7fff);
+		draw_sprites_V(screen.machine(), bitmap, cliprect, 0, 0x0000, 0x07c0, 0, 0x8000, 0x7fff);
 	}
 	else	/* gangwars */
 	{
-		draw_sprites_V(screen->machine(), bitmap, cliprect, 0, 0x07c0, 0x0800, 0x8000, 0, 0x7fff);
-		draw_sprites_V(screen->machine(), bitmap, cliprect, 1, 0x0000, 0x0800, 0x8000, 0, 0x7fff);
-		draw_sprites_V(screen->machine(), bitmap, cliprect, 2, 0x0000, 0x0800, 0x8000, 0, 0x7fff);
-		draw_sprites_V(screen->machine(), bitmap, cliprect, 0, 0x0000, 0x07c0, 0x8000, 0, 0x7fff);
+		draw_sprites_V(screen.machine(), bitmap, cliprect, 0, 0x07c0, 0x0800, 0x8000, 0, 0x7fff);
+		draw_sprites_V(screen.machine(), bitmap, cliprect, 1, 0x0000, 0x0800, 0x8000, 0, 0x7fff);
+		draw_sprites_V(screen.machine(), bitmap, cliprect, 2, 0x0000, 0x0800, 0x8000, 0, 0x7fff);
+		draw_sprites_V(screen.machine(), bitmap, cliprect, 0, 0x0000, 0x07c0, 0x8000, 0, 0x7fff);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
@@ -318,21 +318,21 @@ SCREEN_UPDATE( alpha68k_V )
 
 SCREEN_UPDATE( alpha68k_V_sb )
 {
-	alpha68k_state *state = screen->machine().driver_data<alpha68k_state>();
+	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 
 	if (state->m_last_bank != state->m_bank_base)
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
 
 	state->m_last_bank = state->m_bank_base;
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap_fill(bitmap, cliprect, 4095);
 
 	/* This appears to be correct priority */
-	draw_sprites_V(screen->machine(), bitmap, cliprect, 0, 0x07c0, 0x0800, 0x4000, 0x8000, 0x3fff);
-	draw_sprites_V(screen->machine(), bitmap, cliprect, 1, 0x0000, 0x0800, 0x4000, 0x8000, 0x3fff);
-	draw_sprites_V(screen->machine(), bitmap, cliprect, 2, 0x0000, 0x0800, 0x4000, 0x8000, 0x3fff);
-	draw_sprites_V(screen->machine(), bitmap, cliprect, 0, 0x0000, 0x07c0, 0x4000, 0x8000, 0x3fff);
+	draw_sprites_V(screen.machine(), bitmap, cliprect, 0, 0x07c0, 0x0800, 0x4000, 0x8000, 0x3fff);
+	draw_sprites_V(screen.machine(), bitmap, cliprect, 1, 0x0000, 0x0800, 0x4000, 0x8000, 0x3fff);
+	draw_sprites_V(screen.machine(), bitmap, cliprect, 2, 0x0000, 0x0800, 0x4000, 0x8000, 0x3fff);
+	draw_sprites_V(screen.machine(), bitmap, cliprect, 0, 0x0000, 0x07c0, 0x4000, 0x8000, 0x3fff);
 
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
@@ -370,15 +370,15 @@ static void draw_sprites_I( running_machine &machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( alpha68k_I )
 {
-	alpha68k_state *state = screen->machine().driver_data<alpha68k_state>();
+	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 	int yshift = (state->m_microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	/* This appears to be correct priority */
-	draw_sprites_I(screen->machine(), bitmap, cliprect, 2, 0x0800, yshift);
-	draw_sprites_I(screen->machine(), bitmap, cliprect, 3, 0x0c00, yshift);
-	draw_sprites_I(screen->machine(), bitmap, cliprect, 1, 0x0400, yshift);
+	draw_sprites_I(screen.machine(), bitmap, cliprect, 2, 0x0800, yshift);
+	draw_sprites_I(screen.machine(), bitmap, cliprect, 3, 0x0c00, yshift);
+	draw_sprites_I(screen.machine(), bitmap, cliprect, 1, 0x0400, yshift);
 	return 0;
 }
 //ZT
@@ -503,13 +503,13 @@ static void kyros_draw_sprites( running_machine &machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( kyros )
 {
-	alpha68k_state *state = screen->machine().driver_data<alpha68k_state>();
-	colortable_entry_set_value(screen->machine().colortable, 0x100, *state->m_videoram & 0xff);
+	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
+	colortable_entry_set_value(screen.machine().colortable, 0x100, *state->m_videoram & 0xff);
 	bitmap_fill(bitmap, cliprect, 0x100); //AT
 
-	kyros_draw_sprites(screen->machine(), bitmap, cliprect, 2, 0x0800);
-	kyros_draw_sprites(screen->machine(), bitmap, cliprect, 3, 0x0c00);
-	kyros_draw_sprites(screen->machine(), bitmap, cliprect, 1, 0x0400);
+	kyros_draw_sprites(screen.machine(), bitmap, cliprect, 2, 0x0800);
+	kyros_draw_sprites(screen.machine(), bitmap, cliprect, 3, 0x0c00);
+	kyros_draw_sprites(screen.machine(), bitmap, cliprect, 1, 0x0400);
 	return 0;
 }
 
@@ -563,12 +563,12 @@ static void sstingry_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 
 SCREEN_UPDATE( sstingry )
 {
-	alpha68k_state *state = screen->machine().driver_data<alpha68k_state>();
-	colortable_entry_set_value(screen->machine().colortable, 0x100, *state->m_videoram & 0xff);
+	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
+	colortable_entry_set_value(screen.machine().colortable, 0x100, *state->m_videoram & 0xff);
 	bitmap_fill(bitmap, cliprect, 0x100); //AT
 
-	sstingry_draw_sprites(screen->machine(), bitmap, cliprect, 2, 0x0800);
-	sstingry_draw_sprites(screen->machine(), bitmap, cliprect, 3, 0x0c00);
-	sstingry_draw_sprites(screen->machine(), bitmap, cliprect, 1, 0x0400);
+	sstingry_draw_sprites(screen.machine(), bitmap, cliprect, 2, 0x0800);
+	sstingry_draw_sprites(screen.machine(), bitmap, cliprect, 3, 0x0c00);
+	sstingry_draw_sprites(screen.machine(), bitmap, cliprect, 1, 0x0400);
 	return 0;
 }

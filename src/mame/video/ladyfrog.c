@@ -175,9 +175,9 @@ VIDEO_START( toucheme )
 
 SCREEN_UPDATE( ladyfrog )
 {
-	ladyfrog_state *state = screen->machine().driver_data<ladyfrog_state>();
+	ladyfrog_state *state = screen.machine().driver_data<ladyfrog_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

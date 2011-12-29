@@ -65,7 +65,7 @@ static TIMER_DEVICE_CALLBACK( rotaryf_interrupt )
 
 static SCREEN_UPDATE( rotaryf )
 {
-	rotaryf_state *state = screen->machine().driver_data<rotaryf_state>();
+	rotaryf_state *state = screen.machine().driver_data<rotaryf_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->m_videoram_size; offs++)

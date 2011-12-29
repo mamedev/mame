@@ -73,7 +73,7 @@ static VIDEO_START( shanghai )
 
 static SCREEN_UPDATE( shanghai )
 {
-	device_t *hd63484 = screen->machine().device("hd63484");
+	device_t *hd63484 = screen.machine().device("hd63484");
 	int x, y, b, src;
 
 	b = ((hd63484_regs_r(hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(hd63484, 0xce/2, 0xffff);

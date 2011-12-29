@@ -461,7 +461,7 @@ static void tetrisp2_draw_sprites(running_machine &machine, bitmap_t *bitmap, bi
 
 SCREEN_UPDATE( tetrisp2 )
 {
-	tetrisp2_state *state = screen->machine().driver_data<tetrisp2_state>();
+	tetrisp2_state *state = screen.machine().driver_data<tetrisp2_state>();
 	int flipscreen;
 	int asc_pri;
 	int scr_pri;
@@ -472,13 +472,13 @@ SCREEN_UPDATE( tetrisp2 )
 
 	/* Black background color */
 	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
 
 	/* Flip Screen */
 	if (flipscreen != state->m_flipscreen_old)
 	{
 		state->m_flipscreen_old = flipscreen;
-		tilemap_set_flip_all(screen->machine(), flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(screen.machine(), flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	/* Flip Screen */
@@ -540,13 +540,13 @@ SCREEN_UPDATE( tetrisp2 )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, state->m_tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen->machine(), bitmap, screen->machine().priority_bitmap, cliprect, state->m_priority, screen->machine().generic.spriteram.u16, screen->machine().generic.spriteram_size, 0, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority, screen.machine().generic.spriteram.u16, screen.machine().generic.spriteram_size, 0, (state->m_systemregs[0x00] & 0x02));
 	return 0;
 }
 
 SCREEN_UPDATE( rockntread )
 {
-	tetrisp2_state *state = screen->machine().driver_data<tetrisp2_state>();
+	tetrisp2_state *state = screen.machine().driver_data<tetrisp2_state>();
 	int flipscreen;
 	int asc_pri;
 	int scr_pri;
@@ -557,13 +557,13 @@ SCREEN_UPDATE( rockntread )
 
 	/* Black background color */
 	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
 
 	/* Flip Screen */
 	if (flipscreen != state->m_flipscreen_old)
 	{
 		state->m_flipscreen_old = flipscreen;
-		tilemap_set_flip_all(screen->machine(), flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(screen.machine(), flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	/* Flip Screen */
@@ -625,129 +625,130 @@ SCREEN_UPDATE( rockntread )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, state->m_tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen->machine(), bitmap, screen->machine().priority_bitmap,cliprect, state->m_priority, screen->machine().generic.spriteram.u16, screen->machine().generic.spriteram_size, 0, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, screen.machine().generic.spriteram.u16, screen.machine().generic.spriteram_size, 0, (state->m_systemregs[0x00] & 0x02));
 	return 0;
 }
 
 
 
 
-SCREEN_UPDATE( rocknms )
+SCREEN_UPDATE( rocknms_left )
 {
-	tetrisp2_state *state = screen->machine().driver_data<tetrisp2_state>();
+	tetrisp2_state *state = screen.machine().driver_data<tetrisp2_state>();
 	int asc_pri;
 	int scr_pri;
 	int rot_pri;
 
-	device_t *left_screen  = screen->machine().device("lscreen");
-	device_t *right_screen = screen->machine().device("rscreen");
+	tilemap_set_scrollx(state->m_tilemap_sub_bg, 0, state->m_rocknms_sub_scroll_bg[ 2 ] + 0x000);
+	tilemap_set_scrolly(state->m_tilemap_sub_bg, 0, state->m_rocknms_sub_scroll_bg[ 5 ] + 0x000);
+	tilemap_set_scrollx(state->m_tilemap_sub_fg, 0, state->m_rocknms_sub_scroll_fg[ 2 ] + 0x000);
+	tilemap_set_scrolly(state->m_tilemap_sub_fg, 0, state->m_rocknms_sub_scroll_fg[ 5 ] + 0x000);
+	tilemap_set_scrollx(state->m_tilemap_sub_rot, 0, state->m_rocknms_sub_rotregs[ 0 ] + 0x400);
+	tilemap_set_scrolly(state->m_tilemap_sub_rot, 0, state->m_rocknms_sub_rotregs[ 2 ] + 0x400);
+
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0x0000]);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+
+	asc_pri = scr_pri = rot_pri = 0;
+
+	if((state->m_rocknms_sub_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
+	else
+		rot_pri++;
+
+	if((state->m_rocknms_sub_priority[0x2e00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
+	else
+		scr_pri++;
+
+	if((state->m_rocknms_sub_priority[0x3a00 / 2] & 0x00ff) == 0x000c)
+		scr_pri++;
+	else
+		rot_pri++;
+
+	if (rot_pri == 0)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_rot, 0, 1 << 1);
+	else if (scr_pri == 0)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_bg,  0, 1 << 0);
+	else if (asc_pri == 0)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_fg,  0, 1 << 2);
+
+	if (rot_pri == 1)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_rot, 0, 1 << 1);
+	else if (scr_pri == 1)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_bg,  0, 1 << 0);
+	else if (asc_pri == 1)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_fg,  0, 1 << 2);
+
+	if (rot_pri == 2)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_rot, 0, 1 << 1);
+	else if (scr_pri == 2)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_bg,  0, 1 << 0);
+	else if (asc_pri == 2)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_fg,  0, 1 << 2);
+
+	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, screen.machine().generic.spriteram2.u16, screen.machine().generic.spriteram2_size, 4, (state->m_systemregs[0x00] & 0x02));
+
+	return 0;
+}
+
+SCREEN_UPDATE( rocknms_right )
+{
+	tetrisp2_state *state = screen.machine().driver_data<tetrisp2_state>();
+	int asc_pri;
+	int scr_pri;
+	int rot_pri;
+
+	tilemap_set_scrollx(state->m_tilemap_bg, 0, state->m_scroll_bg[ 2 ] + 0x000);
+	tilemap_set_scrolly(state->m_tilemap_bg, 0, state->m_scroll_bg[ 5 ] + 0x000);
+	tilemap_set_scrollx(state->m_tilemap_fg, 0, state->m_scroll_fg[ 2 ] + 0x000);
+	tilemap_set_scrolly(state->m_tilemap_fg, 0, state->m_scroll_fg[ 5 ] + 0x000);
+	tilemap_set_scrollx(state->m_tilemap_rot, 0, state->m_rotregs[ 0 ] + 0x400);
+	tilemap_set_scrolly(state->m_tilemap_rot, 0, state->m_rotregs[ 2 ] + 0x400);
 
 	/* Black background color */
-	if (screen == left_screen)
-	{
-		tilemap_set_scrollx(state->m_tilemap_sub_bg, 0, state->m_rocknms_sub_scroll_bg[ 2 ] + 0x000);
-		tilemap_set_scrolly(state->m_tilemap_sub_bg, 0, state->m_rocknms_sub_scroll_bg[ 5 ] + 0x000);
-		tilemap_set_scrollx(state->m_tilemap_sub_fg, 0, state->m_rocknms_sub_scroll_fg[ 2 ] + 0x000);
-		tilemap_set_scrolly(state->m_tilemap_sub_fg, 0, state->m_rocknms_sub_scroll_fg[ 5 ] + 0x000);
-		tilemap_set_scrollx(state->m_tilemap_sub_rot, 0, state->m_rocknms_sub_rotregs[ 0 ] + 0x400);
-		tilemap_set_scrolly(state->m_tilemap_sub_rot, 0, state->m_rocknms_sub_rotregs[ 2 ] + 0x400);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0x0000]);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
-		bitmap_fill(bitmap, cliprect, screen->machine().pens[0x0000]);
-		bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	asc_pri = scr_pri = rot_pri = 0;
 
-		asc_pri = scr_pri = rot_pri = 0;
+	if((state->m_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
+	else
+		rot_pri++;
 
-		if((state->m_rocknms_sub_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
-			asc_pri++;
-		else
-			rot_pri++;
+	if((state->m_priority[0x2e00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
+	else
+		scr_pri++;
 
-		if((state->m_rocknms_sub_priority[0x2e00 / 2] & 0x00ff) == 0x0034)
-			asc_pri++;
-		else
-			scr_pri++;
+	if((state->m_priority[0x3a00 / 2] & 0x00ff) == 0x000c)
+		scr_pri++;
+	else
+		rot_pri++;
 
-		if((state->m_rocknms_sub_priority[0x3a00 / 2] & 0x00ff) == 0x000c)
-			scr_pri++;
-		else
-			rot_pri++;
+	if (rot_pri == 0)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_rot, 0, 1 << 1);
+	else if (scr_pri == 0)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_bg,  0, 1 << 0);
+	else if (asc_pri == 0)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_fg,  0, 1 << 2);
 
-		if (rot_pri == 0)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_rot, 0, 1 << 1);
-		else if (scr_pri == 0)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_bg,  0, 1 << 0);
-		else if (asc_pri == 0)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_fg,  0, 1 << 2);
+	if (rot_pri == 1)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_rot, 0, 1 << 1);
+	else if (scr_pri == 1)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_bg,  0, 1 << 0);
+	else if (asc_pri == 1)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_fg,  0, 1 << 2);
 
-		if (rot_pri == 1)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_rot, 0, 1 << 1);
-		else if (scr_pri == 1)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_bg,  0, 1 << 0);
-		else if (asc_pri == 1)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_fg,  0, 1 << 2);
+	if (rot_pri == 2)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_rot, 0, 1 << 1);
+	else if (scr_pri == 2)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_bg,  0, 1 << 0);
+	else if (asc_pri == 2)
+		tilemap_draw(bitmap,cliprect, state->m_tilemap_fg,  0, 1 << 2);
 
-		if (rot_pri == 2)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_rot, 0, 1 << 1);
-		else if (scr_pri == 2)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_bg,  0, 1 << 0);
-		else if (asc_pri == 2)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_sub_fg,  0, 1 << 2);
-
-		tetrisp2_draw_sprites(screen->machine(), bitmap, screen->machine().priority_bitmap,cliprect, state->m_priority, screen->machine().generic.spriteram2.u16, screen->machine().generic.spriteram2_size, 4, (state->m_systemregs[0x00] & 0x02));
-	}
-	else if (screen == right_screen) /* game screen */
-	{
-		tilemap_set_scrollx(state->m_tilemap_bg, 0, state->m_scroll_bg[ 2 ] + 0x000);
-		tilemap_set_scrolly(state->m_tilemap_bg, 0, state->m_scroll_bg[ 5 ] + 0x000);
-		tilemap_set_scrollx(state->m_tilemap_fg, 0, state->m_scroll_fg[ 2 ] + 0x000);
-		tilemap_set_scrolly(state->m_tilemap_fg, 0, state->m_scroll_fg[ 5 ] + 0x000);
-		tilemap_set_scrollx(state->m_tilemap_rot, 0, state->m_rotregs[ 0 ] + 0x400);
-		tilemap_set_scrolly(state->m_tilemap_rot, 0, state->m_rotregs[ 2 ] + 0x400);
-
-		/* Black background color */
-		bitmap_fill(bitmap, cliprect, screen->machine().pens[0x0000]);
-		bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
-
-		asc_pri = scr_pri = rot_pri = 0;
-
-		if((state->m_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
-			asc_pri++;
-		else
-			rot_pri++;
-
-		if((state->m_priority[0x2e00 / 2] & 0x00ff) == 0x0034)
-			asc_pri++;
-		else
-			scr_pri++;
-
-		if((state->m_priority[0x3a00 / 2] & 0x00ff) == 0x000c)
-			scr_pri++;
-		else
-			rot_pri++;
-
-		if (rot_pri == 0)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_rot, 0, 1 << 1);
-		else if (scr_pri == 0)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_bg,  0, 1 << 0);
-		else if (asc_pri == 0)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_fg,  0, 1 << 2);
-
-		if (rot_pri == 1)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_rot, 0, 1 << 1);
-		else if (scr_pri == 1)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_bg,  0, 1 << 0);
-		else if (asc_pri == 1)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_fg,  0, 1 << 2);
-
-		if (rot_pri == 2)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_rot, 0, 1 << 1);
-		else if (scr_pri == 2)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_bg,  0, 1 << 0);
-		else if (asc_pri == 2)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_fg,  0, 1 << 2);
-
-		tetrisp2_draw_sprites(screen->machine(), bitmap, screen->machine().priority_bitmap,cliprect, state->m_priority, screen->machine().generic.spriteram.u16, screen->machine().generic.spriteram_size, 0, (state->m_systemregs[0x00] & 0x02));
-	}
+	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, screen.machine().generic.spriteram.u16, screen.machine().generic.spriteram_size, 0, (state->m_systemregs[0x00] & 0x02));
 
 	return 0;
 }

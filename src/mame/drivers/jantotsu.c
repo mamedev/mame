@@ -137,7 +137,7 @@ static VIDEO_START(jantotsu)
 
 static SCREEN_UPDATE(jantotsu)
 {
-	jantotsu_state *state = screen->machine().driver_data<jantotsu_state>();
+	jantotsu_state *state = screen.machine().driver_data<jantotsu_state>();
 	int x, y, i;
 	int count = 0;
 	UINT8 pen_i;
@@ -158,8 +158,8 @@ static SCREEN_UPDATE(jantotsu)
 				for(pen_i = 0;pen_i<4;pen_i++)
 					color |= (((state->m_bitmap[count + pen_i*0x2000]) >> (7 - i)) & 1) << pen_i;
 
-				if ((x + i) <= screen->visible_area().max_x && (y + 0) < screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, x + i) = screen->machine().pens[color];
+				if ((x + i) <= screen.visible_area().max_x && (y + 0) < screen.visible_area().max_y)
+					*BITMAP_ADDR32(bitmap, y, x + i) = screen.machine().pens[color];
 			}
 
 			count++;

@@ -405,10 +405,10 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( combatsc )
 {
-	combatsc_state *state = screen->machine().driver_data<combatsc_state>();
+	combatsc_state *state = screen.machine().driver_data<combatsc_state>();
 	int i;
 
-	set_pens(screen->machine());
+	set_pens(screen.machine());
 
 	if (k007121_ctrlram_r(state->m_k007121_1, 1) & 0x02)
 	{
@@ -437,7 +437,7 @@ SCREEN_UPDATE( combatsc )
 	tilemap_set_scrolly(state->m_bg_tilemap[0], 0, k007121_ctrlram_r(state->m_k007121_1, 2));
 	tilemap_set_scrolly(state->m_bg_tilemap[1], 0, k007121_ctrlram_r(state->m_k007121_2, 2));
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	if (state->m_priority == 0)
 	{
@@ -447,8 +447,8 @@ SCREEN_UPDATE( combatsc )
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[0], 1, 2);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram[1], 1, 0x0f00);
-		draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram[0], 0, 0x4444);
+		draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram[1], 1, 0x0f00);
+		draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram[0], 0, 0x4444);
 	}
 	else
 	{
@@ -458,8 +458,8 @@ SCREEN_UPDATE( combatsc )
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[1], 0, 8);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram[1], 1, 0x0f00);
-		draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram[0], 0, 0x4444);
+		draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram[1], 1, 0x0f00);
+		draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram[0], 0, 0x4444);
 	}
 
 	if (k007121_ctrlram_r(state->m_k007121_1, 1) & 0x08)
@@ -563,10 +563,10 @@ static void bootleg_draw_sprites( running_machine &machine, bitmap_t *bitmap, co
 
 SCREEN_UPDATE( combatscb )
 {
-	combatsc_state *state = screen->machine().driver_data<combatsc_state>();
+	combatsc_state *state = screen.machine().driver_data<combatsc_state>();
 	int i;
 
-	set_pens(screen->machine());
+	set_pens(screen.machine());
 
 	for (i = 0; i < 32; i++)
 	{
@@ -579,16 +579,16 @@ SCREEN_UPDATE( combatscb )
 	if (state->m_priority == 0)
 	{
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[1], TILEMAP_DRAW_OPAQUE, 0);
-		bootleg_draw_sprites(screen->machine(), bitmap,cliprect, state->m_page[0], 0);
+		bootleg_draw_sprites(screen.machine(), bitmap,cliprect, state->m_page[0], 0);
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[0], 0 ,0);
-		bootleg_draw_sprites(screen->machine(), bitmap,cliprect, state->m_page[1], 1);
+		bootleg_draw_sprites(screen.machine(), bitmap,cliprect, state->m_page[1], 1);
 	}
 	else
 	{
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[0], TILEMAP_DRAW_OPAQUE, 0);
-		bootleg_draw_sprites(screen->machine(), bitmap,cliprect, state->m_page[0], 0);
+		bootleg_draw_sprites(screen.machine(), bitmap,cliprect, state->m_page[0], 0);
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[1], 0, 0);
-		bootleg_draw_sprites(screen->machine(), bitmap,cliprect, state->m_page[1], 1);
+		bootleg_draw_sprites(screen.machine(), bitmap,cliprect, state->m_page[1], 1);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_textlayer, 0, 0);

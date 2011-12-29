@@ -598,14 +598,14 @@ SCREEN_EOF( dragngun )
 
 SCREEN_UPDATE( captaven )
 {
-	deco32_state *state = screen->machine().driver_data<deco32_state>();
-	state->m_deco_tilegen1 = screen->machine().device("tilegen1");
-	state->m_deco_tilegen2 = screen->machine().device("tilegen2");
+	deco32_state *state = screen.machine().driver_data<deco32_state>();
+	state->m_deco_tilegen1 = screen.machine().device("tilegen1");
+	state->m_deco_tilegen2 = screen.machine().device("tilegen2");
 
-	tilemap_set_flip_all(screen->machine(),flip_screen_get(screen->machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(),flip_screen_get(screen.machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,screen->machine().pens[0x000]); // Palette index not confirmed
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,screen.machine().pens[0x000]); // Palette index not confirmed
 
 	deco16ic_set_pf1_8bpp_mode(state->m_deco_tilegen2, 1);
 
@@ -627,19 +627,19 @@ SCREEN_UPDATE( captaven )
 
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
 
-	screen->machine().device<decospr_device>("spritegen")->set_alt_format(true);
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->set_alt_format(true);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x400);
 
 	return 0;
 }
 
 SCREEN_UPDATE( dragngun )
 {
-	deco32_state *state = screen->machine().driver_data<deco32_state>();
-	state->m_deco_tilegen1 = screen->machine().device("tilegen1");
-	state->m_deco_tilegen2 = screen->machine().device("tilegen2");
+	deco32_state *state = screen.machine().driver_data<deco32_state>();
+	state->m_deco_tilegen1 = screen.machine().device("tilegen1");
+	state->m_deco_tilegen2 = screen.machine().device("tilegen2");
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
@@ -668,7 +668,7 @@ SCREEN_UPDATE( dragngun )
 		clip.min_y = 8;
 		clip.max_y = 247;
 
-		dragngun_draw_sprites(screen->machine(),bitmap,&clip,screen->machine().generic.buffered_spriteram.u32);
+		dragngun_draw_sprites(screen.machine(),bitmap,&clip,screen.machine().generic.buffered_spriteram.u32);
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, &clip, 0, 0);
 
 	}
@@ -679,17 +679,17 @@ SCREEN_UPDATE( dragngun )
 
 SCREEN_UPDATE( fghthist )
 {
-	deco32_state *state = screen->machine().driver_data<deco32_state>();
-	state->m_deco_tilegen1 = screen->machine().device("tilegen1");
-	state->m_deco_tilegen2 = screen->machine().device("tilegen2");
+	deco32_state *state = screen.machine().driver_data<deco32_state>();
+	state->m_deco_tilegen1 = screen.machine().device("tilegen1");
+	state->m_deco_tilegen2 = screen.machine().device("tilegen2");
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,screen->machine().pens[0x000]); // Palette index not confirmed
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,screen.machine().pens[0x000]); // Palette index not confirmed
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x800, true);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x800, true);
 
 	/* Draw screen */
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 1);
@@ -697,17 +697,17 @@ SCREEN_UPDATE( fghthist )
 	if(state->m_pri&1)
 	{
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
-		screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
+		screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
-		screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
+		screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
 	}
 
-	screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0000, 0x0800, 1024, 0x1ff);
+	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0000, 0x0800, 1024, 0x1ff);
 
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
@@ -856,10 +856,10 @@ static void mixDualAlphaSprites(bitmap_t *bitmap, const rectangle *cliprect, con
 
 SCREEN_UPDATE( nslasher )
 {
-	deco32_state *state = screen->machine().driver_data<deco32_state>();
+	deco32_state *state = screen.machine().driver_data<deco32_state>();
 	int alphaTilemap=0;
-	state->m_deco_tilegen1 = screen->machine().device("tilegen1");
-	state->m_deco_tilegen2 = screen->machine().device("tilegen2");
+	state->m_deco_tilegen1 = screen.machine().device("tilegen1");
+	state->m_deco_tilegen2 = screen.machine().device("tilegen2");
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
@@ -869,18 +869,18 @@ SCREEN_UPDATE( nslasher )
 		alphaTilemap=1;
 
 	if (state->m_ace_ram_dirty)
-		updateAceRam(screen->machine());
+		updateAceRam(screen.machine());
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
-	bitmap_fill(bitmap,cliprect,screen->machine().pens[0x200]);
+	bitmap_fill(bitmap,cliprect,screen.machine().pens[0x200]);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
-	screen->machine().device<decospr_device>("spritegen1")->set_pix_raw_shift(8);
-	screen->machine().device<decospr_device>("spritegen2")->set_pix_raw_shift(8);
+	screen.machine().device<decospr_device>("spritegen1")->set_pix_raw_shift(8);
+	screen.machine().device<decospr_device>("spritegen2")->set_pix_raw_shift(8);
 
-	screen->machine().device<decospr_device>("spritegen1")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x800, true);
-	screen->machine().device<decospr_device>("spritegen2")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_2_buffered, 0x800, true);
+	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x800, true);
+	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram16_2_buffered, 0x800, true);
 
 
 	/* Render alpha-blended tilemap to separate buffer for proper mixing */
@@ -913,7 +913,7 @@ SCREEN_UPDATE( nslasher )
 		}
 	}
 
-	mixDualAlphaSprites(bitmap, cliprect, screen->machine().gfx[3], screen->machine().gfx[4], alphaTilemap);
+	mixDualAlphaSprites(bitmap, cliprect, screen.machine().gfx[3], screen.machine().gfx[4], alphaTilemap);
 
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;

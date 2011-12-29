@@ -274,14 +274,14 @@ static void srdarwin_draw_sprites( running_machine& machine, bitmap_t *bitmap, c
 
 SCREEN_UPDATE( cobracom )
 {
-	dec8_state *state = screen->machine().driver_data<dec8_state>();
+	dec8_state *state = screen.machine().driver_data<dec8_state>();
 
-	flip_screen_set(screen->machine(), state->m_bg_control[0] >> 7);
+	flip_screen_set(screen.machine(), state->m_bg_control[0] >> 7);
 
-	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x04, 0x00, 0x03);
-	screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x04, 0x04, 0x03);
+	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x04, 0x00, 0x03);
+	screen.machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x04, 0x04, 0x03);
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
@@ -320,9 +320,9 @@ VIDEO_START( cobracom )
 
 SCREEN_UPDATE( ghostb )
 {
-	dec8_state *state = screen->machine().driver_data<dec8_state>();
-	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
+	dec8_state *state = screen.machine().driver_data<dec8_state>();
+	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
@@ -355,13 +355,13 @@ VIDEO_START( ghostb )
 
 SCREEN_UPDATE( oscar )
 {
-	dec8_state *state = screen->machine().driver_data<dec8_state>();
-	flip_screen_set(screen->machine(), state->m_bg_control[1] >> 7);
+	dec8_state *state = screen.machine().driver_data<dec8_state>();
+	flip_screen_set(screen.machine(), state->m_bg_control[1] >> 7);
 
 	// we mimic the priority scheme in dec0.c, this was originally a bit different, so this could be wrong
-	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x00, 0x00, 0x0f);
-	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x08,0x08,0x08,0x08);
+	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x00, 0x00, 0x0f);
+	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x08,0x08,0x08,0x08);
 	tilemap_draw(bitmap,cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
@@ -396,26 +396,26 @@ VIDEO_START( oscar )
 
 SCREEN_UPDATE( lastmisn )
 {
-	dec8_state *state = screen->machine().driver_data<dec8_state>();
+	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8)+ state->m_scroll2[1]));
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_scroll2[2] << 8)+ state->m_scroll2[3]));
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
+	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( shackled )
 {
-	dec8_state *state = screen->machine().driver_data<dec8_state>();
+	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8) + state->m_scroll2[1]));
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_scroll2[2] << 8) + state->m_scroll2[3]));
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 1, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 0, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
+	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 1, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
@@ -485,13 +485,13 @@ VIDEO_START( shackled )
 
 SCREEN_UPDATE( srdarwin )
 {
-	dec8_state *state = screen->machine().driver_data<dec8_state>();
+	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, (state->m_scroll2[0] << 8) + state->m_scroll2[1]);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	srdarwin_draw_sprites(screen->machine(), bitmap, cliprect, 0); //* (srdarwin37b5gre)
+	srdarwin_draw_sprites(screen.machine(), bitmap, cliprect, 0); //* (srdarwin37b5gre)
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	srdarwin_draw_sprites(screen->machine(), bitmap, cliprect, 1);
+	srdarwin_draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
@@ -550,26 +550,26 @@ VIDEO_START( srdarwin )
 
 SCREEN_UPDATE( gondo )
 {
-	dec8_state *state = screen->machine().driver_data<dec8_state>();
+	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8) + state->m_scroll2[1]));
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_scroll2[2] << 8) + state->m_scroll2[3]));
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 2);
+	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 2);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 1);
+	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( garyoret )
 {
-	dec8_state *state = screen->machine().driver_data<dec8_state>();
+	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8) + state->m_scroll2[1]));
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_scroll2[2] << 8) + state->m_scroll2[3]));
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
+	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;

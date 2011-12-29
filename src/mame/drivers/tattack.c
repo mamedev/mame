@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static SCREEN_UPDATE( tattack )
 {
-	tattack_state *state = screen->machine().driver_data<tattack_state>();
+	tattack_state *state = screen.machine().driver_data<tattack_state>();
 	tilemap_mark_all_tiles_dirty(state->m_tmap);
 	tilemap_draw(bitmap,cliprect,state->m_tmap, 0,0);
 	return 0;

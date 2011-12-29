@@ -248,7 +248,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const recta
 
 SCREEN_UPDATE( popper )
 {
-	popper_state *state = screen->machine().driver_data<popper_state>();
+	popper_state *state = screen.machine().driver_data<popper_state>();
 	rectangle finalclip = state->m_tilemap_clip;
 	sect_rect(&finalclip, cliprect);
 
@@ -263,7 +263,7 @@ SCREEN_UPDATE( popper )
 	tilemap_draw(bitmap, &finalclip, state->m_ol_p123_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	tilemap_draw(bitmap, &finalclip, state->m_ol_p0_tilemap,   TILEMAP_DRAW_LAYER1, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_p123_tilemap,      TILEMAP_DRAW_LAYER0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_p0_tilemap,        TILEMAP_DRAW_LAYER0, 0);

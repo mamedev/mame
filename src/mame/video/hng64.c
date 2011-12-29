@@ -1448,7 +1448,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 
 SCREEN_UPDATE( hng64 )
 {
-	hng64_state *state = screen->machine().driver_data<hng64_state>();
+	hng64_state *state = screen.machine().driver_data<hng64_state>();
 	UINT32 *hng64_videoregs = state->m_videoregs;
 	UINT32 *hng64_videoram = state->m_videoram;
 	UINT32 *hng64_tcram = state->m_tcram;
@@ -1461,15 +1461,15 @@ SCREEN_UPDATE( hng64 )
 	// press in sams64_2 attract mode for a nice debug screen from the game
 	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
 	// but it could be useful
-	if ( screen->machine().input().code_pressed_once(KEYCODE_L) )
+	if ( screen.machine().input().code_pressed_once(KEYCODE_L) )
 	{
-		address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 		space->write_byte(0x2f27c8, 0x2);
 	}
 #endif
 
-	bitmap_fill(bitmap, 0, hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen->machine()) : screen->machine().pens[0]); //FIXME: Is the register correct? check with HW tests
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0x00);
+	bitmap_fill(bitmap, 0, hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen.machine()) : screen.machine().pens[0]); //FIXME: Is the register correct? check with HW tests
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0x00);
 
 	if (state->m_screen_dis)
 		return 0;
@@ -1539,10 +1539,10 @@ SCREEN_UPDATE( hng64 )
 	//hng64_mark_all_tiles_dirty(state, 2);
 	//hng64_mark_all_tiles_dirty(state, 3);
 
-	hng64_drawtilemap(screen->machine(),bitmap,cliprect, 3);
-	hng64_drawtilemap(screen->machine(),bitmap,cliprect, 2);
-	hng64_drawtilemap(screen->machine(),bitmap,cliprect, 1);
-	hng64_drawtilemap(screen->machine(),bitmap,cliprect, 0);
+	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 3);
+	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 2);
+	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 1);
+	hng64_drawtilemap(screen.machine(),bitmap,cliprect, 0);
 
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites.
 	{
@@ -1566,10 +1566,10 @@ SCREEN_UPDATE( hng64 )
 		//printf("NEW FRAME!\n");   /* Debug - ajg */
 	}
 
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 
 	if(0)
-		transition_control(screen->machine(), bitmap, cliprect);
+		transition_control(screen.machine(), bitmap, cliprect);
 
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", state->m_spriteregs[0], state->m_spriteregs[1], state->m_spriteregs[2], state->m_spriteregs[3], state->m_spriteregs[4]);
@@ -1629,22 +1629,22 @@ SCREEN_UPDATE( hng64 )
 		hng64_tcram[0x58/4],
 		hng64_tcram[0x5c/4]);
 
-	if ( screen->machine().input().code_pressed_once(KEYCODE_T) )
+	if ( screen.machine().input().code_pressed_once(KEYCODE_T) )
 	{
 		state->m_additive_tilemap_debug ^= 1;
 		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
-	if ( screen->machine().input().code_pressed_once(KEYCODE_Y) )
+	if ( screen.machine().input().code_pressed_once(KEYCODE_Y) )
 	{
 		state->m_additive_tilemap_debug ^= 2;
 		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
-	if ( screen->machine().input().code_pressed_once(KEYCODE_U) )
+	if ( screen.machine().input().code_pressed_once(KEYCODE_U) )
 	{
 		state->m_additive_tilemap_debug ^= 4;
 		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
-	if ( screen->machine().input().code_pressed_once(KEYCODE_I) )
+	if ( screen.machine().input().code_pressed_once(KEYCODE_I) )
 	{
 		state->m_additive_tilemap_debug ^= 8;
 		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
@@ -1655,7 +1655,7 @@ SCREEN_UPDATE( hng64 )
 
 SCREEN_EOF( hng64 )
 {
-	clear3d(screen->machine());
+	clear3d(screen.machine());
 }
 
 VIDEO_START( hng64 )

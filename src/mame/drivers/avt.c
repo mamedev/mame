@@ -503,10 +503,10 @@ static VIDEO_START( avt )
 
 static SCREEN_UPDATE( avt )
 {
-	avt_state *state = screen->machine().driver_data<avt_state>();
+	avt_state *state = screen.machine().driver_data<avt_state>();
 	int x,y;
 	int count;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 
 	count = 0;
 

@@ -84,23 +84,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
                 SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE( warriorb )
+static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int xoffs, device_t *tc0100scn)
 {
-	warriorb_state *state = screen->machine().driver_data<warriorb_state>();
-	int xoffs = 0;
 	UINT8 layer[3], nodraw;
-	device_t *tc0100scn = NULL;
-
-	if (screen == state->m_lscreen)
-	{
-		xoffs = 40 * 8 * 0;
-		tc0100scn = state->m_tc0100scn_1;
-	}
-	else if (screen == state->m_rscreen)
-	{
-		xoffs = 40 * 8 * 1;
-		tc0100scn = state->m_tc0100scn_2;
-	}
 
 	tc0100scn_tilemap_update(tc0100scn);
 
@@ -109,7 +95,7 @@ SCREEN_UPDATE( warriorb )
 	layer[2] = 2;
 
 	/* Clear priority bitmap */
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer
@@ -117,15 +103,18 @@ SCREEN_UPDATE( warriorb )
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	// draw middle layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 1);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(screen->machine(), bitmap, cliprect, xoffs, 8); // draw sprites
+	draw_sprites(screen.machine(), bitmap, cliprect, xoffs, 8); // draw sprites
 
 	// draw top(text) layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 0);
 	return 0;
 }
+
+SCREEN_UPDATE( warriorb_left ) { return update_screen(screen, bitmap, cliprect, 40 * 8 * 0, screen.machine().driver_data<warriorb_state>()->m_tc0100scn_1); }
+SCREEN_UPDATE( warriorb_right ) { return update_screen(screen, bitmap, cliprect, 40 * 8 * 1, screen.machine().driver_data<warriorb_state>()->m_tc0100scn_2); }

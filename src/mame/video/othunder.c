@@ -202,7 +202,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 SCREEN_UPDATE( othunder )
 {
-	othunder_state *state = screen->machine().driver_data<othunder_state>();
+	othunder_state *state = screen.machine().driver_data<othunder_state>();
 	int layer[3];
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
@@ -211,7 +211,7 @@ SCREEN_UPDATE( othunder )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -223,7 +223,7 @@ SCREEN_UPDATE( othunder )
 	/* Sprites can be under/over the layer below text layer */
 	{
 		static const int primasks[2] = {0xf0, 0xfc};
-		draw_sprites(screen->machine(), bitmap, cliprect, primasks, 3);
+		draw_sprites(screen.machine(), bitmap, cliprect, primasks, 3);
 	}
 
 	return 0;

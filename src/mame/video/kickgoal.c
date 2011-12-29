@@ -124,7 +124,7 @@ static void kickgoal_draw_sprites( running_machine &machine, bitmap_t *bitmap,co
 
 SCREEN_UPDATE( kickgoal )
 {
-	kickgoal_state *state = screen->machine().driver_data<kickgoal_state>();
+	kickgoal_state *state = screen.machine().driver_data<kickgoal_state>();
 
 	/* set scroll */
 	tilemap_set_scrollx(state->m_fgtm, 0, state->m_scrram[0]);
@@ -138,7 +138,7 @@ SCREEN_UPDATE( kickgoal )
 	tilemap_draw(bitmap, cliprect, state->m_bg2tm, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bgtm, 0, 0);
 
-	kickgoal_draw_sprites(screen->machine(), bitmap, cliprect);
+	kickgoal_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fgtm, 0, 0);
 
@@ -255,7 +255,7 @@ static void actionhw_draw_sprites(running_machine &machine, bitmap_t *bitmap,con
 
 SCREEN_UPDATE( actionhw )
 {
-	kickgoal_state *state = screen->machine().driver_data<kickgoal_state>();
+	kickgoal_state *state = screen.machine().driver_data<kickgoal_state>();
 	/* set scroll */
 	tilemap_set_scrollx(state->m_fgtm, 0, state->m_scrram[0]);
 	tilemap_set_scrolly(state->m_fgtm, 0, state->m_scrram[1]);
@@ -268,7 +268,7 @@ SCREEN_UPDATE( actionhw )
 	tilemap_draw(bitmap, cliprect, state->m_bg2tm, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bgtm, 0, 0);
 
-	actionhw_draw_sprites(screen->machine(), bitmap, cliprect);
+	actionhw_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fgtm, 0, 0);
 	return 0;

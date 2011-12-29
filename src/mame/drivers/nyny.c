@@ -429,7 +429,7 @@ static const mc6845_interface mc6845_intf =
 
 static SCREEN_UPDATE( nyny )
 {
-	nyny_state *state = screen->machine().driver_data<nyny_state>();
+	nyny_state *state = screen.machine().driver_data<nyny_state>();
 
 	state->m_mc6845->update(bitmap, cliprect);
 

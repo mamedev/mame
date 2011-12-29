@@ -181,21 +181,21 @@ static VIDEO_START( darkhors )
 
 static SCREEN_UPDATE( darkhors )
 {
-	darkhors_state *state = screen->machine().driver_data<darkhors_state>();
+	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
 	int layers_ctrl = -1;
 
 #if DARKHORS_DEBUG
-	if (screen->machine().input().code_pressed(KEYCODE_Z))
+	if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (screen->machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-		if (screen->machine().input().code_pressed(KEYCODE_W))	mask |= 2;
-		if (screen->machine().input().code_pressed(KEYCODE_A))	mask |= 4;
+		if (screen.machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
+		if (screen.machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+		if (screen.machine().input().code_pressed(KEYCODE_A))	mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	tilemap_set_scrollx(state->m_tmap,0, (state->m_tmapscroll[0] >> 16) - 5);
 	tilemap_set_scrolly(state->m_tmap,0, (state->m_tmapscroll[0] & 0xffff) - 0xff );
@@ -205,7 +205,7 @@ static SCREEN_UPDATE( darkhors )
 	tilemap_set_scrolly(state->m_tmap2,0, (state->m_tmapscroll2[0] & 0xffff) - 0xff );
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, state->m_tmap2, 0, 0);
 
-	if (layers_ctrl & 4)	draw_sprites(screen->machine(),bitmap,cliprect);
+	if (layers_ctrl & 4)	draw_sprites(screen.machine(),bitmap,cliprect);
 
 #if DARKHORS_DEBUG
 #if 0

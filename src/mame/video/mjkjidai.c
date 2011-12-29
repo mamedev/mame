@@ -131,13 +131,13 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( mjkjidai )
 {
-	mjkjidai_state *state = screen->machine().driver_data<mjkjidai_state>();
+	mjkjidai_state *state = screen.machine().driver_data<mjkjidai_state>();
 	if (!state->m_display_enable)
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 	else
 	{
 		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-		draw_sprites(screen->machine(), bitmap,cliprect);
+		draw_sprites(screen.machine(), bitmap,cliprect);
 	}
 	return 0;
 }

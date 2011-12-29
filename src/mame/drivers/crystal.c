@@ -635,8 +635,8 @@ static void SetVidReg( address_space *space, UINT16 reg, UINT16 val )
 
 static SCREEN_UPDATE( crystal )
 {
-	crystal_state *state = screen->machine().driver_data<crystal_state>();
-	address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	crystal_state *state = screen.machine().driver_data<crystal_state>();
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int DoFlip;
 
 	UINT32 B0 = 0x0;
@@ -646,7 +646,7 @@ static SCREEN_UPDATE( crystal )
 	UINT16 *srcline;
 	int y;
 	UINT16 head, tail;
-	UINT32 width = screen->width();
+	UINT32 width = screen.width();
 
 	if (GetVidReg(space, 0x8e) & 1)
 	{
@@ -696,8 +696,8 @@ static SCREEN_UPDATE( crystal )
 
 static SCREEN_EOF(crystal)
 {
-	crystal_state *state = machine.driver_data<crystal_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	crystal_state *state = screen.machine().driver_data<crystal_state>();
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 head, tail;
 	int DoFlip = 0;
 

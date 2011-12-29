@@ -479,7 +479,7 @@ static void update_widget_irq(running_machine &machine);
 
 static SCREEN_UPDATE( seattle )
 {
-	seattle_state *state = screen->machine().driver_data<seattle_state>();
+	seattle_state *state = screen.machine().driver_data<seattle_state>();
 	return voodoo_update(state->m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 

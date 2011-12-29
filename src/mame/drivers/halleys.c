@@ -1467,7 +1467,7 @@ static void filter_bitmap(running_machine &machine, bitmap_t *bitmap, int mask)
 
 static SCREEN_UPDATE( halleys )
 {
-	halleys_state *state = screen->machine().driver_data<halleys_state>();
+	halleys_state *state = screen.machine().driver_data<halleys_state>();
 	int i, j;
 
 	if (state->m_stars_enabled)
@@ -1479,7 +1479,7 @@ static SCREEN_UPDATE( halleys )
 		bitmap_fill(bitmap, cliprect, state->m_bgcolor);
 
 #ifdef MAME_DEBUG
-	if (input_port_read(screen->machine(), "DEBUG")) copy_scroll_xp(bitmap, state->m_render_layer[3], *state->m_scrollx0, *state->m_scrolly0); // not used???
+	if (input_port_read(screen.machine(), "DEBUG")) copy_scroll_xp(bitmap, state->m_render_layer[3], *state->m_scrollx0, *state->m_scrolly0); // not used???
 #endif
 
 	copy_scroll_xp(bitmap, state->m_render_layer[2], *state->m_scrollx1, *state->m_scrolly1);
@@ -1489,14 +1489,14 @@ static SCREEN_UPDATE( halleys )
 	// HALF-HACK: apply RGB filter when the following conditions are met
 	i = state->m_io_ram[0xa0];
 	j = state->m_io_ram[0xa1];
-	if (state->m_io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen->machine(), bitmap, i);
+	if (state->m_io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen.machine(), bitmap, i);
 	return 0;
 }
 
 
 static SCREEN_UPDATE( benberob )
 {
-	halleys_state *state = screen->machine().driver_data<halleys_state>();
+	halleys_state *state = screen.machine().driver_data<halleys_state>();
 	if (state->m_io_ram[0xa0] & 0x80)
 		copy_scroll_op(bitmap, state->m_render_layer[2], *state->m_scrollx1, *state->m_scrolly1);
 	else

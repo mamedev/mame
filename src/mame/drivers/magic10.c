@@ -185,7 +185,7 @@ static VIDEO_START( magic10 )
 
 static SCREEN_UPDATE( magic10 )
 {
-	magic10_state *state = screen->machine().driver_data<magic10_state>();
+	magic10_state *state = screen.machine().driver_data<magic10_state>();
 	/*TODO: understand where this comes from. */
 	tilemap_set_scrollx(state->m_layer2_tilemap, 0, state->m_layer2_offset[0]);
 	tilemap_set_scrolly(state->m_layer2_tilemap, 0, state->m_layer2_offset[1]);

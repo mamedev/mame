@@ -141,7 +141,7 @@ VIDEO_START( cobra )
 
 SCREEN_UPDATE( cobra )
 {
-	cobra_state *cobra = screen->machine().driver_data<cobra_state>();
+	cobra_state *cobra = screen.machine().driver_data<cobra_state>();
 
 	if (cobra->polybuffer_ptr > 0)
 	{
@@ -149,7 +149,7 @@ SCREEN_UPDATE( cobra )
 
 		for (i=0; i < cobra->polybuffer_ptr; i++)
 		{
-			poly_render_triangle(cobra->poly, cobra->framebuffer, &screen->machine().primary_screen->visible_area(), render_texture_scan, 2,
+			poly_render_triangle(cobra->poly, cobra->framebuffer, &screen.machine().primary_screen->visible_area(), render_texture_scan, 2,
 								 &cobra->polybuffer[i].v[0], &cobra->polybuffer[i].v[1], &cobra->polybuffer[i].v[2]);
 			poly_wait(cobra->poly, "Finished render");
 		}

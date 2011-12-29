@@ -29,41 +29,41 @@ VIDEO_START(aristmk6)
 
 SCREEN_UPDATE(aristmk6)
 {
-	aristmk6_state *state = screen->machine().driver_data<aristmk6_state>();
+	aristmk6_state *state = screen.machine().driver_data<aristmk6_state>();
 
 	int x,y,count;
-	const UINT8 *blit_ram = screen->machine().region("maincpu")->base();
+	const UINT8 *blit_ram = screen.machine().region("maincpu")->base();
 
-	if(screen->machine().input().code_pressed(KEYCODE_Z))
+	if(screen.machine().input().code_pressed(KEYCODE_Z))
 		state->m_test_x++;
 
-	if(screen->machine().input().code_pressed(KEYCODE_X))
+	if(screen.machine().input().code_pressed(KEYCODE_X))
 		state->m_test_x--;
 
-	if(screen->machine().input().code_pressed(KEYCODE_A))
+	if(screen.machine().input().code_pressed(KEYCODE_A))
 		state->m_test_y++;
 
-	if(screen->machine().input().code_pressed(KEYCODE_S))
+	if(screen.machine().input().code_pressed(KEYCODE_S))
 		state->m_test_y--;
 
-	if(screen->machine().input().code_pressed(KEYCODE_Q))
+	if(screen.machine().input().code_pressed(KEYCODE_Q))
 		state->m_start_offs+=0x2000;
 
-	if(screen->machine().input().code_pressed(KEYCODE_W))
+	if(screen.machine().input().code_pressed(KEYCODE_W))
 		state->m_start_offs-=0x2000;
 
-	if(screen->machine().input().code_pressed(KEYCODE_E))
+	if(screen.machine().input().code_pressed(KEYCODE_E))
 		state->m_start_offs++;
 
-	if(screen->machine().input().code_pressed(KEYCODE_R))
+	if(screen.machine().input().code_pressed(KEYCODE_R))
 		state->m_start_offs--;
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_L))
+	if(screen.machine().input().code_pressed_once(KEYCODE_L))
 		state->m_type^=1;
 
 	popmessage("%d %d %04x %d",state->m_test_x,state->m_test_y,state->m_start_offs,state->m_type);
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	count = (state->m_start_offs);
 
@@ -86,7 +86,7 @@ SCREEN_UPDATE(aristmk6)
 				g = (g << 2) | (g & 3);
 				b = (b << 3) | (b & 0x7);
 
-				if((x)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
+				if((x)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, x) = r | g<<8 | b<<16;
 
 				count+=2;
@@ -97,8 +97,8 @@ SCREEN_UPDATE(aristmk6)
 
 				color = blit_ram[count];
 
-				if((x)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, x) = screen->machine().pens[color];
+				if((x)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+					*BITMAP_ADDR32(bitmap, y, x) = screen.machine().pens[color];
 
 				count++;
 			}

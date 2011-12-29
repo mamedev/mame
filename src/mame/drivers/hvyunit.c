@@ -158,11 +158,11 @@ static SCREEN_UPDATE( hvyunit )
 {
 #define SX_POS	96
 #define SY_POS	0
-	hvyunit_state *state = screen->machine().driver_data<hvyunit_state>();
+	hvyunit_state *state = screen.machine().driver_data<hvyunit_state>();
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_port0_data & 0x40) << 2) + state->m_scrollx + SX_POS); // TODO
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_port0_data & 0x80) << 1) + state->m_scrolly + SY_POS); // TODO
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	pandora_update(state->m_pandora, bitmap, cliprect);
 
@@ -171,7 +171,7 @@ static SCREEN_UPDATE( hvyunit )
 
 static SCREEN_EOF( hvyunit )
 {
-	hvyunit_state *state = machine.driver_data<hvyunit_state>();
+	hvyunit_state *state = screen.machine().driver_data<hvyunit_state>();
 	pandora_eof(state->m_pandora);
 }
 

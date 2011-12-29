@@ -46,5 +46,6 @@ WRITE16_HANDLER( gaelco2_palette_w );
 SCREEN_UPDATE( gaelco2 );
 SCREEN_EOF( gaelco2 );
 VIDEO_START( gaelco2 );
-SCREEN_UPDATE( gaelco2_dual );
+SCREEN_UPDATE( gaelco2_left );
+SCREEN_UPDATE( gaelco2_right );
 VIDEO_START( gaelco2_dual );

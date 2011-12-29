@@ -54,7 +54,7 @@ static VIDEO_START( wink )
 
 static SCREEN_UPDATE( wink )
 {
-	wink_state *state = screen->machine().driver_data<wink_state>();
+	wink_state *state = screen.machine().driver_data<wink_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

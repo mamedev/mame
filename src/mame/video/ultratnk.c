@@ -57,7 +57,7 @@ VIDEO_START( ultratnk )
 
 SCREEN_UPDATE( ultratnk )
 {
-	ultratnk_state *state = screen->machine().driver_data<ultratnk_state>();
+	ultratnk_state *state = screen.machine().driver_data<ultratnk_state>();
 	UINT8 *videoram = state->m_videoram;
 	int i;
 
@@ -77,7 +77,7 @@ SCREEN_UPDATE( ultratnk )
 
 		if (!(attr & 0x80))
 		{
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 				(code >> 3) | bank,
 				i,
 				0, 0,
@@ -92,10 +92,10 @@ SCREEN_UPDATE( ultratnk )
 
 SCREEN_EOF( ultratnk )
 {
-	ultratnk_state *state = machine.driver_data<ultratnk_state>();
+	ultratnk_state *state = screen.machine().driver_data<ultratnk_state>();
 	int i;
-	UINT16 BG = colortable_entry_get_value(machine.colortable, 0);
-	device_t *discrete = machine.device("discrete");
+	UINT16 BG = colortable_entry_get_value(screen.machine().colortable, 0);
+	device_t *discrete = screen.machine().device("discrete");
 	UINT8 *videoram = state->m_videoram;
 
 	/* check for sprite-playfield collisions */
@@ -115,17 +115,17 @@ SCREEN_EOF( ultratnk )
 
 		rect.min_x = horz - 15;
 		rect.min_y = vert - 15;
-		rect.max_x = horz - 15 + machine.gfx[1]->width - 1;
-		rect.max_y = vert - 15 + machine.gfx[1]->height - 1;
+		rect.max_x = horz - 15 + screen.machine().gfx[1]->width - 1;
+		rect.max_y = vert - 15 + screen.machine().gfx[1]->height - 1;
 
-		sect_rect(&rect, &machine.primary_screen->visible_area());
+		sect_rect(&rect, &screen.machine().primary_screen->visible_area());
 
 		tilemap_draw(state->m_helper, &rect, state->m_playfield, 0, 0);
 
 		if (code & 4)
 			bank = 32;
 
-		drawgfx_transpen(state->m_helper, &rect, machine.gfx[1],
+		drawgfx_transpen(state->m_helper, &rect, screen.machine().gfx[1],
 			(code >> 3) | bank,
 			4,
 			0, 0,
@@ -134,7 +134,7 @@ SCREEN_EOF( ultratnk )
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 			for (x = rect.min_x; x <= rect.max_x; x++)
-				if (colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(state->m_helper, y, x)) != BG)
+				if (colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(state->m_helper, y, x)) != BG)
 					state->m_collision[i] = 1;
 	}
 

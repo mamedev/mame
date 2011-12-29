@@ -240,7 +240,7 @@ static VIDEO_START( pkscramble )
 
 static SCREEN_UPDATE( pkscramble )
 {
-	pkscram_state *state = screen->machine().driver_data<pkscram_state>();
+	pkscram_state *state = screen.machine().driver_data<pkscram_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_md_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);

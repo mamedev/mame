@@ -913,7 +913,7 @@ static void draw_bitmap( running_machine &machine, bitmap_t *bitmap )
 
 static SCREEN_UPDATE( nmg5 )
 {
-	nmg5_state *state = screen->machine().driver_data<nmg5_state>();
+	nmg5_state *state = screen.machine().driver_data<nmg5_state>();
 
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll_ram[3] + 9);
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_ram[2] + 3);
@@ -924,33 +924,33 @@ static SCREEN_UPDATE( nmg5 )
 
 	if (state->m_priority_reg == 0)
 	{
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-		draw_bitmap(screen->machine(), bitmap);
+		draw_bitmap(screen.machine(), bitmap);
 	}
 	else if (state->m_priority_reg == 1)
 	{
-		draw_bitmap(screen->machine(), bitmap);
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_bitmap(screen.machine(), bitmap);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	}
 	else if (state->m_priority_reg == 2)
 	{
-		draw_sprites(screen->machine(), bitmap, cliprect);
-		draw_bitmap(screen->machine(), bitmap);
+		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_bitmap(screen.machine(), bitmap);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	}
 	else if (state->m_priority_reg == 3)
 	{
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect);
-		draw_bitmap(screen->machine(), bitmap);
+		draw_sprites(screen.machine(), bitmap, cliprect);
+		draw_bitmap(screen.machine(), bitmap);
 	}
 	else if (state->m_priority_reg == 7)
 	{
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-		draw_bitmap(screen->machine(), bitmap);
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_bitmap(screen.machine(), bitmap);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	return 0;
 }

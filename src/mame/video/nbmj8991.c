@@ -304,19 +304,19 @@ VIDEO_START( nbmj8991 )
 
 SCREEN_UPDATE( nbmj8991_type1 )
 {
-	nbmj8991_state *state = screen->machine().driver_data<nbmj8991_state>();
+	nbmj8991_state *state = screen.machine().driver_data<nbmj8991_state>();
 	int x, y;
 
 	if (state->m_screen_refresh)
 	{
-		int width = screen->machine().primary_screen->width();
-		int height = screen->machine().primary_screen->height();
+		int width = screen.machine().primary_screen->width();
+		int height = screen.machine().primary_screen->height();
 
 		state->m_screen_refresh = 0;
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				update_pixel(screen->machine(), x, y);
+				update_pixel(screen.machine(), x, y);
 	}
 
 	if (state->m_dispflag)
@@ -344,19 +344,19 @@ SCREEN_UPDATE( nbmj8991_type1 )
 
 SCREEN_UPDATE( nbmj8991_type2 )
 {
-	nbmj8991_state *state = screen->machine().driver_data<nbmj8991_state>();
+	nbmj8991_state *state = screen.machine().driver_data<nbmj8991_state>();
 	int x, y;
 
 	if (state->m_screen_refresh)
 	{
-		int width = screen->width();
-		int height = screen->height();
+		int width = screen.width();
+		int height = screen.height();
 
 		state->m_screen_refresh = 0;
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				update_pixel(screen->machine(), x, y);
+				update_pixel(screen.machine(), x, y);
 	}
 
 	if (nb1413m3_inputport & 0x20)

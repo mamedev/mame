@@ -125,10 +125,10 @@ VIDEO_START( polygonet )
 
 SCREEN_UPDATE( polygonet )
 {
-	polygonet_state *state = screen->machine().driver_data<polygonet_state>();
-	device_t *k053936 = screen->machine().device("k053936");
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	polygonet_state *state = screen.machine().driver_data<polygonet_state>();
+	device_t *k053936 = screen.machine().device("k053936");
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	k053936_zoom_draw(k053936, bitmap, cliprect, state->m_roz_tilemap, 0, 0, 0);
 

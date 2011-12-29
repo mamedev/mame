@@ -634,7 +634,7 @@ GFXDECODE_END
 
 static SCREEN_UPDATE(ltcasino)
 {
-	ltcasino_state *state = screen->machine().driver_data<ltcasino_state>();
+	ltcasino_state *state = screen.machine().driver_data<ltcasino_state>();
 	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
 	return 0;
 }

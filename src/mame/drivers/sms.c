@@ -473,7 +473,7 @@ static VIDEO_START( sms )
 
 static SCREEN_UPDATE( sms )
 {
-	sms_state *state = screen->machine().driver_data<sms_state>();
+	sms_state *state = screen.machine().driver_data<sms_state>();
 	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

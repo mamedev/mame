@@ -103,8 +103,8 @@ static void draw_bullets(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( tankbatt )
 {
-	tankbatt_state *state = screen->machine().driver_data<tankbatt_state>();
+	tankbatt_state *state = screen.machine().driver_data<tankbatt_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_bullets(screen->machine(), bitmap, cliprect);
+	draw_bullets(screen.machine(), bitmap, cliprect);
 	return 0;
 }

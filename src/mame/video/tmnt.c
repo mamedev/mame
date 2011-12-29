@@ -578,7 +578,7 @@ WRITE16_HANDLER( tmnt_priority_w )
 
 SCREEN_UPDATE( mia )
 {
-	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
+	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 
 	k052109_tilemap_update(state->m_k052109);
 
@@ -593,7 +593,7 @@ SCREEN_UPDATE( mia )
 
 SCREEN_UPDATE( tmnt )
 {
-	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
+	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 
 	k052109_tilemap_update(state->m_k052109);
 
@@ -609,7 +609,7 @@ SCREEN_UPDATE( tmnt )
 
 SCREEN_UPDATE( punkshot )
 {
-	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
+	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 
 	state->m_sprite_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI1);
 	state->m_layer_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI2);
@@ -627,7 +627,7 @@ SCREEN_UPDATE( punkshot )
 
 	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[2], 0, 4);
@@ -639,7 +639,7 @@ SCREEN_UPDATE( punkshot )
 
 SCREEN_UPDATE( lgtnfght )
 {
-	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
+	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	int bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
@@ -659,7 +659,7 @@ SCREEN_UPDATE( lgtnfght )
 
 	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], 0, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
@@ -686,7 +686,7 @@ popmessage("%04x", state->m_glfgreat_pixel);
 
 SCREEN_UPDATE( glfgreat )
 {
-	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
+	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	int bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
@@ -708,7 +708,7 @@ SCREEN_UPDATE( glfgreat )
 
 	/* not sure about the 053936 priority, but it seems to work */
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect,16 * bg_colorbase);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], 0, 1);
 
@@ -740,7 +740,7 @@ SCREEN_UPDATE( glfgreat )
 
 SCREEN_UPDATE( tmnt2 )
 {
-	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
+	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	double brt;
 	int i, newdim, newen, cb, ce;
 
@@ -769,21 +769,21 @@ SCREEN_UPDATE( tmnt2 )
 
 		// dim all colors before it
 		for (i = 0; i < cb; i++)
-			palette_set_pen_contrast(screen->machine(), i, brt);
+			palette_set_pen_contrast(screen.machine(), i, brt);
 
 		// reset all colors in range
 		for (i = cb; i < ce; i++)
-			palette_set_pen_contrast(screen->machine(), i, 1.0);
+			palette_set_pen_contrast(screen.machine(), i, 1.0);
 
 		// dim all colors after it
 		for (i = ce; i < 2048; i++)
-			palette_set_pen_contrast(screen->machine(), i, brt);
+			palette_set_pen_contrast(screen.machine(), i, brt);
 
 		// toggle shadow/highlight
 		if (~state->m_dim_c & 0x10)
-			palette_set_shadow_mode(screen->machine(), 1);
+			palette_set_shadow_mode(screen.machine(), 1);
 		else
-			palette_set_shadow_mode(screen->machine(), 0);
+			palette_set_shadow_mode(screen.machine(), 0);
 	}
 
 	SCREEN_UPDATE_CALL(lgtnfght);
@@ -793,7 +793,7 @@ SCREEN_UPDATE( tmnt2 )
 
 SCREEN_UPDATE( thndrx2 )
 {
-	tmnt_state *state = screen->machine().driver_data<tmnt_state>();
+	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	int bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
@@ -813,7 +813,7 @@ SCREEN_UPDATE( thndrx2 )
 
 	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], 0, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
@@ -833,6 +833,6 @@ SCREEN_UPDATE( thndrx2 )
 
 SCREEN_EOF( blswhstl )
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
+	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	k053245_clear_buffer(state->m_k053245);
 }

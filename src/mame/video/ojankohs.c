@@ -314,7 +314,7 @@ VIDEO_START( ojankoc )
 
 SCREEN_UPDATE( ojankohs )
 {
-	ojankohs_state *state = screen->machine().driver_data<ojankohs_state>();
+	ojankohs_state *state = screen.machine().driver_data<ojankohs_state>();
 
 	tilemap_set_scrollx(state->m_tilemap, 0, state->m_scrollx);
 	tilemap_set_scrolly(state->m_tilemap, 0, state->m_scrolly);
@@ -325,12 +325,12 @@ SCREEN_UPDATE( ojankohs )
 
 SCREEN_UPDATE( ojankoc )
 {
-	ojankohs_state *state = screen->machine().driver_data<ojankohs_state>();
+	ojankohs_state *state = screen.machine().driver_data<ojankohs_state>();
 	int offs;
 
 	if (state->m_screen_refresh)
 	{
-		address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++)

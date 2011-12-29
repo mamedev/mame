@@ -212,7 +212,7 @@ static VIDEO_START(roul)
 
 static SCREEN_UPDATE(roul)
 {
-	roul_state *state = screen->machine().driver_data<roul_state>();
+	roul_state *state = screen.machine().driver_data<roul_state>();
 	int i,j;
 	for (i = 0; i < 256; i++)
 		for (j = 0; j < 256; j++)

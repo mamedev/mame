@@ -80,10 +80,10 @@ VIDEO_START( arcadecl )
 
 SCREEN_UPDATE( arcadecl )
 {
-	arcadecl_state *state = screen->machine().driver_data<arcadecl_state>();
+	arcadecl_state *state = screen.machine().driver_data<arcadecl_state>();
 
 	/* draw the playfield */
-	arcadecl_bitmap_render(screen->machine(), bitmap, cliprect);
+	arcadecl_bitmap_render(screen.machine(), bitmap, cliprect);
 
 	/* draw and merge the MO */
 	if (state->m_has_mo)

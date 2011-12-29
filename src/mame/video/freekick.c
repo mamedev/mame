@@ -136,24 +136,24 @@ static void freekick_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 
 SCREEN_UPDATE( gigas )
 {
-	freekick_state *state = screen->machine().driver_data<freekick_state>();
+	freekick_state *state = screen.machine().driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->m_freek_tilemap, 0, 0);
-	gigas_draw_sprites(screen->machine(), bitmap, cliprect);
+	gigas_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( pbillrd )
 {
-	freekick_state *state = screen->machine().driver_data<freekick_state>();
+	freekick_state *state = screen.machine().driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->m_freek_tilemap, 0, 0);
-	pbillrd_draw_sprites(screen->machine(), bitmap, cliprect);
+	pbillrd_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( freekick )
 {
-	freekick_state *state = screen->machine().driver_data<freekick_state>();
+	freekick_state *state = screen.machine().driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->m_freek_tilemap, 0, 0);
-	freekick_draw_sprites(screen->machine(), bitmap, cliprect);
+	freekick_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

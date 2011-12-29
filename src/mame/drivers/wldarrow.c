@@ -60,7 +60,7 @@ static void get_pens(pen_t *pens)
 
 static SCREEN_UPDATE( wldarrow )
 {
-	wldarrow_state *state = screen->machine().driver_data<wldarrow_state>();
+	wldarrow_state *state = screen.machine().driver_data<wldarrow_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 

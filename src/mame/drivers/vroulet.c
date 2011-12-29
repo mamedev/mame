@@ -110,9 +110,9 @@ static VIDEO_START(vroulet)
 
 static SCREEN_UPDATE(vroulet)
 {
-	vroulet_state *state = screen->machine().driver_data<vroulet_state>();
+	vroulet_state *state = screen.machine().driver_data<vroulet_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], 0x320, 1, 0, 0,
+	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], 0x320, 1, 0, 0,
 		state->m_ball[1], state->m_ball[0] - 12, 0);
 	return 0;
 }

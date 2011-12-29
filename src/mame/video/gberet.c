@@ -170,10 +170,10 @@ static void gberet_draw_sprites( running_machine &machine, bitmap_t *bitmap, con
 
 SCREEN_UPDATE( gberet )
 {
-	gberet_state *state = screen->machine().driver_data<gberet_state>();
+	gberet_state *state = screen.machine().driver_data<gberet_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
-	gberet_draw_sprites(screen->machine(), bitmap, cliprect);
+	gberet_draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }
@@ -226,9 +226,9 @@ static void gberetb_draw_sprites( running_machine &machine, bitmap_t *bitmap, co
 
 SCREEN_UPDATE( gberetb )
 {
-	gberet_state *state = screen->machine().driver_data<gberet_state>();
+	gberet_state *state = screen.machine().driver_data<gberet_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
-	gberetb_draw_sprites(screen->machine(), bitmap, cliprect);
+	gberetb_draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

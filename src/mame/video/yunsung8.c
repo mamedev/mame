@@ -196,15 +196,15 @@ VIDEO_START( yunsung8 )
 
 SCREEN_UPDATE( yunsung8 )
 {
-	yunsung8_state *state = screen->machine().driver_data<yunsung8_state>();
+	yunsung8_state *state = screen.machine().driver_data<yunsung8_state>();
 	int layers_ctrl = (~state->m_layers_ctrl) >> 4;
 
 #ifdef MAME_DEBUG
-if (screen->machine().input().code_pressed(KEYCODE_Z))
+if (screen.machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif

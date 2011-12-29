@@ -389,10 +389,10 @@ static void sortlayers(int *layer,int *pri)
 
 SCREEN_UPDATE( macrossp )
 {
-	macrossp_state *state = screen->machine().driver_data<macrossp_state>();
+	macrossp_state *state = screen.machine().driver_data<macrossp_state>();
 	int layers[3],layerpri[3];
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	layers[0] = 0;
 	layerpri[0] = (state->m_scra_videoregs[0] & 0x0000c000) >> 14;
@@ -403,13 +403,13 @@ SCREEN_UPDATE( macrossp )
 
 	sortlayers(layers, layerpri);
 
-	draw_layer(screen->machine(), bitmap, cliprect, layers[0]);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
-	draw_layer(screen->machine(), bitmap, cliprect, layers[1]);
-	draw_sprites(screen->machine(), bitmap, cliprect, 1);
-	draw_layer(screen->machine(), bitmap, cliprect, layers[2]);
-	draw_sprites(screen->machine(), bitmap, cliprect, 2);
-	draw_sprites(screen->machine(), bitmap, cliprect, 3);
+	draw_layer(screen.machine(), bitmap, cliprect, layers[0]);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0);
+	draw_layer(screen.machine(), bitmap, cliprect, layers[1]);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1);
+	draw_layer(screen.machine(), bitmap, cliprect, layers[2]);
+	draw_sprites(screen.machine(), bitmap, cliprect, 2);
+	draw_sprites(screen.machine(), bitmap, cliprect, 3);
 	tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
 
 #if 0
@@ -431,7 +431,7 @@ state->m_scrc_videoregs[2]);// 08 - 0b
 
 SCREEN_EOF( macrossp )
 {
-	macrossp_state *state = machine.driver_data<macrossp_state>();
+	macrossp_state *state = screen.machine().driver_data<macrossp_state>();
 
 	/* looks like sprites are *two* frames ahead, like nmk16 */
 	memcpy(state->m_spriteram_old2, state->m_spriteram_old, state->m_spriteram_size);

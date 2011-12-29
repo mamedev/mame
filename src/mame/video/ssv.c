@@ -1167,13 +1167,13 @@ static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_t *bitmap
 
 SCREEN_UPDATE( gdfs )
 {
-	ssv_state *state = screen->machine().driver_data<ssv_state>();
+	ssv_state *state = screen.machine().driver_data<ssv_state>();
 	int pri;
 
 	SCREEN_UPDATE_CALL(ssv);
 
 	for (pri = 0; pri <= 0xf; pri++)
-		gdfs_draw_zooming_sprites(screen->machine(), bitmap, cliprect, pri);
+		gdfs_draw_zooming_sprites(screen.machine(), bitmap, cliprect, pri);
 
 	tilemap_set_scrollx(state->m_gdfs_tmap, 0, state->m_gdfs_tmapscroll[0x0c/2]);
 	tilemap_set_scrolly(state->m_gdfs_tmap, 0, state->m_gdfs_tmapscroll[0x10/2]);
@@ -1193,7 +1193,7 @@ SCREEN_UPDATE( ssv )
 {
 	rectangle clip = { 0, 0, 0, 0 };
 
-	ssv_state *state = screen->machine().driver_data<ssv_state>();
+	ssv_state *state = screen.machine().driver_data<ssv_state>();
 
 	// Shadow
 	if (state->m_scroll[0x76/2] & 0x0080)
@@ -1232,9 +1232,9 @@ SCREEN_UPDATE( ssv )
 	if (!state->m_enable_video)
 		return 0;
 
-	draw_layer(screen->machine(), bitmap, &clip, 0);	// "background layer"
+	draw_layer(screen.machine(), bitmap, &clip, 0);	// "background layer"
 
-	draw_sprites(screen->machine(), bitmap, &clip);	// sprites list
+	draw_sprites(screen.machine(), bitmap, &clip);	// sprites list
 
 
 	return 0;

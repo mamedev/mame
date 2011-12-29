@@ -193,10 +193,10 @@ static VIDEO_START(mpoker)
 
 static SCREEN_UPDATE(mpoker)
 {
-	mpoker_state *state = screen->machine().driver_data<mpoker_state>();
+	mpoker_state *state = screen.machine().driver_data<mpoker_state>();
 	int y,x;
 	int count;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 
 	count = 0;
 	for (y=0;y<32;y++)

@@ -87,12 +87,12 @@ public:
 
 static SCREEN_UPDATE( srmp5 )
 {
-	srmp5_state *state = screen->machine().driver_data<srmp5_state>();
+	srmp5_state *state = screen.machine().driver_data<srmp5_state>();
 	int x,y,address,xs,xs2,ys,ys2,height,width,xw,yw,xb,yb,sizex,sizey;
 	UINT16 *sprite_list=state->m_sprram;
 	UINT16 *sprite_list_end=&state->m_sprram[0x4000]; //guess
 	UINT8 *pixels=(UINT8 *)state->m_tileram;
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 
 //Table surface seems to be tiles, but display corrupts when switching the scene if always ON.
 //Currently the tiles are OFF.
@@ -193,7 +193,7 @@ static SCREEN_UPDATE( srmp5 )
 		{
 			if (state->m_tileduty[i] == 1)
 			{
-				gfx_element_decode(screen->machine().gfx[0], i);
+				gfx_element_decode(screen.machine().gfx[0], i);
 				state->m_tileduty[i] = 0;
 			}
 		}

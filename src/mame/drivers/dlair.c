@@ -174,7 +174,7 @@ static PALETTE_INIT( dleuro )
 
 static SCREEN_UPDATE( dleuro )
 {
-	dlair_state *state = screen->machine().driver_data<dlair_state>();
+	dlair_state *state = screen.machine().driver_data<dlair_state>();
 	UINT8 *videoram = state->m_videoram;
 	int x, y;
 
@@ -183,7 +183,7 @@ static SCREEN_UPDATE( dleuro )
 		for (x = 0; x < 32; x++)
 		{
 			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
-			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y);
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
 
 	return 0;

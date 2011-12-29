@@ -240,9 +240,9 @@ static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 
 static SCREEN_UPDATE( acommand )
 {
-	acommand_state *state = screen->machine().driver_data<acommand_state>();
+	acommand_state *state = screen.machine().driver_data<acommand_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	draw_sprites(screen->machine(),bitmap,cliprect,0,0);
+	draw_sprites(screen.machine(),bitmap,cliprect,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 
 	/*Order might be wrong,but these for sure are the led numbers tested*/

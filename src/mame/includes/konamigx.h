@@ -98,6 +98,8 @@ VIDEO_START(winspike);
 VIDEO_START(opengolf);
 VIDEO_START(racinfrc);
 SCREEN_UPDATE(konamigx);
+SCREEN_UPDATE(konamigx_left);
+SCREEN_UPDATE(konamigx_right);
 
 WRITE32_HANDLER( konamigx_palette_w );
 #ifdef UNUSED_FUNCTION

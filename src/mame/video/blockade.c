@@ -30,7 +30,7 @@ VIDEO_START( blockade )
 
 SCREEN_UPDATE( blockade )
 {
-	blockade_state *state = screen->machine().driver_data<blockade_state>();
+	blockade_state *state = screen.machine().driver_data<blockade_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;

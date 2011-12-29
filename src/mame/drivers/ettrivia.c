@@ -258,7 +258,7 @@ static VIDEO_START( ettrivia )
 
 static SCREEN_UPDATE( ettrivia )
 {
-	ettrivia_state *state = screen->machine().driver_data<ettrivia_state>();
+	ettrivia_state *state = screen.machine().driver_data<ettrivia_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;

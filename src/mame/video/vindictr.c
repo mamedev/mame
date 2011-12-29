@@ -220,7 +220,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 
 SCREEN_UPDATE( vindictr )
 {
-	vindictr_state *state = screen->machine().driver_data<vindictr_state>();
+	vindictr_state *state = screen.machine().driver_data<vindictr_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

@@ -486,10 +486,10 @@ static void update_sprites(running_machine& machine)
 
 SCREEN_UPDATE( ninjakd2 )
 {
-	ninjakd2_state *state = screen->machine().driver_data<ninjakd2_state>();
+	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
 	// updating sprites here instead than in screen_eof avoids a palette glitch
 	// at the end of the "rainbow sky" screens.
-	update_sprites(screen->machine());
+	update_sprites(screen.machine());
 	state->m_sprites_updated = 1;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -505,8 +505,8 @@ SCREEN_UPDATE( ninjakd2 )
 
 SCREEN_UPDATE( robokid )
 {
-	ninjakd2_state *state = screen->machine().driver_data<ninjakd2_state>();
-	update_sprites(screen->machine());
+	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
+	update_sprites(screen.machine());
 	state->m_sprites_updated = 1;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -526,8 +526,8 @@ SCREEN_UPDATE( robokid )
 
 SCREEN_UPDATE( omegaf )
 {
-	ninjakd2_state *state = screen->machine().driver_data<ninjakd2_state>();
-	update_sprites(screen->machine());
+	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
+	update_sprites(screen.machine());
 	state->m_sprites_updated = 1;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -548,9 +548,9 @@ SCREEN_UPDATE( omegaf )
 
 SCREEN_EOF( ninjakd2 )
 {
-	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
+	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
 	if (!state->m_sprites_updated)
-		update_sprites(machine);
+		update_sprites(screen.machine());
 
 	state->m_sprites_updated = 0;
 }

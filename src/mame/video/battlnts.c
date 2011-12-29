@@ -45,12 +45,12 @@ WRITE8_HANDLER( battlnts_spritebank_w )
 
 SCREEN_UPDATE( battlnts )
 {
-	battlnts_state *state = screen->machine().driver_data<battlnts_state>();
+	battlnts_state *state = screen.machine().driver_data<battlnts_state>();
 
 	k007342_tilemap_update(state->m_k007342);
 
 	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE ,0);
-	k007420_sprites_draw(state->m_k007420, bitmap, cliprect, screen->machine().gfx[1]);
+	k007420_sprites_draw(state->m_k007420, bitmap, cliprect, screen.machine().gfx[1]);
 	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE ,0);
 	return 0;
 }

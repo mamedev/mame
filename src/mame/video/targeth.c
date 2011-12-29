@@ -135,7 +135,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( targeth )
 {
-	targeth_state *state = screen->machine().driver_data<targeth_state>();
+	targeth_state *state = screen.machine().driver_data<targeth_state>();
 	/* set scroll registers */
 	tilemap_set_scrolly(state->m_pant[0], 0, state->m_vregs[0]);
 	tilemap_set_scrollx(state->m_pant[0], 0, state->m_vregs[1] + 0x04);
@@ -144,7 +144,7 @@ SCREEN_UPDATE( targeth )
 
 	tilemap_draw(bitmap,cliprect,state->m_pant[1],0,0);
 	tilemap_draw(bitmap,cliprect,state->m_pant[0],0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 
 	return 0;
 }

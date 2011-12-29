@@ -420,17 +420,17 @@ void redclash_draw_stars( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_EOF( redclash )
 {
-	redclash_update_stars_state(machine);
+	redclash_update_stars_state(screen.machine());
 }
 
 SCREEN_UPDATE( redclash )
 {
-	ladybug_state *state = screen->machine().driver_data<ladybug_state>();
+	ladybug_state *state = screen.machine().driver_data<ladybug_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
-	redclash_draw_stars(screen->machine(), bitmap, cliprect, 0x60, 0, 0x00, 0xff);
-	draw_sprites(screen->machine(), bitmap, cliprect);
-	draw_bullets(screen->machine(), bitmap, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 0, 0x00, 0xff);
+	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_bullets(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

@@ -107,10 +107,10 @@ VIDEO_START( lemmings )
 
 SCREEN_EOF( lemmings )
 {
-	lemmings_state *state = machine.driver_data<lemmings_state>();
+	lemmings_state *state = screen.machine().driver_data<lemmings_state>();
 
-	memcpy(state->m_sprite_triple_buffer_0, machine.generic.buffered_spriteram.u16, 0x800);
-	memcpy(state->m_sprite_triple_buffer_1, machine.generic.buffered_spriteram2.u16, 0x800);
+	memcpy(state->m_sprite_triple_buffer_0, screen.machine().generic.buffered_spriteram.u16, 0x800);
+	memcpy(state->m_sprite_triple_buffer_1, screen.machine().generic.buffered_spriteram2.u16, 0x800);
 }
 
 /******************************************************************************/
@@ -168,7 +168,7 @@ WRITE16_HANDLER( lemmings_vram_w )
 
 SCREEN_UPDATE( lemmings )
 {
-	lemmings_state *state = screen->machine().driver_data<lemmings_state>();
+	lemmings_state *state = screen.machine().driver_data<lemmings_state>();
 	int x1 = -state->m_control_data[0];
 	int x0 = -state->m_control_data[2];
 	int y = 0;
@@ -176,8 +176,8 @@ SCREEN_UPDATE( lemmings )
 	rect.max_y = cliprect->max_y;
 	rect.min_y = cliprect->min_y;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x0000);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x0000);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((state->m_control_data[6] & 2) == 0)
@@ -191,9 +191,9 @@ SCREEN_UPDATE( lemmings )
 		rect.min_x = 160;
 		copyscrollbitmap_trans(bitmap, state->m_bitmap0, 1, &x1, 1, &y, &rect, 0x100);
 	}
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_sprite_triple_buffer_0, 0, 0x0000);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x2000);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_0, 0, 0x0000);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x2000);
 	tilemap_draw(bitmap, cliprect, state->m_vram_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_sprite_triple_buffer_0, 0, 0x2000);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_0, 0, 0x2000);
 	return 0;
 }

@@ -379,7 +379,7 @@ static void set_fg_page( running_machine &machine, int page, int value )
 
 SCREEN_UPDATE( deniam )
 {
-	deniam_state *state = screen->machine().driver_data<deniam_state>();
+	deniam_state *state = screen.machine().driver_data<deniam_state>();
 	int bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly;
 	int page;
 
@@ -389,30 +389,30 @@ SCREEN_UPDATE( deniam )
 	bg_scrollx = state->m_textram[state->m_bg_scrollx_reg] - state->m_bg_scrollx_offs;
 	bg_scrolly = (state->m_textram[state->m_bg_scrolly_reg] & 0xff) - state->m_bg_scrolly_offs;
 	page = state->m_textram[state->m_bg_page_reg];
-	set_bg_page(screen->machine(), 3, (page >>12) & 0x0f);
-	set_bg_page(screen->machine(), 2, (page >> 8) & 0x0f);
-	set_bg_page(screen->machine(), 1, (page >> 4) & 0x0f);
-	set_bg_page(screen->machine(), 0, (page >> 0) & 0x0f);
+	set_bg_page(screen.machine(), 3, (page >>12) & 0x0f);
+	set_bg_page(screen.machine(), 2, (page >> 8) & 0x0f);
+	set_bg_page(screen.machine(), 1, (page >> 4) & 0x0f);
+	set_bg_page(screen.machine(), 0, (page >> 0) & 0x0f);
 
 	fg_scrollx = state->m_textram[state->m_fg_scrollx_reg] - state->m_fg_scrollx_offs;
 	fg_scrolly = (state->m_textram[state->m_fg_scrolly_reg] & 0xff) - state->m_fg_scrolly_offs;
 	page = state->m_textram[state->m_fg_page_reg];
-	set_fg_page(screen->machine(), 3, (page >>12) & 0x0f);
-	set_fg_page(screen->machine(), 2, (page >> 8) & 0x0f);
-	set_fg_page(screen->machine(), 1, (page >> 4) & 0x0f);
-	set_fg_page(screen->machine(), 0, (page >> 0) & 0x0f);
+	set_fg_page(screen.machine(), 3, (page >>12) & 0x0f);
+	set_fg_page(screen.machine(), 2, (page >> 8) & 0x0f);
+	set_fg_page(screen.machine(), 1, (page >> 4) & 0x0f);
+	set_fg_page(screen.machine(), 0, (page >> 0) & 0x0f);
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, bg_scrollx & 0x1ff);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, bg_scrolly & 0x0ff);
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, fg_scrollx & 0x1ff);
 	tilemap_set_scrolly(state->m_fg_tilemap, 0, fg_scrolly & 0x0ff);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

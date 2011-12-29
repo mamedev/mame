@@ -369,25 +369,25 @@ static void draw_lasso( running_machine &machine, bitmap_t *bitmap, const rectan
 
 SCREEN_UPDATE( lasso )
 {
-	lasso_state *state = screen->machine().driver_data<lasso_state>();
-	palette_set_color(screen->machine(), 0, get_color(*state->m_back_color));
+	lasso_state *state = screen.machine().driver_data<lasso_state>();
+	palette_set_color(screen.machine(), 0, get_color(*state->m_back_color));
 	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_lasso(screen->machine(), bitmap, cliprect);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_lasso(screen.machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
 
 SCREEN_UPDATE( chameleo )
 {
-	lasso_state *state = screen->machine().driver_data<lasso_state>();
-	palette_set_color(screen->machine(), 0, get_color(*state->m_back_color));
+	lasso_state *state = screen.machine().driver_data<lasso_state>();
+	palette_set_color(screen.machine(), 0, get_color(*state->m_back_color));
 	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -395,9 +395,9 @@ SCREEN_UPDATE( chameleo )
 
 SCREEN_UPDATE( wwjgtin )
 {
-	lasso_state *state = screen->machine().driver_data<lasso_state>();
-	colortable_palette_set_color(screen->machine().colortable, 0, get_color(*state->m_back_color));
-	wwjgtin_set_last_four_colors(screen->machine(), screen->machine().colortable);
+	lasso_state *state = screen.machine().driver_data<lasso_state>();
+	colortable_palette_set_color(screen.machine().colortable, 0, get_color(*state->m_back_color));
+	wwjgtin_set_last_four_colors(screen.machine(), screen.machine().colortable);
 
 	tilemap_set_scrollx(state->m_track_tilemap, 0, state->m_track_scroll[0] + state->m_track_scroll[1] * 256);
 	tilemap_set_scrolly(state->m_track_tilemap, 0, state->m_track_scroll[2] + state->m_track_scroll[3] * 256);
@@ -405,9 +405,9 @@ SCREEN_UPDATE( wwjgtin )
 	if (state->m_track_enable)
 		tilemap_draw(bitmap, cliprect, state->m_track_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
-	draw_sprites(screen->machine(), bitmap, cliprect, 1);	// reverse order
+	draw_sprites(screen.machine(), bitmap, cliprect, 1);	// reverse order
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	return 0;

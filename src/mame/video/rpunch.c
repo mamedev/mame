@@ -274,17 +274,17 @@ static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectan
 
 SCREEN_UPDATE( rpunch )
 {
-	rpunch_state *state = screen->machine().driver_data<rpunch_state>();
+	rpunch_state *state = screen.machine().driver_data<rpunch_state>();
 	int effbins;
 
 	/* this seems like the most plausible explanation */
 	effbins = (state->m_bins > state->m_gins) ? state->m_gins : state->m_bins;
 
 	tilemap_draw(bitmap, cliprect, state->m_background[0], 0,0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0, effbins);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0, effbins);
 	tilemap_draw(bitmap, cliprect, state->m_background[1], 0,0);
-	draw_sprites(screen->machine(), bitmap, cliprect, effbins, state->m_gins);
+	draw_sprites(screen.machine(), bitmap, cliprect, effbins, state->m_gins);
 	if (state->m_bitmapram)
-		draw_bitmap(screen->machine(), bitmap, cliprect);
+		draw_bitmap(screen.machine(), bitmap, cliprect);
 	return 0;
 }

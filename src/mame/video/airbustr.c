@@ -135,7 +135,7 @@ VIDEO_START( airbustr )
 
 SCREEN_UPDATE( airbustr )
 {
-	airbustr_state *state = screen->machine().driver_data<airbustr_state>();
+	airbustr_state *state = screen.machine().driver_data<airbustr_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
@@ -148,7 +148,7 @@ SCREEN_UPDATE( airbustr )
 
 SCREEN_EOF( airbustr )
 {
-	airbustr_state *state = machine.driver_data<airbustr_state>();
+	airbustr_state *state = screen.machine().driver_data<airbustr_state>();
 
 	// update the sprite bitmap
 	pandora_eof(state->m_pandora);

@@ -35,12 +35,12 @@ WRITE16_HANDLER( toki_control_w )
 
 SCREEN_EOF( toki )
 {
-	buffer_spriteram16_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
+	buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 }
 
 SCREEN_EOF( tokib )
 {
-	buffer_spriteram16_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
+	buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -269,7 +269,7 @@ static void tokib_draw_sprites(running_machine &machine, bitmap_t *bitmap,const 
 
 SCREEN_UPDATE( toki )
 {
-	toki_state *state = screen->machine().driver_data<toki_state>();
+	toki_state *state = screen.machine().driver_data<toki_state>();
 	int background_y_scroll,foreground_y_scroll,background_x_scroll,foreground_x_scroll;
 
 	background_x_scroll=((state->m_scrollram16[0x06] &0x7f) << 1)
@@ -288,7 +288,7 @@ SCREEN_UPDATE( toki )
 	tilemap_set_scrollx( state->m_foreground_layer, 0, foreground_x_scroll );
 	tilemap_set_scrolly( state->m_foreground_layer, 0, foreground_y_scroll );
 
-	flip_screen_set(screen->machine(), (state->m_scrollram16[0x28]&0x8000)==0);
+	flip_screen_set(screen.machine(), (state->m_scrollram16[0x28]&0x8000)==0);
 
 	if (state->m_scrollram16[0x28]&0x100) {
 		tilemap_draw(bitmap,cliprect,state->m_background_layer,TILEMAP_DRAW_OPAQUE,0);
@@ -297,14 +297,14 @@ SCREEN_UPDATE( toki )
 		tilemap_draw(bitmap,cliprect,state->m_foreground_layer,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
 	}
-	toki_draw_sprites(screen->machine(), bitmap,cliprect);
+	toki_draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_text_layer,0,0);
 	return 0;
 }
 
 SCREEN_UPDATE( tokib )
 {
-	toki_state *state = screen->machine().driver_data<toki_state>();
+	toki_state *state = screen.machine().driver_data<toki_state>();
 	tilemap_set_scroll_rows(state->m_foreground_layer,1);
 	tilemap_set_scroll_rows(state->m_background_layer,1);
 	tilemap_set_scrolly( state->m_background_layer, 0, state->m_scrollram16[0]+1 );
@@ -320,7 +320,7 @@ SCREEN_UPDATE( tokib )
 		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
 	}
 
-	tokib_draw_sprites(screen->machine(), bitmap,cliprect);
+	tokib_draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_text_layer,0,0);
 	return 0;
 }

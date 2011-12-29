@@ -130,9 +130,9 @@ VIDEO_START(bigstrkb)
 
 SCREEN_UPDATE(bigstrkb)
 {
-	bigstrkb_state *state = screen->machine().driver_data<bigstrkb_state>();
+	bigstrkb_state *state = screen.machine().driver_data<bigstrkb_state>();
 
-//  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+//  bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	tilemap_set_scrollx(state->m_tilemap2,0, state->m_vidreg1[0]+(256-14));
 	tilemap_set_scrolly(state->m_tilemap2,0, state->m_vidreg2[0]);
@@ -143,7 +143,7 @@ SCREEN_UPDATE(bigstrkb)
 	tilemap_draw(bitmap,cliprect,state->m_tilemap2,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_tilemap3,0,0);
 
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
 
 //  popmessage ("Regs %08x %08x %08x %08x",bsb_vidreg2[0],bsb_vidreg2[1],bsb_vidreg2[2],bsb_vidreg2[3]);

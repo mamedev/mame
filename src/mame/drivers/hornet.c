@@ -393,9 +393,9 @@ static void voodoo_vblank_1(device_t *device, int param)
 
 static SCREEN_UPDATE( hornet )
 {
-	hornet_state *state = screen->machine().driver_data<hornet_state>();
-	device_t *voodoo = screen->machine().device("voodoo0");
-	device_t *k037122 = screen->machine().device("k037122_1");
+	hornet_state *state = screen.machine().driver_data<hornet_state>();
+	device_t *voodoo = screen.machine().device("voodoo0");
+	device_t *k037122 = screen.machine().device("k037122_1");
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
@@ -408,20 +408,20 @@ static SCREEN_UPDATE( hornet )
 
 static SCREEN_UPDATE( hornet_2board )
 {
-	hornet_state *state = screen->machine().driver_data<hornet_state>();
-	if (strcmp(screen->tag(), "lscreen") == 0)
+	hornet_state *state = screen.machine().driver_data<hornet_state>();
+	if (strcmp(screen.tag(), "lscreen") == 0)
 	{
-		device_t *k037122 = screen->machine().device("k037122_1");
-		device_t *voodoo = screen->machine().device("voodoo0");
+		device_t *k037122 = screen.machine().device("k037122_1");
+		device_t *voodoo = screen.machine().device("voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
 		k037122_tile_draw(k037122, bitmap, cliprect);
 	}
-	else if (strcmp(screen->tag(), "rscreen") == 0)
+	else if (strcmp(screen.tag(), "rscreen") == 0)
 	{
-		device_t *k037122 = screen->machine().device("k037122_2");
-		device_t *voodoo = screen->machine().device("voodoo1");
+		device_t *k037122 = screen.machine().device("k037122_2");
+		device_t *voodoo = screen.machine().device("voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */

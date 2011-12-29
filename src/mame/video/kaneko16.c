@@ -1009,15 +1009,15 @@ static SCREEN_UPDATE( common )
 {
 	int i;
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
-	kaneko16_prepare_first_tilemap_chip(screen->machine(), bitmap, cliprect);
-	kaneko16_prepare_second_tilemap_chip(screen->machine(), bitmap, cliprect);
+	kaneko16_prepare_first_tilemap_chip(screen.machine(), bitmap, cliprect);
+	kaneko16_prepare_second_tilemap_chip(screen.machine(), bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		kaneko16_render_first_tilemap_chip(screen->machine(),bitmap,cliprect,i);
-		kaneko16_render_second_tilemap_chip(screen->machine(),bitmap,cliprect,i);
+		kaneko16_render_first_tilemap_chip(screen.machine(),bitmap,cliprect,i);
+		kaneko16_render_second_tilemap_chip(screen.machine(),bitmap,cliprect,i);
 	}
 
 	return 0;
@@ -1025,22 +1025,22 @@ static SCREEN_UPDATE( common )
 
 SCREEN_UPDATE(berlwall)
 {
-	kaneko16_state *state = screen->machine().driver_data<kaneko16_state>();
+	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
 	// berlwall uses a 15bpp bitmap as a bg, not a solid fill
-	kaneko16_render_15bpp_bitmap(screen->machine(),bitmap,cliprect);
+	kaneko16_render_15bpp_bitmap(screen.machine(),bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!state->m_disp_enable) return 0;
 
 	SCREEN_UPDATE_CALL(common);
-	kaneko16_render_sprites(screen->machine(),bitmap,cliprect);
+	kaneko16_render_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }
 
 
 SCREEN_UPDATE( jchan_view2 )
 {
-	kaneko16_state *state = screen->machine().driver_data<kaneko16_state>();
+	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
 	int dx,dy;
 
 	SCREEN_UPDATE_CALL(common);
@@ -1060,21 +1060,21 @@ SCREEN_UPDATE( jchan_view2 )
 
 SCREEN_UPDATE( kaneko16 )
 {
-	kaneko16_state *state = screen->machine().driver_data<kaneko16_state>();
-	kaneko16_fill_bitmap(screen->machine(),bitmap,cliprect);
+	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
+	kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!state->m_disp_enable) return 0;
 
 	SCREEN_UPDATE_CALL(common);
-	kaneko16_render_sprites(screen->machine(),bitmap,cliprect);
+	kaneko16_render_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( galsnew )
 {
-	kaneko16_state *state = screen->machine().driver_data<kaneko16_state>();
-//  kaneko16_fill_bitmap(screen->machine(),bitmap,cliprect);
+	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
+//  kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
 	int y,x;
 	int count;
 
@@ -1115,16 +1115,16 @@ SCREEN_UPDATE( galsnew )
 
 	SCREEN_UPDATE_CALL(common);
 
-	kaneko16_render_sprites(screen->machine(),bitmap,cliprect);
+	kaneko16_render_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }
 
 
 SCREEN_UPDATE( sandscrp )
 {
-	kaneko16_state *state = screen->machine().driver_data<kaneko16_state>();
-	device_t *pandora = screen->machine().device("pandora");
-	kaneko16_fill_bitmap(screen->machine(),bitmap,cliprect);
+	kaneko16_state *state = screen.machine().driver_data<kaneko16_state>();
+	device_t *pandora = screen.machine().device("pandora");
+	kaneko16_fill_bitmap(screen.machine(),bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!state->m_disp_enable) return 0;

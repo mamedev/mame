@@ -125,13 +125,13 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( goindol )
 {
-	goindol_state *state = screen->machine().driver_data<goindol_state>();
+	goindol_state *state = screen.machine().driver_data<goindol_state>();
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, *state->m_fg_scrollx);
 	tilemap_set_scrolly(state->m_fg_tilemap, 0, *state->m_fg_scrolly);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 1, state->m_spriteram);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0, state->m_spriteram2);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1, state->m_spriteram);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0, state->m_spriteram2);
 	return 0;
 }

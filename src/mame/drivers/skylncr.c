@@ -156,7 +156,7 @@ static const rectangle visible3 = { 0*8, (20+48)*8-1, 20*8, (20+7)*8-1 };
 
 static SCREEN_UPDATE( skylncr )
 {
-	skylncr_state *state = screen->machine().driver_data<skylncr_state>();
+	skylncr_state *state = screen.machine().driver_data<skylncr_state>();
 	int i;
 
 	bitmap_fill(bitmap,cliprect,0);

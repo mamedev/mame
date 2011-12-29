@@ -52,7 +52,7 @@ void overdriv_zoom_callback_1( running_machine &machine, int *code, int *color, 
 
 SCREEN_UPDATE( overdriv )
 {
-	overdriv_state *state = screen->machine().driver_data<overdriv_state>();
+	overdriv_state *state = screen.machine().driver_data<overdriv_state>();
 
 	state->m_sprite_colorbase  = k053251_get_palette_index(state->m_k053251, K053251_CI0);
 	state->m_road_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI1);
@@ -60,7 +60,7 @@ SCREEN_UPDATE( overdriv )
 	state->m_zoom_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI3);
 	state->m_zoom_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI4);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	k051316_zoom_draw(state->m_k051316_1, bitmap, cliprect, 0, 0);
 	k051316_zoom_draw(state->m_k051316_2, bitmap, cliprect, 0, 1);

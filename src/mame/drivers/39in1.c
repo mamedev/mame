@@ -1514,7 +1514,7 @@ INPUT_PORTS_END
 
 static SCREEN_UPDATE( 39in1 )
 {
-	_39in1_state *state = screen->machine().driver_data<_39in1_state>();
+	_39in1_state *state = screen.machine().driver_data<_39in1_state>();
 	int x = 0;
 	int y = 0;
 

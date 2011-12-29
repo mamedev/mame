@@ -86,7 +86,7 @@ VIDEO_START( magmax )
 
 SCREEN_UPDATE( magmax )
 {
-	magmax_state *state = screen->machine().driver_data<magmax_state>();
+	magmax_state *state = screen.machine().driver_data<magmax_state>();
 	UINT16 *videoram = state->m_videoram;
 	UINT16 *spriteram16 = state->m_spriteram;
 	int offs;
@@ -100,12 +100,12 @@ SCREEN_UPDATE( magmax )
 	else
 	{
 		int v;
-		UINT8 * rom18B = screen->machine().region("user1")->base();
+		UINT8 * rom18B = screen.machine().region("user1")->base();
 		UINT32 scroll_h = (*state->m_scroll_x) & 0x3fff;
 		UINT32 scroll_v = (*state->m_scroll_y) & 0xff;
 
 		/*clear background-over-sprites bitmap*/
-		bitmap_fill(screen->machine().generic.tmpbitmap, NULL, 0);
+		bitmap_fill(screen.machine().generic.tmpbitmap, NULL, 0);
 
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{
@@ -156,7 +156,7 @@ SCREEN_UPDATE( magmax )
 
 				/*priority: background over sprites*/
 				if (map_v_scr_100 && ((graph_data & 0x0c)==0x0c))
-					*BITMAP_ADDR16(screen->machine().generic.tmpbitmap, v, h) = line_data[h];
+					*BITMAP_ADDR16(screen.machine().generic.tmpbitmap, v, h) = line_data[h];
 			}
 
 			if (state->m_flipscreen)
@@ -201,17 +201,17 @@ SCREEN_UPDATE( magmax )
 			if (code & 0x80)	/* sprite bankswitch */
 				code += (*state->m_vreg & 0x30) * 0x8;
 
-			drawgfx_transmask(bitmap, cliprect, screen->machine().gfx[1],
+			drawgfx_transmask(bitmap, cliprect, screen.machine().gfx[1],
 					code,
 					color,
 					flipx, flipy,
 					sx, sy,
-					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color, 0x1f));
+					colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color, 0x1f));
 		}
 	}
 
 	if (!(*state->m_vreg & 0x40))		/* background disable */
-		copybitmap_trans(bitmap, screen->machine().generic.tmpbitmap, state->m_flipscreen,state->m_flipscreen,0,0, cliprect, 0);
+		copybitmap_trans(bitmap, screen.machine().generic.tmpbitmap, state->m_flipscreen,state->m_flipscreen,0,0, cliprect, 0);
 
 	/* draw the foreground characters */
 	for (offs = 32*32-1; offs >= 0; offs -= 1)
@@ -231,7 +231,7 @@ SCREEN_UPDATE( magmax )
 				sy = 31 - sy;
 			}
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
 					code,
 					0,
 					state->m_flipscreen, state->m_flipscreen,

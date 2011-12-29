@@ -425,9 +425,9 @@ static SCREEN_UPDATE( astrof )
 {
 	pen_t pens[ASTROF_NUM_PENS];
 
-	astrof_get_pens(screen->machine(), pens);
+	astrof_get_pens(screen.machine(), pens);
 
-	video_update_common(screen->machine(), bitmap, cliprect, pens);
+	video_update_common(screen.machine(), bitmap, cliprect, pens);
 
 	return 0;
 }
@@ -437,9 +437,9 @@ static SCREEN_UPDATE( tomahawk )
 {
 	pen_t pens[TOMAHAWK_NUM_PENS];
 
-	tomahawk_get_pens(screen->machine(), pens);
+	tomahawk_get_pens(screen.machine(), pens);
 
-	video_update_common(screen->machine(), bitmap, cliprect, pens);
+	video_update_common(screen.machine(), bitmap, cliprect, pens);
 
 	return 0;
 }

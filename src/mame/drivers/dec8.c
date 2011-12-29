@@ -67,7 +67,7 @@ static WRITE8_HANDLER( dec8_mxc06_karn_buffer_spriteram_w)
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static SCREEN_EOF( dec8 )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
 }
 

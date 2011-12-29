@@ -95,11 +95,11 @@ VIDEO_START( dv )
 
 SCREEN_UPDATE( mainevt )
 {
-	mainevt_state *state = screen->machine().driver_data<mainevt_state>();
+	mainevt_state *state = screen.machine().driver_data<mainevt_state>();
 
 	k052109_tilemap_update(state->m_k052109);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 1, 2);	/* low priority part of layer */
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 4);	/* high priority part of layer */
@@ -111,7 +111,7 @@ SCREEN_UPDATE( mainevt )
 
 SCREEN_UPDATE( dv )
 {
-	mainevt_state *state = screen->machine().driver_data<mainevt_state>();
+	mainevt_state *state = screen.machine().driver_data<mainevt_state>();
 
 	k052109_tilemap_update(state->m_k052109);
 

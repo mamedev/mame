@@ -65,7 +65,7 @@ VIDEO_START( calomega )
 
 SCREEN_UPDATE( calomega )
 {
-	calomega_state *state = screen->machine().driver_data<calomega_state>();
+	calomega_state *state = screen.machine().driver_data<calomega_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

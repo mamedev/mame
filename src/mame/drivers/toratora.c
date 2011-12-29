@@ -67,7 +67,7 @@ static WRITE_LINE_DEVICE_HANDLER( cb2_u3_w )
 
 static SCREEN_UPDATE( toratora )
 {
-	toratora_state *state = screen->machine().driver_data<toratora_state>();
+	toratora_state *state = screen.machine().driver_data<toratora_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->m_videoram_size; offs++)

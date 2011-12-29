@@ -120,7 +120,7 @@ static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 /* actually debugging purpose, it will be converted to the artwork system at some point. */
 static SCREEN_UPDATE( kungfur )
 {
-	kungfur_state *state = screen->machine().driver_data<kungfur_state>();
+	kungfur_state *state = screen.machine().driver_data<kungfur_state>();
 //  popmessage("%02x %02x %02x %02x %02x %02x",io_data[0],io_data[1],io_data[2],io_data[3],io_data[4],io_data[5]);
 	int i;
 

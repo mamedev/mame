@@ -276,7 +276,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( kikcubic )
 {
-	vigilant_state *state = screen->machine().driver_data<vigilant_state>();
+	vigilant_state *state = screen.machine().driver_data<vigilant_state>();
 	UINT8 *videoram = state->m_videoram;
 	int offs;
 
@@ -288,20 +288,20 @@ SCREEN_UPDATE( kikcubic )
 		int color = (attributes & 0xF0) >> 4;
 		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
 
-		drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
+		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
 				tile_number,
 				color,
 				0,0,
 				sx,sy);
 	}
 
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( vigilant )
 {
-	vigilant_state *state = screen->machine().driver_data<vigilant_state>();
+	vigilant_state *state = screen.machine().driver_data<vigilant_state>();
 	int i;
 
 	/* copy the background palette */
@@ -310,31 +310,31 @@ SCREEN_UPDATE( vigilant )
 		int r,g,b;
 
 
-		r = (screen->machine().generic.paletteram.u8[0x400 + 16 * state->m_rear_color + i] << 3) & 0xFF;
-		g = (screen->machine().generic.paletteram.u8[0x500 + 16 * state->m_rear_color + i] << 3) & 0xFF;
-		b = (screen->machine().generic.paletteram.u8[0x600 + 16 * state->m_rear_color + i] << 3) & 0xFF;
+		r = (screen.machine().generic.paletteram.u8[0x400 + 16 * state->m_rear_color + i] << 3) & 0xFF;
+		g = (screen.machine().generic.paletteram.u8[0x500 + 16 * state->m_rear_color + i] << 3) & 0xFF;
+		b = (screen.machine().generic.paletteram.u8[0x600 + 16 * state->m_rear_color + i] << 3) & 0xFF;
 
-		palette_set_color(screen->machine(),512 + i,MAKE_RGB(r,g,b));
+		palette_set_color(screen.machine(),512 + i,MAKE_RGB(r,g,b));
 
-		r = (screen->machine().generic.paletteram.u8[0x400 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
-		g = (screen->machine().generic.paletteram.u8[0x500 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
-		b = (screen->machine().generic.paletteram.u8[0x600 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
+		r = (screen.machine().generic.paletteram.u8[0x400 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
+		g = (screen.machine().generic.paletteram.u8[0x500 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
+		b = (screen.machine().generic.paletteram.u8[0x600 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
 
-		palette_set_color(screen->machine(),512 + 16 + i,MAKE_RGB(r,g,b));
+		palette_set_color(screen.machine(),512 + 16 + i,MAKE_RGB(r,g,b));
 	}
 
 	if (state->m_rear_disable)	 /* opaque foreground */
 	{
-		draw_foreground(screen->machine(),bitmap,cliprect,0,1);
-		draw_sprites(screen->machine(),bitmap,&bottomvisiblearea);
-		draw_foreground(screen->machine(),bitmap,cliprect,1,0);
+		draw_foreground(screen.machine(),bitmap,cliprect,0,1);
+		draw_sprites(screen.machine(),bitmap,&bottomvisiblearea);
+		draw_foreground(screen.machine(),bitmap,cliprect,1,0);
 	}
 	else
 	{
-		draw_background(screen->machine(),bitmap,cliprect);
-		draw_foreground(screen->machine(),bitmap,cliprect,0,0);
-		draw_sprites(screen->machine(),bitmap,&bottomvisiblearea);
-		draw_foreground(screen->machine(),bitmap,cliprect,1,0); // priority tiles
+		draw_background(screen.machine(),bitmap,cliprect);
+		draw_foreground(screen.machine(),bitmap,cliprect,0,0);
+		draw_sprites(screen.machine(),bitmap,&bottomvisiblearea);
+		draw_foreground(screen.machine(),bitmap,cliprect,1,0); // priority tiles
 	}
 	return 0;
 }

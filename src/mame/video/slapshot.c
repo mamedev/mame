@@ -430,9 +430,9 @@ static void taito_update_sprites_active_area( running_machine &machine )
 
 SCREEN_EOF( taito_no_buffer )
 {
-	slapshot_state *state = machine.driver_data<slapshot_state>();
+	slapshot_state *state = screen.machine().driver_data<slapshot_state>();
 
-	taito_update_sprites_active_area(machine);
+	taito_update_sprites_active_area(screen.machine());
 
 	state->m_prepare_sprites = 1;
 }
@@ -456,45 +456,45 @@ a bg layer given priority over some sprites.
 
 SCREEN_UPDATE( slapshot )
 {
-	slapshot_state *state = screen->machine().driver_data<slapshot_state>();
+	slapshot_state *state = screen.machine().driver_data<slapshot_state>();
 	UINT8 layer[5];
 	UINT8 tilepri[5];
 	UINT8 spritepri[4];
 	UINT16 priority;
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed_once (KEYCODE_Z))
+	if (screen.machine().input().code_pressed_once (KEYCODE_Z))
 	{
 		state->m_dislayer[0] ^= 1;
 		popmessage("bg0: %01x",state->m_dislayer[0]);
 	}
 
-	if (screen->machine().input().code_pressed_once (KEYCODE_X))
+	if (screen.machine().input().code_pressed_once (KEYCODE_X))
 	{
 		state->m_dislayer[1] ^= 1;
 		popmessage("bg1: %01x",state->m_dislayer[1]);
 	}
 
-	if (screen->machine().input().code_pressed_once (KEYCODE_C))
+	if (screen.machine().input().code_pressed_once (KEYCODE_C))
 	{
 		state->m_dislayer[2] ^= 1;
 		popmessage("bg2: %01x",state->m_dislayer[2]);
 	}
 
-	if (screen->machine().input().code_pressed_once (KEYCODE_V))
+	if (screen.machine().input().code_pressed_once (KEYCODE_V))
 	{
 		state->m_dislayer[3] ^= 1;
 		popmessage("bg3: %01x",state->m_dislayer[3]);
 	}
 
-	if (screen->machine().input().code_pressed_once (KEYCODE_B))
+	if (screen.machine().input().code_pressed_once (KEYCODE_B))
 	{
 		state->m_dislayer[4] ^= 1;
 		popmessage("text: %01x",state->m_dislayer[4]);
 	}
 #endif
 
-	taito_handle_sprite_buffering(screen->machine());
+	taito_handle_sprite_buffering(screen.machine());
 
 	tc0480scp_tilemap_update(state->m_tc0480scp);
 
@@ -519,7 +519,7 @@ SCREEN_UPDATE( slapshot )
 	spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
 	spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
@@ -554,7 +554,7 @@ SCREEN_UPDATE( slapshot )
 			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 		}
 
-		draw_sprites(screen->machine(),bitmap,cliprect,primasks,0);
+		draw_sprites(screen.machine(),bitmap,cliprect,primasks,0);
 	}
 
 	/*

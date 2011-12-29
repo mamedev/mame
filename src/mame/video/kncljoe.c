@@ -240,9 +240,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( kncljoe )
 {
-	kncljoe_state *state = screen->machine().driver_data<kncljoe_state>();
+	kncljoe_state *state = screen.machine().driver_data<kncljoe_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

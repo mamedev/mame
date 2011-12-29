@@ -133,7 +133,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( stlforce )
 {
-	stlforce_state *state = screen->machine().driver_data<stlforce_state>();
+	stlforce_state *state = screen.machine().driver_data<stlforce_state>();
 	int i;
 
 	if (state->m_vidattrram[6] & 1)
@@ -179,7 +179,7 @@ SCREEN_UPDATE( stlforce )
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_mlow_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_mhigh_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
 }

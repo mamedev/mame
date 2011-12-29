@@ -361,19 +361,19 @@ static void check_collision(running_machine &machine)
 
 SCREEN_UPDATE( exidy )
 {
-	exidy_state *state = screen->machine().driver_data<exidy_state>();
+	exidy_state *state = screen.machine().driver_data<exidy_state>();
 	/* refresh the colors from the palette (static or dynamic) */
-	set_colors(screen->machine());
+	set_colors(screen.machine());
 
 	/* update the background and draw it */
-	draw_background(screen->machine());
+	draw_background(screen.machine());
 	copybitmap(bitmap, state->m_background_bitmap, 0, 0, 0, 0, cliprect);
 
 	/* draw the sprites */
-	draw_sprites(screen->machine(), bitmap, NULL);
+	draw_sprites(screen.machine(), bitmap, NULL);
 
 	/* check for collision, this will set the appropriate bits in collision_mask */
-	check_collision(screen->machine());
+	check_collision(screen.machine());
 
 	return 0;
 }

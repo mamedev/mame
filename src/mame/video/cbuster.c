@@ -49,12 +49,12 @@ VIDEO_START( twocrude )
 
 SCREEN_UPDATE( twocrude )
 {
-	cbuster_state *state = screen->machine().driver_data<cbuster_state>();
+	cbuster_state *state = screen.machine().driver_data<cbuster_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen->machine(), !BIT(flip, 7));
+	flip_screen_set(screen.machine(), !BIT(flip, 7));
 
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffer, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram16_buffer, 0x400);
 
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
@@ -62,8 +62,8 @@ SCREEN_UPDATE( twocrude )
 
 	/* Draw playfields & sprites */
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0800, 0x0900, 0x100, 0x0ff);
-	screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0900, 0x0900, 0x500, 0x0ff);
+	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0800, 0x0900, 0x100, 0x0ff);
+	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0900, 0x0900, 0x500, 0x0ff);
 
 	if (state->m_pri)
 	{
@@ -76,8 +76,8 @@ SCREEN_UPDATE( twocrude )
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	}
 
-	screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0000, 0x0900, 0x100, 0x0ff);
-	screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0100, 0x0900, 0x500, 0x0ff);
+	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0000, 0x0900, 0x100, 0x0ff);
+	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0100, 0x0900, 0x500, 0x0ff);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -134,9 +134,9 @@ WRITE8_HANDLER( flkatck_k007121_regs_w )
 
 SCREEN_UPDATE( flkatck )
 {
-	flkatck_state *state = screen->machine().driver_data<flkatck_state>();
+	flkatck_state *state = screen.machine().driver_data<flkatck_state>();
 	rectangle clip[2];
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 
 	if (state->m_flipscreen)
 	{
@@ -170,7 +170,7 @@ SCREEN_UPDATE( flkatck )
 
 	/* draw the graphics */
 	tilemap_draw(bitmap, &clip[0], state->m_k007121_tilemap[0], 0, 0);
-	k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen->machine().gfx[0], NULL, &state->m_k007121_ram[0x1000], 0, 40, 0, (UINT32)-1);
+	k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], NULL, &state->m_k007121_ram[0x1000], 0, 40, 0, (UINT32)-1);
 	tilemap_draw(bitmap, &clip[1], state->m_k007121_tilemap[1], 0, 0);
 	return 0;
 }

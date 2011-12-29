@@ -162,7 +162,7 @@ static INTERRUPT_GEN( attckufo_raster_interrupt )
 
 static SCREEN_UPDATE( attckufo )
 {
-	attckufo_state *state = screen->machine().driver_data<attckufo_state>();
+	attckufo_state *state = screen.machine().driver_data<attckufo_state>();
 	mos6560_video_update(state->m_mos6560, bitmap, cliprect);
 	return 0;
 }

@@ -477,10 +477,10 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( zaxxon )
 {
-	zaxxon_state *state = screen->machine().driver_data<zaxxon_state>();
+	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
-	draw_background(screen->machine(), bitmap, cliprect, TRUE);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x140, 0x180);
+	draw_background(screen.machine(), bitmap, cliprect, TRUE);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x140, 0x180);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
@@ -488,10 +488,10 @@ SCREEN_UPDATE( zaxxon )
 
 SCREEN_UPDATE( futspy )
 {
-	zaxxon_state *state = screen->machine().driver_data<zaxxon_state>();
+	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
-	draw_background(screen->machine(), bitmap, cliprect, TRUE);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x180, 0x180);
+	draw_background(screen.machine(), bitmap, cliprect, TRUE);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x180, 0x180);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
@@ -499,10 +499,10 @@ SCREEN_UPDATE( futspy )
 
 SCREEN_UPDATE( razmataz )
 {
-	zaxxon_state *state = screen->machine().driver_data<zaxxon_state>();
+	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
-	draw_background(screen->machine(), bitmap, cliprect, FALSE);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x140, 0x180);
+	draw_background(screen.machine(), bitmap, cliprect, FALSE);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x140, 0x180);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
@@ -510,10 +510,10 @@ SCREEN_UPDATE( razmataz )
 
 SCREEN_UPDATE( congo )
 {
-	zaxxon_state *state = screen->machine().driver_data<zaxxon_state>();
+	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
-	draw_background(screen->machine(), bitmap, cliprect, TRUE);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x280, 0x180);
+	draw_background(screen.machine(), bitmap, cliprect, TRUE);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x280, 0x180);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

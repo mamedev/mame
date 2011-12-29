@@ -252,7 +252,7 @@ static void draw_water(colortable_t *colortable, bitmap_t* bitmap, const rectang
 
 SCREEN_UPDATE( wolfpack )
 {
-	wolfpack_state *state = screen->machine().driver_data<wolfpack_state>();
+	wolfpack_state *state = screen.machine().driver_data<wolfpack_state>();
 	int i;
 	int j;
 
@@ -262,8 +262,8 @@ SCREEN_UPDATE( wolfpack )
 	if (state->m_ship_size & 0x40) color += 0x3a;
 	if (state->m_ship_size & 0x80) color += 0x48;
 
-	colortable_palette_set_color(screen->machine().colortable, 3, MAKE_RGB(color,color,color));
-	colortable_palette_set_color(screen->machine().colortable, 7, MAKE_RGB(color < 0xb8 ? color + 0x48 : 0xff,
+	colortable_palette_set_color(screen.machine().colortable, 3, MAKE_RGB(color,color,color));
+	colortable_palette_set_color(screen.machine().colortable, 7, MAKE_RGB(color < 0xb8 ? color + 0x48 : 0xff,
 																		  color < 0xb8 ? color + 0x48 : 0xff,
 																		  color < 0xb8 ? color + 0x48 : 0xff));
 
@@ -275,7 +275,7 @@ SCREEN_UPDATE( wolfpack )
 			int code = state->m_alpha_num_ram[32 * i + j];
 
 			drawgfx_opaque(bitmap, cliprect,
-				screen->machine().gfx[0],
+				screen.machine().gfx[0],
 				code,
 				state->m_video_invert,
 				0, 0,
@@ -283,17 +283,17 @@ SCREEN_UPDATE( wolfpack )
 				192 + 8 * i);
 		}
 
-	draw_pt(screen->machine(), bitmap, cliprect);
-	draw_ship(screen->machine(), bitmap, cliprect);
-	draw_torpedo(screen->machine(), bitmap, cliprect);
-	draw_water(screen->machine().colortable, bitmap, cliprect);
+	draw_pt(screen.machine(), bitmap, cliprect);
+	draw_ship(screen.machine(), bitmap, cliprect);
+	draw_torpedo(screen.machine(), bitmap, cliprect);
+	draw_water(screen.machine().colortable, bitmap, cliprect);
 	return 0;
 }
 
 
 SCREEN_EOF( wolfpack )
 {
-	wolfpack_state *state = machine.driver_data<wolfpack_state>();
+	wolfpack_state *state = screen.machine().driver_data<wolfpack_state>();
 	rectangle rect;
 
 	int x;
@@ -306,7 +306,7 @@ SCREEN_EOF( wolfpack )
 
 	bitmap_fill(state->m_helper, &rect, 0);
 
-	draw_ship(machine, state->m_helper, &rect);
+	draw_ship(screen.machine(), state->m_helper, &rect);
 
 	for (y = 128; y < 224 - state->m_torpedo_v; y++)
 	{

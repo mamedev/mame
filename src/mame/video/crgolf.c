@@ -113,13 +113,13 @@ static VIDEO_START( crgolf )
 
 static SCREEN_UPDATE( crgolf )
 {
-	crgolf_state *state = screen->machine().driver_data<crgolf_state>();
+	crgolf_state *state = screen.machine().driver_data<crgolf_state>();
 	int flip = *state->m_screen_flip & 1;
 
 	offs_t offs;
 	pen_t pens[NUM_PENS];
 
-	get_pens(screen->machine(), pens);
+	get_pens(screen.machine(), pens);
 
 	/* for each byte in the video RAM */
 	for (offs = 0; offs < VIDEORAM_SIZE / 3; offs++)

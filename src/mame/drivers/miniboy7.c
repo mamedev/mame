@@ -210,7 +210,7 @@ static VIDEO_START( miniboy7 )
 
 static SCREEN_UPDATE( miniboy7 )
 {
-	miniboy7_state *state = screen->machine().driver_data<miniboy7_state>();
+	miniboy7_state *state = screen.machine().driver_data<miniboy7_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

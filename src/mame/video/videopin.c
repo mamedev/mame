@@ -35,7 +35,7 @@ VIDEO_START( videopin )
 
 SCREEN_UPDATE( videopin )
 {
-	videopin_state *state = screen->machine().driver_data<videopin_state>();
+	videopin_state *state = screen.machine().driver_data<videopin_state>();
 	int col;
 	int row;
 
@@ -84,7 +84,7 @@ SCREEN_UPDATE( videopin )
 				{
 					for (j = 0; j < 2; j++)
 					{
-						drawgfx_transpen(bitmap, &rect, screen->machine().gfx[1],
+						drawgfx_transpen(bitmap, &rect, screen.machine().gfx[1],
 							0, 0,
 							0, 0,
 							x + 16 * i,

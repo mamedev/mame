@@ -150,10 +150,10 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_t *
 
 SCREEN_UPDATE( crbaloon )
 {
-	crbaloon_state *state = screen->machine().driver_data<crbaloon_state>();
+	crbaloon_state *state = screen.machine().driver_data<crbaloon_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	draw_sprite_and_check_collision(screen->machine(), bitmap);
+	draw_sprite_and_check_collision(screen.machine(), bitmap);
 
 	return 0;
 }

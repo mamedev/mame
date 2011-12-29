@@ -839,13 +839,13 @@ WRITE8_HANDLER( pteacher_blitter_start_w )
 
 SCREEN_UPDATE( mrokumei )
 {
-	homedata_state *state = screen->machine().driver_data<homedata_state>();
+	homedata_state *state = screen.machine().driver_data<homedata_state>();
 	int flags,width;
 
 	/* blank screen */
 	if (state->m_vreg[0x3] == 0xc1 && state->m_vreg[0x4] == 0xc0 && state->m_vreg[0x5] == 0xff)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -853,7 +853,7 @@ SCREEN_UPDATE( mrokumei )
 	if (flags != state->m_flipscreen)
 	{
 		state->m_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
 	}
 
 	switch (state->m_vreg[0x3])
@@ -872,7 +872,7 @@ SCREEN_UPDATE( mrokumei )
 			width = 54;
 			break;
 	}
-	screen->set_visible_area(0*8, width*8-1, 2*8, 30*8-1);
+	screen.set_visible_area(0*8, width*8-1, 2*8, 30*8-1);
 
 	tilemap_set_scrollx(state->m_bg_tilemap[state->m_visible_page][0], 0, state->m_vreg[0xc] << 1);
 
@@ -884,7 +884,7 @@ SCREEN_UPDATE( mrokumei )
 #ifdef UNUSED_FUNCTION
 SCREEN_UPDATE( reikaids )
 {
-	homedata_state *state = screen->machine().driver_data<homedata_state>();
+	homedata_state *state = screen.machine().driver_data<homedata_state>();
 	int flags;
 	static const int pritable[8][4] =
 	{
@@ -904,11 +904,11 @@ SCREEN_UPDATE( reikaids )
 	if (flags != state->m_flipscreen)
 	{
 		state->m_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
 	}
 
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	pri = (state->m_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
@@ -919,7 +919,7 @@ SCREEN_UPDATE( reikaids )
 
 SCREEN_UPDATE( reikaids )
 {
-	homedata_state *state = screen->machine().driver_data<homedata_state>();
+	homedata_state *state = screen.machine().driver_data<homedata_state>();
 	int flags;
 	static const int pritable[2][8][4] =	/* table of priorities derived from the PROM */
 	{
@@ -951,11 +951,11 @@ SCREEN_UPDATE( reikaids )
 	if (flags != state->m_flipscreen)
 	{
 		state->m_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
 	}
 
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	pri = (state->m_blitter_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
@@ -966,14 +966,14 @@ SCREEN_UPDATE( reikaids )
 
 SCREEN_UPDATE( pteacher )
 {
-	homedata_state *state = screen->machine().driver_data<homedata_state>();
+	homedata_state *state = screen.machine().driver_data<homedata_state>();
 	int flags, scroll_low, scroll_high;
 
 
 	/* blank screen */
 	if (state->m_vreg[0x3] == 0xc1 && state->m_vreg[0x4] == 0xc0 && state->m_vreg[0x5] == 0xff)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -981,7 +981,7 @@ SCREEN_UPDATE( pteacher )
 	if (flags != state->m_flipscreen)
 	{
 		state->m_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
 	}
 
 	/* bit 2 of blitter_bank stretches characters horizontally by 3/2,
@@ -1013,24 +1013,24 @@ SCREEN_UPDATE( pteacher )
 		if (state->m_vreg[0x4] == 0xae || state->m_vreg[0x4] == 0xb8)
 		{
 			/* kludge for mjkinjas */
-			screen->set_visible_area(0*8, 42*8-1, 2*8, 30*8-1);
+			screen.set_visible_area(0*8, 42*8-1, 2*8, 30*8-1);
 			scroll_low = 0;
 		}
 		else
 		{
 			if (state->m_vreg[0x3] == 0xa6)
-				screen->set_visible_area(0*8, 33*8-1, 2*8, 30*8-1);
+				screen.set_visible_area(0*8, 33*8-1, 2*8, 30*8-1);
 			else
-				screen->set_visible_area(0*8, 35*8-1, 2*8, 30*8-1);
+				screen.set_visible_area(0*8, 35*8-1, 2*8, 30*8-1);
 			scroll_low = (11 - (state->m_vreg[0x4] & 0x0f)) * 8 / 12;
 		}
 	}
 	else
 	{
 		if (state->m_vreg[0x3] == 0xa6)
-			screen->set_visible_area(0*8, 51*8-1, 2*8, 30*8-1);
+			screen.set_visible_area(0*8, 51*8-1, 2*8, 30*8-1);
 		else
-			screen->set_visible_area(0*8, 54*8-1, 2*8, 30*8-1);
+			screen.set_visible_area(0*8, 54*8-1, 2*8, 30*8-1);
 		scroll_low = 7 - (state->m_vreg[0x4] & 0x0f);
 	}
 	scroll_high = state->m_vreg[0xb] >> 2;
@@ -1051,6 +1051,6 @@ SCREEN_UPDATE( mirderby )
 
 SCREEN_EOF( homedata )
 {
-	homedata_state *state = machine.driver_data<homedata_state>();
+	homedata_state *state = screen.machine().driver_data<homedata_state>();
 	state->m_visible_page ^= 1;
 }

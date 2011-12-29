@@ -232,7 +232,7 @@ VIDEO_START( rltennis )
 
 SCREEN_UPDATE( rltennis )
 {
-	rltennis_state *state = screen->machine().driver_data<rltennis_state>();
+	rltennis_state *state = screen.machine().driver_data<rltennis_state>();
 	copybitmap(bitmap, state->m_tmp_bitmap[BITMAP_BG], 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, state->m_tmp_bitmap[BITMAP_FG_DISPLAY], 0, 0, 0, 0, cliprect, 0);
 	return 0;

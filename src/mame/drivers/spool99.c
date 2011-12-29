@@ -128,7 +128,7 @@ static VIDEO_START(spool99)
 
 static SCREEN_UPDATE(spool99)
 {
-	spool99_state *state = screen->machine().driver_data<spool99_state>();
+	spool99_state *state = screen.machine().driver_data<spool99_state>();
 
 	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
 	return 0;

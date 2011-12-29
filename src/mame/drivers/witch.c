@@ -758,7 +758,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 static SCREEN_UPDATE(witch)
 {
-	witch_state *state = screen->machine().driver_data<witch_state>();
+	witch_state *state = screen.machine().driver_data<witch_state>();
 	tilemap_set_scrollx( state->m_gfx1_tilemap, 0, state->m_scrollx-7 ); //offset to have it aligned with the sprites
 	tilemap_set_scrolly( state->m_gfx1_tilemap, 0, state->m_scrolly+8 );
 
@@ -766,7 +766,7 @@ static SCREEN_UPDATE(witch)
 
 	tilemap_draw(bitmap,cliprect,state->m_gfx1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_gfx0a_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_gfx0b_tilemap,0,0);
 	return 0;
 }

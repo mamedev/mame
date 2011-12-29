@@ -119,12 +119,12 @@ static void himesiki_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 
 SCREEN_UPDATE( himesiki )
 {
-	himesiki_state *state = screen->machine().driver_data<himesiki_state>();
+	himesiki_state *state = screen.machine().driver_data<himesiki_state>();
 	int x = -(state->m_scrollx[0] << 8 | state->m_scrollx[1]) & 0x1ff;
 	tilemap_set_scrolldx(state->m_bg_tilemap, x, x);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	himesiki_draw_sprites(screen->machine(), bitmap, cliprect);
+	himesiki_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }

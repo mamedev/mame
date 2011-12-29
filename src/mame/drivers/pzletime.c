@@ -77,11 +77,11 @@ static VIDEO_START( pzletime )
 
 static SCREEN_UPDATE( pzletime )
 {
-	pzletime_state *state = screen->machine().driver_data<pzletime_state>();
+	pzletime_state *state = screen.machine().driver_data<pzletime_state>();
 	int count;
 	int y, x;
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]); //bg pen
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]); //bg pen
 
 	tilemap_set_scrolly(state->m_txt_tilemap, 0, state->m_tilemap_regs[0] - 3);
 	tilemap_set_scrollx(state->m_txt_tilemap, 0, state->m_tilemap_regs[1]);
@@ -123,12 +123,12 @@ static SCREEN_UPDATE( pzletime )
 
 			// is spriteram[offs + 0] & 0x200 flipy? it's always set
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], spr_offs, colour, 0, 1, sx, sy, 0);
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], spr_offs, colour, 0, 1, sx, sy, 0);
 		}
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_txt_tilemap, 0, 0);
-	if ((screen->frame_number() % 16) != 0)
+	if ((screen.frame_number() % 16) != 0)
 		tilemap_draw(bitmap, cliprect, state->m_txt_tilemap, 1, 0);
 
 	return 0;

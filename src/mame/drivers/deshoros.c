@@ -41,7 +41,7 @@ static VIDEO_START( deshoros )
 
 static SCREEN_UPDATE( deshoros )
 {
-	deshoros_state *state = screen->machine().driver_data<deshoros_state>();
+	deshoros_state *state = screen.machine().driver_data<deshoros_state>();
 	popmessage("%s",state->m_led_array);
 	return 0;
 }

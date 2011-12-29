@@ -53,7 +53,7 @@ VIDEO_START( gat )
 
 SCREEN_UPDATE( gat )
 {
-	gatron_state *state = screen->machine().driver_data<gatron_state>();
+	gatron_state *state = screen.machine().driver_data<gatron_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

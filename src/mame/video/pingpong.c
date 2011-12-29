@@ -154,8 +154,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( pingpong )
 {
-	pingpong_state *state = screen->machine().driver_data<pingpong_state>();
+	pingpong_state *state = screen.machine().driver_data<pingpong_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

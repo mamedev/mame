@@ -1548,7 +1548,7 @@ static READ8_DEVICE_HANDLER( dsw2_r )
 static SCREEN_EOF( seta_buffer_sprites )
 {
 	//seta_state *state = machine.driver_data<seta_state>();
-	machine.device<seta001_device>("spritegen")->setac_eof();
+	screen.machine().device<seta001_device>("spritegen")->setac_eof();
 }
 
 

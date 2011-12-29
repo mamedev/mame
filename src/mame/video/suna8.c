@@ -419,17 +419,17 @@ SCREEN_UPDATE( suna8 )
 
 #ifdef MAME_DEBUG
 #if TILEMAPS
-	if (screen->machine().input().code_pressed(KEYCODE_Z) || screen->machine().input().code_pressed(KEYCODE_X))
+	if (screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X))
 	{
-		suna8_state *state = screen->machine().driver_data<suna8_state>();
-		int max_tiles = screen->machine().region("gfx1")->bytes() / (0x400 * 0x20);
+		suna8_state *state = screen.machine().driver_data<suna8_state>();
+		int max_tiles = screen.machine().region("gfx1")->bytes() / (0x400 * 0x20);
 
-		if (screen->machine().input().code_pressed_once(KEYCODE_Q))	{ state->m_page--;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
-		if (screen->machine().input().code_pressed_once(KEYCODE_W))	{ state->m_page++;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
-		if (screen->machine().input().code_pressed_once(KEYCODE_E))	{ state->m_tiles--;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
-		if (screen->machine().input().code_pressed_once(KEYCODE_R))	{ state->m_tiles++;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
-		if (screen->machine().input().code_pressed_once(KEYCODE_A))	{ state->m_trombank--;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
-		if (screen->machine().input().code_pressed_once(KEYCODE_S))	{ state->m_trombank++;	tilemap_mark_all_tiles_dirty_all(screen->machine());	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_Q))	{ state->m_page--;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_W))	{ state->m_page++;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_E))	{ state->m_tiles--;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_R))	{ state->m_tiles++;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_A))	{ state->m_trombank--;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_S))	{ state->m_trombank++;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
 
 		state->m_rombank  &= 0xf;
 		state->m_page  &= (state->m_text_dim > 0)?3:7;
@@ -449,8 +449,8 @@ SCREEN_UPDATE( suna8 )
 #endif
 #endif
 	{
-		draw_normal_sprites(screen->machine() ,bitmap,cliprect);
-		draw_text_sprites(screen->machine(), bitmap,cliprect);
+		draw_normal_sprites(screen.machine() ,bitmap,cliprect);
+		draw_text_sprites(screen.machine(), bitmap,cliprect);
 	}
 	return 0;
 }

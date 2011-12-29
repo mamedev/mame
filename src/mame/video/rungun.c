@@ -105,10 +105,10 @@ VIDEO_START( rng )
 
 SCREEN_UPDATE(rng)
 {
-	rungun_state *state = screen->machine().driver_data<rungun_state>();
+	rungun_state *state = screen.machine().driver_data<rungun_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_936_tilemap, 0, 0, 1);
 

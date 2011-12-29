@@ -189,13 +189,13 @@ void cvs_scroll_stars( running_machine &machine )
 
 SCREEN_UPDATE( cvs )
 {
-	cvs_state *state = screen->machine().driver_data<cvs_state>();
+	cvs_state *state = screen.machine().driver_data<cvs_state>();
 	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };
 	offs_t offs;
 	int scroll[8];
 	bitmap_t *s2636_0_bitmap, *s2636_1_bitmap, *s2636_2_bitmap;
 
-	set_pens(screen->machine());
+	set_pens(screen.machine());
 
 	/* draw the background */
 	for (offs = 0; offs < 0x0400; offs++)
@@ -209,7 +209,7 @@ SCREEN_UPDATE( cvs )
 
 		int gfxnum = (code < ram_based_char_start_indices[state->m_character_banking_mode]) ? 0 : 1;
 
-		drawgfx_opaque(state->m_background_bitmap, 0, screen->machine().gfx[gfxnum],
+		drawgfx_opaque(state->m_background_bitmap, 0, screen.machine().gfx[gfxnum],
 				code, color,
 				0, 0,
 				x, y);
@@ -225,7 +225,7 @@ SCREEN_UPDATE( cvs )
 				collision_color = 0x102;
 		}
 
-		drawgfx_opaque(state->m_collision_background, 0, screen->machine().gfx[gfxnum],
+		drawgfx_opaque(state->m_collision_background, 0, screen.machine().gfx[gfxnum],
 				code, collision_color,
 				0, 0,
 				x, y);
@@ -267,7 +267,7 @@ SCREEN_UPDATE( cvs )
 					state->m_collision_register |= 0x08;
 
 				/* Bullet/Background Collision */
-				if (colortable_entry_get_value(screen->machine().colortable, *BITMAP_ADDR16(state->m_scrolled_collision_background, offs, bx)))
+				if (colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(state->m_scrolled_collision_background, offs, bx)))
 					state->m_collision_register |= 0x80;
 
 				*BITMAP_ADDR16(bitmap, offs, bx) = BULLET_STAR_PEN;
@@ -302,7 +302,7 @@ SCREEN_UPDATE( cvs )
 					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x04;
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen->machine().colortable, *BITMAP_ADDR16(state->m_scrolled_collision_background, y, x)))
+					if (colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(state->m_scrolled_collision_background, y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision_register |= 0x10;
 						if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision_register |= 0x20;
@@ -323,14 +323,14 @@ SCREEN_UPDATE( cvs )
 
 			if ((y & 1) ^ ((x >> 4) & 1))
 			{
-				if (flip_screen_x_get(screen->machine()))
+				if (flip_screen_x_get(screen.machine()))
 					x = ~x;
 
-				if (flip_screen_y_get(screen->machine()))
+				if (flip_screen_y_get(screen.machine()))
 					y = ~y;
 
 				if ((y >= cliprect->min_y) && (y <= cliprect->max_y) &&
-					(colortable_entry_get_value(screen->machine().colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0))
+					(colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0))
 					*BITMAP_ADDR16(bitmap, y, x) = BULLET_STAR_PEN;
 			}
 		}

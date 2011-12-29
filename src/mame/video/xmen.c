@@ -73,7 +73,7 @@ VIDEO_START( xmen6p )
 
 SCREEN_UPDATE( xmen )
 {
-	xmen_state *state = screen->machine().driver_data<xmen_state>();
+	xmen_state *state = screen.machine().driver_data<xmen_state>();
 	int layer[3], bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI4);
@@ -93,7 +93,7 @@ SCREEN_UPDATE( xmen )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	/* note the '+1' in the background color!!! */
 	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase + 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[0], 0, 1);
@@ -107,29 +107,36 @@ SCREEN_UPDATE( xmen )
 }
 
 
-SCREEN_UPDATE( xmen6p )
+SCREEN_UPDATE( xmen6p_left )
 {
-	xmen_state *state = screen->machine().driver_data<xmen_state>();
+	xmen_state *state = screen.machine().driver_data<xmen_state>();
 	int x, y;
 
-	if (screen == state->m_lscreen)
-		for(y = 0; y < 32 * 8; y++)
-		{
-			UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
-			UINT16* line_src = BITMAP_ADDR16(state->m_screen_left, y, 0);
+	for(y = 0; y < 32 * 8; y++)
+	{
+		UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16* line_src = BITMAP_ADDR16(state->m_screen_left, y, 0);
 
-			for (x = 12 * 8; x < 52 * 8; x++)
-				line_dest[x] = line_src[x];
-		}
-	else if (screen == state->m_rscreen)
-		for(y = 0; y < 32 * 8; y++)
-		{
-			UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
-			UINT16* line_src = BITMAP_ADDR16(state->m_screen_right, y, 0);
+		for (x = 12 * 8; x < 52 * 8; x++)
+			line_dest[x] = line_src[x];
+	}
 
-			for (x = 12 * 8; x < 52 * 8; x++)
-				line_dest[x] = line_src[x];
-		}
+	return 0;
+}
+
+SCREEN_UPDATE( xmen6p_right )
+{
+	xmen_state *state = screen.machine().driver_data<xmen_state>();
+	int x, y;
+
+	for(y = 0; y < 32 * 8; y++)
+	{
+		UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16* line_src = BITMAP_ADDR16(state->m_screen_right, y, 0);
+
+		for (x = 12 * 8; x < 52 * 8; x++)
+			line_dest[x] = line_src[x];
+	}
 
 	return 0;
 }
@@ -137,13 +144,13 @@ SCREEN_UPDATE( xmen6p )
 /* my lefts and rights are mixed up in several places.. */
 SCREEN_EOF( xmen6p )
 {
-	xmen_state *state = machine.driver_data<xmen_state>();
+	xmen_state *state = screen.machine().driver_data<xmen_state>();
 	int layer[3], bg_colorbase;
 	bitmap_t * renderbitmap;
 	rectangle cliprect;
 	int offset;
 
-//  const rectangle *visarea = machine.primary_screen->visible_area();
+//  const rectangle *visarea = screen.machine().primary_screen->visible_area();
 //  cliprect.min_x = visarea->min_x;
 //  cliprect.max_x = visarea->max_x;
 //  cliprect.min_y = visarea->min_y;
@@ -155,7 +162,7 @@ SCREEN_EOF( xmen6p )
 	cliprect.max_y = 30 * 8 - 1;
 
 
-	if (machine.primary_screen->frame_number() & 0x01)
+	if (screen.machine().primary_screen->frame_number() & 0x01)
 	{
 
 		/* copy the desired spritelist to the chip */
@@ -212,7 +219,7 @@ SCREEN_EOF( xmen6p )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	bitmap_fill(machine.priority_bitmap, &cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, &cliprect, 0);
 	/* note the '+1' in the background color!!! */
 	bitmap_fill(renderbitmap, &cliprect, 16 * bg_colorbase + 1);
 	k052109_tilemap_draw(state->m_k052109, renderbitmap, &cliprect, layer[0], 0, 1);

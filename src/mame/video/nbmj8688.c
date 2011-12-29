@@ -678,7 +678,7 @@ WRITE8_HANDLER( nbmj8688_HD61830B_both_data_w )
 
 SCREEN_UPDATE( mbmj8688 )
 {
-	nbmj8688_state *state = screen->machine().driver_data<nbmj8688_state>();
+	nbmj8688_state *state = screen.machine().driver_data<nbmj8688_state>();
 	int x, y;
 
 	if (state->m_mjsikaku_screen_refresh)
@@ -712,7 +712,7 @@ SCREEN_UPDATE( mbmj8688 )
 
 SCREEN_UPDATE( mbmj8688_lcd0 )
 {
-	nbmj8688_state *state = screen->machine().driver_data<nbmj8688_state>();
+	nbmj8688_state *state = screen.machine().driver_data<nbmj8688_state>();
 	int x, y, b;
 
 	for (y = 0;y < 64;y++)
@@ -728,7 +728,7 @@ SCREEN_UPDATE( mbmj8688_lcd0 )
 
 SCREEN_UPDATE( mbmj8688_lcd1 )
 {
-	nbmj8688_state *state = screen->machine().driver_data<nbmj8688_state>();
+	nbmj8688_state *state = screen.machine().driver_data<nbmj8688_state>();
 	int x, y, b;
 
 	for (y = 0;y < 64;y++)

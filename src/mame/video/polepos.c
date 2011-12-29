@@ -522,12 +522,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( polepos )
 {
-	polepos_state *state = screen->machine().driver_data<polepos_state>();
+	polepos_state *state = screen.machine().driver_data<polepos_state>();
 	rectangle clip = *cliprect;
 	clip.max_y = 127;
 	tilemap_draw(bitmap,&clip,state->m_bg_tilemap,0,0);
-	draw_road(screen->machine(), bitmap);
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_road(screen.machine(), bitmap);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
 }

@@ -84,7 +84,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE(homerun)
 {
-	homerun_state *state = screen->machine().driver_data<homerun_state>();
+	homerun_state *state = screen.machine().driver_data<homerun_state>();
 	rectangle myclip = *cliprect;
 
 	/* upper part */
@@ -94,14 +94,14 @@ SCREEN_UPDATE(homerun)
 	myclip.max_y /= 2;
 	state->m_gfx_ctrl = state->m_gc_up;
 	tilemap_draw(bitmap, &myclip, state->m_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, &myclip);
+	draw_sprites(screen.machine(), bitmap, &myclip);
 
 	/* lower part */
 	myclip.min_y += myclip.max_y;
 	myclip.max_y *= 2;
 	state->m_gfx_ctrl = state->m_gc_down;
 	tilemap_draw(bitmap, &myclip, state->m_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, &myclip);
+	draw_sprites(screen.machine(), bitmap, &myclip);
 
 	state->m_gc_down = state->m_gc_up;
 	return 0;

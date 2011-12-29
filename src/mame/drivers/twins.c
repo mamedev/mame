@@ -112,12 +112,12 @@ static VIDEO_START(twins)
 
 static SCREEN_UPDATE(twins)
 {
-	twins_state *state = screen->machine().driver_data<twins_state>();
+	twins_state *state = screen.machine().driver_data<twins_state>();
 	int y,x,count;
 	int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, 0, get_black_pen(screen.machine()));
 
 	for (i=0;i<0x100;i++)
 	{
@@ -133,7 +133,7 @@ static SCREEN_UPDATE(twins)
 		b = (dat>>10) & 0x1f;
 		b = BITSWAP8(b,7,6,5,0,1,2,3,4);
 
-		palette_set_color_rgb(screen->machine(),i, pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(screen.machine(),i, pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 
 	count=0;
@@ -219,12 +219,12 @@ static VIDEO_START(twinsa)
 
 static SCREEN_UPDATE(twinsa)
 {
-	twins_state *state = screen->machine().driver_data<twins_state>();
+	twins_state *state = screen.machine().driver_data<twins_state>();
 	int y,x,count;
 	int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, 0, get_black_pen(screen.machine()));
 
 	for (i=0;i<0x1000-3;i+=3)
 	{
@@ -233,7 +233,7 @@ static SCREEN_UPDATE(twinsa)
 		g = state->m_pal[i+1];
 		b = state->m_pal[i+2];
 
-		palette_set_color_rgb(screen->machine(),i/3, pal6bit(r), pal6bit(g), pal6bit(b));
+		palette_set_color_rgb(screen.machine(),i/3, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
 	count=0;

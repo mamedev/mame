@@ -263,10 +263,10 @@ static VIDEO_START(luckgrln)
 
 static SCREEN_UPDATE(luckgrln)
 {
-	luckgrln_state *state = screen->machine().driver_data<luckgrln_state>();
+	luckgrln_state *state = screen.machine().driver_data<luckgrln_state>();
 	int y,x;
 	int count = 0;
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 	int i;
 
 	rectangle clip;
@@ -341,10 +341,10 @@ static SCREEN_UPDATE(luckgrln)
 				if (bgenable==3) tilemap_draw(bitmap, &clip, state->m_reel4_tilemap, 0, 0);
 			}
 
-			if (tileattr&0x08) drawgfx_transpen(bitmap,clip,screen->machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if (tileattr&0x08) drawgfx_transpen(bitmap,clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
 
 #else // treat it as priority flag instead (looks better in non-adult title screen - needs verifying)
-			if (!(tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen->machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if (!(tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
 
 			if (tileattr&0x04)
 			{
@@ -354,7 +354,7 @@ static SCREEN_UPDATE(luckgrln)
 				if (bgenable==3) tilemap_draw(bitmap, &clip, state->m_reel4_tilemap, 0, 0);
 			}
 
-			if ((tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen->machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if ((tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
 #endif
 
 			count++;

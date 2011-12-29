@@ -75,7 +75,7 @@ VIDEO_START( bottom9 )
 
 SCREEN_UPDATE( bottom9 )
 {
-	bottom9_state *state = screen->machine().driver_data<bottom9_state>();
+	bottom9_state *state = screen.machine().driver_data<bottom9_state>();
 
 	k052109_tilemap_update(state->m_k052109);
 

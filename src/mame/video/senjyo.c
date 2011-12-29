@@ -291,16 +291,16 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( senjyo )
 {
-	senjyo_state *state = screen->machine().driver_data<senjyo_state>();
+	senjyo_state *state = screen.machine().driver_data<senjyo_state>();
 	int i;
 
 
 	/* two colors for the radar dots (verified on the real board) */
-	palette_set_color(screen->machine(),512,MAKE_RGB(0xff,0x00,0x00));	/* red for enemies */
-	palette_set_color(screen->machine(),513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
+	palette_set_color(screen.machine(),512,MAKE_RGB(0xff,0x00,0x00));	/* red for enemies */
+	palette_set_color(screen.machine(),513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
 
 	{
-		int flip = flip_screen_get(screen->machine());
+		int flip = flip_screen_get(screen.machine());
 		int scrollx,scrolly;
 
 		for (i = 0;i < 32;i++)
@@ -333,16 +333,16 @@ SCREEN_UPDATE( senjyo )
 		tilemap_set_scrolly(state->m_bg3_tilemap, 0, scrolly);
 	}
 
-	draw_bgbitmap(screen->machine(), bitmap, cliprect);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_bgbitmap(screen.machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg3_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 2);
+	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 3);
+	draw_sprites(screen.machine(), bitmap, cliprect, 3);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	draw_radar(screen->machine(), bitmap, cliprect);
+	draw_radar(screen.machine(), bitmap, cliprect);
 
 #if 0
 {

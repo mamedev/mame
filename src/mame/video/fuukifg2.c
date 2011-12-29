@@ -284,7 +284,7 @@ static void fuuki16_draw_layer( running_machine &machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( fuuki16 )
 {
-	fuuki16_state *state = screen->machine().driver_data<fuuki16_state>();
+	fuuki16_state *state = screen.machine().driver_data<fuuki16_state>();
 	UINT16 layer0_scrollx, layer0_scrolly;
 	UINT16 layer1_scrollx, layer1_scrolly;
 	UINT16 layer2_scrollx, layer2_scrolly;
@@ -306,12 +306,12 @@ SCREEN_UPDATE( fuuki16 )
 	int tm_middle = pri_table[state->m_priority[0] & 0x0f][1];
 	int tm_back   = pri_table[state->m_priority[0] & 0x0f][2];
 
-	flip_screen_set(screen->machine(), state->m_vregs[0x1e / 2] & 1);
+	flip_screen_set(screen.machine(), state->m_vregs[0x1e / 2] & 1);
 
 	/* Layers scrolling */
 
-	scrolly_offs = state->m_vregs[0xc / 2] - (flip_screen_get(screen->machine()) ? 0x103 : 0x1f3);
-	scrollx_offs = state->m_vregs[0xe / 2] - (flip_screen_get(screen->machine()) ? 0x2a7 : 0x3f6);
+	scrolly_offs = state->m_vregs[0xc / 2] - (flip_screen_get(screen.machine()) ? 0x103 : 0x1f3);
+	scrollx_offs = state->m_vregs[0xe / 2] - (flip_screen_get(screen.machine()) ? 0x2a7 : 0x3f6);
 
 	layer0_scrolly = state->m_vregs[0x0 / 2] + scrolly_offs;
 	layer0_scrollx = state->m_vregs[0x2 / 2] + scrollx_offs;
@@ -334,17 +334,17 @@ SCREEN_UPDATE( fuuki16 )
 	/* The backmost tilemap decides the background color(s) but sprites can
        go below the opaque pixels of that tilemap. We thus need to mark the
        transparent pixels of this layer with a different priority value */
-//  fuuki16_draw_layer(screen->machine(), bitmap, cliprect, tm_back, TILEMAP_DRAW_OPAQUE, 0);
+//  fuuki16_draw_layer(screen.machine(), bitmap, cliprect, tm_back, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Actually, bg colour is simply the last pen i.e. 0x1fff -pjp */
 	bitmap_fill(bitmap, cliprect, (0x800 * 4) - 1);
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
-	fuuki16_draw_layer(screen->machine(), bitmap, cliprect, tm_back,   0, 1);
-	fuuki16_draw_layer(screen->machine(), bitmap, cliprect, tm_middle, 0, 2);
-	fuuki16_draw_layer(screen->machine(), bitmap, cliprect, tm_front,  0, 4);
+	fuuki16_draw_layer(screen.machine(), bitmap, cliprect, tm_back,   0, 1);
+	fuuki16_draw_layer(screen.machine(), bitmap, cliprect, tm_middle, 0, 2);
+	fuuki16_draw_layer(screen.machine(), bitmap, cliprect, tm_front,  0, 4);
 
-	draw_sprites(*screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }

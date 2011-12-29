@@ -110,7 +110,7 @@ VIDEO_START( carjmbre )
 
 SCREEN_UPDATE( carjmbre )
 {
-	carjmbre_state *state = screen->machine().driver_data<carjmbre_state>();
+	carjmbre_state *state = screen.machine().driver_data<carjmbre_state>();
 	int offs, troffs, sx, sy, flipx, flipy;
 
 	//colorram
@@ -153,7 +153,7 @@ SCREEN_UPDATE( carjmbre )
 				flipy = !flipy;
 			}
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 					state->m_spriteram[troffs + 1],
 					state->m_spriteram[troffs + 2] & 0xf,
 					flipx,flipy,

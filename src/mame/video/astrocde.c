@@ -246,7 +246,7 @@ static void init_savestate(running_machine &machine)
 
 SCREEN_UPDATE( astrocde )
 {
-	astrocde_state *state = screen->machine().driver_data<astrocde_state>();
+	astrocde_state *state = screen.machine().driver_data<astrocde_state>();
 	UINT8 *videoram = state->m_videoram;
 	UINT32 sparklebase = 0;
 	const int colormask = (state->m_video_config & AC_MONITOR_BW) ? 0 : 0x1f0;
@@ -254,11 +254,11 @@ SCREEN_UPDATE( astrocde )
 	int y;
 
 	/* compute the starting point of sparkle for the current frame */
-	int width = screen->width();
-	int height = screen->height();
+	int width = screen.width();
+	int height = screen.height();
 
 	if (state->m_video_config & AC_STARS)
-		sparklebase = (screen->frame_number() * (UINT64)(width * height)) % RNG_PERIOD;
+		sparklebase = (screen.frame_number() * (UINT64)(width * height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -332,7 +332,7 @@ SCREEN_UPDATE( astrocde )
 
 SCREEN_UPDATE( profpac )
 {
-	astrocde_state *state = screen->machine().driver_data<astrocde_state>();
+	astrocde_state *state = screen.machine().driver_data<astrocde_state>();
 	int y;
 
 	/* iterate over scanlines */

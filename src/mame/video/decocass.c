@@ -521,21 +521,21 @@ VIDEO_START( decocass )
 
 SCREEN_UPDATE( decocass )
 {
-	decocass_state *state = screen->machine().driver_data<decocass_state>();
+	decocass_state *state = screen.machine().driver_data<decocass_state>();
 	int scrollx, scrolly_l, scrolly_r;
 	rectangle clip;
 
-	if (0xc0 != (input_port_read(screen->machine(), "IN2") & 0xc0))  /* coin slots assert an NMI */
+	if (0xc0 != (input_port_read(screen.machine(), "IN2") & 0xc0))  /* coin slots assert an NMI */
 		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (state->m_watchdog_flip & 0x04))
-		watchdog_reset(screen->machine());
+		watchdog_reset(screen.machine());
 	else if (state->m_watchdog_count-- > 0)
-		watchdog_reset(screen->machine());
+		watchdog_reset(screen.machine());
 
 #ifdef MAME_DEBUG
 	{
-		if (screen->machine().input().code_pressed_once(KEYCODE_I))
+		if (screen.machine().input().code_pressed_once(KEYCODE_I))
 			state->m_showmsg ^= 1;
 		if (state->m_showmsg)
 			popmessage("mode:$%02x cm:$%02x ccb:$%02x h:$%02x vl:$%02x vr:$%02x ph:$%02x pv:$%02x ch:$%02x cv:$%02x",
@@ -591,13 +591,13 @@ SCREEN_UPDATE( decocass )
 
 	if (state->m_mode_set & 0x20)
 	{
-		draw_object(screen->machine(), bitmap, cliprect);
-		draw_center(screen->machine(), bitmap, cliprect);
+		draw_object(screen.machine(), bitmap, cliprect);
+		draw_center(screen.machine(), bitmap, cliprect);
 	}
 	else
 	{
-		draw_object(screen->machine(), bitmap, cliprect);
-		draw_center(screen->machine(), bitmap, cliprect);
+		draw_object(screen.machine(), bitmap, cliprect);
+		draw_center(screen.machine(), bitmap, cliprect);
 		if (state->m_mode_set & 0x08)	/* bkg_ena on ? */
 		{
 			clip = state->m_bg_tilemap_l_clip;
@@ -610,7 +610,7 @@ SCREEN_UPDATE( decocass )
 		}
 	}
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, (state->m_color_center_bot >> 1) & 1, 0, 0, state->m_fgvideoram, 0x20);
-	draw_missiles(screen->machine(), bitmap, cliprect, 1, 0, state->m_colorram, 0x20);
+	draw_sprites(screen.machine(), bitmap, cliprect, (state->m_color_center_bot >> 1) & 1, 0, 0, state->m_fgvideoram, 0x20);
+	draw_missiles(screen.machine(), bitmap, cliprect, 1, 0, state->m_colorram, 0x20);
 	return 0;
 }

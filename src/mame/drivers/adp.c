@@ -200,12 +200,12 @@ bool adp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 #if 0
 static SCREEN_UPDATE( adp )
 {
-	adp_state *state = screen->machine().driver_data<adp_state>();
+	adp_state *state = screen.machine().driver_data<adp_state>();
 
 	state->m_h63484->update_screen(bitmap, cliprect);
 
 	#if 0
-	adp_state *state = screen->machine().driver_data<adp_state>();
+	adp_state *state = screen.machine().driver_data<adp_state>();
 	int x, y, b, src;
 
 	b = ((hd63484_regs_r(state->m_hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->m_hd63484, 0xce/2, 0xffff);
@@ -223,7 +223,7 @@ static SCREEN_UPDATE( adp )
 			b++;
 		}
 	}
-if (!screen->machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
+if (!screen.machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
 	if ((hd63484_regs_r(state->m_hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
 		int sy = (hd63484_regs_r(state->m_hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(state->m_hd63484, 0x88/2, 0xffff) >> 8);

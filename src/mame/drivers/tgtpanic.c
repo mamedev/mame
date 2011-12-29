@@ -32,7 +32,7 @@ public:
 
 static SCREEN_UPDATE( tgtpanic )
 {
-	tgtpanic_state *state = screen->machine().driver_data<tgtpanic_state>();
+	tgtpanic_state *state = screen.machine().driver_data<tgtpanic_state>();
 	UINT32 colors[4];
 	UINT32 offs;
 	UINT32 x, y;

@@ -164,10 +164,10 @@ static VIDEO_START(calchase)
 /*GRULL-ADDVGA
 static SCREEN_UPDATE(calchase)
 {
-    calchase_state *state = screen->machine().driver_data<calchase_state>();
+    calchase_state *state = screen.machine().driver_data<calchase_state>();
     int x,y,count,i;
 
-    bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+    bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
     count = (0);
 
@@ -181,8 +181,8 @@ static SCREEN_UPDATE(calchase)
 
                 color = (state->m_vga_vram[count])>>(32-i) & 0x1;
 
-                if((x+i)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-                    *BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen->machine().pens[color];
+                if((x+i)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+                    *BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen.machine().pens[color];
 
             }
 

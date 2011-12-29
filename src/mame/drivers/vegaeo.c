@@ -148,7 +148,7 @@ static VIDEO_START( vega )
 
 static SCREEN_UPDATE( vega )
 {
-	vegaeo_state *state = screen->machine().driver_data<vegaeo_state>();
+	vegaeo_state *state = screen.machine().driver_data<vegaeo_state>();
 	int x,y,count;
 	int color;
 

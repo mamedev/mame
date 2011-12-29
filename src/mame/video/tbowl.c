@@ -214,41 +214,42 @@ VIDEO_START( tbowl )
 }
 
 
-SCREEN_UPDATE( tbowl )
+SCREEN_UPDATE( tbowl_left )
 {
-	tbowl_state *state = screen->machine().driver_data<tbowl_state>();
-	device_t *left_screen  = screen->machine().device("lscreen");
-	device_t *right_screen = screen->machine().device("rscreen");
+	tbowl_state *state = screen.machine().driver_data<tbowl_state>();
 
-	if (screen == left_screen)
-	{
-		tilemap_set_scrollx(state->m_bg_tilemap,  0, state->m_xscroll );
-		tilemap_set_scrolly(state->m_bg_tilemap,  0, state->m_yscroll );
-		tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg2xscroll );
-		tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg2yscroll );
-		tilemap_set_scrollx(state->m_tx_tilemap,  0, 0 );
-		tilemap_set_scrolly(state->m_tx_tilemap,  0, 0 );
+	tilemap_set_scrollx(state->m_bg_tilemap,  0, state->m_xscroll );
+	tilemap_set_scrolly(state->m_bg_tilemap,  0, state->m_yscroll );
+	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg2xscroll );
+	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg2yscroll );
+	tilemap_set_scrollx(state->m_tx_tilemap,  0, 0 );
+	tilemap_set_scrolly(state->m_tx_tilemap,  0, 0 );
 
-		bitmap_fill(bitmap,cliprect,0x100); /* is there a register controling the colour? looks odd when screen is blank */
-		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-		draw_sprites(screen->machine(), bitmap,cliprect, 0);
-		tilemap_draw(bitmap,cliprect,state->m_bg2_tilemap,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
-	}
-	else if (screen == right_screen)
-	{
-		tilemap_set_scrollx(state->m_bg_tilemap,  0, state->m_xscroll+32*8 );
-		tilemap_set_scrolly(state->m_bg_tilemap,  0, state->m_yscroll );
-		tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg2xscroll+32*8 );
-		tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg2yscroll );
-		tilemap_set_scrollx(state->m_tx_tilemap,  0, 32*8 );
-		tilemap_set_scrolly(state->m_tx_tilemap,  0, 0 );
+	bitmap_fill(bitmap,cliprect,0x100); /* is there a register controling the colour? looks odd when screen is blank */
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	draw_sprites(screen.machine(), bitmap,cliprect, 0);
+	tilemap_draw(bitmap,cliprect,state->m_bg2_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 
-		bitmap_fill(bitmap,cliprect,0x100); /* is there a register controling the colour? looks odd when screen is blank */
-		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-		draw_sprites(screen->machine(), bitmap,cliprect, 32*8);
-		tilemap_draw(bitmap,cliprect,state->m_bg2_tilemap,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
-	}
+	return 0;
+}
+
+SCREEN_UPDATE( tbowl_right )
+{
+	tbowl_state *state = screen.machine().driver_data<tbowl_state>();
+
+	tilemap_set_scrollx(state->m_bg_tilemap,  0, state->m_xscroll+32*8 );
+	tilemap_set_scrolly(state->m_bg_tilemap,  0, state->m_yscroll );
+	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg2xscroll+32*8 );
+	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg2yscroll );
+	tilemap_set_scrollx(state->m_tx_tilemap,  0, 32*8 );
+	tilemap_set_scrolly(state->m_tx_tilemap,  0, 0 );
+
+	bitmap_fill(bitmap,cliprect,0x100); /* is there a register controling the colour? looks odd when screen is blank */
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	draw_sprites(screen.machine(), bitmap,cliprect, 32*8);
+	tilemap_draw(bitmap,cliprect,state->m_bg2_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+
 	return 0;
 }

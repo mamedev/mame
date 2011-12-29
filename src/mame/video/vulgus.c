@@ -219,12 +219,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( vulgus )
 {
-	vulgus_state *state = screen->machine().driver_data<vulgus_state>();
+	vulgus_state *state = screen.machine().driver_data<vulgus_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_low[1] + 256 * state->m_scroll_high[1]);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll_low[0] + 256 * state->m_scroll_high[0]);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;
 }

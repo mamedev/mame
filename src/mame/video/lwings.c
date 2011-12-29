@@ -271,21 +271,21 @@ static void trojan_draw_sprites( running_machine &machine, bitmap_t *bitmap, con
 
 SCREEN_UPDATE( lwings )
 {
-	lwings_state *state = screen->machine().driver_data<lwings_state>();
+	lwings_state *state = screen.machine().driver_data<lwings_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
-	lwings_draw_sprites(screen->machine(), bitmap, cliprect);
+	lwings_draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( trojan )
 {
-	lwings_state *state = screen->machine().driver_data<lwings_state>();
+	lwings_state *state = screen.machine().driver_data<lwings_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	trojan_draw_sprites(screen->machine(), bitmap, cliprect);
+	trojan_draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
@@ -293,7 +293,7 @@ SCREEN_UPDATE( trojan )
 
 SCREEN_EOF( lwings )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram_w(space, 0, 0);
 }

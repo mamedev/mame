@@ -123,10 +123,10 @@ static VIDEO_START( cyclemb )
 
 static SCREEN_UPDATE( cyclemb )
 {
-	cyclemb_state *state = screen->machine().driver_data<cyclemb_state>();
+	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
 	int x,y,count;
-	const gfx_element *gfx = screen->machine().gfx[0];
-	UINT8 flip_screen = flip_screen_get(screen->machine());
+	const gfx_element *gfx = screen.machine().gfx[0];
+	UINT8 flip_screen = flip_screen_get(screen.machine());
 
 	count = 0;
 
@@ -208,7 +208,7 @@ static SCREEN_UPDATE( cyclemb )
 				fx = !fx;
 				fy = !fy;
 			}
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[region],spr_offs,col,fx,fy,x,y,0);
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[region],spr_offs,col,fx,fy,x,y,0);
 		}
 	}
 

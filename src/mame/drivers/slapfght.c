@@ -736,7 +736,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 static SCREEN_EOF( perfrman )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram_w(space, 0, 0);
 }
 

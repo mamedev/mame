@@ -378,14 +378,14 @@ static void draw_shell(running_machine &machine,
 
 SCREEN_UPDATE( tunhunt )
 {
-	tunhunt_state *state = screen->machine().driver_data<tunhunt_state>();
-	set_pens(screen->machine());
+	tunhunt_state *state = screen.machine().driver_data<tunhunt_state>();
+	set_pens(screen.machine());
 
-	draw_box(screen->machine(), bitmap, cliprect);
+	draw_box(screen.machine(), bitmap, cliprect);
 
-	draw_motion_object(screen->machine(), bitmap, cliprect);
+	draw_motion_object(screen.machine(), bitmap, cliprect);
 
-	draw_shell(screen->machine(), bitmap, cliprect,
+	draw_shell(screen.machine(), bitmap, cliprect,
 		state->m_workram[SHL0PC],	/* picture code */
 		state->m_workram[SHEL0H],	/* hposition */
 		state->m_workram[SHL0V],	/* vstart */
@@ -393,7 +393,7 @@ SCREEN_UPDATE( tunhunt )
 		state->m_workram[SHL0ST],	/* vstretch */
 		state->m_control&0x08 ); /* hstretch */
 
-	draw_shell(screen->machine(), bitmap, cliprect,
+	draw_shell(screen.machine(), bitmap, cliprect,
 		state->m_workram[SHL1PC],	/* picture code */
 		state->m_workram[SHEL1H],	/* hposition */
 		state->m_workram[SHL1V],	/* vstart */

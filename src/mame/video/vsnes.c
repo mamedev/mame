@@ -58,13 +58,13 @@ VIDEO_START( vsdual )
 SCREEN_UPDATE( vsnes )
 {
 	/* render the ppu */
-	ppu2c0x_render( screen->machine().device("ppu1"), bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render( screen.machine().device("ppu1"), bitmap, 0, 0, 0, 0 );
 	return 0;
 }
 
 
 SCREEN_UPDATE( vsnes_bottom )
 {
-	ppu2c0x_render(screen->machine().device("ppu2"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_render(screen.machine().device("ppu2"), bitmap, 0, 0, 0, 0);
 	return 0;
 }

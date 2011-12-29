@@ -175,9 +175,9 @@ VIDEO_START( bankp )
 
 SCREEN_UPDATE( bankp )
 {
-	bankp_state *state = screen->machine().driver_data<bankp_state>();
+	bankp_state *state = screen.machine().driver_data<bankp_state>();
 
-	if (flip_screen_get(screen->machine()))
+	if (flip_screen_get(screen.machine()))
 	{
 		tilemap_set_scrollx(state->m_fg_tilemap, 0, -state->m_scroll_x);
 		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);

@@ -87,7 +87,7 @@ static VIDEO_START( koftball )
 
 static SCREEN_UPDATE( koftball )
 {
-	koftball_state *state = screen->machine().driver_data<koftball_state>();
+	koftball_state *state = screen.machine().driver_data<koftball_state>();
 	tilemap_draw( bitmap, cliprect, state->m_tilemap_2, 0, 0);
 	tilemap_draw( bitmap, cliprect, state->m_tilemap_1, 0, 0);
 	return 0;

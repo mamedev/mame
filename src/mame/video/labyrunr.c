@@ -182,14 +182,14 @@ WRITE8_HANDLER( labyrunr_vram2_w )
 
 SCREEN_UPDATE( labyrunr )
 {
-	labyrunr_state *state = screen->machine().driver_data<labyrunr_state>();
+	labyrunr_state *state = screen.machine().driver_data<labyrunr_state>();
 	UINT8 ctrl_0 = k007121_ctrlram_r(state->m_k007121, 0);
 	rectangle finalclip0, finalclip1;
 
-	set_pens(screen->machine());
+	set_pens(screen.machine());
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect,0);
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(screen.machine().priority_bitmap, cliprect,0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	if (~k007121_ctrlram_r(state->m_k007121, 3) & 0x20)
 	{
@@ -214,7 +214,7 @@ SCREEN_UPDATE( labyrunr )
 		}
 
 		tilemap_draw(bitmap, &finalclip0, state->m_layer0, TILEMAP_DRAW_OPAQUE, 0);
-		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen->machine().gfx[0], screen->machine().colortable, state->m_spriteram,(k007121_ctrlram_r(state->m_k007121, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(state->m_k007121, 3) & 0x40) >> 5);
+		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram,(k007121_ctrlram_r(state->m_k007121, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(state->m_k007121, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		tilemap_draw(bitmap, &finalclip1, state->m_layer1, TILEMAP_DRAW_OPAQUE, 0);
 	}
@@ -284,7 +284,7 @@ SCREEN_UPDATE( labyrunr )
 		if(use_clip3[1])
 			tilemap_draw(bitmap, &finalclip3, state->m_layer1, 0, 1);
 
-		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen->machine().gfx[0], screen->machine().colortable, state->m_spriteram, (k007121_ctrlram_r(state->m_k007121, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(state->m_k007121, 3) & 0x40) >> 5);
+		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram, (k007121_ctrlram_r(state->m_k007121, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(state->m_k007121, 3) & 0x40) >> 5);
 	}
 	return 0;
 }

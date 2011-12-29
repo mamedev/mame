@@ -364,13 +364,13 @@ VIDEO_START( pgm )
 
 SCREEN_UPDATE( pgm )
 {
-	pgm_state *state = screen->machine().driver_data<pgm_state>();
+	pgm_state *state = screen.machine().driver_data<pgm_state>();
 	int y;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 	bitmap_fill(state->m_tmppgmbitmap, cliprect, 0x00000000);
 
-	draw_sprites(screen->machine(), state->m_tmppgmbitmap, state->m_spritebufferram);
+	draw_sprites(screen.machine(), state->m_tmppgmbitmap, state->m_spritebufferram);
 
 	tilemap_set_scrolly(state->m_bg_tilemap,0, state->m_videoregs[0x2000/2]);
 
@@ -420,7 +420,7 @@ SCREEN_UPDATE( pgm )
 
 SCREEN_EOF( pgm )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_state *state = screen.machine().driver_data<pgm_state>();
 
 	/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
 	memcpy(state->m_spritebufferram, pgm_mainram, 0xa00);

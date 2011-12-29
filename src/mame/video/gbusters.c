@@ -49,7 +49,7 @@ VIDEO_START( gbusters )
 
 SCREEN_UPDATE( gbusters )
 {
-	gbusters_state *state = screen->machine().driver_data<gbusters_state>();
+	gbusters_state *state = screen.machine().driver_data<gbusters_state>();
 
 	k052109_tilemap_update(state->m_k052109);
 

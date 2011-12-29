@@ -201,9 +201,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( groundfx )
 {
-	groundfx_state *state = screen->machine().driver_data<groundfx_state>();
-	device_t *tc0100scn = screen->machine().device("tc0100scn");
-	device_t *tc0480scp = screen->machine().device("tc0480scp");
+	groundfx_state *state = screen.machine().driver_data<groundfx_state>();
+	device_t *tc0100scn = screen.machine().device("tc0100scn");
+	device_t *tc0480scp = screen.machine().device("tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
@@ -223,7 +223,7 @@ SCREEN_UPDATE( groundfx )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
 
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
@@ -256,7 +256,7 @@ SCREEN_UPDATE( groundfx )
 
 		if (tc0480scp_long_r(tc0480scp, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
 			tc0480scp_tilemap_draw(tc0480scp, bitmap, &state->m_hack_cliprect, layer[0], 0, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect, 1, 44, -574);
+		draw_sprites(screen.machine(), bitmap, cliprect, 1, 44, -574);
 	}
 	else
 	{
@@ -267,7 +267,7 @@ SCREEN_UPDATE( groundfx )
 
 		tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
 
-		draw_sprites(screen->machine(), bitmap, cliprect, 0, 44, -574);
+		draw_sprites(screen.machine(), bitmap, cliprect, 0, 44, -574);
 	}
 
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);	/* TC0480SCP text layer */

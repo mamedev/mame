@@ -181,13 +181,13 @@ static VIDEO_START( rdx_v33 )
 
 static SCREEN_UPDATE( rdx_v33 )
 {
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, md_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine(),bitmap,cliprect,0);
+	draw_sprites(screen.machine(),bitmap,cliprect,0);
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 
@@ -196,19 +196,19 @@ static SCREEN_UPDATE( rdx_v33 )
 	{
 		static UINT32 src_addr = 0x100000;
 		static int frame;
-		address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		//if(screen->machine().input().code_pressed_once(KEYCODE_A))
+		//if(screen.machine().input().code_pressed_once(KEYCODE_A))
 		//  src_addr+=0x800;
 
-		//if(screen->machine().input().code_pressed_once(KEYCODE_S))
+		//if(screen.machine().input().code_pressed_once(KEYCODE_S))
 		//  src_addr-=0x800;
 
 		frame++;
 
 		popmessage("%08x 0",src_addr);
 
-		//if(screen->machine().input().code_pressed_once(KEYCODE_Z))
+		//if(screen.machine().input().code_pressed_once(KEYCODE_Z))
 		if(frame == 5)
 		{
 			int i,data;

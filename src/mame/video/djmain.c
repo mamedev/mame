@@ -145,8 +145,8 @@ VIDEO_START( djmain )
 
 SCREEN_UPDATE( djmain )
 {
-	device_t *k056832 = screen->machine().device("k056832");
-	device_t *k055555 = screen->machine().device("k055555");
+	device_t *k056832 = screen.machine().device("k056832");
+	device_t *k055555 = screen.machine().device("k055555");
 	int enables = k055555_read_register(k055555, K55_INPUT_ENABLES);
 	int pri[NUM_LAYERS + 1];
 	int order[NUM_LAYERS + 1];
@@ -169,7 +169,7 @@ SCREEN_UPDATE( djmain )
 				order[j] = temp;
 			}
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 	{
@@ -178,7 +178,7 @@ SCREEN_UPDATE( djmain )
 		if (layer == NUM_LAYERS)
 		{
 			if (enables & K55_INP_SUB2)
-				draw_sprites(screen->machine(), bitmap, cliprect);
+				draw_sprites(screen.machine(), bitmap, cliprect);
 		}
 		else
 		{

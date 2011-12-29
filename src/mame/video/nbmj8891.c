@@ -533,23 +533,23 @@ VIDEO_START( nbmj8891_2layer )
 ******************************************************************************/
 SCREEN_UPDATE( nbmj8891 )
 {
-	nbmj8891_state *state = screen->machine().driver_data<nbmj8891_state>();
+	nbmj8891_state *state = screen.machine().driver_data<nbmj8891_state>();
 	int x, y;
 
 	if (state->m_screen_refresh)
 	{
-		int width = screen->width();
-		int height = screen->height();
+		int width = screen.width();
+		int height = screen.height();
 
 		state->m_screen_refresh = 0;
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				update_pixel0(screen->machine(), x, y);
+				update_pixel0(screen.machine(), x, y);
 
 		if (state->m_gfxdraw_mode)
 			for (y = 0; y < height; y++)
 				for (x = 0; x < width; x++)
-					update_pixel1(screen->machine(), x, y);
+					update_pixel1(screen.machine(), x, y);
 	}
 
 	if (state->m_dispflag)

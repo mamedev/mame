@@ -70,7 +70,7 @@ static VIDEO_START( gunpey )
 
 static SCREEN_UPDATE( gunpey )
 {
-	gunpey_state *state = screen->machine().driver_data<gunpey_state>();
+	gunpey_state *state = screen.machine().driver_data<gunpey_state>();
 	UINT16 *blit_buffer = state->m_blit_buffer;
 	int x,y;
 	int count;
@@ -89,7 +89,7 @@ static SCREEN_UPDATE( gunpey )
 			g = (color & 0x03e0) >> 2;
 			r = (color & 0x7c00) >> 7;
 
-			if(x<screen->visible_area().max_x && y<screen->visible_area().max_y)
+			if(x<screen.visible_area().max_x && y<screen.visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x) = b | (g<<8) | (r<<16);
 
 

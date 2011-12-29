@@ -774,7 +774,7 @@ SCREEN_UPDATE( atari )
 
 	SCREEN_UPDATE_CALL(generic_bitmapped);
 
-	new_tv_artifacts = input_port_read_safe(screen->machine(), "artifacts", 0);
+	new_tv_artifacts = input_port_read_safe(screen.machine(), "artifacts", 0);
 	if( tv_artifacts != new_tv_artifacts )
 	{
 		tv_artifacts = new_tv_artifacts;

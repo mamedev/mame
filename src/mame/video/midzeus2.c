@@ -364,14 +364,14 @@ SCREEN_UPDATE( midzeus2 )
 
 	poly_wait(poly, "VIDEO_UPDATE");
 
-if (screen->machine().input().code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", zbase); }
-if (screen->machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", zbase); }
+if (screen.machine().input().code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", zbase); }
+if (screen.machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", zbase); }
 
 	/* normal update case */
-	if (!screen->machine().input().code_pressed(KEYCODE_W))
+	if (!screen.machine().input().code_pressed(KEYCODE_W))
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0x38]);
-		int xoffs = screen->visible_area().min_x;
+		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
 			UINT32 *dest = (UINT32 *)bitmap->base + y * bitmap->rowpixels;
@@ -385,10 +385,10 @@ if (screen->machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popme
 	{
 		const UINT64 *base;
 
-		if (screen->machine().input().code_pressed(KEYCODE_DOWN)) yoffs += screen->machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (screen->machine().input().code_pressed(KEYCODE_UP)) yoffs -= screen->machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (screen->machine().input().code_pressed(KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (screen->machine().input().code_pressed(KEYCODE_LEFT)) ; }
-		if (screen->machine().input().code_pressed(KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (screen->machine().input().code_pressed(KEYCODE_RIGHT)) ; }
+		if (screen.machine().input().code_pressed(KEYCODE_DOWN)) yoffs += screen.machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (screen.machine().input().code_pressed(KEYCODE_UP)) yoffs -= screen.machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (screen.machine().input().code_pressed(KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (screen.machine().input().code_pressed(KEYCODE_LEFT)) ; }
+		if (screen.machine().input().code_pressed(KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (screen.machine().input().code_pressed(KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
 		base = (const UINT64 *)waveram0_ptr_from_expanded_addr(yoffs << 16);

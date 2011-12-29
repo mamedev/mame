@@ -366,10 +366,10 @@ SCREEN_UPDATE( grchamp )
 		MAKE_RGB(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
-	grchamp_state *state = screen->machine().driver_data<grchamp_state>();
-	const UINT8 *amedata = screen->machine().region("gfx5")->base();
-	const UINT8 *headdata = screen->machine().region("gfx6")->base();
-	const UINT8 *pldata = screen->machine().region("gfx7")->base();
+	grchamp_state *state = screen.machine().driver_data<grchamp_state>();
+	const UINT8 *amedata = screen.machine().region("gfx5")->base();
+	const UINT8 *headdata = screen.machine().region("gfx6")->base();
+	const UINT8 *pldata = screen.machine().region("gfx7")->base();
 	bitmap_t *lpixmap = tilemap_get_pixmap(state->m_left_tilemap);
 	bitmap_t *rpixmap = tilemap_get_pixmap(state->m_right_tilemap);
 	bitmap_t *cpixmap = tilemap_get_pixmap(state->m_center_tilemap);
@@ -409,7 +409,7 @@ SCREEN_UPDATE( grchamp )
 		UINT8 objdata[256];
 
 		/* draw the objects for this scanline */
-		draw_objects(screen->machine(), state, y, objdata);
+		draw_objects(screen.machine(), state, y, objdata);
 
 		/* iterate over columns */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)

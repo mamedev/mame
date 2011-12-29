@@ -375,32 +375,32 @@ static void draw_fg(running_machine &machine, bitmap_t *bitmap, const rectangle 
 
 SCREEN_UPDATE( pacland )
 {
-	pacland_state *state = screen->machine().driver_data<pacland_state>();
+	pacland_state *state = screen.machine().driver_data<pacland_state>();
 	int row;
 
 	for (row = 5; row < 29; row++)
-		tilemap_set_scrollx(state->m_fg_tilemap, row, flip_screen_get(screen->machine()) ? state->m_scroll0-7 : state->m_scroll0);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(screen->machine()) ? state->m_scroll1-4 : state->m_scroll1-3);
+		tilemap_set_scrollx(state->m_fg_tilemap, row, flip_screen_get(screen.machine()) ? state->m_scroll0-7 : state->m_scroll0);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? state->m_scroll1-4 : state->m_scroll1-3);
 
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
        wherever there is a high-priority pixel; note that we draw to the bitmap
        which is safe because the bg_tilemap draw will overwrite everything */
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0x00);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0x00);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	/* draw background */
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* draw low priority fg tiles */
-	draw_fg(screen->machine(), bitmap, cliprect, 0);
+	draw_fg(screen.machine(), bitmap, cliprect, 0);
 
 	/* draw sprites with regular transparency */
-	draw_sprites(screen->machine(), bitmap, cliprect, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	/* draw high priority fg tiles */
-	draw_fg(screen->machine(), bitmap, cliprect, 1);
+	draw_fg(screen.machine(), bitmap, cliprect, 1);
 
 	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
-	draw_sprites(screen->machine(), bitmap, cliprect, 2);
+	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 	return 0;
 }

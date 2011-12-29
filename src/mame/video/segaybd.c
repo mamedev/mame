@@ -41,13 +41,13 @@ VIDEO_START( yboard )
 
 SCREEN_UPDATE( yboard )
 {
-	segas1x_state *state = screen->machine().driver_data<segas1x_state>();
+	segas1x_state *state = screen.machine().driver_data<segas1x_state>();
 	rectangle yboard_clip;
 
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -57,7 +57,7 @@ SCREEN_UPDATE( yboard )
 	segaic16_sprites_draw(screen, state->m_tmp_bitmap, &yboard_clip, 1);
 
 	/* apply rotation */
-	segaic16_rotate_draw(screen->machine(), 0, bitmap, cliprect, state->m_tmp_bitmap);
+	segaic16_rotate_draw(screen.machine(), 0, bitmap, cliprect, state->m_tmp_bitmap);
 
 	/* draw the 16B sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);

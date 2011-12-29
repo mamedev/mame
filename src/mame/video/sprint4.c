@@ -59,7 +59,7 @@ VIDEO_START( sprint4 )
 
 SCREEN_UPDATE( sprint4 )
 {
-	sprint4_state *state = screen->machine().driver_data<sprint4_state>();
+	sprint4_state *state = screen.machine().driver_data<sprint4_state>();
 	UINT8 *videoram = state->m_videoram;
 	int i;
 
@@ -77,7 +77,7 @@ SCREEN_UPDATE( sprint4 )
 		if (i & 1)
 			bank = 32;
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			(code >> 3) | bank,
 			(attr & 0x80) ? 4 : i,
 			0, 0,
@@ -90,13 +90,13 @@ SCREEN_UPDATE( sprint4 )
 
 SCREEN_EOF( sprint4 )
 {
-	sprint4_state *state = machine.driver_data<sprint4_state>();
+	sprint4_state *state = screen.machine().driver_data<sprint4_state>();
 	UINT8 *videoram = state->m_videoram;
 	int i;
 
 	/* check for sprite-playfield collisions */
 
-	device_t *discrete = machine.device("discrete");
+	device_t *discrete = screen.machine().device("discrete");
 
 	for (i = 0; i < 4; i++)
 	{
@@ -113,17 +113,17 @@ SCREEN_EOF( sprint4 )
 
 		rect.min_x = horz - 15;
 		rect.min_y = vert - 15;
-		rect.max_x = horz - 15 + machine.gfx[1]->width - 1;
-		rect.max_y = vert - 15 + machine.gfx[1]->height - 1;
+		rect.max_x = horz - 15 + screen.machine().gfx[1]->width - 1;
+		rect.max_y = vert - 15 + screen.machine().gfx[1]->height - 1;
 
-		sect_rect(&rect, &machine.primary_screen->visible_area());
+		sect_rect(&rect, &screen.machine().primary_screen->visible_area());
 
 		tilemap_draw(state->m_helper, &rect, state->m_playfield, 0, 0);
 
 		if (i & 1)
 			bank = 32;
 
-		drawgfx_transpen(state->m_helper, &rect, machine.gfx[1],
+		drawgfx_transpen(state->m_helper, &rect, screen.machine().gfx[1],
 			(code >> 3) | bank,
 			4,
 			0, 0,
@@ -132,7 +132,7 @@ SCREEN_EOF( sprint4 )
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 			for (x = rect.min_x; x <= rect.max_x; x++)
-				if (colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(state->m_helper, y, x)) != 0)
+				if (colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(state->m_helper, y, x)) != 0)
 					state->m_collision[i] = 1;
 	}
 

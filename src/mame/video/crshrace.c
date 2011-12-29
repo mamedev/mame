@@ -187,11 +187,11 @@ static void draw_fg(running_machine &machine, bitmap_t *bitmap, const rectangle 
 
 SCREEN_UPDATE( crshrace )
 {
-	crshrace_state *state = screen->machine().driver_data<crshrace_state>();
+	crshrace_state *state = screen.machine().driver_data<crshrace_state>();
 
 	if (state->m_gfxctrl & 0x04)	/* display disable? */
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -200,15 +200,15 @@ SCREEN_UPDATE( crshrace )
 	switch (state->m_gfxctrl & 0xfb)
 	{
 		case 0x00:	/* high score screen */
-			draw_sprites(screen->machine(), bitmap, cliprect);
-			draw_bg(screen->machine(), bitmap, cliprect);
-			draw_fg(screen->machine(), bitmap, cliprect);
+			draw_sprites(screen.machine(), bitmap, cliprect);
+			draw_bg(screen.machine(), bitmap, cliprect);
+			draw_fg(screen.machine(), bitmap, cliprect);
 			break;
 		case 0x01:
 		case 0x02:
-			draw_bg(screen->machine(), bitmap, cliprect);
-			draw_fg(screen->machine(), bitmap, cliprect);
-			draw_sprites(screen->machine(), bitmap, cliprect);
+			draw_bg(screen.machine(), bitmap, cliprect);
+			draw_fg(screen.machine(), bitmap, cliprect);
+			draw_sprites(screen.machine(), bitmap, cliprect);
 			break;
 		default:
 			popmessage("gfxctrl = %02x", state->m_gfxctrl);
@@ -219,7 +219,7 @@ SCREEN_UPDATE( crshrace )
 
 SCREEN_EOF( crshrace )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 	buffer_spriteram16_2_w(space, 0, 0, 0xffff);

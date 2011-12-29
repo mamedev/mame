@@ -52,13 +52,13 @@ static VIDEO_START( cball )
 
 static SCREEN_UPDATE( cball )
 {
-	cball_state *state = screen->machine().driver_data<cball_state>();
+	cball_state *state = screen.machine().driver_data<cball_state>();
 
 	/* draw playfield */
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* draw sprite */
-	drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 		state->m_video_ram[0x399] >> 4,
 		0,
 		0, 0,

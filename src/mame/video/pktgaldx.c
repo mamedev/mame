@@ -7,17 +7,17 @@
 
 SCREEN_UPDATE( pktgaldx )
 {
-	pktgaldx_state *state = screen->machine().driver_data<pktgaldx_state>();
+	pktgaldx_state *state = screen.machine().driver_data<pktgaldx_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen->machine(), BIT(flip, 7));
+	flip_screen_set(screen.machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 0); /* not Confirmed */
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, 0x400, true);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0x400, true);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -26,13 +26,13 @@ SCREEN_UPDATE( pktgaldx )
 
 SCREEN_UPDATE( pktgaldb )
 {
-	pktgaldx_state *state = screen->machine().driver_data<pktgaldx_state>();
+	pktgaldx_state *state = screen.machine().driver_data<pktgaldx_state>();
 	int x, y;
 	int offset = 0;
 	int tileno;
 	int colour;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	/* the bootleg seems to treat the tilemaps as sprites */
 	for (offset = 0; offset < 0x1600 / 2; offset += 8)
@@ -46,7 +46,7 @@ SCREEN_UPDATE( pktgaldb )
 		y &= 0x1ff;
 		y -= 8;
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], tileno ^ 0x1000, colour, 0, 0, x, y, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], tileno ^ 0x1000, colour, 0, 0, x, y, 0);
 	}
 
 	for (offset = 0x1600/2; offset < 0x2000 / 2; offset += 8)
@@ -60,7 +60,7 @@ SCREEN_UPDATE( pktgaldb )
 		y &= 0x1ff;
 		y -= 8;
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], tileno ^ 0x4000, colour, 0, 0, x, y, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], tileno ^ 0x4000, colour, 0, 0, x, y, 0);
 	}
 
 	for (offset = 0x2000/2; offset < 0x4000 / 2; offset += 8)
@@ -74,7 +74,7 @@ SCREEN_UPDATE( pktgaldb )
 		y &= 0x1ff;
 		y -= 8;
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], tileno ^ 0x3000, colour, 0, 0, x, y, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], tileno ^ 0x3000, colour, 0, 0, x, y, 0);
 	}
 
 	return 0;

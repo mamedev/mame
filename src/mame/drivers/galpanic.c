@@ -127,7 +127,7 @@ The current set of Super Model is an example of type C
 
 static SCREEN_EOF( galpanic )
 {
-	device_t *pandora = machine.device("pandora");
+	device_t *pandora = screen.machine().device("pandora");
 	pandora_eof(pandora);
 }
 

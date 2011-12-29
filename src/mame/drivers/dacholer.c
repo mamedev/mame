@@ -138,9 +138,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE(dacholer)
 {
-	dacholer_state *state = screen->machine().driver_data<dacholer_state>();
+	dacholer_state *state = screen.machine().driver_data<dacholer_state>();
 
-	if (flip_screen_get(screen->machine()))
+	if (flip_screen_get(screen.machine()))
 	{
 		tilemap_set_scrollx(state->m_bg_tilemap, 0, 256 - state->m_scroll_x);
 		tilemap_set_scrolly(state->m_bg_tilemap, 0, 256 - state->m_scroll_y);
@@ -152,7 +152,7 @@ static SCREEN_UPDATE(dacholer)
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

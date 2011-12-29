@@ -329,7 +329,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( clshroad )
 {
-	clshroad_state *state = screen->machine().driver_data<clshroad_state>();
+	clshroad_state *state = screen.machine().driver_data<clshroad_state>();
 	int scrollx  = state->m_vregs[ 0 ] + (state->m_vregs[ 1 ] << 8);
 //  int priority = state->m_vregs[ 2 ];
 
@@ -339,7 +339,7 @@ SCREEN_UPDATE( clshroad )
 
 	tilemap_draw(bitmap,cliprect,state->m_tilemap_0a,0,0);	// Opaque
 	tilemap_draw(bitmap,cliprect,state->m_tilemap_0b,0,0);
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_tilemap_1,0,0);
 	return 0;
 }

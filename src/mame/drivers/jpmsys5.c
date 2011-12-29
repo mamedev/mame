@@ -199,7 +199,7 @@ static SCREEN_UPDATE( jpmsys5v )
 
 	if (state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -213,8 +213,8 @@ static SCREEN_UPDATE( jpmsys5v )
 			UINT8 pen = src[(x-cliprect->min_x)>>1];
 
 			/* Draw two 4-bit pixels */
-			*dest++ = screen->machine().pens[(pen >> 4) & 0xf];
-			*dest++ = screen->machine().pens[pen & 0xf];
+			*dest++ = screen.machine().pens[(pen >> 4) & 0xf];
+			*dest++ = screen.machine().pens[pen & 0xf];
 		}
 	}
 

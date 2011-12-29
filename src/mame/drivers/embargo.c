@@ -33,7 +33,7 @@ public:
 
 static SCREEN_UPDATE( embargo )
 {
-	embargo_state *state = screen->machine().driver_data<embargo_state>();
+	embargo_state *state = screen.machine().driver_data<embargo_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->m_videoram_size; offs++)

@@ -407,7 +407,7 @@ SCREEN_UPDATE( mcr )
 	tilemap_set_flip(bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 	/* draw the background */
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0x00);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0x10);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 2, 0x20);
@@ -417,18 +417,18 @@ SCREEN_UPDATE( mcr )
 	switch (mcr_sprite_board)
 	{
 		case 91399:
-			render_sprites_91399(screen->machine(), bitmap, cliprect);
+			render_sprites_91399(screen.machine(), bitmap, cliprect);
 			break;
 
 		case 91464:
 			if (mcr_cpu_board == 91442)
-				render_sprites_91464(screen->machine(), bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(screen.machine(), bitmap, cliprect, 0x00, 0x30, 0x00);
 			else if (mcr_cpu_board == 91475)
-				render_sprites_91464(screen->machine(), bitmap, cliprect, 0x00, 0x30, 0x40);
+				render_sprites_91464(screen.machine(), bitmap, cliprect, 0x00, 0x30, 0x40);
 			else if (mcr_cpu_board == 91490)
-				render_sprites_91464(screen->machine(), bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(screen.machine(), bitmap, cliprect, 0x00, 0x30, 0x00);
 			else if (mcr_cpu_board == 91721)
-				render_sprites_91464(screen->machine(), bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(screen.machine(), bitmap, cliprect, 0x00, 0x30, 0x00);
 			break;
 	}
 	return 0;

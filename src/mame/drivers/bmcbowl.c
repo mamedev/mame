@@ -133,14 +133,14 @@ static VIDEO_START( bmcbowl )
 
 static SCREEN_UPDATE( bmcbowl )
 {
-	bmcbowl_state *state = screen->machine().driver_data<bmcbowl_state>();
+	bmcbowl_state *state = screen.machine().driver_data<bmcbowl_state>();
 /*
       280x230,4 bitmap layers, 8bpp,
         missing scroll and priorities   (maybe fixed ones)
 */
 
 	int x,y,z,pixdat;
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	z=0;
 	for (y=0;y<230;y++)

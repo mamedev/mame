@@ -173,24 +173,24 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( shootout )
 {
-	shootout_state *state = screen->machine().driver_data<shootout_state>();
+	shootout_state *state = screen.machine().driver_data<shootout_state>();
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_background,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_foreground,0,1);
-	draw_sprites(screen->machine(), bitmap,cliprect,3/*bank bits */);
+	draw_sprites(screen.machine(), bitmap,cliprect,3/*bank bits */);
 	return 0;
 }
 
 SCREEN_UPDATE( shootouj )
 {
-	shootout_state *state = screen->machine().driver_data<shootout_state>();
+	shootout_state *state = screen.machine().driver_data<shootout_state>();
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_background,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_foreground,0,1);
-	draw_sprites(screen->machine(), bitmap,cliprect,2/*bank bits*/);
+	draw_sprites(screen.machine(), bitmap,cliprect,2/*bank bits*/);
 	return 0;
 }

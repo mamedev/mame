@@ -55,9 +55,9 @@ static void draw_sprites( running_machine &machine,  bitmap_t *bitmap, const rec
 
 SCREEN_UPDATE( bsktball )
 {
-	bsktball_state *state = screen->machine().driver_data<bsktball_state>();
+	bsktball_state *state = screen.machine().driver_data<bsktball_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

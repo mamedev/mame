@@ -174,11 +174,11 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( lkage )
 {
-	lkage_state *state = screen->machine().driver_data<lkage_state>();
+	lkage_state *state = screen.machine().driver_data<lkage_state>();
 	int bank;
 
-	flip_screen_x_set(screen->machine(), ~state->m_vreg[2] & 0x01);
-	flip_screen_y_set(screen->machine(), ~state->m_vreg[2] & 0x02);
+	flip_screen_x_set(screen.machine(), ~state->m_vreg[2] & 0x01);
+	flip_screen_y_set(screen.machine(), ~state->m_vreg[2] & 0x02);
 
 	bank = state->m_vreg[1] & 0x08;
 
@@ -215,13 +215,13 @@ SCREEN_UPDATE( lkage )
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll[4]);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll[5]);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	if ((state->m_vreg[2] & 0xf0) == 0xf0)
 	{
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, (state->m_vreg[1] & 2) ? 2 : 4);
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	else
 	{

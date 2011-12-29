@@ -156,11 +156,11 @@ static void sauro_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 
 SCREEN_UPDATE( sauro )
 {
-	sauro_state *state = screen->machine().driver_data<sauro_state>();
+	sauro_state *state = screen.machine().driver_data<sauro_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	sauro_draw_sprites(screen->machine(), bitmap, cliprect);
+	sauro_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -232,8 +232,8 @@ static void trckydoc_draw_sprites(running_machine &machine, bitmap_t *bitmap, co
 
 SCREEN_UPDATE( trckydoc )
 {
-	sauro_state *state = screen->machine().driver_data<sauro_state>();
+	sauro_state *state = screen.machine().driver_data<sauro_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	trckydoc_draw_sprites(screen->machine(), bitmap, cliprect);
+	trckydoc_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

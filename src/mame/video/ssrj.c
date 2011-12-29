@@ -282,12 +282,12 @@ PALETTE_INIT( ssrj )
 
 SCREEN_UPDATE( ssrj )
 {
-	ssrj_state *state = screen->machine().driver_data<ssrj_state>();
+	ssrj_state *state = screen.machine().driver_data<ssrj_state>();
 
 	tilemap_set_scrollx(state->m_tilemap1, 0, 0xff-state->m_scrollram[2] );
 	tilemap_set_scrolly(state->m_tilemap1, 0, state->m_scrollram[0] );
 	tilemap_draw(bitmap, cliprect, state->m_tilemap1, 0, 0);
-	draw_objects(screen->machine(), bitmap, cliprect);
+	draw_objects(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap2, 0, 0);
 
 	if (state->m_scrollram[0x101] == 0xb) tilemap_draw(bitmap, cliprect, state->m_tilemap4, 0, 0);/* hack to display 4th tilemap */
@@ -296,7 +296,7 @@ SCREEN_UPDATE( ssrj )
 
 SCREEN_EOF( ssrj )
 {
-	ssrj_state *state = screen->machine().driver_data<ssrj_state>();
+	ssrj_state *state = screen.machine().driver_data<ssrj_state>();
 
 	memcpy(state->m_buffer_spriteram, state->m_scrollram, 0x800);
 }

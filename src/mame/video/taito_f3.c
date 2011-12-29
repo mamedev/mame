@@ -517,20 +517,20 @@ static TILE_GET_INFO( get_tile_info_pixel )
 
 SCREEN_EOF( f3 )
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
+	taito_f3_state *state = screen.machine().driver_data<taito_f3_state>();
 	if (state->m_sprite_lag==2)
 	{
-		if (machine.video().skip_this_frame() == 0)
+		if (screen.machine().video().skip_this_frame() == 0)
 		{
-			get_sprite_info(machine, state->m_spriteram16_buffered);
+			get_sprite_info(screen.machine(), state->m_spriteram16_buffered);
 		}
 		memcpy(state->m_spriteram16_buffered,state->m_spriteram,0x10000);
 	}
 	else if (state->m_sprite_lag==1)
 	{
-		if (machine.video().skip_this_frame() == 0)
+		if (screen.machine().video().skip_this_frame() == 0)
 		{
-			get_sprite_info(machine, state->m_spriteram);
+			get_sprite_info(screen.machine(), state->m_spriteram);
 		}
 	}
 }
@@ -3208,11 +3208,11 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( f3 )
 {
-	taito_f3_state *state = screen->machine().driver_data<taito_f3_state>();
+	taito_f3_state *state = screen.machine().driver_data<taito_f3_state>();
 	UINT32 sy_fix[5],sx_fix[5];
 
 	state->m_f3_skip_this_frame=0;
-	tilemap_set_flip_all(screen->machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */
 	sy_fix[0]=((state->m_f3_control_0[4]&0xffff)<< 9) + (1<<16);
@@ -3249,25 +3249,25 @@ SCREEN_UPDATE( f3 )
 
 	/* sprites */
 	if (state->m_sprite_lag==0)
-		get_sprite_info(screen->machine(), state->m_spriteram);
+		get_sprite_info(screen.machine(), state->m_spriteram);
 
 	/* Update sprite buffer */
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 
 	/* Parse sprite, alpha & clipping parts of lineram */
 	get_spritealphaclip_info(state);
 
 	/* Parse playfield effects */
-	get_line_ram_info(screen->machine(), state->m_pf1_tilemap,sx_fix[0],sy_fix[0],0,state->m_f3_pf_data_1);
-	get_line_ram_info(screen->machine(), state->m_pf2_tilemap,sx_fix[1],sy_fix[1],1,state->m_f3_pf_data_2);
-	get_line_ram_info(screen->machine(), state->m_pf3_tilemap,sx_fix[2],sy_fix[2],2,state->m_f3_pf_data_3);
-	get_line_ram_info(screen->machine(), state->m_pf4_tilemap,sx_fix[3],sy_fix[3],3,state->m_f3_pf_data_4);
-	get_vram_info(screen->machine(), state->m_vram_layer,state->m_pixel_layer,sx_fix[4],sy_fix[4]);
+	get_line_ram_info(screen.machine(), state->m_pf1_tilemap,sx_fix[0],sy_fix[0],0,state->m_f3_pf_data_1);
+	get_line_ram_info(screen.machine(), state->m_pf2_tilemap,sx_fix[1],sy_fix[1],1,state->m_f3_pf_data_2);
+	get_line_ram_info(screen.machine(), state->m_pf3_tilemap,sx_fix[2],sy_fix[2],2,state->m_f3_pf_data_3);
+	get_line_ram_info(screen.machine(), state->m_pf4_tilemap,sx_fix[3],sy_fix[3],3,state->m_f3_pf_data_4);
+	get_vram_info(screen.machine(), state->m_vram_layer,state->m_pixel_layer,sx_fix[4],sy_fix[4]);
 
 	/* Draw final framebuffer */
-	scanline_draw(screen->machine(), bitmap,cliprect);
+	scanline_draw(screen.machine(), bitmap,cliprect);
 
 	if (VERBOSE)
-		print_debug_info(screen->machine(), bitmap);
+		print_debug_info(screen.machine(), bitmap);
 	return 0;
 }

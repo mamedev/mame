@@ -242,8 +242,8 @@ static VIDEO_START( coinmvga )
 
 static SCREEN_UPDATE( coinmvga )
 {
-	coinmvga_state *state = screen->machine().driver_data<coinmvga_state>();
-	const gfx_element *gfx = screen->machine().gfx[0];
+	coinmvga_state *state = screen.machine().driver_data<coinmvga_state>();
+	const gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x04000/2;
 
 	int y,x;

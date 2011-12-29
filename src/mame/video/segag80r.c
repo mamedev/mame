@@ -811,7 +811,7 @@ static void draw_background_full_scroll(running_machine &machine, bitmap_t *bitm
 
 SCREEN_UPDATE( segag80r )
 {
-	segag80r_state *state = screen->machine().driver_data<segag80r_state>();
+	segag80r_state *state = screen.machine().driver_data<segag80r_state>();
 	UINT8 transparent_pens[16];
 
 	switch (state->m_background_pcb)
@@ -820,7 +820,7 @@ SCREEN_UPDATE( segag80r )
 		/* background: none */
 		case G80_BACKGROUND_NONE:
 			memset(transparent_pens, 0, 16);
-			draw_videoram(screen->machine(), bitmap, cliprect, transparent_pens);
+			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except where black */
@@ -828,32 +828,32 @@ SCREEN_UPDATE( segag80r )
 		/* we draw the foreground first, then the background to do collision detection */
 		case G80_BACKGROUND_SPACEOD:
 			memset(transparent_pens, 0, 16);
-			draw_videoram(screen->machine(), bitmap, cliprect, transparent_pens);
-			draw_background_spaceod(screen->machine(), bitmap, cliprect);
+			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
+			draw_background_spaceod(screen.machine(), bitmap, cliprect);
 			break;
 
 		/* foreground: visible except for pen 0 (this disagrees with schematics) */
 		/* background: page-granular scrolling */
 		case G80_BACKGROUND_MONSTERB:
 			memset(transparent_pens, 1, 16);
-			draw_background_page_scroll(screen->machine(), bitmap, cliprect);
-			draw_videoram(screen->machine(), bitmap, cliprect, transparent_pens);
+			draw_background_page_scroll(screen.machine(), bitmap, cliprect);
+			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except for pen 0 */
 		/* background: full scrolling */
 		case G80_BACKGROUND_PIGNEWT:
 			memset(transparent_pens, 1, 16);
-			draw_background_full_scroll(screen->machine(), bitmap, cliprect);
-			draw_videoram(screen->machine(), bitmap, cliprect, transparent_pens);
+			draw_background_full_scroll(screen.machine(), bitmap, cliprect);
+			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except for pen 0 */
 		/* background: page-granular scrolling */
 		case G80_BACKGROUND_SINDBADM:
 			memset(transparent_pens, 1, 16);
-			draw_background_page_scroll(screen->machine(), bitmap, cliprect);
-			draw_videoram(screen->machine(), bitmap, cliprect, transparent_pens);
+			draw_background_page_scroll(screen.machine(), bitmap, cliprect);
+			draw_videoram(screen.machine(), bitmap, cliprect, transparent_pens);
 			break;
 	}
 	return 0;

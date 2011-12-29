@@ -330,10 +330,10 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( pang )
 {
-	mitchell_state *state = screen->machine().driver_data<mitchell_state>();
+	mitchell_state *state = screen.machine().driver_data<mitchell_state>();
 
 	bitmap_fill(bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

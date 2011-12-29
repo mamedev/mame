@@ -166,13 +166,13 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( tehkanwc )
 {
-	tehkanwc_state *state = screen->machine().driver_data<tehkanwc_state>();
+	tehkanwc_state *state = screen.machine().driver_data<tehkanwc_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_x[0] + 256 * state->m_scroll_x[1]);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);
-	gridiron_draw_led(screen->machine(), bitmap, cliprect, state->m_led0, 0);
-	gridiron_draw_led(screen->machine(), bitmap, cliprect, state->m_led1, 1);
+	gridiron_draw_led(screen.machine(), bitmap, cliprect, state->m_led0, 0);
+	gridiron_draw_led(screen.machine(), bitmap, cliprect, state->m_led1, 1);
 	return 0;
 }

@@ -38,7 +38,7 @@ VIDEO_START(sbugger)
 
 SCREEN_UPDATE(sbugger)
 {
-	sbugger_state *state = screen->machine().driver_data<sbugger_state>();
+	sbugger_state *state = screen.machine().driver_data<sbugger_state>();
 	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
 	return 0;
 }

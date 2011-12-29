@@ -81,7 +81,7 @@ VIDEO_START( quizpani )
 
 SCREEN_UPDATE( quizpani )
 {
-	quizpani_state *state = screen->machine().driver_data<quizpani_state>();
+	quizpani_state *state = screen.machine().driver_data<quizpani_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollreg[0] - 64);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrollreg[1] + 16);
 	tilemap_set_scrollx(state->m_txt_tilemap, 0, state->m_scrollreg[2] - 64);

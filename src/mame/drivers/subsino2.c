@@ -605,16 +605,16 @@ static VIDEO_START( xtrain )
 
 static SCREEN_UPDATE( subsino2 )
 {
-	subsino2_state *state = screen->machine().driver_data<subsino2_state>();
+	subsino2_state *state = screen.machine().driver_data<subsino2_state>();
 	int layers_ctrl = ~state->m_ss9601_disable;
 	int y;
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed(KEYCODE_Z))
+	if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int msk = 0;
-		if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-		if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+		if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
@@ -659,7 +659,7 @@ static SCREEN_UPDATE( subsino2 )
 		}
 	}
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	if (layers_ctrl & 1)
 	{

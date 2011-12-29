@@ -85,7 +85,7 @@ static VIDEO_START( yumefuda )
 
 static SCREEN_UPDATE( yumefuda )
 {
-	albazg_state *state = screen->machine().driver_data<albazg_state>();
+	albazg_state *state = screen.machine().driver_data<albazg_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

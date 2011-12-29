@@ -176,12 +176,12 @@ static VIDEO_START(jackie)
 
 static SCREEN_UPDATE(jackie)
 {
-	jackie_state *state = screen->machine().driver_data<jackie_state>();
+	jackie_state *state = screen.machine().driver_data<jackie_state>();
 	int i,j;
 	int startclipmin = 0;
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	for (i=0;i < 0x40;i++)
 	{

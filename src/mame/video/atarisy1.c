@@ -502,7 +502,7 @@ static void update_timers(running_machine &machine, int scanline)
 
 SCREEN_UPDATE( atarisy1 )
 {
-	atarisy1_state *state = screen->machine().driver_data<atarisy1_state>();
+	atarisy1_state *state = screen.machine().driver_data<atarisy1_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

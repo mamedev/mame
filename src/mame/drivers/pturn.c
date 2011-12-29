@@ -148,7 +148,7 @@ static VIDEO_START(pturn)
 
 static SCREEN_UPDATE(pturn)
 {
-	pturn_state *state = screen->machine().driver_data<pturn_state>();
+	pturn_state *state = screen.machine().driver_data<pturn_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 	int sx, sy;
@@ -165,13 +165,13 @@ static SCREEN_UPDATE(pturn)
 		flipy=spriteram[offs+1]&0x80;
 
 
-		if (flip_screen_x_get(screen->machine()))
+		if (flip_screen_x_get(screen.machine()))
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (flip_screen_y_get(screen->machine()))
+		if (flip_screen_y_get(screen.machine()))
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;
@@ -179,7 +179,7 @@ static SCREEN_UPDATE(pturn)
 
 		if(sx|sy)
 		{
-			drawgfx_transpen(bitmap, cliprect,screen->machine().gfx[2],
+			drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[2],
 			spriteram[offs+1] & 0x3f ,
 			(spriteram[offs+2] & 0x1f),
 			flipx, flipy,

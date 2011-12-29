@@ -1181,11 +1181,11 @@ static void end_of_frame(running_machine &machine, struct sms_vdp *chip)
 
 SCREEN_EOF(sms)
 {
-	end_of_frame(machine, md_sms_vdp);
+	end_of_frame(screen.machine(), md_sms_vdp);
 
 	// the SMS has a 'RESET' button on the machine, it generates an NMI
-	if (input_port_read_safe(machine,"PAUSE",0x00))
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read_safe(screen.machine(),"PAUSE",0x00))
+		cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 }
 
@@ -1250,19 +1250,19 @@ MACHINE_RESET(megatech_bios)
 
 SCREEN_EOF(systeme)
 {
-	end_of_frame(machine, vdp1);
-	end_of_frame(machine, vdp2);
+	end_of_frame(screen.machine(), vdp1);
+	end_of_frame(screen.machine(), vdp2);
 }
 
 
 SCREEN_EOF(megatech_md_sms)
 {
-	end_of_frame(machine, md_sms_vdp);
+	end_of_frame(screen.machine(), md_sms_vdp);
 }
 
 SCREEN_EOF(megatech_bios)
 {
-	end_of_frame(machine, vdp1);
+	end_of_frame(screen.machine(), vdp1);
 }
 
 SCREEN_UPDATE(megatech_md_sms)

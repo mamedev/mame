@@ -302,35 +302,35 @@ static VIDEO_START(coolridr)
 
 static SCREEN_UPDATE(coolridr)
 {
-	coolridr_state *state = screen->machine().driver_data<coolridr_state>();
+	coolridr_state *state = screen.machine().driver_data<coolridr_state>();
 	/* planes seems to basically be at 0x8000 and 0x28000... */
-	const gfx_element *gfx = screen->machine().gfx[2];
+	const gfx_element *gfx = screen.machine().gfx[2];
 	UINT32 count;
 	int y,x;
 
 
-	if(screen->machine().input().code_pressed(KEYCODE_Z))
+	if(screen.machine().input().code_pressed(KEYCODE_Z))
 		state->m_test_offs+=4;
 
-	if(screen->machine().input().code_pressed(KEYCODE_X))
+	if(screen.machine().input().code_pressed(KEYCODE_X))
 		state->m_test_offs-=4;
 
-	if(screen->machine().input().code_pressed(KEYCODE_C))
+	if(screen.machine().input().code_pressed(KEYCODE_C))
 		state->m_test_offs+=0x40;
 
-	if(screen->machine().input().code_pressed(KEYCODE_V))
+	if(screen.machine().input().code_pressed(KEYCODE_V))
 		state->m_test_offs-=0x40;
 
-	if(screen->machine().input().code_pressed(KEYCODE_B))
+	if(screen.machine().input().code_pressed(KEYCODE_B))
 		state->m_test_offs+=0x400;
 
-	if(screen->machine().input().code_pressed(KEYCODE_N))
+	if(screen.machine().input().code_pressed(KEYCODE_N))
 		state->m_test_offs-=0x400;
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_A))
+	if(screen.machine().input().code_pressed_once(KEYCODE_A))
 		state->m_color++;
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_S))
+	if(screen.machine().input().code_pressed_once(KEYCODE_S))
 		state->m_color--;
 
 	if(state->m_test_offs > 0x100000*4)

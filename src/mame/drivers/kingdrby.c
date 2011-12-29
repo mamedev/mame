@@ -212,8 +212,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 static SCREEN_UPDATE(kingdrby)
 {
-	kingdrby_state *state = screen->machine().driver_data<kingdrby_state>();
-	const rectangle &visarea = screen->visible_area();
+	kingdrby_state *state = screen.machine().driver_data<kingdrby_state>();
+	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
 	tilemap_set_scrollx( state->m_sc0_tilemap,0, state->m_vram[0x342]);
 	tilemap_set_scrolly( state->m_sc0_tilemap,0, state->m_vram[0x341]);
@@ -229,7 +229,7 @@ static SCREEN_UPDATE(kingdrby)
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
 	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_sc1_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
 	tilemap_draw(bitmap,&clip,state->m_sc0w_tilemap,0,0);
 

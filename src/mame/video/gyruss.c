@@ -152,16 +152,16 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( gyruss )
 {
-	gyruss_state *state = screen->machine().driver_data<gyruss_state>();
+	gyruss_state *state = screen.machine().driver_data<gyruss_state>();
 
-	if (cliprect->min_y == screen->visible_area().min_y)
+	if (cliprect->min_y == screen.visible_area().min_y)
 	{
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
-		tilemap_set_flip_all(screen->machine(), (*state->m_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
+		tilemap_set_flip_all(screen.machine(), (*state->m_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().gfx);
+	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().gfx);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 
 	return 0;

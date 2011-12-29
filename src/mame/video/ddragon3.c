@@ -164,7 +164,7 @@ static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( ddragon3 )
 {
-	ddragon3_state *state = screen->machine().driver_data<ddragon3_state>();
+	ddragon3_state *state = screen.machine().driver_data<ddragon3_state>();
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bg_scrollx);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_bg_scrolly);
@@ -175,18 +175,18 @@ SCREEN_UPDATE( ddragon3 )
 	{
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	else if ((state->m_vreg & 0x60) == 0x60)
 	{
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	else
 	{
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	}
 	return 0;
@@ -194,7 +194,7 @@ SCREEN_UPDATE( ddragon3 )
 
 SCREEN_UPDATE( ctribe )
 {
-	ddragon3_state *state = screen->machine().driver_data<ddragon3_state>();
+	ddragon3_state *state = screen.machine().driver_data<ddragon3_state>();
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bg_scrollx);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_bg_scrolly);
@@ -204,14 +204,14 @@ SCREEN_UPDATE( ctribe )
 	if(state->m_vreg & 8)
 	{
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	}
 	else
 	{
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	return 0;
 }

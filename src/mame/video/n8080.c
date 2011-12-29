@@ -141,14 +141,14 @@ VIDEO_START( helifire )
 
 SCREEN_UPDATE( spacefev )
 {
-	n8080_state *state = screen->machine().driver_data<n8080_state>();
-	UINT8 mask = flip_screen_get(screen->machine()) ? 0xff : 0x00;
+	n8080_state *state = screen.machine().driver_data<n8080_state>();
+	UINT8 mask = flip_screen_get(screen.machine()) ? 0xff : 0x00;
 
 	int x;
 	int y;
 
 	const UINT8* pRAM = state->m_videoram;
-	const UINT8* pPROM = screen->machine().region("proms")->base();
+	const UINT8* pPROM = screen.machine().region("proms")->base();
 
 	for (y = 0; y < 256; y++)
 	{
@@ -183,7 +183,7 @@ SCREEN_UPDATE( spacefev )
 						6, /* cyan    */
 					};
 
-					int cycle = screen->frame_number() / 32;
+					int cycle = screen.frame_number() / 32;
 
 					color = ufo_color[cycle % 6];
 				}
@@ -211,10 +211,10 @@ SCREEN_UPDATE( spacefev )
 
 SCREEN_UPDATE( sheriff )
 {
-	n8080_state *state = screen->machine().driver_data<n8080_state>();
-	UINT8 mask = flip_screen_get(screen->machine()) ? 0xff : 0x00;
+	n8080_state *state = screen.machine().driver_data<n8080_state>();
+	UINT8 mask = flip_screen_get(screen.machine()) ? 0xff : 0x00;
 
-	const UINT8* pPROM = screen->machine().region("proms")->base();
+	const UINT8* pPROM = screen.machine().region("proms")->base();
 
 	int x;
 	int y;
@@ -254,9 +254,9 @@ SCREEN_UPDATE( sheriff )
 
 SCREEN_UPDATE( helifire )
 {
-	n8080_state *state = screen->machine().driver_data<n8080_state>();
-	int SUN_BRIGHTNESS = input_port_read(screen->machine(), "POT0");
-	int SEA_BRIGHTNESS = input_port_read(screen->machine(), "POT1");
+	n8080_state *state = screen.machine().driver_data<n8080_state>();
+	int SUN_BRIGHTNESS = input_port_read(screen.machine(), "POT0");
+	int SEA_BRIGHTNESS = input_port_read(screen.machine(), "POT1");
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 
@@ -324,7 +324,7 @@ SCREEN_UPDATE( helifire )
 
 			for (n = 0; n < 8; n++)
 			{
-				if (flip_screen_get(screen->machine()))
+				if (flip_screen_get(screen.machine()))
 				{
 					if ((state->m_videoram[offset ^ 0x1fff] << n) & 0x80)
 					{
@@ -343,7 +343,7 @@ SCREEN_UPDATE( helifire )
 
 		/* next line */
 
-		helifire_next_line(screen->machine());
+		helifire_next_line(screen.machine());
 	}
 
 	state->m_helifire_mv = saved_mv;
@@ -354,8 +354,8 @@ SCREEN_UPDATE( helifire )
 
 SCREEN_EOF( helifire )
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
-	int n = (machine.primary_screen->frame_number() >> 1) % sizeof state->m_helifire_LSFR;
+	n8080_state *state = screen.machine().driver_data<n8080_state>();
+	int n = (screen.machine().primary_screen->frame_number() >> 1) % sizeof state->m_helifire_LSFR;
 
 	int i;
 
@@ -372,13 +372,13 @@ SCREEN_EOF( helifire )
 				G |= B;
 			}
 
-			if (machine.primary_screen->frame_number() & 0x04)
+			if (screen.machine().primary_screen->frame_number() & 0x04)
 			{
 				R |= G;
 			}
 		}
 
-		palette_set_color_rgb(machine,i,
+		palette_set_color_rgb(screen.machine(),i,
 			R ? 255 : 0,
 			G ? 255 : 0,
 			B ? 255 : 0);
@@ -386,6 +386,6 @@ SCREEN_EOF( helifire )
 
 	for (i = 0; i < 256; i++)
 	{
-		helifire_next_line(machine);
+		helifire_next_line(screen.machine());
 	}
 }

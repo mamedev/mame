@@ -75,7 +75,7 @@ static PALETTE_INIT(quizo)
 
 static SCREEN_UPDATE( quizo )
 {
-	quizo_state *state = screen->machine().driver_data<quizo_state>();
+	quizo_state *state = screen.machine().driver_data<quizo_state>();
 	UINT8 *videoram = state->m_videoram;
 	int x,y;
 	for(y=0;y<200;y++)

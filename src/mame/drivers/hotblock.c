@@ -140,17 +140,17 @@ static VIDEO_START(hotblock)
 
 static SCREEN_UPDATE(hotblock)
 {
-	hotblock_state *state = screen->machine().driver_data<hotblock_state>();
+	hotblock_state *state = screen.machine().driver_data<hotblock_state>();
 	int y, x, count;
 	int i;
 	static const int xxx = 320, yyy = 204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, 0, get_black_pen(screen.machine()));
 
 	for (i = 0; i < 256; i++)
 	{
 		int dat = (state->m_pal[i * 2 + 1] << 8) | state->m_pal[i * 2];
-		palette_set_color_rgb(screen->machine(), i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
+		palette_set_color_rgb(screen.machine(), i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
 	}
 
 	count = 0;

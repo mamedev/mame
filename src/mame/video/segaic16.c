@@ -1224,9 +1224,9 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
  *
  *************************************/
 
-void segaic16_tilemap_draw(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark)
+void segaic16_tilemap_draw(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark)
 {
-	running_machine &machine = screen->machine();
+	running_machine &machine = screen.machine();
 	struct tilemap_info *info = &bg_tilemap[which];
 
 	/* text layer is a special common case */
@@ -1268,8 +1268,8 @@ void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum,
 
 	if (info->bank[banknum] != offset)
 	{
-		screen_device *screen = machine.primary_screen;
-		screen->update_partial(screen->vpos());
+		screen_device &screen = *machine.primary_screen;
+		screen.update_partial(screen.vpos());
 		info->bank[banknum] = offset;
 		tilemap_mark_all_tiles_dirty_all(machine);
 	}
@@ -1291,8 +1291,8 @@ void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		screen_device *screen = machine.primary_screen;
-		screen->update_partial(screen->vpos());
+		screen_device &screen = *machine.primary_screen;
+		screen.update_partial(screen.vpos());
 		info->flip = flip;
 		tilemap_set_flip(info->textmap, flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1315,8 +1315,8 @@ void segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int ena
 	enable = (enable != 0);
 	if (info->rowscroll != enable)
 	{
-		screen_device *screen = machine.primary_screen;
-		screen->update_partial(screen->vpos());
+		screen_device &screen = *machine.primary_screen;
+		screen.update_partial(screen.vpos());
 		info->rowscroll = enable;
 	}
 }
@@ -1336,8 +1336,8 @@ void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int ena
 	enable = (enable != 0);
 	if (info->colscroll != enable)
 	{
-		screen_device *screen = machine.primary_screen;
-		screen->update_partial(screen->vpos());
+		screen_device &screen = *machine.primary_screen;
+		screen.update_partial(screen.vpos());
 		info->colscroll = enable;
 	}
 }

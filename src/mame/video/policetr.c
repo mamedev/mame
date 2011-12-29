@@ -350,7 +350,7 @@ WRITE32_HANDLER( policetr_palette_data_w )
 
 SCREEN_UPDATE( policetr )
 {
-	policetr_state *state = screen->machine().driver_data<policetr_state>();
+	policetr_state *state = screen.machine().driver_data<policetr_state>();
 	int width = cliprect->max_x - cliprect->min_x + 1;
 	int y;
 

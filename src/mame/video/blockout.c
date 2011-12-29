@@ -112,7 +112,7 @@ WRITE16_HANDLER( blockout_videoram_w )
 
 SCREEN_UPDATE( blockout )
 {
-	blockout_state *state = screen->machine().driver_data<blockout_state>();
+	blockout_state *state = screen.machine().driver_data<blockout_state>();
 	int x, y;
 	pen_t color = 512;
 

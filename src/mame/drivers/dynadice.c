@@ -208,7 +208,7 @@ static VIDEO_START( dynadice )
 
 static SCREEN_UPDATE( dynadice )
 {
-	dynadice_state *state = screen->machine().driver_data<dynadice_state>();
+	dynadice_state *state = screen.machine().driver_data<dynadice_state>();
 	rectangle myclip = *cliprect;
 	myclip.max_x = 15;
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

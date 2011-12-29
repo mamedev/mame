@@ -138,9 +138,9 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 
 static SCREEN_UPDATE(gamecstl)
 {
-	gamecstl_state *state = screen->machine().driver_data<gamecstl_state>();
+	gamecstl_state *state = screen.machine().driver_data<gamecstl_state>();
 	int i, j;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 	UINT32 *cga = state->m_cga_ram;
 	int index = 0;
 

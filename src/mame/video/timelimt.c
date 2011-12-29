@@ -145,12 +145,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( timelimt )
 {
-	timelimt_state *state = screen->machine().driver_data<timelimt_state>();
+	timelimt_state *state = screen.machine().driver_data<timelimt_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;

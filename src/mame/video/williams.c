@@ -174,13 +174,13 @@ VIDEO_START( williams2 )
 
 SCREEN_UPDATE( williams )
 {
-	williams_state *state = screen->machine().driver_data<williams_state>();
+	williams_state *state = screen.machine().driver_data<williams_state>();
 	rgb_t pens[16];
 	int x, y;
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = state->m_palette_lookup[screen->machine().generic.paletteram.u8[x]];
+		pens[x] = state->m_palette_lookup[screen.machine().generic.paletteram.u8[x]];
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -202,16 +202,16 @@ SCREEN_UPDATE( williams )
 
 SCREEN_UPDATE( blaster )
 {
-	williams_state *state = screen->machine().driver_data<williams_state>();
+	williams_state *state = screen.machine().driver_data<williams_state>();
 	rgb_t pens[16];
 	int x, y;
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = state->m_palette_lookup[screen->machine().generic.paletteram.u8[x]];
+		pens[x] = state->m_palette_lookup[screen.machine().generic.paletteram.u8[x]];
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
-	if (cliprect->min_y == screen->visible_area().min_y || !(state->m_blaster_video_control & 1))
+	if (cliprect->min_y == screen.visible_area().min_y || !(state->m_blaster_video_control & 1))
 		state->m_blaster_color0 = state->m_palette_lookup[state->m_blaster_palette_0[0] ^ 0xff];
 
 	/* loop over rows */
@@ -245,7 +245,7 @@ SCREEN_UPDATE( blaster )
 
 SCREEN_UPDATE( williams2 )
 {
-	williams_state *state = screen->machine().driver_data<williams_state>();
+	williams_state *state = screen.machine().driver_data<williams_state>();
 	rgb_t pens[16];
 	int x, y;
 
@@ -254,7 +254,7 @@ SCREEN_UPDATE( williams2 )
 
 	/* fetch the relevant pens */
 	for (x = 1; x < 16; x++)
-		pens[x] = palette_get_color(screen->machine(), state->m_williams2_fg_color * 16 + x);
+		pens[x] = palette_get_color(screen.machine(), state->m_williams2_fg_color * 16 + x);
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)

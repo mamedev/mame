@@ -89,7 +89,7 @@ static VIDEO_START( supdrapo )
 
 static SCREEN_UPDATE( supdrapo )
 {
-	supdrapo_state *state = screen->machine().driver_data<supdrapo_state>();
+	supdrapo_state *state = screen.machine().driver_data<supdrapo_state>();
 	int x, y;
 	int count;
 	int color;
@@ -104,7 +104,7 @@ static SCREEN_UPDATE( supdrapo )
 			/* Global Column Coloring, GUESS! */
 			color = state->m_col_line[(x*2) + 1] ? (state->m_col_line[(x*2) + 1] - 1) & 7 : 0;
 
-			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], tile,color, 0, 0, x*8, y*8);
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], tile,color, 0, 0, x*8, y*8);
 
 			count++;
 		}

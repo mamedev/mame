@@ -354,7 +354,7 @@ static VIDEO_START( megadpkr )
 
 static SCREEN_UPDATE( megadpkr )
 {
-	blitz_state *state = screen->machine().driver_data<blitz_state>();
+	blitz_state *state = screen.machine().driver_data<blitz_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

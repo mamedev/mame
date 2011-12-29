@@ -230,8 +230,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap)
 
 SCREEN_UPDATE( tinvader )
 {
-	zac2650_state *state = screen->machine().driver_data<zac2650_state>();
+	zac2650_state *state = screen.machine().driver_data<zac2650_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap);
+	draw_sprites(screen.machine(), bitmap);
 	return 0;
 }

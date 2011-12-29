@@ -523,9 +523,9 @@ static VIDEO_START(majorpkr)
 
 static SCREEN_UPDATE(majorpkr)
 {
-	majorpkr_state *state = screen->machine().driver_data<majorpkr_state>();
+	majorpkr_state *state = screen.machine().driver_data<majorpkr_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	rectangle custom_clip;
 

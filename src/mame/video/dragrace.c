@@ -49,7 +49,7 @@ VIDEO_START( dragrace )
 
 SCREEN_UPDATE( dragrace )
 {
-	dragrace_state *state = screen->machine().driver_data<dragrace_state>();
+	dragrace_state *state = screen.machine().driver_data<dragrace_state>();
 	int y;
 
 	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);

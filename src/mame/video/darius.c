@@ -92,17 +92,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 
 
-SCREEN_UPDATE( darius )
+static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int xoffs)
 {
-	darius_state *state = screen->machine().driver_data<darius_state>();
-	int xoffs = 0;
-
-	if (screen == state->m_lscreen)
-		xoffs = 36 * 8 * 0;
-	else if (screen == state->m_mscreen)
-		xoffs = 36 * 8 * 1;
-	else if (screen == state->m_rscreen)
-		xoffs = 36 * 8 * 2;
+	darius_state *state = screen.machine().driver_data<darius_state>();
 
 	pc080sn_tilemap_update(state->m_pc080sn);
 
@@ -110,12 +102,12 @@ SCREEN_UPDATE( darius )
 	pc080sn_tilemap_draw_offset(state->m_pc080sn, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0, -xoffs, 0);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(screen->machine(), bitmap, cliprect, 0, xoffs, -8); // draw sprites with priority 0 which are under the mid layer
+	draw_sprites(screen.machine(), bitmap, cliprect, 0, xoffs, -8); // draw sprites with priority 0 which are under the mid layer
 
 	// draw middle layer
 	pc080sn_tilemap_draw_offset(state->m_pc080sn, bitmap, cliprect, 1, 0, 0, -xoffs, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect, 1, xoffs, -8); // draw sprites with priority 1 which are over the mid layer
+	draw_sprites(screen.machine(), bitmap, cliprect, 1, xoffs, -8); // draw sprites with priority 1 which are over the mid layer
 
 	/* top(text) layer is in fixed position */
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, 0 + xoffs);
@@ -123,3 +115,8 @@ SCREEN_UPDATE( darius )
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
+
+SCREEN_UPDATE( darius_left ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 0); }
+SCREEN_UPDATE( darius_middle ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 1); }
+SCREEN_UPDATE( darius_right ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 2); }
+

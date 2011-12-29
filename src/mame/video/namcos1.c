@@ -372,18 +372,18 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( namcos1 )
 {
-	namcos1_state *state = screen->machine().driver_data<namcos1_state>();
+	namcos1_state *state = screen.machine().driver_data<namcos1_state>();
 	int i, j, scrollx, scrolly, priority;
 	rectangle new_clip = *cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use flip_screen_set(screen->machine(), ) because the visible area is asymmetrical */
-	flip_screen_set_no_update(screen->machine(), state->m_spriteram[0x0ff6] & 1);
-	tilemap_set_flip_all(screen->machine(),flip_screen_get(screen->machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	/* can't use flip_screen_set(screen.machine(), ) because the visible area is asymmetrical */
+	flip_screen_set_no_update(screen.machine(), state->m_spriteram[0x0ff6] & 1);
+	tilemap_set_flip_all(screen.machine(),flip_screen_get(screen.machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 
 	/* background color */
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
 	i = ((state->m_cus116[0] << 8) | state->m_cus116[1]) - 1;			// min x
@@ -411,7 +411,7 @@ SCREEN_UPDATE( namcos1 )
 		scrollx = ( state->m_playfield_control[j+1] + (state->m_playfield_control[j+0]<<8) ) - disp_x[i];
 		scrolly = ( state->m_playfield_control[j+3] + (state->m_playfield_control[j+2]<<8) ) + 8;
 
-		if (flip_screen_get(screen->machine()))
+		if (flip_screen_get(screen.machine()))
 		{
 			scrollx = -scrollx;
 			scrolly = -scrolly;
@@ -422,7 +422,7 @@ SCREEN_UPDATE( namcos1 )
 	}
 
 
-	bitmap_fill(screen->machine().priority_bitmap, &new_clip, 0);
+	bitmap_fill(screen.machine().priority_bitmap, &new_clip, 0);
 
 	/* bit 0-2 priority */
 	/* bit 3   disable  */
@@ -435,14 +435,14 @@ SCREEN_UPDATE( namcos1 )
 		}
 	}
 
-	draw_sprites(screen->machine(), bitmap, &new_clip);
+	draw_sprites(screen.machine(), bitmap, &new_clip);
 	return 0;
 }
 
 
 SCREEN_EOF( namcos1 )
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
+	namcos1_state *state = screen.machine().driver_data<namcos1_state>();
 	if (state->m_copy_sprites)
 	{
 		UINT8 *spriteram = state->m_spriteram + 0x800;

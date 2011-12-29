@@ -54,7 +54,7 @@ void vendetta_sprite_callback( running_machine &machine, int *code, int *color, 
 
 SCREEN_UPDATE( vendetta )
 {
-	vendetta_state *state = screen->machine().driver_data<vendetta_state>();
+	vendetta_state *state = screen.machine().driver_data<vendetta_state>();
 	int layer[3];
 
 	state->m_sprite_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI1);
@@ -73,7 +73,7 @@ SCREEN_UPDATE( vendetta )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[2], 0, 4);

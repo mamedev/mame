@@ -522,15 +522,15 @@ VIDEO_START( twin16 )
 
 SCREEN_UPDATE( twin16 )
 {
-	twin16_state *state = screen->machine().driver_data<twin16_state>();
+	twin16_state *state = screen.machine().driver_data<twin16_state>();
 	int text_flip=0;
 	if (state->m_video_register&TWIN16_SCREEN_FLIPX) text_flip|=TILEMAP_FLIPX;
 	if (state->m_video_register&TWIN16_SCREEN_FLIPY) text_flip|=TILEMAP_FLIPY;
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
-	draw_layer( screen->machine(), bitmap, 1 );
-	draw_layer( screen->machine(), bitmap, 0 );
-	draw_sprites( screen->machine(), bitmap );
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	draw_layer( screen.machine(), bitmap, 1 );
+	draw_layer( screen.machine(), bitmap, 0 );
+	draw_sprites( screen.machine(), bitmap );
 
 	if (text_flip) tilemap_set_flip(state->m_text_tilemap, text_flip);
 	tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
@@ -539,21 +539,21 @@ SCREEN_UPDATE( twin16 )
 
 SCREEN_EOF( twin16 )
 {
-	twin16_state *state = machine.driver_data<twin16_state>();
-	twin16_set_sprite_timer(machine);
+	twin16_state *state = screen.machine().driver_data<twin16_state>();
+	twin16_set_sprite_timer(screen.machine());
 
-	if (twin16_spriteram_process_enable(machine)) {
-		if (state->m_need_process_spriteram) twin16_spriteram_process(machine);
+	if (twin16_spriteram_process_enable(screen.machine())) {
+		if (state->m_need_process_spriteram) twin16_spriteram_process(screen.machine());
 		state->m_need_process_spriteram = 1;
 
 		/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
         as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
         more to it than that */
-		memcpy(&machine.generic.buffered_spriteram.u16[0x1800],state->m_sprite_buffer,0x800*sizeof(UINT16));
-		memcpy(state->m_sprite_buffer,&machine.generic.spriteram.u16[0x1800],0x800*sizeof(UINT16));
+		memcpy(&screen.machine().generic.buffered_spriteram.u16[0x1800],state->m_sprite_buffer,0x800*sizeof(UINT16));
+		memcpy(state->m_sprite_buffer,&screen.machine().generic.spriteram.u16[0x1800],0x800*sizeof(UINT16));
 	}
 	else {
-		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 		buffer_spriteram16_w(space,0,0,0xffff);
 	}
 }

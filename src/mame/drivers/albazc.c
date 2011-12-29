@@ -80,7 +80,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 static SCREEN_UPDATE(hanaroku)
 {
 	bitmap_fill(bitmap, cliprect, 0x1f0);	// ???
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 

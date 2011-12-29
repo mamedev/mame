@@ -1264,10 +1264,10 @@ static VIDEO_START(segac2_new)
 
 static SCREEN_UPDATE(segac2_new)
 {
-	segac2_state *state = screen->machine().driver_data<segac2_state>();
+	segac2_state *state = screen.machine().driver_data<segac2_state>();
 	if (!state->m_segac2_enable_display)
 	{
-		bitmap_fill(bitmap, NULL, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, NULL, get_black_pen(screen.machine()));
 		return 0;
 	}
 

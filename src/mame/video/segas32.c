@@ -2423,35 +2423,35 @@ static void print_mixer_data(segas32_state *state, int which)
 
 SCREEN_UPDATE( system32 )
 {
-	segas32_state *state = screen->machine().driver_data<segas32_state>();
+	segas32_state *state = screen.machine().driver_data<segas32_state>();
 	UINT8 enablemask;
 
 	/* update the visible area */
 	if (state->m_system32_videoram[0x1ff00/2] & 0x8000)
-		screen->set_visible_area(0, 52*8-1, 0, 28*8-1);
+		screen.set_visible_area(0, 52*8-1, 0, 28*8-1);
 	else
-		screen->set_visible_area(0, 40*8-1, 0, 28*8-1);
+		screen.set_visible_area(0, 40*8-1, 0, 28*8-1);
 
 	/* if the display is off, punt */
 	if (!state->m_system32_displayenable[0])
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
 	/* update the tilemaps */
 	g_profiler.start(PROFILER_USER1);
-	enablemask = update_tilemaps(*screen, cliprect);
+	enablemask = update_tilemaps(screen, cliprect);
 	g_profiler.stop();
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
-	if (screen->machine().input().code_pressed(KEYCODE_Q)) enablemask = 0x01;
-	if (screen->machine().input().code_pressed(KEYCODE_W)) enablemask = 0x02;
-	if (screen->machine().input().code_pressed(KEYCODE_E)) enablemask = 0x04;
-	if (screen->machine().input().code_pressed(KEYCODE_R)) enablemask = 0x08;
-	if (screen->machine().input().code_pressed(KEYCODE_T)) enablemask = 0x10;
-	if (screen->machine().input().code_pressed(KEYCODE_Y)) enablemask = 0x20;
+	if (screen.machine().input().code_pressed(KEYCODE_Q)) enablemask = 0x01;
+	if (screen.machine().input().code_pressed(KEYCODE_W)) enablemask = 0x02;
+	if (screen.machine().input().code_pressed(KEYCODE_E)) enablemask = 0x04;
+	if (screen.machine().input().code_pressed(KEYCODE_R)) enablemask = 0x08;
+	if (screen.machine().input().code_pressed(KEYCODE_T)) enablemask = 0x10;
+	if (screen.machine().input().code_pressed(KEYCODE_Y)) enablemask = 0x20;
 #endif
 
 	/* do the mixing */
@@ -2459,9 +2459,9 @@ SCREEN_UPDATE( system32 )
 	mix_all_layers(state, 0, 0, bitmap, cliprect, enablemask);
 	g_profiler.stop();
 
-	if (LOG_SPRITES && screen->machine().input().code_pressed(KEYCODE_L))
+	if (LOG_SPRITES && screen.machine().input().code_pressed(KEYCODE_L))
 	{
-		const rectangle &visarea = screen->visible_area();
+		const rectangle &visarea = screen.visible_area();
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;
 
@@ -2537,13 +2537,13 @@ SCREEN_UPDATE( system32 )
 {
 	int showclip = -1;
 
-//  if (screen->machine().input().code_pressed(KEYCODE_V))
+//  if (screen.machine().input().code_pressed(KEYCODE_V))
 //      showclip = 0;
-//  if (screen->machine().input().code_pressed(KEYCODE_B))
+//  if (screen.machine().input().code_pressed(KEYCODE_B))
 //      showclip = 1;
-//  if (screen->machine().input().code_pressed(KEYCODE_N))
+//  if (screen.machine().input().code_pressed(KEYCODE_N))
 //      showclip = 2;
-//  if (screen->machine().input().code_pressed(KEYCODE_M))
+//  if (screen.machine().input().code_pressed(KEYCODE_M))
 //      showclip = 3;
 //  if (showclip != -1)
 for (showclip = 0; showclip < 4; showclip++)
@@ -2556,10 +2556,10 @@ for (showclip = 0; showclip < 4; showclip++)
 			for (i = 0; i < 4; i++)
 				if (clips & (1 << i))
 				{
-					const rectangle &visarea = screen->visible_area();
+					const rectangle &visarea = screen.visible_area();
 
 					rectangle rect;
-					pen_t white = get_white_pen(screen->machine());
+					pen_t white = get_white_pen(screen.machine());
 					if (!flip)
 					{
 						rect.min_x = state->m_system32_videoram[0x1ff60/2 + i * 4] & 0x1ff;
@@ -2574,7 +2574,7 @@ for (showclip = 0; showclip < 4; showclip++)
 						rect.min_x = (visarea.max_x + 1) - ((state->m_system32_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1);
 						rect.min_y = (visarea.max_y + 1) - ((state->m_system32_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
 					}
-					sect_rect(&rect, &screen->visible_area());
+					sect_rect(&rect, &screen.visible_area());
 
 					if (rect.min_y <= rect.max_y && rect.min_x <= rect.max_x)
 					{
@@ -2600,54 +2600,52 @@ for (showclip = 0; showclip < 4; showclip++)
 }
 
 
-SCREEN_UPDATE( multi32 )
+static UINT32 multi32_update(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int index)
 {
-	segas32_state *state = screen->machine().driver_data<segas32_state>();
+	segas32_state *state = screen.machine().driver_data<segas32_state>();
 	UINT8 enablemask;
-
-	device_t *left_screen  = screen->machine().device("lscreen");
 
 	/* update the visible area */
 	if (state->m_system32_videoram[0x1ff00/2] & 0x8000)
-		screen->set_visible_area(0, 52*8-1, 0, 28*8-1);
+		screen.set_visible_area(0, 52*8-1, 0, 28*8-1);
 	else
-		screen->set_visible_area(0, 40*8-1, 0, 28*8-1);
+		screen.set_visible_area(0, 40*8-1, 0, 28*8-1);
 
 	/* if the display is off, punt */
-	if (!state->m_system32_displayenable[(screen == left_screen) ? 0 : 1])
+	if (!state->m_system32_displayenable[index])
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
 	/* update the tilemaps */
 	g_profiler.start(PROFILER_USER1);
-	enablemask = update_tilemaps(*screen, cliprect);
+	enablemask = update_tilemaps(screen, cliprect);
 	g_profiler.stop();
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
-	if (screen->machine().input().code_pressed(KEYCODE_Q)) enablemask = 0x01;
-	if (screen->machine().input().code_pressed(KEYCODE_W)) enablemask = 0x02;
-	if (screen->machine().input().code_pressed(KEYCODE_E)) enablemask = 0x04;
-	if (screen->machine().input().code_pressed(KEYCODE_R)) enablemask = 0x08;
-	if (screen->machine().input().code_pressed(KEYCODE_T)) enablemask = 0x10;
-	if (screen->machine().input().code_pressed(KEYCODE_Y)) enablemask = 0x20;
+	if (screen.machine().input().code_pressed(KEYCODE_Q)) enablemask = 0x01;
+	if (screen.machine().input().code_pressed(KEYCODE_W)) enablemask = 0x02;
+	if (screen.machine().input().code_pressed(KEYCODE_E)) enablemask = 0x04;
+	if (screen.machine().input().code_pressed(KEYCODE_R)) enablemask = 0x08;
+	if (screen.machine().input().code_pressed(KEYCODE_T)) enablemask = 0x10;
+	if (screen.machine().input().code_pressed(KEYCODE_Y)) enablemask = 0x20;
 #endif
 
 	/* do the mixing */
 	g_profiler.start(PROFILER_USER3);
-	mix_all_layers(state, ((screen == left_screen) ? 0 : 1), 0, bitmap, cliprect, enablemask);
+	mix_all_layers(state, index, 0, bitmap, cliprect, enablemask);
 	g_profiler.stop();
 
 if (PRINTF_MIXER_DATA)
 {
-	if (!screen->machine().input().code_pressed(KEYCODE_M)) print_mixer_data(state, 0);
+	if (!screen.machine().input().code_pressed(KEYCODE_M)) print_mixer_data(state, 0);
 	else print_mixer_data(state, 1);
 }
-	if (LOG_SPRITES && screen->machine().input().code_pressed(KEYCODE_L))
+	if (LOG_SPRITES && screen.machine().input().code_pressed(KEYCODE_L))
 	{
-		const rectangle &visarea = screen->visible_area();
+		const rectangle &visarea = screen.visible_area();
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;
 
@@ -2664,6 +2662,8 @@ if (PRINTF_MIXER_DATA)
 	return 0;
 }
 
+SCREEN_UPDATE( multi32_left ) { return multi32_update(screen, bitmap, cliprect, 0); }
+SCREEN_UPDATE( multi32_right ) { return multi32_update(screen, bitmap, cliprect, 1); }
 
 /*
 

@@ -664,22 +664,22 @@ static void swimmer_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, co
 
 SCREEN_UPDATE( cclimber )
 {
-	cclimber_state *state = screen->machine().driver_data<cclimber_state>();
+	cclimber_state *state = screen.machine().driver_data<cclimber_state>();
 	bitmap_fill(bitmap, cliprect, CCLIMBER_BG_PEN);
-	draw_playfield(screen->machine(), bitmap, cliprect);
+	draw_playfield(screen.machine(), bitmap, cliprect);
 
 	/* draw the "big sprite" under the regular sprites */
 	if ((state->m_bigsprite_control[0] & 0x01))
 	{
-		cclimber_draw_bigsprite(screen->machine(), bitmap, cliprect);
-		cclimber_draw_sprites(bitmap, cliprect, screen->machine().gfx[1]);
+		cclimber_draw_bigsprite(screen.machine(), bitmap, cliprect);
+		cclimber_draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		cclimber_draw_sprites(bitmap, cliprect, screen->machine().gfx[1]);
-		cclimber_draw_bigsprite(screen->machine(), bitmap, cliprect);
+		cclimber_draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
+		cclimber_draw_bigsprite(screen.machine(), bitmap, cliprect);
 	}
 
 	return 0;
@@ -688,9 +688,9 @@ SCREEN_UPDATE( cclimber )
 
 SCREEN_UPDATE( yamato )
 {
-	cclimber_state *state = screen->machine().driver_data<cclimber_state>();
+	cclimber_state *state = screen.machine().driver_data<cclimber_state>();
 	int i;
-	UINT8 *sky_rom = screen->machine().region("user1")->base() + 0x1200;
+	UINT8 *sky_rom = screen.machine().region("user1")->base() + 0x1200;
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -701,20 +701,20 @@ SCREEN_UPDATE( yamato )
 			*BITMAP_ADDR16(bitmap, j, (i - 8) & 0xff) = pen;
 	}
 
-	draw_playfield(screen->machine(), bitmap, cliprect);
+	draw_playfield(screen.machine(), bitmap, cliprect);
 
 	/* draw the "big sprite" under the regular sprites */
 	if ((state->m_bigsprite_control[0] & 0x01))
 	{
-		cclimber_draw_bigsprite(screen->machine(), bitmap, cliprect);
-		toprollr_draw_sprites(bitmap, cliprect, screen->machine().gfx[1]);
+		cclimber_draw_bigsprite(screen.machine(), bitmap, cliprect);
+		toprollr_draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		toprollr_draw_sprites(bitmap, cliprect, screen->machine().gfx[1]);
-		cclimber_draw_bigsprite(screen->machine(), bitmap, cliprect);
+		toprollr_draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
+		cclimber_draw_bigsprite(screen.machine(), bitmap, cliprect);
 	}
 
 	return 0;
@@ -723,8 +723,8 @@ SCREEN_UPDATE( yamato )
 
 SCREEN_UPDATE( swimmer )
 {
-	cclimber_state *state = screen->machine().driver_data<cclimber_state>();
-	swimmer_set_background_pen(screen->machine());
+	cclimber_state *state = screen.machine().driver_data<cclimber_state>();
+	swimmer_set_background_pen(screen.machine());
 
 	if (*state->m_swimmer_side_background_enabled & 0x01)
 	{
@@ -754,20 +754,20 @@ SCREEN_UPDATE( swimmer )
 	else
 		bitmap_fill(bitmap, cliprect, CCLIMBER_BG_PEN);
 
-	draw_playfield(screen->machine(), bitmap, cliprect);
+	draw_playfield(screen.machine(), bitmap, cliprect);
 
 	/* draw the "big sprite" under the regular sprites */
 	if ((state->m_bigsprite_control[0] & 0x01))
 	{
-		cclimber_draw_bigsprite(screen->machine(), bitmap, cliprect);
-		swimmer_draw_sprites(bitmap, cliprect, screen->machine().gfx[1]);
+		cclimber_draw_bigsprite(screen.machine(), bitmap, cliprect);
+		swimmer_draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		swimmer_draw_sprites(bitmap, cliprect, screen->machine().gfx[1]);
-		cclimber_draw_bigsprite(screen->machine(), bitmap, cliprect);
+		swimmer_draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
+		cclimber_draw_bigsprite(screen.machine(), bitmap, cliprect);
 	}
 
 	return 0;
@@ -776,7 +776,7 @@ SCREEN_UPDATE( swimmer )
 
 SCREEN_UPDATE( toprollr )
 {
-	cclimber_state *state = screen->machine().driver_data<cclimber_state>();
+	cclimber_state *state = screen.machine().driver_data<cclimber_state>();
 	rectangle scroll_area_clip = *cliprect;
 	scroll_area_clip.min_x = 4*8;
 	scroll_area_clip.max_x = 29*8-1;
@@ -792,15 +792,15 @@ SCREEN_UPDATE( toprollr )
 	/* draw the "big sprite" over the regular sprites */
 	if ((state->m_bigsprite_control[1] & 0x20))
 	{
-		toprollr_draw_sprites(bitmap, &scroll_area_clip, screen->machine().gfx[1]);
-		toprollr_draw_bigsprite(screen->machine(), bitmap, &scroll_area_clip);
+		toprollr_draw_sprites(bitmap, &scroll_area_clip, screen.machine().gfx[1]);
+		toprollr_draw_bigsprite(screen.machine(), bitmap, &scroll_area_clip);
 	}
 
 	/* draw the "big sprite" under the regular sprites */
 	else
 	{
-		toprollr_draw_bigsprite(screen->machine(), bitmap, &scroll_area_clip);
-		toprollr_draw_sprites(bitmap, &scroll_area_clip, screen->machine().gfx[1]);
+		toprollr_draw_bigsprite(screen.machine(), bitmap, &scroll_area_clip);
+		toprollr_draw_sprites(bitmap, &scroll_area_clip, screen.machine().gfx[1]);
 	}
 
 	tilemap_mark_all_tiles_dirty(state->m_pf_tilemap);

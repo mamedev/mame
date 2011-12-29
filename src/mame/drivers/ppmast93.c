@@ -351,7 +351,7 @@ static VIDEO_START( ppmast93 )
 
 static SCREEN_UPDATE( ppmast93 )
 {
-	ppmast93_state *state = screen->machine().driver_data<ppmast93_state>();
+	ppmast93_state *state = screen.machine().driver_data<ppmast93_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;

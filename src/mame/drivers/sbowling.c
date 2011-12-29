@@ -110,7 +110,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 
 static SCREEN_UPDATE(sbowling)
 {
-	sbowling_state *state = screen->machine().driver_data<sbowling_state>();
+	sbowling_state *state = screen.machine().driver_data<sbowling_state>();
 
 	bitmap_fill(bitmap, cliprect, 0x18);
 	tilemap_draw(bitmap, cliprect,state->m_sb_tilemap, 0, 0);

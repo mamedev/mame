@@ -387,24 +387,24 @@ VIDEO_START( niyanpai )
 ******************************************************************************/
 SCREEN_UPDATE( niyanpai )
 {
-	niyanpai_state *state = screen->machine().driver_data<niyanpai_state>();
+	niyanpai_state *state = screen.machine().driver_data<niyanpai_state>();
 	int i;
 	int x, y;
 	int scrollx[3], scrolly[3];
 
 	if (state->m_screen_refresh)
 	{
-		int width = screen->width();
-		int height = screen->height();
+		int width = screen.width();
+		int height = screen.height();
 
 		state->m_screen_refresh = 0;
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 			{
-				update_pixel(screen->machine(), 0, x, y);
-				update_pixel(screen->machine(), 1, x, y);
-				update_pixel(screen->machine(), 2, x, y);
+				update_pixel(screen.machine(), 0, x, y);
+				update_pixel(screen.machine(), 1, x, y);
+				update_pixel(screen.machine(), 2, x, y);
 			}
 	}
 

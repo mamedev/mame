@@ -308,13 +308,13 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( battlera )
 {
-	battlera_state *state = screen->machine().driver_data<battlera_state>();
+	battlera_state *state = screen.machine().driver_data<battlera_state>();
 	int offs,code,scrollx,scrolly,mx,my;
 
 	/* if any tiles changed, redraw the VRAM */
-	if (screen->machine().gfx[0]->dirtyseq != state->m_tile_dirtyseq)
+	if (screen.machine().gfx[0]->dirtyseq != state->m_tile_dirtyseq)
 	{
-		state->m_tile_dirtyseq = screen->machine().gfx[0]->dirtyseq;
+		state->m_tile_dirtyseq = screen.machine().gfx[0]->dirtyseq;
 		memset(state->m_vram_dirty, 1, 0x1000);
 	}
 
@@ -329,17 +329,17 @@ SCREEN_UPDATE( battlera )
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (state->m_vram_dirty[offs/2]) {
 			state->m_vram_dirty[offs/2]=0;
-			drawgfx_opaque(state->m_tile_bitmap,0,screen->machine().gfx[0],
+			drawgfx_opaque(state->m_tile_bitmap,0,screen.machine().gfx[0],
 					code,
 					state->m_HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my);
-			drawgfx_opaque(state->m_front_bitmap,0,screen->machine().gfx[2],
+			drawgfx_opaque(state->m_front_bitmap,0,screen.machine().gfx[2],
 					0,
 					0,	/* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my);
-			drawgfx_transmask(state->m_front_bitmap,0,screen->machine().gfx[0],
+			drawgfx_transmask(state->m_front_bitmap,0,screen.machine().gfx[0],
 					code,
 					state->m_HuC6270_vram[offs] >> 4,
 					0,0,
@@ -356,13 +356,13 @@ SCREEN_UPDATE( battlera )
 	/* Todo:  Background enable (not used anyway) */
 
 	/* Render low priority sprites, if enabled */
-	if (state->m_sb_enable) draw_sprites(screen->machine(),bitmap,cliprect,0);
+	if (state->m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,0);
 
 	/* Render background over sprites */
 	copyscrollbitmap_trans(bitmap,state->m_front_bitmap,1,&scrollx,1,&scrolly,cliprect,256);
 
 	/* Render high priority sprites, if enabled */
-	if (state->m_sb_enable) draw_sprites(screen->machine(),bitmap,cliprect,1);
+	if (state->m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,1);
 
 	return 0;
 }

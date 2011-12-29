@@ -246,7 +246,7 @@ GFXDECODE_END
 
 static SCREEN_UPDATE(carrera)
 {
-	carrera_state *state = screen->machine().driver_data<carrera_state>();
+	carrera_state *state = screen.machine().driver_data<carrera_state>();
 
 	int x,y;
 	int count = 0;
@@ -257,7 +257,7 @@ static SCREEN_UPDATE(carrera)
 		{
 			int tile = state->m_tileram[count&0x7ff] | state->m_tileram[(count&0x7ff)+0x800]<<8;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,0,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,0,0,0,x*8,y*8);
 			count++;
 		}
 	}

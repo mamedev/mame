@@ -724,12 +724,12 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 SCREEN_UPDATE( changela )
 {
-	changela_state *state = screen->machine().driver_data<changela_state>();
+	changela_state *state = screen.machine().driver_data<changela_state>();
 	copybitmap(bitmap, state->m_river_bitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, state->m_obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, state->m_tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, state->m_tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
-	draw_obj1(screen->machine(), bitmap);
+	draw_obj1(screen.machine(), bitmap);
 
 	return 0;
 }

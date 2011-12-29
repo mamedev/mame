@@ -455,11 +455,11 @@ static void supernova_draw_b( running_machine &machine, bitmap_t *bitmap, bitmap
 
 SCREEN_UPDATE(skns)
 {
-	skns_state *state = screen->machine().driver_data<skns_state>();
+	skns_state *state = screen.machine().driver_data<skns_state>();
 
-	palette_update(screen->machine());
+	palette_update(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 	bitmap_fill(state->m_tilemap_bitmap_lower, NULL, 0);
 	bitmap_fill(state->m_tilemap_bitmapflags_lower, NULL, 0);
 	bitmap_fill(state->m_tilemap_bitmap_higher, NULL, 0);
@@ -476,8 +476,8 @@ SCREEN_UPDATE(skns)
 		//popmessage("pri %d %d\n", supernova_pri_a, supernova_pri_b);
 
 		/*if (!supernova_pri_b) { */
-		supernova_draw_b(screen->machine(), state->m_tilemap_bitmap_lower, state->m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
-		supernova_draw_a(screen->machine(), state->m_tilemap_bitmap_higher,state->m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
+		supernova_draw_b(screen.machine(), state->m_tilemap_bitmap_lower, state->m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
+		supernova_draw_a(screen.machine(), state->m_tilemap_bitmap_higher,state->m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
 
 		{
 			int x,y;
@@ -486,7 +486,7 @@ SCREEN_UPDATE(skns)
 			UINT32* dst;
 			UINT16 pri, pri2, pri3;
 			UINT16 bgpri;
-			const pen_t *clut = &screen->machine().pens[0];
+			const pen_t *clut = &screen.machine().pens[0];
 //          int drawpri;
 
 
@@ -631,7 +631,7 @@ SCREEN_UPDATE(skns)
 	bitmap_fill(state->m_sprite_bitmap, cliprect, 0x0000);
 
 	if (state->m_alt_enable_sprites)
-		state->m_spritegen->skns_draw_sprites(screen->machine(), state->m_sprite_bitmap, cliprect, screen->machine().generic.spriteram.u32, screen->machine().generic.spriteram_size, screen->machine().region("gfx1")->base(), screen->machine().region ("gfx1")->bytes(), state->m_spc_regs );
+		state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap, cliprect, screen.machine().generic.spriteram.u32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
 
 
 	return 0;

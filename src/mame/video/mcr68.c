@@ -333,35 +333,35 @@ static void zwackery_update_sprites(running_machine &machine, bitmap_t *bitmap, 
 
 SCREEN_UPDATE( mcr68 )
 {
-	mcr68_state *state = screen->machine().driver_data<mcr68_state>();
+	mcr68_state *state = screen.machine().driver_data<mcr68_state>();
 	/* draw the background */
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	/* draw the low-priority sprites */
-	mcr68_update_sprites(screen->machine(), bitmap, cliprect, 0);
+	mcr68_update_sprites(screen.machine(), bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
 
 	/* draw the high-priority sprites */
-	mcr68_update_sprites(screen->machine(), bitmap, cliprect, 1);
+	mcr68_update_sprites(screen.machine(), bitmap, cliprect, 1);
 	return 0;
 }
 
 
 SCREEN_UPDATE( zwackery )
 {
-	mcr68_state *state = screen->machine().driver_data<mcr68_state>();
+	mcr68_state *state = screen.machine().driver_data<mcr68_state>();
 	/* draw the background */
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* draw the low-priority sprites */
-	zwackery_update_sprites(screen->machine(), bitmap, cliprect, 0);
+	zwackery_update_sprites(screen.machine(), bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);
 
 	/* draw the high-priority sprites */
-	zwackery_update_sprites(screen->machine(), bitmap, cliprect, 1);
+	zwackery_update_sprites(screen.machine(), bitmap, cliprect, 1);
 	return 0;
 }

@@ -388,7 +388,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( armedf )
 {
-	armedf_state *state = screen->machine().driver_data<armedf_state>();
+	armedf_state *state = screen.machine().driver_data<armedf_state>();
 	int sprite_enable = state->m_vreg & 0x200;
 
 	tilemap_set_enable(state->m_bg_tilemap, state->m_vreg & 0x800);
@@ -418,15 +418,15 @@ SCREEN_UPDATE( armedf )
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	if (sprite_enable)
-		draw_sprites(screen->machine(), bitmap, cliprect, 2);
+		draw_sprites(screen.machine(), bitmap, cliprect, 2);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	if (sprite_enable)
-		draw_sprites(screen->machine(), bitmap, cliprect, 1);
+		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	if (sprite_enable)
-		draw_sprites(screen->machine(), bitmap, cliprect, 0);
+		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, TILEMAP_DRAW_CATEGORY(0), 0);
 
@@ -436,7 +436,7 @@ SCREEN_UPDATE( armedf )
 
 SCREEN_EOF( armedf )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }

@@ -436,15 +436,15 @@ static void update_screen(screen_device &screen, bitmap_t *bitmap, const rectang
 static SCREEN_UPDATE( exidy440 )
 {
 	/* redraw the screen */
-	update_screen(*screen, bitmap, cliprect, 0, TRUE);
+	update_screen(screen, bitmap, cliprect, 0, TRUE);
 
 	/* generate an interrupt once/frame for the beam */
-	if (cliprect->max_y == screen->visible_area().max_y)
+	if (cliprect->max_y == screen.visible_area().max_y)
 	{
 		int i;
 
-		int beamx = ((input_port_read(screen->machine(), "AN0") & 0xff) * (HBSTART - HBEND)) >> 8;
-		int beamy = ((input_port_read(screen->machine(), "AN1") & 0xff) * (VBSTART - VBEND)) >> 8;
+		int beamx = ((input_port_read(screen.machine(), "AN0") & 0xff) * (HBSTART - HBEND)) >> 8;
+		int beamy = ((input_port_read(screen.machine(), "AN1") & 0xff) * (VBSTART - VBEND)) >> 8;
 
 		/* The timing of this FIRQ is very important. The games look for an FIRQ
             and then wait about 650 cycles, clear the old FIRQ, and wait a
@@ -452,11 +452,11 @@ static SCREEN_UPDATE( exidy440 )
             From this, it appears that they are expecting to get beams over
             a 12 scanline period, and trying to pick roughly the middle one.
             This is how it is implemented. */
-		attotime increment = screen->scan_period();
-		attotime time = screen->time_until_pos(beamy, beamx) - increment * 6;
+		attotime increment = screen.scan_period();
+		attotime time = screen.time_until_pos(beamy, beamx) - increment * 6;
 		for (i = 0; i <= 12; i++)
 		{
-			screen->machine().scheduler().timer_set(time, FUNC(beam_firq_callback), beamx);
+			screen.machine().scheduler().timer_set(time, FUNC(beam_firq_callback), beamx);
 			time += increment;
 		}
 	}
@@ -467,9 +467,9 @@ static SCREEN_UPDATE( exidy440 )
 
 static SCREEN_UPDATE( topsecex )
 {
-	exidy440_state *state = screen->machine().driver_data<exidy440_state>();
+	exidy440_state *state = screen.machine().driver_data<exidy440_state>();
 	/* redraw the screen */
-	update_screen(*screen, bitmap, cliprect, *state->m_topsecex_yscroll, FALSE);
+	update_screen(screen, bitmap, cliprect, *state->m_topsecex_yscroll, FALSE);
 
 	return 0;
 }

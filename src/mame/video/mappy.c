@@ -539,14 +539,14 @@ static void phozon_draw_sprites(running_machine &machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( superpac )
 {
-	mappy_state *state = screen->machine().driver_data<mappy_state>();
+	mappy_state *state = screen.machine().driver_data<mappy_state>();
 	bitmap_t *sprite_bitmap = state->m_sprite_bitmap;
 	int x,y;
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
 	bitmap_fill(sprite_bitmap,cliprect,15);
-	mappy_draw_sprites(screen->machine(),sprite_bitmap,cliprect,state->m_spriteram);
+	mappy_draw_sprites(screen.machine(),sprite_bitmap,cliprect,state->m_spriteram);
 	copybitmap_trans(bitmap,sprite_bitmap,0,0,0,0,cliprect,15);
 
 	/* Redraw the high priority characters */
@@ -558,7 +558,7 @@ SCREEN_UPDATE( superpac )
 		for (x = 0;x < sprite_bitmap->width;x++)
 		{
 			int spr_entry = *BITMAP_ADDR16(sprite_bitmap, y, x);
-			int spr_pen = colortable_entry_get_value(screen->machine().colortable, spr_entry);
+			int spr_pen = colortable_entry_get_value(screen.machine().colortable, spr_entry);
 			if (spr_pen == 0 || spr_pen == 1)
 				*BITMAP_ADDR16(bitmap, y, x) = spr_entry;
 		}
@@ -568,14 +568,14 @@ SCREEN_UPDATE( superpac )
 
 SCREEN_UPDATE( phozon )
 {
-	mappy_state *state = screen->machine().driver_data<mappy_state>();
+	mappy_state *state = screen.machine().driver_data<mappy_state>();
 
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(screen->machine(), state->m_spriteram[0x1f7f-0x800] & 1);
+	flip_screen_set(screen.machine(), state->m_spriteram[0x1f7f-0x800] & 1);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	phozon_draw_sprites(screen->machine(),bitmap,cliprect,state->m_spriteram);
+	phozon_draw_sprites(screen.machine(),bitmap,cliprect,state->m_spriteram);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,1,0);
@@ -584,7 +584,7 @@ SCREEN_UPDATE( phozon )
 
 SCREEN_UPDATE( mappy )
 {
-	mappy_state *state = screen->machine().driver_data<mappy_state>();
+	mappy_state *state = screen.machine().driver_data<mappy_state>();
 	int offs;
 
 	for (offs = 2;offs < 34;offs++)
@@ -592,7 +592,7 @@ SCREEN_UPDATE( mappy )
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	mappy_draw_sprites(screen->machine(),bitmap,cliprect,state->m_spriteram);
+	mappy_draw_sprites(screen.machine(),bitmap,cliprect,state->m_spriteram);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,1,0);

@@ -340,7 +340,7 @@ static void copy_screen(running_machine &machine, bitmap_t *bitmap, const rectan
 
 SCREEN_UPDATE( model3 )
 {
-	model3_state *state = screen->machine().driver_data<model3_state>();
+	model3_state *state = screen.machine().driver_data<model3_state>();
 #if 0
 	int layer_scroll_x[4], layer_scroll_y[4];
 	UINT32 layer_data[4];
@@ -370,25 +370,25 @@ SCREEN_UPDATE( model3 )
 	if( state->m_tick >= 5 ) {
 		state->m_tick = 0;
 
-		if( screen->machine().input().code_pressed(KEYCODE_Y) )
+		if( screen.machine().input().code_pressed(KEYCODE_Y) )
 			state->m_debug_layer_disable ^= 0x1;
-		if( screen->machine().input().code_pressed(KEYCODE_U) )
+		if( screen.machine().input().code_pressed(KEYCODE_U) )
 			state->m_debug_layer_disable ^= 0x2;
-		if( screen->machine().input().code_pressed(KEYCODE_I) )
+		if( screen.machine().input().code_pressed(KEYCODE_I) )
 			state->m_debug_layer_disable ^= 0x4;
-		if( screen->machine().input().code_pressed(KEYCODE_O) )
+		if( screen.machine().input().code_pressed(KEYCODE_O) )
 			state->m_debug_layer_disable ^= 0x8;
-		if( screen->machine().input().code_pressed(KEYCODE_T) )
+		if( screen.machine().input().code_pressed(KEYCODE_T) )
 			state->m_debug_layer_disable ^= 0x10;
 	}
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	if (!(state->m_debug_layer_disable & 0x8))
-		draw_layer(screen->machine(), bitmap, cliprect, 3, (state->m_layer_enable >> 3) & 0x1);
+		draw_layer(screen.machine(), bitmap, cliprect, 3, (state->m_layer_enable >> 3) & 0x1);
 
 	if (!(state->m_debug_layer_disable & 0x4))
-		draw_layer(screen->machine(), bitmap, cliprect, 2, (state->m_layer_enable >> 2) & 0x1);
+		draw_layer(screen.machine(), bitmap, cliprect, 2, (state->m_layer_enable >> 2) & 0x1);
 
 	if( !(state->m_debug_layer_disable & 0x10) )
 	{
@@ -396,17 +396,17 @@ SCREEN_UPDATE( model3 )
 		if(state->m_real3d_display_list) {
 			bitmap_fill(state->m_zbuffer, cliprect, 0);
 			bitmap_fill(state->m_bitmap3d, cliprect, 0x8000);
-			real3d_traverse_display_list(screen->machine());
+			real3d_traverse_display_list(screen.machine());
 		}
 #endif
 		copybitmap_trans(bitmap, state->m_bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
 	}
 
 	if (!(state->m_debug_layer_disable & 0x2))
-		draw_layer(screen->machine(), bitmap, cliprect, 1, (state->m_layer_enable >> 1) & 0x1);
+		draw_layer(screen.machine(), bitmap, cliprect, 1, (state->m_layer_enable >> 1) & 0x1);
 
 	if (!(state->m_debug_layer_disable & 0x1))
-		draw_layer(screen->machine(), bitmap, cliprect, 0, (state->m_layer_enable >> 0) & 0x1);
+		draw_layer(screen.machine(), bitmap, cliprect, 0, (state->m_layer_enable >> 0) & 0x1);
 
 	//copy_screen(bitmap, cliprect);
 

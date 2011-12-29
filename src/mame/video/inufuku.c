@@ -236,11 +236,11 @@ VIDEO_START( inufuku )
 
 SCREEN_UPDATE( inufuku )
 {
-	inufuku_state *state = screen->machine().driver_data<inufuku_state>();
+	inufuku_state *state = screen.machine().driver_data<inufuku_state>();
 	int i;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
 
 	if (state->m_bg_raster)
 	{
@@ -260,6 +260,6 @@ SCREEN_UPDATE( inufuku )
 	tilemap_set_scrolly(state->m_tx_tilemap, 0, state->m_tx_scrolly);
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

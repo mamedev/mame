@@ -125,7 +125,7 @@ static void dai3wksi_get_pens(pen_t *pens)
 
 static SCREEN_UPDATE( dai3wksi )
 {
-	dai3wksi_state *state = screen->machine().driver_data<dai3wksi_state>();
+	dai3wksi_state *state = screen.machine().driver_data<dai3wksi_state>();
 	offs_t offs;
 	pen_t pens[8];
 
@@ -147,7 +147,7 @@ static SCREEN_UPDATE( dai3wksi )
 		}
 		else
 		{
-			if (input_port_read(screen->machine(), "IN2") & 0x03)
+			if (input_port_read(screen.machine(), "IN2") & 0x03)
 				color = vr_prom2[value];
 			else
 				color = vr_prom1[value];

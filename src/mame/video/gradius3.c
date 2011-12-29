@@ -125,7 +125,7 @@ WRITE16_HANDLER( gradius3_gfxram_w )
 
 SCREEN_UPDATE( gradius3 )
 {
-	gradius3_state *state = screen->machine().driver_data<gradius3_state>();
+	gradius3_state *state = screen.machine().driver_data<gradius3_state>();
 
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
 	k052109_w(state->m_k052109, 0x1d80, 0x10);
@@ -133,7 +133,7 @@ SCREEN_UPDATE( gradius3 )
 
 	k052109_tilemap_update(state->m_k052109);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	if (state->m_priority == 0)
 	{
 		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);

@@ -103,13 +103,13 @@ WRITE8_HANDLER( rollrace_flipx_w )
 
 SCREEN_UPDATE( rollrace )
 {
-	rollrace_state *state = screen->machine().driver_data<rollrace_state>();
+	rollrace_state *state = screen.machine().driver_data<rollrace_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 	int sx, sy;
 	int scroll;
 	int col;
-	const UINT8 *mem = screen->machine().region("user1")->base();
+	const UINT8 *mem = screen.machine().region("user1")->base();
 
 	/* fill in background colour*/
 	bitmap_fill(bitmap,cliprect,state->m_ra_bkgpen);
@@ -133,7 +133,7 @@ SCREEN_UPDATE( rollrace )
 				sy = 31-sy ;
 
 			drawgfx_transpen(bitmap,
-				cliprect,screen->machine().gfx[RA_BGCHAR_BASE],
+				cliprect,screen.machine().gfx[RA_BGCHAR_BASE],
 				mem[offs + ( state->m_ra_bkgpage * 1024 )]
 				+ ((( mem[offs + 0x4000 + ( state->m_ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
 				state->m_ra_bkgcol,
@@ -171,7 +171,7 @@ SCREEN_UPDATE( rollrace )
 		if(bank)
 			bank += state->m_ra_spritebank;
 
-		drawgfx_transpen(bitmap, cliprect,screen->machine().gfx[ RA_SP_BASE + bank ],
+		drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[ RA_SP_BASE + bank ],
 			spriteram[offs+1] & 0x3f ,
 			spriteram[offs+2] & 0x1f,
 			state->m_ra_flipx,!(s_flipy^state->m_ra_flipy),
@@ -199,7 +199,7 @@ SCREEN_UPDATE( rollrace )
 
 		if (state->m_ra_flipx) sx = 31 - sx;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[RA_FGCHAR_BASE + state->m_ra_chrbank]  ,
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[RA_FGCHAR_BASE + state->m_ra_chrbank]  ,
 			state->m_videoram[ offs ]  ,
 			col,
 			state->m_ra_flipx,state->m_ra_flipy,

@@ -84,16 +84,16 @@ static void draw_bombs( running_machine &machine, bitmap_t *bitmap, const rectan
 
 SCREEN_UPDATE( canyon )
 {
-	canyon_state *state = screen->machine().driver_data<canyon_state>();
+	canyon_state *state = screen.machine().driver_data<canyon_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	draw_bombs(screen->machine(), bitmap, cliprect);
+	draw_bombs(screen.machine(), bitmap, cliprect);
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(screen->machine(), !(input_port_read(screen->machine(), "IN2") & 0x10));
+	watchdog_enable(screen.machine(), !(input_port_read(screen.machine(), "IN2") & 0x10));
 
 	return 0;
 }

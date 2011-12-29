@@ -446,11 +446,11 @@ static void get_pens(running_machine &machine, pen_t *pens)
 
 static SCREEN_UPDATE( berzerk )
 {
-	berzerk_state *state = screen->machine().driver_data<berzerk_state>();
+	berzerk_state *state = screen.machine().driver_data<berzerk_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
-	get_pens(screen->machine(), pens);
+	get_pens(screen.machine(), pens);
 
 	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{

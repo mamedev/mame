@@ -382,7 +382,7 @@ static VIDEO_START( ddayjlc )
 
 static SCREEN_UPDATE( ddayjlc )
 {
-	ddayjlc_state *state = screen->machine().driver_data<ddayjlc_state>();
+	ddayjlc_state *state = screen.machine().driver_data<ddayjlc_state>();
 	UINT32 i;
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
@@ -398,7 +398,7 @@ static SCREEN_UPDATE( ddayjlc )
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], code, color, xflip, yflip, x, y, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], code, color, xflip, yflip, x, y, 0);
 	}
 
 	{
@@ -409,9 +409,9 @@ static SCREEN_UPDATE( ddayjlc )
 			{
 				c = state->m_videoram[y * 32 + x];
 				if (x > 1 && x < 30)
-					drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], c + state->m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
+					drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], c + state->m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
-					drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[1], c + state->m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
+					drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[1], c + state->m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
 			}
 	}
 	return 0;

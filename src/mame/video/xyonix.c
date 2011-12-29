@@ -58,7 +58,7 @@ VIDEO_START(xyonix)
 
 SCREEN_UPDATE(xyonix)
 {
-	xyonix_state *state = screen->machine().driver_data<xyonix_state>();
+	xyonix_state *state = screen.machine().driver_data<xyonix_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 	return 0;

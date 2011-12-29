@@ -49,7 +49,7 @@ VIDEO_START( xexex )
 SCREEN_UPDATE( xexex )
 {
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
-	xexex_state *state = screen->machine().driver_data<xexex_state>();
+	xexex_state *state = screen.machine().driver_data<xexex_state>();
 	int layer[4];
 	int bg_colorbase, new_colorbase, plane, alpha;
 
@@ -81,7 +81,7 @@ SCREEN_UPDATE( xexex )
 	k054338_update_all_shadows(state->m_k054338, 0);
 	k054338_fill_backcolor(state->m_k054338, bitmap, 0);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	for (plane = 0; plane < 4; plane++)
 	{

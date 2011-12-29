@@ -222,13 +222,13 @@ VIDEO_START( wwfsstar )
 
 SCREEN_UPDATE( wwfsstar )
 {
-	wwfsstar_state *state = screen->machine().driver_data<wwfsstar_state>();
+	wwfsstar_state *state = screen.machine().driver_data<wwfsstar_state>();
 
 	tilemap_set_scrolly( state->m_bg0_tilemap, 0, state->m_scrolly  );
 	tilemap_set_scrollx( state->m_bg0_tilemap, 0, state->m_scrollx  );
 
 	tilemap_draw(bitmap,cliprect,state->m_bg0_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect );
+	draw_sprites(screen.machine(), bitmap,cliprect );
 	tilemap_draw(bitmap,cliprect,state->m_fg0_tilemap,0,0);
 
 	return 0;

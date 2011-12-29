@@ -227,19 +227,19 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_t *bitmap,con
 
 SCREEN_UPDATE( pbillian )
 {
-	superqix_state *state = screen->machine().driver_data<superqix_state>();
+	superqix_state *state = screen.machine().driver_data<superqix_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	pbillian_draw_sprites(screen->machine(), bitmap,cliprect);
+	pbillian_draw_sprites(screen.machine(), bitmap,cliprect);
 
 	return 0;
 }
 
 SCREEN_UPDATE( superqix )
 {
-	superqix_state *state = screen->machine().driver_data<superqix_state>();
+	superqix_state *state = screen.machine().driver_data<superqix_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	copybitmap_trans(bitmap,state->m_fg_bitmap[state->m_show_bitmap],flip_screen_get(screen->machine()),flip_screen_get(screen->machine()),0,0,cliprect,0);
-	superqix_draw_sprites(screen->machine(), bitmap,cliprect);
+	copybitmap_trans(bitmap,state->m_fg_bitmap[state->m_show_bitmap],flip_screen_get(screen.machine()),flip_screen_get(screen.machine()),0,0,cliprect,0);
+	superqix_draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

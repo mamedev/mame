@@ -233,7 +233,7 @@ VIDEO_START( hyhoo )
 
 SCREEN_UPDATE( hyhoo )
 {
-	hyhoo_state *state = screen->machine().driver_data<hyhoo_state>();
+	hyhoo_state *state = screen.machine().driver_data<hyhoo_state>();
 	if (state->m_dispflag)
 		copybitmap(bitmap, state->m_tmpbitmap, state->m_flipscreen, state->m_flipscreen, 0, 0, cliprect);
 	else

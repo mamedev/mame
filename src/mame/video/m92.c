@@ -547,34 +547,34 @@ static void m92_draw_tiles(running_machine &machine, bitmap_t *bitmap,const rect
 
 SCREEN_UPDATE( m92 )
 {
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
-	m92_update_scroll_positions(screen->machine());
-	m92_draw_tiles(screen->machine(), bitmap, cliprect);
+	m92_update_scroll_positions(screen.machine());
+	m92_draw_tiles(screen.machine(), bitmap, cliprect);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (input_port_read(screen->machine(), "DSW") & 0x100)
-		flip_screen_set(screen->machine(), 0);
+	if (input_port_read(screen.machine(), "DSW") & 0x100)
+		flip_screen_set(screen.machine(), 0);
 	else
-		flip_screen_set(screen->machine(), 1);
+		flip_screen_set(screen.machine(), 1);
 	return 0;
 }
 
 SCREEN_UPDATE( ppan )
 {
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
-	m92_update_scroll_positions(screen->machine());
-	m92_draw_tiles(screen->machine(), bitmap, cliprect);
+	m92_update_scroll_positions(screen.machine());
+	m92_draw_tiles(screen.machine(), bitmap, cliprect);
 
-	ppan_draw_sprites(screen->machine(), bitmap, cliprect);
+	ppan_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (input_port_read(screen->machine(), "DSW") & 0x100)
-		flip_screen_set(screen->machine(), 0);
+	if (input_port_read(screen.machine(), "DSW") & 0x100)
+		flip_screen_set(screen.machine(), 0);
 	else
-		flip_screen_set(screen->machine(), 1);
+		flip_screen_set(screen.machine(), 1);
 	return 0;
 }

@@ -199,7 +199,7 @@ static VIDEO_START( photon )
 
 static SCREEN_UPDATE( photon )
 {
-	return pk8000_video_update(screen, bitmap, cliprect, screen->machine().region("maincpu")->base());
+	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().region("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon, photon_state )

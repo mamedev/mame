@@ -81,7 +81,7 @@ VIDEO_START( trucocl )
 
 SCREEN_UPDATE( trucocl )
 {
-	trucocl_state *state = screen->machine().driver_data<trucocl_state>();
+	trucocl_state *state = screen.machine().driver_data<trucocl_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

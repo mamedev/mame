@@ -196,7 +196,7 @@ static VIDEO_START( safarir )
 
 static SCREEN_UPDATE( safarir )
 {
-	safarir_state *state = screen->machine().driver_data<safarir_state>();
+	safarir_state *state = screen.machine().driver_data<safarir_state>();
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, *state->m_bg_scroll);
 

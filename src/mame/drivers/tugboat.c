@@ -127,13 +127,13 @@ static void draw_tilemap(running_machine &machine, bitmap_t *bitmap,const rectan
 
 static SCREEN_UPDATE( tugboat )
 {
-	tugboat_state *state = screen->machine().driver_data<tugboat_state>();
+	tugboat_state *state = screen.machine().driver_data<tugboat_state>();
 	int startaddr0 = state->m_hd46505_0_reg[0x0c]*256 + state->m_hd46505_0_reg[0x0d];
 	int startaddr1 = state->m_hd46505_1_reg[0x0c]*256 + state->m_hd46505_1_reg[0x0d];
 
 
-	draw_tilemap(screen->machine(), bitmap,cliprect,startaddr0,0,1,FALSE);
-	draw_tilemap(screen->machine(), bitmap,cliprect,startaddr1,2,3,TRUE);
+	draw_tilemap(screen.machine(), bitmap,cliprect,startaddr0,0,1,FALSE);
+	draw_tilemap(screen.machine(), bitmap,cliprect,startaddr1,2,3,TRUE);
 	return 0;
 }
 

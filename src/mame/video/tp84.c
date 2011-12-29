@@ -177,23 +177,23 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( tp84 )
 {
-	tp84_state *state = screen->machine().driver_data<tp84_state>();
+	tp84_state *state = screen.machine().driver_data<tp84_state>();
 	rectangle clip = *cliprect;
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 
-	if (cliprect->min_y == screen->visible_area().min_y)
+	if (cliprect->min_y == screen.visible_area().min_y)
 	{
-		tilemap_mark_all_tiles_dirty_all(screen->machine());
+		tilemap_mark_all_tiles_dirty_all(screen.machine());
 
 		tilemap_set_scrollx(state->m_bg_tilemap, 0, *state->m_scroll_x);
 		tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_scroll_y);
 
-		tilemap_set_flip_all(screen->machine(), ((*state->m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
+		tilemap_set_flip_all(screen.machine(), ((*state->m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
 									   ((*state->m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* draw top status region */
 	clip.min_x = visarea.min_x;

@@ -390,11 +390,11 @@ static VIDEO_START( stactics )
 
 static SCREEN_UPDATE( stactics )
 {
-	stactics_state *state = screen->machine().driver_data<stactics_state>();
+	stactics_state *state = screen.machine().driver_data<stactics_state>();
 
 	update_beam(state);
 	draw_background(state, bitmap, cliprect);
-	update_artwork(screen->machine(), state);
+	update_artwork(screen.machine(), state);
 
 	state->m_frame_count = (state->m_frame_count + 1) & 0x0f;
 

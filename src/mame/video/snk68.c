@@ -290,14 +290,14 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( pow )
 {
-	snk68_state *state = screen->machine().driver_data<snk68_state>();
+	snk68_state *state = screen.machine().driver_data<snk68_state>();
 
 	bitmap_fill(bitmap, cliprect, 0x7ff);
 
 	/* This appears to be the correct priority order */
-	draw_sprites(screen->machine(), bitmap, cliprect, 2);
-	draw_sprites(screen->machine(), bitmap, cliprect, 3);
-	draw_sprites(screen->machine(), bitmap, cliprect, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, 2);
+	draw_sprites(screen.machine(), bitmap, cliprect, 3);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;

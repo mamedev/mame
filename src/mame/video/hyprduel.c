@@ -673,7 +673,7 @@ static void dirty_tiles( running_machine &machine, int layer, UINT16 *vram )
 
 SCREEN_UPDATE( hyprduel )
 {
-	hyprduel_state *state = screen->machine().driver_data<hyprduel_state>();
+	hyprduel_state *state = screen.machine().driver_data<hyprduel_state>();
 	int i, pri, layers_ctrl = -1;
 	UINT16 screenctrl = *state->m_screenctrl;
 
@@ -696,17 +696,17 @@ SCREEN_UPDATE( hyprduel )
 
 		if (dirty)
 		{
-			dirty_tiles(screen->machine(), 0, state->m_vram_0);
-			dirty_tiles(screen->machine(), 1, state->m_vram_1);
-			dirty_tiles(screen->machine(), 2, state->m_vram_2);
+			dirty_tiles(screen.machine(), 0, state->m_vram_0);
+			dirty_tiles(screen.machine(), 1, state->m_vram_1);
+			dirty_tiles(screen.machine(), 2, state->m_vram_2);
 		}
 	}
 
-	state->m_sprite_xoffs = state->m_videoregs[0x06 / 2] - screen->width()  / 2;
-	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - screen->height() / 2 - state->m_sprite_yoffs_sub;
+	state->m_sprite_xoffs = state->m_videoregs[0x06 / 2] - screen.width()  / 2;
+	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - screen.height() / 2 - state->m_sprite_yoffs_sub;
 
 	/* The background color is selected by a register */
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, ((state->m_videoregs[0x12 / 2] & 0x0fff)) + 0x1000);
 
 	/*  Screen Control Register:
@@ -722,15 +722,15 @@ SCREEN_UPDATE( hyprduel )
         ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)
 		return 0;
-	flip_screen_set(screen->machine(), screenctrl & 1);
+	flip_screen_set(screen.machine(), screenctrl & 1);
 
 #if 0
-if (screen->machine().input().code_pressed(KEYCODE_Z))
+if (screen.machine().input().code_pressed(KEYCODE_Z))
 {	int msk = 0;
-	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 0x01;
-	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 0x02;
-	if (screen->machine().input().code_pressed(KEYCODE_E))	msk |= 0x04;
-	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 0x08;
+	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 0x01;
+	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 0x02;
+	if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 0x04;
+	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 0x08;
 	if (msk != 0)
 	{
 		bitmap_fill(bitmap, cliprect,0);
@@ -745,10 +745,10 @@ if (screen->machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	for (pri = 3; pri >= 0; pri--)
-		draw_layers(screen->machine(), bitmap, cliprect, pri, layers_ctrl);
+		draw_layers(screen.machine(), bitmap, cliprect, pri, layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }

@@ -260,7 +260,7 @@ static VIDEO_START( magictg )
 
 static SCREEN_UPDATE( magictg )
 {
-	magictg_state* state = screen->machine().driver_data<magictg_state>();
+	magictg_state* state = screen.machine().driver_data<magictg_state>();
 	return voodoo_update(state->m_voodoo[0], bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 

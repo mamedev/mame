@@ -973,9 +973,9 @@ VIDEO_START( dkong )
 
 SCREEN_UPDATE( dkong )
 {
-	dkong_state *state = screen->machine().driver_data<dkong_state>();
+	dkong_state *state = screen.machine().driver_data<dkong_state>();
 
-	tilemap_set_flip_all(screen->machine(), state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip_all(screen.machine(), state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_flip ?  0 : 0);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_flip ? -8 : 0);
 
@@ -983,15 +983,15 @@ SCREEN_UPDATE( dkong )
 	{
 		case HARDWARE_TKG02:
 		case HARDWARE_TKG04:
-			check_palette(screen->machine());
+			check_palette(screen.machine());
 			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-			draw_sprites(screen->machine(), bitmap, cliprect, 0x40, 1);
+			draw_sprites(screen.machine(), bitmap, cliprect, 0x40, 1);
 			break;
 		case HARDWARE_TRS01:
 		case HARDWARE_TRS02:
 			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-			draw_sprites(screen->machine(), bitmap, cliprect, 0x40, 1);
-			radarscp_draw_background(screen->machine(), state, bitmap, cliprect);
+			draw_sprites(screen.machine(), bitmap, cliprect, 0x40, 1);
+			radarscp_draw_background(screen.machine(), state, bitmap, cliprect);
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_update");
@@ -1001,7 +1001,7 @@ SCREEN_UPDATE( dkong )
 
 SCREEN_UPDATE( pestplce )
 {
-	dkong_state *state = screen->machine().driver_data<dkong_state>();
+	dkong_state *state = screen.machine().driver_data<dkong_state>();
 	int offs;
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -1011,7 +1011,7 @@ SCREEN_UPDATE( pestplce )
 	{
 		if (state->m_sprite_ram[offs])
 		{
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
 					state->m_sprite_ram[offs + 2],
 					(state->m_sprite_ram[offs + 1] & 0x0f) + 16 * state->m_palette_bank,
 					state->m_sprite_ram[offs + 1] & 0x80,state->m_sprite_ram[offs + 1] & 0x40,
@@ -1023,11 +1023,11 @@ SCREEN_UPDATE( pestplce )
 
 SCREEN_UPDATE( spclforc )
 {
-	dkong_state *state = screen->machine().driver_data<dkong_state>();
+	dkong_state *state = screen.machine().driver_data<dkong_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* it uses sprite_ram[offs + 2] & 0x10 for sprite bank */
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x10, 3);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x10, 3);
 	return 0;
 }

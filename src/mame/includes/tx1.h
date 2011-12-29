@@ -161,7 +161,9 @@ WRITE16_HANDLER( tx1_crtc_w );
 
 PALETTE_INIT( tx1 );
 VIDEO_START( tx1 );
-SCREEN_UPDATE( tx1 );
+SCREEN_UPDATE( tx1_left );
+SCREEN_UPDATE( tx1_middle );
+SCREEN_UPDATE( tx1_right );
 SCREEN_EOF( tx1 );
 WRITE16_HANDLER( tx1_slincs_w );
 WRITE16_HANDLER( tx1_slock_w );
@@ -171,7 +173,9 @@ WRITE16_HANDLER( tx1_flgcs_w );
 
 PALETTE_INIT( buggyboy );
 VIDEO_START( buggyboy );
-SCREEN_UPDATE( buggyboy );
+SCREEN_UPDATE( buggyboy_left );
+SCREEN_UPDATE( buggyboy_middle );
+SCREEN_UPDATE( buggyboy_right );
 SCREEN_EOF( buggyboy );
 
 VIDEO_START( buggybjr );

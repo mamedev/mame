@@ -263,7 +263,7 @@ static I8255_INTERFACE( ppi8255_intf )
 
 static SCREEN_UPDATE( sg1000a )
 {
-	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
 
 	tms9928a->update( bitmap, cliprect );
 	return 0;

@@ -931,30 +931,30 @@ VIDEO_START( lockon )
 
 SCREEN_UPDATE( lockon )
 {
-	lockon_state *state = screen->machine().driver_data<lockon_state>();
+	lockon_state *state = screen.machine().driver_data<lockon_state>();
 
 	/* If screen output is disabled, fill with black */
 	if (!BIT(state->m_ctrl_reg, 7))
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
 	/* Scan out the frame buffer in rotated order */
-	rotate_draw(screen->machine(), bitmap, cliprect);
+	rotate_draw(screen.machine(), bitmap, cliprect);
 
 	/* Draw the character tilemap */
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 
 	/* Draw the HUD */
-	hud_draw(screen->machine(), bitmap, cliprect);
+	hud_draw(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }
 
 SCREEN_EOF( lockon )
 {
-	lockon_state *state = machine.driver_data<lockon_state>();
+	lockon_state *state = screen.machine().driver_data<lockon_state>();
 
 	/* Swap the frame buffers */
 	bitmap_t *tmp = state->m_front_buffer;
@@ -962,7 +962,7 @@ SCREEN_EOF( lockon )
 	state->m_back_buffer = tmp;
 
 	/* Draw the frame buffer layers */
-	scene_draw(machine);
-	ground_draw(machine);
-	objects_draw(machine);
+	scene_draw(screen.machine());
+	ground_draw(screen.machine());
+	objects_draw(screen.machine());
 }

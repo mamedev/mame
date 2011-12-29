@@ -131,9 +131,9 @@ static VIDEO_START( vpoker )
 
 static SCREEN_UPDATE( vpoker )
 {
-	vpoker_state *state = screen->machine().driver_data<vpoker_state>();
+	vpoker_state *state = screen.machine().driver_data<vpoker_state>();
 	UINT8 *videoram = state->m_videoram;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x0000;
 
 	int y,x;

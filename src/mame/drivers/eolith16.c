@@ -123,7 +123,7 @@ static VIDEO_START( eolith16 )
 
 static SCREEN_UPDATE( eolith16 )
 {
-	eolith16_state *state = screen->machine().driver_data<eolith16_state>();
+	eolith16_state *state = screen.machine().driver_data<eolith16_state>();
 	int x,y,count;
 	int color;
 

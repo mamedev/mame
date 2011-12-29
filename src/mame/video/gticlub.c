@@ -983,7 +983,7 @@ VIDEO_START( gticlub )
 
 SCREEN_UPDATE( gticlub )
 {
-	device_t *k001604 = screen->machine().device("k001604_1");
+	device_t *k001604 = screen.machine().device("k001604_1");
 
 	k001604_draw_back_layer(k001604, bitmap, cliprect);
 
@@ -995,15 +995,15 @@ SCREEN_UPDATE( gticlub )
 	if( tick >= 5 ) {
 		tick = 0;
 
-		if( screen->machine().input().code_pressed(KEYCODE_O) )
+		if( screen.machine().input().code_pressed(KEYCODE_O) )
 			debug_tex_page++;
 
-		if( screen->machine().input().code_pressed(KEYCODE_I) )
+		if( screen.machine().input().code_pressed(KEYCODE_I) )
 			debug_tex_page--;
 
-		if (screen->machine().input().code_pressed(KEYCODE_U))
+		if (screen.machine().input().code_pressed(KEYCODE_U))
 			debug_tex_palette++;
-		if (screen->machine().input().code_pressed(KEYCODE_Y))
+		if (screen.machine().input().code_pressed(KEYCODE_Y))
 			debug_tex_palette--;
 
 		if (debug_tex_page < 0)
@@ -1044,19 +1044,19 @@ SCREEN_UPDATE( gticlub )
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg[1]);
 
-	//cputag_set_input_line(screen->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-	sharc_set_flag_input(screen->machine().device("dsp"), 1, ASSERT_LINE);
+	//cputag_set_input_line(screen.machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+	sharc_set_flag_input(screen.machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
 SCREEN_UPDATE( hangplt )
 {
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 
-	if (strcmp(screen->tag(), "lscreen") == 0)
+	if (strcmp(screen.tag(), "lscreen") == 0)
 	{
-		device_t *k001604 = screen->machine().device("k001604_1");
-		device_t *voodoo = screen->machine().device("voodoo0");
+		device_t *k001604 = screen.machine().device("k001604_1");
+		device_t *voodoo = screen.machine().device("voodoo0");
 
 	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 
@@ -1064,10 +1064,10 @@ SCREEN_UPDATE( hangplt )
 
 		k001604_draw_front_layer(k001604, bitmap, cliprect);
 	}
-	else if (strcmp(screen->tag(), "rscreen") == 0)
+	else if (strcmp(screen.tag(), "rscreen") == 0)
 	{
-		device_t *k001604 = screen->machine().device("k001604_2");
-		device_t *voodoo = screen->machine().device("voodoo1");
+		device_t *k001604 = screen.machine().device("k001604_2");
+		device_t *voodoo = screen.machine().device("voodoo1");
 
 	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 

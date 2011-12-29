@@ -284,7 +284,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( ladybug )
 {
-	ladybug_state *state = screen->machine().driver_data<ladybug_state>();
+	ladybug_state *state = screen.machine().driver_data<ladybug_state>();
 	int offs;
 
 	// clear the bg bitmap
@@ -295,25 +295,25 @@ SCREEN_UPDATE( ladybug )
 		int sx = offs % 4;
 		int sy = offs / 4;
 
-		if (flip_screen_get(screen->machine()))
+		if (flip_screen_get(screen.machine()))
 			tilemap_set_scrollx(state->m_bg_tilemap, offs, -state->m_videoram[32 * sx + sy]);
 		else
 			tilemap_set_scrollx(state->m_bg_tilemap, offs, state->m_videoram[32 * sx + sy]);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_EOF( sraider )	/* update starfield position */
 {
-	redclash_update_stars_state(machine);
+	redclash_update_stars_state(screen.machine());
 }
 
 SCREEN_UPDATE( sraider )
 {
-	ladybug_state *state = screen->machine().driver_data<ladybug_state>();
+	ladybug_state *state = screen.machine().driver_data<ladybug_state>();
 
 	// this part is boilerplate from ladybug, not sure if hardware does this,
 	// since it's not used
@@ -326,7 +326,7 @@ SCREEN_UPDATE( sraider )
 		int sx = offs % 4;
 		int sy = offs / 4;
 
-		if (flip_screen_get(screen->machine()))
+		if (flip_screen_get(screen.machine()))
 			tilemap_set_scrollx(state->m_bg_tilemap, offs, -state->m_videoram[32 * sx + sy]);
 		else
 			tilemap_set_scrollx(state->m_bg_tilemap, offs, state->m_videoram[32 * sx + sy]);
@@ -336,16 +336,16 @@ SCREEN_UPDATE( sraider )
 	bitmap_fill(bitmap, cliprect, 0);
 
 	// draw the stars
-	if (flip_screen_get(screen->machine()))
-		redclash_draw_stars(screen->machine(), bitmap, cliprect, 0x60, 1, 0x27, 0xff);
+	if (flip_screen_get(screen.machine()))
+		redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 1, 0x27, 0xff);
 	else
-		redclash_draw_stars(screen->machine(), bitmap, cliprect, 0x60, 1, 0x00, 0xd8);
+		redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 1, 0x00, 0xd8);
 
 	// draw the gridlines
-	colortable_palette_set_color(screen->machine().colortable, 0x40, MAKE_RGB(state->m_grid_color & 0x40 ? 0xff : 0,
+	colortable_palette_set_color(screen.machine().colortable, 0x40, MAKE_RGB(state->m_grid_color & 0x40 ? 0xff : 0,
 		            														 state->m_grid_color & 0x20 ? 0xff : 0,
 		            														 state->m_grid_color & 0x10 ? 0xff : 0));
-	tilemap_draw(bitmap, cliprect, state->m_grid_tilemap, 0, flip_screen_get(screen->machine()));
+	tilemap_draw(bitmap, cliprect, state->m_grid_tilemap, 0, flip_screen_get(screen.machine()));
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -354,7 +354,7 @@ SCREEN_UPDATE( sraider )
 			UINT8 x = i;
 			int height = cliprect->max_y - cliprect->min_y + 1;
 
-			if (flip_screen_get(screen->machine()))
+			if (flip_screen_get(screen.machine()))
 				x = ~x;
 
 			plot_box(bitmap, x, cliprect->min_y, 1, height, 0x81);
@@ -362,10 +362,10 @@ SCREEN_UPDATE( sraider )
 	}
 
 	// now the chars
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, flip_screen_get(screen->machine()));
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, flip_screen_get(screen.machine()));
 
 	// now the sprites
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }

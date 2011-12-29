@@ -876,7 +876,7 @@ static MACHINE_RESET( asuka )
 
 static SCREEN_EOF( asuka )
 {
-	asuka_state *state = machine.driver_data<asuka_state>();
+	asuka_state *state = screen.machine().driver_data<asuka_state>();
 	pc090oj_eof_callback(state->m_pc090oj);
 }
 

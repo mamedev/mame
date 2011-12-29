@@ -171,24 +171,24 @@ static VIDEO_START(galaxi)
 
 static SCREEN_UPDATE(galaxi)
 {
-	galaxi_state *state = screen->machine().driver_data<galaxi_state>();
+	galaxi_state *state = screen.machine().driver_data<galaxi_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed(KEYCODE_R))	// remapped due to inputs changes.
+	if (screen.machine().input().code_pressed(KEYCODE_R))	// remapped due to inputs changes.
 	{
 		int msk = 0;
-		if (screen->machine().input().code_pressed(KEYCODE_T))	msk |= 1;
-		if (screen->machine().input().code_pressed(KEYCODE_Y))	msk |= 2;
-		if (screen->machine().input().code_pressed(KEYCODE_U))	msk |= 4;
-		if (screen->machine().input().code_pressed(KEYCODE_I))	msk |= 8;
-		if (screen->machine().input().code_pressed(KEYCODE_O))	msk |= 16;
+		if (screen.machine().input().code_pressed(KEYCODE_T))	msk |= 1;
+		if (screen.machine().input().code_pressed(KEYCODE_Y))	msk |= 2;
+		if (screen.machine().input().code_pressed(KEYCODE_U))	msk |= 4;
+		if (screen.machine().input().code_pressed(KEYCODE_I))	msk |= 8;
+		if (screen.machine().input().code_pressed(KEYCODE_O))	msk |= 16;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_bg1_tmap, TILEMAP_DRAW_OPAQUE, 0);
-	else				bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	else				bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_bg2_tmap, 0, 0);
 	if (layers_ctrl & 4)	tilemap_draw(bitmap, cliprect, state->m_bg3_tmap, 0, 0);
 	if (layers_ctrl & 8)	tilemap_draw(bitmap, cliprect, state->m_bg4_tmap, 0, 0);

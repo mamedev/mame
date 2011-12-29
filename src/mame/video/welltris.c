@@ -242,12 +242,12 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( welltris )
 {
-	welltris_state *state = screen->machine().driver_data<welltris_state>();
+	welltris_state *state = screen.machine().driver_data<welltris_state>();
 	tilemap_set_scrollx(state->m_char_tilemap, 0, state->m_scrollx);
 	tilemap_set_scrolly(state->m_char_tilemap, 0, state->m_scrolly);
 
-	draw_background(screen->machine(), bitmap, cliprect);
+	draw_background(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_char_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

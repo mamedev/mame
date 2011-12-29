@@ -68,11 +68,11 @@ static VIDEO_START(intrscti)
 
 static SCREEN_UPDATE(intrscti)
 {
-	intrscti_state *state = screen->machine().driver_data<intrscti_state>();
+	intrscti_state *state = screen.machine().driver_data<intrscti_state>();
 	int y,x;
 	int count;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	count = 0;
 	for (y=0;y<64;y++)
@@ -81,7 +81,7 @@ static SCREEN_UPDATE(intrscti)
 		{
 			int dat;
 			dat = state->m_ram[count];
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
 			count++;
 		}
 	}

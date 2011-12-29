@@ -155,7 +155,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( raiden )
 {
-	raiden_state *state = screen->machine().driver_data<raiden_state>();
+	raiden_state *state = screen.machine().driver_data<raiden_state>();
 	/* Setup the tilemaps, alternate version has different scroll positions */
 	if (!state->m_alternate) {
 		tilemap_set_scrollx( state->m_bg_layer,0, state->m_scroll_ram[0]);
@@ -173,11 +173,11 @@ SCREEN_UPDATE( raiden )
 	tilemap_draw(bitmap,cliprect,state->m_bg_layer,0,0);
 
 	/* Draw sprites underneath foreground */
-	draw_sprites(screen->machine(),bitmap,cliprect,0x40);
+	draw_sprites(screen.machine(),bitmap,cliprect,0x40);
 	tilemap_draw(bitmap,cliprect,state->m_fg_layer,0,0);
 
 	/* Rest of sprites */
-	draw_sprites(screen->machine(),bitmap,cliprect,0x80);
+	draw_sprites(screen.machine(),bitmap,cliprect,0x80);
 
 	/* Text layer */
 	tilemap_draw(bitmap,cliprect,state->m_tx_layer,0,0);

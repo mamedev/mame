@@ -260,10 +260,10 @@ static void draw_bitmap( running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( chaknpop )
 {
-	chaknpop_state *state = screen->machine().driver_data<chaknpop_state>();
+	chaknpop_state *state = screen.machine().driver_data<chaknpop_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
-	draw_bitmap(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_bitmap(screen.machine(), bitmap, cliprect);
 	return 0;
 }

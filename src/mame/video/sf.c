@@ -220,7 +220,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const recta
 
 SCREEN_UPDATE( sf )
 {
-	sf_state *state = screen->machine().driver_data<sf_state>();
+	sf_state *state = screen.machine().driver_data<sf_state>();
 
 	if (state->m_sf_active & 0x20)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -230,7 +230,7 @@ SCREEN_UPDATE( sf )
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	if (state->m_sf_active & 0x80)
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 	return 0;

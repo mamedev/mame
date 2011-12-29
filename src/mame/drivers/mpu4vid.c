@@ -449,7 +449,7 @@ static const gfx_layout mpu4_vid_char_16x16_layout =
 
 static SCREEN_UPDATE(mpu4_vid)
 {
-	mpu4_state *state = screen->machine().driver_data<mpu4_state>();
+	mpu4_state *state = screen.machine().driver_data<mpu4_state>();
 	int x, y/*, count = 0*/;
 
 	bitmap_fill(bitmap,cliprect,0);
@@ -482,7 +482,7 @@ static SCREEN_UPDATE(mpu4_vid)
 			attr = tiledat >>12;
 
 			if (attr)
-				drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[gfxregion],tiledat,0,0,0,(x*8),(y*8));
+				drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[gfxregion],tiledat,0,0,0,(x*8),(y*8));
 
 		}
 		if (dbl_size&2)
@@ -2150,7 +2150,7 @@ static PALETTE_INIT( dealem )
 
 static SCREEN_UPDATE(dealem)
 {
-	mpu4_state *state = screen->machine().driver_data<mpu4_state>();
+	mpu4_state *state = screen.machine().driver_data<mpu4_state>();
 	int x,y;
 	int count = 0;
 
@@ -2160,7 +2160,7 @@ static SCREEN_UPDATE(dealem)
 		{
 			int tile = state->m_dealem_videoram[count + 0x1000] | (state->m_dealem_videoram[count] << 8);
 			count++;
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,0,0,0,x * 8,y * 8);
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,0,0,0,x * 8,y * 8);
 		}
 	}
 

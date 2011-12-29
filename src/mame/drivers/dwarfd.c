@@ -837,8 +837,8 @@ static void drawCrt( running_machine &machine, bitmap_t *bitmap,const rectangle 
 
 static SCREEN_UPDATE( dwarfd )
 {
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
-	drawCrt(screen->machine(), bitmap, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	drawCrt(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 

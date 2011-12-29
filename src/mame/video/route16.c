@@ -72,11 +72,11 @@ static pen_t ttmajng_make_pen(UINT8 color)
 
 SCREEN_UPDATE( route16 )
 {
-	route16_state *state = screen->machine().driver_data<route16_state>();
+	route16_state *state = screen.machine().driver_data<route16_state>();
 	offs_t offs;
 
-	UINT8 *color_prom1 = &screen->machine().region("proms")->base()[0x000];
-	UINT8 *color_prom2 = &screen->machine().region("proms")->base()[0x100];
+	UINT8 *color_prom1 = &screen.machine().region("proms")->base()[0x000];
+	UINT8 *color_prom2 = &screen.machine().region("proms")->base()[0x100];
 
 	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{
@@ -179,11 +179,11 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_t *bi
 
 SCREEN_UPDATE( stratvox )
 {
-	return video_update_stratvox_ttmahjng(screen->machine(), bitmap, cliprect, route16_make_pen);
+	return video_update_stratvox_ttmahjng(screen.machine(), bitmap, cliprect, route16_make_pen);
 }
 
 
 SCREEN_UPDATE( ttmahjng )
 {
-	return video_update_stratvox_ttmahjng(screen->machine(), bitmap, cliprect, ttmajng_make_pen);
+	return video_update_stratvox_ttmahjng(screen.machine(), bitmap, cliprect, ttmajng_make_pen);
 }

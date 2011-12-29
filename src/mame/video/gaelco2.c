@@ -339,19 +339,19 @@ VIDEO_START( gaelco2_dual )
 
 ***************************************************************************/
 
-static void draw_sprites(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
+static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
 {
-	gaelco2_state *state = screen->machine().driver_data<gaelco2_state>();
-	UINT16 *buffered_spriteram16 = screen->machine().generic.buffered_spriteram.u16;
+	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
+	UINT16 *buffered_spriteram16 = screen.machine().generic.buffered_spriteram.u16;
 	int j, x, y, ex, ey, px, py;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 
 	/* get sprite ram start and end offsets */
 	int start_offset = (state->m_vregs[1] & 0x10)*0x100;
 	int end_offset = start_offset + 0x1000;
 
 	/* sprite offset is based on the visible area */
-	int spr_x_adjust = (screen->visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((state->m_vregs[0] >> 4) & 0x01) + xoffs;
+	int spr_x_adjust = (screen.visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((state->m_vregs[0] >> 4) & 0x01) + xoffs;
 
 	for (j = start_offset; j < end_offset; j += 8){
 		int data = buffered_spriteram16[(j/2) + 0];
@@ -438,7 +438,7 @@ static void draw_sprites(screen_device *screen, bitmap_t *bitmap, const rectangl
 
 SCREEN_UPDATE( gaelco2 )
 {
-	gaelco2_state *state = screen->machine().driver_data<gaelco2_state>();
+	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	int i;
 
 	/* read scroll values */
@@ -466,13 +466,10 @@ SCREEN_UPDATE( gaelco2 )
 	return 0;
 }
 
-SCREEN_UPDATE( gaelco2_dual )
+static UINT32 dual_update(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int index)
 {
-	gaelco2_state *state = screen->machine().driver_data<gaelco2_state>();
+	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	int i;
-
-	device_t *left_screen  = screen->machine().device("lscreen");
-	device_t *right_screen = screen->machine().device("rscreen");
 
 	/* read scroll values */
 	int scroll0x = state->m_videoram[0x2802/2] + 0x14;
@@ -493,26 +490,20 @@ SCREEN_UPDATE( gaelco2_dual )
 	/* draw screen */
 	bitmap_fill(bitmap, cliprect, 0);
 
-	if (screen == right_screen)
-	{
-		/* monitor 2 output */
-		tilemap_draw(bitmap,cliprect,state->m_pant[1], 0, 0);
-		draw_sprites(screen,bitmap,cliprect, 0x8000, 0);
-	}
-	else if (screen == left_screen)
-	{
-		/* monitor 1 output */
-		tilemap_draw(bitmap,cliprect,state->m_pant[0], 0, 0);
-		draw_sprites(screen,bitmap,cliprect, 0x0000, 0);
-	}
+	tilemap_draw(bitmap,cliprect,state->m_pant[index], 0, 0);
+	draw_sprites(screen,bitmap,cliprect, 0x8000 * index, 0);
 
 	return 0;
 }
 
+SCREEN_UPDATE( gaelco2_left ) { return dual_update(screen, bitmap, cliprect, 0); }
+SCREEN_UPDATE( gaelco2_right ) { return dual_update(screen, bitmap, cliprect, 1); }
+
+
 
 SCREEN_EOF( gaelco2 )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* sprites are one frame ahead */
 	buffer_spriteram16_w(space, 0, 0, 0xffff);

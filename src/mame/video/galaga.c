@@ -567,11 +567,11 @@ static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectang
 
 SCREEN_UPDATE( galaga )
 {
-	galaga_state *state =  screen->machine().driver_data<galaga_state>();
+	galaga_state *state =  screen.machine().driver_data<galaga_state>();
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
-	draw_stars(screen->machine(),bitmap,cliprect);
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	draw_stars(screen.machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;
 }
@@ -580,7 +580,7 @@ SCREEN_UPDATE( galaga )
 
 SCREEN_EOF( galaga )
 {
-	galaga_state *state =  machine.driver_data<galaga_state>();
+	galaga_state *state =  screen.machine().driver_data<galaga_state>();
 	/* this function is called by galaga_interrupt_1() */
 	int s0,s1,s2;
 	static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };

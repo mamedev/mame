@@ -254,24 +254,24 @@ static SCREEN_UPDATE(sigmab98)
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed(KEYCODE_Z))
+	if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int msk = 0;
-		if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-		if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-		if (screen->machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-		if (screen->machine().input().code_pressed(KEYCODE_R))	msk |= 8;
+		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+		if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+		if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+		if (screen.machine().input().code_pressed(KEYCODE_R))	msk |= 8;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	// Draw from priority 3 (bottom, converted to a bitmask) to priority 0 (top)
-	draw_sprites(screen->machine(), bitmap, cliprect, layers_ctrl & 8);
-	draw_sprites(screen->machine(), bitmap, cliprect, layers_ctrl & 4);
-	draw_sprites(screen->machine(), bitmap, cliprect, layers_ctrl & 2);
-	draw_sprites(screen->machine(), bitmap, cliprect, layers_ctrl & 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, layers_ctrl & 8);
+	draw_sprites(screen.machine(), bitmap, cliprect, layers_ctrl & 4);
+	draw_sprites(screen.machine(), bitmap, cliprect, layers_ctrl & 2);
+	draw_sprites(screen.machine(), bitmap, cliprect, layers_ctrl & 1);
 
 	return 0;
 }
@@ -640,7 +640,7 @@ static WRITE8_HANDLER( vblank_w )
 
 static SCREEN_EOF( sammymdl )
 {
-	sigmab98_state *state = machine.driver_data<sigmab98_state>();
+	sigmab98_state *state = screen.machine().driver_data<sigmab98_state>();
 	state->m_vblank &= ~0x01;
 }
 

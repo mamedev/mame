@@ -1812,13 +1812,13 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, UINT8 *spri
 
 SCREEN_UPDATE( galaxold )
 {
-	galaxold_state *state = screen->machine().driver_data<galaxold_state>();
+	galaxold_state *state = screen.machine().driver_data<galaxold_state>();
 
-	(*state->m_draw_background)(screen->machine(), bitmap, cliprect);
+	(*state->m_draw_background)(screen.machine(), bitmap, cliprect);
 
 	if (state->m_stars_on)
 	{
-		(*state->m_draw_stars)(screen->machine(), bitmap, cliprect);
+		(*state->m_draw_stars)(screen.machine(), bitmap, cliprect);
 	}
 
 
@@ -1826,15 +1826,15 @@ SCREEN_UPDATE( galaxold )
 
 	if (state->m_draw_bullets)
 	{
-		draw_bullets_common(screen->machine(), bitmap, cliprect);
+		draw_bullets_common(screen.machine(), bitmap, cliprect);
 	}
 
 
-	draw_sprites(screen->machine(), bitmap, state->m_spriteram, state->m_spriteram_size);
+	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram_size);
 
 	if (state->m_spriteram2_present)
 	{
-		draw_sprites(screen->machine(), bitmap, state->m_spriteram2, state->m_spriteram2_size);
+		draw_sprites(screen.machine(), bitmap, state->m_spriteram2, state->m_spriteram2_size);
 	}
 	return 0;
 }
@@ -1842,15 +1842,15 @@ SCREEN_UPDATE( galaxold )
 
 SCREEN_UPDATE( dambustr )
 {
-	galaxold_state *state = screen->machine().driver_data<galaxold_state>();
+	galaxold_state *state = screen.machine().driver_data<galaxold_state>();
 	int i, j;
 	UINT8 color;
 
-	(*state->m_draw_background)(screen->machine(), bitmap, cliprect);
+	(*state->m_draw_background)(screen.machine(), bitmap, cliprect);
 
 	if (state->m_stars_on)
 	{
-		(*state->m_draw_stars)(screen->machine(), bitmap, cliprect);
+		(*state->m_draw_stars)(screen.machine(), bitmap, cliprect);
 	}
 
 	/* save the background for drawing it again later, if background has priority over characters */
@@ -1860,15 +1860,15 @@ SCREEN_UPDATE( dambustr )
 
 	if (state->m_draw_bullets)
 	{
-		draw_bullets_common(screen->machine(), bitmap, cliprect);
+		draw_bullets_common(screen.machine(), bitmap, cliprect);
 	}
 
-	draw_sprites(screen->machine(), bitmap, state->m_spriteram, state->m_spriteram_size);
+	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram_size);
 
 	if (state->m_dambustr_bg_priority)
 	{
 		/* draw the upper part of the background, as it has priority */
-		dambustr_draw_upper_background(screen->machine(), bitmap, cliprect);
+		dambustr_draw_upper_background(screen.machine(), bitmap, cliprect);
 
 		/* only rows with color code > 3 are stronger than the background */
 		memset(state->m_dambustr_videoram2, 0x20, 0x0400);

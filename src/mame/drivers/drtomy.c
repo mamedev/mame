@@ -125,11 +125,11 @@ static VIDEO_START( drtomy )
 
 static SCREEN_UPDATE( drtomy )
 {
-	drtomy_state *state = screen->machine().driver_data<drtomy_state>();
+	drtomy_state *state = screen.machine().driver_data<drtomy_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_tilemap_bg, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap_fg, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 

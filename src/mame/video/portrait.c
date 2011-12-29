@@ -190,7 +190,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( portrait )
 {
-	portrait_state *state = screen->machine().driver_data<portrait_state>();
+	portrait_state *state = screen.machine().driver_data<portrait_state>();
 	rectangle cliprect_scroll, cliprect_no_scroll;
 
 	cliprect_scroll = cliprect_no_scroll = *cliprect;
@@ -208,6 +208,6 @@ SCREEN_UPDATE( portrait )
 	tilemap_draw(bitmap, &cliprect_scroll, state->m_background, 0, 0);
 	tilemap_draw(bitmap, &cliprect_scroll, state->m_foreground, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

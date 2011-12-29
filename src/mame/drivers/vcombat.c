@@ -104,16 +104,14 @@ public:
 	int m_crtc_select;
 };
 
-
-static SCREEN_UPDATE( vcombat )
+static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int index)
 {
-	vcombat_state *state = screen->machine().driver_data<vcombat_state>();
+	vcombat_state *state = screen.machine().driver_data<vcombat_state>();
 	int y;
-	const rgb_t *const pens = tlc34076_get_pens(screen->machine().device("tlc34076"));
-	device_t *aux = screen->machine().device("aux");
+	const rgb_t *const pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 
 	UINT16 *m68k_buf = state->m_m68k_framebuffer[(*state->m_framebuffer_ctrl & 0x20) ? 1 : 0];
-	UINT16 *i860_buf = state->m_i860_framebuffer[(screen == aux) ? 1 : 0][0];
+	UINT16 *i860_buf = state->m_i860_framebuffer[index][0];
 
 	/* TODO: It looks like the leftmost chunk of the ground should really be on the right side? */
 	/*       But the i860 draws the background correctly, so it may be an original game issue. */
@@ -154,6 +152,9 @@ static SCREEN_UPDATE( vcombat )
 
 	return 0;
 }
+
+static SCREEN_UPDATE( vcombat_main ) { return update_screen(screen, bitmap, cliprect, 0); }
+static SCREEN_UPDATE( vcombat_aux ) { return update_screen(screen, bitmap, cliprect, 1); }
 
 
 static WRITE16_HANDLER( main_video_write )
@@ -599,12 +600,12 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
-	MCFG_SCREEN_UPDATE(vcombat)
+	MCFG_SCREEN_UPDATE(vcombat_main)
 
 	MCFG_SCREEN_ADD("aux", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
-	MCFG_SCREEN_UPDATE(vcombat)
+	MCFG_SCREEN_UPDATE(vcombat_aux)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -636,7 +637,7 @@ static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)
-	MCFG_SCREEN_UPDATE(vcombat)
+	MCFG_SCREEN_UPDATE(vcombat_main)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

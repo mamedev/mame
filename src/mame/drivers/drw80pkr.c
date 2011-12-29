@@ -339,7 +339,7 @@ static VIDEO_START( drw80pkr )
 
 static SCREEN_UPDATE( drw80pkr )
 {
-	drw80pkr_state *state = screen->machine().driver_data<drw80pkr_state>();
+	drw80pkr_state *state = screen.machine().driver_data<drw80pkr_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	return 0;

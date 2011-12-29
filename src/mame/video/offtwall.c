@@ -91,7 +91,7 @@ VIDEO_START( offtwall )
 
 SCREEN_UPDATE( offtwall )
 {
-	offtwall_state *state = screen->machine().driver_data<offtwall_state>();
+	offtwall_state *state = screen.machine().driver_data<offtwall_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

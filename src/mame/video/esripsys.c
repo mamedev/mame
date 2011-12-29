@@ -153,7 +153,7 @@ VIDEO_START( esripsys )
 
 SCREEN_UPDATE( esripsys )
 {
-	esripsys_state *state = screen->machine().driver_data<esripsys_state>();
+	esripsys_state *state = screen.machine().driver_data<esripsys_state>();
 	struct line_buffer_t *line_buffer = state->m_line_buffer;
 	int x, y;
 

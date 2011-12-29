@@ -97,7 +97,7 @@ static WRITE16_HANDLER( palette_w )
 /* TODO: This is a simplified version of what actually happens */
 static SCREEN_UPDATE( cubeqst )
 {
-	cubeqst_state *state = screen->machine().driver_data<cubeqst_state>();
+	cubeqst_state *state = screen.machine().driver_data<cubeqst_state>();
 	int y;
 
 	/*
@@ -112,8 +112,8 @@ static SCREEN_UPDATE( cubeqst )
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
 		int i;
-		int num_entries = cubeqcpu_get_ptr_ram_val(screen->machine().device("line_cpu"), y);
-		UINT32 *stk_ram = cubeqcpu_get_stack_ram(screen->machine().device("line_cpu"));
+		int num_entries = cubeqcpu_get_ptr_ram_val(screen.machine().device("line_cpu"), y);
+		UINT32 *stk_ram = cubeqcpu_get_stack_ram(screen.machine().device("line_cpu"));
 		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 		UINT32 pen;
 
@@ -155,7 +155,7 @@ static SCREEN_UPDATE( cubeqst )
 				}
 
 				/* Draw the span, testing for depth */
-				pen = state->m_colormap[screen->machine().generic.paletteram.u16[color]];
+				pen = state->m_colormap[screen.machine().generic.paletteram.u16[color]];
 				for (x = h1; x <= h2; ++x)
 				{
 					if (!(state->m_depth_buffer[x] < depth))

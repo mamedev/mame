@@ -219,26 +219,26 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( pitnrun )
 {
-	pitnrun_state *state = screen->machine().driver_data<pitnrun_state>();
+	pitnrun_state *state = screen.machine().driver_data<pitnrun_state>();
 	int dx=0,dy=0;
 	rectangle myclip=*cliprect;
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed_once(KEYCODE_Q))
+	if (screen.machine().input().code_pressed_once(KEYCODE_Q))
 	{
-		UINT8 *ROM = screen->machine().region("maincpu")->base();
+		UINT8 *ROM = screen.machine().region("maincpu")->base();
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_W))
+	if (screen.machine().input().code_pressed_once(KEYCODE_W))
 	{
-		UINT8 *ROM = screen->machine().region("maincpu")->base();
+		UINT8 *ROM = screen.machine().region("maincpu")->base();
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
-	if (screen->machine().input().code_pressed_once(KEYCODE_E))
+	if (screen.machine().input().code_pressed_once(KEYCODE_E))
 	{
-		UINT8 *ROM = screen->machine().region("maincpu")->base();
+		UINT8 *ROM = screen.machine().region("maincpu")->base();
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */
 		ROM[0x8102]=1;
 	}
@@ -253,10 +253,10 @@ SCREEN_UPDATE( pitnrun )
 		dx=128-state->m_h_heed+((state->m_ha&8)<<5)+3;
 		dy=128-state->m_v_heed+((state->m_ha&0x10)<<4);
 
-		if (flip_screen_x_get(screen->machine()))
+		if (flip_screen_x_get(screen.machine()))
 			dx=128-dx+16;
 
-		if (flip_screen_y_get(screen->machine()))
+		if (flip_screen_y_get(screen.machine()))
 			dy=128-dy;
 
 		myclip.min_x=dx;
@@ -274,10 +274,10 @@ SCREEN_UPDATE( pitnrun )
 		tilemap_draw(bitmap,&myclip,state->m_bg, 0,0);
 	}
 
-	draw_sprites(screen->machine(),bitmap,&myclip);
+	draw_sprites(screen.machine(),bitmap,&myclip);
 
 	if(state->m_ha&4)
-		copybitmap_trans(bitmap,state->m_tmp_bitmap[state->m_ha&3],flip_screen_x_get(screen->machine()),flip_screen_y_get(screen->machine()),dx,dy,&myclip, 1);
+		copybitmap_trans(bitmap,state->m_tmp_bitmap[state->m_ha&3],flip_screen_x_get(screen.machine()),flip_screen_y_get(screen.machine()),dx,dy,&myclip, 1);
 	tilemap_draw(bitmap,cliprect,state->m_fg, 0,0);
 	return 0;
 }

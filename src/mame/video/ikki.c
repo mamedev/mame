@@ -126,9 +126,9 @@ VIDEO_START( ikki )
 
 SCREEN_UPDATE( ikki )
 {
-	ikki_state *state = screen->machine().driver_data<ikki_state>();
+	ikki_state *state = screen.machine().driver_data<ikki_state>();
 	offs_t offs;
-	UINT8 *VIDEOATTR = screen->machine().region("user1")->base();
+	UINT8 *VIDEOATTR = screen.machine().region("user1")->base();
 
 	/* draw bg layer */
 
@@ -178,14 +178,14 @@ SCREEN_UPDATE( ikki )
 		bank = (color & 0xe0) << 3;
 		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-		drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
+		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
 			state->m_videoram[offs * 2 + 1] + bank,
 			color,
 			state->m_flipscreen,state->m_flipscreen,
 			x,y);
 	}
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* mask sprites */
 
@@ -213,7 +213,7 @@ SCREEN_UPDATE( ikki )
 			bank = (color & 0xe0) << 3;
 			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
 				state->m_videoram[offs * 2 + 1] + bank,
 				color,
 				state->m_flipscreen,state->m_flipscreen,

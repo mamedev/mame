@@ -89,7 +89,7 @@ WRITE8_HANDLER( speedatk_6845_w )
 
 SCREEN_UPDATE( speedatk )
 {
-	speedatk_state *state = screen->machine().driver_data<speedatk_state>();
+	speedatk_state *state = screen.machine().driver_data<speedatk_state>();
 	int x,y;
 	int count;
 	UINT16 tile;
@@ -109,7 +109,7 @@ SCREEN_UPDATE( speedatk )
 			color = state->m_colorram[count] & 0x1f;
 			region = (state->m_colorram[count] & 0x10) >> 4;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[region],tile,color,state->m_flip_scr,state->m_flip_scr,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[region],tile,color,state->m_flip_scr,state->m_flip_scr,x*8,y*8);
 
 			count = (state->m_flip_scr) ? count-1 : count+1;
 			count&=0x3ff;

@@ -2135,12 +2135,12 @@ static VIDEO_START( ss23 )
 
 static SCREEN_UPDATE( ss23 )
 {
-	namcos23_state *state = screen->machine().driver_data<namcos23_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	namcos23_state *state = screen.machine().driver_data<namcos23_state>();
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
-	render_run( screen->machine(), bitmap );
+	render_run( screen.machine(), bitmap );
 
-	gfx_element *gfx = screen->machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	memset(gfx->dirty, 1, gfx->total_elements);
 
 	tilemap_draw( bitmap, cliprect, state->m_bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */

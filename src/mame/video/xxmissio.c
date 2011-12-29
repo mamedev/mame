@@ -138,15 +138,15 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_
 
 SCREEN_UPDATE( xxmissio )
 {
-	xxmissio_state *state = screen->machine().driver_data<xxmissio_state>();
-	tilemap_mark_all_tiles_dirty_all(screen->machine());
-	tilemap_set_flip_all(screen->machine(), state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	xxmissio_state *state = screen.machine().driver_data<xxmissio_state>();
+	tilemap_mark_all_tiles_dirty_all(screen.machine());
+	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_xscroll * 2);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_yscroll);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(bitmap, cliprect, screen->machine().gfx[1]);
+	draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;

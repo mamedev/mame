@@ -182,8 +182,8 @@ void atarig42_scanline_update(screen_device &screen, int scanline)
 
 SCREEN_UPDATE( atarig42 )
 {
-	atarig42_state *state = screen->machine().driver_data<atarig42_state>();
-	bitmap_t *priority_bitmap = screen->machine().priority_bitmap;
+	atarig42_state *state = screen.machine().driver_data<atarig42_state>();
+	bitmap_t *priority_bitmap = screen.machine().priority_bitmap;
 
 	/* draw the playfield */
 	bitmap_fill(priority_bitmap, cliprect, 0);
@@ -229,7 +229,7 @@ SCREEN_UPDATE( atarig42 )
 
 SCREEN_EOF( atarig42 )
 {
-	atarig42_state *state = machine.driver_data<atarig42_state>();
+	atarig42_state *state = screen.machine().driver_data<atarig42_state>();
 
 	atarirle_eof(state->m_rle);
 }

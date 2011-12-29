@@ -120,8 +120,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 static SCREEN_UPDATE(mirax)
 {
-	mirax_state *state = screen->machine().driver_data<mirax_state>();
-	const gfx_element *gfx = screen->machine().gfx[0];
+	mirax_state *state = screen.machine().driver_data<mirax_state>();
+	const gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x00000;
 	int y,x;
 
@@ -142,7 +142,7 @@ static SCREEN_UPDATE(mirax)
 		}
 	}
 
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 
 	count = 0x00000;
 

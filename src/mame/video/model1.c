@@ -454,10 +454,10 @@ static void draw_quads(model1_state *state, bitmap_t *bitmap, const rectangle *c
 
 		fill_quad(bitmap, view, q);
 #if 0
-		draw_line(bitmap, get_black_pen(screen->machine()), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
-		draw_line(bitmap, get_black_pen(screen->machine()), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
-		draw_line(bitmap, get_black_pen(screen->machine()), q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
-		draw_line(bitmap, get_black_pen(screen->machine()), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
+		draw_line(bitmap, get_black_pen(screen.machine()), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
+		draw_line(bitmap, get_black_pen(screen.machine()), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
+		draw_line(bitmap, get_black_pen(screen.machine()), q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
+		draw_line(bitmap, get_black_pen(screen.machine()), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
 #endif
 	}
 
@@ -1470,7 +1470,7 @@ VIDEO_START(model1)
 
 SCREEN_UPDATE(model1)
 {
-	model1_state *state = screen->machine().driver_data<model1_state>();
+	model1_state *state = screen.machine().driver_data<model1_state>();
 	struct view *view = state->m_view;
 #if 0
 	{
@@ -1478,35 +1478,35 @@ SCREEN_UPDATE(model1)
 		double delta;
 		delta = 1;
 
-		if(screen->machine().input().code_pressed(KEYCODE_F)) {
+		if(screen.machine().input().code_pressed(KEYCODE_F)) {
 			mod = 1;
 			view->vxx -= delta;
 		}
-		if(screen->machine().input().code_pressed(KEYCODE_G)) {
+		if(screen.machine().input().code_pressed(KEYCODE_G)) {
 			mod = 1;
 			view->vxx += delta;
 		}
-		if(screen->machine().input().code_pressed(KEYCODE_H)) {
+		if(screen.machine().input().code_pressed(KEYCODE_H)) {
 			mod = 1;
 			view->vyy -= delta;
 		}
-		if(screen->machine().input().code_pressed(KEYCODE_J)) {
+		if(screen.machine().input().code_pressed(KEYCODE_J)) {
 			mod = 1;
 			view->vyy += delta;
 		}
-		if(screen->machine().input().code_pressed(KEYCODE_K)) {
+		if(screen.machine().input().code_pressed(KEYCODE_K)) {
 			mod = 1;
 			view->vzz -= delta;
 		}
-		if(screen->machine().input().code_pressed(KEYCODE_L)) {
+		if(screen.machine().input().code_pressed(KEYCODE_L)) {
 			mod = 1;
 			view->vzz += delta;
 		}
-		if(screen->machine().input().code_pressed(KEYCODE_U)) {
+		if(screen.machine().input().code_pressed(KEYCODE_U)) {
 			mod = 1;
 			view->ayy -= 0.05;
 		}
-		if(screen->machine().input().code_pressed(KEYCODE_I)) {
+		if(screen.machine().input().code_pressed(KEYCODE_I)) {
 			mod = 1;
 			view->ayy += 0.05;
 		}
@@ -1518,16 +1518,16 @@ SCREEN_UPDATE(model1)
 	view->ayyc = cos(view->ayy);
 	view->ayys = sin(view->ayy);
 
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 
-	segas24_tile *tile = screen->machine().device<segas24_tile>("tile");
+	segas24_tile *tile = screen.machine().device<segas24_tile>("tile");
 	tile->draw(bitmap, cliprect, 6, 0, 0);
 	tile->draw(bitmap, cliprect, 4, 0, 0);
 	tile->draw(bitmap, cliprect, 2, 0, 0);
 	tile->draw(bitmap, cliprect, 0, 0, 0);
 
-	tgp_render(screen->machine(), bitmap, cliprect);
+	tgp_render(screen.machine(), bitmap, cliprect);
 
 	tile->draw(bitmap, cliprect, 7, 0, 0);
 	tile->draw(bitmap, cliprect, 5, 0, 0);
@@ -1539,7 +1539,7 @@ SCREEN_UPDATE(model1)
 
 SCREEN_EOF(model1)
 {
-	tgp_scan(machine);
-	end_frame(machine);
+	tgp_scan(screen.machine());
+	end_frame(screen.machine());
 	LOG_TGP(("TGP: vsync\n"));
 }

@@ -48,7 +48,7 @@ public:
 /* VIDEO GOODS */
 static SCREEN_UPDATE( istellar )
 {
-	istellar_state *state = screen->machine().driver_data<istellar_state>();
+	istellar_state *state = screen.machine().driver_data<istellar_state>();
 	int charx, chary;
 
 	/* clear */
@@ -70,7 +70,7 @@ static SCREEN_UPDATE( istellar )
 		{
 			int current_screen_character = (chary*32) + charx;
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
 					state->m_tile_ram[current_screen_character],
 					(state->m_tile_control_ram[current_screen_character] & 0x0f),
 					0, 0, charx*8, chary*8, 0);

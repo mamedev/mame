@@ -357,10 +357,10 @@ static void pkunwar_draw_sprites(running_machine &machine, bitmap_t *bitmap, con
 
 SCREEN_UPDATE( nova2001 )
 {
-	nova2001_state *state = screen->machine().driver_data<nova2001_state>();
+	nova2001_state *state = screen.machine().driver_data<nova2001_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	nova2001_draw_sprites(screen->machine(), bitmap, cliprect);
+	nova2001_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	// according to the schematics, fg category 0 should be drawn behind sprites,
 	// but it doesn't look right that way
@@ -372,10 +372,10 @@ SCREEN_UPDATE( nova2001 )
 
 SCREEN_UPDATE( pkunwar )
 {
-	nova2001_state *state = screen->machine().driver_data<nova2001_state>();
+	nova2001_state *state = screen.machine().driver_data<nova2001_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
-	pkunwar_draw_sprites(screen->machine(), bitmap, cliprect);
+	pkunwar_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
 
@@ -384,12 +384,12 @@ SCREEN_UPDATE( pkunwar )
 
 SCREEN_UPDATE( ninjakun )
 {
-	nova2001_state *state = screen->machine().driver_data<nova2001_state>();
+	nova2001_state *state = screen.machine().driver_data<nova2001_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);
 
-	nova2001_draw_sprites(screen->machine(), bitmap, cliprect);
+	nova2001_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
@@ -398,10 +398,10 @@ SCREEN_UPDATE( ninjakun )
 
 SCREEN_UPDATE( raiders5 )
 {
-	nova2001_state *state = screen->machine().driver_data<nova2001_state>();
+	nova2001_state *state = screen.machine().driver_data<nova2001_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	pkunwar_draw_sprites(screen->machine(), bitmap, cliprect);
+	pkunwar_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 

@@ -401,7 +401,7 @@ VIDEO_START( nbmj8900_2layer )
 ******************************************************************************/
 SCREEN_UPDATE( nbmj8900 )
 {
-	nbmj8900_state *state = screen->machine().driver_data<nbmj8900_state>();
+	nbmj8900_state *state = screen.machine().driver_data<nbmj8900_state>();
 	int x, y;
 
 	if (state->m_screen_refresh)
@@ -411,7 +411,7 @@ SCREEN_UPDATE( nbmj8900 )
 		{
 			for (x = 0; x < state->m_screen_width; x++)
 			{
-				update_pixel0(screen->machine(), x, y);
+				update_pixel0(screen.machine(), x, y);
 			}
 		}
 		if (state->m_gfxdraw_mode)
@@ -420,7 +420,7 @@ SCREEN_UPDATE( nbmj8900 )
 			{
 				for (x = 0; x < state->m_screen_width; x++)
 				{
-					update_pixel1(screen->machine(), x, y);
+					update_pixel1(screen.machine(), x, y);
 				}
 			}
 		}

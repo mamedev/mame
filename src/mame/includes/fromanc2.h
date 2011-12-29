@@ -37,7 +37,8 @@ public:
 
 /*----------- defined in video/fromanc2.c -----------*/
 
-SCREEN_UPDATE( fromanc2 );
+SCREEN_UPDATE( fromanc2_left );
+SCREEN_UPDATE( fromanc2_right );
 VIDEO_START( fromanc2 );
 VIDEO_START( fromancr );
 VIDEO_START( fromanc4 );

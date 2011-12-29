@@ -2746,19 +2746,19 @@ static void convert_bitmap( running_machine &machine, bitmap_t *dst, bitmap_t *s
 
 SCREEN_UPDATE(model2)
 {
-	model2_state *state = screen->machine().driver_data<model2_state>();
+	model2_state *state = screen.machine().driver_data<model2_state>();
 	logerror("--- frame ---\n");
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 	bitmap_fill(state->m_sys24_bitmap, cliprect, 0);
 
-	segas24_tile *tile = screen->machine().device<segas24_tile>("tile");
+	segas24_tile *tile = screen.machine().device<segas24_tile>("tile");
 	tile->draw(state->m_sys24_bitmap, cliprect, 7, 0, 0);
 	tile->draw(state->m_sys24_bitmap, cliprect, 6, 0, 0);
 	tile->draw(state->m_sys24_bitmap, cliprect, 5, 0, 0);
 	tile->draw(state->m_sys24_bitmap, cliprect, 4, 0, 0);
 
-	convert_bitmap(screen->machine(), bitmap, state->m_sys24_bitmap, cliprect);
+	convert_bitmap(screen.machine(), bitmap, state->m_sys24_bitmap, cliprect);
 
 	/* tell the rasterizer we're starting a frame */
 	model2_3d_frame_start(state);
@@ -2775,7 +2775,7 @@ SCREEN_UPDATE(model2)
 	tile->draw(state->m_sys24_bitmap, cliprect, 1, 0, 0);
 	tile->draw(state->m_sys24_bitmap, cliprect, 0, 0, 0);
 
-	convert_bitmap(screen->machine(), bitmap, state->m_sys24_bitmap, cliprect);
+	convert_bitmap(screen.machine(), bitmap, state->m_sys24_bitmap, cliprect);
 
 	return 0;
 }

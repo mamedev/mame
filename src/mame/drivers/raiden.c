@@ -244,7 +244,7 @@ static INTERRUPT_GEN( raiden_interrupt )
 
 static SCREEN_EOF( raiden )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
 }
 

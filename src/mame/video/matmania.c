@@ -129,7 +129,7 @@ VIDEO_START( matmania )
 
 SCREEN_UPDATE( matmania )
 {
-	matmania_state *state = screen->machine().driver_data<matmania_state>();
+	matmania_state *state = screen.machine().driver_data<matmania_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
@@ -140,7 +140,7 @@ SCREEN_UPDATE( matmania )
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(state->m_tmpbitmap, 0, screen->machine().gfx[1],
+		drawgfx_opaque(state->m_tmpbitmap, 0, screen.machine().gfx[1],
 				state->m_videoram[offs] + ((state->m_colorram[offs] & 0x08) << 5),
 				(state->m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -153,7 +153,7 @@ SCREEN_UPDATE( matmania )
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(state->m_tmpbitmap2, 0, screen->machine().gfx[1],
+		drawgfx_opaque(state->m_tmpbitmap2, 0, screen.machine().gfx[1],
 				state->m_videoram3[offs] + ((state->m_colorram3[offs] & 0x08) << 5),
 				(state->m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -175,7 +175,7 @@ SCREEN_UPDATE( matmania )
 	{
 		if (spriteram[offs] & 0x01)
 		{
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[2],
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2],
 					spriteram[offs + 1] + ((spriteram[offs] & 0xf0) << 4),
 					(spriteram[offs] & 0x08) >> 3,
 					spriteram[offs] & 0x04, spriteram[offs] & 0x02,
@@ -190,7 +190,7 @@ SCREEN_UPDATE( matmania )
 		int sx = 31 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
 				state->m_videoram2[offs] + 256 * (state->m_colorram2[offs] & 0x07),
 				(state->m_colorram2[offs] & 0x30) >> 4,
 				0,0,
@@ -201,7 +201,7 @@ SCREEN_UPDATE( matmania )
 
 SCREEN_UPDATE( maniach )
 {
-	matmania_state *state = screen->machine().driver_data<matmania_state>();
+	matmania_state *state = screen.machine().driver_data<matmania_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
@@ -212,7 +212,7 @@ SCREEN_UPDATE( maniach )
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(state->m_tmpbitmap, 0, screen->machine().gfx[1],
+		drawgfx_opaque(state->m_tmpbitmap, 0, screen.machine().gfx[1],
 				state->m_videoram[offs] + ((state->m_colorram[offs] & 0x03) << 8),
 				(state->m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -225,7 +225,7 @@ SCREEN_UPDATE( maniach )
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(state->m_tmpbitmap2, 0, screen->machine().gfx[1],
+		drawgfx_opaque(state->m_tmpbitmap2, 0, screen.machine().gfx[1],
 				state->m_videoram3[offs] + ((state->m_colorram3[offs] & 0x03) << 8),
 				(state->m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -249,7 +249,7 @@ SCREEN_UPDATE( maniach )
 	{
 		if (spriteram[offs] & 0x01)
 		{
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[2],
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],
 					spriteram[offs+1] + ((spriteram[offs] & 0xf0) << 4),
 					(spriteram[offs] & 0x08) >> 3,
 					spriteram[offs] & 0x04,spriteram[offs] & 0x02,
@@ -264,7 +264,7 @@ SCREEN_UPDATE( maniach )
 		int sx = 31 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
 				state->m_videoram2[offs] + 256 * (state->m_colorram2[offs] & 0x07),
 				(state->m_colorram2[offs] & 0x30) >> 4,
 				0,0,

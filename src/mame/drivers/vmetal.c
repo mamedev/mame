@@ -418,10 +418,10 @@ static VIDEO_START(varia)
 
 static SCREEN_UPDATE(varia)
 {
-	vmetal_state *state = screen->machine().driver_data<vmetal_state>();
+	vmetal_state *state = screen.machine().driver_data<vmetal_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	tilemap_set_scrollx(state->m_mid2tilemap, 0, state->m_vmetal_videoregs[0x06a/2]-64 /*+ state->m_vmetal_videoregs[0x066/2]*/);
 	tilemap_set_scrollx(state->m_mid1tilemap, 0, state->m_vmetal_videoregs[0x07a/2]-64 /*+ state->m_vmetal_videoregs[0x076/2]*/);
@@ -433,7 +433,7 @@ static SCREEN_UPDATE(varia)
 
 	tilemap_draw(bitmap, cliprect, state->m_mid1tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_mid2tilemap, 0, 0);
-	metro_draw_sprites(screen->machine(), bitmap, cliprect);
+	metro_draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_texttilemap, 0, 0);
 	return 0;
 }

@@ -175,15 +175,15 @@ ronjan
 
 static SCREEN_UPDATE( pinkiri8 )
 {
-	pinkiri8_state *state = screen->machine().driver_data<pinkiri8_state>();
+	pinkiri8_state *state = screen.machine().driver_data<pinkiri8_state>();
 	int col_bank;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 
 	int game_type_hack = 0;
 
-	if (!strcmp(screen->machine().system().name,"janshi")) game_type_hack = 1;
+	if (!strcmp(screen.machine().system().name,"janshi")) game_type_hack = 1;
 
-	if ( screen->machine().input().code_pressed_once(KEYCODE_W) )
+	if ( screen.machine().input().code_pressed_once(KEYCODE_W) )
 	{
 		int i;
 		int count2;
@@ -213,7 +213,7 @@ static SCREEN_UPDATE( pinkiri8 )
 	//popmessage("%02x",state->m_janshi_crtc_regs[0x0a]);
 	col_bank = (state->m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	/* FIXME: color is a bit of a mystery */
 	{
@@ -287,7 +287,7 @@ static SCREEN_UPDATE( pinkiri8 )
 
 			if (bit)
 			{
-				//col = screen->machine().rand();
+				//col = screen.machine().rand();
 				width = 2;
 			}
 			else

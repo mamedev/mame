@@ -235,10 +235,10 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( tryout )
 {
-	tryout_state *state = screen->machine().driver_data<tryout_state>();
+	tryout_state *state = screen.machine().driver_data<tryout_state>();
 	int scrollx = 0;
 
-	if (!flip_screen_get(screen->machine()))
+	if (!flip_screen_get(screen.machine()))
 		tilemap_set_scrollx(state->m_fg_tilemap, 0, 16); /* Assumed hard-wired */
 	else
 		tilemap_set_scrollx(state->m_fg_tilemap, 0, -8); /* Assumed hard-wired */
@@ -254,13 +254,13 @@ SCREEN_UPDATE( tryout )
 	if(!(state->m_gfx_control[0] & 0x8)) // screen disable
 	{
 		/* TODO: Color might be different, needs a video from an original pcb. */
-		bitmap_fill(bitmap, cliprect, screen->machine().pens[0x10]);
+		bitmap_fill(bitmap, cliprect, screen.machine().pens[0x10]);
 	}
 	else
 	{
 		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
-		draw_sprites(screen->machine(), bitmap,cliprect);
+		draw_sprites(screen.machine(), bitmap,cliprect);
 	}
 
 //  popmessage("%02x %02x %02x %02x",state->m_gfx_control[0],state->m_gfx_control[1],state->m_gfx_control[2],scrollx);

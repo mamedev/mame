@@ -222,16 +222,16 @@ WRITE8_HANDLER( pacman_flipscreen_w )
 
 SCREEN_UPDATE( pacman )
 {
-	pacman_state *state = screen->machine().driver_data<pacman_state>();
+	pacman_state *state = screen.machine().driver_data<pacman_state>();
 	if (state->m_bgpriority != 0)
 		bitmap_fill(bitmap,cliprect,0);
 	else
 		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
-	if( screen->machine().generic.spriteram_size )
+	if( screen.machine().generic.spriteram_size )
 	{
-		UINT8 *spriteram = screen->machine().generic.spriteram.u8;
-		UINT8 *spriteram_2 = screen->machine().generic.spriteram2.u8;
+		UINT8 *spriteram = screen.machine().generic.spriteram.u8;
+		UINT8 *spriteram_2 = screen.machine().generic.spriteram2.u8;
 		int offs;
 
 		rectangle spriteclip = spritevisiblearea;
@@ -239,7 +239,7 @@ SCREEN_UPDATE( pacman )
 
 		/* Draw the sprites. Note that it is important to draw them exactly in this */
 		/* order, to have the correct priorities. */
-		for (offs = screen->machine().generic.spriteram_size - 2;offs > 2*2;offs -= 2)
+		for (offs = screen.machine().generic.spriteram_size - 2;offs > 2*2;offs -= 2)
 		{
 			int color;
 			int sx,sy;
@@ -261,20 +261,20 @@ SCREEN_UPDATE( pacman )
 
 			color = ( spriteram[offs + 1] & 0x1f ) | (state->m_colortablebank << 5) | (state->m_palettebank << 6 );
 
-			drawgfx_transmask(bitmap,&spriteclip,screen->machine().gfx[1],
+			drawgfx_transmask(bitmap,&spriteclip,screen.machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
 					fx,fy,
 					sx,sy,
-					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx_transmask(bitmap,&spriteclip,screen->machine().gfx[1],
+			drawgfx_transmask(bitmap,&spriteclip,screen.machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
 					fx,fy,
 					sx - 256,sy,
-					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color & 0x3f, 0));
 		}
 		/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 		/* one pixel to the left to get a more correct placement */
@@ -299,20 +299,20 @@ SCREEN_UPDATE( pacman )
 			fx = (spriteram[offs] & 1) ^ state->m_inv_spr;
 			fy = (spriteram[offs] & 2) ^ ((state->m_inv_spr) << 1);
 
-			drawgfx_transmask(bitmap,&spriteclip,screen->machine().gfx[1],
+			drawgfx_transmask(bitmap,&spriteclip,screen.machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
 					fx,fy,
 					sx,sy + state->m_xoffsethack,
-					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx_transmask(bitmap,&spriteclip,screen->machine().gfx[1],
+			drawgfx_transmask(bitmap,&spriteclip,screen.machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
 					fy,fx,			//FIXME: flipping bits are really supposed to be inverted here?
 					sx - 256,sy + state->m_xoffsethack,
-					colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color & 0x3f, 0));
 		}
 	}
 
@@ -420,14 +420,14 @@ VIDEO_START( s2650games )
 
 SCREEN_UPDATE( s2650games )
 {
-	pacman_state *state = screen->machine().driver_data<pacman_state>();
-	UINT8 *spriteram = screen->machine().generic.spriteram.u8;
-	UINT8 *spriteram_2 = screen->machine().generic.spriteram2.u8;
+	pacman_state *state = screen.machine().driver_data<pacman_state>();
+	UINT8 *spriteram = screen.machine().generic.spriteram.u8;
+	UINT8 *spriteram_2 = screen.machine().generic.spriteram2.u8;
 	int offs;
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 
-	for (offs = screen->machine().generic.spriteram_size - 2;offs > 2*2;offs -= 2)
+	for (offs = screen.machine().generic.spriteram_size - 2;offs > 2*2;offs -= 2)
 	{
 		int color;
 		int sx,sy;
@@ -438,12 +438,12 @@ SCREEN_UPDATE( s2650games )
 		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
-		drawgfx_transmask(bitmap,cliprect,screen->machine().gfx[1],
+		drawgfx_transmask(bitmap,cliprect,screen.machine().gfx[1],
 				(spriteram[offs] >> 2) | ((state->m_s2650games_spriteram[offs] & 3) << 6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy,
-				colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
+				colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color & 0x3f, 0));
 	}
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
@@ -458,12 +458,12 @@ SCREEN_UPDATE( s2650games )
 		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
-		drawgfx_transmask(bitmap,cliprect,screen->machine().gfx[1],
+		drawgfx_transmask(bitmap,cliprect,screen.machine().gfx[1],
 				(spriteram[offs] >> 2) | ((state->m_s2650games_spriteram[offs] & 3)<<6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy + state->m_xoffsethack,
-				colortable_get_transpen_mask(screen->machine().colortable, screen->machine().gfx[1], color & 0x3f, 0));
+				colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color & 0x3f, 0));
 	}
 	return 0;
 }

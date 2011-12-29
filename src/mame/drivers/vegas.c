@@ -510,7 +510,7 @@ static void remap_dynamic_addresses(running_machine &machine);
 
 static SCREEN_UPDATE( vegas )
 {
-	vegas_state *state = screen->machine().driver_data<vegas_state>();
+	vegas_state *state = screen.machine().driver_data<vegas_state>();
 	return voodoo_update(state->m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 

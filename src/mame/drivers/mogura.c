@@ -80,8 +80,8 @@ static VIDEO_START( mogura )
 
 static SCREEN_UPDATE( mogura )
 {
-	mogura_state *state = screen->machine().driver_data<mogura_state>();
-	const rectangle &visarea = screen->visible_area();
+	mogura_state *state = screen.machine().driver_data<mogura_state>();
+	const rectangle &visarea = screen.visible_area();
 
 	/* tilemap layout is a bit strange ... */
 	rectangle clip;

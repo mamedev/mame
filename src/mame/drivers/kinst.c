@@ -232,7 +232,7 @@ static MACHINE_RESET( kinst )
 
 static SCREEN_UPDATE( kinst )
 {
-	kinst_state *state = screen->machine().driver_data<kinst_state>();
+	kinst_state *state = screen.machine().driver_data<kinst_state>();
 	int y;
 
 	/* loop over rows and copy to the destination */

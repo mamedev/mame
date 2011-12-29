@@ -59,17 +59,17 @@ static VIDEO_START( wcvol95 )
 static SCREEN_UPDATE( wcvol95 )
 {
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen->machine(), 1);
+	flip_screen_set_no_update(screen.machine(), 1);
 
-	deco156_state *state = screen->machine().driver_data<deco156_state>();
+	deco156_state *state = screen.machine().driver_data<deco156_state>();
 
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, NULL, 0);
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, 0x800);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0x800);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

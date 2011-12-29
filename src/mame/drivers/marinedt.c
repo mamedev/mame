@@ -508,21 +508,21 @@ static VIDEO_START( marinedt )
 
 static SCREEN_UPDATE( marinedt )
 {
-	marinedt_state *state = screen->machine().driver_data<marinedt_state>();
+	marinedt_state *state = screen.machine().driver_data<marinedt_state>();
 	int sx, sy;
 
 	bitmap_fill(state->m_tile, NULL, 0);
 	tilemap_draw(state->m_tile, cliprect, state->m_tx_tilemap, 0, 0);
 
 	bitmap_fill(state->m_obj1, NULL, 0);
-	drawgfx_transpen(state->m_obj1, NULL, screen->machine().gfx[1],
+	drawgfx_transpen(state->m_obj1, NULL, screen.machine().gfx[1],
 			OBJ_CODE(state->m_obj1_a),
 			OBJ_COLOR(state->m_obj1_a),
 			OBJ_FLIPX(state->m_obj1_a), OBJ_FLIPY(state->m_obj1_a),
 			0, 0, 0);
 
 	bitmap_fill(state->m_obj2, NULL, 0);
-	drawgfx_transpen(state->m_obj2, NULL, screen->machine().gfx[2],
+	drawgfx_transpen(state->m_obj2, NULL, screen.machine().gfx[2],
 			OBJ_CODE(state->m_obj2_a),
 			OBJ_COLOR(state->m_obj2_a),
 			OBJ_FLIPX(state->m_obj2_a), OBJ_FLIPY(state->m_obj2_a),

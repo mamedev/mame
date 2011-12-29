@@ -124,7 +124,7 @@ static VIDEO_START( nsmpoker )
 
 static SCREEN_UPDATE( nsmpoker )
 {
-	nsmpoker_state *state = screen->machine().driver_data<nsmpoker_state>();
+	nsmpoker_state *state = screen.machine().driver_data<nsmpoker_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

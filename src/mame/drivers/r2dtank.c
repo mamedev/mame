@@ -399,7 +399,7 @@ static const mc6845_interface mc6845_intf =
 
 static SCREEN_UPDATE( r2dtank )
 {
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
 	mc6845->update(bitmap, cliprect);
 
 	return 0;

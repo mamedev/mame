@@ -1192,10 +1192,10 @@ void laserdisc_overlay_enable(device_t *device, int enable)
 
 SCREEN_UPDATE( laserdisc )
 {
-	device_t *laserdisc = screen->machine().device("laserdisc"); // TODO: allow more than one laserdisc
+	device_t *laserdisc = screen.machine().device("laserdisc"); // TODO: allow more than one laserdisc
 	if (laserdisc != NULL)
 	{
-		const rectangle &visarea = screen->visible_area();
+		const rectangle &visarea = screen.visible_area();
 		laserdisc_state *ld = (laserdisc_state *)downcast<legacy_device_base *>(laserdisc)->token();
 		ldcore_data *ldcore = ld->core;
 		bitmap_t *overbitmap = ldcore->overbitmap[ldcore->overindex];
@@ -1234,11 +1234,11 @@ SCREEN_UPDATE( laserdisc )
 				ldcore->videotex->set_bitmap(vidbitmap, NULL, TEXFORMAT_YUY16, ldcore->videopalette);
 
 			/* reset the screen contents */
-			screen->container().empty();
+			screen.container().empty();
 
 			/* add the video texture */
 			if (ldcore->videoenable)
-				screen->container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), ldcore->videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+				screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), ldcore->videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 			/* add the overlay */
 			if (ldcore->overenable && overbitmap != NULL)
@@ -1247,7 +1247,7 @@ SCREEN_UPDATE( laserdisc )
 				float y0 = 0.5f - 0.5f * ldcore->config.overscaley + ldcore->config.overposy;
 				float x1 = x0 + ldcore->config.overscalex;
 				float y1 = y0 + ldcore->config.overscaley;
-				screen->container().add_quad(x0, y0, x1, y1, MAKE_ARGB(0xff,0xff,0xff,0xff), ldcore->overtex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
+				screen.container().add_quad(x0, y0, x1, y1, MAKE_ARGB(0xff,0xff,0xff,0xff), ldcore->overtex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 			}
 
 			/* swap to the next bitmap */

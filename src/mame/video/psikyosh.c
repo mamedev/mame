@@ -1295,7 +1295,7 @@ VIDEO_START( psikyosh )
 SCREEN_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
 {
 	int i;
-	psikyosh_state *state = screen->machine().driver_data<psikyosh_state>();
+	psikyosh_state *state = screen.machine().driver_data<psikyosh_state>();
 
 	// show only the priority associated with a given keypress(s) and/or hide sprites/tilemaps
 	int pri_debug = false;
@@ -1305,14 +1305,14 @@ SCREEN_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct pri
 #ifdef DEBUG_KEYS
 	for (i = 0; i <= 7; i++)
 	{
-		if(screen->machine().input().code_pressed(pri_keys[i])) {
+		if(screen.machine().input().code_pressed(pri_keys[i])) {
 			pri_debug = true;
 		}
 	}
-	if(screen->machine().input().code_pressed(KEYCODE_G)) {
+	if(screen.machine().input().code_pressed(KEYCODE_G)) {
 		sprites = false;
 	}
-	if(screen->machine().input().code_pressed(KEYCODE_H)) {
+	if(screen.machine().input().code_pressed(KEYCODE_H)) {
 		backgrounds = false;
 	}
 #endif
@@ -1327,18 +1327,18 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 
 	bitmap_fill(state->m_z_bitmap, cliprect, 0); /* z-buffer */
 
-	psikyosh_prelineblend(screen->machine(), bitmap, cliprect); // fills screen
+	psikyosh_prelineblend(screen.machine(), bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)
 	{
-		if(!pri_debug || screen->machine().input().code_pressed(pri_keys[i]))
+		if(!pri_debug || screen.machine().input().code_pressed(pri_keys[i]))
 		{
 			if(sprites) {
-				draw_sprites(screen->machine(), bitmap, cliprect, i); // When same priority bg's have higher pri
+				draw_sprites(screen.machine(), bitmap, cliprect, i); // When same priority bg's have higher pri
 			}
 			if(backgrounds) {
-				draw_background(screen->machine(), bitmap, cliprect, i);
+				draw_background(screen.machine(), bitmap, cliprect, i);
 			}
-			psikyosh_postlineblend(screen->machine(), bitmap, cliprect, i); // assume this has highest priority at same priority level
+			psikyosh_postlineblend(screen.machine(), bitmap, cliprect, i); // assume this has highest priority at same priority level
 		}
 	}
 	return 0;
@@ -1346,7 +1346,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 
 SCREEN_EOF( psikyosh )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram32_w(space, 0, 0, 0xffffffff);
 }
 

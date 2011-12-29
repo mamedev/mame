@@ -64,28 +64,28 @@ static VIDEO_START(monzagp)
 
 static SCREEN_UPDATE(monzagp)
 {
-	monzagp_state *state = screen->machine().driver_data<monzagp_state>();
+	monzagp_state *state = screen.machine().driver_data<monzagp_state>();
 	int x,y;
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_Z))
+	if(screen.machine().input().code_pressed_once(KEYCODE_Z))
 		state->m_bank--;
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_X))
+	if(screen.machine().input().code_pressed_once(KEYCODE_X))
 		state->m_bank++;
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_Q))
+	if(screen.machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		state->m_screenw--;
 		printf("%x\n",state->m_screenw);
 	}
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_W))
+	if(screen.machine().input().code_pressed_once(KEYCODE_W))
 	{
 		state->m_screenw++;
 		printf("%x\n",state->m_screenw);
 	}
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_A))
+	if(screen.machine().input().code_pressed_once(KEYCODE_A))
 	{
 		FILE * p=fopen("vram.bin","wb");
 		fwrite(&state->m_vram[0],1,0x10000,p);
@@ -97,7 +97,7 @@ static SCREEN_UPDATE(monzagp)
 	{
 		for(x=0;x<256;x++)
 		{
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[state->m_bank&1],
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[state->m_bank&1],
 				state->m_vram[y*state->m_screenw+x],
 				//(state->m_vram[y*state->m_screenw+x]&0x3f)+(state->m_bank>>1)*64,
 				0,

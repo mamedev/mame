@@ -118,7 +118,7 @@ VIDEO_START( drmicro)
 
 SCREEN_UPDATE( drmicro )
 {
-	drmicro_state *state = screen->machine().driver_data<drmicro_state>();
+	drmicro_state *state = screen.machine().driver_data<drmicro_state>();
 	int offs, adr, g;
 	int chr, col, attr;
 	int x, y, fx, fy;
@@ -150,7 +150,7 @@ SCREEN_UPDATE( drmicro )
 			else
 				x = (240 - x) & 0xff;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[3-g],
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[3-g],
 					chr,
 					col,
 					fx,fy,
@@ -158,7 +158,7 @@ SCREEN_UPDATE( drmicro )
 
 			if (x > 240)
 			{
-				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[3-g],
+				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[3-g],
 						chr,
 						col,
 						fx,fy,

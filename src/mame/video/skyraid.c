@@ -140,14 +140,14 @@ static void draw_trapezoid(running_machine &machine, bitmap_t* dst, bitmap_t* sr
 
 SCREEN_UPDATE( skyraid )
 {
-	skyraid_state *state = screen->machine().driver_data<skyraid_state>();
+	skyraid_state *state = screen.machine().driver_data<skyraid_state>();
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_terrain(screen->machine(), state->m_helper, NULL);
-	draw_sprites(screen->machine(), state->m_helper, NULL);
-	draw_missiles(screen->machine(), state->m_helper, NULL);
-	draw_trapezoid(screen->machine(), bitmap, state->m_helper);
-	draw_text(screen->machine(), bitmap, cliprect);
+	draw_terrain(screen.machine(), state->m_helper, NULL);
+	draw_sprites(screen.machine(), state->m_helper, NULL);
+	draw_missiles(screen.machine(), state->m_helper, NULL);
+	draw_trapezoid(screen.machine(), bitmap, state->m_helper);
+	draw_text(screen.machine(), bitmap, cliprect);
 	return 0;
 }

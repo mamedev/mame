@@ -84,25 +84,25 @@ static VIDEO_START( ace )
 
 static SCREEN_UPDATE( ace )
 {
-	ace_state *state = screen->machine().driver_data<ace_state>();
+	ace_state *state = screen.machine().driver_data<ace_state>();
 	int offs;
 
 	/* first of all, fill the screen with the background color */
 	bitmap_fill(bitmap, cliprect, 0);
 
-	drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[1],
+	drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[1],
 			0,
 			0,
 			0, 0,
 			state->m_objpos[0], state->m_objpos[1]);
 
-	drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[2],
+	drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[2],
 			0,
 			0,
 			0, 0,
 			state->m_objpos[2], state->m_objpos[3]);
 
-	drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[3],
+	drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[3],
 			0,
 			0,
 			0, 0,
@@ -111,7 +111,7 @@ static SCREEN_UPDATE( ace )
 	for (offs = 0; offs < 8; offs++)
 	{
 		drawgfx_opaque(bitmap,/* ?? */
-				cliprect, screen->machine().gfx[4],
+				cliprect, screen.machine().gfx[4],
 				offs,
 				0,
 				0, 0,

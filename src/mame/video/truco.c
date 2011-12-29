@@ -33,7 +33,7 @@ PALETTE_INIT( truco )
 
 SCREEN_UPDATE( truco )
 {
-	truco_state *state = screen->machine().driver_data<truco_state>();
+	truco_state *state = screen.machine().driver_data<truco_state>();
 	UINT8 *videoram = state->m_videoram;
 	UINT8		*vid = videoram;
 	int x, y;

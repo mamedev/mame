@@ -136,7 +136,7 @@ static VIDEO_RESET( atarisy4 )
 
 static SCREEN_UPDATE( atarisy4 )
 {
-	atarisy4_state *state = screen->machine().driver_data<atarisy4_state>();
+	atarisy4_state *state = screen.machine().driver_data<atarisy4_state>();
 	int y;
 	UINT32 offset = 0;
 
@@ -161,8 +161,8 @@ static SCREEN_UPDATE( atarisy4 )
 		{
 			UINT16 data = *src++;
 
-			*dest++ = screen->machine().pens[data & 0xff];
-			*dest++ = screen->machine().pens[data >> 8];
+			*dest++ = screen.machine().pens[data & 0xff];
+			*dest++ = screen.machine().pens[data >> 8];
 		}
 	}
 	return 0;

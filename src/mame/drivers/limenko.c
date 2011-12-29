@@ -457,10 +457,10 @@ static VIDEO_START( limenko )
 
 static SCREEN_UPDATE( limenko )
 {
-	limenko_state *state = screen->machine().driver_data<limenko_state>();
+	limenko_state *state = screen.machine().driver_data<limenko_state>();
 	// state->m_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
 	tilemap_set_enable(state->m_bg_tilemap, state->m_videoreg[0] & 4);
 	tilemap_set_enable(state->m_md_tilemap, state->m_videoreg[0] & 2);
@@ -479,7 +479,7 @@ static SCREEN_UPDATE( limenko )
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);
 
 	if(state->m_videoreg[0] & 8)
-		copy_sprites(screen->machine(), bitmap, state->m_sprites_bitmap, screen->machine().priority_bitmap, cliprect);
+		copy_sprites(screen.machine(), bitmap, state->m_sprites_bitmap, screen.machine().priority_bitmap, cliprect);
 
 	return 0;
 }

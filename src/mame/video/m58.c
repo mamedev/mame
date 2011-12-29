@@ -314,13 +314,13 @@ static void draw_panel( running_machine &machine, bitmap_t *bitmap, const rectan
 
 SCREEN_UPDATE( yard )
 {
-	m58_state *state = screen->machine().driver_data<m58_state>();
+	m58_state *state = screen.machine().driver_data<m58_state>();
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, (*state->m_yard_scroll_x_high * 0x100) + *state->m_yard_scroll_x_low);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_yard_scroll_y_low);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
-	draw_panel(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_panel(screen.machine(), bitmap, cliprect);
 	return 0;
 }

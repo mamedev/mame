@@ -334,7 +334,7 @@ static VIDEO_START( pasha2 )
 
 static SCREEN_UPDATE( pasha2 )
 {
-	pasha2_state *state = screen->machine().driver_data<pasha2_state>();
+	pasha2_state *state = screen.machine().driver_data<pasha2_state>();
 	int x, y, count;
 	int color;
 

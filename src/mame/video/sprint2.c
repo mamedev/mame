@@ -123,7 +123,7 @@ INLINE int get_sprite_y(UINT8 *video_ram, int n)
 
 SCREEN_UPDATE( sprint2 )
 {
-	sprint2_state *state = screen->machine().driver_data<sprint2_state>();
+	sprint2_state *state = screen.machine().driver_data<sprint2_state>();
 	UINT8 *video_ram = state->m_video_ram;
 	int i;
 
@@ -133,7 +133,7 @@ SCREEN_UPDATE( sprint2 )
 
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 			get_sprite_code(video_ram, i),
 			i,
 			0, 0,
@@ -146,11 +146,11 @@ SCREEN_UPDATE( sprint2 )
 
 SCREEN_EOF( sprint2 )
 {
-	sprint2_state *state = machine.driver_data<sprint2_state>();
+	sprint2_state *state = screen.machine().driver_data<sprint2_state>();
 	UINT8 *video_ram = state->m_video_ram;
 	int i;
 	int j;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
 	/*
      * Collisions are detected for both player cars:
@@ -166,8 +166,8 @@ SCREEN_EOF( sprint2 )
 
 		rect.min_x = get_sprite_x(video_ram, i);
 		rect.min_y = get_sprite_y(video_ram, i);
-		rect.max_x = get_sprite_x(video_ram, i) + machine.gfx[1]->width - 1;
-		rect.max_y = get_sprite_y(video_ram, i) + machine.gfx[1]->height - 1;
+		rect.max_x = get_sprite_x(video_ram, i) + screen.machine().gfx[1]->width - 1;
+		rect.max_y = get_sprite_y(video_ram, i) + screen.machine().gfx[1]->height - 1;
 
 		if (rect.min_x < visarea.min_x)
 			rect.min_x = visarea.min_x;
@@ -182,21 +182,21 @@ SCREEN_EOF( sprint2 )
 
 		tilemap_draw(state->m_helper, &rect, state->m_bg_tilemap, 0, 0);
 
-		drawgfx_transpen(state->m_helper, &rect, machine.gfx[1],
+		drawgfx_transpen(state->m_helper, &rect, screen.machine().gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,
 			get_sprite_x(video_ram, i),
 			get_sprite_y(video_ram, i), 1);
 
-		state->m_collision[i] |= collision_check(state, machine.colortable, &rect);
+		state->m_collision[i] |= collision_check(state, screen.machine().colortable, &rect);
 
 		/* check for sprite-sprite collisions */
 
 		for (j = 0; j < 4; j++)
 			if (j != i)
 			{
-				drawgfx_transpen(state->m_helper, &rect, machine.gfx[1],
+				drawgfx_transpen(state->m_helper, &rect, screen.machine().gfx[1],
 					get_sprite_code(video_ram, j),
 					1,
 					0, 0,
@@ -204,13 +204,13 @@ SCREEN_EOF( sprint2 )
 					get_sprite_y(video_ram, j), 0);
 			}
 
-		drawgfx_transpen(state->m_helper, &rect, machine.gfx[1],
+		drawgfx_transpen(state->m_helper, &rect, screen.machine().gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,
 			get_sprite_x(video_ram, i),
 			get_sprite_y(video_ram, i), 1);
 
-		state->m_collision[i] |= collision_check(state, machine.colortable, &rect);
+		state->m_collision[i] |= collision_check(state, screen.machine().colortable, &rect);
 	}
 }

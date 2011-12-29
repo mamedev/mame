@@ -249,10 +249,10 @@ WRITE8_HANDLER( cloud9_bitmode_addr_w )
 
 SCREEN_UPDATE( cloud9 )
 {
-	cloud9_state *state = screen->machine().driver_data<cloud9_state>();
+	cloud9_state *state = screen.machine().driver_data<cloud9_state>();
 	UINT8 *spriteaddr = state->m_spriteram;
 	int flip = state->m_video_control[5] ? 0xff : 0x00;	/* PLAYER2 */
-	pen_t black = get_black_pen(screen->machine());
+	pen_t black = get_black_pen(screen.machine());
 	int x, y, offs;
 
 	/* draw the sprites */
@@ -267,9 +267,9 @@ SCREEN_UPDATE( cloud9 )
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			drawgfx_transpen(state->m_spritebitmap, cliprect, screen->machine().gfx[0], which, color, xflip, yflip, x, y, 0);
+			drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
-				drawgfx_transpen(state->m_spritebitmap, cliprect, screen->machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
+				drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */

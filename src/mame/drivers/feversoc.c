@@ -84,11 +84,11 @@ static VIDEO_START( feversoc )
 
 static SCREEN_UPDATE( feversoc )
 {
-	feversoc_state *state = screen->machine().driver_data<feversoc_state>();
+	feversoc_state *state = screen.machine().driver_data<feversoc_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]); //black pen
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]); //black pen
 
 	for(offs=(0x2000/4)-2;offs>-1;offs-=2)
 	{
@@ -106,7 +106,7 @@ static SCREEN_UPDATE( feversoc )
 
 		for(dx=0;dx<w;dx++)
 			for(dy=0;dy<h;dy++)
-				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
+				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
 	}
 
 	return 0;

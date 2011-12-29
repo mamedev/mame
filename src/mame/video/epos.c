@@ -74,11 +74,11 @@ WRITE8_HANDLER( epos_port_1_w )
 
 SCREEN_UPDATE( epos )
 {
-	epos_state *state = screen->machine().driver_data<epos_state>();
+	epos_state *state = screen.machine().driver_data<epos_state>();
 	pen_t pens[0x20];
 	offs_t offs;
 
-	get_pens(screen->machine(), pens);
+	get_pens(screen.machine(), pens);
 
 	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{

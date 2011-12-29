@@ -82,7 +82,7 @@ static VIDEO_START( rmhaihai )
 
 static SCREEN_UPDATE( rmhaihai )
 {
-	rmhaihai_state *state = screen->machine().driver_data<rmhaihai_state>();
+	rmhaihai_state *state = screen.machine().driver_data<rmhaihai_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

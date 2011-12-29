@@ -92,7 +92,7 @@ static VIDEO_START( onetwo )
 
 static SCREEN_UPDATE( onetwo )
 {
-	onetwo_state *state = screen->machine().driver_data<onetwo_state>();
+	onetwo_state *state = screen.machine().driver_data<onetwo_state>();
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

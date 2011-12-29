@@ -802,7 +802,7 @@ static VIDEO_START( wcrdxtnd )
 
 static SCREEN_UPDATE( goldnpkr )
 {
-	goldnpkr_state *state = screen->machine().driver_data<goldnpkr_state>();
+	goldnpkr_state *state = screen.machine().driver_data<goldnpkr_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

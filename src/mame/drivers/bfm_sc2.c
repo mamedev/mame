@@ -1403,10 +1403,10 @@ static MACHINE_RESET( init )
 
 static SCREEN_UPDATE( addersc2 )
 {
-	bfm_sc2_state *state = screen->machine().driver_data<bfm_sc2_state>();
+	bfm_sc2_state *state = screen.machine().driver_data<bfm_sc2_state>();
 	if ( state->m_sc2_show_door )
 	{
-		output_set_value("door",( Scorpion2_GetSwitchState(screen->machine(),state->m_sc2_door_state>>4, state->m_sc2_door_state & 0x0F) ) );
+		output_set_value("door",( Scorpion2_GetSwitchState(screen.machine(),state->m_sc2_door_state>>4, state->m_sc2_door_state & 0x0F) ) );
 	}
 
 	return SCREEN_UPDATE_CALL(adder2);

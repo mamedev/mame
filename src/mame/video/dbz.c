@@ -99,7 +99,7 @@ VIDEO_START( dbz )
 
 SCREEN_UPDATE( dbz )
 {
-	dbz_state *state = screen->machine().driver_data<dbz_state>();
+	dbz_state *state = screen.machine().driver_data<dbz_state>();
 	static const int K053251_CI[6] = { K053251_CI3, K053251_CI4, K053251_CI4, K053251_CI4, K053251_CI2, K053251_CI1 };
 	int layer[5], plane, new_colorbase;
 
@@ -135,7 +135,7 @@ SCREEN_UPDATE( dbz )
 
 	konami_sortlayers5(layer, state->m_layerpri);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	for (plane = 0; plane < 5; plane++)
 	{

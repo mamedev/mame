@@ -284,16 +284,16 @@ static void exctsccr_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 
 SCREEN_UPDATE( champbas )
 {
-	champbas_state *state = screen->machine().driver_data<champbas_state>();
+	champbas_state *state = screen.machine().driver_data<champbas_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	champbas_draw_sprites(screen->machine(), bitmap, cliprect);
+	champbas_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( exctsccr )
 {
-	champbas_state *state = screen->machine().driver_data<champbas_state>();
+	champbas_state *state = screen.machine().driver_data<champbas_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	exctsccr_draw_sprites(screen->machine(), bitmap, cliprect);
+	exctsccr_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

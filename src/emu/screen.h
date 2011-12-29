@@ -74,8 +74,8 @@ class screen_device;
 // callback that is called to notify of a change in the VBLANK state
 typedef delegate<void (screen_device &, bool)> vblank_state_delegate;
 
-typedef UINT32 (*screen_update_func)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-typedef void (*screen_eof_func)(screen_device *screen, running_machine &machine);
+typedef UINT32 (*screen_update_func)(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect);
+typedef void (*screen_eof_func)(screen_device &screen);
 
 
 // ======================> screen_device
@@ -255,12 +255,12 @@ extern const device_type SCREEN;
 //**************************************************************************
 
 #define SCREEN_UPDATE_NAME(name)		screen_update_##name
-#define SCREEN_UPDATE(name)				UINT32 SCREEN_UPDATE_NAME(name)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+#define SCREEN_UPDATE(name)				UINT32 SCREEN_UPDATE_NAME(name)(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 #define SCREEN_UPDATE_CALL(name)		SCREEN_UPDATE_NAME(name)(screen, bitmap, cliprect)
 
 #define SCREEN_EOF_NAME(name)			screen_eof_##name
-#define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(screen_device *screen, running_machine &machine)
-#define SCREEN_EOF_CALL(name)			SCREEN_EOF_NAME(name)(screen, machine)
+#define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(screen_device &screen)
+#define SCREEN_EOF_CALL(name)			SCREEN_EOF_NAME(name)(screen)
 
 #define screen_eof_0					NULL
 

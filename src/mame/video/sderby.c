@@ -110,10 +110,10 @@ VIDEO_START( sderby )
 
 SCREEN_UPDATE( sderby )
 {
-	sderby_state *state = screen->machine().driver_data<sderby_state>();
+	sderby_state *state = screen.machine().driver_data<sderby_state>();
 
 	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect,0);
+	draw_sprites(screen.machine(), bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,state->m_md_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;
@@ -121,11 +121,11 @@ SCREEN_UPDATE( sderby )
 
 SCREEN_UPDATE( pmroulet )
 {
-	sderby_state *state = screen->machine().driver_data<sderby_state>();
+	sderby_state *state = screen.machine().driver_data<sderby_state>();
 
 	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_md_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect,0);
+	draw_sprites(screen.machine(), bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;
 }

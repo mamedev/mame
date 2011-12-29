@@ -257,7 +257,7 @@ VIDEO_START( wwfwfstb )
 
 SCREEN_UPDATE( wwfwfest )
 {
-	wwfwfest_state *state = screen->machine().driver_data<wwfwfest_state>();
+	wwfwfest_state *state = screen.machine().driver_data<wwfwfest_state>();
 	if (state->m_pri == 0x0078) {
 		tilemap_set_scrolly( state->m_bg0_tilemap, 0, state->m_bg0_scrolly  );
 		tilemap_set_scrollx( state->m_bg0_tilemap, 0, state->m_bg0_scrollx  + state->m_bg0_dx);
@@ -275,13 +275,13 @@ SCREEN_UPDATE( wwfwfest )
 	if (state->m_pri == 0x007b) {
 		tilemap_draw(bitmap,cliprect,state->m_bg0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,state->m_bg1_tilemap,0,0);
-		draw_sprites(screen->machine(), bitmap,cliprect);
+		draw_sprites(screen.machine(), bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,state->m_fg0_tilemap,0,0);
 	}
 
 	if (state->m_pri == 0x007c) {
 		tilemap_draw(bitmap,cliprect,state->m_bg0_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(screen->machine(), bitmap,cliprect);
+		draw_sprites(screen.machine(), bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,state->m_bg1_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,state->m_fg0_tilemap,0,0);
 	}
@@ -289,7 +289,7 @@ SCREEN_UPDATE( wwfwfest )
 	if (state->m_pri == 0x0078) {
 		tilemap_draw(bitmap,cliprect,state->m_bg1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,state->m_bg0_tilemap,0,0);
-		draw_sprites(screen->machine(), bitmap,cliprect);
+		draw_sprites(screen.machine(), bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,state->m_fg0_tilemap,0,0);
 	}
 	return 0;

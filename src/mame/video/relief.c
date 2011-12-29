@@ -110,8 +110,8 @@ VIDEO_START( relief )
 
 SCREEN_UPDATE( relief )
 {
-	relief_state *state = screen->machine().driver_data<relief_state>();
-	bitmap_t *priority_bitmap = screen->machine().priority_bitmap;
+	relief_state *state = screen.machine().driver_data<relief_state>();
+	bitmap_t *priority_bitmap = screen.machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

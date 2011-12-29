@@ -95,18 +95,18 @@ UINT16 dblwings_pri_callback(UINT16 x)
 
 static SCREEN_UPDATE(dblewing)
 {
-	dblewing_state *state = screen->machine().driver_data<dblewing_state>();
+	dblewing_state *state = screen.machine().driver_data<dblewing_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen->machine(), BIT(flip, 7));
+	flip_screen_set(screen.machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 0); /* not Confirmed */
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0x400);
 	return 0;
 }
 

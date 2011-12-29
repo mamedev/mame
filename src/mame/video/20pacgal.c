@@ -408,13 +408,13 @@ static void draw_stars(_20pacgal_state *state, bitmap_t *bitmap, const rectangle
 
 static SCREEN_UPDATE( 20pacgal )
 {
-	_20pacgal_state *state = screen->machine().driver_data<_20pacgal_state>();
+	_20pacgal_state *state = screen.machine().driver_data<_20pacgal_state>();
 
 	bitmap_fill(bitmap,cliprect,0);
 	draw_stars(state, bitmap,cliprect);
 	draw_chars(state, bitmap);
-	draw_sprites(screen->machine(),state, bitmap);
-	do_pen_lookup(screen->machine(), state, bitmap, cliprect);
+	draw_sprites(screen.machine(),state, bitmap);
+	do_pen_lookup(screen.machine(), state, bitmap, cliprect);
 
 	return 0;
 }

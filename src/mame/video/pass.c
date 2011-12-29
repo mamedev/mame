@@ -59,7 +59,7 @@ VIDEO_START( pass )
 
 SCREEN_UPDATE( pass )
 {
-	pass_state *state = screen->machine().driver_data<pass_state>();
+	pass_state *state = screen.machine().driver_data<pass_state>();
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap, 0, 0);

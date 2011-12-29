@@ -130,10 +130,10 @@ static void refresh_pixel_layer( running_machine &machine, bitmap_t *bitmap )
 
 SCREEN_UPDATE( volfied )
 {
-	volfied_state *state = screen->machine().driver_data<volfied_state>();
+	volfied_state *state = screen.machine().driver_data<volfied_state>();
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
-	refresh_pixel_layer(screen->machine(), bitmap);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	refresh_pixel_layer(screen.machine(), bitmap);
 	pc090oj_draw_sprites(state->m_pc090oj, bitmap, cliprect, 0);
 	return 0;
 }

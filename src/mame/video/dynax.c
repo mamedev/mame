@@ -1280,14 +1280,14 @@ static int debug_viewer( running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( hanamai )
 {
-	dynax_state *state = screen->machine().driver_data<dynax_state>();
+	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = ~state->m_layer_enable;
 	int lay[4];
 
-	if (debug_viewer(screen->machine(), bitmap, cliprect))
+	if (debug_viewer(screen.machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine());
+	layers_ctrl &= debug_mask(screen.machine());
 
 	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
 
@@ -1306,25 +1306,25 @@ SCREEN_UPDATE( hanamai )
 		case 0x15:	lay[0] = 0; lay[1] = 2; lay[2] = 3; lay[3] = 1; break;
 	}
 
-	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[0]);
-	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[1]);
-	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[2]);
-	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[3]);
+	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[0]);
+	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[1]);
+	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[2]);
+	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[3]);
 	return 0;
 }
 
 
 SCREEN_UPDATE( hnoridur )
 {
-	dynax_state *state = screen->machine().driver_data<dynax_state>();
+	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = ~BITSWAP8(state->m_hanamai_priority, 7, 6, 5, 4, 0, 1, 2, 3);
 	int lay[4];
 	int pri;
 
-	if (debug_viewer(screen->machine(), bitmap, cliprect))
+	if (debug_viewer(screen.machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine());
+	layers_ctrl &= debug_mask(screen.machine());
 
 	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 0x0f) * 256);
 
@@ -1342,10 +1342,10 @@ SCREEN_UPDATE( hnoridur )
 	lay[2] = (pri >>  4) & 3;
 	lay[3] = (pri >>  0) & 3;
 
-	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[0]);
-	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[1]);
-	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[2]);
-	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen->machine(), bitmap, cliprect, lay[3]);
+	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[0]);
+	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[1]);
+	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[2]);
+	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(screen.machine(), bitmap, cliprect, lay[3]);
 
 	return 0;
 }
@@ -1353,67 +1353,76 @@ SCREEN_UPDATE( hnoridur )
 
 SCREEN_UPDATE( sprtmtch )
 {
-	dynax_state *state = screen->machine().driver_data<dynax_state>();
+	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = ~state->m_layer_enable;
 
-	if (debug_viewer(screen->machine(),bitmap,cliprect))
+	if (debug_viewer(screen.machine(),bitmap,cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine());
+	layers_ctrl &= debug_mask(screen.machine());
 
 	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
 
-	if (BIT(layers_ctrl, 0))   hanamai_copylayer(screen->machine(), bitmap, cliprect, 0);
-	if (BIT(layers_ctrl, 1))   hanamai_copylayer(screen->machine(), bitmap, cliprect, 1);
-	if (BIT(layers_ctrl, 2))   hanamai_copylayer(screen->machine(), bitmap, cliprect, 2);
+	if (BIT(layers_ctrl, 0))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 0);
+	if (BIT(layers_ctrl, 1))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 1);
+	if (BIT(layers_ctrl, 2))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 2);
 	return 0;
 }
 
-SCREEN_UPDATE( jantouki )
+SCREEN_UPDATE( jantouki_top )
 {
-	dynax_state *state = screen->machine().driver_data<dynax_state>();
+	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = state->m_layer_enable;
 
-	if (debug_viewer(screen->machine(), bitmap, cliprect))
+	if (debug_viewer(screen.machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine());
+	layers_ctrl &= debug_mask(screen.machine());
 
 	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
 
-	if (screen == state->m_top_scr)
-	{
-	//  if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 3, 0);
-		if (BIT(layers_ctrl, 1))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 2, 0);
-		if (BIT(layers_ctrl, 2))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 1, 0);
-		if (BIT(layers_ctrl, 3))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 0, 0);
-	}
-	else if (screen == state->m_bot_scr)
-	{
-		if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 3, 0);
-		if (BIT(layers_ctrl, 4))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 7, 0);
-		if (BIT(layers_ctrl, 5))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 6, 0);
-		if (BIT(layers_ctrl, 6))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 5, 0);
-		if (BIT(layers_ctrl, 7))   jantouki_copylayer(screen->machine(), bitmap, cliprect, 4, 0);
-	}
+//  if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 3, 0);
+	if (BIT(layers_ctrl, 1))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 2, 0);
+	if (BIT(layers_ctrl, 2))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 1, 0);
+	if (BIT(layers_ctrl, 3))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+SCREEN_UPDATE( jantouki_bottom )
+{
+	dynax_state *state = screen.machine().driver_data<dynax_state>();
+	int layers_ctrl = state->m_layer_enable;
+
+	if (debug_viewer(screen.machine(), bitmap, cliprect))
+		return 0;
+
+	layers_ctrl &= debug_mask(screen.machine());
+
+	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
+
+	if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 3, 0);
+	if (BIT(layers_ctrl, 4))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 7, 0);
+	if (BIT(layers_ctrl, 5))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 6, 0);
+	if (BIT(layers_ctrl, 6))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 5, 0);
+	if (BIT(layers_ctrl, 7))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 4, 0);
 	return 0;
 }
 
 
 SCREEN_UPDATE( mjdialq2 )
 {
-	dynax_state *state = screen->machine().driver_data<dynax_state>();
+	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = ~state->m_layer_enable;
 
-	if (debug_viewer(screen->machine(), bitmap, cliprect))
+	if (debug_viewer(screen.machine(), bitmap, cliprect))
 		return 0;
 
-	layers_ctrl &= debug_mask(screen->machine());
+	layers_ctrl &= debug_mask(screen.machine());
 
 	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
 
-	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(screen->machine(), bitmap, cliprect, 0);
-	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(screen->machine(), bitmap, cliprect, 1);
+	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(screen.machine(), bitmap, cliprect, 0);
+	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(screen.machine(), bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -1427,7 +1436,7 @@ VIDEO_START(htengoku)
 
 SCREEN_UPDATE(htengoku)
 {
-	dynax_state *state = screen->machine().driver_data<dynax_state>();
+	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layer, x, y;
 
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
@@ -1435,7 +1444,7 @@ SCREEN_UPDATE(htengoku)
 	for (layer = 0; layer < 4; layer++)
 	{
 		bitmap_fill(bitmap, cliprect, 0);
-		hanamai_copylayer(screen->machine(), bitmap, cliprect, layer);
+		hanamai_copylayer(screen.machine(), bitmap, cliprect, layer);
 
 		for (y = 0; y < 256; y++)
 			for (x = 0; x < 512; x++)

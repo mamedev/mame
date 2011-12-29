@@ -99,9 +99,9 @@ static void jack_draw_sprites( running_machine &machine, bitmap_t *bitmap, const
 
 SCREEN_UPDATE( jack )
 {
-	jack_state *state = screen->machine().driver_data<jack_state>();
+	jack_state *state = screen.machine().driver_data<jack_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	jack_draw_sprites(screen->machine(), bitmap, cliprect);
+	jack_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -184,8 +184,8 @@ static void joinem_draw_sprites( running_machine &machine, bitmap_t *bitmap, con
 
 SCREEN_UPDATE( joinem )
 {
-	jack_state *state = screen->machine().driver_data<jack_state>();
+	jack_state *state = screen.machine().driver_data<jack_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	joinem_draw_sprites(screen->machine(), bitmap, cliprect);
+	joinem_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

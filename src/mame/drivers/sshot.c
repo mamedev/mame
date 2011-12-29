@@ -191,7 +191,7 @@ static VIDEO_START( supershot )
 
 static SCREEN_UPDATE( supershot )
 {
-	supershot_state *state = screen->machine().driver_data<supershot_state>();
+	supershot_state *state = screen.machine().driver_data<supershot_state>();
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 	return 0;
 }

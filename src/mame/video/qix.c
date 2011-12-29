@@ -346,7 +346,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static SCREEN_UPDATE( qix )
 {
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(MC6845_TAG);
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(MC6845_TAG);
 	mc6845->update(bitmap, cliprect);
 
 	return 0;

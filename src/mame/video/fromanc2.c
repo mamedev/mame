@@ -547,34 +547,36 @@ VIDEO_START( fromanc4 )
 
 ******************************************************************************/
 
-SCREEN_UPDATE( fromanc2 )
+SCREEN_UPDATE( fromanc2_left )
 {
-	fromanc2_state *state = screen->machine().driver_data<fromanc2_state>();
+	fromanc2_state *state = screen.machine().driver_data<fromanc2_state>();
 	int i;
-	int *scrollx = NULL;
-	int *scrolly = NULL;
-	tilemap_t **tilemaps = NULL;
-
-	if (screen == state->m_left_screen)
-	{
-		tilemaps = state->m_tilemap[0];
-		scrollx = state->m_scrollx[0];
-		scrolly = state->m_scrolly[0];
-	}
-	else if (screen == state->m_right_screen)
-	{
-		tilemaps = state->m_tilemap[1];
-		scrollx = state->m_scrollx[1];
-		scrolly = state->m_scrolly[1];
-	}
 
 	for (i = 0; i < 4; i++)
 	{
-		if (tilemaps[i])
+		if (state->m_tilemap[0][i])
 		{
-			tilemap_set_scrollx(tilemaps[i], 0, -scrollx[i]);
-			tilemap_set_scrolly(tilemaps[i], 0, -scrolly[i]);
-			tilemap_draw(bitmap, cliprect, tilemaps[i], 0, 0);
+			tilemap_set_scrollx(state->m_tilemap[0][i], 0, -state->m_scrollx[0][i]);
+			tilemap_set_scrolly(state->m_tilemap[0][i], 0, -state->m_scrolly[0][i]);
+			tilemap_draw(bitmap, cliprect, state->m_tilemap[0][i], 0, 0);
+		}
+	}
+
+	return 0;
+}
+
+SCREEN_UPDATE( fromanc2_right )
+{
+	fromanc2_state *state = screen.machine().driver_data<fromanc2_state>();
+	int i;
+
+	for (i = 0; i < 4; i++)
+	{
+		if (state->m_tilemap[1][i])
+		{
+			tilemap_set_scrollx(state->m_tilemap[1][i], 0, -state->m_scrollx[1][i]);
+			tilemap_set_scrolly(state->m_tilemap[1][i], 0, -state->m_scrolly[1][i]);
+			tilemap_draw(bitmap, cliprect, state->m_tilemap[1][i], 0, 0);
 		}
 	}
 

@@ -140,12 +140,12 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE(astrocorp)
 {
-	astrocorp_state *state = screen->machine().driver_data<astrocorp_state>();
+	astrocorp_state *state = screen.machine().driver_data<astrocorp_state>();
 
 	if (state->m_screen_enable & 1)
 		copybitmap(bitmap, state->m_bitmap, 0,0,0,0, cliprect);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	return 0;
 }

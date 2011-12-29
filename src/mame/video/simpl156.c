@@ -27,9 +27,9 @@ VIDEO_START( simpl156 )
 
 SCREEN_UPDATE( simpl156 )
 {
-	simpl156_state *state = screen->machine().driver_data<simpl156_state>();
+	simpl156_state *state = screen.machine().driver_data<simpl156_state>();
 
-	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
+	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
@@ -39,8 +39,8 @@ SCREEN_UPDATE( simpl156 )
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
 
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen->machine(), 1);
+	flip_screen_set_no_update(screen.machine(), 1);
 
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, 0x800); // 0x800 needed to charlien title
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0x800); // 0x800 needed to charlien title
 	return 0;
 }

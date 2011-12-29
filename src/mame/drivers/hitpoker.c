@@ -77,7 +77,7 @@ static VIDEO_START(hitpoker)
 
 static SCREEN_UPDATE(hitpoker)
 {
-	hitpoker_state *state = screen->machine().driver_data<hitpoker_state>();
+	hitpoker_state *state = screen.machine().driver_data<hitpoker_state>();
 	int count = 0;
 	int y,x;
 
@@ -93,7 +93,7 @@ static SCREEN_UPDATE(hitpoker)
 			gfx_bpp = (state->m_colorram[count] & 0x80)>>7; //flag between 4 and 8 bpp
 			color = gfx_bpp ? ((state->m_colorram[count] & 0x70)>>4) : (state->m_colorram[count] & 0xf);
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[gfx_bpp],tile,color,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[gfx_bpp],tile,color,0,0,x*8,y*8);
 
 			count+=2;
 		}

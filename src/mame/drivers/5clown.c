@@ -523,7 +523,7 @@ static VIDEO_START(fclown)
 
 static SCREEN_UPDATE( fclown )
 {
-	_5clown_state *state = screen->machine().driver_data<_5clown_state>();
+	_5clown_state *state = screen.machine().driver_data<_5clown_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

@@ -39,7 +39,7 @@ VIDEO_START( 4enraya )
 
 SCREEN_UPDATE( 4enraya )
 {
-	_4enraya_state *state = screen->machine().driver_data<_4enraya_state>();
+	_4enraya_state *state = screen.machine().driver_data<_4enraya_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;

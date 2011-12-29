@@ -179,10 +179,10 @@ static void draw_status( running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( gotya )
 {
-	gotya_state *state = screen->machine().driver_data<gotya_state>();
+	gotya_state *state = screen.machine().driver_data<gotya_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, -(*state->m_scroll + (state->m_scroll_bit_8 * 256)) - 2 * 8);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
-	draw_status(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_status(screen.machine(), bitmap, cliprect);
 	return 0;
 }

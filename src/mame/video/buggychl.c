@@ -238,7 +238,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( buggychl )
 {
-	buggychl_state *state = screen->machine().driver_data<buggychl_state>();
+	buggychl_state *state = screen.machine().driver_data<buggychl_state>();
 
 	if (state->m_sky_on)
 		draw_sky(bitmap, cliprect);
@@ -246,11 +246,11 @@ SCREEN_UPDATE( buggychl )
 		bitmap_fill(bitmap, cliprect, 0);
 
 	if (state->m_bg_on)
-		draw_bg(screen->machine(), bitmap, cliprect);
+		draw_bg(screen.machine(), bitmap, cliprect);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	draw_fg(screen->machine(), bitmap, cliprect);
+	draw_fg(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }

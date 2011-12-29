@@ -364,21 +364,21 @@ static void set_scroll(running_machine &machine, int layer)
 
 SCREEN_UPDATE( namcos86 )
 {
-	namcos86_state *state = screen->machine().driver_data<namcos86_state>();
+	namcos86_state *state = screen.machine().driver_data<namcos86_state>();
 	int layer;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use flip_screen_set(screen->machine(), ) because the visible area is asymmetrical */
-	flip_screen_set_no_update(screen->machine(), state->m_spriteram[0x07f6] & 1);
-	tilemap_set_flip_all(screen->machine(),flip_screen_get(screen->machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	set_scroll(screen->machine(), 0);
-	set_scroll(screen->machine(), 1);
-	set_scroll(screen->machine(), 2);
-	set_scroll(screen->machine(), 3);
+	/* can't use flip_screen_set(screen.machine(), ) because the visible area is asymmetrical */
+	flip_screen_set_no_update(screen.machine(), state->m_spriteram[0x07f6] & 1);
+	tilemap_set_flip_all(screen.machine(),flip_screen_get(screen.machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	set_scroll(screen.machine(), 0);
+	set_scroll(screen.machine(), 1);
+	set_scroll(screen.machine(), 2);
+	set_scroll(screen.machine(), 3);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
-	bitmap_fill(bitmap,cliprect,screen->machine().gfx[0]->color_base + 8*state->m_backcolor+7);
+	bitmap_fill(bitmap,cliprect,screen.machine().gfx[0]->color_base + 8*state->m_backcolor+7);
 
 	for (layer = 0;layer < 8;layer++)
 	{
@@ -391,14 +391,14 @@ SCREEN_UPDATE( namcos86 )
 		}
 	}
 
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }
 
 
 SCREEN_EOF( namcos86 )
 {
-	namcos86_state *state = machine.driver_data<namcos86_state>();
+	namcos86_state *state = screen.machine().driver_data<namcos86_state>();
 	if (state->m_copy_sprites)
 	{
 		UINT8 *spriteram = state->m_spriteram;

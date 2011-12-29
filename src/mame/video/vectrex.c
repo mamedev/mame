@@ -161,13 +161,13 @@ static TIMER_CALLBACK(vectrex_refresh)
 
 SCREEN_UPDATE(vectrex)
 {
-	vectrex_state *state = screen->machine().driver_data<vectrex_state>();
+	vectrex_state *state = screen.machine().driver_data<vectrex_state>();
 	int i;
 
-	vectrex_configuration(screen->machine());
+	vectrex_configuration(screen.machine());
 
 	/* start black */
-	vector_add_point(screen->machine(),
+	vector_add_point(screen.machine(),
 					 state->m_points[state->m_display_start].x,
 					 state->m_points[state->m_display_start].y,
 					 state->m_points[state->m_display_start].col,
@@ -175,7 +175,7 @@ SCREEN_UPDATE(vectrex)
 
 	for (i = state->m_display_start; i != state->m_display_end; i = (i + 1) % NVECT)
 	{
-		vector_add_point(screen->machine(),
+		vector_add_point(screen.machine(),
 						 state->m_points[i].x,
 						 state->m_points[i].y,
 						 state->m_points[i].col,

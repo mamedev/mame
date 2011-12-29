@@ -252,19 +252,19 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( brkthru )
 {
-	brkthru_state *state = screen->machine().driver_data<brkthru_state>();
+	brkthru_state *state = screen.machine().driver_data<brkthru_state>();
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bgscroll);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* low priority sprites */
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x01);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x01);
 
 	/* draw background over low priority sprites */
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* high priority sprites */
-	draw_sprites(screen->machine(), bitmap, cliprect, 0x09);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0x09);
 
 	/* fg layer */
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

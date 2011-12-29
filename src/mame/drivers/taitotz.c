@@ -156,7 +156,7 @@ static SCREEN_UPDATE( taitotz )
     }
     */
 
-	taitotz_state *state = screen->machine().driver_data<taitotz_state>();
+	taitotz_state *state = screen.machine().driver_data<taitotz_state>();
 
 	bitmap_fill(bitmap, cliprect, 0);
 	copybitmap_trans(bitmap, state->framebuffer, 0, 0, 0, 0, cliprect, 0);

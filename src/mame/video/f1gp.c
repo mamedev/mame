@@ -252,9 +252,9 @@ static void f1gp_draw_sprites( running_machine &machine, bitmap_t *bitmap, const
 
 SCREEN_UPDATE( f1gp )
 {
-	f1gp_state *state = screen->machine().driver_data<f1gp_state>();
+	f1gp_state *state = screen.machine().driver_data<f1gp_state>();
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_roz_tilemap, 0, 0, 1);
 
@@ -263,13 +263,13 @@ SCREEN_UPDATE( f1gp )
 	/* quick kludge for "continue" screen priority */
 	if (state->m_gfxctrl == 0x00)
 	{
-		f1gp_draw_sprites(screen->machine(), bitmap, cliprect, 0, 0x02);
-		f1gp_draw_sprites(screen->machine(), bitmap, cliprect, 1, 0x02);
+		f1gp_draw_sprites(screen.machine(), bitmap, cliprect, 0, 0x02);
+		f1gp_draw_sprites(screen.machine(), bitmap, cliprect, 1, 0x02);
 	}
 	else
 	{
-		f1gp_draw_sprites(screen->machine(), bitmap, cliprect, 0, 0x00);
-		f1gp_draw_sprites(screen->machine(), bitmap, cliprect, 1, 0x02);
+		f1gp_draw_sprites(screen.machine(), bitmap, cliprect, 0, 0x00);
+		f1gp_draw_sprites(screen.machine(), bitmap, cliprect, 1, 0x02);
 	}
 	return 0;
 }
@@ -345,7 +345,7 @@ static void f1gpb_draw_sprites( running_machine &machine, bitmap_t *bitmap,const
 
 SCREEN_UPDATE( f1gpb )
 {
-	f1gp_state *state = screen->machine().driver_data<f1gp_state>();
+	f1gp_state *state = screen.machine().driver_data<f1gp_state>();
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy;
 
@@ -357,7 +357,7 @@ SCREEN_UPDATE( f1gpb )
 
 	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_fgregs[0] + 8);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	tilemap_draw_roz(bitmap, cliprect, state->m_roz_tilemap,
 		startx << 13, starty << 13,
@@ -366,7 +366,7 @@ SCREEN_UPDATE( f1gpb )
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 1);
 
-	f1gpb_draw_sprites(screen->machine(), bitmap, cliprect);
+	f1gpb_draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
 }
@@ -446,28 +446,28 @@ static void f1gp2_draw_sprites( running_machine &machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( f1gp2 )
 {
-	f1gp_state *state = screen->machine().driver_data<f1gp_state>();
+	f1gp_state *state = screen.machine().driver_data<f1gp_state>();
 
 	if (state->m_gfxctrl & 4)	/* blank screen */
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 	else
 	{
 		switch (state->m_gfxctrl & 3)
 		{
 			case 0:
 				k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
-				f1gp2_draw_sprites(screen->machine(), bitmap, cliprect);
+				f1gp2_draw_sprites(screen.machine(), bitmap, cliprect);
 				tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 				break;
 			case 1:
 				k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
 				tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-				f1gp2_draw_sprites(screen->machine(), bitmap, cliprect);
+				f1gp2_draw_sprites(screen.machine(), bitmap, cliprect);
 				break;
 			case 2:
 				tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 				k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_roz_tilemap, 0, 0, 1);
-				f1gp2_draw_sprites(screen->machine(), bitmap, cliprect);
+				f1gp2_draw_sprites(screen.machine(), bitmap, cliprect);
 				break;
 #ifdef MAME_DEBUG
 			case 3:

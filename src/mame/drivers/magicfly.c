@@ -515,7 +515,7 @@ static VIDEO_START( 7mezzo )
 
 static SCREEN_UPDATE( magicfly )
 {
-	magicfly_state *state = screen->machine().driver_data<magicfly_state>();
+	magicfly_state *state = screen.machine().driver_data<magicfly_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

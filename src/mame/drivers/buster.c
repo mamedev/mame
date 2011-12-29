@@ -28,8 +28,8 @@ static VIDEO_START(buster)
 
 static SCREEN_UPDATE(buster)
 {
-	buster_state *state = screen->machine().driver_data<buster_state>();
-	const gfx_element *gfx = screen->machine().gfx[0];
+	buster_state *state = screen.machine().driver_data<buster_state>();
+	const gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x0000;
 
 	int y,x;

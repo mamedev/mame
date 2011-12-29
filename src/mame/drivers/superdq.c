@@ -59,7 +59,7 @@ static VIDEO_START( superdq )
 
 static SCREEN_UPDATE( superdq )
 {
-	superdq_state *state = screen->machine().driver_data<superdq_state>();
+	superdq_state *state = screen.machine().driver_data<superdq_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 

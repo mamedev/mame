@@ -193,11 +193,11 @@ VIDEO_START(powerbls)
 
 SCREEN_UPDATE(sslam)
 {
-	sslam_state *state = screen->machine().driver_data<sslam_state>();
+	sslam_state *state = screen.machine().driver_data<sslam_state>();
 
 	if (!(state->m_regs[6] & 1))
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -226,18 +226,18 @@ SCREEN_UPDATE(sslam)
 		tilemap_draw(bitmap,cliprect,state->m_md_tilemap,0,0);
 	}
 
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
 }
 
 SCREEN_UPDATE(powerbls)
 {
-	sslam_state *state = screen->machine().driver_data<sslam_state>();
+	sslam_state *state = screen.machine().driver_data<sslam_state>();
 
 	if (!(state->m_regs[6] & 1))
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -245,6 +245,6 @@ SCREEN_UPDATE(powerbls)
 	tilemap_set_scrolly(state->m_bg_tilemap,0, state->m_regs[1]-240);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

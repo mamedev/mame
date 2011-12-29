@@ -256,7 +256,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( 1943 )
 {
-	_1943_state *state = screen->machine().driver_data<_1943_state>();
+	_1943_state *state = screen.machine().driver_data<_1943_state>();
 	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bgscrollx[0] + 256 * state->m_bgscrollx[1]);
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[0]);
@@ -264,16 +264,16 @@ SCREEN_UPDATE( 1943 )
 	if (state->m_bg2_on)
 		tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	if (state->m_obj_on)
-		draw_sprites(screen->machine(), bitmap, cliprect, 0);
+		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	if (state->m_bg1_on)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	if (state->m_obj_on)
-		draw_sprites(screen->machine(), bitmap, cliprect, 1);
+		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	if (state->m_char_on)
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

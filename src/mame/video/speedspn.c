@@ -95,10 +95,10 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE(speedspn)
 {
-	speedspn_state *state = screen->machine().driver_data<speedspn_state>();
+	speedspn_state *state = screen.machine().driver_data<speedspn_state>();
 	if (state->m_display_disable)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -112,6 +112,6 @@ SCREEN_UPDATE(speedspn)
 #endif
 	tilemap_set_scrollx(state->m_tilemap,0, 0x100); // verify
 	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

@@ -120,7 +120,7 @@ static WRITE8_HANDLER( mjsister_videoram_w )
 
 static SCREEN_UPDATE( mjsister )
 {
-	mjsister_state *state = screen->machine().driver_data<mjsister_state>();
+	mjsister_state *state = screen.machine().driver_data<mjsister_state>();
 	int flip = state->m_flip_screen;
 	int i, j;
 
@@ -130,8 +130,8 @@ static SCREEN_UPDATE( mjsister )
 
 		for (offs = 0; offs < 0x8000; offs++)
 		{
-			mjsister_plot0(screen->machine(), offs, state->m_videoram0[offs]);
-			mjsister_plot1(screen->machine(), offs, state->m_videoram1[offs]);
+			mjsister_plot0(screen.machine(), offs, state->m_videoram0[offs]);
+			mjsister_plot1(screen.machine(), offs, state->m_videoram1[offs]);
 		}
 		state->m_screen_redraw = 0;
 	}
@@ -146,7 +146,7 @@ static SCREEN_UPDATE( mjsister )
 		copybitmap_trans(bitmap, state->m_tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 	return 0;
 }
 

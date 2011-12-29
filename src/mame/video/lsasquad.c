@@ -200,13 +200,13 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( lsasquad )
 {
-	lsasquad_state *state = screen->machine().driver_data<lsasquad_state>();
+	lsasquad_state *state = screen.machine().driver_data<lsasquad_state>();
 	bitmap_fill(bitmap, cliprect, 511);
 
-	draw_layer(screen->machine(), bitmap, cliprect, state->m_scrollram + 0x000);
-	draw_layer(screen->machine(), bitmap, cliprect, state->m_scrollram + 0x080);
-	draw_sprites(screen->machine(), bitmap, cliprect);
-	draw_layer(screen->machine(), bitmap, cliprect, state->m_scrollram + 0x100);
+	draw_layer(screen.machine(), bitmap, cliprect, state->m_scrollram + 0x000);
+	draw_layer(screen.machine(), bitmap, cliprect, state->m_scrollram + 0x080);
+	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_layer(screen.machine(), bitmap, cliprect, state->m_scrollram + 0x100);
 	return 0;
 }
 
@@ -214,8 +214,8 @@ SCREEN_UPDATE( lsasquad )
 SCREEN_UPDATE( daikaiju )
 {
 	bitmap_fill(bitmap, cliprect, 511);
-	drawbg(screen->machine(), bitmap, cliprect, 0); // bottom
-	draw_sprites(screen->machine(), bitmap, cliprect);
-	drawbg(screen->machine(), bitmap, cliprect, 1);	// top = pallete $d ?
+	drawbg(screen.machine(), bitmap, cliprect, 0); // bottom
+	draw_sprites(screen.machine(), bitmap, cliprect);
+	drawbg(screen.machine(), bitmap, cliprect, 1);	// top = pallete $d ?
 	return 0;
 }

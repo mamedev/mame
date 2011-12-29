@@ -162,7 +162,7 @@ static PALETTE_INIT( shougi )
 
 static SCREEN_UPDATE( shougi )
 {
-	shougi_state *state = screen->machine().driver_data<shougi_state>();
+	shougi_state *state = screen.machine().driver_data<shougi_state>();
 	int offs;
 
 	for (offs = 0;offs <0x4000; offs++)

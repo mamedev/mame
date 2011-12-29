@@ -433,30 +433,30 @@ WRITE32_HANDLER( gaelco3d_paletteram_020_w )
 
 SCREEN_UPDATE( gaelco3d )
 {
-	gaelco3d_state *state = screen->machine().driver_data<gaelco3d_state>();
+	gaelco3d_state *state = screen.machine().driver_data<gaelco3d_state>();
 	int ret;
 
 /*
-    if (DISPLAY_TEXTURE && (screen->machine().input().code_pressed(KEYCODE_Z) || screen->machine().input().code_pressed(KEYCODE_X)))
+    if (DISPLAY_TEXTURE && (screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X)))
     {
         static int xv = 0, yv = 0x1000;
         UINT8 *base = state->m_texture;
         int length = state->m_texture_size;
 
-        if (screen->machine().input().code_pressed(KEYCODE_X))
+        if (screen.machine().input().code_pressed(KEYCODE_X))
         {
             base = state->m_texmask;
             length = state->m_texmask_size;
         }
 
-        if (screen->machine().input().code_pressed(KEYCODE_LEFT) && xv >= 4)
+        if (screen.machine().input().code_pressed(KEYCODE_LEFT) && xv >= 4)
             xv -= 4;
-        if (screen->machine().input().code_pressed(KEYCODE_RIGHT) && xv < 4096 - 4)
+        if (screen.machine().input().code_pressed(KEYCODE_RIGHT) && xv < 4096 - 4)
             xv += 4;
 
-        if (screen->machine().input().code_pressed(KEYCODE_UP) && yv >= 4)
+        if (screen.machine().input().code_pressed(KEYCODE_UP) && yv >= 4)
             yv -= 4;
-        if (screen->machine().input().code_pressed(KEYCODE_DOWN) && yv < 0x40000)
+        if (screen.machine().input().code_pressed(KEYCODE_DOWN) && yv < 0x40000)
             yv += 4;
 
         for (y = cliprect->min_y; y <= cliprect->max_y; y++)

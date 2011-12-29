@@ -204,10 +204,10 @@ static VIDEO_START( jetwave )
 
 static SCREEN_UPDATE( jetwave )
 {
-	zr107_state *state = screen->machine().driver_data<zr107_state>();
-	device_t *k001604 = screen->machine().device("k001604");
+	zr107_state *state = screen.machine().driver_data<zr107_state>();
+	device_t *k001604 = screen.machine().device("k001604");
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 
 	K001005_draw(bitmap, cliprect);
 
@@ -216,7 +216,7 @@ static SCREEN_UPDATE( jetwave )
 	draw_7segment_led(bitmap, 3, 3, state->m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, state->m_led_reg1);
 
-	sharc_set_flag_input(screen->machine().device("dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(screen.machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -257,9 +257,9 @@ static VIDEO_START( zr107 )
 
 static SCREEN_UPDATE( zr107 )
 {
-	zr107_state *state = screen->machine().driver_data<zr107_state>();
-	device_t *k056832 = screen->machine().device("k056832");
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	zr107_state *state = screen.machine().driver_data<zr107_state>();
+	device_t *k056832 = screen.machine().device("k056832");
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
 	K001005_draw(bitmap, cliprect);
@@ -268,7 +268,7 @@ static SCREEN_UPDATE( zr107 )
 	draw_7segment_led(bitmap, 3, 3, state->m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, state->m_led_reg1);
 
-	sharc_set_flag_input(screen->machine().device("dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(screen.machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 

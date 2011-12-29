@@ -321,17 +321,17 @@ static void draw_object_bank(running_machine &machine, bitmap_t *bitmap, const r
 //static int tick = 0;
 SCREEN_UPDATE( taitojc )
 {
-	taitojc_state *state = screen->machine().driver_data<taitojc_state>();
+	taitojc_state *state = screen.machine().driver_data<taitojc_state>();
 
 #if 0
     tick++;
     if( tick >= 5 ) {
         tick = 0;
 
-        if( screen->machine().input().code_pressed(KEYCODE_O) )
+        if( screen.machine().input().code_pressed(KEYCODE_O) )
             debug_tex_pal++;
 
-        if( screen->machine().input().code_pressed(KEYCODE_I) )
+        if( screen.machine().input().code_pressed(KEYCODE_I) )
             debug_tex_pal--;
 
         debug_tex_pal &= 0x7f;
@@ -346,15 +346,15 @@ SCREEN_UPDATE( taitojc )
 
 	//popmessage("%08x %08x %08x %08x",state->m_objlist[0xd20/4],state->m_objlist[0xd24/4],state->m_objlist[0xd28/4],state->m_objlist[0xd2c/4]);
 
-	draw_object_bank(screen->machine(), bitmap, cliprect, 0, 0);
-	draw_object_bank(screen->machine(), bitmap, cliprect, 1, 0);
-	draw_object_bank(screen->machine(), bitmap, cliprect, 2, 0);
+	draw_object_bank(screen.machine(), bitmap, cliprect, 0, 0);
+	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 0);
+	draw_object_bank(screen.machine(), bitmap, cliprect, 2, 0);
 
 	copybitmap_trans(bitmap, state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 
-	draw_object_bank(screen->machine(), bitmap, cliprect, 0, 1);
-	draw_object_bank(screen->machine(), bitmap, cliprect, 1, 1);
-	draw_object_bank(screen->machine(), bitmap, cliprect, 2, 1);
+	draw_object_bank(screen.machine(), bitmap, cliprect, 0, 1);
+	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 1);
+	draw_object_bank(screen.machine(), bitmap, cliprect, 2, 1);
 
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0,0);
 

@@ -85,7 +85,7 @@ static VIDEO_START( flyball )
 
 static SCREEN_UPDATE( flyball )
 {
-	flyball_state *state = screen->machine().driver_data<flyball_state>();
+	flyball_state *state = screen.machine().driver_data<flyball_state>();
 	int pitcherx = state->m_pitcher_horz;
 	int pitchery = state->m_pitcher_vert - 31;
 
@@ -101,7 +101,7 @@ static SCREEN_UPDATE( flyball )
 	tilemap_draw(bitmap, cliprect, state->m_tmap, 0, 0);
 
 	/* draw pitcher */
-	drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], state->m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
+	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], state->m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
 
 	/* draw ball */
 

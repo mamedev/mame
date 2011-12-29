@@ -221,42 +221,42 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,
 
 SCREEN_UPDATE( kungfut )
 {
-	wiz_state *state = screen->machine().driver_data<wiz_state>();
+	wiz_state *state = screen.machine().driver_data<wiz_state>();
 	bitmap_fill(bitmap,cliprect,state->m_bgpen);
-	draw_background(screen->machine(), bitmap, cliprect, 2 + state->m_char_bank[0] , 0);
-	draw_foreground(screen->machine(), bitmap, cliprect, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram2, 4);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram  , 5);
+	draw_background(screen.machine(), bitmap, cliprect, 2 + state->m_char_bank[0] , 0);
+	draw_foreground(screen.machine(), bitmap, cliprect, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram2, 4);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram  , 5);
 	return 0;
 }
 
 SCREEN_UPDATE( wiz )
 {
-	wiz_state *state = screen->machine().driver_data<wiz_state>();
+	wiz_state *state = screen.machine().driver_data<wiz_state>();
 	int bank;
 	const rectangle* visible_area;
 
 	bitmap_fill(bitmap,cliprect,state->m_bgpen);
-	draw_background(screen->machine(), bitmap, cliprect, 2 + ((state->m_char_bank[0] << 1) | state->m_char_bank[1]), 0);
-	draw_foreground(screen->machine(), bitmap, cliprect, 0);
+	draw_background(screen.machine(), bitmap, cliprect, 2 + ((state->m_char_bank[0] << 1) | state->m_char_bank[1]), 0);
+	draw_foreground(screen.machine(), bitmap, cliprect, 0);
 
 	visible_area = state->m_flipx ? &spritevisibleareaflipx : &spritevisiblearea;
 
 	bank = 7 + *state->m_sprite_bank;
 
-	draw_sprites(screen->machine(), bitmap, visible_area, state->m_spriteram2, 6);
-	draw_sprites(screen->machine(), bitmap, visible_area, state->m_spriteram  , bank);
+	draw_sprites(screen.machine(), bitmap, visible_area, state->m_spriteram2, 6);
+	draw_sprites(screen.machine(), bitmap, visible_area, state->m_spriteram  , bank);
 	return 0;
 }
 
 
 SCREEN_UPDATE( stinger )
 {
-	wiz_state *state = screen->machine().driver_data<wiz_state>();
+	wiz_state *state = screen.machine().driver_data<wiz_state>();
 	bitmap_fill(bitmap,cliprect,state->m_bgpen);
-	draw_background(screen->machine(), bitmap, cliprect, 2 + state->m_char_bank[0], 1);
-	draw_foreground(screen->machine(), bitmap, cliprect, 1);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram2, 4);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram  , 5);
+	draw_background(screen.machine(), bitmap, cliprect, 2 + state->m_char_bank[0], 1);
+	draw_foreground(screen.machine(), bitmap, cliprect, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram2, 4);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram  , 5);
 	return 0;
 }

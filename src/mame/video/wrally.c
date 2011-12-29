@@ -178,9 +178,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( wrally )
 {
-	wrally_state *state = screen->machine().driver_data<wrally_state>();
+	wrally_state *state = screen.machine().driver_data<wrally_state>();
 	/* set scroll registers */
-	if (!flip_screen_get(screen->machine())) {
+	if (!flip_screen_get(screen.machine())) {
 		tilemap_set_scrolly(state->m_pant[0], 0, state->m_vregs[0]);
 		tilemap_set_scrollx(state->m_pant[0], 0, state->m_vregs[1]+4);
 		tilemap_set_scrolly(state->m_pant[1], 0, state->m_vregs[2]);
@@ -200,11 +200,11 @@ SCREEN_UPDATE( wrally )
 	tilemap_draw(bitmap,cliprect,state->m_pant[1],TILEMAP_DRAW_CATEGORY(1),0);
 	tilemap_draw(bitmap,cliprect,state->m_pant[0],TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
 
-	draw_sprites(screen->machine(),bitmap,cliprect,0);
+	draw_sprites(screen.machine(),bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,state->m_pant[0],TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
 
-	draw_sprites(screen->machine(),bitmap,cliprect,1);
+	draw_sprites(screen.machine(),bitmap,cliprect,1);
 
 	return 0;
 }

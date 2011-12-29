@@ -190,18 +190,18 @@ static void crzrally_draw_sprites( running_machine &machine, bitmap_t *bitmap,co
 
 SCREEN_UPDATE( holeland )
 {
-	holeland_state *state = screen->machine().driver_data<holeland_state>();
+	holeland_state *state = screen.machine().driver_data<holeland_state>();
 /*tilemap_mark_all_tiles_dirty(state->m_bg_tilemap); */
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	holeland_draw_sprites(screen->machine(), bitmap, cliprect);
+	holeland_draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( crzrally )
 {
-	holeland_state *state = screen->machine().driver_data<holeland_state>();
+	holeland_state *state = screen.machine().driver_data<holeland_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	crzrally_draw_sprites(screen->machine(), bitmap, cliprect);
+	crzrally_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -111,35 +111,35 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( topspeed )
 {
-	topspeed_state *state = screen->machine().driver_data<topspeed_state>();
+	topspeed_state *state = screen.machine().driver_data<topspeed_state>();
 	UINT8 layer[4];
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed_once (KEYCODE_V))
+	if (screen.machine().input().code_pressed_once (KEYCODE_V))
 	{
 		state->m_dislayer[0] ^= 1;
 		popmessage("bg: %01x", state->m_dislayer[0]);
 	}
 
-	if (screen->machine().input().code_pressed_once (KEYCODE_B))
+	if (screen.machine().input().code_pressed_once (KEYCODE_B))
 	{
 		state->m_dislayer[1] ^= 1;
 		popmessage("fg: %01x", state->m_dislayer[1]);
 	}
 
-	if (screen->machine().input().code_pressed_once (KEYCODE_N))
+	if (screen.machine().input().code_pressed_once (KEYCODE_N))
 	{
 		state->m_dislayer[2] ^= 1;
 		popmessage("bg2: %01x", state->m_dislayer[2]);
 	}
 
-	if (screen->machine().input().code_pressed_once (KEYCODE_M))
+	if (screen.machine().input().code_pressed_once (KEYCODE_M))
 	{
 		state->m_dislayer[3] ^= 1;
 		popmessage("fg2: %01x", state->m_dislayer[3]);
 	}
 
-	if (screen->machine().input().code_pressed_once (KEYCODE_C))
+	if (screen.machine().input().code_pressed_once (KEYCODE_C))
 	{
 		state->m_dislayer[4] ^= 1;
 		popmessage("sprites: %01x", state->m_dislayer[4]);
@@ -155,7 +155,7 @@ SCREEN_UPDATE( topspeed )
 	layer[2] = 1;
 	layer[3] = 0;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
@@ -182,6 +182,6 @@ SCREEN_UPDATE( topspeed )
 	if (state->m_dislayer[4] == 0)
 #endif
 
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

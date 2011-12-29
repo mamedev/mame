@@ -345,7 +345,7 @@ static VIDEO_START(speglsht)
 
 static SCREEN_UPDATE(speglsht)
 {
-	speglsht_state *state = screen->machine().driver_data<speglsht_state>();
+	speglsht_state *state = screen.machine().driver_data<speglsht_state>();
 	int x,y,dy;
 
 	dy=(state->m_videoreg&0x20)?(256*512):0; //visible frame
@@ -371,7 +371,7 @@ static SCREEN_UPDATE(speglsht)
 		{
 			if(srcline[x])
 			{
-				rgb_t color=palette_get_color(screen->machine(), srcline[x]);
+				rgb_t color=palette_get_color(screen.machine(), srcline[x]);
 				PLOT_PIXEL_RGB(x,y,RGB_RED(color),RGB_GREEN(color),RGB_BLUE(color));
 			}
 		}

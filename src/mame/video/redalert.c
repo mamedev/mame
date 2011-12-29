@@ -188,11 +188,11 @@ static VIDEO_START( ww3 )
 
 static SCREEN_UPDATE( redalert )
 {
-	redalert_state *state = screen->machine().driver_data<redalert_state>();
+	redalert_state *state = screen.machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(screen->machine(), pens);
+	get_pens(screen.machine(), pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -261,11 +261,11 @@ static SCREEN_UPDATE( redalert )
 
 static SCREEN_UPDATE( demoneye )
 {
-	redalert_state *state = screen->machine().driver_data<redalert_state>();
+	redalert_state *state = screen.machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(screen->machine(), pens);
+	get_pens(screen.machine(), pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -336,11 +336,11 @@ static SCREEN_UPDATE( demoneye )
 
 static SCREEN_UPDATE( panther )
 {
-	redalert_state *state = screen->machine().driver_data<redalert_state>();
+	redalert_state *state = screen.machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_panther_pens(screen->machine(), pens);
+	get_panther_pens(screen.machine(), pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{

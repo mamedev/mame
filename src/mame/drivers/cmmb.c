@@ -63,9 +63,9 @@ static VIDEO_START( cmmb )
 
 static SCREEN_UPDATE( cmmb )
 {
-	cmmb_state *state = screen->machine().driver_data<cmmb_state>();
+	cmmb_state *state = screen.machine().driver_data<cmmb_state>();
 	UINT8 *videoram = state->m_videoram;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x00000;
 
 	int y,x;

@@ -219,14 +219,14 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const recta
 
 SCREEN_UPDATE( dogfgt )
 {
-	dogfgt_state *state = screen->machine().driver_data<dogfgt_state>();
+	dogfgt_state *state = screen.machine().driver_data<dogfgt_state>();
 	int offs;
 
-	if (state->m_lastflip != flip_screen_get(screen->machine()) || state->m_lastpixcolor != state->m_pixcolor)
+	if (state->m_lastflip != flip_screen_get(screen.machine()) || state->m_lastpixcolor != state->m_pixcolor)
 	{
-		address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		state->m_lastflip = flip_screen_get(screen->machine());
+		state->m_lastflip = flip_screen_get(screen.machine());
 		state->m_lastpixcolor = state->m_pixcolor;
 
 		for (offs = 0; offs < BITMAPRAM_SIZE; offs++)
@@ -236,7 +236,7 @@ SCREEN_UPDATE( dogfgt )
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	copybitmap_trans(bitmap, state->m_pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * state->m_pixcolor);
 	return 0;

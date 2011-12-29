@@ -64,12 +64,12 @@ VIDEO_START( sichuan2 )
 
 SCREEN_UPDATE( sichuan2 )
 {
-	shisen_state *state = screen->machine().driver_data<shisen_state>();
+	shisen_state *state = screen.machine().driver_data<shisen_state>();
 
 	// on Irem boards, screen flip is handled in both hardware and software.
 	// this game doesn't have cocktail mode so if there's software control we don't
 	// know where it is mapped.
-	flip_screen_set(screen->machine(), ~input_port_read(screen->machine(), "DSW2") & 1);
+	flip_screen_set(screen.machine(), ~input_port_read(screen.machine(), "DSW2") & 1);
 
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

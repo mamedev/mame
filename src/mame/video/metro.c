@@ -723,16 +723,16 @@ static void draw_layers( running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( metro )
 {
-	metro_state *state = screen->machine().driver_data<metro_state>();
+	metro_state *state = screen.machine().driver_data<metro_state>();
 	int pri, layers_ctrl = -1;
 	UINT16 screenctrl = *state->m_screenctrl;
-	const rectangle &visarea = screen->machine().primary_screen->visible_area();
+	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
 	state->m_sprite_xoffs = state->m_videoregs[0x06 / 2] - (visarea.max_x + 1)  / 2;
 	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - (visarea.max_y + 1) / 2;
 
 	/* The background color is selected by a register */
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, ((state->m_videoregs[0x12/2] & 0x0fff)) + 0x1000);
 
 	/*  Screen Control Register:
@@ -749,7 +749,7 @@ SCREEN_UPDATE( metro )
 	if (screenctrl & 2)
 		return 0;
 
-	//flip_screen_set(screen->machine(), screenctrl & 1);
+	//flip_screen_set(screen.machine(), screenctrl & 1);
 	state->m_flip_screen = screenctrl & 1;
 
 	/* If the game supports 16x16 tiles, make sure that the
@@ -770,13 +770,13 @@ SCREEN_UPDATE( metro )
 
 
 #ifdef MAME_DEBUG
-if (screen->machine().input().code_pressed(KEYCODE_Z))
+if (screen.machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen->machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 8;
+	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0)
 	{
 		bitmap_fill(bitmap, cliprect, 0);
@@ -794,9 +794,9 @@ if (screen->machine().input().code_pressed(KEYCODE_Z))
 		k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_k053936_tilemap, 0, 0, 1);
 
 	for (pri = 3; pri >= 0; pri--)
-		draw_layers(screen->machine(), bitmap, cliprect, pri, layers_ctrl);
+		draw_layers(screen.machine(), bitmap, cliprect, pri, layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		metro_draw_sprites(screen->machine(), bitmap, cliprect);
+		metro_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

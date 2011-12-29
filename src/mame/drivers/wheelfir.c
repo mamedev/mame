@@ -566,7 +566,7 @@ static VIDEO_START(wheelfir)
 
 static SCREEN_UPDATE(wheelfir)
 {
-	wheelfir_state *state = screen->machine().driver_data<wheelfir_state>();
+	wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
 
 	bitmap_fill(bitmap, cliprect,0);
 
@@ -587,7 +587,7 @@ static SCREEN_UPDATE(wheelfir)
 
 /*
     {
-        bitmap_fill(state->m_tmp_bitmap[LAYER_BG], &screen->visible_area(),0);
+        bitmap_fill(state->m_tmp_bitmap[LAYER_BG], &screen.visible_area(),0);
 
     }
 */
@@ -597,8 +597,8 @@ static SCREEN_UPDATE(wheelfir)
 
 static SCREEN_EOF( wheelfir )
 {
-	wheelfir_state *state = machine.driver_data<wheelfir_state>();
-	bitmap_fill(state->m_tmp_bitmap[LAYER_FG], &machine.primary_screen->visible_area(),0);
+	wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
+	bitmap_fill(state->m_tmp_bitmap[LAYER_FG], &screen.visible_area(),0);
 }
 
 

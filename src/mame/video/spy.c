@@ -64,11 +64,11 @@ VIDEO_START( spy )
 
 SCREEN_UPDATE( spy )
 {
-	spy_state *state = screen->machine().driver_data<spy_state>();
+	spy_state *state = screen.machine().driver_data<spy_state>();
 
 	k052109_tilemap_update(state->m_k052109);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	if (!state->m_video_enable)
 		bitmap_fill(bitmap, cliprect, 16 * state->m_layer_colorbase[0]);

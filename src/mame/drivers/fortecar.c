@@ -346,7 +346,7 @@ static VIDEO_START(fortecar)
 
 static SCREEN_UPDATE(fortecar)
 {
-	fortecar_state *state = screen->machine().driver_data<fortecar_state>();
+	fortecar_state *state = screen.machine().driver_data<fortecar_state>();
 	int x,y,count;
 	count = 0;
 
@@ -363,7 +363,7 @@ static SCREEN_UPDATE(fortecar)
 			if(bpp)
 				color&=0x3;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[bpp],tile,color,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[bpp],tile,color,0,0,x*8,y*8);
 			count++;
 
 		}

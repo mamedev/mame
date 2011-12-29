@@ -180,7 +180,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( cbasebal )
 {
-	cbasebal_state *state = screen->machine().driver_data<cbasebal_state>();
+	cbasebal_state *state = screen.machine().driver_data<cbasebal_state>();
 
 	if (state->m_bg_on)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -188,7 +188,7 @@ SCREEN_UPDATE( cbasebal )
 		bitmap_fill(bitmap, cliprect, 768);
 
 	if (state->m_obj_on)
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 
 	if (state->m_text_on)
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

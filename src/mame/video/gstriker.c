@@ -535,18 +535,18 @@ WRITE16_HANDLER( gsx_videoram3_w )
 
 SCREEN_UPDATE(gstriker)
 {
-	gstriker_state *state = screen->machine().driver_data<gstriker_state>();
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	gstriker_state *state = screen.machine().driver_data<gstriker_state>();
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality
-	MB60553_draw(screen->machine(), 0, bitmap,cliprect, 0);
+	MB60553_draw(screen.machine(), 0, bitmap,cliprect, 0);
 
-	CG10103_draw(screen->machine(), 0, bitmap, cliprect, 0);
+	CG10103_draw(screen.machine(), 0, bitmap, cliprect, 0);
 
 	VS920A_draw(state, 0, bitmap, cliprect, 0);
 
-	CG10103_draw(screen->machine(), 0, bitmap, cliprect, 1);
+	CG10103_draw(screen.machine(), 0, bitmap, cliprect, 1);
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",

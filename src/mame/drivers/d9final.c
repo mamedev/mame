@@ -59,7 +59,7 @@ static VIDEO_START(d9final)
 
 static SCREEN_UPDATE(d9final)
 {
-	d9final_state *state = screen->machine().driver_data<d9final_state>();
+	d9final_state *state = screen.machine().driver_data<d9final_state>();
 	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
 	return 0;
 }

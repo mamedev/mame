@@ -291,7 +291,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bmp, const rectang
 
 SCREEN_UPDATE( bwing )
 {
-	bwing_state *state = screen->machine().driver_data<bwing_state>();
+	bwing_state *state = screen.machine().driver_data<bwing_state>();
 	unsigned x, y, shiftx;
 
 	if (state->m_mapmask & 0x20)
@@ -316,10 +316,10 @@ SCREEN_UPDATE( bwing )
 		tilemap_draw(bitmap, cliprect, state->m_bgmap, 0, 0);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	// draw low priority sprites
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0);
 
 	// draw foreground
 	if (!(state->m_mapmask & 2))
@@ -333,7 +333,7 @@ SCREEN_UPDATE( bwing )
 	}
 
 	// draw high priority sprites
-	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 1);
 
 	// draw text layer
 //  if (state->m_mapmask & 4)

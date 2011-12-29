@@ -182,7 +182,7 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 				/*
                 if (gamma_dither)
                 {
-                    dith = screen->machine().rand() & 0x3f;
+                    dith = screen.machine().rand() & 0x3f;
                 }
                 if (gamma)
                 {
@@ -3269,7 +3269,7 @@ VIDEO_START(n64)
 
 SCREEN_UPDATE(n64)
 {
-	_n64_state *state = screen->machine().driver_data<_n64_state>();
+	_n64_state *state = screen.machine().driver_data<_n64_state>();
 
     int height = state->m_rdp.GetMiscState()->m_fb_height;
 	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64_vi_origin & 0xffffff) >> 2];

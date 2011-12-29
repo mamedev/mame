@@ -90,11 +90,11 @@ public:
 /* VIDEO GOODS */
 static SCREEN_UPDATE( lgp )
 {
-	lgp_state *state = screen->machine().driver_data<lgp_state>();
+	lgp_state *state = screen.machine().driver_data<lgp_state>();
 	int charx, chary;
 
 	/* make color 0 transparent */
-	palette_set_color(screen->machine(), 0, MAKE_ARGB(0,0,0,0));
+	palette_set_color(screen.machine(), 0, MAKE_ARGB(0,0,0,0));
 
 	/* clear */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -108,7 +108,7 @@ static SCREEN_UPDATE( lgp )
 
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
 					state->m_tile_ram[current_screen_character],
 					0,
 					0, 0, charx*8, chary*8, 0);

@@ -222,7 +222,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( kyugo )
 {
-	kyugo_state *state = screen->machine().driver_data<kyugo_state>();
+	kyugo_state *state = screen.machine().driver_data<kyugo_state>();
 
 	if (state->m_flipscreen)
 		tilemap_set_scrollx(state->m_bg_tilemap, 0, -(state->m_scroll_x_lo + (state->m_scroll_x_hi * 256)));
@@ -232,7 +232,7 @@ SCREEN_UPDATE( kyugo )
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll_y);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

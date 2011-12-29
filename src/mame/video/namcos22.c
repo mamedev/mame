@@ -2813,11 +2813,11 @@ VIDEO_START( namcos22s )
 
 SCREEN_UPDATE( namcos22s )
 {
-	namcos22_state *state = screen->machine().driver_data<namcos22_state>();
-	UpdateVideoMixer(screen->machine());
-	UpdatePalette(screen->machine());
-	namcos22s_recalc_czram(screen->machine());
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	namcos22_state *state = screen.machine().driver_data<namcos22_state>();
+	UpdateVideoMixer(screen.machine());
+	UpdatePalette(screen.machine());
+	namcos22s_recalc_czram(screen.machine());
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	// background color
 	rgbint bg_color;
@@ -2832,21 +2832,21 @@ SCREEN_UPDATE( namcos22s )
 
 	// layers
 	UINT8 layer = nthbyte(state->m_gamma,0x1f);
-	if (layer&4) DrawCharacterLayer(screen->machine(), bitmap, cliprect);
-	if (layer&2) DrawSprites(screen->machine(), bitmap, cliprect);
-	if (layer&1) DrawPolygons(screen->machine(), bitmap);
-	RenderScene(screen->machine(), bitmap );
-	if (layer&4) namcos22s_mix_textlayer(screen->machine(), bitmap, cliprect, 6);
-	ApplyGamma(screen->machine(), bitmap);
+	if (layer&4) DrawCharacterLayer(screen.machine(), bitmap, cliprect);
+	if (layer&2) DrawSprites(screen.machine(), bitmap, cliprect);
+	if (layer&1) DrawPolygons(screen.machine(), bitmap);
+	RenderScene(screen.machine(), bitmap );
+	if (layer&4) namcos22s_mix_textlayer(screen.machine(), bitmap, cliprect, 6);
+	ApplyGamma(screen.machine(), bitmap);
 
 	// debug stuff
 #if ALLOW_MEMDUMP
-	if( screen->machine().input().code_pressed(KEYCODE_D) )
+	if( screen.machine().input().code_pressed(KEYCODE_D) )
 	{
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 			if (1) // czram
 			{
@@ -2885,7 +2885,7 @@ SCREEN_UPDATE( namcos22s )
 			//Dump(space, f,0xc00000, 0xc1ffff, "polygonram");
 			fclose( f );
 		}
-		while( screen->machine().input().code_pressed(KEYCODE_D) ){}
+		while( screen.machine().input().code_pressed(KEYCODE_D) ){}
 	}
 #endif
 
@@ -2896,22 +2896,22 @@ SCREEN_UPDATE( namcos22s )
 
 SCREEN_UPDATE( namcos22 )
 {
-	UpdateVideoMixer(screen->machine());
-	UpdatePalette(screen->machine());
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
-	DrawPolygons(screen->machine(), bitmap);
-	RenderScene(screen->machine(), bitmap);
-	DrawCharacterLayer(screen->machine(), bitmap, cliprect);
-	ApplyGamma(screen->machine(), bitmap);
+	UpdateVideoMixer(screen.machine());
+	UpdatePalette(screen.machine());
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	DrawPolygons(screen.machine(), bitmap);
+	RenderScene(screen.machine(), bitmap);
+	DrawCharacterLayer(screen.machine(), bitmap, cliprect);
+	ApplyGamma(screen.machine(), bitmap);
 
 #if ALLOW_MEMDUMP
-	if( screen->machine().input().code_pressed(KEYCODE_D) )
+	if( screen.machine().input().code_pressed(KEYCODE_D) )
 	{
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
 		{
-			address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 			//Dump(space, f,0x90000000, 0x90000003, "led?" );
 			Dump(space, f,0x90010000, 0x90017fff, "cz_ram");
@@ -2920,7 +2920,7 @@ SCREEN_UPDATE( namcos22 )
 			//Dump(space, f,0x70000000, 0x7001ffff, "polygonram");
 			fclose( f );
 		}
-		while( screen->machine().input().code_pressed(KEYCODE_D) ){}
+		while( screen.machine().input().code_pressed(KEYCODE_D) ){}
 	}
 #endif
 

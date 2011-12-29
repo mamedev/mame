@@ -61,7 +61,7 @@ static WRITE8_HANDLER( dotrikun_color_w )
 
 static SCREEN_UPDATE( dotrikun )
 {
-	dotrikun_state *state = screen->machine().driver_data<dotrikun_state>();
+	dotrikun_state *state = screen.machine().driver_data<dotrikun_state>();
 	int x,y,i;
 
 	pen_t back_pen = MAKE_RGB(pal1bit(state->m_color >> 3), pal1bit(state->m_color >> 4), pal1bit(state->m_color >> 5));

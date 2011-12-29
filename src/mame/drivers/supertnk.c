@@ -244,7 +244,7 @@ static WRITE8_HANDLER( supertnk_bitplane_select_1_w )
 
 static SCREEN_UPDATE( supertnk )
 {
-	supertnk_state *state = screen->machine().driver_data<supertnk_state>();
+	supertnk_state *state = screen.machine().driver_data<supertnk_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)

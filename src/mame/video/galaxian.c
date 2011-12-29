@@ -454,19 +454,19 @@ static void state_save_register(running_machine &machine)
 
 SCREEN_UPDATE( galaxian )
 {
-	galaxian_state *state = screen->machine().driver_data<galaxian_state>();
+	galaxian_state *state = screen.machine().driver_data<galaxian_state>();
 	/* draw the background layer (including stars) */
-	(*state->m_draw_background_ptr)(screen->machine(), bitmap, cliprect);
+	(*state->m_draw_background_ptr)(screen.machine(), bitmap, cliprect);
 
 	/* draw the tilemap characters over top */
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* render the sprites next */
-	sprites_draw(screen->machine(), bitmap, cliprect, &screen->machine().generic.spriteram.u8[0x40]);
+	sprites_draw(screen.machine(), bitmap, cliprect, &screen.machine().generic.spriteram.u8[0x40]);
 
 	/* if we have bullets to draw, render them following */
 	if (state->m_draw_bullet_ptr != NULL)
-		bullets_draw(screen->machine(), bitmap, cliprect, &screen->machine().generic.spriteram.u8[0x60]);
+		bullets_draw(screen.machine(), bitmap, cliprect, &screen.machine().generic.spriteram.u8[0x60]);
 
 	return 0;
 }
@@ -477,7 +477,7 @@ SCREEN_UPDATE( zigzag )
 	SCREEN_UPDATE_CALL(galaxian);
 
 	/* zigzag has an extra sprite generator instead of bullets (note: ideally, this should be rendered in parallel) */
-	sprites_draw(screen->machine(), bitmap, cliprect, &screen->machine().generic.spriteram.u8[0x60]);
+	sprites_draw(screen.machine(), bitmap, cliprect, &screen.machine().generic.spriteram.u8[0x60]);
 
 	return 0;
 }

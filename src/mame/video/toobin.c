@@ -230,9 +230,9 @@ WRITE16_HANDLER( toobin_slip_w )
 
 SCREEN_UPDATE( toobin )
 {
-	toobin_state *state = screen->machine().driver_data<toobin_state>();
-	bitmap_t *priority_bitmap = screen->machine().priority_bitmap;
-	const rgb_t *palette = palette_entry_list_adjusted(screen->machine().palette);
+	toobin_state *state = screen.machine().driver_data<toobin_state>();
+	bitmap_t *priority_bitmap = screen.machine().priority_bitmap;
+	const rgb_t *palette = palette_entry_list_adjusted(screen.machine().palette);
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y;

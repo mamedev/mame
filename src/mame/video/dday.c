@@ -317,7 +317,7 @@ WRITE8_HANDLER( dday_control_w )
 
 SCREEN_UPDATE( dday )
 {
-	dday_state *state = screen->machine().driver_data<dday_state>();
+	dday_state *state = screen.machine().driver_data<dday_state>();
 
 	tilemap_draw(state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	tilemap_draw(state->m_main_bitmap, cliprect, state->m_fg_tilemap, 0, 0);
@@ -337,7 +337,7 @@ SCREEN_UPDATE( dday )
 				UINT16 src_pixel = *BITMAP_ADDR16(state->m_main_bitmap, y, x);
 
 				if (*BITMAP_ADDR16(sl_bitmap, y, x) == 0xff)
-					src_pixel += screen->machine().total_colors();
+					src_pixel += screen.machine().total_colors();
 
 				*BITMAP_ADDR16(bitmap, y, x) = src_pixel;
 			}

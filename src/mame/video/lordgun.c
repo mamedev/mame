@@ -327,26 +327,26 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( lordgun )
 {
-	lordgun_state *state = screen->machine().driver_data<lordgun_state>();
+	lordgun_state *state = screen.machine().driver_data<lordgun_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed(KEYCODE_Z))
+	if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int msk = 0;
 
-		if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-		if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-		if (screen->machine().input().code_pressed(KEYCODE_E))	msk |= 4;
-		if (screen->machine().input().code_pressed(KEYCODE_R))	msk |= 8;
-		if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 16;
+		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+		if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+		if (screen.machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+		if (screen.machine().input().code_pressed(KEYCODE_R))	msk |= 8;
+		if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 16;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	if (state->m_whitescreen)
 	{
-		bitmap_fill(bitmap, cliprect, get_white_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_white_pen(screen.machine()));
 		return 0;
 	}
 
@@ -382,7 +382,7 @@ SCREEN_UPDATE( lordgun )
 	if (layers_ctrl & 2)	tilemap_draw(state->m_bitmaps[1], cliprect, state->m_tilemap[1], 0, 0);
 	if (layers_ctrl & 4)	tilemap_draw(state->m_bitmaps[2], cliprect, state->m_tilemap[2], 0, 0);
 	if (layers_ctrl & 8)	tilemap_draw(state->m_bitmaps[3], cliprect, state->m_tilemap[3], 0, 0);
-	if (layers_ctrl & 16)	draw_sprites(screen->machine(), state->m_bitmaps[4], cliprect);
+	if (layers_ctrl & 16)	draw_sprites(screen.machine(), state->m_bitmaps[4], cliprect);
 
 	// copy to screen bitmap
 

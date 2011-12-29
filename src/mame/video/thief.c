@@ -108,15 +108,15 @@ VIDEO_START( thief ){
 }
 
 SCREEN_UPDATE( thief ){
-	thief_state *state = screen->machine().driver_data<thief_state>();
+	thief_state *state = screen.machine().driver_data<thief_state>();
 	UINT8 *videoram = state->m_videoram;
 	UINT32 offs;
 	int flipscreen = state->m_video_control&1;
 	const UINT8 *source = videoram;
 
-	if (tms9927_screen_reset(screen->machine().device("tms")))
+	if (tms9927_screen_reset(screen.machine().device("tms")))
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 

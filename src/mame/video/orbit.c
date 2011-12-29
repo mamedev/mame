@@ -81,12 +81,12 @@ static void draw_sprites( running_machine &machine, bitmap_t* bitmap, const rect
 
 SCREEN_UPDATE( orbit )
 {
-	orbit_state *state = screen->machine().driver_data<orbit_state>();
+	orbit_state *state = screen.machine().driver_data<orbit_state>();
 
-	state->m_flip_screen = input_port_read(screen->machine(), "DSW2") & 8;
+	state->m_flip_screen = input_port_read(screen.machine(), "DSW2") & 8;
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

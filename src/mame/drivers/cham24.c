@@ -288,7 +288,7 @@ static VIDEO_START( cham24 )
 static SCREEN_UPDATE( cham24 )
 {
 	/* render the ppu */
-	ppu2c0x_render(screen->machine().device("ppu"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_render(screen.machine().device("ppu"), bitmap, 0, 0, 0, 0);
 	return 0;
 }
 

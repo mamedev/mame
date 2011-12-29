@@ -200,7 +200,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( circusc )
 {
-	circusc_state *state = screen->machine().driver_data<circusc_state>();
+	circusc_state *state = screen.machine().driver_data<circusc_state>();
 	int i;
 
 	for (i = 0; i < 10; i++)
@@ -210,7 +210,7 @@ SCREEN_UPDATE( circusc )
 
 	bitmap_fill(bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

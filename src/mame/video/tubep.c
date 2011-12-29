@@ -587,14 +587,14 @@ void tubep_vblank_end(running_machine &machine)
 
 SCREEN_UPDATE( tubep )
 {
-	tubep_state *state = screen->machine().driver_data<tubep_state>();
+	tubep_state *state = screen.machine().driver_data<tubep_state>();
 	int DISP_ = state->m_DISP^1;
 
 	pen_t pen_base = 32; //change it later
 
 	UINT32 v;
-	UINT8 *text_gfx_base = screen->machine().region("gfx1")->base();
-	UINT8 *romBxx = screen->machine().region("user1")->base() + 0x2000*state->m_background_romsel;
+	UINT8 *text_gfx_base = screen.machine().region("gfx1")->base();
+	UINT8 *romBxx = screen.machine().region("user1")->base() + 0x2000*state->m_background_romsel;
 
 	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
 
@@ -745,12 +745,12 @@ WRITE8_HANDLER( rjammer_background_page_w )
 
 SCREEN_UPDATE( rjammer )
 {
-	tubep_state *state = screen->machine().driver_data<tubep_state>();
+	tubep_state *state = screen.machine().driver_data<tubep_state>();
 	int DISP_ = state->m_DISP^1;
 
 	UINT32 v;
-	UINT8 *text_gfx_base = screen->machine().region("gfx1")->base();
-	UINT8 *rom13D  = screen->machine().region("user1")->base();
+	UINT8 *text_gfx_base = screen.machine().region("gfx1")->base();
+	UINT8 *rom13D  = screen.machine().region("user1")->base();
 	UINT8 *rom11BD = rom13D+0x1000;
 	UINT8 *rom19C  = rom13D+0x5000;
 

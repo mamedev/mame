@@ -2384,98 +2384,6 @@ VIDEO_START(racinfrc)
 SCREEN_UPDATE(konamigx)
 {
 	int i, newbank, newbase, dirty, unchained;
-	bitmap_t* realbitmap = bitmap;
-
-	if (konamigx_has_dual_screen)
-	{
-		device_t *left_screen  = screen->machine().device("screen");
-		device_t *right_screen = screen->machine().device("screen2");
-
-		/* the video gets demuxed by a board which plugs into the jamma connector */
-		if (screen==left_screen)
-		{
-			konamigx_current_frame^=1;
-
-			if (konamigx_current_frame==1)
-			{
-				int offset=0;
-
-				if (konamigx_palformat==1)
-				{
-					for (offset=0;offset<0x4000/4;offset++)
-					{
-						UINT32 coldat = screen->machine().generic.paletteram.u32[offset];
-
-						set_color_555(screen->machine(), offset*2, 0, 5, 10,coldat >> 16);
-						set_color_555(screen->machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
-					}
-				}
-				else
-				{
-					for (offset=0;offset<0x8000/4;offset++)
-					{
-						int r,g,b;
-
-						r = (screen->machine().generic.paletteram.u32[offset] >>16) & 0xff;
-						g = (screen->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
-						b = (screen->machine().generic.paletteram.u32[offset] >> 0) & 0xff;
-
-						palette_set_color(screen->machine(),offset,MAKE_RGB(r,g,b));
-					}
-				}
-
-				bitmap = dualscreen_left_tempbitmap;
-				// draw
-			}
-			else
-			{
-				copybitmap(bitmap, dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
-				return 0;
-			}
-
-		}
-		else if (screen==right_screen)
-		{
-
-			if (konamigx_current_frame==1)
-			{
-				copybitmap(bitmap, dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
-				return 0;
-			}
-			else
-			{
-
-				int offset=0;
-
-				if (konamigx_palformat==1)
-				{
-					for (offset=0;offset<0x4000/4;offset++)
-					{
-						UINT32 coldat = gx_subpaletteram32[offset];
-
-						set_color_555(screen->machine(), offset*2, 0, 5, 10,coldat >> 16);
-						set_color_555(screen->machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
-					}
-				}
-				else
-				{
-					for (offset=0;offset<0x8000/4;offset++)
-					{
-						int r,g,b;
-
-						r = (gx_subpaletteram32[offset] >>16) & 0xff;
-						g = (gx_subpaletteram32[offset] >> 8) & 0xff;
-						b = (gx_subpaletteram32[offset] >> 0) & 0xff;
-
-						palette_set_color(screen->machine(),offset,MAKE_RGB(r,g,b));
-					}
-				}
-				bitmap = dualscreen_right_tempbitmap;
-				// draw
-			}
-		}
-	}
-
 
 	/* if any banks are different from last render, we need to flush the planes */
 	for (dirty = 0, i = 0; i < 8; i++)
@@ -2536,7 +2444,7 @@ SCREEN_UPDATE(konamigx)
 
 	if (gx_specialrozenable==3)
 	{
-		konamigx_mixer(screen->machine(), bitmap, cliprect, gx_psac_tilemap, GXSUB_8BPP,0,0,  0, 0, gx_rushingheroes_hack);
+		konamigx_mixer(screen.machine(), bitmap, cliprect, gx_psac_tilemap, GXSUB_8BPP,0,0,  0, 0, gx_rushingheroes_hack);
 	}
 	// hack, draw the roz tilemap if W is held
 	// todo: fix so that it works with the mixer without crashing(!)
@@ -2553,11 +2461,11 @@ SCREEN_UPDATE(konamigx)
 		else K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
 
 
-		konamigx_mixer(screen->machine(), bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
+		konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
 	}
 	else
 	{
-		konamigx_mixer(screen->machine(), bitmap, cliprect, 0, 0, 0, 0, 0, 0, gx_rushingheroes_hack);
+		konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, 0, 0, gx_rushingheroes_hack);
 	}
 
 
@@ -2565,14 +2473,14 @@ SCREEN_UPDATE(konamigx)
 	/* Hack! draw type-1 roz layer here for testing purposes only */
 	if (gx_specialrozenable == 1)
 	{
-		const pen_t *paldata = screen->machine().pens;
+		const pen_t *paldata = screen.machine().pens;
 
-		if ( screen->machine().input().code_pressed(KEYCODE_W) )
+		if ( screen.machine().input().code_pressed(KEYCODE_W) )
 		{
 			int y,x;
 
 			// make it flicker, to compare positioning
-			//if (screen->frame_number() & 1)
+			//if (screen.frame_number() & 1)
 			{
 
 				for (y=0;y<256;y++)
@@ -2597,19 +2505,96 @@ SCREEN_UPDATE(konamigx)
 
 	}
 
-	if (konamigx_has_dual_screen)
-	{
-		device_t *left_screen  = screen->machine().device("screen");
-		device_t *right_screen = screen->machine().device("screen2");
+	return 0;
+}
 
-		if (screen==left_screen)
+SCREEN_UPDATE(konamigx_left)
+{
+	/* the video gets demuxed by a board which plugs into the jamma connector */
+	konamigx_current_frame^=1;
+
+	if (konamigx_current_frame==1)
+	{
+		int offset=0;
+
+		if (konamigx_palformat==1)
 		{
-			copybitmap(realbitmap, dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
+			for (offset=0;offset<0x4000/4;offset++)
+			{
+				UINT32 coldat = screen.machine().generic.paletteram.u32[offset];
+
+				set_color_555(screen.machine(), offset*2, 0, 5, 10,coldat >> 16);
+				set_color_555(screen.machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
+			}
 		}
-		else if (screen==right_screen)
+		else
 		{
-			copybitmap(realbitmap, dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
+			for (offset=0;offset<0x8000/4;offset++)
+			{
+				int r,g,b;
+
+				r = (screen.machine().generic.paletteram.u32[offset] >>16) & 0xff;
+				g = (screen.machine().generic.paletteram.u32[offset] >> 8) & 0xff;
+				b = (screen.machine().generic.paletteram.u32[offset] >> 0) & 0xff;
+
+				palette_set_color(screen.machine(),offset,MAKE_RGB(r,g,b));
+			}
 		}
+
+		bitmap_t* realbitmap = bitmap;
+		bitmap = dualscreen_left_tempbitmap;
+		SCREEN_UPDATE_CALL(konamigx);
+
+		copybitmap(realbitmap, dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
+	}
+	else
+	{
+		copybitmap(bitmap, dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
+	}
+
+	return 0;
+}
+
+SCREEN_UPDATE(konamigx_right)
+{
+	if (konamigx_current_frame==1)
+	{
+		copybitmap(bitmap, dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
+	}
+	else
+	{
+
+		int offset=0;
+
+		if (konamigx_palformat==1)
+		{
+			for (offset=0;offset<0x4000/4;offset++)
+			{
+				UINT32 coldat = gx_subpaletteram32[offset];
+
+				set_color_555(screen.machine(), offset*2, 0, 5, 10,coldat >> 16);
+				set_color_555(screen.machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
+			}
+		}
+		else
+		{
+			for (offset=0;offset<0x8000/4;offset++)
+			{
+				int r,g,b;
+
+				r = (gx_subpaletteram32[offset] >>16) & 0xff;
+				g = (gx_subpaletteram32[offset] >> 8) & 0xff;
+				b = (gx_subpaletteram32[offset] >> 0) & 0xff;
+
+				palette_set_color(screen.machine(),offset,MAKE_RGB(r,g,b));
+			}
+		}
+
+		bitmap_t* realbitmap = bitmap;
+		bitmap = dualscreen_right_tempbitmap;
+		SCREEN_UPDATE_CALL(konamigx);
+
+		copybitmap(realbitmap, dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 
 	return 0;

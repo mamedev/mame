@@ -118,9 +118,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE(k3)
 {
-	k3_state *state = screen->machine().driver_data<k3_state>();
+	k3_state *state = screen.machine().driver_data<k3_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 

@@ -495,7 +495,7 @@ static VIDEO_START( vidadcba )
 
 static SCREEN_UPDATE( videopkr )
 {
-	videopkr_state *state = screen->machine().driver_data<videopkr_state>();
+	videopkr_state *state = screen.machine().driver_data<videopkr_state>();
 	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;

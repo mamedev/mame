@@ -369,67 +369,68 @@ static void punchout_copy_bot_palette(running_machine &machine, int bank)
 }
 
 
-SCREEN_UPDATE( punchout )
+SCREEN_UPDATE( punchout_top )
 {
-	punchout_state *state = screen->machine().driver_data<punchout_state>();
-	device_t *top_screen    = screen->machine().device("top");
-	device_t *bottom_screen = screen->machine().device("bottom");
+	punchout_state *state = screen.machine().driver_data<punchout_state>();
 
-	if (screen == top_screen)
-	{
-		punchout_copy_top_palette(screen->machine(), BIT(*state->m_palettebank,1));
+	punchout_copy_top_palette(screen.machine(), BIT(*state->m_palettebank,1));
 
-		tilemap_draw(bitmap, cliprect, state->m_bg_top_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_top_tilemap, 0, 0);
 
-		if (state->m_spr1_ctrlram[7] & 1)	/* display in top monitor */
-			draw_big_sprite(screen->machine(), bitmap, cliprect, 0);
-	}
-	else if (screen == bottom_screen)
-	{
-		int offs;
+	if (state->m_spr1_ctrlram[7] & 1)	/* display in top monitor */
+		draw_big_sprite(screen.machine(), bitmap, cliprect, 0);
 
-		punchout_copy_bot_palette(screen->machine(), BIT(*state->m_palettebank,0));
+	return 0;
+}
 
-		/* copy the character mapped graphics */
-		for (offs = 0;offs < 32;offs++)
-			tilemap_set_scrollx(state->m_bg_bot_tilemap, offs, 58 + state->m_bg_bot_videoram[2*offs] + 256 * (state->m_bg_bot_videoram[2*offs + 1] & 0x01));
+SCREEN_UPDATE( punchout_bottom )
+{
+	punchout_state *state = screen.machine().driver_data<punchout_state>();
+	int offs;
 
-		tilemap_draw(bitmap, cliprect, state->m_bg_bot_tilemap, 0, 0);
+	punchout_copy_bot_palette(screen.machine(), BIT(*state->m_palettebank,0));
 
-		if (state->m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
-			draw_big_sprite(screen->machine(), bitmap, cliprect, 1);
-		drawbs2(screen->machine(), bitmap, cliprect);
-	}
+	/* copy the character mapped graphics */
+	for (offs = 0;offs < 32;offs++)
+		tilemap_set_scrollx(state->m_bg_bot_tilemap, offs, 58 + state->m_bg_bot_videoram[2*offs] + 256 * (state->m_bg_bot_videoram[2*offs + 1] & 0x01));
+
+	tilemap_draw(bitmap, cliprect, state->m_bg_bot_tilemap, 0, 0);
+
+	if (state->m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
+		draw_big_sprite(screen.machine(), bitmap, cliprect, 1);
+	drawbs2(screen.machine(), bitmap, cliprect);
+
 	return 0;
 }
 
 
-SCREEN_UPDATE( armwrest )
+SCREEN_UPDATE( armwrest_top )
 {
-	punchout_state *state = screen->machine().driver_data<punchout_state>();
-	device_t *top_screen    = screen->machine().device("top");
-	device_t *bottom_screen = screen->machine().device("bottom");
+	punchout_state *state = screen.machine().driver_data<punchout_state>();
 
-	if (screen == top_screen)
-	{
-		punchout_copy_top_palette(screen->machine(), BIT(*state->m_palettebank,1));
+	punchout_copy_top_palette(screen.machine(), BIT(*state->m_palettebank,1));
 
-		tilemap_draw(bitmap, cliprect, state->m_bg_top_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_top_tilemap, 0, 0);
 
-		if (state->m_spr1_ctrlram[7] & 1)	/* display in top monitor */
-			armwrest_draw_big_sprite(screen->machine(), bitmap, cliprect, 0);
-	}
-	else if (screen == bottom_screen)
-	{
-		punchout_copy_bot_palette(screen->machine(), BIT(*state->m_palettebank,0));
+	if (state->m_spr1_ctrlram[7] & 1)	/* display in top monitor */
+		armwrest_draw_big_sprite(screen.machine(), bitmap, cliprect, 0);
 
-		tilemap_draw(bitmap, cliprect, state->m_bg_bot_tilemap, 0, 0);
+	return 0;
+}
 
-		if (state->m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
-			armwrest_draw_big_sprite(screen->machine(), bitmap, cliprect, 1);
-		drawbs2(screen->machine(), bitmap, cliprect);
+SCREEN_UPDATE( armwrest_bottom )
+{
+	punchout_state *state = screen.machine().driver_data<punchout_state>();
 
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	}
+	punchout_copy_bot_palette(screen.machine(), BIT(*state->m_palettebank,0));
+
+	tilemap_draw(bitmap, cliprect, state->m_bg_bot_tilemap, 0, 0);
+
+	if (state->m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
+		armwrest_draw_big_sprite(screen.machine(), bitmap, cliprect, 1);
+	drawbs2(screen.machine(), bitmap, cliprect);
+
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+
 	return 0;
 }

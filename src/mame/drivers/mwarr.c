@@ -468,10 +468,10 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE( mwarr )
 {
-	mwarr_state *state = screen->machine().driver_data<mwarr_state>();
+	mwarr_state *state = screen.machine().driver_data<mwarr_state>();
 	int i;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	if (BIT(state->m_vidattrram[6], 0))
 	{
@@ -517,7 +517,7 @@ static SCREEN_UPDATE( mwarr )
 	tilemap_draw(bitmap, cliprect, state->m_mlow_tilemap,  0, 0x02);
 	tilemap_draw(bitmap, cliprect, state->m_mhigh_tilemap, 0, 0x04);
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap,    0, 0x10);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 

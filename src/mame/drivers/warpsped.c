@@ -205,7 +205,7 @@ static void warpspeed_draw_circles(bitmap_t *bitmap, warpspeed_state *state)
 
 static SCREEN_UPDATE( warpspeed )
 {
-	warpspeed_state *state = screen->machine().driver_data<warpspeed_state>();
+	warpspeed_state *state = screen.machine().driver_data<warpspeed_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_starfield_tilemap, 0, 0);
 	warpspeed_draw_circles(bitmap, state);

@@ -66,7 +66,7 @@ SCREEN_UPDATE( djboy )
      * ---x---- flipscreen?
      * ----xxxx ROM bank
      */
-	djboy_state *state = screen->machine().driver_data<djboy_state>();
+	djboy_state *state = screen.machine().driver_data<djboy_state>();
 	int scroll;
 
 	scroll = state->m_scrollx | ((state->m_videoreg & 0xc0) << 2);
@@ -83,6 +83,6 @@ SCREEN_UPDATE( djboy )
 
 SCREEN_EOF( djboy )
 {
-	djboy_state *state = machine.driver_data<djboy_state>();
+	djboy_state *state = screen.machine().driver_data<djboy_state>();
 	pandora_eof(state->m_pandora);
 }

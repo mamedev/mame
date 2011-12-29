@@ -240,8 +240,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( skykid )
 {
-	skykid_state *state = screen->machine().driver_data<skykid_state>();
-	if (flip_screen_get(screen->machine()))
+	skykid_state *state = screen.machine().driver_data<skykid_state>();
+	if (flip_screen_get(screen.machine()))
 	{
 		tilemap_set_scrollx(state->m_bg_tilemap, 0, 189 - (state->m_scroll_x ^ 1));
 		tilemap_set_scrolly(state->m_bg_tilemap, 0, 7 - state->m_scroll_y);
@@ -262,7 +262,7 @@ SCREEN_UPDATE( skykid )
 		// draw low priority tiles
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, pri, 0);
 
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 
 		// draw the other tiles
 		for (cat = 0; cat < 0xf; cat++)
@@ -270,7 +270,7 @@ SCREEN_UPDATE( skykid )
 	}
 	else
 	{
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	}
 

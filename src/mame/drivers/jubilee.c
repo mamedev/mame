@@ -133,7 +133,7 @@ static VIDEO_START( jubileep )
 
 static SCREEN_UPDATE( jubileep )
 {
-	jubilee_state *state = screen->machine().driver_data<jubilee_state>();
+	jubilee_state *state = screen.machine().driver_data<jubilee_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

@@ -1122,16 +1122,6 @@ bool driver_device::screen_update(screen_device &screen, bitmap_t &bitmap, const
 
 
 //-------------------------------------------------
-//  video_eof - default implementation which
-//  calls to the legacy video_eof function
-//-------------------------------------------------
-
-void driver_device::screen_eof()
-{
-}
-
-
-//-------------------------------------------------
 //  device_rom_region - return a pointer to the
 //  game's ROMs
 //-------------------------------------------------

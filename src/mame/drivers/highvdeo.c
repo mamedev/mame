@@ -112,26 +112,26 @@ static VIDEO_START(tourvisn)
 
 static SCREEN_UPDATE(tourvisn)
 {
-	highvdeo_state *state = screen->machine().driver_data<highvdeo_state>();
+	highvdeo_state *state = screen.machine().driver_data<highvdeo_state>();
 	int x,y,count;
 
 	count = (0/2);
 
-	for(y=0;y<(screen->visible_area().max_y+1);y++)
+	for(y=0;y<(screen.visible_area().max_y+1);y++)
 	{
-		for(x=0;x<(screen->visible_area().max_x+1)/2;x++)
+		for(x=0;x<(screen.visible_area().max_x+1)/2;x++)
 		{
 			UINT32 color;
 
 			color = ((state->m_blit_ram[count]) & 0x00ff)>>0;
 
-			if((x*2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine().pens[color];
+			if((x*2)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen.machine().pens[color];
 
 			color = ((state->m_blit_ram[count]) & 0xff00)>>8;
 
-			if(((x*2)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine().pens[color];
+			if(((x*2)+1)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen.machine().pens[color];
 
 			count++;
 		}
@@ -143,7 +143,7 @@ static SCREEN_UPDATE(tourvisn)
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
 static SCREEN_UPDATE(brasil)
 {
-	highvdeo_state *state = screen->machine().driver_data<highvdeo_state>();
+	highvdeo_state *state = screen.machine().driver_data<highvdeo_state>();
 	int x,y,count;
 
 	count = (0/2);
@@ -162,7 +162,7 @@ static SCREEN_UPDATE(brasil)
 			b = (color & 0x001f) << 3;
 			g = (color & 0x07e0) >> 3;
 			r = (color & 0xf800) >> 8;
-			if(x<screen->visible_area().max_x && y<screen->visible_area().max_y)
+			if(x<screen.visible_area().max_x && y<screen.visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x) = b | (g<<8) | (r<<16);
 
 			count++;

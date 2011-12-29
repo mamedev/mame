@@ -1024,18 +1024,18 @@ VIDEO_START( hotchase )
 
 SCREEN_UPDATE( wecleman )
 {
-	wecleman_state *state = screen->machine().driver_data<wecleman_state>();
+	wecleman_state *state = screen.machine().driver_data<wecleman_state>();
 	const pen_t *mrct;
 	int video_on;
 	int fg_x, bg_x, fg_y, bg_y;
 	int cloud_sx, cloud_sy;
 	int i, j, k;
 
-	mrct = screen->machine().pens;
+	mrct = screen.machine().pens;
 
 	video_on = state->m_irqctrl & 0x40;
 
-	set_led_status(screen->machine(), 0, state->m_selected_ip & 0x04);	// Start lamp
+	set_led_status(screen.machine(), 0, state->m_selected_ip & 0x04);	// Start lamp
 
 	fg_y = (state->m_txtram[0x0f24>>1] & (TILEMAP_DIMY - 1));
 	bg_y = (state->m_txtram[0x0f26>>1] & (TILEMAP_DIMY - 1));
@@ -1063,12 +1063,12 @@ SCREEN_UPDATE( wecleman )
 	/* palette hacks! */
 	((pen_t *)mrct)[0x27] = mrct[0x24];
 
-	get_sprite_info(screen->machine());
+	get_sprite_info(screen.machine());
 
 	bitmap_fill(bitmap, cliprect, state->m_black_pen);
 
 	/* Draw the road (lines which have priority 0x02) */
-	if (video_on) wecleman_draw_road(screen->machine(), bitmap, cliprect, 0x02);
+	if (video_on) wecleman_draw_road(screen.machine(), bitmap, cliprect, 0x02);
 
 	/* Draw the background */
 	if (video_on) tilemap_draw(bitmap,cliprect, state->m_bg_tilemap, 0, 0);
@@ -1082,7 +1082,7 @@ SCREEN_UPDATE( wecleman )
 		if (video_on)
 			draw_cloud(
 			bitmap,
-			screen->machine().gfx[0],
+			screen.machine().gfx[0],
 			state->m_pageram+0x1800,
 			BMP_PAD, BMP_PAD,
 			41, 20,
@@ -1102,10 +1102,10 @@ SCREEN_UPDATE( wecleman )
 	if (video_on) tilemap_draw(bitmap,cliprect, state->m_fg_tilemap, 0, 0);
 
 	/* Draw the road (lines which have priority 0x04) */
-	if (video_on) wecleman_draw_road(screen->machine(), bitmap,cliprect, 0x04);
+	if (video_on) wecleman_draw_road(screen.machine(), bitmap,cliprect, 0x04);
 
 	/* Draw the sprites */
-	if (video_on) sprite_draw(screen->machine(), bitmap,cliprect);
+	if (video_on) sprite_draw(screen.machine(), bitmap,cliprect);
 
 	/* Draw the text layer */
 	if (video_on) tilemap_draw(bitmap,cliprect, state->m_txt_tilemap, 0, 0);
@@ -1118,16 +1118,16 @@ SCREEN_UPDATE( wecleman )
 
 SCREEN_UPDATE( hotchase )
 {
-	wecleman_state *state = screen->machine().driver_data<wecleman_state>();
-	device_t *k051316_1 = screen->machine().device("k051316_1");
-	device_t *k051316_2 = screen->machine().device("k051316_2");
+	wecleman_state *state = screen.machine().driver_data<wecleman_state>();
+	device_t *k051316_1 = screen.machine().device("k051316_1");
+	device_t *k051316_2 = screen.machine().device("k051316_2");
 	int video_on;
 
 	video_on = state->m_irqctrl & 0x40;
 
-	set_led_status(screen->machine(), 0, state->m_selected_ip & 0x04);	// Start lamp
+	set_led_status(screen.machine(), 0, state->m_selected_ip & 0x04);	// Start lamp
 
-	get_sprite_info(screen->machine());
+	get_sprite_info(screen.machine());
 
 	bitmap_fill(bitmap, cliprect, state->m_black_pen);
 
@@ -1137,11 +1137,11 @@ SCREEN_UPDATE( hotchase )
 
 	/* Draw the road */
 	if (video_on)
-		hotchase_draw_road(screen->machine(), bitmap, cliprect);
+		hotchase_draw_road(screen.machine(), bitmap, cliprect);
 
 	/* Draw the sprites */
 	if (video_on)
-		sprite_draw(screen->machine(), bitmap,cliprect);
+		sprite_draw(screen.machine(), bitmap,cliprect);
 
 	/* Draw the foreground (text) */
 	if (video_on)

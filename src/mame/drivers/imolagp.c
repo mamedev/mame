@@ -200,7 +200,7 @@ static VIDEO_START( imolagp )
 
 static SCREEN_UPDATE( imolagp )
 {
-	imolagp_state *state = screen->machine().driver_data<imolagp_state>();
+	imolagp_state *state = screen.machine().driver_data<imolagp_state>();
 	int scroll2 = state->m_scroll ^ 0x03;
 	int pass;
 	for (pass = 0; pass < 2; pass++)

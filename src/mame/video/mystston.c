@@ -256,18 +256,18 @@ static VIDEO_RESET( mystston )
 
 static SCREEN_UPDATE( mystston )
 {
-	mystston_state *state = screen->machine().driver_data<mystston_state>();
+	mystston_state *state = screen.machine().driver_data<mystston_state>();
 
-	int flip = (*state->m_video_control & 0x80) ^ ((input_port_read(screen->machine(), "DSW1") & 0x20) << 2);
+	int flip = (*state->m_video_control & 0x80) ^ ((input_port_read(screen.machine(), "DSW1") & 0x20) << 2);
 
-	set_palette(screen->machine(), state);
+	set_palette(screen.machine(), state);
 
-	tilemap_mark_all_tiles_dirty_all(screen->machine());
+	tilemap_mark_all_tiles_dirty_all(screen.machine());
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_scroll);
-	tilemap_set_flip_all(screen->machine(), flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip_all(screen.machine(), flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(bitmap, cliprect, screen->machine().gfx[2], flip);
+	draw_sprites(bitmap, cliprect, screen.machine().gfx[2], flip);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;

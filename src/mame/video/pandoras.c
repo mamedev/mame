@@ -179,9 +179,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( pandoras )
 {
-	pandoras_state *state = screen->machine().driver_data<pandoras_state>();
+	pandoras_state *state = screen.machine().driver_data<pandoras_state>();
 	tilemap_draw(bitmap,cliprect, state->m_layer0, 1 ,0);
-	draw_sprites(screen->machine(), bitmap, cliprect, &state->m_spriteram[0x800] );
+	draw_sprites(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x800] );
 	tilemap_draw(bitmap,cliprect, state->m_layer0, 0 ,0);
 	return 0;
 }

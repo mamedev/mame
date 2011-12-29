@@ -143,8 +143,8 @@ VIDEO_START(silkroad)
 
 SCREEN_UPDATE(silkroad)
 {
-	silkroad_state *state = screen->machine().driver_data<silkroad_state>();
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	silkroad_state *state = screen.machine().driver_data<silkroad_state>();
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x7c0);
 
 	tilemap_set_scrollx( state->m_fg_tilemap, 0, ((state->m_regs[0] & 0xffff0000) >> 16) );
@@ -159,7 +159,7 @@ SCREEN_UPDATE(silkroad)
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap, 0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg2_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,state->m_fg3_tilemap,0,2);
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 
 	if (0)
 	{

@@ -150,19 +150,19 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( cheekyms )
 {
-	cheekyms_state *state = screen->machine().driver_data<cheekyms_state>();
+	cheekyms_state *state = screen.machine().driver_data<cheekyms_state>();
 	int y, x;
 	int scrolly = ((*state->m_port_80 >> 3) & 0x07);
 	int flip = *state->m_port_80 & 0x80;
 
-	tilemap_mark_all_tiles_dirty_all(screen->machine());
-	tilemap_set_flip_all(screen->machine(), flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_mark_all_tiles_dirty_all(screen.machine());
+	tilemap_set_flip_all(screen.machine(), flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	bitmap_fill(bitmap, cliprect, 0);
 	bitmap_fill(state->m_bitmap_buffer, cliprect, 0);
 
 	/* sprites go under the playfield */
-	draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().gfx[1], flip);
+	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().gfx[1], flip);
 
 	/* draw the tilemap to a temp bitmap */
 	tilemap_draw(state->m_bitmap_buffer, cliprect, state->m_cm_tilemap, 0, 0);

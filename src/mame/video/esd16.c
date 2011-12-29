@@ -325,10 +325,10 @@ static void hedpanic_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 
 SCREEN_UPDATE( esd16 )
 {
-	esd16_state *state = screen->machine().driver_data<esd16_state>();
+	esd16_state *state = screen.machine().driver_data<esd16_state>();
 	int layers_ctrl = -1;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	tilemap_set_scrollx(state->m_tilemap_0, 0, state->m_scroll_0[0]);
 	tilemap_set_scrolly(state->m_tilemap_0, 0, state->m_scroll_0[1]);
@@ -337,12 +337,12 @@ SCREEN_UPDATE( esd16 )
 	tilemap_set_scrolly(state->m_tilemap_1, 0, state->m_scroll_1[1]);
 
 #ifdef MAME_DEBUG
-if (screen->machine().input().code_pressed(KEYCODE_Z))
+if (screen.machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 4;
+	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 4;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -352,25 +352,25 @@ if (screen->machine().input().code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 1);
 
-	if (layers_ctrl & 4)	esd16_draw_sprites(screen->machine(), bitmap, cliprect);
+	if (layers_ctrl & 4)	esd16_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 
 SCREEN_UPDATE( hedpanic )
 {
-	esd16_state *state = screen->machine().driver_data<esd16_state>();
+	esd16_state *state = screen.machine().driver_data<esd16_state>();
 	int layers_ctrl = -1;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-if (screen->machine().input().code_pressed(KEYCODE_Z))
+if (screen.machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 4;
+	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 4;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -413,7 +413,7 @@ if (screen->machine().input().code_pressed(KEYCODE_Z))
 
 	}
 
-	if (layers_ctrl & 4)	hedpanic_draw_sprites(screen->machine(),bitmap,cliprect);
+	if (layers_ctrl & 4)	hedpanic_draw_sprites(screen.machine(),bitmap,cliprect);
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
 	return 0;
@@ -422,18 +422,18 @@ if (screen->machine().input().code_pressed(KEYCODE_Z))
 // uses older style sprites
 SCREEN_UPDATE( hedpanio )
 {
-	esd16_state *state = screen->machine().driver_data<esd16_state>();
+	esd16_state *state = screen.machine().driver_data<esd16_state>();
 	int layers_ctrl = -1;
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 
 #ifdef MAME_DEBUG
-if ( screen->machine().input().code_pressed(KEYCODE_Z) )
+if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 {
 	int msk = 0;
-	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 4;
+	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 4;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -476,7 +476,7 @@ if ( screen->machine().input().code_pressed(KEYCODE_Z) )
 
 	}
 
-	if (layers_ctrl & 4)	esd16_draw_sprites(screen->machine(),bitmap,cliprect);
+	if (layers_ctrl & 4)	esd16_draw_sprites(screen.machine(),bitmap,cliprect);
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
 	return 0;

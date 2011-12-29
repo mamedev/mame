@@ -511,7 +511,7 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectan
 
 SCREEN_EOF( mlc )
 {
-	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
+	deco_mlc_state *state = screen.machine().driver_data<deco_mlc_state>();
 	/* Spriteram is definitely double buffered, as the vram lookup tables
     are often updated a frame after spriteram is setup to point to a new
     lookup table.  Without buffering incorrect one frame glitches are seen
@@ -523,7 +523,7 @@ SCREEN_EOF( mlc )
 SCREEN_UPDATE( mlc )
 {
 //  bitmap_fill(temp_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,screen->machine().pens[0]); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	bitmap_fill(bitmap,cliprect,screen.machine().pens[0]); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

@@ -1093,7 +1093,7 @@ static VIDEO_START( multigam )
 static SCREEN_UPDATE( multigam )
 {
 	/* render the ppu */
-	ppu2c0x_render(screen->machine().device("ppu"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_render(screen.machine().device("ppu"), bitmap, 0, 0, 0, 0);
 	return 0;
 }
 

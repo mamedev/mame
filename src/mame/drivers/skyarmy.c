@@ -117,7 +117,7 @@ static VIDEO_START( skyarmy )
 
 static SCREEN_UPDATE( skyarmy )
 {
-	skyarmy_state *state = screen->machine().driver_data<skyarmy_state>();
+	skyarmy_state *state = screen.machine().driver_data<skyarmy_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int sx, sy, flipx, flipy, offs,pal;
 	int i;
@@ -136,7 +136,7 @@ static SCREEN_UPDATE( skyarmy )
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
 			spriteram[offs+1]&0x3f,
 			pal,
 			flipx,flipy,

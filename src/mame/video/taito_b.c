@@ -377,7 +377,7 @@ g_profiler.stop();
 
 SCREEN_UPDATE( taitob )
 {
-	taitob_state *state = screen->machine().driver_data<taitob_state>();
+	taitob_state *state = screen.machine().driver_data<taitob_state>();
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
 
 	if ((video_control & 0x20) == 0)
@@ -389,7 +389,7 @@ SCREEN_UPDATE( taitob )
 	/* Draw playfields */
 	tc0180vcu_tilemap_draw(state->m_tc0180vcu, bitmap, cliprect, 0, 1);
 
-	draw_framebuffer(screen->machine(), bitmap, cliprect, 1);
+	draw_framebuffer(screen.machine(), bitmap, cliprect, 1);
 
 	tc0180vcu_tilemap_draw(state->m_tc0180vcu, bitmap, cliprect, 1, 0);
 
@@ -402,7 +402,7 @@ SCREEN_UPDATE( taitob )
 		copyscrollbitmap_trans(bitmap, state->m_pixel_bitmap, 1, &scrollx, 1, &scrolly, cliprect, state->m_b_fg_color_base * 16);
 	}
 
-	draw_framebuffer(screen->machine(), bitmap, cliprect, 0);
+	draw_framebuffer(screen.machine(), bitmap, cliprect, 0);
 
 	tc0180vcu_tilemap_draw(state->m_tc0180vcu, bitmap, cliprect, 2, 0);
 
@@ -413,8 +413,8 @@ SCREEN_UPDATE( taitob )
 
 SCREEN_UPDATE( realpunc )
 {
-	taitob_state *state = screen->machine().driver_data<taitob_state>();
-	const rgb_t *palette = palette_entry_list_adjusted(screen->machine().palette);
+	taitob_state *state = screen.machine().driver_data<taitob_state>();
+	const rgb_t *palette = palette_entry_list_adjusted(screen.machine().palette);
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
 	int x, y;
 
@@ -428,12 +428,12 @@ SCREEN_UPDATE( realpunc )
 	/* Draw the palettized playfields to an indexed bitmap */
 	tc0180vcu_tilemap_draw(state->m_tc0180vcu, state->m_realpunc_bitmap, cliprect, 0, 1);
 
-	draw_framebuffer(screen->machine(), state->m_realpunc_bitmap, cliprect, 1);
+	draw_framebuffer(screen.machine(), state->m_realpunc_bitmap, cliprect, 1);
 
 	tc0180vcu_tilemap_draw(state->m_tc0180vcu, state->m_realpunc_bitmap, cliprect, 1, 0);
 
 	if (state->m_realpunc_video_ctrl & 0x0001)
-		draw_framebuffer(screen->machine(), state->m_realpunc_bitmap, cliprect, 0);
+		draw_framebuffer(screen.machine(), state->m_realpunc_bitmap, cliprect, 0);
 
 	/* Copy the intermediate bitmap to the output bitmap, applying the palette */
 	for (y = 0; y <= cliprect->max_y; y++)
@@ -443,7 +443,7 @@ SCREEN_UPDATE( realpunc )
 	/* Draw the 15bpp raw CRTC frame buffer directly to the output bitmap */
 	if (state->m_realpunc_video_ctrl & 0x0002)
 	{
-		device_t *hd63484 = screen->machine().device("hd63484");
+		device_t *hd63484 = screen.machine().device("hd63484");
 
 		int base = (hd63484_regs_r(hd63484, 0xcc/2, 0xffff) << 16) + hd63484_regs_r(hd63484, 0xce/2, 0xffff);
 		int stride = hd63484_regs_r(hd63484, 0xca/2, 0xffff);
@@ -484,7 +484,7 @@ SCREEN_UPDATE( realpunc )
 	bitmap_fill(state->m_realpunc_bitmap, cliprect, 0);
 
 	if (!(state->m_realpunc_video_ctrl & 0x0001))
-		draw_framebuffer(screen->machine(), state->m_realpunc_bitmap, cliprect, 0);
+		draw_framebuffer(screen.machine(), state->m_realpunc_bitmap, cliprect, 0);
 
 	tc0180vcu_tilemap_draw(state->m_tc0180vcu, state->m_realpunc_bitmap, cliprect, 2, 0);
 
@@ -505,12 +505,12 @@ SCREEN_UPDATE( realpunc )
 
 SCREEN_EOF( taitob )
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
+	taitob_state *state = screen.machine().driver_data<taitob_state>();
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
 	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->m_tc0180vcu, 0);
 
 	if (~video_control & 0x01)
-		bitmap_fill(state->m_framebuffer[framebuffer_page], &machine.primary_screen->visible_area(), 0);
+		bitmap_fill(state->m_framebuffer[framebuffer_page], &screen.machine().primary_screen->visible_area(), 0);
 
 	if (~video_control & 0x80)
 	{
@@ -518,5 +518,5 @@ SCREEN_EOF( taitob )
 		tc0180vcu_set_fb_page(state->m_tc0180vcu, 0, framebuffer_page);
 	}
 
-	draw_sprites(machine, state->m_framebuffer[framebuffer_page], &machine.primary_screen->visible_area());
+	draw_sprites(screen.machine(), state->m_framebuffer[framebuffer_page], &screen.machine().primary_screen->visible_area());
 }

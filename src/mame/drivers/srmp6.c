@@ -160,7 +160,7 @@ static int xixi=0;
 
 static SCREEN_UPDATE(srmp6)
 {
-	srmp6_state *state = screen->machine().driver_data<srmp6_state>();
+	srmp6_state *state = screen.machine().driver_data<srmp6_state>();
 	int alpha;
 	int x,y,tileno,height,width,xw,yw,sprite,xb,yb;
 	UINT16 *sprite_list = state->m_sprram_old;
@@ -176,13 +176,13 @@ static SCREEN_UPDATE(srmp6)
 
 #if 0
 	/* debug */
-	if(screen->machine().input().code_pressed_once(KEYCODE_Q))
+	if(screen.machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		++xixi;
 		printf("%x\n",xixi);
 	}
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_W))
+	if(screen.machine().input().code_pressed_once(KEYCODE_W))
 	{
 		--xixi;
 		printf("%x\n",xixi);
@@ -259,7 +259,7 @@ static SCREEN_UPDATE(srmp6)
 						else
 							yb=y+(height-yw-1)*8+global_y;
 
-						drawgfx_alpha(bitmap,cliprect,screen->machine().gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
+						drawgfx_alpha(bitmap,cliprect,screen.machine().gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
 						tileno++;
 					}
 				}
@@ -273,7 +273,7 @@ static SCREEN_UPDATE(srmp6)
 
 	memcpy(state->m_sprram_old, state->m_sprram, 0x80000);
 
-	if(screen->machine().input().code_pressed_once(KEYCODE_Q))
+	if(screen.machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		FILE *p=fopen("tileram.bin","wb");
 		fwrite(state->m_tileram, 1, 0x100000*16, p);

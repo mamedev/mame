@@ -341,7 +341,7 @@ static VIDEO_START( bfcobra )
 
 static SCREEN_UPDATE( bfcobra )
 {
-	bfcobra_state *state = screen->machine().driver_data<bfcobra_state>();
+	bfcobra_state *state = screen.machine().driver_data<bfcobra_state>();
 	int x, y;
 	UINT8  *src;
 	UINT32 *dest;
@@ -385,13 +385,13 @@ static SCREEN_UPDATE( bfcobra )
 
 			if ( ( state->m_videomode & 0x81 ) == 1 || (state->m_videomode & 0x80 && pen & 0x80) )
 			{
-				*dest++ = screen->machine().pens[hirescol[pen & 0x0f]];
-				*dest++ = screen->machine().pens[hirescol[(pen >> 4) & 0x0f]];
+				*dest++ = screen.machine().pens[hirescol[pen & 0x0f]];
+				*dest++ = screen.machine().pens[hirescol[(pen >> 4) & 0x0f]];
 			}
 			else
 			{
-				*dest++ = screen->machine().pens[lorescol[pen]];
-				*dest++ = screen->machine().pens[lorescol[pen]];
+				*dest++ = screen.machine().pens[lorescol[pen]];
+				*dest++ = screen.machine().pens[lorescol[pen]];
 			}
 		}
 	}

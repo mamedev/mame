@@ -91,9 +91,9 @@ static VIDEO_START(spoker)
 
 static SCREEN_UPDATE(spoker)
 {
-	spoker_state *state = screen->machine().driver_data<spoker_state>();
+	spoker_state *state = screen.machine().driver_data<spoker_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;

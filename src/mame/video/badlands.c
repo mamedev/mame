@@ -113,7 +113,7 @@ WRITE16_HANDLER( badlands_pf_bank_w )
 
 SCREEN_UPDATE( badlands )
 {
-	badlands_state *state = screen->machine().driver_data<badlands_state>();
+	badlands_state *state = screen.machine().driver_data<badlands_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;

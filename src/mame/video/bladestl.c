@@ -78,13 +78,13 @@ void bladestl_sprite_callback( running_machine &machine, int *code,int *color )
 
 SCREEN_UPDATE( bladestl )
 {
-	bladestl_state *state = screen->machine().driver_data<bladestl_state>();
-	set_pens(screen->machine());
+	bladestl_state *state = screen.machine().driver_data<bladestl_state>();
+	set_pens(screen.machine());
 
 	k007342_tilemap_update(state->m_k007342);
 
 	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
-	k007420_sprites_draw(state->m_k007420, bitmap, cliprect, screen->machine().gfx[1]);
+	k007420_sprites_draw(state->m_k007420, bitmap, cliprect, screen.machine().gfx[1]);
 	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
 	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 0, 0 ,0);
 	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 0, 1 ,0);

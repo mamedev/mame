@@ -561,7 +561,6 @@ public:
 
 	// additional video helpers
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	virtual void screen_eof();
 
 	// generic helpers
 

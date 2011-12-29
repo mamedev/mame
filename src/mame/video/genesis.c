@@ -119,7 +119,7 @@ static UINT8		window_width;				/* window width */
 ******************************************************************************/
 
 
-static void start_genesis_vdp(screen_device *screen)
+static void start_genesis_vdp(screen_device &screen)
 {
 	static const UINT8 vdp_init[24] =
 	{
@@ -129,12 +129,12 @@ static void start_genesis_vdp(screen_device *screen)
 	};
 	int i;
 
-	genesis_screen = screen;
+	genesis_screen = &screen;
 
 	/* allocate memory for the VDP, the lookup table, and the buffer bitmap */
-	vdp_vram			= auto_alloc_array(screen->machine(), UINT8, VRAM_SIZE);
-	vdp_vsram			= auto_alloc_array(screen->machine(), UINT8, VSRAM_SIZE);
-	transparent_lookup	= auto_alloc_array(screen->machine(), UINT16, 0x1000);
+	vdp_vram			= auto_alloc_array(screen.machine(), UINT8, VRAM_SIZE);
+	vdp_vsram			= auto_alloc_array(screen.machine(), UINT8, VSRAM_SIZE);
+	transparent_lookup	= auto_alloc_array(screen.machine(), UINT16, 0x1000);
 
 	/* clear the VDP memory, prevents corrupt tile in Puyo Puyo 2 */
 	memset(vdp_vram, 0, VRAM_SIZE);
@@ -163,41 +163,41 @@ static void start_genesis_vdp(screen_device *screen)
 
 	/* reset VDP */
     for (i = 0; i < 24; i++)
-        vdp_register_w(screen->machine(), 0x8000 | (i << 8) | vdp_init[i], 1);
+        vdp_register_w(screen.machine(), 0x8000 | (i << 8) | vdp_init[i], 1);
 	vdp_cmdpart = 0;
 	vdp_code    = 0;
 	vdp_address = 0;
 
 	/* Save State Stuff */
-	state_save_register_global_array(screen->machine(), genesis_vdp_regs);
-	state_save_register_global_pointer(screen->machine(), vdp_vram, 0x10000);
-	state_save_register_global_pointer(screen->machine(), vdp_vsram, 0x80);
-	state_save_register_global_array(screen->machine(), genesis_bg_pal_lookup);
-	state_save_register_global_array(screen->machine(), genesis_sp_pal_lookup);
-	state_save_register_global(screen->machine(), display_enable);
-	state_save_register_global(screen->machine(), vdp_scrollabase);
-	state_save_register_global(screen->machine(), vdp_scrollbbase);
-	state_save_register_global(screen->machine(), vdp_windowbase);
-	state_save_register_global(screen->machine(), vdp_spritebase);
-	state_save_register_global(screen->machine(), vdp_hscrollbase);
-	state_save_register_global(screen->machine(), vdp_hscrollmask);
-	state_save_register_global(screen->machine(), vdp_hscrollsize);
-	state_save_register_global(screen->machine(), vdp_vscrollmode);
-	state_save_register_global(screen->machine(), vdp_cmdpart);
-	state_save_register_global(screen->machine(), vdp_code);
-	state_save_register_global(screen->machine(), vdp_address);
-	state_save_register_global(screen->machine(), vdp_dmafill);
-	state_save_register_global(screen->machine(), scrollheight);
-	state_save_register_global(screen->machine(), scrollwidth);
-	state_save_register_global(screen->machine(), bgcol);
-	state_save_register_global(screen->machine(), window_down);
-	state_save_register_global(screen->machine(), window_vpos);
+	state_save_register_global_array(screen.machine(), genesis_vdp_regs);
+	state_save_register_global_pointer(screen.machine(), vdp_vram, 0x10000);
+	state_save_register_global_pointer(screen.machine(), vdp_vsram, 0x80);
+	state_save_register_global_array(screen.machine(), genesis_bg_pal_lookup);
+	state_save_register_global_array(screen.machine(), genesis_sp_pal_lookup);
+	state_save_register_global(screen.machine(), display_enable);
+	state_save_register_global(screen.machine(), vdp_scrollabase);
+	state_save_register_global(screen.machine(), vdp_scrollbbase);
+	state_save_register_global(screen.machine(), vdp_windowbase);
+	state_save_register_global(screen.machine(), vdp_spritebase);
+	state_save_register_global(screen.machine(), vdp_hscrollbase);
+	state_save_register_global(screen.machine(), vdp_hscrollmask);
+	state_save_register_global(screen.machine(), vdp_hscrollsize);
+	state_save_register_global(screen.machine(), vdp_vscrollmode);
+	state_save_register_global(screen.machine(), vdp_cmdpart);
+	state_save_register_global(screen.machine(), vdp_code);
+	state_save_register_global(screen.machine(), vdp_address);
+	state_save_register_global(screen.machine(), vdp_dmafill);
+	state_save_register_global(screen.machine(), scrollheight);
+	state_save_register_global(screen.machine(), scrollwidth);
+	state_save_register_global(screen.machine(), bgcol);
+	state_save_register_global(screen.machine(), window_down);
+	state_save_register_global(screen.machine(), window_vpos);
 }
 
 
 void system18_vdp_start(running_machine &machine)
 {
-	start_genesis_vdp(machine.primary_screen);
+	start_genesis_vdp(*machine.primary_screen);
 
 	genesis_palette_base = 0x1800;
 	genesis_bg_pal_lookup[0] = genesis_sp_pal_lookup[0] = 0x1800;

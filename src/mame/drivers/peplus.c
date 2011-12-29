@@ -674,7 +674,7 @@ static VIDEO_START( peplus )
 
 static SCREEN_UPDATE( peplus )
 {
-	peplus_state *state = screen->machine().driver_data<peplus_state>();
+	peplus_state *state = screen.machine().driver_data<peplus_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	return 0;

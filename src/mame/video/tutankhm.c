@@ -61,13 +61,13 @@ static void get_pens( running_machine &machine, pen_t *pens )
 
 SCREEN_UPDATE( tutankhm )
 {
-	tutankhm_state *state = screen->machine().driver_data<tutankhm_state>();
+	tutankhm_state *state = screen.machine().driver_data<tutankhm_state>();
 	int xorx = state->m_flip_x ? 255 : 0;
 	int xory = state->m_flip_y ? 255 : 0;
 	pen_t pens[NUM_PENS];
 	int x, y;
 
-	get_pens(screen->machine(), pens);
+	get_pens(screen.machine(), pens);
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{

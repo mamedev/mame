@@ -204,13 +204,13 @@ VIDEO_START( amazon )
 
 SCREEN_UPDATE( amazon )
 {
-	terracre_state *state = screen->machine().driver_data<terracre_state>();
+	terracre_state *state = screen.machine().driver_data<terracre_state>();
 	if( state->m_xscroll&0x2000 )
-		bitmap_fill( bitmap,cliprect ,get_black_pen(screen->machine()));
+		bitmap_fill( bitmap,cliprect ,get_black_pen(screen.machine()));
 	else
 		tilemap_draw( bitmap,cliprect, state->m_background, 0, 0 );
 
-	draw_sprites(screen->machine(), bitmap,cliprect );
+	draw_sprites(screen.machine(), bitmap,cliprect );
 	tilemap_draw( bitmap,cliprect, state->m_foreground, 0, 0 );
 	return 0;
 }

@@ -253,7 +253,7 @@ static SCREEN_UPDATE( guab )
 	/* If blanked, fill with black */
 	if (state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -267,8 +267,8 @@ static SCREEN_UPDATE( guab )
 			UINT8 pen = src[x >> 1];
 
 			/* Draw two 4-bit pixels */
-			*dest++ = screen->machine().pens[pen >> 4];
-			*dest++ = screen->machine().pens[pen & 0x0f];
+			*dest++ = screen.machine().pens[pen >> 4];
+			*dest++ = screen.machine().pens[pen & 0x0f];
 		}
 	}
 

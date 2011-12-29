@@ -124,9 +124,9 @@ public:
 
 static SCREEN_UPDATE( rblaster )
 {
-	deco_ld_state *state = screen->machine().driver_data<deco_ld_state>();
+	deco_ld_state *state = screen.machine().driver_data<deco_ld_state>();
 	UINT8 *videoram = state->m_videoram;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x0000;
 
 	int y,x;

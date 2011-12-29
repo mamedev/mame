@@ -71,7 +71,7 @@ static void leprechn_get_pens( pen_t *pens )
 
 static SCREEN_UPDATE( gameplan )
 {
-	gameplan_state *state = screen->machine().driver_data<gameplan_state>();
+	gameplan_state *state = screen.machine().driver_data<gameplan_state>();
 	pen_t pens[GAMEPLAN_NUM_PENS];
 	offs_t offs;
 
@@ -91,7 +91,7 @@ static SCREEN_UPDATE( gameplan )
 
 static SCREEN_UPDATE( leprechn )
 {
-	gameplan_state *state = screen->machine().driver_data<gameplan_state>();
+	gameplan_state *state = screen.machine().driver_data<gameplan_state>();
 	pen_t pens[LEPRECHN_NUM_PENS];
 	offs_t offs;
 

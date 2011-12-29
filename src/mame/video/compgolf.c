@@ -120,7 +120,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( compgolf )
 {
-	compgolf_state *state = screen->machine().driver_data<compgolf_state>();
+	compgolf_state *state = screen.machine().driver_data<compgolf_state>();
 	int scrollx = state->m_scrollx_hi + state->m_scrollx_lo;
 	int scrolly = state->m_scrolly_hi + state->m_scrolly_lo;
 
@@ -129,6 +129,6 @@ SCREEN_UPDATE( compgolf )
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -65,10 +65,10 @@ static VIDEO_START(unclepoo)
 
 static SCREEN_UPDATE(unclepoo)
 {
-	poo_state *state = screen->machine().driver_data<poo_state>();
+	poo_state *state = screen.machine().driver_data<poo_state>();
 	int y,x;
 	int count;
-	const gfx_element *gfx = screen->machine().gfx[0];
+	const gfx_element *gfx = screen.machine().gfx[0];
 
 	count = 0;
 

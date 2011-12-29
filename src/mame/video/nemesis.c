@@ -427,11 +427,11 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( nemesis )
 {
-	nemesis_state *state = screen->machine().driver_data<nemesis_state>();
+	nemesis_state *state = screen.machine().driver_data<nemesis_state>();
 	int offs;
 	rectangle clip;
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 	clip.min_x = 0;
@@ -476,7 +476,7 @@ SCREEN_UPDATE( nemesis )
 		}
 	}
 
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 
 	return 0;
 }

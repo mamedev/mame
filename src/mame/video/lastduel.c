@@ -271,36 +271,36 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( lastduel )
 {
-	lastduel_state *state = screen->machine().driver_data<lastduel_state>();
+	lastduel_state *state = screen.machine().driver_data<lastduel_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( madgear )
 {
-	lastduel_state *state = screen->machine().driver_data<lastduel_state>();
+	lastduel_state *state = screen.machine().driver_data<lastduel_state>();
 
 	if (state->m_tilemap_priority)
 	{
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect, 0);
+		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect, 1);
+		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	}
 	else
 	{
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect, 0);
+		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-		draw_sprites(screen->machine(), bitmap, cliprect, 1);
+		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	}
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 	return 0;
@@ -308,7 +308,7 @@ SCREEN_UPDATE( madgear )
 
 SCREEN_EOF( lastduel )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Spriteram is always 1 frame ahead, suggesting buffering.  I can't find
         a register to control this so I assume it happens automatically

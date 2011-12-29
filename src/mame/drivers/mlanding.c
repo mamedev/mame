@@ -60,7 +60,7 @@ static VIDEO_START(mlanding)
 // 768: plane landing sequence
 static SCREEN_UPDATE(mlanding)
 {
-	mlanding_state *state = screen->machine().driver_data<mlanding_state>();
+	mlanding_state *state = screen.machine().driver_data<mlanding_state>();
 	int x, y;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
@@ -72,8 +72,8 @@ static SCREEN_UPDATE(mlanding)
 		{
 			UINT16 srcpix = *src++;
 
-			*dst++ = screen->machine().pens[256+(srcpix & 0xff) + (state->m_pal_fg_bank & 1 ? 0x100 : 0x000)];
-			*dst++ = screen->machine().pens[256+(srcpix >> 8) + (state->m_pal_fg_bank & 1 ? 0x100 : 0x000)];
+			*dst++ = screen.machine().pens[256+(srcpix & 0xff) + (state->m_pal_fg_bank & 1 ? 0x100 : 0x000)];
+			*dst++ = screen.machine().pens[256+(srcpix >> 8) + (state->m_pal_fg_bank & 1 ? 0x100 : 0x000)];
 		}
 	}
 

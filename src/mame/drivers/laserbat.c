@@ -505,7 +505,7 @@ static VIDEO_START( laserbat )
 
 static SCREEN_UPDATE( laserbat )
 {
-	laserbat_state *state = screen->machine().driver_data<laserbat_state>();
+	laserbat_state *state = screen.machine().driver_data<laserbat_state>();
 	int y;
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
@@ -541,7 +541,7 @@ static SCREEN_UPDATE( laserbat )
 	}
 
 	if (state->m_sprite_enable)
-		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
 		        state->m_sprite_code,
 				state->m_sprite_color,
 				0,0,

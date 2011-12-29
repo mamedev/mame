@@ -122,7 +122,7 @@ static VIDEO_START( m14 )
 
 static SCREEN_UPDATE( m14 )
 {
-	m14_state *state = screen->machine().driver_data<m14_state>();
+	m14_state *state = screen.machine().driver_data<m14_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_m14_tilemap, 0, 0);
 	return 0;

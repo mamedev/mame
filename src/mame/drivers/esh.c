@@ -48,7 +48,7 @@ public:
 /* VIDEO GOODS */
 static SCREEN_UPDATE( esh )
 {
-	esh_state *state = screen->machine().driver_data<esh_state>();
+	esh_state *state = screen.machine().driver_data<esh_state>();
 	int charx, chary;
 
 	/* clear */
@@ -66,7 +66,7 @@ static SCREEN_UPDATE( esh )
 			//int blinkLine = (state->m_tile_control_ram[current_screen_character] & 0x40) >> 6;
 			//int blinkChar = (state->m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
-			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
+			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
 					state->m_tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);

@@ -63,7 +63,7 @@ static WRITE8_HANDLER( mayumi_videoram_w )
 
 static SCREEN_UPDATE( mayumi )
 {
-	mayumi_state *state = screen->machine().driver_data<mayumi_state>();
+	mayumi_state *state = screen.machine().driver_data<mayumi_state>();
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 	return 0;
 }

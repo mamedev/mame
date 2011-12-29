@@ -82,7 +82,7 @@ static WRITE8_HANDLER( ramtek_videoram_w )
 
 static SCREEN_UPDATE( ramtek )
 {
-	m79amb_state *state = screen->machine().driver_data<m79amb_state>();
+	m79amb_state *state = screen.machine().driver_data<m79amb_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)

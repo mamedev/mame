@@ -46,7 +46,7 @@
 
 static SCREEN_UPDATE( avalnche )
 {
-	avalnche_state *state = screen->machine().driver_data<avalnche_state>();
+	avalnche_state *state = screen.machine().driver_data<avalnche_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->m_videoram_size; offs++)

@@ -155,7 +155,7 @@ static VIDEO_START( jokrwild )
 
 static SCREEN_UPDATE( jokrwild )
 {
-	jokrwild_state *state = screen->machine().driver_data<jokrwild_state>();
+	jokrwild_state *state = screen.machine().driver_data<jokrwild_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

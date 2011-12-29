@@ -60,9 +60,9 @@ WRITE8_HANDLER( dribling_colorram_w )
 
 SCREEN_UPDATE( dribling )
 {
-	dribling_state *state = screen->machine().driver_data<dribling_state>();
-	UINT8 *prombase = screen->machine().region("proms")->base();
-	UINT8 *gfxbase = screen->machine().region("gfx1")->base();
+	dribling_state *state = screen.machine().driver_data<dribling_state>();
+	UINT8 *prombase = screen.machine().region("proms")->base();
+	UINT8 *gfxbase = screen.machine().region("gfx1")->base();
 	int x, y;
 
 	/* loop over rows */

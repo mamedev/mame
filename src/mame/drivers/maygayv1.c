@@ -282,7 +282,7 @@ static VIDEO_START( maygayv1 )
 
 static SCREEN_UPDATE( maygayv1 )
 {
-	maygayv1_state *state = screen->machine().driver_data<maygayv1_state>();
+	maygayv1_state *state = screen.machine().driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->m_i82716;
 	UINT16 *atable = &i82716.dram[VREG(ATBA)];
 	UINT16 *otable = &i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
@@ -297,7 +297,7 @@ static SCREEN_UPDATE( maygayv1 )
 	/* If screen output is disabled, fill with black */
 	if (!(VREG(VCR0) & VCR0_DEN))
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -413,7 +413,7 @@ static SCREEN_UPDATE( maygayv1 )
 
 static SCREEN_EOF( maygayv1 )
 {
-	maygayv1_state *state = machine.driver_data<maygayv1_state>();
+	maygayv1_state *state = screen.machine().driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->m_i82716;
 	// UCF
 	if (VREG(VCR0) & VCR0_UCF)
@@ -437,7 +437,7 @@ static SCREEN_EOF( maygayv1 )
 		for (i = 0; i < 16; ++i)
 		{
 			UINT16 entry = *palbase++;
-			palette_set_color_rgb(machine, entry & 0xf, pal4bit(entry >> 12), pal4bit(entry >> 8), pal4bit(entry >> 4));
+			palette_set_color_rgb(screen.machine(), entry & 0xf, pal4bit(entry >> 12), pal4bit(entry >> 8), pal4bit(entry >> 4));
 		}
 	}
 }

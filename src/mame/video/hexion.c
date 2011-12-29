@@ -167,7 +167,7 @@ WRITE8_HANDLER( hexion_gfxrom_select_w )
 
 SCREEN_UPDATE( hexion )
 {
-	hexion_state *state = screen->machine().driver_data<hexion_state>();
+	hexion_state *state = screen.machine().driver_data<hexion_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap[1],0,0);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap[0],0,0);
 	return 0;

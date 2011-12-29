@@ -370,8 +370,8 @@ WRITE8_HANDLER( arabian_videoram_w )
 
 SCREEN_UPDATE( arabian )
 {
-	arabian_state *state = screen->machine().driver_data<arabian_state>();
-	const pen_t *pens = &screen->machine().pens[(state->m_video_control >> 3) << 8];
+	arabian_state *state = screen.machine().driver_data<arabian_state>();
+	const pen_t *pens = &screen.machine().pens[(state->m_video_control >> 3) << 8];
 	int y;
 
 	/* render the screen from the bitmap */

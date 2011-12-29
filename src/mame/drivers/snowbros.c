@@ -83,7 +83,7 @@ static WRITE16_HANDLER( snowbros_flipscreen_w )
 
 static SCREEN_UPDATE( snowbros )
 {
-	device_t *pandora = screen->machine().device("pandora");
+	device_t *pandora = screen.machine().device("pandora");
 
 	/* This clears & redraws the entire screen each pass */
 	bitmap_fill(bitmap,cliprect,0xf0);
@@ -94,7 +94,7 @@ static SCREEN_UPDATE( snowbros )
 
 static SCREEN_EOF( snowbros )
 {
-	device_t *pandora = machine.device("pandora");
+	device_t *pandora = screen.machine().device("pandora");
 	pandora_eof(pandora);
 }
 

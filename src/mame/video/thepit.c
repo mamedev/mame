@@ -296,7 +296,7 @@ static void draw_sprites(running_machine &machine,
 
 SCREEN_UPDATE( thepit )
 {
-	thepit_state *state = screen->machine().driver_data<thepit_state>();
+	thepit_state *state = screen.machine().driver_data<thepit_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 32; offs++)
@@ -316,13 +316,13 @@ SCREEN_UPDATE( thepit )
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 
 	/* low priority sprites */
-	draw_sprites(screen->machine(), bitmap, cliprect, 0);
+	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	/* high priority tiles */
 	tilemap_draw(bitmap, cliprect, state->m_solid_tilemap, 1, 1);
 
 	/* high priority sprites */
-	draw_sprites(screen->machine(), bitmap, cliprect, 1);
+	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	return 0;
 }

@@ -781,13 +781,13 @@ static VIDEO_START(sfbonus)
 
 }
 
-static void sfbonus_draw_reel_layer(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int catagory)
+static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int catagory)
 {
-	sfbonus_state *state = screen->machine().driver_data<sfbonus_state>();
+	sfbonus_state *state = screen.machine().driver_data<sfbonus_state>();
 	int zz;
 	int i;
 	int startclipmin;
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 	UINT8* selectbase = &state->m_videoram[0x600];
 	UINT8* bg_scroll = &state->m_videoram[0x000];
 	UINT8* reels_rowscroll = &state->m_videoram[0x400];
@@ -922,7 +922,7 @@ static void sfbonus_draw_reel_layer(screen_device *screen, bitmap_t *bitmap, con
 
 static SCREEN_UPDATE(sfbonus)
 {
-	sfbonus_state *state = screen->machine().driver_data<sfbonus_state>();
+	sfbonus_state *state = screen.machine().driver_data<sfbonus_state>();
 
 	int globalyscroll = (state->m_vregs[2] | state->m_vregs[3]<<8);
 	int globalxscroll = (state->m_vregs[0] | state->m_vregs[1]<<8);
@@ -934,8 +934,8 @@ static SCREEN_UPDATE(sfbonus)
 	globalyscroll += 8;
 	globalxscroll += 8;
 
-	bitmap_fill(bitmap,cliprect,screen->machine().pens[0]);
-	bitmap_fill(state->m_temp_reel_bitmap,cliprect,screen->machine().pens[0]);
+	bitmap_fill(bitmap,cliprect,screen.machine().pens[0]);
+	bitmap_fill(state->m_temp_reel_bitmap,cliprect,screen.machine().pens[0]);
 
 	/* render reels to bitmap */
 	sfbonus_draw_reel_layer(screen,state->m_temp_reel_bitmap,cliprect,0);
@@ -1031,7 +1031,7 @@ static SCREEN_UPDATE(sfbonus)
     state->m_1800_regs[7]);
 #endif
 
-	ipt = screen->machine().system().ipt;
+	ipt = screen.machine().system().ipt;
 	if ((ipt == INPUT_PORTS_NAME(amcoe2_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe2_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{

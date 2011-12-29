@@ -114,7 +114,7 @@ static void clear_extra_columns( running_machine &machine, bitmap_t *bitmap, pen
 
 SCREEN_UPDATE( invadpt2 )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *prom;
@@ -122,7 +122,7 @@ SCREEN_UPDATE( invadpt2 )
 
 	invadpt2_get_pens(pens);
 
-	prom = screen->machine().region("proms")->base();
+	prom = screen.machine().region("proms")->base();
 	color_map_base = state->m_color_map ? &prom[0x0400] : &prom[0x0000];
 
 	for (offs = 0; offs < state->m_main_ram_size; offs++)
@@ -135,10 +135,10 @@ SCREEN_UPDATE( invadpt2 )
 		UINT8 data = state->m_main_ram[offs];
 		UINT8 fore_color = state->m_screen_red ? 1 : color_map_base[color_address] & 0x07;
 
-		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 0);
+	clear_extra_columns(screen.machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -146,7 +146,7 @@ SCREEN_UPDATE( invadpt2 )
 
 SCREEN_UPDATE( ballbomb )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
@@ -154,7 +154,7 @@ SCREEN_UPDATE( ballbomb )
 
 	invadpt2_get_pens(pens);
 
-	prom = screen->machine().region("proms")->base();
+	prom = screen.machine().region("proms")->base();
 	color_map_base = state->m_color_map ? &prom[0x0400] : &prom[0x0000];
 
 	for (offs = 0; offs < state->m_main_ram_size; offs++)
@@ -168,10 +168,10 @@ SCREEN_UPDATE( ballbomb )
 		UINT8 fore_color = state->m_screen_red ? 1 : color_map_base[color_address] & 0x07;
 
 		/* blue background */
-		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 2);
+		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 2);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 2);
+	clear_extra_columns(screen.machine(), bitmap, pens, 2);
 
 	return 0;
 }
@@ -179,14 +179,14 @@ SCREEN_UPDATE( ballbomb )
 
 SCREEN_UPDATE( schaser )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *background_map_base;
 
 	invadpt2_get_pens(pens);
 
-	background_map_base = screen->machine().region("proms")->base();
+	background_map_base = screen.machine().region("proms")->base();
 
 	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
@@ -209,10 +209,10 @@ SCREEN_UPDATE( schaser )
 			back_color = (((back_data & 0x0c) == 0x0c) && state->m_schaser_background_select) ? 4 : 2;
 		}
 
-		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, back_color);
+		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, back_color);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, state->m_schaser_background_disable ? 0 : 2);
+	clear_extra_columns(screen.machine(), bitmap, pens, state->m_schaser_background_disable ? 0 : 2);
 
 	return 0;
 }
@@ -220,7 +220,7 @@ SCREEN_UPDATE( schaser )
 
 SCREEN_UPDATE( schasercv )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -235,10 +235,10 @@ SCREEN_UPDATE( schasercv )
 		UINT8 fore_color = state->m_colorram[offs & 0x1f9f] & 0x07;
 
 		/* blue background */
-		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 2);
+		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 2);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 2);
+	clear_extra_columns(screen.machine(), bitmap, pens, 2);
 
 	return 0;
 }
@@ -246,7 +246,7 @@ SCREEN_UPDATE( schasercv )
 
 SCREEN_UPDATE( rollingc )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -260,10 +260,10 @@ SCREEN_UPDATE( rollingc )
 		UINT8 data = state->m_main_ram[offs];
 		UINT8 fore_color = state->m_colorram[offs & 0x1f1f] & 0x07;
 
-		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 0);
+	clear_extra_columns(screen.machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -271,7 +271,7 @@ SCREEN_UPDATE( rollingc )
 
 SCREEN_UPDATE( polaris )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
@@ -279,8 +279,8 @@ SCREEN_UPDATE( polaris )
 
 	invadpt2_get_pens(pens);
 
-	color_map_base = screen->machine().region("proms")->base();
-	cloud_gfx = screen->machine().region("user1")->base();
+	color_map_base = screen.machine().region("proms")->base();
+	cloud_gfx = screen.machine().region("user1")->base();
 
 	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
@@ -304,7 +304,7 @@ SCREEN_UPDATE( polaris )
 
 		if ((color_map_base[color_address] & 0x08) || (cloud_y >= 64))
 		{
-			set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, back_color);
+			set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, back_color);
 		}
 		else
 		{
@@ -327,7 +327,7 @@ SCREEN_UPDATE( polaris )
 					color = (cloud_gfx[cloud_gfx_offs] & bit) ? 7 : back_color;
 				}
 
-				set_pixel(screen->machine(), bitmap, y, x, pens, color);
+				set_pixel(screen.machine(), bitmap, y, x, pens, color);
 
 				x = x + 1;
 				data = data >> 1;
@@ -335,7 +335,7 @@ SCREEN_UPDATE( polaris )
 		}
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 6);
+	clear_extra_columns(screen.machine(), bitmap, pens, 6);
 
 	return 0;
 }
@@ -343,7 +343,7 @@ SCREEN_UPDATE( polaris )
 
 SCREEN_UPDATE( lupin3 )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -357,10 +357,10 @@ SCREEN_UPDATE( lupin3 )
 		UINT8 data = state->m_main_ram[offs];
 		UINT8 fore_color = ~state->m_colorram[offs & 0x1f9f] & 0x07;
 
-		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 0);
+	clear_extra_columns(screen.machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -368,7 +368,7 @@ SCREEN_UPDATE( lupin3 )
 
 SCREEN_UPDATE( cosmo )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -384,10 +384,10 @@ SCREEN_UPDATE( cosmo )
 		UINT8 data = state->m_main_ram[offs];
 		UINT8 fore_color = state->m_colorram[color_address] & 0x07;
 
-		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 0);
+	clear_extra_columns(screen.machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -395,7 +395,7 @@ SCREEN_UPDATE( cosmo )
 
 SCREEN_UPDATE( indianbt )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
@@ -403,7 +403,7 @@ SCREEN_UPDATE( indianbt )
 
 	cosmo_get_pens(pens);
 
-	prom = screen->machine().region("proms")->base();
+	prom = screen.machine().region("proms")->base();
 	color_map_base = state->m_color_map ? &prom[0x0400] : &prom[0x0000];
 
 	for (offs = 0; offs < state->m_main_ram_size; offs++)
@@ -416,10 +416,10 @@ SCREEN_UPDATE( indianbt )
 		UINT8 data = state->m_main_ram[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
-		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 0);
+	clear_extra_columns(screen.machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -427,7 +427,7 @@ SCREEN_UPDATE( indianbt )
 
 SCREEN_UPDATE( shuttlei )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
 	offs_t offs;
 
@@ -450,7 +450,7 @@ SCREEN_UPDATE( shuttlei )
 		}
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 0);
+	clear_extra_columns(screen.machine(), bitmap, pens, 0);
 
 	return 0;
 }
@@ -458,7 +458,7 @@ SCREEN_UPDATE( shuttlei )
 
 SCREEN_UPDATE( sflush )
 {
-	_8080bw_state *state = screen->machine().driver_data<_8080bw_state>();
+	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -472,10 +472,10 @@ SCREEN_UPDATE( sflush )
 		UINT8 data = state->m_main_ram[offs];
 		UINT8 fore_color = state->m_colorram[offs & 0x1f9f] & 0x07;
 
-		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen.machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, 0);
+	clear_extra_columns(screen.machine(), bitmap, pens, 0);
 
 	return 0;
 }

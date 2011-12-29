@@ -434,24 +434,24 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( psychic5 )
 {
-	psychic5_state *state = screen->machine().driver_data<psychic5_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	psychic5_state *state = screen.machine().driver_data<psychic5_state>();
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 	if (state->m_bg_status & 1)	/* Backgound enable */
-		draw_background(screen->machine(), bitmap, cliprect);
+		draw_background(screen.machine(), bitmap, cliprect);
 	if (!(state->m_title_screen & 1))
-		draw_sprites(screen->machine(), bitmap, cliprect);
+		draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( bombsa )
 {
-	psychic5_state *state = screen->machine().driver_data<psychic5_state>();
+	psychic5_state *state = screen.machine().driver_data<psychic5_state>();
 	if (state->m_bg_status & 1)	/* Backgound enable */
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, screen->machine().pens[0x0ff]);
-	draw_sprites(screen->machine(), bitmap, cliprect);
+		bitmap_fill(bitmap, cliprect, screen.machine().pens[0x0ff]);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

@@ -304,12 +304,12 @@ VIDEO_START( pastelg )
 ******************************************************************************/
 SCREEN_UPDATE( pastelg )
 {
-	pastelg_state *state = screen->machine().driver_data<pastelg_state>();
+	pastelg_state *state = screen.machine().driver_data<pastelg_state>();
 	if (state->m_dispflag)
 	{
 		int x, y;
-		int width = screen->width();
-		int height = screen->height();
+		int width = screen.width();
+		int height = screen.height();
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)

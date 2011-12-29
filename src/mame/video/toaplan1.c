@@ -1166,10 +1166,10 @@ static void rallybik_draw_sprites(running_machine &machine, bitmap_t *bitmap, co
 
 SCREEN_UPDATE( rallybik )
 {
-	toaplan1_state *state = screen->machine().driver_data<toaplan1_state>();
+	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 	int priority;
 
-	toaplan1_log_vram(screen->machine());
+	toaplan1_log_vram(screen.machine());
 
 	bitmap_fill(bitmap,cliprect,0x120);
 
@@ -1182,7 +1182,7 @@ SCREEN_UPDATE( rallybik )
 		tilemap_draw(bitmap, cliprect, state->m_pf3_tilemap, priority, 0);
 		tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, priority, 0);
 		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, priority, 0);
-		rallybik_draw_sprites(screen->machine(), bitmap,cliprect,priority << 8);
+		rallybik_draw_sprites(screen.machine(), bitmap,cliprect,priority << 8);
 	}
 
 	return 0;
@@ -1190,12 +1190,12 @@ SCREEN_UPDATE( rallybik )
 
 SCREEN_UPDATE( toaplan1 )
 {
-	toaplan1_state *state = screen->machine().driver_data<toaplan1_state>();
+	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 	int priority;
 
-	toaplan1_log_vram(screen->machine());
+	toaplan1_log_vram(screen.machine());
 
-	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
+	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x120);
 
 // it's really correct?
@@ -1210,7 +1210,7 @@ SCREEN_UPDATE( toaplan1 )
 		tilemap_draw_primask(bitmap, cliprect, state->m_pf1_tilemap, priority, priority, 0);
 	}
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -1222,14 +1222,14 @@ SCREEN_UPDATE( toaplan1 )
 
 SCREEN_EOF( rallybik )
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
+	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
 	memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
 }
 
 SCREEN_EOF( toaplan1 )
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
+	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
 	memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
 	memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
@@ -1237,9 +1237,9 @@ SCREEN_EOF( toaplan1 )
 
 SCREEN_EOF( samesame )
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
+	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
 	memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
 	memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
-	cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, HOLD_LINE);	/* Frame done */
+	cputag_set_input_line(screen.machine(), "maincpu", M68K_IRQ_2, HOLD_LINE);	/* Frame done */
 }

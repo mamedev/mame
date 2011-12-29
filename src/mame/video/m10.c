@@ -139,7 +139,7 @@ VIDEO_START( m15 )
 
 SCREEN_UPDATE( m10 )
 {
-	m10_state *state = screen->machine().driver_data<m10_state>();
+	m10_state *state = screen.machine().driver_data<m10_state>();
 	int offs;
 	static const int color[4]= { 3, 3, 5, 5 };
 	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
@@ -158,7 +158,7 @@ SCREEN_UPDATE( m10 )
 		int y;
 
 		for (y = IREMM10_VBEND; y < IREMM10_VBSTART; y++)
-			plot_pixel_m10(screen->machine(), bitmap, 16, y, 1);
+			plot_pixel_m10(screen.machine(), bitmap, 16, y, 1);
 	}
 
 	for (offs = state->m_videoram_size - 1; offs >= 0; offs--)
@@ -179,7 +179,7 @@ SCREEN_UPDATE( m10 )
 
 SCREEN_UPDATE( m15 )
 {
-	m10_state *state = screen->machine().driver_data<m10_state>();
+	m10_state *state = screen.machine().driver_data<m10_state>();
 	int offs;
 
 	for (offs = state->m_videoram_size - 1; offs >= 0; offs--)

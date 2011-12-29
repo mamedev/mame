@@ -390,8 +390,8 @@ WRITE16_HANDLER( m107_spritebuffer_w )
 
 SCREEN_UPDATE( m107 )
 {
-	m107_update_scroll_positions(screen->machine());
-	m107_screenrefresh(screen->machine(), bitmap, cliprect);
+	m107_update_scroll_positions(screen.machine());
+	m107_screenrefresh(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 

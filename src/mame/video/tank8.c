@@ -192,30 +192,30 @@ static TIMER_CALLBACK( tank8_collision_callback )
 
 SCREEN_UPDATE( tank8 )
 {
-	tank8_state *state = screen->machine().driver_data<tank8_state>();
-	set_pens(state, screen->machine().colortable);
+	tank8_state *state = screen.machine().driver_data<tank8_state>();
+	set_pens(state, screen.machine().colortable);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
-	draw_bullets(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
+	draw_bullets(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 
 SCREEN_EOF( tank8 )
 {
-	tank8_state *state = machine.driver_data<tank8_state>();
+	tank8_state *state = screen.machine().driver_data<tank8_state>();
 	int x;
 	int y;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
 	tilemap_draw(state->m_helper1, &visarea, state->m_tilemap, 0, 0);
 
 	bitmap_fill(state->m_helper2, &visarea, 8);
 	bitmap_fill(state->m_helper3, &visarea, 8);
 
-	draw_sprites(machine, state->m_helper2, &visarea);
-	draw_bullets(machine, state->m_helper3, &visarea);
+	draw_sprites(screen.machine(), state->m_helper2, &visarea);
+	draw_bullets(screen.machine(), state->m_helper3, &visarea);
 
 	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{
@@ -225,7 +225,7 @@ SCREEN_EOF( tank8 )
 		const UINT16* p2 = BITMAP_ADDR16(state->m_helper2, y, 0);
 		const UINT16* p3 = BITMAP_ADDR16(state->m_helper3, y, 0);
 
-		if (y % 2 != machine.primary_screen->frame_number() % 2)
+		if (y % 2 != screen.machine().primary_screen->frame_number() % 2)
 			continue; /* video display is interlaced */
 
 		for (x = visarea.min_x; x <= visarea.max_x; x++)
@@ -284,7 +284,7 @@ SCREEN_EOF( tank8 )
 					index |= 0x80; /* collision on right side */
 			}
 
-			machine.scheduler().timer_set(machine.primary_screen->time_until_pos(y, x), FUNC(tank8_collision_callback), index);
+			screen.machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(tank8_collision_callback), index);
 
 			_state = 1;
 		}

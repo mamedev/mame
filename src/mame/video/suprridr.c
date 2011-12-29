@@ -168,11 +168,11 @@ WRITE8_HANDLER( suprridr_fgram_w )
 
 SCREEN_UPDATE( suprridr )
 {
-	suprridr_state *state = screen->machine().driver_data<suprridr_state>();
+	suprridr_state *state = screen.machine().driver_data<suprridr_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	rectangle subclip;
 	int i;
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 
 	/* render left 4 columns with no scroll */
 	subclip = visarea;;
@@ -216,7 +216,7 @@ SCREEN_UPDATE( suprridr )
 			fy = !fy;
 			y = 240 - y;
 		}
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[2], code, color, fx, fy, x, y, 0);
+		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], code, color, fx, fy, x, y, 0);
 	}
 	return 0;
 }

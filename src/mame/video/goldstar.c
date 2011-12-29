@@ -415,10 +415,10 @@ static const rectangle bingowng_visible1 = { 0*8, (14+48)*8-1,  3*8,  (4+7)*8-1 
 
 SCREEN_UPDATE( goldstar )
 {
-	goldstar_state *state = screen->machine().driver_data<goldstar_state>();
+	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -440,9 +440,9 @@ SCREEN_UPDATE( goldstar )
 
 	if (state->m_cm_enable_reg &0x04)
 	{
-		if (screen->machine().region("user1")->base())
+		if (screen.machine().region("user1")->base())
 		{
-			const gfx_element *gfx = screen->machine().gfx[2];
+			const gfx_element *gfx = screen.machine().gfx[2];
 			int girlyscroll = (INT8)((state->m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((state->m_cm_girl_scroll & 0x0f)<<4);
 
@@ -461,10 +461,10 @@ SCREEN_UPDATE( goldstar )
 
 SCREEN_UPDATE( bingowng )
 {
-	goldstar_state *state = screen->machine().driver_data<goldstar_state>();
+	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -482,9 +482,9 @@ SCREEN_UPDATE( bingowng )
 
 	if (state->m_cm_enable_reg &0x04)
 	{
-		if (screen->machine().region("user1")->base())
+		if (screen.machine().region("user1")->base())
 		{
-			const gfx_element *gfx = screen->machine().gfx[2];
+			const gfx_element *gfx = screen.machine().gfx[2];
 			int girlyscroll = (INT8)((state->m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((state->m_cm_girl_scroll & 0x0f)<<4);
 
@@ -503,10 +503,10 @@ SCREEN_UPDATE( bingowng )
 
 SCREEN_UPDATE( magical )
 {
-	goldstar_state *state = screen->machine().driver_data<goldstar_state>();
+	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -555,10 +555,10 @@ SCREEN_UPDATE( magical )
 
 SCREEN_UPDATE( unkch )
 {
-	goldstar_state *state = screen->machine().driver_data<goldstar_state>();
+	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -605,10 +605,10 @@ SCREEN_UPDATE( unkch )
 
 SCREEN_UPDATE( cmast91 )
 {
-	goldstar_state *state = screen->machine().driver_data<goldstar_state>();
+	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -637,10 +637,10 @@ SCREEN_UPDATE( cmast91 )
 
 SCREEN_UPDATE( amcoe1a )
 {
-	goldstar_state *state = screen->machine().driver_data<goldstar_state>();
+	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;

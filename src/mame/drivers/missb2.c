@@ -37,7 +37,7 @@ public:
 
 static SCREEN_UPDATE( missb2 )
 {
-	missb2_state *state = screen->machine().driver_data<missb2_state>();
+	missb2_state *state = screen.machine().driver_data<missb2_state>();
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;
@@ -58,7 +58,7 @@ static SCREEN_UPDATE( missb2 )
 	//popmessage("%02x",(*state->m_bgvram) & 0x1f);
 	for (bg_offs = ((*state->m_bgvram) << 4); bg_offs < (((*state->m_bgvram) << 4) | 0xf); bg_offs++)
 	{
-		drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[1],
+		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[1],
 				bg_offs,
 				1,
 				0,0,
@@ -68,7 +68,7 @@ static SCREEN_UPDATE( missb2 )
 
 	sx = 0;
 
-	prom = screen->machine().region("proms")->base();
+	prom = screen.machine().region("proms")->base();
 	for (offs = 0; offs < state->m_objectram_size; offs += 4)
 	{
 		/* skip empty sprites */
@@ -110,7 +110,7 @@ static SCREEN_UPDATE( missb2 )
 				x = sx + xc * 8;
 				y = (sy + yc * 8) & 0xff;
 
-				if (flip_screen_get(screen->machine()))
+				if (flip_screen_get(screen.machine()))
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -118,7 +118,7 @@ static SCREEN_UPDATE( missb2 )
 					flipy = !flipy;
 				}
 
-				drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
+				drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
 						code,
 						0,
 						flipx,flipy,

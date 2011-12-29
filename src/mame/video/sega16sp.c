@@ -1455,15 +1455,15 @@ void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device
  *
  *************************************/
 
-void segaic16_sprites_draw(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect, int which)
+void segaic16_sprites_draw(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int which)
 {
 	device_t* device = 0;
 	sega16sp_state *sega16sp;
 
 	if (!which)
-		device = screen->machine().device("segaspr1");
+		device = screen.machine().device("segaspr1");
 	else
-		device = screen->machine().device("segaspr2");
+		device = screen.machine().device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_draw device not found\n");
@@ -1475,7 +1475,7 @@ void segaic16_sprites_draw(device_t *screen, bitmap_t *bitmap, const rectangle *
 	else
 		sega16sp->spriteram = segaic16_spriteram_1;
 
-	(*sega16sp->draw)(screen->machine(), device, bitmap, cliprect);
+	(*sega16sp->draw)(screen.machine(), device, bitmap, cliprect);
 }
 
 
@@ -1502,8 +1502,8 @@ void segaic16_sprites_set_bank(running_machine &machine, int which, int banknum,
 
 	if (sega16sp->bank[banknum] != offset)
 	{
-		screen_device *screen = machine.primary_screen;
-		screen->update_partial(screen->vpos());
+		screen_device &screen = *machine.primary_screen;
+		screen.update_partial(screen.vpos());
 		sega16sp->bank[banknum] = offset;
 	}
 }
@@ -1533,8 +1533,8 @@ void segaic16_sprites_set_flip(running_machine &machine, int which, int flip)
 	flip = (flip != 0);
 	if (sega16sp->flip != flip)
 	{
-		screen_device *screen = machine.primary_screen;
-		screen->update_partial(screen->vpos());
+		screen_device &screen = *machine.primary_screen;
+		screen.update_partial(screen.vpos());
 		sega16sp->flip = flip;
 	}
 }
@@ -1564,8 +1564,8 @@ void segaic16_sprites_set_shadow(running_machine &machine, int which, int shadow
 	shadow = (shadow != 0);
 	if (sega16sp->shadow != shadow)
 	{
-		screen_device *screen = machine.primary_screen;
-		screen->update_partial(screen->vpos());
+		screen_device &screen = *machine.primary_screen;
+		screen.update_partial(screen.vpos());
 		sega16sp->shadow = shadow;
 	}
 }

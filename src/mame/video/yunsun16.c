@@ -202,7 +202,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( yunsun16 )
 {
-	yunsun16_state *state = screen->machine().driver_data<yunsun16_state>();
+	yunsun16_state *state = screen.machine().driver_data<yunsun16_state>();
 
 	tilemap_set_scrollx(state->m_tilemap_0, 0, state->m_scrollram_0[0]);
 	tilemap_set_scrolly(state->m_tilemap_0, 0, state->m_scrollram_0[1]);
@@ -212,7 +212,7 @@ SCREEN_UPDATE( yunsun16 )
 
 	//popmessage("%04X", *state->m_priorityram);
 
-	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
+	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
 
 	if ((*state->m_priorityram & 0x0c) == 4)
 	{
@@ -229,6 +229,6 @@ SCREEN_UPDATE( yunsun16 )
 		tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 2);
 	}
 
-	draw_sprites(screen->machine(), bitmap, cliprect);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

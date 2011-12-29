@@ -32,7 +32,7 @@ public:
 
 static SCREEN_UPDATE( mosaicf2 )
 {
-	mosaicf2_state *state = screen->machine().driver_data<mosaicf2_state>();
+	mosaicf2_state *state = screen.machine().driver_data<mosaicf2_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x10000; offs++)

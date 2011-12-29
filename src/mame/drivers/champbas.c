@@ -97,11 +97,11 @@ TODO:
 
 static SCREEN_EOF( champbas )
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
+	champbas_state *state = screen.machine().driver_data<champbas_state>();
 	state->m_watchdog_count++;
 
 	if (state->m_watchdog_count == 0x10)
-		machine.schedule_soft_reset();
+		screen.machine().schedule_soft_reset();
 }
 
 

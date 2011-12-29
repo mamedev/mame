@@ -453,7 +453,7 @@ static VIDEO_START( stisub )
 
 static SCREEN_UPDATE( subsino )
 {
-	subsino_state *state = screen->machine().driver_data<subsino_state>();
+	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	bitmap_fill(bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);
 	return 0;
@@ -466,7 +466,7 @@ static const rectangle visible3 = { 0*8, (14+48)*8-1, 18*8, (18+7)*8-1 };
 
 static SCREEN_UPDATE( subsino_reels )
 {
-	subsino_state *state = screen->machine().driver_data<subsino_state>();
+	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
 	bitmap_fill(bitmap,cliprect,0);
 
@@ -496,7 +496,7 @@ static const rectangle stisub_visible3 = { 0, 511,  144, 223 };
 
 static SCREEN_UPDATE( stisub_reels )
 {
-	subsino_state *state = screen->machine().driver_data<subsino_state>();
+	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
 	bitmap_fill(bitmap,cliprect,0);
 

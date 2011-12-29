@@ -444,32 +444,23 @@ static VIDEO_START(mtnew)
 //attotime::never
 static SCREEN_UPDATE(mtnew)
 {
-	mtech_state *state = screen->machine().driver_data<mtech_state>();
-	device_t *megadriv_screen = screen->machine().device("megadriv");
-	device_t *menu_screen = screen->machine().device("menu");
+	mtech_state *state = screen.machine().driver_data<mtech_state>();
 
-	if (screen == megadriv_screen)
-	{
-		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
-		if (!state->m_current_game_is_sms)
-			SCREEN_UPDATE_CALL(megadriv);
-		else
-			SCREEN_UPDATE_CALL(megatech_md_sms);
-	}
-	else if (screen == menu_screen)
-		SCREEN_UPDATE_CALL(megatech_bios);
+	/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
+	if (!state->m_current_game_is_sms)
+		SCREEN_UPDATE_CALL(megadriv);
+	else
+		SCREEN_UPDATE_CALL(megatech_md_sms);
 	return 0;
 }
 
 static SCREEN_EOF(mtnew)
 {
-	mtech_state *state = machine.driver_data<mtech_state>();
+	mtech_state *state = screen.machine().driver_data<mtech_state>();
 	if (!state->m_current_game_is_sms)
 		SCREEN_EOF_CALL(megadriv);
 	else
 		SCREEN_EOF_CALL(megatech_md_sms);
-
-	SCREEN_EOF_CALL(megatech_bios);
 }
 
 static MACHINE_RESET(mtnew)
@@ -503,7 +494,8 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(342,262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE(mtnew)
+	MCFG_SCREEN_UPDATE(megatech_bios)
+	MCFG_SCREEN_EOF(megatech_bios)
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_UPDATE(mtnew)

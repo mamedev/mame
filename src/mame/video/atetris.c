@@ -66,7 +66,7 @@ VIDEO_START( atetris )
 
 SCREEN_UPDATE( atetris )
 {
-	atetris_state *state = screen->machine().driver_data<atetris_state>();
+	atetris_state *state = screen.machine().driver_data<atetris_state>();
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0,0);
 	return 0;

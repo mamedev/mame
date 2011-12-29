@@ -299,9 +299,9 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_t* bitmap)
 
 SCREEN_UPDATE(tecmosys)
 {
-	tecmosys_state *state = screen->machine().driver_data<tecmosys_state>();
+	tecmosys_state *state = screen.machine().driver_data<tecmosys_state>();
 
-	bitmap_fill(bitmap,cliprect,screen->machine().pens[0x4000]);
+	bitmap_fill(bitmap,cliprect,screen.machine().pens[0x4000]);
 
 
 	tilemap_set_scrolly( state->m_bg0tilemap, 0, state->m_c80000regs[1]+16);
@@ -332,10 +332,10 @@ SCREEN_UPDATE(tecmosys)
 	tecmosys_tilemap_copy_to_compose(state, 0xc000);
 
 
-	tecmosys_do_final_mix(screen->machine(), bitmap);
+	tecmosys_do_final_mix(screen.machine(), bitmap);
 
 	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
-	tecmosys_render_sprites_to_bitmap(screen->machine(), bitmap, state->m_880000regs[0x0], state->m_880000regs[0x1]);
+	tecmosys_render_sprites_to_bitmap(screen.machine(), bitmap, state->m_880000regs[0x0], state->m_880000regs[0x1]);
 
 	return 0;
 }

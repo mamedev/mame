@@ -214,7 +214,7 @@ static WRITE8_HANDLER( mjderngr_palbank_w )
 
 static SCREEN_UPDATE( royalmah )
 {
-	royalmah_state *state = screen->machine().driver_data<royalmah_state>();
+	royalmah_state *state = screen.machine().driver_data<royalmah_state>();
 	UINT8 *videoram = state->m_videoram;
 
 	offs_t offs;

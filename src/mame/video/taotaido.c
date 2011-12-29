@@ -199,7 +199,7 @@ VIDEO_START(taotaido)
 
 SCREEN_UPDATE(taotaido)
 {
-	taotaido_state *state = screen->machine().driver_data<taotaido_state>();
+	taotaido_state *state = screen.machine().driver_data<taotaido_state>();
 //  tilemap_set_scrollx(state->m_bg_tilemap,0,(state->m_scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
 //  tilemap_set_scrolly(state->m_bg_tilemap,0,(state->m_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
 
@@ -207,7 +207,7 @@ SCREEN_UPDATE(taotaido)
 	int line;
 	rectangle clip;
 
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 	clip.min_x = visarea.min_x;
 	clip.max_x = visarea.max_x;
 	clip.min_y = visarea.min_y;
@@ -223,13 +223,13 @@ SCREEN_UPDATE(taotaido)
 		tilemap_draw(bitmap,&clip,state->m_bg_tilemap,0,0);
 	}
 
-	draw_sprites(screen->machine(), bitmap,cliprect);
+	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }
 
 SCREEN_EOF( taotaido )
 {
-	taotaido_state *state = machine.driver_data<taotaido_state>();
+	taotaido_state *state = screen.machine().driver_data<taotaido_state>();
 	/* sprites need to be delayed by 2 frames? */
 
 	memcpy(state->m_spriteram2_older,state->m_spriteram2_old,0x10000);

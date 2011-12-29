@@ -180,27 +180,27 @@ static void update_palette( running_machine &machine )
 
 static SCREEN_UPDATE(gal3)
 {
-	gal3_state *state = screen->machine().driver_data<gal3_state>();
+	gal3_state *state = screen.machine().driver_data<gal3_state>();
 	int i;
 	char mst[18], slv[18];
 	static int pivot = 15;
 	int pri;
 
-	update_palette(screen->machine());
+	update_palette(screen.machine());
 
-	if( screen->machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )	pivot+=1;
-	if( screen->machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) )	pivot-=1;
+	if( screen.machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )	pivot+=1;
+	if( screen.machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) )	pivot-=1;
 
 	for( pri=0; pri<pivot; pri++ )
 	{
-		namco_obj_draw(screen->machine(), bitmap, cliprect, pri );
+		namco_obj_draw(screen.machine(), bitmap, cliprect, pri );
 	}
 
 /*  CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
 
     for( pri=pivot; pri<15; pri++ )
     {
-        namco_obj_draw(screen->machine(), bitmap, cliprect, pri );
+        namco_obj_draw(screen.machine(), bitmap, cliprect, pri );
     }*/
 
 	// CPU Diag LEDs

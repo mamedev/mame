@@ -339,10 +339,10 @@ SCREEN_UPDATE( midzeus )
 	poly_wait(poly, "VIDEO_UPDATE");
 
 	/* normal update case */
-	if (!screen->machine().input().code_pressed(KEYCODE_W))
+	if (!screen.machine().input().code_pressed(KEYCODE_W))
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0xcc]);
-		int xoffs = screen->visible_area().min_x;
+		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
 			UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
@@ -356,10 +356,10 @@ SCREEN_UPDATE( midzeus )
 	{
 		const void *base;
 
-		if (screen->machine().input().code_pressed(KEYCODE_DOWN)) yoffs += screen->machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (screen->machine().input().code_pressed(KEYCODE_UP)) yoffs -= screen->machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (screen->machine().input().code_pressed(KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (screen->machine().input().code_pressed(KEYCODE_LEFT)) ; }
-		if (screen->machine().input().code_pressed(KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (screen->machine().input().code_pressed(KEYCODE_RIGHT)) ; }
+		if (screen.machine().input().code_pressed(KEYCODE_DOWN)) yoffs += screen.machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (screen.machine().input().code_pressed(KEYCODE_UP)) yoffs -= screen.machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (screen.machine().input().code_pressed(KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (screen.machine().input().code_pressed(KEYCODE_LEFT)) ; }
+		if (screen.machine().input().code_pressed(KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (screen.machine().input().code_pressed(KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
 		base = waveram0_ptr_from_block_addr(yoffs << 12);

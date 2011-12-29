@@ -149,23 +149,23 @@ static VIDEO_START(quizpun2)
 
 static SCREEN_UPDATE(quizpun2)
 {
-	quizpun2_state *state = screen->machine().driver_data<quizpun2_state>();
+	quizpun2_state *state = screen.machine().driver_data<quizpun2_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed(KEYCODE_Z))
+	if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int msk = 0;
-		if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-		if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+		if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+		if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->m_bg_tmap,  TILEMAP_DRAW_OPAQUE, 0);
-	else					bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	else					bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
-bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, state->m_fg_tmap, 0, 0);
 
 	return 0;

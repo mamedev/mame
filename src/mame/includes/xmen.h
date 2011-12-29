@@ -44,5 +44,6 @@ void xmen_sprite_callback(running_machine &machine, int *code,int *color,int *pr
 
 VIDEO_START( xmen6p );
 SCREEN_UPDATE( xmen );
-SCREEN_UPDATE( xmen6p );
+SCREEN_UPDATE( xmen6p_left );
+SCREEN_UPDATE( xmen6p_right );
 SCREEN_EOF( xmen6p );

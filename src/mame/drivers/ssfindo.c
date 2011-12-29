@@ -238,7 +238,7 @@ static void PS7500_startTimer1(running_machine &machine);
 
 static SCREEN_UPDATE(ssfindo)
 {
-	ssfindo_state *state = screen->machine().driver_data<ssfindo_state>();
+	ssfindo_state *state = screen.machine().driver_data<ssfindo_state>();
 	int s,x,y;
 
 	if( state->m_PS7500_IO[VIDCR]&0x20) //video DMA enabled

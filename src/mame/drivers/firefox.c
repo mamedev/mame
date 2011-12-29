@@ -184,11 +184,11 @@ static VIDEO_START( firefox )
 
 static SCREEN_UPDATE( firefox )
 {
-	firefox_state *state = screen->machine().driver_data<firefox_state>();
+	firefox_state *state = screen.machine().driver_data<firefox_state>();
 	int sprite;
-	int gfxtop = screen->visible_area().min_y;
+	int gfxtop = screen.visible_area().min_y;
 
-	bitmap_fill( bitmap, cliprect, palette_get_color(screen->machine(), 256) );
+	bitmap_fill( bitmap, cliprect, palette_get_color(screen.machine(), 256) );
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{
@@ -208,7 +208,7 @@ static SCREEN_UPDATE( firefox )
 				int flipx = flags & 0x20;
 				int code = sprite_data[ 15 - row ] + ( 256 * ( ( flags >> 6 ) & 3 ) );
 
-				drawgfx_transpen( bitmap, cliprect, screen->machine().gfx[ 1 ], code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
+				drawgfx_transpen( bitmap, cliprect, screen.machine().gfx[ 1 ], code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
 			}
 		}
 	}

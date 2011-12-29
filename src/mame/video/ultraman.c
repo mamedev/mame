@@ -124,7 +124,7 @@ WRITE16_HANDLER( ultraman_gfxctrl_w )
 
 SCREEN_UPDATE( ultraman )
 {
-	ultraman_state *state = screen->machine().driver_data<ultraman_state>();
+	ultraman_state *state = screen.machine().driver_data<ultraman_state>();
 
 	k051316_zoom_draw(state->m_k051316_3, bitmap, cliprect, 0, 0);
 	k051316_zoom_draw(state->m_k051316_2, bitmap, cliprect, 0, 0);

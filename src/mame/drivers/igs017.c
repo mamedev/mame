@@ -346,31 +346,31 @@ static int debug_viewer(running_machine &machine, bitmap_t *bitmap,const rectang
 
 static SCREEN_UPDATE( igs017 )
 {
-	igs017_state *state = screen->machine().driver_data<igs017_state>();
+	igs017_state *state = screen.machine().driver_data<igs017_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (screen->machine().input().code_pressed(KEYCODE_Z))
+	if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (screen->machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
-		if (screen->machine().input().code_pressed(KEYCODE_W))	mask |= 2;
-		if (screen->machine().input().code_pressed(KEYCODE_A))	mask |= 4;
+		if (screen.machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
+		if (screen.machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+		if (screen.machine().input().code_pressed(KEYCODE_A))	mask |= 4;
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
 
-	if (debug_viewer(screen->machine(), bitmap,cliprect))
+	if (debug_viewer(screen.machine(), bitmap,cliprect))
 		return 0;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	if (state->m_video_disable)
 		return 0;
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 
-	if (layers_ctrl & 4)	draw_sprites(screen->machine(), bitmap, cliprect);
+	if (layers_ctrl & 4)	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 

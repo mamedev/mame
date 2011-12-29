@@ -610,11 +610,11 @@ TIMER_DEVICE_CALLBACK( grmatch_palette_update )
 
 SCREEN_UPDATE( itech8_2layer )
 {
-	itech8_state *state = screen->machine().driver_data<itech8_state>();
+	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	struct tms34061_display &tms_state = state->m_tms_state;
 	UINT32 page_offset;
 	int x, y;
-	const rgb_t *pens = tlc34076_get_pens(screen->machine().device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -622,7 +622,7 @@ SCREEN_UPDATE( itech8_2layer )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -648,7 +648,7 @@ SCREEN_UPDATE( itech8_2layer )
 
 SCREEN_UPDATE( itech8_grmatch )
 {
-	itech8_state *state = screen->machine().driver_data<itech8_state>();
+	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	struct tms34061_display &tms_state = state->m_tms_state;
 	UINT32 page_offset;
 	int x, y;
@@ -659,7 +659,7 @@ SCREEN_UPDATE( itech8_grmatch )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -697,11 +697,11 @@ SCREEN_UPDATE( itech8_grmatch )
 
 SCREEN_UPDATE( itech8_2page )
 {
-	itech8_state *state = screen->machine().driver_data<itech8_state>();
+	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	struct tms34061_display &tms_state = state->m_tms_state;
 	UINT32 page_offset;
 	int x, y;
-	const rgb_t *pens = tlc34076_get_pens(screen->machine().device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -709,7 +709,7 @@ SCREEN_UPDATE( itech8_2page )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 
@@ -730,11 +730,11 @@ SCREEN_UPDATE( itech8_2page )
 
 SCREEN_UPDATE( itech8_2page_large )
 {
-	itech8_state *state = screen->machine().driver_data<itech8_state>();
+	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	struct tms34061_display &tms_state = state->m_tms_state;
 	UINT32 page_offset;
 	int x, y;
-	const rgb_t *pens = tlc34076_get_pens(screen->machine().device("tlc34076"));
+	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -742,7 +742,7 @@ SCREEN_UPDATE( itech8_2page_large )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 		return 0;
 	}
 

@@ -33,7 +33,7 @@ static VIDEO_START(poker72)
 
 static SCREEN_UPDATE(poker72)
 {
-	poker72_state *state = screen->machine().driver_data<poker72_state>();
+	poker72_state *state = screen.machine().driver_data<poker72_state>();
 	int x,y,count;
 
 	count = 0;
@@ -49,7 +49,7 @@ static SCREEN_UPDATE(poker72)
 
 			tile|= state->m_tile_bank << 12;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,color,fx,fy,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,color,fx,fy,x*8,y*8);
 
 			count+=2;
 		}
