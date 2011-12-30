@@ -39,8 +39,18 @@ DECLARE_LEGACY_DEVICE(S3C2400, s3c2400);
     TYPE DEFINITIONS
 *******************************************************************************/
 
-typedef UINT32 (*s3c24xx_gpio_port_r_func)( device_t *device, int port);
-typedef void (*s3c24xx_gpio_port_w_func)( device_t *device, int port, UINT32 data);
+typedef UINT32 (*s3c24xx_gpio_port_r_func)( device_t *device, int port, UINT32 mask);
+typedef void (*s3c24xx_gpio_port_w_func)( device_t *device, int port, UINT32 mask, UINT32 data);
+
+typedef int (*s3c24xx_core_pin_r_func)( device_t *device, int pin);
+typedef void (*s3c24xx_core_pin_w_func)( device_t *device, int pin, int data);
+
+typedef struct _s3c2400_interface_core s3c2400_interface_core;
+struct _s3c2400_interface_core
+{
+	s3c24xx_core_pin_r_func pin_r;
+	s3c24xx_core_pin_w_func pin_w;
+};
 
 typedef struct _s3c2400_interface_gpio s3c2400_interface_gpio;
 struct _s3c2400_interface_gpio
@@ -78,6 +88,7 @@ struct _s3c2400_interface_lcd
 typedef struct _s3c2400_interface s3c2400_interface;
 struct _s3c2400_interface
 {
+	s3c2400_interface_core core;
 	s3c2400_interface_gpio gpio;
 	s3c2400_interface_i2c i2c;
 	s3c2400_interface_adc adc;
@@ -379,6 +390,10 @@ void s3c2400_uart_fifo_w( device_t *device, int uart, UINT8 data);
 #define S3C24XX_GPIO_PORT_E S3C2400_GPIO_PORT_E
 #define S3C24XX_GPIO_PORT_F S3C2400_GPIO_PORT_F
 #define S3C24XX_GPIO_PORT_G S3C2400_GPIO_PORT_G
+
+#define S3C24XX_UART_COUNT  2
+#define S3C24XX_DMA_COUNT   4
+#define S3C24XX_SPI_COUNT   1
 
 /*******************************************************************************
     TYPE DEFINITIONS
@@ -707,11 +722,11 @@ typedef struct
 	s3c24xx_memcon_t memcon;
 	s3c24xx_usbhost_t usbhost;
 	s3c24xx_irq_t irq;
-	s3c24xx_dma_t dma[4];
+	s3c24xx_dma_t dma[S3C24XX_DMA_COUNT];
 	s3c24xx_clkpow_t clkpow;
 	s3c24xx_lcd_t lcd;
 	s3c24xx_lcdpal_t lcdpal;
-	s3c24xx_uart_t uart[2];
+	s3c24xx_uart_t uart[S3C24XX_UART_COUNT];
 	s3c24xx_pwm_t pwm;
 	s3c24xx_usbdev_t usbdev;
 	s3c24xx_wdt_t wdt;
@@ -720,7 +735,7 @@ typedef struct
 	s3c24xx_gpio_t gpio;
 	s3c24xx_rtc_t rtc;
 	s3c24xx_adc_t adc;
-	s3c24xx_spi_t spi[1];
+	s3c24xx_spi_t spi[S3C24XX_SPI_COUNT];
 	s3c24xx_mmc_t mmc;
 } s3c24xx_t;
 

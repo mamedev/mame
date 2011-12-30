@@ -34,6 +34,13 @@ enum
 	S3C2410_GPIO_PORT_H
 };
 
+enum
+{
+	S3C2410_CORE_PIN_NCON = 0,
+	S3C2410_CORE_PIN_OM0,
+	S3C2410_CORE_PIN_OM1
+};
+
 DECLARE_LEGACY_DEVICE(S3C2410, s3c2410);
 
 READ32_DEVICE_HANDLER( s3c2410_lcd_r );
@@ -42,8 +49,18 @@ READ32_DEVICE_HANDLER( s3c2410_lcd_r );
     TYPE DEFINITIONS
 *******************************************************************************/
 
-typedef UINT32 (*s3c24xx_gpio_port_r_func)( device_t *device, int port);
-typedef void (*s3c24xx_gpio_port_w_func)( device_t *device, int port, UINT32 data);
+typedef UINT32 (*s3c24xx_gpio_port_r_func)( device_t *device, int port, UINT32 mask);
+typedef void (*s3c24xx_gpio_port_w_func)( device_t *device, int port, UINT32 mask, UINT32 data);
+
+typedef int (*s3c24xx_core_pin_r_func)( device_t *device, int pin);
+typedef void (*s3c24xx_core_pin_w_func)( device_t *device, int pin, int data);
+
+typedef struct _s3c2410_interface_core s3c2410_interface_core;
+struct _s3c2410_interface_core
+{
+	s3c24xx_core_pin_r_func pin_r;
+	s3c24xx_core_pin_w_func pin_w;
+};
 
 typedef struct _s3c2410_interface_gpio s3c2410_interface_gpio;
 struct _s3c2410_interface_gpio
@@ -90,6 +107,7 @@ struct _s3c2410_interface_lcd
 typedef struct _s3c2410_interface s3c2410_interface;
 struct _s3c2410_interface
 {
+	s3c2410_interface_core core;
 	s3c2410_interface_gpio gpio;
 	s3c2410_interface_i2c i2c;
 	s3c2410_interface_adc adc;
@@ -461,6 +479,14 @@ static const UINT32 MAP_SUBINT_TO_INT[11] =
 #define S3C24XX_GPIO_PORT_G S3C2410_GPIO_PORT_G
 #define S3C24XX_GPIO_PORT_H S3C2410_GPIO_PORT_H
 
+#define S3C24XX_CORE_PIN_NCON S3C2410_CORE_PIN_NCON
+#define S3C24XX_CORE_PIN_OM0  S3C2410_CORE_PIN_OM0
+#define S3C24XX_CORE_PIN_OM1  S3C2410_CORE_PIN_OM1
+
+#define S3C24XX_UART_COUNT  3
+#define S3C24XX_DMA_COUNT   4
+#define S3C24XX_SPI_COUNT   2
+
 /*******************************************************************************
     TYPE DEFINITIONS
 *******************************************************************************/
@@ -618,7 +644,7 @@ typedef struct
 	UINT32 gpadat;
 	UINT32 pad_08;
 	UINT32 pad_0c;
-	UINT32 gpbbon;
+	UINT32 gpbcon;
 	UINT32 gpbdat;
 	UINT32 gpbup;
 	UINT32 pad_1c;
@@ -765,7 +791,7 @@ typedef struct
 {
 	s3c24xx_nand_regs_t regs;
 	UINT8 mecc[3];
-	int pos;
+	int ecc_pos, data_count;
 } s3c24xx_nand_t;
 
 typedef struct
@@ -839,15 +865,16 @@ typedef struct
 typedef struct
 {
 	const s3c2410_interface *iface;
+	UINT8 steppingstone[4*1024];
 	s3c24xx_memcon_t memcon;
 	s3c24xx_usbhost_t usbhost;
 	s3c24xx_irq_t irq;
-	s3c24xx_dma_t dma[4];
+	s3c24xx_dma_t dma[S3C24XX_DMA_COUNT];
 	s3c24xx_clkpow_t clkpow;
 	s3c24xx_lcd_t lcd;
 	s3c24xx_lcdpal_t lcdpal;
 	s3c24xx_nand_t nand;
-	s3c24xx_uart_t uart[3];
+	s3c24xx_uart_t uart[S3C24XX_UART_COUNT];
 	s3c24xx_pwm_t pwm;
 	s3c24xx_usbdev_t usbdev;
 	s3c24xx_wdt_t wdt;
@@ -856,7 +883,7 @@ typedef struct
 	s3c24xx_gpio_t gpio;
 	s3c24xx_rtc_t rtc;
 	s3c24xx_adc_t adc;
-	s3c24xx_spi_t spi[2];
+	s3c24xx_spi_t spi[S3C24XX_SPI_COUNT];
 	s3c24xx_sdi_t sdi;
 } s3c24xx_t;
 

@@ -81,7 +81,6 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_system_memory;
-	UINT32 *m_steppingstone;
 	int m_security_count;
 	UINT32 m_bballoon_port[20];
 	struct nand_t m_nand;
@@ -111,10 +110,11 @@ NAND Flash Controller (4KB internal buffer)
 24-ch external interrupts Controller (Wake-up source 16-ch)
 */
 
+// GPIO
+
 static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22 };
 
-
-static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
+static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 {
 	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
 	UINT32 data = state->m_bballoon_port[port];
@@ -135,7 +135,7 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 	return data;
 }
 
-static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
+static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 mask, UINT32 data)
 {
 	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
 	UINT32 old_value = state->m_bballoon_port[port];
@@ -164,6 +164,34 @@ static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 		break;
 	}
 }
+
+// CORE
+
+/*
+
+OM[1:0] = 00b : Enable NAND flash controller auto boot mode
+
+NAND flash memory page size should be 512Bytes.
+
+NCON : NAND flash memory address step selection
+0 : 3 Step addressing
+1 : 4 Step addressing
+
+*/
+
+static int s3c2410_core_pin_r( device_t *device, int pin)
+{
+	int data = 0;
+	switch (pin)
+	{
+		case S3C2410_CORE_PIN_NCON : data = 1; break;
+		case S3C2410_CORE_PIN_OM0  : data = 0; break;
+		case S3C2410_CORE_PIN_OM1  : data = 0; break;
+	}
+	return data;
+}
+
+// NAND
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 {
@@ -276,6 +304,8 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 }
 
+// I2C
+
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_scl_w )
 {
 	device_t *i2cmem = device->machine().device( "i2cmem");
@@ -316,7 +346,6 @@ static WRITE32_HANDLER( sound_w )
 }
 
 static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_BASE_MEMBER(ghosteo_state, m_steppingstone) AM_MIRROR(0x40000000)
 	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
 	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
@@ -382,15 +411,10 @@ static INPUT_PORTS_START( bballoon )
 	PORT_BIT( 0xFFFFFF50, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/*
-static NAND_INTERFACE( bballoon_nand_intf )
-{
-    DEVCB_DEVICE_LINE("s3c2410", s3c2410_pin_frnb_w)
-};
-*/
-
 static const s3c2410_interface bballoon_s3c2410_intf =
 {
+	// CORE (pin read / pin write)
+	{ s3c2410_core_pin_r, NULL },
 	// GPIO (port read / port write)
 	{ s3c2410_gpio_port_r, s3c2410_gpio_port_w },
 	// I2C (scl write / sda read / sda write)
@@ -399,7 +423,7 @@ static const s3c2410_interface bballoon_s3c2410_intf =
 	{ NULL },
 	// I2S (data write)
 	{ NULL },
-	// NAND (command write, address write, data read, data write)
+	// NAND (command write / address write / data read / data write)
 	{ s3c2410_nand_command_w, s3c2410_nand_address_w, s3c2410_nand_data_r, s3c2410_nand_data_w }
 };
 
@@ -549,8 +573,6 @@ ROM_END
 
 static DRIVER_INIT( bballoon )
 {
-	ghosteo_state *state = machine.driver_data<ghosteo_state>();
-	memcpy( state->m_steppingstone, machine.region( "user1")->base(), 4 * 1024);
 }
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "BnB Arcade", GAME_NO_SOUND )
