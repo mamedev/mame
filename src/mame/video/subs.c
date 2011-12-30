@@ -52,7 +52,7 @@ SCREEN_UPDATE( subs_left )
 	{
 		int charcode;
 		int sx,sy;
-		int left_enable,right_enable;
+		int left_enable; //,right_enable;
 		int left_sonar_window,right_sonar_window;
 
 		left_sonar_window = 0;
@@ -61,7 +61,7 @@ SCREEN_UPDATE( subs_left )
 		charcode = videoram[offs];
 
 		/* Which monitor is this for? */
-		right_enable = charcode & 0x40;
+//		right_enable = charcode & 0x40;
 		left_enable = charcode & 0x80;
 
 		sx = 8 * (offs % 32);
@@ -132,7 +132,7 @@ SCREEN_UPDATE( subs_right )
 	{
 		int charcode;
 		int sx,sy;
-		int left_enable,right_enable;
+		int right_enable; //, left_enable;
 		int left_sonar_window,right_sonar_window;
 
 		left_sonar_window = 0;
@@ -142,7 +142,7 @@ SCREEN_UPDATE( subs_right )
 
 		/* Which monitor is this for? */
 		right_enable = charcode & 0x40;
-		left_enable = charcode & 0x80;
+		//left_enable = charcode & 0x80;
 
 		sx = 8 * (offs % 32);
 		sy = 8 * (offs / 32);
