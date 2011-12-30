@@ -32,7 +32,7 @@ bool adf_format::supports_save() const
 	return true;
 }
 
-int adf_format::identify(io_generic *io)
+int adf_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT64 size = io_generic_size(io);
 	if ((size == 901120) || (size == 1802240))
@@ -42,20 +42,32 @@ int adf_format::identify(io_generic *io)
 	return 0;
 }
 
-bool adf_format::load(io_generic *io, floppy_image *image)
+bool adf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	desc_s sectors[11];
-	UINT8 sectdata[512*11];
-	for(int i=0; i<11; i++) {
+	desc_s sectors[22];
+	UINT8 sectdata[512*22];
+	for(int i=0; i<22; i++) {
 		sectors[i].data = sectdata + 512*i;
 		sectors[i].size = 512;
 		sectors[i].sector_id = i;
 	}
 
-	for(int track=0; track < 80; track++) {
-		for(int side=0; side < 2; side++) {
-			io_generic_read(io, sectdata, (track*2 + side)*512*11, 512*11);
-			generate_track(amiga_11, track, side, sectors, 11, 100000, image);
+	UINT64 size = io_generic_size(io);
+	if(size == 901120) {
+		image->set_variant(floppy_image::DSDD);
+		for(int track=0; track < 80; track++) {
+			for(int side=0; side < 2; side++) {
+				io_generic_read(io, sectdata, (track*2 + side)*512*11, 512*11);
+				generate_track(amiga_11, track, side, sectors, 11, 100000, image);
+			}
+		}
+	} else {
+		image->set_variant(floppy_image::DSHD);
+		for(int track=0; track < 80; track++) {
+			for(int side=0; side < 2; side++) {
+				io_generic_read(io, sectdata, (track*2 + side)*512*22, 512*22);
+				generate_track(amiga_22, track, side, sectors, 22, 200000, image);
+			}
 		}
 	}
 
@@ -94,13 +106,19 @@ UINT32 adf_format::checksum(const UINT8 *trackbuf, int track_size, int pos, int 
 
 bool adf_format::save(io_generic *io, floppy_image *image)
 {
-	// TODO: HD support
-	UINT8 sectdata[512*11];
-	UINT8 trackbuf[150000/8];
+	UINT8 sectdata[512*22];
+	UINT8 trackbuf[300000/8];
+
+	bool hd = image->get_variant() == floppy_image::DSHD;
+
+	fprintf(stderr, "format is %s\n", hd ? "hd" : "dd");
+
+	int data_track_size = hd ? 512*22 : 512*11;
+
 	for(int track=0; track < 80; track++) {
 		for(int side=0; side < 2; side++) {
 			int track_size;
-			generate_bitstream_from_track(track, side, 2000, trackbuf, track_size, image);
+			generate_bitstream_from_track(track, side, hd ? 1000 : 2000, trackbuf, track_size, image);
 
 			for(int i=0; i<track_size; i++)
 				if(g32(trackbuf, track_size, i) == 0x44894489 &&
@@ -109,7 +127,7 @@ bool adf_format::save(io_generic *io, floppy_image *image)
 
 					UINT32 head = ((g32(trackbuf, track_size, i+32) & 0x55555555) << 1) | (g32(trackbuf, track_size, i+64) & 0x55555555);
 					int sect = (head >> 8) & 0xff;
-					if(sect > 11)
+					if(sect > (hd ? 22 : 11))
 						continue;
 
 					UINT8 *dest = sectdata + 512*sect;
@@ -121,7 +139,7 @@ bool adf_format::save(io_generic *io, floppy_image *image)
 						*dest++ = val;
 					}
 
-					io_generic_write(io, sectdata, (track*2 + side)*512*11, 512*11);
+					io_generic_write(io, sectdata, (track*2 + side)*data_track_size, data_track_size);
 				}
 		}
 	}

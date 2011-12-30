@@ -35,7 +35,7 @@ bool pasti_format::supports_save() const
 	return false;
 }
 
-int pasti_format::identify(io_generic *io)
+int pasti_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT8 h[16];
 	io_generic_read(io, h, 0, 16);
@@ -57,7 +57,7 @@ static void hexdump(const UINT8 *d, int s)
 	}
 }
 
-bool pasti_format::load(io_generic *io, floppy_image *image)
+bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT8 fh[16];
 	io_generic_read(io, fh, 0, 16);
@@ -159,6 +159,7 @@ bool pasti_format::load(io_generic *io, floppy_image *image)
 		}
 	}
 
+	image->set_variant(floppy_image::DSDD);
 	return true;
 }
 

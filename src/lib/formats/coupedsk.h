@@ -16,8 +16,8 @@ class mgt_format : public floppy_image_format_t
 public:
 	mgt_format();
 
-	virtual int identify(io_generic *io);
-	virtual bool load(io_generic *io, floppy_image *image);
+	virtual int identify(io_generic *io, UINT32 form_factor);
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
 	virtual bool save(io_generic *io, floppy_image *image);
 
 	virtual const char *name() const;

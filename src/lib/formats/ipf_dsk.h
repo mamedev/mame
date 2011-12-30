@@ -8,8 +8,8 @@ class ipf_format : public floppy_image_format_t
 public:
 	ipf_format();
 
-	virtual int identify(io_generic *io);
-	virtual bool load(io_generic *io, floppy_image *image);
+	virtual int identify(io_generic *io, UINT32 form_factor);
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
 
 	virtual const char *name() const;
 	virtual const char *description() const;

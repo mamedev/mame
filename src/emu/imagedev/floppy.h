@@ -75,6 +75,9 @@ public:
 	attotime time_next_index();
 	attotime get_next_transition(attotime from_when);
 	void write_flux(attotime start, attotime end, int transition_count, const attotime *transitions);
+	void set_write_splice(attotime when);
+	UINT32 get_form_factor() const;
+	UINT32 get_variant() const;
 
 protected:
 	// device-level overrides
@@ -83,7 +86,7 @@ protected:
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	virtual void setup_limits() = 0;
+	virtual void setup_characteristics() = 0;
 
 	image_device_format   format;
 	floppy_image		  *image;
@@ -91,9 +94,10 @@ protected:
 	floppy_image_format_t *fif_list;
 	emu_timer             *index_timer;
 
-	/* Physical characteristics, filled by setup_limits */
+	/* Physical characteristics, filled by setup_characteristics */
 	int tracks; /* addressable tracks */
 	int sides;  /* number of heads */
+	UINT32 form_factor; /* 3"5, 5"25, etc */
 
 	/* state of input lines */
 	int dir;  /* direction */
@@ -130,7 +134,7 @@ public:
 	virtual ~floppy_35_dd();
 
 protected:
-	virtual void setup_limits();
+	virtual void setup_characteristics();
 };
 
 class floppy_35_hd : public floppy_image_device {
@@ -139,7 +143,16 @@ public:
 	virtual ~floppy_35_hd();
 
 protected:
-	virtual void setup_limits();
+	virtual void setup_characteristics();
+};
+
+class floppy_35_ed : public floppy_image_device {
+public:
+	floppy_35_ed(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_35_ed();
+
+protected:
+	virtual void setup_characteristics();
 };
 
 class floppy_525_dd : public floppy_image_device {
@@ -148,7 +161,7 @@ public:
 	virtual ~floppy_525_dd();
 
 protected:
-	virtual void setup_limits();
+	virtual void setup_characteristics();
 };
 
 class floppy_connector: public device_t,
@@ -174,6 +187,7 @@ private:
 extern const device_type FLOPPY_CONNECTOR;
 extern const device_type FLOPPY_35_DD;
 extern const device_type FLOPPY_35_HD;
+extern const device_type FLOPPY_35_ED;
 extern const device_type FLOPPY_525_DD;
 
 #endif /* FLOPPY_H */

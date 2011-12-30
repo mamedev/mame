@@ -54,7 +54,7 @@ bool mfm_format::supports_save() const
 	return true;
 }
 
-int mfm_format::identify(io_generic *io)
+int mfm_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT8 header[7];
 
@@ -65,7 +65,7 @@ int mfm_format::identify(io_generic *io)
 	return 0;
 }
 
-bool mfm_format::load(io_generic *io, floppy_image *image)
+bool mfm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	MFMIMG header;
 	MFMTRACKIMG trackdesc;
@@ -98,6 +98,7 @@ bool mfm_format::load(io_generic *io, floppy_image *image)
 	if(trackbuf)
 		global_free(trackbuf);
 
+	image->set_variant(floppy_image::DSDD);
 	return true;
 }
 

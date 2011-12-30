@@ -48,7 +48,19 @@
   An unformatted track is equivalent to one big MG_N cell covering a
   whole turn, but is encoded as zero-size.
 
-  TODO: big-endian support, cleanup pll, move it where it belongs.
+  The "track splice" information indicates where to start writing
+  if you try to rewrite a physical disk with the data.  Some
+  preservation formats encode that information, it is guessed for
+  others.  The write track function of fdcs should set it.  The
+  representation is the angular position relative to the index.
+  
+  The media type is divided in two parts.  The first half
+  indicate the physical form factor, i.e. all medias with that
+  form factor can be physically inserted in a reader that handles
+  it.  The second half indicates the variants which are usually
+  detectable by the reader, such as density and number of sides.
+
+  TODO: big-endian support
 */
 
 const char mfi_format::sign[16] = "MESSFLOPPYIMAGE"; // Includes the final \0
@@ -77,24 +89,27 @@ bool mfi_format::supports_save() const
 	return true;
 }
 
-int mfi_format::identify(io_generic *io)
+int mfi_format::identify(io_generic *io, UINT32 form_factor)
 {
 	header h;
 
 	io_generic_read(io, &h, 0, sizeof(header));
 	if(memcmp( h.sign, sign, 16 ) == 0 &&
 	   h.cyl_count > 0 && h.cyl_count <= 84 &&
-	   h.head_count > 0 && h.head_count <= 2)
+	   h.head_count > 0 && h.head_count <= 2 &&
+	   h.form_factor == form_factor)
 		return 100;
 	return 0;
 }
 
-bool mfi_format::load(io_generic *io, floppy_image *image)
+bool mfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	header h;
 	entry entries[84*2];
 	io_generic_read(io, &h, 0, sizeof(header));
 	io_generic_read(io, &entries, sizeof(header), h.cyl_count*h.head_count*sizeof(entry));
+
+	image->set_variant(h.variant);
 
 	UINT8 *compressed = 0;
 	int compressed_size = 0;
@@ -161,6 +176,8 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 	memcpy(h.sign, sign, 16);
 	h.cyl_count = tracks;
 	h.head_count = heads;
+	h.form_factor = image->get_form_factor();
+	h.variant = image->get_variant();
 
 	io_generic_write(io, &h, 0, sizeof(header));
 
@@ -194,6 +211,7 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 			entries[epos].offset = pos;
 			entries[epos].uncompressed_size = tsize*4;
 			entries[epos].compressed_size = csize;
+			entries[epos].write_splice = image->get_write_splice_position(track, head);
 			epos++;
 
 			io_generic_write(io, postcomp, pos, csize);

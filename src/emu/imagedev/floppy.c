@@ -12,6 +12,7 @@
 const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
 const device_type FLOPPY_35_DD = &device_creator<floppy_35_dd>;
 const device_type FLOPPY_35_HD = &device_creator<floppy_35_hd>;
+const device_type FLOPPY_35_ED = &device_creator<floppy_35_ed>;
 const device_type FLOPPY_525_DD = &device_creator<floppy_525_dd>;
 
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -136,7 +137,7 @@ void floppy_image_device::set_rpm(float _rpm)
 void floppy_image_device::device_start()
 {
 	rpm = 0;
-	setup_limits();
+	setup_characteristics();
 
 	idx = 0;
 
@@ -174,7 +175,7 @@ bool floppy_image_device::call_load()
 	int best = 0;
 	floppy_image_format_t *best_format = 0;
 	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
-		int score = format->identify(&io);
+		int score = format->identify(&io, form_factor);
 		if(score > best) {
 			best = score;
 			best_format = format;
@@ -184,8 +185,8 @@ bool floppy_image_device::call_load()
 	if(!best_format)
 		return IMAGE_INIT_FAIL;
 
-	image = global_alloc(floppy_image(tracks, sides));
-	best_format->load(&io, image);
+	image = global_alloc(floppy_image(tracks, sides, form_factor));
+	best_format->load(&io, form_factor, image);
 
 	revolution_start_time = attotime::never;
 	revolution_count = 0;
@@ -538,8 +539,9 @@ floppy_35_dd::~floppy_35_dd()
 {
 }
 
-void floppy_35_dd::setup_limits()
+void floppy_35_dd::setup_characteristics()
 {
+	form_factor = floppy_image::FF_35;
 	tracks = 84;
 	sides = 2;
 	set_rpm(300);
@@ -554,8 +556,26 @@ floppy_35_hd::~floppy_35_hd()
 {
 }
 
-void floppy_35_hd::setup_limits()
+void floppy_35_hd::setup_characteristics()
 {
+	form_factor = floppy_image::FF_35;
+	tracks = 84;
+	sides = 2;
+	set_rpm(300);
+}
+
+floppy_35_ed::floppy_35_ed(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, FLOPPY_35_ED, "3.5\" extended density floppy drive", tag, owner, clock)
+{
+}
+
+floppy_35_ed::~floppy_35_ed()
+{
+}
+
+void floppy_35_ed::setup_characteristics()
+{
+	form_factor = floppy_image::FF_35;
 	tracks = 84;
 	sides = 2;
 	set_rpm(300);
@@ -571,8 +591,9 @@ floppy_525_dd::~floppy_525_dd()
 {
 }
 
-void floppy_525_dd::setup_limits()
+void floppy_525_dd::setup_characteristics()
 {
+	form_factor = floppy_image::FF_525;
 	tracks = 42;
 	sides = 1;
 	set_rpm(300);

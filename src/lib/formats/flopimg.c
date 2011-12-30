@@ -942,14 +942,18 @@ LEGACY_FLOPPY_OPTIONS_END
 /// New implementation
 //////////////////////////////////////////////////////////
 
-floppy_image::floppy_image(int _tracks, int _heads)
+floppy_image::floppy_image(int _tracks, int _heads, UINT32 _form_factor)
 {
 	tracks = _tracks;
 	heads = _heads;
 
+	form_factor = _form_factor;
+	variant = 0;
+
 	memset(cell_data, 0, sizeof(cell_data));
 	memset(track_size, 0, sizeof(track_size));
 	memset(track_alloc_size, 0, sizeof(track_alloc_size));
+	memset(write_splice, 0, sizeof(write_splice));
 }
 
 floppy_image::~floppy_image()
@@ -992,16 +996,15 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 
 void floppy_image::ensure_alloc(int track, int head)
 {
-	int idx = (track << 1) + head;
-	if(track_size[idx] > track_alloc_size[idx]) {
-		UINT32 new_size = track_size[idx]*11/10;
+	if(track_size[track][head] > track_alloc_size[track][head]) {
+		UINT32 new_size = track_size[track][head]*11/10;
 		UINT32 *new_array = global_alloc_array(UINT32, new_size);
-		if(track_alloc_size[idx]) {
-			memcpy(new_array, cell_data[idx], track_alloc_size[idx]*4);
-			global_free(cell_data[idx]);
+		if(track_alloc_size[track][head]) {
+			memcpy(new_array, cell_data[track][head], track_alloc_size[track][head]*4);
+			global_free(cell_data[track][head]);
 		}
-		cell_data[idx] = new_array;
-		track_alloc_size[idx] = new_size;
+		cell_data[track][head] = new_array;
+		track_alloc_size[track][head] = new_size;
 	}
 }
 
@@ -1375,10 +1378,15 @@ void floppy_image_format_t::generate_track_from_bitstream(int track, int head, c
 	int size = dest - base;
 	normalize_times(base, size);
 	image->set_track_size(track, head, size);
+	image->set_write_splice_position(track, head, 0);
 }
 
 void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT32 *trackbuf, int track_size, int splice_pos, floppy_image *image)
 {
+	// Retrieve the angular splice pos before messing with the data
+	splice_pos = splice_pos % track_size;
+	UINT32 splice_angular_pos = trackbuf[splice_pos] & floppy_image::TIME_MASK;
+
 	// Check if we need to invert a cell to get an even number of
 	// transitions on the whole track
 	//
@@ -1406,7 +1414,6 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT
 	}
 
 	if(transition_count & 1) {
-		splice_pos = splice_pos % track_size;
 		int pos = splice_pos;
 		while((trackbuf[pos] & floppy_image::MG_MASK) != MG_0 && (trackbuf[pos] & floppy_image::MG_MASK) != MG_1) {
 			pos++;
@@ -1457,6 +1464,7 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT
 	int size = dest - base;
 	normalize_times(base, size);
 	image->set_track_size(track, head, size);
+	image->set_write_splice_position(track, head, splice_angular_pos);
 }
 
 //  Atari ST Fastcopy Pro layouts
@@ -1792,6 +1800,32 @@ const floppy_image_format_t::desc_e floppy_image_format_t::amiga_11[] = {
 	{ END }
 };
 
+const floppy_image_format_t::desc_e floppy_image_format_t::amiga_22[] = {
+	{ SECTOR_LOOP_START, 0, 21 },
+	{   MFM, 0x00, 2 },
+	{   RAW, 0x4489, 2 },
+	{   CRC_AMIGA_START, 1 },
+	{     MFMBITS, 0xf, 4 },
+	{     OFFSET_ID_O },
+	{     SECTOR_ID_O },
+	{     REMAIN_O, 11 },
+	{     MFMBITS, 0xf, 4 },
+	{     OFFSET_ID_E },
+	{     SECTOR_ID_E },
+	{     REMAIN_E, 11 },
+	{     MFM, 0x00, 16 },
+	{   CRC_END, 1 },
+	{   CRC, 1 },
+	{   CRC, 2 },
+	{   CRC_AMIGA_START, 2 },
+	{     SECTOR_DATA_O, -1 },
+	{     SECTOR_DATA_E, -1 },
+	{   CRC_END, 2 },
+	{ SECTOR_LOOP_END },
+	{ MFM, 0x00, 532 },
+	{ END }
+};
+
 void floppy_image_format_t::generate_bitstream_from_track(int track, int head, int cell_size, UINT8 *trackbuf, int &track_size, floppy_image *image)
 {
 	int tsize = image->get_track_size(track, head);
@@ -1802,18 +1836,15 @@ void floppy_image_format_t::generate_bitstream_from_track(int track, int head, i
 		return;
 	}
 
-	// Start a little before the end of the track to pre-synchronize
-	// the pll
+	// Start at the write splice
 	const UINT32 *tbuf = image->get_buffer(track, head);
-	int cur_pos = 190000000;
-	int cur_entry = tsize-1;
-	while((tbuf[cur_entry] & floppy_image::TIME_MASK) > cur_pos)
-		cur_entry--;
-	cur_entry++;
-	if(cur_entry == tsize)
-		cur_entry = 0;
+	UINT32 splice = image->get_write_splice_position(track, head);
+	int cur_pos = splice;
+	int cur_entry = 0;
+	while(cur_entry < tsize-1 && (tbuf[cur_entry+1] & floppy_image::TIME_MASK) < cur_pos)
+		cur_entry++;
 
-	int cur_bit = -1;
+	int cur_bit = 0;
 
 	int period = cell_size;
 	int period_adjust_base = period * 0.05;
@@ -1823,28 +1854,26 @@ void floppy_image_format_t::generate_bitstream_from_track(int track, int head, i
 	int phase_adjust = 0;
 	int freq_hist = 0;
 
-	for(;;) {
+	UINT32 scanned = 0;
+	while(scanned < 200000000) {
 		// Note that all magnetic cell type changes are considered
 		// edges.  No randomness added for neutral/damaged cells
 		int edge = tbuf[cur_entry] & floppy_image::TIME_MASK;
 		if(edge < cur_pos)
 			edge += 200000000;
 		int next = cur_pos + period + phase_adjust;
+		scanned += period + phase_adjust;
 
 		if(edge >= next) {
 			// No transition in the window means 0 and pll in free run mode
-			if(cur_bit >= 0) {
-				trackbuf[cur_bit >> 3] &= ~(0x80 >> (cur_bit & 7));
-				cur_bit++;
-			}
+			trackbuf[cur_bit >> 3] &= ~(0x80 >> (cur_bit & 7));
+			cur_bit++;
 			phase_adjust = 0;
 
 		} else {
 			// Transition in the window means 1, and the pll is adjusted
-			if(cur_bit >= 0) {
-				trackbuf[cur_bit >> 3] |= 0x80 >> (cur_bit & 7);
-				cur_bit++;
-			}
+			trackbuf[cur_bit >> 3] |= 0x80 >> (cur_bit & 7);
+			cur_bit++;
 
 			int delta = edge - (next - period/2);
 
@@ -1881,9 +1910,6 @@ void floppy_image_format_t::generate_bitstream_from_track(int track, int head, i
 
 		cur_pos = next;
 		if(cur_pos >= 200000000) {
-			if(cur_bit >= 0)
-				break;
-			cur_bit = 0;
 			cur_pos -= 200000000;
 			cur_entry = 0;
 		}

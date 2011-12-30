@@ -27,7 +27,7 @@ bool ipf_format::supports_save() const
 	return false;
 }
 
-int ipf_format::identify(io_generic *io)
+int ipf_format::identify(io_generic *io, UINT32 form_factor)
 {
 	static const UINT8 refh[12] = { 0x43, 0x41, 0x50, 0x53, 0x00, 0x00, 0x00, 0x0c, 0x1c, 0xd5, 0x73, 0xba };
 	UINT8 h[12];
@@ -39,7 +39,7 @@ int ipf_format::identify(io_generic *io)
 	return 0;
 }
 
-bool ipf_format::load(io_generic *io, floppy_image *image)
+bool ipf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT32 size = io_generic_size(io);
 	UINT8 *data = global_alloc_array(UINT8, size);
@@ -80,6 +80,7 @@ UINT32 ipf_format::crc32r(const UINT8 *data, UINT32 size)
 
 bool ipf_format::parse(UINT8 *data, UINT32 size, floppy_image *image)
 {
+	image->set_variant(floppy_image::DSDD); // Not handling anything else yet
 	tcount = 84*2+1; // Usual max
 	tinfos = global_alloc_array_clear(track_info, tcount);
 	bool res = scan_all_tags(data, size);

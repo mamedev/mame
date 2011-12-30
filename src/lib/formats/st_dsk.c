@@ -44,7 +44,7 @@ void st_format::find_size(io_generic *io, int &track_count, int &head_count, int
 	track_count = head_count = sector_count = 0;
 }
 
-int st_format::identify(io_generic *io)
+int st_format::identify(io_generic *io, UINT32 form_factor)
 {
 	int track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -54,7 +54,7 @@ int st_format::identify(io_generic *io)
 	return 0;
 }
 
-bool st_format::load(io_generic *io, floppy_image *image)
+bool st_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -72,9 +72,11 @@ bool st_format::load(io_generic *io, floppy_image *image)
 		for(int head=0; head < head_count; head++) {
 			io_generic_read(io, sectdata, (track*head_count + head)*track_size, track_size);
 			generate_track(atari_st_fcp_get_desc(track, head, head_count, sector_count),
-						   track, head, sectors, sector_count+1, 100000, image);
+						   track, head, sectors, sector_count, 100000, image);
 		}
 	}
+
+	image->set_variant(floppy_image::DSDD);
 
 	return true;
 }
@@ -201,7 +203,7 @@ bool msa_format::compress(const UINT8 *buffer, int usize, UINT8 *dest, int &csiz
 	return dst < usize;
 }
 
-int msa_format::identify(io_generic *io)
+int msa_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT16 sign, sect, head, strack, etrack;
 	read_header(io, sign, sect, head, strack, etrack);
@@ -215,7 +217,7 @@ int msa_format::identify(io_generic *io)
 	return 0;
 }
 
-bool msa_format::load(io_generic *io, floppy_image *image)
+bool msa_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT16 sign, sect, heads, strack, etrack;
 	read_header(io, sign, sect, heads, strack, etrack);
@@ -244,10 +246,11 @@ bool msa_format::load(io_generic *io, floppy_image *image)
 					return false;
 			}
 			generate_track(atari_st_fcp_get_desc(track, head, head+1, sect),
-						   track, head, sectors, sect+1, 100000, image);
+						   track, head, sectors, sect, 100000, image);
 		}
 	}
 
+	image->set_variant(floppy_image::DSDD);
 	return true;
 }
 

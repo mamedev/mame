@@ -225,8 +225,8 @@ public:
 	floppy_image_format_t();
 	virtual ~floppy_image_format_t();
 
-	virtual int identify(io_generic *io) = 0;
-	virtual bool load(io_generic *io, floppy_image *image) = 0;
+	virtual int identify(io_generic *io, UINT32 form_factor) = 0;
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) = 0;
 	virtual bool save(io_generic *io, floppy_image *image);
 
 	virtual const char *name() const = 0;
@@ -345,6 +345,9 @@ protected:
 	// Amiga formats (100K cells)
 	//   Standard 11 sectors per track format
 	static const desc_e amiga_11[];
+
+	//   Standard 22 sectors per track format (guessed, to check w.r.t the real thing)
+	static const desc_e amiga_22[];
 
 
 	// **** Writer helpers ****
@@ -473,6 +476,18 @@ public:
 	// The last cell implicit end position is of course 200,000,000.
 	//
 	// Unformatted tracks are encoded as zero-size.
+	//
+	// The "track splice" information indicates where to start writing
+	// if you try to rewrite a physical disk with the data.  Some
+	// preservation formats encode that information, it is guessed for
+	// others.  The write track function of fdcs should set it.  The
+	// representation is the angular position relative to the index.
+	//
+	// The media type is divided in two parts.  The first half
+	// indicate the physical form factor, i.e. all medias with that
+	// form factor can be physically inserted in a reader that handles
+	// it.  The second half indicates the variants which are usually
+	// detectable by the reader, such as density and number of sides.
 
 	enum {
 		TIME_MASK = 0x0fffffff,
@@ -485,14 +500,33 @@ public:
 		MG_D      = (3 << MG_SHIFT)
 	};
 
+	// Form factors
+	enum {
+		FF_UNKNOWN  = 0x00000000, // Unknown, useful when converting
+		FF_35       = 0x20203533, // "35  "
+		FF_525      = 0x20353235, // "525 "
+	};
+
+	// Variants
+	enum {
+		DSDD  = 0x44445344, // "DSDD",
+		DSHD  = 0x44485344, // "DSHD",
+		DSED  = 0x44455344, // "DSED",
+	};
+
 	// construction/destruction
-	floppy_image(int tracks, int heads);
+	floppy_image(int tracks, int heads, UINT32 form_factor);
 	virtual ~floppy_image();
 
-	void set_track_size(int track, int head, UINT32 size) { track_size[(track << 1) + head] = size; ensure_alloc(track, head); }
-	UINT32 *get_buffer(int track, int head) { return cell_data[(track << 1) + head]; }
-	UINT32 get_track_size(int track, int head) { return track_size[(track << 1) + head]; }
+	UINT32 get_form_factor() { return form_factor; }
+	UINT32 get_variant() { return variant; }
+	void set_variant(UINT32 v) { variant = v; }
 
+	void set_track_size(int track, int head, UINT32 size) { track_size[track][head] = size; ensure_alloc(track, head); }
+	UINT32 *get_buffer(int track, int head) { return cell_data[track][head]; }
+	UINT32 get_track_size(int track, int head) { return track_size[track][head]; }
+	void set_write_splice_position(int track, int head, UINT32 pos) { write_splice[track][head] = pos; }
+	UINT32 get_write_splice_position(int track, int head) const { return write_splice[track][head]; }
 	void get_maximal_geometry(int &tracks, int &heads);
 	void get_actual_geometry(int &tracks, int &heads);
 
@@ -504,9 +538,12 @@ private:
 
 	int tracks, heads;
 
-	UINT32 *cell_data[MAX_FLOPPY_HEADS * MAX_FLOPPY_TRACKS];
-	UINT32 track_size[MAX_FLOPPY_HEADS * MAX_FLOPPY_TRACKS];
-	UINT32 track_alloc_size[MAX_FLOPPY_HEADS * MAX_FLOPPY_TRACKS];
+	UINT32 form_factor, variant;
+
+	UINT32 *cell_data[MAX_FLOPPY_TRACKS][MAX_FLOPPY_HEADS];
+	UINT32 track_size[MAX_FLOPPY_TRACKS][MAX_FLOPPY_HEADS];
+	UINT32 track_alloc_size[MAX_FLOPPY_TRACKS][MAX_FLOPPY_HEADS];
+	UINT32 write_splice[MAX_FLOPPY_TRACKS][MAX_FLOPPY_HEADS];
 
 	void ensure_alloc(int track, int head);
 };
