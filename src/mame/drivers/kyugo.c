@@ -29,24 +29,11 @@
 
 /*************************************
  *
- *  Memory handlers
- *
- *************************************/
-
-static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
-{
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
-	device_set_input_line(state->m_subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
-}
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE_MEMBER(kyugo_state, m_bgvideoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE_MEMBER(kyugo_state, m_bgattribram)
@@ -67,25 +54,25 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static WRITE8_HANDLER( nmi_mask_w )
+static WRITE8_HANDLER( kyugo_nmi_mask_w )
 {
 	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 
 	state->m_nmi_mask = data & 1;
 }
 
-#define Main_PortMap( name, base )										\
-static ADDRESS_MAP_START( name##_portmap, AS_IO, 8 )			\
-	ADDRESS_MAP_GLOBAL_MASK(0xff)									\
-	AM_RANGE(base+0, base+0) AM_WRITE(nmi_mask_w)				\
-	AM_RANGE(base+1, base+1) AM_WRITE(kyugo_flipscreen_w)				\
-	AM_RANGE(base+2, base+2) AM_WRITE(kyugo_sub_cpu_control_w)			\
-ADDRESS_MAP_END
+static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
+{
+	kyugo_state *state = space->machine().driver_data<kyugo_state>();
+	device_set_input_line(state->m_subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+}
 
-Main_PortMap( gyrodine, 0x00 )
-Main_PortMap( flashgal, 0x40 )
-Main_PortMap( flashgala, 0xc0 )
-Main_PortMap( srdmissn, 0x08 )
+static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x07)
+	AM_RANGE(0x00, 0x00) AM_WRITE(kyugo_nmi_mask_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(kyugo_flipscreen_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(kyugo_sub_cpu_control_w)
+ADDRESS_MAP_END
 
 
 
@@ -95,20 +82,49 @@ Main_PortMap( srdmissn, 0x08 )
  *
  *************************************/
 
-#define Sub_MemMap( name, rom_end, shared, in0, in1, in2 )					\
-static ADDRESS_MAP_START( name##_sub_map, AS_PROGRAM, 8 )		\
-	AM_RANGE(0x0000, rom_end) AM_ROM										\
-	AM_RANGE(shared, shared+0x7ff) AM_RAM AM_SHARE("share1")						\
-	AM_RANGE(in0, in0) AM_READ_PORT("SYSTEM")								\
-	AM_RANGE(in1, in1) AM_READ_PORT("P1")									\
-	AM_RANGE(in2, in2) AM_READ_PORT("P2")									\
+static ADDRESS_MAP_START( gyrodine_sub_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
+	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("P1")
+	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-Sub_MemMap( gyrodine, 0x1fff, 0x4000, 0x8080, 0x8040, 0x8000 )
-Sub_MemMap( repulse,  0x7fff, 0xa000, 0xc080, 0xc040, 0xc000 )
-Sub_MemMap( srdmissn, 0x7fff, 0x8000, 0xf400, 0xf401, 0xf402 )
-Sub_MemMap( legend,   0x7fff, 0xc000, 0xf800, 0xf801, 0xf802 )
-Sub_MemMap( flashgala,0x7fff, 0xe000, 0xc040, 0xc080, 0xc0c0 )
+
+static ADDRESS_MAP_START( repulse_sub_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P2")
+	AM_RANGE(0xc040, 0xc040) AM_READ_PORT("P1")
+	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("SYSTEM")
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( srdmissn_sub_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P1")
+	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P2")
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( legend_sub_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P1")
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("P2")
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( flashgala_sub_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc040, 0xc040) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("P1")
+	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+ADDRESS_MAP_END
 
 
 
@@ -118,18 +134,45 @@ Sub_MemMap( flashgala,0x7fff, 0xe000, 0xc040, 0xc080, 0xc0c0 )
  *
  *************************************/
 
-#define Sub_PortMap( name, ay0_base, ay1_base )											\
-static ADDRESS_MAP_START( name##_sub_portmap, AS_IO, 8 )						\
-	ADDRESS_MAP_GLOBAL_MASK(0xff)														\
-	AM_RANGE(ay0_base+0, ay0_base+1) AM_DEVWRITE("ay1", ay8910_address_data_w)	\
-	AM_RANGE(ay0_base+2, ay0_base+2) AM_DEVREAD("ay1", ay8910_r)					\
-	AM_RANGE(ay1_base+0, ay1_base+1) AM_DEVWRITE("ay2", ay8910_address_data_w)	\
-ADDRESS_MAP_END																			\
+static WRITE8_HANDLER( kyugo_coin_counter_w )
+{
+	coin_counter_w(space->machine(), offset, data & 1);
+}
 
-Sub_PortMap( gyrodine, 0x00, 0xc0 )
-Sub_PortMap( repulse,  0x00, 0x40 )
-Sub_PortMap( srdmissn, 0x80, 0x84 )
-Sub_PortMap( flashgala,0x40, 0x80 )
+static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE("ay2", ay8910_address_data_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x42, 0x42) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( srdmissn_sub_portmap, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x82, 0x82) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x84, 0x85) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x90, 0x91) AM_WRITE(kyugo_coin_counter_w)
+ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -497,8 +540,8 @@ static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(gyrodine_portmap)
+	MCFG_CPU_PROGRAM_MAP(kyugo_main_map)
+	MCFG_CPU_IO_MAP(kyugo_main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
@@ -548,27 +591,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( srdmissn, gyrodine )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(srdmissn_portmap)
-
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(srdmissn_sub_map)
 	MCFG_CPU_IO_MAP(srdmissn_sub_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( flashgal, repulse )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(flashgal_portmap)
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( flashgala, gyrodine )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(flashgala_portmap)
-
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(flashgala_sub_map)
 	MCFG_CPU_IO_MAP(flashgala_sub_portmap)
@@ -1378,7 +1408,7 @@ GAME( 1985, 99lstwar,  repulse,  repulse,  repulse,  0,        ROT90, "Sega (Pro
 GAME( 1985, 99lstwara, repulse,  repulse,  repulse,  0,        ROT90, "Sega (Proma license)", "'99: The Last War (alternate)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 99lstwark, repulse,  repulse,  repulse,  0,        ROT90, "Sega (Kyugo license)", "'99: The Last War (Kyugo)", GAME_SUPPORTS_SAVE )
 GAME( 1985, sonofphx,  repulse,  repulse,  repulse,  0,        ROT90, "bootleg (Associated Overseas MFR, Inc)", "Son of Phoenix", GAME_SUPPORTS_SAVE )
-GAME( 1985, flashgal,  0,        flashgal, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgal,  0,        repulse,  flashgal, 0,        ROT0,  "Sega", "Flashgal (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, flashgala, flashgal, flashgala,flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, srdmissn,  0,        srdmissn, srdmissn, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", GAME_SUPPORTS_SAVE )
 GAME( 1986, fx,        srdmissn, srdmissn, srdmissn, srdmissn, ROT90, "bootleg", "F-X", GAME_SUPPORTS_SAVE )
