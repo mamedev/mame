@@ -976,29 +976,25 @@ ADDRESS_MAP_END
 static TIMER_DEVICE_CALLBACK( namcona1_interrupt )
 {
 	namcona1_state *state = timer.machine().driver_data<namcona1_state>();
-	int level = param / 50;
-
-	if((param % 51) != 0)
-		return;
-
-	if( level==0 )
+	int scanline = param;
+	int enabled = state->m_mEnableInterrupts ? ~state->m_vreg[0x1a/2] : 0;
+	
+	// vblank
+	if (scanline == 224)
 	{
 		simulate_mcu( timer.machine() );
+		if (enabled & 8)
+			device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 	}
-	if( state->m_mEnableInterrupts )
+
+	// posirq, used with dolphin in Emeraldia's "how to play" attract mode
+	int posirq_scanline = state->m_vreg[0x8a/2] & 0xff;
+	if (scanline == posirq_scanline && enabled & 4)
 	{
-		if( (state->m_vreg[0x1a/2]&(1<<level))==0 )
-		{
-			if( level==2 )
-			{ // posirq used with dolphin in Emeraldia's "how to play" attract mode
-				int scanline = state->m_vreg[0x8a/2]&0xff;
-				if( scanline )
-				{
-					timer.machine().primary_screen->update_partial(scanline );
-				}
-			}
-			device_set_input_line(state->m_maincpu, level+1, HOLD_LINE);
-		}
+		if (posirq_scanline)
+			timer.machine().primary_screen->update_partial(posirq_scanline);
+
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
 	}
 }
 
@@ -1011,14 +1007,13 @@ static TIMER_DEVICE_CALLBACK( mcu_interrupt )
 	namcona1_state *state = timer.machine().driver_data<namcona1_state>();
 	int scanline = param;
 
-	if (scanline == 0)
-	{
+	// vblank
+	if (scanline == 224)
 		device_set_input_line(state->m_mcu, M37710_LINE_IRQ1, HOLD_LINE);
-	}
-	else if (scanline == 128)
-	{
+
+	// adc (timing guessed, when does this trigger?)
+	if (scanline == 0)
 		device_set_input_line(state->m_mcu, M37710_LINE_ADC, HOLD_LINE);
-	}
 }
 
 static const c140_interface C140_interface_typeA =
