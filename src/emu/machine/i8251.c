@@ -99,6 +99,8 @@ void i8251_device::device_config_complete()
 void i8251_device::device_start()
 {
 	// resolve callbacks
+	m_in_rxd_func.resolve(m_in_rxd_cb,*this);
+	m_out_txd_func.resolve(m_out_txd_cb,*this);
 	m_out_rxrdy_func.resolve(m_out_rxrdy_cb, *this);
 	m_out_txrdy_func.resolve(m_out_txrdy_cb, *this);
 	m_out_txempty_func.resolve(m_out_txempty_cb, *this);
@@ -141,7 +143,10 @@ void i8251_device::receive_clock()
 	{
 		//logerror("I8251\n");
 		/* get bit received from other side and update receive register */
-		receive_register_update_bit(get_in_data_bit());
+		if(m_in_rxd_func.isnull())
+			receive_register_update_bit(get_in_data_bit());
+		else
+			receive_register_update_bit(m_in_rxd_func());
 
 		if (is_receive_register_full())
 		{
@@ -184,8 +189,14 @@ void i8251_device::transmit_clock()
 		/* if transmit is not empty... transmit data */
 		if (!is_transmit_register_empty())
 		{
+			UINT8 data = transmit_register_get_data_bit();
 	//      logerror("I8251\n");
-			transmit_register_send_bit();
+			//transmit_register_send_bit();
+			m_out_txd_func(data);
+
+			m_connection_state &=~SERIAL_STATE_TX_DATA;
+			m_connection_state|=(data<<5);
+			serial_connection_out();
 		}
 	}
 
