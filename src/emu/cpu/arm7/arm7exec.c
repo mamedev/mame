@@ -63,12 +63,12 @@
 
 	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	    {
-	    	raddr = arm7_tlb_translate(cpustate, raddr, ARM7_TLB_ABORT_P);
-	    	if (cpustate->pendingAbtP != 0)
+	    	if (!arm7_tlb_translate(cpustate, &raddr, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
 	    	{
 	    		goto skip_exec;
 	    	}
 	    }
+
             insn = cpustate->direct->read_decrypted_word(raddr);
             ARM7_ICOUNT -= (3 - thumbCycles[insn >> 8]);
             switch ((insn & THUMB_INSN_TYPE) >> THUMB_INSN_TYPE_SHIFT)
@@ -1196,8 +1196,7 @@
 
 	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	    {
-	    	raddr = arm7_tlb_translate(cpustate, raddr, ARM7_TLB_ABORT_P);
-	    	if (cpustate->pendingAbtP != 0)
+	    	if (!arm7_tlb_translate(cpustate, &raddr, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
 	    	{
 	    		goto skip_exec;
 	    	}

@@ -139,7 +139,8 @@ enum
 
 #define COPRO_DOMAIN_ACCESS_CONTROL     	cpustate->domainAccessControl
 
-#define COPRO_FAULT_STATUS      	cpustate->faultStatus
+#define COPRO_FAULT_STATUS_D      	cpustate->faultStatus[0]
+#define COPRO_FAULT_STATUS_P      	cpustate->faultStatus[1]
 
 #define COPRO_FAULT_ADDRESS     	cpustate->faultAddress
 
@@ -149,7 +150,7 @@ enum
 #define ARM7COPRO_REGS \
     UINT32 control; \
     UINT32 tlbBase; \
-    UINT32 faultStatus; \
+    UINT32 faultStatus[2]; \
     UINT32 faultAddress; \
     UINT32 fcsePID; \
     UINT32 domainAccessControl;
@@ -503,16 +504,16 @@ enum
 #define MODE26					(!(GET_CPSR & 0x10))
 #define GET_PC                  (MODE32 ? R15 : R15 & 0x03FFFFFC)
 
-enum
-{
-	ARM7_TLB_NO_ABORT,
-	ARM7_TLB_ABORT_D,
-	ARM7_TLB_ABORT_P
-};
+#define ARM7_TLB_ABORT_D (1 << 0)
+#define ARM7_TLB_ABORT_P (1 << 1)
+#define ARM7_TLB_READ    (1 << 2)
+#define ARM7_TLB_WRITE   (1 << 3)
 
 /* At one point I thought these needed to be cpu implementation specific, but they don't.. */
 #define GET_REGISTER(state, reg)       GetRegister(state, reg)
 #define SET_REGISTER(state, reg, val)  SetRegister(state, reg, val)
+#define GET_MODE_REGISTER(state, mode, reg)       GetModeRegister(state, mode, reg)
+#define SET_MODE_REGISTER(state, mode, reg, val)  SetModeRegister(state, mode, reg, val)
 #define ARM7_CHECKIRQ           arm7_check_irq_state(cpustate)
 
 extern write32_device_func arm7_coproc_do_callback;

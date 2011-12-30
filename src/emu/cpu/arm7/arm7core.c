@@ -105,7 +105,7 @@ INLINE void arm7_cpu_write16(arm_state *cpustate, UINT32 addr, UINT16 data);
 INLINE void arm7_cpu_write8(arm_state *cpustate, UINT32 addr, UINT8 data);
 INLINE UINT32 arm7_cpu_read32(arm_state *cpustate, UINT32 addr);
 INLINE UINT16 arm7_cpu_read16(arm_state *cpustate, UINT32 addr);
-INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, offs_t addr);
+INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, UINT32 addr);
 
 /* Static Vars */
 // Note: for multi-cpu implementation, this approach won't work w/o modification
@@ -131,7 +131,10 @@ INLINE void arm7_cpu_write32(arm_state *cpustate, UINT32 addr, UINT32 data)
 {
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
+        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
+        {
+        	return;
+        }
     }
 
     addr &= ~3;
@@ -146,7 +149,10 @@ INLINE void arm7_cpu_write16(arm_state *cpustate, UINT32 addr, UINT16 data)
 {
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
+        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
+        {
+			return;
+        }
     }
 
     addr &= ~1;
@@ -160,7 +166,10 @@ INLINE void arm7_cpu_write8(arm_state *cpustate, UINT32 addr, UINT8 data)
 {
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
+        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE ))
+		{
+			return;
+		}
     }
 
 	if ( cpustate->endian == ENDIANNESS_BIG )
@@ -169,13 +178,16 @@ INLINE void arm7_cpu_write8(arm_state *cpustate, UINT32 addr, UINT8 data)
 		cpustate->program->write_byte(addr, data);
 }
 
-INLINE UINT32 arm7_cpu_read32(arm_state *cpustate, offs_t addr)
+INLINE UINT32 arm7_cpu_read32(arm_state *cpustate, UINT32 addr)
 {
     UINT32 result;
 
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
+        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
+        {
+        	return 0;
+        }
     }
 
     if (addr & 3)
@@ -197,13 +209,16 @@ INLINE UINT32 arm7_cpu_read32(arm_state *cpustate, offs_t addr)
     return result;
 }
 
-INLINE UINT16 arm7_cpu_read16(arm_state *cpustate, offs_t addr)
+INLINE UINT16 arm7_cpu_read16(arm_state *cpustate, UINT32 addr)
 {
     UINT16 result;
 
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
+        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
+        {
+        	return 0;
+        }
     }
 
 	if ( cpustate->endian == ENDIANNESS_BIG )
@@ -219,11 +234,14 @@ INLINE UINT16 arm7_cpu_read16(arm_state *cpustate, offs_t addr)
     return result;
 }
 
-INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, offs_t addr)
+INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, UINT32 addr)
 {
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
+        if (!arm7_tlb_translate( cpustate, &addr, ARM7_TLB_ABORT_D | ARM7_TLB_READ ))
+        {
+        	return 0;
+        }
     }
 
     // Handle through normal 8 bit handler (for 32 bit cpu)
@@ -309,6 +327,9 @@ static const char *GetModeText(int cpsr)
 // used to be functions, but no longer a need, so we'll use define for better speed.
 #define GetRegister(cpustate, rIndex)        ARM7REG(sRegisterTable[GET_MODE][rIndex])
 #define SetRegister(cpustate, rIndex, value) ARM7REG(sRegisterTable[GET_MODE][rIndex]) = value
+
+#define GetModeRegister(cpustate, mode, rIndex)        ARM7REG(sRegisterTable[mode][rIndex])
+#define SetModeRegister(cpustate, mode, rIndex, value) ARM7REG(sRegisterTable[mode][rIndex]) = value
 
 // I could prob. convert to macro, but Switchmode shouldn't occur that often in emulated code..
 INLINE void SwitchMode(arm_state *cpustate, int cpsr_mode_val)
@@ -458,7 +479,7 @@ static UINT32 decodeShift(arm_state *cpustate, UINT32 insn, UINT32 *pCarry)
 } /* decodeShift */
 
 
-static int loadInc(arm_state *cpustate, UINT32 pat, UINT32 rbv, UINT32 s)
+static int loadInc(arm_state *cpustate, UINT32 pat, UINT32 rbv, UINT32 s, int mode)
 {
     int i, result;
     UINT32 data;
@@ -469,28 +490,29 @@ static int loadInc(arm_state *cpustate, UINT32 pat, UINT32 rbv, UINT32 s)
     {
         if ((pat >> i) & 1)
         {
+            if (cpustate->pendingAbtD == 0) // "Overwriting of registers stops when the abort happens."
+            {
             data = READ32(rbv += 4);
-            if (cpustate->pendingAbtD != 0) break;
             if (i == 15) {
                 if (s) /* Pull full contents from stack */
-                    SET_REGISTER(cpustate, 15, data);
+                    SET_MODE_REGISTER(cpustate, mode, 15, data);
                 else /* Pull only address, preserve mode & status flags */
                 	if (MODE32)
-                    	SET_REGISTER(cpustate, 15, data);
+                    	SET_MODE_REGISTER(cpustate, mode, 15, data);
                     else
                     {
-                    	SET_REGISTER(cpustate, 15, (GET_REGISTER(cpustate, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+                    	SET_MODE_REGISTER(cpustate, mode, 15, (GET_MODE_REGISTER(cpustate, mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
                     }
             } else
-                SET_REGISTER(cpustate, i, data);
-
+                SET_MODE_REGISTER(cpustate, mode, i, data);
+			}
             result++;
         }
     }
     return result;
 }
 
-static int loadDec(arm_state *cpustate, UINT32 pat, UINT32 rbv, UINT32 s)
+static int loadDec(arm_state *cpustate, UINT32 pat, UINT32 rbv, UINT32 s, int mode)
 {
     int i, result;
     UINT32 data;
@@ -501,28 +523,30 @@ static int loadDec(arm_state *cpustate, UINT32 pat, UINT32 rbv, UINT32 s)
     {
         if ((pat >> i) & 1)
         {
+            if (cpustate->pendingAbtD == 0) // "Overwriting of registers stops when the abort happens."
+            {
             data = READ32(rbv -= 4);
-            if (cpustate->pendingAbtD != 0) break;
             if (i == 15) {
                 if (s) /* Pull full contents from stack */
-                    SET_REGISTER(cpustate, 15, data);
+                    SET_MODE_REGISTER(cpustate, mode, 15, data);
                 else /* Pull only address, preserve mode & status flags */
                 	if (MODE32)
-                    	SET_REGISTER(cpustate, 15, data);
+                    	SET_MODE_REGISTER(cpustate, mode, 15, data);
                     else
                     {
-                    	SET_REGISTER(cpustate, 15, (GET_REGISTER(cpustate, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+                    	SET_MODE_REGISTER(cpustate, mode, 15, (GET_MODE_REGISTER(cpustate, mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
                     }
             }
             else
-                SET_REGISTER(cpustate, i, data);
+                SET_MODE_REGISTER(cpustate, mode, i, data);
+            }
             result++;
         }
     }
     return result;
 }
 
-static int storeInc(arm_state *cpustate, UINT32 pat, UINT32 rbv)
+static int storeInc(arm_state *cpustate, UINT32 pat, UINT32 rbv, int mode)
 {
     int i, result;
 
@@ -535,14 +559,14 @@ static int storeInc(arm_state *cpustate, UINT32 pat, UINT32 rbv)
             if (i == 15) /* R15 is plus 12 from address of STM */
                 LOG(("%08x: StoreInc on R15\n", R15));
 #endif
-            WRITE32(rbv += 4, GET_REGISTER(cpustate, i));
+            WRITE32(rbv += 4, GET_MODE_REGISTER(cpustate, mode, i));
             result++;
         }
     }
     return result;
 } /* storeInc */
 
-static int storeDec(arm_state *cpustate, UINT32 pat, UINT32 rbv)
+static int storeDec(arm_state *cpustate, UINT32 pat, UINT32 rbv, int mode)
 {
     int i, result;
 
@@ -555,7 +579,7 @@ static int storeDec(arm_state *cpustate, UINT32 pat, UINT32 rbv)
             if (i == 15) /* R15 is plus 12 from address of STM */
                 LOG(("%08x: StoreDec on R15\n", R15));
 #endif
-            WRITE32(rbv -= 4, GET_REGISTER(cpustate, i));
+            WRITE32(rbv -= 4, GET_MODE_REGISTER(cpustate, mode, i));
             result++;
         }
     }
@@ -791,7 +815,10 @@ static void HandleCoProcRT(arm_state *cpustate, UINT32 insn)
         if (arm7_coproc_rt_r_callback)
         {
             UINT32 res = arm7_coproc_rt_r_callback(cpustate->device, insn, 0);   // RT Read handler must parse opcode & return appropriate result
-            SET_REGISTER(cpustate, (insn >> 12) & 0xf, res);
+            if (cpustate->pendingUnd == 0)
+           	{
+         	   SET_REGISTER(cpustate, (insn >> 12) & 0xf, res);
+        	}
         }
         else
             LOG(("%08x: Co-Processor Register Transfer executed, but no RT Read callback defined!\n", R15));
@@ -863,6 +890,8 @@ static void HandleCoProcDT(arm_state *cpustate, UINT32 insn)
         else
             LOG(("%08x: Co-Processer Data Transfer executed, but no WRITE callback defined!\n", R15));
     }
+
+	if (cpustate->pendingUnd != 0) return;
 
     // If writeback not used - ensure the original value of RN is restored in case co-proc callback changed value
     if ((insn & 0x200000) == 0)
@@ -1826,16 +1855,17 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
             // S Flag Set, but R15 not in list = User Bank Transfer
             if (insn & INSN_BDT_S && (insn & 0x8000) == 0)
             {
+            	// !! actually switching to user mode triggers a section permission fault in Happy Fish 302-in-1 (BP C0030DF4, press F5 ~16 times) !!
                 // set to user mode - then do the transfer, and set back
-                int curmode = GET_MODE;
-                SwitchMode(cpustate, eARM7_MODE_USER);
+                //int curmode = GET_MODE;
+                //SwitchMode(cpustate, eARM7_MODE_USER);
                 LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-                result = loadInc(cpustate, insn & 0xffff, rbp, insn & INSN_BDT_S);
+                result = loadInc(cpustate, insn & 0xffff, rbp, insn & INSN_BDT_S, eARM7_MODE_USER);
                 // todo - not sure if Writeback occurs on User registers also..
-                SwitchMode(cpustate, curmode);
+                //SwitchMode(cpustate, curmode);
             }
             else
-                result = loadInc(cpustate, insn & 0xffff, rbp, insn & INSN_BDT_S);
+                result = loadInc(cpustate, insn & 0xffff, rbp, insn & INSN_BDT_S, GET_MODE);
 
             if ((insn & INSN_BDT_W) && (cpustate->pendingAbtD == 0))
             {
@@ -1887,15 +1917,15 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
             if (insn & INSN_BDT_S && ((insn & 0x8000) == 0))
             {
                 // set to user mode - then do the transfer, and set back
-                int curmode = GET_MODE;
-                SwitchMode(cpustate, eARM7_MODE_USER);
+                //int curmode = GET_MODE;
+                //SwitchMode(cpustate, eARM7_MODE_USER);
                 LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-                result = loadDec(cpustate, insn & 0xffff, rbp, insn & INSN_BDT_S);
+                result = loadDec(cpustate, insn & 0xffff, rbp, insn & INSN_BDT_S, eARM7_MODE_USER);
                 // todo - not sure if Writeback occurs on User registers also..
-                SwitchMode(cpustate, curmode);
+                //SwitchMode(cpustate, curmode);
             }
             else
-                result = loadDec(cpustate, insn & 0xffff, rbp, insn & INSN_BDT_S);
+                result = loadDec(cpustate, insn & 0xffff, rbp, insn & INSN_BDT_S, GET_MODE);
 
             if ((insn & INSN_BDT_W) && (cpustate->pendingAbtD == 0))
             {
@@ -1960,15 +1990,15 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
                 // todo: needs to be tested..
 
                 // set to user mode - then do the transfer, and set back
-                int curmode = GET_MODE;
-                SwitchMode(cpustate, eARM7_MODE_USER);
+                //int curmode = GET_MODE;
+                //SwitchMode(cpustate, eARM7_MODE_USER);
                 LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-                result = storeInc(cpustate, insn & 0xffff, rbp);
+                result = storeInc(cpustate, insn & 0xffff, rbp, eARM7_MODE_USER);
                 // todo - not sure if Writeback occurs on User registers also..
-                SwitchMode(cpustate, curmode);
+                //SwitchMode(cpustate, curmode);
             }
             else
-                result = storeInc(cpustate, insn & 0xffff, rbp);
+                result = storeInc(cpustate, insn & 0xffff, rbp, GET_MODE);
 
             if ((insn & INSN_BDT_W) && (cpustate->pendingAbtD == 0))
             {
@@ -1987,15 +2017,15 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
             if (insn & INSN_BDT_S)
             {
                 // set to user mode - then do the transfer, and set back
-                int curmode = GET_MODE;
-                SwitchMode(cpustate, eARM7_MODE_USER);
+                //int curmode = GET_MODE;
+                //SwitchMode(cpustate, eARM7_MODE_USER);
                 LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-                result = storeDec(cpustate, insn & 0xffff, rbp);
+                result = storeDec(cpustate, insn & 0xffff, rbp, eARM7_MODE_USER);
                 // todo - not sure if Writeback occurs on User registers also..
-                SwitchMode(cpustate, curmode);
+                //SwitchMode(cpustate, curmode);
             }
             else
-                result = storeDec(cpustate, insn & 0xffff, rbp);
+                result = storeDec(cpustate, insn & 0xffff, rbp, GET_MODE);
 
             if ((insn & INSN_BDT_W) && (cpustate->pendingAbtD == 0))
             {
