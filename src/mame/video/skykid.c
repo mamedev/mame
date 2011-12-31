@@ -185,7 +185,7 @@ WRITE8_HANDLER( skykid_flipscreen_priority_w )
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	skykid_state *state = machine.driver_data<skykid_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x780;

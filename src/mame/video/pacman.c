@@ -217,7 +217,7 @@ SCREEN_UPDATE( pacman )
 {
 	pacman_state *state = screen.machine().driver_data<pacman_state>();
 	if (state->m_bgpriority != 0)
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 	else
 		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
@@ -228,7 +228,7 @@ SCREEN_UPDATE( pacman )
 		int offs;
 
 		rectangle spriteclip(2*8, 34*8-1, 0*8, 28*8-1);
-		spriteclip &= *cliprect;
+		spriteclip &= cliprect;
 
 		/* Draw the sprites. Note that it is important to draw them exactly in this */
 		/* order, to have the correct priorities. */
@@ -254,7 +254,7 @@ SCREEN_UPDATE( pacman )
 
 			color = ( spriteram[offs + 1] & 0x1f ) | (state->m_colortablebank << 5) | (state->m_palettebank << 6 );
 
-			drawgfx_transmask(bitmap,&spriteclip,screen.machine().gfx[1],
+			drawgfx_transmask(bitmap,spriteclip,screen.machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
 					fx,fy,
@@ -262,7 +262,7 @@ SCREEN_UPDATE( pacman )
 					colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx_transmask(bitmap,&spriteclip,screen.machine().gfx[1],
+			drawgfx_transmask(bitmap,spriteclip,screen.machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
 					fx,fy,
@@ -292,7 +292,7 @@ SCREEN_UPDATE( pacman )
 			fx = (spriteram[offs] & 1) ^ state->m_inv_spr;
 			fy = (spriteram[offs] & 2) ^ ((state->m_inv_spr) << 1);
 
-			drawgfx_transmask(bitmap,&spriteclip,screen.machine().gfx[1],
+			drawgfx_transmask(bitmap,spriteclip,screen.machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
 					fx,fy,
@@ -300,7 +300,7 @@ SCREEN_UPDATE( pacman )
 					colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx_transmask(bitmap,&spriteclip,screen.machine().gfx[1],
+			drawgfx_transmask(bitmap,spriteclip,screen.machine().gfx[1],
 					( spriteram[offs] >> 2 ) | (state->m_spritebank << 6),
 					color,
 					fy,fx,			//FIXME: flipping bits are really supposed to be inverted here?

@@ -164,7 +164,7 @@ VIDEO_START( glass )
       3  | xxxxxxxx xxxxxxxx | sprite code
 */
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	glass_state *state = machine.driver_data<glass_state>();
 	int i;
@@ -205,7 +205,7 @@ SCREEN_UPDATE( glass )
 	tilemap_set_scrollx(state->m_pant[1], 0, state->m_vregs[3]);
 
 	/* draw layers + sprites */
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	copybitmap(bitmap, state->m_screen_bitmap, 0, 0, 0x18, 0x24, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_pant[1], 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_pant[0], 0, 0);

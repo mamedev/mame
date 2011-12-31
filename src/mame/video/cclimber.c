@@ -487,7 +487,7 @@ VIDEO_START( toprollr )
 }
 
 
-static void draw_playfield(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_playfield(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
 	int i;
@@ -502,7 +502,7 @@ static void draw_playfield(running_machine &machine, bitmap_t *bitmap, const rec
 }
 
 
-static void cclimber_draw_bigsprite(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void cclimber_draw_bigsprite(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
 	UINT8 x = state->m_bigsprite_control[3] - 8;
@@ -528,7 +528,7 @@ static void cclimber_draw_bigsprite(running_machine &machine, bitmap_t *bitmap, 
 }
 
 
-static void toprollr_draw_bigsprite(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void toprollr_draw_bigsprite(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
 	UINT8 x = state->m_bigsprite_control[3] - 8;
@@ -545,7 +545,7 @@ static void toprollr_draw_bigsprite(running_machine &machine, bitmap_t *bitmap, 
 }
 
 
-static void cclimber_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx)
+static void cclimber_draw_sprites(bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx)
 {
 	cclimber_state *state = gfx->machine().driver_data<cclimber_state>();
 	int offs;
@@ -586,7 +586,7 @@ static void cclimber_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, c
 }
 
 
-static void toprollr_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx)
+static void toprollr_draw_sprites(bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx)
 {
 	cclimber_state *state = gfx->machine().driver_data<cclimber_state>();
 	int offs;
@@ -624,7 +624,7 @@ static void toprollr_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, c
 }
 
 
-static void swimmer_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx)
+static void swimmer_draw_sprites(bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx)
 {
 	cclimber_state *state = gfx->machine().driver_data<cclimber_state>();
 	int offs;
@@ -665,7 +665,7 @@ static void swimmer_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, co
 SCREEN_UPDATE( cclimber )
 {
 	cclimber_state *state = screen.machine().driver_data<cclimber_state>();
-	bitmap->fill(CCLIMBER_BG_PEN, *cliprect);
+	bitmap->fill(CCLIMBER_BG_PEN, cliprect);
 	draw_playfield(screen.machine(), bitmap, cliprect);
 
 	/* draw the "big sprite" under the regular sprites */
@@ -733,10 +733,10 @@ SCREEN_UPDATE( swimmer )
 			rectangle split_rect_left(0, 0xff - SWIMMER_BG_SPLIT, 0, 0xff);
 			rectangle split_rect_right(0x100 - SWIMMER_BG_SPLIT, 0xff, 0, 0xff);
 
-			split_rect_left &= *cliprect;
+			split_rect_left &= cliprect;
 			bitmap->fill(SWIMMER_SIDE_BG_PEN, split_rect_left);
 
-			split_rect_right &= *cliprect;
+			split_rect_right &= cliprect;
 			bitmap->fill(CCLIMBER_BG_PEN, split_rect_right);
 		}
 		else
@@ -744,15 +744,15 @@ SCREEN_UPDATE( swimmer )
 			rectangle split_rect_left(0, SWIMMER_BG_SPLIT - 1, 0, 0xff);
 			rectangle split_rect_right(SWIMMER_BG_SPLIT, 0xff, 0, 0xff);
 
-			split_rect_left &= *cliprect;
+			split_rect_left &= cliprect;
 			bitmap->fill(CCLIMBER_BG_PEN, split_rect_left);
 
-			split_rect_right &= *cliprect;
+			split_rect_right &= cliprect;
 			bitmap->fill(SWIMMER_SIDE_BG_PEN, split_rect_right);
 		}
 	}
 	else
-		bitmap->fill(CCLIMBER_BG_PEN, *cliprect);
+		bitmap->fill(CCLIMBER_BG_PEN, cliprect);
 
 	draw_playfield(screen.machine(), bitmap, cliprect);
 
@@ -777,30 +777,30 @@ SCREEN_UPDATE( swimmer )
 SCREEN_UPDATE( toprollr )
 {
 	cclimber_state *state = screen.machine().driver_data<cclimber_state>();
-	rectangle scroll_area_clip = *cliprect;
+	rectangle scroll_area_clip = cliprect;
 	scroll_area_clip.min_x = 4*8;
 	scroll_area_clip.max_x = 29*8-1;
 
-	bitmap->fill(CCLIMBER_BG_PEN, *cliprect);
+	bitmap->fill(CCLIMBER_BG_PEN, cliprect);
 
 	tilemap_set_scrollx(state->m_toproller_bg_tilemap, 0, state->m_toprollr_bg_videoram[0]);
 	tilemap_set_flip(state->m_toproller_bg_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
 										   (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
 	tilemap_mark_all_tiles_dirty(state->m_toproller_bg_tilemap);
-	tilemap_draw(bitmap, &scroll_area_clip, state->m_toproller_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, scroll_area_clip, state->m_toproller_bg_tilemap, 0, 0);
 
 	/* draw the "big sprite" over the regular sprites */
 	if ((state->m_bigsprite_control[1] & 0x20))
 	{
-		toprollr_draw_sprites(bitmap, &scroll_area_clip, screen.machine().gfx[1]);
-		toprollr_draw_bigsprite(screen.machine(), bitmap, &scroll_area_clip);
+		toprollr_draw_sprites(bitmap, scroll_area_clip, screen.machine().gfx[1]);
+		toprollr_draw_bigsprite(screen.machine(), bitmap, scroll_area_clip);
 	}
 
 	/* draw the "big sprite" under the regular sprites */
 	else
 	{
-		toprollr_draw_bigsprite(screen.machine(), bitmap, &scroll_area_clip);
-		toprollr_draw_sprites(bitmap, &scroll_area_clip, screen.machine().gfx[1]);
+		toprollr_draw_bigsprite(screen.machine(), bitmap, scroll_area_clip);
+		toprollr_draw_sprites(bitmap, scroll_area_clip, screen.machine().gfx[1]);
 	}
 
 	tilemap_mark_all_tiles_dirty(state->m_pf_tilemap);

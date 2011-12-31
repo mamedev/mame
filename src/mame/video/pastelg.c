@@ -316,7 +316,7 @@ SCREEN_UPDATE( pastelg )
 				bitmap->pix16(y, x) = state->m_videoram[(y * width) + x];
 	}
 	else
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 	return 0;
 }

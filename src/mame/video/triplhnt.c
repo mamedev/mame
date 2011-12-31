@@ -32,7 +32,7 @@ static TIMER_CALLBACK( triplhnt_hit_callback )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
 {
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
 	int i;
@@ -78,14 +78,14 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 			2 * code + state->m_sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y);
 
-		if (rect.min_x < cliprect->min_x)
-			rect.min_x = cliprect->min_x;
-		if (rect.min_y < cliprect->min_y)
-			rect.min_y = cliprect->min_y;
-		if (rect.max_x > cliprect->max_x)
-			rect.max_x = cliprect->max_x;
-		if (rect.max_y > cliprect->max_y)
-			rect.max_y = cliprect->max_y;
+		if (rect.min_x < cliprect.min_x)
+			rect.min_x = cliprect.min_x;
+		if (rect.min_y < cliprect.min_y)
+			rect.min_y = cliprect.min_y;
+		if (rect.max_x > cliprect.max_x)
+			rect.max_x = cliprect.max_x;
+		if (rect.max_y > cliprect.max_y)
+			rect.max_y = cliprect.max_y;
 
 		/* check for collisions and copy sprite */
 

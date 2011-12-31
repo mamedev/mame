@@ -358,7 +358,7 @@ static TILE_GET_INFO_DEVICE( get_pf1_tile_info_b )
 static void custom_tilemap_draw(
 	device_t *device,
 	bitmap_t *bitmap,
-	const rectangle *cliprect,
+	const rectangle &cliprect,
 	tilemap_t *tilemap0_8x8,
 	tilemap_t *tilemap0_16x16,
 	tilemap_t *tilemap1_8x8,
@@ -393,8 +393,8 @@ static void custom_tilemap_draw(
 	if (!BIT(control0, 7))
 		return;
 
-	int starty = cliprect->min_y;
-	int endy = cliprect->max_y+1;
+	int starty = cliprect.min_y;
+	int endy = cliprect.max_y+1;
 
 	width_mask = src_bitmap0->width() - 1;
 	height_mask = src_bitmap0->height() - 1;
@@ -862,7 +862,7 @@ void deco16ic_print_debug_info(device_t *device, bitmap_t *bitmap)
 
 /*****************************************************************************************/
 
-void deco16ic_tilemap_1_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
+void deco16ic_tilemap_1_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int flags, UINT32 priority )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -879,7 +879,7 @@ void deco16ic_tilemap_1_draw( device_t *device, bitmap_t *bitmap, const rectangl
 	}
 }
 
-void deco16ic_tilemap_2_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_2_draw(device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -900,7 +900,7 @@ void deco16ic_tilemap_2_draw(device_t *device, bitmap_t *bitmap, const rectangle
 /*****************************************************************************************/
 
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
-void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority, int is_tattoo)
+void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	custom_tilemap_draw(device, bitmap, cliprect, 0, deco16ic->pf1_tilemap_16x16, 0, deco16ic->pf2_tilemap_16x16, deco16ic->pf1_rowscroll_ptr, deco16ic->pf12_control[1], deco16ic->pf12_control[2], deco16ic->pf12_control[5] & 0xff, deco16ic->pf12_control[6] & 0xff, 0xf, 4, 0xff, flags, priority, is_tattoo);

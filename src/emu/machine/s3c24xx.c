@@ -806,7 +806,7 @@ static void bitmap_blend( bitmap_t *bitmap_dst, bitmap_t *bitmap_src_1, bitmap_t
 		}
 }
 
-static UINT32 s3c24xx_video_update( device_t *device, screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
+static UINT32 s3c24xx_video_update( device_t *device, screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->lcd.regs.lcdcon1 & (1 << 0))

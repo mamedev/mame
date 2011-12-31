@@ -32,7 +32,7 @@
 ***************************************************************************/
 
 /* callback for special processing */
-typedef int (*atarimo_special_func)(bitmap_t *bitmap, const rectangle *clip, int code, int color, int xpos, int ypos, rectangle *mobounds);
+typedef int (*atarimo_special_func)(bitmap_t *bitmap, const rectangle &clip, int code, int color, int xpos, int ypos, rectangle *mobounds);
 
 /* description for a four-word mask */
 typedef struct _atarimo_entry atarimo_entry;
@@ -100,7 +100,7 @@ UINT8 *atarimo_get_color_lookup(int map, int *size);
 UINT8 *atarimo_get_gfx_lookup(int map, int *size);
 
 /* core processing */
-bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *rectlist);
+bitmap_t *atarimo_render(int map, const rectangle &cliprect, atarimo_rect_list *rectlist);
 
 /* atrribute setters */
 void atarimo_set_bank(int map, int bank);

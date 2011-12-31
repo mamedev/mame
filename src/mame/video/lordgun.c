@@ -243,7 +243,7 @@ void lordgun_update_gun(running_machine &machine, int i)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	lordgun_state *state = machine.driver_data<lordgun_state>();
 	UINT16 *s		=	state->m_spriteram;
@@ -346,7 +346,7 @@ SCREEN_UPDATE( lordgun )
 
 	if (state->m_whitescreen)
 	{
-		bitmap->fill(get_white_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_white_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -376,7 +376,7 @@ SCREEN_UPDATE( lordgun )
 
 	int l;
 	for (l = 0; l < 5; l++)
-		state->m_bitmaps[l]->fill(trans_pen, *cliprect);
+		state->m_bitmaps[l]->fill(trans_pen, cliprect);
 
 	if (layers_ctrl & 1)	tilemap_draw(state->m_bitmaps[0], cliprect, state->m_tilemap[0], 0, 0);
 	if (layers_ctrl & 2)	tilemap_draw(state->m_bitmaps[1], cliprect, state->m_tilemap[1], 0, 0);
@@ -391,9 +391,9 @@ SCREEN_UPDATE( lordgun )
 	// layer index (0-3, 4 for sprites) -> priority address bit
 	const int layer2bit[5] = {0,1,2,4,3};
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT16 pens[5];
 

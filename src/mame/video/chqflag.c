@@ -75,7 +75,7 @@ SCREEN_UPDATE( chqflag )
 {
 	chqflag_state *state = screen.machine().driver_data<chqflag_state>();
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	k051316_zoom_draw(state->m_k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, 0);

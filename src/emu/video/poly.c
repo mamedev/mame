@@ -468,7 +468,7 @@ void *poly_get_extra_data(poly_manager *poly)
     triangle given 3 vertexes
 -------------------------------------------------*/
 
-UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle *cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3)
+UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3)
 {
 	float dxdy_v1v2, dxdy_v1v3, dxdy_v2v3;
 	const poly_vertex *tv;
@@ -507,11 +507,8 @@ UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle *cli
 	/* clip coordinates */
 	v1yclip = v1y;
 	v3yclip = v3y + ((poly->flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	if (cliprect != NULL)
-	{
-		v1yclip = MAX(v1yclip, cliprect->min_y);
-		v3yclip = MIN(v3yclip, cliprect->max_y + 1);
-	}
+	v1yclip = MAX(v1yclip, cliprect.min_y);
+	v3yclip = MIN(v3yclip, cliprect.max_y + 1);
 	if (v3yclip - v1yclip <= 0)
 		return 0;
 
@@ -585,13 +582,10 @@ UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle *cli
 				istopx++;
 
 			/* apply left/right clipping */
-			if (cliprect != NULL)
-			{
-				if (istartx < cliprect->min_x)
-					istartx = cliprect->min_x;
-				if (istopx > cliprect->max_x)
-					istopx = cliprect->max_x + 1;
-			}
+			if (istartx < cliprect.min_x)
+				istartx = cliprect.min_x;
+			if (istopx > cliprect.max_x)
+				istopx = cliprect.max_x + 1;
 
 			/* set the extent and update the total pixel count */
 			if (istartx >= istopx)
@@ -657,7 +651,7 @@ UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle *cli
     triangles in a fan
 -------------------------------------------------*/
 
-UINT32 poly_render_triangle_fan(poly_manager *poly, void *dest, const rectangle *cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
+UINT32 poly_render_triangle_fan(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
 {
 	UINT32 pixels = 0;
 	int vertnum;
@@ -674,7 +668,7 @@ UINT32 poly_render_triangle_fan(poly_manager *poly, void *dest, const rectangle 
     render of an object, given specific extents
 -------------------------------------------------*/
 
-UINT32 poly_render_triangle_custom(poly_manager *poly, void *dest, const rectangle *cliprect, poly_draw_scanline_func callback, int startscanline, int numscanlines, const poly_extent *extents)
+UINT32 poly_render_triangle_custom(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int startscanline, int numscanlines, const poly_extent *extents)
 {
 	INT32 curscan, scaninc;
 	polygon_info *polygon;
@@ -683,16 +677,8 @@ UINT32 poly_render_triangle_custom(poly_manager *poly, void *dest, const rectang
 	UINT32 startunit;
 
 	/* clip coordinates */
-	if (cliprect != NULL)
-	{
-		v1yclip = MAX(startscanline, cliprect->min_y);
-		v3yclip = MIN(startscanline + numscanlines, cliprect->max_y + 1);
-	}
-	else
-	{
-		v1yclip = startscanline;
-		v3yclip = startscanline + numscanlines;
-	}
+	v1yclip = MAX(startscanline, cliprect.min_y);
+	v3yclip = MIN(startscanline + numscanlines, cliprect.max_y + 1);
 	if (v3yclip - v1yclip <= 0)
 		return 0;
 
@@ -741,13 +727,10 @@ UINT32 poly_render_triangle_custom(poly_manager *poly, void *dest, const rectang
 			}
 
 			/* apply left/right clipping */
-			if (cliprect != NULL)
-			{
-				if (istartx < cliprect->min_x)
-					istartx = cliprect->min_x;
-				if (istopx > cliprect->max_x)
-					istopx = cliprect->max_x + 1;
-			}
+			if (istartx < cliprect.min_x)
+				istartx = cliprect.min_x;
+			if (istopx > cliprect.max_x)
+				istopx = cliprect.max_x + 1;
 
 			/* set the extent and update the total pixel count */
 			unit->extent[extnum].startx = istartx;
@@ -781,7 +764,7 @@ UINT32 poly_render_triangle_custom(poly_manager *poly, void *dest, const rectang
     given 4 vertexes
 -------------------------------------------------*/
 
-UINT32 poly_render_quad(poly_manager *poly, void *dest, const rectangle *cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3, const poly_vertex *v4)
+UINT32 poly_render_quad(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3, const poly_vertex *v4)
 {
 	poly_edge fedgelist[3], bedgelist[3];
 	const poly_edge *ledge, *redge;
@@ -824,11 +807,8 @@ UINT32 poly_render_quad(poly_manager *poly, void *dest, const rectangle *cliprec
 	/* clip coordinates */
 	minyclip = miny;
 	maxyclip = maxy + ((poly->flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	if (cliprect != NULL)
-	{
-		minyclip = MAX(minyclip, cliprect->min_y);
-		maxyclip = MIN(maxyclip, cliprect->max_y + 1);
-	}
+	minyclip = MAX(minyclip, cliprect.min_y);
+	maxyclip = MIN(maxyclip, cliprect.max_y + 1);
 	if (maxyclip - minyclip <= 0)
 		return 0;
 
@@ -967,17 +947,14 @@ UINT32 poly_render_quad(poly_manager *poly, void *dest, const rectangle *cliprec
 				istopx++;
 
 			/* apply left/right clipping */
-			if (cliprect != NULL)
+			if (istartx < cliprect.min_x)
 			{
-				if (istartx < cliprect->min_x)
-				{
-					for (paramnum = 0; paramnum < paramcount; paramnum++)
-						unit->extent[extnum].param[paramnum].start += (cliprect->min_x - istartx) * unit->extent[extnum].param[paramnum].dpdx;
-					istartx = cliprect->min_x;
-				}
-				if (istopx > cliprect->max_x)
-					istopx = cliprect->max_x + 1;
+				for (paramnum = 0; paramnum < paramcount; paramnum++)
+					unit->extent[extnum].param[paramnum].start += (cliprect.min_x - istartx) * unit->extent[extnum].param[paramnum].dpdx;
+				istartx = cliprect.min_x;
 			}
+			if (istopx > cliprect.max_x)
+				istopx = cliprect.max_x + 1;
 
 			/* set the extent and update the total pixel count */
 			if (istartx >= istopx)
@@ -1007,7 +984,7 @@ UINT32 poly_render_quad(poly_manager *poly, void *dest, const rectangle *cliprec
     quads in a fan
 -------------------------------------------------*/
 
-UINT32 poly_render_quad_fan(poly_manager *poly, void *dest, const rectangle *cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
+UINT32 poly_render_quad_fan(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
 {
 	UINT32 pixels = 0;
 	int vertnum;
@@ -1029,7 +1006,7 @@ UINT32 poly_render_quad_fan(poly_manager *poly, void *dest, const rectangle *cli
     to 32 vertices
 -------------------------------------------------*/
 
-UINT32 poly_render_polygon(poly_manager *poly, void *dest, const rectangle *cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
+UINT32 poly_render_polygon(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
 {
 	poly_edge fedgelist[MAX_POLYGON_VERTS - 1], bedgelist[MAX_POLYGON_VERTS - 1];
 	const poly_edge *ledge, *redge;
@@ -1062,11 +1039,8 @@ UINT32 poly_render_polygon(poly_manager *poly, void *dest, const rectangle *clip
 	/* clip coordinates */
 	minyclip = miny;
 	maxyclip = maxy + ((poly->flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	if (cliprect != NULL)
-	{
-		minyclip = MAX(minyclip, cliprect->min_y);
-		maxyclip = MIN(maxyclip, cliprect->max_y + 1);
-	}
+	minyclip = MAX(minyclip, cliprect.min_y);
+	maxyclip = MIN(maxyclip, cliprect.max_y + 1);
 	if (maxyclip - minyclip <= 0)
 		return 0;
 
@@ -1205,17 +1179,14 @@ UINT32 poly_render_polygon(poly_manager *poly, void *dest, const rectangle *clip
 				istopx++;
 
 			/* apply left/right clipping */
-			if (cliprect != NULL)
+			if (istartx < cliprect.min_x)
 			{
-				if (istartx < cliprect->min_x)
-				{
-					for (paramnum = 0; paramnum < paramcount; paramnum++)
-						unit->extent[extnum].param[paramnum].start += (cliprect->min_x - istartx) * unit->extent[extnum].param[paramnum].dpdx;
-					istartx = cliprect->min_x;
-				}
-				if (istopx > cliprect->max_x)
-					istopx = cliprect->max_x + 1;
+				for (paramnum = 0; paramnum < paramcount; paramnum++)
+					unit->extent[extnum].param[paramnum].start += (cliprect.min_x - istartx) * unit->extent[extnum].param[paramnum].dpdx;
+				istartx = cliprect.min_x;
 			}
+			if (istopx > cliprect.max_x)
+				istopx = cliprect.max_x + 1;
 
 			/* set the extent and update the total pixel count */
 			if (istartx >= istopx)

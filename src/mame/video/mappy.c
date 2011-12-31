@@ -399,7 +399,7 @@ WRITE8_HANDLER( mappy_scroll_w )
 
 ***************************************************************************/
 
-static void mappy_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram_base)
+static void mappy_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
@@ -479,7 +479,7 @@ spriteram_3
 1   -------x  X position MSB
 */
 
-static void phozon_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram_base)
+static void phozon_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
@@ -545,7 +545,7 @@ SCREEN_UPDATE( superpac )
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	sprite_bitmap->fill(15, *cliprect);
+	sprite_bitmap->fill(15, cliprect);
 	mappy_draw_sprites(screen.machine(),sprite_bitmap,cliprect,state->m_spriteram);
 	copybitmap_trans(bitmap,sprite_bitmap,0,0,0,0,cliprect,15);
 

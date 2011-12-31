@@ -158,8 +158,8 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap->fill(0, *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (layers_ctrl & 0x1)
 	{

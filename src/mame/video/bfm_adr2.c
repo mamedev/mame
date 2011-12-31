@@ -218,8 +218,8 @@ SCREEN_UPDATE( adder2 )
 {
 	const rectangle visible1(0, 400-1,  0,  280-1);  //minx,maxx, miny,maxy
 
-	if (adder2_screen_page_reg & SL_DISPLAY) tilemap_draw(bitmap, &visible1, tilemap1, 0, 0);
-	else                                     tilemap_draw(bitmap, &visible1, tilemap0, 0, 0);
+	if (adder2_screen_page_reg & SL_DISPLAY) tilemap_draw(bitmap, visible1, tilemap1, 0, 0);
+	else                                     tilemap_draw(bitmap, visible1, tilemap0, 0, 0);
 
 	return 0;
 }

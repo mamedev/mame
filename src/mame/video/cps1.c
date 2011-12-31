@@ -2298,7 +2298,7 @@ static void cps1_find_last_sprite( running_machine &machine )    /* Find the off
 }
 
 
-static void cps1_render_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void cps1_render_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 
@@ -2541,7 +2541,7 @@ static void cps2_find_last_sprite( running_machine &machine )    /* Find the off
 	state->m_cps2_last_sprite_offset = state->m_cps2_obj_size / 2 - 4;
 }
 
-static void cps2_render_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int *primasks )
+static void cps2_render_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int *primasks )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 
@@ -2690,7 +2690,7 @@ static void cps2_render_sprites( running_machine &machine, bitmap_t *bitmap, con
 
 
 
-static void cps1_render_stars( screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect )
+static void cps1_render_stars( screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	cps_state *state = screen.machine().driver_data<cps_state>();
 	int offs;
@@ -2723,8 +2723,8 @@ static void cps1_render_stars( screen_device &screen, bitmap_t *bitmap, const re
 
 				col = ((col & 0xe0) >> 1) + (screen.frame_number() / 16 & 0x0f);
 
-				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
-					sy >= cliprect->min_y && sy <= cliprect->max_y)
+				if (sx >= cliprect.min_x && sx <= cliprect.max_x &&
+					sy >= cliprect.min_y && sy <= cliprect.max_y)
 					bitmap->pix16(sy, sx) = 0xa00 + col;
 			}
 		}
@@ -2749,8 +2749,8 @@ static void cps1_render_stars( screen_device &screen, bitmap_t *bitmap, const re
 
 				col = ((col & 0xe0) >> 1) + (screen.frame_number() / 16 & 0x0f);
 
-				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
-					sy >= cliprect->min_y && sy <= cliprect->max_y)
+				if (sx >= cliprect.min_x && sx <= cliprect.max_x &&
+					sy >= cliprect.min_y && sy <= cliprect.max_y)
 					bitmap->pix16(sy, sx) = 0x800 + col;
 			}
 		}
@@ -2758,7 +2758,7 @@ static void cps1_render_stars( screen_device &screen, bitmap_t *bitmap, const re
 }
 
 
-static void cps1_render_layer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int primask )
+static void cps1_render_layer( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int layer, int primask )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	switch (layer)
@@ -2774,7 +2774,7 @@ static void cps1_render_layer( running_machine &machine, bitmap_t *bitmap, const
 	}
 }
 
-static void cps1_render_high_layer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
+static void cps1_render_high_layer( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int layer )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	switch (layer)
@@ -2851,7 +2851,7 @@ SCREEN_UPDATE( cps1 )
 	{
 		// CPS1 games use pen 0xbff as background color; this is used in 3wonders,
 		// mtwins (explosion during attract), mercs (intermission).
-		bitmap->fill(0xbff, *cliprect);
+		bitmap->fill(0xbff, cliprect);
 	}
 	else
 	{
@@ -2860,7 +2860,7 @@ SCREEN_UPDATE( cps1 )
 		// Maybe Capcom changed the background handling due to the problems that
 		// it caused on several monitors (because the background extended into the
 		// blanking area instead of going black, causing the monitor to clip).
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	}
 
 	cps1_render_stars(screen, bitmap, cliprect);
@@ -2870,7 +2870,7 @@ SCREEN_UPDATE( cps1 )
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (state->m_cps_version == 1)
 	{

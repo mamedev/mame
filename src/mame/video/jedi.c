@@ -88,15 +88,15 @@ static void get_pens(jedi_state *state, pen_t *pens)
 }
 
 
-static void do_pen_lookup(jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void do_pen_lookup(jedi_state *state, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS];
 
 	get_pens(state, pens);
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		for(x = cliprect->min_x; x <= cliprect->max_x; x++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for(x = cliprect.min_x; x <= cliprect.max_x; x++)
 			bitmap->pix32(y, x) = pens[bitmap->pix32(y, x)];
 }
 
@@ -132,7 +132,7 @@ WRITE8_HANDLER( jedi_hscroll_w )
  *
  *************************************/
 
-static void draw_background_and_text(running_machine &machine, jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background_and_text(running_machine &machine, jedi_state *state, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	int y;
 	int background_line_buffer[0x200];	/* RAM chip at 2A */
@@ -149,12 +149,12 @@ static void draw_background_and_text(running_machine &machine, jedi_state *state
 
 	memset(background_line_buffer, 0, 0x200 * sizeof(int));
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int x;
 		int bg_last_col = 0;
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			int tx_col1, tx_col2, bg_col;
 			int bg_tempcol;
@@ -232,7 +232,7 @@ static void draw_background_and_text(running_machine &machine, jedi_state *state
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 	UINT8 *spriteram = state->m_spriteram;
@@ -276,7 +276,7 @@ static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_t *
 			int i;
 			UINT16 x = spriteram[offs + 0x100] + ((spriteram[offs + 0x40] & 0x01) << 8) - 2;
 
-			if ((y < cliprect->min_y) || (y > cliprect->max_y))
+			if ((y < cliprect.min_y) || (y > cliprect.max_y))
 				continue;
 
 			if (flip_x)
@@ -333,7 +333,7 @@ static SCREEN_UPDATE( jedi )
 
 	/* if no video, clear it all to black */
 	if (*state->m_video_off & 0x01)
-		bitmap->fill(RGB_BLACK, *cliprect);
+		bitmap->fill(RGB_BLACK, cliprect);
 	else
 	{
 		/* draw the background/text layers, followed by the sprites

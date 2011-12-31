@@ -104,7 +104,7 @@ VIDEO_START( wrally )
     in the range 0x8-0xf are used.
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
 {
 	wrally_state *state = machine.driver_data<wrally_state>();
 	int i, px, py;
@@ -144,7 +144,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 				int gfx_py = yflip ? (gfx->height - 1 - py) : py;
 
-				if ((ypos < cliprect->min_y) || (ypos > cliprect->max_y)) continue;
+				if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y)) continue;
 
 				for (px = 0; px < gfx->width; px++){
 					/* get current pixel */
@@ -160,7 +160,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 					/* pens 8..15 are used to select a palette */
 					if ((gfx_pen < 8) || (gfx_pen >= 16)) continue;
 
-					if ((xpos < cliprect->min_x) || (xpos > cliprect->max_x)) continue;
+					if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x)) continue;
 
 					/* modify the color of the tile */
 					*pixel = src_color + (gfx_pen-8)*1024;

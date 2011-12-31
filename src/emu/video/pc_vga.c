@@ -103,7 +103,7 @@ SCREEN_UPDATE( pc_video )
 			if ((pc_current_width > 100) && (pc_current_height > 100))
 				screen.set_visible_area(0, pc_current_width-1, 0, pc_current_height-1);
 
-			bitmap->fill(0, *cliprect);
+			bitmap->fill(0, cliprect);
 		}
 
 		video_update(bitmap);

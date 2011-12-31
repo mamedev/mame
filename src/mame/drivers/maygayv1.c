@@ -297,12 +297,12 @@ static SCREEN_UPDATE( maygayv1 )
 	/* If screen output is disabled, fill with black */
 	if (!(VREG(VCR0) & VCR0_DEN))
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
 	/* For every scanline... */
-	for (sl = cliprect->min_x; sl <= cliprect->max_y; ++sl)
+	for (sl = cliprect.min_x; sl <= cliprect.max_y; ++sl)
 	{
 		int obj;
 		UINT16 aflags = atable[sl];
@@ -399,7 +399,7 @@ static SCREEN_UPDATE( maygayv1 )
 		}
 
 		// Write it out
-		for (sx = cliprect->min_x; sx < cliprect->max_x; sx += 2)
+		for (sx = cliprect.min_x; sx < cliprect.max_x; sx += 2)
 		{
 			UINT8 pix = i82716.line_buf[sx / 2];
 

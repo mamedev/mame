@@ -219,7 +219,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap)
 ***************************************************************************/
 
 
-void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram_base)
+void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;

@@ -66,14 +66,14 @@ SCREEN_UPDATE( videopin )
 				rect.max_x = x + 15;
 				rect.max_y = y + 15;
 
-				if (rect.min_x < cliprect->min_x)
-					rect.min_x = cliprect->min_x;
-				if (rect.min_y < cliprect->min_y)
-					rect.min_y = cliprect->min_y;
-				if (rect.max_x > cliprect->max_x)
-					rect.max_x = cliprect->max_x;
-				if (rect.max_y > cliprect->max_y)
-					rect.max_y = cliprect->max_y;
+				if (rect.min_x < cliprect.min_x)
+					rect.min_x = cliprect.min_x;
+				if (rect.min_y < cliprect.min_y)
+					rect.min_y = cliprect.min_y;
+				if (rect.max_x > cliprect.max_x)
+					rect.max_x = cliprect.max_x;
+				if (rect.max_y > cliprect.max_y)
+					rect.max_y = cliprect.max_y;
 
 				x -= state->m_ball_x;
 				y -= state->m_ball_y;
@@ -84,7 +84,7 @@ SCREEN_UPDATE( videopin )
 				{
 					for (j = 0; j < 2; j++)
 					{
-						drawgfx_transpen(bitmap, &rect, screen.machine().gfx[1],
+						drawgfx_transpen(bitmap, rect, screen.machine().gfx[1],
 							0, 0,
 							0, 0,
 							x + 16 * i,

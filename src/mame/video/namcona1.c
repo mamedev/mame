@@ -312,7 +312,7 @@ VIDEO_START( namcona1 )
 
 static void pdraw_tile(running_machine &machine,
 		bitmap_t *dest_bmp,
-		const rectangle *clip,
+		const rectangle &clip,
 		UINT32 code,
 		int color,
 		int sx, int sy,
@@ -364,31 +364,28 @@ static void pdraw_tile(running_machine &machine,
 			y_index = 0;
 		}
 
-		if( clip )
-		{
-			if( sx < clip->min_x)
-			{ /* clip left */
-				int pixels = clip->min_x-sx;
-				sx += pixels;
-				x_index_base += pixels*dx;
-			}
-			if( sy < clip->min_y )
-			{ /* clip top */
-				int pixels = clip->min_y-sy;
-				sy += pixels;
-				y_index += pixels*dy;
-			}
-			/* NS 980211 - fixed incorrect clipping */
-			if( ex > clip->max_x+1 )
-			{ /* clip right */
-				int pixels = ex-clip->max_x-1;
-				ex -= pixels;
-			}
-			if( ey > clip->max_y+1 )
-			{ /* clip bottom */
-				int pixels = ey-clip->max_y-1;
-				ey -= pixels;
-			}
+		if( sx < clip.min_x)
+		{ /* clip left */
+			int pixels = clip.min_x-sx;
+			sx += pixels;
+			x_index_base += pixels*dx;
+		}
+		if( sy < clip.min_y )
+		{ /* clip top */
+			int pixels = clip.min_y-sy;
+			sy += pixels;
+			y_index += pixels*dy;
+		}
+		/* NS 980211 - fixed incorrect clipping */
+		if( ex > clip.max_x+1 )
+		{ /* clip right */
+			int pixels = ex-clip.max_x-1;
+			ex -= pixels;
+		}
+		if( ey > clip.max_y+1 )
+		{ /* clip bottom */
+			int pixels = ey-clip.max_y-1;
+			ey -= pixels;
 		}
 
 		if( ex>sx )
@@ -456,7 +453,7 @@ static void pdraw_tile(running_machine &machine,
 	}
 } /* pdraw_tile */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	int which;
@@ -553,7 +550,7 @@ static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const 
 	} /* next x */
 } /* draw_pixel_line */
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int which, int primask )
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int which, int primask )
 {
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	UINT16 *videoram = state->m_videoram;
@@ -576,8 +573,8 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	paldata = &machine.pens[pGfx->color_base + pGfx->color_granularity * state->m_tilemap_palette_bank[which]];
 
 	/* draw one scanline at a time */
-	clip.min_x = cliprect->min_x;
-	clip.max_x = cliprect->max_x;
+	clip.min_x = cliprect.min_x;
+	clip.max_x = cliprect.max_x;
 	scrollx = 0;
 	scrolly = 0;
 	for( line=0; line<256; line++ )
@@ -597,7 +594,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 			scrolly = (ydata - line)&0x1ff;
 		}
 
-		if (line >= cliprect->min_y && line <= cliprect->max_y)
+		if (line >= cliprect.min_y && line <= cliprect.max_y)
 		{
 			if( xdata == 0xc001 )
 			{
@@ -624,14 +621,14 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 					int dy = -8; /* vertical adjust */
 					UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
 					UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
-					tilemap_draw_roz_primask(bitmap, &clip, state->m_roz_tilemap,
+					tilemap_draw_roz_primask(bitmap, clip, state->m_roz_tilemap,
 						startx, starty, incxx, incxy, incyx, incyy, 0, 0, primask, 0);
 				}
 				else
 				{
 					tilemap_set_scrollx( state->m_bg_tilemap[which], 0, scrollx );
 					tilemap_set_scrolly( state->m_bg_tilemap[which], 0, scrolly );
-					tilemap_draw_primask( bitmap, &clip, state->m_bg_tilemap[which], 0, primask, 0 );
+					tilemap_draw_primask( bitmap, clip, state->m_bg_tilemap[which], 0, primask, 0 );
 				}
 			}
 		}
@@ -677,9 +674,9 @@ SCREEN_UPDATE( namcona1 )
 			}
 		}
 
-		screen.machine().priority_bitmap->fill(0, *cliprect );
+		screen.machine().priority_bitmap->fill(0, cliprect );
 
-		bitmap->fill(0xff, *cliprect ); /* background color? */
+		bitmap->fill(0xff, cliprect ); /* background color? */
 
 		for( priority = 0; priority<8; priority++ )
 		{

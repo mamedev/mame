@@ -30,10 +30,10 @@ SCREEN_UPDATE( asuka )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);
@@ -56,10 +56,10 @@ SCREEN_UPDATE( bonzeadv )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);

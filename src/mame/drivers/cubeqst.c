@@ -104,10 +104,10 @@ static SCREEN_UPDATE( cubeqst )
     */
 
 	/* Bit 3 selects LD/#GRAPHICS */
-	bitmap->fill(state->m_colormap[255], *cliprect);
+	bitmap->fill(state->m_colormap[255], cliprect);
 
 	/* TODO: Add 1 for linebuffering? */
-	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
+	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		int i;
 		int num_entries = cubeqcpu_get_ptr_ram_val(screen.machine().device("line_cpu"), y);

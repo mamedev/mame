@@ -243,7 +243,7 @@ SCREEN_UPDATE( eprom )
 
 	if (state->m_video_disable)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -398,7 +398,7 @@ SCREEN_UPDATE( guts )
 
 	if (state->m_video_disable)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 

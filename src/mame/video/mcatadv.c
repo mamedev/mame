@@ -53,7 +53,7 @@ WRITE16_HANDLER( mcatadv_videoram2_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	mcatadv_state *state = machine.driver_data<mcatadv_state>();
 	UINT16 *source = state->m_spriteram_old;
@@ -121,7 +121,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 			{
 				drawypos = y + ycnt - global_y;
 
-				if ((drawypos >= cliprect->min_y) && (drawypos <= cliprect->max_y))
+				if ((drawypos >= cliprect.min_y) && (drawypos <= cliprect.max_y))
 				{
 					destline = &bitmap->pix16(drawypos);
 					priline = &machine.priority_bitmap->pix8(drawypos);
@@ -140,7 +140,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 								pix = pix >> 4;
 							pix &= 0x0f;
 
-							if ((drawxpos >= cliprect->min_x) && (drawxpos <= cliprect->max_x) && pix)
+							if ((drawxpos >= cliprect.min_x) && (drawxpos <= cliprect.max_x) && pix)
 								destline[drawxpos] = (pix + (pen << 4));
 						}
 						offset++;
@@ -156,16 +156,16 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_t *bitmap, const rectangle *cliprect )
+static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	int flip;
 	UINT32 drawline;
 	rectangle clip;
 
-	clip.min_x = cliprect->min_x;
-	clip.max_x = cliprect->max_x;
+	clip.min_x = cliprect.min_x;
+	clip.max_x = cliprect.max_x;
 
-	for (drawline = cliprect->min_y; drawline <= cliprect->max_y; drawline++)
+	for (drawline = cliprect.min_y; drawline <= cliprect.max_y; drawline++)
 	{
 		int scrollx, scrolly;
 
@@ -196,7 +196,7 @@ static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_v
 		tilemap_set_scrolly(current_tilemap, 0, scrolly);
 		tilemap_set_flip(current_tilemap, flip);
 
-		tilemap_draw(bitmap, &clip, current_tilemap, i, i);
+		tilemap_draw(bitmap, clip, current_tilemap, i, i);
 	}
 }
 
@@ -205,8 +205,8 @@ SCREEN_UPDATE( mcatadv )
 	mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
 	int i;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (state->m_scroll1[2] != state->m_palette_bank1)
 	{

@@ -317,7 +317,7 @@ void psxgpu_device::DebugCheckKeys( void )
 #endif
 }
 
-int psxgpu_device::DebugMeshDisplay( bitmap_t *bitmap, const rectangle *cliprect )
+int psxgpu_device::DebugMeshDisplay( bitmap_t *bitmap, const rectangle &cliprect )
 {
 	if( m_debug.mesh )
 	{
@@ -600,7 +600,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	machine().save().register_postload( save_prepost_delegate( FUNC( psxgpu_device::updatevisiblearea ), this ) );
 }
 
-void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
+void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	UINT32 n_x;
 	UINT32 n_y;
@@ -628,7 +628,7 @@ void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	if( ( n_gpustatus & ( 1 << 0x17 ) ) != 0 )
 	{
 		/* todo: only draw to necessary area */
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 	}
 	else
 	{

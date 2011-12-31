@@ -146,7 +146,7 @@ WRITE16_HANDLER( tail2nos_gfxbank_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	tail2nos_state *state = machine.driver_data<tail2nos_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -188,7 +188,7 @@ SCREEN_UPDATE( tail2nos )
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	}
 	else
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 	return 0;
 }

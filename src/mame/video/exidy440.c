@@ -302,7 +302,7 @@ static TIMER_CALLBACK( collide_firq_callback )
  *
  *************************************/
 
-static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect,
+static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect,
 						 int scroll_offset, int check_collision)
 {
 	exidy440_state *state = screen.machine().driver_data<exidy440_state>();
@@ -324,7 +324,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 		UINT8 *src;
 
 		/* skip if out of range */
-		if (yoffs < cliprect->min_y || yoffs >= cliprect->max_y + 16)
+		if (yoffs < cliprect.min_y || yoffs >= cliprect.max_y + 16)
 			continue;
 
 		/* get a pointer to the source image */
@@ -345,11 +345,11 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 				sy += (VBSTART - VBEND);
 
 			/* stop if we get before the current scanline */
-			if (yoffs < cliprect->min_y)
+			if (yoffs < cliprect.min_y)
 				break;
 
 			/* only draw scanlines that are in this cliprect */
-			if (yoffs <= cliprect->max_y)
+			if (yoffs <= cliprect.max_y)
 			{
 				UINT8 *old = &state->m_local_videoram[sy * 512 + xoffs];
 				int currx = xoffs;
@@ -403,15 +403,15 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
  *
  *************************************/
 
-static void update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect,
+static void update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect,
 						  int scroll_offset, int check_collision)
 {
 	exidy440_state *state = screen.machine().driver_data<exidy440_state>();
 	int y, sy;
 
 	/* draw any dirty scanlines from the VRAM directly */
-	sy = scroll_offset + cliprect->min_y;
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++, sy++)
+	sy = scroll_offset + cliprect.min_y;
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++, sy++)
 	{
 		/* wrap at the bottom of the screen */
 		if (sy >= VBSTART)
@@ -439,7 +439,7 @@ static SCREEN_UPDATE( exidy440 )
 	update_screen(screen, bitmap, cliprect, 0, TRUE);
 
 	/* generate an interrupt once/frame for the beam */
-	if (cliprect->max_y == screen.visible_area().max_y)
+	if (cliprect.max_y == screen.visible_area().max_y)
 	{
 		int i;
 

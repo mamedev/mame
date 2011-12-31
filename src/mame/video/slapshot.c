@@ -34,7 +34,7 @@ VIDEO_START( slapshot )
             SPRITE DRAW ROUTINES
 ************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int *primasks, int y_offset )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int *primasks, int y_offset )
 {
 	/*
         Sprite format:
@@ -519,8 +519,8 @@ SCREEN_UPDATE( slapshot )
 	spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
 	spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(0, cliprect);
 
 #ifdef MAME_DEBUG
 	if (state->m_dislayer[layer[0]] == 0)

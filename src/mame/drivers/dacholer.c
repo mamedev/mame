@@ -104,7 +104,7 @@ static WRITE8_HANDLER( bg_scroll_y_w )
 	state->m_scroll_y = data;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	dacholer_state *state = machine.driver_data<dacholer_state>();
 	int offs, code, attr, sx, sy, flipx, flipy;

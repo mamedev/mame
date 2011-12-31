@@ -72,7 +72,7 @@ VIDEO_START( bigevglf )
 	state->save_pointer(NAME(state->m_vidram), 0x100 * 0x100 * 4);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 	int i, j;

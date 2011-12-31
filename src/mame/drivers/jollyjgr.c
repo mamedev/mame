@@ -488,7 +488,7 @@ static SCREEN_UPDATE( jollyjgr )
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	bitmap->fill(32, *cliprect);
+	bitmap->fill(32, cliprect);
 
 	if(state->m_pri) //used in Frog & Spiders level 3
 	{
@@ -559,9 +559,9 @@ static SCREEN_UPDATE( fspider )
 		if (state->m_flip_y) sy^=0xff;
 		if (state->m_flip_x) sx+=8;
 
-		if (sy>=cliprect->min_y && sy<=cliprect->max_y)
+		if (sy>=cliprect.min_y && sy<=cliprect.max_y)
 			for (int x=sx-4;x<sx;x++)
-				if (x>=cliprect->min_x && x<=cliprect->max_x)
+				if (x>=cliprect.min_x && x<=cliprect.max_x)
 					bitmap->pix16(sy, x)=bc;
 	}
 

@@ -291,7 +291,7 @@ static SCREEN_UPDATE( trvmadns )
 	int x,y,count;
 	const gfx_element *gfx = screen.machine().gfx[0];
 
-	bitmap->fill(0xd, *cliprect);
+	bitmap->fill(0xd, cliprect);
 
 	count = 0;
 

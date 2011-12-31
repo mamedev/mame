@@ -251,7 +251,7 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
 //  update_screen -
 //-------------------------------------------------
 
-void cdp1861_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1861_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	if (m_disp)
 	{
@@ -259,6 +259,6 @@ void cdp1861_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap->fill(get_black_pen(machine()), *cliprect);
+		bitmap->fill(get_black_pen(machine()), cliprect);
 	}
 }

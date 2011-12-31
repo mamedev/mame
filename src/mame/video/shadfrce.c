@@ -113,7 +113,7 @@ WRITE16_HANDLER ( shadfrce_bg1scrolly_w )
 
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 
 	/* | ---- ---- hhhf Fe-Y | ---- ---- yyyy yyyy | ---- ---- TTTT TTTT | ---- ---- tttt tttt |
@@ -165,7 +165,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( shadfrce )
 {
 	shadfrce_state *state = screen.machine().driver_data<shadfrce_state>();
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (state->m_video_enable)
 	{
@@ -176,7 +176,7 @@ SCREEN_UPDATE( shadfrce )
 	}
 	else
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	}
 
 	return 0;

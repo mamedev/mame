@@ -393,7 +393,7 @@ WRITE8_HANDLER( combatsc_scrollram_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
 {
 	combatsc_state *state = machine.driver_data<combatsc_state>();
 	device_t *k007121 = circuit ? state->m_k007121_2 : state->m_k007121_1;
@@ -437,7 +437,7 @@ SCREEN_UPDATE( combatsc )
 	tilemap_set_scrolly(state->m_bg_tilemap[0], 0, k007121_ctrlram_r(state->m_k007121_1, 2));
 	tilemap_set_scrolly(state->m_bg_tilemap[1], 0, k007121_ctrlram_r(state->m_k007121_2, 2));
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (state->m_priority == 0)
 	{
@@ -476,11 +476,11 @@ SCREEN_UPDATE( combatsc )
 	{
 		rectangle clip;
 
-		clip = *cliprect;
+		clip = cliprect;
 		clip.max_x = clip.min_x + 7;
 		bitmap->fill(0, clip);
 
-		clip = *cliprect;
+		clip = cliprect;
 		clip.min_x = clip.max_x - 7;
 		bitmap->fill(0, clip);
 	}
@@ -515,7 +515,7 @@ byte #4:
 
 ***************************************************************************/
 
-static void bootleg_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
+static void bootleg_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, const UINT8 *source, int circuit )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	const gfx_element *gfx = machine.gfx[circuit + 2];

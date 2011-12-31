@@ -325,7 +325,7 @@ static SCREEN_UPDATE(cb2001)
 {
 	cb2001_state *state = screen.machine().driver_data<cb2001_state>();
 	int count,x,y;
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	count = 0x0000;
 
@@ -388,9 +388,9 @@ static SCREEN_UPDATE(cb2001)
 			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
-			tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
-			tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
-			tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible1, state->m_reel1_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible2, state->m_reel2_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible3, state->m_reel3_tilemap, 0, 0);
 		}
 	}
 

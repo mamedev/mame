@@ -195,7 +195,7 @@ static void draw_scanline32_transpen(bitmap_t *bitmap, INT32 destx, INT32 desty,
     a single transparent pen, storing the alpha value
     in alpha field of ARGB32, negative alpha implies alphatable
 -------------------------------------------------*/
-static void drawgfx_alphastore(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+static void drawgfx_alphastore(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
@@ -242,7 +242,7 @@ static void drawgfx_alphastore(bitmap_t *dest, const rectangle *cliprect, const 
     a fixed alpha value, or if alpha==-1 then uses
     the per-pen alphatable[] array
  -------------------------------------------------*/
-static void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+static void drawgfx_alphatable(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
@@ -281,7 +281,7 @@ static void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const 
 
 /* 'Normal' layers, no line/columnscroll. No per-line effects.
 Zooming isn't supported just because it's not used and it would be slow */
-static void draw_bglayer( running_machine &machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_bglayer( running_machine &machine, int layer, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	gfx_element *gfx;
@@ -375,7 +375,7 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 			int need_alpha = alpha < 0 ? -1 : 0xff; // store per-pen alpha in bitmap, otherwise don't since we'll need it per-line
 
 			if(tileno) { // valid tile, but blank in all games?
-				drawgfx_alphastore(state->m_bg_bitmap, NULL, gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
+				drawgfx_alphastore(state->m_bg_bitmap, state->m_bg_bitmap->cliprect(), gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
 			}
 
 			offs++;
@@ -389,7 +389,7 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 Bitmap is first rendered to an ARGB image, taking into account the per-pen alpha (if used).
 From there we extract data as we compose the image, one scanline at a time, blending the ARGB pixels
 into the RGB32 bitmap (with either the alpha information from the ARGB, or per-line alpha */
-static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	assert(BG_LINE(layer));
@@ -404,8 +404,8 @@ static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t *b
 	int last_bank[32]; // corresponds to bank of bitmap in state->m_bg_bitmap. bg_bitmap is split into 16/32-rows of one-tile high each
 	for(int ii = 0; ii < 32; ii++) last_bank[ii] = -1;
 
-	int scr_width = (cliprect->max_x-cliprect->min_x + 1);
-	int scr_height = (cliprect->max_y-cliprect->min_y + 1);
+	int scr_width = (cliprect.max_x-cliprect.min_x + 1);
+	int scr_height = (cliprect.max_y-cliprect.min_y + 1);
 	UINT32 *scroll_reg = &state->m_bgram[(linebank * 0x800) / 4 - 0x4000 / 4];
 	UINT32 *pzab_reg   = &state->m_bgram[(linebank * 0x800) / 4 - 0x4000 / 4 + 0x400 / 4]; // pri, zoom, alpha, bank
 
@@ -484,7 +484,7 @@ static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t *b
 }
 
 /* 3 BG layers, with priority */
-static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	int i;
@@ -532,7 +532,7 @@ static void draw_background( running_machine &machine, bitmap_t *bitmap, const r
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
 static void psikyosh_drawgfxzoom( running_machine &machine,
-		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+		bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 		int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z)
 {
@@ -550,16 +550,8 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 	assert(dest_bmp->bpp() == 32);
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	if (clip)
-	{
-		myclip.min_x = clip->min_x;
-		myclip.max_x = clip->max_x;
-		myclip.min_y = clip->min_y;
-		myclip.max_y = clip->max_y;
-		
-		myclip &= dest_bmp->cliprect();
-		clip = &myclip;
-	}
+	myclip = clip;
+	myclip &= dest_bmp->cliprect();
 
 	/* Temporary fallback for non-zoomed, needs z-buffer. Note that this is probably a lot slower than drawgfx.c, especially if there was separate code for flipped cases */
 	if (zoomx == 0x400 && zoomy == 0x400)
@@ -598,31 +590,28 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 					ex = sx + gfx->width;
 					ey = sy + gfx->height;
 
-					if (clip)
-					{
-						if (sx < clip->min_x)
-						{ /* clip left */
-							int pixels = clip->min_x - sx;
-							sx += pixels;
-							x_index_base += xinc * pixels;
-						}
-						if (sy < clip->min_y)
-						{ /* clip top */
-							int pixels = clip->min_y - sy;
-							sy += pixels;
-							y_index += yinc * pixels;
-						}
-						/* NS 980211 - fixed incorrect clipping */
-						if (ex > clip->max_x + 1)
-						{ /* clip right */
-							int pixels = ex - clip->max_x - 1;
-							ex -= pixels;
-						}
-						if (ey > clip->max_y + 1)
-						{ /* clip bottom */
-							int pixels = ey - clip->max_y - 1;
-							ey -= pixels;
-						}
+					if (sx < myclip.min_x)
+					{ /* clip left */
+						int pixels = myclip.min_x - sx;
+						sx += pixels;
+						x_index_base += xinc * pixels;
+					}
+					if (sy < myclip.min_y)
+					{ /* clip top */
+						int pixels = myclip.min_y - sy;
+						sy += pixels;
+						y_index += yinc * pixels;
+					}
+					/* NS 980211 - fixed incorrect clipping */
+					if (ex > myclip.max_x + 1)
+					{ /* clip right */
+						int pixels = ex - myclip.max_x - 1;
+						ex -= pixels;
+					}
+					if (ey > myclip.max_y + 1)
+					{ /* clip bottom */
+						int pixels = ey - myclip.max_y - 1;
+						ey -= pixels;
 					}
 
 					if (ex > sx)
@@ -871,31 +860,28 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 				if (flipy)	{ y_index = (sprite_screen_height - 1) * zoomy; dy = -zoomy; }
 				else		{ y_index = 0; dy = zoomy; }
 
-				if (clip)
-				{
-					if (sx < clip->min_x)
-					{ /* clip left */
-						int pixels = clip->min_x - sx;
-						sx += pixels;
-						x_index_base += pixels * dx;
-					}
-					if (sy < clip->min_y)
-					{ /* clip top */
-						int pixels = clip->min_y - sy;
-						sy += pixels;
-						y_index += pixels * dy;
-					}
-					/* NS 980211 - fixed incorrect clipping */
-					if (ex > clip->max_x + 1)
-					{ /* clip right */
-						int pixels = ex-clip->max_x - 1;
-						ex -= pixels;
-					}
-					if (ey > clip->max_y + 1)
-					{ /* clip bottom */
-						int pixels = ey-clip->max_y - 1;
-						ey -= pixels;
-					}
+				if (sx < myclip.min_x)
+				{ /* clip left */
+					int pixels = myclip.min_x - sx;
+					sx += pixels;
+					x_index_base += pixels * dx;
+				}
+				if (sy < myclip.min_y)
+				{ /* clip top */
+					int pixels = myclip.min_y - sy;
+					sy += pixels;
+					y_index += pixels * dy;
+				}
+				/* NS 980211 - fixed incorrect clipping */
+				if (ex > myclip.max_x + 1)
+				{ /* clip right */
+					int pixels = ex-myclip.max_x - 1;
+					ex -= pixels;
+				}
+				if (ey > myclip.max_y + 1)
+				{ /* clip bottom */
+					int pixels = ey-myclip.max_y - 1;
+					ey -= pixels;
 				}
 
 				if (ex > sx)
@@ -1068,7 +1054,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri)
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
@@ -1188,7 +1174,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 }
 
 
-static void psikyosh_prelineblend( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void psikyosh_prelineblend( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	/* There are 224 values for pre-lineblending. Using one for every row currently */
 	/* I suspect that it should be blended against black by the amount specified as
@@ -1203,19 +1189,19 @@ static void psikyosh_prelineblend( running_machine &machine, bitmap_t *bitmap, c
 	assert(bitmap->bpp() == 32);
 
 	g_profiler.start(PROFILER_USER8);
-	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
+	for (y = cliprect.min_y; y <= cliprect.max_y; y += 1) {
 
 		dstline = &bitmap->pix32(y);
 
 		/* linefill[y] & 0xff does what? */
-		for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x += 1)
 			dstline[x] = linefill[y] >> 8;
 	}
 	g_profiler.stop();
 }
 
 
-static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	/* There are 224 values for post-lineblending. Using one for every row currently */
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
@@ -1231,18 +1217,18 @@ static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, 
 	}
 
 	g_profiler.start(PROFILER_USER8);
-	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
+	for (y = cliprect.min_y; y <= cliprect.max_y; y += 1) {
 
 		dstline = &bitmap->pix32(y);
 
 		if (lineblend[y] & 0x80) /* solid */
 		{
-			for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x += 1)
 				dstline[x] = lineblend[y] >> 8;
 		}
 		else if (lineblend[y] & 0x7f) /* blended */
 		{
-			for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x += 1)
 				dstline[x] = alpha_blend_r32(dstline[x], lineblend[y] >> 8, 2 * (lineblend[y] & 0x7f));
 		}
 	}
@@ -1321,7 +1307,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
     state->m_vidregs[6], state->m_vidregs[7]);
 #endif
 
-	state->m_z_bitmap->fill(0, *cliprect); /* z-buffer */
+	state->m_z_bitmap->fill(0, cliprect); /* z-buffer */
 
 	psikyosh_prelineblend(screen.machine(), bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)

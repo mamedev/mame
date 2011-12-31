@@ -110,7 +110,7 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 			0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int pri_mask)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority, int pri_mask)
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
 	UINT16 *spriteram16 = state->m_spriteram;

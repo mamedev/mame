@@ -137,7 +137,7 @@ WRITE16_HANDLER( dynduke_control_w )
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int pri)
 {
 	dynduke_state *state = machine.driver_data<dynduke_state>();
 	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
@@ -175,7 +175,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 	dynduke_state *state = machine.driver_data<dynduke_state>();
 	/* The transparency / palette handling on the background layer is very strange */
@@ -186,7 +186,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	/* if we're disabled, don't draw */
 	if (!state->m_back_enable)
 	{
-		bitmap->fill(get_black_pen(machine), *cliprect);
+		bitmap->fill(get_black_pen(machine), cliprect);
 		return;
 	}
 

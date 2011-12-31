@@ -97,7 +97,7 @@ static SCREEN_UPDATE( lgp )
 	palette_set_color(screen.machine(), 0, MAKE_ARGB(0,0,0,0));
 
 	/* clear */
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	/* Draw tiles */
 	for (charx = 0; charx < 32; charx++)

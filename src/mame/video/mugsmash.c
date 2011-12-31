@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/mugsmash.h"
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 
 	/* Each Sprite takes 16 bytes, 5 used? */

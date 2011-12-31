@@ -159,8 +159,8 @@ static SCREEN_UPDATE( astinvad )
 	int x, y;
 
 	/* render the visible pixels */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		for (x = cliprect->min_x & ~7; x <= cliprect->max_x; x += 8)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
 		{
 			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (state->m_screen_flip ? 0 : 4);
 			UINT8 data = state->m_videoram[(((y ^ state->m_screen_flip) + yoffs) << 5) | ((x ^ state->m_screen_flip) >> 3)];

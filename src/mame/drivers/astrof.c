@@ -376,7 +376,7 @@ static WRITE8_HANDLER( tomahawk_video_control_2_w )
 }
 
 
-static void video_update_common( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, pen_t *pens )
+static void video_update_common( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, pen_t *pens )
 {
 	astrof_state *state = machine.driver_data<astrof_state>();
 	offs_t offs;
@@ -397,7 +397,7 @@ static void video_update_common( running_machine &machine, bitmap_t *bitmap, con
 		if (!state->m_flipscreen)
 			y = ~y;
 
-		if ((y <= cliprect->min_y) || (y >= cliprect->max_y))
+		if ((y <= cliprect.min_y) || (y >= cliprect.max_y))
 			continue;
 
 		if (state->m_screen_off)

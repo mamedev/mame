@@ -469,7 +469,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap)
 				y = 256 - y;
 			}
 
-			drawgfx_transpen(bitmap,&clip,gfx,code,color,fx,fy,x,y,0);
+			drawgfx_transpen(bitmap,clip,gfx,code,color,fx,fy,x,y,0);
 		}
 	}
 }
@@ -523,7 +523,7 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_t *bitmap)
 				y = 256 - y;
 			}
 
-			drawgfx_transpen(bitmap,&clip,gfx,code,color,fx,fy,x,y,0);
+			drawgfx_transpen(bitmap,clip,gfx,code,color,fx,fy,x,y,0);
 		}
 	}
 }
@@ -531,14 +531,14 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_t *bitmap)
 
 static SCREEN_UPDATE( common )
 {
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 	draw_sprites(screen, bitmap);
 	return 0;
 }
 
 static SCREEN_UPDATE( aoh )
 {
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 	draw_sprites_aoh(screen, bitmap);
 	return 0;
 }

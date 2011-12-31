@@ -84,15 +84,15 @@ WRITE8_HANDLER( sprint2_video_ram_w )
 }
 
 
-static UINT8 collision_check(sprint2_state *state, colortable_t *colortable, rectangle* rect)
+static UINT8 collision_check(sprint2_state *state, colortable_t *colortable, rectangle& rect)
 {
 	UINT8 data = 0;
 
 	int x;
 	int y;
 
-	for (y = rect->min_y; y <= rect->max_y; y++)
-		for (x = rect->min_x; x <= rect->max_x; x++)
+	for (y = rect.min_y; y <= rect.max_y; y++)
+		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
 			UINT16 a = colortable_entry_get_value(colortable, state->m_helper->pix16(y, x));
 
@@ -180,23 +180,23 @@ SCREEN_EOF( sprint2 )
 
 		/* check for sprite-tilemap collisions */
 
-		tilemap_draw(state->m_helper, &rect, state->m_bg_tilemap, 0, 0);
+		tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
 
-		drawgfx_transpen(state->m_helper, &rect, screen.machine().gfx[1],
+		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,
 			get_sprite_x(video_ram, i),
 			get_sprite_y(video_ram, i), 1);
 
-		state->m_collision[i] |= collision_check(state, screen.machine().colortable, &rect);
+		state->m_collision[i] |= collision_check(state, screen.machine().colortable, rect);
 
 		/* check for sprite-sprite collisions */
 
 		for (j = 0; j < 4; j++)
 			if (j != i)
 			{
-				drawgfx_transpen(state->m_helper, &rect, screen.machine().gfx[1],
+				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
 					get_sprite_code(video_ram, j),
 					1,
 					0, 0,
@@ -204,13 +204,13 @@ SCREEN_EOF( sprint2 )
 					get_sprite_y(video_ram, j), 0);
 			}
 
-		drawgfx_transpen(state->m_helper, &rect, screen.machine().gfx[1],
+		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,
 			get_sprite_x(video_ram, i),
 			get_sprite_y(video_ram, i), 1);
 
-		state->m_collision[i] |= collision_check(state, screen.machine().colortable, &rect);
+		state->m_collision[i] |= collision_check(state, screen.machine().colortable, rect);
 	}
 }

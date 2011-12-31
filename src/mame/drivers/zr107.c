@@ -207,7 +207,7 @@ static SCREEN_UPDATE( jetwave )
 	zr107_state *state = screen.machine().driver_data<zr107_state>();
 	device_t *k001604 = screen.machine().device("k001604");
 
-	bitmap->fill(screen.machine().pens[0], *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
 
 	K001005_draw(bitmap, cliprect);
 
@@ -259,7 +259,7 @@ static SCREEN_UPDATE( zr107 )
 {
 	zr107_state *state = screen.machine().driver_data<zr107_state>();
 	device_t *k056832 = screen.machine().device("k056832");
-	bitmap->fill(screen.machine().pens[0], *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
 	K001005_draw(bitmap, cliprect);

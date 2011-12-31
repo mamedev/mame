@@ -206,7 +206,7 @@ WRITE8_HANDLER( zaccaria_flip_screen_y_w )
 offsets 1 and 2 are swapped if accessed from spriteram2
 
 */
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,UINT8 *spriteram,int color,int section)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section)
 {
 	int offs,o1 = 1,o2 = 2;
 

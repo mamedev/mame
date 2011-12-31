@@ -346,7 +346,7 @@ static const UINT8 ylookup[16] =
 	  2, 2, 3, 3,
 	  2, 2, 3, 3 };
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int y_offs )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -518,7 +518,7 @@ INLINE void bryan2_drawscanline( bitmap_t *bitmap, int x, int y, int length,
 
 
 
-static void wgp_piv_layer_draw( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
+static void wgp_piv_layer_draw( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
 	bitmap_t *srcbitmap = tilemap_get_pixmap(state->m_piv_tilemap[layer]);
@@ -538,9 +538,9 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_t *bitmap, cons
 	int flipscreen = 0;	/* n/a */
 	int machine_flip = 0;	/* for  ROT 180 ? */
 
-	UINT16 screen_width = cliprect->max_x - cliprect->min_x + 1;
-	UINT16 min_y = cliprect->min_y;
-	UINT16 max_y = cliprect->max_y;
+	UINT16 screen_width = cliprect.max_x - cliprect.min_x + 1;
+	UINT16 min_y = cliprect.min_y;
+	UINT16 max_y = cliprect.max_y;
 
 	int width_mask = 0x3ff;
 
@@ -683,7 +683,7 @@ SCREEN_UPDATE( wgp )
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	layer[0] = 0;
 	layer[1] = 1;

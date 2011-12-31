@@ -89,16 +89,16 @@ void K053936GP_clip_enable(int chip, int status) { K053936_clip_enabled[chip] = 
 
 void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy)
 {
-	rectangle *cliprect = &K053936_cliprect[chip];
-	cliprect->min_x = minx;
-	cliprect->max_x = maxx;
-	cliprect->min_y = miny;
-	cliprect->max_y = maxy;
+	rectangle &cliprect = K053936_cliprect[chip];
+	cliprect.min_x = minx;
+	cliprect.max_x = maxx;
+	cliprect.min_y = miny;
+	cliprect.max_y = maxy;
 }
 
 INLINE void K053936GP_copyroz32clip( running_machine &machine,
 		bitmap_t *dst_bitmap, bitmap_t *src_bitmap,
-		const rectangle *dst_cliprect, const rectangle *src_cliprect,
+		const rectangle &dst_cliprect, const rectangle &src_cliprect,
 		UINT32 _startx,UINT32 _starty,int _incxx,int _incxy,int _incyx,int _incyy,
 		int tilebpp, int blend, int alpha, int clip, int pixeldouble_output )
 {
@@ -123,27 +123,24 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 	incxy = _incxy; incxx = _incxx; incyy = _incyy; incyx = _incyx;
 	starty = _starty; startx = _startx;
 
-	if (src_cliprect && clip) // set source clip range to some extreme values when disabled
+	if (clip) // set source clip range to some extreme values when disabled
 	{
-		src_minx = src_cliprect->min_x;
-		src_maxx = src_cliprect->max_x;
-		src_miny = src_cliprect->min_y;
-		src_maxy = src_cliprect->max_y;
+		src_minx = src_cliprect.min_x;
+		src_maxx = src_cliprect.max_x;
+		src_miny = src_cliprect.min_y;
+		src_maxy = src_cliprect.max_y;
 	}
 	// this simply isn't safe to do!
 	else { src_minx = src_miny = -0x10000; src_maxx = src_maxy = 0x10000; }
 
-	if (dst_cliprect) // set target clip range
-	{
-		sx = dst_cliprect->min_x;
-		tx = dst_cliprect->max_x - sx + 1;
-		sy = dst_cliprect->min_y;
-		ty = dst_cliprect->max_y - sy + 1;
+	// set target clip range
+	sx = dst_cliprect.min_x;
+	tx = dst_cliprect.max_x - sx + 1;
+	sy = dst_cliprect.min_y;
+	ty = dst_cliprect.max_y - sy + 1;
 
-		startx += sx * incxx + sy * incyx;
-		starty += sx * incxy + sy * incyy;
-	}
-	else { sx = sy = 0; tx = dst_bitmap->width(); ty = dst_bitmap->height(); }
+	startx += sx * incxx + sy * incyx;
+	starty += sx * incxy + sy * incyy;
 
 	// adjust entry points and other loop constants
 	dst_pitch = dst_bitmap->rowpixels();
@@ -283,11 +280,10 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 // adapted from generic K053936_zoom_draw()
 static void K053936GP_zoom_draw(running_machine &machine,
 		int chip, UINT16 *ctrl, UINT16 *linectrl,
-		bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap,
+		bitmap_t *bitmap, const rectangle &cliprect, tilemap_t *tmap,
 		int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	bitmap_t *src_bitmap;
-	rectangle *src_cliprect;
 	UINT16 *lineaddr;
 
 	rectangle my_clip;
@@ -295,15 +291,15 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	int incxx, incxy, incyx, incyy, y, maxy, clip;
 
 	src_bitmap = tilemap_get_pixmap(tmap);
-	src_cliprect = &K053936_cliprect[chip];
+	rectangle &src_cliprect = K053936_cliprect[chip];
 	clip = K053936_clip_enabled[chip];
 
 	if (ctrl[0x07] & 0x0040)    /* "super" mode */
 	{
-		my_clip.min_x = cliprect->min_x;
-		my_clip.max_x = cliprect->max_x;
-		y = cliprect->min_y;
-		maxy = cliprect->max_y;
+		my_clip.min_x = cliprect.min_x;
+		my_clip.max_x = cliprect.max_x;
+		y = cliprect.min_y;
+		maxy = cliprect.max_y;
 
 		while (y <= maxy)
 		{
@@ -322,7 +318,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 			starty -= K053936_offset[chip][0] * incxy;
 
 			K053936GP_copyroz32clip(machine,
-					bitmap, src_bitmap, &my_clip, src_cliprect,
+					bitmap, src_bitmap, my_clip, src_cliprect,
 					startx<<5, starty<<5, incxx<<5, incxy<<5, 0, 0,
 					tilebpp, blend, alpha, clip, pixeldouble_output);
 			y++;
@@ -353,13 +349,13 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	}
 }
 
-static void K053936GP_0_zoom_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,
+static void K053936GP_0_zoom_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
 		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	K053936GP_zoom_draw(machine, 0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
 }
 
-static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,
+static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
 		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
@@ -385,7 +381,7 @@ static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_t *bitmap, co
 
 
 INLINE void zdrawgfxzoom32GP(
-		bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx,
+		bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri)
 {
@@ -455,10 +451,10 @@ INLINE void zdrawgfxzoom32GP(
 
 	dst_ptr   = &bitmap->pix32(0);
 	dst_pitch = bitmap->rowpixels();
-	dst_minx  = cliprect->min_x;
-	dst_maxx  = cliprect->max_x;
-	dst_miny  = cliprect->min_y;
-	dst_maxy  = cliprect->max_y;
+	dst_minx  = cliprect.min_x;
+	dst_maxx  = cliprect.max_x;
+	dst_miny  = cliprect.min_y;
+	dst_maxy  = cliprect.max_y;
 	dst_x     = sx;
 	dst_y     = sy;
 
@@ -1163,7 +1159,7 @@ void konamigx_objdma(void)
 	if (gx_objdma && gx_spriteram && K053247_ram) memcpy(gx_spriteram, K053247_ram, 0x1000);
 }
 
-void konamigx_mixer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,
+void konamigx_mixer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_t *extra_bitmap, int rushingheroes_hack)
@@ -2436,8 +2432,8 @@ SCREEN_UPDATE(konamigx)
 	// Type-1
 	if (gx_specialrozenable == 1)
 	{
-		K053936_0_zoom_draw(gxtype1_roz_dstbitmap, &gxtype1_roz_dstbitmapclip,gx_psac_tilemap, 0,0,0); // height data
-		K053936_0_zoom_draw(gxtype1_roz_dstbitmap2,&gxtype1_roz_dstbitmapclip,gx_psac_tilemap2,0,0,0); // colour data (+ some voxel height data?)
+		K053936_0_zoom_draw(gxtype1_roz_dstbitmap, gxtype1_roz_dstbitmapclip,gx_psac_tilemap, 0,0,0); // height data
+		K053936_0_zoom_draw(gxtype1_roz_dstbitmap2,gxtype1_roz_dstbitmapclip,gx_psac_tilemap2,0,0,0); // colour data (+ some voxel height data?)
 	}
 
 
@@ -2452,13 +2448,13 @@ SCREEN_UPDATE(konamigx)
 	{
 		// we're going to throw half of this away anyway in post-process, so only render what's needed
 		rectangle temprect;
-		temprect.min_x = cliprect->min_x;
-		temprect.max_x = cliprect->min_x+320;
-		temprect.min_y = cliprect->min_y;
-		temprect.max_y = cliprect->max_y;
+		temprect.min_x = cliprect.min_x;
+		temprect.max_x = cliprect.min_x+320;
+		temprect.min_y = cliprect.min_y;
+		temprect.max_y = cliprect.max_y;
 
-		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
-		else K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
+		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(type3_roz_temp_bitmap, temprect,gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
+		else K053936_0_zoom_draw(type3_roz_temp_bitmap, temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
 
 
 		konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);

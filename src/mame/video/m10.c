@@ -145,7 +145,7 @@ SCREEN_UPDATE( m10 )
 	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
 	int i;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	for (i = 0; i < 4; i++)
 		if (state->m_flip)

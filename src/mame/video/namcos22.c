@@ -726,7 +726,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 		}
 	}
 
-	poly_render_triangle_fan(state->m_poly, bitmap, &mClip.scissor, renderscanline_uvi_full, 4, clipverts, clipv);
+	poly_render_triangle_fan(state->m_poly, bitmap, mClip.scissor, renderscanline_uvi_full, 4, clipverts, clipv);
 }
 
 static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
@@ -843,7 +843,7 @@ poly3d_DrawSprite(
 			rgb_comp_to_rgbint(&extra->fogColor, mixer.rFogColor, mixer.gFogColor, mixer.bFogColor);
 		}
 
-		poly_render_triangle_fan(state->m_poly, dest_bmp, &mClip.scissor, renderscanline_sprite, 2, 4, vert);
+		poly_render_triangle_fan(state->m_poly, dest_bmp, mClip.scissor, renderscanline_sprite, 2, 4, vert);
 	}
 } /* poly3d_DrawSprite */
 
@@ -1507,7 +1507,7 @@ static void
 DrawSpritesHelper(
 	running_machine &machine,
 	bitmap_t *bitmap,
-	const rectangle *cliprect,
+	const rectangle &cliprect,
 	UINT32 *pBase,
 	const UINT32 *pSource,
 	const UINT32 *pPal,
@@ -1641,7 +1641,7 @@ DrawSpritesHelper(
 } /* DrawSpritesHelper */
 
 static void
-DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -1957,7 +1957,7 @@ WRITE32_HANDLER( namcos22s_spotram_w )
 	}
 }
 
-static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int prival )
+static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int prival )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	const pen_t *pens = machine.pens;
@@ -2041,7 +2041,7 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 	}
 }
 
-static void namcos22_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void namcos22_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	const pen_t *pens = machine.pens;
@@ -2099,7 +2099,7 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_t *bitmap, 
 	}
 }
 
-static void DrawCharacterLayer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void DrawCharacterLayer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int scroll_x = (state->m_tilemapattr[0]>>16) - 0x35c;
@@ -2817,7 +2817,7 @@ SCREEN_UPDATE( namcos22s )
 	UpdateVideoMixer(screen.machine());
 	UpdatePalette(screen.machine());
 	namcos22s_recalc_czram(screen.machine());
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	// background color
 	rgbint bg_color;
@@ -2828,7 +2828,7 @@ SCREEN_UPDATE( namcos22s )
 		rgb_comp_to_rgbint(&fade_color, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
 		rgbint_blend(&bg_color, &fade_color, 0xff - mixer.fadeFactor);
 	}
-	bitmap->fill(rgbint_to_rgb(&bg_color), *cliprect);
+	bitmap->fill(rgbint_to_rgb(&bg_color), cliprect);
 
 	// layers
 	UINT8 layer = nthbyte(state->m_gamma,0x1f);
@@ -2898,8 +2898,8 @@ SCREEN_UPDATE( namcos22 )
 {
 	UpdateVideoMixer(screen.machine());
 	UpdatePalette(screen.machine());
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	DrawPolygons(screen.machine(), bitmap);
 	RenderScene(screen.machine(), bitmap);
 	DrawCharacterLayer(screen.machine(), bitmap, cliprect);

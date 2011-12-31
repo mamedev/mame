@@ -206,24 +206,24 @@ static VIDEO_START( cybertnk )
 	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
 }
 
-static void draw_pixel( bitmap_t* bitmap, const rectangle *cliprect, int y, int x, int pen)
+static void draw_pixel( bitmap_t* bitmap, const rectangle &cliprect, int y, int x, int pen)
 {
-	if (x>cliprect->max_x) return;
-	if (x<cliprect->min_x) return;
-	if (y>cliprect->max_y) return;
-	if (y<cliprect->min_y) return;
+	if (x>cliprect.max_x) return;
+	if (x<cliprect.min_x) return;
+	if (y>cliprect.max_y) return;
+	if (y<cliprect.min_y) return;
 
 	bitmap->pix16(y, x) = pen;
 }
 
-static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int screen_shift)
+static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int screen_shift)
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
 
 	tilemap_set_scrolldx(state->m_tx_tilemap, screen_shift, screen_shift);
 
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	{
 		int i;
@@ -460,7 +460,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 
 			popmessage("%02x %02x %04x %02x",state->m_test_x,state->m_test_y,state->m_start_offs,state->m_color_pen);
 
-			bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+			bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 			count = (state->m_start_offs);
 

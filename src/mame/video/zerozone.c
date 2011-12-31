@@ -42,6 +42,6 @@ void zerozone_state::video_start()
 
 bool zerozone_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	tilemap_draw(&bitmap, &cliprect, m_zz_tilemap, 0, 0);
+	tilemap_draw(&bitmap, cliprect, m_zz_tilemap, 0, 0);
 	return 0;
 }

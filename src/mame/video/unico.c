@@ -221,7 +221,7 @@ VIDEO_START( zeropnt2 )
 
 ***************************************************************************/
 
-static void unico_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void unico_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	unico_state *state = machine.driver_data<unico_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -276,7 +276,7 @@ static void unico_draw_sprites(running_machine &machine, bitmap_t *bitmap,const 
 	}
 }
 
-static void zeropnt2_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void zeropnt2_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	unico_state *state = machine.driver_data<unico_state>();
 	UINT32 *spriteram32 = (UINT32 *)state->m_spriteram;
@@ -368,8 +368,8 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 #endif
 
 	/* The background color is the first of the last palette */
-	bitmap->fill(0x1f00, *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0x1f00, cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->m_tilemap[0],0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->m_tilemap[1],0,2);
@@ -408,8 +408,8 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 #endif
 
 	/* The background color is the first of the last palette */
-	bitmap->fill(0x1f00, *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0x1f00, cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->m_tilemap[0],0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->m_tilemap[1],0,2);

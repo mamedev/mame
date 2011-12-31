@@ -73,7 +73,7 @@ SCREEN_UPDATE( vendetta )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[2], 0, 4);

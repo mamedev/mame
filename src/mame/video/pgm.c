@@ -367,8 +367,8 @@ SCREEN_UPDATE( pgm )
 	pgm_state *state = screen.machine().driver_data<pgm_state>();
 	int y;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
-	state->m_tmppgmbitmap->fill(0x00000000, *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	state->m_tmppgmbitmap->fill(0x00000000, cliprect);
 
 	draw_sprites(screen.machine(), state->m_tmppgmbitmap, state->m_spritebufferram);
 

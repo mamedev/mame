@@ -845,7 +845,7 @@ static VIDEO_START( nmg5 )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	nmg5_state *state = machine.driver_data<nmg5_state>();
 	UINT16 *spriteram = state->m_spriteram;

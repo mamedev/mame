@@ -88,7 +88,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( retbl_w );
 	DECLARE_WRITE_LINE_MEMBER( vsync_w );
 
-	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides

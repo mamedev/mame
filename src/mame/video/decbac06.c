@@ -192,7 +192,7 @@ void deco_bac06_device::device_reset()
 
 void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 								bitmap_t *bitmap,
-								const rectangle *cliprect,
+								const rectangle &cliprect,
 								tilemap_t *tilemap_ptr,
 								const UINT16 *rowscroll_ptr,
 								const UINT16 *colscroll_ptr,
@@ -258,7 +258,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 	else
 		src_y = scrolly;
 
-	for (y=0; y<=cliprect->max_y; y++) {
+	for (y=0; y<=cliprect.max_y; y++) {
 		if (row_scroll_enabled)
 			src_x=scrollx + rowscroll_ptr[(src_y >> (control1[3]&0xf))&(0x1ff>>(control1[3]&0xf))];
 		else
@@ -267,7 +267,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 		if (flip_screen_get(machine))
 			src_x=(src_bitmap->width() - 256) - src_x;
 
-		for (x=0; x<=cliprect->max_x; x++) {
+		for (x=0; x<=cliprect.max_x; x++) {
 			if (col_scroll_enabled)
 				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2]&0xf))&(0x3f>>(control1[2]&0xf))];
 
@@ -288,7 +288,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 	}
 }
 
-void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
+void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_t *bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
 {
 	tilemap_t* tm = 0;
 
@@ -322,7 +322,7 @@ void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_t *bi
 }
 
 // used for pocket gal bootleg, which doesn't set registers properly and simply expects a fixed size tilemap.
-void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect,int flags, int mode, int type)
+void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_t *bitmap,const rectangle &cliprect,int flags, int mode, int type)
 {
 	tilemap_t* tm = 0;
 	if (!mode) tm = pf8x8_tilemap[type];

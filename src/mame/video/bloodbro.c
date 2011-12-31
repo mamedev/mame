@@ -145,7 +145,7 @@ WRITE16_HANDLER( bloodbro_txvideoram_w )
    -------X XXXXXXXX
    -------- YYYYYYYY */
 
-static void bloodbro_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void bloodbro_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	bloodbro_state *state = machine.driver_data<bloodbro_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -194,7 +194,7 @@ static void bloodbro_draw_sprites(running_machine &machine, bitmap_t *bitmap, co
    -------X XXXXXXXX
 */
 
-static void weststry_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void weststry_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	bloodbro_state *state = machine.driver_data<bloodbro_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -240,7 +240,7 @@ SCREEN_UPDATE( bloodbro )
 	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scroll[0x12]);
 	tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_scroll[0x13]);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);
@@ -257,7 +257,7 @@ SCREEN_UPDATE( weststry )
 //  tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scroll[0x12]);
 //  tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_scroll[0x13]);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);
@@ -275,7 +275,7 @@ SCREEN_UPDATE( skysmash )
 	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scroll[0x0a]);
 	tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_scroll[0x0b]);	/* ? */
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);

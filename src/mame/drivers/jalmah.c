@@ -347,7 +347,7 @@ static void jalmah_priority_system(running_machine &machine)
 	//popmessage("%02x %02x %02x %02x",state->m_sc0_prin,state->m_sc1_prin,state->m_sc2_prin,state->m_sc3_prin);
 }
 
-static void draw_sc0_layer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sc0_layer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	switch(state->m_jm_vregs[0] & 3)
@@ -359,7 +359,7 @@ static void draw_sc0_layer(running_machine &machine, bitmap_t *bitmap, const rec
 	}
 }
 
-static void draw_sc1_layer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sc1_layer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	switch(state->m_jm_vregs[1] & 3)
@@ -371,7 +371,7 @@ static void draw_sc1_layer(running_machine &machine, bitmap_t *bitmap, const rec
 	}
 }
 
-static void draw_sc2_layer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sc2_layer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	switch(state->m_jm_vregs[2] & 3)
@@ -383,7 +383,7 @@ static void draw_sc2_layer(running_machine &machine, bitmap_t *bitmap, const rec
 	}
 }
 
-static void draw_sc3_layer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sc3_layer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	switch(state->m_jm_vregs[3] & 3)
@@ -443,7 +443,7 @@ static SCREEN_UPDATE( jalmah )
 	tilemap_set_scrolly(state->m_sc3_tilemap_2, 0, jm_scrollram[7] & 0x1ff);
 	tilemap_set_scrolly(state->m_sc3_tilemap_3, 0, jm_scrollram[7] & 0x3ff);
 
-	bitmap->fill(screen.machine().pens[0xff], *cliprect); //selectable by a ram address?
+	bitmap->fill(screen.machine().pens[0xff], cliprect); //selectable by a ram address?
 
 	for(cur_prin=1;cur_prin<=0x8;cur_prin<<=1)
 	{
@@ -466,7 +466,7 @@ static SCREEN_UPDATE( urashima )
 	tilemap_set_scrolly(state->m_sc0_tilemap_0, 0, jm_scrollram[4]);
 	tilemap_set_scrolly(state->m_sc3_tilemap_0, 0, jm_scrollram[7]);
 
-	bitmap->fill(screen.machine().pens[0x1ff], *cliprect);//selectable by a ram address?
+	bitmap->fill(screen.machine().pens[0x1ff], cliprect);//selectable by a ram address?
 	if(state->m_jm_vregs[0] & 1) { tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap_0,0,0); }
 	if(state->m_jm_vregs[3] & 1) { tilemap_draw(bitmap,cliprect,state->m_sc3_tilemap_0,0,0); }
 	return 0;

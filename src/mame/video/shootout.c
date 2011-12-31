@@ -91,7 +91,7 @@ VIDEO_START( shootout )
 	tilemap_set_transparent_pen( state->m_foreground, 0 );
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_bits )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int bank_bits )
 {
 	shootout_state *state = machine.driver_data<shootout_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -175,7 +175,7 @@ SCREEN_UPDATE( shootout )
 {
 	shootout_state *state = screen.machine().driver_data<shootout_state>();
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_background,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_foreground,0,1);
@@ -187,7 +187,7 @@ SCREEN_UPDATE( shootouj )
 {
 	shootout_state *state = screen.machine().driver_data<shootout_state>();
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_background,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_foreground,0,1);

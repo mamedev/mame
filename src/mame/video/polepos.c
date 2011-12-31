@@ -490,7 +490,7 @@ static void zoom_sprite(running_machine &machine, bitmap_t *bitmap,int big,
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	polepos_state *state = machine.driver_data<polepos_state>();
 	UINT16 *posmem = &state->m_sprite16_memory[0x380];
@@ -523,9 +523,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( polepos )
 {
 	polepos_state *state = screen.machine().driver_data<polepos_state>();
-	rectangle clip = *cliprect;
+	rectangle clip = cliprect;
 	clip.max_y = 127;
-	tilemap_draw(bitmap,&clip,state->m_bg_tilemap,0,0);
+	tilemap_draw(bitmap,clip,state->m_bg_tilemap,0,0);
 	draw_road(screen.machine(), bitmap);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);

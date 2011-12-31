@@ -129,7 +129,7 @@ WRITE8_HANDLER( aeroboto_tilecolor_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 	int offs;
@@ -176,7 +176,7 @@ SCREEN_UPDATE( aeroboto )
 
 		star_color += 2;
 
-		bitmap->fill(sky_color, *cliprect);
+		bitmap->fill(sky_color, cliprect);
 
 		// actual scroll speed is unknown but it can be adjusted by changing the SCROLL_SPEED constant
 		state->m_sx += (char)(*state->m_starx - state->m_ox);
@@ -210,7 +210,7 @@ SCREEN_UPDATE( aeroboto )
 	{
 		state->m_sx = state->m_ox = *state->m_starx;
 		state->m_sy = state->m_oy = *state->m_stary;
-		bitmap->fill(sky_color, *cliprect);
+		bitmap->fill(sky_color, cliprect);
 	}
 
 	for (y = 0; y < 64; y++)
@@ -218,12 +218,12 @@ SCREEN_UPDATE( aeroboto )
 
 	// the playfield is part of a splitscreen and should not overlap with status display
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_vscroll);
-	tilemap_draw(bitmap, &splitrect2, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, splitrect2, state->m_bg_tilemap, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &splitrect1, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, splitrect1, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

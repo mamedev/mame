@@ -90,7 +90,7 @@ static VIDEO_START( astrocorp )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	astrocorp_state *state = machine.driver_data<astrocorp_state>();
 	UINT16 *source = state->m_spriteram;
@@ -145,7 +145,7 @@ static SCREEN_UPDATE(astrocorp)
 	if (state->m_screen_enable & 1)
 		copybitmap(bitmap, state->m_bitmap, 0,0,0,0, cliprect);
 	else
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	return 0;
 }
@@ -163,7 +163,7 @@ static WRITE16_HANDLER( astrocorp_draw_sprites_w )
 	UINT16 now = COMBINE_DATA(&state->m_draw_sprites);
 
 	if (!old && now)
-		draw_sprites(space->machine(), state->m_bitmap, &space->machine().primary_screen->visible_area());
+		draw_sprites(space->machine(), state->m_bitmap, space->machine().primary_screen->visible_area());
 }
 
 static WRITE16_HANDLER( astrocorp_eeprom_w )

@@ -157,11 +157,11 @@ SCREEN_UPDATE( kangaroo )
 		pens[x] = MAKE_RGB(pal1bit(x >> 2), pal1bit(x >> 1), pal1bit(x >> 0));
 
 	/* iterate over pixels */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *dest = &bitmap->pix32(y);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			UINT8 effxa = scrollx + ((x / 2) ^ xora);
 			UINT8 effya = scrolly + (y ^ xora);

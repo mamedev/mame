@@ -212,7 +212,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	if (layers_ctrl & 1)
 		tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
 	else
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 	if (layers_ctrl & 2)
 		tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);

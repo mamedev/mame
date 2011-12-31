@@ -149,7 +149,7 @@ SCREEN_UPDATE( cobra )
 
 		for (i=0; i < cobra->polybuffer_ptr; i++)
 		{
-			poly_render_triangle(cobra->poly, cobra->framebuffer, &screen.machine().primary_screen->visible_area(), render_texture_scan, 2,
+			poly_render_triangle(cobra->poly, cobra->framebuffer, screen.machine().primary_screen->visible_area(), render_texture_scan, 2,
 								 &cobra->polybuffer[i].v[0], &cobra->polybuffer[i].v[1], &cobra->polybuffer[i].v[2]);
 			poly_wait(cobra->poly, "Finished render");
 		}

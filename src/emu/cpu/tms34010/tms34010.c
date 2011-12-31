@@ -1108,29 +1108,29 @@ SCREEN_UPDATE( tms340x0 )
 	if (params.enabled)
 	{
 		/* call through to the callback */
-		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect->min_y, params.rowaddr, params.coladdr));
-		(*tms->config->scanline_callback)(screen, bitmap, cliprect->min_y, &params);
+		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect.min_y, params.rowaddr, params.coladdr));
+		(*tms->config->scanline_callback)(screen, bitmap, cliprect.min_y, &params);
 	}
 
 	/* otherwise, just blank the current scanline */
 	else
-		params.heblnk = params.hsblnk = cliprect->max_x + 1;
+		params.heblnk = params.hsblnk = cliprect.max_x + 1;
 
 	/* blank out the blank regions */
 	if (bitmap->bpp() == 16)
 	{
-		UINT16 *dest = &bitmap->pix16(cliprect->min_y);
-		for (x = cliprect->min_x; x < params.heblnk; x++)
+		UINT16 *dest = &bitmap->pix16(cliprect.min_y);
+		for (x = cliprect.min_x; x < params.heblnk; x++)
 			dest[x] = blackpen;
-		for (x = params.hsblnk; x <= cliprect->max_y; x++)
+		for (x = params.hsblnk; x <= cliprect.max_y; x++)
 			dest[x] = blackpen;
 	}
 	else if (bitmap->bpp() == 32)
 	{
-		UINT32 *dest = &bitmap->pix32(cliprect->min_y);
-		for (x = cliprect->min_x; x < params.heblnk; x++)
+		UINT32 *dest = &bitmap->pix32(cliprect.min_y);
+		for (x = cliprect.min_x; x < params.heblnk; x++)
 			dest[x] = blackpen;
-		for (x = params.hsblnk; x <= cliprect->max_y; x++)
+		for (x = params.hsblnk; x <= cliprect.max_y; x++)
 			dest[x] = blackpen;
 	}
 	return 0;

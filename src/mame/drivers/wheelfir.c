@@ -568,7 +568,7 @@ static SCREEN_UPDATE(wheelfir)
 {
 	wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	for(int y=0;y<NUM_SCANLINES;++y)
 	{

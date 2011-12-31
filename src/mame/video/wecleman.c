@@ -169,7 +169,7 @@ static void sortsprite(int *idx_array, int *key_array, int size)
 }
 
 // draws a 8bpp palette sprites on a 16bpp direct RGB target (sub-par implementation)
-static void do_blit_zoom32(wecleman_state *state, bitmap_t *bitmap, const rectangle *cliprect, struct sprite *sprite)
+static void do_blit_zoom32(wecleman_state *state, bitmap_t *bitmap, const rectangle &cliprect, struct sprite *sprite)
 {
 #define PRECISION_X 20
 #define PRECISION_Y 20
@@ -185,11 +185,11 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t *bitmap, const rectan
 		x2 = sprite->x;
 		x1 = x2 + sprite->total_width;
 		dx = -1;
-		if (x2 < cliprect->min_x) x2 = cliprect->min_x;
-		if (x1 > cliprect->max_x )
+		if (x2 < cliprect.min_x) x2 = cliprect.min_x;
+		if (x1 > cliprect.max_x )
 		{
-			xcount0 = x1 - cliprect->max_x;
-			x1 = cliprect->max_x;
+			xcount0 = x1 - cliprect.max_x;
+			x1 = cliprect.max_x;
 		}
 		if (x2 >= x1) return;
 		x1--; x2--;
@@ -199,12 +199,12 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t *bitmap, const rectan
 		x1 = sprite->x;
 		x2 = x1 + sprite->total_width;
 		dx = 1;
-		if (x1 < cliprect->min_x )
+		if (x1 < cliprect.min_x )
 		{
-			xcount0 = cliprect->min_x - x1;
-			x1 = cliprect->min_x;
+			xcount0 = cliprect.min_x - x1;
+			x1 = cliprect.min_x;
 		}
-		if (x2 > cliprect->max_x ) x2 = cliprect->max_x;
+		if (x2 > cliprect.max_x ) x2 = cliprect.max_x;
 		if (x1 >= x2) return;
 	}
 
@@ -213,11 +213,11 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t *bitmap, const rectan
 		y2 = sprite->y;
 		y1 = y2 + sprite->total_height;
 		dy = -1;
-		if (y2 < cliprect->min_y ) y2 = cliprect->min_y;
-		if (y1 > cliprect->max_y )
+		if (y2 < cliprect.min_y ) y2 = cliprect.min_y;
+		if (y1 > cliprect.max_y )
 		{
-			ycount0 = cliprect->max_y;
-			y1 = cliprect->max_y;
+			ycount0 = cliprect.max_y;
+			y1 = cliprect.max_y;
 		}
 		if (y2 >= y1) return;
 		y1--; y2--;
@@ -227,12 +227,12 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t *bitmap, const rectan
 		y1 = sprite->y;
 		y2 = y1 + sprite->total_height;
 		dy = 1;
-		if (y1 < cliprect->min_y )
+		if (y1 < cliprect.min_y )
 		{
-			ycount0 = cliprect->min_y - y1;
-			y1 = cliprect->min_y;
+			ycount0 = cliprect.min_y - y1;
+			y1 = cliprect.min_y;
 		}
-		if (y2 > cliprect->max_y) y2 = cliprect->max_y;
+		if (y2 > cliprect.max_y) y2 = cliprect.max_y;
 		if (y1 >= y2) return;
 	}
 
@@ -246,7 +246,7 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t *bitmap, const rectan
 	// pre-loop assignments and adjustments
 	pal_base = sprite->pal_data;
 
-	if (x1 > cliprect->min_x)
+	if (x1 > cliprect.min_x)
 	{
 		x1 -= dx;
 		x2 -= dx;
@@ -330,7 +330,7 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t *bitmap, const rectan
 	}
 }
 
-static void sprite_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void sprite_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int i;
@@ -539,7 +539,7 @@ WRITE16_HANDLER( wecleman_pageram_w )
 
 ------------------------------------------------------------------------*/
 
-static void wecleman_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void wecleman_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
 // must be powers of 2
@@ -576,7 +576,7 @@ static void wecleman_draw_road(running_machine &machine, bitmap_t *bitmap, const
 	if (priority == 0x02)
 	{
 		// draw sky; each scanline is assumed to be dword aligned
-		for (sy=cliprect->min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
+		for (sy=cliprect.min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
 		{
 			UINT32 *dst = &bitmap->pix32(sy+BMP_PAD, BMP_PAD);
 			UINT32 pix;
@@ -602,7 +602,7 @@ static void wecleman_draw_road(running_machine &machine, bitmap_t *bitmap, const
 			road_rgb[i] = color ? rgb_ptr[color] : 0xffffffff;
 		}
 
-		for (sy=cliprect->min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
+		for (sy=cliprect.min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
 		{
 			UINT32 *dst = &bitmap->pix32(sy+BMP_PAD, BMP_PAD);
 			UINT32 pix;
@@ -792,7 +792,7 @@ static void draw_cloud(bitmap_t *bitmap,
 
 ------------------------------------------------------------------------*/
 
-static void hotchase_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void hotchase_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
 /* Referred to what's in the ROMs */
@@ -1065,7 +1065,7 @@ SCREEN_UPDATE( wecleman )
 
 	get_sprite_info(screen.machine());
 
-	bitmap->fill(state->m_black_pen, *cliprect);
+	bitmap->fill(state->m_black_pen, cliprect);
 
 	/* Draw the road (lines which have priority 0x02) */
 	if (video_on) wecleman_draw_road(screen.machine(), bitmap, cliprect, 0x02);
@@ -1129,7 +1129,7 @@ SCREEN_UPDATE( hotchase )
 
 	get_sprite_info(screen.machine());
 
-	bitmap->fill(state->m_black_pen, *cliprect);
+	bitmap->fill(state->m_black_pen, cliprect);
 
 	/* Draw the background */
 	if (video_on)

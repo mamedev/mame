@@ -13,7 +13,7 @@ SCREEN_UPDATE( pktgaldx )
 	flip_screen_set(screen.machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
-	bitmap->fill(0, *cliprect); /* not Confirmed */
+	bitmap->fill(0, cliprect); /* not Confirmed */
 	screen.machine().priority_bitmap->fill(0);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
@@ -32,7 +32,7 @@ SCREEN_UPDATE( pktgaldb )
 	int tileno;
 	int colour;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	/* the bootleg seems to treat the tilemaps as sprites */
 	for (offset = 0; offset < 0x1600 / 2; offset += 8)

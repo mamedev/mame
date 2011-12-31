@@ -529,7 +529,7 @@ SCREEN_UPDATE( atarigt )
 	mram = state->m_expanded_mram + 0x2000 * ((color_latch >> 6) & 3);
 
 	/* now do the nasty blend */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *an = &state->m_an_bitmap->pix16(y);
 		UINT16 *pf = &state->m_pf_bitmap->pix16(y);
@@ -540,7 +540,7 @@ SCREEN_UPDATE( atarigt )
 		/* Primal Rage: no TRAM, slightly different priorities */
 		if (state->m_is_primrage)
 		{
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				UINT8 pfpri = (pf[x] >> 10) & 7;
 				UINT8 mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
@@ -574,7 +574,7 @@ SCREEN_UPDATE( atarigt )
 		/* T-Mek: full TRAM and all effects */
 		else
 		{
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				UINT8 pfpri = (pf[x] >> 10) & 7;
 				UINT8 mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;

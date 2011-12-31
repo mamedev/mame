@@ -92,7 +92,7 @@ do																					\
 while (0)																			\
 
 
-static void pdrawgfx_transpen_additive(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+static void pdrawgfx_transpen_additive(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transpen)
 {
@@ -125,7 +125,7 @@ static void pdrawgfx_transpen_additive(bitmap_t *dest, const rectangle *cliprect
 }
 
 
-static void pdrawgfxzoom_transpen_additive(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+static void pdrawgfxzoom_transpen_additive(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transpen)
@@ -207,7 +207,7 @@ static void pdrawgfxzoom_transpen_additive(bitmap_t *dest, const rectangle *clip
  * 0x0e0 in Samurai Shodown/Xrally games, 0x1c0 in all the others, zooming factor?
  */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 	const gfx_element *gfx;
@@ -431,7 +431,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
  */
 
 /* this is broken for the 'How to Play' screen in Buriki after attract, disabled for now */
-static void transition_control(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void transition_control(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 	UINT32 *hng64_tcram = state->m_tcram;
@@ -455,9 +455,9 @@ static void transition_control(running_machine &machine, bitmap_t *bitmap, const
 		brigG = (INT32)((hng64_tcram[0x0000000a] >> 8)  & 0xff);
 		brigB = (INT32)((hng64_tcram[0x0000000a] >> 16) & 0xff);
 
-		for (i = cliprect->min_x; i < cliprect->max_x; i++)
+		for (i = cliprect.min_x; i < cliprect.max_x; i++)
 		{
-			for (j = cliprect->min_y; j < cliprect->max_y; j++)
+			for (j = cliprect.min_y; j < cliprect.max_y; j++)
 			{
 				UINT32* thePixel = &bitmap->pix32(j, i);
 
@@ -705,7 +705,7 @@ struct _blit_parameters
 
 
 
-static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_t *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
+static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_t *dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
 {
 	/* start with nothing */
 	memset(blit, 0, sizeof(*blit));
@@ -714,12 +714,7 @@ static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tm
 	blit->bitmap = dest;
 
 	/* if we have a cliprect, copy */
-	if (cliprect != NULL)
-		blit->cliprect = *cliprect;
-
-	/* otherwise, make one up */
-	else
-		blit->cliprect = dest->cliprect();
+	blit->cliprect = cliprect;
 
 	/* set the priority code and alpha */
 	//blit->tilemap_priority_code = priority | (priority_mask << 8) | (tmap->palette_offset << 16); // fixit
@@ -964,7 +959,7 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 
 
 
-static void hng64_tilemap_draw_roz_primask(running_machine& machine, bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap,
+static void hng64_tilemap_draw_roz_primask(running_machine& machine, bitmap_t *dest, const rectangle &cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
 {
@@ -992,7 +987,7 @@ g_profiler.stop();
 }
 
 
-INLINE void hng64_tilemap_draw_roz(running_machine& machine, bitmap_t *dest, const rectangle *cliprect, tilemap_t *tmap,
+INLINE void hng64_tilemap_draw_roz(running_machine& machine, bitmap_t *dest, const rectangle &cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat)
 {
@@ -1001,7 +996,7 @@ INLINE void hng64_tilemap_draw_roz(running_machine& machine, bitmap_t *dest, con
 
 
 
-static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect, int tm )
+static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const rectangle &cliprect, int tm )
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 	UINT32 *hng64_videoregs = state->m_videoregs;
@@ -1169,7 +1164,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 				xinc = (xmiddle - xtopleft) / 512;
 				yinc = (ymiddle - ytopleft) / 512;
 
-				hng64_tilemap_draw_roz(machine, bitmap,&clip,tilemap,xtopleft,ytopleft,
+				hng64_tilemap_draw_roz(machine, bitmap,clip,tilemap,xtopleft,ytopleft,
 						xinc<<1,0,0,yinc<<1,
 						1,
 						0,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
@@ -1464,8 +1459,8 @@ SCREEN_UPDATE( hng64 )
 	}
 #endif
 
-	bitmap->fill(hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen.machine()) : screen.machine().pens[0], *cliprect); //FIXME: Is the register correct? check with HW tests
-	screen.machine().priority_bitmap->fill(0x00, *cliprect);
+	bitmap->fill(hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen.machine()) : screen.machine().pens[0], cliprect); //FIXME: Is the register correct? check with HW tests
+	screen.machine().priority_bitmap->fill(0x00, cliprect);
 
 	if (state->m_screen_dis)
 		return 0;
@@ -1545,12 +1540,12 @@ SCREEN_UPDATE( hng64 )
 		int x, y;
 
 		// Blit the color buffer into the primary bitmap
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *src = &state->m_colorBuffer3d[y * (cliprect->max_x-cliprect->min_x)];
-			UINT32 *dst = &bitmap->pix32(y, cliprect->min_x);
+			UINT32 *src = &state->m_colorBuffer3d[y * (cliprect.max_x-cliprect.min_x)];
+			UINT32 *dst = &bitmap->pix32(y, cliprect.min_x);
 
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				if(*src & 0xff000000)
 					*dst = *src;

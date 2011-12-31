@@ -153,7 +153,7 @@ static void slapfght_log_vram(running_machine &machine)
   Render the Sprites
 
 ***************************************************************************/
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority_to_display )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority_to_display )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;

@@ -251,7 +251,7 @@ VIDEO_START(godzilla)
 
 *************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
 	UINT16 *spriteram16 = machine.generic.spriteram.u16;
@@ -335,7 +335,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite warp,
            this doesn't work on denjin makai as the visible area is larger */
-		if (cliprect->max_x<(320-1))
+		if (cliprect.max_x<(320-1))
 		{
 			x&=0x1ff;
 			y&=0x1ff;
@@ -428,8 +428,8 @@ SCREEN_UPDATE( legionna )
 	tilemap_set_scrollx( state->m_text_layer, 0,  0/*state->m_scrollram16[6]*/ );
 	tilemap_set_scrolly( state->m_text_layer, 0,  0/*state->m_scrollram16[7]*/ );
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);	/* wrong color? */
 
 	/* state->m_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
 
@@ -461,8 +461,8 @@ SCREEN_UPDATE( godzilla )
 	tilemap_set_scrolly( state->m_text_layer, 0,  0/*state->m_scrollram16[7]*/ );
 
 
-	bitmap->fill(0x0200, *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0x0200, cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (!(state->m_layer_disable&0x0001)) tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
 	if (!(state->m_layer_disable&0x0002)) tilemap_draw(bitmap,cliprect,state->m_midground_layer,0,0);
@@ -487,8 +487,8 @@ SCREEN_UPDATE( grainbow )
 	tilemap_set_scrollx( state->m_text_layer, 0,  0/*state->m_scrollram16[6]*/ );
 	tilemap_set_scrolly( state->m_text_layer, 0,  0/*state->m_scrollram16[7]*/ );
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if(!(state->m_layer_disable & 1))
 		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,1);

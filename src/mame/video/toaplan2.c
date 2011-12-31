@@ -297,14 +297,14 @@ SCREEN_UPDATE( toaplan2_dual )
 
 	if (state->m_vdp1)
 	{
-		bitmap->fill(0, *cliprect);
-		state->m_custom_priority_bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
+		state->m_custom_priority_bitmap->fill(0, cliprect);
 		state->m_vdp1->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 	if (state->m_vdp0)
 	{
-	//  bitmap->fill(0, *cliprect);
-		state->m_custom_priority_bitmap->fill(0, *cliprect);
+	//  bitmap->fill(0, cliprect);
+		state->m_custom_priority_bitmap->fill(0, cliprect);
 		state->m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 
@@ -318,19 +318,19 @@ SCREEN_UPDATE( toaplan2_mixed )
 {
 	toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
 
-//  bitmap->fill(0, *cliprect);
-//  gp9001_custom_priority_bitmap->fill(0, *cliprect);
+//  bitmap->fill(0, cliprect);
+//  gp9001_custom_priority_bitmap->fill(0, cliprect);
 
 	if (state->m_vdp0)
 	{
-		bitmap->fill(0, *cliprect);
-		state->m_custom_priority_bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
+		state->m_custom_priority_bitmap->fill(0, cliprect);
 		state->m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 	if (state->m_vdp1)
 	{
-		state->m_secondary_render_bitmap->fill(0, *cliprect);
-		state->m_custom_priority_bitmap->fill(0, *cliprect);
+		state->m_secondary_render_bitmap->fill(0, cliprect);
+		state->m_custom_priority_bitmap->fill(0, cliprect);
 		state->m_vdp1->gp9001_render_vdp(screen.machine(), state->m_secondary_render_bitmap, cliprect);
 	}
 
@@ -420,8 +420,8 @@ SCREEN_UPDATE( toaplan2 )
 
 	if (state->m_vdp0)
 	{
-		bitmap->fill(0, *cliprect);
-		state->m_custom_priority_bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
+		state->m_custom_priority_bitmap->fill(0, cliprect);
 		state->m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 
@@ -466,7 +466,7 @@ SCREEN_UPDATE( batrider )
 			clip.min_y = clip.max_y = line;
 			tilemap_set_scrolly(state->m_tx_tilemap, 0,     - line + state->m_txvideoram16_offs[      line]);
 		}
-		tilemap_draw(bitmap, &clip, state->m_tx_tilemap, 0, 0);
+		tilemap_draw(bitmap, clip, state->m_tx_tilemap, 0, 0);
 	}
 	return 0;
 }

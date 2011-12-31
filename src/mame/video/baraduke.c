@@ -217,7 +217,7 @@ WRITE8_HANDLER( baraduke_spriteram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int sprite_priority)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int sprite_priority)
 {
 	baraduke_state *state = machine.driver_data<baraduke_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x1800;

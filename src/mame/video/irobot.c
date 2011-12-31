@@ -354,7 +354,7 @@ SCREEN_UPDATE( irobot )
 	int x, y, offs;
 
 	/* copy the polygon bitmap */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], NULL);
 
 	/* redraw the non-zero characters in the alpha layer */

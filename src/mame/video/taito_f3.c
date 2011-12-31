@@ -2168,7 +2168,7 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 
 /******************************************************************************/
 
-static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	int i,j,y,ys,ye;
@@ -2597,7 +2597,7 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 	pri++;
 
 INLINE void f3_drawgfx(
-		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+		bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		int code,
 		int color,
 		int flipx,int flipy,
@@ -2610,12 +2610,8 @@ INLINE void f3_drawgfx(
 	pri_dst=1<<pri_dst;
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	if(clip)
-	{
-		myclip = *clip;
-		myclip &= dest_bmp->cliprect();
-		clip=&myclip;
-	}
+	myclip = clip;
+	myclip &= dest_bmp->cliprect();
 
 
 	if( gfx )
@@ -2654,31 +2650,28 @@ INLINE void f3_drawgfx(
 				y_index = 0;
 			}
 
-			if( clip )
-			{
-				if( sx < clip->min_x)
-				{ /* clip left */
-					int pixels = clip->min_x-sx;
-					sx += pixels;
-					x_index_base += pixels*dx;
-				}
-				if( sy < clip->min_y )
-				{ /* clip top */
-					int pixels = clip->min_y-sy;
-					sy += pixels;
-					y_index += pixels*dy;
-				}
-				/* NS 980211 - fixed incorrect clipping */
-				if( ex > clip->max_x+1 )
-				{ /* clip right */
-					int pixels = ex-clip->max_x-1;
-					ex -= pixels;
-				}
-				if( ey > clip->max_y+1 )
-				{ /* clip bottom */
-					int pixels = ey-clip->max_y-1;
-					ey -= pixels;
-				}
+			if( sx < myclip.min_x)
+			{ /* clip left */
+				int pixels = myclip.min_x-sx;
+				sx += pixels;
+				x_index_base += pixels*dx;
+			}
+			if( sy < myclip.min_y )
+			{ /* clip top */
+				int pixels = myclip.min_y-sy;
+				sy += pixels;
+				y_index += pixels*dy;
+			}
+			/* NS 980211 - fixed incorrect clipping */
+			if( ex > myclip.max_x+1 )
+			{ /* clip right */
+				int pixels = ex-myclip.max_x-1;
+				ex -= pixels;
+			}
+			if( ey > myclip.max_y+1 )
+			{ /* clip bottom */
+				int pixels = ey-myclip.max_y-1;
+				ey -= pixels;
 			}
 
 			if( ex>sx && ey>sy)
@@ -2753,7 +2746,7 @@ INLINE void f3_drawgfx(
 
 
 INLINE void f3_drawgfxzoom(
-		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+		bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		int code,
 		int color,
 		int flipx,int flipy,
@@ -2767,12 +2760,8 @@ INLINE void f3_drawgfxzoom(
 	pri_dst=1<<pri_dst;
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	if(clip)
-	{
-		myclip = *clip;
-		myclip &= dest_bmp->cliprect();
-		clip=&myclip;
-	}
+	myclip = clip;
+	myclip &= dest_bmp->cliprect();
 
 
 	if( gfx )
@@ -2811,31 +2800,28 @@ INLINE void f3_drawgfxzoom(
 				y_index = 0;
 			}
 
-			if( clip )
-			{
-				if( sx < clip->min_x)
-				{ /* clip left */
-					int pixels = clip->min_x-sx;
-					sx += pixels;
-					x_index_base += pixels*dx;
-				}
-				if( sy < clip->min_y )
-				{ /* clip top */
-					int pixels = clip->min_y-sy;
-					sy += pixels;
-					y_index += pixels*dy;
-				}
-				/* NS 980211 - fixed incorrect clipping */
-				if( ex > clip->max_x+1 )
-				{ /* clip right */
-					int pixels = ex-clip->max_x-1;
-					ex -= pixels;
-				}
-				if( ey > clip->max_y+1 )
-				{ /* clip bottom */
-					int pixels = ey-clip->max_y-1;
-					ey -= pixels;
-				}
+			if( sx < myclip.min_x)
+			{ /* clip left */
+				int pixels = myclip.min_x-sx;
+				sx += pixels;
+				x_index_base += pixels*dx;
+			}
+			if( sy < myclip.min_y )
+			{ /* clip top */
+				int pixels = myclip.min_y-sy;
+				sy += pixels;
+				y_index += pixels*dy;
+			}
+			/* NS 980211 - fixed incorrect clipping */
+			if( ex > myclip.max_x+1 )
+			{ /* clip right */
+				int pixels = ex-myclip.max_x-1;
+				ex -= pixels;
+			}
+			if( ey > myclip.max_y+1 )
+			{ /* clip bottom */
+				int pixels = ey-myclip.max_y-1;
+				ey -= pixels;
 			}
 
 			if( ex>sx )
@@ -3148,7 +3134,7 @@ static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_
 #undef CALC_ZOOM
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const struct tempsprite *sprite_ptr;
@@ -3229,7 +3215,7 @@ SCREEN_UPDATE( f3 )
 		sy_fix[4]=-sy_fix[4];
 	}
 
-	state->m_pri_alp_bitmap->fill(0, *cliprect);
+	state->m_pri_alp_bitmap->fill(0, cliprect);
 
 	/* sprites */
 	if (state->m_sprite_lag==0)

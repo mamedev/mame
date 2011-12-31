@@ -185,9 +185,9 @@ static SCREEN_UPDATE( igs011 )
 
 	pri_ram = &state->m_priority_ram[(state->m_priority & 7) * 512/2];
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			scr_addr = x + y * 512;
 			pri_addr = 0xff;

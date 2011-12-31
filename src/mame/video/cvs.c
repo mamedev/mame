@@ -209,7 +209,7 @@ SCREEN_UPDATE( cvs )
 
 		int gfxnum = (code < ram_based_char_start_indices[state->m_character_banking_mode]) ? 0 : 1;
 
-		drawgfx_opaque(state->m_background_bitmap, 0, screen.machine().gfx[gfxnum],
+		drawgfx_opaque(state->m_background_bitmap, state->m_background_bitmap->cliprect(), screen.machine().gfx[gfxnum],
 				code, color,
 				0, 0,
 				x, y);
@@ -225,7 +225,7 @@ SCREEN_UPDATE( cvs )
 				collision_color = 0x102;
 		}
 
-		drawgfx_opaque(state->m_collision_background, 0, screen.machine().gfx[gfxnum],
+		drawgfx_opaque(state->m_collision_background, state->m_collision_background->cliprect(), screen.machine().gfx[gfxnum],
 				code, collision_color,
 				0, 0,
 				x, y);
@@ -280,11 +280,11 @@ SCREEN_UPDATE( cvs )
 	{
 		int y;
 
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			int x;
 
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				int pixel0 = s2636_0_bitmap->pix16(y, x);
 				int pixel1 = s2636_1_bitmap->pix16(y, x);
@@ -329,7 +329,7 @@ SCREEN_UPDATE( cvs )
 				if (flip_screen_y_get(screen.machine()))
 					y = ~y;
 
-				if ((y >= cliprect->min_y) && (y <= cliprect->max_y) &&
+				if ((y >= cliprect.min_y) && (y <= cliprect.max_y) &&
 					(colortable_entry_get_value(screen.machine().colortable, bitmap->pix16(y, x)) == 0))
 					bitmap->pix16(y, x) = BULLET_STAR_PEN;
 			}

@@ -82,7 +82,7 @@ public:
 	bitmap_t *get_y1_bitmap() { return m_y1_bitmap; };
 
 	/* update the screen */
-	void update_video( bitmap_t *bitmap, const rectangle *cliprect );
+	void update_video( bitmap_t *bitmap, const rectangle &cliprect );
 
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) { };
 

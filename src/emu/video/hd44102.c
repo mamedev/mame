@@ -271,7 +271,7 @@ WRITE_LINE_MEMBER( hd44102_device::cs2_w )
 //  update_screen - update screen
 //-------------------------------------------------
 
-void hd44102_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
+void hd44102_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 50; y++)
 	{
@@ -284,7 +284,7 @@ void hd44102_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 			int sy = m_sy + z;
 			int sx = m_sx + y;
 
-			if ((sy >= cliprect->min_y) && (sy <= cliprect->max_y) && (sx >= cliprect->min_x) && (sx <= cliprect->max_x))
+			if ((sy >= cliprect.min_y) && (sy <= cliprect.max_y) && (sx >= cliprect.min_x) && (sx <= cliprect.max_x))
 			{
 				int color = (m_status & STATUS_DISPLAY_OFF) ? 0 : BIT(data, z % 8);
 

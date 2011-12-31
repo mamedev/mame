@@ -845,7 +845,7 @@ SCREEN_UPDATE( mrokumei )
 	/* blank screen */
 	if (state->m_vreg[0x3] == 0xc1 && state->m_vreg[0x4] == 0xc0 && state->m_vreg[0x5] == 0xff)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -908,7 +908,7 @@ SCREEN_UPDATE( reikaids )
 	}
 
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	pri = (state->m_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
@@ -955,7 +955,7 @@ SCREEN_UPDATE( reikaids )
 	}
 
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	pri = (state->m_blitter_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
@@ -973,7 +973,7 @@ SCREEN_UPDATE( pteacher )
 	/* blank screen */
 	if (state->m_vreg[0x3] == 0xc1 && state->m_vreg[0x4] == 0xc0 && state->m_vreg[0x5] == 0xff)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 

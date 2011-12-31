@@ -65,7 +65,7 @@ VIDEO_START( jailbrek )
 	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 396 - 256);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	jailbrek_state *state = machine.driver_data<jailbrek_state>();
 	UINT8 *spriteram = state->m_spriteram;

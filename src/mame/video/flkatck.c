@@ -165,12 +165,12 @@ SCREEN_UPDATE( flkatck )
 	}
 
 	/* compute clipping */
-	clip[0] &= *cliprect;
-	clip[1] &= *cliprect;
+	clip[0] &= cliprect;
+	clip[1] &= cliprect;
 
 	/* draw the graphics */
-	tilemap_draw(bitmap, &clip[0], state->m_k007121_tilemap[0], 0, 0);
+	tilemap_draw(bitmap, clip[0], state->m_k007121_tilemap[0], 0, 0);
 	k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], NULL, &state->m_k007121_ram[0x1000], 0, 40, 0, (UINT32)-1);
-	tilemap_draw(bitmap, &clip[1], state->m_k007121_tilemap[1], 0, 0);
+	tilemap_draw(bitmap, clip[1], state->m_k007121_tilemap[1], 0, 0);
 	return 0;
 }

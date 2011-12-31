@@ -238,7 +238,7 @@ SCREEN_UPDATE( toobin )
 	int x, y;
 
 	/* draw the playfield */
-	priority_bitmap->fill(0, *cliprect);
+	priority_bitmap->fill(0, cliprect);
 	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 1, 1);
 	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 2, 2);
@@ -246,13 +246,13 @@ SCREEN_UPDATE( toobin )
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *dest = &bitmap->pix32(y);
 		UINT16 *mo = &mobitmap->pix16(y);
 		UINT16 *pf = &state->m_pfbitmap->pix16(y);
 		UINT8 *pri = &priority_bitmap->pix8(y);
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT16 pix = pf[x];
 			if (mo[x])

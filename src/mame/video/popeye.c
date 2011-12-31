@@ -279,7 +279,7 @@ VIDEO_START( popeye )
     state_save_register_global_pointer(machine, state->m_bitmapram, popeye_bitmapram_size);
 }
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	int offs;
@@ -296,7 +296,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	set_background_palette(machine, (*state->m_palettebank & 0x08) >> 3);
 
 	if (state->m_background_pos[1] == 0)	/* no background */
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 	else
 	{
 		/* copy the background graphics */
@@ -317,7 +317,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *spriteram = state->m_spriteram;

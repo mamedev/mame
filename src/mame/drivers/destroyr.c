@@ -47,7 +47,7 @@ static SCREEN_UPDATE( destroyr )
 	destroyr_state *state = screen.machine().driver_data<destroyr_state>();
 	int i, j;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	/* draw major objects */
 	for (i = 0; i < 16; i++)

@@ -129,7 +129,7 @@ PALETTE_INIT( portrait )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	portrait_state *state = machine.driver_data<portrait_state>();
 	UINT8 *source = state->m_spriteram;
@@ -193,20 +193,20 @@ SCREEN_UPDATE( portrait )
 	portrait_state *state = screen.machine().driver_data<portrait_state>();
 	rectangle cliprect_scroll, cliprect_no_scroll;
 
-	cliprect_scroll = cliprect_no_scroll = *cliprect;
+	cliprect_scroll = cliprect_no_scroll = cliprect;
 
 	cliprect_no_scroll.min_x = cliprect_no_scroll.max_x - 111;
 	cliprect_scroll.max_x    = cliprect_scroll.min_x    + 319;
 
 	tilemap_set_scrolly(state->m_background, 0, 0);
 	tilemap_set_scrolly(state->m_foreground, 0, 0);
-	tilemap_draw(bitmap, &cliprect_no_scroll, state->m_background, 0, 0);
-	tilemap_draw(bitmap, &cliprect_no_scroll, state->m_foreground, 0, 0);
+	tilemap_draw(bitmap, cliprect_no_scroll, state->m_background, 0, 0);
+	tilemap_draw(bitmap, cliprect_no_scroll, state->m_foreground, 0, 0);
 
 	tilemap_set_scrolly(state->m_background, 0, state->m_scroll);
 	tilemap_set_scrolly(state->m_foreground, 0, state->m_scroll);
-	tilemap_draw(bitmap, &cliprect_scroll, state->m_background, 0, 0);
-	tilemap_draw(bitmap, &cliprect_scroll, state->m_foreground, 0, 0);
+	tilemap_draw(bitmap, cliprect_scroll, state->m_background, 0, 0);
+	tilemap_draw(bitmap, cliprect_scroll, state->m_foreground, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;

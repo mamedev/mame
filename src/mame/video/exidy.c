@@ -215,7 +215,7 @@ INLINE int sprite_1_enabled(exidy_state *state)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	exidy_state *state = machine.driver_data<exidy_state>();
 	/* draw sprite 2 first */
@@ -296,7 +296,7 @@ static void check_collision(running_machine &machine)
 	{
 		org_1_x = 236 - *state->m_sprite1_xpos - 4;
 		org_1_y = 244 - *state->m_sprite1_ypos - 4;
-		drawgfx_transpen(state->m_motion_object_1_vid, &clip, machine.gfx[0],
+		drawgfx_transpen(state->m_motion_object_1_vid, clip, machine.gfx[0],
 				(*state->m_spriteno & 0x0f) + 16 * sprite_set_1, 0,
 				0, 0, 0, 0, 0);
 	}
@@ -305,7 +305,7 @@ static void check_collision(running_machine &machine)
 	state->m_motion_object_2_vid->fill(0xff, clip);
 	org_2_x = 236 - *state->m_sprite2_xpos - 4;
 	org_2_y = 244 - *state->m_sprite2_ypos - 4;
-	drawgfx_transpen(state->m_motion_object_2_vid, &clip, machine.gfx[0],
+	drawgfx_transpen(state->m_motion_object_2_vid, clip, machine.gfx[0],
 			((*state->m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
 			0, 0, 0, 0, 0);
 
@@ -315,7 +315,7 @@ static void check_collision(running_machine &machine)
 	{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
-		drawgfx_transpen(state->m_motion_object_2_clip, &clip, machine.gfx[0],
+		drawgfx_transpen(state->m_motion_object_2_clip, clip, machine.gfx[0],
 				((*state->m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
 				0, 0, sx, sy, 0);
 	}
@@ -370,7 +370,7 @@ SCREEN_UPDATE( exidy )
 	copybitmap(bitmap, state->m_background_bitmap, 0, 0, 0, 0, cliprect);
 
 	/* draw the sprites */
-	draw_sprites(screen.machine(), bitmap, NULL);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* check for collision, this will set the appropriate bits in collision_mask */
 	check_collision(screen.machine());

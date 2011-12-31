@@ -63,12 +63,12 @@ static SCREEN_UPDATE(mlanding)
 	mlanding_state *state = screen.machine().driver_data<mlanding_state>();
 	int x, y;
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
+	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT16 *src = &state->m_g_ram[y * 512/2 + cliprect->min_x];
-		UINT16 *dst = &bitmap->pix16(y, cliprect->min_x);
+		UINT16 *src = &state->m_g_ram[y * 512/2 + cliprect.min_x];
+		UINT16 *dst = &bitmap->pix16(y, cliprect.min_x);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			UINT16 srcpix = *src++;
 

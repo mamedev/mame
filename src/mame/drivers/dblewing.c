@@ -101,7 +101,7 @@ static SCREEN_UPDATE(dblewing)
 	flip_screen_set(screen.machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
-	bitmap->fill(0, *cliprect); /* not Confirmed */
+	bitmap->fill(0, cliprect); /* not Confirmed */
 	screen.machine().priority_bitmap->fill(0);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);

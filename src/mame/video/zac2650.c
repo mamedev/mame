@@ -67,7 +67,7 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 
         /* Draw first sprite */
 
-	    drawgfx_opaque(state->m_spritebitmap,0, machine.gfx[expand],
+	    drawgfx_opaque(state->m_spritebitmap,state->m_spritebitmap->cliprect(), machine.gfx[expand],
 			    first * 2,
 			    0,
 			    0,0,
@@ -93,7 +93,7 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 
         /* Blackout second sprite */
 
-	    drawgfx_transpen(state->m_spritebitmap,0, machine.gfx[1],
+	    drawgfx_transpen(state->m_spritebitmap,state->m_spritebitmap->cliprect(), machine.gfx[1],
 			    second * 2,
 			    1,
 			    0,0,
@@ -119,7 +119,7 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 
         /* Zero bitmap */
 
-	    drawgfx_opaque(state->m_spritebitmap,0, machine.gfx[expand],
+	    drawgfx_opaque(state->m_spritebitmap,state->m_spritebitmap->cliprect(), machine.gfx[expand],
 			    first * 2,
 			    1,
 			    0,0,
@@ -151,7 +151,7 @@ VIDEO_START( tinvader )
 	gfx_element_set_source(machine.gfx[2], state->m_s2636_0_ram);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	zac2650_state *state = machine.driver_data<zac2650_state>();
 	int offs;
@@ -171,7 +171,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap)
     state->m_CollisionBackground = 0;	/* Read from 0x1e80 bit 7 */
 
 	// for collision detection checking
-	copybitmap(machine.generic.tmpbitmap,bitmap,0,0,0,0,&visarea);
+	copybitmap(machine.generic.tmpbitmap,bitmap,0,0,0,0,visarea);
 
     for(offs=0;offs<0x50;offs+=0x10)
     {
@@ -184,7 +184,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap)
             int x,y;
 
             /* Sprite->Background collision detection */
-			drawgfx_transpen(bitmap,0, machine.gfx[expand],
+			drawgfx_transpen(bitmap,cliprect, machine.gfx[expand],
 				    spriteno,
 					1,
 				    0,0,
@@ -210,7 +210,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap)
                 }
 	        }
 
-			drawgfx_transpen(bitmap,0, machine.gfx[expand],
+			drawgfx_transpen(bitmap,cliprect, machine.gfx[expand],
 				    spriteno,
 					0,
 				    0,0,
@@ -232,6 +232,6 @@ SCREEN_UPDATE( tinvader )
 {
 	zac2650_state *state = screen.machine().driver_data<zac2650_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	draw_sprites(screen.machine(), bitmap);
+	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

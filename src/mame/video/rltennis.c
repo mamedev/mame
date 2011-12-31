@@ -122,12 +122,12 @@ WRITE16_HANDLER(rlt_blitter_w)
 	{
 		if(new_data & BLTFLAG_DISPLAY_UD)
 		{
-			copybitmap(state->m_tmp_bitmap[BITMAP_FG_DISPLAY], state->m_tmp_bitmap[BITMAP_FG_1], 0, 0, 0, 0, NULL);
+			copybitmap(state->m_tmp_bitmap[BITMAP_FG_DISPLAY], state->m_tmp_bitmap[BITMAP_FG_1], 0, 0, 0, 0, state->m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
 			state->m_tmp_bitmap[BITMAP_FG_1]->fill(0);
 		}
 		else
 		{
-			copybitmap(state->m_tmp_bitmap[BITMAP_FG_DISPLAY], state->m_tmp_bitmap[BITMAP_FG_2], 0, 0, 0, 0, NULL);
+			copybitmap(state->m_tmp_bitmap[BITMAP_FG_DISPLAY], state->m_tmp_bitmap[BITMAP_FG_2], 0, 0, 0, 0, state->m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
 			state->m_tmp_bitmap[BITMAP_FG_2]->fill(0);
 		}
 	}

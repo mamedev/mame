@@ -150,7 +150,7 @@ WRITE8_HANDLER( spdodgeb_videoram_w )
 					cliprect,gfx, \
 					(which+order),color+ 8 * state->m_sprite_palbank,flipx,flipy,sx,sy,0);
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
 	UINT8 *spriteram = state->m_spriteram;

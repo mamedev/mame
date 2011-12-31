@@ -162,7 +162,7 @@ SCREEN_UPDATE( momoko )
 		}
 	}
 	else
-	bitmap->fill(256, *cliprect);
+	bitmap->fill(256, cliprect);
 
 
 	/* draw sprites (momoko) */

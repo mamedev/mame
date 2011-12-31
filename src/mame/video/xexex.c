@@ -81,7 +81,7 @@ SCREEN_UPDATE( xexex )
 	k054338_update_all_shadows(state->m_k054338, 0);
 	k054338_fill_backcolor(state->m_k054338, bitmap, 0);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	for (plane = 0; plane < 4; plane++)
 	{

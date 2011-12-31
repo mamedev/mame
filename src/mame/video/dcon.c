@@ -151,7 +151,7 @@ VIDEO_START( dcon )
 	state->m_gfx_bank_select = 0;
 }
 
-static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	dcon_state *state = machine.driver_data<dcon_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -280,7 +280,7 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectan
 SCREEN_UPDATE( dcon )
 {
 	dcon_state *state = screen.machine().driver_data<dcon_state>();
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	/* Setup the tilemaps */
 	tilemap_set_scrollx( state->m_background_layer,0, state->m_scroll_ram[0] );
@@ -293,7 +293,7 @@ SCREEN_UPDATE( dcon )
 	if ((state->m_enable&1)!=1)
 		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
 	else
-		bitmap->fill(15, *cliprect); /* Should always be black, not pen 15 */
+		bitmap->fill(15, cliprect); /* Should always be black, not pen 15 */
 
 	tilemap_draw(bitmap,cliprect,state->m_midground_layer,0,1);
 	tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,2);
@@ -307,7 +307,7 @@ SCREEN_UPDATE( sdgndmps )
 {
 	dcon_state *state = screen.machine().driver_data<dcon_state>();
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	/* Gfx banking */
 	if (state->m_last_gfx_bank!=state->m_gfx_bank_select)
@@ -329,7 +329,7 @@ SCREEN_UPDATE( sdgndmps )
 	if ((state->m_enable&1)!=1)
 		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
 	else
-		bitmap->fill(15, *cliprect); /* Should always be black, not pen 15 */
+		bitmap->fill(15, cliprect); /* Should always be black, not pen 15 */
 
 	tilemap_draw(bitmap,cliprect,state->m_midground_layer,0,1);
 	tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,2);

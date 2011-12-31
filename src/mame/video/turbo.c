@@ -421,7 +421,7 @@ SCREEN_UPDATE( turbo )
 	int x, y;
 
 	/* loop over rows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const UINT16 *fore = &fgpixmap->pix16(y);
 		UINT16 *dest = &bitmap->pix16(y);
@@ -440,7 +440,7 @@ SCREEN_UPDATE( turbo )
 		turbo_prepare_sprites(screen.machine(), state, y, &sprinfo);
 
 		/* loop over columns */
-		for (x = 0; x <= cliprect->max_x; x += TURBO_X_SCALE)
+		for (x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
 		{
 			int bacol, red, grn, blu, priority, foreraw, forebits, mx, ix;
 			int xx = x / TURBO_X_SCALE;
@@ -771,7 +771,7 @@ SCREEN_UPDATE( subroc3d )
 	int x, y;
 
 	/* loop over rows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const UINT16 *fore = &fgpixmap->pix16(y);
 		UINT16 *dest = &bitmap->pix16(y);
@@ -782,7 +782,7 @@ SCREEN_UPDATE( subroc3d )
 		subroc3d_prepare_sprites(screen.machine(), state, y, &sprinfo);
 
 		/* loop over columns */
-		for (x = 0; x <= cliprect->max_x; x += TURBO_X_SCALE)
+		for (x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
 		{
 			int offs, finalbits, ix;
 			UINT8 xx = x / TURBO_X_SCALE;
@@ -991,7 +991,7 @@ SCREEN_UPDATE( buckrog )
 	int x, y;
 
 	/* loop over rows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const UINT16 *fore = &fgpixmap->pix16(y);
 		UINT16 *dest = &bitmap->pix16(y);
@@ -1002,7 +1002,7 @@ SCREEN_UPDATE( buckrog )
 		buckrog_prepare_sprites(screen.machine(), state, y, &sprinfo);
 
 		/* loop over columns */
-		for (x = 0; x <= cliprect->max_x; x += TURBO_X_SCALE)
+		for (x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
 		{
 			UINT8 foreraw, forebits, cd, plb, star, mux;
 			UINT8 xx = x / TURBO_X_SCALE;

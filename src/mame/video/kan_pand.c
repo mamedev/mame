@@ -97,7 +97,7 @@ void pandora_set_clear_bitmap( device_t *device, int clear )
 	pandora->clear_bitmap = clear;
 }
 
-void pandora_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
+void pandora_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	kaneko_pandora_state *pandora = get_safe_token(device);
 
@@ -111,7 +111,7 @@ void pandora_update( device_t *device, bitmap_t *bitmap, const rectangle *clipre
 }
 
 
-static void pandora_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
+static void pandora_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	kaneko_pandora_state *pandora = get_safe_token(device);
 	int sx = 0, sy = 0, x = 0, y = 0, offs;
@@ -204,7 +204,7 @@ void pandora_eof( device_t *device )
 	if (pandora->clear_bitmap)
 		pandora->sprites_bitmap->fill(pandora->bg_pen, pandora->screen->visible_area());
 
-	pandora_draw(device, pandora->sprites_bitmap, &pandora->screen->visible_area());
+	pandora_draw(device, pandora->sprites_bitmap, pandora->screen->visible_area());
 }
 
 /*****************************************************************************

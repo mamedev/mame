@@ -199,7 +199,7 @@ WRITE8_HANDLER( blktiger_screen_layout_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 //  blktiger_state *state = machine.driver_data<blktiger_state>();
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
@@ -234,7 +234,7 @@ SCREEN_UPDATE( blktiger )
 {
 	blktiger_state *state = screen.machine().driver_data<blktiger_state>();
 
-	bitmap->fill(1023, *cliprect);
+	bitmap->fill(1023, cliprect);
 
 	if (state->m_bgon)
 		tilemap_draw(bitmap, cliprect, state->m_screen_layout ? state->m_bg_tilemap8x4 : state->m_bg_tilemap4x8, TILEMAP_DRAW_LAYER1, 0);

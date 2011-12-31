@@ -231,7 +231,7 @@ VIDEO_START( sraider )
 	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -288,7 +288,7 @@ SCREEN_UPDATE( ladybug )
 	int offs;
 
 	// clear the bg bitmap
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	for (offs = 0; offs < 32; offs++)
 	{
@@ -333,7 +333,7 @@ SCREEN_UPDATE( sraider )
 	}
 
 	// clear the bg bitmap
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	// draw the stars
 	if (flip_screen_get(screen.machine()))
@@ -352,12 +352,12 @@ SCREEN_UPDATE( sraider )
 		if (state->m_grid_data[i] != 0)
 		{
 			UINT8 x = i;
-			int height = cliprect->max_y - cliprect->min_y + 1;
+			int height = cliprect.max_y - cliprect.min_y + 1;
 
 			if (flip_screen_get(screen.machine()))
 				x = ~x;
 
-			bitmap->plot_box(x, cliprect->min_y, 1, height, 0x81);
+			bitmap->plot_box(x, cliprect.min_y, 1, height, 0x81);
 		}
 	}
 

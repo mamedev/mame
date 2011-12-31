@@ -653,7 +653,7 @@ static SCREEN_UPDATE( subsino2 )
 		}
 	}
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (layers_ctrl & 1)
 	{
@@ -690,7 +690,7 @@ static SCREEN_UPDATE( subsino2 )
 						if ( reelwrap_y-1 <= visible.max_y )
 							tmp.max_y = reelwrap_y-1;
 						tilemap_set_scrolly(l->tmap, 0, reelscroll_y);
-						tilemap_draw(bitmap, &tmp, l->tmap, 0, 0);
+						tilemap_draw(bitmap, tmp, l->tmap, 0, 0);
 						tmp.max_y = visible.max_y;
 					}
 
@@ -700,7 +700,7 @@ static SCREEN_UPDATE( subsino2 )
 						if ( reelwrap_y >= visible.min_y )
 							tmp.min_y = reelwrap_y;
 						tilemap_set_scrolly(l->tmap, 0, -((reelwrap_y &0xff) | (reelscroll_y & 0x100)));
-						tilemap_draw(bitmap, &tmp, l->tmap, 0, 0);
+						tilemap_draw(bitmap, tmp, l->tmap, 0, 0);
 						tmp.min_y = visible.min_y;
 					}
 				}

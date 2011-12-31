@@ -108,17 +108,17 @@ static SCREEN_UPDATE( superwng )
 	int flip=flip_screen_get(screen.machine());
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	rectangle tmp=*cliprect;
+	rectangle tmp=cliprect;
 
 	if(flip)
 	{
 		tmp.min_x+=32;
-		tilemap_draw(bitmap, &tmp, state->m_fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, tmp, state->m_fg_tilemap, 0, 0);
 	}
 	else
 	{
 		tmp.max_x-=32;
-		tilemap_draw(bitmap, &tmp, state->m_fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, tmp, state->m_fg_tilemap, 0, 0);
 	}
 
 	{

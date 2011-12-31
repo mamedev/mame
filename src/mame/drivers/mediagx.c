@@ -201,7 +201,7 @@ static VIDEO_START(mediagx)
 	}
 }
 
-static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	const UINT8 *dp;
@@ -227,7 +227,7 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 	}
 }
 
-static void draw_framebuffer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_framebuffer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
@@ -320,7 +320,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_t *bitmap, const r
 	}
 }
 
-static void draw_cga(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_cga(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
@@ -347,7 +347,7 @@ static void draw_cga(running_machine &machine, bitmap_t *bitmap, const rectangle
 static SCREEN_UPDATE(mediagx)
 {
 	mediagx_state *state = screen.machine().driver_data<mediagx_state>();
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	draw_framebuffer(screen.machine(), bitmap, cliprect);
 

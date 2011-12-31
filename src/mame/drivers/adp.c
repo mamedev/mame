@@ -191,7 +191,7 @@ bool adp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 	bitmap.fill(0, cliprect);
 
 	/* graphics */
-	m_h63484->update_screen(&bitmap, &cliprect);
+	m_h63484->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

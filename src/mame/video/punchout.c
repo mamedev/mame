@@ -205,7 +205,7 @@ WRITE8_HANDLER( punchout_spr2_videoram_w )
 
 
 
-static void draw_big_sprite(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int palette)
+static void draw_big_sprite(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int palette)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int zoom;
@@ -249,7 +249,7 @@ static void draw_big_sprite(running_machine &machine, bitmap_t *bitmap, const re
 }
 
 
-static void armwrest_draw_big_sprite(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int palette)
+static void armwrest_draw_big_sprite(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int palette)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int zoom;
@@ -296,7 +296,7 @@ static void armwrest_draw_big_sprite(running_machine &machine, bitmap_t *bitmap,
 	}
 }
 
-static void drawbs2(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void drawbs2(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int sx,sy;

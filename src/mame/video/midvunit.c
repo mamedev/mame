@@ -546,17 +546,17 @@ SCREEN_UPDATE( midvunit )
 #endif
 
 	/* determine how many pixels to copy */
-	xoffs = cliprect->min_x;
-	width = cliprect->max_x - xoffs + 1;
+	xoffs = cliprect.min_x;
+	width = cliprect.max_x - xoffs + 1;
 
 	/* adjust the offset */
 	offset += xoffs;
-	offset += 512 * (cliprect->min_y - screen.visible_area().min_y);
+	offset += 512 * (cliprect.min_y - screen.visible_area().min_y);
 
 	/* loop over rows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dest = &bitmap->pix16(y, cliprect->min_x);
+		UINT16 *dest = &bitmap->pix16(y, cliprect.min_x);
 		for (x = 0; x < width; x++)
 			*dest++ = state->m_videoram[offset + x] & 0x7fff;
 		offset += 512;

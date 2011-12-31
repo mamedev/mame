@@ -865,7 +865,7 @@ SCREEN_UPDATE( amiga_aga )
 	int y;
 
 	/* render each scanline in the visible region */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		amiga_aga_render_scanline(screen.machine(), bitmap, y);
 
 	return 0;

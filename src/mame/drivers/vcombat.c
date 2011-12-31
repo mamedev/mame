@@ -104,7 +104,7 @@ public:
 	int m_crtc_select;
 };
 
-static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int index)
+static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int index)
 {
 	vcombat_state *state = screen.machine().driver_data<vcombat_state>();
 	int y;
@@ -118,15 +118,15 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 	/*       There's also some garbage in the upper-left corner. Might be related to this 'wraparound'. */
 	/*       Or maybe it's related to the 68k's alpha?  It might come from the 68k side of the house.  */
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
+	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		int x;
 		int src_addr = 256/2 * y;
 		const UINT16 *m68k_src = &m68k_buf[src_addr];
 		const UINT16 *i860_src = &i860_buf[src_addr];
-		UINT32 *dst = &bitmap->pix32(y, cliprect->min_x);
+		UINT32 *dst = &bitmap->pix32(y, cliprect.min_x);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			int i;
 			UINT16 m68k_pix = *m68k_src++;

@@ -205,7 +205,7 @@ static SCREEN_UPDATE(murogem)
 	int xx,yy,count;
 	count = 0x000;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	for (yy=0;yy<32;yy++)
 	{

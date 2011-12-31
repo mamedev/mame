@@ -148,7 +148,7 @@ static void thoop2_sort_sprites(running_machine &machine)
       3  | xxxxxxxx xxxxxx-- | sprite code (low bits)
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri)
 {
 	thoop2_state *state = machine.driver_data<thoop2_state>();
 	int j, x, y, ex, ey;
@@ -210,7 +210,7 @@ SCREEN_UPDATE( thoop2 )
 
 	thoop2_sort_sprites(screen.machine());
 
-	bitmap->fill(0, *cliprect );
+	bitmap->fill(0, cliprect );
 
 	tilemap_draw(bitmap,cliprect,state->m_pant[1],TILEMAP_DRAW_LAYER1 | 3,0);
 	tilemap_draw(bitmap,cliprect,state->m_pant[0],TILEMAP_DRAW_LAYER1 | 3,0);

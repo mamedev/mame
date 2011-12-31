@@ -232,7 +232,7 @@ READ8_HANDLER( thepit_input_port_0_r )
 
 static void draw_sprites(running_machine &machine,
 						 bitmap_t *bitmap,
-						 const rectangle *cliprect,
+						 const rectangle &cliprect,
 						 int priority_to_draw)
 {
 	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8, 30*8-1);
@@ -273,7 +273,7 @@ static void draw_sprites(running_machine &machine,
 			/* sprites 0-3 are drawn one pixel down */
 			if (offs < 16) y++;
 
-			drawgfx_transpen(bitmap, state->m_flip_screen_x ? &spritevisibleareaflipx : &spritevisiblearea,
+			drawgfx_transpen(bitmap, state->m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea,
 					machine.gfx[2 * state->m_graphics_bank + 1],
 					state->m_spriteram[offs + 1] & 0x3f,
 					state->m_spriteram[offs + 2],

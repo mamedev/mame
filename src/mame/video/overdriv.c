@@ -60,7 +60,7 @@ SCREEN_UPDATE( overdriv )
 	state->m_zoom_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI3);
 	state->m_zoom_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI4);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	k051316_zoom_draw(state->m_k051316_1, bitmap, cliprect, 0, 0);
 	k051316_zoom_draw(state->m_k051316_2, bitmap, cliprect, 0, 1);

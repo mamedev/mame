@@ -47,7 +47,7 @@ PALETTE_INIT( ambush )
 }
 
 
-static void draw_chars( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_chars( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
 {
 	ambush_state *state = machine.driver_data<ambush_state>();
 	int offs, transpen;
@@ -92,7 +92,7 @@ SCREEN_UPDATE( ambush )
 	ambush_state *state = screen.machine().driver_data<ambush_state>();
 	int offs;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	/* Draw the characters */
 	draw_chars(screen.machine(), bitmap, cliprect, 0x00);

@@ -20,7 +20,7 @@ SCREEN_UPDATE( archimds_vidc )
 	const UINT8 x_step[4] = { 5, 7, 11, 19 };
 
 	/* border color */
-	bitmap->fill(screen.machine().pens[0x10], *cliprect);
+	bitmap->fill(screen.machine().pens[0x10], cliprect);
 
 	/* define X display area through BPP mode register */
 	calc_dxs = (vidc_regs[VIDC_HDSR]*2)+x_step[vidc_bpp_mode & 3];

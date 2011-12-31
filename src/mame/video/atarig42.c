@@ -186,7 +186,7 @@ SCREEN_UPDATE( atarig42 )
 	bitmap_t *priority_bitmap = screen.machine().priority_bitmap;
 
 	/* draw the playfield */
-	priority_bitmap->fill(0, *cliprect);
+	priority_bitmap->fill(0, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 1);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 2);
@@ -199,10 +199,10 @@ SCREEN_UPDATE( atarig42 )
 	/* copy the motion objects on top */
 	{
 		bitmap_t *mo_bitmap = atarirle_get_vram(state->m_rle, 0);
-		int left	= cliprect->min_x;
-		int top		= cliprect->min_y;
-		int right	= cliprect->max_x + 1;
-		int bottom	= cliprect->max_y + 1;
+		int left	= cliprect.min_x;
+		int top		= cliprect.min_y;
+		int right	= cliprect.max_x + 1;
+		int bottom	= cliprect.max_y + 1;
 		int x, y;
 
 		/* now blend with the playfield */

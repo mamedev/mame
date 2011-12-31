@@ -183,13 +183,13 @@ SCREEN_UPDATE( williams )
 		pens[x] = state->m_palette_lookup[screen.machine().generic.paletteram.u8[x]];
 
 	/* loop over rows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *source = &state->m_videoram[y];
 		UINT32 *dest = &bitmap->pix32(y);
 
 		/* loop over columns */
-		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			int pix = source[(x/2) * 256];
 			dest[x+0] = pens[pix >> 4];
@@ -211,11 +211,11 @@ SCREEN_UPDATE( blaster )
 		pens[x] = state->m_palette_lookup[screen.machine().generic.paletteram.u8[x]];
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
-	if (cliprect->min_y == screen.visible_area().min_y || !(state->m_blaster_video_control & 1))
+	if (cliprect.min_y == screen.visible_area().min_y || !(state->m_blaster_video_control & 1))
 		state->m_blaster_color0 = state->m_palette_lookup[state->m_blaster_palette_0[0] ^ 0xff];
 
 	/* loop over rows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int erase_behind = state->m_blaster_video_control & state->m_blaster_scanline_control[y] & 2;
 		UINT8 *source = &state->m_videoram[y];
@@ -226,7 +226,7 @@ SCREEN_UPDATE( blaster )
 			state->m_blaster_color0 = state->m_palette_lookup[state->m_blaster_palette_0[y] ^ 0xff];
 
 		/* loop over columns */
-		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			int pix = source[(x/2) * 256];
 
@@ -257,13 +257,13 @@ SCREEN_UPDATE( williams2 )
 		pens[x] = palette_get_color(screen.machine(), state->m_williams2_fg_color * 16 + x);
 
 	/* loop over rows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *source = &state->m_videoram[y];
 		UINT32 *dest = &bitmap->pix32(y);
 
 		/* loop over columns */
-		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			int pix = source[(x/2) * 256];
 

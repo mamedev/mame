@@ -322,7 +322,7 @@ WRITE8_HANDLER( congo_sprite_custom_w )
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int skew)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int skew)
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
@@ -345,7 +345,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 			flipoffs += 7;
 
 		/* loop over visible rows */
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			UINT16 *dst = &bitmap->pix16(y);
 			int srcx, srcy, vf;
@@ -360,7 +360,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 			src = &pixmap->pix16(srcy & ymask);
 
 			/* loop over visible colums */
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				/* start with HF = flipped H signals */
 				srcx = x ^ flipmask;
@@ -384,7 +384,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 	/* if not enabled, fill the background with black */
 	else
-		bitmap->fill(get_black_pen(machine), *cliprect);
+		bitmap->fill(get_black_pen(machine), cliprect);
 }
 
 
@@ -440,7 +440,7 @@ INLINE int find_minimum_x(UINT8 value, int flip)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	UINT8 *spriteram = state->m_spriteram;

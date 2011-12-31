@@ -181,7 +181,7 @@ public:
 	psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
 	WRITE32_MEMBER( write );
 	READ32_MEMBER( read );
 	void dma_read( UINT32 n_address, INT32 n_size );
@@ -221,7 +221,7 @@ protected:
 	void DebugMesh( int n_coordx, int n_coordy );
 	void DebugMeshEnd( void );
 	void DebugCheckKeys( void );
-	int DebugMeshDisplay( bitmap_t *bitmap, const rectangle *cliprect );
+	int DebugMeshDisplay( bitmap_t *bitmap, const rectangle &cliprect );
 	int DebugTextureDisplay( bitmap_t *bitmap );
 #endif
 

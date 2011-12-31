@@ -146,7 +146,7 @@ Sprite list:
 [2] xxxx xxxx X attribute
 [3] xxxx xxxx sprite number
 */
-static void zerotrgt_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void zerotrgt_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 	int offs;
@@ -204,7 +204,7 @@ static void zerotrgt_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
      ---- --xx tile bank
 */
 
-static void cntsteer_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void cntsteer_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 	int offs;
@@ -258,7 +258,7 @@ static SCREEN_UPDATE( zerotrgt )
 	cntsteer_state *state = screen.machine().driver_data<cntsteer_state>();
 
 	if (state->m_disable_roz)
-		bitmap->fill(screen.machine().pens[8 * state->m_bg_color_bank], *cliprect);
+		bitmap->fill(screen.machine().pens[8 * state->m_bg_color_bank], cliprect);
 	else
 	{
 		int p1, p2, p3, p4;
@@ -309,7 +309,7 @@ static SCREEN_UPDATE( cntsteer )
 	cntsteer_state *state = screen.machine().driver_data<cntsteer_state>();
 
 	if (state->m_disable_roz)
-		bitmap->fill(screen.machine().pens[8 * state->m_bg_color_bank], *cliprect);
+		bitmap->fill(screen.machine().pens[8 * state->m_bg_color_bank], cliprect);
 	else
 	{
 		int p1, p2, p3, p4;

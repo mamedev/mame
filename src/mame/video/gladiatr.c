@@ -200,7 +200,7 @@ WRITE8_HANDLER( gladiatr_video_registers_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	gladiatr_state *state = machine.driver_data<gladiatr_state>();
 	int offs;
@@ -260,19 +260,19 @@ SCREEN_UPDATE( ppking )
 	/* the fg layer just selects the upper palette bank on underlying pixels */
 	{
 		bitmap_t *flagsbitmap;
-		int sx = cliprect->min_x;
-		int sy = cliprect->min_y;
+		int sx = cliprect.min_x;
+		int sy = cliprect.min_y;
 
 		tilemap_get_pixmap( state->m_fg_tilemap );
 		flagsbitmap = tilemap_get_flagsmap( state->m_fg_tilemap );
 
-		while( sy <= cliprect->max_y )
+		while( sy <= cliprect.max_y )
 		{
 			int x = sx;
 			int y = (sy + state->m_fg_scrolly) & 0x1ff;
 
 			UINT16 *dest = &bitmap->pix16(sy, sx);
-			while( x <= cliprect->max_x )
+			while( x <= cliprect.max_x )
 			{
 				if( flagsbitmap->pix8(y, x)&TILEMAP_PIXEL_LAYER0 )
 				{
@@ -308,6 +308,6 @@ SCREEN_UPDATE( gladiatr )
 		tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	}
 	else
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect );
+		bitmap->fill(get_black_pen(screen.machine()), cliprect );
 	return 0;
 }

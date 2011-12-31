@@ -33,7 +33,7 @@ SCREEN_UPDATE(system24)
 	}
 
 	screen.machine().priority_bitmap->fill(0);
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	std::vector<int> order;
 	order.resize(12);

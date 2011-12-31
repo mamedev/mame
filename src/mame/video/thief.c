@@ -116,7 +116,7 @@ SCREEN_UPDATE( thief ){
 
 	if (tms9927_screen_reset(screen.machine().device("tms")))
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 

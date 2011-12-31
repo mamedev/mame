@@ -210,7 +210,7 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *sbank, int bank )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 *sbank, int bank )
 {
 	hcastle_state *state = machine.driver_data<hcastle_state>();
 	device_t *k007121 = bank ? state->m_k007121_2 : state->m_k007121_1;

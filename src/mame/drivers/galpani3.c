@@ -210,7 +210,7 @@ static SCREEN_UPDATE(galpani3)
 	UINT16 pixdata1;
 	const pen_t *paldata = screen.machine().pens;
 
-	bitmap->fill(0x0000, *cliprect);
+	bitmap->fill(0x0000, cliprect);
 
 	{
 		int drawy, drawx;
@@ -352,7 +352,7 @@ static SCREEN_UPDATE(galpani3)
 		}
 	}
 
-	state->m_sprite_bitmap_1->fill(0x0000, *cliprect);
+	state->m_sprite_bitmap_1->fill(0x0000, cliprect);
 
 	state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap_1, cliprect, state->m_spriteram32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
 

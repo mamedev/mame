@@ -519,11 +519,11 @@ static SCREEN_UPDATE( laserbat )
 	s2636_3_bitmap = s2636_update(state->m_s2636_3, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int x;
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int pixel1 = s2636_1_bitmap->pix16(y, x);
 			int pixel2 = s2636_2_bitmap->pix16(y, x);

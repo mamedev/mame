@@ -66,12 +66,12 @@ SCREEN_UPDATE( dribling )
 	int x, y;
 
 	/* loop over rows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *dst = &bitmap->pix16(y);
 
 		/* loop over columns */
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int b7 = prombase[(x >> 3) | ((y >> 3) << 5)] & 1;
 			int b6 = state->m_abca;

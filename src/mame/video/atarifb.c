@@ -104,7 +104,7 @@ VIDEO_START( atarifb )
 
 
 
-static void draw_playfield_and_alpha( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int playfield_x_offset, int playfield_y_offset )
+static void draw_playfield_and_alpha( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int playfield_x_offset, int playfield_y_offset )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
 	const rectangle bigfield_area(4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1);
@@ -115,13 +115,13 @@ static void draw_playfield_and_alpha( running_machine &machine, bitmap_t *bitmap
 	scroll_x[0] = - *state->m_scroll_register + 32 + playfield_x_offset;
 	scroll_y[0] = 8 + playfield_y_offset;
 
-	copybitmap(bitmap, tilemap_get_pixmap(state->m_alpha1_tilemap), 0, 0, 35*8, 1*8, NULL);
-	copybitmap(bitmap, tilemap_get_pixmap(state->m_alpha2_tilemap), 0, 0,  0*8, 1*8, NULL);
-	copyscrollbitmap(bitmap, tilemap_get_pixmap(state->m_field_tilemap),  1, scroll_x, 1, scroll_y, &bigfield_area);
+	copybitmap(bitmap, tilemap_get_pixmap(state->m_alpha1_tilemap), 0, 0, 35*8, 1*8, cliprect);
+	copybitmap(bitmap, tilemap_get_pixmap(state->m_alpha2_tilemap), 0, 0,  0*8, 1*8, cliprect);
+	copyscrollbitmap(bitmap, tilemap_get_pixmap(state->m_field_tilemap),  1, scroll_x, 1, scroll_y, bigfield_area);
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int gfx, int is_soccer )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int gfx, int is_soccer )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
 	const rectangle bigfield_area(4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1);
@@ -152,14 +152,14 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		{
 			shade = ((state->m_spriteram[obj * 2 + 1 + 0x20]) & 0x07);
 
-			drawgfx_transpen(bitmap, &bigfield_area, machine.gfx[gfx + 1],
+			drawgfx_transpen(bitmap, bigfield_area, machine.gfx[gfx + 1],
 				charcode, shade,
 				flipx, flipy, sx, sy, 0);
 
 			shade = ((state->m_spriteram[obj * 2 + 1 + 0x20]) & 0x08) >> 3;
 		}
 
-		drawgfx_transpen(bitmap, &bigfield_area, machine.gfx[gfx],
+		drawgfx_transpen(bitmap, bigfield_area, machine.gfx[gfx],
 				charcode, shade,
 				flipx, flipy, sx, sy, 0);
 
@@ -171,7 +171,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 			if ((charcode == 0x11) && (sy == 0x07))
 			{
 				sy = 0xf1; /* When multiplexed, it's 0x10...why? */
-				drawgfx_transpen(bitmap, &bigfield_area, machine.gfx[gfx],
+				drawgfx_transpen(bitmap, bigfield_area, machine.gfx[gfx],
 					charcode, 0,
 					flipx, flipy, sx, sy, 0);
 			}

@@ -6,7 +6,7 @@
 
 /* Sprites */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	/*- SPR RAM Format -**
 
@@ -132,7 +132,7 @@ SCREEN_UPDATE(bigstrkb)
 {
 	bigstrkb_state *state = screen.machine().driver_data<bigstrkb_state>();
 
-//  bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+//  bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	tilemap_set_scrollx(state->m_tilemap2,0, state->m_vidreg1[0]+(256-14));
 	tilemap_set_scrolly(state->m_tilemap2,0, state->m_vidreg2[0]);

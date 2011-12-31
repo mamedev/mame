@@ -161,9 +161,9 @@ SCREEN_UPDATE( esripsys )
 	UINT8 *intensity_buf = line_buffer[state->m_12sel ? 0 : 1].intensity_buf;
 	UINT8 *priority_buf = line_buffer[state->m_12sel ? 0 : 1].priority_buf;
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
+	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT32 *dest = &bitmap->pix32(y, cliprect->min_x);
+		UINT32 *dest = &bitmap->pix32(y, cliprect.min_x);
 
 		for (x = 0; x < 512; ++x)
 		{

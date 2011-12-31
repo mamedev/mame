@@ -331,8 +331,8 @@ SCREEN_UPDATE( dday )
 
 		bitmap_t *sl_bitmap = tilemap_get_pixmap(state->m_sl_tilemap);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
 				UINT16 src_pixel = state->m_main_bitmap->pix16(y, x);
 

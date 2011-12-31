@@ -7,18 +7,18 @@
 
 static void blendbitmaps(running_machine &machine,
 		bitmap_t *dest,bitmap_t *src1,bitmap_t *src2,
-		const rectangle *cliprect)
+		const rectangle &cliprect)
 {
 	int y,x;
 	const pen_t *paldata = machine.pens;
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *dd  = &dest->pix32(y);
 		UINT16 *sd1 = &src1->pix16(y);
 		UINT16 *sd2 = &src2->pix16(y);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sd2[x])
 			{
@@ -35,7 +35,7 @@ static void blendbitmaps(running_machine &machine,
 
 
 /* from gals pinball (which was in turn from ninja gaiden) */
-static int draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static int draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -123,7 +123,7 @@ SCREEN_UPDATE( spbactn )
 	spbactn_state *state = screen.machine().driver_data<spbactn_state>();
 	int offs, sx, sy;
 
-	state->m_tile_bitmap_fg->fill(0, *cliprect);
+	state->m_tile_bitmap_fg->fill(0, cliprect);
 
 	/* draw table bg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)

@@ -303,7 +303,7 @@ WRITE8_HANDLER( alpha1v_flipscreen_w )
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int xpos, int ypos, int image)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
 	const rectangle &visarea = machine.primary_screen->visible_area();
@@ -365,7 +365,7 @@ SCREEN_UPDATE( m52 )
 	m52_state *state = screen.machine().driver_data<m52_state>();
 	int offs;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	if (!(state->m_bgcontrol & 0x20))
 	{
@@ -396,7 +396,7 @@ SCREEN_UPDATE( m52 )
 
 		/* sprites from offsets $00-$7F are processed in the upper half of the frame */
 		/* sprites from offsets $80-$FF are processed in the lower half of the frame */
-		clip = *cliprect;
+		clip = cliprect;
 		if (!(offs & 0x80))
 			clip.min_y = 0, clip.max_y = 127;
 		else
@@ -420,10 +420,10 @@ SCREEN_UPDATE( m52 )
 #ifdef SPLIT_SPRITES
 		sect_rect(&clip, cliprect);
 #else
-		clip = *cliprect;
+		clip = cliprect;
 #endif
 
-		drawgfx_transmask(bitmap, &clip, screen.machine().gfx[1],
+		drawgfx_transmask(bitmap, clip, screen.machine().gfx[1],
 			code, color, flipx, flipy, sx, sy,
 			colortable_get_transpen_mask(screen.machine().colortable, screen.machine().gfx[1], color, 512 + 32));
 	}

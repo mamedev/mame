@@ -369,7 +369,7 @@ WRITE8_HANDLER( system1_paletteram_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int xoffset)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int xoffset)
 {
 	system1_state *state = machine.driver_data<system1_state>();
 	UINT32 gfxbanks = machine.region("sprites")->bytes() / 0x8000;
@@ -421,7 +421,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			srcaddr += stride;
 
 			/* skip if outside of our clipping area */
-			if (y < cliprect->min_y || y > cliprect->max_y)
+			if (y < cliprect.min_y || y > cliprect.max_y)
 				continue;
 
 			/* iterate over X */
@@ -455,7 +455,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 					for (i = 0; i < 2; i++)
 					{
 						int effx = flipscreen ? 0x1fe - (x + i) : (x + i);
-						if (effx >= cliprect->min_x && effx <= cliprect->max_x)
+						if (effx >= cliprect.min_x && effx <= cliprect.max_x)
 						{
 							int prevpix = destbase[effx];
 
@@ -476,7 +476,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 					for (i = 0; i < 2; i++)
 					{
 						int effx = flipscreen ? 0x1fe - (x + 2 + i) : (x + 2 + i);
-						if (effx >= cliprect->min_x && effx <= cliprect->max_x)
+						if (effx >= cliprect.min_x && effx <= cliprect.max_x)
 						{
 							int prevpix = destbase[effx];
 
@@ -499,18 +499,18 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-static void video_update_common(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *fgpixmap, bitmap_t **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs)
+static void video_update_common(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, bitmap_t *fgpixmap, bitmap_t **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs)
 {
 	system1_state *state = screen.machine().driver_data<system1_state>();
 	const UINT8 *lookup = screen.machine().region("proms")->base();
 	int x, y;
 
 	/* first clear the sprite bitmap and draw sprites within this area */
-	state->m_sprite_bitmap->fill(0, *cliprect);
+	state->m_sprite_bitmap->fill(0, cliprect);
 	draw_sprites(screen.machine(), state->m_sprite_bitmap, cliprect, spritexoffs);
 
 	/* iterate over rows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *fgbase = &fgpixmap->pix16(y & 0xff);
 		UINT16 *sprbase = &state->m_sprite_bitmap->pix16(y & 0xff);
@@ -524,7 +524,7 @@ static void video_update_common(screen_device &screen, bitmap_t *bitmap, const r
 		bgbase[1] = &bgpixmaps[(bgy >> 8) * 2 + 1]->pix16(bgy & 0xff);
 
 		/* iterate over pixels */
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int bgx = ((x - bgxscroll) / 2) & 0x1ff;
 			UINT16 fgpix = fgbase[x / 2];

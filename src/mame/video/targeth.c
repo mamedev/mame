@@ -105,7 +105,7 @@ VIDEO_START( targeth )
       3  | xx------ -------- | not used?
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	targeth_state *state = machine.driver_data<targeth_state>();
 	int i;

@@ -19,7 +19,7 @@ SCREEN_UPDATE( taxidriv )
 
 	if (state->m_bghide)
 	{
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 
 		/* kludge to fix scroll after death */

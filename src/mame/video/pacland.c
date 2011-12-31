@@ -280,7 +280,7 @@ WRITE8_HANDLER( pacland_bankswitch_w )
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int whichmask)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int whichmask)
 {
 	pacland_state *state = machine.driver_data<pacland_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x780;
@@ -340,7 +340,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_fg(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_fg(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
 {
 	pacland_state *state = machine.driver_data<pacland_state>();
 	int y, x;
@@ -351,7 +351,7 @@ static void draw_fg(running_machine &machine, bitmap_t *bitmap, const rectangle 
 	tilemap_draw(state->m_fg_bitmap, cliprect, state->m_fg_tilemap, priority, 0);
 
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const UINT8 *pri = &machine.priority_bitmap->pix8(y);
 		UINT16 *src = &state->m_fg_bitmap->pix16(y);
@@ -359,7 +359,7 @@ static void draw_fg(running_machine &machine, bitmap_t *bitmap, const rectangle 
 
 		/* only copy if the priority bitmap is 0 (no high priority sprite) and the
            source pixel is not the invalid pen; also clear to 0xffff when finished */
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT16 pix = src[x];
 			if (pix != 0xffff)
@@ -385,7 +385,7 @@ SCREEN_UPDATE( pacland )
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
        wherever there is a high-priority pixel; note that we draw to the bitmap
        which is safe because the bg_tilemap draw will overwrite everything */
-	screen.machine().priority_bitmap->fill(0x00, *cliprect);
+	screen.machine().priority_bitmap->fill(0x00, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	/* draw background */

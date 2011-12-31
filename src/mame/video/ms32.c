@@ -205,7 +205,7 @@ WRITE32_HANDLER( ms32_gfxctrl_w )
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle &cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder)
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
@@ -275,7 +275,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, bitmap_t *b
 }
 
 
-static void draw_roz(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,int priority)
+static void draw_roz(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,int priority)
 {
 	ms32_state *state = machine.driver_data<ms32_state>();
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
@@ -285,11 +285,11 @@ static void draw_roz(running_machine &machine, bitmap_t *bitmap, const rectangle
 		rectangle my_clip;
 		int y,maxy;
 
-		my_clip.min_x = cliprect->min_x;
-		my_clip.max_x = cliprect->max_x;
+		my_clip.min_x = cliprect.min_x;
+		my_clip.max_x = cliprect.max_x;
 
-		y = cliprect->min_y;
-		maxy = cliprect->max_y;
+		y = cliprect.min_y;
+		maxy = cliprect.max_y;
 
 		while (y <= maxy)
 		{
@@ -317,7 +317,7 @@ static void draw_roz(running_machine &machine, bitmap_t *bitmap, const rectangle
 			if (incxx & 0x10000) incxx |= ~0x1ffff;
 			if (incxy & 0x10000) incxy |= ~0x1ffff;
 
-			tilemap_draw_roz(bitmap, &my_clip, state->m_roz_tilemap,
+			tilemap_draw_roz(bitmap, my_clip, state->m_roz_tilemap,
 					(start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
 					incxx<<8, incxy<<8, 0, 0,
 					1, // Wrap
@@ -392,17 +392,17 @@ SCREEN_UPDATE( ms32 )
 	tilemap_set_scrolly(state->m_bg_tilemap_alt, 0, scrolly);
 
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
        top and bottom of the screen becomes black on black) */
-	state->m_temp_bitmap_tilemaps->fill(0, *cliprect);	/* bg color */
+	state->m_temp_bitmap_tilemaps->fill(0, cliprect);	/* bg color */
 
 	/* clear our sprite bitmaps */
-	state->m_temp_bitmap_sprites->fill(0, *cliprect);
-	state->m_temp_bitmap_sprites_pri->fill(0, *cliprect);
+	state->m_temp_bitmap_sprites->fill(0, cliprect);
+	state->m_temp_bitmap_sprites_pri->fill(0, cliprect);
 
 	draw_sprites(screen.machine(), state->m_temp_bitmap_sprites, state->m_temp_bitmap_sprites_pri, cliprect, state->m_sprram_16, 0x20000, 0, state->m_reverse_sprite_order);
 
@@ -485,7 +485,7 @@ SCREEN_UPDATE( ms32 )
 
 		UINT32* dstptr_bitmap;
 
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 		for (yy=0;yy<height;yy++)
 		{

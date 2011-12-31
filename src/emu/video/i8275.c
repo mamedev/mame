@@ -460,7 +460,7 @@ WRITE8_DEVICE_HANDLER( i8275_dack_w )
 }
 
 /* Screen Update */
-void i8275_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void i8275_update(device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	i8275->ypos = 0;
@@ -474,7 +474,7 @@ void i8275_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 	i8275->fifo_write = 0;
 
 	if ((i8275->status_reg & I8275_STATUS_VIDEO_ENABLE)==0) {
-		bitmap->fill(get_black_pen(device->machine()), *cliprect);
+		bitmap->fill(get_black_pen(device->machine()), cliprect);
 	} else {
 		// if value < 16 it is visible otherwise not
 		i8275->cursor_blink_cnt++;

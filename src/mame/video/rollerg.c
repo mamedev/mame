@@ -64,8 +64,8 @@ SCREEN_UPDATE( rollerg )
 	rollerg_state *state = screen.machine().driver_data<rollerg_state>();
 	int bg_colorbase = 16;
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(16 * bg_colorbase, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(16 * bg_colorbase, cliprect);
 	k051316_zoom_draw(state->m_k051316, bitmap, cliprect, 0, 1);
 	k053245_sprites_draw(state->m_k053244, bitmap, cliprect);
 	return 0;

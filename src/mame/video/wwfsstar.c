@@ -111,7 +111,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
  sprite colour marking could probably be improved..
 *******************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	/*- SPR RAM Format -**
 

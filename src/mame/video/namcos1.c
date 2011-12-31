@@ -298,7 +298,7 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	namcos1_state *state = machine.driver_data<namcos1_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x800;
@@ -374,7 +374,7 @@ SCREEN_UPDATE( namcos1 )
 {
 	namcos1_state *state = screen.machine().driver_data<namcos1_state>();
 	int i, j, scrollx, scrolly, priority;
-	rectangle new_clip = *cliprect;
+	rectangle new_clip = cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set(screen.machine(), ) because the visible area is asymmetrical */
@@ -383,7 +383,7 @@ SCREEN_UPDATE( namcos1 )
 
 
 	/* background color */
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
 	i = ((state->m_cus116[0] << 8) | state->m_cus116[1]) - 1;			// min x
@@ -431,11 +431,11 @@ SCREEN_UPDATE( namcos1 )
 		for (i = 0;i < 6;i++)
 		{
 			if (state->m_playfield_control[16 + i] == priority)
-				tilemap_draw_primask(bitmap,&new_clip,state->m_bg_tilemap[i],0,priority,0);
+				tilemap_draw_primask(bitmap,new_clip,state->m_bg_tilemap[i],0,priority,0);
 		}
 	}
 
-	draw_sprites(screen.machine(), bitmap, &new_clip);
+	draw_sprites(screen.machine(), bitmap, new_clip);
 	return 0;
 }
 

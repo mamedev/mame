@@ -184,7 +184,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect )
 {
 	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 	int offs;

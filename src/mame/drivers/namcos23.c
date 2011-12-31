@@ -2083,7 +2083,7 @@ static void render_flush(running_machine &machine, bitmap_t *bitmap)
 		const namcos23_poly_entry *p = render.poly_order[i];
 		namcos23_render_data *rd = (namcos23_render_data *)poly_get_extra_data(render.polymgr);
 		*rd = p->rd;
-		poly_render_triangle_fan(render.polymgr, bitmap, &scissor, render_scanline, 4, p->vertex_count, p->pv);
+		poly_render_triangle_fan(render.polymgr, bitmap, scissor, render_scanline, 4, p->vertex_count, p->pv);
 	}
 	render.poly_count = 0;
 }
@@ -2136,7 +2136,7 @@ static VIDEO_START( ss23 )
 static SCREEN_UPDATE( ss23 )
 {
 	namcos23_state *state = screen.machine().driver_data<namcos23_state>();
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	render_run( screen.machine(), bitmap );
 

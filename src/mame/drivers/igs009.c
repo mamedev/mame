@@ -307,19 +307,19 @@ static SCREEN_UPDATE(jingbell)
 
 			if (rowenable==0)
 			{ // 0 and 1 are the same? or is there a global switchoff?
-				tilemap_draw(bitmap,&clip,state->m_gp98_reel1_tilemap,0,0);
+				tilemap_draw(bitmap,clip,state->m_gp98_reel1_tilemap,0,0);
 			}
 			else if (rowenable==1)
 			{
-				tilemap_draw(bitmap,&clip,state->m_gp98_reel2_tilemap,0,0);
+				tilemap_draw(bitmap,clip,state->m_gp98_reel2_tilemap,0,0);
 			}
 			else if (rowenable==2)
 			{
-				tilemap_draw(bitmap,&clip,state->m_gp98_reel3_tilemap,0,0);
+				tilemap_draw(bitmap,clip,state->m_gp98_reel3_tilemap,0,0);
 			}
 			else if (rowenable==3)
 			{
-				tilemap_draw(bitmap,&clip,state->m_gp98_reel4_tilemap,0,0);
+				tilemap_draw(bitmap,clip,state->m_gp98_reel4_tilemap,0,0);
 			}
 
 
@@ -327,7 +327,7 @@ static SCREEN_UPDATE(jingbell)
 		}
 
 	}
-	else					bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	else					bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

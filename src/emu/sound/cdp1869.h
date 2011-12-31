@@ -231,7 +231,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( predisplay_r );
 	DECLARE_READ_LINE_MEMBER( pal_ntsc_r );
 
-	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides

@@ -80,7 +80,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 }
 
 /* copied from Legionnaire */
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int pri)
 {
 	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -181,7 +181,7 @@ static VIDEO_START( rdx_v33 )
 
 static SCREEN_UPDATE( rdx_v33 )
 {
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, md_tilemap, 0, 0);

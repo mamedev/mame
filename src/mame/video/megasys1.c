@@ -567,7 +567,7 @@ WRITE16_HANDLER( megasys1_vregs_D_w )
     0C      Y position
     0E      Code                                            */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int color,code,sx,sy,flipx,flipy,attr,sprite,offs,color_mask;
@@ -973,7 +973,7 @@ SCREEN_UPDATE( megasys1 )
 		}
 	}
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	flag = TILEMAP_DRAW_OPAQUE;
 	primask = 0;
@@ -999,7 +999,7 @@ SCREEN_UPDATE( megasys1 )
 				if (flag != 0)
 				{
 					flag = 0;
-					bitmap->fill(0, *cliprect);
+					bitmap->fill(0, cliprect);
 				}
 
 				if (state->m_sprite_flag & 0x100)	/* sprites are split */

@@ -393,7 +393,7 @@ SCREEN_UPDATE( goldstar )
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -413,9 +413,9 @@ SCREEN_UPDATE( goldstar )
 		const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
 
-		tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
-		tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
-		tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible1, state->m_reel1_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible2, state->m_reel2_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible3, state->m_reel3_tilemap, 0, 0);
 	}
 
 	if (state->m_cm_enable_reg &0x04)
@@ -444,7 +444,7 @@ SCREEN_UPDATE( bingowng )
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -458,7 +458,7 @@ SCREEN_UPDATE( bingowng )
 
 
 		const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (4+7)*8-1);
-		tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible1, state->m_reel1_tilemap, 0, 0);
 	}
 
 	if (state->m_cm_enable_reg &0x04)
@@ -487,7 +487,7 @@ SCREEN_UPDATE( magical )
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -508,8 +508,8 @@ SCREEN_UPDATE( magical )
 			const rectangle visible1alt(0*8, (16+48)*8-1,  4*8,  16*8-1);
 			const rectangle visible2alt(0*8, (16+48)*8-1, 16*8,  28*8-1);
 
-			tilemap_draw(bitmap, &visible1alt, state->m_reel1_tilemap, 0, 0);
-			tilemap_draw(bitmap, &visible2alt, state->m_reel2_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible1alt, state->m_reel1_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible2alt, state->m_reel2_tilemap, 0, 0);
 			//tilemap_draw(bitmap, &magical_visible3, state->m_reel3_tilemap, 0, 0);
 		}
 		else
@@ -526,9 +526,9 @@ SCREEN_UPDATE( magical )
 			const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+8)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+8)*8-1);
 
-			tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
-			tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
-			tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible1, state->m_reel1_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible2, state->m_reel2_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible3, state->m_reel3_tilemap, 0, 0);
 		}
 	}
 
@@ -546,7 +546,7 @@ SCREEN_UPDATE( unkch )
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -581,9 +581,9 @@ SCREEN_UPDATE( unkch )
 			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
-			tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
-			tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
-			tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible1, state->m_reel1_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible2, state->m_reel2_tilemap, 0, 0);
+			tilemap_draw(bitmap, visible3, state->m_reel3_tilemap, 0, 0);
 		}
 	}
 
@@ -600,7 +600,7 @@ SCREEN_UPDATE( cmast91 )
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -618,9 +618,9 @@ SCREEN_UPDATE( cmast91 )
 		const rectangle visible2(0*8, (14+48)*8-1, 11*8, (12+7)*8-1);	/* 4 pixels less for reel2 */
 		const rectangle visible3(0*8, (14+48)*8-1, 19*8, (19+7)*8-1);	/* 8 pixels less for reel3 */
 
-		tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
-		tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
-		tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible1, state->m_reel1_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible2, state->m_reel2_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible3, state->m_reel3_tilemap, 0, 0);
 	}
 
 	if (state->m_cm_enable_reg &0x02)
@@ -636,7 +636,7 @@ SCREEN_UPDATE( amcoe1a )
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (!state->m_cm_enable_reg &0x01)
 		return 0;
@@ -654,9 +654,9 @@ SCREEN_UPDATE( amcoe1a )
 		const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+6)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 16*8, (16+6)*8-1);
 
-		tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
-		tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
-		tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible1, state->m_reel1_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible2, state->m_reel2_tilemap, 0, 0);
+		tilemap_draw(bitmap, visible3, state->m_reel3_tilemap, 0, 0);
 	}
 
 	if (state->m_cm_enable_reg &0x04)

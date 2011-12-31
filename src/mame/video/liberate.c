@@ -290,7 +290,7 @@ PALETTE_INIT( liberate )
 
 /***************************************************************************/
 
-static void liberate_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void liberate_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -359,7 +359,7 @@ static void liberate_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	}
 }
 
-static void prosport_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void prosport_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
 	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color, gfx_region;
@@ -424,7 +424,7 @@ static void prosport_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	}
 }
 
-static void boomrang_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static void boomrang_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -485,7 +485,7 @@ static void boomrang_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	}
 }
 
-static void prosoccr_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void prosoccr_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -519,7 +519,7 @@ SCREEN_UPDATE( prosoccr )
 	tilemap_set_scrollx(state->m_back_tilemap, 0, -state->m_io_ram[0]);
 
 	if (state->m_background_disable)
-		bitmap->fill(32, *cliprect);
+		bitmap->fill(32, cliprect);
 	else
 		tilemap_draw(bitmap, cliprect, state->m_back_tilemap, 0, 0);
 
@@ -537,7 +537,7 @@ SCREEN_UPDATE( prosport )
 	int mx, my, tile, offs, gfx_region;
 	int scrollx, scrolly;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	offs = 0;
 	/* TODO: what's bits 0 and 2 for? Internal scrolling state? */
@@ -580,7 +580,7 @@ SCREEN_UPDATE( boomrang )
 	tilemap_set_scrollx(state->m_back_tilemap, 0, -state->m_io_ram[0]);
 
 	if (state->m_background_disable)
-		bitmap->fill(32, *cliprect);
+		bitmap->fill(32, cliprect);
 	else
 		tilemap_draw(bitmap, cliprect, state->m_back_tilemap, TILEMAP_DRAW_LAYER1, 0);
 
@@ -600,7 +600,7 @@ SCREEN_UPDATE( liberate )
 	tilemap_set_scrollx(state->m_back_tilemap, 0, -state->m_io_ram[0]);
 
 	if (state->m_background_disable)
-		bitmap->fill(32, *cliprect);
+		bitmap->fill(32, cliprect);
 	else
 		tilemap_draw(bitmap, cliprect, state->m_back_tilemap, 0, 0);
 

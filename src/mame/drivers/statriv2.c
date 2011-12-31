@@ -181,7 +181,7 @@ static SCREEN_UPDATE( statriv2 )
 {
 	statriv2_state *state = screen.machine().driver_data<statriv2_state>();
 	if (tms9927_screen_reset(screen.machine().device("tms")))
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	else
 		tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 	return 0;

@@ -138,7 +138,7 @@ static void get_starfield_pens(spacefb_state *state, pen_t *pens)
 }
 
 
-static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	spacefb_state *state = screen.machine().driver_data<spacefb_state>();
 	int y;
@@ -147,7 +147,7 @@ static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectan
 	get_starfield_pens(state, pens);
 
 	/* the shift register is always shifting -- do the portion in the top VBLANK */
-	if (cliprect->min_y == screen.visible_area().min_y)
+	if (cliprect.min_y == screen.visible_area().min_y)
 	{
 		int i;
 
@@ -159,7 +159,7 @@ static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectan
 	}
 
 	/* visible region of the screen */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int x;
 
@@ -182,7 +182,7 @@ static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectan
 	}
 
 	/* do the shifting in the bottom VBLANK */
-	if (cliprect->max_y == screen.visible_area().max_y)
+	if (cliprect.max_y == screen.visible_area().max_y)
 	{
 		int i;
 		int clock_count = (SPACEFB_HBSTART - SPACEFB_HBEND) * (SPACEFB_VTOTAL - SPACEFB_VBSTART);
@@ -248,7 +248,7 @@ static void get_sprite_pens(running_machine &machine, pen_t *pens)
 }
 
 
-static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap_t *bitmap, const rectangle *cliprect, int flip)
+static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap_t *bitmap, const rectangle &cliprect, int flip)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
@@ -270,7 +270,7 @@ static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap
 		else
 			dy = y;
 
-		if ((dy > cliprect->min_y) && (dy < cliprect->max_y))
+		if ((dy > cliprect.min_y) && (dy < cliprect.max_y))
 		{
 			for (sx = 0; sx < 4; sx++)
 			{
@@ -300,7 +300,7 @@ static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap
 }
 
 
-static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitmap_t *bitmap, const rectangle *cliprect, int flip)
+static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitmap_t *bitmap, const rectangle &cliprect, int flip)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
@@ -325,7 +325,7 @@ static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitm
 		else
 			dy = y;
 
-		if ((dy > cliprect->min_y) && (dy < cliprect->max_y))
+		if ((dy > cliprect.min_y) && (dy < cliprect.max_y))
 		{
 			for (sx = 0; sx < 8; sx++)
 			{
@@ -358,7 +358,7 @@ static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitm
 }
 
 
-static void draw_objects(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_objects(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	pen_t sprite_pens[NUM_SPRITE_PENS];

@@ -140,7 +140,7 @@ static SCREEN_UPDATE( bmcbowl )
 */
 
 	int x,y,z,pixdat;
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	z=0;
 	for (y=0;y<230;y++)

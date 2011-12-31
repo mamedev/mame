@@ -547,7 +547,7 @@ VIDEO_START( ygv608 )
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ygv608_exit), &machine));
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 #ifdef _ENABLE_SPRITES
 
@@ -564,7 +564,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
     return;
 
   /* draw sprites */
-  spriteClip &= *cliprect;
+  spriteClip &= cliprect;
   sa = &ygv608.sprite_attribute_table.s[YGV608_MAX_SPRITES-1];
   for( i=0; i<YGV608_MAX_SPRITES; i++, sa-- )
   {
@@ -600,20 +600,20 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	    logerror( "SZ_8X8: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_8X8_4BIT],
+      drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_8X8_4BIT],
 	       code+namcond1_gfxbank*0x10000,
 	       color,
 	       flipx,flipy,
 	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-8 )
-        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_8X8_4BIT],
+        drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_8X8_4BIT],
 	        code+namcond1_gfxbank*0x10000,
 	        color,
 	        flipx,flipy,
 	        sx-512,sy,0x00);
       if( sy > 512-8 )
-        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_8X8_4BIT],
+        drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_8X8_4BIT],
 	        code+namcond1_gfxbank*0x10000,
 	        color,
 	        flipx,flipy,
@@ -630,20 +630,20 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	    logerror( "SZ_8X8: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_16X16_4BIT],
+      drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_16X16_4BIT],
 	       code+namcond1_gfxbank*0x4000,
 	       color,
 	       flipx,flipy,
 	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-16 )
-        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_16X16_4BIT],
+        drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_16X16_4BIT],
 	        code+namcond1_gfxbank*0x4000,
 	        color,
 	        flipx,flipy,
 	        sx-512,sy,0x00);
       if( sy > 512-16 )
-        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_16X16_4BIT],
+        drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_16X16_4BIT],
 	        code+namcond1_gfxbank*0x4000,
 	        color,
 	        flipx,flipy,
@@ -660,20 +660,20 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	  logerror( "SZ_32X32: sprite=%d\n", code );
 	code = 0;
       }
-      drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_32X32_4BIT],
+      drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_32X32_4BIT],
 	       code+namcond1_gfxbank*0x1000,
 	       color,
 	       flipx,flipy,
 	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-32 )
-        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_32X32_4BIT],
+        drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_32X32_4BIT],
 	        code+namcond1_gfxbank*0x1000,
 	        color,
 	        flipx,flipy,
 	        sx-512,sy,0x00);
       if( sy > 512-32 )
-        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_32X32_4BIT],
+        drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_32X32_4BIT],
 	        code+namcond1_gfxbank*0x1000,
 	        color,
 	        flipx,flipy,
@@ -690,20 +690,20 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	    logerror( "SZ_64X64: sprite=%d\n", code );
 	    code = 0;
       }
-      drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_64X64_4BIT],
+      drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_64X64_4BIT],
 	       code+namcond1_gfxbank*0x400,
 	       color,
 	       flipx,flipy,
 	       sx,sy,0x00);
       // redraw with wrap-around
       if( sx > 512-64 )
-        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_64X64_4BIT],
+        drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_64X64_4BIT],
 	        code+namcond1_gfxbank*0x400,
 	        color,
 	        flipx,flipy,
 	        sx-512,sy,0x00);
       if( sy > 512-64 )
-        drawgfx_transpen( bitmap, &spriteClip,machine.gfx[GFX_64X64_4BIT],
+        drawgfx_transpen( bitmap, spriteClip,machine.gfx[GFX_64X64_4BIT],
 	        code+namcond1_gfxbank*0x400,
 	        color,
 	        flipx,flipy,
@@ -750,13 +750,12 @@ SCREEN_UPDATE( ygv608 )
 	finalclip.min_x = finalclip.min_y = 0;
 	finalclip.max_x = screen.width() - 1;
 	finalclip.max_y = screen.height() - 1;
-	finalclip &= *cliprect;
-	cliprect = &finalclip;
+	finalclip &= cliprect;
 
 	// punt if not initialized
 	if (ygv608.page_x == 0 || ygv608.page_y == 0)
 	{
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, finalclip);
 		return 0;
 	}
 
@@ -808,7 +807,7 @@ SCREEN_UPDATE( ygv608 )
 		tilemap_set_scroll_cols( tilemap_B, ygv608.page_x );
 
 		// now clear the screen in case we change to 1-plane mode
-		work_bitmap->fill(0, *cliprect );
+		work_bitmap->fill(0, finalclip );
 
 		// reset resize flag
 		ygv608.tilemap_resize = 0;
@@ -861,12 +860,12 @@ SCREEN_UPDATE( ygv608 )
 	if ((ygv608.regs.s.r7 & r7_md) & MD_1PLANE)
 	{
 		// If the background tilemap is disabled, we need to clear the bitmap to black
-		work_bitmap->fill(0, *cliprect);
+		work_bitmap->fill(0, finalclip);
 //      work_bitmap->fill(1, *visarea);
 	}
 	else
 #endif
-		tilemap_draw( work_bitmap,cliprect, tilemap_B, 0, 0 );
+		tilemap_draw( work_bitmap,finalclip, tilemap_B, 0, 0 );
 
 #ifdef _ENABLE_ROTATE_ZOOM
 
@@ -882,7 +881,7 @@ SCREEN_UPDATE( ygv608 )
   cos_theta = (double)ygv608.dx / (double)0x10000;
 
   if( ygv608.regs.s.zron )
-    copyrozbitmap( bitmap, cliprect, work_bitmap,
+    copyrozbitmap( bitmap, finalclip, work_bitmap,
                    ( visarea.min_x << 16 ) +
                     ygv608.ax + 0x10000 * r *
                     ( -sin( alpha ) * cos_theta + cos( alpha ) * sin_theta ),
@@ -892,7 +891,7 @@ SCREEN_UPDATE( ygv608 )
                    ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0);
   else
 #endif
-    copybitmap( bitmap, work_bitmap, 0, 0, 0, 0, cliprect);
+    copybitmap( bitmap, work_bitmap, 0, 0, 0, 0, finalclip);
 
   // for some reason we can't use an opaque tilemap_A
   // so use a transparent but clear the work bitmap first
@@ -901,24 +900,24 @@ SCREEN_UPDATE( ygv608 )
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_ASBDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_ASEBDX )
-		draw_sprites(screen.machine(), bitmap,cliprect );
+		draw_sprites(screen.machine(), bitmap,finalclip );
 
-	tilemap_draw( work_bitmap,cliprect, tilemap_A, 0, 0 );
+	tilemap_draw( work_bitmap,finalclip, tilemap_A, 0, 0 );
 
 #ifdef _ENABLE_ROTATE_ZOOM
   if( ygv608.regs.s.zron )
-    copyrozbitmap_trans( bitmap, cliprect, work_bitmap,
+    copyrozbitmap_trans( bitmap, finalclip, work_bitmap,
                    ygv608.ax, // + ( visarea.min_x << 16 ),
                    ygv608.ay, // + ( visarea.min_y << 16 ),
                    ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0,
                    0 );
   else
 #endif
-    copybitmap_trans( bitmap, work_bitmap, 0, 0, 0, 0, cliprect, 0 );
+    copybitmap_trans( bitmap, work_bitmap, 0, 0, 0, 0, finalclip, 0 );
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_SABDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_SEABDX)
-		draw_sprites(screen.machine(), bitmap,cliprect );
+		draw_sprites(screen.machine(), bitmap,finalclip );
 
 
 #ifdef _SHOW_VIDEO_DEBUG

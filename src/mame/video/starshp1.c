@@ -181,7 +181,7 @@ static int get_sprite_vpos(starshp1_state *state, int i)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
 {
 	starshp1_state *state = machine.driver_data<starshp1_state>();
 	int i;
@@ -200,7 +200,7 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 }
 
 
-static void draw_spaceship(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_spaceship(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
 {
 	starshp1_state *state = machine.driver_data<starshp1_state>();
 	double scaler = -5 * log(1 - state->m_ship_size / 256.0); /* ? */
@@ -314,17 +314,17 @@ static void draw_circle(running_machine &machine, bitmap_t* bitmap)
 }
 
 
-static int spaceship_collision(running_machine &machine, bitmap_t *bitmap, const rectangle *rect)
+static int spaceship_collision(running_machine &machine, bitmap_t *bitmap, const rectangle &rect)
 {
 	starshp1_state *state = machine.driver_data<starshp1_state>();
 	int x;
 	int y;
 
-	for (y = rect->min_y; y <= rect->max_y; y++)
+	for (y = rect.min_y; y <= rect.max_y; y++)
 	{
 		const UINT16* pLine = &state->m_helper->pix16(y);
 
-		for (x = rect->min_x; x <= rect->max_x; x++)
+		for (x = rect.min_x; x <= rect.max_x; x++)
 			if (pLine[x] != 0)
 				return 1;
 	}
@@ -342,17 +342,17 @@ static int point_in_circle(int x, int y, int center_x, int center_y, int r)
 }
 
 
-static int circle_collision(starshp1_state *state, const rectangle *rect)
+static int circle_collision(starshp1_state *state, const rectangle &rect)
 {
 	int center_x = get_circle_hpos(state);
 	int center_y = get_circle_vpos(state);
 
 	int r = get_radius(state);
 
-	return point_in_circle(rect->min_x, rect->min_y, center_x, center_y, r) ||
-		   point_in_circle(rect->min_x, rect->max_y, center_x, center_y, r) ||
-		   point_in_circle(rect->max_x, rect->min_y, center_x, center_y, r) ||
-		   point_in_circle(rect->max_x, rect->max_y, center_x, center_y, r);
+	return point_in_circle(rect.min_x, rect.min_y, center_x, center_y, r) ||
+		   point_in_circle(rect.min_x, rect.max_y, center_x, center_y, r) ||
+		   point_in_circle(rect.max_x, rect.min_y, center_x, center_y, r) ||
+		   point_in_circle(rect.max_x, rect.max_y, center_x, center_y, r);
 }
 
 
@@ -361,7 +361,7 @@ SCREEN_UPDATE( starshp1 )
 	starshp1_state *state = screen.machine().driver_data<starshp1_state>();
 	set_pens(state, screen.machine().colortable);
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	if (state->m_starfield_kill == 0)
 		draw_starfield(state, bitmap);
@@ -409,17 +409,17 @@ SCREEN_EOF( starshp1 )
 	state->m_helper->fill(0, visarea);
 
 	if (state->m_attract == 0)
-		draw_spaceship(screen.machine(), state->m_helper, &visarea);
+		draw_spaceship(screen.machine(), state->m_helper, visarea);
 
-	if (circle_collision(state, &visarea))
+	if (circle_collision(state, visarea))
 		state->m_collision_latch |= 1;
 
-	if (circle_collision(state, &rect))
+	if (circle_collision(state, rect))
 		state->m_collision_latch |= 2;
 
-	if (spaceship_collision(screen.machine(), state->m_helper, &rect))
+	if (spaceship_collision(screen.machine(), state->m_helper, rect))
 		state->m_collision_latch |= 4;
 
-	if (spaceship_collision(screen.machine(), state->m_helper, &visarea))
+	if (spaceship_collision(screen.machine(), state->m_helper, visarea))
 		state->m_collision_latch |= 8;
 }

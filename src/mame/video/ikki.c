@@ -62,14 +62,14 @@ WRITE8_HANDLER( ikki_scrn_ctrl_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	ikki_state *state = machine.driver_data<ikki_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int y;
 	offs_t offs;
 
-	state->m_sprite_bitmap->fill(state->m_punch_through_pen, *cliprect);
+	state->m_sprite_bitmap->fill(state->m_punch_through_pen, cliprect);
 
 	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
 	{
@@ -101,11 +101,11 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	}
 
 	/* copy the sprite bitmap into the main bitmap, skipping the transparent pixels */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int x;
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT16 pen = state->m_sprite_bitmap->pix16(y, x);
 

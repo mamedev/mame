@@ -525,20 +525,20 @@ static SCREEN_UPDATE(majorpkr)
 {
 	majorpkr_state *state = screen.machine().driver_data<majorpkr_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	rectangle custom_clip;
 
 	/* The following custom_clip is to exclude the last char column (unused)
        form the render. We need more proof about how the video is working.
     */
-	custom_clip.min_x=cliprect->min_x;
-	custom_clip.max_x=cliprect->max_x-16;
-	custom_clip.min_y=cliprect->min_y;
-	custom_clip.max_y=cliprect->max_y;
+	custom_clip.min_x=cliprect.min_x;
+	custom_clip.max_x=cliprect.max_x-16;
+	custom_clip.min_y=cliprect.min_y;
+	custom_clip.max_y=cliprect.max_y;
 
-	tilemap_draw(bitmap, &custom_clip, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &custom_clip, state->m_fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, custom_clip, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, custom_clip, state->m_fg_tilemap, 0, 0);
 
 	if (state->m_flip_state == 1)
 	{

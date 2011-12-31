@@ -1209,7 +1209,7 @@ void ppu2c0x_spriteram_dma( address_space *space, device_t *device, const UINT8 
 void ppu2c0x_render( device_t *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
-	copybitmap(bitmap, ppu2c0x->bitmap, flipx, flipy, sx, sy, 0);
+	copybitmap(bitmap, ppu2c0x->bitmap, flipx, flipy, sx, sy, bitmap->cliprect());
 }
 
 /*************************************

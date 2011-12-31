@@ -1476,7 +1476,7 @@ static SCREEN_UPDATE( halleys )
 		copy_scroll_xp(bitmap, state->m_render_layer[4], *state->m_scrollx1, *state->m_scrolly1);
 	}
 	else
-		bitmap->fill(state->m_bgcolor, *cliprect);
+		bitmap->fill(state->m_bgcolor, cliprect);
 
 #ifdef MAME_DEBUG
 	if (input_port_read(screen.machine(), "DEBUG")) copy_scroll_xp(bitmap, state->m_render_layer[3], *state->m_scrollx0, *state->m_scrolly0); // not used???
@@ -1500,7 +1500,7 @@ static SCREEN_UPDATE( benberob )
 	if (state->m_io_ram[0xa0] & 0x80)
 		copy_scroll_op(bitmap, state->m_render_layer[2], *state->m_scrollx1, *state->m_scrolly1);
 	else
-		bitmap->fill(state->m_bgcolor, *cliprect);
+		bitmap->fill(state->m_bgcolor, cliprect);
 
 	copy_fixed_xp (bitmap, state->m_render_layer[1]);
 	copy_fixed_xp (bitmap, state->m_render_layer[0]);

@@ -54,11 +54,11 @@ SCREEN_UPDATE( malzak )
 	{
 		int y;
 
-		for (y = cliprect->min_y; y <= cliprect->max_y / 2; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y / 2; y++)
 		{
 			int x;
 
-			for (x = cliprect->min_x; x <= cliprect->max_x / 2; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x / 2; x++)
 			{
 				int pixel0 = s2636_0_bitmap->pix16(y, x);
 				int pixel1 = s2636_1_bitmap->pix16(y, x);

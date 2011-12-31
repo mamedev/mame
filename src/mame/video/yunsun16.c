@@ -136,7 +136,7 @@ VIDEO_START( yunsun16 )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	yunsun16_state *state = machine.driver_data<yunsun16_state>();
 	int offs;
@@ -212,7 +212,7 @@ SCREEN_UPDATE( yunsun16 )
 
 	//popmessage("%04X", *state->m_priorityram);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if ((*state->m_priorityram & 0x0c) == 4)
 	{

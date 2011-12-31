@@ -1267,7 +1267,7 @@ static READ16_HANDLER( ddenlovr_gfxrom_r )
 }
 
 
-static void copylayer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
+static void copylayer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int layer )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	int x,y;
@@ -1285,9 +1285,9 @@ static void copylayer(running_machine &machine, bitmap_t *bitmap, const rectangl
 
 	if (((state->m_ddenlovr_layer_enable2 << 4) | state->m_ddenlovr_layer_enable) & (1 << layer))
 	{
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				int pen = state->m_ddenlovr_pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
 				if ((pen & transmask) != transpen)
@@ -1341,7 +1341,7 @@ SCREEN_UPDATE(ddenlovr)
 	if (screen.machine().input().code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
 #endif
 
-	bitmap->fill(state->m_ddenlovr_bgcolor, *cliprect);
+	bitmap->fill(state->m_ddenlovr_bgcolor, cliprect);
 
 #ifdef MAME_DEBUG
 	if (screen.machine().input().code_pressed(KEYCODE_Z))

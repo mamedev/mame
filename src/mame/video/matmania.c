@@ -140,7 +140,7 @@ SCREEN_UPDATE( matmania )
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(state->m_tmpbitmap, 0, screen.machine().gfx[1],
+		drawgfx_opaque(state->m_tmpbitmap, state->m_tmpbitmap->cliprect(), screen.machine().gfx[1],
 				state->m_videoram[offs] + ((state->m_colorram[offs] & 0x08) << 5),
 				(state->m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -153,7 +153,7 @@ SCREEN_UPDATE( matmania )
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(state->m_tmpbitmap2, 0, screen.machine().gfx[1],
+		drawgfx_opaque(state->m_tmpbitmap2, state->m_tmpbitmap2->cliprect(), screen.machine().gfx[1],
 				state->m_videoram3[offs] + ((state->m_colorram3[offs] & 0x08) << 5),
 				(state->m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -212,7 +212,7 @@ SCREEN_UPDATE( maniach )
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(state->m_tmpbitmap, 0, screen.machine().gfx[1],
+		drawgfx_opaque(state->m_tmpbitmap, state->m_tmpbitmap->cliprect(), screen.machine().gfx[1],
 				state->m_videoram[offs] + ((state->m_colorram[offs] & 0x03) << 8),
 				(state->m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
@@ -225,7 +225,7 @@ SCREEN_UPDATE( maniach )
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		drawgfx_opaque(state->m_tmpbitmap2, 0, screen.machine().gfx[1],
+		drawgfx_opaque(state->m_tmpbitmap2, state->m_tmpbitmap2->cliprect(), screen.machine().gfx[1],
 				state->m_videoram3[offs] + ((state->m_colorram3[offs] & 0x03) << 8),
 				(state->m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */

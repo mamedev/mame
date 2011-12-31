@@ -54,7 +54,7 @@ Heavy use is made of sprite zooming.
 
 ********************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	superchs_state *state = machine.driver_data<superchs_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -215,7 +215,7 @@ SCREEN_UPDATE( superchs )
 	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	/* We have to assume 2nd to bottom layer is always underneath
        sprites as pdrawgfx cannot yet cope with more than 4 layers */

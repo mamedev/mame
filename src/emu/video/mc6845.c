@@ -688,10 +688,9 @@ void mc6845_device::update_cursor_state()
 }
 
 
-void mc6845_device::update(bitmap_t *bitmap, const rectangle *cliprect)
+void mc6845_device::update(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	assert(bitmap != NULL);
-	assert(cliprect != NULL);
 
 	if (m_has_valid_parameters)
 	{
@@ -705,14 +704,14 @@ void mc6845_device::update(bitmap_t *bitmap, const rectangle *cliprect)
 		if (m_begin_update != NULL)
 			param = m_begin_update(this, bitmap, cliprect);
 
-		if (cliprect->min_y == 0)
+		if (cliprect.min_y == 0)
 		{
 			/* read the start address at the beginning of the frame */
 			m_current_disp_addr = m_disp_start_addr;
 		}
 
 		/* for each row in the visible region */
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			/* compute the current raster line */
 			UINT8 ra = y % (m_max_ras_addr + 1);

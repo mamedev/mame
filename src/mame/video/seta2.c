@@ -161,7 +161,7 @@ WRITE16_HANDLER( seta2_vregs_w )
 
 ***************************************************************************/
 
-static void seta_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx,
+static void seta_drawgfx(	bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 							int shadow_depth )
 {
@@ -183,7 +183,7 @@ static void seta_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx
 #define SETA_DRAWGFX(SETPIXELCOLOR)												\
 	for ( sy = y0; sy != y1; sy += dy )											\
 	{																			\
-		if ( sy >= cliprect->min_y && sy <= cliprect->max_y )					\
+		if ( sy >= cliprect.min_y && sy <= cliprect.max_y )					\
 		{																		\
 			source	=	addr;													\
 			dest	=	&bitmap->pix16(sy);							\
@@ -192,7 +192,7 @@ static void seta_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx
 			{																	\
 				pen = *source++;												\
 																				\
-				if ( pen && sx >= cliprect->min_x && sx <= cliprect->max_x )	\
+				if ( pen && sx >= cliprect.min_x && sx <= cliprect.max_x )	\
 					SETPIXELCOLOR												\
 			}																	\
 		}																		\
@@ -212,7 +212,7 @@ static void seta_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	// Sprites list
 
@@ -328,19 +328,19 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 				clip.min_x = (clip.min_x & 0x1ff) - (clip.min_x & 0x200);
 				clip.max_x = clip.min_x + width * 0x10 - 1;
 
-				if (clip.min_x > cliprect->max_x)	continue;
-				if (clip.max_x < cliprect->min_x)	continue;
-				if (clip.min_x < cliprect->min_x)	clip.min_x = cliprect->min_x;
-				if (clip.max_x > cliprect->max_x)	clip.max_x = cliprect->max_x;
+				if (clip.min_x > cliprect.max_x)	continue;
+				if (clip.max_x < cliprect.min_x)	continue;
+				if (clip.min_x < cliprect.min_x)	clip.min_x = cliprect.min_x;
+				if (clip.max_x > cliprect.max_x)	clip.max_x = cliprect.max_x;
 
 				// sprite clipping region (y)
 				clip.min_y = ((sy + yoffs) & 0x1ff) - state->m_yoffset;
 				clip.max_y = clip.min_y + height * 0x10 - 1;
 
-				if (clip.min_y > cliprect->max_y)	continue;
-				if (clip.max_y < cliprect->min_y)	continue;
-				if (clip.min_y < cliprect->min_y)	clip.min_y = cliprect->min_y;
-				if (clip.max_y > cliprect->max_y)	clip.max_y = cliprect->max_y;
+				if (clip.min_y > cliprect.max_y)	continue;
+				if (clip.max_y < cliprect.min_y)	continue;
+				if (clip.min_y < cliprect.min_y)	clip.min_y = cliprect.min_y;
+				if (clip.max_y > cliprect.max_y)	clip.max_y = cliprect.max_y;
 
 				dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
 
@@ -375,7 +375,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 								dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
 
-								seta_drawgfx(bitmap, &clip, gfx,
+								seta_drawgfx(bitmap, clip, gfx,
 										code ^ tx ^ (ty<<1),
 										color,
 										flipx, flipy,
@@ -483,7 +483,7 @@ SCREEN_UPDATE( seta2 )
 	seta2_state *state = screen.machine().driver_data<seta2_state>();
 
 	// Black or pen 0?
-	bitmap->fill(screen.machine().pens[0], *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
 
 	if ( (state->m_vregs[0x30/2] & 1) == 0 )	// 1 = BLANK SCREEN
 		draw_sprites(screen.machine(), bitmap, cliprect);

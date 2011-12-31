@@ -152,7 +152,7 @@ VIDEO_START( tp84 )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	tp84_state *state = machine.driver_data<tp84_state>();
 	int offs;
@@ -178,10 +178,10 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( tp84 )
 {
 	tp84_state *state = screen.machine().driver_data<tp84_state>();
-	rectangle clip = *cliprect;
+	rectangle clip = cliprect;
 	const rectangle &visarea = screen.visible_area();
 
-	if (cliprect->min_y == screen.visible_area().min_y)
+	if (cliprect.min_y == screen.visible_area().min_y)
 	{
 		tilemap_mark_all_tiles_dirty_all(screen.machine());
 
@@ -198,12 +198,12 @@ SCREEN_UPDATE( tp84 )
 	/* draw top status region */
 	clip.min_x = visarea.min_x;
 	clip.max_x = visarea.min_x + 15;
-	tilemap_draw(bitmap, &clip, state->m_fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, clip, state->m_fg_tilemap, 0, 0);
 
 	/* draw bottom status region */
 	clip.min_x = visarea.max_x - 15;
 	clip.max_x = visarea.max_x;
-	tilemap_draw(bitmap, &clip, state->m_fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, clip, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }

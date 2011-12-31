@@ -112,7 +112,7 @@ static SCREEN_UPDATE(sbowling)
 {
 	sbowling_state *state = screen.machine().driver_data<sbowling_state>();
 
-	bitmap->fill(0x18, *cliprect);
+	bitmap->fill(0x18, cliprect);
 	tilemap_draw(bitmap, cliprect,state->m_sb_tilemap, 0, 0);
 	copybitmap_trans(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect, state->m_color_prom_address);
 	return 0;

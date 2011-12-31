@@ -133,7 +133,7 @@ SCREEN_UPDATE( gradius3 )
 
 	k052109_tilemap_update(state->m_k052109);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 	if (state->m_priority == 0)
 	{
 		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);

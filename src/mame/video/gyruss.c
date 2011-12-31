@@ -129,7 +129,7 @@ READ8_HANDLER( gyruss_scanline_r )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, gfx_element **gfx )
 {
 	gyruss_state *state = machine.driver_data<gyruss_state>();
 	int offs;
@@ -154,7 +154,7 @@ SCREEN_UPDATE( gyruss )
 {
 	gyruss_state *state = screen.machine().driver_data<gyruss_state>();
 
-	if (cliprect->min_y == screen.visible_area().min_y)
+	if (cliprect.min_y == screen.visible_area().min_y)
 	{
 		tilemap_mark_all_tiles_dirty_all(screen.machine());
 		tilemap_set_flip_all(screen.machine(), (*state->m_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);

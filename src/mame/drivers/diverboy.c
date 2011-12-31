@@ -73,7 +73,7 @@ static VIDEO_START(diverboy)
 {
 }
 
-static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	diverboy_state *state = machine.driver_data<diverboy_state>();
 	UINT16 *source = state->m_spriteram;
@@ -111,7 +111,7 @@ static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE(diverboy)
 {
-//  bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+//  bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

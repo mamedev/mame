@@ -923,7 +923,7 @@ static const poly_draw_scanline_func render_funcs[8] =
 	model2_3d_render_7	/* checker = 1, textured = 1, translucent = 1 */
 };
 
-static void model2_3d_render( model2_state *state, bitmap_t *bitmap, triangle *tri, const rectangle *cliprect )
+static void model2_3d_render( model2_state *state, bitmap_t *bitmap, triangle *tri, const rectangle &cliprect )
 {
 	poly_manager *poly = state->m_poly;
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
@@ -939,10 +939,10 @@ static void model2_3d_render( model2_state *state, bitmap_t *bitmap, triangle *t
 	vp.min_y = (384-tri->viewport[3])+90;
 	vp.max_y = (384-tri->viewport[1])+90;
 
-	if ( vp.min_x < cliprect->min_x ) vp.min_x = cliprect->min_x;
-	if ( vp.max_x > cliprect->max_x ) vp.max_x = cliprect->max_x;
-	if ( vp.min_y < cliprect->min_y ) vp.min_y = cliprect->min_y;
-	if ( vp.max_y > cliprect->max_y ) vp.max_y = cliprect->max_y;
+	if ( vp.min_x < cliprect.min_x ) vp.min_x = cliprect.min_x;
+	if ( vp.max_x > cliprect.max_x ) vp.max_x = cliprect.max_x;
+	if ( vp.min_y < cliprect.min_y ) vp.min_y = cliprect.min_y;
+	if ( vp.max_y > cliprect.max_y ) vp.max_y = cliprect.max_y;
 
 	extra->state = state;
 	extra->lumabase = ((tri->texheader[1] & 0xFF) << 7) + ((tri->luma >> 5) ^ 0x7);
@@ -968,10 +968,10 @@ static void model2_3d_render( model2_state *state, bitmap_t *bitmap, triangle *t
 		tri->v[2].pu = tri->v[2].pu * tri->v[2].pz * (1.0f / 8.0f);
 		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * (1.0f / 8.0f);
 
-		poly_render_triangle(poly, bitmap, &vp, render_funcs[renderer], 3, &tri->v[0], &tri->v[1], &tri->v[2]);
+		poly_render_triangle(poly, bitmap, vp, render_funcs[renderer], 3, &tri->v[0], &tri->v[1], &tri->v[2]);
 	}
 	else
-		poly_render_triangle(poly, bitmap, &vp, render_funcs[renderer], 0, &tri->v[0], &tri->v[1], &tri->v[2]);
+		poly_render_triangle(poly, bitmap, vp, render_funcs[renderer], 0, &tri->v[0], &tri->v[1], &tri->v[2]);
 }
 
 /*
@@ -1022,7 +1022,7 @@ static void model2_3d_frame_start( model2_state *state )
 	raster->max_z = 0;
 }
 
-static void model2_3d_frame_end( model2_state *state, bitmap_t *bitmap, const rectangle *cliprect )
+static void model2_3d_frame_end( model2_state *state, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	raster_state *raster = state->m_raster;
 	INT32		z;
@@ -2727,16 +2727,16 @@ VIDEO_START(model2)
 	geo_init( machine, (UINT32*)machine.region("user2")->base() );
 }
 
-static void convert_bitmap( running_machine &machine, bitmap_t *dst, bitmap_t *src, const rectangle *rect )
+static void convert_bitmap( running_machine &machine, bitmap_t *dst, bitmap_t *src, const rectangle &rect )
 {
 	int	x, y;
 
-	for( y = rect->min_y; y < rect->max_y; y++ )
+	for( y = rect.min_y; y < rect.max_y; y++ )
 	{
 		UINT32 *d = &dst->pix32(y);
 		UINT16 *s = &src->pix16(y);
 
-		for( x = rect->min_x; x < rect->max_x; x++ )
+		for( x = rect.min_x; x < rect.max_x; x++ )
 		{
 			if ( s[x] )
 				d[x] = machine.pens[s[x]];
@@ -2749,8 +2749,8 @@ SCREEN_UPDATE(model2)
 	model2_state *state = screen.machine().driver_data<model2_state>();
 	logerror("--- frame ---\n");
 
-	bitmap->fill(screen.machine().pens[0], *cliprect);
-	state->m_sys24_bitmap->fill(0, *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
+	state->m_sys24_bitmap->fill(0, cliprect);
 
 	segas24_tile *tile = screen.machine().device<segas24_tile>("tile");
 	tile->draw(state->m_sys24_bitmap, cliprect, 7, 0, 0);
@@ -2769,7 +2769,7 @@ SCREEN_UPDATE(model2)
 	/* have the rasterizer output the frame */
 	model2_3d_frame_end( state, bitmap, cliprect );
 
-	state->m_sys24_bitmap->fill(0, *cliprect);
+	state->m_sys24_bitmap->fill(0, cliprect);
 	tile->draw(state->m_sys24_bitmap, cliprect, 3, 0, 0);
 	tile->draw(state->m_sys24_bitmap, cliprect, 2, 0, 0);
 	tile->draw(state->m_sys24_bitmap, cliprect, 1, 0, 0);

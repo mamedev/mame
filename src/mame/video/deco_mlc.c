@@ -217,7 +217,7 @@ static void mlc_drawgfxzoom(
 	}
 }
 
-static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	UINT32 *index_ptr=0;
@@ -310,7 +310,7 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectan
 		user_clip.min_x=state->m_mlc_clip_ram[(clipper*4)+2];
 		user_clip.max_x=state->m_mlc_clip_ram[(clipper*4)+3];
 
-		user_clip &= *cliprect;
+		user_clip &= cliprect;
 
 		/* Any colours out of range (for the bpp value) trigger 'shadow' mode */
 		if (color & (state->m_colour_mask+1))
@@ -491,7 +491,7 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectan
 //      if (lastRasterMode!=0 && rasterDirty)
 //      {
 //          blitRaster(machine, bitmap, rasterMode);
-//          temp_bitmap->fill(0, *cliprect);
+//          temp_bitmap->fill(0, cliprect);
 //          rasterDirty=0;
 //      }
 //      lastRasterMode=rasterMode;
@@ -514,8 +514,8 @@ SCREEN_EOF( mlc )
 
 SCREEN_UPDATE( mlc )
 {
-//  temp_bitmap->fill(0, *cliprect);
-	bitmap->fill(screen.machine().pens[0], *cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+//  temp_bitmap->fill(0, cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

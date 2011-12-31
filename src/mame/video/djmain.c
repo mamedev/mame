@@ -12,7 +12,7 @@
 
 
 
-static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	djmain_state *state = machine.driver_data<djmain_state>();
 	device_t *k055555 = machine.device("k055555");
@@ -169,7 +169,7 @@ SCREEN_UPDATE( djmain )
 				order[j] = temp;
 			}
 
-	bitmap->fill(screen.machine().pens[0], *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 	{

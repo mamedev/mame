@@ -69,11 +69,11 @@ SCREEN_UPDATE( tutankhm )
 
 	get_pens(screen.machine(), pens);
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *dst = &bitmap->pix32(y);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT8 effx = x ^ xorx;
 			UINT8 yscroll = (effx < 192) ? *state->m_scroll : 0;

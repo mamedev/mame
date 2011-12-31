@@ -596,9 +596,9 @@ SCREEN_UPDATE( tubep )
 	UINT8 *text_gfx_base = screen.machine().region("gfx1")->base();
 	UINT8 *romBxx = screen.machine().region("user1")->base() + 0x2000*state->m_background_romsel;
 
-	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
+	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect.min_y, cliprect.max_y+1); */
 
-	for (v = cliprect->min_y; v <= cliprect->max_y; v++)	/* only for current scanline */
+	for (v = cliprect.min_y; v <= cliprect.max_y; v++)	/* only for current scanline */
 	{
 		UINT32 h;
 		UINT32 sp_data0=0,sp_data1=0,sp_data2=0;
@@ -758,7 +758,7 @@ SCREEN_UPDATE( rjammer )
 	/* especially read from ROM19C can be done once per 8 pixels*/
 	/* and the data could be bitswapped beforehand */
 
-	for (v = cliprect->min_y; v <= cliprect->max_y; v++)	/* only for current scanline */
+	for (v = cliprect.min_y; v <= cliprect.max_y; v++)	/* only for current scanline */
 	{
 		UINT32 h;
 		UINT32 sp_data0=0,sp_data1=0,sp_data2=0;

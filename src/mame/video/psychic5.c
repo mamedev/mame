@@ -311,7 +311,7 @@ VIDEO_RESET( bombsa )
 
 #define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, cliprect, machine.gfx[0], code, color, flipx, flipy, sx, sy, 15);
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	psychic5_state *state = machine.driver_data<psychic5_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -365,12 +365,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	psychic5_state *state = machine.driver_data<psychic5_state>();
 	UINT8 *spriteram = state->m_spriteram;
 
-	rectangle clip = *cliprect;
+	rectangle clip = cliprect;
 
 	set_background_palette_intensity(machine);
 
@@ -429,13 +429,13 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 		}
 	}
 
-	tilemap_draw(bitmap, &clip, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, clip, state->m_bg_tilemap, 0, 0);
 }
 
 SCREEN_UPDATE( psychic5 )
 {
 	psychic5_state *state = screen.machine().driver_data<psychic5_state>();
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	if (state->m_bg_status & 1)	/* Backgound enable */
 		draw_background(screen.machine(), bitmap, cliprect);
 	if (!(state->m_title_screen & 1))
@@ -450,7 +450,7 @@ SCREEN_UPDATE( bombsa )
 	if (state->m_bg_status & 1)	/* Backgound enable */
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
-		bitmap->fill(screen.machine().pens[0x0ff], *cliprect);
+		bitmap->fill(screen.machine().pens[0x0ff], cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;

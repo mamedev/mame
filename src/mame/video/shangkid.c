@@ -60,7 +60,7 @@ WRITE8_HANDLER( shangkid_videoram_w )
 	tilemap_mark_tile_dirty( state->m_background, offset&0x7ff );
 }
 
-static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	shangkid_state *state = machine.driver_data<shangkid_state>();
 	const gfx_element *gfx;
@@ -172,7 +172,7 @@ static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_t 
 	}
 }
 
-static void shangkid_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void shangkid_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	shangkid_state *state = machine.driver_data<shangkid_state>();
 	const UINT8 *source, *finish;
@@ -235,7 +235,7 @@ PALETTE_INIT( dynamski )
 }
 
 
-static void dynamski_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static void dynamski_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 	shangkid_state *state = machine.driver_data<shangkid_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -289,7 +289,7 @@ static void dynamski_draw_background(running_machine &machine, bitmap_t *bitmap,
 	}
 }
 
-static void dynamski_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void dynamski_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	shangkid_state *state = machine.driver_data<shangkid_state>();
 	UINT8 *videoram = state->m_videoram;

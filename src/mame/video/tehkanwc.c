@@ -123,7 +123,7 @@ VIDEO_START( tehkanwc )
    bit 7 = enable (0 = display off)
  */
 
-static void gridiron_draw_led(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 led,int player)
+static void gridiron_draw_led(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 led,int player)
 {
 	if (led&0x80)
 		output_set_digit_value(player, led&0x7f);
@@ -131,7 +131,7 @@ static void gridiron_draw_led(running_machine &machine, bitmap_t *bitmap, const 
 		output_set_digit_value(player, 0x00);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	tehkanwc_state *state = machine.driver_data<tehkanwc_state>();
 	UINT8 *spriteram = state->m_spriteram;

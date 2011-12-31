@@ -146,7 +146,7 @@ static SCREEN_UPDATE( mjsister )
 		copybitmap_trans(bitmap, state->m_tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
 	}
 	else
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	return 0;
 }
 

@@ -377,11 +377,11 @@ static MC6845_END_UPDATE( end_update )
 	pen_t *pens = (pen_t *)param;
 	UINT16 delay_counter = state->m_star_delay_counter;
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int x;
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* check if the star status */
 			if (state->m_star_enable &&

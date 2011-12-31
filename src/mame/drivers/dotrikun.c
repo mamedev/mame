@@ -67,7 +67,7 @@ static SCREEN_UPDATE( dotrikun )
 	pen_t back_pen = MAKE_RGB(pal1bit(state->m_color >> 3), pal1bit(state->m_color >> 4), pal1bit(state->m_color >> 5));
 	pen_t fore_pen = MAKE_RGB(pal1bit(state->m_color >> 0), pal1bit(state->m_color >> 1), pal1bit(state->m_color >> 2));
 
-	for(y = (cliprect->min_y & ~1); y < cliprect->max_y; y+=2)
+	for(y = (cliprect.min_y & ~1); y < cliprect.max_y; y+=2)
 	{
 		for (x = 0; x < 256; x+=16)
 		{

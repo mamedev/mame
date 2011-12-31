@@ -165,7 +165,7 @@ WRITE8_HANDLER( superqix_0410_w )
 
 ***************************************************************************/
 
-static void pbillian_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void pbillian_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -193,7 +193,7 @@ static void pbillian_draw_sprites(running_machine &machine, bitmap_t *bitmap, co
 	}
 }
 
-static void superqix_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void superqix_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
 	UINT8 *spriteram = state->m_spriteram;

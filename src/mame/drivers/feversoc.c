@@ -88,7 +88,7 @@ static SCREEN_UPDATE( feversoc )
 	UINT32 *spriteram32 = state->m_spriteram;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
-	bitmap->fill(screen.machine().pens[0], *cliprect); //black pen
+	bitmap->fill(screen.machine().pens[0], cliprect); //black pen
 
 	for(offs=(0x2000/4)-2;offs>-1;offs-=2)
 	{

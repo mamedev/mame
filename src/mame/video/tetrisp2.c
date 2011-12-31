@@ -380,7 +380,7 @@ VIDEO_START( rocknms )
 /* sprites should be able to create shadows too, how?
   -- it appears that sprites which should be shadows are often rendered *UNDER* the tilemaps, maybe related?
 */
-static void tetrisp2_draw_sprites(running_machine &machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priority_ram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip)
+static void tetrisp2_draw_sprites(running_machine &machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle &cliprect, UINT8* priority_ram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip)
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
@@ -471,7 +471,7 @@ SCREEN_UPDATE( tetrisp2 )
 	flipscreen = (state->m_systemregs[0x00] & 0x02);
 
 	/* Black background color */
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 	screen.machine().priority_bitmap->fill(0);
 
 	/* Flip Screen */
@@ -556,7 +556,7 @@ SCREEN_UPDATE( rockntread )
 	flipscreen = (state->m_systemregs[0x00] & 0x02);
 
 	/* Black background color */
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 	screen.machine().priority_bitmap->fill(0);
 
 	/* Flip Screen */
@@ -646,8 +646,8 @@ SCREEN_UPDATE( rocknms_left )
 	tilemap_set_scrollx(state->m_tilemap_sub_rot, 0, state->m_rocknms_sub_rotregs[ 0 ] + 0x400);
 	tilemap_set_scrolly(state->m_tilemap_sub_rot, 0, state->m_rocknms_sub_rotregs[ 2 ] + 0x400);
 
-	bitmap->fill(screen.machine().pens[0x0000], *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(screen.machine().pens[0x0000], cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	asc_pri = scr_pri = rot_pri = 0;
 
@@ -707,8 +707,8 @@ SCREEN_UPDATE( rocknms_right )
 	tilemap_set_scrolly(state->m_tilemap_rot, 0, state->m_rotregs[ 2 ] + 0x400);
 
 	/* Black background color */
-	bitmap->fill(screen.machine().pens[0x0000], *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(screen.machine().pens[0x0000], cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	asc_pri = scr_pri = rot_pri = 0;
 

@@ -259,7 +259,7 @@ static SCREEN_UPDATE( m2 )
 	}
 	else
 	{
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 	}
 	return 0;
 }

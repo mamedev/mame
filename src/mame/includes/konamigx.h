@@ -73,7 +73,7 @@ extern UINT16 konamigx_wrport2;
 #define GXSUB_5BPP		0x05	//  32 colors
 #define GXSUB_8BPP		0x08	// 256 colors
 
-void konamigx_mixer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,
+void konamigx_mixer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_t* extra_bitmap, int rushingheroes_hack);

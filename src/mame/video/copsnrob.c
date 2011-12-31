@@ -121,7 +121,7 @@ SCREEN_UPDATE( copsnrob )
 		{
 			if (val & mask1)
 			{
-				for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+				for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 					if (state->m_bulletsram[y] & mask2)
 						bitmap->pix16(y, 256 - x) = 1;
 			}

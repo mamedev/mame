@@ -213,8 +213,8 @@ WRITE_LINE_MEMBER( cdp1862_device::con_w )
 //  update_screen -
 //-------------------------------------------------
 
-void cdp1862_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1862_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-	m_bitmap->fill(CDP1862_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8, *cliprect);
+	m_bitmap->fill(CDP1862_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8, cliprect);
 }

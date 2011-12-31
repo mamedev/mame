@@ -132,7 +132,7 @@ SCREEN_UPDATE( volfied )
 {
 	volfied_state *state = screen.machine().driver_data<volfied_state>();
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 	refresh_pixel_layer(screen.machine(), bitmap);
 	pc090oj_draw_sprites(state->m_pc090oj, bitmap, cliprect, 0);
 	return 0;

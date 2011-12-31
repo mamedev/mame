@@ -127,7 +127,7 @@ static SCREEN_UPDATE( spectrum )
 
     scr=state->m_spectrum_video_ram;
 
-	bitmap->fill(state->m_spectrum_port_fe & 0x07, *cliprect);
+	bitmap->fill(state->m_spectrum_port_fe & 0x07, cliprect);
 
     for (y=0; y<192; y++)
     {

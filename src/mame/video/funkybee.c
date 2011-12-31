@@ -95,7 +95,7 @@ VIDEO_START( funkybee )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, funkybee_tilemap_scan, 8, 8, 32, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	funkybee_state *state = machine.driver_data<funkybee_state>();
 	int offs;
@@ -124,7 +124,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void draw_columns( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_columns( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	funkybee_state *state = machine.driver_data<funkybee_state>();
 	int offs;

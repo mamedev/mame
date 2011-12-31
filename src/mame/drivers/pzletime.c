@@ -81,7 +81,7 @@ static SCREEN_UPDATE( pzletime )
 	int count;
 	int y, x;
 
-	bitmap->fill(screen.machine().pens[0], *cliprect); //bg pen
+	bitmap->fill(screen.machine().pens[0], cliprect); //bg pen
 
 	tilemap_set_scrolly(state->m_txt_tilemap, 0, state->m_tilemap_regs[0] - 3);
 	tilemap_set_scrollx(state->m_txt_tilemap, 0, state->m_tilemap_regs[1]);

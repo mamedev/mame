@@ -142,7 +142,7 @@ static emu_timer *force_update_timer;
     STATIC FUNCTION DECLARATIONS
 ***************************************************************************/
 
-static int mo_render_object(atarimo_data *mo, const atarimo_entry *entry, const rectangle *cliprect);
+static int mo_render_object(atarimo_data *mo, const atarimo_entry *entry, const rectangle &cliprect);
 
 
 
@@ -550,19 +550,19 @@ INLINE UINT8 *get_dirty_base(atarimo_data *mo, int x, int y)
     cliprect.
 ---------------------------------------------------------------*/
 
-static void erase_dirty_grid(atarimo_data *mo, const rectangle *cliprect)
+static void erase_dirty_grid(atarimo_data *mo, const rectangle &cliprect)
 {
-	int sx = cliprect->min_x >> mo->tilexshift;
-	int ex = cliprect->max_x >> mo->tilexshift;
-	int sy = cliprect->min_y >> mo->tileyshift;
-	int ey = cliprect->max_y >> mo->tileyshift;
+	int sx = cliprect.min_x >> mo->tilexshift;
+	int ex = cliprect.max_x >> mo->tilexshift;
+	int sy = cliprect.min_y >> mo->tileyshift;
+	int ey = cliprect.max_y >> mo->tileyshift;
 	int y;
 
 	/* loop over all grid rows that intersect our cliprect */
 	for (y = sy; y <= ey; y++)
 	{
 		/* get the base pointer and memset the row */
-		UINT8 *dirtybase = get_dirty_base(mo, cliprect->min_x, y << mo->tileyshift);
+		UINT8 *dirtybase = get_dirty_base(mo, cliprect.min_x, y << mo->tileyshift);
 		memset(dirtybase, 0, ex - sx + 1);
 	}
 }
@@ -573,12 +573,12 @@ static void erase_dirty_grid(atarimo_data *mo, const rectangle *cliprect)
     series of cliprects.
 ---------------------------------------------------------------*/
 
-static void convert_dirty_grid_to_rects(atarimo_data *mo, const rectangle *cliprect, atarimo_rect_list *rectlist)
+static void convert_dirty_grid_to_rects(atarimo_data *mo, const rectangle &cliprect, atarimo_rect_list *rectlist)
 {
-	int sx = cliprect->min_x >> mo->tilexshift;
-	int ex = cliprect->max_x >> mo->tilexshift;
-	int sy = cliprect->min_y >> mo->tileyshift;
-	int ey = cliprect->max_y >> mo->tileyshift;
+	int sx = cliprect.min_x >> mo->tilexshift;
+	int ex = cliprect.max_x >> mo->tilexshift;
+	int sy = cliprect.min_y >> mo->tileyshift;
+	int ey = cliprect.max_y >> mo->tileyshift;
 	int tilewidth = 1 << mo->tilexshift;
 	int tileheight = 1 << mo->tileyshift;
 	rectangle *rect;
@@ -592,7 +592,7 @@ static void convert_dirty_grid_to_rects(atarimo_data *mo, const rectangle *clipr
 	/* loop over all grid rows that intersect our cliprect */
 	for (y = sy; y <= ey; y++)
 	{
-		UINT8 *dirtybase = get_dirty_base(mo, cliprect->min_x, y << mo->tileyshift);
+		UINT8 *dirtybase = get_dirty_base(mo, cliprect.min_x, y << mo->tileyshift);
 		int can_add_to_existing = 0;
 
 		/* loop over all grid columns that intersect our cliprect */
@@ -636,7 +636,7 @@ static void convert_dirty_grid_to_rects(atarimo_data *mo, const rectangle *clipr
     destination bitmap.
 ---------------------------------------------------------------*/
 
-bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *rectlist)
+bitmap_t *atarimo_render(int map, const rectangle &cliprect, atarimo_rect_list *rectlist)
 {
 	atarimo_data *mo = atarimo[map];
 	int startband, stopband, band, i;
@@ -651,8 +651,8 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 	}
 
 	/* compute start/stop bands */
-	startband = ((cliprect->min_y + mo->yscroll - mo->slipoffset) & mo->bitmapymask) >> mo->slipshift;
-	stopband = ((cliprect->max_y + mo->yscroll - mo->slipoffset) & mo->bitmapymask) >> mo->slipshift;
+	startband = ((cliprect.min_y + mo->yscroll - mo->slipoffset) & mo->bitmapymask) >> mo->slipshift;
+	stopband = ((cliprect.max_y + mo->yscroll - mo->slipoffset) & mo->bitmapymask) >> mo->slipshift;
 	if (startband > stopband)
 		startband -= mo->bitmapheight >> mo->slipshift;
 	if (!mo->slipshift)
@@ -672,7 +672,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 		if (!mo->slipshift)
 		{
 			link = 0;
-			bandclip = *cliprect;
+			bandclip = cliprect;
 		}
 
 		/* otherwise, grab the SLIP and compute the bandrect */
@@ -682,7 +682,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 			link = (mo->slip_ram[slipentry] >> mo->linkmask.shift) & mo->linkmask.mask;
 
 			/* start with the cliprect */
-			bandclip = *cliprect;
+			bandclip = cliprect;
 
 			/* compute minimum Y and wrap around if necessary */
 			bandclip.min_y = ((band << mo->slipshift) - mo->yscroll + mo->slipoffset) & mo->bitmapymask;
@@ -693,7 +693,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 			bandclip.max_y = bandclip.min_y + (1 << mo->slipshift) - 1;
 
 			/* keep within the cliprect */
-			bandclip &= *cliprect;
+			bandclip &= cliprect;
 		}
 
 		/* if this matches the last link, we don't need to re-process the list */
@@ -718,7 +718,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 
 		/* render the mos */
 		for (current = first; current != last; current += step)
-			mo_render_object(mo, *current, &bandclip);
+			mo_render_object(mo, *current, bandclip);
 	}
 
 	/* convert the dirty grid to a rectlist */
@@ -726,7 +726,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 
 	/* clip the rectlist */
 	for (i = 0, rect = rectlist->rect; i < rectlist->numrects; i++, rect++)
-		*rect &= *cliprect;
+		*rect &= cliprect;
 
 	/* return the bitmap */
 	return mo->bitmap;
@@ -739,7 +739,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
     to the destination.
 ---------------------------------------------------------------*/
 
-static int mo_render_object(atarimo_data *mo, const atarimo_entry *entry, const rectangle *cliprect)
+static int mo_render_object(atarimo_data *mo, const atarimo_entry *entry, const rectangle &cliprect)
 {
 	int gfxindex = mo->gfxlookup[EXTRACT_DATA(entry, mo->gfxmask)];
 	const gfx_element *gfx = mo->gfxelement[gfxindex];
@@ -838,19 +838,19 @@ if ((temp & 0xff00) == 0xc800)
 		for (y = 0, sy = ypos; y < height; y++, sy += yadv)
 		{
 			/* clip the Y coordinate */
-			if (sy <= cliprect->min_y - mo->tileheight)
+			if (sy <= cliprect.min_y - mo->tileheight)
 			{
 				code += width;
 				continue;
 			}
-			else if (sy > cliprect->max_y)
+			else if (sy > cliprect.max_y)
 				break;
 
 			/* loop over the width */
 			for (x = 0, sx = xpos; x < width; x++, sx += xadv, code++)
 			{
 				/* clip the X coordinate */
-				if (sx <= -cliprect->min_x - mo->tilewidth || sx > cliprect->max_x)
+				if (sx <= -cliprect.min_x - mo->tilewidth || sx > cliprect.max_x)
 					continue;
 
 				/* draw the sprite */
@@ -874,12 +874,12 @@ if ((temp & 0xff00) == 0xc800)
 		for (x = 0, sx = xpos; x < width; x++, sx += xadv)
 		{
 			/* clip the X coordinate */
-			if (sx <= cliprect->min_x - mo->tilewidth)
+			if (sx <= cliprect.min_x - mo->tilewidth)
 			{
 				code += height;
 				continue;
 			}
-			else if (sx > cliprect->max_x)
+			else if (sx > cliprect.max_x)
 				break;
 
 			/* loop over the height */
@@ -887,7 +887,7 @@ if ((temp & 0xff00) == 0xc800)
 			for (y = 0, sy = ypos; y < height; y++, sy += yadv, code++)
 			{
 				/* clip the X coordinate */
-				if (sy <= -cliprect->min_y - mo->tileheight || sy > cliprect->max_y)
+				if (sy <= -cliprect.min_y - mo->tileheight || sy > cliprect.max_y)
 					continue;
 
 				/* draw the sprite */

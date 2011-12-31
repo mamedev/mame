@@ -420,7 +420,7 @@ else
 }
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void kaneko16_draw_sprites_custom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+static void kaneko16_draw_sprites_custom(bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
@@ -462,31 +462,28 @@ static void kaneko16_draw_sprites_custom(bitmap_t *dest_bmp,const rectangle *cli
 			y_index = 0;
 		}
 
-		if( clip )
-		{
-			if( sx < clip->min_x)
-			{ /* clip left */
-				int pixels = clip->min_x-sx;
-				sx += pixels;
-				x_index_base += pixels*dx;
-			}
-			if( sy < clip->min_y )
-			{ /* clip top */
-				int pixels = clip->min_y-sy;
-				sy += pixels;
-				y_index += pixels*dy;
-			}
-			/* NS 980211 - fixed incorrect clipping */
-			if( ex > clip->max_x+1 )
-			{ /* clip right */
-				int pixels = ex-clip->max_x-1;
-				ex -= pixels;
-			}
-			if( ey > clip->max_y+1 )
-			{ /* clip bottom */
-				int pixels = ey-clip->max_y-1;
-				ey -= pixels;
-			}
+		if( sx < clip.min_x)
+		{ /* clip left */
+			int pixels = clip.min_x-sx;
+			sx += pixels;
+			x_index_base += pixels*dx;
+		}
+		if( sy < clip.min_y )
+		{ /* clip top */
+			int pixels = clip.min_y-sy;
+			sy += pixels;
+			y_index += pixels*dy;
+		}
+		/* NS 980211 - fixed incorrect clipping */
+		if( ex > clip.max_x+1 )
+		{ /* clip right */
+			int pixels = ex-clip.max_x-1;
+			ex -= pixels;
+		}
+		if( ey > clip.max_y+1 )
+		{ /* clip bottom */
+			int pixels = ey-clip.max_y-1;
+			ey -= pixels;
 		}
 
 		if( ex>sx )
@@ -520,7 +517,7 @@ static void kaneko16_draw_sprites_custom(bitmap_t *dest_bmp,const rectangle *cli
 
 /* Build a list of sprites to display & draw them */
 
-void kaneko16_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+void kaneko16_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	/* Sprites *must* be parsed from the first in RAM to the last,
@@ -855,7 +852,7 @@ WRITE16_HANDLER( kaneko16_bg15_reg_w )
 
 ***************************************************************************/
 
-static void kaneko16_prepare_first_tilemap_chip(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void kaneko16_prepare_first_tilemap_chip(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	/* Set Up FIRST Tilemap chip */
@@ -896,7 +893,7 @@ static void kaneko16_prepare_first_tilemap_chip(running_machine &machine, bitmap
 
 }
 
-static void kaneko16_prepare_second_tilemap_chip(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void kaneko16_prepare_second_tilemap_chip(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	/* Set Up SECOND Tilemap chip */
@@ -936,14 +933,14 @@ static void kaneko16_prepare_second_tilemap_chip(running_machine &machine, bitma
 	}
 }
 
-static void kaneko16_render_first_tilemap_chip(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void kaneko16_render_first_tilemap_chip(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri)
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	tilemap_draw_primask(bitmap,cliprect, state->m_tmap[0], pri, pri, 0);
 	tilemap_draw_primask(bitmap,cliprect, state->m_tmap[1], pri, pri, 0);
 }
 
-static void kaneko16_render_second_tilemap_chip(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void kaneko16_render_second_tilemap_chip(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri)
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	if (state->m_tmap[2])
@@ -953,7 +950,7 @@ static void kaneko16_render_second_tilemap_chip(running_machine &machine, bitmap
 	}
 }
 
-static void kaneko16_render_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void kaneko16_render_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	/* Sprites last (rendered with pdrawgfx, so they can slip
@@ -967,12 +964,12 @@ static void kaneko16_render_sprites(running_machine &machine, bitmap_t *bitmap, 
 	}
 	else
 	{
-		state->m_sprites_bitmap->fill(0, *cliprect);
+		state->m_sprites_bitmap->fill(0, cliprect);
 		kaneko16_draw_sprites(machine,bitmap,cliprect);
 	}
 }
 
-static void kaneko16_render_15bpp_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void kaneko16_render_15bpp_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	if (state->m_bg15_bitmap)
@@ -993,23 +990,23 @@ static void kaneko16_render_15bpp_bitmap(running_machine &machine, bitmap_t *bit
 	}
 }
 
-static void kaneko16_fill_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void kaneko16_fill_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	if(state->m_sprite_type == 1)
-		bitmap->fill(0x7f00, *cliprect);
+		bitmap->fill(0x7f00, cliprect);
 	else
 		/* Fill the bitmap with pen 0. This is wrong, but will work most of
            the times. To do it right, each pixel should be drawn with pen 0
            of the bottomost tile that covers it (which is pretty tricky to do) */
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 }
 
 static SCREEN_UPDATE( common )
 {
 	int i;
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	kaneko16_prepare_first_tilemap_chip(screen.machine(), bitmap, cliprect);
 	kaneko16_prepare_second_tilemap_chip(screen.machine(), bitmap, cliprect);

@@ -433,7 +433,7 @@ static void unsort_quads(model1_state *state)
 }
 
 
-static void draw_quads(model1_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_quads(model1_state *state, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	struct view *view = state->m_view;
 	int count = state->m_quadpt - state->m_quaddb;
@@ -444,10 +444,10 @@ static void draw_quads(model1_state *state, bitmap_t *bitmap, const rectangle *c
 	int save_x2 = view->x2;
 	int save_y1 = view->y1;
 	int save_y2 = view->y2;
-	view->x1 = MAX(view->x1, cliprect->min_x);
-	view->x2 = MIN(view->x2, cliprect->max_x);
-	view->y1 = MAX(view->y1, cliprect->min_y);
-	view->y2 = MIN(view->y2, cliprect->max_y);
+	view->x1 = MAX(view->x1, cliprect.min_x);
+	view->x2 = MIN(view->x2, cliprect.max_x);
+	view->y1 = MAX(view->y1, cliprect.min_y);
+	view->y2 = MIN(view->y2, cliprect.max_y);
 
 	for(i=0; i<count; i++) {
 		struct quad_m1 *q = state->m_quadind[i];
@@ -1119,7 +1119,7 @@ static UINT16 *skip_direct(UINT16 *list)
 	return list+2;
 }
 
-static void draw_objects(model1_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_objects(model1_state *state, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	if(state->m_quadpt != state->m_quaddb) {
 		LOG_TGP(("VIDEO: sort&draw\n"));
@@ -1131,7 +1131,7 @@ static void draw_objects(model1_state *state, bitmap_t *bitmap, const rectangle 
 	state->m_pointpt = state->m_pointdb;
 }
 
-static UINT16 *draw_direct(model1_state *state, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *list)
+static UINT16 *draw_direct(model1_state *state, bitmap_t *bitmap, const rectangle &cliprect, UINT16 *list)
 {
 	UINT16 *res;
 
@@ -1184,7 +1184,7 @@ WRITE16_HANDLER( model1_listctl_w )
 	LOG_TGP(("VIDEO: control=%08x\n", (state->m_listctl[1]<<16)|state->m_listctl[0]));
 }
 
-static void tgp_render(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void tgp_render(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	model1_state *state = machine.driver_data<model1_state>();
 	struct view *view = state->m_view;
@@ -1519,7 +1519,7 @@ SCREEN_UPDATE(model1)
 	view->ayys = sin(view->ayy);
 
 	screen.machine().priority_bitmap->fill(0);
-	bitmap->fill(screen.machine().pens[0], *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
 
 	segas24_tile *tile = screen.machine().device<segas24_tile>("tile");
 	tile->draw(bitmap, cliprect, 6, 0, 0);

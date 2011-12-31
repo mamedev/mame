@@ -150,7 +150,7 @@ VIDEO_START( m107 )
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	m107_state *state = machine.driver_data<m107_state>();
 	UINT16 *spriteram = state->m_buffered_spriteram;
@@ -313,7 +313,7 @@ static void m107_update_scroll_positions(running_machine &machine)
 
 /*****************************************************************************/
 
-static void m107_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int laynum, int category,int opaque)
+static void m107_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int laynum, int category,int opaque)
 {
 	m107_state *state = machine.driver_data<m107_state>();
 	int line;
@@ -326,7 +326,7 @@ static void m107_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const 
 
 	if (state->m_control[0x08 + laynum] & 0x02)
 	{
-		for (line = cliprect->min_y; line <= cliprect->max_y;line++)
+		for (line = cliprect.min_y; line <= cliprect.max_y;line++)
 		{
 			const UINT16 *scrolldata = state->m_vram_data + (0xe800 + 0x200 * laynum) / 2;
 			clip.min_y = clip.max_y = line;
@@ -334,7 +334,7 @@ static void m107_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const 
 			tilemap_set_scrollx(state->m_pf_layer[laynum].tmap,0,  state->m_control[1 + 2 * laynum]);
 			tilemap_set_scrolly(state->m_pf_layer[laynum].tmap,0,  (state->m_control[0 + 2 * laynum] + scrolldata[line]));
 
-			tilemap_draw(bitmap, &clip, state->m_pf_layer[laynum].tmap, category | opaque, category);
+			tilemap_draw(bitmap, clip, state->m_pf_layer[laynum].tmap, category | opaque, category);
 		}
 	}
 	else
@@ -342,10 +342,10 @@ static void m107_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const 
 }
 
 
-static void m107_screenrefresh(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void m107_screenrefresh(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	m107_state *state = machine.driver_data<m107_state>();
-	machine.priority_bitmap->fill(0, *cliprect);
+	machine.priority_bitmap->fill(0, cliprect);
 
 	if ((~state->m_control[0x0b] >> 7) & 1)
 	{
@@ -353,7 +353,7 @@ static void m107_screenrefresh(running_machine &machine, bitmap_t *bitmap, const
 		m107_tilemap_draw(machine, bitmap, cliprect, 3, 1,0);
 	}
 	else
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 	/* note: the opaque flag is used if layer 3 is disabled, noticeable in World PK Soccer title and gameplay screens */
 	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0,(((state->m_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));

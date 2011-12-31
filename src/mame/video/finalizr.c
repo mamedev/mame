@@ -214,13 +214,13 @@ SCREEN_UPDATE( finalizr )
 
 	{
 		const rectangle &visarea = screen.visible_area();
-		rectangle clip = *cliprect;
+		rectangle clip = cliprect;
 
 		/* draw top status region */
 		clip.min_x = visarea.min_x;
 		clip.max_x = visarea.min_x + 31;
 		tilemap_set_scrolldx(state->m_fg_tilemap,  0,-32);
-		tilemap_draw(bitmap, &clip, state->m_fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, clip, state->m_fg_tilemap, 0, 0);
 	}
 	return 0;
 }

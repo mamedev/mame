@@ -131,7 +131,7 @@ SCREEN_UPDATE( thunderj )
 	int x, y, r;
 
 	/* draw the playfield */
-	priority_bitmap->fill(0, *cliprect);
+	priority_bitmap->fill(0, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 0x01);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 0x02);

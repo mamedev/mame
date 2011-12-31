@@ -372,10 +372,10 @@ if (screen.machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmes
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0x38]);
 		int xoffs = screen.visible_area().min_x;
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			UINT32 *dest = &bitmap->pix32(y);
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dest[x] = WAVERAM_READPIX(base, y, x - xoffs);
 		}
 	}
@@ -393,10 +393,10 @@ if (screen.machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmes
 		if (yoffs < 0) yoffs = 0;
 		base = (const UINT64 *)waveram0_ptr_from_expanded_addr(yoffs << 16);
 
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			UINT32 *dest = &bitmap->pix32(y);
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				UINT8 tex = get_texel_8bit(base, y, x, texel_width);
 				dest[x] = (tex << 16) | (tex << 8) | tex;
@@ -1260,7 +1260,7 @@ In memory:
 	extra->texbase = WAVERAM_BLOCK0(zeus_texbase);
 	extra->palbase = waveram0_ptr_from_expanded_addr(zeusbase[0x41]);
 
-	poly_render_quad_fan(poly, NULL, &zeus_cliprect, callback, 4, numverts, &clipvert[0]);
+	poly_render_quad_fan(poly, NULL, zeus_cliprect, callback, 4, numverts, &clipvert[0]);
 }
 
 

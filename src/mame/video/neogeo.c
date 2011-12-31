@@ -925,11 +925,11 @@ SCREEN_UPDATE( neogeo )
 	neogeo_state *state = screen.machine().driver_data<neogeo_state>();
 
 	/* fill with background color first */
-	bitmap->fill(state->m_pens[0x0fff], *cliprect);
+	bitmap->fill(state->m_pens[0x0fff], cliprect);
 
-	draw_sprites(screen.machine(), bitmap, cliprect->min_y);
+	draw_sprites(screen.machine(), bitmap, cliprect.min_y);
 
-	draw_fixed_layer(screen.machine(), bitmap, cliprect->min_y);
+	draw_fixed_layer(screen.machine(), bitmap, cliprect.min_y);
 
 	return 0;
 }

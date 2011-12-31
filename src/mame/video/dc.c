@@ -132,7 +132,7 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 // the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
 //  our implementation is not currently tile based, and thus the accumulation buffer is screen sized
 static bitmap_t *fake_accumulationbuffer_bitmap;
-static void render_to_accumulation_buffer(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect);
+static void render_to_accumulation_buffer(running_machine &machine,bitmap_t *bitmap,const rectangle &cliprect);
 
 typedef struct texinfo {
 	UINT32 address, vqbase;
@@ -1102,7 +1102,7 @@ WRITE64_HANDLER( pvr_ta_w )
 
 				// we've got a request to draw, so, draw to the accumulation buffer!
 				// this should really be done for each tile!
-				render_to_accumulation_buffer(space->machine(),fake_accumulationbuffer_bitmap,&clip);
+				render_to_accumulation_buffer(space->machine(),fake_accumulationbuffer_bitmap,clip);
 
 				state->endofrender_timer_isp->adjust(attotime::from_usec(4000) ); // hack, make sure render takes some amount of time
 
@@ -1975,7 +1975,7 @@ static void render_tri(running_machine &machine, bitmap_t *bitmap, texinfo *ti, 
 	render_tri_sorted(machine, bitmap, ti, v+i0, v+i1, v+i2);
 }
 
-static void render_to_accumulation_buffer(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect)
+static void render_to_accumulation_buffer(running_machine &machine,bitmap_t *bitmap,const rectangle &cliprect)
 {
 	dc_state *state = machine.driver_data<dc_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -1996,7 +1996,7 @@ static void render_to_accumulation_buffer(running_machine &machine,bitmap_t *bit
 	rs=state_ta.renderselect;
 	c=state->pvrta_regs[ISP_BACKGND_T];
 	c=space->read_dword(0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
-	bitmap->fill(c, *cliprect);
+	bitmap->fill(c, cliprect);
 
 
 	ns=state_ta.grab[rs].strips_size;
@@ -2204,7 +2204,7 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 }
 
 
-static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect)
+static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const rectangle &cliprect)
 {
 	dc_state *state = machine.driver_data<dc_state>();
 
@@ -2246,11 +2246,11 @@ static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const 
 						g = (c & 0x03e0) >> 2;
 						r = (c & 0x7c00) >> 7;
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
 						fbaddr=&bitmap->pix32(y, x*2+1);
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 						addrp+=2;
 					}
@@ -2266,7 +2266,7 @@ static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const 
 						g = (c & 0x03e0) >> 2;
 						r = (c & 0x7c00) >> 7;
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 						addrp+=2;
 					}
@@ -2290,12 +2290,12 @@ static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const 
 						g = (c & 0x07e0) >> 3;
 						r = (c & 0xf800) >> 8;
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
 						fbaddr=&bitmap->pix32(y, x*2+1);
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
 						addrp+=2;
@@ -2312,7 +2312,7 @@ static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const 
 						g = (c & 0x07e0) >> 3;
 						r = (c & 0xf800) >> 8;
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 						addrp+=2;
 					}
@@ -2335,12 +2335,12 @@ static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const 
 						g = (c & 0x07e0) >> 3;
 						r = (c & 0xf800) >> 8;
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
 						fbaddr=&bitmap->pix32(y, x*2+1);
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 						addrp+=2;
 					}
@@ -2356,7 +2356,7 @@ static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const 
 						g = (c & 0x07e0) >> 3;
 						r = (c & 0xf800) >> 8;
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 						addrp+=2;
 					}
@@ -2379,11 +2379,11 @@ static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const 
 						g = (c & 0x07e0) >> 3;
 						r = (c & 0xf800) >> 8;
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
 						fbaddr=&bitmap->pix32(y, x*2+1);
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 
 						addrp+=2;
@@ -2400,7 +2400,7 @@ static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const 
 						g = (c & 0x07e0) >> 3;
 						r = (c & 0xf800) >> 8;
 
-						if (y<=cliprect->max_y)
+						if (y<=cliprect.max_y)
 							*fbaddr = b | (g<<8) | (r<<16);
 						addrp+=2;
 					}
@@ -2679,7 +2679,7 @@ SCREEN_UPDATE(dc)
 	}
 #endif
 
-	bitmap->fill(MAKE_ARGB(0xff,vo_border_R,vo_border_G,vo_border_B), *cliprect); //FIXME: Chroma bit?
+	bitmap->fill(MAKE_ARGB(0xff,vo_border_R,vo_border_G,vo_border_B), cliprect); //FIXME: Chroma bit?
 
 	if(!spg_blank_video)
 		pvr_drawframebuffer(screen.machine(),bitmap,cliprect);

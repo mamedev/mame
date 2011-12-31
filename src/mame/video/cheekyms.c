@@ -108,7 +108,7 @@ VIDEO_START( cheekyms )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int flip )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx, int flip )
 {
 	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 	offs_t offs;
@@ -158,8 +158,8 @@ SCREEN_UPDATE( cheekyms )
 	tilemap_mark_all_tiles_dirty_all(screen.machine());
 	tilemap_set_flip_all(screen.machine(), flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	bitmap->fill(0, *cliprect);
-	state->m_bitmap_buffer->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
+	state->m_bitmap_buffer->fill(0, cliprect);
 
 	/* sprites go under the playfield */
 	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().gfx[1], flip);
@@ -168,9 +168,9 @@ SCREEN_UPDATE( cheekyms )
 	tilemap_draw(state->m_bitmap_buffer, cliprect, state->m_cm_tilemap, 0, 0);
 
 	/* draw the tilemap to the final bitmap applying the scroll to the man character */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int in_man_area;
 

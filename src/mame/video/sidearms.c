@@ -174,7 +174,7 @@ VIDEO_START( sidearms )
 	state->m_flipon = state->m_charon = state->m_staron = state->m_objon = state->m_bgon = 0;
 }
 
-static void draw_sprites_region(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int start_offset, int end_offset )
+static void draw_sprites_region(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int start_offset, int end_offset )
 {
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
 	const gfx_element *gfx = machine.gfx[2];
@@ -331,7 +331,7 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_t *bitmap 
 #endif
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	sidearms_state *state = machine.driver_data<sidearms_state>();
 

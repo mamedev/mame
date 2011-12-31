@@ -118,7 +118,7 @@ static TILE_GET_INFO( get_fg_tile_info )
     big object
  ********************************************/
 
-static void draw_object( running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_object( running_machine& machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 	int sx, sy, color;
@@ -141,7 +141,7 @@ static void draw_object( running_machine& machine, bitmap_t *bitmap, const recta
 	drawgfx_transpen(bitmap, cliprect, machine.gfx[3], 1, color, 0, 1, sx, sy - 64, 0);
 }
 
-static void draw_center( running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_center( running_machine& machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 	int sx, sy, x, y, color;
@@ -160,7 +160,7 @@ static void draw_center( running_machine& machine, bitmap_t *bitmap, const recta
 	sx = (state->m_center_h_shift_space >> 2) & 0x3c;
 
 	for (y = 0; y < 4; y++)
-		if ((sy + y) >= cliprect->min_y && (sy + y) <= cliprect->max_y)
+		if ((sy + y) >= cliprect.min_y && (sy + y) <= cliprect.max_y)
 		{
 			if (((sy + y) & state->m_color_center_bot & 3) == (sy & state->m_color_center_bot & 3))
 				for (x = 0; x < 256; x++)
@@ -391,7 +391,7 @@ WRITE8_HANDLER( decocass_center_v_shift_w )
     memory handlers
  ********************************************/
 
-static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect, int color,
+static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const rectangle &cliprect, int color,
 						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
 						UINT8 *sprite_ram, int interleave)
 {
@@ -440,7 +440,7 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_missiles(running_machine &machine,bitmap_t *bitmap, const rectangle *cliprect,
+static void draw_missiles(running_machine &machine,bitmap_t *bitmap, const rectangle &cliprect,
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
 						UINT8 *missile_ram, int interleave)
 {
@@ -461,10 +461,10 @@ static void draw_missiles(running_machine &machine,bitmap_t *bitmap, const recta
 			sy = 240 - sy + missile_y_adjust_flip_screen;
 		}
 		sy -= missile_y_adjust;
-		if (sy >= cliprect->min_y && sy <= cliprect->max_y)
+		if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 			for (x = 0; x < 4; x++)
 			{
-				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
+				if (sx >= cliprect.min_x && sx <= cliprect.max_x)
 					bitmap->pix16(sy, sx) = (state->m_color_missiles >> 4) & 7;
 				sx++;
 			}
@@ -477,10 +477,10 @@ static void draw_missiles(running_machine &machine,bitmap_t *bitmap, const recta
 			sy = 240 - sy + missile_y_adjust_flip_screen;
 		}
 		sy -= missile_y_adjust;
-		if (sy >= cliprect->min_y && sy <= cliprect->max_y)
+		if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 			for (x = 0; x < 4; x++)
 			{
-				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
+				if (sx >= cliprect.min_x && sx <= cliprect.max_x)
 					bitmap->pix16(sy, sx) = state->m_color_missiles & 7;
 				sx++;
 			}
@@ -552,7 +552,7 @@ SCREEN_UPDATE( decocass )
 	}
 #endif
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	scrolly_l = state->m_back_vl_shift;
 	scrolly_r = 256 - state->m_back_vr_shift;
@@ -581,12 +581,12 @@ SCREEN_UPDATE( decocass )
 	if (state->m_mode_set & 0x08)	/* bkg_ena on ? */
 	{
 		clip = state->m_bg_tilemap_l_clip;
-		clip &= *cliprect;
-		tilemap_draw(bitmap, &clip, state->m_bg_tilemap_l, TILEMAP_DRAW_OPAQUE, 0);
+		clip &= cliprect;
+		tilemap_draw(bitmap, clip, state->m_bg_tilemap_l, TILEMAP_DRAW_OPAQUE, 0);
 
 		clip = state->m_bg_tilemap_r_clip;
-		clip &= *cliprect;
-		tilemap_draw(bitmap, &clip, state->m_bg_tilemap_r, TILEMAP_DRAW_OPAQUE, 0);
+		clip &= cliprect;
+		tilemap_draw(bitmap, clip, state->m_bg_tilemap_r, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
 	if (state->m_mode_set & 0x20)
@@ -601,12 +601,12 @@ SCREEN_UPDATE( decocass )
 		if (state->m_mode_set & 0x08)	/* bkg_ena on ? */
 		{
 			clip = state->m_bg_tilemap_l_clip;
-			clip &= *cliprect;
-			tilemap_draw(bitmap, &clip, state->m_bg_tilemap_l, 0, 0);
+			clip &= cliprect;
+			tilemap_draw(bitmap, clip, state->m_bg_tilemap_l, 0, 0);
 
 			clip = state->m_bg_tilemap_r_clip;
-			clip &= *cliprect;
-			tilemap_draw(bitmap, &clip, state->m_bg_tilemap_r, 0, 0);
+			clip &= cliprect;
+			tilemap_draw(bitmap, clip, state->m_bg_tilemap_r, 0, 0);
 		}
 	}
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

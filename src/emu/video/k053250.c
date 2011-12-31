@@ -59,7 +59,7 @@ void k053250_t::device_reset()
 
 // utility function to render a clipped scanline vertically or horizontally
 inline void k053250_t::pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, UINT8 *source,
-									  const rectangle *cliprect, int linepos, int scroll, int zoom,
+									  const rectangle &cliprect, int linepos, int scroll, int zoom,
 									  UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_t *priority, UINT8 pri)
 {
 // a sixteen-bit fixed point resolution should be adequate to our application
@@ -81,14 +81,14 @@ inline void k053250_t::pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, 
 	if (!(orientation & ORIENTATION_SWAP_XY))
 	{
 		flip = orientation & ORIENTATION_FLIP_X;
-		dst_min = cliprect->min_x;
-		dst_max = cliprect->max_x;
+		dst_min = cliprect.min_x;
+		dst_max = cliprect.max_x;
 	}
 	else
 	{
 		flip = orientation & ORIENTATION_FLIP_Y;
-		dst_min = cliprect->min_y;
-		dst_max = cliprect->max_y;
+		dst_min = cliprect.min_y;
+		dst_max = cliprect.max_y;
 	}
 
 	if (clipmask)
@@ -221,7 +221,7 @@ inline void k053250_t::pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, 
 #undef FIXPOINT_PRECISION_HALF
 }
 
-void k053250_t::draw( bitmap_t *bitmap, const rectangle *cliprect, int colorbase, int flags, int priority )
+void k053250_t::draw( bitmap_t *bitmap, const rectangle &cliprect, int colorbase, int flags, int priority )
 {
 	UINT8 *pix_ptr;
 	const pen_t *pal_base, *pal_ptr;
@@ -236,10 +236,10 @@ void k053250_t::draw( bitmap_t *bitmap, const rectangle *cliprect, int colorbase
 	UINT8 ctrl = regs[4];									// register four is the main control register
 
 	// copy visible boundary values to more accessible locations
-	int dst_minx  = cliprect->min_x;
-	int dst_maxx  = cliprect->max_x;
-	int dst_miny  = cliprect->min_y;
-	int dst_maxy  = cliprect->max_y;
+	int dst_minx  = cliprect.min_x;
+	int dst_maxx  = cliprect.max_x;
+	int dst_miny  = cliprect.min_y;
+	int dst_maxy  = cliprect.max_y;
 
 	int orientation  = 0;	// orientation defaults to no swapping and no flipping
 	int dst_height   = 512;	// virtual bitmap height defaults to five hundred and twelve pixels

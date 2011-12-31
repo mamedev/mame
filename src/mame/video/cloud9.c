@@ -256,7 +256,7 @@ SCREEN_UPDATE( cloud9 )
 	int x, y, offs;
 
 	/* draw the sprites */
-	state->m_spritebitmap->fill(0x00, *cliprect);
+	state->m_spritebitmap->fill(0x00, cliprect);
 	for (offs = 0; offs < 0x20; offs++)
 		if (spriteaddr[offs + 0x00] != 0)
 		{
@@ -273,14 +273,14 @@ SCREEN_UPDATE( cloud9 )
 		}
 
 	/* draw the bitmap to the screen, looping over Y */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *dst = &bitmap->pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (~state->m_syncprom[y] & 2)
 		{
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dst[x] = black;
 		}
 
@@ -296,7 +296,7 @@ SCREEN_UPDATE( cloud9 )
 			src[1] = &state->m_videoram[0x0000 | (effy * 64)];
 
 			/* loop over X */
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				/* if we're in the HBLANK region, just store black */
 				if (x >= 256)

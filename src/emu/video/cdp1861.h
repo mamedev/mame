@@ -113,7 +113,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( disp_on_w );
 	DECLARE_WRITE_LINE_MEMBER( disp_off_w );
 
-	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides

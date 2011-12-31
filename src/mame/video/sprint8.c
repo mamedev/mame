@@ -128,7 +128,7 @@ VIDEO_START( sprint8 )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
 {
 	sprint8_state *state = machine.driver_data<sprint8_state>();
 	int i;
@@ -175,11 +175,11 @@ SCREEN_EOF( sprint8 )
 	int y;
 	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-	tilemap_draw(state->m_helper2, &visarea, state->m_tilemap2, 0, 0);
+	tilemap_draw(state->m_helper2, visarea, state->m_tilemap2, 0, 0);
 
 	state->m_helper1->fill(0x20, visarea);
 
-	draw_sprites(screen.machine(), state->m_helper1, &visarea);
+	draw_sprites(screen.machine(), state->m_helper1, visarea);
 
 	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{

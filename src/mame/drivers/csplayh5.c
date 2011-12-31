@@ -70,7 +70,7 @@ static VIDEO_START( csplayh5 )
 static SCREEN_UPDATE( csplayh5 )
 {
 	csplayh5_state *state = screen.machine().driver_data<csplayh5_state>();
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	copybitmap(bitmap, state->m_vdp0_bitmap, 0, 0, 0, 0, cliprect);
 

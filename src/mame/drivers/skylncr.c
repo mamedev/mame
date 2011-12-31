@@ -154,7 +154,7 @@ static SCREEN_UPDATE( skylncr )
 	skylncr_state *state = screen.machine().driver_data<skylncr_state>();
 	int i;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 	tilemap_draw(bitmap,cliprect, state->m_reel_1_tilemap, 0, 0);
 
 	// are these hardcoded, or registers?
@@ -169,9 +169,9 @@ static SCREEN_UPDATE( skylncr )
 		tilemap_set_scrolly(state->m_reel_4_tilemap, i, state->m_reelscroll4[i]);
 	}
 
-	tilemap_draw(bitmap,&visible1,state->m_reel_2_tilemap, 0, 0);
-	tilemap_draw(bitmap,&visible2,state->m_reel_3_tilemap, 0, 0);
-	tilemap_draw(bitmap,&visible3,state->m_reel_4_tilemap, 0, 0);
+	tilemap_draw(bitmap,visible1,state->m_reel_2_tilemap, 0, 0);
+	tilemap_draw(bitmap,visible2,state->m_reel_3_tilemap, 0, 0);
+	tilemap_draw(bitmap,visible3,state->m_reel_4_tilemap, 0, 0);
 
 
 	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);

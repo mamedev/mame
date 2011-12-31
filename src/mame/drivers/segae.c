@@ -1008,14 +1008,14 @@ static SCREEN_UPDATE( systeme )
 	bitmap_t *vdp2_bitmap = state->m_vdp2->get_bitmap();
 	bitmap_t *vdp2_y1 = state->m_vdp2->get_y1_bitmap();
 
-	for( int y = cliprect->min_y; y <= cliprect->max_y; y++ )
+	for( int y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
 		UINT32 *dest_ptr = &bitmap->pix32(y);
 		UINT32 *vdp1_ptr = &vdp1_bitmap->pix32(y);
 		UINT32 *vdp2_ptr = &vdp2_bitmap->pix32(y);
 		UINT8 *y1_ptr = &vdp2_y1->pix8(y);
 
-		for ( int x = cliprect->min_x; x <= cliprect->max_x; x++ )
+		for ( int x = cliprect.min_x; x <= cliprect.max_x; x++ )
 		{
 			dest_ptr[x] = ( y1_ptr[x] ) ? vdp1_ptr[x] : vdp2_ptr[x];
 //dest_ptr[x] = y1_ptr[x] ? 0xFF0000 : 0x00FF00;

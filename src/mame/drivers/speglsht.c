@@ -364,10 +364,10 @@ static SCREEN_UPDATE(speglsht)
 	st0016_draw_screen(screen, state->m_bitmap, cliprect);
 
 	//copy temporary bitmap to rgb 32 bit bitmap
-	for(y=cliprect->min_y; y<cliprect->max_y;y++)
+	for(y=cliprect.min_y; y<cliprect.max_y;y++)
 	{
 		UINT16 *srcline = &state->m_bitmap->pix16(y);
-		for(x=cliprect->min_x; x<cliprect->max_x;x++)
+		for(x=cliprect.min_x; x<cliprect.max_x;x++)
 		{
 			if(srcline[x])
 			{

@@ -102,7 +102,7 @@ static SCREEN_UPDATE( tetriskr )
 
 	//popmessage("%04x",m_start_offs);
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	for(y=0;y<200/8;y++)
 	{

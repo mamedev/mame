@@ -89,7 +89,7 @@ namco_tilemap_init( running_machine &machine, int gfxbank, void *maskBaseAddr,
 } /* namco_tilemap_init */
 
 void
-namco_tilemap_draw( bitmap_t *bitmap, const rectangle *cliprect, int pri )
+namco_tilemap_draw( bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 	int i;
 	for( i=0; i<6; i++ )
@@ -266,7 +266,7 @@ WRITE32_HANDLER( namco_tilemapvideoram32_le_w )
 /**************************************************************************************/
 
 static void zdrawgfxzoom(
-		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+		bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int scalex, int scaley, int zpos )
 {
@@ -312,30 +312,27 @@ static void zdrawgfxzoom(
 					y_index = 0;
 				}
 
-				if( clip )
-				{
-					if( sx < clip->min_x)
-					{ /* clip left */
-						int pixels = clip->min_x-sx;
-						sx += pixels;
-						x_index_base += pixels*dx;
-					}
-					if( sy < clip->min_y )
-					{ /* clip top */
-						int pixels = clip->min_y-sy;
-						sy += pixels;
-						y_index += pixels*dy;
-					}
-					if( ex > clip->max_x+1 )
-					{ /* clip right */
-						int pixels = ex-clip->max_x-1;
-						ex -= pixels;
-					}
-					if( ey > clip->max_y+1 )
-					{ /* clip bottom */
-						int pixels = ey-clip->max_y-1;
-						ey -= pixels;
-					}
+				if( sx < clip.min_x)
+				{ /* clip left */
+					int pixels = clip.min_x-sx;
+					sx += pixels;
+					x_index_base += pixels*dx;
+				}
+				if( sy < clip.min_y )
+				{ /* clip top */
+					int pixels = clip.min_y-sy;
+					sy += pixels;
+					y_index += pixels*dy;
+				}
+				if( ex > clip.max_x+1 )
+				{ /* clip right */
+					int pixels = ex-clip.max_x-1;
+					ex -= pixels;
+				}
+				if( ey > clip.max_y+1 )
+				{ /* clip bottom */
+					int pixels = ey-clip.max_y-1;
+					ey -= pixels;
 				}
 
 				if( ex>sx )
@@ -411,13 +408,13 @@ static void zdrawgfxzoom(
 } /* zdrawgfxzoom */
 
 void
-namcos2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int control )
+namcos2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri, int control )
 {
 	int offset = (control & 0x000f) * (128*4);
 	int loop;
 	if( pri==0 )
 	{
-		machine.priority_bitmap->fill(0, *cliprect );
+		machine.priority_bitmap->fill(0, cliprect );
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -491,7 +488,7 @@ namcos2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle
 } /* namcos2_draw_sprites */
 
 void
-namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 	/**
      * word#0
@@ -528,7 +525,7 @@ namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_t *bitmap, const
 	int loop;
 	if( pri==0 )
 	{
-		machine.priority_bitmap->fill(0, *cliprect );
+		machine.priority_bitmap->fill(0, cliprect );
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -584,10 +581,10 @@ namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_t *bitmap, const
 			rect.min_y=sy;
 			rect.max_y=sy+(sizey-1);
 
-			if (cliprect->min_x > rect.min_x) rect.min_x = cliprect->min_x;
-			if (cliprect->max_x < rect.max_x) rect.max_x = cliprect->max_x;
-			if (cliprect->min_y > rect.min_y) rect.min_y = cliprect->min_y;
-			if (cliprect->max_y < rect.max_y) rect.max_y = cliprect->max_y;
+			if (cliprect.min_x > rect.min_x) rect.min_x = cliprect.min_x;
+			if (cliprect.max_x < rect.max_x) rect.max_x = cliprect.max_x;
+			if (cliprect.min_y > rect.min_y) rect.min_y = cliprect.min_y;
+			if (cliprect.max_y < rect.max_y) rect.max_y = cliprect.max_y;
 
 			if( !bBigSprite )
 			{
@@ -610,7 +607,7 @@ namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_t *bitmap, const
 			}
 			zdrawgfxzoom(
 				bitmap,
-				&rect,
+				rect,
 				machine.gfx[0],
 				sprn, color,
 				flipx,flipy,
@@ -717,7 +714,7 @@ static int mGfxC355;	/* gfx bank for sprites */
  * 0x14000 sprite list (page1)
  */
 static void
-draw_spriteC355(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *pSource, int pri, int zpos )
+draw_spriteC355(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, const UINT16 *pSource, int pri, int zpos )
 {
 	UINT16 *spriteram16 = machine.generic.spriteram.u16;
 	unsigned screen_height_remaining, screen_width_remaining;
@@ -802,10 +799,10 @@ draw_spriteC355(running_machine &machine, bitmap_t *bitmap, const rectangle *cli
 	clip.max_x = pWinAttr[1] - xscroll;
 	clip.min_y = pWinAttr[2] - yscroll;
 	clip.max_y = pWinAttr[3] - yscroll;
-	if( clip.min_x < cliprect->min_x ){ clip.min_x = cliprect->min_x; }
-	if( clip.min_y < cliprect->min_y ){ clip.min_y = cliprect->min_y; }
-	if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
-	if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
+	if( clip.min_x < cliprect.min_x ){ clip.min_x = cliprect.min_x; }
+	if( clip.min_y < cliprect.min_y ){ clip.min_y = cliprect.min_y; }
+	if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
+	if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
 	hpos&=0x7ff; if( hpos&0x400 ) hpos |= ~0x7ff; /* sign extend */
 	vpos&=0x7ff; if( vpos&0x400 ) vpos |= ~0x7ff; /* sign extend */
 
@@ -875,7 +872,7 @@ draw_spriteC355(running_machine &machine, bitmap_t *bitmap, const rectangle *cli
 			{
 				zdrawgfxzoom(
 					bitmap,
-					&clip,
+					clip,
 					machine.gfx[mGfxC355],
 					mpCodeToTile(machine, tile) + offset,
 					color,
@@ -926,7 +923,7 @@ namco_obj_init( running_machine &machine, int gfxbank, int palXOR, int (*codeToT
 static void
 DrawObjectList(running_machine &machine,
 		bitmap_t *bitmap,
-		const rectangle *cliprect,
+		const rectangle &cliprect,
 		int pri,
 		const UINT16 *pSpriteList16,
 		const UINT16 *pSpriteTable )
@@ -942,12 +939,12 @@ DrawObjectList(running_machine &machine,
 } /* DrawObjectList */
 
 void
-namco_obj_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+namco_obj_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if( pri==0 )
 	{
-		machine.priority_bitmap->fill(0, *cliprect );
+		machine.priority_bitmap->fill(0, cliprect );
 	}
 //  if( offs==0 )
 	{ /* boot */
@@ -1215,7 +1212,7 @@ static void
 DrawRozHelper(
 	bitmap_t *bitmap,
 	tilemap_t *tmap,
-	const rectangle *clip,
+	const rectangle &clip,
 	const struct RozParam *rozInfo )
 {
 
@@ -1226,17 +1223,17 @@ DrawRozHelper(
 		UINT32 size_mask = rozInfo->size-1;
 		bitmap_t *srcbitmap = tilemap_get_pixmap( tmap );
 		bitmap_t *flagsbitmap = tilemap_get_flagsmap( tmap );
-		UINT32 startx = rozInfo->startx + clip->min_x * rozInfo->incxx + clip->min_y * rozInfo->incyx;
-		UINT32 starty = rozInfo->starty + clip->min_x * rozInfo->incxy + clip->min_y * rozInfo->incyy;
-		int sx = clip->min_x;
-		int sy = clip->min_y;
-		while( sy <= clip->max_y )
+		UINT32 startx = rozInfo->startx + clip.min_x * rozInfo->incxx + clip.min_y * rozInfo->incyx;
+		UINT32 starty = rozInfo->starty + clip.min_x * rozInfo->incxy + clip.min_y * rozInfo->incyy;
+		int sx = clip.min_x;
+		int sy = clip.min_y;
+		while( sy <= clip.max_y )
 		{
 			int x = sx;
 			UINT32 cx = startx;
 			UINT32 cy = starty;
 			UINT16 *dest = &bitmap->pix16(sy, sx);
-			while( x <= clip->max_x )
+			while( x <= clip.max_x )
 			{
 				UINT32 xpos = (((cx>>16)&size_mask) + rozInfo->left)&0xfff;
 				UINT32 ypos = (((cy>>16)&size_mask) + rozInfo->top)&0xfff;
@@ -1271,9 +1268,9 @@ DrawRozHelper(
 } /* DrawRozHelper */
 
 static void
-DrawRozScanline( bitmap_t *bitmap, int line, int which, int pri, const rectangle *cliprect )
+DrawRozScanline( bitmap_t *bitmap, int line, int which, int pri, const rectangle &cliprect )
 {
-	if( line>=cliprect->min_y && line<=cliprect->max_y )
+	if( line>=cliprect.min_y && line<=cliprect.max_y )
 	{
 		struct RozParam rozInfo;
 		rectangle clip;
@@ -1289,19 +1286,19 @@ DrawRozScanline( bitmap_t *bitmap, int line, int which, int pri, const rectangle
 				clip.max_x = bitmap->width()-1;
 				clip.min_y = clip.max_y = line;
 
-				if( clip.min_x < cliprect->min_x ){ clip.min_x = cliprect->min_x; }
-				if( clip.min_y < cliprect->min_y ){ clip.min_y = cliprect->min_y; }
-				if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
-				if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
+				if( clip.min_x < cliprect.min_x ){ clip.min_x = cliprect.min_x; }
+				if( clip.min_y < cliprect.min_y ){ clip.min_y = cliprect.min_y; }
+				if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
+				if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
 
-				DrawRozHelper( bitmap, mRozTilemap[which], &clip, &rozInfo );
+				DrawRozHelper( bitmap, mRozTilemap[which], clip, &rozInfo );
 			} /* priority */
 		} /* enabled */
 	}
 } /* DrawRozScanline */
 
 void
-namco_roz_draw( bitmap_t *bitmap, const rectangle *cliprect, int pri )
+namco_roz_draw( bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 	int mode = rozcontrol16[0]; /* 0x8000 or 0x1000 */
 	int which, special = 1;
@@ -1599,7 +1596,7 @@ namco_road_set_transparent_color(pen_t pen)
 }
 
 void
-namco_road_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+namco_road_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 	const UINT8 *clut = (const UINT8 *)machine.region("user3")->base();
 	bitmap_t *pSourceBitmap;
@@ -1609,7 +1606,7 @@ namco_road_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cli
 	pSourceBitmap = tilemap_get_pixmap(mpRoadTilemap);
 	yscroll = mpRoadRAM[0x1fdfe/2];
 
-	for( i=cliprect->min_y; i<=cliprect->max_y; i++ )
+	for( i=cliprect.min_y; i<=cliprect.max_y; i++ )
 	{
 		int screenx	= mpRoadRAM[0x1fa00/2+i+15];
 		if( pri == ((screenx&0xf000)>>12) )
@@ -1637,15 +1634,15 @@ namco_road_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cli
 					/* adjust the horizontal placement */
 					screenx -= 64; /*needs adjustment to left*/
 
-					clipPixels = cliprect->min_x - screenx;
+					clipPixels = cliprect.min_x - screenx;
 					if( clipPixels>0 )
 					{ /* crop left */
 						numpixels -= clipPixels;
 						sourcex += dsourcex*clipPixels;
-						screenx = cliprect->min_x;
+						screenx = cliprect.min_x;
 					}
 
-					clipPixels = (screenx+numpixels) - (cliprect->max_x+1);
+					clipPixels = (screenx+numpixels) - (cliprect.max_x+1);
 					if( clipPixels>0 )
 					{ /* crop right */
 						numpixels -= clipPixels;

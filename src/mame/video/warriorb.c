@@ -17,7 +17,7 @@ VIDEO_START( warriorb )
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int x_offs, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int x_offs, int y_offs )
 {
 	warriorb_state *state = machine.driver_data<warriorb_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -84,7 +84,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
                 SCREEN REFRESH
 **************************************************************/
 
-static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int xoffs, device_t *tc0100scn)
+static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
 {
 	UINT8 layer[3], nodraw;
 
@@ -95,7 +95,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 	layer[2] = 2;
 
 	/* Clear priority bitmap */
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer
@@ -103,7 +103,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	// draw middle layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 1);

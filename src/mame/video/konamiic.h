@@ -37,7 +37,7 @@ int K053246_read_register(int regnum);
 
 extern UINT16 *K053936_0_ctrl,*K053936_0_linectrl;
 extern UINT16 *K053936_1_ctrl,*K053936_1_linectrl;
-void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack);
+void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack);
 void K053936_wraparound_enable(int chip, int status);
 void K053936_set_offset(int chip, int xoffs, int yoffs);
 
@@ -76,7 +76,7 @@ WRITE16_HANDLER( K056832_word_w ); // "VRAM" registers
 WRITE16_HANDLER( K056832_b_word_w );
 void K056832_mark_plane_dirty(int num);
 void K056832_MarkAllTilemapsDirty(void);
-void K056832_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int num, UINT32 flags, UINT32 priority);
+void K056832_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
 int  K056832_get_LayerAssociation(void);
 void K056832_set_LayerOffset(int layer, int offsx, int offsy);
 void K056832_set_UpdateMode(int mode);

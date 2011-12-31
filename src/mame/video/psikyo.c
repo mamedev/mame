@@ -263,7 +263,7 @@ Note:   Not all sprites are displayed: in the top part of spriteram
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int trans_pen )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int trans_pen )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
@@ -382,7 +382,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 // until I work out why it makes a partial copy of the sprite list, and how best to apply it
 // sprite placement of the explosion graphic seems incorrect compared to the original sets? (no / different zoom support?)
 // it might be a problem with the actual bootleg
-static void draw_sprites_bootleg( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int trans_pen )
+static void draw_sprites_bootleg( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int trans_pen )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
@@ -674,9 +674,9 @@ SCREEN_UPDATE( psikyo )
 	tilemap_set_transparent_pen(state->m_tilemap_1_size2, (layer1_ctrl & 8 ? 0 : 15));
 	tilemap_set_transparent_pen(state->m_tilemap_1_size3, (layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (layers_ctrl & 1)
 		tilemap_draw(bitmap, cliprect, tmptilemap0, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
@@ -848,9 +848,9 @@ SCREEN_UPDATE( psikyo_bootleg )
 	tilemap_set_transparent_pen(state->m_tilemap_1_size2, (layer1_ctrl & 8 ? 0 : 15));
 	tilemap_set_transparent_pen(state->m_tilemap_1_size3, (layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	if (layers_ctrl & 1)
 		tilemap_draw(bitmap, cliprect, tmptilemap0, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);

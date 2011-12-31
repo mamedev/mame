@@ -618,7 +618,7 @@ void upd3301_device::draw_scanline()
 //  update_screen -
 //-------------------------------------------------
 
-void upd3301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
+void upd3301_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	if (m_status & STATUS_VE)
 	{
@@ -648,6 +648,6 @@ void upd3301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap->fill(get_black_pen(machine()), *cliprect);
+		bitmap->fill(get_black_pen(machine()), cliprect);
 	}
 }

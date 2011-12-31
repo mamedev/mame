@@ -102,7 +102,7 @@ static void namconb1_install_palette(running_machine &machine)
 } /* namconb1_install_palette */
 
 static void
-video_update_common(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bROZ )
+video_update_common(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int bROZ )
 {
 	int pri;
 	namconb1_install_palette(machine);
@@ -143,14 +143,14 @@ SCREEN_UPDATE( namconb1 )
 	clip.min_y = (yclip>>16)    - 0x21;
 	clip.max_y = (yclip&0xffff) - 0x21 - 1;
 	/* intersect with master clip rectangle */
-	if( clip.min_x < cliprect->min_x ){ clip.min_x = cliprect->min_x; }
-	if( clip.min_y < cliprect->min_y ){ clip.min_y = cliprect->min_y; }
-	if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
-	if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
+	if( clip.min_x < cliprect.min_x ){ clip.min_x = cliprect.min_x; }
+	if( clip.min_y < cliprect.min_y ){ clip.min_y = cliprect.min_y; }
+	if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
+	if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect );
+	bitmap->fill(get_black_pen(screen.machine()), cliprect );
 
-	video_update_common( screen.machine(), bitmap, &clip, 0 );
+	video_update_common( screen.machine(), bitmap, clip, 0 );
 
 	return 0;
 }
@@ -184,19 +184,19 @@ SCREEN_UPDATE( namconb2 )
 	clip.min_y = (yclip>>16)    - 0x21;
 	clip.max_y = (yclip&0xffff) - 0x21 - 1;
 	/* intersect with master clip rectangle */
-	if( clip.min_x < cliprect->min_x ){ clip.min_x = cliprect->min_x; }
-	if( clip.min_y < cliprect->min_y ){ clip.min_y = cliprect->min_y; }
-	if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
-	if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
+	if( clip.min_x < cliprect.min_x ){ clip.min_x = cliprect.min_x; }
+	if( clip.min_y < cliprect.min_y ){ clip.min_y = cliprect.min_y; }
+	if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
+	if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect );
+	bitmap->fill(get_black_pen(screen.machine()), cliprect );
 
 	if( memcmp(state->m_tilemap_tile_bank,state->m_tilebank32,sizeof(state->m_tilemap_tile_bank))!=0 )
 	{
 		namco_tilemap_invalidate();
 		memcpy(state->m_tilemap_tile_bank,state->m_tilebank32,sizeof(state->m_tilemap_tile_bank));
 	}
-	video_update_common( screen.machine(), bitmap, &clip, 1 );
+	video_update_common( screen.machine(), bitmap, clip, 1 );
 	return 0;
 }
 

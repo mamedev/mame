@@ -440,7 +440,7 @@ VIDEO_START( tceptor )
     z: zoom y
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int sprite_priority)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int sprite_priority)
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
 	UINT16 *mem1 = &state->m_sprite_ram_buffered[0x000/2];
@@ -511,8 +511,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	{
 		int x, y;
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 				if (colortable_entry_get_value(machine.colortable, bitmap->pix16(y, x)) == SPR_MASK_COLOR)
 					// restore pixel
 					bitmap->pix16(y, x) = state->m_temp_bitmap->pix16(y, x);
@@ -528,18 +528,18 @@ SCREEN_UPDATE( tceptor_2d )
 	int bg_center = 144 - ((((state->m_bg1_scroll_x + state->m_bg2_scroll_x ) & 0x1ff) - 288) / 2);
 
 	// left background
-	rect = *cliprect;
+	rect = cliprect;
 	rect.max_x = bg_center;
 	tilemap_set_scrollx(state->m_bg1_tilemap, 0, state->m_bg1_scroll_x + 12);
 	tilemap_set_scrolly(state->m_bg1_tilemap, 0, state->m_bg1_scroll_y + 20); //32?
-	tilemap_draw(bitmap, &rect, state->m_bg1_tilemap, 0, 0);
+	tilemap_draw(bitmap, rect, state->m_bg1_tilemap, 0, 0);
 
 	// right background
 	rect.min_x = bg_center;
-	rect.max_x = cliprect->max_x;
+	rect.max_x = cliprect.max_x;
 	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg2_scroll_x + 20);
 	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg2_scroll_y + 20); // 32?
-	tilemap_draw(bitmap, &rect, state->m_bg2_tilemap, 0, 0);
+	tilemap_draw(bitmap, rect, state->m_bg2_tilemap, 0, 0);
 
 	for (pri = 0; pri < 8; pri++)
 	{

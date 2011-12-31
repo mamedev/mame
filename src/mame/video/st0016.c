@@ -212,7 +212,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	/*
     object ram :
@@ -377,10 +377,10 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 									if (!flipx) { drawxpos = xpos+xloop; } else { drawxpos = (xpos+8-1)-xloop; }
 
-									if (drawxpos > cliprect->max_x)
+									if (drawxpos > cliprect.max_x)
 										drawxpos -= 512; // wrap around
 
-									if ((drawxpos >= cliprect->min_x) && (drawxpos <= cliprect->max_x) && (drawypos >= cliprect->min_y) && (drawypos <= cliprect->max_y) )
+									if ((drawxpos >= cliprect.min_x) && (drawxpos <= cliprect.max_x) && (drawypos >= cliprect.min_y) && (drawypos <= cliprect.max_y) )
 									{
 										if(st0016_spriteram[offset+5]&0x40)
 										{
@@ -488,7 +488,7 @@ VIDEO_START( st0016 )
 }
 
 
-static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int priority)
+static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect, int priority)
 {
 	gfx_element *gfx = machine.gfx[st0016_ramgfx];
 	int j;
@@ -543,10 +543,10 @@ static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangl
 
 									if (!flipx) { drawxpos = xpos+xloop; } else { drawxpos = (xpos+8-1)-xloop; }
 
-									if (drawxpos > cliprect->max_x)
+									if (drawxpos > cliprect.max_x)
 										drawxpos -= 512; // wrap around
 
-									if ((drawxpos >= cliprect->min_x) && (drawxpos <= cliprect->max_x) && (drawypos >= cliprect->min_y) && (drawypos <= cliprect->max_y) )
+									if ((drawxpos >= cliprect.min_x) && (drawxpos <= cliprect.max_x) && (drawypos >= cliprect.min_y) && (drawypos <= cliprect.max_y) )
 									{
 
 										if(st0016_vregs[j+7]==0x12)
@@ -584,7 +584,7 @@ static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangl
 }
 
 
-void st0016_draw_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
+void st0016_draw_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	draw_bgmap(screen.machine(), bitmap,cliprect,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
@@ -616,7 +616,7 @@ SCREEN_UPDATE( st0016 )
 	}
 #endif
 
-	bitmap->fill(UNUSED_PEN, *cliprect);
+	bitmap->fill(UNUSED_PEN, cliprect);
 	st0016_draw_screen(screen, bitmap, cliprect);
 	return 0;
 }

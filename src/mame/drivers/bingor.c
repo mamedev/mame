@@ -462,7 +462,7 @@ static SCREEN_UPDATE(bingor)
 	bingor_state *state = screen.machine().driver_data<bingor_state>();
 	int x,y,count;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	count = (0x2000/2);
 

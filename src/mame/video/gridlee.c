@@ -140,7 +140,7 @@ SCREEN_UPDATE( gridlee )
 	int x, y, i;
 
 	/* draw scanlines from the VRAM directly */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		/* non-flipped: draw directly from the bitmap */
 		if (!state->m_cocktail_flip)
@@ -184,7 +184,7 @@ SCREEN_UPDATE( gridlee )
 				currxor = 0xff;
 			}
 
-			if (ypos >= (16 + GRIDLEE_VBEND) && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
+			if (ypos >= (16 + GRIDLEE_VBEND) && ypos >= cliprect.min_y && ypos <= cliprect.max_y)
 			{
 				int currx = xpos;
 

@@ -1580,7 +1580,7 @@ void sega315_5378_device::update_palette()
 }
 
 
-void sega315_5124_device::update_video( bitmap_t *bitmap, const rectangle *cliprect )
+void sega315_5124_device::update_video( bitmap_t *bitmap, const rectangle &cliprect )
 {
 	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 }

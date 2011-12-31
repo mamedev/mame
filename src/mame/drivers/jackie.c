@@ -181,7 +181,7 @@ static SCREEN_UPDATE(jackie)
 	int startclipmin = 0;
 	const rectangle &visarea = screen.visible_area();
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	for (i=0;i < 0x40;i++)
 	{
@@ -203,15 +203,15 @@ static SCREEN_UPDATE(jackie)
 
 		if (rowenable==0)
 		{
-			tilemap_draw(bitmap,&clip,state->m_reel1_tilemap,0,0);
+			tilemap_draw(bitmap,clip,state->m_reel1_tilemap,0,0);
 		}
 		else if (rowenable==1)
 		{
-			tilemap_draw(bitmap,&clip,state->m_reel2_tilemap,0,0);
+			tilemap_draw(bitmap,clip,state->m_reel2_tilemap,0,0);
 		}
 		else if (rowenable==2)
 		{
-			tilemap_draw(bitmap,&clip,state->m_reel3_tilemap,0,0);
+			tilemap_draw(bitmap,clip,state->m_reel3_tilemap,0,0);
 		}
 		else if (rowenable==3)
 		{

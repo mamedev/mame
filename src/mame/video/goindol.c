@@ -85,7 +85,7 @@ WRITE8_HANDLER( goindol_bg_videoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int gfxbank, UINT8 *sprite_ram )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int gfxbank, UINT8 *sprite_ram )
 {
 	goindol_state *state = machine.driver_data<goindol_state>();
 	int offs, sx, sy, tile, palette;

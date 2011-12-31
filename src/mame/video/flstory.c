@@ -178,7 +178,7 @@ WRITE8_HANDLER( flstory_scrlram_w )
 }
 
 
-static void flstory_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static void flstory_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
 	int i;
@@ -235,7 +235,7 @@ SCREEN_UPDATE( flstory )
 	return 0;
 }
 
-static void victnine_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void victnine_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
 	int i;

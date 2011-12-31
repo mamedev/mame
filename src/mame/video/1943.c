@@ -221,7 +221,7 @@ VIDEO_START( 1943 )
 	state->save_item(NAME(state->m_bg2_on));
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
 {
 	_1943_state *state = machine.driver_data<_1943_state>();
 	int offs;
@@ -264,7 +264,7 @@ SCREEN_UPDATE( 1943 )
 	if (state->m_bg2_on)
 		tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 	else
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (state->m_obj_on)
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);

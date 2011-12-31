@@ -100,10 +100,10 @@ VIDEO_START( mustache )
 	tilemap_set_scroll_rows(state->m_bg_tilemap, 4);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	mustache_state *state = machine.driver_data<mustache_state>();
-	rectangle clip = *cliprect;
+	rectangle clip = cliprect;
 	const gfx_element *gfx = machine.gfx[1];
 	const rectangle &visarea = machine.primary_screen->visible_area();
 	UINT8 *spriteram = state->m_spriteram;
@@ -135,7 +135,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap,&clip,gfx,
+		drawgfx_transpen(bitmap,clip,gfx,
 				code,
 				color,
 				flip_screen_get(machine),flip_screen_get(machine),

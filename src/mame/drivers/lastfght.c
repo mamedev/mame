@@ -142,7 +142,7 @@ static SCREEN_UPDATE( lastfght )
 
 		count = state->m_base;
 
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect );
+		bitmap->fill(get_black_pen(screen.machine()), cliprect );
 		for (y = 0 ; y < 256; y++)
 		{
 			for (x = 0; x < 512; x++)

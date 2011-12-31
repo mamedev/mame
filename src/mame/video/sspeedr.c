@@ -181,7 +181,7 @@ static void draw_track(running_machine &machine, bitmap_t* bitmap)
 }
 
 
-static void draw_drones(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_drones(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
 {
 	sspeedr_state *state = machine.driver_data<sspeedr_state>();
 	static const UINT8 code[6] =
@@ -221,7 +221,7 @@ static void draw_drones(running_machine &machine, bitmap_t* bitmap, const rectan
 }
 
 
-static void draw_driver(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
+static void draw_driver(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
 {
 	sspeedr_state *state = machine.driver_data<sspeedr_state>();
 	int x;

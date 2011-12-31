@@ -182,7 +182,7 @@ VIDEO_START(pitnrun)
 	pitnrun_spotlights(machine);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -221,7 +221,7 @@ SCREEN_UPDATE( pitnrun )
 {
 	pitnrun_state *state = screen.machine().driver_data<pitnrun_state>();
 	int dx=0,dy=0;
-	rectangle myclip=*cliprect;
+	rectangle myclip=cliprect;
 
 #ifdef MAME_DEBUG
 	if (screen.machine().input().code_pressed_once(KEYCODE_Q))
@@ -244,7 +244,7 @@ SCREEN_UPDATE( pitnrun )
 	}
 #endif
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	if(!(state->m_ha&4))
 		tilemap_draw(bitmap,cliprect,state->m_bg, 0,0);
@@ -265,19 +265,19 @@ SCREEN_UPDATE( pitnrun )
 		myclip.max_y=dy+127;
 
 
-		if(myclip.min_y<cliprect->min_y)myclip.min_y=cliprect->min_y;
-		if(myclip.min_x<cliprect->min_x)myclip.min_x=cliprect->min_x;
+		if(myclip.min_y<cliprect.min_y)myclip.min_y=cliprect.min_y;
+		if(myclip.min_x<cliprect.min_x)myclip.min_x=cliprect.min_x;
 
-		if(myclip.max_y>cliprect->max_y)myclip.max_y=cliprect->max_y;
-		if(myclip.max_x>cliprect->max_x)myclip.max_x=cliprect->max_x;
+		if(myclip.max_y>cliprect.max_y)myclip.max_y=cliprect.max_y;
+		if(myclip.max_x>cliprect.max_x)myclip.max_x=cliprect.max_x;
 
-		tilemap_draw(bitmap,&myclip,state->m_bg, 0,0);
+		tilemap_draw(bitmap,myclip,state->m_bg, 0,0);
 	}
 
-	draw_sprites(screen.machine(),bitmap,&myclip);
+	draw_sprites(screen.machine(),bitmap,myclip);
 
 	if(state->m_ha&4)
-		copybitmap_trans(bitmap,state->m_tmp_bitmap[state->m_ha&3],flip_screen_x_get(screen.machine()),flip_screen_y_get(screen.machine()),dx,dy,&myclip, 1);
+		copybitmap_trans(bitmap,state->m_tmp_bitmap[state->m_ha&3],flip_screen_x_get(screen.machine()),flip_screen_y_get(screen.machine()),dx,dy,myclip, 1);
 	tilemap_draw(bitmap,cliprect,state->m_fg, 0,0);
 	return 0;
 }

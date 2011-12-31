@@ -541,7 +541,7 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 static void render_polygons(running_machine &machine)
 {
 	int i, j;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle visarea = machine.primary_screen->visible_area();
 
 //  mame_printf_debug("K001005_fifo_ptr = %08X\n", K001005_3d_fifo_ptr);
 
@@ -582,9 +582,9 @@ static void render_polygons(running_machine &machine)
 			++index;
 
 			extra->color = color;
-			poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
-			poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
-//          poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page],  &visarea, draw_scanline, 1, 4, v);
+			poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+			poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
+//          poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page],  visarea, draw_scanline, 1, 4, v);
 
 			i = index - 1;
 		}
@@ -689,13 +689,13 @@ static void render_polygons(running_machine &machine)
 
 			if (num_verts < 3)
 			{
-				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, &prev_v[2], &v[0], &v[1]);
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, &prev_v[2], &v[0], &v[1]);
 				if (prev_poly_type)
-					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, &prev_v[2], &prev_v[3], &v[0]);
+					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, &prev_v[2], &prev_v[3], &v[0]);
 //              if (prev_poly_type)
-//                  poly_render_quad(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, &prev_v[2], &prev_v[3], &v[0], &v[1]);
+//                  poly_render_quad(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, &prev_v[2], &prev_v[3], &v[0], &v[1]);
 //              else
-//                  poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, &prev_v[2], &v[0], &v[1]);
+//                  poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, &prev_v[2], &v[0], &v[1]);
 
 				memcpy(&prev_v[0], &prev_v[2], sizeof(poly_vertex));
 				memcpy(&prev_v[1], &prev_v[3], sizeof(poly_vertex));
@@ -704,10 +704,10 @@ static void render_polygons(running_machine &machine)
 			}
 			else
 			{
-				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
 				if (num_verts > 3)
-					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
-//              poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, num_verts, v);
+					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
+//              poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, num_verts, v);
 
 				memcpy(prev_v, v, sizeof(poly_vertex) * 4);
 			}
@@ -788,10 +788,10 @@ static void render_polygons(running_machine &machine)
 
 				extra->color = color;
 
-				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
 				if (new_verts > 1)
-					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
-//              poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline_tex, 4, new_verts + 2, v);
+					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
+//              poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 4, new_verts + 2, v);
 
 				memcpy(prev_v, v, sizeof(poly_vertex) * 4);
 			};
@@ -847,10 +847,10 @@ static void render_polygons(running_machine &machine)
 
 			extra->color = color;
 
-			poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+			poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
 			if (num_verts > 3)
-				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline, 1, &v[2], &v[3], &v[0]);
-//          poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline, 1, num_verts, v);
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 1, &v[2], &v[3], &v[0]);
+//          poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 1, num_verts, v);
 
 			memcpy(prev_v, v, sizeof(poly_vertex) * 4);
 
@@ -906,10 +906,10 @@ static void render_polygons(running_machine &machine)
 
 				extra->color = color;
 
-				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+				poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
 				if (new_verts > 1)
-					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
-//              poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], &visarea, draw_scanline, 1, new_verts + 2, v);
+					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
+//              poly_render_polygon(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 1, new_verts + 2, v);
 
 				memcpy(prev_v, v, sizeof(poly_vertex) * 4);
 			};
@@ -934,18 +934,18 @@ static void render_polygons(running_machine &machine)
 	}
 }
 
-void K001005_draw(bitmap_t *bitmap, const rectangle *cliprect)
+void K001005_draw(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
-	memcpy(&K001005_cliprect, cliprect, sizeof(rectangle));
+	memcpy(&K001005_cliprect, &cliprect, sizeof(rectangle));
 
-	for (j=cliprect->min_y; j <= cliprect->max_y; j++)
+	for (j=cliprect.min_y; j <= cliprect.max_y; j++)
 	{
 		UINT32 *bmp = &bitmap->pix32(j);
 		UINT32 *src = &K001005_bitmap[K001005_bitmap_page^1]->pix32(j);
 
-		for (i=cliprect->min_x; i <= cliprect->max_x; i++)
+		for (i=cliprect.min_x; i <= cliprect.max_x; i++)
 		{
 			if (src[i] & 0xff000000)
 			{
@@ -1051,7 +1051,7 @@ SCREEN_UPDATE( gticlub )
 
 SCREEN_UPDATE( hangplt )
 {
-	bitmap->fill(screen.machine().pens[0], *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
 
 	if (strcmp(screen.tag(), "lscreen") == 0)
 	{

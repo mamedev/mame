@@ -236,11 +236,11 @@ INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 }
 
 
-static void draw_background(stactics_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(stactics_state *state, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	int y;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	/* for every row */
 	for (y = 0; y < 0x100; y++)

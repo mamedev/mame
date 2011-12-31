@@ -167,7 +167,7 @@ public:
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri_mask)
 {
 	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	UINT8 *end		=	state->m_spriteram - 0x10;
@@ -265,7 +265,7 @@ static SCREEN_UPDATE(sigmab98)
 	}
 #endif
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	// Draw from priority 3 (bottom, converted to a bitmask) to priority 0 (top)
 	draw_sprites(screen.machine(), bitmap, cliprect, layers_ctrl & 8);

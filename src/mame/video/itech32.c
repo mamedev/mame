@@ -1436,7 +1436,7 @@ SCREEN_UPDATE( itech32 )
 	int y;
 
 	/* loop over height */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *src1 = &state->m_videoplane[0][compute_safe_address(state, VIDEO_DISPLAY_XORIGIN1, VIDEO_DISPLAY_YORIGIN1 + y)];
 
@@ -1448,7 +1448,7 @@ SCREEN_UPDATE( itech32 )
 			int x;
 
 			/* blend the pixels in the scanline; color xxFF is transparent */
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				UINT16 pixel = src1[x];
 				if ((pixel & 0xff) == 0xff)
@@ -1457,12 +1457,12 @@ SCREEN_UPDATE( itech32 )
 			}
 
 			/* draw from the buffer */
-			draw_scanline16(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], NULL);
+			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.max_x - cliprect.min_x + 1, &scanline[cliprect.min_x], NULL);
 		}
 
 		/* otherwise, draw directly from VRAM */
 		else
-			draw_scanline16(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &src1[cliprect->min_x], NULL);
+			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.max_x - cliprect.min_x + 1, &src1[cliprect.min_x], NULL);
 	}
 	return 0;
 }

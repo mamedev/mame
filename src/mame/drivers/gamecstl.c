@@ -117,7 +117,7 @@ static VIDEO_START(gamecstl)
 		palette_set_color(machine, i, cga_palette[i]);
 }
 
-static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	const UINT8 *dp;
@@ -147,7 +147,7 @@ static SCREEN_UPDATE(gamecstl)
 	UINT32 *cga = state->m_cga_ram;
 	int index = 0;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	for (j=0; j < 25; j++)
 	{

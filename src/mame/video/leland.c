@@ -400,7 +400,7 @@ static SCREEN_UPDATE( leland )
 	offs_t prom_bank = ((state->m_gfxbank >> 3) & 0x01) * 0x2000;
 
 	/* for each scanline in the visible region */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int x;
 		UINT8 fg_data = 0;
@@ -467,7 +467,7 @@ static SCREEN_UPDATE( ataxx )
 	offs_t bg_gfx_offs_mask = bg_gfx_bank_page_size - 1;
 
 	/* for each scanline in the visible region */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int x;
 		UINT8 fg_data = 0;

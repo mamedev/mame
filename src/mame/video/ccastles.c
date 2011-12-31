@@ -274,7 +274,7 @@ SCREEN_UPDATE( ccastles )
 	int x, y, offs;
 
 	/* draw the sprites */
-	state->m_spritebitmap->fill(0x0f, *cliprect);
+	state->m_spritebitmap->fill(0x0f, cliprect);
 	for (offs = 0; offs < 320/2; offs += 4)
 	{
 		int x = spriteaddr[offs + 3];
@@ -286,14 +286,14 @@ SCREEN_UPDATE( ccastles )
 	}
 
 	/* draw the bitmap to the screen, looping over Y */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *dst = &bitmap->pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (state->m_syncprom[y] & 1)
 		{
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dst[x] = black;
 		}
 
@@ -310,7 +310,7 @@ SCREEN_UPDATE( ccastles )
 			src = &state->m_videoram[effy * 128];
 
 			/* loop over X */
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				/* if we're in the HBLANK region, just store black */
 				if (x >= 256)

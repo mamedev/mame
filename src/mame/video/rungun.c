@@ -107,8 +107,8 @@ SCREEN_UPDATE(rng)
 {
 	rungun_state *state = screen.machine().driver_data<rungun_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_936_tilemap, 0, 0, 1);
 

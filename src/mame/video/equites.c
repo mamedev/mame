@@ -258,7 +258,7 @@ WRITE16_HANDLER(splndrbt_bg_scrolly_w)
  *
  *************************************/
 
-static void equites_draw_sprites_block( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int start, int end )
+static void equites_draw_sprites_block( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int start, int end )
 {
 	equites_state *state = machine.driver_data<equites_state>();
 	int offs;
@@ -299,7 +299,7 @@ static void equites_draw_sprites_block( running_machine &machine, bitmap_t *bitm
 	}
 }
 
-static void equites_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void equites_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	// note that we draw the sprites in three blocks; in each blocks, sprites at
 	// a lower address have priority. This gives good priorities in gekisou.
@@ -332,7 +332,7 @@ Also, note that sprites are 30x30, not 32x32.
 03020303 03030303 03030303 03030303
 */
 
-static void splndrbt_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void splndrbt_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	equites_state *state = machine.driver_data<equites_state>();
 	const UINT8 * const xrom = machine.region("user2")->base();
@@ -384,13 +384,13 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 			{
 				int const y = yhalf ? sy + 1 + yy : sy - yy;
 
-				if (y >= cliprect->min_y && y <= cliprect->max_y)
+				if (y >= cliprect.min_y && y <= cliprect.max_y)
 				{
 					for (x = 0; x <= (scalex << 1); ++x)
 					{
 						int bx = (sx + x) & 0xff;
 
-						if (bx >= cliprect->min_x && bx <= cliprect->max_x)
+						if (bx >= cliprect.min_x && bx <= cliprect.max_x)
 						{
 							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16;	// FIXME This is wrong. Should use the PROM.
 							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line) ) * gfx->line_modulo;
@@ -408,7 +408,7 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 }
 
 
-static void splndrbt_copy_bg( running_machine &machine, bitmap_t *dst_bitmap, const rectangle *cliprect )
+static void splndrbt_copy_bg( running_machine &machine, bitmap_t *dst_bitmap, const rectangle &cliprect )
 {
 	equites_state *state = machine.driver_data<equites_state>();
 	bitmap_t * const src_bitmap = tilemap_get_pixmap(state->m_bg_tilemap);
@@ -429,7 +429,7 @@ static void splndrbt_copy_bg( running_machine &machine, bitmap_t *dst_bitmap, co
 
 	for (dst_y = 32; dst_y < 256-32; ++dst_y)
 	{
-		if (dst_y >= cliprect->min_y && dst_y <= cliprect->max_y)
+		if (dst_y >= cliprect.min_y && dst_y <= cliprect.max_y)
 		{
 			const UINT8 * const romline = &xrom[(dst_y ^ dinvert) << 5];
 			const UINT16 * const src_line = &src_bitmap->pix16((src_y + scroll_y) & 0x1ff);
@@ -466,7 +466,7 @@ static void splndrbt_copy_bg( running_machine &machine, bitmap_t *dst_bitmap, co
 SCREEN_UPDATE( equites )
 {
 	equites_state *state = screen.machine().driver_data<equites_state>();
-	bitmap->fill(state->m_bgcolor, *cliprect);
+	bitmap->fill(state->m_bgcolor, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
@@ -480,7 +480,7 @@ SCREEN_UPDATE( equites )
 SCREEN_UPDATE( splndrbt )
 {
 	equites_state *state = screen.machine().driver_data<equites_state>();
-	bitmap->fill(state->m_bgcolor, *cliprect);
+	bitmap->fill(state->m_bgcolor, cliprect);
 
 	splndrbt_copy_bg(screen.machine(), bitmap, cliprect);
 

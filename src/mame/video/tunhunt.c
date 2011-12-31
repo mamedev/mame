@@ -200,7 +200,7 @@ static void set_pens(running_machine &machine)
 	}
 }
 
-static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 /*
  *      VSTRLO  0x1202
@@ -272,7 +272,7 @@ static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const
 	);
 }
 
-static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
@@ -302,7 +302,7 @@ static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle
 
 	for( y=0; y<256; y++ )
 	{
-		if (0xff-y >= cliprect->min_y && 0xff-y <= cliprect->max_y)
+		if (0xff-y >= cliprect.min_y && 0xff-y <= cliprect.max_y)
 			for( x=0; x<256; x++ )
 			{
 				color = 0;
@@ -319,7 +319,7 @@ static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle
 						z = x0; /* give priority to rightmost spans */
 					}
 				}
-				if (x >= cliprect->min_x && x <= cliprect->max_x)
+				if (x >= cliprect.min_x && x <= cliprect.max_x)
 					bitmap->pix16(0xff-y, x) = color;
 			}
 	}
@@ -328,7 +328,7 @@ static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle
 /* "shell" graphics are 16x16 pixel tiles used for player shots and targeting cursor */
 static void draw_shell(running_machine &machine,
 		bitmap_t *bitmap,
-		const rectangle *cliprect,
+		const rectangle &cliprect,
 		int picture_code,
 		int hposition,
 		int vstart,

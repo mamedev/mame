@@ -80,7 +80,7 @@ WRITE16_HANDLER( splash_vram_w )
 	tilemap_mark_tile_dirty(state->m_bg_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 1);
 }
 
-static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	splash_state *state = machine.driver_data<splash_state>();
 	int sx,sy,color,count,colxor,bitswap;
@@ -156,7 +156,7 @@ static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectan
 				break;
 			}
 
-			if (sy >= cliprect->min_y && sy <= cliprect->max_y && sx-9 >= cliprect->min_x && sx-9 <= cliprect->max_x)
+			if (sy >= cliprect.min_y && sy <= cliprect.max_y && sx-9 >= cliprect.min_x && sx-9 <= cliprect.max_x)
 				bitmap->pix16(sy, sx-9) = 0x300+(color^colxor);
 		}
 	}
@@ -210,7 +210,7 @@ VIDEO_START( splash )
       400| xxxxxxxx -------- | unused
 */
 
-static void splash_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void splash_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	splash_state *state = machine.driver_data<splash_state>();
 	int i;
@@ -231,7 +231,7 @@ static void splash_draw_sprites(running_machine &machine, bitmap_t *bitmap,const
 	}
 }
 
-static void funystrp_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void funystrp_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	splash_state *state = machine.driver_data<splash_state>();
 	int i;

@@ -180,11 +180,11 @@ WRITE8_HANDLER( kncljoe_scroll_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	kncljoe_state *state = machine.driver_data<kncljoe_state>();
 	UINT8 *spriteram = state->m_spriteram;
-	rectangle clip = *cliprect;
+	rectangle clip = cliprect;
 	const gfx_element *gfx = machine.gfx[1 + state->m_sprite_bank];
 	int i, j;
 	static const int pribase[4]={0x0180, 0x0080, 0x0100, 0x0000};
@@ -230,7 +230,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 			if (sx >= 256-8)
 				sx -= 256;
 
-			drawgfx_transpen(bitmap,&clip,gfx,
+			drawgfx_transpen(bitmap,clip,gfx,
 				code,
 				color,
 				flipx,flipy,

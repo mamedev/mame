@@ -127,7 +127,7 @@ static SCREEN_UPDATE( progolf )
 					{
 						color = state->m_fg_fb[(xi+yi*8)+count*0x40];
 
-						if((x+yi) <= cliprect->max_x && (256-y+xi) <= cliprect->max_y && color != 0)
+						if((x+yi) <= cliprect.max_x && (256-y+xi) <= cliprect.max_y && color != 0)
 							bitmap->pix16(x+yi, 256-y+xi) = screen.machine().pens[(color & 0x7)];
 					}
 				}

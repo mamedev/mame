@@ -527,7 +527,7 @@ SCREEN_UPDATE( twin16 )
 	if (state->m_video_register&TWIN16_SCREEN_FLIPX) text_flip|=TILEMAP_FLIPX;
 	if (state->m_video_register&TWIN16_SCREEN_FLIPY) text_flip|=TILEMAP_FLIPY;
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 	draw_layer( screen.machine(), bitmap, 1 );
 	draw_layer( screen.machine(), bitmap, 0 );
 	draw_sprites( screen.machine(), bitmap );

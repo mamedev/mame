@@ -200,7 +200,7 @@ static WRITE32_HANDLER( ms32_bg1_ram_w )
 
 /* ROZ Layers */
 
-static void draw_roz(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int chip)
+static void draw_roz(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority, int chip)
 {
 	bnstars_state *state = machine.driver_data<bnstars_state>();
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
@@ -213,11 +213,11 @@ static void draw_roz(running_machine &machine, bitmap_t *bitmap, const rectangle
         rectangle my_clip;
         int y,maxy;
 
-        my_clip.min_x = cliprect->min_x;
-        my_clip.max_x = cliprect->max_x;
+        my_clip.min_x = cliprect.min_x;
+        my_clip.max_x = cliprect.max_x;
 
-        y = cliprect->min_y;
-        maxy = cliprect->max_y;
+        y = cliprect.min_y;
+        maxy = cliprect.max_y;
 
         while (y <= maxy)
         {
@@ -351,7 +351,7 @@ static WRITE32_HANDLER( ms32_pal1_ram_w )
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 *sprram_top, size_t sprram_size, int region)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region)
 {
 	bnstars_state *state = machine.driver_data<bnstars_state>();
 /***************************************************************************
@@ -515,9 +515,9 @@ static SCREEN_UPDATE(bnstars_left)
 {
 	bnstars_state *state = screen.machine().driver_data<bnstars_state>();
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
-	bitmap->fill(0, *cliprect);	/* bg color */
+	bitmap->fill(0, cliprect);	/* bg color */
 
 
 	tilemap_set_scrollx(state->m_ms32_bg_tilemap[0], 0, state->m_ms32_bg0_scroll[0x00/4] + state->m_ms32_bg0_scroll[0x08/4] + 0x10 );
@@ -540,9 +540,9 @@ static SCREEN_UPDATE(bnstars_right)
 {
 	bnstars_state *state = screen.machine().driver_data<bnstars_state>();
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
-	bitmap->fill(0x8000+0, *cliprect);	/* bg color */
+	bitmap->fill(0x8000+0, cliprect);	/* bg color */
 
 
 	tilemap_set_scrollx(state->m_ms32_bg_tilemap[1], 0, state->m_ms32_bg1_scroll[0x00/4] + state->m_ms32_bg1_scroll[0x08/4] + 0x10 );

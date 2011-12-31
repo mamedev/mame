@@ -78,10 +78,10 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 	int step_spr = step;				\
 	int bxs = 0, bys = 0;				\
 	rectangle clip;					\
-	clip.min_x = cliprect->min_x<<6;					\
-	clip.max_x = (cliprect->max_x+1)<<6;					\
-	clip.min_y = cliprect->min_y<<6;					\
-	clip.max_y = (cliprect->max_y+1)<<6;					\
+	clip.min_x = cliprect.min_x<<6;					\
+	clip.max_x = (cliprect.max_x+1)<<6;					\
+	clip.min_y = cliprect.min_y<<6;					\
+	clip.max_y = (cliprect.max_y+1)<<6;					\
 	sx <<= 6;					\
 	sy <<= 6;					\
 	x <<= 6;					\
@@ -165,7 +165,7 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 		old2 += 0x40;				\
 	}
 
-static void blit_nf_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_nf_z(bitmap_t *bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -179,7 +179,7 @@ static void blit_nf_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *
 	}
 }
 
-static void blit_fy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_fy_z(bitmap_t *bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -193,7 +193,7 @@ static void blit_fy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *
 	}
 }
 
-static void blit_fx_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_fx_z(bitmap_t *bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -207,7 +207,7 @@ static void blit_fx_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *
 	}
 }
 
-static void blit_fxy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_fxy_z(bitmap_t *bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -221,14 +221,14 @@ static void blit_fxy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 
 	}
 }
 
-static void (*const blit_z[4])(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour) = {
+static void (*const blit_z[4])(bitmap_t *bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour) = {
 	blit_nf_z,
 	blit_fy_z,
 	blit_fx_z,
 	blit_fxy_z,
 };
 
-void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
+void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
 {
 	/*- SPR RAM Format -**
 
@@ -475,11 +475,11 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitma
 
 						for (xx = 0; xx<xsize; xx++)
 						{
-							if ((sx+xx < (cliprect->max_x+1)) && (sx+xx >= cliprect->min_x))
+							if ((sx+xx < (cliprect.max_x+1)) && (sx+xx >= cliprect.min_x))
 							{
 								for (yy = 0; yy<ysize; yy++)
 								{
-									if ((sy+yy < (cliprect->max_y+1)) && (sy+yy >= cliprect->min_y))
+									if ((sy+yy < (cliprect.max_y+1)) && (sy+yy >= cliprect.min_y))
 									{
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
@@ -495,11 +495,11 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitma
 
 						for (xx = 0; xx<xsize; xx++)
 						{
-							if ((sx+xx < (cliprect->max_x+1)) && (sx+xx >= cliprect->min_x))
+							if ((sx+xx < (cliprect.max_x+1)) && (sx+xx >= cliprect.min_x))
 							{
 								for (yy = 0; yy<ysize; yy++)
 								{
-									if ((sy+(ysize-1-yy) < (cliprect->max_y+1)) && (sy+(ysize-1-yy) >= cliprect->min_y))
+									if ((sy+(ysize-1-yy) < (cliprect.max_y+1)) && (sy+(ysize-1-yy) >= cliprect.min_y))
 									{
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
@@ -515,11 +515,11 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitma
 
 						for (xx = 0; xx<xsize; xx++)
 						{
-							if ( (sx+(xsize-1-xx) < (cliprect->max_x+1)) && (sx+(xsize-1-xx) >= cliprect->min_x))
+							if ( (sx+(xsize-1-xx) < (cliprect.max_x+1)) && (sx+(xsize-1-xx) >= cliprect.min_x))
 							{
 								for (yy = 0; yy<ysize; yy++)
 								{
-									if ((sy+yy < (cliprect->max_y+1)) && (sy+yy >= cliprect->min_y))
+									if ((sy+yy < (cliprect.max_y+1)) && (sy+yy >= cliprect.min_y))
 									{
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
@@ -536,11 +536,11 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitma
 
 						for (xx = 0; xx<xsize; xx++)
 						{
-							if ((sx+(xsize-1-xx) < (cliprect->max_x+1)) && (sx+(xsize-1-xx) >= cliprect->min_x))
+							if ((sx+(xsize-1-xx) < (cliprect.max_x+1)) && (sx+(xsize-1-xx) >= cliprect.min_x))
 							{
 								for (yy = 0; yy<ysize; yy++)
 								{
-									if ((sy+(ysize-1-yy) < (cliprect->max_y+1)) && (sy+(ysize-1-yy) >= cliprect->min_y))
+									if ((sy+(ysize-1-yy) < (cliprect.max_y+1)) && (sy+(ysize-1-yy) >= cliprect.min_y))
 									{
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];

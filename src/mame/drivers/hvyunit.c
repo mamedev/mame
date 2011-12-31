@@ -162,7 +162,7 @@ static SCREEN_UPDATE( hvyunit )
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_port0_data & 0x40) << 2) + state->m_scrollx + SX_POS); // TODO
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_port0_data & 0x80) << 1) + state->m_scrolly + SY_POS); // TODO
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	pandora_update(state->m_pandora, bitmap, cliprect);
 

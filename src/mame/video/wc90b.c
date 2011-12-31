@@ -98,7 +98,7 @@ WRITE8_HANDLER( wc90b_txvideoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
 {
 	wc90b_state *state = machine.driver_data<wc90b_state>();
 	UINT8 *spriteram = state->m_spriteram;

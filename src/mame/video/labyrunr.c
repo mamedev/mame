@@ -188,8 +188,8 @@ SCREEN_UPDATE( labyrunr )
 
 	set_pens(screen.machine());
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (~k007121_ctrlram_r(state->m_k007121, 3) & 0x20)
 	{
@@ -198,8 +198,8 @@ SCREEN_UPDATE( labyrunr )
 		finalclip0 = state->m_clip0;
 		finalclip1 = state->m_clip1;
 
-		finalclip0 &= *cliprect;
-		finalclip1 &= *cliprect;
+		finalclip0 &= cliprect;
+		finalclip1 &= cliprect;
 
 		tilemap_set_scrollx(state->m_layer0, 0, ctrl_0 - 40);
 		tilemap_set_scrollx(state->m_layer1, 0, 0);
@@ -213,10 +213,10 @@ SCREEN_UPDATE( labyrunr )
 				tilemap_set_scrolly(state->m_layer0, (i + 2) & 0x1f, k007121_ctrlram_r(state->m_k007121, 2));
 		}
 
-		tilemap_draw(bitmap, &finalclip0, state->m_layer0, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, finalclip0, state->m_layer0, TILEMAP_DRAW_OPAQUE, 0);
 		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram,(k007121_ctrlram_r(state->m_k007121, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(state->m_k007121, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
-		tilemap_draw(bitmap, &finalclip1, state->m_layer1, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, finalclip1, state->m_layer1, TILEMAP_DRAW_OPAQUE, 0);
 	}
 	else
 	{
@@ -224,17 +224,17 @@ SCREEN_UPDATE( labyrunr )
 		rectangle finalclip3;
 
 		/* custom cliprects needed for the weird effect used in the endinq sequence to hide and show the needed part of text */
-		finalclip0.min_y = finalclip1.min_y = cliprect->min_y;
-		finalclip0.max_y = finalclip1.max_y = cliprect->max_y;
+		finalclip0.min_y = finalclip1.min_y = cliprect.min_y;
+		finalclip0.max_y = finalclip1.max_y = cliprect.max_y;
 
 		if(k007121_ctrlram_r(state->m_k007121, 1) & 1)
 		{
-			finalclip0.min_x = cliprect->max_x - ctrl_0 + 8;
-			finalclip0.max_x = cliprect->max_x;
+			finalclip0.min_x = cliprect.max_x - ctrl_0 + 8;
+			finalclip0.max_x = cliprect.max_x;
 
 			if(ctrl_0 >= 40)
 			{
-				finalclip1.min_x = cliprect->min_x;
+				finalclip1.min_x = cliprect.min_x;
 			}
 			else
 			{
@@ -243,14 +243,14 @@ SCREEN_UPDATE( labyrunr )
 				finalclip1.min_x = 40 - ctrl_0;
 			}
 
-			finalclip1.max_x = cliprect->max_x - ctrl_0 + 8;
+			finalclip1.max_x = cliprect.max_x - ctrl_0 + 8;
 
 		}
 		else
 		{
 			if(ctrl_0 >= 40)
 			{
-				finalclip0.min_x = cliprect->min_x;
+				finalclip0.min_x = cliprect.min_x;
 			}
 			else
 			{
@@ -259,30 +259,30 @@ SCREEN_UPDATE( labyrunr )
 				finalclip0.min_x = 40 - ctrl_0;
 			}
 
-			finalclip0.max_x = cliprect->max_x - ctrl_0 + 8;
+			finalclip0.max_x = cliprect.max_x - ctrl_0 + 8;
 
-			finalclip1.min_x = cliprect->max_x - ctrl_0 + 8;
-			finalclip1.max_x = cliprect->max_x;
+			finalclip1.min_x = cliprect.max_x - ctrl_0 + 8;
+			finalclip1.max_x = cliprect.max_x;
 		}
 
 		if(use_clip3[0] || use_clip3[1])
 		{
-			finalclip3.min_y = cliprect->min_y;
-			finalclip3.max_y = cliprect->max_y;
-			finalclip3.min_x = cliprect->min_x;
+			finalclip3.min_y = cliprect.min_y;
+			finalclip3.max_y = cliprect.max_y;
+			finalclip3.min_x = cliprect.min_x;
 			finalclip3.max_x = 40 - ctrl_0 - 8;
 		}
 
 		tilemap_set_scrollx(state->m_layer0, 0, ctrl_0 - 40);
 		tilemap_set_scrollx(state->m_layer1, 0, ctrl_0 - 40);
 
-		tilemap_draw(bitmap, &finalclip0, state->m_layer0, 0, 1);
+		tilemap_draw(bitmap, finalclip0, state->m_layer0, 0, 1);
 		if(use_clip3[0])
-			tilemap_draw(bitmap, &finalclip3, state->m_layer0, 0, 1);
+			tilemap_draw(bitmap, finalclip3, state->m_layer0, 0, 1);
 
-		tilemap_draw(bitmap, &finalclip1, state->m_layer1, 0, 1);
+		tilemap_draw(bitmap, finalclip1, state->m_layer1, 0, 1);
 		if(use_clip3[1])
-			tilemap_draw(bitmap, &finalclip3, state->m_layer1, 0, 1);
+			tilemap_draw(bitmap, finalclip3, state->m_layer1, 0, 1);
 
 		k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram, (k007121_ctrlram_r(state->m_k007121, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(state->m_k007121, 3) & 0x40) >> 5);
 	}

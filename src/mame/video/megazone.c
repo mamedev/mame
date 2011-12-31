@@ -135,7 +135,7 @@ SCREEN_UPDATE( megazone )
 			flipy = !flipy;
 		}
 
-		drawgfx_opaque(state->m_tmpbitmap, 0, screen.machine().gfx[1],
+		drawgfx_opaque(state->m_tmpbitmap, state->m_tmpbitmap->cliprect(), screen.machine().gfx[1],
 				((int)state->m_videoram[offs]) + ((state->m_colorram[offs] & (1 << 7) ? 256 : 0) ),
 				(state->m_colorram[offs] & 0x0f) + 0x10,
 				flipx,flipy,

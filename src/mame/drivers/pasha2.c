@@ -341,11 +341,11 @@ static SCREEN_UPDATE( pasha2 )
 	/* 2 512x256 bitmaps */
 
 	count = 0;
-	for (y = 0; y <= cliprect->max_y; y++)
+	for (y = 0; y <= cliprect.max_y; y++)
 	{
 		for (x = 0; x < 512 / 2; x++)
 		{
-			if (x * 2 < cliprect->max_x)
+			if (x * 2 < cliprect.max_x)
 			{
 				color = (state->m_bitmap0[count + (state->m_vbuffer ^ 1) * 0x20000 / 2] & 0xff00) >> 8;
 				bitmap->pix16(y, x * 2 + 0) = color + 0x100;
@@ -359,11 +359,11 @@ static SCREEN_UPDATE( pasha2 )
 	}
 
 	count = 0;
-	for (y = 0; y <= cliprect->max_y; y++)
+	for (y = 0; y <= cliprect.max_y; y++)
 	{
 		for (x = 0; x < 512 / 2; x++)
 		{
-			if (x * 2 < cliprect->max_x)
+			if (x * 2 < cliprect.max_x)
 			{
 				color = state->m_bitmap1[count + (state->m_vbuffer ^ 1) * 0x20000 / 2] & 0xff;
 				if (color != 0)

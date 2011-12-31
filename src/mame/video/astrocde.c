@@ -261,7 +261,7 @@ SCREEN_UPDATE( astrocde )
 		sparklebase = (screen.frame_number() * (UINT64)(width * height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *dest = &bitmap->pix16(y);
 		int effy = mame_vpos_to_astrocade_vpos(y);
@@ -336,7 +336,7 @@ SCREEN_UPDATE( profpac )
 	int y;
 
 	/* iterate over scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = mame_vpos_to_astrocade_vpos(y);
 		UINT16 *dest = &bitmap->pix16(y);

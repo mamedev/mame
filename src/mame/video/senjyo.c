@@ -175,14 +175,14 @@ WRITE8_HANDLER( senjyo_bgstripes_w )
 
 ***************************************************************************/
 
-static void draw_bgbitmap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_bgbitmap(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
 	int x,y,pen,strwid,count;
 
 
 	if (state->m_bgstripes == 0xff)	/* off */
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 	else
 	{
 		int flip = flip_screen_get(machine);
@@ -212,7 +212,7 @@ static void draw_bgbitmap(running_machine &machine, bitmap_t *bitmap,const recta
 	}
 }
 
-static void draw_radar(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_radar(running_machine &machine,bitmap_t *bitmap,const rectangle &cliprect)
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
 	int offs,x;
@@ -232,13 +232,13 @@ static void draw_radar(running_machine &machine,bitmap_t *bitmap,const rectangle
 					sy = 255 - sy;
 				}
 
-				if (sy >= cliprect->min_y && sy <= cliprect->max_y &&
-					sx >= cliprect->min_x && sx <= cliprect->max_x)
+				if (sy >= cliprect.min_y && sy <= cliprect.max_y &&
+					sx >= cliprect.min_x && sx <= cliprect.max_x)
 					bitmap->pix16(sy, sx) = offs < 0x200 ? 512 : 513;
 			}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int priority)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int priority)
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
 	UINT8 *spriteram = state->m_spriteram;

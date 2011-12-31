@@ -45,7 +45,7 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 }
 
 
-static void comad_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void comad_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	galpanic_state *state = machine.driver_data<galpanic_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -83,7 +83,7 @@ static void comad_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 	}
 }
 
-static void draw_fgbitmap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_fgbitmap(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	galpanic_state *state = machine.driver_data<galpanic_state>();
 	int offs;
@@ -125,7 +125,7 @@ SCREEN_UPDATE( comad )
 
 //  if(galpanic_clear_sprites)
 	{
-		state->m_sprites_bitmap->fill(0, *cliprect);
+		state->m_sprites_bitmap->fill(0, cliprect);
 		comad_draw_sprites(screen.machine(),bitmap,cliprect);
 	}
 //  else

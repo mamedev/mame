@@ -25,7 +25,7 @@ PALETTE_INIT( flower )
 		colortable_entry_set_value(machine.colortable, i, i);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	flower_state *state = machine.driver_data<flower_state>();
 	const gfx_element *gfx = machine.gfx[1];
@@ -166,7 +166,7 @@ VIDEO_START(flower)
 SCREEN_UPDATE( flower )
 {
 	flower_state *state = screen.machine().driver_data<flower_state>();
-	rectangle myclip = *cliprect;
+	rectangle myclip = cliprect;
 
 	tilemap_set_scrolly(state->m_bg0_tilemap,0, state->m_bg0_scroll[0]+16);
 	tilemap_set_scrolly(state->m_bg1_tilemap,0, state->m_bg1_scroll[0]+16);
@@ -178,17 +178,17 @@ SCREEN_UPDATE( flower )
 
 	if(flip_screen_get(screen.machine()))
 	{
-		myclip.min_x = cliprect->min_x;
-		myclip.max_x = cliprect->min_x + 15;
+		myclip.min_x = cliprect.min_x;
+		myclip.max_x = cliprect.min_x + 15;
 	}
 	else
 	{
-		myclip.min_x = cliprect->max_x - 15;
-		myclip.max_x = cliprect->max_x;
+		myclip.min_x = cliprect.max_x - 15;
+		myclip.max_x = cliprect.max_x;
 	}
 
 	tilemap_draw(bitmap,cliprect,state->m_text_tilemap,0,0);
-	tilemap_draw(bitmap,&myclip,state->m_text_right_tilemap,0,0);
+	tilemap_draw(bitmap,myclip,state->m_text_right_tilemap,0,0);
 	return 0;
 }
 

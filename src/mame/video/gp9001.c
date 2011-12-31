@@ -758,7 +758,7 @@ WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w )
     Sprite Handlers
 ***************************************************************************/
 
-void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8* primap )
+void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, const UINT8* primap )
 {
 	const gfx_element *gfx = machine.gfx[tile_region+1];
 
@@ -914,7 +914,7 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_t *bitmap,
 							{
 								int drawxx = xx+sx;
 
-								if (drawxx>=cliprect->min_x && drawxx<=cliprect->max_x && drawyy>=cliprect->min_y && drawyy<=cliprect->max_y)
+								if (drawxx>=cliprect.min_x && drawxx<=cliprect.max_x && drawyy>=cliprect.min_y && drawyy<=cliprect.max_y)
 								{
 									UINT8 pix = srcdata[count];
 									UINT16* dstptr = &bitmap->pix16(drawyy, drawxx);
@@ -1004,7 +1004,7 @@ static const UINT8 gp9001_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14
 
 static const UINT8 batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
 
-void gp9001vdp_device::gp9001_render_vdp(running_machine& machine, bitmap_t* bitmap, const rectangle* cliprect)
+void gp9001vdp_device::gp9001_render_vdp(running_machine& machine, bitmap_t* bitmap, const rectangle &cliprect)
 {
 	if (gp9001_gfxrom_is_banked && gp9001_gfxrom_bank_dirty)
 	{

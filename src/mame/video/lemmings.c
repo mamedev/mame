@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "includes/lemmings.h"
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri )
 {
 	int offs;
 
@@ -173,10 +173,10 @@ SCREEN_UPDATE( lemmings )
 	int x0 = -state->m_control_data[2];
 	int y = 0;
 	rectangle rect;
-	rect.max_y = cliprect->max_y;
-	rect.min_y = cliprect->min_y;
+	rect.max_y = cliprect.max_y;
+	rect.min_y = cliprect.min_y;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x0000);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
@@ -186,10 +186,10 @@ SCREEN_UPDATE( lemmings )
 	{
 		rect.max_x = 159;
 		rect.min_x = 0;
-		copyscrollbitmap_trans(bitmap, state->m_bitmap0, 1, &x0, 1, &y, &rect, 0x100);
+		copyscrollbitmap_trans(bitmap, state->m_bitmap0, 1, &x0, 1, &y, rect, 0x100);
 		rect.max_x = 319;
 		rect.min_x = 160;
-		copyscrollbitmap_trans(bitmap, state->m_bitmap0, 1, &x1, 1, &y, &rect, 0x100);
+		copyscrollbitmap_trans(bitmap, state->m_bitmap0, 1, &x1, 1, &y, rect, 0x100);
 	}
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_0, 0, 0x0000);
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x2000);

@@ -410,7 +410,7 @@ Notes:
 
 static void copy_from_nvram(running_machine &machine);
 
-INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,
 		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask)
@@ -440,13 +440,8 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 
 
 	/* force clip to bitmap boundary */
-	if(clip)
-	{
-		myclip = *clip;
-		myclip &= dest_bmp->cliprect();
-		clip=&myclip;
-	}
-
+	myclip = clip;
+	myclip &= dest_bmp->cliprect();
 
 	/* 32-bit ONLY */
 	{
@@ -492,30 +487,27 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 					y_index = 0;
 				}
 
-				if( clip )
-				{
-					if( sx < clip->min_x)
-					{ /* clip left */
-						int pixels = clip->min_x-sx;
-						sx += pixels;
-						x_index_base += pixels*dx;
-					}
-					if( sy < clip->min_y )
-					{ /* clip top */
-						int pixels = clip->min_y-sy;
-						sy += pixels;
-						y_index += pixels*dy;
-					}
-					if( ex > clip->max_x+1 )
-					{ /* clip right */
-						int pixels = ex-clip->max_x-1;
-						ex -= pixels;
-					}
-					if( ey > clip->max_y+1 )
-					{ /* clip bottom */
-						int pixels = ey-clip->max_y-1;
-						ey -= pixels;
-					}
+				if( sx < myclip.min_x)
+				{ /* clip left */
+					int pixels = myclip.min_x-sx;
+					sx += pixels;
+					x_index_base += pixels*dx;
+				}
+				if( sy < myclip.min_y )
+				{ /* clip top */
+					int pixels = myclip.min_y-sy;
+					sy += pixels;
+					y_index += pixels*dy;
+				}
+				if( ex > myclip.max_x+1 )
+				{ /* clip right */
+					int pixels = ex-myclip.max_x-1;
+					ex -= pixels;
+				}
+				if( ey > myclip.max_y+1 )
+				{ /* clip bottom */
+					int pixels = ey-myclip.max_y-1;
+					ey -= pixels;
 				}
 
 				if( ex>sx )
@@ -866,7 +858,7 @@ static VIDEO_START(cps3)
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, int drawline, bitmap_t *bitmap, const rectangle *cliprect )
+static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, int drawline, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	cps3_state *state = machine.driver_data<cps3_state>();
 	UINT32* tmapregs[4] = { state->m_tilemap20_regs_base, state->m_tilemap30_regs_base, state->m_tilemap40_regs_base, state->m_tilemap50_regs_base };
@@ -918,14 +910,14 @@ static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, in
 
 		drawline&=0x3ff;
 
-		if (drawline>cliprect->max_y+4) return;
+		if (drawline>cliprect.max_y+4) return;
 
-		clip.min_x = cliprect->min_x;
-		clip.max_x = cliprect->max_x;
+		clip.min_x = cliprect.min_x;
+		clip.max_x = cliprect.max_x;
 		clip.min_y = drawline;
 		clip.max_y = drawline;
 
-		for (x=0;x<(cliprect->max_x/16)+2;x++)
+		for (x=0;x<(cliprect.max_x/16)+2;x++)
 		{
 
 			UINT32 dat;
@@ -944,7 +936,7 @@ static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, in
 			if (!bpp) machine.gfx[1]->color_granularity=256;
 			else machine.gfx[1]->color_granularity=64;
 
-			cps3_drawgfxzoom(bitmap,&clip,machine.gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
+			cps3_drawgfxzoom(bitmap,clip,machine.gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
 		}
 	}
 }
@@ -1101,7 +1093,7 @@ static SCREEN_UPDATE(cps3)
 					{
 						for (uu=0;uu<1023;uu++)
 						{
-							cps3_draw_tilemapsprite_line(screen.machine(), tilemapnum, uu, state->m_renderbuffer_bitmap, &state->m_renderbuffer_clip );
+							cps3_draw_tilemapsprite_line(screen.machine(), tilemapnum, uu, state->m_renderbuffer_bitmap, state->m_renderbuffer_clip );
 						}
 					}
 					bg_drawn[tilemapnum] = 1;
@@ -1188,11 +1180,11 @@ static SCREEN_UPDATE(cps3)
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,&state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,&state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
 									}
 									count++;
 								}

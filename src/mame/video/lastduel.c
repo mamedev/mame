@@ -218,7 +218,7 @@ WRITE16_HANDLER( lastduel_palette_word_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
 {
 	lastduel_state *state = machine.driver_data<lastduel_state>();
 

@@ -204,7 +204,7 @@ VIDEO_START( popper )
 	state->m_tilemap_clip = machine.primary_screen->visible_area();
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect )
 {
 	popper_state *state = machine.driver_data<popper_state>();
 	int offs, sx, sy, flipx, flipy;
@@ -250,7 +250,7 @@ SCREEN_UPDATE( popper )
 {
 	popper_state *state = screen.machine().driver_data<popper_state>();
 	rectangle finalclip = state->m_tilemap_clip;
-	finalclip &= *cliprect;
+	finalclip &= cliprect;
 
 	//attribram
 	//76543210
@@ -260,14 +260,14 @@ SCREEN_UPDATE( popper )
 
 	tilemap_draw(bitmap, cliprect, state->m_p123_tilemap,      TILEMAP_DRAW_LAYER1, 0);
 	tilemap_draw(bitmap, cliprect, state->m_p0_tilemap,        TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(bitmap, &finalclip, state->m_ol_p123_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(bitmap, &finalclip, state->m_ol_p0_tilemap,   TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(bitmap, finalclip, state->m_ol_p123_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(bitmap, finalclip, state->m_ol_p0_tilemap,   TILEMAP_DRAW_LAYER1, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_p123_tilemap,      TILEMAP_DRAW_LAYER0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_p0_tilemap,        TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(bitmap, &finalclip, state->m_ol_p123_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(bitmap, &finalclip, state->m_ol_p0_tilemap,   TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, finalclip, state->m_ol_p123_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, finalclip, state->m_ol_p0_tilemap,   TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

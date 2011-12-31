@@ -138,7 +138,7 @@ static VIDEO_START(cshooter)
 static SCREEN_UPDATE(cshooter)
 {
 	cshooter_state *state = screen.machine().driver_data<cshooter_state>();
-	bitmap->fill(0/*get_black_pen(screen.screen.machine(, *cliprect))*/);
+	bitmap->fill(0/*get_black_pen(screen.screen.machine(, cliprect))*/);
 	tilemap_mark_all_tiles_dirty(state->m_txtilemap);
 
 	//sprites

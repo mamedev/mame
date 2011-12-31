@@ -346,7 +346,7 @@ void segas24_tile::draw_rect_rgb(bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const
 	}
 }
 
-void segas24_tile::draw(bitmap_t *bitmap, const rectangle *cliprect, int layer, int lpri, int flags)
+void segas24_tile::draw(bitmap_t *bitmap, const rectangle &cliprect, int layer, int lpri, int flags)
 {
 	UINT16 hscr = tile_ram[0x5000+(layer >> 1)];
 	UINT16 vscr = tile_ram[0x5004+(layer >> 1)];
@@ -378,9 +378,9 @@ void segas24_tile::draw(bitmap_t *bitmap, const rectangle *cliprect, int layer, 
 				UINT16 v = (-vscr) & 0x1ff;
 				if(!((-vscr) & 0x200))
 					layer ^= 1;
-				for(y=cliprect->min_y; y<=cliprect->max_y; y++) {
+				for(y=cliprect.min_y; y<=cliprect.max_y; y++) {
 					UINT16 h;
-					rectangle c = *cliprect;
+					rectangle c = cliprect;
 					int l1 = layer;
 					if(y >= v)
 						l1 ^= 1;
@@ -391,16 +391,16 @@ void segas24_tile::draw(bitmap_t *bitmap, const rectangle *cliprect, int layer, 
 
 					h = hscr & 0x1ff;
 					tilemap_set_scrollx(tile_layer[l1], 0, -h);
-					tilemap_draw(bitmap, &c, tile_layer[l1], tpri, lpri);
+					tilemap_draw(bitmap, c, tile_layer[l1], tpri, lpri);
 				}
 				break;
 			}
 			case 2: case 3: {
 				int y;
-				for(y=cliprect->min_y; y<=cliprect->max_y; y++) {
+				for(y=cliprect.min_y; y<=cliprect.max_y; y++) {
 					UINT16 h;
-					rectangle c1 = *cliprect;
-					rectangle c2 = *cliprect;
+					rectangle c1 = cliprect;
+					rectangle c2 = cliprect;
 					int l1 = layer;
 
 					hscr = hscrtb[y];
@@ -418,8 +418,8 @@ void segas24_tile::draw(bitmap_t *bitmap, const rectangle *cliprect, int layer, 
 
 					c1.min_y = c1.max_y = c2.min_y = c2.max_y = y;
 
-					tilemap_draw(bitmap, &c1, tile_layer[l1],   tpri, lpri);
-					tilemap_draw(bitmap, &c2, tile_layer[l1^1], tpri, lpri);
+					tilemap_draw(bitmap, c1, tile_layer[l1],   tpri, lpri);
+					tilemap_draw(bitmap, c2, tile_layer[l1^1], tpri, lpri);
 				}
 				break;
 			}
@@ -431,8 +431,8 @@ void segas24_tile::draw(bitmap_t *bitmap, const rectangle *cliprect, int layer, 
 
 			switch((ctrl & 0x6000) >> 13) {
 			case 1: {
-				rectangle c1 = *cliprect;
-				rectangle c2 = *cliprect;
+				rectangle c1 = cliprect;
+				rectangle c2 = cliprect;
 				UINT16 v;
 				v = (-vscr) & 0x1ff;
 				if(c1.max_y >= v)
@@ -442,13 +442,13 @@ void segas24_tile::draw(bitmap_t *bitmap, const rectangle *cliprect, int layer, 
 				if(!((-vscr) & 0x200))
 					layer ^= 1;
 
-				tilemap_draw(bitmap, &c1, tile_layer[layer],   tpri, lpri);
-				tilemap_draw(bitmap, &c2, tile_layer[layer^1], tpri, lpri);
+				tilemap_draw(bitmap, c1, tile_layer[layer],   tpri, lpri);
+				tilemap_draw(bitmap, c2, tile_layer[layer^1], tpri, lpri);
 				break;
 			}
 			case 2: case 3: {
-				rectangle c1 = *cliprect;
-				rectangle c2 = *cliprect;
+				rectangle c1 = cliprect;
+				rectangle c2 = cliprect;
 				UINT16 h;
 				h = (+hscr) & 0x1ff;
 				if(c1.max_x >= h)
@@ -458,8 +458,8 @@ void segas24_tile::draw(bitmap_t *bitmap, const rectangle *cliprect, int layer, 
 				if(!((+hscr) & 0x200))
 					layer ^= 1;
 
-				tilemap_draw(bitmap, &c1, tile_layer[layer],   tpri, lpri);
-				tilemap_draw(bitmap, &c2, tile_layer[layer^1], tpri, lpri);
+				tilemap_draw(bitmap, c1, tile_layer[layer],   tpri, lpri);
+				tilemap_draw(bitmap, c2, tile_layer[layer^1], tpri, lpri);
 				break;
 			}
 			}
@@ -613,7 +613,7 @@ void segas24_sprite::device_start()
     0   11------    --------
 */
 
-void segas24_sprite::draw(bitmap_t *bitmap, const rectangle *cliprect, const int *spri)
+void segas24_sprite::draw(bitmap_t *bitmap, const rectangle &cliprect, const int *spri)
 {
 	UINT16 curspr = 0;
 	int countspr = 0;
@@ -690,14 +690,14 @@ void segas24_sprite::draw(bitmap_t *bitmap, const rectangle *cliprect, const int
 		}
 
 
-		if(min_x < cliprect->min_x)
-			min_x = cliprect->min_x;
-		if(min_y < cliprect->min_y)
-			min_y = cliprect->min_y;
-		if(max_x > cliprect->max_x)
-			max_x = cliprect->max_x;
-		if(max_y > cliprect->max_y)
-			max_y = cliprect->max_y;
+		if(min_x < cliprect.min_x)
+			min_x = cliprect.min_x;
+		if(min_y < cliprect.min_y)
+			min_y = cliprect.min_y;
+		if(max_x > cliprect.max_x)
+			max_x = cliprect.max_x;
+		if(max_y > cliprect.max_y)
+			max_y = cliprect.max_y;
 
 		if(!(source[0] & 0x2000))
 			zoomx = zoomy = source[1] & 0xff;

@@ -103,7 +103,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( hrtc_r );
 	DECLARE_READ_LINE_MEMBER( vrtc_r );
 
-	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides

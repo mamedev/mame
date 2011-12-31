@@ -126,7 +126,7 @@ SCREEN_UPDATE( route16 )
  */
 
 static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_t *bitmap,
-										  const rectangle *cliprect,
+										  const rectangle &cliprect,
 										  pen_t (*make_pen)(UINT8))
 {
 	route16_state *state = machine.driver_data<route16_state>();

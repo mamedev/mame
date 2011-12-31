@@ -143,7 +143,7 @@ VIDEO_START( fuuki32 )
 
 ***************************************************************************/
 
-static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 	int offs;
@@ -289,7 +289,7 @@ if (screen.machine().input().code_pressed(KEYCODE_X))
 ***************************************************************************/
 
 /* Wrapper to handle bg and bg2 ttogether */
-static void fuuki32_draw_layer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int i, int flag, int pri )
+static void fuuki32_draw_layer( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
 	fuuki32_state *state = machine.driver_data<fuuki32_state>();
 	int buffer = ((state->m_vregs[0x1e / 4] & 0x0000ffff) & 0x40);
@@ -356,8 +356,8 @@ SCREEN_UPDATE( fuuki32 )
 	tilemap_set_scrolly(state->m_tilemap[3], 0, layer2_scrolly);
 
 	/* The bg colour is the last pen i.e. 0x1fff */
-	bitmap->fill((0x800 * 4) - 1, *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill((0x800 * 4) - 1, cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	fuuki32_draw_layer(screen.machine(), bitmap, cliprect, tm_back,   0, 1);
 	fuuki32_draw_layer(screen.machine(), bitmap, cliprect, tm_middle, 0, 2);

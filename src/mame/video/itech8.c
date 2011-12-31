@@ -622,7 +622,7 @@ SCREEN_UPDATE( itech8_2layer )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -630,13 +630,13 @@ SCREEN_UPDATE( itech8_2layer )
 	/*    top layer @ 0x00000 is only 4bpp, colors come from the first 16 palettes */
 	/* bottom layer @ 0x20000 is full 8bpp */
 	page_offset = tms_state.dispstart & 0x0ffff;
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *base0 = &tms_state.vram[(0x00000 + page_offset + y * 256) & 0x3ffff];
 		UINT8 *base2 = &tms_state.vram[(0x20000 + page_offset + y * 256) & 0x3ffff];
 		UINT32 *dest = &bitmap->pix32(y);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int pix0 = base0[x] & 0x0f;
 			dest[x] = pens[pix0 ? pix0 : base2[x]];
@@ -659,7 +659,7 @@ SCREEN_UPDATE( itech8_grmatch )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -669,13 +669,13 @@ SCREEN_UPDATE( itech8_grmatch )
 	/* 4bpp pixels are packed 2 to a byte */
 	/* xscroll is set via a separate register */
 	page_offset = (tms_state.dispstart & 0x0ffff) | state->m_grmatch_xscroll;
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *base0 = &tms_state.vram[0x00000 + ((page_offset + y * 256) & 0xffff)];
 		UINT8 *base2 = &tms_state.vram[0x20000 + ((page_offset + y * 256) & 0xffff)];
 		UINT32 *dest = &bitmap->pix32(y);
 
-		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			UINT8 pix0 = base0[x / 2];
 			UINT8 pix2 = base2[x / 2];
@@ -709,19 +709,19 @@ SCREEN_UPDATE( itech8_2page )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
 	/* there are two pages, each of which is a full 8bpp */
 	/* page index is selected by the top bit of the page_select register */
 	page_offset = ((state->m_page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];
 		UINT32 *dest = &bitmap->pix32(y);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			dest[x] = pens[base[x]];
 	}
 	return 0;
@@ -742,7 +742,7 @@ SCREEN_UPDATE( itech8_2page_large )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -751,13 +751,13 @@ SCREEN_UPDATE( itech8_2page_large )
 	/* the upper 4 bits were latched on each write into a separate bitmap */
 	/* page index is selected by the top bit of the page_select register */
 	page_offset = ((~state->m_page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];
 		UINT8 *latch = &tms_state.latchram[(page_offset + y * 256) & 0x3ffff];
 		UINT32 *dest = &bitmap->pix32(y);
 
-		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			dest[x + 0] = pens[(latch[x/2] & 0xf0) | (base[x/2] >> 4)];
 			dest[x + 1] = pens[((latch[x/2] << 4) & 0xf0) | (base[x/2] & 0x0f)];

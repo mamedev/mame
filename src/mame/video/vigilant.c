@@ -64,7 +64,7 @@ static void update_background(running_machine &machine)
 			for( col=0; col<512; col+=32 )
 			{
 				drawgfx_opaque(state->m_bg_bitmap,
-						0,machine.gfx[2],
+						state->m_bg_bitmap->cliprect(),machine.gfx[2],
 						charcode,
 						row < 128 ? 0 : 1,
 						0,0,
@@ -168,7 +168,7 @@ WRITE8_HANDLER( vigilant_rear_color_w )
  ???
  **************************************************************************/
 
-static void draw_foreground(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int opaque )
+static void draw_foreground(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority, int opaque )
 {
 	vigilant_state *state = machine.driver_data<vigilant_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -192,7 +192,7 @@ static void draw_foreground(running_machine &machine, bitmap_t *bitmap, const re
 				{
 					sx = (sx + scroll) & 0x1ff;
 
-					drawgfx_transmask(bitmap,&bottomvisiblearea,machine.gfx[0],
+					drawgfx_transmask(bitmap,bottomvisiblearea,machine.gfx[0],
 							tile_number,
 							color,
 							0,0,
@@ -217,7 +217,7 @@ static void draw_foreground(running_machine &machine, bitmap_t *bitmap, const re
 
 
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	vigilant_state *state = machine.driver_data<vigilant_state>();
 	int scrollx = 0x17a + 16*8 - (state->m_rear_horiz_scroll_low + state->m_rear_horiz_scroll_high);
@@ -229,11 +229,11 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 		state->m_rear_refresh=0;
 	}
 
-	copyscrollbitmap(bitmap,state->m_bg_bitmap,1,&scrollx,0,0,&bottomvisiblearea);
+	copyscrollbitmap(bitmap,state->m_bg_bitmap,1,&scrollx,0,0,bottomvisiblearea);
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	vigilant_state *state = machine.driver_data<vigilant_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -322,14 +322,14 @@ SCREEN_UPDATE( vigilant )
 	if (state->m_rear_disable)	 /* opaque foreground */
 	{
 		draw_foreground(screen.machine(),bitmap,cliprect,0,1);
-		draw_sprites(screen.machine(),bitmap,&bottomvisiblearea);
+		draw_sprites(screen.machine(),bitmap,bottomvisiblearea);
 		draw_foreground(screen.machine(),bitmap,cliprect,1,0);
 	}
 	else
 	{
 		draw_background(screen.machine(),bitmap,cliprect);
 		draw_foreground(screen.machine(),bitmap,cliprect,0,0);
-		draw_sprites(screen.machine(),bitmap,&bottomvisiblearea);
+		draw_sprites(screen.machine(),bitmap,bottomvisiblearea);
 		draw_foreground(screen.machine(),bitmap,cliprect,1,0); // priority tiles
 	}
 	return 0;

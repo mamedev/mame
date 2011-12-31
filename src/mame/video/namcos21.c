@@ -98,17 +98,17 @@ namcos21_ClearPolyFrameBuffer( running_machine &machine )
 } /* namcos21_ClearPolyFrameBuffer */
 
 static void
-CopyVisiblePolyFrameBuffer( running_machine &machine, bitmap_t *bitmap, const rectangle *clip, int zlo, int zhi )
+CopyVisiblePolyFrameBuffer( running_machine &machine, bitmap_t *bitmap, const rectangle &clip, int zlo, int zhi )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>(); /* blit the visible framebuffer */
 	int sy;
-	for( sy=clip->min_y; sy<=clip->max_y; sy++ )
+	for( sy=clip.min_y; sy<=clip.max_y; sy++ )
 	{
 		UINT16 *dest = &bitmap->pix16(sy);
 		const UINT16 *pPen = state->m_mpPolyFrameBufferPens2+NAMCOS21_POLY_FRAME_WIDTH*sy;
 		const UINT16 *pZ = state->m_mpPolyFrameBufferZ2+NAMCOS21_POLY_FRAME_WIDTH*sy;
 		int sx;
-		for( sx=clip->min_x; sx<=clip->max_x; sx++ )
+		for( sx=clip.min_x; sx<=clip.max_x; sx++ )
 		{
 			int z = pZ[sx];
 			//if( pZ[sx]!=0x7fff )
@@ -179,7 +179,7 @@ SCREEN_UPDATE( namcos21 )
 	int pivot = 3;
 	int pri;
 	update_palette(screen.machine());
-	bitmap->fill(0xff, *cliprect );
+	bitmap->fill(0xff, cliprect );
 
 	if( namcos2_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
@@ -208,14 +208,14 @@ SCREEN_UPDATE( namcos21 )
 	}
 	else
 	{ /* winrun bitmap layer */
-		int yscroll = -cliprect->min_y+(INT16)state->m_winrun_gpu_register[0x2/2];
+		int yscroll = -cliprect.min_y+(INT16)state->m_winrun_gpu_register[0x2/2];
 		int base = 0x1000+0x100*(state->m_winrun_color&0xf);
 		int sx,sy;
-		for( sy=cliprect->min_y; sy<=cliprect->max_y; sy++ )
+		for( sy=cliprect.min_y; sy<=cliprect.max_y; sy++ )
 		{
 			const UINT8 *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
 			UINT16 *pDest = &bitmap->pix16(sy);
-			for( sx=cliprect->min_x; sx<=cliprect->max_x; sx++ )
+			for( sx=cliprect.min_x; sx<=cliprect.max_x; sx++ )
 			{
 				int pen = pSource[sx];
 				switch( pen )

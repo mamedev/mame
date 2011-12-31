@@ -63,7 +63,7 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int do_hack,int x_offs,int y_offs)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
 {
 	groundfx_state *state = machine.driver_data<groundfx_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -183,9 +183,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 		if (do_hack && sprite_ptr->pri==1 && sprite_ptr->y<100)
 			clipper=&state->m_hack_cliprect;
 		else
-			clipper=cliprect;
+			clipper=&cliprect;
 
-		pdrawgfxzoom_transpen(bitmap,clipper,machine.gfx[sprite_ptr->gfx],
+		pdrawgfxzoom_transpen(bitmap,*clipper,machine.gfx[sprite_ptr->gfx],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
@@ -223,8 +223,8 @@ SCREEN_UPDATE( groundfx )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(0, *cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(0, cliprect);	/* wrong color? */
 
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
@@ -255,7 +255,7 @@ SCREEN_UPDATE( groundfx )
 		//tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, 0, pivlayer[2], 0, 0);
 
 		if (tc0480scp_long_r(tc0480scp, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
-			tc0480scp_tilemap_draw(tc0480scp, bitmap, &state->m_hack_cliprect, layer[0], 0, 0);
+			tc0480scp_tilemap_draw(tc0480scp, bitmap, state->m_hack_cliprect, layer[0], 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 1, 44, -574);
 	}
 	else

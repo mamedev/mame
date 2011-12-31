@@ -109,7 +109,7 @@ WRITE8_HANDLER( holeland_flipscreen_w )
 }
 
 
-static void holeland_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void holeland_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	holeland_state *state = machine.driver_data<holeland_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -149,7 +149,7 @@ static void holeland_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	}
 }
 
-static void crzrally_draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void crzrally_draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect )
 {
 	holeland_state *state = machine.driver_data<holeland_state>();
 	UINT8 *spriteram = state->m_spriteram;

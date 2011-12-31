@@ -30,7 +30,7 @@ public:
 	DECLARE_READ32_MEMBER(char32_r);
 	DECLARE_WRITE32_MEMBER(char32_w);
 
-	void draw(bitmap_t *bitmap, const rectangle *cliprect, int layer, int pri, int flags);
+	void draw(bitmap_t *bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 
 protected:
 	virtual void device_start();
@@ -70,7 +70,7 @@ public:
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
-	void draw(bitmap_t *bitmap, const rectangle *cliprect, const int *spri);
+	void draw(bitmap_t *bitmap, const rectangle &cliprect, const int *spri);
 
 protected:
 	virtual void device_start();

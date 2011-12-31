@@ -169,7 +169,7 @@ WRITE16_HANDLER( gcpinbal_ctrl_word_w )
 
 ****************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int y_offs )
 {
 	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -292,8 +292,8 @@ SCREEN_UPDATE( gcpinbal )
 		tilemap_set_scrolly(state->m_tilemap[i], 0, state->m_scrolly[i]);
 	}
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(0, cliprect);
 
 	layer[0] = 0;
 	layer[1] = 1;

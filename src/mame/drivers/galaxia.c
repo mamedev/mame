@@ -74,11 +74,11 @@ static SCREEN_UPDATE( galaxia )
 	{
 		int y;
 
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			int x;
 
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				int pixel0 = s2636_0_bitmap->pix16(y, x);
 				int pixel1 = s2636_1_bitmap->pix16(y, x);

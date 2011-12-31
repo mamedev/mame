@@ -96,7 +96,7 @@ SCREEN_UPDATE( magmax )
 
 	/* copy the background graphics */
 	if (*state->m_vreg & 0x40)		/* background disable */
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 	else
 	{
 		int v;

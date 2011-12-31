@@ -79,7 +79,7 @@ static SCREEN_UPDATE( suprgolf )
 {
 	suprgolf_state *state = screen.machine().driver_data<suprgolf_state>();
 	int x,y,count,color;
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	{
 		count = 0;
@@ -90,7 +90,7 @@ static SCREEN_UPDATE( suprgolf )
 			{
 				color = state->m_bg_fb[count];
 
-				if(x <= cliprect->max_x && y <= cliprect->max_y)
+				if(x <= cliprect.max_x && y <= cliprect.max_y)
 					bitmap->pix16(y, x) = screen.machine().pens[(color & 0x7ff)];
 
 				count++;
@@ -107,7 +107,7 @@ static SCREEN_UPDATE( suprgolf )
 			{
 				color = state->m_fg_fb[count];
 
-				if(((state->m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect->max_x && y <= cliprect->max_y))
+				if(((state->m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect.max_x && y <= cliprect.max_y))
 					bitmap->pix16(y, x) = screen.machine().pens[(color & 0x7ff)];
 
 				count++;

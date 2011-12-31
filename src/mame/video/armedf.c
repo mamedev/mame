@@ -277,7 +277,7 @@ WRITE16_HANDLER( armedf_bg_scrolly_w )
 ***************************************************************************/
 
 /* custom code to handle color cycling effect, handled by m_spr_pal_clut */
-void armedf_drawgfx(running_machine &machine, bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+void armedf_drawgfx(running_machine &machine, bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
 							UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
@@ -301,29 +301,26 @@ void armedf_drawgfx(running_machine &machine, bitmap_t *dest_bmp,const rectangle
 	ex = sx + gfx->width;
 	ey = sy + gfx->height;
 
-	if (clip)
-	{
-		if (sx < clip->min_x)
-		{ /* clip left */
-			int pixels = clip->min_x-sx;
-			sx += pixels;
-			x_index_base += xinc*pixels;
-		}
-		if (sy < clip->min_y)
-		{ /* clip top */
-			int pixels = clip->min_y-sy;
-			sy += pixels;
-			y_index += yinc*pixels;
-		}
-		/* NS 980211 - fixed incorrect clipping */
-		if (ex > clip->max_x+1)
-		{ /* clip right */
-			ex = clip->max_x+1;
-		}
-		if (ey > clip->max_y+1)
-		{ /* clip bottom */
-			ey = clip->max_y+1;
-		}
+	if (sx < clip.min_x)
+	{ /* clip left */
+		int pixels = clip.min_x-sx;
+		sx += pixels;
+		x_index_base += xinc*pixels;
+	}
+	if (sy < clip.min_y)
+	{ /* clip top */
+		int pixels = clip.min_y-sy;
+		sy += pixels;
+		y_index += yinc*pixels;
+	}
+	/* NS 980211 - fixed incorrect clipping */
+	if (ex > clip.max_x+1)
+	{ /* clip right */
+		ex = clip.max_x+1;
+	}
+	if (ey > clip.max_y+1)
+	{ /* clip bottom */
+		ey = clip.max_y+1;
 	}
 
 	if (ex > sx)
@@ -351,7 +348,7 @@ void armedf_drawgfx(running_machine &machine, bitmap_t *dest_bmp,const rectangle
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
 {
 	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
 	armedf_state *state = machine.driver_data<armedf_state>();
@@ -411,7 +408,7 @@ SCREEN_UPDATE( armedf )
 
 	}
 
-	bitmap->fill(0xff, *cliprect );
+	bitmap->fill(0xff, cliprect );
 
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, TILEMAP_DRAW_CATEGORY(1), 0);
 

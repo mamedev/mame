@@ -470,15 +470,15 @@ WRITE_LINE_MEMBER( cdp1864_device::evs_w )
 //  update_screen -
 //-------------------------------------------------
 
-void cdp1864_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1864_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	if (m_disp)
 	{
 		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-		m_bitmap->fill(CDP1864_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8, *cliprect);
+		m_bitmap->fill(CDP1864_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8, cliprect);
 	}
 	else
 	{
-		bitmap->fill(get_black_pen(machine()), *cliprect);
+		bitmap->fill(get_black_pen(machine()), cliprect);
 	}
 }

@@ -3,7 +3,7 @@
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram_base, int gfx_region )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT16* spriteram_base, int gfx_region )
 {
 	boogwing_state *state = machine.driver_data<boogwing_state>();
 	int offs;
@@ -150,7 +150,7 @@ SCREEN_UPDATE( boogwing )
 
 	/* Draw playfields */
 	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
-	bitmap->fill(screen.machine().pens[0x400], *cliprect); /* pen not confirmed */
+	bitmap->fill(screen.machine().pens[0x400], cliprect); /* pen not confirmed */
 	screen.machine().priority_bitmap->fill(0);
 
 	// bit&0x8 is definitely some kind of palette effect

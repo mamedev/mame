@@ -184,7 +184,7 @@ VIDEO_START( exedexes )
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 0xcf);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
 {
 	exedexes_state *state = machine.driver_data<exedexes_state>();
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
@@ -226,7 +226,7 @@ SCREEN_UPDATE( exedexes )
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	}
 	else
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 

@@ -1196,20 +1196,20 @@ SCREEN_UPDATE( laserdisc )
 		/* handle the overlay if present */
 		if (overbitmap != NULL && ldcore->config.overupdate != NULL)
 		{
-			rectangle clip = *cliprect;
+			rectangle clip = cliprect;
 
 			/* scale the cliprect to the overlay size and then call the update callback */
 			clip.min_x = ldcore->config.overclip_min_x;
 			clip.max_x = ldcore->config.overclip_max_x;
-			clip.min_y = cliprect->min_y * overbitmap->height() / bitmap->height();
-			if (cliprect->min_y == visarea.min_y)
+			clip.min_y = cliprect.min_y * overbitmap->height() / bitmap->height();
+			if (cliprect.min_y == visarea.min_y)
 				clip.min_y = MIN(clip.min_y, ldcore->config.overclip_min_y);
-			clip.max_y = (cliprect->max_y + 1) * overbitmap->height() / bitmap->height() - 1;
-			(*ldcore->config.overupdate)(screen, overbitmap, &clip);
+			clip.max_y = (cliprect.max_y + 1) * overbitmap->height() / bitmap->height() - 1;
+			(*ldcore->config.overupdate)(screen, overbitmap, clip);
 		}
 
 		/* if this is the last update, do the rendering */
-		if (cliprect->max_y == visarea.max_y)
+		if (cliprect.max_y == visarea.max_y)
 		{
 			/* update the texture with the overlay contents */
 			if (overbitmap != NULL)

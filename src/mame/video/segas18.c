@@ -116,19 +116,19 @@ void system18_set_vdp_mixing(running_machine &machine, int mixing)
  *
  *************************************/
 
-static void draw_vdp(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void draw_vdp(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int priority)
 {
 	segas1x_state *state = screen.machine().driver_data<segas1x_state>();
 	int x, y;
 	bitmap_t *priority_bitmap = screen.machine().priority_bitmap;
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *src = &state->m_tmp_bitmap->pix16(y);
 		UINT16 *dst = &bitmap->pix16(y);
 		UINT8 *pri = &priority_bitmap->pix8(y);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT16 pix = src[x];
 			if (pix != 0xffff)
@@ -202,7 +202,7 @@ SCREEN_UPDATE( system18 )
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -211,7 +211,7 @@ SCREEN_UPDATE( system18 )
 		system18_vdp_update(state->m_tmp_bitmap, cliprect);
 
 	/* reset priorities */
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	/* draw background opaquely first, not setting any priorities */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
@@ -239,7 +239,7 @@ SCREEN_UPDATE( system18 )
 #if DEBUG_VDP
 	if (state->m_vdp_enable && screen.machine().input().code_pressed(KEYCODE_V))
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		update_system18_vdp(bitmap, cliprect);
 	}
 	if (vdp_enable && screen.machine().input().code_pressed(KEYCODE_B))

@@ -459,12 +459,12 @@ SCREEN_UPDATE( gaelco3d )
         if (screen.machine().input().code_pressed(KEYCODE_DOWN) && yv < 0x40000)
             yv += 4;
 
-        for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+        for (y = cliprect.min_y; y <= cliprect.max_y; y++)
         {
             UINT16 *dest = &bitmap->pix16(y);
-            for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+            for (x = cliprect.min_x; x <= cliprect.max_x; x++)
             {
-                int offs = (yv + y - cliprect->min_y) * 4096 + xv + x - cliprect->min_x;
+                int offs = (yv + y - cliprect.min_y) * 4096 + xv + x - cliprect.min_x;
                 if (offs < length)
                     dest[x] = base[offs];
                 else

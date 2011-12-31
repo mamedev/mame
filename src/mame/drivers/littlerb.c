@@ -449,7 +449,7 @@ static SCREEN_UPDATE(littlerb)
 	int xsize,ysize;
 	int pal;
 	UINT16* spriteregion = &state->m_region4[0x400];
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	//printf("frame\n");
 	/* the spriteram format is something like this .. */
 	for (offs=0x26/2;offs<0xc00;offs+=6) // start at 00x26?

@@ -168,7 +168,7 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 	return result?(1<<which):0;
 }
 
-static void draw_fog(grchamp_state *state, bitmap_t *bitmap, const rectangle *cliprect, int fog)
+static void draw_fog(grchamp_state *state, bitmap_t *bitmap, const rectangle &cliprect, int fog)
 {
 	int x,y,offs;
 
@@ -185,7 +185,7 @@ static void draw_fog(grchamp_state *state, bitmap_t *bitmap, const rectangle *cl
 	}
 }
 
-static void draw_sprites(running_machine &machine, grchamp_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, grchamp_state *state, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	const gfx_element *gfx = machine.gfx[5];
 	int bank = (state->m_cpu0_out[0] & 0x20) ? 0x40 : 0x00;
@@ -395,7 +395,7 @@ SCREEN_UPDATE( grchamp )
 	cxmask = (state->m_cpu1_out[3] & 0x20) ? 0xff : 0x1ff;
 
 	/* iterate over scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		/* select either left or right tilemaps based on Y */
 		bitmap_t *lrpixmap = (y < 128) ? lpixmap : rpixmap;
@@ -412,7 +412,7 @@ SCREEN_UPDATE( grchamp )
 		draw_objects(screen.machine(), state, y, objdata);
 
 		/* iterate over columns */
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			rgb_t finalpix;
 			int headbit = 0;

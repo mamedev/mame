@@ -29,7 +29,7 @@ WRITE8_HANDLER( freek_videoram_w )
 	tilemap_mark_tile_dirty(state->m_freek_tilemap, offset & 0x3ff);
 }
 
-static void gigas_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void gigas_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
 	int offs;
@@ -64,7 +64,7 @@ static void gigas_draw_sprites( running_machine &machine, bitmap_t *bitmap, cons
 }
 
 
-static void pbillrd_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void pbillrd_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
 	int offs;
@@ -100,7 +100,7 @@ static void pbillrd_draw_sprites( running_machine &machine, bitmap_t *bitmap, co
 
 
 
-static void freekick_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void freekick_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
 	int offs;

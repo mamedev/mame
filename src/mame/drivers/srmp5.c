@@ -129,7 +129,7 @@ static SCREEN_UPDATE( srmp5 )
 	}
 	else
 #endif
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 	while((sprite_list[SUBLIST_OFFSET]&SPRITE_LIST_END_MARKER)==0 && sprite_list<sprite_list_end)
 	{

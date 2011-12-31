@@ -311,19 +311,19 @@ WRITE16_HANDLER( gaiden_videoram_w )
    in the bitmaps? */
 static void blendbitmaps(running_machine &machine,
 		bitmap_t *dest,bitmap_t *src1,bitmap_t *src2,bitmap_t *src3,
-		int sx,int sy,const rectangle *cliprect)
+		int sx,int sy,const rectangle &cliprect)
 {
 	int y,x;
 	const pen_t *paldata = machine.pens;
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *dd  = &dest->pix32(y);
 		UINT16 *sd1 = &src1->pix16(y);
 		UINT16 *sd2 = &src2->pix16(y);
 		UINT16 *sd3 = &src3->pix16(y);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (sd3[x])
 			{
@@ -367,7 +367,7 @@ static void blendbitmaps(running_machine &machine,
 
 #define NUM_SPRITES 256
 
-static void gaiden_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect )
+static void gaiden_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle &cliprect )
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -489,7 +489,7 @@ static void gaiden_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, 
 }
 
 
-static void raiga_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect )
+static void raiga_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle &cliprect )
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -629,7 +629,7 @@ static void raiga_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, b
  *         |---------x------- | x position (high bit)
  */
 
-static void drgnbowl_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void drgnbowl_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	gaiden_state *state = machine.driver_data<gaiden_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -673,11 +673,11 @@ static void drgnbowl_draw_sprites(running_machine &machine, bitmap_t *bitmap, co
 SCREEN_UPDATE( gaiden )
 {
 	gaiden_state *state = screen.machine().driver_data<gaiden_state>();
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
-	state->m_tile_bitmap_bg->fill(0x200, *cliprect);
-	state->m_tile_bitmap_fg->fill(0, *cliprect);
-	state->m_sprite_bitmap->fill(0, *cliprect);
+	state->m_tile_bitmap_bg->fill(0x200, cliprect);
+	state->m_tile_bitmap_fg->fill(0, cliprect);
+	state->m_sprite_bitmap->fill(0, cliprect);
 
 	/* draw tilemaps into a 16-bit bitmap */
 	tilemap_draw(state->m_tile_bitmap_bg, cliprect, state->m_background, 0, 1);
@@ -699,11 +699,11 @@ SCREEN_UPDATE( gaiden )
 SCREEN_UPDATE( raiga )
 {
 	gaiden_state *state = screen.machine().driver_data<gaiden_state>();
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
-	state->m_tile_bitmap_bg->fill(0x200, *cliprect);
-	state->m_tile_bitmap_fg->fill(0, *cliprect);
-	state->m_sprite_bitmap->fill(0, *cliprect);
+	state->m_tile_bitmap_bg->fill(0x200, cliprect);
+	state->m_tile_bitmap_fg->fill(0, cliprect);
+	state->m_sprite_bitmap->fill(0, cliprect);
 
 	/* draw tilemaps into a 16-bit bitmap */
 	tilemap_draw(state->m_tile_bitmap_bg, cliprect, state->m_background, 0, 1);
@@ -724,7 +724,7 @@ SCREEN_UPDATE( raiga )
 SCREEN_UPDATE( drgnbowl )
 {
 	gaiden_state *state = screen.machine().driver_data<gaiden_state>();
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_background, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_foreground, 0, 2);

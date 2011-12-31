@@ -141,7 +141,7 @@ Note: press Z to show some info on each sprite (debug builds only)
 #endif
 
 
-static void ssv_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx,
+static void ssv_drawgfx(	bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx,
 					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 					int shadow )
 {
@@ -164,7 +164,7 @@ static void ssv_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx_
 #define SSV_DRAWGFX(SETPIXELCOLOR)												\
 	for ( sy = y0; sy != y1; sy += dy )											\
 	{																			\
-		if ( sy >= cliprect->min_y && sy <= cliprect->max_y )					\
+		if ( sy >= cliprect.min_y && sy <= cliprect.max_y )					\
 		{																		\
 			source	=	addr;													\
 			dest	=	&bitmap->pix16(sy);							\
@@ -173,7 +173,7 @@ static void ssv_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx_
 			{																	\
 				pen = *source++;												\
 																				\
-				if ( pen && sx >= cliprect->min_x && sx <= cliprect->max_x )	\
+				if ( pen && sx >= cliprect.min_x && sx <= cliprect.max_x )	\
 					SETPIXELCOLOR												\
 			}																	\
 		}																		\
@@ -606,7 +606,7 @@ From the above some noteworthy cases are:
 
 /* Draw a tilemap sprite */
 
-static void draw_row(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int sx, int sy, int scroll)
+static void draw_row(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int sx, int sy, int scroll)
 {
 	ssv_state *state = machine.driver_data<ssv_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -635,17 +635,17 @@ static void draw_row(running_machine &machine, bitmap_t *bitmap, const rectangle
 
 	/* .. and clip it against the visible screen */
 
-	if (clip.min_x > cliprect->max_x)	return;
-	if (clip.min_y > cliprect->max_y)	return;
+	if (clip.min_x > cliprect.max_x)	return;
+	if (clip.min_y > cliprect.max_y)	return;
 
-	if (clip.max_x < cliprect->min_x)	return;
-	if (clip.max_y < cliprect->min_y)	return;
+	if (clip.max_x < cliprect.min_x)	return;
+	if (clip.max_y < cliprect.min_y)	return;
 
-	if (clip.min_x < cliprect->min_x)	clip.min_x = cliprect->min_x;
-	if (clip.max_x > cliprect->max_x)	clip.max_x = cliprect->max_x;
+	if (clip.min_x < cliprect.min_x)	clip.min_x = cliprect.min_x;
+	if (clip.max_x > cliprect.max_x)	clip.max_x = cliprect.max_x;
 
-	if (clip.min_y < cliprect->min_y)	clip.min_y = cliprect->min_y;
-	if (clip.max_y > cliprect->max_y)	clip.max_y = cliprect->max_y;
+	if (clip.min_y < cliprect.min_y)	clip.min_y = cliprect.min_y;
+	if (clip.max_y > cliprect.max_y)	clip.max_y = cliprect.max_y;
 
 	/* Get the scroll data */
 	x    = ssv_scroll[ scroll * 4 + 0 ];	// x scroll
@@ -725,7 +725,7 @@ static void draw_row(running_machine &machine, bitmap_t *bitmap, const rectangle
 			{
 				for (ty = ystart; ty != yend; ty += yinc)
 				{
-					ssv_drawgfx( bitmap, &clip, machine.gfx[gfx],
+					ssv_drawgfx( bitmap, clip, machine.gfx[gfx],
 											code++,
 											color,
 											flipx, flipy,
@@ -741,7 +741,7 @@ static void draw_row(running_machine &machine, bitmap_t *bitmap, const rectangle
 
 /* Draw the "background layer" using multiple tilemap sprites */
 
-static void draw_layer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int  nr)
+static void draw_layer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int  nr)
 {
 	int sy;
 	for ( sy = 0; sy <= machine.primary_screen->visible_area().max_y; sy += 0x40 )
@@ -750,7 +750,7 @@ static void draw_layer(running_machine &machine, bitmap_t *bitmap, const rectang
 
 /* Draw sprites in the sprites list */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	/* Sprites list */
 	ssv_state *state = machine.driver_data<ssv_state>();
@@ -1042,7 +1042,7 @@ SCREEN_UPDATE( eaglshot )
         E.h                             Unused
 
 */
-static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
 {
 	/* Sprites list */
 
@@ -1209,20 +1209,20 @@ SCREEN_UPDATE( ssv )
 	state->m_shadow_pen_mask = (1 << state->m_shadow_pen_shift) - 1;
 
 	/* The background color is the first one in the palette */
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	// used by twineag2 and ultrax
-	clip.min_x = (cliprect->max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x64/2] * 2 + 2;
-	clip.max_x = (cliprect->max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x62/2] * 2 + 1;
-	clip.min_y = (cliprect->max_y     + state->m_scroll[0x6a/2])     - state->m_scroll[0x6c/2]     + 1;
-	clip.max_y = (cliprect->max_y     + state->m_scroll[0x6a/2])     - state->m_scroll[0x6a/2]        ;
+	clip.min_x = (cliprect.max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x64/2] * 2 + 2;
+	clip.max_x = (cliprect.max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x62/2] * 2 + 1;
+	clip.min_y = (cliprect.max_y     + state->m_scroll[0x6a/2])     - state->m_scroll[0x6c/2]     + 1;
+	clip.max_y = (cliprect.max_y     + state->m_scroll[0x6a/2])     - state->m_scroll[0x6a/2]        ;
 
 //  printf("%04x %04x %04x %04x\n",clip.min_x, clip.max_x, clip.min_y, clip.max_y);
 
 	if (clip.min_x < 0) clip.min_x = 0;
 	if (clip.min_y < 0) clip.min_y = 0;
-	if (clip.max_x > cliprect->max_x) clip.max_x = cliprect->max_x;
-	if (clip.max_y > cliprect->max_y) clip.max_y = cliprect->max_y;
+	if (clip.max_x > cliprect.max_x) clip.max_x = cliprect.max_x;
+	if (clip.max_y > cliprect.max_y) clip.max_y = cliprect.max_y;
 
 	if (clip.min_x > clip.max_x)
 		clip.min_x = clip.max_x;
@@ -1232,9 +1232,9 @@ SCREEN_UPDATE( ssv )
 	if (!state->m_enable_video)
 		return 0;
 
-	draw_layer(screen.machine(), bitmap, &clip, 0);	// "background layer"
+	draw_layer(screen.machine(), bitmap, clip, 0);	// "background layer"
 
-	draw_sprites(screen.machine(), bitmap, &clip);	// sprites list
+	draw_sprites(screen.machine(), bitmap, clip);	// sprites list
 
 
 	return 0;

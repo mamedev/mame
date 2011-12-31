@@ -214,7 +214,7 @@ WRITE16_HANDLER( deniam_coinctrl_w )
  *   c  | ---------------- | zoomy like in System 16?
  *   e  | ---------------- |
  */
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	deniam_state *state = machine.driver_data<deniam_state>();
 	int offs;
@@ -269,8 +269,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 					{
 						if (rom[i] & 0x0f)
 						{
-							if (sx + x >= cliprect->min_x && sx + x <= cliprect->max_x &&
-								y >= cliprect->min_y && y <= cliprect->max_y)
+							if (sx + x >= cliprect.min_x && sx + x <= cliprect.max_x &&
+								y >= cliprect.min_y && y <= cliprect.max_y)
 							{
 								if ((machine.priority_bitmap->pix8(y, sx + x) & primask) == 0)
 									bitmap->pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
@@ -289,8 +289,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 					{
 						if (rom[i] & 0xf0)
 						{
-							if (sx + x >= cliprect->min_x && sx + x <= cliprect->max_x &&
-								y >= cliprect->min_y && y <= cliprect->max_y)
+							if (sx + x >= cliprect.min_x && sx + x <= cliprect.max_x &&
+								y >= cliprect.min_y && y <= cliprect.max_y)
 							{
 								if ((machine.priority_bitmap->pix8(y, sx + x) & primask) == 0)
 									bitmap->pix16(y, sx + x) = color * 16+(rom[i] >> 4);
@@ -313,8 +313,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 					{
 						if (rom[i] & 0xf0)
 						{
-							if (sx + x >= cliprect->min_x && sx + x <= cliprect->max_x &&
-								y >= cliprect->min_y && y <= cliprect->max_y)
+							if (sx + x >= cliprect.min_x && sx + x <= cliprect.max_x &&
+								y >= cliprect.min_y && y <= cliprect.max_y)
 							{
 								if ((machine.priority_bitmap->pix8(y, sx + x) & primask) == 0)
 									bitmap->pix16(y, sx + x) = color * 16 + (rom[i] >> 4);
@@ -333,8 +333,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 					{
 						if (rom[i] & 0x0f)
 						{
-							if (sx + x >= cliprect->min_x && sx + x <= cliprect->max_x &&
-								y >= cliprect->min_y && y <= cliprect->max_y)
+							if (sx + x >= cliprect.min_x && sx + x <= cliprect.max_x &&
+								y >= cliprect.min_y && y <= cliprect.max_y)
 							{
 								if ((machine.priority_bitmap->pix8(y, sx + x) & primask) == 0)
 									bitmap->pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
@@ -407,7 +407,7 @@ SCREEN_UPDATE( deniam )
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, fg_scrollx & 0x1ff);
 	tilemap_set_scrolly(state->m_fg_tilemap, 0, fg_scrolly & 0x0ff);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);

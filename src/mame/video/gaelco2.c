@@ -339,7 +339,7 @@ VIDEO_START( gaelco2_dual )
 
 ***************************************************************************/
 
-static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
+static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int mask, int xoffs)
 {
 	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	UINT16 *buffered_spriteram16 = screen.machine().generic.buffered_spriteram.u16;
@@ -402,7 +402,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 
 							int gfx_py = yflip ? (gfx->height - 1 - py) : py;
 
-							if ((ypos < cliprect->min_y) || (ypos > cliprect->max_y)) continue;
+							if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y)) continue;
 
 							for (px = 0; px < gfx->width; px++){
 								/* get current pixel */
@@ -417,7 +417,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 
 								if ((gfx_pen == 0) || (gfx_pen >= 16)) continue;
 
-								if ((xpos < cliprect->min_x) || (xpos > cliprect->max_x)) continue;
+								if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x)) continue;
 
 								/* make background color darker or brighter */
 								*pixel = src_color + 4096*gfx_pen;
@@ -458,7 +458,7 @@ SCREEN_UPDATE( gaelco2 )
 	}
 
 	/* draw screen */
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_pant[1], 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_pant[0], 0, 0);
@@ -466,7 +466,7 @@ SCREEN_UPDATE( gaelco2 )
 	return 0;
 }
 
-static UINT32 dual_update(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int index)
+static UINT32 dual_update(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int index)
 {
 	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	int i;
@@ -488,7 +488,7 @@ static UINT32 dual_update(screen_device &screen, bitmap_t *bitmap, const rectang
 	}
 
 	/* draw screen */
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_pant[index], 0, 0);
 	draw_sprites(screen,bitmap,cliprect, 0x8000 * index, 0);

@@ -64,7 +64,7 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	undrfire_state *state = machine.driver_data<undrfire_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -208,7 +208,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 }
 
 
-static void draw_sprites_cbombers(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
+static void draw_sprites_cbombers(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	undrfire_state *state = machine.driver_data<undrfire_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -408,8 +408,8 @@ SCREEN_UPDATE( undrfire )
 	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(0, *cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(0, cliprect);	/* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a
@@ -551,8 +551,8 @@ SCREEN_UPDATE( cbombers )
 	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(0, *cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(0, cliprect);	/* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a

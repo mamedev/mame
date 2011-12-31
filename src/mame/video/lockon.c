@@ -698,7 +698,7 @@ do {                                     \
 	if (carry) --CNT;                    \
 } while(0)
 
-static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
 	UINT32 y;
@@ -722,7 +722,7 @@ static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const recta
 	UINT32 axy_en  = !BIT(state->m_dx0ll, 8);
 	UINT32 ayy_en  = !BIT(state->m_dy0ll, 8);
 
-	for (y = 0; y <= cliprect->max_y; ++y)
+	for (y = 0; y <= cliprect.max_y; ++y)
 	{
 		UINT32 carry;
 		UINT16 *dst = &bitmap->pix16(y);
@@ -734,7 +734,7 @@ static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const recta
 		UINT8 axx = axy;
 		UINT8 ayx = ayy;
 
-		for (x = 0; x <= cliprect->max_x; ++x)
+		for (x = 0; x <= cliprect.max_x; ++x)
 		{
 			cx &= 0x1ff;
 			cy &= 0x1ff;
@@ -803,7 +803,7 @@ static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const recta
 
 *******************************************************************************************/
 
-static void hud_draw( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void hud_draw( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
 	UINT8	*tile_rom = machine.region("gfx3")->base();
@@ -844,7 +844,7 @@ static void hud_draw( running_machine &machine, bitmap_t *bitmap, const rectangl
 		else
 			y_size = 8;
 
-		for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
+		for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 		{
 			UINT32 xt;
 			UINT32 cy;
@@ -883,7 +883,7 @@ static void hud_draw( running_machine &machine, bitmap_t *bitmap, const rectangl
 				{
 					UINT32 x = x_pos + (xt << 3) + px;
 
-					if (x <= cliprect->max_x)
+					if (x <= cliprect.max_x)
 					{
 						UINT16 *dst = &bitmap->pix16(y, x);
 
@@ -936,7 +936,7 @@ SCREEN_UPDATE( lockon )
 	/* If screen output is disabled, fill with black */
 	if (!BIT(state->m_ctrl_reg, 7))
 	{
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 

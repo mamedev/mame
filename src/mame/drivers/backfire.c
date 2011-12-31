@@ -95,7 +95,7 @@ static SCREEN_UPDATE( backfire_left )
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	screen.machine().priority_bitmap->fill(0);
-	bitmap->fill(0x100, *cliprect);
+	bitmap->fill(0x100, cliprect);
 
 	if (state->m_left_priority[0] == 0)
 	{
@@ -128,7 +128,7 @@ static SCREEN_UPDATE( backfire_right )
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	screen.machine().priority_bitmap->fill(0);
-	bitmap->fill(0x500, *cliprect);
+	bitmap->fill(0x500, cliprect);
 
 	if (state->m_right_priority[0] == 0)
 	{

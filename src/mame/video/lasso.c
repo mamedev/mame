@@ -272,7 +272,7 @@ WRITE8_HANDLER( pinbo_video_control_w )
  *
  *************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int reverse )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int reverse )
 {
 	lasso_state *state = machine.driver_data<lasso_state>();
 	const UINT8 *finish, *source;
@@ -326,7 +326,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 }
 
 
-static void draw_lasso( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_lasso( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	lasso_state *state = machine.driver_data<lasso_state>();
 	offs_t offs;
@@ -342,7 +342,7 @@ static void draw_lasso( running_machine &machine, bitmap_t *bitmap, const rectan
 		if (flip_screen_y_get(machine))
 			y = ~y;
 
-		if ((y < cliprect->min_y) || (y > cliprect->max_y))
+		if ((y < cliprect.min_y) || (y > cliprect.max_y))
 			continue;
 
 		x = (offs & 0x1f) << 3;
@@ -353,7 +353,7 @@ static void draw_lasso( running_machine &machine, bitmap_t *bitmap, const rectan
 
 		for (bit = 0; bit < 8; bit++)
 		{
-			if ((data & 0x80) && (x >= cliprect->min_x) && (x <= cliprect->max_x))
+			if ((data & 0x80) && (x >= cliprect.min_x) && (x <= cliprect.max_x))
 				bitmap->pix16(y, x) = pen;
 
 			if (flip_screen_x_get(machine))
@@ -371,7 +371,7 @@ SCREEN_UPDATE( lasso )
 {
 	lasso_state *state = screen.machine().driver_data<lasso_state>();
 	palette_set_color(screen.machine(), 0, get_color(*state->m_back_color));
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_lasso(screen.machine(), bitmap, cliprect);
@@ -384,7 +384,7 @@ SCREEN_UPDATE( chameleo )
 {
 	lasso_state *state = screen.machine().driver_data<lasso_state>();
 	palette_set_color(screen.machine(), 0, get_color(*state->m_back_color));
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
@@ -405,7 +405,7 @@ SCREEN_UPDATE( wwjgtin )
 	if (state->m_track_enable)
 		tilemap_draw(bitmap, cliprect, state->m_track_tilemap, 0, 0);
 	else
-		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+		bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);	// reverse order
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

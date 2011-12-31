@@ -1074,7 +1074,7 @@ void screen_device::load_effect_overlay(const char *filename)
 bool screen_device::screen_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (m_screen_update != NULL) {
-		return (*m_screen_update)(*this, &bitmap, &cliprect);
+		return (*m_screen_update)(*this, &bitmap, cliprect);
 	} else {
 		return machine().driver_data<driver_device>()->screen_update(*this, bitmap, cliprect);
 	}

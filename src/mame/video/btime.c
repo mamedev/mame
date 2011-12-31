@@ -301,7 +301,7 @@ WRITE8_HANDLER( disco_video_control_w )
 }
 
 
-static void draw_chars( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 transparency, UINT8 color, int priority )
+static void draw_chars( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 transparency, UINT8 color, int priority )
 {
 	btime_state *state = machine.driver_data<btime_state>();
 	offs_t offs;
@@ -332,7 +332,7 @@ static void draw_chars( running_machine &machine, bitmap_t *bitmap, const rectan
 	}
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 color,
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 color,
 						 UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
 						 UINT8 *sprite_ram, offs_t interleave )
 {
@@ -382,7 +382,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 }
 
 
-static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8* tmap, UINT8 color )
+static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8* tmap, UINT8 color )
 {
 	btime_state *state = machine.driver_data<btime_state>();
 	int i;
@@ -513,7 +513,7 @@ SCREEN_UPDATE( bnj )
 				sy = 256 - sy;
 			}
 
-			drawgfx_opaque(state->m_background_bitmap, 0, screen.machine().gfx[2],
+			drawgfx_opaque(state->m_background_bitmap, state->m_background_bitmap->cliprect(), screen.machine().gfx[2],
 					(state->m_bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32,
 					0,
 					flip_screen_get(screen.machine()), flip_screen_get(screen.machine()),

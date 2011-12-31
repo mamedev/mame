@@ -212,7 +212,7 @@ WRITE16_HANDLER( zwackery_spriteram_w )
  *
  *************************************/
 
-static void mcr68_update_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void mcr68_update_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
 	rectangle sprite_clip = machine.primary_screen->visible_area();
@@ -222,7 +222,7 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_t *bitmap, con
 	/* adjust for clipping */
 	sprite_clip.min_x += state->m_sprite_clip;
 	sprite_clip.max_x -= state->m_sprite_clip;
-	sprite_clip &= *cliprect;
+	sprite_clip &= cliprect;
 
 	machine.priority_bitmap->fill(1, sprite_clip);
 
@@ -256,23 +256,23 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_t *bitmap, con
             The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		pdrawgfx_transmask(bitmap, &sprite_clip, machine.gfx[1], code, color, flipx, flipy, x, y,
+		pdrawgfx_transmask(bitmap, sprite_clip, machine.gfx[1], code, color, flipx, flipy, x, y,
 				machine.priority_bitmap, 0x00, 0x0101);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx_transmask(bitmap, &sprite_clip, machine.gfx[1], code, color, flipx, flipy, x, y,
+		pdrawgfx_transmask(bitmap, sprite_clip, machine.gfx[1], code, color, flipx, flipy, x, y,
 				machine.priority_bitmap, 0x02, 0xfeff);
 	}
 }
 
 
-static void zwackery_update_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void zwackery_update_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
 	int offs;
 
-	machine.priority_bitmap->fill(1, *cliprect);
+	machine.priority_bitmap->fill(1, cliprect);
 
 	/* loop over sprite RAM */
 	for (offs = state->m_spriteram_size / 2 - 4;offs >= 0;offs -= 4)

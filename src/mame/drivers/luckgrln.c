@@ -276,7 +276,7 @@ static SCREEN_UPDATE(luckgrln)
 	clip.min_y = visarea.min_y;
 	clip.max_y = visarea.max_y;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	for (i= 0;i < 64;i++)
 	{
@@ -335,26 +335,26 @@ static SCREEN_UPDATE(luckgrln)
 #if 0 // treat bit as fg enable
 			if (tileattr&0x04)
 			{
-				if (bgenable==0) tilemap_draw(bitmap, &clip, state->m_reel1_tilemap, 0, 0);
-				if (bgenable==1) tilemap_draw(bitmap, &clip, state->m_reel2_tilemap, 0, 0);
-				if (bgenable==2) tilemap_draw(bitmap, &clip, state->m_reel3_tilemap, 0, 0);
-				if (bgenable==3) tilemap_draw(bitmap, &clip, state->m_reel4_tilemap, 0, 0);
+				if (bgenable==0) tilemap_draw(bitmap, clip, state->m_reel1_tilemap, 0, 0);
+				if (bgenable==1) tilemap_draw(bitmap, clip, state->m_reel2_tilemap, 0, 0);
+				if (bgenable==2) tilemap_draw(bitmap, clip, state->m_reel3_tilemap, 0, 0);
+				if (bgenable==3) tilemap_draw(bitmap, clip, state->m_reel4_tilemap, 0, 0);
 			}
 
 			if (tileattr&0x08) drawgfx_transpen(bitmap,clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
 
 #else // treat it as priority flag instead (looks better in non-adult title screen - needs verifying)
-			if (!(tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if (!(tileattr&0x08)) drawgfx_transpen(bitmap,clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
 
 			if (tileattr&0x04)
 			{
-				if (bgenable==0) tilemap_draw(bitmap, &clip, state->m_reel1_tilemap, 0, 0);
-				if (bgenable==1) tilemap_draw(bitmap, &clip, state->m_reel2_tilemap, 0, 0);
-				if (bgenable==2) tilemap_draw(bitmap, &clip, state->m_reel3_tilemap, 0, 0);
-				if (bgenable==3) tilemap_draw(bitmap, &clip, state->m_reel4_tilemap, 0, 0);
+				if (bgenable==0) tilemap_draw(bitmap, clip, state->m_reel1_tilemap, 0, 0);
+				if (bgenable==1) tilemap_draw(bitmap, clip, state->m_reel2_tilemap, 0, 0);
+				if (bgenable==2) tilemap_draw(bitmap, clip, state->m_reel3_tilemap, 0, 0);
+				if (bgenable==3) tilemap_draw(bitmap, clip, state->m_reel4_tilemap, 0, 0);
 			}
 
-			if ((tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if ((tileattr&0x08)) drawgfx_transpen(bitmap,clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
 #endif
 
 			count++;

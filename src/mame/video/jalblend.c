@@ -84,7 +84,7 @@ rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 	return MAKE_RGB(r,g,b);
 }
 
-void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
@@ -117,29 +117,26 @@ void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle *clip,const gfx_elemen
 		ex = sx + gfx->width;
 		ey = sy + gfx->height;
 
-		if (clip)
-		{
-			if (sx < clip->min_x)
-			{ /* clip left */
-				int pixels = clip->min_x-sx;
-				sx += pixels;
-				x_index_base += xinc*pixels;
-			}
-			if (sy < clip->min_y)
-			{ /* clip top */
-				int pixels = clip->min_y-sy;
-				sy += pixels;
-				y_index += yinc*pixels;
-			}
-			/* NS 980211 - fixed incorrect clipping */
-			if (ex > clip->max_x+1)
-			{ /* clip right */
-				ex = clip->max_x+1;
-			}
-			if (ey > clip->max_y+1)
-			{ /* clip bottom */
-				ey = clip->max_y+1;
-			}
+		if (sx < clip.min_x)
+		{ /* clip left */
+			int pixels = clip.min_x-sx;
+			sx += pixels;
+			x_index_base += xinc*pixels;
+		}
+		if (sy < clip.min_y)
+		{ /* clip top */
+			int pixels = clip.min_y-sy;
+			sy += pixels;
+			y_index += yinc*pixels;
+		}
+		/* NS 980211 - fixed incorrect clipping */
+		if (ex > clip.max_x+1)
+		{ /* clip right */
+			ex = clip.max_x+1;
+		}
+		if (ey > clip.max_y+1)
+		{ /* clip bottom */
+			ey = clip.max_y+1;
 		}
 
 		if (ex > sx)

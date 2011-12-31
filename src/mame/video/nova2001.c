@@ -270,7 +270,7 @@ WRITE8_HANDLER( pkunwar_flipscreen_w )
  *
  *************************************/
 
-static void nova2001_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void nova2001_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -308,7 +308,7 @@ static void nova2001_draw_sprites(running_machine &machine, bitmap_t *bitmap, co
 	}
 }
 
-static void pkunwar_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void pkunwar_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
 	UINT8 *spriteram = state->m_spriteram;

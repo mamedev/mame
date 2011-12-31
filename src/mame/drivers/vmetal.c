@@ -420,8 +420,8 @@ static SCREEN_UPDATE(varia)
 {
 	vmetal_state *state = screen.machine().driver_data<vmetal_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 
 	tilemap_set_scrollx(state->m_mid2tilemap, 0, state->m_vmetal_videoregs[0x06a/2]-64 /*+ state->m_vmetal_videoregs[0x066/2]*/);
 	tilemap_set_scrollx(state->m_mid1tilemap, 0, state->m_vmetal_videoregs[0x07a/2]-64 /*+ state->m_vmetal_videoregs[0x076/2]*/);

@@ -385,7 +385,7 @@ static SCREEN_UPDATE(magicard)
 	int x,y;
 	UINT32 count;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect); //TODO
+	bitmap->fill(get_black_pen(screen.machine()), cliprect); //TODO
 
 	if(!(SCC_DE_VREG)) //display enable
 		return 0;

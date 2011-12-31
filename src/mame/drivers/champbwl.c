@@ -451,7 +451,7 @@ static MACHINE_RESET( champbwl )
 
 SCREEN_UPDATE( champbwl )
 {
-	bitmap->fill(0x1f0, *cliprect);
+	bitmap->fill(0x1f0, cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
 	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
@@ -509,7 +509,7 @@ MACHINE_CONFIG_END
 
 static SCREEN_UPDATE( doraemon )
 {
-	bitmap->fill(0x1f0, *cliprect);
+	bitmap->fill(0x1f0, cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x00, 0x01 );
 	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x00, 0x10 );

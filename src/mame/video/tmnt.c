@@ -627,7 +627,7 @@ SCREEN_UPDATE( punkshot )
 
 	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[2], 0, 4);
@@ -659,8 +659,8 @@ SCREEN_UPDATE( lgtnfght )
 
 	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(16 * bg_colorbase, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(16 * bg_colorbase, cliprect);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], 0, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[2], 0, 4);
@@ -708,8 +708,8 @@ SCREEN_UPDATE( glfgreat )
 
 	/* not sure about the 053936 priority, but it seems to work */
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(16 * bg_colorbase, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(16 * bg_colorbase, cliprect);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], 0, 1);
 
 	if (state->m_layerpri[0] >= 0x30 && state->m_layerpri[1] < 0x30)
@@ -813,8 +813,8 @@ SCREEN_UPDATE( thndrx2 )
 
 	konami_sortlayers3(state->m_sorted_layer, state->m_layerpri);
 
-	screen.machine().priority_bitmap->fill(0, *cliprect);
-	bitmap->fill(16 * bg_colorbase, *cliprect);
+	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap->fill(16 * bg_colorbase, cliprect);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[0], 0, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, state->m_sorted_layer[2], 0, 4);

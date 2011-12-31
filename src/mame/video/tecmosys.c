@@ -301,7 +301,7 @@ SCREEN_UPDATE(tecmosys)
 {
 	tecmosys_state *state = screen.machine().driver_data<tecmosys_state>();
 
-	bitmap->fill(screen.machine().pens[0x4000], *cliprect);
+	bitmap->fill(screen.machine().pens[0x4000], cliprect);
 
 
 	tilemap_set_scrolly( state->m_bg0tilemap, 0, state->m_c80000regs[1]+16);
@@ -313,21 +313,21 @@ SCREEN_UPDATE(tecmosys)
 	tilemap_set_scrolly( state->m_bg2tilemap, 0, state->m_b00000regs[1]+17);
 	tilemap_set_scrollx( state->m_bg2tilemap, 0, state->m_b00000regs[0]+106);
 
-	state->m_tmp_tilemap_composebitmap->fill(0, *cliprect);
+	state->m_tmp_tilemap_composebitmap->fill(0, cliprect);
 
-	state->m_tmp_tilemap_renderbitmap->fill(0, *cliprect);
+	state->m_tmp_tilemap_renderbitmap->fill(0, cliprect);
 	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg0tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x0000);
 
-	state->m_tmp_tilemap_renderbitmap->fill(0, *cliprect);
+	state->m_tmp_tilemap_renderbitmap->fill(0, cliprect);
 	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg1tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x4000);
 
-	state->m_tmp_tilemap_renderbitmap->fill(0, *cliprect);
+	state->m_tmp_tilemap_renderbitmap->fill(0, cliprect);
 	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg2tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x8000);
 
-	state->m_tmp_tilemap_renderbitmap->fill(0, *cliprect);
+	state->m_tmp_tilemap_renderbitmap->fill(0, cliprect);
 	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_txt_tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0xc000);
 

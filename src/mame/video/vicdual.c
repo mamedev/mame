@@ -33,7 +33,7 @@ SCREEN_UPDATE( vicdual_bw )
 {
 	vicdual_state *state = screen.machine().driver_data<vicdual_state>();
 	UINT8 x = 0;
-	UINT8 y = cliprect->min_y;
+	UINT8 y = cliprect.min_y;
 	UINT8 video_data = 0;
 
 	while (1)
@@ -66,7 +66,7 @@ SCREEN_UPDATE( vicdual_bw )
 		if (x == 0)
 		{
 			/* end of region to update? */
-			if (y == cliprect->max_y)
+			if (y == cliprect.max_y)
 			{
 				break;
 			}
@@ -85,7 +85,7 @@ SCREEN_UPDATE( vicdual_color )
 	vicdual_state *state = screen.machine().driver_data<vicdual_state>();
 	UINT8 *color_prom = (UINT8 *)screen.machine().region("proms")->base();
 	UINT8 x = 0;
-	UINT8 y = cliprect->min_y;
+	UINT8 y = cliprect.min_y;
 	UINT8 video_data = 0;
 	pen_t back_pen = 0;
 	pen_t fore_pen = 0;
@@ -125,7 +125,7 @@ SCREEN_UPDATE( vicdual_color )
 		if (x == 0)
 		{
 			/* end of region to update? */
-			if (y == cliprect->max_y)
+			if (y == cliprect.max_y)
 			{
 				break;
 			}

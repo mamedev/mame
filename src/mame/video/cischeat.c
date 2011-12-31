@@ -715,13 +715,13 @@ WRITE16_HANDLER( scudhamm_vregs_w )
 /*  Draw the road in the given bitmap. The priority1 and priority2 parameters
     specify the range of lines to draw  */
 
-static void cischeat_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int road_num, int priority1, int priority2, int transparency)
+static void cischeat_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int road_num, int priority1, int priority2, int transparency)
 {
 	cischeat_state *state = machine.driver_data<cischeat_state>();
 	int curr_code,sx,sy;
 	int min_priority, max_priority;
 
-	rectangle rect		=	*cliprect;
+	rectangle rect		=	cliprect;
 	gfx_element *gfx		=	machine.gfx[(road_num & 1)?5:4];
 
 	UINT16 *roadram			=	state->m_roadram[road_num & 1];
@@ -757,7 +757,7 @@ static void cischeat_draw_road(running_machine &machine, bitmap_t *bitmap, const
 
 		for (sx = -(xscroll%TILE_SIZE) ; sx <= max_x ; sx +=TILE_SIZE)
 		{
-			drawgfx_transpen(bitmap,&rect,gfx,
+			drawgfx_transpen(bitmap,rect,gfx,
 					curr_code++,
 					attr,
 					0,0,
@@ -805,14 +805,14 @@ static void cischeat_draw_road(running_machine &machine, bitmap_t *bitmap, const
 /*  Draw the road in the given bitmap. The priority1 and priority2 parameters
     specify the range of lines to draw  */
 
-static void f1gpstar_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int road_num, int priority1, int priority2, int transparency)
+static void f1gpstar_draw_road(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int road_num, int priority1, int priority2, int transparency)
 {
 	cischeat_state *state = machine.driver_data<cischeat_state>();
 	int sx,sy;
 	int xstart;
 	int min_priority, max_priority;
 
-	rectangle rect		=	*cliprect;
+	rectangle rect		=	cliprect;
 	gfx_element *gfx		=	machine.gfx[(road_num & 1)?5:4];
 
 	UINT16 *roadram			=	state->m_roadram[road_num & 1];
@@ -864,7 +864,7 @@ static void f1gpstar_draw_road(running_machine &machine, bitmap_t *bitmap, const
 		/* Draw the line */
 		for (sx = xstart ; sx <= max_x ; sx += xdim)
 		{
-			drawgfxzoom_transpen(bitmap,&rect,gfx,
+			drawgfxzoom_transpen(bitmap,rect,gfx,
 						code++,
 						attr >> 8,
 						0,0,
@@ -921,7 +921,7 @@ static void f1gpstar_draw_road(running_machine &machine, bitmap_t *bitmap, const
     sprites whose priority nibble is between 0 and 15 and whose
     colour code's high bit is set.  */
 
-static void cischeat_draw_sprites(running_machine &machine, bitmap_t *bitmap , const rectangle *cliprect, int priority1, int priority2)
+static void cischeat_draw_sprites(running_machine &machine, bitmap_t *bitmap , const rectangle &cliprect, int priority1, int priority2)
 {
 	cischeat_state *state = machine.driver_data<cischeat_state>();
 	int x, sx, flipx, xzoom, xscale, xdim, xnum, xstart, xend, xinc;
@@ -1077,7 +1077,7 @@ if (machine.input().code_pressed(KEYCODE_X))
 
 ***************************************************************************/
 
-static void bigrun_draw_sprites(running_machine &machine, bitmap_t *bitmap , const rectangle *cliprect, int priority1, int priority2)
+static void bigrun_draw_sprites(running_machine &machine, bitmap_t *bitmap , const rectangle &cliprect, int priority1, int priority2)
 {
 	cischeat_state *state = machine.driver_data<cischeat_state>();
 	int x, sx, flipx, xzoom, xscale, xdim, xnum, xstart, xend, xinc;
@@ -1265,7 +1265,7 @@ SCREEN_UPDATE( bigrun )
 	cischeat_tmap_SET_SCROLL(1)
 	cischeat_tmap_SET_SCROLL(2)
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	for (i = 7; i >= 4; i--)
 	{											/* bitmap, road, min_priority, max_priority, transparency */
@@ -1319,7 +1319,7 @@ SCREEN_UPDATE( cischeat )
 	cischeat_tmap_SET_SCROLL(1)
 	cischeat_tmap_SET_SCROLL(2)
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 										/* bitmap, road, priority, transparency */
 	if (state->m_active_layers & 0x10)	cischeat_draw_road(screen.machine(),bitmap,cliprect,0,7,5,FALSE);
@@ -1327,7 +1327,7 @@ SCREEN_UPDATE( cischeat )
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
-//  else bitmap->fill(0, *cliprect);
+//  else bitmap->fill(0, cliprect);
 	cischeat_tmap_DRAW(1)
 
 	if (state->m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,15,3);
@@ -1376,7 +1376,7 @@ SCREEN_UPDATE( f1gpstar )
 	cischeat_tmap_SET_SCROLL(1);
 	cischeat_tmap_SET_SCROLL(2);
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
@@ -1386,7 +1386,7 @@ SCREEN_UPDATE( f1gpstar )
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
-//  else bitmap->fill(0, *cliprect);
+//  else bitmap->fill(0, cliprect);
 	cischeat_tmap_DRAW(1)
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
@@ -1453,7 +1453,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	cischeat_tmap_SET_SCROLL(0)
 	cischeat_tmap_SET_SCROLL(2)
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)

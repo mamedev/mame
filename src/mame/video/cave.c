@@ -769,15 +769,15 @@ static void sprite_init_cave( running_machine &machine )
 	machine.save().register_postload(save_prepost_delegate(FUNC(cave_get_sprite_info), &machine));
 }
 
-static void cave_sprite_check( screen_device &screen, const rectangle *clip )
+static void cave_sprite_check( screen_device &screen, const rectangle &clip )
 {
 	cave_state *state = screen.machine().driver_data<cave_state>();
 
 	{	/* set clip */
-		int left = clip->min_x;
-		int top = clip->min_y;
-		int right = clip->max_x + 1;
-		int bottom = clip->max_y + 1;
+		int left = clip.min_x;
+		int top = clip.min_y;
+		int right = clip.max_x + 1;
+		int bottom = clip.max_y + 1;
 
 		state->m_blit.clip_left = left;
 		state->m_blit.clip_top = top;
@@ -824,7 +824,7 @@ static void cave_sprite_check( screen_device &screen, const rectangle *clip )
 
 			case CAVE_SPRITETYPE_ZOOM | CAVE_SPRITETYPE_ZBUF:
 				state->m_sprite_draw = sprite_draw_cave_zbuf;
-				if (clip->min_y == visarea.min_y)
+				if (clip.min_y == visarea.min_y)
 				{
 					if(!(state->m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
 						state->m_sprite_zbuf->fill(0, visarea);
@@ -833,7 +833,7 @@ static void cave_sprite_check( screen_device &screen, const rectangle *clip )
 
 			case CAVE_SPRITETYPE_ZBUF:
 				state->m_sprite_draw = sprite_draw_donpachi_zbuf;
-				if (clip->min_y == visarea.min_y)
+				if (clip.min_y == visarea.min_y)
 				{
 					if(!(state->m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
 						state->m_sprite_zbuf->fill(0, visarea);
@@ -1418,7 +1418,7 @@ static void sprite_draw_donpachi_zbuf( running_machine &machine, int priority )
 ***************************************************************************/
 
 INLINE void cave_tilemap_draw(
-	running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,
+	running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
 	UINT32 flags, UINT32 priority, UINT32 priority2, int GFX )
 {
 	cave_state *state = machine.driver_data<cave_state>();
@@ -1467,14 +1467,14 @@ INLINE void cave_tilemap_draw(
             tilemap_draw multiple times.
         */
 
-		clip.min_x = cliprect->min_x;
-		clip.max_x = cliprect->max_x;
+		clip.min_x = cliprect.min_x;
+		clip.max_x = cliprect.max_x;
 
-		for (startline = cliprect->min_y; startline <= cliprect->max_y;)
+		for (startline = cliprect.min_y; startline <= cliprect.max_y;)
 		{
 			/* Find the largest slice */
 			vramdata0 = (vramdata1 = VRAM[(0x1002 + (((sy + offs_row + startline) * 4) & 0x7ff)) / 2]);
-			for(endline = startline + 1; endline <= cliprect->max_y; endline++)
+			for(endline = startline + 1; endline <= cliprect.max_y; endline++)
 				if((++vramdata1) != VRAM[(0x1002 + (((sy + offs_row + endline) * 4) & 0x7ff)) / 2]) break;
 
 			tilemap_set_scrolly(TILEMAP, 0, vramdata0 - startline);
@@ -1504,8 +1504,8 @@ INLINE void cave_tilemap_draw(
 
 			if (flipy)
 			{
-				clip.min_y = cliprect->max_y - (endline - 1 - cliprect->min_y);
-				clip.max_y = cliprect->max_y - (startline - cliprect->min_y);
+				clip.min_y = cliprect.max_y - (endline - 1 - cliprect.min_y);
+				clip.max_y = cliprect.max_y - (startline - cliprect.min_y);
 			}
 			else
 			{
@@ -1513,7 +1513,7 @@ INLINE void cave_tilemap_draw(
 				clip.max_y = endline - 1;
 			}
 
-			tilemap_draw(bitmap, &clip, TILEMAP, flags, priority);
+			tilemap_draw(bitmap, clip, TILEMAP, flags, priority);
 
 			startline = endline;
 		}
@@ -1522,7 +1522,7 @@ INLINE void cave_tilemap_draw(
 	{
 		int line;
 		tilemap_set_scroll_rows(TILEMAP, 512);
-		for(line = cliprect->min_y; line <= cliprect->max_y; line++)
+		for(line = cliprect.min_y; line <= cliprect.max_y; line++)
 			tilemap_set_scrollx(TILEMAP, (line + sy) & 511,
 							sx + VRAM[(0x1000+(((sy + offs_row + line) * 4) & 0x7ff)) / 2] );
 		tilemap_set_scrolly(TILEMAP, 0, sy);
@@ -1621,7 +1621,7 @@ SCREEN_UPDATE( cave )
 
 	cave_sprite_check(screen, cliprect);
 
-	bitmap->fill(state->m_background_color, *cliprect);
+	bitmap->fill(state->m_background_color, cliprect);
 
 	/*
         Tiles and sprites are ordered by priority (0 back, 3 front) with

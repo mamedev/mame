@@ -781,7 +781,7 @@ static VIDEO_START(sfbonus)
 
 }
 
-static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int catagory)
+static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int catagory)
 {
 	sfbonus_state *state = screen.machine().driver_data<sfbonus_state>();
 	int zz;
@@ -877,38 +877,38 @@ static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_t *bitmap, con
 
 		if (rowenable2==0)
 		{
-			tilemap_draw(state->m_temp_reel_bitmap,&clip,state->m_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),3);
+			tilemap_draw(state->m_temp_reel_bitmap,clip,state->m_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),3);
 		}
 		if (rowenable==0)
 		{
-			tilemap_draw(state->m_temp_reel_bitmap,&clip,state->m_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),3);
+			tilemap_draw(state->m_temp_reel_bitmap,clip,state->m_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),3);
 		}
 
 		if (rowenable2==0x1)
 		{
-			tilemap_draw(state->m_temp_reel_bitmap,&clip,state->m_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),2);
+			tilemap_draw(state->m_temp_reel_bitmap,clip,state->m_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),2);
 		}
 		if (rowenable==0x1)
 		{
-			tilemap_draw(state->m_temp_reel_bitmap,&clip,state->m_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),2);
+			tilemap_draw(state->m_temp_reel_bitmap,clip,state->m_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),2);
 		}
 
 		if (rowenable2==0x2)
 		{
-			tilemap_draw(state->m_temp_reel_bitmap,&clip,state->m_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),1);
+			tilemap_draw(state->m_temp_reel_bitmap,clip,state->m_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),1);
 		}
 		if (rowenable==0x2)
 		{
-			tilemap_draw(state->m_temp_reel_bitmap,&clip,state->m_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),1);
+			tilemap_draw(state->m_temp_reel_bitmap,clip,state->m_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),1);
 		}
 
 		if (rowenable2==0x3)
 		{
-			tilemap_draw(state->m_temp_reel_bitmap,&clip,state->m_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),4);
+			tilemap_draw(state->m_temp_reel_bitmap,clip,state->m_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),4);
 		}
 		if (rowenable==0x3)
 		{
-			tilemap_draw(state->m_temp_reel_bitmap,&clip,state->m_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),4);
+			tilemap_draw(state->m_temp_reel_bitmap,clip,state->m_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),4);
 		}
 
 
@@ -934,8 +934,8 @@ static SCREEN_UPDATE(sfbonus)
 	globalyscroll += 8;
 	globalxscroll += 8;
 
-	bitmap->fill(screen.machine().pens[0], *cliprect);
-	state->m_temp_reel_bitmap->fill(screen.machine().pens[0], *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
+	state->m_temp_reel_bitmap->fill(screen.machine().pens[0], cliprect);
 
 	/* render reels to bitmap */
 	sfbonus_draw_reel_layer(screen,state->m_temp_reel_bitmap,cliprect,0);

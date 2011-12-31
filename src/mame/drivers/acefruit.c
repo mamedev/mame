@@ -79,8 +79,8 @@ static INTERRUPT_GEN( acefruit_vblank )
 static SCREEN_UPDATE( acefruit )
 {
 	acefruit_state *state = screen.machine().driver_data<acefruit_state>();
-	int startrow = cliprect->min_y / 8;
-	int endrow = cliprect->max_y / 8;
+	int startrow = cliprect.min_y / 8;
+	int endrow = cliprect.max_y / 8;
 	int row;
 	int col;
 

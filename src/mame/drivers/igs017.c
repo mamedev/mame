@@ -247,7 +247,7 @@ static VIDEO_START( igs017 )
 
 ***************************************************************************/
 
-static void draw_sprite(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
+static void draw_sprite(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
 	// prepare GfxElement on the fly
@@ -265,7 +265,7 @@ static void draw_sprite(running_machine &machine, bitmap_t *bitmap,const rectang
 				sx, sy, 0x1f	);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
 	UINT8 *s	=	state->m_spriteram;
@@ -301,7 +301,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 }
 
 // A simple gfx viewer (toggle with T)
-static int debug_viewer(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static int debug_viewer(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
 	igs017_state *state = machine.driver_data<igs017_state>();
@@ -330,7 +330,7 @@ static int debug_viewer(running_machine &machine, bitmap_t *bitmap,const rectang
 		if (w <= 0)		w = 0;
 		if (w > 1024)	w = 1024;
 
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 		draw_sprite(machine, bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
 
@@ -363,7 +363,7 @@ static SCREEN_UPDATE( igs017 )
 	if (debug_viewer(screen.machine(), bitmap,cliprect))
 		return 0;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (state->m_video_disable)
 		return 0;

@@ -215,7 +215,7 @@ static VIDEO_START( panicr )
 	colortable_configure_tilemap_groups(machine.colortable, state->m_txttilemap, machine.gfx[0], 0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect )
 {
 	panicr_state *state = machine.driver_data<panicr_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -242,7 +242,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 static SCREEN_UPDATE( panicr)
 {
 	panicr_state *state = screen.machine().driver_data<panicr_state>();
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	tilemap_mark_all_tiles_dirty( state->m_txttilemap );
 	tilemap_set_scrollx( state->m_bgtilemap,0, ((state->m_scrollram[0x02]&0x0f)<<12)+((state->m_scrollram[0x02]&0xf0)<<4)+((state->m_scrollram[0x04]&0x7f)<<1)+((state->m_scrollram[0x04]&0x80)>>7) );
 	tilemap_draw(bitmap,cliprect,state->m_bgtilemap,0,0);

@@ -501,7 +501,7 @@ static void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
     no transparency
 -------------------------------------------------*/
 
-void drawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfx_opaque(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
@@ -529,7 +529,7 @@ void drawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element
     a single transparent pen
 -------------------------------------------------*/
 
-void drawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfx_transpen(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen)
 {
@@ -583,7 +583,7 @@ void drawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_eleme
     lookups
 -------------------------------------------------*/
 
-void drawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfx_transpen_raw(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen)
 {
@@ -614,7 +614,7 @@ void drawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_e
     a mask
 -------------------------------------------------*/
 
-void drawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfx_transmask(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transmask)
 {
@@ -668,7 +668,7 @@ void drawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
     transparent, opaque, or shadowing
 -------------------------------------------------*/
 
-void drawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfx_transtable(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		const UINT8 *pentable, const pen_t *shadowtable)
 {
@@ -699,7 +699,7 @@ void drawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
     remaining pixels with a fixed alpha value
 -------------------------------------------------*/
 
-void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfx_alpha(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen, UINT8 alpha)
 {
@@ -744,7 +744,7 @@ void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element 
     element with no transparency
 -------------------------------------------------*/
 
-void drawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfxzoom_opaque(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley)
 {
@@ -780,7 +780,7 @@ void drawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
     element with a single transparent pen
 -------------------------------------------------*/
 
-void drawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfxzoom_transpen(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen)
 {
@@ -841,7 +841,7 @@ void drawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_e
     color lookups
 -------------------------------------------------*/
 
-void drawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen)
 {
@@ -879,7 +879,7 @@ void drawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const g
     provided as a mask
 -------------------------------------------------*/
 
-void drawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfxzoom_transmask(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transmask)
 {
@@ -940,7 +940,7 @@ void drawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_
     are transparent, opaque, or shadowing
 -------------------------------------------------*/
 
-void drawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfxzoom_transtable(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, const UINT8 *pentable, const pen_t *shadowtable)
 {
@@ -978,7 +978,7 @@ void drawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx
     the remaining pixels with a fixed alpha value
 -------------------------------------------------*/
 
-void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void drawgfxzoom_alpha(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen, UINT8 alpha)
 {
@@ -1031,7 +1031,7 @@ void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
     bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfx_opaque(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask)
 {
@@ -1063,7 +1063,7 @@ void pdrawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_elemen
     priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfx_transpen(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transpen)
 {
@@ -1119,7 +1119,7 @@ void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
     lookups, checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfx_transpen_raw(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transpen)
 {
@@ -1151,7 +1151,7 @@ void pdrawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_
     a mask, checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfx_transmask(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transmask)
 {
@@ -1208,7 +1208,7 @@ void pdrawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
     against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfx_transtable(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, const UINT8 *pentable, const pen_t *shadowtable)
 {
@@ -1242,7 +1242,7 @@ void pdrawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_el
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfx_alpha(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transpen, UINT8 alpha)
 {
@@ -1290,7 +1290,7 @@ void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element
     the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask)
 {
@@ -1329,7 +1329,7 @@ void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_el
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transpen)
@@ -1394,7 +1394,7 @@ void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_
     bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transpen)
@@ -1435,7 +1435,7 @@ void pdrawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const 
     priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transmask)
@@ -1500,7 +1500,7 @@ void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transtable(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		const UINT8 *pentable, const pen_t *shadowtable)
@@ -1543,7 +1543,7 @@ void pdrawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gf
     bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_alpha(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transpen, UINT8 alpha)
@@ -1764,7 +1764,7 @@ void extract_scanline32(bitmap_t *bitmap, INT32 srcx, INT32 srcy, INT32 length, 
     copying all unclipped pixels
 -------------------------------------------------*/
 
-void copybitmap(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle *cliprect)
+void copybitmap(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 
@@ -1788,7 +1788,7 @@ void copybitmap(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx
     those that match transpen
 -------------------------------------------------*/
 
-void copybitmap_trans(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle *cliprect, UINT32 transpen)
+void copybitmap_trans(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect, UINT32 transpen)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 
@@ -1832,7 +1832,7 @@ void copybitmap_trans(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32
     applying scrolling to one or more rows/colums
 -------------------------------------------------*/
 
-void copyscrollbitmap(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle *cliprect)
+void copyscrollbitmap(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect)
 {
 	/* just call through to the transparent case as the underlying copybitmap will
        optimize for pen == 0xffffffff */
@@ -1847,7 +1847,7 @@ void copyscrollbitmap(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32
     scrolling to one or more rows/colums
 -------------------------------------------------*/
 
-void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle *cliprect, UINT32 transpen)
+void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect, UINT32 transpen)
 {
 	/* no rowscroll and no colscroll means no scroll */
 	if (numrows == 0 && numcols == 0)
@@ -1864,10 +1864,6 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 	assert(numrows == 0 || rowscroll != NULL);
 	assert(numcols != 0 || colscroll == NULL);
 	assert(numcols == 0 || colscroll != NULL);
-
-	/* NULL clip means use the full bitmap */
-	if (cliprect == NULL)
-		cliprect = &dest->cliprect();
 
 	/* fully scrolling X,Y playfield */
 	if (numrows <= 1 && numcols <= 1)
@@ -1886,7 +1882,7 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 	else if (numrows <= 1)
 	{
 		INT32 xscroll = normalize_xscroll(src, (numrows == 0) ? 0 : rowscroll[0]);
-		rectangle subclip = *cliprect;
+		rectangle subclip = cliprect;
 		int col, colwidth, groupcols;
 
 		/* determine width of each column */
@@ -1911,11 +1907,11 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 				/* compute the cliprect for this group */
 				subclip.min_x = col * colwidth + sx;
 				subclip.max_x = (col + groupcols) * colwidth - 1 + sx;
-				subclip &= *cliprect;
+				subclip &= cliprect;
 
 				/* iterate over all portions of the scroll that overlap the destination */
 				for (sy = yscroll - src->height(); sy < dest->height(); sy += src->height())
-					copybitmap_trans(dest, src, 0, 0, sx, sy, &subclip, transpen);
+					copybitmap_trans(dest, src, 0, 0, sx, sy, subclip, transpen);
 			}
 		}
 	}
@@ -1924,7 +1920,7 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 	else if (numcols <= 1)
 	{
 		INT32 yscroll = normalize_yscroll(src, (numcols == 0) ? 0 : colscroll[0]);
-		rectangle subclip = *cliprect;
+		rectangle subclip = cliprect;
 		int row, rowheight, grouprows;
 
 		/* determine width of each rows */
@@ -1949,11 +1945,11 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 				/* compute the cliprect for this group */
 				subclip.min_y = row * rowheight + sy;
 				subclip.max_y = (row + grouprows) * rowheight - 1 + sy;
-				subclip &= *cliprect;
+				subclip &= cliprect;
 
 				/* iterate over all portions of the scroll that overlap the destination */
 				for (sx = xscroll - src->width(); sx < dest->width(); sx += src->width())
-					copybitmap_trans(dest, src, 0, 0, sx, sy, &subclip, transpen);
+					copybitmap_trans(dest, src, 0, 0, sx, sy, subclip, transpen);
 			}
 		}
 	}
@@ -1971,7 +1967,7 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
     pixels
 -------------------------------------------------*/
 
-void copyrozbitmap(bitmap_t *dest, const rectangle *cliprect, bitmap_t *src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound)
+void copyrozbitmap(bitmap_t *dest, const rectangle &cliprect, bitmap_t *src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 
@@ -1996,7 +1992,7 @@ void copyrozbitmap(bitmap_t *dest, const rectangle *cliprect, bitmap_t *src, INT
     transpen
 -------------------------------------------------*/
 
-void copyrozbitmap_trans(bitmap_t *dest, const rectangle *cliprect, bitmap_t *src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound, UINT32 transpen)
+void copyrozbitmap_trans(bitmap_t *dest, const rectangle &cliprect, bitmap_t *src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound, UINT32 transpen)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 

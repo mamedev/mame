@@ -107,10 +107,10 @@ static SCREEN_UPDATE( flyball )
 
 	for (y = bally; y < bally + 2; y++)
 		for (x = ballx; x < ballx + 2; x++)
-			if (x >= cliprect->min_x &&
-			    x <= cliprect->max_x &&
-			    y >= cliprect->min_y &&
-			    y <= cliprect->max_y)
+			if (x >= cliprect.min_x &&
+			    x <= cliprect.max_x &&
+			    y >= cliprect.min_y &&
+			    y <= cliprect.max_y)
 				bitmap->pix16(y, x) = 1;
 	return 0;
 }

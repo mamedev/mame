@@ -13,7 +13,7 @@
 #include "includes/arcadecl.h"
 
 
-static void arcadecl_bitmap_render(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void arcadecl_bitmap_render(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect);
 
 /*************************************
  *
@@ -121,19 +121,19 @@ SCREEN_UPDATE( arcadecl )
  *
  *************************************/
 
-static void arcadecl_bitmap_render(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void arcadecl_bitmap_render(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	arcadecl_state *state = machine.driver_data<arcadecl_state>();
 	int x, y;
 
 	/* update any dirty scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const UINT16 *src = &state->m_bitmap[256 * y];
 		UINT16 *dst = &bitmap->pix16(y);
 
 		/* regenerate the line */
-		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
+		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			int bits = src[(x - 8) / 2];
 			dst[x + 0] = bits >> 8;

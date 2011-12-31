@@ -357,7 +357,7 @@ static SCREEN_UPDATE(coolridr)
 	}
 
 	copybitmap_trans(bitmap, state->m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
-	state->m_temp_bitmap_sprites->fill(0, *cliprect);
+	state->m_temp_bitmap_sprites->fill(0, cliprect);
 
 
 	return 0;
@@ -479,7 +479,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 						x2 = (state->m_attr_buff[9] & 0x000001ff);
 						clip = state->m_temp_bitmap_sprites->cliprect();
 
-						drawgfx_opaque(state->m_temp_bitmap_sprites,&clip,gfx,1,1,0,0,x2,y2);
+						drawgfx_opaque(state->m_temp_bitmap_sprites,clip,gfx,1,1,0,0,x2,y2);
 					}
 				}
 				if(state->m_attr_index == 0xc)

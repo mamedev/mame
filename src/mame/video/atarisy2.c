@@ -327,7 +327,7 @@ SCREEN_UPDATE( atarisy2 )
 	int x, y, r;
 
 	/* draw the playfield */
-	priority_bitmap->fill(0, *cliprect);
+	priority_bitmap->fill(0, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 1);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 2);

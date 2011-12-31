@@ -161,8 +161,8 @@ SCREEN_UPDATE( fastlane )
 	rectangle finalclip0 = state->m_clip0, finalclip1 = state->m_clip1;
 	int i, xoffs;
 
-	finalclip0 &= *cliprect;
-	finalclip1 &= *cliprect;
+	finalclip0 &= cliprect;
+	finalclip1 &= cliprect;
 
 	set_pens(screen.machine());
 
@@ -173,8 +173,8 @@ SCREEN_UPDATE( fastlane )
 
 	tilemap_set_scrolly(state->m_layer0, 0, k007121_ctrlram_r(state->m_k007121, 2));
 
-	tilemap_draw(bitmap, &finalclip0, state->m_layer0, 0, 0);
+	tilemap_draw(bitmap, finalclip0, state->m_layer0, 0, 0);
 	k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], screen.machine().colortable, state->m_spriteram, 0, 40, 0, (UINT32)-1);
-	tilemap_draw(bitmap, &finalclip1, state->m_layer1, 0, 0);
+	tilemap_draw(bitmap, finalclip1, state->m_layer1, 0, 0);
 	return 0;
 }

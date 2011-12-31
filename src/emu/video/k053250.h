@@ -26,7 +26,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ram_w);
 	DECLARE_READ16_MEMBER(rom_r);
 
-	void draw( bitmap_t *bitmap, const rectangle *cliprect, int colorbase, int flags, int priority );
+	void draw( bitmap_t *bitmap, const rectangle &cliprect, int colorbase, int flags, int priority );
 
 protected:
 	void device_start();
@@ -47,7 +47,7 @@ private:
 	void unpack_nibbles();
 	void dma(int limiter);
 	static void pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, UINT8 *source,
-								 const rectangle *cliprect, int linepos, int scroll, int zoom,
+								 const rectangle &cliprect, int linepos, int scroll, int zoom,
 								 UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_t *priority, UINT8 pri);
 };
 

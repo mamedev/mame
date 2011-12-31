@@ -267,7 +267,7 @@ static PALETTE_INIT( whitestar )
 
 bool whitestar_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_mc6845->update(&bitmap, &cliprect);
+	m_mc6845->update(&bitmap, cliprect);
 	return 0;
 }
 

@@ -141,7 +141,7 @@ WRITE16_HANDLER( tc0180vcu_framebuffer_word_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 /*  Sprite format: (16 bytes per sprite)
   offs:             bits:
@@ -270,10 +270,10 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 }
 
 
-static void draw_framebuffer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_framebuffer( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	rectangle myclip = *cliprect;
+	rectangle myclip = cliprect;
 	int x, y;
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
 	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->m_tc0180vcu, 0);
@@ -382,7 +382,7 @@ SCREEN_UPDATE( taitob )
 
 	if ((video_control & 0x20) == 0)
 	{
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 		return 0;
 	}
 
@@ -421,7 +421,7 @@ SCREEN_UPDATE( realpunc )
 	/* Video blanked? */
 	if (!(video_control & 0x20))
 	{
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 		return 0;
 	}
 
@@ -436,8 +436,8 @@ SCREEN_UPDATE( realpunc )
 		draw_framebuffer(screen.machine(), state->m_realpunc_bitmap, cliprect, 0);
 
 	/* Copy the intermediate bitmap to the output bitmap, applying the palette */
-	for (y = 0; y <= cliprect->max_y; y++)
-		for (x = 0; x <= cliprect->max_x; x++)
+	for (y = 0; y <= cliprect.max_y; y++)
+		for (x = 0; x <= cliprect.max_x; x++)
 			bitmap->pix32(y, x) = palette[state->m_realpunc_bitmap->pix16(y, x)];
 
 	/* Draw the 15bpp raw CRTC frame buffer directly to the output bitmap */
@@ -451,10 +451,10 @@ SCREEN_UPDATE( realpunc )
 //      scrollx = taitob_scroll[0];
 //      scrolly = taitob_scroll[1];
 
-		for (y = 0; y <= cliprect->max_y; y++)
+		for (y = 0; y <= cliprect.max_y; y++)
 		{
 			int addr = base + (y*stride);
-			for (x = 0; x <= cliprect->max_x; x++)
+			for (x = 0; x <= cliprect.max_x; x++)
 			{
 				int r, g, b;
 				UINT16 srcpix = hd63484_ram_r(hd63484, addr++, 0xffff);
@@ -473,15 +473,15 @@ SCREEN_UPDATE( realpunc )
 	/* Draw the 15bpp raw output of the camera ADCs (TODO) */
 	else if (state->m_realpunc_video_ctrl & 0x0004)
 	{
-		for (y = 0; y <= cliprect->max_y; y++)
+		for (y = 0; y <= cliprect.max_y; y++)
 		{
-			for (x = 0; x <= cliprect->max_x; x++)
+			for (x = 0; x <= cliprect.max_x; x++)
 				bitmap->pix32(y, x) = MAKE_RGB(0x00, 0x00, 0x00);
 		}
 	}
 
 	/* Clear the indexed bitmap and draw the final indexed layers */
-	state->m_realpunc_bitmap->fill(0, *cliprect);
+	state->m_realpunc_bitmap->fill(0, cliprect);
 
 	if (!(state->m_realpunc_video_ctrl & 0x0001))
 		draw_framebuffer(screen.machine(), state->m_realpunc_bitmap, cliprect, 0);
@@ -489,9 +489,9 @@ SCREEN_UPDATE( realpunc )
 	tc0180vcu_tilemap_draw(state->m_tc0180vcu, state->m_realpunc_bitmap, cliprect, 2, 0);
 
 	/* Merge the indexed layers with the output bitmap */
-	for (y = 0; y <= cliprect->max_y; y++)
+	for (y = 0; y <= cliprect.max_y; y++)
 	{
-		for (x = 0; x <= cliprect->max_x; x++)
+		for (x = 0; x <= cliprect.max_x; x++)
 		{
 			if (state->m_realpunc_bitmap->pix16(y, x))
 				bitmap->pix32(y, x) = palette[state->m_realpunc_bitmap->pix16(y, x)];
@@ -518,5 +518,5 @@ SCREEN_EOF( taitob )
 		tc0180vcu_set_fb_page(state->m_tc0180vcu, 0, framebuffer_page);
 	}
 
-	draw_sprites(screen.machine(), state->m_framebuffer[framebuffer_page], &screen.machine().primary_screen->visible_area());
+	draw_sprites(screen.machine(), state->m_framebuffer[framebuffer_page], screen.machine().primary_screen->visible_area());
 }

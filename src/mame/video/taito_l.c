@@ -243,7 +243,7 @@ void taitol_obj1b_m( running_machine &machine, int offset )
                  plgirs2 bullets and raimais big bosses.
 */
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	int offs;
@@ -307,7 +307,7 @@ SCREEN_UPDATE( taitol )
 
 	if (state->m_cur_ctrl & 0x20)	/* display enable */
 	{
-		screen.machine().priority_bitmap->fill(0, *cliprect);
+		screen.machine().priority_bitmap->fill(0, cliprect);
 
 		tilemap_draw(bitmap, cliprect, state->m_bg19_tilemap, 0, 0);
 
@@ -321,7 +321,7 @@ SCREEN_UPDATE( taitol )
 		tilemap_draw(bitmap, cliprect, state->m_ch1a_tilemap, 0, 0);
 	}
 	else
-		bitmap->fill(screen.machine().pens[0], *cliprect);
+		bitmap->fill(screen.machine().pens[0], cliprect);
 	return 0;
 }
 

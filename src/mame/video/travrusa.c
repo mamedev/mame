@@ -293,13 +293,13 @@ WRITE8_HANDLER( travrusa_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	travrusa_state *state = machine.driver_data<travrusa_state>();
 	int offs;
 	const rectangle spritevisiblearea(1*8, 31*8-1, 0*8, 24*8-1);
 	const rectangle spritevisibleareaflip(1*8, 31*8-1, 8*8, 32*8-1);
-	rectangle clip = *cliprect;
+	rectangle clip = cliprect;
 	if (flip_screen_get(machine))
 		clip &= spritevisibleareaflip;
 	else
@@ -323,7 +323,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, &clip, machine.gfx[1],
+		drawgfx_transpen(bitmap, clip, machine.gfx[1],
 				code,
 				attr & 0x0f,
 				flipx, flipy,

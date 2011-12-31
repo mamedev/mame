@@ -122,12 +122,12 @@ SCREEN_UPDATE( dcheese )
 	int x, y;
 
 	/* update the pixels */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *dest = &bitmap->pix16(y);
 		UINT16 *src = &state->m_dstbitmap->pix16((y + state->m_blitter_vidparam[0x28/2]) % DSTBITMAP_HEIGHT);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			dest[x] = src[x];
 	}
 	return 0;

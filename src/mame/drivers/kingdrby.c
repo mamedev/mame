@@ -165,7 +165,7 @@ static const UINT8 hw_sprite[16] =
 	0x22, 0x22, 0x22, 0x22, 0x22, 0x11, 0x22, 0x22
 };
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	kingdrby_state *state = machine.driver_data<kingdrby_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -231,7 +231,7 @@ static SCREEN_UPDATE(kingdrby)
 	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_sc1_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
-	tilemap_draw(bitmap,&clip,state->m_sc0w_tilemap,0,0);
+	tilemap_draw(bitmap,clip,state->m_sc0w_tilemap,0,0);
 
 	return 0;
 }

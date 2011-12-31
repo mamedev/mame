@@ -55,7 +55,7 @@ WRITE16_HANDLER( inufuku_scrollreg_w )
 
 ******************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	inufuku_state *state = machine.driver_data<inufuku_state>();
 	int offs;
@@ -239,7 +239,7 @@ SCREEN_UPDATE( inufuku )
 	inufuku_state *state = screen.machine().driver_data<inufuku_state>();
 	int i;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap->fill(0);
 
 	if (state->m_bg_raster)

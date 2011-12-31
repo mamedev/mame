@@ -102,7 +102,7 @@ static SCREEN_UPDATE( itgambl3 )
 
 	popmessage("%d %d %04x",state->m_test_x,state->m_test_y,state->m_start_offs);
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	count = (state->m_start_offs);
 

@@ -907,7 +907,7 @@ READ_LINE_MEMBER( cdp1869_device::pal_ntsc_r )
 //  update_screen - update screen
 //-------------------------------------------------
 
-void cdp1869_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1869_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	rectangle screen_rect, outer;
 
@@ -934,7 +934,7 @@ void cdp1869_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 		screen_rect.max_y = CDP1869_SCANLINE_DISPLAY_END_PAL - 1;
 	}
 
-	outer &= *cliprect;
+	outer &= cliprect;
 	bitmap->fill(m_bkg, outer);
 
 	if (!m_dispoff)

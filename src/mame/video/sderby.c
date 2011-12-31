@@ -65,7 +65,7 @@ WRITE16_HANDLER( sderby_fg_videoram_w )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int codeshift)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int codeshift)
 {
 	sderby_state *state = machine.driver_data<sderby_state>();
 	UINT16 *spriteram16 = state->m_spriteram;

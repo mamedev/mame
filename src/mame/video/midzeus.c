@@ -343,10 +343,10 @@ SCREEN_UPDATE( midzeus )
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0xcc]);
 		int xoffs = screen.visible_area().min_x;
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			UINT16 *dest = &bitmap->pix16(y);
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
 		}
 	}
@@ -364,10 +364,10 @@ SCREEN_UPDATE( midzeus )
 		if (yoffs < 0) yoffs = 0;
 		base = waveram0_ptr_from_block_addr(yoffs << 12);
 
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			UINT16 *dest = &bitmap->pix16(y);
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				UINT8 tex = get_texel_8bit(base, y, x, texel_width);
 				dest[x] = (tex << 8) | tex;
@@ -653,7 +653,7 @@ static void zeus_register_update(running_machine &machine, offs_t offset)
 					extra->solidcolor = zeusbase[0x00];
 					extra->zoffset = 0x7fff;
 
-					poly_render_quad(poly, NULL, &zeus_cliprect, render_poly_solid_fixedz, 0, &vert[0], &vert[1], &vert[2], &vert[3]);
+					poly_render_quad(poly, NULL, zeus_cliprect, render_poly_solid_fixedz, 0, &vert[0], &vert[1], &vert[2], &vert[3]);
 					poly_wait(poly, "Normal");
 				}
 				else
@@ -1275,7 +1275,7 @@ static void zeus_draw_quad(running_machine &machine, int long_fmt, const UINT32 
 	extra->transcolor = ((ctrl_word >> 16) & 1) ? 0 : 0x100;
 	extra->palbase = waveram0_ptr_from_block_addr(zeus_palbase);
 
-	poly_render_quad_fan(poly, NULL, &zeus_cliprect, callback, 4, numverts, &clipvert[0]);
+	poly_render_quad_fan(poly, NULL, zeus_cliprect, callback, 4, numverts, &clipvert[0]);
 }
 
 

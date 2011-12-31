@@ -231,7 +231,7 @@ WRITE8_HANDLER( fastfred_flip_screen_y_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
@@ -287,7 +287,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,flip_screen_x_get(machine) ? &spritevisibleareaflipx : &spritevisiblearea,machine.gfx[1],
+		drawgfx_transpen(bitmap,flip_screen_x_get(machine) ? spritevisibleareaflipx : spritevisiblearea,machine.gfx[1],
 				code,
 				state->m_colorbank | (state->m_spriteram[offs + 2] & 0x07),
 				flipx,flipy,
@@ -299,7 +299,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( fastfred )
 {
 	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
-	bitmap->fill(*state->m_background_color, *cliprect);
+	bitmap->fill(*state->m_background_color, cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 

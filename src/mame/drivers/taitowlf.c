@@ -68,7 +68,7 @@ static SCREEN_UPDATE( taitowlf )
 	int x,y,count;
 	const UINT8 *blit_ram = screen.machine().region("user5")->base();
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	count = (0);
 
