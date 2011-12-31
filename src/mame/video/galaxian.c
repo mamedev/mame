@@ -1075,22 +1075,22 @@ void frogger_draw_background(running_machine &machine, bitmap_t *bitmap, const r
 
 
 #ifdef UNUSED_FUNCTION
-static int flip_and_clip(rectangle *draw, int xstart, int xend, const rectangle &cliprect)
+static int flip_and_clip(rectangle &draw, int xstart, int xend, const rectangle &cliprect)
 {
 	galaxian_state *state = machine.driver_data<galaxian_state>();
-	*draw = cliprect;
+	draw = cliprect;
 	if (!state->m_flipscreen_x)
 	{
-		draw->min_x = xstart * GALAXIAN_XSCALE;
-		draw->max_x = xend * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
+		draw.min_x = xstart * GALAXIAN_XSCALE;
+		draw.max_x = xend * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
 	}
 	else
 	{
-		draw->min_x = (xend ^ 255) * GALAXIAN_XSCALE;
-		draw->max_x = (xstart ^ 255) * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
+		draw.min_x = (xend ^ 255) * GALAXIAN_XSCALE;
+		draw.max_x = (xstart ^ 255) * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
 	}
-	sect_rect(draw, cliprect);
-	return (draw->min_x <= draw->max_x);
+	draw &= cliprect;
+	return (draw.min_x <= draw.max_x);
 }
 
 void amidar_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)

@@ -843,20 +843,20 @@ static int compute_clipping_extents(screen_device &screen, int enable, int clipo
 			for (j = 0; j < 5; j++)
 				if (i & (1 << sorted[j]))
 				{
-					const rectangle *cur = &clips[sorted[j]];
+					const rectangle &cur = clips[sorted[j]];
 
 					/* see if this intersects our last extent */
-					if (extent != &list->extent[i][1] && cur->min_x <= extent[-1])
+					if (extent != &list->extent[i][1] && cur.min_x <= extent[-1])
 					{
-						if (cur->max_x > extent[-1])
-							extent[-1] = cur->max_x;
+						if (cur.max_x > extent[-1])
+							extent[-1] = cur.max_x;
 					}
 
 					/* otherwise, just append to the list */
 					else
 					{
-						*extent++ = cur->min_x;
-						*extent++ = cur->max_x;
+						*extent++ = cur.min_x;
+						*extent++ = cur.max_x;
 					}
 				}
 
@@ -1613,8 +1613,8 @@ static void sprite_swap_buffers(segas32_state *state)
 
 #define sprite_draw_pixel_16(trans)											\
 	/* only draw if onscreen, not 0 or 15 */								\
-	if (x >= clipin->min_x && x <= clipin->max_x && 						\
-		(!do_clipout || x < clipout->min_x || x > clipout->max_x) &&		\
+	if (x >= clipin.min_x && x <= clipin.max_x && 							\
+		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&			\
 		pix != trans)														\
 	{																		\
 		if (!indirect)														\
@@ -1642,8 +1642,8 @@ static void sprite_swap_buffers(segas32_state *state)
 
 #define sprite_draw_pixel_256(trans)										\
 	/* only draw if onscreen, not 0 or 15 */								\
-	if (x >= clipin->min_x && x <= clipin->max_x && 						\
-		(!do_clipout || x < clipout->min_x || x > clipout->max_x) &&		\
+	if (x >= clipin.min_x && x <= clipin.max_x && 							\
+		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&			\
 		pix != trans)														\
 	{																		\
 		if (!indirect)														\
@@ -1669,7 +1669,7 @@ static void sprite_swap_buffers(segas32_state *state)
 		}																	\
 	}
 
-static int draw_one_sprite(running_machine &machine, UINT16 *data, int xoffs, int yoffs, const rectangle *clipin, const rectangle *clipout)
+static int draw_one_sprite(running_machine &machine, UINT16 *data, int xoffs, int yoffs, const rectangle &clipin, const rectangle &clipout)
 {
 	segas32_state *state = machine.driver_data<segas32_state>();
 	static const int transparency_masks[4][4] =
@@ -1788,15 +1788,15 @@ static int draw_one_sprite(running_machine &machine, UINT16 *data, int xoffs, in
 	ytarget = ypos + ydelta * dsth;
 
 	/* adjust target x for clipping */
-	if (xdelta > 0 && xtarget > clipin->max_x)
+	if (xdelta > 0 && xtarget > clipin.max_x)
 	{
-		xtarget = clipin->max_x + 1;
+		xtarget = clipin.max_x + 1;
 		if (xpos >= xtarget)
 			goto bail;
 	}
-	if (xdelta < 0 && xtarget < clipin->min_x)
+	if (xdelta < 0 && xtarget < clipin.min_x)
 	{
-		xtarget = clipin->min_x - 1;
+		xtarget = clipin.min_x - 1;
 		if (xpos <= xtarget)
 			goto bail;
 	}
@@ -1805,9 +1805,9 @@ static int draw_one_sprite(running_machine &machine, UINT16 *data, int xoffs, in
 	for (y = ypos; y != ytarget; y += ydelta)
 	{
 		/* skip drawing if not within the inclusive cliprect */
-		if (y >= clipin->min_y && y <= clipin->max_y)
+		if (y >= clipin.min_y && y <= clipin.max_y)
 		{
-			int do_clipout = (y >= clipout->min_y && y <= clipout->max_y);
+			int do_clipout = (y >= clipout.min_y && y <= clipout.max_y);
 			UINT16 *dest = &bitmap->pix16(y);
 			int xacc = 0;
 
@@ -1903,7 +1903,7 @@ static void sprite_render_list(running_machine &machine)
 		{
 			/* command 0 = draw sprite */
 			case 0:
-				spritenum += 1 + draw_one_sprite(machine, sprite, xoffs, yoffs, &clipin, &clipout);
+				spritenum += 1 + draw_one_sprite(machine, sprite, xoffs, yoffs, clipin, clipout);
 				break;
 
 			/* command 1 = set clipping */

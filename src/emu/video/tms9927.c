@@ -188,16 +188,16 @@ int tms9927_upscroll_offset(device_t *device)
 }
 
 
-int tms9927_cursor_bounds(device_t *device, rectangle *bounds)
+int tms9927_cursor_bounds(device_t *device, rectangle &bounds)
 {
 	tms9927_state *tms = get_safe_token(device);
 	int cursorx = CURSOR_CHAR_ADDRESS(tms);
 	int cursory = CURSOR_ROW_ADDRESS(tms);
 
-	bounds->min_x = cursorx * tms->hpixels_per_column;
-	bounds->max_x = bounds->min_x + tms->hpixels_per_column - 1;
-	bounds->min_y = cursory * SCANS_PER_DATA_ROW(tms);
-	bounds->max_y = bounds->min_y + SCANS_PER_DATA_ROW(tms) - 1;
+	bounds.min_x = cursorx * tms->hpixels_per_column;
+	bounds.max_x = bounds.min_x + tms->hpixels_per_column - 1;
+	bounds.min_y = cursory * SCANS_PER_DATA_ROW(tms);
+	bounds.max_y = bounds.min_y + SCANS_PER_DATA_ROW(tms) - 1;
 
 	return (cursorx < HCOUNT(tms) && cursory <= LAST_DISP_DATA_ROW(tms));
 }

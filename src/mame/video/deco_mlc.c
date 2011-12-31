@@ -62,7 +62,7 @@ static void blitRaster(running_machine &machine, bitmap_t *bitmap, int rasterMod
 #endif
 
 static void mlc_drawgfxzoom(
-		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+		bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,int use8bpp,
 		int scalex, int scaley,int alpha)
@@ -79,12 +79,8 @@ static void mlc_drawgfxzoom(
     */
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	if(clip)
-	{
-		myclip = *clip;
-		myclip &= dest_bmp->cliprect();
-		clip=&myclip;
-	}
+	myclip = clip;
+	myclip &= dest_bmp->cliprect();
 
 	{
 		if( gfx )
@@ -131,31 +127,28 @@ static void mlc_drawgfxzoom(
 					y_index = 0;
 				}
 
-				if( clip )
-				{
-					if( sx < clip->min_x)
-					{ /* clip left */
-						int pixels = clip->min_x-sx;
-						sx += pixels;
-						x_index_base += pixels*dx;
-					}
-					if( sy < clip->min_y )
-					{ /* clip top */
-						int pixels = clip->min_y-sy;
-						sy += pixels;
-						y_index += pixels*dy;
-					}
-					/* NS 980211 - fixed incorrect clipping */
-					if( ex > clip->max_x+1 )
-					{ /* clip right */
-						int pixels = ex-clip->max_x-1;
-						ex -= pixels;
-					}
-					if( ey > clip->max_y+1 )
-					{ /* clip bottom */
-						int pixels = ey-clip->max_y-1;
-						ey -= pixels;
-					}
+				if( sx < myclip.min_x)
+				{ /* clip left */
+					int pixels = myclip.min_x-sx;
+					sx += pixels;
+					x_index_base += pixels*dx;
+				}
+				if( sy < myclip.min_y )
+				{ /* clip top */
+					int pixels = myclip.min_y-sy;
+					sy += pixels;
+					y_index += pixels*dy;
+				}
+				/* NS 980211 - fixed incorrect clipping */
+				if( ex > myclip.max_x+1 )
+				{ /* clip right */
+					int pixels = ex-myclip.max_x-1;
+					ex -= pixels;
+				}
+				if( ey > myclip.max_y+1 )
+				{ /* clip bottom */
+					int pixels = ey-myclip.max_y-1;
+					ey -= pixels;
 				}
 
 				if( ex>sx )
@@ -474,7 +467,7 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectan
 //                  rasterDirty=1;
 
 				mlc_drawgfxzoom(
-								/*rasterMode ? temp_bitmap : */bitmap,&user_clip,machine.gfx[0],
+								/*rasterMode ? temp_bitmap : */bitmap,user_clip,machine.gfx[0],
 								tile,tile2,
 								color + colorOffset,fx,fy,xbase,ybase,
 								0,

@@ -260,8 +260,8 @@ protected:
 	inline int get_pen(int ccb0, int ccb1, int pcb);
 
 	void initialize_palette();
-	void draw_line(bitmap_t *bitmap, const rectangle *rect, int x, int y, UINT8 data, int color);
-	void draw_char(bitmap_t *bitmap, const rectangle *rect, int x, int y, UINT16 pma);
+	void draw_line(bitmap_t *bitmap, const rectangle &rect, int x, int y, UINT8 data, int color);
+	void draw_char(bitmap_t *bitmap, const rectangle &rect, int x, int y, UINT16 pma);
 
 private:
 	devcb_resolved_read_line		m_in_pal_ntsc_func;

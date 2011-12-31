@@ -539,7 +539,7 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  draw_line - draw character line
 //-------------------------------------------------
 
-void cdp1869_device::draw_line(bitmap_t *bitmap, const rectangle *rect, int x, int y, UINT8 data, int color)
+void cdp1869_device::draw_line(bitmap_t *bitmap, const rectangle &rect, int x, int y, UINT8 data, int color)
 {
 	int i;
 
@@ -583,7 +583,7 @@ void cdp1869_device::draw_line(bitmap_t *bitmap, const rectangle *rect, int x, i
 //  draw_char - draw character
 //-------------------------------------------------
 
-void cdp1869_device::draw_char(bitmap_t *bitmap, const rectangle *rect, int x, int y, UINT16 pma)
+void cdp1869_device::draw_char(bitmap_t *bitmap, const rectangle &rect, int x, int y, UINT16 pma)
 {
 	UINT8 pmd = read_page_ram_byte(pma);
 
@@ -597,7 +597,7 @@ void cdp1869_device::draw_char(bitmap_t *bitmap, const rectangle *rect, int x, i
 
 		int color = get_pen(ccb0, ccb1, pcb);
 
-		draw_line(bitmap, rect, rect->min_x + x, rect->min_y + y, data, color);
+		draw_line(bitmap, rect, rect.min_x + x, rect.min_y + y, data, color);
 
 		y++;
 
@@ -965,7 +965,7 @@ void cdp1869_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 				int x = sx * width;
 				int y = sy * height;
 
-				draw_char(bitmap, &screen_rect, x, y, addr);
+				draw_char(bitmap, screen_rect, x, y, addr);
 
 				addr++;
 

@@ -58,8 +58,8 @@ enum
     MACROS
 ***************************************************************************/
 
-//#define NX(_dv, _x) ((float) (_x)/(float)rect_get_width(&(_dv)->bounds))
-//#define NY(_dv, _y) ((float) (_y)/(float)rect_get_height(&(_dv)->bounds))
+//#define NX(_dv, _x) ((float) (_x)/(float)(_dv)->bounds.width())
+//#define NY(_dv, _y) ((float) (_y)/(float)(_dv)->bounds.height())
 #define NX(_dv, _x) ((float) (_x)/(float) (dv)->rt_width)
 #define NY(_dv, _y) ((float) (_y)/(float) (dv)->rt_height)
 
@@ -221,37 +221,6 @@ public:
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE int rect_get_width(rectangle *r)
-{
-	return r->max_x - r->min_x + 1;
-}
-
-INLINE int rect_get_height(rectangle *r)
-{
-	return r->max_y - r->min_y + 1;
-}
-
-INLINE void rect_set_width(rectangle *r, int width)
-{
-	r->max_x = r->min_x + width - 1;
-}
-
-INLINE void rect_set_height(rectangle *r, int height)
-{
-	r->max_y = r->min_y + height - 1;
-}
-
-INLINE void rect_move(rectangle *r, int x, int y)
-{
-	int dx = x - r->min_x;
-	int dy = y - r->min_y;
-
-	r->min_x += dx;
-	r->max_x += dx;
-	r->min_y += dy;
-	r->max_y += dy;
-}
-
 INLINE int dview_is_state(DView *dv, int state)
 {
 	return ((dv->state & state) ? TRUE : FALSE);
@@ -321,42 +290,42 @@ static void dview_free(DView *dv)
 	auto_free(dv->machine(), dv);
 }
 
-static void dview_get_rect(DView *dv, int type, rectangle *rect)
+static void dview_get_rect(DView *dv, int type, rectangle &rect)
 {
-	*rect = dv->bounds;
+	rect = dv->bounds;
 	switch (type)
 	{
 	case RECT_DVIEW:
 		break;
 	case RECT_DVIEW_CLIENT:
-		rect->min_x += BORDER_XTHICKNESS;
-		rect->max_x -= (BORDER_XTHICKNESS + dv->vsb.visible * VSB_WIDTH);
-		rect->min_y += 2 * BORDER_YTHICKNESS + TITLE_HEIGHT;
-		rect->max_y -= (BORDER_YTHICKNESS + dv->hsb.visible * HSB_HEIGHT);
+		rect.min_x += BORDER_XTHICKNESS;
+		rect.max_x -= (BORDER_XTHICKNESS + dv->vsb.visible * VSB_WIDTH);
+		rect.min_y += 2 * BORDER_YTHICKNESS + TITLE_HEIGHT;
+		rect.max_y -= (BORDER_YTHICKNESS + dv->hsb.visible * HSB_HEIGHT);
 		break;
 	case RECT_DVIEW_HSB:
-		rect->min_x += 0;
-		rect->max_x -= /* dv->vsb.visible * */ VSB_WIDTH;
-		rect->min_y = dv->bounds.max_y - HSB_HEIGHT;
-		rect->max_y -= 0;
+		rect.min_x += 0;
+		rect.max_x -= /* dv->vsb.visible * */ VSB_WIDTH;
+		rect.min_y = dv->bounds.max_y - HSB_HEIGHT;
+		rect.max_y -= 0;
 		break;
 	case RECT_DVIEW_VSB:
-		rect->min_x = dv->bounds.max_x - VSB_WIDTH;
-		rect->max_x -= 0;
-		rect->min_y += TITLE_HEIGHT;
-		rect->max_y -= /* dv->hsb.visible * */ HSB_HEIGHT;
+		rect.min_x = dv->bounds.max_x - VSB_WIDTH;
+		rect.max_x -= 0;
+		rect.min_y += TITLE_HEIGHT;
+		rect.max_y -= /* dv->hsb.visible * */ HSB_HEIGHT;
 		break;
 	case RECT_DVIEW_SIZE:
-		rect->min_x = dv->bounds.max_x - VSB_WIDTH;
-		rect->max_x -= 0;
-		rect->min_y = dv->bounds.max_y - HSB_HEIGHT;
-		rect->max_y -= 0;
+		rect.min_x = dv->bounds.max_x - VSB_WIDTH;
+		rect.max_x -= 0;
+		rect.min_y = dv->bounds.max_y - HSB_HEIGHT;
+		rect.max_y -= 0;
 		break;
 	case RECT_DVIEW_TITLE:
-		rect->min_x += 0;
-		rect->max_x -= 0;
-		rect->min_y += 0;
-		rect->max_y = rect->min_y + TITLE_HEIGHT - 1;
+		rect.min_x += 0;
+		rect.max_x -= 0;
+		rect.min_y += 0;
+		rect.max_y = rect.min_y + TITLE_HEIGHT - 1;
 		break;
 	default:
 		assert_always(FALSE, "unknown rectangle type");
@@ -373,7 +342,7 @@ static void dview_draw_outlined_box(DView *dv, int rtype, int x, int y, int w, i
 {
 	rectangle r;
 
-	dview_get_rect(dv, rtype, &r);
+	dview_get_rect(dv, rtype, r);
 	ui_draw_outlined_box(dv->container, NX(dv, x + r.min_x), NY(dv, y + r.min_y),
 			NX(dv, x + r.min_x + w), NY(dv, y + r.min_y + h), bg);
 }
@@ -382,7 +351,7 @@ static void dview_draw_box(DView *dv, int rtype, int x, int y, int w, int h, rgb
 {
 	rectangle r;
 
-	dview_get_rect(dv, rtype, &r);
+	dview_get_rect(dv, rtype, r);
 	dv->container->add_rect(NX(dv, x + r.min_x), NY(dv, y + r.min_y),
 			NX(dv, x + r.min_x + w), NY(dv, y + r.min_y + h), col,
 			PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -392,13 +361,13 @@ static void dview_draw_char(DView *dv, int rtype, int x, int y, int h, rgb_t col
 {
 	rectangle r;
 
-	dview_get_rect(dv, rtype, &r);
+	dview_get_rect(dv, rtype, r);
 	dv->container->add_char(
 			NX(dv, x + r.min_x),
 			NY(dv, y + r.min_y),
 			NY(dv, h),
 			debug_font_aspect,
-			//(float) rect_get_height(&dv->bounds) / (float) rect_get_width(&dv->bounds), //render_get_ui_aspect(),
+			//(float) dv->bounds.height() / (float) dv->bounds->width(), //render_get_ui_aspect(),
 			col,
 			*debug_font,
 			ch);
@@ -408,7 +377,7 @@ static int dview_xy_in_rect(DView *dv, int type, int x, int y)
 {
 	rectangle r;
 
-	dview_get_rect(dv, type, &r);
+	dview_get_rect(dv, type, r);
 	if (x >= r.min_x && x <= r.max_x && y >= r.min_y && y <= r.max_y)
 		return TRUE;
 	return FALSE;
@@ -423,10 +392,10 @@ static void dview_draw_hsb(DView *dv)
 	rectangle r;
 	adjustment *sb = &dv->hsb;
 
-	dview_get_rect(dv, RECT_DVIEW_HSB, &r);
+	dview_get_rect(dv, RECT_DVIEW_HSB, r);
 
 	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, 0, 0, VSB_WIDTH,HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
-	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, rect_get_width(&r) - VSB_WIDTH, 0, VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, r.width() - VSB_WIDTH, 0, VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
 
 	ts = (r.max_x - r.min_x + 1) - 2 * VSB_WIDTH;
 
@@ -447,10 +416,10 @@ static void dview_draw_vsb(DView *dv)
 	rectangle r;
 	adjustment *sb = &dv->vsb;
 
-	dview_get_rect(dv, RECT_DVIEW_VSB, &r);
+	dview_get_rect(dv, RECT_DVIEW_VSB, r);
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, rect_get_height(&r) - HSB_HEIGHT, VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
-	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, 0,               VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, r.height() - HSB_HEIGHT, VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, 0,                       VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
 
 	ts = (r.max_y - r.min_y + 1) - 2 * HSB_HEIGHT;
 
@@ -466,10 +435,10 @@ static void dview_draw_size(DView *dv)
 {
 	rectangle r;
 
-	dview_get_rect(dv, RECT_DVIEW_SIZE, &r);
+	dview_get_rect(dv, RECT_DVIEW_SIZE, r);
 
 	dview_draw_outlined_box(dv, RECT_DVIEW_SIZE, 0, 0,
-			rect_get_width(&r),rect_get_height(&r), MAKE_ARGB(0xff, 0xff, 0xff, 0x00));
+			r.width(),r.height(), MAKE_ARGB(0xff, 0xff, 0xff, 0x00));
 }
 
 static void dview_set_title(DView *dv, astring title)
@@ -487,12 +456,12 @@ static void dview_draw_title(DView *dv)
 	rgb_t col = MAKE_ARGB(0xff,0x00,0x00,0xff);
 	rectangle r;
 
-	dview_get_rect(dv, RECT_DVIEW_TITLE, &r);
+	dview_get_rect(dv, RECT_DVIEW_TITLE, r);
 
 	if (dv == focus_view)
 		col = MAKE_ARGB(0xff,0x00,0x7f,0x00);
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_TITLE, 0, 0, rect_get_width(&dv->bounds), TITLE_HEIGHT, col);
+	dview_draw_outlined_box(dv, RECT_DVIEW_TITLE, 0, 0, dv->bounds.width(), TITLE_HEIGHT, col);
 
 	if (!dv->title)
 		return;
@@ -562,13 +531,13 @@ static int dview_on_mouse(DView *dv, int mx, int my, int button)
 			rectangle r;
 			int xt;
 
-			dview_get_rect(dv, RECT_DVIEW_HSB, &r);
+			dview_get_rect(dv, RECT_DVIEW_HSB, r);
 			x -= r.min_x;
 
-			xt = (x - VSB_WIDTH) * (sb->upper - sb->lower) / (rect_get_width(&r) - 2 * dv->vsb.visible * VSB_WIDTH) + sb->lower;
+			xt = (x - VSB_WIDTH) * (sb->upper - sb->lower) / (r.width() - 2 * dv->vsb.visible * VSB_WIDTH) + sb->lower;
 			if (x < VSB_WIDTH)
 				sb->value -= sb->step_increment;
-			else if (x > rect_get_width(&r) - VSB_WIDTH)
+			else if (x > r.width() - VSB_WIDTH)
 				sb->value += sb->step_increment;
 			else if (xt < sb->value)
 				sb->value -= sb->page_increment;
@@ -601,13 +570,13 @@ static int dview_on_mouse(DView *dv, int mx, int my, int button)
 			rectangle r;
 			int yt;
 
-			dview_get_rect(dv, RECT_DVIEW_VSB, &r);
+			dview_get_rect(dv, RECT_DVIEW_VSB, r);
 			y -= r.min_y;
-			yt = (y - HSB_HEIGHT) * (sb->upper - sb->lower) / (rect_get_height(&r) - 2 * HSB_HEIGHT) + sb->lower;
+			yt = (y - HSB_HEIGHT) * (sb->upper - sb->lower) / (r.height() - 2 * HSB_HEIGHT) + sb->lower;
 
 			if (y < HSB_HEIGHT)
 				sb->value -= sb->step_increment;
-			else if (y > rect_get_height(&r) - HSB_HEIGHT)
+			else if (y > r.height() - HSB_HEIGHT)
 				sb->value += sb->step_increment;
 			else if (yt < sb->value)
 				sb->value -= sb->page_increment;
@@ -712,11 +681,11 @@ static void dview_draw(DView *dv)
 
 	dview_draw_title(dv);
 
-	dview_get_rect(dv, RECT_DVIEW_CLIENT, &r);
+	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
 	dview_draw_outlined_box(dv, RECT_DVIEW_CLIENT, 0, 0,
-			rect_get_width(&r) /*- (dv->vs ? VSB_WIDTH : 0)*/,
-			rect_get_height(&r) /*- (dv->hsb.visible ? HSB_HEIGHT : 0)*/, bg_base);
+			r.width() /*- (dv->vs ? VSB_WIDTH : 0)*/,
+			r.height() /*- (dv->hsb.visible ? HSB_HEIGHT : 0)*/, bg_base);
 
 	/* background first */
 	viewdata = dv->view->viewdata();
@@ -785,8 +754,8 @@ static void dview_size_allocate(DView *dv)
 	dv->container->get_user_settings(rcus);
 	rcus.m_xoffset = (float) dv->ofs_x / (float) dv->rt_width;
 	rcus.m_yoffset = (float) dv->ofs_y / (float) dv->rt_height;
-	rcus.m_xscale = 1.0; //(float) rect_get_width(&dv->bounds) / (float) dv->rt_width;
-	rcus.m_yscale = 1.0; //(float) rect_get_height(&dv->bounds) / (float) dv->rt_height;
+	rcus.m_xscale = 1.0; //(float) dv->bounds.width() / (float) dv->rt_width;
+	rcus.m_yscale = 1.0; //(float) dv->bounds.height() / (float) dv->rt_height;
 	dv->container->set_user_settings(rcus);
 	//printf("%d %d %d %d\n", wpos.min_x, wpos.max_x, wpos.min_y, wpos.max_y);
 
@@ -795,18 +764,18 @@ static void dview_size_allocate(DView *dv)
 
 	dv->hsb.visible = 0;
 	dv->vsb.visible = 0;
-	dview_get_rect(dv, RECT_DVIEW_CLIENT, &r);
+	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
-	dv->hsb.visible = (size.x * debug_font_width > rect_get_width(&r) ? 1 : 0);
-	dv->vsb.visible = (size.y * debug_font_height > rect_get_height(&r) ? 1 : 0);
-	dview_get_rect(dv, RECT_DVIEW_CLIENT, &r);
+	dv->hsb.visible = (size.x * debug_font_width > r.width() ? 1 : 0);
+	dv->vsb.visible = (size.y * debug_font_height > r.height() ? 1 : 0);
+	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
-	dv->hsb.visible = (size.x * debug_font_width > rect_get_width(&r) ? 1 : 0);
-	dv->vsb.visible = (size.y * debug_font_height > rect_get_height(&r) ? 1 : 0);
-	dview_get_rect(dv, RECT_DVIEW_CLIENT, &r);
+	dv->hsb.visible = (size.x * debug_font_width > r.width() ? 1 : 0);
+	dv->vsb.visible = (size.y * debug_font_height > r.height() ? 1 : 0);
+	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
-	col.y = (rect_get_height(&r) - 2 * BORDER_YTHICKNESS /*+ debug_font_height  - 1*/) / debug_font_height;
-	col.x = (rect_get_width(&r) - 2 * BORDER_XTHICKNESS /*+ debug_font_width - 1*/) / debug_font_width;
+	col.y = (r.height() - 2 * BORDER_YTHICKNESS /*+ debug_font_height  - 1*/) / debug_font_height;
+	col.x = (r.width() - 2 * BORDER_XTHICKNESS /*+ debug_font_width - 1*/) / debug_font_width;
 
 	vsize.y = size.y - pos.y;
 	vsize.x = size.x - pos.x;
@@ -831,7 +800,7 @@ static void dview_size_allocate(DView *dv)
 	dv->view->set_visible_size(vsize);
 
 	if(dv->hsb.visible) {
-		int span = (rect_get_width(&r) - 2 * BORDER_XTHICKNESS) / debug_font_width;
+		int span = (r.width() - 2 * BORDER_XTHICKNESS) / debug_font_width;
 
 		if(pos.x + span > size.x)
 			pos.x = size.x - span;
@@ -848,7 +817,7 @@ static void dview_size_allocate(DView *dv)
 	}
 
 	if(dv->vsb.visible) {
-		int span = (rect_get_height(&r) - 2 * BORDER_YTHICKNESS) / debug_font_height;
+		int span = (r.height() - 2 * BORDER_YTHICKNESS) / debug_font_height;
 
 		if(pos.y + span > size.y)
 			pos.y = size.y - span;

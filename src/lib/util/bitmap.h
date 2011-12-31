@@ -100,7 +100,12 @@ public:
 	bool contains(INT32 x, INT32 y) const { return (x >= min_x && x <= max_x && y >= min_y && y <= max_y); }
 	INT32 width() const { return max_x + 1 - min_x; }
 	INT32 height() const { return max_y + 1 - min_y; }
+	
+	// setters
 	void set(INT32 minx, INT32 maxx, INT32 miny, INT32 maxy) { min_x = minx; max_x = maxx; min_y = miny; max_y = maxy; }
+	void set_width(INT32 width) { max_x = min_x + width - 1; }
+	void set_height(INT32 height) { max_y = min_y + height - 1; }
+	void set_origin(INT32 x, INT32 y) { max_x += x - min_x; max_y += y - min_y; min_x = x; min_y = y; }
 
 	// internal state
 	INT32			min_x;			// minimum X, or left coordinate
