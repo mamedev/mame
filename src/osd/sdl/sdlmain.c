@@ -23,7 +23,7 @@
 #endif
 #endif
 
-// standard includes              c/mess/src/
+// standard includes
 #if !defined(SDLMAME_WIN32) && !defined(SDLMAME_OS2)
 #include <unistd.h>
 #endif
