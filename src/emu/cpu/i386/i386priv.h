@@ -989,5 +989,39 @@ INLINE void WRITEPORT32(i386_state *cpustate, offs_t port, UINT32 value)
 	}
 }
 
+/***********************************************************************************
+    MSR ACCESS
+***********************************************************************************/
+
+INLINE UINT64 MSR_READ(i386_state *cpustate, UINT32 offset,UINT8 *valid_msr)
+{
+	UINT64 res;
+
+	*valid_msr = 0;
+
+	switch(offset)
+	{
+		default:
+			logerror("RDMSR: unimplemented register called %08x at %08x\n",offset,cpustate->pc-2);
+			res = -1;
+			*valid_msr = 1;
+			break;
+	}
+
+	return res;
+}
+
+INLINE void MSR_WRITE(i386_state *cpustate, UINT32 offset, UINT64 data, UINT8 *valid_msr)
+{
+	*valid_msr = 0;
+
+	switch(offset)
+	{
+		default:
+			logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n",offset,(UINT32)(data >> 32),(UINT32)data,cpustate->pc-2);
+			*valid_msr = 1;
+			break;
+	}
+}
 
 #endif /* __I386_H__ */

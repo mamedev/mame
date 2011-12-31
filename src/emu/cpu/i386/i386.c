@@ -3243,7 +3243,7 @@ CPU_GET_INFO( pentium )
 		case CPUINFO_INT_REGISTER + X87_ST7:			info->i = ST(7).f;						break;
 
 		case DEVINFO_STR_NAME:							strcpy(info->s, "PENTIUM");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel Pentium");		break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel Pentium");		break;
 		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "FPU_CW: %04X", cpustate->fpu_control_word); break;
 		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "FPU_SW: %04X", cpustate->fpu_status_word); break;
 		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", ST(0).f);	break;
