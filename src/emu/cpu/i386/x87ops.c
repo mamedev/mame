@@ -304,6 +304,25 @@ static void I386OP(fpu_group_dd)(i386_state *cpustate)		// Opcode 0xdd
 
 		switch ((modrm >> 3) & 0x7)
 		{
+			case 0: // FLD
+			{
+				X87_REG t;
+				t.i = READ64(cpustate,ea);
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,3);
+				break;
+			}
+
+			case 2: // FST
+			{
+				X87_REG t;
+				t.f = ST(0).f;
+				WRITE64(cpustate,ea, t.i);
+				FPU_POP(cpustate);
+				CYCLES(cpustate,8);
+				break;
+			}
+
 			case 7:			// FSTSW
 			{
 				WRITE16(cpustate,ea, (cpustate->fpu_status_word & ~FPU_STACK_TOP_MASK) | (cpustate->fpu_top << 10));
@@ -312,7 +331,7 @@ static void I386OP(fpu_group_dd)(i386_state *cpustate)		// Opcode 0xdd
 			}
 
 			default:
-				fatalerror("I386: FPU Op DD %02X at %08X", modrm, cpustate->pc-2);
+				fatalerror("I386: FPU Op DD %02X (%02X) at %08X", modrm, (modrm >> 3) & 7, cpustate->pc-2);
 		}
 	}
 	else
