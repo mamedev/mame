@@ -23,7 +23,7 @@
 #endif
 #endif
 
-// standard includes
+// standard includes              c/mess/src/
 #if !defined(SDLMAME_WIN32) && !defined(SDLMAME_OS2)
 #include <unistd.h>
 #endif
@@ -1078,7 +1078,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 		bitmap = auto_alloc(machine(), bitmap_t(drawsurf->w, drawsurf->h, BITMAP_FORMAT_ARGB32));
 
 		// copy the rendered character image into it
-		for (int y = 0; y < bitmap->height; y++)
+		for (int y = 0; y < bitmap->height(); y++)
 		{
 			UINT32 *dstrow = &bitmap->pix32(y);
 			UINT8 *srcrow = (UINT8 *)drawsurf->pixels;
