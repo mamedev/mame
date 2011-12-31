@@ -3,6 +3,9 @@
 
     Skeleton driver by R. Belmont, based on taitowlf.c by Ville Linde
 
+	Note:
+	- bp 000F16B5 do bx=0x16bb (can't skip this check?)
+
     Specs: P3-866, SiS 630 graphics card, SiS 7018 sound, Windows 98, DirectX 8.1.
 
     Input is via a custom COM1 port JAMMA adaptor.
@@ -190,15 +193,14 @@ static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
 static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-//  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
-
+	printf("MXTC: read %d, %02X\n", function, reg);
 	return state->m_mxtc_config_reg[reg];
 }
 
 static void mxtc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
+	printf("%s:MXTC: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -210,7 +212,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("user1")->base() + 0x30000);
+				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0x30000);
 			}
 			break;
 		}
@@ -277,14 +279,14 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-//  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
+	printf("PIIX4: read %d, %02X\n", function, reg);
 	return state->m_piix4_config_reg[function][reg];
 }
 
 static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
 	gamecstl_state *state = busdevice->machine().driver_data<gamecstl_state>();
-//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
+	printf("%s:PIIX4: write %d, %02X, %02X\n", busdevice->machine().describe_context(), function, reg, data);
 	state->m_piix4_config_reg[function][reg] = data;
 }
 
@@ -520,7 +522,7 @@ static ADDRESS_MAP_START( gamecstl_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gamecstl_io, AS_IO, 32)
@@ -533,6 +535,7 @@ static ADDRESS_MAP_START(gamecstl_io, AS_IO, 32)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
+	AM_RANGE(0x00ec, 0x00ef) AM_NOP
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
@@ -618,7 +621,7 @@ static MACHINE_START(gamecstl)
 
 static MACHINE_RESET(gamecstl)
 {
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base() + 0x30000);
+	memory_set_bankptr(machine, "bank1", machine.region("bios")->base() + 0x30000);
 
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 }
@@ -778,22 +781,22 @@ static DRIVER_INIT( gamecstl )
 
 // not the correct BIOS, f205v owes me a dump of it...
 ROM_START(gamecstl)
-	ROM_REGION32_LE(0x40000, "user1", 0)
-	ROM_LOAD( "bios.bin",     0x000000, 0x040000, CRC(27834ce9) SHA1(134c546dd75138c6f4bc5729b40e20e118454df9) )
+	ROM_REGION32_LE(0x40000, "bios", 0)
+	ROM_LOAD( "bios.bin",     0x000000, 0x040000, BAD_DUMP CRC(27834ce9) SHA1(134c546dd75138c6f4bc5729b40e20e118454df9) )
 
 	ROM_REGION(0x08100, "gfx1", 0)
-	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "ide" )
 	DISK_IMAGE( "gamecstl", 0, SHA1(b431af3c42c48ba07972d77a3d24e60ee1e4359e) )
 ROM_END
 
 ROM_START(gamecst2)
-	ROM_REGION32_LE(0x40000, "user1", 0)
-	ROM_LOAD( "bios.bin",     0x000000, 0x040000, CRC(27834ce9) SHA1(134c546dd75138c6f4bc5729b40e20e118454df9) )
+	ROM_REGION32_LE(0x40000, "bios", 0)
+	ROM_LOAD( "bios.bin",     0x000000, 0x040000, BAD_DUMP CRC(27834ce9) SHA1(134c546dd75138c6f4bc5729b40e20e118454df9) )
 
 	ROM_REGION(0x08100, "gfx1", 0)
-	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "ide" )
 	DISK_IMAGE( "gamecst2", 0, SHA1(14e1b311cb474801c7bdda3164a0c220fb102159) )
