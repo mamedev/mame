@@ -829,6 +829,9 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 		track->pgsubsize = 0;
 		cdrom_convert_type_string_to_pregap_info(pgtype, track);
 		cdrom_convert_subtype_string_to_pregap_info(pgsub, track);
+
+        /* set the postgap info */
+        track->postgap = postgap;
 	}
 
 	/* if we got any tracks this way, we're done */

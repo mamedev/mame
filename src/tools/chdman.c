@@ -1661,7 +1661,7 @@ static int do_extractcd(int argc, char *argv[], int param)
 				f %= 75;
 				m = s / 60;
 				s %= 60;
-				fprintf(outfile, "  POSTGAP %02d:%02d:%02d\n", m, s, f);
+				fprintf(outfile, "    POSTGAP %02d:%02d:%02d\n", m, s, f);
 			}
 		}
 		else
