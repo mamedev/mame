@@ -3,12 +3,16 @@
 static void PENTIUMOP(rdmsr)(i386_state *cpustate)			// Opcode 0x0f 32
 {
 	// TODO
+	logerror("Unemulated RDMSR opcode called\n");
+
 	CYCLES(cpustate,CYCLES_RDMSR);
 }
 
 static void PENTIUMOP(wrmsr)(i386_state *cpustate)			// Opcode 0x0f 30
 {
 	// TODO
+	logerror("Unemulated WRMSR opcode called\n");
+
 	CYCLES(cpustate,1);		// TODO: correct cycle count
 }
 
@@ -23,6 +27,8 @@ static void PENTIUMOP(rdtsc)(i386_state *cpustate)			// Opcode 0x0f 31
 
 static void I386OP(cyrix_unknown)(i386_state *cpustate)		// Opcode 0x0f 74
 {
+	logerror("Unemulated 0x0f 0x74 opcode called\n");
+
 	CYCLES(cpustate,1);
 }
 
@@ -54,6 +60,7 @@ static void PENTIUMOP(sse_group0fae)(i386_state *cpustate)	// Opcode 0x0f ae
 {
 	UINT8 modm = FETCH(cpustate);
 	if( modm == 0xf8 ) {
+		logerror("Unemulated SFENCE opcode called\n");
 		CYCLES(cpustate,1); // sfence instruction
 	} else {
 		fatalerror("pentium: bad/unsupported 0f ae opcode");
