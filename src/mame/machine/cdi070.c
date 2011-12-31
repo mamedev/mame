@@ -216,9 +216,9 @@ static void quizard_set_seeds(UINT8 *rx)
 
 static void quizard_calculate_state(running_machine &machine, scc68070_regs_t *scc68070)
 {
-	const UINT16 desired_bitfield = mcu_value;
+	//const UINT16 desired_bitfield = mcu_value;
 	const UINT16 field0 = 0x00ff;
-	const UINT16 field1 = desired_bitfield ^ field0;
+	const UINT16 field1 = mcu_value ^ 0x00ff;
 
 	UINT16 total0 = 0;
 	UINT16 total1 = 0;
@@ -275,7 +275,7 @@ static void quizard_handle_byte_tx(running_machine &machine, scc68070_regs_t *sc
 	static UINT8 rx_ptr = 0xff;
 	UINT8 tx = scc68070->uart.transmit_holding_register;
 
-	//printf("T: %02x ", tx );
+	//printf("%02x ", tx );
 	if((tx >= 0x20 && tx < 0x7f) || tx == 0x0d || tx == 0x0a)
 	{
 		//printf("%c ", tx);
@@ -325,9 +325,18 @@ static void quizard_handle_byte_tx(running_machine &machine, scc68070_regs_t *sc
 			break;
 
 		case 2: // Receiving the seed acknowledge
+		case 4:
 			if(tx == mcu_ack)
 			{
-				state = 0;
+				if(state == 2)
+				{
+					state = 4;
+				}
+				else
+				{
+					state = 0;
+				}
+				//printf("Sending seed ack\n");
 				scc68070_uart_rx(machine, scc68070, 0x5a);
 				scc68070_uart_rx(machine, scc68070, g_state[0]);
 				scc68070_uart_rx(machine, scc68070, g_state[1]);
@@ -345,7 +354,7 @@ static void quizard_handle_byte_tx(running_machine &machine, scc68070_regs_t *sc
 			rx_ptr++;
 			if(tx == 0x0a)
 			{
-				rx[rx_ptr] = 0;
+				/*rx[rx_ptr] = 0;
 				//printf("Database path: %s\n", rx);
 				scc68070_uart_rx(machine, scc68070, 0x5a);
 				scc68070_uart_rx(machine, scc68070, g_state[0]);
@@ -355,7 +364,7 @@ static void quizard_handle_byte_tx(running_machine &machine, scc68070_regs_t *sc
 				scc68070_uart_rx(machine, scc68070, g_state[4]);
 				scc68070_uart_rx(machine, scc68070, g_state[5]);
 				scc68070_uart_rx(machine, scc68070, g_state[6]);
-				scc68070_uart_rx(machine, scc68070, g_state[7]);
+				scc68070_uart_rx(machine, scc68070, g_state[7]);*/
 				state = 0;
 			}
 			break;

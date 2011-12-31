@@ -11704,9 +11704,12 @@ cashtrn		//
 // Quizard (Philips CD-I based HW)
 cdimono1		// Base unit
 quizard			// (c) TAB Austria 1996
-quizrd22		// (c) TAB Austria 1995
-quizrd17		// (c) TAB Austria 1996
 quizrd12		// (c) TAB Austria 1996
+quizrd17		// (c) TAB Austria 1996
+quizrd18		// (c) TAB Austria 199?
+quizrd22		// (c) TAB Austria 1995
+quizrd23		// (c) TAB Austria 199?
+quizrd34		// (c) TAB Austria 199?
 quizrr42		// (c) TAB Austria 1998
 quizrr41		// (c) TAB Austria 1998
 quizrr40		// (c) TAB Austria 1997
