@@ -6,7 +6,8 @@
 
  I've also seen CDs of this for sale, so maybe there should be a CD too, for the music?
 
-
+TODO:
+can't be emulated without proper mb bios
 
  -- set info
 

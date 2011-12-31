@@ -2,6 +2,9 @@
 
  IGS PC based hardware
 
+TODO:
+can't be emulated without proper mb bios
+
  4 boards
     1x NV440 gfx card
     1x sound card

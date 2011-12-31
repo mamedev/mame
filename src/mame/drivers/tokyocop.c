@@ -1,5 +1,8 @@
 /* Tokyo Cop
 
+TODO:
+can't be emulated without proper mb bios
+
 Italian Version
 
 PC based hardware
