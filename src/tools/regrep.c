@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <new>
 #include "osdcore.h"
 #include "png.h"
 
@@ -779,7 +780,7 @@ static void output_report(const astring *dirname, const astring *tempheader, con
 
 static int compare_screenshots(summary_file *curfile)
 {
-	bitmap_t *bitmaps[MAX_COMPARES];
+	bitmap_t *bitmaps[MAX_COMPARES] = { NULL };
 	int unique[MAX_COMPARES];
 	int numunique = 0;
 	int listnum;
@@ -837,19 +838,19 @@ static int compare_screenshots(summary_file *curfile)
 				int x, y;
 
 				/* if the sizes are different, we differ; otherwise start off assuming we are the same */
-				bitmaps_differ = (this_bitmap->width != base_bitmap->width || this_bitmap->height != base_bitmap->height);
+				bitmaps_differ = (this_bitmap->width() != base_bitmap->width() || this_bitmap->height() != base_bitmap->height());
 
 				/* compare scanline by scanline */
-				for (y = 0; y < this_bitmap->height && !bitmaps_differ; y++)
+				for (y = 0; y < this_bitmap->height() && !bitmaps_differ; y++)
 				{
-					UINT32 *base = BITMAP_ADDR32(base_bitmap, y, 0);
-					UINT32 *curr = BITMAP_ADDR32(this_bitmap, y, 0);
+					UINT32 *base = &base_bitmap->pix32(y);
+					UINT32 *curr = &this_bitmap->pix32(y);
 
 					/* scan the scanline */
-					for (x = 0; x < this_bitmap->width; x++)
+					for (x = 0; x < this_bitmap->width(); x++)
 						if (*base++ != *curr++)
 							break;
-					bitmaps_differ = (x != this_bitmap->width);
+					bitmaps_differ = (x != this_bitmap->width());
 				}
 
 				/* if we matched, remember which listnum index we matched, and stop */
@@ -876,8 +877,7 @@ static int compare_screenshots(summary_file *curfile)
 
 	/* free the bitmaps */
 	for (listnum = 0; listnum < list_count; listnum++)
-		if (bitmaps[listnum] != NULL)
-			bitmap_free(bitmaps[listnum]);
+		delete bitmaps[listnum];
 
 	/* if all screenshots matched, we're good */
 	if (numunique == 1)
@@ -942,24 +942,24 @@ static int generate_png_diff(const summary_file *curfile, const astring *destdir
 
 	/* determine the size of the final bitmap */
 	height = width = 0;
-	maxwidth = bitmaps[0]->width;
+	maxwidth = bitmaps[0]->width();
 	for (bmnum = 1; bmnum < bitmapcount; bmnum++)
 	{
 		int curwidth;
 
 		/* determine the maximal width */
-		maxwidth = MAX(maxwidth, bitmaps[bmnum]->width);
-		curwidth = bitmaps[0]->width + BITMAP_SPACE + maxwidth + BITMAP_SPACE + maxwidth;
+		maxwidth = MAX(maxwidth, bitmaps[bmnum]->width());
+		curwidth = bitmaps[0]->width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE + maxwidth;
 		width = MAX(width, curwidth);
 
 		/* add to the height */
-		height += MAX(bitmaps[0]->height, bitmaps[bmnum]->height);
+		height += MAX(bitmaps[0]->height(), bitmaps[bmnum]->height());
 		if (bmnum != 1)
 			height += BITMAP_SPACE;
 	}
 
 	/* allocate the final bitmap */
-	finalbitmap = bitmap_alloc(width, height, BITMAP_FORMAT_ARGB32);
+	finalbitmap = new(std::nothrow) bitmap_t(width, height, BITMAP_FORMAT_ARGB32);
 	if (finalbitmap == NULL)
 		goto error;
 
@@ -969,33 +969,33 @@ static int generate_png_diff(const summary_file *curfile, const astring *destdir
 	{
 		bitmap_t *bitmap1 = bitmaps[0];
 		bitmap_t *bitmap2 = bitmaps[bmnum];
-		int curheight = MAX(bitmap1->height, bitmap2->height);
+		int curheight = MAX(bitmap1->height(), bitmap2->height());
 		int x, y;
 
 		/* iterate over rows in these bitmaps */
 		for (y = 0; y < curheight; y++)
 		{
-			UINT32 *src1 = (y < bitmap1->height) ? BITMAP_ADDR32(bitmap1, y, 0) : NULL;
-			UINT32 *src2 = (y < bitmap2->height) ? BITMAP_ADDR32(bitmap2, y, 0) : NULL;
-			UINT32 *dst1 = BITMAP_ADDR32(finalbitmap, starty + y, 0);
-			UINT32 *dst2 = BITMAP_ADDR32(finalbitmap, starty + y, bitmap1->width + BITMAP_SPACE);
-			UINT32 *dstdiff = BITMAP_ADDR32(finalbitmap, starty + y, bitmap1->width + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
+			UINT32 *src1 = (y < bitmap1->height()) ? &bitmap1->pix32(y) : NULL;
+			UINT32 *src2 = (y < bitmap2->height()) ? &bitmap2->pix32(y) : NULL;
+			UINT32 *dst1 = &finalbitmap->pix32(starty + y, 0);
+			UINT32 *dst2 = &finalbitmap->pix32(starty + y, bitmap1->width() + BITMAP_SPACE);
+			UINT32 *dstdiff = &finalbitmap->pix32(starty + y, bitmap1->width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
 
 			/* now iterate over columns */
 			for (x = 0; x < maxwidth; x++)
 			{
 				int pix1 = -1, pix2 = -2;
 
-				if (src1 != NULL && x < bitmap1->width)
+				if (src1 != NULL && x < bitmap1->width())
 					pix1 = dst1[x] = src1[x];
-				if (src2 != NULL && x < bitmap2->width)
+				if (src2 != NULL && x < bitmap2->width())
 					pix2 = dst2[x] = src2[x];
 				dstdiff[x] = (pix1 != pix2) ? 0xffffffff : 0xff000000;
 			}
 		}
 
 		/* update the starting Y position */
-		starty += BITMAP_SPACE + MAX(bitmap1->height, bitmap2->height);
+		starty += BITMAP_SPACE + MAX(bitmap1->height(), bitmap2->height());
 	}
 
 	/* write the final PNG */
@@ -1011,11 +1011,9 @@ static int generate_png_diff(const summary_file *curfile, const astring *destdir
 	error = 0;
 
 error:
-	if (finalbitmap != NULL)
-		bitmap_free(finalbitmap);
+	delete finalbitmap;
 	for (bmnum = 0; bmnum < bitmapcount; bmnum++)
-		if (bitmaps[bmnum] != NULL)
-			bitmap_free(bitmaps[bmnum]);
+		delete bitmaps[bmnum];
 	if (error)
 		osd_rmfile(astring_c(dstfilename));
 	astring_free(dstfilename);

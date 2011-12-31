@@ -41,6 +41,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <math.h>
+#include <new>
 #include "bitmap.h"
 #include "chd.h"
 #include "vbiparse.h"
@@ -150,7 +151,7 @@ INLINE UINT32 sample_number_to_field(const movie_info *info, UINT32 samplenum, U
 static int chd_allocate_buffers(movie_info *info)
 {
 	/* allocate a bitmap */
-	info->bitmap = bitmap_alloc(info->width, info->height, BITMAP_FORMAT_YUY16);
+	info->bitmap = new(std::nothrow) bitmap_t(info->width, info->height, BITMAP_FORMAT_YUY16);
 	if (info->bitmap == NULL)
 	{
 		fprintf(stderr, "Out of memory creating %dx%d bitmap\n", info->width, info->height);

@@ -40,6 +40,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <new>
 #include "aviio.h"
 #include "bitmap.h"
 #include "chd.h"
@@ -271,13 +272,9 @@ static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 	for (fieldnum = 0; fieldnum < interlace_factor; fieldnum++)
 	{
 		/* make a fake bitmap for this field */
-		bitmap_clone_existing(&fakebitmap, bitmap);
-		fakebitmap.base = BITMAP_ADDR16(&fakebitmap, fieldnum, 0);
-		fakebitmap.rowpixels *= interlace_factor;
-		fakebitmap.height /= interlace_factor;
+		avconfig.video = new(&fakebitmap) bitmap_t(&bitmap->pix16(fieldnum), bitmap->width(), bitmap->height() / interlace_factor, bitmap->rowpixels() * interlace_factor, bitmap->format());
 
 		/* configure the codec */
-		avconfig.video = &fakebitmap;
 		avconfig.maxsamples = 48000;
 		avconfig.actsamples = &numsamples;
 		avconfig.audio[0] = &lsound[*samples];
@@ -366,7 +363,7 @@ static void verify_video(video_info *video, int frame, bitmap_t *bitmap)
 			fprintf(stderr, "%6d.%d...\r", frame, fieldnum);
 
 		/* parse the VBI data */
-		vbi_parse_all(BITMAP_ADDR16(bitmap, fieldnum, 0), bitmap->rowpixels * 2, bitmap->width, 8, &metadata);
+		vbi_parse_all(&bitmap->pix16(fieldnum), bitmap->rowpixels() * 2, bitmap->width(), 8, &metadata);
 
 		/* if we have data in both 17 and 18, it should match */
 		if (metadata.line17 != 0 && metadata.line18 != 0 && metadata.line17 != metadata.line18)
@@ -522,7 +519,7 @@ static void verify_video(video_info *video, int frame, bitmap_t *bitmap)
 
 		/* now examine the active video signal */
 		pixels = 0;
-		for (y = 22*2 + fieldnum; y < bitmap->height; y += 2)
+		for (y = 22*2 + fieldnum; y < bitmap->height(); y += 2)
 		{
 			for (x = 16; x < 720 - 16; x++)
 			{
@@ -618,7 +615,7 @@ static void verify_video(video_info *video, int frame, bitmap_t *bitmap)
 
 static void verify_video_final(video_info *video, int frame, bitmap_t *bitmap)
 {
-	int fields_per_frame = (bitmap->height >= 288) ? 2 : 1;
+	int fields_per_frame = (bitmap->height() >= 288) ? 2 : 1;
 	int field = frame * fields_per_frame;
 
 	/* did we ever see any white flags? */
@@ -803,7 +800,7 @@ int main(int argc, char *argv[])
 		printf("WARNING: Unexpected sampele rate (should be 48000Hz)\n");
 
 	/* allocate a bitmap */
-	bitmap = bitmap_alloc(info.width, info.height, BITMAP_FORMAT_YUY16);
+	bitmap = new(std::nothrow) bitmap_t(info.width, info.height, BITMAP_FORMAT_YUY16);
 	if (bitmap == NULL)
 	{
 		isavi ? close_avi(file) : close_chd(file);
@@ -817,7 +814,7 @@ int main(int argc, char *argv[])
 	if (lsound == NULL || rsound == NULL)
 	{
 		isavi ? close_avi(file) : close_chd(file);
-		bitmap_free(bitmap);
+		delete bitmap;
 		if (rsound != NULL)
 			free(rsound);
 		if (lsound != NULL)
@@ -843,7 +840,7 @@ int main(int argc, char *argv[])
 	verify_audio_final(&audio);
 
 	/* free memory */
-	bitmap_free(bitmap);
+	delete bitmap;
 	free(lsound);
 	free(rsound);
 

@@ -49,6 +49,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <ctype.h>
+#include <new>
 
 
 /***************************************************************************
@@ -878,13 +879,10 @@ static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 	}
 
 	/* build the fake bitmap */
-	bitmap_clone_existing(avconfig->video, fullbitmap);
-	if (interlaced)
-	{
-		avconfig->video->base = BITMAP_ADDR16(avconfig->video, framenum % interlace_factor, 0);
-		avconfig->video->rowpixels *= 2;
-		avconfig->video->height /= 2;
-	}
+	if (!interlaced)
+		avconfig->video->clone_existing(*fullbitmap);
+	else
+		avconfig->video = new(avconfig->video) bitmap_t(&fullbitmap->pix16(framenum % interlace_factor), fullbitmap->width(), fullbitmap->height() / 2, fullbitmap->rowpixels() * 2, fullbitmap->format());
 
 cleanup:
 	return avierr;
@@ -948,30 +946,27 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 	}
 
 	/* build the fake bitmap */
-	bitmap_clone_existing(avconfig->video, fullbitmap);
-	if (interlaced)
-	{
-		avconfig->video->base = BITMAP_ADDR16(avconfig->video, framenum % interlace_factor, 0);
-		avconfig->video->rowpixels *= 2;
-		avconfig->video->height /= 2;
-	}
+	if (!interlaced)
+		avconfig->video->clone_existing(*fullbitmap);
+	else
+		avconfig->video = new(avconfig->video) bitmap_t(&fullbitmap->pix16(framenum % interlace_factor), fullbitmap->width(), fullbitmap->height() / 2, fullbitmap->rowpixels() * 2, fullbitmap->format());
 
 	/* loop over the data and copy it to the cache */
-	for (y = 0; y < avconfig->video->height; y++)
+	for (y = 0; y < avconfig->video->height(); y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(avconfig->video, y, 0);
+		UINT16 *dest = &avconfig->video->pix16(y);
 
 		/* white flag? */
 		if (y == 11 && whiteflag)
 		{
 			for (x = 0; x < AVI_FAKE_WIDTH; x++)
-				*dest++ = (x > 10 && x < avconfig->video->width - 10) ? 0xff80 : 0x0080;
+				*dest++ = (x > 10 && x < avconfig->video->width() - 10) ? 0xff80 : 0x0080;
 		}
 
 		/* line 17/18 */
 		else if ((y == 17 || y == 18) && line1718 != 0)
 		{
-			for (x = 0; x < avconfig->video->width; x++)
+			for (x = 0; x < avconfig->video->width(); x++)
 			{
 				UINT16 pixel = 0x0080;
 				if (x >= 20)
@@ -991,14 +986,14 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 		/* anything else in VBI-land */
 		else if (y < 22)
 		{
-			for (x = 0; x < avconfig->video->width; x++)
+			for (x = 0; x < avconfig->video->width(); x++)
 				*dest++ = 0x0080;
 		}
 
 		/* everything else */
 		else
 		{
-			for (x = 0; x < avconfig->video->width; x++)
+			for (x = 0; x < avconfig->video->width(); x++)
 				*dest++ = framenum;
 		}
 	}
@@ -1122,7 +1117,7 @@ static int do_createav(int argc, char *argv[], int param)
 	bytes_per_frame = 12 + channels * max_samples_per_frame * 2 + width * height * 2;
 
 	/* allocate a video buffer */
-	fullbitmap = bitmap_alloc(width, height * (interlaced ? 2 : 1), BITMAP_FORMAT_YUY16);
+	fullbitmap = new(std::nothrow) bitmap_t(width, height * (interlaced ? 2 : 1), BITMAP_FORMAT_YUY16);
 	if (fullbitmap == NULL)
 	{
 		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
@@ -1204,7 +1199,7 @@ static int do_createav(int argc, char *argv[], int param)
 		{
 			/* parse the data and pack it */
 			vbi_metadata vbi;
-			vbi_parse_all((const UINT16 *)avconfig.video->base, avconfig.video->rowpixels, avconfig.video->width, 8, &vbi);
+			vbi_parse_all(&avconfig.video->pix16(0), avconfig.video->rowpixels(), avconfig.video->width(), 8, &vbi);
 			vbi_metadata_pack(&ldframedata[framenum * VBI_PACKED_BYTES], framenum, &vbi);
 		}
 
@@ -1244,8 +1239,7 @@ cleanup:
 	for (chnum = 0; chnum < ARRAY_LENGTH(avconfig.audio); chnum++)
 		if (avconfig.audio[chnum] != NULL)
 			free(avconfig.audio[chnum]);
-	if (fullbitmap != NULL)
-		bitmap_free(fullbitmap);
+	delete fullbitmap;
 	if (ldframedata != NULL)
 		free(ldframedata);
 	if (err != CHDERR_NONE)
@@ -1878,7 +1872,7 @@ static int do_extractav(int argc, char *argv[], int param)
 	numframes = MIN(totalframes - firstframe, numframes);
 
 	/* allocate a video buffer */
-	fullbitmap = bitmap_alloc(width, height, BITMAP_FORMAT_YUY16);
+	fullbitmap = new(std::nothrow) bitmap_t(width, height, BITMAP_FORMAT_YUY16);
 	if (fullbitmap ==  NULL)
 	{
 		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
@@ -1941,13 +1935,10 @@ static int do_extractav(int argc, char *argv[], int param)
 		progress(framenum == 0, "Extracting hunk %d/%d...  \r", framenum, numframes);
 
 		/* set up the fake bitmap for this frame */
-		bitmap_clone_existing(avconfig.video, fullbitmap);
-		if (interlaced)
-		{
-			avconfig.video->base = BITMAP_ADDR16(avconfig.video, framenum % 2, 0);
-			avconfig.video->rowpixels *= 2;
-			avconfig.video->height /= 2;
-		}
+		if (!interlaced)
+			avconfig.video->clone_existing(*fullbitmap);
+		else
+			avconfig.video = new(avconfig.video) bitmap_t(&fullbitmap->pix16(framenum % 2), fullbitmap->width(), fullbitmap->height() / 2, fullbitmap->rowpixels() * 2, fullbitmap->format());
 
 		/* configure the decompressor for this frame */
 		chd_codec_config(chd, AV_CODEC_DECOMPRESS_CONFIG, &avconfig);
@@ -1991,8 +1982,7 @@ cleanup:
 	for (chnum = 0; chnum < ARRAY_LENGTH(avconfig.audio); chnum++)
 		if (avconfig.audio[chnum] != NULL)
 			free(avconfig.audio[chnum]);
-	if (fullbitmap != NULL)
-		bitmap_free(fullbitmap);
+	delete fullbitmap;
 	if (chd != NULL)
 		chd_close(chd);
 	if (err != CHDERR_NONE)
@@ -2228,7 +2218,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 	}
 
 	/* allocate a video buffer */
-	fullbitmap = bitmap_alloc(width, height, BITMAP_FORMAT_YUY16);
+	fullbitmap = new(std::nothrow) bitmap_t(width, height, BITMAP_FORMAT_YUY16);
 	if (fullbitmap ==  NULL)
 	{
 		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
@@ -2272,7 +2262,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 		progress(framenum == 0, "Processing hunk %d/%d...  \r", framenum, header.totalhunks);
 
 		/* set up the fake bitmap for this frame */
-		bitmap_clone_existing(avconfig.video, fullbitmap);
+		avconfig.video->clone_existing(*fullbitmap);
 
 		/* configure the decompressor for this frame */
 		chd_codec_config(chd, AV_CODEC_DECOMPRESS_CONFIG, &avconfig);
@@ -2289,7 +2279,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 		vbi_metadata_unpack(&origvbi, &vbiframe, &vbidata[framenum * VBI_PACKED_BYTES]);
 
 		/* parse the video data */
-		vbi_parse_all((const UINT16 *)avconfig.video->base, avconfig.video->rowpixels, avconfig.video->width, 8, &vbi);
+		vbi_parse_all(&avconfig.video->pix16(0), avconfig.video->rowpixels(), avconfig.video->width(), 8, &vbi);
 
 		/* verify the data */
 		if (vbiframe != 0 || origvbi.white != 0 || origvbi.line16 != 0 || origvbi.line17 != 0 || origvbi.line18 != 0 || origvbi.line1718 != 0)
@@ -2379,8 +2369,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 
 cleanup:
 	/* clean up our mess */
-	if (fullbitmap != NULL)
-		bitmap_free(fullbitmap);
+	delete fullbitmap;
 	if (vbidata != NULL)
 		free(vbidata);
 	if (chd != NULL)
