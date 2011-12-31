@@ -226,7 +226,7 @@ SCREEN_UPDATE( exedexes )
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 

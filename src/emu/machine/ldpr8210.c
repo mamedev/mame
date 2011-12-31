@@ -906,13 +906,13 @@ static void overlay_draw_group(bitmap_t *bitmap, const UINT8 *text, int count, f
 
 static void overlay_erase(bitmap_t *bitmap, float xstart, float xend)
 {
-	UINT32 xmin = (UINT32)(xstart * 256.0f * (float)bitmap->width);
-	UINT32 xmax = (UINT32)(xend * 256.0f * (float)bitmap->width);
+	UINT32 xmin = (UINT32)(xstart * 256.0f * (float)bitmap->width());
+	UINT32 xmax = (UINT32)(xend * 256.0f * (float)bitmap->width());
 	UINT32 x, y;
 
 	for (y = OVERLAY_Y; y < (OVERLAY_Y + (OVERLAY_Y_PIXELS + 2) * OVERLAY_PIXEL_HEIGHT); y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, xmin >> 8);
+		UINT16 *dest = &bitmap->pix16(y, xmin >> 8);
 		UINT16 ymin, ymax, yres;
 
 		ymax = *dest >> 8;
@@ -944,8 +944,8 @@ static void overlay_erase(bitmap_t *bitmap, float xstart, float xend)
 
 static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart)
 {
-	UINT32 xminbase = (UINT32)(xstart * 256.0f * (float)bitmap->width);
-	UINT32 xsize = (UINT32)(OVERLAY_PIXEL_WIDTH * 256.0f * (float)bitmap->width);
+	UINT32 xminbase = (UINT32)(xstart * 256.0f * (float)bitmap->width());
+	UINT32 xsize = (UINT32)(OVERLAY_PIXEL_WIDTH * 256.0f * (float)bitmap->width());
 	const UINT8 *chdataptr = &text_bitmap[ch & 0x3f][0];
 	UINT32 x, y, xx, yy;
 
@@ -961,7 +961,7 @@ static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart)
 				UINT32 xmax = xmin + xsize;
 				for (yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
 				{
-					UINT16 *dest = BITMAP_ADDR16(bitmap, OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
+					UINT16 *dest = &bitmap->pix16(OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
 					UINT16 ymin, ymax, yres;
 
 					ymax = 0xff;

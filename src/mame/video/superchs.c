@@ -215,7 +215,7 @@ SCREEN_UPDATE( superchs )
 	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	/* We have to assume 2nd to bottom layer is always underneath
        sprites as pdrawgfx cannot yet cope with more than 4 layers */

@@ -271,10 +271,10 @@ SCREEN_UPDATE( ppking )
 			int x = sx;
 			int y = (sy + state->m_fg_scrolly) & 0x1ff;
 
-			UINT16 *dest = BITMAP_ADDR16(bitmap, sy, sx);
+			UINT16 *dest = &bitmap->pix16(sy, sx);
 			while( x <= cliprect->max_x )
 			{
-				if( *BITMAP_ADDR8(flagsbitmap, y, x)&TILEMAP_PIXEL_LAYER0 )
+				if( flagsbitmap->pix8(y, x)&TILEMAP_PIXEL_LAYER0 )
 				{
 					*dest += 512;
 				}
@@ -308,6 +308,6 @@ SCREEN_UPDATE( gladiatr )
 		tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	}
 	else
-		bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 	return 0;
 }

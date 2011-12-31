@@ -86,7 +86,7 @@ static void draw_sky( bitmap_t *bitmap, const rectangle *cliprect )
 
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
-			*BITMAP_ADDR16(bitmap, y, x) = 128 + x / 2;
+			bitmap->pix16(y, x) = 128 + x / 2;
 }
 
 
@@ -220,7 +220,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 						{
 							int dx = flip_screen_x_get(machine) ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
-								*BITMAP_ADDR16(bitmap, dy, dx) = state->m_sprite_color_base + col;
+								bitmap->pix16(dy, dx) = state->m_sprite_color_base + col;
 						}
 
 						/* the following line is almost certainly wrong */
@@ -243,7 +243,7 @@ SCREEN_UPDATE( buggychl )
 	if (state->m_sky_on)
 		draw_sky(bitmap, cliprect);
 	else
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 
 	if (state->m_bg_on)
 		draw_bg(screen.machine(), bitmap, cliprect);

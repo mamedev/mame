@@ -300,8 +300,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 				// buffer the tile and rotate it into bitmap
 				if( rot )
 				{
-					bitmap_fill( state->m_tmpbitmap0, &spritetile_clip , 0);
-					bitmap_fill( state->m_tmpbitmap1, &spritetile_clip , 0);
+					state->m_tmpbitmap0->fill(0, spritetile_clip );
+					state->m_tmpbitmap1->fill(0, spritetile_clip );
 					drawgfxzoom_transpen(	state->m_tmpbitmap0,&spritetile_clip,machine.gfx[gfx],
 									code++,
 									color,
@@ -522,11 +522,11 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 
 	if (state->m_disable_video)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 	else
-		bitmap_fill(bitmap,cliprect,state->m_vregs[0xc/2] & 0x7fff);
+		bitmap->fill(state->m_vregs[0xc/2] & 0x7fff, *cliprect);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->m_tilemap_1,0,0);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->m_tilemap_0,0,0);
@@ -593,11 +593,11 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 
 	if (state->m_disable_video)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 	else
-		bitmap_fill(bitmap,cliprect,state->m_vregs[0xc/2] & 0x7fff);
+		bitmap->fill(state->m_vregs[0xc/2] & 0x7fff, *cliprect);
 
 
 

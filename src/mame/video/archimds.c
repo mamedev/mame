@@ -20,7 +20,7 @@ SCREEN_UPDATE( archimds_vidc )
 	const UINT8 x_step[4] = { 5, 7, 11, 19 };
 
 	/* border color */
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0x10]);
+	bitmap->fill(screen.machine().pens[0x10], *cliprect);
 
 	/* define X display area through BPP mode register */
 	calc_dxs = (vidc_regs[VIDC_HDSR]*2)+x_step[vidc_bpp_mode & 3];
@@ -67,18 +67,18 @@ SCREEN_UPDATE( archimds_vidc )
 								if ((res_x) >= 0 &&
 									(res_y) >= 0 &&
 									(res_x) <= screen.visible_area().max_x && (res_y) <= screen.visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
-									*BITMAP_ADDR32(bitmap, res_y, res_x) = screen.machine().pens[(pen>>(xi))&0x1];
+									bitmap->pix32(res_y, res_x) = screen.machine().pens[(pen>>(xi))&0x1];
 								if ((res_x) >= 0 &&
 									(res_y) >= 0 &&
 									(res_x) <= screen.visible_area().max_x && (res_y+1) <= screen.visible_area().max_y && (res_x) <= xend && (res_y+1) <= yend)
-									*BITMAP_ADDR32(bitmap, res_y+1, res_x) = screen.machine().pens[(pen>>(xi))&0x1];
+									bitmap->pix32(res_y+1, res_x) = screen.machine().pens[(pen>>(xi))&0x1];
 							}
 							else
 							{
 								if ((res_x) >= 0 &&
 									(res_y) >= 0 &&
 									(res_x) <= screen.visible_area().max_x && (res_y) <= screen.visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
-									*BITMAP_ADDR32(bitmap, res_y, res_x) = screen.machine().pens[(pen>>(xi))&0x1];
+									bitmap->pix32(res_y, res_x) = screen.machine().pens[(pen>>(xi))&0x1];
 							}
 						}
 
@@ -103,18 +103,18 @@ SCREEN_UPDATE( archimds_vidc )
 							if ((res_x) >= 0 &&
 								(res_y) >= 0 &&
 								(res_x) <= screen.visible_area().max_x && (res_y) <= screen.visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
-								*BITMAP_ADDR32(bitmap, res_y, res_x) = screen.machine().pens[(pen&0xff)+0x100];
+								bitmap->pix32(res_y, res_x) = screen.machine().pens[(pen&0xff)+0x100];
 							if ((res_x) >= 0 &&
 								(res_y) >= 0 &&
 								(res_x) <= screen.visible_area().max_x && (res_y+1) <= screen.visible_area().max_y && (res_x) <= xend && (res_y+1) <= yend)
-								*BITMAP_ADDR32(bitmap, res_y+1, res_x) = screen.machine().pens[(pen&0xff)+0x100];
+								bitmap->pix32(res_y+1, res_x) = screen.machine().pens[(pen&0xff)+0x100];
 						}
 						else
 						{
 							if ((res_x) >= 0 &&
 								(res_y) >= 0 &&
 								(res_x) <= screen.visible_area().max_x && (res_y) <= screen.visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
-								*BITMAP_ADDR32(bitmap, res_y, res_x) = screen.machine().pens[(pen&0xff)+0x100];
+								bitmap->pix32(res_y, res_x) = screen.machine().pens[(pen&0xff)+0x100];
 						}
 
 						count++;

@@ -116,7 +116,7 @@ SCREEN_UPDATE( thief ){
 
 	if (tms9927_screen_reset(screen.machine().device("tms")))
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 
@@ -133,7 +133,7 @@ SCREEN_UPDATE( thief ){
 		int bit;
 		if( flipscreen ){
 			for( bit=0; bit<8; bit++ ){
-				*BITMAP_ADDR16(bitmap, 0xff - ypos, 0xff - (xpos+bit)) =
+				bitmap->pix16(0xff - ypos, 0xff - (xpos+bit)) =
 						(((plane0<<bit)&0x80)>>7) |
 						(((plane1<<bit)&0x80)>>6) |
 						(((plane2<<bit)&0x80)>>5) |
@@ -142,7 +142,7 @@ SCREEN_UPDATE( thief ){
 		}
 		else {
 			for( bit=0; bit<8; bit++ ){
-				*BITMAP_ADDR16(bitmap, ypos, xpos+bit) =
+				bitmap->pix16(ypos, xpos+bit) =
 						(((plane0<<bit)&0x80)>>7) |
 						(((plane1<<bit)&0x80)>>6) |
 						(((plane2<<bit)&0x80)>>5) |

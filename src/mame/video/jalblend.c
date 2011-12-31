@@ -147,13 +147,13 @@ void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle *clip,const gfx_elemen
 			int x, y;
 
 			/* 32-bit destination bitmap */
-			if (dest_bmp->bpp == 32)
+			if (dest_bmp->bpp() == 32)
 			{
 				/* taken from case 7: TRANSPARENCY_ALPHARANGE */
 				for (y = sy; y < ey; y++)
 				{
 					const UINT8 *source = source_base + y_index*gfx->line_modulo;
-					UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+					UINT32 *dest = &dest_bmp->pix32(y);
 					int x_index = x_index_base;
 					for (x = sx; x < ex; x++)
 					{
@@ -184,7 +184,7 @@ void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle *clip,const gfx_elemen
 				for (y = sy; y < ey; y++)
 				{
 					const UINT8 *source = source_base + y_index*gfx->line_modulo;
-					UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
+					UINT16 *dest = &dest_bmp->pix16(y);
 					int x_index = x_index_base;
 					for (x = sx; x < ex; x++)
 					{

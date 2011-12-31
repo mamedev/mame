@@ -69,7 +69,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	int y;
 	offs_t offs;
 
-	bitmap_fill(state->m_sprite_bitmap, cliprect, state->m_punch_through_pen);
+	state->m_sprite_bitmap->fill(state->m_punch_through_pen, *cliprect);
 
 	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
 	{
@@ -107,10 +107,10 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			UINT16 pen = *BITMAP_ADDR16(state->m_sprite_bitmap, y, x);
+			UINT16 pen = state->m_sprite_bitmap->pix16(y, x);
 
 			if (colortable_entry_get_value(machine.colortable, pen) != 0x100)
-				*BITMAP_ADDR16(bitmap, y, x) = pen;
+				bitmap->pix16(y, x) = pen;
 		}
 	}
 }

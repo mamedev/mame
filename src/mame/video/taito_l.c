@@ -307,7 +307,7 @@ SCREEN_UPDATE( taitol )
 
 	if (state->m_cur_ctrl & 0x20)	/* display enable */
 	{
-		bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+		screen.machine().priority_bitmap->fill(0, *cliprect);
 
 		tilemap_draw(bitmap, cliprect, state->m_bg19_tilemap, 0, 0);
 
@@ -321,7 +321,7 @@ SCREEN_UPDATE( taitol )
 		tilemap_draw(bitmap, cliprect, state->m_ch1a_tilemap, 0, 0);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
+		bitmap->fill(screen.machine().pens[0], *cliprect);
 	return 0;
 }
 

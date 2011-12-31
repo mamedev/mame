@@ -331,8 +331,8 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	{
 		bitmap_t *pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
 		int colorbase = state->m_bg_color + (state->m_congo_color_bank << 8);
-		int xmask = pixmap->width - 1;
-		int ymask = pixmap->height - 1;
+		int xmask = pixmap->width() - 1;
+		int ymask = pixmap->height() - 1;
 		int flipmask = flip_screen_get(machine) ? 0xff : 0x00;
 		int flipoffs = flip_screen_get(machine) ? 0x38 : 0x40;
 		int x, y;
@@ -347,7 +347,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 		/* loop over visible rows */
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
-			UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+			UINT16 *dst = &bitmap->pix16(y);
 			int srcx, srcy, vf;
 			UINT16 *src;
 
@@ -357,7 +357,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 			/* base of the source row comes from VF plus the scroll value */
 			/* this is done by the 3 4-bit adders at U56, U74, U75 */
 			srcy = vf + ((state->m_bg_position << 1) ^ 0xfff) + 1;
-			src = (UINT16 *)pixmap->base + (srcy & ymask) * pixmap->rowpixels;
+			src = &pixmap->pix16(srcy & ymask);
 
 			/* loop over visible colums */
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
@@ -384,7 +384,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 	/* if not enabled, fill the background with black */
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(machine));
+		bitmap->fill(get_black_pen(machine), *cliprect);
 }
 
 

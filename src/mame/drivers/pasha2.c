@@ -348,10 +348,10 @@ static SCREEN_UPDATE( pasha2 )
 			if (x * 2 < cliprect->max_x)
 			{
 				color = (state->m_bitmap0[count + (state->m_vbuffer ^ 1) * 0x20000 / 2] & 0xff00) >> 8;
-				*BITMAP_ADDR16(bitmap, y, x * 2 + 0) = color + 0x100;
+				bitmap->pix16(y, x * 2 + 0) = color + 0x100;
 
 				color = state->m_bitmap0[count + (state->m_vbuffer ^ 1) * 0x20000 / 2] & 0xff;
-				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = color + 0x100;
+				bitmap->pix16(y, x * 2 + 1) = color + 0x100;
 			}
 
 			count++;
@@ -367,11 +367,11 @@ static SCREEN_UPDATE( pasha2 )
 			{
 				color = state->m_bitmap1[count + (state->m_vbuffer ^ 1) * 0x20000 / 2] & 0xff;
 				if (color != 0)
-					*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = color;
+					bitmap->pix16(y, x * 2 + 1) = color;
 
 				color = (state->m_bitmap1[count + (state->m_vbuffer ^ 1) * 0x20000 / 2] & 0xff00) >> 8;
 				if (color != 0)
-					*BITMAP_ADDR16(bitmap, y, x * 2 + 0) = color;
+					bitmap->pix16(y, x * 2 + 0) = color;
 			}
 
 			count++;

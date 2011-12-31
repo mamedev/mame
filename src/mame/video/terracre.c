@@ -206,7 +206,7 @@ SCREEN_UPDATE( amazon )
 {
 	terracre_state *state = screen.machine().driver_data<terracre_state>();
 	if( state->m_xscroll&0x2000 )
-		bitmap_fill( bitmap,cliprect ,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 	else
 		tilemap_draw( bitmap,cliprect, state->m_background, 0, 0 );
 

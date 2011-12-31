@@ -272,9 +272,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 							if (sx + x >= cliprect->min_x && sx + x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR8(machine.priority_bitmap, y, sx + x) & primask) == 0)
-									*BITMAP_ADDR16(bitmap, y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								*BITMAP_ADDR8(machine.priority_bitmap, y, sx + x) = 8;
+								if ((machine.priority_bitmap->pix8(y, sx + x) & primask) == 0)
+									bitmap->pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
+								machine.priority_bitmap->pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -292,9 +292,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 							if (sx + x >= cliprect->min_x && sx + x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR8(machine.priority_bitmap, y, sx + x) & primask) == 0)
-									*BITMAP_ADDR16(bitmap, y, sx + x) = color * 16+(rom[i] >> 4);
-								*BITMAP_ADDR8(machine.priority_bitmap, y, sx + x) = 8;
+								if ((machine.priority_bitmap->pix8(y, sx + x) & primask) == 0)
+									bitmap->pix16(y, sx + x) = color * 16+(rom[i] >> 4);
+								machine.priority_bitmap->pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -316,9 +316,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 							if (sx + x >= cliprect->min_x && sx + x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR8(machine.priority_bitmap, y, sx + x) & primask) == 0)
-									*BITMAP_ADDR16(bitmap, y, sx + x) = color * 16 + (rom[i] >> 4);
-								*BITMAP_ADDR8(machine.priority_bitmap, y, sx + x) = 8;
+								if ((machine.priority_bitmap->pix8(y, sx + x) & primask) == 0)
+									bitmap->pix16(y, sx + x) = color * 16 + (rom[i] >> 4);
+								machine.priority_bitmap->pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -336,9 +336,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 							if (sx + x >= cliprect->min_x && sx + x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR8(machine.priority_bitmap, y, sx + x) & primask) == 0)
-									*BITMAP_ADDR16(bitmap, y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								*BITMAP_ADDR8(machine.priority_bitmap, y, sx + x) = 8;
+								if ((machine.priority_bitmap->pix8(y, sx + x) & primask) == 0)
+									bitmap->pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
+								machine.priority_bitmap->pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -407,7 +407,7 @@ SCREEN_UPDATE( deniam )
 	tilemap_set_scrollx(state->m_fg_tilemap, 0, fg_scrollx & 0x1ff);
 	tilemap_set_scrolly(state->m_fg_tilemap, 0, fg_scrolly & 0x0ff);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);

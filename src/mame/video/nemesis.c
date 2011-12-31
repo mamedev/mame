@@ -431,8 +431,8 @@ SCREEN_UPDATE( nemesis )
 	int offs;
 	rectangle clip;
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);
 
 	clip.min_x = 0;
 	clip.max_x = 255;

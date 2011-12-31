@@ -475,7 +475,7 @@ static void zoom_sprite(running_machine &machine, bitmap_t *bitmap,int big,
 					int pen = src[offs/2 ^ flipx];
 
 					if (!((transmask >> pen) & 1))
-						*BITMAP_ADDR16(bitmap, yy, xx) = pen + coloroffs;
+						bitmap->pix16(yy, xx) = pen + coloroffs;
 				}
 				offs++;
 

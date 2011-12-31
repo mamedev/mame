@@ -344,7 +344,7 @@ void msm6255_device::draw_scanline(bitmap_t *bitmap, const rectangle *cliprect, 
 
 		for (x = 0; x < hp; x++)
 		{
-			*BITMAP_ADDR16(bitmap, y, (sx * hp) + x) = BIT(data, 7);
+			bitmap->pix16(y, (sx * hp) + x) = BIT(data, 7);
 
 			data <<= 1;
 		}
@@ -432,6 +432,6 @@ void msm6255_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(machine()));
+		bitmap->fill(get_black_pen(machine()), *cliprect);
 	}
 }

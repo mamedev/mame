@@ -183,7 +183,7 @@ SCREEN_UPDATE( gunsmoke )
 	if (state->m_bgon)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	if (state->m_objon)
 		draw_sprites(screen.machine(), bitmap, cliprect);

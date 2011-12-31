@@ -84,11 +84,11 @@ WRITE8_HANDLER( battlane_bitmap_w )
 	{
 		if (data & 1 << i)
 		{
-			*BITMAP_ADDR8(state->m_screen_bitmap, offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
+			state->m_screen_bitmap->pix8(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
 		}
 		else
 		{
-			*BITMAP_ADDR8(state->m_screen_bitmap, offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
+			state->m_screen_bitmap->pix8(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
 		}
 	}
 }
@@ -221,14 +221,14 @@ static void draw_fg_bitmap( running_machine &machine, bitmap_t *bitmap )
 	{
 		for (x = 0; x < 32 * 8; x++)
 		{
-			data = *BITMAP_ADDR8(state->m_screen_bitmap, y, x);
+			data = state->m_screen_bitmap->pix8(y, x);
 
 			if (data)
 			{
 				if (flip_screen_get(machine))
-					*BITMAP_ADDR16(bitmap, 255 - y, 255 - x) = data;
+					bitmap->pix16(255 - y, 255 - x) = data;
 				else
-					*BITMAP_ADDR16(bitmap, y, x) = data;
+					bitmap->pix16(y, x) = data;
 			}
 		}
 	}

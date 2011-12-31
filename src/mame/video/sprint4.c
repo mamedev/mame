@@ -116,7 +116,7 @@ SCREEN_EOF( sprint4 )
 		rect.max_x = horz - 15 + screen.machine().gfx[1]->width - 1;
 		rect.max_y = vert - 15 + screen.machine().gfx[1]->height - 1;
 
-		sect_rect(&rect, &screen.machine().primary_screen->visible_area());
+		rect &= screen.machine().primary_screen->visible_area();
 
 		tilemap_draw(state->m_helper, &rect, state->m_playfield, 0, 0);
 
@@ -132,7 +132,7 @@ SCREEN_EOF( sprint4 )
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 			for (x = rect.min_x; x <= rect.max_x; x++)
-				if (colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(state->m_helper, y, x)) != 0)
+				if (colortable_entry_get_value(screen.machine().colortable, state->m_helper->pix16(y, x)) != 0)
 					state->m_collision[i] = 1;
 	}
 

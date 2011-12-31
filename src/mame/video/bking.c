@@ -281,7 +281,7 @@ SCREEN_UPDATE( bking )
 SCREEN_EOF( bking )
 {
 	bking_state *state = screen.machine().driver_data<bking_state>();
-	static const rectangle rect = { 0, 7, 0, 15 };
+	const rectangle rect(0, 7, 0, 15);
 
 	int xld = 0;
 	int yld = 0;
@@ -333,8 +333,8 @@ SCREEN_EOF( bking )
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 		{
-			const UINT16* p0 = BITMAP_ADDR16(state->m_tmp_bitmap1, y, 0);
-			const UINT16* p1 = BITMAP_ADDR16(state->m_tmp_bitmap2, y, 0);
+			const UINT16* p0 = &state->m_tmp_bitmap1->pix16(y);
+			const UINT16* p1 = &state->m_tmp_bitmap2->pix16(y);
 
 			for (x = rect.min_x; x <= rect.max_x; x++)
 			{

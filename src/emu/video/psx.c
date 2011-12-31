@@ -129,7 +129,7 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 
 	if( m_debug.b_clear )
 	{
-		bitmap_fill( m_debug.mesh, NULL , 0x0000);
+		m_debug.mesh->fill(0x0000);
 		m_debug.b_clear = 0;
 	}
 
@@ -225,8 +225,8 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 				(INT16)n_x.w.h <= width - 1 &&
 				(INT16)n_y.w.h <= height - 1 )
 			{
-				if( *BITMAP_ADDR16(m_debug.mesh, n_y.w.h, n_x.w.h) != 0xffff )
-					*BITMAP_ADDR16(m_debug.mesh, n_y.w.h, n_x.w.h) = n_colour;
+				if( m_debug.mesh->pix16(n_y.w.h, n_x.w.h) != 0xffff )
+					m_debug.mesh->pix16(n_y.w.h, n_x.w.h) = n_colour;
 			}
 			n_x.d += n_dx;
 			n_y.d += n_dy;
@@ -628,7 +628,7 @@ void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	if( ( n_gpustatus & ( 1 << 0x17 ) ) != 0 )
 	{
 		/* todo: only draw to necessary area */
-		bitmap_fill( bitmap, cliprect , 0);
+		bitmap->fill(0, *cliprect);
 	}
 	else
 	{
@@ -710,7 +710,7 @@ void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 			while( n_line > 0 )
 			{
 				UINT16 *p_n_src = p_p_vram[ n_y + n_displaystarty ] + ((n_x + n_displaystartx) * 3);
-				UINT16 *p_n_dest = BITMAP_ADDR16(bitmap, n_y + n_top, n_x + n_left);
+				UINT16 *p_n_dest = &bitmap->pix16(n_y + n_top, n_x + n_left);
 
 				n_column = n_columns;
 				while( n_column > 0 )

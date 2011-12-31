@@ -382,7 +382,7 @@ static SCREEN_UPDATE( meritm )
 		popmessage("Layer 1 %sabled",state->m_layer1_enabled ? "en" : "dis");
 	}
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	if ( state->m_layer0_enabled )
 	{

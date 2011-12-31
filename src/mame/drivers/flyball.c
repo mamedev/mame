@@ -111,7 +111,7 @@ static SCREEN_UPDATE( flyball )
 			    x <= cliprect->max_x &&
 			    y >= cliprect->min_y &&
 			    y <= cliprect->max_y)
-				*BITMAP_ADDR16(bitmap, y, x) = 1;
+				bitmap->pix16(y, x) = 1;
 	return 0;
 }
 

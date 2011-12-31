@@ -254,7 +254,7 @@ SCREEN_UPDATE( tryout )
 	if(!(state->m_gfx_control[0] & 0x8)) // screen disable
 	{
 		/* TODO: Color might be different, needs a video from an original pcb. */
-		bitmap_fill(bitmap, cliprect, screen.machine().pens[0x10]);
+		bitmap->fill(screen.machine().pens[0x10], *cliprect);
 	}
 	else
 	{

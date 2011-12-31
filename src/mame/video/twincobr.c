@@ -504,7 +504,7 @@ SCREEN_UPDATE( toaplan0 )
 
 	if (state->m_wardner_sprite_hack) wardner_sprite_priority_hack(screen.machine());
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0x0400);

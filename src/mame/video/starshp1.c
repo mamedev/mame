@@ -158,13 +158,13 @@ static void draw_starfield(starshp1_state *state, bitmap_t* bitmap)
 	int x;
 	int y;
 
-	for (y = 0; y < bitmap->height; y++)
+	for (y = 0; y < bitmap->height(); y++)
 	{
 		const UINT16* p = state->m_LSFR + (UINT16) (512 * y);
 
-		UINT16* pLine = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16* pLine = &bitmap->pix16(y);
 
-		for (x = 0; x < bitmap->width; x++)
+		for (x = 0; x < bitmap->width(); x++)
 			if ((p[x] & 0x5b56) == 0x5b44)
 				pLine[x] = (p[x] & 0x0400) ? 0x0e : 0x0f;
 	}
@@ -233,10 +233,10 @@ static void draw_phasor(starshp1_state *state, bitmap_t* bitmap)
 	for (i = 128; i < 240; i++)
 		if (i >= get_sprite_vpos(state, 13))
 		{
-			*BITMAP_ADDR16(bitmap, i, 2 * i + 0) = 0x10;
-			*BITMAP_ADDR16(bitmap, i, 2 * i + 1) = 0x10;
-			*BITMAP_ADDR16(bitmap, i, 2 * (255 - i) + 0) = 0x10;
-			*BITMAP_ADDR16(bitmap, i, 2 * (255 - i) + 1) = 0x10;
+			bitmap->pix16(i, 2 * i + 0) = 0x10;
+			bitmap->pix16(i, 2 * i + 1) = 0x10;
+			bitmap->pix16(i, 2 * (255 - i) + 0) = 0x10;
+			bitmap->pix16(i, 2 * (255 - i) + 1) = 0x10;
 		}
 }
 
@@ -258,19 +258,19 @@ static int get_circle_vpos(starshp1_state *state)
 static void draw_circle_line(running_machine &machine, bitmap_t *bitmap, int x, int y, int l)
 {
 	starshp1_state *state = machine.driver_data<starshp1_state>();
-	if (y >= 0 && y <= bitmap->height - 1)
+	if (y >= 0 && y <= bitmap->height() - 1)
 	{
 		const UINT16* p = state->m_LSFR + (UINT16) (512 * y);
 
-		UINT16* pLine = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16* pLine = &bitmap->pix16(y);
 
 		int h1 = x - 2 * l;
 		int h2 = x + 2 * l;
 
 		if (h1 < 0)
 			h1 = 0;
-		if (h2 > bitmap->width - 1)
-			h2 = bitmap->width - 1;
+		if (h2 > bitmap->width() - 1)
+			h2 = bitmap->width() - 1;
 
 		for (x = h1; x <= h2; x++)
 			if (state->m_circle_mod)
@@ -322,7 +322,7 @@ static int spaceship_collision(running_machine &machine, bitmap_t *bitmap, const
 
 	for (y = rect->min_y; y <= rect->max_y; y++)
 	{
-		const UINT16* pLine = BITMAP_ADDR16(state->m_helper, y, 0);
+		const UINT16* pLine = &state->m_helper->pix16(y);
 
 		for (x = rect->min_x; x <= rect->max_x; x++)
 			if (pLine[x] != 0)
@@ -361,7 +361,7 @@ SCREEN_UPDATE( starshp1 )
 	starshp1_state *state = screen.machine().driver_data<starshp1_state>();
 	set_pens(state, screen.machine().colortable);
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	if (state->m_starfield_kill == 0)
 		draw_starfield(state, bitmap);
@@ -401,12 +401,12 @@ SCREEN_EOF( starshp1 )
 		rect.min_x = 0;
 	if (rect.min_y < 0)
 		rect.min_y = 0;
-	if (rect.max_x > state->m_helper->width - 1)
-		rect.max_x = state->m_helper->width - 1;
-	if (rect.max_y > state->m_helper->height - 1)
-		rect.max_y = state->m_helper->height - 1;
+	if (rect.max_x > state->m_helper->width() - 1)
+		rect.max_x = state->m_helper->width() - 1;
+	if (rect.max_y > state->m_helper->height() - 1)
+		rect.max_y = state->m_helper->height() - 1;
 
-	bitmap_fill(state->m_helper, &visarea, 0);
+	state->m_helper->fill(0, visarea);
 
 	if (state->m_attract == 0)
 		draw_spaceship(screen.machine(), state->m_helper, &visarea);

@@ -78,7 +78,10 @@ struct _laserdisc_config
 	/* overlay information */
 	screen_update_func		overupdate;
 	UINT32					overwidth, overheight, overformat;
-	rectangle				overclip;
+	INT32					overclip_min_x;
+	INT32					overclip_max_x;
+	INT32					overclip_min_y;
+	INT32					overclip_max_y;
 	float					overposx, overposy;
 	float					overscalex, overscaley;
 };
@@ -107,10 +110,10 @@ struct _laserdisc_config
 	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overformat, _format)
 
 #define MCFG_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \
-	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.min_x, _minx) \
-	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.max_x, _maxx) \
-	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.min_y, _miny) \
-	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.max_y, _maxy)
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip_min_x, _minx) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip_max_x, _maxx) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip_min_y, _miny) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip_max_y, _maxy)
 
 #define MCFG_LASERDISC_OVERLAY_POSITION(_posx, _posy) \
 	MCFG_DEVICE_CONFIG_DATAFP32(laserdisc_config, overposx, _posx, 24) \

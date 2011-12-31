@@ -355,7 +355,7 @@ void screen_device::device_start()
 		m_burnin = auto_alloc(machine(), bitmap_t(width, height, BITMAP_FORMAT_INDEXED64));
 		if (m_burnin == NULL)
 			fatalerror("Error allocating burn-in bitmap for screen at (%dx%d)\n", width, height);
-		bitmap_fill(m_burnin, NULL, 0);
+		m_burnin->fill(0);
 	}
 
 	// load the effect overlay
@@ -500,8 +500,8 @@ void screen_device::realloc_screen_bitmaps()
 	// extract the current width/height from the bitmap
 	if (m_bitmap[0] != NULL)
 	{
-		curwidth = m_bitmap[0]->width;
-		curheight = m_bitmap[0]->height;
+		curwidth = m_bitmap[0]->width();
+		curheight = m_bitmap[0]->height();
 	}
 
 	// if we're too small to contain this width/height, reallocate our bitmaps and textures
@@ -529,9 +529,9 @@ void screen_device::realloc_screen_bitmaps()
 
 		// allocate bitmaps
 		m_bitmap[0] = auto_alloc(machine(), bitmap_t(curwidth, curheight, m_format));
-		bitmap_set_palette(m_bitmap[0], machine().palette);
+		m_bitmap[0]->set_palette(machine().palette);
 		m_bitmap[1] = auto_alloc(machine(), bitmap_t(curwidth, curheight, m_format));
-		bitmap_set_palette(m_bitmap[1], machine().palette);
+		m_bitmap[1]->set_palette(machine().palette);
 
 		// allocate textures
 		m_texture[0] = machine().render().texture_alloc();
@@ -909,10 +909,10 @@ void screen_device::update_burnin()
 	if (srcbitmap == NULL)
 		return;
 
-	int srcwidth = srcbitmap->width;
-	int srcheight = srcbitmap->height;
-	int dstwidth = m_burnin->width;
-	int dstheight = m_burnin->height;
+	int srcwidth = srcbitmap->width();
+	int srcheight = srcbitmap->height();
+	int dstwidth = m_burnin->width();
+	int dstheight = m_burnin->height();
 	int xstep = (srcwidth << 16) / dstwidth;
 	int ystep = (srcheight << 16) / dstheight;
 	int xstart = ((UINT32)rand() % 32767) * xstep / 32767;
@@ -923,12 +923,12 @@ void screen_device::update_burnin()
 	// iterate over rows in the destination
 	for (y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
 	{
-		UINT64 *dst = BITMAP_ADDR64(m_burnin, y, 0);
+		UINT64 *dst = &m_burnin->pix64(y);
 
 		// handle the 16-bit palettized case
-		if (srcbitmap->format == BITMAP_FORMAT_INDEXED16)
+		if (srcbitmap->format() == BITMAP_FORMAT_INDEXED16)
 		{
-			const UINT16 *src = BITMAP_ADDR16(srcbitmap, srcy >> 16, 0);
+			const UINT16 *src = &srcbitmap->pix16(srcy >> 16);
 			const rgb_t *palette = palette_entry_list_adjusted(machine().palette);
 			for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 			{
@@ -938,9 +938,9 @@ void screen_device::update_burnin()
 		}
 
 		// handle the 15-bit RGB case
-		else if (srcbitmap->format == BITMAP_FORMAT_RGB15)
+		else if (srcbitmap->format() == BITMAP_FORMAT_RGB15)
 		{
-			const UINT16 *src = BITMAP_ADDR16(srcbitmap, srcy >> 16, 0);
+			const UINT16 *src = &srcbitmap->pix16(srcy >> 16);
 			for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 			{
 				rgb15_t pixel = src[srcx >> 16];
@@ -949,9 +949,9 @@ void screen_device::update_burnin()
 		}
 
 		// handle the 32-bit RGB case
-		else if (srcbitmap->format == BITMAP_FORMAT_RGB32)
+		else if (srcbitmap->format() == BITMAP_FORMAT_RGB32)
 		{
-			const UINT32 *src = BITMAP_ADDR32(srcbitmap, srcy >> 16, 0);
+			const UINT32 *src = &srcbitmap->pix32(srcy >> 16);
 			for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 			{
 				rgb_t pixel = src[srcx >> 16];
@@ -973,20 +973,20 @@ void screen_device::finalize_burnin()
 
 	// compute the scaled visible region
 	rectangle scaledvis;
-	scaledvis.min_x = m_visarea.min_x * m_burnin->width / m_width;
-	scaledvis.max_x = m_visarea.max_x * m_burnin->width / m_width;
-	scaledvis.min_y = m_visarea.min_y * m_burnin->height / m_height;
-	scaledvis.max_y = m_visarea.max_y * m_burnin->height / m_height;
+	scaledvis.min_x = m_visarea.min_x * m_burnin->width() / m_width;
+	scaledvis.max_x = m_visarea.max_x * m_burnin->width() / m_width;
+	scaledvis.min_y = m_visarea.min_y * m_burnin->height() / m_height;
+	scaledvis.max_y = m_visarea.max_y * m_burnin->height() / m_height;
 
 	// wrap a bitmap around the subregion we care about
 	bitmap_t *finalmap = auto_alloc(machine(), bitmap_t(scaledvis.max_x + 1 - scaledvis.min_x,
 				                        scaledvis.max_y + 1 - scaledvis.min_y,
 				                        BITMAP_FORMAT_ARGB32));
 
-	int srcwidth = m_burnin->width;
-	int srcheight = m_burnin->height;
-	int dstwidth = finalmap->width;
-	int dstheight = finalmap->height;
+	int srcwidth = m_burnin->width();
+	int srcheight = m_burnin->height();
+	int dstwidth = finalmap->width();
+	int dstheight = finalmap->height();
 	int xstep = (srcwidth << 16) / dstwidth;
 	int ystep = (srcheight << 16) / dstheight;
 
@@ -995,7 +995,7 @@ void screen_device::finalize_burnin()
 	UINT64 maxval = 0;
 	for (int y = 0; y < srcheight; y++)
 	{
-		UINT64 *src = BITMAP_ADDR64(m_burnin, y, 0);
+		UINT64 *src = &m_burnin->pix64(y);
 		for (int x = 0; x < srcwidth; x++)
 		{
 			minval = MIN(minval, src[x]);
@@ -1009,8 +1009,8 @@ void screen_device::finalize_burnin()
 	// now normalize and convert to RGB
 	for (int y = 0, srcy = 0; y < dstheight; y++, srcy += ystep)
 	{
-		UINT64 *src = BITMAP_ADDR64(m_burnin, srcy >> 16, 0);
-		UINT32 *dst = BITMAP_ADDR32(finalmap, y, 0);
+		UINT64 *src = &m_burnin->pix64(srcy >> 16);
+		UINT32 *dst = &finalmap->pix32(y);
 		for (int x = 0, srcx = 0; x < dstwidth; x++, srcx += xstep)
 		{
 			int brightness = (UINT64)(maxval - src[srcx >> 16]) * 255 / (maxval - minval);

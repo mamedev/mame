@@ -545,7 +545,7 @@ SCREEN_UPDATE( superpac )
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	bitmap_fill(sprite_bitmap,cliprect,15);
+	sprite_bitmap->fill(15, *cliprect);
 	mappy_draw_sprites(screen.machine(),sprite_bitmap,cliprect,state->m_spriteram);
 	copybitmap_trans(bitmap,sprite_bitmap,0,0,0,0,cliprect,15);
 
@@ -553,14 +553,14 @@ SCREEN_UPDATE( superpac )
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,1,0);
 
 	/* sprite color 0/1 still has priority over that (ghost eyes in Pac 'n Pal) */
-	for (y = 0;y < sprite_bitmap->height;y++)
+	for (y = 0;y < sprite_bitmap->height();y++)
 	{
-		for (x = 0;x < sprite_bitmap->width;x++)
+		for (x = 0;x < sprite_bitmap->width();x++)
 		{
-			int spr_entry = *BITMAP_ADDR16(sprite_bitmap, y, x);
+			int spr_entry = sprite_bitmap->pix16(y, x);
 			int spr_pen = colortable_entry_get_value(screen.machine().colortable, spr_entry);
 			if (spr_pen == 0 || spr_pen == 1)
-				*BITMAP_ADDR16(bitmap, y, x) = spr_entry;
+				bitmap->pix16(y, x) = spr_entry;
 		}
 	}
 	return 0;

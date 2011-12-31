@@ -442,16 +442,8 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 	/* force clip to bitmap boundary */
 	if(clip)
 	{
-		myclip.min_x = clip->min_x;
-		myclip.max_x = clip->max_x;
-		myclip.min_y = clip->min_y;
-		myclip.max_y = clip->max_y;
-
-		if (myclip.min_x < 0) myclip.min_x = 0;
-		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width-1;
-		if (myclip.min_y < 0) myclip.min_y = 0;
-		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
-
+		myclip = *clip;
+		myclip &= dest_bmp->cliprect();
 		clip=&myclip;
 	}
 
@@ -537,7 +529,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -556,7 +548,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -576,7 +568,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -596,7 +588,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -868,7 +860,7 @@ static VIDEO_START(cps3)
 	state->m_renderbuffer_clip.min_y = 0;
 	state->m_renderbuffer_clip.max_y = 224-1;
 
-	bitmap_fill(state->m_renderbuffer_bitmap,&state->m_renderbuffer_clip,0x3f);
+	state->m_renderbuffer_bitmap->fill(0x3f, state->m_renderbuffer_clip);
 
 }
 
@@ -1010,7 +1002,7 @@ static SCREEN_UPDATE(cps3)
 	state->m_renderbuffer_clip.min_y = 0;
 	state->m_renderbuffer_clip.max_y = ((224*fszx)>>16)-1;
 
-	bitmap_fill(state->m_renderbuffer_bitmap,&state->m_renderbuffer_clip,0);
+	state->m_renderbuffer_bitmap->fill(0, state->m_renderbuffer_clip);
 
 	/* Sprites */
 	{
@@ -1226,8 +1218,8 @@ static SCREEN_UPDATE(cps3)
 		srcy=0;
 		for (rendery=0;rendery<224;rendery++)
 		{
-			dstbitmap = BITMAP_ADDR32(bitmap, rendery, 0);
-			srcbitmap = BITMAP_ADDR32(state->m_renderbuffer_bitmap, srcy>>16, 0);
+			dstbitmap = &bitmap->pix32(rendery);
+			srcbitmap = &state->m_renderbuffer_bitmap->pix32(srcy>>16);
 			srcx=0;
 
 			for (renderx=0;renderx<state->m_screenwidth;renderx++)

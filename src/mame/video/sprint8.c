@@ -177,14 +177,14 @@ SCREEN_EOF( sprint8 )
 
 	tilemap_draw(state->m_helper2, &visarea, state->m_tilemap2, 0, 0);
 
-	bitmap_fill(state->m_helper1, &visarea, 0x20);
+	state->m_helper1->fill(0x20, visarea);
 
 	draw_sprites(screen.machine(), state->m_helper1, &visarea);
 
 	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{
-		const UINT16* p1 = BITMAP_ADDR16(state->m_helper1, y, 0);
-		const UINT16* p2 = BITMAP_ADDR16(state->m_helper2, y, 0);
+		const UINT16* p1 = &state->m_helper1->pix16(y);
+		const UINT16* p2 = &state->m_helper2->pix16(y);
 
 		for (x = visarea.min_x; x <= visarea.max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)

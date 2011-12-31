@@ -265,7 +265,7 @@ static SCREEN_UPDATE(sigmab98)
 	}
 #endif
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	// Draw from priority 3 (bottom, converted to a bitmask) to priority 0 (top)
 	draw_sprites(screen.machine(), bitmap, cliprect, layers_ctrl & 8);

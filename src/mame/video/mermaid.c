@@ -2,18 +2,6 @@
 #include "includes/mermaid.h"
 
 
-static const rectangle spritevisiblearea =
-{
-	0 * 8, 26 * 8 - 1,
-	2 * 8, 30 * 8 - 1
-};
-
-static const rectangle flip_spritevisiblearea =
-{
-	6 * 8, 31 * 8 - 1,
-	2 * 8, 30 * 8 - 1
-};
-
 PALETTE_INIT( mermaid )
 {
 	int i;
@@ -202,6 +190,9 @@ VIDEO_START( mermaid )
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	const rectangle spritevisiblearea(0 * 8, 26 * 8 - 1, 2 * 8, 30 * 8 - 1);
+	const rectangle flip_spritevisiblearea(6 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1);
+
 	mermaid_state *state = machine.driver_data<mermaid_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
@@ -260,8 +251,8 @@ static UINT8 collision_check( running_machine &machine, rectangle* rect )
 	for (y = rect->min_y; y <= rect->max_y; y++)
 		for (x = rect->min_x; x <= rect->max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(state->m_helper, y, x)) & 0x3f;
-			UINT16 b = colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(state->m_helper2, y, x)) & 0x3f;
+			UINT16 a = colortable_entry_get_value(machine.colortable, state->m_helper->pix16(y, x)) & 0x3f;
+			UINT16 b = colortable_entry_get_value(machine.colortable, state->m_helper2->pix16(y, x)) & 0x3f;
 
 			if (b)
 				if (a)
@@ -333,8 +324,8 @@ SCREEN_EOF( mermaid )
 
 		// check collision sprite - background
 
-		bitmap_fill(state->m_helper, &rect, 0);
-		bitmap_fill(state->m_helper2, &rect, 0);
+		state->m_helper->fill(0, rect);
+		state->m_helper2->fill(0, rect);
 
 		tilemap_draw(state->m_helper, &rect, state->m_bg_tilemap, 0, 0);
 
@@ -344,8 +335,8 @@ SCREEN_EOF( mermaid )
 
 		// check collision sprite - foreground
 
-		bitmap_fill(state->m_helper, &rect, 0);
-		bitmap_fill(state->m_helper2, &rect, 0);
+		state->m_helper->fill(0, rect);
+		state->m_helper2->fill(0, rect);
 
 		tilemap_draw(state->m_helper, &rect, state->m_fg_tilemap, 0, 0);
 
@@ -355,8 +346,8 @@ SCREEN_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		bitmap_fill(state->m_helper, &rect, 0);
-		bitmap_fill(state->m_helper2, &rect, 0);
+		state->m_helper->fill(0, rect);
+		state->m_helper2->fill(0, rect);
 
 		for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
@@ -443,8 +434,8 @@ SCREEN_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		bitmap_fill(state->m_helper, &rect, 0);
-		bitmap_fill(state->m_helper2, &rect, 0);
+		state->m_helper->fill(0, rect);
+		state->m_helper2->fill(0, rect);
 
 		for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
@@ -531,8 +522,8 @@ SCREEN_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		bitmap_fill(state->m_helper, &rect, 0);
-		bitmap_fill(state->m_helper2, &rect, 0);
+		state->m_helper->fill(0, rect);
+		state->m_helper2->fill(0, rect);
 
 		for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)

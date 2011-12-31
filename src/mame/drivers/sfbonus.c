@@ -934,8 +934,8 @@ static SCREEN_UPDATE(sfbonus)
 	globalyscroll += 8;
 	globalxscroll += 8;
 
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[0]);
-	bitmap_fill(state->m_temp_reel_bitmap,cliprect,screen.machine().pens[0]);
+	bitmap->fill(screen.machine().pens[0], *cliprect);
+	state->m_temp_reel_bitmap->fill(screen.machine().pens[0], *cliprect);
 
 	/* render reels to bitmap */
 	sfbonus_draw_reel_layer(screen,state->m_temp_reel_bitmap,cliprect,0);
@@ -947,8 +947,8 @@ static SCREEN_UPDATE(sfbonus)
 		{
 			for (x=0;x<512;x++)
 			{
-				UINT16* src = BITMAP_ADDR16(state->m_temp_reel_bitmap, y, x);
-				UINT16* dst = BITMAP_ADDR16(bitmap, y, x);
+				UINT16* src = &state->m_temp_reel_bitmap->pix16(y, x);
+				UINT16* dst = &bitmap->pix16(y, x);
 
 				if ((src[0]&0x100)==0x000)
 					dst[0] = src[0];
@@ -973,8 +973,8 @@ static SCREEN_UPDATE(sfbonus)
 		{
 			for (x=0;x<512;x++)
 			{
-				UINT16* src = BITMAP_ADDR16(state->m_temp_reel_bitmap, y, x);
-				UINT16* dst = BITMAP_ADDR16(bitmap, y, x);
+				UINT16* src = &state->m_temp_reel_bitmap->pix16(y, x);
+				UINT16* dst = &bitmap->pix16(y, x);
 
 				if ((src[0]&0x100)==0x100)
 					dst[0] = src[0]-0x100;

@@ -94,7 +94,7 @@ static UINT8 collision_check(sprint2_state *state, colortable_t *colortable, rec
 	for (y = rect->min_y; y <= rect->max_y; y++)
 		for (x = rect->min_x; x <= rect->max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(colortable, *BITMAP_ADDR16(state->m_helper, y, x));
+			UINT16 a = colortable_entry_get_value(colortable, state->m_helper->pix16(y, x));
 
 			if (a == 0)
 				data |= 0x40;

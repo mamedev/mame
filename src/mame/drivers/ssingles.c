@@ -209,7 +209,7 @@ static MC6845_UPDATE_ROW( ssingles_update_row )
 
 		for(x=7;x>=0;--x)
 		{
-			*BITMAP_ADDR32(bitmap, y, (cx<<3)|(x)) = state->m_pens[palette+((b1&1)|((b0&1)<<1))];
+			bitmap->pix32(y, (cx<<3)|(x)) = state->m_pens[palette+((b1&1)|((b0&1)<<1))];
 			b0>>=1;
 			b1>>=1;
 		}
@@ -247,7 +247,7 @@ static MC6845_UPDATE_ROW( atamanot_update_row )
 
 		for(x=7;x>=0;--x)
 		{
-			*BITMAP_ADDR32(bitmap, y, (cx<<3)|(x)) = state->m_pens[palette+((b1&1)|((b0&1)<<1))];
+			bitmap->pix32(y, (cx<<3)|(x)) = state->m_pens[palette+((b1&1)|((b0&1)<<1))];
 			b0>>=1;
 			b1>>=1;
 		}

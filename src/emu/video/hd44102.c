@@ -288,7 +288,7 @@ void hd44102_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 			{
 				int color = (m_status & STATUS_DISPLAY_OFF) ? 0 : BIT(data, z % 8);
 
-				*BITMAP_ADDR16(bitmap, sy, sx) = color;
+				bitmap->pix16(sy, sx) = color;
 			}
 
 			z++;

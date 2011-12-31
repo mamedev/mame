@@ -38,8 +38,8 @@ static void blitRaster(running_machine &machine, bitmap_t *bitmap, int rasterMod
 	int x,y;
 	for (y=0; y<256; y++) //todo
 	{
-		UINT32* src=BITMAP_ADDR32(temp_bitmap, y&0x1ff, 0);
-		UINT32* dst=BITMAP_ADDR32(bitmap, y, 0);
+		UINT32* src=&temp_bitmap->pix32(y&0x1ff);
+		UINT32* dst=&bitmap->pix32(y);
 		UINT32 xptr=(state->m_mlc_raster_table[0][y]<<13);
 
 		if (machine.input().code_pressed(KEYCODE_X))
@@ -81,16 +81,8 @@ static void mlc_drawgfxzoom(
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	if(clip)
 	{
-		myclip.min_x = clip->min_x;
-		myclip.max_x = clip->max_x;
-		myclip.min_y = clip->min_y;
-		myclip.max_y = clip->max_y;
-
-		if (myclip.min_x < 0) myclip.min_x = 0;
-		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width-1;
-		if (myclip.min_y < 0) myclip.min_y = 0;
-		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
-
+		myclip = *clip;
+		myclip &= dest_bmp->cliprect();
 		clip=&myclip;
 	}
 
@@ -178,7 +170,7 @@ static void mlc_drawgfxzoom(
 							{
 								const UINT8 *source1 = code_base1 + (y_index>>16) * gfx->line_modulo;
 								const UINT8 *source2 = code_base2 + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 
@@ -205,7 +197,7 @@ static void mlc_drawgfxzoom(
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base1 + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -318,7 +310,7 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectan
 		user_clip.min_x=state->m_mlc_clip_ram[(clipper*4)+2];
 		user_clip.max_x=state->m_mlc_clip_ram[(clipper*4)+3];
 
-		sect_rect(&user_clip, cliprect);
+		user_clip &= *cliprect;
 
 		/* Any colours out of range (for the bpp value) trigger 'shadow' mode */
 		if (color & (state->m_colour_mask+1))
@@ -499,7 +491,7 @@ static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectan
 //      if (lastRasterMode!=0 && rasterDirty)
 //      {
 //          blitRaster(machine, bitmap, rasterMode);
-//          bitmap_fill(temp_bitmap,cliprect,0);
+//          temp_bitmap->fill(0, *cliprect);
 //          rasterDirty=0;
 //      }
 //      lastRasterMode=rasterMode;
@@ -522,8 +514,8 @@ SCREEN_EOF( mlc )
 
 SCREEN_UPDATE( mlc )
 {
-//  bitmap_fill(temp_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[0]); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+//  temp_bitmap->fill(0, *cliprect);
+	bitmap->fill(screen.machine().pens[0], *cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

@@ -197,7 +197,7 @@ SCREEN_UPDATE(sslam)
 
 	if (!(state->m_regs[6] & 1))
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 
@@ -237,7 +237,7 @@ SCREEN_UPDATE(powerbls)
 
 	if (!(state->m_regs[6] & 1))
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 

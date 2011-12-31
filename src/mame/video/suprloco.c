@@ -165,8 +165,8 @@ INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,in
 {
 	if (flip)
 	{
-		x = bitmap->width - x - 1;
-		y = bitmap->height - y - 1;
+		x = bitmap->width() - x - 1;
+		y = bitmap->height() - y - 1;
 	}
 
 	if (x < cliprect->min_x ||
@@ -175,7 +175,7 @@ INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,in
 		y > cliprect->max_y)
 		return;
 
-	*BITMAP_ADDR16(bitmap, y, x) = color;
+	bitmap->pix16(y, x) = color;
 }
 
 

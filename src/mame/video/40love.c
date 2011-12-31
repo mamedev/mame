@@ -201,9 +201,9 @@ static void fortyl_plot_pix( running_machine &machine, int offset )
 	{
 		c = ((d2 >> i) & 1) + ((d1 >> i) & 1) * 2;
 		if (state->m_pixram_sel)
-			*BITMAP_ADDR16(state->m_tmp_bitmap2, y, x + i) = state->m_pix_color[c];
+			state->m_tmp_bitmap2->pix16(y, x + i) = state->m_pix_color[c];
 		else
-			*BITMAP_ADDR16(state->m_tmp_bitmap1, y, x + i) = state->m_pix_color[c];
+			state->m_tmp_bitmap1->pix16(y, x + i) = state->m_pix_color[c];
 	}
 }
 

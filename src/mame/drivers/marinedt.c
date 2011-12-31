@@ -511,24 +511,24 @@ static SCREEN_UPDATE( marinedt )
 	marinedt_state *state = screen.machine().driver_data<marinedt_state>();
 	int sx, sy;
 
-	bitmap_fill(state->m_tile, NULL, 0);
+	state->m_tile->fill(0);
 	tilemap_draw(state->m_tile, cliprect, state->m_tx_tilemap, 0, 0);
 
-	bitmap_fill(state->m_obj1, NULL, 0);
+	state->m_obj1->fill(0);
 	drawgfx_transpen(state->m_obj1, NULL, screen.machine().gfx[1],
 			OBJ_CODE(state->m_obj1_a),
 			OBJ_COLOR(state->m_obj1_a),
 			OBJ_FLIPX(state->m_obj1_a), OBJ_FLIPY(state->m_obj1_a),
 			0, 0, 0);
 
-	bitmap_fill(state->m_obj2, NULL, 0);
+	state->m_obj2->fill(0);
 	drawgfx_transpen(state->m_obj2, NULL, screen.machine().gfx[2],
 			OBJ_CODE(state->m_obj2_a),
 			OBJ_COLOR(state->m_obj2_a),
 			OBJ_FLIPX(state->m_obj2_a), OBJ_FLIPY(state->m_obj2_a),
 			0, 0, 0);
 
-	bitmap_fill(bitmap, NULL, 0);
+	bitmap->fill(0);
 
 	if (state->m_pd & 0x02)
 		copybitmap_trans(bitmap, state->m_obj2, 0, 0, OBJ_X(state->m_obj2_x), OBJ_Y(state->m_obj2_y), cliprect, 0);
@@ -550,10 +550,10 @@ static SCREEN_UPDATE( marinedt )
 				if (x < cliprect->min_x || x > cliprect->max_x || y < cliprect->min_y || y > cliprect->max_y)
 					continue;
 
-				if (*BITMAP_ADDR16(state->m_obj1, sy, sx) == 0)
+				if (state->m_obj1->pix16(sy, sx) == 0)
 					continue;
 
-				if (*BITMAP_ADDR16(state->m_tile, y, x) != 0)
+				if (state->m_tile->pix16(y, x) != 0)
 				{
 					state->m_coll = 0x08;
 
@@ -586,10 +586,10 @@ static SCREEN_UPDATE( marinedt )
 				if (xx < 0 || xx >= 32 || yy < 0 || yy >= 32)
 					continue;
 
-				if (*BITMAP_ADDR16(state->m_obj1, sy, sx) == 0)
+				if (state->m_obj1->pix16(sy, sx) == 0)
 					continue;
 
-				if (*BITMAP_ADDR16(state->m_obj2, yy, xx) != 0)
+				if (state->m_obj2->pix16(yy, xx) != 0)
 				{
 					state->m_collh = 0x80;
 

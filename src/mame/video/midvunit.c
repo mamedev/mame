@@ -556,7 +556,7 @@ SCREEN_UPDATE( midvunit )
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels + cliprect->min_x;
+		UINT16 *dest = &bitmap->pix16(y, cliprect->min_x);
 		for (x = 0; x < width; x++)
 			*dest++ = state->m_videoram[offset + x] & 0x7fff;
 		offset += 512;

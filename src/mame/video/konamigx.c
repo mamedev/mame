@@ -78,7 +78,7 @@ static void (*game_tile_callback)(running_machine &machine, int layer, int *code
 // Localized K053936/ROZ+
 #define K053936_MAX_CHIPS 2
 
-static rectangle K053936_cliprect[K053936_MAX_CHIPS] = {{0,0,0,0},{0,0,0,0}};
+static rectangle K053936_cliprect[K053936_MAX_CHIPS];
 static int K053936_offset[K053936_MAX_CHIPS][2] = {{0,0},{0,0}};
 static int K053936_clip_enabled[K053936_MAX_CHIPS] = {0,0};
 
@@ -143,11 +143,11 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 		startx += sx * incxx + sy * incyx;
 		starty += sx * incxy + sy * incyy;
 	}
-	else { sx = sy = 0; tx = dst_bitmap->width; ty = dst_bitmap->height; }
+	else { sx = sy = 0; tx = dst_bitmap->width(); ty = dst_bitmap->height(); }
 
 	// adjust entry points and other loop constants
-	dst_pitch = dst_bitmap->rowpixels;
-	dst_base = (UINT32*)dst_bitmap->base;
+	dst_pitch = dst_bitmap->rowpixels();
+	dst_base = &dst_bitmap->pix32(0);
 	dst_base2 = sy * dst_pitch + sx + tx;
 	ecx = tx = -tx;
 
@@ -155,10 +155,10 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 	pal_base = machine.pens;
 	cmask = colormask[tilebpp];
 
-	src_pitch = src_bitmap->rowpixels;
-	src_base = (UINT16 *)src_bitmap->base;
-	src_size = src_bitmap->width * src_bitmap->height;
-	dst_size = dst_bitmap->width * dst_bitmap->height;
+	src_pitch = src_bitmap->rowpixels();
+	src_base = &src_bitmap->pix16(0);
+	src_size = src_bitmap->width() * src_bitmap->height();
+	dst_size = dst_bitmap->width() * dst_bitmap->height();
 	dst_ptr = 0;//dst_base;
 	cy = starty;
 	cx = startx;
@@ -453,8 +453,8 @@ INLINE void zdrawgfxzoom32GP(
 	pal_base  = gfx->machine().pens + gfx->color_base + (color % gfx->total_colors) * granularity;
 	shd_base  = gfx->machine().shadow_table;
 
-	dst_ptr   = (UINT32 *)bitmap->base;
-	dst_pitch = bitmap->rowpixels;
+	dst_ptr   = &bitmap->pix32(0);
+	dst_pitch = bitmap->rowpixels();
 	dst_minx  = cliprect->min_x;
 	dst_maxx  = cliprect->max_x;
 	dst_miny  = cliprect->min_y;
@@ -1134,7 +1134,7 @@ void konamigx_mixer_init(running_machine &machine, int objdma)
 	gx_objdma = 0;
 	gx_primode = 0;
 
-	gx_objzbuf = (UINT8 *)machine.priority_bitmap->base;
+	gx_objzbuf = &machine.priority_bitmap->pix8(0);
 	gx_shdzbuf = auto_alloc_array(machine, UINT8, GX_ZBUFSIZE);
 	gx_objpool = auto_alloc_array(machine, struct GX_OBJ, GX_MAX_OBJECTS);
 
@@ -1633,8 +1633,8 @@ void konamigx_mixer(running_machine &machine, bitmap_t *bitmap, const rectangle 
 							// - todo, use the pixeldouble_output I just added for vsnet instead?
 							for (yy=0;yy<height;yy++)
 							{
-								UINT16* src = BITMAP_ADDR16(extra_bitmap,yy,0);
-								UINT32* dst = BITMAP_ADDR32(bitmap,yy,0);
+								UINT16* src = &extra_bitmap->pix16(yy);
+								UINT32* dst = &bitmap->pix32(yy);
 								int shiftpos = 0;
 								for (xx=0;xx<width;xx+=2)
 								{
@@ -2485,13 +2485,13 @@ SCREEN_UPDATE(konamigx)
 
 				for (y=0;y<256;y++)
 				{
-					//UINT16* src = BITMAP_ADDR16( gxtype1_roz_dstbitmap, y, 0);
+					//UINT16* src = &gxtype1_roz_dstbitmap->pix16(y);
 
-					//UINT32* dst = BITMAP_ADDR32( bitmap, y, 0);
+					//UINT32* dst = &bitmap->pix32(y);
 					// ths K053936 rendering should probably just be flipped
 					// this is just kludged to align the racing force 2d logo
-					UINT16* src = BITMAP_ADDR16( gxtype1_roz_dstbitmap2, y+30, 0);
-					UINT32* dst = BITMAP_ADDR32( bitmap, 256-y, 0);
+					UINT16* src = &gxtype1_roz_dstbitmap2->pix16(y+30);
+					UINT32* dst = &bitmap->pix32(256-y);
 
 					for (x=0;x<512;x++)
 					{

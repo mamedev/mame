@@ -81,7 +81,7 @@ static void plot_pixel_sbw(bitmap_t *tmpbitmap, int x, int y, int col, int flip)
 		y = 255-y;
 		x = 247-x;
 	}
-	*BITMAP_ADDR16(tmpbitmap, y, x) = col;
+	tmpbitmap->pix16(y, x) = col;
 }
 
 static WRITE8_HANDLER( sbw_videoram_w )
@@ -112,7 +112,7 @@ static SCREEN_UPDATE(sbowling)
 {
 	sbowling_state *state = screen.machine().driver_data<sbowling_state>();
 
-	bitmap_fill(bitmap, cliprect, 0x18);
+	bitmap->fill(0x18, *cliprect);
 	tilemap_draw(bitmap, cliprect,state->m_sb_tilemap, 0, 0);
 	copybitmap_trans(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect, state->m_color_prom_address);
 	return 0;

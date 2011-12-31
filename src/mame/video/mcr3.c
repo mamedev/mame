@@ -211,7 +211,7 @@ static void mcr3_update_sprites(running_machine &machine, bitmap_t *bitmap, cons
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	bitmap_fill(machine.priority_bitmap, cliprect, 1);
+	machine.priority_bitmap->fill(1, *cliprect);
 
 	/* loop over sprite RAM */
 	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)

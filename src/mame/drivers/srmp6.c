@@ -172,7 +172,7 @@ static SCREEN_UPDATE(srmp6)
 		UINT16 b;
 	} temp;
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 #if 0
 	/* debug */

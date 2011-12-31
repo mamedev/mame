@@ -489,8 +489,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 INLINE void bryan2_drawscanline( bitmap_t *bitmap, int x, int y, int length,
 		const UINT16 *src, int transparent, UINT32 orient, bitmap_t *priority, int pri )
 {
-	UINT16 *dsti = BITMAP_ADDR16(bitmap, y, x);
-	UINT8 *dstp = BITMAP_ADDR8(priority, y, x);
+	UINT16 *dsti = &bitmap->pix16(y, x);
+	UINT8 *dstp = &priority->pix8(y, x);
 
 	if (transparent)
 	{
@@ -604,8 +604,8 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_t *bitmap, cons
 			x_step += (((0x7f - row_zoom) << 8) & 0xffff);
 		}
 
-		src16 = BITMAP_ADDR16(srcbitmap, src_y_index, 0);
-		tsrc  = BITMAP_ADDR8(flagsbitmap, src_y_index, 0);
+		src16 = &srcbitmap->pix16(src_y_index);
+		tsrc  = &flagsbitmap->pix8(src_y_index);
 		dst16 = scanline;
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
@@ -683,7 +683,7 @@ SCREEN_UPDATE( wgp )
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	layer[0] = 0;
 	layer[1] = 1;

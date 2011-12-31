@@ -154,7 +154,7 @@ static SCREEN_UPDATE(pturn)
 	int sx, sy;
 	int flipx, flipy;
 
-	bitmap_fill(bitmap, cliprect, state->m_bgcolor);
+	bitmap->fill(state->m_bgcolor, *cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_bgmap,0,0);
 	for ( offs = 0x80-4 ; offs >=0 ; offs -= 4)
 	{

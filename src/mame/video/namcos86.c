@@ -376,9 +376,9 @@ SCREEN_UPDATE( namcos86 )
 	set_scroll(screen.machine(), 2);
 	set_scroll(screen.machine(), 3);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
-	bitmap_fill(bitmap,cliprect,screen.machine().gfx[0]->color_base + 8*state->m_backcolor+7);
+	bitmap->fill(screen.machine().gfx[0]->color_base + 8*state->m_backcolor+7, *cliprect);
 
 	for (layer = 0;layer < 8;layer++)
 	{

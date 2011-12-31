@@ -1655,7 +1655,7 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 	float dv = extent->param[2].dpdx;
 	float dl = extent->param[3].dpdx;
 	bitmap_t *bitmap = (bitmap_t *)dest;
-	UINT32 *img = BITMAP_ADDR32(bitmap, scanline, extent->startx);
+	UINT32 *img = &bitmap->pix32(scanline, extent->startx);
 
 	for(int x = extent->startx; x < extent->stopx; x++) {
 		float z = w ? 1/w : 0;
@@ -2077,7 +2077,7 @@ static void render_flush(running_machine &machine, bitmap_t *bitmap)
 
 	qsort(render.poly_order, render.poly_count, sizeof(namcos23_poly_entry *), render_poly_compare);
 
-	const static rectangle scissor = { 0, 639, 0, 479 };
+	const static rectangle scissor(0, 639, 0, 479);
 
 	for(int i=0; i<render.poly_count; i++) {
 		const namcos23_poly_entry *p = render.poly_order[i];
@@ -2136,7 +2136,7 @@ static VIDEO_START( ss23 )
 static SCREEN_UPDATE( ss23 )
 {
 	namcos23_state *state = screen.machine().driver_data<namcos23_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	render_run( screen.machine(), bitmap );
 

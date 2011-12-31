@@ -147,7 +147,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	switch (state->m_layers)
 	{

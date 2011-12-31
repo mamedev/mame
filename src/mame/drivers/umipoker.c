@@ -117,7 +117,7 @@ static SCREEN_UPDATE( umipoker )
 	tilemap_set_scrolly(state->m_tilemap_2, 0, state->m_umipoker_scrolly[2]);
 	tilemap_set_scrolly(state->m_tilemap_3, 0, state->m_umipoker_scrolly[3]);
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_tilemap_0,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_tilemap_1,0,0);

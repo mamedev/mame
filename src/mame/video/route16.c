@@ -107,9 +107,9 @@ SCREEN_UPDATE( route16 )
 			pen_t pen = route16_make_pen(final_color);
 
 			if (state->m_flipscreen)
-				*BITMAP_ADDR32(bitmap, 255 - y, 255 - x) = pen;
+				bitmap->pix32(255 - y, 255 - x) = pen;
 			else
-				*BITMAP_ADDR32(bitmap, y, x) = pen;
+				bitmap->pix32(y, x) = pen;
 
 			x = x + 1;
 			data1 = data1 >> 1;
@@ -163,9 +163,9 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_t *bi
 			pen_t pen = make_pen(final_color);
 
 			if (state->m_flipscreen)
-				*BITMAP_ADDR32(bitmap, 255 - y, 255 - x) = pen;
+				bitmap->pix32(255 - y, 255 - x) = pen;
 			else
-				*BITMAP_ADDR32(bitmap, y, x) = pen;
+				bitmap->pix32(y, x) = pen;
 
 			x = x + 1;
 			data1 = data1 >> 1;

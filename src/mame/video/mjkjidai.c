@@ -133,7 +133,7 @@ SCREEN_UPDATE( mjkjidai )
 {
 	mjkjidai_state *state = screen.machine().driver_data<mjkjidai_state>();
 	if (!state->m_display_enable)
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	else
 	{
 		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);

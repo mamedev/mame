@@ -58,8 +58,6 @@ public:
  *
  *************************************/
 
-static const rectangle overlay_clip = { 0, 320-1, 0, 256-8 };
-
 static VIDEO_START( cubeqst )
 {
 	cubeqst_state *state = machine.driver_data<cubeqst_state>();
@@ -106,7 +104,7 @@ static SCREEN_UPDATE( cubeqst )
     */
 
 	/* Bit 3 selects LD/#GRAPHICS */
-	bitmap_fill(bitmap, cliprect, state->m_colormap[255]);
+	bitmap->fill(state->m_colormap[255], *cliprect);
 
 	/* TODO: Add 1 for linebuffering? */
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
@@ -114,7 +112,7 @@ static SCREEN_UPDATE( cubeqst )
 		int i;
 		int num_entries = cubeqcpu_get_ptr_ram_val(screen.machine().device("line_cpu"), y);
 		UINT32 *stk_ram = cubeqcpu_get_stack_ram(screen.machine().device("line_cpu"));
-		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
+		UINT32 *dest = &bitmap->pix32(y);
 		UINT32 pen;
 
 		/* Zap the depth buffer */

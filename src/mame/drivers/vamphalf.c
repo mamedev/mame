@@ -531,14 +531,14 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_t *bitmap)
 
 static SCREEN_UPDATE( common )
 {
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 	draw_sprites(screen, bitmap);
 	return 0;
 }
 
 static SCREEN_UPDATE( aoh )
 {
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 	draw_sprites_aoh(screen, bitmap);
 	return 0;
 }

@@ -176,11 +176,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap)
 	UINT8 *spriteram_2 = state->m_sharedram + 0x0f80;
 	UINT8 *spriteram_3 = state->m_sharedram + 0x1780;
 	int offs;
-	static const rectangle spritevisiblearea =
-	{
-		2*8, 34*8-1,
-		0*8, 28*8-1
-	};
+	const rectangle spritevisiblearea(2*8, 34*8-1, 0*8, 28*8-1);
 
 	for (offs = 0;offs < 0x80;offs += 2)
 	{

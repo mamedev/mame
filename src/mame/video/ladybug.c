@@ -288,7 +288,7 @@ SCREEN_UPDATE( ladybug )
 	int offs;
 
 	// clear the bg bitmap
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	for (offs = 0; offs < 32; offs++)
 	{
@@ -333,7 +333,7 @@ SCREEN_UPDATE( sraider )
 	}
 
 	// clear the bg bitmap
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	// draw the stars
 	if (flip_screen_get(screen.machine()))
@@ -357,7 +357,7 @@ SCREEN_UPDATE( sraider )
 			if (flip_screen_get(screen.machine()))
 				x = ~x;
 
-			plot_box(bitmap, x, cliprect->min_y, 1, height, 0x81);
+			bitmap->plot_box(x, cliprect->min_y, 1, height, 0x81);
 		}
 	}
 

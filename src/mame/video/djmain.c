@@ -169,7 +169,7 @@ SCREEN_UPDATE( djmain )
 				order[j] = temp;
 			}
 
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
+	bitmap->fill(screen.machine().pens[0], *cliprect);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 	{

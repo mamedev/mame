@@ -269,7 +269,7 @@ static SCREEN_UPDATE( goldngam )
 	{
 		for(x = 0; x < 384; ++x)
 		{
-		  *BITMAP_ADDR16(bitmap, y, x) = tmp[index ^ 1]; /* swapped bytes in 16 bit word */
+		  bitmap->pix16(y, x) = tmp[index ^ 1]; /* swapped bytes in 16 bit word */
 			++index;
 		}
 	}

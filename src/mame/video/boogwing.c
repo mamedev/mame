@@ -150,8 +150,8 @@ SCREEN_UPDATE( boogwing )
 
 	/* Draw playfields */
 	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0x400]); /* pen not confirmed */
-	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
+	bitmap->fill(screen.machine().pens[0x400], *cliprect); /* pen not confirmed */
+	screen.machine().priority_bitmap->fill(0);
 
 	// bit&0x8 is definitely some kind of palette effect
 	// bit&0x4 combines playfields

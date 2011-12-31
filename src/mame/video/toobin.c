@@ -238,7 +238,7 @@ SCREEN_UPDATE( toobin )
 	int x, y;
 
 	/* draw the playfield */
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	priority_bitmap->fill(0, *cliprect);
 	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 1, 1);
 	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 2, 2);
@@ -248,10 +248,10 @@ SCREEN_UPDATE( toobin )
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
-		UINT16 *mo = BITMAP_ADDR16(mobitmap, y, 0);
-		UINT16 *pf = BITMAP_ADDR16(state->m_pfbitmap, y, 0);
-		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+		UINT32 *dest = &bitmap->pix32(y);
+		UINT16 *mo = &mobitmap->pix16(y);
+		UINT16 *pf = &state->m_pfbitmap->pix16(y);
+		UINT8 *pri = &priority_bitmap->pix8(y);
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 			UINT16 pix = pf[x];

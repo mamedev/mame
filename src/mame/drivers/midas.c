@@ -190,7 +190,7 @@ static SCREEN_UPDATE( midas )
 	}
 #endif
 
-	bitmap_fill(bitmap,cliprect,4095);
+	bitmap->fill(4095, *cliprect);
 
 	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap,cliprect);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);

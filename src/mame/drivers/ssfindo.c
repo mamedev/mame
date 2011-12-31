@@ -250,10 +250,10 @@ static SCREEN_UPDATE(ssfindo)
 			for(y=0;y<256;y++)
 				for(x=0;x<320;x+=4)
 				{
-					*BITMAP_ADDR16(bitmap, y, x+0) = state->m_vram[s]&0xff;
-					*BITMAP_ADDR16(bitmap, y, x+1) = (state->m_vram[s]>>8)&0xff;
-					*BITMAP_ADDR16(bitmap, y, x+2) = (state->m_vram[s]>>16)&0xff;
-					*BITMAP_ADDR16(bitmap, y, x+3) = (state->m_vram[s]>>24)&0xff;
+					bitmap->pix16(y, x+0) = state->m_vram[s]&0xff;
+					bitmap->pix16(y, x+1) = (state->m_vram[s]>>8)&0xff;
+					bitmap->pix16(y, x+2) = (state->m_vram[s]>>16)&0xff;
+					bitmap->pix16(y, x+3) = (state->m_vram[s]>>24)&0xff;
 					s++;
 				}
 		}

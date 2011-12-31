@@ -202,7 +202,7 @@ void pandora_eof( device_t *device )
 
 	// the games can disable the clearing of the sprite bitmap, to leave sprite trails
 	if (pandora->clear_bitmap)
-		bitmap_fill(pandora->sprites_bitmap, &pandora->screen->visible_area(), pandora->bg_pen);
+		pandora->sprites_bitmap->fill(pandora->bg_pen, pandora->screen->visible_area());
 
 	pandora_draw(device, pandora->sprites_bitmap, &pandora->screen->visible_area());
 }

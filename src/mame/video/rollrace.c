@@ -112,7 +112,7 @@ SCREEN_UPDATE( rollrace )
 	const UINT8 *mem = screen.machine().region("user1")->base();
 
 	/* fill in background colour*/
-	bitmap_fill(bitmap,cliprect,state->m_ra_bkgpen);
+	bitmap->fill(state->m_ra_bkgpen, *cliprect);
 
 	/* draw road */
 	for (offs = 0x3ff; offs >= 0; offs--)

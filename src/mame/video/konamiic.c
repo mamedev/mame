@@ -2595,7 +2595,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_t *bitmap, in
 			// *really ugly but it minimizes alteration to tilemap.c
 			memset (&zerorect, 0, sizeof(rectangle));	// zero dimension
 			tilemap_draw(bitmap, &zerorect, tmap, 0, 0);	// dummy call to reset tile_dirty_map
-			bitmap_fill(xprmap, 0, 0);						// reset pixel transparency_bitmap;
+			xprmap->fill(0);						// reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
 		}
 		else
@@ -2646,8 +2646,8 @@ static int K056832_update_linemap(running_machine &machine, bitmap_t *bitmap, in
 
 				tile_data tileinfo = {0};
 
-				dst_ptr = BITMAP_ADDR16(pixmap, line, 0);
-				xpr_ptr = BITMAP_ADDR8(xprmap, line, 0);
+				dst_ptr = &pixmap->pix16(line);
+				xpr_ptr = &xprmap->pix8(line);
 
 				if (!all_dirty)
 				{
@@ -3188,8 +3188,8 @@ void K054338_fill_backcolor(running_machine &machine, bitmap_t *bitmap, int mode
 	clipw = (visarea.max_x - clipx + 4) & ~3;
 	cliph = visarea.max_y - clipy + 1;
 
-	dst_ptr = BITMAP_ADDR32(bitmap, clipy, 0);
-	dst_pitch = bitmap->rowpixels;
+	dst_ptr = &bitmap->pix32(clipy);
+	dst_pitch = bitmap->rowpixels();
 	dst_ptr += clipx;
 
 	BGC_SET = 0;

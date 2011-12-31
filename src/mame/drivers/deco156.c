@@ -63,8 +63,8 @@ static SCREEN_UPDATE( wcvol95 )
 
 	deco156_state *state = screen.machine().driver_data<deco156_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
-	bitmap_fill(bitmap, NULL, 0);
+	screen.machine().priority_bitmap->fill(0);
+	bitmap->fill(0);
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 

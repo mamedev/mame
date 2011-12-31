@@ -1265,7 +1265,7 @@ SCREEN_UPDATE( bigrun )
 	cischeat_tmap_SET_SCROLL(1)
 	cischeat_tmap_SET_SCROLL(2)
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 	for (i = 7; i >= 4; i--)
 	{											/* bitmap, road, min_priority, max_priority, transparency */
@@ -1319,7 +1319,7 @@ SCREEN_UPDATE( cischeat )
 	cischeat_tmap_SET_SCROLL(1)
 	cischeat_tmap_SET_SCROLL(2)
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 										/* bitmap, road, priority, transparency */
 	if (state->m_active_layers & 0x10)	cischeat_draw_road(screen.machine(),bitmap,cliprect,0,7,5,FALSE);
@@ -1327,7 +1327,7 @@ SCREEN_UPDATE( cischeat )
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
-//  else bitmap_fill(bitmap,cliprect,0);
+//  else bitmap->fill(0, *cliprect);
 	cischeat_tmap_DRAW(1)
 
 	if (state->m_active_layers & 0x08)	cischeat_draw_sprites(screen.machine(),bitmap,cliprect,15,3);
@@ -1376,7 +1376,7 @@ SCREEN_UPDATE( f1gpstar )
 	cischeat_tmap_SET_SCROLL(1);
 	cischeat_tmap_SET_SCROLL(2);
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
@@ -1386,7 +1386,7 @@ SCREEN_UPDATE( f1gpstar )
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
-//  else bitmap_fill(bitmap,cliprect,0);
+//  else bitmap->fill(0, *cliprect);
 	cischeat_tmap_DRAW(1)
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
@@ -1453,7 +1453,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	cischeat_tmap_SET_SCROLL(0)
 	cischeat_tmap_SET_SCROLL(2)
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)

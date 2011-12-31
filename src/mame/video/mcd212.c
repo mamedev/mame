@@ -88,7 +88,7 @@ static void cdi220_draw_lcd(running_machine &machine, int y)
 {
     cdi_state *state = machine.driver_data<cdi_state>();
     bitmap_t *bitmap = state->m_lcdbitmap;
-    UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
+    UINT32 *scanline = &bitmap->pix32(y);
     int x = 0;
     int lcd = 0;
 
@@ -1336,7 +1336,7 @@ static void mcd212_draw_scanline(mcd212_regs_t *mcd212, int y)
     UINT8 plane_a_r[768], plane_a_g[768], plane_a_b[768];
     UINT8 plane_b_r[768], plane_b_g[768], plane_b_b[768];
     UINT32 out[768];
-    UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
+    UINT32 *scanline = &bitmap->pix32(y);
     int x;
 
     mcd212_process_vsr(mcd212, 0, plane_a_r, plane_a_g, plane_a_b);

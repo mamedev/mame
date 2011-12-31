@@ -268,16 +268,8 @@ INLINE void roundupt_drawgfxzoomrotate(
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	if(clip)
 	{
-		myclip.min_x = clip->min_x;
-		myclip.max_x = clip->max_x;
-		myclip.min_y = clip->min_y;
-		myclip.max_y = clip->max_y;
-
-		if (myclip.min_x < 0) myclip.min_x = 0;
-		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width-1;
-		if (myclip.min_y < 0) myclip.min_y = 0;
-		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
-
+		myclip = *clip;
+		myclip &= dest_bmp->cliprect();
 		clip=&myclip;
 	}
 
@@ -403,7 +395,7 @@ INLINE void roundupt_drawgfxzoomrotate(
 
 							for( y=sy; y<ey; y++ )
 							{
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
 								int cx = startx;
 								int cy = starty;
 
@@ -434,8 +426,8 @@ INLINE void roundupt_drawgfxzoomrotate(
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT8 *priority_dest = BITMAP_ADDR8(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT8 *priority_dest = &dest_bmp->pix8(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -501,13 +493,13 @@ static void mycopyrozbitmap_core(bitmap_t *bitmap,bitmap_t *srcbitmap,
 			x = sx;
 			cx = startx;
 			cy = starty;
-			dest = BITMAP_ADDR32(bitmap, sy, sx);
+			dest = &bitmap->pix32(sy, sx);
 
 			while (x <= ex)
 			{
 				if (cx < widthshifted && cy < heightshifted)
 				{
-					int c = *BITMAP_ADDR32(srcbitmap, cy >> 16, cx >> 16);
+					int c = srcbitmap->pix32(cy >> 16, cx >> 16);
 
 					if (c != transparent_color)
 						*dest = c;
@@ -612,7 +604,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		if (rotate)
 		{
 			render_y = 0;
-			bitmap_fill(state->m_temp_bitmap, 0, 0);
+			state->m_temp_bitmap->fill(0);
 		}
 
 		extent_x = extent_y = 0;
@@ -729,7 +721,7 @@ start_offset-=48;
 			if (col<palette_base) col=palette_base;
 			if (col>palette_base+127) col=palette_base+127;
 
-			*BITMAP_ADDR32(bitmap, y, x) = machine.pens[col];
+			bitmap->pix32(y, x) = machine.pens[col];
 		}
 	}
 }
@@ -860,11 +852,11 @@ offset is from last pixel of first road segment?
 		/* Fill in left of road segment */
 		for (x=0; x<startPos && x<320; x++) {
 			int col = linedata[0]&0xf;
-			UINT8 shadow=*BITMAP_ADDR8(shadow_bitmap, y, x);
+			UINT8 shadow=shadow_bitmap->pix8(y, x);
 			if (shadow)
-				*BITMAP_ADDR32(bitmap, y, x) = machine.pens[768 + pal*16 + col];
+				bitmap->pix32(y, x) = machine.pens[768 + pal*16 + col];
 			else
-				*BITMAP_ADDR32(bitmap, y, x) = machine.pens[256 + pal*16 + col];
+				bitmap->pix32(y, x) = machine.pens[256 + pal*16 + col];
 		}
 
 		/* If startpos is negative, clip it and adjust the sampling position accordingly */
@@ -879,16 +871,16 @@ offset is from last pixel of first road segment?
 		for (x=startPos; x<320 && (samplePos>>11)<0x80; x++) {
 			// look up colour
 			int col = linedata[(samplePos>>11)&0x7f]&0xf;
-			UINT8 shadow=*BITMAP_ADDR8(shadow_bitmap, y, x);
+			UINT8 shadow=shadow_bitmap->pix8(y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			//if ((samplePos>>11) > 0x7f)
 			//  col=linedata[0x7f]&0xf;
 
 			if (shadow)
-				*BITMAP_ADDR32(bitmap, y, x) = machine.pens[768 + pal*16 + col];
+				bitmap->pix32(y, x) = machine.pens[768 + pal*16 + col];
 			else
-				*BITMAP_ADDR32(bitmap, y, x) = machine.pens[256 + pal*16 + col];
+				bitmap->pix32(y, x) = machine.pens[256 + pal*16 + col];
 
 			samplePos+=step;
 		}
@@ -910,16 +902,16 @@ offset is from last pixel of first road segment?
 		/* Fill pixels */
 		for (x=startPos; x<320 && x<endPos; x++) {
 			int col = linedata[0x80]&0xf;
-			UINT8 shadow=*BITMAP_ADDR8(shadow_bitmap, y, x);
+			UINT8 shadow=shadow_bitmap->pix8(y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			//if ((samplePos>>11) > 0x7f)
 			//  col=linedata[0x7f]&0xf;
 
 			if (shadow)
-				*BITMAP_ADDR32(bitmap, y, x) = machine.pens[768 + pal*16 + col + 32];
+				bitmap->pix32(y, x) = machine.pens[768 + pal*16 + col + 32];
 			else
-				*BITMAP_ADDR32(bitmap, y, x) = machine.pens[256 + pal*16 + col + 32];
+				bitmap->pix32(y, x) = machine.pens[256 + pal*16 + col + 32];
 		}
 
 		if (endPos<0) {
@@ -934,16 +926,16 @@ offset is from last pixel of first road segment?
 		for (/*x=endPos*/; x<320; x++) {
 			// look up colour
 			int col = linedata[((samplePos>>11)&0x7f) + 0x200]&0xf;
-			UINT8 shadow=*BITMAP_ADDR8(shadow_bitmap, y, x);
+			UINT8 shadow=shadow_bitmap->pix8(y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			if ((samplePos>>11) > 0x7f)
 				col=linedata[0x7f + 0x200]&0xf;
 
 			if (shadow)
-				*BITMAP_ADDR32(bitmap, y, x) = machine.pens[768 + pal*16 + col + 32];
+				bitmap->pix32(y, x) = machine.pens[768 + pal*16 + col + 32];
 			else
-				*BITMAP_ADDR32(bitmap, y, x) = machine.pens[256 + pal*16 + col + 32];
+				bitmap->pix32(y, x) = machine.pens[256 + pal*16 + col + 32];
 
 			samplePos+=step;
 		}
@@ -1013,12 +1005,12 @@ static void draw_bg(running_machine &machine, bitmap_t *dst, tilemap_t *src, con
 			int bank = (tile_bank >> (((tilemap_ram[(tile_index+0x400)&0x7fff]&0xc00)>>10)*4))&0xf;
 			int tile = (tilemap_ram[(tile_index+0x400)&0x7fff]&0x3ff) | (bank<<10);
 
-			p=*BITMAP_ADDR16(src_bitmap, src_y&src_y_mask, src_x&src_x_mask);
+			p=src_bitmap->pix16(src_y&src_y_mask, src_x&src_x_mask);
 			pp=tile_cluts[tile*8 + (p&0x7)];
 			ppp=pp + ((p&0x78)<<5);
 
 			if ((p&0x7)!=0 || ((p&0x7)==0 && (pp&0x7)!=0)) // Transparent pixels are set by both the tile pixel data==0 AND colour palette==0
-				*BITMAP_ADDR32(dst, y, x) = machine.pens[ppp];
+				dst->pix32(y, x) = machine.pens[ppp];
 		}
 	}
 }
@@ -1045,7 +1037,7 @@ static void draw_ground(running_machine &machine, bitmap_t *dst, const rectangle
 			/* Sky */
 			for (x = cliprect->min_x; x <= cliprect->max_x; ++x)
 			{
-				*BITMAP_ADDR32(dst, y, x) = machine.pens[0x100 + (sky_val & 0x7f)];
+				dst->pix32(y, x) = machine.pens[0x100 + (sky_val & 0x7f)];
 
 				/* Update horizontal counter? */
 				gha = (gha + 1) & 0xfff;
@@ -1075,7 +1067,7 @@ static void draw_ground(running_machine &machine, bitmap_t *dst, const rectangle
 				colour = (BIT(hval, 11) << 4) | (colour << 2) | ln;
 
 				/* Draw the pixel */
-				*BITMAP_ADDR32(dst, y, x) = machine.pens[0x200 + colour];
+				dst->pix32(y, x) = machine.pens[0x200 + colour];
 
 				/* Update horizontal counter */
 				gha = (gha + 1) & 0xfff;
@@ -1097,7 +1089,7 @@ SCREEN_UPDATE( apache3 )
 
 	tilemap_set_scrollx(state->m_tx_layer,0,24);
 
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[0]);
+	bitmap->fill(screen.machine().pens[0], *cliprect);
 	draw_sky(screen.machine(), bitmap, cliprect, 256, state->m_apache3_rotate_ctrl[1]);
 //  draw_ground(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap,cliprect,0, (state->m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
@@ -1116,8 +1108,8 @@ SCREEN_UPDATE( roundup5 )
 	tilemap_set_scrollx(state->m_tx_layer,0,24);
 	tilemap_set_scrolly(state->m_tx_layer,0,0); //(((state->m_roundupt_crt_reg[0xe]<<8)|state->m_roundupt_crt_reg[0xf])>>5) + 96);
 
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[384]); // todo
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	bitmap->fill(screen.machine().pens[384], *cliprect); // todo
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	draw_sprites(screen.machine(), screen.machine().priority_bitmap,cliprect,1,(state->m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_road(screen.machine(), bitmap,cliprect,screen.machine().priority_bitmap);
@@ -1139,7 +1131,7 @@ SCREEN_UPDATE( cyclwarr )
 		state->m_bigfight_last_bank=state->m_bigfight_bank;
 	}
 
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[0]);
+	bitmap->fill(screen.machine().pens[0], *cliprect);
 
 	draw_bg(screen.machine(), bitmap, state->m_layer3, &state->m_cyclwarr_videoram1[0x000], &state->m_cyclwarr_videoram1[0x100], state->m_cyclwarr_videoram1, state->m_bigfight_a40000[0], 8, -0x80, 512, 4096);
 	draw_bg(screen.machine(), bitmap, state->m_layer2, &state->m_cyclwarr_videoram1[0x200], &state->m_cyclwarr_videoram1[0x300], state->m_cyclwarr_videoram1, state->m_bigfight_a40000[0], 8, -0x80, 512, 4096);
@@ -1164,7 +1156,7 @@ SCREEN_UPDATE( bigfight )
 		state->m_bigfight_last_bank=state->m_bigfight_bank;
 	}
 
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[0]);
+	bitmap->fill(screen.machine().pens[0], *cliprect);
 	draw_bg(screen.machine(), bitmap, state->m_layer3, &state->m_cyclwarr_videoram1[0x000], &state->m_cyclwarr_videoram1[0x100], state->m_cyclwarr_videoram1, state->m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
 	draw_bg(screen.machine(), bitmap, state->m_layer2, &state->m_cyclwarr_videoram1[0x200], &state->m_cyclwarr_videoram1[0x300], state->m_cyclwarr_videoram1, state->m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
 	draw_bg(screen.machine(), bitmap, state->m_layer1, &state->m_cyclwarr_videoram0[0x000], &state->m_cyclwarr_videoram0[0x100], state->m_cyclwarr_videoram0, state->m_bigfight_a40000[0], 8, -0x40, 1024, 2048);

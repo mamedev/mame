@@ -157,7 +157,7 @@ static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectan
 			}
 
 			if (sy >= cliprect->min_y && sy <= cliprect->max_y && sx-9 >= cliprect->min_x && sx-9 <= cliprect->max_x)
-				*BITMAP_ADDR16(bitmap, sy, sx-9) = 0x300+(color^colxor);
+				bitmap->pix16(sy, sx-9) = 0x300+(color^colxor);
 		}
 	}
 

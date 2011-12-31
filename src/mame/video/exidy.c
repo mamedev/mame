@@ -171,9 +171,9 @@ static void draw_background(running_machine &machine)
 				for (i = 0; i < 8; i++)
 				{
 					if (data1 & 0x80)
-						*BITMAP_ADDR16(state->m_background_bitmap, y, x) = (data2 & 0x80) ? on_pen_2 : on_pen_1;
+						state->m_background_bitmap->pix16(y, x) = (data2 & 0x80) ? on_pen_2 : on_pen_1;
 					else
-						*BITMAP_ADDR16(state->m_background_bitmap, y, x) = off_pen;
+						state->m_background_bitmap->pix16(y, x) = off_pen;
 
 					x = x + 1;
 					data1 = data1 << 1;
@@ -187,7 +187,7 @@ static void draw_background(running_machine &machine)
 
 				for (i = 0; i < 8; i++)
 				{
-					*BITMAP_ADDR16(state->m_background_bitmap, y, x) = (data & 0x80) ? on_pen_1 : off_pen;
+					state->m_background_bitmap->pix16(y, x) = (data & 0x80) ? on_pen_1 : off_pen;
 
 					x = x + 1;
 					data = data << 1;
@@ -280,7 +280,7 @@ static void check_collision(running_machine &machine)
 	exidy_state *state = machine.driver_data<exidy_state>();
 	UINT8 sprite_set_1 = ((*state->m_sprite_enable & 0x20) != 0);
 	UINT8 sprite_set_2 = ((*state->m_sprite_enable & 0x40) != 0);
-	static const rectangle clip = { 0, 15, 0, 15 };
+	const rectangle clip(0, 15, 0, 15);
 	int org_1_x = 0, org_1_y = 0;
 	int org_2_x = 0, org_2_y = 0;
 	int sx, sy;
@@ -291,7 +291,7 @@ static void check_collision(running_machine &machine)
 		return;
 
 	/* draw sprite 1 */
-	bitmap_fill(state->m_motion_object_1_vid, &clip, 0xff);
+	state->m_motion_object_1_vid->fill(0xff, clip);
 	if (sprite_1_enabled(state))
 	{
 		org_1_x = 236 - *state->m_sprite1_xpos - 4;
@@ -302,7 +302,7 @@ static void check_collision(running_machine &machine)
 	}
 
 	/* draw sprite 2 */
-	bitmap_fill(state->m_motion_object_2_vid, &clip, 0xff);
+	state->m_motion_object_2_vid->fill(0xff, clip);
 	org_2_x = 236 - *state->m_sprite2_xpos - 4;
 	org_2_y = 244 - *state->m_sprite2_ypos - 4;
 	drawgfx_transpen(state->m_motion_object_2_vid, &clip, machine.gfx[0],
@@ -310,7 +310,7 @@ static void check_collision(running_machine &machine)
 			0, 0, 0, 0, 0);
 
 	/* draw sprite 2 clipped to sprite 1's location */
-	bitmap_fill(state->m_motion_object_2_clip, &clip, 0xff);
+	state->m_motion_object_2_clip->fill(0xff, clip);
 	if (sprite_1_enabled(state))
 	{
 		sx = org_2_x - org_1_x;
@@ -324,16 +324,16 @@ static void check_collision(running_machine &machine)
 	for (sy = 0; sy < 16; sy++)
 		for (sx = 0; sx < 16; sx++)
 		{
-			if (*BITMAP_ADDR16(state->m_motion_object_1_vid, sy, sx) != 0xff)
+			if (state->m_motion_object_1_vid->pix16(sy, sx) != 0xff)
 			{
 				UINT8 current_collision_mask = 0;
 
 				/* check for background collision (M1CHAR) */
-				if (*BITMAP_ADDR16(state->m_background_bitmap, org_1_y + sy, org_1_x + sx) != 0)
+				if (state->m_background_bitmap->pix16(org_1_y + sy, org_1_x + sx) != 0)
 					current_collision_mask |= 0x04;
 
 				/* check for motion object collision (M1M2) */
-				if (*BITMAP_ADDR16(state->m_motion_object_2_clip, sy, sx) != 0xff)
+				if (state->m_motion_object_2_clip->pix16(sy, sx) != 0xff)
 					current_collision_mask |= 0x10;
 
 				/* if we got one, trigger an interrupt */
@@ -341,10 +341,10 @@ static void check_collision(running_machine &machine)
 					machine.scheduler().timer_set(machine.primary_screen->time_until_pos(org_1_x + sx, org_1_y + sy), FUNC(collision_irq_callback), current_collision_mask);
 			}
 
-			if (*BITMAP_ADDR16(state->m_motion_object_2_vid, sy, sx) != 0xff)
+			if (state->m_motion_object_2_vid->pix16(sy, sx) != 0xff)
 			{
 				/* check for background collision (M2CHAR) */
-				if (*BITMAP_ADDR16(state->m_background_bitmap, org_2_y + sy, org_2_x + sx) != 0)
+				if (state->m_background_bitmap->pix16(org_2_y + sy, org_2_x + sx) != 0)
 					if ((state->m_collision_mask & 0x08) && (count++ < 128))
 						machine.scheduler().timer_set(machine.primary_screen->time_until_pos(org_2_x + sx, org_2_y + sy), FUNC(collision_irq_callback), 0x08);
 			}

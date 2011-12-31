@@ -140,7 +140,7 @@ static MC6845_UPDATE_ROW( update_row )
 				col |= 0x03;
 
 			col = state->m_ram_palette[col & 0x3ff];
-			*BITMAP_ADDR32(bitmap, y, x) = pens[col ? col : (lscnblk ? 8 : 0)];
+			bitmap->pix32(y, x) = pens[col ? col : (lscnblk ? 8 : 0)];
 
 			x++;
 		}

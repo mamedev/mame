@@ -889,7 +889,7 @@ static VIDEO_START( raiden2 )
 static SCREEN_UPDATE( raiden2 )
 {
 	raiden2_state *state = screen.machine().driver_data<raiden2_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_Q))
 	{

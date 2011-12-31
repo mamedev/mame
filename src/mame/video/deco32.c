@@ -171,16 +171,8 @@ INLINE void dragngun_drawgfxzoom(
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	if(clip)
 	{
-		myclip.min_x = clip->min_x;
-		myclip.max_x = clip->max_x;
-		myclip.min_y = clip->min_y;
-		myclip.max_y = clip->max_y;
-
-		if (myclip.min_x < 0) myclip.min_x = 0;
-		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width-1;
-		if (myclip.min_y < 0) myclip.min_y = 0;
-		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
-
+		myclip = *clip;
+		myclip &= dest_bmp->cliprect();
 		clip=&myclip;
 	}
 
@@ -261,8 +253,8 @@ INLINE void dragngun_drawgfxzoom(
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT8 *pri = &pri_buffer->pix8(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -285,7 +277,7 @@ INLINE void dragngun_drawgfxzoom(
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -308,8 +300,8 @@ INLINE void dragngun_drawgfxzoom(
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT8 *pri = &pri_buffer->pix8(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -332,7 +324,7 @@ INLINE void dragngun_drawgfxzoom(
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -604,8 +596,8 @@ SCREEN_UPDATE( captaven )
 
 	tilemap_set_flip_all(screen.machine(),flip_screen_get(screen.machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[0x000]); // Palette index not confirmed
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(screen.machine().pens[0x000], *cliprect); // Palette index not confirmed
 
 	deco16ic_set_pf1_8bpp_mode(state->m_deco_tilegen2, 1);
 
@@ -639,7 +631,7 @@ SCREEN_UPDATE( dragngun )
 	state->m_deco_tilegen1 = screen.machine().device("tilegen1");
 	state->m_deco_tilegen2 = screen.machine().device("tilegen2");
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
@@ -683,8 +675,8 @@ SCREEN_UPDATE( fghthist )
 	state->m_deco_tilegen1 = screen.machine().device("tilegen1");
 	state->m_deco_tilegen2 = screen.machine().device("tilegen2");
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[0x000]); // Palette index not confirmed
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(screen.machine().pens[0x000], *cliprect); // Palette index not confirmed
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
@@ -736,11 +728,11 @@ static void mixDualAlphaSprites(bitmap_t *bitmap, const rectangle *cliprect, con
 
 	/* Mix sprites into main bitmap, based on priority & alpha */
 	for (y=8; y<248; y++) {
-		UINT8* tilemapPri=BITMAP_ADDR8(machine.priority_bitmap, y, 0);
-		UINT16* sprite0=BITMAP_ADDR16(sprite0_mix_bitmap, y, 0);
-		UINT16* sprite1=BITMAP_ADDR16(sprite1_mix_bitmap, y, 0);
-		UINT32* destLine=BITMAP_ADDR32(bitmap, y, 0);
-		UINT16* alphaTilemap=BITMAP_ADDR16(state->m_tilemap_alpha_bitmap, y, 0);
+		UINT8* tilemapPri=&machine.priority_bitmap->pix8(y);
+		UINT16* sprite0=&sprite0_mix_bitmap->pix16(y);
+		UINT16* sprite1=&sprite1_mix_bitmap->pix16(y);
+		UINT32* destLine=&bitmap->pix32(y);
+		UINT16* alphaTilemap=&state->m_tilemap_alpha_bitmap->pix16(y);
 
 		for (x=0; x<320; x++) {
 			UINT16 priColAlphaPal0=sprite0[x];
@@ -871,9 +863,9 @@ SCREEN_UPDATE( nslasher )
 	if (state->m_ace_ram_dirty)
 		updateAceRam(screen.machine());
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[0x200]);
+	bitmap->fill(screen.machine().pens[0x200], *cliprect);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
 	screen.machine().device<decospr_device>("spritegen1")->set_pix_raw_shift(8);
@@ -884,7 +876,7 @@ SCREEN_UPDATE( nslasher )
 
 
 	/* Render alpha-blended tilemap to separate buffer for proper mixing */
-	bitmap_fill(state->m_tilemap_alpha_bitmap,cliprect,0);
+	state->m_tilemap_alpha_bitmap->fill(0, *cliprect);
 
 	/* Draw playfields & sprites */
 	if (state->m_pri&2)

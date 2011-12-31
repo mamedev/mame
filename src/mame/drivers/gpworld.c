@@ -92,8 +92,8 @@ INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,in
 {
 	if (flip)
 	{
-		x = bitmap->width - x - 1;
-		y = bitmap->height - y - 1;
+		x = bitmap->width() - x - 1;
+		y = bitmap->height() - y - 1;
 	}
 
 	if (x < cliprect->min_x ||
@@ -102,7 +102,7 @@ INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,in
 		y > cliprect->max_y)
 		return;
 
-	*BITMAP_ADDR32(bitmap, y, x) = color;
+	bitmap->pix32(y, x) = color;
 }
 
 static void gpworld_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -218,7 +218,7 @@ static void gpworld_draw_sprites(running_machine &machine, bitmap_t *bitmap, con
 
 static SCREEN_UPDATE( gpworld )
 {
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	gpworld_draw_tiles(screen.machine(), bitmap, cliprect);
 	gpworld_draw_sprites(screen.machine(), bitmap, cliprect);

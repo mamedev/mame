@@ -81,8 +81,8 @@ SCREEN_UPDATE( aliens )
 
 	k052109_tilemap_update(state->m_k052109);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, state->m_layer_colorbase[1] * 16);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(state->m_layer_colorbase[1] * 16, *cliprect);
 
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 2);

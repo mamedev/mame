@@ -201,9 +201,9 @@ SCREEN_UPDATE( othldrby )
 		}
 	}
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 0, 0);

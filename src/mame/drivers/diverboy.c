@@ -111,7 +111,7 @@ static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rect
 
 static SCREEN_UPDATE(diverboy)
 {
-//  bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+//  bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -70,9 +70,9 @@ INLINE void set_pixel( running_machine &machine, bitmap_t *bitmap, UINT8 y, UINT
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
 		if (state->m_c8080bw_flip_screen)
-			*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pens[color];
+			bitmap->pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pens[color];
 		else
-			*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pens[color];
+			bitmap->pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pens[color];
 	}
 }
 
@@ -104,9 +104,9 @@ static void clear_extra_columns( running_machine &machine, bitmap_t *bitmap, pen
 		for (y = MW8080BW_VCOUNTER_START_NO_VBLANK; y != 0; y++)
 		{
 			if (state->m_c8080bw_flip_screen)
-				*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) = pens[color];
+				bitmap->pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) = pens[color];
 			else
-				*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) = pens[color];
+				bitmap->pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) = pens[color];
 		}
 	}
 }
@@ -443,7 +443,7 @@ SCREEN_UPDATE( shuttlei )
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
-			*BITMAP_ADDR32(bitmap, y, x) = pen;
+			bitmap->pix32(y, x) = pen;
 
 			x = x + 1;
 			data = data << 1;

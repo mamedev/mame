@@ -140,7 +140,7 @@ static SCREEN_UPDATE( bmcbowl )
 */
 
 	int x,y,z,pixdat;
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	z=0;
 	for (y=0;y<230;y++)
@@ -150,30 +150,30 @@ static SCREEN_UPDATE( bmcbowl )
 			pixdat = state->m_vid2[0x8000+z];
 
 			if(pixdat&0xff)
-				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
+				bitmap->pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
-				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
+				bitmap->pix16(y, x) = (pixdat>>8);
 
 			pixdat = state->m_vid2[z];
 
 			if(pixdat&0xff)
-				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
+				bitmap->pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
-				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
+				bitmap->pix16(y, x) = (pixdat>>8);
 
 			pixdat = state->m_vid1[0x8000+z];
 
 			if(pixdat&0xff)
-				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
+				bitmap->pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
-				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
+				bitmap->pix16(y, x) = (pixdat>>8);
 
 			pixdat = state->m_vid1[z];
 
 			if(pixdat&0xff)
-				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
+				bitmap->pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
-				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
+				bitmap->pix16(y, x) = (pixdat>>8);
 
 			z++;
 		}

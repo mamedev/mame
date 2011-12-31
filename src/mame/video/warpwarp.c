@@ -218,7 +218,7 @@ WRITE8_HANDLER( warpwarp_videoram_w )
 INLINE void geebee_plot(bitmap_t *bitmap, const rectangle *cliprect, int x, int y, pen_t pen)
 {
 	if (x >= cliprect->min_x && x <= cliprect->max_x && y >= cliprect->min_y && y <= cliprect->max_y)
-		*BITMAP_ADDR16(bitmap, y, x) = pen;
+		bitmap->pix16(y, x) = pen;
 }
 
 static void draw_ball(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,pen_t pen)

@@ -345,7 +345,7 @@ static void m107_tilemap_draw(running_machine &machine, bitmap_t *bitmap, const 
 static void m107_screenrefresh(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	m107_state *state = machine.driver_data<m107_state>();
-	bitmap_fill(machine.priority_bitmap, cliprect, 0);
+	machine.priority_bitmap->fill(0, *cliprect);
 
 	if ((~state->m_control[0x0b] >> 7) & 1)
 	{
@@ -353,7 +353,7 @@ static void m107_screenrefresh(running_machine &machine, bitmap_t *bitmap, const
 		m107_tilemap_draw(machine, bitmap, cliprect, 3, 1,0);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 
 	/* note: the opaque flag is used if layer 3 is disabled, noticeable in World PK Soccer title and gameplay screens */
 	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0,(((state->m_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));

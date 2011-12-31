@@ -144,8 +144,8 @@ SCREEN_UPDATE( simpsons )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(16 * bg_colorbase, *cliprect);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[0], 0, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[2], 0, 4);

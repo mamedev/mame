@@ -165,8 +165,8 @@ SCREEN_UPDATE( flkatck )
 	}
 
 	/* compute clipping */
-	sect_rect(&clip[0], cliprect);
-	sect_rect(&clip[1], cliprect);
+	clip[0] &= *cliprect;
+	clip[1] &= *cliprect;
 
 	/* draw the graphics */
 	tilemap_draw(bitmap, &clip[0], state->m_k007121_tilemap[0], 0, 0);

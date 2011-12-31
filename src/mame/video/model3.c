@@ -173,7 +173,7 @@ static void draw_tile_4bit(running_machine &machine, bitmap_t *bitmap, int tx, i
 	tile = &tile_base[tile_index];
 
 	for(y = ty; y < ty+8; y++) {
-		UINT16 *d = BITMAP_ADDR16(bitmap, y^1, 0);
+		UINT16 *d = &bitmap->pix16(y^1);
 		for(x = tx; x < tx+8; x+=2) {
 			UINT8 tile0, tile1;
 			UINT16 pix0, pix1;
@@ -209,7 +209,7 @@ static void draw_tile_8bit(running_machine &machine, bitmap_t *bitmap, int tx, i
 	tile = &tile_base[tile_index];
 
 	for(y = ty; y < ty+8; y++) {
-		UINT16 *d = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *d = &bitmap->pix16(y);
 		int xx = 0;
 		for(x = tx; x < tx+8; x++) {
 			UINT8 tile0;
@@ -232,7 +232,7 @@ static void draw_texture_sheet(running_machine &machine, bitmap_t *bitmap, const
 	int x,y;
 	for(y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *d = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *d = &bitmap->pix16(y);
 		int index = (y*2)*2048;
 		for(x = cliprect->min_x; x <= cliprect->max_x; x++) {
 			UINT16 pix = state->m_texture_ram[0][index];
@@ -326,8 +326,8 @@ static void copy_screen(running_machine &machine, bitmap_t *bitmap, const rectan
 	model3_state *state = machine.driver_data<model3_state>();
 	int x,y;
 	for(y=cliprect->min_y; y <= cliprect->max_y; y++) {
-		UINT16 *d = BITMAP_ADDR16(bitmap, y, 0);
-		UINT16 *s = BITMAP_ADDR16(state->m_bitmap3d, y, 0);
+		UINT16 *d = &bitmap->pix16(y);
+		UINT16 *s = &state->m_bitmap3d->pix16(y);
 		for(x=cliprect->min_x; x <= cliprect->max_x; x++) {
 			UINT16 pix = s[x];
 			if(!(pix & 0x8000)) {
@@ -382,7 +382,7 @@ SCREEN_UPDATE( model3 )
 			state->m_debug_layer_disable ^= 0x10;
 	}
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	if (!(state->m_debug_layer_disable & 0x8))
 		draw_layer(screen.machine(), bitmap, cliprect, 3, (state->m_layer_enable >> 3) & 0x1);
@@ -394,8 +394,8 @@ SCREEN_UPDATE( model3 )
 	{
 #if 0
 		if(state->m_real3d_display_list) {
-			bitmap_fill(state->m_zbuffer, cliprect, 0);
-			bitmap_fill(state->m_bitmap3d, cliprect, 0x8000);
+			state->m_zbuffer->fill(0, *cliprect);
+			state->m_bitmap3d->fill(0x8000, *cliprect);
 			real3d_traverse_display_list(screen.machine());
 		}
 #endif
@@ -784,8 +784,8 @@ void real3d_display_list_end(running_machine &machine)
 		};
 	}
 	state->m_texture_fifo_pos = 0;
-	bitmap_fill(state->m_zbuffer, NULL, 0);
-	bitmap_fill(state->m_bitmap3d, NULL, 0x8000);
+	state->m_zbuffer->fill(0);
+	state->m_bitmap3d->fill(0x8000);
 	real3d_traverse_display_list(machine);
 	//state->m_real3d_display_list = 1;
 }

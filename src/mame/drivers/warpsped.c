@@ -142,17 +142,17 @@ static VIDEO_START( warpspeed )
 
 static void draw_circle_line(bitmap_t *bitmap, int x, int y, int l, int color)
 {
-	if (y >= 0 && y <= bitmap->height - 1)
+	if (y >= 0 && y <= bitmap->height() - 1)
 	{
-		UINT16* pLine = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16* pLine = &bitmap->pix16(y);
 
 		int h1 = x - l;
 		int h2 = x + l;
 
 		if (h1 < 0)
 			h1 = 0;
-		if (h2 > bitmap->width - 1)
-			h2 = bitmap->width - 1;
+		if (h2 > bitmap->width() - 1)
+			h2 = bitmap->width() - 1;
 
 		for (x = h1; x <= h2; x++)
 			pLine[x] = color;

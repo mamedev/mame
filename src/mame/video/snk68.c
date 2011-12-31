@@ -292,7 +292,7 @@ SCREEN_UPDATE( pow )
 {
 	snk68_state *state = screen.machine().driver_data<snk68_state>();
 
-	bitmap_fill(bitmap, cliprect, 0x7ff);
+	bitmap->fill(0x7ff, *cliprect);
 
 	/* This appears to be the correct priority order */
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);

@@ -145,7 +145,7 @@ static SCREEN_UPDATE(hotblock)
 	int i;
 	static const int xxx = 320, yyy = 204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()));
 
 	for (i = 0; i < 256; i++)
 	{
@@ -159,7 +159,7 @@ static SCREEN_UPDATE(hotblock)
 		for(x = 0; x < xxx; x++)
 		{
 			if (state->m_port0 & 0x40)
-				*BITMAP_ADDR16(bitmap, y, x) = state->m_vram[count];
+				bitmap->pix16(y, x) = state->m_vram[count];
 			count++;
 		}
 	}

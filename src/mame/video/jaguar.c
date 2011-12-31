@@ -832,7 +832,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 	/* only run if video is enabled and we are past the "display begin" */
 	if ((gpu_regs[VMODE] & 1) && vc >= (gpu_regs[VDB] & 0x7ff))
 	{
-		UINT32 *dest = BITMAP_ADDR32(screen_bitmap, vc >> 1, 0);
+		UINT32 *dest = &screen_bitmap->pix32(vc >> 1);
 		int maxx = visarea.max_x;
 		int hde = effective_hvalue(gpu_regs[HDE]) >> 1;
 		UINT16 x,scanline[760];
@@ -927,7 +927,7 @@ SCREEN_UPDATE( cojag )
 	/* if not enabled, just blank */
 	if (!(gpu_regs[VMODE] & 1))
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 		return 0;
 	}
 

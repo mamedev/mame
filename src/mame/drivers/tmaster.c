@@ -300,7 +300,7 @@ static VIDEO_START( tmaster )
 		for (buffer = 0; buffer < 2; buffer++)
 		{
 			state->m_bitmap[layer][buffer] = machine.primary_screen->alloc_compatible_bitmap();
-			bitmap_fill(state->m_bitmap[layer][buffer], NULL, 0xff);
+			state->m_bitmap[layer][buffer]->fill(0xff);
 		}
 	}
 
@@ -330,7 +330,7 @@ static SCREEN_UPDATE( tmaster )
 #endif
 
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->m_bitmap[0][(state->m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
 	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->m_bitmap[1][(state->m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
@@ -425,7 +425,7 @@ static void tmaster_draw(running_machine &machine)
 							pen = dst_pen;
 
 						if ((pen != 0xff) && (sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-							*BITMAP_ADDR16(bitmap, sy + y, sx + x) = pen + color;
+							bitmap->pix16(sy + y, sx + x) = pen + color;
 					}
 				}
 			}
@@ -440,7 +440,7 @@ static void tmaster_draw(running_machine &machine)
 						pen = gfxdata[addr++];
 
 						if ((pen != 0xff) && (sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-							*BITMAP_ADDR16(bitmap, sy + y, sx + x) = pen + color;
+							bitmap->pix16(sy + y, sx + x) = pen + color;
 					}
 				}
 			}
@@ -457,7 +457,7 @@ static void tmaster_draw(running_machine &machine)
 				for (x = x0; x != x1; x += dx)
 				{
 					if ((sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-						*BITMAP_ADDR16(bitmap, sy + y, sx + x) = pen;
+						bitmap->pix16(sy + y, sx + x) = pen;
 				}
 			}
 			break;

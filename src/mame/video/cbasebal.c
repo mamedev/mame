@@ -185,7 +185,7 @@ SCREEN_UPDATE( cbasebal )
 	if (state->m_bg_on)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, 768);
+		bitmap->fill(768, *cliprect);
 
 	if (state->m_obj_on)
 		draw_sprites(screen.machine(), bitmap, cliprect);

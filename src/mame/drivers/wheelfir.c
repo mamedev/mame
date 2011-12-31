@@ -321,7 +321,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 			if(x<512 && y <512)
 			{
-				*BITMAP_ADDR16(state->m_tmp_bitmap[LAYER_BG], y, x) = sixdat;
+				state->m_tmp_bitmap[LAYER_BG]->pix16(y, x) = sixdat;
 			}
 		}
 
@@ -539,7 +539,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 						//hack for clear
 						if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
 						{
-					//      *BITMAP_ADDR16(state->m_tmp_bitmap[vpage], screen_y , screen_x ) =0;
+					//      state->m_tmp_bitmap[vpage]->pix16(screen_y , screen_x ) =0;
 						}
 					}
 					else
@@ -548,7 +548,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 						if(pix && screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
 						{
-							*BITMAP_ADDR16(state->m_tmp_bitmap[vpage], screen_y , screen_x ) = pix;
+							state->m_tmp_bitmap[vpage]->pix16(screen_y , screen_x ) = pix;
 						}
 					}
 				}
@@ -568,12 +568,12 @@ static SCREEN_UPDATE(wheelfir)
 {
 	wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
 
-	bitmap_fill(bitmap, cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 	for(int y=0;y<NUM_SCANLINES;++y)
 	{
-		UINT16 *source = BITMAP_ADDR16(state->m_tmp_bitmap[LAYER_BG],( (state->m_scanlines[y].y)&511), 0);
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *source = &state->m_tmp_bitmap[LAYER_BG]->pix16(( (state->m_scanlines[y].y)&511));
+		UINT16 *dest = &bitmap->pix16(y);
 
 		for (int x=0;x<336;x++)
 		{
@@ -587,7 +587,7 @@ static SCREEN_UPDATE(wheelfir)
 
 /*
     {
-        bitmap_fill(state->m_tmp_bitmap[LAYER_BG], &screen.visible_area(),0);
+        state->m_tmp_bitmap[LAYER_BG]->fill(0, screen.visible_area());
 
     }
 */
@@ -598,7 +598,7 @@ static SCREEN_UPDATE(wheelfir)
 static SCREEN_EOF( wheelfir )
 {
 	wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
-	bitmap_fill(state->m_tmp_bitmap[LAYER_FG], &screen.visible_area(),0);
+	state->m_tmp_bitmap[LAYER_FG]->fill(0, screen.visible_area());
 }
 
 

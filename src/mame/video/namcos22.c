@@ -407,8 +407,8 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	int penmask = 0xff;
 	int penshift = 0;
 	int prioverchar = extra->prioverchar;
-	UINT32 *dest = BITMAP_ADDR32(destmap, scanline, 0);
-	UINT8 *primap = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
+	UINT32 *dest = &destmap->pix32(scanline);
+	UINT8 *primap = &extra->priority_bitmap->pix8(scanline);
 	int x;
 
 	if (extra->cmode & 4)
@@ -744,8 +744,8 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	rgbint fogColor = extra->fogColor;
 	rgbint fadeColor = extra->fadeColor;
 	UINT8 *source = (UINT8 *)extra->source + y_index * extra->line_modulo;
-	UINT32 *dest = BITMAP_ADDR32(destmap, scanline, 0);
-	UINT8 *primap = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
+	UINT32 *dest = &destmap->pix32(scanline);
+	UINT8 *primap = &extra->priority_bitmap->pix8(scanline);
 	int x;
 
 	for( x=extent->startx; x<extent->stopx; x++ )
@@ -857,10 +857,10 @@ ApplyGamma( running_machine &machine, bitmap_t *bitmap )
 		const UINT8 *rlut = (const UINT8 *)&state->m_gamma[0x100/4];
 		const UINT8 *glut = (const UINT8 *)&state->m_gamma[0x200/4];
 		const UINT8 *blut = (const UINT8 *)&state->m_gamma[0x300/4];
-		for( y=0; y<bitmap->height; y++ )
+		for( y=0; y<bitmap->height(); y++ )
 		{
-			UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
-			for( x=0; x<bitmap->width; x++ )
+			UINT32 *dest = &bitmap->pix32(y);
+			for( x=0; x<bitmap->width(); x++ )
 			{
 				int rgb = dest[x];
 				int r = rlut[NATIVE_ENDIAN_VALUE_LE_BE(3,0)^((rgb>>16)&0xff)];
@@ -875,10 +875,10 @@ ApplyGamma( running_machine &machine, bitmap_t *bitmap )
 		const UINT8 *rlut = 0x000+(const UINT8 *)machine.region("user1")->base();
 		const UINT8 *glut = 0x100+rlut;
 		const UINT8 *blut = 0x200+rlut;
-		for( y=0; y<bitmap->height; y++ )
+		for( y=0; y<bitmap->height(); y++ )
 		{
-			UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
-			for( x=0; x<bitmap->width; x++ )
+			UINT32 *dest = &bitmap->pix32(y);
+			for( x=0; x<bitmap->width(); x++ )
 			{
 				int rgb = dest[x];
 				int r = rlut[(rgb>>16)&0xff];
@@ -1986,9 +1986,9 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 	// mix textlayer with poly/sprites
 	for (y=0;y<480;y++)
 	{
-		src = BITMAP_ADDR16(state->m_mix_bitmap, y, 0);
-		dest = BITMAP_ADDR32(bitmap, y, 0);
-		pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+		src = &state->m_mix_bitmap->pix16(y);
+		dest = &bitmap->pix32(y);
+		pri = &machine.priority_bitmap->pix8(y);
 		for (x=0;x<640;x++)
 		{
 			// skip if transparent or under poly/sprite
@@ -2063,9 +2063,9 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_t *bitmap, 
 	// mix textlayer with poly/sprites
 	for (y=0;y<480;y++)
 	{
-		src = BITMAP_ADDR16(state->m_mix_bitmap, y, 0);
-		dest = BITMAP_ADDR32(bitmap, y, 0);
-		pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+		src = &state->m_mix_bitmap->pix16(y);
+		dest = &bitmap->pix32(y);
+		pri = &machine.priority_bitmap->pix8(y);
 		for (x=0;x<640;x++)
 		{
 			// skip if transparent or under poly
@@ -2817,7 +2817,7 @@ SCREEN_UPDATE( namcos22s )
 	UpdateVideoMixer(screen.machine());
 	UpdatePalette(screen.machine());
 	namcos22s_recalc_czram(screen.machine());
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	// background color
 	rgbint bg_color;
@@ -2828,7 +2828,7 @@ SCREEN_UPDATE( namcos22s )
 		rgb_comp_to_rgbint(&fade_color, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
 		rgbint_blend(&bg_color, &fade_color, 0xff - mixer.fadeFactor);
 	}
-	bitmap_fill( bitmap, cliprect, rgbint_to_rgb(&bg_color));
+	bitmap->fill(rgbint_to_rgb(&bg_color), *cliprect);
 
 	// layers
 	UINT8 layer = nthbyte(state->m_gamma,0x1f);
@@ -2898,8 +2898,8 @@ SCREEN_UPDATE( namcos22 )
 {
 	UpdateVideoMixer(screen.machine());
 	UpdatePalette(screen.machine());
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	DrawPolygons(screen.machine(), bitmap);
 	RenderScene(screen.machine(), bitmap);
 	DrawCharacterLayer(screen.machine(), bitmap, cliprect);

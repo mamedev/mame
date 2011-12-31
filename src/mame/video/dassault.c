@@ -186,8 +186,8 @@ SCREEN_UPDATE( dassault )
 
 	/* Draw playfields/update priority bitmap */
 	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[3072]);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(screen.machine().pens[3072], *cliprect);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */

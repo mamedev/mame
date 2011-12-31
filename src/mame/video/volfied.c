@@ -121,7 +121,7 @@ static void refresh_pixel_layer( running_machine &machine, bitmap_t *bitmap )
 			else
 				color |= p[x] & 0xf;
 
-			*BITMAP_ADDR16(bitmap, y, x - 1) = color;
+			bitmap->pix16(y, x - 1) = color;
 		}
 
 		p += 512;
@@ -132,7 +132,7 @@ SCREEN_UPDATE( volfied )
 {
 	volfied_state *state = screen.machine().driver_data<volfied_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 	refresh_pixel_layer(screen.machine(), bitmap);
 	pc090oj_draw_sprites(state->m_pc090oj, bitmap, cliprect, 0);
 	return 0;

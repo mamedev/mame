@@ -123,12 +123,12 @@ WRITE16_HANDLER(rlt_blitter_w)
 		if(new_data & BLTFLAG_DISPLAY_UD)
 		{
 			copybitmap(state->m_tmp_bitmap[BITMAP_FG_DISPLAY], state->m_tmp_bitmap[BITMAP_FG_1], 0, 0, 0, 0, NULL);
-			bitmap_fill(state->m_tmp_bitmap[BITMAP_FG_1], NULL, 0);
+			state->m_tmp_bitmap[BITMAP_FG_1]->fill(0);
 		}
 		else
 		{
 			copybitmap(state->m_tmp_bitmap[BITMAP_FG_DISPLAY], state->m_tmp_bitmap[BITMAP_FG_2], 0, 0, 0, 0, NULL);
-			bitmap_fill(state->m_tmp_bitmap[BITMAP_FG_2], NULL, 0);
+			state->m_tmp_bitmap[BITMAP_FG_2]->fill(0);
 		}
 	}
 
@@ -214,7 +214,7 @@ WRITE16_HANDLER(rlt_blitter_w)
 
 				if((pix || force_blit)&& screen_x >0 && y >0 && screen_x < 512 && y < 256 )
 				{
-					*BITMAP_ADDR16(state->m_tmp_bitmap[layer], y  , screen_x ) = pix;
+					state->m_tmp_bitmap[layer]->pix16(y  , screen_x ) = pix;
 				}
 			}
 		}

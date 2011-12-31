@@ -163,10 +163,10 @@ static WRITE16_HANDLER(ke_w)
 static SCREEN_UPDATE( galaxygame )
 {
 	galaxygame_state *state = screen.machine().driver_data<galaxygame_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	for (int i = 0; i < state->m_point_display_list_index; i++ )
 	{
-		*BITMAP_ADDR16(bitmap, state->m_point_display_list[i].x >> 7, state->m_point_display_list[i].y >> 7) = 1;
+		bitmap->pix16(state->m_point_display_list[i].x >> 7, state->m_point_display_list[i].y >> 7) = 1;
 	}
 	return 0;
 }

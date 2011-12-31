@@ -1294,7 +1294,7 @@ static void copylayer(running_machine &machine, bitmap_t *bitmap, const rectangl
 				{
 					pen &= penmask;
 					pen |= palbase;
-					*BITMAP_ADDR16(bitmap, y, x) = pen;
+					bitmap->pix16(y, x) = pen;
 				}
 			}
 		}
@@ -1341,7 +1341,7 @@ SCREEN_UPDATE(ddenlovr)
 	if (screen.machine().input().code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
 #endif
 
-	bitmap_fill(bitmap, cliprect, state->m_ddenlovr_bgcolor);
+	bitmap->fill(state->m_ddenlovr_bgcolor, *cliprect);
 
 #ifdef MAME_DEBUG
 	if (screen.machine().input().code_pressed(KEYCODE_Z))

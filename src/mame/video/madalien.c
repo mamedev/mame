@@ -180,8 +180,8 @@ static void draw_edges(running_machine &machine, bitmap_t *bitmap, const rectang
 		clip_edge2.min_y = *state->m_edge2_pos | 0x80;
 	}
 
-	sect_rect(&clip_edge1, cliprect);
-	sect_rect(&clip_edge2, cliprect);
+	clip_edge1 &= *cliprect;
+	clip_edge2 &= *cliprect;
 
 	tilemap_mark_all_tiles_dirty(state->m_tilemap_edge1[scroll_mode]);
 	tilemap_mark_all_tiles_dirty(state->m_tilemap_edge2[scroll_mode]);
@@ -227,8 +227,8 @@ static void draw_headlight(running_machine &machine, bitmap_t *bitmap, const rec
 				if ((hx < cliprect->min_x) || (hx > cliprect->max_x))
 					continue;
 
-				if (*BITMAP_ADDR16(state->m_headlight_bitmap, y, x) != 0)
-					*BITMAP_ADDR16(bitmap, hy, hx) |= 8;
+				if (state->m_headlight_bitmap->pix16(y, x) != 0)
+					bitmap->pix16(hy, hx) |= 8;
 			}
 		}
 	}
@@ -265,7 +265,7 @@ static SCREEN_UPDATE( madalien )
 	// mode 3 - transition from A to B
 	int scroll_mode = *state->m_scroll & 3;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 	draw_edges(screen.machine(), bitmap, cliprect, flip, scroll_mode);
 	draw_foreground(screen.machine(), bitmap, cliprect, flip);
 
@@ -298,7 +298,7 @@ static SCREEN_UPDATE( madalien )
 		for (y = cliprect->min_y; y <= cliprect->max_y ; y++)
 			for (x = min_x; x <= max_x; x++)
 				if ((x >= cliprect->min_x) && (x <= cliprect->max_x))
-					*BITMAP_ADDR16(bitmap, y, x) |= 8;
+					bitmap->pix16(y, x) |= 8;
 	}
 
 	draw_headlight(screen.machine(), bitmap, cliprect, flip);

@@ -385,7 +385,7 @@ static SCREEN_UPDATE(magicard)
 	int x,y;
 	UINT32 count;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine())); //TODO
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect); //TODO
 
 	if(!(SCC_DE_VREG)) //display enable
 		return 0;
@@ -403,22 +403,22 @@ static SCREEN_UPDATE(magicard)
 				color = ((state->m_magicram[count]) & 0x000f)>>0;
 
 				if(((x*4)+3)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*4)+3) = screen.machine().pens[color];
+					bitmap->pix32(y, (x*4)+3) = screen.machine().pens[color];
 
 				color = ((state->m_magicram[count]) & 0x00f0)>>4;
 
 				if(((x*4)+2)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*4)+2) = screen.machine().pens[color];
+					bitmap->pix32(y, (x*4)+2) = screen.machine().pens[color];
 
 				color = ((state->m_magicram[count]) & 0x0f00)>>8;
 
 				if(((x*4)+1)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*4)+1) = screen.machine().pens[color];
+					bitmap->pix32(y, (x*4)+1) = screen.machine().pens[color];
 
 				color = ((state->m_magicram[count]) & 0xf000)>>12;
 
 				if(((x*4)+0)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*4)+0) = screen.machine().pens[color];
+					bitmap->pix32(y, (x*4)+0) = screen.machine().pens[color];
 
 				count++;
 			}
@@ -435,12 +435,12 @@ static SCREEN_UPDATE(magicard)
 				color = ((state->m_magicram[count]) & 0x00ff)>>0;
 
 				if(((x*2)+1)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen.machine().pens[color];
+					bitmap->pix32(y, (x*2)+1) = screen.machine().pens[color];
 
 				color = ((state->m_magicram[count]) & 0xff00)>>8;
 
 				if(((x*2)+0)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen.machine().pens[color];
+					bitmap->pix32(y, (x*2)+0) = screen.machine().pens[color];
 
 				count++;
 			}

@@ -321,16 +321,11 @@ e3 -> c6
 */
 
 
-// these areas are wrong
-static const rectangle visible1 = { 0*8, (14+48)*8-1,  3*8,  (3+7)*8-1 };
-static const rectangle visible2 = { 0*8, (14+48)*8-1, 10*8, (10+7)*8-1 };
-static const rectangle visible3 = { 0*8, (14+48)*8-1, 17*8, (17+7)*8-1 };
-
 static SCREEN_UPDATE(cb2001)
 {
 	cb2001_state *state = screen.machine().driver_data<cb2001_state>();
 	int count,x,y;
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	count = 0x0000;
 
@@ -387,6 +382,11 @@ static SCREEN_UPDATE(cb2001)
 				tilemap_set_scrolly(state->m_reel3_tilemap, i, scroll);
 
 			}
+
+			// these areas are wrong
+			const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (3+7)*8-1);
+			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
+			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
 			tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
 			tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);

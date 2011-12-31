@@ -662,10 +662,10 @@ static MACHINE_RESET( itech8 )
 	}
 
 	/* set the visible area */
-	if (state->m_visarea)
+	if (state->m_visarea.width() > 1)
 	{
-		machine.primary_screen->set_visible_area(state->m_visarea->min_x, state->m_visarea->max_x, state->m_visarea->min_y, state->m_visarea->max_y);
-		state->m_visarea = NULL;
+		machine.primary_screen->set_visible_area(state->m_visarea.min_x, state->m_visarea.max_x, state->m_visarea.min_y, state->m_visarea.max_y);
+		state->m_visarea.set(0, 0, 0, 0);
 	}
 }
 
@@ -2659,32 +2659,28 @@ static DRIVER_INIT( sstrike )
 static DRIVER_INIT( hstennis )
 {
 	itech8_state *state = machine.driver_data<itech8_state>();
-	static const rectangle visible = { 0, 375, 0, 239 };
-	state->m_visarea = &visible;
+	state->m_visarea.set(0, 375, 0, 239);
 }
 
 
 static DRIVER_INIT( arligntn )
 {
 	itech8_state *state = machine.driver_data<itech8_state>();
-	static const rectangle visible = { 16, 389, 0, 239 };
-	state->m_visarea = &visible;
+	state->m_visarea.set(16, 389, 0, 239);
 }
 
 
 static DRIVER_INIT( peggle )
 {
 	itech8_state *state = machine.driver_data<itech8_state>();
-	static const rectangle visible = { 18, 367, 0, 239 };
-	state->m_visarea = &visible;
+	state->m_visarea.set(18, 367, 0, 239);
 }
 
 
 static DRIVER_INIT( neckneck )
 {
 	itech8_state *state = machine.driver_data<itech8_state>();
-	static const rectangle visible = { 8, 375, 0, 239 };
-	state->m_visarea = &visible;
+	state->m_visarea.set(8, 375, 0, 239);
 }
 
 

@@ -91,7 +91,7 @@ static void astron_draw_sprites(running_machine &machine, bitmap_t *bitmap, cons
 
 static SCREEN_UPDATE( astron )
 {
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	astron_draw_characters(screen.machine(), bitmap, cliprect);
 	astron_draw_sprites(screen.machine(), bitmap, cliprect);

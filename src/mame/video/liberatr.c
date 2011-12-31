@@ -273,7 +273,7 @@ void liberatr_state::draw_planet(bitmap_t &bitmap, pen_t *pens)
 				color = base_color;
 
 			for (i = 0; i < segment_length; i++, x++)
-				*BITMAP_ADDR32(&bitmap, y, x) = pens[color];
+				bitmap.pix32(y, x) = pens[color];
 		}
 	}
 }
@@ -291,7 +291,7 @@ void liberatr_state::draw_bitmap(bitmap_t &bitmap, pen_t *pens)
 		UINT8 x = offs & 0xff;
 
 		if (data)
-			*BITMAP_ADDR32(&bitmap, y, x) = pens[(data >> 5) | 0x10];
+			bitmap.pix32(y, x) = pens[(data >> 5) | 0x10];
 	}
 }
 
@@ -301,7 +301,7 @@ bool liberatr_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 	pen_t pens[NUM_PENS];
 	get_pens(pens);
 
-	bitmap_fill(&bitmap, &cliprect, RGB_BLACK);
+	bitmap.fill(RGB_BLACK, cliprect);
 	draw_planet(bitmap, pens);
 	draw_bitmap(bitmap, pens);
 

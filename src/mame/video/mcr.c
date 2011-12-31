@@ -293,8 +293,8 @@ static void render_sprites_91399(running_machine &machine, bitmap_t *bitmap, con
 			if (sy >= cliprect->min_y && sy <= cliprect->max_y)
 			{
 				const UINT8 *src = gfx_element_get_data(gfx, code) + gfx->line_modulo * (y ^ vflip);
-				UINT16 *dst = BITMAP_ADDR16(bitmap, sy, 0);
-				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, sy, 0);
+				UINT16 *dst = &bitmap->pix16(sy);
+				UINT8 *pri = &machine.priority_bitmap->pix8(sy);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)
@@ -364,8 +364,8 @@ static void render_sprites_91464(running_machine &machine, bitmap_t *bitmap, con
 			if (sy >= 2 && sy >= cliprect->min_y && sy <= cliprect->max_y)
 			{
 				const UINT8 *src = gfx_element_get_data(gfx, code) + gfx->line_modulo * (y ^ vflip);
-				UINT16 *dst = BITMAP_ADDR16(bitmap, sy, 0);
-				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, sy, 0);
+				UINT16 *dst = &bitmap->pix16(sy);
+				UINT8 *pri = &machine.priority_bitmap->pix8(sy);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)
@@ -407,7 +407,7 @@ SCREEN_UPDATE( mcr )
 	tilemap_set_flip(bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 	/* draw the background */
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0x00);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0x10);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 2, 0x20);

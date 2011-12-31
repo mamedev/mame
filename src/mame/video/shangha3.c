@@ -155,7 +155,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 			myclip.max_x = sx + sizex;
 			myclip.min_y = sy;
 			myclip.max_y = sy + sizey;
-			sect_rect(&myclip, &rawbitmap->cliprect);
+			myclip &= rawbitmap->cliprect();
 
 			if (shangha3_ram[offs+4] & 0x08)	/* tilemap */
 			{

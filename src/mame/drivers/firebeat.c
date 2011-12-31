@@ -254,7 +254,7 @@ static void gcu_draw_object(running_machine &machine, bitmap_t *bitmap, const re
 	{
 		int xi;
 		int index;
-		UINT16 *d = BITMAP_ADDR16(bitmap, j+y, x);
+		UINT16 *d = &bitmap->pix16(j+y, x);
 		//int index = address + ((v >> 6) * 1024);
 
 		if (yflip)
@@ -382,7 +382,7 @@ static void gcu_fill_rect(bitmap_t *bitmap, const rectangle *cliprect, UINT32 *c
 
 	for (j=y1; j < y2; j++)
 	{
-		UINT16 *d = BITMAP_ADDR16(bitmap, j, 0);
+		UINT16 *d = &bitmap->pix16(j);
 		for (i=x1; i < x2; i++)
 		{
 			if (color[i&3] & 0x8000)
@@ -429,7 +429,7 @@ static void gcu_draw_character(running_machine &machine, bitmap_t *bitmap, const
 
 	for (j=0; j < 8; j++)
 	{
-		UINT16 *d = BITMAP_ADDR16(bitmap, y+j, x);
+		UINT16 *d = &bitmap->pix16(y+j, x);
 		UINT16 line = vr[address^1];
 
 		address += 4;
@@ -517,7 +517,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 {
 	firebeat_state *state = screen.machine().driver_data<firebeat_state>();
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	if (mame_stricmp(screen.machine().system().name, "popn7") == 0)
 	{

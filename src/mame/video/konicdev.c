@@ -4496,7 +4496,7 @@ void k053247_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *
     */
 	if (machine.config().m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (bitmap->bpp == 32 && (machine.config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (bitmap->bpp() == 32 && (machine.config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -6999,7 +6999,7 @@ static int k056832_update_linemap( device_t *device, bitmap_t *bitmap, int page,
 			// *really ugly but it minimizes alteration to tilemap.c
 			memset(&zerorect, 0, sizeof(rectangle));	// zero dimension
 			tilemap_draw(bitmap, &zerorect, tmap, 0, 0);	// dummy call to reset tile_dirty_map
-			bitmap_fill(xprmap, 0, 0);						// reset pixel transparency_bitmap;
+			xprmap->fill(0);						// reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
 		}
 		else
@@ -7049,8 +7049,8 @@ static int k056832_update_linemap( device_t *device, bitmap_t *bitmap, int page,
 			{
 				tile_data tileinfo = {0};
 
-				dst_ptr = BITMAP_ADDR16(pixmap, line, 0);
-				xpr_ptr = BITMAP_ADDR8(xprmap, line, 0);
+				dst_ptr = &pixmap->pix16(line);
+				xpr_ptr = &xprmap->pix8(line);
 
 				if (!all_dirty)
 				{
@@ -8219,11 +8219,10 @@ void k054338_fill_solid_bg( device_t *device, bitmap_t *bitmap )
 	bgcolor |= k054338_register_r(device, K338_REG_BGC_GB);
 
 	/* and fill the screen with it */
-	for (y = 0; y < bitmap->height; y++)
+	for (y = 0; y < bitmap->height(); y++)
 	{
-		pLine = (UINT32 *)bitmap->base;
-		pLine += (bitmap->rowpixels * y);
-		for (x = 0; x < bitmap->width; x++)
+		pLine = &bitmap->pix32(y);
+		for (x = 0; x < bitmap->width(); x++)
 			*pLine++ = bgcolor;
 	}
 }
@@ -8243,8 +8242,8 @@ void k054338_fill_backcolor( device_t *device, bitmap_t *bitmap, int mode ) // (
 	clipw = (visarea.max_x - clipx + 4) & ~3;
 	cliph = visarea.max_y - clipy + 1;
 
-	dst_ptr = BITMAP_ADDR32(bitmap, clipy, 0);
-	dst_pitch = bitmap->rowpixels;
+	dst_ptr = &bitmap->pix32(clipy);
+	dst_pitch = bitmap->rowpixels();
 	dst_ptr += clipx;
 
 	BGC_SET = 0;
@@ -8744,8 +8743,8 @@ void k001005_swap_buffers( device_t *device )
 
 	//if (k001005->status == 2)
 	{
-		bitmap_fill(k001005->bitmap[k001005->bitmap_page], &k001005->cliprect, device->machine().pens[0] & 0x00ffffff);
-		bitmap_fill(k001005->zbuffer, &k001005->cliprect, 0xffffffff);
+		k001005->bitmap[k001005->bitmap_page]->fill(device->machine().pens[0] & 0x00ffffff, k001005->cliprect);
+		k001005->zbuffer->fill(0xffffffff, k001005->cliprect);
 	}
 }
 
@@ -8922,8 +8921,8 @@ static void draw_scanline( device_t *device, void *dest, INT32 scanline, const p
 	bitmap_t *destmap = (bitmap_t *)dest;
 	float z = extent->param[0].start;
 	float dz = extent->param[0].dpdx;
-	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
-	UINT32 *zb = BITMAP_ADDR32(k001005->zbuffer, scanline, 0);
+	UINT32 *fb = &destmap->pix32(scanline);
+	UINT32 *zb = &k001005->zbuffer->pix32(scanline);
 	UINT32 color = extra->color;
 	int x;
 
@@ -8968,8 +8967,8 @@ static void draw_scanline_tex( device_t *device, void *dest, INT32 scanline, con
 	int texture_y = extra->texture_y;
 	int x;
 
-	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
-	UINT32 *zb = BITMAP_ADDR32(k001005->zbuffer, scanline, 0);
+	UINT32 *fb = &destmap->pix32(scanline);
+	UINT32 *zb = &k001005->zbuffer->pix32(scanline);
 
 	for (x = extent->startx; x < extent->stopx; x++)
 	{
@@ -9426,8 +9425,8 @@ void k001005_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect
 
 	for (j = cliprect->min_y; j <= cliprect->max_y; j++)
 	{
-		UINT32 *bmp = BITMAP_ADDR32(bitmap, j, 0);
-		UINT32 *src = BITMAP_ADDR32(k001005->bitmap[k001005->bitmap_page ^ 1], j, 0);
+		UINT32 *bmp = &bitmap->pix32(j);
+		UINT32 *src = &k001005->bitmap[k001005->bitmap_page ^ 1]->pix32(j);
 
 		for (i = cliprect->min_x; i <= cliprect->max_x; i++)
 		{
@@ -9701,7 +9700,7 @@ void k001604_draw_back_layer( device_t *device, bitmap_t *bitmap, const rectangl
 	k001604_state *k001604 = k001604_get_safe_token(device);
 	int layer;
 	int num_layers;
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	num_layers = k001604->layer_size ? 2 : 1;
 

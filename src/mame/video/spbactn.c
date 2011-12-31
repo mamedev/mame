@@ -14,9 +14,9 @@ static void blendbitmaps(running_machine &machine,
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT32 *dd  = BITMAP_ADDR32(dest, y, 0);
-		UINT16 *sd1 = BITMAP_ADDR16(src1, y, 0);
-		UINT16 *sd2 = BITMAP_ADDR16(src2, y, 0);
+		UINT32 *dd  = &dest->pix32(y);
+		UINT16 *sd1 = &src1->pix16(y);
+		UINT16 *sd2 = &src2->pix16(y);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
@@ -123,7 +123,7 @@ SCREEN_UPDATE( spbactn )
 	spbactn_state *state = screen.machine().driver_data<spbactn_state>();
 	int offs, sx, sy;
 
-	bitmap_fill(state->m_tile_bitmap_fg, cliprect, 0);
+	state->m_tile_bitmap_fg->fill(0, *cliprect);
 
 	/* draw table bg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)

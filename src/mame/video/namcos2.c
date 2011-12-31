@@ -82,8 +82,8 @@ DrawRozHelperBlock(const struct RozParam *rozInfo, int destx, int desty,
 	int end_incrx = rozInfo->incyx - (width * rozInfo->incxx);
 	int end_incry = rozInfo->incyy - (width * rozInfo->incxy);
 
-	UINT16 *dest = BITMAP_ADDR16(destbitmap, desty, destx);
-	int dest_rowinc = destbitmap->rowpixels - width;
+	UINT16 *dest = &destbitmap->pix16(desty, destx);
+	int dest_rowinc = destbitmap->rowpixels() - width;
 
 	while (desty < desty_end)
 	{
@@ -103,9 +103,9 @@ DrawRozHelperBlock(const struct RozParam *rozInfo, int destx, int desty,
 				goto L_SkipPixel;
 			}
 
-			if (*BITMAP_ADDR8(flagsbitmap, ypos, xpos) & TILEMAP_PIXEL_LAYER0)
+			if (flagsbitmap->pix8(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
 			{
-				*dest = *BITMAP_ADDR16(srcbitmap, ypos, xpos) + rozInfo->color;
+				*dest = srcbitmap->pix16(ypos, xpos) + rozInfo->color;
 			}
 
 		L_SkipPixel:
@@ -130,7 +130,7 @@ DrawRozHelper(
 {
 	tilemap_set_palette_offset( tmap, rozInfo->color );
 
-	if( bitmap->bpp == 16 )
+	if( bitmap->bpp() == 16 )
 	{
 		/* On many processors, the simple approach of an outer loop over the
             rows of the destination bitmap with an inner loop over the columns
@@ -457,7 +457,7 @@ ApplyClip( rectangle *clip, const rectangle *cliprect )
 	clip->min_y = GetPaletteRegister(2) - 0x21;
 	clip->max_y = GetPaletteRegister(3) - 0x21 - 1;
 	/* intersect with master clip rectangle */
-	sect_rect(clip, cliprect);
+	*clip &= *cliprect;
 } /* ApplyClip */
 
 SCREEN_UPDATE( namcos2_default )
@@ -466,7 +466,7 @@ SCREEN_UPDATE( namcos2_default )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 	ApplyClip( &clip, cliprect );
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
@@ -503,7 +503,7 @@ SCREEN_UPDATE( finallap )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -540,7 +540,7 @@ SCREEN_UPDATE( luckywld )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -573,7 +573,7 @@ SCREEN_UPDATE( sgunner )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<8; pri++ )
@@ -599,7 +599,7 @@ SCREEN_UPDATE( metlhawk )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )

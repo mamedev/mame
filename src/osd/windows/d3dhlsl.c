@@ -290,7 +290,7 @@ void hlsl_info::avi_update_snap(d3d_surface *surface)
 	D3DLOCKED_RECT rect;
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (avi_snap == NULL || (int)snap_width != avi_snap->width || (int)snap_height != avi_snap->height)
+	if (avi_snap == NULL || (int)snap_width != avi_snap->width() || (int)snap_height != avi_snap->height())
 	{
 		if (avi_snap != NULL)
 		{
@@ -319,7 +319,7 @@ void hlsl_info::avi_update_snap(d3d_surface *surface)
 	for (int srcy = 0; srcy < (int)snap_height; srcy++)
 	{
 		BYTE *src = (BYTE *)rect.pBits + srcy * rect.Pitch;
-		BYTE *dst = (BYTE *)avi_snap->base + srcy * avi_snap->rowpixels * 4;
+		BYTE *dst = &avi_snap->pix8(srcy * 4);
 
 		for(int x = 0; x < snap_width; x++)
 		{
@@ -353,7 +353,7 @@ void hlsl_info::render_snapshot(d3d_surface *surface)
 	render_snap = false;
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (avi_snap == NULL || snap_width != (avi_snap->width / 2) || snap_height != (avi_snap->height / 2))
+	if (avi_snap == NULL || snap_width != (avi_snap->width() / 2) || snap_height != (avi_snap->height() / 2))
 	{
 		if (avi_snap != NULL)
 		{
@@ -388,7 +388,7 @@ void hlsl_info::render_snapshot(d3d_surface *surface)
 				int toty = (srcy + cy * (snap_height / 2));
 				int totx = cx * (snap_width / 2);
 				BYTE *src = (BYTE *)rect.pBits + toty * rect.Pitch + totx * 4;
-				BYTE *dst = (BYTE *)avi_snap->base + srcy * avi_snap->rowpixels * 4;
+				BYTE *dst = &avi_snap->pix8(srcy * 4);
 
 				for(int x = 0; x < snap_width / 2; x++)
 				{
@@ -936,10 +936,10 @@ int hlsl_info::create_resources()
 		render_texinfo texture;
 
 		// fake in the basic data so it looks like it came from render.c
-		texture.base = shadow_bitmap->base;
-		texture.rowpixels = shadow_bitmap->rowpixels;
-		texture.width = shadow_bitmap->width;
-		texture.height = shadow_bitmap->height;
+		texture.base = shadow_bitmap->raw_pixptr(0);
+		texture.rowpixels = shadow_bitmap->rowpixels();
+		texture.width = shadow_bitmap->width();
+		texture.height = shadow_bitmap->height();
 		texture.palette = NULL;
 		texture.seqid = 0;
 

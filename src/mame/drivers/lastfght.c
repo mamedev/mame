@@ -142,13 +142,13 @@ static SCREEN_UPDATE( lastfght )
 
 		count = state->m_base;
 
-		bitmap_fill(bitmap, cliprect , get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 		for (y = 0 ; y < 256; y++)
 		{
 			for (x = 0; x < 512; x++)
 			{
 				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? get_white_pen(screen.machine()) : gfxdata[count];	// white grid or data
-				*BITMAP_ADDR16(bitmap, y, x) = data;
+				bitmap->pix16(y, x) = data;
 				count++;
 			}
 		}
@@ -345,7 +345,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 				data = gfxdata[addr];
 
 				if (data && (state->m_x + x >= 0) && (state->m_x + x < 512) && (state->m_y + y >= 0) && (state->m_y + y < 256))
-					*BITMAP_ADDR16(dest, state->m_y + y, state->m_x + x) = data;
+					dest->pix16(state->m_y + y, state->m_x + x) = data;
 			}
 		}
 	}

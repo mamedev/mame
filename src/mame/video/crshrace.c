@@ -191,11 +191,11 @@ SCREEN_UPDATE( crshrace )
 
 	if (state->m_gfxctrl & 0x04)	/* display disable? */
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 
-	bitmap_fill(bitmap, cliprect, 0x1ff);
+	bitmap->fill(0x1ff, *cliprect);
 
 	switch (state->m_gfxctrl & 0xfb)
 	{

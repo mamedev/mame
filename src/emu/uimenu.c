@@ -92,7 +92,7 @@ void ui_menu::init(running_machine &machine)
 		int alpha = 0xff;
 		if (x < 25) alpha = 0xff * x / 25;
 		if (x > 256 - 25) alpha = 0xff * (255 - x) / 25;
-		*BITMAP_ADDR32(hilight_bitmap, 0, x) = MAKE_ARGB(alpha,0xff,0xff,0xff);
+		hilight_bitmap->pix32(0, x) = MAKE_ARGB(alpha,0xff,0xff,0xff);
 	}
 	hilight_texture = machine.render().texture_alloc();
 	hilight_texture->set_bitmap(hilight_bitmap, NULL, TEXFORMAT_ARGB32);
@@ -1065,21 +1065,21 @@ UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container
 
 void ui_menu::render_triangle(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param)
 {
-	int halfwidth = dest.width / 2;
-	int height = dest.height;
+	int halfwidth = dest.width() / 2;
+	int height = dest.height();
 	int x, y;
 
 	/* start with all-transparent */
-	bitmap_fill(&dest, NULL, MAKE_ARGB(0x00,0x00,0x00,0x00));
+	dest.fill(MAKE_ARGB(0x00,0x00,0x00,0x00));
 
 	/* render from the tip to the bottom */
 	for (y = 0; y < height; y++)
 	{
 		int linewidth = (y * (halfwidth - 1) + (height / 2)) * 255 * 2 / height;
-		UINT32 *target = BITMAP_ADDR32(&dest, y, halfwidth);
+		UINT32 *target = &dest.pix32(y, halfwidth);
 
 		/* don't antialias if height < 12 */
-		if (dest.height < 12)
+		if (dest.height() < 12)
 		{
 			int pixels = (linewidth + 254) / 255;
 			if (pixels % 2 == 0) pixels++;

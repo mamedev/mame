@@ -215,7 +215,7 @@ SCREEN_UPDATE( lkage )
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll[4]);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll[5]);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 	if ((state->m_vreg[2] & 0xf0) == 0xf0)
 	{
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);

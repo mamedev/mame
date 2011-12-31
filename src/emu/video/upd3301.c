@@ -648,6 +648,6 @@ void upd3301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(machine()));
+		bitmap->fill(get_black_pen(machine()), *cliprect);
 	}
 }

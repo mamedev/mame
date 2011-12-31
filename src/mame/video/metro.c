@@ -601,8 +601,8 @@ static void draw_tilemap( running_machine &machine, bitmap_t *bitmap, const rect
 	int width = big ? 4096 : 2048;//pixdata->width;
 	int height = big ? 4096 : 2048;//pixdata->height;
 
-	int scrwidth = bitmap->width;
-	int scrheight = bitmap->height;
+	int scrwidth = bitmap->width();
+	int scrheight = bitmap->height();
 
 	int windowwidth = width >> 2;
 	int windowheight = height >> 3;
@@ -637,8 +637,8 @@ static void draw_tilemap( running_machine &machine, bitmap_t *bitmap, const rect
 
 		if (!state->m_flip_screen)
 		{
-			dst = BITMAP_ADDR16(bitmap, y, 0);
-			priority_baseaddr = BITMAP_ADDR8(priority_bitmap, y, 0);
+			dst = &bitmap->pix16(y);
+			priority_baseaddr = &priority_bitmap->pix8(y);
 
 			for (x=0;x<scrwidth;x++)
 			{
@@ -661,8 +661,8 @@ static void draw_tilemap( running_machine &machine, bitmap_t *bitmap, const rect
 		}
 		else // flipped case
 		{
-			dst = BITMAP_ADDR16(bitmap, scrheight-y-1, 0);
-			priority_baseaddr = BITMAP_ADDR8(priority_bitmap, scrheight-y-1, 0);
+			dst = &bitmap->pix16(scrheight-y-1);
+			priority_baseaddr = &priority_bitmap->pix8(scrheight-y-1);
 
 			for (x=0;x<scrwidth;x++)
 			{
@@ -732,8 +732,8 @@ SCREEN_UPDATE( metro )
 	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - (visarea.max_y + 1) / 2;
 
 	/* The background color is selected by a register */
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, ((state->m_videoregs[0x12/2] & 0x0fff)) + 0x1000);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill((state->m_videoregs[0x12/2] & 0x0fff) + 0x1000, *cliprect);
 
 	/*  Screen Control Register:
 
@@ -779,7 +779,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0)
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 		layers_ctrl &= msk;
 	}
 

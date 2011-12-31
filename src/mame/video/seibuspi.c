@@ -306,7 +306,7 @@ static void drawgfx_blend(bitmap_t *bitmap, const rectangle *cliprect, const gfx
 	// draw
 	for (j=y1; j <= y2; j++)
 	{
-		UINT32 *p = BITMAP_ADDR32(bitmap, j, 0);
+		UINT32 *p = &bitmap->pix32(j);
 		UINT8 trans_pen = (1 << state->m_sprite_bpp) - 1;
 		int dp_i = (py * width) + px;
 		py += yd;
@@ -571,8 +571,8 @@ static void combine_tilemap(running_machine &machine, bitmap_t *bitmap, const re
 
 	pen_bitmap = tilemap_get_pixmap(tile);
 	flags_bitmap = tilemap_get_flagsmap(tile);
-	xscroll_mask = pen_bitmap->width - 1;
-	yscroll_mask = pen_bitmap->height - 1;
+	xscroll_mask = pen_bitmap->width() - 1;
+	yscroll_mask = pen_bitmap->height() - 1;
 
 	for (j=cliprect->min_y; j <= cliprect->max_y; j++)
 	{
@@ -582,9 +582,9 @@ static void combine_tilemap(running_machine &machine, bitmap_t *bitmap, const re
 			rx += rowscroll[(j+y) & yscroll_mask];
 		}
 
-		d = BITMAP_ADDR32(bitmap, j, 0);
-		s = BITMAP_ADDR16(pen_bitmap, (j+y) & yscroll_mask, 0);
-		t = BITMAP_ADDR8(flags_bitmap, (j+y) & yscroll_mask, 0);
+		d = &bitmap->pix32(j);
+		s = &pen_bitmap->pix16((j+y) & yscroll_mask);
+		t = &flags_bitmap->pix8((j+y) & yscroll_mask);
 		for (i=cliprect->min_x+rx; i <= cliprect->max_x+rx; i++)
 		{
 			if (opaque || (t[i & xscroll_mask] & (TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1)))
@@ -622,7 +622,7 @@ SCREEN_UPDATE( spi )
 	}
 
 	if( state->m_layer_enable & 0x1 )
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 
 	if (!(state->m_layer_enable & 0x1))
 		combine_tilemap(screen.machine(), bitmap, cliprect, state->m_back_layer, state->m_spi_scrollram[0] & 0xffff, (state->m_spi_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);
@@ -672,7 +672,7 @@ VIDEO_START( sys386f2 )
 
 SCREEN_UPDATE( sys386f2 )
 {
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);

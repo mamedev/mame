@@ -213,7 +213,7 @@ static void draw_pixel( bitmap_t* bitmap, const rectangle *cliprect, int y, int 
 	if (y>cliprect->max_y) return;
 	if (y<cliprect->min_y) return;
 
-	*BITMAP_ADDR16(bitmap, y, x) = pen;
+	bitmap->pix16(y, x) = pen;
 }
 
 static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int screen_shift)
@@ -223,7 +223,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 	tilemap_set_scrolldx(state->m_tx_tilemap, screen_shift, screen_shift);
 
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	{
 		int i;
@@ -460,7 +460,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 
 			popmessage("%02x %02x %04x %02x",state->m_test_x,state->m_test_y,state->m_start_offs,state->m_color_pen);
 
-			bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+			bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 			count = (state->m_start_offs);
 
@@ -477,28 +477,28 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 					color|= ((blit_ram[count+3] & 0xff) << 0);
 
 					dot = (color & 0xf0000000) >> 28;
-					*BITMAP_ADDR16(bitmap, y, x+0) = screen.machine().pens[dot+(state->m_color_pen<<4)];
+					bitmap->pix16(y, x+0) = screen.machine().pens[dot+(state->m_color_pen<<4)];
 
 					dot = (color & 0x0f000000) >> 24;
-					*BITMAP_ADDR16(bitmap, y, x+4) = screen.machine().pens[dot+(state->m_color_pen<<4)];
+					bitmap->pix16(y, x+4) = screen.machine().pens[dot+(state->m_color_pen<<4)];
 
 					dot = (color & 0x00f00000) >> 20;
-					*BITMAP_ADDR16(bitmap, y, x+1) = screen.machine().pens[dot+(state->m_color_pen<<4)];
+					bitmap->pix16(y, x+1) = screen.machine().pens[dot+(state->m_color_pen<<4)];
 
 					dot = (color & 0x000f0000) >> 16;
-					*BITMAP_ADDR16(bitmap, y, x+5) = screen.machine().pens[dot+(state->m_color_pen<<4)];
+					bitmap->pix16(y, x+5) = screen.machine().pens[dot+(state->m_color_pen<<4)];
 
 					dot = (color & 0x0000f000) >> 12;
-					*BITMAP_ADDR16(bitmap, y, x+2) = screen.machine().pens[dot+(state->m_color_pen<<4)];
+					bitmap->pix16(y, x+2) = screen.machine().pens[dot+(state->m_color_pen<<4)];
 
 					dot = (color & 0x00000f00) >> 8;
-					*BITMAP_ADDR16(bitmap, y, x+6) = screen.machine().pens[dot+(state->m_color_pen<<4)];
+					bitmap->pix16(y, x+6) = screen.machine().pens[dot+(state->m_color_pen<<4)];
 
 					dot = (color & 0x000000f0) >> 4;
-					*BITMAP_ADDR16(bitmap, y, x+3) = screen.machine().pens[dot+(state->m_color_pen<<4)];
+					bitmap->pix16(y, x+3) = screen.machine().pens[dot+(state->m_color_pen<<4)];
 
 					dot = (color & 0x0000000f) >> 0;
-					*BITMAP_ADDR16(bitmap, y, x+7) = screen.machine().pens[dot+(state->m_color_pen<<4)];
+					bitmap->pix16(y, x+7) = screen.machine().pens[dot+(state->m_color_pen<<4)];
 
 					count+=4;
 				}

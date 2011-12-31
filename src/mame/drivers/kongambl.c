@@ -43,8 +43,8 @@ static SCREEN_UPDATE(kongambl)
 {
 	device_t *k056832 = screen.machine().device("k056832");
 
-	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 //  k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 0);
 //  k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);

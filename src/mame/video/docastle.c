@@ -137,7 +137,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	docastle_state *state = machine.driver_data<docastle_state>();
 	int offs;
 
-	bitmap_fill(machine.priority_bitmap, NULL, 1);
+	machine.priority_bitmap->fill(1);
 
 	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{

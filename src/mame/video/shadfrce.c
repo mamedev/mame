@@ -165,7 +165,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( shadfrce )
 {
 	shadfrce_state *state = screen.machine().driver_data<shadfrce_state>();
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (state->m_video_enable)
 	{
@@ -176,7 +176,7 @@ SCREEN_UPDATE( shadfrce )
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	}
 
 	return 0;

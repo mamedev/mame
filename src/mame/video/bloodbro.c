@@ -240,7 +240,7 @@ SCREEN_UPDATE( bloodbro )
 	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scroll[0x12]);
 	tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_scroll[0x13]);
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);
@@ -257,7 +257,7 @@ SCREEN_UPDATE( weststry )
 //  tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scroll[0x12]);
 //  tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_scroll[0x13]);
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);
@@ -275,7 +275,7 @@ SCREEN_UPDATE( skysmash )
 	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scroll[0x0a]);
 	tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_scroll[0x0b]);	/* ? */
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);

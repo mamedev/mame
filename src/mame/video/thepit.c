@@ -10,20 +10,6 @@
 #include "includes/thepit.h"
 
 
-static const rectangle spritevisiblearea =
-{
-	2*8+1, 32*8-1,
-	2*8, 30*8-1
-};
-
-static const rectangle spritevisibleareaflipx =
-{
-	0*8, 30*8-2,
-	2*8, 30*8-1
-};
-
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -249,6 +235,9 @@ static void draw_sprites(running_machine &machine,
 						 const rectangle *cliprect,
 						 int priority_to_draw)
 {
+	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8, 30*8-1);
+	const rectangle spritevisibleareaflipx(0*8, 30*8-2, 2*8, 30*8-1);
+
 	thepit_state *state = machine.driver_data<thepit_state>();
 	int offs;
 

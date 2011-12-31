@@ -156,8 +156,8 @@ SCREEN_UPDATE( deadang )
 	tilemap_set_enable(state->m_pf2_layer,!(state->m_scroll_ram[0x34]&4));
 	flip_screen_set(screen.machine(),  state->m_scroll_ram[0x34]&0x40 );
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_pf3_layer,0,1);
 	tilemap_draw(bitmap,cliprect,state->m_pf1_layer,0,2);
 	tilemap_draw(bitmap,cliprect,state->m_pf2_layer,0,4);

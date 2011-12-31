@@ -97,12 +97,12 @@ WRITE16_HANDLER( glass_blitter_w )
 					{
 						int color = *gfx;
 						gfx++;
-						*BITMAP_ADDR16(state->m_screen_bitmap, j, i) = color & 0xff;
+						state->m_screen_bitmap->pix16(j, i) = color & 0xff;
 					}
 				}
 			}
 			else
-				bitmap_fill(state->m_screen_bitmap, 0, 0);
+				state->m_screen_bitmap->fill(0);
 		}
 	}
 }
@@ -205,7 +205,7 @@ SCREEN_UPDATE( glass )
 	tilemap_set_scrollx(state->m_pant[1], 0, state->m_vregs[3]);
 
 	/* draw layers + sprites */
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	copybitmap(bitmap, state->m_screen_bitmap, 0, 0, 0x18, 0x24, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_pant[1], 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_pant[0], 0, 0);

@@ -148,8 +148,8 @@ static void hyhoo_gfxdraw(running_machine &machine)
 
 						pen = MAKE_RGB(pal6bit(r), pal5bit(g), pal5bit(b));
 
-						*BITMAP_ADDR32(state->m_tmpbitmap, dy, dx1) = *BITMAP_ADDR32(state->m_tmpbitmap, dy, dx1) | pen;
-						*BITMAP_ADDR32(state->m_tmpbitmap, dy, dx2) = *BITMAP_ADDR32(state->m_tmpbitmap, dy, dx2) | pen;
+						state->m_tmpbitmap->pix32(dy, dx1) = state->m_tmpbitmap->pix32(dy, dx1) | pen;
+						state->m_tmpbitmap->pix32(dy, dx2) = state->m_tmpbitmap->pix32(dy, dx2) | pen;
 					}
 					else
 					{
@@ -164,8 +164,8 @@ static void hyhoo_gfxdraw(running_machine &machine)
 
 						pen = MAKE_RGB(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
-						*BITMAP_ADDR32(state->m_tmpbitmap, dy, dx1) = pen;
-						*BITMAP_ADDR32(state->m_tmpbitmap, dy, dx2) = pen;
+						state->m_tmpbitmap->pix32(dy, dx1) = pen;
+						state->m_tmpbitmap->pix32(dy, dx2) = pen;
 					}
 				}
 			}
@@ -197,7 +197,7 @@ static void hyhoo_gfxdraw(running_machine &machine)
 
 					pen = MAKE_RGB(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
-					*BITMAP_ADDR32(state->m_tmpbitmap, dy, dx1) = pen;
+					state->m_tmpbitmap->pix32(dy, dx1) = pen;
 				}
 
 				if (state->m_clut[color2])
@@ -211,7 +211,7 @@ static void hyhoo_gfxdraw(running_machine &machine)
 
 					pen = MAKE_RGB(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
-					*BITMAP_ADDR32(state->m_tmpbitmap, dy, dx2) = pen;
+					state->m_tmpbitmap->pix32(dy, dx2) = pen;
 				}
 			}
 
@@ -237,7 +237,7 @@ SCREEN_UPDATE( hyhoo )
 	if (state->m_dispflag)
 		copybitmap(bitmap, state->m_tmpbitmap, state->m_flipscreen, state->m_flipscreen, 0, 0, cliprect);
 	else
-		bitmap_fill(bitmap, cliprect, RGB_BLACK);
+		bitmap->fill(RGB_BLACK, *cliprect);
 
 	return 0;
 }

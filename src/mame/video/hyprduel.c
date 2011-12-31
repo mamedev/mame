@@ -706,8 +706,8 @@ SCREEN_UPDATE( hyprduel )
 	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - screen.height() / 2 - state->m_sprite_yoffs_sub;
 
 	/* The background color is selected by a register */
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, ((state->m_videoregs[0x12 / 2] & 0x0fff)) + 0x1000);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill((state->m_videoregs[0x12 / 2] & 0x0fff) + 0x1000, *cliprect);
 
 	/*  Screen Control Register:
 
@@ -733,7 +733,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 0x08;
 	if (msk != 0)
 	{
-		bitmap_fill(bitmap, cliprect,0);
+		bitmap->fill(0, *cliprect);
 		layers_ctrl &= msk;
 	}
 

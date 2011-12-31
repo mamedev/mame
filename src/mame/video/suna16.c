@@ -226,7 +226,7 @@ SCREEN_UPDATE( suna16 )
 	suna16_state *state = screen.machine().driver_data<suna16_state>();
 
 	/* Suna Quiz indicates the background is the last pen */
-	bitmap_fill(bitmap,cliprect,0xff);
+	bitmap->fill(0xff, *cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0);
 	return 0;
 }
@@ -246,7 +246,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	/* Suna Quiz indicates the background is the last pen */
-	bitmap_fill(bitmap,cliprect,0xff);
+	bitmap->fill(0xff, *cliprect);
 	if (layers_ctrl & 1)	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram,  0);
 	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram2, 1);
 	return 0;

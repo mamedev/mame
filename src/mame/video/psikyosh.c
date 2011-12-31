@@ -153,7 +153,7 @@ static void draw_scanline32_alpha(bitmap_t *bitmap, INT32 destx, INT32 desty, IN
 	UINT32 transpen = BG_TRANSPEN;
 
 	assert(bitmap != NULL);
-	assert(bitmap->bpp == 32);
+	assert(bitmap->bpp() == 32);
 
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32, NO_PRIORITY);
 }
@@ -168,8 +168,8 @@ static void draw_scanline32_argb(bitmap_t *bitmap, INT32 destx, INT32 desty, INT
 	UINT32 transpen = BG_TRANSPEN;
 
 	assert(bitmap != NULL);
-	assert(bitmap->bpp == 32);
-	assert(bitmap->format == BITMAP_FORMAT_ARGB32);
+	assert(bitmap->bpp() == 32);
+	assert(bitmap->format() == BITMAP_FORMAT_ARGB32);
 
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32, NO_PRIORITY);
 }
@@ -184,8 +184,8 @@ static void draw_scanline32_transpen(bitmap_t *bitmap, INT32 destx, INT32 desty,
 	UINT32 transpen = BG_TRANSPEN;
 
 	assert(bitmap != NULL);
-	assert(bitmap->bpp == 32);
-	assert(bitmap->format == BITMAP_FORMAT_ARGB32);
+	assert(bitmap->bpp() == 32);
+	assert(bitmap->format() == BITMAP_FORMAT_ARGB32);
 
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_RENDER32, NO_PRIORITY);
 }
@@ -205,8 +205,8 @@ static void drawgfx_alphastore(bitmap_t *dest, const rectangle *cliprect, const 
 	const pen_t *paldata;
 
 	assert(dest != NULL);
-	assert(dest->bpp == 32);
-	assert(dest->format == BITMAP_FORMAT_ARGB32);
+	assert(dest->bpp() == 32);
+	assert(dest->format() == BITMAP_FORMAT_ARGB32);
 	assert(gfx != NULL);
 	assert(alphatable != NULL);
 
@@ -260,7 +260,7 @@ static void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const 
 	}
 
 	assert(dest != NULL);
-	assert(dest->bpp == 32);
+	assert(dest->bpp() == 32);
 	assert(gfx != NULL);
 	assert(alphatable != NULL);
 
@@ -356,11 +356,11 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 		rectangle cliprect;
 
 		cliprect.min_x = 0;
-		cliprect.max_x = state->m_bg_bitmap->width - 1;
+		cliprect.max_x = state->m_bg_bitmap->width() - 1;
 		cliprect.min_y = sy * 16;
 		cliprect.max_y = cliprect.min_y + 16 - 1;
 
-		bitmap_fill(state->m_bg_bitmap, &cliprect, BG_TRANSPEN);
+		state->m_bg_bitmap->fill(BG_TRANSPEN, cliprect);
 		int width = size * 16;
 
 		int offs = size * sy;
@@ -547,7 +547,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 
 	g_profiler.start(PROFILER_DRAWGFX);
 
-	assert(dest_bmp->bpp == 32);
+	assert(dest_bmp->bpp() == 32);
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	if (clip)
@@ -556,12 +556,8 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 		myclip.max_x = clip->max_x;
 		myclip.min_y = clip->min_y;
 		myclip.max_y = clip->max_y;
-
-		if (myclip.min_x < 0) myclip.min_x = 0;
-		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width - 1;
-		if (myclip.min_y < 0) myclip.min_y = 0;
-		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
-
+		
+		myclip &= dest_bmp->cliprect();
 		clip = &myclip;
 	}
 
@@ -639,10 +635,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							if (z > 0)
 							{
 								const UINT8 *source = code_base + (y_index) * gfx->line_modulo + x_index_base;
-								UINT32 *dest = (UINT32 *)dest_bmp->base + sy * dest_bmp->rowpixels + sx;
-								UINT16 *pri = (UINT16 *)state->m_z_bitmap->base + sy * state->m_z_bitmap->rowpixels + sx;
+								UINT32 *dest = &dest_bmp->pix32(sy, sx);
+								UINT16 *pri = &state->m_z_bitmap->pix16(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels - (ex - sx);
+								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -670,9 +666,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							else
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = (UINT32 *)dest_bmp->base + sy * dest_bmp->rowpixels + sx;
+								UINT32 *dest = &dest_bmp->pix32(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels - (ex - sx);
+								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -698,10 +694,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							if (z > 0)
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = (UINT32 *)dest_bmp->base + sy * dest_bmp->rowpixels + sx;
-								UINT16 *pri = (UINT16 *)state->m_z_bitmap->base + sy * state->m_z_bitmap->rowpixels + sx;
+								UINT32 *dest = &dest_bmp->pix32(sy, sx);
+								UINT16 *pri = &state->m_z_bitmap->pix16(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels - (ex - sx);
+								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -729,9 +725,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							else
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = (UINT32 *)dest_bmp->base + sy * dest_bmp->rowpixels + sx;
+								UINT32 *dest = &dest_bmp->pix32(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels - (ex - sx);
+								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -758,10 +754,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							if (z > 0)
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = (UINT32 *)dest_bmp->base + sy * dest_bmp->rowpixels + sx;
-								UINT16 *pri = (UINT16 *)state->m_z_bitmap->base + sy * state->m_z_bitmap->rowpixels + sx;
+								UINT32 *dest = &dest_bmp->pix32(sy, sx);
+								UINT16 *pri = &state->m_z_bitmap->pix16(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels - (ex - sx);
+								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -793,9 +789,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							else
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = (UINT32 *)dest_bmp->base + sy * dest_bmp->rowpixels + sx;
+								UINT32 *dest = &dest_bmp->pix32(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels - (ex - sx);
+								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -836,7 +832,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 				for (ypixel = 0; ypixel < gfx->height; ypixel++)
 				{
 					const UINT8 *source = code_base + ypixel * gfx->line_modulo;
-					UINT8 *dest = BITMAP_ADDR8(state->m_zoom_bitmap, ypixel + ytile*gfx->height, 0);
+					UINT8 *dest = &state->m_zoom_bitmap->pix8(ypixel + ytile*gfx->height);
 
 					for (xpixel = 0; xpixel < gfx->width; xpixel++)
 					{
@@ -914,9 +910,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = BITMAP_ADDR8(state->m_zoom_bitmap, y_index >> 10, 0);
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT16 *pri = BITMAP_ADDR16(state->m_z_bitmap, y, 0);
+								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT16 *pri = &state->m_z_bitmap->pix16(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -940,8 +936,8 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = BITMAP_ADDR8(state->m_zoom_bitmap, y_index >> 10, 0);
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -964,9 +960,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = BITMAP_ADDR8(state->m_zoom_bitmap, y_index >> 10, 0);
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT16 *pri = BITMAP_ADDR16(state->m_z_bitmap, y, 0);
+								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT16 *pri = &state->m_z_bitmap->pix16(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -990,8 +986,8 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = BITMAP_ADDR8(state->m_zoom_bitmap, y_index >> 10, 0);
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -1013,9 +1009,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = BITMAP_ADDR8(state->m_zoom_bitmap, y_index >> 10, 0);
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT16 *pri = BITMAP_ADDR16(state->m_z_bitmap, y, 0);
+								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT16 *pri = &state->m_z_bitmap->pix16(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -1043,8 +1039,8 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = BITMAP_ADDR8(state->m_zoom_bitmap, y_index >> 10, 0);
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT32 *dest = &dest_bmp->pix32(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -1204,12 +1200,12 @@ static void psikyosh_prelineblend( running_machine &machine, bitmap_t *bitmap, c
 	UINT32 *linefill = &state->m_bgram[(bank * 0x800) / 4 - 0x4000 / 4]; /* Per row */
 	int x, y;
 
-	assert(bitmap->bpp == 32);
+	assert(bitmap->bpp() == 32);
 
 	g_profiler.start(PROFILER_USER8);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
 
-		dstline = BITMAP_ADDR32(bitmap, y, 0);
+		dstline = &bitmap->pix32(y);
 
 		/* linefill[y] & 0xff does what? */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
@@ -1228,7 +1224,7 @@ static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, 
 	UINT32 *lineblend = &state->m_bgram[(bank * 0x800) / 4 - 0x4000 / 4 + 0x400 / 4]; /* Per row */
 	int x, y;
 
-	assert(bitmap->bpp == 32);
+	assert(bitmap->bpp() == 32);
 
 	if ((state->m_vidregs[2] & 0xf) != req_pri) {
 		return;
@@ -1237,7 +1233,7 @@ static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, 
 	g_profiler.start(PROFILER_USER8);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
 
-		dstline = BITMAP_ADDR32(bitmap, y, 0);
+		dstline = &bitmap->pix32(y);
 
 		if (lineblend[y] & 0x80) /* solid */
 		{
@@ -1325,7 +1321,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
     state->m_vidregs[6], state->m_vidregs[7]);
 #endif
 
-	bitmap_fill(state->m_z_bitmap, cliprect, 0); /* z-buffer */
+	state->m_z_bitmap->fill(0, *cliprect); /* z-buffer */
 
 	psikyosh_prelineblend(screen.machine(), bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)

@@ -162,16 +162,16 @@ inline void k053250_t::pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, 
 		// calculate target increment for horizontal scanlines which is exactly one
 		dst_adv = 1;
 		dst_offset = dst_length;
-		pri_base = BITMAP_ADDR8(priority, linepos, dst_start + dst_offset);
-		dst_base = BITMAP_ADDR32(bitmap, linepos, dst_start + dst_length);
+		pri_base = &priority->pix8(linepos, dst_start + dst_offset);
+		dst_base = &bitmap->pix32(linepos, dst_start + dst_length);
 	}
 	else
 	{
 		// calculate target increment for vertical scanlines which is the bitmap's pitch value
-		dst_adv = bitmap->rowpixels;
+		dst_adv = bitmap->rowpixels();
 		dst_offset= dst_length * dst_adv;
-		pri_base = BITMAP_ADDR8(priority, dst_start, linepos + dst_offset);
-		dst_base = BITMAP_ADDR32(bitmap, dst_start, linepos + dst_offset);
+		pri_base = &priority->pix8(dst_start, linepos + dst_offset);
+		dst_base = &bitmap->pix32(dst_start, linepos + dst_offset);
 	}
 
 	// generalized
@@ -307,7 +307,7 @@ void k053250_t::draw( bitmap_t *bitmap, const rectangle *cliprect, int colorbase
 		if (orientation & ORIENTATION_FLIP_Y)
 		{
 			linedata_adv = -linedata_adv;			// traverse line RAM backward in Y flipped scenarioes
-			linedata_offs += bitmap->height - 1;	// and get info for the first line from the bottom
+			linedata_offs += bitmap->height() - 1;	// and get info for the first line from the bottom
 		}
 
 		dst_wrapmask = ~0;	// scanlines don't seem to wrap horizontally in normal orientation
@@ -334,7 +334,7 @@ void k053250_t::draw( bitmap_t *bitmap, const rectangle *cliprect, int colorbase
 		if (orientation & ORIENTATION_FLIP_X)
 		{
 			linedata_adv = -linedata_adv;		// traverse line RAM backward in X flipped scenarioes
-			linedata_offs += bitmap->width - 1;	// and get info for the first line from the bottom
+			linedata_offs += bitmap->width() - 1;	// and get info for the first line from the bottom
 		}
 
 		if (src_clipmask)

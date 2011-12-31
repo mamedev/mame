@@ -303,8 +303,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap )
 				int sy = (flipy)?(ypos+height-1-y):(ypos+y);
 				if( sy>=16 && sy<256-16 )
 				{
-					UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
-					UINT8 *pdest = BITMAP_ADDR8(machine.priority_bitmap, sy, 0);
+					UINT16 *dest = &bitmap->pix16(sy);
+					UINT8 *pdest = &machine.priority_bitmap->pix8(sy);
 
 					for( x=0; x<width; x++ )
 					{
@@ -416,9 +416,9 @@ static void draw_layer( running_machine &machine, bitmap_t *bitmap, int opaque )
 		if( ypos>=256 ) ypos -= 512;
 
 		x1 = MAX(xpos, 0);
-		x2 = MIN(xpos+7, bitmap->width-1);
+		x2 = MIN(xpos+7, bitmap->width()-1);
 		y1 = MAX(ypos, 0);
-		y2 = MIN(ypos+7, bitmap->height-1);
+		y2 = MIN(ypos+7, bitmap->height()-1);
 
 		if (x1 <= x2 && y1 <= y2)
 		{
@@ -438,8 +438,8 @@ static void draw_layer( running_machine &machine, bitmap_t *bitmap, int opaque )
 				for (y = y1; y <= y2; y++)
 				{
 					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
-					UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-					UINT8 *pdest = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+					UINT16 *dest = &bitmap->pix16(y);
+					UINT8 *pdest = &machine.priority_bitmap->pix8(y);
 
 					for (x = x1; x <= x2; x++)
 					{
@@ -455,8 +455,8 @@ static void draw_layer( running_machine &machine, bitmap_t *bitmap, int opaque )
 				for (y = y1; y <= y2; y++)
 				{
 					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
-					UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-					UINT8 *pdest = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+					UINT16 *dest = &bitmap->pix16(y);
+					UINT8 *pdest = &machine.priority_bitmap->pix8(y);
 
 					for (x = x1; x <= x2; x++)
 					{
@@ -527,7 +527,7 @@ SCREEN_UPDATE( twin16 )
 	if (state->m_video_register&TWIN16_SCREEN_FLIPX) text_flip|=TILEMAP_FLIPX;
 	if (state->m_video_register&TWIN16_SCREEN_FLIPY) text_flip|=TILEMAP_FLIPY;
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 	draw_layer( screen.machine(), bitmap, 1 );
 	draw_layer( screen.machine(), bitmap, 0 );
 	draw_sprites( screen.machine(), bitmap );

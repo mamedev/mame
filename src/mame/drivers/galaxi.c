@@ -188,7 +188,7 @@ static SCREEN_UPDATE(galaxi)
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_bg1_tmap, TILEMAP_DRAW_OPAQUE, 0);
-	else				bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	else				bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_bg2_tmap, 0, 0);
 	if (layers_ctrl & 4)	tilemap_draw(bitmap, cliprect, state->m_bg3_tmap, 0, 0);
 	if (layers_ctrl & 8)	tilemap_draw(bitmap, cliprect, state->m_bg4_tmap, 0, 0);

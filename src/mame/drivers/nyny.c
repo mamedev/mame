@@ -350,7 +350,7 @@ static MC6845_UPDATE_ROW( update_row )
 			else
 				color = bit2 ? color2 : 0;
 
-			*BITMAP_ADDR32(bitmap, y, x) = pens[color];
+			bitmap->pix32(y, x) = pens[color];
 
 			x += 1;
 		}
@@ -385,7 +385,7 @@ static MC6845_END_UPDATE( end_update )
 		{
 			/* check if the star status */
 			if (state->m_star_enable &&
-			    (*BITMAP_ADDR32(bitmap, y, x) == pens[0]) &&
+			    (bitmap->pix32(y, x) == pens[0]) &&
 			    ((state->m_star_shift_reg & 0x80ff) == 0x00ff) &&
 			    (((y & 0x01) ^ state->m_flipscreen) ^ (((x & 0x08) >> 3) ^ state->m_flipscreen)))
 			{
@@ -393,7 +393,7 @@ static MC6845_END_UPDATE( end_update )
 							  ((state->m_star_shift_reg & 0x0400) >>  9) |	/* G */
 							  ((state->m_star_shift_reg & 0x1000) >> 10);		/* B */
 
-				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
+				bitmap->pix32(y, x) = pens[color];
 			}
 
 			if (delay_counter == 0)

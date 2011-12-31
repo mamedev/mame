@@ -12,24 +12,6 @@
 #include "includes/naughtyb.h"
 
 
-static const rectangle scrollvisiblearea =
-{
-	2*8, 34*8-1,
-	0*8, 28*8-1
-};
-
-static const rectangle leftvisiblearea =
-{
-	0*8, 2*8-1,
-	0*8, 28*8-1
-};
-
-static const rectangle rightvisiblearea =
-{
-	34*8, 36*8-1,
-	0*8, 28*8-1
-};
-
 static const res_net_decode_info naughtyb_decode_info =
 {
 	2,		/*  two proms          */
@@ -202,6 +184,10 @@ WRITE8_HANDLER( popflame_videoreg_w )
 ***************************************************************************/
 SCREEN_UPDATE( naughtyb )
 {
+	const rectangle scrollvisiblearea(2*8, 34*8-1, 0*8, 28*8-1);
+	const rectangle leftvisiblearea(0*8, 2*8-1, 0*8, 28*8-1);
+	const rectangle rightvisiblearea(34*8, 36*8-1, 0*8, 28*8-1);
+
 	naughtyb_state *state = screen.machine().driver_data<naughtyb_state>();
 	UINT8 *videoram = state->m_videoram;
 	int offs;

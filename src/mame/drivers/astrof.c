@@ -410,9 +410,9 @@ static void video_update_common( running_machine &machine, bitmap_t *bitmap, con
 			pen_t pen = (data & 0x01) ? fore_pen : back_pen;
 
 			if (state->m_flipscreen)
-				*BITMAP_ADDR32(bitmap, y, 255 - x) = pen;
+				bitmap->pix32(y, 255 - x) = pen;
 			else
-				*BITMAP_ADDR32(bitmap, y, x) = pen;
+				bitmap->pix32(y, x) = pen;
 
 			x = x + 1;
 			data = data >> 1;

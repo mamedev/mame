@@ -2733,8 +2733,8 @@ static void convert_bitmap( running_machine &machine, bitmap_t *dst, bitmap_t *s
 
 	for( y = rect->min_y; y < rect->max_y; y++ )
 	{
-		UINT32 *d = BITMAP_ADDR32( dst, y, 0 );
-		UINT16 *s = BITMAP_ADDR16( src, y, 0 );
+		UINT32 *d = &dst->pix32(y);
+		UINT16 *s = &src->pix16(y);
 
 		for( x = rect->min_x; x < rect->max_x; x++ )
 		{
@@ -2749,8 +2749,8 @@ SCREEN_UPDATE(model2)
 	model2_state *state = screen.machine().driver_data<model2_state>();
 	logerror("--- frame ---\n");
 
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
-	bitmap_fill(state->m_sys24_bitmap, cliprect, 0);
+	bitmap->fill(screen.machine().pens[0], *cliprect);
+	state->m_sys24_bitmap->fill(0, *cliprect);
 
 	segas24_tile *tile = screen.machine().device<segas24_tile>("tile");
 	tile->draw(state->m_sys24_bitmap, cliprect, 7, 0, 0);
@@ -2769,7 +2769,7 @@ SCREEN_UPDATE(model2)
 	/* have the rasterizer output the frame */
 	model2_3d_frame_end( state, bitmap, cliprect );
 
-	bitmap_fill(state->m_sys24_bitmap, cliprect, 0);
+	state->m_sys24_bitmap->fill(0, *cliprect);
 	tile->draw(state->m_sys24_bitmap, cliprect, 3, 0, 0);
 	tile->draw(state->m_sys24_bitmap, cliprect, 2, 0, 0);
 	tile->draw(state->m_sys24_bitmap, cliprect, 1, 0, 0);

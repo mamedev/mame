@@ -917,7 +917,7 @@ static void stars_draw_row(galaxian_state *state, bitmap_t *bitmap, int maxx, in
 		if (star_offs >= STAR_RNG_PERIOD)
 			star_offs = 0;
 		if (enable_star && (star & 0x80) != 0 && (star & starmask) != 0)
-			*BITMAP_ADDR32(bitmap, y, GALAXIAN_XSCALE*x + 0) = state->m_star_color[star & 0x3f];
+			bitmap->pix32(y, GALAXIAN_XSCALE*x + 0) = state->m_star_color[star & 0x3f];
 
 		/* second RNG clock: two pixels */
 		star = state->m_stars[star_offs++];
@@ -925,8 +925,8 @@ static void stars_draw_row(galaxian_state *state, bitmap_t *bitmap, int maxx, in
 			star_offs = 0;
 		if (enable_star && (star & 0x80) != 0 && (star & starmask) != 0)
 		{
-			*BITMAP_ADDR32(bitmap, y, GALAXIAN_XSCALE*x + 1) = state->m_star_color[star & 0x3f];
-			*BITMAP_ADDR32(bitmap, y, GALAXIAN_XSCALE*x + 2) = state->m_star_color[star & 0x3f];
+			bitmap->pix32(y, GALAXIAN_XSCALE*x + 1) = state->m_star_color[star & 0x3f];
+			bitmap->pix32(y, GALAXIAN_XSCALE*x + 2) = state->m_star_color[star & 0x3f];
 		}
 	}
 }
@@ -943,7 +943,7 @@ void galaxian_draw_background(running_machine &machine, bitmap_t *bitmap, const 
 {
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* erase the background to black first */
-	bitmap_fill(bitmap, cliprect, RGB_BLACK);
+	bitmap->fill(RGB_BLACK, *cliprect);
 
 	/* update the star origin to the current frame */
 	stars_update_origin(machine);
@@ -972,24 +972,24 @@ static void background_draw_colorsplit(running_machine &machine, bitmap_t *bitma
 		rectangle draw = *cliprect;
 		draw.max_x = MIN(draw.max_x, split_flipped * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
-			bitmap_fill(bitmap, &draw, RGB_BLACK);
+			bitmap->fill(RGB_BLACK, draw);
 
 		draw = *cliprect;
 		draw.min_x = MAX(draw.min_x, split_flipped * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
-			bitmap_fill(bitmap, &draw, color);
+			bitmap->fill(color, draw);
 	}
 	else
 	{
 		rectangle draw = *cliprect;
 		draw.max_x = MIN(draw.max_x, split * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
-			bitmap_fill(bitmap, &draw, color);
+			bitmap->fill(color, draw);
 
 		draw = *cliprect;
 		draw.min_x = MAX(draw.min_x, split * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
-			bitmap_fill(bitmap, &draw, RGB_BLACK);
+			bitmap->fill(RGB_BLACK, draw);
 	}
 }
 
@@ -1025,7 +1025,7 @@ void scramble_draw_background(running_machine &machine, bitmap_t *bitmap, const 
 {
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* blue background - 390 ohm resistor */
-	bitmap_fill(bitmap, cliprect, state->m_background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK);
+	bitmap->fill(state->m_background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, *cliprect);
 
 	scramble_draw_stars(machine, bitmap, cliprect, 256);
 }
@@ -1045,7 +1045,7 @@ void jumpbug_draw_background(running_machine &machine, bitmap_t *bitmap, const r
 {
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* blue background - 390 ohm resistor */
-	bitmap_fill(bitmap, cliprect, state->m_background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK);
+	bitmap->fill(state->m_background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, *cliprect);
 
 	/* render stars same as scramble but nothing in the status area */
 	scramble_draw_stars(machine, bitmap, cliprect, 240);
@@ -1062,7 +1062,7 @@ void turtles_draw_background(running_machine &machine, bitmap_t *bitmap, const r
             GREEN - 470 ohm resistor
             BLUE  - 390 ohm resistor
     */
-	bitmap_fill(bitmap, cliprect, MAKE_RGB(state->m_background_red * 0x55, state->m_background_green * 0x47, state->m_background_blue * 0x55));
+	bitmap->fill(MAKE_RGB(state->m_background_red * 0x55, state->m_background_green * 0x47, state->m_background_blue * 0x55), *cliprect);
 }
 
 
@@ -1120,7 +1120,7 @@ void amidar_draw_background(running_machine &machine, bitmap_t *bitmap, const re
 			UINT8 red = ((~prom[x] & 0x02) && state->m_background_red) ? 0x7c : 0x00;
 			UINT8 green = ((~prom[x] & 0x02) && state->m_background_green) ? 0x3c : 0x00;
 			UINT8 blue = ((~prom[x] & 0x01) && state->m_background_blue) ? 0x47 : 0x00;
-			bitmap_fill(bitmap, &draw, MAKE_RGB(red, green, blue));
+			bitmap->fill(MAKE_RGB(red, green, blue, draw));
 		}
 }
 #endif
@@ -1140,15 +1140,15 @@ INLINE void galaxian_draw_pixel(bitmap_t *bitmap, const rectangle *cliprect, int
 		x *= GALAXIAN_XSCALE;
 		x += GALAXIAN_H0START;
 		if (x >= cliprect->min_x && x <= cliprect->max_x)
-			*BITMAP_ADDR32(bitmap, y, x) = color;
+			bitmap->pix32(y, x) = color;
 
 		x++;
 		if (x >= cliprect->min_x && x <= cliprect->max_x)
-			*BITMAP_ADDR32(bitmap, y, x) = color;
+			bitmap->pix32(y, x) = color;
 
 		x++;
 		if (x >= cliprect->min_x && x <= cliprect->max_x)
-			*BITMAP_ADDR32(bitmap, y, x) = color;
+			bitmap->pix32(y, x) = color;
 	}
 }
 

@@ -676,8 +676,8 @@ static void draw_background_spaceod(running_machine &machine, bitmap_t *bitmap, 
 	bitmap_t *pixmap = tilemap_get_pixmap(!(state->m_spaceod_bg_control & 0x02) ? state->m_spaceod_bg_htilemap : state->m_spaceod_bg_vtilemap);
 	int flipmask = (state->m_spaceod_bg_control & 0x01) ? 0xff : 0x00;
 	int xoffset = (state->m_spaceod_bg_control & 0x02) ? 0x10 : 0x00;
-	int xmask = pixmap->width - 1;
-	int ymask = pixmap->height - 1;
+	int xmask = pixmap->width() - 1;
+	int ymask = pixmap->height() - 1;
 	int x, y;
 
 	/* The H and V counters on this board are independent of the ones on */
@@ -690,8 +690,8 @@ static void draw_background_spaceod(running_machine &machine, bitmap_t *bitmap, 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		int effy = (y + state->m_spaceod_vcounter + 22) ^ flipmask;
-		UINT16 *src = (UINT16 *)pixmap->base + (effy & ymask) * pixmap->rowpixels;
-		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *src = &pixmap->pix16(effy & ymask);
+		UINT16 *dst = &bitmap->pix16(y);
 
 		/* loop over horizontal pixels */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
@@ -733,14 +733,14 @@ static void draw_background_page_scroll(running_machine &machine, bitmap_t *bitm
 	segag80r_state *state = machine.driver_data<segag80r_state>();
 	bitmap_t *pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
 	int flipmask = (state->m_video_control & 0x08) ? 0xff : 0x00;
-	int xmask = pixmap->width - 1;
-	int ymask = pixmap->height - 1;
+	int xmask = pixmap->width() - 1;
+	int ymask = pixmap->height() - 1;
 	int x, y;
 
 	/* if disabled, draw nothing */
 	if (!state->m_bg_enable)
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 		return;
 	}
 
@@ -748,8 +748,8 @@ static void draw_background_page_scroll(running_machine &machine, bitmap_t *bitm
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		int effy = state->m_bg_scrolly + (((y ^ flipmask) + (flipmask & 0xe0)) & 0xff);
-		UINT16 *src = (UINT16 *)pixmap->base + (effy & ymask) * pixmap->rowpixels;
-		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *src = &pixmap->pix16(effy & ymask);
+		UINT16 *dst = &bitmap->pix16(y);
 
 		/* loop over horizontal pixels */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
@@ -774,14 +774,14 @@ static void draw_background_full_scroll(running_machine &machine, bitmap_t *bitm
 	segag80r_state *state = machine.driver_data<segag80r_state>();
 	bitmap_t *pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
 	int flipmask = (state->m_video_control & 0x08) ? 0x3ff : 0x000;
-	int xmask = pixmap->width - 1;
-	int ymask = pixmap->height - 1;
+	int xmask = pixmap->width() - 1;
+	int ymask = pixmap->height() - 1;
 	int x, y;
 
 	/* if disabled, draw nothing */
 	if (!state->m_bg_enable)
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 		return;
 	}
 
@@ -789,8 +789,8 @@ static void draw_background_full_scroll(running_machine &machine, bitmap_t *bitm
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		int effy = (y + state->m_bg_scrolly) ^ flipmask;
-		UINT16 *src = (UINT16 *)pixmap->base + (effy & ymask) * pixmap->rowpixels;
-		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *src = &pixmap->pix16(effy & ymask);
+		UINT16 *dst = &bitmap->pix16(y);
 
 		/* loop over horizontal pixels */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)

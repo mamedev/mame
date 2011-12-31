@@ -383,7 +383,7 @@ SCREEN_UPDATE( namcos1 )
 
 
 	/* background color */
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
 	i = ((state->m_cus116[0] << 8) | state->m_cus116[1]) - 1;			// min x
@@ -422,7 +422,7 @@ SCREEN_UPDATE( namcos1 )
 	}
 
 
-	bitmap_fill(screen.machine().priority_bitmap, &new_clip, 0);
+	screen.machine().priority_bitmap->fill(0, new_clip);
 
 	/* bit 0-2 priority */
 	/* bit 3   disable  */

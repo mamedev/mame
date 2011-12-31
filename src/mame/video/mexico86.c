@@ -27,7 +27,7 @@ SCREEN_UPDATE( mexico86 )
 	/* Bubble Bobble doesn't have a real video RAM. All graphics (characters */
 	/* and sprites) are stored in the same memory region, and information on */
 	/* the background character columns is stored inthe area dd00-dd3f */
-	bitmap_fill(bitmap, cliprect, 255);
+	bitmap->fill(255, *cliprect);
 
 	sx = 0;
 
@@ -109,7 +109,7 @@ SCREEN_UPDATE( kikikai )
 	int goffs, code, color, y;
 	int tx, ty;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	sx = 0;
 	for (offs = 0; offs < state->m_objectram_size; offs += 4)
 	{

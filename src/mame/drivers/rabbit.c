@@ -240,7 +240,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	UINT32 *source = (state->m_spriteram+ (todraw*2))-2;
 	UINT32 *finish = state->m_spriteram;
 
-//  bitmap_fill(state->m_sprite_bitmap, &state->m_sprite_clip, 0x0); // sloooow
+//  state->m_sprite_bitmap->fill(0x0, state->m_sprite_clip); // sloooow
 
 	while( source>=finish )
 	{
@@ -291,7 +291,7 @@ static void rabbit_clearspritebitmap( running_machine &machine, bitmap_t *bitmap
 
 	for (y=0; y<amounty;y++)
 	{
-		dstline = BITMAP_ADDR16(state->m_sprite_bitmap, (starty+y)&0xfff, 0);
+		dstline = &state->m_sprite_bitmap->pix16((starty+y)&0xfff);
 		memset(dstline+startx,0x00,amountx*2);
 	}
 }
@@ -332,8 +332,8 @@ static void draw_sprite_bitmap( running_machine &machine, bitmap_t *bitmap, cons
 
 		if ((ydrawpos >= cliprect->min_y) && (ydrawpos <= cliprect->max_y))
 		{
-			srcline = BITMAP_ADDR16(state->m_sprite_bitmap, (starty+(y>>7))&0xfff, 0);
-			dstline = BITMAP_ADDR16(bitmap, ydrawpos, 0);
+			srcline = &state->m_sprite_bitmap->pix16((starty+(y>>7))&0xfff);
+			dstline = &bitmap->pix16(ydrawpos);
 
 			for (x=0;x<xsize;x+=0x80)
 			{
@@ -434,7 +434,7 @@ static SCREEN_UPDATE(rabbit)
 	rabbit_state *state = screen.machine().driver_data<rabbit_state>();
 	int prilevel;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 //  popmessage("%08x %08x", state->m_viewregs0[0], state->m_viewregs0[1]);
 //  popmessage("%08x %08x %08x %08x %08x %08x", state->m_tilemap_regs[0][0],state->m_tilemap_regs[0][1],state->m_tilemap_regs[0][2],state->m_tilemap_regs[0][3],state->m_tilemap_regs[0][4],state->m_tilemap_regs[0][5]);

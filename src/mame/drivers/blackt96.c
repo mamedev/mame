@@ -135,7 +135,7 @@ static SCREEN_UPDATE( blackt96 )
 	int x,y;
 	const gfx_element *gfx = screen.machine().gfx[2];
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	draw_main(screen.machine(),bitmap,cliprect,1);
 	draw_main(screen.machine(),bitmap,cliprect,0);

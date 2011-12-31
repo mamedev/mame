@@ -12,19 +12,6 @@
 
 
 
-static const rectangle spritevisiblearea =
-{
-	2*8, 32*8-1,
-	2*8, 30*8-1
-};
-
-static const rectangle spritevisibleareaflipx =
-{
-        0*8, 30*8-1,
-        2*8, 30*8-1
-};
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -246,6 +233,8 @@ WRITE8_HANDLER( fastfred_flip_screen_y_w )
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
+	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
 	fastfred_state *state = machine.driver_data<fastfred_state>();
 	int offs;
 
@@ -310,7 +299,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( fastfred )
 {
 	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
-	bitmap_fill(bitmap, cliprect, *state->m_background_color);
+	bitmap->fill(*state->m_background_color, *cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 

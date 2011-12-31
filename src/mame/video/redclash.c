@@ -285,7 +285,7 @@ static void draw_bullets( running_machine &machine, bitmap_t *bitmap, const rect
 
 		if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 			sy >= cliprect->min_y && sy <= cliprect->max_y)
-			*BITMAP_ADDR16(bitmap, sy, sx) = 0x19;
+			bitmap->pix16(sy, sx) = 0x19;
 	}
 }
 
@@ -407,7 +407,7 @@ void redclash_draw_stars( running_machine &machine, bitmap_t *bitmap, const rect
 					if ((xloc >= firstx) && (xloc <= lastx))
 					{
 						star_color = (state >> 9) & 0x1f;
-						*BITMAP_ADDR16(bitmap, yloc, xloc) = palette_offset + star_color;
+						bitmap->pix16(yloc, xloc) = palette_offset + star_color;
 					}
 				}
 			}
@@ -427,7 +427,7 @@ SCREEN_UPDATE( redclash )
 {
 	ladybug_state *state = screen.machine().driver_data<ladybug_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 0, 0x00, 0xff);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	draw_bullets(screen.machine(), bitmap, cliprect);

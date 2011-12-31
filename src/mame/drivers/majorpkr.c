@@ -525,7 +525,7 @@ static SCREEN_UPDATE(majorpkr)
 {
 	majorpkr_state *state = screen.machine().driver_data<majorpkr_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	rectangle custom_clip;
 

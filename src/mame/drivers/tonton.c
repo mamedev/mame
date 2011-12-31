@@ -71,7 +71,7 @@ static VIDEO_START( tonton )
 static SCREEN_UPDATE( tonton )
 {
 	tonton_state *state = screen.machine().driver_data<tonton_state>();
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	copybitmap(bitmap, state->m_vdp0_bitmap, 0, 0, 0, 0, cliprect);
 

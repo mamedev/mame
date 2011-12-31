@@ -263,7 +263,7 @@ SCREEN_UPDATE( astrocde )
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
 		int effy = mame_vpos_to_astrocade_vpos(y);
 		UINT16 offset = (effy / xystep) * (80 / xystep);
 		UINT32 sparkleoffs = 0, staroffs = 0;
@@ -339,7 +339,7 @@ SCREEN_UPDATE( profpac )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		int effy = mame_vpos_to_astrocade_vpos(y);
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
 		UINT16 offset = state->m_profpac_vispage * 0x4000 + effy * 80;
 		int x;
 

@@ -653,7 +653,7 @@ void amiga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanl
 
 	/* start of a new line, signal we're not done with it and fill up vars */
 	if (bitmap != NULL)
-		dst = BITMAP_ADDR16(bitmap, scanline, 0);
+		dst = &bitmap->pix16(scanline);
 
 	/* all sprites off at the start of the line */
 	memset(state->m_sprite_remain, 0, sizeof(state->m_sprite_remain));

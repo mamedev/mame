@@ -114,7 +114,7 @@ static SCREEN_UPDATE( itgambl2 )
 
 	popmessage("%d %d %04x",state->m_test_x,state->m_test_y,state->m_start_offs);
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	count = (state->m_start_offs);
 
@@ -127,7 +127,7 @@ static SCREEN_UPDATE( itgambl2 )
 			color = (blit_ram[count] & 0xff)>>0;
 
 			if((x)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, x) = screen.machine().pens[color];
+				bitmap->pix32(y, x) = screen.machine().pens[color];
 
 			count++;
 		}

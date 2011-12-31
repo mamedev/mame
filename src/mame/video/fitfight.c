@@ -126,7 +126,7 @@ SCREEN_UPDATE(fitfight)
 	vblank = (state->m_fof_700000[0] & 0x8000);
 
 	if (vblank > 0)
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	else {
 //      if (screen.machine().input().code_pressed(KEYCODE_Q))
 //          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x0038) >> 3);

@@ -144,7 +144,7 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 #define z_draw_pixel()				\
 	UINT8 val = src[xs >> 6];			\
 	if(val)					\
-		*BITMAP_ADDR16(bitmap, yd>>6, xd>>6) = val + colour;
+		bitmap->pix16(yd>>6, xd>>6) = val + colour;
 
 #define z_x_dst(op)			\
 	old = xd;					\
@@ -484,7 +484,7 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitma
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
 										if (pix)
-											*BITMAP_ADDR16(bitmap, sy+yy, sx+xx) = pix+ NewColour; // change later
+											bitmap->pix16(sy+yy, sx+xx) = pix+ NewColour; // change later
 									}
 								}
 							}
@@ -504,7 +504,7 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitma
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
 										if (pix)
-											*BITMAP_ADDR16(bitmap, sy+(ysize-1-yy), sx+xx) = pix+ NewColour; // change later
+											bitmap->pix16(sy+(ysize-1-yy), sx+xx) = pix+ NewColour; // change later
 									}
 								}
 							}
@@ -524,7 +524,7 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitma
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
 										if (pix)
-											*BITMAP_ADDR16(bitmap, sy+yy, sx+(xsize-1-xx)) = pix+ NewColour; // change later
+											bitmap->pix16(sy+yy, sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}
 								}
 							}
@@ -545,7 +545,7 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t *bitma
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
 										if (pix)
-											*BITMAP_ADDR16(bitmap, sy+(ysize-1-yy), sx+(xsize-1-xx)) = pix+ NewColour; // change later
+											bitmap->pix16(sy+(ysize-1-yy), sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}
 								}
 							}

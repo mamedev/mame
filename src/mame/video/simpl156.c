@@ -29,11 +29,11 @@ SCREEN_UPDATE( simpl156 )
 {
 	simpl156_state *state = screen.machine().driver_data<simpl156_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
+	screen.machine().priority_bitmap->fill(0);
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
-	bitmap_fill(bitmap, cliprect, 256);
+	bitmap->fill(256, *cliprect);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);

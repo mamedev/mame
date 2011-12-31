@@ -368,8 +368,8 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 #endif
 
 	/* The background color is the first of the last palette */
-	bitmap_fill(bitmap,cliprect,0x1f00);
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	bitmap->fill(0x1f00, *cliprect);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->m_tilemap[0],0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->m_tilemap[1],0,2);
@@ -408,8 +408,8 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 #endif
 
 	/* The background color is the first of the last palette */
-	bitmap_fill(bitmap,cliprect,0x1f00);
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	bitmap->fill(0x1f00, *cliprect);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->m_tilemap[0],0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->m_tilemap[1],0,2);

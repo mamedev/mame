@@ -556,7 +556,7 @@ void midyunit_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanl
 {
 	midyunit_state *state = screen.machine().driver_data<midyunit_state>();
 	UINT16 *src = &state->m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT16 *dest = &bitmap->pix16(scanline);
 	int coladdr = params->coladdr << 1;
 	int x;
 

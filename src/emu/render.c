@@ -456,8 +456,8 @@ void render_texture::set_bitmap(bitmap_t *bitmap, const rectangle *sbounds, int 
 	m_bitmap = bitmap;
 	m_sbounds.min_x = (sbounds != NULL) ? sbounds->min_x : 0;
 	m_sbounds.min_y = (sbounds != NULL) ? sbounds->min_y : 0;
-	m_sbounds.max_x = (sbounds != NULL) ? sbounds->max_x : (bitmap != NULL) ? bitmap->width : 1000;
-	m_sbounds.max_y = (sbounds != NULL) ? sbounds->max_y : (bitmap != NULL) ? bitmap->height : 1000;
+	m_sbounds.max_x = (sbounds != NULL) ? sbounds->max_x : (bitmap != NULL) ? bitmap->width() : 1000;
+	m_sbounds.max_y = (sbounds != NULL) ? sbounds->max_y : (bitmap != NULL) ? bitmap->height() : 1000;
 	m_palette = palette;
 	m_format = format;
 
@@ -483,7 +483,7 @@ void render_texture::set_bitmap(bitmap_t *bitmap, const rectangle *sbounds, int 
 void render_texture::hq_scale(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param)
 {
 	render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, &source, &sbounds, &color);
+	render_resample_argb_bitmap_hq(&dest.pix32(0), dest.rowpixels(), dest.width(), dest.height(), &source, &sbounds, &color);
 }
 
 
@@ -508,8 +508,8 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		// add a reference and set up the source bitmap
 		primlist.add_reference(m_bitmap);
 		UINT8 bpp = (m_format == TEXFORMAT_PALETTE16 || m_format == TEXFORMAT_PALETTEA16 || m_format == TEXFORMAT_RGB15 || m_format == TEXFORMAT_YUY16) ? 16 : 32;
-		texinfo.base = (UINT8 *)m_bitmap->base + (m_sbounds.min_y * m_bitmap->rowpixels + m_sbounds.min_x) * (bpp / 8);
-		texinfo.rowpixels = m_bitmap->rowpixels;
+		texinfo.base = &m_bitmap->pix8(m_sbounds.min_y * bpp / 8, m_sbounds.min_x * bpp / 8);
+		texinfo.rowpixels = m_bitmap->rowpixels();
 		texinfo.width = swidth;
 		texinfo.height = sheight;
 		texinfo.palette = palbase;
@@ -525,7 +525,7 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		scaled = &m_scaled[scalenum];
 
 		// we need a non-NULL bitmap with matching dest size
-		if (scaled->bitmap != NULL && dwidth == scaled->bitmap->width && dheight == scaled->bitmap->height)
+		if (scaled->bitmap != NULL && dwidth == scaled->bitmap->width() && dheight == scaled->bitmap->height())
 			break;
 	}
 
@@ -558,8 +558,8 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 
 	// finally fill out the new info
 	primlist.add_reference(scaled->bitmap);
-	texinfo.base = scaled->bitmap->base;
-	texinfo.rowpixels = scaled->bitmap->rowpixels;
+	texinfo.base = &scaled->bitmap->pix32(0);
+	texinfo.rowpixels = scaled->bitmap->rowpixels();
 	texinfo.width = dwidth;
 	texinfo.height = dheight;
 	texinfo.palette = palbase;
@@ -886,17 +886,17 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 void render_container::overlay_scale(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param)
 {
 	// simply replicate the source bitmap over the target
-	for (int y = 0; y < dest.height; y++)
+	for (int y = 0; y < dest.height(); y++)
 	{
-		UINT32 *src = (UINT32 *)source.base + (y % source.height) * source.rowpixels;
-		UINT32 *dst = (UINT32 *)dest.base + y * dest.rowpixels;
+		UINT32 *src = &source.pix32(y % source.height());
+		UINT32 *dst = &dest.pix32(y);
 		int sx = 0;
 
 		// loop over columns
-		for (int x = 0; x < dest.width; x++)
+		for (int x = 0; x < dest.width(); x++)
 		{
 			*dst++ = src[sx++];
-			if (sx >= source.width)
+			if (sx >= source.width())
 				sx = 0;
 		}
 	}
@@ -1355,7 +1355,7 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 			{
 				// use a hard-coded default visible area for vector screens
 				screen_device *screen = curitem->screen();
-				const rectangle vectorvis = { 0, 639, 0, 479 };
+				const rectangle vectorvis(0, 639, 0, 479);
 				const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
 
 				// apply target orientation to the bounds

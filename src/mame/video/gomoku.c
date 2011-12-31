@@ -124,7 +124,7 @@ VIDEO_START( gomoku )
 	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
 
 	/* make background bitmap */
-	bitmap_fill(state->m_bg_bitmap, 0, 0x20);
+	state->m_bg_bitmap->fill(0x20);
 
 	// board
 	for (y = 0; y < 256; y++)
@@ -138,7 +138,7 @@ VIDEO_START( gomoku )
 			if (bgdata & 0x01) color = 0x21;	// board (brown)
 			if (bgdata & 0x02) color = 0x20;	// frame line (while)
 
-			*BITMAP_ADDR16(state->m_bg_bitmap, (255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+			state->m_bg_bitmap->pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 		}
 	}
 }
@@ -192,7 +192,7 @@ SCREEN_UPDATE( gomoku )
 				}
 				else continue;
 
-				*BITMAP_ADDR16(bitmap, (255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+				bitmap->pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 			}
 		}
 
@@ -220,13 +220,13 @@ SCREEN_UPDATE( gomoku )
 				}
 				else continue;
 
-				*BITMAP_ADDR16(bitmap, (255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+				bitmap->pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 			}
 		}
 	}
 	else
 	{
-		bitmap_fill(bitmap, 0, 0x20);
+		bitmap->fill(0x20);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

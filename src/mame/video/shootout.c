@@ -175,7 +175,7 @@ SCREEN_UPDATE( shootout )
 {
 	shootout_state *state = screen.machine().driver_data<shootout_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_background,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_foreground,0,1);
@@ -187,7 +187,7 @@ SCREEN_UPDATE( shootouj )
 {
 	shootout_state *state = screen.machine().driver_data<shootout_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_background,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_foreground,0,1);

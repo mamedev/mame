@@ -82,7 +82,7 @@ static SCREEN_UPDATE( gameplan )
 		UINT8 y = offs >> 8;
 		UINT8 x = offs & 0xff;
 
-		*BITMAP_ADDR32(bitmap, y, x) = pens[state->m_videoram[offs] & 0x07];
+		bitmap->pix32(y, x) = pens[state->m_videoram[offs] & 0x07];
 	}
 
 	return 0;
@@ -102,7 +102,7 @@ static SCREEN_UPDATE( leprechn )
 		UINT8 y = offs >> 8;
 		UINT8 x = offs & 0xff;
 
-		*BITMAP_ADDR32(bitmap, y, x) = pens[state->m_videoram[offs]];
+		bitmap->pix32(y, x) = pens[state->m_videoram[offs]];
 	}
 
 	return 0;

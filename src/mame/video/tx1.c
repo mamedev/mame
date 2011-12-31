@@ -1141,7 +1141,7 @@ static void tx1_combine_layers(running_machine &machine, bitmap_t *bitmap, int s
 
 	for (y = 0; y < 240; ++y)
 	{
-		UINT16 *bmp_addr = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *bmp_addr = &bitmap->pix16(y);
 
 		UINT32 bmp_offset = y * 768 + x_offset;
 
@@ -2961,7 +2961,7 @@ static void bb_combine_layers(running_machine &machine, bitmap_t *bitmap, int sc
 		UINT32 sky_en = BIT(state->m_vregs.sky, 7);
 		UINT32 sky_val = (((state->m_vregs.sky & 0x7f) + y) >> 2) & 0x3f;
 
-		UINT16 *bmp_addr = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *bmp_addr = &bitmap->pix16(y);
 
 		for (x = 0; x < 256; ++x)
 		{

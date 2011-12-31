@@ -256,7 +256,7 @@ SCREEN_UPDATE( cloud9 )
 	int x, y, offs;
 
 	/* draw the sprites */
-	bitmap_fill(state->m_spritebitmap, cliprect, 0x00);
+	state->m_spritebitmap->fill(0x00, *cliprect);
 	for (offs = 0; offs < 0x20; offs++)
 		if (spriteaddr[offs + 0x00] != 0)
 		{
@@ -275,7 +275,7 @@ SCREEN_UPDATE( cloud9 )
 	/* draw the bitmap to the screen, looping over Y */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *dst = &bitmap->pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (~state->m_syncprom[y] & 2)
@@ -287,7 +287,7 @@ SCREEN_UPDATE( cloud9 )
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			UINT16 *mosrc = (UINT16 *)state->m_spritebitmap->base + y * state->m_spritebitmap->rowpixels;
+			UINT16 *mosrc = &state->m_spritebitmap->pix16(y);
 			int effy = y ^ flip;
 			UINT8 *src[2];
 

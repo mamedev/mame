@@ -192,7 +192,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 
 		for (j=y1; j < y2; j++)
 		{
-			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
+			UINT16 *d = &bitmap->pix16(j);
 
 			for (i=x1; i < x2; i++)
 			{
@@ -208,7 +208,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 	{
 		for (j=y1; j < y2; j++)
 		{
-			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
+			UINT16 *d = &bitmap->pix16(j);
 			int index = (iy * (width / 2)) + ix;
 
 			for (i=x1; i < x2; i+=2)
@@ -232,7 +232,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 		{
 			for (j=y1; j < y2; j++)
 			{
-				UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
+				UINT16 *d = &bitmap->pix16(j);
 				int index = (iy * width) + ix;
 
 				for (i=x1; i < x2; i++)
@@ -338,7 +338,7 @@ SCREEN_UPDATE( taitojc )
     }
 #endif
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	/* 0xf000 used on Densha de Go disclaimer screen(s) (disable object RAM?) */
 	if((state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x0000 && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x2000  && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0xf000 )
@@ -364,7 +364,7 @@ SCREEN_UPDATE( taitojc )
         int j;
         for (j=cliprect->min_y; j <= cliprect->max_y; j++)
         {
-            UINT16 *d = BITMAP_ADDR16(bitmap, j, 0);
+            UINT16 *d = &bitmap->pix16(j);
             int index = 2048 * j;
 
             for (i=cliprect->min_x; i <= cliprect->max_x; i++)
@@ -400,8 +400,8 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 	float z = extent->param[0].start;
 	int color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
-	UINT16 *fb = BITMAP_ADDR16(destmap, scanline, 0);
-	UINT16 *zb;// = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
+	UINT16 *fb = &destmap->pix16(scanline);
+	UINT16 *zb;// = &extra->zbuffer->pix16(scanline);
 	int x;
 
 	// avoid crash in dendego2
@@ -410,7 +410,7 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 	//  return;
 	//}
 
-	zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
+	zb = &extra->zbuffer->pix16(scanline);
 
 	for (x = extent->startx; x < extent->stopx; x++)
 	{
@@ -434,7 +434,7 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 	float color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
 	float dcolor = extent->param[1].dpdx;
-	UINT16 *fb = BITMAP_ADDR16(destmap, scanline, 0);
+	UINT16 *fb = &destmap->pix16(scanline);
 	UINT16 *zb;
 	int x;
 
@@ -444,7 +444,7 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 	//  return;
 	//}
 
-	zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
+	zb = &extra->zbuffer->pix16(scanline);
 
 	for (x = extent->startx; x < extent->stopx; x++)
 	{
@@ -474,8 +474,8 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 	float du = extent->param[1].dpdx;
 	float dv = extent->param[2].dpdx;
 	float dcolor = extent->param[3].dpdx;
-	UINT16 *fb = BITMAP_ADDR16(destmap, scanline, 0);
-	UINT16 *zb = BITMAP_ADDR16(extra->zbuffer, scanline, 0);
+	UINT16 *fb = &destmap->pix16(scanline);
+	UINT16 *zb = &extra->zbuffer->pix16(scanline);
 	int tex_wrap_x = extra->tex_wrap_x;
 	int tex_wrap_y = extra->tex_wrap_y;
 	int tex_base_x = extra->tex_base_x;
@@ -794,6 +794,6 @@ void taitojc_clear_frame(running_machine &machine)
 	cliprect.max_x = machine.primary_screen->width() - 1;
 	cliprect.max_y = machine.primary_screen->height() - 1;
 
-	bitmap_fill(state->m_framebuffer, &cliprect, 0);
-	bitmap_fill(state->m_zbuffer, &cliprect, 0xffff);
+	state->m_framebuffer->fill(0, cliprect);
+	state->m_zbuffer->fill(0xffff, cliprect);
 }

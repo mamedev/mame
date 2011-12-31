@@ -471,8 +471,8 @@ SCREEN_UPDATE( tetrisp2 )
 	flipscreen = (state->m_systemregs[0x00] & 0x02);
 
 	/* Black background color */
-	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
+	bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0);
 
 	/* Flip Screen */
 	if (flipscreen != state->m_flipscreen_old)
@@ -556,8 +556,8 @@ SCREEN_UPDATE( rockntread )
 	flipscreen = (state->m_systemregs[0x00] & 0x02);
 
 	/* Black background color */
-	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
+	bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0);
 
 	/* Flip Screen */
 	if (flipscreen != state->m_flipscreen_old)
@@ -646,8 +646,8 @@ SCREEN_UPDATE( rocknms_left )
 	tilemap_set_scrollx(state->m_tilemap_sub_rot, 0, state->m_rocknms_sub_rotregs[ 0 ] + 0x400);
 	tilemap_set_scrolly(state->m_tilemap_sub_rot, 0, state->m_rocknms_sub_rotregs[ 2 ] + 0x400);
 
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0x0000]);
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	bitmap->fill(screen.machine().pens[0x0000], *cliprect);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	asc_pri = scr_pri = rot_pri = 0;
 
@@ -707,8 +707,8 @@ SCREEN_UPDATE( rocknms_right )
 	tilemap_set_scrolly(state->m_tilemap_rot, 0, state->m_rotregs[ 2 ] + 0x400);
 
 	/* Black background color */
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0x0000]);
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	bitmap->fill(screen.machine().pens[0x0000], *cliprect);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	asc_pri = scr_pri = rot_pri = 0;
 

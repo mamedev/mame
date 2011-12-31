@@ -450,12 +450,12 @@ static int drawd3d_window_init(win_window_info *window)
 	d3d->vector_bitmap = render_load_png(file, NULL, "vector.png", NULL, NULL);
 	if (d3d->vector_bitmap != NULL)
 	{
-		bitmap_fill(d3d->vector_bitmap, NULL, MAKE_ARGB(0xff,0xff,0xff,0xff));
+		d3d->vector_bitmap->fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
 		d3d->vector_bitmap = render_load_png(file, NULL, "vector.png", d3d->vector_bitmap, NULL);
 	}
 
 	d3d->default_bitmap = auto_bitmap_alloc(window->machine(), 8, 8, BITMAP_FORMAT_RGB32);
-	bitmap_fill(d3d->default_bitmap, NULL, MAKE_ARGB(0xff,0xff,0xff,0xff));
+	d3d->default_bitmap->fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
 
 	// configure the adapter for the mode we want
 	if (config_adapter_mode(window))
@@ -785,10 +785,10 @@ try_again:
 		render_texinfo texture;
 
 		// fake in the basic data so it looks like it came from render.c
-		texture.base = d3d->default_bitmap->base;
-		texture.rowpixels = d3d->default_bitmap->rowpixels;
-		texture.width = d3d->default_bitmap->width;
-		texture.height = d3d->default_bitmap->height;
+		texture.base = d3d->default_bitmap->raw_pixptr(0);
+		texture.rowpixels = d3d->default_bitmap->rowpixels();
+		texture.width = d3d->default_bitmap->width();
+		texture.height = d3d->default_bitmap->height();
 		texture.palette = NULL;
 		texture.seqid = 0;
 
@@ -870,10 +870,10 @@ static int device_create_resources(d3d_info *d3d)
 		render_texinfo texture;
 
 		// fake in the basic data so it looks like it came from render.c
-		texture.base = d3d->vector_bitmap->base;
-		texture.rowpixels = d3d->vector_bitmap->rowpixels;
-		texture.width = d3d->vector_bitmap->width;
-		texture.height = d3d->vector_bitmap->height;
+		texture.base = &d3d->vector_bitmap->pix32(0);
+		texture.rowpixels = d3d->vector_bitmap->rowpixels();
+		texture.width = d3d->vector_bitmap->width();
+		texture.height = d3d->vector_bitmap->height();
 		texture.palette = NULL;
 		texture.seqid = 0;
 

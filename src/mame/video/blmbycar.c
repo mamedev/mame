@@ -243,13 +243,13 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (layers_ctrl & 1)
 		for (i = 0; i <= 1; i++)
 			tilemap_draw(bitmap, cliprect, state->m_tilemap_0, i, i);
 	else
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 
 	if (layers_ctrl & 2)
 		for (i = 0; i <= 1; i++)

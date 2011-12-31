@@ -110,7 +110,7 @@ void jpmimpct_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanl
 {
 	jpmimpct_state *state = screen.machine().driver_data<jpmimpct_state>();
 	UINT16 *vram = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
+	UINT32 *dest = &bitmap->pix32(scanline);
 	int coladdr = params->coladdr;
 	int x;
 

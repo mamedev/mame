@@ -261,16 +261,16 @@ SCREEN_UPDATE( cvs )
 				int bx = 255 - 7 - state->m_bullet_ram[offs] - ct;
 
 				/* Bullet/Object Collision */
-				if ((*BITMAP_ADDR16(s2636_0_bitmap, offs, bx) != 0) ||
-					(*BITMAP_ADDR16(s2636_1_bitmap, offs, bx) != 0) ||
-					(*BITMAP_ADDR16(s2636_2_bitmap, offs, bx) != 0))
+				if ((s2636_0_bitmap->pix16(offs, bx) != 0) ||
+					(s2636_1_bitmap->pix16(offs, bx) != 0) ||
+					(s2636_2_bitmap->pix16(offs, bx) != 0))
 					state->m_collision_register |= 0x08;
 
 				/* Bullet/Background Collision */
-				if (colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(state->m_scrolled_collision_background, offs, bx)))
+				if (colortable_entry_get_value(screen.machine().colortable, state->m_scrolled_collision_background->pix16(offs, bx)))
 					state->m_collision_register |= 0x80;
 
-				*BITMAP_ADDR16(bitmap, offs, bx) = BULLET_STAR_PEN;
+				bitmap->pix16(offs, bx) = BULLET_STAR_PEN;
 			}
 		}
 	}
@@ -286,15 +286,15 @@ SCREEN_UPDATE( cvs )
 
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				int pixel0 = *BITMAP_ADDR16(s2636_0_bitmap, y, x);
-				int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
-				int pixel2 = *BITMAP_ADDR16(s2636_2_bitmap, y, x);
+				int pixel0 = s2636_0_bitmap->pix16(y, x);
+				int pixel1 = s2636_1_bitmap->pix16(y, x);
+				int pixel2 = s2636_2_bitmap->pix16(y, x);
 
 				int pixel = pixel0 | pixel1 | pixel2;
 
 				if (S2636_IS_PIXEL_DRAWN(pixel))
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel);
+					bitmap->pix16(y, x) = SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. S2636 collision detection */
 					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision_register |= 0x01;
@@ -302,7 +302,7 @@ SCREEN_UPDATE( cvs )
 					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x04;
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(state->m_scrolled_collision_background, y, x)))
+					if (colortable_entry_get_value(screen.machine().colortable, state->m_scrolled_collision_background->pix16(y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision_register |= 0x10;
 						if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision_register |= 0x20;
@@ -330,8 +330,8 @@ SCREEN_UPDATE( cvs )
 					y = ~y;
 
 				if ((y >= cliprect->min_y) && (y <= cliprect->max_y) &&
-					(colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0))
-					*BITMAP_ADDR16(bitmap, y, x) = BULLET_STAR_PEN;
+					(colortable_entry_get_value(screen.machine().colortable, bitmap->pix16(y, x)) == 0))
+					bitmap->pix16(y, x) = BULLET_STAR_PEN;
 			}
 		}
 	}

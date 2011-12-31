@@ -246,7 +246,7 @@ SCREEN_UPDATE( metlclsh )
 {
 	metlclsh_state *state = screen.machine().driver_data<metlclsh_state>();
 
-	bitmap_fill(bitmap, cliprect, 0x10);
+	bitmap->fill(0x10, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);	// low priority tiles of foreground
 

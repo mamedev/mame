@@ -181,7 +181,7 @@ static VIDEO_START( rdx_v33 )
 
 static SCREEN_UPDATE( rdx_v33 )
 {
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, md_tilemap, 0, 0);

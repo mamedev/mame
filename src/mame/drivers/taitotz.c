@@ -126,7 +126,7 @@ static SCREEN_UPDATE( taitotz )
 
                 for (y=0; y < FONT_HEIGHT; y++)
                 {
-                    UINT32 *fb = BITMAP_ADDR32(bitmap, y+(u*FONT_WIDTH), 0);
+                    UINT32 *fb = &bitmap->pix32(y+(u*FONT_WIDTH));
                     for (x=0; x < FONT_WIDTH; x++)
                     {
                         UINT32 p = s[((tile*(FONT_WIDTH*FONT_HEIGHT*2)) + ((y*FONT_WIDTH)+x)) ^ 1];
@@ -145,7 +145,7 @@ static SCREEN_UPDATE( taitotz )
         int t,u;
         for (u=0; u < 256; u++)
         {
-            UINT32 *fb = BITMAP_ADDR32(bitmap, u, 0);
+            UINT32 *fb = &bitmap->pix32(u);
             for (t=0; t < 512; t++)
             {
                 UINT32 p = s[((u*512)+t) ^ 1];
@@ -158,7 +158,7 @@ static SCREEN_UPDATE( taitotz )
 
 	taitotz_state *state = screen.machine().driver_data<taitotz_state>();
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 	copybitmap_trans(bitmap, state->framebuffer, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
@@ -182,7 +182,7 @@ static void draw_tile(running_machine &machine, UINT32 pos, UINT32 tile)
 	{
 		int u = tileu;
 
-		UINT32 *fb = BITMAP_ADDR32(state->framebuffer, j, 0);
+		UINT32 *fb = &state->framebuffer->pix32(j);
 
 		for (int i=tilex; i < (tilex+16); i++)
 		{

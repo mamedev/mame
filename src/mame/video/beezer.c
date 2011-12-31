@@ -28,8 +28,8 @@ SCREEN_UPDATE( beezer )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		for (x = cliprect->min_x; x <= cliprect->max_x; x+=2)
 		{
-			*BITMAP_ADDR16(bitmap, y,   x+1) = videoram[0x80*x+y] & 0x0f;
-			*BITMAP_ADDR16(bitmap, y,   x+0) = videoram[0x80*x+y] >> 4;
+			bitmap->pix16(y, x+1) = videoram[0x80*x+y] & 0x0f;
+			bitmap->pix16(y, x+0) = videoram[0x80*x+y] >> 4;
 		}
 
 	return 0;

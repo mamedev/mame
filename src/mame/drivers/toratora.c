@@ -81,7 +81,7 @@ static SCREEN_UPDATE( toratora )
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
-			*BITMAP_ADDR32(bitmap, y, x) = pen;
+			bitmap->pix32(y, x) = pen;
 
 			data = data << 1;
 			x = x + 1;

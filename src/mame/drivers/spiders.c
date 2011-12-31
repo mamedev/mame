@@ -490,7 +490,7 @@ static MC6845_UPDATE_ROW( update_row )
 				data3 = data3 >> 1;
 			}
 
-			*BITMAP_ADDR32(bitmap, y, x) = pens[color];
+			bitmap->pix32(y, x) = pens[color];
 
 			x = x + 1;
 		}

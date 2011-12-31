@@ -13,7 +13,8 @@ class itech8_state : public driver_device
 {
 public:
 	itech8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_visarea(0, 0, 0, 0) { }
 
 	UINT8 *m_grom_bank;
 	UINT8 m_blitter_int;
@@ -22,7 +23,7 @@ public:
 	UINT8 m_sound_data;
 	UINT8 m_pia_porta_data;
 	UINT8 m_pia_portb_data;
-	const rectangle *m_visarea;
+	rectangle m_visarea;
 	UINT8 m_z80_ctrl;
 	UINT8 m_z80_port_val;
 	UINT8 m_z80_clear_to_send;

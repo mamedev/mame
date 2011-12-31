@@ -202,7 +202,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		{
 			for (x = 0; x < 8; x++)
 			{
-				*BITMAP_ADDR16(state->m_tmpbitmap2, sy+y, sx+x) = colour;
+				state->m_tmpbitmap2->pix16(sy+y, sx+x) = colour;
 			}
 		}
 	}
@@ -219,7 +219,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		{
 			for (x = 0; x < 8; x++)
 			{
-				*BITMAP_ADDR16(state->m_tmpbitmap2, sy+y, sx+x) = colour;
+				state->m_tmpbitmap2->pix16(sy+y, sx+x) = colour;
 			}
 		}
 	}
@@ -296,7 +296,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	set_background_palette(machine, (*state->m_palettebank & 0x08) >> 3);
 
 	if (state->m_background_pos[1] == 0)	/* no background */
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap->fill(0, *cliprect);
 	else
 	{
 		/* copy the background graphics */

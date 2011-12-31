@@ -1117,17 +1117,17 @@ SCREEN_UPDATE( tms340x0 )
 		params.heblnk = params.hsblnk = cliprect->max_x + 1;
 
 	/* blank out the blank regions */
-	if (bitmap->bpp == 16)
+	if (bitmap->bpp() == 16)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, cliprect->min_y, 0);
+		UINT16 *dest = &bitmap->pix16(cliprect->min_y);
 		for (x = cliprect->min_x; x < params.heblnk; x++)
 			dest[x] = blackpen;
 		for (x = params.hsblnk; x <= cliprect->max_y; x++)
 			dest[x] = blackpen;
 	}
-	else if (bitmap->bpp == 32)
+	else if (bitmap->bpp() == 32)
 	{
-		UINT32 *dest = BITMAP_ADDR32(bitmap, cliprect->min_y, 0);
+		UINT32 *dest = &bitmap->pix32(cliprect->min_y);
 		for (x = cliprect->min_x; x < params.heblnk; x++)
 			dest[x] = blackpen;
 		for (x = params.hsblnk; x <= cliprect->max_y; x++)

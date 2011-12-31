@@ -25,7 +25,7 @@ SCREEN_UPDATE( bublbobl )
 	/* the background character columns is stored in the area dd00-dd3f */
 
 	/* This clears & redraws the entire screen each pass */
-	bitmap_fill(bitmap, cliprect, 255);
+	bitmap->fill(255, *cliprect);
 
 	if (!state->m_video_enable)
 		return 0;

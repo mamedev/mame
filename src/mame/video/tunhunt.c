@@ -238,10 +238,10 @@ static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const
 			color = ((span_data>>6)&0x3)^0x3;
 			count = (span_data&0x1f)+1;
 			while( count-- && x < 256 )
-				*BITMAP_ADDR16(tmpbitmap, line, x++) = color;
+				tmpbitmap->pix16(line, x++) = color;
 		}
 		while( x<256 )
-			*BITMAP_ADDR16(tmpbitmap, line, x++) = 0;
+			tmpbitmap->pix16(line, x++) = 0;
 	} /* next line */
 
 	switch( tunhunt_ram[VSTRLO] )
@@ -320,7 +320,7 @@ static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle
 					}
 				}
 				if (x >= cliprect->min_x && x <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, 0xff-y, x) = color;
+					bitmap->pix16(0xff-y, x) = color;
 			}
 	}
 }

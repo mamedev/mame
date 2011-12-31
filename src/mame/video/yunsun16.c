@@ -212,7 +212,7 @@ SCREEN_UPDATE( yunsun16 )
 
 	//popmessage("%04X", *state->m_priorityram);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if ((*state->m_priorityram & 0x0c) == 4)
 	{

@@ -106,7 +106,7 @@ UINT32 pk8000_video_update(screen_device &screen, bitmap_t *bitmap, const rectan
 	my_rect.max_y = 192+32-1;
 
 	if (pk8000_video_enable) {
-		bitmap_fill(bitmap, &my_rect, (pk8000_video_color >> 4) & 0x0f);
+		bitmap->fill((pk8000_video_color >> 4) & 0x0f, my_rect);
 
 		if (BIT(pk8000_video_mode,4)==0){
 			// Text mode
@@ -124,7 +124,7 @@ UINT32 pk8000_video_update(screen_device &screen, bitmap_t *bitmap, const rectan
 							for (b = 0; b < 8; b++)
 							{
 								UINT8 col = (code >> b) & 0x01 ? (color & 0x0f) : ((color>>4) & 0x0f);
-								*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*8+(7-b)+16) =  col;
+								bitmap->pix16((y*8)+j+16, x*8+(7-b)+16) =  col;
 							}
 						}
 					}
@@ -141,7 +141,7 @@ UINT32 pk8000_video_update(screen_device &screen, bitmap_t *bitmap, const rectan
 							for (b = 2; b < 8; b++)
 							{
 								UINT8 col = ((code >> b) & 0x01) ? (pk8000_video_color) & 0x0f : (pk8000_video_color>>4) & 0x0f;
-								*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*6+(7-b)+16+8) =  col;
+								bitmap->pix16((y*8)+j+16, x*6+(7-b)+16+8) =  col;
 							}
 						}
 					}
@@ -163,7 +163,7 @@ UINT32 pk8000_video_update(screen_device &screen, bitmap_t *bitmap, const rectan
 						for (b = 0; b < 8; b++)
 						{
 							UINT8 col = (code >> b) & 0x01 ? (color & 0x0f) : ((color>>4) & 0x0f);
-							*BITMAP_ADDR16(bitmap, (y*8)+j+16, x*8+(7-b)+16) =  col;
+							bitmap->pix16((y*8)+j+16, x*8+(7-b)+16) =  col;
 						}
 					}
 				}
@@ -171,7 +171,7 @@ UINT32 pk8000_video_update(screen_device &screen, bitmap_t *bitmap, const rectan
 		}
 	} else {
 		// Disabled video
-		bitmap_fill(bitmap, &my_rect, 0);
+		bitmap->fill(0, my_rect);
 	}
     return 0;
 }

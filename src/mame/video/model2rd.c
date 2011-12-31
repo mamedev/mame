@@ -60,7 +60,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	model2_state *state = extra->state;
 	bitmap_t *destmap = (bitmap_t *)dest;
-	UINT32 *p = BITMAP_ADDR32(destmap, scanline, 0);
+	UINT32 *p = &destmap->pix32(scanline);
 
 	/* extract color information */
 	const UINT16 *colortable_r = (const UINT16 *)&state->m_colorxlat[0x0000/4];
@@ -113,7 +113,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	model2_state *state = extra->state;
 	bitmap_t *destmap = (bitmap_t *)dest;
-	UINT32 *p = BITMAP_ADDR32(destmap, scanline, 0);
+	UINT32 *p = &destmap->pix32(scanline);
 
 	UINT32	tex_width = extra->texwidth;
 	UINT32	tex_height = extra->texheight;

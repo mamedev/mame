@@ -334,12 +334,12 @@ SCREEN_UPDATE( dday )
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 			{
-				UINT16 src_pixel = *BITMAP_ADDR16(state->m_main_bitmap, y, x);
+				UINT16 src_pixel = state->m_main_bitmap->pix16(y, x);
 
-				if (*BITMAP_ADDR16(sl_bitmap, y, x) == 0xff)
+				if (sl_bitmap->pix16(y, x) == 0xff)
 					src_pixel += screen.machine().total_colors();
 
-				*BITMAP_ADDR16(bitmap, y, x) = src_pixel;
+				bitmap->pix16(y, x) = src_pixel;
 			}
 	}
 	else

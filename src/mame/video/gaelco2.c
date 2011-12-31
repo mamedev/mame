@@ -398,7 +398,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 						for (py = 0; py < gfx->height; py++){
 							/* get a pointer to the current line in the screen bitmap */
 							int ypos = ((sy + ey*16 + py) & 0x1ff);
-							UINT16 *srcy = BITMAP_ADDR16(bitmap, ypos, 0);
+							UINT16 *srcy = &bitmap->pix16(ypos);
 
 							int gfx_py = yflip ? (gfx->height - 1 - py) : py;
 
@@ -458,7 +458,7 @@ SCREEN_UPDATE( gaelco2 )
 	}
 
 	/* draw screen */
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_pant[1], 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_pant[0], 0, 0);
@@ -488,7 +488,7 @@ static UINT32 dual_update(screen_device &screen, bitmap_t *bitmap, const rectang
 	}
 
 	/* draw screen */
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_pant[index], 0, 0);
 	draw_sprites(screen,bitmap,cliprect, 0x8000 * index, 0);

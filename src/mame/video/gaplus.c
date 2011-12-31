@@ -248,7 +248,7 @@ static void starfield_render(running_machine &machine, bitmap_t *bitmap)
 
 		if ( x >=0 && x < width && y >= 0 && y < height )
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = stars[i].col;
+			bitmap->pix16(y, x) = stars[i].col;
 		}
 	}
 }
@@ -313,7 +313,7 @@ SCREEN_UPDATE( gaplus )
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(screen.machine(), state->m_spriteram[0x1f7f-0x800] & 1);
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	starfield_render(screen.machine(), bitmap);
 

@@ -622,7 +622,7 @@ SCREEN_UPDATE( itech8_2layer )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 
@@ -634,7 +634,7 @@ SCREEN_UPDATE( itech8_2layer )
 	{
 		UINT8 *base0 = &tms_state.vram[(0x00000 + page_offset + y * 256) & 0x3ffff];
 		UINT8 *base2 = &tms_state.vram[(0x20000 + page_offset + y * 256) & 0x3ffff];
-		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
+		UINT32 *dest = &bitmap->pix32(y);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
@@ -659,7 +659,7 @@ SCREEN_UPDATE( itech8_grmatch )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 
@@ -673,7 +673,7 @@ SCREEN_UPDATE( itech8_grmatch )
 	{
 		UINT8 *base0 = &tms_state.vram[0x00000 + ((page_offset + y * 256) & 0xffff)];
 		UINT8 *base2 = &tms_state.vram[0x20000 + ((page_offset + y * 256) & 0xffff)];
-		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
+		UINT32 *dest = &bitmap->pix32(y);
 
 		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
 		{
@@ -709,7 +709,7 @@ SCREEN_UPDATE( itech8_2page )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 
@@ -719,7 +719,7 @@ SCREEN_UPDATE( itech8_2page )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];
-		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
+		UINT32 *dest = &bitmap->pix32(y);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			dest[x] = pens[base[x]];
@@ -742,7 +742,7 @@ SCREEN_UPDATE( itech8_2page_large )
 	/* if we're blanked, just fill with black */
 	if (tms_state.blanked)
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 
@@ -755,7 +755,7 @@ SCREEN_UPDATE( itech8_2page_large )
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];
 		UINT8 *latch = &tms_state.latchram[(page_offset + y * 256) & 0x3ffff];
-		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
+		UINT32 *dest = &bitmap->pix32(y);
 
 		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
 		{

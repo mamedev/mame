@@ -318,14 +318,14 @@ static void update_pixel0(running_machine &machine, int x, int y)
 {
 	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
 	UINT8 color = state->m_videoram0[(y * machine.primary_screen->width()) + x];
-	*BITMAP_ADDR16(state->m_tmpbitmap0, y, x) = color;
+	state->m_tmpbitmap0->pix16(y, x) = color;
 }
 
 static void update_pixel1(running_machine &machine, int x, int y)
 {
 	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
 	UINT8 color = state->m_videoram1[(y * machine.primary_screen->width()) + x];
-	*BITMAP_ADDR16(state->m_tmpbitmap1, y, x) = (color == 0x7f) ? 0xff : color;
+	state->m_tmpbitmap1->pix16(y, x) = (color == 0x7f) ? 0xff : color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
@@ -567,7 +567,7 @@ SCREEN_UPDATE( nbmj8891 )
 			copyscrollbitmap(bitmap, state->m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
 	}
 	else
-		bitmap_fill(bitmap, 0, 0xff);
+		bitmap->fill(0xff);
 
 	return 0;
 }

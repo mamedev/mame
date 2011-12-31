@@ -145,7 +145,7 @@ static SCREEN_UPDATE(astrocorp)
 	if (state->m_screen_enable & 1)
 		copybitmap(bitmap, state->m_bitmap, 0,0,0,0, cliprect);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	return 0;
 }

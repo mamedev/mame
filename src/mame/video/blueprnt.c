@@ -136,7 +136,7 @@ SCREEN_UPDATE( blueprnt )
 		for (i = 0; i < 32; i++)
 			tilemap_set_scrolly(state->m_bg_tilemap, i, state->m_scrollram[30 - i]);
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);

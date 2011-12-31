@@ -746,8 +746,8 @@ static void sprite_init_cave( running_machine &machine )
 
 	state->m_sprite_zbuf_baseval = 0x10000 - MAX_SPRITE_NUM;
 	state->m_sprite_zbuf = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
-	state->m_blit.baseaddr_zbuf = (UINT8 *)state->m_sprite_zbuf->base;
-	state->m_blit.line_offset_zbuf = state->m_sprite_zbuf->rowpixels * state->m_sprite_zbuf->bpp / 8;
+	state->m_blit.baseaddr_zbuf = &state->m_sprite_zbuf->pix8(0);
+	state->m_blit.line_offset_zbuf = state->m_sprite_zbuf->rowpixels() * state->m_sprite_zbuf->bpp() / 8;
 
 	state->m_num_sprites = state->m_spriteram_size / 0x10 / 2;
 	state->m_sprite = auto_alloc_array_clear(machine, struct sprite_cave, state->m_num_sprites);
@@ -827,7 +827,7 @@ static void cave_sprite_check( screen_device &screen, const rectangle *clip )
 				if (clip->min_y == visarea.min_y)
 				{
 					if(!(state->m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						bitmap_fill(state->m_sprite_zbuf, &visarea, 0);
+						state->m_sprite_zbuf->fill(0, visarea);
 				}
 				break;
 
@@ -836,7 +836,7 @@ static void cave_sprite_check( screen_device &screen, const rectangle *clip )
 				if (clip->min_y == visarea.min_y)
 				{
 					if(!(state->m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						bitmap_fill(state->m_sprite_zbuf,&visarea,0);
+						state->m_sprite_zbuf->fill(0, visarea);
 				}
 				break;
 
@@ -1548,8 +1548,8 @@ SCREEN_UPDATE( cave )
 
 	set_pens(screen.machine());
 
-	state->m_blit.baseaddr = (UINT8 *)bitmap->base;
-	state->m_blit.line_offset = bitmap->rowpixels * bitmap->bpp / 8;
+	state->m_blit.baseaddr = &bitmap->pix8(0);
+	state->m_blit.line_offset = bitmap->rowpixels() * bitmap->bpp() / 8;
 
 	/* Choose the tilemap to display (8x8 tiles or 16x16 tiles) */
 	for (GFX = 0; GFX < 4; GFX++)
@@ -1621,7 +1621,7 @@ SCREEN_UPDATE( cave )
 
 	cave_sprite_check(screen, cliprect);
 
-	bitmap_fill(bitmap, cliprect, state->m_background_color);
+	bitmap->fill(state->m_background_color, *cliprect);
 
 	/*
         Tiles and sprites are ordered by priority (0 back, 3 front) with

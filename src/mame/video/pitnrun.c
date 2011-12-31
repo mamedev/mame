@@ -116,7 +116,7 @@ static void pitnrun_spotlights(running_machine &machine)
 		datapix=ROM[128*16*i+x+y*16];
 		for(b=0;b<8;b++)
 		{
-			*BITMAP_ADDR16(state->m_tmp_bitmap[i], y, x*8+(7-b)) = (datapix&1);
+			state->m_tmp_bitmap[i]->pix16(y, x*8+(7-b)) = (datapix&1);
 			datapix>>=1;
 		}
 	  }
@@ -244,7 +244,7 @@ SCREEN_UPDATE( pitnrun )
 	}
 #endif
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 	if(!(state->m_ha&4))
 		tilemap_draw(bitmap,cliprect,state->m_bg, 0,0);

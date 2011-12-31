@@ -396,8 +396,8 @@ static void custom_tilemap_draw(
 	int starty = cliprect->min_y;
 	int endy = cliprect->max_y+1;
 
-	width_mask = src_bitmap0->width - 1;
-	height_mask = src_bitmap0->height - 1;
+	width_mask = src_bitmap0->width() - 1;
+	height_mask = src_bitmap0->height() - 1;
 	src_y = (scrolly + starty) & height_mask;
 
 
@@ -410,7 +410,7 @@ static void custom_tilemap_draw(
 
 		src_x &= width_mask;
 
-		if (bitmap->bpp == 16)
+		if (bitmap->bpp() == 16)
 		{
 			for (x = 0; x < 320; x++)
 			{
@@ -419,21 +419,21 @@ static void custom_tilemap_draw(
 				else
 					column_offset = 0;
 
-				p = *BITMAP_ADDR16(src_bitmap0, (src_y + column_offset) & height_mask, src_x);
+				p = src_bitmap0->pix16((src_y + column_offset) & height_mask, src_x);
 
 				if (src_bitmap1)
 				{
-					p |= (*BITMAP_ADDR16(src_bitmap1, (src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
+					p |= (src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
 				}
 
 				src_x = (src_x + 1) & width_mask;
 
 				if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = machine.pens[p];
+					bitmap->pix16(y, x) = machine.pens[p];
 					if (machine.priority_bitmap)
 					{
-						UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+						UINT8 *pri = &machine.priority_bitmap->pix8(y);
 						pri[x] |= priority;
 					}
 				}
@@ -449,18 +449,18 @@ static void custom_tilemap_draw(
 				else
 					column_offset = 0;
 
-				p = *BITMAP_ADDR16(src_bitmap0, (src_y + column_offset) & height_mask, src_x);
+				p = src_bitmap0->pix16((src_y + column_offset) & height_mask, src_x);
 
 				if (src_bitmap1)
 				{
 					if (!is_tattoo)
 					{
 						// does boogie wings actually use this, or is the tattoo assassing code correct in this mode?
-						p |= (*BITMAP_ADDR16(src_bitmap1, (src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
+						p |= (src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
 					}
 					else
 					{
-						UINT16 p2 = *BITMAP_ADDR16(src_bitmap1, (src_y + column_offset) & height_mask, src_x);
+						UINT16 p2 = src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x);
 						p = 0x200+( ((p&0x30)<<4) | (p&0x0f) | ((p2 & 0x0f)<<4));
 					}
 				}
@@ -468,10 +468,10 @@ static void custom_tilemap_draw(
 
 				if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 				{
-					*BITMAP_ADDR32(bitmap, y, x) = machine.pens[p];
+					bitmap->pix32(y, x) = machine.pens[p];
 					if (machine.priority_bitmap)
 					{
-						UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+						UINT8 *pri = &machine.priority_bitmap->pix8(y);
 						pri[x] |= priority;
 					}
 				}

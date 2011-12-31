@@ -251,8 +251,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 SCREEN_UPDATE( tecmo )
 {
 	tecmo_state *state = screen.machine().driver_data<tecmo_state>();
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0x100);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0x100, *cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,2);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,4);

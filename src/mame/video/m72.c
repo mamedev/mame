@@ -540,7 +540,7 @@ SCREEN_UPDATE( m72 )
 	m72_state *state = screen.machine().driver_data<m72_state>();
 	if (state->m_video_off)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 
@@ -566,7 +566,7 @@ SCREEN_UPDATE( majtitle )
 
 	if (state->m_video_off)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 

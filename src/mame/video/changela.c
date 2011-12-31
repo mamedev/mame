@@ -82,7 +82,7 @@ static void draw_obj0( running_machine &machine, bitmap_t *bitmap, int sy )
 					data = (ROM[rom_addr] & 0xf0) >> 4;
 
 				if ((data != 0x0f) && (data != 0))
-					*BITMAP_ADDR16(bitmap, sy, xpos + i) = data | 0x10;
+					bitmap->pix16(sy, xpos + i) = data | 0x10;
 
 				if (hs)
 				{
@@ -92,7 +92,7 @@ static void draw_obj0( running_machine &machine, bitmap_t *bitmap, int sy )
 						data = (ROM[rom_addr ^ 0x100] & 0xf0) >> 4;
 
 					if ((data != 0x0f) && (data != 0))
-						*BITMAP_ADDR16(bitmap, sy, xpos + i + 16) = data | 0x10;
+						bitmap->pix16(sy, xpos + i + 16) = data | 0x10;
 				}
 			}
 		}
@@ -159,7 +159,7 @@ static void draw_obj1( running_machine &machine, bitmap_t *bitmap )
 
 			col = c0 | (c1 << 1) | ((attrib & 0xc0) >> 4);
 			if ((col & 0x07) != 0x07)
-				*BITMAP_ADDR16(bitmap, sy, sx) = col | 0x20;
+				bitmap->pix16(sy, sx) = col | 0x20;
 		}
 	}
 }
@@ -307,7 +307,7 @@ static void draw_river( running_machine &machine, bitmap_t *bitmap, int sy )
 			else
 				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
 
-			*BITMAP_ADDR16(bitmap, sy, sx) = col;
+			bitmap->pix16(sy, sx) = col;
 		}
 
 		for (sx = 16; sx < 256; sx++)
@@ -338,7 +338,7 @@ static void draw_river( running_machine &machine, bitmap_t *bitmap, int sy )
 			else
 				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
 
-			*BITMAP_ADDR16(bitmap, sy, sx) = col;
+			bitmap->pix16(sy, sx) = col;
 		}
 	}
 }
@@ -547,7 +547,7 @@ static void draw_tree( running_machine &machine, bitmap_t *bitmap, int sy, int t
 				all_ff = 0;
 
 			if (col != 0x0f && col != 0x00)
-				*BITMAP_ADDR16(bitmap, sy, sx) = col | 0x30;
+				bitmap->pix16(sy, sx) = col | 0x30;
 		}
 	}
 
@@ -587,7 +587,7 @@ static void draw_tree( running_machine &machine, bitmap_t *bitmap, int sy, int t
 				all_ff = 0;
 
 			if (col != 0x0f && col != 0x00)
-				*BITMAP_ADDR16(bitmap, sy, sx) = col | 0x30;
+				bitmap->pix16(sy, sx) = col | 0x30;
 		}
 	}
 
@@ -652,11 +652,11 @@ static TIMER_CALLBACK( changela_scanline_callback )
 	int sx;
 
 	/* clear the current scanline first */
-	rectangle rect = { 0, 255, sy, sy };
-	bitmap_fill(state->m_river_bitmap, &rect, 0x00);
-	bitmap_fill(state->m_obj0_bitmap, &rect, 0x00);
-	bitmap_fill(state->m_tree0_bitmap, &rect, 0x00);
-	bitmap_fill(state->m_tree1_bitmap, &rect, 0x00);
+	const rectangle rect(0, 255, sy, sy);
+	state->m_river_bitmap->fill(0x00, rect);
+	state->m_obj0_bitmap->fill(0x00, rect);
+	state->m_tree0_bitmap->fill(0x00, rect);
+	state->m_tree1_bitmap->fill(0x00, rect);
 
 	draw_river(machine, state->m_river_bitmap, sy);
 	draw_obj0(machine, state->m_obj0_bitmap, sy);
@@ -668,28 +668,28 @@ static TIMER_CALLBACK( changela_scanline_callback )
 	{
 		int riv_col, prev_col;
 
-		if ((*BITMAP_ADDR16(state->m_river_bitmap, sy, sx) == 0x08)
-		|| (*BITMAP_ADDR16(state->m_river_bitmap, sy, sx) == 0x09)
-		|| (*BITMAP_ADDR16(state->m_river_bitmap, sy, sx) == 0x0a))
+		if ((state->m_river_bitmap->pix16(sy, sx) == 0x08)
+		|| (state->m_river_bitmap->pix16(sy, sx) == 0x09)
+		|| (state->m_river_bitmap->pix16(sy, sx) == 0x0a))
 			riv_col = 1;
 		else
 			riv_col = 0;
 
-		if ((*BITMAP_ADDR16(state->m_river_bitmap, sy, sx-1) == 0x08)
-		|| (*BITMAP_ADDR16(state->m_river_bitmap, sy, sx-1) == 0x09)
-		|| (*BITMAP_ADDR16(state->m_river_bitmap, sy, sx-1) == 0x0a))
+		if ((state->m_river_bitmap->pix16(sy, sx-1) == 0x08)
+		|| (state->m_river_bitmap->pix16(sy, sx-1) == 0x09)
+		|| (state->m_river_bitmap->pix16(sy, sx-1) == 0x0a))
 			prev_col = 1;
 		else
 			prev_col = 0;
 
-		if (*BITMAP_ADDR16(state->m_obj0_bitmap, sy, sx) == 0x14) /* Car Outline Color */
+		if (state->m_obj0_bitmap->pix16(sy, sx) == 0x14) /* Car Outline Color */
 		{
 			/* Tree 0 Collision */
-			if (*BITMAP_ADDR16(state->m_tree0_bitmap, sy, sx) != 0)
+			if (state->m_tree0_bitmap->pix16(sy, sx) != 0)
 				state->m_tree0_col = 1;
 
 			/* Tree 1 Collision */
-			if (*BITMAP_ADDR16(state->m_tree1_bitmap, sy, sx) != 0)
+			if (state->m_tree1_bitmap->pix16(sy, sx) != 0)
 				state->m_tree1_col = 1;
 
 			/* Hit Right Bank */

@@ -1268,8 +1268,8 @@ static void copy_scroll_op(bitmap_t *bitmap, UINT16 *source, int sx, int sy)
 	if ((bch = CLIP_H - sy) < 0) bch = 0;
 
 	esi = source + CLIP_SKIP + (sy << SCREEN_WIDTH_L2);
-	edi = BITMAP_ADDR16(bitmap, VIS_MINY, VIS_MINX);
-	edx = bitmap->rowpixels;
+	edi = &bitmap->pix16(VIS_MINY, VIS_MINX);
+	edx = bitmap->rowpixels();
 
 	// draw top split
 	for (ecx=bch; ecx; ecx--) OPCOPY_COMMON
@@ -1325,8 +1325,8 @@ static void copy_scroll_xp(bitmap_t *bitmap, UINT16 *source, int sx, int sy)
 	if ((bch = CLIP_H - sy) < 0) bch = 0;
 
 	src_base = source + CLIP_SKIP + (sy << SCREEN_WIDTH_L2);
-	edi = BITMAP_ADDR16(bitmap, VIS_MINY, VIS_MINX);
-	dst_adv = bitmap->rowpixels - CLIP_W;
+	edi = &bitmap->pix16(VIS_MINY, VIS_MINX);
+	dst_adv = bitmap->rowpixels() - CLIP_W;
 
 	// draw top split
 	for (edx=bch; edx; edx--) YCOPY_COMMON
@@ -1349,8 +1349,8 @@ static void copy_fixed_xp(bitmap_t *bitmap, UINT16 *source)
 	UINT16 ax, bx;
 
 	esi = source + CLIP_SKIP + CLIP_W;
-	edi = BITMAP_ADDR16(bitmap, VIS_MINY, VIS_MINX + CLIP_W);
-	dst_pitch = bitmap->rowpixels;
+	edi = &bitmap->pix16(VIS_MINY, VIS_MINX + CLIP_W);
+	dst_pitch = bitmap->rowpixels();
 	ecx = -CLIP_W;
 	edx = CLIP_H;
 
@@ -1384,8 +1384,8 @@ static void copy_fixed_2b(bitmap_t *bitmap, UINT16 *source)
 	UINT16 ax, bx;
 
 	esi = source + CLIP_SKIP + CLIP_W;
-	edi = BITMAP_ADDR16(bitmap, VIS_MINY, VIS_MINX + CLIP_W);
-	dst_pitch = bitmap->rowpixels;
+	edi = &bitmap->pix16(VIS_MINY, VIS_MINX + CLIP_W);
+	dst_pitch = bitmap->rowpixels();
 	ecx = -CLIP_W;
 	edx = CLIP_H;
 
@@ -1434,8 +1434,8 @@ static void filter_bitmap(running_machine &machine, bitmap_t *bitmap, int mask)
 
 	pal_ptr = state->m_internal_palette;
 	esi = mask | 0xffffff00;
-	edi = (UINT32*)BITMAP_ADDR16(bitmap, VIS_MINY, VIS_MINX + CLIP_W);
-	dst_pitch = bitmap->rowpixels >> 1;
+	edi = (UINT32*)&bitmap->pix16(VIS_MINY, VIS_MINX + CLIP_W);
+	dst_pitch = bitmap->rowpixels() >> 1;
 	ecx = -(CLIP_W>>1);
 	edx = CLIP_H;
 
@@ -1476,7 +1476,7 @@ static SCREEN_UPDATE( halleys )
 		copy_scroll_xp(bitmap, state->m_render_layer[4], *state->m_scrollx1, *state->m_scrolly1);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, state->m_bgcolor);
+		bitmap->fill(state->m_bgcolor, *cliprect);
 
 #ifdef MAME_DEBUG
 	if (input_port_read(screen.machine(), "DEBUG")) copy_scroll_xp(bitmap, state->m_render_layer[3], *state->m_scrollx0, *state->m_scrolly0); // not used???
@@ -1500,7 +1500,7 @@ static SCREEN_UPDATE( benberob )
 	if (state->m_io_ram[0xa0] & 0x80)
 		copy_scroll_op(bitmap, state->m_render_layer[2], *state->m_scrollx1, *state->m_scrolly1);
 	else
-		bitmap_fill(bitmap, cliprect, state->m_bgcolor);
+		bitmap->fill(state->m_bgcolor, *cliprect);
 
 	copy_fixed_xp (bitmap, state->m_render_layer[1]);
 	copy_fixed_xp (bitmap, state->m_render_layer[0]);

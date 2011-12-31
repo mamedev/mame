@@ -46,182 +46,130 @@
 #include "palette.h"
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/* bitmap_format describes the various bitmap formats we use */
-enum _bitmap_format
+// bitmap_format describes the various bitmap formats we use
+enum bitmap_format
 {
-	BITMAP_FORMAT_INVALID = 0,		/* invalid format */
-	BITMAP_FORMAT_INDEXED8,			/* 8bpp indexed */
-	BITMAP_FORMAT_INDEXED16,		/* 16bpp indexed */
-	BITMAP_FORMAT_INDEXED32,		/* 32bpp indexed */
-	BITMAP_FORMAT_INDEXED64,		/* 64bpp indexed */
-	BITMAP_FORMAT_RGB15,			/* 15bpp 5-5-5 RGB */
-	BITMAP_FORMAT_RGB32,			/* 32bpp 8-8-8 RGB */
-	BITMAP_FORMAT_ARGB32,			/* 32bpp 8-8-8-8 ARGB */
-	BITMAP_FORMAT_YUY16,			/* 16bpp 8-8 Y/Cb, Y/Cr in sequence */
+	BITMAP_FORMAT_INVALID = 0,		// invalid forma
+	BITMAP_FORMAT_INDEXED8,			// 8bpp indexed
+	BITMAP_FORMAT_INDEXED16,		// 16bpp indexed
+	BITMAP_FORMAT_INDEXED32,		// 32bpp indexed
+	BITMAP_FORMAT_INDEXED64,		// 64bpp indexed
+	BITMAP_FORMAT_RGB15,			// 15bpp 5-5-5 RGB
+	BITMAP_FORMAT_RGB32,			// 32bpp 8-8-8 RGB
+	BITMAP_FORMAT_ARGB32,			// 32bpp 8-8-8-8 ARGB
+	BITMAP_FORMAT_YUY16,			// 16bpp 8-8 Y/Cb, Y/Cr in sequence
 	BITMAP_FORMAT_LAST
 };
-typedef enum _bitmap_format bitmap_format;
 
 
-/* rectangles describe a bitmap portion */
-typedef struct _rectangle rectangle;
-struct _rectangle
+// rectangles describe a bitmap portion
+class rectangle
 {
-	int				min_x;			/* minimum X, or left coordinate */
-	int				max_x;			/* maximum X, or right coordinate (inclusive) */
-	int				min_y;			/* minimum Y, or top coordinate */
-	int				max_y;			/* maximum Y, or bottom coordinate (inclusive) */
+public:
+	// construction/destruction
+	rectangle() { }
+	rectangle(INT32 minx, INT32 maxx, INT32 miny, INT32 maxy)
+		: min_x(minx), max_x(maxx), min_y(miny), max_y(maxy) { }
+
+	// compute intersection with another rect
+	rectangle &operator&=(const rectangle &src)
+	{
+		if (src.min_x > min_x) min_x = src.min_x;
+		if (src.max_x < max_x) max_x = src.max_x;
+		if (src.min_y > min_y) min_y = src.min_y;
+		if (src.max_y < max_y) max_y = src.max_y;
+		return *this;
+	}
+
+	// compute union with another rect
+	rectangle &operator|=(const rectangle &src)
+	{
+		if (src.min_x < min_x) min_x = src.min_x;
+		if (src.max_x > max_x) max_x = src.max_x;
+		if (src.min_y < min_y) min_y = src.min_y;
+		if (src.max_y > max_y) max_y = src.max_y;
+		return *this;
+	}
+	
+	// other helpers
+	bool empty() const { return (min_x > max_x || min_y > max_y); }
+	bool contains(INT32 x, INT32 y) const { return (x >= min_x && x <= max_x && y >= min_y && y <= max_y); }
+	INT32 width() const { return max_x + 1 - min_x; }
+	INT32 height() const { return max_y + 1 - min_y; }
+	void set(INT32 minx, INT32 maxx, INT32 miny, INT32 maxy) { min_x = minx; max_x = maxx; min_y = miny; max_y = maxy; }
+
+	// internal state
+	INT32			min_x;			// minimum X, or left coordinate
+	INT32			max_x;			// maximum X, or right coordinate (inclusive)
+	INT32			min_y;			// minimum Y, or top coordinate
+	INT32			max_y;			// maximum Y, or bottom coordinate (inclusive)
 };
 
 
-/* bitmaps describe a rectangular array of pixels */
-typedef struct _bitmap_base bitmap_base;
-struct _bitmap_base
-{
-	void *			alloc;			/* pointer to allocated pixel memory */
-	void *			base;			/* pointer to pixel (0,0) (adjusted for padding) */
-	int				rowpixels;		/* pixels per row (including padding) */
-	int 			width;			/* width of the bitmap */
-	int				height;			/* height of the bitmap */
-	bitmap_format	format;			/* format of the bitmap */
-	int				bpp;			/* bits per pixel */
-	palette_t *		palette;		/* optional palette */
-	rectangle		cliprect;		/* a clipping rectangle covering the full bitmap */
-};
-
-
-#ifdef __cplusplus
-
-/* class for C++ */
-class bitmap_t : public bitmap_base
+// bitmaps describe a rectangular array of pixels
+class bitmap_t
 {
 private:
+	// prevent implicit copying
 	bitmap_t(const bitmap_t &);
 	bitmap_t &operator=(const bitmap_t &);
 
 public:
+	// construction/destruction
 	bitmap_t();
-	bitmap_t(int _width, int _height, bitmap_format _format, int _xslop = 0, int _yslop = 0);
-	bitmap_t(void *_base, int _width, int _height, int _rowpixels, bitmap_format _format);
+	bitmap_t(int width, int height, bitmap_format format, int xslop = 0, int yslop = 0);
+	bitmap_t(void *base, int width, int height, int rowpixels, bitmap_format format);
 	~bitmap_t();
+	
+	// getters
+	UINT32 width() const { return m_width; }
+	UINT32 height() const { return m_height; }
+	UINT32 rowpixels() const { return m_rowpixels; }
+	UINT32 rowbytes() const { return m_rowpixels * m_bpp / 8; }
+	UINT8 bpp() const { return m_bpp; }
+	bitmap_format format() const { return m_format; }
+	palette_t *palette() const { return m_palette; }
+	const rectangle &cliprect() const { return m_cliprect; }
+	
+	// helpers
+	void clone_existing(const bitmap_t &srcbitmap);
+	void set_palette(palette_t *palette);
+	void fill(rgb_t color) { fill(color, m_cliprect); }
+	void fill(rgb_t color, const rectangle &cliprect);
+	void plot_box(int x, int y, int width, int height, UINT32 color)
+	{
+		rectangle clip(x, x + width - 1, y, y + height - 1);
+		fill(color, clip);
+	}
+	
+	// pixel access
+	template<typename _PixelType>
+	_PixelType &pix(INT32 y, INT32 x = 0) const { return *(reinterpret_cast<_PixelType *>(m_base) + y * m_rowpixels + x); }
+	UINT8 &pix8(INT32 y, INT32 x = 0) const { return *(reinterpret_cast<UINT8 *>(m_base) + y * m_rowpixels + x); }
+	UINT16 &pix16(INT32 y, INT32 x = 0) const { return *(reinterpret_cast<UINT16 *>(m_base) + y * m_rowpixels + x); }
+	UINT32 &pix32(INT32 y, INT32 x = 0) const { return *(reinterpret_cast<UINT32 *>(m_base) + y * m_rowpixels + x); }
+	UINT64 &pix64(INT32 y, INT32 x = 0) const { return *(reinterpret_cast<UINT64 *>(m_base) + y * m_rowpixels + x); }
+	void *raw_pixptr(INT32 y, INT32 x = 0) const { return reinterpret_cast<UINT8 *>(m_base) + (y * m_rowpixels + x) * m_bpp / 8; }
+	
+	// static helpers
+	static UINT8 format_to_bpp(bitmap_format format);
+
+private:
+	// internal state
+	UINT8 *			m_alloc;		// pointer to allocated pixel memory
+	void *			m_base;			// pointer to pixel (0,0) (adjusted for padding)
+	INT32			m_rowpixels;	// pixels per row (including padding)
+	INT32 			m_width;		// width of the bitmap
+	INT32			m_height;		// height of the bitmap
+	bitmap_format	m_format;		// format of the bitmap
+	UINT8			m_bpp;			// bits per pixel
+	palette_t *		m_palette;		// optional palette
+	rectangle		m_cliprect;		// a clipping rectangle covering the full bitmap
 };
 
-#else
 
-/* direct map for C */
-typedef bitmap_base bitmap_t;
-
-#endif
-
-
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-/* Macros for accessing bitmap pixels */
-#define BITMAP_ADDR(bitmap, type, y, x)	\
-	((type *)(bitmap)->base + (y) * (bitmap)->rowpixels + (x))
-
-#define BITMAP_ADDR8(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT8, y, x)
-#define BITMAP_ADDR16(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT16, y, x)
-#define BITMAP_ADDR32(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT32, y, x)
-#define BITMAP_ADDR64(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT64, y, x)
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
-/* ----- bitmap allocation ----- */
-
-/* allocate a new bitmap of the given dimensions and format */
-bitmap_t *bitmap_alloc(int width, int height, bitmap_format format);
-
-/* allocate a new bitmap with additional slop on the borders */
-bitmap_t *bitmap_alloc_slop(int width, int height, int xslop, int yslop, bitmap_format format);
-
-/* wrap a bitmap object around an existing array of data */
-bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_format format);
-
-/* associate a palette with a bitmap */
-void bitmap_set_palette(bitmap_t *bitmap, palette_t *palette);
-
-/* free allocated data for a bitmap */
-void bitmap_free(bitmap_t *bitmap);
-
-/* clone an existing bitmap by copying its fields; the target bitmap does not own the memory */
-void bitmap_clone_existing(bitmap_t *bitmap, const bitmap_t *srcbitmap);
-
-
-
-/* ----- bitmap drawing ----- */
-
-/* fill a bitmap with a single color, clipping to the given rectangle */
-void bitmap_fill(bitmap_t *dest, const rectangle *clip, rgb_t color);
-
-
-
-/* ----- bitmap utilities ----- */
-
-/* return the number of bits per pixel for a given bitmap format */
-int bitmap_format_to_bpp(bitmap_format format);
-
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    sect_rect - compute the intersection of two
-    rectangles
--------------------------------------------------*/
-
-INLINE void sect_rect(rectangle *dst, const rectangle *src)
-{
-	if (src->min_x > dst->min_x) dst->min_x = src->min_x;
-	if (src->max_x < dst->max_x) dst->max_x = src->max_x;
-	if (src->min_y > dst->min_y) dst->min_y = src->min_y;
-	if (src->max_y < dst->max_y) dst->max_y = src->max_y;
-}
-
-
-/*-------------------------------------------------
-    union_rect - compute the union of two
-    rectangles
--------------------------------------------------*/
-
-INLINE void union_rect(rectangle *dst, const rectangle *src)
-{
-	if (src->min_x < dst->min_x) dst->min_x = src->min_x;
-	if (src->max_x > dst->max_x) dst->max_x = src->max_x;
-	if (src->min_y < dst->min_y) dst->min_y = src->min_y;
-	if (src->max_y > dst->max_y) dst->max_y = src->max_y;
-}
-
-
-/*-------------------------------------------------
-    plot_box - draw a filled rectangle into a
-    bitmap of arbitrary depth
--------------------------------------------------*/
-
-INLINE void plot_box(bitmap_t *bitmap, int x, int y, int width, int height, UINT32 color)
-{
-	rectangle clip;
-	clip.min_x = x;
-	clip.min_y = y;
-	clip.max_x = x + width - 1;
-	clip.max_y = y + height - 1;
-	bitmap_fill(bitmap, &clip, color);
-}
-
-
-#endif	/* __BITMAP_H__ */
+#endif	// __BITMAP_H__

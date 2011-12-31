@@ -81,7 +81,7 @@ static SCREEN_UPDATE( pzletime )
 	int count;
 	int y, x;
 
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]); //bg pen
+	bitmap->fill(screen.machine().pens[0], *cliprect); //bg pen
 
 	tilemap_set_scrolly(state->m_txt_tilemap, 0, state->m_tilemap_regs[0] - 3);
 	tilemap_set_scrollx(state->m_txt_tilemap, 0, state->m_tilemap_regs[1]);
@@ -98,7 +98,7 @@ static SCREEN_UPDATE( pzletime )
 			for (x = 0; x < 512; x++)
 			{
 				if (state->m_bg_videoram[count] & 0x8000)
-					*BITMAP_ADDR16(bitmap, (y - 18) & 0xff, (x - 32) & 0x1ff) = 0x300 + (state->m_bg_videoram[count] & 0x7fff);
+					bitmap->pix16((y - 18) & 0xff, (x - 32) & 0x1ff) = 0x300 + (state->m_bg_videoram[count] & 0x7fff);
 
 				count++;
 			}

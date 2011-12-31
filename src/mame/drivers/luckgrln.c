@@ -276,7 +276,7 @@ static SCREEN_UPDATE(luckgrln)
 	clip.min_y = visarea.min_y;
 	clip.max_y = visarea.max_y;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	for (i= 0;i < 64;i++)
 	{

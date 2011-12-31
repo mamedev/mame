@@ -96,8 +96,8 @@ WRITE8_HANDLER( superqix_bitmapram_w )
 
 		state->m_bitmapram[offset] = data;
 
-		*BITMAP_ADDR16(state->m_fg_bitmap[0], y, x)     = data >> 4;
-		*BITMAP_ADDR16(state->m_fg_bitmap[0], y, x + 1) = data & 0x0f;
+		state->m_fg_bitmap[0]->pix16(y, x)     = data >> 4;
+		state->m_fg_bitmap[0]->pix16(y, x + 1) = data & 0x0f;
 	}
 }
 
@@ -111,8 +111,8 @@ WRITE8_HANDLER( superqix_bitmapram2_w )
 
 		state->m_bitmapram2[offset] = data;
 
-		*BITMAP_ADDR16(state->m_fg_bitmap[1], y, x)     = data >> 4;
-		*BITMAP_ADDR16(state->m_fg_bitmap[1], y, x + 1) = data & 0x0f;
+		state->m_fg_bitmap[1]->pix16(y, x)     = data >> 4;
+		state->m_fg_bitmap[1]->pix16(y, x + 1) = data & 0x0f;
 	}
 }
 

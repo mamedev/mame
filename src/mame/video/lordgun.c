@@ -346,7 +346,7 @@ SCREEN_UPDATE( lordgun )
 
 	if (state->m_whitescreen)
 	{
-		bitmap_fill(bitmap, cliprect, get_white_pen(screen.machine()));
+		bitmap->fill(get_white_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 
@@ -376,7 +376,7 @@ SCREEN_UPDATE( lordgun )
 
 	int l;
 	for (l = 0; l < 5; l++)
-		bitmap_fill(state->m_bitmaps[l], cliprect, trans_pen);
+		state->m_bitmaps[l]->fill(trans_pen, *cliprect);
 
 	if (layers_ctrl & 1)	tilemap_draw(state->m_bitmaps[0], cliprect, state->m_tilemap[0], 0, 0);
 	if (layers_ctrl & 2)	tilemap_draw(state->m_bitmaps[1], cliprect, state->m_tilemap[1], 0, 0);
@@ -402,7 +402,7 @@ SCREEN_UPDATE( lordgun )
 			// bits 0-4: layer transparency
 			for (l = 0; l < 5; l++)
 			{
-				pens[l] = *BITMAP_ADDR16(state->m_bitmaps[l], y, x);
+				pens[l] = state->m_bitmaps[l]->pix16(y, x);
 				if (pens[l] == trans_pen)
 					pri_addr |= 1 << layer2bit[l];
 			}
@@ -420,7 +420,7 @@ SCREEN_UPDATE( lordgun )
 
 			l	=	pri2layer[state->m_priority_ram[pri_addr] & 7];
 
-			*BITMAP_ADDR16(bitmap, y, x) = pens[l];
+			bitmap->pix16(y, x) = pens[l];
 		}
 	}
 

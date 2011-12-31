@@ -495,9 +495,9 @@ static void draw_bitmap( running_machine &machine, bitmap_t *bitmap, const recta
 			{
 				if (state->m_bg_full_size)
 				{
-					*BITMAP_ADDR16(bitmap, (y + state->m_bgscrolly) & 0x1ff, (x + state->m_bgscrollx) & 0x1ff) = 0x100 + color;
+					bitmap->pix16((y + state->m_bgscrolly) & 0x1ff, (x + state->m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-					pri = BITMAP_ADDR8(machine.priority_bitmap, (y + state->m_bgscrolly) & 0x1ff, 0);
+					pri = &machine.priority_bitmap->pix8((y + state->m_bgscrolly) & 0x1ff);
 					pri[(x + state->m_bgscrollx) & 0x1ff] |= 2;
 				}
 				else
@@ -505,9 +505,9 @@ static void draw_bitmap( running_machine &machine, bitmap_t *bitmap, const recta
 					/* 50% size */
 					if(!(x % 2) && !(y % 2))
 					{
-						*BITMAP_ADDR16(bitmap, (y / 2 + state->m_bgscrolly) & 0x1ff, (x / 2 + state->m_bgscrollx) & 0x1ff) = 0x100 + color;
+						bitmap->pix16((y / 2 + state->m_bgscrolly) & 0x1ff, (x / 2 + state->m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-						pri = BITMAP_ADDR8(machine.priority_bitmap, (y / 2 + state->m_bgscrolly) & 0x1ff, 0);
+						pri = &machine.priority_bitmap->pix8((y / 2 + state->m_bgscrolly) & 0x1ff);
 						pri[(x / 2 + state->m_bgscrollx) & 0x1ff] |= 2;
 					}
 				}
@@ -522,7 +522,7 @@ SCREEN_UPDATE( bigtwin )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	if (state->m_bg_enable)
@@ -546,7 +546,7 @@ SCREEN_UPDATE( bigtwinb )
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	return 0;
 }
 
@@ -554,7 +554,7 @@ SCREEN_UPDATE( excelsr )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 1);
 	if (state->m_bg_enable)
@@ -582,7 +582,7 @@ SCREEN_UPDATE( wbeachvl )
 		tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_fgscrollx);
 	}
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
@@ -595,7 +595,7 @@ SCREEN_UPDATE( hrdtimes )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	// video enabled
 	if (state->m_scroll[6] & 1)
@@ -606,6 +606,6 @@ SCREEN_UPDATE( hrdtimes )
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	return 0;
 }

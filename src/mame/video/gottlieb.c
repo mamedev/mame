@@ -258,7 +258,7 @@ SCREEN_UPDATE( gottlieb )
 	if (!state->m_background_priority)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	else
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 
 	/* draw the sprites */
 	draw_sprites(screen.machine(), bitmap, cliprect);

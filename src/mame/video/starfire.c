@@ -250,14 +250,14 @@ static TIMER_CALLBACK( starfire_scanline_callback )
 		int data = pix[0];
 		int color = col[0];
 
-		*BITMAP_ADDR32(state->m_starfire_screen, y, x + 0) = pens[color | ((data >> 2) & 0x20)];
-		*BITMAP_ADDR32(state->m_starfire_screen, y, x + 1) = pens[color | ((data >> 1) & 0x20)];
-		*BITMAP_ADDR32(state->m_starfire_screen, y, x + 2) = pens[color | ((data >> 0) & 0x20)];
-		*BITMAP_ADDR32(state->m_starfire_screen, y, x + 3) = pens[color | ((data << 1) & 0x20)];
-		*BITMAP_ADDR32(state->m_starfire_screen, y, x + 4) = pens[color | ((data << 2) & 0x20)];
-		*BITMAP_ADDR32(state->m_starfire_screen, y, x + 5) = pens[color | ((data << 3) & 0x20)];
-		*BITMAP_ADDR32(state->m_starfire_screen, y, x + 6) = pens[color | ((data << 4) & 0x20)];
-		*BITMAP_ADDR32(state->m_starfire_screen, y, x + 7) = pens[color | ((data << 5) & 0x20)];
+		state->m_starfire_screen->pix32(y, x + 0) = pens[color | ((data >> 2) & 0x20)];
+		state->m_starfire_screen->pix32(y, x + 1) = pens[color | ((data >> 1) & 0x20)];
+		state->m_starfire_screen->pix32(y, x + 2) = pens[color | ((data >> 0) & 0x20)];
+		state->m_starfire_screen->pix32(y, x + 3) = pens[color | ((data << 1) & 0x20)];
+		state->m_starfire_screen->pix32(y, x + 4) = pens[color | ((data << 2) & 0x20)];
+		state->m_starfire_screen->pix32(y, x + 5) = pens[color | ((data << 3) & 0x20)];
+		state->m_starfire_screen->pix32(y, x + 6) = pens[color | ((data << 4) & 0x20)];
+		state->m_starfire_screen->pix32(y, x + 7) = pens[color | ((data << 5) & 0x20)];
 
 		pix += 256;
 		col += 256;

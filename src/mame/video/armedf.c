@@ -334,7 +334,7 @@ void armedf_drawgfx(running_machine &machine, bitmap_t *dest_bmp,const rectangle
 			for (y = sy; y < ey; y++)
 			{
 				const UINT8 *source = source_base + y_index*gfx->line_modulo;
-				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
+				UINT16 *dest = &dest_bmp->pix16(y);
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)
 				{
@@ -411,7 +411,7 @@ SCREEN_UPDATE( armedf )
 
 	}
 
-	bitmap_fill(bitmap, cliprect , 0xff);
+	bitmap->fill(0xff, *cliprect );
 
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, TILEMAP_DRAW_CATEGORY(1), 0);
 

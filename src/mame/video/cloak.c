@@ -199,7 +199,7 @@ static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectan
 			pen_t pen = state->m_current_bitmap_videoram_displayed[(y << 8) | x] & 0x07;
 
 			if (pen)
-				*BITMAP_ADDR16(bitmap, y, (x - 6) & 0xff) = 0x10 | ((x & 0x80) >> 4) | pen;
+				bitmap->pix16(y, (x - 6) & 0xff) = 0x10 | ((x & 0x80) >> 4) | pen;
 		}
 }
 

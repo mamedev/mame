@@ -95,7 +95,7 @@ VIDEO_START( lemmings )
 	state->m_sprite_triple_buffer_1 = auto_alloc_array(machine, UINT16, 0x800 / 2);
 
 	tilemap_set_transparent_pen(state->m_vram_tilemap, 0);
-	bitmap_fill(state->m_bitmap0, 0, 0x100);
+	state->m_bitmap0->fill(0x100);
 
 	gfx_element_set_source(machine.gfx[2], state->m_vram_buffer);
 
@@ -132,8 +132,8 @@ WRITE16_HANDLER( lemmings_pixel_0_w )
 	if (sx > 2047 || sy > 255)
 		return;
 
-	*BITMAP_ADDR16(state->m_bitmap0, sy, sx + 0) = ((src >> 8) & 0xf) | 0x100;
-	*BITMAP_ADDR16(state->m_bitmap0, sy, sx + 1) = ((src >> 0) & 0xf) | 0x100;
+	state->m_bitmap0->pix16(sy, sx + 0) = ((src >> 8) & 0xf) | 0x100;
+	state->m_bitmap0->pix16(sy, sx + 1) = ((src >> 0) & 0xf) | 0x100;
 }
 
 WRITE16_HANDLER( lemmings_pixel_1_w )
@@ -176,7 +176,7 @@ SCREEN_UPDATE( lemmings )
 	rect.max_y = cliprect->max_y;
 	rect.min_y = cliprect->min_y;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x0000);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */

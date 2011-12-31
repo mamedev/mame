@@ -780,23 +780,23 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t *bitm
 	int pixel_effect_mask = gfx_tilemap->color_base + (gfx_tilemap->total_colors - 1) * gfx_tilemap->color_granularity;
 	int p;
 
-	width_mask = src_bitmap->width - 1;
-	height_mask = src_bitmap->height - 1;
+	width_mask = src_bitmap->width() - 1;
+	height_mask = src_bitmap->height() - 1;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
 
 		int x;
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 			if(!flipscreen)
 			{
-				p = *BITMAP_ADDR16(src_bitmap, (y + scrolly) & height_mask, (x + scrollx) & width_mask);
+				p = src_bitmap->pix16((y + scrolly) & height_mask, (x + scrollx) & width_mask);
 			}
 			else
 			{
-				p = *BITMAP_ADDR16(src_bitmap, (y - scrolly - 256) & height_mask, (x - scrollx - 512) & width_mask);
+				p = src_bitmap->pix16((y - scrolly - 256) & height_mask, (x - scrollx - 512) & width_mask);
 			}
 
 			// draw not transparent pixels
@@ -831,7 +831,7 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t *bitm
 SCREEN_UPDATE( seta_no_layers )
 {
 	set_pens(screen.machine());
-	bitmap_fill(bitmap,cliprect,0x1f0);
+	bitmap->fill(0x1f0, *cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
@@ -944,7 +944,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 	if (order & 1)	// swap the layers?
 	{
@@ -1055,7 +1055,7 @@ static SCREEN_UPDATE( seta_layers )
 
 SCREEN_UPDATE( setaroul )
 {
-	bitmap_fill(bitmap, cliprect, 0x0);
+	bitmap->fill(0x0, *cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
 	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );

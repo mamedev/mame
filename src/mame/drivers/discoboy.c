@@ -157,7 +157,7 @@ static SCREEN_UPDATE( discoboy )
 		palette_set_color(screen.machine(), (i / 2) + 0x400, MAKE_RGB(r, g, b));
 	}
 
-	bitmap_fill(bitmap, cliprect, 0x3ff);
+	bitmap->fill(0x3ff, *cliprect);
 
 	for (y = 0; y < 32; y++)
 	{

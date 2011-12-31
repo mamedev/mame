@@ -316,7 +316,7 @@ SCREEN_UPDATE( bwing )
 		tilemap_draw(bitmap, cliprect, state->m_bgmap, 0, 0);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	// draw low priority sprites
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0);

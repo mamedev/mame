@@ -34,7 +34,7 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 	sy = offset / 256;
 	sx = offset % 256;
 
-	*BITMAP_ADDR16(space->machine().generic.tmpbitmap, sy, sx) = 1024 + (data >> 1);
+	space->machine().generic.tmpbitmap->pix16(sy, sx) = 1024 + (data >> 1);
 }
 
 WRITE16_HANDLER( galpanic_paletteram_w )
@@ -96,7 +96,7 @@ static void draw_fgbitmap(running_machine &machine, bitmap_t *bitmap, const rect
 		sy = offs / 256;
 		color = state->m_fgvideoram[offs];
 		if (color)
-			*BITMAP_ADDR16(bitmap, sy, sx) = color;
+			bitmap->pix16(sy, sx) = color;
 	}
 }
 
@@ -125,7 +125,7 @@ SCREEN_UPDATE( comad )
 
 //  if(galpanic_clear_sprites)
 	{
-		bitmap_fill(state->m_sprites_bitmap,cliprect,0);
+		state->m_sprites_bitmap->fill(0, *cliprect);
 		comad_draw_sprites(screen.machine(),bitmap,cliprect);
 	}
 //  else

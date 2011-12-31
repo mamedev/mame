@@ -144,7 +144,7 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 	{
 		for( x = 0; x<32; x++ )
 		{
-			pixel = *BITMAP_ADDR16(state->m_work_bitmap, y, x);
+			pixel = state->m_work_bitmap->pix16(y, x);
 			if( pixel != sprite_transp ){
 				sx = x+x0;
 				sy = y+y0;
@@ -152,13 +152,13 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 					(sy >= visarea->min_y) && (sy <= visarea->max_y) )
 				{
 					// Collision check uses only 16 pens!
-					pixel = *BITMAP_ADDR16(bitmap, sy, sx) % 16;
+					pixel = bitmap->pix16(sy, sx) % 16;
 					if( pixel != bgcolor )
 					{
 						result = 1; /* flag collision */
 						/*  wipe this pixel, so collision checks with the
                         **  next layer work */
-						*BITMAP_ADDR16(bitmap, sy, sx) = bgcolor;
+						bitmap->pix16(sy, sx) = bgcolor;
 					}
 				}
 			}
@@ -180,7 +180,7 @@ static void draw_fog(grchamp_state *state, bitmap_t *bitmap, const rectangle *cl
 			offs = 0x40*(x-(100-FOG_SIZE-1));
 		for(y=16;y<240;y++)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, x) + offs;
+			bitmap->pix16(y, x) = bitmap->pix16(y, x) + offs;
 		}
 	}
 }
@@ -381,8 +381,8 @@ SCREEN_UPDATE( grchamp )
 	int x, y;
 
 	/* ensure that the tilemaps are the same size */
-	assert(lpixmap->width == rpixmap->width && lpixmap->width == cpixmap->width);
-	assert(lpixmap->height == rpixmap->height && lpixmap->height == cpixmap->height);
+	assert(lpixmap->width() == rpixmap->width() && lpixmap->width() == cpixmap->width());
+	assert(lpixmap->height() == rpixmap->height() && lpixmap->height() == cpixmap->height());
 
 	/* extract background scroll values; left and right share the same X scroll */
 	lrxscroll = state->m_cpu1_out[0] + (state->m_cpu1_out[1] & 1) * 256;
@@ -403,9 +403,9 @@ SCREEN_UPDATE( grchamp )
 
 		/* get source/dest pointers */
 		/* the Y counter starts counting when VBLANK goes to 0, which is at Y=16 */
-		UINT16 *lrsrc = (UINT16 *)lrpixmap->base + ((lryscroll + y - 16) & 0xff) * lrpixmap->rowpixels;
-		UINT16 *csrc = (UINT16 *)cpixmap->base + ((cyscroll + y - 16) & 0xff) * cpixmap->rowpixels;
-		UINT32 *dest = (UINT32 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *lrsrc = &lrpixmap->pix16((lryscroll + y - 16) & 0xff);
+		UINT16 *csrc = &cpixmap->pix16((cyscroll + y - 16) & 0xff);
+		UINT32 *dest = &bitmap->pix32(y);
 		UINT8 objdata[256];
 
 		/* draw the objects for this scanline */

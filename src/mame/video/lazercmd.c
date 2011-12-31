@@ -44,7 +44,7 @@ static void plot_pattern( running_machine &machine, bitmap_t *bitmap, int x, int
 			if (x + xbit < 0 || x + xbit >= HORZ_RES * HORZ_CHR)
 				continue;
 
-			*BITMAP_ADDR16(bitmap, y + ybit, x + xbit) = 4;
+			bitmap->pix16(y + ybit, x + xbit) = 4;
 		}
 	}
 }

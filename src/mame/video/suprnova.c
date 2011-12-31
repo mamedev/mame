@@ -11,10 +11,10 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 	//bitmap_t *destbitmap = bitmap;
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
 	bitmap_t *srcbitmapflags = tilemap_get_flagsmap(tmap);
-	const int xmask = srcbitmap->width-1;
-	const int ymask = srcbitmap->height-1;
-	const int widthshifted = srcbitmap->width << 16;
-	const int heightshifted = srcbitmap->height << 16;
+	const int xmask = srcbitmap->width()-1;
+	const int ymask = srcbitmap->height()-1;
+	const int widthshifted = srcbitmap->width() << 16;
+	const int heightshifted = srcbitmap->height() << 16;
 	UINT32 cx;
 	UINT32 cy;
 	int x;
@@ -50,8 +50,8 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 			cy = starty;
 
 			/* get dest and priority pointers */
-			dest = BITMAP_ADDR16( bitmap, sy, sx);
-			destflags = BITMAP_ADDR8( bitmapflags, sy, sx);
+			dest = &bitmap->pix16(sy, sx);
+			destflags = &bitmapflags->pix8(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
@@ -60,13 +60,13 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 				{
 					if (columnscroll)
 					{
-						dest[0] = BITMAP_ADDR16(srcbitmap, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
-						destflags[0] = BITMAP_ADDR8(srcbitmapflags, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
+						dest[0] = srcbitmap->pix16(((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask);
+						destflags[0] = srcbitmapflags->pix8(((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask);
 					}
 					else
 					{
-						dest[0] = BITMAP_ADDR16(srcbitmap, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
-						destflags[0] = BITMAP_ADDR8(srcbitmapflags, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+						dest[0] = srcbitmap->pix16((cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask);
+						destflags[0] = srcbitmapflags->pix8((cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask);
 					}
 				}
 
@@ -459,11 +459,11 @@ SCREEN_UPDATE(skns)
 
 	palette_update(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
-	bitmap_fill(state->m_tilemap_bitmap_lower, NULL, 0);
-	bitmap_fill(state->m_tilemap_bitmapflags_lower, NULL, 0);
-	bitmap_fill(state->m_tilemap_bitmap_higher, NULL, 0);
-	bitmap_fill(state->m_tilemap_bitmapflags_higher, NULL, 0);
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	state->m_tilemap_bitmap_lower->fill(0);
+	state->m_tilemap_bitmapflags_lower->fill(0);
+	state->m_tilemap_bitmap_higher->fill(0);
+	state->m_tilemap_bitmapflags_higher->fill(0);
 
 	{
 		int supernova_pri_a;
@@ -492,15 +492,15 @@ SCREEN_UPDATE(skns)
 
 			for (y=0;y<240;y++)
 			{
-				src = BITMAP_ADDR16(state->m_tilemap_bitmap_lower, y, 0);
-				srcflags = BITMAP_ADDR8(state->m_tilemap_bitmapflags_lower, y, 0);
+				src = &state->m_tilemap_bitmap_lower->pix16(y);
+				srcflags = &state->m_tilemap_bitmapflags_lower->pix8(y);
 
-				src2 = BITMAP_ADDR16(state->m_tilemap_bitmap_higher, y, 0);
-				src2flags = BITMAP_ADDR8(state->m_tilemap_bitmapflags_higher, y, 0);
+				src2 = &state->m_tilemap_bitmap_higher->pix16(y);
+				src2flags = &state->m_tilemap_bitmapflags_higher->pix8(y);
 
-				src3 = BITMAP_ADDR16(state->m_sprite_bitmap, y, 0);
+				src3 = &state->m_sprite_bitmap->pix16(y);
 
-				dst = BITMAP_ADDR32(bitmap, y, 0);
+				dst = &bitmap->pix32(y);
 
 
 				for (x=0;x<320;x++)
@@ -628,7 +628,7 @@ SCREEN_UPDATE(skns)
 		}
 	}
 
-	bitmap_fill(state->m_sprite_bitmap, cliprect, 0x0000);
+	state->m_sprite_bitmap->fill(0x0000, *cliprect);
 
 	if (state->m_alt_enable_sprites)
 		state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap, cliprect, screen.machine().generic.spriteram.u32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );

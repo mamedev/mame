@@ -38,7 +38,7 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_t *bitmap, in
 {
 	xtheball_state *state = screen.machine().driver_data<xtheball_state>();
 	UINT16 *srcbg = &state->m_vram_bg[(params->rowaddr << 8) & 0xff00];
-	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
+	UINT32 *dest = &bitmap->pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr;
 	int x;

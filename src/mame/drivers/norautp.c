@@ -571,7 +571,7 @@ static SCREEN_UPDATE( norautp )
 
 	count = 0;
 
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]); //black pen
+	bitmap->fill(screen.machine().pens[0], *cliprect); //black pen
 
 	for(y = 0; y < 8; y++)
 	{

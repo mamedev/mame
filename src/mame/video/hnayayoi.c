@@ -233,11 +233,11 @@ static void draw_layer_interleaved( running_machine &machine, bitmap_t *bitmap, 
 	int county, countx, pen;
 	UINT8 *src1 = state->m_pixmap[left_pixmap];
 	UINT8 *src2 = state->m_pixmap[right_pixmap];
-	UINT16 *dstbase = (UINT16 *)bitmap->base;
+	UINT16 *dstbase = &bitmap->pix16(0);
 
 	palbase *= 16;
 
-	for (county = 255; county >= 0; county--, dstbase += bitmap->rowpixels)
+	for (county = 255; county >= 0; county--, dstbase += bitmap->rowpixels())
 	{
 		UINT16 *dst = dstbase;
 

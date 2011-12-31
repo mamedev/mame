@@ -131,7 +131,7 @@ SCREEN_UPDATE( thunderj )
 	int x, y, r;
 
 	/* draw the playfield */
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	priority_bitmap->fill(0, *cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0x00);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 0x01);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 0x02);
@@ -146,9 +146,9 @@ SCREEN_UPDATE( thunderj )
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
-			UINT16 *mo = (UINT16 *)mobitmap->base + mobitmap->rowpixels * y;
-			UINT16 *pf = (UINT16 *)bitmap->base + bitmap->rowpixels * y;
-			UINT8 *pri = (UINT8 *)priority_bitmap->base + priority_bitmap->rowpixels * y;
+			UINT16 *mo = &mobitmap->pix16(y);
+			UINT16 *pf = &bitmap->pix16(y);
+			UINT8 *pri = &priority_bitmap->pix8(y);
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{
@@ -245,8 +245,8 @@ SCREEN_UPDATE( thunderj )
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
-			UINT16 *mo = (UINT16 *)mobitmap->base + mobitmap->rowpixels * y;
-			UINT16 *pf = (UINT16 *)bitmap->base + bitmap->rowpixels * y;
+			UINT16 *mo = &mobitmap->pix16(y);
+			UINT16 *pf = &bitmap->pix16(y);
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{

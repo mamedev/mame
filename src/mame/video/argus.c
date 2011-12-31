@@ -923,18 +923,18 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const r
 				for (x=0;x<height+step;x+=step)
 				{
 					if (y < height && x < width)
-						c=*BITMAP_ADDR32(state->m_mosaicbitmap, y, x);
+						c=state->m_mosaicbitmap->pix32(y, x);
 
 					if (state->m_mosaic<0)
 						if (y+step-1<height && x+step-1< width)
-							c = *BITMAP_ADDR32(state->m_mosaicbitmap, y+step-1, x+step-1);
+							c = state->m_mosaicbitmap->pix32(y+step-1, x+step-1);
 
 					for (yy=0;yy<step;yy++)
 						for (xx=0;xx<step;xx++)
 						{
 							if (xx+x < width && yy+y<height)
 							{
-								dest=BITMAP_ADDR32(bitmap, y+yy, x+xx);
+								dest=&bitmap->pix32(y+yy, x+xx);
 								*dest=c;
 							}
 						}
@@ -963,18 +963,18 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const r
 				for (x = 0; x < height+step; x += step)
 				{
 					if (y < height && x < width)
-						c = *BITMAP_ADDR32(state->m_mosaicbitmap, y, x);
+						c = state->m_mosaicbitmap->pix32(y, x);
 
 					if (state->m_valtric_mosaic & 0x80)
 						if (y+step-1 < height && x+step-1 < width)
-							c = *BITMAP_ADDR32(state->m_mosaicbitmap, y+step-1, x+step-1);
+							c = state->m_mosaicbitmap->pix32(y+step-1, x+step-1);
 
 					for (yy = 0; yy < step; yy++)
 						for (xx = 0; xx < step; xx++)
 						{
 							if (xx+x < width && yy+y < height)
 							{
-								dest = BITMAP_ADDR32(bitmap, y+yy, x+xx);
+								dest = &bitmap->pix32(y+yy, x+xx);
 								*dest = c;
 							}
 						}
@@ -1214,7 +1214,7 @@ SCREEN_UPDATE( valtric )
 	if (state->m_bg_status & 1)	/* Backgound enable */
 		valtric_draw_mosaic(screen, bitmap, cliprect);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	valtric_draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap,  0, 0);
 	return 0;
@@ -1228,7 +1228,7 @@ SCREEN_UPDATE( butasan )
 	if (state->m_bg_status & 1)	/* Backgound enable */
 		tilemap_draw(bitmap, cliprect, state->m_bg0_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	if (state->m_butasan_bg1_status & 1) tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
 	butasan_draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap,  0, 0);

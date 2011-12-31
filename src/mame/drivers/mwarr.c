@@ -471,7 +471,7 @@ static SCREEN_UPDATE( mwarr )
 	mwarr_state *state = screen.machine().driver_data<mwarr_state>();
 	int i;
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (BIT(state->m_vidattrram[6], 0))
 	{

@@ -217,8 +217,8 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_t *bitmap 
 	sidearms_state *state = machine.driver_data<sidearms_state>();
 
 	// clear starfield background
-	lineptr = BITMAP_ADDR16(bitmap, 16, 64);
-	lineadv = bitmap->rowpixels;
+	lineptr = &bitmap->pix16(16, 64);
+	lineadv = bitmap->rowpixels();
 
 	for (i=224; i; i--) { memset(lineptr, 0, 768); lineptr += lineadv; }
 
@@ -243,7 +243,7 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_t *bitmap 
 	}
 	else
 	{
-		lineptr = BITMAP_ADDR16(bitmap, 255, 512 - 1);
+		lineptr = &bitmap->pix16(255, 512 - 1);
 		pixadv  = -1;
 		lineadv = -lineadv + 512;
 	}
@@ -280,13 +280,13 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_t *bitmap 
 #else // optimized loop
 	if (!state->m_flipon)
 	{
-		lineptr = BITMAP_ADDR16(bitmap, 16, 64);
+		lineptr = &bitmap->pix16(16, 64);
 		pixadv  = 1;
 		lineadv = lineadv - 384;
 	}
 	else
 	{
-		lineptr = BITMAP_ADDR16(bitmap, 239, 512 - 64 - 1);
+		lineptr = &bitmap->pix16(239, 512 - 64 - 1);
 		pixadv  = -1;
 		lineadv = -lineadv + 384;
 	}

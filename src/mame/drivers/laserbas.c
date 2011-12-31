@@ -69,14 +69,14 @@ static SCREEN_UPDATE(laserbas)
 		for(x = 0; x < 128; x++)
 		{
 			if (state->m_vram2[y * 128 + x] & 0xf)
-				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->m_vram2[y * 128 + x] & 0xf);
+				bitmap->pix16(y, x * 2) = (state->m_vram2[y * 128 + x] & 0xf);
 			else
-				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->m_vram1[y * 128 + x] & 0xf) + 16;
+				bitmap->pix16(y, x * 2) = (state->m_vram1[y * 128 + x] & 0xf) + 16;
 
 			if (state->m_vram2[y * 128 + x] >> 4)
-				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->m_vram2[y * 128 + x] >> 4);
+				bitmap->pix16(y, x * 2 + 1) = (state->m_vram2[y * 128 + x] >> 4);
 			else
-				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->m_vram1[y * 128 + x] >> 4) + 16;
+				bitmap->pix16(y, x * 2 + 1) = (state->m_vram1[y * 128 + x] >> 4) + 16;
 		}
 	return 0;
 }

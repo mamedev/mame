@@ -422,7 +422,7 @@ WRITE8_MEMBER( cdp1864_device::dma_w )
 			color = (gdata << 2) | (bdata << 1) | rdata;
 		}
 
-		*BITMAP_ADDR16(m_bitmap, y, sx + x) = color;
+		m_bitmap->pix16(y, sx + x) = color;
 
 		data <<= 1;
 	}
@@ -475,10 +475,10 @@ void cdp1864_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	if (m_disp)
 	{
 		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-		bitmap_fill(m_bitmap, cliprect, CDP1864_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8);
+		m_bitmap->fill(CDP1864_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8, *cliprect);
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(machine()));
+		bitmap->fill(get_black_pen(machine()), *cliprect);
 	}
 }

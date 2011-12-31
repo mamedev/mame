@@ -162,7 +162,7 @@ static SCREEN_UPDATE( boxer )
 	boxer_state *state = screen.machine().driver_data<boxer_state>();
 	int i, j;
 
-	bitmap_fill(bitmap, cliprect, 1);
+	bitmap->fill(1, *cliprect);
 
 	for (i = 0; i < 16; i++)
 	{

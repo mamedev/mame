@@ -170,7 +170,7 @@ static void bbusters_draw_block(running_machine &machine, bitmap_t *dest,int x,i
 	while (state->m_scale_line_count) {
 
 		if (dy>=16 && dy<240) {
-			UINT16 *destline = BITMAP_ADDR16(dest, dy, 0);
+			UINT16 *destline = &dest->pix16(dy);
 			UINT8 srcline=*state->m_scale_table_ptr;
 			const UINT8 *srcptr=0;
 

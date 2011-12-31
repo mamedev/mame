@@ -88,7 +88,7 @@ static SCREEN_UPDATE( ace )
 	int offs;
 
 	/* first of all, fill the screen with the background color */
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[1],
 			0,

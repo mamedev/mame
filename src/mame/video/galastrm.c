@@ -224,7 +224,7 @@ static void tc0610_draw_scanline(void *dest, INT32 scanline, const poly_extent *
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	bitmap_t *destmap = (bitmap_t *)dest;
-	UINT16 *framebuffer = BITMAP_ADDR16(destmap, scanline, 0);
+	UINT16 *framebuffer = &destmap->pix16(scanline);
 	bitmap_t *texbase = extra->texbase;
 	int startx = extent->startx;
 	int stopx = extent->stopx;
@@ -236,7 +236,7 @@ static void tc0610_draw_scanline(void *dest, INT32 scanline, const poly_extent *
 
 	for (x = startx; x < stopx; x++)
 	{
-		framebuffer[x] = *BITMAP_ADDR16(texbase, v >> 16, u >> 16);
+		framebuffer[x] = texbase->pix16(v >> 16, u >> 16);
 		u += dudx;
 		v += dvdx;
 	}
@@ -254,8 +254,8 @@ static void tc0610_rotate_draw(running_machine &machine, bitmap_t *bitmap, bitma
 	const int rzy = state->m_tc0610_ctrl_reg[1][3];
 	const int ryx = state->m_tc0610_ctrl_reg[1][5];
 	const int ryy = state->m_tc0610_ctrl_reg[1][4];
-	const int lx  = srcbitmap->width;
-	const int ly  = srcbitmap->height;
+	const int lx  = srcbitmap->width();
+	const int ly  = srcbitmap->height();
 
 	int yx, /*yy,*/ zx, zy, pxx, pxy, pyx, pyy;
 	float /*ssn, scs, ysn, ycs,*/ zsn, zcs;
@@ -466,9 +466,9 @@ SCREEN_UPDATE( galastrm )
 	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(priority_bitmap, &clip, 0);
-	bitmap_fill(state->m_tmpbitmaps, &clip, 0);
+	bitmap->fill(0, *cliprect);
+	priority_bitmap->fill(0, clip);
+	state->m_tmpbitmaps->fill(0, clip);
 
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], 0, 0);
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
@@ -498,8 +498,8 @@ SCREEN_UPDATE( galastrm )
 		{
 			for (x=0; x < priority_bitmap->width; x++)
 			{
-				pri = BITMAP_ADDR8(priority_bitmap, y, x);
-				if (!(*pri & 0x02) && *BITMAP_ADDR16(state->m_tmpbitmaps, y, x))
+				pri = &priority_bitmap->pix8(y, x);
+				if (!(*pri & 0x02) && state->m_tmpbitmaps->pix16(y, x))
 					 *pri |= 0x04;
 			}
 		}
@@ -509,10 +509,10 @@ SCREEN_UPDATE( galastrm )
 	draw_sprites(screen.machine(),state->m_tmpbitmaps,&clip,primasks,1);
 
 	copybitmap_trans(bitmap,state->m_polybitmap,0,0, 0,0,cliprect,0);
-	bitmap_fill(state->m_polybitmap, &clip, 0);
+	state->m_polybitmap->fill(0, clip);
 	tc0610_rotate_draw(screen.machine(),state->m_polybitmap,state->m_tmpbitmaps,cliprect);
 
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	priority_bitmap->fill(0, *cliprect);
 	draw_sprites(screen.machine(),bitmap,cliprect,primasks,0);
 
 	if (!screen.machine().input().code_pressed(KEYCODE_B)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
@@ -541,12 +541,12 @@ SCREEN_UPDATE( galastrm )
 		int x,y;
 		UINT8 *pri;
 
-		for (y=0; y < priority_bitmap->height; y++)
+		for (y=0; y < priority_bitmap->height(); y++)
 		{
-			for (x=0; x < priority_bitmap->width; x++)
+			for (x=0; x < priority_bitmap->width(); x++)
 			{
-				pri = BITMAP_ADDR8(priority_bitmap, y, x);
-				if (!(*pri & 0x02) && *BITMAP_ADDR16(state->m_tmpbitmaps, y, x))
+				pri = &priority_bitmap->pix8(y, x);
+				if (!(*pri & 0x02) && state->m_tmpbitmaps->pix16(y, x))
 					 *pri |= 0x04;
 			}
 		}
@@ -556,10 +556,10 @@ SCREEN_UPDATE( galastrm )
 	draw_sprites(screen.machine(),state->m_tmpbitmaps,&clip,primasks,1);
 
 	copybitmap_trans(bitmap,state->m_polybitmap,0,0, 0,0,cliprect,0);
-	bitmap_fill(state->m_polybitmap, &clip, 0);
+	state->m_polybitmap->fill(0, clip);
 	tc0610_rotate_draw(screen.machine(),state->m_polybitmap,state->m_tmpbitmaps,cliprect);
 
-	bitmap_fill(priority_bitmap, cliprect, 0);
+	priority_bitmap->fill(0, *cliprect);
 	draw_sprites(screen.machine(),bitmap,cliprect,primasks,0);
 
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);

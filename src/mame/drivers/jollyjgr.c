@@ -467,13 +467,13 @@ static void draw_bitmap( running_machine &machine, bitmap_t *bitmap )
 				if(color)
 				{
 					if(state->m_flip_x && state->m_flip_y)
-						*BITMAP_ADDR16(bitmap, y, x * 8 + i) = color + 32;
+						bitmap->pix16(y, x * 8 + i) = color + 32;
 					else if(state->m_flip_x && !state->m_flip_y)
-						*BITMAP_ADDR16(bitmap, 255 - y, x * 8 + i) = color + 32;
+						bitmap->pix16(255 - y, x * 8 + i) = color + 32;
 					else if(!state->m_flip_x && state->m_flip_y)
-						*BITMAP_ADDR16(bitmap, y, 255 - x * 8 - i) = color + 32;
+						bitmap->pix16(y, 255 - x * 8 - i) = color + 32;
 					else
-						*BITMAP_ADDR16(bitmap, 255 - y, 255 - x * 8 - i) = color + 32;
+						bitmap->pix16(255 - y, 255 - x * 8 - i) = color + 32;
 				}
 			}
 
@@ -488,7 +488,7 @@ static SCREEN_UPDATE( jollyjgr )
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	bitmap_fill(bitmap, cliprect, 32);
+	bitmap->fill(32, *cliprect);
 
 	if(state->m_pri) //used in Frog & Spiders level 3
 	{
@@ -562,7 +562,7 @@ static SCREEN_UPDATE( fspider )
 		if (sy>=cliprect->min_y && sy<=cliprect->max_y)
 			for (int x=sx-4;x<sx;x++)
 				if (x>=cliprect->min_x && x<=cliprect->max_x)
-					*BITMAP_ADDR16(bitmap,sy,x)=bc;
+					bitmap->pix16(sy, x)=bc;
 	}
 
 	return 0;

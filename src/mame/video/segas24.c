@@ -28,12 +28,12 @@ SCREEN_UPDATE(system24)
 	segas24_state *state = screen.machine().driver_data<segas24_state>();
 
 	if(state->vmixer->get_reg(13) & 1) {
-		bitmap_fill(bitmap, 0, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()));
 		return 0;
 	}
 
-	bitmap_fill(screen.machine().priority_bitmap, 0, 0);
-	bitmap_fill(bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0);
+	bitmap->fill(0, *cliprect);
 
 	std::vector<int> order;
 	order.resize(12);

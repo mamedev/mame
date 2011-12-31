@@ -149,8 +149,8 @@ WRITE8_HANDLER( paradise_pixmap_w )
 	x = (offset & 0x7f) << 1;
 	y = (offset >> 7);
 
-	*BITMAP_ADDR16(state->m_tmpbitmap, y, x + 0) = 0x80f - (data >> 4);
-	*BITMAP_ADDR16(state->m_tmpbitmap, y, x + 1) = 0x80f - (data & 0x0f);
+	state->m_tmpbitmap->pix16(y, x + 0) = 0x80f - (data >> 4);
+	state->m_tmpbitmap->pix16(y, x + 1) = 0x80f - (data & 0x0f);
 }
 
 
@@ -259,7 +259,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	if (!(state->m_priority & 4))	/* Screen blanking */
 		return 0;
@@ -296,7 +296,7 @@ SCREEN_UPDATE( torus )
 {
 	paradise_state *state = screen.machine().driver_data<paradise_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	if (!(state->m_priority & 2))	/* Screen blanking */
 		return 0;
@@ -328,7 +328,7 @@ SCREEN_UPDATE( madball )
 {
 	paradise_state *state = screen.machine().driver_data<paradise_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);

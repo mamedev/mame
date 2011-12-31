@@ -129,14 +129,14 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( psikyo4_left )
 {
-	bitmap_fill(bitmap, cliprect, 0x1000);
+	bitmap->fill(0x1000, *cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x0000);
 	return 0;
 }
 
 SCREEN_UPDATE( psikyo4_right )
 {
-	bitmap_fill(bitmap, cliprect, 0x1001);
+	bitmap->fill(0x1001, *cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x2000);
 	return 0;
 }

@@ -23,7 +23,7 @@ SCREEN_UPDATE( spcforce )
 	int flip = flip_screen_get(screen.machine());
 
 	/* draw the characters as sprites because they could be overlapping */
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 	for (offs = 0; offs < 0x400; offs++)
 	{
 		int code,sx,sy,col;

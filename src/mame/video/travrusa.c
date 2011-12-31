@@ -297,21 +297,13 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 {
 	travrusa_state *state = machine.driver_data<travrusa_state>();
 	int offs;
-	static const rectangle spritevisiblearea =
-	{
-		1*8, 31*8-1,
-		0*8, 24*8-1
-	};
-	static const rectangle spritevisibleareaflip =
-	{
-		1*8, 31*8-1,
-		8*8, 32*8-1
-	};
+	const rectangle spritevisiblearea(1*8, 31*8-1, 0*8, 24*8-1);
+	const rectangle spritevisibleareaflip(1*8, 31*8-1, 8*8, 32*8-1);
 	rectangle clip = *cliprect;
 	if (flip_screen_get(machine))
-		sect_rect(&clip, &spritevisibleareaflip);
+		clip &= spritevisibleareaflip;
 	else
-		sect_rect(&clip, &spritevisiblearea);
+		clip &= spritevisiblearea;
 
 
 	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)

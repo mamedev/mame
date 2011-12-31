@@ -148,7 +148,7 @@ SCREEN_UPDATE( namconb1 )
 	if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
 	if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
 
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 
 	video_update_common( screen.machine(), bitmap, &clip, 0 );
 
@@ -189,7 +189,7 @@ SCREEN_UPDATE( namconb2 )
 	if( clip.max_x > cliprect->max_x ){ clip.max_x = cliprect->max_x; }
 	if( clip.max_y > cliprect->max_y ){ clip.max_y = cliprect->max_y; }
 
-	bitmap_fill( bitmap, cliprect , get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect );
 
 	if( memcmp(state->m_tilemap_tile_bank,state->m_tilebank32,sizeof(state->m_tilemap_tile_bank))!=0 )
 	{

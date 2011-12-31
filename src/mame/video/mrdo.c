@@ -265,7 +265,7 @@ SCREEN_UPDATE( mrdo )
 {
 	mrdo_state *state = screen.machine().driver_data<mrdo_state>();
 
-	bitmap_fill(bitmap, cliprect,0);
+	bitmap->fill(0, *cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);

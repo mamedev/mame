@@ -87,19 +87,19 @@ static SCREEN_UPDATE( quizo )
 			int pix;
 
 			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-			*BITMAP_ADDR16(bitmap, y, x*4+3) = pix;
+			bitmap->pix16(y, x*4+3) = pix;
 			data>>=1;
 			data1>>=1;
 			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-			*BITMAP_ADDR16(bitmap, y, x*4+2) = pix;
+			bitmap->pix16(y, x*4+2) = pix;
 			data>>=1;
 			data1>>=1;
 			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-			*BITMAP_ADDR16(bitmap, y, x*4+1) = pix;
+			bitmap->pix16(y, x*4+1) = pix;
 			data>>=1;
 			data1>>=1;
 			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-			*BITMAP_ADDR16(bitmap, y, x*4+0) = pix;
+			bitmap->pix16(y, x*4+0) = pix;
 		}
 	}
 	return 0;

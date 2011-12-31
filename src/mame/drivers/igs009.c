@@ -303,7 +303,7 @@ static SCREEN_UPDATE(jingbell)
 			clip.min_y = startclipmin;
 			clip.max_y = startclipmin+2;
 
-			bitmap_fill(bitmap,&clip,screen.machine().pens[rowenable]);
+			bitmap->fill(screen.machine().pens[rowenable], clip);
 
 			if (rowenable==0)
 			{ // 0 and 1 are the same? or is there a global switchoff?
@@ -327,7 +327,7 @@ static SCREEN_UPDATE(jingbell)
 		}
 
 	}
-	else					bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	else					bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

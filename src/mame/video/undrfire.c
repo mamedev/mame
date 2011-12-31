@@ -408,8 +408,8 @@ SCREEN_UPDATE( undrfire )
 	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);	/* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a
@@ -551,8 +551,8 @@ SCREEN_UPDATE( cbombers )
 	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);	/* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a

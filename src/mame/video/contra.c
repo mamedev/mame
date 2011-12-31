@@ -327,9 +327,9 @@ SCREEN_UPDATE( contra )
 	rectangle fg_finalclip = state->m_fg_clip;
 	rectangle tx_finalclip = state->m_tx_clip;
 
-	sect_rect(&bg_finalclip, cliprect);
-	sect_rect(&fg_finalclip, cliprect);
-	sect_rect(&tx_finalclip, cliprect);
+	bg_finalclip &= *cliprect;
+	fg_finalclip &= *cliprect;
+	tx_finalclip &= *cliprect;
 
 	set_pens(screen.machine());
 

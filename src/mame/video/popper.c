@@ -250,7 +250,7 @@ SCREEN_UPDATE( popper )
 {
 	popper_state *state = screen.machine().driver_data<popper_state>();
 	rectangle finalclip = state->m_tilemap_clip;
-	sect_rect(&finalclip, cliprect);
+	finalclip &= *cliprect;
 
 	//attribram
 	//76543210

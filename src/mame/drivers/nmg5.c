@@ -897,13 +897,13 @@ static void draw_bitmap( running_machine &machine, bitmap_t *bitmap )
 		for (x = 0; x < xxx; x++)
 		{
 			pix = (state->m_bitmap[count] & 0xf000) >> 12;
-			if (pix) *BITMAP_ADDR16(bitmap, y + yoff, x * 4 + 0 + xoff) = pix + 0x300;
+			if (pix) bitmap->pix16(y + yoff, x * 4 + 0 + xoff) = pix + 0x300;
 			pix = (state->m_bitmap[count] & 0x0f00) >> 8;
-			if (pix) *BITMAP_ADDR16(bitmap, y + yoff, x * 4 + 1 + xoff) = pix + 0x300;
+			if (pix) bitmap->pix16(y + yoff, x * 4 + 1 + xoff) = pix + 0x300;
 			pix = (state->m_bitmap[count] & 0x00f0) >> 4;
-			if (pix) *BITMAP_ADDR16(bitmap, y + yoff, x * 4 + 2 + xoff) = pix + 0x300;
+			if (pix) bitmap->pix16(y + yoff, x * 4 + 2 + xoff) = pix + 0x300;
 			pix = (state->m_bitmap[count] & 0x000f) >> 0;
-			if (pix) *BITMAP_ADDR16(bitmap, y + yoff, x * 4 + 3 + xoff) = pix + 0x300;
+			if (pix) bitmap->pix16(y + yoff, x * 4 + 3 + xoff) = pix + 0x300;
 
 			count++;
 		}

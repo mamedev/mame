@@ -128,7 +128,7 @@ SCREEN_UPDATE(ksayakyu)
 {
 	ksayakyu_state *state = screen.machine().driver_data<ksayakyu_state>();
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	if (state->m_video_ctrl & 1)
 		tilemap_draw(bitmap, cliprect,state->m_tilemap, 0, 0);

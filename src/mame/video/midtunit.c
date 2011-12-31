@@ -805,7 +805,7 @@ skipdma:
 void midtunit_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &local_videoram[(params->rowaddr << 9) & 0x3fe00];
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT16 *dest = &bitmap->pix16(scanline);
 	int coladdr = params->coladdr << 1;
 	int x;
 
@@ -818,7 +818,7 @@ void midxunit_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanl
 {
 	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 3;
 	UINT16 *src = &local_videoram[fulladdr & 0x3fe00];
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT16 *dest = &bitmap->pix16(scanline);
 	int x;
 
 	/* copy the non-blanked portions of this scanline */

@@ -214,7 +214,7 @@ WRITE8_MEMBER( cdp1861_device::dma_w )
 	for (x = 0; x < 8; x++)
 	{
 		int color = BIT(data, 7);
-		*BITMAP_ADDR16(m_bitmap, y, sx + x) = color;
+		m_bitmap->pix16(y, sx + x) = color;
 		data <<= 1;
 	}
 }
@@ -259,6 +259,6 @@ void cdp1861_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(machine()));
+		bitmap->fill(get_black_pen(machine()), *cliprect);
 	}
 }

@@ -103,7 +103,7 @@ SCREEN_UPDATE( pc_video )
 			if ((pc_current_width > 100) && (pc_current_height > 100))
 				screen.set_visible_area(0, pc_current_width-1, 0, pc_current_height-1);
 
-			bitmap_fill(bitmap, cliprect, 0);
+			bitmap->fill(0, *cliprect);
 		}
 
 		video_update(bitmap);
@@ -1019,9 +1019,9 @@ static void vga_vh_text(bitmap_t *bitmap)
 			attr = vga.memory[(pos<<2) + 1];
 			font = vga.memory+2+(ch<<(5+2))+FONT1;
 
-			for (h = MAX(-line, 0); (h < height) && (line+h < MIN(TEXT_LINES, bitmap->height)); h++)
+			for (h = MAX(-line, 0); (h < height) && (line+h < MIN(TEXT_LINES, bitmap->height())); h++)
 			{
-				bitmapline = BITMAP_ADDR16(bitmap, line+h, 0);
+				bitmapline = &bitmap->pix16(line+h);
 				bits = font[h<<2];
 
 				assert(bitmapline);
@@ -1051,7 +1051,7 @@ static void vga_vh_text(bitmap_t *bitmap)
 					 (h<=CRTC_CURSOR_BOTTOM)&&(h<height)&&(line+h<TEXT_LINES);
 					 h++)
 				{
-					plot_box(bitmap, column*width, line+h, width, 1, vga.pens[attr&0xf]);
+					bitmap->plot_box(column*width, line+h, width, 1, vga.pens[attr&0xf]);
 				}
 			}
 		}
@@ -1069,7 +1069,7 @@ static void vga_vh_ega(bitmap_t *bitmap)
 	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES;
 		 line += height, addr=(addr+EGA_LINE_LENGTH)&0x3ffff)
 	{
-		bitmapline = BITMAP_ADDR16(bitmap, line, 0);
+		bitmapline = &bitmap->pix16(line);
 
 		for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+4)&0x3ffff)
 		{
@@ -1097,7 +1097,7 @@ static void vga_vh_ega(bitmap_t *bitmap)
 			if (line + i >= LINES)
 				break;
 
-			newbitmapline = BITMAP_ADDR16(bitmap, line+i, 0);
+			newbitmapline = &bitmap->pix16(line+i);
 			memcpy(newbitmapline, bitmapline, EGA_COLUMNS * 8 * sizeof(UINT16));
 		}
 	}
@@ -1117,7 +1117,7 @@ static void vga_vh_vga(bitmap_t *bitmap)
 				curr_addr = addr;
 			if(line == (vga.line_compare & 0x3ff))
 				curr_addr = 0;
-			bitmapline = BITMAP_ADDR16(bitmap, line, 0);
+			bitmapline = &bitmap->pix16(line);
 			addr %= vga.svga_intf.vram_size;
 			for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x20)
 			{
@@ -1142,7 +1142,7 @@ static void vga_vh_vga(bitmap_t *bitmap)
 				curr_addr = addr;
 			if(line == (vga.line_compare & 0x3ff))
 				curr_addr = 0;
-			bitmapline = BITMAP_ADDR16(bitmap, line, 0);
+			bitmapline = &bitmap->pix16(line);
 			addr %= vga.svga_intf.vram_size;
 			for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x08)
 			{

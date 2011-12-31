@@ -349,7 +349,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	bitmap_fill(bitmap, &rect, machine.gfx[image]->color_base + 3);
+	bitmap->fill(machine.gfx[image]->color_base + 3, rect);
 }
 
 
@@ -365,7 +365,7 @@ SCREEN_UPDATE( m52 )
 	m52_state *state = screen.machine().driver_data<m52_state>();
 	int offs;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	if (!(state->m_bgcontrol & 0x20))
 	{

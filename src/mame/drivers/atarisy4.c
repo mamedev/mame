@@ -154,7 +154,7 @@ static SCREEN_UPDATE( atarisy4 )
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
 		UINT16 *src = &state->m_screen_ram[(offset + (4096 * y)) / 2];
-		UINT32 *dest = BITMAP_ADDR32(bitmap, y, cliprect->min_x);
+		UINT32 *dest = &bitmap->pix32(y, cliprect->min_x);
 		int x;
 
 		for (x = cliprect->min_x; x < cliprect->max_x; x += 2)

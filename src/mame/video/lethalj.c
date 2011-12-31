@@ -175,7 +175,7 @@ void lethalj_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanli
 {
 	lethalj_state *state = screen.machine().driver_data<lethalj_state>();
 	UINT16 *src = &state->m_screenram[(state->m_vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT16 *dest = &bitmap->pix16(scanline);
 	int coladdr = params->coladdr << 1;
 	int x;
 

@@ -57,10 +57,10 @@ static void draw_line( bitmap_t *bitmap, const rectangle *cliprect, int x1, int 
 
 	if (x1 == x2)
 		for (count = y2; count >= y1; count -= skip)
-			*BITMAP_ADDR16(bitmap, count, x1) = 1;
+			bitmap->pix16(count, x1) = 1;
 	else
 		for (count = x2; count >= x1; count -= skip)
-			*BITMAP_ADDR16(bitmap, y1, count) = 1;
+			bitmap->pix16(y1, count) = 1;
 }
 
 static void draw_sprite_collision( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -75,18 +75,18 @@ static void draw_sprite_collision( running_machine &machine, bitmap_t *bitmap, c
 	for (sy = 0; sy < 16; sy++)
 	{
 		dy = state->m_clown_x + sy-1;
-		if (dy>=0 && dy<bitmap->height)
+		if (dy>=0 && dy<bitmap->height())
 		{
 			for (sx = 0; sx < 16; sx++)
 			{
 				dx = state->m_clown_y + sx;
-				if (dx>=0 && dx<bitmap->width)
+				if (dx>=0 && dx<bitmap->width())
 				{
 					pixel = sprite_data[sy * sprite_gfx->line_modulo + sx];
 					if (pixel)
 					{
-						collision |= *BITMAP_ADDR16(bitmap, dy, dx);
-						*BITMAP_ADDR16(bitmap, dy, dx) = machine.pens[pixel];
+						collision |= bitmap->pix16(dy, dx);
+						bitmap->pix16(dy, dx) = machine.pens[pixel];
 					}
 				}
 			}

@@ -77,7 +77,7 @@ static void draw_bombs( running_machine &machine, bitmap_t *bitmap, const rectan
 		if (rect.max_x > cliprect->max_x) rect.max_x = cliprect->max_x;
 		if (rect.max_y > cliprect->max_y) rect.max_y = cliprect->max_y;
 
-		bitmap_fill(bitmap, &rect, 1 + 2 * i);
+		bitmap->fill(1 + 2 * i, rect);
 	}
 }
 

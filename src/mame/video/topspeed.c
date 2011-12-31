@@ -155,8 +155,8 @@ SCREEN_UPDATE( topspeed )
 	layer[2] = 1;
 	layer[3] = 0;
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);
 
 #ifdef MAME_DEBUG
 	if (state->m_dislayer[3] == 0)

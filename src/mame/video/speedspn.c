@@ -98,7 +98,7 @@ SCREEN_UPDATE(speedspn)
 	speedspn_state *state = screen.machine().driver_data<speedspn_state>();
 	if (state->m_display_disable)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 

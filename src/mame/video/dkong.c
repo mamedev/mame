@@ -821,12 +821,12 @@ static void radarscp_draw_background(running_machine &machine, dkong_state *stat
 		x = cliprect->min_x;
 		while (x <= cliprect->max_x)
 		{
-			pixel = BITMAP_ADDR16(bitmap, y, x);
+			pixel = &bitmap->pix16(y, x);
 			draw_ok = !(*pixel & 0x01) && !(*pixel & 0x02);
 			if (state->m_hardware_type == HARDWARE_TRS01) /*  Check again from schematics */
 				draw_ok = draw_ok  && !((htable[ (!state->m_rflip_sig<<7) | (x>>2)] >>2) & 0x01);
 			if (draw_ok)
-				*pixel = *(BITMAP_ADDR16(state->m_bg_bits, y, x));
+				*pixel = *(&state->m_bg_bits->pix16(y, x));
 			x++;
 		}
 		y++;
@@ -850,7 +850,7 @@ static void radarscp_scanline(running_machine &machine, int scanline)
 	x = 0;
 	while (x < machine.primary_screen->width())
 	{
-		pixel = BITMAP_ADDR16(state->m_bg_bits, y, x);
+		pixel = &state->m_bg_bits->pix16(y, x);
 		if ((state->m_counter < table_len) && (x == 4 * (table[state->m_counter|offset] & 0x7f)))
 		{
 			if ( state->m_star_ff && (table[state->m_counter|offset] & 0x80) )	/* star */

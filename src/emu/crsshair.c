@@ -181,14 +181,14 @@ static void create_bitmap(running_machine &machine, int player)
 	{
 		/* allocate a blank bitmap to start with */
 		global.bitmap[player] = global_alloc(bitmap_t(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32));
-		bitmap_fill(global.bitmap[player], NULL, MAKE_ARGB(0x00,0xff,0xff,0xff));
+		global.bitmap[player]->fill(MAKE_ARGB(0x00,0xff,0xff,0xff));
 
 		/* extract the raw source data to it */
 		for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
 		{
 			/* assume it is mirrored vertically */
-			UINT32 *dest0 = BITMAP_ADDR32(global.bitmap[player], y, 0);
-			UINT32 *dest1 = BITMAP_ADDR32(global.bitmap[player], CROSSHAIR_RAW_SIZE - 1 - y, 0);
+			UINT32 *dest0 = &global.bitmap[player]->pix32(y);
+			UINT32 *dest1 = &global.bitmap[player]->pix32(CROSSHAIR_RAW_SIZE - 1 - y);
 
 			/* extract to two rows simultaneously */
 			for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)

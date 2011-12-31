@@ -96,8 +96,8 @@ SCREEN_UPDATE( asterix )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);
 
 	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);
 	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[1], K056832_DRAW_FLAG_MIRROR, 2);

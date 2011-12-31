@@ -240,7 +240,7 @@ static void draw_background(stactics_state *state, bitmap_t *bitmap, const recta
 {
 	int y;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	/* for every row */
 	for (y = 0; y < 0x100; y++)
@@ -275,7 +275,7 @@ static void draw_background(stactics_state *state, bitmap_t *bitmap, const recta
 
 			/* plot if visible */
 			if ((sy >= 0) && (sy < 0x100) && (sx >= 0) && (sx < 0x100))
-				*BITMAP_ADDR16(bitmap, sy, sx) = pen;
+				bitmap->pix16(sy, sx) = pen;
 		}
 	}
 }

@@ -234,7 +234,7 @@ SCREEN_UPDATE( blktiger )
 {
 	blktiger_state *state = screen.machine().driver_data<blktiger_state>();
 
-	bitmap_fill(bitmap, cliprect, 1023);
+	bitmap->fill(1023, *cliprect);
 
 	if (state->m_bgon)
 		tilemap_draw(bitmap, cliprect, state->m_screen_layout ? state->m_bg_tilemap8x4 : state->m_bg_tilemap4x8, TILEMAP_DRAW_LAYER1, 0);

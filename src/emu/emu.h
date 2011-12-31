@@ -49,6 +49,9 @@
 #ifndef __EMU_H__
 #define __EMU_H__
 
+// turn off legacy bitmap addressing macros
+#define BITMAP_DISABLE_LEGACY_MACROS
+
 // core emulator headers -- must be first
 #include "emucore.h"
 #include "emutempl.h"

@@ -549,20 +549,20 @@ void cdp1869_device::draw_line(bitmap_t *bitmap, const rectangle *rect, int x, i
 	{
 		if (data & 0x80)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = color;
+			bitmap->pix16(y, x) = color;
 
 			if (!m_fresvert)
 			{
-				*BITMAP_ADDR16(bitmap, y + 1, x) = color;
+				bitmap->pix16(y + 1, x) = color;
 			}
 
 			if (!m_freshorz)
 			{
-				*BITMAP_ADDR16(bitmap, y, x + 1) = color;
+				bitmap->pix16(y, x + 1) = color;
 
 				if (!m_fresvert)
 				{
-					*BITMAP_ADDR16(bitmap, y + 1, x + 1) = color;
+					bitmap->pix16(y + 1, x + 1) = color;
 				}
 			}
 		}
@@ -934,8 +934,8 @@ void cdp1869_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 		screen_rect.max_y = CDP1869_SCANLINE_DISPLAY_END_PAL - 1;
 	}
 
-	sect_rect(&outer, cliprect);
-	bitmap_fill(bitmap, &outer, m_bkg);
+	outer &= *cliprect;
+	bitmap->fill(m_bkg, outer);
 
 	if (!m_dispoff)
 	{

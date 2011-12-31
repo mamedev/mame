@@ -322,7 +322,7 @@ void btoads_state::scanline_update(screen_device &screen, bitmap_t *bitmap, int 
 	UINT16 *bg0_base = &m_vram_bg0[(fulladdr + (m_yscroll0 << 10)) & 0x3fc00];
 	UINT16 *bg1_base = &m_vram_bg1[(fulladdr + (m_yscroll1 << 10)) & 0x3fc00];
 	UINT8 *spr_base = &m_vram_fg_display[fulladdr & 0x3fc00];
-	UINT32 *dst = BITMAP_ADDR32(bitmap, scanline, 0);
+	UINT32 *dst = &bitmap->pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(m_tlc34076);
 	int coladdr = fulladdr & 0x3ff;
 	int x;

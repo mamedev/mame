@@ -352,7 +352,7 @@ SCREEN_UPDATE( galivan )
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_galivan_scrolly[0] + 256 * (state->m_galivan_scrolly[1] & 0x07));
 
 	if (state->m_layers & 0x40)
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 	else
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
@@ -381,7 +381,7 @@ SCREEN_UPDATE( ninjemak )
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly);
 
 	if (state->m_ninjemak_dispdisable)
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 	else
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 

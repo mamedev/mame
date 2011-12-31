@@ -11,17 +11,6 @@
 
 
 
-/* This is strange; it's unlikely that the sprites actually have a hardware */
-/* clipping region, but I haven't found another way to have them masked by */
-/* the characters at the top and bottom of the screen. */
-static const rectangle spritevisiblearea =
-{
-	0*8, 32*8-1,
-	4*8, 29*8-1
-};
-
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -126,6 +115,11 @@ VIDEO_START( pingpong )
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	/* This is strange; it's unlikely that the sprites actually have a hardware */
+	/* clipping region, but I haven't found another way to have them masked by */
+	/* the characters at the top and bottom of the screen. */
+	const rectangle spritevisiblearea(0*8, 32*8-1, 4*8, 29*8-1);
+
 	pingpong_state *state = machine.driver_data<pingpong_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;

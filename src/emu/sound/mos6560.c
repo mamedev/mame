@@ -215,14 +215,14 @@ static void mos6560_draw_character( device_t *device, int ybegin, int yend, int 
 	for (y = ybegin; y <= yend; y++)
 	{
 		code = mos6560->dma_read(device->machine(), (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 0) = color[code >> 7];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 1) = color[(code >> 6) & 1];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 2) = color[(code >> 5) & 1];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 3) = color[(code >> 4) & 1];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 4) = color[(code >> 3) & 1];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 5) = color[(code >> 2) & 1];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 6) = color[(code >> 1) & 1];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 7) = color[code & 1];
+		mos6560->bitmap->pix16(y + yoff, xoff + 0) = color[code >> 7];
+		mos6560->bitmap->pix16(y + yoff, xoff + 1) = color[(code >> 6) & 1];
+		mos6560->bitmap->pix16(y + yoff, xoff + 2) = color[(code >> 5) & 1];
+		mos6560->bitmap->pix16(y + yoff, xoff + 3) = color[(code >> 4) & 1];
+		mos6560->bitmap->pix16(y + yoff, xoff + 4) = color[(code >> 3) & 1];
+		mos6560->bitmap->pix16(y + yoff, xoff + 5) = color[(code >> 2) & 1];
+		mos6560->bitmap->pix16(y + yoff, xoff + 6) = color[(code >> 1) & 1];
+		mos6560->bitmap->pix16(y + yoff, xoff + 7) = color[code & 1];
 	}
 }
 
@@ -239,14 +239,14 @@ static void mos6560_draw_character_multi( device_t *device, int ybegin, int yend
 	for (y = ybegin; y <= yend; y++)
 	{
 		code = mos6560->dma_read(device->machine(), (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 0) =
-			*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 1) = color[code >> 6];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 2) =
-			*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 3) = color[(code >> 4) & 3];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 4) =
-			*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 5) = color[(code >> 2) & 3];
-		*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 6) =
-			*BITMAP_ADDR16(mos6560->bitmap, y + yoff, xoff + 7) = color[code & 3];
+		mos6560->bitmap->pix16(y + yoff, xoff + 0) =
+			mos6560->bitmap->pix16(y + yoff, xoff + 1) = color[code >> 6];
+		mos6560->bitmap->pix16(y + yoff, xoff + 2) =
+			mos6560->bitmap->pix16(y + yoff, xoff + 3) = color[(code >> 4) & 3];
+		mos6560->bitmap->pix16(y + yoff, xoff + 4) =
+			mos6560->bitmap->pix16(y + yoff, xoff + 5) = color[(code >> 2) & 3];
+		mos6560->bitmap->pix16(y + yoff, xoff + 6) =
+			mos6560->bitmap->pix16(y + yoff, xoff + 7) = color[code & 3];
 	}
 }
 
@@ -269,7 +269,7 @@ static void mos6560_drawlines( device_t *device, int first, int last )
 	for (line = first; (line < mos6560->ypos) && (line < last); line++)
 	{
 		for (j = 0; j < mos6560->total_xsize; j++)
-			*BITMAP_ADDR16(mos6560->bitmap, line, j) = mos6560->framecolor;
+			mos6560->bitmap->pix16(line, j) = mos6560->framecolor;
 	}
 
 	for (vline = line - mos6560->ypos; (line < last) && (line < mos6560->ypos + mos6560->ysize);)
@@ -293,7 +293,7 @@ static void mos6560_drawlines( device_t *device, int first, int last )
 		{
 			for (i = ybegin; i <= yend; i++)
 				for (j = 0; j < mos6560->xpos; j++)
-					*BITMAP_ADDR16(mos6560->bitmap, yoff + i, j) = mos6560->framecolor;
+					mos6560->bitmap->pix16(yoff + i, j) = mos6560->framecolor;
 		}
 
 		for (xoff = mos6560->xpos; (xoff < mos6560->xpos + mos6560->xsize) && (xoff < mos6560->total_xsize); xoff += 8, offs++)
@@ -339,7 +339,7 @@ static void mos6560_drawlines( device_t *device, int first, int last )
 		{
 			for (i = ybegin; i <= yend; i++)
 				for (j = xoff; j < mos6560->total_xsize; j++)
-					*BITMAP_ADDR16(mos6560->bitmap, yoff + i, j) = mos6560->framecolor;
+					mos6560->bitmap->pix16(yoff + i, j) = mos6560->framecolor;
 		}
 
 		if (mos6560->matrix8x16)
@@ -356,7 +356,7 @@ static void mos6560_drawlines( device_t *device, int first, int last )
 
 	for (; line < last; line++)
 		for (j = 0; j < mos6560->total_xsize; j++)
-			*BITMAP_ADDR16(mos6560->bitmap, line, j) = mos6560->framecolor;
+			mos6560->bitmap->pix16(line, j) = mos6560->framecolor;
 }
 
 

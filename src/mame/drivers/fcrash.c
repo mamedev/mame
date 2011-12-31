@@ -268,9 +268,9 @@ static SCREEN_UPDATE( fcrash )
 	tilemap_set_enable(state->m_bg_tilemap[2], 1);
 
 	/* Blank screen */
-	bitmap_fill(bitmap, cliprect, 0xbff);
+	bitmap->fill(0xbff, *cliprect);
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
@@ -349,9 +349,9 @@ static SCREEN_UPDATE( kodb )
 	tilemap_set_enable(state->m_bg_tilemap[2], 1);
 
 	/* Blank screen */
-	bitmap_fill(bitmap, cliprect, 0xbff);
+	bitmap->fill(0xbff, *cliprect);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 	l0 = (layercontrol >> 0x06) & 03;
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;

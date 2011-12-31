@@ -367,7 +367,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 					{
 						/* combine with the background */
 						pen = left | old[0];
-						*BITMAP_ADDR16(bitmap, yoffs, currx) = pen;
+						bitmap->pix16(yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
@@ -380,7 +380,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 					{
 						/* combine with the background */
 						pen = right | old[1];
-						*BITMAP_ADDR16(bitmap, yoffs, currx) = pen;
+						bitmap->pix16(yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))

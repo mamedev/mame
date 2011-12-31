@@ -124,7 +124,7 @@ static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_t
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
-	bitmap_fill(state->m_sprite_bitmap, NULL, 0x0000);
+	state->m_sprite_bitmap->fill(0x0000);
 	/* there are multiple spritelists in here, to allow for buffering */
 	for (i=(state->m_spritelist*0x4000)/2;i<((state->m_spritelist+1)*0x4000)/2;i+=8)
 	{
@@ -194,7 +194,7 @@ static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_t
 				{
 					UINT8 data;
 
-					dstptr = BITMAP_ADDR16(state->m_sprite_bitmap, drawy, drawx);
+					dstptr = &state->m_sprite_bitmap->pix16(drawy, drawx);
 
 
 					data =  (gfxsrc[address]);
@@ -216,8 +216,8 @@ static void tecmosys_tilemap_copy_to_compose(tecmosys_state *state, UINT16 pri)
 	UINT16 *dstptr;
 	for (y=0;y<240;y++)
 	{
-		srcptr = BITMAP_ADDR16(state->m_tmp_tilemap_renderbitmap, y, 0);
-		dstptr = BITMAP_ADDR16(state->m_tmp_tilemap_composebitmap, y, 0);
+		srcptr = &state->m_tmp_tilemap_renderbitmap->pix16(y);
+		dstptr = &state->m_tmp_tilemap_composebitmap->pix16(y);
 		for (x=0;x<320;x++)
 		{
 			if ((srcptr[x]&0xf)!=0x0)
@@ -237,10 +237,10 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_t* bitmap)
 
 	for (y=0;y<240;y++)
 	{
-		srcptr = BITMAP_ADDR16(state->m_tmp_tilemap_composebitmap, y, 0);
-		srcptr2 = BITMAP_ADDR16(state->m_sprite_bitmap, y, 0);
+		srcptr = &state->m_tmp_tilemap_composebitmap->pix16(y);
+		srcptr2 = &state->m_sprite_bitmap->pix16(y);
 
-		dstptr = BITMAP_ADDR32(bitmap, y, 0);
+		dstptr = &bitmap->pix32(y);
 		for (x=0;x<320;x++)
 		{
 			UINT16 pri, pri2;
@@ -301,7 +301,7 @@ SCREEN_UPDATE(tecmosys)
 {
 	tecmosys_state *state = screen.machine().driver_data<tecmosys_state>();
 
-	bitmap_fill(bitmap,cliprect,screen.machine().pens[0x4000]);
+	bitmap->fill(screen.machine().pens[0x4000], *cliprect);
 
 
 	tilemap_set_scrolly( state->m_bg0tilemap, 0, state->m_c80000regs[1]+16);
@@ -313,21 +313,21 @@ SCREEN_UPDATE(tecmosys)
 	tilemap_set_scrolly( state->m_bg2tilemap, 0, state->m_b00000regs[1]+17);
 	tilemap_set_scrollx( state->m_bg2tilemap, 0, state->m_b00000regs[0]+106);
 
-	bitmap_fill(state->m_tmp_tilemap_composebitmap,cliprect,0);
+	state->m_tmp_tilemap_composebitmap->fill(0, *cliprect);
 
-	bitmap_fill(state->m_tmp_tilemap_renderbitmap,cliprect,0);
+	state->m_tmp_tilemap_renderbitmap->fill(0, *cliprect);
 	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg0tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x0000);
 
-	bitmap_fill(state->m_tmp_tilemap_renderbitmap,cliprect,0);
+	state->m_tmp_tilemap_renderbitmap->fill(0, *cliprect);
 	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg1tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x4000);
 
-	bitmap_fill(state->m_tmp_tilemap_renderbitmap,cliprect,0);
+	state->m_tmp_tilemap_renderbitmap->fill(0, *cliprect);
 	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg2tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x8000);
 
-	bitmap_fill(state->m_tmp_tilemap_renderbitmap,cliprect,0);
+	state->m_tmp_tilemap_renderbitmap->fill(0, *cliprect);
 	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_txt_tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0xc000);
 
@@ -344,13 +344,13 @@ VIDEO_START(tecmosys)
 {
 	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 	state->m_sprite_bitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
-	bitmap_fill(state->m_sprite_bitmap, NULL, 0x4000);
+	state->m_sprite_bitmap->fill(0x4000);
 
 	state->m_tmp_tilemap_composebitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
 	state->m_tmp_tilemap_renderbitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
 
-	bitmap_fill(state->m_tmp_tilemap_composebitmap, NULL, 0x0000);
-	bitmap_fill(state->m_tmp_tilemap_renderbitmap, NULL, 0x0000);
+	state->m_tmp_tilemap_composebitmap->fill(0x0000);
+	state->m_tmp_tilemap_renderbitmap->fill(0x0000);
 
 
 	state->m_txt_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32*2,32*2);

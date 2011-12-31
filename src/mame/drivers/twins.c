@@ -117,7 +117,7 @@ static SCREEN_UPDATE(twins)
 	int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()));
 
 	for (i=0;i<0x100;i++)
 	{
@@ -141,7 +141,7 @@ static SCREEN_UPDATE(twins)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = ((UINT8 *)state->m_videoram)[BYTE_XOR_LE(count)];
+			bitmap->pix16(y, x) = ((UINT8 *)state->m_videoram)[BYTE_XOR_LE(count)];
 			count++;
 		}
 	}
@@ -224,7 +224,7 @@ static SCREEN_UPDATE(twinsa)
 	int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap_fill(bitmap, 0, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()));
 
 	for (i=0;i<0x1000-3;i+=3)
 	{
@@ -241,7 +241,7 @@ static SCREEN_UPDATE(twinsa)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = ((UINT8 *)state->m_videoram)[BYTE_XOR_LE(count)];
+			bitmap->pix16(y, x) = ((UINT8 *)state->m_videoram)[BYTE_XOR_LE(count)];
 			count++;
 		}
 	}

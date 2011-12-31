@@ -82,7 +82,7 @@ static void do_pen_lookup(running_machine &machine, const _20pacgal_state *state
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		for(x = cliprect->min_x; x <= cliprect->max_x; x++)
-			*BITMAP_ADDR32(bitmap, y, x) = pens[*BITMAP_ADDR32(bitmap, y, x)];
+			bitmap->pix32(y, x) = pens[bitmap->pix32(y, x)];
 }
 
 
@@ -139,7 +139,7 @@ static void draw_sprite(running_machine& machine, const _20pacgal_state *state, 
 
 					/* pen bits A0-A3 */
 					if (col)
-						*BITMAP_ADDR32(bitmap, y, x) = (*BITMAP_ADDR32(bitmap, y, x) & 0xff0) | col;
+						bitmap->pix32(y, x) = (bitmap->pix32(y, x) & 0xff0) | col;
 				}
 
 				/* next pixel */
@@ -274,7 +274,7 @@ static void draw_chars(const _20pacgal_state *state, bitmap_t *bitmap)
 
 				/* pen bits A4-A11 */
 				if ( col != 0 )
-					*BITMAP_ADDR32(bitmap, y, x) = (color_base | col) << 4;
+					bitmap->pix32(y, x) = (color_base | col) << 4;
 
 				/* next pixel */
 				if (flip)
@@ -392,7 +392,7 @@ static void draw_stars(_20pacgal_state *state, bitmap_t *bitmap, const rectangle
 			if (((lfsr & 0xffc0) == star_seta) || ((lfsr & 0xffc0) == star_setb))
 			{
 				if (y >= cliprect->min_y && y <= cliprect->max_y)
-					*BITMAP_ADDR32(bitmap, y, x) = NUM_PENS + (lfsr & 0x3f);
+					bitmap->pix32(y, x) = NUM_PENS + (lfsr & 0x3f);
 				cnt++;
 			}
 		}
@@ -410,7 +410,7 @@ static SCREEN_UPDATE( 20pacgal )
 {
 	_20pacgal_state *state = screen.machine().driver_data<_20pacgal_state>();
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 	draw_stars(state, bitmap,cliprect);
 	draw_chars(state, bitmap);
 	draw_sprites(screen.machine(),state, bitmap);

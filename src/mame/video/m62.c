@@ -580,11 +580,11 @@ SCREEN_UPDATE( ldrun3 )
 
 		my_cliprect.min_y = 0 * 8;
 		my_cliprect.max_y = 1 * 8 - 1;
-		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), my_cliprect);
 
 		my_cliprect.min_y = 31 * 8;
 		my_cliprect.max_y = 32 * 8 - 1;
-		bitmap_fill(bitmap, &my_cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), my_cliprect);
 	}
 
 	return 0;

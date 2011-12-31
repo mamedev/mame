@@ -79,7 +79,7 @@ SCREEN_UPDATE(funybubl)
 	int x, y, offs;
 	offs = 0;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */
 	for (y = 0; y < 32; y++)

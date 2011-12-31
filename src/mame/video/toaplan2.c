@@ -297,14 +297,14 @@ SCREEN_UPDATE( toaplan2_dual )
 
 	if (state->m_vdp1)
 	{
-		bitmap_fill(bitmap,cliprect,0);
-		bitmap_fill(state->m_custom_priority_bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
+		state->m_custom_priority_bitmap->fill(0, *cliprect);
 		state->m_vdp1->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 	if (state->m_vdp0)
 	{
-	//  bitmap_fill(bitmap,cliprect,0);
-		bitmap_fill(state->m_custom_priority_bitmap, cliprect, 0);
+	//  bitmap->fill(0, *cliprect);
+		state->m_custom_priority_bitmap->fill(0, *cliprect);
 		state->m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 
@@ -318,19 +318,19 @@ SCREEN_UPDATE( toaplan2_mixed )
 {
 	toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
 
-//  bitmap_fill(bitmap,cliprect,0);
-//  bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+//  bitmap->fill(0, *cliprect);
+//  gp9001_custom_priority_bitmap->fill(0, *cliprect);
 
 	if (state->m_vdp0)
 	{
-		bitmap_fill(bitmap,cliprect,0);
-		bitmap_fill(state->m_custom_priority_bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
+		state->m_custom_priority_bitmap->fill(0, *cliprect);
 		state->m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 	if (state->m_vdp1)
 	{
-		bitmap_fill(state->m_secondary_render_bitmap,cliprect,0);
-		bitmap_fill(state->m_custom_priority_bitmap, cliprect, 0);
+		state->m_secondary_render_bitmap->fill(0, *cliprect);
+		state->m_custom_priority_bitmap->fill(0, *cliprect);
 		state->m_vdp1->gp9001_render_vdp(screen.machine(), state->m_secondary_render_bitmap, cliprect);
 	}
 
@@ -356,8 +356,8 @@ SCREEN_UPDATE( toaplan2_mixed )
 
 		for (y=0;y<height;y++)
 		{
-			src_vdp0 = BITMAP_ADDR16(bitmap, y, 0);
-			src_vdp1 = BITMAP_ADDR16(state->m_secondary_render_bitmap, y, 0);
+			src_vdp0 = &bitmap->pix16(y);
+			src_vdp1 = &state->m_secondary_render_bitmap->pix16(y);
 
 			for (x=0;x<width;x++)
 			{
@@ -420,8 +420,8 @@ SCREEN_UPDATE( toaplan2 )
 
 	if (state->m_vdp0)
 	{
-		bitmap_fill(bitmap,cliprect,0);
-		bitmap_fill(state->m_custom_priority_bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
+		state->m_custom_priority_bitmap->fill(0, *cliprect);
 		state->m_vdp0->gp9001_render_vdp(screen.machine(), bitmap, cliprect);
 	}
 

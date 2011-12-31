@@ -60,7 +60,7 @@ static SCREEN_UPDATE( sstrangr )
 				data = data >> 1;
 			}
 
-			*BITMAP_ADDR32(bitmap, y, x) = pen;
+			bitmap->pix32(y, x) = pen;
 
 			x = x + 1;
 		}
@@ -119,7 +119,7 @@ static SCREEN_UPDATE( sstrngr2 )
 				data = data >> 1;
 			}
 
-			*BITMAP_ADDR32(bitmap, y, x) = pens[color];
+			bitmap->pix32(y, x) = pens[color];
 
 			x = x + 1;
 		}

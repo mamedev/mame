@@ -1035,8 +1035,8 @@ static void toaplan1_draw_sprite_custom(bitmap_t *dest_bmp,const rectangle *clip
 			for( y=sy; y<ey; y++ )
 			{
 				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+				UINT16 *dest = &dest_bmp->pix16(y);
+				UINT8 *pri = &priority_bitmap->pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -1171,7 +1171,7 @@ SCREEN_UPDATE( rallybik )
 
 	toaplan1_log_vram(screen.machine());
 
-	bitmap_fill(bitmap,cliprect,0x120);
+	bitmap->fill(0x120, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
@@ -1195,8 +1195,8 @@ SCREEN_UPDATE( toaplan1 )
 
 	toaplan1_log_vram(screen.machine());
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0x120);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0x120, *cliprect);
 
 // it's really correct?
 	tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);

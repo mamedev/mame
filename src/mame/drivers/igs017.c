@@ -330,7 +330,7 @@ static int debug_viewer(running_machine &machine, bitmap_t *bitmap,const rectang
 		if (w <= 0)		w = 0;
 		if (w > 1024)	w = 1024;
 
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap->fill(0, *cliprect);
 
 		draw_sprite(machine, bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
 
@@ -363,7 +363,7 @@ static SCREEN_UPDATE( igs017 )
 	if (debug_viewer(screen.machine(), bitmap,cliprect))
 		return 0;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	if (state->m_video_disable)
 		return 0;

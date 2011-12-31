@@ -2725,7 +2725,7 @@ static void cps1_render_stars( screen_device &screen, bitmap_t *bitmap, const re
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
-					*BITMAP_ADDR16(bitmap, sy, sx) = 0xa00 + col;
+					bitmap->pix16(sy, sx) = 0xa00 + col;
 			}
 		}
 	}
@@ -2751,7 +2751,7 @@ static void cps1_render_stars( screen_device &screen, bitmap_t *bitmap, const re
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
-					*BITMAP_ADDR16(bitmap, sy, sx) = 0x800 + col;
+					bitmap->pix16(sy, sx) = 0x800 + col;
 			}
 		}
 	}
@@ -2851,7 +2851,7 @@ SCREEN_UPDATE( cps1 )
 	{
 		// CPS1 games use pen 0xbff as background color; this is used in 3wonders,
 		// mtwins (explosion during attract), mercs (intermission).
-		bitmap_fill(bitmap, cliprect, 0xbff);
+		bitmap->fill(0xbff, *cliprect);
 	}
 	else
 	{
@@ -2860,7 +2860,7 @@ SCREEN_UPDATE( cps1 )
 		// Maybe Capcom changed the background handling due to the problems that
 		// it caused on several monitors (because the background extended into the
 		// blanking area instead of going black, causing the monitor to clip).
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	}
 
 	cps1_render_stars(screen, bitmap, cliprect);
@@ -2870,7 +2870,7 @@ SCREEN_UPDATE( cps1 )
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (state->m_cps_version == 1)
 	{

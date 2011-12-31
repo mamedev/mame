@@ -294,7 +294,7 @@ static SCREEN_UPDATE( dgpix )
 	{
 		int x;
 		UINT32 *src = &state->m_vram[(state->m_vbuffer ? 0 : 0x10000) | (y << 8)];
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
 
 		for (x = 0; x < 320; x += 2)
 		{

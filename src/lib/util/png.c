@@ -43,6 +43,8 @@
 #include <zlib.h>
 #include "png.h"
 
+#include <new>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -631,7 +633,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 	png_expand_buffer_8bit(&png);
 
 	/* allocate a bitmap of the appropriate size and copy it */
-	*bitmap = bitmap_alloc(png.width, png.height, BITMAP_FORMAT_ARGB32);
+	*bitmap = new(std::nothrow) bitmap_t(png.width, png.height, BITMAP_FORMAT_ARGB32);
 	if (*bitmap == NULL)
 	{
 		png_free(&png);
@@ -648,7 +650,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 			{
 				/* determine alpha and expand to 32bpp */
 				UINT8 alpha = (*src < png.num_trans) ? png.trans[*src] : 0xff;
-				*BITMAP_ADDR32(*bitmap, y, x) = (alpha << 24) | (png.palette[*src * 3] << 16) | (png.palette[*src * 3 + 1] << 8) | png.palette[*src * 3 + 2];
+				(*bitmap)->pix32(y, x) = (alpha << 24) | (png.palette[*src * 3] << 16) | (png.palette[*src * 3 + 1] << 8) | png.palette[*src * 3 + 2];
 			}
 	}
 
@@ -657,7 +659,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 	{
 		for (y = 0; y < png.height; y++)
 			for (x = 0; x < png.width; x++, src++)
-				*BITMAP_ADDR32(*bitmap, y, x) = 0xff000000 | (*src << 16) | (*src << 8) | *src;
+				(*bitmap)->pix32(y, x) = 0xff000000 | (*src << 16) | (*src << 8) | *src;
 	}
 
 	/* handle 32bpp non-alpha case */
@@ -665,7 +667,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 	{
 		for (y = 0; y < png.height; y++)
 			for (x = 0; x < png.width; x++, src += 3)
-				*BITMAP_ADDR32(*bitmap, y, x) = 0xff000000 | (src[0] << 16) | (src[1] << 8) | src[2];
+				(*bitmap)->pix32(y, x) = 0xff000000 | (src[0] << 16) | (src[1] << 8) | src[2];
 	}
 
 	/* handle 32bpp alpha case */
@@ -673,7 +675,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 	{
 		for (y = 0; y < png.height; y++)
 			for (x = 0; x < png.width; x++, src += 4)
-				*BITMAP_ADDR32(*bitmap, y, x) = (src[3] << 24) | (src[0] << 16) | (src[1] << 8) | src[2];
+				(*bitmap)->pix32(y, x) = (src[3] << 24) | (src[0] << 16) | (src[1] << 8) | src[2];
 	}
 
 	/* free our temporary data and return */
@@ -908,8 +910,8 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 	int x, y;
 
 	/* set the common info */
-	pnginfo->width = bitmap->width;
-	pnginfo->height = bitmap->height;
+	pnginfo->width = bitmap->width();
+	pnginfo->height = bitmap->height();
 	pnginfo->bit_depth = 8;
 	pnginfo->color_type = 3;
 	pnginfo->num_palette = 256;
@@ -941,7 +943,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 	/* copy in the pixels, specifying a NULL filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
-		UINT16 *src = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *src = &bitmap->pix16(y);
 		UINT8 *dst = pnginfo->image + y * (rowbytes + 1);
 
 		/* store the filter byte, then copy the data */
@@ -961,13 +963,13 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 
 static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *bitmap, int palette_length, const rgb_t *palette)
 {
-	int alpha = (bitmap->format == BITMAP_FORMAT_ARGB32);
+	int alpha = (bitmap->format() == BITMAP_FORMAT_ARGB32);
 	int rowbytes;
 	int x, y;
 
 	/* set the common info */
-	pnginfo->width = bitmap->width;
-	pnginfo->height = bitmap->height;
+	pnginfo->width = bitmap->width();
+	pnginfo->height = bitmap->height();
 	pnginfo->bit_depth = 8;
 	pnginfo->color_type = alpha ? 6 : 2;
 	rowbytes = pnginfo->width * (alpha ? 4 : 3);
@@ -980,15 +982,15 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 	/* copy in the pixels, specifying a NULL filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
-		UINT32 *src32 = BITMAP_ADDR32(bitmap, y, 0);
-		UINT16 *src16 = BITMAP_ADDR16(bitmap, y, 0);
+		UINT32 *src32 = &bitmap->pix32(y);
+		UINT16 *src16 = &bitmap->pix16(y);
 		UINT8 *dst = pnginfo->image + y * (rowbytes + 1);
 
 		/* store the filter byte, then copy the data */
 		*dst++ = 0;
 
 		/* 16bpp palettized format */
-		if (bitmap->format == BITMAP_FORMAT_INDEXED16)
+		if (bitmap->format() == BITMAP_FORMAT_INDEXED16)
 		{
 			for (x = 0; x < pnginfo->width; x++)
 			{
@@ -1000,7 +1002,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 		}
 
 		/* RGB formats */
-		else if (bitmap->format == BITMAP_FORMAT_RGB15)
+		else if (bitmap->format() == BITMAP_FORMAT_RGB15)
 		{
 			for (x = 0; x < pnginfo->width; x++)
 			{
@@ -1012,7 +1014,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 		}
 
 		/* 32-bit RGB direct */
-		else if (bitmap->format == BITMAP_FORMAT_RGB32)
+		else if (bitmap->format() == BITMAP_FORMAT_RGB32)
 		{
 			for (x = 0; x < pnginfo->width; x++)
 			{
@@ -1024,7 +1026,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 		}
 
 		/* 32-bit ARGB direct */
-		else if (bitmap->format == BITMAP_FORMAT_ARGB32)
+		else if (bitmap->format() == BITMAP_FORMAT_ARGB32)
 		{
 			for (x = 0; x < pnginfo->width; x++)
 			{
@@ -1057,7 +1059,7 @@ static png_error write_png_stream(core_file *fp, png_info *pnginfo, const bitmap
 	png_error error;
 
 	/* create an unfiltered image in either palette or RGB form */
-	if (bitmap->format == BITMAP_FORMAT_INDEXED16 && palette_length <= 256)
+	if (bitmap->format() == BITMAP_FORMAT_INDEXED16 && palette_length <= 256)
 		error = convert_bitmap_to_image_palette(pnginfo, bitmap, palette_length, palette);
 	else
 		error = convert_bitmap_to_image_rgb(pnginfo, bitmap, palette_length, palette);
@@ -1150,8 +1152,8 @@ png_error mng_capture_start(core_file *fp, bitmap_t *bitmap, double rate)
 		return PNGERR_FILE_ERROR;
 
 	memset(mhdr, 0, 28);
-	put_32bit(mhdr + 0, bitmap->width);
-	put_32bit(mhdr + 4, bitmap->height);
+	put_32bit(mhdr + 0, bitmap->width());
+	put_32bit(mhdr + 4, bitmap->height());
 	put_32bit(mhdr + 8, rate);
 	put_32bit(mhdr + 24, 0x0041); /* Simplicity profile */
 	/* frame count and play time unspecified because

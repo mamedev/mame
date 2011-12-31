@@ -457,13 +457,13 @@ static void erase_sprites(running_machine& machine, bitmap_t* bitmap, const rect
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	// if sprite overdraw is disabled, clear the sprite framebuffer
 	if (!state->m_next_sprite_overdraw_enabled)
-		bitmap_fill(state->m_sp_bitmap, cliprect, TRANSPARENTCODE);
+		state->m_sp_bitmap->fill(TRANSPARENTCODE, *cliprect);
 	else
-		for (int y = 0; y < state->m_sp_bitmap->height; ++y)
+		for (int y = 0; y < state->m_sp_bitmap->height(); ++y)
 		{
-			for (int x = 0; x < state->m_sp_bitmap->width; ++x)
+			for (int x = 0; x < state->m_sp_bitmap->width(); ++x)
 			{
-				UINT16* const ptr = BITMAP_ADDR16(state->m_sp_bitmap, y, x);
+				UINT16* const ptr = &state->m_sp_bitmap->pix16(y, x);
 
 				if ( (*state->m_stencil_compare_function)(*ptr) ) *ptr = TRANSPARENTCODE ;
 			}
@@ -492,7 +492,7 @@ SCREEN_UPDATE( ninjakd2 )
 	update_sprites(screen.machine());
 	state->m_sprites_updated = 1;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
@@ -509,7 +509,7 @@ SCREEN_UPDATE( robokid )
 	update_sprites(screen.machine());
 	state->m_sprites_updated = 1;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg0_tilemap, 0, 0);
 
@@ -530,7 +530,7 @@ SCREEN_UPDATE( omegaf )
 	update_sprites(screen.machine());
 	state->m_sprites_updated = 1;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg0_tilemap, 0, 0);
 

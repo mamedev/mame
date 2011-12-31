@@ -93,9 +93,9 @@ SCREEN_UPDATE( xmen )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 	/* note the '+1' in the background color!!! */
-	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase + 1);
+	bitmap->fill(16 * bg_colorbase + 1, *cliprect);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[0], 0, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[2], 0, 4);
@@ -114,8 +114,8 @@ SCREEN_UPDATE( xmen6p_left )
 
 	for(y = 0; y < 32 * 8; y++)
 	{
-		UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
-		UINT16* line_src = BITMAP_ADDR16(state->m_screen_left, y, 0);
+		UINT16* line_dest = &bitmap->pix16(y);
+		UINT16* line_src = &state->m_screen_left->pix16(y);
 
 		for (x = 12 * 8; x < 52 * 8; x++)
 			line_dest[x] = line_src[x];
@@ -131,8 +131,8 @@ SCREEN_UPDATE( xmen6p_right )
 
 	for(y = 0; y < 32 * 8; y++)
 	{
-		UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
-		UINT16* line_src = BITMAP_ADDR16(state->m_screen_right, y, 0);
+		UINT16* line_dest = &bitmap->pix16(y);
+		UINT16* line_src = &state->m_screen_right->pix16(y);
 
 		for (x = 12 * 8; x < 52 * 8; x++)
 			line_dest[x] = line_src[x];
@@ -219,9 +219,9 @@ SCREEN_EOF( xmen6p )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	bitmap_fill(screen.machine().priority_bitmap, &cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, cliprect);
 	/* note the '+1' in the background color!!! */
-	bitmap_fill(renderbitmap, &cliprect, 16 * bg_colorbase + 1);
+	renderbitmap->fill(16 * bg_colorbase + 1, cliprect);
 	k052109_tilemap_draw(state->m_k052109, renderbitmap, &cliprect, layer[0], 0, 1);
 	k052109_tilemap_draw(state->m_k052109, renderbitmap, &cliprect, layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, renderbitmap, &cliprect, layer[2], 0, 4);

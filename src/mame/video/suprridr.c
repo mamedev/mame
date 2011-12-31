@@ -177,20 +177,20 @@ SCREEN_UPDATE( suprridr )
 	/* render left 4 columns with no scroll */
 	subclip = visarea;;
 	subclip.max_x = subclip.min_x + (state->m_flipx ? 1*8 : 4*8) - 1;
-	sect_rect(&subclip, cliprect);
+	subclip &= *cliprect;
 	tilemap_draw(bitmap, &subclip, state->m_bg_tilemap_noscroll, 0, 0);
 
 	/* render right 1 column with no scroll */
 	subclip = visarea;;
 	subclip.min_x = subclip.max_x - (state->m_flipx ? 4*8 : 1*8) + 1;
-	sect_rect(&subclip, cliprect);
+	subclip &= *cliprect;
 	tilemap_draw(bitmap, &subclip, state->m_bg_tilemap_noscroll, 0, 0);
 
 	/* render the middle columns normally */
 	subclip = visarea;;
 	subclip.min_x += state->m_flipx ? 1*8 : 4*8;
 	subclip.max_x -= state->m_flipx ? 4*8 : 1*8;
-	sect_rect(&subclip, cliprect);
+	subclip &= *cliprect;
 	tilemap_draw(bitmap, &subclip, state->m_bg_tilemap, 0, 0);
 
 	/* render the top layer */

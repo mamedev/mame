@@ -123,8 +123,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 				if ((drawypos >= cliprect->min_y) && (drawypos <= cliprect->max_y))
 				{
-					destline = BITMAP_ADDR16(bitmap, drawypos, 0);
-					priline = BITMAP_ADDR8(machine.priority_bitmap, drawypos, 0);
+					destline = &bitmap->pix16(drawypos);
+					priline = &machine.priority_bitmap->pix8(drawypos);
 
 					for (xcnt = xstart; xcnt != xend; xcnt += xinc)
 					{
@@ -205,8 +205,8 @@ SCREEN_UPDATE( mcatadv )
 	mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
 	int i;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (state->m_scroll1[2] != state->m_palette_bank1)
 	{

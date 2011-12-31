@@ -66,7 +66,7 @@ INLINE void galpani2_bg8_w(address_space *space, offs_t offset, UINT16 data, UIN
 	pen	=	newword & 0xff;
 	x	=	(offset % 512);	/* 512 x 256 */
 	y	=	(offset / 512);
-	*BITMAP_ADDR16(state->m_bg8_bitmap[_n_], y, x) = 0x4000 + pen;
+	state->m_bg8_bitmap[_n_]->pix16(y, x) = 0x4000 + pen;
 }
 
 WRITE16_HANDLER( galpani2_bg8_0_w ) { galpani2_bg8_w(space, offset, data, mem_mask, 0); }
@@ -100,7 +100,7 @@ WRITE16_HANDLER( galpani2_bg15_w )
 	int x = (offset % 256) + (offset / (256*256)) * 256 ;
 	int y = (offset / 256) % 256;
 
-	*BITMAP_ADDR16(state->m_bg15_bitmap, y, x) = 0x4200 + (newword & 0x7fff);
+	state->m_bg15_bitmap->pix16(y, x) = 0x4200 + (newword & 0x7fff);
 }
 
 
@@ -158,8 +158,8 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap_fill(bitmap,cliprect,0);
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (layers_ctrl & 0x1)
 	{

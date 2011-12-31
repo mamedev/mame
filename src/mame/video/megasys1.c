@@ -973,7 +973,7 @@ SCREEN_UPDATE( megasys1 )
 		}
 	}
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	flag = TILEMAP_DRAW_OPAQUE;
 	primask = 0;
@@ -999,7 +999,7 @@ SCREEN_UPDATE( megasys1 )
 				if (flag != 0)
 				{
 					flag = 0;
-					bitmap_fill(bitmap,cliprect,0);
+					bitmap->fill(0, *cliprect);
 				}
 
 				if (state->m_sprite_flag & 0x100)	/* sprites are split */

@@ -224,7 +224,7 @@ SCREEN_UPDATE( thedeep )
 		tilemap_set_scrolly(state->m_tilemap_0, x, y + scrolly);
 	}
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_tilemap_0,0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);

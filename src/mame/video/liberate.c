@@ -519,7 +519,7 @@ SCREEN_UPDATE( prosoccr )
 	tilemap_set_scrollx(state->m_back_tilemap, 0, -state->m_io_ram[0]);
 
 	if (state->m_background_disable)
-		bitmap_fill(bitmap, cliprect, 32);
+		bitmap->fill(32, *cliprect);
 	else
 		tilemap_draw(bitmap, cliprect, state->m_back_tilemap, 0, 0);
 
@@ -537,7 +537,7 @@ SCREEN_UPDATE( prosport )
 	int mx, my, tile, offs, gfx_region;
 	int scrollx, scrolly;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	offs = 0;
 	/* TODO: what's bits 0 and 2 for? Internal scrolling state? */
@@ -580,7 +580,7 @@ SCREEN_UPDATE( boomrang )
 	tilemap_set_scrollx(state->m_back_tilemap, 0, -state->m_io_ram[0]);
 
 	if (state->m_background_disable)
-		bitmap_fill(bitmap, cliprect, 32);
+		bitmap->fill(32, *cliprect);
 	else
 		tilemap_draw(bitmap, cliprect, state->m_back_tilemap, TILEMAP_DRAW_LAYER1, 0);
 
@@ -600,7 +600,7 @@ SCREEN_UPDATE( liberate )
 	tilemap_set_scrollx(state->m_back_tilemap, 0, -state->m_io_ram[0]);
 
 	if (state->m_background_disable)
-		bitmap_fill(bitmap, cliprect, 32);
+		bitmap->fill(32, *cliprect);
 	else
 		tilemap_draw(bitmap, cliprect, state->m_back_tilemap, 0, 0);
 

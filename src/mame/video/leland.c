@@ -405,7 +405,7 @@ static SCREEN_UPDATE( leland )
 		int x;
 		UINT8 fg_data = 0;
 
-		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dst = &bitmap->pix16(y);
 		UINT8 *fg_src = &state->m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
@@ -472,7 +472,7 @@ static SCREEN_UPDATE( ataxx )
 		int x;
 		UINT8 fg_data = 0;
 
-		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dst = &bitmap->pix16(y);
 		UINT8 *fg_src = &state->m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */

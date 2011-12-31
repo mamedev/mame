@@ -89,7 +89,7 @@ static SCREEN_UPDATE( hitme )
 	/* now loop over and invert anything */
 	for (y = 0; y < 19; y++)
 	{
-		int dy = bitmap->rowpixels;
+		int dy = bitmap->rowpixels();
 		for (inv = x = 0; x < 40; x++, offs++)
 		{
 			/* if the high bit is set, reset the oneshot */
@@ -99,7 +99,7 @@ static SCREEN_UPDATE( hitme )
 			/* invert pixels until we run out */
 			for (xx = 0; xx < 8 && inv; xx++, inv--)
 			{
-				UINT16 *dest = BITMAP_ADDR16(bitmap, y * 10, x * 8 + xx);
+				UINT16 *dest = &bitmap->pix16(y * 10, x * 8 + xx);
 				dest[0 * dy] ^= 1;
 				dest[1 * dy] ^= 1;
 				dest[2 * dy] ^= 1;

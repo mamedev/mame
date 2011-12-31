@@ -13,7 +13,7 @@ Atari Fire Truck + Super Bug + Monte Carlo video emulation
 
 
 
-static const rectangle playfield_window = { 0x02a, 0x115, 0x000, 0x0ff };
+static const rectangle playfield_window(0x02a, 0x115, 0x000, 0x0ff);
 
 
 
@@ -345,8 +345,8 @@ static void check_collision(firetrk_state *state, int which)
 	for (y = playfield_window.min_y; y <= playfield_window.max_y; y++)
 		for (x = playfield_window.min_x; x <= playfield_window.max_x; x++)
 		{
-			pen_t a = *BITMAP_ADDR16(state->m_helper1, y, x);
-			pen_t b = *BITMAP_ADDR16(state->m_helper2, y, x);
+			pen_t a = state->m_helper1->pix16(y, x);
+			pen_t b = state->m_helper2->pix16(y, x);
 
 			if (b != 0xff && (state->m_color1_mask >> a) & 1)
 				state->m_crash[which] = 1;
@@ -366,7 +366,7 @@ SCREEN_UPDATE( firetrk )
 	tilemap_set_scrolly(state->m_tilemap1, 0, *state->m_scroll_y);
 	tilemap_set_scrolly(state->m_tilemap2, 0, *state->m_scroll_y);
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 	tilemap_draw(bitmap, &playfield_window, state->m_tilemap1, 0, 0);
 	firetrk_draw_car(screen.machine(), bitmap, &playfield_window, screen.machine().gfx, 0, state->m_flash);
 	firetrk_draw_car(screen.machine(), bitmap, &playfield_window, screen.machine().gfx, 1, state->m_flash);
@@ -377,11 +377,11 @@ SCREEN_UPDATE( firetrk )
 	{
 		tilemap_draw(state->m_helper1, &playfield_window, state->m_tilemap2, 0, 0);
 
-		bitmap_fill(state->m_helper2, &playfield_window, 0xff);
+		state->m_helper2->fill(0xff, playfield_window);
 		firetrk_draw_car(screen.machine(), state->m_helper2, &playfield_window, screen.machine().gfx, 0, FALSE);
 		check_collision(state, 0);
 
-		bitmap_fill(state->m_helper2, &playfield_window, 0xff);
+		state->m_helper2->fill(0xff, playfield_window);
 		firetrk_draw_car(screen.machine(), state->m_helper2, &playfield_window, screen.machine().gfx, 1, FALSE);
 		check_collision(state, 1);
 
@@ -401,7 +401,7 @@ SCREEN_UPDATE( superbug )
 	tilemap_set_scrolly(state->m_tilemap1, 0, *state->m_scroll_y);
 	tilemap_set_scrolly(state->m_tilemap2, 0, *state->m_scroll_y);
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 	tilemap_draw(bitmap, &playfield_window, state->m_tilemap1, 0, 0);
 	superbug_draw_car(screen.machine(), bitmap, &playfield_window, screen.machine().gfx, state->m_flash);
 	draw_text(bitmap, cliprect, screen.machine().gfx, state->m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
@@ -411,7 +411,7 @@ SCREEN_UPDATE( superbug )
 	{
 		tilemap_draw(state->m_helper1, &playfield_window, state->m_tilemap2, 0, 0);
 
-		bitmap_fill(state->m_helper2, &playfield_window, 0xff);
+		state->m_helper2->fill(0xff, playfield_window);
 		superbug_draw_car(screen.machine(), state->m_helper2, &playfield_window, screen.machine().gfx, FALSE);
 		check_collision(state, 0);
 
@@ -431,7 +431,7 @@ SCREEN_UPDATE( montecar )
 	tilemap_set_scrolly(state->m_tilemap1, 0, *state->m_scroll_y);
 	tilemap_set_scrolly(state->m_tilemap2, 0, *state->m_scroll_y);
 
-	bitmap_fill(bitmap, cliprect, 0x2c);
+	bitmap->fill(0x2c, *cliprect);
 	tilemap_draw(bitmap, &playfield_window, state->m_tilemap1, 0, 0);
 	montecar_draw_car(screen.machine(), bitmap, &playfield_window, screen.machine().gfx, 0, FALSE);
 	montecar_draw_car(screen.machine(), bitmap, &playfield_window, screen.machine().gfx, 1, FALSE);
@@ -442,11 +442,11 @@ SCREEN_UPDATE( montecar )
 	{
 		tilemap_draw(state->m_helper1, &playfield_window, state->m_tilemap2, 0, 0);
 
-		bitmap_fill(state->m_helper2, &playfield_window, 0xff);
+		state->m_helper2->fill(0xff, playfield_window);
 		montecar_draw_car(screen.machine(), state->m_helper2, &playfield_window, screen.machine().gfx, 0, TRUE);
 		check_collision(state, 0);
 
-		bitmap_fill(state->m_helper2, &playfield_window, 0xff);
+		state->m_helper2->fill(0xff, playfield_window);
 		montecar_draw_car(screen.machine(), state->m_helper2, &playfield_window, screen.machine().gfx, 1, TRUE);
 		check_collision(state, 1);
 	}

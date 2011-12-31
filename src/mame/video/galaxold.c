@@ -7,18 +7,6 @@
 #include "emu.h"
 #include "includes/galaxold.h"
 
-static const rectangle spritevisiblearea =
-{
-	2*8+1, 32*8-1,
-	2*8,   30*8-1
-};
-static const rectangle spritevisibleareaflipx =
-{
-	0*8, 30*8-2,
-	2*8, 30*8-1
-};
-
-
 #define STARS_COLOR_BASE		(machine.region("proms")->bytes())
 #define BULLETS_COLOR_BASE		(STARS_COLOR_BASE + 64)
 #define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
@@ -636,7 +624,7 @@ static void theend_draw_bullets(running_machine &machine, bitmap_t *bitmap, cons
 		x--;
 
 		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-			*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
+			bitmap->pix16(y, x) = BULLETS_COLOR_BASE;
 	}
 }
 
@@ -1163,7 +1151,7 @@ static void galaxold_draw_bullets(running_machine &machine, bitmap_t *bitmap, co
 			/* yellow missile, white shells (this is the terminology on the schematics) */
 			color = ((offs == 7*4) ? BULLETS_COLOR_BASE : BULLETS_COLOR_BASE + 1);
 
-			*BITMAP_ADDR16(bitmap, y, x) = color;
+			bitmap->pix16(y, x) = color;
 		}
 	}
 }
@@ -1177,7 +1165,7 @@ static void scrambold_draw_bullets(running_machine &machine, bitmap_t *bitmap, c
 
 	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
 		/* yellow bullets */
-		*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
+		bitmap->pix16(y, x) = BULLETS_COLOR_BASE;
 }
 
 static void darkplnt_draw_bullets(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
@@ -1188,7 +1176,7 @@ static void darkplnt_draw_bullets(running_machine &machine, bitmap_t *bitmap, co
 	x = x - 6;
 
 	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-		*BITMAP_ADDR16(bitmap, y, x) = 32 + state->m_darkplnt_bullet_color;
+		bitmap->pix16(y, x) = 32 + state->m_darkplnt_bullet_color;
 }
 
 static void dambustr_draw_bullets(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
@@ -1213,7 +1201,7 @@ static void dambustr_draw_bullets(running_machine &machine, bitmap_t *bitmap, co
 		}
 
 		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-			*BITMAP_ADDR16(bitmap, y, x) = color;
+			bitmap->pix16(y, x) = color;
 	}
 }
 
@@ -1224,16 +1212,16 @@ static void dambustr_draw_bullets(running_machine &machine, bitmap_t *bitmap, co
 static void galaxold_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* plain black background */
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 }
 
 static void scrambold_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (state->m_background_enable)
-		bitmap_fill(bitmap,cliprect,BACKGROUND_COLOR_BASE);
+		bitmap->fill(BACKGROUND_COLOR_BASE, *cliprect);
 	else
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap->fill(0, *cliprect);
 }
 
 static void ad2083_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -1241,7 +1229,7 @@ static void ad2083_draw_background(running_machine &machine, bitmap_t *bitmap, c
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int color = (state->m_background_blue << 2) | (state->m_background_green << 1) | state->m_background_red;
 
-	bitmap_fill(bitmap,cliprect,BACKGROUND_COLOR_BASE + color);
+	bitmap->fill(BACKGROUND_COLOR_BASE + color, *cliprect);
 }
 
 static void stratgyx_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -1277,7 +1265,7 @@ static void stratgyx_draw_background(running_machine &machine, bitmap_t *bitmap,
 		else
 			sx = 8 * x;
 
-		plot_box(bitmap, sx, 0, 8, 256, base + color);
+		bitmap->plot_box(sx, 0, 8, 256, base + color);
 	}
 }
 
@@ -1291,15 +1279,15 @@ static void minefld_draw_background(running_machine &machine, bitmap_t *bitmap, 
 
 
 		for (x = 0; x < 128; x++)
-			plot_box(bitmap, x,       0, 1, 256, base + x);
+			bitmap->plot_box(x,       0, 1, 256, base + x);
 
 		for (x = 0; x < 120; x++)
-			plot_box(bitmap, x + 128, 0, 1, 256, base + x + 128);
+			bitmap->plot_box(x + 128, 0, 1, 256, base + x + 128);
 
-		plot_box(bitmap, 248, 0, 16, 256, base);
+		bitmap->plot_box(248, 0, 16, 256, base);
 	}
 	else
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap->fill(0, *cliprect);
 }
 
 static void rescue_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -1311,15 +1299,15 @@ static void rescue_draw_background(running_machine &machine, bitmap_t *bitmap, c
 		int x;
 
 		for (x = 0; x < 128; x++)
-			plot_box(bitmap, x,       0, 1, 256, base + x);
+			bitmap->plot_box(x,       0, 1, 256, base + x);
 
 		for (x = 0; x < 120; x++)
-			plot_box(bitmap, x + 128, 0, 1, 256, base + x + 8);
+			bitmap->plot_box(x + 128, 0, 1, 256, base + x + 8);
 
-		plot_box(bitmap, 248, 0, 16, 256, base);
+		bitmap->plot_box(248, 0, 16, 256, base);
 	}
 	else
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap->fill(0, *cliprect);
 }
 
 static void mariner_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -1347,7 +1335,7 @@ static void mariner_draw_background(running_machine &machine, bitmap_t *bitmap, 
 			else
 				color = prom[0x20 + x - 1];
 
-			plot_box(bitmap, 8 * (31 - x), 0, 8, 256, base + color);
+			bitmap->plot_box(8 * (31 - x), 0, 8, 256, base + color);
 		}
 	}
 	else
@@ -1361,7 +1349,7 @@ static void mariner_draw_background(running_machine &machine, bitmap_t *bitmap, 
 			else
 				color = prom[x + 1];
 
-			plot_box(bitmap, 8 * x, 0, 8, 256, base + color);
+			bitmap->plot_box(8 * x, 0, 8, 256, base + color);
 		}
 	}
 }
@@ -1375,13 +1363,13 @@ static void dambustr_draw_background(running_machine &machine, bitmap_t *bitmap,
 
 	if (flip_screen_x_get(machine))
 	{
-		plot_box(bitmap,   0, 0, 256-state->m_dambustr_bg_split_line, 256, col2);
-		plot_box(bitmap, 256-state->m_dambustr_bg_split_line, 0, state->m_dambustr_bg_split_line, 256, col1);
+		bitmap->plot_box(  0, 0, 256-state->m_dambustr_bg_split_line, 256, col2);
+		bitmap->plot_box(256-state->m_dambustr_bg_split_line, 0, state->m_dambustr_bg_split_line, 256, col1);
 	}
 	else
 	{
-		plot_box(bitmap,   0, 0, 256-state->m_dambustr_bg_split_line, 256, col1);
-		plot_box(bitmap, 256-state->m_dambustr_bg_split_line, 0, state->m_dambustr_bg_split_line, 256, col2);
+		bitmap->plot_box(  0, 0, 256-state->m_dambustr_bg_split_line, 256, col1);
+		bitmap->plot_box(256-state->m_dambustr_bg_split_line, 0, state->m_dambustr_bg_split_line, 256, col2);
 	}
 
 }
@@ -1495,7 +1483,7 @@ static void plot_star(galaxold_state *state, bitmap_t *bitmap, int x, int y, int
 		y = 255 - y;
 
 	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-		*BITMAP_ADDR16(bitmap, y, x) = state->m_stars_colors_start + color;
+		bitmap->pix16(y, x) = state->m_stars_colors_start + color;
 }
 
 static void noop_draw_stars(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -1746,6 +1734,9 @@ static void draw_bullets_common(running_machine &machine, bitmap_t *bitmap, cons
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, UINT8 *spriteram, size_t spriteram_size)
 {
+	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8,   30*8-1);
+	const rectangle spritevisibleareaflipx(0*8, 30*8-2, 2*8, 30*8-1);
+
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int offs;
 

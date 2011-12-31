@@ -1036,7 +1036,7 @@ static void hanamai_copylayer( running_machine &machine, bitmap_t *bitmap, const
 		for (dy = 0; dy < 256; dy++)
 		{
 			UINT16 *dst;
-			UINT16 *dstbase = BITMAP_ADDR16(bitmap, (dy - scrolly) & 0xff, 0);
+			UINT16 *dstbase = &bitmap->pix16((dy - scrolly) & 0xff);
 
 			length = scrollx;
 			dst = dstbase + 2 * (256 - length);
@@ -1104,7 +1104,7 @@ static void jantouki_copylayer( running_machine &machine, bitmap_t *bitmap, cons
 		{
 			int sy = ((dy - scrolly) & 0xff) + y;
 			UINT16 *dst;
-			UINT16 *dstbase = BITMAP_ADDR16(bitmap, sy, 0);
+			UINT16 *dstbase = &bitmap->pix16(sy);
 
 			if ((sy < cliprect->min_y) || (sy > cliprect->max_y))
 			{
@@ -1166,7 +1166,7 @@ static void mjdialq2_copylayer( running_machine &machine, bitmap_t *bitmap, cons
 		for (dy = 0; dy < 256; dy++)
 		{
 			UINT16 *dst;
-			UINT16 *dstbase = BITMAP_ADDR16(bitmap, (dy - scrolly) & 0xff, 0);
+			UINT16 *dstbase = &bitmap->pix16((dy - scrolly) & 0xff);
 
 			length = scrollx;
 			dst = dstbase + 256 - length;
@@ -1255,7 +1255,7 @@ static int debug_viewer( running_machine &machine, bitmap_t *bitmap, const recta
 		state->m_blit_palettes = (c & 0xf) * 0x111;
 		state->m_blit_palbank  = (c >>  4) & 1;
 
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 		memset(state->m_pixmap[0][0], 0, sizeof(UINT8) * 0x100 * 0x100);
 
 		if (state->m_layer_layout != LAYOUT_MJDIALQ2)
@@ -1289,7 +1289,7 @@ SCREEN_UPDATE( hanamai )
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
+	bitmap->fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, *cliprect);
 
 	/* bit 4 = display enable? */
 	if (!(state->m_hanamai_priority & 0x10))
@@ -1326,7 +1326,7 @@ SCREEN_UPDATE( hnoridur )
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 0x0f) * 256);
+	bitmap->fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 0x0f) * 256, *cliprect);
 
 	pri = state->m_hanamai_priority >> 4;
 
@@ -1361,7 +1361,7 @@ SCREEN_UPDATE( sprtmtch )
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
+	bitmap->fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, *cliprect);
 
 	if (BIT(layers_ctrl, 0))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 0);
 	if (BIT(layers_ctrl, 1))   hanamai_copylayer(screen.machine(), bitmap, cliprect, 1);
@@ -1379,7 +1379,7 @@ SCREEN_UPDATE( jantouki_top )
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
+	bitmap->fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, *cliprect);
 
 //  if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 3, 0);
 	if (BIT(layers_ctrl, 1))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 2, 0);
@@ -1398,7 +1398,7 @@ SCREEN_UPDATE( jantouki_bottom )
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
+	bitmap->fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, *cliprect);
 
 	if (BIT(layers_ctrl, 0))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 3, 0);
 	if (BIT(layers_ctrl, 4))   jantouki_copylayer(screen.machine(), bitmap, cliprect, 7, 0);
@@ -1419,7 +1419,7 @@ SCREEN_UPDATE( mjdialq2 )
 
 	layers_ctrl &= debug_mask(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, (state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256);
+	bitmap->fill((state->m_blit_backpen & 0xff) + (state->m_blit_palbank & 1) * 256, *cliprect);
 
 	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(screen.machine(), bitmap, cliprect, 0);
 	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(screen.machine(), bitmap, cliprect, 1);
@@ -1443,12 +1443,12 @@ SCREEN_UPDATE(htengoku)
 	// format and let SCREEN_UPDATE(ddenlovr) do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 		hanamai_copylayer(screen.machine(), bitmap, cliprect, layer);
 
 		for (y = 0; y < 256; y++)
 			for (x = 0; x < 512; x++)
-				state->m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (UINT8)(*BITMAP_ADDR16(bitmap, y, x));
+				state->m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (UINT8)(bitmap->pix16(y, x));
 	}
 
 	return SCREEN_UPDATE_CALL(ddenlovr);

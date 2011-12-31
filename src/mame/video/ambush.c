@@ -92,7 +92,7 @@ SCREEN_UPDATE( ambush )
 	ambush_state *state = screen.machine().driver_data<ambush_state>();
 	int offs;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	/* Draw the characters */
 	draw_chars(screen.machine(), bitmap, cliprect, 0x00);

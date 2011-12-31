@@ -250,9 +250,9 @@ static void draw_bitmap( running_machine &machine, bitmap_t *bitmap, const recta
 
 			if (color)
 			{
-				pen_t pen = *BITMAP_ADDR16(bitmap, y, x);
+				pen_t pen = bitmap->pix16(y, x);
 				pen |= color;
-				*BITMAP_ADDR16(bitmap, y, x) = pen;
+				bitmap->pix16(y, x) = pen;
 			}
 		}
 	}

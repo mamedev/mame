@@ -49,7 +49,7 @@ SCREEN_UPDATE( truco )
 			else
 				pixel = ( vid[x>>1] >> 4 ) & 0x0f;
 
-			*BITMAP_ADDR16(bitmap, y, x) = pixel;
+			bitmap->pix16(y, x) = pixel;
 		}
 
 		vid += 0x80;

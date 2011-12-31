@@ -131,12 +131,12 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_t *
 			/* draw the current pixel, but check collision first */
 			if (bit)
 			{
-				if (*BITMAP_ADDR16(bitmap, sy, sx) & 0x01)
+				if (bitmap->pix16(sy, sx) & 0x01)
 					/* compute the collision address -- the +1 is via observation
                        of the game code, probably wrong for cocktail mode */
 					state->m_collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
 
-				*BITMAP_ADDR16(bitmap, sy, sx) = (color << 1) | 1;
+				bitmap->pix16(sy, sx) = (color << 1) | 1;
 			}
 
 			sx = sx + 1;

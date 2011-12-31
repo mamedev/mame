@@ -125,8 +125,8 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 	clip.min_y = 0;
 	clip.max_y = 239;
 
-	bitmap_fill(state->m_sprites_bitmap_pri,&clip,0);
-	bitmap_fill(state->m_sprites_bitmap,&clip,0);
+	state->m_sprites_bitmap_pri->fill(0, clip);
+	state->m_sprites_bitmap->fill(0, clip);
 
 	// toggle spriterams location in the memory map
 	state->m_spriteram_bit ^= 1;
@@ -333,8 +333,8 @@ static void draw_single_sprite(bitmap_t *dest_bmp,const rectangle *clip,const gf
 			for( y=sy; y<ey; y++ )
 			{
 				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(state->m_sprites_bitmap_pri, y, 0);
+				UINT16 *dest = &dest_bmp->pix16(y);
+				UINT8 *pri = &state->m_sprites_bitmap_pri->pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -424,10 +424,10 @@ static void copy_sprites(running_machine &machine, bitmap_t *bitmap, bitmap_t *s
 	int y;
 	for( y=cliprect->min_y; y<=cliprect->max_y; y++ )
 	{
-		UINT16 *source = BITMAP_ADDR16(sprites_bitmap, y, 0);
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-		UINT8 *dest_pri = BITMAP_ADDR8(priority_bitmap, y, 0);
-		UINT8 *source_pri = BITMAP_ADDR8(state->m_sprites_bitmap_pri, y, 0);
+		UINT16 *source = &sprites_bitmap->pix16(y);
+		UINT16 *dest = &bitmap->pix16(y);
+		UINT8 *dest_pri = &priority_bitmap->pix8(y);
+		UINT8 *source_pri = &state->m_sprites_bitmap_pri->pix8(y);
 
 		int x;
 		for( x=cliprect->min_x; x<=cliprect->max_x; x++ )
@@ -460,7 +460,7 @@ static SCREEN_UPDATE( limenko )
 	limenko_state *state = screen.machine().driver_data<limenko_state>();
 	// state->m_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_set_enable(state->m_bg_tilemap, state->m_videoreg[0] & 4);
 	tilemap_set_enable(state->m_md_tilemap, state->m_videoreg[0] & 2);

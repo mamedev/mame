@@ -87,7 +87,7 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 				    continue;
 			    }
 
-        	    Checksum += *BITMAP_ADDR16(state->m_spritebitmap, y, x);
+        	    Checksum += state->m_spritebitmap->pix16(y, x);
             }
 	    }
 
@@ -113,7 +113,7 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 				    continue;
 			    }
 
-        	    Checksum -= *BITMAP_ADDR16(state->m_spritebitmap, y, x);
+        	    Checksum -= state->m_spritebitmap->pix16(y, x);
             }
 	    }
 
@@ -202,7 +202,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap)
 				        continue;
 			        }
 
-        	        if (*BITMAP_ADDR16(bitmap, y, x) != *BITMAP_ADDR16(machine.generic.tmpbitmap, y, x))
+        	        if (bitmap->pix16(y, x) != machine.generic.tmpbitmap->pix16(y, x))
         	        {
                     	state->m_CollisionBackground = 0x80;
 				        break;

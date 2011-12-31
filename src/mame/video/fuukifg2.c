@@ -337,8 +337,8 @@ SCREEN_UPDATE( fuuki16 )
 //  fuuki16_draw_layer(screen.machine(), bitmap, cliprect, tm_back, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Actually, bg colour is simply the last pen i.e. 0x1fff -pjp */
-	bitmap_fill(bitmap, cliprect, (0x800 * 4) - 1);
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	bitmap->fill((0x800 * 4) - 1, *cliprect);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	fuuki16_draw_layer(screen.machine(), bitmap, cliprect, tm_back,   0, 1);
 	fuuki16_draw_layer(screen.machine(), bitmap, cliprect, tm_middle, 0, 2);

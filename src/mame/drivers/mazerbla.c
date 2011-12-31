@@ -185,7 +185,7 @@ SCREEN_UPDATE( test_vcu )
 	if (state->m_game_id == GREATGUN)
 		color_base = 0x00;
 
-	bitmap_fill(bitmap, NULL, 0);
+	bitmap->fill(0);
 //  logerror("-->frame\n");
 
 	if (planes_enabled[3])
@@ -194,17 +194,17 @@ SCREEN_UPDATE( test_vcu )
 	if (planes_enabled[2])
 		copybitmap_trans(bitmap, state->m_tmpbitmaps[2], 0, 0, 0, 0,cliprect, color_base);
 
-	bitmap_fill(state->m_tmpbitmaps[2], NULL, color_base);
+	state->m_tmpbitmaps[2]->fill(color_base);
 
 	if (planes_enabled[1])
 		copybitmap_trans(bitmap, state->m_tmpbitmaps[1], 0, 0, 0, 0,cliprect, color_base);
 
-	bitmap_fill(state->m_tmpbitmaps[1], NULL, color_base);
+	state->m_tmpbitmaps[1]->fill(color_base);
 
 	if (planes_enabled[0])
 		copybitmap_trans(bitmap, state->m_tmpbitmaps[0], 0, 0, 0, 0,cliprect, color_base);
 
-	bitmap_fill(state->m_tmpbitmaps[0], NULL, color_base);
+	state->m_tmpbitmaps[0]->fill(color_base);
 
 	if (screen.machine().input().code_pressed_once(KEYCODE_1))	/* plane 1 */
 		planes_enabled[0] ^= 1;
@@ -281,7 +281,7 @@ static SCREEN_UPDATE( mazerbla )
 //  if (state->m_game_id == GREATGUN)
 //      color_base = 0x00;
 
-	//  bitmap_fill(bitmap, NULL, 0);
+	//  bitmap->fill(0);
 
 	copybitmap(bitmap, state->m_tmpbitmaps[3], 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, state->m_tmpbitmaps[2], 0, 0, 0, 0, cliprect, 0);
@@ -464,7 +464,7 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 					}
 
 					if (((state->m_xpos + x) < 256) && ((state->m_ypos + y) < 256) )
-						*BITMAP_ADDR16(state->m_tmpbitmaps[state->m_plane], state->m_ypos + y, state->m_xpos + x) = col;
+						state->m_tmpbitmaps[state->m_plane]->pix16(state->m_ypos + y, state->m_xpos + x) = col;
 
 					bits += 2;
 				}
@@ -493,7 +493,7 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 					/* color = 4 MSB = front PEN, 4 LSB = background PEN */
 
 					if (((state->m_xpos + x) < 256) && ((state->m_ypos + y) < 256))
-						*BITMAP_ADDR16(state->m_tmpbitmaps[state->m_plane], state->m_ypos + y, state->m_xpos + x) = data ? color_base | ((state->m_color1 & 0xf0) >> 4): color_base | ((state->m_color1 & 0x0f));
+						state->m_tmpbitmaps[state->m_plane]->pix16(state->m_ypos + y, state->m_xpos + x) = data ? color_base | ((state->m_color1 & 0xf0) >> 4): color_base | ((state->m_color1 & 0x0f));
 
 					bits += 1;
 				}
@@ -521,7 +521,7 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 					col = color_base | data;
 
 					if (((state->m_xpos + x) < 256) && ((state->m_ypos + y) < 256))
-						*BITMAP_ADDR16(state->m_tmpbitmaps[state->m_plane], state->m_ypos + y, state->m_xpos + x) = col;
+						state->m_tmpbitmaps[state->m_plane]->pix16(state->m_ypos + y, state->m_xpos + x) = col;
 
 					bits += 4;
 				}
@@ -622,7 +622,7 @@ static READ8_HANDLER( vcu_set_clr_addr_r )
 					}
 
 					if (((state->m_xpos + x) < 256) && ((state->m_ypos + y) < 256))
-						*BITMAP_ADDR16(state->m_tmpbitmaps[state->m_plane], state->m_ypos + y, state->m_xpos + x) = col;
+						state->m_tmpbitmaps[state->m_plane]->pix16(state->m_ypos + y, state->m_xpos + x) = col;
 
 						bits += 2;
 				}

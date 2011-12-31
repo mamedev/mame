@@ -138,7 +138,7 @@ SCREEN_UPDATE( alpha68k_II )
 	state->m_last_bank = state->m_bank_base;
 	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	bitmap_fill(bitmap, cliprect, 2047);
+	bitmap->fill(2047, *cliprect);
 //AT
 	draw_sprites(screen.machine(), bitmap, cliprect, 0, 0x07c0, 0x0800);
 	draw_sprites(screen.machine(), bitmap, cliprect, 1, 0x0000, 0x0800);
@@ -286,7 +286,7 @@ SCREEN_UPDATE( alpha68k_V )
 	state->m_last_bank = state->m_bank_base;
 	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	bitmap_fill(bitmap, cliprect, 4095);
+	bitmap->fill(4095, *cliprect);
 
 	/* This appears to be correct priority */
 	if (state->m_microcontroller_id == 0x8814) /* Sky Adventure */
@@ -326,7 +326,7 @@ SCREEN_UPDATE( alpha68k_V_sb )
 	state->m_last_bank = state->m_bank_base;
 	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	bitmap_fill(bitmap, cliprect, 4095);
+	bitmap->fill(4095, *cliprect);
 
 	/* This appears to be correct priority */
 	draw_sprites_V(screen.machine(), bitmap, cliprect, 0, 0x07c0, 0x0800, 0x4000, 0x8000, 0x3fff);
@@ -373,7 +373,7 @@ SCREEN_UPDATE( alpha68k_I )
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 	int yshift = (state->m_microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	/* This appears to be correct priority */
 	draw_sprites_I(screen.machine(), bitmap, cliprect, 2, 0x0800, yshift);
@@ -505,7 +505,7 @@ SCREEN_UPDATE( kyros )
 {
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 	colortable_entry_set_value(screen.machine().colortable, 0x100, *state->m_videoram & 0xff);
-	bitmap_fill(bitmap, cliprect, 0x100); //AT
+	bitmap->fill(0x100, *cliprect); //AT
 
 	kyros_draw_sprites(screen.machine(), bitmap, cliprect, 2, 0x0800);
 	kyros_draw_sprites(screen.machine(), bitmap, cliprect, 3, 0x0c00);
@@ -565,7 +565,7 @@ SCREEN_UPDATE( sstingry )
 {
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 	colortable_entry_set_value(screen.machine().colortable, 0x100, *state->m_videoram & 0xff);
-	bitmap_fill(bitmap, cliprect, 0x100); //AT
+	bitmap->fill(0x100, *cliprect); //AT
 
 	sstingry_draw_sprites(screen.machine(), bitmap, cliprect, 2, 0x0800);
 	sstingry_draw_sprites(screen.machine(), bitmap, cliprect, 3, 0x0c00);

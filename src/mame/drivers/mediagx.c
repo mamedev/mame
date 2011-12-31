@@ -212,7 +212,7 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 
 	for (j=y; j < y+8; j++)
 	{
-		UINT32 *p = BITMAP_ADDR32(bitmap, j, 0);
+		UINT32 *p = &bitmap->pix32(j);
 		for (i=x; i < x+8; i++)
 		{
 			UINT8 pen = dp[index++];
@@ -264,7 +264,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_t *bitmap, const r
 
 		for (j=0; j < state->m_frame_height; j++)
 		{
-			UINT32 *p = BITMAP_ADDR32(bitmap, j, 0);
+			UINT32 *p = &bitmap->pix32(j);
 			UINT8 *si = &framebuf[j * line_delta];
 			for (i=0; i < state->m_frame_width; i++)
 			{
@@ -286,7 +286,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_t *bitmap, const r
 		{
 			for (j=0; j < state->m_frame_height; j++)
 			{
-				UINT32 *p = BITMAP_ADDR32(bitmap, j, 0);
+				UINT32 *p = &bitmap->pix32(j);
 				UINT16 *si = &framebuf[j * (line_delta/2)];
 				for (i=0; i < state->m_frame_width; i++)
 				{
@@ -304,7 +304,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_t *bitmap, const r
 		{
 			for (j=0; j < state->m_frame_height; j++)
 			{
-				UINT32 *p = BITMAP_ADDR32(bitmap, j, 0);
+				UINT32 *p = &bitmap->pix32(j);
 				UINT16 *si = &framebuf[j * (line_delta/2)];
 				for (i=0; i < state->m_frame_width; i++)
 				{
@@ -347,7 +347,7 @@ static void draw_cga(running_machine &machine, bitmap_t *bitmap, const rectangle
 static SCREEN_UPDATE(mediagx)
 {
 	mediagx_state *state = screen.machine().driver_data<mediagx_state>();
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	draw_framebuffer(screen.machine(), bitmap, cliprect);
 

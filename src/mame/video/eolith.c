@@ -47,7 +47,7 @@ SCREEN_UPDATE( eolith )
 	{
 		int x;
 		UINT32 *src = &state->m_vram[(state->m_buffer ? 0 : 0x10000) | (y * (336 / 2))];
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
 
 		for (x = 0; x < 320; x += 2)
 		{

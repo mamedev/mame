@@ -15,8 +15,8 @@ WRITE16_HANDLER( hitice_pixelram_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 15 of pixel_scroll[0] is probably flip screen */
-		*BITMAP_ADDR16(state->m_pixel_bitmap, sy, 2 * sx + 0) = state->m_b_fg_color_base * 16 + (data & 0xff);
-		*BITMAP_ADDR16(state->m_pixel_bitmap, sy, 2 * sx + 1) = state->m_b_fg_color_base * 16 + (data & 0xff);
+		state->m_pixel_bitmap->pix16(sy, 2 * sx + 0) = state->m_b_fg_color_base * 16 + (data & 0xff);
+		state->m_pixel_bitmap->pix16(sy, 2 * sx + 1) = state->m_b_fg_color_base * 16 + (data & 0xff);
 	}
 }
 
@@ -125,7 +125,7 @@ READ16_HANDLER( tc0180vcu_framebuffer_word_r )
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
 
-	return (*BITMAP_ADDR16(state->m_framebuffer[sy >> 8], sy & 0xff, sx + 0) << 8) | *BITMAP_ADDR16(state->m_framebuffer[sy >> 8], sy & 0xff, sx + 1);
+	return (state->m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) << 8) | state->m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1);
 }
 
 WRITE16_HANDLER( tc0180vcu_framebuffer_word_w )
@@ -135,9 +135,9 @@ WRITE16_HANDLER( tc0180vcu_framebuffer_word_w )
 	int sx = 2 * (offset & 0xff);
 
 	if (ACCESSING_BITS_8_15)
-		*BITMAP_ADDR16(state->m_framebuffer[sy >> 8], sy & 0xff, sx + 0) = data >> 8;
+		state->m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) = data >> 8;
 	if (ACCESSING_BITS_0_7)
-		*BITMAP_ADDR16(state->m_framebuffer[sy >> 8], sy & 0xff, sx + 1) = data & 0xff;
+		state->m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1) = data & 0xff;
 }
 
 
@@ -295,10 +295,10 @@ g_profiler.start(PROFILER_USER1);
 			/*popmessage("1. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
 			for (y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				UINT16 *src = BITMAP_ADDR16(state->m_framebuffer[framebuffer_page], y, myclip.min_x);
+				UINT16 *src = &state->m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
 				UINT16 *dst;
 
-				dst = BITMAP_ADDR16(bitmap, bitmap->height-1-y, myclip.max_x);
+				dst = &bitmap->pix16(bitmap->height()-1-y, myclip.max_x);
 
 				for (x = myclip.min_x; x <= myclip.max_x; x++)
 				{
@@ -315,8 +315,8 @@ g_profiler.start(PROFILER_USER1);
 		{
 			for (y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				UINT16 *src = BITMAP_ADDR16(state->m_framebuffer[framebuffer_page], y, myclip.min_x);
-				UINT16 *dst = BITMAP_ADDR16(bitmap, y, myclip.min_x);
+				UINT16 *src = &state->m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
+				UINT16 *dst = &bitmap->pix16(y, myclip.min_x);
 
 				for (x = myclip.min_x; x <= myclip.max_x; x++)
 				{
@@ -337,10 +337,10 @@ g_profiler.start(PROFILER_USER1);
 			/*popmessage("3. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
 			for (y = myclip.min_y ;y <= myclip.max_y; y++)
 			{
-				UINT16 *src = BITMAP_ADDR16(state->m_framebuffer[framebuffer_page], y, myclip.min_x);
+				UINT16 *src = &state->m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
 				UINT16 *dst;
 
-				dst = BITMAP_ADDR16(bitmap, bitmap->height-1-y, myclip.max_x);
+				dst = &bitmap->pix16(bitmap->height()-1-y, myclip.max_x);
 
 				for (x = myclip.min_x; x <= myclip.max_x; x++)
 				{
@@ -357,8 +357,8 @@ g_profiler.start(PROFILER_USER1);
 	    {
 	        for (y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				UINT16 *src = BITMAP_ADDR16(state->m_framebuffer[framebuffer_page], y, myclip.min_x);
-				UINT16 *dst = BITMAP_ADDR16(bitmap, y, myclip.min_x);
+				UINT16 *src = &state->m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
+				UINT16 *dst = &bitmap->pix16(y, myclip.min_x);
 
 				for (x = myclip.min_x; x <= myclip.max_x; x++)
 				{
@@ -382,7 +382,7 @@ SCREEN_UPDATE( taitob )
 
 	if ((video_control & 0x20) == 0)
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 		return 0;
 	}
 
@@ -421,7 +421,7 @@ SCREEN_UPDATE( realpunc )
 	/* Video blanked? */
 	if (!(video_control & 0x20))
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 		return 0;
 	}
 
@@ -438,7 +438,7 @@ SCREEN_UPDATE( realpunc )
 	/* Copy the intermediate bitmap to the output bitmap, applying the palette */
 	for (y = 0; y <= cliprect->max_y; y++)
 		for (x = 0; x <= cliprect->max_x; x++)
-			*BITMAP_ADDR32(bitmap, y, x) = palette[*BITMAP_ADDR16(state->m_realpunc_bitmap, y, x)];
+			bitmap->pix32(y, x) = palette[state->m_realpunc_bitmap->pix16(y, x)];
 
 	/* Draw the 15bpp raw CRTC frame buffer directly to the output bitmap */
 	if (state->m_realpunc_video_ctrl & 0x0002)
@@ -464,7 +464,7 @@ SCREEN_UPDATE( realpunc )
 				b = (BIT(srcpix, 3)) | ((srcpix >> 3) & 0x1e);
 
 				if (srcpix)
-					*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+					bitmap->pix32(y, x) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 			}
 
 			addr += stride;
@@ -476,12 +476,12 @@ SCREEN_UPDATE( realpunc )
 		for (y = 0; y <= cliprect->max_y; y++)
 		{
 			for (x = 0; x <= cliprect->max_x; x++)
-				*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0x00, 0x00, 0x00);
+				bitmap->pix32(y, x) = MAKE_RGB(0x00, 0x00, 0x00);
 		}
 	}
 
 	/* Clear the indexed bitmap and draw the final indexed layers */
-	bitmap_fill(state->m_realpunc_bitmap, cliprect, 0);
+	state->m_realpunc_bitmap->fill(0, *cliprect);
 
 	if (!(state->m_realpunc_video_ctrl & 0x0001))
 		draw_framebuffer(screen.machine(), state->m_realpunc_bitmap, cliprect, 0);
@@ -493,8 +493,8 @@ SCREEN_UPDATE( realpunc )
 	{
 		for (x = 0; x <= cliprect->max_x; x++)
 		{
-			if (*BITMAP_ADDR16(state->m_realpunc_bitmap, y, x))
-				*BITMAP_ADDR32(bitmap, y, x) = palette[*BITMAP_ADDR16(state->m_realpunc_bitmap, y, x)];
+			if (state->m_realpunc_bitmap->pix16(y, x))
+				bitmap->pix32(y, x) = palette[state->m_realpunc_bitmap->pix16(y, x)];
 		}
 	}
 
@@ -510,7 +510,7 @@ SCREEN_EOF( taitob )
 	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->m_tc0180vcu, 0);
 
 	if (~video_control & 0x01)
-		bitmap_fill(state->m_framebuffer[framebuffer_page], &screen.machine().primary_screen->visible_area(), 0);
+		state->m_framebuffer[framebuffer_page]->fill(0, screen.machine().primary_screen->visible_area());
 
 	if (~video_control & 0x80)
 	{

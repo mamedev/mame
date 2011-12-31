@@ -402,7 +402,7 @@ void atarimo_init(running_machine &machine, int map, const atarimo_desc *desc)
 
 	/* allocate the temp bitmap */
 	mo->bitmap        = auto_bitmap_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height(), BITMAP_FORMAT_INDEXED16);
-	bitmap_fill(mo->bitmap, NULL, desc->transpen);
+	mo->bitmap->fill(desc->transpen);
 
 	/* allocate the spriteram */
 	mo->spriteram = auto_alloc_array_clear(machine, atarimo_entry, mo->spriteramsize);
@@ -693,7 +693,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 			bandclip.max_y = bandclip.min_y + (1 << mo->slipshift) - 1;
 
 			/* keep within the cliprect */
-			sect_rect(&bandclip, cliprect);
+			bandclip &= *cliprect;
 		}
 
 		/* if this matches the last link, we don't need to re-process the list */
@@ -726,7 +726,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 
 	/* clip the rectlist */
 	for (i = 0, rect = rectlist->rect; i < rectlist->numrects; i++, rect++)
-		sect_rect(rect, cliprect);
+		*rect &= *cliprect;
 
 	/* return the bitmap */
 	return mo->bitmap;
@@ -1148,7 +1148,7 @@ void atarimo_mark_high_palette(bitmap_t *bitmap, UINT16 *pf, UINT16 *mo, int x, 
 	#define END_MARKER		((4 << ATARIMO_PRIORITY_SHIFT) | 4)
 	int offnext = 0;
 
-	for ( ; x < bitmap->width; x++)
+	for ( ; x < bitmap->width(); x++)
 	{
 		pf[x] |= 0x400;
 		if (offnext && (mo[x] & START_MARKER) != START_MARKER)

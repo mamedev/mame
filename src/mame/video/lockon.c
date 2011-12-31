@@ -213,7 +213,7 @@ static void scene_draw( running_machine &machine )
 			d2 = *(gfx3 + tileidx);
 		}
 
-		bmpaddr = BITMAP_ADDR16(state->m_back_buffer, y, 0);
+		bmpaddr = &state->m_back_buffer->pix16(y);
 
 		for (x = 0; x < FRAMEBUFFER_MAX_X; ++x)
 		{
@@ -324,7 +324,7 @@ static void ground_draw( running_machine &machine )
 	/* TODO: Clean up and emulate CS of GFX ROMs? */
 	for (y = 0; y < FRAMEBUFFER_MAX_Y; ++y)
 	{
-		UINT16 *bmpaddr = BITMAP_ADDR16(state->m_back_buffer, y, 0);
+		UINT16 *bmpaddr = &state->m_back_buffer->pix16(y);
 		UINT8 ls163;
 		UINT32 clut_addr;
 		UINT32 gfx_addr;
@@ -491,7 +491,7 @@ static void objects_draw( running_machine &machine )
 			UINT32 tile;
 			UINT8	cnt;
 			UINT32 yidx;
-			UINT16 *line = BITMAP_ADDR16(state->m_back_buffer, y, 0);
+			UINT16 *line = &state->m_back_buffer->pix16(y);
 			UINT32 px = xpos;
 
 			/* Outside the limits? */
@@ -725,7 +725,7 @@ static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const recta
 	for (y = 0; y <= cliprect->max_y; ++y)
 	{
 		UINT32 carry;
-		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dst = &bitmap->pix16(y);
 		UINT32 x;
 
 		UINT32 cx = cxy;
@@ -739,7 +739,7 @@ static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const recta
 			cx &= 0x1ff;
 			cy &= 0x1ff;
 
-			*dst++ = *BITMAP_ADDR16(state->m_front_buffer, cy, cx);
+			*dst++ = state->m_front_buffer->pix16(cy, cx);
 
 			if (axx_en)
 				INCREMENT(axx, cx);
@@ -885,7 +885,7 @@ static void hud_draw( running_machine &machine, bitmap_t *bitmap, const rectangl
 
 					if (x <= cliprect->max_x)
 					{
-						UINT16 *dst = BITMAP_ADDR16(bitmap, y, x);
+						UINT16 *dst = &bitmap->pix16(y, x);
 
 						if (BIT(gfx_strip, px ^ 7) && *dst > 255)
 							*dst = colour;
@@ -936,7 +936,7 @@ SCREEN_UPDATE( lockon )
 	/* If screen output is disabled, fill with black */
 	if (!BIT(state->m_ctrl_reg, 7))
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 		return 0;
 	}
 

@@ -99,7 +99,7 @@ static void pdrawgfx_transpen_additive(bitmap_t *dest, const rectangle *cliprect
 	const pen_t *paldata;
 
 	assert(dest != NULL);
-	assert(dest->bpp == 32);
+	assert(dest->bpp() == 32);
 	assert(gfx != NULL);
 
 	/* get final code and color, and grab lookup tables */
@@ -141,7 +141,7 @@ static void pdrawgfxzoom_transpen_additive(bitmap_t *dest, const rectangle *clip
 	}
 
 	assert(dest != NULL);
-	assert(dest->bpp == 32);
+	assert(dest->bpp() == 32);
 	assert(gfx != NULL);
 
 	/* get final code and color, and grab lookup tables */
@@ -459,7 +459,7 @@ static void transition_control(running_machine &machine, bitmap_t *bitmap, const
 		{
 			for (j = cliprect->min_y; j < cliprect->max_y; j++)
 			{
-				UINT32* thePixel = BITMAP_ADDR32(bitmap, j, i);
+				UINT32* thePixel = &bitmap->pix32(j, i);
 
 				finR = (INT32)RGB_RED(*thePixel);
 				finG = (INT32)RGB_GREEN(*thePixel);
@@ -719,11 +719,7 @@ static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tm
 
 	/* otherwise, make one up */
 	else
-	{
-		blit->cliprect.min_x = blit->cliprect.min_y = 0;
-		blit->cliprect.max_x = dest->width - 1;
-		blit->cliprect.max_y = dest->height - 1;
-	}
+		blit->cliprect = dest->cliprect();
 
 	/* set the priority code and alpha */
 	//blit->tilemap_priority_code = priority | (priority_mask << 8) | (tmap->palette_offset << 16); // fixit
@@ -798,10 +794,10 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 	bitmap_t *destbitmap = blit->bitmap;
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
 	bitmap_t *flagsmap = tilemap_get_flagsmap(tmap);
-	const int xmask = srcbitmap->width-1;
-	const int ymask = srcbitmap->height-1;
-	const int widthshifted = srcbitmap->width << 16;
-	const int heightshifted = srcbitmap->height << 16;
+	const int xmask = srcbitmap->width()-1;
+	const int ymask = srcbitmap->height()-1;
+	const int widthshifted = srcbitmap->width() << 16;
+	const int heightshifted = srcbitmap->height() << 16;
 	UINT32 priority = blit->tilemap_priority_code;
 	UINT8 mask = blit->mask;
 	UINT8 value = blit->value;
@@ -817,7 +813,7 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 	UINT8 *pri;
 	const UINT16 *src;
 	const UINT8 *maskptr;
-	int destadvance = destbitmap->bpp / 8;
+	int destadvance = destbitmap->bpp() / 8;
 
 	/* pre-advance based on the cliprect */
 	startx += blit->cliprect.min_x * incxx + blit->cliprect.min_y * incyx;
@@ -855,10 +851,10 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 				cy = starty >> 16;
 
 				/* get source and priority pointers */
-				pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
-				src = BITMAP_ADDR16(srcbitmap, cy, 0);
-				maskptr = BITMAP_ADDR8(flagsmap, cy, 0);
-				dest = (UINT8 *)destbitmap->base + (destbitmap->rowpixels * sy + sx) * destadvance;
+				pri = &priority_bitmap->pix8(sy, sx);
+				src = &srcbitmap->pix16(cy);
+				maskptr = &flagsmap->pix8(cy);
+				dest = &destbitmap->pix8(sy * destadvance, sx * destadvance);
 
 				/* loop over columns */
 				while (x <= ex && cx < widthshifted)
@@ -896,16 +892,16 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 			cy = starty;
 
 			/* get dest and priority pointers */
-			dest = (UINT8 *)destbitmap->base + (destbitmap->rowpixels * sy + sx) * destadvance;
-			pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
+			dest = &destbitmap->pix8(sy * destadvance, sx * destadvance);
+			pri = &priority_bitmap->pix8(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
 			{
 				/* plot if we match the mask */
-				if ((*BITMAP_ADDR8(flagsmap, (cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
+				if ((flagsmap->pix8((cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
 				{
-					HNG64_ROZ_PLOT_PIXEL(*BITMAP_ADDR16(srcbitmap, (cy >> 16) & ymask, (cx >> 16) & xmask));
+					HNG64_ROZ_PLOT_PIXEL(srcbitmap->pix16((cy >> 16) & ymask, (cx >> 16) & xmask));
 					*pri = (*pri & (priority >> 8)) | priority;
 				}
 
@@ -936,17 +932,17 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 			cy = starty;
 
 			/* get dest and priority pointers */
-			dest = (UINT8 *)destbitmap->base + (destbitmap->rowpixels * sy + sx) * destadvance;
-			pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
+			dest = &destbitmap->pix8(sy * destadvance, sx * destadvance);
+			pri = &priority_bitmap->pix8(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
 			{
 				/* plot if we're within the bitmap and we match the mask */
 				if (cx < widthshifted && cy < heightshifted)
-					if ((*BITMAP_ADDR8(flagsmap, cy >> 16, cx >> 16) & mask) == value)
+					if ((flagsmap->pix8(cy >> 16, cx >> 16) & mask) == value)
 					{
-						HNG64_ROZ_PLOT_PIXEL(*BITMAP_ADDR16(srcbitmap, cy >> 16, cx >> 16));
+						HNG64_ROZ_PLOT_PIXEL(srcbitmap->pix16(cy >> 16, cx >> 16));
 						*pri = (*pri & (priority >> 8)) | priority;
 					}
 
@@ -1241,8 +1237,8 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 			if (MAKE_MAME_REEEEAAALLLL_SLOW)
 			{
 				bitmap_t *bm = tilemap_get_pixmap(tilemap);
-				int bmheight = bm->height;
-				int bmwidth = bm->width;
+				int bmheight = bm->height();
+				int bmwidth = bm->width();
 				const pen_t *paldata = machine.pens;
 				UINT32* dstptr;
 				UINT16* srcptr;
@@ -1256,7 +1252,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 				for (yy=0;yy<448;yy++)
 				{
 
-					dstptr = BITMAP_ADDR32(bitmap,yy,0);
+					dstptr = &bitmap->pix32(yy);
 
 					tmp = xtopleft;
 					tmp2 = ytopleft;
@@ -1267,7 +1263,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 						int realsrcy = (ytopleft>>16)&(bmheight-1);
 						UINT16 pen;
 
-						srcptr = BITMAP_ADDR16(bm, realsrcy, 0);
+						srcptr = &bm->pix16(realsrcy);
 
 						pen = srcptr[realsrcx];
 
@@ -1339,8 +1335,8 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 			if (MAKE_MAME_REEEEAAALLLL_SLOW)
 			{
 				bitmap_t *bm = tilemap_get_pixmap(tilemap);
-				int bmheight = bm->height;
-				int bmwidth = bm->width;
+				int bmheight = bm->height();
+				int bmwidth = bm->width();
 				const pen_t *paldata = machine.pens;
 				UINT32* dstptr;
 				UINT16* srcptr;
@@ -1354,8 +1350,8 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 				{
 					int realsrcy = (ytopleft>>16)&(bmheight-1);
 
-					dstptr = BITMAP_ADDR32(bitmap,yy,0);
-					srcptr = BITMAP_ADDR16(bm, realsrcy, 0);
+					dstptr = &bitmap->pix32(yy);
+					srcptr = &bm->pix16(realsrcy);
 
 					xtopleft = tmp;
 
@@ -1468,8 +1464,8 @@ SCREEN_UPDATE( hng64 )
 	}
 #endif
 
-	bitmap_fill(bitmap, 0, hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen.machine()) : screen.machine().pens[0]); //FIXME: Is the register correct? check with HW tests
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0x00);
+	bitmap->fill(hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen.machine()) : screen.machine().pens[0], *cliprect); //FIXME: Is the register correct? check with HW tests
+	screen.machine().priority_bitmap->fill(0x00, *cliprect);
 
 	if (state->m_screen_dis)
 		return 0;
@@ -1552,7 +1548,7 @@ SCREEN_UPDATE( hng64 )
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
 			UINT32 *src = &state->m_colorBuffer3d[y * (cliprect->max_x-cliprect->min_x)];
-			UINT32 *dst = BITMAP_ADDR32(bitmap, y, cliprect->min_x);
+			UINT32 *dst = &bitmap->pix32(y, cliprect->min_x);
 
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{

@@ -1439,7 +1439,7 @@ static void segaic16_road_hangon_draw(struct road_info *info, bitmap_t *bitmap, 
 	/* loop over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
 		int control = roadram[0x000 + y];
 		int hpos = roadram[0x100 + (control & 0xff)];
 		int color0 = roadram[0x200 + (control & 0xff)];
@@ -1718,7 +1718,7 @@ static void segaic16_road_outrun_draw(struct road_info *info, bitmap_t *bitmap, 
 //          { 0x80,0x81,0x81,0x83,0,0,0,0x00 },
 //          { 0x81,0x87,0x87,0x8f,0,0,0,0x00 }
 		};
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
 		int data0 = roadram[0x000 + y];
 		int data1 = roadram[0x100 + y];
 
@@ -2047,9 +2047,9 @@ void segaic16_rotate_draw(running_machine &machine, int which, bitmap_t *bitmap,
 	/* loop over screen Y coordinates */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-		UINT16 *src = (UINT16 *)srcbitmap->base;
-		UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
+		UINT16 *src = &srcbitmap->pix16(0);
+		UINT8 *pri = &machine.priority_bitmap->pix8(y);
 		INT32 tx = currx;
 		INT32 ty = curry;
 
@@ -2059,7 +2059,7 @@ void segaic16_rotate_draw(running_machine &machine, int which, bitmap_t *bitmap,
 			/* fetch the pixel from the source bitmap */
 			int sx = (tx >> 14) & 0x1ff;
 			int sy = (ty >> 14) & 0x1ff;
-			int pix = src[sy * srcbitmap->rowpixels + sx];
+			int pix = src[sy * srcbitmap->rowpixels() + sx];
 
 			/* non-zero pixels get written; everything else is the scanline color */
 			if (pix != 0xffff)

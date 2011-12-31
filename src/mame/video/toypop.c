@@ -183,7 +183,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap)
 		int offs = 0xFDFE/2;
 		for (int y = 0; y < 224; y++)
 		{
-			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
+			UINT16 *scanline = &bitmap->pix16(y);
 			for (int x = 0; x < 288; x+=2)
 			{
 				UINT16 data = state->m_bg_image[offs];
@@ -198,7 +198,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap)
 		int offs = 0x200/2;
 		for (int y = 0; y < 224; y++)
 		{
-			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
+			UINT16 *scanline = &bitmap->pix16(y);
 			for (int x = 0; x < 288; x+=2)
 			{
 				UINT16 data = state->m_bg_image[offs];

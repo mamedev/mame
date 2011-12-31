@@ -457,8 +457,8 @@ static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent,
 	bitmap_t *destmap = (bitmap_t *)dest;
 	float z = extent->param[0].start;
 	float dz = extent->param[0].dpdx;
-	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
-	UINT32 *zb = BITMAP_ADDR32(K001005_zbuffer, scanline, 0);
+	UINT32 *fb = &destmap->pix32(scanline);
+	UINT32 *zb = &K001005_zbuffer->pix32(scanline);
 	UINT32 color = extra->color;
 	int x;
 
@@ -500,8 +500,8 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 	int texture_y = extra->texture_y;
 	int x;
 
-	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
-	UINT32 *zb = BITMAP_ADDR32(K001005_zbuffer, scanline, 0);
+	UINT32 *fb = &destmap->pix32(scanline);
+	UINT32 *zb = &K001005_zbuffer->pix32(scanline);
 
 	for (x = extent->startx; x < extent->stopx; x++)
 	{
@@ -942,8 +942,8 @@ void K001005_draw(bitmap_t *bitmap, const rectangle *cliprect)
 
 	for (j=cliprect->min_y; j <= cliprect->max_y; j++)
 	{
-		UINT32 *bmp = BITMAP_ADDR32(bitmap, j, 0);
-		UINT32 *src = BITMAP_ADDR32(K001005_bitmap[K001005_bitmap_page^1], j, 0);
+		UINT32 *bmp = &bitmap->pix32(j);
+		UINT32 *src = &K001005_bitmap[K001005_bitmap_page^1]->pix32(j);
 
 		for (i=cliprect->min_x; i <= cliprect->max_x; i++)
 		{
@@ -961,8 +961,8 @@ void K001005_swap_buffers(running_machine &machine)
 
 	//if (K001005_status == 2)
 	{
-		bitmap_fill(K001005_bitmap[K001005_bitmap_page], &K001005_cliprect, machine.pens[0]&0x00ffffff);
-		bitmap_fill(K001005_zbuffer, &K001005_cliprect, 0xffffffff);
+		K001005_bitmap[K001005_bitmap_page]->fill(machine.pens[0]&0x00ffffff, K001005_cliprect);
+		K001005_zbuffer->fill(0xffffffff, K001005_cliprect);
 	}
 }
 
@@ -1032,7 +1032,7 @@ SCREEN_UPDATE( gticlub )
             for (x=0; x < 512; x++)
             {
                 UINT8 pixel = rom[index + (y*512) + x];
-                *BITMAP_ADDR32(bitmap, y, x) = K001006_palette[tp][(pal * 256) + pixel];
+                bitmap->pix32(y, x) = K001006_palette[tp][(pal * 256) + pixel];
             }
         }
 
@@ -1051,7 +1051,7 @@ SCREEN_UPDATE( gticlub )
 
 SCREEN_UPDATE( hangplt )
 {
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
+	bitmap->fill(screen.machine().pens[0], *cliprect);
 
 	if (strcmp(screen.tag(), "lscreen") == 0)
 	{

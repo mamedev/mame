@@ -86,7 +86,7 @@ static SCREEN_UPDATE( snowbros )
 	device_t *pandora = screen.machine().device("pandora");
 
 	/* This clears & redraws the entire screen each pass */
-	bitmap_fill(bitmap,cliprect,0xf0);
+	bitmap->fill(0xf0, *cliprect);
 	pandora_update(pandora, bitmap, cliprect);
 	return 0;
 }

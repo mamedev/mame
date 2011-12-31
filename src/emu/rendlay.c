@@ -551,10 +551,10 @@ void layout_element::element_scale(bitmap_t &dest, const bitmap_t &source, const
 		{
 			// get the local scaled bounds
 			rectangle bounds;
-			bounds.min_x = render_round_nearest(curcomp->bounds().x0 * dest.width);
-			bounds.min_y = render_round_nearest(curcomp->bounds().y0 * dest.height);
-			bounds.max_x = render_round_nearest(curcomp->bounds().x1 * dest.width);
-			bounds.max_y = render_round_nearest(curcomp->bounds().y1 * dest.height);
+			bounds.min_x = render_round_nearest(curcomp->bounds().x0 * dest.width());
+			bounds.min_y = render_round_nearest(curcomp->bounds().y0 * dest.height());
+			bounds.max_x = render_round_nearest(curcomp->bounds().x1 * dest.width());
+			bounds.max_y = render_round_nearest(curcomp->bounds().y1 * dest.height());
 
 			// based on the component type, add to the texture
 			curcomp->draw(elemtex->m_element->machine(), dest, bounds, elemtex->m_state);
@@ -689,8 +689,8 @@ void layout_element::component::draw(running_machine &machine, bitmap_t &dest, c
 			if (m_bitmap == NULL)
 				m_bitmap = load_bitmap();
 			render_resample_argb_bitmap_hq(
-					BITMAP_ADDR32(&dest, bounds.min_y, bounds.min_x),
-					dest.rowpixels,
+					&dest.pix32(bounds.min_y, bounds.min_x),
+					dest.rowpixels(),
 					bounds.max_x - bounds.min_x,
 					bounds.max_y - bounds.min_y,
 					m_bitmap, NULL, &m_color);
@@ -762,14 +762,14 @@ void layout_element::component::draw_rect(bitmap_t &dest, const rectangle &bound
 			// if we're translucent, add in the destination pixel contribution
 			if (inva > 0)
 			{
-				UINT32 dpix = *BITMAP_ADDR32(&dest, y, x);
+				UINT32 dpix = dest.pix32(y, x);
 				finalr += (RGB_RED(dpix) * inva) >> 8;
 				finalg += (RGB_GREEN(dpix) * inva) >> 8;
 				finalb += (RGB_BLUE(dpix) * inva) >> 8;
 			}
 
 			// store the target pixel, dividing the RGBA values by the overall scale factor
-			*BITMAP_ADDR32(&dest, y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
+			dest.pix32(y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
 		}
 }
 
@@ -814,14 +814,14 @@ void layout_element::component::draw_disk(bitmap_t &dest, const rectangle &bound
 			// if we're translucent, add in the destination pixel contribution
 			if (inva > 0)
 			{
-				UINT32 dpix = *BITMAP_ADDR32(&dest, y, x);
+				UINT32 dpix = dest.pix32(y, x);
 				finalr += (RGB_RED(dpix) * inva) >> 8;
 				finalg += (RGB_GREEN(dpix) * inva) >> 8;
 				finalb += (RGB_BLUE(dpix) * inva) >> 8;
 			}
 
 			// store the target pixel, dividing the RGBA values by the overall scale factor
-			*BITMAP_ADDR32(&dest, y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
+			dest.pix32(y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
 		}
 	}
 }
@@ -853,7 +853,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_t &de
 	INT32 curx = bounds.min_x + (bounds.max_x - bounds.min_x - width) / 2;
 
 	// allocate a temporary bitmap
-	bitmap_t *tempbitmap = global_alloc(bitmap_t(dest.width, dest.height, BITMAP_FORMAT_ARGB32));
+	bitmap_t *tempbitmap = global_alloc(bitmap_t(dest.width(), dest.height(), BITMAP_FORMAT_ARGB32));
 
 	// loop over characters
 	for (const char *s = m_string; *s != 0; s++)
@@ -868,8 +868,8 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_t &de
 			int effy = bounds.min_y + y;
 			if (effy >= bounds.min_y && effy <= bounds.max_y)
 			{
-				UINT32 *src = BITMAP_ADDR32(tempbitmap, y, 0);
-				UINT32 *d = BITMAP_ADDR32(&dest, effy, 0);
+				UINT32 *src = &tempbitmap->pix32(y);
+				UINT32 *d = &dest.pix32(effy);
 				for (int x = 0; x < chbounds.max_x - chbounds.min_x; x++)
 				{
 					int effx = curx + x + chbounds.min_x;
@@ -924,10 +924,10 @@ bitmap_t *layout_element::component::load_bitmap()
 	{
 		// draw some stripes in the bitmap
 		bitmap = global_alloc(bitmap_t(100, 100, BITMAP_FORMAT_ARGB32));
-		bitmap_fill(bitmap, NULL, 0);
+		bitmap->fill(0);
 		for (int step = 0; step < 100; step += 25)
 			for (int line = 0; line < 100; line++)
-				*BITMAP_ADDR32(bitmap, (step + line) % 100, line % 100) = MAKE_ARGB(0xff,0xff,0xff,0xff);
+				bitmap->pix32((step + line) % 100, line % 100) = MAKE_ARGB(0xff,0xff,0xff,0xff);
 
 		// log an error
 		if (!m_alphafile)
@@ -957,7 +957,7 @@ void layout_element::component::draw_led7seg(bitmap_t &dest, const rectangle &bo
 
 	// allocate a temporary bitmap for drawing
 	bitmap_t *tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32));
-	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff,0x00,0x00,0x00));
+	tempbitmap->fill(MAKE_ARGB(0xff,0x00,0x00,0x00));
 
 	// top bar
 	draw_segment_horizontal(*tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 0)) ? onpen : offpen);
@@ -987,7 +987,7 @@ void layout_element::component::draw_led7seg(bitmap_t &dest, const rectangle &bo
 	draw_segment_decimal(*tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 7)) ? onpen : offpen);
 
 	// resample to the target size
-	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &m_color);
+	render_resample_argb_bitmap_hq(&dest.pix32(0), dest.rowpixels(), dest.width(), dest.height(), tempbitmap, NULL, &m_color);
 
 	global_free(tempbitmap);
 }
@@ -1010,7 +1010,7 @@ void layout_element::component::draw_led14seg(bitmap_t &dest, const rectangle &b
 
 	// allocate a temporary bitmap for drawing
 	bitmap_t *tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32));
-	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap->fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	// top bar
 	draw_segment_horizontal(*tempbitmap,
@@ -1090,7 +1090,7 @@ void layout_element::component::draw_led14seg(bitmap_t &dest, const rectangle &b
 	apply_skew(*tempbitmap, 40);
 
 	// resample to the target size
-	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &m_color);
+	render_resample_argb_bitmap_hq(&dest.pix32(0), dest.rowpixels(), dest.width(), dest.height(), tempbitmap, NULL, &m_color);
 
 	global_free(tempbitmap);
 }
@@ -1114,7 +1114,7 @@ void layout_element::component::draw_led14segsc(bitmap_t &dest, const rectangle 
 
 	// allocate a temporary bitmap for drawing, adding some extra space for the tail
 	bitmap_t *tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight + segwidth, BITMAP_FORMAT_ARGB32));
-	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap->fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	// top bar
 	draw_segment_horizontal(*tempbitmap,
@@ -1203,7 +1203,7 @@ void layout_element::component::draw_led14segsc(bitmap_t &dest, const rectangle 
 	draw_segment_decimal(*tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 14)) ? onpen : offpen);
 
 	// resample to the target size
-	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &m_color);
+	render_resample_argb_bitmap_hq(&dest.pix32(0), dest.rowpixels(), dest.width(), dest.height(), tempbitmap, NULL, &m_color);
 
 	global_free(tempbitmap);
 }
@@ -1226,7 +1226,7 @@ void layout_element::component::draw_led16seg(bitmap_t &dest, const rectangle &b
 
 	// allocate a temporary bitmap for drawing
 	bitmap_t *tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32));
-	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap->fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	// top-left bar
 	draw_segment_horizontal_caps(*tempbitmap,
@@ -1316,7 +1316,7 @@ void layout_element::component::draw_led16seg(bitmap_t &dest, const rectangle &b
 	apply_skew(*tempbitmap, 40);
 
 	// resample to the target size
-	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &m_color);
+	render_resample_argb_bitmap_hq(&dest.pix32(0), dest.rowpixels(), dest.width(), dest.height(), tempbitmap, NULL, &m_color);
 
 	global_free(tempbitmap);
 }
@@ -1340,7 +1340,7 @@ void layout_element::component::draw_led16segsc(bitmap_t &dest, const rectangle 
 
 	// allocate a temporary bitmap for drawing
 	bitmap_t *tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight + segwidth, BITMAP_FORMAT_ARGB32));
-	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap->fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	// top-left bar
 	draw_segment_horizontal_caps(*tempbitmap,
@@ -1439,7 +1439,7 @@ void layout_element::component::draw_led16segsc(bitmap_t &dest, const rectangle 
 	apply_skew(*tempbitmap, 40);
 
 	// resample to the target size
-	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &m_color);
+	render_resample_argb_bitmap_hq(&dest.pix32(0), dest.rowpixels(), dest.width(), dest.height(), tempbitmap, NULL, &m_color);
 
 	global_free(tempbitmap);
 }
@@ -1462,13 +1462,13 @@ void layout_element::component::draw_dotmatrix(bitmap_t &dest, const rectangle &
 
 	// allocate a temporary bitmap for drawing
 	bitmap_t *tempbitmap = global_alloc(bitmap_t(bmwidth, bmheight, BITMAP_FORMAT_ARGB32));
-	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap->fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	for (int i = 0; i < 8; i++)
 		draw_segment_decimal(*tempbitmap, ((dotwidth/2 )+ (i * dotwidth)), bmheight/2, dotwidth, (pattern & (1 << i))?onpen:offpen);
 
 	// resample to the target size
-	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &m_color);
+	render_resample_argb_bitmap_hq(&dest.pix32(0), dest.rowpixels(), dest.width(), dest.height(), tempbitmap, NULL, &m_color);
 
 	global_free(tempbitmap);
 }
@@ -1485,8 +1485,8 @@ void layout_element::component::draw_segment_horizontal_caps(bitmap_t &dest, int
 	// loop over the width of the segment
 	for (int y = 0; y < width / 2; y++)
 	{
-		UINT32 *d0 = BITMAP_ADDR32(&dest, midy - y, 0);
-		UINT32 *d1 = BITMAP_ADDR32(&dest, midy + y, 0);
+		UINT32 *d0 = &dest.pix32(midy - y);
+		UINT32 *d1 = &dest.pix32(midy + y);
 		int ty = (y < width / 8) ? width / 8 : y;
 
 		// loop over the length of the segment
@@ -1518,13 +1518,13 @@ void layout_element::component::draw_segment_vertical_caps(bitmap_t &dest, int m
 	// loop over the width of the segment
 	for (int x = 0; x < width / 2; x++)
 	{
-		UINT32 *d0 = BITMAP_ADDR32(&dest, 0, midx - x);
-		UINT32 *d1 = BITMAP_ADDR32(&dest, 0, midx + x);
+		UINT32 *d0 = &dest.pix32(0, midx - x);
+		UINT32 *d1 = &dest.pix32(0, midx + x);
 		int tx = (x < width / 8) ? width / 8 : x;
 
 		// loop over the length of the segment
 		for (int y = miny + ((caps & LINE_CAP_START) ? tx : 0); y < maxy - ((caps & LINE_CAP_END) ? tx : 0); y++)
-			d0[y * dest.rowpixels] = d1[y * dest.rowpixels] = color;
+			d0[y * dest.rowpixels()] = d1[y * dest.rowpixels()] = color;
 	}
 }
 
@@ -1553,14 +1553,14 @@ void layout_element::component::draw_segment_diagonal_1(bitmap_t &dest, int minx
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
-		if (x >= 0 && x < dest.width)
+		if (x >= 0 && x < dest.width())
 		{
-			UINT32 *d = BITMAP_ADDR32(&dest, 0, x);
+			UINT32 *d = &dest.pix32(0, x);
 			int step = (x - minx) * ratio;
 
 			for (int y = maxy - width - step; y < maxy - step; y++)
-				if (y >= 0 && y < dest.height)
-					d[y * dest.rowpixels] = color;
+				if (y >= 0 && y < dest.height())
+					d[y * dest.rowpixels()] = color;
 		}
 }
 
@@ -1578,14 +1578,14 @@ void layout_element::component::draw_segment_diagonal_2(bitmap_t &dest, int minx
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
-		if (x >= 0 && x < dest.width)
+		if (x >= 0 && x < dest.width())
 		{
-			UINT32 *d = BITMAP_ADDR32(&dest, 0, x);
+			UINT32 *d = &dest.pix32(0, x);
 			int step = (x - minx) * ratio;
 
 			for (int y = miny + step; y < miny + step + width; y++)
-				if (y >= 0 && y < dest.height)
-					d[y * dest.rowpixels] = color;
+				if (y >= 0 && y < dest.height())
+					d[y * dest.rowpixels()] = color;
 		}
 }
 
@@ -1603,8 +1603,8 @@ void layout_element::component::draw_segment_decimal(bitmap_t &dest, int midx, i
 	// iterate over y
 	for (UINT32 y = 0; y <= width; y++)
 	{
-		UINT32 *d0 = BITMAP_ADDR32(&dest, midy - y, 0);
-		UINT32 *d1 = BITMAP_ADDR32(&dest, midy + y, 0);
+		UINT32 *d0 = &dest.pix32(midy - y);
+		UINT32 *d1 = &dest.pix32(midy + y);
 		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
 		INT32 left, right;
 
@@ -1632,11 +1632,11 @@ void layout_element::component::draw_segment_comma(bitmap_t &dest, int minx, int
 	// draw line
 	for (int x = minx; x < maxx; x++)
 	{
-		UINT32 *d = BITMAP_ADDR32(&dest, 0, x);
+		UINT32 *d = &dest.pix32(0, x);
 		int step = (x - minx) * ratio;
 
 		for (int y = maxy; y < maxy  - width - step; y--)
-			d[y * dest.rowpixels] = color;
+			d[y * dest.rowpixels()] = color;
 	}
 }
 
@@ -1647,11 +1647,11 @@ void layout_element::component::draw_segment_comma(bitmap_t &dest, int minx, int
 
 void layout_element::component::apply_skew(bitmap_t &dest, int skewwidth)
 {
-	for (int y = 0; y < dest.height; y++)
+	for (int y = 0; y < dest.height(); y++)
 	{
-		UINT32 *destrow = BITMAP_ADDR32(&dest, y, 0);
-		int offs = skewwidth * (dest.height - y) / dest.height;
-		for (int x = dest.width - skewwidth - 1; x >= 0; x--)
+		UINT32 *destrow = &dest.pix32(y);
+		int offs = skewwidth * (dest.height() - y) / dest.height();
+		for (int x = dest.width() - skewwidth - 1; x >= 0; x--)
 			destrow[x + offs] = destrow[x];
 		for (int x = 0; x < offs; x++)
 			destrow[x] = 0;

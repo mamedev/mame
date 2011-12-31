@@ -45,7 +45,7 @@ WRITE8_HANDLER( bigevglf_vidram_w )
 	state->m_vidram[o + 0x10000 * state->m_plane_selected] = data;
 	y = o >>8;
 	x = (o & 255);
-	*BITMAP_ADDR16(state->m_tmp_bitmap[state->m_plane_selected], y, x) = data;
+	state->m_tmp_bitmap[state->m_plane_selected]->pix16(y, x) = data;
 }
 
 READ8_HANDLER( bigevglf_vidram_r )

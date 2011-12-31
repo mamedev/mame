@@ -169,7 +169,7 @@ SCREEN_UPDATE( goal92 )
 		tilemap_set_scrolly(state->m_fg_layer, 0, state->m_scrollram[3] + 8);
 	}
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_layer, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);

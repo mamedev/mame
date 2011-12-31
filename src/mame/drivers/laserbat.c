@@ -525,18 +525,18 @@ static SCREEN_UPDATE( laserbat )
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
-			int pixel2 = *BITMAP_ADDR16(s2636_2_bitmap, y, x);
-			int pixel3 = *BITMAP_ADDR16(s2636_3_bitmap, y, x);
+			int pixel1 = s2636_1_bitmap->pix16(y, x);
+			int pixel2 = s2636_2_bitmap->pix16(y, x);
+			int pixel3 = s2636_3_bitmap->pix16(y, x);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel1))
-				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel1);
+				bitmap->pix16(y, x) = S2636_PIXEL_COLOR(pixel1);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel2))
-				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel2);
+				bitmap->pix16(y, x) = S2636_PIXEL_COLOR(pixel2);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel3))
-				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel3);
+				bitmap->pix16(y, x) = S2636_PIXEL_COLOR(pixel3);
 		}
 	}
 

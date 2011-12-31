@@ -44,7 +44,7 @@ PALETTE_INIT( arknoid2 )
 
 SCREEN_UPDATE( tnzs )
 {
-	bitmap_fill(bitmap, cliprect, 0x1f0);
+	bitmap->fill(0x1f0, *cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
 	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );

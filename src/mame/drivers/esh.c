@@ -52,7 +52,7 @@ static SCREEN_UPDATE( esh )
 	int charx, chary;
 
 	/* clear */
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	/* Draw tiles */
 	for (charx = 0; charx < 32; charx++)

@@ -18,11 +18,7 @@
 #include "includes/vigilant.h"
 
 
-static const rectangle bottomvisiblearea =
-{
-	16*8, 48*8-1,
-	6*8, 32*8-1
-};
+static const rectangle bottomvisiblearea(16*8, 48*8-1, 6*8, 32*8-1);
 
 
 VIDEO_START( vigilant )

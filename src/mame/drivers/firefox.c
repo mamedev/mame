@@ -188,7 +188,7 @@ static SCREEN_UPDATE( firefox )
 	int sprite;
 	int gfxtop = screen.visible_area().min_y;
 
-	bitmap_fill( bitmap, cliprect, palette_get_color(screen.machine(), 256) );
+	bitmap->fill(palette_get_color(screen.machine(), 256), *cliprect);
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{

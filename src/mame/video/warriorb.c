@@ -95,7 +95,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 	layer[2] = 2;
 
 	/* Clear priority bitmap */
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer
@@ -103,7 +103,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	// draw middle layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 1);

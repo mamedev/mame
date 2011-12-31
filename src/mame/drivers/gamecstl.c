@@ -123,7 +123,7 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 
 	for (j=y; j < y+8; j++)
 	{
-		UINT16 *p = BITMAP_ADDR16(bitmap, j, 0);
+		UINT16 *p = &bitmap->pix16(j);
 
 		for (i=x; i < x+8; i++)
 		{
@@ -144,7 +144,7 @@ static SCREEN_UPDATE(gamecstl)
 	UINT32 *cga = state->m_cga_ram;
 	int index = 0;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	for (j=0; j < 25; j++)
 	{

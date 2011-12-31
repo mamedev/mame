@@ -140,7 +140,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			for (py = 0; py < gfx->height; py++){
 				/* get a pointer to the current line in the screen bitmap */
 				int ypos = ((sy + py) & 0x1ff);
-				UINT16 *srcy = BITMAP_ADDR16(bitmap, ypos, 0);
+				UINT16 *srcy = &bitmap->pix16(ypos);
 
 				int gfx_py = yflip ? (gfx->height - 1 - py) : py;
 

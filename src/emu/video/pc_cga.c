@@ -445,7 +445,7 @@ VIDEO_START( pc_cga_superimpose )
 static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	int i;
 	running_machine &machine = device->machine();
 
@@ -484,7 +484,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	int i;
 	running_machine &machine = device->machine();
 
@@ -522,7 +522,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	int i;
 	running_machine &machine = device->machine();
 
@@ -560,7 +560,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16	*p = &bitmap->pix16(y);
 	int i;
 	running_machine &machine = device->machine();
 
@@ -603,7 +603,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16	*p = &bitmap->pix16(y);
 	int i;
 	running_machine &machine = device->machine();
 
@@ -654,7 +654,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
 static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	int i;
 	running_machine &machine = device->machine();
 
@@ -701,7 +701,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	int i;
 	running_machine &machine = device->machine();
 
@@ -758,7 +758,7 @@ static const UINT8 yc_lut[16][8] =
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	int i;
 	running_machine &machine = device->machine();
 
@@ -801,7 +801,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	int i;
 	running_machine &machine = device->machine();
 
@@ -836,7 +836,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	UINT8	fg = cga.color_select & 0x0F;
 	int i;
 	running_machine &machine = device->machine();
@@ -1239,7 +1239,7 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 //      color = ((values[0] & 0x3) << 1) |
 //          ((values[1] & 2)   >> 1) |
 //          ((values[1] & 1)   << 3);
-//      *BITMAP_ADDR16(bitmap, y, x+i) = Machine->pens[color];
+//      bitmap->pix16(y, x+i) = Machine->pens[color];
 //      values[0]>>=2;
 //      values[1]>>=2;
 //  }
@@ -1314,7 +1314,7 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 //      values[1] = values[1] << 1;
 //  }
 //
-//  dest = BITMAP_ADDR16(bitmap, y, x);
+//  dest = &bitmap->pix16(y, x);
 //  *(dest++) = palette[(bmap[0] >> 6) & 0x03];
 //  *(dest++) = palette[(bmap[0] >> 4) & 0x03];
 //  *(dest++) = palette[(bmap[0] >> 2) & 0x03];
@@ -1417,7 +1417,7 @@ static struct
 static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	UINT16	offset_base = ra << 13;
 	int j;
 	running_machine &machine = device->machine();

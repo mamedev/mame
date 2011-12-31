@@ -542,34 +542,34 @@ void draw_7segment_led(bitmap_t *bitmap, int x, int y, UINT8 value)
 		return;
 	}
 
-	plot_box(bitmap, x-1, y-1, 7, 11, 0x00000000);
+	bitmap->plot_box(x-1, y-1, 7, 11, 0x00000000);
 
 	/* Top */
 	if( (value & 0x40) == 0 ) {
-		plot_box(bitmap, x+1, y+0, 3, 1, LED_ON);
+		bitmap->plot_box(x+1, y+0, 3, 1, LED_ON);
 	}
 	/* Middle */
 	if( (value & 0x01) == 0 ) {
-		plot_box(bitmap, x+1, y+4, 3, 1, LED_ON);
+		bitmap->plot_box(x+1, y+4, 3, 1, LED_ON);
 	}
 	/* Bottom */
 	if( (value & 0x08) == 0 ) {
-		plot_box(bitmap, x+1, y+8, 3, 1, LED_ON);
+		bitmap->plot_box(x+1, y+8, 3, 1, LED_ON);
 	}
 	/* Top Left */
 	if( (value & 0x02) == 0 ) {
-		plot_box(bitmap, x+0, y+1, 1, 3, LED_ON);
+		bitmap->plot_box(x+0, y+1, 1, 3, LED_ON);
 	}
 	/* Top Right */
 	if( (value & 0x20) == 0 ) {
-		plot_box(bitmap, x+4, y+1, 1, 3, LED_ON);
+		bitmap->plot_box(x+4, y+1, 1, 3, LED_ON);
 	}
 	/* Bottom Left */
 	if( (value & 0x04) == 0 ) {
-		plot_box(bitmap, x+0, y+5, 1, 3, LED_ON);
+		bitmap->plot_box(x+0, y+5, 1, 3, LED_ON);
 	}
 	/* Bottom Right */
 	if( (value & 0x10) == 0 ) {
-		plot_box(bitmap, x+4, y+5, 1, 3, LED_ON);
+		bitmap->plot_box(x+4, y+5, 1, 3, LED_ON);
 	}
 }

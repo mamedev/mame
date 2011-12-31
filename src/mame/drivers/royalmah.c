@@ -233,7 +233,7 @@ static SCREEN_UPDATE( royalmah )
 		{
 			UINT8 pen = ((data2 >> 1) & 0x08) | ((data2 << 2) & 0x04) | ((data1 >> 3) & 0x02) | ((data1 >> 0) & 0x01);
 
-			*BITMAP_ADDR16(bitmap, y, x) = (state->m_palette_base << 4) | pen;
+			bitmap->pix16(y, x) = (state->m_palette_base << 4) | pen;
 
 			x = x - 1;
 			data1 = data1 >> 1;

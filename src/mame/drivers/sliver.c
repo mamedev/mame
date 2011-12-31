@@ -197,9 +197,9 @@ static void plot_pixel_rgb(sliver_state *state, int x, int y, UINT32 r, UINT32 g
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	if (state->m_bitmap_bg->bpp == 32)
+	if (state->m_bitmap_bg->bpp() == 32)
 	{
-		*BITMAP_ADDR32(state->m_bitmap_bg, y, x) = r | (g<<8) | (b<<16);
+		state->m_bitmap_bg->pix32(y, x) = r | (g<<8) | (b<<16);
 	}
 	else
 	{
@@ -207,7 +207,7 @@ static void plot_pixel_rgb(sliver_state *state, int x, int y, UINT32 r, UINT32 g
 		g>>=3;
 		b>>=3;
 		color = r|(g<<5)|(b<<10);
-		*BITMAP_ADDR16(state->m_bitmap_bg, y, x) = color;
+		state->m_bitmap_bg->pix16(y, x) = color;
 	}
 }
 
@@ -224,9 +224,9 @@ static void plot_pixel_pal(running_machine &machine, int x, int y, int addr)
 	g=(state->m_colorram[addr+0x100] << 2) | (state->m_colorram[addr+0x100] & 3);
 	r=(state->m_colorram[addr+0x200] << 2) | (state->m_colorram[addr+0x200] & 3);
 
-	if (state->m_bitmap_fg->bpp == 32)
+	if (state->m_bitmap_fg->bpp() == 32)
 	{
-		*BITMAP_ADDR32(state->m_bitmap_fg, y, x) = r | (g<<8) | (b<<16);
+		state->m_bitmap_fg->pix32(y, x) = r | (g<<8) | (b<<16);
 	}
 	else
 	{
@@ -234,7 +234,7 @@ static void plot_pixel_pal(running_machine &machine, int x, int y, int addr)
 		g>>=3;
 		b>>=3;
 		color = r|(g<<5)|(b<<10);
-		*BITMAP_ADDR16(state->m_bitmap_fg, y, x) = color;
+		state->m_bitmap_fg->pix16(y, x) = color;
 	}
 }
 
@@ -299,7 +299,7 @@ static WRITE16_HANDLER( fifo_clear_w )
 {
 	sliver_state *state = space->machine().driver_data<sliver_state>();
 
-	bitmap_fill(state->m_bitmap_fg, 0,0);
+	state->m_bitmap_fg->fill(0);
 	state->m_fptr=0;
 	state->m_tmp_counter=0;
 }
@@ -324,7 +324,7 @@ static void render_jpeg(running_machine &machine)
 	int addr = state->m_jpeg_addr;
 	UINT8 *rom;
 
-	bitmap_fill(state->m_bitmap_bg, 0, 0);
+	state->m_bitmap_bg->fill(0);
 	if (addr < 0)
 	{
 		return;

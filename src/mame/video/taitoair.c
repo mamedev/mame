@@ -243,7 +243,7 @@ static void fill_slope( bitmap_t *bitmap, const rectangle *cliprect, int color, 
 
 				while (xx1 <= xx2)
 				{
-					*BITMAP_ADDR16(bitmap, y1, xx1) = color + grad_col;
+					bitmap->pix16(y1, xx1) = color + grad_col;
 					xx1++;
 				}
 			}
@@ -372,11 +372,11 @@ WRITE16_HANDLER( dsp_flags_w )
 		if(offset == 1)
 		{
 			/* clear screen fb */
-			bitmap_fill(state->m_framebuffer[1], &cliprect, 0);
+			state->m_framebuffer[1]->fill(0, cliprect);
 			/* copy buffer fb into screen fb (at this stage we are ready to draw) */
 			copybitmap_trans(state->m_framebuffer[1], state->m_framebuffer[0], 0, 0, 0, 0, &cliprect, 0);
 			/* now clear buffer fb */
-			bitmap_fill(state->m_framebuffer[0], &cliprect, 0);
+			state->m_framebuffer[0]->fill(0, cliprect);
 		}
 
 		/* if offset 0x3001 OR 0x3002 we put data in the buffer fb */
@@ -577,7 +577,7 @@ SCREEN_UPDATE( taitoair )
 
 	tc0080vco_tilemap_update(state->m_tc0080vco);
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	{
 		int x,y;
@@ -593,7 +593,7 @@ SCREEN_UPDATE( taitoair )
 		{
 			for(x=cliprect->min_x;x<cliprect->max_x;x++)
 			{
-				*BITMAP_ADDR16(bitmap,y,x) = 0x2000 + (0x3f - ((y >> 2) & 0x3f));
+				bitmap->pix16(y, x) = 0x2000 + (0x3f - ((y >> 2) & 0x3f));
 			}
 		}
 
@@ -602,7 +602,7 @@ SCREEN_UPDATE( taitoair )
 		{
 			for(x=cliprect->min_x;x<cliprect->max_x;x++)
 			{
-				*BITMAP_ADDR16(bitmap,y,x) = 0x2040 + (0x3f - ((y >> 2) & 0x3f));
+				bitmap->pix16(y, x) = 0x2040 + (0x3f - ((y >> 2) & 0x3f));
 			}
 		}
 		#endif
@@ -622,7 +622,7 @@ SCREEN_UPDATE( taitoair )
 
 	/* Hacky 3d bitmap */
 	//copybitmap_trans(bitmap, state->m_buffer3d, 0, 0, 0, 0, cliprect, 0);
-	//bitmap_fill(state->m_buffer3d, cliprect, 0);
+	//state->m_buffer3d->fill(0, *cliprect);
 
 	return 0;
 }

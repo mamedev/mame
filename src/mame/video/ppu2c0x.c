@@ -413,7 +413,7 @@ static void draw_background( device_t *device, UINT8 *line_priority )
 	tile_index = ((refresh_data & 0xc00) | 0x2000) + scroll_y_coarse * 32;
 
 	/* set up dest */
-	dest = ((UINT16 *) bitmap->base) + (bitmap->rowpixels * scanline) + start_x;
+	dest = &bitmap->pix16(scanline, start_x);
 
 	/* draw the 32 or 33 tiles that make up a line */
 	while (tilecount < 34)
@@ -500,7 +500,7 @@ static void draw_background( device_t *device, UINT8 *line_priority )
 	/* if the left 8 pixels for the background are off, blank 'em */
 	if (!(ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
 	{
-		dest = ((UINT16 *) bitmap->base) + (bitmap->rowpixels * scanline);
+		dest = &bitmap->pix16(scanline);
 		for (i = 0; i < 8; i++)
 		{
 			*(dest++) = back_pen;
@@ -652,7 +652,7 @@ static void draw_sprites( device_t *device, UINT8 *line_priority )
 						{
 							/* no, draw */
 							if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
-								*BITMAP_ADDR16(bitmap, scanline, sprite_xpos + pixel) = paldata[pixel_data];
+								bitmap->pix16(scanline, sprite_xpos + pixel) = paldata[pixel_data];
 						}
 						/* indicate that a sprite was drawn at this location, even if it's not seen */
 						if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
@@ -695,7 +695,7 @@ static void draw_sprites( device_t *device, UINT8 *line_priority )
 							/* no, draw */
 							if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
 							{
-								*BITMAP_ADDR16(bitmap, scanline, sprite_xpos + pixel) = paldata[pixel_data];
+								bitmap->pix16(scanline, sprite_xpos + pixel) = paldata[pixel_data];
 								line_priority[sprite_xpos + pixel] |= 0x01;
 							}
 						}
@@ -749,8 +749,8 @@ static void render_scanline( device_t *device )
 		back_pen = (ppu2c0x->back_color & color_mask) + ppu2c0x->color_base;
 
 		// Fill this scanline with the background pen.
-		for (i = 0; i < bitmap->width; i++)
-			*BITMAP_ADDR16(bitmap, scanline, i) = back_pen;
+		for (i = 0; i < bitmap->width(); i++)
+			bitmap->pix16(scanline, i) = back_pen;
 	}
 
 	/* if sprites are on, draw them, but we call always to process them */
@@ -812,8 +812,8 @@ static void update_scanline( device_t *device )
 				back_pen = (ppu2c0x->back_color & color_mask) + ppu2c0x->color_base;
 
 			// Fill this scanline with the background pen.
-			for (i = 0; i < bitmap->width; i++)
-				*BITMAP_ADDR16(bitmap, scanline, i) = back_pen;
+			for (i = 0; i < bitmap->width(); i++)
+				bitmap->pix16(scanline, i) = back_pen;
 		}
 
 		/* increment the fine y-scroll */
@@ -1228,7 +1228,7 @@ int ppu2c0x_get_pixel( device_t *device, int x, int y )
 	if (y >= VISIBLE_SCREEN_HEIGHT)
 		y = VISIBLE_SCREEN_HEIGHT - 1;
 
-	return *BITMAP_ADDR16(ppu2c0x->bitmap, y, x);
+	return ppu2c0x->bitmap->pix16(y, x);
 }
 
 int ppu2c0x_get_colorbase( device_t *device )

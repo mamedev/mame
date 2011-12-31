@@ -148,19 +148,19 @@ static VIDEO_START( skylncr )
 	tilemap_set_transparent_pen(state->m_tmap, 0);
 }
 
-// are these hardcoded, or registers?
-static const rectangle visible1 = { 0*8, (20+48)*8-1,  4*8,  (4+7)*8-1 };
-static const rectangle visible2 = { 0*8, (20+48)*8-1, 12*8, (12+7)*8-1 };
-static const rectangle visible3 = { 0*8, (20+48)*8-1, 20*8, (20+7)*8-1 };
-
 
 static SCREEN_UPDATE( skylncr )
 {
 	skylncr_state *state = screen.machine().driver_data<skylncr_state>();
 	int i;
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 	tilemap_draw(bitmap,cliprect, state->m_reel_1_tilemap, 0, 0);
+
+	// are these hardcoded, or registers?
+	const rectangle visible1(0*8, (20+48)*8-1,  4*8,  (4+7)*8-1);
+	const rectangle visible2(0*8, (20+48)*8-1, 12*8, (12+7)*8-1);
+	const rectangle visible3(0*8, (20+48)*8-1, 20*8, (20+7)*8-1);
 
 	for (i= 0;i < 64;i++)
 	{

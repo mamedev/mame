@@ -513,9 +513,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-				if (colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(bitmap, y, x)) == SPR_MASK_COLOR)
+				if (colortable_entry_get_value(machine.colortable, bitmap->pix16(y, x)) == SPR_MASK_COLOR)
 					// restore pixel
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->m_temp_bitmap, y, x);
+					bitmap->pix16(y, x) = state->m_temp_bitmap->pix16(y, x);
 	}
 }
 

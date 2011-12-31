@@ -167,7 +167,7 @@ static void ssv_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx_
 		if ( sy >= cliprect->min_y && sy <= cliprect->max_y )					\
 		{																		\
 			source	=	addr;													\
-			dest	=	BITMAP_ADDR16(bitmap, sy, 0);							\
+			dest	=	&bitmap->pix16(sy);							\
 																				\
 			for ( sx = x0; sx != x1; sx += dx )									\
 			{																	\
@@ -1191,7 +1191,7 @@ void ssv_enable_video(running_machine &machine, int enable)
 
 SCREEN_UPDATE( ssv )
 {
-	rectangle clip = { 0, 0, 0, 0 };
+	rectangle clip;
 
 	ssv_state *state = screen.machine().driver_data<ssv_state>();
 
@@ -1209,7 +1209,7 @@ SCREEN_UPDATE( ssv )
 	state->m_shadow_pen_mask = (1 << state->m_shadow_pen_shift) - 1;
 
 	/* The background color is the first one in the palette */
-	bitmap_fill(bitmap,cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	// used by twineag2 and ultrax
 	clip.min_x = (cliprect->max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x64/2] * 2 + 2;

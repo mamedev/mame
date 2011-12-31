@@ -64,7 +64,7 @@ bool cesclassic_state::screen_update(screen_device &screen, bitmap_t &bitmap, co
 {
 	int x,y,xi;
 
-	bitmap_fill(&bitmap,&cliprect,get_black_pen(machine()));
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	{
 		for(y=0;y<64;y++)
@@ -79,7 +79,7 @@ bool cesclassic_state::screen_update(screen_device &screen, bitmap_t &bitmap, co
 					color |= (((m_vram[x+y*16])>>(15-xi)) & 1)<<1;
 
 					if((x*16+xi)<256 && ((y)+0)<256)
-						*BITMAP_ADDR32(&bitmap, y, x*16+xi) = machine().pens[color];
+						bitmap.pix32(y, x*16+xi) = machine().pens[color];
 				}
 			}
 		}

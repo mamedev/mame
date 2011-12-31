@@ -186,7 +186,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	/* if we're disabled, don't draw */
 	if (!state->m_back_enable)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(machine));
+		bitmap->fill(get_black_pen(machine), *cliprect);
 		return;
 	}
 
@@ -196,8 +196,8 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	for (y=0;y<256;y++)
 	{
 		int realy = (y + scrolly) & 0x1ff;
-		UINT16 *src = BITMAP_ADDR16(bm,     realy, 0);
-		UINT16 *dst = BITMAP_ADDR16(bitmap, y,     0);
+		UINT16 *src = &bm->pix16(realy);
+		UINT16 *dst = &bitmap->pix16(y);
 
 
 		for (x=0;x<256;x++)

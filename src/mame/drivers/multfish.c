@@ -246,7 +246,7 @@ static SCREEN_UPDATE(multfish)
 	multfish_state *state = screen.machine().driver_data<multfish_state>();
 	int i;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	if (!state->m_disp_enable) return 0;
 

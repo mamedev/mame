@@ -547,8 +547,8 @@ static void m92_draw_tiles(running_machine &machine, bitmap_t *bitmap,const rect
 
 SCREEN_UPDATE( m92 )
 {
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);
 	m92_update_scroll_positions(screen.machine());
 	m92_draw_tiles(screen.machine(), bitmap, cliprect);
 
@@ -564,8 +564,8 @@ SCREEN_UPDATE( m92 )
 
 SCREEN_UPDATE( ppan )
 {
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);
 	m92_update_scroll_positions(screen.machine());
 	m92_draw_tiles(screen.machine(), bitmap, cliprect);
 

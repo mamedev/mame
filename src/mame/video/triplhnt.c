@@ -97,8 +97,8 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 			{
 				for (y = rect.min_y; y <= rect.max_y; y++)
 				{
-					pen_t a = *BITMAP_ADDR16(state->m_helper, y, x);
-					pen_t b = *BITMAP_ADDR16(bitmap, y, x);
+					pen_t a = state->m_helper->pix16(y, x);
+					pen_t b = bitmap->pix16(y, x);
 
 					if (a == 2 && b == 7)
 					{
@@ -107,7 +107,7 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 					}
 
 					if (a != 1)
-						*BITMAP_ADDR16(bitmap, y, x) = a;
+						bitmap->pix16(y, x) = a;
 				}
 			}
 		}

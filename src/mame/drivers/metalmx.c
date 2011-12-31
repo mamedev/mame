@@ -291,7 +291,7 @@ static SCREEN_UPDATE( metalmx )
 	{
 		int x;
 		UINT16 *src = &src_base[512 * y];
-		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dst = &bitmap->pix16(y);
 
 		for(x = 0; x < 512; x++)
 			*dst++ = *src++;

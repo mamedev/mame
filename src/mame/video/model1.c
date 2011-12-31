@@ -137,7 +137,7 @@ static void project_point_direct(struct view *view, struct point *p)
 
 static void draw_hline(bitmap_t *bitmap, int x1, int x2, int y, int color)
 {
-	UINT16 *base = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *base = &bitmap->pix16(y);
 	while(x1 <= x2) {
 		base[x1] = color;
 		x1++;
@@ -146,7 +146,7 @@ static void draw_hline(bitmap_t *bitmap, int x1, int x2, int y, int color)
 
 static void draw_hline_moired(bitmap_t *bitmap, int x1, int x2, int y, int color)
 {
-	UINT16 *base = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *base = &bitmap->pix16(y);
 	while(x1 <= x2) {
 		if((x1^y)&1)
 			base[x1] = color;
@@ -385,7 +385,7 @@ static void draw_line(bitmap_t *bitmap, struct view *view, int color, int x1, in
 	cur = 0;
 	while(x != x2 || y != y2) {
 		if(x>=view->x1 && x<=view->x2 && y>=view->y1 && y<=view->y2)
-			*BITMAP_ADDR16(bitmap, y, x) = color;
+			bitmap->pix16(y, x) = color;
 		x += s1x;
 		y += s1y;
 		cur += d2;
@@ -396,7 +396,7 @@ static void draw_line(bitmap_t *bitmap, struct view *view, int color, int x1, in
 		}
 	}
 	if(x>=view->x1 && x<=view->x2 && y>=view->y1 && y<=view->y2)
-		*BITMAP_ADDR16(bitmap, y, x) = color;
+		bitmap->pix16(y, x) = color;
 }
 #endif
 static int comp_quads(const void *q1, const void *q2)
@@ -1518,8 +1518,8 @@ SCREEN_UPDATE(model1)
 	view->ayyc = cos(view->ayy);
 	view->ayys = sin(view->ayy);
 
-	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
+	screen.machine().priority_bitmap->fill(0);
+	bitmap->fill(screen.machine().pens[0], *cliprect);
 
 	segas24_tile *tile = screen.machine().device<segas24_tile>("tile");
 	tile->draw(bitmap, cliprect, 6, 0, 0);

@@ -96,7 +96,7 @@ SCREEN_UPDATE( magmax )
 
 	/* copy the background graphics */
 	if (*state->m_vreg & 0x40)		/* background disable */
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 	else
 	{
 		int v;
@@ -105,7 +105,7 @@ SCREEN_UPDATE( magmax )
 		UINT32 scroll_v = (*state->m_scroll_y) & 0xff;
 
 		/*clear background-over-sprites bitmap*/
-		bitmap_fill(screen.machine().generic.tmpbitmap, NULL, 0);
+		screen.machine().generic.tmpbitmap->fill(0);
 
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{
@@ -156,7 +156,7 @@ SCREEN_UPDATE( magmax )
 
 				/*priority: background over sprites*/
 				if (map_v_scr_100 && ((graph_data & 0x0c)==0x0c))
-					*BITMAP_ADDR16(screen.machine().generic.tmpbitmap, v, h) = line_data[h];
+					screen.machine().generic.tmpbitmap->pix16(v, h) = line_data[h];
 			}
 
 			if (state->m_flipscreen)

@@ -234,8 +234,8 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 		for (x = 0; x < 512 / 2; x++) {
 			pixdata = state->m_pixelram[(x & 0xff) + (y & 0xff) * 256];
 
-			*BITMAP_ADDR16(bitmap, y, (x * 2) + 0) = (pixdata >> 8) + (0x100 * state->m_pixelpalettebank) + 0x400;
-			*BITMAP_ADDR16(bitmap, y, (x * 2) + 1) = (pixdata & 0xff) + (0x100 * state->m_pixelpalettebank) + 0x400;
+			bitmap->pix16(y, (x * 2) + 0) = (pixdata >> 8) + (0x100 * state->m_pixelpalettebank) + 0x400;
+			bitmap->pix16(y, (x * 2) + 1) = (pixdata & 0xff) + (0x100 * state->m_pixelpalettebank) + 0x400;
 		}
 	}
 }

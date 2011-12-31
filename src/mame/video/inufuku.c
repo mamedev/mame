@@ -239,8 +239,8 @@ SCREEN_UPDATE( inufuku )
 	inufuku_state *state = screen.machine().driver_data<inufuku_state>();
 	int i;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
-	bitmap_fill(screen.machine().priority_bitmap, NULL, 0);
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	screen.machine().priority_bitmap->fill(0);
 
 	if (state->m_bg_raster)
 	{

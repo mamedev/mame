@@ -944,11 +944,11 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 		bitmap = auto_alloc(machine(), bitmap_t(actbounds.max_x + 1 - actbounds.min_x, actbounds.max_y + 1 - actbounds.min_y, BITMAP_FORMAT_ARGB32));
 
 		// copy the bits into it
-		for (int y = 0; y < bitmap->height; y++)
+		for (int y = 0; y < bitmap->height(); y++)
 		{
-			UINT32 *dstrow = BITMAP_ADDR32(bitmap, y, 0);
+			UINT32 *dstrow = &bitmap->pix32(y);
 			UINT8 *srcrow = &bits[(y + actbounds.min_y) * rowbytes];
-			for (int x = 0; x < bitmap->width; x++)
+			for (int x = 0; x < bitmap->width(); x++)
 			{
 				int effx = x + actbounds.min_x;
 				dstrow[x] = ((srcrow[effx / 8] << (effx % 8)) & 0x80) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);

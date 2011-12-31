@@ -115,7 +115,7 @@ static SCREEN_UPDATE( acefruit )
 
 					for( y = 0; y < 8; y++ )
 					{
-						UINT16 *dst = BITMAP_ADDR16( bitmap, y + ( row * 8 ), x + ( col * 16 ) );
+						UINT16 *dst = &bitmap->pix16(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->line_modulo ) + ( ( spriteindex % 64 ) >> 1 ) );
 					}
 
@@ -131,7 +131,7 @@ static SCREEN_UPDATE( acefruit )
 				{
 					for( y = 0; y < 8; y++ )
 					{
-						UINT16 *dst = BITMAP_ADDR16( bitmap, y + ( row * 8 ), x + ( col * 16 ) );
+						UINT16 *dst = &bitmap->pix16(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = 0;
 					}
 				}

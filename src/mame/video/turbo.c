@@ -423,8 +423,8 @@ SCREEN_UPDATE( turbo )
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		const UINT16 *fore = (UINT16 *)fgpixmap->base + y * fgpixmap->rowpixels;
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		const UINT16 *fore = &fgpixmap->pix16(y);
+		UINT16 *dest = &bitmap->pix16(y);
 		int sel, coch, babit, slipar_acciar, area, offs, areatmp, road = 0;
 		sprite_info sprinfo;
 
@@ -773,8 +773,8 @@ SCREEN_UPDATE( subroc3d )
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		const UINT16 *fore = (UINT16 *)fgpixmap->base + y * fgpixmap->rowpixels;
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		const UINT16 *fore = &fgpixmap->pix16(y);
+		UINT16 *dest = &bitmap->pix16(y);
 		sprite_info sprinfo;
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
@@ -993,8 +993,8 @@ SCREEN_UPDATE( buckrog )
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		const UINT16 *fore = (UINT16 *)fgpixmap->base + y * fgpixmap->rowpixels;
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		const UINT16 *fore = &fgpixmap->pix16(y);
+		UINT16 *dest = &bitmap->pix16(y);
 		sprite_info sprinfo;
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */

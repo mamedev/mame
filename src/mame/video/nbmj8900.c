@@ -206,14 +206,14 @@ static void update_pixel0(running_machine &machine, int x, int y)
 {
 	nbmj8900_state *state = machine.driver_data<nbmj8900_state>();
 	UINT8 color = state->m_videoram0[(y * state->m_screen_width) + x];
-	*BITMAP_ADDR16(state->m_tmpbitmap0, y, x) = machine.pens[color];
+	state->m_tmpbitmap0->pix16(y, x) = machine.pens[color];
 }
 
 static void update_pixel1(running_machine &machine, int x, int y)
 {
 	nbmj8900_state *state = machine.driver_data<nbmj8900_state>();
 	UINT8 color = state->m_videoram1[(y * state->m_screen_width) + x];
-	*BITMAP_ADDR16(state->m_tmpbitmap1, y, x) = machine.pens[color];
+	state->m_tmpbitmap1->pix16(y, x) = machine.pens[color];
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
@@ -444,7 +444,7 @@ SCREEN_UPDATE( nbmj8900 )
 	}
 	else
 	{
-		bitmap_fill(bitmap, 0, 0);
+		bitmap->fill(0);
 	}
 	return 0;
 }

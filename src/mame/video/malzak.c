@@ -26,7 +26,7 @@ SCREEN_UPDATE( malzak )
 	bitmap_t *s2636_0_bitmap;
 	bitmap_t *s2636_1_bitmap;
 
-	bitmap_fill(bitmap, 0, 0);
+	bitmap->fill(0);
 
 	saa5050_update(state->m_saa5050, bitmap, cliprect);
 	saa5050_frame_advance(state->m_saa5050);
@@ -60,21 +60,21 @@ SCREEN_UPDATE( malzak )
 
 			for (x = cliprect->min_x; x <= cliprect->max_x / 2; x++)
 			{
-				int pixel0 = *BITMAP_ADDR16(s2636_0_bitmap, y, x);
-				int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
+				int pixel0 = s2636_0_bitmap->pix16(y, x);
+				int pixel1 = s2636_1_bitmap->pix16(y, x);
 
 				if (S2636_IS_PIXEL_DRAWN(pixel0)) {
-					*BITMAP_ADDR16(bitmap, y*2, x*2) = S2636_PIXEL_COLOR(pixel0);
-					*BITMAP_ADDR16(bitmap, y*2+1, x*2) = S2636_PIXEL_COLOR(pixel0);
-					*BITMAP_ADDR16(bitmap, y*2, x*2+1) = S2636_PIXEL_COLOR(pixel0);
-					*BITMAP_ADDR16(bitmap, y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel0);
+					bitmap->pix16(y*2, x*2) = S2636_PIXEL_COLOR(pixel0);
+					bitmap->pix16(y*2+1, x*2) = S2636_PIXEL_COLOR(pixel0);
+					bitmap->pix16(y*2, x*2+1) = S2636_PIXEL_COLOR(pixel0);
+					bitmap->pix16(y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel0);
 				}
 
 				if (S2636_IS_PIXEL_DRAWN(pixel1)) {
-					*BITMAP_ADDR16(bitmap, y*2, x*2) = S2636_PIXEL_COLOR(pixel1);
-					*BITMAP_ADDR16(bitmap, y*2+1, x*2) = S2636_PIXEL_COLOR(pixel1);
-					*BITMAP_ADDR16(bitmap, y*2, x*2+1) = S2636_PIXEL_COLOR(pixel1);
-					*BITMAP_ADDR16(bitmap, y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel1);
+					bitmap->pix16(y*2, x*2) = S2636_PIXEL_COLOR(pixel1);
+					bitmap->pix16(y*2+1, x*2) = S2636_PIXEL_COLOR(pixel1);
+					bitmap->pix16(y*2, x*2+1) = S2636_PIXEL_COLOR(pixel1);
+					bitmap->pix16(y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel1);
 				}
 			}
 		}

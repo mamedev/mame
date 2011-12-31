@@ -272,7 +272,7 @@ static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectang
 					if (flip) x += 20*8;
 
 					if (x >= cliprect->min_x && x <= cliprect->max_x && y >= cliprect->min_y && y <= cliprect->max_y)
-						*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
+						bitmap->pix16(y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
 				}
 			}
 		}
@@ -299,7 +299,7 @@ SCREEN_UPDATE( bosco )
 		fg_clip.min_x = 28*8;
 	}
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	draw_stars(screen.machine(),bitmap,cliprect,flip_screen_get(screen.machine()));
 
 	tilemap_draw(bitmap,&bg_clip,state->m_bg_tilemap,0,0);

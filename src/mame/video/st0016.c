@@ -367,7 +367,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 								UINT16 drawypos;
 
 								if (!flipy) {drawypos = ypos+yloop;} else {drawypos = (ypos+8-1)-yloop;}
-								destline = BITMAP_ADDR16(bitmap, drawypos, 0);
+								destline = &bitmap->pix16(drawypos);
 
 								for (xloop=0; xloop<8; xloop++)
 								{
@@ -533,7 +533,7 @@ static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangl
 								UINT16 drawypos;
 
 								if (!flipy) {drawypos = ypos+yloop;} else {drawypos = (ypos+8-1)-yloop;}
-								destline = BITMAP_ADDR16(bitmap, drawypos, 0);
+								destline = &bitmap->pix16(drawypos);
 
 								for (xloop=0; xloop<8; xloop++)
 								{
@@ -616,7 +616,7 @@ SCREEN_UPDATE( st0016 )
 	}
 #endif
 
-	bitmap_fill(bitmap,cliprect,UNUSED_PEN);
+	bitmap->fill(UNUSED_PEN, *cliprect);
 	st0016_draw_screen(screen, bitmap, cliprect);
 	return 0;
 }

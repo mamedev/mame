@@ -274,7 +274,7 @@ SCREEN_UPDATE( ccastles )
 	int x, y, offs;
 
 	/* draw the sprites */
-	bitmap_fill(state->m_spritebitmap, cliprect, 0x0f);
+	state->m_spritebitmap->fill(0x0f, *cliprect);
 	for (offs = 0; offs < 320/2; offs += 4)
 	{
 		int x = spriteaddr[offs + 3];
@@ -288,7 +288,7 @@ SCREEN_UPDATE( ccastles )
 	/* draw the bitmap to the screen, looping over Y */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *dst = &bitmap->pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (state->m_syncprom[y] & 1)
@@ -300,7 +300,7 @@ SCREEN_UPDATE( ccastles )
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			UINT16 *mosrc = (UINT16 *)state->m_spritebitmap->base + y * state->m_spritebitmap->rowpixels;
+			UINT16 *mosrc = &state->m_spritebitmap->pix16(y);
 			int effy = (((y - state->m_vblank_end) + (flip ? 0 : state->m_vscroll)) ^ flip) & 0xff;
 			UINT8 *src;
 

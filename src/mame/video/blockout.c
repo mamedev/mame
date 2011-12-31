@@ -88,14 +88,14 @@ static void update_pixels( running_machine &machine, int x, int y )
 	else
 		color = (back >> 8) + 256;
 
-	*BITMAP_ADDR16(state->m_tmpbitmap, y, x) = color;
+	state->m_tmpbitmap->pix16(y, x) = color;
 
 	if (front & 0xff)
 		color = front & 0xff;
 	else
 		color = (back & 0xff) + 256;
 
-	*BITMAP_ADDR16(state->m_tmpbitmap, y, x + 1) = color;
+	state->m_tmpbitmap->pix16(y, x + 1) = color;
 }
 
 
@@ -126,14 +126,14 @@ SCREEN_UPDATE( blockout )
 
 			if (d)
 			{
-				if (d & 0x80) *BITMAP_ADDR16(bitmap, y, x + 0) = color;
-				if (d & 0x40) *BITMAP_ADDR16(bitmap, y, x + 1) = color;
-				if (d & 0x20) *BITMAP_ADDR16(bitmap, y, x + 2) = color;
-				if (d & 0x10) *BITMAP_ADDR16(bitmap, y, x + 3) = color;
-				if (d & 0x08) *BITMAP_ADDR16(bitmap, y, x + 4) = color;
-				if (d & 0x04) *BITMAP_ADDR16(bitmap, y, x + 5) = color;
-				if (d & 0x02) *BITMAP_ADDR16(bitmap, y, x + 6) = color;
-				if (d & 0x01) *BITMAP_ADDR16(bitmap, y, x + 7) = color;
+				if (d & 0x80) bitmap->pix16(y, x + 0) = color;
+				if (d & 0x40) bitmap->pix16(y, x + 1) = color;
+				if (d & 0x20) bitmap->pix16(y, x + 2) = color;
+				if (d & 0x10) bitmap->pix16(y, x + 3) = color;
+				if (d & 0x08) bitmap->pix16(y, x + 4) = color;
+				if (d & 0x04) bitmap->pix16(y, x + 5) = color;
+				if (d & 0x02) bitmap->pix16(y, x + 6) = color;
+				if (d & 0x01) bitmap->pix16(y, x + 7) = color;
 			}
 		}
 	}

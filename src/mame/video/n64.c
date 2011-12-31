@@ -124,7 +124,7 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 	{
 		for(int j = 0; j < vres; j++)
 		{
-			UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
+			UINT32 *d = &bitmap->pix32(j);
 
 			for(int i = 0; i < hres; i++)
 			{
@@ -250,7 +250,7 @@ void Processor::VideoUpdate32(bitmap_t *bitmap)
 	{
 		for (int j = 0; j < vres; j++)
 		{
-			UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
+			UINT32 *d = &bitmap->pix32(j);
 			for (int i = 0; i < hres; i++)
 			{
 				UINT32 pix = *frame_buffer32++;
@@ -3314,7 +3314,7 @@ SCREEN_UPDATE(n64)
     {
         for (int j = 0; j <height; j++)
         {
-            UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
+            UINT32 *d = &bitmap->pix32(j);
             for (int i = 0; i < state->m_rdp.GetMiscState()->m_fb_width; i++)
             {
                 d[BYTE_XOR_BE(i)] = 0;

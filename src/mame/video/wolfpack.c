@@ -196,7 +196,7 @@ static void draw_torpedo(running_machine &machine, bitmap_t* bitmap, const recta
 
 		for (x = 2 * x1; x < 2 * x2; x++)
 			if (state->m_LFSR[(state->m_current_index + 0x300 * y + x) % 0x8000])
-				*BITMAP_ADDR16(bitmap, y, x) = 1;
+				bitmap->pix16(y, x) = 1;
 	}
 }
 
@@ -242,7 +242,7 @@ static void draw_water(colortable_t *colortable, bitmap_t* bitmap, const rectang
 
 	for (y = rect.min_y; y <= rect.max_y; y++)
 	{
-		UINT16* p = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16* p = &bitmap->pix16(y);
 
 		for (x = rect.min_x; x <= rect.max_x; x++)
 			p[x] = colortable_entry_get_value(colortable, p[x]) | 0x08;
@@ -267,7 +267,7 @@ SCREEN_UPDATE( wolfpack )
 																		  color < 0xb8 ? color + 0x48 : 0xff,
 																		  color < 0xb8 ? color + 0x48 : 0xff));
 
-	bitmap_fill(bitmap, cliprect, state->m_video_invert);
+	bitmap->fill(state->m_video_invert, *cliprect);
 
 	for (i = 0; i < 8; i++)
 		for (j = 0; j < 32; j++)
@@ -294,19 +294,13 @@ SCREEN_UPDATE( wolfpack )
 SCREEN_EOF( wolfpack )
 {
 	wolfpack_state *state = screen.machine().driver_data<wolfpack_state>();
-	rectangle rect;
 
 	int x;
 	int y;
 
-	rect.min_x = 0;
-	rect.min_y = 0;
-	rect.max_x = state->m_helper->width - 1;
-	rect.max_y = state->m_helper->height - 1;
+	state->m_helper->fill(0);
 
-	bitmap_fill(state->m_helper, &rect, 0);
-
-	draw_ship(screen.machine(), state->m_helper, &rect);
+	draw_ship(screen.machine(), state->m_helper, &state->m_helper->cliprect());
 
 	for (y = 128; y < 224 - state->m_torpedo_v; y++)
 	{
@@ -315,12 +309,12 @@ SCREEN_EOF( wolfpack )
 
 		for (x = 2 * x1; x < 2 * x2; x++)
 		{
-			if (x < 0 || x >= state->m_helper->width)
+			if (x < 0 || x >= state->m_helper->width())
 				continue;
-			if (y < 0 || y >= state->m_helper->height)
+			if (y < 0 || y >= state->m_helper->height())
 				continue;
 
-			if (*BITMAP_ADDR16(state->m_helper, y, x))
+			if (state->m_helper->pix16(y, x))
 				state->m_collision = 1;
 		}
 	}

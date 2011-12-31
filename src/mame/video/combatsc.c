@@ -437,7 +437,7 @@ SCREEN_UPDATE( combatsc )
 	tilemap_set_scrolly(state->m_bg_tilemap[0], 0, k007121_ctrlram_r(state->m_k007121_1, 2));
 	tilemap_set_scrolly(state->m_bg_tilemap[1], 0, k007121_ctrlram_r(state->m_k007121_2, 2));
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (state->m_priority == 0)
 	{
@@ -478,11 +478,11 @@ SCREEN_UPDATE( combatsc )
 
 		clip = *cliprect;
 		clip.max_x = clip.min_x + 7;
-		bitmap_fill(bitmap, &clip, 0);
+		bitmap->fill(0, clip);
 
 		clip = *cliprect;
 		clip.min_x = clip.max_x - 7;
-		bitmap_fill(bitmap, &clip, 0);
+		bitmap->fill(0, clip);
 	}
 	return 0;
 }

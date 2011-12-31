@@ -163,7 +163,7 @@ SCREEN_UPDATE( playch10_top )
 		/* render the ppu */
 		ppu2c0x_render( ppu, bitmap, 0, 0, 0, 0 );
 	else
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 
 	return 0;
 }
@@ -181,7 +181,7 @@ SCREEN_UPDATE( playch10_bottom )
 	if ( !state->m_pc10_sdcs )
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 
 	return 0;
 }

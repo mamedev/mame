@@ -271,7 +271,7 @@ static void zdrawgfxzoom(
 		int scalex, int scaley, int zpos )
 {
 	if (!scalex || !scaley) return;
-	if (dest_bmp->bpp == 16)
+	if (dest_bmp->bpp() == 16)
 	{
 		if( gfx )
 		{
@@ -347,8 +347,8 @@ static void zdrawgfxzoom(
 						for( y=sy; y<ey; y++ )
 						{
 							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-							UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+							UINT16 *dest = &dest_bmp->pix16(y);
+							UINT8 *pri = &priority_bitmap->pix8(y);
 							int x, x_index = x_index_base;
 							if( mPalXOR )
 							{
@@ -417,7 +417,7 @@ namcos2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle
 	int loop;
 	if( pri==0 )
 	{
-		bitmap_fill( machine.priority_bitmap, cliprect , 0);
+		machine.priority_bitmap->fill(0, *cliprect );
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -528,7 +528,7 @@ namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_t *bitmap, const
 	int loop;
 	if( pri==0 )
 	{
-		bitmap_fill( machine.priority_bitmap, cliprect , 0);
+		machine.priority_bitmap->fill(0, *cliprect );
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -773,7 +773,7 @@ draw_spriteC355(running_machine &machine, bitmap_t *bitmap, const rectangle *cli
 	xscroll &= 0x1ff; if( xscroll & 0x100 ) xscroll |= ~0x1ff;
 	yscroll &= 0x1ff; if( yscroll & 0x100 ) yscroll |= ~0x1ff;
 
-	if( bitmap->width > 384 )
+	if( bitmap->width() > 384 )
 	{ /* Medium Resolution: System21 adjust */
 			xscroll = (INT16)mSpritePos[1];
 			xscroll &= 0x3ff; if( xscroll & 0x200 ) xscroll |= ~0x3ff;
@@ -947,7 +947,7 @@ namco_obj_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *clip
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if( pri==0 )
 	{
-		bitmap_fill( machine.priority_bitmap, cliprect , 0);
+		machine.priority_bitmap->fill(0, *cliprect );
 	}
 //  if( offs==0 )
 	{ /* boot */
@@ -1219,7 +1219,7 @@ DrawRozHelper(
 	const struct RozParam *rozInfo )
 {
 
-	if( (bitmap->bpp == 16) &&
+	if( (bitmap->bpp() == 16) &&
 	    (namcos2_gametype != NAMCOFL_SPEED_RACER) &&
 	    (namcos2_gametype != NAMCOFL_FINAL_LAP_R))
 	{
@@ -1235,14 +1235,14 @@ DrawRozHelper(
 			int x = sx;
 			UINT32 cx = startx;
 			UINT32 cy = starty;
-			UINT16 *dest = BITMAP_ADDR16(bitmap, sy, sx);
+			UINT16 *dest = &bitmap->pix16(sy, sx);
 			while( x <= clip->max_x )
 			{
 				UINT32 xpos = (((cx>>16)&size_mask) + rozInfo->left)&0xfff;
 				UINT32 ypos = (((cy>>16)&size_mask) + rozInfo->top)&0xfff;
-				if( *BITMAP_ADDR8(flagsbitmap, ypos, xpos)&TILEMAP_PIXEL_LAYER0 )
+				if( flagsbitmap->pix8(ypos, xpos)&TILEMAP_PIXEL_LAYER0 )
 				{
-					*dest = *BITMAP_ADDR16(srcbitmap,ypos,xpos)+rozInfo->color;
+					*dest = srcbitmap->pix16(ypos, xpos)+rozInfo->color;
 				}
 				cx += rozInfo->incxx;
 				cy += rozInfo->incxy;
@@ -1286,7 +1286,7 @@ DrawRozScanline( bitmap_t *bitmap, int line, int which, int pri, const rectangle
 			if( pri == rozInfo.priority )
 			{
 				clip.min_x = 0;
-				clip.max_x = bitmap->width-1;
+				clip.max_x = bitmap->width()-1;
 				clip.min_y = clip.max_y = line;
 
 				if( clip.min_x < cliprect->min_x ){ clip.min_x = cliprect->min_x; }
@@ -1618,11 +1618,11 @@ namco_road_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cli
 			if( zoomx )
 			{
 				unsigned sourcey = mpRoadRAM[0x1fc00/2+i+15]+yscroll;
-				const UINT16 *pSourceGfx = BITMAP_ADDR16(pSourceBitmap, sourcey&(ROAD_TILEMAP_HEIGHT-1), 0);
+				const UINT16 *pSourceGfx = &pSourceBitmap->pix16(sourcey&(ROAD_TILEMAP_HEIGHT-1));
 				unsigned dsourcex = (ROAD_TILEMAP_WIDTH<<16)/zoomx;
 				if( dsourcex )
 				{
-					UINT16 *pDest = BITMAP_ADDR16(bitmap, i, 0);
+					UINT16 *pDest = &bitmap->pix16(i);
 					unsigned sourcex = 0;
 					int numpixels = (44*ROAD_TILE_SIZE<<16)/dsourcex;
 					int clipPixels;

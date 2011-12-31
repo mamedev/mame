@@ -92,7 +92,7 @@ SCREEN_UPDATE( fgoal )
 		{
 			if (y < 256 && x < 256)
 			{
-				*BITMAP_ADDR16(state->m_fgbitmap, y, x) = 128 + 16;
+				state->m_fgbitmap->pix16(y, x) = 128 + 16;
 			}
 		}
 	}
@@ -101,10 +101,10 @@ SCREEN_UPDATE( fgoal )
 
 	for (y = 0; y < 256; y++)
 	{
-		UINT16* p = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16* p = &bitmap->pix16(y);
 
-		const UINT16* FG = BITMAP_ADDR16(state->m_fgbitmap, y, 0);
-		const UINT16* BG = BITMAP_ADDR16(state->m_bgbitmap, y, 0);
+		const UINT16* FG = &state->m_fgbitmap->pix16(y);
+		const UINT16* BG = &state->m_bgbitmap->pix16(y);
 
 		for (x = 0; x < 256; x += 8)
 		{

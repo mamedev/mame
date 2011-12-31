@@ -819,7 +819,7 @@ static void update_bitmap(int next_x, int next_y)
 		if (collision_check(lineM0, lineM1, colx1, x2))
 			CXPPMM |= 0x40;
 
-		p = BITMAP_ADDR16(helper[current_bitmap], y % screen_height, 34);
+		p = &helper[current_bitmap]->pix16(y % screen_height, 34);
 
 		for (x = x1; x < x2; x++)
 		{
@@ -828,12 +828,12 @@ static void update_bitmap(int next_x, int next_y)
 
 		if ( x2 == 160 && y % screen_height == (screen_height - 1) ) {
 			int	t_y;
-			for ( t_y = 0; t_y < helper[2]->height; t_y++ ) {
-				UINT16*	l0 = BITMAP_ADDR16( helper[current_bitmap], t_y, 0 );
-				UINT16*	l1 = BITMAP_ADDR16( helper[1 - current_bitmap], t_y, 0 );
-				UINT16*	l2 = BITMAP_ADDR16( helper[2], t_y, 0 );
+			for ( t_y = 0; t_y < helper[2]->height(); t_y++ ) {
+				UINT16*	l0 = &helper[current_bitmap]->pix16(t_y);
+				UINT16*	l1 = &helper[1 - current_bitmap]->pix16(t_y);
+				UINT16*	l2 = &helper[2]->pix16(t_y);
 				int t_x;
-				for( t_x = 0; t_x < helper[2]->width; t_x++ ) {
+				for( t_x = 0; t_x < helper[2]->width(); t_x++ ) {
 					if ( l0[t_x] != l1[t_x] ) {
 						/* Combine both entries */
 						l2[t_x] = ( ( l0[t_x] + 1 ) << 7 ) | l1[t_x];
@@ -1188,7 +1188,7 @@ static WRITE8_HANDLER( HMOVE_w )
 		}
 		if (curr_y < screen_height)
 		{
-			memset(BITMAP_ADDR16(helper[current_bitmap], curr_y, 34), 0, 16);
+			memset(&helper[current_bitmap]->pix16(curr_y, 34), 0, 16);
 		}
 
 		prev_x = 8;

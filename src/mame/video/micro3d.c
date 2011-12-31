@@ -69,7 +69,7 @@ void micro3d_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanli
 	micro3d_state *state = screen.machine().driver_data<micro3d_state>();
 
 	UINT16 *src = &state->m_micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT16 *dest = &bitmap->pix16(scanline);
 	int coladdr = params->coladdr;
 	int sd_11_7 = (state->m_creg & 0x1f) << 7;
 	int x;

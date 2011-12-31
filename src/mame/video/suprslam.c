@@ -157,7 +157,7 @@ SCREEN_UPDATE( suprslam )
 	suprslam_state *state = screen.machine().driver_data<suprslam_state>();
 	tilemap_set_scrollx( state->m_screen_tilemap,0, state->m_screen_vregs[0x04/2] );
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_bg_tilemap, 0, 0, 1);
 	if(!(state->m_spr_ctrl[0] & 8))
 		draw_sprites(screen.machine(), bitmap, cliprect);

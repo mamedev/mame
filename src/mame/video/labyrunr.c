@@ -188,8 +188,8 @@ SCREEN_UPDATE( labyrunr )
 
 	set_pens(screen.machine());
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect,0);
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	if (~k007121_ctrlram_r(state->m_k007121, 3) & 0x20)
 	{
@@ -198,8 +198,8 @@ SCREEN_UPDATE( labyrunr )
 		finalclip0 = state->m_clip0;
 		finalclip1 = state->m_clip1;
 
-		sect_rect(&finalclip0, cliprect);
-		sect_rect(&finalclip1, cliprect);
+		finalclip0 &= *cliprect;
+		finalclip1 &= *cliprect;
 
 		tilemap_set_scrollx(state->m_layer0, 0, ctrl_0 - 40);
 		tilemap_set_scrollx(state->m_layer1, 0, 0);

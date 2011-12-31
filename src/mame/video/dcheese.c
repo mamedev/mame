@@ -124,8 +124,8 @@ SCREEN_UPDATE( dcheese )
 	/* update the pixels */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-		UINT16 *src = BITMAP_ADDR16(state->m_dstbitmap, (y + state->m_blitter_vidparam[0x28/2]) % DSTBITMAP_HEIGHT, 0);
+		UINT16 *dest = &bitmap->pix16(y);
+		UINT16 *src = &state->m_dstbitmap->pix16((y + state->m_blitter_vidparam[0x28/2]) % DSTBITMAP_HEIGHT);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			dest[x] = src[x];
@@ -148,7 +148,7 @@ static void do_clear( running_machine &machine )
 
 	/* clear the requested scanlines */
 	for (y = state->m_blitter_vidparam[0x2c/2]; y < state->m_blitter_vidparam[0x2a/2]; y++)
-		memset(BITMAP_ADDR16(state->m_dstbitmap, y % DSTBITMAP_HEIGHT, 0), 0, DSTBITMAP_WIDTH * 2);
+		memset(&state->m_dstbitmap->pix16(y % DSTBITMAP_HEIGHT), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
 	machine.scheduler().timer_set(machine.primary_screen->scan_period(), FUNC(dcheese_signal_irq_callback), 1);
@@ -182,7 +182,7 @@ static void do_blit( running_machine &machine )
 	/* loop over target rows */
 	for (y = ystart; y <= yend; y++)
 	{
-		UINT16 *dst = BITMAP_ADDR16(state->m_dstbitmap, y % DSTBITMAP_HEIGHT, 0);
+		UINT16 *dst = &state->m_dstbitmap->pix16(y % DSTBITMAP_HEIGHT);
 
 		/* loop over target columns */
 		for (x = xstart; x <= xend; x++)

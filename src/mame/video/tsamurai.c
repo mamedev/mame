@@ -218,7 +218,7 @@ SCREEN_UPDATE( tsamurai )
         Note that the background color register isn't well understood
         (screenshots would be helpful)
     */
-	bitmap_fill(bitmap,cliprect,state->m_bgcolor);
+	bitmap->fill(state->m_bgcolor, *cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_background,0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_foreground,0,0);

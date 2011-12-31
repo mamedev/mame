@@ -878,7 +878,7 @@ SCREEN_UPDATE( jumppop )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 
-	//  bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	//  bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	tilemap_set_scrollx(state->m_pf1_tilemap, 0, state->m_control[2] - 0x3a0);
 	tilemap_set_scrolly(state->m_pf1_tilemap, 0, state->m_control[3]);

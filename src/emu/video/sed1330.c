@@ -599,7 +599,7 @@ void sed1330_device::draw_text_scanline(bitmap_t *bitmap, const rectangle *clipr
 				{
 					for (x = 0; x < m_crx; x++)
 					{
-						*BITMAP_ADDR16(bitmap, y, (sx * m_fx) + x) = 1;
+						bitmap->pix16(y, (sx * m_fx) + x) = 1;
 					}
 				}
 			}
@@ -610,7 +610,7 @@ void sed1330_device::draw_text_scanline(bitmap_t *bitmap, const rectangle *clipr
 				{
 					for (x = 0; x < m_crx; x++)
 					{
-						*BITMAP_ADDR16(bitmap, y, (sx * m_fx) + x) = 1;
+						bitmap->pix16(y, (sx * m_fx) + x) = 1;
 					}
 				}
 			}
@@ -633,7 +633,7 @@ void sed1330_device::draw_graphics_scanline(bitmap_t *bitmap, const rectangle *c
 
 		for (x = 0; x < m_fx; x++)
 		{
-			*BITMAP_ADDR16(bitmap, y, (sx * m_fx) + x) = BIT(data, 7);
+			bitmap->pix16(y, (sx * m_fx) + x) = BIT(data, 7);
 			data <<= 1;
 		}
 	}

@@ -340,16 +340,16 @@ static DEVICE_START( atarirle )
 
 	mo->vram[0][0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	mo->vram[0][1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	bitmap_fill(mo->vram[0][0], NULL, 0);
-	bitmap_fill(mo->vram[0][1], NULL, 0);
+	mo->vram[0][0]->fill(0);
+	mo->vram[0][1]->fill(0);
 
 	/* allocate alternate bitmaps if needed */
 	if (mo->vrammask.mask != 0)
 	{
 		mo->vram[1][0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 		mo->vram[1][1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-		bitmap_fill(mo->vram[1][0], NULL, 0);
-		bitmap_fill(mo->vram[1][1], NULL, 0);
+		mo->vram[1][0]->fill(0);
+		mo->vram[1][1]->fill(0);
 	}
 
 	mo->partial_scanline = -1;
@@ -425,9 +425,9 @@ void atarirle_control_w(device_t *device, UINT8 bits)
 //logerror("  partial erase %d-%d (frame %d)\n", cliprect.min_y, cliprect.max_y, (oldbits & ATARIRLE_CONTROL_FRAME) >> 2);
 
 		/* erase the bitmap */
-		bitmap_fill(mo->vram[0][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2], &cliprect, 0);
+		mo->vram[0][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2]->fill(0, cliprect);
 		if (mo->vrammask.mask != 0)
-			bitmap_fill(mo->vram[1][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2], &cliprect, 0);
+			mo->vram[1][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2]->fill(0, cliprect);
 	}
 
 	/* update the bits */
@@ -481,9 +481,9 @@ void atarirle_eof(device_t *device)
 //logerror("  partial erase %d-%d (frame %d)\n", cliprect.min_y, cliprect.max_y, (mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2);
 
 			/* erase the bitmap */
-			bitmap_fill(mo->vram[0][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2], &cliprect, 0);
+			mo->vram[0][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2]->fill(0, cliprect);
 			if (mo->vrammask.mask != 0)
-				bitmap_fill(mo->vram[1][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2], &cliprect, 0);
+				mo->vram[1][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2]->fill(0, cliprect);
 		}
 
 		/* reset the partial scanline to -1 so we can detect full updates */
@@ -921,13 +921,13 @@ if (hilite)
 
 			for (ty = sy; ty <= ey; ty++)
 			{
-				*BITMAP_ADDR16(bitmap1, ty, sx) = machine.rand() & 0xff;
-				*BITMAP_ADDR16(bitmap1, ty, ex) = machine.rand() & 0xff;
+				bitmap1->pix16(ty, sx) = machine.rand() & 0xff;
+				bitmap1->pix16(ty, ex) = machine.rand() & 0xff;
 			}
 			for (tx = sx; tx <= ex; tx++)
 			{
-				*BITMAP_ADDR16(bitmap1, sy, tx) = machine.rand() & 0xff;
-				*BITMAP_ADDR16(bitmap1, ey, tx) = machine.rand() & 0xff;
+				bitmap1->pix16(sy, tx) = machine.rand() & 0xff;
+				bitmap1->pix16(ey, tx) = machine.rand() & 0xff;
 			}
 		} while (0);
 fprintf(stderr, "   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",
@@ -973,7 +973,7 @@ void draw_rle(atarirle_data *mo, bitmap_t *bitmap, int code, int color, int hfli
 		return;
 
 	/* 16-bit case */
-	assert(bitmap->bpp == 16);
+	assert(bitmap->bpp() == 16);
 	if (!hflip)
 		draw_rle_zoom(bitmap, info, palettebase, x, y, xscale << 4, yscale << 4, clip);
 	else
@@ -1043,7 +1043,7 @@ void draw_rle_zoom(bitmap_t *bitmap, const atarirle_info *gfx,
 	/* loop top to bottom */
 	for (y = sy; y <= ey; y++, sourcey += dy)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, sx);
+		UINT16 *dest = &bitmap->pix16(y, sx);
 		int j, sourcex = dx / 2, rle_end = 0;
 		const UINT16 *base;
 		int entry_count;
@@ -1106,7 +1106,7 @@ void draw_rle_zoom(bitmap_t *bitmap, const atarirle_info *gfx,
 		/* clipped case */
 		else
 		{
-			const UINT16 *end = BITMAP_ADDR16(bitmap, y, ex);
+			const UINT16 *end = &bitmap->pix16(y, ex);
 			int to_be_skipped = pixels_to_skip;
 
 			/* decode the pixels */
@@ -1232,7 +1232,7 @@ void draw_rle_zoom_hflip(bitmap_t *bitmap, const atarirle_info *gfx,
 	/* loop top to bottom */
 	for (y = sy; y <= ey; y++, sourcey += dy)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, ex);
+		UINT16 *dest = &bitmap->pix16(y, ex);
 		int j, sourcex = dx / 2, rle_end = 0;
 		const UINT16 *base;
 		int entry_count;
@@ -1295,7 +1295,7 @@ void draw_rle_zoom_hflip(bitmap_t *bitmap, const atarirle_info *gfx,
 		/* clipped case */
 		else
 		{
-			const UINT16 *start = BITMAP_ADDR16(bitmap, y, sx);
+			const UINT16 *start = &bitmap->pix16(y, sx);
 			int to_be_skipped = pixels_to_skip;
 
 			/* decode the pixels */

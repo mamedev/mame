@@ -399,8 +399,8 @@ static void pdraw_tile(running_machine &machine,
 			{
 				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 				const UINT8 *mask_addr = mask_base + (y_index>>16) * mask->line_modulo;
-				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, y, 0);
+				UINT16 *dest = &dest_bmp->pix16(y);
+				UINT8 *pri = &machine.priority_bitmap->pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -605,8 +605,8 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
                  * feature, Numan Athletics.
                  */
 				draw_pixel_line(
-					BITMAP_ADDR16(bitmap, line, 0),
-					BITMAP_ADDR8(machine.priority_bitmap, line, 0),
+					&bitmap->pix16(line),
+					&machine.priority_bitmap->pix8(line),
 					videoram + ydata + 25,
 					paldata );
 			}
@@ -677,9 +677,9 @@ SCREEN_UPDATE( namcona1 )
 			}
 		}
 
-		bitmap_fill( screen.machine().priority_bitmap,cliprect ,0);
+		screen.machine().priority_bitmap->fill(0, *cliprect );
 
-		bitmap_fill( bitmap, cliprect , 0xff); /* background color? */
+		bitmap->fill(0xff, *cliprect ); /* background color? */
 
 		for( priority = 0; priority<8; priority++ )
 		{

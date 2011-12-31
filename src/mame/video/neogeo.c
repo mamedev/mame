@@ -276,7 +276,7 @@ static void draw_fixed_layer( running_machine &machine, bitmap_t *bitmap, int sc
 	UINT8* gfx_base = machine.region(state->m_fixed_layer_source ? "fixed" : "fixedbios")->base();
 	UINT32 addr_mask = machine.region(state->m_fixed_layer_source ? "fixed" : "fixedbios")->bytes() - 1;
 	UINT16 *video_data = &state->m_videoram[0x7000 | (scanline >> 3)];
-	UINT32 *pixel_addr = BITMAP_ADDR32(bitmap, scanline, NEOGEO_HBEND);
+	UINT32 *pixel_addr = &bitmap->pix32(scanline, NEOGEO_HBEND);
 
 	int garouoffsets[32];
 	int banked = state->m_fixed_layer_source && (addr_mask > 0x1ffff);
@@ -540,7 +540,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, int scanli
 			{
 				int i;
 
-				UINT32 *pixel_addr = BITMAP_ADDR32(bitmap, scanline, x + NEOGEO_HBEND);
+				UINT32 *pixel_addr = &bitmap->pix32(scanline, x + NEOGEO_HBEND);
 
 				for (i = 0; i < 0x10; i++)
 				{
@@ -562,7 +562,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, int scanli
 				int i;
 
 				int x_save = x;
-				UINT32 *pixel_addr = BITMAP_ADDR32(bitmap, scanline, NEOGEO_HBEND);
+				UINT32 *pixel_addr = &bitmap->pix32(scanline, NEOGEO_HBEND);
 
 				for (i = 0; i < 0x10; i++)
 				{
@@ -925,7 +925,7 @@ SCREEN_UPDATE( neogeo )
 	neogeo_state *state = screen.machine().driver_data<neogeo_state>();
 
 	/* fill with background color first */
-	bitmap_fill(bitmap, cliprect, state->m_pens[0x0fff]);
+	bitmap->fill(state->m_pens[0x0fff], *cliprect);
 
 	draw_sprites(screen.machine(), bitmap, cliprect->min_y);
 

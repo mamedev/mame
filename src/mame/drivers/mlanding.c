@@ -66,7 +66,7 @@ static SCREEN_UPDATE(mlanding)
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
 		UINT16 *src = &state->m_g_ram[y * 512/2 + cliprect->min_x];
-		UINT16 *dst = BITMAP_ADDR16(bitmap, y, cliprect->min_x);
+		UINT16 *dst = &bitmap->pix16(y, cliprect->min_x);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
 		{

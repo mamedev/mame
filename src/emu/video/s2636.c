@@ -173,9 +173,9 @@ static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or
 						continue;
 
 					if (or_mode)
-						*BITMAP_ADDR16(bitmap, ty, tx) = 0x08 | *BITMAP_ADDR16(bitmap, ty, tx) | color;
+						bitmap->pix16(ty, tx) = 0x08 | bitmap->pix16(ty, tx) | color;
 					else
-						*BITMAP_ADDR16(bitmap, ty, tx) = 0x08 | color;
+						bitmap->pix16(ty, tx) = 0x08 | color;
 				}
 			}
 		}
@@ -200,7 +200,7 @@ static int check_collision( device_t *device, int spriteno1, int spriteno2, cons
 
 	/* TODO: does not check shadow sprites yet */
 
-	bitmap_fill(s2636->collision_bitmap, cliprect, 0);
+	s2636->collision_bitmap->fill(0, *cliprect);
 
 	if ((attr1[0x0a] != 0xff) && (attr2[0x0a] != 0xff))
 	{
@@ -225,7 +225,7 @@ static int check_collision( device_t *device, int spriteno1, int spriteno2, cons
 					(y < cliprect->min_y) || (y > cliprect->max_y))
 					continue;
 
-				checksum = checksum + *BITMAP_ADDR16(s2636->collision_bitmap, y, x);
+				checksum = checksum + s2636->collision_bitmap->pix16(y, x);
 			}
 
 		/* black out second sprite */
@@ -239,7 +239,7 @@ static int check_collision( device_t *device, int spriteno1, int spriteno2, cons
 					(y < cliprect->min_y) || (y > cliprect->max_y))
 					continue;
 
-				checksum = checksum - *BITMAP_ADDR16(s2636->collision_bitmap, y, x);
+				checksum = checksum - s2636->collision_bitmap->pix16(y, x);
 			}
 	}
 
@@ -260,7 +260,7 @@ bitmap_t *s2636_update( device_t *device, const rectangle *cliprect )
 	UINT8 collision = 0;
 	int spriteno;
 
-	bitmap_fill(s2636->bitmap, cliprect, 0);
+	s2636->bitmap->fill(0, *cliprect);
 
 	for (spriteno = 0; spriteno < 4; spriteno++)
 	{

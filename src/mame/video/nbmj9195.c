@@ -201,7 +201,7 @@ static void update_pixel(running_machine &machine, int vram, int x, int y)
 {
 	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
 	UINT16 color = state->m_videoram[vram][(y * machine.primary_screen->width()) + x];
-	*BITMAP_ADDR16(state->m_tmpbitmap[vram], y, x) = color;
+	state->m_tmpbitmap[vram]->pix16(y, x) = color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
@@ -494,7 +494,7 @@ SCREEN_UPDATE( nbmj9195 )
 		// nbmj9195 1layer
 		copyscrollbitmap(bitmap, state->m_tmpbitmap[0], SCANLINE_MAX, state->m_scrollx_raster[0], 1, &scrolly[0], cliprect);
 	else
-		bitmap_fill(bitmap, 0, 0x0ff);
+		bitmap->fill(0x0ff);
 
 	if (state->m_dispflag[1])
 	{

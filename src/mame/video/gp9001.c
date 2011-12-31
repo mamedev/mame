@@ -917,8 +917,8 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_t *bitmap,
 								if (drawxx>=cliprect->min_x && drawxx<=cliprect->max_x && drawyy>=cliprect->min_y && drawyy<=cliprect->max_y)
 								{
 									UINT8 pix = srcdata[count];
-									UINT16* dstptr = BITMAP_ADDR16(bitmap,drawyy,drawxx);
-									UINT8* dstpri = BITMAP_ADDR8(this->custom_priority_bitmap, drawyy, drawxx);
+									UINT16* dstptr = &bitmap->pix16(drawyy, drawxx);
+									UINT8* dstpri = &this->custom_priority_bitmap->pix8(drawyy, drawxx);
 
 									if (priority >= dstpri[0])
 									{
@@ -968,9 +968,9 @@ void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine& machine, bitm
 	{
 		int realy = (y+scrolly)&0x1ff;
 
-		srcptr = BITMAP_ADDR16(tmb, realy, 0);
-		dstptr = BITMAP_ADDR16(bitmap, y, 0);
-		dstpriptr = BITMAP_ADDR8(this->custom_priority_bitmap, y, 0);
+		srcptr = &tmb->pix16(realy);
+		dstptr = &bitmap->pix16(y);
+		dstpriptr = &this->custom_priority_bitmap->pix8(y);
 
 		for (x=0;x<width;x++)
 		{

@@ -160,7 +160,7 @@ SCREEN_UPDATE( oneshot )
 {
 	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	tilemap_set_scrollx(state->m_mid_tilemap, 0, state->m_scroll[0] - 0x1f5);
 	tilemap_set_scrolly(state->m_mid_tilemap, 0, state->m_scroll[1]);
@@ -177,7 +177,7 @@ SCREEN_UPDATE( maddonna )
 {
 	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	tilemap_set_scrolly(state->m_mid_tilemap, 0, state->m_scroll[1]); // other registers aren't used so we don't know which layers they relate to
 

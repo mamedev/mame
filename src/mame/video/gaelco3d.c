@@ -212,8 +212,8 @@ void gaelco3d_renderer::render_noz_noperspective(INT32 scanline, const extent_t 
 	offs_t endmask = m_texture_size - 1;
 	const rgb_t *palsource = m_state.m_palette + object.color;
 	UINT32 tex = object.tex;
-	UINT16 *dest = BITMAP_ADDR16(m_screenbits, scanline, 0);
-	UINT16 *zbuf = BITMAP_ADDR16(m_zbuffer, scanline, 0);
+	UINT16 *dest = &m_screenbits->pix16(scanline);
+	UINT16 *zbuf = &m_zbuffer->pix16(scanline);
 	int startx = extent.startx;
 	float uoz = (object.uoz_base + scanline * object.uoz_dy + startx * object.uoz_dx) * zbase;
 	float voz = (object.voz_base + scanline * object.voz_dy + startx * object.voz_dx) * zbase;
@@ -251,8 +251,8 @@ void gaelco3d_renderer::render_normal(INT32 scanline, const extent_t &extent, co
 	const rgb_t *palsource = m_state.m_palette + object.color;
 	UINT32 tex = object.tex;
 	float z0 = object.z0;
-	UINT16 *dest = BITMAP_ADDR16(m_screenbits, scanline, 0);
-	UINT16 *zbuf = BITMAP_ADDR16(m_zbuffer, scanline, 0);
+	UINT16 *dest = &m_screenbits->pix16(scanline);
+	UINT16 *zbuf = &m_zbuffer->pix16(scanline);
 	int startx = extent.startx;
 	float ooz = object.ooz_base + scanline * object.ooz_dy + startx * ooz_dx;
 	float uoz = object.uoz_base + scanline * object.uoz_dy + startx * uoz_dx;
@@ -301,8 +301,8 @@ void gaelco3d_renderer::render_alphablend(INT32 scanline, const extent_t &extent
 	const rgb_t *palsource = m_state.m_palette + object.color;
 	UINT32 tex = object.tex;
 	float z0 = object.z0;
-	UINT16 *dest = BITMAP_ADDR16(m_screenbits, scanline, 0);
-	UINT16 *zbuf = BITMAP_ADDR16(m_zbuffer, scanline, 0);
+	UINT16 *dest = &m_screenbits->pix16(scanline);
+	UINT16 *zbuf = &m_zbuffer->pix16(scanline);
 	int startx = extent.startx;
 	float ooz = object.ooz_base + object.ooz_dy * scanline + startx * ooz_dx;
 	float uoz = object.uoz_base + object.uoz_dy * scanline + startx * uoz_dx;
@@ -461,7 +461,7 @@ SCREEN_UPDATE( gaelco3d )
 
         for (y = cliprect->min_y; y <= cliprect->max_y; y++)
         {
-            UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+            UINT16 *dest = &bitmap->pix16(y);
             for (x = cliprect->min_x; x <= cliprect->max_x; x++)
             {
                 int offs = (yv + y - cliprect->min_y) * 4096 + xv + x - cliprect->min_x;

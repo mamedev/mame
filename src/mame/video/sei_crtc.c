@@ -271,7 +271,7 @@ VIDEO_START( seibu_crtc )
 
 SCREEN_UPDATE( seibu_crtc )
 {
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0x7ff]); //black pen
+	bitmap->fill(screen.machine().pens[0x7ff], *cliprect); //black pen
 
 	tilemap_set_scrollx( sc0_tilemap,0, (SEIBU_CRTC_SC0_SX + SEIBU_CRTC_FIX_SX+64) & 0x1ff );
 	tilemap_set_scrolly( sc0_tilemap,0, (SEIBU_CRTC_SC0_SY + SEIBU_CRTC_FIX_SY+1) & 0x1ff );

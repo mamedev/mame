@@ -6468,7 +6468,7 @@ INLINE UINT8 read_pixel_from_stampmap( running_machine& machine, bitmap_t* srcbi
     if (x >= srcbitmap->width) return 0;
     if (y >= srcbitmap->height) return 0;
 
-    UINT16* cacheptr = BITMAP_ADDR16( srcbitmap, y, x);
+    UINT16* cacheptr = &srcbitmap->pix16(y, x);
 
     return cacheptr[0] & 0xf;
 */
@@ -8553,7 +8553,7 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine &machine,
 {
 	UINT16*lineptr;
 	int x;
-	lineptr = BITMAP_ADDR16(render_bitmap, scanline, 0);
+	lineptr = &render_bitmap->pix16(scanline);
 
 	/* render 32x output to a buffer */
 	if (_32x_is_connected && (_32x_displaymode != 0))

@@ -313,10 +313,10 @@ SCREEN_UPDATE( pastelg )
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				*BITMAP_ADDR16(bitmap, y, x) = state->m_videoram[(y * width) + x];
+				bitmap->pix16(y, x) = state->m_videoram[(y * width) + x];
 	}
 	else
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 
 	return 0;
 }

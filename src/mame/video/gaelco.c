@@ -197,8 +197,8 @@ SCREEN_UPDATE( maniacsq )
 	tilemap_set_scrolly(state->m_tilemap[1], 0, state->m_vregs[2]);
 	tilemap_set_scrollx(state->m_tilemap[1], 0, state->m_vregs[3]);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], 3, 0);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], 3, 0);
@@ -226,8 +226,8 @@ SCREEN_UPDATE( bigkarnk )
 	tilemap_set_scrolly(state->m_tilemap[1], 0, state->m_vregs[2]);
 	tilemap_set_scrollx(state->m_tilemap[1], 0, state->m_vregs[3]);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], TILEMAP_DRAW_LAYER1 | 3, 0);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], TILEMAP_DRAW_LAYER1 | 3, 0);

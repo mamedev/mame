@@ -227,7 +227,7 @@ void system18_vdp_update( bitmap_t *bitmap, const rectangle *cliprect )
 
 	/* generate the final screen */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		drawline(BITMAP_ADDR16(bitmap, y, 0), y, 0xffff);
+		drawline(&bitmap->pix16(y), y, 0xffff);
 }
 
 /******************************************************************************

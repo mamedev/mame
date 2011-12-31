@@ -265,8 +265,8 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 		}
 
 		for (j = 0 ; j <= ((pen & 0x80) ? 0 : 3); j++)
-			*BITMAP_ADDR16(bitmap,
-						   (((j / 2) & 1) + y) % 256,
+			bitmap->pix16(
+						   (((j / 2) & 1) + y) % 256, 
 						   ((j & 1)     + x) % 512) = 256 + (pen & 0x7f);
 	}
 }
@@ -283,7 +283,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 SCREEN_UPDATE( skyfox )
 {
-	bitmap_fill(bitmap, cliprect, 255);	// the bg is black
+	bitmap->fill(255, *cliprect);	// the bg is black
 	draw_background(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

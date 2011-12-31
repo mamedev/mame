@@ -21,13 +21,6 @@
 #include "video/resnet.h"
 
 
-static const rectangle spritevisiblearea =
-{
-	2*8, 34*8-1,
-	0*8, 28*8-1
-};
-
-
 
 /***************************************************************************
 
@@ -224,7 +217,7 @@ SCREEN_UPDATE( pacman )
 {
 	pacman_state *state = screen.machine().driver_data<pacman_state>();
 	if (state->m_bgpriority != 0)
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap->fill(0, *cliprect);
 	else
 		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
@@ -234,8 +227,8 @@ SCREEN_UPDATE( pacman )
 		UINT8 *spriteram_2 = screen.machine().generic.spriteram2.u8;
 		int offs;
 
-		rectangle spriteclip = spritevisiblearea;
-		sect_rect(&spriteclip, cliprect);
+		rectangle spriteclip(2*8, 34*8-1, 0*8, 28*8-1);
+		spriteclip &= *cliprect;
 
 		/* Draw the sprites. Note that it is important to draw them exactly in this */
 		/* order, to have the correct priorities. */

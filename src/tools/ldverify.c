@@ -526,11 +526,11 @@ static void verify_video(video_info *video, int frame, bitmap_t *bitmap)
 		{
 			for (x = 16; x < 720 - 16; x++)
 			{
-				yhisto[*BITMAP_ADDR16(bitmap, y, x) >> 8]++;
+				yhisto[bitmap->pix16(y, x) >> 8]++;
 				if (x % 2 == 0)
-					cbhisto[*BITMAP_ADDR16(bitmap, y, x) & 0xff]++;
+					cbhisto[bitmap->pix16(y, x) & 0xff]++;
 				else
-					crhisto[*BITMAP_ADDR16(bitmap, y, x) & 0xff]++;
+					crhisto[bitmap->pix16(y, x) & 0xff]++;
 			}
 			pixels += 720 - 16 - 16;
 		}

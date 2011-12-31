@@ -107,7 +107,7 @@ VIDEO_START( atarifb )
 static void draw_playfield_and_alpha( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int playfield_x_offset, int playfield_y_offset )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
-	static const rectangle bigfield_area = { 4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1 };
+	const rectangle bigfield_area(4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1);
 
 	int scroll_x[1];
 	int scroll_y[1];
@@ -124,7 +124,7 @@ static void draw_playfield_and_alpha( running_machine &machine, bitmap_t *bitmap
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int gfx, int is_soccer )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
-	static const rectangle bigfield_area = { 4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1 };
+	const rectangle bigfield_area(4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1);
 
 	int obj;
 

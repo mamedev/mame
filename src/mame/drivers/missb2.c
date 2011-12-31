@@ -49,7 +49,7 @@ static SCREEN_UPDATE( missb2 )
 	/* and sprites) are stored in the same memory region, and information on */
 	/* the background character columns is stored in the area dd00-dd3f */
 
-	bitmap_fill(bitmap, cliprect, 255);
+	bitmap->fill(255, *cliprect);
 
 	if (!state->m_video_enable)
 		return 0;

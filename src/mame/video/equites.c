@@ -398,7 +398,7 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 							int pen = srcgfx[offset];
 
 							if ((transmask & (1 << pen)) == 0)
-								*BITMAP_ADDR16(bitmap, y, bx) = paldata[pen];
+								bitmap->pix16(y, bx) = paldata[pen];
 						}
 					}
 				}
@@ -432,9 +432,9 @@ static void splndrbt_copy_bg( running_machine &machine, bitmap_t *dst_bitmap, co
 		if (dst_y >= cliprect->min_y && dst_y <= cliprect->max_y)
 		{
 			const UINT8 * const romline = &xrom[(dst_y ^ dinvert) << 5];
-			const UINT16 * const src_line = BITMAP_ADDR16(src_bitmap, (src_y + scroll_y) & 0x1ff, 0);
-			const UINT8 * const flags_line = BITMAP_ADDR8(flags_bitmap, (src_y + scroll_y) & 0x1ff, 0);
-			UINT16 * const dst_line = BITMAP_ADDR16(dst_bitmap, dst_y, 0);
+			const UINT16 * const src_line = &src_bitmap->pix16((src_y + scroll_y) & 0x1ff);
+			const UINT8 * const flags_line = &flags_bitmap->pix8((src_y + scroll_y) & 0x1ff);
+			UINT16 * const dst_line = &dst_bitmap->pix16(dst_y);
 			int dst_x = 0;
 			int src_x;
 
@@ -466,7 +466,7 @@ static void splndrbt_copy_bg( running_machine &machine, bitmap_t *dst_bitmap, co
 SCREEN_UPDATE( equites )
 {
 	equites_state *state = screen.machine().driver_data<equites_state>();
-	bitmap_fill(bitmap, cliprect, state->m_bgcolor);
+	bitmap->fill(state->m_bgcolor, *cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
@@ -480,7 +480,7 @@ SCREEN_UPDATE( equites )
 SCREEN_UPDATE( splndrbt )
 {
 	equites_state *state = screen.machine().driver_data<equites_state>();
-	bitmap_fill(bitmap, cliprect, state->m_bgcolor);
+	bitmap->fill(state->m_bgcolor, *cliprect);
 
 	splndrbt_copy_bg(screen.machine(), bitmap, cliprect);
 

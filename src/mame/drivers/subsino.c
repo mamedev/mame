@@ -454,21 +454,16 @@ static VIDEO_START( stisub )
 static SCREEN_UPDATE( subsino )
 {
 	subsino_state *state = screen.machine().driver_data<subsino_state>();
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);
 	return 0;
 }
-
-// are these hardcoded, or registers?
-static const rectangle visible1 = { 0*8, (14+48)*8-1,  4*8,  (4+7)*8-1 };
-static const rectangle visible2 = { 0*8, (14+48)*8-1, 10*8, (10+7)*8-1 };
-static const rectangle visible3 = { 0*8, (14+48)*8-1, 18*8, (18+7)*8-1 };
 
 static SCREEN_UPDATE( subsino_reels )
 {
 	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 	for (i= 0;i < 64;i++)
 	{
@@ -479,6 +474,11 @@ static SCREEN_UPDATE( subsino_reels )
 
 	if (state->m_out_c&0x08)
 	{
+		// are these hardcoded, or registers?
+		const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
+		const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
+		const rectangle visible3(0*8, (14+48)*8-1, 18*8, (18+7)*8-1);
+
 		tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
 		tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
 		tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
@@ -488,17 +488,12 @@ static SCREEN_UPDATE( subsino_reels )
 	return 0;
 }
 
-// areas based on d-up game in attract mode
-static const rectangle stisub_visible1 = { 0, 511,  0,  87 };
-static const rectangle stisub_visible2 = { 0, 511,  88, 143 };
-static const rectangle stisub_visible3 = { 0, 511,  144, 223 };
-
 
 static SCREEN_UPDATE( stisub_reels )
 {
 	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 	if (state->m_reel1_attr)
 	{
@@ -516,9 +511,14 @@ static SCREEN_UPDATE( stisub_reels )
 
 	if (state->m_out_c&0x08)
 	{
-		tilemap_draw(bitmap, &stisub_visible1, state->m_reel1_tilemap, 0, 0);
-		tilemap_draw(bitmap, &stisub_visible2, state->m_reel2_tilemap, 0, 0);
-		tilemap_draw(bitmap, &stisub_visible3, state->m_reel3_tilemap, 0, 0);
+		// areas based on d-up game in attract mode
+		const rectangle visible1(0, 511,  0,  87);
+		const rectangle visible2(0, 511,  88, 143);
+		const rectangle visible3(0, 511,  144, 223);
+
+		tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
+		tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
+		tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
 	}
 
 	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);

@@ -10,19 +10,6 @@
 #include "includes/wiz.h"
 
 
-static const rectangle spritevisiblearea =
-{
-	2*8, 32*8-1,
-	2*8, 30*8-1
-};
-
-static const rectangle spritevisibleareaflipx =
-{
-	0*8, 30*8-1,
-	2*8, 30*8-1
-};
-
-
 VIDEO_START( wiz )
 {
 	wiz_state *state = machine.driver_data<wiz_state>();
@@ -222,7 +209,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,
 SCREEN_UPDATE( kungfut )
 {
 	wiz_state *state = screen.machine().driver_data<wiz_state>();
-	bitmap_fill(bitmap,cliprect,state->m_bgpen);
+	bitmap->fill(state->m_bgpen, *cliprect);
 	draw_background(screen.machine(), bitmap, cliprect, 2 + state->m_char_bank[0] , 0);
 	draw_foreground(screen.machine(), bitmap, cliprect, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram2, 4);
@@ -236,10 +223,12 @@ SCREEN_UPDATE( wiz )
 	int bank;
 	const rectangle* visible_area;
 
-	bitmap_fill(bitmap,cliprect,state->m_bgpen);
+	bitmap->fill(state->m_bgpen, *cliprect);
 	draw_background(screen.machine(), bitmap, cliprect, 2 + ((state->m_char_bank[0] << 1) | state->m_char_bank[1]), 0);
 	draw_foreground(screen.machine(), bitmap, cliprect, 0);
 
+	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
+	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
 	visible_area = state->m_flipx ? &spritevisibleareaflipx : &spritevisiblearea;
 
 	bank = 7 + *state->m_sprite_bank;
@@ -253,7 +242,7 @@ SCREEN_UPDATE( wiz )
 SCREEN_UPDATE( stinger )
 {
 	wiz_state *state = screen.machine().driver_data<wiz_state>();
-	bitmap_fill(bitmap,cliprect,state->m_bgpen);
+	bitmap->fill(state->m_bgpen, *cliprect);
 	draw_background(screen.machine(), bitmap, cliprect, 2 + state->m_char_bank[0], 1);
 	draw_foreground(screen.machine(), bitmap, cliprect, 1);
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram2, 4);

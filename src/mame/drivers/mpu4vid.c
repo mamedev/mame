@@ -452,7 +452,7 @@ static SCREEN_UPDATE(mpu4_vid)
 	mpu4_state *state = screen.machine().driver_data<mpu4_state>();
 	int x, y/*, count = 0*/;
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap->fill(0, *cliprect);
 
 	/* this is in main ram.. i think it must transfer it out of here??? */
 	/* count = 0x0018b6/2; - crmaze count = 0x004950/2; - turnover */

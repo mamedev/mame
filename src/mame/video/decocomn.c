@@ -120,7 +120,7 @@ void decocomn_clear_sprite_priority_bitmap( device_t *device )
 	decocomn_state *decocomn = get_safe_token(device);
 
 	if (decocomn->sprite_priority_bitmap)
-		bitmap_fill(decocomn->sprite_priority_bitmap, NULL, 0);
+		decocomn->sprite_priority_bitmap->fill(0);
 }
 
 /* A special pdrawgfx z-buffered sprite renderer that is needed to properly draw multiple sprite sources with alpha */
@@ -157,9 +157,9 @@ void decocomn_pdrawgfx(
 	for (y = 0; y < 16 - cy; y++)
 	{
 		const UINT8 *source = code_base + (y_index * gfx->line_modulo);
-		UINT32 *destb = BITMAP_ADDR32(dest, sy, 0);
-		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
-		UINT8 *spri = BITMAP_ADDR8(decocomn->sprite_priority_bitmap, sy, 0);
+		UINT32 *destb = &dest->pix32(sy);
+		UINT8 *pri = &priority_bitmap->pix8(sy);
+		UINT8 *spri = &decocomn->sprite_priority_bitmap->pix8(sy);
 
 		if (sy >= 0 && sy < 248)
 		{

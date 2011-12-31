@@ -274,7 +274,7 @@ VIDEO_START( berlwall )
 			if ((r & 0x10) && (b & 0x10))
 				g = (g - 1) & 0x1f;		/* decrease with wraparound */
 
-			*BITMAP_ADDR16(state->m_bg15_bitmap, y, sx * 256 + x) = 2048 + ((g << 10) | (r << 5) | b);
+			state->m_bg15_bitmap->pix16(y, sx * 256 + x) = 2048 + ((g << 10) | (r << 5) | b);
 	  }
 
 	VIDEO_START_CALL(kaneko16_1xVIEW2);
@@ -496,8 +496,8 @@ static void kaneko16_draw_sprites_custom(bitmap_t *dest_bmp,const rectangle *cli
 			for( y=sy; y<ey; y++ )
 			{
 				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+				UINT16 *dest = &dest_bmp->pix16(y);
+				UINT8 *pri = &priority_bitmap->pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -967,7 +967,7 @@ static void kaneko16_render_sprites(running_machine &machine, bitmap_t *bitmap, 
 	}
 	else
 	{
-		bitmap_fill(state->m_sprites_bitmap,cliprect,0);
+		state->m_sprites_bitmap->fill(0, *cliprect);
 		kaneko16_draw_sprites(machine,bitmap,cliprect);
 	}
 }
@@ -997,19 +997,19 @@ static void kaneko16_fill_bitmap(running_machine &machine, bitmap_t *bitmap, con
 {
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	if(state->m_sprite_type == 1)
-		bitmap_fill(bitmap,cliprect,0x7f00);
+		bitmap->fill(0x7f00, *cliprect);
 	else
 		/* Fill the bitmap with pen 0. This is wrong, but will work most of
            the times. To do it right, each pixel should be drawn with pen 0
            of the bottomost tile that covers it (which is pretty tricky to do) */
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap->fill(0, *cliprect);
 }
 
 static SCREEN_UPDATE( common )
 {
 	int i;
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	kaneko16_prepare_first_tilemap_chip(screen.machine(), bitmap, cliprect);
 	kaneko16_prepare_second_tilemap_chip(screen.machine(), bitmap, cliprect);
@@ -1082,7 +1082,7 @@ SCREEN_UPDATE( galsnew )
 	count = 0;
 	for (y=0;y<256;y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
 
 		for (x=0;x<256;x++)
 		{
@@ -1096,7 +1096,7 @@ SCREEN_UPDATE( galsnew )
 	count = 0;
 	for (y=0;y<256;y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *dest = &bitmap->pix16(y);
 
 		for (x=0;x<256;x++)
 		{

@@ -96,7 +96,7 @@ TIMER_DEVICE_CALLBACK( pce_interrupt )
                otherwise is 2 + sprite# */
 			UINT8 drawn[VDC_WPF];
 			/* our line buffer */
-			UINT16 *line_buffer = BITMAP_ADDR16( vce.bmp, vce.current_bitmap_line, 86 );
+			UINT16 *line_buffer = &vce.bmp->pix16(vce.current_bitmap_line, 86 );
 
 			/* clear our priority/sprite collision detection buffer. */
 			memset(drawn, 0, VDC_WPF);
@@ -168,7 +168,7 @@ TIMER_DEVICE_CALLBACK( sgx_interrupt )
 				pce_refresh_sprites(timer.machine(), 1, vdc[1].current_segment_line, drawn[1], temp_buffer[1]);
 			}
 
-			line_buffer = BITMAP_ADDR16( vce.bmp, vce.current_bitmap_line, 86 );
+			line_buffer = &vce.bmp->pix16(vce.current_bitmap_line, 86 );
 			/* Combine the output of both VDCs */
 			for( i = 0; i < 512; i++ )
 			{
@@ -444,7 +444,7 @@ static void draw_black_line(running_machine &machine, int line)
 	int i;
 
 	/* our line buffer */
-	UINT16 *line_buffer = BITMAP_ADDR16( vce.bmp, line, 0 );
+	UINT16 *line_buffer = &vce.bmp->pix16(line);
 
 	for( i=0; i< VDC_WPF; i++ )
 		line_buffer[i] = get_black_pen( machine );
@@ -458,7 +458,7 @@ static void draw_overscan_line(int line)
 	int color_base = vce.vce_control & 0x80 ? 512 : 0;
 
 	/* our line buffer */
-	UINT16 *line_buffer = BITMAP_ADDR16( vce.bmp, line, 0 );
+	UINT16 *line_buffer = &vce.bmp->pix16(line);
 
 	for ( i = 0; i < VDC_WPF; i++ )
 		line_buffer[i] = color_base + vce.vce_data[0x100].w;
@@ -472,7 +472,7 @@ static void draw_sgx_overscan_line(int line)
 	int color_base = vce.vce_control & 0x80 ? 512 : 0;
 
 	/* our line buffer */
-	UINT16 *line_buffer = BITMAP_ADDR16( vce.bmp, line, 0 );
+	UINT16 *line_buffer = &vce.bmp->pix16(line);
 
 	for ( i = 0; i < VDC_WPF; i++ )
 		line_buffer[i] = color_base + vce.vce_data[0].w;

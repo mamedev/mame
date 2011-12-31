@@ -368,7 +368,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	if (layers_ctrl&1)		tilemap_draw(bitmap,cliprect, state->m_tilemap_0, 0, 0);
-	else					bitmap_fill(bitmap,cliprect,0);
+	else					bitmap->fill(0, *cliprect);
 	if (layers_ctrl&8)		draw_sprites(screen.machine(),bitmap,cliprect);
 	if (layers_ctrl&2)		tilemap_draw(bitmap,cliprect, state->m_tilemap_1, 0, 0);
 	return 0;

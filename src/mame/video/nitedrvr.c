@@ -49,7 +49,7 @@ static void draw_box( bitmap_t *bitmap, int bx, int by, int ex, int ey )
 	{
 		for (x = bx; x < ex; x++)
 			if ((y < 256) && (x < 256))
-				*BITMAP_ADDR16(bitmap, y, x) = 1;
+				bitmap->pix16(y, x) = 1;
 	}
 
 	return;

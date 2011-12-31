@@ -158,8 +158,8 @@ SCREEN_UPDATE( aeroboto )
 {
 	aeroboto_state *state = screen.machine().driver_data<aeroboto_state>();
 
-	static const rectangle splitrect1 = { 0, 255, 0, 39 };
-	static const rectangle splitrect2 = { 0, 255, 40, 255 };
+	const rectangle splitrect1(0, 255, 0, 39);
+	const rectangle splitrect2(0, 255, 40, 255);
 	UINT8 *src_base, *src_colptr, *src_rowptr;
 	int src_offsx, src_colmask, sky_color, star_color, x, y, i, j, pen;
 
@@ -176,7 +176,7 @@ SCREEN_UPDATE( aeroboto )
 
 		star_color += 2;
 
-		bitmap_fill(bitmap, cliprect, sky_color);
+		bitmap->fill(sky_color, *cliprect);
 
 		// actual scroll speed is unknown but it can be adjusted by changing the SCROLL_SPEED constant
 		state->m_sx += (char)(*state->m_starx - state->m_ox);
@@ -202,7 +202,7 @@ SCREEN_UPDATE( aeroboto )
 			{
 				src_rowptr = src_colptr + (((y + j) & 0xff) << 5 );
 				if (!((unsigned)*src_rowptr & src_colmask))
-					*BITMAP_ADDR16(bitmap, j, i) = pen;
+					bitmap->pix16(j, i) = pen;
 			}
 		}
 	}
@@ -210,7 +210,7 @@ SCREEN_UPDATE( aeroboto )
 	{
 		state->m_sx = state->m_ox = *state->m_starx;
 		state->m_sy = state->m_oy = *state->m_stary;
-		bitmap_fill(bitmap, cliprect, sky_color);
+		bitmap->fill(sky_color, *cliprect);
 	}
 
 	for (y = 0; y < 64; y++)

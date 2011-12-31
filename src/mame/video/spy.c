@@ -68,10 +68,10 @@ SCREEN_UPDATE( spy )
 
 	k052109_tilemap_update(state->m_k052109);
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (!state->m_video_enable)
-		bitmap_fill(bitmap, cliprect, 16 * state->m_layer_colorbase[0]);
+		bitmap->fill(16 * state->m_layer_colorbase[0], *cliprect);
 	else
 	{
 		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);

@@ -91,9 +91,9 @@ VIDEO_START( ms32 )
 	state->m_temp_bitmap_sprites  = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	state->m_temp_bitmap_sprites_pri = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16); // not actually being used for rendering, we embed pri info in the raw colour bitmap
 
-	bitmap_fill(state->m_temp_bitmap_tilemaps,0,0);
-	bitmap_fill(state->m_temp_bitmap_sprites,0,0);
-	bitmap_fill(state->m_temp_bitmap_sprites_pri,0,0);
+	state->m_temp_bitmap_tilemaps->fill(0);
+	state->m_temp_bitmap_sprites->fill(0);
+	state->m_temp_bitmap_sprites_pri->fill(0);
 
 	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
 	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
@@ -392,17 +392,17 @@ SCREEN_UPDATE( ms32 )
 	tilemap_set_scrolly(state->m_bg_tilemap_alt, 0, scrolly);
 
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
        top and bottom of the screen becomes black on black) */
-	bitmap_fill(state->m_temp_bitmap_tilemaps,cliprect,0);	/* bg color */
+	state->m_temp_bitmap_tilemaps->fill(0, *cliprect);	/* bg color */
 
 	/* clear our sprite bitmaps */
-	bitmap_fill(state->m_temp_bitmap_sprites,cliprect,0);
-	bitmap_fill(state->m_temp_bitmap_sprites_pri,cliprect,0);
+	state->m_temp_bitmap_sprites->fill(0, *cliprect);
+	state->m_temp_bitmap_sprites_pri->fill(0, *cliprect);
 
 	draw_sprites(screen.machine(), state->m_temp_bitmap_sprites, state->m_temp_bitmap_sprites_pri, cliprect, state->m_sprram_16, 0x20000, 0, state->m_reverse_sprite_order);
 
@@ -485,15 +485,15 @@ SCREEN_UPDATE( ms32 )
 
 		UINT32* dstptr_bitmap;
 
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap->fill(0, *cliprect);
 
 		for (yy=0;yy<height;yy++)
 		{
-			srcptr_tile =     BITMAP_ADDR16(state->m_temp_bitmap_tilemaps, yy, 0);
-			srcptr_tilepri =  BITMAP_ADDR8(screen.machine().priority_bitmap, yy, 0);
-			srcptr_spri =     BITMAP_ADDR16(state->m_temp_bitmap_sprites, yy, 0);
-			//srcptr_spripri =  BITMAP_ADDR8(state->m_temp_bitmap_sprites_pri, yy, 0);
-			dstptr_bitmap  =  BITMAP_ADDR32(bitmap, yy, 0);
+			srcptr_tile =     &state->m_temp_bitmap_tilemaps->pix16(yy);
+			srcptr_tilepri =  &screen.machine().priority_bitmap->pix8(yy);
+			srcptr_spri =     &state->m_temp_bitmap_sprites->pix16(yy);
+			//srcptr_spripri =  &state->m_temp_bitmap_sprites_pri->pix8(yy);
+			dstptr_bitmap  =  &bitmap->pix32(yy);
 			for (xx=0;xx<width;xx++)
 			{
 				UINT16 src_tile  = srcptr_tile[xx];

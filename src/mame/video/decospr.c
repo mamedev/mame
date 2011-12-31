@@ -185,7 +185,7 @@ void decospr_device::draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 		fatalerror("m_sprite_bitmap && m_pricallback is invalid");
 
 	if (m_sprite_bitmap)
-		bitmap_fill(m_sprite_bitmap, cliprect, 0);
+		m_sprite_bitmap->fill(0, *cliprect);
 
 
 	int offs, end, incr;
@@ -529,8 +529,8 @@ void decospr_device::inefficient_copy_sprite_bitmap(running_machine& machine, bi
 
 	for (y=cliprect->min_y;y<=cliprect->max_y;y++)
 	{
-		srcline= BITMAP_ADDR16(m_sprite_bitmap, y, 0);
-		dstline= BITMAP_ADDR32(bitmap, y, 0);
+		srcline= &m_sprite_bitmap->pix16(y);
+		dstline= &bitmap->pix32(y);
 
 		if (alpha==0xff)
 		{

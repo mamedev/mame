@@ -1520,7 +1520,7 @@ static SCREEN_UPDATE( 39in1 )
 
 	for(y = 0; y <= (state->m_lcd_regs.lccr2 & PXA255_LCCR2_LPP); y++)
 	{
-		UINT32 *d = BITMAP_ADDR32(bitmap, y, 0);
+		UINT32 *d = &bitmap->pix32(y);
 		for(x = 0; x <= (state->m_lcd_regs.lccr1 & PXA255_LCCR1_PPL); x++)
 		{
 			d[x] = state->m_pxa255_lcd_palette[state->m_pxa255_lcd_framebuffer[y*((state->m_lcd_regs.lccr1 & PXA255_LCCR1_PPL) + 1) + x]];

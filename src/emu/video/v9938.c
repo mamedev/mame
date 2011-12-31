@@ -1236,17 +1236,17 @@ static void v9938_refresh_16 (running_machine &machine, bitmap_t *bmp, int line)
 		if (vdp->contReg[9] & 0x08)
 			{
 			vdp->size_now = RENDER_HIGH;
-			ln = BITMAP_ADDR16(bmp, line*2+((vdp->statReg[2]>>1)&1), 0);
+			ln = &bmp->pix16(line*2+((vdp->statReg[2]>>1)&1));
 			}
 		else
 			{
-			ln = BITMAP_ADDR16(bmp, line*2, 0);
-			ln2 = BITMAP_ADDR16(bmp, line*2+1, 0);
+			ln = &bmp->pix16(line*2);
+			ln2 = &bmp->pix16(line*2+1);
 			double_lines = 1;
 			}
 		}
 	else
-		ln = BITMAP_ADDR16(bmp, line, 0);
+		ln = &bmp->pix16(line);
 
 	if ( !(vdp->contReg[1] & 0x40) || (vdp->statReg[2] & 0x40) )
 		{

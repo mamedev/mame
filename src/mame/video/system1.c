@@ -413,7 +413,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		/* iterate over all rows of the sprite */
 		for (y = top; y < bottom; y++)
 		{
-			UINT16 *destbase = BITMAP_ADDR16(bitmap, y, 0);
+			UINT16 *destbase = &bitmap->pix16(y);
 			UINT16 curaddr;
 			int addrdelta;
 
@@ -506,22 +506,22 @@ static void video_update_common(screen_device &screen, bitmap_t *bitmap, const r
 	int x, y;
 
 	/* first clear the sprite bitmap and draw sprites within this area */
-	bitmap_fill(state->m_sprite_bitmap, cliprect, 0);
+	state->m_sprite_bitmap->fill(0, *cliprect);
 	draw_sprites(screen.machine(), state->m_sprite_bitmap, cliprect, spritexoffs);
 
 	/* iterate over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *fgbase = BITMAP_ADDR16(fgpixmap, y & 0xff, 0);
-		UINT16 *sprbase = BITMAP_ADDR16(state->m_sprite_bitmap, y & 0xff, 0);
-		UINT16 *dstbase = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *fgbase = &fgpixmap->pix16(y & 0xff);
+		UINT16 *sprbase = &state->m_sprite_bitmap->pix16(y & 0xff);
+		UINT16 *dstbase = &bitmap->pix16(y);
 		int bgy = (y + bgyscroll) & 0x1ff;
 		int bgxscroll = bgrowscroll[y / 8];
 		UINT16 *bgbase[2];
 
 		/* get the base of the left and right pixmaps for the effective background Y */
-		bgbase[0] = BITMAP_ADDR16(bgpixmaps[(bgy >> 8) * 2 + 0], bgy & 0xff, 0);
-		bgbase[1] = BITMAP_ADDR16(bgpixmaps[(bgy >> 8) * 2 + 1], bgy & 0xff, 0);
+		bgbase[0] = &bgpixmaps[(bgy >> 8) * 2 + 0]->pix16(bgy & 0xff);
+		bgbase[1] = &bgpixmaps[(bgy >> 8) * 2 + 1]->pix16(bgy & 0xff);
 
 		/* iterate over pixels */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)

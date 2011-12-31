@@ -414,7 +414,7 @@ void hd61830_device::draw_scanline(bitmap_t *bitmap, const rectangle *cliprect, 
 
 		for (int x = 0; x < m_hp; x++)
 		{
-			*BITMAP_ADDR16(bitmap, y, (sx * m_hp) + x) = BIT(data, x);
+			bitmap->pix16(y, (sx * m_hp) + x) = BIT(data, x);
 		}
 	}
 }
@@ -505,7 +505,7 @@ void hd61830_device::draw_char(bitmap_t *bitmap, const rectangle *cliprect, UINT
 			}
 
 			if (sy < m_screen->height() && sx < m_screen->width())
-				*BITMAP_ADDR16(bitmap, sy, sx) = pixel;
+				bitmap->pix16(sy, sx) = pixel;
 		}
 	}
 }
@@ -549,7 +549,7 @@ void hd61830_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 	}
 
 	m_blink++;

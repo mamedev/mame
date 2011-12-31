@@ -297,9 +297,9 @@ SCREEN_UPDATE( stfight )
 	stfight_state *state = screen.machine().driver_data<stfight_state>();
 	set_pens(screen.machine());
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
-	bitmap_fill(bitmap,cliprect,0);	/* in case state->m_bg_tilemap is disabled */
+	bitmap->fill(0, *cliprect);	/* in case state->m_bg_tilemap is disabled */
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);
 

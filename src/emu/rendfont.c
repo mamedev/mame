@@ -200,8 +200,8 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 		}
 
 		// populate the bmwidth/bmheight fields
-		gl.bmwidth = gl.bitmap->width;
-		gl.bmheight = gl.bitmap->height;
+		gl.bmwidth = gl.bitmap->width();
+		gl.bmheight = gl.bitmap->height();
 	}
 
 	// other formats need to parse their data
@@ -213,7 +213,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 
 		// allocate a new bitmap of the size we need
 		gl.bitmap = auto_alloc(m_manager.machine(), bitmap_t(gl.bmwidth, m_height, BITMAP_FORMAT_ARGB32));
-		bitmap_fill(gl.bitmap, NULL, 0);
+		gl.bitmap->fill(0);
 
 		// extract the data
 		const char *ptr = gl.rawdata;
@@ -221,7 +221,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 		for (int y = 0; y < gl.bmheight; y++)
 		{
 			int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-			UINT32 *dest = (desty >= 0 && desty < m_height) ? BITMAP_ADDR32(gl.bitmap, desty, 0) : NULL;
+			UINT32 *dest = (desty >= 0 && desty < m_height) ? &gl.bitmap->pix32(desty) : NULL;
 
 			// text format
 			if (m_format == FF_TEXT)
@@ -322,28 +322,19 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_t &dest, float height, flo
 	bounds.max_y = bounds.min_y + (float)m_height * scale;
 
 	// if the bitmap isn't big enough, bail
-	if (dest.width < bounds.max_x - bounds.min_x || dest.height < bounds.max_y - bounds.min_y)
+	if (dest.width() < bounds.max_x - bounds.min_x || dest.height() < bounds.max_y - bounds.min_y)
 		return;
 
 	// if no texture, fill the target
 	if (gl.texture == NULL)
 	{
-		bitmap_fill(&dest, NULL, 0);
+		dest.fill(0);
 		return;
 	}
 
 	// scale the font
-	INT32 origwidth = dest.width;
-	INT32 origheight = dest.height;
-	dest.width = bounds.max_x - bounds.min_x;
-	dest.height = bounds.max_y - bounds.min_y;
-	rectangle clip;
-	clip.min_x = clip.min_y = 0;
-	clip.max_x = gl.bitmap->width - 1;
-	clip.max_y = gl.bitmap->height - 1;
-	render_texture::hq_scale(dest, *gl.bitmap, clip, NULL);
-	dest.width = origwidth;
-	dest.height = origheight;
+	bitmap_t tempbitmap(&dest.pix8(0), bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y, dest.rowpixels(), dest.format());
+	render_texture::hq_scale(tempbitmap, *gl.bitmap, gl.bitmap->cliprect(), NULL);
 }
 
 
@@ -748,7 +739,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 					for (int y = 0; y < gl.bmheight; y++)
 					{
 						int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-						const UINT32 *src = (desty >= 0 && desty < m_height) ? BITMAP_ADDR32(gl.bitmap, desty, 0) : NULL;
+						const UINT32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap->pix32(desty) : NULL;
 						for (int x = 0; x < gl.bmwidth; x++)
 						{
 							if (src != NULL && RGB_ALPHA(src[x]) != 0)

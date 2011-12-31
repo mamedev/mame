@@ -90,7 +90,7 @@ static SCREEN_UPDATE( gunpey )
 			r = (color & 0x7c00) >> 7;
 
 			if(x<screen.visible_area().max_x && y<screen.visible_area().max_y)
-				*BITMAP_ADDR32(bitmap, y, x) = b | (g<<8) | (r<<16);
+				bitmap->pix32(y, x) = b | (g<<8) | (r<<16);
 
 
 			count++;

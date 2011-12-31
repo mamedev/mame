@@ -113,7 +113,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(screen.machine(), bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer

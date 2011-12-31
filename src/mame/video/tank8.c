@@ -179,7 +179,7 @@ static void draw_bullets(running_machine &machine, bitmap_t *bitmap, const recta
 		if (rect.max_y > cliprect->max_y)
 			rect.max_y = cliprect->max_y;
 
-		bitmap_fill(bitmap, &rect, (i << 1) | 0x01);
+		bitmap->fill((i << 1) | 0x01, rect);
 	}
 }
 
@@ -211,8 +211,8 @@ SCREEN_EOF( tank8 )
 
 	tilemap_draw(state->m_helper1, &visarea, state->m_tilemap, 0, 0);
 
-	bitmap_fill(state->m_helper2, &visarea, 8);
-	bitmap_fill(state->m_helper3, &visarea, 8);
+	state->m_helper2->fill(8, visarea);
+	state->m_helper3->fill(8, visarea);
 
 	draw_sprites(screen.machine(), state->m_helper2, &visarea);
 	draw_bullets(screen.machine(), state->m_helper3, &visarea);
@@ -221,9 +221,9 @@ SCREEN_EOF( tank8 )
 	{
 		int _state = 0;
 
-		const UINT16* p1 = BITMAP_ADDR16(state->m_helper1, y, 0);
-		const UINT16* p2 = BITMAP_ADDR16(state->m_helper2, y, 0);
-		const UINT16* p3 = BITMAP_ADDR16(state->m_helper3, y, 0);
+		const UINT16* p1 = &state->m_helper1->pix16(y);
+		const UINT16* p2 = &state->m_helper2->pix16(y);
+		const UINT16* p3 = &state->m_helper3->pix16(y);
 
 		if (y % 2 != screen.machine().primary_screen->frame_number() % 2)
 			continue; /* video display is interlaced */

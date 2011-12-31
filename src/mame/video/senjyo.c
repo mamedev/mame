@@ -182,7 +182,7 @@ static void draw_bgbitmap(running_machine &machine, bitmap_t *bitmap,const recta
 
 
 	if (state->m_bgstripes == 0xff)	/* off */
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap->fill(0, *cliprect);
 	else
 	{
 		int flip = flip_screen_get(machine);
@@ -197,10 +197,10 @@ static void draw_bgbitmap(running_machine &machine, bitmap_t *bitmap,const recta
 		{
 			if (flip)
 				for (y = 0;y < 256;y++)
-					*BITMAP_ADDR16(bitmap, y, 255 - x) = 384 + pen;
+					bitmap->pix16(y, 255 - x) = 384 + pen;
 			else
 				for (y = 0;y < 256;y++)
-					*BITMAP_ADDR16(bitmap, y, x) = 384 + pen;
+					bitmap->pix16(y, x) = 384 + pen;
 
 			count += 0x10;
 			if (count >= strwid)
@@ -234,7 +234,7 @@ static void draw_radar(running_machine &machine,bitmap_t *bitmap,const rectangle
 
 				if (sy >= cliprect->min_y && sy <= cliprect->max_y &&
 					sx >= cliprect->min_x && sx <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, sy, sx) = offs < 0x200 ? 512 : 513;
+					bitmap->pix16(sy, sx) = offs < 0x200 ? 512 : 513;
 			}
 }
 

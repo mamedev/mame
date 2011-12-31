@@ -328,10 +328,10 @@ avcomp_error avcomp_encode_data(avcomp_state *state, const UINT8 *source, UINT8 
 		videostride = width = height = 0;
 		if (state->compress.video != NULL)
 		{
-			videostart = (const UINT8 *)state->compress.video->base;
-			videostride = state->compress.video->rowpixels * 2;
-			width = state->compress.video->width;
-			height = state->compress.video->height;
+			videostart = &state->compress.video->pix8(0);
+			videostride = state->compress.video->rowpixels() * 2;
+			width = state->compress.video->width();
+			height = state->compress.video->height();
 		}
 
 		/* data is assumed to be native-endian */
@@ -483,15 +483,15 @@ avcomp_error avcomp_decode_data(avcomp_state *state, const UINT8 *source, UINT32
 		metastart = state->decompress.metadata;
 		for (chnum = 0; chnum < channels; chnum++)
 			audiostart[chnum] = (UINT8 *)state->decompress.audio[chnum];
-		videostart = (state->decompress.video != NULL) ? (UINT8 *)state->decompress.video->base : NULL;
-		videostride = (state->decompress.video != NULL) ? state->decompress.video->rowpixels * 2 : 0;
+		videostart = (state->decompress.video != NULL) ? &state->decompress.video->pix8(0) : NULL;
+		videostride = (state->decompress.video != NULL) ? state->decompress.video->rowpixels() * 2 : 0;
 
 		/* data is assumed to be native-endian */
 		*(UINT8 *)&betest = 1;
 		audioxor = videoxor = (betest == 1) ? 1 : 0;
 
 		/* verify against sizes */
-		if (state->decompress.video != NULL && (state->decompress.video->width < width || state->decompress.video->height < height))
+		if (state->decompress.video != NULL && (state->decompress.video->width() < width || state->decompress.video->height() < height))
 			return AVCERR_VIDEO_TOO_LARGE;
 		for (chnum = 0; chnum < channels; chnum++)
 			if (state->decompress.audio[chnum] != NULL && state->decompress.maxsamples < samples)

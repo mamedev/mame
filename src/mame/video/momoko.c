@@ -100,7 +100,7 @@ static void momoko_draw_bg_pri( running_machine &machine, bitmap_t *bitmap, int 
 					else      py = 7 - sy + y;
 
 				if (dot >= pri)
-					*BITMAP_ADDR16(bitmap, py, px) = col * 16 + dot + 256;
+					bitmap->pix16(py, px) = col * 16 + dot + 256;
 
 				d0 = d0 << 1;
 				d1 = d1 << 1;
@@ -162,7 +162,7 @@ SCREEN_UPDATE( momoko )
 		}
 	}
 	else
-	bitmap_fill(bitmap, cliprect, 256);
+	bitmap->fill(256, *cliprect);
 
 
 	/* draw sprites (momoko) */

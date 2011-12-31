@@ -553,7 +553,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
   // sprites are always clipped to 512x512
   // - regardless of the visible display dimensions
-  rectangle spriteClip = { 0, 512, 0, 512 };
+  rectangle spriteClip(0, 512, 0, 512);
 
   PSPRITE_ATTR sa;
   int flipx = 0, flipy = 0;
@@ -564,7 +564,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
     return;
 
   /* draw sprites */
-  sect_rect(&spriteClip, cliprect);
+  spriteClip &= *cliprect;
   sa = &ygv608.sprite_attribute_table.s[YGV608_MAX_SPRITES-1];
   for( i=0; i<YGV608_MAX_SPRITES; i++, sa-- )
   {
@@ -747,17 +747,16 @@ SCREEN_UPDATE( ygv608 )
 	const rectangle &visarea = screen.visible_area();
 
 	// clip to the current bitmap
-	finalclip.min_x = 0;
+	finalclip.min_x = finalclip.min_y = 0;
 	finalclip.max_x = screen.width() - 1;
-	finalclip.min_y = 0;
 	finalclip.max_y = screen.height() - 1;
-	sect_rect(&finalclip, cliprect);
+	finalclip &= *cliprect;
 	cliprect = &finalclip;
 
 	// punt if not initialized
 	if (ygv608.page_x == 0 || ygv608.page_y == 0)
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 		return 0;
 	}
 
@@ -809,7 +808,7 @@ SCREEN_UPDATE( ygv608 )
 		tilemap_set_scroll_cols( tilemap_B, ygv608.page_x );
 
 		// now clear the screen in case we change to 1-plane mode
-		bitmap_fill( work_bitmap, cliprect , 0);
+		work_bitmap->fill(0, *cliprect );
 
 		// reset resize flag
 		ygv608.tilemap_resize = 0;
@@ -862,8 +861,8 @@ SCREEN_UPDATE( ygv608 )
 	if ((ygv608.regs.s.r7 & r7_md) & MD_1PLANE)
 	{
 		// If the background tilemap is disabled, we need to clear the bitmap to black
-		bitmap_fill (work_bitmap,cliprect,0);
-//      bitmap_fill (work_bitmap,visarea,1);
+		work_bitmap->fill(0, *cliprect);
+//      work_bitmap->fill(1, *visarea);
 	}
 	else
 #endif
@@ -898,7 +897,7 @@ SCREEN_UPDATE( ygv608 )
   // for some reason we can't use an opaque tilemap_A
   // so use a transparent but clear the work bitmap first
   // - look at why this is the case?!?
-  bitmap_fill( work_bitmap,&visarea ,0);
+  work_bitmap->fill(0, visarea );
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_ASBDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_ASEBDX )

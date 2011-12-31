@@ -392,7 +392,7 @@ SCREEN_UPDATE( macrossp )
 	macrossp_state *state = screen.machine().driver_data<macrossp_state>();
 	int layers[3],layerpri[3];
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	layers[0] = 0;
 	layerpri[0] = (state->m_scra_videoregs[0] & 0x0000c000) >> 14;

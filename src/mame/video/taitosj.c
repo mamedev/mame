@@ -313,7 +313,7 @@ static int check_sprite_sprite_bitpattern(running_machine &machine,
 	}
 
 	/* draw the sprites into separate bitmaps and check overlapping region */
-	bitmap_fill(state->m_sprite_layer_collbitmap1, NULL, TRANSPARENT_PEN);
+	state->m_sprite_layer_collbitmap1->fill(TRANSPARENT_PEN);
 	drawgfx_transpen(state->m_sprite_sprite_collbitmap1, 0, get_sprite_gfx_element(machine, which1),
 			state->m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 3] & 0x3f,
 			0,
@@ -321,7 +321,7 @@ static int check_sprite_sprite_bitpattern(running_machine &machine,
 			state->m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 2] & 0x02,
 			sx1, sy1, 0);
 
-	bitmap_fill(state->m_sprite_sprite_collbitmap2, NULL, TRANSPARENT_PEN);
+	state->m_sprite_sprite_collbitmap2->fill(TRANSPARENT_PEN);
 	drawgfx_transpen(state->m_sprite_sprite_collbitmap2, 0, get_sprite_gfx_element(machine, which2),
 			state->m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 3] & 0x3f,
 			0,
@@ -331,8 +331,8 @@ static int check_sprite_sprite_bitpattern(running_machine &machine,
 
 	for (y = miny; y < maxy; y++)
 		for (x = minx; x < maxx; x++)
-			if ((*BITMAP_ADDR16(state->m_sprite_sprite_collbitmap1, y, x) != TRANSPARENT_PEN) &&
-			    (*BITMAP_ADDR16(state->m_sprite_sprite_collbitmap2, y, x) != TRANSPARENT_PEN))
+			if ((state->m_sprite_sprite_collbitmap1->pix16(y, x) != TRANSPARENT_PEN) &&
+			    (state->m_sprite_sprite_collbitmap2->pix16(y, x) != TRANSPARENT_PEN))
 				return 1;  /* collided */
 
 	return 0;
@@ -470,7 +470,7 @@ static int check_sprite_layer_bitpattern(running_machine &machine, int which, re
 	int flip_y = (state->m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x02) ^ GLOBAL_FLIP_Y;
 
 	/* draw sprite into a bitmap and check if layers collide */
-	bitmap_fill(state->m_sprite_layer_collbitmap1, NULL, TRANSPARENT_PEN);
+	state->m_sprite_layer_collbitmap1->fill(TRANSPARENT_PEN);
 	drawgfx_transpen(state->m_sprite_layer_collbitmap1, 0,get_sprite_gfx_element(machine, which),
 			state->m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x3f,
 			0,
@@ -479,15 +479,15 @@ static int check_sprite_layer_bitpattern(running_machine &machine, int which, re
 
 	for (y = miny; y < maxy; y++)
 		for (x = minx; x < maxx; x++)
-			if (*BITMAP_ADDR16(state->m_sprite_layer_collbitmap1, y - miny, x - minx) != TRANSPARENT_PEN) /* is there anything to check for ? */
+			if (state->m_sprite_layer_collbitmap1->pix16(y - miny, x - minx) != TRANSPARENT_PEN) /* is there anything to check for ? */
 			{
-				if (check_layer_1 && (*BITMAP_ADDR16(state->m_sprite_layer_collbitmap2[0], y, x) != TRANSPARENT_PEN))
+				if (check_layer_1 && (state->m_sprite_layer_collbitmap2[0]->pix16(y, x) != TRANSPARENT_PEN))
 					result |= 0x01;  /* collided with layer 1 */
 
-				if (check_layer_2 && (*BITMAP_ADDR16(state->m_sprite_layer_collbitmap2[1], y, x) != TRANSPARENT_PEN))
+				if (check_layer_2 && (state->m_sprite_layer_collbitmap2[1]->pix16(y, x) != TRANSPARENT_PEN))
 					result |= 0x02;  /* collided with layer 2 */
 
-				if (check_layer_3 && (*BITMAP_ADDR16(state->m_sprite_layer_collbitmap2[2], y, x) != TRANSPARENT_PEN))
+				if (check_layer_3 && (state->m_sprite_layer_collbitmap2[2]->pix16(y, x) != TRANSPARENT_PEN))
 					result |= 0x04;  /* collided with layer 3 */
 			}
 
@@ -519,9 +519,9 @@ static void draw_layers(running_machine &machine)
 	taitosj_state *state = machine.driver_data<taitosj_state>();
 	offs_t offs;
 
-	bitmap_fill(state->m_layer_bitmap[0], NULL, TRANSPARENT_PEN);
-	bitmap_fill(state->m_layer_bitmap[1], NULL, TRANSPARENT_PEN);
-	bitmap_fill(state->m_layer_bitmap[2], NULL, TRANSPARENT_PEN);
+	state->m_layer_bitmap[0]->fill(TRANSPARENT_PEN);
+	state->m_layer_bitmap[1]->fill(TRANSPARENT_PEN);
+	state->m_layer_bitmap[2]->fill(TRANSPARENT_PEN);
 
 	for (offs = 0; offs < 0x0400; offs++)
 	{
@@ -561,16 +561,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap)
        Note that the clipping is asymmetrical. This matches the real thing.
        I'm not sure of what should happen when the screen is flipped, though.
      */
-	static const rectangle spritevisiblearea =
-	{
-		0*8+3, 32*8-1-1,
-		2*8, 30*8-1
-	};
-	static const rectangle spritevisibleareaflip =
-	{
-		0*8+1, 32*8-3-1,
-		2*8, 30*8-1
-	};
+	const rectangle spritevisiblearea(0*8+3, 32*8-1-1, 2*8, 30*8-1);
+	const rectangle spritevisibleareaflip(0*8+1, 32*8-3-1, 2*8, 30*8-1);
 
 	if (SPRITES_ON)
 	{
@@ -712,7 +704,7 @@ static void copy_layers(running_machine &machine, bitmap_t *bitmap, const rectan
 	int i = 0;
 
 	/* fill the screen with the background color */
-	bitmap_fill(bitmap, cliprect, 8 * (state->m_colorbank[1] & 0x07));
+	bitmap->fill(8 * (state->m_colorbank[1] & 0x07), *cliprect);
 
 	for (i = 0; i < 4; i++)
 	{

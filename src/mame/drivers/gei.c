@@ -116,7 +116,7 @@ static WRITE8_HANDLER( gei_bitmap_w )
 
 
 	for (i = 0; i < 8; i++)
-		*BITMAP_ADDR16(space->machine().generic.tmpbitmap, sy, sx+i) = state->m_color[8-i-1];
+		space->machine().generic.tmpbitmap->pix16(sy, sx+i) = state->m_color[8-i-1];
 }
 
 static PALETTE_INIT(gei)

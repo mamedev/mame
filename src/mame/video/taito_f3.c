@@ -1459,17 +1459,17 @@ INLINE void draw_scanlines(running_machine &machine,
 
 	UINT8 *dstp0,*dstp;
 
-	int yadv = bitmap->rowpixels;
+	int yadv = bitmap->rowpixels();
 	int i=0,y=draw_line_num[0];
 	int ty = y;
 
 	if (orient & ORIENTATION_FLIP_Y)
 	{
-		ty = bitmap->height - 1 - ty;
+		ty = bitmap->height() - 1 - ty;
 		yadv = -yadv;
 	}
 
-	dstp0 = BITMAP_ADDR8(state->m_pri_alp_bitmap, ty, x);
+	dstp0 = &state->m_pri_alp_bitmap->pix8(ty, x);
 
 	state->m_pdest_2a = state->m_f3_alpha_level_2ad ? 0x10 : 0;
 	state->m_pdest_2b = state->m_f3_alpha_level_2bd ? 0x20 : 0;
@@ -1482,7 +1482,7 @@ INLINE void draw_scanlines(running_machine &machine,
 
 	{
 		UINT32 *dsti0,*dsti;
-		dsti0 = BITMAP_ADDR32(bitmap, ty, x);
+		dsti0 = &bitmap->pix32(ty, x);
 		while(1)
 		{
 			int cx=0;
@@ -2031,11 +2031,11 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 
 			/* set pixmap index */
 			line_t->x_count[y]=x_index_fx & 0xffff; // Fractional part
-			line_t->src_s[y]=src_s=BITMAP_ADDR16(srcbitmap, y_index, 0);
+			line_t->src_s[y]=src_s=&srcbitmap->pix16(y_index);
 			line_t->src_e[y]=&src_s[state->m_width_mask+1];
 			line_t->src[y]=&src_s[x_index_fx>>16];
 
-			line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap, y_index, 0);
+			line_t->tsrc_s[y]=tsrc_s=&flagsbitmap->pix8(y_index);
 			line_t->tsrc[y]=&tsrc_s[x_index_fx>>16];
 		}
 
@@ -2148,16 +2148,16 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 			/* set pixmap index */
 			line_t->x_count[y]=0xffff;
 			if (usePixelLayer)
-				line_t->src_s[y]=src_s=BITMAP_ADDR16(srcbitmap_pixel, sy&0xff, 0);
+				line_t->src_s[y]=src_s=&srcbitmap_pixel->pix16(sy&0xff);
 			else
-				line_t->src_s[y]=src_s=BITMAP_ADDR16(srcbitmap_vram, sy&0x1ff, 0);
+				line_t->src_s[y]=src_s=&srcbitmap_vram->pix16(sy&0x1ff);
 			line_t->src_e[y]=&src_s[vram_width_mask+1];
 			line_t->src[y]=&src_s[sx];
 
 			if (usePixelLayer)
-				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap_pixel, sy&0xff, 0);
+				line_t->tsrc_s[y]=tsrc_s=&flagsbitmap_pixel->pix8(sy&0xff);
 			else
-				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap_vram, sy&0x1ff, 0);
+				line_t->tsrc_s[y]=tsrc_s=&flagsbitmap_vram->pix8(sy&0x1ff);
 			line_t->tsrc[y]=&tsrc_s[sx];
 		}
 
@@ -2612,16 +2612,8 @@ INLINE void f3_drawgfx(
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	if(clip)
 	{
-		myclip.min_x = clip->min_x;
-		myclip.max_x = clip->max_x;
-		myclip.min_y = clip->min_y;
-		myclip.max_y = clip->max_y;
-
-		if (myclip.min_x < 0) myclip.min_x = 0;
-		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width-1;
-		if (myclip.min_y < 0) myclip.min_y = 0;
-		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
-
+		myclip = *clip;
+		myclip &= dest_bmp->cliprect();
 		clip=&myclip;
 	}
 
@@ -2696,9 +2688,9 @@ INLINE void f3_drawgfx(
 					int y=ey-sy;
 					int x=(ex-sx-1)|(state->m_tile_opaque_sp[code % gfx->total_elements]<<4);
 					const UINT8 *source0 = code_base + y_index * 16 + x_index_base;
-					UINT32 *dest0 = BITMAP_ADDR32(dest_bmp, sy, sx);
-					UINT8 *pri0 = BITMAP_ADDR8(state->m_pri_alp_bitmap, sy, sx);
-					int yadv = dest_bmp->rowpixels;
+					UINT32 *dest0 = &dest_bmp->pix32(sy, sx);
+					UINT8 *pri0 = &state->m_pri_alp_bitmap->pix8(sy, sx);
+					int yadv = dest_bmp->rowpixels();
 					dy=dy*16;
 					while(1)
 					{
@@ -2777,16 +2769,8 @@ INLINE void f3_drawgfxzoom(
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	if(clip)
 	{
-		myclip.min_x = clip->min_x;
-		myclip.max_x = clip->max_x;
-		myclip.min_y = clip->min_y;
-		myclip.max_y = clip->max_y;
-
-		if (myclip.min_x < 0) myclip.min_x = 0;
-		if (myclip.max_x >= dest_bmp->width) myclip.max_x = dest_bmp->width-1;
-		if (myclip.min_y < 0) myclip.min_y = 0;
-		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
-
+		myclip = *clip;
+		myclip &= dest_bmp->cliprect();
 		clip=&myclip;
 	}
 
@@ -2862,8 +2846,8 @@ INLINE void f3_drawgfxzoom(
 					for( y=sy; y<ey; y++ )
 					{
 						const UINT8 *source = code_base + (y_index>>16) * 16;
-						UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-						UINT8 *pri = BITMAP_ADDR8(state->m_pri_alp_bitmap, y, 0);
+						UINT32 *dest = &dest_bmp->pix32(y);
+						UINT8 *pri = &state->m_pri_alp_bitmap->pix8(y);
 
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
@@ -3245,7 +3229,7 @@ SCREEN_UPDATE( f3 )
 		sy_fix[4]=-sy_fix[4];
 	}
 
-	bitmap_fill(state->m_pri_alp_bitmap,cliprect,0);
+	state->m_pri_alp_bitmap->fill(0, *cliprect);
 
 	/* sprites */
 	if (state->m_sprite_lag==0)

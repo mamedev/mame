@@ -292,8 +292,8 @@ SCREEN_UPDATE( gcpinbal )
 		tilemap_set_scrolly(state->m_tilemap[i], 0, state->m_scrolly[i]);
 	}
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(0, *cliprect);
 
 	layer[0] = 0;
 	layer[1] = 1;

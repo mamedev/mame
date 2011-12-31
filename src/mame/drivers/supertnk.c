@@ -261,7 +261,7 @@ static SCREEN_UPDATE( supertnk )
 		for (i = 0; i < 8; i++)
 		{
 			UINT8 color = ((data0 & 0x80) >> 5) | ((data1 & 0x80) >> 6) | ((data2 & 0x80) >> 7);
-			*BITMAP_ADDR32(bitmap, y, x) = state->m_pens[color];
+			bitmap->pix32(y, x) = state->m_pens[color];
 
 			data0 = data0 << 1;
 			data1 = data1 << 1;

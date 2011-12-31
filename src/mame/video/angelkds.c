@@ -278,7 +278,7 @@ SCREEN_UPDATE( angelkds )
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
 
-	bitmap_fill(bitmap, cliprect, 0x3f); /* is there a register controling the colour?, we currently use the last colour of the tx palette */
+	bitmap->fill(0x3f, *cliprect); /* is there a register controling the colour?, we currently use the last colour of the tx palette */
 
 	/* draw top of screen */
 	clip.min_x = 8*0;

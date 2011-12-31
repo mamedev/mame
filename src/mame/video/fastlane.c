@@ -161,8 +161,8 @@ SCREEN_UPDATE( fastlane )
 	rectangle finalclip0 = state->m_clip0, finalclip1 = state->m_clip1;
 	int i, xoffs;
 
-	sect_rect(&finalclip0, cliprect);
-	sect_rect(&finalclip1, cliprect);
+	finalclip0 &= *cliprect;
+	finalclip1 &= *cliprect;
 
 	set_pens(screen.machine());
 

@@ -399,7 +399,7 @@ SCREEN_UPDATE( syvalion )
 
 	taitoh_log_vram(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
@@ -418,7 +418,7 @@ SCREEN_UPDATE( recordbr )
 
 	taitoh_log_vram(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 #ifdef MAME_DEBUG
 	if (!screen.machine().input().code_pressed(KEYCODE_A))
@@ -449,7 +449,7 @@ SCREEN_UPDATE( dleague )
 
 	taitoh_log_vram(screen.machine());
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 #ifdef MAME_DEBUG
 	if (!screen.machine().input().code_pressed(KEYCODE_A))

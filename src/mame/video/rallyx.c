@@ -458,8 +458,8 @@ static void plot_star( running_machine &machine, bitmap_t *bitmap, const rectang
 	if (flip_screen_y_get(machine))
 		y = 255 - y;
 
-	if (colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(bitmap, y, x) % 0x144) == 0)
-		*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + color;
+	if (colortable_entry_get_value(machine.colortable, bitmap->pix16(y, x) % 0x144) == 0)
+		bitmap->pix16(y, x) = STARS_COLOR_BASE + color;
 }
 
 static void draw_stars( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -646,7 +646,7 @@ SCREEN_UPDATE( rallyx )
 		fg_clip.min_x = 28 * 8;
 	}
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, &bg_clip, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, &fg_clip, state->m_fg_tilemap, 0, 0);
@@ -680,7 +680,7 @@ SCREEN_UPDATE( jungler )
 		fg_clip.min_x = 28 * 8;
 	}
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	/* tile priority doesn't seem to be supported in Jungler */
 	tilemap_draw(bitmap,&bg_clip, state->m_bg_tilemap, 0, 0);
@@ -727,7 +727,7 @@ SCREEN_UPDATE( locomotn )
 		fg_clip.min_x = 28 * 8;
 	}
 
-	bitmap_fill(screen.machine().priority_bitmap, cliprect, 0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	tilemap_draw(bitmap, &bg_clip, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, &fg_clip, state->m_fg_tilemap, 0, 0);

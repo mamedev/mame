@@ -236,17 +236,17 @@ static void blendbitmaps(running_machine &machine,
 	ox = sx;
 	oy = sy;
 
-	ex = sx + src1->width - 1;
+	ex = sx + src1->width() - 1;
 	if (sx < 0) sx = 0;
 	if (sx < clip->min_x) sx = clip->min_x;
-	if (ex >= dest->width) ex = dest->width - 1;
+	if (ex >= dest->width()) ex = dest->width() - 1;
 	if (ex > clip->max_x) ex = clip->max_x;
 	if (sx > ex) return;
 
-	ey = sy + src1->height - 1;
+	ey = sy + src1->height() - 1;
 	if (sy < 0) sy = 0;
 	if (sy < clip->min_y) sy = clip->min_y;
-	if (ey >= dest->height) ey = dest->height - 1;
+	if (ey >= dest->height()) ey = dest->height() - 1;
 	if (ey > clip->max_y) ey = clip->max_y;
 	if (sy > ey) return;
 
@@ -254,16 +254,16 @@ static void blendbitmaps(running_machine &machine,
 		const pen_t *paldata = machine.pens;
 		UINT32 *end;
 
-		UINT16 *sd1 = (UINT16 *)src1->base;												/* source data   */
-		UINT16 *sd2 = (UINT16 *)src2->base;
-		UINT16 *sd3 = (UINT16 *)src3->base;
+		UINT16 *sd1 = &src1->pix16(0);
+		UINT16 *sd2 = &src2->pix16(0);
+		UINT16 *sd3 = &src3->pix16(0);
 
 		int sw = ex-sx+1;														/* source width  */
 		int sh = ey-sy+1;														/* source height */
-		int sm = src1->rowpixels;												/* source modulo */
+		int sm = src1->rowpixels();												/* source modulo */
 
-		UINT32 *dd = BITMAP_ADDR32(dest, sy, sx);								/* dest data     */
-		int dm = dest->rowpixels;												/* dest modulo   */
+		UINT32 *dd = &dest->pix32(sy, sx);								/* dest data     */
+		int dm = dest->rowpixels();												/* dest modulo   */
 
 		sd1 += (sx-ox);
 		sd1 += sm * (sy-oy);
@@ -493,11 +493,11 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap_bg, bitmap_t
 SCREEN_UPDATE( tecmo16 )
 {
 	tecmo16_state *state = screen.machine().driver_data<tecmo16_state>();
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
-	bitmap_fill(state->m_tile_bitmap_bg, cliprect, 0x300);
-	bitmap_fill(state->m_tile_bitmap_fg,     cliprect, 0);
-	bitmap_fill(state->m_sprite_bitmap,      cliprect, 0);
+	state->m_tile_bitmap_bg->fill(0x300, *cliprect);
+	state->m_tile_bitmap_fg->fill(0, *cliprect);
+	state->m_sprite_bitmap->fill(0, *cliprect);
 
 	/* draw tilemaps into a 16-bit bitmap */
 	tilemap_draw(state->m_tile_bitmap_bg, cliprect,state->m_bg_tilemap, 0, 1);

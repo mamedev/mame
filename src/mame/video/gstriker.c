@@ -536,7 +536,7 @@ WRITE16_HANDLER( gsx_videoram3_w )
 SCREEN_UPDATE(gstriker)
 {
 	gstriker_state *state = screen.machine().driver_data<gstriker_state>();
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality

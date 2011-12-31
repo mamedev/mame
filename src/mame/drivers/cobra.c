@@ -75,7 +75,7 @@ public:
 static void render_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	bitmap_t *destmap = (bitmap_t *)dest;
-	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
+	UINT32 *fb = &destmap->pix32(scanline);
 	int x;
 
 	for (x = extent->startx; x < extent->stopx; x++)
@@ -92,7 +92,7 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 	float v = extent->param[1].start;
 	float du = extent->param[0].dpdx;
 	float dv = extent->param[1].dpdx;
-	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
+	UINT32 *fb = &destmap->pix32(scanline);
 	int x;
 
 	for (x = extent->startx; x < extent->stopx; x++)

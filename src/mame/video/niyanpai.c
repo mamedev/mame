@@ -170,7 +170,7 @@ static void update_pixel(running_machine &machine, int vram, int x, int y)
 {
 	niyanpai_state *state = machine.driver_data<niyanpai_state>();
 	UINT16 color = state->m_videoram[vram][(y * machine.primary_screen->width()) + x];
-	*BITMAP_ADDR16(state->m_tmpbitmap[vram], y, x) = color;
+	state->m_tmpbitmap[vram]->pix16(y, x) = color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
@@ -425,7 +425,7 @@ SCREEN_UPDATE( niyanpai )
 	if (state->m_dispflag[0])
 		copyscrollbitmap(bitmap, state->m_tmpbitmap[0], 1, &scrollx[0], 1, &scrolly[0], cliprect);
 	else
-		bitmap_fill(bitmap, 0, 0x00ff);
+		bitmap->fill(0x00ff);
 
 	if (state->m_dispflag[1])
 		copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, 0x01ff);

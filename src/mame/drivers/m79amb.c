@@ -96,7 +96,7 @@ static SCREEN_UPDATE( ramtek )
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
-			*BITMAP_ADDR32(bitmap, y, x) = pen;
+			bitmap->pix32(y, x) = pen;
 
 			x++;
 			data <<= 1;

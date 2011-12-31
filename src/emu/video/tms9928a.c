@@ -276,7 +276,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 {
 	int vpos = m_screen->vpos();
 	UINT16 BackColour = m_Regs[7] & 15;
-	UINT16 *p = BITMAP_ADDR16( m_tmpbmp, vpos, 0 );
+	UINT16 *p = &m_tmpbmp->pix16(vpos);
 
 	int y = vpos - m_top_border;
 

@@ -363,7 +363,7 @@ SCREEN_UPDATE( m90 )
 		tilemap_set_scrollx( state->m_pf2_wide_layer,0, state->m_video_control_data[3]+256-2 );
 	}
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
 	if (video_enable)
 	{
@@ -410,7 +410,7 @@ SCREEN_UPDATE( m90 )
 		}
 		else
 		{
-			bitmap_fill(bitmap,cliprect,0);
+			bitmap->fill(0, *cliprect);
 		}
 
 		if (pf1_enable)
@@ -457,7 +457,7 @@ SCREEN_UPDATE( m90 )
 		draw_sprites(screen.machine(),bitmap,cliprect);
 
 	} else {
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+		bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 	}
 
 	return 0;
@@ -467,8 +467,8 @@ SCREEN_UPDATE( bomblord )
 {
 	m90_state *state = screen.machine().driver_data<m90_state>();
 	int i;
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	/* Setup scrolling */
 	if (state->m_video_control_data[6]&0x20) {
@@ -519,8 +519,8 @@ SCREEN_UPDATE( bomblord )
 SCREEN_UPDATE( dynablsb )
 {
 	m90_state *state = screen.machine().driver_data<m90_state>();
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	screen.machine().priority_bitmap->fill(0, *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	if (!(state->m_video_data[0xf008/2] & 0x4000)) {
 		tilemap_mark_all_tiles_dirty(state->m_pf1_wide_layer);

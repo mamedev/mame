@@ -258,7 +258,7 @@ static SCREEN_UPDATE( zerotrgt )
 	cntsteer_state *state = screen.machine().driver_data<cntsteer_state>();
 
 	if (state->m_disable_roz)
-		bitmap_fill(bitmap, cliprect, screen.machine().pens[8 * state->m_bg_color_bank]);
+		bitmap->fill(screen.machine().pens[8 * state->m_bg_color_bank], *cliprect);
 	else
 	{
 		int p1, p2, p3, p4;
@@ -309,7 +309,7 @@ static SCREEN_UPDATE( cntsteer )
 	cntsteer_state *state = screen.machine().driver_data<cntsteer_state>();
 
 	if (state->m_disable_roz)
-		bitmap_fill(bitmap, cliprect, screen.machine().pens[8 * state->m_bg_color_bank]);
+		bitmap->fill(screen.machine().pens[8 * state->m_bg_color_bank], *cliprect);
 	else
 	{
 		int p1, p2, p3, p4;

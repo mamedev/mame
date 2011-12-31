@@ -93,7 +93,7 @@ static void draw_layer(running_machine &machine, bitmap_t *bitmap,const rectangl
 
 SCREEN_UPDATE(neoprint)
 {
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	draw_layer(screen.machine(),bitmap,cliprect,1,2);
 	draw_layer(screen.machine(),bitmap,cliprect,0,2);
@@ -103,7 +103,7 @@ SCREEN_UPDATE(neoprint)
 
 SCREEN_UPDATE(nprsp)
 {
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	draw_layer(screen.machine(),bitmap,cliprect,1,0);
 	draw_layer(screen.machine(),bitmap,cliprect,2,0);

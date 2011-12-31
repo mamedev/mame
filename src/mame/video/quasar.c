@@ -124,7 +124,7 @@ SCREEN_UPDATE( quasar )
 
 		for (ox = 0; ox < 8; ox++)
 			for (oy = 0; oy < 8; oy++)
-				*BITMAP_ADDR16(bitmap, y + oy, x + ox) = forecolor;
+				bitmap->pix16(y + oy, x + ox) = forecolor;
 
 		/* Main Screen */
 		drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0],
@@ -161,10 +161,10 @@ SCREEN_UPDATE( quasar )
             	int bx = 255 - 9 - state->m_bullet_ram[offs] - ct;
 
             	/* bullet/object Collision */
-				if (*BITMAP_ADDR16(s2636_0_bitmap, offs, bx) != 0) state->m_collision_register |= 0x04;
-				if (*BITMAP_ADDR16(s2636_2_bitmap, offs, bx) != 0) state->m_collision_register |= 0x08;
+				if (s2636_0_bitmap->pix16(offs, bx) != 0) state->m_collision_register |= 0x04;
+				if (s2636_2_bitmap->pix16(offs, bx) != 0) state->m_collision_register |= 0x08;
 
-				*BITMAP_ADDR16(bitmap, offs, bx) = 7;
+				bitmap->pix16(offs, bx) = 7;
             }
         }
     }
@@ -180,18 +180,18 @@ SCREEN_UPDATE( quasar )
 
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				int pixel0 = *BITMAP_ADDR16(s2636_0_bitmap, y, x);
-				int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
-				int pixel2 = *BITMAP_ADDR16(s2636_2_bitmap, y, x);
+				int pixel0 = s2636_0_bitmap->pix16(y, x);
+				int pixel1 = s2636_1_bitmap->pix16(y, x);
+				int pixel2 = s2636_2_bitmap->pix16(y, x);
 
 				int pixel = pixel0 | pixel1 | pixel2;
 
 				if (S2636_IS_PIXEL_DRAWN(pixel))
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel);
+					bitmap->pix16(y, x) = S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen.machine().colortable, *BITMAP_ADDR16(state->m_collision_background, y, x)))
+					if (colortable_entry_get_value(screen.machine().colortable, state->m_collision_background->pix16(y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision_register |= 0x01;
 						if (S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x02;

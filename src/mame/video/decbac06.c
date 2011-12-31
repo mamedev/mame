@@ -232,8 +232,8 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 	if (!src_bitmap)
 		return;
 
-	width_mask = src_bitmap->width - 1;
-	height_mask = src_bitmap->height - 1;
+	width_mask = src_bitmap->width() - 1;
+	height_mask = src_bitmap->height() - 1;
 
 	/* Column scroll & row scroll may per applied per pixel, there are
     shift registers for each which control the granularity of the row/col
@@ -254,7 +254,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
     */
 
 	if (flip_screen_get(machine))
-		src_y = (src_bitmap->height - 256) - scrolly;
+		src_y = (src_bitmap->height() - 256) - scrolly;
 	else
 		src_y = scrolly;
 
@@ -265,14 +265,14 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 			src_x=scrollx;
 
 		if (flip_screen_get(machine))
-			src_x=(src_bitmap->width - 256) - src_x;
+			src_x=(src_bitmap->width() - 256) - src_x;
 
 		for (x=0; x<=cliprect->max_x; x++) {
 			if (col_scroll_enabled)
 				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2]&0xf))&(0x3f>>(control1[2]&0xf))];
 
-			p = *BITMAP_ADDR16(src_bitmap, (src_y + column_offset)&height_mask, src_x&width_mask);
-			colpri =  *BITMAP_ADDR8(flags_bitmap, (src_y + column_offset)&height_mask, src_x&width_mask)&0xf;
+			p = src_bitmap->pix16((src_y + column_offset)&height_mask, src_x&width_mask);
+			colpri =  flags_bitmap->pix8((src_y + column_offset)&height_mask, src_x&width_mask)&0xf;
 
 			src_x++;
 			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&m_bppmask))
@@ -281,7 +281,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 
 				if ((p&penmask)==pencondition)
 					if((colpri&colprimask)==colpricondition)
-						*BITMAP_ADDR16(bitmap, y, x) = p+(colpri&m_gfxcolmask)*m_bppmult;
+						bitmap->pix16(y, x) = p+(colpri&m_gfxcolmask)*m_bppmult;
 			}
 		}
 		src_y++;

@@ -515,9 +515,9 @@ static SCREEN_UPDATE(bnstars_left)
 {
 	bnstars_state *state = screen.machine().driver_data<bnstars_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
-	bitmap_fill(bitmap,cliprect,0);	/* bg color */
+	bitmap->fill(0, *cliprect);	/* bg color */
 
 
 	tilemap_set_scrollx(state->m_ms32_bg_tilemap[0], 0, state->m_ms32_bg0_scroll[0x00/4] + state->m_ms32_bg0_scroll[0x08/4] + 0x10 );
@@ -540,9 +540,9 @@ static SCREEN_UPDATE(bnstars_right)
 {
 	bnstars_state *state = screen.machine().driver_data<bnstars_state>();
 
-	bitmap_fill(screen.machine().priority_bitmap,cliprect,0);
+	screen.machine().priority_bitmap->fill(0, *cliprect);
 
-	bitmap_fill(bitmap,cliprect,0x8000+0);	/* bg color */
+	bitmap->fill(0x8000+0, *cliprect);	/* bg color */
 
 
 	tilemap_set_scrollx(state->m_ms32_bg_tilemap[1], 0, state->m_ms32_bg1_scroll[0x00/4] + state->m_ms32_bg1_scroll[0x08/4] + 0x10 );

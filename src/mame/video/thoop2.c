@@ -210,7 +210,7 @@ SCREEN_UPDATE( thoop2 )
 
 	thoop2_sort_sprites(screen.machine());
 
-	bitmap_fill( bitmap, cliprect , 0);
+	bitmap->fill(0, *cliprect );
 
 	tilemap_draw(bitmap,cliprect,state->m_pant[1],TILEMAP_DRAW_LAYER1 | 3,0);
 	tilemap_draw(bitmap,cliprect,state->m_pant[0],TILEMAP_DRAW_LAYER1 | 3,0);

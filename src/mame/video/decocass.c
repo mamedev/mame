@@ -165,7 +165,7 @@ static void draw_center( running_machine& machine, bitmap_t *bitmap, const recta
 			if (((sy + y) & state->m_color_center_bot & 3) == (sy & state->m_color_center_bot & 3))
 				for (x = 0; x < 256; x++)
 					if (0 != (x & 16) || 0 != (state->m_center_h_shift_space & 1))
-						*BITMAP_ADDR16(bitmap, sy + y, (sx + x) & 255) = color;
+						bitmap->pix16(sy + y, (sx + x) & 255) = color;
 		}
 }
 
@@ -465,7 +465,7 @@ static void draw_missiles(running_machine &machine,bitmap_t *bitmap, const recta
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, sy, sx) = (state->m_color_missiles >> 4) & 7;
+					bitmap->pix16(sy, sx) = (state->m_color_missiles >> 4) & 7;
 				sx++;
 			}
 
@@ -481,7 +481,7 @@ static void draw_missiles(running_machine &machine,bitmap_t *bitmap, const recta
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, sy, sx) = state->m_color_missiles & 7;
+					bitmap->pix16(sy, sx) = state->m_color_missiles & 7;
 				sx++;
 			}
 	}
@@ -552,7 +552,7 @@ SCREEN_UPDATE( decocass )
 	}
 #endif
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	scrolly_l = state->m_back_vl_shift;
 	scrolly_r = 256 - state->m_back_vr_shift;
@@ -581,11 +581,11 @@ SCREEN_UPDATE( decocass )
 	if (state->m_mode_set & 0x08)	/* bkg_ena on ? */
 	{
 		clip = state->m_bg_tilemap_l_clip;
-		sect_rect(&clip, cliprect);
+		clip &= *cliprect;
 		tilemap_draw(bitmap, &clip, state->m_bg_tilemap_l, TILEMAP_DRAW_OPAQUE, 0);
 
 		clip = state->m_bg_tilemap_r_clip;
-		sect_rect(&clip, cliprect);
+		clip &= *cliprect;
 		tilemap_draw(bitmap, &clip, state->m_bg_tilemap_r, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
@@ -601,11 +601,11 @@ SCREEN_UPDATE( decocass )
 		if (state->m_mode_set & 0x08)	/* bkg_ena on ? */
 		{
 			clip = state->m_bg_tilemap_l_clip;
-			sect_rect(&clip, cliprect);
+			clip &= *cliprect;
 			tilemap_draw(bitmap, &clip, state->m_bg_tilemap_l, 0, 0);
 
 			clip = state->m_bg_tilemap_r_clip;
-			sect_rect(&clip, cliprect);
+			clip &= *cliprect;
 			tilemap_draw(bitmap, &clip, state->m_bg_tilemap_r, 0, 0);
 		}
 	}

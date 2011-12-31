@@ -96,7 +96,7 @@ static void draw_background( running_machine &machine, bitmap_t *bitmap, const r
 		int y = offs >> 9;
 		int x = offs & 0x1ff;
 
-		*BITMAP_ADDR16(bitmap, y, x) = 1024 + (state->m_bgvideoram[offs] >> 1);
+		bitmap->pix16(y, x) = 1024 + (state->m_bgvideoram[offs] >> 1);
 	}
 }
 

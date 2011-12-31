@@ -158,8 +158,8 @@ SCREEN_UPDATE( cheekyms )
 	tilemap_mark_all_tiles_dirty_all(screen.machine());
 	tilemap_set_flip_all(screen.machine(), flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(state->m_bitmap_buffer, cliprect, 0);
+	bitmap->fill(0, *cliprect);
+	state->m_bitmap_buffer->fill(0, *cliprect);
 
 	/* sprites go under the playfield */
 	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().gfx[1], flip);
@@ -185,13 +185,13 @@ SCREEN_UPDATE( cheekyms )
 
 			if (in_man_area)
 			{
-				if ((y + scrolly) < 27 * 8 && *BITMAP_ADDR16(state->m_bitmap_buffer, y + scrolly, x) != 0)
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->m_bitmap_buffer, y + scrolly, x);
+				if ((y + scrolly) < 27 * 8 && state->m_bitmap_buffer->pix16(y + scrolly, x) != 0)
+					bitmap->pix16(y, x) = state->m_bitmap_buffer->pix16(y + scrolly, x);
 			}
 			else
 			{
-				if(*BITMAP_ADDR16(state->m_bitmap_buffer, y, x) != 0)
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->m_bitmap_buffer, y, x);
+				if(state->m_bitmap_buffer->pix16(y, x) != 0)
+					bitmap->pix16(y, x) = state->m_bitmap_buffer->pix16(y, x);
 			}
 		}
 	}

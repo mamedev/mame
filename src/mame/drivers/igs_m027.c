@@ -167,7 +167,7 @@ static SCREEN_UPDATE(igs_majhong)
 {
 	igs_m027_state *state = screen.machine().driver_data<igs_m027_state>();
 	//??????????
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
 
 	//??????
 	tilemap_draw(bitmap,cliprect,state->m_igs_bg_tilemap,0,0);

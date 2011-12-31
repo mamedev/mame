@@ -159,7 +159,7 @@ static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = BITMAP_ADDR32(bitmap, ydrawpos, 0);
+				dest = &bitmap->pix32(ydrawpos);
 				draw_sprite_line(machine, wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
 			}
 			ycntdraw++;
@@ -172,7 +172,7 @@ static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = BITMAP_ADDR32(bitmap, ydrawpos, 0);
+				dest = &bitmap->pix32(ydrawpos);
 				draw_sprite_line(machine, wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
 			}
 			ycntdraw++;
@@ -196,7 +196,7 @@ static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = BITMAP_ADDR32(bitmap, ydrawpos, 0);
+				dest = &bitmap->pix32(ydrawpos);
 				draw_sprite_line(machine, wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
 			}
 			ycntdraw++;
@@ -367,8 +367,8 @@ SCREEN_UPDATE( pgm )
 	pgm_state *state = screen.machine().driver_data<pgm_state>();
 	int y;
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
-	bitmap_fill(state->m_tmppgmbitmap, cliprect, 0x00000000);
+	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	state->m_tmppgmbitmap->fill(0x00000000, *cliprect);
 
 	draw_sprites(screen.machine(), state->m_tmppgmbitmap, state->m_spritebufferram);
 
@@ -382,8 +382,8 @@ SCREEN_UPDATE( pgm )
 
 		for (y = 0; y < 224; y++)
 		{
-			UINT32* src = BITMAP_ADDR32(state->m_tmppgmbitmap, y, 0);
-			UINT16* dst = BITMAP_ADDR16(bitmap, y, 0);
+			UINT32* src = &state->m_tmppgmbitmap->pix32(y);
+			UINT16* dst = &bitmap->pix16(y);
 
 			for (x = 0; x < 448; x++)
 			{
@@ -400,8 +400,8 @@ SCREEN_UPDATE( pgm )
 
 		for (y = 0; y < 224; y++)
 		{
-			UINT32* src = BITMAP_ADDR32(state->m_tmppgmbitmap, y, 0);
-			UINT16* dst = BITMAP_ADDR16(bitmap, y, 0);
+			UINT32* src = &state->m_tmppgmbitmap->pix32(y);
+			UINT16* dst = &bitmap->pix16(y);
 
 			for (x = 0; x < 448; x++)
 			{

@@ -199,17 +199,17 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
 				if ((x + scrolly) <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, x + scrolly);
+					bitmap->pix16(y, x) = bitmap->pix16(y, x + scrolly);
 				else
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, cliprect->max_x);
+					bitmap->pix16(y, x) = bitmap->pix16(y, cliprect->max_x);
 			}
 		} else {
 			for (x = cliprect->max_x; x >= cliprect->min_x; x--)
 			{
 				if ((x + scrolly) >= cliprect->min_x)
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, x + scrolly);
+					bitmap->pix16(y, x) = bitmap->pix16(y, x + scrolly);
 				else
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, cliprect->min_x);
+					bitmap->pix16(y, x) = bitmap->pix16(y, cliprect->min_x);
 			}
 		}
 	}

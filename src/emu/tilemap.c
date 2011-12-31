@@ -889,7 +889,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 				/* update the cliprect just for this set of rows */
 				blit.cliprect.min_y = currow * rowheight + ypos;
 				blit.cliprect.max_y = nextrow * rowheight - 1 + ypos;
-				sect_rect(&blit.cliprect, &original_cliprect);
+				blit.cliprect &= original_cliprect;
 
 				/* iterate over X to handle wraparound */
 				for (xpos = scrollx - tmap->width; xpos <= original_cliprect.max_x; xpos += tmap->width)
@@ -926,7 +926,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 				/* update the cliprect just for this set of columns */
 				blit.cliprect.min_x = curcol * colwidth + xpos;
 				blit.cliprect.max_x = nextcol * colwidth - 1 + xpos;
-				sect_rect(&blit.cliprect, &original_cliprect);
+				blit.cliprect &= original_cliprect;
 
 				/* iterate over Y to handle wraparound */
 				for (ypos = scrolly - tmap->height; ypos <= original_cliprect.max_y; ypos += tmap->height)
@@ -1407,8 +1407,8 @@ static UINT8 tile_draw(tilemap_t *tmap, const UINT8 *pendata, UINT32 x0, UINT32 
 	/* iterate over rows */
 	for (ty = 0; ty < height; ty++)
 	{
-		UINT16 *pixptr = BITMAP_ADDR16(pixmap, y0, x0);
-		UINT8 *flagsptr = BITMAP_ADDR8(flagsmap, y0, x0);
+		UINT16 *pixptr = &pixmap->pix16(y0, x0);
+		UINT8 *flagsptr = &flagsmap->pix8(y0, x0);
 		int xoffs = 0;
 
 		/* pre-advance to the next row */
@@ -1492,7 +1492,7 @@ static UINT8 tile_apply_bitmask(tilemap_t *tmap, const UINT8 *maskdata, UINT32 x
 	/* iterate over rows */
 	for (ty = 0; ty < height; ty++)
 	{
-		UINT8 *flagsptr = BITMAP_ADDR8(flagsmap, y0, x0);
+		UINT8 *flagsptr = &flagsmap->pix8(y0, x0);
 		int xoffs = 0;
 
 		/* pre-advance to the next row */
@@ -1541,11 +1541,7 @@ static void configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bi
 
 	/* otherwise, make one up */
 	else
-	{
-		blit->cliprect.min_x = blit->cliprect.min_y = 0;
-		blit->cliprect.max_x = dest->width - 1;
-		blit->cliprect.max_y = dest->height - 1;
-	}
+		blit->cliprect = dest->cliprect();
 
 	/* set the priority code and alpha */
 	blit->tilemap_priority_code = priority | (priority_mask << 8) | (tmap->palette_offset << 16);
@@ -1561,7 +1557,7 @@ static void configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bi
 	/* otherwise get the appropriate callbacks for the format and flags */
 	else
 	{
-		switch (dest->format)
+		switch (dest->format())
 		{
 			case BITMAP_FORMAT_RGB32:
 				blit->draw_masked = (blit->alpha < 0xff) ? scanline_draw_masked_rgb32_alpha : scanline_draw_masked_rgb32;
@@ -1644,12 +1640,12 @@ static void tilemap_draw_instance(tilemap_t *tmap, const blit_parameters *blit, 
 		return;
 
 	/* look up priority and destination base addresses for y1 */
-	priority_baseaddr = BITMAP_ADDR8(priority_bitmap, y1, xpos);
+	priority_baseaddr = &priority_bitmap->pix8(y1, xpos);
 	if (dest != NULL)
 	{
-		dest_bytespp = dest->bpp / 8;
-		dest_line_pitch_bytes = dest->rowpixels * dest_bytespp;
-		dest_baseaddr = (UINT8 *)dest->base + (y1 * dest->rowpixels + xpos) * dest_bytespp;
+		dest_bytespp = dest->bpp() / 8;
+		dest_line_pitch_bytes = dest->rowbytes();
+		dest_baseaddr = dest->raw_pixptr(y1, xpos);
 	}
 
 	/* convert screen coordinates to source tilemap coordinates */
@@ -1659,8 +1655,8 @@ static void tilemap_draw_instance(tilemap_t *tmap, const blit_parameters *blit, 
 	y2 -= ypos;
 
 	/* get tilemap pixels */
-	source_baseaddr = BITMAP_ADDR16(tmap->pixmap, y1, 0);
-	mask_baseaddr = BITMAP_ADDR8(tmap->flagsmap, y1, 0);
+	source_baseaddr = &tmap->pixmap->pix16(y1);
+	mask_baseaddr = &tmap->flagsmap->pix8(y1);
 
 	/* get start/stop columns, rounding outward */
 	mincol = x1 / tmap->tilewidth;
@@ -1732,8 +1728,8 @@ static void tilemap_draw_instance(tilemap_t *tmap, const blit_parameters *blit, 
 						(*blit->draw_opaque)(dest0, source0, x_end - x_start, tmap->machine().pens, pmap0, blit->tilemap_priority_code, blit->alpha);
 
 						dest0 = (UINT8 *)dest0 + dest_line_pitch_bytes;
-						source0 += tmap->pixmap->rowpixels;
-						pmap0 += priority_bitmap->rowpixels;
+						source0 += tmap->pixmap->rowpixels();
+						pmap0 += priority_bitmap->rowpixels();
 					}
 				}
 
@@ -1746,9 +1742,9 @@ static void tilemap_draw_instance(tilemap_t *tmap, const blit_parameters *blit, 
 						(*blit->draw_masked)(dest0, source0, mask0, blit->mask, blit->value, x_end - x_start, tmap->machine().pens, pmap0, blit->tilemap_priority_code, blit->alpha);
 
 						dest0 = (UINT8 *)dest0 + dest_line_pitch_bytes;
-						source0 += tmap->pixmap->rowpixels;
-						mask0 += tmap->flagsmap->rowpixels;
-						pmap0 += priority_bitmap->rowpixels;
+						source0 += tmap->pixmap->rowpixels();
+						mask0 += tmap->flagsmap->rowpixels();
+						pmap0 += priority_bitmap->rowpixels();
 					}
 				}
 			}
@@ -1763,9 +1759,9 @@ static void tilemap_draw_instance(tilemap_t *tmap, const blit_parameters *blit, 
 			break;
 
 		/* advance to the next row on all our bitmaps */
-		priority_baseaddr += priority_bitmap->rowpixels * (nexty - y);
-		source_baseaddr += tmap->pixmap->rowpixels * (nexty - y);
-		mask_baseaddr += tmap->flagsmap->rowpixels * (nexty - y);
+		priority_baseaddr += priority_bitmap->rowpixels() * (nexty - y);
+		source_baseaddr += tmap->pixmap->rowpixels() * (nexty - y);
+		mask_baseaddr += tmap->flagsmap->rowpixels() * (nexty - y);
 		dest_baseaddr = (UINT8 *)dest_baseaddr + dest_line_pitch_bytes * (nexty - y);
 
 		/* increment the Y counter */
@@ -1804,10 +1800,10 @@ static void tilemap_draw_roz_core(tilemap_t *tmap, const blit_parameters *blit,
 	bitmap_t *destbitmap = blit->bitmap;
 	bitmap_t *srcbitmap = tmap->pixmap;
 	bitmap_t *flagsmap = tmap->flagsmap;
-	const int xmask = srcbitmap->width-1;
-	const int ymask = srcbitmap->height-1;
-	const int widthshifted = srcbitmap->width << 16;
-	const int heightshifted = srcbitmap->height << 16;
+	const int xmask = srcbitmap->width()-1;
+	const int ymask = srcbitmap->height()-1;
+	const int widthshifted = srcbitmap->width() << 16;
+	const int heightshifted = srcbitmap->height() << 16;
 	UINT32 priority = blit->tilemap_priority_code;
 	UINT8 mask = blit->mask;
 	UINT8 value = blit->value;
@@ -1823,7 +1819,7 @@ static void tilemap_draw_roz_core(tilemap_t *tmap, const blit_parameters *blit,
 	UINT8 *pri;
 	const UINT16 *src;
 	const UINT8 *maskptr;
-	int destadvance = destbitmap->bpp / 8;
+	int destadvance = destbitmap->bpp() / 8;
 
 	/* pre-advance based on the cliprect */
 	startx += blit->cliprect.min_x * incxx + blit->cliprect.min_y * incyx;
@@ -1861,10 +1857,10 @@ static void tilemap_draw_roz_core(tilemap_t *tmap, const blit_parameters *blit,
 				cy = starty >> 16;
 
 				/* get source and priority pointers */
-				pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
-				src = BITMAP_ADDR16(srcbitmap, cy, 0);
-				maskptr = BITMAP_ADDR8(flagsmap, cy, 0);
-				dest = (UINT8 *)destbitmap->base + (destbitmap->rowpixels * sy + sx) * destadvance;
+				pri = &priority_bitmap->pix8(sy, sx);
+				src = &srcbitmap->pix16(cy);
+				maskptr = &flagsmap->pix8(cy);
+				dest = destbitmap->raw_pixptr(sy, sx);
 
 				/* loop over columns */
 				while (x <= ex && cx < widthshifted)
@@ -1902,16 +1898,16 @@ static void tilemap_draw_roz_core(tilemap_t *tmap, const blit_parameters *blit,
 			cy = starty;
 
 			/* get dest and priority pointers */
-			dest = (UINT8 *)destbitmap->base + (destbitmap->rowpixels * sy + sx) * destadvance;
-			pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
+			dest = destbitmap->raw_pixptr(sy, sx);
+			pri = &priority_bitmap->pix8(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
 			{
 				/* plot if we match the mask */
-				if ((*BITMAP_ADDR8(flagsmap, (cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
+				if ((flagsmap->pix8((cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
 				{
-					ROZ_PLOT_PIXEL(*BITMAP_ADDR16(srcbitmap, (cy >> 16) & ymask, (cx >> 16) & xmask));
+					ROZ_PLOT_PIXEL(srcbitmap->pix16((cy >> 16) & ymask, (cx >> 16) & xmask));
 					*pri = (*pri & (priority >> 8)) | priority;
 				}
 
@@ -1942,17 +1938,17 @@ static void tilemap_draw_roz_core(tilemap_t *tmap, const blit_parameters *blit,
 			cy = starty;
 
 			/* get dest and priority pointers */
-			dest = (UINT8 *)destbitmap->base + (destbitmap->rowpixels * sy + sx) * destadvance;
-			pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
+			dest = destbitmap->raw_pixptr(sy, sx);
+			pri = &priority_bitmap->pix8(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
 			{
 				/* plot if we're within the bitmap and we match the mask */
 				if (cx < widthshifted && cy < heightshifted)
-					if ((*BITMAP_ADDR8(flagsmap, cy >> 16, cx >> 16) & mask) == value)
+					if ((flagsmap->pix8(cy >> 16, cx >> 16) & mask) == value)
 					{
-						ROZ_PLOT_PIXEL(*BITMAP_ADDR16(srcbitmap, cy >> 16, cx >> 16));
+						ROZ_PLOT_PIXEL(srcbitmap->pix16(cy >> 16, cx >> 16));
 						*pri = (*pri & (priority >> 8)) | priority;
 					}
 

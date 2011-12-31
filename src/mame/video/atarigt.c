@@ -531,11 +531,11 @@ SCREEN_UPDATE( atarigt )
 	/* now do the nasty blend */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *an = (UINT16 *)state->m_an_bitmap->base + y * state->m_an_bitmap->rowpixels;
-		UINT16 *pf = (UINT16 *)state->m_pf_bitmap->base + y * state->m_pf_bitmap->rowpixels;
-		UINT16 *mo = (UINT16 *)mo_bitmap->base + y * mo_bitmap->rowpixels;
-		UINT16 *tm = (UINT16 *)tm_bitmap->base + y * tm_bitmap->rowpixels;
-		UINT32 *dst = (UINT32 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *an = &state->m_an_bitmap->pix16(y);
+		UINT16 *pf = &state->m_pf_bitmap->pix16(y);
+		UINT16 *mo = &mo_bitmap->pix16(y);
+		UINT16 *tm = &tm_bitmap->pix16(y);
+		UINT32 *dst = &bitmap->pix32(y);
 
 		/* Primal Rage: no TRAM, slightly different priorities */
 		if (state->m_is_primrage)
