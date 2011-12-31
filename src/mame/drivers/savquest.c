@@ -6,8 +6,8 @@
     Skeleton by R. Belmont
 
 	TODO:
-	- currently asserts due of:
-	  000F6E09: fld     qword ptr [esi]
+	- BIOS ROM checksum error;
+	- floppy drive error, system halt;
 
     H/W is a white-box PC consisting of:
     Pentium II 450 CPU
@@ -49,6 +49,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_pit8254(*this, "pit8254"),
+		  m_dma8237_1(*this, "dma8237_1"),
+		  m_dma8237_2(*this, "dma8237_2"),
 		  m_pic8259_1(*this, "pic8259_1"),
 		  m_pic8259_2(*this, "pic8259_2")
 	{ }
@@ -63,6 +65,8 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8254_device> m_pit8254;
+	required_device<i8237_device> m_dma8237_1;
+	required_device<i8237_device> m_dma8237_2;
 	required_device<pic8259_device> m_pic8259_1;
 	required_device<pic8259_device> m_pic8259_2;
 
@@ -75,9 +79,6 @@ protected:
 	// driver_device overrides
 //	virtual void video_start();
 //	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-
-//	device_t	*m_dma8237_1;
-//	device_t	*m_dma8237_2;
 };
 
 // Intel 82439TX System Controller (MXTC)
@@ -106,7 +107,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0);
+				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0x20000);
 			}
 			break;
 		}
@@ -238,23 +239,195 @@ WRITE32_MEMBER(savquest_state::bios_ram_w)
 	#endif
 }
 
+static READ32_DEVICE_HANDLER( ide_r )
+{
+	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
+}
+
+static WRITE32_DEVICE_HANDLER( ide_w )
+{
+	ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
+}
+
+static READ32_DEVICE_HANDLER( fdc_r )
+{
+	return ide_controller32_r(device, 0x3f0/4 + offset, mem_mask);
+}
+
+static WRITE32_DEVICE_HANDLER( fdc_w )
+{
+	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
+	ide_controller32_w(device, 0x3f0/4 + offset, data, mem_mask);
+}
+
+static READ8_HANDLER(at_page8_r)
+{
+	savquest_state *state = space->machine().driver_data<savquest_state>();
+	UINT8 data = state->m_at_pages[offset % 0x10];
+
+	switch(offset % 8) {
+	case 1:
+		data = state->m_dma_offset[(offset / 8) & 1][2];
+		break;
+	case 2:
+		data = state->m_dma_offset[(offset / 8) & 1][3];
+		break;
+	case 3:
+		data = state->m_dma_offset[(offset / 8) & 1][1];
+		break;
+	case 7:
+		data = state->m_dma_offset[(offset / 8) & 1][0];
+		break;
+	}
+	return data;
+}
+
+
+static WRITE8_HANDLER(at_page8_w)
+{
+	savquest_state *state = space->machine().driver_data<savquest_state>();
+	state->m_at_pages[offset % 0x10] = data;
+
+	switch(offset % 8) {
+	case 1:
+		state->m_dma_offset[(offset / 8) & 1][2] = data;
+		break;
+	case 2:
+		state->m_dma_offset[(offset / 8) & 1][3] = data;
+		break;
+	case 3:
+		state->m_dma_offset[(offset / 8) & 1][1] = data;
+		break;
+	case 7:
+		state->m_dma_offset[(offset / 8) & 1][0] = data;
+		break;
+	}
+}
+
+static READ32_HANDLER(at_page32_r)
+{
+	return read32le_with_read8_handler(at_page8_r, space, offset, mem_mask);
+}
+
+
+static WRITE32_HANDLER(at_page32_w)
+{
+	write32le_with_write8_handler(at_page8_w, space, offset, data, mem_mask);
+}
+
+static READ8_DEVICE_HANDLER(at_dma8237_2_r)
+{
+	return i8237_r(device, offset / 2);
+}
+
+static WRITE8_DEVICE_HANDLER(at_dma8237_2_w)
+{
+	i8237_w(device, offset / 2, data);
+}
+
+static READ32_DEVICE_HANDLER(at32_dma8237_2_r)
+{
+	return read32le_with_read8_device_handler(at_dma8237_2_r, device, offset, mem_mask);
+}
+
+static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
+{
+	write32le_with_write8_device_handler(at_dma8237_2_w, device, offset, data, mem_mask);
+}
+
+
+
+
+static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
+{
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	i8237_hlda_w( device, state );
+}
+
+
+static READ8_HANDLER( pc_dma_read_byte )
+{
+	savquest_state *state = space->machine().driver_data<savquest_state>();
+	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+		& 0xFF0000;
+
+	return space->read_byte(page_offset + offset);
+}
+
+
+static WRITE8_HANDLER( pc_dma_write_byte )
+{
+	savquest_state *state = space->machine().driver_data<savquest_state>();
+	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+		& 0xFF0000;
+
+	space->write_byte(page_offset + offset, data);
+}
+
+static void set_dma_channel(device_t *device, int channel, int state)
+{
+	savquest_state *drvstate = device->machine().driver_data<savquest_state>();
+	if (!state) drvstate->m_dma_channel = channel;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
+
+static I8237_INTERFACE( dma8237_1_config )
+{
+	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
+};
+
+static I8237_INTERFACE( dma8237_2_config )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+};
+
+
 static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
+//	AM_RANGE(0x02000000, 0x02000003) // protection dongle lies there?
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(savquest_io, AS_IO, 32, savquest_state)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE_LEGACY(kbdc8042_32le_r,			kbdc8042_32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff) /* todo: nvram (CMOS Setup Save)*/
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE_LEGACY(at_page32_r,				at_page32_w)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
+	AM_RANGE(0x00e8, 0x00ef) AM_NOP
+
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
+
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
 
+//	AM_RANGE(0x5000, 0x5007) // routes to port $eb
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( savquest )
@@ -344,6 +517,12 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
+static void ide_interrupt(device_t *device, int state)
+{
+	savquest_state *drvstate = device->machine().driver_data<savquest_state>();
+	pic8259_ir6_w(drvstate->m_pic8259_2, state);
+}
+
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
 static const struct pc_vga_interface vga_interface =
@@ -373,7 +552,7 @@ static MACHINE_START( savquest )
 
 static MACHINE_RESET( savquest )
 {
-	memory_set_bankptr(machine, "bank1", machine.region("bios")->base());
+	memory_set_bankptr(machine, "bank1", machine.region("bios")->base() + 0x20000);
 }
 
 
@@ -386,20 +565,26 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_MACHINE_RESET(savquest)
 
 	MCFG_PIT8254_ADD( "pit8254", savquest_pit8254_config )
+	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
+	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MCFG_PIC8259_ADD( "pic8259_1", savquest_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", savquest_pic8259_2_config )
+
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 MACHINE_CONFIG_END
 
 ROM_START( savquest )
-	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_LOAD( "sq-aflash.bin", 0x00000, 0x020000, CRC(0b4f406f) SHA1(4003b0e6d46dcb47012acc118837f0f7cf529faf) ) // first half is 1-filled
-	ROM_CONTINUE(              0x00000, 0x020000 )
+	ROM_REGION32_LE(0x40000, "bios", 0)
+	ROM_LOAD( "sq-aflash.bin", 0x00000, 0x040000, CRC(0b4f406f) SHA1(4003b0e6d46dcb47012acc118837f0f7cf529faf) ) // first half is 1-filled
 
 	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: needs proper video BIOS dumped
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
