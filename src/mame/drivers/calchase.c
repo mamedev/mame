@@ -134,7 +134,6 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_bios_ram;
-	//UINT32 *m_vga_vram; //GRULL-ADDVGA
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
@@ -318,7 +317,7 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 
 
 // Intel 82439TX System Controller (MXTC)
-//GRULL VIA82C585VPX (North Bridge - APOLLO Chipset)
+// TODO: change with a VIA82C585VPX (North Bridge - APOLLO Chipset)
 
 static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
@@ -488,8 +487,7 @@ static WRITE32_HANDLER(bios_ram_w)
 
 static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	//AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE_MEMBER(calchase_state, m_vga_vram) //GRULL-ADDVGA
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
+	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000c8000, 0x000dffff) AM_NOP
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
@@ -536,8 +534,8 @@ static ADDRESS_MAP_START( calchase_io, AS_IO, 32)
 	AM_RANGE(0x03a0, 0x03a7) AM_NOP //To debug
 	AM_RANGE(0x03e0, 0x03ef) AM_NOP //To debug
 	AM_RANGE(0x0378, 0x037f) AM_NOP //To debug
-	//GRULL-ADDVGA AM_RANGE(0x0300, 0x03af) AM_NOP
-	//GRULL-ADDVGA AM_RANGE(0x03b0, 0x03df) AM_NOP
+	// AM_RANGE(0x0300, 0x03af) AM_NOP
+	// AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_NOP // To debug Serial Port COM1:
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
@@ -753,7 +751,7 @@ static DRIVER_INIT( calchase )
 	calchase_state *state = machine.driver_data<calchase_state>();
 	state->m_bios_ram = auto_alloc_array(machine, UINT32, 0x20000/4);
 
-	pc_vga_init(machine, &vga_interface, NULL); //GRULL_ADDVGA
+	pc_vga_init(machine, &vga_interface, NULL);
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, calchase_set_keyb_int);
 
 	intel82439tx_init(machine);
