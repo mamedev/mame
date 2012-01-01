@@ -2,6 +2,11 @@
 
 X Tom 3D
 
+TODO:
+- clears a work RAM snippet then jumps to that snippet ... it doesn't do
+  that if you soft reset emulation.
+- understand how to load game ROMs
+
 This game runs on PC-based hardware.
 Major components are....
 
@@ -64,6 +69,12 @@ public:
 		  { }
 
 	UINT32 *m_bios_ram;
+	UINT32 *m_bios_ext1_ram;
+	UINT32 *m_bios_ext2_ram;
+	UINT32 *m_bios_ext3_ram;
+	UINT32 *m_bios_ext4_ram;
+	UINT32 *m_isa_ram1;
+	UINT32 *m_isa_ram2;
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
@@ -79,6 +90,15 @@ public:
 	required_device<pic8259_device> m_pic8259_2;
 
 	DECLARE_READ8_MEMBER( get_slave_ack );
+
+	DECLARE_WRITE32_MEMBER( isa_ram1_w );
+	DECLARE_WRITE32_MEMBER( isa_ram2_w );
+
+	DECLARE_WRITE32_MEMBER( bios_ext1_ram_w );
+	DECLARE_WRITE32_MEMBER( bios_ext2_ram_w );
+	DECLARE_WRITE32_MEMBER( bios_ext3_ram_w );
+	DECLARE_WRITE32_MEMBER( bios_ext4_ram_w );
+
 	DECLARE_WRITE32_MEMBER( bios_ram_w );
 
 
@@ -98,25 +118,81 @@ static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, 
 static void mxtc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
 	xtom3d_state *state = busdevice->machine().driver_data<xtom3d_state>();
-//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
+	printf("MXTC: write %d, %02X, %02X\n",  function, reg, data);
 
-	#if 1
+	/*
+	memory banking with North Bridge:
+	0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
+	            ---- xxxx Reserved
+	0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
+	            ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
+	0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
+	            ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
+	0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
+	            ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
+	0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
+	            ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
+	0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
+	            ---- xxxx BIOS extension 0xe0000 - 0xe3fff
+	0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
+	            ---- xxxx BIOS extension 0xe8000 - 0xebfff
+
+	3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
+	*/
+
 	switch(reg)
 	{
-		case 0x59:		// PAM0
+		case 0x59: // PAM0
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
-			{
-				memory_set_bankptr(busdevice->machine(), "bank1", state->m_bios_ram);
-			}
+				memory_set_bankptr(busdevice->machine(), "bios_bank", state->m_bios_ram);
 			else					// disable RAM access (reads go to BIOS ROM)
-			{
-				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0x10000);
-			}
+				memory_set_bankptr(busdevice->machine(), "bios_bank", busdevice->machine().region("bios")->base() + 0x10000);
+			break;
+		}
+		case 0x5a: // PAM1
+		{
+			if (data & 0x1)
+				memory_set_bankptr(busdevice->machine(), "video_bank1", state->m_isa_ram1);
+			else
+				memory_set_bankptr(busdevice->machine(), "video_bank1", busdevice->machine().region("video_bios")->base() + 0);
+
+			if (data & 0x10)
+				memory_set_bankptr(busdevice->machine(), "video_bank2", state->m_isa_ram2);
+			else
+				memory_set_bankptr(busdevice->machine(), "video_bank2", busdevice->machine().region("video_bios")->base() + 0x4000);
+
+			break;
+		}
+		case 0x5e: // PAM5
+		{
+			if (data & 0x1)
+				memory_set_bankptr(busdevice->machine(), "bios_ext1", state->m_bios_ext1_ram);
+			else
+				memory_set_bankptr(busdevice->machine(), "bios_ext1", busdevice->machine().region("bios")->base() + 0);
+
+			if (data & 0x10)
+				memory_set_bankptr(busdevice->machine(), "bios_ext2", state->m_bios_ext2_ram);
+			else
+				memory_set_bankptr(busdevice->machine(), "bios_ext2", busdevice->machine().region("bios")->base() + 0x4000);
+
+			break;
+		}
+		case 0x5f: // PAM6
+		{
+			if (data & 0x1)
+				memory_set_bankptr(busdevice->machine(), "bios_ext3", state->m_bios_ext3_ram);
+			else
+				memory_set_bankptr(busdevice->machine(), "bios_ext3", busdevice->machine().region("bios")->base() + 0x8000);
+
+			if (data & 0x10)
+				memory_set_bankptr(busdevice->machine(), "bios_ext4", state->m_bios_ext4_ram);
+			else
+				memory_set_bankptr(busdevice->machine(), "bios_ext4", busdevice->machine().region("bios")->base() + 0xc000);
+
 			break;
 		}
 	}
-	#endif
 
 	state->m_mxtc_config_reg[reg] = data;
 }
@@ -232,28 +308,78 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 	}
 }
 
+
+WRITE32_MEMBER(xtom3d_state::isa_ram1_w)
+{
+	if (m_mxtc_config_reg[0x5a] & 0x2)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_isa_ram1 + offset);
+	}
+}
+
+WRITE32_MEMBER(xtom3d_state::isa_ram2_w)
+{
+	if (m_mxtc_config_reg[0x5a] & 0x2)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_isa_ram2 + offset);
+	}
+}
+
+WRITE32_MEMBER(xtom3d_state::bios_ext1_ram_w)
+{
+	if (m_mxtc_config_reg[0x5e] & 0x2)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_bios_ext1_ram + offset);
+	}
+}
+
+
+WRITE32_MEMBER(xtom3d_state::bios_ext2_ram_w)
+{
+	if (m_mxtc_config_reg[0x5e] & 0x20)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_bios_ext2_ram + offset);
+	}
+}
+
+
+WRITE32_MEMBER(xtom3d_state::bios_ext3_ram_w)
+{
+	if (m_mxtc_config_reg[0x5f] & 0x2)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_bios_ext3_ram + offset);
+	}
+}
+
+
+WRITE32_MEMBER(xtom3d_state::bios_ext4_ram_w)
+{
+	if (m_mxtc_config_reg[0x5f] & 0x20)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_bios_ext4_ram + offset);
+	}
+}
+
+
 WRITE32_MEMBER(xtom3d_state::bios_ram_w)
 {
-	//if (m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
-	#if 1
 	if (m_mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ram + offset);
 	}
-	#endif
 }
 
 static READ32_DEVICE_HANDLER( ide_r )
 {
-	return -1;
+	return -1; // crashes otherwise
 
 	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
 }
 
 static WRITE32_DEVICE_HANDLER( ide_w )
 {
-	if(0)
-	ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
+	if(0) // crashes otherwise
+		ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
 }
 
 static READ32_DEVICE_HANDLER( fdc_r )
@@ -409,12 +535,14 @@ static I8237_INTERFACE( dma8237_2_config )
 static ADDRESS_MAP_START(xtom3d_map, AS_PROGRAM, 32, xtom3d_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000e0000, 0x000effff) AM_RAM // TODO: PAM register banks this region
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
+	AM_RANGE(0x000c0000, 0x000c3fff) AM_ROMBANK("video_bank1") AM_WRITE(isa_ram1_w)
+	AM_RANGE(0x000c4000, 0x000c7fff) AM_ROMBANK("video_bank2") AM_WRITE(isa_ram2_w)
+	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_ext1") AM_WRITE(bios_ext1_ram_w)
+	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_ext2") AM_WRITE(bios_ext2_ram_w)
+	AM_RANGE(0x000e8000, 0x000ebfff) AM_ROMBANK("bios_ext3") AM_WRITE(bios_ext3_ram_w)
+	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ext4") AM_WRITE(bios_ext4_ram_w)
+	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_bank") AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-//	AM_RANGE(0x02000000, 0x02000003) // protection dongle lies there?
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
@@ -542,7 +670,14 @@ static const struct pc_vga_interface vga_interface =
 static MACHINE_START( xtom3d )
 {
 	xtom3d_state *state = machine.driver_data<xtom3d_state>();
-	state->m_bios_ram = auto_alloc_array(machine, UINT32, 0x20000/4);
+
+	state->m_bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
+	state->m_bios_ext1_ram = auto_alloc_array(machine, UINT32, 0x4000/4);
+	state->m_bios_ext2_ram = auto_alloc_array(machine, UINT32, 0x4000/4);
+	state->m_bios_ext3_ram = auto_alloc_array(machine, UINT32, 0x4000/4);
+	state->m_bios_ext4_ram = auto_alloc_array(machine, UINT32, 0x4000/4);
+	state->m_isa_ram1 = auto_alloc_array(machine, UINT32, 0x4000/4);
+	state->m_isa_ram2 = auto_alloc_array(machine, UINT32, 0x4000/4);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, xtom3d_set_keyb_int);
 
@@ -555,7 +690,13 @@ static MACHINE_START( xtom3d )
 
 static MACHINE_RESET( xtom3d )
 {
-	memory_set_bankptr(machine, "bank1", machine.region("bios")->base() + 0x10000);
+	memory_set_bankptr(machine, "bios_bank", machine.region("bios")->base() + 0x10000);
+	memory_set_bankptr(machine, "bios_ext1", machine.region("bios")->base() + 0);
+	memory_set_bankptr(machine, "bios_ext2", machine.region("bios")->base() + 0x4000);
+	memory_set_bankptr(machine, "bios_ext3", machine.region("bios")->base() + 0x8000);
+	memory_set_bankptr(machine, "bios_ext4", machine.region("bios")->base() + 0xc000);
+	memory_set_bankptr(machine, "video_bank1", machine.region("video_bios")->base() + 0);
+	memory_set_bankptr(machine, "video_bank2", machine.region("video_bios")->base() + 0x4000);
 }
 
 
@@ -590,7 +731,7 @@ ROM_START( xtom3d )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "bios.u22", 0x000000, 0x020000, CRC(f7c58044) SHA1(fd967d009e0d3c8ed9dd7be852946f2b9dee7671) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: needs proper video BIOS dumped
+	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: no VGA card is hooked up, to be removed
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
