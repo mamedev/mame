@@ -100,9 +100,6 @@ public:
 	DECLARE_WRITE32_MEMBER( bios_ext4_ram_w );
 
 	DECLARE_WRITE32_MEMBER( bios_ram_w );
-
-
-protected:
 };
 
 // Intel 82439TX System Controller (MXTC)
