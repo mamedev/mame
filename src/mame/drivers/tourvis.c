@@ -380,7 +380,7 @@ Notes:
 
 */
 
-ROM_START(scitvpce)
+ROM_START(tvsci)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_sci.bin", 0x00000, 0x100000, CRC(4baac6d8) SHA1(4c2431d9553e2bd952cf816e78fc1e3387376ef4) )
 
@@ -397,4 +397,4 @@ GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootle
 GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvrs2,    tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Rastan Saga II (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, tvpwlg4,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Hudson", "Power League IV (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, scitvpce, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, tvsci,    tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
