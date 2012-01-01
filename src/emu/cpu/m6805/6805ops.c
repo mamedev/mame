@@ -307,7 +307,7 @@ OP_HANDLER( tst_di )
 OP_HANDLER( clr_di )
 {
 	DIRECT;
-	CLR_NZC; SEZ;
+	CLR_NZ; SEZ;
 	WM(EAD,0);
 }
 
