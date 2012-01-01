@@ -3,12 +3,8 @@
     Midway Quicksilver skeleton driver
 
 	TODO:
-	- Currently fails to recognize a PCI card with ID 0x71108086:
-	Chip Number: 	82371AB/EB/MB
-	Chip Description: 	PIIX4/4E/4M ISA Bridge
-	Notes: 	IDE
-    ... that is obviously hooked but current PCI emulation doesn't return
-    ID vendor -.-"
+	- Tries to read 0x8 / 0xc registers of the PIIX4 PCI card, unknown
+	  purpose;
 
     Main CPU : Intel Celeron 333/366MHz
     Motherboard : Intel SE440BX-2
@@ -97,6 +93,9 @@ static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, 
 {
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
 //  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
+
+	if((reg & 0xfc) == 0 && function == 0) // return vendor ID
+		return (0x71008086 >> (reg & 3)*8) & 0xff;
 
 	return state->m_mxtc_config_reg[reg];
 }
@@ -240,15 +239,20 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
+	address_space *space = busdevice->machine().firstcpu->memory().space( AS_PROGRAM );
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
-//  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
+	printf("%08x PIIX4: read %d, %02X\n", cpu_get_pc(&space->device()), function, reg);
+
+	if((reg & 0xfc) == 0 && function == 0) // return vendor ID
+		return (0x71108086 >> (reg & 3)*8) & 0xff;
+
 	return state->m_piix4_config_reg[function][reg];
 }
 
 static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
-//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
+	printf("PIIX4: write %d, %02X, %02X\n", function, reg, data);
 	state->m_piix4_config_reg[function][reg] = data;
 }
 
