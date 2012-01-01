@@ -131,10 +131,10 @@ public:
 	~bitmap_t();
 	
 	// getters
-	UINT32 width() const { return m_width; }
-	UINT32 height() const { return m_height; }
-	UINT32 rowpixels() const { return m_rowpixels; }
-	UINT32 rowbytes() const { return m_rowpixels * m_bpp / 8; }
+	INT32 width() const { return m_width; }
+	INT32 height() const { return m_height; }
+	INT32 rowpixels() const { return m_rowpixels; }
+	INT32 rowbytes() const { return m_rowpixels * m_bpp / 8; }
 	UINT8 bpp() const { return m_bpp; }
 	bitmap_format format() const { return m_format; }
 	palette_t *palette() const { return m_palette; }
