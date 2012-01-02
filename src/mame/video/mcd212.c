@@ -1332,7 +1332,7 @@ static void mcd212_draw_cursor(mcd212_regs_t *mcd212, UINT32 *scanline, int y)
 static void mcd212_draw_scanline(mcd212_regs_t *mcd212, int y)
 {
     running_machine &machine = mcd212->machine();
-    bitmap_t &bitmap = *machine.generic.tmpbitmap;
+    bitmap_t &bitmap = machine.primary_screen->default_bitmap();
     UINT8 plane_a_r[768], plane_a_g[768], plane_a_b[768];
     UINT8 plane_b_r[768], plane_b_g[768], plane_b_b[768];
     UINT32 out[768];
@@ -1652,7 +1652,6 @@ VIDEO_START( cdimono1 )
 {
     cdi_state *state = machine.driver_data<cdi_state>();
 
-    VIDEO_START_CALL(generic_bitmapped);
     mcd212_ab_init(&state->m_mcd212_ab);
     mcd212_init(machine, &state->m_mcd212_regs);
     state->m_mcd212_regs.scan_timer = machine.scheduler().timer_alloc(FUNC(mcd212_perform_scan));
@@ -1663,7 +1662,7 @@ VIDEO_START( cdimono1 )
 
 SCREEN_UPDATE( cdimono1 )
 {
-    copybitmap(bitmap, *screen.machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
     return 0;
 }
 

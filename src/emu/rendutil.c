@@ -628,6 +628,59 @@ bitmap_t *render_load_png(emu_file &file, const char *dirname, const char *filen
 	return bitmap;
 }
 
+void render_load_png(bitmap_t &bitmap, emu_file &file, const char *dirname, const char *filename)
+{
+	png_info png;
+	png_error result;
+	
+	bitmap.deallocate();
+
+	/* open the file */
+	astring fname;
+	if (dirname == NULL)
+		fname.cpy(filename);
+	else
+		fname.cpy(dirname).cat(PATH_SEPARATOR).cat(filename);
+	file_error filerr = file.open(fname);
+	if (filerr != FILERR_NONE)
+		return;
+
+	/* read the PNG data */
+	result = png_read_file(file, &png);
+	file.close();
+	if (result != PNGERR_NONE)
+		return;
+
+	/* verify we can handle this PNG */
+	if (png.bit_depth > 8)
+	{
+		logerror("%s: Unsupported bit depth %d (8 bit max)\n", filename, png.bit_depth);
+		png_free(&png);
+		return;
+	}
+	if (png.interlace_method != 0)
+	{
+		logerror("%s: Interlace unsupported\n", filename);
+		png_free(&png);
+		return;
+	}
+	if (png.color_type != 0 && png.color_type != 3 && png.color_type != 2 && png.color_type != 6)
+	{
+		logerror("%s: Unsupported color type %d\n", filename, png.color_type);
+		png_free(&png);
+		return;
+	}
+
+	/* if less than 8 bits, upsample */
+	png_expand_buffer_8bit(&png);
+
+	bitmap.allocate(png.width, png.height, BITMAP_FORMAT_ARGB32);
+	copy_png_to_bitmap(bitmap, &png, NULL);
+
+	/* free PNG data */
+	png_free(&png);
+}
+
 
 /*-------------------------------------------------
     copy_png_to_bitmap - copy the PNG data to a

@@ -268,7 +268,6 @@ struct generic_pointers
 	generic_ptr				buffered_spriteram2;// secondary buffered spriteram
 	generic_ptr				paletteram;			// palette RAM
 	generic_ptr				paletteram2;		// secondary palette RAM
-	bitmap_t *				tmpbitmap;			// temporary bitmap
 };
 
 

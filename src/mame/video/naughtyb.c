@@ -104,7 +104,7 @@ VIDEO_START( naughtyb )
 	state->m_palreg = state->m_bankreg = 0;
 
 	/* Naughty Boy has a virtual screen twice as large as the visible screen */
-	machine.generic.tmpbitmap = auto_bitmap_alloc(machine,68*8,28*8,machine.primary_screen->format());
+	state->m_tmpbitmap.allocate(68*8,28*8,machine.primary_screen->format());
 }
 
 
@@ -190,7 +190,7 @@ SCREEN_UPDATE( naughtyb )
 
 	naughtyb_state *state = screen.machine().driver_data<naughtyb_state>();
 	UINT8 *videoram = state->m_videoram;
-	bitmap_t &tmpbitmap = *screen.machine().generic.tmpbitmap;
+	bitmap_t &tmpbitmap = state->m_tmpbitmap;
 	int offs;
 
 	// for every character in the Video RAM

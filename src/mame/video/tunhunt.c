@@ -76,7 +76,7 @@ VIDEO_START( tunhunt )
     */
 	tunhunt_state *state = machine.driver_data<tunhunt_state>();
 
-	machine.generic.tmpbitmap = auto_bitmap_alloc(machine, 256, 64, machine.primary_screen->format());
+	state->m_tmpbitmap.allocate(256, 64, machine.primary_screen->format());
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
@@ -214,7 +214,7 @@ static void draw_motion_object(running_machine &machine, bitmap_t &bitmap, const
  */
 
 	tunhunt_state *state = machine.driver_data<tunhunt_state>();
-	bitmap_t &tmpbitmap = *machine.generic.tmpbitmap;
+	bitmap_t &tmpbitmap = state->m_tmpbitmap;
 	UINT8 *spriteram = state->m_spriteram;
 	UINT8 *tunhunt_ram = state->m_workram;
 	//int skip = tunhunt_ram[MOBST];

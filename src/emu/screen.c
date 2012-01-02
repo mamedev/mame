@@ -88,13 +88,11 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	  m_container(NULL),
 	  m_width(100),
 	  m_height(100),
-	  m_burnin(NULL),
 	  m_curbitmap(0),
 	  m_curtexture(0),
 	  m_texture_format(0),
 	  m_changed(true),
 	  m_last_partial_scan(0),
-	  m_screen_overlay_bitmap(NULL),
 	  m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds()),
 	  m_scantime(1),
 	  m_pixeltime(1),
@@ -112,7 +110,6 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	m_visarea.max_x = m_width - 1;
 	m_visarea.max_y = m_height - 1;
 	memset(m_texture, 0, sizeof(m_texture));
-	memset(m_bitmap, 0, sizeof(m_bitmap));
 }
 
 
@@ -352,10 +349,8 @@ void screen_device::device_start()
 		int width, height;
 		if (sscanf(machine().options().snap_size(), "%dx%d", &width, &height) != 2 || width == 0 || height == 0)
 			width = height = 300;
-		m_burnin = auto_alloc(machine(), bitmap_t(width, height, BITMAP_FORMAT_INDEXED64));
-		if (m_burnin == NULL)
-			fatalerror("Error allocating burn-in bitmap for screen at (%dx%d)\n", width, height);
-		m_burnin->fill(0);
+		m_burnin.allocate(width, height, BITMAP_FORMAT_INDEXED64);
+		m_burnin.fill(0);
 	}
 
 	// load the effect overlay
@@ -390,9 +385,8 @@ void screen_device::device_stop()
 {
 	machine().render().texture_free(m_texture[0]);
 	machine().render().texture_free(m_texture[1]);
-	if (m_burnin != NULL)
+	if (m_burnin.valid())
 		finalize_burnin();
-	global_free(m_screen_overlay_bitmap);
 }
 
 
@@ -495,13 +489,12 @@ void screen_device::realloc_screen_bitmaps()
 	if (m_type == SCREEN_TYPE_VECTOR)
 		return;
 
-	int curwidth = 0, curheight = 0;
-
 	// extract the current width/height from the bitmap
-	if (m_bitmap[0] != NULL)
+	int curwidth = 0, curheight = 0;
+	if (m_bitmap[0].valid())
 	{
-		curwidth = m_bitmap[0]->width();
-		curheight = m_bitmap[0]->height();
+		curwidth = m_bitmap[0].width();
+		curheight = m_bitmap[0].height();
 	}
 
 	// if we're too small to contain this width/height, reallocate our bitmaps and textures
@@ -510,8 +503,6 @@ void screen_device::realloc_screen_bitmaps()
 		// free what we have currently
 		machine().render().texture_free(m_texture[0]);
 		machine().render().texture_free(m_texture[1]);
-		auto_free(machine(), m_bitmap[0]);
-		auto_free(machine(), m_bitmap[1]);
 
 		// compute new width/height
 		curwidth = MAX(m_width, curwidth);
@@ -528,16 +519,20 @@ void screen_device::realloc_screen_bitmaps()
 		}
 
 		// allocate bitmaps
-		m_bitmap[0] = auto_alloc(machine(), bitmap_t(curwidth, curheight, m_format));
-		m_bitmap[0]->set_palette(machine().palette);
-		m_bitmap[1] = auto_alloc(machine(), bitmap_t(curwidth, curheight, m_format));
-		m_bitmap[1]->set_palette(machine().palette);
+		m_bitmap[0].allocate(curwidth, curheight, m_format);
+		m_bitmap[0].set_palette(machine().palette);
+		m_bitmap[1].allocate(curwidth, curheight, m_format);
+		m_bitmap[1].set_palette(machine().palette);
 
 		// allocate textures
 		m_texture[0] = machine().render().texture_alloc();
-		m_texture[0]->set_bitmap(m_bitmap[0], &m_visarea, m_texture_format, palette);
+		m_texture[0]->set_bitmap(&m_bitmap[0], &m_visarea, m_texture_format, palette);
 		m_texture[1] = machine().render().texture_alloc();
-		m_texture[1]->set_bitmap(m_bitmap[1], &m_visarea, m_texture_format, palette);
+		m_texture[1]->set_bitmap(&m_bitmap[1], &m_visarea, m_texture_format, palette);
+		
+		// allocate generic backing bitmap
+		m_default.allocate(curwidth, curheight, m_format);
+		m_default.set_palette(machine().palette);
 	}
 }
 
@@ -618,7 +613,7 @@ bool screen_device::update_partial(int scanline)
 		g_profiler.start(PROFILER_VIDEO);
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 
-		flags = screen_update(*m_bitmap[m_curbitmap], clip);
+		flags = screen_update(m_bitmap[m_curbitmap], clip);
 		m_partial_updates_this_frame++;
 		g_profiler.stop();
 
@@ -876,7 +871,7 @@ bool screen_device::update_quads()
 				fixedvis.max_y++;
 
 				palette_t *palette = (m_texture_format == TEXFORMAT_PALETTE16) ? machine().palette : NULL;
-				m_texture[m_curbitmap]->set_bitmap(m_bitmap[m_curbitmap], &fixedvis, m_texture_format, palette);
+				m_texture[m_curbitmap]->set_bitmap(&m_bitmap[m_curbitmap], &fixedvis, m_texture_format, palette);
 
 				m_curtexture = m_curbitmap;
 				m_curbitmap = 1 - m_curbitmap;
@@ -902,17 +897,17 @@ bool screen_device::update_quads()
 void screen_device::update_burnin()
 {
 #undef rand
-	if (m_burnin == NULL)
+	if (!m_burnin.valid())
 		return;
 
-	bitmap_t *srcbitmap = m_bitmap[m_curtexture];
-	if (srcbitmap == NULL)
+	bitmap_t &srcbitmap = m_bitmap[m_curtexture];
+	if (!srcbitmap.valid())
 		return;
 
-	int srcwidth = srcbitmap->width();
-	int srcheight = srcbitmap->height();
-	int dstwidth = m_burnin->width();
-	int dstheight = m_burnin->height();
+	int srcwidth = srcbitmap.width();
+	int srcheight = srcbitmap.height();
+	int dstwidth = m_burnin.width();
+	int dstheight = m_burnin.height();
 	int xstep = (srcwidth << 16) / dstwidth;
 	int ystep = (srcheight << 16) / dstheight;
 	int xstart = ((UINT32)rand() % 32767) * xstep / 32767;
@@ -923,12 +918,12 @@ void screen_device::update_burnin()
 	// iterate over rows in the destination
 	for (y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
 	{
-		UINT64 *dst = &m_burnin->pix64(y);
+		UINT64 *dst = &m_burnin.pix64(y);
 
 		// handle the 16-bit palettized case
-		if (srcbitmap->format() == BITMAP_FORMAT_INDEXED16)
+		if (srcbitmap.format() == BITMAP_FORMAT_INDEXED16)
 		{
-			const UINT16 *src = &srcbitmap->pix16(srcy >> 16);
+			const UINT16 *src = &srcbitmap.pix16(srcy >> 16);
 			const rgb_t *palette = palette_entry_list_adjusted(machine().palette);
 			for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 			{
@@ -938,9 +933,9 @@ void screen_device::update_burnin()
 		}
 
 		// handle the 15-bit RGB case
-		else if (srcbitmap->format() == BITMAP_FORMAT_RGB15)
+		else if (srcbitmap.format() == BITMAP_FORMAT_RGB15)
 		{
-			const UINT16 *src = &srcbitmap->pix16(srcy >> 16);
+			const UINT16 *src = &srcbitmap.pix16(srcy >> 16);
 			for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 			{
 				rgb15_t pixel = src[srcx >> 16];
@@ -949,9 +944,9 @@ void screen_device::update_burnin()
 		}
 
 		// handle the 32-bit RGB case
-		else if (srcbitmap->format() == BITMAP_FORMAT_RGB32)
+		else if (srcbitmap.format() == BITMAP_FORMAT_RGB32)
 		{
-			const UINT32 *src = &srcbitmap->pix32(srcy >> 16);
+			const UINT32 *src = &srcbitmap.pix32(srcy >> 16);
 			for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 			{
 				rgb_t pixel = src[srcx >> 16];
@@ -968,20 +963,20 @@ void screen_device::update_burnin()
 
 void screen_device::finalize_burnin()
 {
-	if (m_burnin == NULL)
+	if (!m_burnin.valid())
 		return;
 
 	// compute the scaled visible region
 	rectangle scaledvis;
-	scaledvis.min_x = m_visarea.min_x * m_burnin->width() / m_width;
-	scaledvis.max_x = m_visarea.max_x * m_burnin->width() / m_width;
-	scaledvis.min_y = m_visarea.min_y * m_burnin->height() / m_height;
-	scaledvis.max_y = m_visarea.max_y * m_burnin->height() / m_height;
+	scaledvis.min_x = m_visarea.min_x * m_burnin.width() / m_width;
+	scaledvis.max_x = m_visarea.max_x * m_burnin.width() / m_width;
+	scaledvis.min_y = m_visarea.min_y * m_burnin.height() / m_height;
+	scaledvis.max_y = m_visarea.max_y * m_burnin.height() / m_height;
 
 	// wrap a bitmap around the subregion we care about
 	bitmap_t finalmap(scaledvis.max_x + 1 - scaledvis.min_x, scaledvis.max_y + 1 - scaledvis.min_y, BITMAP_FORMAT_ARGB32);
-	int srcwidth = m_burnin->width();
-	int srcheight = m_burnin->height();
+	int srcwidth = m_burnin.width();
+	int srcheight = m_burnin.height();
 	int dstwidth = finalmap.width();
 	int dstheight = finalmap.height();
 	int xstep = (srcwidth << 16) / dstwidth;
@@ -992,7 +987,7 @@ void screen_device::finalize_burnin()
 	UINT64 maxval = 0;
 	for (int y = 0; y < srcheight; y++)
 	{
-		UINT64 *src = &m_burnin->pix64(y);
+		UINT64 *src = &m_burnin.pix64(y);
 		for (int x = 0; x < srcwidth; x++)
 		{
 			minval = MIN(minval, src[x]);
@@ -1006,7 +1001,7 @@ void screen_device::finalize_burnin()
 	// now normalize and convert to RGB
 	for (int y = 0, srcy = 0; y < dstheight; y++, srcy += ystep)
 	{
-		UINT64 *src = &m_burnin->pix64(srcy >> 16);
+		UINT64 *src = &m_burnin.pix64(srcy >> 16);
 		UINT32 *dst = &finalmap.pix32(y);
 		for (int x = 0, srcx = 0; x < dstwidth; x++, srcx += xstep)
 		{
@@ -1056,12 +1051,13 @@ void screen_device::load_effect_overlay(const char *filename)
 
 	// load the file
 	emu_file file(machine().options().art_path(), OPEN_FLAG_READ);
-	m_screen_overlay_bitmap = render_load_png(file, NULL, fullname, NULL, NULL);
-	if (m_screen_overlay_bitmap != NULL)
-		m_container->set_overlay(m_screen_overlay_bitmap);
+	render_load_png(m_screen_overlay_bitmap, file, NULL, fullname);
+	if (m_screen_overlay_bitmap.valid())
+		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else
 		mame_printf_warning("Unable to load effect PNG file '%s'\n", fullname.cstr());
 }
+
 
 //-------------------------------------------------
 //  screen_update - default implementation which
@@ -1070,12 +1066,12 @@ void screen_device::load_effect_overlay(const char *filename)
 
 bool screen_device::screen_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
-	if (m_screen_update != NULL) {
+	if (m_screen_update != NULL)
 		return (*m_screen_update)(*this, bitmap, cliprect);
-	} else {
+	else
 		return machine().driver_data<driver_device>()->screen_update(*this, bitmap, cliprect);
-	}
 }
+
 
 //-------------------------------------------------
 //  screen_eof - default implementation which

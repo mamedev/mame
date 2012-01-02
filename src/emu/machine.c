@@ -1116,6 +1116,8 @@ void driver_device::video_reset()
 
 bool driver_device::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
+	// if nothing provided, just copy the screen's generic bitmap
+	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

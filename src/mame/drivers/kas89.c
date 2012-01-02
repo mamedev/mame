@@ -241,8 +241,7 @@ static TIMER_DEVICE_CALLBACK( kas89_interrupt )
 
 static VIDEO_START( kas89 )
 {
-	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init (machine, 0, *machine.primary_screen, *machine.generic.tmpbitmap, MODEL_V9938, VDP_MEM, kas89_vdp_interrupt);
+	v9938_init (machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(), MODEL_V9938, VDP_MEM, kas89_vdp_interrupt);
 	v9938_reset(0);
 }
 
@@ -802,7 +801,6 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(544, 524)
 	MCFG_SCREEN_VISIBLE_AREA(0, 544 - 1, 0, 480 - 1)
-	MCFG_SCREEN_UPDATE(generic_bitmapped)
 
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT(v9938)

@@ -40,12 +40,6 @@ extern const gfx_layout gfx_16x16x4_planar;
 /* set up all the common systems */
 void generic_video_init(running_machine &machine);
 
-/* generic video start with a temporary bitmap */
-VIDEO_START( generic_bitmapped );
-
-/* generic video update to blit a temporary bitmap */
-SCREEN_UPDATE( generic_bitmapped );
-
 
 
 /* ----- sprite buffering ----- */

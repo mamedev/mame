@@ -116,7 +116,7 @@ static WRITE8_HANDLER( gei_bitmap_w )
 
 
 	for (i = 0; i < 8; i++)
-		space->machine().generic.tmpbitmap->pix16(sy, sx+i) = state->m_color[8-i-1];
+		space->machine().primary_screen->default_bitmap().pix16(sy, sx+i) = state->m_color[8-i-1];
 }
 
 static PALETTE_INIT(gei)
@@ -1087,14 +1087,11 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
-	MCFG_SCREEN_UPDATE(generic_bitmapped)
 
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(gei)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	MCFG_VIDEO_START(generic_bitmapped)
 
 	MCFG_PPI8255_ADD( "ppi8255_0", getrivia_ppi8255_intf[0] )
 	MCFG_PPI8255_ADD( "ppi8255_1", getrivia_ppi8255_intf[1] )

@@ -262,38 +262,6 @@ void generic_video_init(running_machine &machine)
 
 
 /***************************************************************************
-    GENERIC VIDEO START/UPDATE
-***************************************************************************/
-
-/*-------------------------------------------------
-    VIDEO_START( generic_bitmapped ) - general video
-    system with a bitmap
--------------------------------------------------*/
-
-VIDEO_START( generic_bitmapped )
-{
-	/* allocate the temporary bitmap */
-	machine.generic.tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
-
-	/* ensure the contents of the bitmap are saved */
-	machine.save().save_item(NAME(*machine.generic.tmpbitmap));
-}
-
-
-/*-------------------------------------------------
-    SCREEN_UPDATE( generic_bitmapped ) - blast the
-    generic bitmap to the screen
--------------------------------------------------*/
-
-SCREEN_UPDATE( generic_bitmapped )
-{
-	copybitmap(bitmap, *screen.machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
-	return 0;
-}
-
-
-
-/***************************************************************************
     GENERIC SPRITE BUFFERING
 ***************************************************************************/
 

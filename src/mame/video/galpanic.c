@@ -6,7 +6,6 @@
 VIDEO_START( galpanic )
 {
 	galpanic_state *state = machine.driver_data<galpanic_state>();
-	machine.generic.tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
 	state->m_sprites_bitmap = machine.primary_screen->alloc_compatible_bitmap();
 }
 
@@ -34,7 +33,7 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 	sy = offset / 256;
 	sx = offset % 256;
 
-	space->machine().generic.tmpbitmap->pix16(sy, sx) = 1024 + (data >> 1);
+	space->machine().primary_screen->default_bitmap().pix16(sy, sx) = 1024 + (data >> 1);
 }
 
 WRITE16_HANDLER( galpanic_paletteram_w )
@@ -105,7 +104,7 @@ SCREEN_UPDATE( galpanic )
 	device_t *pandora = screen.machine().device("pandora");
 
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,*screen.machine().generic.tmpbitmap,0,0,0,0,cliprect);
+	copybitmap(bitmap,screen.default_bitmap(),0,0,0,0,cliprect);
 
 	draw_fgbitmap(screen.machine(), bitmap, cliprect);
 
@@ -118,7 +117,7 @@ SCREEN_UPDATE( comad )
 {
 	galpanic_state *state = screen.machine().driver_data<galpanic_state>();
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,*screen.machine().generic.tmpbitmap,0,0,0,0,cliprect);
+	copybitmap(bitmap,screen.default_bitmap(),0,0,0,0,cliprect);
 
 	draw_fgbitmap(screen.machine(), bitmap, cliprect);
 

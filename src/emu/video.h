@@ -181,7 +181,7 @@ private:
 
 	// snapshot stuff
 	render_target *		m_snap_target;				// screen shapshot target
-	bitmap_t *			m_snap_bitmap;				// screen snapshot bitmap
+	bitmap_t			m_snap_bitmap;				// screen snapshot bitmap
 	bool				m_snap_native;				// are we using native per-screen layouts?
 	INT32				m_snap_width;				// width of snapshots (0 == auto)
 	INT32				m_snap_height;				// height of snapshots (0 == auto)

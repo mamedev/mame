@@ -14,6 +14,7 @@ public:
 	int m_cocktail;
 	UINT8 m_palreg;
 	int m_bankreg;
+	bitmap_t m_tmpbitmap;
 };
 
 

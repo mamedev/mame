@@ -162,7 +162,6 @@ public:
 
 	required_device<h63484_device> m_h63484;
 
-	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	/* misc */
@@ -174,11 +173,6 @@ public:
 	device_t *m_maincpu;
 	device_t *m_duart;
 };
-
-void adp_state::video_start()
-{
-	VIDEO_START_NAME(generic_bitmapped)(machine());
-}
 
 
 static H63484_DISPLAY_PIXELS( acrtc_display_pixels )
@@ -679,7 +673,6 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_PALETTE_LENGTH(0x10)
 
 	MCFG_PALETTE_INIT(adp)
-//  MCFG_VIDEO_START(adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
@@ -712,7 +705,6 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_PALETTE_LENGTH(0x10)
 
 	MCFG_PALETTE_INIT(adp)
-//  MCFG_VIDEO_START(adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
@@ -744,7 +736,6 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_PALETTE_LENGTH(0x10)
 
 //  MCFG_PALETTE_INIT(adp)
-//  MCFG_VIDEO_START(adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 

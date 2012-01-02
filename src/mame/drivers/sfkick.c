@@ -436,8 +436,7 @@ static void sfkick_vdp_interrupt(running_machine &machine, int i)
 
 static VIDEO_START( sfkick )
 {
-	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init (machine, 0, *machine.primary_screen, *machine.generic.tmpbitmap, MODEL_V9938, 0x80000, sfkick_vdp_interrupt);
+	v9938_init (machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(), MODEL_V9938, 0x80000, sfkick_vdp_interrupt);
 	v9938_reset(0);
 }
 
@@ -496,7 +495,6 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_UPDATE(generic_bitmapped)
 
 	MCFG_PALETTE_LENGTH(512)
 

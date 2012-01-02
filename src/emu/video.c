@@ -124,7 +124,6 @@ video_manager::video_manager(running_machine &machine)
 	  m_skipping_this_frame(false),
 	  m_average_oversleep(0),
 	  m_snap_target(NULL),
-	  m_snap_bitmap(NULL),
 	  m_snap_native(true),
 	  m_snap_width(0),
 	  m_snap_height(0),
@@ -345,7 +344,7 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 
 	// now do the actual work
 	const rgb_t *palette = (machine().palette != NULL) ? palette_entry_list_adjusted(machine().palette) : NULL;
-	png_error error = png_write_bitmap(file, &pnginfo, *m_snap_bitmap, machine().total_colors(), palette);
+	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, machine().total_colors(), palette);
 	if (error != PNGERR_NONE)
 		mame_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
 
@@ -411,8 +410,8 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		info.video_timescale = 1000 * ((machine().primary_screen != NULL) ? ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
 		info.video_sampletime = 1000;
 		info.video_numsamples = 0;
-		info.video_width = m_snap_bitmap->width();
-		info.video_height = m_snap_bitmap->height();
+		info.video_width = m_snap_bitmap.width();
+		info.video_height = m_snap_bitmap.height();
 		info.video_depth = 24;
 
 		info.audio_format = 0;
@@ -465,7 +464,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		{
 			// start the capture
 			int rate = (machine().primary_screen != NULL) ? ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE;
-			png_error pngerr = mng_capture_start(*m_mngfile, *m_snap_bitmap, rate);
+			png_error pngerr = mng_capture_start(*m_mngfile, m_snap_bitmap, rate);
 			if (pngerr != PNGERR_NONE)
 				return end_recording();
 
@@ -548,8 +547,7 @@ void video_manager::exit()
 
 	// free the snapshot target
 	machine().render().target_free(m_snap_target);
-	if (m_snap_bitmap != NULL)
-		global_free(m_snap_bitmap);
+	m_snap_bitmap.deallocate();
 
 	// print a final result if we have at least 5 seconds' worth of data
 	if (m_overall_emutime.seconds >= 5)
@@ -1076,17 +1074,13 @@ void video_manager::create_snapshot_bitmap(device_t *screen)
 	m_snap_target->set_bounds(width, height);
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (m_snap_bitmap == NULL || width != m_snap_bitmap->width() || height != m_snap_bitmap->height())
-	{
-		if (m_snap_bitmap != NULL)
-			auto_free(machine(), m_snap_bitmap);
-		m_snap_bitmap = auto_alloc(machine(), bitmap_t(width, height, BITMAP_FORMAT_RGB32));
-	}
+	if (!m_snap_bitmap.valid() || width != m_snap_bitmap.width() || height != m_snap_bitmap.height())
+		m_snap_bitmap.allocate(width, height, BITMAP_FORMAT_RGB32);
 
 	// render the screen there
 	render_primitive_list &primlist = m_snap_target->get_primitives();
 	primlist.acquire_lock();
-	rgb888_draw_primitives(primlist, &m_snap_bitmap->pix32(0), width, height, m_snap_bitmap->rowpixels());
+	rgb888_draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
 	primlist.release_lock();
 }
 
@@ -1244,7 +1238,7 @@ void video_manager::record_frame()
 		if (m_avifile != NULL)
 		{
 			// write the next frame
-			avi_error avierr = avi_append_video_frame_rgb32(m_avifile, *m_snap_bitmap);
+			avi_error avierr = avi_append_video_frame_rgb32(m_avifile, m_snap_bitmap);
 			if (avierr != AVIERR_NONE)
 			{
 				g_profiler.stop();
@@ -1267,7 +1261,7 @@ void video_manager::record_frame()
 
 			// write the next frame
 			const rgb_t *palette = (machine().palette != NULL) ? palette_entry_list_adjusted(machine().palette) : NULL;
-			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, *m_snap_bitmap, machine().total_colors(), palette);
+			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, machine().total_colors(), palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
 			{

@@ -759,8 +759,6 @@ VIDEO_START( atari )
     {
 		antic.video[i] = auto_alloc_clear(machine, VIDEO);
     }
-
-    VIDEO_START_CALL(generic_bitmapped);
 }
 
 /************************************************************************
@@ -772,7 +770,7 @@ SCREEN_UPDATE( atari )
 {
 	UINT32 new_tv_artifacts;
 
-	SCREEN_UPDATE_CALL(generic_bitmapped);
+	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
 
 	new_tv_artifacts = input_port_read_safe(screen.machine(), "artifacts", 0);
 	if( tv_artifacts != new_tv_artifacts )
@@ -1043,7 +1041,7 @@ static void antic_linerefresh(running_machine &machine)
 	dst[2] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
 	dst[3] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
 
-	draw_scanline8(*machine.generic.tmpbitmap, 12, y, MIN(machine.generic.tmpbitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
+	draw_scanline8(machine.primary_screen->default_bitmap(), 12, y, MIN(machine.primary_screen->default_bitmap().width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
 }
 
 static int cycle(running_machine &machine)

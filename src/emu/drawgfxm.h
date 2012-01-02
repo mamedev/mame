@@ -804,14 +804,14 @@ do {																					\
 /*
     Assumed input parameters or local variables:
 
-        bitmap_t *dest - the bitmap to copy to
-        bitmap_t *src - the bitmap to copy from (must be same bpp as dest)
+        bitmap_t &dest - the bitmap to copy to
+        bitmap_t &src - the bitmap to copy from (must be same bpp as dest)
         const rectangle &cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
         int flipx - non-zero means render right-to-left instead of left-to-right
         int flipy - non-zero means render bottom-to-top instead of top-to-bottom
         INT32 destx - the top-left X coordinate to copy to
         INT32 desty - the top-left Y coordinate to copy to
-        bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
+        bitmap_t &priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 #define COPYBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)							\
@@ -978,8 +978,8 @@ do {																					\
 /*
     Assumed input parameters or local variables:
 
-        bitmap_t *dest - the bitmap to copy to
-        bitmap_t *src - the bitmap to copy from (must be same bpp as dest)
+        bitmap_t &dest - the bitmap to copy to
+        bitmap_t &src - the bitmap to copy from (must be same bpp as dest)
         const rectangle &cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
         INT32 destx - the 16.16 source X position at destination pixel (0,0)
         INT32 desty - the 16.16 source Y position at destination pixel (0,0)
@@ -988,7 +988,7 @@ do {																					\
         INT32 incxy - the 16.16 amount to increment in source X for each destination Y pixel
         INT32 incyy - the 16.16 amount to increment in source Y for each destination Y pixel
         int wraparound - non-zero means wrap when hitting the edges of the source
-        bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
+        bitmap_t &priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 #define COPYROZBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)						\
@@ -1284,7 +1284,7 @@ do {																				\
         INT32 desty - the Y coordinate to copy to
         INT32 length - the total number of pixels to copy
         const UINTx *srcptr - pointer to memory containing the source pixels
-        bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
+        bitmap_t &priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 #define DRAWSCANLINE_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)						\

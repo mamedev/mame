@@ -338,8 +338,7 @@ static const msm5205_interface msm_interface =
 
 static VIDEO_START( sothello )
 {
-    VIDEO_START_CALL(generic_bitmapped);
-    v9938_init (machine, 0, *machine.primary_screen, *machine.generic.tmpbitmap, MODEL_V9938, VDP_MEM, sothello_vdp_interrupt);
+    v9938_init (machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(), MODEL_V9938, VDP_MEM, sothello_vdp_interrupt);
     v9938_reset(0);
 }
 
@@ -387,7 +386,6 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
     MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
-    MCFG_SCREEN_UPDATE(generic_bitmapped)
 
     MCFG_PALETTE_LENGTH(512)
     MCFG_PALETTE_INIT( v9938 )

@@ -150,6 +150,7 @@ public:
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
 	bitmap_t *alloc_compatible_bitmap(int width = 0, int height = 0) { return auto_bitmap_alloc(machine(), (width == 0) ? m_width : width, (height == 0) ? m_height : height, format()); }
+	bitmap_t &default_bitmap() { return m_default; }
 
 	// internal to the video system
 	bool update_quads();
@@ -208,14 +209,15 @@ private:
 
 	// textures and bitmaps
 	render_texture *	m_texture[2];				// 2x textures for the screen bitmap
-	bitmap_t *			m_bitmap[2];				// 2x bitmaps for rendering
-	bitmap_t *			m_burnin;					// burn-in bitmap
+	bitmap_t			m_bitmap[2];				// 2x bitmaps for rendering
+	bitmap_t			m_default;					// default backing bitmap (copied by default)
+	bitmap_t			m_burnin;					// burn-in bitmap
 	UINT8				m_curbitmap;				// current bitmap index
 	UINT8				m_curtexture;				// current texture index
 	INT32				m_texture_format;			// texture format of bitmap for this screen
 	bool				m_changed;					// has this bitmap changed?
 	INT32				m_last_partial_scan;		// scanline of last partial update
-	bitmap_t *			m_screen_overlay_bitmap;	// screen overlay bitmap
+	bitmap_t			m_screen_overlay_bitmap;	// screen overlay bitmap
 
 	// screen timing
 	attoseconds_t		m_frame_period;				// attoseconds per frame

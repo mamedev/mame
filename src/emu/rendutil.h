@@ -29,6 +29,7 @@ int render_clip_line(render_bounds *bounds, const render_bounds *clip);
 int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords);
 void render_line_to_quad(const render_bounds *bounds, float width, render_bounds *bounds0, render_bounds *bounds1);
 bitmap_t *render_load_png(emu_file &file, const char *dirname, const char *filename, bitmap_t *alphadest, bool *hasalpha);
+void render_load_png(bitmap_t &bitmap, emu_file &file, const char *dirname, const char *filename);
 
 
 
