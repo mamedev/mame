@@ -1080,7 +1080,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 		// copy the rendered character image into it
 		for (int y = 0; y < bitmap->height(); y++)
 		{
-			UINT32 *dstrow = &bitmap.pix32(y);
+			UINT32 *dstrow = &bitmap->pix32(y);
 			UINT8 *srcrow = (UINT8 *)drawsurf->pixels;
 
 			srcrow += (y * drawsurf->pitch);
