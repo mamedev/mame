@@ -67,6 +67,18 @@ INLINE X87_REG FPU_POP(i386_state *cpustate)
 	return value;
 }
 
+INLINE X87_REG X87_FROUND(i386_state *cpustate, X87_REG t)
+{
+	switch((cpustate->fpu_control_word >> 10) & 3)
+	{
+		case 0: t.f = (INT64)t.f + 0.5; break; /* Nearest */
+		case 1: t.f = (INT64)floor(t.f); break; /* Down */
+		case 2: t.f = (INT64)ceil(t.f); break; /* Up */
+		case 3: t.f = (INT64)t.f; break; /* Chop */
+	}
+	return t;
+}
+
 static void I386OP(fpu_group_d8)(i386_state *cpustate)		// Opcode 0xd8
 {
 	UINT8 modrm = FETCH(cpustate);
@@ -87,7 +99,35 @@ static void I386OP(fpu_group_d8)(i386_state *cpustate)		// Opcode 0xd8
 	}
 	else
 	{
-		fatalerror("I386: FPU Op D8 %02X at %08X", modrm, cpustate->pc-2);
+		switch (modrm & 0x3f)
+		{
+			case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: // FADD
+			{
+				ST(0).f+=ST(modrm & 7).f;
+				CYCLES(cpustate,8);
+				break;
+			}
+			case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f: // FMUL
+			{
+				ST(0).f*=ST(modrm & 7).f;
+				CYCLES(cpustate,16);
+				break;
+			}
+			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f: // FCOMP
+			{
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if(ST(0).f == ST(modrm & 7).f)
+					cpustate->fpu_status_word |= FPU_C3;
+				if(ST(0).f < ST(modrm & 7).f)
+					cpustate->fpu_status_word |= FPU_C0;
+				FPU_POP(cpustate);
+				CYCLES(cpustate,4);
+				break;
+			}
+			default:
+				fatalerror("I386: FPU Op D8 %02X at %08X", modrm, cpustate->pc-2);
+		}
+
 	}
 }
 
@@ -203,8 +243,48 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 				X87_REG t;
 				t.f = 1.0;
 				FPU_PUSH(cpustate,t);
-				CYCLES(cpustate,1);		// TODO
+				CYCLES(cpustate,4);
 				break;
+			}
+
+			case 0x29:		// FLDL2T
+			{
+				X87_REG t;
+				t.f = 3.3219280948873623;
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,8);
+			}
+
+			case 0x2a:		// FLDL2E
+			{
+				X87_REG t;
+				t.f = 1.4426950408889634;
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,8);
+			}
+
+			case 0x2b:		// FLDPI
+			{
+				X87_REG t;
+				t.f = 3.141592653589793;
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,8);
+			}
+
+			case 0x2c:		// FLDEG2
+			{
+				X87_REG t;
+				t.f = 0.3010299956639812;
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,8);
+			}
+
+			case 0x2d:		// FLDLN2
+			{
+				X87_REG t;
+				t.f = 0.693147180559945;
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,8);
 			}
 
 			case 0x2e:		// FLDZ
@@ -212,11 +292,16 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 				X87_REG t;
 				t.f = 0.0;
 				FPU_PUSH(cpustate,t);
-				CYCLES(cpustate,1);		// TODO
+				CYCLES(cpustate,4);
 				break;
 			}
 
-
+			case 0x3c:		// FRNDINT
+			{
+				ST(0) = X87_FROUND(cpustate,ST(0));
+				CYCLES(cpustate,21);
+				break;
+			}
 
 			default:
 				fatalerror("I386: FPU Op D9 %02X at %08X", modrm, cpustate->pc-2);
@@ -301,7 +386,22 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 		switch ((modrm >> 3) & 0x7)
 		{
+			case 3: /* FCOMP double */
+			{
+				X87_REG t;
+				t.i = READ64(cpustate,ea);
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if(ST(0).f == t.f)
+					cpustate->fpu_status_word |= FPU_C3;
+				if(ST(0).f < t.f)
+					cpustate->fpu_status_word |= FPU_C0;
+
+				FPU_POP(cpustate);
+				CYCLES(cpustate,4);
+				break;
+			}
 			case 6: /* FDIV double */
+			{
 				X87_REG t;
 				t.i = READ64(cpustate,ea);
 				if(t.f)
@@ -311,6 +411,7 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 				CYCLES(cpustate,73);
 				break;
+			}
 
 			default:
 				printf("I386: FPU Op DC %02X at %08X", (modrm >> 3) & 0x7, cpustate->pc-2);
@@ -400,6 +501,17 @@ static void I386OP(fpu_group_dd)(i386_state *cpustate)		// Opcode 0xdd
 	{
 		switch (modrm & 0x3f)
 		{
+			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+			{
+				UINT16 tmp;
+				ST(modrm & 7) = ST(0);
+				tmp = (cpustate->fpu_tag_word>>((cpustate->fpu_top&7)<<1))&3;
+				cpustate->fpu_tag_word &= ~(3<<((modrm & 7)<< 1));
+				cpustate->fpu_tag_word |= (tmp<<((modrm & 7)<< 1));
+				FPU_POP(cpustate);
+				CYCLES(cpustate,3);
+				break;
+			}
 			default:
 				fatalerror("I386: FPU Op DD %02X at %08X", modrm, cpustate->pc-2);
 		}
@@ -496,8 +608,19 @@ static void I386OP(fpu_group_df)(i386_state *cpustate)		// Opcode 0xdf
 				break;
 			}
 
+			case 7:		// FISTP long
+			{
+				X87_REG t;
+
+				t = X87_FROUND(cpustate,ST(0));
+				WRITE64(cpustate,ea,t.i);
+				FPU_POP(cpustate);
+				CYCLES(cpustate,29);
+				break;
+			}
+
 			default:
-				fatalerror("I386: FPU Op DF %02X at %08X", modrm, cpustate->pc-2);
+				fatalerror("I386: FPU Op DF %02X at %08X", (modrm >> 3) & 7, cpustate->pc-2);
 		}
 	}
 	else

@@ -8,10 +8,7 @@ Notes:
   It does: mov [ebx],ecx in there, where ebx is 0xfffxxxxx, but only lower
   16 bits are used so it ends up in reading at conventional work RAM.
   CPU core bug?
-bp 0x182a8,ax = 1
-bp 0x18390,ax = 1
-bp 0x183a2,ax = 1
-bp 0x1b578,ax = 1
+bp 0x182a8,ax = 1;bp 0x18390,ax = 1;bp 0x183a2,ax = 1;bp 0x1b578,ax = 1
 
 Funky Ball
 dgPIX, 1998
