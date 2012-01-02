@@ -208,7 +208,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 	m68k->mmu_tmp_sr |= ((tbl_entry2 & 0x0100) && !(fc & 4)) ? M68K_MMU_SR_SUPERVISOR_ONLY : 0;
 	m68k->mmu_tmp_sr |= tbl_entry2 & 0x0004 ? M68K_MMU_SR_WRITE_PROTECT : 0;
 
-	if (!ptest)
+	if (!ptest && dt != M68K_MMU_DF_DT0)
 	{
 		if (dt == M68K_MMU_DF_DT1 && !m68k->mmu_tmp_rw && !(m68k->mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
 		{
@@ -794,7 +794,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 						}
 					}
 
-                    printf("680x0: PLOADing ATC with logical %08x => phys %08x\n", ltmp, ptmp);
+//                    printf("680x0: PLOADing ATC with logical %08x => phys %08x\n", ltmp, ptmp);
 					// FIXME: rw bit?
 					pmmu_atc_add(m68k, ltmp, ptmp,  modes & 0x07);
 					return;
