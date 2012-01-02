@@ -170,10 +170,31 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 				break;
 			}
 
+			// FXCH
+			case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+			{
+				X87_REG t = ST(0);
+				ST(0) = ST(modrm & 7);
+				ST(modrm & 7) = t;
+				CYCLES(cpustate,4);
+				break;
+			}
+
 			case 0x20:		// FCHS
 			{
 				ST(0).i ^= FPU_SIGN_BIT_DOUBLE;
 				CYCLES(cpustate,1);		// TODO
+				break;
+			}
+
+			case 0x24:		// FTST
+			{
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if(ST(0).f == 0.0)
+					cpustate->fpu_status_word |= FPU_C3;
+				if(ST(0).f < 0.0)
+					cpustate->fpu_status_word |= FPU_C0;
+				CYCLES(cpustate,4);
 				break;
 			}
 
@@ -194,6 +215,9 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 				CYCLES(cpustate,1);		// TODO
 				break;
 			}
+
+
+
 			default:
 				fatalerror("I386: FPU Op D9 %02X at %08X", modrm, cpustate->pc-2);
 		}
@@ -273,12 +297,23 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 	if (modrm < 0xc0)
 	{
-		//UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm);
 
 		switch ((modrm >> 3) & 0x7)
 		{
+			case 6: /* FDIV double */
+				X87_REG t;
+				t.i = READ64(cpustate,ea);
+				if(t.f)
+					ST(0).f /= t.f;
+				else
+					fatalerror("FPU Op DC 6 Divide by zero unhandled exception");
+
+				CYCLES(cpustate,73);
+				break;
+
 			default:
-				fatalerror("I386: FPU Op DC %02X at %08X", modrm, cpustate->pc-2);
+				printf("I386: FPU Op DC %02X at %08X", (modrm >> 3) & 0x7, cpustate->pc-2);
 		}
 	}
 	else
@@ -335,6 +370,17 @@ static void I386OP(fpu_group_dd)(i386_state *cpustate)		// Opcode 0xdd
 				t.f = ST(0).f;
 				WRITE64(cpustate,ea, t.i);
 				//FPU_POP(cpustate);
+				CYCLES(cpustate,8);
+				break;
+			}
+
+
+			case 3: // FSTP
+			{
+				X87_REG t;
+				t.f = ST(0).f;
+				WRITE64(cpustate,ea, t.i);
+				FPU_POP(cpustate);
 				CYCLES(cpustate,8);
 				break;
 			}
@@ -436,10 +482,20 @@ static void I386OP(fpu_group_df)(i386_state *cpustate)		// Opcode 0xdf
 
 	if (modrm < 0xc0)
 	{
-	//  UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm);
 
 		switch ((modrm >> 3) & 0x7)
 		{
+			case 5:		// FILD
+			{
+				X87_REG t;
+
+				t.f=(INT64)READ64(cpustate,ea);
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,10);
+				break;
+			}
+
 			default:
 				fatalerror("I386: FPU Op DF %02X at %08X", modrm, cpustate->pc-2);
 		}

@@ -8,7 +8,10 @@ Notes:
   It does: mov [ebx],ecx in there, where ebx is 0xfffxxxxx, but only lower
   16 bits are used so it ends up in reading at conventional work RAM.
   CPU core bug?
-- Trips 00019652: fld     dword ptr [esp+4Ch] after it
+bp 0x182a8,ax = 1
+bp 0x18390,ax = 1
+bp 0x183a2,ax = 1
+bp 0x1b578,ax = 1
 
 Funky Ball
 dgPIX, 1998
@@ -161,7 +164,7 @@ static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function
 	funkball_state* state = device->machine().driver_data<funkball_state>();
 	UINT32 val = 0;
 
-	printf("Voodoo[0] PCI R: %x\n", reg);
+	printf("Voodoo PCI R: %x\n", reg);
 
 	switch (reg)
 	{
