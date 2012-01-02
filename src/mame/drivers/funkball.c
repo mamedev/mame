@@ -108,6 +108,7 @@ public:
 	UINT16 m_flash_addr;
 	UINT32 *m_unk_ram;
 	UINT8 m_flash_cmd;
+	UINT8 m_flash_data_cmd;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -118,8 +119,9 @@ public:
 	required_device<pic8259_device> m_pic8259_2;
 
 	DECLARE_READ8_MEMBER( get_slave_ack );
-	DECLARE_READ8_MEMBER( flash_r );
 	DECLARE_WRITE8_MEMBER( flash_w );
+	DECLARE_READ8_MEMBER( flash_data_r );
+	DECLARE_WRITE8_MEMBER( flash_data_w );
 };
 
 static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -377,27 +379,49 @@ WRITE8_MEMBER( funkball_state::flash_w )
 		printf("%02x %02x\n",offset,data);
 }
 
-READ8_MEMBER( funkball_state::flash_r )
+READ8_MEMBER( funkball_state::flash_data_r )
 {
-	printf("%02x %08x %02x\n",offset,m_flash_addr << 16,m_flash_cmd);
+	if(m_flash_data_cmd == 0x90)
+	{
+		if(offset == 0)
+			return 0x89;
 
-	if(offset == 0)
-		return 0x89;
+		if(offset == 2)
+			return (m_flash_cmd & 0x80) ? 0x15 : 0x14; // recognize
 
-	if(offset == 2)
-		return (m_flash_cmd & 0x80) ? 0x15 : 0x14; // recognize
+		return 0;
+	}
+
+	if(m_flash_data_cmd == 0xff)
+	{
+		UINT8 *ROM = machine().region(m_flash_cmd & 0x80 ? "flash1" : "flash2")->base();
+
+		return ROM[offset + (m_flash_addr << 16)];
+	}
+
+	printf("%02x %08x %02x %02x\n",offset,m_flash_addr << 16,m_flash_cmd,m_flash_data_cmd);
 
 	return 0;
+}
+
+WRITE8_MEMBER( funkball_state::flash_data_w )
+{
+	if(offset == 0)
+	{
+		m_flash_data_cmd = data;
+	}
+	else
+		printf("%08x %02x FLASH DATA W %08x\n",offset,data,m_flash_addr << 16);
 }
 
 static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b0003) AM_READ8(flash_r,0xffffffff)
+	AM_RANGE(0x000b0000, 0x000bffff) AM_READWRITE8(flash_data_r,flash_data_w,0xffffffff)
 	AM_RANGE(0x000c0000, 0x000cffff) AM_RAM
 	AM_RANGE(0x000d0000, 0x000dffff) AM_RAM
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0) AM_WRITENOP	/* System BIOS */
+	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0)	/* System BIOS */
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
 	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_BASE(m_unk_ram)
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
@@ -522,7 +546,7 @@ static MACHINE_START( funkball )
 
 	kbdc8042_init(machine, &at8042);
 
-	/* defaults, so it won't boot */
+	/* defaults, otherwise it won't boot */
 	state->m_unk_ram[0x010/4] = 0x2f8d85ff;
 	state->m_unk_ram[0x018/4] = 0x000018c5;
 }
@@ -561,12 +585,12 @@ ROM_START( funkball )
 	ROM_REGION32_LE(0x10000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "512k-epr.u62", 0x000000, 0x010000, CRC(cced894a) SHA1(298c81716e375da4b7215f3e588a45ca3ea7e35c) )
 
-	ROM_REGION(0x400000, "user2", 0)
-	ROM_LOAD( "flash.u3", 0x000000, 0x400000, CRC(fb376abc) SHA1(ea4c48bb6cd2055431a33f5c426e52c7af6997eb) )
-
-	ROM_REGION(0x800000, "user3", 0)
+	ROM_REGION(0x800000, "flash1", 0)
 	ROM_LOAD( "flash.u29", 0x000000, 0x400000, CRC(7cf6ff4b) SHA1(4ccdd4864ad92cc218998f3923997119a1a9dd1d) )
 	ROM_LOAD( "flash.u30", 0x400000, 0x400000, CRC(1d46717a) SHA1(acfbd0a2ccf4d717779733c4a9c639296c3bbe0e) )
+
+	ROM_REGION(0x400000, "flash2", 0)
+	ROM_LOAD( "flash.u3", 0x000000, 0x400000, CRC(fb376abc) SHA1(ea4c48bb6cd2055431a33f5c426e52c7af6997eb) )
 ROM_END
 
 
