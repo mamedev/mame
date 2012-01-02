@@ -106,8 +106,8 @@ SCREEN_UPDATE(lethalen)
 {
 	lethal_state *state = screen.machine().driver_data<lethal_state>();
 
-	bitmap->fill(7168, cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(7168, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
 	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);

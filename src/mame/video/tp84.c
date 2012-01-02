@@ -152,7 +152,7 @@ VIDEO_START( tp84 )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	tp84_state *state = machine.driver_data<tp84_state>();
 	int offs;

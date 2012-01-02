@@ -374,7 +374,7 @@ if (screen.machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmes
 		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *dest = &bitmap->pix32(y);
+			UINT32 *dest = &bitmap.pix32(y);
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dest[x] = WAVERAM_READPIX(base, y, x - xoffs);
 		}
@@ -395,7 +395,7 @@ if (screen.machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmes
 
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *dest = &bitmap->pix32(y);
+			UINT32 *dest = &bitmap.pix32(y);
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				UINT8 tex = get_texel_8bit(base, y, x, texel_width);

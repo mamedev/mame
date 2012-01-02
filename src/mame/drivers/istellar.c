@@ -52,7 +52,7 @@ static SCREEN_UPDATE( istellar )
 	int charx, chary;
 
 	/* clear */
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	/* DEBUG */
 	/*

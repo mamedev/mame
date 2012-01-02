@@ -104,7 +104,7 @@ VIDEO_START( wrally )
     in the range 0x8-0xf are used.
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
 {
 	wrally_state *state = machine.driver_data<wrally_state>();
 	int i, px, py;
@@ -140,7 +140,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			for (py = 0; py < gfx->height; py++){
 				/* get a pointer to the current line in the screen bitmap */
 				int ypos = ((sy + py) & 0x1ff);
-				UINT16 *srcy = &bitmap->pix16(ypos);
+				UINT16 *srcy = &bitmap.pix16(ypos);
 
 				int gfx_py = yflip ? (gfx->height - 1 - py) : py;
 

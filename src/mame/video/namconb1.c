@@ -102,7 +102,7 @@ static void namconb1_install_palette(running_machine &machine)
 } /* namconb1_install_palette */
 
 static void
-video_update_common(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int bROZ )
+video_update_common(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bROZ )
 {
 	int pri;
 	namconb1_install_palette(machine);
@@ -148,7 +148,7 @@ SCREEN_UPDATE( namconb1 )
 	if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
 	if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 
 	video_update_common( screen.machine(), bitmap, clip, 0 );
 
@@ -189,7 +189,7 @@ SCREEN_UPDATE( namconb2 )
 	if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
 	if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 
 	if( memcmp(state->m_tilemap_tile_bank,state->m_tilebank32,sizeof(state->m_tilemap_tile_bank))!=0 )
 	{

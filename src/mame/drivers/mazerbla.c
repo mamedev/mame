@@ -185,7 +185,7 @@ SCREEN_UPDATE( test_vcu )
 	if (state->m_game_id == GREATGUN)
 		color_base = 0x00;
 
-	bitmap->fill(0);
+	bitmap.fill(0);
 //  logerror("-->frame\n");
 
 	if (planes_enabled[3])
@@ -281,12 +281,12 @@ static SCREEN_UPDATE( mazerbla )
 //  if (state->m_game_id == GREATGUN)
 //      color_base = 0x00;
 
-	//  bitmap->fill(0);
+	//  bitmap.fill(0);
 
-	copybitmap(bitmap, state->m_tmpbitmaps[3], 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, state->m_tmpbitmaps[2], 0, 0, 0, 0, cliprect, 0);
-	copybitmap_trans(bitmap, state->m_tmpbitmaps[1], 0, 0, 0, 0, cliprect, 0);
-	copybitmap_trans(bitmap, state->m_tmpbitmaps[0], 0, 0, 0, 0, cliprect, 0);
+	copybitmap(bitmap, *state->m_tmpbitmaps[3], 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, *state->m_tmpbitmaps[2], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *state->m_tmpbitmaps[1], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *state->m_tmpbitmaps[0], 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
 

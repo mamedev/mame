@@ -16,7 +16,7 @@ VIDEO_START( ninjaw )
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs )
 {
 	ninjaw_state *state = machine.driver_data<ninjaw_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -97,7 +97,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
                 SCREEN REFRESH
 **************************************************************/
 
-static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
+static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
 {
 	UINT8 layer[3], nodraw;
 
@@ -113,7 +113,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const recta
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(screen.machine(), bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer

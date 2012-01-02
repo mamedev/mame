@@ -39,7 +39,7 @@ static SCREEN_UPDATE( ultrsprt )
 
 	for (j=0; j < 400; j++)
 	{
-		UINT16 *dest = &bitmap->pix16(j);
+		UINT16 *dest = &bitmap.pix16(j);
 		int fb_index = j * 1024;
 
 		for (i=0; i < 512; i++)

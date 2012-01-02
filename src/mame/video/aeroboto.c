@@ -129,7 +129,7 @@ WRITE8_HANDLER( aeroboto_tilecolor_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 	int offs;
@@ -176,7 +176,7 @@ SCREEN_UPDATE( aeroboto )
 
 		star_color += 2;
 
-		bitmap->fill(sky_color, cliprect);
+		bitmap.fill(sky_color, cliprect);
 
 		// actual scroll speed is unknown but it can be adjusted by changing the SCROLL_SPEED constant
 		state->m_sx += (char)(*state->m_starx - state->m_ox);
@@ -202,7 +202,7 @@ SCREEN_UPDATE( aeroboto )
 			{
 				src_rowptr = src_colptr + (((y + j) & 0xff) << 5 );
 				if (!((unsigned)*src_rowptr & src_colmask))
-					bitmap->pix16(j, i) = pen;
+					bitmap.pix16(j, i) = pen;
 			}
 		}
 	}
@@ -210,7 +210,7 @@ SCREEN_UPDATE( aeroboto )
 	{
 		state->m_sx = state->m_ox = *state->m_starx;
 		state->m_sy = state->m_oy = *state->m_stary;
-		bitmap->fill(sky_color, cliprect);
+		bitmap.fill(sky_color, cliprect);
 	}
 
 	for (y = 0; y < 64; y++)

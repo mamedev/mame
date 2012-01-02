@@ -297,7 +297,7 @@ static SCREEN_UPDATE( maygayv1 )
 	/* If screen output is disabled, fill with black */
 	if (!(VREG(VCR0) & VCR0_DEN))
 	{
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -308,7 +308,7 @@ static SCREEN_UPDATE( maygayv1 )
 		UINT16 aflags = atable[sl];
 		UINT16 slmask_old = slmask;
 
-		UINT16 *bmp_ptr = &bitmap->pix16(sl);
+		UINT16 *bmp_ptr = &bitmap.pix16(sl);
 
 		slmask = 0xffff ^ (slmask ^ aflags);
 

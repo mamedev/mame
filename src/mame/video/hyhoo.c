@@ -235,9 +235,9 @@ SCREEN_UPDATE( hyhoo )
 {
 	hyhoo_state *state = screen.machine().driver_data<hyhoo_state>();
 	if (state->m_dispflag)
-		copybitmap(bitmap, state->m_tmpbitmap, state->m_flipscreen, state->m_flipscreen, 0, 0, cliprect);
+		copybitmap(bitmap, *state->m_tmpbitmap, state->m_flipscreen, state->m_flipscreen, 0, 0, cliprect);
 	else
-		bitmap->fill(RGB_BLACK, cliprect);
+		bitmap.fill(RGB_BLACK, cliprect);
 
 	return 0;
 }

@@ -209,7 +209,7 @@ Offset:         Values:         Format:
 
 ------------------------------------------------------------------------ */
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
 {
 	ginganin_state *state = machine.driver_data<ginganin_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -281,7 +281,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	if (layers_ctrl1 & 1)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl1 & 2)
 		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

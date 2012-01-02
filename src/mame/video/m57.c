@@ -177,7 +177,7 @@ WRITE8_HANDLER( m57_flipscreen_w )
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	m57_state *state = machine.driver_data<m57_state>();
 	int y,x;
@@ -199,17 +199,17 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				if ((x + scrolly) <= cliprect.max_x)
-					bitmap->pix16(y, x) = bitmap->pix16(y, x + scrolly);
+					bitmap.pix16(y, x) = bitmap.pix16(y, x + scrolly);
 				else
-					bitmap->pix16(y, x) = bitmap->pix16(y, cliprect.max_x);
+					bitmap.pix16(y, x) = bitmap.pix16(y, cliprect.max_x);
 			}
 		} else {
 			for (x = cliprect.max_x; x >= cliprect.min_x; x--)
 			{
 				if ((x + scrolly) >= cliprect.min_x)
-					bitmap->pix16(y, x) = bitmap->pix16(y, x + scrolly);
+					bitmap.pix16(y, x) = bitmap.pix16(y, x + scrolly);
 				else
-					bitmap->pix16(y, x) = bitmap->pix16(y, cliprect.min_x);
+					bitmap.pix16(y, x) = bitmap.pix16(y, cliprect.min_x);
 			}
 		}
 	}
@@ -221,7 +221,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	m57_state *state = machine.driver_data<m57_state>();
 	int offs;

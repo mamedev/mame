@@ -440,7 +440,7 @@ VIDEO_START( tceptor )
     z: zoom y
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int sprite_priority)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int sprite_priority)
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
 	UINT16 *mem1 = &state->m_sprite_ram_buffered[0x000/2];
@@ -481,7 +481,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			{
 				if (!need_mask)
 					// backup previous bitmap
-					copybitmap(state->m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+					copybitmap(*state->m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
 				need_mask = 1;
 			}
@@ -513,9 +513,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-				if (colortable_entry_get_value(machine.colortable, bitmap->pix16(y, x)) == SPR_MASK_COLOR)
+				if (colortable_entry_get_value(machine.colortable, bitmap.pix16(y, x)) == SPR_MASK_COLOR)
 					// restore pixel
-					bitmap->pix16(y, x) = state->m_temp_bitmap->pix16(y, x);
+					bitmap.pix16(y, x) = state->m_temp_bitmap->pix16(y, x);
 	}
 }
 

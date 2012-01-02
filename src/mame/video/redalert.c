@@ -235,9 +235,9 @@ static SCREEN_UPDATE( redalert )
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
 			if ((*state->m_video_control ^ state->m_control_xor) & 0x04)
-				bitmap->pix32(y, x) = pen;
+				bitmap.pix32(y, x) = pen;
 			else
-				bitmap->pix32(y ^ 0xff, x ^ 0xff) = pen;
+				bitmap.pix32(y ^ 0xff, x ^ 0xff) = pen;
 
 			/* next pixel */
 			x = x + 1;
@@ -312,9 +312,9 @@ static SCREEN_UPDATE( demoneye )
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
 			if (*state->m_video_control & 0x04)
-				bitmap->pix32(y ^ 0xff, x ^ 0xff) = pen;
+				bitmap.pix32(y ^ 0xff, x ^ 0xff) = pen;
 			else
-				bitmap->pix32(y, x) = pen;
+				bitmap.pix32(y, x) = pen;
 
 			/* next pixel */
 			x = x + 1;
@@ -383,9 +383,9 @@ static SCREEN_UPDATE( panther )
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
 			if ((*state->m_video_control ^ state->m_control_xor) & 0x04)
-				bitmap->pix32(y, x) = pen;
+				bitmap.pix32(y, x) = pen;
 			else
-				bitmap->pix32(y ^ 0xff, x ^ 0xff) = pen;
+				bitmap.pix32(y ^ 0xff, x ^ 0xff) = pen;
 
 			/* next pixel */
 			x = x + 1;

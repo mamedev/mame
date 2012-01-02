@@ -110,7 +110,7 @@ VIDEO_START( mrjong )
 /*
 Note: First 0x40 entries in the videoram are actually spriteram
 */
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	mrjong_state *state = machine.driver_data<mrjong_state>();
 	int offs;

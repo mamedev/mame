@@ -68,7 +68,7 @@ SCREEN_UPDATE( dribling )
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *dst = &bitmap.pix16(y);
 
 		/* loop over columns */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)

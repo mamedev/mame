@@ -50,17 +50,17 @@ static SCREEN_UPDATE( tgtpanic )
 		x = (offs >> 7) << 2;
 
 		/* I'm guessing the hardware doubles lines */
-		bitmap->pix32(y + 0, x + 0) = colors[val & 3];
-		bitmap->pix32(y + 1, x + 0) = colors[val & 3];
+		bitmap.pix32(y + 0, x + 0) = colors[val & 3];
+		bitmap.pix32(y + 1, x + 0) = colors[val & 3];
 		val >>= 2;
-		bitmap->pix32(y + 0, x + 1) = colors[val & 3];
-		bitmap->pix32(y + 1, x + 1) = colors[val & 3];
+		bitmap.pix32(y + 0, x + 1) = colors[val & 3];
+		bitmap.pix32(y + 1, x + 1) = colors[val & 3];
 		val >>= 2;
-		bitmap->pix32(y + 0, x + 2) = colors[val & 3];
-		bitmap->pix32(y + 1, x + 2) = colors[val & 3];
+		bitmap.pix32(y + 0, x + 2) = colors[val & 3];
+		bitmap.pix32(y + 1, x + 2) = colors[val & 3];
 		val >>= 2;
-		bitmap->pix32(y + 0, x + 3) = colors[val & 3];
-		bitmap->pix32(y + 1, x + 3) = colors[val & 3];
+		bitmap.pix32(y + 0, x + 3) = colors[val & 3];
+		bitmap.pix32(y + 1, x + 3) = colors[val & 3];
 	}
 
 	return 0;

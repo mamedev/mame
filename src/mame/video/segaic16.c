@@ -518,7 +518,7 @@ WRITE16_HANDLER( segaic16_paletteram_w )
  *
  *************************************/
 
-static void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilemap_info *info, bitmap_t *bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority)
+static void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilemap_info *info, bitmap_t &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority)
 {
 	int leftmin = -1, leftmax = -1, rightmin = -1, rightmax = -1;
 	int topmin = -1, topmax = -1, bottommin = -1, bottommax = -1;
@@ -744,7 +744,7 @@ static TILE_GET_INFO( segaic16_tilemap_16a_text_info )
 }
 
 
-static void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_t *bitmap, const rectangle &cliprect, int which, int flags, int priority)
+static void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_t &bitmap, const rectangle &cliprect, int which, int flags, int priority)
 {
 	UINT16 *textram = info->textram;
 
@@ -986,7 +986,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_alt_text_info )
 }
 
 
-static void segaic16_tilemap_16b_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_t *bitmap, const rectangle &cliprect, int which, int flags, int priority)
+static void segaic16_tilemap_16b_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_t &bitmap, const rectangle &cliprect, int which, int flags, int priority)
 {
 	UINT16 *textram = info->textram;
 	UINT16 xscroll, yscroll, pages;
@@ -1224,7 +1224,7 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
  *
  *************************************/
 
-void segaic16_tilemap_draw(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark)
+void segaic16_tilemap_draw(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark)
 {
 	running_machine &machine = screen.machine();
 	struct tilemap_info *info = &bg_tilemap[which];
@@ -1431,7 +1431,7 @@ static void segaic16_road_hangon_decode(running_machine &machine, struct road_in
 }
 
 
-static void segaic16_road_hangon_draw(struct road_info *info, bitmap_t *bitmap, const rectangle &cliprect, int priority)
+static void segaic16_road_hangon_draw(struct road_info *info, bitmap_t &bitmap, const rectangle &cliprect, int priority)
 {
 	UINT16 *roadram = info->roadram;
 	int x, y;
@@ -1439,7 +1439,7 @@ static void segaic16_road_hangon_draw(struct road_info *info, bitmap_t *bitmap, 
 	/* loop over scanlines */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dest = &bitmap->pix16(y);
+		UINT16 *dest = &bitmap.pix16(y);
 		int control = roadram[0x000 + y];
 		int hpos = roadram[0x100 + (control & 0xff)];
 		int color0 = roadram[0x200 + (control & 0xff)];
@@ -1701,7 +1701,7 @@ static void segaic16_road_outrun_decode(running_machine &machine, struct road_in
 }
 
 
-static void segaic16_road_outrun_draw(struct road_info *info, bitmap_t *bitmap, const rectangle &cliprect, int priority)
+static void segaic16_road_outrun_draw(struct road_info *info, bitmap_t &bitmap, const rectangle &cliprect, int priority)
 {
 	UINT16 *roadram = info->buffer;
 	int x, y;
@@ -1718,7 +1718,7 @@ static void segaic16_road_outrun_draw(struct road_info *info, bitmap_t *bitmap, 
 //          { 0x80,0x81,0x81,0x83,0,0,0,0x00 },
 //          { 0x81,0x87,0x87,0x8f,0,0,0,0x00 }
 		};
-		UINT16 *dest = &bitmap->pix16(y);
+		UINT16 *dest = &bitmap.pix16(y);
 		int data0 = roadram[0x000 + y];
 		int data1 = roadram[0x100 + y];
 
@@ -1927,7 +1927,7 @@ void segaic16_road_init(running_machine &machine, int which, int type, int color
  *
  *************************************/
 
-void segaic16_road_draw(int which, bitmap_t *bitmap, const rectangle &cliprect, int priority)
+void segaic16_road_draw(int which, bitmap_t &bitmap, const rectangle &cliprect, int priority)
 {
 	struct road_info *info = &segaic16_road[which];
 	(*info->draw)(info, bitmap, cliprect, priority);
@@ -2029,7 +2029,7 @@ void segaic16_rotate_init(running_machine &machine, int which, int type, int col
  *
  *************************************/
 
-void segaic16_rotate_draw(running_machine &machine, int which, bitmap_t *bitmap, const rectangle &cliprect, bitmap_t *srcbitmap)
+void segaic16_rotate_draw(running_machine &machine, int which, bitmap_t &bitmap, const rectangle &cliprect, bitmap_t *srcbitmap)
 {
 	struct rotate_info *info = &segaic16_rotate[which];
 	INT32 currx = (info->buffer[0x3f0] << 16) | info->buffer[0x3f1];
@@ -2047,9 +2047,9 @@ void segaic16_rotate_draw(running_machine &machine, int which, bitmap_t *bitmap,
 	/* loop over screen Y coordinates */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dest = &bitmap->pix16(y);
+		UINT16 *dest = &bitmap.pix16(y);
 		UINT16 *src = &srcbitmap->pix16(0);
-		UINT8 *pri = &machine.priority_bitmap->pix8(y);
+		UINT8 *pri = &machine.priority_bitmap.pix8(y);
 		INT32 tx = currx;
 		INT32 ty = curry;
 

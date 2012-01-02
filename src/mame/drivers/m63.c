@@ -297,7 +297,7 @@ static VIDEO_START( m63 )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	m63_state *state = machine.driver_data<m63_state>();
 	int offs;

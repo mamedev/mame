@@ -60,7 +60,7 @@ VIDEO_START( qdrmfgp2 )
 SCREEN_UPDATE( qdrmfgp )
 {
 	device_t *k056832 = screen.machine().device("k056832");
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 1);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 2);

@@ -311,7 +311,7 @@ VIDEO_START( namcona1 )
 /*************************************************************************/
 
 static void pdraw_tile(running_machine &machine,
-		bitmap_t *dest_bmp,
+		bitmap_t &dest_bmp,
 		const rectangle &clip,
 		UINT32 code,
 		int color,
@@ -396,8 +396,8 @@ static void pdraw_tile(running_machine &machine,
 			{
 				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 				const UINT8 *mask_addr = mask_base + (y_index>>16) * mask->line_modulo;
-				UINT16 *dest = &dest_bmp->pix16(y);
-				UINT8 *pri = &machine.priority_bitmap->pix8(y);
+				UINT16 *dest = &dest_bmp.pix16(y);
+				UINT8 *pri = &machine.priority_bitmap.pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -453,7 +453,7 @@ static void pdraw_tile(running_machine &machine,
 	}
 } /* pdraw_tile */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	int which;
@@ -550,7 +550,7 @@ static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const 
 	} /* next x */
 } /* draw_pixel_line */
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int which, int primask )
+static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int which, int primask )
 {
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	UINT16 *videoram = state->m_videoram;
@@ -602,8 +602,8 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
                  * feature, Numan Athletics.
                  */
 				draw_pixel_line(
-					&bitmap->pix16(line),
-					&machine.priority_bitmap->pix8(line),
+					&bitmap.pix16(line),
+					&machine.priority_bitmap.pix8(line),
 					videoram + ydata + 25,
 					paldata );
 			}
@@ -674,9 +674,9 @@ SCREEN_UPDATE( namcona1 )
 			}
 		}
 
-		screen.machine().priority_bitmap->fill(0, cliprect );
+		screen.machine().priority_bitmap.fill(0, cliprect );
 
-		bitmap->fill(0xff, cliprect ); /* background color? */
+		bitmap.fill(0xff, cliprect ); /* background color? */
 
 		for( priority = 0; priority<8; priority++ )
 		{

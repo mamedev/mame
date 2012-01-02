@@ -1271,7 +1271,7 @@ SCREEN_UPDATE(megatech_md_sms)
 
 	for (y=0;y<224;y++)
 	{
-		UINT16* lineptr = &bitmap->pix16(y);
+		UINT16* lineptr = &bitmap.pix16(y);
 		UINT16* srcptr =  &md_sms_vdp->r_bitmap->pix16(y);
 
 		for (x=0;x<256;x++)
@@ -1290,7 +1290,7 @@ SCREEN_UPDATE(megatech_bios)
 
 	for (y=0;y<224;y++)
 	{
-		UINT16* lineptr = &bitmap->pix16(y);
+		UINT16* lineptr = &bitmap.pix16(y);
 		UINT16* srcptr =  &vdp1->r_bitmap->pix16(y);
 
 		for (x=0;x<256;x++)
@@ -1308,7 +1308,7 @@ SCREEN_UPDATE(megaplay_bios)
 
 	for (y=0;y<224;y++)
 	{
-		UINT16* lineptr = &bitmap->pix16(y+16, 32);
+		UINT16* lineptr = &bitmap.pix16(y+16, 32);
 		UINT16* srcptr =  &vdp1->r_bitmap->pix16(y);
 
 		for (x=0;x<256;x++)
@@ -1330,7 +1330,7 @@ SCREEN_UPDATE(systeme)
 
 	for (y=0;y<192;y++)
 	{
-		UINT16* lineptr = &bitmap->pix16(y);
+		UINT16* lineptr = &bitmap.pix16(y);
 		UINT16* srcptr =  &vdp1->r_bitmap->pix16(y);
 
 		for (x=0;x<256;x++)
@@ -1342,7 +1342,7 @@ SCREEN_UPDATE(systeme)
 
 	for (y=0;y<192;y++)
 	{
-		UINT16* lineptr = &bitmap->pix16(y);
+		UINT16* lineptr = &bitmap.pix16(y);
 		UINT16* srcptr =  &vdp2->r_bitmap->pix16(y);
 
 		for (x=0;x<256;x++)

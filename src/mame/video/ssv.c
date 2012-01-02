@@ -141,7 +141,7 @@ Note: press Z to show some info on each sprite (debug builds only)
 #endif
 
 
-static void ssv_drawgfx(	bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx,
+static void ssv_drawgfx(	bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx,
 					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 					int shadow )
 {
@@ -167,7 +167,7 @@ static void ssv_drawgfx(	bitmap_t *bitmap, const rectangle &cliprect, const gfx_
 		if ( sy >= cliprect.min_y && sy <= cliprect.max_y )					\
 		{																		\
 			source	=	addr;													\
-			dest	=	&bitmap->pix16(sy);							\
+			dest	=	&bitmap.pix16(sy);							\
 																				\
 			for ( sx = x0; sx != x1; sx += dx )									\
 			{																	\
@@ -606,7 +606,7 @@ From the above some noteworthy cases are:
 
 /* Draw a tilemap sprite */
 
-static void draw_row(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int sx, int sy, int scroll)
+static void draw_row(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int sx, int sy, int scroll)
 {
 	ssv_state *state = machine.driver_data<ssv_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -741,7 +741,7 @@ static void draw_row(running_machine &machine, bitmap_t *bitmap, const rectangle
 
 /* Draw the "background layer" using multiple tilemap sprites */
 
-static void draw_layer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int  nr)
+static void draw_layer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int  nr)
 {
 	int sy;
 	for ( sy = 0; sy <= machine.primary_screen->visible_area().max_y; sy += 0x40 )
@@ -750,7 +750,7 @@ static void draw_layer(running_machine &machine, bitmap_t *bitmap, const rectang
 
 /* Draw sprites in the sprites list */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* Sprites list */
 	ssv_state *state = machine.driver_data<ssv_state>();
@@ -1042,7 +1042,7 @@ SCREEN_UPDATE( eaglshot )
         E.h                             Unused
 
 */
-static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
+static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
 {
 	/* Sprites list */
 
@@ -1209,7 +1209,7 @@ SCREEN_UPDATE( ssv )
 	state->m_shadow_pen_mask = (1 << state->m_shadow_pen_shift) - 1;
 
 	/* The background color is the first one in the palette */
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	// used by twineag2 and ultrax
 	clip.min_x = (cliprect.max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x64/2] * 2 + 2;

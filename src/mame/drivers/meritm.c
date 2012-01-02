@@ -352,11 +352,11 @@ static VIDEO_START( meritm )
 	state->m_layer0_enabled = state->m_layer1_enabled = 1;
 
 	state->m_vdp0_bitmap = machine.primary_screen->alloc_compatible_bitmap();
-	v9938_init (machine, 0, *machine.primary_screen, state->m_vdp0_bitmap, MODEL_V9938, 0x20000, meritm_vdp0_interrupt);
+	v9938_init (machine, 0, *machine.primary_screen, *state->m_vdp0_bitmap, MODEL_V9938, 0x20000, meritm_vdp0_interrupt);
 	v9938_reset(0);
 
 	state->m_vdp1_bitmap = machine.primary_screen->alloc_compatible_bitmap();
-	v9938_init (machine, 1, *machine.primary_screen, state->m_vdp1_bitmap, MODEL_V9938, 0x20000, meritm_vdp1_interrupt);
+	v9938_init (machine, 1, *machine.primary_screen, *state->m_vdp1_bitmap, MODEL_V9938, 0x20000, meritm_vdp1_interrupt);
 	v9938_reset(1);
 
 	state->m_vint = 0x18;
@@ -382,16 +382,16 @@ static SCREEN_UPDATE( meritm )
 		popmessage("Layer 1 %sabled",state->m_layer1_enabled ? "en" : "dis");
 	}
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if ( state->m_layer0_enabled )
 	{
-		copybitmap(bitmap, state->m_vdp0_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, *state->m_vdp0_bitmap, 0, 0, 0, 0, cliprect);
 	}
 
 	if ( state->m_layer1_enabled )
 	{
-		copybitmap_trans(bitmap, state->m_vdp1_bitmap, 0, 0, -6, -12, cliprect, v9938_get_transpen(1));
+		copybitmap_trans(bitmap, *state->m_vdp1_bitmap, 0, 0, -6, -12, cliprect, v9938_get_transpen(1));
 	}
 	return 0;
 }

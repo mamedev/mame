@@ -176,7 +176,7 @@ SCREEN_UPDATE( capbowl )
 	/* if we're blanked, just fill with black */
 	if (state.blanked)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -184,7 +184,7 @@ SCREEN_UPDATE( capbowl )
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *src = &state.vram[256 * y];
-		UINT32 *dest = &bitmap->pix32(y);
+		UINT32 *dest = &bitmap.pix32(y);
 
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{

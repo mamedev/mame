@@ -129,7 +129,7 @@ struct _ldplayer_data
 static void pr8210_init(laserdisc_state *ld);
 static void pr8210_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
 static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
-static void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap);
+static void pr8210_overlay(laserdisc_state *ld, bitmap_t &bitmap);
 static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data);
 
 static TIMER_CALLBACK( vsync_off );
@@ -143,9 +143,9 @@ static WRITE8_HANDLER( pr8210_port2_w );
 static READ8_HANDLER( pr8210_t0_r );
 static READ8_HANDLER( pr8210_t1_r );
 
-static void overlay_draw_group(bitmap_t *bitmap, const UINT8 *text, int count, float xstart);
-static void overlay_erase(bitmap_t *bitmap, float xstart, float xend);
-static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart);
+static void overlay_draw_group(bitmap_t &bitmap, const UINT8 *text, int count, float xstart);
+static void overlay_erase(bitmap_t &bitmap, float xstart, float xend);
+static void overlay_draw_char(bitmap_t &bitmap, UINT8 ch, float xstart);
 
 static void simutrek_init(laserdisc_state *ld);
 static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
@@ -413,7 +413,7 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
     player data
 -------------------------------------------------*/
 
-static void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap)
+static void pr8210_overlay(laserdisc_state *ld, bitmap_t &bitmap)
 {
 	ldplayer_data *player = ld->player;
 
@@ -881,7 +881,7 @@ static READ8_HANDLER( pr8210_t1_r )
     characters
 -------------------------------------------------*/
 
-static void overlay_draw_group(bitmap_t *bitmap, const UINT8 *text, int count, float xstart)
+static void overlay_draw_group(bitmap_t &bitmap, const UINT8 *text, int count, float xstart)
 {
 	int skip = TRUE;
 	int x;
@@ -904,15 +904,15 @@ static void overlay_draw_group(bitmap_t *bitmap, const UINT8 *text, int count, f
     where the text overlay will be displayed
 -------------------------------------------------*/
 
-static void overlay_erase(bitmap_t *bitmap, float xstart, float xend)
+static void overlay_erase(bitmap_t &bitmap, float xstart, float xend)
 {
-	UINT32 xmin = (UINT32)(xstart * 256.0f * (float)bitmap->width());
-	UINT32 xmax = (UINT32)(xend * 256.0f * (float)bitmap->width());
+	UINT32 xmin = (UINT32)(xstart * 256.0f * (float)bitmap.width());
+	UINT32 xmax = (UINT32)(xend * 256.0f * (float)bitmap.width());
 	UINT32 x, y;
 
 	for (y = OVERLAY_Y; y < (OVERLAY_Y + (OVERLAY_Y_PIXELS + 2) * OVERLAY_PIXEL_HEIGHT); y++)
 	{
-		UINT16 *dest = &bitmap->pix16(y, xmin >> 8);
+		UINT16 *dest = &bitmap.pix16(y, xmin >> 8);
 		UINT16 ymin, ymax, yres;
 
 		ymax = *dest >> 8;
@@ -942,10 +942,10 @@ static void overlay_erase(bitmap_t *bitmap, float xstart, float xend)
     of the text overlay
 -------------------------------------------------*/
 
-static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart)
+static void overlay_draw_char(bitmap_t &bitmap, UINT8 ch, float xstart)
 {
-	UINT32 xminbase = (UINT32)(xstart * 256.0f * (float)bitmap->width());
-	UINT32 xsize = (UINT32)(OVERLAY_PIXEL_WIDTH * 256.0f * (float)bitmap->width());
+	UINT32 xminbase = (UINT32)(xstart * 256.0f * (float)bitmap.width());
+	UINT32 xsize = (UINT32)(OVERLAY_PIXEL_WIDTH * 256.0f * (float)bitmap.width());
 	const UINT8 *chdataptr = &text_bitmap[ch & 0x3f][0];
 	UINT32 x, y, xx, yy;
 
@@ -961,7 +961,7 @@ static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart)
 				UINT32 xmax = xmin + xsize;
 				for (yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
 				{
-					UINT16 *dest = &bitmap->pix16(OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
+					UINT16 *dest = &bitmap.pix16(OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
 					UINT16 ymin, ymax, yres;
 
 					ymax = 0xff;

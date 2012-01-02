@@ -92,14 +92,14 @@ WRITE8_HANDLER( m15_chargen_w )
 }
 
 
-INLINE void plot_pixel_m10( running_machine &machine, bitmap_t *bm, int x, int y, int col )
+INLINE void plot_pixel_m10( running_machine &machine, bitmap_t &bm, int x, int y, int col )
 {
 	m10_state *state = machine.driver_data<m10_state>();
 
 	if (!state->m_flip)
-		bm->pix16(y, x) = col;
+		bm.pix16(y, x) = col;
 	else
-		bm->pix16((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND) + 6, 
+		bm.pix16((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND) + 6, 
 				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
 }
 
@@ -145,7 +145,7 @@ SCREEN_UPDATE( m10 )
 	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
 	int i;
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	for (i = 0; i < 4; i++)
 		if (state->m_flip)

@@ -293,7 +293,7 @@ WRITE8_HANDLER( travrusa_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
 {
 	travrusa_state *state = machine.driver_data<travrusa_state>();
 	int offs;

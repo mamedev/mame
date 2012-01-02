@@ -653,7 +653,7 @@ static SCREEN_UPDATE( subsino2 )
 		}
 	}
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if (layers_ctrl & 1)
 	{

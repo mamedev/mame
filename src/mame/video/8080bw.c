@@ -63,21 +63,21 @@ static void cosmo_get_pens( pen_t *pens )
 }
 
 
-INLINE void set_pixel( running_machine &machine, bitmap_t *bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color )
+INLINE void set_pixel( running_machine &machine, bitmap_t &bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color )
 {
 	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
 		if (state->m_c8080bw_flip_screen)
-			bitmap->pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pens[color];
+			bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pens[color];
 		else
-			bitmap->pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pens[color];
+			bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pens[color];
 	}
 }
 
 
-INLINE void set_8_pixels( running_machine &machine, bitmap_t *bitmap, UINT8 y, UINT8 x, UINT8 data, pen_t *pens, UINT8 fore_color, UINT8 back_color )
+INLINE void set_8_pixels( running_machine &machine, bitmap_t &bitmap, UINT8 y, UINT8 x, UINT8 data, pen_t *pens, UINT8 fore_color, UINT8 back_color )
 {
 	int i;
 
@@ -92,7 +92,7 @@ INLINE void set_8_pixels( running_machine &machine, bitmap_t *bitmap, UINT8 y, U
 
 
 /* this is needed as this driver doesn't emulate the shift register like mw8080bw does */
-static void clear_extra_columns( running_machine &machine, bitmap_t *bitmap, pen_t *pens, UINT8 color )
+static void clear_extra_columns( running_machine &machine, bitmap_t &bitmap, pen_t *pens, UINT8 color )
 {
 	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 	UINT8 x;
@@ -104,9 +104,9 @@ static void clear_extra_columns( running_machine &machine, bitmap_t *bitmap, pen
 		for (y = MW8080BW_VCOUNTER_START_NO_VBLANK; y != 0; y++)
 		{
 			if (state->m_c8080bw_flip_screen)
-				bitmap->pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) = pens[color];
+				bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) = pens[color];
 			else
-				bitmap->pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) = pens[color];
+				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) = pens[color];
 		}
 	}
 }
@@ -443,7 +443,7 @@ SCREEN_UPDATE( shuttlei )
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
-			bitmap->pix32(y, x) = pen;
+			bitmap.pix32(y, x) = pen;
 
 			x = x + 1;
 			data = data << 1;

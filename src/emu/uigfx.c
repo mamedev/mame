@@ -84,7 +84,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 
 /* graphics set handling */
 static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, int xcells, int ycells);
-static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_t *bitmap, int dstx, int dsty, int color, int rotate);
+static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_t &bitmap, int dstx, int dsty, int color, int rotate);
 static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, int xcells, int ycells, gfx_element *gfx);
 static void gfxset_handler(running_machine &machine, render_container *container, ui_gfx_state *state);
 
@@ -736,7 +736,7 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 
 					/* only render if there is data */
 					if (index < gfx->total_elements)
-						gfxset_draw_item(machine, gfx, index, state->bitmap, cellbounds.min_x, cellbounds.min_y, state->gfxset.color[set], state->gfxset.rotate[set]);
+						gfxset_draw_item(machine, gfx, index, *state->bitmap, cellbounds.min_x, cellbounds.min_y, state->gfxset.color[set], state->gfxset.rotate[set]);
 
 					/* otherwise, fill with transparency */
 					else
@@ -761,7 +761,7 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
     the view
 -------------------------------------------------*/
 
-static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_t *bitmap, int dstx, int dsty, int color, int rotate)
+static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_t &bitmap, int dstx, int dsty, int color, int rotate)
 {
 	static const pen_t default_palette[] =
 	{
@@ -785,7 +785,7 @@ static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, i
 	/* loop over rows in the cell */
 	for (y = 0; y < height; y++)
 	{
-		UINT32 *dest = &bitmap->pix32(dsty + y, dstx);
+		UINT32 *dest = &bitmap.pix32(dsty + y, dstx);
 		const UINT8 *src = gfx_element_get_data(gfx, index);
 
 		/* loop over columns in the cell */
@@ -1066,7 +1066,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state,
 	/* handle the redraw */
 	if (state->bitmap_dirty)
 	{
-		tilemap_draw_by_index(machine, state->bitmap, state->tilemap.which, state->tilemap.xoffs, state->tilemap.yoffs);
+		tilemap_draw_by_index(machine, *state->bitmap, state->tilemap.which, state->tilemap.xoffs, state->tilemap.yoffs);
 
 		/* reset the texture to force an update */
 		state->texture->set_bitmap(state->bitmap, NULL, screen_texformat, palette);

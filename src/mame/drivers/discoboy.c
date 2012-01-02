@@ -76,7 +76,7 @@ static VIDEO_START( discoboy )
 {
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	discoboy_state *state = machine.driver_data<discoboy_state>();
 	int flipscreen = 0;
@@ -157,7 +157,7 @@ static SCREEN_UPDATE( discoboy )
 		palette_set_color(screen.machine(), (i / 2) + 0x400, MAKE_RGB(r, g, b));
 	}
 
-	bitmap->fill(0x3ff, cliprect);
+	bitmap.fill(0x3ff, cliprect);
 
 	for (y = 0; y < 32; y++)
 	{

@@ -414,7 +414,7 @@ void hlsl_info::render_snapshot(d3d_surface *surface)
 			png_add_text(&pnginfo, "System", text2);
 
 			// now do the actual work
-			png_error error = png_write_bitmap(file, &pnginfo, avi_snap, 1 << 24, NULL);
+			png_error error = png_write_bitmap(file, &pnginfo, *avi_snap, 1 << 24, NULL);
 			if (error != PNGERR_NONE)
 				mame_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
 
@@ -478,7 +478,7 @@ void hlsl_info::record_texture()
 	{
 		// handle an AVI recording
 		// write the next frame
-		avi_error avierr = avi_append_video_frame_rgb32(avi_output_file, avi_snap);
+		avi_error avierr = avi_append_video_frame_rgb32(avi_output_file, *avi_snap);
 		if (avierr != AVIERR_NONE)
 		{
 			end_avi_recording();

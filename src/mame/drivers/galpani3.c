@@ -210,7 +210,7 @@ static SCREEN_UPDATE(galpani3)
 	UINT16 pixdata1;
 	const pen_t *paldata = screen.machine().pens;
 
-	bitmap->fill(0x0000, cliprect);
+	bitmap.fill(0x0000, cliprect);
 
 	{
 		int drawy, drawx;
@@ -236,7 +236,7 @@ static SCREEN_UPDATE(galpani3)
 
 				UINT8 pridat = state->m_priority_buffer[(priline*0x200)+prioffs];
 
-				UINT32* dst = &bitmap->pix32(drawy, drawx);
+				UINT32* dst = &bitmap.pix32(drawy, drawx);
 
 
 
@@ -354,13 +354,13 @@ static SCREEN_UPDATE(galpani3)
 
 	state->m_sprite_bitmap_1->fill(0x0000, cliprect);
 
-	state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap_1, cliprect, state->m_spriteram32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
+	state->m_spritegen->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_1, cliprect, state->m_spriteram32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)
 	{
 		src1 = &state->m_sprite_bitmap_1->pix16(y);
-		dst =  &bitmap->pix32(y);
+		dst =  &bitmap.pix32(y);
 
 		for (x=0;x<320;x++)
 		{

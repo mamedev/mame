@@ -32,14 +32,14 @@ VIDEO_START( mlc )
 }
 
 #ifdef UNUSED_FUNCTION
-static void blitRaster(running_machine &machine, bitmap_t *bitmap, int rasterMode)
+static void blitRaster(running_machine &machine, bitmap_t &bitmap, int rasterMode)
 {
 	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	int x,y;
 	for (y=0; y<256; y++) //todo
 	{
 		UINT32* src=&temp_bitmap->pix32(y&0x1ff);
-		UINT32* dst=&bitmap->pix32(y);
+		UINT32* dst=&bitmap.pix32(y);
 		UINT32 xptr=(state->m_mlc_raster_table[0][y]<<13);
 
 		if (machine.input().code_pressed(KEYCODE_X))
@@ -62,7 +62,7 @@ static void blitRaster(running_machine &machine, bitmap_t *bitmap, int rasterMod
 #endif
 
 static void mlc_drawgfxzoom(
-		bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,int use8bpp,
 		int scalex, int scaley,int alpha)
@@ -80,7 +80,7 @@ static void mlc_drawgfxzoom(
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
-	myclip &= dest_bmp->cliprect();
+	myclip &= dest_bmp.cliprect();
 
 	{
 		if( gfx )
@@ -163,7 +163,7 @@ static void mlc_drawgfxzoom(
 							{
 								const UINT8 *source1 = code_base1 + (y_index>>16) * gfx->line_modulo;
 								const UINT8 *source2 = code_base2 + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
 
@@ -190,7 +190,7 @@ static void mlc_drawgfxzoom(
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base1 + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -210,7 +210,7 @@ static void mlc_drawgfxzoom(
 	}
 }
 
-static void draw_sprites(running_machine& machine, bitmap_t *bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine& machine, bitmap_t &bitmap,const rectangle &cliprect)
 {
 	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	UINT32 *index_ptr=0;
@@ -508,7 +508,7 @@ SCREEN_EOF( mlc )
 SCREEN_UPDATE( mlc )
 {
 //  temp_bitmap->fill(0, cliprect);
-	bitmap->fill(screen.machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+	bitmap.fill(screen.machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

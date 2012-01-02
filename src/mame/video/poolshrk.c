@@ -34,7 +34,7 @@ SCREEN_UPDATE( poolshrk )
 
 	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	/* draw sprites */
 

@@ -34,11 +34,11 @@ public:
  *
  *************************************/
 
-static void xtheball_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void xtheball_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	xtheball_state *state = screen.machine().driver_data<xtheball_state>();
 	UINT16 *srcbg = &state->m_vram_bg[(params->rowaddr << 8) & 0xff00];
-	UINT32 *dest = &bitmap->pix32(scanline);
+	UINT32 *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr;
 	int x;

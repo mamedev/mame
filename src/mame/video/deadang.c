@@ -87,7 +87,7 @@ VIDEO_START( deadang )
 	tilemap_set_transparent_pen(state->m_text_layer, 15);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	deadang_state *state = machine.driver_data<deadang_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -156,8 +156,8 @@ SCREEN_UPDATE( deadang )
 	tilemap_set_enable(state->m_pf2_layer,!(state->m_scroll_ram[0x34]&4));
 	flip_screen_set(screen.machine(),  state->m_scroll_ram[0x34]&0x40 );
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_pf3_layer,0,1);
 	tilemap_draw(bitmap,cliprect,state->m_pf1_layer,0,2);
 	tilemap_draw(bitmap,cliprect,state->m_pf2_layer,0,4);

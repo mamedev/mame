@@ -316,13 +316,13 @@ void btoads_state::from_shiftreg(address_space *space, UINT32 address, UINT16 *s
  *
  *************************************/
 
-void btoads_state::scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void btoads_state::scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 4;
 	UINT16 *bg0_base = &m_vram_bg0[(fulladdr + (m_yscroll0 << 10)) & 0x3fc00];
 	UINT16 *bg1_base = &m_vram_bg1[(fulladdr + (m_yscroll1 << 10)) & 0x3fc00];
 	UINT8 *spr_base = &m_vram_fg_display[fulladdr & 0x3fc00];
-	UINT32 *dst = &bitmap->pix32(scanline);
+	UINT32 *dst = &bitmap.pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(m_tlc34076);
 	int coladdr = fulladdr & 0x3ff;
 	int x;

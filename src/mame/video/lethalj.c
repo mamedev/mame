@@ -171,11 +171,11 @@ WRITE16_HANDLER( lethalj_blitter_w )
  *
  *************************************/
 
-void lethalj_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void lethalj_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	lethalj_state *state = screen.machine().driver_data<lethalj_state>();
 	UINT16 *src = &state->m_screenram[(state->m_vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
-	UINT16 *dest = &bitmap->pix16(scanline);
+	UINT16 *dest = &bitmap.pix16(scanline);
 	int coladdr = params->coladdr << 1;
 	int x;
 

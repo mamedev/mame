@@ -123,7 +123,7 @@ SCREEN_UPDATE( copsnrob )
 			{
 				for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 					if (state->m_bulletsram[y] & mask2)
-						bitmap->pix16(y, 256 - x) = 1;
+						bitmap.pix16(y, 256 - x) = 1;
 			}
 
 			mask1 <<= 1;

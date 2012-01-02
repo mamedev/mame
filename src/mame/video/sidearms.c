@@ -174,7 +174,7 @@ VIDEO_START( sidearms )
 	state->m_flipon = state->m_charon = state->m_staron = state->m_objon = state->m_bgon = 0;
 }
 
-static void draw_sprites_region(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int start_offset, int end_offset )
+static void draw_sprites_region(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int start_offset, int end_offset )
 {
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
 	const gfx_element *gfx = machine.gfx[2];
@@ -207,7 +207,7 @@ static void draw_sprites_region(running_machine &machine, bitmap_t *bitmap, cons
 	}
 }
 
-static void sidearms_draw_starfield( running_machine &machine, bitmap_t *bitmap )
+static void sidearms_draw_starfield( running_machine &machine, bitmap_t &bitmap )
 {
 	int x, y, i;
 	UINT32 hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
@@ -217,8 +217,8 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_t *bitmap 
 	sidearms_state *state = machine.driver_data<sidearms_state>();
 
 	// clear starfield background
-	lineptr = &bitmap->pix16(16, 64);
-	lineadv = bitmap->rowpixels();
+	lineptr = &bitmap.pix16(16, 64);
+	lineadv = bitmap.rowpixels();
 
 	for (i=224; i; i--) { memset(lineptr, 0, 768); lineptr += lineadv; }
 
@@ -237,13 +237,13 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_t *bitmap 
 #if 0 // old loop (for reference; easier to read)
 	if (!flipon)
 	{
-		lineptr = bitmap->base;
+		lineptr = bitmap.base;
 		pixadv  = 1;
 		lineadv = lineadv - 512;
 	}
 	else
 	{
-		lineptr = &bitmap->pix16(255, 512 - 1);
+		lineptr = &bitmap.pix16(255, 512 - 1);
 		pixadv  = -1;
 		lineadv = -lineadv + 512;
 	}
@@ -280,13 +280,13 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_t *bitmap 
 #else // optimized loop
 	if (!state->m_flipon)
 	{
-		lineptr = &bitmap->pix16(16, 64);
+		lineptr = &bitmap.pix16(16, 64);
 		pixadv  = 1;
 		lineadv = lineadv - 384;
 	}
 	else
 	{
-		lineptr = &bitmap->pix16(239, 512 - 64 - 1);
+		lineptr = &bitmap.pix16(239, 512 - 64 - 1);
 		pixadv  = -1;
 		lineadv = -lineadv + 384;
 	}
@@ -331,7 +331,7 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_t *bitmap 
 #endif
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	sidearms_state *state = machine.driver_data<sidearms_state>();
 

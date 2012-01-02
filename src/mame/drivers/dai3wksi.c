@@ -158,9 +158,9 @@ static SCREEN_UPDATE( dai3wksi )
 			pen_t pen = (data & (1 << i)) ? pens[color] : pens[0];
 
 			if (state->m_dai3wksi_flipscreen)
-				bitmap->pix32(255-y, 255-x) = pen;
+				bitmap.pix32(255-y, 255-x) = pen;
 			else
-				bitmap->pix32(y, x) = pen;
+				bitmap.pix32(y, x) = pen;
 
 			x++;
 		}

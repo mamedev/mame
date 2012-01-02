@@ -517,10 +517,10 @@ SCREEN_UPDATE( atarigt )
 	int x, y;
 
 	/* draw the playfield */
-	tilemap_draw(state->m_pf_bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	tilemap_draw(*state->m_pf_bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 
 	/* draw the alpha layer */
-	tilemap_draw(state->m_an_bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	tilemap_draw(*state->m_an_bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
 
 	/* cache pointers */
 	color_latch = state->m_colorram[0x30000/2];
@@ -535,7 +535,7 @@ SCREEN_UPDATE( atarigt )
 		UINT16 *pf = &state->m_pf_bitmap->pix16(y);
 		UINT16 *mo = &mo_bitmap->pix16(y);
 		UINT16 *tm = &tm_bitmap->pix16(y);
-		UINT32 *dst = &bitmap->pix32(y);
+		UINT32 *dst = &bitmap.pix32(y);
 
 		/* Primal Rage: no TRAM, slightly different priorities */
 		if (state->m_is_primrage)

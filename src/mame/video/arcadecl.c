@@ -13,7 +13,7 @@
 #include "includes/arcadecl.h"
 
 
-static void arcadecl_bitmap_render(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect);
+static void arcadecl_bitmap_render(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
 
 /*************************************
  *
@@ -97,7 +97,7 @@ SCREEN_UPDATE( arcadecl )
 			for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 			{
 				UINT16 *mo = &mobitmap->pix16(y);
-				UINT16 *pf = &bitmap->pix16(y);
+				UINT16 *pf = &bitmap.pix16(y);
 				for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 					if (mo[x])
 					{
@@ -121,7 +121,7 @@ SCREEN_UPDATE( arcadecl )
  *
  *************************************/
 
-static void arcadecl_bitmap_render(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void arcadecl_bitmap_render(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	arcadecl_state *state = machine.driver_data<arcadecl_state>();
 	int x, y;
@@ -130,7 +130,7 @@ static void arcadecl_bitmap_render(running_machine &machine, bitmap_t *bitmap, c
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const UINT16 *src = &state->m_bitmap[256 * y];
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *dst = &bitmap.pix16(y);
 
 		/* regenerate the line */
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)

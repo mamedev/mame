@@ -225,7 +225,7 @@ WRITE8_HANDLER( gaplus_starfield_control_w )
 
 ***************************************************************************/
 
-static void starfield_render(running_machine &machine, bitmap_t *bitmap)
+static void starfield_render(running_machine &machine, bitmap_t &bitmap)
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
 	struct star *stars = state->m_stars;
@@ -248,12 +248,12 @@ static void starfield_render(running_machine &machine, bitmap_t *bitmap)
 
 		if ( x >=0 && x < width && y >= 0 && y < height )
 		{
-			bitmap->pix16(y, x) = stars[i].col;
+			bitmap.pix16(y, x) = stars[i].col;
 		}
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x780;
@@ -313,7 +313,7 @@ SCREEN_UPDATE( gaplus )
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(screen.machine(), state->m_spriteram[0x1f7f-0x800] & 1);
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	starfield_render(screen.machine(), bitmap);
 

@@ -76,7 +76,7 @@ INLINE const sega16sp_interface *get_interface( device_t *device )
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -134,8 +134,8 @@ void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bi
 			/* skip drawing if not within the cliprect */
 			if (y >= cliprect.min_y && y <= cliprect.max_y)
 			{
-				UINT16 *dest = &bitmap->pix16(y);
-				UINT8 *pri = &machine.priority_bitmap->pix8(y);
+				UINT16 *dest = &bitmap.pix16(y);
+				UINT8 *pri = &machine.priority_bitmap.pix8(y);
 				int xacc = 0x00;
 
 				/* note that the System 16A sprites have a design flaw that allows the address */
@@ -241,7 +241,7 @@ void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bi
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
 	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
@@ -300,8 +300,8 @@ void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, 
 			/* skip drawing if not within the cliprect */
 			if (y >= cliprect.min_y && y <= cliprect.max_y)
 			{
-				UINT16 *dest = &bitmap->pix16(y);
-				UINT8 *pri = &machine.priority_bitmap->pix8(y);
+				UINT16 *dest = &bitmap.pix16(y);
+				UINT8 *pri = &machine.priority_bitmap.pix8(y);
 				int xacc = 0x00;
 
 				/* note that the System 16A sprites have a design flaw that allows the address */
@@ -412,7 +412,7 @@ void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, 
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -469,8 +469,8 @@ void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitma
 			/* skip drawing if not within the cliprect */
 			if (y >= cliprect.min_y && y <= cliprect.max_y)
 			{
-				UINT16 *dest = &bitmap->pix16(y);
-				UINT8 *pri = &machine.priority_bitmap->pix8(y);
+				UINT16 *dest = &bitmap.pix16(y);
+				UINT8 *pri = &machine.priority_bitmap.pix8(y);
 
 				/* note that the System 16A sprites have a design flaw that allows the address */
 				/* to carry into the flip flag, which is the topmost bit -- it is very important */
@@ -573,7 +573,7 @@ void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitma
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks;
 	const UINT16 *spritebase;
@@ -658,8 +658,8 @@ void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitma
 			/* skip drawing if not within the cliprect */
 			if (y >= cliprect.min_y && y <= cliprect.max_y)
 			{
-				UINT16 *dest = &bitmap->pix16(y);
-				UINT8 *pri = &machine.priority_bitmap->pix8(y);
+				UINT16 *dest = &bitmap.pix16(y);
+				UINT8 *pri = &machine.priority_bitmap.pix8(y);
 				int xacc;
 
 				/* compute the initial X zoom accumulator; this is verified on the real PCB */
@@ -739,7 +739,7 @@ void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitma
 		pri[x] = 0;															\
 	}																		\
 
-void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -811,8 +811,8 @@ void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device
 			/* skip drawing if not within the cliprect */
 			if (y >= cliprect.min_y && y <= cliprect.max_y)
 			{
-				UINT16 *dest = &bitmap->pix16(y);
-				UINT8 *pri = &machine.priority_bitmap->pix8(y);
+				UINT16 *dest = &bitmap.pix16(y);
+				UINT8 *pri = &machine.priority_bitmap.pix8(y);
 				int xacc;
 
 				/* compute the initial X zoom accumulator; this is verified on the real PCB */
@@ -917,7 +917,7 @@ void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int type)
+static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int type)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x40000;
 	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
@@ -980,8 +980,8 @@ static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device
 			/* skip drawing if not within the cliprect */
 			if (y >= cliprect.min_y && y <= cliprect.max_y)
 			{
-				UINT16 *dest = &bitmap->pix16(y);
-				UINT8 *pri = &machine.priority_bitmap->pix8(y);
+				UINT16 *dest = &bitmap.pix16(y);
+				UINT8 *pri = &machine.priority_bitmap.pix8(y);
 				int xacc = 0;
 
 				/* non-flipped case */
@@ -1043,12 +1043,12 @@ static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device
 	}
 }
 
-void segaic16_sprites_outrun_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_outrun_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_OUTRUN);
 }
 
-void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_XBOARD);
 }
@@ -1088,7 +1088,7 @@ void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bi
 	if (x >= minx && x <= maxx && ind < 0x1fe)								\
 		dest[x] = ind | colorpri;											\
 
-void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx1")->bytes() / 0x80000;
 	const UINT64 *spritebase = (const UINT64 *)machine.region("gfx1")->base();
@@ -1105,7 +1105,7 @@ void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bi
 	/* clear out any scanlines we might be using */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		if (!(rotatebase[y & ~1] & 0xc000))
-			memset(&bitmap->pix16(y, cliprect.min_x), 0xff, (cliprect.max_x - cliprect.min_x + 1) * sizeof(UINT16));
+			memset(&bitmap.pix16(y, cliprect.min_x), 0xff, (cliprect.max_x - cliprect.min_x + 1) * sizeof(UINT16));
 
 	/* now scan backwards and render the sprites in order */
 	for (data = sega16sp->spriteram; !(data[0] & 0x8000) && !visited[next]; data = sega16sp->spriteram + next * 8)
@@ -1150,7 +1150,7 @@ void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bi
 			/* skip drawing if not within the cliprect */
 			if (y >= cliprect.min_y && y <= cliprect.max_y)
 			{
-				UINT16 *dest = &bitmap->pix16(y);
+				UINT16 *dest = &bitmap.pix16(y);
 				int minx = rotatebase[y & ~1];
 				int maxx = rotatebase[y |  1];
 				int xacc = 0;
@@ -1325,8 +1325,8 @@ void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bi
 			/* skip drawing if not within the cliprect */								\
 			if (y >= cliprect.min_y && y <= cliprect.max_y)							\
 			{																			\
-				UINT16 *dest = &bitmap->pix16(y);								\
-				UINT8 *pri = &machine.priority_bitmap->pix8(y);						\
+				UINT16 *dest = &bitmap.pix16(y);								\
+				UINT8 *pri = &machine.priority_bitmap.pix8(y);						\
 																						\
 				/* note that the System 16A sprites have a design flaw that allows the address */		\
 				/* to carry into the flip flag, which is the topmost bit -- it is very important */		\
@@ -1382,7 +1382,7 @@ void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bi
 
 
 
-void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -1405,7 +1405,7 @@ void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t 
 }
 
 /* 4 player passing shot is different to this.. */
-void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -1427,7 +1427,7 @@ void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_
 	}
 }
 
-void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -1455,7 +1455,7 @@ void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device
  *
  *************************************/
 
-void segaic16_sprites_draw(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int which)
+void segaic16_sprites_draw(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int which)
 {
 	device_t* device = 0;
 	sega16sp_state *sega16sp;

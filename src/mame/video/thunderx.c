@@ -72,10 +72,10 @@ SCREEN_UPDATE( scontra )
 
 	k052109_tilemap_update(state->m_k052109);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	/* The background color is always from layer 1 - but it's always black anyway */
-//  bitmap->fill(16 * state->m_layer_colorbase[1], cliprect);
+//  bitmap.fill(16 * state->m_layer_colorbase[1], cliprect);
 	if (state->m_priority)
 	{
 		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 1);

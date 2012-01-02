@@ -73,7 +73,7 @@ static void get_pens(running_machine &machine, const _20pacgal_state *state, pen
 }
 
 
-static void do_pen_lookup(running_machine &machine, const _20pacgal_state *state, bitmap_t *bitmap, const rectangle &cliprect)
+static void do_pen_lookup(running_machine &machine, const _20pacgal_state *state, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS + NUM_STAR_PENS];
@@ -82,7 +82,7 @@ static void do_pen_lookup(running_machine &machine, const _20pacgal_state *state
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for(x = cliprect.min_x; x <= cliprect.max_x; x++)
-			bitmap->pix32(y, x) = pens[bitmap->pix32(y, x)];
+			bitmap.pix32(y, x) = pens[bitmap.pix32(y, x)];
 }
 
 
@@ -93,7 +93,7 @@ static void do_pen_lookup(running_machine &machine, const _20pacgal_state *state
  *
  *************************************/
 
-static void draw_sprite(running_machine& machine, const _20pacgal_state *state, bitmap_t *bitmap, int y, int x,
+static void draw_sprite(running_machine& machine, const _20pacgal_state *state, bitmap_t &bitmap, int y, int x,
 						UINT8 code, UINT8 color, int flip_y, int flip_x)
 {
 	int sy;
@@ -139,7 +139,7 @@ static void draw_sprite(running_machine& machine, const _20pacgal_state *state, 
 
 					/* pen bits A0-A3 */
 					if (col)
-						bitmap->pix32(y, x) = (bitmap->pix32(y, x) & 0xff0) | col;
+						bitmap.pix32(y, x) = (bitmap.pix32(y, x) & 0xff0) | col;
 				}
 
 				/* next pixel */
@@ -163,7 +163,7 @@ static void draw_sprite(running_machine& machine, const _20pacgal_state *state, 
 }
 
 
-static void draw_sprites(running_machine& machine,const _20pacgal_state *state, bitmap_t *bitmap)
+static void draw_sprites(running_machine& machine,const _20pacgal_state *state, bitmap_t &bitmap)
 {
 	int offs;
 
@@ -215,7 +215,7 @@ static void draw_sprites(running_machine& machine,const _20pacgal_state *state, 
  *
  *************************************/
 
-static void draw_chars(const _20pacgal_state *state, bitmap_t *bitmap)
+static void draw_chars(const _20pacgal_state *state, bitmap_t &bitmap)
 {
 	offs_t offs;
 
@@ -274,7 +274,7 @@ static void draw_chars(const _20pacgal_state *state, bitmap_t *bitmap)
 
 				/* pen bits A4-A11 */
 				if ( col != 0 )
-					bitmap->pix32(y, x) = (color_base | col) << 4;
+					bitmap.pix32(y, x) = (color_base | col) << 4;
 
 				/* next pixel */
 				if (flip)
@@ -349,7 +349,7 @@ static void draw_chars(const _20pacgal_state *state, bitmap_t *bitmap)
  *
  */
 
-static void draw_stars(_20pacgal_state *state, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_stars(_20pacgal_state *state, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	if ( (state->m_stars_ctrl[0] >> 5) & 1 )
 	{
@@ -392,7 +392,7 @@ static void draw_stars(_20pacgal_state *state, bitmap_t *bitmap, const rectangle
 			if (((lfsr & 0xffc0) == star_seta) || ((lfsr & 0xffc0) == star_setb))
 			{
 				if (y >= cliprect.min_y && y <= cliprect.max_y)
-					bitmap->pix32(y, x) = NUM_PENS + (lfsr & 0x3f);
+					bitmap.pix32(y, x) = NUM_PENS + (lfsr & 0x3f);
 				cnt++;
 			}
 		}
@@ -410,7 +410,7 @@ static SCREEN_UPDATE( 20pacgal )
 {
 	_20pacgal_state *state = screen.machine().driver_data<_20pacgal_state>();
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 	draw_stars(state, bitmap,cliprect);
 	draw_chars(state, bitmap);
 	draw_sprites(screen.machine(),state, bitmap);

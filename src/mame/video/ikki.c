@@ -62,7 +62,7 @@ WRITE8_HANDLER( ikki_scrn_ctrl_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	ikki_state *state = machine.driver_data<ikki_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -93,7 +93,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		if (y > 240)
 			y = y - 256;
 
-		drawgfx_transmask(state->m_sprite_bitmap,cliprect, machine.gfx[1],
+		drawgfx_transmask(*state->m_sprite_bitmap,cliprect, machine.gfx[1],
 				code, color,
 				state->m_flipscreen,state->m_flipscreen,
 				x,y,
@@ -110,7 +110,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 			UINT16 pen = state->m_sprite_bitmap->pix16(y, x);
 
 			if (colortable_entry_get_value(machine.colortable, pen) != 0x100)
-				bitmap->pix16(y, x) = pen;
+				bitmap.pix16(y, x) = pen;
 		}
 	}
 }

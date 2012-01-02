@@ -64,7 +64,7 @@ VIDEO_START( jack )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flipy, 8, 8, 32, 32);
 }
 
-static void jack_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void jack_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	jack_state *state = machine.driver_data<jack_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -149,7 +149,7 @@ VIDEO_START( joinem )
 	state->m_bg_tilemap = tilemap_create(machine, joinem_get_bg_tile_info, tilemap_scan_cols_flipy, 8, 8, 32, 32);
 }
 
-static void joinem_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void joinem_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	jack_state *state = machine.driver_data<jack_state>();
 	UINT8 *spriteram = state->m_spriteram;

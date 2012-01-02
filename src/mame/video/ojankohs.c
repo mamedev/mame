@@ -340,6 +340,6 @@ SCREEN_UPDATE( ojankoc )
 		state->m_screen_refresh = 0;
 	}
 
-	copybitmap(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

@@ -260,7 +260,7 @@ static SCREEN_UPDATE( enigma2 )
 			/* stars only appear at certain positions */
 			color = ((x & y & 0x0f) == 0x0f) ? star_color : 0;
 
-		bitmap->pix32(bitmap_y, x) = pens[color];
+		bitmap.pix32(bitmap_y, x) = pens[color];
 
 		/* next pixel */
 		x = x + 1;
@@ -323,7 +323,7 @@ static SCREEN_UPDATE( enigma2a )
 		}
 
 		pen = bit ? RGB_WHITE : RGB_BLACK;
-		bitmap->pix32(bitmap_y, x) = pen;
+		bitmap.pix32(bitmap_y, x) = pen;
 
 		/* next pixel */
 		x = x + 1;

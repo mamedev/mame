@@ -65,7 +65,7 @@ bool chsuper_state::screen_update( screen_device &screen, bitmap_t &bitmap, cons
 		{
 			int tile = ((m_vram[count+1]<<8) | m_vram[count]) & 0xffff;
 
-			drawgfx_opaque(&bitmap,cliprect,gfx,tile,0,0,0,x*4,y*8);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*4,y*8);
 			count+=2;
 		}
 	}

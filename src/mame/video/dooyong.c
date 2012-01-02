@@ -350,7 +350,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pollux_extensions)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pollux_extensions)
 {
 	/* Sprites take 32 bytes each in memory:
                      MSB   LSB
@@ -440,7 +440,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void rshark_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void rshark_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 
@@ -515,8 +515,8 @@ static void rshark_draw_sprites(running_machine &machine, bitmap_t *bitmap, cons
 SCREEN_UPDATE( lastday )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
@@ -530,8 +530,8 @@ SCREEN_UPDATE( lastday )
 SCREEN_UPDATE( gulfstrm )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
@@ -544,8 +544,8 @@ SCREEN_UPDATE( gulfstrm )
 SCREEN_UPDATE( pollux )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
@@ -558,8 +558,8 @@ SCREEN_UPDATE( pollux )
 SCREEN_UPDATE( flytiger )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	if (state->m_flytiger_pri)
 	{
@@ -581,8 +581,8 @@ SCREEN_UPDATE( flytiger )
 SCREEN_UPDATE( bluehawk )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
@@ -596,7 +596,7 @@ SCREEN_UPDATE( bluehawk )
 SCREEN_UPDATE( primella )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	if (state->m_tx_pri) tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
@@ -608,8 +608,8 @@ SCREEN_UPDATE( primella )
 SCREEN_UPDATE( rshark )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, (state->m_rshark_pri ? 2 : 1));
@@ -623,8 +623,8 @@ SCREEN_UPDATE( rshark )
 SCREEN_UPDATE( popbingo )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
 

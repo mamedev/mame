@@ -118,7 +118,7 @@ WRITE8_HANDLER (tbowl_bg2yscroll_hi)
 	state->m_bg2yscroll = (state->m_bg2yscroll & 0x00ff) | (data << 8);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect, int xscroll)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int xscroll)
 {
 	tbowl_state *state = machine.driver_data<tbowl_state>();
 	int offs;
@@ -225,7 +225,7 @@ SCREEN_UPDATE( tbowl_left )
 	tilemap_set_scrollx(state->m_tx_tilemap,  0, 0 );
 	tilemap_set_scrolly(state->m_tx_tilemap,  0, 0 );
 
-	bitmap->fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
+	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect, 0);
 	tilemap_draw(bitmap,cliprect,state->m_bg2_tilemap,0,0);
@@ -245,7 +245,7 @@ SCREEN_UPDATE( tbowl_right )
 	tilemap_set_scrollx(state->m_tx_tilemap,  0, 32*8 );
 	tilemap_set_scrolly(state->m_tx_tilemap,  0, 0 );
 
-	bitmap->fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
+	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect, 32*8);
 	tilemap_draw(bitmap,cliprect,state->m_bg2_tilemap,0,0);

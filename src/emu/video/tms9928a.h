@@ -104,7 +104,7 @@ public:
 	DECLARE_WRITE8_MEMBER( register_write );
 
 	/* update the screen */
-	void update( bitmap_t *bitmap, const rectangle &cliprect );
+	void update( bitmap_t &bitmap, const rectangle &cliprect );
 
 protected:
 	// device-level overrides

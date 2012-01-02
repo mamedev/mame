@@ -95,7 +95,7 @@ void crbaloon_set_clear_collision_address(running_machine &machine, int _crbaloo
 
 
 
-static void draw_sprite_and_check_collision(running_machine &machine, bitmap_t *bitmap)
+static void draw_sprite_and_check_collision(running_machine &machine, bitmap_t &bitmap)
 {
 	crbaloon_state *state = machine.driver_data<crbaloon_state>();
 	int y;
@@ -131,12 +131,12 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_t *
 			/* draw the current pixel, but check collision first */
 			if (bit)
 			{
-				if (bitmap->pix16(sy, sx) & 0x01)
+				if (bitmap.pix16(sy, sx) & 0x01)
 					/* compute the collision address -- the +1 is via observation
                        of the game code, probably wrong for cocktail mode */
 					state->m_collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
 
-				bitmap->pix16(sy, sx) = (color << 1) | 1;
+				bitmap.pix16(sy, sx) = (color << 1) | 1;
 			}
 
 			sx = sx + 1;

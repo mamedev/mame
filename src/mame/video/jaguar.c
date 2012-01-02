@@ -927,12 +927,12 @@ SCREEN_UPDATE( cojag )
 	/* if not enabled, just blank */
 	if (!(gpu_regs[VMODE] & 1))
 	{
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 		return 0;
 	}
 
 	/* render the object list */
-	copybitmap(bitmap, screen_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *screen_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

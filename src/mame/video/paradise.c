@@ -192,7 +192,7 @@ WRITE8_HANDLER( paradise_priority_w )
 	state->m_priority = data;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -259,7 +259,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if (!(state->m_priority & 4))	/* Screen blanking */
 		return 0;
@@ -270,7 +270,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
-	if (layers_ctrl & 4)	copybitmap_trans(bitmap, state->m_tmpbitmap, flip_screen_get(screen.machine()), flip_screen_get(screen.machine()), 0, 0, cliprect, 0x80f);
+	if (layers_ctrl & 4)	copybitmap_trans(bitmap, *state->m_tmpbitmap, flip_screen_get(screen.machine()), flip_screen_get(screen.machine()), 0, 0, cliprect, 0x80f);
 
 	if (state->m_priority & 2)
 	{
@@ -296,7 +296,7 @@ SCREEN_UPDATE( torus )
 {
 	paradise_state *state = screen.machine().driver_data<paradise_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if (!(state->m_priority & 2))	/* Screen blanking */
 		return 0;
@@ -328,7 +328,7 @@ SCREEN_UPDATE( madball )
 {
 	paradise_state *state = screen.machine().driver_data<paradise_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);

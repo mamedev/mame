@@ -70,7 +70,7 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-static void syvalion_draw_sprites( running_machine &machine,bitmap_t *bitmap, const rectangle &cliprect )
+static void syvalion_draw_sprites( running_machine &machine,bitmap_t &bitmap, const rectangle &cliprect )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -163,7 +163,7 @@ static void syvalion_draw_sprites( running_machine &machine,bitmap_t *bitmap, co
 	}
 }
 
-static void recordbr_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
+static void recordbr_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -275,7 +275,7 @@ static void recordbr_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	}
 }
 
-static void dleague_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
+static void dleague_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -399,7 +399,7 @@ SCREEN_UPDATE( syvalion )
 
 	taitoh_log_vram(screen.machine());
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
@@ -418,7 +418,7 @@ SCREEN_UPDATE( recordbr )
 
 	taitoh_log_vram(screen.machine());
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
 	if (!screen.machine().input().code_pressed(KEYCODE_A))
@@ -449,7 +449,7 @@ SCREEN_UPDATE( dleague )
 
 	taitoh_log_vram(screen.machine());
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
 	if (!screen.machine().input().code_pressed(KEYCODE_A))

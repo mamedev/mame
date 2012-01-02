@@ -190,7 +190,7 @@ SCREEN_UPDATE( naughtyb )
 
 	naughtyb_state *state = screen.machine().driver_data<naughtyb_state>();
 	UINT8 *videoram = state->m_videoram;
-	bitmap_t *tmpbitmap = screen.machine().generic.tmpbitmap;
+	bitmap_t &tmpbitmap = *screen.machine().generic.tmpbitmap;
 	int offs;
 
 	// for every character in the Video RAM
@@ -226,13 +226,13 @@ SCREEN_UPDATE( naughtyb )
 			}
 		}
 
-		drawgfx_opaque(tmpbitmap,tmpbitmap->cliprect(),screen.machine().gfx[0],
+		drawgfx_opaque(tmpbitmap,tmpbitmap.cliprect(),screen.machine().gfx[0],
 				state->m_videoram2[offs] + 256 * state->m_bankreg,
 				(state->m_videoram2[offs] >> 5) + 8 * state->m_palreg,
 				state->m_cocktail,state->m_cocktail,
 				8*sx,8*sy);
 
-		drawgfx_transpen(tmpbitmap,tmpbitmap->cliprect(),screen.machine().gfx[1],
+		drawgfx_transpen(tmpbitmap,tmpbitmap.cliprect(),screen.machine().gfx[1],
 				videoram[offs] + 256*state->m_bankreg,
 				(videoram[offs] >> 5) + 8 * state->m_palreg,
 				state->m_cocktail,state->m_cocktail,

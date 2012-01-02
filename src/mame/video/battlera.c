@@ -241,7 +241,7 @@ WRITE8_HANDLER( HuC6270_data_w )
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &clip,int pri)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &clip,int pri)
 {
 	battlera_state *state = machine.driver_data<battlera_state>();
 	int offs,my,mx,code,code2,fx,fy,cgy=0,cgx,colour,i,yinc;
@@ -329,17 +329,17 @@ SCREEN_UPDATE( battlera )
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (state->m_vram_dirty[offs/2]) {
 			state->m_vram_dirty[offs/2]=0;
-			drawgfx_opaque(state->m_tile_bitmap,state->m_tile_bitmap->cliprect(),screen.machine().gfx[0],
+			drawgfx_opaque(*state->m_tile_bitmap,state->m_tile_bitmap->cliprect(),screen.machine().gfx[0],
 					code,
 					state->m_HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my);
-			drawgfx_opaque(state->m_front_bitmap,state->m_tile_bitmap->cliprect(),screen.machine().gfx[2],
+			drawgfx_opaque(*state->m_front_bitmap,state->m_tile_bitmap->cliprect(),screen.machine().gfx[2],
 					0,
 					0,	/* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my);
-			drawgfx_transmask(state->m_front_bitmap,state->m_tile_bitmap->cliprect(),screen.machine().gfx[0],
+			drawgfx_transmask(*state->m_front_bitmap,state->m_tile_bitmap->cliprect(),screen.machine().gfx[0],
 					code,
 					state->m_HuC6270_vram[offs] >> 4,
 					0,0,
@@ -351,7 +351,7 @@ SCREEN_UPDATE( battlera )
 	scrollx=-state->m_HuC6270_registers[7];
 	scrolly=-state->m_HuC6270_registers[8]+cliprect.min_y-1;
 
-	copyscrollbitmap(bitmap,state->m_tile_bitmap,1,&scrollx,1,&scrolly,cliprect);
+	copyscrollbitmap(bitmap,*state->m_tile_bitmap,1,&scrollx,1,&scrolly,cliprect);
 
 	/* Todo:  Background enable (not used anyway) */
 
@@ -359,7 +359,7 @@ SCREEN_UPDATE( battlera )
 	if (state->m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,0);
 
 	/* Render background over sprites */
-	copyscrollbitmap_trans(bitmap,state->m_front_bitmap,1,&scrollx,1,&scrolly,cliprect,256);
+	copyscrollbitmap_trans(bitmap,*state->m_front_bitmap,1,&scrollx,1,&scrolly,cliprect,256);
 
 	/* Render high priority sprites, if enabled */
 	if (state->m_sb_enable) draw_sprites(screen.machine(),bitmap,cliprect,1);

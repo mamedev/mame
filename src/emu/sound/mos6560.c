@@ -509,11 +509,11 @@ void mos6560_raster_interrupt_gen( device_t *device )
      main screen bitmap
 -------------------------------------------------*/
 
-UINT32 mos6560_video_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+UINT32 mos6560_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 
-	copybitmap(bitmap, mos6560->bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *mos6560->bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

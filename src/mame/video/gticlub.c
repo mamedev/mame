@@ -934,7 +934,7 @@ static void render_polygons(running_machine &machine)
 	}
 }
 
-void K001005_draw(bitmap_t *bitmap, const rectangle &cliprect)
+void K001005_draw(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
@@ -942,7 +942,7 @@ void K001005_draw(bitmap_t *bitmap, const rectangle &cliprect)
 
 	for (j=cliprect.min_y; j <= cliprect.max_y; j++)
 	{
-		UINT32 *bmp = &bitmap->pix32(j);
+		UINT32 *bmp = &bitmap.pix32(j);
 		UINT32 *src = &K001005_bitmap[K001005_bitmap_page^1]->pix32(j);
 
 		for (i=cliprect.min_x; i <= cliprect.max_x; i++)
@@ -1032,7 +1032,7 @@ SCREEN_UPDATE( gticlub )
             for (x=0; x < 512; x++)
             {
                 UINT8 pixel = rom[index + (y*512) + x];
-                bitmap->pix32(y, x) = K001006_palette[tp][(pal * 256) + pixel];
+                bitmap.pix32(y, x) = K001006_palette[tp][(pal * 256) + pixel];
             }
         }
 
@@ -1051,7 +1051,7 @@ SCREEN_UPDATE( gticlub )
 
 SCREEN_UPDATE( hangplt )
 {
-	bitmap->fill(screen.machine().pens[0], cliprect);
+	bitmap.fill(screen.machine().pens[0], cliprect);
 
 	if (strcmp(screen.tag(), "lscreen") == 0)
 	{

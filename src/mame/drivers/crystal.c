@@ -689,7 +689,7 @@ static SCREEN_UPDATE( crystal )
 
 	srcline = (UINT16 *) Visible;
 	for (y = 0; y < 240; y++)
-		memcpy(&bitmap->pix16(y), &srcline[y * 512], width * 2);
+		memcpy(&bitmap.pix16(y), &srcline[y * 512], width * 2);
 
 	return 0;
 }

@@ -140,13 +140,13 @@ static SCREEN_UPDATE( mjsister )
 	{
 		for (i = 0; i < 256; i++)
 			for (j = 0; j < 4; j++)
-				bitmap->pix16(i, 256 + j) = state->m_colorbank * 0x20;
+				bitmap.pix16(i, 256 + j) = state->m_colorbank * 0x20;
 
-		copybitmap(bitmap, state->m_tmpbitmap0, flip, flip, 0, 0, cliprect);
-		copybitmap_trans(bitmap, state->m_tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
+		copybitmap(bitmap, *state->m_tmpbitmap0, flip, flip, 0, 0, cliprect);
+		copybitmap_trans(bitmap, *state->m_tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
 	}
 	else
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	return 0;
 }
 

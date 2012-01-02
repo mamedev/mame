@@ -122,12 +122,12 @@ WRITE16_HANDLER(rlt_blitter_w)
 	{
 		if(new_data & BLTFLAG_DISPLAY_UD)
 		{
-			copybitmap(state->m_tmp_bitmap[BITMAP_FG_DISPLAY], state->m_tmp_bitmap[BITMAP_FG_1], 0, 0, 0, 0, state->m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
+			copybitmap(*state->m_tmp_bitmap[BITMAP_FG_DISPLAY], *state->m_tmp_bitmap[BITMAP_FG_1], 0, 0, 0, 0, state->m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
 			state->m_tmp_bitmap[BITMAP_FG_1]->fill(0);
 		}
 		else
 		{
-			copybitmap(state->m_tmp_bitmap[BITMAP_FG_DISPLAY], state->m_tmp_bitmap[BITMAP_FG_2], 0, 0, 0, 0, state->m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
+			copybitmap(*state->m_tmp_bitmap[BITMAP_FG_DISPLAY], *state->m_tmp_bitmap[BITMAP_FG_2], 0, 0, 0, 0, state->m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
 			state->m_tmp_bitmap[BITMAP_FG_2]->fill(0);
 		}
 	}
@@ -233,7 +233,7 @@ VIDEO_START( rltennis )
 SCREEN_UPDATE( rltennis )
 {
 	rltennis_state *state = screen.machine().driver_data<rltennis_state>();
-	copybitmap(bitmap, state->m_tmp_bitmap[BITMAP_BG], 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, state->m_tmp_bitmap[BITMAP_FG_DISPLAY], 0, 0, 0, 0, cliprect, 0);
+	copybitmap(bitmap, *state->m_tmp_bitmap[BITMAP_BG], 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, *state->m_tmp_bitmap[BITMAP_FG_DISPLAY], 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }

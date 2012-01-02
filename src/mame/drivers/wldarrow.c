@@ -89,7 +89,7 @@ static SCREEN_UPDATE( wldarrow )
 						  ((data_g >> 6) & 0x02) |
 						  ((data_b >> 7) & 0x01);
 
-			bitmap->pix32(y, x) = pens[color];
+			bitmap.pix32(y, x) = pens[color];
 
 			data_r = data_r << 1;
 			data_g = data_g << 1;

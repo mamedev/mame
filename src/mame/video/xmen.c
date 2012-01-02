@@ -93,9 +93,9 @@ SCREEN_UPDATE( xmen )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 	/* note the '+1' in the background color!!! */
-	bitmap->fill(16 * bg_colorbase + 1, cliprect);
+	bitmap.fill(16 * bg_colorbase + 1, cliprect);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[0], 0, 1);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[1], 0, 2);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[2], 0, 4);
@@ -114,7 +114,7 @@ SCREEN_UPDATE( xmen6p_left )
 
 	for(y = 0; y < 32 * 8; y++)
 	{
-		UINT16* line_dest = &bitmap->pix16(y);
+		UINT16* line_dest = &bitmap.pix16(y);
 		UINT16* line_src = &state->m_screen_left->pix16(y);
 
 		for (x = 12 * 8; x < 52 * 8; x++)
@@ -131,7 +131,7 @@ SCREEN_UPDATE( xmen6p_right )
 
 	for(y = 0; y < 32 * 8; y++)
 	{
-		UINT16* line_dest = &bitmap->pix16(y);
+		UINT16* line_dest = &bitmap.pix16(y);
 		UINT16* line_src = &state->m_screen_right->pix16(y);
 
 		for (x = 12 * 8; x < 52 * 8; x++)
@@ -219,14 +219,14 @@ SCREEN_EOF( xmen6p )
 
 	konami_sortlayers3(layer, state->m_layerpri);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 	/* note the '+1' in the background color!!! */
 	renderbitmap->fill(16 * bg_colorbase + 1, cliprect);
-	k052109_tilemap_draw(state->m_k052109, renderbitmap, cliprect, layer[0], 0, 1);
-	k052109_tilemap_draw(state->m_k052109, renderbitmap, cliprect, layer[1], 0, 2);
-	k052109_tilemap_draw(state->m_k052109, renderbitmap, cliprect, layer[2], 0, 4);
+	k052109_tilemap_draw(state->m_k052109, *renderbitmap, cliprect, layer[0], 0, 1);
+	k052109_tilemap_draw(state->m_k052109, *renderbitmap, cliprect, layer[1], 0, 2);
+	k052109_tilemap_draw(state->m_k052109, *renderbitmap, cliprect, layer[2], 0, 4);
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
-	k053247_sprites_draw(state->m_k053246, renderbitmap, cliprect);
+	k053247_sprites_draw(state->m_k053246, *renderbitmap, cliprect);
 }

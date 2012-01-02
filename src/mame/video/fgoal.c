@@ -53,14 +53,14 @@ SCREEN_UPDATE( fgoal )
 
 	if (state->m_fgoal_player == 1 && (input_port_read(screen.machine(), "IN1") & 0x40))
 	{
-		drawgfxzoom_opaque(state->m_fgbitmap, cliprect, screen.machine().gfx[0],
+		drawgfxzoom_opaque(*state->m_fgbitmap, cliprect, screen.machine().gfx[0],
 			0, (state->m_fgoal_player << 2) | state->m_current_color,
 			1, 1,
 			0, 16,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom_opaque(state->m_bgbitmap, cliprect, screen.machine().gfx[1],
+		drawgfxzoom_opaque(*state->m_bgbitmap, cliprect, screen.machine().gfx[1],
 			0, 0,
 			1, 1,
 			0, 16,
@@ -69,14 +69,14 @@ SCREEN_UPDATE( fgoal )
 	}
 	else
 	{
-		drawgfxzoom_opaque(state->m_fgbitmap, cliprect, screen.machine().gfx[0],
+		drawgfxzoom_opaque(*state->m_fgbitmap, cliprect, screen.machine().gfx[0],
 			0, (state->m_fgoal_player << 2) | state->m_current_color,
 			0, 0,
 			0, 0,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom_opaque(state->m_bgbitmap, cliprect, screen.machine().gfx[1],
+		drawgfxzoom_opaque(*state->m_bgbitmap, cliprect, screen.machine().gfx[1],
 			0, 0,
 			0, 0,
 			0, 0,
@@ -101,7 +101,7 @@ SCREEN_UPDATE( fgoal )
 
 	for (y = 0; y < 256; y++)
 	{
-		UINT16* p = &bitmap->pix16(y);
+		UINT16* p = &bitmap.pix16(y);
 
 		const UINT16* FG = &state->m_fgbitmap->pix16(y);
 		const UINT16* BG = &state->m_bgbitmap->pix16(y);

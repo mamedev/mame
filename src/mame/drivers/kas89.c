@@ -242,7 +242,7 @@ static TIMER_DEVICE_CALLBACK( kas89_interrupt )
 static VIDEO_START( kas89 )
 {
 	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init (machine, 0, *machine.primary_screen, machine.generic.tmpbitmap, MODEL_V9938, VDP_MEM, kas89_vdp_interrupt);
+	v9938_init (machine, 0, *machine.primary_screen, *machine.generic.tmpbitmap, MODEL_V9938, VDP_MEM, kas89_vdp_interrupt);
 	v9938_reset(0);
 }
 

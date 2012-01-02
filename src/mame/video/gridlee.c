@@ -197,12 +197,12 @@ SCREEN_UPDATE( gridlee )
 
 					/* left pixel */
 					if (left && currx >= 0 && currx < 256)
-						bitmap->pix16(ypos, currx ^ currxor) = pens[left];
+						bitmap.pix16(ypos, currx ^ currxor) = pens[left];
 					currx++;
 
 					/* right pixel */
 					if (right && currx >= 0 && currx < 256)
-						bitmap->pix16(ypos, currx ^ currxor) = pens[right];
+						bitmap.pix16(ypos, currx ^ currxor) = pens[right];
 					currx++;
 				}
 			}

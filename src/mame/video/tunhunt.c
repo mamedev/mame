@@ -200,7 +200,7 @@ static void set_pens(running_machine &machine)
 	}
 }
 
-static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_motion_object(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 /*
  *      VSTRLO  0x1202
@@ -214,7 +214,7 @@ static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const
  */
 
 	tunhunt_state *state = machine.driver_data<tunhunt_state>();
-	bitmap_t *tmpbitmap = machine.generic.tmpbitmap;
+	bitmap_t &tmpbitmap = *machine.generic.tmpbitmap;
 	UINT8 *spriteram = state->m_spriteram;
 	UINT8 *tunhunt_ram = state->m_workram;
 	//int skip = tunhunt_ram[MOBST];
@@ -238,10 +238,10 @@ static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const
 			color = ((span_data>>6)&0x3)^0x3;
 			count = (span_data&0x1f)+1;
 			while( count-- && x < 256 )
-				tmpbitmap->pix16(line, x++) = color;
+				tmpbitmap.pix16(line, x++) = color;
 		}
 		while( x<256 )
-			tmpbitmap->pix16(line, x++) = 0;
+			tmpbitmap.pix16(line, x++) = 0;
 	} /* next line */
 
 	switch( tunhunt_ram[VSTRLO] )
@@ -272,7 +272,7 @@ static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const
 	);
 }
 
-static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_box(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
@@ -320,14 +320,14 @@ static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle
 					}
 				}
 				if (x >= cliprect.min_x && x <= cliprect.max_x)
-					bitmap->pix16(0xff-y, x) = color;
+					bitmap.pix16(0xff-y, x) = color;
 			}
 	}
 }
 
 /* "shell" graphics are 16x16 pixel tiles used for player shots and targeting cursor */
 static void draw_shell(running_machine &machine,
-		bitmap_t *bitmap,
+		bitmap_t &bitmap,
 		const rectangle &cliprect,
 		int picture_code,
 		int hposition,

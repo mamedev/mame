@@ -347,7 +347,7 @@ static SCREEN_UPDATE(dderby)
 	const gfx_element *sprites = screen.machine().gfx[1];
 	const gfx_element *track = screen.machine().gfx[2];
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 
 /* Draw racetrack

@@ -188,8 +188,8 @@ SCREEN_UPDATE( labyrunr )
 
 	set_pens(screen.machine());
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if (~k007121_ctrlram_r(state->m_k007121, 3) & 0x20)
 	{

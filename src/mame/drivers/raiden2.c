@@ -629,7 +629,7 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 
 /* SPRITE DRAWING (move to video file) */
 
-void raiden2_state::draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect ,int pri_mask )
+void raiden2_state::draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect ,int pri_mask )
 {
 	UINT16 *source = sprites + sprites_cur_start/2 - 4;
 
@@ -889,7 +889,7 @@ static VIDEO_START( raiden2 )
 static SCREEN_UPDATE( raiden2 )
 {
 	raiden2_state *state = screen.machine().driver_data<raiden2_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_Q))
 	{

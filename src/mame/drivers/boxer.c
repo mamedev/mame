@@ -109,7 +109,7 @@ static PALETTE_INIT( boxer )
 	palette_set_color(machine,3, MAKE_RGB(0x00,0x00,0x00));
 }
 
-static void draw_boxer( running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect )
+static void draw_boxer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	boxer_state *state = machine.driver_data<boxer_state>();
 	int n;
@@ -162,7 +162,7 @@ static SCREEN_UPDATE( boxer )
 	boxer_state *state = screen.machine().driver_data<boxer_state>();
 	int i, j;
 
-	bitmap->fill(1, cliprect);
+	bitmap.fill(1, cliprect);
 
 	for (i = 0; i < 16; i++)
 	{

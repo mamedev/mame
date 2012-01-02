@@ -90,7 +90,7 @@ static VIDEO_START(mirax)
 {
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	mirax_state *state = machine.driver_data<mirax_state>();
 	UINT8 *spriteram = state->m_spriteram;

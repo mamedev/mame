@@ -97,7 +97,7 @@ WRITE32_HANDLER(taitojc_char_w)
 
 */
 
-static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type)
+static void draw_object(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type)
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 	int x, y, width, height, palette;
@@ -192,7 +192,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 
 		for (j=y1; j < y2; j++)
 		{
-			UINT16 *d = &bitmap->pix16(j);
+			UINT16 *d = &bitmap.pix16(j);
 
 			for (i=x1; i < x2; i++)
 			{
@@ -208,7 +208,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 	{
 		for (j=y1; j < y2; j++)
 		{
-			UINT16 *d = &bitmap->pix16(j);
+			UINT16 *d = &bitmap.pix16(j);
 			int index = (iy * (width / 2)) + ix;
 
 			for (i=x1; i < x2; i+=2)
@@ -232,7 +232,7 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 		{
 			for (j=y1; j < y2; j++)
 			{
-				UINT16 *d = &bitmap->pix16(j);
+				UINT16 *d = &bitmap.pix16(j);
 				int index = (iy * width) + ix;
 
 				for (i=x1; i < x2; i++)
@@ -292,7 +292,7 @@ VIDEO_START( taitojc )
 	state->m_zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
-static void draw_object_bank(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri)
+static void draw_object_bank(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri)
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 	UINT16 start_offs;
@@ -338,7 +338,7 @@ SCREEN_UPDATE( taitojc )
     }
 #endif
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	/* 0xf000 used on Densha de Go disclaimer screen(s) (disable object RAM?) */
 	if((state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x0000 && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x2000  && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0xf000 )
@@ -350,7 +350,7 @@ SCREEN_UPDATE( taitojc )
 	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 0);
 	draw_object_bank(screen.machine(), bitmap, cliprect, 2, 0);
 
-	copybitmap_trans(bitmap, state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 
 	draw_object_bank(screen.machine(), bitmap, cliprect, 0, 1);
 	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 1);
@@ -364,7 +364,7 @@ SCREEN_UPDATE( taitojc )
         int j;
         for (j=cliprect.min_y; j <= cliprect.max_y; j++)
         {
-            UINT16 *d = &bitmap->pix16(j);
+            UINT16 *d = &bitmap.pix16(j);
             int index = 2048 * j;
 
             for (i=cliprect.min_x; i <= cliprect.max_x; i++)

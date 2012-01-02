@@ -137,7 +137,7 @@ WRITE8_HANDLER( tsamurai_fg_colorram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	tsamurai_state *state = machine.driver_data<tsamurai_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -218,7 +218,7 @@ SCREEN_UPDATE( tsamurai )
         Note that the background color register isn't well understood
         (screenshots would be helpful)
     */
-	bitmap->fill(state->m_bgcolor, cliprect);
+	bitmap.fill(state->m_bgcolor, cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_background,0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_foreground,0,0);

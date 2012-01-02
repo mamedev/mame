@@ -26,7 +26,7 @@ VIDEO_START( stoneage )
 
 
 /* The bootleg sprites are in a different format! */
-static void cninjabl_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void cninjabl_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
 	int offs;
@@ -134,8 +134,8 @@ SCREEN_UPDATE( cninja )
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	/* Draw playfields */
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(512, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(512, cliprect);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 2);
@@ -159,8 +159,8 @@ SCREEN_UPDATE( cninjabl )
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	/* Draw playfields */
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(512, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(512, cliprect);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 2);
@@ -179,8 +179,8 @@ SCREEN_UPDATE( edrandy )
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
@@ -215,8 +215,8 @@ SCREEN_UPDATE( robocop2 )
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	/* Draw playfields */
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0x200, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0x200, cliprect);
 
 	if ((priority & 4) == 0)
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
@@ -258,7 +258,7 @@ SCREEN_UPDATE( mutantf )
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	/* Draw playfields */
-	bitmap->fill(0x400, cliprect); /* Confirmed */
+	bitmap.fill(0x400, cliprect); /* Confirmed */
 
 	screen.machine().device<decospr_device>("spritegen1")->set_alt_format(true);
 	screen.machine().device<decospr_device>("spritegen2")->set_alt_format(true);

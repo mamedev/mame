@@ -23,10 +23,8 @@ SCREEN_UPDATE( malzak )
 	malzak_state *state = screen.machine().driver_data<malzak_state>();
 	int sx, sy;
 	int x,y;
-	bitmap_t *s2636_0_bitmap;
-	bitmap_t *s2636_1_bitmap;
 
-	bitmap->fill(0);
+	bitmap.fill(0);
 
 	saa5050_update(state->m_saa5050, bitmap, cliprect);
 	saa5050_frame_advance(state->m_saa5050);
@@ -47,8 +45,8 @@ SCREEN_UPDATE( malzak )
 		}
 
 	/* update the S2636 chips */
-	s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
-	s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
+	bitmap_t &s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
+	bitmap_t &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	{
@@ -60,21 +58,21 @@ SCREEN_UPDATE( malzak )
 
 			for (x = cliprect.min_x; x <= cliprect.max_x / 2; x++)
 			{
-				int pixel0 = s2636_0_bitmap->pix16(y, x);
-				int pixel1 = s2636_1_bitmap->pix16(y, x);
+				int pixel0 = s2636_0_bitmap.pix16(y, x);
+				int pixel1 = s2636_1_bitmap.pix16(y, x);
 
 				if (S2636_IS_PIXEL_DRAWN(pixel0)) {
-					bitmap->pix16(y*2, x*2) = S2636_PIXEL_COLOR(pixel0);
-					bitmap->pix16(y*2+1, x*2) = S2636_PIXEL_COLOR(pixel0);
-					bitmap->pix16(y*2, x*2+1) = S2636_PIXEL_COLOR(pixel0);
-					bitmap->pix16(y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel0);
+					bitmap.pix16(y*2, x*2) = S2636_PIXEL_COLOR(pixel0);
+					bitmap.pix16(y*2+1, x*2) = S2636_PIXEL_COLOR(pixel0);
+					bitmap.pix16(y*2, x*2+1) = S2636_PIXEL_COLOR(pixel0);
+					bitmap.pix16(y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel0);
 				}
 
 				if (S2636_IS_PIXEL_DRAWN(pixel1)) {
-					bitmap->pix16(y*2, x*2) = S2636_PIXEL_COLOR(pixel1);
-					bitmap->pix16(y*2+1, x*2) = S2636_PIXEL_COLOR(pixel1);
-					bitmap->pix16(y*2, x*2+1) = S2636_PIXEL_COLOR(pixel1);
-					bitmap->pix16(y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel1);
+					bitmap.pix16(y*2, x*2) = S2636_PIXEL_COLOR(pixel1);
+					bitmap.pix16(y*2+1, x*2) = S2636_PIXEL_COLOR(pixel1);
+					bitmap.pix16(y*2, x*2+1) = S2636_PIXEL_COLOR(pixel1);
+					bitmap.pix16(y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel1);
 				}
 			}
 		}

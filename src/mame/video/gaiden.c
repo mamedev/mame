@@ -310,7 +310,7 @@ WRITE16_HANDLER( gaiden_videoram_w )
    changes?) it appears that the sprite drawing is no longer putting the correct raw data
    in the bitmaps? */
 static void blendbitmaps(running_machine &machine,
-		bitmap_t *dest,bitmap_t *src1,bitmap_t *src2,bitmap_t *src3,
+		bitmap_t &dest,bitmap_t &src1,bitmap_t &src2,bitmap_t &src3,
 		int sx,int sy,const rectangle &cliprect)
 {
 	int y,x;
@@ -318,10 +318,10 @@ static void blendbitmaps(running_machine &machine,
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32 *dd  = &dest->pix32(y);
-		UINT16 *sd1 = &src1->pix16(y);
-		UINT16 *sd2 = &src2->pix16(y);
-		UINT16 *sd3 = &src3->pix16(y);
+		UINT32 *dd  = &dest.pix32(y);
+		UINT16 *sd1 = &src1.pix16(y);
+		UINT16 *sd2 = &src2.pix16(y);
+		UINT16 *sd3 = &src3.pix16(y);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -367,7 +367,7 @@ static void blendbitmaps(running_machine &machine,
 
 #define NUM_SPRITES 256
 
-static void gaiden_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle &cliprect )
+static void gaiden_draw_sprites( running_machine &machine, bitmap_t &bitmap_bg, bitmap_t &bitmap_fg, bitmap_t &bitmap_sp, const rectangle &cliprect )
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -465,7 +465,7 @@ static void gaiden_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, 
 			}
 			else
 			{
-				bitmap_t *bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
+				bitmap_t &bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
 
 				for (row = 0; row < sizey; row++)
 				{
@@ -489,7 +489,7 @@ static void gaiden_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, 
 }
 
 
-static void raiga_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle &cliprect )
+static void raiga_draw_sprites( running_machine &machine, bitmap_t &bitmap_bg, bitmap_t &bitmap_fg, bitmap_t &bitmap_sp, const rectangle &cliprect )
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -586,7 +586,7 @@ static void raiga_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, b
 			}
 			else
 			{
-				bitmap_t *bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
+				bitmap_t &bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
 
 				for (row = 0; row < sizey; row++)
 				{
@@ -629,7 +629,7 @@ static void raiga_draw_sprites( running_machine &machine, bitmap_t *bitmap_bg, b
  *         |---------x------- | x position (high bit)
  */
 
-static void drgnbowl_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void drgnbowl_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	gaiden_state *state = machine.driver_data<gaiden_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -673,25 +673,25 @@ static void drgnbowl_draw_sprites(running_machine &machine, bitmap_t *bitmap, co
 SCREEN_UPDATE( gaiden )
 {
 	gaiden_state *state = screen.machine().driver_data<gaiden_state>();
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	state->m_tile_bitmap_bg->fill(0x200, cliprect);
 	state->m_tile_bitmap_fg->fill(0, cliprect);
 	state->m_sprite_bitmap->fill(0, cliprect);
 
 	/* draw tilemaps into a 16-bit bitmap */
-	tilemap_draw(state->m_tile_bitmap_bg, cliprect, state->m_background, 0, 1);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_foreground, 0, 2);
+	tilemap_draw(*state->m_tile_bitmap_bg, cliprect, state->m_background, 0, 1);
+	tilemap_draw(*state->m_tile_bitmap_fg, cliprect, state->m_foreground, 0, 2);
 	/* draw the blended tiles at a lower priority
        so sprites covered by them will still be drawn */
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_foreground, 1, 0);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_text_layer, 0, 4);
+	tilemap_draw(*state->m_tile_bitmap_fg, cliprect, state->m_foreground, 1, 0);
+	tilemap_draw(*state->m_tile_bitmap_fg, cliprect, state->m_text_layer, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	gaiden_draw_sprites(screen.machine(), state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, state->m_sprite_bitmap, cliprect);
+	gaiden_draw_sprites(screen.machine(), *state->m_tile_bitmap_bg, *state->m_tile_bitmap_fg, *state->m_sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen.machine(), bitmap, state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, state->m_sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(screen.machine(), bitmap, *state->m_tile_bitmap_bg, *state->m_tile_bitmap_fg, *state->m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 
 }
@@ -699,32 +699,32 @@ SCREEN_UPDATE( gaiden )
 SCREEN_UPDATE( raiga )
 {
 	gaiden_state *state = screen.machine().driver_data<gaiden_state>();
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	state->m_tile_bitmap_bg->fill(0x200, cliprect);
 	state->m_tile_bitmap_fg->fill(0, cliprect);
 	state->m_sprite_bitmap->fill(0, cliprect);
 
 	/* draw tilemaps into a 16-bit bitmap */
-	tilemap_draw(state->m_tile_bitmap_bg, cliprect, state->m_background, 0, 1);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_foreground, 0, 2);
+	tilemap_draw(*state->m_tile_bitmap_bg, cliprect, state->m_background, 0, 1);
+	tilemap_draw(*state->m_tile_bitmap_fg, cliprect, state->m_foreground, 0, 2);
 	/* draw the blended tiles at a lower priority
        so sprites covered by them will still be drawn */
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_foreground, 1, 0);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_text_layer, 0, 4);
+	tilemap_draw(*state->m_tile_bitmap_fg, cliprect, state->m_foreground, 1, 0);
+	tilemap_draw(*state->m_tile_bitmap_fg, cliprect, state->m_text_layer, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	raiga_draw_sprites(screen.machine(), state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, state->m_sprite_bitmap, cliprect);
+	raiga_draw_sprites(screen.machine(), *state->m_tile_bitmap_bg, *state->m_tile_bitmap_fg, *state->m_sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen.machine(), bitmap, state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, state->m_sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(screen.machine(), bitmap, *state->m_tile_bitmap_bg, *state->m_tile_bitmap_fg, *state->m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }
 
 SCREEN_UPDATE( drgnbowl )
 {
 	gaiden_state *state = screen.machine().driver_data<gaiden_state>();
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_background, 0, 1);
 	tilemap_draw(bitmap, cliprect, state->m_foreground, 0, 2);

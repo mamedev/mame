@@ -388,7 +388,7 @@ static TILE_GET_INFO( powerbal_get_bg_tile_info )
 	SET_TILE_INFO(1, code, colr >> 12, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 	UINT16 *spriteram = state->m_spriteram;

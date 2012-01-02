@@ -46,10 +46,6 @@ static SCREEN_UPDATE( galaxia )
 	galaxia_state *state = screen.machine().driver_data<galaxia_state>();
 	int x,y, count;
 
-	bitmap_t *s2636_0_bitmap;
-	bitmap_t *s2636_1_bitmap;
-	bitmap_t *s2636_2_bitmap;
-
 	device_t *s2636_0 = screen.machine().device("s2636_0");
 	device_t *s2636_1 = screen.machine().device("s2636_1");
 	device_t *s2636_2 = screen.machine().device("s2636_2");
@@ -66,9 +62,9 @@ static SCREEN_UPDATE( galaxia )
 		}
 	}
 
-	s2636_0_bitmap = s2636_update(s2636_0, cliprect);
-	s2636_1_bitmap = s2636_update(s2636_1, cliprect);
-	s2636_2_bitmap = s2636_update(s2636_2, cliprect);
+	bitmap_t &s2636_0_bitmap = s2636_update(s2636_0, cliprect);
+	bitmap_t &s2636_1_bitmap = s2636_update(s2636_1, cliprect);
+	bitmap_t &s2636_2_bitmap = s2636_update(s2636_2, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	{
@@ -80,18 +76,18 @@ static SCREEN_UPDATE( galaxia )
 
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				int pixel0 = s2636_0_bitmap->pix16(y, x);
-				int pixel1 = s2636_1_bitmap->pix16(y, x);
-				int pixel2 = s2636_2_bitmap->pix16(y, x);
+				int pixel0 = s2636_0_bitmap.pix16(y, x);
+				int pixel1 = s2636_1_bitmap.pix16(y, x);
+				int pixel2 = s2636_2_bitmap.pix16(y, x);
 
 				if (S2636_IS_PIXEL_DRAWN(pixel0))
-					bitmap->pix16(y, x) = S2636_PIXEL_COLOR(pixel0);
+					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel0);
 
 				if (S2636_IS_PIXEL_DRAWN(pixel1))
-					bitmap->pix16(y, x) = S2636_PIXEL_COLOR(pixel1);
+					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel1);
 
 				if (S2636_IS_PIXEL_DRAWN(pixel2))
-					bitmap->pix16(y, x) = S2636_PIXEL_COLOR(pixel2);
+					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel2);
 			}
 		}
 	}

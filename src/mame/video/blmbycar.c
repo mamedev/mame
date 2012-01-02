@@ -165,7 +165,7 @@ VIDEO_START( blmbycar )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 	UINT16 *source, *finish;
@@ -243,13 +243,13 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 1)
 		for (i = 0; i <= 1; i++)
 			tilemap_draw(bitmap, cliprect, state->m_tilemap_0, i, i);
 	else
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 2)
 		for (i = 0; i <= 1; i++)

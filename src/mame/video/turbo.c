@@ -407,7 +407,7 @@ static UINT32 turbo_get_sprite_bits(running_machine &machine, UINT8 road, sprite
 SCREEN_UPDATE( turbo )
 {
 	turbo_state *state = screen.machine().driver_data<turbo_state>();
-	bitmap_t *fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
+	bitmap_t &fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
 	const UINT8 *road_gfxdata = screen.machine().region("gfx3")->base();
 	const UINT8 *prom_base = screen.machine().region("proms")->base();
 	const UINT8 *pr1114 = prom_base + 0x000;
@@ -423,8 +423,8 @@ SCREEN_UPDATE( turbo )
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const UINT16 *fore = &fgpixmap->pix16(y);
-		UINT16 *dest = &bitmap->pix16(y);
+		const UINT16 *fore = &fgpixmap.pix16(y);
+		UINT16 *dest = &bitmap.pix16(y);
 		int sel, coch, babit, slipar_acciar, area, offs, areatmp, road = 0;
 		sprite_info sprinfo;
 
@@ -762,7 +762,7 @@ static UINT32 subroc3d_get_sprite_bits(running_machine &machine, sprite_info *sp
 SCREEN_UPDATE( subroc3d )
 {
 	turbo_state *state = screen.machine().driver_data<turbo_state>();
-	bitmap_t *fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
+	bitmap_t &fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
 	const UINT8 *prom_base = screen.machine().region("proms")->base();
 	const UINT8 *pr1419 = prom_base + 0x000;
 	const UINT8 *pr1620 = prom_base + 0x200;
@@ -773,8 +773,8 @@ SCREEN_UPDATE( subroc3d )
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const UINT16 *fore = &fgpixmap->pix16(y);
-		UINT16 *dest = &bitmap->pix16(y);
+		const UINT16 *fore = &fgpixmap.pix16(y);
+		UINT16 *dest = &bitmap.pix16(y);
 		sprite_info sprinfo;
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
@@ -982,7 +982,7 @@ static UINT32 buckrog_get_sprite_bits(running_machine &machine, sprite_info *spr
 SCREEN_UPDATE( buckrog )
 {
 	turbo_state *state = screen.machine().driver_data<turbo_state>();
-	bitmap_t *fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
+	bitmap_t &fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
 	const UINT8 *bgcolor = screen.machine().region("gfx3")->base();
 	const UINT8 *prom_base = screen.machine().region("proms")->base();
 	const UINT8 *pr5194 = prom_base + 0x000;
@@ -993,8 +993,8 @@ SCREEN_UPDATE( buckrog )
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const UINT16 *fore = &fgpixmap->pix16(y);
-		UINT16 *dest = &bitmap->pix16(y);
+		const UINT16 *fore = &fgpixmap.pix16(y);
+		UINT16 *dest = &bitmap.pix16(y);
 		sprite_info sprinfo;
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */

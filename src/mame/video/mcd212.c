@@ -87,8 +87,8 @@ static const UINT16 cdi220_lcd_char[20*22] =
 static void cdi220_draw_lcd(running_machine &machine, int y)
 {
     cdi_state *state = machine.driver_data<cdi_state>();
-    bitmap_t *bitmap = state->m_lcdbitmap;
-    UINT32 *scanline = &bitmap->pix32(y);
+    bitmap_t &bitmap = *state->m_lcdbitmap;
+    UINT32 *scanline = &bitmap.pix32(y);
     int x = 0;
     int lcd = 0;
 
@@ -1332,11 +1332,11 @@ static void mcd212_draw_cursor(mcd212_regs_t *mcd212, UINT32 *scanline, int y)
 static void mcd212_draw_scanline(mcd212_regs_t *mcd212, int y)
 {
     running_machine &machine = mcd212->machine();
-    bitmap_t *bitmap = machine.generic.tmpbitmap;
+    bitmap_t &bitmap = *machine.generic.tmpbitmap;
     UINT8 plane_a_r[768], plane_a_g[768], plane_a_b[768];
     UINT8 plane_b_r[768], plane_b_g[768], plane_b_b[768];
     UINT32 out[768];
-    UINT32 *scanline = &bitmap->pix32(y);
+    UINT32 *scanline = &bitmap.pix32(y);
     int x;
 
     mcd212_process_vsr(mcd212, 0, plane_a_r, plane_a_g, plane_a_b);
@@ -1663,13 +1663,13 @@ VIDEO_START( cdimono1 )
 
 SCREEN_UPDATE( cdimono1 )
 {
-    copybitmap(bitmap, screen.machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, *screen.machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }
 
 SCREEN_UPDATE( cdimono1_lcd )
 {
     cdi_state *state = screen.machine().driver_data<cdi_state>();
-    copybitmap(bitmap, state->m_lcdbitmap, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, *state->m_lcdbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }

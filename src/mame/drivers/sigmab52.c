@@ -182,10 +182,10 @@ static SCREEN_UPDATE( jwildb52 )
 
 			src = hd63484_ram_r(hd63484, b & (HD63484_RAM_SIZE - 1), 0xffff);
 
-			bitmap->pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
-			bitmap->pix16(y, x + 1) = ((src & 0x00f0) >>  4) << 0;
-			bitmap->pix16(y, x + 2) = ((src & 0x0f00) >>  8) << 0;
-			bitmap->pix16(y, x + 3) = ((src & 0xf000) >> 12) << 0;
+			bitmap.pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
+			bitmap.pix16(y, x + 1) = ((src & 0x00f0) >>  4) << 0;
+			bitmap.pix16(y, x + 2) = ((src & 0x0f00) >>  8) << 0;
+			bitmap.pix16(y, x + 3) = ((src & 0xf000) >> 12) << 0;
 			b++;
 		}
 	}
@@ -210,10 +210,10 @@ if (!screen.machine().input().code_pressed(KEYCODE_O))
 
 				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(hd63484, 0xca/2, 0xffff) & 0x0fff) * 4)
 					{
-						bitmap->pix16(y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
-						bitmap->pix16(y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
-						bitmap->pix16(y, x + sx + 2) = ((src & 0x0f00) >>  8) << 0;
-						bitmap->pix16(y, x + sx + 3) = ((src & 0xf000) >> 12) << 0;
+						bitmap.pix16(y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
+						bitmap.pix16(y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
+						bitmap.pix16(y, x + sx + 2) = ((src & 0x0f00) >>  8) << 0;
+						bitmap.pix16(y, x + sx + 3) = ((src & 0xf000) >> 12) << 0;
 					}
 				b++;
 			}

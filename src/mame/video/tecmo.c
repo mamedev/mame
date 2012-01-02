@@ -169,7 +169,7 @@ WRITE8_HANDLER( tecmo_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
 {
 	tecmo_state *state = machine.driver_data<tecmo_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -251,8 +251,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 SCREEN_UPDATE( tecmo )
 {
 	tecmo_state *state = screen.machine().driver_data<tecmo_state>();
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0x100, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0x100, cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,2);
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,4);

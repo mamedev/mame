@@ -47,7 +47,7 @@ static SCREEN_UPDATE( minivadr )
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
-			bitmap->pix32(y, x) = pen;
+			bitmap.pix32(y, x) = pen;
 
 			data = data << 1;
 			x = x + 1;

@@ -23,8 +23,8 @@
 /* utilities */
 static void resample_argb_bitmap_average(UINT32 *dest, UINT32 drowpixels, UINT32 dwidth, UINT32 dheight, const UINT32 *source, UINT32 srowpixels, UINT32 swidth, UINT32 sheight, const render_color *color, UINT32 dx, UINT32 dy);
 static void resample_argb_bitmap_bilinear(UINT32 *dest, UINT32 drowpixels, UINT32 dwidth, UINT32 dheight, const UINT32 *source, UINT32 srowpixels, UINT32 swidth, UINT32 sheight, const render_color *color, UINT32 dx, UINT32 dy);
-static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasalpha);
-static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasalpha);
+static void copy_png_to_bitmap(bitmap_t &bitmap, const png_info *png, bool *hasalpha);
+static void copy_png_alpha_to_bitmap(bitmap_t &bitmap, const png_info *png, bool *hasalpha);
 
 
 
@@ -610,7 +610,7 @@ bitmap_t *render_load_png(emu_file &file, const char *dirname, const char *filen
 	{
 		bitmap = global_alloc(bitmap_t(png.width, png.height, BITMAP_FORMAT_ARGB32));
 		if (bitmap != NULL)
-			copy_png_to_bitmap(bitmap, &png, hasalpha);
+			copy_png_to_bitmap(*bitmap, &png, hasalpha);
 	}
 
 	/* alpha case */
@@ -619,7 +619,7 @@ bitmap_t *render_load_png(emu_file &file, const char *dirname, const char *filen
 		if (png.width == alphadest->width() && png.height == alphadest->height())
 		{
 			bitmap = alphadest;
-			copy_png_alpha_to_bitmap(bitmap, &png, hasalpha);
+			copy_png_alpha_to_bitmap(*bitmap, &png, hasalpha);
 		}
 	}
 
@@ -634,7 +634,7 @@ bitmap_t *render_load_png(emu_file &file, const char *dirname, const char *filen
     bitmap
 -------------------------------------------------*/
 
-static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasalpha)
+static void copy_png_to_bitmap(bitmap_t &bitmap, const png_info *png, bool *hasalpha)
 {
 	UINT8 accumalpha = 0xff;
 	UINT8 *src;
@@ -651,7 +651,7 @@ static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasa
 				/* determine alpha and expand to 32bpp */
 				UINT8 alpha = (*src < png->num_trans) ? png->trans[*src] : 0xff;
 				accumalpha &= alpha;
-				bitmap->pix32(y, x) = MAKE_ARGB(alpha, png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]);
+				bitmap.pix32(y, x) = MAKE_ARGB(alpha, png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]);
 			}
 	}
 
@@ -662,7 +662,7 @@ static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasa
 		src = png->image;
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src++)
-				bitmap->pix32(y, x) = MAKE_ARGB(0xff, *src, *src, *src);
+				bitmap.pix32(y, x) = MAKE_ARGB(0xff, *src, *src, *src);
 	}
 
 	/* handle 32bpp non-alpha case */
@@ -672,7 +672,7 @@ static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasa
 		src = png->image;
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src += 3)
-				bitmap->pix32(y, x) = MAKE_ARGB(0xff, src[0], src[1], src[2]);
+				bitmap.pix32(y, x) = MAKE_ARGB(0xff, src[0], src[1], src[2]);
 	}
 
 	/* handle 32bpp alpha case */
@@ -684,7 +684,7 @@ static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasa
 			for (x = 0; x < png->width; x++, src += 4)
 			{
 				accumalpha &= src[3];
-				bitmap->pix32(y, x) = MAKE_ARGB(src[3], src[0], src[1], src[2]);
+				bitmap.pix32(y, x) = MAKE_ARGB(src[3], src[0], src[1], src[2]);
 			}
 	}
 
@@ -699,7 +699,7 @@ static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasa
     to the alpha channel of a bitmap
 -------------------------------------------------*/
 
-static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasalpha)
+static void copy_png_alpha_to_bitmap(bitmap_t &bitmap, const png_info *png, bool *hasalpha)
 {
 	UINT8 accumalpha = 0xff;
 	UINT8 *src;
@@ -713,10 +713,10 @@ static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, bool
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src++)
 			{
-				rgb_t pixel = bitmap->pix32(y, x);
+				rgb_t pixel = bitmap.pix32(y, x);
 				UINT8 alpha = compute_brightness(MAKE_RGB(png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]));
 				accumalpha &= alpha;
-				bitmap->pix32(y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
+				bitmap.pix32(y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
 			}
 	}
 
@@ -728,9 +728,9 @@ static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, bool
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src++)
 			{
-				rgb_t pixel = bitmap->pix32(y, x);
+				rgb_t pixel = bitmap.pix32(y, x);
 				accumalpha &= *src;
-				bitmap->pix32(y, x) = MAKE_ARGB(*src, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
+				bitmap.pix32(y, x) = MAKE_ARGB(*src, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
 			}
 	}
 
@@ -742,10 +742,10 @@ static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, bool
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src += 3)
 			{
-				rgb_t pixel = bitmap->pix32(y, x);
+				rgb_t pixel = bitmap.pix32(y, x);
 				UINT8 alpha = compute_brightness(MAKE_RGB(src[0], src[1], src[2]));
 				accumalpha &= alpha;
-				bitmap->pix32(y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
+				bitmap.pix32(y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
 			}
 	}
 
@@ -757,10 +757,10 @@ static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, bool
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src += 4)
 			{
-				rgb_t pixel = bitmap->pix32(y, x);
+				rgb_t pixel = bitmap.pix32(y, x);
 				UINT8 alpha = compute_brightness(MAKE_RGB(src[0], src[1], src[2]));
 				accumalpha &= alpha;
-				bitmap->pix32(y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
+				bitmap.pix32(y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
 			}
 	}
 

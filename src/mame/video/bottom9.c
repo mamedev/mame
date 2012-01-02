@@ -80,7 +80,7 @@ SCREEN_UPDATE( bottom9 )
 	k052109_tilemap_update(state->m_k052109);
 
 	/* note: FIX layer is not used */
-	bitmap->fill(state->m_layer_colorbase[1], cliprect);
+	bitmap.fill(state->m_layer_colorbase[1], cliprect);
 //  if (state->m_video_enable)
 	{
 		k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 1, 1);

@@ -282,7 +282,7 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	namcos86_state *state = machine.driver_data<namcos86_state>();
 	const UINT8 *source = &state->m_spriteram[0x0800-0x20];	/* the last is NOT a sprite */
@@ -376,9 +376,9 @@ SCREEN_UPDATE( namcos86 )
 	set_scroll(screen.machine(), 2);
 	set_scroll(screen.machine(), 3);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap->fill(screen.machine().gfx[0]->color_base + 8*state->m_backcolor+7, cliprect);
+	bitmap.fill(screen.machine().gfx[0]->color_base + 8*state->m_backcolor+7, cliprect);
 
 	for (layer = 0;layer < 8;layer++)
 	{

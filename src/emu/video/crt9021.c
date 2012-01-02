@@ -222,6 +222,6 @@ WRITE_LINE_MEMBER( crt9021_device::vsync_w )
 //  update_screen - update screen
 //-------------------------------------------------
 
-void crt9021_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
+void crt9021_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 {
 }

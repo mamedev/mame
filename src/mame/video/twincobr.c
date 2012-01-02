@@ -458,7 +458,7 @@ static void twincobr_log_vram(running_machine &machine)
     Sprite Handlers
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int offs;
@@ -504,7 +504,7 @@ SCREEN_UPDATE( toaplan0 )
 
 	if (state->m_wardner_sprite_hack) wardner_sprite_priority_hack(screen.machine());
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0x0400);

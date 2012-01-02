@@ -182,7 +182,7 @@ VIDEO_START(pitnrun)
 	pitnrun_spotlights(machine);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -244,7 +244,7 @@ SCREEN_UPDATE( pitnrun )
 	}
 #endif
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	if(!(state->m_ha&4))
 		tilemap_draw(bitmap,cliprect,state->m_bg, 0,0);
@@ -277,7 +277,7 @@ SCREEN_UPDATE( pitnrun )
 	draw_sprites(screen.machine(),bitmap,myclip);
 
 	if(state->m_ha&4)
-		copybitmap_trans(bitmap,state->m_tmp_bitmap[state->m_ha&3],flip_screen_x_get(screen.machine()),flip_screen_y_get(screen.machine()),dx,dy,myclip, 1);
+		copybitmap_trans(bitmap,*state->m_tmp_bitmap[state->m_ha&3],flip_screen_x_get(screen.machine()),flip_screen_y_get(screen.machine()),dx,dy,myclip, 1);
 	tilemap_draw(bitmap,cliprect,state->m_fg, 0,0);
 	return 0;
 }

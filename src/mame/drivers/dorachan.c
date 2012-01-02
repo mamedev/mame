@@ -109,7 +109,7 @@ static SCREEN_UPDATE( dorachan )
 		for (i = 0; i < 8; i++)
 		{
 			UINT8 color = (data & 0x01) ? fore_color : RGB_BLACK;
-			bitmap->pix32(y, x) = pens[color];
+			bitmap.pix32(y, x) = pens[color];
 
 			data = data >> 1;
 			x = x + 1;

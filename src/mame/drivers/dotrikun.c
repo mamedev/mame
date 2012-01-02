@@ -78,10 +78,10 @@ static SCREEN_UPDATE( dotrikun )
 				pen_t pen = ((data >> (7 - i)) & 1) ? fore_pen : back_pen;
 
 				/* I think the video hardware doubles pixels, screen would be too small otherwise */
-				bitmap->pix32(y + 0, (x + 0) + i*2) = pen;
-				bitmap->pix32(y + 0, (x + 1) + i*2) = pen;
-				bitmap->pix32(y + 1, (x + 0) + i*2) = pen;
-				bitmap->pix32(y + 1, (x + 1) + i*2) = pen;
+				bitmap.pix32(y + 0, (x + 0) + i*2) = pen;
+				bitmap.pix32(y + 0, (x + 1) + i*2) = pen;
+				bitmap.pix32(y + 1, (x + 0) + i*2) = pen;
+				bitmap.pix32(y + 1, (x + 1) + i*2) = pen;
 			}
 		}
 	}

@@ -198,7 +198,7 @@ static INTERRUPT_GEN( whitestar_firq_interrupt )
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
 
-void dmd_put_pixel(bitmap_t *bitmap, int x, int y, int color)
+void dmd_put_pixel(bitmap_t &bitmap, int x, int y, int color)
 {
 	int midx = x * DMD_CHUNK_SIZE + DMD_CHUNK_SIZE/2;
 	int midy = y * DMD_CHUNK_SIZE + DMD_CHUNK_SIZE/2;
@@ -210,8 +210,8 @@ void dmd_put_pixel(bitmap_t *bitmap, int x, int y, int color)
 	// iterate over y
 	for (UINT32 y = 0; y <= width; y++)
 	{
-		UINT16 *d0 = &bitmap->pix16(midy - y);
-		UINT16 *d1 = &bitmap->pix16(midy + y);
+		UINT16 *d0 = &bitmap.pix16(midy - y);
+		UINT16 *d1 = &bitmap.pix16(midy + y);
 		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
 		INT32 left, right;
 
@@ -267,7 +267,7 @@ static PALETTE_INIT( whitestar )
 
 bool whitestar_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_mc6845->update(&bitmap, cliprect);
+	m_mc6845->update(bitmap, cliprect);
 	return 0;
 }
 

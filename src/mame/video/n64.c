@@ -66,7 +66,7 @@ void Processor::GetAlphaCvg(UINT8 *comb_alpha)
 
 /*****************************************************************************/
 
-void Processor::VideoUpdate(bitmap_t *bitmap)
+void Processor::VideoUpdate(bitmap_t &bitmap)
 {
 	switch(n64_vi_control & 0x3)
 	{
@@ -84,7 +84,7 @@ void Processor::VideoUpdate(bitmap_t *bitmap)
 	}
 }
 
-void Processor::VideoUpdate16(bitmap_t *bitmap)
+void Processor::VideoUpdate16(bitmap_t &bitmap)
 {
     int fsaa = (((n64_vi_control >> 8) & 3) < 2);
     int divot = (n64_vi_control >> 4) & 1;
@@ -124,7 +124,7 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 	{
 		for(int j = 0; j < vres; j++)
 		{
-			UINT32 *d = &bitmap->pix32(j);
+			UINT32 *d = &bitmap.pix32(j);
 
 			for(int i = 0; i < hres; i++)
 			{
@@ -218,7 +218,7 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 	}
 }
 
-void Processor::VideoUpdate32(bitmap_t *bitmap)
+void Processor::VideoUpdate32(bitmap_t &bitmap)
 {
     int gamma = (n64_vi_control >> 3) & 1;
     int gamma_dither = (n64_vi_control >> 2) & 1;
@@ -250,7 +250,7 @@ void Processor::VideoUpdate32(bitmap_t *bitmap)
 	{
 		for (int j = 0; j < vres; j++)
 		{
-			UINT32 *d = &bitmap->pix32(j);
+			UINT32 *d = &bitmap.pix32(j);
 			for (int i = 0; i < hres; i++)
 			{
 				UINT32 pix = *frame_buffer32++;
@@ -3314,7 +3314,7 @@ SCREEN_UPDATE(n64)
     {
         for (int j = 0; j <height; j++)
         {
-            UINT32 *d = &bitmap->pix32(j);
+            UINT32 *d = &bitmap.pix32(j);
             for (int i = 0; i < state->m_rdp.GetMiscState()->m_fb_width; i++)
             {
                 d[BYTE_XOR_BE(i)] = 0;

@@ -84,7 +84,7 @@ SCREEN_UPDATE( exzisus )
 	int gfx_num, gfx_attr, gfx_offs;
 
 	/* Is this correct ? */
-	bitmap->fill(1023, cliprect);
+	bitmap.fill(1023, cliprect);
 
 	/* ---------- 1st TC0010VCU ---------- */
 	sx = 0;

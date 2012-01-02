@@ -180,7 +180,7 @@ static VIDEO_START(igs_video)
 static SCREEN_UPDATE(igs_video)
 {
 	igspoker_state *state = screen.machine().driver_data<igspoker_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	// FIX: CSK227IT must have some way to disable background, or wrong gfx?
 	if (state->m_bg_enable) tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

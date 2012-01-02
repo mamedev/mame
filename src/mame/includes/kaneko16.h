@@ -165,7 +165,7 @@ WRITE16_HANDLER( kaneko16_layers_1_regs_w );
 READ16_HANDLER ( kaneko16_sprites_regs_r );
 WRITE16_HANDLER( kaneko16_sprites_regs_w );
 
-void kaneko16_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect);
+void kaneko16_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
 
 READ16_HANDLER ( kaneko16_bg15_select_r );
 WRITE16_HANDLER( kaneko16_bg15_select_w );

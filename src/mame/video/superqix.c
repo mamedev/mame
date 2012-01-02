@@ -165,7 +165,7 @@ WRITE8_HANDLER( superqix_0410_w )
 
 ***************************************************************************/
 
-static void pbillian_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void pbillian_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -193,7 +193,7 @@ static void pbillian_draw_sprites(running_machine &machine, bitmap_t *bitmap, co
 	}
 }
 
-static void superqix_draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
+static void superqix_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -238,7 +238,7 @@ SCREEN_UPDATE( superqix )
 {
 	superqix_state *state = screen.machine().driver_data<superqix_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	copybitmap_trans(bitmap,state->m_fg_bitmap[state->m_show_bitmap],flip_screen_get(screen.machine()),flip_screen_get(screen.machine()),0,0,cliprect,0);
+	copybitmap_trans(bitmap,*state->m_fg_bitmap[state->m_show_bitmap],flip_screen_get(screen.machine()),flip_screen_get(screen.machine()),0,0,cliprect,0);
 	superqix_draw_sprites(screen.machine(), bitmap,cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;

@@ -345,7 +345,7 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 
 	// now do the actual work
 	const rgb_t *palette = (machine().palette != NULL) ? palette_entry_list_adjusted(machine().palette) : NULL;
-	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, machine().total_colors(), palette);
+	png_error error = png_write_bitmap(file, &pnginfo, *m_snap_bitmap, machine().total_colors(), palette);
 	if (error != PNGERR_NONE)
 		mame_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
 
@@ -465,7 +465,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		{
 			// start the capture
 			int rate = (machine().primary_screen != NULL) ? ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE;
-			png_error pngerr = mng_capture_start(*m_mngfile, m_snap_bitmap, rate);
+			png_error pngerr = mng_capture_start(*m_mngfile, *m_snap_bitmap, rate);
 			if (pngerr != PNGERR_NONE)
 				return end_recording();
 
@@ -1244,7 +1244,7 @@ void video_manager::record_frame()
 		if (m_avifile != NULL)
 		{
 			// write the next frame
-			avi_error avierr = avi_append_video_frame_rgb32(m_avifile, m_snap_bitmap);
+			avi_error avierr = avi_append_video_frame_rgb32(m_avifile, *m_snap_bitmap);
 			if (avierr != AVIERR_NONE)
 			{
 				g_profiler.stop();
@@ -1267,7 +1267,7 @@ void video_manager::record_frame()
 
 			// write the next frame
 			const rgb_t *palette = (machine().palette != NULL) ? palette_entry_list_adjusted(machine().palette) : NULL;
-			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, machine().total_colors(), palette);
+			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, *m_snap_bitmap, machine().total_colors(), palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
 			{
@@ -1291,21 +1291,21 @@ void video_manager::record_frame()
     invalid palette index
 -------------------------------------------------*/
 
-void video_assert_out_of_range_pixels(running_machine &machine, bitmap_t *bitmap)
+void video_assert_out_of_range_pixels(running_machine &machine, bitmap_t &bitmap)
 {
 #ifdef MAME_DEBUG
 	int maxindex = palette_get_max_index(machine.palette);
 	int x, y;
 
 	// this only applies to indexed16 bitmaps
-	if (bitmap->format() != BITMAP_FORMAT_INDEXED16)
+	if (bitmap.format() != BITMAP_FORMAT_INDEXED16)
 		return;
 
 	// iterate over rows
-	for (y = 0; y < bitmap->height(); y++)
+	for (y = 0; y < bitmap.height(); y++)
 	{
-		UINT16 *rowbase = &bitmap->pix16(y);
-		for (x = 0; x < bitmap->width(); x++)
+		UINT16 *rowbase = &bitmap.pix16(y);
+		for (x = 0; x < bitmap.width(); x++)
 			assert(rowbase[x] < maxindex);
 	}
 #endif

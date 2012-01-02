@@ -319,31 +319,31 @@ SCREEN_UPDATE( dday )
 {
 	dday_state *state = screen.machine().driver_data<dday_state>();
 
-	tilemap_draw(state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(state->m_main_bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	tilemap_draw(state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(state->m_main_bitmap, cliprect, state->m_text_tilemap, 0, 0);
+	tilemap_draw(*state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(*state->m_main_bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	tilemap_draw(*state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(*state->m_main_bitmap, cliprect, state->m_text_tilemap, 0, 0);
 
 	if (state->m_sl_enable)
 	{
 		/* apply shadow */
 		int x, y;
 
-		bitmap_t *sl_bitmap = tilemap_get_pixmap(state->m_sl_tilemap);
+		bitmap_t &sl_bitmap = tilemap_get_pixmap(state->m_sl_tilemap);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
 				UINT16 src_pixel = state->m_main_bitmap->pix16(y, x);
 
-				if (sl_bitmap->pix16(y, x) == 0xff)
+				if (sl_bitmap.pix16(y, x) == 0xff)
 					src_pixel += screen.machine().total_colors();
 
-				bitmap->pix16(y, x) = src_pixel;
+				bitmap.pix16(y, x) = src_pixel;
 			}
 	}
 	else
-		copybitmap(bitmap, state->m_main_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, *state->m_main_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

@@ -158,16 +158,16 @@ static SCREEN_UPDATE( vega )
 		for (x=0;x < 320/4;x++)
 		{
 			color = state->m_vega_vram[count + (0x14000/4) * (state->m_vega_vbuffer ^ 1)] & 0xff;
-			bitmap->pix16(y, x*4 + 3) = color;
+			bitmap.pix16(y, x*4 + 3) = color;
 
 			color = (state->m_vega_vram[count + (0x14000/4) * (state->m_vega_vbuffer ^ 1)] & 0xff00) >> 8;
-			bitmap->pix16(y, x*4 + 2) = color;
+			bitmap.pix16(y, x*4 + 2) = color;
 
 			color = (state->m_vega_vram[count + (0x14000/4) * (state->m_vega_vbuffer ^ 1)] & 0xff0000) >> 16;
-			bitmap->pix16(y, x*4 + 1) = color;
+			bitmap.pix16(y, x*4 + 1) = color;
 
 			color = (state->m_vega_vram[count + (0x14000/4) * (state->m_vega_vbuffer ^ 1)] & 0xff000000) >> 24;
-			bitmap->pix16(y, x*4 + 0) = color;
+			bitmap.pix16(y, x*4 + 0) = color;
 
 			count++;
 		}

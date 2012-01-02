@@ -158,14 +158,14 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap->fill(0, cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 0x1)
 	{
 		int x = 0;
 		int y = 0;
-		copyscrollbitmap_trans(bitmap, state->m_bg15_bitmap,
+		copyscrollbitmap_trans(bitmap, *state->m_bg15_bitmap,
 							   1, &x, 1, &y,
 							   cliprect,0x4200 + 0);
 	}
@@ -180,7 +180,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int x = - ( *state->m_bg8_scrollx[0] + 0x200 - 0x0f5 );
 		int y = - ( *state->m_bg8_scrolly[0] + 0x200 - 0x1be );
-		copyscrollbitmap_trans(bitmap, state->m_bg8_bitmap[0],
+		copyscrollbitmap_trans(bitmap, *state->m_bg8_bitmap[0],
 							   1, &x, 1, &y,
 							   cliprect,0x4000 + 0);
 	}
@@ -189,7 +189,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		int x = - ( *state->m_bg8_scrollx[1] + 0x200 - 0x0f5 );
 		int y = - ( *state->m_bg8_scrolly[1] + 0x200 - 0x1be );
-		copyscrollbitmap_trans(bitmap, state->m_bg8_bitmap[1],
+		copyscrollbitmap_trans(bitmap, *state->m_bg8_bitmap[1],
 							   1, &x, 1, &y,
 							   cliprect,0x4000 + 0);
 	}

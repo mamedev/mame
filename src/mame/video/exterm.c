@@ -67,12 +67,12 @@ void exterm_from_shiftreg_slave(address_space *space, UINT32 address, UINT16 *sh
  *
  *************************************/
 
-void exterm_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void exterm_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	exterm_state *state = screen.machine().driver_data<exterm_state>();
 	UINT16 *bgsrc = &state->m_master_videoram[(params->rowaddr << 8) & 0xff00];
 	UINT16 *fgsrc = NULL;
-	UINT16 *dest = &bitmap->pix16(scanline);
+	UINT16 *dest = &bitmap.pix16(scanline);
 	tms34010_display_params fgparams;
 	int coladdr = params->coladdr;
 	int fgcoladdr = 0;

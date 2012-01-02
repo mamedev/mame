@@ -138,7 +138,7 @@ static void get_starfield_pens(spacefb_state *state, pen_t *pens)
 }
 
 
-static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_starfield(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	spacefb_state *state = screen.machine().driver_data<spacefb_state>();
 	int y;
@@ -165,16 +165,16 @@ static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectan
 
 		for (x = SPACEFB_HBEND; x < SPACEFB_HBSTART; x++)
 		{
-			if (state->m_object_present_map[(y * bitmap->width()) + x] == 0)
+			if (state->m_object_present_map[(y * bitmap.width()) + x] == 0)
 			{
 				/* draw the star - the 4 possible values come from the effect of the two XOR gates */
 				if (((state->m_star_shift_reg & 0x1c0ff) == 0x0c0b7) ||
 					((state->m_star_shift_reg & 0x1c0ff) == 0x0c0d7) ||
 					((state->m_star_shift_reg & 0x1c0ff) == 0x0c0bb) ||
 					((state->m_star_shift_reg & 0x1c0ff) == 0x0c0db))
-					bitmap->pix32(y, x) = pens[(state->m_star_shift_reg >> 8) & 0x3f];
+					bitmap.pix32(y, x) = pens[(state->m_star_shift_reg >> 8) & 0x3f];
 				else
-					bitmap->pix32(y, x) = pens[0];
+					bitmap.pix32(y, x) = pens[0];
 			}
 
 			shift_star_generator(state);
@@ -248,7 +248,7 @@ static void get_sprite_pens(running_machine &machine, pen_t *pens)
 }
 
 
-static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap_t *bitmap, const rectangle &cliprect, int flip)
+static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap_t &bitmap, const rectangle &cliprect, int flip)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
@@ -283,11 +283,11 @@ static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap
 					else
 						dx = x * 2;
 
-					bitmap->pix32(dy, dx + 0) = pen;
-					bitmap->pix32(dy, dx + 1) = pen;
+					bitmap.pix32(dy, dx + 0) = pen;
+					bitmap.pix32(dy, dx + 1) = pen;
 
-					state->m_object_present_map[(dy * bitmap->width()) + dx + 0] = 1;
-					state->m_object_present_map[(dy * bitmap->width()) + dx + 1] = 1;
+					state->m_object_present_map[(dy * bitmap.width()) + dx + 0] = 1;
+					state->m_object_present_map[(dy * bitmap.width()) + dx + 1] = 1;
 				}
 
 				x = x + 1;
@@ -300,7 +300,7 @@ static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap
 }
 
 
-static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitmap_t *bitmap, const rectangle &cliprect, int flip)
+static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitmap_t &bitmap, const rectangle &cliprect, int flip)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
@@ -341,11 +341,11 @@ static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitm
 				data = ((data1 << 1) & 0x02) | (data2 & 0x01);
 				pen = pens[color_base | data];
 
-				bitmap->pix32(dy, dx + 0) = pen;
-				bitmap->pix32(dy, dx + 1) = pen;
+				bitmap.pix32(dy, dx + 0) = pen;
+				bitmap.pix32(dy, dx + 1) = pen;
 
-				state->m_object_present_map[(dy * bitmap->width()) + dx + 0] = (data != 0);
-				state->m_object_present_map[(dy * bitmap->width()) + dx + 1] = (data != 0);
+				state->m_object_present_map[(dy * bitmap.width()) + dx + 0] = (data != 0);
+				state->m_object_present_map[(dy * bitmap.width()) + dx + 1] = (data != 0);
 
 				x = x + 1;
 				data1 = data1 >> 1;
@@ -358,7 +358,7 @@ static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitm
 }
 
 
-static void draw_objects(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_objects(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	pen_t sprite_pens[NUM_SPRITE_PENS];
@@ -372,7 +372,7 @@ static void draw_objects(running_machine &machine, bitmap_t *bitmap, const recta
 
 	get_sprite_pens(machine, sprite_pens);
 
-	memset(state->m_object_present_map, 0, bitmap->width() * bitmap->height());
+	memset(state->m_object_present_map, 0, bitmap.width() * bitmap.height());
 
 	while (1)
 	{

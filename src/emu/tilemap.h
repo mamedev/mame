@@ -505,10 +505,10 @@ int tilemap_get_scrolly(tilemap_t *tmap, int col);
 /* ----- internal map access ----- */
 
 /* return a pointer to the (updated) internal pixmap for a tilemap */
-bitmap_t *tilemap_get_pixmap(tilemap_t *tmap);
+bitmap_t &tilemap_get_pixmap(tilemap_t *tmap);
 
 /* return a pointer to the (updated) internal flagsmap for a tilemap */
-bitmap_t *tilemap_get_flagsmap(tilemap_t *tmap);
+bitmap_t &tilemap_get_flagsmap(tilemap_t *tmap);
 
 /* return a pointer to the (updated) internal per-tile flags for a tilemap */
 UINT8 *tilemap_get_tile_flags(tilemap_t *tmap);
@@ -518,11 +518,11 @@ UINT8 *tilemap_get_tile_flags(tilemap_t *tmap);
 /* ----- tilemap rendering ----- */
 
 /* draw a tilemap to the destination with clipping; pixels apply priority/priority_mask to the priority bitmap */
-void tilemap_draw_primask(bitmap_t *dest, const rectangle &cliprect, tilemap_t *tmap, UINT32 flags, UINT8 priority, UINT8 priority_mask);
+void tilemap_draw_primask(bitmap_t &dest, const rectangle &cliprect, tilemap_t *tmap, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 
 /* draw a tilemap to the destination with clipping and arbitrary rotate/zoom; */
 /* pixels apply priority/priority_mask to the priority bitmap */
-void tilemap_draw_roz_primask(bitmap_t *dest, const rectangle &cliprect, tilemap_t *tmap,
+void tilemap_draw_roz_primask(bitmap_t &dest, const rectangle &cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 
@@ -537,7 +537,7 @@ int tilemap_count(running_machine &machine);
 void tilemap_size_by_index(running_machine &machine, int number, UINT32 *width, UINT32 *height);
 
 /* render an indexed tilemap with fixed characteristics (no priority) */
-void tilemap_draw_by_index(running_machine &machine, bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly);
+void tilemap_draw_by_index(running_machine &machine, bitmap_t &dest, int number, UINT32 scrollx, UINT32 scrolly);
 
 
 
@@ -595,7 +595,7 @@ INLINE void tilemap_map_pen_to_layer(tilemap_t *tmap, int group, pen_t pen, UINT
     tilemap_draw_primask
 -------------------------------------------------*/
 
-INLINE void tilemap_draw(bitmap_t *dest, const rectangle &cliprect, tilemap_t *tmap, UINT32 flags, UINT8 priority)
+INLINE void tilemap_draw(bitmap_t &dest, const rectangle &cliprect, tilemap_t *tmap, UINT32 flags, UINT8 priority)
 {
 	tilemap_draw_primask(dest, cliprect, tmap, flags, priority, 0xff);
 }
@@ -606,7 +606,7 @@ INLINE void tilemap_draw(bitmap_t *dest, const rectangle &cliprect, tilemap_t *t
     tilemap_draw_roz_primask
 -------------------------------------------------*/
 
-INLINE void tilemap_draw_roz(bitmap_t *dest, const rectangle &cliprect, tilemap_t *tmap,
+INLINE void tilemap_draw_roz(bitmap_t &dest, const rectangle &cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority)
 {

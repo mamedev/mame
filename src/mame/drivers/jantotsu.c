@@ -159,7 +159,7 @@ static SCREEN_UPDATE(jantotsu)
 					color |= (((state->m_bitmap[count + pen_i*0x2000]) >> (7 - i)) & 1) << pen_i;
 
 				if ((x + i) <= screen.visible_area().max_x && (y + 0) < screen.visible_area().max_y)
-					bitmap->pix32(y, x + i) = screen.machine().pens[color];
+					bitmap.pix32(y, x + i) = screen.machine().pens[color];
 			}
 
 			count++;

@@ -19,7 +19,7 @@ SCREEN_UPDATE( taxidriv )
 
 	if (state->m_bghide)
 	{
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 
 
 		/* kludge to fix scroll after death */
@@ -65,7 +65,7 @@ SCREEN_UPDATE( taxidriv )
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
-						bitmap->pix16(sy, sx) = color;
+						bitmap.pix16(sy, sx) = color;
 				}
 			}
 		}
@@ -83,7 +83,7 @@ SCREEN_UPDATE( taxidriv )
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
-						bitmap->pix16(sy, sx) = color;
+						bitmap.pix16(sy, sx) = color;
 				}
 			}
 		}
@@ -101,7 +101,7 @@ SCREEN_UPDATE( taxidriv )
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
-						bitmap->pix16(sy, sx) = color;
+						bitmap.pix16(sy, sx) = color;
 				}
 			}
 		}
@@ -128,7 +128,7 @@ SCREEN_UPDATE( taxidriv )
 			color = (state->m_vram4[offs/4]>>(2*(offs&3)))&0x03;
 			if (color)
 			{
-				bitmap->pix16(sy, sx) = 2 * color;
+				bitmap.pix16(sy, sx) = 2 * color;
 			}
 		}
 	}

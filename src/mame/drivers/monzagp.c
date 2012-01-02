@@ -92,7 +92,7 @@ static SCREEN_UPDATE(monzagp)
 		fclose(p);
 	}
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 	for(y=0;y<256;y++)
 	{
 		for(x=0;x<256;x++)

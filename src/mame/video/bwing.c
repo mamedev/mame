@@ -247,7 +247,7 @@ VIDEO_START( bwing )
 //****************************************************************************
 // Realtime
 
-static void draw_sprites( running_machine &machine, bitmap_t *bmp, const rectangle &clip, UINT8 *ram, int pri )
+static void draw_sprites( running_machine &machine, bitmap_t &bmp, const rectangle &clip, UINT8 *ram, int pri )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
 	int attrib, fx, fy, code, x, y, color, i;
@@ -316,7 +316,7 @@ SCREEN_UPDATE( bwing )
 		tilemap_draw(bitmap, cliprect, state->m_bgmap, 0, 0);
 	}
 	else
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	// draw low priority sprites
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0);

@@ -156,10 +156,10 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap);
 png_error png_expand_buffer_8bit(png_info *p);
 
 png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text);
-png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t *bitmap, int palette_length, const UINT32 *palette);
+png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const UINT32 *palette);
 
-png_error mng_capture_start(core_file *fp, bitmap_t *bitmap, double rate);
-png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t *bitmap, int palette_length, const UINT32 *palette);
+png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate);
+png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const UINT32 *palette);
 png_error mng_capture_stop(core_file *fp);
 
 #endif	/* __PNG_H__ */

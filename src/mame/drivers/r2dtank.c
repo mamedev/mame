@@ -366,7 +366,7 @@ static MC6845_UPDATE_ROW( update_row )
 			}
 
 			color = bit ? fore_color : RGB_BLACK;
-			bitmap->pix32(y, x) = pens[color];
+			bitmap.pix32(y, x) = pens[color];
 
 			x = x + 1;
 		}

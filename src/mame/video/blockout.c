@@ -116,7 +116,7 @@ SCREEN_UPDATE( blockout )
 	int x, y;
 	pen_t color = 512;
 
-	copybitmap(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
 
 	for (y = 0; y < 256; y++)
 	{
@@ -126,14 +126,14 @@ SCREEN_UPDATE( blockout )
 
 			if (d)
 			{
-				if (d & 0x80) bitmap->pix16(y, x + 0) = color;
-				if (d & 0x40) bitmap->pix16(y, x + 1) = color;
-				if (d & 0x20) bitmap->pix16(y, x + 2) = color;
-				if (d & 0x10) bitmap->pix16(y, x + 3) = color;
-				if (d & 0x08) bitmap->pix16(y, x + 4) = color;
-				if (d & 0x04) bitmap->pix16(y, x + 5) = color;
-				if (d & 0x02) bitmap->pix16(y, x + 6) = color;
-				if (d & 0x01) bitmap->pix16(y, x + 7) = color;
+				if (d & 0x80) bitmap.pix16(y, x + 0) = color;
+				if (d & 0x40) bitmap.pix16(y, x + 1) = color;
+				if (d & 0x20) bitmap.pix16(y, x + 2) = color;
+				if (d & 0x10) bitmap.pix16(y, x + 3) = color;
+				if (d & 0x08) bitmap.pix16(y, x + 4) = color;
+				if (d & 0x04) bitmap.pix16(y, x + 5) = color;
+				if (d & 0x02) bitmap.pix16(y, x + 6) = color;
+				if (d & 0x01) bitmap.pix16(y, x + 7) = color;
 			}
 		}
 	}

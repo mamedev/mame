@@ -38,6 +38,6 @@ READ32_DEVICE_HANDLER(nwk_voodoo_1_r);
 WRITE32_DEVICE_HANDLER(nwk_voodoo_0_w);
 WRITE32_DEVICE_HANDLER(nwk_voodoo_1_w);
 
-void draw_7segment_led(bitmap_t *bitmap, int x, int y, UINT8 value);
+void draw_7segment_led(bitmap_t &bitmap, int x, int y, UINT8 value);
 
 #endif

@@ -165,7 +165,7 @@ static const UINT8 hw_sprite[16] =
 	0x22, 0x22, 0x22, 0x22, 0x22, 0x11, 0x22, 0x22
 };
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	kingdrby_state *state = machine.driver_data<kingdrby_state>();
 	UINT8 *spriteram = state->m_spriteram;

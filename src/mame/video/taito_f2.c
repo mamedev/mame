@@ -286,13 +286,13 @@ WRITE16_HANDLER( koshien_spritebank_w )
 	state->m_spritebank_buffered[7] = state->m_spritebank_buffered[6] + 0x400;
 }
 
-static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_t *dest_bmp, const rectangle &clip, const gfx_element *gfx,
+static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_t &dest_bmp, const rectangle &clip, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-	bitmap_t *priority_bitmap = gfx->machine().priority_bitmap;
+	bitmap_t &priority_bitmap = gfx->machine().priority_bitmap;
 	int sprite_screen_height = (scaley * gfx->height + 0x8000) >> 16;
 	int sprite_screen_width = (scalex * gfx->width + 0x8000) >> 16;
 
@@ -363,8 +363,8 @@ static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_t *de
 			for (y = sy; y < ey; y++)
 			{
 				const UINT8 *source = source_base + (y_index >> 16) * gfx->line_modulo;
-				UINT16 *dest = &dest_bmp->pix16(y);
-				UINT8 *pri = &priority_bitmap->pix8(y);
+				UINT16 *dest = &dest_bmp.pix16(y);
+				UINT8 *pri = &priority_bitmap.pix8(y);
 
 				int x, x_index = x_index_base;
 				for (x = sx; x < ex; x++)
@@ -432,7 +432,7 @@ static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_t *de
 	}
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int *primasks, int uses_tc360_mixer )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int *primasks, int uses_tc360_mixer )
 {
 	/*
         Sprite format:
@@ -982,8 +982,8 @@ SCREEN_UPDATE( taitof2_ssi )
 
 	/* SSI only uses sprites, the tilemap registers are not even initialized.
        (they are in Majestic 12, but the tilemaps are not used anyway) */
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, NULL, 0);
 	return 0;
 }
@@ -997,8 +997,8 @@ SCREEN_UPDATE( taitof2_yesnoj )
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);	/* wrong color? */
 	draw_sprites(screen.machine(), bitmap, cliprect, NULL, 0);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->m_tc0100scn), 0, 0);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->m_tc0100scn) ^ 1, 0, 0);
@@ -1015,8 +1015,8 @@ SCREEN_UPDATE( taitof2 )
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);	/* wrong color? */
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->m_tc0100scn), 0, 0);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->m_tc0100scn) ^ 1, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, NULL, 0);
@@ -1048,8 +1048,8 @@ SCREEN_UPDATE( taitof2_pri )
 
 	state->m_spriteblendmode = tc0360pri_r(state->m_tc0360pri, 0) & 0xc0;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);	/* wrong color? */
 
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[0], 0, 1);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);
@@ -1061,7 +1061,7 @@ SCREEN_UPDATE( taitof2_pri )
 
 
 
-static void draw_roz_layer( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT32 priority)
+static void draw_roz_layer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32 priority)
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
@@ -1110,8 +1110,8 @@ SCREEN_UPDATE( taitof2_pri_roz )
 
 	state->m_spriteblendmode = tc0360pri_r(state->m_tc0360pri, 0) & 0xc0;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);	/* wrong color? */
 
 	drawn = 0;
 	for (i = 0; i < 16; i++)
@@ -1173,8 +1173,8 @@ SCREEN_UPDATE( taitof2_thundfox )
 	spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
 	spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);	/* wrong color? */
 
 	/*
     TODO: This isn't the correct way to handle the priority. At the moment of
@@ -1314,8 +1314,8 @@ SCREEN_UPDATE( taitof2_metalb )
 
 	state->m_spriteblendmode = tc0360pri_r(state->m_tc0360pri, 0) & 0xc0;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[1], 0, 2);
@@ -1362,8 +1362,8 @@ SCREEN_UPDATE( taitof2_deadconx )
 	spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
 	spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
 	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[1], 0, 2);

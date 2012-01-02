@@ -76,7 +76,7 @@ WRITE16_HANDLER( ohmygod_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	ohmygod_state *state = machine.driver_data<ohmygod_state>();
 	UINT16 *spriteram = state->m_spriteram;

@@ -332,7 +332,7 @@ void cyberbal_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-static UINT32 update_one_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int index)
+static UINT32 update_one_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int index)
 {
 	cyberbal_state *state = screen.machine().driver_data<cyberbal_state>();
 	atarimo_rect_list rectlist;
@@ -361,7 +361,7 @@ static UINT32 update_one_screen(screen_device &screen, bitmap_t *bitmap, const r
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
-			UINT16 *pf = &bitmap->pix16(y) + mooffset;
+			UINT16 *pf = &bitmap.pix16(y) + mooffset;
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{

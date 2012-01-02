@@ -339,12 +339,12 @@ WRITE16_HANDLER( artmagic_blitter_w )
  *
  *************************************/
 
-void artmagic_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void artmagic_scanline(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	artmagic_state *state = screen.machine().driver_data<artmagic_state>();
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
 	UINT16 *vram = address_to_vram(state, &offset);
-	UINT32 *dest = &bitmap->pix32(scanline);
+	UINT32 *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;

@@ -1107,7 +1107,7 @@ SCREEN_UPDATE( victory )
 	/* blend the bitmaps and do collision detection */
 	for (y = 0; y < 256; y++)
 	{
-		UINT16 *scanline = &bitmap->pix16(y);
+		UINT16 *scanline = &bitmap.pix16(y);
 		UINT8 sy = state->m_scrolly + y;
 		UINT8 *fg = &state->m_fgbitmap[y * 256];
 		UINT8 *bg = &state->m_bgbitmap[sy * 256];

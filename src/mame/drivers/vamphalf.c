@@ -400,7 +400,7 @@ or
 Offset+3
 -------x xxxxxxxx X offs
 */
-static void draw_sprites(screen_device &screen, bitmap_t *bitmap)
+static void draw_sprites(screen_device &screen, bitmap_t &bitmap)
 {
 	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -474,7 +474,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap)
 	}
 }
 
-static void draw_sprites_aoh(screen_device &screen, bitmap_t *bitmap)
+static void draw_sprites_aoh(screen_device &screen, bitmap_t &bitmap)
 {
 	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -531,14 +531,14 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_t *bitmap)
 
 static SCREEN_UPDATE( common )
 {
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 	draw_sprites(screen, bitmap);
 	return 0;
 }
 
 static SCREEN_UPDATE( aoh )
 {
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 	draw_sprites_aoh(screen, bitmap);
 	return 0;
 }

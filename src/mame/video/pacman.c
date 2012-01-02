@@ -217,7 +217,7 @@ SCREEN_UPDATE( pacman )
 {
 	pacman_state *state = screen.machine().driver_data<pacman_state>();
 	if (state->m_bgpriority != 0)
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 	else
 		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 

@@ -63,7 +63,7 @@ SCREEN_UPDATE(bishi)
 
 	konami_sortlayers4(layers, layerpri);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	for (i = 0; i < 4; i++)
 	{

@@ -191,7 +191,7 @@ void deco_bac06_device::device_reset()
 
 
 void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
-								bitmap_t *bitmap,
+								bitmap_t &bitmap,
 								const rectangle &cliprect,
 								tilemap_t *tilemap_ptr,
 								const UINT16 *rowscroll_ptr,
@@ -205,8 +205,8 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 								UINT16 colpricondition
 								)
 {
-	const bitmap_t *src_bitmap = tilemap_get_pixmap(tilemap_ptr);
-	const bitmap_t *flags_bitmap = tilemap_get_flagsmap(tilemap_ptr);
+	const bitmap_t &src_bitmap = tilemap_get_pixmap(tilemap_ptr);
+	const bitmap_t &flags_bitmap = tilemap_get_flagsmap(tilemap_ptr);
 	int x, y, p, colpri;
 	int column_offset=0, src_x=0, src_y=0;
 	UINT32 scrollx = 0;
@@ -229,11 +229,8 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 		col_scroll_enabled = (colscroll_ptr && (control0[0]&0x8));
 	}
 
-	if (!src_bitmap)
-		return;
-
-	width_mask = src_bitmap->width() - 1;
-	height_mask = src_bitmap->height() - 1;
+	width_mask = src_bitmap.width() - 1;
+	height_mask = src_bitmap.height() - 1;
 
 	/* Column scroll & row scroll may per applied per pixel, there are
     shift registers for each which control the granularity of the row/col
@@ -254,7 +251,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
     */
 
 	if (flip_screen_get(machine))
-		src_y = (src_bitmap->height() - 256) - scrolly;
+		src_y = (src_bitmap.height() - 256) - scrolly;
 	else
 		src_y = scrolly;
 
@@ -265,14 +262,14 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 			src_x=scrollx;
 
 		if (flip_screen_get(machine))
-			src_x=(src_bitmap->width() - 256) - src_x;
+			src_x=(src_bitmap.width() - 256) - src_x;
 
 		for (x=0; x<=cliprect.max_x; x++) {
 			if (col_scroll_enabled)
 				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2]&0xf))&(0x3f>>(control1[2]&0xf))];
 
-			p = src_bitmap->pix16((src_y + column_offset)&height_mask, src_x&width_mask);
-			colpri =  flags_bitmap->pix8((src_y + column_offset)&height_mask, src_x&width_mask)&0xf;
+			p = src_bitmap.pix16((src_y + column_offset)&height_mask, src_x&width_mask);
+			colpri =  flags_bitmap.pix8((src_y + column_offset)&height_mask, src_x&width_mask)&0xf;
 
 			src_x++;
 			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&m_bppmask))
@@ -281,14 +278,14 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 
 				if ((p&penmask)==pencondition)
 					if((colpri&colprimask)==colpricondition)
-						bitmap->pix16(y, x) = p+(colpri&m_gfxcolmask)*m_bppmult;
+						bitmap.pix16(y, x) = p+(colpri&m_gfxcolmask)*m_bppmult;
 			}
 		}
 		src_y++;
 	}
 }
 
-void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_t *bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
+void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_t &bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
 {
 	tilemap_t* tm = 0;
 
@@ -322,7 +319,7 @@ void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_t *bi
 }
 
 // used for pocket gal bootleg, which doesn't set registers properly and simply expects a fixed size tilemap.
-void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_t *bitmap,const rectangle &cliprect,int flags, int mode, int type)
+void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_t &bitmap,const rectangle &cliprect,int flags, int mode, int type)
 {
 	tilemap_t* tm = 0;
 	if (!mode) tm = pf8x8_tilemap[type];

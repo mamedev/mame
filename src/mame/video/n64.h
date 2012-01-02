@@ -574,7 +574,7 @@ class Processor
 		bool			ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dzpix);
 
 		// Fullscreen update-related
-		void			VideoUpdate(bitmap_t *bitmap);
+		void			VideoUpdate(bitmap_t &bitmap);
 
 		// Commands
 		void		CmdInvalid(UINT32 w1, UINT32 w2);
@@ -754,8 +754,8 @@ class Processor
 		static const ZDecompressEntry z_dec_table[8];
 
 		// Internal screen-update functions
-		void			VideoUpdate16(bitmap_t *bitmap);
-		void			VideoUpdate32(bitmap_t *bitmap);
+		void			VideoUpdate16(bitmap_t &bitmap);
+		void			VideoUpdate32(bitmap_t &bitmap);
 
 		typedef void (*Command)(UINT32 w1, UINT32 w2);
 

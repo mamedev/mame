@@ -118,12 +118,12 @@ SCREEN_EOF( sprint4 )
 
 		rect &= screen.machine().primary_screen->visible_area();
 
-		tilemap_draw(state->m_helper, rect, state->m_playfield, 0, 0);
+		tilemap_draw(*state->m_helper, rect, state->m_playfield, 0, 0);
 
 		if (i & 1)
 			bank = 32;
 
-		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+		drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1],
 			(code >> 3) | bank,
 			4,
 			0, 0,

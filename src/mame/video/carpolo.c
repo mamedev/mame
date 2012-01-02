@@ -167,7 +167,7 @@ VIDEO_START( carpolo )
  *
  *************************************/
 
-static void draw_alpha_line(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+static void draw_alpha_line(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 							int alpha_line, int video_line)
 {
 	carpolo_state *state = machine.driver_data<carpolo_state>();
@@ -198,7 +198,7 @@ static void remap_sprite_code(running_machine &machine, int bank, int code, int 
 }
 
 
-static void draw_sprite(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+static void draw_sprite(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 						UINT8 x, UINT8 y, int bank, int code, int col)
 {
 	int remapped_code, flipy;
@@ -227,10 +227,10 @@ SCREEN_UPDATE( carpolo )
 	/* draw the playfield elements in the correct priority order */
 
 	/* score area - position determined by bit 4 of the vertical timing PROM */
-	bitmap->plot_box(0,0,RIGHT_BORDER+1,TOP_BORDER,BACKGROUND_PEN);
+	bitmap.plot_box(0,0,RIGHT_BORDER+1,TOP_BORDER,BACKGROUND_PEN);
 
 	/* field */
-	bitmap->plot_box(0,TOP_BORDER,RIGHT_BORDER+1,BOTTOM_BORDER-TOP_BORDER+1,FIELD_PEN);
+	bitmap.plot_box(0,TOP_BORDER,RIGHT_BORDER+1,BOTTOM_BORDER-TOP_BORDER+1,FIELD_PEN);
 
 	/* car 1 */
 	draw_sprite(screen.machine(), bitmap, cliprect,
@@ -238,10 +238,10 @@ SCREEN_UPDATE( carpolo )
 				0, state->m_spriteram[0x0c] & 0x0f, CAR1_COLOR);
 
 	/* border - position determined by bit 4 and 7 of the vertical timing PROM */
-	bitmap->plot_box(0,TOP_BORDER,   RIGHT_BORDER+1,1,LINE_PEN);
-	bitmap->plot_box(0,BOTTOM_BORDER,RIGHT_BORDER+1,1,LINE_PEN);
-	bitmap->plot_box(LEFT_BORDER,TOP_BORDER, 1,BOTTOM_BORDER-TOP_BORDER+1,LINE_PEN);
-	bitmap->plot_box(RIGHT_BORDER,TOP_BORDER,1,BOTTOM_BORDER-TOP_BORDER+1,LINE_PEN);
+	bitmap.plot_box(0,TOP_BORDER,   RIGHT_BORDER+1,1,LINE_PEN);
+	bitmap.plot_box(0,BOTTOM_BORDER,RIGHT_BORDER+1,1,LINE_PEN);
+	bitmap.plot_box(LEFT_BORDER,TOP_BORDER, 1,BOTTOM_BORDER-TOP_BORDER+1,LINE_PEN);
+	bitmap.plot_box(RIGHT_BORDER,TOP_BORDER,1,BOTTOM_BORDER-TOP_BORDER+1,LINE_PEN);
 
 	/* car 4 */
 	draw_sprite(screen.machine(), bitmap, cliprect,
@@ -363,12 +363,12 @@ static int check_sprite_sprite_collision(running_machine &machine,
 		state->m_sprite_sprite_collision_bitmap1->fill(0);
 		state->m_sprite_sprite_collision_bitmap2->fill(0);
 
-		drawgfx_opaque(state->m_sprite_sprite_collision_bitmap1,state->m_sprite_sprite_collision_bitmap1->cliprect(),machine.gfx[0],
+		drawgfx_opaque(*state->m_sprite_sprite_collision_bitmap1,state->m_sprite_sprite_collision_bitmap1->cliprect(),machine.gfx[0],
 				code1,0,
 				0,flipy1,
 				x1,y1);
 
-		drawgfx_opaque(state->m_sprite_sprite_collision_bitmap2,state->m_sprite_sprite_collision_bitmap2->cliprect(),machine.gfx[0],
+		drawgfx_opaque(*state->m_sprite_sprite_collision_bitmap2,state->m_sprite_sprite_collision_bitmap2->cliprect(),machine.gfx[0],
 				code2,0,
 				0,flipy2,
 				x2,y2);
@@ -417,12 +417,12 @@ static int check_sprite_left_goal_collision(running_machine &machine, int x1, in
 		state->m_sprite_goal_collision_bitmap1->fill(0);
 		state->m_sprite_goal_collision_bitmap2->fill(0);
 
-		drawgfx_opaque(state->m_sprite_goal_collision_bitmap1,state->m_sprite_goal_collision_bitmap1->cliprect(),machine.gfx[0],
+		drawgfx_opaque(*state->m_sprite_goal_collision_bitmap1,state->m_sprite_goal_collision_bitmap1->cliprect(),machine.gfx[0],
 				code1,0,
 				0,flipy1,
 				x1,y1);
 
-		drawgfxzoom_transpen(state->m_sprite_goal_collision_bitmap2,state->m_sprite_goal_collision_bitmap2->cliprect(),machine.gfx[1],
+		drawgfxzoom_transpen(*state->m_sprite_goal_collision_bitmap2,state->m_sprite_goal_collision_bitmap2->cliprect(),machine.gfx[1],
 					0,0,
 					0,0,
 					x2,y2,
@@ -475,12 +475,12 @@ static int check_sprite_right_goal_collision(running_machine &machine, int x1, i
 		state->m_sprite_goal_collision_bitmap1->fill(0);
 		state->m_sprite_goal_collision_bitmap2->fill(0);
 
-		drawgfx_opaque(state->m_sprite_goal_collision_bitmap1,state->m_sprite_goal_collision_bitmap1->cliprect(),machine.gfx[0],
+		drawgfx_opaque(*state->m_sprite_goal_collision_bitmap1,state->m_sprite_goal_collision_bitmap1->cliprect(),machine.gfx[0],
 				code1,0,
 				0,flipy1,
 				x1,y1);
 
-		drawgfxzoom_transpen(state->m_sprite_goal_collision_bitmap2,state->m_sprite_goal_collision_bitmap2->cliprect(),machine.gfx[1],
+		drawgfxzoom_transpen(*state->m_sprite_goal_collision_bitmap2,state->m_sprite_goal_collision_bitmap2->cliprect(),machine.gfx[1],
 					0,1,
 					1,0,
 					x2,y2,
@@ -521,7 +521,7 @@ static int check_sprite_border_collision(running_machine &machine, UINT8 x1, UIN
 	x1 = 240 - x1;
 	y1 = 240 - y1;
 
-	drawgfx_opaque(state->m_sprite_border_collision_bitmap,state->m_sprite_border_collision_bitmap->cliprect(),machine.gfx[0],
+	drawgfx_opaque(*state->m_sprite_border_collision_bitmap,state->m_sprite_border_collision_bitmap->cliprect(),machine.gfx[0],
 			code1,0,
 			0,flipy1,
 			0,0);

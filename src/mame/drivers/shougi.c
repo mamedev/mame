@@ -182,7 +182,7 @@ static SCREEN_UPDATE( shougi )
 			color= ((data1>>x) & 1) | (((data1>>(4+x)) & 1)<<1);
 			data = ((data2>>x) & 1) | (((data2>>(4+x)) & 1)<<1);
 
-			bitmap->pix16(255-sy, 255-(sx*4 + x)) = color*4 + data;
+			bitmap.pix16(255-sy, 255-(sx*4 + x)) = color*4 + data;
 		}
 	}
 

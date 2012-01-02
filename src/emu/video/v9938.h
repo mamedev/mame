@@ -14,7 +14,7 @@
 #define RENDER_LOW	(1)
 #define RENDER_AUTO	(2)
 
-void v9938_init (running_machine &machine, int which, screen_device &screen, bitmap_t *bitmap, int model, int vram_size, void (*callback)(running_machine &, int) );
+void v9938_init (running_machine &machine, int which, screen_device &screen, bitmap_t &bitmap, int model, int vram_size, void (*callback)(running_machine &, int) );
 void v9938_reset (int which);
 int v9938_interrupt (running_machine &machine, int which);
 void v9938_set_sprite_limit (int which, int);

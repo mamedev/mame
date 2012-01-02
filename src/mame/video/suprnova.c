@@ -6,15 +6,15 @@
 
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
+static void suprnova_draw_roz(bitmap_t &bitmap, bitmap_t* bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
 {
 	//bitmap_t *destbitmap = bitmap;
-	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
-	bitmap_t *srcbitmapflags = tilemap_get_flagsmap(tmap);
-	const int xmask = srcbitmap->width()-1;
-	const int ymask = srcbitmap->height()-1;
-	const int widthshifted = srcbitmap->width() << 16;
-	const int heightshifted = srcbitmap->height() << 16;
+	bitmap_t &srcbitmap = tilemap_get_pixmap(tmap);
+	bitmap_t &srcbitmapflags = tilemap_get_flagsmap(tmap);
+	const int xmask = srcbitmap.width()-1;
+	const int ymask = srcbitmap.height()-1;
+	const int widthshifted = srcbitmap.width() << 16;
+	const int heightshifted = srcbitmap.height() << 16;
 	UINT32 cx;
 	UINT32 cy;
 	int x;
@@ -50,7 +50,7 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 			cy = starty;
 
 			/* get dest and priority pointers */
-			dest = &bitmap->pix16(sy, sx);
+			dest = &bitmap.pix16(sy, sx);
 			destflags = &bitmapflags->pix8(sy, sx);
 
 			/* loop over columns */
@@ -60,13 +60,13 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 				{
 					if (columnscroll)
 					{
-						dest[0] = srcbitmap->pix16(((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask);
-						destflags[0] = srcbitmapflags->pix8(((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask);
+						dest[0] = srcbitmap.pix16(((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask);
+						destflags[0] = srcbitmapflags.pix8(((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask);
 					}
 					else
 					{
-						dest[0] = srcbitmap->pix16((cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask);
-						destflags[0] = srcbitmapflags->pix8((cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask);
+						dest[0] = srcbitmap.pix16((cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask);
+						destflags[0] = srcbitmapflags.pix8((cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask);
 					}
 				}
 
@@ -391,7 +391,7 @@ VIDEO_RESET( skns )
 	state->m_alt_enable_background = state->m_alt_enable_sprites = 1;
 }
 
-static void supernova_draw_a( running_machine &machine, bitmap_t *bitmap, bitmap_t* bitmap_flags, const rectangle &cliprect, int tran )
+static void supernova_draw_a( running_machine &machine, bitmap_t &bitmap, bitmap_t* bitmap_flags, const rectangle &cliprect, int tran )
 {
 	skns_state *state = machine.driver_data<skns_state>();
 	int enable_a  = (state->m_v3_regs[0x10/4] >> 0) & 0x0001;
@@ -422,7 +422,7 @@ static void supernova_draw_a( running_machine &machine, bitmap_t *bitmap, bitmap
 	}
 }
 
-static void supernova_draw_b( running_machine &machine, bitmap_t *bitmap, bitmap_t* bitmap_flags, const rectangle &cliprect, int tran )
+static void supernova_draw_b( running_machine &machine, bitmap_t &bitmap, bitmap_t* bitmap_flags, const rectangle &cliprect, int tran )
 {
 	skns_state *state = machine.driver_data<skns_state>();
 	int enable_b  = (state->m_v3_regs[0x34/4] >> 0) & 0x0001;
@@ -459,7 +459,7 @@ SCREEN_UPDATE(skns)
 
 	palette_update(screen.machine());
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	state->m_tilemap_bitmap_lower->fill(0);
 	state->m_tilemap_bitmapflags_lower->fill(0);
 	state->m_tilemap_bitmap_higher->fill(0);
@@ -476,8 +476,8 @@ SCREEN_UPDATE(skns)
 		//popmessage("pri %d %d\n", supernova_pri_a, supernova_pri_b);
 
 		/*if (!supernova_pri_b) { */
-		supernova_draw_b(screen.machine(), state->m_tilemap_bitmap_lower, state->m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
-		supernova_draw_a(screen.machine(), state->m_tilemap_bitmap_higher,state->m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
+		supernova_draw_b(screen.machine(), *state->m_tilemap_bitmap_lower, state->m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
+		supernova_draw_a(screen.machine(), *state->m_tilemap_bitmap_higher,state->m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
 
 		{
 			int x,y;
@@ -500,7 +500,7 @@ SCREEN_UPDATE(skns)
 
 				src3 = &state->m_sprite_bitmap->pix16(y);
 
-				dst = &bitmap->pix32(y);
+				dst = &bitmap.pix32(y);
 
 
 				for (x=0;x<320;x++)
@@ -631,7 +631,7 @@ SCREEN_UPDATE(skns)
 	state->m_sprite_bitmap->fill(0x0000, cliprect);
 
 	if (state->m_alt_enable_sprites)
-		state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap, cliprect, screen.machine().generic.spriteram.u32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
+		state->m_spritegen->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap, cliprect, screen.machine().generic.spriteram.u32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
 
 
 	return 0;

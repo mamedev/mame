@@ -109,7 +109,7 @@ void ppu2c0x_init_palette(running_machine &machine, int first_entry );
 void ppu2c0x_init_palette_rgb(running_machine &machine, int first_entry );
 
 void ppu2c0x_spriteram_dma(address_space *space, device_t *device, const UINT8 page ) ATTR_NONNULL(1);
-void ppu2c0x_render( device_t *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);
+void ppu2c0x_render( device_t *device, bitmap_t &bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);
 int ppu2c0x_get_pixel( device_t *device, int x, int y ) ATTR_NONNULL(1);
 int ppu2c0x_get_colorbase( device_t *device ) ATTR_NONNULL(1);
 int ppu2c0x_get_current_scanline( device_t *device ) ATTR_NONNULL(1);

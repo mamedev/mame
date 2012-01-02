@@ -96,7 +96,7 @@ SCREEN_UPDATE( magmax )
 
 	/* copy the background graphics */
 	if (*state->m_vreg & 0x40)		/* background disable */
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 	else
 	{
 		int v;
@@ -211,7 +211,7 @@ SCREEN_UPDATE( magmax )
 	}
 
 	if (!(*state->m_vreg & 0x40))		/* background disable */
-		copybitmap_trans(bitmap, screen.machine().generic.tmpbitmap, state->m_flipscreen,state->m_flipscreen,0,0, cliprect, 0);
+		copybitmap_trans(bitmap, *screen.machine().generic.tmpbitmap, state->m_flipscreen,state->m_flipscreen,0,0, cliprect, 0);
 
 	/* draw the foreground characters */
 	for (offs = 32*32-1; offs >= 0; offs -= 1)

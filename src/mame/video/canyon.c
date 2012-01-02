@@ -33,7 +33,7 @@ VIDEO_START( canyon )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	canyon_state *state = machine.driver_data<canyon_state>();
 	int i;
@@ -55,7 +55,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 }
 
 
-static void draw_bombs( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_bombs( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	canyon_state *state = machine.driver_data<canyon_state>();
 	int i;
@@ -77,7 +77,7 @@ static void draw_bombs( running_machine &machine, bitmap_t *bitmap, const rectan
 		if (rect.max_x > cliprect.max_x) rect.max_x = cliprect.max_x;
 		if (rect.max_y > cliprect.max_y) rect.max_y = cliprect.max_y;
 
-		bitmap->fill(1 + 2 * i, rect);
+		bitmap.fill(1 + 2 * i, rect);
 	}
 }
 

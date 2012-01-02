@@ -189,7 +189,7 @@ WRITE8_HANDLER( bosco_starclr_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	UINT8 *spriteram = machine.generic.spriteram.u8;
 	UINT8 *spriteram_2 = machine.generic.spriteram2.u8;
@@ -219,7 +219,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_bullets(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	bosco_state *state =  machine.driver_data<bosco_state>();
 	int offs;
@@ -244,7 +244,7 @@ static void draw_bullets(running_machine &machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int flip)
+static void draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int flip)
 {
 	bosco_state *state = machine.driver_data<bosco_state>();
 
@@ -272,7 +272,7 @@ static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectang
 					if (flip) x += 20*8;
 
 					if (x >= cliprect.min_x && x <= cliprect.max_x && y >= cliprect.min_y && y <= cliprect.max_y)
-						bitmap->pix16(y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
+						bitmap.pix16(y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
 				}
 			}
 		}
@@ -299,7 +299,7 @@ SCREEN_UPDATE( bosco )
 		fg_clip.min_x = 28*8;
 	}
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	draw_stars(screen.machine(),bitmap,cliprect,flip_screen_get(screen.machine()));
 
 	tilemap_draw(bitmap,bg_clip,state->m_bg_tilemap,0,0);

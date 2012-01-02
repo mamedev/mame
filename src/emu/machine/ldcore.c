@@ -210,17 +210,17 @@ INLINE void add_and_clamp_track(ldcore_data *ldcore, INT32 delta)
     given color pattern
 -------------------------------------------------*/
 
-INLINE void fillbitmap_yuy16(bitmap_t *bitmap, UINT8 yval, UINT8 cr, UINT8 cb)
+INLINE void fillbitmap_yuy16(bitmap_t &bitmap, UINT8 yval, UINT8 cr, UINT8 cb)
 {
 	UINT16 color0 = (yval << 8) | cb;
 	UINT16 color1 = (yval << 8) | cr;
 	int x, y;
 
 	/* write 32 bits of color (2 pixels at a time) */
-	for (y = 0; y < bitmap->height(); y++)
+	for (y = 0; y < bitmap.height(); y++)
 	{
-		UINT16 *dest = &bitmap->pix16(y);
-		for (x = 0; x < bitmap->width() / 2; x++)
+		UINT16 *dest = &bitmap.pix16(y);
+		for (x = 0; x < bitmap.width() / 2; x++)
 		{
 			*dest++ = color0;
 			*dest++ = color1;
@@ -903,7 +903,7 @@ static void process_track_data(device_t *device)
 
 	/* render the display if present */
 	if (ldcore->avconfig.video != NULL && ldcore->intf.overlay != NULL)
-		(*ldcore->intf.overlay)(ld, ldcore->avconfig.video);
+		(*ldcore->intf.overlay)(ld, *ldcore->avconfig.video);
 
 	/* pass the audio to the callback */
 	if (ldcore->config.audio != NULL)
@@ -1201,11 +1201,11 @@ SCREEN_UPDATE( laserdisc )
 			/* scale the cliprect to the overlay size and then call the update callback */
 			clip.min_x = ldcore->config.overclip_min_x;
 			clip.max_x = ldcore->config.overclip_max_x;
-			clip.min_y = cliprect.min_y * overbitmap->height() / bitmap->height();
+			clip.min_y = cliprect.min_y * overbitmap->height() / bitmap.height();
 			if (cliprect.min_y == visarea.min_y)
 				clip.min_y = MIN(clip.min_y, ldcore->config.overclip_min_y);
-			clip.max_y = (cliprect.max_y + 1) * overbitmap->height() / bitmap->height() - 1;
-			(*ldcore->config.overupdate)(screen, overbitmap, clip);
+			clip.max_y = (cliprect.max_y + 1) * overbitmap->height() / bitmap.height() - 1;
+			(*ldcore->config.overupdate)(screen, *overbitmap, clip);
 		}
 
 		/* if this is the last update, do the rendering */
@@ -1373,7 +1373,7 @@ static void init_video(device_t *device)
 
 		/* first allocate a YUY16 bitmap at 2x the height */
 		frame->bitmap = auto_alloc(device->machine(), bitmap_t(ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16));
-		fillbitmap_yuy16(frame->bitmap, 40, 109, 240);
+		fillbitmap_yuy16(*frame->bitmap, 40, 109, 240);
 
 		/* make a copy of the bitmap that clips out the VBI and horizontal blanking areas */
 		frame->visbitmap = auto_alloc(device->machine(), bitmap_t(&frame->bitmap->pix16(44, frame->bitmap->width() * 8 / 720),
@@ -1384,7 +1384,7 @@ static void init_video(device_t *device)
 
 	/* allocate an empty frame of the same size */
 	ldcore->emptyframe = auto_bitmap_alloc(device->machine(), ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
-	fillbitmap_yuy16(ldcore->emptyframe, 0, 128, 128);
+	fillbitmap_yuy16(*ldcore->emptyframe, 0, 128, 128);
 
 	/* allocate texture for rendering */
 	ldcore->videoenable = TRUE;

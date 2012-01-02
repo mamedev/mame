@@ -116,7 +116,7 @@ VIDEO_START( ddragon3 )
  *   6,7| unused
  */
 
-static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	ddragon3_state *state = machine.driver_data<ddragon3_state>();
 	UINT16 *source = state->m_spriteram;

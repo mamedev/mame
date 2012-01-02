@@ -207,7 +207,7 @@ WRITE16_HANDLER( bionicc_gfxctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
 //  bionicc_state *state = machine.driver_data<bionicc_state>();
@@ -250,7 +250,7 @@ SCREEN_UPDATE( bionicc )
 {
 	bionicc_state *state = screen.machine().driver_data<bionicc_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1 | TILEMAP_DRAW_LAYER1, 0);	/* nothing in FRONT */
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0 | TILEMAP_DRAW_LAYER1, 0);

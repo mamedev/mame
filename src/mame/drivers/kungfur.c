@@ -81,40 +81,40 @@ g & 40
 #define LED_ON		0x0001
 #define LED_OFF		0x0000
 
-static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
+static void draw_led(bitmap_t &bitmap, int x, int y,UINT8 value)
 {
-	bitmap->plot_box(x, y, 6, 10, 0x00000000);
+	bitmap.plot_box(x, y, 6, 10, 0x00000000);
 
 	/*a*/
-	bitmap->pix16(y+0, x+1) = ((value & 0x01) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+0, x+2) = ((value & 0x01) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+0, x+3) = ((value & 0x01) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+0, x+1) = ((value & 0x01) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+0, x+2) = ((value & 0x01) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+0, x+3) = ((value & 0x01) ? LED_ON : LED_OFF);
 	/*b*/
-	bitmap->pix16(y+1, x+4) = ((value & 0x02) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+2, x+4) = ((value & 0x02) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+3, x+4) = ((value & 0x02) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+1, x+4) = ((value & 0x02) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+2, x+4) = ((value & 0x02) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+3, x+4) = ((value & 0x02) ? LED_ON : LED_OFF);
 	/*c*/
-	bitmap->pix16(y+5, x+4) = ((value & 0x04) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+6, x+4) = ((value & 0x04) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+7, x+4) = ((value & 0x04) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+5, x+4) = ((value & 0x04) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+6, x+4) = ((value & 0x04) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+7, x+4) = ((value & 0x04) ? LED_ON : LED_OFF);
 	/*d*/
-	bitmap->pix16(y+8, x+1) = ((value & 0x08) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+8, x+2) = ((value & 0x08) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+8, x+3) = ((value & 0x08) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+8, x+1) = ((value & 0x08) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+8, x+2) = ((value & 0x08) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+8, x+3) = ((value & 0x08) ? LED_ON : LED_OFF);
 	/*e*/
-	bitmap->pix16(y+5, x+0) = ((value & 0x10) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+6, x+0) = ((value & 0x10) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+7, x+0) = ((value & 0x10) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+5, x+0) = ((value & 0x10) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+6, x+0) = ((value & 0x10) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+7, x+0) = ((value & 0x10) ? LED_ON : LED_OFF);
 	/*f*/
-	bitmap->pix16(y+1, x+0) = ((value & 0x20) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+2, x+0) = ((value & 0x20) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+3, x+0) = ((value & 0x20) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+1, x+0) = ((value & 0x20) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+2, x+0) = ((value & 0x20) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+3, x+0) = ((value & 0x20) ? LED_ON : LED_OFF);
 	/*g*/
-	bitmap->pix16(y+4, x+1) = ((value & 0x40) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+4, x+2) = ((value & 0x40) ? LED_ON : LED_OFF);
-	bitmap->pix16(y+4, x+3) = ((value & 0x40) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+4, x+1) = ((value & 0x40) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+4, x+2) = ((value & 0x40) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+4, x+3) = ((value & 0x40) ? LED_ON : LED_OFF);
 	/*"point" (just for debugging)*/
-	bitmap->pix16(y+9, x+4) = ((value & 0x80) ? LED_ON : LED_OFF);
+	bitmap.pix16(y+9, x+4) = ((value & 0x80) ? LED_ON : LED_OFF);
 }
 
 /* actually debugging purpose, it will be converted to the artwork system at some point. */

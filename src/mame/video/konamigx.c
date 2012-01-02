@@ -97,7 +97,7 @@ void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy)
 }
 
 INLINE void K053936GP_copyroz32clip( running_machine &machine,
-		bitmap_t *dst_bitmap, bitmap_t *src_bitmap,
+		bitmap_t &dst_bitmap, bitmap_t &src_bitmap,
 		const rectangle &dst_cliprect, const rectangle &src_cliprect,
 		UINT32 _startx,UINT32 _starty,int _incxx,int _incxy,int _incyx,int _incyy,
 		int tilebpp, int blend, int alpha, int clip, int pixeldouble_output )
@@ -143,8 +143,8 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 	starty += sx * incxy + sy * incyy;
 
 	// adjust entry points and other loop constants
-	dst_pitch = dst_bitmap->rowpixels();
-	dst_base = &dst_bitmap->pix32(0);
+	dst_pitch = dst_bitmap.rowpixels();
+	dst_base = &dst_bitmap.pix32(0);
 	dst_base2 = sy * dst_pitch + sx + tx;
 	ecx = tx = -tx;
 
@@ -152,10 +152,10 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 	pal_base = machine.pens;
 	cmask = colormask[tilebpp];
 
-	src_pitch = src_bitmap->rowpixels();
-	src_base = &src_bitmap->pix16(0);
-	src_size = src_bitmap->width() * src_bitmap->height();
-	dst_size = dst_bitmap->width() * dst_bitmap->height();
+	src_pitch = src_bitmap.rowpixels();
+	src_base = &src_bitmap.pix16(0);
+	src_size = src_bitmap.width() * src_bitmap.height();
+	dst_size = dst_bitmap.width() * dst_bitmap.height();
 	dst_ptr = 0;//dst_base;
 	cy = starty;
 	cx = startx;
@@ -280,17 +280,16 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 // adapted from generic K053936_zoom_draw()
 static void K053936GP_zoom_draw(running_machine &machine,
 		int chip, UINT16 *ctrl, UINT16 *linectrl,
-		bitmap_t *bitmap, const rectangle &cliprect, tilemap_t *tmap,
+		bitmap_t &bitmap, const rectangle &cliprect, tilemap_t *tmap,
 		int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
-	bitmap_t *src_bitmap;
 	UINT16 *lineaddr;
 
 	rectangle my_clip;
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy, y, maxy, clip;
 
-	src_bitmap = tilemap_get_pixmap(tmap);
+	bitmap_t &src_bitmap = tilemap_get_pixmap(tmap);
 	rectangle &src_cliprect = K053936_cliprect[chip];
 	clip = K053936_clip_enabled[chip];
 
@@ -349,13 +348,13 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	}
 }
 
-static void K053936GP_0_zoom_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+static void K053936GP_0_zoom_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	K053936GP_zoom_draw(machine, 0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
 }
 
-static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
@@ -381,7 +380,7 @@ static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_t *bitmap, co
 
 
 INLINE void zdrawgfxzoom32GP(
-		bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx,
+		bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri)
 {
@@ -449,8 +448,8 @@ INLINE void zdrawgfxzoom32GP(
 	pal_base  = gfx->machine().pens + gfx->color_base + (color % gfx->total_colors) * granularity;
 	shd_base  = gfx->machine().shadow_table;
 
-	dst_ptr   = &bitmap->pix32(0);
-	dst_pitch = bitmap->rowpixels();
+	dst_ptr   = &bitmap.pix32(0);
+	dst_pitch = bitmap.rowpixels();
 	dst_minx  = cliprect.min_x;
 	dst_maxx  = cliprect.max_x;
 	dst_miny  = cliprect.min_y;
@@ -1130,7 +1129,7 @@ void konamigx_mixer_init(running_machine &machine, int objdma)
 	gx_objdma = 0;
 	gx_primode = 0;
 
-	gx_objzbuf = &machine.priority_bitmap->pix8(0);
+	gx_objzbuf = &machine.priority_bitmap.pix8(0);
 	gx_shdzbuf = auto_alloc_array(machine, UINT8, GX_ZBUFSIZE);
 	gx_objpool = auto_alloc_array(machine, struct GX_OBJ, GX_MAX_OBJECTS);
 
@@ -1159,7 +1158,7 @@ void konamigx_objdma(void)
 	if (gx_objdma && gx_spriteram && K053247_ram) memcpy(gx_spriteram, K053247_ram, 0x1000);
 }
 
-void konamigx_mixer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+void konamigx_mixer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_t *extra_bitmap, int rushingheroes_hack)
@@ -1630,7 +1629,7 @@ void konamigx_mixer(running_machine &machine, bitmap_t *bitmap, const rectangle 
 							for (yy=0;yy<height;yy++)
 							{
 								UINT16* src = &extra_bitmap->pix16(yy);
-								UINT32* dst = &bitmap->pix32(yy);
+								UINT32* dst = &bitmap.pix32(yy);
 								int shiftpos = 0;
 								for (xx=0;xx<width;xx+=2)
 								{
@@ -2331,7 +2330,7 @@ VIDEO_START(opengolf)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	machine.priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16);
+	machine.priority_bitmap.allocate(2048,2048,BITMAP_FORMAT_INDEXED16);
 
 }
 
@@ -2372,7 +2371,7 @@ VIDEO_START(racinfrc)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	machine.priority_bitmap = auto_bitmap_alloc(machine,2048,2048,BITMAP_FORMAT_INDEXED16);
+	machine.priority_bitmap.allocate(2048,2048,BITMAP_FORMAT_INDEXED16);
 
 
 }
@@ -2432,8 +2431,8 @@ SCREEN_UPDATE(konamigx)
 	// Type-1
 	if (gx_specialrozenable == 1)
 	{
-		K053936_0_zoom_draw(gxtype1_roz_dstbitmap, gxtype1_roz_dstbitmapclip,gx_psac_tilemap, 0,0,0); // height data
-		K053936_0_zoom_draw(gxtype1_roz_dstbitmap2,gxtype1_roz_dstbitmapclip,gx_psac_tilemap2,0,0,0); // colour data (+ some voxel height data?)
+		K053936_0_zoom_draw(*gxtype1_roz_dstbitmap, gxtype1_roz_dstbitmapclip,gx_psac_tilemap, 0,0,0); // height data
+		K053936_0_zoom_draw(*gxtype1_roz_dstbitmap2,gxtype1_roz_dstbitmapclip,gx_psac_tilemap2,0,0,0); // colour data (+ some voxel height data?)
 	}
 
 
@@ -2453,8 +2452,8 @@ SCREEN_UPDATE(konamigx)
 		temprect.min_y = cliprect.min_y;
 		temprect.max_y = cliprect.max_y;
 
-		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(type3_roz_temp_bitmap, temprect,gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
-		else K053936_0_zoom_draw(type3_roz_temp_bitmap, temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
+		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(*type3_roz_temp_bitmap, temprect,gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
+		else K053936_0_zoom_draw(*type3_roz_temp_bitmap, temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
 
 
 		konamigx_mixer(screen.machine(), bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
@@ -2483,11 +2482,11 @@ SCREEN_UPDATE(konamigx)
 				{
 					//UINT16* src = &gxtype1_roz_dstbitmap->pix16(y);
 
-					//UINT32* dst = &bitmap->pix32(y);
+					//UINT32* dst = &bitmap.pix32(y);
 					// ths K053936 rendering should probably just be flipped
 					// this is just kludged to align the racing force 2d logo
 					UINT16* src = &gxtype1_roz_dstbitmap2->pix16(y+30);
-					UINT32* dst = &bitmap->pix32(256-y);
+					UINT32* dst = &bitmap.pix32(256-y);
 
 					for (x=0;x<512;x++)
 					{
@@ -2537,15 +2536,12 @@ SCREEN_UPDATE(konamigx_left)
 			}
 		}
 
-		bitmap_t* realbitmap = bitmap;
-		bitmap = dualscreen_left_tempbitmap;
-		SCREEN_UPDATE_CALL(konamigx);
-
-		copybitmap(realbitmap, dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
+		SCREEN_UPDATE_NAME(konamigx)(screen, *dualscreen_left_tempbitmap, cliprect);
+		copybitmap(bitmap, *dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
 	{
-		copybitmap(bitmap, dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, *dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 
 	return 0;
@@ -2555,7 +2551,7 @@ SCREEN_UPDATE(konamigx_right)
 {
 	if (konamigx_current_frame==1)
 	{
-		copybitmap(bitmap, dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, *dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
 	{
@@ -2586,11 +2582,8 @@ SCREEN_UPDATE(konamigx_right)
 			}
 		}
 
-		bitmap_t* realbitmap = bitmap;
-		bitmap = dualscreen_right_tempbitmap;
-		SCREEN_UPDATE_CALL(konamigx);
-
-		copybitmap(realbitmap, dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
+		SCREEN_UPDATE_NAME(konamigx)(screen, *dualscreen_right_tempbitmap, cliprect);
+		copybitmap(bitmap, *dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 
 	return 0;

@@ -992,8 +992,8 @@ SCREEN_UPDATE( _3do )
 
 	for ( int i = 0; i < 120; i++ )
 	{
-		UINT32	*dest_p0 = &bitmap->pix32(22 + i * 2, 254 );
-		UINT32	*dest_p1 = &bitmap->pix32(22 + i * 2 + 1, 254 );
+		UINT32	*dest_p0 = &bitmap.pix32(22 + i * 2, 254 );
+		UINT32	*dest_p1 = &bitmap.pix32(22 + i * 2 + 1, 254 );
 
 		for ( int j = 0; j < 320; j++ )
 		{

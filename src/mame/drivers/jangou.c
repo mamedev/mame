@@ -128,7 +128,7 @@ static SCREEN_UPDATE( jangou )
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		UINT8 *src = &state->m_blit_buffer[y * 512 / 2 + cliprect.min_x];
-		UINT16 *dst = &bitmap->pix16(y, cliprect.min_x);
+		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{

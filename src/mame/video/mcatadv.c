@@ -53,7 +53,7 @@ WRITE16_HANDLER( mcatadv_videoram2_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	mcatadv_state *state = machine.driver_data<mcatadv_state>();
 	UINT16 *source = state->m_spriteram_old;
@@ -123,8 +123,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 				if ((drawypos >= cliprect.min_y) && (drawypos <= cliprect.max_y))
 				{
-					destline = &bitmap->pix16(drawypos);
-					priline = &machine.priority_bitmap->pix8(drawypos);
+					destline = &bitmap.pix16(drawypos);
+					priline = &machine.priority_bitmap.pix8(drawypos);
 
 					for (xcnt = xstart; xcnt != xend; xcnt += xinc)
 					{
@@ -156,7 +156,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_t *bitmap, const rectangle &cliprect )
+static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	int flip;
 	UINT32 drawline;
@@ -205,8 +205,8 @@ SCREEN_UPDATE( mcatadv )
 	mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
 	int i;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	if (state->m_scroll1[2] != state->m_palette_bank1)
 	{

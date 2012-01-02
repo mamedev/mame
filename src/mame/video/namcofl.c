@@ -86,7 +86,7 @@ SCREEN_UPDATE( namcofl )
 
 	namcofl_install_palette(screen.machine());
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 
 	for( pri=0; pri<16; pri++ )
 	{

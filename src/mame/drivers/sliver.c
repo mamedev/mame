@@ -474,8 +474,8 @@ static SCREEN_UPDATE(sliver)
 {
 	sliver_state *state = screen.machine().driver_data<sliver_state>();
 
-	copybitmap      (bitmap, state->m_bitmap_bg, 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, state->m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
+	copybitmap      (bitmap, *state->m_bitmap_bg, 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, *state->m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
 

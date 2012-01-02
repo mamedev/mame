@@ -44,7 +44,7 @@ public:
 };
 
 /* VIDEO GOODS */
-static void astron_draw_characters(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
+static void astron_draw_characters(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
 {
 	segald_state *state = machine.driver_data<segald_state>();
 	UINT8 characterX, characterY;
@@ -60,7 +60,7 @@ static void astron_draw_characters(running_machine &machine, bitmap_t *bitmap,co
 	}
 }
 
-static void astron_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void astron_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* Heisted from Daphne */
 	const UINT8 SPR_Y_TOP     = 0;
@@ -91,7 +91,7 @@ static void astron_draw_sprites(running_machine &machine, bitmap_t *bitmap, cons
 
 static SCREEN_UPDATE( astron )
 {
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	astron_draw_characters(screen.machine(), bitmap, cliprect);
 	astron_draw_sprites(screen.machine(), bitmap, cliprect);

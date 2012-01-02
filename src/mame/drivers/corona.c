@@ -454,7 +454,7 @@ static SCREEN_UPDATE(winner)
 
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
-			bitmap->pix16(y, x) = state->m_videobuf[y * 512 + x];
+			bitmap.pix16(y, x) = state->m_videobuf[y * 512 + x];
 
 	return 0;
 }
@@ -466,7 +466,7 @@ static SCREEN_UPDATE(luckyrlt)
 
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
-			bitmap->pix16(255 - y, x) = state->m_videobuf[y * 512 + x];
+			bitmap.pix16(255 - y, x) = state->m_videobuf[y * 512 + x];
 
 	return 0;
 }

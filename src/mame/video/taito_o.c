@@ -25,7 +25,7 @@ static const int zoomy_conv_table[] =
 };
 
 
-static void parentj_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
+static void parentj_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -144,7 +144,7 @@ SCREEN_UPDATE( parentj )
 
 	tc0080vco_tilemap_update(state->m_tc0080vco);
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 

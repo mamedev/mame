@@ -161,7 +161,7 @@ WRITE8_HANDLER( circusc_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	circusc_state *state = machine.driver_data<circusc_state>();
 	int offs;
@@ -208,7 +208,7 @@ SCREEN_UPDATE( circusc )
 	for (i = 10; i < 32; i++)
 		tilemap_set_scrolly(state->m_bg_tilemap, i, *state->m_scroll);
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

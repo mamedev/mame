@@ -11,7 +11,7 @@
 
 /******************************************************************************/
 
-static void draw_sprites( running_machine& machine, bitmap_t *bitmap, const rectangle &cliprect, int pf_priority )
+static void draw_sprites( running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect, int pf_priority )
 {
 	dassault_state *state = machine.driver_data<dassault_state>();
 	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
@@ -186,8 +186,8 @@ SCREEN_UPDATE( dassault )
 
 	/* Draw playfields/update priority bitmap */
 	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(screen.machine().pens[3072], cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(screen.machine().pens[3072], cliprect);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */

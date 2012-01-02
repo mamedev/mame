@@ -26,7 +26,7 @@
 
 ********************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -155,8 +155,8 @@ SCREEN_UPDATE( topspeed )
 	layer[2] = 1;
 	layer[3] = 0;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
 	if (state->m_dislayer[3] == 0)

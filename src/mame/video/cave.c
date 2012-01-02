@@ -1418,7 +1418,7 @@ static void sprite_draw_donpachi_zbuf( running_machine &machine, int priority )
 ***************************************************************************/
 
 INLINE void cave_tilemap_draw(
-	running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+	running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 	UINT32 flags, UINT32 priority, UINT32 priority2, int GFX )
 {
 	cave_state *state = machine.driver_data<cave_state>();
@@ -1548,8 +1548,8 @@ SCREEN_UPDATE( cave )
 
 	set_pens(screen.machine());
 
-	state->m_blit.baseaddr = &bitmap->pix8(0);
-	state->m_blit.line_offset = bitmap->rowpixels() * bitmap->bpp() / 8;
+	state->m_blit.baseaddr = &bitmap.pix8(0);
+	state->m_blit.line_offset = bitmap.rowpixels() * bitmap.bpp() / 8;
 
 	/* Choose the tilemap to display (8x8 tiles or 16x16 tiles) */
 	for (GFX = 0; GFX < 4; GFX++)
@@ -1621,7 +1621,7 @@ SCREEN_UPDATE( cave )
 
 	cave_sprite_check(screen, cliprect);
 
-	bitmap->fill(state->m_background_color, cliprect);
+	bitmap.fill(state->m_background_color, cliprect);
 
 	/*
         Tiles and sprites are ordered by priority (0 back, 3 front) with

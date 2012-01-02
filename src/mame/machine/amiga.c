@@ -335,10 +335,11 @@ static TIMER_CALLBACK( scanline_callback )
 	/* render up to this scanline */
 	if (!machine.primary_screen->update_partial(scanline))
 	{
+		bitmap_t dummy_bitmap;
 		if (IS_AGA(state->m_intf))
-			amiga_aga_render_scanline(machine, NULL, scanline);
+			amiga_aga_render_scanline(machine, dummy_bitmap, scanline);
 		else
-			amiga_render_scanline(machine, NULL, scanline);
+			amiga_render_scanline(machine, dummy_bitmap, scanline);
 	}
 
 	/* force a sound update */

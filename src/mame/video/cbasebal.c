@@ -144,7 +144,7 @@ WRITE8_HANDLER( cbasebal_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	cbasebal_state *state = machine.driver_data<cbasebal_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -185,7 +185,7 @@ SCREEN_UPDATE( cbasebal )
 	if (state->m_bg_on)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
-		bitmap->fill(768, cliprect);
+		bitmap.fill(768, cliprect);
 
 	if (state->m_obj_on)
 		draw_sprites(screen.machine(), bitmap, cliprect);

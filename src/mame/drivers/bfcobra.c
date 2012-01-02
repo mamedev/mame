@@ -376,7 +376,7 @@ static SCREEN_UPDATE( bfcobra )
 	{
 		UINT16 y_offset = (y + state->m_v_scroll) * 256;
 		src = &state->m_video_ram[offset + y_offset];
-		dest = &bitmap->pix32(y);
+		dest = &bitmap.pix32(y);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x / 2; ++x)
 		{

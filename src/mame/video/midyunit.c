@@ -552,11 +552,11 @@ static TIMER_CALLBACK( autoerase_line )
 }
 
 
-void midyunit_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void midyunit_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	midyunit_state *state = screen.machine().driver_data<midyunit_state>();
 	UINT16 *src = &state->m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
-	UINT16 *dest = &bitmap->pix16(scanline);
+	UINT16 *dest = &bitmap.pix16(scanline);
 	int coladdr = params->coladdr << 1;
 	int x;
 

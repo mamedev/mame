@@ -104,7 +104,7 @@ VIDEO_START( lkage )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
 	const UINT8 *source = state->m_spriteram;
@@ -215,7 +215,7 @@ SCREEN_UPDATE( lkage )
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll[4]);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll[5]);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 	if ((state->m_vreg[2] & 0xf0) == 0xf0)
 	{
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);

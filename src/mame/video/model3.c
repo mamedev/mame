@@ -158,7 +158,7 @@ VIDEO_START( model3 )
 	init_matrix_stack(machine);
 }
 
-static void draw_tile_4bit(running_machine &machine, bitmap_t *bitmap, int tx, int ty, int tilenum)
+static void draw_tile_4bit(running_machine &machine, bitmap_t &bitmap, int tx, int ty, int tilenum)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x, y;
@@ -173,7 +173,7 @@ static void draw_tile_4bit(running_machine &machine, bitmap_t *bitmap, int tx, i
 	tile = &tile_base[tile_index];
 
 	for(y = ty; y < ty+8; y++) {
-		UINT16 *d = &bitmap->pix16(y^1);
+		UINT16 *d = &bitmap.pix16(y^1);
 		for(x = tx; x < tx+8; x+=2) {
 			UINT8 tile0, tile1;
 			UINT16 pix0, pix1;
@@ -194,7 +194,7 @@ static void draw_tile_4bit(running_machine &machine, bitmap_t *bitmap, int tx, i
 	}
 }
 
-static void draw_tile_8bit(running_machine &machine, bitmap_t *bitmap, int tx, int ty, int tilenum)
+static void draw_tile_8bit(running_machine &machine, bitmap_t &bitmap, int tx, int ty, int tilenum)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x, y;
@@ -209,7 +209,7 @@ static void draw_tile_8bit(running_machine &machine, bitmap_t *bitmap, int tx, i
 	tile = &tile_base[tile_index];
 
 	for(y = ty; y < ty+8; y++) {
-		UINT16 *d = &bitmap->pix16(y);
+		UINT16 *d = &bitmap.pix16(y);
 		int xx = 0;
 		for(x = tx; x < tx+8; x++) {
 			UINT8 tile0;
@@ -226,13 +226,13 @@ static void draw_tile_8bit(running_machine &machine, bitmap_t *bitmap, int tx, i
 	}
 }
 #ifdef UNUSED_FUNCTION
-static void draw_texture_sheet(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_texture_sheet(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x,y;
 	for(y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *d = &bitmap->pix16(y);
+		UINT16 *d = &bitmap.pix16(y);
 		int index = (y*2)*2048;
 		for(x = cliprect.min_x; x <= cliprect.max_x; x++) {
 			UINT16 pix = state->m_texture_ram[0][index];
@@ -245,7 +245,7 @@ static void draw_texture_sheet(running_machine &machine, bitmap_t *bitmap, const
 }
 #endif
 
-static void draw_layer(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int layer, int bitdepth)
+static void draw_layer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int layer, int bitdepth)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x, y;
@@ -321,12 +321,12 @@ static void draw_layer(running_machine &machine, bitmap_t *bitmap, const rectang
 }
 
 #ifdef UNUSED_FUNCTION
-static void copy_screen(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void copy_screen(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x,y;
 	for(y=cliprect.min_y; y <= cliprect.max_y; y++) {
-		UINT16 *d = &bitmap->pix16(y);
+		UINT16 *d = &bitmap.pix16(y);
 		UINT16 *s = &state->m_bitmap3d->pix16(y);
 		for(x=cliprect.min_x; x <= cliprect.max_x; x++) {
 			UINT16 pix = s[x];
@@ -382,7 +382,7 @@ SCREEN_UPDATE( model3 )
 			state->m_debug_layer_disable ^= 0x10;
 	}
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	if (!(state->m_debug_layer_disable & 0x8))
 		draw_layer(screen.machine(), bitmap, cliprect, 3, (state->m_layer_enable >> 3) & 0x1);
@@ -399,7 +399,7 @@ SCREEN_UPDATE( model3 )
 			real3d_traverse_display_list(screen.machine());
 		}
 #endif
-		copybitmap_trans(bitmap, state->m_bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
+		copybitmap_trans(bitmap, *state->m_bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
 	}
 
 	if (!(state->m_debug_layer_disable & 0x2))

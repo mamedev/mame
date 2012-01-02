@@ -107,7 +107,7 @@ static VIDEO_START(cabaret)
 static SCREEN_UPDATE(cabaret)
 {
 	cabaret_state *state = screen.machine().driver_data<cabaret_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 

@@ -425,7 +425,7 @@ WRITE16_HANDLER( bioship_bank_w )
 
 // manybloc uses extra flip bits on the sprites, but these break other games
 
-static void nmk16_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
+static void nmk16_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 	int offs;
@@ -476,7 +476,7 @@ static void nmk16_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 	}
 }
 
-static void nmk16_draw_sprites_flipsupported(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
+static void nmk16_draw_sprites_flipsupported(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 	int offs;
@@ -727,7 +727,7 @@ SCREEN_UPDATE( bioship )
 				int numtile = data&0xfff;
 				int color = (data&0xf000)>>12;
 
-				drawgfx_opaque(state->m_background_bitmap,state->m_background_bitmap->cliprect(),screen.machine().gfx[3],
+				drawgfx_opaque(*state->m_background_bitmap,state->m_background_bitmap->cliprect(),screen.machine().gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */
@@ -736,7 +736,7 @@ SCREEN_UPDATE( bioship )
 				data = tilerom[offs+0x1000+bank];
 				numtile = data&0xfff;
 				color = (data&0xf000)>>12;
-				drawgfx_opaque(state->m_background_bitmap,state->m_background_bitmap->cliprect(),screen.machine().gfx[3],
+				drawgfx_opaque(*state->m_background_bitmap,state->m_background_bitmap->cliprect(),screen.machine().gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */
@@ -747,7 +747,7 @@ SCREEN_UPDATE( bioship )
 		}
 	}
 
-	copyscrollbitmap(bitmap,state->m_background_bitmap,1,&scrollx,1,&scrolly,cliprect);
+	copyscrollbitmap(bitmap,*state->m_background_bitmap,1,&scrollx,1,&scrolly,cliprect);
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap0,0,0);
 
 	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
@@ -898,7 +898,7 @@ VIDEO_START( firehawk )
 
 ***************************************************************************/
 
-static void video_update(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+static void video_update(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 	int dsw_flipscreen,			// 1 = Horizontal and vertical screen flip are hardwired to 2 dip switches
 	int xoffset, int yoffset,	// bg_tilemap0 offsets
 	int attr_mask				// "sprite active" mask
@@ -933,7 +933,7 @@ static void video_update(running_machine &machine, bitmap_t *bitmap, const recta
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 }
 
-static void redhawki_video_update(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect	)
+static void redhawki_video_update(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect	)
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 

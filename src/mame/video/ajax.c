@@ -93,9 +93,9 @@ SCREEN_UPDATE( ajax )
 
 	k052109_tilemap_update(state->m_k052109);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 1);
 	if (state->m_priority)
 	{

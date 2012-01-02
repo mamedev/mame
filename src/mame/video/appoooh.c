@@ -207,7 +207,7 @@ WRITE8_HANDLER( appoooh_out_w )
 	/* bit 7 unknown (used) */
 }
 
-static void appoooh_draw_sprites( bitmap_t *dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
+static void appoooh_draw_sprites( bitmap_t &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
 {
 	int offs;
 	int flipy = flip_screen_get(gfx->machine());
@@ -238,7 +238,7 @@ static void appoooh_draw_sprites( bitmap_t *dest_bmp, const rectangle &cliprect,
 	}
 }
 
-static void robowres_draw_sprites( bitmap_t *dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
+static void robowres_draw_sprites( bitmap_t &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
 {
 	int offs;
 	int flipy = flip_screen_get(gfx->machine());

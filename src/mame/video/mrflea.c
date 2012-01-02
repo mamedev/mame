@@ -43,7 +43,7 @@ WRITE8_HANDLER( mrflea_spriteram_w )
 	state->m_spriteram[offset] = data;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	mrflea_state *state = machine.driver_data<mrflea_state>();
 	const gfx_element *gfx = machine.gfx[0];
@@ -74,7 +74,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	mrflea_state *state = machine.driver_data<mrflea_state>();
 	const UINT8 *source = state->m_videoram;

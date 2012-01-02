@@ -199,7 +199,7 @@ WRITE16_HANDLER( pow_paletteram16_word_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int group)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int group)
 {
 	snk68_state *state = machine.driver_data<snk68_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -292,7 +292,7 @@ SCREEN_UPDATE( pow )
 {
 	snk68_state *state = screen.machine().driver_data<snk68_state>();
 
-	bitmap->fill(0x7ff, cliprect);
+	bitmap.fill(0x7ff, cliprect);
 
 	/* This appears to be the correct priority order */
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);

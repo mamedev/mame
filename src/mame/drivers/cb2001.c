@@ -325,7 +325,7 @@ static SCREEN_UPDATE(cb2001)
 {
 	cb2001_state *state = screen.machine().driver_data<cb2001_state>();
 	int count,x,y;
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	count = 0x0000;
 

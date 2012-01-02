@@ -174,7 +174,7 @@ VIDEO_START( metlclsh )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	metlclsh_state *state = machine.driver_data<metlclsh_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -246,7 +246,7 @@ SCREEN_UPDATE( metlclsh )
 {
 	metlclsh_state *state = screen.machine().driver_data<metlclsh_state>();
 
-	bitmap->fill(0x10, cliprect);
+	bitmap.fill(0x10, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);	// low priority tiles of foreground
 

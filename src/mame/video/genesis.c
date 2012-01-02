@@ -221,13 +221,13 @@ void system18_vdp_start(running_machine &machine)
 
 ******************************************************************************/
 
-void system18_vdp_update( bitmap_t *bitmap, const rectangle &cliprect )
+void system18_vdp_update( bitmap_t &bitmap, const rectangle &cliprect )
 {
 	int y;
 
 	/* generate the final screen */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		drawline(&bitmap->pix16(y), y, 0xffff);
+		drawline(&bitmap.pix16(y), y, 0xffff);
 }
 
 /******************************************************************************

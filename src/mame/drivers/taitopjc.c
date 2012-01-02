@@ -95,7 +95,7 @@ static SCREEN_UPDATE( taitopjc )
 
 				for (y=0; y < 16; y++)
 				{
-					UINT32 *fb = &bitmap->pix32(y+(u*16));
+					UINT32 *fb = &bitmap.pix32(y+(u*16));
 					for (x=0; x < 16; x++)
 					{
 						UINT8 p = s[((tile*256) + ((y*16)+x)) ^3];

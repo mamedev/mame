@@ -322,17 +322,17 @@ WRITE8_HANDLER( congo_sprite_custom_w )
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int skew)
+static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int skew)
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* only draw if enabled */
 	if (state->m_bg_enable)
 	{
-		bitmap_t *pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
+		bitmap_t &pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
 		int colorbase = state->m_bg_color + (state->m_congo_color_bank << 8);
-		int xmask = pixmap->width() - 1;
-		int ymask = pixmap->height() - 1;
+		int xmask = pixmap.width() - 1;
+		int ymask = pixmap.height() - 1;
 		int flipmask = flip_screen_get(machine) ? 0xff : 0x00;
 		int flipoffs = flip_screen_get(machine) ? 0x38 : 0x40;
 		int x, y;
@@ -347,7 +347,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 		/* loop over visible rows */
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT16 *dst = &bitmap->pix16(y);
+			UINT16 *dst = &bitmap.pix16(y);
 			int srcx, srcy, vf;
 			UINT16 *src;
 
@@ -357,7 +357,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 			/* base of the source row comes from VF plus the scroll value */
 			/* this is done by the 3 4-bit adders at U56, U74, U75 */
 			srcy = vf + ((state->m_bg_position << 1) ^ 0xfff) + 1;
-			src = &pixmap->pix16(srcy & ymask);
+			src = &pixmap.pix16(srcy & ymask);
 
 			/* loop over visible colums */
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -384,7 +384,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 	/* if not enabled, fill the background with black */
 	else
-		bitmap->fill(get_black_pen(machine), cliprect);
+		bitmap.fill(get_black_pen(machine), cliprect);
 }
 
 
@@ -440,7 +440,7 @@ INLINE int find_minimum_x(UINT8 value, int flip)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	UINT8 *spriteram = state->m_spriteram;

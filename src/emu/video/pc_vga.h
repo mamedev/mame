@@ -9,7 +9,7 @@
 #ifndef PC_VGA_H
 #define PC_VGA_H
 
-typedef void (*pc_video_update_proc)(bitmap_t *bitmap);
+typedef void (*pc_video_update_proc)(bitmap_t &bitmap);
 
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
 

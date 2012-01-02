@@ -267,15 +267,15 @@ SCREEN_UPDATE( cloud9 )
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x, y, 0);
+			drawgfx_transpen(*state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
-				drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
+				drawgfx_transpen(*state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (~state->m_syncprom[y] & 2)

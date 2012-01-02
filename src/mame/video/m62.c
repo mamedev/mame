@@ -353,7 +353,7 @@ WRITE8_HANDLER( m62_textram_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority )
 {
 	m62_state *state = machine.driver_data<m62_state>();
 	int offs;
@@ -580,11 +580,11 @@ SCREEN_UPDATE( ldrun3 )
 
 		my_cliprect.min_y = 0 * 8;
 		my_cliprect.max_y = 1 * 8 - 1;
-		bitmap->fill(get_black_pen(screen.machine()), my_cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), my_cliprect);
 
 		my_cliprect.min_y = 31 * 8;
 		my_cliprect.max_y = 32 * 8 - 1;
-		bitmap->fill(get_black_pen(screen.machine()), my_cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), my_cliprect);
 	}
 
 	return 0;

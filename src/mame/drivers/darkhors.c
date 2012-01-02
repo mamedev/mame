@@ -129,7 +129,7 @@ static WRITE32_HANDLER( darkhors_tmapram2_w )
 	tilemap_mark_tile_dirty(state->m_tmap2, offset);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
 	UINT32 *s		=	state->m_spriteram;
@@ -195,7 +195,7 @@ static SCREEN_UPDATE( darkhors )
 	}
 #endif
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	tilemap_set_scrollx(state->m_tmap,0, (state->m_tmapscroll[0] >> 16) - 5);
 	tilemap_set_scrolly(state->m_tmap,0, (state->m_tmapscroll[0] & 0xffff) - 0xff );

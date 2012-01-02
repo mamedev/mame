@@ -317,17 +317,17 @@ void psxgpu_device::DebugCheckKeys( void )
 #endif
 }
 
-int psxgpu_device::DebugMeshDisplay( bitmap_t *bitmap, const rectangle &cliprect )
+int psxgpu_device::DebugMeshDisplay( bitmap_t &bitmap, const rectangle &cliprect )
 {
 	if( m_debug.mesh )
 	{
-		copybitmap( bitmap, m_debug.mesh, 0, 0, 0, 0, cliprect );
+		copybitmap( bitmap, *m_debug.mesh, 0, 0, 0, 0, cliprect );
 	}
 	m_debug.b_clear = 1;
 	return m_debug.b_mesh;
 }
 
-int psxgpu_device::DebugTextureDisplay( bitmap_t *bitmap )
+int psxgpu_device::DebugTextureDisplay( bitmap_t &bitmap )
 {
 	UINT32 n_y;
 
@@ -600,7 +600,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	machine().save().register_postload( save_prepost_delegate( FUNC( psxgpu_device::updatevisiblearea ), this ) );
 }
 
-void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
+void psxgpu_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT32 n_x;
 	UINT32 n_y;
@@ -628,7 +628,7 @@ void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 	if( ( n_gpustatus & ( 1 << 0x17 ) ) != 0 )
 	{
 		/* todo: only draw to necessary area */
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 	}
 	else
 	{
@@ -710,7 +710,7 @@ void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 			while( n_line > 0 )
 			{
 				UINT16 *p_n_src = p_p_vram[ n_y + n_displaystarty ] + ((n_x + n_displaystartx) * 3);
-				UINT16 *p_n_dest = &bitmap->pix16(n_y + n_top, n_x + n_left);
+				UINT16 *p_n_dest = &bitmap.pix16(n_y + n_top, n_x + n_left);
 
 				n_column = n_columns;
 				while( n_column > 0 )

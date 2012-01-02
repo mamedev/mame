@@ -462,7 +462,7 @@ static SCREEN_UPDATE(bingor)
 	bingor_state *state = screen.machine().driver_data<bingor_state>();
 	int x,y,count;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	count = (0x2000/2);
 
@@ -475,22 +475,22 @@ static SCREEN_UPDATE(bingor)
 			color = (state->m_blit_ram[count] & 0xf000)>>12;
 
 			if((x+3)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-				bitmap->pix32(y, x+3) = screen.machine().pens[color];
+				bitmap.pix32(y, x+3) = screen.machine().pens[color];
 
 			color = (state->m_blit_ram[count] & 0x0f00)>>8;
 
 			if((x+2)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-				bitmap->pix32(y, x+2) = screen.machine().pens[color];
+				bitmap.pix32(y, x+2) = screen.machine().pens[color];
 
 			color = (state->m_blit_ram[count] & 0x00f0)>>4;
 
 			if((x+1)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-				bitmap->pix32(y, x+1) = screen.machine().pens[color];
+				bitmap.pix32(y, x+1) = screen.machine().pens[color];
 
 			color = (state->m_blit_ram[count] & 0x000f)>>0;
 
 			if((x+0)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-				bitmap->pix32(y, x+0) = screen.machine().pens[color];
+				bitmap.pix32(y, x+0) = screen.machine().pens[color];
 
 			count++;
 		}

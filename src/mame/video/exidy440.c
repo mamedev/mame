@@ -302,7 +302,7 @@ static TIMER_CALLBACK( collide_firq_callback )
  *
  *************************************/
 
-static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect,
+static void draw_sprites(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect,
 						 int scroll_offset, int check_collision)
 {
 	exidy440_state *state = screen.machine().driver_data<exidy440_state>();
@@ -367,7 +367,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 					{
 						/* combine with the background */
 						pen = left | old[0];
-						bitmap->pix16(yoffs, currx) = pen;
+						bitmap.pix16(yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
@@ -380,7 +380,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 					{
 						/* combine with the background */
 						pen = right | old[1];
-						bitmap->pix16(yoffs, currx) = pen;
+						bitmap.pix16(yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
@@ -403,7 +403,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
  *
  *************************************/
 
-static void update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect,
+static void update_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect,
 						  int scroll_offset, int check_collision)
 {
 	exidy440_state *state = screen.machine().driver_data<exidy440_state>();

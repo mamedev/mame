@@ -101,7 +101,7 @@ static SCREEN_UPDATE(blitz68k)
 	{
 		for(x = 0; x < 512; x++)
 		{
-			bitmap->pix32(y, x) = screen.machine().pens[*src++];
+			bitmap.pix32(y, x) = screen.machine().pens[*src++];
 		}
 	}
 
@@ -123,10 +123,10 @@ static SCREEN_UPDATE(blitz68k_noblit)
 		for(x = 0; x < 512; )
 		{
 			UINT16 pen = *src++;
-			bitmap->pix32(y, x++) = screen.machine().pens[(pen >>  8) & 0xf];
-			bitmap->pix32(y, x++) = screen.machine().pens[(pen >> 12) & 0xf];
-			bitmap->pix32(y, x++) = screen.machine().pens[(pen >>  0) & 0xf];
-			bitmap->pix32(y, x++) = screen.machine().pens[(pen >>  4) & 0xf];
+			bitmap.pix32(y, x++) = screen.machine().pens[(pen >>  8) & 0xf];
+			bitmap.pix32(y, x++) = screen.machine().pens[(pen >> 12) & 0xf];
+			bitmap.pix32(y, x++) = screen.machine().pens[(pen >>  0) & 0xf];
+			bitmap.pix32(y, x++) = screen.machine().pens[(pen >>  4) & 0xf];
 		}
 	}
 

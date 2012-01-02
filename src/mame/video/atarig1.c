@@ -159,7 +159,7 @@ SCREEN_UPDATE( atarig1 )
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 
 	/* copy the motion objects on top */
-	copybitmap_trans(bitmap, atarirle_get_vram(state->m_rle, 0), 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *atarirle_get_vram(state->m_rle, 0), 0, 0, 0, 0, cliprect, 0);
 
 	/* add the alpha on top */
 	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);

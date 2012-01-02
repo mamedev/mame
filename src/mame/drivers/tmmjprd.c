@@ -78,7 +78,7 @@ static WRITE32_HANDLER( tmmjprd_tilemap3_w )
 	COMBINE_DATA(&state->m_tilemap_ram[3][offset]);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int screen)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int screen)
 {
 	tmmjprd_state *state = machine.driver_data<tmmjprd_state>();
 	int xpos,ypos,tileno,xflip,yflip, colr;
@@ -155,7 +155,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void ttmjprd_draw_tile(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom)
+static void ttmjprd_draw_tile(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom)
 {
 	/* note, it's tile address _NOT_ tile number, 'sub-tile' access is possible, hence using the custom rendering */
 	int tileaddr = (tiledata&0x000fffff)>>0;
@@ -198,7 +198,7 @@ static void ttmjprd_draw_tile(running_machine &machine, bitmap_t *bitmap, const 
 					if (dat!=15)
 					{
 						//dat += (colour<<8);
-						dst = &bitmap->pix16(drawy, drawx);
+						dst = &bitmap.pix16(drawy, drawx);
 						dst[0] = dat;
 					}
 				}
@@ -209,7 +209,7 @@ static void ttmjprd_draw_tile(running_machine &machine, bitmap_t *bitmap, const 
 					if (dat!=15)
 					{
 						//dat += (colour<<8);
-						dst = &bitmap->pix16(drawy, drawx);
+						dst = &bitmap.pix16(drawy, drawx);
 						dst[0] = dat;
 					}
 				}
@@ -224,7 +224,7 @@ static void ttmjprd_draw_tile(running_machine &machine, bitmap_t *bitmap, const 
 					if (dat!=255)
 					{
 						dat += (colour<<8) & 0xf00;
-						dst = &bitmap->pix16(drawy, drawx);
+						dst = &bitmap.pix16(drawy, drawx);
 						dst[0] = dat;
 					}
 				}
@@ -234,7 +234,7 @@ static void ttmjprd_draw_tile(running_machine &machine, bitmap_t *bitmap, const 
 	}
 }
 
-static void ttmjprd_draw_tilemap(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom )
+static void ttmjprd_draw_tilemap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom )
 {
 	int y,x;
 	int count;
@@ -280,7 +280,7 @@ static SCREEN_UPDATE( tmmjprd_left )
 	tmmjprd_state *state = screen.machine().driver_data<tmmjprd_state>();
 	UINT8* gfxroms = screen.machine().region("gfx2")->base();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, state->m_tilemap_ram[3], state->m_tilemap_regs[3], gfxroms );
 	draw_sprites(screen.machine(),bitmap,cliprect, 1);
@@ -315,7 +315,7 @@ static SCREEN_UPDATE( tmmjprd_right )
 	tmmjprd_state *state = screen.machine().driver_data<tmmjprd_state>();
 	UINT8* gfxroms = screen.machine().region("gfx2")->base();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	ttmjprd_draw_tilemap( screen.machine(), bitmap, cliprect, state->m_tilemap_ram[1], state->m_tilemap_regs[1], gfxroms );
 	draw_sprites(screen.machine(),bitmap,cliprect, 0);

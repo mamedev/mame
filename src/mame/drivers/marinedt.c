@@ -512,31 +512,31 @@ static SCREEN_UPDATE( marinedt )
 	int sx, sy;
 
 	state->m_tile->fill(0);
-	tilemap_draw(state->m_tile, cliprect, state->m_tx_tilemap, 0, 0);
+	tilemap_draw(*state->m_tile, cliprect, state->m_tx_tilemap, 0, 0);
 
 	state->m_obj1->fill(0);
-	drawgfx_transpen(state->m_obj1, state->m_obj1->cliprect(), screen.machine().gfx[1],
+	drawgfx_transpen(*state->m_obj1, state->m_obj1->cliprect(), screen.machine().gfx[1],
 			OBJ_CODE(state->m_obj1_a),
 			OBJ_COLOR(state->m_obj1_a),
 			OBJ_FLIPX(state->m_obj1_a), OBJ_FLIPY(state->m_obj1_a),
 			0, 0, 0);
 
 	state->m_obj2->fill(0);
-	drawgfx_transpen(state->m_obj2, state->m_obj2->cliprect(), screen.machine().gfx[2],
+	drawgfx_transpen(*state->m_obj2, state->m_obj2->cliprect(), screen.machine().gfx[2],
 			OBJ_CODE(state->m_obj2_a),
 			OBJ_COLOR(state->m_obj2_a),
 			OBJ_FLIPX(state->m_obj2_a), OBJ_FLIPY(state->m_obj2_a),
 			0, 0, 0);
 
-	bitmap->fill(0);
+	bitmap.fill(0);
 
 	if (state->m_pd & 0x02)
-		copybitmap_trans(bitmap, state->m_obj2, 0, 0, OBJ_X(state->m_obj2_x), OBJ_Y(state->m_obj2_y), cliprect, 0);
+		copybitmap_trans(bitmap, *state->m_obj2, 0, 0, OBJ_X(state->m_obj2_x), OBJ_Y(state->m_obj2_y), cliprect, 0);
 
 	if (state->m_pd & 0x01)
-		copybitmap_trans(bitmap, state->m_obj1, 0, 0, OBJ_X(state->m_obj1_x), OBJ_Y(state->m_obj1_y), cliprect, 0);
+		copybitmap_trans(bitmap, *state->m_obj1, 0, 0, OBJ_X(state->m_obj1_x), OBJ_Y(state->m_obj1_y), cliprect, 0);
 
-	copybitmap_trans(bitmap, state->m_tile, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *state->m_tile, 0, 0, 0, 0, cliprect, 0);
 
 	state->m_coll = state->m_cx = state->m_cyr = state->m_cyq = 0;
 	if (state->m_pd & 0x01)

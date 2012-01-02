@@ -96,7 +96,7 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 
 	height = lbucket * VECTOR_WIDTH_DENOM / TEXTURE_LENGTH_BUCKETS;
 	tex->bitmap = global_alloc(bitmap_t(TEXTURE_WIDTH, height, BITMAP_FORMAT_ARGB32));
-	tex->bitmap->fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
+	tex->bitmap.fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
 
 	totalint = 1.0f;
 	for (x = TEXTURE_WIDTH / 2 - 1; x >= 0; x--)
@@ -109,10 +109,10 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 		{
 			UINT32 *pix;
 
-			pix = (UINT32 *)bitmap->base + y * bitmap->rowpixels + x;
+			pix = (UINT32 *)bitmap.base + y * bitmap.rowpixels + x;
 			*pix = MAKE_ARGB((RGB_ALPHA(*pix) * intensity) >> 8,0xff,0xff,0xff);
 
-			pix = (UINT32 *)bitmap->base + y * bitmap->rowpixels + (TEXTURE_WIDTH - 1 - x);
+			pix = (UINT32 *)bitmap.base + y * bitmap.rowpixels + (TEXTURE_WIDTH - 1 - x);
 			*pix = MAKE_ARGB((RGB_ALPHA(*pix) * intensity) >> 8,0xff,0xff,0xff);
 		}
 	}

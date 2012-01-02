@@ -106,7 +106,7 @@ VIDEO_START( sauro )
 	state->m_palette_bank = 0;
 }
 
-static void sauro_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void sauro_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	sauro_state *state = machine.driver_data<sauro_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -174,7 +174,7 @@ VIDEO_START( trckydoc )
 		 8, 8, 32, 32);
 }
 
-static void trckydoc_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void trckydoc_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	sauro_state *state = machine.driver_data<sauro_state>();
 	UINT8 *spriteram = state->m_spriteram;

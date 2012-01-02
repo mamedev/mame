@@ -19,7 +19,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 /******************************************************************************/
 
-static void tumblepb_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void tumblepb_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -85,7 +85,7 @@ static void tumblepb_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	}
 }
 
-static void jumpkids_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void jumpkids_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -152,7 +152,7 @@ static void jumpkids_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	}
 }
 
-static void fncywld_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void fncywld_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -878,7 +878,7 @@ SCREEN_UPDATE( jumppop )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 
-	//  bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	//  bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	tilemap_set_scrollx(state->m_pf1_tilemap, 0, state->m_control[2] - 0x3a0);
 	tilemap_set_scrolly(state->m_pf1_tilemap, 0, state->m_control[3]);

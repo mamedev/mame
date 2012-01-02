@@ -32,7 +32,7 @@
 ***************************************************************************/
 
 /* callback for special processing */
-typedef int (*atarimo_special_func)(bitmap_t *bitmap, const rectangle &clip, int code, int color, int xpos, int ypos, rectangle *mobounds);
+typedef int (*atarimo_special_func)(bitmap_t &bitmap, const rectangle &clip, int code, int color, int xpos, int ypos, rectangle *mobounds);
 
 /* description for a four-word mask */
 typedef struct _atarimo_entry atarimo_entry;
@@ -127,7 +127,7 @@ WRITE16_HANDLER( atarimo_0_slipram_w );
 WRITE16_HANDLER( atarimo_1_spriteram_w );
 WRITE16_HANDLER( atarimo_1_slipram_w );
 
-void atarimo_mark_high_palette(bitmap_t *bitmap, UINT16 *pf, UINT16 *mo, int x, int y);
+void atarimo_mark_high_palette(bitmap_t &bitmap, UINT16 *pf, UINT16 *mo, int x, int y);
 
 
 #endif

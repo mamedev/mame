@@ -130,7 +130,7 @@ void zodiack_state::video_start()
 	flip_screen_set_no_update(machine(), 0);
 }
 
-void zodiack_state::draw_bullets( bitmap_t *bitmap, const rectangle &cliprect )
+void zodiack_state::draw_bullets( bitmap_t &bitmap, const rectangle &cliprect )
 {
 	for (int offs = 0; offs < m_bulletsram_size; offs += 4)
 	{
@@ -154,7 +154,7 @@ void zodiack_state::draw_bullets( bitmap_t *bitmap, const rectangle &cliprect )
 	}
 }
 
-void zodiack_state::draw_sprites( bitmap_t *bitmap, const rectangle &cliprect )
+void zodiack_state::draw_sprites( bitmap_t &bitmap, const rectangle &cliprect )
 {
 	for (int offs = m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
@@ -186,9 +186,9 @@ bool zodiack_state::screen_update( screen_device &screen, bitmap_t &bitmap, cons
 	for (int i = 0; i < 32; i++)
 		tilemap_set_scrolly(m_fg_tilemap, i, m_attributeram[i * 2]);
 
-	tilemap_draw(&bitmap, cliprect, m_bg_tilemap, 0, 0);
-	tilemap_draw(&bitmap, cliprect, m_fg_tilemap, 0, 0);
-	draw_bullets(&bitmap, cliprect);
-	draw_sprites(&bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, m_fg_tilemap, 0, 0);
+	draw_bullets(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

@@ -743,7 +743,7 @@ static int mo_render_object(atarimo_data *mo, const atarimo_entry *entry, const 
 {
 	int gfxindex = mo->gfxlookup[EXTRACT_DATA(entry, mo->gfxmask)];
 	const gfx_element *gfx = mo->gfxelement[gfxindex];
-	bitmap_t *bitmap = mo->bitmap;
+	bitmap_t &bitmap = *mo->bitmap;
 	int x, y, sx, sy;
 
 	/* extract data from the various words */
@@ -1142,13 +1142,13 @@ WRITE16_HANDLER( atarimo_1_slipram_w )
     or the end of line.
 ---------------------------------------------------------------*/
 
-void atarimo_mark_high_palette(bitmap_t *bitmap, UINT16 *pf, UINT16 *mo, int x, int y)
+void atarimo_mark_high_palette(bitmap_t &bitmap, UINT16 *pf, UINT16 *mo, int x, int y)
 {
 	#define START_MARKER	((4 << ATARIMO_PRIORITY_SHIFT) | 2)
 	#define END_MARKER		((4 << ATARIMO_PRIORITY_SHIFT) | 4)
 	int offnext = 0;
 
-	for ( ; x < bitmap->width(); x++)
+	for ( ; x < bitmap.width(); x++)
 	{
 		pf[x] |= 0x400;
 		if (offnext && (mo[x] & START_MARKER) != START_MARKER)

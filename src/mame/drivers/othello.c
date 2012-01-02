@@ -92,7 +92,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 		for(x = 0; x < TILE_WIDTH; ++x)
 		{
-			bitmap->pix16(y, (cx * TILE_WIDTH + x) ^ 1) = tmp & 0x0f;
+			bitmap.pix16(y, (cx * TILE_WIDTH + x) ^ 1) = tmp & 0x0f;
 			tmp >>= 4;
 		}
 	}

@@ -76,8 +76,8 @@ static const pen_t default_colortable[] =
 typedef struct _ppu2c0x_state  ppu2c0x_state;
 struct _ppu2c0x_state
 {
-	address_space		*space;					/* memory space */
-	bitmap_t                    *bitmap;			/* target bitmap */
+	address_space				*space;					/* memory space */
+	bitmap_t 					*bitmap;			/* target bitmap */
 	UINT8                       *spriteram;			/* sprite ram */
 	pen_t                       *colortable;			/* color table modified at run time */
 	pen_t                       *colortable_mono;		/* monochromatic color table modified at run time */
@@ -368,7 +368,7 @@ static void draw_background( device_t *device, UINT8 *line_priority )
 	ppu2c0x_state *ppu2c0x = get_token(device);
 
 	/* cache some values locally */
-	bitmap_t *bitmap = ppu2c0x->bitmap;
+	bitmap_t &bitmap = *ppu2c0x->bitmap;
 	const int *ppu_regs = &ppu2c0x->regs[0];
 	const int scanline = ppu2c0x->scanline;
 	const int refresh_data = ppu2c0x->refresh_data;
@@ -413,7 +413,7 @@ static void draw_background( device_t *device, UINT8 *line_priority )
 	tile_index = ((refresh_data & 0xc00) | 0x2000) + scroll_y_coarse * 32;
 
 	/* set up dest */
-	dest = &bitmap->pix16(scanline, start_x);
+	dest = &bitmap.pix16(scanline, start_x);
 
 	/* draw the 32 or 33 tiles that make up a line */
 	while (tilecount < 34)
@@ -500,7 +500,7 @@ static void draw_background( device_t *device, UINT8 *line_priority )
 	/* if the left 8 pixels for the background are off, blank 'em */
 	if (!(ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
 	{
-		dest = &bitmap->pix16(scanline);
+		dest = &bitmap.pix16(scanline);
 		for (i = 0; i < 8; i++)
 		{
 			*(dest++) = back_pen;
@@ -514,7 +514,7 @@ static void draw_sprites( device_t *device, UINT8 *line_priority )
 	ppu2c0x_state *ppu2c0x = get_token(device);
 
 	/* cache some values locally */
-	bitmap_t *bitmap = ppu2c0x->bitmap;
+	bitmap_t &bitmap = *ppu2c0x->bitmap;
 	const int scanline = ppu2c0x->scanline;
 	const int sprite_page = ppu2c0x->sprite_page;
 	const UINT8 *sprite_ram = ppu2c0x->spriteram;
@@ -652,7 +652,7 @@ static void draw_sprites( device_t *device, UINT8 *line_priority )
 						{
 							/* no, draw */
 							if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
-								bitmap->pix16(scanline, sprite_xpos + pixel) = paldata[pixel_data];
+								bitmap.pix16(scanline, sprite_xpos + pixel) = paldata[pixel_data];
 						}
 						/* indicate that a sprite was drawn at this location, even if it's not seen */
 						if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
@@ -695,7 +695,7 @@ static void draw_sprites( device_t *device, UINT8 *line_priority )
 							/* no, draw */
 							if ((sprite_xpos + pixel) < VISIBLE_SCREEN_WIDTH)
 							{
-								bitmap->pix16(scanline, sprite_xpos + pixel) = paldata[pixel_data];
+								bitmap.pix16(scanline, sprite_xpos + pixel) = paldata[pixel_data];
 								line_priority[sprite_xpos + pixel] |= 0x01;
 							}
 						}
@@ -733,7 +733,7 @@ static void render_scanline( device_t *device )
 		draw_background(device, line_priority);
 	else
 	{
-		bitmap_t *bitmap = ppu2c0x->bitmap;
+		bitmap_t &bitmap = *ppu2c0x->bitmap;
 		const int scanline = ppu2c0x->scanline;
 		UINT8 color_mask;
 		UINT16 back_pen;
@@ -749,8 +749,8 @@ static void render_scanline( device_t *device )
 		back_pen = (ppu2c0x->back_color & color_mask) + ppu2c0x->color_base;
 
 		// Fill this scanline with the background pen.
-		for (i = 0; i < bitmap->width(); i++)
-			bitmap->pix16(scanline, i) = back_pen;
+		for (i = 0; i < bitmap.width(); i++)
+			bitmap.pix16(scanline, i) = back_pen;
 	}
 
 	/* if sprites are on, draw them, but we call always to process them */
@@ -781,7 +781,7 @@ static void update_scanline( device_t *device )
 		}
 		else
 		{
-			bitmap_t *bitmap = ppu2c0x->bitmap;
+			bitmap_t &bitmap = *ppu2c0x->bitmap;
 			UINT8 color_mask;
 			UINT16 back_pen;
 			int i;
@@ -812,8 +812,8 @@ static void update_scanline( device_t *device )
 				back_pen = (ppu2c0x->back_color & color_mask) + ppu2c0x->color_base;
 
 			// Fill this scanline with the background pen.
-			for (i = 0; i < bitmap->width(); i++)
-				bitmap->pix16(scanline, i) = back_pen;
+			for (i = 0; i < bitmap.width(); i++)
+				bitmap.pix16(scanline, i) = back_pen;
 		}
 
 		/* increment the fine y-scroll */
@@ -1206,10 +1206,10 @@ void ppu2c0x_spriteram_dma( address_space *space, device_t *device, const UINT8 
  *
  *************************************/
 
-void ppu2c0x_render( device_t *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy )
+void ppu2c0x_render( device_t *device, bitmap_t &bitmap, int flipx, int flipy, int sx, int sy )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
-	copybitmap(bitmap, ppu2c0x->bitmap, flipx, flipy, sx, sy, bitmap->cliprect());
+	copybitmap(bitmap, *ppu2c0x->bitmap, flipx, flipy, sx, sy, bitmap.cliprect());
 }
 
 /*************************************

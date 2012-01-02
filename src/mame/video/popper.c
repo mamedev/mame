@@ -204,7 +204,7 @@ VIDEO_START( popper )
 	state->m_tilemap_clip = machine.primary_screen->visible_area();
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
 {
 	popper_state *state = machine.driver_data<popper_state>();
 	int offs, sx, sy, flipx, flipy;

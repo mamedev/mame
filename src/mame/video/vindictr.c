@@ -234,7 +234,7 @@ SCREEN_UPDATE( vindictr )
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
-			UINT16 *pf = &bitmap->pix16(y);
+			UINT16 *pf = &bitmap.pix16(y);
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{
@@ -275,7 +275,7 @@ SCREEN_UPDATE( vindictr )
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
-			UINT16 *pf = &bitmap->pix16(y);
+			UINT16 *pf = &bitmap.pix16(y);
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{

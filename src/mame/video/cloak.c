@@ -188,7 +188,7 @@ VIDEO_START( cloak )
 	machine.save().register_postload(save_prepost_delegate(FUNC(set_current_bitmap_videoram_pointer), state));
 }
 
-static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_bitmap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	cloak_state *state = machine.driver_data<cloak_state>();
 	int x, y;
@@ -199,11 +199,11 @@ static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectan
 			pen_t pen = state->m_current_bitmap_videoram_displayed[(y << 8) | x] & 0x07;
 
 			if (pen)
-				bitmap->pix16(y, (x - 6) & 0xff) = 0x10 | ((x & 0x80) >> 4) | pen;
+				bitmap.pix16(y, (x - 6) & 0xff) = 0x10 | ((x & 0x80) >> 4) | pen;
 		}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	cloak_state *state = machine.driver_data<cloak_state>();
 	UINT8 *spriteram = state->m_spriteram;

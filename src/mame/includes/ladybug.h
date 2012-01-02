@@ -80,4 +80,4 @@ SCREEN_EOF( redclash );
 void redclash_set_stars_enable(running_machine &machine, UINT8 on);
 void redclash_update_stars_state(running_machine &machine);
 void redclash_set_stars_speed(running_machine &machine, UINT8 speed);
-void redclash_draw_stars(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
+void redclash_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);

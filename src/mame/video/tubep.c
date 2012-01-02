@@ -617,7 +617,7 @@ SCREEN_UPDATE( tubep )
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
-				bitmap->pix16(v, h) = (state->m_textram[text_offs + 1] & 0x0f) | state->m_color_A4;
+				bitmap.pix16(v, h) = (state->m_textram[text_offs + 1] & 0x0f) | state->m_color_A4;
 			else
 			{
 				UINT32 bg_data;
@@ -658,7 +658,7 @@ SCREEN_UPDATE( tubep )
 				if (sp_data != 0x0f)
 					bg_data = state->m_prom2[sp_data | state->m_color_A4];
 
-				bitmap->pix16(v, h) = pen_base + bg_data*64 + romB_data_h;
+				bitmap.pix16(v, h) = pen_base + bg_data*64 + romB_data_h;
 			}
 		}
 	}
@@ -788,7 +788,7 @@ SCREEN_UPDATE( rjammer )
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
-				bitmap->pix16(v, h) = 0x10 | (state->m_textram[text_offs + 1] & 0x0f);
+				bitmap.pix16(v, h) = 0x10 | (state->m_textram[text_offs + 1] & 0x0f);
 			else
 			{
 				UINT32 sp_data;
@@ -799,7 +799,7 @@ SCREEN_UPDATE( rjammer )
 					sp_data = sp_data1;
 
 				if (sp_data != 0x0f)
-					bitmap->pix16(v, h) = 0x00 + sp_data;
+					bitmap.pix16(v, h) = 0x00 + sp_data;
 				else
 				{
 					UINT32 bg_data;
@@ -852,7 +852,7 @@ SCREEN_UPDATE( rjammer )
 					color_bank =  (pal14h4_pin13 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) & (((bg_data&0x02)>>1)^1) &  (bg_data&0x01)    )
 								| (pal14h4_pin18 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) &  ((bg_data&0x02)>>1)    & ((bg_data&0x01)^1) )
 								| (pal14h4_pin19);
-					bitmap->pix16(v, h) = 0x20 + color_bank*0x10 + bg_data;
+					bitmap.pix16(v, h) = 0x20 + color_bank*0x10 + bg_data;
 				}
 			}
 		}

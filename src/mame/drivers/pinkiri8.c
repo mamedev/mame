@@ -213,7 +213,7 @@ static SCREEN_UPDATE( pinkiri8 )
 	//popmessage("%02x",state->m_janshi_crtc_regs[0x0a]);
 	col_bank = (state->m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	/* FIXME: color is a bit of a mystery */
 	{

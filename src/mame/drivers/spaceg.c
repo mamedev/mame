@@ -306,7 +306,7 @@ static SCREEN_UPDATE( spaceg )
 
 		for (i = 0; i < 8; i++)
 		{
-			bitmap->pix16(y, x) = (data & 0x80) ? state->m_colorram[offs] : 0;
+			bitmap.pix16(y, x) = (data & 0x80) ? state->m_colorram[offs] : 0;
 
 			x++;
 			data <<= 1;

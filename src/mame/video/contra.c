@@ -301,7 +301,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int bank )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bank )
 {
 	contra_state *state = machine.driver_data<contra_state>();
 	device_t *k007121 = bank ? state->m_k007121_2 : state->m_k007121_1;

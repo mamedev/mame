@@ -128,7 +128,7 @@ static int get_y_pos(tank8_state *state, int n)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	tank8_state *state = machine.driver_data<tank8_state>();
 	int i;
@@ -151,7 +151,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_bullets(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	tank8_state *state = machine.driver_data<tank8_state>();
 	int i;
@@ -179,7 +179,7 @@ static void draw_bullets(running_machine &machine, bitmap_t *bitmap, const recta
 		if (rect.max_y > cliprect.max_y)
 			rect.max_y = cliprect.max_y;
 
-		bitmap->fill((i << 1) | 0x01, rect);
+		bitmap.fill((i << 1) | 0x01, rect);
 	}
 }
 
@@ -209,13 +209,13 @@ SCREEN_EOF( tank8 )
 	int y;
 	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-	tilemap_draw(state->m_helper1, visarea, state->m_tilemap, 0, 0);
+	tilemap_draw(*state->m_helper1, visarea, state->m_tilemap, 0, 0);
 
 	state->m_helper2->fill(8, visarea);
 	state->m_helper3->fill(8, visarea);
 
-	draw_sprites(screen.machine(), state->m_helper2, visarea);
-	draw_bullets(screen.machine(), state->m_helper3, visarea);
+	draw_sprites(screen.machine(), *state->m_helper2, visarea);
+	draw_bullets(screen.machine(), *state->m_helper3, visarea);
 
 	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{

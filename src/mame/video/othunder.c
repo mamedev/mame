@@ -63,7 +63,7 @@ spriteram is being tested, take no notice of that.]
 ********************************************************/
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
 {
 	othunder_state *state = machine.driver_data<othunder_state>();
 	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
@@ -211,10 +211,10 @@ SCREEN_UPDATE( othunder )
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);

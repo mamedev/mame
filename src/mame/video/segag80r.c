@@ -640,7 +640,7 @@ WRITE8_HANDLER( sindbadm_back_port_w )
  *
  *************************************/
 
-static void draw_videoram(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, const UINT8 *transparent_pens)
+static void draw_videoram(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *transparent_pens)
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -670,14 +670,14 @@ static void draw_videoram(running_machine &machine, bitmap_t *bitmap, const rect
  *
  *************************************/
 
-static void draw_background_spaceod(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_background_spaceod(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
-	bitmap_t *pixmap = tilemap_get_pixmap(!(state->m_spaceod_bg_control & 0x02) ? state->m_spaceod_bg_htilemap : state->m_spaceod_bg_vtilemap);
+	bitmap_t &pixmap = tilemap_get_pixmap(!(state->m_spaceod_bg_control & 0x02) ? state->m_spaceod_bg_htilemap : state->m_spaceod_bg_vtilemap);
 	int flipmask = (state->m_spaceod_bg_control & 0x01) ? 0xff : 0x00;
 	int xoffset = (state->m_spaceod_bg_control & 0x02) ? 0x10 : 0x00;
-	int xmask = pixmap->width() - 1;
-	int ymask = pixmap->height() - 1;
+	int xmask = pixmap.width() - 1;
+	int ymask = pixmap.height() - 1;
 	int x, y;
 
 	/* The H and V counters on this board are independent of the ones on */
@@ -690,8 +690,8 @@ static void draw_background_spaceod(running_machine &machine, bitmap_t *bitmap, 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = (y + state->m_spaceod_vcounter + 22) ^ flipmask;
-		UINT16 *src = &pixmap->pix16(effy & ymask);
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *src = &pixmap.pix16(effy & ymask);
+		UINT16 *dst = &bitmap.pix16(y);
 
 		/* loop over horizontal pixels */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -728,19 +728,19 @@ static void draw_background_spaceod(running_machine &machine, bitmap_t *bitmap, 
  *
  *************************************/
 
-static void draw_background_page_scroll(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_background_page_scroll(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
-	bitmap_t *pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
+	bitmap_t &pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
 	int flipmask = (state->m_video_control & 0x08) ? 0xff : 0x00;
-	int xmask = pixmap->width() - 1;
-	int ymask = pixmap->height() - 1;
+	int xmask = pixmap.width() - 1;
+	int ymask = pixmap.height() - 1;
 	int x, y;
 
 	/* if disabled, draw nothing */
 	if (!state->m_bg_enable)
 	{
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 		return;
 	}
 
@@ -748,8 +748,8 @@ static void draw_background_page_scroll(running_machine &machine, bitmap_t *bitm
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = state->m_bg_scrolly + (((y ^ flipmask) + (flipmask & 0xe0)) & 0xff);
-		UINT16 *src = &pixmap->pix16(effy & ymask);
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *src = &pixmap.pix16(effy & ymask);
+		UINT16 *dst = &bitmap.pix16(y);
 
 		/* loop over horizontal pixels */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -769,19 +769,19 @@ static void draw_background_page_scroll(running_machine &machine, bitmap_t *bitm
  *
  *************************************/
 
-static void draw_background_full_scroll(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_background_full_scroll(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
-	bitmap_t *pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
+	bitmap_t &pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
 	int flipmask = (state->m_video_control & 0x08) ? 0x3ff : 0x000;
-	int xmask = pixmap->width() - 1;
-	int ymask = pixmap->height() - 1;
+	int xmask = pixmap.width() - 1;
+	int ymask = pixmap.height() - 1;
 	int x, y;
 
 	/* if disabled, draw nothing */
 	if (!state->m_bg_enable)
 	{
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 		return;
 	}
 
@@ -789,8 +789,8 @@ static void draw_background_full_scroll(running_machine &machine, bitmap_t *bitm
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = (y + state->m_bg_scrolly) ^ flipmask;
-		UINT16 *src = &pixmap->pix16(effy & ymask);
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *src = &pixmap.pix16(effy & ymask);
+		UINT16 *dst = &bitmap.pix16(y);
 
 		/* loop over horizontal pixels */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)

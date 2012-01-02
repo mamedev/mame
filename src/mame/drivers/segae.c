@@ -1010,7 +1010,7 @@ static SCREEN_UPDATE( systeme )
 
 	for( int y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
-		UINT32 *dest_ptr = &bitmap->pix32(y);
+		UINT32 *dest_ptr = &bitmap.pix32(y);
 		UINT32 *vdp1_ptr = &vdp1_bitmap->pix32(y);
 		UINT32 *vdp2_ptr = &vdp2_bitmap->pix32(y);
 		UINT8 *y1_ptr = &vdp2_y1->pix8(y);

@@ -688,9 +688,9 @@ void mc6845_device::update_cursor_state()
 }
 
 
-void mc6845_device::update(bitmap_t *bitmap, const rectangle &cliprect)
+void mc6845_device::update(bitmap_t &bitmap, const rectangle &cliprect)
 {
-	assert(bitmap != NULL);
+	assert(bitmap.valid());
 
 	if (m_has_valid_parameters)
 	{

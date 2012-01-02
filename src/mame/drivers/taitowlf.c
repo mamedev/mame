@@ -68,7 +68,7 @@ static SCREEN_UPDATE( taitowlf )
 	int x,y,count;
 	const UINT8 *blit_ram = screen.machine().region("user5")->base();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	count = (0);
 
@@ -81,7 +81,7 @@ static SCREEN_UPDATE( taitowlf )
 			color = (blit_ram[count] & 0xff);
 
 			if((x)+0<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-				bitmap->pix32(y, x+0) = screen.machine().pens[color];
+				bitmap.pix32(y, x+0) = screen.machine().pens[color];
 
 			count++;
 		}

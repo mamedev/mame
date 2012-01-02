@@ -148,7 +148,7 @@ VIDEO_START( battlane )
 	state->m_screen_bitmap = auto_bitmap_alloc(machine, 32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	battlane_state *state = machine.driver_data<battlane_state>();
 	int offs, attr, code, color, sx, sy, flipx, flipy, dy;
@@ -212,7 +212,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void draw_fg_bitmap( running_machine &machine, bitmap_t *bitmap )
+static void draw_fg_bitmap( running_machine &machine, bitmap_t &bitmap )
 {
 	battlane_state *state = machine.driver_data<battlane_state>();
 	int x, y, data;
@@ -226,9 +226,9 @@ static void draw_fg_bitmap( running_machine &machine, bitmap_t *bitmap )
 			if (data)
 			{
 				if (flip_screen_get(machine))
-					bitmap->pix16(255 - y, 255 - x) = data;
+					bitmap.pix16(255 - y, 255 - x) = data;
 				else
-					bitmap->pix16(y, x) = data;
+					bitmap.pix16(y, x) = data;
 			}
 		}
 	}

@@ -76,7 +76,7 @@ WRITE8_HANDLER( momoko_flipscreen_w )
 
 /****************************************************************************/
 
-static void momoko_draw_bg_pri( running_machine &machine, bitmap_t *bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri )
+static void momoko_draw_bg_pri( running_machine &machine, bitmap_t &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri )
 {
 	int xx, sx, sy, px, py, dot;
 	UINT32 gfxadr;
@@ -100,7 +100,7 @@ static void momoko_draw_bg_pri( running_machine &machine, bitmap_t *bitmap, int 
 					else      py = 7 - sy + y;
 
 				if (dot >= pri)
-					bitmap->pix16(py, px) = col * 16 + dot + 256;
+					bitmap.pix16(py, px) = col * 16 + dot + 256;
 
 				d0 = d0 << 1;
 				d1 = d1 << 1;
@@ -162,7 +162,7 @@ SCREEN_UPDATE( momoko )
 		}
 	}
 	else
-	bitmap->fill(256, cliprect);
+	bitmap.fill(256, cliprect);
 
 
 	/* draw sprites (momoko) */

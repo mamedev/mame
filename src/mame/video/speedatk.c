@@ -95,7 +95,7 @@ SCREEN_UPDATE( speedatk )
 	UINT16 tile;
 	UINT8 color, region;
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	count = (state->m_crtc_vreg[0x0c]<<8)|(state->m_crtc_vreg[0x0d] & 0xff);
 

@@ -163,9 +163,9 @@ static SCREEN_UPDATE(quizpun2)
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->m_bg_tmap,  TILEMAP_DRAW_OPAQUE, 0);
-	else					bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	else					bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-bitmap->fill(get_black_pen(screen.machine()), cliprect);
+bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, state->m_fg_tmap, 0, 0);
 
 	return 0;

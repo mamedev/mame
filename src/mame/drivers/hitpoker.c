@@ -81,7 +81,7 @@ static SCREEN_UPDATE(hitpoker)
 	int count = 0;
 	int y,x;
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	for (y=0;y<31;y++)
 	{

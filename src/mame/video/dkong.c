@@ -559,7 +559,7 @@ WRITE8_HANDLER( dkong_spritebank_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT32 mask_bank, UINT32 shift_bits)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32 mask_bank, UINT32 shift_bits)
 {
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int offs;
@@ -805,7 +805,7 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 
 }
 
-static void radarscp_draw_background(running_machine &machine, dkong_state *state, bitmap_t *bitmap, const rectangle &cliprect)
+static void radarscp_draw_background(running_machine &machine, dkong_state *state, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	const UINT8 	*htable = NULL;
 	int 			x,y;
@@ -821,7 +821,7 @@ static void radarscp_draw_background(running_machine &machine, dkong_state *stat
 		x = cliprect.min_x;
 		while (x <= cliprect.max_x)
 		{
-			pixel = &bitmap->pix16(y, x);
+			pixel = &bitmap.pix16(y, x);
 			draw_ok = !(*pixel & 0x01) && !(*pixel & 0x02);
 			if (state->m_hardware_type == HARDWARE_TRS01) /*  Check again from schematics */
 				draw_ok = draw_ok  && !((htable[ (!state->m_rflip_sig<<7) | (x>>2)] >>2) & 0x01);

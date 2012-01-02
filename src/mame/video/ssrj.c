@@ -236,7 +236,7 @@ VIDEO_START( ssrj )
 }
 
 
-static void draw_objects(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_objects(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int i,j,k,x,y;

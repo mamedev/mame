@@ -47,14 +47,14 @@ SCREEN_UPDATE( yboard )
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
 	/* draw the yboard sprites */
 	yboard_clip.min_x = yboard_clip.min_y = 0;
 	yboard_clip.max_x = yboard_clip.max_y = 511;
-	segaic16_sprites_draw(screen, state->m_tmp_bitmap, yboard_clip, 1);
+	segaic16_sprites_draw(screen, *state->m_tmp_bitmap, yboard_clip, 1);
 
 	/* apply rotation */
 	segaic16_rotate_draw(screen.machine(), 0, bitmap, cliprect, state->m_tmp_bitmap);

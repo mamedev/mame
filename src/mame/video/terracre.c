@@ -31,7 +31,7 @@ TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO( 0,data&0xff,0,0 );
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	terracre_state *state = machine.driver_data<terracre_state>();
 	const UINT8 *spritepalettebank = machine.region("user1")->base();
@@ -206,7 +206,7 @@ SCREEN_UPDATE( amazon )
 {
 	terracre_state *state = screen.machine().driver_data<terracre_state>();
 	if( state->m_xscroll&0x2000 )
-		bitmap->fill(get_black_pen(screen.machine()), cliprect );
+		bitmap.fill(get_black_pen(screen.machine()), cliprect );
 	else
 		tilemap_draw( bitmap,cliprect, state->m_background, 0, 0 );
 

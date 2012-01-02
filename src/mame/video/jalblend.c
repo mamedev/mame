@@ -84,7 +84,7 @@ rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 	return MAKE_RGB(r,g,b);
 }
 
-void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
+void jal_blend_drawgfx(bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
@@ -144,13 +144,13 @@ void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle &clip,const gfx_elemen
 			int x, y;
 
 			/* 32-bit destination bitmap */
-			if (dest_bmp->bpp() == 32)
+			if (dest_bmp.bpp() == 32)
 			{
 				/* taken from case 7: TRANSPARENCY_ALPHARANGE */
 				for (y = sy; y < ey; y++)
 				{
 					const UINT8 *source = source_base + y_index*gfx->line_modulo;
-					UINT32 *dest = &dest_bmp->pix32(y);
+					UINT32 *dest = &dest_bmp.pix32(y);
 					int x_index = x_index_base;
 					for (x = sx; x < ex; x++)
 					{
@@ -181,7 +181,7 @@ void jal_blend_drawgfx(bitmap_t *dest_bmp,const rectangle &clip,const gfx_elemen
 				for (y = sy; y < ey; y++)
 				{
 					const UINT8 *source = source_base + y_index*gfx->line_modulo;
-					UINT16 *dest = &dest_bmp->pix16(y);
+					UINT16 *dest = &dest_bmp.pix16(y);
 					int x_index = x_index_base;
 					for (x = sx; x < ex; x++)
 					{

@@ -141,7 +141,7 @@ SCREEN_UPDATE( darkmist)
 	tilemap_set_scrollx(state->m_fgtilemap, 0, DM_GETSCROLL(0xa));
 	tilemap_set_scrolly(state->m_fgtilemap, 0, DM_GETSCROLL(0xe));
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if(state->m_hw & DISPLAY_BG)
 		tilemap_draw(bitmap,cliprect,state->m_bgtilemap, 0,0);

@@ -72,7 +72,7 @@ static SCREEN_UPDATE(intrscti)
 	int y,x;
 	int count;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	count = 0;
 	for (y=0;y<64;y++)

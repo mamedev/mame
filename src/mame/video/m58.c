@@ -219,7 +219,7 @@ WRITE8_HANDLER( yard_flipscreen_w )
 
 #define DRAW_SPRITE(code, sy) drawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, sx, sy, colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 512));
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	m58_state *state = machine.driver_data<m58_state>();
 	int offs;
@@ -274,7 +274,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-static void draw_panel( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_panel( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	m58_state *state = machine.driver_data<m58_state>();
 
@@ -291,7 +291,7 @@ static void draw_panel( running_machine &machine, bitmap_t *bitmap, const rectan
 		clip.max_y += visarea.max_y + yoffs;
 		clip &= cliprect;
 
-		copybitmap(bitmap, state->m_scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
+		copybitmap(bitmap, *state->m_scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
 				   sx, visarea.min_y + yoffs, clip);
 	}
 }

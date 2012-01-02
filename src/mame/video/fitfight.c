@@ -4,7 +4,7 @@
 #include "includes/fitfight.h"
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int layer )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int layer )
 {
 	fitfight_state *state = machine.driver_data<fitfight_state>();
 	const gfx_element *gfx = machine.gfx[3];
@@ -126,7 +126,7 @@ SCREEN_UPDATE(fitfight)
 	vblank = (state->m_fof_700000[0] & 0x8000);
 
 	if (vblank > 0)
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	else {
 //      if (screen.machine().input().code_pressed(KEYCODE_Q))
 //          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x0038) >> 3);

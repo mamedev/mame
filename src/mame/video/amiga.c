@@ -619,7 +619,7 @@ INLINE int update_ham(amiga_state *state, int newpix)
  *
  *************************************/
 
-void amiga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanline)
+void amiga_render_scanline(running_machine &machine, bitmap_t &bitmap, int scanline)
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
@@ -652,8 +652,8 @@ void amiga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanl
 	update_sprite_dma(state, scanline);
 
 	/* start of a new line, signal we're not done with it and fill up vars */
-	if (bitmap != NULL)
-		dst = &bitmap->pix16(scanline);
+	if (bitmap.valid())
+		dst = &bitmap.pix16(scanline);
 
 	/* all sprites off at the start of the line */
 	memset(state->m_sprite_remain, 0, sizeof(state->m_sprite_remain));

@@ -247,7 +247,7 @@ struct _sdl_info
 	GLhandleARB		glsl_program[2*GLSL_SHADER_MAX];  // GLSL programs, or 0
 	int				glsl_program_num;	// number of GLSL programs
 	int				glsl_program_mb2sc;	// GLSL program idx, which transforms
-			                            // the mame-bitmap -> screen-bitmap (size/rotation/..)
+			                            // the mame-bitmap. screen-bitmap (size/rotation/..)
 										// All progs <= glsl_program_mb2sc using the mame bitmap
 										// as input, otherwise the screen bitmap.
 										// All progs >= glsl_program_mb2sc using the screen bitmap

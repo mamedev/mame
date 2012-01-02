@@ -239,7 +239,7 @@ static SCREEN_UPDATE( kinst )
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *src = &state->m_video_base[640/4 * y];
-		UINT16 *dest = &bitmap->pix16(y, cliprect.min_x);
+		UINT16 *dest = &bitmap.pix16(y, cliprect.min_x);
 		int x;
 
 		/* loop over columns */

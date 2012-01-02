@@ -157,7 +157,7 @@ SCREEN_UPDATE( birdtry )
 
 	/* This game doesn't have the extra playfield chip on the game board, but
     the palette does show through. */
-	bitmap->fill(screen.machine().pens[768], cliprect);
+	bitmap.fill(screen.machine().pens[768], cliprect);
 	screen.machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);

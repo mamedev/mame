@@ -169,7 +169,7 @@ WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap)
 {
 	retofinv_state *state = machine.driver_data<retofinv_state>();
 	UINT8 *spriteram = state->m_sharedram + 0x0780;

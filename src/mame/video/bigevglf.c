@@ -72,7 +72,7 @@ VIDEO_START( bigevglf )
 	state->save_pointer(NAME(state->m_vidram), 0x100 * 0x100 * 4);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 	int i, j;
@@ -95,7 +95,7 @@ SCREEN_UPDATE( bigevglf )
 {
 	bigevglf_state *state = screen.machine().driver_data<bigevglf_state>();
 
-	copybitmap(bitmap, state->m_tmp_bitmap[state->m_plane_visible], 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *state->m_tmp_bitmap[state->m_plane_visible], 0, 0, 0, 0, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

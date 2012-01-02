@@ -126,12 +126,12 @@ static SCREEN_UPDATE(tourvisn)
 			color = ((state->m_blit_ram[count]) & 0x00ff)>>0;
 
 			if((x*2)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-				bitmap->pix32(y, (x*2)+0) = screen.machine().pens[color];
+				bitmap.pix32(y, (x*2)+0) = screen.machine().pens[color];
 
 			color = ((state->m_blit_ram[count]) & 0xff00)>>8;
 
 			if(((x*2)+1)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-				bitmap->pix32(y, (x*2)+1) = screen.machine().pens[color];
+				bitmap.pix32(y, (x*2)+1) = screen.machine().pens[color];
 
 			count++;
 		}
@@ -163,7 +163,7 @@ static SCREEN_UPDATE(brasil)
 			g = (color & 0x07e0) >> 3;
 			r = (color & 0xf800) >> 8;
 			if(x<screen.visible_area().max_x && y<screen.visible_area().max_y)
-				bitmap->pix32(y, x) = b | (g<<8) | (r<<16);
+				bitmap.pix32(y, x) = b | (g<<8) | (r<<16);
 
 			count++;
 		}

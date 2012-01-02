@@ -5380,11 +5380,11 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 			// converts data stored in bitmap format (in dataram) to be read out as tiles (for dma->vram purposes)
 			// used by Heart of the Alien
 
-			if(offset<0x30000/2)		/* 0x20000 - 0x2ffff */ // 512x256 bitmap -> tiles
+			if(offset<0x30000/2)		/* 0x20000 - 0x2ffff */ // 512x256 bitmap. tiles
 				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,8,7,6,5,4,3,2,1,14,13,12,11,10,9,0);
-			else if(offset<0x38000/2)	/* 0x30000 - 0x37fff */  // 512x128 bitmap -> tiles
+			else if(offset<0x38000/2)	/* 0x30000 - 0x37fff */  // 512x128 bitmap. tiles
 				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,7,6,5,4,3,2,1,13,12,11,10,9,8,0);
-			else if(offset<0x3c000/2)	/* 0x38000 - 0x3bfff */  // 512x64 bitmap -> tiles
+			else if(offset<0x3c000/2)	/* 0x38000 - 0x3bfff */  // 512x64 bitmap. tiles
 				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,13,6,5,4,3,2,1,12,11,10,9,8,7,0);
 			else  /* 0x3c000 - 0x3dfff and 0x3e000 - 0x3ffff */  // 512x32 bitmap (x2) -> tiles
 				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,13,12,5,4,3,2,1,11,10,9,8,7,6,0);
@@ -7275,7 +7275,7 @@ VIDEO_START(megadriv)
 SCREEN_UPDATE(megadriv)
 {
 	/* Copy our screen buffer here */
-	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *render_bitmap, 0, 0, 0, 0, cliprect);
 
 //  int xxx;
 	/* reference */

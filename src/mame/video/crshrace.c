@@ -99,7 +99,7 @@ WRITE16_HANDLER( crshrace_gfxctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
@@ -171,14 +171,14 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 }
 
 
-static void draw_bg( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_bg( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 	tilemap_draw(bitmap, cliprect, state->m_tilemap2, 0, 0);
 }
 
 
-static void draw_fg(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_fg(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_tilemap1, 0, 0, 1);
@@ -191,11 +191,11 @@ SCREEN_UPDATE( crshrace )
 
 	if (state->m_gfxctrl & 0x04)	/* display disable? */
 	{
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
-	bitmap->fill(0x1ff, cliprect);
+	bitmap.fill(0x1ff, cliprect);
 
 	switch (state->m_gfxctrl & 0xfb)
 	{

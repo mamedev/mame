@@ -206,7 +206,7 @@ static TILE_GET_INFO( seibucrtc_sc3_tile_info )
 	SET_TILE_INFO(4, tile, color, 0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int pri)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int pri)
 {
 	UINT16 *spriteram16 = reinterpret_cast<UINT16 *>(memory_get_shared(machine, "spriteram"));
 	int offs,fx,fy,x,y,color,sprite;
@@ -271,7 +271,7 @@ VIDEO_START( seibu_crtc )
 
 SCREEN_UPDATE( seibu_crtc )
 {
-	bitmap->fill(screen.machine().pens[0x7ff], cliprect); //black pen
+	bitmap.fill(screen.machine().pens[0x7ff], cliprect); //black pen
 
 	tilemap_set_scrollx( sc0_tilemap,0, (SEIBU_CRTC_SC0_SX + SEIBU_CRTC_FIX_SX+64) & 0x1ff );
 	tilemap_set_scrolly( sc0_tilemap,0, (SEIBU_CRTC_SC0_SY + SEIBU_CRTC_FIX_SY+1) & 0x1ff );

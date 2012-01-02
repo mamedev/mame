@@ -102,7 +102,7 @@ static SCREEN_UPDATE( tetriskr )
 
 	//popmessage("%04x",m_start_offs);
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	for(y=0;y<200/8;y++)
 	{
@@ -121,7 +121,7 @@ static SCREEN_UPDATE( tetriskr )
 						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+state->m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
 
 					if((x+xi)<screen.visible_area().max_x && ((y)+yi)<screen.visible_area().max_y)
-						bitmap->pix16(y*8+yi, x*8+xi) = screen.machine().pens[color];
+						bitmap.pix16(y*8+yi, x*8+xi) = screen.machine().pens[color];
 				}
 			}
 		}

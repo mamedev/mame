@@ -698,7 +698,7 @@ do {                                     \
 	if (carry) --CNT;                    \
 } while(0)
 
-static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void rotate_draw( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
 	UINT32 y;
@@ -725,7 +725,7 @@ static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const recta
 	for (y = 0; y <= cliprect.max_y; ++y)
 	{
 		UINT32 carry;
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *dst = &bitmap.pix16(y);
 		UINT32 x;
 
 		UINT32 cx = cxy;
@@ -803,7 +803,7 @@ static void rotate_draw( running_machine &machine, bitmap_t *bitmap, const recta
 
 *******************************************************************************************/
 
-static void hud_draw( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void hud_draw( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
 	UINT8	*tile_rom = machine.region("gfx3")->base();
@@ -885,7 +885,7 @@ static void hud_draw( running_machine &machine, bitmap_t *bitmap, const rectangl
 
 					if (x <= cliprect.max_x)
 					{
-						UINT16 *dst = &bitmap->pix16(y, x);
+						UINT16 *dst = &bitmap.pix16(y, x);
 
 						if (BIT(gfx_strip, px ^ 7) && *dst > 255)
 							*dst = colour;
@@ -936,7 +936,7 @@ SCREEN_UPDATE( lockon )
 	/* If screen output is disabled, fill with black */
 	if (!BIT(state->m_ctrl_reg, 7))
 	{
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 

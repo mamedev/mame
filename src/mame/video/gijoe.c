@@ -158,8 +158,8 @@ SCREEN_UPDATE( gijoe )
 
 	konami_sortlayers4(layer, state->m_layer_pri);
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[0], 0, 1);
 	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layer[1], 0, 2);

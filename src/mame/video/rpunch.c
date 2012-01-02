@@ -201,7 +201,7 @@ WRITE16_HANDLER( rpunch_ins_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int start, int stop)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int start, int stop)
 {
 	rpunch_state *state = machine.driver_data<rpunch_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -239,7 +239,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_bitmap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	rpunch_state *state = machine.driver_data<rpunch_state>();
 	int colourbase;
@@ -256,10 +256,10 @@ static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectan
 		for(x=0;x<xxx;x++)
 		{
 			int coldat;
-			coldat = (state->m_bitmapram[count]>>12)&0xf; if (coldat!=15) bitmap->pix16(y, ((x*4+0)-4)&0x1ff) = coldat+colourbase;
-			coldat = (state->m_bitmapram[count]>>8 )&0xf; if (coldat!=15) bitmap->pix16(y, ((x*4+1)-4)&0x1ff) = coldat+colourbase;
-			coldat = (state->m_bitmapram[count]>>4 )&0xf; if (coldat!=15) bitmap->pix16(y, ((x*4+2)-4)&0x1ff) = coldat+colourbase;
-			coldat = (state->m_bitmapram[count]>>0 )&0xf; if (coldat!=15) bitmap->pix16(y, ((x*4+3)-4)&0x1ff) = coldat+colourbase;
+			coldat = (state->m_bitmapram[count]>>12)&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+0)-4)&0x1ff) = coldat+colourbase;
+			coldat = (state->m_bitmapram[count]>>8 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+1)-4)&0x1ff) = coldat+colourbase;
+			coldat = (state->m_bitmapram[count]>>4 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+2)-4)&0x1ff) = coldat+colourbase;
+			coldat = (state->m_bitmapram[count]>>0 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+3)-4)&0x1ff) = coldat+colourbase;
 			count++;
 		}
 	}

@@ -357,5 +357,5 @@ WRITE16_HANDLER( hdgsp_paletteram_lo_w );
 READ16_HANDLER( hdgsp_paletteram_hi_r );
 WRITE16_HANDLER( hdgsp_paletteram_hi_w );
 
-void harddriv_scanline_driver(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
-void harddriv_scanline_multisync(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+void harddriv_scanline_driver(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params);
+void harddriv_scanline_multisync(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params);

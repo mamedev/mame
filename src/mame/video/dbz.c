@@ -135,7 +135,7 @@ SCREEN_UPDATE( dbz )
 
 	konami_sortlayers5(layer, state->m_layerpri);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	for (plane = 0; plane < 5; plane++)
 	{

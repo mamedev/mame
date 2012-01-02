@@ -184,7 +184,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
 {
 	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 	int offs;
@@ -238,6 +238,6 @@ SCREEN_UPDATE( dogfgt )
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	copybitmap_trans(bitmap, state->m_pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * state->m_pixcolor);
+	copybitmap_trans(bitmap, *state->m_pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * state->m_pixcolor);
 	return 0;
 }

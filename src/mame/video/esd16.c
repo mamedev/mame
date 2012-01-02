@@ -183,7 +183,7 @@ VIDEO_START( esd16 )
 
 ***************************************************************************/
 
-static void esd16_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void esd16_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	esd16_state *state = machine.driver_data<esd16_state>();
 	int offs;
@@ -247,7 +247,7 @@ static void esd16_draw_sprites( running_machine &machine, bitmap_t *bitmap, cons
 }
 
 /* note, check if i can re-merge this with the other or if its really different */
-static void hedpanic_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void hedpanic_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	esd16_state *state = machine.driver_data<esd16_state>();
 	int offs;
@@ -328,7 +328,7 @@ SCREEN_UPDATE( esd16 )
 	esd16_state *state = screen.machine().driver_data<esd16_state>();
 	int layers_ctrl = -1;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_set_scrollx(state->m_tilemap_0, 0, state->m_scroll_0[0]);
 	tilemap_set_scrolly(state->m_tilemap_0, 0, state->m_scroll_0[1]);
@@ -348,7 +348,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
-	else					bitmap->fill(0, cliprect);
+	else					bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 1);
 
@@ -362,7 +362,7 @@ SCREEN_UPDATE( hedpanic )
 	esd16_state *state = screen.machine().driver_data<esd16_state>();
 	int layers_ctrl = -1;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
 if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -392,7 +392,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	}
 	else
 	{
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 	}
 
 
@@ -425,7 +425,7 @@ SCREEN_UPDATE( hedpanio )
 	esd16_state *state = screen.machine().driver_data<esd16_state>();
 	int layers_ctrl = -1;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 #ifdef MAME_DEBUG
 if ( screen.machine().input().code_pressed(KEYCODE_Z) )
@@ -455,7 +455,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 	}
 	else
 	{
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 	}
 
 

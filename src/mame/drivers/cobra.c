@@ -156,7 +156,7 @@ SCREEN_UPDATE( cobra )
 		cobra->polybuffer_ptr = 0;
 	}
 
-	copybitmap_trans(bitmap, cobra->framebuffer, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *cobra->framebuffer, 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
 

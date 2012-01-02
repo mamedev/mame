@@ -368,22 +368,22 @@ static SCREEN_UPDATE(jchan)
 	UINT16 pixdata1;
 	UINT16 pixdata2;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	SCREEN_UPDATE_CALL(jchan_view2);
 
 	state->m_sprite_bitmap_1->fill(0x0000, cliprect);
 	state->m_sprite_bitmap_2->fill(0x0000, cliprect);
 
-	state->m_spritegen1->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap_1, cliprect, state->m_sprite_ram32_1, 0x4000, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_sprite_regs32_1 );
-	state->m_spritegen2->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap_2, cliprect, state->m_sprite_ram32_2, 0x4000, screen.machine().region("gfx2")->base(), screen.machine().region ("gfx2")->bytes(), state->m_sprite_regs32_2 );
+	state->m_spritegen1->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_1, cliprect, state->m_sprite_ram32_1, 0x4000, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_sprite_regs32_1 );
+	state->m_spritegen2->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_2, cliprect, state->m_sprite_ram32_2, 0x4000, screen.machine().region("gfx2")->base(), screen.machine().region ("gfx2")->bytes(), state->m_sprite_regs32_2 );
 
 	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)
 	{
 		src1 = &state->m_sprite_bitmap_1->pix16(y);
 		src2 = &state->m_sprite_bitmap_2->pix16(y);
-		dst =  &bitmap->pix16(y);
+		dst =  &bitmap.pix16(y);
 
 		for (x=0;x<320;x++)
 		{

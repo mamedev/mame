@@ -979,14 +979,11 @@ void screen_device::finalize_burnin()
 	scaledvis.max_y = m_visarea.max_y * m_burnin->height() / m_height;
 
 	// wrap a bitmap around the subregion we care about
-	bitmap_t *finalmap = auto_alloc(machine(), bitmap_t(scaledvis.max_x + 1 - scaledvis.min_x,
-				                        scaledvis.max_y + 1 - scaledvis.min_y,
-				                        BITMAP_FORMAT_ARGB32));
-
+	bitmap_t finalmap(scaledvis.max_x + 1 - scaledvis.min_x, scaledvis.max_y + 1 - scaledvis.min_y, BITMAP_FORMAT_ARGB32);
 	int srcwidth = m_burnin->width();
 	int srcheight = m_burnin->height();
-	int dstwidth = finalmap->width();
-	int dstheight = finalmap->height();
+	int dstwidth = finalmap.width();
+	int dstheight = finalmap.height();
 	int xstep = (srcwidth << 16) / dstwidth;
 	int ystep = (srcheight << 16) / dstheight;
 
@@ -1010,7 +1007,7 @@ void screen_device::finalize_burnin()
 	for (int y = 0, srcy = 0; y < dstheight; y++, srcy += ystep)
 	{
 		UINT64 *src = &m_burnin->pix64(srcy >> 16);
-		UINT32 *dst = &finalmap->pix32(y);
+		UINT32 *dst = &finalmap.pix32(y);
 		for (int x = 0, srcx = 0; x < dstwidth; x++, srcx += xstep)
 		{
 			int brightness = (UINT64)(maxval - src[srcx >> 16]) * 255 / (maxval - minval);
@@ -1074,7 +1071,7 @@ void screen_device::load_effect_overlay(const char *filename)
 bool screen_device::screen_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (m_screen_update != NULL) {
-		return (*m_screen_update)(*this, &bitmap, cliprect);
+		return (*m_screen_update)(*this, bitmap, cliprect);
 	} else {
 		return machine().driver_data<driver_device>()->screen_update(*this, bitmap, cliprect);
 	}

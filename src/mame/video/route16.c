@@ -107,9 +107,9 @@ SCREEN_UPDATE( route16 )
 			pen_t pen = route16_make_pen(final_color);
 
 			if (state->m_flipscreen)
-				bitmap->pix32(255 - y, 255 - x) = pen;
+				bitmap.pix32(255 - y, 255 - x) = pen;
 			else
-				bitmap->pix32(y, x) = pen;
+				bitmap.pix32(y, x) = pen;
 
 			x = x + 1;
 			data1 = data1 >> 1;
@@ -125,7 +125,7 @@ SCREEN_UPDATE( route16 )
  *  The Stratovox video connections have been verified from the schematics
  */
 
-static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_t *bitmap,
+static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_t &bitmap,
 										  const rectangle &cliprect,
 										  pen_t (*make_pen)(UINT8))
 {
@@ -163,9 +163,9 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_t *bi
 			pen_t pen = make_pen(final_color);
 
 			if (state->m_flipscreen)
-				bitmap->pix32(255 - y, 255 - x) = pen;
+				bitmap.pix32(255 - y, 255 - x) = pen;
 			else
-				bitmap->pix32(y, x) = pen;
+				bitmap.pix32(y, x) = pen;
 
 			x = x + 1;
 			data1 = data1 >> 1;

@@ -560,14 +560,14 @@ SCREEN_UPDATE( nbmj8891 )
 
 		if (state->m_gfxdraw_mode)
 		{
-			copyscrollbitmap      (bitmap, state->m_tmpbitmap0, 0, 0, 0, 0, cliprect);
-			copyscrollbitmap_trans(bitmap, state->m_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
+			copyscrollbitmap      (bitmap, *state->m_tmpbitmap0, 0, 0, 0, 0, cliprect);
+			copyscrollbitmap_trans(bitmap, *state->m_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
 		}
 		else
-			copyscrollbitmap(bitmap, state->m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, *state->m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
 	}
 	else
-		bitmap->fill(0xff);
+		bitmap.fill(0xff);
 
 	return 0;
 }

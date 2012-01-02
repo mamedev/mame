@@ -287,7 +287,7 @@ VIDEO_START( generic_bitmapped )
 
 SCREEN_UPDATE( generic_bitmapped )
 {
-	copybitmap(bitmap, screen.machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *screen.machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

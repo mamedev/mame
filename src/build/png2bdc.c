@@ -93,9 +93,9 @@ struct _render_font
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE int pixel_is_set(bitmap_t *bitmap, int y, int x)
+INLINE int pixel_is_set(bitmap_t &bitmap, int y, int x)
 {
-	return (bitmap->pix32(y, x) & 0xffffff) == 0;
+	return (bitmap.pix32(y, x) & 0xffffff) == 0;
 }
 
 
@@ -258,26 +258,26 @@ error:
     characters in the given font
 -------------------------------------------------*/
 
-static int bitmap_to_chars(bitmap_t *bitmap, render_font *font)
+static int bitmap_to_chars(bitmap_t &bitmap, render_font *font)
 {
 	int rowstart = 0;
 	int x, y;
 
 	/* loop over rows */
-	while (rowstart < bitmap->height())
+	while (rowstart < bitmap.height())
 	{
 		int rowend, baseline, colstart;
 		int chstart;
 
 		/* find the top of the row */
-		for ( ; rowstart < bitmap->height(); rowstart++)
+		for ( ; rowstart < bitmap.height(); rowstart++)
 			if (pixel_is_set(bitmap, rowstart, 0))
 				break;
-		if (rowstart >= bitmap->height())
+		if (rowstart >= bitmap.height())
 			break;
 
 		/* find the bottom of the row */
-		for (rowend = rowstart + 1; rowend < bitmap->height(); rowend++)
+		for (rowend = rowstart + 1; rowend < bitmap.height(); rowend++)
 			if (!pixel_is_set(bitmap, rowend, 0))
 			{
 				rowend--;
@@ -325,20 +325,20 @@ static int bitmap_to_chars(bitmap_t *bitmap, render_font *font)
 
 		/* scan the column to find characters */
 		colstart = 0;
-		while (colstart < bitmap->width())
+		while (colstart < bitmap.width())
 		{
 			render_font_char *ch = &font->chars[chstart];
 			int colend;
 
 			/* find the start of the character */
-			for ( ; colstart < bitmap->width(); colstart++)
+			for ( ; colstart < bitmap.width(); colstart++)
 				if (pixel_is_set(bitmap, rowend + 2, colstart))
 					break;
-			if (colstart >= bitmap->width())
+			if (colstart >= bitmap.width())
 				break;
 
 			/* find the end of the character */
-			for (colend = colstart + 1; colend < bitmap->width(); colend++)
+			for (colend = colstart + 1; colend < bitmap.width(); colend++)
 				if (!pixel_is_set(bitmap, rowend + 2, colend))
 				{
 					colend--;
@@ -382,7 +382,7 @@ static int bitmap_to_chars(bitmap_t *bitmap, render_font *font)
 	}
 
 	/* return non-zero (TRUE) if we errored */
-	return (rowstart < bitmap->height());
+	return (rowstart < bitmap.height());
 }
 
 
@@ -438,7 +438,7 @@ int main(int argc, char *argv[])
 		}
 
 		/* parse the PNG into characters */
-		error = bitmap_to_chars(bitmap, font);
+		error = bitmap_to_chars(*bitmap, font);
 		delete bitmap;
 		if (error)
 			break;

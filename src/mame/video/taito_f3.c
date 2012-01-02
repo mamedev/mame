@@ -326,7 +326,7 @@ static void init_alpha_blend_func(running_machine &machine);
 
 /******************************************************************************/
 
-static void print_debug_info(running_machine &machine, bitmap_t *bitmap)
+static void print_debug_info(running_machine &machine, bitmap_t &bitmap)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	UINT16 *f3_line_ram = state->m_f3_line_ram;
@@ -1437,7 +1437,7 @@ static void init_alpha_blend_func(running_machine &machine)
 /*============================================================================*/
 
 INLINE void draw_scanlines(running_machine &machine,
-		bitmap_t *bitmap,int xsize,INT16 *draw_line_num,
+		bitmap_t &bitmap,int xsize,INT16 *draw_line_num,
 		const struct f3_playfield_line_inf **line_t,
 		const int *sprite,
 		UINT32 orient,
@@ -1459,13 +1459,13 @@ INLINE void draw_scanlines(running_machine &machine,
 
 	UINT8 *dstp0,*dstp;
 
-	int yadv = bitmap->rowpixels();
+	int yadv = bitmap.rowpixels();
 	int i=0,y=draw_line_num[0];
 	int ty = y;
 
 	if (orient & ORIENTATION_FLIP_Y)
 	{
-		ty = bitmap->height() - 1 - ty;
+		ty = bitmap.height() - 1 - ty;
 		yadv = -yadv;
 	}
 
@@ -1482,7 +1482,7 @@ INLINE void draw_scanlines(running_machine &machine,
 
 	{
 		UINT32 *dsti0,*dsti;
-		dsti0 = &bitmap->pix32(ty, x);
+		dsti0 = &bitmap.pix32(ty, x);
 		while(1)
 		{
 			int cx=0;
@@ -1846,8 +1846,6 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	struct f3_playfield_line_inf *line_t=&state->m_pf_line_inf[pos];
-	const bitmap_t *srcbitmap;
-	const bitmap_t *flagsbitmap;
 
 	int y,y_start,y_end,y_inc;
 	int line_base,zoom_base,col_base,pri_base,inc;
@@ -2011,8 +2009,8 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 		}
 
 		/* set pixmap pointer */
-		srcbitmap = tilemap_get_pixmap(tmap);
-		flagsbitmap = tilemap_get_flagsmap(tmap);
+		bitmap_t &srcbitmap = tilemap_get_pixmap(tmap);
+		bitmap_t &flagsbitmap = tilemap_get_flagsmap(tmap);
 
 		if(line_t->alpha_mode[y]!=0)
 		{
@@ -2031,11 +2029,11 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 
 			/* set pixmap index */
 			line_t->x_count[y]=x_index_fx & 0xffff; // Fractional part
-			line_t->src_s[y]=src_s=&srcbitmap->pix16(y_index);
+			line_t->src_s[y]=src_s=&srcbitmap.pix16(y_index);
 			line_t->src_e[y]=&src_s[state->m_width_mask+1];
 			line_t->src[y]=&src_s[x_index_fx>>16];
 
-			line_t->tsrc_s[y]=tsrc_s=&flagsbitmap->pix8(y_index);
+			line_t->tsrc_s[y]=tsrc_s=&flagsbitmap.pix8(y_index);
 			line_t->tsrc[y]=&tsrc_s[x_index_fx>>16];
 		}
 
@@ -2049,8 +2047,6 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const struct f3_spritealpha_line_inf *sprite_alpha_line_t=&state->m_sa_line_inf[0];
 	struct f3_playfield_line_inf *line_t=&state->m_pf_line_inf[4];
-	const bitmap_t *srcbitmap_pixel, *srcbitmap_vram;
-	const bitmap_t *flagsbitmap_pixel, *flagsbitmap_vram;
 
 	int y,y_start,y_end,y_inc;
 	int pri_base,inc;
@@ -2128,10 +2124,10 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 	sx&=0x1ff;
 
 	/* set pixmap pointer */
-	srcbitmap_pixel = tilemap_get_pixmap(pixel_tilemap);
-	flagsbitmap_pixel = tilemap_get_flagsmap(pixel_tilemap);
-	srcbitmap_vram = tilemap_get_pixmap(vram_tilemap);
-	flagsbitmap_vram = tilemap_get_flagsmap(vram_tilemap);
+	bitmap_t &srcbitmap_pixel = tilemap_get_pixmap(pixel_tilemap);
+	bitmap_t &flagsbitmap_pixel = tilemap_get_flagsmap(pixel_tilemap);
+	bitmap_t &srcbitmap_vram = tilemap_get_pixmap(vram_tilemap);
+	bitmap_t &flagsbitmap_vram = tilemap_get_flagsmap(vram_tilemap);
 
 	y=y_start;
 	while(y!=y_end)
@@ -2148,16 +2144,16 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 			/* set pixmap index */
 			line_t->x_count[y]=0xffff;
 			if (usePixelLayer)
-				line_t->src_s[y]=src_s=&srcbitmap_pixel->pix16(sy&0xff);
+				line_t->src_s[y]=src_s=&srcbitmap_pixel.pix16(sy&0xff);
 			else
-				line_t->src_s[y]=src_s=&srcbitmap_vram->pix16(sy&0x1ff);
+				line_t->src_s[y]=src_s=&srcbitmap_vram.pix16(sy&0x1ff);
 			line_t->src_e[y]=&src_s[vram_width_mask+1];
 			line_t->src[y]=&src_s[sx];
 
 			if (usePixelLayer)
-				line_t->tsrc_s[y]=tsrc_s=&flagsbitmap_pixel->pix8(sy&0xff);
+				line_t->tsrc_s[y]=tsrc_s=&flagsbitmap_pixel.pix8(sy&0xff);
 			else
-				line_t->tsrc_s[y]=tsrc_s=&flagsbitmap_vram->pix8(sy&0x1ff);
+				line_t->tsrc_s[y]=tsrc_s=&flagsbitmap_vram.pix8(sy&0x1ff);
 			line_t->tsrc[y]=&tsrc_s[sx];
 		}
 
@@ -2168,7 +2164,7 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 
 /******************************************************************************/
 
-static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void scanline_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	int i,j,y,ys,ye;
@@ -2597,7 +2593,7 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 	pri++;
 
 INLINE void f3_drawgfx(
-		bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		int code,
 		int color,
 		int flipx,int flipy,
@@ -2611,7 +2607,7 @@ INLINE void f3_drawgfx(
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
-	myclip &= dest_bmp->cliprect();
+	myclip &= dest_bmp.cliprect();
 
 
 	if( gfx )
@@ -2676,14 +2672,14 @@ INLINE void f3_drawgfx(
 
 			if( ex>sx && ey>sy)
 			{ /* skip if inner loop doesn't draw anything */
-//              if (dest_bmp->bpp == 32)
+//              if (dest_bmp.bpp == 32)
 				{
 					int y=ey-sy;
 					int x=(ex-sx-1)|(state->m_tile_opaque_sp[code % gfx->total_elements]<<4);
 					const UINT8 *source0 = code_base + y_index * 16 + x_index_base;
-					UINT32 *dest0 = &dest_bmp->pix32(sy, sx);
+					UINT32 *dest0 = &dest_bmp.pix32(sy, sx);
 					UINT8 *pri0 = &state->m_pri_alp_bitmap->pix8(sy, sx);
-					int yadv = dest_bmp->rowpixels();
+					int yadv = dest_bmp.rowpixels();
 					dy=dy*16;
 					while(1)
 					{
@@ -2746,7 +2742,7 @@ INLINE void f3_drawgfx(
 
 
 INLINE void f3_drawgfxzoom(
-		bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		int code,
 		int color,
 		int flipx,int flipy,
@@ -2761,7 +2757,7 @@ INLINE void f3_drawgfxzoom(
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
-	myclip &= dest_bmp->cliprect();
+	myclip &= dest_bmp.cliprect();
 
 
 	if( gfx )
@@ -2826,13 +2822,13 @@ INLINE void f3_drawgfxzoom(
 
 			if( ex>sx )
 			{ /* skip if inner loop doesn't draw anything */
-//              if (dest_bmp->bpp == 32)
+//              if (dest_bmp.bpp == 32)
 				{
 					int y;
 					for( y=sy; y<ey; y++ )
 					{
 						const UINT8 *source = code_base + (y_index>>16) * 16;
-						UINT32 *dest = &dest_bmp->pix32(y);
+						UINT32 *dest = &dest_bmp.pix32(y);
 						UINT8 *pri = &state->m_pri_alp_bitmap->pix8(y);
 
 						int x, x_index = x_index_base;
@@ -3134,7 +3130,7 @@ static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_
 #undef CALC_ZOOM
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const struct tempsprite *sprite_ptr;

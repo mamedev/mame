@@ -571,9 +571,9 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 
 
-void tms9928a_device::update( bitmap_t *bitmap, const rectangle &cliprect )
+void tms9928a_device::update( bitmap_t &bitmap, const rectangle &cliprect )
 {
-	copybitmap( bitmap, m_tmpbmp, 0, 0, 0, 0, cliprect );
+	copybitmap( bitmap, *m_tmpbmp, 0, 0, 0, 0, cliprect );
 }
 
 

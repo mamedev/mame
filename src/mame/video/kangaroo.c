@@ -159,7 +159,7 @@ SCREEN_UPDATE( kangaroo )
 	/* iterate over pixels */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32 *dest = &bitmap->pix32(y);
+		UINT32 *dest = &bitmap.pix32(y);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{

@@ -109,7 +109,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 {
 	shangha3_state *state = space->machine().driver_data<shangha3_state>();
 	UINT16 *shangha3_ram = state->m_ram;
-	bitmap_t *rawbitmap = state->m_rawbitmap;
+	bitmap_t &rawbitmap = *state->m_rawbitmap;
 	UINT8 *drawmode_table = state->m_drawmode_table;
 	int offs;
 
@@ -155,7 +155,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 			myclip.max_x = sx + sizex;
 			myclip.min_y = sy;
 			myclip.max_y = sy + sizey;
-			myclip &= rawbitmap->cliprect();
+			myclip &= rawbitmap.cliprect();
 
 			if (shangha3_ram[offs+4] & 0x08)	/* tilemap */
 			{
@@ -265,6 +265,6 @@ SCREEN_UPDATE( shangha3 )
 {
 	shangha3_state *state = screen.machine().driver_data<shangha3_state>();
 
-	copybitmap(bitmap, state->m_rawbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *state->m_rawbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

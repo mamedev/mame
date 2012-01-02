@@ -222,7 +222,7 @@ WRITE8_HANDLER( gondo_scroll_w )
 /******************************************************************************/
 
 
-static void srdarwin_draw_sprites( running_machine& machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
+static void srdarwin_draw_sprites( running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
 {
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
 	int offs;

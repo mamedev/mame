@@ -547,7 +547,7 @@ VIDEO_START( ygv608 )
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ygv608_exit), &machine));
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 #ifdef _ENABLE_SPRITES
 
@@ -755,7 +755,7 @@ SCREEN_UPDATE( ygv608 )
 	// punt if not initialized
 	if (ygv608.page_x == 0 || ygv608.page_y == 0)
 	{
-		bitmap->fill(0, finalclip);
+		bitmap.fill(0, finalclip);
 		return 0;
 	}
 
@@ -865,7 +865,7 @@ SCREEN_UPDATE( ygv608 )
 	}
 	else
 #endif
-		tilemap_draw( work_bitmap,finalclip, tilemap_B, 0, 0 );
+		tilemap_draw( *work_bitmap,finalclip, tilemap_B, 0, 0 );
 
 #ifdef _ENABLE_ROTATE_ZOOM
 
@@ -891,7 +891,7 @@ SCREEN_UPDATE( ygv608 )
                    ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0);
   else
 #endif
-    copybitmap( bitmap, work_bitmap, 0, 0, 0, 0, finalclip);
+    copybitmap( bitmap, *work_bitmap, 0, 0, 0, 0, finalclip);
 
   // for some reason we can't use an opaque tilemap_A
   // so use a transparent but clear the work bitmap first
@@ -902,7 +902,7 @@ SCREEN_UPDATE( ygv608 )
 		(ygv608.regs.s.r11 & r11_prm) == PRM_ASEBDX )
 		draw_sprites(screen.machine(), bitmap,finalclip );
 
-	tilemap_draw( work_bitmap,finalclip, tilemap_A, 0, 0 );
+	tilemap_draw( *work_bitmap,finalclip, tilemap_A, 0, 0 );
 
 #ifdef _ENABLE_ROTATE_ZOOM
   if( ygv608.regs.s.zron )
@@ -913,7 +913,7 @@ SCREEN_UPDATE( ygv608 )
                    0 );
   else
 #endif
-    copybitmap_trans( bitmap, work_bitmap, 0, 0, 0, 0, finalclip, 0 );
+    copybitmap_trans( bitmap, *work_bitmap, 0, 0, 0, 0, finalclip, 0 );
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_SABDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_SEABDX)

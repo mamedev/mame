@@ -166,7 +166,7 @@ SCREEN_UPDATE( gomoku )
 	if (state->m_bg_dispsw)
 	{
 		/* copy bg bitmap */
-		copybitmap(bitmap, state->m_bg_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, *state->m_bg_bitmap, 0, 0, 0, 0, cliprect);
 
 		// stone
 		for (y = 0; y < 256; y++)
@@ -192,7 +192,7 @@ SCREEN_UPDATE( gomoku )
 				}
 				else continue;
 
-				bitmap->pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+				bitmap.pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 			}
 		}
 
@@ -220,13 +220,13 @@ SCREEN_UPDATE( gomoku )
 				}
 				else continue;
 
-				bitmap->pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+				bitmap.pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 			}
 		}
 	}
 	else
 	{
-		bitmap->fill(0x20);
+		bitmap.fill(0x20);
 	}
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);

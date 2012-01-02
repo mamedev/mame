@@ -376,7 +376,7 @@ static WRITE8_HANDLER( tomahawk_video_control_2_w )
 }
 
 
-static void video_update_common( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, pen_t *pens )
+static void video_update_common( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, pen_t *pens )
 {
 	astrof_state *state = machine.driver_data<astrof_state>();
 	offs_t offs;
@@ -410,9 +410,9 @@ static void video_update_common( running_machine &machine, bitmap_t *bitmap, con
 			pen_t pen = (data & 0x01) ? fore_pen : back_pen;
 
 			if (state->m_flipscreen)
-				bitmap->pix32(y, 255 - x) = pen;
+				bitmap.pix32(y, 255 - x) = pen;
 			else
-				bitmap->pix32(y, x) = pen;
+				bitmap.pix32(y, x) = pen;
 
 			x = x + 1;
 			data = data >> 1;

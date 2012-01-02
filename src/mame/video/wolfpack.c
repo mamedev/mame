@@ -131,7 +131,7 @@ VIDEO_START( wolfpack )
 }
 
 
-static void draw_ship(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
+static void draw_ship(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	static const UINT32 scaler[] =
@@ -167,7 +167,7 @@ static void draw_ship(running_machine &machine, bitmap_t* bitmap, const rectangl
 }
 
 
-static void draw_torpedo(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
+static void draw_torpedo(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	int count = 0;
@@ -196,12 +196,12 @@ static void draw_torpedo(running_machine &machine, bitmap_t* bitmap, const recta
 
 		for (x = 2 * x1; x < 2 * x2; x++)
 			if (state->m_LFSR[(state->m_current_index + 0x300 * y + x) % 0x8000])
-				bitmap->pix16(y, x) = 1;
+				bitmap.pix16(y, x) = 1;
 	}
 }
 
 
-static void draw_pt(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
+static void draw_pt(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	rectangle rect = cliprect;
@@ -230,7 +230,7 @@ static void draw_pt(running_machine &machine, bitmap_t* bitmap, const rectangle 
 }
 
 
-static void draw_water(colortable_t *colortable, bitmap_t* bitmap, const rectangle &cliprect)
+static void draw_water(colortable_t *colortable, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	rectangle rect = cliprect;
 
@@ -242,7 +242,7 @@ static void draw_water(colortable_t *colortable, bitmap_t* bitmap, const rectang
 
 	for (y = rect.min_y; y <= rect.max_y; y++)
 	{
-		UINT16* p = &bitmap->pix16(y);
+		UINT16* p = &bitmap.pix16(y);
 
 		for (x = rect.min_x; x <= rect.max_x; x++)
 			p[x] = colortable_entry_get_value(colortable, p[x]) | 0x08;
@@ -267,7 +267,7 @@ SCREEN_UPDATE( wolfpack )
 																		  color < 0xb8 ? color + 0x48 : 0xff,
 																		  color < 0xb8 ? color + 0x48 : 0xff));
 
-	bitmap->fill(state->m_video_invert, cliprect);
+	bitmap.fill(state->m_video_invert, cliprect);
 
 	for (i = 0; i < 8; i++)
 		for (j = 0; j < 32; j++)
@@ -300,7 +300,7 @@ SCREEN_EOF( wolfpack )
 
 	state->m_helper->fill(0);
 
-	draw_ship(screen.machine(), state->m_helper, state->m_helper->cliprect());
+	draw_ship(screen.machine(), *state->m_helper, state->m_helper->cliprect());
 
 	for (y = 128; y < 224 - state->m_torpedo_v; y++)
 	{

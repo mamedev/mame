@@ -91,7 +91,7 @@ static VIDEO_START( midas )
 	tilemap_set_transparent_pen(state->m_tmap, 0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	midas_state *state = machine.driver_data<midas_state>();
 	UINT16 *s		=	state->m_gfxram + 0x8000;
@@ -190,7 +190,7 @@ static SCREEN_UPDATE( midas )
 	}
 #endif
 
-	bitmap->fill(4095, cliprect);
+	bitmap.fill(4095, cliprect);
 
 	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap,cliprect);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);

@@ -410,7 +410,7 @@ Notes:
 
 static void copy_from_nvram(running_machine &machine);
 
-INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
+INLINE void cps3_drawgfxzoom(bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,
 		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask)
@@ -441,7 +441,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle &clip,const gfx_
 
 	/* force clip to bitmap boundary */
 	myclip = clip;
-	myclip &= dest_bmp->cliprect();
+	myclip &= dest_bmp.cliprect();
 
 	/* 32-bit ONLY */
 	{
@@ -521,7 +521,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle &clip,const gfx_
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -540,7 +540,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle &clip,const gfx_
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -560,7 +560,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle &clip,const gfx_
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -580,7 +580,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle &clip,const gfx_
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -858,7 +858,7 @@ static VIDEO_START(cps3)
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, int drawline, bitmap_t *bitmap, const rectangle &cliprect )
+static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, int drawline, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	cps3_state *state = machine.driver_data<cps3_state>();
 	UINT32* tmapregs[4] = { state->m_tilemap20_regs_base, state->m_tilemap30_regs_base, state->m_tilemap40_regs_base, state->m_tilemap50_regs_base };
@@ -1093,7 +1093,7 @@ static SCREEN_UPDATE(cps3)
 					{
 						for (uu=0;uu<1023;uu++)
 						{
-							cps3_draw_tilemapsprite_line(screen.machine(), tilemapnum, uu, state->m_renderbuffer_bitmap, state->m_renderbuffer_clip );
+							cps3_draw_tilemapsprite_line(screen.machine(), tilemapnum, uu, *state->m_renderbuffer_bitmap, state->m_renderbuffer_clip );
 						}
 					}
 					bg_drawn[tilemapnum] = 1;
@@ -1180,11 +1180,11 @@ static SCREEN_UPDATE(cps3)
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(*state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(*state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
 									}
 									count++;
 								}
@@ -1210,7 +1210,7 @@ static SCREEN_UPDATE(cps3)
 		srcy=0;
 		for (rendery=0;rendery<224;rendery++)
 		{
-			dstbitmap = &bitmap->pix32(rendery);
+			dstbitmap = &bitmap.pix32(rendery);
 			srcbitmap = &state->m_renderbuffer_bitmap->pix32(srcy>>16);
 			srcx=0;
 

@@ -161,7 +161,7 @@ VIDEO_START( mario )
  * confirmed on mametests.org as being present on real PCB as well.
  */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/* TODO: draw_sprites should adopt the scanline logic from dkong.c
      * The schematics have the same logic for sprite buffering.

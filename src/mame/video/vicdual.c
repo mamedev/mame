@@ -56,7 +56,7 @@ SCREEN_UPDATE( vicdual_bw )
 
 		/* plot the current pixel */
 		pen = (video_data & 0x80) ? RGB_WHITE : RGB_BLACK;
-		bitmap->pix32(y, x) = pen;
+		bitmap.pix32(y, x) = pen;
 
 		/* next pixel */
 		video_data = video_data << 1;
@@ -115,7 +115,7 @@ SCREEN_UPDATE( vicdual_color )
 
 		/* plot the current pixel */
 		pen = (video_data & 0x80) ? fore_pen : back_pen;
-		bitmap->pix32(y, x) = pen;
+		bitmap.pix32(y, x) = pen;
 
 		/* next pixel */
 		video_data = video_data << 1;

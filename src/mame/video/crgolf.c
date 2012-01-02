@@ -165,7 +165,7 @@ static SCREEN_UPDATE( crgolf )
 			if (*state->m_color_select)
 				color = color | 0x10;
 
-			bitmap->pix32(y, x) = pens[color];
+			bitmap.pix32(y, x) = pens[color];
 
 			/* next pixel */
 			data_a0 = data_a0 << 1;

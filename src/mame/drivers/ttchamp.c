@@ -67,7 +67,7 @@ static SCREEN_UPDATE(ttchamp)
 //  int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap->fill(get_black_pen(screen.machine()));
+	bitmap.fill(get_black_pen(screen.machine()));
 
 //  for (i=0;i<256;i++)
 //  {
@@ -85,7 +85,7 @@ static SCREEN_UPDATE(ttchamp)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			/*if(hotblock_port0&0x40)*/bitmap->pix16(y, x) = ((UINT8 *)state->m_peno_vram)[BYTE_XOR_LE(count)]+0x300;
+			/*if(hotblock_port0&0x40)*/bitmap.pix16(y, x) = ((UINT8 *)state->m_peno_vram)[BYTE_XOR_LE(count)]+0x300;
             count++;
         }
     }

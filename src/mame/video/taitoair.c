@@ -69,7 +69,7 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -182,7 +182,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void fill_slope( bitmap_t *bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
+static void fill_slope( bitmap_t &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
 {
 	if (y1 > cliprect.max_y)
 		return;
@@ -243,7 +243,7 @@ static void fill_slope( bitmap_t *bitmap, const rectangle &cliprect, int color, 
 
 				while (xx1 <= xx2)
 				{
-					bitmap->pix16(y1, xx1) = color + grad_col;
+					bitmap.pix16(y1, xx1) = color + grad_col;
 					xx1++;
 				}
 			}
@@ -257,7 +257,7 @@ static void fill_slope( bitmap_t *bitmap, const rectangle &cliprect, int color, 
 	*nx2 = x2;
 }
 
-static void fill_poly( bitmap_t *bitmap, const rectangle &cliprect, const struct taitoair_poly *q )
+static void fill_poly( bitmap_t &bitmap, const rectangle &cliprect, const struct taitoair_poly *q )
 {
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
@@ -374,7 +374,7 @@ WRITE16_HANDLER( dsp_flags_w )
 			/* clear screen fb */
 			state->m_framebuffer[1]->fill(0, cliprect);
 			/* copy buffer fb into screen fb (at this stage we are ready to draw) */
-			copybitmap_trans(state->m_framebuffer[1], state->m_framebuffer[0], 0, 0, 0, 0, cliprect, 0);
+			copybitmap_trans(*state->m_framebuffer[1], *state->m_framebuffer[0], 0, 0, 0, 0, cliprect, 0);
 			/* now clear buffer fb */
 			state->m_framebuffer[0]->fill(0, cliprect);
 		}
@@ -407,7 +407,7 @@ WRITE16_HANDLER( dsp_flags_w )
 					}
 					adr--;
 					state->m_q.pcount = pcount;
-					fill_poly(state->m_framebuffer[0], cliprect, &state->m_q);
+					fill_poly(*state->m_framebuffer[0], cliprect, &state->m_q);
 				}
 			}
 		}
@@ -577,7 +577,7 @@ SCREEN_UPDATE( taitoair )
 
 	tc0080vco_tilemap_update(state->m_tc0080vco);
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	{
 		int x,y;
@@ -593,7 +593,7 @@ SCREEN_UPDATE( taitoair )
 		{
 			for(x=cliprect.min_x;x<cliprect.max_x;x++)
 			{
-				bitmap->pix16(y, x) = 0x2000 + (0x3f - ((y >> 2) & 0x3f));
+				bitmap.pix16(y, x) = 0x2000 + (0x3f - ((y >> 2) & 0x3f));
 			}
 		}
 
@@ -602,7 +602,7 @@ SCREEN_UPDATE( taitoair )
 		{
 			for(x=cliprect.min_x;x<cliprect.max_x;x++)
 			{
-				bitmap->pix16(y, x) = 0x2040 + (0x3f - ((y >> 2) & 0x3f));
+				bitmap.pix16(y, x) = 0x2040 + (0x3f - ((y >> 2) & 0x3f));
 			}
 		}
 		#endif
@@ -612,7 +612,7 @@ SCREEN_UPDATE( taitoair )
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
-	copybitmap_trans(bitmap, state->m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *state->m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 

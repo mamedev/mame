@@ -156,7 +156,7 @@ INLINE const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int 
 	return gfx_element_get_data(gfx, (sprite+code) % gfx->total_elements) + ((dy%16) * gfx->line_modulo);
 }
 
-static void bbusters_draw_block(running_machine &machine, bitmap_t *dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
+static void bbusters_draw_block(running_machine &machine, bitmap_t &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
 	bbusters_state *state = machine.driver_data<bbusters_state>();
 	gfx_element *gfx = machine.gfx[bank];
@@ -170,7 +170,7 @@ static void bbusters_draw_block(running_machine &machine, bitmap_t *dest,int x,i
 	while (state->m_scale_line_count) {
 
 		if (dy>=16 && dy<240) {
-			UINT16 *destline = &dest->pix16(dy);
+			UINT16 *destline = &dest.pix16(dy);
 			UINT8 srcline=*state->m_scale_table_ptr;
 			const UINT8 *srcptr=0;
 
@@ -203,7 +203,7 @@ static void bbusters_draw_block(running_machine &machine, bitmap_t *dest,int x,i
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const UINT16 *source, int bank, int colval, int colmask)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const UINT16 *source, int bank, int colval, int colmask)
 {
 	bbusters_state *state = machine.driver_data<bbusters_state>();
 	const UINT8 *scale_table=machine.region("user1")->base();

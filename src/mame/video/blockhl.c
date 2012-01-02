@@ -59,7 +59,7 @@ SCREEN_UPDATE( blockhl )
 {
 	blockhl_state *state = screen.machine().driver_data<blockhl_state>();
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	k052109_tilemap_update(state->m_k052109);
 

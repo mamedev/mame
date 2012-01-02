@@ -193,7 +193,7 @@ WRITE8_HANDLER( champbas_flipscreen_w )
 
 
 
-static void champbas_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void champbas_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
 	int offs;
@@ -225,7 +225,7 @@ static void champbas_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	}
 }
 
-static void exctsccr_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void exctsccr_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
 	int offs;

@@ -492,19 +492,19 @@ SCREEN_UPDATE( nbmj9195 )
 
 	if (state->m_dispflag[0])
 		// nbmj9195 1layer
-		copyscrollbitmap(bitmap, state->m_tmpbitmap[0], SCANLINE_MAX, state->m_scrollx_raster[0], 1, &scrolly[0], cliprect);
+		copyscrollbitmap(bitmap, *state->m_tmpbitmap[0], SCANLINE_MAX, state->m_scrollx_raster[0], 1, &scrolly[0], cliprect);
 	else
-		bitmap->fill(0x0ff);
+		bitmap.fill(0x0ff);
 
 	if (state->m_dispflag[1])
 	{
 		if (state->m_gfxdraw_mode == 1)
 			// nbmj9195 2layer
-			copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[1], SCANLINE_MAX, state->m_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x0ff);
+			copyscrollbitmap_trans(bitmap, *state->m_tmpbitmap[1], SCANLINE_MAX, state->m_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x0ff);
 
 		if (state->m_gfxdraw_mode == 2)
 			// nbmj9195 nb22090 2layer
-			copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[1], SCANLINE_MAX, state->m_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x1ff);
+			copyscrollbitmap_trans(bitmap, *state->m_tmpbitmap[1], SCANLINE_MAX, state->m_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x1ff);
 	}
 	return 0;
 }

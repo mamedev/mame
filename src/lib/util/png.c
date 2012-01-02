@@ -904,14 +904,14 @@ static png_error write_deflated_chunk(core_file *fp, UINT8 *data, UINT32 type, U
     bitmap to a palettized image
 -------------------------------------------------*/
 
-static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap_t *bitmap, int palette_length, const rgb_t *palette)
+static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	int rowbytes;
 	int x, y;
 
 	/* set the common info */
-	pnginfo->width = bitmap->width();
-	pnginfo->height = bitmap->height();
+	pnginfo->width = bitmap.width();
+	pnginfo->height = bitmap.height();
 	pnginfo->bit_depth = 8;
 	pnginfo->color_type = 3;
 	pnginfo->num_palette = 256;
@@ -943,7 +943,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 	/* copy in the pixels, specifying a NULL filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
-		UINT16 *src = &bitmap->pix16(y);
+		UINT16 *src = &bitmap.pix16(y);
 		UINT8 *dst = pnginfo->image + y * (rowbytes + 1);
 
 		/* store the filter byte, then copy the data */
@@ -961,15 +961,15 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
     bitmap to an RGB image
 -------------------------------------------------*/
 
-static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *bitmap, int palette_length, const rgb_t *palette)
+static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
-	int alpha = (bitmap->format() == BITMAP_FORMAT_ARGB32);
+	int alpha = (bitmap.format() == BITMAP_FORMAT_ARGB32);
 	int rowbytes;
 	int x, y;
 
 	/* set the common info */
-	pnginfo->width = bitmap->width();
-	pnginfo->height = bitmap->height();
+	pnginfo->width = bitmap.width();
+	pnginfo->height = bitmap.height();
 	pnginfo->bit_depth = 8;
 	pnginfo->color_type = alpha ? 6 : 2;
 	rowbytes = pnginfo->width * (alpha ? 4 : 3);
@@ -982,15 +982,15 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 	/* copy in the pixels, specifying a NULL filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
-		UINT32 *src32 = &bitmap->pix32(y);
-		UINT16 *src16 = &bitmap->pix16(y);
+		UINT32 *src32 = &bitmap.pix32(y);
+		UINT16 *src16 = &bitmap.pix16(y);
 		UINT8 *dst = pnginfo->image + y * (rowbytes + 1);
 
 		/* store the filter byte, then copy the data */
 		*dst++ = 0;
 
 		/* 16bpp palettized format */
-		if (bitmap->format() == BITMAP_FORMAT_INDEXED16)
+		if (bitmap.format() == BITMAP_FORMAT_INDEXED16)
 		{
 			for (x = 0; x < pnginfo->width; x++)
 			{
@@ -1002,7 +1002,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 		}
 
 		/* RGB formats */
-		else if (bitmap->format() == BITMAP_FORMAT_RGB15)
+		else if (bitmap.format() == BITMAP_FORMAT_RGB15)
 		{
 			for (x = 0; x < pnginfo->width; x++)
 			{
@@ -1014,7 +1014,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 		}
 
 		/* 32-bit RGB direct */
-		else if (bitmap->format() == BITMAP_FORMAT_RGB32)
+		else if (bitmap.format() == BITMAP_FORMAT_RGB32)
 		{
 			for (x = 0; x < pnginfo->width; x++)
 			{
@@ -1026,7 +1026,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 		}
 
 		/* 32-bit ARGB direct */
-		else if (bitmap->format() == BITMAP_FORMAT_ARGB32)
+		else if (bitmap.format() == BITMAP_FORMAT_ARGB32)
 		{
 			for (x = 0; x < pnginfo->width; x++)
 			{
@@ -1052,14 +1052,14 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
     chunks to the given file
 -------------------------------------------------*/
 
-static png_error write_png_stream(core_file *fp, png_info *pnginfo, const bitmap_t *bitmap, int palette_length, const rgb_t *palette)
+static png_error write_png_stream(core_file *fp, png_info *pnginfo, const bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	UINT8 tempbuff[16];
 	png_text *text;
 	png_error error;
 
 	/* create an unfiltered image in either palette or RGB form */
-	if (bitmap->format() == BITMAP_FORMAT_INDEXED16 && palette_length <= 256)
+	if (bitmap.format() == BITMAP_FORMAT_INDEXED16 && palette_length <= 256)
 		error = convert_bitmap_to_image_palette(pnginfo, bitmap, palette_length, palette);
 	else
 		error = convert_bitmap_to_image_rgb(pnginfo, bitmap, palette_length, palette);
@@ -1108,7 +1108,7 @@ handle_error:
 
 
 
-png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t *bitmap, int palette_length, const UINT32 *palette)
+png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const UINT32 *palette)
 {
 	png_info pnginfo;
 	png_error error;
@@ -1143,7 +1143,7 @@ png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t *bitmap, int 
 
 ********************************************************************************/
 
-png_error mng_capture_start(core_file *fp, bitmap_t *bitmap, double rate)
+png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
 {
 	UINT8 mhdr[28];
 	png_error error;
@@ -1152,8 +1152,8 @@ png_error mng_capture_start(core_file *fp, bitmap_t *bitmap, double rate)
 		return PNGERR_FILE_ERROR;
 
 	memset(mhdr, 0, 28);
-	put_32bit(mhdr + 0, bitmap->width());
-	put_32bit(mhdr + 4, bitmap->height());
+	put_32bit(mhdr + 0, bitmap.width());
+	put_32bit(mhdr + 4, bitmap.height());
 	put_32bit(mhdr + 8, rate);
 	put_32bit(mhdr + 24, 0x0041); /* Simplicity profile */
 	/* frame count and play time unspecified because
@@ -1165,7 +1165,7 @@ png_error mng_capture_start(core_file *fp, bitmap_t *bitmap, double rate)
 	return PNGERR_NONE;
 }
 
-png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t *bitmap, int palette_length, const UINT32 *palette)
+png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const UINT32 *palette)
 {
 	return write_png_stream(fp, info, bitmap, palette_length, palette);
 }

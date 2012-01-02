@@ -140,7 +140,7 @@ a split down the middle of the screen
 
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int enable_n)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int enable_n)
 {
 	angelkds_state *state = machine.driver_data<angelkds_state>();
 	const UINT8 *source = state->m_spriteram + 0x100 - 4;
@@ -278,7 +278,7 @@ SCREEN_UPDATE( angelkds )
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
 
-	bitmap->fill(0x3f, cliprect); /* is there a register controling the colour?, we currently use the last colour of the tx palette */
+	bitmap.fill(0x3f, cliprect); /* is there a register controling the colour?, we currently use the last colour of the tx palette */
 
 	/* draw top of screen */
 	clip.min_x = 8*0;

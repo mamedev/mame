@@ -1159,7 +1159,7 @@ void h63484_device::device_reset()
 //  draw_graphics_line -
 //-------------------------------------------------
 
-void h63484_device::draw_graphics_line(bitmap_t *bitmap, const rectangle &cliprect, int y, int layer_n)
+void h63484_device::draw_graphics_line(bitmap_t &bitmap, const rectangle &cliprect, int y, int layer_n)
 {
 	int x;
 	int pitch;
@@ -1188,7 +1188,7 @@ void h63484_device::draw_graphics_line(bitmap_t *bitmap, const rectangle &clipre
 //  update_screen -
 //-------------------------------------------------
 
-void h63484_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
+void h63484_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if(m_dcr & 0x8000) // correct?
 	{

@@ -158,7 +158,7 @@ VIDEO_START( shaolins )
 	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	shaolins_state *state = machine.driver_data<shaolins_state>();
 	UINT8 *spriteram = state->m_spriteram;

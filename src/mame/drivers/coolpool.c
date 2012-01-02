@@ -54,12 +54,12 @@ static const UINT16 nvram_unlock_seq[] =
  *
  *************************************/
 
-static void amerdart_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void amerdart_scanline(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	coolpool_state *state = screen.machine().driver_data<coolpool_state>();
 
 	UINT16 *vram = &state->m_vram_base[(params->rowaddr << 8) & 0xff00];
-	UINT32 *dest = &bitmap->pix32(scanline);
+	UINT32 *dest = &bitmap.pix32(scanline);
 	rgb_t pens[16];
 	int coladdr = params->coladdr;
 	int x;
@@ -83,12 +83,12 @@ static void amerdart_scanline(screen_device &screen, bitmap_t *bitmap, int scanl
 }
 
 
-static void coolpool_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void coolpool_scanline(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	coolpool_state *state = screen.machine().driver_data<coolpool_state>();
 
 	UINT16 *vram = &state->m_vram_base[(params->rowaddr << 8) & 0x1ff00];
-	UINT32 *dest = &bitmap->pix32(scanline);
+	UINT32 *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr;
 	int x;

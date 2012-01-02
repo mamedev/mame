@@ -152,7 +152,7 @@ SCREEN_UPDATE( spacefev )
 
 	for (y = 0; y < 256; y++)
 	{
-		UINT16* pLine = &bitmap->pix16(y ^ mask);
+		UINT16* pLine = &bitmap.pix16(y ^ mask);
 
 		for (x = 0; x < 256; x += 8)
 		{
@@ -223,7 +223,7 @@ SCREEN_UPDATE( sheriff )
 
 	for (y = 0; y < 256; y++)
 	{
-		UINT16* pLine = &bitmap->pix16(y ^ mask);
+		UINT16* pLine = &bitmap.pix16(y ^ mask);
 
 		for (x = 0; x < 256; x += 8)
 		{
@@ -268,7 +268,7 @@ SCREEN_UPDATE( helifire )
 
 	for (y = 0; y < 256; y++)
 	{
-		UINT16* pLine = &bitmap->pix16(y);
+		UINT16* pLine = &bitmap.pix16(y);
 
 		int level = 120 + wave[state->m_helifire_mv & 7];
 

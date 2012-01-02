@@ -135,7 +135,7 @@ struct _laserdisc_state
 typedef void (*laserdisc_init_func)(laserdisc_state *ld);
 typedef void (*laserdisc_vsync_func)(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
 typedef INT32 (*laserdisc_update_func)(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
-typedef void (*laserdisc_overlay_func)(laserdisc_state *ld, bitmap_t *bitmap);
+typedef void (*laserdisc_overlay_func)(laserdisc_state *ld, bitmap_t &bitmap);
 typedef void (*laserdisc_w_func)(laserdisc_state *ld, UINT8 prev, UINT8 newval);
 typedef UINT8 (*laserdisc_r_func)(laserdisc_state *ld);
 

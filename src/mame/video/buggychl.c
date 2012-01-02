@@ -80,17 +80,17 @@ WRITE8_HANDLER( buggychl_bg_scrollx_w )
 }
 
 
-static void draw_sky( bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sky( bitmap_t &bitmap, const rectangle &cliprect )
 {
 	int x, y;
 
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
-			bitmap->pix16(y, x) = 128 + x / 2;
+			bitmap.pix16(y, x) = 128 + x / 2;
 }
 
 
-static void draw_bg( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_bg( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
 	int offs;
@@ -113,7 +113,7 @@ static void draw_bg( running_machine &machine, bitmap_t *bitmap, const rectangle
 		if (flip_screen_y_get(machine))
 			sy = 31 - sy;
 
-		drawgfx_opaque(state->m_tmp_bitmap1, state->m_tmp_bitmap1->cliprect(), machine.gfx[0],
+		drawgfx_opaque(*state->m_tmp_bitmap1, state->m_tmp_bitmap1->cliprect(), machine.gfx[0],
 				code,
 				2,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
@@ -124,17 +124,17 @@ static void draw_bg( running_machine &machine, bitmap_t *bitmap, const rectangle
 	for (offs = 0; offs < 256; offs++)
 		scroll[offs] = -state->m_scrollv[offs / 8];
 
-	copyscrollbitmap(state->m_tmp_bitmap2, state->m_tmp_bitmap1, 1, &state->m_bg_scrollx, 256, scroll, state->m_tmp_bitmap2->cliprect());
+	copyscrollbitmap(*state->m_tmp_bitmap2, *state->m_tmp_bitmap1, 1, &state->m_bg_scrollx, 256, scroll, state->m_tmp_bitmap2->cliprect());
 
 	/* then copy to the screen doing row scroll */
 	for (offs = 0; offs < 256; offs++)
 		scroll[offs] = -state->m_scrollh[offs];
 
-	copyscrollbitmap_trans(bitmap, state->m_tmp_bitmap2, 256, scroll, 0, 0, clip, 32);
+	copyscrollbitmap_trans(bitmap, *state->m_tmp_bitmap2, 256, scroll, 0, 0, clip, 32);
 }
 
 
-static void draw_fg( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_fg( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
 	int offs;
@@ -163,7 +163,7 @@ static void draw_fg( running_machine &machine, bitmap_t *bitmap, const rectangle
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -220,7 +220,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 						{
 							int dx = flip_screen_x_get(machine) ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
-								bitmap->pix16(dy, dx) = state->m_sprite_color_base + col;
+								bitmap.pix16(dy, dx) = state->m_sprite_color_base + col;
 						}
 
 						/* the following line is almost certainly wrong */
@@ -243,7 +243,7 @@ SCREEN_UPDATE( buggychl )
 	if (state->m_sky_on)
 		draw_sky(bitmap, cliprect);
 	else
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 
 	if (state->m_bg_on)
 		draw_bg(screen.machine(), bitmap, cliprect);

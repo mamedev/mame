@@ -98,4 +98,4 @@ VIDEO_START( gstrik2 );
 
 SCREEN_UPDATE( metro );
 
-void metro_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect);
+void metro_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);

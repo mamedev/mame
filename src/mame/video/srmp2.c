@@ -53,7 +53,7 @@ int srmp3_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
 SCREEN_UPDATE( srmp2 )
 {
 	srmp2_state *state = screen.machine().driver_data<srmp2_state>();
-	bitmap->fill(0x1ff, cliprect);
+	bitmap.fill(0x1ff, cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->set_transpen(15);
 
@@ -71,7 +71,7 @@ SCREEN_UPDATE( srmp2 )
 SCREEN_UPDATE( srmp3 )
 {
 	//srmp2_state *state = screen.machine().driver_data<srmp2_state>();
-	bitmap->fill(0x1f0, cliprect);
+	bitmap.fill(0x1f0, cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->set_fg_xoffsets( 0x10, 0x10 );
 	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x06, 0x06 );
@@ -87,7 +87,7 @@ SCREEN_UPDATE( srmp3 )
 SCREEN_UPDATE( mjyuugi )
 {
 	//srmp2_state *state = screen.machine().driver_data<srmp2_state>();
-	bitmap->fill(0x1f0, cliprect);
+	bitmap.fill(0x1f0, cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->set_fg_xoffsets( 0x10, 0x10 );
 	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x06, 0x06 );

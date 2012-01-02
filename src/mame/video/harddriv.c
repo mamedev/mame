@@ -423,11 +423,11 @@ static void display_speedups(void)
 }
 
 
-void harddriv_scanline_driver(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void harddriv_scanline_driver(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	harddriv_state *state = screen.machine().driver_data<harddriv_state>();
 	UINT8 *vram_base = &state->m_gsp_vram[(params->rowaddr << 12) & state->m_vram_mask];
-	UINT16 *dest = &bitmap->pix16(scanline);
+	UINT16 *dest = &bitmap.pix16(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (state->m_gfx_finescroll & 0x0f);
 	int x;
 
@@ -439,11 +439,11 @@ void harddriv_scanline_driver(screen_device &screen, bitmap_t *bitmap, int scanl
 }
 
 
-void harddriv_scanline_multisync(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void harddriv_scanline_multisync(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	harddriv_state *state = screen.machine().driver_data<harddriv_state>();
 	UINT8 *vram_base = &state->m_gsp_vram[(params->rowaddr << 11) & state->m_vram_mask];
-	UINT16 *dest = &bitmap->pix16(scanline);
+	UINT16 *dest = &bitmap.pix16(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (state->m_gfx_finescroll & 0x07);
 	int x;
 

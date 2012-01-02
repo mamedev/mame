@@ -192,7 +192,7 @@ static VIDEO_START(firebeat)
 }
 
 
-static void gcu_draw_object(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
+static void gcu_draw_object(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	// 0x00: xxx----- -------- -------- --------   command type
@@ -254,7 +254,7 @@ static void gcu_draw_object(running_machine &machine, bitmap_t *bitmap, const re
 	{
 		int xi;
 		int index;
-		UINT16 *d = &bitmap->pix16(j+y, x);
+		UINT16 *d = &bitmap.pix16(j+y, x);
 		//int index = address + ((v >> 6) * 1024);
 
 		if (yflip)
@@ -346,7 +346,7 @@ static void gcu_draw_object(running_machine &machine, bitmap_t *bitmap, const re
 	}
 }
 
-static void gcu_fill_rect(bitmap_t *bitmap, const rectangle &cliprect, UINT32 *cmd)
+static void gcu_fill_rect(bitmap_t &bitmap, const rectangle &cliprect, UINT32 *cmd)
 {
 	int i, j;
 	int x1, y1, x2, y2;
@@ -382,7 +382,7 @@ static void gcu_fill_rect(bitmap_t *bitmap, const rectangle &cliprect, UINT32 *c
 
 	for (j=y1; j < y2; j++)
 	{
-		UINT16 *d = &bitmap->pix16(j);
+		UINT16 *d = &bitmap.pix16(j);
 		for (i=x1; i < x2; i++)
 		{
 			if (color[i&3] & 0x8000)
@@ -393,7 +393,7 @@ static void gcu_fill_rect(bitmap_t *bitmap, const rectangle &cliprect, UINT32 *c
 	}
 }
 
-static void gcu_draw_character(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
+static void gcu_draw_character(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	// 0x00: xxx----- -------- -------- --------   command type
@@ -429,7 +429,7 @@ static void gcu_draw_character(running_machine &machine, bitmap_t *bitmap, const
 
 	for (j=0; j < 8; j++)
 	{
-		UINT16 *d = &bitmap->pix16(y+j, x);
+		UINT16 *d = &bitmap.pix16(y+j, x);
 		UINT16 line = vr[address^1];
 
 		address += 4;
@@ -442,7 +442,7 @@ static void gcu_draw_character(running_machine &machine, bitmap_t *bitmap, const
 	}
 }
 
-static void gcu_exec_display_list(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int chip, UINT32 address)
+static void gcu_exec_display_list(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, UINT32 address)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	int counter = 0;
@@ -513,11 +513,11 @@ static void gcu_exec_display_list(running_machine &machine, bitmap_t *bitmap, co
 	};
 }
 
-static UINT32 update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int chip)
+static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int chip)
 {
 	firebeat_state *state = screen.machine().driver_data<firebeat_state>();
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	if (mame_stricmp(screen.machine().system().name, "popn7") == 0)
 	{

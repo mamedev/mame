@@ -271,7 +271,7 @@ static TIMER_CALLBACK( starfire_scanline_callback )
 SCREEN_UPDATE( starfire )
 {
 	starfire_state *state = screen.machine().driver_data<starfire_state>();
-    copybitmap(bitmap, state->m_starfire_screen, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, *state->m_starfire_screen, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

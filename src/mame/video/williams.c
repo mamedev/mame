@@ -186,7 +186,7 @@ SCREEN_UPDATE( williams )
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *source = &state->m_videoram[y];
-		UINT32 *dest = &bitmap->pix32(y);
+		UINT32 *dest = &bitmap.pix32(y);
 
 		/* loop over columns */
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
@@ -219,7 +219,7 @@ SCREEN_UPDATE( blaster )
 	{
 		int erase_behind = state->m_blaster_video_control & state->m_blaster_scanline_control[y] & 2;
 		UINT8 *source = &state->m_videoram[y];
-		UINT32 *dest = &bitmap->pix32(y);
+		UINT32 *dest = &bitmap.pix32(y);
 
 		/* latch a new color0 pen? */
 		if (state->m_blaster_video_control & state->m_blaster_scanline_control[y] & 1)
@@ -260,7 +260,7 @@ SCREEN_UPDATE( williams2 )
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *source = &state->m_videoram[y];
-		UINT32 *dest = &bitmap->pix32(y);
+		UINT32 *dest = &bitmap.pix32(y);
 
 		/* loop over columns */
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)

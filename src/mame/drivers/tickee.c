@@ -141,11 +141,11 @@ static VIDEO_START( tickee )
  *
  *************************************/
 
-static void scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
 	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = &bitmap->pix32(scanline);
+	UINT32 *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
@@ -167,11 +167,11 @@ static void scanline_update(screen_device &screen, bitmap_t *bitmap, int scanlin
 }
 
 
-static void rapidfir_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void rapidfir_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
 {
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
 	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = &bitmap->pix32(scanline);
+	UINT32 *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;

@@ -74,16 +74,16 @@ struct RozParam
 INLINE void
 DrawRozHelperBlock(const struct RozParam *rozInfo, int destx, int desty,
 	int srcx, int srcy, int width, int height,
-	bitmap_t *destbitmap, bitmap_t *flagsbitmap,
-	bitmap_t *srcbitmap, UINT32 size_mask)
+	bitmap_t &destbitmap, bitmap_t &flagsbitmap,
+	bitmap_t &srcbitmap, UINT32 size_mask)
 {
 	int desty_end = desty + height;
 
 	int end_incrx = rozInfo->incyx - (width * rozInfo->incxx);
 	int end_incry = rozInfo->incyy - (width * rozInfo->incxy);
 
-	UINT16 *dest = &destbitmap->pix16(desty, destx);
-	int dest_rowinc = destbitmap->rowpixels() - width;
+	UINT16 *dest = &destbitmap.pix16(desty, destx);
+	int dest_rowinc = destbitmap.rowpixels() - width;
 
 	while (desty < desty_end)
 	{
@@ -103,9 +103,9 @@ DrawRozHelperBlock(const struct RozParam *rozInfo, int destx, int desty,
 				goto L_SkipPixel;
 			}
 
-			if (flagsbitmap->pix8(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
+			if (flagsbitmap.pix8(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
 			{
-				*dest = srcbitmap->pix16(ypos, xpos) + rozInfo->color;
+				*dest = srcbitmap.pix16(ypos, xpos) + rozInfo->color;
 			}
 
 		L_SkipPixel:
@@ -123,14 +123,14 @@ DrawRozHelperBlock(const struct RozParam *rozInfo, int destx, int desty,
 
 static void
 DrawRozHelper(
-	bitmap_t *bitmap,
+	bitmap_t &bitmap,
 	tilemap_t *tmap,
 	const rectangle &clip,
 	const struct RozParam *rozInfo )
 {
 	tilemap_set_palette_offset( tmap, rozInfo->color );
 
-	if( bitmap->bpp() == 16 )
+	if( bitmap.bpp() == 16 )
 	{
 		/* On many processors, the simple approach of an outer loop over the
             rows of the destination bitmap with an inner loop over the columns
@@ -162,8 +162,8 @@ DrawRozHelper(
 #define ROZ_BLOCK_SIZE 8
 
 		UINT32 size_mask = rozInfo->size - 1;
-		bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
-		bitmap_t *flagsbitmap = tilemap_get_flagsmap(tmap);
+		bitmap_t &srcbitmap = tilemap_get_pixmap(tmap);
+		bitmap_t &flagsbitmap = tilemap_get_flagsmap(tmap);
 		UINT32 srcx = (rozInfo->startx + (clip.min_x * rozInfo->incxx) +
 			(clip.min_y * rozInfo->incyx));
 		UINT32 srcy = (rozInfo->starty + (clip.min_x * rozInfo->incxy) +
@@ -245,7 +245,7 @@ DrawRozHelper(
 } /* DrawRozHelper */
 
 static void
-DrawROZ(bitmap_t *bitmap,const rectangle &cliprect)
+DrawROZ(bitmap_t &bitmap,const rectangle &cliprect)
 {
 	const int xoffset = 38,yoffset = 0;
 	struct RozParam rozParam;
@@ -466,7 +466,7 @@ SCREEN_UPDATE( namcos2_default )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap->fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 	ApplyClip( clip, cliprect );
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
@@ -503,7 +503,7 @@ SCREEN_UPDATE( finallap )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap->fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 	ApplyClip( clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -540,7 +540,7 @@ SCREEN_UPDATE( luckywld )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap->fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 	ApplyClip( clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -573,7 +573,7 @@ SCREEN_UPDATE( sgunner )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap->fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 	ApplyClip( clip, cliprect );
 
 	for( pri=0; pri<8; pri++ )
@@ -599,7 +599,7 @@ SCREEN_UPDATE( metlhawk )
 	int pri;
 
 	UpdatePalette(screen.machine());
-	bitmap->fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 	ApplyClip( clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )

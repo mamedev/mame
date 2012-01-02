@@ -334,10 +334,10 @@ SCREEN_UPDATE( nbmj8991_type1 )
 			scrolly =  (( state->m_scrolly) + 0x0f1) & 0x1ff;
 		}
 
-		copyscrollbitmap(bitmap, state->m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
+		copyscrollbitmap(bitmap, *state->m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
-		bitmap->fill(0);
+		bitmap.fill(0);
 
 	return 0;
 }
@@ -374,10 +374,10 @@ SCREEN_UPDATE( nbmj8991_type2 )
 			scrolly =  (( state->m_scrolly) + 0x0f1) & 0x1ff;
 		}
 
-		copyscrollbitmap(bitmap, state->m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
+		copyscrollbitmap(bitmap, *state->m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
-		bitmap->fill(0);
+		bitmap.fill(0);
 
 	return 0;
 }

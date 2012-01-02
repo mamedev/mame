@@ -142,13 +142,13 @@ static SCREEN_UPDATE( lastfght )
 
 		count = state->m_base;
 
-		bitmap->fill(get_black_pen(screen.machine()), cliprect );
+		bitmap.fill(get_black_pen(screen.machine()), cliprect );
 		for (y = 0 ; y < 256; y++)
 		{
 			for (x = 0; x < 512; x++)
 			{
 				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? get_white_pen(screen.machine()) : gfxdata[count];	// white grid or data
-				bitmap->pix16(y, x) = data;
+				bitmap.pix16(y, x) = data;
 				count++;
 			}
 		}
@@ -158,7 +158,7 @@ static SCREEN_UPDATE( lastfght )
 #endif
 #endif
 
-	copybitmap(bitmap, state->m_bitmap[state->m_dest ^ 1], 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *state->m_bitmap[state->m_dest ^ 1], 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

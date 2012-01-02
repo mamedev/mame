@@ -136,7 +136,7 @@ WRITE16_HANDLER( othldrby_vreg_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
 {
 	othldrby_state *state = machine.driver_data<othldrby_state>();
 	int offs;
@@ -201,9 +201,9 @@ SCREEN_UPDATE( othldrby )
 		}
 	}
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	for (layer = 0; layer < 3; layer++)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 0, 0);

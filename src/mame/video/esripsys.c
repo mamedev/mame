@@ -163,7 +163,7 @@ SCREEN_UPDATE( esripsys )
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT32 *dest = &bitmap->pix32(y, cliprect.min_x);
+		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		for (x = 0; x < 512; ++x)
 		{

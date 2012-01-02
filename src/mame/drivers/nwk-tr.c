@@ -265,7 +265,7 @@ static SCREEN_UPDATE( nwktr )
 	device_t *voodoo = screen.machine().device("voodoo");
 	device_t *k001604 = screen.machine().device("k001604");
 
-	bitmap->fill(screen.machine().pens[0], cliprect);
+	bitmap.fill(screen.machine().pens[0], cliprect);
 
 	voodoo_update(voodoo, bitmap, cliprect);
 

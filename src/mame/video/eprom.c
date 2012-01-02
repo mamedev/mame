@@ -243,7 +243,7 @@ SCREEN_UPDATE( eprom )
 
 	if (state->m_video_disable)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -258,7 +258,7 @@ SCREEN_UPDATE( eprom )
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
-			UINT16 *pf = &bitmap->pix16(y);
+			UINT16 *pf = &bitmap.pix16(y);
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{
@@ -367,7 +367,7 @@ SCREEN_UPDATE( eprom )
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
-			UINT16 *pf = &bitmap->pix16(y);
+			UINT16 *pf = &bitmap.pix16(y);
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{
@@ -398,7 +398,7 @@ SCREEN_UPDATE( guts )
 
 	if (state->m_video_disable)
 	{
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
 
@@ -413,7 +413,7 @@ SCREEN_UPDATE( guts )
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
-			UINT16 *pf = &bitmap->pix16(y);
+			UINT16 *pf = &bitmap.pix16(y);
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{
@@ -441,7 +441,7 @@ SCREEN_UPDATE( guts )
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
-			UINT16 *pf = &bitmap->pix16(y);
+			UINT16 *pf = &bitmap.pix16(y);
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{

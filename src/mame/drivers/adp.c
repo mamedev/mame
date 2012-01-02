@@ -183,7 +183,7 @@ void adp_state::video_start()
 
 static H63484_DISPLAY_PIXELS( acrtc_display_pixels )
 {
-	bitmap->pix16(y, x) = data & 0xf;
+	bitmap.pix16(y, x) = data & 0xf;
 }
 
 bool adp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -191,7 +191,7 @@ bool adp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 	bitmap.fill(0, cliprect);
 
 	/* graphics */
-	m_h63484->update_screen(&bitmap, cliprect);
+	m_h63484->update_screen(bitmap, cliprect);
 
 	return 0;
 }
@@ -216,10 +216,10 @@ static SCREEN_UPDATE( adp )
 		{
 			b &= (HD63484_RAM_SIZE - 1);
 			src = hd63484_ram_r(state->m_hd63484, b, 0xffff);
-			bitmap->pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
-			bitmap->pix16(y, x + 1) = ((src & 0x00f0) >>  4) << 0;
-			bitmap->pix16(y, x + 2) = ((src & 0x0f00) >>  8) << 0;
-			bitmap->pix16(y, x + 3) = ((src & 0xf000) >> 12) << 0;
+			bitmap.pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
+			bitmap.pix16(y, x + 1) = ((src & 0x00f0) >>  4) << 0;
+			bitmap.pix16(y, x + 2) = ((src & 0x0f00) >>  8) << 0;
+			bitmap.pix16(y, x + 3) = ((src & 0xf000) >> 12) << 0;
 			b++;
 		}
 	}
@@ -243,10 +243,10 @@ if (!screen.machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
 
 				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4)
 				{
-					bitmap->pix16(y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
-					bitmap->pix16(y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
-					bitmap->pix16(y, x + sx + 2) = ((src & 0x0f00) >>  8) << 0;
-					bitmap->pix16(y, x + sx + 3) = ((src & 0xf000) >> 12) << 0;
+					bitmap.pix16(y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
+					bitmap.pix16(y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
+					bitmap.pix16(y, x + sx + 2) = ((src & 0x0f00) >>  8) << 0;
+					bitmap.pix16(y, x + sx + 3) = ((src & 0xf000) >> 12) << 0;
 				}
 				b++;
 			}

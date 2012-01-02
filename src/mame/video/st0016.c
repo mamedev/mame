@@ -212,7 +212,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	/*
     object ram :
@@ -367,7 +367,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 								UINT16 drawypos;
 
 								if (!flipy) {drawypos = ypos+yloop;} else {drawypos = (ypos+8-1)-yloop;}
-								destline = &bitmap->pix16(drawypos);
+								destline = &bitmap.pix16(drawypos);
 
 								for (xloop=0; xloop<8; xloop++)
 								{
@@ -488,7 +488,7 @@ VIDEO_START( st0016 )
 }
 
 
-static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect, int priority)
+static void draw_bgmap(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int priority)
 {
 	gfx_element *gfx = machine.gfx[st0016_ramgfx];
 	int j;
@@ -533,7 +533,7 @@ static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangl
 								UINT16 drawypos;
 
 								if (!flipy) {drawypos = ypos+yloop;} else {drawypos = (ypos+8-1)-yloop;}
-								destline = &bitmap->pix16(drawypos);
+								destline = &bitmap.pix16(drawypos);
 
 								for (xloop=0; xloop<8; xloop++)
 								{
@@ -584,7 +584,7 @@ static void draw_bgmap(running_machine &machine, bitmap_t *bitmap,const rectangl
 }
 
 
-void st0016_draw_screen(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect)
+void st0016_draw_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	draw_bgmap(screen.machine(), bitmap,cliprect,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
@@ -616,7 +616,7 @@ SCREEN_UPDATE( st0016 )
 	}
 #endif
 
-	bitmap->fill(UNUSED_PEN, cliprect);
+	bitmap.fill(UNUSED_PEN, cliprect);
 	st0016_draw_screen(screen, bitmap, cliprect);
 	return 0;
 }

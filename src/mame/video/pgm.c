@@ -130,7 +130,7 @@ static void draw_sprite_line( running_machine &machine, int wide, UINT32* dest, 
 	}
 }
 /* this just loops over our decoded bitmap and puts it on the screen */
-static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
+static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t &bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
 {
 	int ycnt;
 	int ydrawpos;
@@ -159,7 +159,7 @@ static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = &bitmap->pix32(ydrawpos);
+				dest = &bitmap.pix32(ydrawpos);
 				draw_sprite_line(machine, wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
 			}
 			ycntdraw++;
@@ -172,7 +172,7 @@ static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = &bitmap->pix32(ydrawpos);
+				dest = &bitmap.pix32(ydrawpos);
 				draw_sprite_line(machine, wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
 			}
 			ycntdraw++;
@@ -196,7 +196,7 @@ static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = &bitmap->pix32(ydrawpos);
+				dest = &bitmap.pix32(ydrawpos);
 				draw_sprite_line(machine, wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
 			}
 			ycntdraw++;
@@ -210,7 +210,7 @@ static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t* spritebitmap, UINT16 *sprite_source )
+static void draw_sprites( running_machine &machine, bitmap_t& spritebitmap, UINT16 *sprite_source )
 {
 	/* ZZZZ Zxxx xxxx xxxx
        zzzz z-yy yyyy yyyy
@@ -367,10 +367,10 @@ SCREEN_UPDATE( pgm )
 	pgm_state *state = screen.machine().driver_data<pgm_state>();
 	int y;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	state->m_tmppgmbitmap->fill(0x00000000, cliprect);
 
-	draw_sprites(screen.machine(), state->m_tmppgmbitmap, state->m_spritebufferram);
+	draw_sprites(screen.machine(), *state->m_tmppgmbitmap, state->m_spritebufferram);
 
 	tilemap_set_scrolly(state->m_bg_tilemap,0, state->m_videoregs[0x2000/2]);
 
@@ -383,7 +383,7 @@ SCREEN_UPDATE( pgm )
 		for (y = 0; y < 224; y++)
 		{
 			UINT32* src = &state->m_tmppgmbitmap->pix32(y);
-			UINT16* dst = &bitmap->pix16(y);
+			UINT16* dst = &bitmap.pix16(y);
 
 			for (x = 0; x < 448; x++)
 			{
@@ -401,7 +401,7 @@ SCREEN_UPDATE( pgm )
 		for (y = 0; y < 224; y++)
 		{
 			UINT32* src = &state->m_tmppgmbitmap->pix32(y);
-			UINT16* dst = &bitmap->pix16(y);
+			UINT16* dst = &bitmap.pix16(y);
 
 			for (x = 0; x < 448; x++)
 			{

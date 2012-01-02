@@ -15,7 +15,7 @@ SCREEN_UPDATE( honeydol )
 
 	/* not standard snowbros video */
 
-	bitmap->fill(0xf0, cliprect);
+	bitmap.fill(0xf0, cliprect);
 
 	for (offs = 0x0000/2;offs < 0x2000/2;offs += 8)
 	{
@@ -101,7 +101,7 @@ SCREEN_UPDATE( twinadv )
 
 	/* not standard snowbros video */
 
-	bitmap->fill(0xf0, cliprect);
+	bitmap.fill(0xf0, cliprect);
 
 	for (offs = 0x0000/2;offs < 0x2000/2;offs += 8)
 	{
@@ -152,7 +152,7 @@ SCREEN_UPDATE( wintbob )
 	UINT16 *spriteram16 = state->m_bootleg_spriteram16;
 	int offs;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	for (offs = 0;offs < state->m_spriteram_size/2;offs += 8)
 	{
@@ -220,7 +220,7 @@ SCREEN_UPDATE( snowbro3 )
 
 	/* This clears & redraws the entire screen each pass */
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	for (offs = 0;offs < state->m_spriteram_size/2;offs += 8)
 	{

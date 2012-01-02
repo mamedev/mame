@@ -166,7 +166,7 @@ WRITE8_HANDLER( cop01_vreg_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	cop01_state *state = machine.driver_data<cop01_state>();
 	int offs, code, attr, sx, sy, flipx, flipy, color;

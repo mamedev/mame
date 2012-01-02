@@ -180,9 +180,9 @@ SCREEN_EOF( sprint2 )
 
 		/* check for sprite-tilemap collisions */
 
-		tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
+		tilemap_draw(*state->m_helper, rect, state->m_bg_tilemap, 0, 0);
 
-		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+		drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,
@@ -196,7 +196,7 @@ SCREEN_EOF( sprint2 )
 		for (j = 0; j < 4; j++)
 			if (j != i)
 			{
-				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+				drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1],
 					get_sprite_code(video_ram, j),
 					1,
 					0, 0,
@@ -204,7 +204,7 @@ SCREEN_EOF( sprint2 )
 					get_sprite_y(video_ram, j), 0);
 			}
 
-		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+		drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,

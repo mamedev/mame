@@ -403,7 +403,7 @@ static INPUT_PORTS_START( littlerb )
 INPUT_PORTS_END
 
 
-static void draw_sprite(running_machine &machine, bitmap_t *bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
+static void draw_sprite(running_machine &machine, bitmap_t &bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
 {
 	littlerb_state *state = machine.driver_data<littlerb_state>();
 	UINT16* spritegfx = state->m_region4;
@@ -426,12 +426,12 @@ static void draw_sprite(running_machine &machine, bitmap_t *bitmap, int xsize,in
 
 			if ((drawxpos < 320) && (drawypos < 256) && (drawxpos >= 0) && (drawypos >=0))
 			{
-				if(pix1&0xf) bitmap->pix16(drawypos, drawxpos) = pix1;
+				if(pix1&0xf) bitmap.pix16(drawypos, drawxpos) = pix1;
 			}
 			drawxpos++;
 			if ((drawxpos < 320) && (drawypos < 256) && (drawxpos >= 0) && (drawypos >=0))
 			{
-				if(pix2&0xf) bitmap->pix16(drawypos, drawxpos) = pix2;
+				if(pix2&0xf) bitmap.pix16(drawypos, drawxpos) = pix2;
 			}
 
 			offset++;
@@ -449,7 +449,7 @@ static SCREEN_UPDATE(littlerb)
 	int xsize,ysize;
 	int pal;
 	UINT16* spriteregion = &state->m_region4[0x400];
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	//printf("frame\n");
 	/* the spriteram format is something like this .. */
 	for (offs=0x26/2;offs<0xc00;offs+=6) // start at 00x26?

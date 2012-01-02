@@ -212,7 +212,7 @@ WRITE16_HANDLER( zwackery_spriteram_w )
  *
  *************************************/
 
-static void mcr68_update_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
+static void mcr68_update_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
 	rectangle sprite_clip = machine.primary_screen->visible_area();
@@ -224,7 +224,7 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_t *bitmap, con
 	sprite_clip.max_x -= state->m_sprite_clip;
 	sprite_clip &= cliprect;
 
-	machine.priority_bitmap->fill(1, sprite_clip);
+	machine.priority_bitmap.fill(1, sprite_clip);
 
 	/* loop over sprite RAM */
 	for (offs = state->m_spriteram_size / 2 - 4;offs >= 0;offs -= 4)
@@ -266,13 +266,13 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_t *bitmap, con
 }
 
 
-static void zwackery_update_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority)
+static void zwackery_update_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
 	int offs;
 
-	machine.priority_bitmap->fill(1, cliprect);
+	machine.priority_bitmap.fill(1, cliprect);
 
 	/* loop over sprite RAM */
 	for (offs = state->m_spriteram_size / 2 - 4;offs >= 0;offs -= 4)

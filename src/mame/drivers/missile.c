@@ -673,7 +673,7 @@ static SCREEN_UPDATE( missile )
 	/* draw the bitmap to the screen, looping over Y */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *dst = &bitmap.pix16(y);
 
 		int effy = state->m_flipscreen ? ((256+24 - y) & 0xff) : y;
 		UINT8 *src = &videoram[effy * 64];

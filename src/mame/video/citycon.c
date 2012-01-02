@@ -106,7 +106,7 @@ WRITE8_HANDLER( citycon_background_w )
 
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	citycon_state *state = machine.driver_data<citycon_state>();
 	int offs;

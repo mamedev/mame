@@ -1422,12 +1422,12 @@ WRITE8_DEVICE_HANDLER( k007121_ctrl_w )
  *
  */
 
-void k007121_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,
+void k007121_sprites_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,
 						  const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask )
 {
 	k007121_state *k007121 = k007121_get_safe_token(device);
 //  const gfx_element *gfx = gfxs[chip];
-	bitmap_t *priority_bitmap = gfx->machine().priority_bitmap;
+	bitmap_t &priority_bitmap = gfx->machine().priority_bitmap;
 	int flipscreen = k007121->flipscreen;
 	int i, num, inc, offs[5];
 	int is_flakatck = (ctable == NULL);
@@ -1749,7 +1749,7 @@ void k007342_tilemap_update( device_t *device )
 #endif
 }
 
-void k007342_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority )
+void k007342_tilemap_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority )
 {
 	k007342_state *k007342 = k007342_get_safe_token(device);
 	tilemap_draw(bitmap, cliprect, k007342->tilemap[num], flags, priority);
@@ -1942,7 +1942,7 @@ WRITE8_DEVICE_HANDLER( k007420_w )
  *   7  | xxxxxxxx | unused
  */
 
-void k007420_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, gfx_element *gfx )
+void k007420_sprites_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, gfx_element *gfx )
 {
 	k007420_state *k007420 = k007420_get_safe_token(device);
 	int offs;
@@ -2561,7 +2561,7 @@ if (machine.input().code_pressed(KEYCODE_F))
 #endif
 }
 
-void k052109_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority )
+void k052109_tilemap_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	tilemap_draw(bitmap, cliprect, k052109->tilemap[tmap_num], flags, priority);
@@ -3003,7 +3003,7 @@ WRITE16_DEVICE_HANDLER( k051937_word_w )
  * Note that Aliens also uses the shadow bit to select the second sprite bank.
  */
 
-void k051960_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int min_priority, int max_priority )
+void k051960_sprites_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int min_priority, int max_priority )
 {
 #define NUM_SPRITES 128
 	k051960_state *k051960 = k051960_get_safe_token(device);
@@ -3529,7 +3529,7 @@ void k053244_bankselect( device_t *device, int bank )
  * The rest of the sprite remains normal.
  */
 
-void k053245_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+void k053245_sprites_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 #define NUM_SPRITES 128
 	k05324x_state *k053245 = k05324x_get_safe_token(device);
@@ -3783,7 +3783,7 @@ if (machine.input().code_pressed(KEYCODE_D))
 
 /* Lethal Enforcers has 2 of these chips hooked up in parallel to give 6bpp gfx.. lets cheat a
   bit and make emulating it a little less messy by using a custom function instead */
-void k053245_sprites_draw_lethal( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+void k053245_sprites_draw_lethal( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 #define NUM_SPRITES 128
 	k05324x_state *k053245 = k05324x_get_safe_token(device);
@@ -4450,7 +4450,7 @@ int k053246_is_irq_enabled( device_t *device )
  * The rest of the sprite remains normal.
  */
 
-void k053247_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+void k053247_sprites_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 #define NUM_SPRITES 256
 	k053247_state *k053246 = k053247_get_safe_token(device);
@@ -4496,7 +4496,7 @@ void k053247_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle &
     */
 	if (machine.config().m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (bitmap->bpp() == 32 && (machine.config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (bitmap.bpp() == 32 && (machine.config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -5221,7 +5221,7 @@ INLINE void k051316_get_tile_info( device_t *device, tile_data *tileinfo, int ti
 static TILE_GET_INFO_DEVICE( k051316_get_tile_info0 ) { k051316_get_tile_info(device, tileinfo, tile_index); }
 
 
-void k051316_zoom_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void k051316_zoom_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
 {
 	k051316_state *k051316= k051316_get_safe_token(device);
 	UINT32 startx, starty;
@@ -5459,7 +5459,7 @@ READ16_DEVICE_HANDLER( k053936_linectrl_r )
 
 // there is another implementation of this in  video/konamigx.c (!)
 //  why? shall they be merged?
-void k053936_zoom_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
+void k053936_zoom_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
 {
 	k053936_state *k053936= k053936_get_safe_token(device);
 	if (!tmap)
@@ -6966,7 +6966,7 @@ WRITE32_DEVICE_HANDLER( k056832_b_long_w )
 	}
 }
 
-static int k056832_update_linemap( device_t *device, bitmap_t *bitmap, int page, int flags )
+static int k056832_update_linemap( device_t *device, bitmap_t &bitmap, int page, int flags )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 
@@ -6980,11 +6980,10 @@ static int k056832_update_linemap( device_t *device, bitmap_t *bitmap, int page,
 		tilemap_t *tmap;
 		UINT32 *dirty;
 		int all_dirty;
-		bitmap_t* xprmap;
 		UINT8 *xprdata;
 
 		tmap = k056832->tilemap[page];
-		xprmap  = tilemap_get_flagsmap(tmap);
+		bitmap_t &xprmap  = tilemap_get_flagsmap(tmap);
 		xprdata = tilemap_get_tile_flags(tmap);
 
 		dirty = k056832->line_dirty[page];
@@ -6999,7 +6998,7 @@ static int k056832_update_linemap( device_t *device, bitmap_t *bitmap, int page,
 			// *really ugly but it minimizes alteration to tilemap.c
 			memset(&zerorect, 0, sizeof(rectangle));	// zero dimension
 			tilemap_draw(bitmap, zerorect, tmap, 0, 0);	// dummy call to reset tile_dirty_map
-			xprmap->fill(0);						// reset pixel transparency_bitmap;
+			xprmap.fill(0);						// reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
 		}
 		else
@@ -7050,7 +7049,7 @@ static int k056832_update_linemap( device_t *device, bitmap_t *bitmap, int page,
 				tile_data tileinfo = {0};
 
 				dst_ptr = &pixmap->pix16(line);
-				xpr_ptr = &xprmap->pix8(line);
+				xpr_ptr = &xprmap.pix8(line);
 
 				if (!all_dirty)
 				{
@@ -7090,7 +7089,7 @@ static int k056832_update_linemap( device_t *device, bitmap_t *bitmap, int page,
 	return(0);
 }
 
-void k056832_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_tilemap_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT32 last_dx, last_visible, new_colorbase, last_active;
@@ -7413,7 +7412,7 @@ printf("\nend\n");
 } // end of function
 
 
-void k056832_tilemap_draw_dj( device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_tilemap_draw_dj( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT32 last_dx, last_visible, new_colorbase, last_active;
@@ -7942,7 +7941,7 @@ static DEVICE_START( k056832 )
 	{
 		tmap = k056832->tilemap[i];
 
-		k056832->pixmap[i] = tilemap_get_pixmap(tmap);
+		k056832->pixmap[i] = &tilemap_get_pixmap(tmap);
 
 		tilemap_set_transparent_pen(tmap, 0);
 	}
@@ -8209,7 +8208,7 @@ void k054338_update_all_shadows( device_t *device, int rushingheroes_hack )
 }
 
 // k054338 BG color fill
-void k054338_fill_solid_bg( device_t *device, bitmap_t *bitmap )
+void k054338_fill_solid_bg( device_t *device, bitmap_t &bitmap )
 {
 	UINT32 bgcolor;
 	UINT32 *pLine;
@@ -8219,16 +8218,16 @@ void k054338_fill_solid_bg( device_t *device, bitmap_t *bitmap )
 	bgcolor |= k054338_register_r(device, K338_REG_BGC_GB);
 
 	/* and fill the screen with it */
-	for (y = 0; y < bitmap->height(); y++)
+	for (y = 0; y < bitmap.height(); y++)
 	{
-		pLine = &bitmap->pix32(y);
-		for (x = 0; x < bitmap->width(); x++)
+		pLine = &bitmap.pix32(y);
+		for (x = 0; x < bitmap.width(); x++)
 			*pLine++ = bgcolor;
 	}
 }
 
 // Unified k054338/K055555 BG color fill
-void k054338_fill_backcolor( device_t *device, bitmap_t *bitmap, int mode ) // (see p.67)
+void k054338_fill_backcolor( device_t *device, bitmap_t &bitmap, int mode ) // (see p.67)
 {
 	k054338_state *k054338 = k054338_get_safe_token(device);
 	int clipx, clipy, clipw, cliph, i, dst_pitch;
@@ -8242,8 +8241,8 @@ void k054338_fill_backcolor( device_t *device, bitmap_t *bitmap, int mode ) // (
 	clipw = (visarea.max_x - clipx + 4) & ~3;
 	cliph = visarea.max_y - clipy + 1;
 
-	dst_ptr = &bitmap->pix32(clipy);
-	dst_pitch = bitmap->rowpixels();
+	dst_ptr = &bitmap.pix32(clipy);
+	dst_pitch = bitmap.rowpixels();
 	dst_ptr += clipx;
 
 	BGC_SET = 0;
@@ -9416,7 +9415,7 @@ static void k001005_render_polygons( device_t *device )
 	}
 }
 
-void k001005_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+void k001005_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	k001005_state *k001005 = k001005_get_safe_token(device);
 	int i, j;
@@ -9425,7 +9424,7 @@ void k001005_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect
 
 	for (j = cliprect.min_y; j <= cliprect.max_y; j++)
 	{
-		UINT32 *bmp = &bitmap->pix32(j);
+		UINT32 *bmp = &bitmap.pix32(j);
 		UINT32 *src = &k001005->bitmap[k001005->bitmap_page ^ 1]->pix32(j);
 
 		for (i = cliprect.min_x; i <= cliprect.max_x; i++)
@@ -9695,12 +9694,12 @@ static TILE_GET_INFO_DEVICE( k001604_tile_info_layer_roz )
 }
 
 
-void k001604_draw_back_layer( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+void k001604_draw_back_layer( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	k001604_state *k001604 = k001604_get_safe_token(device);
 	int layer;
 	int num_layers;
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	num_layers = k001604->layer_size ? 2 : 1;
 
@@ -9730,7 +9729,7 @@ void k001604_draw_back_layer( device_t *device, bitmap_t *bitmap, const rectangl
 	}
 }
 
-void k001604_draw_front_layer( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+void k001604_draw_front_layer( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
@@ -10031,7 +10030,7 @@ static TILE_GET_INFO_DEVICE( k037122_tile_info_layer1 )
 }
 
 
-void k037122_tile_draw( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+void k037122_tile_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	const rectangle &visarea = k037122->screen->visible_area();

@@ -302,7 +302,7 @@ static SCREEN_UPDATE(meijinsn)
 		{
 			color= BIT(data1, x) | (BIT(data1, x + 4) << 1);
 			data = BIT(data2, x) | (BIT(data2, x + 4) << 1);
-			bitmap->pix16(sy, (sx * 4 + (3 - x))) = color * 4 + data;
+			bitmap.pix16(sy, (sx * 4 + (3 - x))) = color * 4 + data;
 		}
 	}
 	return 0;

@@ -137,10 +137,13 @@ public:
 	INT32 rowbytes() const { return m_rowpixels * m_bpp / 8; }
 	UINT8 bpp() const { return m_bpp; }
 	bitmap_format format() const { return m_format; }
+	bool valid() const { return (m_format != BITMAP_FORMAT_INVALID); }
 	palette_t *palette() const { return m_palette; }
 	const rectangle &cliprect() const { return m_cliprect; }
 	
-	// helpers
+	// operations
+	void allocate(int width, int height, bitmap_format format, int xslop = 0, int yslop = 0);
+	void deallocate();
 	void clone_existing(const bitmap_t &srcbitmap);
 	void set_palette(palette_t *palette);
 	void fill(rgb_t color) { fill(color, m_cliprect); }

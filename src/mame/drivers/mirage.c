@@ -83,7 +83,7 @@ static SCREEN_UPDATE( mirage )
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
-	bitmap->fill(256, cliprect); /* not verified */
+	bitmap.fill(256, cliprect); /* not verified */
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);

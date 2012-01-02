@@ -137,7 +137,7 @@ WRITE16_HANDLER( dynduke_control_w )
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int pri)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int pri)
 {
 	dynduke_state *state = machine.driver_data<dynduke_state>();
 	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
@@ -175,18 +175,18 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-static void draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int pri )
+static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
 {
 	dynduke_state *state = machine.driver_data<dynduke_state>();
 	/* The transparency / palette handling on the background layer is very strange */
-	bitmap_t *bm = tilemap_get_pixmap(state->m_bg_layer);
+	bitmap_t &bm = tilemap_get_pixmap(state->m_bg_layer);
 	int scrolly, scrollx;
 	int x,y;
 
 	/* if we're disabled, don't draw */
 	if (!state->m_back_enable)
 	{
-		bitmap->fill(get_black_pen(machine), cliprect);
+		bitmap.fill(get_black_pen(machine), cliprect);
 		return;
 	}
 
@@ -196,8 +196,8 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	for (y=0;y<256;y++)
 	{
 		int realy = (y + scrolly) & 0x1ff;
-		UINT16 *src = &bm->pix16(realy);
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *src = &bm.pix16(realy);
+		UINT16 *dst = &bitmap.pix16(y);
 
 
 		for (x=0;x<256;x++)

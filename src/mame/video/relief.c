@@ -111,13 +111,13 @@ VIDEO_START( relief )
 SCREEN_UPDATE( relief )
 {
 	relief_state *state = screen.machine().driver_data<relief_state>();
-	bitmap_t *priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_t &priority_bitmap = screen.machine().priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	priority_bitmap->fill(0, cliprect);
+	priority_bitmap.fill(0, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 0, 1);
 
@@ -127,8 +127,8 @@ SCREEN_UPDATE( relief )
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap->pix16(y);
-			UINT16 *pf = &bitmap->pix16(y);
-			UINT8 *pri = &priority_bitmap->pix8(y);
+			UINT16 *pf = &bitmap.pix16(y);
+			UINT8 *pri = &priority_bitmap.pix8(y);
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{

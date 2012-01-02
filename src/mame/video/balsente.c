@@ -126,7 +126,7 @@ WRITE8_HANDLER( shrike_sprite_select_w )
  *
  *************************************/
 
-static void draw_one_sprite(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 *sprite)
+static void draw_one_sprite(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 *sprite)
 {
 	balsente_state *state = machine.driver_data<balsente_state>();
 	int flags = sprite[0];
@@ -161,12 +161,12 @@ static void draw_one_sprite(running_machine &machine, bitmap_t *bitmap, const re
 
 					/* left pixel, combine with the background */
 					if (left && currx >= 0 && currx < 256)
-						bitmap->pix16(ypos, currx) = pens[left | old[0]];
+						bitmap.pix16(ypos, currx) = pens[left | old[0]];
 					currx++;
 
 					/* right pixel, combine with the background */
 					if (right && currx >= 0 && currx < 256)
-						bitmap->pix16(ypos, currx) = pens[right | old[1]];
+						bitmap.pix16(ypos, currx) = pens[right | old[1]];
 					currx++;
 				}
 			}
@@ -185,12 +185,12 @@ static void draw_one_sprite(running_machine &machine, bitmap_t *bitmap, const re
 
 					/* left pixel, combine with the background */
 					if (left && currx >= 0 && currx < 256)
-						bitmap->pix16(ypos, currx) = pens[left | old[0]];
+						bitmap.pix16(ypos, currx) = pens[left | old[0]];
 					currx++;
 
 					/* right pixel, combine with the background */
 					if (right && currx >= 0 && currx < 256)
-						bitmap->pix16(ypos, currx) = pens[right | old[1]];
+						bitmap.pix16(ypos, currx) = pens[right | old[1]];
 					currx++;
 				}
 				src += 4;

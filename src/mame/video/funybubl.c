@@ -28,7 +28,7 @@ VIDEO_START(funybubl)
 {
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	funybubl_state *state = machine.driver_data<funybubl_state>();
 	UINT8 *source = &state->m_banked_vram[0x2000 - 0x20];
@@ -79,7 +79,7 @@ SCREEN_UPDATE(funybubl)
 	int x, y, offs;
 	offs = 0;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */
 	for (y = 0; y < 32; y++)

@@ -207,10 +207,10 @@ static SCREEN_UPDATE( igs011 )
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				bitmap->pix16(y, x) = get_black_pen(screen.machine());
+				bitmap.pix16(y, x) = get_black_pen(screen.machine());
 			else
 #endif
-				bitmap->pix16(y, x) = state->m_layer[l][scr_addr] | (l << 8);
+				bitmap.pix16(y, x) = state->m_layer[l][scr_addr] | (l << 8);
 		}
 	}
 	return 0;

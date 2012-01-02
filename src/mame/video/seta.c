@@ -770,33 +770,33 @@ static void usclssic_set_pens(running_machine &machine)
 
 
 
-static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
+static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
 {
 	int y;
 	const gfx_element *gfx_tilemap = machine.gfx[gfxnum];
-	const bitmap_t *src_bitmap = tilemap_get_pixmap(tilemap);
+	const bitmap_t &src_bitmap = tilemap_get_pixmap(tilemap);
 	int width_mask, height_mask;
 	int opaque_mask = gfx_tilemap->color_granularity - 1;
 	int pixel_effect_mask = gfx_tilemap->color_base + (gfx_tilemap->total_colors - 1) * gfx_tilemap->color_granularity;
 	int p;
 
-	width_mask = src_bitmap->width() - 1;
-	height_mask = src_bitmap->height() - 1;
+	width_mask = src_bitmap.width() - 1;
+	height_mask = src_bitmap.height() - 1;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dest = &bitmap->pix16(y);
+		UINT16 *dest = &bitmap.pix16(y);
 
 		int x;
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if(!flipscreen)
 			{
-				p = src_bitmap->pix16((y + scrolly) & height_mask, (x + scrollx) & width_mask);
+				p = src_bitmap.pix16((y + scrolly) & height_mask, (x + scrollx) & width_mask);
 			}
 			else
 			{
-				p = src_bitmap->pix16((y - scrolly - 256) & height_mask, (x - scrollx - 512) & width_mask);
+				p = src_bitmap.pix16((y - scrolly - 256) & height_mask, (x - scrollx - 512) & width_mask);
 			}
 
 			// draw not transparent pixels
@@ -831,7 +831,7 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t *bitm
 SCREEN_UPDATE( seta_no_layers )
 {
 	set_pens(screen.machine());
-	bitmap->fill(0x1f0, cliprect);
+	bitmap.fill(0x1f0, cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
@@ -839,7 +839,7 @@ SCREEN_UPDATE( seta_no_layers )
 
 
 /* For games with 1 or 2 tilemaps */
-void seta_layers_update(screen_device &screen, bitmap_t *bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac )
+void seta_layers_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac )
 {
 	seta_state *state = screen.machine().driver_data<seta_state>();
 	int layers_ctrl = -1;
@@ -944,7 +944,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	if (order & 1)	// swap the layers?
 	{
@@ -1055,7 +1055,7 @@ static SCREEN_UPDATE( seta_layers )
 
 SCREEN_UPDATE( setaroul )
 {
-	bitmap->fill(0x0, cliprect);
+	bitmap.fill(0x0, cliprect);
 
 	screen.machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
 	screen.machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );

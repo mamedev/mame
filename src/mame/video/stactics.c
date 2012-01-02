@@ -236,11 +236,11 @@ INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 }
 
 
-static void draw_background(stactics_state *state, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_background(stactics_state *state, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	int y;
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	/* for every row */
 	for (y = 0; y < 0x100; y++)
@@ -275,7 +275,7 @@ static void draw_background(stactics_state *state, bitmap_t *bitmap, const recta
 
 			/* plot if visible */
 			if ((sy >= 0) && (sy < 0x100) && (sx >= 0) && (sx < 0x100))
-				bitmap->pix16(sy, sx) = pen;
+				bitmap.pix16(sy, sx) = pen;
 		}
 	}
 }

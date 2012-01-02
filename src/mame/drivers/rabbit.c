@@ -230,7 +230,7 @@ sprites invisible at the end of a round in rabbit, why?
 
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int xpos,ypos,tileno,xflip,yflip, colr;
@@ -258,7 +258,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 		if(xpos&0x800)xpos-=0x1000;
 
-		drawgfx_transpen(state->m_sprite_bitmap,state->m_sprite_clip,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(state->m_spriteregs[0]&0x00000fff)*/,ypos-24/*-((state->m_spriteregs[1]&0x0fff0000)>>16)*/,15);
+		drawgfx_transpen(*state->m_sprite_bitmap,state->m_sprite_clip,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(state->m_spriteregs[0]&0x00000fff)*/,ypos-24/*-((state->m_spriteregs[1]&0x0fff0000)>>16)*/,15);
 //      drawgfx_transpen(bitmap,cliprect,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(state->m_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((state->m_spriteregs[1]&0x0fff0000)>>16)*/,0);
 
 
@@ -269,7 +269,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 }
 
 /* the sprite bitmap can probably be handled better than this ... */
-static void rabbit_clearspritebitmap( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void rabbit_clearspritebitmap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int startx, starty;
@@ -297,7 +297,7 @@ static void rabbit_clearspritebitmap( running_machine &machine, bitmap_t *bitmap
 }
 
 /* todo: fix zoom, its inaccurate and this code is ugly */
-static void draw_sprite_bitmap( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprite_bitmap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
 
@@ -333,7 +333,7 @@ static void draw_sprite_bitmap( running_machine &machine, bitmap_t *bitmap, cons
 		if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 		{
 			srcline = &state->m_sprite_bitmap->pix16((starty+(y>>7))&0xfff);
-			dstline = &bitmap->pix16(ydrawpos);
+			dstline = &bitmap.pix16(ydrawpos);
 
 			for (x=0;x<xsize;x+=0x80)
 			{
@@ -405,7 +405,7 @@ each line represents the differences on each tilemap for unknown variables
 
 */
 
-static void rabbit_drawtilemap( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int whichtilemap )
+static void rabbit_drawtilemap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int whichtilemap )
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
 	INT32 startx, starty, incxx, incxy, incyx, incyy, tran;
@@ -434,7 +434,7 @@ static SCREEN_UPDATE(rabbit)
 	rabbit_state *state = screen.machine().driver_data<rabbit_state>();
 	int prilevel;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 //  popmessage("%08x %08x", state->m_viewregs0[0], state->m_viewregs0[1]);
 //  popmessage("%08x %08x %08x %08x %08x %08x", state->m_tilemap_regs[0][0],state->m_tilemap_regs[0][1],state->m_tilemap_regs[0][2],state->m_tilemap_regs[0][3],state->m_tilemap_regs[0][4],state->m_tilemap_regs[0][5]);

@@ -56,52 +56,21 @@
 
 bitmap_t::bitmap_t()
 	: m_alloc(NULL),
-	  m_base(NULL),
-	  m_rowpixels(0),
-	  m_width(0),
-	  m_height(0),
-	  m_format(BITMAP_FORMAT_INVALID),
-	  m_bpp(0),
-	  m_palette(NULL),
-	  m_cliprect(0, 0, 0, 0)
+	  m_palette(NULL)
 {
+	// deallocate intializes all other fields
+	deallocate();
 }
 
-
-//-------------------------------------------------
-//  bitmap_t - basic constructor
-//-------------------------------------------------
 
 bitmap_t::bitmap_t(int width, int height, bitmap_format format, int xslop, int yslop)
 	: m_alloc(NULL),
-	  m_base(NULL),
-	  m_rowpixels((width + 2 * xslop + 7) & ~7),
-	  m_width(width),
-	  m_height(height),
-	  m_format(format),
-	  m_bpp(format_to_bpp(format)),
-	  m_palette(NULL),
-	  m_cliprect(0, width - 1, 0, height - 1)
+	  m_palette(NULL)
 {
-	// fail if invalid format
-	if (m_bpp == 0)
-		throw std::bad_alloc();
-
-	// allocate memory for the bitmap itself
-	size_t allocbytes = m_rowpixels * (m_height + 2 * yslop) * m_bpp / 8;
-	m_alloc = new UINT8[allocbytes];
-
-	// clear to 0 by default
-	memset(m_alloc, 0, allocbytes);
-
-	// compute the base
-	m_base = m_alloc + (m_rowpixels * yslop + xslop) * (m_bpp / 8);
+	// allocate intializes all other fields
+	allocate(width, height, format, xslop, yslop);
 }
 
-
-//-------------------------------------------------
-//  bitmap_t - basic constructor
-//-------------------------------------------------
 
 bitmap_t::bitmap_t(void *base, int width, int height, int rowpixels, bitmap_format format)
 	: m_alloc(NULL),
@@ -126,12 +95,64 @@ bitmap_t::bitmap_t(void *base, int width, int height, int rowpixels, bitmap_form
 
 bitmap_t::~bitmap_t()
 {
-	// dereference the palette
-	if (m_palette != NULL)
-		palette_deref(m_palette);
+	// delete any existing stuff
+	deallocate();
+}
 
-	// free any allocated memory
+
+//-------------------------------------------------
+//  allocate -- (re)allocate memory for the bitmap
+//  at the given size, destroying anything that
+//  already exists
+//-------------------------------------------------
+
+void bitmap_t::allocate(int width, int height, bitmap_format format, int xslop, int yslop)
+{
+	// delete any existing stuff
+	deallocate();
+	
+	// initialize fields
+	m_rowpixels = (width + 2 * xslop + 7) & ~7;
+	m_width = width;
+	m_height = height;
+	m_format = format;
+	m_bpp = format_to_bpp(format);
+	if (m_bpp == 0)
+		throw std::bad_alloc();
+	m_cliprect.set(0, width - 1, 0, height - 1);
+	
+	// allocate memory for the bitmap itself
+	size_t allocbytes = m_rowpixels * (m_height + 2 * yslop) * m_bpp / 8;
+	m_alloc = new UINT8[allocbytes];
+
+	// clear to 0 by default
+	memset(m_alloc, 0, allocbytes);
+
+	// compute the base
+	m_base = m_alloc + (m_rowpixels * yslop + xslop) * (m_bpp / 8);
+}
+
+
+//-------------------------------------------------
+//  deallocate -- reset to an invalid bitmap,
+//  deleting all allocated stuff
+//-------------------------------------------------
+
+void bitmap_t::deallocate()
+{
+	// delete any existing stuff
+	set_palette(NULL);
 	delete[] m_alloc;
+	m_alloc = NULL;
+	m_base = NULL;
+	
+	// reset all fields
+	m_rowpixels = 0;
+	m_width = 0;
+	m_height = 0;
+	m_format = BITMAP_FORMAT_INVALID;
+	m_bpp = 0;
+	m_cliprect.set(0, -1, 0, -1);
 }
 
 

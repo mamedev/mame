@@ -568,12 +568,12 @@ static SCREEN_UPDATE(wheelfir)
 {
 	wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	for(int y=0;y<NUM_SCANLINES;++y)
 	{
 		UINT16 *source = &state->m_tmp_bitmap[LAYER_BG]->pix16(( (state->m_scanlines[y].y)&511));
-		UINT16 *dest = &bitmap->pix16(y);
+		UINT16 *dest = &bitmap.pix16(y);
 
 		for (int x=0;x<336;x++)
 		{
@@ -583,7 +583,7 @@ static SCREEN_UPDATE(wheelfir)
 		}
 	}
 
-	copybitmap_trans(bitmap, state->m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *state->m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
 
 /*
     {

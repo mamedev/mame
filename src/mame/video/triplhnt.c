@@ -32,7 +32,7 @@ static TIMER_CALLBACK( triplhnt_hit_callback )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
 	int i;
@@ -74,7 +74,7 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 
 		/* render sprite to auxiliary bitmap */
 
-		drawgfx_opaque(state->m_helper, cliprect, machine.gfx[state->m_sprite_zoom],
+		drawgfx_opaque(*state->m_helper, cliprect, machine.gfx[state->m_sprite_zoom],
 			2 * code + state->m_sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y);
 
@@ -98,7 +98,7 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 				for (y = rect.min_y; y <= rect.max_y; y++)
 				{
 					pen_t a = state->m_helper->pix16(y, x);
-					pen_t b = bitmap->pix16(y, x);
+					pen_t b = bitmap.pix16(y, x);
 
 					if (a == 2 && b == 7)
 					{
@@ -107,7 +107,7 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 					}
 
 					if (a != 1)
-						bitmap->pix16(y, x) = a;
+						bitmap.pix16(y, x) = a;
 				}
 			}
 		}

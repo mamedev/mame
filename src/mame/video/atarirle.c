@@ -131,12 +131,12 @@ static int count_objects(const UINT16 *base, int length);
 static void prescan_rle(const atarirle_data *mo, int which);
 static void sort_and_render(running_machine &machine, atarirle_data *mo);
 static void compute_checksum(atarirle_data *mo);
-static void draw_rle(atarirle_data *mo, bitmap_t *bitmap, int code, int color, int hflip, int vflip,
+static void draw_rle(atarirle_data *mo, bitmap_t &bitmap, int code, int color, int hflip, int vflip,
 		int x, int y, int xscale, int yscale, const rectangle &clip);
-static void draw_rle_zoom(bitmap_t *bitmap, const atarirle_info *gfx,
+static void draw_rle_zoom(bitmap_t &bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle &clip);
-static void draw_rle_zoom_hflip(bitmap_t *bitmap, const atarirle_info *gfx,
+static void draw_rle_zoom_hflip(bitmap_t &bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle &clip);
 
@@ -832,9 +832,9 @@ if (count++ == atarirle_hilite_index)
 
 				/* render to one or both bitmaps */
 				if (which == 0)
-					draw_rle(mo, bitmap1, code, color, hflip, 0, x, y, scale, scale, mo->cliprect);
+					draw_rle(mo, *bitmap1, code, color, hflip, 0, x, y, scale, scale, mo->cliprect);
 				if (bitmap2 && which != 0)
-					draw_rle(mo, bitmap2, code, color, hflip, 0, x, y, scale, scale, mo->cliprect);
+					draw_rle(mo, *bitmap2, code, color, hflip, 0, x, y, scale, scale, mo->cliprect);
 			}
 		}
 
@@ -946,7 +946,7 @@ fprintf(stderr, "   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d 
     object.
 ---------------------------------------------------------------*/
 
-void draw_rle(atarirle_data *mo, bitmap_t *bitmap, int code, int color, int hflip, int vflip,
+void draw_rle(atarirle_data *mo, bitmap_t &bitmap, int code, int color, int hflip, int vflip,
 	int x, int y, int xscale, int yscale, const rectangle &clip)
 {
 	UINT32 palettebase = mo->palettebase + color;
@@ -973,7 +973,7 @@ void draw_rle(atarirle_data *mo, bitmap_t *bitmap, int code, int color, int hfli
 		return;
 
 	/* 16-bit case */
-	assert(bitmap->bpp() == 16);
+	assert(bitmap.bpp() == 16);
 	if (!hflip)
 		draw_rle_zoom(bitmap, info, palettebase, x, y, xscale << 4, yscale << 4, clip);
 	else
@@ -987,7 +987,7 @@ void draw_rle(atarirle_data *mo, bitmap_t *bitmap, int code, int color, int hfli
     bitmap.
 ---------------------------------------------------------------*/
 
-void draw_rle_zoom(bitmap_t *bitmap, const atarirle_info *gfx,
+void draw_rle_zoom(bitmap_t &bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle &clip)
 {
@@ -1043,7 +1043,7 @@ void draw_rle_zoom(bitmap_t *bitmap, const atarirle_info *gfx,
 	/* loop top to bottom */
 	for (y = sy; y <= ey; y++, sourcey += dy)
 	{
-		UINT16 *dest = &bitmap->pix16(y, sx);
+		UINT16 *dest = &bitmap.pix16(y, sx);
 		int j, sourcex = dx / 2, rle_end = 0;
 		const UINT16 *base;
 		int entry_count;
@@ -1106,7 +1106,7 @@ void draw_rle_zoom(bitmap_t *bitmap, const atarirle_info *gfx,
 		/* clipped case */
 		else
 		{
-			const UINT16 *end = &bitmap->pix16(y, ex);
+			const UINT16 *end = &bitmap.pix16(y, ex);
 			int to_be_skipped = pixels_to_skip;
 
 			/* decode the pixels */
@@ -1177,7 +1177,7 @@ void draw_rle_zoom(bitmap_t *bitmap, const atarirle_info *gfx,
     16-bit bitmap with horizontal flip.
 ---------------------------------------------------------------*/
 
-void draw_rle_zoom_hflip(bitmap_t *bitmap, const atarirle_info *gfx,
+void draw_rle_zoom_hflip(bitmap_t &bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle &clip)
 {
@@ -1232,7 +1232,7 @@ void draw_rle_zoom_hflip(bitmap_t *bitmap, const atarirle_info *gfx,
 	/* loop top to bottom */
 	for (y = sy; y <= ey; y++, sourcey += dy)
 	{
-		UINT16 *dest = &bitmap->pix16(y, ex);
+		UINT16 *dest = &bitmap.pix16(y, ex);
 		int j, sourcex = dx / 2, rle_end = 0;
 		const UINT16 *base;
 		int entry_count;
@@ -1295,7 +1295,7 @@ void draw_rle_zoom_hflip(bitmap_t *bitmap, const atarirle_info *gfx,
 		/* clipped case */
 		else
 		{
-			const UINT16 *start = &bitmap->pix16(y, sx);
+			const UINT16 *start = &bitmap.pix16(y, sx);
 			int to_be_skipped = pixels_to_skip;
 
 			/* decode the pixels */

@@ -177,7 +177,7 @@ WRITE16_HANDLER( f1gp2_gfxctrl_w )
 
 ***************************************************************************/
 
-static void f1gp_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int chip, int primask )
+static void f1gp_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, int primask )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 	int attr_start, first;
@@ -254,7 +254,7 @@ SCREEN_UPDATE( f1gp )
 {
 	f1gp_state *state = screen.machine().driver_data<f1gp_state>();
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_roz_tilemap, 0, 0, 1);
 
@@ -275,7 +275,7 @@ SCREEN_UPDATE( f1gp )
 }
 
 
-static void f1gpb_draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect )
+static void f1gpb_draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -357,7 +357,7 @@ SCREEN_UPDATE( f1gpb )
 
 	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_fgregs[0] + 8);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_draw_roz(bitmap, cliprect, state->m_roz_tilemap,
 		startx << 13, starty << 13,
@@ -372,7 +372,7 @@ SCREEN_UPDATE( f1gpb )
 }
 
 
-static void f1gp2_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void f1gp2_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 	int offs;
@@ -449,7 +449,7 @@ SCREEN_UPDATE( f1gp2 )
 	f1gp_state *state = screen.machine().driver_data<f1gp_state>();
 
 	if (state->m_gfxctrl & 4)	/* blank screen */
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	else
 	{
 		switch (state->m_gfxctrl & 3)

@@ -423,15 +423,15 @@ SCREEN_UPDATE( niyanpai )
 	}
 
 	if (state->m_dispflag[0])
-		copyscrollbitmap(bitmap, state->m_tmpbitmap[0], 1, &scrollx[0], 1, &scrolly[0], cliprect);
+		copyscrollbitmap(bitmap, *state->m_tmpbitmap[0], 1, &scrollx[0], 1, &scrolly[0], cliprect);
 	else
-		bitmap->fill(0x00ff);
+		bitmap.fill(0x00ff);
 
 	if (state->m_dispflag[1])
-		copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, 0x01ff);
+		copyscrollbitmap_trans(bitmap, *state->m_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, 0x01ff);
 
 	if (state->m_dispflag[2])
-		copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[2], 1, &scrollx[2], 1, &scrolly[2], cliprect, 0x02ff);
+		copyscrollbitmap_trans(bitmap, *state->m_tmpbitmap[2], 1, &scrollx[2], 1, &scrolly[2], cliprect, 0x02ff);
 
 	return 0;
 }

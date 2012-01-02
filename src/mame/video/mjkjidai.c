@@ -87,7 +87,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
 {
 	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
 	UINT8 *spriteram = state->m_spriteram1;
@@ -133,7 +133,7 @@ SCREEN_UPDATE( mjkjidai )
 {
 	mjkjidai_state *state = screen.machine().driver_data<mjkjidai_state>();
 	if (!state->m_display_enable)
-		bitmap->fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	else
 	{
 		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);

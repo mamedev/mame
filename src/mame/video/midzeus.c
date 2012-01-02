@@ -345,7 +345,7 @@ SCREEN_UPDATE( midzeus )
 		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT16 *dest = &bitmap->pix16(y);
+			UINT16 *dest = &bitmap.pix16(y);
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
 		}
@@ -366,7 +366,7 @@ SCREEN_UPDATE( midzeus )
 
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT16 *dest = &bitmap->pix16(y);
+			UINT16 *dest = &bitmap.pix16(y);
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				UINT8 tex = get_texel_8bit(base, y, x, texel_width);

@@ -231,7 +231,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( predisplay_r );
 	DECLARE_READ_LINE_MEMBER( pal_ntsc_r );
 
-	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
+	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -260,8 +260,8 @@ protected:
 	inline int get_pen(int ccb0, int ccb1, int pcb);
 
 	void initialize_palette();
-	void draw_line(bitmap_t *bitmap, const rectangle &rect, int x, int y, UINT8 data, int color);
-	void draw_char(bitmap_t *bitmap, const rectangle &rect, int x, int y, UINT16 pma);
+	void draw_line(bitmap_t &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color);
+	void draw_char(bitmap_t &bitmap, const rectangle &rect, int x, int y, UINT16 pma);
 
 private:
 	devcb_resolved_read_line		m_in_pal_ntsc_func;

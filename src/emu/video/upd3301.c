@@ -606,7 +606,7 @@ void upd3301_device::draw_scanline()
 			int csr = m_cm && m_cursor_blink && ((y / m_r) == m_cy) && (sx == m_cx);
 			int gpa = 0; // TODO
 
-			m_display_cb(this, m_bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
+			m_display_cb(this, *m_bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
 		}
 	}
 
@@ -618,12 +618,12 @@ void upd3301_device::draw_scanline()
 //  update_screen -
 //-------------------------------------------------
 
-void upd3301_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
+void upd3301_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (m_status & STATUS_VE)
 	{
 		m_y = 0;
-		m_bitmap = bitmap;
+		m_bitmap = &bitmap;
 		m_data_fifo_pos = 0;
 		m_attr_fifo_pos = 0;
 
@@ -648,6 +648,6 @@ void upd3301_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 	}
 	else
 	{
-		bitmap->fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
 }

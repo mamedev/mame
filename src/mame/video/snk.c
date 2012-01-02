@@ -744,7 +744,7 @@ WRITE8_HANDLER( tdfever_spriteram_w )
 
 /**************************************************************************************/
 
-static void marvins_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+static void marvins_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 		const int scrollx, const int scrolly, const int from, const int to)
 {
 	snk_state *state = machine.driver_data<snk_state>();
@@ -789,7 +789,7 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_t *bitmap, con
 }
 
 
-static void tnk3_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, const int xscroll, const int yscroll)
+static void tnk3_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll)
 {
 	snk_state *state = machine.driver_data<snk_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -854,7 +854,7 @@ static void tnk3_draw_sprites(running_machine &machine, bitmap_t *bitmap, const 
 }
 
 
-static void ikari_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+static void ikari_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 		const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum )
 {
 	snk_state *state = machine.driver_data<snk_state>();
@@ -926,7 +926,7 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-static void tdfever_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect,
+static void tdfever_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
 		const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, const int hw_xflip, const int from, const int to )
 {
 	snk_state *state = machine.driver_data<snk_state>();

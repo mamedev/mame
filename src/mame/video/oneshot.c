@@ -66,7 +66,7 @@ VIDEO_START( oneshot )
 	tilemap_set_transparent_pen(state->m_fg_tilemap,  0);
 }
 
-static void draw_crosshairs( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_crosshairs( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	oneshot_state *state = machine.driver_data<oneshot_state>();
 	//int xpos,ypos;
@@ -99,7 +99,7 @@ static void draw_crosshairs( running_machine &machine, bitmap_t *bitmap, const r
 		state->m_gun_x_p2 = 0;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	oneshot_state *state = machine.driver_data<oneshot_state>();
 	const UINT16 *source = state->m_sprites;
@@ -160,7 +160,7 @@ SCREEN_UPDATE( oneshot )
 {
 	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	tilemap_set_scrollx(state->m_mid_tilemap, 0, state->m_scroll[0] - 0x1f5);
 	tilemap_set_scrolly(state->m_mid_tilemap, 0, state->m_scroll[1]);
@@ -177,7 +177,7 @@ SCREEN_UPDATE( maddonna )
 {
 	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	tilemap_set_scrolly(state->m_mid_tilemap, 0, state->m_scroll[1]); // other registers aren't used so we don't know which layers they relate to
 

@@ -161,7 +161,7 @@ WRITE16_HANDLER( seta2_vregs_w )
 
 ***************************************************************************/
 
-static void seta_drawgfx(	bitmap_t *bitmap, const rectangle &cliprect, const gfx_element *gfx,
+static void seta_drawgfx(	bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 							int shadow_depth )
 {
@@ -186,7 +186,7 @@ static void seta_drawgfx(	bitmap_t *bitmap, const rectangle &cliprect, const gfx
 		if ( sy >= cliprect.min_y && sy <= cliprect.max_y )					\
 		{																		\
 			source	=	addr;													\
-			dest	=	&bitmap->pix16(sy);							\
+			dest	=	&bitmap.pix16(sy);							\
 																				\
 			for ( sx = x0; sx != x1; sx += dx )									\
 			{																	\
@@ -212,7 +212,7 @@ static void seta_drawgfx(	bitmap_t *bitmap, const rectangle &cliprect, const gfx
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
 {
 	// Sprites list
 
@@ -483,7 +483,7 @@ SCREEN_UPDATE( seta2 )
 	seta2_state *state = screen.machine().driver_data<seta2_state>();
 
 	// Black or pen 0?
-	bitmap->fill(screen.machine().pens[0], cliprect);
+	bitmap.fill(screen.machine().pens[0], cliprect);
 
 	if ( (state->m_vregs[0x30/2] & 1) == 0 )	// 1 = BLANK SCREEN
 		draw_sprites(screen.machine(), bitmap, cliprect);

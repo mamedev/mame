@@ -129,7 +129,7 @@ INLINE int sf_invert( int nb )
 	return nb ^ delta[(nb >> 3) & 3];
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
 {
 	sf_state *state = machine.driver_data<sf_state>();
 	int offs;
@@ -225,7 +225,7 @@ SCREEN_UPDATE( sf )
 	if (state->m_sf_active & 0x20)
 		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 

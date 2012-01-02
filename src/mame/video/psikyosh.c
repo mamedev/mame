@@ -147,13 +147,12 @@ while (0)																							\
     draw_scanline32_alpha - take an RGB-encoded UINT32
     scanline and alpha-blend it into the destination bitmap
 -------------------------------------------------*/
-static void draw_scanline32_alpha(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr, int alpha)
+static void draw_scanline32_alpha(bitmap_t &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr, int alpha)
 {
-	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
+	DECLARE_NO_PRIORITY;
 	UINT32 transpen = BG_TRANSPEN;
 
-	assert(bitmap != NULL);
-	assert(bitmap->bpp() == 32);
+	assert(bitmap.bpp() == 32);
 
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32, NO_PRIORITY);
 }
@@ -162,14 +161,13 @@ static void draw_scanline32_alpha(bitmap_t *bitmap, INT32 destx, INT32 desty, IN
     draw_scanline32_argb - take an ARGB-encoded UINT32
     scanline and alpha-blend it into the destination bitmap
 -------------------------------------------------*/
-static void draw_scanline32_argb(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
+static void draw_scanline32_argb(bitmap_t &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
 {
-	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
+	DECLARE_NO_PRIORITY;
 	UINT32 transpen = BG_TRANSPEN;
 
-	assert(bitmap != NULL);
-	assert(bitmap->bpp() == 32);
-	assert(bitmap->format() == BITMAP_FORMAT_ARGB32);
+	assert(bitmap.bpp() == 32);
+	assert(bitmap.format() == BITMAP_FORMAT_ARGB32);
 
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32, NO_PRIORITY);
 }
@@ -178,14 +176,13 @@ static void draw_scanline32_argb(bitmap_t *bitmap, INT32 destx, INT32 desty, INT
     draw_scanline32_tranpens - take an RGB-encoded UINT32
     scanline and copy it into the destination bitmap, testing for the special ARGB transpen
 -------------------------------------------------*/
-static void draw_scanline32_transpen(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
+static void draw_scanline32_transpen(bitmap_t &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
 {
-	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
+	DECLARE_NO_PRIORITY;
 	UINT32 transpen = BG_TRANSPEN;
 
-	assert(bitmap != NULL);
-	assert(bitmap->bpp() == 32);
-	assert(bitmap->format() == BITMAP_FORMAT_ARGB32);
+	assert(bitmap.bpp() == 32);
+	assert(bitmap.format() == BITMAP_FORMAT_ARGB32);
 
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_RENDER32, NO_PRIORITY);
 }
@@ -195,18 +192,17 @@ static void draw_scanline32_transpen(bitmap_t *bitmap, INT32 destx, INT32 desty,
     a single transparent pen, storing the alpha value
     in alpha field of ARGB32, negative alpha implies alphatable
 -------------------------------------------------*/
-static void drawgfx_alphastore(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
+static void drawgfx_alphastore(bitmap_t &dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
 	psikyosh_state *state = gfx->machine().driver_data<psikyosh_state>();
 	UINT8 *alphatable = state->m_alphatable;
-	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
+	DECLARE_NO_PRIORITY;
 	const pen_t *paldata;
 
-	assert(dest != NULL);
-	assert(dest->bpp() == 32);
-	assert(dest->format() == BITMAP_FORMAT_ARGB32);
+	assert(dest.bpp() == 32);
+	assert(dest.format() == BITMAP_FORMAT_ARGB32);
 	assert(gfx != NULL);
 	assert(alphatable != NULL);
 
@@ -242,13 +238,13 @@ static void drawgfx_alphastore(bitmap_t *dest, const rectangle &cliprect, const 
     a fixed alpha value, or if alpha==-1 then uses
     the per-pen alphatable[] array
  -------------------------------------------------*/
-static void drawgfx_alphatable(bitmap_t *dest, const rectangle &cliprect, const gfx_element *gfx,
+static void drawgfx_alphatable(bitmap_t &dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
 	psikyosh_state *state = gfx->machine().driver_data<psikyosh_state>();
 	UINT8 *alphatable = state->m_alphatable;
-	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
+	DECLARE_NO_PRIORITY;
 
 	const pen_t *paldata;
 
@@ -259,8 +255,7 @@ static void drawgfx_alphatable(bitmap_t *dest, const rectangle &cliprect, const 
 		return;
 	}
 
-	assert(dest != NULL);
-	assert(dest->bpp() == 32);
+	assert(dest.bpp() == 32);
 	assert(gfx != NULL);
 	assert(alphatable != NULL);
 
@@ -281,7 +276,7 @@ static void drawgfx_alphatable(bitmap_t *dest, const rectangle &cliprect, const 
 
 /* 'Normal' layers, no line/columnscroll. No per-line effects.
 Zooming isn't supported just because it's not used and it would be slow */
-static void draw_bglayer( running_machine &machine, int layer, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri )
+static void draw_bglayer( running_machine &machine, int layer, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	gfx_element *gfx;
@@ -375,7 +370,7 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 			int need_alpha = alpha < 0 ? -1 : 0xff; // store per-pen alpha in bitmap, otherwise don't since we'll need it per-line
 
 			if(tileno) { // valid tile, but blank in all games?
-				drawgfx_alphastore(state->m_bg_bitmap, state->m_bg_bitmap->cliprect(), gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
+				drawgfx_alphastore(*state->m_bg_bitmap, state->m_bg_bitmap->cliprect(), gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
 			}
 
 			offs++;
@@ -389,7 +384,7 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 Bitmap is first rendered to an ARGB image, taking into account the per-pen alpha (if used).
 From there we extract data as we compose the image, one scanline at a time, blending the ARGB pixels
 into the RGB32 bitmap (with either the alpha information from the ARGB, or per-line alpha */
-static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri )
+static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	assert(BG_LINE(layer));
@@ -443,7 +438,7 @@ static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t *b
 				g_profiler.start(PROFILER_USER2);
 				UINT32 tilemap_line[32 * 16];
 				UINT32 scr_line[64 * 8];
-				extract_scanline32(state->m_bg_bitmap, 0, tilemap_scanline, width, tilemap_line);
+				extract_scanline32(*state->m_bg_bitmap, 0, tilemap_scanline, width, tilemap_line);
 				g_profiler.stop();
 
 				/* slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
@@ -484,7 +479,7 @@ static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t *b
 }
 
 /* 3 BG layers, with priority */
-static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri )
+static void draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	int i;
@@ -532,7 +527,7 @@ static void draw_background( running_machine &machine, bitmap_t *bitmap, const r
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
 static void psikyosh_drawgfxzoom( running_machine &machine,
-		bitmap_t *dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 		int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z)
 {
@@ -547,11 +542,11 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 
 	g_profiler.start(PROFILER_DRAWGFX);
 
-	assert(dest_bmp->bpp() == 32);
+	assert(dest_bmp.bpp() == 32);
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
-	myclip &= dest_bmp->cliprect();
+	myclip &= dest_bmp.cliprect();
 
 	/* Temporary fallback for non-zoomed, needs z-buffer. Note that this is probably a lot slower than drawgfx.c, especially if there was separate code for flipped cases */
 	if (zoomx == 0x400 && zoomy == 0x400)
@@ -624,10 +619,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							if (z > 0)
 							{
 								const UINT8 *source = code_base + (y_index) * gfx->line_modulo + x_index_base;
-								UINT32 *dest = &dest_bmp->pix32(sy, sx);
+								UINT32 *dest = &dest_bmp.pix32(sy, sx);
 								UINT16 *pri = &state->m_z_bitmap->pix16(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
+								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -655,9 +650,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							else
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = &dest_bmp->pix32(sy, sx);
+								UINT32 *dest = &dest_bmp.pix32(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
+								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -683,10 +678,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							if (z > 0)
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = &dest_bmp->pix32(sy, sx);
+								UINT32 *dest = &dest_bmp.pix32(sy, sx);
 								UINT16 *pri = &state->m_z_bitmap->pix16(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
+								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -714,9 +709,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							else
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = &dest_bmp->pix32(sy, sx);
+								UINT32 *dest = &dest_bmp.pix32(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
+								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -743,10 +738,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							if (z > 0)
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = &dest_bmp->pix32(sy, sx);
+								UINT32 *dest = &dest_bmp.pix32(sy, sx);
 								UINT16 *pri = &state->m_z_bitmap->pix16(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
+								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -778,9 +773,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							else
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
-								UINT32 *dest = &dest_bmp->pix32(sy, sx);
+								UINT32 *dest = &dest_bmp.pix32(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
-								int dst_modulo = dest_bmp->rowpixels() - (ex - sx);
+								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
 								{
@@ -897,7 +892,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 								UINT16 *pri = &state->m_z_bitmap->pix16(y);
 
 								int x, x_index = x_index_base;
@@ -923,7 +918,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -947,7 +942,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 								UINT16 *pri = &state->m_z_bitmap->pix16(y);
 
 								int x, x_index = x_index_base;
@@ -973,7 +968,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -996,7 +991,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 								UINT16 *pri = &state->m_z_bitmap->pix16(y);
 
 								int x, x_index = x_index_base;
@@ -1026,7 +1021,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
-								UINT32 *dest = &dest_bmp->pix32(y);
+								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -1054,7 +1049,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri)
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
@@ -1174,7 +1169,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 }
 
 
-static void psikyosh_prelineblend( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void psikyosh_prelineblend( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	/* There are 224 values for pre-lineblending. Using one for every row currently */
 	/* I suspect that it should be blended against black by the amount specified as
@@ -1186,12 +1181,12 @@ static void psikyosh_prelineblend( running_machine &machine, bitmap_t *bitmap, c
 	UINT32 *linefill = &state->m_bgram[(bank * 0x800) / 4 - 0x4000 / 4]; /* Per row */
 	int x, y;
 
-	assert(bitmap->bpp() == 32);
+	assert(bitmap.bpp() == 32);
 
 	g_profiler.start(PROFILER_USER8);
 	for (y = cliprect.min_y; y <= cliprect.max_y; y += 1) {
 
-		dstline = &bitmap->pix32(y);
+		dstline = &bitmap.pix32(y);
 
 		/* linefill[y] & 0xff does what? */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 1)
@@ -1201,7 +1196,7 @@ static void psikyosh_prelineblend( running_machine &machine, bitmap_t *bitmap, c
 }
 
 
-static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, UINT8 req_pri )
+static void psikyosh_postlineblend( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	/* There are 224 values for post-lineblending. Using one for every row currently */
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
@@ -1210,7 +1205,7 @@ static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, 
 	UINT32 *lineblend = &state->m_bgram[(bank * 0x800) / 4 - 0x4000 / 4 + 0x400 / 4]; /* Per row */
 	int x, y;
 
-	assert(bitmap->bpp() == 32);
+	assert(bitmap.bpp() == 32);
 
 	if ((state->m_vidregs[2] & 0xf) != req_pri) {
 		return;
@@ -1219,7 +1214,7 @@ static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, 
 	g_profiler.start(PROFILER_USER8);
 	for (y = cliprect.min_y; y <= cliprect.max_y; y += 1) {
 
-		dstline = &bitmap->pix32(y);
+		dstline = &bitmap.pix32(y);
 
 		if (lineblend[y] & 0x80) /* solid */
 		{

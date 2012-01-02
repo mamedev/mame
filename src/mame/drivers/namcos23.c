@@ -2064,7 +2064,7 @@ static int render_poly_compare(const void *i1, const void *i2)
 	return p1->zkey < p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
 }
 
-static void render_flush(running_machine &machine, bitmap_t *bitmap)
+static void render_flush(running_machine &machine, bitmap_t &bitmap)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
 	render_t &render = state->m_render;
@@ -2083,12 +2083,12 @@ static void render_flush(running_machine &machine, bitmap_t *bitmap)
 		const namcos23_poly_entry *p = render.poly_order[i];
 		namcos23_render_data *rd = (namcos23_render_data *)poly_get_extra_data(render.polymgr);
 		*rd = p->rd;
-		poly_render_triangle_fan(render.polymgr, bitmap, scissor, render_scanline, 4, p->vertex_count, p->pv);
+		poly_render_triangle_fan(render.polymgr, &bitmap, scissor, render_scanline, 4, p->vertex_count, p->pv);
 	}
 	render.poly_count = 0;
 }
 
-static void render_run(running_machine &machine, bitmap_t *bitmap)
+static void render_run(running_machine &machine, bitmap_t &bitmap)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
 	render_t &render = state->m_render;
@@ -2136,7 +2136,7 @@ static VIDEO_START( ss23 )
 static SCREEN_UPDATE( ss23 )
 {
 	namcos23_state *state = screen.machine().driver_data<namcos23_state>();
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	render_run( screen.machine(), bitmap );
 

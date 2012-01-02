@@ -293,7 +293,7 @@ SCREEN_EOF( bking )
 		xld = state->m_xld1;
 		yld = state->m_yld1;
 
-		drawgfx_opaque(state->m_tmp_bitmap2, rect, screen.machine().gfx[2],
+		drawgfx_opaque(*state->m_tmp_bitmap2, rect, screen.machine().gfx[2],
 			state->m_ball1_pic,
 			0,
 			0, 0,
@@ -307,7 +307,7 @@ SCREEN_EOF( bking )
 		xld = state->m_xld2;
 		yld = state->m_yld2;
 
-		drawgfx_opaque(state->m_tmp_bitmap2, rect, screen.machine().gfx[3],
+		drawgfx_opaque(*state->m_tmp_bitmap2, rect, screen.machine().gfx[3],
 			state->m_ball2_pic,
 			0,
 			0, 0,
@@ -319,7 +319,7 @@ SCREEN_EOF( bking )
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? -xld : xld);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? -yld : yld);
 
-	tilemap_draw(state->m_tmp_bitmap1, rect, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(*state->m_tmp_bitmap1, rect, state->m_bg_tilemap, 0, 0);
 
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);

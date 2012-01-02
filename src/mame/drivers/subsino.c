@@ -454,7 +454,7 @@ static VIDEO_START( stisub )
 static SCREEN_UPDATE( subsino )
 {
 	subsino_state *state = screen.machine().driver_data<subsino_state>();
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);
 	return 0;
 }
@@ -463,7 +463,7 @@ static SCREEN_UPDATE( subsino_reels )
 {
 	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	for (i= 0;i < 64;i++)
 	{
@@ -493,7 +493,7 @@ static SCREEN_UPDATE( stisub_reels )
 {
 	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	if (state->m_reel1_attr)
 	{

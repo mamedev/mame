@@ -173,7 +173,7 @@ VIDEO_START( macrossp )
 
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
 {
 	macrossp_state *state = machine.driver_data<macrossp_state>();
 	const gfx_element *gfx = machine.gfx[0];
@@ -320,7 +320,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_layer( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int layer )
+static void draw_layer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int layer )
 {
 	macrossp_state *state = machine.driver_data<macrossp_state>();
 	tilemap_t *tm;
@@ -392,7 +392,7 @@ SCREEN_UPDATE( macrossp )
 	macrossp_state *state = screen.machine().driver_data<macrossp_state>();
 	int layers[3],layerpri[3];
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	layers[0] = 0;
 	layerpri[0] = (state->m_scra_videoregs[0] & 0x0000c000) >> 14;

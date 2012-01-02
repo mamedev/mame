@@ -128,7 +128,7 @@ o fedcba9876543210
 
 3 xxxx............ color+priority, other bits unknown
 */
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int foreground )
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int foreground )
 {
 	prehisle_state *state = machine.driver_data<prehisle_state>();
 	UINT16 *spriteram16 = state->m_spriteram;

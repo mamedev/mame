@@ -1498,7 +1498,7 @@ INLINE void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_
  * the optimized averaging algorithm.
  *********************************************/
 
-static void snes_refresh_scanline( running_machine &machine, bitmap_t *bitmap, UINT16 curline )
+static void snes_refresh_scanline( running_machine &machine, bitmap_t &bitmap, UINT16 curline )
 {
 	UINT16 ii;
 	int x;
@@ -1512,7 +1512,7 @@ static void snes_refresh_scanline( running_machine &machine, bitmap_t *bitmap, U
 
 	if (snes_ppu.screen_disabled) /* screen is forced blank */
 		for (x = 0; x < SNES_SCR_WIDTH * 2; x++)
-			bitmap->pix32(curline, x) = RGB_BLACK;
+			bitmap.pix32(curline, x) = RGB_BLACK;
 	else
 	{
 		/* Update clip window masks if necessary */
@@ -1596,8 +1596,8 @@ static void snes_refresh_scanline( running_machine &machine, bitmap_t *bitmap, U
 				g = (((c & 0x3e0) >> 5) * fade) >> 4;
 				b = (((c & 0x7c00) >> 10) * fade) >> 4;
 
-				bitmap->pix32(curline, x * 2 + 0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
-				bitmap->pix32(curline, x * 2 + 1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix32(curline, x * 2 + 0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix32(curline, x * 2 + 1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 			}
 			else
 			{
@@ -1635,7 +1635,7 @@ static void snes_refresh_scanline( running_machine &machine, bitmap_t *bitmap, U
 				g = (((c & 0x3e0) >> 5) * fade) >> 4;
 				b = (((c & 0x7c00) >> 10) * fade) >> 4;
 
-				bitmap->pix32(curline, x * 2 + 0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix32(curline, x * 2 + 0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 				prev_colour = tmp_col[0];
 
 				/* average the second pixel if required, or draw it directly*/
@@ -1648,7 +1648,7 @@ static void snes_refresh_scanline( running_machine &machine, bitmap_t *bitmap, U
 				g = (((c & 0x3e0) >> 5) * fade) >> 4;
 				b = (((c & 0x7c00) >> 10) * fade) >> 4;
 
-				bitmap->pix32(curline, x * 2 + 1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix32(curline, x * 2 + 1) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 				prev_colour = tmp_col[1];
 			}
 		}

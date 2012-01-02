@@ -369,7 +369,7 @@ static TIMER_DEVICE_CALLBACK( sangho_interrupt )
 static VIDEO_START( sangho )
 {
 	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init (machine, 0, *machine.primary_screen, machine.generic.tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
+	v9938_init (machine, 0, *machine.primary_screen, *machine.generic.tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
 }
 
 static MACHINE_CONFIG_START( pzlestar, sangho_state )

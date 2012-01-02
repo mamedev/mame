@@ -465,7 +465,7 @@ static SCREEN_UPDATE( berzerk )
 		for (i = 0; i < 4; i++)
 		{
 			pen_t pen = (data & 0x80) ? pens[color >> 4] : RGB_BLACK;
-			bitmap->pix32(y, x) = pen;
+			bitmap.pix32(y, x) = pen;
 
 			x = x + 1;
 			data = data << 1;
@@ -474,7 +474,7 @@ static SCREEN_UPDATE( berzerk )
 		for (; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? pens[color & 0x0f] : RGB_BLACK;
-			bitmap->pix32(y, x) = pen;
+			bitmap.pix32(y, x) = pen;
 
 			x = x + 1;
 			data = data << 1;

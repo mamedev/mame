@@ -129,7 +129,7 @@ READ8_HANDLER( gyruss_scanline_r )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, gfx_element **gfx )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, gfx_element **gfx )
 {
 	gyruss_state *state = machine.driver_data<gyruss_state>();
 	int offs;

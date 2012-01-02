@@ -166,7 +166,7 @@ static VIDEO_START( ddealer )
 	state->m_back_tilemap = tilemap_create(machine, get_back_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
 }
 
-static void ddealer_draw_video_layer( running_machine &machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t* bitmap, const rectangle &cliprect, int flipy)
+static void ddealer_draw_video_layer( running_machine &machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t &bitmap, const rectangle &cliprect, int flipy)
 {
 	const gfx_element *gfx = machine.gfx[1];
 

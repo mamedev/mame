@@ -334,7 +334,7 @@ VIDEO_START( nemesis )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	/*
      *  16 bytes per sprite, in memory from 56000-56fff
@@ -431,8 +431,8 @@ SCREEN_UPDATE( nemesis )
 	int offs;
 	rectangle clip;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	clip.min_x = 0;
 	clip.max_x = 255;

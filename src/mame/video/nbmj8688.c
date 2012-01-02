@@ -699,11 +699,11 @@ SCREEN_UPDATE( mbmj8688 )
 		if (state->m_mjsikaku_flipscreen) scrolly =   state->m_mjsikaku_scrolly;
 		else                     scrolly = (-state->m_mjsikaku_scrolly) & 0xff;
 
-		copybitmap(bitmap, state->m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly,       cliprect);
-		copybitmap(bitmap, state->m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly - 256, cliprect);
+		copybitmap(bitmap, *state->m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly,       cliprect);
+		copybitmap(bitmap, *state->m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly - 256, cliprect);
 	}
 	else
-		bitmap->fill(0);
+		bitmap.fill(0);
 
 	return 0;
 }
@@ -721,7 +721,7 @@ SCREEN_UPDATE( mbmj8688_lcd0 )
 			int data = state->m_HD61830B_ram[0][y * 60 + x];
 
 			for (b = 0;b < 8;b++)
-				bitmap->pix16(y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
+				bitmap.pix16(y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
 		}
 	return 0;
 }
@@ -737,7 +737,7 @@ SCREEN_UPDATE( mbmj8688_lcd1 )
 			int data = state->m_HD61830B_ram[1][y * 60 + x];
 
 			for (b = 0;b < 8;b++)
-				bitmap->pix16(y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
+				bitmap.pix16(y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
 		}
 	return 0;
 }

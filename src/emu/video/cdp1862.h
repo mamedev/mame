@@ -94,7 +94,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( bkg_w );
 	DECLARE_WRITE_LINE_MEMBER( con_w );
 
-	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
+	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides

@@ -298,7 +298,7 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	namcos1_state *state = machine.driver_data<namcos1_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x800;
@@ -383,7 +383,7 @@ SCREEN_UPDATE( namcos1 )
 
 
 	/* background color */
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
 	i = ((state->m_cus116[0] << 8) | state->m_cus116[1]) - 1;			// min x
@@ -422,7 +422,7 @@ SCREEN_UPDATE( namcos1 )
 	}
 
 
-	screen.machine().priority_bitmap->fill(0, new_clip);
+	screen.machine().priority_bitmap.fill(0, new_clip);
 
 	/* bit 0-2 priority */
 	/* bit 3   disable  */

@@ -140,26 +140,26 @@ static VIDEO_START( warpspeed )
 	tilemap_mark_all_tiles_dirty(state->m_starfield_tilemap);
 }
 
-static void draw_circle_line(bitmap_t *bitmap, int x, int y, int l, int color)
+static void draw_circle_line(bitmap_t &bitmap, int x, int y, int l, int color)
 {
-	if (y >= 0 && y <= bitmap->height() - 1)
+	if (y >= 0 && y <= bitmap.height() - 1)
 	{
-		UINT16* pLine = &bitmap->pix16(y);
+		UINT16* pLine = &bitmap.pix16(y);
 
 		int h1 = x - l;
 		int h2 = x + l;
 
 		if (h1 < 0)
 			h1 = 0;
-		if (h2 > bitmap->width() - 1)
-			h2 = bitmap->width() - 1;
+		if (h2 > bitmap.width() - 1)
+			h2 = bitmap.width() - 1;
 
 		for (x = h1; x <= h2; x++)
 			pLine[x] = color;
 	}
 }
 
-static void warpspeed_draw_circle(bitmap_t *bitmap, INT16 cx, INT16 cy, UINT16 radius, UINT8 color )
+static void warpspeed_draw_circle(bitmap_t &bitmap, INT16 cx, INT16 cy, UINT16 radius, UINT8 color )
 {
 	/* Bresenham's circle algorithm */
 
@@ -184,7 +184,7 @@ static void warpspeed_draw_circle(bitmap_t *bitmap, INT16 cx, INT16 cy, UINT16 r
 	}
 }
 
-static void warpspeed_draw_circles(bitmap_t *bitmap, warpspeed_state *state)
+static void warpspeed_draw_circles(bitmap_t &bitmap, warpspeed_state *state)
 {
 	for (int i = 0; i < 4; i++)
 	{

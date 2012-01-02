@@ -63,7 +63,7 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
+static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
 {
 	groundfx_state *state = machine.driver_data<groundfx_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -223,8 +223,8 @@ SCREEN_UPDATE( groundfx )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
-	bitmap->fill(0, cliprect);	/* wrong color? */
+	screen.machine().priority_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);	/* wrong color? */
 
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);

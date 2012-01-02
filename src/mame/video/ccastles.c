@@ -282,13 +282,13 @@ SCREEN_UPDATE( ccastles )
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs + 2] >> 7;
 
-		drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, flip, flip, x, y, 7);
+		drawgfx_transpen(*state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, flip, flip, x, y, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dst = &bitmap->pix16(y);
+		UINT16 *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (state->m_syncprom[y] & 1)

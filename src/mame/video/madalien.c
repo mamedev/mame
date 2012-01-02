@@ -155,12 +155,12 @@ static VIDEO_START( madalien )
 
 	gfx_element_set_source(machine.gfx[0], state->m_charram);
 
-	drawgfx_opaque(state->m_headlight_bitmap, state->m_headlight_bitmap->cliprect(), machine.gfx[2], 0, 0, 0, 0, 0x00, 0x00);
-	drawgfx_opaque(state->m_headlight_bitmap, state->m_headlight_bitmap->cliprect(), machine.gfx[2], 0, 0, 0, 1, 0x00, 0x40);
+	drawgfx_opaque(*state->m_headlight_bitmap, state->m_headlight_bitmap->cliprect(), machine.gfx[2], 0, 0, 0, 0, 0x00, 0x00);
+	drawgfx_opaque(*state->m_headlight_bitmap, state->m_headlight_bitmap->cliprect(), machine.gfx[2], 0, 0, 0, 1, 0x00, 0x40);
 }
 
 
-static void draw_edges(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int flip, int scroll_mode)
+static void draw_edges(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int flip, int scroll_mode)
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
 	rectangle clip_edge1;
@@ -199,7 +199,7 @@ static void draw_edges(running_machine &machine, bitmap_t *bitmap, const rectang
 }
 
 
-static void draw_headlight(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int flip)
+static void draw_headlight(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int flip)
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
 	if (BIT(*state->m_video_flags, 0))
@@ -228,14 +228,14 @@ static void draw_headlight(running_machine &machine, bitmap_t *bitmap, const rec
 					continue;
 
 				if (state->m_headlight_bitmap->pix16(y, x) != 0)
-					bitmap->pix16(hy, hx) |= 8;
+					bitmap.pix16(hy, hx) |= 8;
 			}
 		}
 	}
 }
 
 
-static void draw_foreground(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int flip)
+static void draw_foreground(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int flip)
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
 	tilemap_set_flip(state->m_tilemap_fg, flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -265,7 +265,7 @@ static SCREEN_UPDATE( madalien )
 	// mode 3 - transition from A to B
 	int scroll_mode = *state->m_scroll & 3;
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 	draw_edges(screen.machine(), bitmap, cliprect, flip, scroll_mode);
 	draw_foreground(screen.machine(), bitmap, cliprect, flip);
 
@@ -298,7 +298,7 @@ static SCREEN_UPDATE( madalien )
 		for (y = cliprect.min_y; y <= cliprect.max_y ; y++)
 			for (x = min_x; x <= max_x; x++)
 				if ((x >= cliprect.min_x) && (x <= cliprect.max_x))
-					bitmap->pix16(y, x) |= 8;
+					bitmap.pix16(y, x) |= 8;
 	}
 
 	draw_headlight(screen.machine(), bitmap, cliprect, flip);

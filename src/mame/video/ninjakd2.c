@@ -360,7 +360,7 @@ WRITE8_HANDLER( ninjakd2_sprite_overdraw_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine& machine, bitmap_t* bitmap)
+static void draw_sprites(running_machine& machine, bitmap_t &bitmap)
 {
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	const gfx_element* const gfx = machine.gfx[1];
@@ -413,7 +413,7 @@ static void draw_sprites(running_machine& machine, bitmap_t* bitmap)
 				{
 					int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
 
-					drawgfx_transpen(bitmap, bitmap->cliprect(), gfx,
+					drawgfx_transpen(bitmap, bitmap.cliprect(), gfx,
 							tile,
 							color,
 							flipx,flipy,
@@ -452,7 +452,7 @@ static int stencil_omegaf(   UINT16 pal ) { return( TRUE ); }
 // This is very hackish.
 // (Is there a possibility that software can't select it but hardware can?)
 
-static void erase_sprites(running_machine& machine, bitmap_t* bitmap)
+static void erase_sprites(running_machine& machine, bitmap_t &bitmap)
 {
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	// if sprite overdraw is disabled, clear the sprite framebuffer
@@ -474,8 +474,8 @@ static void erase_sprites(running_machine& machine, bitmap_t* bitmap)
 static void update_sprites(running_machine& machine)
 {
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	erase_sprites(machine, state->m_sp_bitmap);
-	draw_sprites(machine, state->m_sp_bitmap);
+	erase_sprites(machine, *state->m_sp_bitmap);
+	draw_sprites(machine, *state->m_sp_bitmap);
 }
 	////// Before modified, this was written.
 		// we want to erase the sprites with the old setting and draw them with the
@@ -492,11 +492,11 @@ SCREEN_UPDATE( ninjakd2 )
 	update_sprites(screen.machine());
 	state->m_sprites_updated = 1;
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	copybitmap_trans(bitmap, state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
+	copybitmap_trans(bitmap, *state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
@@ -509,13 +509,13 @@ SCREEN_UPDATE( robokid )
 	update_sprites(screen.machine());
 	state->m_sprites_updated = 1;
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg0_tilemap, 0, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
 
-	copybitmap_trans(bitmap, state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
+	copybitmap_trans(bitmap, *state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 
@@ -530,7 +530,7 @@ SCREEN_UPDATE( omegaf )
 	update_sprites(screen.machine());
 	state->m_sprites_updated = 1;
 
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg0_tilemap, 0, 0);
 
@@ -538,7 +538,7 @@ SCREEN_UPDATE( omegaf )
 
 	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 
-	copybitmap_trans(bitmap, state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
+	copybitmap_trans(bitmap, *state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 

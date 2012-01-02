@@ -100,19 +100,19 @@ void segas24_tile::device_start()
 	save_pointer(NAME(char_ram), 0x80000/2);
 }
 
-void segas24_tile::draw_rect(bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
+void segas24_tile::draw_rect(bitmap_t &bm, bitmap_t &tm, bitmap_t &dm, const UINT16 *mask,
 							 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
-	const UINT16 *source  = &bm->pix16(sy, sx);
-	const UINT8  *trans = &tm->pix8(sy, sx);
-	UINT8        *prib = &machine().priority_bitmap->pix8(0);
-	UINT16       *dest = &dm->pix16(0);
+	const UINT16 *source  = &bm.pix16(sy, sx);
+	const UINT8  *trans = &tm.pix8(sy, sx);
+	UINT8        *prib = &machine().priority_bitmap.pix8(0);
+	UINT16       *dest = &dm.pix16(0);
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 
-	dest += yy1*dm->rowpixels() + xx1;
-	prib += yy1*machine().priority_bitmap->rowpixels() + xx1;
+	dest += yy1*dm.rowpixels() + xx1;
+	prib += yy1*machine().priority_bitmap.rowpixels() + xx1;
 	mask += yy1*4;
 	yy2 -= yy1;
 
@@ -221,10 +221,10 @@ void segas24_tile::draw_rect(bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UIN
 			llx -= 128;
 			cur_x = 0;
 		}
-		source += bm->rowpixels();
-		trans  += tm->rowpixels();
-		dest   += dm->rowpixels();
-		prib   += machine().priority_bitmap->rowpixels();
+		source += bm.rowpixels();
+		trans  += tm.rowpixels();
+		dest   += dm.rowpixels();
+		prib   += machine().priority_bitmap.rowpixels();
 		mask   += 4;
 	}
 }
@@ -234,18 +234,18 @@ void segas24_tile::draw_rect(bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UIN
 // about sprite priority hence the lack of support for the
 // priority_bitmap
 
-void segas24_tile::draw_rect_rgb(bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
+void segas24_tile::draw_rect_rgb(bitmap_t &bm, bitmap_t &tm, bitmap_t &dm, const UINT16 *mask,
 								 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
-	const UINT16 *source  = &bm->pix16(sy, sx);
-	const UINT8  *trans = &tm->pix8(sy, sx);
-	UINT16       *dest = &dm->pix16(0);
+	const UINT16 *source  = &bm.pix16(sy, sx);
+	const UINT8  *trans = &tm.pix8(sy, sx);
+	UINT16       *dest = &dm.pix16(0);
 	const pen_t  *pens   = machine().pens;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 
-	dest += yy1*dm->rowpixels() + xx1;
+	dest += yy1*dm.rowpixels() + xx1;
 	mask += yy1*4;
 	yy2 -= yy1;
 
@@ -339,14 +339,14 @@ void segas24_tile::draw_rect_rgb(bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const
 			llx -= 128;
 			cur_x = 0;
 		}
-		source += bm->rowpixels();
-		trans  += tm->rowpixels();
-		dest   += dm->rowpixels();
+		source += bm.rowpixels();
+		trans  += tm.rowpixels();
+		dest   += dm.rowpixels();
 		mask   += 4;
 	}
 }
 
-void segas24_tile::draw(bitmap_t *bitmap, const rectangle &cliprect, int layer, int lpri, int flags)
+void segas24_tile::draw(bitmap_t &bitmap, const rectangle &cliprect, int layer, int lpri, int flags)
 {
 	UINT16 hscr = tile_ram[0x5000+(layer >> 1)];
 	UINT16 vscr = tile_ram[0x5004+(layer >> 1)];
@@ -466,18 +466,17 @@ void segas24_tile::draw(bitmap_t *bitmap, const rectangle &cliprect, int layer, 
 		}
 
 	} else {
-		bitmap_t *bm, *tm;
-		void (segas24_tile::*draw)(bitmap_t *, bitmap_t *, bitmap_t *, const UINT16 *,
+		void (segas24_tile::*draw)(bitmap_t &, bitmap_t &, bitmap_t &, const UINT16 *,
 					 UINT16, UINT8, int, int, int, int, int, int, int);
 		int win = layer & 1;
 
-		if(bitmap->format() != BITMAP_FORMAT_INDEXED16)
+		if(bitmap.format() != BITMAP_FORMAT_INDEXED16)
 			draw = &segas24_tile::draw_rect_rgb;
 		else
 			draw = &segas24_tile::draw_rect;
 
-		bm = tilemap_get_pixmap(tile_layer[layer]);
-		tm = tilemap_get_flagsmap(tile_layer[layer]);
+		bitmap_t &bm = tilemap_get_pixmap(tile_layer[layer]);
+		bitmap_t &tm = tilemap_get_flagsmap(tile_layer[layer]);
 
 		if(hscr & 0x8000) {
 			int y;
@@ -613,7 +612,7 @@ void segas24_sprite::device_start()
     0   11------    --------
 */
 
-void segas24_sprite::draw(bitmap_t *bitmap, const rectangle &cliprect, const int *spri)
+void segas24_sprite::draw(bitmap_t &bitmap, const rectangle &cliprect, const int *spri)
 {
 	UINT16 curspr = 0;
 	int countspr = 0;
@@ -775,11 +774,11 @@ void segas24_sprite::draw(bitmap_t *bitmap, const rectangle &cliprect, const int
 										int zx1 = flipx ? 7-zx : zx;
 										UINT32 neweroffset = (newoffset+(zx1>>2))&0x1ffff; // crackdown sometimes attempts to use data past the end of spriteram
 										int c = (sprite_ram[neweroffset] >> (((~zx1) & 3) << 2)) & 0xf;
-										UINT8 *pri = &machine().priority_bitmap->pix8(ypos1, xpos2);
+										UINT8 *pri = &machine().priority_bitmap.pix8(ypos1, xpos2);
 										if(!(*pri & pm[c])) {
 											c = colors[c];
 											if(c) {
-												UINT16 *dst = &bitmap->pix16(ypos1, xpos2);
+												UINT16 *dst = &bitmap.pix16(ypos1, xpos2);
 												if(c==1)
 													*dst = (*dst) | 0x2000;
 												else

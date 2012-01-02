@@ -112,7 +112,7 @@ SCREEN_UPDATE(moo)
 	k054338_update_all_shadows(state->m_k054338, 0);
 	k054338_fill_backcolor(state->m_k054338, bitmap, 0);
 
-	screen.machine().priority_bitmap->fill(0, cliprect);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	if (state->m_layerpri[0] < k053251_get_priority(state->m_k053251, K053251_CI1))	/* bucky hides back layer behind background */
 		k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, layers[0], 0, 1);

@@ -63,7 +63,7 @@ SCREEN_UPDATE(aristmk6)
 
 	popmessage("%d %d %04x %d",state->m_test_x,state->m_test_y,state->m_start_offs,state->m_type);
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	count = (state->m_start_offs);
 
@@ -87,7 +87,7 @@ SCREEN_UPDATE(aristmk6)
 				b = (b << 3) | (b & 0x7);
 
 				if((x)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-					bitmap->pix32(y, x) = r | g<<8 | b<<16;
+					bitmap.pix32(y, x) = r | g<<8 | b<<16;
 
 				count+=2;
 			}
@@ -98,7 +98,7 @@ SCREEN_UPDATE(aristmk6)
 				color = blit_ram[count];
 
 				if((x)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-					bitmap->pix32(y, x) = screen.machine().pens[color];
+					bitmap.pix32(y, x) = screen.machine().pens[color];
 
 				count++;
 			}

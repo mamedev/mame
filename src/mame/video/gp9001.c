@@ -758,7 +758,7 @@ WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w )
     Sprite Handlers
 ***************************************************************************/
 
-void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, const UINT8* primap )
+void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const UINT8* primap )
 {
 	const gfx_element *gfx = machine.gfx[tile_region+1];
 
@@ -917,7 +917,7 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_t *bitmap,
 								if (drawxx>=cliprect.min_x && drawxx<=cliprect.max_x && drawyy>=cliprect.min_y && drawyy<=cliprect.max_y)
 								{
 									UINT8 pix = srcdata[count];
-									UINT16* dstptr = &bitmap->pix16(drawyy, drawxx);
+									UINT16* dstptr = &bitmap.pix16(drawyy, drawxx);
 									UINT8* dstpri = &this->custom_priority_bitmap->pix8(drawyy, drawxx);
 
 									if (priority >= dstpri[0])
@@ -951,12 +951,12 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_t *bitmap,
     Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
-void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine& machine, bitmap_t* bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable )
+void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine& machine, bitmap_t &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable )
 {
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 	int y,x;
-	bitmap_t *tmb = tilemap_get_pixmap(tilemap);
+	bitmap_t &tmb = tilemap_get_pixmap(tilemap);
 	UINT16* srcptr;
 	UINT16* dstptr;
 	UINT8* dstpriptr;
@@ -968,8 +968,8 @@ void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine& machine, bitm
 	{
 		int realy = (y+scrolly)&0x1ff;
 
-		srcptr = &tmb->pix16(realy);
-		dstptr = &bitmap->pix16(y);
+		srcptr = &tmb.pix16(realy);
+		dstptr = &bitmap.pix16(y);
 		dstpriptr = &this->custom_priority_bitmap->pix8(y);
 
 		for (x=0;x<width;x++)
@@ -1004,7 +1004,7 @@ static const UINT8 gp9001_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14
 
 static const UINT8 batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
 
-void gp9001vdp_device::gp9001_render_vdp(running_machine& machine, bitmap_t* bitmap, const rectangle &cliprect)
+void gp9001vdp_device::gp9001_render_vdp(running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (gp9001_gfxrom_is_banked && gp9001_gfxrom_bank_dirty)
 	{

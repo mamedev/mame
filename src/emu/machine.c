@@ -146,7 +146,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  pens(NULL),
 	  colortable(NULL),
 	  shadow_table(NULL),
-	  priority_bitmap(NULL),
 	  debug_flags(0),
 	  memory_data(NULL),
 	  palette_data(NULL),

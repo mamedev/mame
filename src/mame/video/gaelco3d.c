@@ -461,7 +461,7 @@ SCREEN_UPDATE( gaelco3d )
 
         for (y = cliprect.min_y; y <= cliprect.max_y; y++)
         {
-            UINT16 *dest = &bitmap->pix16(y);
+            UINT16 *dest = &bitmap.pix16(y);
             for (x = cliprect.min_x; x <= cliprect.max_x; x++)
             {
                 int offs = (yv + y - cliprect.min_y) * 4096 + xv + x - cliprect.min_x;
@@ -476,7 +476,7 @@ SCREEN_UPDATE( gaelco3d )
     else*/
 	{
 		if (state->m_video_changed)
-			copybitmap(bitmap, state->m_poly->screenbits(), 0,1, 0,0, cliprect);
+			copybitmap(bitmap, *state->m_poly->screenbits(), 0,1, 0,0, cliprect);
 		ret = state->m_video_changed;
 		state->m_video_changed = FALSE;
 	}

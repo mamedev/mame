@@ -143,11 +143,11 @@ const char *avi_error_string(avi_error err);
 const avi_movie_info *avi_get_movie_info(avi_file *file);
 UINT32 avi_first_sample_in_frame(avi_file *file, UINT32 framenum);
 
-avi_error avi_read_video_frame_yuy16(avi_file *file, UINT32 framenum, bitmap_t *bitmap);
+avi_error avi_read_video_frame_yuy16(avi_file *file, UINT32 framenum, bitmap_t &bitmap);
 avi_error avi_read_sound_samples(avi_file *file, int channel, UINT32 firstsample, UINT32 numsamples, INT16 *output);
 
-avi_error avi_append_video_frame_yuy16(avi_file *file, const bitmap_t *bitmap);
-avi_error avi_append_video_frame_rgb32(avi_file *file, const bitmap_t *bitmap);
+avi_error avi_append_video_frame_yuy16(avi_file *file, const bitmap_t &bitmap);
+avi_error avi_append_video_frame_rgb32(avi_file *file, const bitmap_t &bitmap);
 avi_error avi_append_sound_samples(avi_file *file, int channel, const INT16 *samples, UINT32 numsamples, UINT32 sampleskip);
 
 #endif

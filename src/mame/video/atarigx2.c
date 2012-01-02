@@ -181,10 +181,10 @@ void atarigx2_scanline_update(screen_device &screen, int scanline)
 SCREEN_UPDATE( atarigx2 )
 {
 	atarigx2_state *state = screen.machine().driver_data<atarigx2_state>();
-	bitmap_t *priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_t &priority_bitmap = screen.machine().priority_bitmap;
 
 	/* draw the playfield */
-	priority_bitmap->fill(0, cliprect);
+	priority_bitmap.fill(0, cliprect);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 1);
 	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 2);
@@ -206,9 +206,9 @@ SCREEN_UPDATE( atarigx2 )
 		/* now blend with the playfield */
 		for (y = top; y < bottom; y++)
 		{
-			UINT16 *pf = &bitmap->pix16(y);
+			UINT16 *pf = &bitmap.pix16(y);
 			UINT16 *mo = &mo_bitmap->pix16(y);
-			UINT8 *pri = &priority_bitmap->pix8(y);
+			UINT8 *pri = &priority_bitmap.pix8(y);
 			for (x = left; x < right; x++)
 				if (mo[x] && (mo[x] >> ATARIRLE_PRIORITY_SHIFT) >= pri[x])
 					pf[x] = mo[x] & ATARIRLE_DATA_MASK;
