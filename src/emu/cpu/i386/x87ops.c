@@ -101,6 +101,22 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 
 		switch ((modrm >> 3) & 0x7)
 		{
+			case 0:			// FLD single-precision
+			{
+				X87_REG t;
+				t.i = READ32(cpustate,ea);
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,3);
+				break;
+			}
+
+			case 2:			// FST single-precision
+			{
+				WRITE32(cpustate,ea,FPU_SINGLE_INT32(ST(0)));
+				CYCLES(cpustate,7);
+				break;
+			}
+
 			case 3:			// FSTP
 			{
 				// st(0) -> ea
@@ -138,7 +154,7 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 			}
 
 			default:
-				fatalerror("I386: FPU Op D9 %02X at %08X", modrm, cpustate->pc-2);
+				fatalerror("I386: FPU Op D9 %02X at %08X", (modrm >> 3) & 0x7, cpustate->pc-2);
 		}
 	}
 	else
@@ -318,7 +334,7 @@ static void I386OP(fpu_group_dd)(i386_state *cpustate)		// Opcode 0xdd
 				X87_REG t;
 				t.f = ST(0).f;
 				WRITE64(cpustate,ea, t.i);
-				FPU_POP(cpustate);
+				//FPU_POP(cpustate);
 				CYCLES(cpustate,8);
 				break;
 			}
