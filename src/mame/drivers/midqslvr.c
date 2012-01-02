@@ -131,7 +131,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 				memory_set_bankptr(busdevice->machine(), "bios_bank", state->m_bios_ram);
 			else					// disable RAM access (reads go to BIOS ROM)
-				memory_set_bankptr(busdevice->machine(), "bios_bank", busdevice->machine().region("bios")->base() + 0x10000);
+				memory_set_bankptr(busdevice->machine(), "bios_bank", busdevice->machine().region("bios")->base() + 0x70000);
 			break;
 		}
 		case 0x5a: // PAM1
@@ -153,12 +153,12 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			if (data & 0x1)
 				memory_set_bankptr(busdevice->machine(), "bios_ext1", state->m_bios_ext1_ram);
 			else
-				memory_set_bankptr(busdevice->machine(), "bios_ext1", busdevice->machine().region("bios")->base() + 0);
+				memory_set_bankptr(busdevice->machine(), "bios_ext1", busdevice->machine().region("bios")->base() + 0x60000);
 
 			if (data & 0x10)
 				memory_set_bankptr(busdevice->machine(), "bios_ext2", state->m_bios_ext2_ram);
 			else
-				memory_set_bankptr(busdevice->machine(), "bios_ext2", busdevice->machine().region("bios")->base() + 0x4000);
+				memory_set_bankptr(busdevice->machine(), "bios_ext2", busdevice->machine().region("bios")->base() + 0x64000);
 
 			break;
 		}
@@ -167,12 +167,12 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			if (data & 0x1)
 				memory_set_bankptr(busdevice->machine(), "bios_ext3", state->m_bios_ext3_ram);
 			else
-				memory_set_bankptr(busdevice->machine(), "bios_ext3", busdevice->machine().region("bios")->base() + 0x8000);
+				memory_set_bankptr(busdevice->machine(), "bios_ext3", busdevice->machine().region("bios")->base() + 0x68000);
 
 			if (data & 0x10)
 				memory_set_bankptr(busdevice->machine(), "bios_ext4", state->m_bios_ext4_ram);
 			else
-				memory_set_bankptr(busdevice->machine(), "bios_ext4", busdevice->machine().region("bios")->base() + 0xc000);
+				memory_set_bankptr(busdevice->machine(), "bios_ext4", busdevice->machine().region("bios")->base() + 0x6c000);
 
 			break;
 		}
