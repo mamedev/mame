@@ -873,7 +873,7 @@ static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 	/* read the video data when we hit a new frame */
 	if (framenum % interlace_factor == 0)
 	{
-		avierr = avi_read_video_frame_yuy16(avi, framenum / interlace_factor, fullbitmap);
+		avierr = avi_read_video_frame_yuy16(avi, framenum / interlace_factor, *fullbitmap);
 		if (avierr != AVIERR_NONE)
 			goto cleanup;
 	}
@@ -1965,7 +1965,7 @@ static int do_extractav(int argc, char *argv[], int param)
 		/* write video */
 		if (!interlaced || (firstframe + framenum) % 2 == 1)
 		{
-			avierr = avi_append_video_frame_yuy16(avi, fullbitmap);
+			avierr = avi_append_video_frame_yuy16(avi, *fullbitmap);
 			if (avierr != AVIERR_NONE)
 			{
 				fprintf(stderr, "Error writing video for hunk %d to AVI file: %s\n", firstframe + framenum, avi_error_string(avierr));

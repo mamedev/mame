@@ -825,9 +825,9 @@ int main(int argc, char *argv[])
 
 	/* loop over frames */
 	frame = 0;
-	while (isavi ? read_avi(file, frame, bitmap, lsound, rsound, &samples) : read_chd(file, frame, bitmap, lsound, rsound, &samples))
+	while (isavi ? read_avi(file, frame, *bitmap, lsound, rsound, &samples) : read_chd(file, frame, *bitmap, lsound, rsound, &samples))
 	{
-		verify_video(&video, frame, bitmap);
+		verify_video(&video, frame, *bitmap);
 		verify_audio(&audio, lsound, rsound, samples);
 		frame++;
 	}
@@ -836,7 +836,7 @@ int main(int argc, char *argv[])
 	isavi ? close_avi(file) : close_chd(file);
 
 	/* final output */
-	verify_video_final(&video, frame, bitmap);
+	verify_video_final(&video, frame, *bitmap);
 	verify_audio_final(&audio);
 
 	/* free memory */

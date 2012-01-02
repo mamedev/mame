@@ -1002,7 +1002,7 @@ static int generate_png_diff(const summary_file *curfile, const astring *destdir
 	filerr = core_fopen(astring_c(dstfilename), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 	if (filerr != FILERR_NONE)
 		goto error;
-	pngerr = png_write_bitmap(file, NULL, finalbitmap, 0, NULL);
+	pngerr = png_write_bitmap(file, NULL, *finalbitmap, 0, NULL);
 	core_fclose(file);
 	if (pngerr != PNGERR_NONE)
 		goto error;
