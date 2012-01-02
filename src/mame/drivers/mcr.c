@@ -427,6 +427,32 @@ static WRITE8_HANDLER( journey_op4_w )
 
 /*************************************
  *
+ *  Two Tigers I/O ports
+ *
+ *************************************/
+
+static WRITE8_HANDLER( twotiger_op4_w )
+{
+	device_t *samples = space->machine().device("samples");
+
+	for (int i = 0; i < 2; i++)
+	{
+		/* play tape, and loop it */
+		if (!sample_playing(samples, i))
+			sample_start(samples, i, i, 1);
+	
+		/* bit 1 turns cassette on/off */
+		sample_set_pause(samples, i, ~data & 2);
+	}
+
+	// bit 2: lamp control?
+	// if (data & 0xfc) printf("%x ",data);
+}
+
+
+
+/*************************************
+ *
  *  Discs of Tron I/O ports
  *
  *************************************/
@@ -1558,6 +1584,21 @@ static const samples_interface journey_samples_interface =
 };
 
 
+static const char *const twotiger_sample_names[] =
+{
+	"*twotiger",
+	"left.wav",
+	"right.wav",
+	0
+};
+
+static const samples_interface twotiger_samples_interface =
+{
+	2,
+	twotiger_sample_names
+};
+
+
 
 /*************************************
  *
@@ -1613,6 +1654,17 @@ static MACHINE_CONFIG_DERIVED( mcr_90010, mcr_90009 )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(64)
+MACHINE_CONFIG_END
+
+
+/* as above, plus 8-track tape */
+static MACHINE_CONFIG_DERIVED( mcr_90010_tt, mcr_90010 )
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(twotiger_samples_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -2580,6 +2632,8 @@ static DRIVER_INIT( twotiger )
 	mcr_init(machine, 90010, 91399, 90913);
 	mcr_sound_init(machine, MCR_SSIO);
 
+	ssio_set_custom_output(4, 0xff, twotiger_op4_w);
+
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe800, 0xefff, 0, 0x1000, FUNC(twotiger_videoram_r), FUNC(twotiger_videoram_w));
 }
 
@@ -2678,7 +2732,7 @@ GAME( 1982, wacko,    0,        mcr_90010,     wacko,    wacko,     ROT0,  "Ball
 GAME( 1984, twotigerc,twotiger, mcr_90010,     twotigrc, mcr_90010, ROT0,  "Bally Midway", "Two Tigers (Tron conversion)", GAME_SUPPORTS_SAVE )
 
 /* hacked 90010 CPU board + 91399 video gen + 90913 sound I/O + 8-track interface */
-GAME( 1984, twotiger, 0,        mcr_90010,     twotiger, twotiger,  ROT0,  "Bally Midway", "Two Tigers (dedicated)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, twotiger, 0,        mcr_90010_tt,  twotiger, twotiger,  ROT0,  "Bally Midway", "Two Tigers (dedicated)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* 90010 CPU board + 91399 video gen + 91483 sound I/O */
 GAME( 1982, kroozr,   0,        mcr_90010,     kroozr,   kroozr,    ROT0,  "Bally Midway", "Kozmik Kroozr", GAME_SUPPORTS_SAVE )
