@@ -4,8 +4,11 @@
 /***************************************************************************
 
 Notes:
-- Say hi to 0x9fe80-0x9feff debug strings, that clearly states the current
-  flash state
+- Voodoo currently fails to init DAC regs, sub-routine is at 0x182a3.
+  It does: mov [ebx],ecx in there, where ebx is 0xfffxxxxx, but only lower
+  16 bits are used so it ends up in reading at conventional work RAM.
+  CPU core bug?
+- Trips 00019652: fld     dword ptr [esp+4Ch] after it
 
 Funky Ball
 dgPIX, 1998
@@ -80,6 +83,7 @@ Notes:
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "video/voodoo.h"
 
 
 class funkball_state : public driver_device
@@ -92,7 +96,8 @@ public:
 		  m_dma8237_1(*this, "dma8237_1"),
 		  m_dma8237_2(*this, "dma8237_2"),
 		  m_pic8259_1(*this, "pic8259_1"),
-		  m_pic8259_2(*this, "pic8259_2")
+		  m_pic8259_2(*this, "pic8259_2"),
+		  m_voodoo(*this, "voodoo_0")
 		  { }
 
 	int m_dma_channel;
@@ -117,6 +122,7 @@ public:
 	required_device<i8237_device> m_dma8237_2;
 	required_device<pic8259_device> m_pic8259_1;
 	required_device<pic8259_device> m_pic8259_2;
+	required_device<voodoo_device> m_voodoo;
 
 	DECLARE_READ8_MEMBER( get_slave_ack );
 	DECLARE_WRITE8_MEMBER( flash_w );
@@ -130,6 +136,14 @@ public:
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
+	struct
+	{
+		/* PCI */
+		UINT32 command;
+		UINT32 base_addr;
+
+		UINT32 init_enable;
+	} m_voodoo_pci_regs;
 };
 
 void funkball_state::video_start()
@@ -139,7 +153,53 @@ void funkball_state::video_start()
 
 bool funkball_state::screen_update( screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect )
 {
-	return 0;
+	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+}
+
+static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+{
+	funkball_state* state = device->machine().driver_data<funkball_state>();
+	UINT32 val = 0;
+
+	printf("Voodoo[0] PCI R: %x\n", reg);
+
+	switch (reg)
+	{
+		case 0:
+			val = 0x0001121a;
+			break;
+		case 0x10:
+			val = state->m_voodoo_pci_regs.base_addr;
+			break;
+		case 0x40:
+			val = state->m_voodoo_pci_regs.init_enable;
+			break;
+	}
+	return val;
+}
+
+static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+	funkball_state* state = device->machine().driver_data<funkball_state>();
+
+	printf("Voodoo [%x]: %x\n", reg, data);
+
+	switch (reg)
+	{
+		case 0x04:
+			state->m_voodoo_pci_regs.command = data & 0x3;
+			break;
+		case 0x10:
+			if (data == 0xffffffff)
+				state->m_voodoo_pci_regs.base_addr = 0xff000000;
+			else
+				state->m_voodoo_pci_regs.base_addr = data;
+			break;
+		case 0x40:
+			state->m_voodoo_pci_regs.init_enable = data;
+			voodoo_set_init_enable(state->m_voodoo, data);
+			break;
+	}
 }
 
 static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -517,7 +577,7 @@ static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x000fc000, 0x000fffff) AM_ROMBANK("bios_bank4")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE8_LEGACY(bios_ram_w,0xffffffff)
 	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
-	AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
+//	AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
 	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE_LEGACY(biu_ctrl_r, biu_ctrl_w)
 	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_BASE(m_unk_ram)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
@@ -685,16 +745,22 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
+	MCFG_PCI_BUS_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
 	MCFG_PCI_BUS_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	/* video hardware */
+	MCFG_3DFX_VOODOO_1_ADD("voodoo_0", STD_VOODOO_1_CLOCK, 2, "screen")
+	MCFG_3DFX_VOODOO_CPU("maincpu")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MCFG_SCREEN_SIZE(1024, 1024)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
 MACHINE_CONFIG_END
 
 ROM_START( funkball )
