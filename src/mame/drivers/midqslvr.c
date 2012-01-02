@@ -3,8 +3,7 @@
     Midway Quicksilver skeleton driver
 
 	TODO:
-	- Tries to read 0x8 / 0xc registers of the PIIX4 PCI card, unknown
-	  purpose;
+	- offrthnd: illegal opcode tripped just after that PIIX4 is recognized
 
     Main CPU : Intel Celeron 333/366MHz
     Motherboard : Intel SE440BX-2
@@ -241,10 +240,27 @@ static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function,
 {
 	address_space *space = busdevice->machine().firstcpu->memory().space( AS_PROGRAM );
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
-	printf("%08x PIIX4: read %d, %02X\n", cpu_get_pc(&space->device()), function, reg);
 
-	if((reg & 0xfc) == 0 && function == 0) // return vendor ID
-		return (0x71108086 >> (reg & 3)*8) & 0xff;
+	function &= 3;
+
+	if((reg & 0xfc) == 0) // return vendor ID
+		return (((0x71108086 | (function & 3) << 16) >> (reg & 3)*8) & 0xff);
+
+	if(reg == 0xe)
+	{
+		const UINT8 header_type_val[4] = { 0x80, 0x00, 0x00, 0x00 };
+		return header_type_val[function];
+	}
+
+	if((reg & 0xfc) == 0x8)
+	{
+		/* TODO: reg 8 indicates Revision ID */
+		const UINT32 class_code_val[4] = { 0x06010000, 0x01018000, 0x0c030000, 0x06800000 };
+
+		return (((class_code_val[function]) >> (reg & 3)*8) & 0xff);
+	}
+
+	printf("%08x PIIX4: read %d, %02X\n", cpu_get_pc(&space->device()), function, reg);
 
 	return state->m_piix4_config_reg[function][reg];
 }
@@ -253,6 +269,9 @@ static void piix4_config_w(device_t *busdevice, device_t *device, int function, 
 {
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
 	printf("PIIX4: write %d, %02X, %02X\n", function, reg, data);
+
+	function &= 3;
+
 	state->m_piix4_config_reg[function][reg] = data;
 }
 
@@ -704,8 +723,8 @@ static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_DEVICE( 0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_DEVICE(31, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
@@ -739,8 +758,8 @@ ROM_START( hydrthnd )
 ROM_END
 
 ROM_START( arctthnd )
-	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD( "m29f002bt.u6", 0x000000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
+	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
+	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
 //	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
