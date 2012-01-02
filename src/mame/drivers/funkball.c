@@ -1,5 +1,5 @@
 // dgPIX 'VRender 2 Beta Rev4' hardware
-// funkball CPU + 3dFX VooDoo chipset
+// MEDIAGX CPU + 3dFX VooDoo chipset
 
 /***************************************************************************
 
@@ -105,6 +105,9 @@ public:
 	UINT8 m_funkball_config_reg_sel;
 	UINT8 m_funkball_config_regs[256];
 	UINT32 m_cx5510_regs[256/4];
+	UINT16 m_flash_addr;
+	UINT32 *m_unk_ram;
+	UINT8 m_flash_cmd;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -115,6 +118,8 @@ public:
 	required_device<pic8259_device> m_pic8259_2;
 
 	DECLARE_READ8_MEMBER( get_slave_ack );
+	DECLARE_READ8_MEMBER( flash_r );
+	DECLARE_WRITE8_MEMBER( flash_w );
 };
 
 static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -352,14 +357,49 @@ static WRITE8_DEVICE_HANDLER( io20_w )
 	}
 }
 
+WRITE8_MEMBER( funkball_state::flash_w )
+{
+	if(!(offset & 0x2))
+	{
+		m_flash_addr = (offset & 1) ? ((m_flash_addr & 0xff) | (data << 8)) : ((m_flash_addr & 0xff00) | (data));
+		//printf("%08x ADDR\n",m_flash_addr << 16);
+	}
+	else if(offset == 2)
+	{
+		/* 0x83: read from u29/u30
+		   0x03: read from u3
+		   0x81: init device
+		*/
+		m_flash_cmd = data;
+		//printf("%02x CMD\n",data);
+	}
+	else
+		printf("%02x %02x\n",offset,data);
+}
+
+READ8_MEMBER( funkball_state::flash_r )
+{
+	printf("%02x %08x %02x\n",offset,m_flash_addr << 16,m_flash_cmd);
+
+	if(offset == 0)
+		return 0x89;
+
+	if(offset == 2)
+		return (m_flash_cmd & 0x80) ? 0x15 : 0x14; // recognize
+
+	return 0;
+}
 
 static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
-//	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)	/* System BIOS */
+	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
+	AM_RANGE(0x000b0000, 0x000b0003) AM_READ8(flash_r,0xffffffff)
+	AM_RANGE(0x000c0000, 0x000cffff) AM_RAM
+	AM_RANGE(0x000d0000, 0x000dffff) AM_RAM
+	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0) AM_WRITENOP	/* System BIOS */
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM
+	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_BASE(m_unk_ram)
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
@@ -375,8 +415,9 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
-//	AM_RANGE(0x0350, 0x035f) AM_NOP
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
+
+	AM_RANGE(0x0360, 0x0363) AM_WRITE8(flash_w,0xffffffff)
 
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
 ADDRESS_MAP_END
@@ -480,6 +521,10 @@ static MACHINE_START( funkball )
 	device_set_irq_callback(state->m_maincpu, irq_callback);
 
 	kbdc8042_init(machine, &at8042);
+
+	/* defaults, so it won't boot */
+	state->m_unk_ram[0x010/4] = 0x2f8d85ff;
+	state->m_unk_ram[0x018/4] = 0x000018c5;
 }
 
 static MACHINE_RESET( funkball )
