@@ -3,6 +3,13 @@
 
 /***************************************************************************
 
+Notes:
+- You should soft reset at first boot, this is because there's an
+  uninitialized read at 0x40010e10 that is written to after it (presumably
+  the port that follows actually trips the reset line)
+- Say hi to 0x9fe80-0x9feff debug strings, that clearly states the current
+  flash state
+
 Funky Ball
 dgPIX, 1998
 
