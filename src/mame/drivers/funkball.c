@@ -4,9 +4,6 @@
 /***************************************************************************
 
 Notes:
-- You should soft reset at first boot, this is because there's an
-  uninitialized read at 0x40010e10 that is written to after it (presumably
-  the port that follows actually trips the reset line)
 - Say hi to 0x9fe80-0x9feff debug strings, that clearly states the current
   flash state
 
@@ -127,7 +124,23 @@ public:
 	DECLARE_WRITE8_MEMBER( flash_data_w );
 //	DECLARE_WRITE8_MEMBER( bios_ram_w );
 
+	DECLARE_READ8_MEMBER( fdc_r );
+	DECLARE_WRITE8_MEMBER( fdc_w );
+
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
 };
+
+void funkball_state::video_start()
+{
+
+}
+
+bool funkball_state::screen_update( screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect )
+{
+	return 0;
+}
 
 static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
@@ -150,6 +163,7 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
 }
 
+#if 0
 static READ32_DEVICE_HANDLER( ide_r )
 {
 	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
@@ -170,6 +184,28 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
 	ide_controller32_w(device, 0x3f0/4 + offset, data, mem_mask);
 }
+#endif
+
+READ8_MEMBER( funkball_state::fdc_r )
+{
+	//printf("%02x\n",offset);
+	if(offset == 0xd)
+		return 0x20;
+
+	return 0;
+}
+
+WRITE8_MEMBER( funkball_state::fdc_w )
+{
+	if(offset == 8)
+	{
+		if(data == 0x0d)
+			printf("\n");
+		else
+			printf("%c",data);
+	}
+}
+
 
 static READ8_HANDLER(at_page8_r)
 {
@@ -378,7 +414,7 @@ WRITE8_MEMBER( funkball_state::flash_w )
 		   0x81: init device
 		*/
 		m_flash_cmd = data;
-		//printf("%02x CMD\n",data);
+		printf("%02x CMD\n",data);
 	}
 	else
 		printf("%02x %02x\n",offset,data);
@@ -388,18 +424,21 @@ READ8_MEMBER( funkball_state::flash_data_r )
 {
 	if(m_flash_data_cmd == 0x90)
 	{
-		if(offset == 0)
-			return 0x89;
+		if(offset == 0 && (m_flash_addr == 0))
+			return 0x89; // manufacturer code
 
-		if(offset == 2)
-			return (m_flash_cmd & 0x80) ? 0x15 : 0x14; // recognize
+		if(offset == 2 && (m_flash_addr == 0))
+			return 0x14; // device code, 32 MBit in both cases
+
+		if(offset > 3)
+			printf("%02x FLASH DATA 0x90\n",offset);
 
 		return 0;
 	}
 
 	if(m_flash_data_cmd == 0xff)
 	{
-		UINT8 *ROM = machine().region(m_flash_cmd & 0x80 ? "flash1" : "flash2")->base();
+		UINT8 *ROM = machine().region(m_flash_cmd & 0x80 ? "prg_flash" : "data_flash")->base();
 
 		return ROM[offset + (m_flash_addr << 16)];
 	}
@@ -477,7 +516,8 @@ static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x000f8000, 0x000fbfff) AM_ROMBANK("bios_bank3")
 	AM_RANGE(0x000fc000, 0x000fffff) AM_ROMBANK("bios_bank4")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE8_LEGACY(bios_ram_w,0xffffffff)
-	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
+	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
+	AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
 	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE_LEGACY(biu_ctrl_r, biu_ctrl_w)
 	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_BASE(m_unk_ram)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
@@ -494,8 +534,9 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
-	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
+//	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
+//	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE8(fdc_r,fdc_w,0xffffffff)
 
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
 
@@ -504,6 +545,9 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 //	AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
 //	AM_RANGE(0x036c, 0x036f) AM_READ(test_r)
 ADDRESS_MAP_END
+
+static INPUT_PORTS_START( funkball )
+INPUT_PORTS_END
 
 static const struct pit8253_config funkball_pit8254_config =
 {
@@ -625,7 +669,7 @@ static MACHINE_RESET( funkball )
 }
 
 static MACHINE_CONFIG_START( funkball, funkball_state )
-	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5)
+	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5/16) // 66,6 MHz x 3.5
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
 	MCFG_CPU_IO_MAP(funkball_io)
 
@@ -646,20 +690,24 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	/* video hardware */
-	// ...
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 MACHINE_CONFIG_END
 
 ROM_START( funkball )
 	ROM_REGION32_LE(0x20000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "512k-epr.u62", 0x010000, 0x010000, CRC(cced894a) SHA1(298c81716e375da4b7215f3e588a45ca3ea7e35c) )
 
-	ROM_REGION(0x800000, "flash1", 0)
-	ROM_LOAD( "flash.u29", 0x000000, 0x400000, CRC(7cf6ff4b) SHA1(4ccdd4864ad92cc218998f3923997119a1a9dd1d) )
-	ROM_LOAD( "flash.u30", 0x400000, 0x400000, CRC(1d46717a) SHA1(acfbd0a2ccf4d717779733c4a9c639296c3bbe0e) )
+	ROM_REGION(0x8000000, "prg_flash", ROMREGION_ERASE00)
+	ROM_LOAD( "flash.u3", 0x0000000, 0x400000, CRC(fb376abc) SHA1(ea4c48bb6cd2055431a33f5c426e52c7af6997eb) )
 
-	ROM_REGION(0x400000, "flash2", 0)
-	ROM_LOAD( "flash.u3", 0x000000, 0x400000, CRC(fb376abc) SHA1(ea4c48bb6cd2055431a33f5c426e52c7af6997eb) )
+	ROM_REGION(0x8000000, "data_flash", ROMREGION_ERASE00)
+	ROM_LOAD( "flash.u29",0x0000000, 0x400000, CRC(7cf6ff4b) SHA1(4ccdd4864ad92cc218998f3923997119a1a9dd1d) )
+	ROM_LOAD( "flash.u30",0x0400000, 0x400000, CRC(1d46717a) SHA1(acfbd0a2ccf4d717779733c4a9c639296c3bbe0e) )
 ROM_END
 
 
-GAME(1998, funkball, 0, funkball, at_keyboard, 0, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", GAME_IS_SKELETON)
+GAME(1998, funkball, 0, funkball, funkball, 0, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", GAME_IS_SKELETON)
