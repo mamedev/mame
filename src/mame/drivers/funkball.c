@@ -107,8 +107,11 @@ public:
 	UINT32 m_cx5510_regs[256/4];
 	UINT16 m_flash_addr;
 	UINT32 *m_unk_ram;
+	UINT8 *m_bios_ram;
 	UINT8 m_flash_cmd;
 	UINT8 m_flash_data_cmd;
+
+	UINT32 m_biu_ctrl_reg[256/4];
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -122,6 +125,8 @@ public:
 	DECLARE_WRITE8_MEMBER( flash_w );
 	DECLARE_READ8_MEMBER( flash_data_r );
 	DECLARE_WRITE8_MEMBER( flash_data_w );
+//	DECLARE_WRITE8_MEMBER( bios_ram_w );
+
 };
 
 static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -414,17 +419,68 @@ WRITE8_MEMBER( funkball_state::flash_data_w )
 		printf("%08x %02x FLASH DATA W %08x\n",offset,data,m_flash_addr << 16);
 }
 
+static READ32_HANDLER( biu_ctrl_r )
+{
+	funkball_state *state = space->machine().driver_data<funkball_state>();
+
+	if (offset == 0)
+	{
+		return 0xffffff;
+	}
+	return state->m_biu_ctrl_reg[offset];
+}
+
+static WRITE32_HANDLER( biu_ctrl_w )
+{
+	funkball_state *state = space->machine().driver_data<funkball_state>();
+
+	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
+	COMBINE_DATA(state->m_biu_ctrl_reg + offset);
+
+	if (offset == 0x0c/4)		// BC_XMAP_3 register
+	{
+		const char *const banknames[8] = { "bios_ext1", "bios_ext2", "bios_ext3","bios_ext4", "bios_bank1", "bios_bank2", "bios_bank3", "bios_bank4" };
+		int i;
+
+		for(i=0;i<8;i++)
+		{
+			if (data & 0x1 << i*4)		// enable RAM access to region 0xe0000 - 0xfffff
+				memory_set_bankptr(space->machine(), banknames[i], state->m_bios_ram + (0x4000 * i));
+			else					// disable RAM access (reads go to BIOS ROM)
+				memory_set_bankptr(space->machine(), banknames[i], space->machine().region("bios")->base() + (0x4000 * i));
+		}
+	}
+}
+
+static WRITE8_HANDLER( bios_ram_w )
+{
+	funkball_state *state = space->machine().driver_data<funkball_state>();
+
+	if(state->m_biu_ctrl_reg[0x0c/4] & (2 << ((offset & 0x4000)>>14)*4)) // memory is write-able
+	{
+		state->m_bios_ram[offset] = data;
+	}
+}
+
 static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
 	AM_RANGE(0x000b0000, 0x000bffff) AM_READWRITE8(flash_data_r,flash_data_w,0xffffffff)
 	AM_RANGE(0x000c0000, 0x000cffff) AM_RAM
 	AM_RANGE(0x000d0000, 0x000dffff) AM_RAM
-	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_ext1")
+	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_ext2")
+	AM_RANGE(0x000e8000, 0x000ebfff) AM_ROMBANK("bios_ext3")
+	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ext4")
+	AM_RANGE(0x000f0000, 0x000f3fff) AM_ROMBANK("bios_bank1")
+	AM_RANGE(0x000f4000, 0x000f7fff) AM_ROMBANK("bios_bank2")
+	AM_RANGE(0x000f8000, 0x000fbfff) AM_ROMBANK("bios_bank3")
+	AM_RANGE(0x000fc000, 0x000fffff) AM_ROMBANK("bios_bank4")
+	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE8_LEGACY(bios_ram_w,0xffffffff)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
+	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE_LEGACY(biu_ctrl_r, biu_ctrl_w)
 	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_BASE(m_unk_ram)
-	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
@@ -441,9 +497,12 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
 
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
+
 	AM_RANGE(0x0360, 0x0363) AM_WRITE8(flash_w,0xffffffff)
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
+//	AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
+//	AM_RANGE(0x036c, 0x036f) AM_READ(test_r)
 ADDRESS_MAP_END
 
 static const struct pit8253_config funkball_pit8254_config =
@@ -540,6 +599,8 @@ static MACHINE_START( funkball )
 {
 	funkball_state *state = machine.driver_data<funkball_state>();
 
+	state->m_bios_ram = auto_alloc_array(machine, UINT8, 0x20000);
+
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, funkball_set_keyb_int);
 
 	device_set_irq_callback(state->m_maincpu, irq_callback);
@@ -553,7 +614,14 @@ static MACHINE_START( funkball )
 
 static MACHINE_RESET( funkball )
 {
-	// ...
+	memory_set_bankptr(machine, "bios_ext1", machine.region("bios")->base() + 0x00000);
+	memory_set_bankptr(machine, "bios_ext2", machine.region("bios")->base() + 0x04000);
+	memory_set_bankptr(machine, "bios_ext3", machine.region("bios")->base() + 0x08000);
+	memory_set_bankptr(machine, "bios_ext4", machine.region("bios")->base() + 0x0c000);
+	memory_set_bankptr(machine, "bios_bank1", machine.region("bios")->base() + 0x10000);
+	memory_set_bankptr(machine, "bios_bank2", machine.region("bios")->base() + 0x14000);
+	memory_set_bankptr(machine, "bios_bank3", machine.region("bios")->base() + 0x18000);
+	memory_set_bankptr(machine, "bios_bank4", machine.region("bios")->base() + 0x1c000);
 }
 
 static MACHINE_CONFIG_START( funkball, funkball_state )
@@ -582,8 +650,8 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 MACHINE_CONFIG_END
 
 ROM_START( funkball )
-	ROM_REGION32_LE(0x10000, "bios", ROMREGION_ERASEFF)
-	ROM_LOAD( "512k-epr.u62", 0x000000, 0x010000, CRC(cced894a) SHA1(298c81716e375da4b7215f3e588a45ca3ea7e35c) )
+	ROM_REGION32_LE(0x20000, "bios", ROMREGION_ERASEFF)
+	ROM_LOAD( "512k-epr.u62", 0x010000, 0x010000, CRC(cced894a) SHA1(298c81716e375da4b7215f3e588a45ca3ea7e35c) )
 
 	ROM_REGION(0x800000, "flash1", 0)
 	ROM_LOAD( "flash.u29", 0x000000, 0x400000, CRC(7cf6ff4b) SHA1(4ccdd4864ad92cc218998f3923997119a1a9dd1d) )
