@@ -836,6 +836,12 @@ static void I386OP(fpu_group_db)(i386_state *cpustate)		// Opcode 0xdb
 	{
 		switch (modrm & 0x3f)
 		{
+			case 0x21:		// ??? (Sim City 2k)
+			{
+				logerror("x87 opcode 0xdb 0xe1 called at %08x\n",cpustate->pc-2);
+				CYCLES(cpustate,1);		// TODO
+				break;
+			}
 			case 0x22:		// FCLEX
 			{
 				// clears exception flags and busy bit.
