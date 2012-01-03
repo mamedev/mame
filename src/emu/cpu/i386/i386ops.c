@@ -1187,6 +1187,8 @@ outofcycles:
 	/* if we run out of cycles to execute, and we are still in the repeat, we need
      * to exit this instruction in such a way to go right back into it when we have
      * time to execute cycles */
+	if(flag && (invert_flag ? *flag : !*flag))
+		return;
 	cpustate->eip = cpustate->prev_eip;
 	CHANGE_PC(cpustate,cpustate->eip);
 	CYCLES_NUM(-cycle_base);
