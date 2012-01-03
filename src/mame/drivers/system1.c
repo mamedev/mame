@@ -4761,9 +4761,9 @@ GAME( 1984, wmatch,     0,        sys1ppis, wmatch,    wmatch,   ROT270, "Sega",
 GAME( 1984, bullfgt,    0,        sys1ppi,  bullfgt,   bullfgtj, ROT0,   "Coreland / Sega", "Bullfight (315-5065)", GAME_SUPPORTS_SAVE )
 GAME( 1985, nprinces,   seganinj, sys1ppi,  seganinj,  flicky,   ROT0,   "bootleg?",        "Ninja Princess (315-5051, 64k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1985, nprincesu,  seganinj, sys1ppi,  seganinj,  bank00,   ROT0,   "Sega",            "Ninja Princess (64k Ver. not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy2,      wboy,     sys1ppi,  wboy,      wboy2,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, 315-5178)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy2u,     wboy,     sys1ppi,  wboy,      bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wbdeluxe,   wboy,     sys1ppi,  wbdeluxe,  bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy2,      wboy,     sys1ppi,  wboy,      wboy2,    ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy2u,     wboy,     sys1ppi,  wboy,      bank00,   ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wbdeluxe,   wboy,     sys1ppi,  wbdeluxe,  bank00,   ROT0,   "Escape (Sega license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
 GAME( 1986, nob,        0,        nobm,     nob,       nob,      ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, nobb,       nob,      nob,      nob,       nobb,     ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
 
@@ -4790,11 +4790,11 @@ GAME( 1985, sscandal,   myhero,   sys1pio,  myhero,    myheroj,  ROT0,   "Corela
 GAME( 1985, myherok,    myhero,   sys1pio,  myhero,    myherok,  ROT0,   "Coreland / Sega", "My Hero (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 4dwarrio,   0,        sys1pio,  4dwarrio,  4dwarrio, ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", GAME_SUPPORTS_SAVE )
 GAME( 1986, raflesia,   0,        sys1pio,  raflesia,  4dwarrio, ROT270, "Coreland / Sega", "Rafflesia (315-5162)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy,       0,        sys1pio,  wboy,      wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (set 1, 315-5177)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboyo,      wboy,     sys1pio,  wboy,      wboyo,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 1, 315-5135)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy3,      wboy,     sys1pio,  wboy3,     wboyo,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 3, 315-5135)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy4,      wboy,     sys1pio,  wboy,      4dwarrio, ROT0,   "Sega (Escape license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboyu,      wboy,     sys1pio,  wboyu,     bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy (prototype?)", GAME_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
+GAME( 1986, wboy,       0,        sys1pio,  wboy,      wboy,     ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5177)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboyo,      wboy,     sys1pio,  wboy,      wboyo,    ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5135)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy3,      wboy,     sys1pio,  wboy3,     wboyo,    ROT0,   "Escape (Sega license)", "Wonder Boy (set 3, 315-5135)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy4,      wboy,     sys1pio,  wboy,      4dwarrio, ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboyu,      wboy,     sys1pio,  wboyu,     bank00,   ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", GAME_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
 GAME( 1987, blockgal,   0,        sys1pio,  blockgal,  blockgal, ROT90,  "Sega / Vic Tokai", "Block Gal (MC-8123B, 317-0029)", GAME_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */
@@ -4809,7 +4809,7 @@ GAME( 1985, chopliftbl, choplift, sys2row,  choplift,  bank0c,   ROT0,   "bootle
 GAME( 1985, shtngmst,   0,        sys2m,    shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1985, shtngmste,  shtngmst, sys2m,    shtngmst,  shtngmst, ROT0,   "Sega / EVG",      "Shooting Master (EVG, 8751 315-5159a)", GAME_SUPPORTS_SAVE )
 GAME( 1986, gardiab,    gardia,   sys2,     gardia,    gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1986, wboysys2,   wboy,     sys2,     wboysys2,  wboysys2, ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboysys2,   wboy,     sys2,     wboysys2,  wboysys2, ROT0,   "Escape (Sega license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, tokisens,   0,        sys2,     tokisens,  bank0c,   ROT90,  "Sega",            "Toki no Senshi - Chrono Soldier", GAME_SUPPORTS_SAVE )
 GAME( 1987, wbml,       0,        sys2,     wbml,      wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", GAME_SUPPORTS_SAVE )
 GAME( 1987, wbmljo,     wbml,     sys2,     wbml,      wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", GAME_SUPPORTS_SAVE )
