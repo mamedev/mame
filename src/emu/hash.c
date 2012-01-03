@@ -590,7 +590,7 @@ const char *hash_collection::macro_string(astring &buffer) const
 	buffer.reset();
 	for (hash_base *hash = m_hashlist.first(); hash != NULL; hash = hash->next())
 	{
-		buffer.cat(temp.cpy(hash->name()).toupper());
+		buffer.cat(temp.cpy(hash->name()).makeupper());
 		buffer.cat("(").cat(hash->string(temp)).cat(") ");
 	}
 

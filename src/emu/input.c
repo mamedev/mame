@@ -2179,7 +2179,7 @@ input_device_item::input_device_item(input_device &device, const char *name, voi
 
 	// otherwise, create a tokenized name
 	else
-		m_token.cpy(name).toupper().delchr(' ').delchr('_');
+		m_token.cpy(name).makeupper().delchr(' ').delchr('_');
 }
 
 

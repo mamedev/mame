@@ -883,7 +883,7 @@ int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...)
     assumptions about path separators
 -------------------------------------------------*/
 
-astring *core_filename_extract_base(astring *result, const char *name, int strip_extension)
+astring &core_filename_extract_base(astring &result, const char *name, bool strip_extension)
 {
 	/* find the start of the name */
 	const char *start = name + strlen(name);
@@ -891,11 +891,11 @@ astring *core_filename_extract_base(astring *result, const char *name, int strip
 		start--;
 
 	/* copy the rest into an astring */
-	astring_cpyc(result, start);
+	result.cpy(start);
 
 	/* chop the extension if present */
 	if (strip_extension)
-		astring_substr(result, 0, astring_rchr(result, 0, '.'));
+		result.substr(0, result.rchr(0, '.'));
 	return result;
 }
 

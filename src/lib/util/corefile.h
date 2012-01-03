@@ -149,7 +149,7 @@ int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...) ATTR_PRINTF(2,3);
 /* ----- filename utilities ----- */
 
 /* extract the base part of a filename (remove extensions and paths) */
-astring *core_filename_extract_base(astring *result, const char *name, int strip_extension);
+astring &core_filename_extract_base(astring &result, const char *name, bool strip_extension = false);
 
 /* true if the given filename ends with a particular extension */
 int core_filename_ends_with(const char *filename, const char *extension);

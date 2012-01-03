@@ -166,7 +166,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 		// determine the base name of the EXE
 		astring exename;
-		core_filename_extract_base(&exename, argv[0], TRUE);
+		core_filename_extract_base(exename, argv[0], true);
 
 		// if we have a command, execute that
 		if (strlen(m_options.command()) != 0)
@@ -345,7 +345,7 @@ void cli_frontend::listsource(const char *gamename)
 	// iterate through drivers and output the info
 	astring filename;
 	while (drivlist.next())
-		mame_printf_info("%-16s %s\n", drivlist.driver().name, core_filename_extract_base(&filename, drivlist.driver().source_file, FALSE)->cstr());
+		mame_printf_info("%-16s %s\n", drivlist.driver().name, core_filename_extract_base(filename, drivlist.driver().source_file).cstr());
 }
 
 
@@ -435,7 +435,7 @@ void cli_frontend::listbrothers(const char *gamename)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		mame_printf_info("%-16s %-16s %-16s\n", core_filename_extract_base(&filename, drivlist.driver().source_file, FALSE)->cstr(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		mame_printf_info("%-16s %-16s %-16s\n", core_filename_extract_base(filename, drivlist.driver().source_file).cstr(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
 	}
 }
 
@@ -1488,7 +1488,7 @@ void media_identifier::identify_file(const char *name)
 	{
 		// output the name
 		astring basename;
-		mame_printf_info("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
+		mame_printf_info("%-20s", core_filename_extract_base(basename, name).cstr());
 		m_total++;
 
 		// attempt to open as a CHD; fail if not
@@ -1570,7 +1570,7 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 	// output the name
 	m_total++;
 	astring basename;
-	mame_printf_info("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
+	mame_printf_info("%-20s", core_filename_extract_base(basename, name).cstr());
 
 	// see if we can find a match in the ROMs
 	int found = find_by_hash(hashes, length);

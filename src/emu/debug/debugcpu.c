@@ -51,9 +51,6 @@
 #include "xmlfile.h"
 #include <ctype.h>
 #include <zlib.h>
-#if defined(SDLMAME_FREEBSD) || defined(SDLMAME_NETBSD) || defined(SDLMAME_OS2)
-# undef tolower
-#endif
 
 
 /***************************************************************************
@@ -1712,7 +1709,7 @@ device_debug::device_debug(device_t &device)
 		// add all registers into it
 		astring tempstr;
 		for (const device_state_entry *entry = m_state->state_first(); entry != NULL; entry = entry->next())
-			m_symtable.add(tempstr.cpy(entry->symbol()).tolower(), (void *)(FPTR)entry->index(), get_state, set_state);
+			m_symtable.add(tempstr.cpy(entry->symbol()).makelower(), (void *)(FPTR)entry->index(), get_state, set_state);
 	}
 
 	// set up execution-related stuff
@@ -3056,8 +3053,7 @@ UINT32 device_debug::dasm_wrapped(astring &buffer, offs_t pc)
 	}
 
 	// disassemble to our buffer
-	buffer.expand(200);
-	return disassemble(buffer.text, pc, opbuf, argbuf);
+	return disassemble(buffer.stringbuffer(200), pc, opbuf, argbuf);
 }
 
 

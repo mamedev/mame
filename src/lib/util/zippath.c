@@ -8,6 +8,7 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <new>
 #include "zippath.h"
 #include "unzip.h"
 #include "corestr.h"
@@ -18,28 +19,35 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _zippath_returned_directory zippath_returned_directory;
-struct _zippath_returned_directory
+struct zippath_returned_directory
 {
 	zippath_returned_directory *next;
-	char name[1];
+	astring name;
 };
 
 
 
-struct _zippath_directory
+class zippath_directory
 {
+public:
+	zippath_directory()
+		: returned_parent(false),
+		  directory(NULL),
+		  called_zip_first(false),
+		  zipfile(NULL),
+		  returned_dirlist(NULL) { }
+
 	/* common */
-	unsigned int returned_parent : 1;
+	bool returned_parent;
 	osd_directory_entry returned_entry;
 
 	/* specific to normal directories */
 	osd_directory *directory;
 
 	/* specific to ZIP directories */
-	unsigned int called_zip_first : 1;
+	bool called_zip_first;
 	zip_file *zipfile;
-	astring *zipprefix;
+	astring zipprefix;
 	zippath_returned_directory *returned_dirlist;
 };
 
@@ -99,13 +107,13 @@ static void parse_parent_path(const char *path, int *beginpos, int *endpos)
     zippath_parent - retrieves the parent directory
 -------------------------------------------------*/
 
-astring *zippath_parent(astring *dst, const char *path)
+astring &zippath_parent(astring &dst, const char *path)
 {
 	int pos;
 	parse_parent_path(path, &pos, NULL);
 
 	/* return the result */
-	return (pos >= 0) ? astring_cpych(dst, path, pos + 1) : astring_cpyc(dst, "");
+	return (pos >= 0) ? dst.cpy(path, pos + 1) : dst.reset();
 }
 
 
@@ -115,12 +123,12 @@ astring *zippath_parent(astring *dst, const char *path)
     directory basename
 -------------------------------------------------*/
 
-astring *zippath_parent_basename(astring *dst, const char *path)
+astring &zippath_parent_basename(astring &dst, const char *path)
 {
 	int beginpos, endpos;
 	parse_parent_path(path, &beginpos, &endpos);
 
-	return astring_cpych(dst, path + beginpos + 1, endpos - beginpos);
+	return dst.cpy(path + beginpos + 1, endpos - beginpos);
 }
 
 
@@ -129,31 +137,29 @@ astring *zippath_parent_basename(astring *dst, const char *path)
     zippath_combine - combines two paths
 -------------------------------------------------*/
 
-astring *zippath_combine(astring *dst, const char *path1, const char *path2)
+astring &zippath_combine(astring &dst, const char *path1, const char *path2)
 {
-	astring *result;
-
 	if (!strcmp(path2, "."))
 	{
-		result = astring_cpyc(dst, path1);
+		dst.cpy(path1);
 	}
 	else if (!strcmp(path2, ".."))
 	{
-		result = zippath_parent(dst, path1);
+		zippath_parent(dst, path1);
 	}
 	else if (osd_is_absolute_path(path2))
 	{
-		result = astring_cpyc(dst, path2);
+		dst.cpy(path2);
 	}
 	else if ((path1[0] != '\0') && !is_path_separator(path1[strlen(path1) - 1]))
 	{
-		result = astring_assemble_3(dst, path1, PATH_SEPARATOR, path2);
+		dst.cpy(path1).cat(PATH_SEPARATOR).cat(path2);
 	}
 	else
 	{
-		result = astring_assemble_2(dst, path1, path2);
+		dst.cpy(path1).cat(path2);
 	}
-	return result;
+	return dst;
 }
 
 
@@ -200,7 +206,7 @@ static file_error file_error_from_zip_error(zip_error ziperr)
     from a zip file entry
 -------------------------------------------------*/
 
-static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, core_file **file)
+static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, core_file *&file)
 {
 	file_error filerr;
 	zip_error ziperr;
@@ -220,7 +226,7 @@ static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header
 		goto done;
 	}
 
-	filerr = core_fopen_ram_copy(ptr, header->uncompressed_length, OPEN_FLAG_READ, file);
+	filerr = core_fopen_ram_copy(ptr, header->uncompressed_length, OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 		goto done;
 
@@ -235,36 +241,30 @@ done:
     zippath_fopen - opens a zip path file
 -------------------------------------------------*/
 
-file_error zippath_fopen(const char *filename, UINT32 openflags, core_file **file, astring *revised_path)
+file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&file, astring &revised_path)
 {
 	file_error filerr = FILERR_NOT_FOUND;
 	zip_error ziperr;
 	zip_file *zip = NULL;
 	const zip_file_header *header;
 	osd_dir_entry_type entry_type;
-	astring *mainpath;
-	astring *subpath;
-	astring *temp;
-	astring *temp2;
 	char *alloc_fullpath = NULL;
 	int len;
 
 	/* first, set up the two types of paths */
-	mainpath = astring_cpyc(astring_alloc(), filename);
-	subpath = astring_alloc();
-	temp = astring_alloc();
-	temp2 = astring_alloc();
-	*file = NULL;
+	astring mainpath(filename);
+	astring subpath;
+	file = NULL;
 
 	/* loop through */
-	while((*file == NULL) && (astring_len(mainpath) > 0)
-		&& ((openflags == OPEN_FLAG_READ) || (astring_len(subpath) == 0)))
+	while((file == NULL) && (mainpath.len() > 0)
+		&& ((openflags == OPEN_FLAG_READ) || (subpath.len() == 0)))
 	{
 		/* is the mainpath a ZIP path? */
-		if (is_zip_file(astring_c(mainpath)))
+		if (is_zip_file(mainpath))
 		{
 			/* this file might be a zip file - lets take a look */
-			ziperr = zip_file_open(astring_c(mainpath), &zip);
+			ziperr = zip_file_open(mainpath, &zip);
 			if (ziperr == ZIPERR_NONE)
 			{
 				/* it is a zip file - error if we're not opening for reading */
@@ -274,8 +274,8 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file **fil
 					goto done;
 				}
 
-				if (astring_len(subpath) > 0)
-					header = zippath_find_sub_path(zip, astring_c(subpath), &entry_type);
+				if (subpath.len() > 0)
+					header = zippath_find_sub_path(zip, subpath, &entry_type);
 				else
 					header = zip_file_first_file(zip);
 
@@ -291,16 +291,16 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file **fil
 					goto done;
 
 				/* update subpath, if appropriate */
-				if (astring_len(subpath) == 0)
-					astring_cpyc(subpath, header->filename);
+				if (subpath.len() == 0)
+					subpath.cpy(header->filename);
 
 				/* we're done */
 				goto done;
 			}
 		}
 
-		if (astring_len(subpath) == 0)
-			filerr = core_fopen(filename, openflags, file);
+		if (subpath.len() == 0)
+			filerr = core_fopen(filename, openflags, &file);
 		else
 			filerr = FILERR_NOT_FOUND;
 
@@ -308,56 +308,45 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file **fil
 		if (filerr != FILERR_NONE)
 		{
 			/* go up a directory */
-			zippath_parent(temp, astring_c(mainpath));
+			astring temp;
+			zippath_parent(temp, mainpath);
 
 			/* append to the sub path */
-			if (astring_len(subpath) > 0)
+			if (subpath.len() > 0)
 			{
-				astring_assemble_3(temp2, astring_c(mainpath) + astring_len(temp), PATH_SEPARATOR, astring_c(subpath));
-				astring_cpy(subpath, temp2);
+				astring temp2;
+				temp2.cpysubstr(mainpath, temp.len()).cat(PATH_SEPARATOR).cat(subpath);
+				subpath.cpy(temp2);
 			}
 			else
-			{
-				astring_cpyc(subpath, astring_c(mainpath) + astring_len(temp));
-			}
+				subpath.cpysubstr(mainpath, temp.len());
 
 			/* get the new main path, truncating path separators */
-			len = astring_len(temp);
-			while((len > 0) && is_zip_file_separator(astring_c(temp)[len - 1]))
+			len = temp.len();
+			while (len > 0 && is_zip_file_separator(temp[len - 1]))
 				len--;
-			astring_cpych(mainpath, astring_c(temp), len);
+			mainpath.cpysubstr(temp, 0, len);
 		}
 	}
 
 done:
-	/* store the revised path if appropriate */
-	if (revised_path != NULL)
+	/* store the revised path */
+	revised_path.reset();
+	if (filerr == FILERR_NONE)
 	{
-		astring_cpyc(revised_path, "");
+		/* cannonicalize mainpath */
+		filerr = osd_get_full_path(&alloc_fullpath, mainpath);
 		if (filerr == FILERR_NONE)
 		{
-			/* cannonicalize mainpath */
-			filerr = osd_get_full_path(&alloc_fullpath, astring_c(mainpath));
-			if (filerr == FILERR_NONE)
-			{
-				if (astring_len(subpath) > 0)
-					astring_assemble_3(revised_path, alloc_fullpath, PATH_SEPARATOR, astring_c(subpath));
-				else
-					astring_cpyc(revised_path, alloc_fullpath);
-			}
+			if (subpath.len() > 0)
+				revised_path.cpy(alloc_fullpath).cat(PATH_SEPARATOR).cat(subpath);
+			else
+				revised_path.cpy(alloc_fullpath);
 		}
 	}
 
 	if (zip != NULL)
 		zip_file_close(zip);
-	if (mainpath != NULL)
-		astring_free(mainpath);
-	if (subpath != NULL)
-		astring_free(subpath);
-	if (temp != NULL)
-		astring_free(temp);
-	if (temp2 != NULL)
-		astring_free(temp2);
 	if (alloc_fullpath != NULL)
 		osd_free(alloc_fullpath);
 	return filerr;
@@ -526,32 +515,32 @@ static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const cha
     true path and ZIP entry components
 -------------------------------------------------*/
 
-static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_type,
-	zip_file **zipfile, astring *newpath)
+static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_type, zip_file *&zipfile, astring &newpath)
 {
 	file_error err;
 	osd_directory_entry *current_entry = NULL;
 	osd_dir_entry_type current_entry_type;
-	astring *apath = astring_cpyc(astring_alloc(), path);
-	astring *apath_trimmed = astring_alloc();
-	astring *parent = NULL;
 	int went_up = FALSE;
 	int i;
+	
+	newpath.reset();
 
 	/* be conservative */
-	*entry_type = ENTTYPE_NONE;
-	*zipfile = NULL;
+	entry_type = ENTTYPE_NONE;
+	zipfile = NULL;
 
+	astring apath(path);
+	astring apath_trimmed;
 	do
 	{
 		/* trim the path of trailing path separators */
-		i = astring_len(apath);
-		while((i > 1) && is_path_separator(astring_c(apath)[i - 1]))
+		i = apath.len();
+		while (i > 1 && is_path_separator(apath[i - 1]))
 			i--;
-		apath_trimmed = astring_cpysubstr(apath_trimmed, apath, 0, i);
+		apath_trimmed.cpysubstr(apath, 0, i);
 
 		/* stat the path */
-		current_entry = osd_stat(astring_c(apath_trimmed));
+		current_entry = osd_stat(apath_trimmed);
 
 		/* did we find anything? */
 		if (current_entry != NULL)
@@ -566,12 +555,11 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 			/* if we have not found the file or directory, go up */
 			current_entry_type = ENTTYPE_NONE;
 			went_up = TRUE;
-			parent = zippath_parent(astring_alloc(), astring_c(apath));
-			astring_free(apath);
-			apath = parent;
+			astring parent;
+			apath.cpy(zippath_parent(parent, apath));
 		}
 	}
-	while((current_entry_type == ENTTYPE_NONE) && (apath != NULL) && !is_root(astring_c(apath)));
+	while (current_entry_type == ENTTYPE_NONE && !is_root(apath));
 
 	/* if we did not find anything, then error out */
 	if (current_entry_type == ENTTYPE_NONE)
@@ -581,16 +569,16 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 	}
 
 	/* is this file a ZIP file? */
-	if ((current_entry_type == ENTTYPE_FILE) && is_zip_file(astring_c(apath_trimmed))
-		&& (zip_file_open(astring_c(apath_trimmed), zipfile) == ZIPERR_NONE))
+	if ((current_entry_type == ENTTYPE_FILE) && is_zip_file(apath_trimmed)
+		&& (zip_file_open(apath_trimmed, &zipfile) == ZIPERR_NONE))
 	{
-		i = strlen(path + astring_len(apath));
-		while((i > 0) && is_zip_path_separator(path[astring_len(apath) + i - 1]))
+		i = strlen(path + apath.len());
+		while (i > 0 && is_zip_path_separator(path[apath.len() + i - 1]))
 			i--;
-		astring_cpych(newpath, path + astring_len(apath), i);
+		newpath.cpy(path + apath.len(), i);
 
 		/* this was a true ZIP path - attempt to identify the type of path */
-		zippath_find_sub_path(*zipfile, astring_c(newpath), &current_entry_type);
+		zippath_find_sub_path(zipfile, newpath, &current_entry_type);
 		if (current_entry_type == ENTTYPE_NONE)
 		{
 			err = FILERR_NOT_FOUND;
@@ -605,18 +593,14 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 			err = FILERR_NOT_FOUND;
 			goto done;
 		}
-		astring_cpyc(newpath, path);
+		newpath.cpy(path);
 	}
 
 	/* success! */
-	*entry_type = current_entry_type;
+	entry_type = current_entry_type;
 	err = FILERR_NONE;
 
 done:
-	if (apath != NULL)
-		astring_free(apath);
-	if (apath_trimmed != NULL)
-		astring_free(apath_trimmed);
 	return err;
 }
 
@@ -628,21 +612,18 @@ done:
 file_error zippath_opendir(const char *path, zippath_directory **directory)
 {
 	file_error err;
-	osd_dir_entry_type entry_type;
-	astring *newpath = astring_alloc();
-	zippath_directory *result;
 
 	/* allocate a directory */
-	result = (zippath_directory *) malloc(sizeof(*result));
+	zippath_directory *result = new(std::nothrow) zippath_directory;
 	if (result == NULL)
 	{
 		err = FILERR_OUT_OF_MEMORY;
 		goto done;
 	}
-	memset(result, 0, sizeof(*result));
 
 	/* resolve the path */
-	err = zippath_resolve(path, &entry_type, &result->zipfile, newpath);
+	osd_dir_entry_type entry_type;
+	err = zippath_resolve(path, entry_type, result->zipfile, result->zipprefix);
 	if (err != FILERR_NONE)
 		goto done;
 
@@ -654,12 +635,7 @@ file_error zippath_opendir(const char *path, zippath_directory **directory)
 	}
 
 	/* was the result a ZIP? */
-	if (result->zipfile != NULL)
-	{
-		result->zipprefix = newpath;
-		newpath = NULL;
-	}
-	else
+	if (result->zipfile == NULL)
 	{
 		/* a conventional directory */
 		result->directory = osd_opendir(path);
@@ -671,19 +647,14 @@ file_error zippath_opendir(const char *path, zippath_directory **directory)
 
 		/* is this path the root? if so, pretend we've already returned the parent */
 		if (is_root(path))
-			result->returned_parent = TRUE;
+			result->returned_parent = true;
 	}
 
 done:
-	if (((directory == NULL) || (err != FILERR_NONE)) && (result != NULL))
+	if ((directory == NULL || err != FILERR_NONE) && result != NULL)
 	{
 		zippath_closedir(result);
 		result = NULL;
-	}
-	if (newpath != NULL)
-	{
-		astring_free(newpath);
-		newpath = NULL;
 	}
 	if (directory != NULL)
 		*directory = result;
@@ -697,25 +668,20 @@ done:
 
 void zippath_closedir(zippath_directory *directory)
 {
-	zippath_returned_directory *dirlist;
-
 	if (directory->directory != NULL)
 		osd_closedir(directory->directory);
 
 	if (directory->zipfile != NULL)
 		zip_file_close(directory->zipfile);
 
-	if (directory->zipprefix != NULL)
-		astring_free(directory->zipprefix);
-
-	while(directory->returned_dirlist != NULL)
+	while (directory->returned_dirlist != NULL)
 	{
-		dirlist = directory->returned_dirlist;
+		zippath_returned_directory *dirlist = directory->returned_dirlist;
 		directory->returned_dirlist = directory->returned_dirlist->next;
-		free(dirlist);
+		delete dirlist;
 	}
 
-	free(directory);
+	delete directory;
 }
 
 
@@ -728,10 +694,10 @@ void zippath_closedir(zippath_directory *directory)
 static const char *get_relative_path(zippath_directory *directory, const zip_file_header *header)
 {
 	const char *result = NULL;
-	int len = astring_len(directory->zipprefix);
+	int len = directory->zipprefix.len();
 
 	if ((len <= strlen(header->filename))
-		&& !strncmp(astring_c(directory->zipprefix), header->filename, len))
+		&& !strncmp(directory->zipprefix, header->filename, len))
 	{
 		result = &header->filename[len];
 		while(is_zip_file_separator(*result))
@@ -758,7 +724,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 	if (!directory->returned_parent)
 	{
 		/* first thing's first - return parent directory */
-		directory->returned_parent = TRUE;
+		directory->returned_parent = true;
 		memset(&directory->returned_entry, 0, sizeof(directory->returned_entry));
 		directory->returned_entry.name = "..";
 		directory->returned_entry.type = ENTTYPE_DIR;
@@ -793,7 +759,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 					header = zip_file_first_file(directory->zipfile);
 				else
 					header = zip_file_next_file(directory->zipfile);
-				directory->called_zip_first = TRUE;
+				directory->called_zip_first = true;
 				relpath = NULL;
 			}
 			while((header != NULL) && ((relpath = get_relative_path(directory, header)) == NULL));
@@ -817,10 +783,9 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 					if (rdent == NULL)
 					{
 						/* we've found a new directory; add this to returned_dirlist */
-						rdent = (zippath_returned_directory *)malloc(sizeof(*rdent) + (separator - relpath));
+						rdent = new zippath_returned_directory;
 						rdent->next = directory->returned_dirlist;
-						memcpy(rdent->name, relpath, (separator - relpath) * sizeof(rdent->name[0]));
-						rdent->name[separator - relpath] = '\0';
+						rdent->name.cpy(relpath, separator - relpath);
 						directory->returned_dirlist = rdent;
 
 						/* ...and return it */

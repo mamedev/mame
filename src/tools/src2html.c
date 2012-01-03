@@ -67,7 +67,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-enum _file_type
+enum file_type
 {
 	FILE_TYPE_INVALID,
 	FILE_TYPE_C,
@@ -75,38 +75,33 @@ enum _file_type
 	FILE_TYPE_XML,
 	FILE_TYPE_TEXT
 };
-typedef enum _file_type file_type;
 
 
-typedef struct _ext_to_type ext_to_type;
-struct _ext_to_type
+struct ext_to_type
 {
 	const char *	extension;
 	file_type		type;
 };
 
 
-typedef struct _token_entry token_entry;
-struct _token_entry
+struct token_entry
 {
 	const char *	token;
 	const char *	color;
 };
 
 
-typedef struct _include_path include_path;
-struct _include_path
+struct include_path
 {
 	include_path *	next;
-	const astring *	path;
+	astring  		path;
 };
 
 
-typedef struct _list_entry list_entry;
-struct _list_entry
+struct list_entry
 {
 	list_entry *	next;
-	const astring *	name;
+	astring 		name;
 };
 
 
@@ -234,18 +229,18 @@ static const token_entry c_token_table[] =
     PROTOTYPES
 ***************************************************************************/
 
-/* core output functions */
-static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, const astring *dstdir, const astring *tempheader, const astring *tempfooter);
-static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, int link_to_file, const astring *tempheader, const astring *tempfooter);
+// core output functions
+static int recurse_dir(int srcrootlen, int dstrootlen, astring &srcdir, astring &dstdir, astring &tempheader, astring &tempfooter);
+static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &srcfile, astring &dstfile, bool link_to_file, astring &tempheader, astring &tempfooter);
 
-/* HTML helpers */
-static core_file *create_file_and_output_header(const astring *filename, const astring *templatefile, const astring *path);
-static void output_footer_and_close_file(core_file *file, const astring *templatefile, const astring *path);
+// HTML helpers
+static core_file *create_file_and_output_header(astring &filename, astring &templatefile, astring &path);
+static void output_footer_and_close_file(core_file *file, astring &templatefile, astring &path);
 
-/* path helpers */
-static const astring *normalized_subpath(const astring *path, int start);
-static void output_path_as_links(core_file *file, const astring *path, int end_is_directory, int link_to_file);
-static astring *find_include_file(int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, const astring *filename);
+// path helpers
+static astring &normalized_subpath(astring &dest, astring &path, int start);
+static void output_path_as_links(core_file *file, astring &path, bool end_is_directory, bool link_to_file);
+static bool find_include_file(astring &srcincpath, int srcrootlen, int dstrootlen, astring &srcfile, astring &dstfile, astring &filename);
 
 
 
@@ -257,93 +252,84 @@ static astring *find_include_file(int srcrootlen, int dstrootlen, const astring 
     main - main entry point
 -------------------------------------------------*/
 
+void usage(const char *argv0)
+{
+	fprintf(stderr, "Usage:\n%s <srcroot> <destroot> <template.html> [-Iincpath [-Iincpath [...]]]\n", argv0);
+	exit(1);
+}
+
 int main(int argc, char *argv[])
 {
-	astring *srcdir = NULL, *dstdir = NULL, *tempfilename = NULL, *tempheader = NULL, *tempfooter = NULL;
-	int unadorned = 0;
-	UINT32 bufsize;
-	void *buffer;
-	int result;
-	int argnum;
+	// loop over arguments
 	include_path **incpathhead = &incpaths;
-
-	/* loop over arguments */
-	for (argnum = 1; argnum < argc; argnum++)
+	astring srcdir, dstdir, tempfilename, tempheader, tempfooter;
+	int unadorned = 0;
+	for (int argnum = 1; argnum < argc; argnum++)
 	{
 		char *arg = argv[argnum];
 
-		/* include path? */
+		// include path?
 		if (arg[0] == '-' && arg[1] == 'I')
 		{
-			*incpathhead = (include_path *)malloc(sizeof(**incpathhead));
+			*incpathhead = new include_path;
 			if (*incpathhead != NULL)
 			{
 				(*incpathhead)->next = NULL;
-				(*incpathhead)->path = astring_replacechr(astring_dupc(&arg[2]), '/', PATH_SEPARATOR[0]);
+				(*incpathhead)->path.cpy(&arg[2]).replacechr('/', PATH_SEPARATOR[0]);
 				incpathhead = &(*incpathhead)->next;
 			}
 		}
 
-		/* other parameter */
+		// other parameter
 		else if (arg[0] != '-' && unadorned == 0)
 		{
-			srcdir = astring_dupc(arg);
+			srcdir.cpy(arg);
 			unadorned++;
 		}
 		else if (arg[0] != '-' && unadorned == 1)
 		{
-			dstdir = astring_dupc(arg);
+			dstdir.cpy(arg);
 			unadorned++;
 		}
 		else if (arg[0] != '-' && unadorned == 2)
 		{
-			tempfilename = astring_dupc(arg);
+			tempfilename.cpy(arg);
 			unadorned++;
 		}
 		else
-			goto usage;
+			usage(argv[0]);
 	}
 
-	/* make sure we got 3 parameters */
-	if (srcdir == NULL || dstdir == NULL || tempfilename == NULL)
-		goto usage;
+	// make sure we got 3 parameters
+	if (srcdir.len() == 0 || dstdir.len() == 0 || tempfilename.len() == 0)
+		usage(argv[0]);
 
-	/* read the template file into an astring */
-	if (core_fload(astring_c(tempfilename), &buffer, &bufsize) == FILERR_NONE)
+	// read the template file into an astring
+	UINT32 bufsize;
+	void *buffer;
+	if (core_fload(tempfilename, &buffer, &bufsize) == FILERR_NONE)
 	{
-		tempheader = astring_dupch((const char *)buffer, bufsize);
+		tempheader.cpy((const char *)buffer, bufsize);
 		osd_free(buffer);
 	}
 
-	/* verify the template */
-	if (tempheader == NULL)
+	// verify the template
+	if (tempheader.len() == 0)
 	{
 		fprintf(stderr, "Unable to read template file\n");
 		return 1;
 	}
-	result = astring_findc(tempheader, 0, "<!--CONTENT-->");
+	int result = tempheader.find(0, "<!--CONTENT-->");
 	if (result == -1)
 	{
 		fprintf(stderr, "Template is missing a <!--CONTENT--> marker\n");
 		return 1;
 	}
-	tempfooter = astring_substr(astring_dup(tempheader), result + 14, -1);
-	tempheader = astring_substr(tempheader, 0, result);
+	tempfooter.cpy(tempheader).substr(result + 14, -1);
+	tempheader.substr(0, result);
 
-	/* recurse over subdirectories */
-	result = recurse_dir(astring_len(srcdir), astring_len(dstdir), srcdir, dstdir, tempheader, tempfooter);
-
-	/* free source and destination directories */
-	astring_free(srcdir);
-	astring_free(dstdir);
-	astring_free(tempfilename);
-	astring_free(tempheader);
-	astring_free(tempfooter);
-	return result;
-
-usage:
-	fprintf(stderr, "Usage:\n%s <srcroot> <destroot> <template.html> [-Iincpath [-Iincpath [...]]]\n", argv[0]);
-	return 1;
+	// recurse over subdirectories
+	return recurse_dir(srcdir.len(), dstdir.len(), srcdir, dstdir, tempheader, tempfooter);
 }
 
 
@@ -356,7 +342,7 @@ static int compare_list_entries(const void *p1, const void *p2)
 {
 	const list_entry *entry1 = *(const list_entry **)p1;
 	const list_entry *entry2 = *(const list_entry **)p2;
-	return strcmp(astring_c(entry1->name), astring_c(entry2->name));
+	return entry1->name.cmp(entry2->name);
 }
 
 
@@ -364,156 +350,136 @@ static int compare_list_entries(const void *p1, const void *p2)
     recurse_dir - recurse through a directory
 -------------------------------------------------*/
 
-static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, const astring *dstdir, const astring *tempheader, const astring *tempfooter)
+static int recurse_dir(int srcrootlen, int dstrootlen, astring &srcdir, astring &dstdir, astring &tempheader, astring &tempfooter)
 {
 	static const osd_dir_entry_type typelist[] = { ENTTYPE_DIR, ENTTYPE_FILE };
-	const astring *srcdir_subpath;
-	core_file *indexfile = NULL;
-	astring *indexname;
-	int result = 0;
-	int entindex;
 
-	/* extract a normalized subpath */
-	srcdir_subpath = normalized_subpath(srcdir, srcrootlen + 1);
-	if (srcdir_subpath == NULL)
-		return 1;
+	// extract a normalized subpath
+	astring srcdir_subpath;
+	normalized_subpath(srcdir_subpath, srcdir, srcrootlen + 1);
 
-	/* create an index file */
-	indexname = astring_alloc();
-	astring_printf(indexname, "%s%c%s", astring_c(dstdir), PATH_SEPARATOR[0], "index.html");
-	indexfile = create_file_and_output_header(indexname, tempheader, srcdir_subpath);
-	astring_free(indexname);
+	// create an index file
+	astring indexname;
+	indexname.printf("%s%c%s", dstdir.cstr(), PATH_SEPARATOR[0], "index.html");
+	core_file *indexfile = create_file_and_output_header(indexname, tempheader, srcdir_subpath);
 
-	/* output the directory navigation */
+	// output the directory navigation
 	core_fprintf(indexfile, "<h3>Viewing Directory: ");
-	output_path_as_links(indexfile, srcdir_subpath, TRUE, FALSE);
+	output_path_as_links(indexfile, srcdir_subpath, true, false);
 	core_fprintf(indexfile, "</h3>");
 
-	/* iterate first over directories, then over files */
-	for (entindex = 0; entindex < ARRAY_LENGTH(typelist) && result == 0; entindex++)
+	// iterate first over directories, then over files
+	int result = 0;
+	for (int entindex = 0; entindex < ARRAY_LENGTH(typelist) && result == 0; entindex++)
 	{
 		osd_dir_entry_type entry_type = typelist[entindex];
-		const osd_directory_entry *entry;
-		list_entry **listarray = NULL;
-		list_entry *list = NULL;
-		list_entry *curlist;
-		osd_directory *dir;
-		int found = 0;
 
-		/* open the directory and iterate through it */
-		dir = osd_opendir(astring_c(srcdir));
+		// open the directory and iterate through it
+		osd_directory *dir = osd_opendir(srcdir);
 		if (dir == NULL)
 		{
 			result = 1;
-			goto error;
+			break;
 		}
 
-		/* build up the list of files */
+		// build up the list of files
+		const osd_directory_entry *entry;
+		int found = 0;
+		list_entry *list = NULL;
 		while ((entry = osd_readdir(dir)) != NULL)
 			if (entry->type == entry_type && entry->name[0] != '.')
 			{
-				list_entry *lentry = (list_entry *)malloc(sizeof(*lentry));
-				lentry->name = astring_dupc(entry->name);
+				list_entry *lentry = new list_entry;
+				lentry->name.cpy(entry->name);
 				lentry->next = list;
 				list = lentry;
 				found++;
 			}
 
-		/* close the directory */
+		// close the directory
 		osd_closedir(dir);
 
-		/* skip if nothing found */
+		// skip if nothing found
 		if (found == 0)
 			continue;
 
-		/* allocate memory for sorting */
-		listarray = (list_entry **)malloc(sizeof(list_entry *) * found);
+		// allocate memory for sorting
+		list_entry **listarray = new list_entry *[found];
 		found = 0;
-		for (curlist = list; curlist != NULL; curlist = curlist->next)
+		for (list_entry *curlist = list; curlist != NULL; curlist = curlist->next)
 			listarray[found++] = curlist;
 
-		/* sort the list */
+		// sort the list
 		qsort(listarray, found, sizeof(listarray[0]), compare_list_entries);
 
-		/* rebuild the list */
+		// rebuild the list
 		list = NULL;
 		while (--found >= 0)
 		{
 			listarray[found]->next = list;
 			list = listarray[found];
 		}
-		free(listarray);
+		delete[] listarray;
 
-		/* iterate through each file */
-		for (curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
+		// iterate through each file
+		for (list_entry *curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
 		{
-			astring *srcfile, *dstfile;
-
-			/* add a header */
+			// add a header
 			if (curlist == list)
 				core_fprintf(indexfile, "\t<h2>%s</h2>\n\t<ul>\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
 
-			/* build the source filename */
-			srcfile = astring_alloc();
-			astring_printf(srcfile, "%s%c%s", astring_c(srcdir), PATH_SEPARATOR[0], astring_c(curlist->name));
+			// build the source filename
+			astring srcfile;
+			srcfile.printf("%s%c%s", srcdir.cstr(), PATH_SEPARATOR[0], curlist->name.cstr());
 
-			/* if we have a file, output it */
-			dstfile = astring_alloc();
+			// if we have a file, output it
+			astring dstfile;
 			if (entry_type == ENTTYPE_FILE)
 			{
+				// make sure we care, first
 				file_type type = FILE_TYPE_INVALID;
-				int extnum;
-
-				/* make sure we care, first */
-				for (extnum = 0; extnum < ARRAY_LENGTH(extension_lookup); extnum++)
-					if (core_filename_ends_with(astring_c(curlist->name), extension_lookup[extnum].extension))
+				for (int extnum = 0; extnum < ARRAY_LENGTH(extension_lookup); extnum++)
+					if (core_filename_ends_with(curlist->name, extension_lookup[extnum].extension))
 					{
 						type = extension_lookup[extnum].type;
 						break;
 					}
 
-				/* if we got a valid file, process it */
+				// if we got a valid file, process it
 				if (type != FILE_TYPE_INVALID)
 				{
-					astring_printf(dstfile, "%s%c%s.html", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
+					dstfile.printf("%s%c%s.html", dstdir.cstr(), PATH_SEPARATOR[0], curlist->name.cstr());
 					if (indexfile != NULL)
-						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
-					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, astring_cmp(srcdir, dstdir) == 0, tempheader, tempfooter);
+						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", curlist->name.cstr(), curlist->name.cstr());
+					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, srcdir == dstdir, tempheader, tempfooter);
 				}
 			}
 
-			/* if we have a directory, recurse */
+			// if we have a directory, recurse
 			else
 			{
-				astring_printf(dstfile, "%s%c%s", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
+				dstfile.printf("%s%c%s", dstdir.cstr(), PATH_SEPARATOR[0], curlist->name.cstr());
 				if (indexfile != NULL)
-					core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
+					core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", curlist->name.cstr(), curlist->name.cstr());
 				result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile, tempheader, tempfooter);
 			}
-
-			/* free memory for the names */
-			astring_free(srcfile);
-			astring_free(dstfile);
 		}
 
-		/* close the list if we found some stuff */
+		// close the list if we found some stuff
 		if (list != NULL)
 			core_fprintf(indexfile, "\t</ul>\n");
 
-		/* free all the allocated entries */
+		// free all the allocated entries
 		while (list != NULL)
 		{
 			list_entry *next = list->next;
-			astring_free((astring *)list->name);
-			free(list);
+			delete list;
 			list = next;
 		}
 	}
 
-error:
 	if (indexfile != NULL)
 		output_footer_and_close_file(indexfile, tempfooter, srcdir_subpath);
-	astring_free((astring *)srcdir_subpath);
 	return result;
 }
 
@@ -523,41 +489,30 @@ error:
     HTML
 -------------------------------------------------*/
 
-static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, int link_to_file, const astring *tempheader, const astring *tempfooter)
+static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &srcfile, astring &dstfile, bool link_to_file, astring &tempheader, astring &tempfooter)
 {
-	const char *comment_start, *comment_end, *comment_inline, *token_chars;
-	const char *comment_start_esc, *comment_end_esc, *comment_inline_esc;
-	const token_entry *token_table;
-	const astring *srcfile_subpath;
-	char srcline[4096], *srcptr;
-	int in_comment = FALSE;
-	UINT8 is_token[256];
-	int color_quotes;
-	core_file *src;
-	core_file *dst;
-	int toknum;
-	int linenum = 1;
+	// extract a normalized subpath
+	astring srcfile_subpath;
+	normalized_subpath(srcfile_subpath, srcfile, srcrootlen + 1);
 
-	/* extract a normalized subpath */
-	srcfile_subpath = normalized_subpath(srcfile, srcrootlen + 1);
-	if (srcfile_subpath == NULL)
-		return 1;
+	fprintf(stderr, "Processing %s\n", srcfile_subpath.cstr());
 
-	fprintf(stderr, "Processing %s\n", astring_c(srcfile_subpath));
+	// set some defaults
+	bool color_quotes = false;
+	const char *comment_start = "";
+	const char *comment_start_esc = "";
+	const char *comment_end = "";
+	const char *comment_end_esc = "";
+	const char *comment_inline = "";
+	const char *comment_inline_esc = "";
+	const char *token_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#";
+	const token_entry *token_table = dummy_token_table;
 
-	/* set some defaults */
-	color_quotes = FALSE;
-	comment_start = comment_start_esc = "";
-	comment_end = comment_end_esc = "";
-	comment_inline = comment_inline_esc = "";
-	token_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#";
-	token_table = dummy_token_table;
-
-	/* based on the file type, set the comment info */
+	// based on the file type, set the comment info
 	switch (type)
 	{
 		case FILE_TYPE_C:
-			color_quotes = TRUE;
+			color_quotes = true;
 			comment_start = comment_start_esc = "/*";
 			comment_end = comment_end_esc = "*/";
 			comment_inline = comment_inline_esc = "//";
@@ -565,12 +520,12 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 			break;
 
 		case FILE_TYPE_MAKE:
-			color_quotes = TRUE;
+			color_quotes = true;
 			comment_inline = comment_inline_esc = "#";
 			break;
 
 		case FILE_TYPE_XML:
-			color_quotes = TRUE;
+			color_quotes = true;
 			comment_start = "<!--";
 			comment_start_esc = "&lt;!--";
 			comment_end = "-->";
@@ -582,207 +537,208 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 			break;
 	}
 
-	/* make the token lookup table */
+	// make the token lookup table
+	bool is_token[256];
 	memset(is_token, 0, sizeof(is_token));
-	for (toknum = 0; token_chars[toknum] != 0; toknum++)
-		is_token[(UINT8)token_chars[toknum]] = TRUE;
+	for (int toknum = 0; token_chars[toknum] != 0; toknum++)
+		is_token[(UINT8)token_chars[toknum]] = true;
 
-	/* open the source file */
-	if (core_fopen(astring_c(srcfile), OPEN_FLAG_READ, &src) != FILERR_NONE)
+	// open the source file
+	core_file *src;
+	if (core_fopen(srcfile, OPEN_FLAG_READ, &src) != FILERR_NONE)
 	{
-		fprintf(stderr, "Unable to read file '%s'\n", astring_c(srcfile));
+		fprintf(stderr, "Unable to read file '%s'\n", srcfile.cstr());
 		return 1;
 	}
 
-	/* open the output file */
-	dst = create_file_and_output_header(dstfile, tempheader, srcfile_subpath);
+	// open the output file
+	core_file *dst = create_file_and_output_header(dstfile, tempheader, srcfile_subpath);
 	if (dst == NULL)
 	{
-		fprintf(stderr, "Unable to write file '%s'\n", astring_c(dstfile));
+		fprintf(stderr, "Unable to write file '%s'\n", dstfile.cstr());
 		core_fclose(src);
 		return 1;
 	}
 
-	/* output the directory navigation */
+	// output the directory navigation
 	core_fprintf(dst, "<h3>Viewing File: ");
-	output_path_as_links(dst, srcfile_subpath, FALSE, link_to_file);
+	output_path_as_links(dst, srcfile_subpath, false, link_to_file);
 	core_fprintf(dst, "</h3>");
 
-	/* start with some tags */
+	// start with some tags
 	core_fprintf(dst, "\t<pre class=\"source\">\n");
 
-	/* iterate over lines in the source file */
+	// iterate over lines in the source file
+	int linenum = 1;
+	bool in_comment = false;
+	char srcline[4096];
 	while (core_fgets(srcline, ARRAY_LENGTH(srcline), src) != NULL)
 	{
-		char dstline[4096], *dstptr = dstline;
-		int in_inline_comment = FALSE;
-		int last_token_was_include = FALSE;
-		int last_was_token = FALSE;
-		int quotes_are_linked = FALSE;
-		char in_quotes = 0;
+		// start with the line number
+		astring dstline;
+		dstline.catprintf("<span class=\"linenum\">%5d</span>&nbsp;&nbsp;", linenum++);
+
+		// iterate over characters in the source line
+		bool escape = false;
+		bool in_quotes = false;
+		bool in_inline_comment = false;
+		bool last_token_was_include = false;
+		bool last_was_token = false;
+		bool quotes_are_linked = false;
 		int curcol = 0;
-		int escape = 0;
-
-		/* start with the line number */
-		dstptr += sprintf(dstptr, "<span class=\"linenum\">%5d</span>&nbsp;&nbsp;", linenum++);
-
-		/* iterate over characters in the source line */
-		for (srcptr = srcline; *srcptr != 0; )
+		for (char *srcptr = srcline; *srcptr != 0; )
 		{
 			UINT8 ch = *srcptr++;
 
-			/* track whether or not we are within an extended (C-style) comment */
+			// track whether or not we are within an extended (C-style) comment
 			if (!in_quotes && !in_inline_comment)
 			{
 				if (!in_comment && ch == comment_start[0] && strncmp(srcptr - 1, comment_start, strlen(comment_start)) == 0)
 				{
-					dstptr += sprintf(dstptr, "<span class=\"comment\">%s", comment_start_esc);
+					dstline.catprintf("<span class=\"comment\">%s", comment_start_esc);
 					curcol += strlen(comment_start);
 					srcptr += strlen(comment_start) - 1;
 					ch = 0;
-					in_comment = TRUE;
+					in_comment = true;
 				}
 				else if (in_comment && ch == comment_end[0] && strncmp(srcptr - 1, comment_end, strlen(comment_end)) == 0)
 				{
-					dstptr += sprintf(dstptr, "%s</span>", comment_end_esc);
+					dstline.catprintf("%s</span>", comment_end_esc);
 					curcol += strlen(comment_end);
 					srcptr += strlen(comment_end) - 1;
 					ch = 0;
-					in_comment = FALSE;
+					in_comment = false;
 				}
 			}
 
-			/* track whether or not we are within an inline (C++-style) comment */
+			// track whether or not we are within an inline (C++-style) comment
 			if (!in_quotes && !in_comment && !in_inline_comment && ch == comment_inline[0] && strncmp(srcptr - 1, comment_inline, strlen(comment_inline)) == 0)
 			{
-				dstptr += sprintf(dstptr, "<span class=\"comment\">%s", comment_inline_esc);
+				dstline.catprintf("<span class=\"comment\">%s", comment_inline_esc);
 				curcol += strlen(comment_inline);
 				srcptr += strlen(comment_inline) - 1;
 				ch = 0;
-				in_inline_comment = TRUE;
+				in_inline_comment = true;
 			}
 
-			/* if this is the start of a new token, see if we want to color it */
+			// if this is the start of a new token, see if we want to color it
 			if (!in_quotes && !in_comment && !in_inline_comment && !last_was_token && is_token[ch])
 			{
 				const token_entry *curtoken;
 				char *temp = srcptr;
 				int toklength;
 
-				/* find the end of the token */
+				// find the end of the token
 				while (*temp != 0 && is_token[(UINT8)*temp])
 					temp++;
 				toklength = temp - (srcptr - 1);
 
-				/* scan the token table */
-				last_token_was_include = FALSE;
+				// scan the token table
+				last_token_was_include = false;
 				for (curtoken = token_table; curtoken->token != NULL; curtoken++)
 					if (strncmp(srcptr - 1, curtoken->token, toklength) == 0 && strlen(curtoken->token) == toklength)
 					{
-						dstptr += sprintf(dstptr, "<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
+						dstline.catprintf("<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
 						curcol += strlen(curtoken->token);
 						srcptr += strlen(curtoken->token) - 1;
 						ch = 0;
 
-						/* look for include tokens specially */
+						// look for include tokens specially
 						if (type == FILE_TYPE_C && strcmp(curtoken->token, "#include") == 0)
-							last_token_was_include = TRUE;
+							last_token_was_include = true;
 						break;
 					}
 			}
 			last_was_token = is_token[ch];
 
-			/* if we hit a tab, expand it */
+			// if we hit a tab, expand it
 			if (ch == 0x09)
 			{
-				/* compute how many spaces */
+				// compute how many spaces
 				int spaces = 4 - curcol % 4;
 				while (spaces--)
 				{
-					*dstptr++ = ' ';
+					dstline.cat(' ');
 					curcol++;
 				}
 			}
 
-			/* otherwise, copy the source character */
+			// otherwise, copy the source character
 			else if (ch != 0x0a && ch != 0x0d && ch != 0)
 			{
-				/* track opening quotes */
+				// track opening quotes
 				if (!in_comment && !in_inline_comment && !in_quotes && (ch == '"' || ch == '\''))
 				{
 					if (color_quotes)
-						dstptr += sprintf(dstptr, "<span class=\"string\">%c", ch);
+						dstline.catprintf("<span class=\"string\">%c", ch);
 					else
-						*dstptr++ = ch;
+						dstline.cat(ch);
 					in_quotes = ch;
 
-					/* handle includes */
+					// handle includes
 					if (last_token_was_include)
 					{
 						char *endquote = strchr(srcptr, ch);
 						if (endquote != NULL)
 						{
-							astring *filename = astring_dupch(srcptr, endquote - srcptr);
-							astring *target = find_include_file(srcrootlen, dstrootlen, srcfile, dstfile, filename);
-							if (target != NULL)
+							astring filename(srcptr, endquote - srcptr);
+							astring target;
+							if (find_include_file(target, srcrootlen, dstrootlen, srcfile, dstfile, filename))
 							{
-								dstptr += sprintf(dstptr, "<a href=\"%s\">", astring_c(target));
-								quotes_are_linked = TRUE;
-								astring_free(target);
+								dstline.catprintf("<a href=\"%s\">", target.cstr());
+								quotes_are_linked = true;
 							}
-							astring_free(filename);
 						}
 					}
 				}
 
-				/* track closing quotes */
+				// track closing quotes
 				else if (!in_comment && !in_inline_comment && in_quotes && ch == in_quotes && !escape)
 				{
 					if (quotes_are_linked)
-						dstptr += sprintf(dstptr, "</a>");
+						dstline.catprintf("</a>");
 					if (color_quotes)
-						dstptr += sprintf(dstptr, "%c</span>", ch);
+						dstline.catprintf("%c</span>", ch);
 					else
-						*dstptr++ = ch;
+						dstline.cat(ch);
 					in_quotes = 0;
-					quotes_are_linked = FALSE;
+					quotes_are_linked = false;
 				}
 
-				/* else just output the current character */
+				// else just output the current character
 				else if (ch == '&')
-					dstptr += sprintf(dstptr, "&amp;");
+					dstline.catprintf("&amp;");
 				else if (ch == '<')
-					dstptr += sprintf(dstptr, "&lt;");
+					dstline.catprintf("&lt;");
 				else if (ch == '>')
-					dstptr += sprintf(dstptr, "&gt;");
+					dstline.catprintf("&gt;");
 				else
-					*dstptr++ = ch;
+					dstline.cat(ch);
 				curcol++;
 			}
 
-			/* Update escape state */
+			// Update escape state
 			if (in_quotes)
 				escape = (ch == '\\' && type == FILE_TYPE_C) ? !escape : 0;
 		}
 
-		/* finish inline comments */
+		// finish inline comments
 		if (in_inline_comment)
 		{
-			dstptr += sprintf(dstptr, "</span>");
-			in_inline_comment = FALSE;
+			dstline.catprintf("</span>");
+			in_inline_comment = false;
 		}
 
-		/* append a break and move on */
-		dstptr += sprintf(dstptr, "\n");
+		// append a break and move on
+		dstline.catprintf("\n");
 		core_fputs(dst, dstline);
 	}
 
-	/* close tags */
+	// close tags
 	core_fprintf(dst, "\t</pre>\n");
 
-	/* close the file */
+	// close the file
 	output_footer_and_close_file(dst, tempfooter, srcfile_subpath);
-	astring_free((astring *)srcfile_subpath);
 	core_fclose(src);
 	return 0;
 }
@@ -798,22 +754,19 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
     HTML file with a standard header
 -------------------------------------------------*/
 
-static core_file *create_file_and_output_header(const astring *filename, const astring *templatefile, const astring *path)
+static core_file *create_file_and_output_header(astring &filename, astring &templatefile, astring &path)
 {
-	astring *modified;
+	// create the indexfile
 	core_file *file;
-
-	/* create the indexfile */
-	if (core_fopen(astring_c(filename), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
+	if (core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
 		return NULL;
 
-	/* print a header */
-	modified = astring_dup(templatefile);
-	astring_replacec(modified, 0, "<!--PATH-->", astring_c(path));
-	core_fwrite(file, astring_c(modified), astring_len(modified));
+	// print a header
+	astring modified(templatefile);
+	modified.replace(0, "<!--PATH-->", path.cstr());
+	core_fwrite(file, modified.cstr(), modified.len());
 
-	/* return the file */
-	astring_free(modified);
+	// return the file
 	return file;
 }
 
@@ -823,14 +776,11 @@ static core_file *create_file_and_output_header(const astring *filename, const a
     standard footer to an HTML file and close it
 -------------------------------------------------*/
 
-static void output_footer_and_close_file(core_file *file, const astring *templatefile, const astring *path)
+static void output_footer_and_close_file(core_file *file, astring &templatefile, astring &path)
 {
-	astring *modified;
-
-	modified = astring_dup(templatefile);
-	astring_replacec(modified, 0, "<!--PATH-->", astring_c(path));
-	core_fwrite(file, astring_c(modified), astring_len(modified));
-	astring_free(modified);
+	astring modified(templatefile);
+	modified.replace(0, "<!--PATH-->", path.cstr());
+	core_fwrite(file, modified.cstr(), modified.len());
 	core_fclose(file);
 }
 
@@ -845,12 +795,9 @@ static void output_footer_and_close_file(core_file *file, const astring *templat
     forward slashes and extract a subpath
 -------------------------------------------------*/
 
-static const astring *normalized_subpath(const astring *path, int start)
+static astring &normalized_subpath(astring &dest, astring &path, int start)
 {
-	astring *result = astring_dupsubstr(path, start, -1);
-	if (result != NULL)
-		astring_replacechr(result, PATH_SEPARATOR[0], '/');
-	return result;
+	return dest.cpysubstr(path, start, -1).replacechr(PATH_SEPARATOR[0], '/');
 }
 
 
@@ -859,51 +806,45 @@ static const astring *normalized_subpath(const astring *path, int start)
     series of links
 -------------------------------------------------*/
 
-static void output_path_as_links(core_file *file, const astring *path, int end_is_directory, int link_to_file)
+static void output_path_as_links(core_file *file, astring &path, bool end_is_directory, bool link_to_file)
 {
-	astring *substr = astring_alloc();
-	int srcdepth, curdepth, depth;
-	int slashindex, lastslash;
-
-	/* first count how deep we are */
-	srcdepth = 0;
-	for (slashindex = astring_chr(path, 0, '/'); slashindex != -1; slashindex = astring_chr(path, slashindex + 1, '/'))
+	// first count how deep we are
+	int srcdepth = 0;
+	for (int slashindex = path.chr(0, '/'); slashindex != -1; slashindex = path.chr(slashindex + 1, '/'))
 		srcdepth++;
 	if (end_is_directory)
 		srcdepth++;
 
-	/* output a link to the root */
+	// output a link to the root
 	core_fprintf(file, "<a href=\"");
-	for (depth = 0; depth < srcdepth; depth++)
+	for (int depth = 0; depth < srcdepth; depth++)
 		core_fprintf(file, "../");
 	core_fprintf(file, "index.html\">&lt;root&gt;</a>/");
 
-	/* now output links to each path up the chain */
-	curdepth = 0;
-	lastslash = 0;
-	for (slashindex = astring_chr(path, lastslash, '/'); slashindex != -1; slashindex = astring_chr(path, lastslash, '/'))
+	// now output links to each path up the chain
+	int curdepth = 0;
+	int lastslash = 0;
+	for (int slashindex = path.chr(lastslash, '/'); slashindex != -1; slashindex = path.chr(lastslash, '/'))
 	{
-		astring_cpysubstr(substr, path, lastslash, slashindex - lastslash);
+		astring substr(path, lastslash, slashindex - lastslash);
 
 		curdepth++;
 		core_fprintf(file, "<a href=\"");
-		for (depth = curdepth; depth < srcdepth; depth++)
+		for (int depth = curdepth; depth < srcdepth; depth++)
 			core_fprintf(file, "../");
-		core_fprintf(file, "index.html\">%s</a>/", astring_c(substr));
+		core_fprintf(file, "index.html\">%s</a>/", substr.cstr());
 
 		lastslash = slashindex + 1;
 	}
 
-	/* and a final link to the current directory */
-	astring_cpysubstr(substr, path, lastslash, -1);
+	// and a final link to the current directory
+	astring substr(path, lastslash, -1);
 	if (end_is_directory)
-		core_fprintf(file, "<a href=\"index.html\">%s</a>", astring_c(substr));
+		core_fprintf(file, "<a href=\"index.html\">%s</a>", substr.cstr());
 	else if (link_to_file)
-		core_fprintf(file, "<a href=\"%s\">%s</a>", astring_c(substr), astring_c(substr));
+		core_fprintf(file, "<a href=\"%s\">%s</a>", substr.cstr(), substr.cstr());
 	else
-		core_fprintf(file, "<a href=\"%s.html\">%s</a>", astring_c(substr), astring_c(substr));
-
-	astring_free(substr);
+		core_fprintf(file, "<a href=\"%s.html\">%s</a>", substr.cstr(), substr.cstr());
 }
 
 
@@ -911,92 +852,78 @@ static void output_path_as_links(core_file *file, const astring *path, int end_i
     find_include_file - find an include file
 -------------------------------------------------*/
 
-static astring *find_include_file(int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, const astring *filename)
+static bool find_include_file(astring &srcincpath, int srcrootlen, int dstrootlen, astring &srcfile, astring &dstfile, astring &filename)
 {
-	include_path *curpath;
-
-	/* iterate over include paths and find the file */
-	for (curpath = incpaths; curpath != NULL; curpath = curpath->next)
+	// iterate over include paths and find the file
+	for (include_path *curpath = incpaths; curpath != NULL; curpath = curpath->next)
 	{
-		astring *srcincpath = astring_cat(astring_dupsubstr(srcfile, 0, srcrootlen + 1), curpath->path);
-		core_file *testfile;
+		// a '.' include path is specially treated
+		if (curpath->path == ".")
+			srcincpath.cpysubstr(srcfile, 0, srcfile.rchr(0, PATH_SEPARATOR[0]));
+		else
+			srcincpath.cpysubstr(srcfile, 0, srcrootlen + 1).cat(curpath->path);
+
+		// append the filename piecemeal to account for directories
 		int lastsepindex = 0;
 		int sepindex;
-
-		/* a '.' include path is specially treated */
-		if (astring_cmpc(curpath->path, ".") == 0)
-			astring_cpysubstr(srcincpath, srcfile, 0, astring_rchr(srcfile, 0, PATH_SEPARATOR[0]));
-
-		/* append the filename piecemeal to account for directories */
-		while ((sepindex = astring_chr(filename, lastsepindex, '/')) != -1)
+		while ((sepindex = filename.chr(lastsepindex, '/')) != -1)
 		{
-			astring *pathpart = astring_dupsubstr(filename, lastsepindex, sepindex - lastsepindex);
-
-			/* handle .. by removing a chunk from the incpath */
-			if (astring_cmpc(pathpart, "..") == 0)
+			// handle .. by removing a chunk from the incpath
+			astring pathpart(filename, lastsepindex, sepindex - lastsepindex);
+			if (pathpart == "..")
 			{
-				sepindex = astring_rchr(srcincpath, 0, PATH_SEPARATOR[0]);
+				sepindex = srcincpath.rchr(0, PATH_SEPARATOR[0]);
 				if (sepindex != -1)
-					astring_substr(srcincpath, 0, sepindex);
+					srcincpath.substr(0, sepindex);
 			}
 
-			/* otherwise, append a path separator and the pathpart */
+			// otherwise, append a path separator and the pathpart
 			else
-				astring_cat(astring_catc(srcincpath, PATH_SEPARATOR), pathpart);
+				srcincpath.cat(PATH_SEPARATOR).cat(pathpart);
 
-			/* advance past the previous index */
+			// advance past the previous index
 			lastsepindex = sepindex + 1;
-
-			/* free the path part we extracted */
-			astring_free(pathpart);
 		}
 
-		/* now append the filename */
-		astring_catsubstr(astring_catc(srcincpath, PATH_SEPARATOR), filename, lastsepindex, -1);
+		// now append the filename
+		srcincpath.cat(PATH_SEPARATOR).catsubstr(filename, lastsepindex, -1);
 
-		/* see if we can open it */
-		if (core_fopen(astring_c(srcincpath), OPEN_FLAG_READ, &testfile) == FILERR_NONE)
+		// see if we can open it
+		core_file *testfile;
+		if (core_fopen(srcincpath, OPEN_FLAG_READ, &testfile) == FILERR_NONE)
 		{
-			astring *tempfile = astring_alloc();
-			astring *tempinc = astring_alloc();
-
-			/* close the file */
+			// close the file
 			core_fclose(testfile);
 
-			/* find the longest matching directory substring between the include and source file */
+			// find the longest matching directory substring between the include and source file
 			lastsepindex = 0;
-			while ((sepindex = astring_chr(srcincpath, lastsepindex, PATH_SEPARATOR[0])) != -1)
+			while ((sepindex = srcincpath.chr(lastsepindex, PATH_SEPARATOR[0])) != -1)
 			{
-				/* get substrings up to the current directory */
-				astring_cpysubstr(tempfile, srcfile, 0, sepindex);
-				astring_cpysubstr(tempinc, srcincpath, 0, sepindex);
+				// get substrings up to the current directory
+				astring tempfile(srcfile, 0, sepindex);
+				astring tempinc(srcincpath, 0, sepindex);
 
-				/* if we don't match, stop */
-				if (astring_cmp(tempfile, tempinc) != 0)
+				// if we don't match, stop
+				if (tempfile != tempinc)
 					break;
 				lastsepindex = sepindex + 1;
 			}
 
-			/* chop off the common parts of the paths */
-			astring_cpysubstr(tempfile, srcfile, lastsepindex, -1);
-			astring_replacechr(astring_substr(srcincpath, lastsepindex, -1), PATH_SEPARATOR[0], '/');
+			// chop off the common parts of the paths
+			astring tempfile(srcfile, lastsepindex, -1);
+			srcincpath.substr(lastsepindex, -1).replacechr(PATH_SEPARATOR[0], '/');
 
-			/* for each directory left in the filename, we need to prepend a "../" */
-			while ((sepindex = astring_chr(tempfile, 0, PATH_SEPARATOR[0])) != -1)
+			// for each directory left in the filename, we need to prepend a "../"
+			while ((sepindex = tempfile.chr(0, PATH_SEPARATOR[0])) != -1)
 			{
-				astring_substr(tempfile, sepindex + 1, -1);
-				astring_insc(srcincpath, 0, "../");
+				tempfile.substr(sepindex + 1, -1);
+				srcincpath.ins(0, "../");
 			}
-			astring_catc(srcincpath, ".html");
+			srcincpath.cat(".html");
 
-			/* free the strings and return the include path */
-			astring_free(tempfile);
-			astring_free(tempinc);
-			return srcincpath;
+			// free the strings and return the include path
+			return true;
 		}
-
-		/* free our include path */
-		astring_free(srcincpath);
 	}
-	return NULL;
+	return false;
 }

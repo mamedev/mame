@@ -285,7 +285,6 @@ static DView *dview_alloc(render_target *target, running_machine &machine, debug
 
 static void dview_free(DView *dv)
 {
-	//astring_free(dv->title);
 	LIST_REMOVE(list, dv, DView);
 	auto_free(dv->machine(), dv);
 }

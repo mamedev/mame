@@ -706,7 +706,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 	/* handle bdf fonts in the core */
 	if (name.len() > 4)
-		if (name.toupper().substr(name.len()-4,4) == ".BDF" )
+		if (name.makeupper().substr(name.len()-4,4) == ".BDF" )
 			return NULL;
 
 	font_name = CFStringCreateWithCString( NULL, _name, kCFStringEncodingUTF8 );

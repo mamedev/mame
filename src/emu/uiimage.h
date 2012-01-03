@@ -24,8 +24,8 @@ public:
 
 class ui_menu_file_manager : public ui_menu {
 public:
-	astring *current_directory;
-	astring *current_file;
+	astring current_directory;
+	astring current_file;
 	device_image_interface *selected_device;
 
 	ui_menu_file_manager(running_machine &machine, render_container *container);

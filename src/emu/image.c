@@ -371,17 +371,17 @@ static char *strip_extension(const char *filename)
     string with the image info text
 -------------------------------------------------*/
 
-astring *image_info_astring(running_machine &machine, astring *string)
+astring &image_info_astring(running_machine &machine, astring &string)
 {
 	device_image_interface *image = NULL;
 
-	astring_printf(string, "%s\n\n", machine.system().description);
+	string.printf("%s\n\n", machine.system().description);
 
 #if 0
 	if (mess_ram_size > 0)
 	{
 		char buf2[RAM_STRING_BUFLEN];
-		astring_catprintf(string, "RAM: %s\n\n", ram_string(buf2, mess_ram_size));
+		string.catprintf("RAM: %s\n\n", ram_string(buf2, mess_ram_size));
 	}
 #endif
 
@@ -398,28 +398,28 @@ astring *image_info_astring(running_machine &machine, astring *string)
 			base_filename_noextension = strip_extension(base_filename);
 
 			/* display device type and filename */
-			astring_catprintf(string, "%s: %s\n", image->device().name(), base_filename);
+			string.catprintf("%s: %s\n", image->device().name(), base_filename);
 
 			/* display long filename, if present and doesn't correspond to name */
 			info = image->longname();
 			if (info && (!base_filename_noextension || mame_stricmp(info, base_filename_noextension)))
-				astring_catprintf(string, "%s\n", info);
+				string.catprintf("%s\n", info);
 
 			/* display manufacturer, if available */
 			info = image->manufacturer();
 			if (info != NULL)
 			{
-				astring_catprintf(string, "%s", info);
+				string.catprintf("%s", info);
 				info = stripspace(image->year());
 				if (info && *info)
-					astring_catprintf(string, ", %s", info);
-				astring_catprintf(string,"\n");
+					string.catprintf(", %s", info);
+				string.catprintf("\n");
 			}
 
 			/* display supported information, if available */
 			switch(image->supported()) {
-				case SOFTWARE_SUPPORTED_NO : astring_catprintf(string, "Not supported\n"); break;
-				case SOFTWARE_SUPPORTED_PARTIAL : astring_catprintf(string, "Partialy supported\n"); break;
+				case SOFTWARE_SUPPORTED_NO : string.catprintf("Not supported\n"); break;
+				case SOFTWARE_SUPPORTED_PARTIAL : string.catprintf("Partialy supported\n"); break;
 				default : break;
 			}
 
@@ -428,7 +428,7 @@ astring *image_info_astring(running_machine &machine, astring *string)
 		}
 		else
 		{
-			astring_catprintf(string, "%s: ---\n", image->device().name());
+			string.catprintf("%s: ---\n", image->device().name());
 		}
 	}
 	return string;

@@ -1911,7 +1911,7 @@ void validate_softlists(emu_options &options)
 						}
 
 						/* check for duplicate descriptions */
-						if (descriptions.add(astring(swinfo->longname).tolower().cstr(), swinfo, FALSE) == TMERR_DUPLICATE)
+						if (descriptions.add(astring(swinfo->longname).makelower().cstr(), swinfo, FALSE) == TMERR_DUPLICATE)
 						{
 							mame_printf_error("%s: %s is a duplicate description (%s)\n", list->file->filename(), swinfo->longname, swinfo->shortname);
 							error = TRUE;

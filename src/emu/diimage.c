@@ -182,7 +182,7 @@ void device_image_interface::device_compute_hash(hash_collection &hashes, const 
 image_error_t device_image_interface::set_image_filename(const char *filename)
 {
     m_image_name = filename;
-    zippath_parent(&m_working_directory, filename);
+    zippath_parent(m_working_directory, filename);
 	m_basename.cpy(m_image_name);
 
 	int loc1 = m_image_name.rchr(0,'\\');
@@ -352,7 +352,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
     /* did we successfully identify the directory? */
     if (success)
-        zippath_combine(&m_working_directory, m_working_directory, subdir);
+        zippath_combine(m_working_directory, m_working_directory, subdir);
 
     return success;
 }
@@ -532,10 +532,9 @@ UINT32 device_image_interface::crc()
 -------------------------------------------------*/
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
-    astring *fname = astring_assemble_4(astring_alloc(), device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
+    astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
 
-    image_battery_load_by_name(device().machine().options(), astring_c(fname), buffer, length, fill);
-    astring_free(fname);
+    image_battery_load_by_name(device().machine().options(), fname, buffer, length, fill);
 }
 
 /*-------------------------------------------------
@@ -546,10 +545,9 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 -------------------------------------------------*/
 void device_image_interface::battery_save(const void *buffer, int length)
 {
-    astring *fname = astring_assemble_4(astring_alloc(), device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
+    astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
 
-    image_battery_save_by_name(device().machine().options(), astring_c(fname), buffer, length);
-    astring_free(fname);
+    image_battery_save_by_name(device().machine().options(), fname, buffer, length);
 }
 
 //-------------------------------------------------
@@ -605,7 +603,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
     astring revised_path;
 
     /* attempt to read the file */
-    filerr = zippath_fopen(path, open_flags, &m_file, &revised_path);
+    filerr = zippath_fopen(path, open_flags, m_file, revised_path);
 
     /* did the open succeed? */
     switch(filerr)

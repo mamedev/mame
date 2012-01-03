@@ -14,14 +14,13 @@
 #include "corefile.h"
 #include "astring.h"
 #include "unzip.h"
-#include "astring.h"
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _zippath_directory zippath_directory;
+class zippath_directory;
 
 
 
@@ -32,19 +31,19 @@ typedef struct _zippath_directory zippath_directory;
 /* ----- path operations ----- */
 
 /* retrieves the parent directory */
-astring *zippath_parent(astring *dst, const char *path);
+astring &zippath_parent(astring &dst, const char *path);
 
 /* retrieves the parent directory basename */
-astring *zippath_parent_basename(astring *dst, const char *path);
+astring &zippath_parent_basename(astring &dst, const char *path);
 
 /* combines two paths */
-astring *zippath_combine(astring *dst, const char *path1, const char *path2);
+astring &zippath_combine(astring &dst, const char *path1, const char *path2);
 
 
 /* ----- file operations ----- */
 
 /* opens a zip path file */
-file_error zippath_fopen(const char *filename, UINT32 openflags, core_file **file, astring *revised_path);
+file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&file, astring &revised_path);
 
 
 /* ----- directory operations ----- */

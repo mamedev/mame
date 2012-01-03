@@ -33,9 +33,9 @@
 
 // core system includes
 #include "osdcomm.h"
+#include "astring.h"
 #include "emualloc.h"
 #include "corestr.h"
-#include "astring.h"
 #include "bitmap.h"
 #include "tagmap.h"
 

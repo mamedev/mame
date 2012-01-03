@@ -448,10 +448,10 @@ void emu_options::parse_standard_inis(astring &error_string)
 
 	// next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini
 	astring sourcename;
-	core_filename_extract_base(&sourcename, cursystem->source_file, TRUE)->ins(0, "source" PATH_SEPARATOR);
+	core_filename_extract_base(sourcename, cursystem->source_file, true).ins(0, "source" PATH_SEPARATOR);
 	if (!parse_one_ini(sourcename, OPTION_PRIORITY_SOURCE_INI, &error_string))
 	{
-		core_filename_extract_base(&sourcename, cursystem->source_file, TRUE);
+		core_filename_extract_base(sourcename, cursystem->source_file, true);
 		parse_one_ini(sourcename, OPTION_PRIORITY_SOURCE_INI, &error_string);
 	}
 
@@ -474,7 +474,7 @@ void emu_options::parse_standard_inis(astring &error_string)
 const game_driver *emu_options::system() const
 {
 	astring tempstr;
-	int index = driver_list::find(*core_filename_extract_base(&tempstr, system_name(), TRUE));
+	int index = driver_list::find(core_filename_extract_base(tempstr, system_name(), true));
 	return (index != -1) ? &driver_list::driver(index) : NULL;
 }
 

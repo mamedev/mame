@@ -515,14 +515,12 @@ static MACHINE_RESET( jaguar )
 static emu_file *jaguar_nvram_fopen( running_machine &machine, UINT32 openflags)
 {
     device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
-    astring *fname;
     file_error filerr;
     emu_file *file;
     if (image->exists())
     {
-        fname = astring_assemble_4( astring_alloc(), machine.system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
-        filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
-        astring_free( fname);
+        astring fname(machine.system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
+        filerr = mame_fopen( SEARCHPATH_NVRAM, fname, openflags, &file);
         return (filerr == FILERR_NONE) ? file : NULL;
     }
     else
