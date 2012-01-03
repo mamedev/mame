@@ -30,7 +30,7 @@ public:
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( globalfr_map, AS_PROGRAM, 8, globalfr_state )
+static ADDRESS_MAP_START( globalfr_map, AS_PROGRAM, 16, globalfr_state )
     AM_RANGE(0x002000, 0x002fff) AM_RAM
 	AM_RANGE(0x008000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0x8000)
     AM_RANGE(0x0a0000, 0x0a01ff) AM_RAM
