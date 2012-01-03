@@ -718,6 +718,7 @@ static MACHINE_START( funkball )
 
 static MACHINE_RESET( funkball )
 {
+	funkball_state *state = machine.driver_data<funkball_state>();
 	memory_set_bankptr(machine, "bios_ext1", machine.region("bios")->base() + 0x00000);
 	memory_set_bankptr(machine, "bios_ext2", machine.region("bios")->base() + 0x04000);
 	memory_set_bankptr(machine, "bios_ext3", machine.region("bios")->base() + 0x08000);
@@ -726,6 +727,7 @@ static MACHINE_RESET( funkball )
 	memory_set_bankptr(machine, "bios_bank2", machine.region("bios")->base() + 0x14000);
 	memory_set_bankptr(machine, "bios_bank3", machine.region("bios")->base() + 0x18000);
 	memory_set_bankptr(machine, "bios_bank4", machine.region("bios")->base() + 0x1c000);
+	state->m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
 static MACHINE_CONFIG_START( funkball, funkball_state )
