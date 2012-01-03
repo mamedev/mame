@@ -104,6 +104,7 @@ static READ16_HANDLER( m107_sound_status_r )
 
 static READ16_HANDLER( m107_soundlatch_r )
 {
+	cputag_set_input_line(space->machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 	return soundlatch_r(space, offset) | 0xff00;
 }
 
