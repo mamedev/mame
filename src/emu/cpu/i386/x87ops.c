@@ -628,7 +628,86 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 static void I386OP(fpu_group_da)(i386_state *cpustate)		// Opcode 0xda
 {
 	UINT8 modrm = FETCH(cpustate);
-	fatalerror("I386: FPU Op DA %02X at %08X", modrm, cpustate->pc-2);
+
+	if (modrm < 0xc0)
+	{
+		UINT32 ea = GetEA(cpustate,modrm);
+		X87_REG t;
+		t.i = READ32(cpustate,ea);
+
+		switch ((modrm >> 3) & 0x7)
+		{
+			case 0:	// FIADD
+				ST(0).i+=t.i;
+				CYCLES(cpustate,20);
+				break;
+			case 1:	// FIMUL
+				ST(0).i*=t.i;
+				CYCLES(cpustate,22);
+				break;
+			case 2:	// FICOM
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if(ST(0).i == t.i)
+					cpustate->fpu_status_word |= FPU_C3;
+				if(ST(0).i < t.i)
+					cpustate->fpu_status_word |= FPU_C0;
+
+				CYCLES(cpustate,15);
+				break;
+			case 3:	// FICOMP
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if(ST(0).i == t.i)
+					cpustate->fpu_status_word |= FPU_C3;
+				if(ST(0).i < t.i)
+					cpustate->fpu_status_word |= FPU_C0;
+
+				FPU_POP(cpustate);
+				CYCLES(cpustate,15);
+				break;
+
+			case 4:	// FISUB
+				ST(0).i-=t.i;
+				CYCLES(cpustate,15);
+				break;
+
+			case 5:	// FISUBR
+				ST(0).i = t.i - ST(0).i;
+				CYCLES(cpustate,15);
+				break;
+
+			case 6:	// FIDIV
+				ST(0).i/=t.i;
+				CYCLES(cpustate,84);
+				break;
+
+			case 7:	// FIDIVR
+				ST(0).i = t.i / ST(0).i;
+				CYCLES(cpustate,84);
+				break;
+
+			default:
+				fatalerror("I386: FPU Op DA %02X at %08X", modrm, cpustate->pc-2);
+		}
+	}
+	else
+	{
+		switch(modrm & 0x3f)
+		{
+			case 0x29: // FUCOMPP
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if(ST(0).f == ST(1).f)
+					cpustate->fpu_status_word |= FPU_C3;
+				if(ST(0).f < ST(1).f)
+					cpustate->fpu_status_word |= FPU_C0;
+
+				FPU_POP(cpustate);
+				FPU_POP(cpustate);
+				CYCLES(cpustate,5);
+				break;
+			default:
+				fatalerror("I386: FPU Op DA %02X at %08X", modrm, cpustate->pc-2);
+		}
+	}
 }
 
 static void I386OP(fpu_group_db)(i386_state *cpustate)		// Opcode 0xdb
@@ -648,6 +727,16 @@ static void I386OP(fpu_group_db)(i386_state *cpustate)		// Opcode 0xdb
 				t.f=(INT32)READ32(cpustate,ea);
 				FPU_PUSH(cpustate,t);
 				CYCLES(cpustate,9);
+				break;
+			}
+
+			case 2:		// FIST
+			{
+				X87_REG t;
+
+				t = X87_FROUND(cpustate,ST(0));
+				WRITE32(cpustate,ea,(INT32)t.i);
+				CYCLES(cpustate,28);
 				break;
 			}
 
@@ -687,7 +776,7 @@ static void I386OP(fpu_group_db)(i386_state *cpustate)		// Opcode 0xdb
 				cpustate->fpu_inst_ptr = 0;
 				cpustate->fpu_opcode = 0;
 
-				CYCLES(cpustate,1);		// TODO
+				CYCLES(cpustate,17);
 				break;
 			}
 
