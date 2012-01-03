@@ -64,7 +64,7 @@ static const astring dummy_astring;
 //  given string, or else reallocate our buffer
 //-------------------------------------------------
 
-inline bool astring::ensure_room(int length)
+bool astring::ensure_room(int length)
 {
 	// always fail to expand the dummy
 	if (this == &dummy_astring)
