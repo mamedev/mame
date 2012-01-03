@@ -557,7 +557,7 @@ ROM_START( quizrd34 ) /* CD-ROM printed ??/?? */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd34", 0, SHA1(3456781234567812345678123456781234567812) )
+    DISK_IMAGE_READONLY( "quizrd34", 0, SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 ROM_END
 
 ROM_START( quizrr42 ) /* CD-ROM printed 09/98 */
