@@ -454,7 +454,7 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 
 			case 0x21:		// FABS
 			{
-				ST(0).i = abs(ST(0).i);
+				ST(0).f = fabs(ST(0).f);
 				CYCLES(cpustate,3);
 				break;
 			}
