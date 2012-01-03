@@ -4,11 +4,9 @@
 /***************************************************************************
 
 Notes:
-- Voodoo currently fails to init DAC regs, sub-routine is at 0x182a3.
-  It does: mov [ebx],ecx in there, where ebx is 0xfffxxxxx, but only lower
-  16 bits are used so it ends up in reading at conventional work RAM.
-  CPU core bug?
-bp 0x182a8,ax = 1;bp 0x18390,ax = 1;bp 0x183a2,ax = 1;bp 0x1b578,ax = 1
+- currently fails DAC r/w in Voodoo registers;
+(note: some of those are redundant)
+bp 0x182a8,ax = 1;bp 0x18390,ax = 1;bp 0x183a2,ax = 1;bp 0x1b578,ax = 1;bp 0x1b5cb,ax = 1;
 
 Funky Ball
 dgPIX, 1998
@@ -580,6 +578,7 @@ static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 //	AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
 	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE_LEGACY(biu_ctrl_r, biu_ctrl_w)
 	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_BASE(m_unk_ram)
+	AM_RANGE(0xff000000, 0xffffdfff) AM_DEVREADWRITE_LEGACY("voodoo_0", voodoo_r, voodoo_w)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
