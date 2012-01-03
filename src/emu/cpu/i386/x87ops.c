@@ -1,10 +1,17 @@
 // Intel x87 FPU opcodes
 
+// TODO:
+// - double check single precision opcodes;
+// - opcode cycles (every single CPU has different counting on it);
+// - clean-ups;
+
 #define ST(x)	(cpustate->fpu_reg[(cpustate->fpu_top + (x)) & 7])
 #define FPU_INFINITY_DOUBLE		U64(0x7ff0000000000000)
 #define FPU_INFINITY_SINGLE		(0x7f800000)
 #define FPU_SIGN_BIT_DOUBLE		U64(0x8000000000000000)
 #define FPU_SIGN_BIT_SINGLE		(0x80000000)
+#define FPU_MANTISSA_DOUBLE		U64(0x000fffffffffffff)
+
 
 // FPU control word flags
 #define FPU_MASK_INVALID_OP			0x0001
@@ -77,6 +84,52 @@ INLINE X87_REG X87_FROUND(i386_state *cpustate, X87_REG t)
 		case 3: t.f = (INT64)t.f; break; /* Chop */
 	}
 	return t;
+}
+
+INLINE X87_REG READ80(i386_state *cpustate,UINT32 ea)
+{
+	X87_REG t;
+	UINT16 begin;
+	INT64 exp;
+	INT64 mantissa;
+	UINT8 sign;
+
+	t.i = READ64(cpustate,ea);
+	begin = READ16(cpustate,ea+8);
+
+	exp = (begin&0x7fff) - 16383;
+	exp = (exp > 0) ? (exp&0x3ff) : (-exp&0x3ff);
+	exp += 1023;
+
+	mantissa = (t.i >> 11) & (FPU_MANTISSA_DOUBLE);
+	sign = (begin&0x8000) >> 15;
+
+	if(t.i & 0x400)
+		mantissa++;
+
+	t.i = ((UINT64)sign << 63)|((UINT64)exp << 52)|((UINT64)mantissa);
+
+	return t;
+}
+
+INLINE void WRITE80(i386_state *cpustate,UINT32 ea, X87_REG t)
+{
+	UINT8 sign = (t.i & FPU_SIGN_BIT_DOUBLE) ? 1 : 0;
+	INT64 exp = (t.i & FPU_INFINITY_DOUBLE) >> 52;
+	INT64 mantissa = (t.i & FPU_MANTISSA_DOUBLE) << 11;
+	INT16 begin;
+
+	if(t.f != 0)
+	{
+		logerror("Check WRITE80 with t.f != 0\n");
+		//mantissa |= FPU_SIGN_BIT_DOUBLE;
+		//exp += (16383 - 1023);
+	}
+
+	begin = (sign<<15)|(INT16)(exp);
+	t.i = mantissa;
+	WRITE64(cpustate,ea,t.i);
+	WRITE16(cpustate,ea+8,begin);
 }
 
 static void I386OP(fpu_group_d8)(i386_state *cpustate)		// Opcode 0xd8
@@ -676,12 +729,18 @@ static void I386OP(fpu_group_da)(i386_state *cpustate)		// Opcode 0xda
 				break;
 
 			case 6:	// FIDIV
-				ST(0).i/=t.i;
+				if(t.i)
+					ST(0).i/=t.i;
+				else
+					fatalerror("Divide-by-zero on FIDIV 0xda 0x06 opcode");
 				CYCLES(cpustate,84);
 				break;
 
 			case 7:	// FIDIVR
-				ST(0).i = t.i / ST(0).i;
+				if(ST(0).i)
+					ST(0).i = t.i / ST(0).i;
+				else
+					fatalerror("Divide-by-zero on FIDIV 0xda 0x07 opcode");
 				CYCLES(cpustate,84);
 				break;
 
@@ -751,6 +810,24 @@ static void I386OP(fpu_group_db)(i386_state *cpustate)		// Opcode 0xdb
 				break;
 			}
 
+			case 5:		// FLD extended
+			{
+				X87_REG t;
+
+				t = READ80(cpustate,ea);
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,6);
+				break;
+			}
+
+			case 7:		// FSTP extended
+			{
+				WRITE80(cpustate,ea,ST(0));
+				FPU_POP(cpustate);
+				CYCLES(cpustate,6);
+				break;
+			}
+
 			default:
 				fatalerror("I386: FPU Op DB %02X at %08X", modrm, cpustate->pc-2);
 		}
@@ -799,13 +876,14 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 	if (modrm < 0xc0)
 	{
 		UINT32 ea = GetEA(cpustate,modrm);
+		X87_REG t;
+
+		t.i = READ64(cpustate,ea);
 
 		switch ((modrm >> 3) & 0x7)
 		{
 			case 0: /* FADD double */
 			{
-				X87_REG t;
-				t.i = READ64(cpustate,ea);
 				ST(0).f += t.f;
 				CYCLES(cpustate,8);
 				break;
@@ -813,8 +891,6 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 			case 1: /* FMUL double */
 			{
-				X87_REG t;
-				t.i = READ64(cpustate,ea);
 				ST(0).f *= t.f;
 				CYCLES(cpustate,14);
 				break;
@@ -822,8 +898,6 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 			case 2: /* FCOM double */
 			{
-				X87_REG t;
-				t.i = READ64(cpustate,ea);
 				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
 				if(ST(0).f == t.f)
 					cpustate->fpu_status_word |= FPU_C3;
@@ -836,8 +910,6 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 			case 3: /* FCOMP double */
 			{
-				X87_REG t;
-				t.i = READ64(cpustate,ea);
 				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
 				if(ST(0).f == t.f)
 					cpustate->fpu_status_word |= FPU_C3;
@@ -851,8 +923,6 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 			case 4: /* FSUB double */
 			{
-				X87_REG t;
-				t.i = READ64(cpustate,ea);
 				ST(0).f -= t.f;
 				CYCLES(cpustate,8);
 				break;
@@ -860,8 +930,6 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 			case 5: /* FSUBR double */
 			{
-				X87_REG t;
-				t.i = READ64(cpustate,ea);
 				ST(0).f = t.f - ST(0).f;
 				CYCLES(cpustate,8);
 				break;
@@ -869,8 +937,6 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 			case 6: /* FDIV double */
 			{
-				X87_REG t;
-				t.i = READ64(cpustate,ea);
 				if(t.f)
 					ST(0).f /= t.f;
 				else
@@ -882,8 +948,6 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 
 			case 7: /* FDIV double */
 			{
-				X87_REG t;
-				t.i = READ64(cpustate,ea);
 				if(ST(0).f)
 					ST(0).f = t.f / ST(0).f;
 				else
@@ -915,6 +979,20 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 				break;
 			}
 
+			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // FSUBR
+			{
+				ST(modrm & 7).f = ST(0).f - ST(modrm & 7).f;
+				CYCLES(cpustate,8);
+				break;
+			}
+
+			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f: // FSUB
+			{
+				ST(modrm & 7).f -= ST(0).f;
+				CYCLES(cpustate,8);
+				break;
+			}
+
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // FSUBR
 			{
 				ST(modrm & 7).f = ST(0).f - ST(modrm & 7).f;
@@ -929,9 +1007,9 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 				break;
 			}
 
+			// FDIVR
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 			{
-				// FDIVR
 				if ((ST(modrm & 7).i & U64(0x7fffffffffffffff)) == 0)
 				{
 					// set result as infinity if zero divide is masked
@@ -944,7 +1022,26 @@ static void I386OP(fpu_group_dc)(i386_state *cpustate)		// Opcode 0xdc
 				{
 					ST(modrm & 7).f = ST(0).f / ST(modrm & 7).f;
 				}
-				CYCLES(cpustate,1);		// TODO
+				CYCLES(cpustate,73);
+				break;
+			}
+
+			 // FDIV
+			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+			{
+				if ((ST(0).i & U64(0x7fffffffffffffff)) == 0)
+				{
+					// set result as infinity if zero divide is masked
+					if (cpustate->fpu_control_word & FPU_MASK_ZERO_DIVIDE)
+					{
+						ST(modrm & 7).i |= FPU_INFINITY_DOUBLE;
+					}
+				}
+				else
+				{
+					ST(modrm & 7).f /= ST(0).f;
+				}
+				CYCLES(cpustate,73);
 				break;
 			}
 
@@ -994,6 +1091,89 @@ static void I386OP(fpu_group_dd)(i386_state *cpustate)		// Opcode 0xdd
 				break;
 			}
 
+			case 4:	// FRSTOR
+			{
+				int i;
+				if( cpustate->operand_size )  // 32-bit real/protected mode
+				{
+					cpustate->fpu_control_word = READ16(cpustate,ea);
+					cpustate->fpu_status_word = READ16(cpustate,ea+4);
+					cpustate->fpu_tag_word = READ16(cpustate,ea+8);
+					ea+=28;
+				}
+				else // 16-bit real/protected mode
+				{
+					cpustate->fpu_control_word = READ16(cpustate,ea);
+					cpustate->fpu_status_word = READ16(cpustate,ea+2);
+					cpustate->fpu_tag_word = READ16(cpustate,ea+4);
+					ea+=14;
+				}
+
+				cpustate->fpu_top = (cpustate->fpu_status_word>>11) & 7;
+
+				for(i=0;i<8;i++)
+					ST(i) = READ80(cpustate,ea+i*10);
+
+				CYCLES(cpustate,(cpustate->cr[0] & 1) ? 34 : 44);
+				break;
+			}
+
+			case 6: // FSAVE
+			{
+				int i;
+				logerror("x87 FSAVE triggered with mode = %d %02x %02x\n",(cpustate->cr[0] & 1)|(cpustate->operand_size & 1)<<1,cpustate->cr[0],cpustate->operand_size);
+				switch((cpustate->cr[0] & 1)|(cpustate->operand_size & 1)<<1)
+				{
+					case 0:	// 16-bit real mode
+						WRITE16(cpustate,ea, cpustate->fpu_control_word);
+						WRITE16(cpustate,ea+2, cpustate->fpu_status_word);
+						WRITE16(cpustate,ea+4, cpustate->fpu_tag_word);
+						WRITE16(cpustate,ea+6, cpustate->fpu_inst_ptr & 0xffff);
+						//WRITE16(cpustate,ea+8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+						WRITE16(cpustate,ea+10, cpustate->fpu_data_ptr & 0xffff);
+						//WRITE16(cpustate,ea+12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+						ea+=14;
+						break;
+					case 1: // 16-bit protected mode
+						WRITE16(cpustate,ea, cpustate->fpu_control_word);
+						WRITE16(cpustate,ea+2, cpustate->fpu_status_word);
+						WRITE16(cpustate,ea+4, cpustate->fpu_tag_word);
+						WRITE16(cpustate,ea+6, cpustate->fpu_inst_ptr & 0xffff);
+						WRITE16(cpustate,ea+8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+						WRITE16(cpustate,ea+10, cpustate->fpu_data_ptr & 0xffff);
+						WRITE16(cpustate,ea+12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+						ea+=14;
+						break;
+					case 2: // 32-bit real mode
+						WRITE16(cpustate,ea, cpustate->fpu_control_word);
+						WRITE16(cpustate,ea+4, cpustate->fpu_status_word);
+						WRITE16(cpustate,ea+8, cpustate->fpu_tag_word);
+						WRITE16(cpustate,ea+12, cpustate->fpu_inst_ptr & 0xffff);
+						//WRITE16(cpustate,ea+8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+						WRITE16(cpustate,ea+20, cpustate->fpu_data_ptr & 0xffff);
+						//WRITE16(cpustate,ea+12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+						WRITE32(cpustate,ea+24, (cpustate->fpu_data_ptr>>16)<<12);
+						ea+=28;
+						break;
+					case 3: // 32-bit protected mode
+						WRITE16(cpustate,ea, cpustate->fpu_control_word);
+						WRITE16(cpustate,ea+4, cpustate->fpu_status_word);
+						WRITE16(cpustate,ea+8, cpustate->fpu_tag_word);
+						WRITE32(cpustate,ea+12, cpustate->fpu_inst_ptr);
+						WRITE32(cpustate,ea+16, cpustate->fpu_opcode);
+						WRITE32(cpustate,ea+20, cpustate->fpu_data_ptr);
+						WRITE32(cpustate,ea+24, cpustate->fpu_inst_ptr);
+						ea+=28;
+						break;
+				}
+
+				for(i=0;i<8;i++)
+					ST(i) = READ80(cpustate,ea+i*10);
+
+				CYCLES(cpustate,(cpustate->cr[0] & 1) ? 56 : 67);
+				break;
+			}
+
 			case 7:			// FSTSW
 			{
 				WRITE16(cpustate,ea, (cpustate->fpu_status_word & ~FPU_STACK_TOP_MASK) | (cpustate->fpu_top << 10));
@@ -1009,7 +1189,25 @@ static void I386OP(fpu_group_dd)(i386_state *cpustate)		// Opcode 0xdd
 	{
 		switch (modrm & 0x3f)
 		{
-			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+			case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: // FFREE
+			{
+				cpustate->fpu_tag_word |= (3<<((modrm & 7)<< 1));
+				CYCLES(cpustate,3);
+				break;
+			}
+
+			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // FST
+			{
+				UINT16 tmp;
+				ST(modrm & 7) = ST(0);
+				tmp = (cpustate->fpu_tag_word>>((cpustate->fpu_top&7)<<1))&3;
+				cpustate->fpu_tag_word &= ~(3<<((modrm & 7)<< 1));
+				cpustate->fpu_tag_word |= (tmp<<((modrm & 7)<< 1));
+				CYCLES(cpustate,3);
+				break;
+			}
+
+			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f: // FSTP
 			{
 				UINT16 tmp;
 				ST(modrm & 7) = ST(0);
@@ -1020,6 +1218,59 @@ static void I386OP(fpu_group_dd)(i386_state *cpustate)		// Opcode 0xdd
 				CYCLES(cpustate,3);
 				break;
 			}
+
+			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // FUCOM
+			{
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if (ST(0).f > ST(modrm & 7).f)
+				{
+					// C3 = 0, C2 = 0, C0 = 0
+				}
+				else if (ST(0).f < ST(modrm & 7).f)
+				{
+					cpustate->fpu_status_word |= FPU_C0;
+				}
+				else if (ST(0).f == ST(modrm & 7).f)
+				{
+					cpustate->fpu_status_word |= FPU_C3;
+				}
+				else
+				{
+					// unordered
+					cpustate->fpu_status_word |= (FPU_C3 | FPU_C2 | FPU_C0);
+				}
+
+				//FPU_POP(cpustate);
+				CYCLES(cpustate,4);
+				break;
+			}
+
+			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f: // FUCOMP
+			{
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if (ST(0).f > ST(modrm & 7).f)
+				{
+					// C3 = 0, C2 = 0, C0 = 0
+				}
+				else if (ST(0).f < ST(modrm & 7).f)
+				{
+					cpustate->fpu_status_word |= FPU_C0;
+				}
+				else if (ST(0).f == ST(modrm & 7).f)
+				{
+					cpustate->fpu_status_word |= FPU_C3;
+				}
+				else
+				{
+					// unordered
+					cpustate->fpu_status_word |= (FPU_C3 | FPU_C2 | FPU_C0);
+				}
+
+				FPU_POP(cpustate);
+				CYCLES(cpustate,4);
+				break;
+			}
+
 			default:
 				fatalerror("I386: FPU Op DD %02X at %08X", modrm, cpustate->pc-2);
 		}
@@ -1032,10 +1283,109 @@ static void I386OP(fpu_group_de)(i386_state *cpustate)		// Opcode 0xde
 
 	if (modrm < 0xc0)
 	{
-	//  UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm);
+		INT32 t;
+
+		t = (INT32)READ16(cpustate,ea);
 
 		switch ((modrm >> 3) & 0x7)
 		{
+			case 0:	// FIADD single precision
+			{
+				ST(0).f+=(double)t;
+				CYCLES(cpustate,20);
+				break;
+			}
+
+			case 1:	// FIMUL single precision
+			{
+				ST(0).f*=(double)t;
+				CYCLES(cpustate,22);
+				break;
+			}
+
+			case 2: // FICOM
+			{
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if (ST(0).f > (double)t)
+				{
+					// C3 = 0, C2 = 0, C0 = 0
+				}
+				else if (ST(0).f < (double)t)
+				{
+					cpustate->fpu_status_word |= FPU_C0;
+				}
+				else if (ST(0).f == (double)t)
+				{
+					cpustate->fpu_status_word |= FPU_C3;
+				}
+				else
+				{
+					// unordered
+					cpustate->fpu_status_word |= (FPU_C3 | FPU_C2 | FPU_C0);
+				}
+				CYCLES(cpustate,15);
+			}
+
+			case 3: // FICOMP
+			{
+				cpustate->fpu_status_word &= ~(FPU_C3 | FPU_C2 | FPU_C0);
+				if (ST(0).f > (double)t)
+				{
+					// C3 = 0, C2 = 0, C0 = 0
+				}
+				else if (ST(0).f < (double)t)
+				{
+					cpustate->fpu_status_word |= FPU_C0;
+				}
+				else if (ST(0).f == (double)t)
+				{
+					cpustate->fpu_status_word |= FPU_C3;
+				}
+				else
+				{
+					// unordered
+					cpustate->fpu_status_word |= (FPU_C3 | FPU_C2 | FPU_C0);
+				}
+				FPU_POP(cpustate);
+				CYCLES(cpustate,15);
+			}
+
+			case 4:	// FISUB single precision
+			{
+				ST(0).f-=(double)t;
+				CYCLES(cpustate,20);
+				break;
+			}
+
+			case 5:	// FISUBR single precision
+			{
+				ST(0).f = (double)t - ST(0).f;
+				CYCLES(cpustate,20);
+				break;
+			}
+
+			case 6:	// FIDIV single precision
+			{
+				if((double)t == 0)
+					fatalerror("Divide by zero on x87 opcode 0xde 0x06");
+				else
+					ST(0).f/=(double)t;
+				CYCLES(cpustate,84);
+				break;
+			}
+
+			case 7:	// FIDIVR single precision
+			{
+				if(ST(0).f == 0)
+					fatalerror("Divide by zero on x87 opcode 0xde 0x07");
+				else
+					ST(0).f = (double)t / ST(0).f;
+				CYCLES(cpustate,84);
+				break;
+			}
+
+
 			default:
 				fatalerror("I386: FPU Op DE %02X at %08X", modrm, cpustate->pc-2);
 		}
@@ -1082,7 +1432,7 @@ static void I386OP(fpu_group_de)(i386_state *cpustate)		// Opcode 0xde
 				}
 				FPU_POP(cpustate);
 				FPU_POP(cpustate);
-				CYCLES(cpustate,1);		// TODO
+				CYCLES(cpustate,5);
 				break;
 			}
 
@@ -1186,6 +1536,33 @@ static void I386OP(fpu_group_df)(i386_state *cpustate)		// Opcode 0xdf
 				t.f=(INT64)READ64(cpustate,ea);
 				FPU_PUSH(cpustate,t);
 				CYCLES(cpustate,10);
+				break;
+			}
+
+			case 6:		// FBSTP
+			{
+				UINT8 res;
+				double bcd_data;
+				int i;
+
+				bcd_data = ST(0).f;
+
+				for(i=0;i<9;i++)
+				{
+					res = (UINT8)floor(fmod(bcd_data,10.0));
+					bcd_data -= floor(fmod(bcd_data,10.0));
+					bcd_data /= 10.0;
+					res = (UINT8)floor(fmod(bcd_data,10.0))<<4;
+					bcd_data -= floor(fmod(bcd_data,10.0));
+					bcd_data /= 10.0;
+					WRITE8(cpustate,ea+i,res);
+				}
+				res = (UINT8)floor(fmod(bcd_data,10.0));
+				if(bcd_data < 0)
+					res |= 0x80;
+				WRITE8(cpustate,ea+9,res);
+				FPU_POP(cpustate);
+				CYCLES(cpustate,1); // TODO
 				break;
 			}
 
