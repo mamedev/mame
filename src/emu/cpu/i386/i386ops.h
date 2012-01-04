@@ -293,7 +293,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0x07,		OP_2BYTE|OP_I386,			I386OP(loadall),				I386OP(loadall),			},
 	{ 0x08,		OP_2BYTE|OP_I486,			I486OP(invd),					I486OP(invd),				},
 	{ 0x09,		OP_2BYTE|OP_I486,			I486OP(wbinvd),					I486OP(wbinvd),				},
-	{ 0x0B,		OP_2BYTE|OP_I386,			I386OP(unimplemented),			I386OP(unimplemented),		},
+	{ 0x0B,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(ud2),					PENTIUMOP(ud2),				},
 	{ 0x20,		OP_2BYTE|OP_I386,			I386OP(mov_r32_cr),				I386OP(mov_r32_cr),			},
 	{ 0x21,		OP_2BYTE|OP_I386,			I386OP(mov_r32_dr),				I386OP(mov_r32_dr),			},
 	{ 0x22,		OP_2BYTE|OP_I386,			I386OP(mov_cr_r32),				I386OP(mov_cr_r32),			},

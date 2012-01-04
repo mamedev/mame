@@ -82,3 +82,7 @@ static void PENTIUMOP(sse_group0fae)(i386_state *cpustate)	// Opcode 0x0f ae
 	}
 }
 
+static void PENTIUMOP(ud2)(i386_state *cpustate)	// Opcode 0x0f 0b
+{
+	i386_trap(cpustate, 6, 0, 0);
+}
