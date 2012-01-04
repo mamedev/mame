@@ -851,18 +851,25 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	FILE *infile;
 	int i, trknum;
 	static char token[512];
+    char tocftemp[512];
 
-	if (strstr(tocfname,".gdi"))
+    strcpy(tocftemp, tocfname);
+    for (i = 0; i < strlen(tocfname); i++)
+    {
+        tocftemp[i] = tolower(tocftemp[i]);
+    }
+
+	if (strstr(tocftemp,".gdi"))
 	{
 		return chdcd_parse_gdi(tocfname, outtoc, outinfo);
 	}
 
-	if (strstr(tocfname,".cue"))
+	if (strstr(tocftemp,".cue"))
 	{
 		return chdcd_parse_cue(tocfname, outtoc, outinfo);
 	}
 
-	if (strstr(tocfname,".nrg"))
+	if (strstr(tocftemp,".nrg"))
 	{
 		return chdcd_parse_nero(tocfname, outtoc, outinfo);
 	}
