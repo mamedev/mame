@@ -597,10 +597,11 @@ UINT8 z80dma_device::read()
 {
 	UINT8 res;
 
-	if(m_read_num_follow == 0) /* TODO: should return the status, but let me know WHAT uses this first */
-		fatalerror("Z80DMA '%s' Read without anything setted into stack", tag());
+	if(m_read_num_follow == 0) // special case: Legend of Kage on X1 Turbo
+		res = m_status;
+	else
+		res = m_read_regs_follow[m_read_cur_follow];
 
-	res = m_read_regs_follow[m_read_cur_follow];
 	m_read_cur_follow++;
 
 	if(m_read_cur_follow >= m_read_num_follow)
