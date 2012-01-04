@@ -862,9 +862,14 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						sprintf( hashdata, "%c%s%s", hash_collection::HASH_SHA1, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
 
 						add_rom_entry( swlist, s_name, hashdata, 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY ) );
-					} else {
-						parse_error(&swlist->state, "%s: Incomplete disk definition (line %lu)\n",
-							swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
+					}
+					else
+					{
+						if (!str_status || strcmp(str_status, "nodump")) // a no_dump chd is not an incomplete entry
+						{
+							parse_error(&swlist->state, "%s: Incomplete disk definition (line %lu)\n",
+										swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
+						}
 					}
 				}
 			}
