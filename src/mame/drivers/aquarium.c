@@ -20,31 +20,16 @@ AQUARF1              68000-16            6
    YM2151  M6295  4  32MHz               1
                      Z80-6  5                    SW2Q
 
-*/
 
-/* To Do (top are higher priorities)
+To Do:
+- Merge with gcpinbal.c (and clean up gcpinbal.c)
 
-Controls + Dipswitches *done* - stephh
-Verify Z80 program banking
-Fix Priority Problems *done* - Pierpaolo Prazzoli
-Merge with gcpinbal.c (and clean up gcpinbal.c)
-
-
-Note, a bug in the program code causes the OKI to be reset on the very
-first coin inserted.
-
-
-Stephh's notes (based on the game M68000 code and some tests) :
-
-  - The current set is a Japan set (0x0a5c.w = 0x0000), so there must exist
-    a non-Japan set which is AFAIK not dumped at the moment.
-    I have however no clue about what should be the value in the non-Japan set.
-  - Use AQUARIUS_HACK to be able to change the game to English language
-    via the FAKE Dip Switch.
-    Change the Dip Switch then reset the game to make the changes effective.
-  - I haven't found a way to enter sort of "test mode", even if there seems
-    to be code (or at least data) for it.
-
+Notes:
+- A bug in the program code causes the OKI to be reset on the very
+  first coin inserted.
+- The current dump is Japanese. The game also includes English text,
+  so it may have been released overseas too. Use cheat/debugger and
+  set RAM[0x000a5c / 2] to 1 to be able to change the game to English.
 
 */
 
@@ -56,21 +41,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/okim6295.h"
 #include "includes/aquarium.h"
 
-#define AQUARIUS_HACK	0
-
-
-#if AQUARIUS_HACK
-static MACHINE_RESET( aquarium_hack )
-{
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
-	int data = input_port_read(machine, "FAKE");
-
-	/* Language : 0x0000 = Japanese - Other value = English */
-
-	RAM[0x000a5c / 2] = data;
-
-}
-#endif
 
 static READ16_HANDLER( aquarium_coins_r )
 {
@@ -214,7 +184,7 @@ static INPUT_PORTS_START( aquarium )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* used in testmode, but not in game? */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -222,26 +192,19 @@ static INPUT_PORTS_START( aquarium )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* used in testmode, but not in game? */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* untested */
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* sound status */
-
-#if AQUARIUS_HACK
-	PORT_START("FAKE")	/* FAKE DSW to support language */
-	PORT_DIPNAME( 0xffff, 0x0001, DEF_STR( Language ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( English ) )		// This is a guess of what should be the value
-#endif
 INPUT_PORTS_END
 
 static const gfx_layout char5bpplayout =
@@ -353,20 +316,16 @@ static MACHINE_RESET( aquarium )
 {
 	aquarium_state *state = machine.driver_data<aquarium_state>();
 	state->m_aquarium_snd_ack = 0;
-
-#if AQUARIUS_HACK
-	MACHINE_RESET_CALL(aquarium_hack);
-#endif
 }
 
 static MACHINE_CONFIG_START( aquarium, aquarium_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // clock not verified on pcb
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 6000000)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6) // clock not verified on pcb
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 	MCFG_CPU_IO_MAP(snd_portmap)
 
@@ -390,7 +349,7 @@ static MACHINE_CONFIG_START( aquarium, aquarium_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_14_31818MHz/4) // clock not verified on pcb
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -404,9 +363,8 @@ ROM_START( aquarium )
 	ROM_REGION( 0x080000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "aquar3",  0x000000, 0x080000, CRC(344509a1) SHA1(9deb610732dee5066b3225cd7b1929b767579235) )
 
-	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 (sound) code */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 (sound) code */
 	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
-	ROM_RELOAD( 		0x010000, 0x40000 )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
 	ROM_LOAD( "aquar1",      0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
@@ -430,8 +388,4 @@ ROM_START( aquarium )
 	ROM_LOAD( "aquar4",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 
-#if !AQUARIUS_HACK
 GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-#else
-GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-#endif
