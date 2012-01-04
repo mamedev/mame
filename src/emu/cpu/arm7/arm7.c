@@ -1197,12 +1197,28 @@ static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
 
 void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr))
 {
-	cpustate->pendingUnd = 1;
+	UINT8 cpn = (insn >> 8) & 0xF;
+	if ((cpustate->archFlags & eARM_ARCHFLAGS_XSCALE) && (cpn == 0))
+	{
+		LOG( ( "arm7_dt_r_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC ) );
+	}
+	else
+	{
+		cpustate->pendingUnd = 1;
+	}
 }
 
 void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data))
 {
-	cpustate->pendingUnd = 1;
+	UINT8 cpn = (insn >> 8) & 0xF;
+	if ((cpustate->archFlags & eARM_ARCHFLAGS_XSCALE) && (cpn == 0))
+	{
+		LOG( ( "arm7_dt_w_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC ) );
+	}
+	else
+	{
+		cpustate->pendingUnd = 1;
+	}
 }
 
 DEFINE_LEGACY_CPU_DEVICE(ARM7, arm7);
