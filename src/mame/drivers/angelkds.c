@@ -24,7 +24,6 @@ Decrypt Space Position Somehow (not something I
 can do)
 Unknown Reads / Writes
 Whats the Prom for? nothing important?
-Clock Speeds etc.
 Is the level order correct?
 the progress sprite on the side of the screen re-appears at the bottom when you get
 to the top, but the wrap-around is needed for other things, actual game bug?
@@ -606,12 +605,12 @@ static MACHINE_RESET( angelkds )
 
 static MACHINE_CONFIG_START( angelkds, angelkds_state )
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz) // clock unverified on pcb
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_4MHz) // clock unverified on pcb
+	MCFG_CPU_ADD("sub", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(sub_portmap)
 
@@ -636,14 +635,14 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_4MHz)  // clock unverified on pcb
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_4MHz)
 	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_4MHz)  // clock unverified on pcb
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_4MHz)
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
