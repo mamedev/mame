@@ -55,7 +55,7 @@ enum
 	XTAL_3MHz   		= 3000000,		/* Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
 	XTAL_3_12MHz		= 3120000,		/* SP0250 clock on Gottlieb games */
 	XTAL_3_52128MHz		= 3521280,		/* RCA COSMAC VIP */
-	XTAL_3_579545MHz	= 3579545,		/* NTSC color subcarrier, extremely common, used on 100's of PCBs */
+	XTAL_3_579545MHz	= 3579545,		/* NTSC color subcarrier, extremely common, used on 100's of PCBs (48-300-010) */
 	XTAL_3_6864MHz  	= 3686400,		/* CPS3 */
 	XTAL_4MHz   		= 4000000,
 	XTAL_4_028MHz		= 4028000,		/* Sony SMC-777 */
@@ -145,6 +145,7 @@ enum
 	XTAL_22_1184MHz		= 22118400,
 	XTAL_23_9616MHz		= 23961600,		/* Osborne 4 (Vixen) */
 	XTAL_24MHz  		= 24000000,		/* Mario, 80's Data East games, 80's Konami games */
+	XTAL_24_0734MHz 	= 24073400,		/* DEC Rainbow 100 */
 	XTAL_24_576MHz  	= 24576000,		/* Pole Position h/w, Model 3 CPU board */
 	XTAL_24_8832MHz 	= 24883200,		/* DEC VT100 */
 	XTAL_25MHz  		= 25000000,		/* Namco System 22, Taito GNET, Dogyuun h/w */
