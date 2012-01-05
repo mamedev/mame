@@ -48,7 +48,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "bfm_sc45.h"
+#include "includes/bfm_sc45.h"
 
 
 class sc4_state : public driver_device
