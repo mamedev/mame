@@ -38,6 +38,13 @@ static unsigned char co_swap_function[] = {
     DWORD old_privileges;
     VirtualProtect(co_swap_function, sizeof co_swap_function, PAGE_EXECUTE_READWRITE, &old_privileges);
   }
+#elif defined(__OS2__)
+  #define INCL_DOS
+  #include <os2.h>
+
+  void co_init() {
+    DosSetMem(co_swap_function, sizeof co_swap_function, PAG_READ | PAG_WRITE | PAG_EXECUTE);
+  }
 #else
   #include <unistd.h>
   #include <sys/mman.h>

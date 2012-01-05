@@ -391,7 +391,9 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
     {
         ULONG ulCount;
 
-        DosResetEventSem(event->hev, &ulCount);
+        if(rc == 0)
+            DosResetEventSem(event->hev, &ulCount);
+
         DosReleaseMutexSem(event->hmtx);
     }
 
