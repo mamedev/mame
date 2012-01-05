@@ -1916,7 +1916,7 @@ static astring &get_keyboard_key_name(astring &name, const input_field_config *f
 	int i;
 	unicode_char ch;
 
-
+	name.reset();
 	/* loop through each character on the field*/
 	for (i = 0; i < ARRAY_LENGTH(field->chars) && (field->chars[i] != '\0'); i++)
 	{
