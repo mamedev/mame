@@ -171,6 +171,7 @@ enum
 	XTAL_32_5304MHz 	= 32530400,		/* Seta 2 */
 	XTAL_33MHz  		= 33000000,		/* Sega Model 3 video board */
 	XTAL_33_333MHz  	= 33333000,		/* Sega Model 3 CPU board, Vegas */
+	XTAL_33_833MHz		= 33833000,
 	XTAL_33_8688MHz 	= 33868800,		/* Usually used to drive 90's Yamaha OPL/FM chips with /2 divider */
 	XTAL_36MHz  		= 36000000,		/* Sega Model 1 video board */
 	XTAL_38_76922MHz	= 38769220,		/* Namco System 21 video board */
