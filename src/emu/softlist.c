@@ -1648,7 +1648,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 		if ( software_info_ptr->publisher )
 			(*sw_info)->publisher = auto_strdup( image->device().machine(), software_info_ptr->publisher );
 
-		(*sw_info)->partdata = (software_part *)auto_alloc_array_clear(image->device().machine(), UINT8, software_list_ptr->part_entries * sizeof(software_part) );
+		(*sw_info)->partdata = (software_part *)auto_alloc_array_clear(image->device().machine(), UINT8, (software_list_ptr->part_entries + 1)* sizeof(software_part) );
 		software_part *new_part = (*sw_info)->partdata;
 		for (software_part *swp = software_find_part(software_info_ptr, NULL, NULL); swp != NULL; swp = software_part_next(swp))
 		{
