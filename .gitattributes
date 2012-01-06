@@ -2563,6 +2563,7 @@ src/mame/drivers/pengo.c svneol=native#text/plain
 src/mame/drivers/peplus.c svneol=native#text/plain
 src/mame/drivers/peyper.c svneol=native#text/plain
 src/mame/drivers/pgm.c svneol=native#text/plain
+src/mame/drivers/pgm2.c svneol=native#text/plain
 src/mame/drivers/phoenix.c svneol=native#text/plain
 src/mame/drivers/photon.c svneol=native#text/plain
 src/mame/drivers/photon2.c svneol=native#text/plain
