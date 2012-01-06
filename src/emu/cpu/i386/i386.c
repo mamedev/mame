@@ -379,6 +379,126 @@ static void i386_check_sreg_validity(i386_state* cpustate, int reg)
 	}
 }
 
+static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector, UINT8 reg)
+{
+	// Checks done when MOV changes a segment register in protected mode
+	UINT8 CPL,RPL,DPL;
+
+	CPL = cpustate->CPL;
+	RPL = selector & 0x0003;
+
+	if(reg == SS)
+	{
+		I386_SREG stack;
+
+		memset(&stack, 0, sizeof(stack));
+		stack.selector = selector;
+		i386_load_protected_mode_segment(cpustate,&stack);
+		DPL = (stack.flags >> 5) & 0x03;
+
+		if((selector & ~0x0007) == 0)
+		{
+			logerror("SReg Load (%08x): Selector is null.\n",cpustate->pc);
+			FAULT(FAULT_GP,0)
+		}
+		if(selector & 0x0004)  // LDT
+		{
+			if((selector & ~0x0007) > cpustate->ldtr.limit)
+			{
+				logerror("SReg Load (%08x): Selector is out of LDT bounds.\n",cpustate->pc);
+				FAULT(FAULT_GP,selector)
+			}
+		}
+		else  // GDT
+		{
+			if((selector & ~0x0007) > cpustate->gdtr.limit)
+			{
+				logerror("SReg Load (%08x): Selector is out of GDT bounds.\n",cpustate->pc);
+				FAULT(FAULT_GP,selector)
+			}
+		}
+		if (RPL != CPL)
+		{
+			logerror("SReg Load (%08x): Selector RPL does not equal CPL.\n",cpustate->pc);
+			FAULT(FAULT_GP,selector)
+		}
+		if(((stack.flags & 0x0018) != 0x10) && (stack.flags & 0x0002) != 0)
+		{
+			logerror("SReg Load (%08x): Segment is not a writable data segment.\n",cpustate->pc);
+			FAULT(FAULT_GP,selector)
+		}
+		if(DPL != CPL)
+		{
+			logerror("SReg Load (%08x): Segment DPL does not equal CPL.\n",cpustate->pc);
+			FAULT(FAULT_GP,selector)
+		}
+		if(!(stack.flags & 0x0080))
+		{
+			logerror("SReg Load (%08x): Segment is not present.\n",cpustate->pc);
+			FAULT(FAULT_SS,selector)
+		}
+	}
+	if(reg == DS || reg == ES || reg == FS || reg == GS)
+	{
+		I386_SREG desc;
+
+		if((selector & ~0x0007) == 0)
+		{
+			cpustate->sreg[reg].selector = selector;
+			i386_load_segment_descriptor(cpustate, reg );
+			// TODO: mark segment as invalid
+			return;
+		}
+
+		memset(&desc, 0, sizeof(desc));
+		desc.selector = selector;
+		i386_load_protected_mode_segment(cpustate,&desc);
+		DPL = (desc.flags >> 5) & 0x03;
+
+		if(selector & 0x0004)  // LDT
+		{
+			if((selector & ~0x0007) > cpustate->ldtr.limit)
+			{
+				logerror("SReg Load (%08x): Selector is out of LDT bounds.\n",cpustate->pc);
+				FAULT(FAULT_GP,selector)
+			}
+		}
+		else  // GDT
+		{
+			if((selector & ~0x0007) > cpustate->gdtr.limit)
+			{
+				logerror("SReg Load (%08x): Selector is out of GDT bounds.\n",cpustate->pc);
+				FAULT(FAULT_GP,selector)
+			}
+		}
+		if((desc.flags & 0x0018) != 0x10)
+		{
+			if(((desc.flags & 0x0002) != 0) && ((desc.flags & 0x0018) != 0x18))
+			{
+				logerror("SReg Load (%08x): Segment is not a data segment or readable code segment.\n",cpustate->pc);
+				FAULT(FAULT_GP,selector)
+			}
+		}
+		if(((desc.flags & 0x0018) == 0x10) || ((!(desc.flags & 0x0004)) && ((desc.flags & 0x0018) == 0x18)))
+		{
+			// if data or non-conforming code segment
+			if((RPL > DPL) || (CPL > DPL))
+			{
+				logerror("SReg Load (%08x): Selector RPL or CPL is not less or equal to segment DPL.\n",cpustate->pc);
+				FAULT(FAULT_GP,selector)
+			}
+		}
+		if(!(desc.flags & 0x0080))
+		{
+			logerror("SReg Load (%08x): Segment is not present.\n",cpustate->pc);
+			FAULT(FAULT_NP,selector)
+		}
+	}
+
+	cpustate->sreg[reg].selector = selector;
+	i386_load_segment_descriptor(cpustate, reg );
+}
+
 static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level)
 {
 	/*  I386 Interrupts/Traps/Faults:
@@ -728,7 +848,7 @@ static void i386_trap_with_error(i386_state *cpustate,int irq, int irq_gate, int
 	{
 		// for these exceptions, an error code is pushed onto the stack by the processor.
 		// no error code is pushed for software interrupts, either.
-		PUSH32(cpustate,error);
+		PUSH16(cpustate,error);
 	}
 }
 
@@ -1253,7 +1373,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 
 	if((selector & ~0x07) == 0)
 	{
-		logerror("CALL: Selector is null.\n");
+		logerror("CALL (%08x): Selector is null.\n",cpustate->pc);
 		FAULT(FAULT_GP,0)  // #GP(0)
 	}
 	if(selector & 0x04)
@@ -1588,6 +1708,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 						logerror("CALL: EIP is past segment limit.\n");
 						FAULT(FAULT_GP,0) // #GP(0)
 					}
+					SetRPL = 1;
 				}
 				break;
 			case 0x05:  // task gate
@@ -1682,17 +1803,24 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 	I386_SREG desc;
 	UINT8 CPL, RPL, DPL;
 
+
 	if(operand32 == 0)
 	{
 		newEIP = POP16(cpustate) & 0xffff;
 		newCS = POP16(cpustate) & 0xffff;
 		REG16(SP) += count;
+		newESP = POP16(cpustate) & 0xffff;
+		newSS = POP16(cpustate) & 0xffff;
+		REG16(SP) -= (8+count);  // re-adjust stack pointer
 	}
 	else
 	{
 		newEIP = POP32(cpustate);
 		newCS = POP32(cpustate) & 0xffff;
 		REG32(ESP) += count;
+		newESP = POP32(cpustate);
+		newSS = POP32(cpustate) & 0xffff;
+		REG32(ESP) -= (16+count);  // re-adjust stack pointer
 	}
 
 	memset(&desc, 0, sizeof(desc));
@@ -1704,7 +1832,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 
 	if(RPL < CPL)
 	{
-		logerror("RETF: Return segment RPL is less than CPL.\n");
+		logerror("RETF (%08x): Return segment RPL is less than CPL.\n",cpustate->pc);
 		FAULT(FAULT_GP,newCS & ~0x07)
 	}
 
@@ -1713,7 +1841,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		/* same privilege level */
 		if((newCS & ~0x07) == 0)
 		{
-			logerror("RETF: Return segment RPL is less than CPL.\n");
+			logerror("RETF: Return segment is null.\n");
 			FAULT(FAULT_GP,0)
 		}
 		if(newCS & 0x04)
@@ -1767,7 +1895,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		{
 			if(REG16(SP) > (cpustate->sreg[SS].limit & 0xffff))
 			{
-				logerror("RETF: SP is past stack segment limit.\n");
+				logerror("RETF (%08x): SP is past stack segment limit.\n",cpustate->pc);
 				FAULT(FAULT_SS,0)
 			}
 		}
@@ -1779,25 +1907,25 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 				FAULT(FAULT_SS,0)
 			}
 		}
+		if(operand32 == 0)
+			REG16(SP) += (4+count);
+		else
+			REG32(ESP) += (8+count);
 	}
 	else if(RPL > CPL)
 	{
 		/* outer privilege level */
 		if(operand32 == 0)
 		{
-			newESP = POP16(cpustate) & 0xffff;
-			newSS = POP16(cpustate);
-			if(newESP+8+count > cpustate->sreg[SS].limit)
+			if(REG16(SP)+8+count > cpustate->sreg[SS].limit)
 			{
-				logerror("RETF: SP is past stack segment limit.\n");
+				logerror("RETF (%08x): SP is past stack segment limit.\n",cpustate->pc);
 				FAULT(FAULT_SS,0)
 			}
 		}
 		else
 		{
-			newESP = POP32(cpustate);
-			newSS = POP32(cpustate);
-			if(newESP+16+count > cpustate->sreg[SS].limit)
+			if(REG32(ESP)+16+count > cpustate->sreg[SS].limit)
 			{
 				logerror("RETF: ESP is past stack segment limit.\n");
 				FAULT(FAULT_SS,0)
@@ -1870,7 +1998,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		{
 			if((newSS & ~0x07) > cpustate->ldtr.limit)
 			{
-				logerror("RETF: SS segment selector is past LDT limit.\n");
+				logerror("RETF (%08x): SS segment selector is past LDT limit.\n",cpustate->pc);
 				FAULT(FAULT_GP,newSS & ~0x07)
 			}
 		}
@@ -1878,7 +2006,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		{
 			if((newSS & ~0x07) > cpustate->gdtr.limit)
 			{
-				logerror("RETF: SS segment selector is past GDT limit.\n");
+				logerror("RETF (%08x): SS segment selector is past GDT limit.\n",cpustate->pc);
 				FAULT(FAULT_GP,newSS & ~0x07)
 			}
 		}
@@ -1913,9 +2041,10 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		i386_load_segment_descriptor(cpustate, SS );
 
 		if(operand32 == 0)
-			REG16(SP) += count;
+			REG16(SP) += (8+count);
 		else
-			REG32(ESP) += count;
+			REG32(ESP) += (16+count);
+
 
 		/* Check that DS, ES, FS and GS are valid for the new privilege level */
 		i386_check_sreg_validity(cpustate,DS);
@@ -1945,15 +2074,21 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 	CPL = cpustate->CPL;
 	if(operand32 == 0)
 	{
-		newEIP = POP16(cpustate);
-		newCS = POP16(cpustate);
-		newflags = POP16(cpustate);
+		newEIP = POP16(cpustate) & 0xffff;
+		newCS = POP16(cpustate) & 0xffff;
+		newflags = POP16(cpustate) & 0xffff;
+		newESP = POP16(cpustate) & 0xffff;
+		newSS = POP16(cpustate) & 0xffff;
+		REG16(SP) -= 10;
 	}
 	else
 	{
 		newEIP = POP32(cpustate);
 		newCS = POP32(cpustate) & 0xffff;
 		newflags = POP32(cpustate);
+		newESP = POP32(cpustate);
+		newSS = POP32(cpustate) & 0xffff;
+		REG32(ESP) -= 20;
 	}
 
 	if(V8086_MODE)
@@ -2001,7 +2136,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		if(newflags & 0x00020000) // if returning to virtual 8086 mode
 		{
 			/* Return to v86 mode */
-			popmessage("IRET: Unimplemented return to Virtual 8086 mode.");
+			popmessage("IRET (%08x): Unimplemented return to Virtual 8086 mode.",cpustate->pc);
 		}
 		else
 		{
@@ -2024,7 +2159,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			RPL = newCS & 0x03;
 			if(RPL < CPL)
 			{
-				logerror("IRET: Return CS RPL is less than CPL.\n");
+				logerror("IRET (%08x): Return CS RPL is less than CPL.\n",cpustate->pc);
 				FAULT(FAULT_GP,newCS & ~0x07)
 			}
 			if(RPL == CPL)
@@ -2074,7 +2209,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				RPL = newCS & 0x03;
 				if((desc.flags & 0x0018) != 0x0018)
 				{
-					logerror("IRET: Return CS segment is not a code segment.\n");
+					logerror("IRET (%08x): Return CS segment is not a code segment.\n",cpustate->pc);
 					FAULT(FAULT_GP,newCS & ~0x07)
 				}
 				if(desc.flags & 0x0004)
@@ -2108,37 +2243,20 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					cpustate->eip = newEIP;
 					cpustate->sreg[CS].selector = newCS;
 					set_flags(cpustate,newflags);
+					REG16(SP) += 6;
 				}
 				else
 				{
 					cpustate->eip = newEIP;
 					cpustate->sreg[CS].selector = newCS & 0xffff;
 					set_flags(cpustate,newflags);
+					REG32(ESP) += 12;
 				}
 			}
 			else if(RPL > CPL)
 			{
 				I386_SREG stack;
 				/* return to outer privilege level */
-				if(operand32 == 0)
-				{
-					newESP = POP16(cpustate);
-					newSS = POP16(cpustate);
-					if(REG16(SP) > cpustate->sreg[SS].limit)
-					{
-						logerror("IRET: ESP is past SS limit.\n");
-						FAULT(FAULT_SS,0)					}
-				}
-				else
-				{
-					newESP = POP32(cpustate);
-					newSS = POP32(cpustate) & 0xffff;
-					if(REG32(ESP) > cpustate->sreg[SS].limit)
-					{
-						logerror("IRET: ESP is past SS limit.\n");
-						FAULT(FAULT_SS,0)
-					}
-				}
 				memset(&desc, 0, sizeof(desc));
 				desc.selector = newCS;
 				i386_load_protected_mode_segment(cpustate,&desc);
@@ -2147,6 +2265,21 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				memset(&stack, 0, sizeof(stack));
 				stack.selector = newSS;
 				i386_load_protected_mode_segment(cpustate,&stack);
+				if(operand32 == 0)
+				{
+					if(REG16(SP)+10 > cpustate->sreg[SS].limit)
+					{
+						logerror("IRET: SP is past SS limit.\n");
+						FAULT(FAULT_SS,0)					}
+				}
+				else
+				{
+					if(REG32(ESP)+20 > cpustate->sreg[SS].limit)
+					{
+						logerror("IRET: ESP is past SS limit.\n");
+						FAULT(FAULT_SS,0)
+					}
+				}
 				/* Check CS selector and descriptor */
 				if((newCS & ~0x07) == 0)
 				{
@@ -2249,6 +2382,11 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					logerror("IRET: EIP is past return CS limit.\n");
 					FAULT(FAULT_GP,0)
 				}
+
+				if(operand32 == 0)
+					REG16(SP) += 10;
+				else
+					REG32(ESP) += 20;
 
 				if(operand32 == 0)
 				{

@@ -3288,7 +3288,7 @@ static void I386OP(lar_r16_rm16)(i386_state *cpustate)  // Opcode 0x0f 0x02
 		if(seg.selector == 0)
 		{
 			SetZF(0);  // not a valid segment
-			logerror("i386: LAR: Selector %04x is invalid type.\n",seg.selector);
+		//	logerror("i386 (%08x): LAR: Selector %04x is invalid type.\n",cpustate->pc,seg.selector);
 		}
 		else
 		{

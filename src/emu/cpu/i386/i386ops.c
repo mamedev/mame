@@ -763,8 +763,13 @@ static void I386OP(mov_sreg_rm16)(i386_state *cpustate)		// Opcode 0x8e
 		}
 	}
 
-	cpustate->sreg[s].selector = selector;
-	i386_load_segment_descriptor(cpustate, s );
+	if(PROTECTED_MODE && !(V8086_MODE))  // no checks in virtual 8086 mode?
+		i386_protected_mode_sreg_load(cpustate,selector,s);
+	else
+	{
+		cpustate->sreg[s].selector = selector;
+		i386_load_segment_descriptor(cpustate, s );
+	}
 }
 
 static void I386OP(mov_al_i8)(i386_state *cpustate)			// Opcode 0xb0
@@ -905,25 +910,30 @@ static void I386OP(arpl)(i386_state *cpustate)           // Opcode 0x63
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 flag = 0;
 
-     if( modrm >= 0xc0 ) {
-    	src = LOAD_REG16(modrm);
-    	dst = LOAD_RM16(modrm);
-		if( (dst&0x3) < (src&0x3) ) {
-			dst = (dst&0xfffc) | (src&0x3);
-			flag = 1;
-			STORE_RM16(modrm, dst);
+	if(PROTECTED_MODE)
+	{
+		 if( modrm >= 0xc0 ) {
+			src = LOAD_REG16(modrm);
+			dst = LOAD_RM16(modrm);
+			if( (dst&0x3) < (src&0x3) ) {
+				dst = (dst&0xfffc) | (src&0x3);
+				flag = 1;
+				STORE_RM16(modrm, dst);
+			}
+		} else {
+			UINT32 ea = GetEA(cpustate, modrm);
+			src = LOAD_REG16(modrm);
+			dst = READ16(cpustate, ea);
+			if( (dst&0x3) < (src&0x3) ) {
+				dst = (dst&0xfffc) | (src&0x3);
+				flag = 1;
+				WRITE16(cpustate, ea, dst);
+			}
 		}
-	} else {
-    	UINT32 ea = GetEA(cpustate, modrm);
-    	src = LOAD_REG16(modrm);
-    	dst = READ16(cpustate, ea);
-		if( (dst&0x3) < (src&0x3) ) {
-			dst = (dst&0xfffc) | (src&0x3);
-			flag = 1;
-			WRITE16(cpustate, ea, dst);
-		}
+		SetZF(flag);
 	}
-	SetZF(flag);
+	else
+		i386_trap(cpustate, 6, 0, 0);  // invalid opcode in real mode or v8086 mode
 }
 
 static void I386OP(push_i8)(i386_state *cpustate)			// Opcode 0x6a
