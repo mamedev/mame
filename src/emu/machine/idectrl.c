@@ -1165,7 +1165,7 @@ static void handle_command(ide_state *ide, UINT8 command)
 			ide->error = IDE_ERROR_DEFAULT;
 
 			/* signal an interrupt */
-			signal_interrupt(ide);
+			signal_delayed_interrupt(ide, MINIMUM_COMMAND_TIME, 0);
 			break;
 
 		case IDE_COMMAND_RECALIBRATE:
@@ -1173,7 +1173,7 @@ static void handle_command(ide_state *ide, UINT8 command)
 			ide->error = IDE_ERROR_NONE;
 
 			/* signal an interrupt */
-			signal_interrupt(ide);
+			signal_delayed_interrupt(ide, MINIMUM_COMMAND_TIME, 0);
 			break;
 
 		case IDE_COMMAND_IDLE:
@@ -1195,7 +1195,7 @@ static void handle_command(ide_state *ide, UINT8 command)
 			ide->num_heads = ide->cur_head + 1;
 
 			/* signal an interrupt */
-			signal_interrupt(ide);
+			signal_delayed_interrupt(ide, MINIMUM_COMMAND_TIME, 0);
 			break;
 
 		case IDE_COMMAND_UNKNOWN_F9:
