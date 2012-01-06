@@ -14,6 +14,7 @@ typedef struct
 {
 	UINT32 lba;
 	UINT32 blocks;
+	int sectorbytes;
 	hard_disk_file *disk;
 	bool is_file;
 } SCSIHd;
@@ -45,7 +46,7 @@ static int scsihd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			logerror("SCSIHD: READ at LBA %x for %x blocks\n", our_this->lba, our_this->blocks);
 
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return our_this->blocks * 512;
+			return our_this->blocks * our_this->sectorbytes;
 
 		case 0x0a: // WRITE(6)
 			our_this->lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
@@ -54,7 +55,7 @@ static int scsihd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			logerror("SCSIHD: WRITE to LBA %x for %x blocks\n", our_this->lba, our_this->blocks);
 
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAOUT );
-			return our_this->blocks * 512;
+			return our_this->blocks * our_this->sectorbytes;
 
 		case 0x12: // INQUIRY
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
@@ -80,7 +81,7 @@ static int scsihd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			logerror("SCSIHD: READ at LBA %x for %x blocks\n", our_this->lba, our_this->blocks);
 
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return our_this->blocks * 512;
+			return our_this->blocks * our_this->sectorbytes;
 
 		case 0x2a: // WRITE (10)
 			our_this->lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
@@ -90,7 +91,7 @@ static int scsihd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAOUT );
 
-			return our_this->blocks * 512;
+			return our_this->blocks * our_this->sectorbytes;
 
 		case 0xa8: // READ(12)
 			our_this->lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
@@ -99,7 +100,7 @@ static int scsihd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			logerror("SCSIHD: READ at LBA %x for %x blocks\n", our_this->lba, our_this->blocks);
 
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
-			return our_this->blocks * 512;
+			return our_this->blocks * our_this->sectorbytes;
 
 		default:
 			return SCSIBase( &SCSIClassHARDDISK, SCSIOP_EXEC_COMMAND, scsiInstance, 0, NULL );
@@ -168,8 +169,8 @@ static void scsihd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 					}
 					our_this->lba++;
 					our_this->blocks--;
-					dataLength -= 512;
-					data += 512;
+					dataLength -= our_this->sectorbytes;
+					data += our_this->sectorbytes;
 				}
 			}
 			break;
@@ -231,8 +232,8 @@ static void scsihd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 					}
 					our_this->lba++;
 					our_this->blocks--;
-					dataLength -= 512;
-					data += 512;
+					dataLength -= our_this->sectorbytes;
+					data += our_this->sectorbytes;
 				}
 			}
 			break;
@@ -250,6 +251,7 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 
 	our_this->lba = 0;
 	our_this->blocks = 0;
+	our_this->sectorbytes = 512;
 
 	state_save_register_item( machine, "scsihd", diskregion, 0, our_this->lba );
 	state_save_register_item( machine, "scsihd", diskregion, 0, our_this->blocks );
@@ -258,13 +260,29 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 		our_this->is_file = TRUE;
 		our_this->disk = machine.device<harddisk_image_device>(diskregion)->get_hard_disk_file();
 	} else {
-		our_this->is_file = FALSE;
-		our_this->disk = hard_disk_open(get_disk_handle( machine, diskregion ));
+		for (device_t *device = machine.devicelist().first(); device != NULL; device = device->next())
+		{
+			if (device->subdevice(diskregion)) {
+				our_this->is_file = TRUE;
+				our_this->disk = device->subdevice<harddisk_image_device>(diskregion)->get_hard_disk_file();
+			}
+		}
+		
+		if (!our_this->disk)
+		{
+			our_this->is_file = FALSE;
+			our_this->disk = hard_disk_open(get_disk_handle( machine, diskregion ));
+		}
 	}
 
 	if (!our_this->disk)
 	{
 		logerror("SCSIHD: no HD found!\n");
+	}
+	else
+	{
+		const hard_disk_info *hdinfo = hard_disk_get_info(our_this->disk);
+		our_this->sectorbytes = hdinfo->sectorbytes;
 	}
 }
 
