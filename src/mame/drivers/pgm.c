@@ -4160,12 +4160,12 @@ static void expand_colourdata( running_machine &machine )
 
 
 
-static void pgm_basic_init( running_machine &machine )
+static void pgm_basic_init( running_machine &machine, bool set_bank = true )
 {
 	pgm_state *state = machine.driver_data<pgm_state>();
 
 	UINT8 *ROM = machine.region("maincpu")->base();
-	if (ROM) memory_set_bankptr(machine, "bank1", &ROM[0x100000]);
+	if (set_bank) memory_set_bankptr(machine, "bank1", &ROM[0x100000]);
 
 	expand_32x32x5bpp(machine);
 	expand_colourdata(machine);
@@ -5598,21 +5598,21 @@ void install_asic27a_espgal(running_machine& machine)
 
 static DRIVER_INIT( ddp3 )
 {
-	pgm_basic_init(machine);
+	pgm_basic_init(machine, false);
 	pgm_py2k2_decrypt(machine); // yes, it's the same as photo y2k2
 	install_asic27a_ddp3(machine);
 }
 
 static DRIVER_INIT( ket )
 {
-	pgm_basic_init(machine);
+	pgm_basic_init(machine, false);
 	pgm_ket_decrypt(machine);
 	install_asic27a_ket(machine);
 }
 
 static DRIVER_INIT( espgal )
 {
-	pgm_basic_init(machine);
+	pgm_basic_init(machine, false);
 	pgm_espgal_decrypt(machine);
 	install_asic27a_espgal(machine);
 }
