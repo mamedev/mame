@@ -2240,10 +2240,10 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-/* Different Softlists for different regions (for now at least) */
 MACHINE_CONFIG_DERIVED( saturnus, saturn )
 	MCFG_CDROM_ADD( "cdrom",saturn_cdrom )
-	MCFG_SOFTWARE_LIST_ADD("cd_list","sat_us")
+	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
+	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-U")
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("sat_cart")
@@ -2254,7 +2254,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( saturneu, saturn )
 	MCFG_CDROM_ADD( "cdrom",saturn_cdrom )
-	MCFG_SOFTWARE_LIST_ADD("cd_list","sat_eu")
+	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
+	MCFG_SOFTWARE_LIST_FILTER("cd_list","PAL")
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("sat_cart")
@@ -2265,7 +2266,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( saturnjp, saturn )
 	MCFG_CDROM_ADD( "cdrom",saturn_cdrom )
-	MCFG_SOFTWARE_LIST_ADD("cd_list","sat_jp")
+	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
+	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-J")
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("sat_cart")
