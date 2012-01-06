@@ -4,7 +4,9 @@ class pgm_state : public driver_device
 public:
 	pgm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		{ }
+		{
+			m_irq4_disabled = 0;
+		}
 
 	/* memory pointers */
 //  UINT16 *      m_mainram;  // currently this is also used by nvram handler
@@ -85,6 +87,10 @@ public:
 	cpu_device *m_soundcpu;
 	cpu_device *m_prot;
 	device_t *m_ics;
+
+
+	/* hack */
+	int m_irq4_disabled;
 };
 
 class oldsplus_state : public pgm_state

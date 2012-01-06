@@ -12,9 +12,9 @@
 
 /***************************************************************************/
 
-WRITE16_HANDLER( rainbow_spritectrl_w )
+WRITE16_HANDLER( rbisland_spritectrl_w )
 {
-	rainbow_state *state = space->machine().driver_data<rainbow_state>();
+	rbisland_state *state = space->machine().driver_data<rbisland_state>();
 
 	if (offset == 0)
 	{
@@ -28,7 +28,7 @@ WRITE16_HANDLER( rainbow_spritectrl_w )
 
 WRITE16_HANDLER( jumping_spritectrl_w )
 {
-	rainbow_state *state = space->machine().driver_data<rainbow_state>();
+	rbisland_state *state = space->machine().driver_data<rbisland_state>();
 
 	if (offset == 0)
 	{
@@ -42,9 +42,9 @@ WRITE16_HANDLER( jumping_spritectrl_w )
 
 /***************************************************************************/
 
-SCREEN_UPDATE( rainbow )
+SCREEN_UPDATE( rbisland )
 {
-	rainbow_state *state = screen.machine().driver_data<rainbow_state>();
+	rbisland_state *state = screen.machine().driver_data<rbisland_state>();
 	int layer[2];
 
 	pc080sn_tilemap_update(state->m_pc080sn);
@@ -65,7 +65,7 @@ SCREEN_UPDATE( rainbow )
 /***************************************************************************
 
 Jumping uses different sprite controller
-than rainbow island. - values are remapped
+than rbisland island. - values are remapped
 at address 0x2EA in the code. Apart from
 physical layout, the main change is that
 the Y settings are active low.
@@ -74,7 +74,7 @@ the Y settings are active low.
 
 VIDEO_START( jumping )
 {
-	rainbow_state *state = machine.driver_data<rainbow_state>();
+	rbisland_state *state = machine.driver_data<rbisland_state>();
 
 	pc080sn_set_trans_pen(state->m_pc080sn, 1, 15);
 
@@ -89,7 +89,7 @@ VIDEO_START( jumping )
 
 SCREEN_UPDATE( jumping )
 {
-	rainbow_state *state = screen.machine().driver_data<rainbow_state>();
+	rbisland_state *state = screen.machine().driver_data<rbisland_state>();
 	UINT16 *spriteram = state->m_spriteram;
 	int offs, layer[2];
 	int sprite_colbank = (state->m_sprite_ctrl & 0xe0) >> 1;

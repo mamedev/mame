@@ -751,6 +751,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
+	$(DRIVERS)/pgm2.o \
 	$(DRIVERS)/spoker.o \
 	$(MACHINE)/pgmcrypt.o \
 	$(MACHINE)/pgmprot.o \
