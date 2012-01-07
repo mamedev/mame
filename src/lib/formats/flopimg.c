@@ -2018,6 +2018,7 @@ void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const UINT8 *b
 		UINT8 head = sbyte_mfm_r(bitstream, pos, track_size);
 		UINT8 sector = sbyte_mfm_r(bitstream, pos, track_size);
 		UINT8 size = sbyte_mfm_r(bitstream, pos, track_size);
+
 		if(size >= 8)
 			continue;
 		int ssize = 128 << size;
@@ -2027,13 +2028,13 @@ void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const UINT8 *b
 			continue;
 
 		// Start of IDAM and DAM are supposed to be exactly 704 cells
-		// apart.  Of course the hardware is tolerant, but not that
-		// tolerant.  Accept +/- 32 cells of shift.
+		// apart.  Of course the hardware is tolerant.  Accept +/- 128
+		// cells of shift.
 
 		int d_index;
 		for(d_index = 0; d_index < dblk_count; d_index++) {
 			int delta = dblk[d_index] - idblk[i];
-			if(delta >= 704-32 && delta <= 704+32)
+			if(delta >= 704-128 && delta <= 704+128)
 				break;
 		}
 		if(d_index == dblk_count)
