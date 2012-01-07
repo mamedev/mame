@@ -13,7 +13,7 @@ const char *dfi_format::name() const
 
 const char *dfi_format::description() const
 {
-	return "Diskferret flux dump format";
+	return "DiskFerret flux dump format";
 }
 
 const char *dfi_format::extensions() const
