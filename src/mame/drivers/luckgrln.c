@@ -11,7 +11,7 @@
  - reel scroll / reel enable / reel colours
  - are the colours correct even on the text layer? they look odd in places, and there are unused bits
  - dunno where / how is the service mode bit is connected (I've accessed it once, but dunno how I've did it)
-
+ - graphics in 7smash are quite off (encrypted ROM?)
 
  Lucky Girl
  Wing 1991
@@ -398,6 +398,12 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( _7smash_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x0bfff) AM_ROM
+	AM_IMPORT_FROM( mainmap )
+	AM_RANGE(0x10000, 0x2ffff) AM_UNMAP
+	AM_RANGE(0xf0000, 0xfffff) AM_UNMAP
+ADDRESS_MAP_END
 
 static WRITE8_HANDLER( output_w )
 {
@@ -543,7 +549,7 @@ static WRITE8_HANDLER(counters_w)
 
 /* are some of these reads / writes mirrored? there seem to be far too many */
 static ADDRESS_MAP_START( portmap, AS_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff) // i think
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
 	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
 
@@ -596,6 +602,16 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8 )
 
 ADDRESS_MAP_END
 
+/* reads a bit 1 status there after every round played */
+static READ8_HANDLER( test_r )
+{
+	return 0xff;
+}
+
+static ADDRESS_MAP_START( _7smash_io, AS_IO, 8 )
+	AM_RANGE(0x66, 0x66) AM_READ(test_r)
+	AM_IMPORT_FROM( portmap )
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( luckgrln )
 	PORT_START("IN0")
@@ -797,6 +813,120 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( _7smash )
+	PORT_START("DSW1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "DSW4" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED  )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SLOT_STOP3 ) PORT_NAME("Slot 3 / Odds")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SLOT_STOP2 ) PORT_NAME("Slot 2 / Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SLOT_STOP1 ) PORT_NAME("Slot 1")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED  )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_NAME("Service SW")
+	PORT_BIT( 0xef, IP_ACTIVE_LOW,  IPT_UNUSED  )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN2  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN3  )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED  )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Reset SW")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNUSED ) //PORT_NAME("Hopper Coin SW")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED ) //PORT_NAME("Hopper Coin Empty SW")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK )
+INPUT_PORTS_END
+
 
 static const gfx_layout tiles8x8_layout =
 {
@@ -871,6 +1001,12 @@ static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( _7smash, luckgrln )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(_7smash_map)
+	MCFG_CPU_IO_MAP(_7smash_io)
+MACHINE_CONFIG_END
+
 static DRIVER_INIT( luckgrln )
 {
 	int i;
@@ -924,6 +1060,25 @@ ROM_START( luckgrln )
 	ROM_LOAD( "falcon.6", 0x40000, 0x20000, CRC(bfb02c87) SHA1(1b5ca562ed76eb3f1b4a52d379a6af07e79b6ee5) )
 ROM_END
 
+ROM_START( 7smash )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "eagle.8",      0x000000, 0x020000, CRC(b115c5d5) SHA1(3f80613886b7f8092ec914c9bfb416078aca82a3) )
+	ROM_LOAD( "7smash.bin",   0x000000, 0x004000, CRC(58396efa) SHA1(b957d28e321a5c4f9a90e0a7eaf8f01450662c0e) ) // internal Z180 rom
+
+	ROM_REGION( 0x20000, "rom_data", ROMREGION_ERASEFF ) // external data / cpu rom
+
+
+	ROM_REGION( 0x60000, "reels", ROMREGION_ERASE00 ) // reel gfxs
+	ROM_LOAD( "eagle.3",      0x40000, 0x020000, CRC(d75b3b2f) SHA1(1d90bc17f9e645966126fa19c42a7c4d54098776) )
+	ROM_LOAD( "eagle.2",      0x20000, 0x020000, CRC(211b5acb) SHA1(e35ae6c93a1daa9d3aa46970c5c3d39788f948bb) )
+	ROM_LOAD( "eagle.1",      0x00000, 0x020000, CRC(21317c37) SHA1(7706045b85f86f6e58cc67c2d7dee01d80df3422) )  // half unused, 5bpp
+
+	ROM_REGION( 0x60000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "eagle.6",      0x40000, 0x20000, CRC(2c4416d4) SHA1(25d04d4d08ab491a9684b8e6f21e57479711ee87) )
+	ROM_LOAD( "eagle.5",      0x20000, 0x20000, CRC(cd8bc456) SHA1(cefe211492158f445ceaaa9015e1143ea9afddbb) )
+	ROM_LOAD( "eagle.4",      0x00000, 0x20000, CRC(dcf92dca) SHA1(87c7d88dc35981ad636376b53264cee87ccdaa71) )  // half unused, 5bpp
+ROM_END
+
 
 /*********************************************
 *                Game Drivers                *
@@ -931,4 +1086,5 @@ ROM_END
 
        YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY           FULLNAME                                 FLAGS                                  LAYOUT  */
 GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_NO_SOUND, layout_luckgrln )
+GAMEL( 1993, 7smash, 0,        _7smash,  _7smash,  0,        ROT0, "Sovic",          "7 Smash", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_NO_SOUND, layout_luckgrln )
 
