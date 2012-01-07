@@ -182,6 +182,8 @@ public:
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
 
+	virtual class ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
+
 	const image_device_format *device_get_indexed_creatable_format(int index);
 	const image_device_format *device_get_named_creatable_format(const char *format_name);
 	const option_guide *device_get_creation_option_guide() { return create_option_guide(); }

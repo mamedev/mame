@@ -975,11 +975,11 @@ static void data_handler(void *data, const XML_Char *s, int len)
  software_list_get_count
  -------------------------------------------------*/
 
-static int software_list_get_count(software_list *swlist)
+static int software_list_get_count(const software_list *swlist)
 {
 	int count = 0;
 
-	for (software_info *swinfo = software_list_find(swlist, "*", NULL); swinfo != NULL; swinfo = software_list_find(swlist, "*", swinfo))
+	for (const software_info *swinfo = software_list_find(swlist, "*", NULL); swinfo != NULL; swinfo = software_list_find(swlist, "*", swinfo))
 		count++;
 
 	return count;
@@ -993,11 +993,11 @@ static int software_list_get_count(software_list *swlist)
 
 const char *software_get_clone(emu_options &options, char *swlist, const char *swname)
 {
-	software_list *software_list_ptr = software_list_open(options, swlist, FALSE, NULL);
+	const software_list *software_list_ptr = software_list_open(options, swlist, FALSE, NULL);
 	const char *retval = NULL;
 	if (software_list_ptr)
 	{
-		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
+		const software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
 		retval = core_strdup(tmp->parentname);
 		software_list_close(software_list_ptr);
 	}
@@ -1013,12 +1013,12 @@ const char *software_get_clone(emu_options &options, char *swlist, const char *s
 
 UINT32 software_get_support(emu_options &options, char *swlist, const char *swname)
 {
-	software_list *software_list_ptr = software_list_open(options, swlist, FALSE, NULL);
+	const software_list *software_list_ptr = software_list_open(options, swlist, FALSE, NULL);
 	UINT32 retval = 0;
 
 	if (software_list_ptr)
 	{
-		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
+		const software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
 		retval = tmp->supported;
 		software_list_close(software_list_ptr);
 	}
@@ -1132,7 +1132,7 @@ error:
     software_list_close
 -------------------------------------------------*/
 
-void software_list_close(software_list *swlist)
+void software_list_close(const software_list *swlist)
 {
 	if (swlist == NULL)
 		return;
@@ -1147,7 +1147,7 @@ void software_list_close(software_list *swlist)
  software_list_get_description
  -------------------------------------------------*/
 
-const char *software_list_get_description(software_list *swlist)
+const char *software_list_get_description(const software_list *swlist)
 {
 	return swlist->description;
 }
@@ -1279,7 +1279,7 @@ void software_list_find_approx_matches(software_list_config *swlistcfg, software
     software_list_find
 -------------------------------------------------*/
 
-software_info *software_list_find(software_list *swlist, const char *look_for, software_info *prev)
+const software_info *software_list_find(const software_list *swlist, const char *look_for, const software_info *prev)
 {
 	if (swlist == NULL)
 		return NULL;
@@ -1288,8 +1288,9 @@ software_info *software_list_find(software_list *swlist, const char *look_for, s
 		return NULL;
 
 	/* If we haven't read in the xml file yet, then do it now */
+	/* Just-in-time parsing, hence the const-cast */
 	if ( ! swlist->software_info_list )
-		software_list_parse( swlist, swlist->error_proc, NULL );
+		software_list_parse( const_cast<software_list *>(swlist), swlist->error_proc, NULL );
 
 	for ( prev = prev ? prev->next : swlist->software_info_list; prev; prev = prev->next )
 	{
@@ -1300,6 +1301,12 @@ software_info *software_list_find(software_list *swlist, const char *look_for, s
 	return prev;
 }
 
+software_info *software_list_find(software_list *swlist, const char *look_for, software_info *prev)
+{
+	return const_cast<software_info *>(software_list_find(const_cast<const software_list *>(swlist),
+														  look_for,
+														  const_cast<const software_info *>(prev)));
+}
 
 /*-------------------------------------------------
     software_find_romdata (for validation purposes)
@@ -1357,9 +1364,9 @@ static struct rom_entry *software_romdata_next(struct rom_entry *romdata)
     software_find_part
 -------------------------------------------------*/
 
-software_part *software_find_part(software_info *sw, const char *partname, const char *interface)
+const software_part *software_find_part(const software_info *sw, const char *partname, const char *interface)
 {
-	software_part *part = sw ? sw->partdata : NULL;
+	const software_part *part = sw ? sw->partdata : NULL;
 
 	 /* If neither partname nor interface supplied, then we just return the first entry */
 	if ( partname || interface )
@@ -1404,12 +1411,16 @@ software_part *software_find_part(software_info *sw, const char *partname, const
 	return part;
 }
 
+software_part *software_find_part(software_info *sw, const char *partname, const char *interface)
+{
+	return const_cast<software_part *>(software_find_part(const_cast<const software_info *>(sw), partname, interface));
+}
 
 /*-------------------------------------------------
     software_part_next
 -------------------------------------------------*/
 
-software_part *software_part_next(software_part *part)
+const software_part *software_part_next(const software_part *part)
 {
 	if ( part && part->name )
 	{
@@ -1420,6 +1431,11 @@ software_part *software_part_next(software_part *part)
 		part = NULL;
 
 	return part;
+}
+
+software_part *software_part_next(software_part *part)
+{
+	return const_cast<software_part *>(software_part_next(const_cast<const software_part *>(part)));
 }
 
 /*-------------------------------------------------
@@ -1754,9 +1770,9 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
     software_part_get_feature
  -------------------------------------------------*/
 
-const char *software_part_get_feature(software_part *part, const char *feature_name)
+const char *software_part_get_feature(const software_part *part, const char *feature_name)
 {
-	feature_list *feature;
+	const feature_list *feature;
 
 	if (part == NULL)
 		return NULL;
@@ -1803,7 +1819,7 @@ const char *software_part_get_feature(software_part *part, const char *feature_n
     is_software_compatible
  -------------------------------------------------*/
 
-bool is_software_compatible(software_part *swpart, software_list_config *swlist)
+bool is_software_compatible(const software_part *swpart, const software_list_config *swlist)
 {
 	const char *compatibility = software_part_get_feature(swpart, "compatibility");
 	const char *filter = swlist->filter;
@@ -1817,6 +1833,22 @@ bool is_software_compatible(software_part *swpart, software_list_config *swlist)
 		token = strtok (NULL, ",");
 	}
 	return FALSE;
+}
+
+/*-------------------------------------------------
+    swinfo_has_multiple_parts
+ -------------------------------------------------*/
+
+bool swinfo_has_multiple_parts(const software_info *swinfo, const char *interface)
+{
+	int count = 0;
+
+	for (const software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
+	{
+		if (strcmp(interface, swpart->interface_) == 0)
+			count++;
+	}
+	return (count > 1) ? true : false;
 }
 
 /***************************************************************************

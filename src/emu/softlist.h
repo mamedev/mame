@@ -107,18 +107,22 @@ struct _software_list_config
 
 /* Handling a software list */
 software_list *software_list_open(emu_options &options, const char *listname, int is_preload, void (*error_proc)(const char *message));
-void software_list_close(software_list *swlist);
+void software_list_close(const software_list *swlist);
 software_info *software_list_find(software_list *swlist, const char *look_for, software_info *prev);
-const char *software_list_get_description(software_list *swlist);
+const char *software_list_get_description(const software_list *swlist);
 void software_list_parse(software_list *swlist, void (*error_proc)(const char *message), void *param);
 
 software_part *software_find_part(software_info *sw, const char *partname, const char *interface_);
 software_part *software_part_next(software_part *part);
 
+const software_info *software_list_find(const software_list *swlist, const char *look_for, const software_info *prev);
+const software_part *software_find_part(const software_info *sw, const char *partname, const char *interface_);
+const software_part *software_part_next(const software_part *part);
+
 /* helpers */
 const char *software_get_clone(emu_options &options, char *swlist, const char *swname);
 UINT32 software_get_support(emu_options &options, char *swlist, const char *swname);
-const char *software_part_get_feature(software_part *part, const char *feature_name);
+const char *software_part_get_feature(const software_part *part, const char *feature_name);
 
 bool load_software_part(emu_options &options, device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
 
@@ -128,7 +132,9 @@ const char *software_get_default_slot(const device_list &devlist, emu_options &o
 
 void validate_softlists(emu_options &options);
 
-bool is_software_compatible(software_part *swpart, software_list_config *swlist);
+bool is_software_compatible(const software_part *swpart, const software_list_config *swlist);
+bool swinfo_has_multiple_parts(const software_info *swinfo, const char *interface);
+
 /*********************************************************************
 
     Driver software list configuration

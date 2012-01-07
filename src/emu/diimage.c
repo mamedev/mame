@@ -40,7 +40,9 @@
 #include "emu.h"
 #include "ui.h"
 #include "zippath.h"
-
+#include "uimenu.h"
+#include "uiimage.h"
+#include "uiswlist.h"
 
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE
@@ -107,7 +109,7 @@ device_image_interface::~device_image_interface()
 
 //-------------------------------------------------
 //  find_device_type - search trough list of
-//  device types to extact data
+//  device types to extract data
 //-------------------------------------------------
 
 const image_device_type_info *device_image_interface::find_device_type(iodevice_t type)
@@ -1030,5 +1032,303 @@ void device_image_interface::update_names()
 	{
 		m_instance_name = device_typename(image_type());
 		m_brief_instance_name = device_brieftypename(image_type());
+	}
+}
+
+/*-------------------------------------------------
+    get_selection_menu - create the menu stack
+    for ui-level image selection
+-------------------------------------------------*/
+
+class ui_menu_control_device_image : public ui_menu {
+public:
+	ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *image);
+	virtual ~ui_menu_control_device_image();
+	virtual void populate();
+	virtual void handle();
+		
+private:
+	enum {
+		START_FILE, START_OTHER_PART, START_SOFTLIST, SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, DO_CREATE, SELECT_SOFTLIST
+	};
+	int state;
+
+	device_image_interface *image;
+	astring current_directory;
+	astring current_file;
+	int submenu_result;
+	bool create_confirmed;
+	bool softlist_done;
+	const software_list *swl;
+	const software_info *swi;
+	const software_part *swp;
+	const software_list_config *slc;
+	astring software_info_name;
+
+	void test_create(bool &can_create, bool &need_confirm);
+	void load_software_part();
+};
+
+ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
+{
+	return auto_alloc_clear(machine, ui_menu_control_device_image(machine, container, this));
+}
+
+ui_menu_control_device_image::ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *_image) : ui_menu(machine, container)
+{
+	image = _image;
+
+	slc = 0;
+	swi = image->software_entry();
+	swp = image->part_entry();
+
+	if(swi)
+	{
+		state = START_OTHER_PART;
+		current_directory.cpy(image->working_directory());
+	}
+	else
+	{
+		state = START_FILE;
+
+		/* if the image exists, set the working directory to the parent directory */
+		if (image->exists())
+		{
+			current_file.cpy(image->filename());
+			zippath_parent(current_directory, current_file);
+		} else
+			current_directory.cpy(image->working_directory());
+
+		/* check to see if the path exists; if not clear it */
+		if (zippath_opendir(current_directory, NULL) != FILERR_NONE)
+			current_directory.reset();
+	}
+}
+
+ui_menu_control_device_image::~ui_menu_control_device_image()
+{
+}
+
+
+
+
+/*-------------------------------------------------
+    create_new_image - creates a new disk image
+-------------------------------------------------*/
+
+void ui_menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
+{
+	astring path;
+	osd_directory_entry *entry;
+	osd_dir_entry_type file_type;
+
+	/* assemble the full path */
+	zippath_combine(path, current_directory, current_file);
+
+	/* does a file or a directory exist at the path */
+	entry = osd_stat(path);
+	file_type = (entry != NULL) ? entry->type : ENTTYPE_NONE;
+	if (entry != NULL)
+		free(entry);
+
+	switch(file_type)
+	{
+		case ENTTYPE_NONE:
+			/* no file/dir here - always create */
+			can_create = true;
+			need_confirm = false;
+			break;
+
+		case ENTTYPE_FILE:
+			/* a file exists here - ask for permission from the user */
+			can_create = true;
+			need_confirm = true;
+			break;
+
+		case ENTTYPE_DIR:
+			/* a directory exists here - we can't save over it */
+			ui_popup_time(5, "Cannot save over directory");
+			can_create = false;
+			need_confirm = false;
+			break;
+
+		default:
+			fatalerror("Unexpected");
+			can_create = false;
+			need_confirm = false;
+			break;
+	}
+}
+
+void ui_menu_control_device_image::load_software_part()
+{
+	astring temp_name(swi->shortname);
+	temp_name.cat(":");
+	temp_name.cat(swp->name);
+	image->load(temp_name.cstr());
+}
+
+void ui_menu_control_device_image::populate()
+{
+}
+
+void ui_menu_control_device_image::handle()
+{
+	switch(state) {
+	case START_FILE: {
+		bool can_create = false;
+		if(image->is_creatable()) {
+			zippath_directory *directory = NULL;
+			file_error err = zippath_opendir(current_directory, &directory);
+			can_create = err == FILERR_NONE && !zippath_is_zip(directory);
+			if(directory)
+				zippath_closedir(directory);
+		}
+		submenu_result = -1;
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, true, can_create, &submenu_result)));
+		state = SELECT_FILE;
+		break;
+	}
+
+	case START_SOFTLIST:
+		slc = 0;
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software(machine(), container, image->image_interface(), &slc)));
+		state = SELECT_SOFTLIST;
+		break;
+
+	case START_OTHER_PART: {
+		submenu_result = -1;
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, swp->interface_, &swp, true, &submenu_result)));
+		state = SELECT_OTHER_PART;
+		break;
+	}
+
+	case SELECT_SOFTLIST:
+		if(!slc) {
+			ui_menu::stack_pop(machine());
+			break;
+		}
+		software_info_name = "";
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, slc, image->image_interface(), software_info_name)));
+		state = SELECT_PARTLIST;
+		break;
+
+	case SELECT_PARTLIST:
+		swl = software_list_open(machine().options(), slc->list_name, false, NULL);
+		swi = software_list_find(swl, software_info_name, NULL);
+		if(swinfo_has_multiple_parts(swi, image->image_interface())) {
+			submenu_result = -1;
+			swp = 0;
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
+			state = SELECT_ONE_PART;
+		} else {
+			image->load(software_info_name);
+			software_list_close(swl);
+			ui_menu::stack_pop(machine());
+		}
+		break;
+
+	case SELECT_ONE_PART:
+		switch(submenu_result) {
+		case ui_menu_software_parts::T_ENTRY: {
+			load_software_part();
+			software_list_close(swl);
+			ui_menu::stack_pop(machine());
+			break;
+		}
+
+		case -1: // return to list
+			software_list_close(swl);
+			state = SELECT_SOFTLIST;
+			break;
+			
+		}
+		break;
+
+	case SELECT_OTHER_PART:
+		switch(submenu_result) {
+		case ui_menu_software_parts::T_ENTRY: {
+			load_software_part();
+			ui_menu::stack_pop(machine());
+			break;
+		}
+
+		case ui_menu_software_parts::T_FMGR:
+			state = START_FILE;
+			handle();
+			break;
+
+		case -1: // return to system
+			ui_menu::stack_pop(machine());
+			break;
+			
+		}
+		break;
+
+	case SELECT_FILE:
+		switch(submenu_result) {
+		case ui_menu_file_selector::R_EMPTY:
+			image->unload();
+			ui_menu::stack_pop(machine());
+			break;
+
+		case ui_menu_file_selector::R_FILE:
+			image->load(current_file);
+			ui_menu::stack_pop(machine());
+			break;
+
+		case ui_menu_file_selector::R_CREATE:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file)));
+			state = CREATE_FILE;
+			break;
+
+		case ui_menu_file_selector::R_SOFTLIST:
+			state = START_SOFTLIST;
+			handle();
+			break;
+
+		case -1: // return to system
+			ui_menu::stack_pop(machine());
+			break;
+		}
+		break;
+
+	case CREATE_FILE: {
+		bool can_create, need_confirm;
+		test_create(can_create, need_confirm);
+		if(can_create) {
+			if(need_confirm) {
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_confirm_save_as(machine(), container, &create_confirmed)));
+				state = CREATE_CONFIRM;
+			} else {
+				astring path;
+				zippath_combine(path, current_directory, current_file);
+				int err = image->create(path, 0, NULL);
+				if (err != 0)
+					popmessage("Error: %s", image->error());
+				ui_menu::stack_pop(machine());				
+			}
+		} else {
+			state = START_FILE;
+			handle();
+		}			
+		break;
+	}
+
+	case CREATE_CONFIRM: {
+		state = create_confirmed ? DO_CREATE : START_FILE;
+		handle();
+		break;
+	}
+
+	case DO_CREATE: {
+		astring path;
+		zippath_combine(path, current_directory, current_file);
+		int err = image->create(path, 0, NULL);
+		if (err != 0)
+			popmessage("Error: %s", image->error());
+		ui_menu::stack_pop(machine());
+		break;
+	}
 	}
 }

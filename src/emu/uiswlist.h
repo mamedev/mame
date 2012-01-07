@@ -12,60 +12,63 @@
 #ifndef __UISWLIST_H__
 #define __UISWLIST_H__
 
-struct ui_menu_software_entry_info {
-	ui_menu_software_entry_info *next;
-
-	const char *short_name;
-	const char *long_name;
-	const char *interface;
-	char *list_name;
-	device_image_interface* image;
-};
-
 class ui_menu_software_parts : public ui_menu {
 public:
-	ui_menu_software_parts(running_machine &machine, render_container *container, ui_menu_software_entry_info *entry);
+	enum { T_ENTRY, T_FMGR };
+	ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool opt_fmgr, int *result);
 	virtual ~ui_menu_software_parts();
 	virtual void populate();
 	virtual void handle();
 
 private:
-	struct software_part_info {
-		const char *part_name;
-		const char *interface;
+	struct software_part_menu_entry {
+		int type;
+		const software_part *part;
 	};
 
-	ui_menu_software_entry_info *entry;
+	const software_info *info;
+	const char *interface;
+	const software_part **selected_part;
+	bool opt_fmgr;
+	int *result;
 };
 
 class ui_menu_software_list : public ui_menu {
 public:
-	ui_menu_software_list(running_machine &machine, render_container *container, software_list_config *swlist, device_image_interface *image);
+	ui_menu_software_list(running_machine &machine, render_container *container, const software_list_config *swlist, const char *interface, astring &result);
 	virtual ~ui_menu_software_list();
 	virtual void populate();
 	virtual void handle();
 
 private:
-	software_list_config *swlist;	/* currently selected list */
-	device_image_interface *image;
-	ui_menu_software_entry_info *entrylist;
+	struct entry_info {
+		entry_info *next;
+
+		const char *short_name;
+		const char *long_name;
+	};
+
+	const software_list_config *swlist;	/* currently selected list */
+	const char *interface;
+	astring &result;
+	entry_info *entrylist;
 	char filename_buffer[1024];
 	bool ordered_by_shortname;
 
-	int compare_entries(const ui_menu_software_entry_info *e1, const ui_menu_software_entry_info *e2, bool shortname);
-	ui_menu_software_entry_info *append_software_entry(software_info *swinfo, device_image_interface* image);
-	bool swinfo_has_multiple_parts(software_info *swinfo, const char *interface);
+	int compare_entries(const entry_info *e1, const entry_info *e2, bool shortname);
+	entry_info *append_software_entry(const software_info *swinfo);
 };
 
 class ui_menu_software : public ui_menu {
 public:
-	ui_menu_software(running_machine &machine, render_container *container, device_image_interface *device);
+	ui_menu_software(running_machine &machine, render_container *container, const char *interface, const software_list_config **result);
 	virtual ~ui_menu_software();
 	virtual void populate();
 	virtual void handle();
 
 private:
-	device_image_interface *image;
+	const char *interface;
+	const software_list_config **result;
 };
 
 #endif	/* __UISWLIST_H__ */
