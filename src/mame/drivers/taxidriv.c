@@ -2,6 +2,11 @@
 
 Taxi Driver  (c) 1984 Graphic Techno
 
+XTAL:  10MHz, 8MHz
+CPU:   3 * NEC D780C (clocks unknown)
+SOUND: 2 * AY-3-8910 (clocks unknown)
+OTHER: 5 * M5L8255AP
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -454,6 +459,9 @@ ROM_START( taxidriv )
 	ROM_REGION( 0x4000, "gfx5", 0 )	/* not used?? */
     ROM_LOAD( "12.21.ic88",   0x0000, 0x2000, CRC(684b7bb0) SHA1(d83c45ff3adf94c649340227794020482231399f) )
     ROM_LOAD( "13.20.ic89",   0x2000, 0x2000, CRC(d1ef110e) SHA1(e34b6b4b70c783a8cf1296a05d3cec6af5820d0c) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.ic2",  0x0000, 0x0100, NO_DUMP ) // color prom located at edge of pcb
 ROM_END
 
 
