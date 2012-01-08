@@ -20,7 +20,9 @@
     Mr. Dig                    (c) 2000 Sun
     Final Godori               (c) 2001 SemiCom            (version 2.20.5915)
     Wyvern Wings               (c) 2001 SemiCom
+    Toy Land Adventure         (c) 2001 SemiCom
     Mr. Kicker                 (c) 2001 SemiCom [1]
+    Toy Land Adventure         (c) 2001 SemiCom [2]
     Age Of Heroes - Silkroad 2 (c) 2001 Unico              (v0.63 - 2001/02/07)
 
  Real games bugs:
@@ -29,14 +31,14 @@
  Notes:
  [1]    Mr. Kicker game code crashes if the eeprom values are empty, because it replaces the SP register with a bogus value at PC = $18D0 before crashing.
         It could be an original game bug or a hyperstone core bug
+ [2]    Toy Land Adventure is currently missing graphics roms which makes it non-working.
 
- Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB
- that Semicom also used for Date Quiz Go Go Episode 2 game.
+ Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB that
+   Semicom also used for Toy Land Adventure & SemiComDate Quiz Go Go Episode 2 game.
 
  Undumped Semicom games on similar hardware:
    Wivern Wings - Semicom's orginal release with alt spelling of title
    Red Wyvern - A semi-sequel or update?
-   Toy Land Adventure (c) 2001 - PCB photo shows Hyperstone based hardware
  Same time era, but unknown hardware:
    Gaia The last Choice of the Earth (c) 1998 (might be Byron Future Assault type hardware)
    Diet Family (c) 2001
@@ -2079,6 +2081,15 @@ static DRIVER_INIT( dquizgo2 )
 	state->m_flip_bit = 1;
 }
 
+static DRIVER_INIT( toyland )
+{
+	vamphalf_state *state = machine.driver_data<vamphalf_state>();
+//	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00cde70, 0x00cde73, FUNC(dquizgo2_speedup_r) ); /* Needs it's own speed up */
+
+	state->m_palshift = 0;
+	state->m_flip_bit = 1;
+}
+
 static DRIVER_INIT( aoh )
 {
 	vamphalf_state *state = machine.driver_data<vamphalf_state>();
@@ -2119,6 +2130,6 @@ GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",    
 GAME( 2000, mrdig,    0,        mrdig,    common,   mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
 GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", 0 )
-GAME( 2001, toyland,  0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",           "Toy Land Adventure", GAME_NOT_WORKING ) /* Missing GRFX roms */
+GAME( 2001, toyland,  0,        coolmini, common,   toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", GAME_NOT_WORKING ) /* Missing GRFX roms */
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings", GAME_NO_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
