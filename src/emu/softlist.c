@@ -175,7 +175,7 @@ static void software_name_split(const char *swlist_swname, char **swlist_name, c
 
 static void add_rom_entry(software_list *swlist, const char *name, const char *hashdata, UINT32 offset, UINT32 length, UINT32 flags)
 {
-	software_part *part = &swlist->softinfo->partdata[swlist->current_part_entry-1];
+	software_part *part = &swlist->softinfo->partdata[swlist->softinfo->current_part_entry-1];
 	if ((flags & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_REGION && name!=NULL && part!=NULL) {
 		if (swlist->current_rom_entry>0) {
 			for (int i=0;i<swlist->current_rom_entry;i++) {
@@ -221,7 +221,7 @@ static void add_rom_entry(software_list *swlist, const char *name, const char *h
 
 static void add_feature(software_list *swlist, char *feature_name, char *feature_value)
 {
-	software_part *part = &swlist->softinfo->partdata[swlist->current_part_entry-1];
+	software_part *part = &swlist->softinfo->partdata[swlist->softinfo->current_part_entry-1];
 	feature_list *new_entry;
 
 	/* First allocate the new entry */
@@ -300,21 +300,21 @@ static void add_info(software_list *swlist, char *feature_name, char *feature_va
 
 static void add_software_part(software_list *swlist, const char *name, const char *interface)
 {
-	software_part *part = &swlist->softinfo->partdata[swlist->current_part_entry];
+	software_part *part = &swlist->softinfo->partdata[swlist->softinfo->current_part_entry];
 
 	part->name = name;
 	part->interface_ = interface;
 	part->featurelist = NULL;
 	part->romdata = NULL;
 
-	swlist->current_part_entry += 1;
+	swlist->softinfo->current_part_entry += 1;
 
-	if ( swlist->current_part_entry >= swlist->part_entries )
+	if ( swlist->softinfo->current_part_entry >= swlist->softinfo->part_entries )
 	{
 		software_part *new_parts;
 
-		swlist->part_entries += 2;
-		new_parts = (software_part *)pool_realloc_lib(swlist->pool, swlist->softinfo->partdata, swlist->part_entries * sizeof(software_part) );
+		swlist->softinfo->part_entries += 2;
+		new_parts = (software_part *)pool_realloc_lib(swlist->pool, swlist->softinfo->partdata, swlist->softinfo->part_entries * sizeof(software_part) );
 
 		if ( new_parts )
 		{
@@ -323,7 +323,7 @@ static void add_software_part(software_list *swlist, const char *name, const cha
 		else
 		{
 			/* Allocation error */
-			swlist->current_part_entry -= 1;
+			swlist->softinfo->current_part_entry -= 1;
 		}
 	}
 }
@@ -416,9 +416,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					}
 
 					/* Allocate initial space to hold part information */
-					swlist->part_entries = 2;
-					swlist->current_part_entry = 0;
-					elem->partdata = (software_part *)pool_malloc_lib(swlist->pool, swlist->part_entries * sizeof(software_part) );
+					elem->part_entries = 2;
+					elem->current_part_entry = 0;
+					elem->partdata = (software_part *)pool_malloc_lib(swlist->pool, elem->part_entries * sizeof(software_part) );
 					if ( !elem->partdata )
 						return;
 					elem->shared_info = (feature_list *)pool_malloc_lib(swlist->pool, sizeof(feature_list) );
@@ -561,8 +561,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						/* Allocate initial space to hold the rom information */
 						swlist->rom_entries = 3;
 						swlist->current_rom_entry = 0;
-						swlist->softinfo->partdata[swlist->current_part_entry-1].romdata = (struct rom_entry *)pool_malloc_lib(swlist->pool, swlist->rom_entries * sizeof(struct rom_entry));
-						if ( ! swlist->softinfo->partdata[swlist->current_part_entry-1].romdata )
+						swlist->softinfo->partdata[swlist->softinfo->current_part_entry-1].romdata = (struct rom_entry *)pool_malloc_lib(swlist->pool, swlist->rom_entries * sizeof(struct rom_entry));
+						if ( ! swlist->softinfo->partdata[swlist->softinfo->current_part_entry-1].romdata )
 							return;
 					}
 				}
@@ -1664,7 +1664,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 		if ( software_info_ptr->publisher )
 			(*sw_info)->publisher = auto_strdup( image->device().machine(), software_info_ptr->publisher );
 
-		(*sw_info)->partdata = (software_part *)auto_alloc_array_clear(image->device().machine(), UINT8, (software_list_ptr->part_entries + 1)* sizeof(software_part) );
+		(*sw_info)->partdata = (software_part *)auto_alloc_array_clear(image->device().machine(), UINT8, (software_info_ptr->part_entries + 1)* sizeof(software_part) );
 		software_part *new_part = (*sw_info)->partdata;
 		for (software_part *swp = software_find_part(software_info_ptr, NULL, NULL); swp != NULL; swp = software_part_next(swp))
 		{

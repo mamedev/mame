@@ -49,6 +49,8 @@ struct software_info
 	feature_list *shared_info;	// Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
 								// by each part of this software entry (after loading these are stored in partdata->featurelist)
 	UINT32 supported;
+	int part_entries;
+	int current_part_entry;
 	software_part *partdata;
 	struct software_info *next;	// Used internally
 };
@@ -64,8 +66,7 @@ enum softlist_parse_position
 };
 
 
-typedef struct _parse_state parse_state;
-struct _parse_state
+struct parse_state
 {
 	XML_Parser	parser;
 	int			done;
@@ -78,8 +79,7 @@ struct _parse_state
 };
 
 
-typedef struct _software_list software_list;
-struct _software_list
+struct software_list
 {
 	emu_file	*file;
 	object_pool	*pool;
@@ -89,16 +89,13 @@ struct _software_list
 	struct software_info	*current_software_info;
 	software_info	*softinfo;
 	const char *look_for;
-	int part_entries;
-	int current_part_entry;
 	int rom_entries;
 	int current_rom_entry;
 	void (*error_proc)(const char *message);
 	int list_entries;
 };
 
-typedef struct _software_list_config software_list_config;
-struct _software_list_config
+struct software_list_config
 {
 	char *list_name;
 	UINT32 list_type;
