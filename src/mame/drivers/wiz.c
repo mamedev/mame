@@ -80,7 +80,6 @@ TODO:
 
 Wiz:
 - Possible sprite/char priority issues.
-- There is unknown device (Sony CXK5808-55) on the board.
 - And the supplier of the screenshot says there still may be some wrong
   colors. Just before the break on Level 2 there is a cresent moon,
   the background should probably be black.
@@ -718,7 +717,7 @@ static INTERRUPT_GEN( wiz_sound_interrupt )
 {
 	wiz_state *state = device->machine().driver_data<wiz_state>();
 
-	if(state->m_sound_nmi_mask)
+	if(state->m_sound_nmi_mask & 1)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
