@@ -978,7 +978,7 @@ static TIMER_DEVICE_CALLBACK( namcona1_interrupt )
 	namcona1_state *state = timer.machine().driver_data<namcona1_state>();
 	int scanline = param;
 	int enabled = state->m_mEnableInterrupts ? ~state->m_vreg[0x1a/2] : 0;
-	
+
 	// vblank
 	if (scanline == 224)
 	{

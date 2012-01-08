@@ -1046,7 +1046,7 @@ public:
 	virtual ~ui_menu_control_device_image();
 	virtual void populate();
 	virtual void handle();
-		
+
 private:
 	enum {
 		START_FILE, START_OTHER_PART, START_SOFTLIST, SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, DO_CREATE, SELECT_SOFTLIST
@@ -1241,7 +1241,7 @@ void ui_menu_control_device_image::handle()
 			software_list_close(swl);
 			state = SELECT_SOFTLIST;
 			break;
-			
+
 		}
 		break;
 
@@ -1261,7 +1261,7 @@ void ui_menu_control_device_image::handle()
 		case -1: // return to system
 			ui_menu::stack_pop(machine());
 			break;
-			
+
 		}
 		break;
 
@@ -1306,12 +1306,12 @@ void ui_menu_control_device_image::handle()
 				int err = image->create(path, 0, NULL);
 				if (err != 0)
 					popmessage("Error: %s", image->error());
-				ui_menu::stack_pop(machine());				
+				ui_menu::stack_pop(machine());
 			}
 		} else {
 			state = START_FILE;
 			handle();
-		}			
+		}
 		break;
 	}
 

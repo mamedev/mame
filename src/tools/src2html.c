@@ -94,7 +94,7 @@ struct token_entry
 struct include_path
 {
 	include_path *	next;
-	astring  		path;
+	astring 		path;
 };
 
 

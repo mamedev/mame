@@ -395,8 +395,8 @@ void ui_menu_software::handle()
 	const ui_menu_event *event = process(0);
 
 	if (event != NULL && event->iptkey == IPT_UI_SELECT) {
-		//		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, (software_list_config *)event->itemref, image)));
+		//      ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, (software_list_config *)event->itemref, image)));
 		*result = (software_list_config *)event->itemref;
 		ui_menu::stack_pop(machine());
-	}		
+	}
 }

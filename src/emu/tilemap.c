@@ -117,10 +117,10 @@ public:
 	INT32						dy_flipped;			/* global vertical scroll offset when flipped */
 
 	/* pixel data */
-	bitmap_t 					pixmap;				/* cached pixel data */
+	bitmap_t					pixmap;				/* cached pixel data */
 
 	/* transparency mapping */
-	bitmap_t 					flagsmap;			/* per-pixel flags */
+	bitmap_t					flagsmap;			/* per-pixel flags */
 	UINT8 *						tileflags;			/* per-tile flags */
 	UINT8 *						pen_to_flags;		/* mapping of pens to flags */
 

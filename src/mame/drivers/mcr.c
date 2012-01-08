@@ -440,7 +440,7 @@ static WRITE8_HANDLER( twotiger_op4_w )
 		/* play tape, and loop it */
 		if (!sample_playing(samples, i))
 			sample_start(samples, i, i, 1);
-	
+
 		/* bit 1 turns cassette on/off */
 		sample_set_pause(samples, i, ~data & 2);
 	}

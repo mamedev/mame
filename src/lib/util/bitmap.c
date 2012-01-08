@@ -110,7 +110,7 @@ void bitmap_t::allocate(int width, int height, bitmap_format format, int xslop, 
 {
 	// delete any existing stuff
 	deallocate();
-	
+
 	// initialize fields
 	m_rowpixels = (width + 2 * xslop + 7) & ~7;
 	m_width = width;
@@ -120,7 +120,7 @@ void bitmap_t::allocate(int width, int height, bitmap_format format, int xslop, 
 	if (m_bpp == 0)
 		throw std::bad_alloc();
 	m_cliprect.set(0, width - 1, 0, height - 1);
-	
+
 	// allocate memory for the bitmap itself
 	size_t allocbytes = m_rowpixels * (m_height + 2 * yslop) * m_bpp / 8;
 	m_alloc = new UINT8[allocbytes];
@@ -145,7 +145,7 @@ void bitmap_t::deallocate()
 	delete[] m_alloc;
 	m_alloc = NULL;
 	m_base = NULL;
-	
+
 	// reset all fields
 	m_rowpixels = 0;
 	m_width = 0;
@@ -157,8 +157,8 @@ void bitmap_t::deallocate()
 
 
 //-------------------------------------------------
-//  clone_existing -- clone an existing bitmap by 
-//  copying its fields; the target bitmap does not 
+//  clone_existing -- clone an existing bitmap by
+//  copying its fields; the target bitmap does not
 //  own the memory
 //-------------------------------------------------
 
@@ -181,7 +181,7 @@ void bitmap_t::clone_existing(const bitmap_t &srcbitmap)
 
 
 //-------------------------------------------------
-//  set_palette -- associate a palette with a 
+//  set_palette -- associate a palette with a
 //  bitmap
 //-------------------------------------------------
 

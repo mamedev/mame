@@ -816,8 +816,8 @@ static void HandleCoProcRT(arm_state *cpustate, UINT32 insn)
         {
             UINT32 res = arm7_coproc_rt_r_callback(cpustate->device, insn, 0);   // RT Read handler must parse opcode & return appropriate result
             if (cpustate->pendingUnd == 0)
-           	{
-         	   SET_REGISTER(cpustate, (insn >> 12) & 0xf, res);
+        	{
+        	   SET_REGISTER(cpustate, (insn >> 12) & 0xf, res);
         	}
         }
         else

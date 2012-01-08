@@ -9,10 +9,10 @@
 
     Todo: complete jamma interface emulation.
 
-	By now, three known BIOS versions, U4-52 (dumped from a board with-subboard PCB), 
-	U4-55 (dumped from an integrated PCB) and U4-60 (dumped from a board with-subboard PCB). 
+    By now, three known BIOS versions, U4-52 (dumped from a board with-subboard PCB),
+    U4-55 (dumped from an integrated PCB) and U4-60 (dumped from a board with-subboard PCB).
 
-	Known games:
+    Known games:
 
     Special Criminal Investigation
     Power League IV
@@ -29,8 +29,8 @@
     Final Lap
     Columns
     Power Sports
-	Saigo no Nindou
-	Son Son II
+    Saigo no Nindou
+    Son Son II
 
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
@@ -295,7 +295,7 @@ MACHINE_CONFIG_END
 	ROMX_LOAD( "u4-55_am27c256.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 2, "52", "U4-52" ) \
 	ROMX_LOAD( "bios.29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) )
-	
+
 
 ROM_START(tourvis)
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )

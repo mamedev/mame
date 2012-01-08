@@ -632,7 +632,7 @@ void render_load_png(bitmap_t &bitmap, emu_file &file, const char *dirname, cons
 {
 	png_info png;
 	png_error result;
-	
+
 	bitmap.deallocate();
 
 	/* open the file */

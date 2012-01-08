@@ -1611,7 +1611,7 @@ static void sprite_swap_buffers(segas32_state *state)
 
 #define sprite_draw_pixel_16(trans)											\
 	/* only draw if onscreen, not 0 or 15 */								\
-	if (x >= clipin.min_x && x <= clipin.max_x && 							\
+	if (x >= clipin.min_x && x <= clipin.max_x &&							\
 		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&			\
 		pix != trans)														\
 	{																		\
@@ -1640,7 +1640,7 @@ static void sprite_swap_buffers(segas32_state *state)
 
 #define sprite_draw_pixel_256(trans)										\
 	/* only draw if onscreen, not 0 or 15 */								\
-	if (x >= clipin.min_x && x <= clipin.max_x && 							\
+	if (x >= clipin.min_x && x <= clipin.max_x &&							\
 		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&			\
 		pix != trans)														\
 	{																		\

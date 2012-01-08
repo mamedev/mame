@@ -529,7 +529,7 @@ void screen_device::realloc_screen_bitmaps()
 		m_texture[0]->set_bitmap(&m_bitmap[0], &m_visarea, m_texture_format, palette);
 		m_texture[1] = machine().render().texture_alloc();
 		m_texture[1]->set_bitmap(&m_bitmap[1], &m_visarea, m_texture_format, palette);
-		
+
 		// allocate generic backing bitmap
 		m_default.allocate(curwidth, curheight, m_format);
 		m_default.set_palette(machine().palette);

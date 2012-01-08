@@ -522,7 +522,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 	osd_dir_entry_type current_entry_type;
 	int went_up = FALSE;
 	int i;
-	
+
 	newpath.reset();
 
 	/* be conservative */

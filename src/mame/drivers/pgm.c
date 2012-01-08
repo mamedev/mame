@@ -115,7 +115,7 @@ ASIC 27A(55857F/55857G):
     The Killing Blade Plus
     Spectral VS Generation
 
-	The 55857G variant appears to be protected against reading even from native code.
+    The 55857G variant appears to be protected against reading even from native code.
 
 there are probably more...
 
@@ -3701,7 +3701,7 @@ ROM_START( oldsplus )
 	ROM_LOAD( "oldsplus_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASE00 )
-	
+
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t05301.rom",   0x180000, 0x800000, CRC(8257bbb0) SHA1(b48067b7e7081a15fddf21739b641d677c2df3d9) )
@@ -5082,7 +5082,7 @@ static WRITE16_HANDLER( puzzli2_asic_w )
 					//if (state->m_value0 == 6) {
 						state->m_valueresponse = (0x74<<16)|1; // |1?
 					//} else {
-					//	state->m_valueresponse = 0x74<<16;
+					//  state->m_valueresponse = 0x74<<16;
 					//}
 				}
 				break;
@@ -5627,7 +5627,7 @@ static DRIVER_INIT( puzzli2 )
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(puzzli2_asic_w));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4fffff, FUNC(sango_protram_r));
-	
+
 	// doesn't like this irq??
 	state->m_irq4_disabled = 1;
 }

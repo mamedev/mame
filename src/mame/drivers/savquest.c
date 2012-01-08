@@ -5,9 +5,9 @@
     "Savage Quest" (c) 1999 Interactive Light, developed by Angel Studios.
     Skeleton by R. Belmont
 
-	TODO:
-	- BIOS ROM checksum error;
-	- floppy drive error, system halt;
+    TODO:
+    - BIOS ROM checksum error;
+    - floppy drive error, system halt;
 
     H/W is a white-box PC consisting of:
     Pentium II 450 CPU
@@ -77,8 +77,8 @@ protected:
 
 
 	// driver_device overrides
-//	virtual void video_start();
-//	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+//  virtual void video_start();
+//  virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 // Intel 82439TX System Controller (MXTC)
@@ -407,7 +407,7 @@ static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-//	AM_RANGE(0x02000000, 0x02000003) // protection dongle lies there?
+//  AM_RANGE(0x02000000, 0x02000003) // protection dongle lies there?
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
@@ -427,7 +427,7 @@ static ADDRESS_MAP_START(savquest_io, AS_IO, 32, savquest_state)
 
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
 
-//	AM_RANGE(0x5000, 0x5007) // routes to port $eb
+//  AM_RANGE(0x5000, 0x5007) // routes to port $eb
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( savquest )

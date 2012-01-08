@@ -2,8 +2,8 @@
 
     Midway Quicksilver skeleton driver
 
-	TODO:
-	- offrthnd: illegal opcode tripped just after that PIIX4 is recognized
+    TODO:
+    - offrthnd: illegal opcode tripped just after that PIIX4 is recognized
 
     Main CPU : Intel Celeron 333/366MHz
     Motherboard : Intel SE440BX-2
@@ -105,24 +105,24 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	printf("MXTC: write %d, %02X, %02X\n",  function, reg, data);
 
 	/*
-	memory banking with North Bridge:
-	0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
-	            ---- xxxx Reserved
-	0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
-	            ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
-	0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
-	            ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
-	0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
-	            ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
-	0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
-	            ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
-	0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
-	            ---- xxxx BIOS extension 0xe0000 - 0xe3fff
-	0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
-	            ---- xxxx BIOS extension 0xe8000 - 0xebfff
+    memory banking with North Bridge:
+    0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
+                ---- xxxx Reserved
+    0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
+                ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
+    0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
+                ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
+    0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
+                ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
+    0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
+                ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
+    0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
+                ---- xxxx BIOS extension 0xe0000 - 0xe3fff
+    0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
+                ---- xxxx BIOS extension 0xe8000 - 0xebfff
 
-	3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
-	*/
+    3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
+    */
 
 	switch(reg)
 	{
@@ -738,8 +738,8 @@ ROM_START( offrthnd )
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
-//	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//	ROM_CONTINUE(                                 0x0001, 0x4000 )
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	DISK_REGION( "disk" )
 	DISK_IMAGE( "offrthnd", 0, SHA1(d88f1c5b75361a1e310565a8a5a09c674a4a1a22) )
@@ -750,8 +750,8 @@ ROM_START( hydrthnd )
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
-//	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//	ROM_CONTINUE(                                 0x0001, 0x4000 )
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	DISK_REGION( "disk" )
 	DISK_IMAGE( "hydro", 0,  SHA1(d481d178782943c066b41764628a419cd55f676d) )
@@ -762,8 +762,8 @@ ROM_START( arctthnd )
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
-//	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//	ROM_CONTINUE(                                 0x0001, 0x4000 )
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	DISK_REGION( "disk" )
 	DISK_IMAGE( "arctthnd", 0,  SHA1(f4373e57c3f453ac09c735b5d8d99ff811416a23) )

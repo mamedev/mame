@@ -126,7 +126,7 @@ public:
 	DECLARE_WRITE8_MEMBER( flash_w );
 	DECLARE_READ8_MEMBER( flash_data_r );
 	DECLARE_WRITE8_MEMBER( flash_data_w );
-//	DECLARE_WRITE8_MEMBER( bios_ram_w );
+//  DECLARE_WRITE8_MEMBER( bios_ram_w );
 
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
@@ -468,9 +468,9 @@ WRITE8_MEMBER( funkball_state::flash_w )
 	else if(offset == 2)
 	{
 		/* 0x83: read from u29/u30
-		   0x03: read from u3
-		   0x81: init device
-		*/
+           0x03: read from u3
+           0x81: init device
+        */
 		m_flash_cmd = data;
 		printf("%02x CMD\n",data);
 	}
@@ -575,7 +575,7 @@ static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x000fc000, 0x000fffff) AM_ROMBANK("bios_bank4")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE8_LEGACY(bios_ram_w,0xffffffff)
 	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
-//	AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
+//  AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
 	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE_LEGACY(biu_ctrl_r, biu_ctrl_w)
 	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_BASE(m_unk_ram)
 	AM_RANGE(0xff000000, 0xffffdfff) AM_DEVREADWRITE_LEGACY("voodoo_0", voodoo_r, voodoo_w)
@@ -593,16 +593,16 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
-//	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
-//	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
+//  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
+//  AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE8(fdc_r,fdc_w,0xffffffff)
 
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
 
 	AM_RANGE(0x0360, 0x0363) AM_WRITE8(flash_w,0xffffffff)
 
-//	AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
-//	AM_RANGE(0x036c, 0x036f) AM_READ(test_r)
+//  AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
+//  AM_RANGE(0x036c, 0x036f) AM_READ(test_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( funkball )

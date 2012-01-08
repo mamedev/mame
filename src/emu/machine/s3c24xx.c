@@ -2107,7 +2107,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_usb_host_r )
 		// HcRhStatus
 		case 0x50 / 4:
 		{
-			data = data & ~(1 << 16); // "The Root Hub does not support the local power status feature; thus, this bit is always read as ‘0’."
+			data = data & ~(1 << 16); // "The Root Hub does not support the local power status feature; thus, this bit is always read as ?0?."
 		}
 		break;
 	}

@@ -266,7 +266,7 @@ static void draw_background(running_machine &machine, bitmap_t &bitmap, const re
 
 		for (j = 0 ; j <= ((pen & 0x80) ? 0 : 3); j++)
 			bitmap.pix16(
-						   (((j / 2) & 1) + y) % 256, 
+						   (((j / 2) & 1) + y) % 256,
 						   ((j & 1)     + x) % 512) = 256 + (pen & 0x7f);
 	}
 }

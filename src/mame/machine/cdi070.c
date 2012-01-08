@@ -355,16 +355,16 @@ static void quizard_handle_byte_tx(running_machine &machine, scc68070_regs_t *sc
 			if(tx == 0x0a)
 			{
 				/*rx[rx_ptr] = 0;
-				//printf("Database path: %s\n", rx);
-				scc68070_uart_rx(machine, scc68070, 0x5a);
-				scc68070_uart_rx(machine, scc68070, g_state[0]);
-				scc68070_uart_rx(machine, scc68070, g_state[1]);
-				scc68070_uart_rx(machine, scc68070, g_state[2]);
-				scc68070_uart_rx(machine, scc68070, g_state[3]);
-				scc68070_uart_rx(machine, scc68070, g_state[4]);
-				scc68070_uart_rx(machine, scc68070, g_state[5]);
-				scc68070_uart_rx(machine, scc68070, g_state[6]);
-				scc68070_uart_rx(machine, scc68070, g_state[7]);*/
+                //printf("Database path: %s\n", rx);
+                scc68070_uart_rx(machine, scc68070, 0x5a);
+                scc68070_uart_rx(machine, scc68070, g_state[0]);
+                scc68070_uart_rx(machine, scc68070, g_state[1]);
+                scc68070_uart_rx(machine, scc68070, g_state[2]);
+                scc68070_uart_rx(machine, scc68070, g_state[3]);
+                scc68070_uart_rx(machine, scc68070, g_state[4]);
+                scc68070_uart_rx(machine, scc68070, g_state[5]);
+                scc68070_uart_rx(machine, scc68070, g_state[6]);
+                scc68070_uart_rx(machine, scc68070, g_state[7]);*/
 				state = 0;
 			}
 			break;

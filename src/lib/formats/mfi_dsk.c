@@ -53,7 +53,7 @@
   preservation formats encode that information, it is guessed for
   others.  The write track function of fdcs should set it.  The
   representation is the angular position relative to the index.
-  
+
   The media type is divided in two parts.  The first half
   indicate the physical form factor, i.e. all medias with that
   form factor can be physically inserted in a reader that handles

@@ -61,7 +61,7 @@ SCREEN_UPDATE( subs_left )
 		charcode = videoram[offs];
 
 		/* Which monitor is this for? */
-//		right_enable = charcode & 0x40;
+//      right_enable = charcode & 0x40;
 		left_enable = charcode & 0x80;
 
 		sx = 8 * (offs % 32);

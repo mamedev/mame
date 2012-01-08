@@ -3,8 +3,8 @@
 
     Skeleton driver by R. Belmont, based on taitowlf.c by Ville Linde
 
-	Note:
-	- bp 000F16B5 do bx=0x16bb (can't skip this check?)
+    Note:
+    - bp 000F16B5 do bx=0x16bb (can't skip this check?)
 
     Specs: P3-866, SiS 630 graphics card, SiS 7018 sound, Windows 98, DirectX 8.1.
 

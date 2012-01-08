@@ -1097,7 +1097,7 @@ do {																				\
 			{																		\
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
 				PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, cliprect.min_x); \
-				const PIXEL_TYPE *srcptr = &src.pix<PIXEL_TYPE>(starty >> 16); 	\
+				const PIXEL_TYPE *srcptr = &src.pix<PIXEL_TYPE>(starty >> 16);	\
 				INT32 srcx = startx;												\
 																					\
 				starty = (starty + incyy) & srcfixheight;							\
@@ -1156,7 +1156,7 @@ do {																				\
 				{																	\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
+						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
 						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
@@ -1164,7 +1164,7 @@ do {																				\
 																					\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
+						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
 						PIXEL_OP(destptr[1], priptr[1], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
@@ -1172,7 +1172,7 @@ do {																				\
 																					\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
+						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
 						PIXEL_OP(destptr[2], priptr[2], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
@@ -1180,7 +1180,7 @@ do {																				\
 																					\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
+						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
 						PIXEL_OP(destptr[3], priptr[3], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
@@ -1195,7 +1195,7 @@ do {																				\
 				{																	\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
+						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
 						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\

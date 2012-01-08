@@ -94,13 +94,13 @@ public:
 		if (src.max_y > max_y) max_y = src.max_y;
 		return *this;
 	}
-	
+
 	// other helpers
 	bool empty() const { return (min_x > max_x || min_y > max_y); }
 	bool contains(INT32 x, INT32 y) const { return (x >= min_x && x <= max_x && y >= min_y && y <= max_y); }
 	INT32 width() const { return max_x + 1 - min_x; }
 	INT32 height() const { return max_y + 1 - min_y; }
-	
+
 	// setters
 	void set(INT32 minx, INT32 maxx, INT32 miny, INT32 maxy) { min_x = minx; max_x = maxx; min_y = miny; max_y = maxy; }
 	void set_width(INT32 width) { max_x = min_x + width - 1; }
@@ -129,7 +129,7 @@ public:
 	bitmap_t(int width, int height, bitmap_format format, int xslop = 0, int yslop = 0);
 	bitmap_t(void *base, int width, int height, int rowpixels, bitmap_format format);
 	~bitmap_t();
-	
+
 	// getters
 	INT32 width() const { return m_width; }
 	INT32 height() const { return m_height; }
@@ -140,7 +140,7 @@ public:
 	bool valid() const { return (m_format != BITMAP_FORMAT_INVALID); }
 	palette_t *palette() const { return m_palette; }
 	const rectangle &cliprect() const { return m_cliprect; }
-	
+
 	// operations
 	void allocate(int width, int height, bitmap_format format, int xslop = 0, int yslop = 0);
 	void deallocate();
@@ -153,7 +153,7 @@ public:
 		rectangle clip(x, x + width - 1, y, y + height - 1);
 		fill(color, clip);
 	}
-	
+
 	// pixel access
 	template<typename _PixelType>
 	_PixelType &pix(INT32 y, INT32 x = 0) const { return *(reinterpret_cast<_PixelType *>(m_base) + y * m_rowpixels + x); }
@@ -162,7 +162,7 @@ public:
 	UINT32 &pix32(INT32 y, INT32 x = 0) const { return *(reinterpret_cast<UINT32 *>(m_base) + y * m_rowpixels + x); }
 	UINT64 &pix64(INT32 y, INT32 x = 0) const { return *(reinterpret_cast<UINT64 *>(m_base) + y * m_rowpixels + x); }
 	void *raw_pixptr(INT32 y, INT32 x = 0) const { return reinterpret_cast<UINT8 *>(m_base) + (y * m_rowpixels + x) * m_bpp / 8; }
-	
+
 	// static helpers
 	static UINT8 format_to_bpp(bitmap_format format);
 
@@ -171,7 +171,7 @@ private:
 	UINT8 *			m_alloc;		// pointer to allocated pixel memory
 	void *			m_base;			// pointer to pixel (0,0) (adjusted for padding)
 	INT32			m_rowpixels;	// pixels per row (including padding)
-	INT32 			m_width;		// width of the bitmap
+	INT32			m_width;		// width of the bitmap
 	INT32			m_height;		// height of the bitmap
 	bitmap_format	m_format;		// format of the bitmap
 	UINT8			m_bpp;			// bits per pixel

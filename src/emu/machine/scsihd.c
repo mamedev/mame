@@ -267,7 +267,7 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 				our_this->disk = device->subdevice<harddisk_image_device>(diskregion)->get_hard_disk_file();
 			}
 		}
-		
+
 		if (!our_this->disk)
 		{
 			our_this->is_file = FALSE;

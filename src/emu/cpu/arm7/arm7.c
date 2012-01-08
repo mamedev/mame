@@ -307,7 +307,7 @@ INLINE int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
 	            LOG( ( "ARM7: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", R15, vaddr ) );
             	cpustate->pendingAbtP = 1;
             }
-           	return FALSE;
+        	return FALSE;
             break;
         case COPRO_TLB_COARSE_TABLE:
             // Entry is the physical address of a coarse second-level table
@@ -323,9 +323,9 @@ INLINE int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
         case COPRO_TLB_SECTION_TABLE:
         	{
             // Entry is a section
-           	UINT8 ap = (desc_lvl1 >> 10) & 3;
-           	int fault = detect_fault( cpustate, permission, ap, flags);
-           	if (fault == FAULT_NONE)
+        	UINT8 ap = (desc_lvl1 >> 10) & 3;
+        	int fault = detect_fault( cpustate, permission, ap, flags);
+        	if (fault == FAULT_NONE)
             {
             	paddr = ( desc_lvl1 & COPRO_TLB_SECTION_PAGE_MASK ) | ( vaddr & ~COPRO_TLB_SECTION_PAGE_MASK );
             }
@@ -334,12 +334,12 @@ INLINE int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
                 if (flags & ARM7_TLB_ABORT_D)
                 {
                 	LOG( ( "ARM7: Section Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", vaddr, R15 ) );
-           			COPRO_FAULT_STATUS_D = ((fault == FAULT_DOMAIN) ? (9 << 0) : (13 << 0)) | (domain << 4); // 9 = section domain fault, 13 = section permission fault
+        			COPRO_FAULT_STATUS_D = ((fault == FAULT_DOMAIN) ? (9 << 0) : (13 << 0)) | (domain << 4); // 9 = section domain fault, 13 = section permission fault
                 	COPRO_FAULT_ADDRESS = vaddr;
             	    cpustate->pendingAbtD = 1;
-       				LOG( ( "vaddr %08X desc_lvl1 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
-       					vaddr, desc_lvl1, domain, permission, ap, (COPRO_CTRL & COPRO_CTRL_SYSTEM) ? 1 : 0, (COPRO_CTRL & COPRO_CTRL_ROM) ? 1 : 0,
-       					GET_MODE, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0) );
+    				LOG( ( "vaddr %08X desc_lvl1 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
+    					vaddr, desc_lvl1, domain, permission, ap, (COPRO_CTRL & COPRO_CTRL_SYSTEM) ? 1 : 0, (COPRO_CTRL & COPRO_CTRL_ROM) ? 1 : 0,
+    					GET_MODE, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0) );
             	}
             	else if (flags & ARM7_TLB_ABORT_P)
             	{
@@ -389,7 +389,7 @@ INLINE int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
 					UINT8 ap = ((((desc_lvl2 >> 4) & 0xFF) >> (((vaddr >> 10) & 3) << 1)) & 3);
 					int fault = detect_fault( cpustate, permission, ap, flags);
 					if (fault == FAULT_NONE)
-               		{
+            		{
                 		paddr = ( desc_lvl2 & COPRO_TLB_SMALL_PAGE_MASK ) | ( vaddr & ~COPRO_TLB_SMALL_PAGE_MASK );
             		}
             		else
@@ -398,12 +398,12 @@ INLINE int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
             			{
             				// hapyfish expects a data abort when something tries to write to a read-only memory location from user mode
 		                	LOG( ( "ARM7: Page Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", vaddr, R15 ) );
-		               		COPRO_FAULT_STATUS_D = ((fault == FAULT_DOMAIN) ? (11 << 0) : (15 << 0)) | (domain << 4); // 11 = page domain fault, 15 = page permission fault
-        		       		COPRO_FAULT_ADDRESS = vaddr;
+		            		COPRO_FAULT_STATUS_D = ((fault == FAULT_DOMAIN) ? (11 << 0) : (15 << 0)) | (domain << 4); // 11 = page domain fault, 15 = page permission fault
+        		    		COPRO_FAULT_ADDRESS = vaddr;
             		    	cpustate->pendingAbtD = 1;
-		       				LOG( ( "vaddr %08X desc_lvl2 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
-		       					vaddr, desc_lvl2, domain, permission, ap, (COPRO_CTRL & COPRO_CTRL_SYSTEM) ? 1 : 0, (COPRO_CTRL & COPRO_CTRL_ROM) ? 1 : 0,
-		       					GET_MODE, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0) );
+		    				LOG( ( "vaddr %08X desc_lvl2 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
+		    					vaddr, desc_lvl2, domain, permission, ap, (COPRO_CTRL & COPRO_CTRL_SYSTEM) ? 1 : 0, (COPRO_CTRL & COPRO_CTRL_ROM) ? 1 : 0,
+		    					GET_MODE, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0) );
 		            	}
 		            	else if (flags & ARM7_TLB_ABORT_P)
 		            	{

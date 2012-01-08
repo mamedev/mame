@@ -94,18 +94,18 @@ public:
 	bool operator>=(const char *string) const { return (cmp(string) >= 0); }
 	bool operator>=(const astring &string) const { return (cmp(string) >= 0); }
 
-	// character access operators	
+	// character access operators
 	char operator[](int index) const { return (index < len()) ? m_text[index] : 0; }
 
 	// implicit boolean conversion operators
 	operator bool() { return m_text[0] != 0; }
 	operator bool() const { return m_text[0] != 0; }
-	
+
 	// C string conversion operators and helpers
 	operator const char *() const { return m_text; }
 	const char *cstr() const { return m_text; }
 	char *stringbuffer(int size) { ensure_room(size); return m_text; }
-	
+
 	// buffer management
 	astring &reset() { return cpy(""); }
 	astring &expand(int length) { ensure_room(length); return *this; }

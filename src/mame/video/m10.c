@@ -99,7 +99,7 @@ INLINE void plot_pixel_m10( running_machine &machine, bitmap_t &bm, int x, int y
 	if (!state->m_flip)
 		bm.pix16(y, x) = col;
 	else
-		bm.pix16((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND) + 6, 
+		bm.pix16((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND) + 6,
 				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
 }
 

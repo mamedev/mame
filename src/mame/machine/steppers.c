@@ -211,22 +211,22 @@ int stepper_update(int which, UINT8 pattern)
 	int changed = 0;
 
 	/* This code probably makes more sense if you visualise what is being emulated, namely
-	a spinning drum with two electromagnets inside. Essentially, the CPU
-	activates a pair of windings on these magnets leads as necessary to attract and repel the drum to pull it round and 
-	display as appropriate. To attempt to visualise the rotation effect, take a look at the compass rose below, the numbers
-	indicate the phase information as used
+    a spinning drum with two electromagnets inside. Essentially, the CPU
+    activates a pair of windings on these magnets leads as necessary to attract and repel the drum to pull it round and
+    display as appropriate. To attempt to visualise the rotation effect, take a look at the compass rose below, the numbers
+    indicate the phase information as used
 
-	    7
-	    N
-	1 W   E 5
-		S
-		3
+        7
+        N
+    1 W   E 5
+        S
+        3
 
-	For sake of accuracy, we're representing all possible phases of the motor, effectively moving the motor one half step at a time, so a 48 step motor becomes
-	96 half steps. This is necessary because of some programs running the wiring in series with a distinct delay between the pair being completed. This causes
-	a small movement that may trigger the optic.
+    For sake of accuracy, we're representing all possible phases of the motor, effectively moving the motor one half step at a time, so a 48 step motor becomes
+    96 half steps. This is necessary because of some programs running the wiring in series with a distinct delay between the pair being completed. This causes
+    a small movement that may trigger the optic.
 
-	*/
+    */
 
 	{
 		int pos,steps=0;
@@ -300,7 +300,7 @@ int stepper_update(int which, UINT8 pattern)
 						step[which].phase = 3;
 					}
 				}
-				
+
 				if (!step[which].stator1[0] && !step[which].stator1[1] && step[which].stator2[0] && step[which].stator2[1])
 				{
 					if ((step[which].old_phase ==6)||(step[which].old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
@@ -312,7 +312,7 @@ int stepper_update(int which, UINT8 pattern)
 						step[which].phase = 1;
 					}
 				}
-			}	
+			}
 			break;
 			case MPU3_48STEP_REEL :	    /* Same unit as above, but different interface (2 active lines, not 4)*/
 			//TODO - set up stators using manual, this seems to be correct based on the previous behaviour
@@ -337,7 +337,7 @@ int stepper_update(int which, UINT8 pattern)
 		if ((step[which].type == BARCREST_48STEP_REEL) || (step[which].type == MPU3_48STEP_REEL))
 		{
 			steps = step[which].old_phase - step[which].phase;
-		
+
 			if (steps < -4)
 			{
 				steps = steps +8;

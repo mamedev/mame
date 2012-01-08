@@ -77,7 +77,7 @@ typedef struct _ppu2c0x_state  ppu2c0x_state;
 struct _ppu2c0x_state
 {
 	address_space				*space;					/* memory space */
-	bitmap_t 					*bitmap;			/* target bitmap */
+	bitmap_t					*bitmap;			/* target bitmap */
 	UINT8                       *spriteram;			/* sprite ram */
 	pen_t                       *colortable;			/* color table modified at run time */
 	pen_t                       *colortable_mono;		/* monochromatic color table modified at run time */

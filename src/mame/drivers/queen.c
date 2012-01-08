@@ -113,24 +113,24 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	printf("MXTC: write %d, %02X, %02X\n",  function, reg, data);
 
 	/*
-	memory banking with North Bridge:
-	0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
-	            ---- xxxx Reserved
-	0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
-	            ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
-	0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
-	            ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
-	0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
-	            ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
-	0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
-	            ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
-	0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
-	            ---- xxxx BIOS extension 0xe0000 - 0xe3fff
-	0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
-	            ---- xxxx BIOS extension 0xe8000 - 0xebfff
+    memory banking with North Bridge:
+    0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
+                ---- xxxx Reserved
+    0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
+                ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
+    0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
+                ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
+    0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
+                ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
+    0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
+                ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
+    0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
+                ---- xxxx BIOS extension 0xe0000 - 0xe3fff
+    0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
+                ---- xxxx BIOS extension 0xe8000 - 0xebfff
 
-	3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
-	*/
+    3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
+    */
 
 	switch(reg)
 	{
@@ -725,8 +725,8 @@ ROM_START( queen )
 	ROM_LOAD( "bios-original.bin", 0x00000, 0x40000, CRC(feb542d4) SHA1(3cc5d8aeb0e3b7d9ed33248a4f3dc507d29debd9) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
-//	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-//	ROM_CONTINUE(                                 0x0001, 0x4000 )
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	DISK_REGION( "ide" )
 	DISK_IMAGE( "pqiidediskonmodule", 0,SHA1(a56efcc711b1c5a2e63160b3088001a8c4fb56c2) )

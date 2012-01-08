@@ -139,8 +139,8 @@ enum
 
 #define COPRO_DOMAIN_ACCESS_CONTROL     	cpustate->domainAccessControl
 
-#define COPRO_FAULT_STATUS_D      	cpustate->faultStatus[0]
-#define COPRO_FAULT_STATUS_P      	cpustate->faultStatus[1]
+#define COPRO_FAULT_STATUS_D    	cpustate->faultStatus[0]
+#define COPRO_FAULT_STATUS_P    	cpustate->faultStatus[1]
 
 #define COPRO_FAULT_ADDRESS     	cpustate->faultAddress
 

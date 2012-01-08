@@ -4,28 +4,28 @@
 
     preliminary driver by Phil Bennett
 
-	Known games:
-		* Dactyl Nightmare SP
-		* Virtual Boxing
-		* Buggy Ball
-		* Missile Command
-		* Zone Hunter
+    Known games:
+        * Dactyl Nightmare SP
+        * Virtual Boxing
+        * Buggy Ball
+        * Missile Command
+        * Zone Hunter
 
 
     Hardware Info:
-		See: http://arianchen.de/su2000/status.html
+        See: http://arianchen.de/su2000/status.html
 
 
-	TODO:
-		* Get system booting
-		* Add game software		
-		* Fix i386 core issues (e.g. protected mode)		
-		* Write MC88110 CPU core
-		* Emulate HDD and CD drive
-		* Emulate PIX 1000 card
-		* Emulate VID 1000 card
-		* Emulate tracker card
-		* Emulate format card
+    TODO:
+        * Get system booting
+        * Add game software
+        * Fix i386 core issues (e.g. protected mode)
+        * Write MC88110 CPU core
+        * Emulate HDD and CD drive
+        * Emulate PIX 1000 card
+        * Emulate VID 1000 card
+        * Emulate tracker card
+        * Emulate format card
 
 ***************************************************************************/
 

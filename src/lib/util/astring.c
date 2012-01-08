@@ -143,7 +143,7 @@ astring &astring::init()
 
 astring::~astring()
 {
-	if (m_text != m_smallbuf) 
+	if (m_text != m_smallbuf)
 		delete[] m_text;
 }
 
@@ -172,7 +172,7 @@ astring &astring::cpy(const char *src, int count)
 
 
 //-------------------------------------------------
-//  cpysubstr - copy a substring of one string to 
+//  cpysubstr - copy a substring of one string to
 //  another
 //-------------------------------------------------
 
@@ -208,7 +208,7 @@ astring &astring::ins(int insbefore, const char *src, int count)
 
 
 //-------------------------------------------------
-//  inssubstr - insert a substring of one string 
+//  inssubstr - insert a substring of one string
 //  into another
 //-------------------------------------------------
 
@@ -220,7 +220,7 @@ astring &astring::inssubstr(int insbefore, const astring &src, int start, int co
 
 
 //-------------------------------------------------
-//  substr - extract a substring of ourself, 
+//  substr - extract a substring of ourself,
 //  removing everything else
 //-------------------------------------------------
 
@@ -242,7 +242,7 @@ astring &astring::substr(int start, int count)
 
 
 //-------------------------------------------------
-//  del - delete a substring of ourself, keeping 
+//  del - delete a substring of ourself, keeping
 //  everything else
 //-------------------------------------------------
 
@@ -281,7 +281,7 @@ int astring::vprintf(const char *format, va_list args)
 
 
 //-------------------------------------------------
-//  catprintf - formatted vprintf to the end of 
+//  catprintf - formatted vprintf to the end of
 //  an astring
 //-------------------------------------------------
 
@@ -367,7 +367,7 @@ int astring::icmpsubstr(const astring &str2, int start, int count) const
 
 
 //-------------------------------------------------
-//  chr - return the index of a character in an 
+//  chr - return the index of a character in an
 //  astring
 //-------------------------------------------------
 
@@ -379,7 +379,7 @@ int astring::chr(int start, int ch) const
 
 
 //-------------------------------------------------
-//  rchr - return the index of a character in an 
+//  rchr - return the index of a character in an
 //  astring, searching from the end
 //-------------------------------------------------
 
@@ -402,8 +402,8 @@ int astring::find(int start, const char *search) const
 
 
 //-------------------------------------------------
-//  replacec - search in an astring for a C string, 
-//  replacing all instances with another C string 
+//  replacec - search in an astring for a C string,
+//  replacing all instances with another C string
 //  and returning the number of matches
 //-------------------------------------------------
 
@@ -444,7 +444,7 @@ astring &astring::delchr(int ch)
 
 
 //-------------------------------------------------
-//  replacechr - replace all instances of 'ch' 
+//  replacechr - replace all instances of 'ch'
 //  with 'newch'
 //-------------------------------------------------
 
@@ -485,7 +485,7 @@ astring &astring::makelower()
 
 
 //-------------------------------------------------
-//  trimspace - remove all space characters from 
+//  trimspace - remove all space characters from
 //  beginning/end
 //-------------------------------------------------
 

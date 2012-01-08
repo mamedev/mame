@@ -118,24 +118,24 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	printf("MXTC: write %d, %02X, %02X\n",  function, reg, data);
 
 	/*
-	memory banking with North Bridge:
-	0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
-	            ---- xxxx Reserved
-	0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
-	            ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
-	0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
-	            ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
-	0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
-	            ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
-	0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
-	            ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
-	0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
-	            ---- xxxx BIOS extension 0xe0000 - 0xe3fff
-	0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
-	            ---- xxxx BIOS extension 0xe8000 - 0xebfff
+    memory banking with North Bridge:
+    0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
+                ---- xxxx Reserved
+    0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
+                ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
+    0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
+                ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
+    0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
+                ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
+    0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
+                ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
+    0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
+                ---- xxxx BIOS extension 0xe0000 - 0xe3fff
+    0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
+                ---- xxxx BIOS extension 0xe8000 - 0xebfff
 
-	3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
-	*/
+    3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
+    */
 
 	switch(reg)
 	{

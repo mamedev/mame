@@ -391,7 +391,7 @@ static WRITE8_HANDLER( fdc765_data_w )
 
 static WRITE8_HANDLER( drive_selection_w )
 {
-//	pcxt_state *state = space->machine().driver_data<pcxt_state>();
+//  pcxt_state *state = space->machine().driver_data<pcxt_state>();
 
 	/* TODO: properly hook-up upd765 FDC there */
 	pic8259_ir6_w(space->machine().device("pic8259_1"), 1);
@@ -656,7 +656,7 @@ static INPUT_PORTS_START( tetriskr )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) duplicate
+//  PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) duplicate
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )

@@ -385,7 +385,7 @@ static WRITE32_HANDLER( disp_ctrl_w )
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-//	printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
+//  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(state->m_disp_ctrl_reg + offset);
 }
 
@@ -434,7 +434,7 @@ static WRITE32_HANDLER( memory_ctrl_w )
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-//	printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
+//  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
 		ramdac_device *ramdac = space->machine().device<ramdac_device>("ramdac");

@@ -16,14 +16,14 @@
     ega/vga
     64k (early ega 16k) words of 32 bit memory
 
-	TODO:
-	- modernize
-	- convert to a device.
-	- fix pixel clock
-	- add emulated mc6845 hook-up
-	- fix resolution change
-	- fix video update.
-	- (and many more ...)
+    TODO:
+    - modernize
+    - convert to a device.
+    - fix pixel clock
+    - add emulated mc6845 hook-up
+    - fix resolution change
+    - fix video update.
+    - (and many more ...)
 
     ROM declarations:
 

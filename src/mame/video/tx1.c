@@ -3042,7 +3042,7 @@ SCREEN_EOF( buggyboy )
 SCREEN_UPDATE( buggyboy_left )
 {
 	tx1_state *state = screen.machine().driver_data<tx1_state>();
-	
+
 	memset(state->m_obj_bmp, 0, 768*240);
 	memset(state->m_rod_bmp, 0, 768*240);
 
