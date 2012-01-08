@@ -3233,7 +3233,7 @@ jojobane		// 13/09/1999 (c) 1999 (Euro)
 
 // Capcom ZN1
 cpzn1
-ts2				// Battle Arena Toshinden 2 (USA 951124)
+ts2			// Battle Arena Toshinden 2 (USA 951124)
 ts2j			// Battle Arena Toshinden 2 (JAPAN 951124)
 starglad		// Star Gladiator (USA 960627)
 stargladj		// Star Gladiator (JAPAN 960627)
@@ -3248,7 +3248,8 @@ sfexpj			// Street Fighter EX Plus (JAPAN 970311)
 
 // Capcom ZN2
 cpzn2
-rvschool		// Rival Schools (USA 971117)
+rvschool		// Rival Schools (EURO 971117)
+rvschoolu		// Rival Schools (USA 971117)
 rvschoola		// Rival Schools (ASIA 971117)
 jgakuen			// Justice Gakuen (JAPAN 971117)
 sfex2			// Street Fighter EX 2 (USA 980526)
