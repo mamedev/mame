@@ -194,7 +194,7 @@ bits(7:4) and bit(24)), X, and Y:
 #define LOG_VBLANK_SWAP		(0)
 #define LOG_FIFO			(0)
 #define LOG_FIFO_VERBOSE	(0)
-#define LOG_REGISTERS		(0)
+#define LOG_REGISTERS		(1)
 #define LOG_WAITS			(0)
 #define LOG_LFB				(0)
 #define LOG_TEXTURE_RAM		(0)

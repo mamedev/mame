@@ -4,9 +4,9 @@
 /***************************************************************************
 
 Notes:
-- currently fails DAC r/w in Voodoo registers;
+- currently fails DAC r/w in Voodoo registers (FPU fault?);
 (note: some of those are redundant)
-bp 0x182a8,ax = 1;bp 0x18390,ax = 1;bp 0x183a2,ax = 1;bp 0x1b578,ax = 1;bp 0x1b5cb,ax = 1;
+bp 0x18390,ax = 1;bp 0x1b5cb,ax = 1;
 
 Funky Ball
 dgPIX, 1998
@@ -127,6 +127,7 @@ public:
 	DECLARE_READ8_MEMBER( flash_data_r );
 	DECLARE_WRITE8_MEMBER( flash_data_w );
 //  DECLARE_WRITE8_MEMBER( bios_ram_w );
+	DECLARE_READ32_MEMBER( test_r );
 
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
@@ -559,6 +560,11 @@ static WRITE8_HANDLER( bios_ram_w )
 	}
 }
 
+READ32_MEMBER( funkball_state::test_r )
+{
+	return -1;
+}
+
 static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
@@ -602,7 +608,7 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_RANGE(0x0360, 0x0363) AM_WRITE8(flash_w,0xffffffff)
 
 //  AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
-//  AM_RANGE(0x036c, 0x036f) AM_READ(test_r)
+	AM_RANGE(0x036c, 0x036f) AM_READ(test_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( funkball )
