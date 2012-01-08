@@ -1206,7 +1206,51 @@ ROM_END
 Date Quiz Go Go Episode 2
 SemiCom, 2000
 
+PCB Layout
+----------
+
 F-E1-16-010
++-----------------------------------------------+
+|     VR1          YM3012  VROM1                |
+|                  YM2151  M6295   ROML03 ROMU03|
+|               CRAM2              ROML02 ROMU02|
+|               CRAM1              ROML01 ROMU01|
+|               MEM1L              ROML00 ROMU00|
+|J              MEM1U                           |
+|A              MEM2  +----------++----------+  |
+|M                    |          ||          |  |
+|M              MEM3  |Quicklogic||Quicklogic| 2|
+|A                    | QL2003-  || QL2003-  | 8|
+|               MEM6  | XPL84C   || XPL84C   | M|
+|                     |          ||          | H|
+|               MEM7  +----------++----------+ z|
+|                      GAL                      |
+|    93C46                       ROM1           |
+|P1 P2   50MHz E1-16T   DRAM1    ROM2           |
++-----------------------------------------------+
+
+Notes:
+CPU - Hyperstone E1-16T @ 50.000MHz
+
+DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
+CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
+MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
+
+Oki M6295 rebaged as AD-65
+YM3012/YM2151 rebaged as BS902/KA51
+
+ P1 - Reset push button
+ P2 - Setup push button
+VR1 - Volume adjust pot
+
+ROMs:
+    ROML00 & ROMH00 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML01 & ROMH01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML02 & ROMH02 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML03 & ROMH03 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+    VROM1           - 27C020 2MBit DIP32 EPROM
+    ROM1            - 27C040 4MBit DIP32 EPROM
+    ROM2            - 27C040 4MBit DIP32 EPROM
 
 */
 
@@ -1227,6 +1271,78 @@ ROM_START( dquizgo2 )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(24d5b55f) SHA1(cb4d3a22440831e37df0a7fe5433bea708d60f31) )
+ROM_END
+
+/*
+
+Toy Land Adventure
+SemiCom, 2001
+
+PCB Layout
+----------
+
+F-E1-16-010
++-----------------------------------------------+
+|     VR1          YM3012  VROM1                |
+|                  YM2151  M6295   ROML03 ROMU03|
+|               CRAM2              ROML02 ROMU02|
+|               CRAM1              ROML01 ROMU01|
+|               MEM1L              ROML00 ROMU00|
+|J              MEM1U                           |
+|A              MEM2  +----------++----------+  |
+|M                    |          ||          |  |
+|M              MEM3  |Quicklogic||Quicklogic| 2|
+|A                    | QL2003-  || QL2003-  | 8|
+|               MEM6  | XPL84C   || XPL84C   | M|
+|                     |          ||          | H|
+|               MEM7  +----------++----------+ z|
+|                      GAL                      |
+|    93C46                       ROM1*          |
+|P1 P2   50MHz E1-16T   DRAM1    ROM2           |
++-----------------------------------------------+
+
+Notes:
+CPU - Hyperstone E1-16T @ 50.000MHz
+
+DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
+CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
+MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
+
+Oki M6295 rebaged as AD-65
+YM3012/YM2151 rebaged as BS902/KA51
+
+ P1 - Reset push button
+ P2 - Setup push button
+VR1 - Volume adjust pot
+
+ROMs:
+    ROML00 & ROMH00 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML01 & ROMH01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML02 & ROMH02 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML03 & ROMH03 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+    VROM1           - MX 27C2000 2MBit DIP32 EPROM
+  * ROM1            - Unpopulated space for DIP32 EPROM (up to 4MBit)
+    ROM2            - TMS 27C040 4MBit DIP32 EPROM
+
+*/
+
+ROM_START( toyland )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	/* ROM1 empty */
+	ROM_LOAD( "rom2",         0x80000, 0x080000, CRC(e3455002) SHA1(5ad7884f82fb125d70829accec02f238e7d9593c) )
+
+	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD32_WORD( "romu00", 0x000002, 0x200000, NO_DUMP )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, NO_DUMP )
+	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, NO_DUMP )
+	/* roml02 empty */
+	/* romu02 empty */
+	/* roml03 empty */
+	/* romu03 empty */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(d7e6fc5d) SHA1(ab5bca4035299214d98b222320276fbcaedb0898) )
 ROM_END
 
 /*
@@ -2003,5 +2119,6 @@ GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",    
 GAME( 2000, mrdig,    0,        mrdig,    common,   mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
 GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", 0 )
+GAME( 2001, toyland,  0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",           "Toy Land Adventure", GAME_NOT_WORKING ) /* Missing GRFX roms */
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings", GAME_NO_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
