@@ -3147,7 +3147,7 @@ static void I386OP(lsl_r32_rm32)(i386_state *cpustate)  // Opcode 0x0f 0x03
 	UINT32 limit;
 	I386_SREG seg;
 
-	if(PROTECTED_MODE)
+	if(PROTECTED_MODE && !V8086_MODE)
 	{
 		memset(&seg, 0, sizeof(seg));
 		if(modrm >= 0xc0)

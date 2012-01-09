@@ -225,6 +225,7 @@ struct _i386_state
 	UINT8 IOP1;
 	UINT8 IOP2;
 	UINT8 NT;
+	UINT8 VM;
 
 	UINT8 CPL;  // current privilege level
 
@@ -244,6 +245,8 @@ struct _i386_state
 
 	int operand_size;
 	int address_size;
+	int operand_prefix;
+	int address_prefix;
 
 	int segment_prefix;
 	int segment_override;

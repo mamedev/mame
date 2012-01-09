@@ -2207,13 +2207,21 @@ static void I386OP(segment_SS)(i386_state *cpustate)		// Opcode 0x36
 
 static void I386OP(operand_size)(i386_state *cpustate)		// Opcode 0x66
 {
-	cpustate->operand_size ^= 1;
+	if(cpustate->operand_prefix == 0)
+	{
+		cpustate->operand_size ^= 1;
+		cpustate->operand_prefix = 1;
+	}
 	I386OP(decode_opcode)(cpustate);
 }
 
 static void I386OP(address_size)(i386_state *cpustate)		// Opcode 0x67
 {
-	cpustate->address_size ^= 1;
+	if(cpustate->address_prefix == 0)
+	{
+		cpustate->address_size ^= 1;
+		cpustate->address_prefix = 1;
+	}
 	I386OP(decode_opcode)(cpustate);
 }
 

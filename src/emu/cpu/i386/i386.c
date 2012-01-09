@@ -167,6 +167,7 @@ static UINT32 get_flags(i386_state *cpustate)
 	f |= cpustate->IOP1 << 12;
 	f |= cpustate->IOP2 << 13;
 	f |= cpustate->NT << 14;
+	f |= cpustate->VM << 17;
 	return (cpustate->eflags & cpustate->eflags_mask) | (f & 0xffff);
 }
 
@@ -184,6 +185,7 @@ static void set_flags(i386_state *cpustate, UINT32 f )
 	cpustate->IOP1 = (f & 0x1000) ? 1 : 0;
 	cpustate->IOP2 = (f & 0x2000) ? 1 : 0;
 	cpustate->NT = (f & 0x4000) ? 1 : 0;
+	cpustate->VM = (f & 0x20000) ? 1 : 0;
 	cpustate->eflags = f & cpustate->eflags_mask;
 }
 
@@ -575,13 +577,13 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		/* segment privilege checks */
 		if(entry > cpustate->idtr.limit)
 		{
-			logerror("IRQ: Vector is past IDT limit.\n");
+			logerror("IRQ (%08x): Vector %02xh is past IDT limit.\n",cpustate->pc,entry);
 			FAULT_EXP(FAULT_GP,entry+2)
 		}
 		/* segment must be interrupt gate, trap gate, or task gate */
 		if(type != 0x05 && type != 0x06 && type != 0x07 && type != 0x0e && type != 0x0f)
 		{
-			logerror("IRQ: Vector segment is not an interrupt, trap or task gate.\n");
+			logerror("IRQ (%08x): Vector segment %04x is not an interrupt, trap or task gate.\n",cpustate->pc,segment);
 			FAULT_EXP(FAULT_GP,entry+2)
 		}
 
@@ -591,6 +593,48 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		{
 			logerror("IRQ: Vector segment is not present.\n");
 			FAULT_EXP(FAULT_NP,entry+2)
+		}
+
+		if(V8086_MODE)
+		{
+			UINT32 tempflags;
+			UINT32 tempESP,tempSS;
+			/* Interrupt for a Virtual 8086 task */
+			logerror("IRQ (%08x): Interrupt during V8086 task\n",cpustate->pc);
+			tempflags = get_flags(cpustate);
+			cpustate->VM = 0;
+			cpustate->TF = 0;
+			if(irq_gate == 1)
+				cpustate->IF = 0;
+			tempSS = cpustate->sreg[SS].selector;
+			tempESP = REG32(ESP);
+			/* Get privilege level 0 stack pointer from TSS */
+			cpustate->sreg[SS].selector = i386_get_stack_segment(cpustate,0);
+			REG32(ESP) = i386_get_stack_ptr(cpustate,0);
+			PUSH32(cpustate,cpustate->sreg[GS].selector & 0xffff);
+			PUSH32(cpustate,cpustate->sreg[FS].selector & 0xffff);
+			PUSH32(cpustate,cpustate->sreg[DS].selector & 0xffff);
+			PUSH32(cpustate,cpustate->sreg[ES].selector & 0xffff);
+			cpustate->sreg[GS].selector = 0;
+			cpustate->sreg[FS].selector = 0;
+			cpustate->sreg[DS].selector = 0;
+			cpustate->sreg[ES].selector = 0;
+			i386_load_segment_descriptor(cpustate,GS);
+			i386_load_segment_descriptor(cpustate,FS);
+			i386_load_segment_descriptor(cpustate,DS);
+			i386_load_segment_descriptor(cpustate,ES);
+			PUSH32(cpustate,tempESP);
+			PUSH32(cpustate,tempSS & 0xffff);
+			PUSH32(cpustate,tempflags);
+			PUSH32(cpustate,cpustate->sreg[CS].selector & 0xffff);
+			PUSH32(cpustate,cpustate->eip);
+
+			cpustate->sreg[CS].selector = segment;
+			cpustate->eip = offset;
+
+			i386_load_segment_descriptor(cpustate,CS);
+			CHANGE_PC(cpustate,cpustate->eip);
+			return;
 		}
 
 		if(type == 0x05)
@@ -1428,7 +1472,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 		}
 		if((desc.flags & 0x0080) == 0)
 		{
-			logerror("CALL: Code segment is not present.\n");
+			logerror("CALL (%08x): Code segment is not present.\n",cpustate->pc);
 			FAULT(FAULT_NP,selector & ~0x07)  // #NP(selector)
 		}
 		if (operand32 != 0)  // if 32-bit
@@ -2032,6 +2076,11 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		cpustate->CPL = newCS & 0x03;
 
+		if(operand32 == 0)
+			REG16(SP) += (8+count);
+		else
+			REG32(ESP) += (16+count);
+
 		/* Load new SS:(E)SP */
 		if(operand32 == 0)
 			REG16(SP) = newESP & 0xffff;
@@ -2039,12 +2088,6 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			REG32(ESP) = newESP;
 		cpustate->sreg[SS].selector = newSS;
 		i386_load_segment_descriptor(cpustate, SS );
-
-		if(operand32 == 0)
-			REG16(SP) += (8+count);
-		else
-			REG32(ESP) += (16+count);
-
 
 		/* Check that DS, ES, FS and GS are valid for the new privilege level */
 		i386_check_sreg_validity(cpustate,DS);
@@ -2067,7 +2110,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 {
 	UINT32 newCS, newEIP;
 	UINT32 newSS, newESP;  // when changing privilege
-	I386_SREG desc;
+	I386_SREG desc,stack;
 	UINT8 CPL, RPL, DPL;
 	UINT32 newflags;
 
@@ -2093,8 +2136,28 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 
 	if(V8086_MODE)
 	{
-		logerror("IRET: Is in Virtual 8086 mode.\n");
-		FAULT(FAULT_GP,0)
+		if(!cpustate->IOP1 || !cpustate->IOP2)
+		{
+			logerror("IRET: Is in Virtual 8086 mode and IOPL != 3.\n");
+			FAULT(FAULT_GP,0)
+		}
+		/* Is this correct?  The 80386 programmers' reference says IRET should always trigger #GP(0) in V86 mode */
+		if(operand32 == 0)
+		{
+			cpustate->eip = newEIP & 0xffff;
+			cpustate->sreg[CS].selector = newCS & 0xffff;
+			newflags |= 0x3000;  // IOPL cannot be changed in V86 mode
+			newflags |= 0x4000;  // NT flag
+			set_flags(cpustate,newflags & 0xffff);
+		}
+		else
+		{
+			cpustate->eip = newEIP;
+			cpustate->sreg[CS].selector = newCS & 0xffff;
+			newflags |= 0x3000;  // IOPL cannot be changed in V86 mode
+			newflags |= 0x4000;  // NT flag
+			set_flags(cpustate,newflags & 0xffff);
+		}
 	}
 	else if(NESTED_TASK)
 	{
@@ -2135,8 +2198,149 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 	{
 		if(newflags & 0x00020000) // if returning to virtual 8086 mode
 		{
+			UINT8 SSRPL,SSDPL;
+			memset(&desc, 0, sizeof(desc));
+			desc.selector = newCS;
+			i386_load_protected_mode_segment(cpustate,&desc);
+			DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
+			RPL = newCS & 0x03;
+			memset(&stack, 0, sizeof(stack));
+			stack.selector = newSS;
+			i386_load_protected_mode_segment(cpustate,&stack);
+			SSRPL = newSS & 0x03;
+			SSDPL = (stack.flags >> 5) & 0x03;
+
 			/* Return to v86 mode */
-			popmessage("IRET (%08x): Unimplemented return to Virtual 8086 mode.",cpustate->pc);
+			popmessage("IRET (%08x): Returning to Virtual 8086 mode.",cpustate->pc);
+			// Should these be done at this point?  The 386 programmers' reference is a bit confusing about this
+/*			if(RPL != 3)
+			{
+				logerror("IRET to V86 (%08x): Return CS RPL is not 3\n",cpustate->pc);
+				FAULT(FAULT_GP,newCS);
+			}
+			if(operand32 == 0)
+			{
+				if(REG16(SP)+36 > cpustate->sreg[SS].limit)
+				{
+					logerror("IRET to V86 (%08x): Stack does not have enough room left\n",cpustate->pc);
+					FAULT(FAULT_SS,0);
+				}
+			}
+			else
+			{
+				if(REG32(ESP)+36 > cpustate->sreg[SS].limit)
+				{
+					logerror("IRET to V86 (%08x): Stack does not have enough space left\n",cpustate->pc);
+					FAULT(FAULT_SS,0);
+				}
+			}
+			// code segment checks
+			if((newCS & ~0x07) == 0)
+			{
+				logerror("IRET to V86 (%08x): Return CS selector is null\n",cpustate->pc);
+				FAULT(FAULT_GP,newCS);
+			}
+			if(desc.flags & 0x04)
+			{  // LDT
+				if(newCS > cpustate->ldtr.limit)
+				{
+					logerror("IRET to V86 (%08x): Return CS selector is past LDT limit\n",cpustate->pc);
+					FAULT(FAULT_GP,newCS);
+				}
+			}
+			else
+			{  // GDT
+				if(newCS > cpustate->gdtr.limit)
+				{
+					logerror("IRET to V86 (%08x): Return CS selector is past GDT limit\n",cpustate->pc);
+					FAULT(FAULT_GP,newCS);
+				}
+			}
+			if((desc.flags & 0x18) != 0x18)
+			{
+				logerror("IRET to V86 (%08x): Return CS segment is not a code segment\n",cpustate->pc);
+				FAULT(FAULT_GP,newCS);
+			}
+			if(DPL != 3)
+			{
+				logerror("IRET to V86 (%08x): Return CS segment does not have a DPL of 3\n",cpustate->pc);
+				FAULT(FAULT_GP,newCS);
+			}
+			if(!(desc.flags & 0x0080))
+			{
+				logerror("IRET to V86 (%08x): Return CS segment is not present\n",cpustate->pc);
+				FAULT(FAULT_NP,newCS);
+			}
+			// Stack segment checks
+			if((newSS & ~0x07) == 0)
+			{
+				logerror("IRET to V86 (%08x): Return SS segment is null\n",cpustate->pc);
+				FAULT(FAULT_GP,newSS);
+			}
+			if(desc.flags & 0x04)
+			{  // LDT
+				if(newSS > cpustate->ldtr.limit)
+				{
+					logerror("IRET to V86 (%08x): Return SS selector is past LDT limit\n",cpustate->pc);
+					FAULT(FAULT_GP,newSS);
+				}
+			}
+			else
+			{  // GDT
+				if(newSS > cpustate->gdtr.limit)
+				{
+					logerror("IRET to V86 (%08x): Return SS selector is past GDT limit\n",cpustate->pc);
+					FAULT(FAULT_GP,newSS);
+				}
+			}
+			if(SSRPL != RPL)
+			{
+				logerror("IRET to V86 (%08x): Return SS selector RPL is not equal to CS selector RPL\n",cpustate->pc);
+				FAULT(FAULT_GP,newSS);
+			}
+			if(((stack.flags & 0x0018) != 0x10) && (!(stack.flags & 0x02)))
+			{
+				logerror("IRET to V86 (%08x): Return SS segment is not a writable data segment\n",cpustate->pc);
+				FAULT(FAULT_GP,newSS);
+			}
+			if(SSDPL != RPL)
+			{
+				logerror("IRET to V86 (%08x): Return SS segment DPL is not equal to CS selector RPL\n",cpustate->pc);
+				FAULT(FAULT_GP,newSS);
+			}
+			if(!(stack.flags & 0x0080))
+			{
+				logerror("IRET to V86 (%08x): Return SS segment is not present\n",cpustate->pc);
+				FAULT(FAULT_NP,newSS);
+			}
+
+			if(newEIP > desc.limit)
+			{
+				logerror("IRET to V86 (%08x): New EIP is past CS segment limit\n",cpustate->pc);
+				FAULT(FAULT_GP,0);
+			}
+			*/
+			set_flags(cpustate,newflags);
+			cpustate->eip = POP32(cpustate) & 0xffff;  // high 16 bits are ignored
+			cpustate->sreg[CS].selector = POP32(cpustate) & 0xffff;
+			POP32(cpustate);  // already set flags
+			if(RPL > CPL)
+			{
+				newESP = POP32(cpustate);
+				newSS = POP32(cpustate) & 0xffff;
+			}
+			cpustate->sreg[ES].selector = POP32(cpustate) & 0xffff;
+			cpustate->sreg[DS].selector = POP32(cpustate) & 0xffff;
+			cpustate->sreg[FS].selector = POP32(cpustate) & 0xffff;
+			cpustate->sreg[GS].selector = POP32(cpustate) & 0xffff;
+			REG32(ESP) = newESP;  // all 32 bits are loaded
+			cpustate->sreg[SS].selector = newSS;
+			i386_load_segment_descriptor(cpustate,ES);
+			i386_load_segment_descriptor(cpustate,DS);
+			i386_load_segment_descriptor(cpustate,FS);
+			i386_load_segment_descriptor(cpustate,GS);
+			i386_load_segment_descriptor(cpustate,SS);
+			cpustate->CPL = 3;  // Virtual 8086 tasks are always run at CPL 3
 		}
 		else
 		{
@@ -2383,10 +2587,10 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					FAULT(FAULT_GP,0)
 				}
 
-				if(operand32 == 0)
-					REG16(SP) += 10;
-				else
-					REG32(ESP) += 20;
+//				if(operand32 == 0)
+//					REG16(SP) += 10;
+//				else
+//					REG32(ESP) += 20;
 
 				if(operand32 == 0)
 				{
@@ -2790,6 +2994,8 @@ static CPU_EXECUTE( i386 )
 	{
 		cpustate->operand_size = cpustate->sreg[CS].d;
 		cpustate->address_size = cpustate->sreg[CS].d;
+		cpustate->operand_prefix = 0;
+		cpustate->address_prefix = 0;
 
 		cpustate->segment_prefix = 0;
 		cpustate->prev_eip = cpustate->eip;

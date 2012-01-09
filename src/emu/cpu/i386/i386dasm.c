@@ -1092,6 +1092,8 @@ static const char *const i386_sreg[8] = {"es", "cs", "ss", "ds", "fs", "gs", "??
 
 static int address_size;
 static int operand_size;
+static int address_prefix;
+static int operand_prefix;
 static int max_length;
 static UINT64 pc;
 static UINT8 modrm;
@@ -2021,18 +2023,25 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 
 		case OP_SIZE:
 			rex = regex = sibex = rmex = 0;
-			if (operand_size < 2)
+			if (operand_size < 2 && operand_prefix == 0)
+			{
 				operand_size ^= 1;
+				operand_prefix = 1;
+			}
 			op2 = FETCH();
 			decode_opcode( s, &i386_opcode_table1[op2], op2 );
 			return;
 
 		case ADDR_SIZE:
 			rex = regex = sibex = rmex = 0;
-			if (curmode != 64)
-				address_size ^= 1;
-			else
-				address_size ^= 3;
+			if(address_prefix == 0)
+			{
+				if (curmode != 64)
+					address_size ^= 1;
+				else
+					address_size ^= 3;
+				address_prefix = 1;
+			}
 			op2 = FETCH();
 			decode_opcode( s, &i386_opcode_table1[op2], op2 );
 			return;
@@ -2163,6 +2172,8 @@ int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode)
 	curmode = mode;
 	pre0f = 0;
 	rex = regex = sibex = rmex = 0;
+	address_prefix = 0;
+	operand_prefix = 0;
 
 	op = FETCH();
 
