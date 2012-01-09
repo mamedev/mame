@@ -20,7 +20,6 @@
     Mr. Dig                    (c) 2000 Sun
     Final Godori               (c) 2001 SemiCom            (version 2.20.5915)
     Wyvern Wings               (c) 2001 SemiCom
-    Toy Land Adventure         (c) 2001 SemiCom
     Mr. Kicker                 (c) 2001 SemiCom [1]
     Toy Land Adventure         (c) 2001 SemiCom [2]
     Age Of Heroes - Silkroad 2 (c) 2001 Unico              (v0.63 - 2001/02/07)
@@ -1954,6 +1953,17 @@ static READ16_HANDLER( mrdig_speedup_r )
 	return state->m_wram[(0x00a99c / 2)+offset];
 }
 
+static READ16_HANDLER( toyland_speedup_r )
+{
+	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
+	
+	if (cpu_get_pc(&space->device()) == 0x130c2)
+		device_spin_until_interrupt(&space->device());
+
+	return state->m_wram[0x780d8 / 2];
+
+}
+
 static DRIVER_INIT( vamphalf )
 {
 	vamphalf_state *state = machine.driver_data<vamphalf_state>();
@@ -2084,7 +2094,7 @@ static DRIVER_INIT( dquizgo2 )
 static DRIVER_INIT( toyland )
 {
 	vamphalf_state *state = machine.driver_data<vamphalf_state>();
-//	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00cde70, 0x00cde73, FUNC(dquizgo2_speedup_r) ); /* Needs it's own speed up */
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x780d8, 0x780d9, FUNC(toyland_speedup_r) );
 
 	state->m_palshift = 0;
 	state->m_flip_bit = 1;
@@ -2129,7 +2139,7 @@ GAME( 2000, dquizgo2, 0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",
 GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
 GAME( 2000, mrdig,    0,        mrdig,    common,   mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
-GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", 0 )
+GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_NOT_WORKING ) // game stops booting / working properly after you get a high score, or if you don't have a default eeprom with 'valid data.  It's never worked properly, CPU core issue?
 GAME( 2001, toyland,  0,        coolmini, common,   toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", GAME_NOT_WORKING ) /* Missing GRFX roms */
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings", GAME_NO_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
