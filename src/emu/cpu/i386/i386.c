@@ -2198,7 +2198,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 	{
 		if(newflags & 0x00020000) // if returning to virtual 8086 mode
 		{
-			UINT8 SSRPL,SSDPL;
+//			UINT8 SSRPL,SSDPL;
 			memset(&desc, 0, sizeof(desc));
 			desc.selector = newCS;
 			i386_load_protected_mode_segment(cpustate,&desc);
@@ -2207,8 +2207,8 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			memset(&stack, 0, sizeof(stack));
 			stack.selector = newSS;
 			i386_load_protected_mode_segment(cpustate,&stack);
-			SSRPL = newSS & 0x03;
-			SSDPL = (stack.flags >> 5) & 0x03;
+			//SSRPL = newSS & 0x03;
+			//SSDPL = (stack.flags >> 5) & 0x03;
 
 			/* Return to v86 mode */
 			popmessage("IRET (%08x): Returning to Virtual 8086 mode.",cpustate->pc);
