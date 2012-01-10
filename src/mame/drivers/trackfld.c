@@ -381,13 +381,20 @@ static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+
+READ8_DEVICE_HANDLER( trackfld_SN76496_r )
+{
+	konami_SN76496_w(device, 0, 0);
+	return 0xff; // ?
+}
+
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("snsnd", konami_SN76496_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVREADWRITE("snsnd", trackfld_SN76496_r, konami_SN76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP			/* watch dog ?; reaktor reads here */
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("vlm", trackfld_speech_r)
@@ -401,7 +408,7 @@ static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(trackfld_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("snsnd", konami_SN76496_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVREADWRITE("snsnd", trackfld_SN76496_r, konami_SN76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP			/* watch dog ?; reaktor reads here */
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_busy_r)
