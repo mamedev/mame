@@ -7,6 +7,7 @@ driver by Ernesto Corvi
 
 Notes:
 - Sprite colors are wrong (missing colortable?)
+- driver should probably be merged with suprridr.c
 
 ***************************************************************************/
 

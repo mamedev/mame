@@ -17,6 +17,8 @@
         * what are the writes to $08DB and $08E8 for?
           (guess: a discrete sound effect)
 
+    ** driver should probably be merged with timelimt.c
+
 ****************************************************************************
 
     PCB Layout
@@ -444,4 +446,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, suprridr, 0, suprridr, suprridr, 0, ROT90, "Venture Line (Taito Corporation license)", "Super Rider", GAME_IMPERFECT_SOUND )
+GAME( 1983, suprridr, 0, suprridr, suprridr, 0, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", GAME_IMPERFECT_SOUND )
