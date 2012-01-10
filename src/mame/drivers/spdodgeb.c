@@ -6,7 +6,7 @@ briver by Paul Hampson and Nicola Salmoria
 
 TODO:
 - sprite lag (the real game has quite a bit of lag too)
-- double-tap tolerance (find a way to dump + emulate MCU?)
+- double-tap tolerance (find a way to emulate MCU?)
 
 Notes:
 - there's probably a 63701 on the board, used for protection. It is checked
@@ -466,8 +466,9 @@ ROM_START( spdodgeb )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* I/O mcu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP )	/* missing */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
+	/* Not hooked up yet, we need to add HD63701Y0 support to the hd63701 core (with extra io ports, serial ports, and timers). */
+	ROM_LOAD( "22ja-0.162",   0x0c000, 0x04000, CRC(7162a97b) SHA1(d6d4ee025e73a340428345f08711cd32f9169a8c) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
 	ROM_LOAD( "22a-4.121",    0x00000, 0x20000, CRC(acc26051) SHA1(445224238cce420990894824d95447e3f63a9ef0) )
@@ -525,7 +526,7 @@ ROM_START( nkdodge )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* I/O mcu */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP )	/* missing */
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
@@ -555,7 +556,7 @@ ROM_START( nkdodgeb )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* I/O mcu */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP )	/* missing */
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
