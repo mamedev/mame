@@ -173,7 +173,7 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 	int ycntdraw;
 	int yzoombit;
 	int xzoombit;
-	int xcnt;
+	int xcnt = 0;
 
 
 	state->m_aoffset = (state->m_bdata[(state->m_boffset + 3) & state->m_bdatasize] << 24) | (state->m_bdata[(state->m_boffset + 2) & state->m_bdatasize] << 16) |
