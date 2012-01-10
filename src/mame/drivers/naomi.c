@@ -3933,6 +3933,23 @@ ROM_START( gram2000 )
 	ROM_LOAD( "gram2000-key.bin", 0, 4, CRC(179314d9) SHA1(3dbbc04e9ff62800d08c4a239af3a83252a28dc0) )
 ROM_END
 
+ROM_START( tduno2 )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+    ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
+    ROM_LOAD( "epr-23071.ic11",         0x0000000, 0x0200000, CRC(1b58f24a) SHA1(90f91af31beff9399c8d72ae0087bf4d3122cac2) ) 
+    ROM_LOAD32_WORD( "mpr-23063.ic17s", 0x1000000, 0x0800000, CRC(9678a759) SHA1(6f2602c6eef8db0d4a145d832aec3ea0e0491c0c) ) 
+    ROM_LOAD32_WORD( "mpr-23064.ic18",  0x1000002, 0x0800000, CRC(e159c44d) SHA1(fd0dcd74f7e214c7c9214bb04167f7c3acea30cf) ) 
+    ROM_LOAD32_WORD( "mpr-23065.ic19s", 0x2000000, 0x0800000, CRC(10eff527) SHA1(c208529b0825ba45dc474c6aaa4b4c5557335c10) ) 
+    ROM_LOAD32_WORD( "mpr-23066.ic20",  0x2000002, 0x0800000, CRC(4f9c1710) SHA1(7834bab5933a156656756f837c217e7820f2ae63) ) 
+    ROM_LOAD32_WORD( "mpr-23067.ic21s", 0x3000000, 0x0800000, CRC(32724cd9) SHA1(7bfdd58dd5e69529125a720f51c53ebe526ef2e9) ) 
+    ROM_LOAD32_WORD( "mpr-23068.ic22",  0x3000002, 0x0800000, CRC(2ce3e0ea) SHA1(805ec80273856ec6e5ee04fdca5fd1407c404f8e) ) 
+
+    ROM_REGION( 4, "rom_key", 0 )
+    ROM_LOAD( "tduno2.key",   0x000000, 0x000004, CRC(8e0f0f3b) SHA1(914d3db8746c806d559539cc0851169161d32c04) ) 
+ROM_END
+
 ROM_START( crackndj )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -7700,7 +7717,7 @@ ROM_END
 /* 0020 */ GAME( 1999, samba,    naomi,    naomim2, naomi,    naomi,    ROT0, "Sega", "Samba De Amigo (JPN) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0021 */ GAME( 2000, virnbao,  virnba,   naomim2, naomi,    naomi,    ROT0, "Sega", "Virtua NBA (JPN, USA, EXP, KOR, AUS) (original)", GAME_FLAGS )
 /* 0021-01 */ GAME( 2000,virnba, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
-// 0022 Touch de Uno! 2
+/* 0022 */ GAME( 2000, tduno2,   naomi,    naomim2, naomi,    naomi,    ROT0, "Sega", "Touch de Uno! 2", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
 /* 0023 */ GAME( 2000, 18wheelr, naomi,    naomim2, 18wheelr, naomi,    ROT0, "Sega", "18 Wheeler Deluxe (Rev A) (JPN)", GAME_FLAGS )
 /* 0023 */ GAME( 2000, 18wheels, 18wheelr, naomim2, 18wheelr, naomi,    ROT0, "Sega", "18 Wheeler (Rev A) (JPN)", GAME_FLAGS )
 // 0025 Mars TV
