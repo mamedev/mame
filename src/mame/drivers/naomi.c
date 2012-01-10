@@ -5429,6 +5429,33 @@ ROM_START( wldkicks )
 	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(c1e3000b) SHA1(36c2546833effe9452e2b3f7d31335fc5e349f49) )
 ROM_END
 
+ROM_START( toukon4 )
+    NAOMI_BIOS
+    NAOMI_DEFAULT_EEPROM
+
+    ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+    ROM_LOAD( "trf1_fl0.2f",  0x0000000, 0x0800000, CRC(862e673d) SHA1(f2c90932ba4abe31d02e86f80ef3e2689342c384) ) 
+    ROM_LOAD( "trf1_fl1.2d",  0x0800000, 0x0800000, CRC(59a935c9) SHA1(7298d83a27eac74bad18d716a791ab2016fe028f) ) 
+    ROM_LOAD( "trf1_ma1.4n",  0x1000000, 0x1000000, CRC(b1b3ab96) SHA1(3dc4bcf796583a0fb51359a86a46d7883df54fad) ) 
+    ROM_LOAD( "trf1_ma2.4m",  0x2000000, 0x1000000, CRC(a27d3dda) SHA1(b9ec4be5845cbe91fd7bc537669e96716513a5f0) ) 
+    ROM_LOAD( "trf1_ma3.4l",  0x3000000, 0x1000000, CRC(345ec434) SHA1(986d9930e7de46b88936c898ba8b05d950262a1f) ) 
+    ROM_LOAD( "trf1_ma4.4k",  0x4000000, 0x1000000, CRC(fc47a104) SHA1(07ced58c1b17719ac36db1589771e67ce16d912e) ) 
+    ROM_LOAD( "trf1_ma5.4j",  0x5000000, 0x1000000, CRC(e1bb077d) SHA1(6b70d8103bf067319e9022742fc1dd843d7e5076) ) 
+    ROM_LOAD( "trf1_ma6.4h",  0x6000000, 0x1000000, CRC(abae4d06) SHA1(56da2ca3551287942afabf37e7fd1b884bd3cac8) ) 
+    ROM_LOAD( "trf1_ma7.4f",  0x7000000, 0x1000000, CRC(19d0092a) SHA1(2ae2dbf2f3958da9f69b3a8636c6837e4243bb67) ) 
+    ROM_LOAD( "trf1_ma8.4e",  0x8000000, 0x1000000, CRC(6fbf34ab) SHA1(f4747d1a1c02e22502e68d72a4f0c152fa69d778) ) 
+    ROM_LOAD( "trf1_ma9.4d",  0x9000000, 0x1000000, CRC(2fa36c5d) SHA1(6478687c91484141521ae79a997cecbcfbb7beae) ) 
+    ROM_LOAD( "trf1_ma10.4c", 0xa000000, 0x1000000, CRC(bc866a37) SHA1(d4d12f285a3bc9136cf3fc2a59dba5ad557cc7d7) ) 
+    ROM_LOAD( "trf1_ma11.4b", 0xb000000, 0x1000000, CRC(68d11482) SHA1(fe991ba5664d6ccf0aac5167f05c5a780f851ae9) ) 
+    ROM_LOAD( "trf1_ma12.6p", 0xc000000, 0x1000000, CRC(a7c3bd3c) SHA1(ed5a24e4c47f686120577dae4550fb9378209cf8) ) 
+    ROM_LOAD( "trf1_ma13.6n", 0xd000000, 0x1000000, CRC(e52d41fe) SHA1(e1769d42d6048f9621ca289af3ddeca7c14cee00) ) 
+    ROM_LOAD( "trf1_ma14.6m", 0xe000000, 0x1000000, CRC(87cb31a0) SHA1(27aef9ac571a0b5e3a76e4ee22f5bc5d0ae962f2) ) 
+    ROM_LOAD( "trf1_ma15.6l", 0xf000000, 0x1000000, CRC(42d318c5) SHA1(f9fe82ffbfc51fcb52333f94c55a7092e7124fb4) ) 
+
+    ROM_REGION( 4, "rom_key", 0 )
+    ROM_LOAD( "tr4ae-key.bin", 0x000000, 0x000004, CRC(986a7cee) SHA1(70c3ff80f86de6a0655251658c66a156fb644995) ) 
+ROM_END
+
 ROM_START( vtenis2c )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -7755,7 +7782,7 @@ ROM_END
 
 /* Cart games on Namco custom ROM board */
 /* 25209801 */ GAME( 2000, wldkicks, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "World Kicks", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-// 25349801 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edition
+/* 25349801 */ GAME( 2000, toukon4,  naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
 // 25469801 Ninja Assault
 /* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 // 25869812 Mazan : Flash of the Blade
