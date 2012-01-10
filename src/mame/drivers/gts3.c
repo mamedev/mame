@@ -356,7 +356,7 @@ ROM_START(nudgeit)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Operation Thunder (#732)
+/ Operation: Thunder (#732)
 /-------------------------------------------------------------------*/
 ROM_START(opthund)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -932,7 +932,7 @@ GAME(1989,	lca2,		lca,		gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Lights...Camera.
 GAME(1995,	andretti,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Mario Andretti",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1995,	andretti4,	andretti,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Mario Andretti (rev.T4)",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1990,	nudgeit,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Nudge-It",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1992,	opthund,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Operation Thunder",				GAME_IS_SKELETON_MECHANICAL)
+GAME(1992,	opthund,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Operation: Thunder",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,	rescu911,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Rescue 911 (rev.1)",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1995,	shaqattq,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Shaq Attaq (rev.5)",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1995,	shaqattq2,	shaqattq,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Shaq Attaq (rev.2)",				GAME_IS_SKELETON_MECHANICAL)
