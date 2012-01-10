@@ -327,13 +327,13 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("sn1", Y2404, XTAL_14_31818MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("sn2", Y2404, XTAL_14_31818MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 0.75)
 
-	MCFG_SOUND_ADD("sn3", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("sn3", Y2404, XTAL_14_31818MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 0.75)
 
 	MCFG_SOUND_ADD("filter1", FILTER_RC, 0)

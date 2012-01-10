@@ -385,9 +385,9 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
     MCFG_SOUND_CONFIG(msm5205_config)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
-    MCFG_SOUND_ADD("sn76_1", SN76489A, XTAL_10_738635MHz/3) /* guess */
+    MCFG_SOUND_ADD("sn76_1", Y2404, XTAL_10_738635MHz/3) /* guess */
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-    MCFG_SOUND_ADD("sn76_2", SN76489A, XTAL_10_738635MHz/3) /* guess */
+    MCFG_SOUND_ADD("sn76_2", Y2404, XTAL_10_738635MHz/3) /* guess */
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
