@@ -623,7 +623,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pgm_basic_mem, AS_PROGRAM, 16)
 	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK("bank1") /* Game ROM */
+	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( killbld_mem, AS_PROGRAM, 16)
@@ -827,6 +827,19 @@ static INPUT_PORTS_START( sango )
 
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sango_ch )
+	PORT_INCLUDE ( pgm )
+
+	PORT_MODIFY("Region")	/* Region - supplied by protection device */
+	PORT_CONFNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" )
@@ -1115,7 +1128,7 @@ static MACHINE_RESET( pgm )
 static MACHINE_RESET( killbld );
 static MACHINE_RESET( dw3 );
 static MACHINE_RESET( olds );
-
+extern MACHINE_RESET( kov );
 
 MACHINE_CONFIG_FRAGMENT( pgmbase )
 	/* basic machine hardware */
@@ -1204,6 +1217,13 @@ static MACHINE_CONFIG_DERIVED( kov_disabled_arm, pgm ) // for simulated cases
 	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857E?
 	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
 	MCFG_DEVICE_DISABLE()
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( kov_simulated_arm, kov_disabled_arm ) // for simulated cases
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(kov_map)
+
+	MCFG_MACHINE_RESET(kov)
 MACHINE_CONFIG_END
 
 /******* ARM 55857F *******/
@@ -2060,6 +2080,7 @@ ROM_START( kovplus )
 	ROM_LOAD( "m0600.rom",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
 ROM_END
 
+
 /*
 
 Sangoku Senki Plus / Knights of Valour Plus (Alt 119 Ver.)
@@ -2121,6 +2142,91 @@ ROM_START( kovplusa )
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "m0600.rom",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
 ROM_END
+
+
+ROM_START( kovsgqyz )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "pgm_sgqyz.rom",    0x100000, 0x400000, CRC(18e1eed9) SHA1(db18d9121bb533140957e9c58dbc38211d164b01) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kovsgqyz_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // bootleg is probably a different device
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t0600.rom",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
+
+	ROM_REGION( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a0600.rom",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a0601.rom",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a0602.rom",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "qyza0603.rom", 0x1800000, 0x0800000, CRC(c8b92220) SHA1(4f9c43970d92ac8a8f1563021022797ae8e32012) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b0600.rom",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
+	ROM_LOAD( "qyzb0601.rom", 0x0800000, 0x0800000, CRC(64f55882) SHA1(ab9ac1396587c3d78d06f6ec83cab61d6a9faacd) )
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m0600.rom",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
+ROM_END
+
+ROM_START( kovsgqyza )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "pgm_sgqyza.rom",    0x100000, 0x400000, CRC(5a30dcb7) SHA1(64f34faf99a19c0a54899990695129c512d5a3c8) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kovsgqyza_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // bootleg is probably a different device
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t0600.rom",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
+
+	ROM_REGION( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a0600.rom",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a0601.rom",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a0602.rom",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "qyza0603.rom", 0x1800000, 0x0800000, CRC(c8b92220) SHA1(4f9c43970d92ac8a8f1563021022797ae8e32012) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b0600.rom",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
+	ROM_LOAD( "qyzb0601.rom", 0x0800000, 0x0800000, CRC(64f55882) SHA1(ab9ac1396587c3d78d06f6ec83cab61d6a9faacd) )
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m0600.rom",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
+ROM_END
+
+ROM_START( kovsgqyzb )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "pgm_sgqyzb.rom",    0x100000, 0x400000, CRC(18b8b9c0) SHA1(f4937aa21cd11af16fb50e7a75c8d4c4ed27c5cf) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kovsgqyzb_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // bootleg is probably a different device
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t0600.rom",    0x180000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
+
+	ROM_REGION( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a0600.rom",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a0601.rom",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a0602.rom",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "qyza0603.rom", 0x1800000, 0x0800000, CRC(c8b92220) SHA1(4f9c43970d92ac8a8f1563021022797ae8e32012) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b0600.rom",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
+	ROM_LOAD( "qyzb0601.rom", 0x0800000, 0x0800000, CRC(64f55882) SHA1(ab9ac1396587c3d78d06f6ec83cab61d6a9faacd) )
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m0600.rom",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
+ROM_END
+
+
+
 
 ROM_START( kovsh )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
@@ -2276,6 +2382,36 @@ ROM_START( kovqhsgs )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "qhsg_c51.rom", 0x100000, 0x400000, CRC(e5cbac85) SHA1(4b424206387057863990b04f6d5bd0b6f754814f) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "qhsg_prot.c51", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
+
+	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "lsqh2_t01.rom",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
+	ROM_IGNORE( 0x800000 )	// second half identical
+
+	ROM_REGION( 0x3000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "lsqh2_a01.rom", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
+	ROM_LOAD( "lsqh2_a23.rom", 0x1000000, 0x1000000, CRC(7a779112) SHA1(0a7d36b3715063d8eac629b95a9bb3ecd8e54fca) )
+	ROM_LOAD( "lsqh2_a45.rom", 0x2000000, 0x1000000, CRC(5d7de052) SHA1(7663b6cf09f65c4644661005a38f9aba84a32913) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "lsqh2_b01.rom", 0x0000000, 0x1000000, CRC(df7ca696) SHA1(7af3d27957a39de7e4873867c9972c05af7e7964) )
+
+	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "lsqh2_m01.rom",0x400000, 0x400000, CRC(01af1b65) SHA1(6cf523fa8f1e03f974771611bb9a4e08a4d4443f) )
+	ROM_IGNORE( 0x400000 )	// 400000-7fffff empty
+	ROM_CONTINUE( 0x800000, 0x400000 )
+	ROM_IGNORE( 0x400000 )	// c00000-ffffff empty
+ROM_END
+
+
+ROM_START( kovlsqh )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "lsqh_v200cn.rom", 0x100000, 0x400000, CRC(9935a27a) SHA1(3075935293172466c4bd997dcb67f864ae26493e) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "qhsg_prot.c51", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
@@ -3084,7 +3220,7 @@ ROM_START( kov2p )
 	ROM_LOAD16_WORD_SWAP( "v204-32m.rom",    0x100000, 0x400000, CRC(583e0650) SHA1(2e5656dd9c6cba9f84af9baa3f5f70cdccf9db47) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "kov2p_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "kov2p_igs027a.bin", 0x000000, 0x04000, BAD_DUMP CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) ) // NOT for this version, works with a hack
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200-16.rom", 0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
@@ -3115,7 +3251,7 @@ ROM_START( kov2p205 )
 	ROM_LOAD16_WORD_SWAP( "u8-27322.rom",    0x100000, 0x400000, CRC(3a2cc0de) SHA1(d7511478b34bfb03b2fb5b8268b60502d05b9414) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "kov2p_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "kov2p_igs027a.bin", 0x000000, 0x04000, BAD_DUMP CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) ) // NOT for this version, works with a hack
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200-16.rom", 0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
@@ -4292,6 +4428,15 @@ static DRIVER_INIT( kov )
 	pgm_basic_init(machine);
 	pgm_kov_decrypt(machine);
 	kovsh_latch_init(machine);
+	install_protection_asic_sim_kov(machine);
+}
+
+static DRIVER_INIT( kovboot )
+{
+	pgm_basic_init(machine);
+//	pgm_kov_decrypt(machine);
+	kovsh_latch_init(machine);
+	install_protection_asic_sim_kov(machine);
 }
 
 static DRIVER_INIT( pstar )
@@ -4373,12 +4518,6 @@ static DRIVER_INIT( kov2 )
 	kov2_latch_init(machine);
 }
 
-static DRIVER_INIT( kov2p )
-{
-	pgm_basic_init(machine);
-	pgm_kov2p_decrypt(machine);
-	kov2_latch_init(machine);
-}
 
 static DRIVER_INIT( martmast )
 {
@@ -5669,6 +5808,35 @@ static DRIVER_INIT( oldsplus )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4fffff, FUNC(oldsplus_protram_r));
 }
 
+static DRIVER_INIT( kov2p )
+{
+	// this hacks the identification of the kov2 rom to return the string required for kov2p
+	// this isn't guaranteed to work properly (and definitely wouldn't on real hardware due to the internal
+	// ROM uploading the encryption table)  The internal ROM should be dumped properly.
+	UINT8 *mem8 = (UINT8 *)machine.region("user1")->base();
+	pgm_basic_init(machine);
+	pgm_kov2p_decrypt(machine);
+	kov2_latch_init(machine);
+	mem8[0xDE] = 0xC0;
+	mem8[0xDF] = 0x46;
+	mem8[0x4ED8] = 0xA8;// B0
+	mem8[0x4EDC] = 0x9C;// A4
+	mem8[0x4EE0] = 0x5C;// 64
+	mem8[0x4EE4] = 0x94;// 9C
+	mem8[0x4EE8] = 0xE8;// F0
+	mem8[0x4EEC] = 0x6C;// 74
+	mem8[0x4EF0] = 0xD4;// DC
+	mem8[0x4EF4] = 0x50;// 58
+	mem8[0x4EF8] = 0x80;// 88
+	mem8[0x4EFC] = 0x9C;// A4
+	mem8[0x4F00] = 0x28;// 30
+	mem8[0x4F04] = 0x30;// 38
+	mem8[0x4F08] = 0x34;// 3C
+	mem8[0x4F0C] = 0x1C;// 24
+	mem8[0x1FFFFC] = 0x33;
+	mem8[0x1FFFFD] = 0x99;
+}
+
 /*** GAME ********************************************************************/
 
 GAME( 1997, pgm,          0,         pgm,     pgm,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", GAME_IS_BIOS_ROOT )
@@ -5706,6 +5874,9 @@ GAME( 2000, kov2102,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS
 GAME( 2000, kov2101,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 101, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
 GAME( 2000, kov2100,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 100, 100, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
 
+GAME( 2001, kov2p,        pgm,       kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, kov2p205,     kov2p,     kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+
 GAME( 2001, martmast,     pgm,       kov2,    sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 102US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 102US
 GAME( 2001, martmastc,    martmast,  kov2,    sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 101CN
 GAME( 2001, martmastc102, martmast,  kov2,    sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V102, Ext Arm 101, Int Arm 101CN
@@ -5722,6 +5893,21 @@ GAME( 1998, olds,         pgm,       olds,    olds,     olds,       ROT0,   "IGS
 GAME( 1998, olds100,      olds,      olds,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1998, olds100a,     olds,      olds,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (alt ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // crashes on some bosses, high score table etc.
 
+GAME( 1999, kov,          pgm,       kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
+GAME( 1999, kov115,       kov,       kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18
+GAME( 1999, kov100,       kov,       kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // V0002 01/31/99 01:54:16
+
+GAME( 1999, kovplus,      pgm,       kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovplusa,     kovplus,   kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (alt ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+
+// modified title screen is only visible for china region, so use that by default.  Character select portraits don't seem quite right (different protection?)
+GAME( 1999, kovsgqyz,     kovplus,   kov_simulated_arm,     sango_ch,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovsgqyza,    kovplus,   kov_simulated_arm,     sango_ch,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovsgqyzb,    kovplus,   kov_simulated_arm,     sango_ch,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 3)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+
+
+
+
 /* -----------------------------------------------------------------------------------------------------------------------
    NOT Working (mostly due to needing internal protection roms dumped)
    -----------------------------------------------------------------------------------------------------------------------*/
@@ -5733,21 +5919,9 @@ GAME( 1998, drgw3100,     drgw3,     dw3,     dw3,      drgw3,      ROT0,   "IGS
 
 GAME( 1998, dwex,         pgm,       dw3,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-
-GAME( 1999, kov,          pgm,       kov_disabled_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
-GAME( 1999, kov115,       kov,       kov_disabled_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18
-GAME( 1999, kov100,       kov,       kov_disabled_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // V0002 01/31/99 01:54:16
-
-GAME( 1999, kovplus,      pgm,       kov_disabled_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 1999, kovplusa,     kovplus,   kov_disabled_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (alt ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-
 GAME( 1999, puzlstar,     pgm,       kov_disabled_arm,     sango,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 GAME( 2001, py2k2,        pgm,       kov_disabled_arm,     photoy2k, py2k2,      ROT0,   "IGS", "Photo Y2K 2", GAME_NOT_WORKING )  /* need internal rom of IGS027A */
-
-
-GAME( 2001, kov2p,        pgm,       kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2001, kov2p205,     kov2p,     kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 GAME( 2001, ddp2,         pgm,       kov2_disabled_arm,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2001, ddp2101,      ddp2,      kov2_disabled_arm,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 101)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
@@ -5769,6 +5943,7 @@ GAME( 2004, oldsplus,     pgm,       svg_disabled_arm,     oldsplus,     oldsplu
 
 GAME( 2004, kovshp,       pgm,       kov,     sango,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 // these bootlegs are clones of this instead
+GAME( 2004, kovlsqh,      kovshp,     kov,     sango,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang / Sangoku Senki: Luan Shi Quan Huang (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2004, kovlsqh2,     kovshp,     kov,     sango,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang 2 / Sangoku Senki: Luan Shi Quan Huang 2 (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2004, kovlsjb,      kovshp,     kov,     sango,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2004, kovlsjba,     kovshp,     kov,     sango,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (alt ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */

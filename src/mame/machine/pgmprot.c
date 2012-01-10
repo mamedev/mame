@@ -1130,3 +1130,199 @@ WRITE16_HANDLER( oldsplus_w )
 		}
 	}
 }
+
+/* Old KOV and bootlegs sim ... really these should be read out... */
+
+static const UINT8 kov_BATABLE[0x40] = {
+	0x00,0x29,0x2c,0x35,0x3a,0x41,0x4a,0x4e,0x57,0x5e,0x77,0x79,0x7a,0x7b,0x7c,0x7d,
+	0x7e,0x7f,0x80,0x81,0x82,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x90,
+	0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9e,0xa3,0xd4,0xa9,0xaf,0xb5,0xbb,0xc1
+};
+
+static const UINT8 kov_B0TABLE[16] = { 2, 0, 1, 4, 3 }; // Maps char portraits to tables
+
+static UINT32 kov_slots[16];
+static UINT16 kov_internal_slot;
+static UINT16 kov_key;
+static UINT32 kov_response;
+static UINT16 kov_value;
+
+static UINT16 kov_c0_value;
+static UINT16 kov_cb_value;
+static UINT16 kov_fe_value;
+
+WRITE16_HANDLER( kov_asic_sim_w )
+{
+	switch ((offset*2) & 0x06)
+	{
+		case 0: kov_value = data; return;
+
+		case 2:
+		{
+			if ((data >> 8) == 0xff) kov_key = 0xffff;
+
+			kov_value ^= kov_key;
+
+		//	bprintf (PRINT_NORMAL, _T("ASIC27 command: %2.2x data: %4.4x\n"), (data ^ kov_key) & 0xff, kov_value);
+
+			switch ((data ^ kov_key) & 0xff)
+			{
+				case 0x67: // unknown or status check?
+				case 0x8e:
+				case 0xa3:
+				case 0x33: // kovsgqyz (a3)
+				case 0x3a: // kovplus
+				case 0xc5: // kovplus
+					kov_response = 0x880000;
+				break;
+
+				case 0x99: // Reset
+					kov_response = 0x880000;
+					kov_key = 0;
+				break;
+
+				case 0x9d: // Sprite palette offset
+					kov_response = 0xa00000 + ((kov_value & 0x1f) * 0x40);
+				break;
+
+				case 0xb0: // Read from data table
+					kov_response = kov_B0TABLE[kov_value & 0x0f];
+				break;
+
+				case 0xb4: // Copy slot 'a' to slot 'b'
+				case 0xb7: // kovsgqyz (b4)
+				{
+					kov_response = 0x880000;
+
+					if (kov_value == 0x0102) kov_value = 0x0100; // why?
+
+					kov_slots[(kov_value >> 8) & 0x0f] = kov_slots[(kov_value >> 0) & 0x0f];
+				}
+				break;
+
+				case 0xba: // Read from data table
+					kov_response = kov_BATABLE[kov_value & 0x3f];
+				break;
+
+				case 0xc0: // Text layer 'x' select
+					kov_response = 0x880000;
+					kov_c0_value = kov_value;
+				break;
+
+				case 0xc3: // Text layer offset
+					kov_response = 0x904000 + ((kov_c0_value + (kov_value * 0x40)) * 4);
+				break;
+
+				case 0xcb: // Background layer 'x' select
+					kov_response = 0x880000;
+					kov_cb_value = kov_value;
+				break;
+
+				case 0xcc: // Background layer offset
+					if (kov_value & 0x400) kov_value = -(0x400 - (kov_value & 0x3ff));
+					kov_response = 0x900000 + ((kov_cb_value + (kov_value * 0x40)) * 4);
+				break;
+
+				case 0xd0: // Text palette offset
+				case 0xcd: // kovsgqyz (d0)
+					kov_response = 0xa01000 + (kov_value * 0x20);
+				break;
+
+				case 0xd6: // Copy slot to slot 0
+					kov_response = 0x880000;
+					kov_slots[0] = kov_slots[kov_value & 0x0f];
+				break;
+
+				case 0xdc: // Background palette offset
+				case 0x11: // kovsgqyz (dc)
+					kov_response = 0xa00800 + (kov_value * 0x40);
+				break;
+
+				case 0xe0: // Sprite palette offset
+				case 0x9e: // kovsgqyz (e0)
+					kov_response = 0xa00000 + ((kov_value & 0x1f) * 0x40);
+				break;
+
+				case 0xe5: // Write slot (low)
+				{
+					kov_response = 0x880000;
+
+					INT32 sel = (kov_internal_slot >> 12) & 0x0f;
+					kov_slots[sel] = (kov_slots[sel] & 0x00ff0000) | ((kov_value & 0xffff) <<  0);
+				}
+				break;
+
+				case 0xe7: // Write slot (and slot select) (high)
+				{
+					kov_response = 0x880000;
+					kov_internal_slot = kov_value;
+
+					INT32 sel = (kov_internal_slot >> 12) & 0x0f;
+					kov_slots[sel] = (kov_slots[sel] & 0x0000ffff) | ((kov_value & 0x00ff) << 16);
+				}
+				break;
+
+				case 0xf0: // Some sort of status read?
+					kov_response = 0x00c000;
+				break;
+
+				case 0xf8: // Read slot
+				case 0xab: // kovsgqyz (f8)
+					kov_response = kov_slots[kov_value & 0x0f] & 0x00ffffff;
+				break;
+
+				case 0xfc: // Adjust damage level to char experience level
+					kov_response = (kov_value * kov_fe_value) >> 6;
+				break;
+
+				case 0xfe: // Damage level adjust
+					kov_response = 0x880000;
+					kov_fe_value = kov_value;
+				break;
+
+				default:
+					kov_response = 0x880000;
+		//			bprintf (PRINT_NORMAL, _T("Unknown ASIC27 command: %2.2x data: %4.4x\n"), (data ^ kov_key) & 0xff, kov_value);
+				break;
+			}
+
+			kov_key = (kov_key + 0x0100) & 0xff00;
+			if (kov_key == 0xff00) kov_key = 0x0100;
+			kov_key |= kov_key >> 8;
+		}
+		return;
+
+		case 4: return;
+	}
+}
+
+READ16_HANDLER( kov_asic_sim_r )
+{
+	switch ((offset*2) & 0x02)
+	{
+		case 0: return (kov_response >>  0) ^ kov_key;
+		case 2: return (kov_response >> 16) ^ kov_key;
+	}
+
+	return 0;
+}
+
+MACHINE_RESET( kov )
+{
+	kov_internal_slot = 0;
+	kov_key = 0;
+	kov_response = 0;
+	kov_value = 0;
+
+	kov_c0_value = 0;
+	kov_cb_value = 0;
+	kov_fe_value = 0;
+
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+}
+
+void install_protection_asic_sim_kov(running_machine &machine)
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500003, FUNC(kov_asic_sim_r), FUNC(kov_asic_sim_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4fffff, FUNC(sango_protram_r));
+}

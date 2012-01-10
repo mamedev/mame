@@ -4,205 +4,318 @@
 #include "emu.h"
 #include "includes/pgm.h"
 
-/* Sprites - These are a pain! */
+/******************************************************************************
+ Sprites
 
-/* this decodes one of the funky sprites to a bitmap so we can draw it more easily -- slow but easier to use*/
-static void pgm_prepare_sprite( running_machine &machine, int wide, int high, int palt, int boffset )
+ these are fairly complex to render due to the data format, unless you
+ pre-decode the data you have to draw pixels in the order they're decoded from
+ the ROM which becomes quite complex with flipped and zoomed cases
+******************************************************************************/
+
+// nothing pri is 0
+// bg pri is 2
+// sprite already here is 1 / 3
+
+INLINE void pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, UINT16 srcdat)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT8 *bdata = machine.region("sprmask")->base();
-	size_t  bdatasize = machine.region("sprmask")->bytes() - 1;
-	UINT8 *adata = state->m_sprite_a_region;
-	size_t  adatasize = state->m_sprite_a_region_size - 1;
-	int xcnt, ycnt;
 
-	UINT32 aoffset;
-	UINT16 msk;
-
-	aoffset = (bdata[(boffset + 3) & bdatasize] << 24) | (bdata[(boffset + 2) & bdatasize] << 16) |
-				(bdata[(boffset + 1) & bdatasize] << 8) | (bdata[(boffset + 0) & bdatasize] << 0);
-	aoffset = aoffset >> 2; aoffset *= 3;
-
-	boffset += 4; /* because the first dword is the a data offset */
-
-	for (ycnt = 0 ; ycnt < high ; ycnt++)
+	if ((xdrawpos >= 0) && (xdrawpos < 448))
 	{
-		for (xcnt = 0 ; xcnt < wide ; xcnt++)
+		if (!(destpri[xdrawpos]&1))
 		{
-			int x;
-
-			msk = ((bdata[(boffset + 1) & bdatasize] << 8) |( bdata[(boffset + 0) & bdatasize] << 0));
-
-			for (x = 0; x < 16; x++)
+			if (!pri)
 			{
-				if (!(msk & 0x0001))
-				{
-					state->m_sprite_temp_render[(ycnt * (wide * 16))+(xcnt * 16 + x)] = adata[aoffset & adatasize] + palt * 32;
-					aoffset++;
-				}
-				else
-				{
-					state->m_sprite_temp_render[(ycnt * (wide * 16)) + (xcnt * 16 + x)] = 0x8000;
-				}
-				msk >>= 1;
+				dest[xdrawpos] = srcdat;
 			}
-
-			boffset += 2;
+			else
+			{
+				if (!(destpri[xdrawpos]&2))
+				{
+					dest[xdrawpos] = srcdat;	
+				}						
+			}
 		}
+
+		destpri[xdrawpos]|=1;
 	}
 }
 
+INLINE void pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat)
+{
+	if ((xdrawpos >= 0) && (xdrawpos < 448))
+	{
+		if (!(destpri[xdrawpos]&1))
+		{
+			dest[xdrawpos] = srcdat;
+		}
+		destpri[xdrawpos]|=1;
+	}
+}
 
-// in the dest bitmap 0x10000 is used to mark 'used pixel' and 0x8000 is used to mark 'high priority'
-static void draw_sprite_line( running_machine &machine, int wide, UINT32* dest, int xzoom, int xgrow, int yoffset, int flip, int xpos, int pri )
+INLINE void pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat)
+{
+	if ((xdrawpos >= 0) && (xdrawpos < 448))
+	{
+		if (!(destpri[xdrawpos]&1))
+		{
+			if (!(destpri[xdrawpos]&2))
+			{
+				dest[xdrawpos] = srcdat;	
+			}	
+		}
+		destpri[xdrawpos]|=1;
+	}
+}
+
+/*************************************************************************
+ Full Sprite Renderer
+  for complex zoomed cases
+*************************************************************************/
+
+static void draw_sprite_line( running_machine &machine, int wide, UINT16* dest, UINT8* destpri, int xzoom, int xgrow, int flip, int xpos, int pri, int realxsize, int palt, int draw )
 {
 	pgm_state *state = machine.driver_data<pgm_state>();
 	int xcnt,xcntdraw;
 	int xzoombit;
-	int xoffset;
+	int xoffset = 0;
 	int xdrawpos = 0;
+
+	UINT8 *adata = state->m_sprite_a_region;
+	size_t  adatasize = state->m_sprite_a_region_size - 1;
+
+	UINT16 msk;
+	UINT16 srcdat;
 
 	xcnt = 0;
 	xcntdraw = 0;
-	while (xcnt < wide * 16)
+
+	for (xcnt = 0 ; xcnt < wide ; xcnt++)
 	{
-		UINT32 srcdat;
-		if (!(flip & 0x01))
-			xoffset = xcnt;
-		else
-			xoffset = (wide * 16) - xcnt - 1;
+		int x;
 
-		srcdat = state->m_sprite_temp_render[yoffset + xoffset];
-		xzoombit = (xzoom >> (xcnt & 0x1f)) & 1;
+		msk = ((state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) |( state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0));
 
-		if (xzoombit == 1 && xgrow == 1)
-		{ // double this column
-			xdrawpos = xpos + xcntdraw;
-			if (!(srcdat & 0x8000))
-			{
-				if ((xdrawpos >= 0) && (xdrawpos < 448))
-				{
-					if (pri)
-						dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
-					else
-						dest[xdrawpos] = srcdat | 0x10000;
-				}
-			}
-			xcntdraw++;
-
-			xdrawpos = xpos + xcntdraw;
-
-			if (!(srcdat & 0x8000))
-			{
-				if ((xdrawpos >= 0) && (xdrawpos < 448))
-				{
-					if (pri)
-						dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
-					else
-						dest[xdrawpos] = srcdat | 0x10000;
-				}
-			}
-			xcntdraw++;
-		}
-		else if (xzoombit == 1 && xgrow == 0)
+		for (x = 0; x < 16; x++)
 		{
-			/* skip this column */
-		}
-		else //normal column
-		{
-			xdrawpos = xpos + xcntdraw;
-			if (!(srcdat & 0x8000))
+			if (!(msk & 0x0001))
 			{
-				if ((xdrawpos >= 0) && (xdrawpos < 448))
+				srcdat = adata[state->m_aoffset & adatasize] + palt * 32;
+				state->m_aoffset++;
+
+				if (draw)
 				{
-					if (pri)
-						dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
-					else
-						dest[xdrawpos] = srcdat | 0x10000;
+					xzoombit = (xzoom >> (xoffset & 0x1f)) & 1;
+					xoffset++;
+
+					if (xzoombit == 1 && xgrow == 1)
+					{ // double this column
+
+						if (!(flip & 0x01))
+							xdrawpos = xpos + xcntdraw;
+						else
+							xdrawpos = xpos + realxsize - xcntdraw;
+			
+						pgm_draw_pix(xdrawpos, pri, dest, destpri, srcdat);
+
+						xcntdraw++;
+
+						if (!(flip & 0x01))
+							xdrawpos = xpos + xcntdraw;
+						else
+							xdrawpos = xpos + realxsize - xcntdraw;
+
+						pgm_draw_pix(xdrawpos, pri, dest, destpri, srcdat);
+					
+						xcntdraw++;
+					}
+					else if (xzoombit == 1 && xgrow == 0)
+					{
+						/* skip this column */
+					}
+					else //normal column
+					{
+						if (!(flip & 0x01))
+							xdrawpos = xpos + xcntdraw;
+						else
+							xdrawpos = xpos + realxsize - xcntdraw;
+
+						pgm_draw_pix(xdrawpos, pri, dest, destpri, srcdat);
+						
+						xcntdraw++;
+					}
 				}
+
 			}
-			xcntdraw++;
+			else
+			{
+				xzoombit = (xzoom >> (xoffset & 0x1f)) & 1;
+				xoffset++;
+				if (xzoombit == 1 && xgrow == 1) { xcntdraw+=2; }
+				else if (xzoombit == 1 && xgrow == 0) { }
+				else { xcntdraw++; }
+			}
+
+			msk >>= 1;
+
+
 		}
 
-		xcnt++;
-
-		if (xdrawpos == 448) xcnt = wide*16;
+		state->m_boffset += 2;
 	}
 }
-/* this just loops over our decoded bitmap and puts it on the screen */
-static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t &bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
+
+static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_t &bitmap, bitmap_t &priority_bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
 {
 	int ycnt;
 	int ydrawpos;
-	UINT32 *dest;
-	int yoffset;
+	UINT16 *dest;
+	UINT8* destpri;
 	int ycntdraw;
 	int yzoombit;
+	int xzoombit;
+	int xcnt;
 
-	pgm_prepare_sprite(machine, wide,high, palt, boffset);
+
+	state->m_aoffset = (state->m_bdata[(state->m_boffset + 3) & state->m_bdatasize] << 24) | (state->m_bdata[(state->m_boffset + 2) & state->m_bdatasize] << 16) |
+				(state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) | (state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0);
+	state->m_aoffset = state->m_aoffset >> 2; state->m_aoffset *= 3;
+
+	state->m_boffset+=4;
+
+	/* precalculate where drawing will end, for flipped zoomed cases. */
+	/* if we're to avoid pre-decoding the data for each sprite each time we draw then we have to draw the sprite data
+	   in the order it is in ROM due to the nature of the compresson scheme.  This means drawing upwards from the end point
+	   in the case of flipped sprites */
+	ycnt = 0;
+	ycntdraw = 0;
+	int realysize = 0;
+
+	while (ycnt < high)
+	{
+		yzoombit = (yzoom >> (ycnt & 0x1f)) & 1;
+		if (yzoombit == 1 && ygrow == 1) { realysize+=2; }
+		else if (yzoombit == 1 && ygrow == 0) { }
+		else { realysize++; };
+
+		ycnt++;
+	}
+	realysize--;
+
+	int realxsize = 0;
+
+	while (xcnt < wide * 16)
+	{
+		xzoombit = (xzoom >> (xcnt & 0x1f)) & 1;
+		if (xzoombit == 1 && xgrow == 1) { realxsize+=2; }
+		else if (xzoombit == 1 && xgrow == 0) { }
+		else { realxsize++; };
+
+		xcnt++;
+	}
+	realxsize--;
+
 
 	/* now draw it */
 	ycnt = 0;
 	ycntdraw = 0;
+
 	while (ycnt < high)
 	{
 		yzoombit = (yzoom >> (ycnt & 0x1f)) & 1;
 
 		if (yzoombit == 1 && ygrow == 1) // double this line
 		{
-			ydrawpos = ypos + ycntdraw;
-
+			int temp_aoffset = state->m_aoffset;
+			int temp_boffset = state->m_boffset;
+			
 			if (!(flip & 0x02))
-				yoffset = (ycnt * (wide * 16));
+				ydrawpos = ypos + ycntdraw;
 			else
-				yoffset = ((high - ycnt - 1) * (wide * 16));
+				ydrawpos = ypos + realysize - ycntdraw;
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = &bitmap.pix32(ydrawpos);
-				draw_sprite_line(machine, wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
+				dest = &bitmap.pix16(ydrawpos);
+				destpri = &priority_bitmap.pix8(ydrawpos);
+				draw_sprite_line(machine, wide, dest, destpri, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 1);
 			}
-			ycntdraw++;
-
-			ydrawpos = ypos + ycntdraw;
-			if (!(flip & 0x02))
-				yoffset = (ycnt * (wide * 16));
 			else
-				yoffset = ((high - ycnt - 1) * (wide * 16));
+			{
+				draw_sprite_line(machine, wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+			}
+
+			ycntdraw++;
+		
+			// we need to draw this line again, so restore our pointers to previous values
+			state->m_aoffset = temp_aoffset;
+			state->m_boffset = temp_boffset;
+
+			if (!(flip & 0x02))
+				ydrawpos = ypos + ycntdraw;
+			else
+				ydrawpos = ypos + realysize - ycntdraw;
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = &bitmap.pix32(ydrawpos);
-				draw_sprite_line(machine, wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
+				dest = &bitmap.pix16(ydrawpos);
+				destpri = &priority_bitmap.pix8(ydrawpos);
+				draw_sprite_line(machine, wide, dest, destpri, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 1);
 			}
+			else
+			{
+				draw_sprite_line(machine, wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+
+				if (!(flip & 0x02))
+				{
+					if (ydrawpos>224)
+						return;
+				}
+				else
+				{
+					if (ydrawpos<0)
+						return;
+				}
+			}
+
 			ycntdraw++;
 
-			if (ydrawpos ==224)
-				ycnt = high;
 		}
 		else if (yzoombit == 1 && ygrow == 0)
 		{
 			/* skip this line */
-			/* we should process anyway if we don't do the pre-decode.. */
+			draw_sprite_line(machine, wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
 		}
 		else /* normal line */
 		{
-			ydrawpos = ypos + ycntdraw;
-
 			if (!(flip & 0x02))
-				yoffset = (ycnt * (wide * 16));
+				ydrawpos = ypos + ycntdraw;
 			else
-				yoffset = ((high - ycnt - 1) * (wide * 16));
+				ydrawpos = ypos + realysize - ycntdraw;
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = &bitmap.pix32(ydrawpos);
-				draw_sprite_line(machine, wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
+				dest = &bitmap.pix16(ydrawpos);
+				destpri = &priority_bitmap.pix8(ydrawpos);
+				draw_sprite_line(machine, wide, dest, destpri, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 1);
 			}
-			ycntdraw++;
+			else
+			{
+				draw_sprite_line(machine, wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+			
+				if (!(flip & 0x02))
+				{
+					if (ydrawpos>224)
+						return;
+				}
+				else
+				{
+					if (ydrawpos<0)
+						return;
+				}
+			
+			}
 
-			if (ydrawpos == 224)
-				ycnt = high;
+			ycntdraw++;
 		}
 
 		ycnt++;
@@ -210,7 +323,170 @@ static void draw_sprite_new_zoomed( running_machine &machine, int wide, int high
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t& spritebitmap, UINT16 *sprite_source )
+static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* dest, UINT8* destpri, int flip, int xpos, int pri, int realxsize, int palt, int draw )
+{
+	pgm_state *state = machine.driver_data<pgm_state>();
+	int xcnt,xcntdraw;
+	int xoffset = 0;
+	int xdrawpos = 0;
+	UINT8 *adata = state->m_sprite_a_region;
+	size_t  adatasize = state->m_sprite_a_region_size - 1;
+
+	UINT16 msk;
+	UINT16 srcdat;
+
+	xcnt = 0;
+	xcntdraw = 0;
+
+	if (!pri)
+	{
+		for (xcnt = 0 ; xcnt < wide ; xcnt++)
+		{
+			int x;
+
+			msk = ((state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) |( state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0));
+
+			for (x = 0; x < 16; x++)
+			{
+				if (!(msk & 0x0001))
+				{
+					srcdat = adata[state->m_aoffset & adatasize] + palt * 32;
+					state->m_aoffset++;
+
+					if (draw)
+					{
+						xoffset++;
+
+						if (!(flip & 0x01))
+							xdrawpos = xpos + xcntdraw;
+						else
+							xdrawpos = xpos + realxsize - xcntdraw;
+
+						pgm_draw_pix_nopri(xdrawpos, dest, destpri, srcdat);
+						
+						xcntdraw++;
+					}
+
+				}
+				else
+				{
+					xoffset++;
+					xcntdraw++;
+				}
+
+				msk >>= 1;
+			}
+
+			state->m_boffset += 2;
+		}
+	}
+	else
+	{
+		for (xcnt = 0 ; xcnt < wide ; xcnt++)
+		{
+			int x;
+
+			msk = ((state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) |( state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0));
+
+			for (x = 0; x < 16; x++)
+			{
+				if (!(msk & 0x0001))
+				{
+					srcdat = adata[state->m_aoffset & adatasize] + palt * 32;
+					state->m_aoffset++;
+
+					if (draw)
+					{
+						xoffset++;
+
+						if (!(flip & 0x01))
+							xdrawpos = xpos + xcntdraw;
+						else
+							xdrawpos = xpos + realxsize - xcntdraw;
+
+						pgm_draw_pix_pri(xdrawpos, dest, destpri, srcdat);
+						
+						xcntdraw++;
+					}
+
+				}
+				else
+				{
+					xoffset++;
+					xcntdraw++;
+				}
+
+				msk >>= 1;
+			}
+
+			state->m_boffset += 2;
+		}
+	}
+}
+
+/*************************************************************************
+ Basic Sprite Renderer
+  simplified version for non-zoomed cases, a bit faster
+*************************************************************************/
+
+static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_t &bitmap, bitmap_t &priority_bitmap, int pri )
+{
+	int ycnt;
+	int ydrawpos;
+	UINT16 *dest;
+	UINT8* destpri;
+	int ycntdraw;
+
+	state->m_aoffset = (state->m_bdata[(state->m_boffset + 3) & state->m_bdatasize] << 24) | (state->m_bdata[(state->m_boffset + 2) & state->m_bdatasize] << 16) |
+				(state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) | (state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0);
+	state->m_aoffset = state->m_aoffset >> 2; state->m_aoffset *= 3;
+
+	state->m_boffset+=4;
+
+	int realysize = high-1;
+	int realxsize = (wide * 16)-1;
+
+	/* now draw it */
+	ycnt = 0;
+	ycntdraw = 0;
+
+	while (ycnt < high)
+	{
+	
+		if (!(flip & 0x02))
+			ydrawpos = ypos + ycntdraw;
+		else
+			ydrawpos = ypos + realysize - ycntdraw;
+
+		if ((ydrawpos >= 0) && (ydrawpos < 224))
+		{
+			dest = &bitmap.pix16(ydrawpos);
+			destpri = &priority_bitmap.pix8(ydrawpos);
+			draw_sprite_line_basic(machine, wide, dest, destpri, flip, xpos, pri, realxsize, palt, 1);
+		}
+		else
+		{
+			draw_sprite_line_basic(machine, wide, NULL, NULL, flip, xpos, pri, realxsize, palt, 0);
+			
+			if (!(flip & 0x02))
+			{
+				if (ydrawpos>224)
+					return;
+			}
+			else
+			{
+				if (ydrawpos<0)
+					return;
+			}
+		}
+
+		ycntdraw++;
+		ycnt++;
+	}
+}
+
+
+static void draw_sprites( pgm_state *state, running_machine &machine, bitmap_t& spritebitmap, UINT16 *sprite_source, bitmap_t& priority_bitmap )
 {
 	/* ZZZZ Zxxx xxxx xxxx
        zzzz z-yy yyyy yyyy
@@ -219,11 +495,18 @@ static void draw_sprites( running_machine &machine, bitmap_t& spritebitmap, UINT
        wwww wwwh hhhh hhhh
     */
 
-
-	pgm_state *state = machine.driver_data<pgm_state>();
 	const UINT16 *finish = state->m_spritebufferram + (0xa00 / 2);
 
+	UINT16* start = sprite_source;
+
 	while (sprite_source < finish)
+	{
+		if (!sprite_source[4]) break; /* is this right? */
+		sprite_source += 5;
+	}
+	sprite_source-=5;
+
+	while (sprite_source >= start)
 	{
 		int xpos = sprite_source[0] & 0x07ff;
 		int ypos = sprite_source[1] & 0x03ff;
@@ -261,13 +544,13 @@ static void draw_sprites( running_machine &machine, bitmap_t& spritebitmap, UINT
 		if (xpos > 0x3ff) xpos -=0x800;
 		if (ypos > 0x1ff) ypos -=0x400;
 
-		if (!sprite_source[4]) break; /* is this right? */
-
 		//if ((priority == 1) && (pri == 0)) break;
 
-		draw_sprite_new_zoomed(machine, wide, high, xpos, ypos, palt, boff, flip, spritebitmap, xzoom, xgrow, yzoom, ygrow, pri);
+		state->m_boffset = boff;
+		if ((!xzoom) && (!yzoom)) draw_sprite_new_basic(state, machine, wide, high, xpos, ypos, palt, flip, spritebitmap, priority_bitmap, pri );
+		else draw_sprite_new_zoomed(state, machine, wide, high, xpos, ypos, palt, flip, spritebitmap, priority_bitmap, xzoom, xgrow, yzoom, ygrow, pri );
 
-		sprite_source += 5;
+		sprite_source -= 5;
 	}
 }
 
@@ -339,6 +622,11 @@ VIDEO_START( pgm )
 	pgm_state *state = machine.driver_data<pgm_state>();
 	int i;
 
+	state->m_bdata = machine.region("sprmask")->base();
+	state->m_bdatasize = machine.region("sprmask")->bytes() - 1;
+	state->m_aoffset = 0;
+	state->m_boffset = 0;
+	
 	state->m_tx_tilemap = tilemap_create(machine, get_pgm_tx_tilemap_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
 
@@ -346,20 +634,13 @@ VIDEO_START( pgm )
 	tilemap_set_transparent_pen(state->m_bg_tilemap, 31);
 	tilemap_set_scroll_rows(state->m_bg_tilemap, 16 * 32);
 
-	state->m_tmppgmbitmap = auto_bitmap_alloc(machine, 448, 224, BITMAP_FORMAT_RGB32);
-
 	for (i = 0; i < 0x1200 / 2; i++)
 		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
 
 	state->m_spritebufferram = auto_alloc_array(machine, UINT16, 0xa00/2);
 
-	/* we render each sprite to a bitmap then copy the bitmap to screen bitmap with zooming */
-	/* easier this way because of the funky sprite format */
-	state->m_sprite_temp_render = auto_alloc_array(machine, UINT16, 0x400*0x200);
 
 	state->save_pointer(NAME(state->m_spritebufferram), 0xa00/2);
-	state->save_pointer(NAME(state->m_sprite_temp_render), 0x400*0x200);
-	state->save_item(NAME(*state->m_tmppgmbitmap));
 }
 
 SCREEN_UPDATE( pgm )
@@ -367,55 +648,29 @@ SCREEN_UPDATE( pgm )
 	pgm_state *state = screen.machine().driver_data<pgm_state>();
 	int y;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	state->m_tmppgmbitmap->fill(0x00000000, cliprect);
+	bitmap.fill(0x3ff, cliprect); // ddp2 igs logo needs 0x3ff
 
-	draw_sprites(screen.machine(), *state->m_tmppgmbitmap, state->m_spritebufferram);
+	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	tilemap_set_scrolly(state->m_bg_tilemap,0, state->m_videoregs[0x2000/2]);
 
 	for (y = 0; y < 224; y++)
 		tilemap_set_scrollx(state->m_bg_tilemap, (y + state->m_videoregs[0x2000 / 2]) & 0x1ff, state->m_videoregs[0x3000 / 2] + state->m_rowscrollram[y]);
 
-	{
-		int y, x;
 
-		for (y = 0; y < 224; y++)
-		{
-			UINT32* src = &state->m_tmppgmbitmap->pix32(y);
-			UINT16* dst = &bitmap.pix16(y);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 2);
 
-			for (x = 0; x < 448; x++)
-			{
-				if (src[x] & 0x10000)
-					if ((src[x] & 0x8000) == 0x8000)
-						dst[x] = src[x] & 0x7fff;
-			}
-		}
-	}
-
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	{
-		int y, x;
-
-		for (y = 0; y < 224; y++)
-		{
-			UINT32* src = &state->m_tmppgmbitmap->pix32(y);
-			UINT16* dst = &bitmap.pix16(y);
-
-			for (x = 0; x < 448; x++)
-			{
-				if (src[x] & 0x10000)
-					if ((src[x] & 0x8000) == 0x0000)
-						dst[x] = src[x];
-			}
-		}
-	}
+	draw_sprites(state, screen.machine(), bitmap, state->m_spritebufferram, screen.machine().priority_bitmap);
 
 	tilemap_set_scrolly(state->m_tx_tilemap, 0, state->m_videoregs[0x5000/2]);
 	tilemap_set_scrollx(state->m_tx_tilemap, 0, state->m_videoregs[0x6000/2]); // Check
+
+
 	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+
+
 	return 0;
+
 }
 
 SCREEN_EOF( pgm )

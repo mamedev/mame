@@ -8859,11 +8859,15 @@ killbld104		// (c) 1998
 kov				// (c) 1999
 kovplus			// (c) 1999
 kovplusa		// (c) 1999
+kovsgqyz		// bootleg
+kovsgqyza		// bootleg
+kovsgqyzb		// bootleg
 kov115			// (c) 1999
 kov100			// (c) 1999
 kovsh			// (c) 1999
 kovsh103		// (c) 1999
 kovqhsgs		// bootleg
+kovlsqh			// bootleg
 kovlsqh2		// bootleg
 kovlsjb			// bootleg
 kovlsjba		// bootleg
@@ -8909,6 +8913,9 @@ ddpdojb			// (c) 2002 Cave
 ddpdojblk		// (c) 2002 Cave
 espgal			// (c) 2003 Cave
 orleg2			// (c) 2007
+orleg2o			//
+kov2nl			// (c) 2008
+kov2nlo			//
 
 // IGS PC based HW
 speeddrv		// (c) 2004

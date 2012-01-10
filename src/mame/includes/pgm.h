@@ -88,6 +88,11 @@ public:
 	cpu_device *m_prot;
 	device_t *m_ics;
 
+	/* used by rendering */
+	UINT8 *m_bdata;
+	size_t  m_bdatasize;
+	int m_aoffset;
+	int m_boffset;
 
 	/* hack */
 	int m_irq4_disabled;
@@ -157,6 +162,8 @@ READ16_HANDLER( oldsplus_protram_r );
 READ16_HANDLER( oldsplus_r );
 WRITE16_HANDLER( oldsplus_w );
 
+MACHINE_RESET( kov );
+void install_protection_asic_sim_kov(running_machine &machine);
 
 /*----------- defined in video/pgm.c -----------*/
 
