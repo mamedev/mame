@@ -137,7 +137,7 @@ public:
 static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // separate region needed for decrypting
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_MIRROR(0x400)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )
