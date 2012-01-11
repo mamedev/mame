@@ -1107,15 +1107,19 @@ static void vga_vh_vga(bitmap_t &bitmap)
 {
 	int pos, line, column, c, addr, curr_addr;
 	UINT16 *bitmapline;
+	UINT16 mask_comp;
+
+	/* line compare is screen sensitive */
+	mask_comp = 0xff | (LINES & 0x300);
 
 	curr_addr = 0;
 	if(vga.sequencer.data[4] & 0x08)
 	{
 		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line++, addr+=VGA_LINE_LENGTH, curr_addr+=VGA_LINE_LENGTH)
 		{
-			if(line < (vga.line_compare & 0x3ff))
+			if(line < (vga.line_compare & mask_comp))
 				curr_addr = addr;
-			if(line == (vga.line_compare & 0x3ff))
+			if(line == (vga.line_compare & mask_comp))
 				curr_addr = 0;
 			bitmapline = &bitmap.pix16(line);
 			addr %= vga.svga_intf.vram_size;
@@ -1138,9 +1142,9 @@ static void vga_vh_vga(bitmap_t &bitmap)
 	{
 		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line++, addr+=VGA_LINE_LENGTH/4, curr_addr+=VGA_LINE_LENGTH/4)
 		{
-			if(line < (vga.line_compare & 0x3ff))
+			if(line < (vga.line_compare & mask_comp))
 				curr_addr = addr;
-			if(line == (vga.line_compare & 0x3ff))
+			if(line == (vga.line_compare & mask_comp))
 				curr_addr = 0;
 			bitmapline = &bitmap.pix16(line);
 			addr %= vga.svga_intf.vram_size;
