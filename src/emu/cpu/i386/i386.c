@@ -27,8 +27,8 @@ static void i386_trap_with_error(i386_state* cpustate, int irq, int irq_gate, in
 static void i286_task_switch(i386_state* cpustate, UINT16 selector, UINT8 nested);
 static void i386_task_switch(i386_state* cpustate, UINT16 selector, UINT8 nested);
 
-#define FAULT(fault,error) {i386_trap_with_error(cpustate,fault,0,0,error); return;}
-#define FAULT_EXP(fault,error) {i386_trap_with_error(cpustate,fault,0,trap_level+1,error); return;}
+#define FAULT(fault,error) {cpustate->ext = 1; i386_trap_with_error(cpustate,fault,0,0,error); return;}
+#define FAULT_EXP(fault,error) {cpustate->ext = 1; i386_trap_with_error(cpustate,fault,0,trap_level+1,error); return;}
 
 /*************************************************************************/
 
@@ -168,7 +168,7 @@ static UINT32 get_flags(i386_state *cpustate)
 	f |= cpustate->IOP2 << 13;
 	f |= cpustate->NT << 14;
 	f |= cpustate->VM << 17;
-	return (cpustate->eflags & cpustate->eflags_mask) | (f & 0xffff);
+	return (cpustate->eflags & ~cpustate->eflags_mask) | (f & cpustate->eflags_mask);
 }
 
 static void set_flags(i386_state *cpustate, UINT32 f )
@@ -550,7 +550,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		int type;
 		UINT16 flags;
 		I386_SREG desc;
-		UINT8 CPL = 0, DPL = 0; //, RPL = 0;
+		UINT8 CPL = cpustate->CPL, DPL = 0; //, RPL = 0;
 		I386_CALL_GATE gate;
 
 		/* 32-bit */
@@ -573,7 +573,6 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			return;
 		}
 
-		// TODO: support for EXT bit
 		/* segment privilege checks */
 		if(entry > cpustate->idtr.limit)
 		{
@@ -587,7 +586,14 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			FAULT_EXP(FAULT_GP,entry+2)
 		}
 
-		/* TODO: if software IRQ, then gate DPL must be less than CPL, else #GP(vector*8+2+EXT) */
+		if(cpustate->ext == 0) // if software interrupt (caused by INT/INTO/INT3)
+		{
+			if(((flags >> 5) & 0x03) < CPL)
+			{
+				logerror("IRQ (%08x): Software IRQ - gate DPL is less than CPL.\n",cpustate->pc);
+				FAULT_EXP(FAULT_GP,entry+2)
+			}
+		}
 
 		if((flags & 0x0080) == 0)
 		{
@@ -600,6 +606,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			UINT32 tempflags;
 			UINT32 tempESP,tempSS;
 			/* Interrupt for a Virtual 8086 task */
+
 			logerror("IRQ (%08x): Interrupt during V8086 task\n",cpustate->pc);
 			tempflags = get_flags(cpustate);
 			cpustate->VM = 0;
@@ -611,6 +618,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			/* Get privilege level 0 stack pointer from TSS */
 			cpustate->sreg[SS].selector = i386_get_stack_segment(cpustate,0);
 			REG32(ESP) = i386_get_stack_ptr(cpustate,0);
+			i386_load_segment_descriptor(cpustate,SS);
 			PUSH32(cpustate,cpustate->sreg[GS].selector & 0xffff);
 			PUSH32(cpustate,cpustate->sreg[FS].selector & 0xffff);
 			PUSH32(cpustate,cpustate->sreg[DS].selector & 0xffff);
@@ -623,14 +631,19 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			i386_load_segment_descriptor(cpustate,FS);
 			i386_load_segment_descriptor(cpustate,DS);
 			i386_load_segment_descriptor(cpustate,ES);
-			PUSH32(cpustate,tempESP);
 			PUSH32(cpustate,tempSS & 0xffff);
+			PUSH32(cpustate,tempESP);
 			PUSH32(cpustate,tempflags);
 			PUSH32(cpustate,cpustate->sreg[CS].selector & 0xffff);
-			PUSH32(cpustate,cpustate->eip);
+			if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
+				PUSH32(cpustate, cpustate->eip );
+			else
+				PUSH32(cpustate, cpustate->prev_eip );
 
 			cpustate->sreg[CS].selector = segment;
 			cpustate->eip = offset;
+			// CPL set to CS RPL?
+			cpustate->CPL = segment & 0x03;
 
 			i386_load_segment_descriptor(cpustate,CS);
 			CHANGE_PC(cpustate,cpustate->eip);
@@ -688,14 +701,14 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			if((segment & ~0x07) == 0)
 			{
 				logerror("IRQ: Gate segment is null.\n");
-				FAULT_EXP(FAULT_GP,0)
+				FAULT_EXP(FAULT_GP,cpustate->ext)
 			}
 			if(segment & 0x04)
 			{
 				if((segment & ~0x07) > cpustate->ldtr.limit)
 				{
 					logerror("IRQ: Gate segment is past LDT limit.\n");
-					FAULT_EXP(FAULT_GP,segment)
+					FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
 				}
 			}
 			else
@@ -703,18 +716,18 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				if((segment & ~0x07) > cpustate->gdtr.limit)
 				{
 					logerror("IRQ: Gate segment is past GDT limit.\n");
-					FAULT_EXP(FAULT_GP,segment)
+					FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
 				}
 			}
 			if((desc.flags & 0x0018) != 0x18)
 			{
 				logerror("IRQ: Gate descriptor is not a code segment.\n");
-				FAULT_EXP(FAULT_GP,segment)
+				FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
 			}
 			if((desc.flags & 0x0080) == 0)
 			{
 				logerror("IRQ: Gate segment is not present.\n");
-				FAULT_EXP(FAULT_NP,segment)
+				FAULT_EXP(FAULT_NP,(segment & 0x07)+cpustate->ext)
 			}
 			if((desc.flags & 0x0004) == 0 && (DPL < CPL))
 			{
@@ -737,14 +750,14 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				if((stack.selector & ~0x07) == 0)
 				{
 					logerror("IRQ: New stack selector is null.\n");
-					FAULT_EXP(FAULT_GP,0)  // #GP(EXT)
+					FAULT_EXP(FAULT_GP,cpustate->ext)
 				}
 				if(stack.selector & 0x04)
 				{
 					if((stack.selector & ~0x07) > cpustate->ldtr.base)
 					{
 						logerror("IRQ: New stack selector is past LDT limit.\n");
-						FAULT_EXP(FAULT_TS,stack.selector & ~0x07)
+						FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
 					}
 				}
 				else
@@ -752,28 +765,28 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 					if((stack.selector & ~0x07) > cpustate->gdtr.base)
 					{
 						logerror("IRQ: New stack selector is past GDT limit.\n");
-						FAULT_EXP(FAULT_TS,stack.selector & ~0x07) // #TS(stack selector + EXT)
+						FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
 					}
 				}
 				if((stack.selector & 0x03) != DPL)
 				{
 					logerror("IRQ: New stack selector RPL is not equal to code segment DPL.\n");
-					FAULT_EXP(FAULT_TS,stack.selector & ~0x07) // #TS(stack selector + EXT)
+					FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
 				}
 				if(((stack.flags >> 5) & 0x03) != DPL)
 				{
 					logerror("IRQ: New stack segment DPL is not equal to code segment DPL.\n");
-					FAULT_EXP(FAULT_TS,stack.selector & ~0x07) // #TS(stack selector + EXT)
+					FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
 				}
 				if(((stack.flags & 0x0018) != 0x10) && (stack.flags & 0x0002) != 0)
 				{
 					logerror("IRQ: New stack segment is not a writable data segment.\n");
-					FAULT_EXP(FAULT_TS,stack.selector & ~0x07) // #TS(stack selector + EXT)
+					FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext) // #TS(stack selector + EXT)
 				}
 				if((stack.flags & 0x0080) == 0)
 				{
 					logerror("IRQ: New stack segment is not present.\n");
-					FAULT_EXP(FAULT_SS,stack.selector & ~0x07) // #TS(stack selector + EXT)
+					FAULT_EXP(FAULT_SS,(stack.selector & ~0x07)+cpustate->ext) // #TS(stack selector + EXT)
 				}
 				if(type & 0x08) // 32-bit gate
 				{
@@ -892,7 +905,19 @@ static void i386_trap_with_error(i386_state *cpustate,int irq, int irq_gate, int
 	{
 		// for these exceptions, an error code is pushed onto the stack by the processor.
 		// no error code is pushed for software interrupts, either.
-		PUSH16(cpustate,error);
+		if(PROTECTED_MODE)
+		{
+			UINT32 entry = irq * 8;
+			UINT32 v2,type;
+			v2 = READ32(cpustate, cpustate->idtr.base + entry + 4 );
+			type = (v2>>8) & 0x1F;
+			if(type >= 9)
+				PUSH32(cpustate,error);
+			else
+				PUSH16(cpustate,error);
+		}
+		else
+			PUSH16(cpustate,error);
 	}
 }
 
@@ -2138,25 +2163,26 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 	{
 		if(!cpustate->IOP1 || !cpustate->IOP2)
 		{
-			logerror("IRET: Is in Virtual 8086 mode and IOPL != 3.\n");
+			logerror("IRET (%08x): Is in Virtual 8086 mode and IOPL != 3.\n",cpustate->pc);
 			FAULT(FAULT_GP,0)
 		}
 		/* Is this correct?  The 80386 programmers' reference says IRET should always trigger #GP(0) in V86 mode */
 		if(operand32 == 0)
 		{
+			UINT32 oldflags = get_flags(cpustate);
 			cpustate->eip = newEIP & 0xffff;
 			cpustate->sreg[CS].selector = newCS & 0xffff;
 			newflags |= 0x3000;  // IOPL cannot be changed in V86 mode
-			newflags |= 0x4000;  // NT flag
-			set_flags(cpustate,newflags & 0xffff);
+			set_flags(cpustate,newflags | oldflags);
+			REG16(SP) += 6;
 		}
 		else
 		{
 			cpustate->eip = newEIP;
 			cpustate->sreg[CS].selector = newCS & 0xffff;
 			newflags |= 0x3000;  // IOPL cannot be changed in V86 mode
-			newflags |= 0x4000;  // NT flag
-			set_flags(cpustate,newflags & 0xffff);
+			set_flags(cpustate,newflags);
+			REG32(ESP) += 12;
 		}
 	}
 	else if(NESTED_TASK)
@@ -2180,7 +2206,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		i386_load_protected_mode_segment(cpustate,&desc);
 		if((desc.flags & 0x001f) != 0x000b)
 		{
-			logerror("IRET: Task return: Back-linked TSS is not a busy TSS.\n");
+			logerror("IRET (%08x): Task return: Back-linked TSS is not a busy TSS.\n",cpustate->pc);
 			FAULT(FAULT_TS,task & ~0x07)
 		}
 		if((desc.flags & 0x0080) == 0)
@@ -2324,7 +2350,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			cpustate->eip = POP32(cpustate) & 0xffff;  // high 16 bits are ignored
 			cpustate->sreg[CS].selector = POP32(cpustate) & 0xffff;
 			POP32(cpustate);  // already set flags
-			if(RPL > CPL)
+//			if(RPL > CPL)
 			{
 				newESP = POP32(cpustate);
 				newSS = POP32(cpustate) & 0xffff;
@@ -2925,7 +2951,7 @@ static CPU_RESET( i386 )
 
 	cpustate->cr[0] = 0x7fffffe0; // reserved bits set to 1
 	cpustate->eflags = 0;
-	cpustate->eflags_mask = 0x00030000;
+	cpustate->eflags_mask = 0x00037fd7;
 	cpustate->eip = 0xfff0;
 
 	// [11:8] Family
@@ -2996,6 +3022,8 @@ static CPU_EXECUTE( i386 )
 		cpustate->address_size = cpustate->sreg[CS].d;
 		cpustate->operand_prefix = 0;
 		cpustate->address_prefix = 0;
+
+		cpustate->ext = 1;
 
 		cpustate->segment_prefix = 0;
 		cpustate->prev_eip = cpustate->eip;
@@ -3392,7 +3420,7 @@ static CPU_RESET( i486 )
 
 	cpustate->cr[0] = 0x00000010;
 	cpustate->eflags = 0;
-	cpustate->eflags_mask = 0x00070000;
+	cpustate->eflags_mask = 0x00077fd7;
 	cpustate->eip = 0xfff0;
 
 	// [11:8] Family
@@ -3509,7 +3537,7 @@ static CPU_RESET( pentium )
 
 	cpustate->cr[0] = 0x00000010;
 	cpustate->eflags = 0;
-	cpustate->eflags_mask = 0x003b0000;
+	cpustate->eflags_mask = 0x003b7fd7;
 	cpustate->eip = 0xfff0;
 
 	// [11:8] Family
@@ -3641,7 +3669,7 @@ static CPU_RESET( mediagx )
 
 	cpustate->cr[0] = 0x00000010;
 	cpustate->eflags = 0;
-	cpustate->eflags_mask = 0x00270000; /* TODO: is this correct? */
+	cpustate->eflags_mask = 0x00277fd7; /* TODO: is this correct? */
 	cpustate->eip = 0xfff0;
 
 	// [11:8] Family

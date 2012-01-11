@@ -2233,20 +2233,26 @@ static void I386OP(nop)(i386_state *cpustate)				// Opcode 0x90
 static void I386OP(int3)(i386_state *cpustate)				// Opcode 0xcc
 {
 	CYCLES(cpustate,CYCLES_INT3);
+	cpustate->ext = 0; // not an external interrupt
 	i386_trap(cpustate,3, 1, 0);
+	cpustate->ext = 1;
 }
 
 static void I386OP(int)(i386_state *cpustate)				// Opcode 0xcd
 {
 	int interrupt = FETCH(cpustate);
 	CYCLES(cpustate,CYCLES_INT);
+	cpustate->ext = 0; // not an external interrupt
 	i386_trap(cpustate,interrupt, 1, 0);
+	cpustate->ext = 1;
 }
 
 static void I386OP(into)(i386_state *cpustate)				// Opcode 0xce
 {
 	if( cpustate->OF ) {
+		cpustate->ext = 0;
 		i386_trap(cpustate,4, 1, 0);
+		cpustate->ext = 1;
 		CYCLES(cpustate,CYCLES_INTO_OF1);
 	}
 	else

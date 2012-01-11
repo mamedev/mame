@@ -1490,7 +1490,19 @@ static void I386OP(popad)(i386_state *cpustate)				// Opcode 0x61
 static void I386OP(popfd)(i386_state *cpustate)				// Opcode 0x9d
 {
 	UINT32 value = POP32(cpustate);
-	set_flags(cpustate,value);
+	UINT32 current = get_flags(cpustate);
+	UINT8 IOPL = (current >> 12) & 0x03;
+	UINT32 mask = 0x00007fd5;  // VM and RF are not affected by POPF or POPFD, same for higher (486+) bits?
+
+	// IOPL can only change if CPL is 0
+	if(cpustate->CPL != 0)
+		mask &= ~0x00003000;
+
+	// IF can only change if CPL is at least as privileged as IOPL
+	if(cpustate->CPL > IOPL)
+		mask &= ~0x00000200;
+
+	set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
 	CYCLES(cpustate,CYCLES_POPF);
 }
 

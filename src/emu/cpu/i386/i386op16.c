@@ -1613,8 +1613,20 @@ static void I386OP(popa)(i386_state *cpustate)				// Opcode 0x61
 
 static void I386OP(popf)(i386_state *cpustate)				// Opcode 0x9d
 {
-	UINT16 value = POP16(cpustate);
-	set_flags(cpustate,value);
+	UINT32 value = POP16(cpustate);
+	UINT32 current = get_flags(cpustate);
+	UINT8 IOPL = (current >> 12) & 0x03;
+	UINT32 mask = 0x7fd5;
+
+	// IOPL can only change if CPL is 0
+	if(cpustate->CPL != 0)
+		mask &= ~0x00003000;
+
+	// IF can only change if CPL is at least as privileged as IOPL
+	if(cpustate->CPL > IOPL)
+		mask &= ~0x00000200;
+
+set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
 	CYCLES(cpustate,CYCLES_POPF);
 }
 

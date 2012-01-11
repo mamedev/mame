@@ -241,6 +241,8 @@ struct _i386_state
 	I386_SEG_DESC task;		// Task register
 	I386_SEG_DESC ldtr;		// Local Descriptor Table Register
 
+	UINT8 ext;  // external interrupt
+
 	int halted;
 
 	int operand_size;
@@ -302,8 +304,8 @@ extern int i386_parity_table[256];
 
 #define PROTECTED_MODE		(cpustate->cr[0] & 0x1)
 #define STACK_32BIT			(cpustate->sreg[SS].d)
-#define V8086_MODE			(cpustate->eflags & 0x00020000)
-#define NESTED_TASK			(cpustate->eflags & 0x00004000)
+#define V8086_MODE			(cpustate->VM)
+#define NESTED_TASK			(cpustate->NT)
 
 #define SetOF_Add32(r,s,d)	(cpustate->OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x80000000) ? 1: 0)
 #define SetOF_Add16(r,s,d)	(cpustate->OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x8000) ? 1 : 0)
