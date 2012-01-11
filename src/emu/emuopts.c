@@ -366,7 +366,6 @@ void emu_options::remove_device_options()
 
 bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_string, const char *name, const char *value)
 {
-	remove_device_options();
 	bool isfirst = true;
 	bool result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	while (add_slot_options(isfirst)) {
@@ -399,6 +398,7 @@ bool emu_options::parse_command_line(int argc, char *argv[], astring &error_stri
 	if (old_system_name != system_name())
 	{
 		// remove any existing device options
+		remove_device_options();
 		result = parse_slot_devices(argc, argv, error_string, NULL, NULL);
 	}
 	return result;

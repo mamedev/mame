@@ -180,7 +180,8 @@ int cli_frontend::execute(int argc, char **argv)
 			if (system == NULL && strlen(m_options.system_name()) > 0)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
-			if (strlen(m_options.software_name()) > 0) {
+			if (strlen(m_options.software_name()) > 0)
+			{
 				machine_config config(*system, m_options);
 				if (!config.devicelist().first(SOFTWARE_LIST))
 					throw emu_fatalerror(MAMERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
@@ -193,14 +194,17 @@ int cli_frontend::execute(int argc, char **argv)
 					if (list)
 					{
 						software_info *swinfo = software_list_find(list, m_options.software_name(), NULL);
-						if (swinfo!=NULL) {
+						if (swinfo != NULL)
+						{
+							// loop through all parts
 							for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
 							{
 								const char *mount = software_part_get_feature(swpart, "automount");
-								if (is_software_compatible(swpart, swlist)) {
-									if (mount==NULL || strcmp(mount,"no")!=0) {
-										// loop trough all parts
-										// search for a device with the right interface
+								if (is_software_compatible(swpart, swlist))
+								{
+									if (mount == NULL || strcmp(mount,"no") != 0)
+									{
+										// search for an image device with the right interface
 										const device_image_interface *image = NULL;
 										for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
 										{
@@ -211,13 +215,14 @@ int cli_frontend::execute(int argc, char **argv)
 												{
 													const char *option = m_options.value(image->brief_instance_name());
 													// mount only if not already mounted
-													if (strlen(option)==0) {
+													if (strlen(option) == 0)
+													{
 														astring val;
 														val.printf("%s:%s:%s",swlist->list_name,m_options.software_name(),swpart->name);
 														// call this in order to set slot devices according to mounting
 														m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.cstr());
+														break;
 													}
-													break;
 												}
 											}
 										}
@@ -225,16 +230,14 @@ int cli_frontend::execute(int argc, char **argv)
 									found = TRUE;
 								}
 							}
-							software_list_close(list);
-							break;
 						}
-
+						software_list_close(list);
 					}
-					software_list_close(list);
 
 					if (found) break;
 				}
-				if (!found) {
+				if (!found)
+				{
 					software_display_matches(config.devicelist(),m_options, NULL,m_options.software_name());
 					throw emu_fatalerror(MAMERR_FATALERROR, "");
 				}
