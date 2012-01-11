@@ -448,4 +448,4 @@ ROM_END
 
 GAME( 1987, exzisus,  0,       exzisus, exzisus, 0, ROT0, "Taito Corporation", "Exzisus (Japan, dedicated)",  0 )
 GAME( 1987, exzisusa, exzisus, exzisus, exzisus, 0, ROT0, "Taito Corporation", "Exzisus (Japan, conversion)", 0 )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, 0, ROT0, "Taito Corporation", "Exzisus (TAD License)", 0 )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)", 0 )
