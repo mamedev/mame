@@ -41,11 +41,6 @@
 #include "arm7thmb.h"
 #include "arm7help.h"
 
-#if 0
-#define LOG(x) mame_printf_debug x
-#else
-#define LOG(x) logerror x
-#endif
 
 /* prototypes of coprocessor functions */
 static WRITE32_DEVICE_HANDLER(arm7_do_callback);
@@ -53,6 +48,10 @@ static READ32_DEVICE_HANDLER(arm7_rt_r_callback);
 static WRITE32_DEVICE_HANDLER(arm7_rt_w_callback);
 void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
 void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
+
+// holder for the co processor Data Transfer Read & Write Callback funcs
+void (*arm7_coproc_dt_r_callback)(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
+void (*arm7_coproc_dt_w_callback)(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
 
 
 INLINE arm_state *get_safe_token(device_t *device)
@@ -96,21 +95,6 @@ void set_cpsr( arm_state *cpustate, UINT32 val)
 	ARM7REG(eCPSR) = val;
 }
 
-INLINE INT64 saturate_qbit_overflow(arm_state *cpustate, INT64 res)
-{
-	if (res > 2147483647)	// INT32_MAX
-	{	// overflow high? saturate and set Q
-		res = 2147483647;
-		SET_CPSR(GET_CPSR | Q_MASK);
-	}
-	else if (res < (-2147483647-1))	// INT32_MIN
-	{	// overflow low? saturate and set Q
-		res = (-2147483647-1);
-		SET_CPSR(GET_CPSR | Q_MASK);
-	}
-
-	return res;
-}
 
 /**************************************************************************
  * ARM TLB IMPLEMENTATION
@@ -533,12 +517,149 @@ static CPU_EXIT( arm7 )
 	/* nothing to do here */
 }
 
+#define UNEXECUTED() \
+	R15 += 4; \
+	ARM7_ICOUNT +=2; /* Any unexecuted instruction only takes 1 cycle (page 193) */ \
+
 static CPU_EXECUTE( arm7 )
 {
-/* include the arm7 core execute code */
-#include "arm7exec.c"
-}
+    UINT32 pc;
+    UINT32 insn;
+    arm_state *cpustate = get_safe_token(device);
 
+    do
+    {
+        debugger_instruction_hook(cpustate->device, GET_PC);
+
+        /* handle Thumb instructions if active */
+        if (T_IS_SET(GET_CPSR))
+        {
+			UINT32 raddr;
+
+            pc = R15;
+
+			// "In Thumb state, bit [0] is undefined and must be ignored. Bits [31:1] contain the PC."
+			raddr = pc & (~1);
+
+			if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+			{
+	    		if (!arm7_tlb_translate(cpustate, &raddr, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
+	    		{
+	    			goto skip_exec;
+	    		}
+			}
+
+			insn = cpustate->direct->read_decrypted_word(raddr);
+			thumb_handler[(insn & 0xffc0) >> 6](cpustate, pc, insn);
+          
+        }
+        else
+        {
+			UINT32 raddr;
+
+            /* load 32 bit instruction */
+            pc = GET_PC;
+
+			// "In ARM state, bits [1:0] of r15 are undefined and must be ignored. Bits [31:2] contain the PC."
+			raddr = pc & (~3);
+
+	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+	    {
+	    	if (!arm7_tlb_translate(cpustate, &raddr, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
+	    	{
+	    		goto skip_exec;
+	    	}
+	    }
+
+#if 0
+			if (MODE26)
+			{
+				UINT32 temp1, temp2;
+				temp1 = GET_CPSR & 0xF00000C3;
+				temp2 = (R15 & 0xF0000000) | ((R15 & 0x0C000000) >> (26 - 6)) | (R15 & 0x00000003);
+				if (temp1 != temp2) fatalerror( "%08X: 32-bit and 26-bit modes are out of sync (%08X %08X)", pc, temp1, temp2);
+			}
+#endif
+
+            insn = cpustate->direct->read_decrypted_dword(raddr);
+
+            /* process condition codes for this instruction */
+            switch (insn >> INSN_COND_SHIFT)
+            {
+				case COND_EQ:
+					if (Z_IS_CLEAR(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_NE:
+					if (Z_IS_SET(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_CS:
+					if (C_IS_CLEAR(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_CC:
+					if (C_IS_SET(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_MI:
+					if (N_IS_CLEAR(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_PL:
+					if (N_IS_SET(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_VS:
+					if (V_IS_CLEAR(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_VC:
+					if (V_IS_SET(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_HI:
+					if (C_IS_CLEAR(GET_CPSR) || Z_IS_SET(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_LS:
+					if (C_IS_SET(GET_CPSR) && Z_IS_CLEAR(GET_CPSR))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_GE:
+					if (!(GET_CPSR & N_MASK) != !(GET_CPSR & V_MASK)) /* Use x ^ (x >> ...) method */
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_LT:
+					if (!(GET_CPSR & N_MASK) == !(GET_CPSR & V_MASK))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_GT:
+					if (Z_IS_SET(GET_CPSR) || (!(GET_CPSR & N_MASK) != !(GET_CPSR & V_MASK)))
+						{ UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_LE:
+					if (Z_IS_CLEAR(GET_CPSR) && (!(GET_CPSR & N_MASK) == !(GET_CPSR & V_MASK)))
+					  { UNEXECUTED();  goto skip_exec; }
+					break;
+				case COND_NV:
+					{ UNEXECUTED();  goto skip_exec; }
+					break;
+            }
+            /*******************************************************************/
+            /* If we got here - condition satisfied, so decode the instruction */
+            /*******************************************************************/
+			ops_handler[((insn & 0xF000000) >> 24)](cpustate, insn);
+		}
+
+skip_exec:
+
+        ARM7_CHECKIRQ;
+
+        /* All instructions remove 3 cycles.. Others taking less / more will have adjusted this # prior to here */
+        ARM7_ICOUNT -= 3;
+    } while (ARM7_ICOUNT > 0);
+}
 
 static void set_irq_line(arm_state *cpustate, int irqline, int state)
 {

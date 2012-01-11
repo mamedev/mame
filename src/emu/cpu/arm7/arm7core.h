@@ -34,6 +34,8 @@
 #define __ARM7CORE_H__
 
 #define ARM7_MMU_ENABLE_HACK 0
+#define ARM7_DEBUG_CORE 0
+
 
 /****************************************************************************************************
  *  INTERRUPT LINES/EXCEPTIONS
@@ -390,12 +392,12 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define THUMB_ADDSUB_RNIMM  ((UINT16)0x01c0)
 #define THUMB_ADDSUB_RS     ((UINT16)0x0038)
 #define THUMB_ADDSUB_RD     ((UINT16)0x0007)
-#define THUMB_INSN_ADDSUB   ((UINT16)0x0800)
 #define THUMB_INSN_CMP      ((UINT16)0x0800)
 #define THUMB_INSN_SUB      ((UINT16)0x0800)
 #define THUMB_INSN_IMM_RD   ((UINT16)0x0700)
 #define THUMB_INSN_IMM_S    ((UINT16)0x0080)
 #define THUMB_INSN_IMM      ((UINT16)0x00ff)
+#define THUMB_INSN_ADDSUB   ((UINT16)0x0800)
 #define THUMB_ADDSUB_TYPE   ((UINT16)0x0600)
 #define THUMB_HIREG_OP      ((UINT16)0x0300)
 #define THUMB_HIREG_H       ((UINT16)0x00c0)

@@ -5,6 +5,14 @@
 #define ARM7_ICOUNT         cpustate->iCount
 
 
+extern void SwitchMode(arm_state *cpustate, int cpsr_mode_val);
+
+#if 0
+#define LOG(x) mame_printf_debug x
+#else
+#define LOG(x) logerror x
+#endif
+
 /***************
  * helper funcs
  ***************/
@@ -82,7 +90,15 @@ void arm7_check_irq_state(arm_state *cpustate);
 
 typedef const void (*arm7thumb_ophandler)(arm_state*, UINT32, UINT32);
 
-extern arm7thumb_ophandler thumb_handler[0x10];
+extern arm7thumb_ophandler thumb_handler[0x40*0x10];
+
+typedef const void (*arm7ops_ophandler)(arm_state*, UINT32);
+
+extern arm7ops_ophandler ops_handler[0x10];
+
+extern void (*arm7_coproc_dt_r_callback)(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
+extern void (*arm7_coproc_dt_w_callback)(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
+
 
 /***************************************************************************
  * Default Memory Handlers
