@@ -53,7 +53,7 @@ struct _ide_config
 
 #define MCFG_IDE_CONTROLLER_REGIONS(_master, _slave) \
 	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, master, _master) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, master, _slave)
+	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, slave,  _slave)
 
 #define MCFG_IDE_BUS_MASTER_SPACE(_cpu, _space) \
 	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, bmcpu, _cpu) \

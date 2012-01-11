@@ -1861,7 +1861,7 @@ static DEVICE_START( ide_controller )
 	ide->handle = get_disk_handle(device->machine(), (config->master != NULL) ? config->master : device->tag());
 	ide->disk = hard_disk_open(ide->handle);
 	ide->is_image_device = false;
-	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
+	//assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
 
 	/* find the bus master space */
 	if (config->bmcpu != NULL)
@@ -1972,10 +1972,13 @@ static DEVICE_STOP( ide_controller )
 static DEVICE_RESET( ide_controller )
 {
 	ide_state *ide = get_safe_token(device);
+	const ide_config *config = (const ide_config *)downcast<const legacy_device_base *>(device)->inline_config();
 
 	LOG(("IDE controller reset performed\n"));
 	astring hardtag;
-	device->siblingtag(hardtag, "harddisk");
+	if (config->master) {
+		device->siblingtag(hardtag, config->master);
+	}
 
 	if (device->machine().device( hardtag.cstr() )) {
 		if (!ide->disk)
