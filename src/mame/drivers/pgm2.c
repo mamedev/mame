@@ -85,13 +85,28 @@ static const gfx_layout tiles32x32x8_layout =
 	256*32
 };
 
+/* sprites aren't tile based, this is variable width 1bpp data, colour data is almost certainly in sprites b */
+/* there don't seem to be any indexes into the colour data, probably provided by the program, or the colour data references the bitmaps (reverse of PGM) */
+static const gfx_layout tiles32x8x1_layout =
+{
+	32,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 },
+	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32 },
+	8*32
+};
+
+
+
 
 static GFXDECODE_START( pgm2 )
 	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "bgtile", 0, tiles32x32x8_layout, 0, 16 )
 	// not tile based
-	GFXDECODE_ENTRY( "spritesa", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "spritesb", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "spritesa", 0, tiles32x8x1_layout, 0, 16 )
+	GFXDECODE_ENTRY( "spritesb", 0, tiles32x8x1_layout, 0, 16 )
 GFXDECODE_END
 
 
@@ -101,7 +116,7 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 20000000)	// ?? unknown CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
-	MCFG_DEVICE_DISABLE()
+//	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_START( pgm2 )
 	MCFG_MACHINE_RESET( pgm2 )
@@ -139,12 +154,11 @@ ROM_START( orleg2 )
 	ROM_LOAD16_BYTE( "ig-a.u35",  0x000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
 	ROM_LOAD16_BYTE( "ig-a.u36",  0x000001, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
 	
-	/* probably sprites - mask data and colour data like PGM1? */
-	ROM_REGION( 0x2000000, "spritesa", 0 )
-	ROM_LOAD( "ig-a.u12",  0x000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
-	ROM_LOAD( "ig-a.u16",  0x000001, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
+	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_LOAD32_WORD( "ig-a.u12",  0x000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
+	ROM_LOAD32_WORD( "ig-a.u16",  0x000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 )
+	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data?
 	ROM_LOAD16_BYTE( "ig-a.u18",  0x000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) )
 	ROM_LOAD16_BYTE( "ig-a.u26",  0x000001, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) )
 
@@ -163,12 +177,11 @@ ROM_START( orleg2o )
 	ROM_LOAD16_BYTE( "ig-a.u35",  0x000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
 	ROM_LOAD16_BYTE( "ig-a.u36",  0x000001, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
 	
-	/* probably sprites - mask data and colour data like PGM1? */
-	ROM_REGION( 0x2000000, "spritesa", 0 )
-	ROM_LOAD( "ig-a.u12",  0x000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
-	ROM_LOAD( "ig-a.u16",  0x000001, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
+	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_LOAD32_WORD( "ig-a.u12",  0x000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
+	ROM_LOAD32_WORD( "ig-a.u16",  0x000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 )
+	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data?
 	ROM_LOAD16_BYTE( "ig-a.u18",  0x000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) )
 	ROM_LOAD16_BYTE( "ig-a.u26",  0x000001, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) )
 
@@ -187,12 +200,11 @@ ROM_START( kov2nl )
 	ROM_LOAD16_BYTE( "ig-a3.u35",  0x000000, 0x0800000, CRC(2d46b1f6) SHA1(ea8c805eda6292e86a642e9633d8fee7054d10b1) )
 	ROM_LOAD16_BYTE( "ig-a3.u36",  0x000001, 0x0800000, CRC(df710c36) SHA1(f826c3f496c4f17b46d18af1d8e02cac7b7027ac) )
 	
-	/* probably sprites - mask data and colour data like PGM1? */
-	ROM_REGION( 0x2000000, "spritesa", 0 )
-	ROM_LOAD( "ig-a3.u12",  0x000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
-	ROM_LOAD( "ig-a3.u16",  0x000001, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
+	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_LOAD32_WORD( "ig-a3.u12",  0x000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
+	ROM_LOAD32_WORD( "ig-a3.u16",  0x000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 )
+	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data?
 	ROM_LOAD16_BYTE( "ig-a3.u18",  0x000000, 0x2000000, CRC(8d923e1f) SHA1(14371cf385dd8857017d3111cd4710f4291b1ae2) )
 	ROM_LOAD16_BYTE( "ig-a3.u26",  0x000001, 0x2000000, CRC(5b6fbf3f) SHA1(d1f52e230b91ee6cde939d7c2b74da7fd6527e73) )
 
@@ -211,12 +223,11 @@ ROM_START( kov2nlo )
 	ROM_LOAD16_BYTE( "ig-a3.u35",  0x000000, 0x0800000, CRC(2d46b1f6) SHA1(ea8c805eda6292e86a642e9633d8fee7054d10b1) )
 	ROM_LOAD16_BYTE( "ig-a3.u36",  0x000001, 0x0800000, CRC(df710c36) SHA1(f826c3f496c4f17b46d18af1d8e02cac7b7027ac) )
 	
-	/* probably sprites - mask data and colour data like PGM1? */
-	ROM_REGION( 0x2000000, "spritesa", 0 )
-	ROM_LOAD( "ig-a3.u12",  0x000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
-	ROM_LOAD( "ig-a3.u16",  0x000001, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
+	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_LOAD32_WORD( "ig-a3.u12",  0x000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
+	ROM_LOAD32_WORD( "ig-a3.u16",  0x000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 )
+	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data?
 	ROM_LOAD16_BYTE( "ig-a3.u18",  0x000000, 0x2000000, CRC(8d923e1f) SHA1(14371cf385dd8857017d3111cd4710f4291b1ae2) )
 	ROM_LOAD16_BYTE( "ig-a3.u26",  0x000001, 0x2000000, CRC(5b6fbf3f) SHA1(d1f52e230b91ee6cde939d7c2b74da7fd6527e73) )
 
@@ -224,10 +235,76 @@ ROM_START( kov2nlo )
 	ROM_LOAD16_WORD_SWAP( "ig-a3.u37",   0x000000, 0x2000000, CRC(45cdf422) SHA1(8005d284bcee73cff37a147fcd1c3e9f039a7203) )
 ROM_END
 
+static void iga_u16_decode(UINT16 *rom, int len, int ixor)
+{
+	int i;
+
+	for (i = 1; i < len / 2; i+=2)
+	{
+		UINT16 x = ixor; 
+
+		if ( (i>>1) & 0x000001) x ^= 0x0010;
+		if ( (i>>1) & 0x000002) x ^= 0x2004;
+		if ( (i>>1) & 0x000004) x ^= 0x0801;
+		if ( (i>>1) & 0x000008) x ^= 0x0300;
+		if ( (i>>1) & 0x000010) x ^= 0x0080;
+		if ( (i>>1) & 0x000020) x ^= 0x0020;
+		if ( (i>>1) & 0x000040) x ^= 0x4008;
+		if ( (i>>1) & 0x000080) x ^= 0x1002;
+		if ( (i>>1) & 0x000100) x ^= 0x0400;
+		if ( (i>>1) & 0x000200) x ^= 0x0040;
+		if ( (i>>1) & 0x000400) x ^= 0x8000;
+
+		rom[i] ^= x;
+		rom[i] = BITSWAP16(rom[i], 8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	}
+}
+
+static void iga_u12_decode(UINT16* rom, int len, int ixor)
+{
+	int i;
+
+	for (i = 0; i < len / 2; i+=2)
+	{
+		UINT16 x = ixor; 
+
+		if ( (i>>1) & 0x000001) x ^= 0x9004;
+		if ( (i>>1) & 0x000002) x ^= 0x0028;
+		if ( (i>>1) & 0x000004) x ^= 0x0182;
+		if ( (i>>1) & 0x000008) x ^= 0x0010;
+		if ( (i>>1) & 0x000010) x ^= 0x2040;
+		if ( (i>>1) & 0x000020) x ^= 0x0801;
+		if ( (i>>1) & 0x000040) x ^= 0x0000;
+		if ( (i>>1) & 0x000080) x ^= 0x0000;
+		if ( (i>>1) & 0x000100) x ^= 0x4000;
+		if ( (i>>1) & 0x000200) x ^= 0x0600;
+		if ( (i>>1) & 0x000400) x ^= 0x0000;
+
+		rom[i] ^= x;
+		rom[i] = BITSWAP16(rom[i], 8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+	}
+}
+
+static DRIVER_INIT( orleg2 )
+{
+	UINT16 *src = (UINT16 *)machine.region("spritesa")->base();
+
+	iga_u12_decode(src, 0x2000000, 0x4761);
+	iga_u16_decode(src, 0x2000000, 0xc79f);
+}
+
+static DRIVER_INIT( kov2nl )
+{
+	UINT16 *src = (UINT16 *)machine.region("spritesa")->base();
+
+	iga_u12_decode(src, 0x2000000, 0xa193);
+	iga_u16_decode(src, 0x2000000, 0xb780);
+}
+
 
 /* PGM2 */
-GAME( 2007, orleg2,       0,         pgm2,    pgm2,     0,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", GAME_IS_SKELETON )
-GAME( 2007, orleg2o,      orleg2,    pgm2,    pgm2,     0,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", GAME_IS_SKELETON )
+GAME( 2007, orleg2,       0,         pgm2,    pgm2,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", GAME_IS_SKELETON )
+GAME( 2007, orleg2o,      orleg2,    pgm2,    pgm2,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", GAME_IS_SKELETON )
 
-GAME( 2008, kov2nl,       0,         pgm2,    pgm2,     0,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", GAME_IS_SKELETON )
-GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2,     0,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", GAME_IS_SKELETON )
+GAME( 2008, kov2nl,       0,         pgm2,    pgm2,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", GAME_IS_SKELETON )
+GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", GAME_IS_SKELETON )

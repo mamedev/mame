@@ -29,6 +29,7 @@ protected:
 };
 
 static ADDRESS_MAP_START( astropc_map, AS_PROGRAM, 32, astropc_state )
+	AM_RANGE(0x000c0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
