@@ -38,6 +38,8 @@
 #include "debugger.h"
 #include "arm7.h"
 #include "arm7core.h"   //include arm7 core
+#include "arm7thmb.h"
+#include "arm7help.h"
 
 #if 0
 #define LOG(x) mame_printf_debug x
@@ -52,21 +54,6 @@ static WRITE32_DEVICE_HANDLER(arm7_rt_w_callback);
 void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
 void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
 
-/* Macros that can be re-defined for custom cpu implementations - The core expects these to be defined */
-/* In this case, we are using the default arm7 handlers (supplied by the core)
-   - but simply changes these and define your own if needed for cpu implementation specific needs */
-#define READ8(addr)         arm7_cpu_read8(cpustate, addr)
-#define WRITE8(addr,data)   arm7_cpu_write8(cpustate, addr,data)
-#define READ16(addr)        arm7_cpu_read16(cpustate, addr)
-#define WRITE16(addr,data)  arm7_cpu_write16(cpustate, addr,data)
-#define READ32(addr)        arm7_cpu_read32(cpustate, addr)
-#define WRITE32(addr,data)  arm7_cpu_write32(cpustate, addr,data)
-#define PTR_READ32          &arm7_cpu_read32
-#define PTR_WRITE32         &arm7_cpu_write32
-
-/* Macros that need to be defined according to the cpu implementation specific need */
-#define ARM7REG(reg)        cpustate->sArmRegister[reg]
-#define ARM7_ICOUNT         cpustate->iCount
 
 INLINE arm_state *get_safe_token(device_t *device)
 {
@@ -254,7 +241,7 @@ INLINE int detect_fault( arm_state *cpustate, int permission, int ap, int flags)
 	return FAULT_NONE;
 }
 
-INLINE int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
+int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
 {
     UINT32 desc_lvl1;
     UINT32 desc_lvl2 = 0;
