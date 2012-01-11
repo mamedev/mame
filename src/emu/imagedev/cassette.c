@@ -270,10 +270,10 @@ bool cassette_image_device::call_load()
 		{
 			is_writable = !is_readonly();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
+			astring fname = astring(m_mame_file->filename());
 			if (software_entry()==NULL) {
 				extension = filetype();
 			} else {
-				astring fname = astring(m_mame_file->filename());
 				int loc = fname.rchr(0,'.');
 				if (loc!=-1) {
 					extension = fname.substr(loc + 1,fname.len()-loc).cstr();
