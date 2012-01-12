@@ -67,7 +67,7 @@ struct _ide_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-UINT8 *ide_get_features(device_t *device);
+UINT8 *ide_get_features(device_t *device, int drive);
 
 void ide_set_master_password(device_t *device, const UINT8 *password);
 void ide_set_user_password(device_t *device, const UINT8 *password);

@@ -167,7 +167,7 @@ static MACHINE_START( kinst )
 {
 	kinst_state *state = machine.driver_data<kinst_state>();
 	device_t *ide = machine.device("ide");
-	UINT8 *features = ide_get_features(ide);
+	UINT8 *features = ide_get_features(ide,0);
 
 	if (strncmp(machine.system().name, "kinst2", 6) != 0)
 	{
