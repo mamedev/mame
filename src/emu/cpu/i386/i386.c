@@ -613,7 +613,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			tempflags = get_flags(cpustate);
 			cpustate->VM = 0;
 			cpustate->TF = 0;
-			if(irq_gate == 1)
+			if(type == 0x0e || type == 0x06)
 				cpustate->IF = 0;
 			tempSS = cpustate->sreg[SS].selector;
 			tempESP = REG32(ESP);
@@ -2241,7 +2241,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			//SSDPL = (stack.flags >> 5) & 0x03;
 
 			/* Return to v86 mode */
-			popmessage("IRET (%08x): Returning to Virtual 8086 mode.",cpustate->pc);
+			logerror("IRET (%08x): Returning to Virtual 8086 mode.\n",cpustate->pc);
 			// Should these be done at this point?  The 386 programmers' reference is a bit confusing about this
 /*			if(RPL != 3)
 			{
