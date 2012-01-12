@@ -33,7 +33,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       . 2 players game : [0x1839] = 0xaa (player 1) or 0x55 (player 2)
   - Credits are stored at address 0x1837 (BCD coded, range 0x00-0x99)
 
-2) 'beaminva'
+2) 'pacominv'
 
   - Routine to handle the analog inputs at 0x04bd.
     Contents from 0x3400 (IN2) is compared with contents from 0x1d05 (value in RAM).
@@ -298,7 +298,7 @@ static INPUT_PORTS_START( beaminv )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( beaminva )
+static INPUT_PORTS_START( pacominv )
 	PORT_INCLUDE( beaminv )
 
 	PORT_MODIFY("DSW")
@@ -367,7 +367,7 @@ ROM_START( beaminv )
 ROM_END
 
 
-ROM_START( beaminva )
+ROM_START( pacominv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom_0", 0x0000, 0x0400, CRC(67e100dd) SHA1(5f58e2ed3da14c48f7c382ee6091a59caf8e0609) )
 	ROM_LOAD( "rom_1", 0x0400, 0x0400, CRC(442bbe98) SHA1(0e0382d4f6491629449759747019bd453a458b66) )
@@ -385,5 +385,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, beaminv,  0,       beaminv, beaminv,  0, ROT270, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_beaminv )
-GAMEL( 1979, beaminva, beaminv, beaminv, beaminva, 0, ROT270, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_beaminv ) // what's the real title ?
+GAMEL( 1979, beaminv,  0,       beaminv, beaminv,  0, ROT270, "Tekunon Kougyou",   "Beam Invader",  GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, pacominv, beaminv, beaminv, pacominv, 0, ROT270, "Pacom Corporation", "Pacom Invader", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_beaminv )
