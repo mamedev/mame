@@ -53,6 +53,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "beaminv.lh"
 
 
 class beaminv_state : public driver_device
@@ -384,5 +385,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, beaminv,  0,       beaminv, beaminv,  0, ROT270, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, beaminva, beaminv, beaminv, beaminva, 0, ROT270, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // what's the real title ?
+GAMEL( 1979, beaminv,  0,       beaminv, beaminv,  0, ROT270, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, beaminva, beaminv, beaminv, beaminva, 0, ROT270, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_beaminv ) // what's the real title ?

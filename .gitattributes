@@ -3729,6 +3729,7 @@ src/mame/layout/awpvid14.lay svneol=native#text/plain
 src/mame/layout/awpvid16.lay svneol=native#text/plain
 src/mame/layout/babydad.lay svneol=native#text/plain
 src/mame/layout/babypkr.lay svneol=native#text/plain
+src/mame/layout/beaminv.lay svneol=native#text/plain
 src/mame/layout/bfm_sc1.lay svneol=native#text/plain
 src/mame/layout/bfm_sc2.lay svneol=native#text/plain
 src/mame/layout/bigdeal.lay svneol=native#text/plain
