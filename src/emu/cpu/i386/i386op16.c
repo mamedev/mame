@@ -1626,7 +1626,7 @@ static void I386OP(popf)(i386_state *cpustate)				// Opcode 0x9d
 	if(cpustate->CPL > IOPL)
 		mask &= ~0x00000200;
 
-set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
+	set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
 	CYCLES(cpustate,CYCLES_POPF);
 }
 

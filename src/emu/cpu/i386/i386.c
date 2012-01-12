@@ -107,11 +107,13 @@ static void i386_load_segment_descriptor(i386_state *cpustate, int segment )
 			cpustate->sreg[segment].base = cpustate->sreg[segment].selector << 4;
 			cpustate->sreg[segment].limit = 0xffff;
 			cpustate->sreg[segment].flags = (segment == CS) ? 0x009a : 0x0092;
+			cpustate->sreg[segment].d = 0;
 		}
 	}
 	else
 	{
 		cpustate->sreg[segment].base = cpustate->sreg[segment].selector << 4;
+		cpustate->sreg[segment].d = 0;
 
 		if( segment == CS && !cpustate->performed_intersegment_jump )
 			cpustate->sreg[segment].base |= 0xfff00000;
@@ -2161,6 +2163,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 
 	if(V8086_MODE)
 	{
+		UINT32 oldflags = get_flags(cpustate);
 		if(!cpustate->IOP1 || !cpustate->IOP2)
 		{
 			logerror("IRET (%08x): Is in Virtual 8086 mode and IOPL != 3.\n",cpustate->pc);
@@ -2169,18 +2172,19 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		/* Is this correct?  The 80386 programmers' reference says IRET should always trigger #GP(0) in V86 mode */
 		if(operand32 == 0)
 		{
-			UINT32 oldflags = get_flags(cpustate);
 			cpustate->eip = newEIP & 0xffff;
 			cpustate->sreg[CS].selector = newCS & 0xffff;
-			newflags |= 0x3000;  // IOPL cannot be changed in V86 mode
-			set_flags(cpustate,newflags | oldflags);
+			newflags &= ~(3<<12);
+			newflags |= (((oldflags>>12)&3)<<12);  // IOPL cannot be changed in V86 mode
+			set_flags(cpustate,(newflags & 0xffff) | (oldflags & ~0xffff));
 			REG16(SP) += 6;
 		}
 		else
 		{
 			cpustate->eip = newEIP;
 			cpustate->sreg[CS].selector = newCS & 0xffff;
-			newflags |= 0x3000;  // IOPL cannot be changed in V86 mode
+			newflags &= ~(3<<12);
+			newflags |= 0x20000 | (((oldflags>>12)&3)<<12);  // IOPL and VM cannot be changed in V86 mode
 			set_flags(cpustate,newflags);
 			REG32(ESP) += 12;
 		}

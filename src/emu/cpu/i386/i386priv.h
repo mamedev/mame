@@ -384,14 +384,26 @@ INLINE int translate_address(i386_state *cpustate, UINT32 *address)
 
 	// TODO: 4MB pages
 	UINT32 page_dir = cpustate->program->read_dword(pdbr + directory * 4);
-	if (!(cpustate->cr[4] & 0x10)) {
+	if (!(cpustate->cr[4] & 0x10))
+	{
 		page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
+		if(!(page_entry & 1))
+			return 0;
 		*address = (page_entry & 0xfffff000) | offset;
-	} else {
+	}
+	else
+	{
 		if (page_dir & 0x80)
+		{
+			if(!(page_dir & 1))
+				return 0;
 			*address = (page_dir & 0xffc00000) | (a & 0x003fffff);
-		else {
+		}
+		else
+		{
 			page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
+			if(!(page_entry & 1))
+				return 0;
 			*address = (page_entry & 0xfffff000) | offset;
 		}
 	}

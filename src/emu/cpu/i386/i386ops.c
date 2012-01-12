@@ -910,7 +910,7 @@ static void I386OP(arpl)(i386_state *cpustate)           // Opcode 0x63
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 flag = 0;
 
-	if(PROTECTED_MODE)
+	if(PROTECTED_MODE && !V8086_MODE)
 	{
 		 if( modrm >= 0xc0 ) {
 			src = LOAD_REG16(modrm);
