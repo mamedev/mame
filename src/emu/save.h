@@ -268,9 +268,27 @@ ALLOW_SAVE_TYPE(endianness_t);
 //-------------------------------------------------
 
 template<>
-inline void save_manager::save_item(const char *module, const char *tag, int index, bitmap_t &value, const char *name)
+inline void save_manager::save_item(const char *module, const char *tag, int index, bitmap_ind8 &value, const char *name)
 {
-	save_memory(module, tag, index, name, &value.pix8(0), value.bpp() / 8, value.rowpixels() * value.height());
+	save_memory(module, tag, index, name, &value.pix(0), value.bpp() / 8, value.rowpixels() * value.height());
+}
+
+template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, bitmap_ind16 &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value.pix(0), value.bpp() / 8, value.rowpixels() * value.height());
+}
+
+template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, bitmap_ind32 &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value.pix(0), value.bpp() / 8, value.rowpixels() * value.height());
+}
+
+template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, bitmap_rgb32 &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value.pix(0), value.bpp() / 8, value.rowpixels() * value.height());
 }
 
 

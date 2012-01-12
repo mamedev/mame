@@ -44,6 +44,6 @@ DISCRETE_SOUND_EXTERN( canyon );
 /*----------- defined in video/canyon.c -----------*/
 
 VIDEO_START( canyon );
-SCREEN_UPDATE( canyon );
+SCREEN_UPDATE_IND16( canyon );
 
 WRITE8_HANDLER( canyon_videoram_w );

@@ -53,7 +53,7 @@ WRITE16_HANDLER( mcatadv_videoram2_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	mcatadv_state *state = machine.driver_data<mcatadv_state>();
 	UINT16 *source = state->m_spriteram_old;
@@ -156,7 +156,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_t &bitmap, const rectangle &cliprect )
+static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int flip;
 	UINT32 drawline;
@@ -200,7 +200,7 @@ static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_v
 	}
 }
 
-SCREEN_UPDATE( mcatadv )
+SCREEN_UPDATE_IND16( mcatadv )
 {
 	mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
 	int i;

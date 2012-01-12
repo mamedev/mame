@@ -34,7 +34,7 @@ VIDEO_START( slapshot )
             SPRITE DRAW ROUTINES
 ************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int *primasks, int y_offset )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset )
 {
 	/*
         Sprite format:
@@ -454,7 +454,7 @@ One exception is the "puck" in early attract which is
 a bg layer given priority over some sprites.
 ********************************************************************/
 
-SCREEN_UPDATE( slapshot )
+SCREEN_UPDATE_IND16( slapshot )
 {
 	slapshot_state *state = screen.machine().driver_data<slapshot_state>();
 	UINT8 layer[5];

@@ -63,7 +63,7 @@ static VIDEO_START(unclepoo)
 {
 }
 
-static SCREEN_UPDATE(unclepoo)
+static SCREEN_UPDATE_IND16(unclepoo)
 {
 	poo_state *state = screen.machine().driver_data<poo_state>();
 	int y,x;
@@ -339,10 +339,9 @@ static MACHINE_CONFIG_START( unclepoo, poo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE(unclepoo)
+	MCFG_SCREEN_UPDATE_STATIC(unclepoo)
 
 	MCFG_GFXDECODE(unclepoo)
 	MCFG_PALETTE_LENGTH(0x100)

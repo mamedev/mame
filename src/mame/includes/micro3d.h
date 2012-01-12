@@ -143,7 +143,7 @@ VIDEO_START( micro3d );
 VIDEO_RESET( micro3d );
 
 void micro3d_tms_interrupt(device_t *device, int state);
-void micro3d_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params);
+void micro3d_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
 
 WRITE16_HANDLER( micro3d_clut_w );
 WRITE16_HANDLER( micro3d_creg_w );

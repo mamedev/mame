@@ -121,7 +121,7 @@ VIDEO_START( playch10_hboard )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( playch10_single )
+SCREEN_UPDATE_IND16( playch10_single )
 {
 	playch10_state *state = screen.machine().driver_data<playch10_state>();
 	device_t *ppu = screen.machine().device("ppu");
@@ -150,14 +150,14 @@ SCREEN_UPDATE( playch10_single )
 	return 0;
 }
 
-SCREEN_UPDATE( playch10_top )
+SCREEN_UPDATE_IND16( playch10_top )
 {
 	playch10_state *state = screen.machine().driver_data<playch10_state>();
 	device_t *ppu = screen.machine().device("ppu");
 
 	/* Single Monitor version */
 	if (state->m_pc10_bios != 1)
-		return SCREEN_UPDATE_CALL(playch10_single);
+		return SCREEN_UPDATE16_CALL(playch10_single);
 
 	if ( !state->m_pc10_dispmask )
 		/* render the ppu */
@@ -168,13 +168,13 @@ SCREEN_UPDATE( playch10_top )
 	return 0;
 }
 
-SCREEN_UPDATE( playch10_bottom )
+SCREEN_UPDATE_IND16( playch10_bottom )
 {
 	playch10_state *state = screen.machine().driver_data<playch10_state>();
 
 	/* Single Monitor version */
 	if (state->m_pc10_bios != 1)
-		return SCREEN_UPDATE_CALL(playch10_single);
+		return SCREEN_UPDATE16_CALL(playch10_single);
 
 	/* When the bios is accessing vram, the video circuitry can't access it */
 

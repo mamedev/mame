@@ -140,7 +140,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 */
 
 /* jumpkids / tumbleb.c! */
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	crospang_state *state = machine.driver_data<crospang_state>();
 	int offs;
@@ -215,7 +215,7 @@ VIDEO_START( crospang )
 	tilemap_set_transparent_pen(state->m_fg_layer, 0);
 }
 
-SCREEN_UPDATE( crospang )
+SCREEN_UPDATE_IND16( crospang )
 {
 	crospang_state *state = screen.machine().driver_data<crospang_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_layer, 0, 0);

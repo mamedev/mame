@@ -8,8 +8,8 @@ public:
 	UINT8 *     m_playfield_ram;
 
 	/* video-related */
-	bitmap_t    *m_tmp_bitmap1;
-	bitmap_t    *m_tmp_bitmap2;
+	bitmap_ind16    m_tmp_bitmap1;
+	bitmap_ind16    m_tmp_bitmap2;
 	tilemap_t     *m_bg_tilemap;
 	int         m_pc3259_output[4];
 	int         m_pc3259_mask;
@@ -71,5 +71,5 @@ READ8_HANDLER( bking_pos_r );
 
 PALETTE_INIT( bking );
 VIDEO_START( bking );
-SCREEN_UPDATE( bking );
+SCREEN_UPDATE_IND16( bking );
 SCREEN_EOF( bking );

@@ -46,12 +46,14 @@ class sangho_state : public driver_device
 {
 public:
 	sangho_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_v9938(*this, "v9938") { }
 
 	UINT8* m_ram;
 	UINT8 m_sexyboom_bank[8];
 	UINT8 m_pzlestar_mem_bank;
 	UINT8 m_pzlestar_rom_bank;
+	required_device<v9938_device> m_v9938;
 };
 
 
@@ -235,10 +237,7 @@ static ADDRESS_MAP_START( pzlestar_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ymsnd", ym2413_w )
 	AM_RANGE( 0x91, 0x91) AM_WRITE( pzlestar_bank_w )
-	AM_RANGE( 0x98, 0x98) AM_READWRITE( v9938_0_vram_r, v9938_0_vram_w )
-	AM_RANGE( 0x99, 0x99) AM_READWRITE( v9938_0_status_r, v9938_0_command_w )
-	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_0_palette_w )
-	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_0_register_w )
+	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
 	AM_RANGE( 0xa8, 0xa8) AM_READWRITE( pzlestar_mem_bank_r, pzlestar_mem_bank_w )
@@ -252,10 +251,7 @@ static ADDRESS_MAP_START( sexyboom_io_map, AS_IO, 8 )
 	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ymsnd", ym2413_w )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
-	AM_RANGE( 0xf0, 0xf0) AM_READWRITE( v9938_0_vram_r,v9938_0_vram_w )
-	AM_RANGE( 0xf1, 0xf1) AM_READWRITE( v9938_0_status_r,v9938_0_command_w )
-	AM_RANGE( 0xf2, 0xf2) AM_WRITE( v9938_0_palette_w )
-	AM_RANGE( 0xf3, 0xf3) AM_WRITE( v9938_0_register_w )
+	AM_RANGE( 0xf0, 0xf3) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write )
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
 	AM_RANGE( 0xf8, 0xff) AM_WRITE( sexyboom_bank_w )
 ADDRESS_MAP_END
@@ -325,8 +321,6 @@ static MACHINE_RESET(pzlestar)
 	sangho_state *state = machine.driver_data<sangho_state>();
 	state->m_pzlestar_mem_bank = 2;
 	pzlestar_map_banks(machine);
-
-	v9938_reset(0);
 }
 
 static MACHINE_RESET(sexyboom)
@@ -344,32 +338,26 @@ static MACHINE_RESET(sexyboom)
 	sexyboom_map_bank(machine, 1);
 	sexyboom_map_bank(machine, 2);
 	sexyboom_map_bank(machine, 3);
-
-	v9938_reset(0);
 }
 
-static void msx_vdp_interrupt(running_machine &machine, int i)
+static void msx_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-	cputag_set_input_line (machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line (device.machine(), "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static TIMER_DEVICE_CALLBACK( sangho_interrupt )
 {
+	sangho_state *state = timer.machine().driver_data<sangho_state>();
 	int scanline = param;
 
 	if((scanline % 2) == 0)
 	{
-		v9938_set_sprite_limit(0, 0);
-		v9938_set_resolution(0, RENDER_HIGH);
-		v9938_interrupt(timer.machine(), 0);
+		state->m_v9938->set_sprite_limit(0);
+		state->m_v9938->set_resolution(RENDER_HIGH);
+		state->m_v9938->interrupt();
 	}
 }
 
-
-static VIDEO_START( sangho )
-{
-	v9938_init (machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(), MODEL_V9938, 0x20000, msx_vdp_interrupt);
-}
 
 static MACHINE_CONFIG_START( pzlestar, sangho_state )
 
@@ -380,10 +368,13 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
+	MCFG_V9938_ADD("v9938", "screen", 0x20000)
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(msx_vdp_interrupt)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
@@ -392,9 +383,6 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 	MCFG_MACHINE_RESET(pzlestar)
 
 	MCFG_PALETTE_INIT( v9938 )
-
-	MCFG_VIDEO_START( sangho )
-
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)
@@ -412,10 +400,13 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
+	MCFG_V9938_ADD("v9938", "screen", 0x20000)
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(msx_vdp_interrupt)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
@@ -424,8 +415,6 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_MACHINE_RESET(sexyboom)
 
 	MCFG_PALETTE_INIT( v9938 )
-
-	MCFG_VIDEO_START( sangho )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)

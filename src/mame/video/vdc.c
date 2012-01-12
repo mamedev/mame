@@ -46,7 +46,7 @@ typedef struct {
 	pair	vce_address;			/* Current address in the palette */
 	pair	vce_data[512];			/* Palette data */
 	int		current_bitmap_line;	/* The current line in the display we are on */
-	bitmap_t	*bmp;
+	bitmap_ind16	*bmp;
 }VCE;
 
 typedef struct {
@@ -423,7 +423,7 @@ VIDEO_START( pce )
 	memset(vdc[1].vram, 0, 0x10000);
 
 	/* create display bitmap */
-	vce.bmp = machine.primary_screen->alloc_compatible_bitmap();
+	vce.bmp = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
 
 	vdc[0].inc = 1;
 	vdc[1].inc = 1;
@@ -432,7 +432,7 @@ VIDEO_START( pce )
 }
 
 
-SCREEN_UPDATE( pce )
+SCREEN_UPDATE_IND16( pce )
 {
 	/* copy our rendering buffer to the display */
 	copybitmap (bitmap,*vce.bmp,0,0,0,0,cliprect);

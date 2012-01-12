@@ -119,7 +119,7 @@ public:
 	UINT8 *m_shared;
 	UINT32 *m_framebuffer;
 	UINT32 m_videoreg;
-	bitmap_t *m_bitmap;
+	bitmap_ind16 *m_bitmap;
 	UINT32 *m_cop_ram;
 };
 
@@ -334,7 +334,7 @@ static MACHINE_RESET(speglsht)
 static VIDEO_START(speglsht)
 {
 	speglsht_state *state = machine.driver_data<speglsht_state>();
-	state->m_bitmap = auto_bitmap_alloc(machine, 512, 5122, BITMAP_FORMAT_INDEXED16 );
+	state->m_bitmap = auto_bitmap_ind16_alloc(machine, 512, 5122 );
 	VIDEO_START_CALL(st0016);
 }
 
@@ -343,7 +343,7 @@ static VIDEO_START(speglsht)
 		bitmap.pix32(y, x) = (b) | ((g)<<8) | ((r)<<16); \
 }
 
-static SCREEN_UPDATE(speglsht)
+static SCREEN_UPDATE_RGB32(speglsht)
 {
 	speglsht_state *state = screen.machine().driver_data<speglsht_state>();
 	int x,y,dy;
@@ -400,10 +400,9 @@ static MACHINE_CONFIG_START( speglsht, speglsht_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
-	MCFG_SCREEN_UPDATE(speglsht)
+	MCFG_SCREEN_UPDATE_STATIC(speglsht)
 
 	MCFG_GFXDECODE(speglsht)
 	MCFG_PALETTE_LENGTH(16*16*4+1)

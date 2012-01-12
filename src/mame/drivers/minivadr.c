@@ -31,7 +31,7 @@ public:
  *
  *************************************/
 
-static SCREEN_UPDATE( minivadr )
+static SCREEN_UPDATE_RGB32( minivadr )
 {
 	minivadr_state *state = screen.machine().driver_data<minivadr_state>();
 	offs_t offs;
@@ -89,10 +89,9 @@ static MACHINE_CONFIG_START( minivadr, minivadr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE(minivadr)
+	MCFG_SCREEN_UPDATE_STATIC(minivadr)
 
 	/* the board has no sound hardware */
 MACHINE_CONFIG_END

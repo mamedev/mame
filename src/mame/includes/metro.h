@@ -96,6 +96,6 @@ VIDEO_START( metro_14300 );
 VIDEO_START( blzntrnd );
 VIDEO_START( gstrik2 );
 
-SCREEN_UPDATE( metro );
+SCREEN_UPDATE_IND16( metro );
 
-void metro_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
+void metro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -221,7 +221,7 @@ void twin16_spriteram_process( running_machine &machine )
 	state->m_need_process_spriteram = 0;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap )
 {
 	twin16_state *state = machine.driver_data<twin16_state>();
 	const UINT16 *source = 0x1800+machine.generic.buffered_spriteram.u16 + 0x800 - 4;
@@ -344,7 +344,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap )
 
 
 
-static void draw_layer( running_machine &machine, bitmap_t &bitmap, int opaque )
+static void draw_layer( running_machine &machine, bitmap_ind16 &bitmap, int opaque )
 {
 	twin16_state *state = machine.driver_data<twin16_state>();
 	UINT16 *videoram = state->m_videoram;
@@ -520,7 +520,7 @@ VIDEO_START( twin16 )
 	state_save_register_global(machine, state->m_sprite_busy);
 }
 
-SCREEN_UPDATE( twin16 )
+SCREEN_UPDATE_IND16( twin16 )
 {
 	twin16_state *state = screen.machine().driver_data<twin16_state>();
 	int text_flip=0;

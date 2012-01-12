@@ -745,9 +745,9 @@ static void sprite_init_cave( running_machine &machine )
 	}
 
 	state->m_sprite_zbuf_baseval = 0x10000 - MAX_SPRITE_NUM;
-	state->m_sprite_zbuf = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
-	state->m_blit.baseaddr_zbuf = &state->m_sprite_zbuf->pix8(0);
-	state->m_blit.line_offset_zbuf = state->m_sprite_zbuf->rowpixels() * state->m_sprite_zbuf->bpp() / 8;
+	state->m_sprite_zbuf.allocate(screen_width, screen_height);
+	state->m_blit.baseaddr_zbuf = &state->m_sprite_zbuf.pix8(0);
+	state->m_blit.line_offset_zbuf = state->m_sprite_zbuf.rowpixels() * state->m_sprite_zbuf.bpp() / 8;
 
 	state->m_num_sprites = state->m_spriteram_size / 0x10 / 2;
 	state->m_sprite = auto_alloc_array_clear(machine, struct sprite_cave, state->m_num_sprites);
@@ -755,7 +755,7 @@ static void sprite_init_cave( running_machine &machine )
 	memset(state->m_sprite_table, 0, sizeof(state->m_sprite_table));
 	state->m_sprite_draw = sprite_draw_donpachi;
 
-	state->save_item(NAME(*state->m_sprite_zbuf));
+	state->save_item(NAME(state->m_sprite_zbuf));
 	state->save_item(NAME(state->m_sprite_zbuf_baseval));
 	state->save_item(NAME(state->m_num_sprites));
 	state->save_item(NAME(state->m_spriteram_bank));
@@ -827,7 +827,7 @@ static void cave_sprite_check( screen_device &screen, const rectangle &clip )
 				if (clip.min_y == visarea.min_y)
 				{
 					if(!(state->m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						state->m_sprite_zbuf->fill(0, visarea);
+						state->m_sprite_zbuf.fill(0, visarea);
 				}
 				break;
 
@@ -836,7 +836,7 @@ static void cave_sprite_check( screen_device &screen, const rectangle &clip )
 				if (clip.min_y == visarea.min_y)
 				{
 					if(!(state->m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						state->m_sprite_zbuf->fill(0, visarea);
+						state->m_sprite_zbuf.fill(0, visarea);
 				}
 				break;
 
@@ -1418,7 +1418,7 @@ static void sprite_draw_donpachi_zbuf( running_machine &machine, int priority )
 ***************************************************************************/
 
 INLINE void cave_tilemap_draw(
-	running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+	running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
 	UINT32 flags, UINT32 priority, UINT32 priority2, int GFX )
 {
 	cave_state *state = machine.driver_data<cave_state>();
@@ -1540,7 +1540,7 @@ INLINE void cave_tilemap_draw(
 }
 
 
-SCREEN_UPDATE( cave )
+SCREEN_UPDATE_IND16( cave )
 {
 	cave_state *state = screen.machine().driver_data<cave_state>();
 	int pri, pri2, GFX;
@@ -1548,7 +1548,7 @@ SCREEN_UPDATE( cave )
 
 	set_pens(screen.machine());
 
-	state->m_blit.baseaddr = &bitmap.pix8(0);
+	state->m_blit.baseaddr = reinterpret_cast<UINT8 *>(bitmap.raw_pixptr(0));
 	state->m_blit.line_offset = bitmap.rowpixels() * bitmap.bpp() / 8;
 
 	/* Choose the tilemap to display (8x8 tiles or 16x16 tiles) */

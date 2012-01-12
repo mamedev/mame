@@ -69,26 +69,26 @@ public:
 
 static VIDEO_START( mirage )
 {
-	machine.device<decospr_device>("spritegen")->alloc_sprite_bitmap(machine);
+	machine.device<decospr_device>("spritegen")->alloc_sprite_bitmap();
 }
 
-static SCREEN_UPDATE( mirage )
+static SCREEN_UPDATE_RGB32( mirage )
 {
 	mirage_state *state = screen.machine().driver_data<mirage_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
 	flip_screen_set(screen.machine(), BIT(flip, 7));
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400);
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
 	bitmap.fill(256, cliprect); /* not verified */
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
+	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen.machine(), bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
+	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
 
 	return 0;
 }
@@ -330,10 +330,9 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(mirage)
+	MCFG_SCREEN_UPDATE_STATIC(mirage)
 	MCFG_SCREEN_EOF(mirage)
 
 	MCFG_VIDEO_START(mirage)

@@ -224,13 +224,13 @@ WRITE16_HANDLER(rlt_blitter_w)
 VIDEO_START( rltennis )
 {
 	rltennis_state *state = machine.driver_data<rltennis_state>();
-	state->m_tmp_bitmap[BITMAP_BG] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
-	state->m_tmp_bitmap[BITMAP_FG_1] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
-	state->m_tmp_bitmap[BITMAP_FG_2] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
-	state->m_tmp_bitmap[BITMAP_FG_DISPLAY] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
+	state->m_tmp_bitmap[BITMAP_BG] = auto_bitmap_ind16_alloc(machine, 512, 256);
+	state->m_tmp_bitmap[BITMAP_FG_1] = auto_bitmap_ind16_alloc(machine, 512, 256);
+	state->m_tmp_bitmap[BITMAP_FG_2] = auto_bitmap_ind16_alloc(machine, 512, 256);
+	state->m_tmp_bitmap[BITMAP_FG_DISPLAY] = auto_bitmap_ind16_alloc(machine, 512, 256);
 }
 
-SCREEN_UPDATE( rltennis )
+SCREEN_UPDATE_IND16( rltennis )
 {
 	rltennis_state *state = screen.machine().driver_data<rltennis_state>();
 	copybitmap(bitmap, *state->m_tmp_bitmap[BITMAP_BG], 0, 0, 0, 0, cliprect);

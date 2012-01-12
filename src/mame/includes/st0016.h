@@ -57,6 +57,6 @@ WRITE8_HANDLER	(st0016_character_ram_w);
 READ8_HANDLER	(st0016_vregs_r);
 WRITE8_HANDLER	(st0016_vregs_w);
 
-void st0016_draw_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 VIDEO_START(st0016);
-SCREEN_UPDATE(st0016);
+SCREEN_UPDATE_IND16(st0016);

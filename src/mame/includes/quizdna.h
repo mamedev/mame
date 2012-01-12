@@ -19,7 +19,7 @@ public:
 /*----------- defined in video/quizdna.c -----------*/
 
 VIDEO_START( quizdna );
-SCREEN_UPDATE( quizdna );
+SCREEN_UPDATE_IND16( quizdna );
 
 WRITE8_HANDLER( quizdna_fg_ram_w );
 WRITE8_HANDLER( quizdna_bg_ram_w );

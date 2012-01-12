@@ -30,4 +30,4 @@ WRITE8_HANDLER( mosaic_fgvideoram_w );
 WRITE8_HANDLER( mosaic_bgvideoram_w );
 
 VIDEO_START( mosaic );
-SCREEN_UPDATE( mosaic );
+SCREEN_UPDATE_IND16( mosaic );

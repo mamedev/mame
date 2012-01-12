@@ -141,7 +141,7 @@ Note: press Z to show some info on each sprite (debug builds only)
 #endif
 
 
-static void ssv_drawgfx(	bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx,
+static void ssv_drawgfx(	bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx,
 					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 					int shadow )
 {
@@ -606,7 +606,7 @@ From the above some noteworthy cases are:
 
 /* Draw a tilemap sprite */
 
-static void draw_row(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int sx, int sy, int scroll)
+static void draw_row(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll)
 {
 	ssv_state *state = machine.driver_data<ssv_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -741,7 +741,7 @@ static void draw_row(running_machine &machine, bitmap_t &bitmap, const rectangle
 
 /* Draw the "background layer" using multiple tilemap sprites */
 
-static void draw_layer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int  nr)
+static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr)
 {
 	int sy;
 	for ( sy = 0; sy <= machine.primary_screen->visible_area().max_y; sy += 0x40 )
@@ -750,7 +750,7 @@ static void draw_layer(running_machine &machine, bitmap_t &bitmap, const rectang
 
 /* Draw sprites in the sprites list */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Sprites list */
 	ssv_state *state = machine.driver_data<ssv_state>();
@@ -984,9 +984,9 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 ***************************************************************************/
 
-SCREEN_UPDATE( eaglshot )
+SCREEN_UPDATE_IND16( eaglshot )
 {
-	return SCREEN_UPDATE_CALL(ssv);
+	return SCREEN_UPDATE16_CALL(ssv);
 }
 
 /*
@@ -1042,7 +1042,7 @@ SCREEN_UPDATE( eaglshot )
         E.h                             Unused
 
 */
-static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	/* Sprites list */
 
@@ -1165,12 +1165,12 @@ static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_t &bitmap
 	}	/* sprites list */
 }
 
-SCREEN_UPDATE( gdfs )
+SCREEN_UPDATE_IND16( gdfs )
 {
 	ssv_state *state = screen.machine().driver_data<ssv_state>();
 	int pri;
 
-	SCREEN_UPDATE_CALL(ssv);
+	SCREEN_UPDATE16_CALL(ssv);
 
 	for (pri = 0; pri <= 0xf; pri++)
 		gdfs_draw_zooming_sprites(screen.machine(), bitmap, cliprect, pri);
@@ -1189,7 +1189,7 @@ void ssv_enable_video(running_machine &machine, int enable)
 	state->m_enable_video = enable;
 }
 
-SCREEN_UPDATE( ssv )
+SCREEN_UPDATE_IND16( ssv )
 {
 	rectangle clip;
 

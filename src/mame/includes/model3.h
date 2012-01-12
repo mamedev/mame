@@ -78,8 +78,8 @@ public:
 	UINT32 *m_polygon_ram;
 	UINT16 *m_pal_lookup;
 	int m_real3d_display_list;
-	bitmap_t *m_bitmap3d;
-	bitmap_t *m_zbuffer;
+	bitmap_ind16 m_bitmap3d;
+	bitmap_ind32 m_zbuffer;
 	rectangle m_clip3d;
 	rectangle *m_screen_clip;
 	VECTOR3 m_parallel_light;
@@ -133,7 +133,7 @@ READ64_HANDLER(model3_palette_r);
 WRITE64_HANDLER(model3_palette_w);
 
 VIDEO_START(model3);
-SCREEN_UPDATE(model3);
+SCREEN_UPDATE_IND16(model3);
 
 WRITE64_HANDLER(real3d_cmd_w);
 WRITE64_HANDLER(real3d_display_list_w);

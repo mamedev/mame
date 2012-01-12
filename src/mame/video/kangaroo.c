@@ -136,7 +136,7 @@ static void blitter_execute( running_machine &machine )
  *
  *************************************/
 
-SCREEN_UPDATE( kangaroo )
+SCREEN_UPDATE_RGB32( kangaroo )
 {
 	kangaroo_state *state = screen.machine().driver_data<kangaroo_state>();
 	UINT8 scrolly = state->m_video_control[6];

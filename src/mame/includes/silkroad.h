@@ -21,4 +21,4 @@ WRITE32_HANDLER( silkroad_fgram_w );
 WRITE32_HANDLER( silkroad_fgram2_w );
 WRITE32_HANDLER( silkroad_fgram3_w );
 VIDEO_START(silkroad);
-SCREEN_UPDATE(silkroad);
+SCREEN_UPDATE_IND16(silkroad);

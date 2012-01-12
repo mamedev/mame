@@ -28,7 +28,7 @@ VIDEO_START(funybubl)
 {
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	funybubl_state *state = machine.driver_data<funybubl_state>();
 	UINT8 *source = &state->m_banked_vram[0x2000 - 0x20];
@@ -73,7 +73,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-SCREEN_UPDATE(funybubl)
+SCREEN_UPDATE_IND16(funybubl)
 {
 	funybubl_state *state = screen.machine().driver_data<funybubl_state>();
 	int x, y, offs;

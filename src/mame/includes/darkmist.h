@@ -20,6 +20,6 @@ public:
 /*----------- defined in video/darkmist.c -----------*/
 
 VIDEO_START( darkmist );
-SCREEN_UPDATE( darkmist );
+SCREEN_UPDATE_IND16( darkmist );
 PALETTE_INIT( darkmist );
 

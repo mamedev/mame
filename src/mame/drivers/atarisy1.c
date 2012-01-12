@@ -785,11 +785,10 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* video timing comes from an 82S163 (H) and an 82S129 (V) */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE(atarisy1)
+	MCFG_SCREEN_UPDATE_STATIC(atarisy1)
 
 	MCFG_VIDEO_START(atarisy1)
 

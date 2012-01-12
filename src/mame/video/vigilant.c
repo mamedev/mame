@@ -24,7 +24,7 @@ static const rectangle bottomvisiblearea(16*8, 48*8-1, 6*8, 32*8-1);
 VIDEO_START( vigilant )
 {
 	vigilant_state *state = machine.driver_data<vigilant_state>();
-	state->m_bg_bitmap = auto_bitmap_alloc(machine,512*4,256,machine.primary_screen->format());
+	state->m_bg_bitmap = auto_bitmap_ind16_alloc(machine,512*4,256);
 }
 
 
@@ -168,7 +168,7 @@ WRITE8_HANDLER( vigilant_rear_color_w )
  ???
  **************************************************************************/
 
-static void draw_foreground(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority, int opaque )
+static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int opaque )
 {
 	vigilant_state *state = machine.driver_data<vigilant_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -217,7 +217,7 @@ static void draw_foreground(running_machine &machine, bitmap_t &bitmap, const re
 
 
 
-static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	vigilant_state *state = machine.driver_data<vigilant_state>();
 	int scrollx = 0x17a + 16*8 - (state->m_rear_horiz_scroll_low + state->m_rear_horiz_scroll_high);
@@ -233,7 +233,7 @@ static void draw_background(running_machine &machine, bitmap_t &bitmap, const re
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	vigilant_state *state = machine.driver_data<vigilant_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -270,7 +270,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-SCREEN_UPDATE( kikcubic )
+SCREEN_UPDATE_IND16( kikcubic )
 {
 	vigilant_state *state = screen.machine().driver_data<vigilant_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -295,7 +295,7 @@ SCREEN_UPDATE( kikcubic )
 	return 0;
 }
 
-SCREEN_UPDATE( vigilant )
+SCREEN_UPDATE_IND16( vigilant )
 {
 	vigilant_state *state = screen.machine().driver_data<vigilant_state>();
 	int i;

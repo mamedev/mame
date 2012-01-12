@@ -41,4 +41,4 @@ extern void ultraman_zoom_callback_2(running_machine &machine, int *code,int *co
 WRITE16_HANDLER( ultraman_gfxctrl_w );
 
 VIDEO_START( ultraman );
-SCREEN_UPDATE( ultraman );
+SCREEN_UPDATE_IND16( ultraman );

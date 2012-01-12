@@ -285,7 +285,7 @@ static VIDEO_START( dgpix )
 	state->m_vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
 }
 
-static SCREEN_UPDATE( dgpix )
+static SCREEN_UPDATE_IND16( dgpix )
 {
 	dgpix_state *state = screen.machine().driver_data<dgpix_state>();
 	int y;
@@ -336,10 +336,9 @@ static MACHINE_CONFIG_START( dgpix, dgpix_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(dgpix)
+	MCFG_SCREEN_UPDATE_STATIC(dgpix)
 
 	MCFG_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
 	MCFG_PALETTE_LENGTH(32768)

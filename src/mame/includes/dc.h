@@ -276,7 +276,7 @@ WRITE32_HANDLER( elan_regs_w );
 WRITE64_HANDLER( ta_fifo_poly_w );
 WRITE64_HANDLER( ta_fifo_yuv_w );
 VIDEO_START(dc);
-SCREEN_UPDATE(dc);
+SCREEN_UPDATE_RGB32(dc);
 
 /*--------------- CORE registers --------------*/
 #define PVRID				((0x005f8000-0x005f8000)/4)

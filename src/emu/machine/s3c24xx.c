@@ -449,7 +449,7 @@ static UINT32 s3c24xx_lcd_dma_read_bits( device_t *device, int count)
 static void s3c24xx_lcd_render_tpal( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 color = s3c24xx_get_color_tpal( device);
 	for (int y = s3c24xx->lcd.vpos_min; y <= s3c24xx->lcd.vpos_max; y++)
 	{
@@ -464,7 +464,7 @@ static void s3c24xx_lcd_render_tpal( device_t *device)
 static void s3c24xx_lcd_render_stn_01( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -496,7 +496,7 @@ static void s3c24xx_lcd_render_stn_01( device_t *device)
 static void s3c24xx_lcd_render_stn_02( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -520,7 +520,7 @@ static void s3c24xx_lcd_render_stn_02( device_t *device)
 static void s3c24xx_lcd_render_stn_04( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -544,7 +544,7 @@ static void s3c24xx_lcd_render_stn_04( device_t *device)
 static void s3c24xx_lcd_render_stn_08( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -568,7 +568,7 @@ static void s3c24xx_lcd_render_stn_08( device_t *device)
 static void s3c24xx_lcd_render_stn_12_p( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 16; i++)
 	{
@@ -587,7 +587,7 @@ static void s3c24xx_lcd_render_stn_12_p( device_t *device)
 static void s3c24xx_lcd_render_stn_12_u( device_t *device) // not tested
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -611,7 +611,7 @@ static void s3c24xx_lcd_render_stn_12_u( device_t *device) // not tested
 static void s3c24xx_lcd_render_tft_01( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -635,7 +635,7 @@ static void s3c24xx_lcd_render_tft_01( device_t *device)
 static void s3c24xx_lcd_render_tft_02( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -659,7 +659,7 @@ static void s3c24xx_lcd_render_tft_02( device_t *device)
 static void s3c24xx_lcd_render_tft_04( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -683,7 +683,7 @@ static void s3c24xx_lcd_render_tft_04( device_t *device)
 static void s3c24xx_lcd_render_tft_08( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -707,7 +707,7 @@ static void s3c24xx_lcd_render_tft_08( device_t *device)
 static void s3c24xx_lcd_render_tft_16( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	bitmap_t &bitmap = *s3c24xx->lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = *s3c24xx->lcd.bitmap[0];
 	UINT32 *scanline = &bitmap.pix32(s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -777,11 +777,11 @@ static void s3c24xx_video_start( device_t *device, running_machine &machine)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	screen_device *screen = machine.primary_screen;
-	s3c24xx->lcd.bitmap[0] = screen->alloc_compatible_bitmap();
-	s3c24xx->lcd.bitmap[1] = screen->alloc_compatible_bitmap();
+	s3c24xx->lcd.bitmap[0] = auto_bitmap_rgb32_alloc(machine, screen->width(), screen->height());
+	s3c24xx->lcd.bitmap[1] = auto_bitmap_rgb32_alloc(machine, screen->width(), screen->height());
 }
 
-static void bitmap_blend( bitmap_t &bitmap_dst, bitmap_t &bitmap_src_1, bitmap_t &bitmap_src_2)
+static void bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bitmap_src_1, bitmap_rgb32 &bitmap_src_2)
 {
 	for (int y = 0; y < bitmap_dst.height(); y++)
 	{
@@ -806,7 +806,7 @@ static void bitmap_blend( bitmap_t &bitmap_dst, bitmap_t &bitmap_src_1, bitmap_t
 		}
 }
 
-static UINT32 s3c24xx_video_update( device_t *device, screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+static UINT32 s3c24xx_video_update( device_t *device, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->lcd.regs.lcdcon1 & (1 << 0))

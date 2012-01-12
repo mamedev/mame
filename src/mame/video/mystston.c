@@ -179,7 +179,7 @@ static TILE_GET_INFO( get_fg_tile_info )
  *
  *************************************/
 
-static void draw_sprites(bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx, int flip)
+static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx, int flip)
 {
 	mystston_state *state = gfx->machine().driver_data<mystston_state>();
 	int offs;
@@ -254,7 +254,7 @@ static VIDEO_RESET( mystston )
  *
  *************************************/
 
-static SCREEN_UPDATE( mystston )
+static SCREEN_UPDATE_IND16( mystston )
 {
 	mystston_state *state = screen.machine().driver_data<mystston_state>();
 
@@ -329,7 +329,6 @@ MACHINE_CONFIG_FRAGMENT( mystston_video )
 	MCFG_PALETTE_LENGTH(0x40)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE(mystston)
+	MCFG_SCREEN_UPDATE_STATIC(mystston)
 MACHINE_CONFIG_END

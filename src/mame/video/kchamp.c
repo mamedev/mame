@@ -68,7 +68,7 @@ VIDEO_START( kchamp )
              3        XXXXXXXX
 */
 
-static void kchamp_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void kchamp_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -97,7 +97,7 @@ static void kchamp_draw_sprites( running_machine &machine, bitmap_t &bitmap, con
 	}
 }
 
-static void kchampvs_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void kchampvs_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -127,7 +127,7 @@ static void kchampvs_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 }
 
 
-SCREEN_UPDATE( kchamp )
+SCREEN_UPDATE_IND16( kchamp )
 {
 	kchamp_state *state = screen.machine().driver_data<kchamp_state>();
 
@@ -136,7 +136,7 @@ SCREEN_UPDATE( kchamp )
 	return 0;
 }
 
-SCREEN_UPDATE( kchampvs )
+SCREEN_UPDATE_IND16( kchampvs )
 {
 	kchamp_state *state = screen.machine().driver_data<kchamp_state>();
 

@@ -54,4 +54,4 @@ WRITE16_HANDLER( joe_tilemaps_xscroll_w );
 WRITE16_HANDLER( joe_tilemaps_yscroll_w );
 
 VIDEO_START( ashnojoe );
-SCREEN_UPDATE( ashnojoe );
+SCREEN_UPDATE_IND16( ashnojoe );

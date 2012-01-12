@@ -447,15 +447,15 @@ static int drawd3d_window_init(win_window_info *window)
 	// experimental: load a PNG to use for vector rendering; it is treated
 	// as a brightness map
 	emu_file file(window->machine().options().art_path(), OPEN_FLAG_READ);
-	d3d->vector_bitmap = render_load_png(file, NULL, "vector.png", NULL, NULL);
-	if (d3d->vector_bitmap != NULL)
+	render_load_png(d3d->vector_bitmap, file, NULL, "vector.png");
+	if (d3d->vector_bitmap.valid())
 	{
-		d3d->vector_bitmap->fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
-		d3d->vector_bitmap = render_load_png(file, NULL, "vector.png", d3d->vector_bitmap, NULL);
+		d3d->vector_bitmap.fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
+		render_load_png(d3d->vector_bitmap, file, NULL, "vector.png", true);
 	}
 
-	d3d->default_bitmap = auto_bitmap_alloc(window->machine(), 8, 8, BITMAP_FORMAT_RGB32);
-	d3d->default_bitmap->fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
+	d3d->default_bitmap.allocate(8, 8);
+	d3d->default_bitmap.fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
 
 	// configure the adapter for the mode we want
 	if (config_adapter_mode(window))
@@ -509,10 +509,6 @@ static void drawd3d_window_destroy(win_window_info *window)
 
 	// delete the device
 	device_delete(d3d);
-
-	// experimental: free the vector PNG
-	global_free(d3d->vector_bitmap);
-	d3d->vector_bitmap = NULL;
 
 	// free the memory in the window
 	global_free(d3d);
@@ -780,15 +776,15 @@ try_again:
 		}
 	}
 
-	if (d3d->default_bitmap != NULL)
+	if (d3d->default_bitmap.valid())
 	{
 		render_texinfo texture;
 
 		// fake in the basic data so it looks like it came from render.c
-		texture.base = d3d->default_bitmap->raw_pixptr(0);
-		texture.rowpixels = d3d->default_bitmap->rowpixels();
-		texture.width = d3d->default_bitmap->width();
-		texture.height = d3d->default_bitmap->height();
+		texture.base = d3d->default_bitmap.raw_pixptr(0);
+		texture.rowpixels = d3d->default_bitmap.rowpixels();
+		texture.width = d3d->default_bitmap.width();
+		texture.height = d3d->default_bitmap.height();
 		texture.palette = NULL;
 		texture.seqid = 0;
 
@@ -865,15 +861,15 @@ static int device_create_resources(d3d_info *d3d)
 	result = (*d3dintf->device.present)(d3d->device, NULL, NULL, NULL, NULL, 0);
 
 	// experimental: if we have a vector bitmap, create a texture for it
-	if (d3d->vector_bitmap != NULL)
+	if (d3d->vector_bitmap.valid())
 	{
 		render_texinfo texture;
 
 		// fake in the basic data so it looks like it came from render.c
-		texture.base = &d3d->vector_bitmap->pix32(0);
-		texture.rowpixels = d3d->vector_bitmap->rowpixels();
-		texture.width = d3d->vector_bitmap->width();
-		texture.height = d3d->vector_bitmap->height();
+		texture.base = &d3d->vector_bitmap.pix32(0);
+		texture.rowpixels = d3d->vector_bitmap.rowpixels();
+		texture.width = d3d->vector_bitmap.width();
+		texture.height = d3d->vector_bitmap.height();
 		texture.palette = NULL;
 		texture.seqid = 0;
 
@@ -2011,62 +2007,6 @@ INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const
 
 
 //============================================================
-//  copyline_rgb15
-//============================================================
-
-INLINE void copyline_rgb15(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
-{
-	int x;
-
-	assert(xborderpix == 0 || xborderpix == 1);
-
-	// palette (really RGB map) case
-	if (palette != NULL)
-	{
-		if (xborderpix)
-		{
-			UINT16 pix = *src;
-			*dst++ = 0xff000000 | palette[0x40 + ((pix >> 10) & 0x1f)] | palette[0x20 + ((pix >> 5) & 0x1f)] | palette[0x00 + ((pix >> 0) & 0x1f)];
-		}
-		for (x = 0; x < width; x++)
-		{
-			UINT16 pix = *src++;
-			*dst++ = 0xff000000 | palette[0x40 + ((pix >> 10) & 0x1f)] | palette[0x20 + ((pix >> 5) & 0x1f)] | palette[0x00 + ((pix >> 0) & 0x1f)];
-		}
-		if (xborderpix)
-		{
-			UINT16 pix = *--src;
-			*dst++ = 0xff000000 | palette[0x40 + ((pix >> 10) & 0x1f)] | palette[0x20 + ((pix >> 5) & 0x1f)] | palette[0x00 + ((pix >> 0) & 0x1f)];
-		}
-	}
-
-	// direct case
-	else
-	{
-		if (xborderpix)
-		{
-			UINT16 pix = *src;
-			UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
-			*dst++ = 0xff000000 | color | ((color >> 5) & 0x070707);
-		}
-		for (x = 0; x < width; x++)
-		{
-			UINT16 pix = *src++;
-			UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
-			*dst++ = 0xff000000 | color | ((color >> 5) & 0x070707);
-		}
-		if (xborderpix)
-		{
-			UINT16 pix = *--src;
-			UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
-			*dst++ = 0xff000000 | color | ((color >> 5) & 0x070707);
-		}
-	}
-}
-
-
-
-//============================================================
 //  copyline_rgb32
 //============================================================
 
@@ -2401,10 +2341,6 @@ static void texture_set_data(d3d_info *d3d, d3d_texture_info *texture, const ren
 
 			case TEXFORMAT_PALETTEA16:
 				copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
-				break;
-
-			case TEXFORMAT_RGB15:
-				copyline_rgb15((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_RGB32:

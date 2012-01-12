@@ -331,7 +331,7 @@ INLINE void uBackgroundColour(running_machine &machine)
 	}
 }
 
-static SCREEN_UPDATE(aristmk4)
+static SCREEN_UPDATE_IND16(aristmk4)
 {
 	aristmk4_state *state = screen.machine().driver_data<aristmk4_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -1674,7 +1674,6 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)	/* from the crtc registers... updated by crtc */
 
@@ -1683,7 +1682,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_PALETTE_INIT(aristmk4)
 
 	MCFG_VIDEO_START(aristmk4)
-	MCFG_SCREEN_UPDATE(aristmk4)
+	MCFG_SCREEN_UPDATE_STATIC(aristmk4)
 
 	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf1 )
 	MCFG_VIA6522_ADD("via6522_0", 0, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */

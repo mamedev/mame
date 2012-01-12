@@ -10,7 +10,7 @@
 
 // Model 1 geometrizer TGP and rasterizer simulation
 enum { FRAC_SHIFT = 16 };
-enum { MOIRE = 0x00010000 };
+enum { MOIRE = 0x01000000 };
 
 
 
@@ -135,18 +135,18 @@ static void project_point_direct(struct view *view, struct point *p)
 }
 
 
-static void draw_hline(bitmap_t &bitmap, int x1, int x2, int y, int color)
+static void draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color)
 {
-	UINT16 *base = &bitmap.pix16(y);
+	UINT32 *base = &bitmap.pix32(y);
 	while(x1 <= x2) {
 		base[x1] = color;
 		x1++;
 	}
 }
 
-static void draw_hline_moired(bitmap_t &bitmap, int x1, int x2, int y, int color)
+static void draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color)
 {
-	UINT16 *base = &bitmap.pix16(y);
+	UINT32 *base = &bitmap.pix32(y);
 	while(x1 <= x2) {
 		if((x1^y)&1)
 			base[x1] = color;
@@ -154,7 +154,7 @@ static void draw_hline_moired(bitmap_t &bitmap, int x1, int x2, int y, int color
 	}
 }
 
-static void fill_slope(bitmap_t &bitmap, struct view *view, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2)
+static void fill_slope(bitmap_rgb32 &bitmap, struct view *view, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2)
 {
 	if(y1 > view->y2)
 		return;
@@ -214,7 +214,7 @@ static void fill_slope(bitmap_t &bitmap, struct view *view, int color, INT32 x1,
 	*nx2 = x2;
 }
 
-static void fill_line(bitmap_t &bitmap, struct view *view, int color, INT32 y, INT32 x1, INT32 x2)
+static void fill_line(bitmap_rgb32 &bitmap, struct view *view, int color, INT32 y, INT32 x1, INT32 x2)
 {
 	int xx1 = x1>>FRAC_SHIFT;
 	int xx2 = x2>>FRAC_SHIFT;
@@ -235,7 +235,7 @@ static void fill_line(bitmap_t &bitmap, struct view *view, int color, INT32 y, I
 	}
 }
 
-static void fill_quad(bitmap_t &bitmap, struct view *view, const struct quad_m1 *q)
+static void fill_quad(bitmap_rgb32 &bitmap, struct view *view, const struct quad_m1 *q)
 {
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
@@ -336,7 +336,7 @@ static void fill_quad(bitmap_t &bitmap, struct view *view, const struct quad_m1 
 		fill_line(bitmap, view, color, cury, x1, x2);
 }
 #if 0
-static void draw_line(bitmap_t &bitmap, struct view *view, int color, int x1, int y1, int x2, int y2)
+static void draw_line(bitmap_rgb32 &bitmap, struct view *view, int color, int x1, int y1, int x2, int y2)
 {
 	int s1x, s1y, s2x, s2y;
 	int d1, d2;
@@ -385,7 +385,7 @@ static void draw_line(bitmap_t &bitmap, struct view *view, int color, int x1, in
 	cur = 0;
 	while(x != x2 || y != y2) {
 		if(x>=view->x1 && x<=view->x2 && y>=view->y1 && y<=view->y2)
-			bitmap.pix16(y, x) = color;
+			bitmap.pix32(y, x) = color;
 		x += s1x;
 		y += s1y;
 		cur += d2;
@@ -433,7 +433,7 @@ static void unsort_quads(model1_state *state)
 }
 
 
-static void draw_quads(model1_state *state, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_quads(model1_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	struct view *view = state->m_view;
 	int count = state->m_quadpt - state->m_quaddb;
@@ -913,7 +913,7 @@ static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_ad
 			r=(state->m_color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
 			g=(state->m_color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
 			b=(state->m_color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
-			cquad.col=(r<<10)|(g<<5)|(b<<0);
+			cquad.col=(pal5bit(r)<<16)|(pal5bit(g)<<8)|(pal5bit(b)<<0);
 		}
 
 		if(flags & 0x00002000)
@@ -1071,7 +1071,7 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 			r=(state->m_color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
 			g=(state->m_color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
 			b=(state->m_color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
-			cquad.col=(r<<10)|(g<<5)|(b<<0);
+			cquad.col=(pal5bit(r)<<16)|(pal5bit(g)<<8)|(pal5bit(b)<<0);
 		}
 		//cquad.col  = scale_color(machine.pens[0x1000|(state->m_tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
 		if(flags & 0x00002000)
@@ -1119,7 +1119,7 @@ static UINT16 *skip_direct(UINT16 *list)
 	return list+2;
 }
 
-static void draw_objects(model1_state *state, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_objects(model1_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if(state->m_quadpt != state->m_quaddb) {
 		LOG_TGP(("VIDEO: sort&draw\n"));
@@ -1131,7 +1131,7 @@ static void draw_objects(model1_state *state, bitmap_t &bitmap, const rectangle 
 	state->m_pointpt = state->m_pointdb;
 }
 
-static UINT16 *draw_direct(model1_state *state, bitmap_t &bitmap, const rectangle &cliprect, UINT16 *list)
+static UINT16 *draw_direct(model1_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 *list)
 {
 	UINT16 *res;
 
@@ -1184,7 +1184,7 @@ WRITE16_HANDLER( model1_listctl_w )
 	LOG_TGP(("VIDEO: control=%08x\n", (state->m_listctl[1]<<16)|state->m_listctl[0]));
 }
 
-static void tgp_render(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void tgp_render(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	model1_state *state = machine.driver_data<model1_state>();
 	struct view *view = state->m_view;
@@ -1468,7 +1468,7 @@ VIDEO_START(model1)
 	state_save_register_global_array(machine, state->m_listctl);
 }
 
-SCREEN_UPDATE(model1)
+SCREEN_UPDATE_RGB32(model1)
 {
 	model1_state *state = screen.machine().driver_data<model1_state>();
 	struct view *view = state->m_view;

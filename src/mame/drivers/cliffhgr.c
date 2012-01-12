@@ -76,7 +76,7 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "render.h"
-#include "machine/laserdsc.h"
+#include "machine/ldpr8210.h"
 #include "video/tms9928a.h"
 #include "sound/discrete.h"
 #include "machine/nvram.h"
@@ -84,12 +84,23 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #define CLIFF_ENABLE_SND_1	NODE_01
 #define CLIFF_ENABLE_SND_2	NODE_02
 
-static device_t *laserdisc;
+class cliffhgr_state : public driver_device
+{
+public:
+	cliffhgr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc"),
+		  m_port_bank(0),
+		  m_phillips_code(0) { }
 
-static int port_bank = 0;
-static int phillips_code = 0;
+	required_device<pioneer_pr8210_device> m_laserdisc;
 
-static emu_timer *irq_timer;
+	int m_port_bank;
+	UINT32 m_phillips_code;
+
+	emu_timer *m_irq_timer;
+};
+
 
 /********************************************************/
 
@@ -100,19 +111,23 @@ static WRITE8_HANDLER( cliff_test_led_w )
 
 static WRITE8_HANDLER( cliff_port_bank_w )
 {
+	cliffhgr_state *state = space->machine().driver_data<cliffhgr_state>();
+
 	/* writing 0x0f clears the LS174 flip flop */
 	if (data == 0x0f)
-		port_bank = 0;
+		state->m_port_bank = 0;
 	else
-		port_bank = data & 0x0f; /* only D3-D0 are connected */
+		state->m_port_bank = data & 0x0f; /* only D3-D0 are connected */
 }
 
 static READ8_HANDLER( cliff_port_r )
 {
 	static const char *const banknames[] = { "BANK0", "BANK1", "BANK2", "BANK3", "BANK4", "BANK5", "BANK6" };
 
-	if (port_bank < 7)
-		return input_port_read(space->machine(),  banknames[port_bank]);
+	cliffhgr_state *state = space->machine().driver_data<cliffhgr_state>();
+
+	if (state->m_port_bank < 7)
+		return input_port_read(space->machine(),  banknames[state->m_port_bank]);
 
 	/* output is pulled up for non-mapped ports */
 	return 0xff;
@@ -120,10 +135,8 @@ static READ8_HANDLER( cliff_port_r )
 
 static READ8_HANDLER( cliff_phillips_code_r )
 {
-	if (laserdisc != NULL)
-		return (phillips_code >> (8 * offset)) & 0xff;
-
-	return 0x00;
+	cliffhgr_state *state = space->machine().driver_data<cliffhgr_state>();
+	return (state->m_phillips_code >> (8 * offset)) & 0xff;
 }
 
 static WRITE8_HANDLER( cliff_phillips_clear_w )
@@ -155,7 +168,8 @@ static WRITE8_DEVICE_HANDLER( cliff_sound_overlay_w )
 
 static WRITE8_HANDLER( cliff_ldwire_w )
 {
-	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	cliffhgr_state *state = space->machine().driver_data<cliffhgr_state>();
+	state->m_laserdisc->control_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -163,29 +177,30 @@ static WRITE8_HANDLER( cliff_ldwire_w )
 
 static TIMER_CALLBACK( cliff_irq_callback )
 {
-	phillips_code = 0;
+	cliffhgr_state *state = machine.driver_data<cliffhgr_state>();
+	state->m_phillips_code = 0;
 
 	switch (param)
 	{
 		case 17:
-			phillips_code = laserdisc_get_field_code(laserdisc, LASERDISC_CODE_LINE17, TRUE);
+			state->m_phillips_code = state->m_laserdisc->get_field_code(LASERDISC_CODE_LINE17, true);
 			param = 18;
 			break;
 
 		case 18:
-			phillips_code = laserdisc_get_field_code(laserdisc, LASERDISC_CODE_LINE18, TRUE);
+			state->m_phillips_code = state->m_laserdisc->get_field_code(LASERDISC_CODE_LINE18, true);
 			param = 17;
 			break;
 	}
 
 	/* if we have a valid code, trigger an IRQ */
-	if (phillips_code & 0x800000)
+	if (state->m_phillips_code & 0x800000)
 	{
 //      printf("%2d:code = %06X\n", param, phillips_code);
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	}
 
-	irq_timer->adjust(machine.primary_screen->time_until_pos(param * 2), param);
+	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(param * 2), param);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
@@ -197,15 +212,16 @@ static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
 
 static MACHINE_START( cliffhgr )
 {
-	laserdisc = machine.device("laserdisc");
-	irq_timer = machine.scheduler().timer_alloc(FUNC(cliff_irq_callback));
+	cliffhgr_state *state = machine.driver_data<cliffhgr_state>();
+	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(cliff_irq_callback));
 }
 
 static MACHINE_RESET( cliffhgr )
 {
-	port_bank = 0;
-	phillips_code = 0;
-	irq_timer->adjust(machine.primary_screen->time_until_pos(17), 17);
+	cliffhgr_state *state = machine.driver_data<cliffhgr_state>();
+	state->m_port_bank = 0;
+	state->m_phillips_code = 0;
+	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(17), 17);
 }
 
 /********************************************************/
@@ -655,11 +671,11 @@ static TMS9928A_INTERFACE(cliffhgr_tms9928a_interface)
 	DEVCB_LINE(vdp_interrupt)
 };
 
-static SCREEN_UPDATE( cliffhgr )
+static SCREEN_UPDATE_IND16( cliffhgr )
 {
 	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
 
-	tms9928a->update( bitmap, cliprect );
+	tms9928a->screen_update( screen, bitmap, cliprect );
 	return 0;
 }
 
@@ -673,7 +689,7 @@ DISCRETE_SOUND_EXTERN( cliffhgr );
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cliffhgr, driver_device )
+static MACHINE_CONFIG_START( cliffhgr, cliffhgr_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmem)
@@ -684,8 +700,8 @@ static MACHINE_CONFIG_START( cliffhgr, driver_device )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(cliffhgr, TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_NTSC, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_PR8210_ADD("laserdisc")
+	MCFG_LASERDISC_OVERLAY(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_NTSC, cliffhgr)
 	MCFG_LASERDISC_OVERLAY_CLIP(TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START+32*8+12-1, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC+24*8+12-1)
 
 	/* start with the TMS9928a video configuration */
@@ -693,12 +709,12 @@ static MACHINE_CONFIG_START( cliffhgr, driver_device )
 
 	/* override video rendering and raw screen info */
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

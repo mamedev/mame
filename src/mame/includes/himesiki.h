@@ -28,7 +28,7 @@ public:
 /*----------- defined in video/himesiki.c -----------*/
 
 VIDEO_START( himesiki );
-SCREEN_UPDATE( himesiki );
+SCREEN_UPDATE_IND16( himesiki );
 
 WRITE8_HANDLER( himesiki_bg_ram_w );
 WRITE8_HANDLER( himesiki_scrollx_w );

@@ -91,15 +91,15 @@ WRITE8_HANDLER( shuttlei_sh_port_2_w );
 
 MACHINE_START( extra_8080bw_vh );
 
-SCREEN_UPDATE( invadpt2 );
-SCREEN_UPDATE( ballbomb );
-SCREEN_UPDATE( schaser );
-SCREEN_UPDATE( schasercv );
-SCREEN_UPDATE( rollingc );
-SCREEN_UPDATE( polaris );
-SCREEN_UPDATE( lupin3 );
-SCREEN_UPDATE( cosmo );
-SCREEN_UPDATE( indianbt );
-SCREEN_UPDATE( shuttlei );
-SCREEN_UPDATE( sflush );
+SCREEN_UPDATE_RGB32( invadpt2 );
+SCREEN_UPDATE_RGB32( ballbomb );
+SCREEN_UPDATE_RGB32( schaser );
+SCREEN_UPDATE_RGB32( schasercv );
+SCREEN_UPDATE_RGB32( rollingc );
+SCREEN_UPDATE_RGB32( polaris );
+SCREEN_UPDATE_RGB32( lupin3 );
+SCREEN_UPDATE_RGB32( cosmo );
+SCREEN_UPDATE_RGB32( indianbt );
+SCREEN_UPDATE_RGB32( shuttlei );
+SCREEN_UPDATE_RGB32( sflush );
 

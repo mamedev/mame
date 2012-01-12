@@ -28,7 +28,7 @@ PALETTE_INIT( warpwarp );
 VIDEO_START( geebee );
 VIDEO_START( navarone );
 VIDEO_START( warpwarp );
-SCREEN_UPDATE( geebee );
+SCREEN_UPDATE_IND16( geebee );
 WRITE8_HANDLER( warpwarp_videoram_w );
 WRITE8_HANDLER( geebee_videoram_w );
 

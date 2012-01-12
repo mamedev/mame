@@ -34,7 +34,7 @@ static VIDEO_START(summit)
 {
 }
 
-static SCREEN_UPDATE(summit)
+static SCREEN_UPDATE_IND16(summit)
 {
 	summit_state *state = screen.machine().driver_data<summit_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -302,10 +302,9 @@ static MACHINE_CONFIG_START( summit, summit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE(summit)
+	MCFG_SCREEN_UPDATE_STATIC(summit)
 
 	MCFG_GFXDECODE(summit)
 

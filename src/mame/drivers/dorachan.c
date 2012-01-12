@@ -77,7 +77,7 @@ static void get_pens(pen_t *pens)
 }
 
 
-static SCREEN_UPDATE( dorachan )
+static SCREEN_UPDATE_RGB32( dorachan )
 {
 	dorachan_state *state = screen.machine().driver_data<dorachan_state>();
 	pen_t pens[NUM_PENS];
@@ -250,11 +250,10 @@ static MACHINE_CONFIG_START( dorachan, dorachan_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE(dorachan)
+	MCFG_SCREEN_UPDATE_STATIC(dorachan)
 
 MACHINE_CONFIG_END
 

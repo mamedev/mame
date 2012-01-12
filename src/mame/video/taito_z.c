@@ -146,7 +146,7 @@ confirmed
 ********************************************************/
 
 
-static void contcirc_draw_sprites_16x8( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int y_offs )
+static void contcirc_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
@@ -241,7 +241,7 @@ static void contcirc_draw_sprites_16x8( running_machine &machine, bitmap_t &bitm
 
 
 
-static void chasehq_draw_sprites_16x16( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int y_offs )
+static void chasehq_draw_sprites_16x16( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
@@ -427,7 +427,7 @@ static void chasehq_draw_sprites_16x16( running_machine &machine, bitmap_t &bitm
 
 
 
-static void bshark_draw_sprites_16x8( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int y_offs )
+static void bshark_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
@@ -523,7 +523,7 @@ static void bshark_draw_sprites_16x8( running_machine &machine, bitmap_t &bitmap
 
 
 
-static void sci_draw_sprites_16x8( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int y_offs )
+static void sci_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
@@ -628,7 +628,7 @@ static void sci_draw_sprites_16x8( running_machine &machine, bitmap_t &bitmap, c
 
 
 
-static void aquajack_draw_sprites_16x8(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int y_offs)
+static void aquajack_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
@@ -723,7 +723,7 @@ static void aquajack_draw_sprites_16x8(running_machine &machine, bitmap_t &bitma
 
 
 
-static void spacegun_draw_sprites_16x8(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int y_offs)
+static void spacegun_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
@@ -842,7 +842,7 @@ WRITE16_HANDLER( contcirc_out_w )
 }
 
 
-SCREEN_UPDATE( contcirc )
+SCREEN_UPDATE_IND16( contcirc )
 {
 	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -869,7 +869,7 @@ SCREEN_UPDATE( contcirc )
 
 /* Nightstr and ChaseHQ */
 
-SCREEN_UPDATE( chasehq )
+SCREEN_UPDATE_IND16( chasehq )
 {
 	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -895,7 +895,7 @@ SCREEN_UPDATE( chasehq )
 }
 
 
-SCREEN_UPDATE( bshark )
+SCREEN_UPDATE_IND16( bshark )
 {
 	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -921,7 +921,7 @@ SCREEN_UPDATE( bshark )
 }
 
 
-SCREEN_UPDATE( sci )
+SCREEN_UPDATE_IND16( sci )
 {
 	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -947,7 +947,7 @@ SCREEN_UPDATE( sci )
 }
 
 
-SCREEN_UPDATE( aquajack )
+SCREEN_UPDATE_IND16( aquajack )
 {
 	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -973,7 +973,7 @@ SCREEN_UPDATE( aquajack )
 }
 
 
-SCREEN_UPDATE( spacegun )
+SCREEN_UPDATE_IND16( spacegun )
 {
 	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -999,7 +999,7 @@ SCREEN_UPDATE( spacegun )
 }
 
 
-SCREEN_UPDATE( dblaxle )
+SCREEN_UPDATE_IND16( dblaxle )
 {
 	taitoz_state *state = screen.machine().driver_data<taitoz_state>();
 	UINT8 layer[5];

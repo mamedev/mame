@@ -104,7 +104,7 @@ VIDEO_START( atarifb )
 
 
 
-static void draw_playfield_and_alpha( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int playfield_x_offset, int playfield_y_offset )
+static void draw_playfield_and_alpha( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int playfield_x_offset, int playfield_y_offset )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
 	const rectangle bigfield_area(4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1);
@@ -121,7 +121,7 @@ static void draw_playfield_and_alpha( running_machine &machine, bitmap_t &bitmap
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int gfx, int is_soccer )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, int is_soccer )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
 	const rectangle bigfield_area(4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1);
@@ -180,7 +180,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-SCREEN_UPDATE( atarifb )
+SCREEN_UPDATE_IND16( atarifb )
 {
 	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, 0, 0);
 
@@ -190,7 +190,7 @@ SCREEN_UPDATE( atarifb )
 }
 
 
-SCREEN_UPDATE( abaseb )
+SCREEN_UPDATE_IND16( abaseb )
 {
 	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, -8, 0);
 
@@ -200,7 +200,7 @@ SCREEN_UPDATE( abaseb )
 }
 
 
-SCREEN_UPDATE( soccer )
+SCREEN_UPDATE_IND16( soccer )
 {
 	draw_playfield_and_alpha(screen.machine(), bitmap, cliprect, 0, 8);
 

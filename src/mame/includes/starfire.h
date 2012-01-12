@@ -29,12 +29,12 @@ public:
     UINT8 *m_starfire_colorram;
 
     emu_timer* m_scanline_timer;
-    bitmap_t *m_starfire_screen;
+    bitmap_rgb32 m_starfire_screen;
 };
 
 /*----------- defined in video/starfire.c -----------*/
 
-SCREEN_UPDATE( starfire );
+SCREEN_UPDATE_RGB32( starfire );
 VIDEO_START( starfire );
 
 WRITE8_HANDLER( starfire_videoram_w );

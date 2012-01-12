@@ -34,4 +34,4 @@ WRITE16_HANDLER( vaportra_priority_w );
 WRITE16_HANDLER( vaportra_palette_24bit_rg_w );
 WRITE16_HANDLER( vaportra_palette_24bit_b_w );
 
-SCREEN_UPDATE( vaportra );
+SCREEN_UPDATE_IND16( vaportra );

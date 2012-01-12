@@ -29,13 +29,13 @@ public:
 /* Video emulation definitions */
 VIDEO_START( dec0 );
 VIDEO_START( dec0_nodma );
-SCREEN_UPDATE( hbarrel );
-SCREEN_UPDATE( baddudes );
-SCREEN_UPDATE( birdtry );
-SCREEN_UPDATE( robocop );
-SCREEN_UPDATE( hippodrm );
-SCREEN_UPDATE( slyspy );
-SCREEN_UPDATE( midres );
+SCREEN_UPDATE_IND16( hbarrel );
+SCREEN_UPDATE_IND16( baddudes );
+SCREEN_UPDATE_IND16( birdtry );
+SCREEN_UPDATE_IND16( robocop );
+SCREEN_UPDATE_IND16( hippodrm );
+SCREEN_UPDATE_IND16( slyspy );
+SCREEN_UPDATE_IND16( midres );
 
 WRITE16_HANDLER( dec0_priority_w );
 WRITE16_HANDLER( dec0_update_sprites_w );

@@ -123,7 +123,7 @@ VIDEO_START( polygonet )
 	state->save_item(NAME(state->m_roz_vram));
 }
 
-SCREEN_UPDATE( polygonet )
+SCREEN_UPDATE_IND16( polygonet )
 {
 	polygonet_state *state = screen.machine().driver_data<polygonet_state>();
 	device_t *k053936 = screen.machine().device("k053936");

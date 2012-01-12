@@ -47,7 +47,7 @@ VIDEO_START( system18 )
 	/* create a temp bitmap to draw the VDP data into */
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
-	state->m_tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_tmp_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
 
 
 	state->save_item(NAME(state->m_grayscale_enable));
@@ -116,11 +116,11 @@ void system18_set_vdp_mixing(running_machine &machine, int mixing)
  *
  *************************************/
 
-static void draw_vdp(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static void draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	segas1x_state *state = screen.machine().driver_data<segas1x_state>();
 	int x, y;
-	bitmap_t &priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -148,7 +148,7 @@ static void draw_vdp(screen_device &screen, bitmap_t &bitmap, const rectangle &c
  *
  *************************************/
 
-SCREEN_UPDATE( system18 )
+SCREEN_UPDATE_IND16( system18 )
 {
 	segas1x_state *state = screen.machine().driver_data<segas1x_state>();
 	int vdppri, vdplayer;

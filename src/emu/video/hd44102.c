@@ -271,7 +271,7 @@ WRITE_LINE_MEMBER( hd44102_device::cs2_w )
 //  update_screen - update screen
 //-------------------------------------------------
 
-void hd44102_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 hd44102_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 50; y++)
 	{
@@ -295,4 +295,5 @@ void hd44102_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 			z %= 32;
 		}
 	}
+	return 0;
 }

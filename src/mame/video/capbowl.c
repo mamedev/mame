@@ -165,7 +165,7 @@ INLINE rgb_t pen_for_pixel( UINT8 *src, UINT8 pix )
 }
 
 
-SCREEN_UPDATE( capbowl )
+SCREEN_UPDATE_RGB32( capbowl )
 {
 	struct tms34061_display state;
 	int x, y;

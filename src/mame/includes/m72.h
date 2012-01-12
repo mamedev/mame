@@ -67,5 +67,5 @@ WRITE16_HANDLER( m72_port02_w );
 WRITE16_HANDLER( rtype2_port02_w );
 WRITE16_HANDLER( majtitle_gfx_ctrl_w );
 
-SCREEN_UPDATE( m72 );
-SCREEN_UPDATE( majtitle );
+SCREEN_UPDATE_IND16( m72 );
+SCREEN_UPDATE_IND16( majtitle );

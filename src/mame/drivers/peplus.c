@@ -672,7 +672,7 @@ static VIDEO_START( peplus )
 	memset(state->m_palette_ram2, 0, 0x3000);
 }
 
-static SCREEN_UPDATE( peplus )
+static SCREEN_UPDATE_IND16( peplus )
 {
 	peplus_state *state = screen.machine().driver_data<peplus_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -1037,10 +1037,9 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_UPDATE(peplus)
+	MCFG_SCREEN_UPDATE_STATIC(peplus)
 
 	MCFG_GFXDECODE(peplus)
 	MCFG_PALETTE_LENGTH(16*16*2)

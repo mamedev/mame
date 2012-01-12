@@ -92,11 +92,11 @@ READ8_HANDLER( victnine_mcu_status_r );
 /*----------- defined in video/flstory.c -----------*/
 
 VIDEO_START( flstory );
-SCREEN_UPDATE( flstory );
+SCREEN_UPDATE_IND16( flstory );
 VIDEO_START( victnine );
-SCREEN_UPDATE( victnine );
+SCREEN_UPDATE_IND16( victnine );
 VIDEO_START( rumba );
-SCREEN_UPDATE( rumba );
+SCREEN_UPDATE_IND16( rumba );
 
 WRITE8_HANDLER( flstory_videoram_w );
 READ8_HANDLER( flstory_palette_r );

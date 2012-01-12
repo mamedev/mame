@@ -45,9 +45,9 @@ int vicdual_is_cabinet_color(running_machine &machine);
 
 WRITE8_HANDLER( vicdual_palette_bank_w );
 
-SCREEN_UPDATE( vicdual_bw );
-SCREEN_UPDATE( vicdual_color );
-SCREEN_UPDATE( vicdual_bw_or_color );
+SCREEN_UPDATE_RGB32( vicdual_bw );
+SCREEN_UPDATE_RGB32( vicdual_color );
+SCREEN_UPDATE_RGB32( vicdual_bw_or_color );
 
 
 /*----------- defined in audio/vicdual.c -----------*/

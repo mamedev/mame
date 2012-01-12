@@ -15,7 +15,7 @@ ADDRESS_MAP_EXTERN( adder2_memmap, 8 );
 
 VIDEO_START(  adder2 );
 VIDEO_RESET(  adder2 );
-SCREEN_UPDATE( adder2 );
+SCREEN_UPDATE_IND16( adder2 );
 PALETTE_INIT( adder2 );
 
 #endif

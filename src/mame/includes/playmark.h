@@ -71,8 +71,8 @@ VIDEO_START( excelsr );
 VIDEO_START( hotmind );
 VIDEO_START( hrdtimes );
 
-SCREEN_UPDATE( bigtwin );
-SCREEN_UPDATE( bigtwinb );
-SCREEN_UPDATE( wbeachvl );
-SCREEN_UPDATE( excelsr );
-SCREEN_UPDATE( hrdtimes );
+SCREEN_UPDATE_IND16( bigtwin );
+SCREEN_UPDATE_IND16( bigtwinb );
+SCREEN_UPDATE_IND16( wbeachvl );
+SCREEN_UPDATE_IND16( excelsr );
+SCREEN_UPDATE_IND16( hrdtimes );

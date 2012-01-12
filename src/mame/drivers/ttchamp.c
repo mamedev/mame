@@ -60,7 +60,7 @@ static VIDEO_START(ttchamp)
 {
 }
 
-static SCREEN_UPDATE(ttchamp)
+static SCREEN_UPDATE_IND16(ttchamp)
 {
 	ttchamp_state *state = screen.machine().driver_data<ttchamp_state>();
 	int y,x,count;
@@ -244,10 +244,9 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE(ttchamp)
+	MCFG_SCREEN_UPDATE_STATIC(ttchamp)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 

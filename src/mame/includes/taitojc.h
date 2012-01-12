@@ -24,8 +24,8 @@ public:
 	INT32 m_intersection_data[3];
 
 	UINT8 *m_texture;
-	bitmap_t *m_framebuffer;
-	bitmap_t *m_zbuffer;
+	bitmap_ind16 m_framebuffer;
+	bitmap_ind16 m_zbuffer;
 
 	UINT32 *m_vram;
 	UINT32 *m_objlist;
@@ -73,7 +73,7 @@ void taitojc_clear_frame(running_machine &machine);
 void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length);
 
 VIDEO_START(taitojc);
-SCREEN_UPDATE(taitojc);
+SCREEN_UPDATE_IND16(taitojc);
 
 const double taitojc_odometer_table[0x100] =
 {

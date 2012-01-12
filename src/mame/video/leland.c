@@ -388,7 +388,7 @@ READ8_HANDLER( ataxx_svram_port_r )
  *
  *************************************/
 
-static SCREEN_UPDATE( leland )
+static SCREEN_UPDATE_IND16( leland )
 {
 	leland_state *state = screen.machine().driver_data<leland_state>();
 	int y;
@@ -457,7 +457,7 @@ static SCREEN_UPDATE( leland )
  *
  *************************************/
 
-static SCREEN_UPDATE( ataxx )
+static SCREEN_UPDATE_IND16( ataxx )
 {
 	leland_state *state = screen.machine().driver_data<leland_state>();
 	int y;
@@ -531,16 +531,15 @@ MACHINE_CONFIG_FRAGMENT( leland_video )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE(leland)
+	MCFG_SCREEN_UPDATE_STATIC(leland)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( ataxx_video, leland_video )
 	MCFG_VIDEO_START(ataxx)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(ataxx)
+	MCFG_SCREEN_UPDATE_STATIC(ataxx)
 MACHINE_CONFIG_END

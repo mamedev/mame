@@ -71,6 +71,8 @@ VIDEO_START( magmax )
 	state_save_register_global(machine, state->m_flipscreen);
 
 	state->m_prom_tab = auto_alloc_array(machine, UINT32, 256);
+	
+	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	/* Allocate temporary bitmap */
 	for (i=0; i<256; i++)
@@ -82,7 +84,7 @@ VIDEO_START( magmax )
 
 
 
-SCREEN_UPDATE( magmax )
+SCREEN_UPDATE_IND16( magmax )
 {
 	magmax_state *state = screen.machine().driver_data<magmax_state>();
 	UINT16 *videoram = state->m_videoram;
@@ -103,7 +105,7 @@ SCREEN_UPDATE( magmax )
 		UINT32 scroll_v = (*state->m_scroll_y) & 0xff;
 
 		/*clear background-over-sprites bitmap*/
-		screen.default_bitmap().fill(0);
+		state->m_bitmap.fill(0);
 
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{
@@ -154,7 +156,7 @@ SCREEN_UPDATE( magmax )
 
 				/*priority: background over sprites*/
 				if (map_v_scr_100 && ((graph_data & 0x0c)==0x0c))
-					screen.default_bitmap().pix16(v, h) = line_data[h];
+					state->m_bitmap.pix16(v, h) = line_data[h];
 			}
 
 			if (state->m_flipscreen)
@@ -209,7 +211,7 @@ SCREEN_UPDATE( magmax )
 	}
 
 	if (!(*state->m_vreg & 0x40))		/* background disable */
-		copybitmap_trans(bitmap, screen.default_bitmap(), state->m_flipscreen,state->m_flipscreen,0,0, cliprect, 0);
+		copybitmap_trans(bitmap, state->m_bitmap, state->m_flipscreen,state->m_flipscreen,0,0, cliprect, 0);
 
 	/* draw the foreground characters */
 	for (offs = 32*32-1; offs >= 0; offs -= 1)

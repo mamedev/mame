@@ -53,5 +53,5 @@ WRITE8_HANDLER( blktiger_scrollx_w );
 WRITE8_HANDLER( blktiger_scrolly_w );
 
 VIDEO_START( blktiger );
-SCREEN_UPDATE( blktiger );
+SCREEN_UPDATE_IND16( blktiger );
 SCREEN_EOF( blktiger );

@@ -82,7 +82,7 @@ void cdp1861_device::device_start()
 	// find devices
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	m_screen =  machine().device<screen_device>(m_screen_tag);
-	m_bitmap = auto_bitmap_alloc(machine(), m_screen->width(), m_screen->height(), m_screen->format());
+	m_bitmap.allocate(m_screen->width(), m_screen->height(), m_screen->format());
 
 	// register for state saving
 	save_item(NAME(m_disp));
@@ -214,7 +214,7 @@ WRITE8_MEMBER( cdp1861_device::dma_w )
 	for (x = 0; x < 8; x++)
 	{
 		int color = BIT(data, 7);
-		m_bitmap->pix16(y, sx + x) = color;
+		m_bitmap.pix16(y, sx + x) = color;
 		data <<= 1;
 	}
 }
@@ -248,17 +248,18 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
 
 
 //-------------------------------------------------
-//  update_screen -
+//  screen_update -
 //-------------------------------------------------
 
-void cdp1861_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 cdp1861_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_disp)
 	{
-		copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
+	return 0;
 }

@@ -1449,11 +1449,10 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE(atarigx2)
+	MCFG_SCREEN_UPDATE_STATIC(atarigx2)
 	MCFG_SCREEN_EOF(atarigx2)
 
 	MCFG_VIDEO_START(atarigx2)

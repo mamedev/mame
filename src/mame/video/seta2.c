@@ -161,7 +161,7 @@ WRITE16_HANDLER( seta2_vregs_w )
 
 ***************************************************************************/
 
-static void seta_drawgfx(	bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx,
+static void seta_drawgfx(	bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 							int shadow_depth )
 {
@@ -212,7 +212,7 @@ static void seta_drawgfx(	bitmap_t &bitmap, const rectangle &cliprect, const gfx
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	// Sprites list
 
@@ -478,7 +478,7 @@ VIDEO_START( seta2_yoffset )
 	state->m_yoffset = 0x10;
 }
 
-SCREEN_UPDATE( seta2 )
+SCREEN_UPDATE_IND16( seta2 )
 {
 	seta2_state *state = screen.machine().driver_data<seta2_state>();
 

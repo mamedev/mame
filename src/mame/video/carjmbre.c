@@ -108,7 +108,7 @@ VIDEO_START( carjmbre )
 	state->save_item(NAME(state->m_bgcolor));
 }
 
-SCREEN_UPDATE( carjmbre )
+SCREEN_UPDATE_IND16( carjmbre )
 {
 	carjmbre_state *state = screen.machine().driver_data<carjmbre_state>();
 	int offs, troffs, sx, sy, flipx, flipy;

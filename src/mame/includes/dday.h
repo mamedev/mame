@@ -22,7 +22,7 @@ public:
 	tilemap_t        *m_bg_tilemap;
 	tilemap_t        *m_text_tilemap;
 	tilemap_t        *m_sl_tilemap;
-	bitmap_t       *m_main_bitmap;
+	bitmap_ind16 m_main_bitmap;
 	int            m_control;
 	int            m_sl_image;
 	int            m_sl_enable;
@@ -37,7 +37,7 @@ public:
 
 PALETTE_INIT( dday );
 VIDEO_START( dday );
-SCREEN_UPDATE( dday );
+SCREEN_UPDATE_IND16( dday );
 
 WRITE8_HANDLER( dday_bgvideoram_w );
 WRITE8_HANDLER( dday_fgvideoram_w );

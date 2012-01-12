@@ -102,7 +102,7 @@ static void namconb1_install_palette(running_machine &machine)
 } /* namconb1_install_palette */
 
 static void
-video_update_common(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bROZ )
+video_update_common(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ )
 {
 	int pri;
 	namconb1_install_palette(machine);
@@ -131,7 +131,7 @@ video_update_common(running_machine &machine, bitmap_t &bitmap, const rectangle 
 
 /************************************************************************************************/
 
-SCREEN_UPDATE( namconb1 )
+SCREEN_UPDATE_IND16( namconb1 )
 {
 	/* compute window for custom screen blanking */
 	rectangle clip;
@@ -171,7 +171,7 @@ VIDEO_START( namconb1 )
 
 /****************************************************************************************************/
 
-SCREEN_UPDATE( namconb2 )
+SCREEN_UPDATE_IND16( namconb2 )
 {
 	namconb1_state *state = screen.machine().driver_data<namconb1_state>();
 	/* compute window for custom screen blanking */

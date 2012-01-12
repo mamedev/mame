@@ -5,7 +5,7 @@
 
 /* Video on the orginal */
 
-SCREEN_UPDATE( pktgaldx )
+SCREEN_UPDATE_IND16( pktgaldx )
 {
 	pktgaldx_state *state = screen.machine().driver_data<pktgaldx_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
@@ -17,14 +17,14 @@ SCREEN_UPDATE( pktgaldx )
 	screen.machine().priority_bitmap.fill(0);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0x400, true);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400, true);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 /* Video for the bootleg */
 
-SCREEN_UPDATE( pktgaldb )
+SCREEN_UPDATE_IND16( pktgaldb )
 {
 	pktgaldx_state *state = screen.machine().driver_data<pktgaldx_state>();
 	int x, y;

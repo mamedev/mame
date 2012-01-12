@@ -191,7 +191,7 @@ void deco_bac06_device::device_reset()
 
 
 void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
-								bitmap_t &bitmap,
+								bitmap_ind16 &bitmap,
 								const rectangle &cliprect,
 								tilemap_t *tilemap_ptr,
 								const UINT16 *rowscroll_ptr,
@@ -205,8 +205,8 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 								UINT16 colpricondition
 								)
 {
-	const bitmap_t &src_bitmap = tilemap_get_pixmap(tilemap_ptr);
-	const bitmap_t &flags_bitmap = tilemap_get_flagsmap(tilemap_ptr);
+	const bitmap_ind16 &src_bitmap = tilemap_get_pixmap(tilemap_ptr);
+	const bitmap_ind8 &flags_bitmap = tilemap_get_flagsmap(tilemap_ptr);
 	int x, y, p, colpri;
 	int column_offset=0, src_x=0, src_y=0;
 	UINT32 scrollx = 0;
@@ -285,7 +285,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 	}
 }
 
-void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_t &bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
+void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
 {
 	tilemap_t* tm = 0;
 
@@ -319,7 +319,7 @@ void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_t &bi
 }
 
 // used for pocket gal bootleg, which doesn't set registers properly and simply expects a fixed size tilemap.
-void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_t &bitmap,const rectangle &cliprect,int flags, int mode, int type)
+void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type)
 {
 	tilemap_t* tm = 0;
 	if (!mode) tm = pf8x8_tilemap[type];

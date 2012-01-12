@@ -314,15 +314,6 @@ static VIDEO_START(ssingles)
 }
 
 
-static SCREEN_UPDATE( ssingles )
-{
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
-	mc6845->update(bitmap, cliprect);
-
-	return 0;
-}
-
-
 static READ8_HANDLER(c000_r)
 {
 	ssingles_state *state = space->machine().driver_data<ssingles_state>();
@@ -578,9 +569,8 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
-	MCFG_SCREEN_UPDATE(ssingles)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(4) //guess
 

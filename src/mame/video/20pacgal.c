@@ -73,7 +73,7 @@ static void get_pens(running_machine &machine, const _20pacgal_state *state, pen
 }
 
 
-static void do_pen_lookup(running_machine &machine, const _20pacgal_state *state, bitmap_t &bitmap, const rectangle &cliprect)
+static void do_pen_lookup(running_machine &machine, const _20pacgal_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS + NUM_STAR_PENS];
@@ -93,7 +93,7 @@ static void do_pen_lookup(running_machine &machine, const _20pacgal_state *state
  *
  *************************************/
 
-static void draw_sprite(running_machine& machine, const _20pacgal_state *state, bitmap_t &bitmap, int y, int x,
+static void draw_sprite(running_machine& machine, const _20pacgal_state *state, bitmap_rgb32 &bitmap, int y, int x,
 						UINT8 code, UINT8 color, int flip_y, int flip_x)
 {
 	int sy;
@@ -163,7 +163,7 @@ static void draw_sprite(running_machine& machine, const _20pacgal_state *state, 
 }
 
 
-static void draw_sprites(running_machine& machine,const _20pacgal_state *state, bitmap_t &bitmap)
+static void draw_sprites(running_machine& machine,const _20pacgal_state *state, bitmap_rgb32 &bitmap)
 {
 	int offs;
 
@@ -215,7 +215,7 @@ static void draw_sprites(running_machine& machine,const _20pacgal_state *state, 
  *
  *************************************/
 
-static void draw_chars(const _20pacgal_state *state, bitmap_t &bitmap)
+static void draw_chars(const _20pacgal_state *state, bitmap_rgb32 &bitmap)
 {
 	offs_t offs;
 
@@ -349,7 +349,7 @@ static void draw_chars(const _20pacgal_state *state, bitmap_t &bitmap)
  *
  */
 
-static void draw_stars(_20pacgal_state *state, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_stars(_20pacgal_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	if ( (state->m_stars_ctrl[0] >> 5) & 1 )
 	{
@@ -406,7 +406,7 @@ static void draw_stars(_20pacgal_state *state, bitmap_t &bitmap, const rectangle
  *
  *************************************/
 
-static SCREEN_UPDATE( 20pacgal )
+static SCREEN_UPDATE_RGB32( 20pacgal )
 {
 	_20pacgal_state *state = screen.machine().driver_data<_20pacgal_state>();
 
@@ -431,8 +431,7 @@ MACHINE_CONFIG_FRAGMENT( 20pacgal_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
-	MCFG_SCREEN_UPDATE(20pacgal)
+	MCFG_SCREEN_UPDATE_STATIC(20pacgal)
 MACHINE_CONFIG_END

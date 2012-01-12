@@ -208,7 +208,7 @@ static VIDEO_START( miniboy7 )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 37, 37);
 }
 
-static SCREEN_UPDATE( miniboy7 )
+static SCREEN_UPDATE_IND16( miniboy7 )
 {
 	miniboy7_state *state = screen.machine().driver_data<miniboy7_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -456,10 +456,9 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((47+1)*8, (39+1)*8)                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE(miniboy7)
+	MCFG_SCREEN_UPDATE_STATIC(miniboy7)
 
 	MCFG_GFXDECODE(miniboy7)
 

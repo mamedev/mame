@@ -444,7 +444,7 @@ static void get_pens(running_machine &machine, pen_t *pens)
 }
 
 
-static SCREEN_UPDATE( berzerk )
+static SCREEN_UPDATE_RGB32( berzerk )
 {
 	berzerk_state *state = screen.machine().driver_data<berzerk_state>();
 	pen_t pens[NUM_PENS];
@@ -1084,9 +1084,8 @@ static MACHINE_CONFIG_START( berzerk, berzerk_state )
 	MCFG_VIDEO_START(berzerk)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE(berzerk)
+	MCFG_SCREEN_UPDATE_STATIC(berzerk)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -35,4 +35,4 @@ READ8_HANDLER( gyruss_scanline_r );
 
 PALETTE_INIT( gyruss );
 VIDEO_START( gyruss );
-SCREEN_UPDATE( gyruss );
+SCREEN_UPDATE_IND16( gyruss );

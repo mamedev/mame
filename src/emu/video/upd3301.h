@@ -66,8 +66,8 @@
 
 // ======================> upd3301_display_pixels_func
 
-typedef void (*upd3301_display_pixels_func)(device_t *device, bitmap_t &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa);
-#define UPD3301_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
+typedef void (*upd3301_display_pixels_func)(device_t *device, bitmap_ind16 &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa);
+#define UPD3301_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_ind16 &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
 
 
 // ======================> upd3301_interface
@@ -103,7 +103,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( hrtc_r );
 	DECLARE_READ_LINE_MEMBER( vrtc_r );
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -136,7 +136,7 @@ private:
 	screen_device *m_screen;
 
 	// screen drawing
-	bitmap_t *m_bitmap;				// bitmap
+	bitmap_ind16 *m_bitmap;		// bitmap
 	int m_y;						// current scanline
 	int m_hrtc;						// horizontal retrace
 	int m_vrtc;						// vertical retrace

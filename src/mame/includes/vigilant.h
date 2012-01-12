@@ -12,7 +12,7 @@ public:
 	int m_rear_color;
 	int m_rear_disable;
 	int m_rear_refresh;
-	bitmap_t *m_bg_bitmap;
+	bitmap_ind16 *m_bg_bitmap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
 };
@@ -26,5 +26,5 @@ WRITE8_HANDLER( vigilant_paletteram_w );
 WRITE8_HANDLER( vigilant_horiz_scroll_w );
 WRITE8_HANDLER( vigilant_rear_horiz_scroll_w );
 WRITE8_HANDLER( vigilant_rear_color_w );
-SCREEN_UPDATE( vigilant );
-SCREEN_UPDATE( kikcubic );
+SCREEN_UPDATE_IND16( vigilant );
+SCREEN_UPDATE_IND16( kikcubic );

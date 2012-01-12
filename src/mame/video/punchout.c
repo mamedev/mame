@@ -205,7 +205,7 @@ WRITE8_HANDLER( punchout_spr2_videoram_w )
 
 
 
-static void draw_big_sprite(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int palette)
+static void draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int zoom;
@@ -249,7 +249,7 @@ static void draw_big_sprite(running_machine &machine, bitmap_t &bitmap, const re
 }
 
 
-static void armwrest_draw_big_sprite(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int palette)
+static void armwrest_draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int zoom;
@@ -296,7 +296,7 @@ static void armwrest_draw_big_sprite(running_machine &machine, bitmap_t &bitmap,
 	}
 }
 
-static void drawbs2(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void drawbs2(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int sx,sy;
@@ -369,7 +369,7 @@ static void punchout_copy_bot_palette(running_machine &machine, int bank)
 }
 
 
-SCREEN_UPDATE( punchout_top )
+SCREEN_UPDATE_IND16( punchout_top )
 {
 	punchout_state *state = screen.machine().driver_data<punchout_state>();
 
@@ -383,7 +383,7 @@ SCREEN_UPDATE( punchout_top )
 	return 0;
 }
 
-SCREEN_UPDATE( punchout_bottom )
+SCREEN_UPDATE_IND16( punchout_bottom )
 {
 	punchout_state *state = screen.machine().driver_data<punchout_state>();
 	int offs;
@@ -404,7 +404,7 @@ SCREEN_UPDATE( punchout_bottom )
 }
 
 
-SCREEN_UPDATE( armwrest_top )
+SCREEN_UPDATE_IND16( armwrest_top )
 {
 	punchout_state *state = screen.machine().driver_data<punchout_state>();
 
@@ -418,7 +418,7 @@ SCREEN_UPDATE( armwrest_top )
 	return 0;
 }
 
-SCREEN_UPDATE( armwrest_bottom )
+SCREEN_UPDATE_IND16( armwrest_bottom )
 {
 	punchout_state *state = screen.machine().driver_data<punchout_state>();
 

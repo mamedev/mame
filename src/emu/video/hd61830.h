@@ -68,7 +68,7 @@ public:
     DECLARE_READ8_MEMBER( data_r );
     DECLARE_WRITE8_MEMBER( data_w );
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -87,10 +87,10 @@ protected:
 private:
 	void set_busy_flag();
 
-	void draw_scanline(bitmap_t &bitmap, const rectangle &cliprect, int y, UINT16 ra);
-	void update_graphics(bitmap_t &bitmap, const rectangle &cliprect);
-	void draw_char(bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md);
-	void update_text(bitmap_t &bitmap, const rectangle &cliprect);
+	void draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra);
+	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md);
+	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
     devcb_resolved_read8 m_in_rd_func;
 

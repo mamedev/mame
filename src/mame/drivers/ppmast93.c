@@ -349,7 +349,7 @@ static VIDEO_START( ppmast93 )
 	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
 }
 
-static SCREEN_UPDATE( ppmast93 )
+static SCREEN_UPDATE_IND16( ppmast93 )
 {
 	ppmast93_state *state = screen.machine().driver_data<ppmast93_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
@@ -373,10 +373,9 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(ppmast93)
+	MCFG_SCREEN_UPDATE_STATIC(ppmast93)
 
 	MCFG_GFXDECODE(ppmast93)
 

@@ -40,8 +40,8 @@ public:
 
 /*----------- defined in video/namconb1.c -----------*/
 
-SCREEN_UPDATE( namconb1 );
+SCREEN_UPDATE_IND16( namconb1 );
 VIDEO_START( namconb1 );
 
-SCREEN_UPDATE( namconb2 );
+SCREEN_UPDATE_IND16( namconb2 );
 VIDEO_START( namconb2 );

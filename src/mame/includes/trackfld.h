@@ -42,6 +42,6 @@ WRITE8_HANDLER( atlantol_gfxbank_w );
 
 PALETTE_INIT( trackfld );
 VIDEO_START( trackfld );
-SCREEN_UPDATE( trackfld );
+SCREEN_UPDATE_IND16( trackfld );
 VIDEO_START( atlantol );
 

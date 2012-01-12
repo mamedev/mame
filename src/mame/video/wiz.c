@@ -97,7 +97,7 @@ WRITE8_HANDLER( wiz_flipy_w )
 	state->m_flipy = data;
 }
 
-static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bank, int colortype)
+static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, int colortype)
 {
 	wiz_state *state = machine.driver_data<wiz_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -138,7 +138,7 @@ static void draw_background(running_machine &machine, bitmap_t &bitmap, const re
 	}
 }
 
-static void draw_foreground(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int colortype)
+static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int colortype)
 {
 	wiz_state *state = machine.driver_data<wiz_state>();
 	int offs;
@@ -177,7 +177,7 @@ static void draw_foreground(running_machine &machine, bitmap_t &bitmap, const re
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 						 const rectangle &cliprect, UINT8* sprite_ram,
                          int bank)
 {
@@ -206,7 +206,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,
 }
 
 
-SCREEN_UPDATE( kungfut )
+SCREEN_UPDATE_IND16( kungfut )
 {
 	wiz_state *state = screen.machine().driver_data<wiz_state>();
 	bitmap.fill(state->m_bgpen, cliprect);
@@ -217,7 +217,7 @@ SCREEN_UPDATE( kungfut )
 	return 0;
 }
 
-SCREEN_UPDATE( wiz )
+SCREEN_UPDATE_IND16( wiz )
 {
 	wiz_state *state = screen.machine().driver_data<wiz_state>();
 	int bank;
@@ -238,7 +238,7 @@ SCREEN_UPDATE( wiz )
 }
 
 
-SCREEN_UPDATE( stinger )
+SCREEN_UPDATE_IND16( stinger )
 {
 	wiz_state *state = screen.machine().driver_data<wiz_state>();
 	bitmap.fill(state->m_bgpen, cliprect);

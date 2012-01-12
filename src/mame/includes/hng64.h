@@ -107,5 +107,5 @@ WRITE32_HANDLER( hng64_videoram_w );
 void hng64_command3d(running_machine& machine, const UINT16* packet);
 
 VIDEO_START( hng64 );
-SCREEN_UPDATE( hng64 );
+SCREEN_UPDATE_RGB32( hng64 );
 SCREEN_EOF( hng64 );

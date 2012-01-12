@@ -162,7 +162,7 @@ public:
 
 	required_device<h63484_device> m_h63484;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	/* misc */
 	UINT8 m_mux_data;
@@ -180,19 +180,19 @@ static H63484_DISPLAY_PIXELS( acrtc_display_pixels )
 	bitmap.pix16(y, x) = data & 0xf;
 }
 
-bool adp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 adp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
 	/* graphics */
-	m_h63484->update_screen(bitmap, cliprect);
+	m_h63484->update_screen(screen, bitmap, cliprect);
 
 	return 0;
 }
 
 
 #if 0
-static SCREEN_UPDATE( adp )
+static SCREEN_UPDATE_IND16( adp )
 {
 	adp_state *state = screen.machine().driver_data<adp_state>();
 
@@ -665,10 +665,9 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-//  MCFG_SCREEN_UPDATE(adp)
+	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x10)
 
@@ -697,10 +696,9 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-//  MCFG_SCREEN_UPDATE(adp)
+	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x10)
 
@@ -728,10 +726,9 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-//  MCFG_SCREEN_UPDATE(adp)
+	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x10)
 

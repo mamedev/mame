@@ -100,12 +100,12 @@ VIDEO_START( blswhstl );
 VIDEO_START( glfgreat );
 VIDEO_START( prmrsocr );
 
-SCREEN_UPDATE( mia );
-SCREEN_UPDATE( tmnt );
-SCREEN_UPDATE( punkshot );
-SCREEN_UPDATE( lgtnfght );
-SCREEN_UPDATE( glfgreat );
-SCREEN_UPDATE( tmnt2 );
-SCREEN_UPDATE( thndrx2 );
+SCREEN_UPDATE_IND16( mia );
+SCREEN_UPDATE_IND16( tmnt );
+SCREEN_UPDATE_IND16( punkshot );
+SCREEN_UPDATE_IND16( lgtnfght );
+SCREEN_UPDATE_IND16( glfgreat );
+SCREEN_UPDATE_IND16( tmnt2 );
+SCREEN_UPDATE_IND16( thndrx2 );
 
 SCREEN_EOF( blswhstl );

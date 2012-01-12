@@ -25,7 +25,7 @@ static const int zoomy_conv_table[] =
 };
 
 
-static void parentj_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void parentj_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -138,7 +138,7 @@ static void parentj_draw_sprites( running_machine &machine, bitmap_t &bitmap, co
 }
 
 
-SCREEN_UPDATE( parentj )
+SCREEN_UPDATE_IND16( parentj )
 {
 	taitoo_state *state = screen.machine().driver_data<taitoo_state>();
 

@@ -140,7 +140,7 @@ a split down the middle of the screen
 
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int enable_n)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int enable_n)
 {
 	angelkds_state *state = machine.driver_data<angelkds_state>();
 	const UINT8 *source = state->m_spriteram + 0x100 - 4;
@@ -272,7 +272,7 @@ VIDEO_START( angelkds )
 
 /* enable bits are uncertain */
 
-SCREEN_UPDATE( angelkds )
+SCREEN_UPDATE_IND16( angelkds )
 {
 	angelkds_state *state = screen.machine().driver_data<angelkds_state>();
 	const rectangle &visarea = screen.visible_area();

@@ -70,7 +70,7 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-static void syvalion_draw_sprites( running_machine &machine,bitmap_t &bitmap, const rectangle &cliprect )
+static void syvalion_draw_sprites( running_machine &machine,bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -163,7 +163,7 @@ static void syvalion_draw_sprites( running_machine &machine,bitmap_t &bitmap, co
 	}
 }
 
-static void recordbr_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void recordbr_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -275,7 +275,7 @@ static void recordbr_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void dleague_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void dleague_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -391,7 +391,7 @@ static void taitoh_log_vram(running_machine &machine)
 
 /**************************************************************************/
 
-SCREEN_UPDATE( syvalion )
+SCREEN_UPDATE_IND16( syvalion )
 {
 	taitoh_state *state = screen.machine().driver_data<taitoh_state>();
 
@@ -410,7 +410,7 @@ SCREEN_UPDATE( syvalion )
 }
 
 
-SCREEN_UPDATE( recordbr )
+SCREEN_UPDATE_IND16( recordbr )
 {
 	taitoh_state *state = screen.machine().driver_data<taitoh_state>();
 
@@ -441,7 +441,7 @@ SCREEN_UPDATE( recordbr )
 }
 
 
-SCREEN_UPDATE( dleague )
+SCREEN_UPDATE_IND16( dleague )
 {
 	taitoh_state *state = screen.machine().driver_data<taitoh_state>();
 

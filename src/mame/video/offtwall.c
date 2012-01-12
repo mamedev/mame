@@ -89,11 +89,11 @@ VIDEO_START( offtwall )
  *
  *************************************/
 
-SCREEN_UPDATE( offtwall )
+SCREEN_UPDATE_IND16( offtwall )
 {
 	offtwall_state *state = screen.machine().driver_data<offtwall_state>();
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

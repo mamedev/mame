@@ -21,7 +21,7 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
-	bitmap_t   *m_sprites_bitmap;
+	bitmap_ind16 m_sprites_bitmap;
 	int        m_bg_scrollx;
 	int        m_bg_scrolly;
 	int        m_fg_scrollx;
@@ -49,5 +49,5 @@ WRITE8_HANDLER( airbustr_colorram2_w );
 WRITE8_HANDLER( airbustr_scrollregs_w );
 
 VIDEO_START( airbustr );
-SCREEN_UPDATE( airbustr );
+SCREEN_UPDATE_IND16( airbustr );
 SCREEN_EOF( airbustr );

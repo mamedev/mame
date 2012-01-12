@@ -520,10 +520,9 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)	/* guess, but avoids glitching of Chameleon's high score table */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(lasso)
+	MCFG_SCREEN_UPDATE_STATIC(lasso)
 
 	MCFG_GFXDECODE(lasso)
 	MCFG_PALETTE_LENGTH(0x40)
@@ -560,7 +559,7 @@ static MACHINE_CONFIG_DERIVED( chameleo, base )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(chameleo)
+	MCFG_SCREEN_UPDATE_STATIC(chameleo)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wwjgtin, base )
@@ -578,7 +577,7 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)	// Smaller visible area?
-	MCFG_SCREEN_UPDATE(wwjgtin)
+	MCFG_SCREEN_UPDATE_STATIC(wwjgtin)
 	MCFG_GFXDECODE(wwjgtin)	// Has 1 additional layer
 	MCFG_PALETTE_LENGTH(0x40 + 16*16)
 
@@ -607,7 +606,7 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(pinbo)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(chameleo)
+	MCFG_SCREEN_UPDATE_STATIC(chameleo)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("sn76489.1")

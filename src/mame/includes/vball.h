@@ -23,7 +23,7 @@ public:
 /*----------- defined in video/vball.c -----------*/
 
 VIDEO_START( vb );
-SCREEN_UPDATE( vb );
+SCREEN_UPDATE_IND16( vb );
 void vb_bgprombank_w(running_machine &machine, int bank);
 void vb_spprombank_w(running_machine &machine, int bank);
 WRITE8_HANDLER( vb_attrib_w );

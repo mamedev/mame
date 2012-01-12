@@ -19,6 +19,6 @@ public:
 /*----------- defined in video/blstroid.c -----------*/
 
 VIDEO_START( blstroid );
-SCREEN_UPDATE( blstroid );
+SCREEN_UPDATE_IND16( blstroid );
 
 void blstroid_scanline_update(screen_device &screen, int scanline);

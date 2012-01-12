@@ -118,7 +118,7 @@ WRITE8_HANDLER (tbowl_bg2yscroll_hi)
 	state->m_bg2yscroll = (state->m_bg2yscroll & 0x00ff) | (data << 8);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int xscroll)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int xscroll)
 {
 	tbowl_state *state = machine.driver_data<tbowl_state>();
 	int offs;
@@ -214,7 +214,7 @@ VIDEO_START( tbowl )
 }
 
 
-SCREEN_UPDATE( tbowl_left )
+SCREEN_UPDATE_IND16( tbowl_left )
 {
 	tbowl_state *state = screen.machine().driver_data<tbowl_state>();
 
@@ -234,7 +234,7 @@ SCREEN_UPDATE( tbowl_left )
 	return 0;
 }
 
-SCREEN_UPDATE( tbowl_right )
+SCREEN_UPDATE_IND16( tbowl_right )
 {
 	tbowl_state *state = screen.machine().driver_data<tbowl_state>();
 

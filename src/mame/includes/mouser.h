@@ -31,4 +31,4 @@ WRITE8_HANDLER( mouser_flip_screen_x_w );
 WRITE8_HANDLER( mouser_flip_screen_y_w );
 
 PALETTE_INIT( mouser );
-SCREEN_UPDATE( mouser );
+SCREEN_UPDATE_IND16( mouser );

@@ -104,7 +104,7 @@ static WRITE8_HANDLER( bg_scroll_y_w )
 	state->m_scroll_y = data;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	dacholer_state *state = machine.driver_data<dacholer_state>();
 	int offs, code, attr, sx, sy, flipx, flipy;
@@ -136,7 +136,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static SCREEN_UPDATE(dacholer)
+static SCREEN_UPDATE_IND16(dacholer)
 {
 	dacholer_state *state = screen.machine().driver_data<dacholer_state>();
 
@@ -662,10 +662,9 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE(dacholer)
+	MCFG_SCREEN_UPDATE_STATIC(dacholer)
 
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT(dacholer)

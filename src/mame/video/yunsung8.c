@@ -194,7 +194,7 @@ VIDEO_START( yunsung8 )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( yunsung8 )
+SCREEN_UPDATE_IND16( yunsung8 )
 {
 	yunsung8_state *state = screen.machine().driver_data<yunsung8_state>();
 	int layers_ctrl = (~state->m_layers_ctrl) >> 4;

@@ -13,7 +13,7 @@ public:
 	UINT8 *m_background_pos;
 	UINT8 *m_palettebank;
 	UINT8 *m_bitmapram;
-	bitmap_t *m_tmpbitmap2;
+	bitmap_ind16 *m_tmpbitmap2;
 	UINT8 m_invertmask;
 	UINT8 m_bitmap_type;
 	tilemap_t *m_fg_tilemap;
@@ -34,4 +34,4 @@ PALETTE_INIT( popeye );
 PALETTE_INIT( popeyebl );
 VIDEO_START( skyskipr );
 VIDEO_START( popeye );
-SCREEN_UPDATE( popeye );
+SCREEN_UPDATE_IND16( popeye );

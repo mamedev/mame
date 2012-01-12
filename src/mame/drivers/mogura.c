@@ -78,7 +78,7 @@ static VIDEO_START( mogura )
 	state->m_tilemap = tilemap_create(machine, get_mogura_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
-static SCREEN_UPDATE( mogura )
+static SCREEN_UPDATE_IND16( mogura )
 {
 	mogura_state *state = screen.machine().driver_data<mogura_state>();
 	const rectangle &visarea = screen.visible_area();
@@ -215,10 +215,9 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60) // ?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(mogura)
+	MCFG_SCREEN_UPDATE_STATIC(mogura)
 
 	MCFG_PALETTE_LENGTH(32)
 

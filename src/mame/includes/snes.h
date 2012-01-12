@@ -688,7 +688,7 @@ extern struct SNES_PPU_STRUCT snes_ppu;
 extern void snes_latch_counters(running_machine &machine);
 
 extern VIDEO_START( snes );
-extern SCREEN_UPDATE( snes );
+extern SCREEN_UPDATE_RGB32( snes );
 
 extern READ8_HANDLER( snes_ppu_read );
 extern WRITE8_HANDLER( snes_ppu_write );

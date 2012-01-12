@@ -15,7 +15,7 @@ public:
 
 	/* misc video */
 	UINT8 m_road_priority;		// segaxbd
-	bitmap_t *m_tmp_bitmap;		// segaybd & segas18
+	bitmap_ind16 *m_tmp_bitmap;		// segaybd & segas18
 	UINT8 m_grayscale_enable;		// segas18
 	UINT8 m_vdp_enable;			// segas18
 	UINT8 m_vdp_mixing;			// segas18
@@ -105,23 +105,23 @@ public:
 
 VIDEO_START( hangon );
 VIDEO_START( sharrier );
-SCREEN_UPDATE( hangon );
+SCREEN_UPDATE_IND16( hangon );
 
 /*----------- defined in video/segas16a.c -----------*/
 
 VIDEO_START( system16a );
-SCREEN_UPDATE( system16a );
+SCREEN_UPDATE_IND16( system16a );
 
 /*----------- defined in video/segas16b.c -----------*/
 
 VIDEO_START( system16b );
 VIDEO_START( timscanr );
-SCREEN_UPDATE( system16b );
+SCREEN_UPDATE_IND16( system16b );
 
 /*----------- defined in video/segas18.c -----------*/
 
 VIDEO_START( system18 );
-SCREEN_UPDATE( system18 );
+SCREEN_UPDATE_IND16( system18 );
 
 void system18_set_grayscale(running_machine &machine, int enable);
 void system18_set_vdp_enable(running_machine &machine, int eanble);
@@ -131,18 +131,18 @@ void system18_set_vdp_mixing(running_machine &machine, int mixing);
 
 VIDEO_START( outrun );
 VIDEO_START( shangon );
-SCREEN_UPDATE( outrun );
-SCREEN_UPDATE( shangon );
+SCREEN_UPDATE_IND16( outrun );
+SCREEN_UPDATE_IND16( shangon );
 
 /*----------- defined in video/segaxbd.c -----------*/
 
 VIDEO_START( xboard );
-SCREEN_UPDATE( xboard );
+SCREEN_UPDATE_IND16( xboard );
 
 /*----------- defined in video/segaybd.c -----------*/
 
 VIDEO_START( yboard );
-SCREEN_UPDATE( yboard );
+SCREEN_UPDATE_IND16( yboard );
 
 
 /*----------- defined in machine/s16fd.c -----------*/

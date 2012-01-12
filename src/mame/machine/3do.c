@@ -985,7 +985,7 @@ VIDEO_START( _3do )
 
 
 /* This is incorrect! Just testing stuff */
-SCREEN_UPDATE( _3do )
+SCREEN_UPDATE_RGB32( _3do )
 {
 	_3do_state *state = screen.machine().driver_data<_3do_state>();
 	UINT32 *source_p = state->m_vram + 0x1c0000 / 4;

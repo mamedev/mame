@@ -144,7 +144,7 @@ WRITE8_HANDLER( cbasebal_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	cbasebal_state *state = machine.driver_data<cbasebal_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -178,7 +178,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( cbasebal )
+SCREEN_UPDATE_IND16( cbasebal )
 {
 	cbasebal_state *state = screen.machine().driver_data<cbasebal_state>();
 

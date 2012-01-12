@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/mugsmash.h"
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 
 	/* Each Sprite takes 16 bytes, 5 used? */
@@ -151,7 +151,7 @@ VIDEO_START( mugsmash )
 	state->m_tilemap2 = tilemap_create(machine, get_mugsmash_tile_info2, tilemap_scan_rows, 16, 16, 32, 32);
 }
 
-SCREEN_UPDATE( mugsmash )
+SCREEN_UPDATE_IND16( mugsmash )
 {
 	mugsmash_state *state = screen.machine().driver_data<mugsmash_state>();
 

@@ -167,7 +167,7 @@ WRITE8_HANDLER( nycaptor_scrlram_w )
 	tilemap_set_scrolly(state->m_bg_tilemap, offset, data);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 	int i;
@@ -249,7 +249,7 @@ static void nycaptor_setmask( running_machine &machine )
 }
 #endif
 
-SCREEN_UPDATE( nycaptor )
+SCREEN_UPDATE_IND16( nycaptor )
 {
 	nycaptor_state *state = screen.machine().driver_data<nycaptor_state>();
 

@@ -161,7 +161,7 @@ WRITE8_HANDLER( circusc_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	circusc_state *state = machine.driver_data<circusc_state>();
 	int offs;
@@ -198,7 +198,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( circusc )
+SCREEN_UPDATE_IND16( circusc )
 {
 	circusc_state *state = screen.machine().driver_data<circusc_state>();
 	int i;

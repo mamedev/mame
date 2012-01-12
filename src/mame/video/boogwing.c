@@ -3,7 +3,7 @@
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT16* spriteram_base, int gfx_region )
+static void draw_sprites( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16* spriteram_base, int gfx_region )
 {
 	boogwing_state *state = machine.driver_data<boogwing_state>();
 	int offs;
@@ -138,7 +138,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( boogwing )
+SCREEN_UPDATE_RGB32( boogwing )
 {
 	boogwing_state *state = screen.machine().driver_data<boogwing_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);

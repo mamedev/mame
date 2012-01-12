@@ -37,4 +37,4 @@ WRITE8_HANDLER( flkatck_k007121_w );
 WRITE8_HANDLER( flkatck_k007121_regs_w );
 
 VIDEO_START( flkatck );
-SCREEN_UPDATE( flkatck );
+SCREEN_UPDATE_IND16( flkatck );

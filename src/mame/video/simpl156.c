@@ -25,7 +25,7 @@ VIDEO_START( simpl156 )
 	state_save_register_global_pointer(machine, machine.generic.paletteram.u16, 0x1000/2);
 }
 
-SCREEN_UPDATE( simpl156 )
+SCREEN_UPDATE_IND16( simpl156 )
 {
 	simpl156_state *state = screen.machine().driver_data<simpl156_state>();
 
@@ -41,6 +41,6 @@ SCREEN_UPDATE( simpl156 )
 	//FIXME: flip_screen_x should not be written!
 	flip_screen_set_no_update(screen.machine(), 1);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0x800); // 0x800 needed to charlien title
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x800); // 0x800 needed to charlien title
 	return 0;
 }

@@ -183,7 +183,7 @@ VIDEO_START( esd16 )
 
 ***************************************************************************/
 
-static void esd16_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void esd16_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	esd16_state *state = machine.driver_data<esd16_state>();
 	int offs;
@@ -247,7 +247,7 @@ static void esd16_draw_sprites( running_machine &machine, bitmap_t &bitmap, cons
 }
 
 /* note, check if i can re-merge this with the other or if its really different */
-static void hedpanic_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void hedpanic_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	esd16_state *state = machine.driver_data<esd16_state>();
 	int offs;
@@ -323,7 +323,7 @@ static void hedpanic_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 
 ***************************************************************************/
 
-SCREEN_UPDATE( esd16 )
+SCREEN_UPDATE_IND16( esd16 )
 {
 	esd16_state *state = screen.machine().driver_data<esd16_state>();
 	int layers_ctrl = -1;
@@ -357,7 +357,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 
 
-SCREEN_UPDATE( hedpanic )
+SCREEN_UPDATE_IND16( hedpanic )
 {
 	esd16_state *state = screen.machine().driver_data<esd16_state>();
 	int layers_ctrl = -1;
@@ -420,7 +420,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 
 // uses older style sprites
-SCREEN_UPDATE( hedpanio )
+SCREEN_UPDATE_IND16( hedpanio )
 {
 	esd16_state *state = screen.machine().driver_data<esd16_state>();
 	int layers_ctrl = -1;

@@ -20,5 +20,5 @@ WRITE8_HANDLER( shootout_textram_w );
 
 PALETTE_INIT( shootout );
 VIDEO_START( shootout );
-SCREEN_UPDATE( shootout );
-SCREEN_UPDATE( shootouj );
+SCREEN_UPDATE_IND16( shootout );
+SCREEN_UPDATE_IND16( shootouj );

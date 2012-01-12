@@ -47,7 +47,7 @@ VIDEO_START( dragrace )
 }
 
 
-SCREEN_UPDATE( dragrace )
+SCREEN_UPDATE_IND16( dragrace )
 {
 	dragrace_state *state = screen.machine().driver_data<dragrace_state>();
 	int y;

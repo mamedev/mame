@@ -60,7 +60,7 @@ public:
 /*----------- defined in video/victory.c -----------*/
 
 VIDEO_START( victory );
-SCREEN_UPDATE( victory );
+SCREEN_UPDATE_IND16( victory );
 INTERRUPT_GEN( victory_vblank_interrupt );
 
 READ8_HANDLER( victory_video_control_r );

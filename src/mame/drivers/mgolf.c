@@ -54,7 +54,7 @@ static VIDEO_START( mgolf )
 }
 
 
-static SCREEN_UPDATE( mgolf )
+static SCREEN_UPDATE_IND16( mgolf )
 {
 	mgolf_state *state = screen.machine().driver_data<mgolf_state>();
 	int i;
@@ -331,10 +331,9 @@ static MACHINE_CONFIG_START( mgolf, mgolf_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE(mgolf)
+	MCFG_SCREEN_UPDATE_STATIC(mgolf)
 
 	MCFG_GFXDECODE(mgolf)
 	MCFG_PALETTE_LENGTH(4)

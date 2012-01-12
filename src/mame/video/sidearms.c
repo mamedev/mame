@@ -174,7 +174,7 @@ VIDEO_START( sidearms )
 	state->m_flipon = state->m_charon = state->m_staron = state->m_objon = state->m_bgon = 0;
 }
 
-static void draw_sprites_region(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int start_offset, int end_offset )
+static void draw_sprites_region(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset )
 {
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
 	const gfx_element *gfx = machine.gfx[2];
@@ -207,7 +207,7 @@ static void draw_sprites_region(running_machine &machine, bitmap_t &bitmap, cons
 	}
 }
 
-static void sidearms_draw_starfield( running_machine &machine, bitmap_t &bitmap )
+static void sidearms_draw_starfield( running_machine &machine, bitmap_ind16 &bitmap )
 {
 	int x, y, i;
 	UINT32 hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
@@ -331,7 +331,7 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_t &bitmap 
 #endif
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	sidearms_state *state = machine.driver_data<sidearms_state>();
 
@@ -346,7 +346,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( sidearms )
+SCREEN_UPDATE_IND16( sidearms )
 {
 	sidearms_state *state = screen.machine().driver_data<sidearms_state>();
 

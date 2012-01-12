@@ -16,4 +16,4 @@ WRITE16_HANDLER( xorworld_videoram16_w );
 
 PALETTE_INIT( xorworld );
 VIDEO_START( xorworld );
-SCREEN_UPDATE( xorworld );
+SCREEN_UPDATE_IND16( xorworld );

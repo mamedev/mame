@@ -22,4 +22,4 @@ WRITE16_HANDLER( pirates_fg_tileram_w );
 WRITE16_HANDLER( pirates_bg_tileram_w );
 
 VIDEO_START( pirates );
-SCREEN_UPDATE( pirates );
+SCREEN_UPDATE_IND16( pirates );

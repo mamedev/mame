@@ -40,4 +40,4 @@ WRITE8_HANDLER( metlclsh_gfxbank_w );
 WRITE8_HANDLER( metlclsh_rambank_w );
 
 VIDEO_START( metlclsh );
-SCREEN_UPDATE( metlclsh );
+SCREEN_UPDATE_IND16( metlclsh );

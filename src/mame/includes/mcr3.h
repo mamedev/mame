@@ -38,5 +38,5 @@ VIDEO_START( spyhunt );
 
 PALETTE_INIT( spyhunt );
 
-SCREEN_UPDATE( mcr3 );
-SCREEN_UPDATE( spyhunt );
+SCREEN_UPDATE_IND16( mcr3 );
+SCREEN_UPDATE_IND16( spyhunt );

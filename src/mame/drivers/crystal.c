@@ -633,7 +633,7 @@ static void SetVidReg( address_space *space, UINT16 reg, UINT16 val )
 }
 
 
-static SCREEN_UPDATE( crystal )
+static SCREEN_UPDATE_IND16( crystal )
 {
 	crystal_state *state = screen.machine().driver_data<crystal_state>();
 	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
@@ -831,10 +831,9 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(crystal)
+	MCFG_SCREEN_UPDATE_STATIC(crystal)
 	MCFG_SCREEN_EOF(crystal)
 
 	MCFG_VIDEO_VRENDER0_ADD("vr0", vr0video_config)

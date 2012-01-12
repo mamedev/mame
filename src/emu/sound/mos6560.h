@@ -107,7 +107,7 @@ WRITE8_DEVICE_HANDLER( mos6560_port_w );
 READ8_DEVICE_HANDLER( mos6560_port_r );
 
 void mos6560_raster_interrupt_gen( device_t *device );
-UINT32 mos6560_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect );
+UINT32 mos6560_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 
 #endif /* __MOS6560_H__ */

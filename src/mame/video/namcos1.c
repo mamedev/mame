@@ -298,7 +298,7 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	namcos1_state *state = machine.driver_data<namcos1_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x800;
@@ -370,7 +370,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 
 
-SCREEN_UPDATE( namcos1 )
+SCREEN_UPDATE_IND16( namcos1 )
 {
 	namcos1_state *state = screen.machine().driver_data<namcos1_state>();
 	int i, j, scrollx, scrolly, priority;

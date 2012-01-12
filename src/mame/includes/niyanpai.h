@@ -27,7 +27,7 @@ public:
 	int m_screen_refresh;
 	int m_nb19010_busyctr;
 	int m_nb19010_busyflag;
-	bitmap_t *m_tmpbitmap[VRAM_MAX];
+	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
 	UINT16 *m_videoram[VRAM_MAX];
 	UINT16 *m_videoworkram[VRAM_MAX];
 	UINT16 *m_palette;
@@ -38,7 +38,7 @@ public:
 
 /*----------- defined in video/niyanpai.c -----------*/
 
-SCREEN_UPDATE( niyanpai );
+SCREEN_UPDATE_IND16( niyanpai );
 VIDEO_START( niyanpai );
 
 READ16_HANDLER( niyanpai_palette_r );

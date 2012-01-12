@@ -201,7 +201,7 @@ WRITE16_HANDLER( rpunch_ins_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int start, int stop)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop)
 {
 	rpunch_state *state = machine.driver_data<rpunch_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -239,7 +239,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
  *
  *************************************/
 
-static void draw_bitmap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rpunch_state *state = machine.driver_data<rpunch_state>();
 	int colourbase;
@@ -272,7 +272,7 @@ static void draw_bitmap(running_machine &machine, bitmap_t &bitmap, const rectan
  *
  *************************************/
 
-SCREEN_UPDATE( rpunch )
+SCREEN_UPDATE_IND16( rpunch )
 {
 	rpunch_state *state = screen.machine().driver_data<rpunch_state>();
 	int effbins;

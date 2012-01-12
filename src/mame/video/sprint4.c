@@ -51,13 +51,13 @@ static TILE_GET_INFO( sprint4_tile_info )
 VIDEO_START( sprint4 )
 {
 	sprint4_state *state = machine.driver_data<sprint4_state>();
-	state->m_helper = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_playfield = tilemap_create(machine, sprint4_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
-SCREEN_UPDATE( sprint4 )
+SCREEN_UPDATE_IND16( sprint4 )
 {
 	sprint4_state *state = screen.machine().driver_data<sprint4_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -118,12 +118,12 @@ SCREEN_EOF( sprint4 )
 
 		rect &= screen.machine().primary_screen->visible_area();
 
-		tilemap_draw(*state->m_helper, rect, state->m_playfield, 0, 0);
+		tilemap_draw(state->m_helper, rect, state->m_playfield, 0, 0);
 
 		if (i & 1)
 			bank = 32;
 
-		drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1],
+		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
 			(code >> 3) | bank,
 			4,
 			0, 0,
@@ -132,7 +132,7 @@ SCREEN_EOF( sprint4 )
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 			for (x = rect.min_x; x <= rect.max_x; x++)
-				if (colortable_entry_get_value(screen.machine().colortable, state->m_helper->pix16(y, x)) != 0)
+				if (colortable_entry_get_value(screen.machine().colortable, state->m_helper.pix16(y, x)) != 0)
 					state->m_collision[i] = 1;
 	}
 

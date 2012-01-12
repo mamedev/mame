@@ -158,7 +158,7 @@ static VIDEO_START(srmp6)
 static int xixi=0;
 #endif
 
-static SCREEN_UPDATE(srmp6)
+static SCREEN_UPDATE_RGB32(srmp6)
 {
 	srmp6_state *state = screen.machine().driver_data<srmp6_state>();
 	int alpha;
@@ -673,10 +673,9 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(srmp6)
+	MCFG_SCREEN_UPDATE_STATIC(srmp6)
 
 	MCFG_PALETTE_LENGTH(0x800)
 

@@ -41,4 +41,4 @@ READ16_HANDLER( gradius3_gfxrom_r );
 WRITE16_HANDLER( gradius3_gfxram_w );
 
 VIDEO_START( gradius3 );
-SCREEN_UPDATE( gradius3 );
+SCREEN_UPDATE_IND16( gradius3 );

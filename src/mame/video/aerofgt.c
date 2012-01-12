@@ -333,7 +333,7 @@ WRITE16_HANDLER( wbbc97_bitmap_enable_w )
 
 ***************************************************************************/
 
-static void aerofgt_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void aerofgt_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int offs;
@@ -404,7 +404,8 @@ static void aerofgt_draw_sprites( running_machine &machine, bitmap_t &bitmap, co
 	}
 }
 
-static void turbofrc_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
+template<class _BitmapClass>
+static void turbofrc_draw_sprites( running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int attr_start, base, first;
@@ -489,7 +490,7 @@ static void turbofrc_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void spinlbrk_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
+static void spinlbrk_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int attr_start, base, first;
@@ -573,7 +574,7 @@ static void spinlbrk_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void aerfboo2_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
+static void aerfboo2_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int attr_start, base, first;
@@ -658,7 +659,7 @@ static void aerfboo2_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void pspikesb_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void pspikesb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int i;
@@ -693,7 +694,7 @@ static void pspikesb_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void spikes91_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void spikes91_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int i;
@@ -735,7 +736,7 @@ static void spikes91_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void aerfboot_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void aerfboot_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int attr_start, last;
@@ -817,7 +818,7 @@ static void aerfboot_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void wbbc97_draw_bitmap( running_machine &machine, bitmap_t &bitmap )
+static void wbbc97_draw_bitmap( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int x, y, count;
@@ -838,7 +839,7 @@ static void wbbc97_draw_bitmap( running_machine &machine, bitmap_t &bitmap )
 }
 
 
-SCREEN_UPDATE( pspikes )
+SCREEN_UPDATE_IND16( pspikes )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -857,7 +858,7 @@ SCREEN_UPDATE( pspikes )
 	return 0;
 }
 
-SCREEN_UPDATE( pspikesb )
+SCREEN_UPDATE_IND16( pspikesb )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -873,7 +874,7 @@ SCREEN_UPDATE( pspikesb )
 	return 0;
 }
 
-SCREEN_UPDATE( spikes91 )
+SCREEN_UPDATE_IND16( spikes91 )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -914,7 +915,7 @@ SCREEN_UPDATE( spikes91 )
 	return 0;
 }
 
-SCREEN_UPDATE( karatblz )
+SCREEN_UPDATE_IND16( karatblz )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	tilemap_set_scrollx(state->m_bg1_tilemap, 0, state->m_bg1scrollx - 8);
@@ -935,7 +936,7 @@ SCREEN_UPDATE( karatblz )
 	return 0;
 }
 
-SCREEN_UPDATE( spinlbrk )
+SCREEN_UPDATE_IND16( spinlbrk )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -961,7 +962,7 @@ SCREEN_UPDATE( spinlbrk )
 	return 0;
 }
 
-SCREEN_UPDATE( turbofrc )
+SCREEN_UPDATE_IND16( turbofrc )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -988,7 +989,7 @@ SCREEN_UPDATE( turbofrc )
 	return 0;
 }
 
-SCREEN_UPDATE( aerofgt )
+SCREEN_UPDATE_IND16( aerofgt )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	tilemap_set_scrollx(state->m_bg1_tilemap, 0, state->m_rasterram[0x0000] - 18);
@@ -1011,7 +1012,7 @@ SCREEN_UPDATE( aerofgt )
 }
 
 
-SCREEN_UPDATE( aerfboot )
+SCREEN_UPDATE_IND16( aerfboot )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -1034,7 +1035,7 @@ SCREEN_UPDATE( aerfboot )
 	return 0;
 }
 
-SCREEN_UPDATE( aerfboo2 )
+SCREEN_UPDATE_IND16( aerfboo2 )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -1061,7 +1062,7 @@ SCREEN_UPDATE( aerfboo2 )
 	return 0;
 }
 
-SCREEN_UPDATE( wbbc97 )
+SCREEN_UPDATE_RGB32( wbbc97 )
 {
 	aerofgt_state *state = screen.machine().driver_data<aerofgt_state>();
 	int i, scrolly;

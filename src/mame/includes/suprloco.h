@@ -17,7 +17,7 @@ public:
 
 PALETTE_INIT( suprloco );
 VIDEO_START( suprloco );
-SCREEN_UPDATE( suprloco );
+SCREEN_UPDATE_IND16( suprloco );
 WRITE8_HANDLER( suprloco_videoram_w );
 WRITE8_HANDLER( suprloco_scrollram_w );
 WRITE8_HANDLER( suprloco_control_w );

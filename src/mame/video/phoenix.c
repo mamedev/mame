@@ -450,7 +450,7 @@ READ_LINE_DEVICE_HANDLER( survival_sid_callback )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( phoenix )
+SCREEN_UPDATE_IND16( phoenix )
 {
 	phoenix_state *state = screen.machine().driver_data<phoenix_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);

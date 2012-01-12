@@ -49,13 +49,13 @@ static TILE_GET_INFO( ultratnk_tile_info )
 VIDEO_START( ultratnk )
 {
 	ultratnk_state *state = machine.driver_data<ultratnk_state>();
-	state->m_helper = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_playfield = tilemap_create(machine, ultratnk_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
-SCREEN_UPDATE( ultratnk )
+SCREEN_UPDATE_IND16( ultratnk )
 {
 	ultratnk_state *state = screen.machine().driver_data<ultratnk_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -120,12 +120,12 @@ SCREEN_EOF( ultratnk )
 
 		rect &= screen.machine().primary_screen->visible_area();
 
-		tilemap_draw(*state->m_helper, rect, state->m_playfield, 0, 0);
+		tilemap_draw(state->m_helper, rect, state->m_playfield, 0, 0);
 
 		if (code & 4)
 			bank = 32;
 
-		drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1],
+		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
 			(code >> 3) | bank,
 			4,
 			0, 0,
@@ -134,7 +134,7 @@ SCREEN_EOF( ultratnk )
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 			for (x = rect.min_x; x <= rect.max_x; x++)
-				if (colortable_entry_get_value(screen.machine().colortable, state->m_helper->pix16(y, x)) != BG)
+				if (colortable_entry_get_value(screen.machine().colortable, state->m_helper.pix16(y, x)) != BG)
 					state->m_collision[i] = 1;
 	}
 

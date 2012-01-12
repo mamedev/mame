@@ -39,5 +39,5 @@ WRITE16_HANDLER( sslam_bg_tileram_w );
 WRITE16_HANDLER( powerbls_bg_tileram_w );
 VIDEO_START(sslam);
 VIDEO_START(powerbls);
-SCREEN_UPDATE(sslam);
-SCREEN_UPDATE(powerbls);
+SCREEN_UPDATE_IND16(sslam);
+SCREEN_UPDATE_IND16(powerbls);

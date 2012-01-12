@@ -132,7 +132,7 @@ VIDEO_START( glass )
 	glass_state *state = machine.driver_data<glass_state>();
 	state->m_pant[0] = tilemap_create(machine, get_tile_info_glass_screen0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_pant[1] = tilemap_create(machine, get_tile_info_glass_screen1, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_screen_bitmap = auto_bitmap_alloc (machine, 320, 200, machine.primary_screen->format());
+	state->m_screen_bitmap = auto_bitmap_ind16_alloc (machine, 320, 200);
 
 	state->save_item(NAME(*state->m_screen_bitmap));
 
@@ -164,7 +164,7 @@ VIDEO_START( glass )
       3  | xxxxxxxx xxxxxxxx | sprite code
 */
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	glass_state *state = machine.driver_data<glass_state>();
 	int i;
@@ -195,7 +195,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 ****************************************************************************/
 
-SCREEN_UPDATE( glass )
+SCREEN_UPDATE_IND16( glass )
 {
 	glass_state *state = screen.machine().driver_data<glass_state>();
 	/* set scroll registers */

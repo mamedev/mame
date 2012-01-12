@@ -70,15 +70,18 @@ WRITE32_DEVICE_HANDLER( deco16ic_pf_control_dword_w );
 
 READ32_DEVICE_HANDLER( deco16ic_pf_control_dword_r );
 
-void deco16ic_print_debug_info(device_t *device, bitmap_t &bitmap);
+void deco16ic_print_debug_info(device_t *device, bitmap_ind16 &bitmap);
 
 void deco16ic_pf_update(device_t *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr);
 
-void deco16ic_tilemap_1_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
-void deco16ic_tilemap_2_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
+void deco16ic_tilemap_1_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
+void deco16ic_tilemap_1_draw(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
+void deco16ic_tilemap_2_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
+void deco16ic_tilemap_2_draw(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
 
 /* used by boogwing, nitrobal */
-void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo = false);
+void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo = false);
+void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo = false);
 
 /* used by robocop2 */
 void deco16ic_set_tilemap_colour_mask(device_t *device, int tmap, int mask);

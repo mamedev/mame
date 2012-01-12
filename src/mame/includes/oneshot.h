@@ -38,5 +38,5 @@ WRITE16_HANDLER( oneshot_mid_videoram_w );
 WRITE16_HANDLER( oneshot_fg_videoram_w );
 
 VIDEO_START( oneshot );
-SCREEN_UPDATE( oneshot );
-SCREEN_UPDATE( maddonna );
+SCREEN_UPDATE_IND16( oneshot );
+SCREEN_UPDATE_IND16( maddonna );

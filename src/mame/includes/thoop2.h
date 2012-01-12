@@ -17,4 +17,4 @@ public:
 
 WRITE16_HANDLER( thoop2_vram_w );
 VIDEO_START( thoop2 );
-SCREEN_UPDATE( thoop2 );
+SCREEN_UPDATE_IND16( thoop2 );

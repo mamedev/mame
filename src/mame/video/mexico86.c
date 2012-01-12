@@ -16,7 +16,7 @@ WRITE8_HANDLER( mexico86_bankswitch_w )
 
 
 
-SCREEN_UPDATE( mexico86 )
+SCREEN_UPDATE_IND16( mexico86 )
 {
 	mexico86_state *state = screen.machine().driver_data<mexico86_state>();
 	int offs;
@@ -99,7 +99,7 @@ SCREEN_UPDATE( mexico86 )
 	return 0;
 }
 
-SCREEN_UPDATE( kikikai )
+SCREEN_UPDATE_IND16( kikikai )
 {
 	mexico86_state *state = screen.machine().driver_data<mexico86_state>();
 	int offs;

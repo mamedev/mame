@@ -29,5 +29,5 @@ public:
 
 /*----------- defined in video/pktgaldx.c -----------*/
 
-SCREEN_UPDATE( pktgaldx );
-SCREEN_UPDATE( pktgaldb );
+SCREEN_UPDATE_IND16( pktgaldx );
+SCREEN_UPDATE_IND16( pktgaldb );

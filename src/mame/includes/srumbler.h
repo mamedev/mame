@@ -24,5 +24,5 @@ WRITE8_HANDLER( srumbler_scroll_w );
 WRITE8_HANDLER( srumbler_4009_w );
 
 VIDEO_START( srumbler );
-SCREEN_UPDATE( srumbler );
+SCREEN_UPDATE_IND16( srumbler );
 SCREEN_EOF( srumbler );

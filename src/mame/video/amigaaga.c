@@ -444,7 +444,7 @@ INLINE int update_ham(amiga_state *state, int newpix)
  *
  *************************************/
 
-void amiga_aga_render_scanline(running_machine &machine, bitmap_t &bitmap, int scanline)
+void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, int scanline)
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
@@ -860,7 +860,7 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_t &bitmap, int s
  *
  *************************************/
 
-SCREEN_UPDATE( amiga_aga )
+SCREEN_UPDATE_RGB32( amiga_aga )
 {
 	int y;
 

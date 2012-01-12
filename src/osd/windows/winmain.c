@@ -832,7 +832,7 @@ void windows_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	// create a dummy DC to work with
 	HDC dummyDC = CreateCompatibleDC(NULL);
@@ -938,17 +938,16 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	}
 
 	// allocate a new bitmap
-	bitmap_t *bitmap = NULL;
 	if (actbounds.max_x >= actbounds.min_x && actbounds.max_y >= actbounds.min_y)
 	{
-		bitmap = auto_alloc(machine(), bitmap_t(actbounds.max_x + 1 - actbounds.min_x, actbounds.max_y + 1 - actbounds.min_y, BITMAP_FORMAT_ARGB32));
+		bitmap.allocate(actbounds.max_x + 1 - actbounds.min_x, actbounds.max_y + 1 - actbounds.min_y);
 
 		// copy the bits into it
-		for (int y = 0; y < bitmap->height(); y++)
+		for (int y = 0; y < bitmap.height(); y++)
 		{
-			UINT32 *dstrow = &bitmap->pix32(y);
+			UINT32 *dstrow = &bitmap.pix32(y);
 			UINT8 *srcrow = &bits[(y + actbounds.min_y) * rowbytes];
-			for (int x = 0; x < bitmap->width(); x++)
+			for (int x = 0; x < bitmap.width(); x++)
 			{
 				int effx = x + actbounds.min_x;
 				dstrow[x] = ((srcrow[effx / 8] << (effx % 8)) & 0x80) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
@@ -965,7 +964,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	DeleteObject(dib);
 	SelectObject(dummyDC, oldfont);
 	DeleteDC(dummyDC);
-	return bitmap;
+	return bitmap.valid();
 }
 
 

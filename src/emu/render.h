@@ -86,12 +86,11 @@
 //**************************************************************************
 
 // texture formats
-enum
+enum texture_format
 {
 	TEXFORMAT_UNDEFINED = 0,							// require a format to be specified
 	TEXFORMAT_PALETTE16,								// 16bpp palettized, alpha ignored
 	TEXFORMAT_PALETTEA16,								// 16bpp palettized, alpha respected
-	TEXFORMAT_RGB15,									// 16bpp 5-5-5 RGB
 	TEXFORMAT_RGB32,									// 32bpp 8-8-8 RGB
 	TEXFORMAT_ARGB32,									// 32bpp 8-8-8-8 ARGB
 	TEXFORMAT_YUY16										// 16bpp 8-8 Y/Cb, Y/Cr in sequence
@@ -181,7 +180,7 @@ class layout_file;
 
 
 // texture scaling callback
-typedef void (*texture_scaler_func)(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param);
+typedef void (*texture_scaler_func)(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 
 // render_bounds - floating point bounding rectangle
@@ -437,10 +436,10 @@ public:
 	int format() const { return m_format; }
 
 	// configure the texture bitmap
-	void set_bitmap(bitmap_t *bitmap, const rectangle *sbounds, int format, palette_t *palette = NULL);
+	void set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, texture_format format);
 
 	// generic high-quality bitmap scaler
-	static void hq_scale(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param);
+	static void hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 private:
 	// internal helpers
@@ -452,7 +451,7 @@ private:
 	// a scaled_texture contains a single scaled entry for a texture
 	struct scaled_texture
 	{
-		bitmap_t *			bitmap;					// final bitmap
+		bitmap_argb32 *		bitmap;					// final bitmap
 		UINT32				seqid;					// sequence number
 	};
 
@@ -461,14 +460,15 @@ private:
 	render_texture *	m_next;						// next texture (for free list)
 	bitmap_t *			m_bitmap;					// pointer to the original bitmap
 	rectangle			m_sbounds;					// source bounds within the bitmap
-	palette_t *			m_palette;					// palette associated with the texture
-	int					m_format;					// format of the texture data
+	texture_format		m_format;					// format of the texture data
+	rgb_t *				m_bcglookup;				// dynamically allocated B/C/G lookup table
+	UINT32				m_bcglookup_entries;		// number of B/C/G lookup entries allocated
+
+	// scaling state (ARGB32 only)
 	texture_scaler_func	m_scaler;					// scaling callback
 	void *				m_param;					// scaling callback parameter
 	UINT32				m_curseq;					// current sequence number
 	scaled_texture		m_scaled[MAX_TEXTURE_SCALES];// array of scaled variants of this texture
-	rgb_t *				m_bcglookup;				// dynamically allocated B/C/G lookup table
-	UINT32				m_bcglookup_entries;		// number of B/C/G lookup entries allocated
 };
 
 
@@ -518,7 +518,7 @@ public:
 	void get_user_settings(user_settings &settings) const { settings = m_user; }
 
 	// setters
-	void set_overlay(bitmap_t *bitmap);
+	void set_overlay(bitmap_argb32 *bitmap);
 	void set_user_settings(const user_settings &settings);
 
 	// empty the item list
@@ -568,7 +568,7 @@ private:
 	};
 
 	// generic screen overlay scaler
-	static void overlay_scale(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param);
+	static void overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 	// internal helpers
 	item *first_item() const { return m_itemlist.first(); }
@@ -583,11 +583,10 @@ private:
 	fixed_allocator<item>	m_item_allocator;		// free container items
 	screen_device *			m_screen;				// the screen device
 	user_settings			m_user;					// user settings
-	bitmap_t *				m_overlaybitmap;		// overlay bitmap
+	bitmap_argb32 *			m_overlaybitmap;		// overlay bitmap
 	render_texture *		m_overlaytexture;		// overlay texture
 	palette_client *		m_palclient;			// client to the system palette
 	rgb_t					m_bcglookup256[0x400];	// lookup table for brightness/contrast/gamma
-	rgb_t					m_bcglookup32[0x80];	// lookup table for brightness/contrast/gamma
 	rgb_t					m_bcglookup[0x10000];	// full palette lookup with bcg adjustements
 };
 

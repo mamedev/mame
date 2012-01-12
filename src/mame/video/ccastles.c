@@ -32,7 +32,7 @@ VIDEO_START( ccastles )
 			3,	resistances, state->m_bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	state->m_spritebitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_spritebitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	/* register for savestates */
 	state->save_item(NAME(state->m_video_control));
@@ -265,7 +265,7 @@ WRITE8_HANDLER( ccastles_bitmode_addr_w )
  *
  *************************************/
 
-SCREEN_UPDATE( ccastles )
+SCREEN_UPDATE_IND16( ccastles )
 {
 	ccastles_state *state = screen.machine().driver_data<ccastles_state>();
 	UINT8 *spriteaddr = &state->m_spriteram[state->m_video_control[7] * 0x100];	/* BUF1/BUF2 */
@@ -274,7 +274,7 @@ SCREEN_UPDATE( ccastles )
 	int x, y, offs;
 
 	/* draw the sprites */
-	state->m_spritebitmap->fill(0x0f, cliprect);
+	state->m_spritebitmap.fill(0x0f, cliprect);
 	for (offs = 0; offs < 320/2; offs += 4)
 	{
 		int x = spriteaddr[offs + 3];
@@ -282,7 +282,7 @@ SCREEN_UPDATE( ccastles )
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs + 2] >> 7;
 
-		drawgfx_transpen(*state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, flip, flip, x, y, 7);
+		drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, flip, flip, x, y, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */
@@ -300,7 +300,7 @@ SCREEN_UPDATE( ccastles )
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			UINT16 *mosrc = &state->m_spritebitmap->pix16(y);
+			UINT16 *mosrc = &state->m_spritebitmap.pix16(y);
 			int effy = (((y - state->m_vblank_end) + (flip ? 0 : state->m_vscroll)) ^ flip) & 0xff;
 			UINT8 *src;
 

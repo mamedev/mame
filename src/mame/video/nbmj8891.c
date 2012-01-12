@@ -318,14 +318,14 @@ static void update_pixel0(running_machine &machine, int x, int y)
 {
 	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
 	UINT8 color = state->m_videoram0[(y * machine.primary_screen->width()) + x];
-	state->m_tmpbitmap0->pix16(y, x) = color;
+	state->m_tmpbitmap0.pix16(y, x) = color;
 }
 
 static void update_pixel1(running_machine &machine, int x, int y)
 {
 	nbmj8891_state *state = machine.driver_data<nbmj8891_state>();
 	UINT8 color = state->m_videoram1[(y * machine.primary_screen->width()) + x];
-	state->m_tmpbitmap1->pix16(y, x) = (color == 0x7f) ? 0xff : color;
+	state->m_tmpbitmap1.pix16(y, x) = (color == 0x7f) ? 0xff : color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
@@ -499,7 +499,7 @@ VIDEO_START( nbmj8891_1layer )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_tmpbitmap0 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmpbitmap0.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 	state->m_videoram0 = auto_alloc_array(machine, UINT8, width * height);
 	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);
 	state->m_clut = auto_alloc_array(machine, UINT8, 0x800);
@@ -516,8 +516,8 @@ VIDEO_START( nbmj8891_2layer )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_tmpbitmap0 = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_tmpbitmap1 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmpbitmap0.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_tmpbitmap1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 	state->m_videoram0 = auto_alloc_array(machine, UINT8, width * height);
 	state->m_videoram1 = auto_alloc_array(machine, UINT8, width * height);
 	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);
@@ -531,7 +531,7 @@ VIDEO_START( nbmj8891_2layer )
 
 
 ******************************************************************************/
-SCREEN_UPDATE( nbmj8891 )
+SCREEN_UPDATE_IND16( nbmj8891 )
 {
 	nbmj8891_state *state = screen.machine().driver_data<nbmj8891_state>();
 	int x, y;
@@ -560,11 +560,11 @@ SCREEN_UPDATE( nbmj8891 )
 
 		if (state->m_gfxdraw_mode)
 		{
-			copyscrollbitmap      (bitmap, *state->m_tmpbitmap0, 0, 0, 0, 0, cliprect);
-			copyscrollbitmap_trans(bitmap, *state->m_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
+			copyscrollbitmap      (bitmap, state->m_tmpbitmap0, 0, 0, 0, 0, cliprect);
+			copyscrollbitmap_trans(bitmap, state->m_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
 		}
 		else
-			copyscrollbitmap(bitmap, *state->m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, state->m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
 	}
 	else
 		bitmap.fill(0xff);

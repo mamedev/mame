@@ -19,7 +19,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 /******************************************************************************/
 
-static void tumblepb_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void tumblepb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -85,7 +85,7 @@ static void tumblepb_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void jumpkids_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void jumpkids_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -152,7 +152,7 @@ static void jumpkids_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void fncywld_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void fncywld_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -603,7 +603,7 @@ VIDEO_START( suprtrio )
 /******************************************************************************/
 
 
-SCREEN_UPDATE( tumblepb )
+SCREEN_UPDATE_IND16( tumblepb )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -639,7 +639,7 @@ SCREEN_UPDATE( tumblepb )
 	return 0;
 }
 
-SCREEN_UPDATE( jumpkids )
+SCREEN_UPDATE_IND16( jumpkids )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -675,7 +675,7 @@ SCREEN_UPDATE( jumpkids )
 	return 0;
 }
 
-SCREEN_UPDATE( semicom )
+SCREEN_UPDATE_IND16( semicom )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -711,7 +711,7 @@ SCREEN_UPDATE( semicom )
 	return 0;
 }
 
-SCREEN_UPDATE( semicom_altoffsets )
+SCREEN_UPDATE_IND16( semicom_altoffsets )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offsx, offsy, offsx2;
@@ -740,7 +740,7 @@ SCREEN_UPDATE( semicom_altoffsets )
 	return 0;
 }
 
-SCREEN_UPDATE( bcstory )
+SCREEN_UPDATE_IND16( bcstory )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -778,7 +778,7 @@ SCREEN_UPDATE( bcstory )
 	return 0;
 }
 
-SCREEN_UPDATE( semibase )
+SCREEN_UPDATE_IND16( semibase )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -807,7 +807,7 @@ SCREEN_UPDATE( semibase )
 	return 0;
 }
 
-SCREEN_UPDATE( sdfight )
+SCREEN_UPDATE_IND16( sdfight )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -837,7 +837,7 @@ SCREEN_UPDATE( sdfight )
 
 
 
-SCREEN_UPDATE( fncywld )
+SCREEN_UPDATE_IND16( fncywld )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -874,7 +874,7 @@ SCREEN_UPDATE( fncywld )
 }
 
 
-SCREEN_UPDATE( jumppop )
+SCREEN_UPDATE_IND16( jumppop )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 
@@ -906,7 +906,7 @@ SCREEN_UPDATE( jumppop )
 }
 
 
-SCREEN_UPDATE( suprtrio )
+SCREEN_UPDATE_IND16( suprtrio )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 
@@ -934,7 +934,7 @@ popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
 	return 0;
 }
 
-SCREEN_UPDATE( pangpang )
+SCREEN_UPDATE_IND16( pangpang )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 	int offs, offs2;

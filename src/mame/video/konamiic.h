@@ -37,7 +37,7 @@ int K053246_read_register(int regnum);
 
 extern UINT16 *K053936_0_ctrl,*K053936_0_linectrl;
 extern UINT16 *K053936_1_ctrl,*K053936_1_linectrl;
-void K053936_0_zoom_draw(bitmap_t &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack);
+void K053936_0_zoom_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack);
 void K053936_wraparound_enable(int chip, int status);
 void K053936_set_offset(int chip, int xoffs, int yoffs);
 
@@ -76,7 +76,7 @@ WRITE16_HANDLER( K056832_word_w ); // "VRAM" registers
 WRITE16_HANDLER( K056832_b_word_w );
 void K056832_mark_plane_dirty(int num);
 void K056832_MarkAllTilemapsDirty(void);
-void K056832_tilemap_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
 int  K056832_get_LayerAssociation(void);
 void K056832_set_LayerOffset(int layer, int offsx, int offsy);
 void K056832_set_UpdateMode(int mode);
@@ -173,8 +173,8 @@ WRITE16_HANDLER( K054338_word_w ); // "CLCT" registers
 WRITE32_HANDLER( K054338_long_w );
 int K054338_read_register(int reg);
 void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack);			// called at the beginning of SCREEN_UPDATE()
-void K054338_fill_solid_bg(bitmap_t &bitmap);				// solid backcolor fill
-void K054338_fill_backcolor(running_machine &machine, bitmap_t &bitmap, int mode);	// unified fill, 0=solid, 1=gradient
+void K054338_fill_solid_bg(bitmap_ind16 &bitmap);				// solid backcolor fill
+void K054338_fill_backcolor(running_machine &machine, bitmap_rgb32 &bitmap, int mode);	// unified fill, 0=solid, 1=gradient
 int  K054338_set_alpha_level(int pblend);							// blend style 0-2
 void K054338_invert_alpha(int invert);								// 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
 void K054338_export_config(int **shdRGB);

@@ -47,8 +47,8 @@ public:
 VIDEO_START( stoneage );
 VIDEO_START( mutantf );
 
-SCREEN_UPDATE( cninja );
-SCREEN_UPDATE( cninjabl );
-SCREEN_UPDATE( edrandy );
-SCREEN_UPDATE( robocop2 );
-SCREEN_UPDATE( mutantf );
+SCREEN_UPDATE_IND16( cninja );
+SCREEN_UPDATE_IND16( cninjabl );
+SCREEN_UPDATE_IND16( edrandy );
+SCREEN_UPDATE_IND16( robocop2 );
+SCREEN_UPDATE_RGB32( mutantf );

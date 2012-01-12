@@ -1401,7 +1401,7 @@ static MACHINE_RESET( init )
 	BFM_BD1_init(1);
 }
 
-static SCREEN_UPDATE( addersc2 )
+static SCREEN_UPDATE_IND16( addersc2 )
 {
 	bfm_sc2_state *state = screen.machine().driver_data<bfm_sc2_state>();
 	if ( state->m_sc2_show_door )
@@ -1409,7 +1409,7 @@ static SCREEN_UPDATE( addersc2 )
 		output_set_value("door",( Scorpion2_GetSwitchState(screen.machine(),state->m_sc2_door_state>>4, state->m_sc2_door_state & 0x0F) ) );
 	}
 
-	return SCREEN_UPDATE_CALL(adder2);
+	return SCREEN_UPDATE16_CALL(adder2);
 }
 
 
@@ -2146,11 +2146,10 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_DEFAULT_LAYOUT(layout_bfm_sc2)
 
 	MCFG_SCREEN_ADD("adder", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE( 400, 280)
 	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE(addersc2)
+	MCFG_SCREEN_UPDATE_STATIC(addersc2)
 
 	MCFG_VIDEO_START( adder2)
 	MCFG_VIDEO_RESET( adder2)

@@ -196,7 +196,7 @@ static UINT16 gpu_regs[GPU_REGS];
 static emu_timer *object_timer;
 static UINT8 cpu_irq_state;
 
-static bitmap_t *screen_bitmap;
+static bitmap_rgb32 *screen_bitmap;
 
 static pen_t *pen_table;
 static int pixel_clock;
@@ -895,7 +895,7 @@ VIDEO_START( cojag )
 	object_timer = machine.scheduler().timer_alloc(FUNC(cojag_scanline_update));
 	adjust_object_timer(machine, 0);
 
-	screen_bitmap = auto_bitmap_alloc(machine, 760, 512, BITMAP_FORMAT_RGB32);
+	screen_bitmap = auto_bitmap_rgb32_alloc(machine, 760, 512);
 
 	jagobj_init(machine);
 
@@ -922,7 +922,7 @@ VIDEO_START( jaguar )
  *
  *************************************/
 
-SCREEN_UPDATE( cojag )
+SCREEN_UPDATE_RGB32( cojag )
 {
 	/* if not enabled, just blank */
 	if (!(gpu_regs[VMODE] & 1))

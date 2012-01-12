@@ -25,7 +25,7 @@ public:
 /*----------- defined in video/tankbust.c -----------*/
 
 VIDEO_START( tankbust );
-SCREEN_UPDATE( tankbust );
+SCREEN_UPDATE_IND16( tankbust );
 
 WRITE8_HANDLER( tankbust_background_videoram_w );
 READ8_HANDLER( tankbust_background_videoram_r );

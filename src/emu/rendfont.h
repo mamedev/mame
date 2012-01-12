@@ -72,7 +72,7 @@ public:
 
 	// texture/bitmap queries
 	render_texture *get_char_texture_and_bounds(float height, float aspect, unicode_char ch, render_bounds &bounds);
-	void get_scaled_bitmap_and_bounds(bitmap_t &dest, float height, float aspect, unicode_char chnum, rectangle &bounds);
+	void get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height, float aspect, unicode_char chnum, rectangle &bounds);
 
 private:
 	// a glyph describes a single glyph
@@ -83,7 +83,7 @@ private:
 		INT32				xoffs, yoffs;		// X and Y offset from baseline to top,left of bitmap
 		INT32				bmwidth, bmheight;	// width and height of bitmap
 		const char *		rawdata;			// pointer to the raw data for this one
-		bitmap_t *			bitmap;				// pointer to the bitmap containing the raw data
+		bitmap_argb32		bitmap;				// pointer to the bitmap containing the raw data
 		render_texture *	texture;			// pointer to a texture for rendering and sizing
 	};
 

@@ -144,7 +144,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
  sprite drawing could probably be improved a bit
 *******************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- SPR RAM Format -**
@@ -255,7 +255,7 @@ VIDEO_START( wwfwfstb )
 	state->m_bg1_dx[1] = -2;
 }
 
-SCREEN_UPDATE( wwfwfest )
+SCREEN_UPDATE_IND16( wwfwfest )
 {
 	wwfwfest_state *state = screen.machine().driver_data<wwfwfest_state>();
 	if (state->m_pri == 0x0078) {

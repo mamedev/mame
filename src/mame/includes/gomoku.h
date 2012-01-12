@@ -12,7 +12,7 @@ public:
 	int m_flipscreen;
 	int m_bg_dispsw;
 	tilemap_t *m_fg_tilemap;
-	bitmap_t *m_bg_bitmap;
+	bitmap_ind16 m_bg_bitmap;
 };
 
 
@@ -28,7 +28,7 @@ DECLARE_LEGACY_SOUND_DEVICE(GOMOKU, gomoku_sound);
 
 PALETTE_INIT( gomoku );
 VIDEO_START( gomoku );
-SCREEN_UPDATE( gomoku );
+SCREEN_UPDATE_IND16( gomoku );
 
 WRITE8_HANDLER( gomoku_videoram_w );
 WRITE8_HANDLER( gomoku_colorram_w );

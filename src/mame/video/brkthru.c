@@ -156,7 +156,7 @@ WRITE8_HANDLER( brkthru_1800_w )
 
 
 #if 0
-static void show_register( bitmap_t &bitmap, int x, int y, UINT32 data )
+static void show_register( bitmap_ind16 &bitmap, int x, int y, UINT32 data )
 {
 	char buf[5];
 
@@ -166,7 +166,7 @@ static void show_register( bitmap_t &bitmap, int x, int y, UINT32 data )
 #endif
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int prio )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int prio )
 {
 	brkthru_state *state = machine.driver_data<brkthru_state>();
 	int offs;
@@ -250,7 +250,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( brkthru )
+SCREEN_UPDATE_IND16( brkthru )
 {
 	brkthru_state *state = screen.machine().driver_data<brkthru_state>();
 

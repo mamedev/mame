@@ -38,7 +38,7 @@ VIDEO_START( eolith )
 	state->m_vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
 }
 
-SCREEN_UPDATE( eolith )
+SCREEN_UPDATE_IND16( eolith )
 {
 	eolith_state *state = screen.machine().driver_data<eolith_state>();
 	int y;

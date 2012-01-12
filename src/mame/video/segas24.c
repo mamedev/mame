@@ -23,7 +23,7 @@ namespace {
 	};
 };
 
-SCREEN_UPDATE(system24)
+SCREEN_UPDATE_IND16(system24)
 {
 	segas24_state *state = screen.machine().driver_data<segas24_state>();
 

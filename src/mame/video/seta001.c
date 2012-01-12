@@ -198,7 +198,7 @@ doraemon:   19 2a 00 03   (always)
 
 
 
-void seta001_device::seta001_draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bank_size, int setac_type)
+void seta001_device::seta001_draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac_type)
 {
 	int transpen;
 
@@ -319,7 +319,7 @@ void seta001_device::seta001_draw_background( running_machine &machine, bitmap_t
 }
 
 
-void seta001_device::seta001_draw_foreground( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bank_size)
+void seta001_device::seta001_draw_foreground( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
 {
 	int screenflip = (m_spritectrl[0] & 0x40) >> 6;
 	int i;
@@ -457,7 +457,7 @@ void seta001_device::tnzs_eof( void )
 
 }
 
-void seta001_device::seta001_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bank_size, int setac)
+void seta001_device::seta001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac)
 {
 	seta001_draw_background(machine, bitmap, cliprect, bank_size, setac);
 	seta001_draw_foreground(machine, bitmap, cliprect, bank_size);

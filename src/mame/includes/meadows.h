@@ -42,7 +42,7 @@ void meadows_sh_update(running_machine &machine);
 /*----------- defined in video/meadows.c -----------*/
 
 VIDEO_START( meadows );
-SCREEN_UPDATE( meadows );
+SCREEN_UPDATE_IND16( meadows );
 WRITE8_HANDLER( meadows_videoram_w );
 WRITE8_HANDLER( meadows_spriteram_w );
 

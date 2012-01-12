@@ -96,14 +96,14 @@ VIDEO_START( quasar )
 	state->m_effectram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* create helper bitmap */
-	state->m_collision_background = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_collision_background.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	/* register save */
-	state->save_item(NAME(*state->m_collision_background));
+	state->save_item(NAME(state->m_collision_background));
 	state->save_pointer(NAME(state->m_effectram), 0x400);
 }
 
-SCREEN_UPDATE( quasar )
+SCREEN_UPDATE_IND16( quasar )
 {
 	quasar_state *state = screen.machine().driver_data<quasar_state>();
 	int offs;
@@ -136,7 +136,7 @@ SCREEN_UPDATE( quasar )
 		/* background for Collision Detection (it can only hit certain items) */
 		if((state->m_color_ram[offs] & 7) == 0)
 		{
-			drawgfx_opaque(*state->m_collision_background,cliprect,screen.machine().gfx[0],
+			drawgfx_opaque(state->m_collision_background,cliprect,screen.machine().gfx[0],
 					code,
 					64,
 					0,0,
@@ -145,9 +145,9 @@ SCREEN_UPDATE( quasar )
 	}
 
     /* update the S2636 chips */
-	bitmap_t &s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
-	bitmap_t &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
-	bitmap_t &s2636_2_bitmap = s2636_update(state->m_s2636_2, cliprect);
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
+	bitmap_ind16 &s2636_2_bitmap = s2636_update(state->m_s2636_2, cliprect);
 
     /* Bullet Hardware */
     for (offs = 8; offs < 256; offs++ )
@@ -190,7 +190,7 @@ SCREEN_UPDATE( quasar )
 					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen.machine().colortable, state->m_collision_background->pix16(y, x)))
+					if (colortable_entry_get_value(screen.machine().colortable, state->m_collision_background.pix16(y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision_register |= 0x01;
 						if (S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x02;

@@ -56,10 +56,10 @@ WRITE16_HANDLER( sci_spriteframe_w );
 
 VIDEO_START( taitoz );
 
-SCREEN_UPDATE( contcirc );
-SCREEN_UPDATE( chasehq );
-SCREEN_UPDATE( bshark );
-SCREEN_UPDATE( sci );
-SCREEN_UPDATE( aquajack );
-SCREEN_UPDATE( spacegun );
-SCREEN_UPDATE( dblaxle );
+SCREEN_UPDATE_IND16( contcirc );
+SCREEN_UPDATE_IND16( chasehq );
+SCREEN_UPDATE_IND16( bshark );
+SCREEN_UPDATE_IND16( sci );
+SCREEN_UPDATE_IND16( aquajack );
+SCREEN_UPDATE_IND16( spacegun );
+SCREEN_UPDATE_IND16( dblaxle );

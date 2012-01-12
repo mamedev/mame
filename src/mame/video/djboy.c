@@ -58,7 +58,7 @@ WRITE8_HANDLER( djboy_paletteram_w )
 	palette_set_color_rgb(space->machine(), offset / 2, pal4bit(val >> 8), pal4bit(val >> 4), pal4bit(val >> 0));
 }
 
-SCREEN_UPDATE( djboy )
+SCREEN_UPDATE_IND16( djboy )
 {
 	/**
      * xx------ msb x

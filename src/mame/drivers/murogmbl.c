@@ -90,7 +90,7 @@ static VIDEO_START(murogmbl)
 
 }
 
-static SCREEN_UPDATE(murogmbl)
+static SCREEN_UPDATE_IND16(murogmbl)
 {
 	murogmbl_state *state = screen.machine().driver_data<murogmbl_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -187,12 +187,11 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(murogmbl)
+	MCFG_SCREEN_UPDATE_STATIC(murogmbl)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

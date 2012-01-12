@@ -195,7 +195,7 @@ VIDEO_START(magicrd2)
 }
 
 
-SCREEN_UPDATE(funworld)
+SCREEN_UPDATE_IND16(funworld)
 {
 	funworld_state *state = screen.machine().driver_data<funworld_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "machine/6532riot.h"
+#include "machine/ldpr8210.h"
 
 
 #define GOTTLIEB_VIDEO_HCOUNT	318
@@ -17,7 +18,8 @@ class gottlieb_state : public driver_device
 {
 public:
 	gottlieb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
 	UINT8 *m_videoram;
 	UINT8 m_votrax_queue[100];
@@ -36,7 +38,7 @@ public:
 	int m_last;
 	UINT8 m_joystick_select;
 	UINT8 m_track[2];
-	device_t *m_laserdisc;
+	optional_device<pioneer_pr8210_device> m_laserdisc;
 	emu_timer *m_laserdisc_bit_timer;
 	emu_timer *m_laserdisc_philips_timer;
 	UINT8 m_laserdisc_select;
@@ -84,4 +86,4 @@ extern WRITE8_HANDLER( gottlieb_paletteram_w );
 
 VIDEO_START( gottlieb );
 VIDEO_START( screwloo );
-SCREEN_UPDATE( gottlieb );
+SCREEN_UPDATE_IND16( gottlieb );

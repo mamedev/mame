@@ -38,6 +38,6 @@ WRITE8_HANDLER( gladiatr_video_registers_w );
 WRITE8_HANDLER( gladiatr_spritebuffer_w );
 WRITE8_HANDLER( gladiatr_spritebank_w );
 VIDEO_START( ppking );
-SCREEN_UPDATE( ppking );
+SCREEN_UPDATE_IND16( ppking );
 VIDEO_START( gladiatr );
-SCREEN_UPDATE( gladiatr );
+SCREEN_UPDATE_IND16( gladiatr );

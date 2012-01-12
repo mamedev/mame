@@ -25,7 +25,7 @@ public:
 
     UINT8 m_timer_set;
     emu_timer *m_test_timer;
-    bitmap_t* m_lcdbitmap;
+    bitmap_rgb32 m_lcdbitmap;
     scc68070_regs_t m_scc68070_regs;
     mcd212_regs_t m_mcd212_regs;
     mcd212_ab_t m_mcd212_ab;

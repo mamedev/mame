@@ -66,8 +66,8 @@ VIDEO_START( blockout )
 	blockout_state *state = machine.driver_data<blockout_state>();
 
 	/* Allocate temporary bitmaps */
-	state->m_tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
-	state->save_item(NAME(*state->m_tmpbitmap));
+	state->m_tmpbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->save_item(NAME(state->m_tmpbitmap));
 }
 
 static void update_pixels( running_machine &machine, int x, int y )
@@ -88,14 +88,14 @@ static void update_pixels( running_machine &machine, int x, int y )
 	else
 		color = (back >> 8) + 256;
 
-	state->m_tmpbitmap->pix16(y, x) = color;
+	state->m_tmpbitmap.pix16(y, x) = color;
 
 	if (front & 0xff)
 		color = front & 0xff;
 	else
 		color = (back & 0xff) + 256;
 
-	state->m_tmpbitmap->pix16(y, x + 1) = color;
+	state->m_tmpbitmap.pix16(y, x + 1) = color;
 }
 
 
@@ -110,13 +110,13 @@ WRITE16_HANDLER( blockout_videoram_w )
 
 
 
-SCREEN_UPDATE( blockout )
+SCREEN_UPDATE_IND16( blockout )
 {
 	blockout_state *state = screen.machine().driver_data<blockout_state>();
 	int x, y;
 	pen_t color = 512;
 
-	copybitmap(bitmap, *state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
 
 	for (y = 0; y < 256; y++)
 	{

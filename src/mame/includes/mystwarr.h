@@ -34,10 +34,10 @@ VIDEO_START( viostorm );
 VIDEO_START( metamrph );
 VIDEO_START( martchmp );
 VIDEO_START( mystwarr );
-SCREEN_UPDATE( dadandrn );
-SCREEN_UPDATE( mystwarr );
-SCREEN_UPDATE( metamrph );
-SCREEN_UPDATE( martchmp );
+SCREEN_UPDATE_RGB32( dadandrn );
+SCREEN_UPDATE_RGB32( mystwarr );
+SCREEN_UPDATE_RGB32( metamrph );
+SCREEN_UPDATE_RGB32( martchmp );
 
 WRITE16_HANDLER( ddd_053936_enable_w );
 WRITE16_HANDLER( ddd_053936_clip_w );

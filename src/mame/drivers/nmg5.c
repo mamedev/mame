@@ -845,7 +845,7 @@ static VIDEO_START( nmg5 )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	nmg5_state *state = machine.driver_data<nmg5_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -881,7 +881,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static void draw_bitmap( running_machine &machine, bitmap_t &bitmap )
+static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 {
 	nmg5_state *state = machine.driver_data<nmg5_state>();
 	int yyy = 256;
@@ -911,7 +911,7 @@ static void draw_bitmap( running_machine &machine, bitmap_t &bitmap )
 }
 
 
-static SCREEN_UPDATE( nmg5 )
+static SCREEN_UPDATE_IND16( nmg5 )
 {
 	nmg5_state *state = screen.machine().driver_data<nmg5_state>();
 
@@ -1052,10 +1052,9 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(nmg5)
+	MCFG_SCREEN_UPDATE_STATIC(nmg5)
 
 	MCFG_GFXDECODE(nmg5)
 	MCFG_PALETTE_LENGTH(0x400)

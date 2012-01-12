@@ -150,7 +150,7 @@ public:
 
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	const gfx_element *gfx = machine.gfx[0];
@@ -280,7 +280,7 @@ SCREEN_EOF( dreamwld )
 }
 
 
-static SCREEN_UPDATE( dreamwld )
+static SCREEN_UPDATE_IND16( dreamwld )
 {
 	dreamwld_state *state = screen.machine().driver_data<dreamwld_state>();
 //  int tm0size, tm1size;
@@ -584,10 +584,9 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE(dreamwld)
+	MCFG_SCREEN_UPDATE_STATIC(dreamwld)
 	MCFG_SCREEN_EOF(dreamwld)
 
 	MCFG_PALETTE_LENGTH(0x1000)

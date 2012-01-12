@@ -77,7 +77,7 @@ VIDEO_START( crimfght )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( crimfght )
+SCREEN_UPDATE_IND16( crimfght )
 {
 	crimfght_state *state = screen.machine().driver_data<crimfght_state>();
 

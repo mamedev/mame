@@ -63,6 +63,6 @@ VIDEO_START( ssv );
 VIDEO_START( eaglshot );
 VIDEO_START( gdfs );
 
-SCREEN_UPDATE( ssv );
-SCREEN_UPDATE( eaglshot );
-SCREEN_UPDATE( gdfs );
+SCREEN_UPDATE_IND16( ssv );
+SCREEN_UPDATE_IND16( eaglshot );
+SCREEN_UPDATE_IND16( gdfs );

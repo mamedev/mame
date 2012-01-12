@@ -19,8 +19,8 @@ public:
 	int m_clutsel;
 	int m_screen_refresh;
 	int m_gfxdraw_mode;
-	bitmap_t *m_tmpbitmap0;
-	bitmap_t *m_tmpbitmap1;
+	bitmap_ind16 m_tmpbitmap0;
+	bitmap_ind16 m_tmpbitmap1;
 	UINT8 *m_videoram0;
 	UINT8 *m_videoram1;
 	UINT8 *m_palette;
@@ -33,7 +33,7 @@ public:
 
 /*----------- defined in video/nbmj8891.c -----------*/
 
-SCREEN_UPDATE( nbmj8891 );
+SCREEN_UPDATE_IND16( nbmj8891 );
 VIDEO_START( nbmj8891_1layer );
 VIDEO_START( nbmj8891_2layer );
 

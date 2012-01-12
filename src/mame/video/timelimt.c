@@ -116,7 +116,7 @@ WRITE8_HANDLER( timelimt_scroll_y_w )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	timelimt_state *state = machine.driver_data<timelimt_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -143,7 +143,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( timelimt )
+SCREEN_UPDATE_IND16( timelimt )
 {
 	timelimt_state *state = screen.machine().driver_data<timelimt_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx);

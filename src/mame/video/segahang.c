@@ -49,7 +49,7 @@ VIDEO_START( sharrier )
  *
  *************************************/
 
-SCREEN_UPDATE( hangon )
+SCREEN_UPDATE_IND16( hangon )
 {
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)

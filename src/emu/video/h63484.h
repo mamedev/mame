@@ -26,8 +26,8 @@
 #define H63484_INTERFACE(name) \
 	const h63484_interface (name) =
 
-typedef void (*h63484_display_pixels_func)(device_t *device, bitmap_t &bitmap, int y, int x, UINT16 data);
-#define H63484_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t &bitmap, int y, int x, UINT16 data)
+typedef void (*h63484_display_pixels_func)(device_t *device, bitmap_ind16 &bitmap, int y, int x, UINT16 data);
+#define H63484_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_ind16 &bitmap, int y, int x, UINT16 data)
 
 // ======================> h63484_interface
 
@@ -56,7 +56,7 @@ public:
     DECLARE_READ8_MEMBER( vram_r );
     DECLARE_WRITE8_MEMBER( vram_w );
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
@@ -89,7 +89,7 @@ private:
 	UINT16 video_registers_r(int offset);
 	void video_registers_w(int offset);
 	int translate_command(UINT16 data);
-	void draw_graphics_line(bitmap_t &bitmap, const rectangle &cliprect, int y, int layer_n);
+	void draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int layer_n);
 
 
 	screen_device *m_screen;

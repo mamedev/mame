@@ -35,4 +35,4 @@ READ8_HANDLER( thief_coprocessor_r );
 WRITE8_HANDLER( thief_coprocessor_w );
 
 VIDEO_START( thief );
-SCREEN_UPDATE( thief );
+SCREEN_UPDATE_IND16( thief );

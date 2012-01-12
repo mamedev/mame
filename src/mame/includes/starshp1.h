@@ -58,7 +58,7 @@ public:
 	int m_mux;
 	int m_inverse;
 	UINT16 *m_LSFR;
-	bitmap_t *m_helper;
+	bitmap_ind16 m_helper;
 	tilemap_t *m_bg_tilemap;
 };
 
@@ -72,7 +72,7 @@ WRITE8_HANDLER( starshp1_ssadd_w );
 WRITE8_HANDLER( starshp1_playfield_w );
 
 PALETTE_INIT( starshp1 );
-SCREEN_UPDATE( starshp1 );
+SCREEN_UPDATE_IND16( starshp1 );
 SCREEN_EOF( starshp1 );
 VIDEO_START( starshp1 );
 

@@ -143,15 +143,14 @@ PALETTE_INIT( carpolo )
 VIDEO_START( carpolo )
 {
 	carpolo_state *state = machine.driver_data<carpolo_state>();
-	bitmap_format format = machine.primary_screen->format();
 
-	state->m_sprite_sprite_collision_bitmap1 = auto_bitmap_alloc(machine, SPRITE_WIDTH*2, SPRITE_HEIGHT*2, format);
-	state->m_sprite_sprite_collision_bitmap2 = auto_bitmap_alloc(machine, SPRITE_WIDTH*2, SPRITE_HEIGHT*2, format);
+	state->m_sprite_sprite_collision_bitmap1 = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
+	state->m_sprite_sprite_collision_bitmap2 = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
 
-	state->m_sprite_goal_collision_bitmap1 = auto_bitmap_alloc(machine, SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT, format);
-	state->m_sprite_goal_collision_bitmap2 = auto_bitmap_alloc(machine, SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT, format);
+	state->m_sprite_goal_collision_bitmap1 = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
+	state->m_sprite_goal_collision_bitmap2 = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT);
 
-	state->m_sprite_border_collision_bitmap = auto_bitmap_alloc(machine, SPRITE_WIDTH, SPRITE_HEIGHT, format);
+	state->m_sprite_border_collision_bitmap = auto_bitmap_ind16_alloc(machine, SPRITE_WIDTH, SPRITE_HEIGHT);
 
     state_save_register_global_bitmap(machine, state->m_sprite_sprite_collision_bitmap1);
     state_save_register_global_bitmap(machine, state->m_sprite_sprite_collision_bitmap2);
@@ -167,7 +166,7 @@ VIDEO_START( carpolo )
  *
  *************************************/
 
-static void draw_alpha_line(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+static void draw_alpha_line(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
 							int alpha_line, int video_line)
 {
 	carpolo_state *state = machine.driver_data<carpolo_state>();
@@ -198,7 +197,7 @@ static void remap_sprite_code(running_machine &machine, int bank, int code, int 
 }
 
 
-static void draw_sprite(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
 						UINT8 x, UINT8 y, int bank, int code, int col)
 {
 	int remapped_code, flipy;
@@ -221,7 +220,7 @@ static void draw_sprite(running_machine &machine, bitmap_t &bitmap, const rectan
 }
 
 
-SCREEN_UPDATE( carpolo )
+SCREEN_UPDATE_IND16( carpolo )
 {
 	carpolo_state *state = screen.machine().driver_data<carpolo_state>();
 	/* draw the playfield elements in the correct priority order */

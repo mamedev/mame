@@ -72,7 +72,7 @@ WRITE8_HANDLER( mario_flip_w );
 
 PALETTE_INIT( mario );
 VIDEO_START( mario );
-SCREEN_UPDATE( mario );
+SCREEN_UPDATE_IND16( mario );
 
 
 /*----------- defined in audio/mario.c -----------*/

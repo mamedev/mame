@@ -15,4 +15,4 @@ public:
 READ32_HANDLER( eolith_vram_r );
 WRITE32_HANDLER( eolith_vram_w );
 VIDEO_START( eolith );
-SCREEN_UPDATE( eolith );
+SCREEN_UPDATE_IND16( eolith );

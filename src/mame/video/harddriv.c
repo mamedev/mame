@@ -423,7 +423,7 @@ static void display_speedups(void)
 }
 
 
-void harddriv_scanline_driver(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
+void harddriv_scanline_driver(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	harddriv_state *state = screen.machine().driver_data<harddriv_state>();
 	UINT8 *vram_base = &state->m_gsp_vram[(params->rowaddr << 12) & state->m_vram_mask];
@@ -439,7 +439,7 @@ void harddriv_scanline_driver(screen_device &screen, bitmap_t &bitmap, int scanl
 }
 
 
-void harddriv_scanline_multisync(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
+void harddriv_scanline_multisync(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	harddriv_state *state = screen.machine().driver_data<harddriv_state>();
 	UINT8 *vram_base = &state->m_gsp_vram[(params->rowaddr << 11) & state->m_vram_mask];

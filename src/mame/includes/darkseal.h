@@ -24,7 +24,7 @@ public:
 /*----------- defined in video/darkseal.c -----------*/
 
 VIDEO_START( darkseal );
-SCREEN_UPDATE( darkseal );
+SCREEN_UPDATE_IND16( darkseal );
 
 WRITE16_HANDLER( darkseal_palette_24bit_rg_w );
 WRITE16_HANDLER( darkseal_palette_24bit_b_w );

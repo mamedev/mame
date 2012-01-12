@@ -38,5 +38,5 @@ READ8_HANDLER( actfancr_pf2_data_r );
 WRITE8_HANDLER( actfancr_pf2_control_w );
 
 VIDEO_START( actfancr );
-SCREEN_UPDATE( actfancr );
+SCREEN_UPDATE_IND16( actfancr );
 

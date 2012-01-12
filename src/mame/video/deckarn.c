@@ -28,7 +28,7 @@ void deco_karnovsprites_device::device_reset()
 
 }
 
-void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT16* spriteram, int size, int priority )
+void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int size, int priority )
 {
 	int offs;
 

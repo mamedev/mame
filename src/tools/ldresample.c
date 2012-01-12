@@ -82,7 +82,7 @@ struct _movie_info
 	int			samplerate;
 	int			channels;
 	int			interlaced;
-	bitmap_t *	bitmap;
+	bitmap_yuy16 *bitmap;
 	INT16 *		lsound;
 	INT16 *		rsound;
 	UINT32		samples;
@@ -151,7 +151,7 @@ INLINE UINT32 sample_number_to_field(const movie_info *info, UINT32 samplenum, U
 static int chd_allocate_buffers(movie_info *info)
 {
 	/* allocate a bitmap */
-	info->bitmap = new(std::nothrow) bitmap_t(info->width, info->height, BITMAP_FORMAT_YUY16);
+	info->bitmap = new(std::nothrow) bitmap_yuy16(info->width, info->height);
 	if (info->bitmap == NULL)
 	{
 		fprintf(stderr, "Out of memory creating %dx%d bitmap\n", info->width, info->height);
@@ -177,8 +177,7 @@ static int chd_allocate_buffers(movie_info *info)
 
 static void chd_free_buffers(movie_info *info)
 {
-	if (info->bitmap != NULL)
-		free(info->bitmap);
+	delete info->bitmap;
 	if (info->lsound != NULL)
 		free(info->lsound);
 	if (info->rsound != NULL)
@@ -294,11 +293,11 @@ static chd_file *create_chd(const char *filename, chd_file *source, const movie_
 
 static int read_chd(chd_file *file, UINT32 field, movie_info *info, UINT32 soundoffs)
 {
-	av_codec_decompress_config avconfig = { 0 };
+	av_codec_decompress_config avconfig;
 	chd_error chderr;
 
 	/* configure the codec */
-	avconfig.video = info->bitmap;
+	avconfig.video.wrap(*info->bitmap, info->bitmap->cliprect());
 	avconfig.maxsamples = 48000;
 	avconfig.actsamples = &info->samples;
 	avconfig.audio[0] = info->lsound + soundoffs;
@@ -322,11 +321,11 @@ static int read_chd(chd_file *file, UINT32 field, movie_info *info, UINT32 sound
 
 static int write_chd(chd_file *file, UINT32 field, movie_info *info)
 {
-	av_codec_compress_config avconfig = { 0 };
+	av_codec_compress_config avconfig;
 	chd_error chderr;
 
 	/* configure the codec */
-	avconfig.video = info->bitmap;
+	avconfig.video.wrap(*info->bitmap, info->bitmap->cliprect());
 	avconfig.channels = 2;
 	avconfig.samples = info->samples;
 	avconfig.audio[0] = info->lsound;

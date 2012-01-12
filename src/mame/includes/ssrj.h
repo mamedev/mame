@@ -24,6 +24,6 @@ WRITE8_HANDLER(ssrj_vram2_w);
 WRITE8_HANDLER(ssrj_vram4_w);
 
 VIDEO_START( ssrj );
-SCREEN_UPDATE( ssrj );
+SCREEN_UPDATE_IND16( ssrj );
 SCREEN_EOF( ssrj );
 PALETTE_INIT( ssrj );

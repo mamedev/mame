@@ -47,4 +47,4 @@ WRITE16_HANDLER( drgnmst_bg_videoram_w );
 WRITE16_HANDLER( drgnmst_md_videoram_w );
 
 VIDEO_START(drgnmst);
-SCREEN_UPDATE(drgnmst);
+SCREEN_UPDATE_IND16(drgnmst);

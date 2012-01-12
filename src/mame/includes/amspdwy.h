@@ -38,4 +38,4 @@ WRITE8_HANDLER( amspdwy_paletteram_w );
 WRITE8_HANDLER( amspdwy_flipscreen_w );
 
 VIDEO_START( amspdwy );
-SCREEN_UPDATE( amspdwy );
+SCREEN_UPDATE_IND16( amspdwy );

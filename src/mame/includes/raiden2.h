@@ -109,7 +109,7 @@ public:
 
 	UINT16 cop_hit_status;
 
-	void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect ,int pri_mask );
+	void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect ,int pri_mask );
 	UINT8 cop_calculate_collsion_detection(running_machine &machine);
 
 };

@@ -84,7 +84,7 @@ static VIDEO_START( chinsan )
 {
 }
 
-static SCREEN_UPDATE( chinsan )
+static SCREEN_UPDATE_IND16( chinsan )
 {
 	chinsan_state *state = screen.machine().driver_data<chinsan_state>();
 	int y, x, count;
@@ -603,12 +603,11 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE(chinsan)
+	MCFG_SCREEN_UPDATE_STATIC(chinsan)
 
 	MCFG_GFXDECODE(chinsan)
 	MCFG_PALETTE_LENGTH(0x100)

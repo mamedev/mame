@@ -272,7 +272,7 @@ WRITE8_HANDLER( pinbo_video_control_w )
  *
  *************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int reverse )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse )
 {
 	lasso_state *state = machine.driver_data<lasso_state>();
 	const UINT8 *finish, *source;
@@ -326,7 +326,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-static void draw_lasso( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_lasso( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lasso_state *state = machine.driver_data<lasso_state>();
 	offs_t offs;
@@ -367,7 +367,7 @@ static void draw_lasso( running_machine &machine, bitmap_t &bitmap, const rectan
 }
 
 
-SCREEN_UPDATE( lasso )
+SCREEN_UPDATE_IND16( lasso )
 {
 	lasso_state *state = screen.machine().driver_data<lasso_state>();
 	palette_set_color(screen.machine(), 0, get_color(*state->m_back_color));
@@ -380,7 +380,7 @@ SCREEN_UPDATE( lasso )
 	return 0;
 }
 
-SCREEN_UPDATE( chameleo )
+SCREEN_UPDATE_IND16( chameleo )
 {
 	lasso_state *state = screen.machine().driver_data<lasso_state>();
 	palette_set_color(screen.machine(), 0, get_color(*state->m_back_color));
@@ -393,7 +393,7 @@ SCREEN_UPDATE( chameleo )
 }
 
 
-SCREEN_UPDATE( wwjgtin )
+SCREEN_UPDATE_IND16( wwjgtin )
 {
 	lasso_state *state = screen.machine().driver_data<lasso_state>();
 	colortable_palette_set_color(screen.machine().colortable, 0, get_color(*state->m_back_color));

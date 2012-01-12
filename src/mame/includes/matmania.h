@@ -22,8 +22,8 @@ public:
 	size_t          m_spriteram_size;
 
 	/* video-related */
-	bitmap_t        *m_tmpbitmap;
-	bitmap_t        *m_tmpbitmap2;
+	bitmap_ind16        *m_tmpbitmap;
+	bitmap_ind16        *m_tmpbitmap2;
 
 	/* mcu */
 	/* maniach 68705 protection */
@@ -67,6 +67,6 @@ READ8_HANDLER( maniach_mcu_status_r );
 
 WRITE8_HANDLER( matmania_paletteram_w );
 PALETTE_INIT( matmania );
-SCREEN_UPDATE( maniach );
+SCREEN_UPDATE_IND16( maniach );
 VIDEO_START( matmania );
-SCREEN_UPDATE( matmania );
+SCREEN_UPDATE_IND16( matmania );

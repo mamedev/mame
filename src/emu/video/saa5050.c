@@ -206,7 +206,7 @@ void saa5050_frame_advance( device_t *device )
 		saa5050->frame_count = 0;
 }
 
-void saa5050_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect  )
+void saa5050_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect  )
 {
 	saa5050_state *saa5050 = get_safe_token(device);
 	int code, colour;

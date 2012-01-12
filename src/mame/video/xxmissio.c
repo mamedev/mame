@@ -85,7 +85,7 @@ VIDEO_START( xxmissio )
 }
 
 
-static void draw_sprites(bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx)
+static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx)
 {
 	xxmissio_state *state = gfx->machine().driver_data<xxmissio_state>();
 	int offs;
@@ -136,7 +136,7 @@ static void draw_sprites(bitmap_t &bitmap, const rectangle &cliprect, const gfx_
 }
 
 
-SCREEN_UPDATE( xxmissio )
+SCREEN_UPDATE_IND16( xxmissio )
 {
 	xxmissio_state *state = screen.machine().driver_data<xxmissio_state>();
 	tilemap_mark_all_tiles_dirty_all(screen.machine());

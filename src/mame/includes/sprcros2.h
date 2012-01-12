@@ -30,4 +30,4 @@ WRITE8_HANDLER( sprcros2_bgscrolly_w );
 
 PALETTE_INIT( sprcros2 );
 VIDEO_START( sprcros2 );
-SCREEN_UPDATE( sprcros2 );
+SCREEN_UPDATE_IND16( sprcros2 );

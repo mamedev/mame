@@ -286,13 +286,13 @@ WRITE16_HANDLER( koshien_spritebank_w )
 	state->m_spritebank_buffered[7] = state->m_spritebank_buffered[6] + 0x400;
 }
 
-static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_t &dest_bmp, const rectangle &clip, const gfx_element *gfx,
+static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_ind16 &dest_bmp, const rectangle &clip, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-	bitmap_t &priority_bitmap = gfx->machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
 	int sprite_screen_height = (scaley * gfx->height + 0x8000) >> 16;
 	int sprite_screen_width = (scalex * gfx->width + 0x8000) >> 16;
 
@@ -432,7 +432,7 @@ static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_t &de
 	}
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int *primasks, int uses_tc360_mixer )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int uses_tc360_mixer )
 {
 	/*
         Sprite format:
@@ -976,7 +976,7 @@ SCREEN_EOF( taitof2_partial_buffer_delayed_qzchikyu )
 
 
 /* SSI */
-SCREEN_UPDATE( taitof2_ssi )
+SCREEN_UPDATE_IND16( taitof2_ssi )
 {
 	taitof2_handle_sprite_buffering(screen.machine());
 
@@ -989,7 +989,7 @@ SCREEN_UPDATE( taitof2_ssi )
 }
 
 
-SCREEN_UPDATE( taitof2_yesnoj )
+SCREEN_UPDATE_IND16( taitof2_yesnoj )
 {
 	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 
@@ -1007,7 +1007,7 @@ SCREEN_UPDATE( taitof2_yesnoj )
 }
 
 
-SCREEN_UPDATE( taitof2 )
+SCREEN_UPDATE_IND16( taitof2 )
 {
 	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 
@@ -1025,7 +1025,7 @@ SCREEN_UPDATE( taitof2 )
 }
 
 
-SCREEN_UPDATE( taitof2_pri )
+SCREEN_UPDATE_IND16( taitof2_pri )
 {
 	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 	int layer[3];
@@ -1061,7 +1061,7 @@ SCREEN_UPDATE( taitof2_pri )
 
 
 
-static void draw_roz_layer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32 priority)
+static void draw_roz_layer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 priority)
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
@@ -1072,7 +1072,7 @@ static void draw_roz_layer( running_machine &machine, bitmap_t &bitmap, const re
 		tc0430grw_zoom_draw(state->m_tc0430grw, bitmap, cliprect, state->m_pivot_xdisp, state->m_pivot_ydisp, priority);
 }
 
-SCREEN_UPDATE( taitof2_pri_roz )
+SCREEN_UPDATE_IND16( taitof2_pri_roz )
 {
 	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 	int tilepri[3];
@@ -1141,7 +1141,7 @@ SCREEN_UPDATE( taitof2_pri_roz )
 
 
 /* Thunderfox */
-SCREEN_UPDATE( taitof2_thundfox )
+SCREEN_UPDATE_IND16( taitof2_thundfox )
 {
 	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 	int tilepri[2][3];
@@ -1278,7 +1278,7 @@ and it changes these (and the sprite pri settings) a lot.
 
 ********************************************************************/
 
-SCREEN_UPDATE( taitof2_metalb )
+SCREEN_UPDATE_IND16( taitof2_metalb )
 {
 	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 	UINT8 layer[5], invlayer[4];
@@ -1329,7 +1329,7 @@ SCREEN_UPDATE( taitof2_metalb )
 
 
 /* Deadconx, Footchmp */
-SCREEN_UPDATE( taitof2_deadconx )
+SCREEN_UPDATE_IND16( taitof2_deadconx )
 {
 	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 	UINT8 layer[5];

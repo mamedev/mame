@@ -47,6 +47,6 @@ WRITE16_HANDLER( lastduel_palette_word_w );
 
 VIDEO_START( lastduel );
 VIDEO_START( madgear );
-SCREEN_UPDATE( lastduel );
-SCREEN_UPDATE( madgear );
+SCREEN_UPDATE_IND16( lastduel );
+SCREEN_UPDATE_IND16( madgear );
 SCREEN_EOF( lastduel );

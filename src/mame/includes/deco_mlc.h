@@ -23,5 +23,5 @@ public:
 /*----------- defined in video/deco_mlc.c -----------*/
 
 VIDEO_START( mlc );
-SCREEN_UPDATE( mlc );
+SCREEN_UPDATE_RGB32( mlc );
 SCREEN_EOF( mlc );

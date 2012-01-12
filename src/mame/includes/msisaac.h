@@ -17,8 +17,8 @@ public:
 	size_t      m_spriteram2_size;
 
 	/* video-related */
-	bitmap_t    *m_tmp_bitmap1;
-	bitmap_t    *m_tmp_bitmap2;
+	bitmap_ind16    *m_tmp_bitmap1;
+	bitmap_ind16    *m_tmp_bitmap2;
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_fg_tilemap;
 	tilemap_t     *m_bg2_tilemap;
@@ -59,5 +59,5 @@ WRITE8_HANDLER( msisaac_bg_videoram_w );
 WRITE8_HANDLER( msisaac_bg2_videoram_w );
 WRITE8_HANDLER( msisaac_fg_videoram_w );
 
-SCREEN_UPDATE( msisaac );
+SCREEN_UPDATE_IND16( msisaac );
 VIDEO_START( msisaac );

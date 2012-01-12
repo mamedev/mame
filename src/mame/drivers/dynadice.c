@@ -206,7 +206,7 @@ static VIDEO_START( dynadice )
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, -16);
 }
 
-static SCREEN_UPDATE( dynadice )
+static SCREEN_UPDATE_IND16( dynadice )
 {
 	dynadice_state *state = screen.machine().driver_data<dynadice_state>();
 	rectangle myclip = cliprect;
@@ -255,10 +255,9 @@ static MACHINE_CONFIG_START( dynadice, dynadice_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256+16, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 3*8, 28*8-1)
-	MCFG_SCREEN_UPDATE(dynadice)
+	MCFG_SCREEN_UPDATE_STATIC(dynadice)
 
 	MCFG_GFXDECODE(dynadice)
 	MCFG_PALETTE_LENGTH(8)

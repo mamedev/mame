@@ -28,8 +28,8 @@ public:
 
 VIDEO_START( bbuster );
 VIDEO_START( mechatt );
-SCREEN_UPDATE( bbuster );
-SCREEN_UPDATE( mechatt );
+SCREEN_UPDATE_IND16( bbuster );
+SCREEN_UPDATE_IND16( mechatt );
 
 WRITE16_HANDLER( bbusters_pf1_w );
 WRITE16_HANDLER( bbusters_pf2_w );

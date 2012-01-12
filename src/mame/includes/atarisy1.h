@@ -60,4 +60,4 @@ WRITE16_HANDLER( atarisy1_yscroll_w );
 WRITE16_HANDLER( atarisy1_priority_w );
 
 VIDEO_START( atarisy1 );
-SCREEN_UPDATE( atarisy1 );
+SCREEN_UPDATE_IND16( atarisy1 );

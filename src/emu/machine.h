@@ -160,6 +160,10 @@ const int DEBUG_FLAG_OSD_ENABLED	= 0x00001000;		// The OSD debugger is enabled
 #define auto_free(m, v)					pool_free(static_cast<running_machine &>(m).respool(), v)
 
 #define auto_bitmap_alloc(m, w, h, f)	auto_alloc(m, bitmap_t(w, h, f))
+#define auto_bitmap_ind8_alloc(m, w, h)	auto_alloc(m, bitmap_ind8(w, h))
+#define auto_bitmap_ind16_alloc(m, w, h)	auto_alloc(m, bitmap_ind16(w, h))
+#define auto_bitmap_ind32_alloc(m, w, h)	auto_alloc(m, bitmap_ind32(w, h))
+#define auto_bitmap_rgb32_alloc(m, w, h)	auto_alloc(m, bitmap_rgb32(w, h))
 #define auto_strdup(m, s)				strcpy(auto_alloc_array(m, char, strlen(s) + 1), s)
 
 
@@ -414,7 +418,7 @@ public:
 	const pen_t *			pens;				// remapped palette pen numbers
 	colortable_t *			colortable;			// global colortable for remapping
 	pen_t *					shadow_table;		// table for looking up a shadowed pen
-	bitmap_t				priority_bitmap;	// priority bitmap
+	bitmap_ind8			priority_bitmap;	// priority bitmap
 
 	// debugger-related information
 	UINT32					debug_flags;		// the current debug flags
@@ -557,9 +561,6 @@ public:
 	static void static_set_game(device_t &device, const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, legacy_callback_func callback);
 	static void static_set_palette_init(device_t &device, palette_init_func callback);
-
-	// additional video helpers
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	// generic helpers
 

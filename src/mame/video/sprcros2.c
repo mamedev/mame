@@ -146,7 +146,7 @@ VIDEO_START( sprcros2 )
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fgtilemap, machine.gfx[2], 0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 	int offs,sx,sy,color,flipx,flipy;
@@ -194,7 +194,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-SCREEN_UPDATE( sprcros2 )
+SCREEN_UPDATE_IND16( sprcros2 )
 {
 	sprcros2_state *state = screen.machine().driver_data<sprcros2_state>();
 

@@ -66,7 +66,7 @@ public:
 
 	struct {
 	    UINT8     *gfx_decode;
-	    bitmap_t  *roz_bitmap[2];
+	    bitmap_rgb32 roz_bitmap[2];
 	    UINT8     dotsel;
 	    UINT8     pal;
 	    UINT16    h_count;
@@ -118,6 +118,8 @@ public:
 	legacy_cpu_device* m_maincpu;
 	legacy_cpu_device* m_slave;
 	legacy_cpu_device* m_audiocpu;
+	
+	bitmap_rgb32 m_tmpbitmap;
 };
 
 #define MASTER_CLOCK_352 57272720
@@ -222,7 +224,7 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w );
 WRITE16_HANDLER ( saturn_vdp2_regs_w );
 
 VIDEO_START ( stv_vdp2 );
-SCREEN_UPDATE( stv_vdp2 );
+SCREEN_UPDATE_RGB32( stv_vdp2 );
 #if NEW_VIDEO_CODE
-SCREEN_UPDATE( saturn );
+SCREEN_UPDATE_RGB32( saturn );
 #endif

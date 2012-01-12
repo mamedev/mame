@@ -54,7 +54,7 @@ public:
 
 PALETTE_INIT( exerion );
 VIDEO_START( exerion );
-SCREEN_UPDATE( exerion );
+SCREEN_UPDATE_IND16( exerion );
 
 WRITE8_HANDLER( exerion_videoreg_w );
 WRITE8_HANDLER( exerion_video_latch_w );

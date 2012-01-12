@@ -16,13 +16,13 @@ public:
 	int m_dispflag;
 	int m_highcolorflag;
 	int m_flipscreen;
-	bitmap_t *m_tmpbitmap;
+	bitmap_rgb32 m_tmpbitmap;
 };
 
 
 /*----------- defined in video/hyhoo.c -----------*/
 
-SCREEN_UPDATE( hyhoo );
+SCREEN_UPDATE_RGB32( hyhoo );
 VIDEO_START( hyhoo );
 
 WRITE8_HANDLER( hyhoo_blitter_w );

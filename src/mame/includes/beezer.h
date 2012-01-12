@@ -35,6 +35,6 @@ READ8_DEVICE_HANDLER( beezer_noise_r );
 /*----------- defined in video/beezer.c -----------*/
 
 TIMER_DEVICE_CALLBACK( beezer_interrupt );
-SCREEN_UPDATE( beezer );
+SCREEN_UPDATE_IND16( beezer );
 WRITE8_HANDLER( beezer_map_w );
 READ8_HANDLER( beezer_line_r );

@@ -251,7 +251,7 @@ VIDEO_START(godzilla)
 
 *************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
 	UINT16 *spriteram16 = machine.generic.spriteram.u16;
@@ -415,7 +415,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 
 #define LAYER_DB 0
 
-SCREEN_UPDATE( legionna )
+SCREEN_UPDATE_IND16( legionna )
 {
 	legionna_state *state = screen.machine().driver_data<legionna_state>();
 	/* Setup the tilemaps */
@@ -445,7 +445,7 @@ SCREEN_UPDATE( legionna )
 }
 
 
-SCREEN_UPDATE( godzilla )
+SCREEN_UPDATE_IND16( godzilla )
 {
 	legionna_state *state = screen.machine().driver_data<legionna_state>();
 //  tilemap_set_scrollx( state->m_text_layer, 0, 0 );
@@ -474,7 +474,7 @@ SCREEN_UPDATE( godzilla )
 	return 0;
 }
 
-SCREEN_UPDATE( grainbow )
+SCREEN_UPDATE_IND16( grainbow )
 {
 	legionna_state *state = screen.machine().driver_data<legionna_state>();
 	/* Setup the tilemaps */

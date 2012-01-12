@@ -34,7 +34,7 @@ public:
 
 VIDEO_START( atarigx2 );
 SCREEN_EOF( atarigx2 );
-SCREEN_UPDATE( atarigx2 );
+SCREEN_UPDATE_IND16( atarigx2 );
 
 WRITE16_HANDLER( atarigx2_mo_control_w );
 

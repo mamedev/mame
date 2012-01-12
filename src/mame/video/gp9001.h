@@ -54,14 +54,14 @@ public:
 	UINT16 gp9001_gfxrom_bank[8];		/* Batrider object bank */
 
 
-	void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const UINT8* primap );
-	void gp9001_draw_custom_tilemap(running_machine& machine, bitmap_t &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable );
-	void gp9001_render_vdp(running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect);
+	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap );
+	void gp9001_draw_custom_tilemap(running_machine& machine, bitmap_ind16 &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable );
+	void gp9001_render_vdp(running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gp9001_screen_eof(void);
 	void create_tilemaps(int region);
 	void init_scroll_regs(void);
 
-	bitmap_t *custom_priority_bitmap;
+	bitmap_ind8 *custom_priority_bitmap;
 
 protected:
 	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;

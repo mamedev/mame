@@ -28,6 +28,6 @@ WRITE8_HANDLER( exzisus_videoram_1_w );
 WRITE8_HANDLER( exzisus_objectram_0_w );
 WRITE8_HANDLER( exzisus_objectram_1_w );
 
-SCREEN_UPDATE( exzisus );
+SCREEN_UPDATE_IND16( exzisus );
 
 

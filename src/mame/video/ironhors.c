@@ -155,7 +155,7 @@ VIDEO_START( ironhors )
 	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	ironhors_state *state = machine.driver_data<ironhors_state>();
 	int offs;
@@ -239,7 +239,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( ironhors )
+SCREEN_UPDATE_IND16( ironhors )
 {
 	ironhors_state *state = screen.machine().driver_data<ironhors_state>();
 	int row;
@@ -271,7 +271,7 @@ VIDEO_START( farwest )
 	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 }
 
-static void farwest_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	ironhors_state *state = machine.driver_data<ironhors_state>();
 	int offs;
@@ -352,7 +352,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_t &bitmap, co
 	}
 }
 
-SCREEN_UPDATE( farwest)
+SCREEN_UPDATE_IND16( farwest)
 {
 	ironhors_state *state = screen.machine().driver_data<ironhors_state>();
 	int row;

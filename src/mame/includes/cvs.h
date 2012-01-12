@@ -32,9 +32,9 @@ public:
 
 	/* video-related */
 	struct cvs_star m_stars[CVS_MAX_STARS];
-	bitmap_t   *m_collision_background;
-	bitmap_t   *m_background_bitmap;
-	bitmap_t   *m_scrolled_collision_background;
+	bitmap_ind16   m_collision_background;
+	bitmap_ind16   m_background_bitmap;
+	bitmap_ind16   m_scrolled_collision_background;
 	int        m_collision_register;
 	int        m_total_stars;
 	int        m_stars_on;
@@ -109,11 +109,11 @@ READ8_HANDLER( cvs_collision_clear );
 void cvs_scroll_stars(running_machine &machine);
 
 PALETTE_INIT( cvs );
-SCREEN_UPDATE( cvs );
+SCREEN_UPDATE_IND16( cvs );
 VIDEO_START( cvs );
 
 /*----------- defined in video/quasar.c -----------*/
 
 PALETTE_INIT( quasar );
-SCREEN_UPDATE( quasar );
+SCREEN_UPDATE_IND16( quasar );
 VIDEO_START( quasar );

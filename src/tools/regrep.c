@@ -767,15 +767,13 @@ static void output_report(astring &dirname, astring &tempheader, astring &tempfo
 
 static int compare_screenshots(summary_file *curfile)
 {
-	bitmap_t *bitmaps[MAX_COMPARES] = { NULL };
+	bitmap_argb32 bitmaps[MAX_COMPARES];
 	int unique[MAX_COMPARES];
 	int numunique = 0;
 	int listnum;
 
 	/* iterate over all files and load their bitmaps */
 	for (listnum = 0; listnum < list_count; listnum++)
-	{
-		bitmaps[listnum] = NULL;
 		if (curfile->status[listnum] == STATUS_SUCCESS)
 		{
 			astring fullname;
@@ -801,42 +799,39 @@ static int compare_screenshots(summary_file *curfile)
 			/* if that worked, load the file */
 			if (filerr == FILERR_NONE)
 			{
-				png_read_bitmap(file, &bitmaps[listnum]);
+				png_read_bitmap(file, bitmaps[listnum]);
 				core_fclose(file);
 			}
 		}
-	}
 
 	/* now find all the different bitmap types */
 	for (listnum = 0; listnum < list_count; listnum++)
 	{
 		curfile->matchbitmap[listnum] = 0xff;
-		if (bitmaps[listnum] != NULL)
+		if (bitmaps[listnum].valid())
 		{
-			bitmap_t *this_bitmap = bitmaps[listnum];
-			int compnum;
+			bitmap_argb32 &this_bitmap = bitmaps[listnum];
 
 			/* compare against all unique bitmaps */
+			int compnum;
 			for (compnum = 0; compnum < numunique; compnum++)
 			{
-				bitmap_t *base_bitmap = bitmaps[unique[compnum]];
-				int bitmaps_differ;
-				int x, y;
-
 				/* if the sizes are different, we differ; otherwise start off assuming we are the same */
-				bitmaps_differ = (this_bitmap->width() != base_bitmap->width() || this_bitmap->height() != base_bitmap->height());
+				bitmap_argb32 &base_bitmap = bitmaps[unique[compnum]];
+				bool bitmaps_differ = (this_bitmap.width() != base_bitmap.width() || this_bitmap.height() != base_bitmap.height());
 
 				/* compare scanline by scanline */
-				for (y = 0; y < this_bitmap->height() && !bitmaps_differ; y++)
+				for (int y = 0; y < this_bitmap.height() && !bitmaps_differ; y++)
 				{
-					UINT32 *base = &base_bitmap->pix32(y);
-					UINT32 *curr = &this_bitmap->pix32(y);
+					UINT32 *base = &base_bitmap.pix32(y);
+					UINT32 *curr = &this_bitmap.pix32(y);
 
 					/* scan the scanline */
-					for (x = 0; x < this_bitmap->width(); x++)
+					int x;
+					for (x = 0; x < this_bitmap.width(); x++)
 						if (*base++ != *curr++)
 							break;
-					bitmaps_differ = (x != this_bitmap->width());
+					bitmaps_differ = (x != this_bitmap.width());
 				}
 
 				/* if we matched, remember which listnum index we matched, and stop */
@@ -861,10 +856,6 @@ static int compare_screenshots(summary_file *curfile)
 		}
 	}
 
-	/* free the bitmaps */
-	for (listnum = 0; listnum < list_count; listnum++)
-		delete bitmaps[listnum];
-
 	/* if all screenshots matched, we're good */
 	if (numunique == 1)
 		return BUCKET_GOOD;
@@ -886,11 +877,11 @@ static int compare_screenshots(summary_file *curfile)
 
 static int generate_png_diff(const summary_file *curfile, astring &destdir, const char *destname)
 {
-	bitmap_t *bitmaps[MAX_COMPARES] = { NULL };
+	bitmap_argb32 bitmaps[MAX_COMPARES];
 	astring srcimgname;
 	astring dstfilename;
 	astring tempname;
-	bitmap_t *finalbitmap = NULL;
+	bitmap_argb32 finalbitmap;
 	int width, height, maxwidth;
 	int bitmapcount = 0;
 	int listnum, bmnum;
@@ -916,7 +907,7 @@ static int generate_png_diff(const summary_file *curfile, astring &destdir, cons
 				goto error;
 
 			/* load the source image */
-			pngerr = png_read_bitmap(file, &bitmaps[bitmapcount++]);
+			pngerr = png_read_bitmap(file, bitmaps[bitmapcount++]);
 			core_fclose(file);
 			if (pngerr != PNGERR_NONE)
 				goto error;
@@ -928,67 +919,65 @@ static int generate_png_diff(const summary_file *curfile, astring &destdir, cons
 
 	/* determine the size of the final bitmap */
 	height = width = 0;
-	maxwidth = bitmaps[0]->width();
+	maxwidth = bitmaps[0].width();
 	for (bmnum = 1; bmnum < bitmapcount; bmnum++)
 	{
 		int curwidth;
 
 		/* determine the maximal width */
-		maxwidth = MAX(maxwidth, bitmaps[bmnum]->width());
-		curwidth = bitmaps[0]->width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE + maxwidth;
+		maxwidth = MAX(maxwidth, bitmaps[bmnum].width());
+		curwidth = bitmaps[0].width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE + maxwidth;
 		width = MAX(width, curwidth);
 
 		/* add to the height */
-		height += MAX(bitmaps[0]->height(), bitmaps[bmnum]->height());
+		height += MAX(bitmaps[0].height(), bitmaps[bmnum].height());
 		if (bmnum != 1)
 			height += BITMAP_SPACE;
 	}
 
 	/* allocate the final bitmap */
-	finalbitmap = new(std::nothrow) bitmap_t(width, height, BITMAP_FORMAT_ARGB32);
-	if (finalbitmap == NULL)
-		goto error;
+	finalbitmap.allocate(width, height);
 
 	/* now copy and compare each set of bitmaps */
 	starty = 0;
 	for (bmnum = 1; bmnum < bitmapcount; bmnum++)
 	{
-		bitmap_t *bitmap1 = bitmaps[0];
-		bitmap_t *bitmap2 = bitmaps[bmnum];
-		int curheight = MAX(bitmap1->height(), bitmap2->height());
+		bitmap_argb32 &bitmap1 = bitmaps[0];
+		bitmap_argb32 &bitmap2 = bitmaps[bmnum];
+		int curheight = MAX(bitmap1.height(), bitmap2.height());
 		int x, y;
 
 		/* iterate over rows in these bitmaps */
 		for (y = 0; y < curheight; y++)
 		{
-			UINT32 *src1 = (y < bitmap1->height()) ? &bitmap1->pix32(y) : NULL;
-			UINT32 *src2 = (y < bitmap2->height()) ? &bitmap2->pix32(y) : NULL;
-			UINT32 *dst1 = &finalbitmap->pix32(starty + y, 0);
-			UINT32 *dst2 = &finalbitmap->pix32(starty + y, bitmap1->width() + BITMAP_SPACE);
-			UINT32 *dstdiff = &finalbitmap->pix32(starty + y, bitmap1->width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
+			UINT32 *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : NULL;
+			UINT32 *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : NULL;
+			UINT32 *dst1 = &finalbitmap.pix32(starty + y, 0);
+			UINT32 *dst2 = &finalbitmap.pix32(starty + y, bitmap1.width() + BITMAP_SPACE);
+			UINT32 *dstdiff = &finalbitmap.pix32(starty + y, bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
 
 			/* now iterate over columns */
 			for (x = 0; x < maxwidth; x++)
 			{
 				int pix1 = -1, pix2 = -2;
 
-				if (src1 != NULL && x < bitmap1->width())
+				if (src1 != NULL && x < bitmap1.width())
 					pix1 = dst1[x] = src1[x];
-				if (src2 != NULL && x < bitmap2->width())
+				if (src2 != NULL && x < bitmap2.width())
 					pix2 = dst2[x] = src2[x];
 				dstdiff[x] = (pix1 != pix2) ? 0xffffffff : 0xff000000;
 			}
 		}
 
 		/* update the starting Y position */
-		starty += BITMAP_SPACE + MAX(bitmap1->height(), bitmap2->height());
+		starty += BITMAP_SPACE + MAX(bitmap1.height(), bitmap2.height());
 	}
 
 	/* write the final PNG */
 	filerr = core_fopen(dstfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 	if (filerr != FILERR_NONE)
 		goto error;
-	pngerr = png_write_bitmap(file, NULL, *finalbitmap, 0, NULL);
+	pngerr = png_write_bitmap(file, NULL, finalbitmap, 0, NULL);
 	core_fclose(file);
 	if (pngerr != PNGERR_NONE)
 		goto error;
@@ -997,9 +986,6 @@ static int generate_png_diff(const summary_file *curfile, astring &destdir, cons
 	error = 0;
 
 error:
-	delete finalbitmap;
-	for (bmnum = 0; bmnum < bitmapcount; bmnum++)
-		delete bitmaps[bmnum];
 	if (error)
 		osd_rmfile(dstfilename);
 	return error;

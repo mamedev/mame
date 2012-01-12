@@ -241,7 +241,7 @@ static VIDEO_START(multfish)
 	tilemap_set_scroll_cols(state->m_reel_tilemap, 64);
 }
 
-static SCREEN_UPDATE(multfish)
+static SCREEN_UPDATE_IND16(multfish)
 {
 	multfish_state *state = screen.machine().driver_data<multfish_state>();
 	int i;
@@ -1034,10 +1034,9 @@ static MACHINE_CONFIG_START( multfish, multfish_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
-	MCFG_SCREEN_UPDATE(multfish)
+	MCFG_SCREEN_UPDATE_STATIC(multfish)
 	MCFG_GFXDECODE(multfish)
 	MCFG_PALETTE_LENGTH(0x1000)
 

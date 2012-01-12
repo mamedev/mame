@@ -183,7 +183,7 @@ VIDEO_START( redclash )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -267,7 +267,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static void draw_bullets( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_bullets( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 	int offs;
@@ -360,7 +360,7 @@ void redclash_set_stars_speed( running_machine &machine, UINT8 speed )
 /* Space Raider doesn't use the Va bit, and it is also set up to */
 /* window the stars to a certain x range */
 
-void redclash_draw_stars( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx )
+void redclash_draw_stars( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx )
 {
 	ladybug_state *redclash = machine.driver_data<ladybug_state>();
 	int i;
@@ -423,7 +423,7 @@ SCREEN_EOF( redclash )
 	redclash_update_stars_state(screen.machine());
 }
 
-SCREEN_UPDATE( redclash )
+SCREEN_UPDATE_IND16( redclash )
 {
 	ladybug_state *state = screen.machine().driver_data<ladybug_state>();
 

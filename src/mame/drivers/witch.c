@@ -708,7 +708,7 @@ static VIDEO_START(witch)
 	tilemap_set_palette_offset(state->m_gfx1_tilemap,0x200);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	witch_state *state = machine.driver_data<witch_state>();
 	int i,sx,sy,tileno,flags,color;
@@ -756,7 +756,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 }
 
-static SCREEN_UPDATE(witch)
+static SCREEN_UPDATE_IND16(witch)
 {
 	witch_state *state = screen.machine().driver_data<witch_state>();
 	tilemap_set_scrollx( state->m_gfx1_tilemap, 0, state->m_scrollx-7 ); //offset to have it aligned with the sprites
@@ -798,10 +798,9 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
-	MCFG_SCREEN_UPDATE(witch)
+	MCFG_SCREEN_UPDATE_STATIC(witch)
 
 	MCFG_GFXDECODE(witch)
 	MCFG_PALETTE_LENGTH(0x800)

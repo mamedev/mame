@@ -120,7 +120,7 @@ static WRITE8_HANDLER( mole_flipscreen_w )
 	flip_screen_set(space->machine(), data & 0x01);
 }
 
-static SCREEN_UPDATE( mole )
+static SCREEN_UPDATE_IND16( mole )
 {
 	mole_state *state = screen.machine().driver_data<mole_state>();
 
@@ -328,10 +328,9 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_UPDATE(mole)
+	MCFG_SCREEN_UPDATE_STATIC(mole)
 
 	MCFG_GFXDECODE(mole)
 	MCFG_PALETTE_LENGTH(8)

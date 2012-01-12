@@ -84,7 +84,7 @@ WRITE8_HANDLER( speedbal_background_videoram_w )
  *                                   *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	speedbal_state *state = machine.driver_data<speedbal_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -127,7 +127,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
  *                                   *
  *************************************/
 
-SCREEN_UPDATE( speedbal )
+SCREEN_UPDATE_IND16( speedbal )
 {
 	speedbal_state *state = screen.machine().driver_data<speedbal_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);

@@ -44,7 +44,7 @@ public:
 
 /*----------- defined in video/renegade.c -----------*/
 
-SCREEN_UPDATE( renegade );
+SCREEN_UPDATE_IND16( renegade );
 VIDEO_START( renegade );
 WRITE8_HANDLER( renegade_scroll0_w );
 WRITE8_HANDLER( renegade_scroll1_w );

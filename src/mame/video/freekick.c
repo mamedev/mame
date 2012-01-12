@@ -29,7 +29,7 @@ WRITE8_HANDLER( freek_videoram_w )
 	tilemap_mark_tile_dirty(state->m_freek_tilemap, offset & 0x3ff);
 }
 
-static void gigas_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void gigas_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
 	int offs;
@@ -64,7 +64,7 @@ static void gigas_draw_sprites( running_machine &machine, bitmap_t &bitmap, cons
 }
 
 
-static void pbillrd_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void pbillrd_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
 	int offs;
@@ -100,7 +100,7 @@ static void pbillrd_draw_sprites( running_machine &machine, bitmap_t &bitmap, co
 
 
 
-static void freekick_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void freekick_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
 	int offs;
@@ -134,7 +134,7 @@ static void freekick_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-SCREEN_UPDATE( gigas )
+SCREEN_UPDATE_IND16( gigas )
 {
 	freekick_state *state = screen.machine().driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->m_freek_tilemap, 0, 0);
@@ -142,7 +142,7 @@ SCREEN_UPDATE( gigas )
 	return 0;
 }
 
-SCREEN_UPDATE( pbillrd )
+SCREEN_UPDATE_IND16( pbillrd )
 {
 	freekick_state *state = screen.machine().driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->m_freek_tilemap, 0, 0);
@@ -150,7 +150,7 @@ SCREEN_UPDATE( pbillrd )
 	return 0;
 }
 
-SCREEN_UPDATE( freekick )
+SCREEN_UPDATE_IND16( freekick )
 {
 	freekick_state *state = screen.machine().driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->m_freek_tilemap, 0, 0);

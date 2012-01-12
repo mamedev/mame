@@ -36,7 +36,8 @@
 #include "cpu/z80/z80.h"
 #include "render.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/laserdsc.h"
+#include "machine/ldv1000.h"
+#include "machine/ldstub.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "sound/ay8910.h"
@@ -48,12 +49,55 @@ class dlair_state : public driver_device
 {
 public:
 	dlair_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_ldv1000(*this, "ld_ldv1000"),
+		  m_pr7820(*this, "ld_pr7820"),
+		  m_22vp932(*this, "ld_22vp932") { }
+
+	void laserdisc_data_w(UINT8 data)
+	{
+		if (m_ldv1000 != NULL) m_ldv1000->data_w(data);
+		if (m_pr7820 != NULL) m_pr7820->data_w(data);
+		if (m_22vp932 != NULL) m_22vp932->data_w(data);
+	}
+
+	void laserdisc_enter_w(UINT8 data)
+	{
+		if (m_pr7820 != NULL) m_pr7820->enter_w(data);
+		if (m_22vp932 != NULL) m_22vp932->enter_w(data);
+	}
+
+	UINT8 laserdisc_data_r()
+	{
+		if (m_ldv1000 != NULL) return m_ldv1000->status_r();
+		if (m_pr7820 != NULL) return m_pr7820->data_r();
+		if (m_22vp932 != NULL) return m_22vp932->data_r();
+		return 0;
+	}
+
+	UINT8 laserdisc_data_available_r()
+	{
+		return CLEAR_LINE;
+	}
+
+	UINT8 laserdisc_status_r()
+	{
+		if (m_ldv1000 != NULL) return m_ldv1000->status_strobe_r();
+		return CLEAR_LINE;
+	}
+	
+	UINT8 laserdisc_ready_r()
+	{
+		if (m_ldv1000 != NULL) return m_ldv1000->command_strobe_r();
+		if (m_pr7820 != NULL) return m_pr7820->ready_r();
+		return CLEAR_LINE;
+	}
 
 	UINT8 *m_videoram;
-	device_t *m_laserdisc;
+	optional_device<pioneer_ldv1000_device> m_ldv1000;
+	optional_device<pioneer_pr7820_device> m_pr7820;
+	optional_device<phillips_22vp932_device> m_22vp932;
 	UINT8 m_last_misc;
-	UINT8 m_laserdisc_type;
 	UINT8 m_laserdisc_data;
 };
 
@@ -68,9 +112,6 @@ public:
 
 #define MASTER_CLOCK_US				16000000
 #define MASTER_CLOCK_EURO			14318180
-
-#define LASERDISC_TYPE_FIXED		0
-#define LASERDISC_TYPE_VARIABLE		1
 
 
 
@@ -102,7 +143,7 @@ static void dleuro_interrupt(device_t *device, int state)
 static WRITE8_DEVICE_HANDLER( serial_transmit )
 {
 	dlair_state *state = device->machine().driver_data<dlair_state>();
-	laserdisc_data_w(state->m_laserdisc, data);
+	state->laserdisc_data_w(data);
 }
 
 
@@ -110,8 +151,8 @@ static int serial_receive(device_t *device, int channel)
 {
 	dlair_state *state = device->machine().driver_data<dlair_state>();
 	/* if we still have data to send, do it now */
-	if (channel == 0 && laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		return laserdisc_data_r(state->m_laserdisc);
+	if (channel == 0 && state->laserdisc_data_available_r() == ASSERT_LINE)
+		return state->laserdisc_data_r();
 
 	return -1;
 }
@@ -172,7 +213,7 @@ static PALETTE_INIT( dleuro )
  *
  *************************************/
 
-static SCREEN_UPDATE( dleuro )
+static SCREEN_UPDATE_IND16( dleuro )
 {
 	dlair_state *state = screen.machine().driver_data<dlair_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -199,20 +240,21 @@ static SCREEN_UPDATE( dleuro )
 
 static MACHINE_START( dlair )
 {
-	dlair_state *state = machine.driver_data<dlair_state>();
-	state->m_laserdisc = machine.device<device_t>("laserdisc");
 }
 
 
 static MACHINE_RESET( dlair )
 {
+#if 0
 	dlair_state *state = machine.driver_data<dlair_state>();
+
 	/* determine the laserdisc player from the DIP switches */
 	if (state->m_laserdisc_type == LASERDISC_TYPE_VARIABLE)
 	{
 		int newtype = (input_port_read(machine, "DSW2") & 0x08) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
 		laserdisc_set_type(state->m_laserdisc, newtype);
 	}
+#endif
 }
 
 
@@ -260,10 +302,10 @@ static WRITE8_HANDLER( misc_w )
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		laserdisc_data_w(state->m_laserdisc, state->m_laserdisc_data);
+		state->laserdisc_data_w(state->m_laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	state->laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -288,10 +330,10 @@ static WRITE8_HANDLER( dleuro_misc_w )
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		laserdisc_data_w(state->m_laserdisc, state->m_laserdisc_data);
+		state->laserdisc_data_w(state->m_laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	state->laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -317,43 +359,21 @@ static WRITE8_HANDLER( led_den2_w )
 static CUSTOM_INPUT( laserdisc_status_r )
 {
 	dlair_state *state = field.machine().driver_data<dlair_state>();
-	switch (laserdisc_get_type(state->m_laserdisc))
-	{
-		case LASERDISC_TYPE_PIONEER_PR7820:
-			return 0;
-
-		case LASERDISC_TYPE_PIONEER_LDV1000:
-			return (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 0 : 1;
-
-		case LASERDISC_TYPE_PHILLIPS_22VP932:
-			return 0;
-	}
-	return 0;
+	return state->laserdisc_status_r();
 }
 
 
 static CUSTOM_INPUT( laserdisc_command_r )
 {
 	dlair_state *state = field.machine().driver_data<dlair_state>();
-	switch (laserdisc_get_type(state->m_laserdisc))
-	{
-		case LASERDISC_TYPE_PIONEER_PR7820:
-			return (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
-
-		case LASERDISC_TYPE_PIONEER_LDV1000:
-			return (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_COMMAND) == ASSERT_LINE) ? 0 : 1;
-
-		case LASERDISC_TYPE_PHILLIPS_22VP932:
-			return 0;
-	}
-	return 0;
+	return (state->laserdisc_ready_r() == ASSERT_LINE) ? 0 : 1;
 }
 
 
 static READ8_HANDLER( laserdisc_r )
 {
 	dlair_state *state = space->machine().driver_data<dlair_state>();
-	UINT8 result = laserdisc_data_r(state->m_laserdisc);
+	UINT8 result = state->laserdisc_data_r();
 	mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
@@ -703,29 +723,28 @@ static MACHINE_CONFIG_START( dlair_base, dlair_state )
 	MCFG_MACHINE_START(dlair)
 	MCFG_MACHINE_RESET(dlair)
 
-	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
-
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dlair_pr7820, dlair_base )
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
+	MCFG_LASERDISC_PR7820_ADD("ld_pr7820")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_pr7820")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
+	MCFG_LASERDISC_LDV1000_ADD("ld_ldv1000")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_ldv1000")
 MACHINE_CONFIG_END
 
 
@@ -746,11 +765,11 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_MACHINE_START(dlair)
 	MCFG_MACHINE_RESET(dlair)
 
-	MCFG_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(dleuro, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
+	MCFG_LASERDISC_OVERLAY(256, 256, dleuro)
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
 
 	MCFG_GFXDECODE(dlair)
 	MCFG_PALETTE_LENGTH(16)
@@ -764,7 +783,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("ld_22vp932")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -784,7 +803,7 @@ ROM_START( dlair )		/* revision F2 */
 	ROM_LOAD( "dl_f2_u3.bin", 0x4000, 0x2000,  CRC(ab514e5b) SHA1(29d1015b951f0f2d4e5257497f3bf007c5e2262c) )
 	ROM_LOAD( "dl_f2_u4.bin", 0x6000, 0x2000,  CRC(f5ec23d2) SHA1(71149e2d359cc5944fbbb53dd7d0c2b42fbc9bb4) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_ldv1000" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -796,7 +815,7 @@ ROM_START( dlaira )		/* revision A */
 	ROM_LOAD( "dl_a_u4.bin", 0x6000, 0x2000,  CRC(924d12f2) SHA1(05b487e651a4817991dfc2308834b8f2fae918b4) )
 	ROM_LOAD( "dl_a_u5.bin", 0x8000, 0x2000,  CRC(6ec2f9c1) SHA1(0b8026927697a99fe8fa0dd4bd643418779a1d45) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_pr7820" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -808,7 +827,7 @@ ROM_START( dlairb )		/* revision B */
 	ROM_LOAD( "dl_b_u4.bin", 0x6000, 0x2000,  CRC(924d12f2) SHA1(05b487e651a4817991dfc2308834b8f2fae918b4) )
 	ROM_LOAD( "dl_b_u5.bin", 0x8000, 0x2000,  CRC(6ec2f9c1) SHA1(0b8026927697a99fe8fa0dd4bd643418779a1d45) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_pr7820" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -820,7 +839,7 @@ ROM_START( dlairc )		/* revision C */
 	ROM_LOAD( "dl_c_u4.bin", 0x6000, 0x2000,  CRC(924d12f2) SHA1(05b487e651a4817991dfc2308834b8f2fae918b4) )
 	ROM_LOAD( "dl_c_u5.bin", 0x8000, 0x2000,  CRC(6ec2f9c1) SHA1(0b8026927697a99fe8fa0dd4bd643418779a1d45) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_pr7820" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -832,7 +851,7 @@ ROM_START( dlaird )		/* revision D */
 	ROM_LOAD( "dl_d_u4.bin", 0x6000, 0x2000,  CRC(5f7212cb) SHA1(69c34de1bb44b6cd2adc2947d00d8823d3e87130) )
 	ROM_LOAD( "dl_d_u5.bin", 0x8000, 0x2000,  CRC(2b469c89) SHA1(646394b51325ca9163221a43b5af64a8067eb80b) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_ldv1000" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -843,7 +862,7 @@ ROM_START( dlaire )		/* revision E */
 	ROM_LOAD( "dl_e_u3.bin", 0x4000, 0x2000,  CRC(897bf075) SHA1(d2ff9c2fec37544cfe8fb60273524c6610488502) )
 	ROM_LOAD( "dl_e_u4.bin", 0x6000, 0x2000,  CRC(4ebffba5) SHA1(d04711247ffa88e371ec461465dd75a8158d90bc) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_ldv1000" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -854,7 +873,7 @@ ROM_START( dlairf )		/* revision F */
 	ROM_LOAD( "dl_f_u3.bin", 0x4000, 0x2000,  CRC(ab514e5b) SHA1(29d1015b951f0f2d4e5257497f3bf007c5e2262c) )
 	ROM_LOAD( "dl_f_u4.bin", 0x6000, 0x2000,  CRC(a817324e) SHA1(1299c83342fc70932f67bda8ae60bace91d66429) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_ldv1000" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -868,7 +887,7 @@ ROM_START( dleuro )		/* European Atari version */
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "elu33.bin", 0x0000, 0x2000, CRC(e7506d96) SHA1(610ae25bd8db13b18b9e681e855ffa978043255b) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_22vp932" )
 	DISK_IMAGE_READONLY( "dleuro", 0, NO_DUMP )
 ROM_END
 
@@ -882,7 +901,7 @@ ROM_START( dlital )		/* Italian Sidam version */
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "dlita33.bin", 0x0000, 0x2000, CRC(e7506d96) SHA1(610ae25bd8db13b18b9e681e855ffa978043255b) ) /* Label: ELU 33 REV.B */
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_22vp932" )
 	DISK_IMAGE_READONLY( "dleuro", 0, NO_DUMP )
 ROM_END
 
@@ -895,11 +914,11 @@ ROM_START( spaceace )		/* revision A3 */
 	ROM_LOAD( "sa_a3_u4.bin", 0x6000, 0x2000,  CRC(57db2a79) SHA1(5286905d9bde697845a98bd77f31f2a96a8874fc) )
 	ROM_LOAD( "sa_a3_u5.bin", 0x8000, 0x2000,  CRC(85cbcdc4) SHA1(97e01e96c885ab7af4c3a3b586eb40374d54f12f) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_ldv1000" )
 	DISK_IMAGE_READONLY( "spaceace", 0, NO_DUMP )
 ROM_END
 
-ROM_START( spaceaa2 )		/* revision A2 */
+ROM_START( spaceacea2 )		/* revision A2 */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "sa_a2_u1.bin", 0x0000, 0x2000,  CRC(71b39e27) SHA1(15a34eee9d541b186761a78b5c97449c7b496e4f) )
 	ROM_LOAD( "sa_a2_u2.bin", 0x2000, 0x2000,  CRC(18d0262d) SHA1(c3920e3cabfe2b2add51881e262f090c5018e508) )
@@ -907,11 +926,11 @@ ROM_START( spaceaa2 )		/* revision A2 */
 	ROM_LOAD( "sa_a2_u4.bin", 0x6000, 0x2000,  CRC(57db2a79) SHA1(5286905d9bde697845a98bd77f31f2a96a8874fc) )
 	ROM_LOAD( "sa_a2_u5.bin", 0x8000, 0x2000,  CRC(85cbcdc4) SHA1(97e01e96c885ab7af4c3a3b586eb40374d54f12f) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_ldv1000" )
 	DISK_IMAGE_READONLY( "spaceace", 0, NO_DUMP )
 ROM_END
 
-ROM_START( spaceaa )		/* revision A */
+ROM_START( spaceacea )		/* revision A */
 	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "sa_a_u1.bin", 0x0000, 0x2000,  CRC(8eb1889e) SHA1(bfa2c5fc139c448b7b6b5c5757d4f2f74e610b85) )
 	ROM_LOAD( "sa_a_u2.bin", 0x2000, 0x2000,  CRC(18d0262d) SHA1(c3920e3cabfe2b2add51881e262f090c5018e508) )
@@ -919,11 +938,11 @@ ROM_START( spaceaa )		/* revision A */
 	ROM_LOAD( "sa_a_u4.bin", 0x6000, 0x2000,  CRC(57db2a79) SHA1(5286905d9bde697845a98bd77f31f2a96a8874fc) )
 	ROM_LOAD( "sa_a_u5.bin", 0x8000, 0x2000,  CRC(85cbcdc4) SHA1(97e01e96c885ab7af4c3a3b586eb40374d54f12f) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_ldv1000" )
 	DISK_IMAGE_READONLY( "spaceace", 0, NO_DUMP )
 ROM_END
 
-ROM_START( saeuro )		/* Italian Sidam version */
+ROM_START( spaceaceeuro )		/* Italian Sidam version */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sa_u45a.bin", 0x0000, 0x2000, CRC(41264d46) SHA1(3e0ecfb3249f857a29fe58a3853a55d31cbd63d6) )
 	ROM_LOAD( "sa_u46a.bin", 0x2000, 0x2000, CRC(bc1c70cf) SHA1(cd6d2456ac2fbbfb86e1f31bd7cbd0cec0d31b45) )
@@ -934,7 +953,7 @@ ROM_START( saeuro )		/* Italian Sidam version */
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "sa_u33a.bin", 0x0000, 0x2000, CRC(a8c14612) SHA1(dbcf90b929e714f328bdcb0d8cd7c9e7d08a8be7) )
 
-	DISK_REGION( "laserdisc" )
+	DISK_REGION( "ld_22vp932" )
 	DISK_IMAGE_READONLY( "saeuro", 0, NO_DUMP )
 ROM_END
 
@@ -949,15 +968,15 @@ ROM_END
 
 static DRIVER_INIT( fixed )
 {
-	dlair_state *state = machine.driver_data<dlair_state>();
-	state->m_laserdisc_type = LASERDISC_TYPE_FIXED;
+//	dlair_state *state = machine.driver_data<dlair_state>();
+//	state->m_laserdisc_type = LASERDISC_TYPE_FIXED;
 }
 
 
 static DRIVER_INIT( variable )
 {
-	dlair_state *state = machine.driver_data<dlair_state>();
-	state->m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
+//	dlair_state *state = machine.driver_data<dlair_state>();
+//	state->m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
 
 
@@ -978,7 +997,7 @@ GAMEL( 1983, dlaira,   dlair,    dlair_pr7820,  dlair,  fixed,    ROT0, "Cinemat
 GAMEL( 1983, dleuro,   dlair,    dleuro,        dleuro, fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European)",  GAME_NOT_WORKING, layout_dlair )
 GAMEL( 1983, dlital,   dlair,    dleuro,        dleuro, fixed,    ROT0, "Cinematronics (Sidam license?)","Dragon's Lair (Italian)",  GAME_NOT_WORKING, layout_dlair )
 
-GAMEL( 1983, spaceace, 0,        dlair_ldv1000, dlaire, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", GAME_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceaa2, spaceace, dlair_ldv1000, dlaire, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A2)", GAME_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceaa,  spaceace, dlair_ldv1000, dlaire, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A)", GAME_NOT_WORKING, layout_dlair )
-GAMEL( 1983, saeuro,   spaceace, dleuro,        dleuro, fixed,    ROT0, "Cinematronics (Atari license)", "Space Ace (European)",  GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceace,     0,        dlair_ldv1000, dlaire, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceacea2,   spaceace, dlair_ldv1000, dlaire, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A2)", GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceacea,    spaceace, dlair_ldv1000, dlaire, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A)", GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceaceeuro, spaceace, dleuro,        dleuro, fixed,    ROT0, "Cinematronics (Atari license)", "Space Ace (European)",  GAME_NOT_WORKING, layout_dlair )

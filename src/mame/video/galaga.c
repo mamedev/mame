@@ -476,7 +476,7 @@ WRITE8_HANDLER ( gatsbee_bank_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	galaga_state *state =  machine.driver_data<galaga_state>();
 
@@ -530,7 +530,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static void draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	galaga_state *state =  machine.driver_data<galaga_state>();
 	/* draw the stars */
@@ -565,7 +565,7 @@ static void draw_stars(running_machine &machine, bitmap_t &bitmap, const rectang
 	}
 }
 
-SCREEN_UPDATE( galaga )
+SCREEN_UPDATE_IND16( galaga )
 {
 	galaga_state *state =  screen.machine().driver_data<galaga_state>();
 

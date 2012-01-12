@@ -83,7 +83,7 @@ static VIDEO_START( flyball )
 }
 
 
-static SCREEN_UPDATE( flyball )
+static SCREEN_UPDATE_IND16( flyball )
 {
 	flyball_state *state = screen.machine().driver_data<flyball_state>();
 	int pitcherx = state->m_pitcher_horz;
@@ -419,10 +419,9 @@ static MACHINE_CONFIG_START( flyball, flyball_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE(flyball)
+	MCFG_SCREEN_UPDATE_STATIC(flyball)
 
 	MCFG_GFXDECODE(flyball)
 	MCFG_PALETTE_LENGTH(4)

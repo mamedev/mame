@@ -64,7 +64,7 @@ VIDEO_START( battlex )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	battlex_state *state = machine.driver_data<battlex_state>();
 	const gfx_element *gfx = machine.gfx[1];
@@ -95,7 +95,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-SCREEN_UPDATE(battlex)
+SCREEN_UPDATE_IND16(battlex)
 {
 	battlex_state *state = screen.machine().driver_data<battlex_state>();
 

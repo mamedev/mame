@@ -77,7 +77,7 @@ READ8_HANDLER( segag80r_video_port_r );
 WRITE8_HANDLER( segag80r_video_port_w );
 
 VIDEO_START( segag80r );
-SCREEN_UPDATE( segag80r );
+SCREEN_UPDATE_IND16( segag80r );
 
 
 READ8_HANDLER( spaceod_back_port_r );

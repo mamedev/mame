@@ -37,7 +37,7 @@ extern void psx_lightgun_set( running_machine &, int, int );
 
 // emu/video/psx.c
 PALETTE_INIT( psx );
-SCREEN_UPDATE( psx );
+SCREEN_UPDATE_IND16( psx );
 INTERRUPT_GEN( psx_vblank );
 
 #define PSX_H ( 1 )

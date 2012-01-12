@@ -263,7 +263,7 @@ Note:   Not all sprites are displayed: in the top part of spriteram
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int trans_pen )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
@@ -382,7 +382,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 // until I work out why it makes a partial copy of the sprite list, and how best to apply it
 // sprite placement of the explosion graphic seems incorrect compared to the original sets? (no / different zoom support?)
 // it might be a problem with the actual bootleg
-static void draw_sprites_bootleg( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int trans_pen )
+static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
@@ -524,7 +524,7 @@ static int tilemap_width( int size )
 		return 0x10 * 16;
 }
 
-SCREEN_UPDATE( psikyo )
+SCREEN_UPDATE_IND16( psikyo )
 {
 	psikyo_state *state = screen.machine().driver_data<psikyo_state>();
 	int i, layers_ctrl = -1;
@@ -698,7 +698,7 @@ SCREEN_UPDATE( psikyo )
 
 */
 
-SCREEN_UPDATE( psikyo_bootleg )
+SCREEN_UPDATE_IND16( psikyo_bootleg )
 {
 	psikyo_state *state = screen.machine().driver_data<psikyo_state>();
 	int i, layers_ctrl = -1;

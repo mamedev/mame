@@ -385,7 +385,7 @@ static timer_device* frame_timer;
 static timer_device* scanline_timer;
 static timer_device* irq6_on_timer;
 static timer_device* irq4_on_timer;
-static bitmap_t* render_bitmap;
+static bitmap_ind16* render_bitmap;
 //emu_timer* vblankirq_off_timer;
 
 /* Sega CD stuff */
@@ -6457,7 +6457,7 @@ static WRITE16_HANDLER( segacd_stampsize_w )
 // the lower 3 bits of segacd_imagebuffer_hdot_size are set
 
 // this really needs to be doing it's own lookups rather than depending on the inefficient MAME cache..
-INLINE UINT8 read_pixel_from_stampmap( running_machine& machine, bitmap_t* srcbitmap, int x, int y)
+INLINE UINT8 read_pixel_from_stampmap( running_machine& machine, bitmap_ind16* srcbitmap, int x, int y)
 {
 /*
     if (!srcbitmap)
@@ -6514,8 +6514,8 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 
 
 		int line;
-		//bitmap_t *srcbitmap = tilemap_get_pixmap(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
-		bitmap_t *srcbitmap = 0;
+		//bitmap_ind16 *srcbitmap = tilemap_get_pixmap(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
+		bitmap_ind16 *srcbitmap = 0;
 		UINT32 bufferstart = ((segacd_imagebuffer_start_address&0xfff8)*2)<<3;
 
 		for (line=0;line<segacd_imagebuffer_vdot_size;line++)
@@ -7224,7 +7224,7 @@ VIDEO_START(megadriv)
 {
 	int x;
 
-	render_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	render_bitmap = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
 
 	megadrive_vdp_vram  = auto_alloc_array(machine, UINT16, 0x10000/2);
 	megadrive_vdp_cram  = auto_alloc_array(machine, UINT16, 0x80/2);
@@ -7272,10 +7272,15 @@ VIDEO_START(megadriv)
 	segac2_sp_pal_lookup[3] = 0x30;
 }
 
-SCREEN_UPDATE(megadriv)
+SCREEN_UPDATE_RGB32(megadriv)
 {
 	/* Copy our screen buffer here */
-	copybitmap(bitmap, *render_bitmap, 0, 0, 0, 0, cliprect);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			UINT16 src = render_bitmap->pix(y, x);
+			bitmap.pix32(y, x) = MAKE_RGB(pal5bit(src >> 10), pal5bit(src >> 5), pal5bit(src >> 0));
+		}
 
 //  int xxx;
 	/* reference */
@@ -9555,12 +9560,11 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE(megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_EOF(megadriv) /* Used to Sync the timing */
 
 	MCFG_NVRAM_HANDLER(megadriv)
@@ -9604,12 +9608,11 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE(megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_EOF(megadriv) /* Used to Sync the timing */
 
 	MCFG_NVRAM_HANDLER(megadriv)

@@ -265,7 +265,7 @@ static void common_start(running_machine &machine, int multi32)
 	/* allocate the bitmaps (a few extra for multi32) */
 	for (tmap = 0; tmap < 9 + 2 * multi32; tmap++)
 	{
-		state->m_layer_data[tmap].bitmap = auto_bitmap_alloc(machine, 416, 224, BITMAP_FORMAT_INDEXED16);
+		state->m_layer_data[tmap].bitmap = auto_bitmap_ind16_alloc(machine, 416, 224);
 		state->m_layer_data[tmap].transparent = auto_alloc_array_clear(machine, UINT8, 256);
 	}
 
@@ -545,7 +545,7 @@ READ16_HANDLER( system32_sprite_control_r )
 			/*  D1 : Seems to be '1' only during an erase in progress, this
                      occurs very briefly though.
                 D0 : Selected frame buffer (0= A, 1= B) */
-			return 0xfffc | (int)(state->m_layer_data[MIXER_LAYER_SPRITES].bitmap < state->m_layer_data[MIXER_LAYER_SPRITES_2].bitmap);
+			return 0xfffc | (int)(&state->m_layer_data[MIXER_LAYER_SPRITES].bitmap < &state->m_layer_data[MIXER_LAYER_SPRITES_2].bitmap);
 
 		case 1:
 			/*  D1 : ?
@@ -913,7 +913,7 @@ static void update_tilemap_zoom(screen_device &screen, struct layer_info *layer,
 {
 	segas32_state *state = screen.machine().driver_data<segas32_state>();
 	int clipenable, clipout, clips, clipdraw_start;
-	bitmap_t &bitmap = *layer->bitmap;
+	bitmap_ind16 &bitmap = *layer->bitmap;
 	struct extents_list clip_extents;
 	tilemap_t *tilemaps[4];
 	UINT32 srcx, srcx_start, srcy;
@@ -996,8 +996,8 @@ static void update_tilemap_zoom(screen_device &screen, struct layer_info *layer,
 			UINT16 *src[2];
 
 			/* look up the pages and get their source pixmaps */
-			bitmap_t &tm0 = tilemap_get_pixmap(tilemaps[((srcy >> 27) & 2) + 0]);
-			bitmap_t &tm1 = tilemap_get_pixmap(tilemaps[((srcy >> 27) & 2) + 1]);
+			bitmap_ind16 &tm0 = tilemap_get_pixmap(tilemaps[((srcy >> 27) & 2) + 0]);
+			bitmap_ind16 &tm1 = tilemap_get_pixmap(tilemaps[((srcy >> 27) & 2) + 1]);
 			src[0] = &tm0.pix16((srcy >> 20) & 0xff);
 			src[1] = &tm1.pix16((srcy >> 20) & 0xff);
 
@@ -1066,7 +1066,7 @@ static void update_tilemap_rowscroll(screen_device &screen, struct layer_info *l
 {
 	segas32_state *state = screen.machine().driver_data<segas32_state>();
 	int clipenable, clipout, clips, clipdraw_start;
-	bitmap_t &bitmap = *layer->bitmap;
+	bitmap_ind16 &bitmap = *layer->bitmap;
 	struct extents_list clip_extents;
 	tilemap_t *tilemaps[4];
 	int rowscroll, rowselect;
@@ -1154,8 +1154,8 @@ static void update_tilemap_rowscroll(screen_device &screen, struct layer_info *l
 			}
 
 			/* look up the pages and get their source pixmaps */
-			bitmap_t &tm0 = tilemap_get_pixmap(tilemaps[((srcy >> 7) & 2) + 0]);
-			bitmap_t &tm1 = tilemap_get_pixmap(tilemaps[((srcy >> 7) & 2) + 1]);
+			bitmap_ind16 &tm0 = tilemap_get_pixmap(tilemaps[((srcy >> 7) & 2) + 0]);
+			bitmap_ind16 &tm1 = tilemap_get_pixmap(tilemaps[((srcy >> 7) & 2) + 1]);
 			src[0] = &tm0.pix16(srcy & 0xff);
 			src[1] = &tm1.pix16(srcy & 0xff);
 
@@ -1217,7 +1217,7 @@ static void update_tilemap_rowscroll(screen_device &screen, struct layer_info *l
 static void update_tilemap_text(screen_device &screen, struct layer_info *layer, const rectangle &cliprect)
 {
 	segas32_state *state = screen.machine().driver_data<segas32_state>();
-	bitmap_t &bitmap = *layer->bitmap;
+	bitmap_ind16 &bitmap = *layer->bitmap;
 	UINT16 *tilebase;
 	UINT16 *gfxbase;
 	int startx, starty;
@@ -1378,7 +1378,7 @@ static void update_bitmap(screen_device &screen, struct layer_info *layer, const
 {
 	segas32_state *state = screen.machine().driver_data<segas32_state>();
 	int clipenable, clipout, clips, clipdraw_start;
-	bitmap_t &bitmap = *layer->bitmap;
+	bitmap_ind16 &bitmap = *layer->bitmap;
 	struct extents_list clip_extents;
 	int xscroll, yscroll;
 	int color;
@@ -1480,7 +1480,7 @@ static void update_bitmap(screen_device &screen, struct layer_info *layer, const
 
 static void update_background(segas32_state *state, struct layer_info *layer, const rectangle &cliprect)
 {
-	bitmap_t &bitmap = *layer->bitmap;
+	bitmap_ind16 &bitmap = *layer->bitmap;
 	int x, y;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -1678,7 +1678,7 @@ static int draw_one_sprite(running_machine &machine, UINT16 *data, int xoffs, in
 		{ 0x1fff, 0x0fff, 0x07ff, 0x03ff }
 	};
 
-	bitmap_t &bitmap = *state->m_layer_data[(!state->m_is_multi32 || !(data[3] & 0x0800)) ? MIXER_LAYER_SPRITES_2 : MIXER_LAYER_MULTISPR_2].bitmap;
+	bitmap_ind16 &bitmap = *state->m_layer_data[(!state->m_is_multi32 || !(data[3] & 0x0800)) ? MIXER_LAYER_SPRITES_2 : MIXER_LAYER_MULTISPR_2].bitmap;
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x400000;
 	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
 
@@ -2008,7 +2008,7 @@ INLINE UINT16 *get_layer_scanline(segas32_state *state, int layer, int scanline)
 	return &state->m_layer_data[layer].bitmap->pix16(scanline);
 }
 
-static void mix_all_layers(segas32_state *state, int which, int xoffs, bitmap_t &bitmap, const rectangle &cliprect, UINT8 enablemask)
+static void mix_all_layers(segas32_state *state, int which, int xoffs, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 enablemask)
 {
 	int blendenable = state->m_mixer_control[which][0x4e/2] & 0x0800;
 	int blendfactor = (state->m_mixer_control[which][0x4e/2] >> 8) & 7;
@@ -2419,7 +2419,7 @@ static void print_mixer_data(segas32_state *state, int which)
 	}
 }
 
-SCREEN_UPDATE( system32 )
+SCREEN_UPDATE_RGB32( system32 )
 {
 	segas32_state *state = screen.machine().driver_data<segas32_state>();
 	UINT8 enablemask;
@@ -2598,7 +2598,7 @@ for (showclip = 0; showclip < 4; showclip++)
 }
 
 
-static UINT32 multi32_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int index)
+static UINT32 multi32_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
 {
 	segas32_state *state = screen.machine().driver_data<segas32_state>();
 	UINT8 enablemask;
@@ -2660,8 +2660,8 @@ if (PRINTF_MIXER_DATA)
 	return 0;
 }
 
-SCREEN_UPDATE( multi32_left ) { return multi32_update(screen, bitmap, cliprect, 0); }
-SCREEN_UPDATE( multi32_right ) { return multi32_update(screen, bitmap, cliprect, 1); }
+SCREEN_UPDATE_RGB32( multi32_left ) { return multi32_update(screen, bitmap, cliprect, 0); }
+SCREEN_UPDATE_RGB32( multi32_right ) { return multi32_update(screen, bitmap, cliprect, 1); }
 
 /*
 

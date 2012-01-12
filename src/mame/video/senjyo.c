@@ -175,7 +175,7 @@ WRITE8_HANDLER( senjyo_bgstripes_w )
 
 ***************************************************************************/
 
-static void draw_bgbitmap(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_bgbitmap(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
 	int x,y,pen,strwid,count;
@@ -212,7 +212,7 @@ static void draw_bgbitmap(running_machine &machine, bitmap_t &bitmap,const recta
 	}
 }
 
-static void draw_radar(running_machine &machine,bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_radar(running_machine &machine,bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
 	int offs,x;
@@ -238,7 +238,7 @@ static void draw_radar(running_machine &machine,bitmap_t &bitmap,const rectangle
 			}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int priority)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int priority)
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -289,7 +289,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-SCREEN_UPDATE( senjyo )
+SCREEN_UPDATE_IND16( senjyo )
 {
 	senjyo_state *state = screen.machine().driver_data<senjyo_state>();
 	int i;

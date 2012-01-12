@@ -46,4 +46,4 @@ public:
 
 /*----------- defined in video/lazercmd.c -----------*/
 
-SCREEN_UPDATE( lazercmd );
+SCREEN_UPDATE_IND16( lazercmd );

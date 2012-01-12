@@ -16,7 +16,7 @@ public:
 	UINT16 * m_paletteram;
 
 	/* video-related */
-	bitmap_t *m_tmpbitmap;
+	bitmap_ind16 m_tmpbitmap;
 	UINT16   m_color;
 
 	/* devices */
@@ -32,4 +32,4 @@ WRITE16_HANDLER( blockout_paletteram_w );
 WRITE16_HANDLER( blockout_frontcolor_w );
 
 VIDEO_START( blockout );
-SCREEN_UPDATE( blockout );
+SCREEN_UPDATE_IND16( blockout );

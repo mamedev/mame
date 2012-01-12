@@ -4,8 +4,36 @@
 
     Philips 22VP931 laserdisc emulation.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 **************************************************************************
 
@@ -16,127 +44,60 @@
 
 *************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
-#include "ldcore.h"
-#include "cpu/mcs48/mcs48.h"
+#include "ldvp931.h"
 
 
 
-/***************************************************************************
-    DEBUGGING
-***************************************************************************/
+//**************************************************************************
+//  DEBUGGING
+//**************************************************************************
 
 #define LOG_COMMANDS				0
 #define LOG_PORTS					0
 
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-/* scanning speeds */
-#define SCAN_SPEED						(2000 / 30)			/* 2000 frames/second */
-#define SCAN_FAST_SPEED					(4000 / 30)			/* 4000 frames/second */
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-/* player-specific data */
-struct _ldplayer_data
-{
-	/* low-level emulation data */
-	device_t *cpu;					/* CPU index of the 8049 */
-	timer_device *		tracktimer;				/* timer device */
-	vp931_data_ready_func data_ready_cb;		/* data ready callback */
-
-	/* I/O port states */
-	UINT8				out0;					/* output 0 state */
-	UINT8				out1;					/* output 1 state */
-	UINT8				port1;					/* port 1 state */
-
-	/* DATIC circuit implementation */
-	UINT8				daticval;				/* latched DATIC value */
-	UINT8				daticerp;				/* /ERP value from DATIC */
-	UINT8				datastrobe;				/* DATA STROBE line from DATIC */
-
-	/* communication status */
-	UINT8				fromcontroller;			/* command byte from the controller */
-	UINT8				fromcontroller_pending;	/* TRUE if data is pending */
-	UINT8				tocontroller;			/* command byte to the controller */
-	UINT8				tocontroller_pending;	/* TRUE if data is pending */
-
-	/* tracking */
-	INT8				trackdir;				/* direction of tracking */
-	UINT8				trackstate;				/* state of tracking */
-
-	/* debugging */
-	UINT8				cmdbuf[3];				/* 3 bytes worth of commands */
-	UINT8				cmdcount;				/* number of command bytes seen */
-	INT16				advanced;				/* number of frames advanced */
-};
+// scanning speeds
+#define SCAN_SPEED						(2000 / 30)			// 2000 frames/second
+#define SCAN_FAST_SPEED					(4000 / 30)			// 4000 frames/second
 
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
-static void vp931_init(laserdisc_state *ld);
-static void vp931_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
-static INT32 vp931_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
-static void vp931_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data);
-static UINT8 vp931_data_r(laserdisc_state *ld);
-static UINT8 vp931_ready(laserdisc_state *ld);
-static UINT8 vp931_data_ready(laserdisc_state *ld);
-
-static TIMER_CALLBACK( vbi_data_fetch );
-static TIMER_CALLBACK( deferred_data_w );
-static TIMER_CALLBACK( irq_off );
-static TIMER_CALLBACK( datastrobe_off );
-static TIMER_CALLBACK( erp_off );
-static TIMER_DEVICE_CALLBACK( track_timer );
-
-static WRITE8_HANDLER( output0_w );
-static WRITE8_HANDLER( output1_w );
-static WRITE8_HANDLER( lcd_w );
-static READ8_HANDLER( unknown_r );
-static READ8_HANDLER( keypad_r );
-static READ8_HANDLER( datic_r );
-static READ8_HANDLER( from_controller_r );
-static WRITE8_HANDLER( to_controller_w );
-static READ8_HANDLER( port1_r );
-static WRITE8_HANDLER( port1_w );
-static READ8_HANDLER( port2_r );
-static WRITE8_HANDLER( port2_w );
-static READ8_HANDLER( t0_r );
-static READ8_HANDLER( t1_r );
+// devices
+const device_type PHILLIPS_22VP931 = &device_creator<phillips_22vp931_device>;
 
 
 
-/***************************************************************************
-    22VP931 ROM AND MACHINE INTERFACES
-***************************************************************************/
+//**************************************************************************
+//  22VP931 ROM AND MACHINE INTERFACES
+//**************************************************************************
 
-static ADDRESS_MAP_START( vp931_portmap, AS_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xcf) AM_READWRITE(keypad_r, output0_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0xcf) AM_READWRITE(unknown_r, output1_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xcf) AM_READWRITE(datic_r, lcd_w)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0xcf) AM_READWRITE(from_controller_r, to_controller_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(port1_r, port1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(port2_r, port2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
+static ADDRESS_MAP_START( vp931_portmap, AS_IO, 8, phillips_22vp931_device )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xcf) AM_READWRITE(i8049_keypad_r, i8049_output0_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0xcf) AM_READWRITE(i8049_unknown_r, i8049_output1_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xcf) AM_READWRITE(i8049_datic_r, i8049_lcd_w)
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0xcf) AM_READWRITE(i8049_from_controller_r, i8049_to_controller_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(i8049_port1_r, i8049_port1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(i8049_port2_r, i8049_port2_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(i8049_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(i8049_t1_r)
 ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( vp931 )
 	MCFG_CPU_ADD("vp931", I8049, XTAL_11MHz)
 	MCFG_CPU_IO_MAP(vp931_portmap)
-	MCFG_TIMER_ADD("tracktimer", track_timer)
 MACHINE_CONFIG_END
 
 
@@ -147,306 +108,268 @@ ROM_END
 
 
 
-/***************************************************************************
-    22VP931 PLAYER INTERFACE
-***************************************************************************/
+//**************************************************************************
+//  PHILLIPS 22VP931 IMPLEMENTATION
+//**************************************************************************
 
-const ldplayer_interface vp931_interface =
+//-------------------------------------------------
+//  phillips_22vp931_device - constructor
+//-------------------------------------------------
+
+phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: laserdisc_device(mconfig, PHILLIPS_22VP931, "Phillips 22VP931", "22vp931", tag, owner, clock),
+	  m_i8049_cpu(*this, "vp931"),
+	  m_tracktimer(NULL),
+	  m_i8049_out0(0),
+	  m_i8049_out1(0),
+	  m_i8049_port1(0),
+	  m_daticval(0),
+	  m_daticerp(0),
+	  m_datastrobe(0),
+	  m_fromcontroller(0),
+	  m_fromcontroller_pending(false),
+	  m_tocontroller(0),
+	  m_tocontroller_pending(false),
+	  m_trackdir(0),
+	  m_trackstate(0),
+	  m_cmdcount(0),
+	  m_advanced(0)
 {
-	LASERDISC_TYPE_PHILLIPS_22VP931,			/* type of the player */
-	sizeof(ldplayer_data),						/* size of the state */
-	"Phillips 22VP931",							/* name of the player */
-	"22vp931",									/* shortname of the player */
-	ROM_NAME(vp931),							/* pointer to ROM region information */
-	MACHINE_CONFIG_NAME(vp931),					/* pointer to machine configuration */
-	vp931_init,									/* initialization callback */
-	vp931_vsync,								/* vsync callback */
-	vp931_update,								/* update callback */
-	NULL,										/* overlay callback */
-	vp931_data_w,								/* parallel data write */
-	{											/* single line write: */
-		NULL,									/*    LASERDISC_LINE_ENTER */
-		NULL									/*    LASERDISC_LINE_CONTROL */
-	},
-	vp931_data_r,								/* parallel data read */
-	{											/* single line read: */
-		vp931_ready,							/*    LASERDISC_LINE_READY */
-		NULL,									/*    LASERDISC_LINE_STATUS */
-		NULL,									/*    LASERDISC_LINE_COMMAND */
-		vp931_data_ready,						/*    LASERDISC_LINE_DATA_AVAIL */
+}
+
+
+//-------------------------------------------------
+//  reset_w - write to the reset line
+//-------------------------------------------------
+
+void phillips_22vp931_device::reset_w(UINT8 data)
+{
+	// control the CPU state
+	m_i8049_cpu->set_input_line(INPUT_LINE_RESET, data);
+	
+	// on an assert, reset the device state as well
+	if (data == ASSERT_LINE)
+		reset();
+}
+
+
+//-------------------------------------------------
+//  data_r - handle a parallel data read from the 
+//  22VP931
+//-------------------------------------------------
+
+UINT8 phillips_22vp931_device::data_r()
+{
+	// if data is pending, clear the pending flag and notify any callbacks
+	if (m_tocontroller_pending)
+	{
+		m_tocontroller_pending = false;
+		if (!m_data_ready.isnull())
+			m_data_ready(*this, false);
 	}
-};
 
-
-
-/***************************************************************************
-    PUBLIC FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    vp931_set_data_ready_callback - set the data
-    ready callback
--------------------------------------------------*/
-
-void vp931_set_data_ready_callback(device_t *device, vp931_data_ready_func callback)
-{
-	laserdisc_state *ld = ldcore_get_safe_token(device);
-	ld->player->data_ready_cb = callback;
+	// also boost interleave for 4 scanlines to ensure proper communications
+	machine().scheduler().boost_interleave(attotime::zero, screen().scan_period() * 4);
+	return m_tocontroller;
 }
 
 
+//-------------------------------------------------
+//  device_start - device initialization
+//-------------------------------------------------
 
-/***************************************************************************
-    PHILLIPS 22VP931 IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    vp931_init - player-specific initialization
--------------------------------------------------*/
-
-static void vp931_init(laserdisc_state *ld)
+void phillips_22vp931_device::device_start()
 {
-	astring tempstring;
-	ldplayer_data *player = ld->player;
-	vp931_data_ready_func cbsave;
-
-	/* reset our state */
-	cbsave = player->data_ready_cb;
-	memset(player, 0, sizeof(*player));
-	player->data_ready_cb = cbsave;
-
-	/* find our devices */
-	player->cpu = ld->device->subdevice("vp931");
-	player->tracktimer = downcast<timer_device *>(ld->device->subdevice("tracktimer"));
-	player->tracktimer->set_ptr(ld);
+	// pass through to the parent
+	laserdisc_device::device_start();
+	
+	// allocate a timer
+	m_tracktimer = timer_alloc(TID_HALF_TRACK);
 }
 
 
-/*-------------------------------------------------
-    vp931_vsync - VSYNC callback, called at the
-    start of the blanking period
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_reset - device reset
+//-------------------------------------------------
 
-static void vp931_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
+void phillips_22vp931_device::device_reset()
 {
-	/* reset our command counter (debugging only) */
-	ld->player->cmdcount = 0;
+	// pass through to the parent
+	laserdisc_device::device_reset();
 
-	/* set the ERP signal to 1 to indicate start of frame, and set a timer to turn it off */
-	ld->player->daticerp = 1;
-	ld->device->machine().scheduler().timer_set(ld->screen->time_until_pos(15*2), FUNC(erp_off), 0, ld);
+	// reset our state
+	m_i8049_out0 = 0;
+	m_i8049_out1 = 0;
+	m_i8049_port1 = 0;
+	
+	m_daticval = 0;
+	m_daticerp = 0;
+	m_datastrobe = 0;
+	
+	m_fromcontroller = 0;
+	m_fromcontroller_pending = false;
+	m_tocontroller = 0;
+	m_tocontroller_pending = false;
+	
+	m_trackdir = 0;
+	m_trackstate = 0;
+	
+	m_cmdcount = 0;
+	m_advanced = 0;
 }
 
 
-/*-------------------------------------------------
-    vp931_update - update callback, called on
-    the first visible line of the frame
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_timer - handle timers set by this
+//  device
+//-------------------------------------------------
 
-static INT32 vp931_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
+void phillips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	/* set the first VBI timer to go at the start of line 16 */
-	ld->device->machine().scheduler().timer_set(ld->screen->time_until_pos(16*2), FUNC(vbi_data_fetch), LASERDISC_CODE_LINE16 << 2, ld);
+	switch (id)
+	{
+		case TID_VBI_DATA_FETCH:
+		{
+			UINT32 line = param >> 2;
+			int which = param & 3;
+			UINT32 code = 0;
 
-	/* play forward by default */
+			// fetch the code and compute the DATIC latched value
+			if (line >= LASERDISC_CODE_LINE16 && line <= LASERDISC_CODE_LINE18)
+				code = get_field_code(laserdisc_field_code(line), false);
+
+			// at the start of each line, signal an interrupt and use a timer to turn it off
+			if (which == 0)
+			{
+				m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
+				timer_set(attotime::from_nsec(5580), TID_IRQ_OFF);
+			}
+
+			// clock the data strobe on each subsequent callback
+			else if (code != 0)
+			{
+				m_daticval = code >> (8 * (3 - which));
+				m_datastrobe = 1;
+				timer_set(attotime::from_nsec(5000), TID_DATA_STROBE_OFF);
+			}
+
+			// determine the next bit to fetch and reprime ourself
+			if (++which == 4)
+			{
+				which = 0;
+				line++;
+			}
+			if (line <= LASERDISC_CODE_LINE18 + 1)
+				timer_set(screen().time_until_pos(line*2, which * 2 * screen().width() / 4), TID_VBI_DATA_FETCH, (line << 2) + which);
+			break;
+		}
+		
+		case TID_DEFERRED_DATA:
+			// set the value and mark it pending
+			if (LOG_COMMANDS && m_fromcontroller_pending)
+				printf("Dropped previous command byte\n");
+			m_fromcontroller = param;
+			m_fromcontroller_pending = true;
+
+			// track the commands for debugging purposes
+			if (m_cmdcount < ARRAY_LENGTH(m_cmdbuf))
+			{
+				m_cmdbuf[m_cmdcount++ % 3] = param;
+				if (LOG_COMMANDS && m_cmdcount % 3 == 0)
+					printf("Cmd: %02X %02X %02X\n", m_cmdbuf[0], m_cmdbuf[1], m_cmdbuf[2]);
+			}
+			break;
+		
+		case TID_IRQ_OFF:
+			m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
+			break;
+		
+		case TID_DATA_STROBE_OFF:
+			m_datastrobe = 0;
+			break;
+		
+		case TID_ERP_OFF:
+			m_daticerp = 0;
+			break;
+		
+		case TID_HALF_TRACK:
+			// advance by the count and toggle the state
+			m_trackstate ^= 1;
+			if ((m_trackdir < 0 && !m_trackstate) || (m_trackdir > 0 && m_trackstate))
+			{
+				advance_slider(m_trackdir);
+				m_advanced += m_trackdir;
+			}
+			break;
+	
+		// pass everything else onto the parent
+		default:
+			laserdisc_device::device_timer(timer, id, param, ptr);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  device_rom_region - return a pointer to our
+//  ROM region definitions
+//-------------------------------------------------
+
+const rom_entry *phillips_22vp931_device::device_rom_region() const
+{
+	return ROM_NAME(vp931);
+}
+
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  our machine config fragment
+//-------------------------------------------------
+
+machine_config_constructor phillips_22vp931_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(vp931);
+}
+
+
+//-------------------------------------------------
+//  player_vsync - VSYNC callback, called at the
+//  start of the blanking period
+//-------------------------------------------------
+
+void phillips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum, attotime curtime)
+{
+	// reset our command counter (debugging only)
+	m_cmdcount = 0;
+
+	// set the ERP signal to 1 to indicate start of frame, and set a timer to turn it off
+	m_daticerp = 1;
+	timer_set(screen().time_until_pos(15*2), TID_ERP_OFF);
+}
+
+
+//-------------------------------------------------
+//  player_update - update callback, called on
+//  the first visible line of the frame
+//-------------------------------------------------
+
+INT32 phillips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldnum, attotime curtime)
+{
+	// set the first VBI timer to go at the start of line 16
+	timer_set(screen().time_until_pos(16*2), TID_VBI_DATA_FETCH, LASERDISC_CODE_LINE16 << 2);
+
+	// play forward by default
 	return fieldnum;
 }
 
 
-/*-------------------------------------------------
-    vp931_data_w - handle a parallel data write
-    to the 22VP931
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_output0_w - controls audio/video squelch
+//  and other bits
+//-------------------------------------------------
 
-static void vp931_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
+WRITE8_MEMBER( phillips_22vp931_device::i8049_output0_w )
 {
-	/* set a timer to synchronize execution before sending the data */
-	ld->device->machine().scheduler().synchronize(FUNC(deferred_data_w), data, ld);
-}
-
-
-/*-------------------------------------------------
-    vp931_data_r - handle a parallel data read
-    from the 22VP931
--------------------------------------------------*/
-
-static UINT8 vp931_data_r(laserdisc_state *ld)
-{
-	ldplayer_data *player = ld->player;
-
-	/* if data is pending, clear the pending flag and notify any callbacks */
-	if (player->tocontroller_pending)
-	{
-		player->tocontroller_pending = FALSE;
-		if (player->data_ready_cb != NULL)
-			(*player->data_ready_cb)(ld->device, FALSE);
-	}
-
-	/* also boost interleave for 4 scanlines to ensure proper communications */
-	ld->device->machine().scheduler().boost_interleave(attotime::zero, ld->screen->scan_period() * 4);
-	return player->tocontroller;
-}
-
-
-/*-------------------------------------------------
-    vp931_ready - return the status of "ready"
-    to the caller (ready to accept another
-    command)
--------------------------------------------------*/
-
-static UINT8 vp931_ready(laserdisc_state *ld)
-{
-	/* if data is pending, we are not ready */
-	ldplayer_data *player = ld->player;
-	return player->fromcontroller_pending ? CLEAR_LINE : ASSERT_LINE;
-}
-
-
-/*-------------------------------------------------
-    vp931_data_ready - return the status of
-    "data available" to the caller
--------------------------------------------------*/
-
-static UINT8 vp931_data_ready(laserdisc_state *ld)
-{
-	ldplayer_data *player = ld->player;
-	return player->tocontroller_pending ? ASSERT_LINE : CLEAR_LINE;
-}
-
-
-/*-------------------------------------------------
-    vbi_data_fetch - called 4 times per scanline
-    on lines 16, 17, and 18 to feed the VBI data
-    through one byte at a time
--------------------------------------------------*/
-
-static TIMER_CALLBACK( vbi_data_fetch )
-{
-	laserdisc_state *ld = (laserdisc_state *)ptr;
-	ldplayer_data *player = ld->player;
-	int which = param & 3;
-	int line = param >> 2;
-	UINT32 code = 0;
-
-	/* fetch the code and compute the DATIC latched value */
-	if (line >= LASERDISC_CODE_LINE16 && line <= LASERDISC_CODE_LINE18)
-		code = laserdisc_get_field_code(ld->device, line, FALSE);
-
-	/* at the start of each line, signal an interrupt and use a timer to turn it off */
-	if (which == 0)
-	{
-		device_set_input_line(player->cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
-		machine.scheduler().timer_set(attotime::from_nsec(5580), FUNC(irq_off), 0, ld);
-	}
-
-	/* clock the data strobe on each subsequent callback */
-	else if (code != 0)
-	{
-		player->daticval = code >> (8 * (3 - which));
-		player->datastrobe = 1;
-		machine.scheduler().timer_set(attotime::from_nsec(5000), FUNC(datastrobe_off), 0, ld);
-	}
-
-	/* determine the next bit to fetch and reprime ourself */
-	if (++which == 4)
-	{
-		which = 0;
-		line++;
-	}
-	if (line <= LASERDISC_CODE_LINE18 + 1)
-		machine.scheduler().timer_set(ld->screen->time_until_pos(line*2, which * 2 * ld->screen->width() / 4), FUNC(vbi_data_fetch), (line << 2), ld);
-}
-
-
-/*-------------------------------------------------
-    deferred_data_w - handle a write from the
-    external controller
--------------------------------------------------*/
-
-static TIMER_CALLBACK( deferred_data_w )
-{
-	laserdisc_state *ld = (laserdisc_state *)ptr;
-	ldplayer_data *player = ld->player;
-
-	/* set the value and mark it pending */
-	if (LOG_COMMANDS && player->fromcontroller_pending)
-		printf("Dropped previous command byte\n");
-	player->fromcontroller = param;
-	player->fromcontroller_pending = TRUE;
-
-	/* track the commands for debugging purposes */
-	if (player->cmdcount < ARRAY_LENGTH(player->cmdbuf))
-	{
-		player->cmdbuf[player->cmdcount++ % 3] = param;
-		if (LOG_COMMANDS && player->cmdcount % 3 == 0)
-			printf("Cmd: %02X %02X %02X\n", player->cmdbuf[0], player->cmdbuf[1], player->cmdbuf[2]);
-	}
-}
-
-
-/*-------------------------------------------------
-    irq_off - turn off the 8048 IRQ signal
--------------------------------------------------*/
-
-static TIMER_CALLBACK( irq_off )
-{
-	laserdisc_state *ld = (laserdisc_state *)ptr;
-	device_set_input_line(ld->player->cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
-}
-
-
-/*-------------------------------------------------
-    datastrobe_off - turn off the DATIC data
-    strobe signal
--------------------------------------------------*/
-
-static TIMER_CALLBACK( datastrobe_off )
-{
-	laserdisc_state *ld = (laserdisc_state *)ptr;
-	ld->player->datastrobe = 0;
-}
-
-
-/*-------------------------------------------------
-    erp_off - turn off the DATIC ERP signal
--------------------------------------------------*/
-
-static TIMER_CALLBACK( erp_off )
-{
-	laserdisc_state *ld = (laserdisc_state *)ptr;
-	ld->player->daticerp = 0;
-}
-
-
-/*-------------------------------------------------
-    track_timer - advance by one half-track
--------------------------------------------------*/
-
-static TIMER_DEVICE_CALLBACK( track_timer )
-{
-	laserdisc_state *ld = (laserdisc_state *)ptr;
-	ldplayer_data *player = ld->player;
-
-	/* advance by the count and toggle the state */
-	player->trackstate ^= 1;
-	if ((player->trackdir < 0 && !player->trackstate) || (player->trackdir > 0 && player->trackstate))
-	{
-		ldcore_advance_slider(ld, player->trackdir);
-		player->advanced += player->trackdir;
-	}
-}
-
-
-/*-------------------------------------------------
-    output0_w - controls audio/video squelch
-    and other bits
--------------------------------------------------*/
-
-static WRITE8_HANDLER( output0_w )
-{
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	ldplayer_data *player = ld->player;
-
 	/*
         $80 = n/c
         $40 = LED (?) -> C335
@@ -458,9 +381,9 @@ static WRITE8_HANDLER( output0_w )
         $01 = inverted -> VIDEO MUTE
     */
 
-	if (LOG_PORTS && (player->out0 ^ data) & 0xff)
+	if (LOG_PORTS && (m_i8049_out0 ^ data) & 0xff)
 	{
-		printf("%03X:out0:", cpu_get_pc(&space->device()));
+		printf("%03X:out0:", cpu_get_pc(&space.device()));
 		if ( (data & 0x80)) printf(" ???");
 		if ( (data & 0x40)) printf(" LED1");
 		if ( (data & 0x20)) printf(" LED2");
@@ -470,25 +393,21 @@ static WRITE8_HANDLER( output0_w )
 		if (!(data & 0x02)) printf(" AUDMUTE1");
 		if (!(data & 0x01)) printf(" VIDMUTE");
 		printf("\n");
-		player->out0 = data;
+		m_i8049_out0 = data;
 	}
 
-	/* update a/v squelch */
-	ldcore_set_audio_squelch(ld, !(data & 0x02), !(data & 0x04));
-	ldcore_set_video_squelch(ld, !(data & 0x01));
+	// update a/v squelch
+	set_audio_squelch(!(data & 0x02), !(data & 0x04));
+	set_video_squelch(!(data & 0x01));
 }
 
 
-/*-------------------------------------------------
-    output1_w - controls scanning behaviors
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_output1_w - controls scanning behaviors
+//-------------------------------------------------
 
-static WRITE8_HANDLER( output1_w )
+WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	ldplayer_data *player = ld->player;
-	INT32 speed = 0;
-
 	/*
         $80 = n/c
         $40 = n/c
@@ -500,36 +419,38 @@ static WRITE8_HANDLER( output1_w )
         $01 = OSM
     */
 
-	if (LOG_PORTS && (player->out1 ^ data) & 0x08)
+	INT32 speed = 0;
+
+	if (LOG_PORTS && (m_i8049_out1 ^ data) & 0x08)
 	{
-		mame_printf_debug("%03X:out1:", cpu_get_pc(&space->device()));
+		mame_printf_debug("%03X:out1:", cpu_get_pc(&space.device()));
 		if (!(data & 0x08)) mame_printf_debug(" SMS");
 		mame_printf_debug("\n");
-		player->out1 = data;
+		m_i8049_out1 = data;
 	}
 
-	/* speed is 0 unless SCAN CMD is clear */
+	// speed is 0 unless SCAN CMD is clear
 	speed = 0;
 	if (!(data & 0x02))
 	{
-		/* fast/slow is based on bit 2 */
+		// fast/slow is based on bit 2
 		speed = (data & 0x04) ? SCAN_FAST_SPEED : SCAN_SPEED;
 
-		/* direction is based on bit 0 */
+		// direction is based on bit 0
 		if (data & 0x01)
 			speed = -speed;
 	}
 
-	/* update the speed */
-	ldcore_set_slider_speed(ld, speed);
+	// update the speed
+	set_slider_speed(speed);
 }
 
 
-/*-------------------------------------------------
-    lcd_w - vestigial LCD frame display
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_lcd_w - vestigial LCD frame display
+//-------------------------------------------------
 
-static WRITE8_HANDLER( lcd_w )
+WRITE8_MEMBER( phillips_22vp931_device::i8049_lcd_w )
 {
 	/*
         Frame number is written as 5 digits here; however, it is not actually
@@ -538,22 +459,23 @@ static WRITE8_HANDLER( lcd_w )
 }
 
 
-/*-------------------------------------------------
-    unknown_r - unknown input port
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_unknown_r - unknown input port
+//-------------------------------------------------
 
-static READ8_HANDLER( unknown_r )
+READ8_MEMBER( phillips_22vp931_device::i8049_unknown_r )
 {
-	/* only bit $80 is checked and its effects are minor */
+	// only bit $80 is checked and its effects are minor
 	return 0x00;
 }
 
 
-/*-------------------------------------------------
-    keypad_r - vestigial keypad/button controls
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_keypad_r - vestigial keypad/button 
+//  controls
+//-------------------------------------------------
 
-static READ8_HANDLER( keypad_r )
+READ8_MEMBER( phillips_22vp931_device::i8049_keypad_r )
 {
 	/*
         From the code, this is apparently a vestigial keypad with basic controls:
@@ -570,89 +492,75 @@ static READ8_HANDLER( keypad_r )
 }
 
 
-/*-------------------------------------------------
-    datic_r - read the latched value from the
-    DATIC circuit
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_datic_r - read the latched value from the
+//  DATIC circuit
+//-------------------------------------------------
 
-static READ8_HANDLER( datic_r )
+READ8_MEMBER( phillips_22vp931_device::i8049_datic_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	return ld->player->daticval;
+	return m_daticval;
 }
 
 
-/*-------------------------------------------------
-    from_controller_r - read the value the
-    external controller wrote
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_from_controller_r - read the value the
+//  external controller wrote
+//-------------------------------------------------
 
-static READ8_HANDLER( from_controller_r )
+READ8_MEMBER( phillips_22vp931_device::i8049_from_controller_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	ldplayer_data *player = ld->player;
-
-	/* clear the pending flag and return the data */
-	player->fromcontroller_pending = FALSE;
-	return player->fromcontroller;
+	// clear the pending flag and return the data
+	m_fromcontroller_pending = false;
+	return m_fromcontroller;
 }
 
 
-/*-------------------------------------------------
-    to_controller_w - write a value back to the
-    external controller
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_to_controller_w - write a value back to 
+//  the external controller
+//-------------------------------------------------
 
-static WRITE8_HANDLER( to_controller_w )
+WRITE8_MEMBER( phillips_22vp931_device::i8049_to_controller_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	ldplayer_data *player = ld->player;
+	// set the pending flag and stash the data
+	m_tocontroller_pending = TRUE;
+	m_tocontroller = data;
 
-	/* set the pending flag and stash the data */
-	player->tocontroller_pending = TRUE;
-	player->tocontroller = data;
+	// signal to the callback if provided
+	if (!m_data_ready.isnull())
+		m_data_ready(*this, true);
 
-	/* signal to the callback if provided */
-	if (player->data_ready_cb != NULL)
-		(*player->data_ready_cb)(ld->device, TRUE);
-
-	/* also boost interleave for 4 scanlines to ensure proper communications */
-	ld->device->machine().scheduler().boost_interleave(attotime::zero, ld->screen->scan_period() * 4);
+	// also boost interleave for 4 scanlines to ensure proper communications
+	machine().scheduler().boost_interleave(attotime::zero, screen().scan_period() * 4);
 }
 
 
-/*-------------------------------------------------
-    port1_r - read the 8048 I/O port 1
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_port1_r - read the 8048 I/O port 1
+//-------------------------------------------------
 
-static READ8_HANDLER( port1_r )
+READ8_MEMBER( phillips_22vp931_device::i8049_port1_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	ldplayer_data *player = ld->player;
-	UINT8 result = 0x00;
-
 	/*
         $80 = P17 = (in) unsure
         $40 = P16 = (in) /ERP from datic circuit
         $20 = P15 = (in) D105
     */
 
-	if (!player->daticerp)
+	UINT8 result = 0x00;
+	if (!m_daticerp)
 		result |= 0x40;
-
 	return result;
 }
 
 
-/*-------------------------------------------------
-    port1_w - write the 8048 I/O port 1
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_port1_w - write the 8048 I/O port 1
+//-------------------------------------------------
 
-static WRITE8_HANDLER( port1_w )
+WRITE8_MEMBER( phillips_22vp931_device::i8049_port1_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	ldplayer_data *player = ld->player;
-
 	/*
         $10 = P14 = (out) D104 -> /SPEED
         $08 = P13 = (out) D103 -> /TIMER ENABLE
@@ -661,9 +569,9 @@ static WRITE8_HANDLER( port1_w )
         $01 = P10 = (out) D100 -> some op-amp then to C334, B56, B332
     */
 
-	if (LOG_PORTS && (player->port1 ^ data) & 0x1f)
+	if (LOG_PORTS && (m_i8049_port1 ^ data) & 0x1f)
 	{
-		printf("%03X:port1:", cpu_get_pc(&space->device()));
+		printf("%03X:port1:", cpu_get_pc(&space.device()));
 		if (!(data & 0x10)) printf(" SPEED");
 		if (!(data & 0x08)) printf(" TIMENABLE");
 		if (!(data & 0x04)) printf(" REV");
@@ -672,82 +580,78 @@ static WRITE8_HANDLER( port1_w )
 		printf("\n");
 	}
 
-	/* if bit 0 is set, we are not tracking */
+	// if bit 0 is set, we are not tracking
 	if (data & 0x01)
-		player->trackdir = 0;
+		m_trackdir = 0;
 
-	/* if bit 0 is clear and we weren't tracking before, initialize the state */
-	else if (player->trackdir == 0)
+	// if bit 0 is clear and we weren't tracking before, initialize the state
+	else if (m_trackdir == 0)
 	{
-		player->advanced = 0;
+		m_advanced = 0;
 
-		/* if bit 2 is clear, we are moving backwards */
+		// if bit 2 is clear, we are moving backwards
 		if (!(data & 0x04))
 		{
-			player->trackdir = -1;
-			player->trackstate = 1;
+			m_trackdir = -1;
+			m_trackstate = 1;
 		}
 
-		/* if bit 1 is clear, we are moving forward */
+		// if bit 1 is clear, we are moving forward
 		else if (!(data & 0x02))
 		{
-			player->trackdir = 1;
-			player->trackstate = 0;
+			m_trackdir = 1;
+			m_trackstate = 0;
 		}
 	}
 
-	/* if we have a timer, adjust it */
-	if (player->tracktimer != NULL)
+	// if we have a timer, adjust it
+	if (m_tracktimer != NULL)
 	{
-		/* turn it off if we're not tracking */
-		if (player->trackdir == 0)
-			player->tracktimer->reset();
+		// turn it off if we're not tracking
+		if (m_trackdir == 0)
+			m_tracktimer->reset();
 
-		/* if we just started tracking, or if the speed was changed, reprime the timer */
-		else if (((player->port1 ^ data) & 0x11) != 0)
+		// if we just started tracking, or if the speed was changed, reprime the timer
+		else if (((m_i8049_port1 ^ data) & 0x11) != 0)
 		{
-			/* speeds here are just guesses, but work with the player logic; this is the time per half-track */
+			// speeds here are just guesses, but work with the player logic; this is the time per half-track
 			attotime speed = (data & 0x10) ? attotime::from_usec(60) : attotime::from_usec(10);
 
-			/* always start with an initial long delay; the code expects this */
-			player->tracktimer->adjust(attotime::from_usec(100), 0, speed);
+			// always start with an initial long delay; the code expects this
+			m_tracktimer->adjust(attotime::from_usec(100), 0, speed);
 		}
 	}
 
-	player->port1 = data;
+	m_i8049_port1 = data;
 }
 
 
-/*-------------------------------------------------
-    port2_r - read from the 8048 I/O port 2
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_port2_r - read from the 8048 I/O port 2
+//-------------------------------------------------
 
-static READ8_HANDLER( port2_r )
+READ8_MEMBER( phillips_22vp931_device::i8049_port2_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	ldplayer_data *player = ld->player;
-	UINT8 result = 0x00;
-
 	/*
         $80 = P27 = (in) set/reset latch; set by FOC LS, reset by IGR
         $20 = P25 = (in) D125 -> 0 when data written to controller is preset, reset to 1 when read
         $10 = P24 = (in) D124 -> 0 when data from controller is present, reset to 1 on a read
     */
 
-	if (!player->tocontroller_pending)
+	UINT8 result = 0x00;
+	if (!m_tocontroller_pending)
 		result |= 0x20;
-	if (!player->fromcontroller_pending)
+	if (!m_fromcontroller_pending)
 		result |= 0x10;
-
 	return result;
 }
 
 
-/*-------------------------------------------------
-    port2_w - write the 8048 I/O port 2
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_port2_w - write the 8048 I/O port 2
+//-------------------------------------------------
 
-static WRITE8_HANDLER( port2_w )
+WRITE8_MEMBER( phillips_22vp931_device::i8049_port2_w )
 {
 	/*
         $40 = P26 = (out) cleared while data is sent back & forth; set afterwards
@@ -756,26 +660,24 @@ static WRITE8_HANDLER( port2_w )
 }
 
 
-/*-------------------------------------------------
-    t0_r - return the T0 line status, which is
-    connected to the DATIC's data strobe line
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_t0_r - return the T0 line status, which is
+//  connected to the DATIC's data strobe line
+//-------------------------------------------------
 
-static READ8_HANDLER( t0_r )
+READ8_MEMBER( phillips_22vp931_device::i8049_t0_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	return ld->player->datastrobe;
+	return m_datastrobe;
 }
 
 
-/*-------------------------------------------------
-    t1_r - return the T1 line status, which is
-    connected to the tracking state and is used
-    to count the number of tracks advanced
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8049_t1_r - return the T1 line status, which 
+//  is connected to the tracking state and is used
+//  to count the number of tracks advanced
+//-------------------------------------------------
 
-static READ8_HANDLER( t1_r )
+READ8_MEMBER( phillips_22vp931_device::i8049_t1_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->device().owner());
-	return ld->player->trackstate;
+	return m_trackstate;
 }

@@ -68,6 +68,6 @@ WRITE32_HANDLER( psikyo_vram_1_w );
 
 VIDEO_START( sngkace );
 VIDEO_START( psikyo );
-SCREEN_UPDATE( psikyo );
-SCREEN_UPDATE( psikyo_bootleg );
+SCREEN_UPDATE_IND16( psikyo );
+SCREEN_UPDATE_IND16( psikyo_bootleg );
 SCREEN_EOF( psikyo );

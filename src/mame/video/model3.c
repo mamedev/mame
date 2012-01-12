@@ -37,7 +37,7 @@ typedef struct _poly_extra_data poly_extra_data;
 struct _poly_extra_data
 {
 	cached_texture *texture;
-	bitmap_t *zbuffer;
+	bitmap_ind32 *zbuffer;
 	UINT32 color;
 	UINT8 texture_param;
 	int polygon_transparency;
@@ -124,8 +124,8 @@ VIDEO_START( model3 )
 
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
-	state->m_bitmap3d = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
+	state->m_bitmap3d.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_zbuffer.allocate(width, height);
 
 	state->m_m3_char_ram = auto_alloc_array_clear(machine, UINT64, 0x100000/8);
 	state->m_m3_tile_ram = auto_alloc_array_clear(machine, UINT64, 0x8000/8);
@@ -158,7 +158,7 @@ VIDEO_START( model3 )
 	init_matrix_stack(machine);
 }
 
-static void draw_tile_4bit(running_machine &machine, bitmap_t &bitmap, int tx, int ty, int tilenum)
+static void draw_tile_4bit(running_machine &machine, bitmap_ind16 &bitmap, int tx, int ty, int tilenum)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x, y;
@@ -194,7 +194,7 @@ static void draw_tile_4bit(running_machine &machine, bitmap_t &bitmap, int tx, i
 	}
 }
 
-static void draw_tile_8bit(running_machine &machine, bitmap_t &bitmap, int tx, int ty, int tilenum)
+static void draw_tile_8bit(running_machine &machine, bitmap_ind16 &bitmap, int tx, int ty, int tilenum)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x, y;
@@ -226,7 +226,7 @@ static void draw_tile_8bit(running_machine &machine, bitmap_t &bitmap, int tx, i
 	}
 }
 #ifdef UNUSED_FUNCTION
-static void draw_texture_sheet(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_texture_sheet(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x,y;
@@ -245,7 +245,7 @@ static void draw_texture_sheet(running_machine &machine, bitmap_t &bitmap, const
 }
 #endif
 
-static void draw_layer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int layer, int bitdepth)
+static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int bitdepth)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x, y;
@@ -321,13 +321,13 @@ static void draw_layer(running_machine &machine, bitmap_t &bitmap, const rectang
 }
 
 #ifdef UNUSED_FUNCTION
-static void copy_screen(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void copy_screen(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	int x,y;
 	for(y=cliprect.min_y; y <= cliprect.max_y; y++) {
 		UINT16 *d = &bitmap.pix16(y);
-		UINT16 *s = &state->m_bitmap3d->pix16(y);
+		UINT16 *s = &state->m_bitmap3d.pix16(y);
 		for(x=cliprect.min_x; x <= cliprect.max_x; x++) {
 			UINT16 pix = s[x];
 			if(!(pix & 0x8000)) {
@@ -338,7 +338,7 @@ static void copy_screen(running_machine &machine, bitmap_t &bitmap, const rectan
 }
 #endif
 
-SCREEN_UPDATE( model3 )
+SCREEN_UPDATE_IND16( model3 )
 {
 	model3_state *state = screen.machine().driver_data<model3_state>();
 #if 0
@@ -394,12 +394,12 @@ SCREEN_UPDATE( model3 )
 	{
 #if 0
 		if(state->m_real3d_display_list) {
-			state->m_zbuffer->fill(0, cliprect);
-			state->m_bitmap3d->fill(0x8000, cliprect);
+			state->m_zbuffer.fill(0, cliprect);
+			state->m_bitmap3d.fill(0x8000, cliprect);
 			real3d_traverse_display_list(screen.machine());
 		}
 #endif
-		copybitmap_trans(bitmap, *state->m_bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
+		copybitmap_trans(bitmap, state->m_bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
 	}
 
 	if (!(state->m_debug_layer_disable & 0x2))
@@ -784,8 +784,8 @@ void real3d_display_list_end(running_machine &machine)
 		};
 	}
 	state->m_texture_fifo_pos = 0;
-	state->m_zbuffer->fill(0);
-	state->m_bitmap3d->fill(0x8000);
+	state->m_zbuffer.fill(0);
+	state->m_bitmap3d.fill(0x8000);
 	real3d_traverse_display_list(machine);
 	//state->m_real3d_display_list = 1;
 }
@@ -1070,7 +1070,7 @@ static void render_one(running_machine &machine, TRIANGLE *tri)
 	tri->v[1].pz = 1.0f / tri->v[1].pz;
 	tri->v[2].pz = 1.0f / tri->v[2].pz;
 
-	extra->zbuffer = state->m_zbuffer;
+	extra->zbuffer = &state->m_zbuffer;
 	if (tri->param & TRI_PARAM_TEXTURE_ENABLE)
 	{
 		tri->v[0].pu = tri->v[0].pu * tri->v[0].pz * 256.0f;
@@ -1091,7 +1091,7 @@ static void render_one(running_machine &machine, TRIANGLE *tri)
 			callback = (tri->transparency >= 32) ? draw_scanline_normal : draw_scanline_trans;
 		else
 			callback = draw_scanline_alpha;
-		poly_render_triangle(state->m_poly, state->m_bitmap3d, state->m_clip3d, callback, 3, &tri->v[0], &tri->v[1], &tri->v[2]);
+		poly_render_triangle(state->m_poly, &state->m_bitmap3d, state->m_clip3d, callback, 3, &tri->v[0], &tri->v[1], &tri->v[2]);
 	}
 	else
 	{
@@ -1099,7 +1099,7 @@ static void render_one(running_machine &machine, TRIANGLE *tri)
 		extra->polygon_intensity	= tri->intensity;
 		extra->color                = tri->color;
 
-		poly_render_triangle(state->m_poly, state->m_bitmap3d, state->m_clip3d, draw_scanline_color, 1, &tri->v[0], &tri->v[1], &tri->v[2]);
+		poly_render_triangle(state->m_poly, &state->m_bitmap3d, state->m_clip3d, draw_scanline_color, 1, &tri->v[0], &tri->v[1], &tri->v[2]);
 	}
 }
 

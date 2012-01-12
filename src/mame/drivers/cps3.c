@@ -410,10 +410,10 @@ Notes:
 
 static void copy_from_nvram(running_machine &machine);
 
-INLINE void cps3_drawgfxzoom(bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,
-		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask)
+		int scalex, int scaley,bitmap_ind8 *pri_buffer,UINT32 pri_mask)
 {
 	cps3_state *state = gfx->machine().driver_data<cps3_state>();
 	rectangle myclip;
@@ -845,20 +845,20 @@ static VIDEO_START(cps3)
 
 	// the renderbuffer can be twice the size of the screen, this allows us to handle framebuffer zoom values
 	// between 0x00 and 0x80 (0x40 is normal, 0x80 would be 'view twice as much', 0x20 is 'view half as much')
-	state->m_renderbuffer_bitmap = auto_bitmap_alloc(machine,512*2,224*2,machine.primary_screen->format());
+	state->m_renderbuffer_bitmap.allocate(512*2,224*2);
 
 	state->m_renderbuffer_clip.min_x = 0;
 	state->m_renderbuffer_clip.max_x = state->m_screenwidth-1;
 	state->m_renderbuffer_clip.min_y = 0;
 	state->m_renderbuffer_clip.max_y = 224-1;
 
-	state->m_renderbuffer_bitmap->fill(0x3f, state->m_renderbuffer_clip);
+	state->m_renderbuffer_bitmap.fill(0x3f, state->m_renderbuffer_clip);
 
 }
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, int drawline, bitmap_t &bitmap, const rectangle &cliprect )
+static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	cps3_state *state = machine.driver_data<cps3_state>();
 	UINT32* tmapregs[4] = { state->m_tilemap20_regs_base, state->m_tilemap30_regs_base, state->m_tilemap40_regs_base, state->m_tilemap50_regs_base };
@@ -941,7 +941,7 @@ static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, in
 	}
 }
 
-static SCREEN_UPDATE(cps3)
+static SCREEN_UPDATE_RGB32(cps3)
 {
 	cps3_state *state = screen.machine().driver_data<cps3_state>();
 	int y,x, count;
@@ -994,7 +994,7 @@ static SCREEN_UPDATE(cps3)
 	state->m_renderbuffer_clip.min_y = 0;
 	state->m_renderbuffer_clip.max_y = ((224*fszx)>>16)-1;
 
-	state->m_renderbuffer_bitmap->fill(0, state->m_renderbuffer_clip);
+	state->m_renderbuffer_bitmap.fill(0, state->m_renderbuffer_clip);
 
 	/* Sprites */
 	{
@@ -1093,7 +1093,7 @@ static SCREEN_UPDATE(cps3)
 					{
 						for (uu=0;uu<1023;uu++)
 						{
-							cps3_draw_tilemapsprite_line(screen.machine(), tilemapnum, uu, *state->m_renderbuffer_bitmap, state->m_renderbuffer_clip );
+							cps3_draw_tilemapsprite_line(screen.machine(), tilemapnum, uu, state->m_renderbuffer_bitmap, state->m_renderbuffer_clip );
 						}
 					}
 					bg_drawn[tilemapnum] = 1;
@@ -1180,11 +1180,11 @@ static SCREEN_UPDATE(cps3)
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(*state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(*state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(state->m_renderbuffer_bitmap,state->m_renderbuffer_clip,screen.machine().gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
 									}
 									count++;
 								}
@@ -1211,7 +1211,7 @@ static SCREEN_UPDATE(cps3)
 		for (rendery=0;rendery<224;rendery++)
 		{
 			dstbitmap = &bitmap.pix32(rendery);
-			srcbitmap = &state->m_renderbuffer_bitmap->pix32(srcy>>16);
+			srcbitmap = &state->m_renderbuffer_bitmap.pix32(srcy>>16);
 			srcx=0;
 
 			for (renderx=0;renderx<state->m_screenwidth;renderx++)
@@ -2581,9 +2581,8 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
-	MCFG_SCREEN_UPDATE(cps3)
+	MCFG_SCREEN_UPDATE_STATIC(cps3)
 /*
     Measured clocks:
         V = 59.5992Hz

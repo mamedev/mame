@@ -914,7 +914,7 @@ static VIDEO_START( coinmstr )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 46, 32);
 }
 
-static SCREEN_UPDATE( coinmstr )
+static SCREEN_UPDATE_IND16( coinmstr )
 {
 	coinmstr_state *state = screen.machine().driver_data<coinmstr_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -1014,10 +1014,9 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(coinmstr)
+	MCFG_SCREEN_UPDATE_STATIC(coinmstr)
 
 	MCFG_GFXDECODE(coinmstr)
 	MCFG_PALETTE_LENGTH(46*32*4)

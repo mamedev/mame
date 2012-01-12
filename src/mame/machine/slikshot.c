@@ -549,14 +549,14 @@ VIDEO_START( slikshot )
  *
  *************************************/
 
-SCREEN_UPDATE( slikshot )
+SCREEN_UPDATE_RGB32( slikshot )
 {
 	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	int totaldy, totaldx;
 	int temp, i;
 
 	/* draw the normal video first */
-	SCREEN_UPDATE_CALL(itech8_2page);
+	SCREEN_UPDATE32_CALL(itech8_2page);
 
 	/* add the current X,Y positions to the list */
 	state->m_xbuffer[state->m_ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen.machine(), "FAKEX", 0);

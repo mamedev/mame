@@ -36,4 +36,4 @@ extern void gbusters_tile_callback(running_machine &machine, int layer,int bank,
 extern void gbusters_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
 
 VIDEO_START( gbusters );
-SCREEN_UPDATE( gbusters );
+SCREEN_UPDATE_IND16( gbusters );

@@ -17,11 +17,12 @@ public:
 	UINT32 *m_prom_tab;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
+	bitmap_ind16 m_bitmap;
 };
 
 
 /*----------- defined in video/magmax.c -----------*/
 
 PALETTE_INIT( magmax );
-SCREEN_UPDATE( magmax );
+SCREEN_UPDATE_IND16( magmax );
 VIDEO_START( magmax );

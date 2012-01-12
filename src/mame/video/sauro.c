@@ -106,7 +106,7 @@ VIDEO_START( sauro )
 	state->m_palette_bank = 0;
 }
 
-static void sauro_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void sauro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	sauro_state *state = machine.driver_data<sauro_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -154,7 +154,7 @@ static void sauro_draw_sprites(running_machine &machine, bitmap_t &bitmap, const
 	}
 }
 
-SCREEN_UPDATE( sauro )
+SCREEN_UPDATE_IND16( sauro )
 {
 	sauro_state *state = screen.machine().driver_data<sauro_state>();
 
@@ -174,7 +174,7 @@ VIDEO_START( trckydoc )
 		 8, 8, 32, 32);
 }
 
-static void trckydoc_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void trckydoc_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	sauro_state *state = machine.driver_data<sauro_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -230,7 +230,7 @@ static void trckydoc_draw_sprites(running_machine &machine, bitmap_t &bitmap, co
 	}
 }
 
-SCREEN_UPDATE( trckydoc )
+SCREEN_UPDATE_IND16( trckydoc )
 {
 	sauro_state *state = screen.machine().driver_data<sauro_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

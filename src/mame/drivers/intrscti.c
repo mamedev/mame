@@ -66,7 +66,7 @@ static VIDEO_START(intrscti)
 {
 }
 
-static SCREEN_UPDATE(intrscti)
+static SCREEN_UPDATE_IND16(intrscti)
 {
 	intrscti_state *state = screen.machine().driver_data<intrscti_state>();
 	int y,x;
@@ -101,10 +101,9 @@ static MACHINE_CONFIG_START( intrscti, intrscti_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 512-1)
-	MCFG_SCREEN_UPDATE(intrscti)
+	MCFG_SCREEN_UPDATE_STATIC(intrscti)
 
 	MCFG_GFXDECODE(intrscti)
 	MCFG_PALETTE_LENGTH(0x100)

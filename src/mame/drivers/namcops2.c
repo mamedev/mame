@@ -35,6 +35,8 @@ public:
 		  m_maincpu(*this, "maincpu")
 	{ }
 
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 protected:
 
 	// devices
@@ -42,7 +44,6 @@ protected:
 
 	// driver_device overrides
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -50,7 +51,7 @@ void namcops2_state::video_start()
 {
 }
 
-bool namcops2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 namcops2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -77,7 +78,7 @@ static MACHINE_CONFIG_START( system246, namcops2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_UPDATE_DRIVER(namcops2_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 

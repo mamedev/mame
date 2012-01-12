@@ -20,7 +20,7 @@ public:
 /*----------- defined in video/baraduke.c -----------*/
 
 VIDEO_START( baraduke );
-SCREEN_UPDATE( baraduke );
+SCREEN_UPDATE_IND16( baraduke );
 SCREEN_EOF( baraduke );
 READ8_HANDLER( baraduke_videoram_r );
 WRITE8_HANDLER( baraduke_videoram_w );

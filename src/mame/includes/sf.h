@@ -38,4 +38,4 @@ WRITE16_HANDLER( sf_videoram_w );
 WRITE16_HANDLER( sf_gfxctrl_w );
 
 VIDEO_START( sf );
-SCREEN_UPDATE( sf );
+SCREEN_UPDATE_IND16( sf );

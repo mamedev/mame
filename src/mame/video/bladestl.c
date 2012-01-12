@@ -76,7 +76,7 @@ void bladestl_sprite_callback( running_machine &machine, int *code,int *color )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( bladestl )
+SCREEN_UPDATE_IND16( bladestl )
 {
 	bladestl_state *state = screen.machine().driver_data<bladestl_state>();
 	set_pens(screen.machine());

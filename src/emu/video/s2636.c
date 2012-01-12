@@ -104,8 +104,8 @@ struct _s2636_state
 	int       y_offset;
 	int       x_offset;
 
-	bitmap_t *bitmap;
-	bitmap_t *collision_bitmap;
+	bitmap_ind16 *bitmap;
+	bitmap_ind16 *collision_bitmap;
 };
 
 /*************************************
@@ -136,7 +136,7 @@ INLINE const s2636_interface *get_interface( device_t *device )
  *
  *************************************/
 
-static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or_mode, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or_mode, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int sy;
 
@@ -254,7 +254,7 @@ static int check_collision( device_t *device, int spriteno1, int spriteno2, cons
  *
  *************************************/
 
-bitmap_t &s2636_update( device_t *device, const rectangle &cliprect )
+bitmap_ind16 &s2636_update( device_t *device, const rectangle &cliprect )
 {
 	s2636_state *s2636 = get_safe_token(device);
 	UINT8 collision = 0;
@@ -360,8 +360,8 @@ static DEVICE_START( s2636 )
 	s2636->y_offset = intf->y_offset;
 
 	s2636->work_ram = auto_alloc_array_clear(device->machine(), UINT8, intf->work_ram_size);
-	s2636->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
-	s2636->collision_bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
+	s2636->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
+	s2636->collision_bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
 
 	device->save_item(NAME(s2636->x_offset));
 	device->save_item(NAME(s2636->y_offset));

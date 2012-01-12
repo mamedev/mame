@@ -547,7 +547,7 @@ VIDEO_START( fromanc4 )
 
 ******************************************************************************/
 
-SCREEN_UPDATE( fromanc2_left )
+SCREEN_UPDATE_IND16( fromanc2_left )
 {
 	fromanc2_state *state = screen.machine().driver_data<fromanc2_state>();
 	int i;
@@ -565,7 +565,7 @@ SCREEN_UPDATE( fromanc2_left )
 	return 0;
 }
 
-SCREEN_UPDATE( fromanc2_right )
+SCREEN_UPDATE_IND16( fromanc2_right )
 {
 	fromanc2_state *state = screen.machine().driver_data<fromanc2_state>();
 	int i;

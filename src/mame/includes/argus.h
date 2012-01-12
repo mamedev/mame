@@ -29,7 +29,7 @@ public:
 	int m_lowbitscroll;
 	int m_prvscrollx;
 	UINT8 m_valtric_mosaic;
-	bitmap_t *m_mosaicbitmap;
+	bitmap_rgb32 m_mosaicbitmap;
 	UINT8 m_valtric_unknown;
 	UINT8 m_butasan_unknown;
 	int m_mosaic;
@@ -46,9 +46,9 @@ VIDEO_START( butasan );
 VIDEO_RESET( argus );
 VIDEO_RESET( valtric );
 VIDEO_RESET( butasan );
-SCREEN_UPDATE( argus );
-SCREEN_UPDATE( valtric );
-SCREEN_UPDATE( butasan );
+SCREEN_UPDATE_RGB32( argus );
+SCREEN_UPDATE_RGB32( valtric );
+SCREEN_UPDATE_RGB32( butasan );
 
 READ8_HANDLER( argus_txram_r );
 READ8_HANDLER( argus_bg1ram_r );

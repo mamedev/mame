@@ -24,7 +24,7 @@
 #include "cpu/m68000/m68000.h"
 #include "render.h"
 #include "includes/amiga.h"
-#include "machine/laserdsc.h"
+#include "machine/ldstub.h"
 #include "machine/6526cia.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
@@ -34,10 +34,11 @@ class alg_state : public amiga_state
 {
 public:
 	alg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag) { }
+		: amiga_state(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
 
-	device_t *m_laserdisc;
+	required_device<sony_ldp1450_device> m_laserdisc;
 	emu_timer *m_serial_timer;
 	UINT8 m_serial_timer_active;
 	UINT16 m_input_select;
@@ -97,7 +98,6 @@ static VIDEO_START( alg )
 static MACHINE_START( alg )
 {
 	alg_state *state = machine.driver_data<alg_state>();
-	state->m_laserdisc = machine.device("laserdisc");
 
 	state->m_serial_timer = machine.scheduler().timer_alloc(FUNC(response_timer));
 	state->m_serial_timer_active = FALSE;
@@ -122,16 +122,16 @@ static TIMER_CALLBACK( response_timer )
 	alg_state *state = machine.driver_data<alg_state>();
 
 	/* if we still have data to send, do it now */
-	if (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (state->m_laserdisc->data_available_r() == ASSERT_LINE)
 	{
-		UINT8 data = laserdisc_data_r(state->m_laserdisc);
+		UINT8 data = state->m_laserdisc->data_r();
 		if (data != 0x0a)
 			mame_printf_debug("Sending serial data = %02X\n", data);
 		amiga_serial_in_w(machine, data);
 	}
 
 	/* if there's more to come, set another timer */
-	if (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (state->m_laserdisc->data_available_r() == ASSERT_LINE)
 		state->m_serial_timer->adjust(amiga_get_serial_char_period(machine));
 	else
 		state->m_serial_timer_active = FALSE;
@@ -143,7 +143,7 @@ static void vsync_callback(running_machine &machine)
 	alg_state *state = machine.driver_data<alg_state>();
 
 	/* if we have data available, set a timer to read it */
-	if (!state->m_serial_timer_active && laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (!state->m_serial_timer_active && state->m_laserdisc->data_available_r() == ASSERT_LINE)
 	{
 		state->m_serial_timer->adjust(amiga_get_serial_char_period(machine));
 		state->m_serial_timer_active = TRUE;
@@ -156,10 +156,10 @@ static void serial_w(running_machine &machine, UINT16 data)
 	alg_state *state = machine.driver_data<alg_state>();
 
 	/* write to the laserdisc player */
-	laserdisc_data_w(state->m_laserdisc, data & 0xff);
+	state->m_laserdisc->data_w(data & 0xff);
 
 	/* if we have data available, set a timer to read it */
-	if (!state->m_serial_timer_active && laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (!state->m_serial_timer_active && state->m_laserdisc->data_available_r() == ASSERT_LINE)
 	{
 		state->m_serial_timer->adjust(amiga_get_serial_char_period(machine));
 		state->m_serial_timer_active = TRUE;
@@ -437,12 +437,12 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	MCFG_MACHINE_RESET(alg)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_LASERDISC_ADD("laserdisc", SONY_LDP1450, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(amiga, 512*2, 262, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_LDP1450_ADD("laserdisc")
+	MCFG_LASERDISC_OVERLAY(512*2, 262, amiga)
 	MCFG_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_SCREEN_REFRESH_RATE(59.997)
 	MCFG_SCREEN_SIZE(512*2, 262)
 	MCFG_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
@@ -461,7 +461,7 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

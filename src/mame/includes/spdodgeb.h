@@ -40,7 +40,7 @@ public:
 
 PALETTE_INIT( spdodgeb );
 VIDEO_START( spdodgeb );
-SCREEN_UPDATE( spdodgeb );
+SCREEN_UPDATE_IND16( spdodgeb );
 TIMER_DEVICE_CALLBACK( spdodgeb_interrupt );
 WRITE8_HANDLER( spdodgeb_scrollx_lo_w );
 WRITE8_HANDLER( spdodgeb_ctrl_w );

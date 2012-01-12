@@ -152,7 +152,7 @@ struct _png_info
 void png_free(png_info *pnginfo);
 
 png_error png_read_file(core_file *fp, png_info *pnginfo);
-png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap);
+png_error png_read_bitmap(core_file *fp, bitmap_argb32 &bitmap);
 png_error png_expand_buffer_8bit(png_info *p);
 
 png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text);

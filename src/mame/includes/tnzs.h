@@ -87,5 +87,5 @@ MACHINE_START( jpopnics );
 /*----------- defined in video/tnzs.c -----------*/
 
 PALETTE_INIT( arknoid2 );
-SCREEN_UPDATE( tnzs );
+SCREEN_UPDATE_IND16( tnzs );
 SCREEN_EOF( tnzs );

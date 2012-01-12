@@ -24,7 +24,7 @@ VIDEO_START( actfancr )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( actfancr )
+SCREEN_UPDATE_IND16( actfancr )
 {
 	actfancr_state *state = screen.machine().driver_data<actfancr_state>();
 

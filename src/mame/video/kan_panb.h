@@ -1,4 +1,4 @@
-SCREEN_UPDATE( honeydol );
-SCREEN_UPDATE( twinadv );
-SCREEN_UPDATE( wintbob );
-SCREEN_UPDATE( snowbro3 );
+SCREEN_UPDATE_IND16( honeydol );
+SCREEN_UPDATE_IND16( twinadv );
+SCREEN_UPDATE_IND16( wintbob );
+SCREEN_UPDATE_IND16( snowbro3 );

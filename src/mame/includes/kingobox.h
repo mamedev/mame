@@ -44,8 +44,8 @@ WRITE8_HANDLER( kingofb_f800_w );
 
 PALETTE_INIT( kingofb );
 VIDEO_START( kingofb );
-SCREEN_UPDATE( kingofb );
+SCREEN_UPDATE_IND16( kingofb );
 
 PALETTE_INIT( ringking );
 VIDEO_START( ringking );
-SCREEN_UPDATE( ringking );
+SCREEN_UPDATE_IND16( ringking );

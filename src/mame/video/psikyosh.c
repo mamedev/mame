@@ -147,12 +147,10 @@ while (0)																							\
     draw_scanline32_alpha - take an RGB-encoded UINT32
     scanline and alpha-blend it into the destination bitmap
 -------------------------------------------------*/
-static void draw_scanline32_alpha(bitmap_t &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr, int alpha)
+static void draw_scanline32_alpha(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr, int alpha)
 {
 	DECLARE_NO_PRIORITY;
 	UINT32 transpen = BG_TRANSPEN;
-
-	assert(bitmap.bpp() == 32);
 
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32, NO_PRIORITY);
 }
@@ -161,13 +159,10 @@ static void draw_scanline32_alpha(bitmap_t &bitmap, INT32 destx, INT32 desty, IN
     draw_scanline32_argb - take an ARGB-encoded UINT32
     scanline and alpha-blend it into the destination bitmap
 -------------------------------------------------*/
-static void draw_scanline32_argb(bitmap_t &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
+static void draw_scanline32_argb(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
 {
 	DECLARE_NO_PRIORITY;
 	UINT32 transpen = BG_TRANSPEN;
-
-	assert(bitmap.bpp() == 32);
-	assert(bitmap.format() == BITMAP_FORMAT_ARGB32);
 
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32, NO_PRIORITY);
 }
@@ -176,13 +171,10 @@ static void draw_scanline32_argb(bitmap_t &bitmap, INT32 destx, INT32 desty, INT
     draw_scanline32_tranpens - take an RGB-encoded UINT32
     scanline and copy it into the destination bitmap, testing for the special ARGB transpen
 -------------------------------------------------*/
-static void draw_scanline32_transpen(bitmap_t &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
+static void draw_scanline32_transpen(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr)
 {
 	DECLARE_NO_PRIORITY;
 	UINT32 transpen = BG_TRANSPEN;
-
-	assert(bitmap.bpp() == 32);
-	assert(bitmap.format() == BITMAP_FORMAT_ARGB32);
 
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_RENDER32, NO_PRIORITY);
 }
@@ -192,7 +184,7 @@ static void draw_scanline32_transpen(bitmap_t &bitmap, INT32 destx, INT32 desty,
     a single transparent pen, storing the alpha value
     in alpha field of ARGB32, negative alpha implies alphatable
 -------------------------------------------------*/
-static void drawgfx_alphastore(bitmap_t &dest, const rectangle &cliprect, const gfx_element *gfx,
+static void drawgfx_alphastore(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
@@ -238,7 +230,7 @@ static void drawgfx_alphastore(bitmap_t &dest, const rectangle &cliprect, const 
     a fixed alpha value, or if alpha==-1 then uses
     the per-pen alphatable[] array
  -------------------------------------------------*/
-static void drawgfx_alphatable(bitmap_t &dest, const rectangle &cliprect, const gfx_element *gfx,
+static void drawgfx_alphatable(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
@@ -276,7 +268,7 @@ static void drawgfx_alphatable(bitmap_t &dest, const rectangle &cliprect, const 
 
 /* 'Normal' layers, no line/columnscroll. No per-line effects.
 Zooming isn't supported just because it's not used and it would be slow */
-static void draw_bglayer( running_machine &machine, int layer, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri )
+static void draw_bglayer( running_machine &machine, int layer, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	gfx_element *gfx;
@@ -351,11 +343,11 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 		rectangle cliprect;
 
 		cliprect.min_x = 0;
-		cliprect.max_x = state->m_bg_bitmap->width() - 1;
+		cliprect.max_x = state->m_bg_bitmap.width() - 1;
 		cliprect.min_y = sy * 16;
 		cliprect.max_y = cliprect.min_y + 16 - 1;
 
-		state->m_bg_bitmap->fill(BG_TRANSPEN, cliprect);
+		state->m_bg_bitmap.fill(BG_TRANSPEN, cliprect);
 		int width = size * 16;
 
 		int offs = size * sy;
@@ -370,7 +362,7 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 			int need_alpha = alpha < 0 ? -1 : 0xff; // store per-pen alpha in bitmap, otherwise don't since we'll need it per-line
 
 			if(tileno) { // valid tile, but blank in all games?
-				drawgfx_alphastore(*state->m_bg_bitmap, state->m_bg_bitmap->cliprect(), gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
+				drawgfx_alphastore(state->m_bg_bitmap, state->m_bg_bitmap.cliprect(), gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
 			}
 
 			offs++;
@@ -384,7 +376,7 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 Bitmap is first rendered to an ARGB image, taking into account the per-pen alpha (if used).
 From there we extract data as we compose the image, one scanline at a time, blending the ARGB pixels
 into the RGB32 bitmap (with either the alpha information from the ARGB, or per-line alpha */
-static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri )
+static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	assert(BG_LINE(layer));
@@ -438,7 +430,7 @@ static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t &b
 				g_profiler.start(PROFILER_USER2);
 				UINT32 tilemap_line[32 * 16];
 				UINT32 scr_line[64 * 8];
-				extract_scanline32(*state->m_bg_bitmap, 0, tilemap_scanline, width, tilemap_line);
+				extract_scanline32(state->m_bg_bitmap, 0, tilemap_scanline, width, tilemap_line);
 				g_profiler.stop();
 
 				/* slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
@@ -479,7 +471,7 @@ static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_t &b
 }
 
 /* 3 BG layers, with priority */
-static void draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri )
+static void draw_background( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	int i;
@@ -527,7 +519,7 @@ static void draw_background( running_machine &machine, bitmap_t &bitmap, const r
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
 static void psikyosh_drawgfxzoom( running_machine &machine,
-		bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 		int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z)
 {
@@ -620,7 +612,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							{
 								const UINT8 *source = code_base + (y_index) * gfx->line_modulo + x_index_base;
 								UINT32 *dest = &dest_bmp.pix32(sy, sx);
-								UINT16 *pri = &state->m_z_bitmap->pix16(sy, sx);
+								UINT16 *pri = &state->m_z_bitmap.pix16(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
@@ -679,7 +671,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
 								UINT32 *dest = &dest_bmp.pix32(sy, sx);
-								UINT16 *pri = &state->m_z_bitmap->pix16(sy, sx);
+								UINT16 *pri = &state->m_z_bitmap.pix16(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
@@ -739,7 +731,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							{
 								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
 								UINT32 *dest = &dest_bmp.pix32(sy, sx);
-								UINT16 *pri = &state->m_z_bitmap->pix16(sy, sx);
+								UINT16 *pri = &state->m_z_bitmap.pix16(sy, sx);
 								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
@@ -816,7 +808,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 				for (ypixel = 0; ypixel < gfx->height; ypixel++)
 				{
 					const UINT8 *source = code_base + ypixel * gfx->line_modulo;
-					UINT8 *dest = &state->m_zoom_bitmap->pix8(ypixel + ytile*gfx->height);
+					UINT8 *dest = &state->m_zoom_bitmap.pix8(ypixel + ytile*gfx->height);
 
 					for (xpixel = 0; xpixel < gfx->width; xpixel++)
 					{
@@ -891,9 +883,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT8 *source = &state->m_zoom_bitmap.pix8(y_index >> 10);
 								UINT32 *dest = &dest_bmp.pix32(y);
-								UINT16 *pri = &state->m_z_bitmap->pix16(y);
+								UINT16 *pri = &state->m_z_bitmap.pix16(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -917,7 +909,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT8 *source = &state->m_zoom_bitmap.pix8(y_index >> 10);
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -941,9 +933,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT8 *source = &state->m_zoom_bitmap.pix8(y_index >> 10);
 								UINT32 *dest = &dest_bmp.pix32(y);
-								UINT16 *pri = &state->m_z_bitmap->pix16(y);
+								UINT16 *pri = &state->m_z_bitmap.pix16(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -967,7 +959,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT8 *source = &state->m_zoom_bitmap.pix8(y_index >> 10);
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -990,9 +982,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT8 *source = &state->m_zoom_bitmap.pix8(y_index >> 10);
 								UINT32 *dest = &dest_bmp.pix32(y);
-								UINT16 *pri = &state->m_z_bitmap->pix16(y);
+								UINT16 *pri = &state->m_z_bitmap.pix16(y);
 
 								int x, x_index = x_index_base;
 								for (x = sx; x < ex; x++)
@@ -1020,7 +1012,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							for (y = sy; y < ey; y++)
 							{
-								UINT8 *source = &state->m_zoom_bitmap->pix8(y_index >> 10);
+								UINT8 *source = &state->m_zoom_bitmap.pix8(y_index >> 10);
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -1049,7 +1041,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri)
+static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri)
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
@@ -1169,7 +1161,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static void psikyosh_prelineblend( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void psikyosh_prelineblend( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	/* There are 224 values for pre-lineblending. Using one for every row currently */
 	/* I suspect that it should be blended against black by the amount specified as
@@ -1196,7 +1188,7 @@ static void psikyosh_prelineblend( running_machine &machine, bitmap_t &bitmap, c
 }
 
 
-static void psikyosh_postlineblend( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 req_pri )
+static void psikyosh_postlineblend( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri )
 {
 	/* There are 224 values for post-lineblending. Using one for every row currently */
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
@@ -1238,9 +1230,9 @@ VIDEO_START( psikyosh )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_z_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16); /* z-buffer */
-	state->m_zoom_bitmap = auto_bitmap_alloc(machine, 16*16, 16*16, BITMAP_FORMAT_INDEXED8); /* temp buffer for assembling sprites */
-	state->m_bg_bitmap = auto_bitmap_alloc(machine, 32*16, 32*16, BITMAP_FORMAT_RGB32); /* temp buffer for assembling tilemaps */
+	state->m_z_bitmap.allocate(width, height); /* z-buffer */
+	state->m_zoom_bitmap.allocate(16*16, 16*16); /* temp buffer for assembling sprites */
+	state->m_bg_bitmap.allocate(32*16, 32*16); /* temp buffer for assembling tilemaps */
 	state->m_bg_zoom = auto_alloc_array(machine, UINT16, 256);
 
 	machine.gfx[1]->color_granularity = 16; /* 256 colour sprites with palette selectable on 16 colour boundaries */
@@ -1262,14 +1254,14 @@ VIDEO_START( psikyosh )
 		state->m_bg_zoom[i] = (64 * 0x400) / (i + 64);
 	}
 
-	state->save_item(NAME(*state->m_z_bitmap));
-	state->save_item(NAME(*state->m_zoom_bitmap));
-	state->save_item(NAME(*state->m_bg_bitmap));
+	state->save_item(NAME(state->m_z_bitmap));
+	state->save_item(NAME(state->m_zoom_bitmap));
+	state->save_item(NAME(state->m_bg_bitmap));
 	state->save_pointer(NAME(state->m_bg_zoom), 256);
 }
 
 
-SCREEN_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
+SCREEN_UPDATE_RGB32( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
 {
 	int i;
 	psikyosh_state *state = screen.machine().driver_data<psikyosh_state>();
@@ -1302,7 +1294,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
     state->m_vidregs[6], state->m_vidregs[7]);
 #endif
 
-	state->m_z_bitmap->fill(0, cliprect); /* z-buffer */
+	state->m_z_bitmap.fill(0, cliprect); /* z-buffer */
 
 	psikyosh_prelineblend(screen.machine(), bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)

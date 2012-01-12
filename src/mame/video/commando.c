@@ -105,7 +105,7 @@ VIDEO_START( commando )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 3);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
 	int offs;
@@ -135,7 +135,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( commando )
+SCREEN_UPDATE_IND16( commando )
 {
 	commando_state *state = screen.machine().driver_data<commando_state>();
 

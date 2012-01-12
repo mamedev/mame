@@ -134,7 +134,7 @@ static VIDEO_RESET( atarisy4 )
 	gpu.vblank_wait = 0;
 }
 
-static SCREEN_UPDATE( atarisy4 )
+static SCREEN_UPDATE_RGB32( atarisy4 )
 {
 	atarisy4_state *state = screen.machine().driver_data<atarisy4_state>();
 	int y;
@@ -736,8 +736,7 @@ static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(32000000/2, 660, 0, 512, 404, 0, 384)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE(atarisy4)
+	MCFG_SCREEN_UPDATE_STATIC(atarisy4)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(atarisy4)

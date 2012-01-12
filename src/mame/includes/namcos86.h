@@ -23,7 +23,7 @@ public:
 
 PALETTE_INIT( namcos86 );
 VIDEO_START( namcos86 );
-SCREEN_UPDATE( namcos86 );
+SCREEN_UPDATE_IND16( namcos86 );
 SCREEN_EOF( namcos86 );
 
 READ8_HANDLER( rthunder_videoram1_r );

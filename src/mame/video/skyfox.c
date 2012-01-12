@@ -159,7 +159,7 @@ Offset:         Value:
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	skyfox_state *state = machine.driver_data<skyfox_state>();
 	int offs;
@@ -238,7 +238,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 ***************************************************************************/
 
-static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	skyfox_state *state = machine.driver_data<skyfox_state>();
 	UINT8 *RAM = machine.region("gfx2")->base();
@@ -281,7 +281,7 @@ static void draw_background(running_machine &machine, bitmap_t &bitmap, const re
 ***************************************************************************/
 
 
-SCREEN_UPDATE( skyfox )
+SCREEN_UPDATE_IND16( skyfox )
 {
 	bitmap.fill(255, cliprect);	// the bg is black
 	draw_background(screen.machine(), bitmap, cliprect);

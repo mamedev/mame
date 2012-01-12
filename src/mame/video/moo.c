@@ -63,7 +63,7 @@ VIDEO_START(moo)
 	}
 }
 
-SCREEN_UPDATE(moo)
+SCREEN_UPDATE_RGB32(moo)
 {
 	moo_state *state = screen.machine().driver_data<moo_state>();
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };

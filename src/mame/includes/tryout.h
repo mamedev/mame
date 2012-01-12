@@ -26,4 +26,4 @@ WRITE8_HANDLER( tryout_flipscreen_w );
 
 PALETTE_INIT( tryout );
 VIDEO_START( tryout );
-SCREEN_UPDATE( tryout );
+SCREEN_UPDATE_IND16( tryout );

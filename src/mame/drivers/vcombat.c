@@ -104,7 +104,7 @@ public:
 	int m_crtc_select;
 };
 
-static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int index)
+static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
 {
 	vcombat_state *state = screen.machine().driver_data<vcombat_state>();
 	int y;
@@ -153,8 +153,8 @@ static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const recta
 	return 0;
 }
 
-static SCREEN_UPDATE( vcombat_main ) { return update_screen(screen, bitmap, cliprect, 0); }
-static SCREEN_UPDATE( vcombat_aux ) { return update_screen(screen, bitmap, cliprect, 1); }
+static SCREEN_UPDATE_RGB32( vcombat_main ) { return update_screen(screen, bitmap, cliprect, 0); }
+static SCREEN_UPDATE_RGB32( vcombat_aux ) { return update_screen(screen, bitmap, cliprect, 1); }
 
 
 static WRITE16_HANDLER( main_video_write )
@@ -598,14 +598,12 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
-	MCFG_SCREEN_UPDATE(vcombat_main)
+	MCFG_SCREEN_UPDATE_STATIC(vcombat_main)
 
 	MCFG_SCREEN_ADD("aux", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
-	MCFG_SCREEN_UPDATE(vcombat_aux)
+	MCFG_SCREEN_UPDATE_STATIC(vcombat_aux)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -635,9 +633,8 @@ static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 4 / 16, mc6845_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)
-	MCFG_SCREEN_UPDATE(vcombat_main)
+	MCFG_SCREEN_UPDATE_STATIC(vcombat_main)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

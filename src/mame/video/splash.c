@@ -80,7 +80,7 @@ WRITE16_HANDLER( splash_vram_w )
 	tilemap_mark_tile_dirty(state->m_bg_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 1);
 }
 
-static void draw_bitmap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	splash_state *state = machine.driver_data<splash_state>();
 	int sx,sy,color,count,colxor,bitswap;
@@ -210,7 +210,7 @@ VIDEO_START( splash )
       400| xxxxxxxx -------- | unused
 */
 
-static void splash_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void splash_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	splash_state *state = machine.driver_data<splash_state>();
 	int i;
@@ -231,7 +231,7 @@ static void splash_draw_sprites(running_machine &machine, bitmap_t &bitmap,const
 	}
 }
 
-static void funystrp_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void funystrp_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	splash_state *state = machine.driver_data<splash_state>();
 	int i;
@@ -258,7 +258,7 @@ static void funystrp_draw_sprites(running_machine &machine, bitmap_t &bitmap,con
 
 ***************************************************************************/
 
-SCREEN_UPDATE( splash )
+SCREEN_UPDATE_IND16( splash )
 {
 	splash_state *state = screen.machine().driver_data<splash_state>();
 
@@ -274,7 +274,7 @@ SCREEN_UPDATE( splash )
 	return 0;
 }
 
-SCREEN_UPDATE( funystrp )
+SCREEN_UPDATE_IND16( funystrp )
 {
 	splash_state *state = screen.machine().driver_data<splash_state>();
 

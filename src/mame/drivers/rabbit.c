@@ -103,7 +103,7 @@ public:
 	UINT32 *m_tilemap_regs[4];
 	UINT32 *m_spriteregs;
 	UINT32 *m_blitterregs;
-	bitmap_t *m_sprite_bitmap;
+	bitmap_ind16 *m_sprite_bitmap;
 	rectangle m_sprite_clip;
 	int m_vblirqlevel;
 	int m_bltirqlevel;
@@ -230,7 +230,7 @@ sprites invisible at the end of a round in rabbit, why?
 
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int xpos,ypos,tileno,xflip,yflip, colr;
@@ -269,7 +269,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 /* the sprite bitmap can probably be handled better than this ... */
-static void rabbit_clearspritebitmap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void rabbit_clearspritebitmap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int startx, starty;
@@ -297,7 +297,7 @@ static void rabbit_clearspritebitmap( running_machine &machine, bitmap_t &bitmap
 }
 
 /* todo: fix zoom, its inaccurate and this code is ugly */
-static void draw_sprite_bitmap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprite_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
 
@@ -376,7 +376,7 @@ static VIDEO_START(rabbit)
     tilemap_map_pen_to_layer(state->m_tilemap[3], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
     tilemap_map_pen_to_layer(state->m_tilemap[3], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
-	state->m_sprite_bitmap = auto_bitmap_alloc(machine,0x1000,0x1000,machine.primary_screen->format());
+	state->m_sprite_bitmap = auto_bitmap_ind16_alloc(machine,0x1000,0x1000);
 	state->m_sprite_clip.min_x = 0;
 	state->m_sprite_clip.max_x = 0x1000-1;
 	state->m_sprite_clip.min_y = 0;
@@ -405,7 +405,7 @@ each line represents the differences on each tilemap for unknown variables
 
 */
 
-static void rabbit_drawtilemap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int whichtilemap )
+static void rabbit_drawtilemap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap )
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
 	INT32 startx, starty, incxx, incxy, incyx, incyy, tran;
@@ -429,7 +429,7 @@ static void rabbit_drawtilemap( running_machine &machine, bitmap_t &bitmap, cons
 			tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 }
 
-static SCREEN_UPDATE(rabbit)
+static SCREEN_UPDATE_IND16(rabbit)
 {
 	rabbit_state *state = screen.machine().driver_data<rabbit_state>();
 	int prilevel;
@@ -964,12 +964,11 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*16, 64*16-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
-	MCFG_SCREEN_UPDATE(rabbit)
+	MCFG_SCREEN_UPDATE_STATIC(rabbit)
 
 	MCFG_PALETTE_LENGTH(0x4000)
 	MCFG_PALETTE_INIT( all_black ) // the status bar palette doesn't get transfered (or our colour select is wrong).. more obvious when it's black than in 'MAME default' colours

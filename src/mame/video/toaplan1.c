@@ -959,13 +959,13 @@ static void toaplan1_log_vram(running_machine &machine)
 ***************************************************************************/
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void toaplan1_draw_sprite_custom(bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+static void toaplan1_draw_sprite_custom(bitmap_ind16 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-	bitmap_t &priority_bitmap = gfx->machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width+0x8000)>>16;
 
@@ -1055,7 +1055,7 @@ static void toaplan1_draw_sprite_custom(bitmap_t &dest_bmp,const rectangle &clip
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 	UINT16 *source = (UINT16 *)state->m_buffered_spriteram;
@@ -1123,7 +1123,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static void rallybik_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void rallybik_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 	UINT16 *buffered_spriteram16 = state->m_buffered_spriteram;
@@ -1158,10 +1158,10 @@ static void rallybik_draw_sprites(running_machine &machine, bitmap_t &bitmap, co
 
 
 /***************************************************************************
-    Draw the game screen in the given bitmap_t.
+    Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-SCREEN_UPDATE( rallybik )
+SCREEN_UPDATE_IND16( rallybik )
 {
 	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 	int priority;
@@ -1185,7 +1185,7 @@ SCREEN_UPDATE( rallybik )
 	return 0;
 }
 
-SCREEN_UPDATE( toaplan1 )
+SCREEN_UPDATE_IND16( toaplan1 )
 {
 	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 	int priority;

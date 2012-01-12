@@ -9,7 +9,8 @@ public:
 	UINT16 *m_bgvideoram;
 	UINT16 *m_fgvideoram;
 	size_t m_fgvideoram_size;
-	bitmap_t *m_sprites_bitmap;
+	bitmap_ind16 m_bitmap;
+	bitmap_ind16 m_sprites_bitmap;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
 };
@@ -21,7 +22,7 @@ PALETTE_INIT( galpanic );
 WRITE16_HANDLER( galpanic_bgvideoram_w );
 WRITE16_HANDLER( galpanic_paletteram_w );
 VIDEO_START( galpanic );
-SCREEN_UPDATE( galpanic );
-SCREEN_UPDATE( comad );
+SCREEN_UPDATE_IND16( galpanic );
+SCREEN_UPDATE_IND16( comad );
 
 

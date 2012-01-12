@@ -27,10 +27,10 @@ extern WRITE8_HANDLER( ninjakun_paletteram_w );
 
 extern PALETTE_INIT( nova2001 );
 extern VIDEO_START( nova2001 );
-extern SCREEN_UPDATE( nova2001 );
+extern SCREEN_UPDATE_IND16( nova2001 );
 extern VIDEO_START( ninjakun );
-extern SCREEN_UPDATE( ninjakun );
+extern SCREEN_UPDATE_IND16( ninjakun );
 extern VIDEO_START( pkunwar );
-extern SCREEN_UPDATE( pkunwar );
+extern SCREEN_UPDATE_IND16( pkunwar );
 extern VIDEO_START( raiders5 );
-extern SCREEN_UPDATE( raiders5 );
+extern SCREEN_UPDATE_IND16( raiders5 );

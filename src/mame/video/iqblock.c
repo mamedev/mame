@@ -90,7 +90,7 @@ WRITE8_HANDLER( iqblock_fgscroll_w )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( iqblock )
+SCREEN_UPDATE_IND16( iqblock )
 {
 	iqblock_state *state = screen.machine().driver_data<iqblock_state>();
 	if (!state->m_videoenable) return 0;

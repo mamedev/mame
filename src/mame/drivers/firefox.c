@@ -30,7 +30,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "machine/laserdsc.h"
+#include "machine/ldvp931.h"
 #include "machine/6532riot.h"
 #include "machine/x2212.h"
 
@@ -39,9 +39,10 @@ class firefox_state : public driver_device
 {
 public:
 	firefox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
-	device_t *m_laserdisc;
+	required_device<phillips_22vp931_device> m_laserdisc;
 	int m_n_disc_lock;
 	int m_n_disc_data;
 	int m_n_disc_read_data;
@@ -93,9 +94,9 @@ static READ8_HANDLER( firefox_disc_status_r )
 	UINT8 result = 0xff;
 
 	result ^= 0x20;
-	if (!laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_READY))
+	if (!state->m_laserdisc->ready_r())
 		result ^= 0x40;
-	if (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_DATA_AVAIL))
+	if (state->m_laserdisc->data_available_r())
 		result ^= 0x80;
 
 	return result;
@@ -114,7 +115,7 @@ static READ8_HANDLER( firefox_disc_data_r )
 static WRITE8_HANDLER( firefox_disc_read_w )
 {
 	firefox_state *state = space->machine().driver_data<firefox_state>();
-	state->m_n_disc_read_data = laserdisc_data_r(state->m_laserdisc);
+	state->m_n_disc_read_data = state->m_laserdisc->data_r();
 }
 
 static WRITE8_HANDLER( firefox_disc_lock_w )
@@ -125,13 +126,14 @@ static WRITE8_HANDLER( firefox_disc_lock_w )
 
 static WRITE8_HANDLER( audio_enable_w )
 {
-	space->machine().device<laserdisc_sound_device>("ldsound")->set_output_gain(~offset & 1, (data & 0x80) ? 1.0 : 0.0);
+	firefox_state *state = space->machine().driver_data<firefox_state>();
+	state->m_laserdisc->set_output_gain(~offset & 1, (data & 0x80) ? 1.0 : 0.0);
 }
 
 static WRITE8_HANDLER( firefox_disc_reset_w )
 {
 	firefox_state *state = space->machine().driver_data<firefox_state>();
-	laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	state->m_laserdisc->reset_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* active low on dbb7 */
@@ -139,7 +141,7 @@ static WRITE8_HANDLER( firefox_disc_write_w )
 {
 	firefox_state *state = space->machine().driver_data<firefox_state>();
 	if ( ( data & 0x80 ) == 0 )
-		laserdisc_data_w(state->m_laserdisc, state->m_n_disc_data);
+		state->m_laserdisc->data_w(state->m_n_disc_data);
 }
 
 /* latch the data */
@@ -182,7 +184,7 @@ static VIDEO_START( firefox )
 }
 
 
-static SCREEN_UPDATE( firefox )
+static SCREEN_UPDATE_RGB32( firefox )
 {
 	firefox_state *state = screen.machine().driver_data<firefox_state>();
 	int sprite;
@@ -459,10 +461,10 @@ static WRITE8_HANDLER( firefox_coin_counter_w )
 
 
 
-static void firq_gen(device_t *device, int state)
+static void firq_gen(running_machine &machine, phillips_22vp931_device &laserdisc, int state)
 {
 	if (state)
-	    cputag_set_input_line( device->machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
+	    cputag_set_input_line( machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 
@@ -473,8 +475,7 @@ static MACHINE_START( firefox )
 	state->m_nvram_1c = machine.device<x2212_device>("nvram_1c");
 	state->m_nvram_1d = machine.device<x2212_device>("nvram_1d");
 
-	state->m_laserdisc = machine.device("laserdisc");
-	vp931_set_data_ready_callback(state->m_laserdisc, firq_gen);
+	state->m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(FUNC(firq_gen), &machine));
 
 	state->m_control_num = 0;
 	state->m_sprite_bank = 0;
@@ -698,16 +699,16 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz((double)MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
-
 	MCFG_GFXDECODE(firefox)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(firefox)
 
-	MCFG_LASERDISC_ADD("laserdisc", PHILLIPS_22VP931, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(firefox, 64*8, 525, BITMAP_FORMAT_RGB32)
+	MCFG_LASERDISC_22VP931_ADD("laserdisc")
+	MCFG_LASERDISC_OVERLAY(64*8, 525, firefox)
 	MCFG_LASERDISC_OVERLAY_CLIP(7*8, 53*8-1, 44, 480+44)
+
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_X2212_ADD_AUTOSAVE("nvram_1c")
 	MCFG_X2212_ADD_AUTOSAVE("nvram_1d")
@@ -736,7 +737,7 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END

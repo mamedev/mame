@@ -35,4 +35,4 @@ extern void blockhl_tile_callback(running_machine &machine, int layer,int bank,i
 extern void blockhl_sprite_callback(running_machine &machine, int *code,int *color,int *priority,int *shadow);
 
 VIDEO_START( blockhl );
-SCREEN_UPDATE( blockhl );
+SCREEN_UPDATE_IND16( blockhl );

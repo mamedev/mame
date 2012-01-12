@@ -1498,7 +1498,7 @@ INLINE void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_
  * the optimized averaging algorithm.
  *********************************************/
 
-static void snes_refresh_scanline( running_machine &machine, bitmap_t &bitmap, UINT16 curline )
+static void snes_refresh_scanline( running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline )
 {
 	UINT16 ii;
 	int x;
@@ -1789,7 +1789,7 @@ VIDEO_START( snes )
 	state_save_register_global_pointer(machine, snes_oam, SNES_OAM_SIZE/2);
 }
 
-SCREEN_UPDATE( snes )
+SCREEN_UPDATE_RGB32( snes )
 {
 	int y;
 

@@ -27,4 +27,4 @@ public:
 /*----------- defined in video/madmotor.c -----------*/
 
 VIDEO_START( madmotor );
-SCREEN_UPDATE( madmotor );
+SCREEN_UPDATE_IND16( madmotor );

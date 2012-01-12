@@ -138,7 +138,7 @@ static void get_starfield_pens(spacefb_state *state, pen_t *pens)
 }
 
 
-static void draw_starfield(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	spacefb_state *state = screen.machine().driver_data<spacefb_state>();
 	int y;
@@ -248,7 +248,7 @@ static void get_sprite_pens(running_machine &machine, pen_t *pens)
 }
 
 
-static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap_t &bitmap, const rectangle &cliprect, int flip)
+static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
@@ -300,7 +300,7 @@ static void draw_bullet(running_machine &machine, offs_t offs, pen_t pen, bitmap
 }
 
 
-static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitmap_t &bitmap, const rectangle &cliprect, int flip)
+static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	UINT8 sy;
@@ -358,7 +358,7 @@ static void draw_sprite(running_machine &machine, offs_t offs, pen_t *pens, bitm
 }
 
 
-static void draw_objects(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_objects(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	spacefb_state *state = machine.driver_data<spacefb_state>();
 	pen_t sprite_pens[NUM_SPRITE_PENS];
@@ -397,7 +397,7 @@ static void draw_objects(running_machine &machine, bitmap_t &bitmap, const recta
  *
  *************************************/
 
-SCREEN_UPDATE( spacefb )
+SCREEN_UPDATE_RGB32( spacefb )
 {
 	draw_objects(screen.machine(), bitmap, cliprect);
 	draw_starfield(screen, bitmap, cliprect);

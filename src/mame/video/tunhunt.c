@@ -200,7 +200,7 @@ static void set_pens(running_machine &machine)
 	}
 }
 
-static void draw_motion_object(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_motion_object(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
  *      VSTRLO  0x1202
@@ -214,7 +214,7 @@ static void draw_motion_object(running_machine &machine, bitmap_t &bitmap, const
  */
 
 	tunhunt_state *state = machine.driver_data<tunhunt_state>();
-	bitmap_t &tmpbitmap = state->m_tmpbitmap;
+	bitmap_ind16 &tmpbitmap = state->m_tmpbitmap;
 	UINT8 *spriteram = state->m_spriteram;
 	UINT8 *tunhunt_ram = state->m_workram;
 	//int skip = tunhunt_ram[MOBST];
@@ -272,7 +272,7 @@ static void draw_motion_object(running_machine &machine, bitmap_t &bitmap, const
 	);
 }
 
-static void draw_box(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_box(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
@@ -327,7 +327,7 @@ static void draw_box(running_machine &machine, bitmap_t &bitmap, const rectangle
 
 /* "shell" graphics are 16x16 pixel tiles used for player shots and targeting cursor */
 static void draw_shell(running_machine &machine,
-		bitmap_t &bitmap,
+		bitmap_ind16 &bitmap,
 		const rectangle &cliprect,
 		int picture_code,
 		int hposition,
@@ -376,7 +376,7 @@ static void draw_shell(running_machine &machine,
 			255-hposition-16,vstart-32,0 );
 }
 
-SCREEN_UPDATE( tunhunt )
+SCREEN_UPDATE_IND16( tunhunt )
 {
 	tunhunt_state *state = screen.machine().driver_data<tunhunt_state>();
 	set_pens(screen.machine());

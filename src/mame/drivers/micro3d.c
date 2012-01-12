@@ -293,7 +293,8 @@ static const tms34010_config vgb_config =
 	"screen",						/* the screen operated on */
 	XTAL_40MHz / 8,					/* pixel clock */
 	4,								/* pixels per clock */
-	micro3d_scanline_update,		/* scanline updater */
+	micro3d_scanline_update,		/* scanline updater (indexed16) */
+	NULL,							/* scanline updater (rgb32) */
 	micro3d_tms_interrupt,			/* Generate interrupt */
 	NULL,
 	NULL
@@ -358,9 +359,8 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/8*4, 192*4, 0, 144*4, 434, 0, 400)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
 	MCFG_VIDEO_START(micro3d)
 	MCFG_VIDEO_RESET(micro3d)

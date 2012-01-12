@@ -169,7 +169,7 @@ WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	retofinv_state *state = machine.driver_data<retofinv_state>();
 	UINT8 *spriteram = state->m_sharedram + 0x0780;
@@ -225,7 +225,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap)
 
 
 
-SCREEN_UPDATE( retofinv )
+SCREEN_UPDATE_IND16( retofinv )
 {
 	retofinv_state *state = screen.machine().driver_data<retofinv_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);

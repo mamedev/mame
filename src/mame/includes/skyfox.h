@@ -32,5 +32,5 @@ WRITE8_HANDLER( skyfox_vregs_w );
 
 PALETTE_INIT( skyfox );
 
-SCREEN_UPDATE( skyfox );
+SCREEN_UPDATE_IND16( skyfox );
 

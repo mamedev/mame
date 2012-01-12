@@ -346,7 +346,7 @@ void irobot_run_video(running_machine &machine)
 
 
 
-SCREEN_UPDATE( irobot )
+SCREEN_UPDATE_IND16( irobot )
 {
 	irobot_state *state = screen.machine().driver_data<irobot_state>();
 	UINT8 *videoram = state->m_videoram;

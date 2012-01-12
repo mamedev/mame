@@ -35,6 +35,6 @@ WRITE8_HANDLER( flower_bg0ram_w );
 WRITE8_HANDLER( flower_bg1ram_w );
 WRITE8_HANDLER( flower_flipscreen_w );
 
-SCREEN_UPDATE( flower );
+SCREEN_UPDATE_IND16( flower );
 VIDEO_START( flower );
 PALETTE_INIT( flower );

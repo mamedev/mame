@@ -388,7 +388,7 @@ WRITE8_HANDLER( cm_background_col_w )
 
 
 
-SCREEN_UPDATE( goldstar )
+SCREEN_UPDATE_IND16( goldstar )
 {
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
@@ -439,7 +439,7 @@ SCREEN_UPDATE( goldstar )
 }
 
 
-SCREEN_UPDATE( bingowng )
+SCREEN_UPDATE_IND16( bingowng )
 {
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
@@ -482,7 +482,7 @@ SCREEN_UPDATE( bingowng )
 }
 
 
-SCREEN_UPDATE( magical )
+SCREEN_UPDATE_IND16( magical )
 {
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
@@ -541,7 +541,7 @@ SCREEN_UPDATE( magical )
 }
 
 
-SCREEN_UPDATE( unkch )
+SCREEN_UPDATE_IND16( unkch )
 {
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
@@ -595,7 +595,7 @@ SCREEN_UPDATE( unkch )
 	return 0;
 }
 
-SCREEN_UPDATE( cmast91 )
+SCREEN_UPDATE_IND16( cmast91 )
 {
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;
@@ -631,7 +631,7 @@ SCREEN_UPDATE( cmast91 )
 	return 0;
 }
 
-SCREEN_UPDATE( amcoe1a )
+SCREEN_UPDATE_IND16( amcoe1a )
 {
 	goldstar_state *state = screen.machine().driver_data<goldstar_state>();
 	int i;

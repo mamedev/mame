@@ -22,4 +22,4 @@ WRITE8_HANDLER(mainsnk_c600_w);
 WRITE8_HANDLER(mainsnk_fgram_w);
 WRITE8_HANDLER(mainsnk_bgram_w);
 VIDEO_START(mainsnk);
-SCREEN_UPDATE(mainsnk);
+SCREEN_UPDATE_IND16(mainsnk);

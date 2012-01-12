@@ -353,7 +353,7 @@ struct sms_vdp
 	UINT8* vram;
 	UINT8* cram;
 	UINT8  writemode;
-	bitmap_t* r_bitmap;
+	bitmap_rgb32* r_bitmap;
 	UINT8* tile_renderline;
 	UINT8* sprite_renderline;
 
@@ -377,7 +377,7 @@ struct sms_vdp
 	int sms_total_scanlines;
 	int sms_framerate;
 	emu_timer* sms_scanline_timer;
-	UINT16* cram_mamecolours; // for use on RGB_DIRECT screen
+	UINT32* cram_mamecolours; // for use on RGB_DIRECT screen
 	int	 (*set_irq)(running_machine &machine, int state);
 
 };
@@ -420,13 +420,13 @@ static void *start_vdp(running_machine &machine, int type)
 	if (chip->vdp_type==GG_VDP)
 	{
 		chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0040);
-		chip->cram_mamecolours = auto_alloc_array_clear(machine, UINT16, 0x0080/2);
+		chip->cram_mamecolours = auto_alloc_array_clear(machine, UINT32, 0x0080/2);
 		chip->gg_cram_latch = 0;
 	}
 	else
 	{
 		chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0020);
-		chip->cram_mamecolours = auto_alloc_array(machine, UINT16, 0x0040/2);
+		chip->cram_mamecolours = auto_alloc_array(machine, UINT32, 0x0040/2);
 	}
 
 	chip->tile_renderline = auto_alloc_array(machine, UINT8, 256+8);
@@ -436,7 +436,7 @@ static void *start_vdp(running_machine &machine, int type)
 	memset(chip->sprite_renderline,0x00,256+32);
 
 	chip->writemode = 0;
-	chip->r_bitmap = auto_bitmap_alloc(machine, 256, 256, BITMAP_FORMAT_RGB15);
+	chip->r_bitmap = auto_bitmap_rgb32_alloc(machine, 256, 256);
 
 	chip->sms_scanline_timer = machine.scheduler().timer_alloc(FUNC(sms_scanline_timer_callback), chip);
 
@@ -521,8 +521,9 @@ static void vdp_data_w(address_space *space, UINT8 data, struct sms_vdp* chip)
 					r = (palword & 0x000f)>>0;
 					g = (palword & 0x00f0)>>4;
 					b = (palword & 0x0f00)>>8;
-					palette_set_color_rgb(space->machine(),(chip->addr_reg&0x3e)/2, pal4bit(r), pal4bit(g), pal4bit(b));
-					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=(b<<1)|(g<<6)|(r<<11);
+					rgb_t rgb = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
+					palette_set_color(space->machine(),(chip->addr_reg&0x3e)/2, rgb);
+					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=rgb;
 				}
 			}
 		}
@@ -536,8 +537,9 @@ static void vdp_data_w(address_space *space, UINT8 data, struct sms_vdp* chip)
 				r = (data & 0x03)>>0;
 				g = (data & 0x0c)>>2;
 				b = (data & 0x30)>>4;
-				palette_set_color_rgb(space->machine(),chip->addr_reg&0x1f, pal2bit(r), pal2bit(g), pal2bit(b));
-				chip->cram_mamecolours[chip->addr_reg&0x1f]=(b<<3)|(g<<8)|(r<<13);
+				rgb_t rgb = MAKE_RGB(pal2bit(r), pal2bit(g), pal2bit(b));
+				palette_set_color(space->machine(),chip->addr_reg&0x1f, rgb);
+				chip->cram_mamecolours[chip->addr_reg&0x1f]=rgb;
 			}
 
 		}
@@ -937,7 +939,7 @@ static void sms_render_tileline(int scanline, struct sms_vdp* chip)
 static void sms_copy_to_renderbuffer(int scanline, struct sms_vdp* chip)
 {
 	int x;
-	UINT16* lineptr = &chip->r_bitmap->pix16(scanline);
+	UINT32* lineptr = &chip->r_bitmap->pix32(scanline);
 
 	for (x=0;x<256;x++)
 	{
@@ -956,7 +958,7 @@ static void sms_copy_to_renderbuffer(int scanline, struct sms_vdp* chip)
 		if (!(dat & 0x80))
 		{
 			lineptr[x] = chip->cram_mamecolours[dat&0x1f];
-			if ((dat&0xf)==0x0) lineptr[x]|=0x8000;
+			if ((dat&0xf)==0x0) lineptr[x]|=0x80000000;
 
 		}
 
@@ -968,7 +970,7 @@ static void sms_copy_to_renderbuffer(int scanline, struct sms_vdp* chip)
 		if (dat & 0x80)
 		{
 			lineptr[x] = chip->cram_mamecolours[dat&0x1f];
-			if ((dat&0xf)==0x0) lineptr[x]|=0x8000;
+			if ((dat&0xf)==0x0) lineptr[x]|=0x80000000;
 		}
 
 	}
@@ -1080,7 +1082,7 @@ static void show_tiles(struct sms_vdp* chip)
 			for (yy=0;yy<8;yy++)
 			{
 				int drawypos = y*8+yy;
-				UINT16* lineptr = &chip->r_bitmap->pix16(drawypos);
+				UINT32* lineptr = &chip->r_bitmap->pix32(drawypos);
 
 				UINT32 gfxdata = (SMS_VDP_VRAM(count)<<24)|(SMS_VDP_VRAM(count+1)<<16)|(SMS_VDP_VRAM(count+2)<<8)|(SMS_VDP_VRAM(count+3)<<0);
 
@@ -1265,18 +1267,18 @@ SCREEN_EOF(megatech_bios)
 	end_of_frame(screen.machine(), vdp1);
 }
 
-SCREEN_UPDATE(megatech_md_sms)
+SCREEN_UPDATE_RGB32(megatech_md_sms)
 {
 	int x,y;
 
 	for (y=0;y<224;y++)
 	{
-		UINT16* lineptr = &bitmap.pix16(y);
-		UINT16* srcptr =  &md_sms_vdp->r_bitmap->pix16(y);
+		UINT32* lineptr = &bitmap.pix32(y);
+		UINT32* srcptr =  &md_sms_vdp->r_bitmap->pix32(y);
 
 		for (x=0;x<256;x++)
 		{
-			lineptr[x]=srcptr[x]&0x7fff;
+			lineptr[x]=srcptr[x];
 		}
 	}
 
@@ -1284,70 +1286,71 @@ SCREEN_UPDATE(megatech_md_sms)
 }
 
 
-SCREEN_UPDATE(megatech_bios)
+SCREEN_UPDATE_RGB32(megatech_bios)
 {
 	int x,y;
 
 	for (y=0;y<224;y++)
 	{
-		UINT16* lineptr = &bitmap.pix16(y);
-		UINT16* srcptr =  &vdp1->r_bitmap->pix16(y);
+		UINT32* lineptr = &bitmap.pix32(y);
+		UINT32* srcptr =  &vdp1->r_bitmap->pix32(y);
 
 		for (x=0;x<256;x++)
 		{
-			lineptr[x]=srcptr[x]&0x7fff;
+			lineptr[x]=srcptr[x];
 		}
 	}
 
 	return 0;
 }
 
-SCREEN_UPDATE(megaplay_bios)
+SCREEN_UPDATE_RGB32(megaplay_bios)
 {
 	int x,y;
 
 	for (y=0;y<224;y++)
 	{
-		UINT16* lineptr = &bitmap.pix16(y+16, 32);
-		UINT16* srcptr =  &vdp1->r_bitmap->pix16(y);
+		UINT32* lineptr = &bitmap.pix32(y+16, 32);
+		UINT32* srcptr =  &vdp1->r_bitmap->pix32(y);
 
 		for (x=0;x<256;x++)
 		{
-			UINT16 src = srcptr[x]&0x7fff;
+			UINT32 src = srcptr[x]&0xffffff;
 
 			if (src)
-				lineptr[x]=srcptr[x]&0x7fff;
+				lineptr[x]=src;
 		}
 	}
 
 	return 0;
 }
 
-SCREEN_UPDATE(systeme)
+SCREEN_UPDATE_RGB32(systeme)
 {
 //  show_tiles();
 	int x,y;
 
 	for (y=0;y<192;y++)
 	{
-		UINT16* lineptr = &bitmap.pix16(y);
-		UINT16* srcptr =  &vdp1->r_bitmap->pix16(y);
+		UINT32* lineptr = &bitmap.pix32(y);
+		UINT32* srcptr =  &vdp1->r_bitmap->pix32(y);
 
 		for (x=0;x<256;x++)
 		{
-			lineptr[x]=srcptr[x]&0x7fff;
+			lineptr[x]=srcptr[x];
 		}
 
 	}
 
 	for (y=0;y<192;y++)
 	{
-		UINT16* lineptr = &bitmap.pix16(y);
-		UINT16* srcptr =  &vdp2->r_bitmap->pix16(y);
+		UINT32* lineptr = &bitmap.pix32(y);
+		UINT32* srcptr =  &vdp2->r_bitmap->pix32(y);
 
 		for (x=0;x<256;x++)
 		{
-			if(!(srcptr[x]&0x8000)) lineptr[x]=srcptr[x]&0x7fff;
+			UINT16 src = srcptr[x];
+			if(!(src&0x80000000)) lineptr[x]=src;
 		}
 	}
 
@@ -1722,11 +1725,10 @@ MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
-	MCFG_SCREEN_UPDATE(megatech_md_sms) /* Copies a bitmap */
+	MCFG_SCREEN_UPDATE_STATIC(megatech_md_sms) /* Copies a bitmap */
 	MCFG_SCREEN_EOF(sms) /* Used to Sync the timing */
 
 	MCFG_PALETTE_LENGTH(0x200)

@@ -126,6 +126,9 @@ public:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
 
+	// stream creation
+	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);
+
 	// helpers
 	int inputs() const;
 	int outputs() const;

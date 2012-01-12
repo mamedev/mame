@@ -73,7 +73,7 @@ WRITE16_HANDLER( volfied_sprite_ctrl_w )
                 SCREEN REFRESH
 *******************************************************/
 
-static void refresh_pixel_layer( running_machine &machine, bitmap_t &bitmap )
+static void refresh_pixel_layer( running_machine &machine, bitmap_ind16 &bitmap )
 {
 	int x, y;
 
@@ -128,7 +128,7 @@ static void refresh_pixel_layer( running_machine &machine, bitmap_t &bitmap )
 	}
 }
 
-SCREEN_UPDATE( volfied )
+SCREEN_UPDATE_IND16( volfied )
 {
 	volfied_state *state = screen.machine().driver_data<volfied_state>();
 

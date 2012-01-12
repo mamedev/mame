@@ -24,4 +24,4 @@ WRITE16_HANDLER( deadang_text_w );
 WRITE16_HANDLER( deadang_bank_w );
 
 VIDEO_START( deadang );
-SCREEN_UPDATE( deadang );
+SCREEN_UPDATE_IND16( deadang );

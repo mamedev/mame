@@ -37,5 +37,5 @@ WRITE8_HANDLER( gunsmoke_colorram_w );
 
 PALETTE_INIT( gunsmoke );
 VIDEO_START( gunsmoke );
-SCREEN_UPDATE( gunsmoke );
+SCREEN_UPDATE_IND16( gunsmoke );
 

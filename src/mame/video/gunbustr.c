@@ -56,7 +56,7 @@ Heavy use is made of sprite zooming.
 
 ********************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	gunbustr_state *state = machine.driver_data<gunbustr_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -202,7 +202,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE( gunbustr )
+SCREEN_UPDATE_IND16( gunbustr )
 {
 	device_t *tc0480scp = screen.machine().device("tc0480scp");
 	UINT8 layer[5];

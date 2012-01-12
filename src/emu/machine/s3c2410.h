@@ -123,7 +123,7 @@ struct _s3c2410_interface
 DEVICE_GET_INFO( s3c2410 );
 
 VIDEO_START( s3c2410 );
-SCREEN_UPDATE( s3c2410 );
+SCREEN_UPDATE_RGB32( s3c2410 );
 
 void s3c2410_uart_fifo_w( device_t *device, int uart, UINT8 data);
 void s3c2410_touch_screen( device_t *device, int state);
@@ -767,7 +767,7 @@ typedef struct
 {
 	s3c24xx_lcd_regs_t regs;
 	emu_timer *timer;
-	bitmap_t *bitmap[2];
+	bitmap_rgb32 *bitmap[2];
 	UINT32 vramaddr_cur;
 	UINT32 vramaddr_max;
 	UINT32 offsize;

@@ -212,7 +212,7 @@ void mvs_install_protection(device_image_interface& image);
 
 VIDEO_START( neogeo );
 VIDEO_RESET( neogeo );
-SCREEN_UPDATE( neogeo );
+SCREEN_UPDATE_RGB32( neogeo );
 
 READ16_HANDLER( neogeo_video_register_r );
 WRITE16_HANDLER( neogeo_video_register_w );

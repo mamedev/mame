@@ -96,7 +96,7 @@ WRITE8_HANDLER( rockrage_vreg_w )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( rockrage )
+SCREEN_UPDATE_IND16( rockrage )
 {
 	rockrage_state *state = screen.machine().driver_data<rockrage_state>();
 

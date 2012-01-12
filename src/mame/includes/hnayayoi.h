@@ -27,7 +27,7 @@ public:
 
 VIDEO_START( hnayayoi );
 VIDEO_START( untoucha );
-SCREEN_UPDATE( hnayayoi );
+SCREEN_UPDATE_IND16( hnayayoi );
 
 WRITE8_HANDLER( dynax_blitter_rev1_param_w );
 WRITE8_HANDLER( dynax_blitter_rev1_start_w );

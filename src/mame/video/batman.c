@@ -194,12 +194,12 @@ void batman_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE( batman )
+SCREEN_UPDATE_IND16( batman )
 {
 	batman_state *state = screen.machine().driver_data<batman_state>();
-	bitmap_t &priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

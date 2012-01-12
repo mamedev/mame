@@ -15,5 +15,5 @@ public:
 
 
 PALETTE_INIT( pcktgal );
-SCREEN_UPDATE( pcktgal );
-SCREEN_UPDATE( pcktgalb );
+SCREEN_UPDATE_IND16( pcktgal );
+SCREEN_UPDATE_IND16( pcktgalb );

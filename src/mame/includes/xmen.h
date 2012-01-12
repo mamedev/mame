@@ -14,8 +14,8 @@ public:
 	int        m_layerpri[3];
 
 	/* for xmen6p */
-	bitmap_t   *m_screen_right;
-	bitmap_t   *m_screen_left;
+	bitmap_ind16   *m_screen_right;
+	bitmap_ind16   *m_screen_left;
 	UINT16 *   m_xmen6p_spriteramleft;
 	UINT16 *   m_xmen6p_spriteramright;
 	UINT16 *   m_xmen6p_tilemapleft;
@@ -43,7 +43,7 @@ void xmen_tile_callback(running_machine &machine, int layer,int bank,int *code,i
 void xmen_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 
 VIDEO_START( xmen6p );
-SCREEN_UPDATE( xmen );
-SCREEN_UPDATE( xmen6p_left );
-SCREEN_UPDATE( xmen6p_right );
+SCREEN_UPDATE_IND16( xmen );
+SCREEN_UPDATE_IND16( xmen6p_left );
+SCREEN_UPDATE_IND16( xmen6p_right );
 SCREEN_EOF( xmen6p );

@@ -54,10 +54,10 @@ void seibuspi_sprite_decrypt(UINT8 *src, int romsize);
 /*----------- defined in video/seibuspi.c -----------*/
 
 VIDEO_START( spi );
-SCREEN_UPDATE( spi );
+SCREEN_UPDATE_RGB32( spi );
 
 VIDEO_START( sys386f2 );
-SCREEN_UPDATE( sys386f2 );
+SCREEN_UPDATE_RGB32( sys386f2 );
 
 READ32_HANDLER( spi_layer_bank_r );
 WRITE32_HANDLER( spi_layer_bank_w );

@@ -124,7 +124,7 @@ static VIDEO_START ( pipeline )
 	tilemap_set_transparent_pen(state->m_tilemap2,0);
 }
 
-static SCREEN_UPDATE( pipeline )
+static SCREEN_UPDATE_IND16( pipeline )
 {
 	pipeline_state *state = screen.machine().driver_data<pipeline_state>();
 	tilemap_draw(bitmap,cliprect,state->m_tilemap1, 0,0);
@@ -406,10 +406,9 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
-	MCFG_SCREEN_UPDATE(pipeline)
+	MCFG_SCREEN_UPDATE_STATIC(pipeline)
 
 	MCFG_GFXDECODE(pipeline)
 

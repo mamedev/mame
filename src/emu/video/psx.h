@@ -47,7 +47,7 @@ extern const device_type CXD8654Q;
 typedef struct _psx_gpu_debug psx_gpu_debug;
 struct _psx_gpu_debug
 {
-	bitmap_t *mesh;
+	bitmap_ind16 *mesh;
 	int b_clear;
 	int b_mesh;
 	int n_skip;
@@ -181,7 +181,7 @@ public:
 	psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	WRITE32_MEMBER( write );
 	READ32_MEMBER( read );
 	void dma_read( UINT32 n_address, INT32 n_size );
@@ -221,8 +221,8 @@ protected:
 	void DebugMesh( int n_coordx, int n_coordy );
 	void DebugMeshEnd( void );
 	void DebugCheckKeys( void );
-	int DebugMeshDisplay( bitmap_t &bitmap, const rectangle &cliprect );
-	int DebugTextureDisplay( bitmap_t &bitmap );
+	int DebugMeshDisplay( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	int DebugTextureDisplay( bitmap_ind16 &bitmap );
 #endif
 
 	INT32 m_n_tx;

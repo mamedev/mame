@@ -66,4 +66,4 @@ READ32_HANDLER( cojag_gun_input_r );
 
 VIDEO_START( cojag );
 VIDEO_START( jaguar );
-SCREEN_UPDATE( cojag );
+SCREEN_UPDATE_RGB32( cojag );

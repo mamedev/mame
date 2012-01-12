@@ -57,5 +57,5 @@ PALETTE_INIT( combatsc );
 PALETTE_INIT( combatscb );
 VIDEO_START( combatsc );
 VIDEO_START( combatscb );
-SCREEN_UPDATE( combatscb );
-SCREEN_UPDATE( combatsc );
+SCREEN_UPDATE_IND16( combatscb );
+SCREEN_UPDATE_IND16( combatsc );

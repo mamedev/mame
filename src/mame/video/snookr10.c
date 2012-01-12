@@ -187,7 +187,7 @@ VIDEO_START( apple10 )
 	state->m_bg_tilemap = tilemap_create(machine, apple10_get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
 }
 
-SCREEN_UPDATE( snookr10 )
+SCREEN_UPDATE_IND16( snookr10 )
 {
 	snookr10_state *state = screen.machine().driver_data<snookr10_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

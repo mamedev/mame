@@ -259,7 +259,7 @@ static void voodoo_vblank_0(device_t *device, int param)
 }
 
 
-static SCREEN_UPDATE( nwktr )
+static SCREEN_UPDATE_RGB32( nwktr )
 {
 	nwktr_state *state = screen.machine().driver_data<nwktr_state>();
 	device_t *voodoo = screen.machine().device("voodoo");
@@ -701,10 +701,9 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE(nwktr)
+	MCFG_SCREEN_UPDATE_STATIC(nwktr)
 
 	MCFG_PALETTE_LENGTH(65536)
 

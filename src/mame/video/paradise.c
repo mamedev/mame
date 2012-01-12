@@ -149,8 +149,8 @@ WRITE8_HANDLER( paradise_pixmap_w )
 	x = (offset & 0x7f) << 1;
 	y = (offset >> 7);
 
-	state->m_tmpbitmap->pix16(y, x + 0) = 0x80f - (data >> 4);
-	state->m_tmpbitmap->pix16(y, x + 1) = 0x80f - (data & 0x0f);
+	state->m_tmpbitmap.pix16(y, x + 0) = 0x80f - (data >> 4);
+	state->m_tmpbitmap.pix16(y, x + 1) = 0x80f - (data & 0x0f);
 }
 
 
@@ -169,13 +169,13 @@ VIDEO_START( paradise )
 	state->m_tilemap_2 = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 0x20, 0x20);
 
 	/* pixmap */
-	state->m_tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmpbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	tilemap_set_transparent_pen(state->m_tilemap_0, 0x0f);
 	tilemap_set_transparent_pen(state->m_tilemap_1, 0xff);
 	tilemap_set_transparent_pen(state->m_tilemap_2, 0xff);
 
-	state->save_item(NAME(*state->m_tmpbitmap));
+	state->save_item(NAME(state->m_tmpbitmap));
 }
 
 
@@ -192,7 +192,7 @@ WRITE8_HANDLER( paradise_priority_w )
 	state->m_priority = data;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -241,7 +241,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 ***************************************************************************/
 
-SCREEN_UPDATE( paradise )
+SCREEN_UPDATE_IND16( paradise )
 {
 	paradise_state *state = screen.machine().driver_data<paradise_state>();
 	int layers_ctrl = -1;
@@ -270,7 +270,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
-	if (layers_ctrl & 4)	copybitmap_trans(bitmap, *state->m_tmpbitmap, flip_screen_get(screen.machine()), flip_screen_get(screen.machine()), 0, 0, cliprect, 0x80f);
+	if (layers_ctrl & 4)	copybitmap_trans(bitmap, state->m_tmpbitmap, flip_screen_get(screen.machine()), flip_screen_get(screen.machine()), 0, 0, cliprect, 0x80f);
 
 	if (state->m_priority & 2)
 	{
@@ -292,7 +292,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 
 /* no pix layer, no tilemap_0, different priority bits */
-SCREEN_UPDATE( torus )
+SCREEN_UPDATE_IND16( torus )
 {
 	paradise_state *state = screen.machine().driver_data<paradise_state>();
 
@@ -324,7 +324,7 @@ SCREEN_UPDATE( torus )
 }
 
 /* I don't know how the priority bits work on this one */
-SCREEN_UPDATE( madball )
+SCREEN_UPDATE_IND16( madball )
 {
 	paradise_state *state = screen.machine().driver_data<paradise_state>();
 

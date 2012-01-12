@@ -98,5 +98,5 @@ WRITE8_HANDLER( playch10_videoram_w );
 PALETTE_INIT( playch10 );
 VIDEO_START( playch10 );
 VIDEO_START( playch10_hboard );
-SCREEN_UPDATE( playch10_top );
-SCREEN_UPDATE( playch10_bottom );
+SCREEN_UPDATE_IND16( playch10_top );
+SCREEN_UPDATE_IND16( playch10_bottom );

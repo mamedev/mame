@@ -42,7 +42,7 @@ PALETTE_INIT( arknoid2 )
 }
 
 
-SCREEN_UPDATE( tnzs )
+SCREEN_UPDATE_IND16( tnzs )
 {
 	bitmap.fill(0x1f0, cliprect);
 

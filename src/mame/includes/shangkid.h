@@ -17,9 +17,9 @@ public:
 /*----------- defined in video/shangkid.c -----------*/
 
 VIDEO_START( shangkid );
-SCREEN_UPDATE( shangkid );
+SCREEN_UPDATE_IND16( shangkid );
 WRITE8_HANDLER( shangkid_videoram_w );
 
 PALETTE_INIT( dynamski );
-SCREEN_UPDATE( dynamski );
+SCREEN_UPDATE_IND16( dynamski );
 

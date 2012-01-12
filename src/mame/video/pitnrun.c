@@ -175,14 +175,14 @@ VIDEO_START(pitnrun)
 	state->m_fg = tilemap_create( machine, get_tile_info1,tilemap_scan_rows,8,8,32,32 );
 	state->m_bg = tilemap_create( machine, get_tile_info2,tilemap_scan_rows,8,8,32*4,32 );
 	tilemap_set_transparent_pen( state->m_fg, 0 );
-	state->m_tmp_bitmap[0] = auto_bitmap_alloc(machine,128,128,machine.primary_screen->format());
-	state->m_tmp_bitmap[1] = auto_bitmap_alloc(machine,128,128,machine.primary_screen->format());
-	state->m_tmp_bitmap[2] = auto_bitmap_alloc(machine,128,128,machine.primary_screen->format());
-	state->m_tmp_bitmap[3] = auto_bitmap_alloc(machine,128,128,machine.primary_screen->format());
+	state->m_tmp_bitmap[0] = auto_bitmap_ind16_alloc(machine,128,128);
+	state->m_tmp_bitmap[1] = auto_bitmap_ind16_alloc(machine,128,128);
+	state->m_tmp_bitmap[2] = auto_bitmap_ind16_alloc(machine,128,128);
+	state->m_tmp_bitmap[3] = auto_bitmap_ind16_alloc(machine,128,128);
 	pitnrun_spotlights(machine);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -217,7 +217,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( pitnrun )
+SCREEN_UPDATE_IND16( pitnrun )
 {
 	pitnrun_state *state = screen.machine().driver_data<pitnrun_state>();
 	int dx=0,dy=0;

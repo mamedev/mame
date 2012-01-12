@@ -87,7 +87,6 @@
 
 #define MCFG_CDP1864_SCREEN_ADD(_tag, _clock) \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
 	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
 
@@ -156,7 +155,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( aoe_w );
 	DECLARE_WRITE_LINE_MEMBER( evs_w );
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -187,7 +186,7 @@ private:
 
 	cpu_device *m_cpu;
 	screen_device *m_screen;		// screen
-	bitmap_t *m_bitmap;				// bitmap
+	bitmap_ind16 m_bitmap;				// bitmap
 	sound_stream *m_stream;			// sound output
 
 	// video state

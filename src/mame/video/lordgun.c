@@ -136,7 +136,7 @@ VIDEO_START( lordgun )
 
 	// Buffer bitmaps for 4 tilemaps (0-3) + sprites (4)
 	for (i = 0; i < 5; i++)
-		state->m_bitmaps[i] = auto_bitmap_alloc(machine, w, h, BITMAP_FORMAT_INDEXED16);
+		state->m_bitmaps[i] = auto_bitmap_ind16_alloc(machine, w, h);
 }
 
 /***************************************************************************
@@ -243,7 +243,7 @@ void lordgun_update_gun(running_machine &machine, int i)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	lordgun_state *state = machine.driver_data<lordgun_state>();
 	UINT16 *s		=	state->m_spriteram;
@@ -325,7 +325,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 ***************************************************************************/
 
-SCREEN_UPDATE( lordgun )
+SCREEN_UPDATE_IND16( lordgun )
 {
 	lordgun_state *state = screen.machine().driver_data<lordgun_state>();
 	int layers_ctrl = -1;

@@ -38,5 +38,5 @@ WRITE8_HANDLER( gaplus_videoram_w );
 WRITE8_HANDLER( gaplus_starfield_control_w );
 VIDEO_START( gaplus );
 PALETTE_INIT( gaplus );
-SCREEN_UPDATE( gaplus );
+SCREEN_UPDATE_IND16( gaplus );
 SCREEN_EOF( gaplus );	/* update starfields */

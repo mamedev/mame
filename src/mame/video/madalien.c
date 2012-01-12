@@ -151,7 +151,7 @@ static VIDEO_START( madalien )
 		tilemap_set_scrolldy(state->m_tilemap_edge2[i], 0, machine.primary_screen->height() - 256);
 	}
 
-	state->m_headlight_bitmap = auto_bitmap_alloc(machine, 128, 128, BITMAP_FORMAT_INDEXED16);
+	state->m_headlight_bitmap = auto_bitmap_ind16_alloc(machine, 128, 128);
 
 	gfx_element_set_source(machine.gfx[0], state->m_charram);
 
@@ -160,7 +160,7 @@ static VIDEO_START( madalien )
 }
 
 
-static void draw_edges(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int flip, int scroll_mode)
+static void draw_edges(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode)
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
 	rectangle clip_edge1;
@@ -199,7 +199,7 @@ static void draw_edges(running_machine &machine, bitmap_t &bitmap, const rectang
 }
 
 
-static void draw_headlight(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int flip)
+static void draw_headlight(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
 	if (BIT(*state->m_video_flags, 0))
@@ -235,7 +235,7 @@ static void draw_headlight(running_machine &machine, bitmap_t &bitmap, const rec
 }
 
 
-static void draw_foreground(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int flip)
+static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
 	tilemap_set_flip(state->m_tilemap_fg, flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -251,7 +251,7 @@ WRITE8_HANDLER( madalien_charram_w )
 }
 
 
-static SCREEN_UPDATE( madalien )
+static SCREEN_UPDATE_IND16( madalien )
 {
 	madalien_state *state = screen.machine().driver_data<madalien_state>();
 	int flip = BIT(input_port_read(screen.machine(), "DSW"), 6) && BIT(*state->m_video_control, 0);
@@ -398,8 +398,7 @@ static const mc6845_interface mc6845_intf =
 MACHINE_CONFIG_FRAGMENT( madalien_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_UPDATE(madalien)
+	MCFG_SCREEN_UPDATE_STATIC(madalien)
 
 	MCFG_GFXDECODE(madalien)
 	MCFG_PALETTE_LENGTH(0x30)

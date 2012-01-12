@@ -42,7 +42,7 @@ public:
 };
 
 
-static SCREEN_UPDATE( destroyr )
+static SCREEN_UPDATE_IND16( destroyr )
 {
 	destroyr_state *state = screen.machine().driver_data<destroyr_state>();
 	int i, j;
@@ -454,10 +454,9 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE(destroyr)
+	MCFG_SCREEN_UPDATE_STATIC(destroyr)
 
 	MCFG_GFXDECODE(destroyr)
 	MCFG_PALETTE_LENGTH(8)

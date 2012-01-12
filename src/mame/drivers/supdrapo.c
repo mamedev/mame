@@ -87,7 +87,7 @@ static VIDEO_START( supdrapo )
 }
 
 
-static SCREEN_UPDATE( supdrapo )
+static SCREEN_UPDATE_IND16( supdrapo )
 {
 	supdrapo_state *state = screen.machine().driver_data<supdrapo_state>();
 	int x, y;
@@ -441,10 +441,9 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(supdrapo)
+	MCFG_SCREEN_UPDATE_STATIC(supdrapo)
 
 	MCFG_GFXDECODE(supdrapo)
 	MCFG_PALETTE_LENGTH(0x100)

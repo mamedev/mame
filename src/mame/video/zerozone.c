@@ -40,7 +40,7 @@ void zerozone_state::video_start()
 	m_zz_tilemap = tilemap_create(machine(), get_zerozone_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
 }
 
-bool zerozone_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 zerozone_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	tilemap_draw(bitmap, cliprect, m_zz_tilemap, 0, 0);
 	return 0;

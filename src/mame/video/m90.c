@@ -139,7 +139,7 @@ VIDEO_START( dynablsb )
 	state_save_register_global_array(machine, state->m_video_control_data);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	m90_state *state = machine.driver_data<m90_state>();
 	UINT16 *spriteram = state->m_video_data + 0xee00/2;;
@@ -193,7 +193,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-static void bomblord_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void bomblord_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	m90_state *state = machine.driver_data<m90_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -233,7 +233,7 @@ static void bomblord_draw_sprites(running_machine &machine, bitmap_t &bitmap,con
 	}
 }
 
-static void dynablsb_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void dynablsb_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	m90_state *state = machine.driver_data<m90_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -297,7 +297,7 @@ WRITE16_HANDLER( m90_video_w )
 	markdirty(state->m_pf2_wide_layer,state->m_video_control_data[6] & 0x2,offset);
 }
 
-SCREEN_UPDATE( m90 )
+SCREEN_UPDATE_IND16( m90 )
 {
 	m90_state *state = screen.machine().driver_data<m90_state>();
 	UINT8 pf1_base = state->m_video_control_data[5] & 0x3;
@@ -463,7 +463,7 @@ SCREEN_UPDATE( m90 )
 	return 0;
 }
 
-SCREEN_UPDATE( bomblord )
+SCREEN_UPDATE_IND16( bomblord )
 {
 	m90_state *state = screen.machine().driver_data<m90_state>();
 	int i;
@@ -516,7 +516,7 @@ SCREEN_UPDATE( bomblord )
 	return 0;
 }
 
-SCREEN_UPDATE( dynablsb )
+SCREEN_UPDATE_IND16( dynablsb )
 {
 	m90_state *state = screen.machine().driver_data<m90_state>();
 	screen.machine().priority_bitmap.fill(0, cliprect);

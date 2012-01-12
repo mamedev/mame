@@ -140,7 +140,7 @@ VIDEO_START( gunsmoke )
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x4f);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -174,7 +174,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( gunsmoke )
+SCREEN_UPDATE_IND16( gunsmoke )
 {
 	gunsmoke_state *state = screen.machine().driver_data<gunsmoke_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);

@@ -131,8 +131,8 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 
 // the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
 //  our implementation is not currently tile based, and thus the accumulation buffer is screen sized
-static bitmap_t *fake_accumulationbuffer_bitmap;
-static void render_to_accumulation_buffer(running_machine &machine,bitmap_t &bitmap,const rectangle &cliprect);
+static bitmap_rgb32 *fake_accumulationbuffer_bitmap;
+static void render_to_accumulation_buffer(running_machine &machine,bitmap_rgb32 &bitmap,const rectangle &cliprect);
 
 typedef struct texinfo {
 	UINT32 address, vqbase;
@@ -1716,7 +1716,7 @@ static void computedilated(void)
 			dilatechose[(b << 3) + a]=3+(a < b ? a : b);
 }
 
-static void render_hline(running_machine &machine,bitmap_t &bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr)
+static void render_hline(running_machine &machine,bitmap_rgb32 &bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr)
 {
 	dc_state *state = machine.driver_data<dc_state>();
 	int xxl, xxr;
@@ -1802,7 +1802,7 @@ static void render_hline(running_machine &machine,bitmap_t &bitmap, texinfo *ti,
 	}
 }
 
-static void render_span(running_machine &machine, bitmap_t &bitmap, texinfo *ti,
+static void render_span(running_machine &machine, bitmap_rgb32 &bitmap, texinfo *ti,
                  float y0, float y1,
                  float xl, float xr,
                  float ul, float ur,
@@ -1901,7 +1901,7 @@ static void sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 }
 
 
-static void render_tri_sorted(running_machine &machine, bitmap_t &bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
+static void render_tri_sorted(running_machine &machine, bitmap_rgb32 &bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
 	float dy01, dy02, dy12;
 //  float dy; // unused, compiler complains about this
@@ -1967,7 +1967,7 @@ static void render_tri_sorted(running_machine &machine, bitmap_t &bitmap, texinf
 	}
 }
 
-static void render_tri(running_machine &machine, bitmap_t &bitmap, texinfo *ti, const vert *v)
+static void render_tri(running_machine &machine, bitmap_rgb32 &bitmap, texinfo *ti, const vert *v)
 {
 	int i0, i1, i2;
 
@@ -1975,7 +1975,7 @@ static void render_tri(running_machine &machine, bitmap_t &bitmap, texinfo *ti, 
 	render_tri_sorted(machine, bitmap, ti, v+i0, v+i1, v+i2);
 }
 
-static void render_to_accumulation_buffer(running_machine &machine,bitmap_t &bitmap,const rectangle &cliprect)
+static void render_to_accumulation_buffer(running_machine &machine,bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	dc_state *state = machine.driver_data<dc_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -2204,7 +2204,7 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 }
 
 
-static void pvr_drawframebuffer(running_machine &machine,bitmap_t &bitmap,const rectangle &cliprect)
+static void pvr_drawframebuffer(running_machine &machine,bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	dc_state *state = machine.driver_data<dc_state>();
 
@@ -2637,11 +2637,11 @@ VIDEO_START(dc)
 	state->endofrender_timer_tsp->adjust(attotime::never);
 	state->endofrender_timer_video->adjust(attotime::never);
 
-	fake_accumulationbuffer_bitmap = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_RGB32);
+	fake_accumulationbuffer_bitmap = auto_bitmap_rgb32_alloc(machine,1024,1024);
 
 }
 
-SCREEN_UPDATE(dc)
+SCREEN_UPDATE_RGB32(dc)
 {
 	dc_state *state = screen.machine().driver_data<dc_state>();
 

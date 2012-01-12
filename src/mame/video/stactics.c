@@ -236,7 +236,7 @@ INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 }
 
 
-static void draw_background(stactics_state *state, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_background(stactics_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y;
 
@@ -388,7 +388,7 @@ static VIDEO_START( stactics )
  *
  *************************************/
 
-static SCREEN_UPDATE( stactics )
+static SCREEN_UPDATE_IND16( stactics )
 {
 	stactics_state *state = screen.machine().driver_data<stactics_state>();
 
@@ -416,10 +416,9 @@ MACHINE_CONFIG_FRAGMENT( stactics_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(stactics)
+	MCFG_SCREEN_UPDATE_STATIC(stactics)
 
 	MCFG_PALETTE_LENGTH(0x400)
 

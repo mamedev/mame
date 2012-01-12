@@ -75,7 +75,7 @@ public:
 		{ }
 
 	/* video-related */
-	bitmap_t *m_bitmap[2];
+	bitmap_ind16 m_bitmap[2];
 	int m_clr_offset;
 	int m_dest;
 	int m_hi;
@@ -114,15 +114,15 @@ static VIDEO_START( lastfght )
 	lastfght_state *state = machine.driver_data<lastfght_state>();
 	int i;
 	for (i = 0; i < 2; i++)
-		state->m_bitmap[i] = machine.primary_screen->alloc_compatible_bitmap();
+		state->m_bitmap[i].allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
-	state->save_item(NAME(*state->m_bitmap[0]));
-	state->save_item(NAME(*state->m_bitmap[1]));
+	state->save_item(NAME(state->m_bitmap[0]));
+	state->save_item(NAME(state->m_bitmap[1]));
 	state->save_item(NAME(state->m_colorram));
 }
 
 
-static SCREEN_UPDATE( lastfght )
+static SCREEN_UPDATE_IND16( lastfght )
 {
 	lastfght_state *state = screen.machine().driver_data<lastfght_state>();
 
@@ -158,7 +158,7 @@ static SCREEN_UPDATE( lastfght )
 #endif
 #endif
 
-	copybitmap(bitmap, *state->m_bitmap[state->m_dest ^ 1], 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_bitmap[state->m_dest ^ 1], 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
@@ -323,7 +323,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 	{
 		int x, y, addr;
 		UINT8 *gfxdata = space->machine().region( "gfx1" )->base();
-		bitmap_t *dest = state->m_bitmap[state->m_dest];
+		bitmap_ind16 &dest = state->m_bitmap[state->m_dest];
 
 #if 0
 		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", cpu_get_pc(&space->device()),
@@ -345,7 +345,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 				data = gfxdata[addr];
 
 				if (data && (state->m_x + x >= 0) && (state->m_x + x < 512) && (state->m_y + y >= 0) && (state->m_y + y < 256))
-					dest->pix16(state->m_y + y, state->m_x + x) = data;
+					dest.pix16(state->m_y + y, state->m_x + x) = data;
 			}
 		}
 	}
@@ -586,11 +586,10 @@ static MACHINE_CONFIG_START( lastfght, lastfght_state )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE( 512, 256 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_UPDATE( lastfght )
+	MCFG_SCREEN_UPDATE_STATIC( lastfght )
 
 	MCFG_VIDEO_START( lastfght )
 MACHINE_CONFIG_END

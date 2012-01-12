@@ -150,7 +150,7 @@ WRITE8_HANDLER( spdodgeb_videoram_w )
 					cliprect,gfx, \
 					(which+order),color+ 8 * state->m_sprite_palbank,flipx,flipy,sx,sy,0);
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -208,7 +208,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 #undef DRAW_SPRITE
 
 
-SCREEN_UPDATE( spdodgeb )
+SCREEN_UPDATE_IND16( spdodgeb )
 {
 	spdodgeb_state *state = screen.machine().driver_data<spdodgeb_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_lastscroll+5);

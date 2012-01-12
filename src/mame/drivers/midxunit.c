@@ -243,7 +243,8 @@ static const tms34010_config tms_config =
 	"screen",						/* the screen operated on */
 	PIXEL_CLOCK,					/* pixel clock */
 	1,								/* pixels per clock */
-	midxunit_scanline_update,		/* scanline updater */
+	midxunit_scanline_update,		/* scanline updater (indexed16) */
+	NULL,							/* scanline updater (rgb32) */
 	NULL,							/* generate interrupt */
 	midtunit_to_shiftreg,			/* write to shiftreg function */
 	midtunit_from_shiftreg			/* read from shiftreg function */
@@ -271,9 +272,8 @@ static MACHINE_CONFIG_START( midxunit, midxunit_state )
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 505, 0, 399, 289, 0, 253)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 	MCFG_VIDEO_START(midxunit)
 
 	/* sound hardware */

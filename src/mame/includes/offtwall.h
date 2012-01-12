@@ -24,4 +24,4 @@ public:
 /*----------- defined in video/offtwall.c -----------*/
 
 VIDEO_START( offtwall );
-SCREEN_UPDATE( offtwall );
+SCREEN_UPDATE_IND16( offtwall );

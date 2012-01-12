@@ -184,11 +184,11 @@ VIDEO_START( mermaid )
 	tilemap_set_scroll_cols(state->m_fg_tilemap, 32);
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
-	state->m_helper = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_helper2 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	const rectangle spritevisiblearea(0 * 8, 26 * 8 - 1, 2 * 8, 30 * 8 - 1);
 	const rectangle flip_spritevisiblearea(6 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1);
@@ -230,7 +230,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( mermaid )
+SCREEN_UPDATE_IND16( mermaid )
 {
 	mermaid_state *state = screen.machine().driver_data<mermaid_state>();
 
@@ -251,8 +251,8 @@ static UINT8 collision_check( running_machine &machine, rectangle& rect )
 	for (y = rect.min_y; y <= rect.max_y; y++)
 		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(machine.colortable, state->m_helper->pix16(y, x)) & 0x3f;
-			UINT16 b = colortable_entry_get_value(machine.colortable, state->m_helper2->pix16(y, x)) & 0x3f;
+			UINT16 a = colortable_entry_get_value(machine.colortable, state->m_helper.pix16(y, x)) & 0x3f;
+			UINT16 b = colortable_entry_get_value(machine.colortable, state->m_helper2.pix16(y, x)) & 0x3f;
 
 			if (b)
 				if (a)
@@ -324,30 +324,30 @@ SCREEN_EOF( mermaid )
 
 		// check collision sprite - background
 
-		state->m_helper->fill(0, rect);
-		state->m_helper2->fill(0, rect);
+		state->m_helper.fill(0, rect);
+		state->m_helper2.fill(0, rect);
 
-		tilemap_draw(*state->m_helper, rect, state->m_bg_tilemap, 0, 0);
+		tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
 
-		drawgfx_transpen(*state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->m_coll_bit2 |= collision_check(screen.machine(), rect);
 
 		// check collision sprite - foreground
 
-		state->m_helper->fill(0, rect);
-		state->m_helper2->fill(0, rect);
+		state->m_helper.fill(0, rect);
+		state->m_helper2.fill(0, rect);
 
-		tilemap_draw(*state->m_helper, rect, state->m_fg_tilemap, 0, 0);
+		tilemap_draw(state->m_helper, rect, state->m_fg_tilemap, 0, 0);
 
-		drawgfx_transpen(*state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->m_coll_bit1 |= collision_check(screen.machine(), rect);
 
 		// check collision sprite - sprite
 
-		state->m_helper->fill(0, rect);
-		state->m_helper2->fill(0, rect);
+		state->m_helper.fill(0, rect);
+		state->m_helper2.fill(0, rect);
 
 		for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
@@ -378,10 +378,10 @@ SCREEN_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx_transpen(*state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->m_coll_bit0 |= collision_check(screen.machine(), rect);
 	}
@@ -434,8 +434,8 @@ SCREEN_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		state->m_helper->fill(0, rect);
-		state->m_helper2->fill(0, rect);
+		state->m_helper.fill(0, rect);
+		state->m_helper2.fill(0, rect);
 
 		for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
@@ -466,10 +466,10 @@ SCREEN_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx_transpen(*state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->m_coll_bit3 |= collision_check(screen.machine(), rect);
 	}
@@ -522,8 +522,8 @@ SCREEN_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		state->m_helper->fill(0, rect);
-		state->m_helper2->fill(0, rect);
+		state->m_helper.fill(0, rect);
+		state->m_helper2.fill(0, rect);
 
 		for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
@@ -554,10 +554,10 @@ SCREEN_EOF( mermaid )
 					sy2 = 240 - sy2;
 				}
 
-				drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
 			}
 
-		drawgfx_transpen(*state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
 		state->m_coll_bit6 |= collision_check(screen.machine(), rect);
 	}

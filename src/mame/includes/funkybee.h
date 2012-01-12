@@ -26,4 +26,4 @@ WRITE8_HANDLER( funkybee_flipscreen_w );
 
 PALETTE_INIT( funkybee );
 VIDEO_START( funkybee );
-SCREEN_UPDATE( funkybee );
+SCREEN_UPDATE_IND16( funkybee );

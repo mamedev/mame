@@ -192,7 +192,7 @@ static VIDEO_START(firebeat)
 }
 
 
-static void gcu_draw_object(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
+static void gcu_draw_object(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	// 0x00: xxx----- -------- -------- --------   command type
@@ -346,7 +346,7 @@ static void gcu_draw_object(running_machine &machine, bitmap_t &bitmap, const re
 	}
 }
 
-static void gcu_fill_rect(bitmap_t &bitmap, const rectangle &cliprect, UINT32 *cmd)
+static void gcu_fill_rect(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *cmd)
 {
 	int i, j;
 	int x1, y1, x2, y2;
@@ -393,7 +393,7 @@ static void gcu_fill_rect(bitmap_t &bitmap, const rectangle &cliprect, UINT32 *c
 	}
 }
 
-static void gcu_draw_character(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
+static void gcu_draw_character(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	// 0x00: xxx----- -------- -------- --------   command type
@@ -442,7 +442,7 @@ static void gcu_draw_character(running_machine &machine, bitmap_t &bitmap, const
 	}
 }
 
-static void gcu_exec_display_list(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, UINT32 address)
+static void gcu_exec_display_list(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 address)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	int counter = 0;
@@ -513,7 +513,7 @@ static void gcu_exec_display_list(running_machine &machine, bitmap_t &bitmap, co
 	};
 }
 
-static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int chip)
+static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip)
 {
 	firebeat_state *state = screen.machine().driver_data<firebeat_state>();
 
@@ -591,8 +591,8 @@ static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const recta
 	return 0;
 }
 
-static SCREEN_UPDATE( firebeat_0 ) { return update_screen(screen, bitmap, cliprect, 0); }
-static SCREEN_UPDATE( firebeat_1 ) { return update_screen(screen, bitmap, cliprect, 1); }
+static SCREEN_UPDATE_IND16( firebeat_0 ) { return update_screen(screen, bitmap, cliprect, 0); }
+static SCREEN_UPDATE_IND16( firebeat_1 ) { return update_screen(screen, bitmap, cliprect, 1); }
 
 static UINT32 GCU_r(running_machine &machine, int chip, UINT32 offset, UINT32 mem_mask)
 {
@@ -1986,10 +1986,9 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE(firebeat_0)
+	MCFG_SCREEN_UPDATE_STATIC(firebeat_0)
 
 	MCFG_PALETTE_LENGTH(32768)
 
@@ -2031,20 +2030,18 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE(firebeat_0)
+	MCFG_SCREEN_UPDATE_STATIC(firebeat_0)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE(firebeat_1)
+	MCFG_SCREEN_UPDATE_STATIC(firebeat_1)
 
 	MCFG_VIDEO_START(firebeat)
 

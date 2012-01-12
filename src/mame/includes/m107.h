@@ -35,7 +35,7 @@ public:
 /*----------- defined in video/m107.c -----------*/
 
 WRITE16_HANDLER( m107_spritebuffer_w );
-SCREEN_UPDATE( m107 );
+SCREEN_UPDATE_IND16( m107 );
 VIDEO_START( m107 );
 WRITE16_HANDLER( m107_control_w );
 WRITE16_HANDLER( m107_vram_w );

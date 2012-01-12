@@ -474,23 +474,23 @@ extern const UINT16 amiga_expand_byte[256];
 
 PALETTE_INIT( amiga );
 VIDEO_START( amiga );
-SCREEN_UPDATE( amiga );
+SCREEN_UPDATE_IND16( amiga );
 
 void amiga_copper_setpc(running_machine &machine, UINT32 pc);
 int amiga_copper_execute_next(running_machine &machine, int xpos);
 
 UINT32 amiga_gethvpos(screen_device &screen);
 void amiga_set_genlock_color(running_machine &machine, UINT16 color);
-void amiga_render_scanline(running_machine &machine, bitmap_t &bitmap, int scanline);
+void amiga_render_scanline(running_machine &machine, bitmap_ind16 &bitmap, int scanline);
 void amiga_sprite_dma_reset(running_machine &machine, int which);
 void amiga_sprite_enable_comparitor(running_machine &machine, int which, int enable);
 
 /*----------- defined in video/amigaaga.c -----------*/
 
 VIDEO_START( amiga_aga );
-SCREEN_UPDATE( amiga_aga );
+SCREEN_UPDATE_RGB32( amiga_aga );
 
-void amiga_aga_render_scanline(running_machine &machine, bitmap_t &bitmap, int scanline);
+void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, int scanline);
 void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data);
 void amiga_aga_diwhigh_written(running_machine &machine, int written);
 

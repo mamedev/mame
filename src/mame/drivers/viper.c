@@ -371,7 +371,7 @@ static emu_timer *ds2430_timer;
 static timer_device *ds2430_bit_timer;
 
 
-static SCREEN_UPDATE(viper)
+static SCREEN_UPDATE_RGB32(viper)
 {
 	device_t *device = screen.machine().device("voodoo");
 	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
@@ -2012,13 +2012,12 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 383)
 
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_SCREEN_UPDATE(viper)
+	MCFG_SCREEN_UPDATE_STATIC(viper)
 
 	MCFG_TIMER_ADD("ds2430_timer2", NULL)
 

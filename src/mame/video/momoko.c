@@ -76,7 +76,7 @@ WRITE8_HANDLER( momoko_flipscreen_w )
 
 /****************************************************************************/
 
-static void momoko_draw_bg_pri( running_machine &machine, bitmap_t &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri )
+static void momoko_draw_bg_pri( running_machine &machine, bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri )
 {
 	int xx, sx, sy, px, py, dot;
 	UINT32 gfxadr;
@@ -111,7 +111,7 @@ static void momoko_draw_bg_pri( running_machine &machine, bitmap_t &bitmap, int 
 
 /****************************************************************************/
 
-SCREEN_UPDATE( momoko )
+SCREEN_UPDATE_IND16( momoko )
 {
 	momoko_state *state = screen.machine().driver_data<momoko_state>();
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;

@@ -160,7 +160,7 @@ WRITE8_HANDLER( kyugo_flipscreen_w )
  *
  *************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	kyugo_state *state = machine.driver_data<kyugo_state>();
 
@@ -220,7 +220,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-SCREEN_UPDATE( kyugo )
+SCREEN_UPDATE_IND16( kyugo )
 {
 	kyugo_state *state = screen.machine().driver_data<kyugo_state>();
 

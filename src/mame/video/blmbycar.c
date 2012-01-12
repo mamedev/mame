@@ -165,7 +165,7 @@ VIDEO_START( blmbycar )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 	UINT16 *source, *finish;
@@ -219,7 +219,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 ***************************************************************************/
 
-SCREEN_UPDATE( blmbycar )
+SCREEN_UPDATE_IND16( blmbycar )
 {
 	blmbycar_state *state = screen.machine().driver_data<blmbycar_state>();
 	int i, layers_ctrl = -1;

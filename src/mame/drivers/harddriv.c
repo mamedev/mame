@@ -341,7 +341,8 @@ static const tms34010_config gsp_config_driver =
 	"screen",						/* the screen operated on */
 	4000000,						/* pixel clock */
 	4,								/* pixels per clock */
-	harddriv_scanline_driver,		/* scanline callback */
+	harddriv_scanline_driver,		/* scanline callback (indexed16) */
+	NULL,							/* scanline callback (rgb32) */
 	hdgsp_irq_gen,					/* generate interrupt */
 	hdgsp_write_to_shiftreg,		/* write to shiftreg function */
 	hdgsp_read_from_shiftreg		/* read from shiftreg function */
@@ -355,7 +356,8 @@ static const tms34010_config gsp_config_multisync =
 	"screen",						/* the screen operated on */
 	6000000,						/* pixel clock */
 	2,								/* pixels per clock */
-	harddriv_scanline_multisync,	/* scanline callback */
+	harddriv_scanline_multisync,	/* scanline callback (indexed16) */
+	NULL,							/* scanline callback (rgb32 */
 	hdgsp_irq_gen,					/* generate interrupt */
 	hdgsp_write_to_shiftreg,		/* write to shiftreg function */
 	hdgsp_read_from_shiftreg		/* read from shiftreg function */
@@ -369,7 +371,8 @@ static const tms34010_config gsp_config_multisync_stunrun =
 	"screen",						/* the screen operated on */
 	5000000,						/* pixel clock */
 	2,								/* pixels per clock */
-	harddriv_scanline_multisync,	/* scanline callback */
+	harddriv_scanline_multisync,	/* scanline callback (indexed16) */
+	NULL,							/* scanline callback (rgb32 */
 	hdgsp_irq_gen,					/* generate interrupt */
 	hdgsp_write_to_shiftreg,		/* write to shiftreg function */
 	hdgsp_read_from_shiftreg		/* read from shiftreg function */
@@ -382,7 +385,8 @@ static const tms34010_config msp_config =
 	"screen",						/* the screen operated on */
 	5000000,						/* pixel clock */
 	2,								/* pixels per clock */
-	NULL,							/* scanline callback */
+	NULL,							/* scanline callback (indexed16) */
+	NULL,							/* scanline callback (rgb32 */
 	hdmsp_irq_gen					/* generate interrupt */
 };
 
@@ -1136,9 +1140,8 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(4000000*4, 160*4, 0, 127*4, 417, 0, 384)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
 	MCFG_VIDEO_START(harddriv)
 MACHINE_CONFIG_END

@@ -44,7 +44,7 @@ static VIDEO_START( timetrv )
 
 }
 
-static SCREEN_UPDATE( timetrv )
+static SCREEN_UPDATE_IND16( timetrv )
 {
 	timetrv_state *state = screen.machine().driver_data<timetrv_state>();
 	popmessage("%s%s",state->m_led_vram_lo,state->m_led_vram_hi);
@@ -150,10 +150,9 @@ static MACHINE_CONFIG_START( timetrv, timetrv_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE(timetrv)
+	MCFG_SCREEN_UPDATE_STATIC(timetrv)
 
 	MCFG_PALETTE_LENGTH(512)
 

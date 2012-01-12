@@ -311,7 +311,7 @@ VIDEO_START( namcona1 )
 /*************************************************************************/
 
 static void pdraw_tile(running_machine &machine,
-		bitmap_t &dest_bmp,
+		bitmap_ind16 &dest_bmp,
 		const rectangle &clip,
 		UINT32 code,
 		int color,
@@ -453,7 +453,7 @@ static void pdraw_tile(running_machine &machine,
 	}
 } /* pdraw_tile */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	int which;
@@ -550,7 +550,7 @@ static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const 
 	} /* next x */
 } /* draw_pixel_line */
 
-static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int which, int primask )
+static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask )
 {
 	namcona1_state *state = machine.driver_data<namcona1_state>();
 	UINT16 *videoram = state->m_videoram;
@@ -635,7 +635,7 @@ static void draw_background(running_machine &machine, bitmap_t &bitmap, const re
 	}
 } /* draw_background */
 
-SCREEN_UPDATE( namcona1 )
+SCREEN_UPDATE_IND16( namcona1 )
 {
 	namcona1_state *state = screen.machine().driver_data<namcona1_state>();
 	int which;

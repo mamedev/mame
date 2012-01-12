@@ -44,7 +44,7 @@ VIDEO_START( bishi )
 	state->m_layer_colorbase[3] = 0xc0;
 }
 
-SCREEN_UPDATE(bishi)
+SCREEN_UPDATE_RGB32(bishi)
 {
 	bishi_state *state = screen.machine().driver_data<bishi_state>();
 	int layers[4], layerpri[4], i;/*, old;*/

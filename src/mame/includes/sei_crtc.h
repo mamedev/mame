@@ -11,4 +11,4 @@ WRITE16_HANDLER( seibucrtc_sc3vram_w );
 WRITE16_HANDLER( seibucrtc_vregs_w );
 void seibucrtc_sc0bank_w(UINT16 data);
 VIDEO_START( seibu_crtc );
-SCREEN_UPDATE( seibu_crtc );
+SCREEN_UPDATE_IND16( seibu_crtc );

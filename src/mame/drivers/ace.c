@@ -82,7 +82,7 @@ static VIDEO_START( ace )
 	gfx_element_set_source(machine.gfx[4], state->m_scoreram);
 }
 
-static SCREEN_UPDATE( ace )
+static SCREEN_UPDATE_IND16( ace )
 {
 	ace_state *state = screen.machine().driver_data<ace_state>();
 	int offs;
@@ -354,10 +354,9 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(ace)
+	MCFG_SCREEN_UPDATE_STATIC(ace)
 
 	MCFG_GFXDECODE(ace)
 	MCFG_PALETTE_LENGTH(2)

@@ -416,7 +416,7 @@ static VIDEO_START(varia)
 	tilemap_set_transparent_pen(state->m_mid2tilemap, 15);
 }
 
-static SCREEN_UPDATE(varia)
+static SCREEN_UPDATE_IND16(varia)
 {
 	vmetal_state *state = screen.machine().driver_data<vmetal_state>();
 
@@ -450,10 +450,9 @@ static MACHINE_CONFIG_START( varia, vmetal_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(2048, 2048)
 	MCFG_SCREEN_VISIBLE_AREA(0+64, 319+64, 0+64, 223+64)
-	MCFG_SCREEN_UPDATE(varia)
+	MCFG_SCREEN_UPDATE_STATIC(varia)
 
 	MCFG_GFXDECODE(vmetal)
 	MCFG_PALETTE_LENGTH(0x4000)

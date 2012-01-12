@@ -62,7 +62,7 @@ VIDEO_START( spy )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( spy )
+SCREEN_UPDATE_IND16( spy )
 {
 	spy_state *state = screen.machine().driver_data<spy_state>();
 

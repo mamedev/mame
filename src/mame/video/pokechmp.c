@@ -38,7 +38,7 @@ VIDEO_START( pokechmp )
 		 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pokechmp_state *state = machine.driver_data<pokechmp_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -72,7 +72,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( pokechmp )
+SCREEN_UPDATE_IND16( pokechmp )
 {
 	pokechmp_state *state = screen.machine().driver_data<pokechmp_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

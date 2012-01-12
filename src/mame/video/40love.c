@@ -106,8 +106,8 @@ VIDEO_START( fortyl )
 	state->m_pixram1 = auto_alloc_array_clear(machine, UINT8, 0x4000);
 	state->m_pixram2 = auto_alloc_array_clear(machine, UINT8, 0x4000);
 
-	state->m_tmp_bitmap1 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
-	state->m_tmp_bitmap2 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
+	state->m_tmp_bitmap1 = auto_bitmap_ind16_alloc(machine, 256, 256);
+	state->m_tmp_bitmap2 = auto_bitmap_ind16_alloc(machine, 256, 256);
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
@@ -274,7 +274,7 @@ spriteram format (4 bytes per sprite):
     offset  3   xxxxxxxx    x position
 */
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -338,7 +338,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static void draw_pixram( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_pixram( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
 	int offs;
@@ -358,7 +358,7 @@ static void draw_pixram( running_machine &machine, bitmap_t &bitmap, const recta
 		copybitmap(bitmap, *state->m_tmp_bitmap2, f, f, state->m_xoffset, 0, cliprect);
 }
 
-SCREEN_UPDATE( fortyl )
+SCREEN_UPDATE_IND16( fortyl )
 {
 	fortyl_state *state = screen.machine().driver_data<fortyl_state>();
 	draw_pixram(screen.machine(), bitmap, cliprect);

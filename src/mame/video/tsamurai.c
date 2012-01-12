@@ -137,7 +137,7 @@ WRITE8_HANDLER( tsamurai_fg_colorram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	tsamurai_state *state = machine.driver_data<tsamurai_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -197,7 +197,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( tsamurai )
+SCREEN_UPDATE_IND16( tsamurai )
 {
 	tsamurai_state *state = screen.machine().driver_data<tsamurai_state>();
 	int i;
@@ -262,7 +262,7 @@ VIDEO_START( vsgongf )
 	state->m_foreground = tilemap_create(machine, get_vsgongf_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
-SCREEN_UPDATE( vsgongf )
+SCREEN_UPDATE_IND16( vsgongf )
 {
 	tsamurai_state *state = screen.machine().driver_data<tsamurai_state>();
 	#ifdef MAME_DEBUG

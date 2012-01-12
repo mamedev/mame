@@ -49,11 +49,11 @@ DECLARE_LEGACY_DEVICE(S2636, s2636);
  *************************************/
 
 
-/* returns a BITMAP_FORMAT_INDEXED16 bitmap the size of the screen
+/* returns a BITMAP_FORMAT_IND16 bitmap the size of the screen
    D0-D2 of each pixel is the pixel color
    D3 indicates whether the S2636 drew this pixel - 0 = not drawn, 1 = drawn */
 
-bitmap_t &s2636_update( device_t *device, const rectangle &cliprect );
+bitmap_ind16 &s2636_update( device_t *device, const rectangle &cliprect );
 WRITE8_DEVICE_HANDLER( s2636_work_ram_w );
 READ8_DEVICE_HANDLER( s2636_work_ram_r );
 

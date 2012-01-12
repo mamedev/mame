@@ -174,7 +174,7 @@ public:
 
 private:
 	static ui_menu *menu_free;
-	static bitmap_t *hilight_bitmap;
+	static bitmap_rgb32 *hilight_bitmap;
 	static render_texture *hilight_texture, *arrow_texture;
 
 	bool special_main_menu;
@@ -189,7 +189,7 @@ private:
 
 	inline bool exclusive_input_pressed(int key, int repeat);
 	static void clear_free_list(running_machine &machine);
-	static void render_triangle(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param);
+	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 };
 
 #endif	/* __UIMENU_H__ */

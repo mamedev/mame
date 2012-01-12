@@ -160,7 +160,7 @@ static WRITE16_HANDLER(ke_w)
  *
  *************************************/
 
-static SCREEN_UPDATE( galaxygame )
+static SCREEN_UPDATE_IND16( galaxygame )
 {
 	galaxygame_state *state = screen.machine().driver_data<galaxygame_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -335,10 +335,9 @@ static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 511)
-	MCFG_SCREEN_UPDATE(galaxygame)
+	MCFG_SCREEN_UPDATE_STATIC(galaxygame)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(galaxygame)

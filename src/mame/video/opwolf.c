@@ -36,7 +36,7 @@ WRITE16_HANDLER( opwolf_spritectrl_w )
 
 /***************************************************************************/
 
-SCREEN_UPDATE( opwolf )
+SCREEN_UPDATE_IND16( opwolf )
 {
 	opwolf_state *state = screen.machine().driver_data<opwolf_state>();
 	int layer[2];

@@ -281,7 +281,7 @@ public:
 	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	bitmap_t *m_temp_reel_bitmap;
+	bitmap_ind16 *m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
 	tilemap_t *m_reel_tilemap;
 	tilemap_t *m_reel2_tilemap;
@@ -757,7 +757,7 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 static VIDEO_START(sfbonus)
 {
 	sfbonus_state *state = machine.driver_data<sfbonus_state>();
-	state->m_temp_reel_bitmap = auto_bitmap_alloc(machine,1024,512,BITMAP_FORMAT_INDEXED16);
+	state->m_temp_reel_bitmap = auto_bitmap_ind16_alloc(machine,1024,512);
 
 	state->m_tilemap = tilemap_create(machine,get_sfbonus_tile_info,tilemap_scan_rows,8,8, 128, 64);
 	state->m_reel_tilemap = tilemap_create(machine,get_sfbonus_reel_tile_info,tilemap_scan_rows,8,32, 64, 16);
@@ -781,7 +781,7 @@ static VIDEO_START(sfbonus)
 
 }
 
-static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int catagory)
+static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int catagory)
 {
 	sfbonus_state *state = screen.machine().driver_data<sfbonus_state>();
 	int zz;
@@ -920,7 +920,7 @@ static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_t &bitmap, con
 
 }
 
-static SCREEN_UPDATE(sfbonus)
+static SCREEN_UPDATE_IND16(sfbonus)
 {
 	sfbonus_state *state = screen.machine().driver_data<sfbonus_state>();
 
@@ -1260,10 +1260,9 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
-	MCFG_SCREEN_UPDATE(sfbonus)
+	MCFG_SCREEN_UPDATE_STATIC(sfbonus)
 
 	MCFG_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
 

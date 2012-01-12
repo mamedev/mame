@@ -244,7 +244,7 @@ WRITE8_HANDLER( stfight_vh_latch_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	stfight_state *state = machine.driver_data<stfight_state>();
 	int offs,sx,sy;
@@ -292,7 +292,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( stfight )
+SCREEN_UPDATE_IND16( stfight )
 {
 	stfight_state *state = screen.machine().driver_data<stfight_state>();
 	set_pens(screen.machine());

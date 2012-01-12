@@ -70,7 +70,7 @@ public:
 
 
 static VIDEO_START( midas );
-static SCREEN_UPDATE( midas );
+static SCREEN_UPDATE_IND16( midas );
 
 
 static TILE_GET_INFO( get_tile_info )
@@ -91,7 +91,7 @@ static VIDEO_START( midas )
 	tilemap_set_transparent_pen(state->m_tmap, 0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	midas_state *state = machine.driver_data<midas_state>();
 	UINT16 *s		=	state->m_gfxram + 0x8000;
@@ -175,7 +175,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-static SCREEN_UPDATE( midas )
+static SCREEN_UPDATE_IND16( midas )
 {
 	midas_state *state = screen.machine().driver_data<midas_state>();
 	int layers_ctrl = -1;
@@ -700,10 +700,9 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE(midas)
+	MCFG_SCREEN_UPDATE_STATIC(midas)
 
 	MCFG_GFXDECODE(midas)
 	MCFG_PALETTE_LENGTH(0x10000)
@@ -735,10 +734,9 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE(midas)
+	MCFG_SCREEN_UPDATE_STATIC(midas)
 
 	MCFG_GFXDECODE(midas)
 	MCFG_PALETTE_LENGTH(0x10000)

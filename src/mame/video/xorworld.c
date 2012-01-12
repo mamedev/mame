@@ -96,7 +96,7 @@ VIDEO_START( xorworld )
       1  | xxxx---- -------- | sprite color
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	xorworld_state *state = machine.driver_data<xorworld_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -113,7 +113,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( xorworld )
+SCREEN_UPDATE_IND16( xorworld )
 {
 	xorworld_state *state = screen.machine().driver_data<xorworld_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

@@ -346,7 +346,7 @@ static const UINT8 ylookup[16] =
 	  2, 2, 3, 3,
 	  2, 2, 3, 3 };
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -486,8 +486,8 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
                        CUSTOM DRAW
 *********************************************************/
 
-INLINE void bryan2_drawscanline( bitmap_t &bitmap, int x, int y, int length,
-		const UINT16 *src, int transparent, UINT32 orient, bitmap_t &priority, int pri )
+INLINE void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int length,
+		const UINT16 *src, int transparent, UINT32 orient, bitmap_ind8 &priority, int pri )
 {
 	UINT16 *dsti = &bitmap.pix16(y, x);
 	UINT8 *dstp = &priority.pix8(y, x);
@@ -518,11 +518,11 @@ INLINE void bryan2_drawscanline( bitmap_t &bitmap, int x, int y, int length,
 
 
 
-static void wgp_piv_layer_draw( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	bitmap_t &srcbitmap = tilemap_get_pixmap(state->m_piv_tilemap[layer]);
-	bitmap_t &flagsbitmap = tilemap_get_flagsmap(state->m_piv_tilemap[layer]);
+	bitmap_ind16 &srcbitmap = tilemap_get_pixmap(state->m_piv_tilemap[layer]);
+	bitmap_ind8 &flagsbitmap = tilemap_get_flagsmap(state->m_piv_tilemap[layer]);
 
 	UINT16 *dst16,*src16;
 	UINT8 *tsrc;
@@ -643,7 +643,7 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_t &bitmap, cons
                         SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE( wgp )
+SCREEN_UPDATE_IND16( wgp )
 {
 	wgp_state *state = screen.machine().driver_data<wgp_state>();
 	int i;

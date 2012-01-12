@@ -214,7 +214,7 @@ VIDEO_START( adder2 )
 }
 
 // video update ///////////////////////////////////////////////////////////
-SCREEN_UPDATE( adder2 )
+SCREEN_UPDATE_IND16( adder2 )
 {
 	const rectangle visible1(0, 400-1,  0,  280-1);  //minx,maxx, miny,maxy
 

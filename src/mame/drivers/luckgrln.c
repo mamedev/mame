@@ -261,7 +261,7 @@ static VIDEO_START(luckgrln)
 	tilemap_set_transparent_pen( state->m_reel4_tilemap, 0 );
 }
 
-static SCREEN_UPDATE(luckgrln)
+static SCREEN_UPDATE_IND16(luckgrln)
 {
 	luckgrln_state *state = screen.machine().driver_data<luckgrln_state>();
 	int y,x;
@@ -987,10 +987,9 @@ static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(luckgrln)
+	MCFG_SCREEN_UPDATE_STATIC(luckgrln)
 
 	MCFG_GFXDECODE(luckgrln)
 	MCFG_PALETTE_LENGTH(0x8000)

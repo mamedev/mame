@@ -21,7 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/cubeqcpu/cubeqcpu.h"
 #include "sound/dac.h"
-#include "machine/laserdsc.h"
+#include "machine/ldpr8210.h"
 #include "machine/nvram.h"
 
 
@@ -29,13 +29,14 @@ class cubeqst_state : public driver_device
 {
 public:
 	cubeqst_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
 	UINT8 *m_depth_buffer;
 	int m_video_field;
 	UINT8 m_io_latch;
 	UINT8 m_reset_latch;
-	device_t *m_laserdisc;
+	required_device<simutrek_special_device> m_laserdisc;
 	rgb_t *m_colormap;
 };
 
@@ -93,7 +94,7 @@ static WRITE16_HANDLER( palette_w )
 }
 
 /* TODO: This is a simplified version of what actually happens */
-static SCREEN_UPDATE( cubeqst )
+static SCREEN_UPDATE_RGB32( cubeqst )
 {
 	cubeqst_state *state = screen.machine().driver_data<cubeqst_state>();
 	int y;
@@ -196,7 +197,7 @@ static INTERRUPT_GEN( vblank )
 static WRITE16_HANDLER( laserdisc_w )
 {
 	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	laserdisc_data_w(state->m_laserdisc, data & 0xff);
+	state->m_laserdisc->data_w(data & 0xff);
 }
 
 /*
@@ -206,8 +207,8 @@ static WRITE16_HANDLER( laserdisc_w )
 static READ16_HANDLER( laserdisc_r )
 {
 	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	int ldp_command_flag = (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
-	int ldp_seek_status = (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 1 : 0;
+	int ldp_command_flag = (state->m_laserdisc->ready_r() == ASSERT_LINE) ? 0 : 1;
+	int ldp_seek_status = (state->m_laserdisc->status_r() == ASSERT_LINE) ? 1 : 0;
 
 	return (ldp_seek_status << 1) | ldp_command_flag;
 }
@@ -217,7 +218,7 @@ static READ16_HANDLER( laserdisc_r )
 static WRITE16_HANDLER( ldaud_w )
 {
 	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	simutrek_set_audio_squelch(state->m_laserdisc, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	state->m_laserdisc->set_external_audio_squelch(data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -233,7 +234,7 @@ static WRITE16_HANDLER( ldaud_w )
 static WRITE16_HANDLER( control_w )
 {
 	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	laserdisc_video_enable(state->m_laserdisc, data & 1);
+	state->m_laserdisc->video_enable(data & 1);
 }
 
 
@@ -435,8 +436,6 @@ ADDRESS_MAP_END
 
 static MACHINE_START( cubeqst )
 {
-	cubeqst_state *state = machine.driver_data<cubeqst_state>();
-	state->m_laserdisc = machine.device("laserdisc");
 }
 
 static MACHINE_RESET( cubeqst )
@@ -526,20 +525,20 @@ static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
 	MCFG_MACHINE_RESET(cubeqst)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
-	MCFG_VIDEO_START(cubeqst)
-
-	MCFG_PALETTE_INIT(cubeqst)
-
-	MCFG_LASERDISC_ADD("laserdisc", SIMUTREK_SPECIAL, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(cubeqst, CUBEQST_HBLANK, CUBEQST_VCOUNT, BITMAP_FORMAT_RGB32)
+	MCFG_LASERDISC_SIMUTREK_ADD("laserdisc")
+	MCFG_LASERDISC_OVERLAY(CUBEQST_HBLANK, CUBEQST_VCOUNT, cubeqst)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, 320-1, 0, 256-8)
 	MCFG_LASERDISC_OVERLAY_POSITION(0.002, -0.018)
 	MCFG_LASERDISC_OVERLAY_SCALE(1.0, 1.030)
 
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+
+	MCFG_VIDEO_START(cubeqst)
+	MCFG_PALETTE_INIT(cubeqst)
+
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

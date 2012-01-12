@@ -66,7 +66,7 @@ VIDEO_START( scontra )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( scontra )
+SCREEN_UPDATE_IND16( scontra )
 {
 	thunderx_state *state = screen.machine().driver_data<thunderx_state>();
 

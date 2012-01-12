@@ -93,7 +93,7 @@ UINT16 dblwings_pri_callback(UINT16 x)
 
 
 
-static SCREEN_UPDATE(dblewing)
+static SCREEN_UPDATE_IND16(dblewing)
 {
 	dblewing_state *state = screen.machine().driver_data<dblewing_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
@@ -106,7 +106,7 @@ static SCREEN_UPDATE(dblewing)
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400);
 	return 0;
 }
 
@@ -652,10 +652,9 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(dblewing)
+	MCFG_SCREEN_UPDATE_STATIC(dblewing)
 
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_GFXDECODE(dblewing)

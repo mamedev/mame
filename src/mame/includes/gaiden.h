@@ -21,9 +21,9 @@ public:
 	tilemap_t   *m_text_layer;
 	tilemap_t   *m_foreground;
 	tilemap_t   *m_background;
-	bitmap_t    *m_sprite_bitmap;
-	bitmap_t    *m_tile_bitmap_bg;
-	bitmap_t    *m_tile_bitmap_fg;
+	bitmap_ind16 m_sprite_bitmap;
+	bitmap_ind16 m_tile_bitmap_bg;
+	bitmap_ind16 m_tile_bitmap_fg;
 	UINT16      m_tx_scroll_x;
 	UINT16      m_tx_scroll_y;
 	UINT16      m_bg_scroll_x;
@@ -53,9 +53,9 @@ VIDEO_START( raiga );
 VIDEO_START( drgnbowl );
 VIDEO_START( mastninj );
 
-SCREEN_UPDATE( gaiden );
-SCREEN_UPDATE( raiga );
-SCREEN_UPDATE( drgnbowl );
+SCREEN_UPDATE_RGB32( gaiden );
+SCREEN_UPDATE_RGB32( raiga );
+SCREEN_UPDATE_IND16( drgnbowl );
 
 WRITE16_HANDLER( gaiden_videoram_w );
 WRITE16_HANDLER( gaiden_videoram2_w );

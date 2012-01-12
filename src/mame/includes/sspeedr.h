@@ -37,5 +37,5 @@ WRITE8_HANDLER( sspeedr_track_vert_w );
 WRITE8_HANDLER( sspeedr_track_ice_w );
 
 VIDEO_START( sspeedr );
-SCREEN_UPDATE( sspeedr );
+SCREEN_UPDATE_IND16( sspeedr );
 SCREEN_EOF( sspeedr );

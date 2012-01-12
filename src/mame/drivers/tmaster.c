@@ -126,7 +126,7 @@ public:
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];
-	bitmap_t *m_bitmap[2][2];
+	bitmap_ind16 m_bitmap[2][2];
 	UINT16 *m_regs;
 	UINT16 m_color;
 	UINT16 m_addr;
@@ -299,8 +299,8 @@ static VIDEO_START( tmaster )
 	{
 		for (buffer = 0; buffer < 2; buffer++)
 		{
-			state->m_bitmap[layer][buffer] = machine.primary_screen->alloc_compatible_bitmap();
-			state->m_bitmap[layer][buffer]->fill(0xff);
+			state->m_bitmap[layer][buffer].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+			state->m_bitmap[layer][buffer].fill(0xff);
 		}
 	}
 
@@ -314,7 +314,7 @@ static VIDEO_START( galgames )
 	state->m_compute_addr = galgames_compute_addr;
 }
 
-static SCREEN_UPDATE( tmaster )
+static SCREEN_UPDATE_IND16( tmaster )
 {
 	tmaster_state *state = screen.machine().driver_data<tmaster_state>();
 	int layers_ctrl = -1;
@@ -332,8 +332,8 @@ static SCREEN_UPDATE( tmaster )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (layers_ctrl & 1)	copybitmap_trans(bitmap, *state->m_bitmap[0][(state->m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
-	if (layers_ctrl & 2)	copybitmap_trans(bitmap, *state->m_bitmap[1][(state->m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->m_bitmap[0][(state->m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->m_bitmap[1][(state->m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
 
 	return 0;
 }
@@ -371,7 +371,7 @@ static void tmaster_draw(running_machine &machine)
 
 	layer	=	(mode >> 7) & 1;	// layer to draw to
 	buffer	=	((mode >> 6) & 1) ^ ((buffer >> layer) & 1);	// bit 6 selects whether to use the opposite buffer to that displayed
-	bitmap_t &bitmap	=	*state->m_bitmap[layer][buffer];
+	bitmap_ind16 &bitmap	=	state->m_bitmap[layer][buffer];
 
 	addr <<= 1;
 
@@ -914,10 +914,9 @@ static MACHINE_CONFIG_START( tm3k, tmaster_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(tmaster)
+	MCFG_SCREEN_UPDATE_STATIC(tmaster)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -971,12 +970,11 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(tmaster)
+	MCFG_SCREEN_UPDATE_STATIC(tmaster)
 
 	MCFG_PALETTE_LENGTH(0x1000)	// only 0x100 used
 

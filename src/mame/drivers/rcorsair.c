@@ -60,6 +60,8 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 
 	// devices
@@ -67,7 +69,6 @@ protected:
 
 	// driver_device overrides
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -122,7 +123,7 @@ void rcorsair_state::video_start()
 {
 }
 
-bool rcorsair_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 rcorsair_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
 	return 0;
@@ -140,7 +141,7 @@ static MACHINE_CONFIG_START( rcorsair, rcorsair_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(rcorsair_state, screen_update)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 

@@ -802,7 +802,8 @@ static const tms34010_config tms_config =
 	"screen",                   /* the screen operated on */
 	40000000/16,                /* pixel clock */
 	4,                          /* pixels per clock */
-	jpmimpct_scanline_update,   /* scanline updater */
+	NULL,                       /* scanline updater (indexed16) */
+	jpmimpct_scanline_update,   /* scanline updater (rgb32) */
 	jpmimpct_tms_irq,           /* generate interrupt */
 	jpmimpct_to_shiftreg,       /* write to shiftreg function */
 	jpmimpct_from_shiftreg      /* read from shiftreg function */
@@ -831,9 +832,8 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 	MCFG_TIMER_ADD( "duart_1_timer", duart_1_timer_event)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

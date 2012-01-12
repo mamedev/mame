@@ -236,7 +236,7 @@ static void PS7500_startTimer0(running_machine &machine);
 static void PS7500_startTimer1(running_machine &machine);
 
 
-static SCREEN_UPDATE(ssfindo)
+static SCREEN_UPDATE_IND16(ssfindo)
 {
 	ssfindo_state *state = screen.machine().driver_data<ssfindo_state>();
 	int s,x,y;
@@ -752,10 +752,9 @@ static MACHINE_CONFIG_START( ssfindo, ssfindo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(ssfindo)
+	MCFG_SCREEN_UPDATE_STATIC(ssfindo)
 
 	MCFG_PALETTE_LENGTH(256)
 MACHINE_CONFIG_END

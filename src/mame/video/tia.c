@@ -106,7 +106,7 @@ static UINT8 HMBL_latch;
 static UINT8 REFLECT;		/* Should playfield be reflected or not */
 static UINT8 NUSIZx_changed;
 
-static bitmap_t *helper[3];
+static bitmap_ind16 *helper[3];
 
 static UINT16 screen_height;
 
@@ -274,13 +274,13 @@ VIDEO_START( tia )
 	int cx = machine.primary_screen->width();
 
 	screen_height = machine.primary_screen->height();
-	helper[0] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, machine.primary_screen->format());
-	helper[1] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, machine.primary_screen->format());
-	helper[2] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, machine.primary_screen->format());
+	helper[0] = auto_bitmap_ind16_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT);
+	helper[1] = auto_bitmap_ind16_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT);
+	helper[2] = auto_bitmap_ind16_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT);
 }
 
 
-SCREEN_UPDATE( tia )
+SCREEN_UPDATE_IND16( tia )
 {
 	screen_height = screen.height();
 	copybitmap(bitmap, *helper[2], 0, 0, 0, 0, cliprect);

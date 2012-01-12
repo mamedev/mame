@@ -13,7 +13,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "render.h"
-#include "machine/laserdsc.h"
+#include "machine/ldstub.h"
+#include "machine/ldv1000.h"
 #include "cpu/cop400/cop400.h"
 //#include "dlair.lh"
 
@@ -35,9 +36,12 @@ class thayers_state : public driver_device
 {
 public:
 	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_pr7820(*this, "laserdisc"),
+		  m_ldv1000(*this, "laserdisc") { }
 
-	device_t *m_laserdisc;
+	optional_device<pioneer_pr7820_device> m_pr7820;
+	optional_device<pioneer_ldv1000_device> m_ldv1000;
 	UINT8 m_laserdisc_data;
 	int m_rx_bit;
 	int m_keylatch;
@@ -350,7 +354,9 @@ static READ8_HANDLER( dsw_b_r )
 static READ8_HANDLER( laserdsc_data_r )
 {
 	thayers_state *state = space->machine().driver_data<thayers_state>();
-	return laserdisc_data_r(state->m_laserdisc);
+	if (state->m_ldv1000 != NULL) return state->m_ldv1000->status_r();
+	if (state->m_pr7820 != NULL) return state->m_pr7820->data_r();
+	return 0;
 }
 
 static WRITE8_HANDLER( laserdsc_data_w )
@@ -381,22 +387,18 @@ static WRITE8_HANDLER( laserdsc_control_w )
 
 	if (BIT(data, 5))
 	{
-		laserdisc_data_w(state->m_laserdisc, state->m_laserdisc_data);
-	}
-
-	switch (laserdisc_get_type(state->m_laserdisc))
-	{
-		case LASERDISC_TYPE_PIONEER_PR7820:
+		if (state->m_ldv1000 != NULL) 
+		{
+			state->m_ldv1000->data_w(state->m_laserdisc_data);
+			state->m_ldv1000->enter_w(BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+		}
+		if (state->m_pr7820 != NULL)
+		{
+			state->m_pr7820->data_w(state->m_laserdisc_data);
 			state->m_pr7820_enter = BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE;
-
-			laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_ENTER, state->m_pr7820_enter);
-
+			state->m_pr7820->enter_w(state->m_pr7820_enter);
 			// BIT(data, 7) is INT/_EXT, but there is no such input line in laserdsc.h
-			break;
-
-		case LASERDISC_TYPE_PIONEER_LDV1000:
-			laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_ENTER, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
-			break;
+		}
 	}
 }
 
@@ -615,30 +617,16 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( laserdisc_enter_r )
 {
 	thayers_state *state = field.machine().driver_data<thayers_state>();
-	switch (laserdisc_get_type(state->m_laserdisc))
-	{
-		case LASERDISC_TYPE_PIONEER_PR7820:
-			return state->m_pr7820_enter;
-
-		case LASERDISC_TYPE_PIONEER_LDV1000:
-			return (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 0 : 1;
-	}
-
+	if (state->m_pr7820 != NULL) return state->m_pr7820_enter;
+	if (state->m_ldv1000 != NULL) return (state->m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
 static CUSTOM_INPUT( laserdisc_ready_r )
 {
 	thayers_state *state = field.machine().driver_data<thayers_state>();
-	switch (laserdisc_get_type(state->m_laserdisc))
-	{
-		case LASERDISC_TYPE_PIONEER_PR7820:
-			return (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
-
-		case LASERDISC_TYPE_PIONEER_LDV1000:
-			return (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_COMMAND) == ASSERT_LINE) ? 0 : 1;
-	}
-
+	if (state->m_pr7820 != NULL) return (state->m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
+	if (state->m_ldv1000 != NULL) return (state->m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
@@ -748,14 +736,12 @@ INPUT_PORTS_END
 static MACHINE_START( thayers )
 {
 	thayers_state *state = machine.driver_data<thayers_state>();
-	state->m_laserdisc = machine.device("laserdisc");
 	memset(&state->m_ssi263, 0, sizeof(state->m_ssi263));
 }
 
 static MACHINE_RESET( thayers )
 {
 	thayers_state *state = machine.driver_data<thayers_state>();
-	int newtype;
 
 	state->m_laserdisc_data = 0;
 
@@ -774,8 +760,8 @@ static MACHINE_RESET( thayers )
 	state->m_cart_present = 0;
 	state->m_pr7820_enter = 0;
 
-	newtype = (input_port_read(machine, "DSWB") & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
-	laserdisc_set_type(state->m_laserdisc, newtype);
+//	newtype = (input_port_read(machine, "DSWB") & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
+//	laserdisc_set_type(state->m_laserdisc, newtype);
 }
 
 /* COP400 Interface */
@@ -802,10 +788,10 @@ static MACHINE_CONFIG_START( thayers, thayers_state )
 	MCFG_MACHINE_START(thayers)
 	MCFG_MACHINE_RESET(thayers)
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
+	MCFG_LASERDISC_PR7820_ADD("laserdisc")
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -813,7 +799,7 @@ static MACHINE_CONFIG_START( thayers, thayers_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	// SSI 263 @ 2MHz
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

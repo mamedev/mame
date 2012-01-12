@@ -15,7 +15,7 @@ public:
 /*----------- defined in video/speedspn.c -----------*/
 
 VIDEO_START( speedspn );
-SCREEN_UPDATE( speedspn );
+SCREEN_UPDATE_IND16( speedspn );
 
 WRITE8_HANDLER( speedspn_vidram_w );
 WRITE8_HANDLER( speedspn_attram_w );

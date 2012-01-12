@@ -61,8 +61,8 @@ public:
 	static void static_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg) { space->machine().driver_data<btoads_state>()->to_shiftreg(space, address, shiftreg); }
 	void from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
 	static void static_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg) { space->machine().driver_data<btoads_state>()->from_shiftreg(space, address, shiftreg); }
-	void scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params);
-	static void static_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params) { screen.machine().driver_data<btoads_state>()->scanline_update(screen, bitmap, scanline, params); }
+	void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);
+	static void static_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params) { screen.machine().driver_data<btoads_state>()->scanline_update(screen, bitmap, scanline, params); }
 
 protected:
 	// device overrides

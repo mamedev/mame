@@ -58,13 +58,13 @@
 /* special priority type meaning "none" */
 typedef struct { char dummy[3]; } NO_PRIORITY;
 
-extern bitmap_t drawgfx_dummy_priority_bitmap;
+extern bitmap_ind8 drawgfx_dummy_priority_bitmap;
 #define DECLARE_NO_PRIORITY bitmap_t &priority = drawgfx_dummy_priority_bitmap;
 
 
 /* macros for using the optional priority */
 #define PRIORITY_VALID(x)		(sizeof(x) != sizeof(NO_PRIORITY))
-#define PRIORITY_ADDR(p,t,y,x)	(PRIORITY_VALID(t) ? (&(p).pix<t>(y, x)) : NULL)
+#define PRIORITY_ADDR(p,t,y,x)	(PRIORITY_VALID(t) ? (&(p).pixt<t>(y, x)) : NULL)
 #define PRIORITY_ADVANCE(t,p,i)	do { if (PRIORITY_VALID(t)) (p) += (i); } while (0)
 
 
@@ -305,34 +305,12 @@ while (0)																			\
     against the destination using 'alpha'
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_TRANSPEN_ALPHA16(DEST, PRIORITY, SOURCE)						\
-do																					\
-{																					\
-	UINT32 srcdata = (SOURCE);														\
-	if (srcdata != transpen)														\
-		(DEST) = alpha_blend_r16((DEST), paldata[srcdata], alpha);					\
-}																					\
-while (0)																			\
-
 #define PIXEL_OP_REMAP_TRANSPEN_ALPHA32(DEST, PRIORITY, SOURCE)						\
 do																					\
 {																					\
 	UINT32 srcdata = (SOURCE);														\
 	if (srcdata != transpen)														\
 		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alpha);					\
-}																					\
-while (0)																			\
-
-#define PIXEL_OP_REMAP_TRANSPEN_ALPHA16_PRIORITY(DEST, PRIORITY, SOURCE)			\
-do																					\
-{																					\
-	UINT32 srcdata = (SOURCE);														\
-	if (srcdata != transpen)														\
-	{																				\
-		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)								\
-			(DEST) = alpha_blend_r16((DEST), paldata[srcdata], alpha);				\
-		(PRIORITY) = 31;															\
-	}																				\
 }																					\
 while (0)																			\
 
@@ -387,7 +365,8 @@ do {																					\
 		assert(cliprect.min_x >= 0);													\
 		assert(cliprect.max_x < dest.width());											\
 		assert(cliprect.min_y >= 0);													\
-		assert(cliprect.max_y < dest.height());										\
+		assert(cliprect.max_y < dest.height());											\
+		assert(code < gfx->total_elements);												\
 																						\
 		/* ignore empty/invalid cliprects */											\
 		if (cliprect.empty())															\
@@ -400,10 +379,10 @@ do {																					\
 																						\
 		/* apply left clip */															\
 		srcx = 0;																		\
-		if (destx < cliprect.min_x)													\
+		if (destx < cliprect.min_x)														\
 		{																				\
 			srcx = cliprect.min_x - destx;												\
-			destx = cliprect.min_x;													\
+			destx = cliprect.min_x;														\
 		}																				\
 																						\
 		/* apply right clip */															\
@@ -417,10 +396,10 @@ do {																					\
 																						\
 		/* apply top clip */															\
 		srcy = 0;																		\
-		if (desty < cliprect.min_y)													\
+		if (desty < cliprect.min_y)														\
 		{																				\
 			srcy = cliprect.min_y - desty;												\
-			desty = cliprect.min_y;													\
+			desty = cliprect.min_y;														\
 		}																				\
 																						\
 		/* apply bottom clip */															\
@@ -459,7 +438,7 @@ do {																					\
 				for (cury = desty; cury <= destendy; cury++)							\
 				{																		\
 					PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-					PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, destx);			\
+					PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
 					const UINT8 *srcptr = srcdata;										\
 					srcdata += dy;														\
 																						\
@@ -494,7 +473,7 @@ do {																					\
 				for (cury = desty; cury <= destendy; cury++)							\
 				{																		\
 					PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-					PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, destx);			\
+					PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
 					const UINT8 *srcptr = srcdata;										\
 					srcdata += dy;														\
 																						\
@@ -541,7 +520,7 @@ do {																					\
 				for (cury = desty; cury <= destendy; cury++)							\
 				{																		\
 					PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-					PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, destx);			\
+					PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
 					const UINT8 *srcptr = srcdata;										\
 					srcdata += dy;														\
 																						\
@@ -582,7 +561,7 @@ do {																					\
 				for (cury = desty; cury <= destendy; cury++)							\
 				{																		\
 					PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-					PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, destx);			\
+					PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
 					const UINT8 *srcptr = srcdata;										\
 					srcdata += dy;														\
 																						\
@@ -612,7 +591,7 @@ do {																					\
 			}																			\
 		}																				\
 	} while (0);																		\
-	g_profiler.stop();														\
+	g_profiler.stop();																	\
 } while (0)
 
 
@@ -737,7 +716,7 @@ do {																					\
 			for (cury = desty; cury <= destendy; cury++)								\
 			{																			\
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-				PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, destx);				\
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);				\
 				const UINT8 *srcptr = srcdata + (srcy >> 16) * gfx->line_modulo;		\
 				INT32 cursrcx = srcx;													\
 				srcy += dy;																\
@@ -776,7 +755,7 @@ do {																					\
 			for (cury = desty; cury <= destendy; cury++)								\
 			{																			\
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-				PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, destx);				\
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);				\
 				const UINT8 *srcptr = srcdata + (srcy >> 16) * gfx->line_modulo;		\
 				INT32 cursrcx = srcx;													\
 				srcy += dy;																\
@@ -894,7 +873,7 @@ do {																					\
 		leftovers = (destendx + 1 - destx) - 4 * numblocks;								\
 																						\
 		/* compute the address of the first source pixel of the first row */			\
-		srcdata = &src.pix<PIXEL_TYPE>(srcy, srcx);									\
+		srcdata = &src.pixt<PIXEL_TYPE>(srcy, srcx);									\
 																						\
 		/* non-flipped case */															\
 		if (!flipx)																		\
@@ -903,7 +882,7 @@ do {																					\
 			for (cury = desty; cury <= destendy; cury++)								\
 			{																			\
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-				PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, destx);				\
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);				\
 				const PIXEL_TYPE *srcptr = srcdata;										\
 				srcdata += dy;															\
 																						\
@@ -938,7 +917,7 @@ do {																					\
 			for (cury = desty; cury <= destendy; cury++)								\
 			{																			\
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-				PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, destx);				\
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);				\
 				const PIXEL_TYPE *srcptr = srcdata;										\
 				srcdata += dy;															\
 																						\
@@ -1035,7 +1014,7 @@ do {																				\
 			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)			\
 			{																		\
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
-				PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, cliprect.min_x); \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
 				const PIXEL_TYPE *srcptr;											\
 				INT32 srcx = startx;												\
 				INT32 srcy = starty;												\
@@ -1045,7 +1024,7 @@ do {																				\
 				/* check srcy for the whole row at once */							\
 				if ((UINT32)srcy < srcfixheight)									\
 				{																	\
-					srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16);						\
+					srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16);						\
 																					\
 					/* iterate over unrolled blocks of 4 */							\
 					for (curx = 0; curx < numblocks; curx++)						\
@@ -1096,8 +1075,8 @@ do {																				\
 			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)			\
 			{																		\
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
-				PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, cliprect.min_x); \
-				const PIXEL_TYPE *srcptr = &src.pix<PIXEL_TYPE>(starty >> 16);	\
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
+				const PIXEL_TYPE *srcptr = &src.pixt<PIXEL_TYPE>(starty >> 16); 	\
 				INT32 srcx = startx;												\
 																					\
 				starty = (starty + incyy) & srcfixheight;							\
@@ -1143,7 +1122,7 @@ do {																				\
 			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)			\
 			{																		\
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
-				PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, cliprect.min_x); \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
 				const PIXEL_TYPE *srcptr;											\
 				INT32 srcx = startx;												\
 				INT32 srcy = starty;												\
@@ -1156,7 +1135,7 @@ do {																				\
 				{																	\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
+						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
 						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
@@ -1164,7 +1143,7 @@ do {																				\
 																					\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
+						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
 						PIXEL_OP(destptr[1], priptr[1], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
@@ -1172,7 +1151,7 @@ do {																				\
 																					\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
+						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
 						PIXEL_OP(destptr[2], priptr[2], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
@@ -1180,7 +1159,7 @@ do {																				\
 																					\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
+						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
 						PIXEL_OP(destptr[3], priptr[3], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
@@ -1195,7 +1174,7 @@ do {																				\
 				{																	\
 					if ((UINT32)srcx < srcfixwidth && (UINT32)srcy < srcfixheight)	\
 					{																\
-						srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);	\
+						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16); 	\
 						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);					\
 					}																\
 					srcx += incxx;													\
@@ -1219,7 +1198,7 @@ do {																				\
 			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)			\
 			{																		\
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
-				PIXEL_TYPE *destptr = &dest.pix<PIXEL_TYPE>(cury, cliprect.min_x); \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
 				const PIXEL_TYPE *srcptr;											\
 				INT32 srcx = startx;												\
 				INT32 srcy = starty;												\
@@ -1230,22 +1209,22 @@ do {																				\
 				/* iterate over unrolled blocks of 4 */								\
 				for (curx = 0; curx < numblocks; curx++)							\
 				{																	\
-					srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
+					srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
 					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);						\
 					srcx = (srcx + incxx) & srcfixwidth;							\
 					srcy = (srcy + incxy) & srcfixheight;							\
 																					\
-					srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
+					srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
 					PIXEL_OP(destptr[1], priptr[1], srcptr[0]);						\
 					srcx = (srcx + incxx) & srcfixwidth;							\
 					srcy = (srcy + incxy) & srcfixheight;							\
 																					\
-					srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
+					srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
 					PIXEL_OP(destptr[2], priptr[2], srcptr[0]);						\
 					srcx = (srcx + incxx) & srcfixwidth;							\
 					srcy = (srcy + incxy) & srcfixheight;							\
 																					\
-					srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
+					srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
 					PIXEL_OP(destptr[3], priptr[3], srcptr[0]);						\
 					srcx = (srcx + incxx) & srcfixwidth;							\
 					srcy = (srcy + incxy) & srcfixheight;							\
@@ -1257,7 +1236,7 @@ do {																				\
 				/* iterate over leftover pixels */									\
 				for (curx = 0; curx < leftovers; curx++)							\
 				{																	\
-					srcptr = &src.pix<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
+					srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);			\
 					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);						\
 					srcx = (srcx + incxx) & srcfixwidth;							\
 					srcy = (srcy + incxy) & srcfixheight;							\
@@ -1299,7 +1278,7 @@ do {																				\
 																					\
 	{																				\
 		PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, desty, destx); \
-		PIXEL_TYPE *destptr = &bitmap.pix<PIXEL_TYPE>(desty, destx);				\
+		PIXEL_TYPE *destptr = &bitmap.pixt<PIXEL_TYPE>(desty, destx);				\
 																					\
 		/* iterate over unrolled blocks of 4 */										\
 		while (length >= 4)															\
@@ -1352,7 +1331,7 @@ do {																				\
 	assert(destptr != NULL);														\
 																					\
 	{																				\
-		const PIXEL_TYPE *srcptr = &bitmap.pix<PIXEL_TYPE>(srcy, srcx);			\
+		const PIXEL_TYPE *srcptr = &bitmap.pixt<PIXEL_TYPE>(srcy, srcx);			\
 																					\
 		/* iterate over unrolled blocks of 4 */										\
 		while (length >= 4)															\

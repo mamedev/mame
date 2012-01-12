@@ -150,7 +150,7 @@ VIDEO_START( m107 )
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m107_state *state = machine.driver_data<m107_state>();
 	UINT16 *spriteram = state->m_buffered_spriteram;
@@ -313,7 +313,7 @@ static void m107_update_scroll_positions(running_machine &machine)
 
 /*****************************************************************************/
 
-static void m107_tilemap_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int laynum, int category,int opaque)
+static void m107_tilemap_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category,int opaque)
 {
 	m107_state *state = machine.driver_data<m107_state>();
 	int line;
@@ -342,7 +342,7 @@ static void m107_tilemap_draw(running_machine &machine, bitmap_t &bitmap, const 
 }
 
 
-static void m107_screenrefresh(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void m107_screenrefresh(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m107_state *state = machine.driver_data<m107_state>();
 	machine.priority_bitmap.fill(0, cliprect);
@@ -388,7 +388,7 @@ WRITE16_HANDLER( m107_spritebuffer_w )
 
 /*****************************************************************************/
 
-SCREEN_UPDATE( m107 )
+SCREEN_UPDATE_IND16( m107 )
 {
 	m107_update_scroll_positions(screen.machine());
 	m107_screenrefresh(screen.machine(), bitmap, cliprect);

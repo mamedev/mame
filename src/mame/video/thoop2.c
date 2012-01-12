@@ -148,7 +148,7 @@ static void thoop2_sort_sprites(running_machine &machine)
       3  | xxxxxxxx xxxxxx-- | sprite code (low bits)
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
 	thoop2_state *state = machine.driver_data<thoop2_state>();
 	int j, x, y, ex, ey;
@@ -199,7 +199,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 ***************************************************************************/
 
-SCREEN_UPDATE( thoop2 )
+SCREEN_UPDATE_IND16( thoop2 )
 {
 	thoop2_state *state = screen.machine().driver_data<thoop2_state>();
 	/* set scroll registers */

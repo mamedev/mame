@@ -269,7 +269,7 @@ public:
 	UINT32* m_h1_vram;
 	UINT32* m_sysh1_txt_blit;
 	UINT32* m_txt_vram;
-	bitmap_t* m_temp_bitmap_sprites;
+	bitmap_rgb32 m_temp_bitmap_sprites;
 	UINT32 m_test_offs;
 	int m_color;
 	UINT8 m_vblank;
@@ -296,11 +296,11 @@ static VIDEO_START(coolridr)
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_temp_bitmap_sprites  = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+	state->m_temp_bitmap_sprites.allocate(width, height);
 	state->m_test_offs = 0x2000;
 }
 
-static SCREEN_UPDATE(coolridr)
+static SCREEN_UPDATE_RGB32(coolridr)
 {
 	coolridr_state *state = screen.machine().driver_data<coolridr_state>();
 	/* planes seems to basically be at 0x8000 and 0x28000... */
@@ -356,8 +356,8 @@ static SCREEN_UPDATE(coolridr)
 		}
 	}
 
-	copybitmap_trans(bitmap, *state->m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
-	state->m_temp_bitmap_sprites->fill(0, cliprect);
+	copybitmap_trans(bitmap, state->m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
+	state->m_temp_bitmap_sprites.fill(0, cliprect);
 
 
 	return 0;
@@ -477,9 +477,9 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 
 						y2 = (state->m_attr_buff[9] & 0x01ff0000) >> 16;
 						x2 = (state->m_attr_buff[9] & 0x000001ff);
-						clip = state->m_temp_bitmap_sprites->cliprect();
+						clip = state->m_temp_bitmap_sprites.cliprect();
 
-						drawgfx_opaque(*state->m_temp_bitmap_sprites,clip,gfx,1,1,0,0,x2,y2);
+						drawgfx_opaque(state->m_temp_bitmap_sprites,clip,gfx,1,1,0,0,x2,y2);
 					}
 				}
 				if(state->m_attr_index == 0xc)
@@ -1112,10 +1112,9 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(128*8+22, 64*8+44)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1) //TODO: these are just two different screens
-	MCFG_SCREEN_UPDATE(coolridr)
+	MCFG_SCREEN_UPDATE_STATIC(coolridr)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 	MCFG_MACHINE_RESET(coolridr)

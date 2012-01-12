@@ -55,7 +55,7 @@ struct _kaneko_pandora_state
 {
 	screen_device *screen;
 	UINT8 *      spriteram;
-	bitmap_t     *sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
+	bitmap_ind16     *sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
 	int          clear_bitmap;
 	UINT8        region;
 	int          xoffset, yoffset;
@@ -97,7 +97,7 @@ void pandora_set_clear_bitmap( device_t *device, int clear )
 	pandora->clear_bitmap = clear;
 }
 
-void pandora_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
+void pandora_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	kaneko_pandora_state *pandora = get_safe_token(device);
 
@@ -111,7 +111,7 @@ void pandora_update( device_t *device, bitmap_t &bitmap, const rectangle &clipre
 }
 
 
-static void pandora_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
+static void pandora_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	kaneko_pandora_state *pandora = get_safe_token(device);
 	int sx = 0, sy = 0, x = 0, y = 0, offs;
@@ -309,7 +309,7 @@ static DEVICE_START( kaneko_pandora )
 
 	pandora->spriteram = auto_alloc_array(device->machine(), UINT8, 0x1000);
 
-	pandora->sprites_bitmap = pandora->screen->alloc_compatible_bitmap();
+	pandora->sprites_bitmap = auto_bitmap_ind16_alloc(device->machine(), pandora->screen->width(), pandora->screen->height());
 
 	device->save_item(NAME(pandora->clear_bitmap));
 	device->save_pointer(NAME(pandora->spriteram), 0x1000);

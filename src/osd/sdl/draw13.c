@@ -923,9 +923,6 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 		case TEXFORMAT_PALETTE16:
 			texture->format = SDL_TEXFORMAT_PALETTE16;
 			break;
-		case TEXFORMAT_RGB15:
-			texture->format = texsource->palette ? SDL_TEXFORMAT_RGB15_PALETTED : SDL_TEXFORMAT_RGB15;
-			break;
 		case TEXFORMAT_PALETTEA16:
 			texture->format = SDL_TEXFORMAT_PALETTE16A;
 			break;

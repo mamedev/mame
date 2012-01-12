@@ -46,7 +46,7 @@ void surpratk_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-SCREEN_UPDATE( surpratk )
+SCREEN_UPDATE_IND16( surpratk )
 {
 	surpratk_state *state = screen.machine().driver_data<surpratk_state>();
 	int layer[3], bg_colorbase;

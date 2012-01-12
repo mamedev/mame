@@ -57,8 +57,8 @@ VIDEO_START( xmen6p )
 
 	k053247_get_ram(state->m_k053246, &state->m_k053247_ram);
 
-	state->m_screen_left  = auto_bitmap_alloc(machine, 64 * 8, 32 * 8, BITMAP_FORMAT_INDEXED16);
-	state->m_screen_right = auto_bitmap_alloc(machine, 64 * 8, 32 * 8, BITMAP_FORMAT_INDEXED16);
+	state->m_screen_left  = auto_bitmap_ind16_alloc(machine, 64 * 8, 32 * 8);
+	state->m_screen_right = auto_bitmap_ind16_alloc(machine, 64 * 8, 32 * 8);
 
 	state->save_item(NAME(*state->m_screen_left));
 	state->save_item(NAME(*state->m_screen_right));
@@ -71,7 +71,7 @@ VIDEO_START( xmen6p )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( xmen )
+SCREEN_UPDATE_IND16( xmen )
 {
 	xmen_state *state = screen.machine().driver_data<xmen_state>();
 	int layer[3], bg_colorbase;
@@ -107,7 +107,7 @@ SCREEN_UPDATE( xmen )
 }
 
 
-SCREEN_UPDATE( xmen6p_left )
+SCREEN_UPDATE_IND16( xmen6p_left )
 {
 	xmen_state *state = screen.machine().driver_data<xmen_state>();
 	int x, y;
@@ -124,7 +124,7 @@ SCREEN_UPDATE( xmen6p_left )
 	return 0;
 }
 
-SCREEN_UPDATE( xmen6p_right )
+SCREEN_UPDATE_IND16( xmen6p_right )
 {
 	xmen_state *state = screen.machine().driver_data<xmen_state>();
 	int x, y;
@@ -146,7 +146,7 @@ SCREEN_EOF( xmen6p )
 {
 	xmen_state *state = screen.machine().driver_data<xmen_state>();
 	int layer[3], bg_colorbase;
-	bitmap_t * renderbitmap;
+	bitmap_ind16 * renderbitmap;
 	rectangle cliprect;
 	int offset;
 

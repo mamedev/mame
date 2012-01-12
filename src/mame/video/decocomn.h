@@ -50,7 +50,7 @@ READ16_DEVICE_HANDLER( decocomn_71_r );
 void decocomn_clear_sprite_priority_bitmap(device_t *device);
 void decocomn_pdrawgfx(
 		device_t *device,
-		bitmap_t &dest,const rectangle &clip,const gfx_element *gfx,
+		bitmap_rgb32 &dest,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha);
 

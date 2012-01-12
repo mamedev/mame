@@ -21,7 +21,7 @@ public:
 
 VIDEO_START( timelimt );
 PALETTE_INIT( timelimt );
-SCREEN_UPDATE( timelimt );
+SCREEN_UPDATE_IND16( timelimt );
 
 WRITE8_HANDLER( timelimt_videoram_w );
 WRITE8_HANDLER( timelimt_bg_videoram_w );

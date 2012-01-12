@@ -137,11 +137,11 @@ static VIDEO_START( skimaxx )
 	memory_configure_bank(machine, "bank1", 1, 1, state->m_bg_buffer_front, 0);
 }
 
-static SCREEN_UPDATE( skimaxx )
+static SCREEN_UPDATE_IND16( skimaxx )
 {
 //  popmessage("%02x %02x", input_port_read(screen.machine(), "X"), input_port_read(screen.machine(), "Y") );
 
-	SCREEN_UPDATE_CALL(tms340x0);
+	SCREEN_UPDATE16_CALL(tms340x0_ind16);
 
 	return 0;
 }
@@ -172,7 +172,7 @@ static void skimaxx_from_shiftreg(address_space *space, UINT32 address, UINT16 *
  *
  *************************************/
 
-static void skimaxx_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
+static void skimaxx_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	skimaxx_state *state = screen.machine().driver_data<skimaxx_state>();
 	// TODO: This isn't correct. I just hacked it together quickly so I could see something!
@@ -486,7 +486,8 @@ static const tms34010_config tms_config =
 	"screen",                  /* the screen operated on */
 	50000000/8,                /* pixel clock */
 	2,                         /* pixels per clock */
-	skimaxx_scanline_update,   /* scanline updater */
+	skimaxx_scanline_update,   /* scanline updater (indexed16) */
+	NULL,					   /* scanline updater (rgb32) */
 	skimaxx_tms_irq,           /* generate interrupt */
 	skimaxx_to_shiftreg,       /* write to shiftreg function */
 	skimaxx_from_shiftreg      /* read from shiftreg function */
@@ -526,14 +527,13 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 //  MCFG_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300) // TODO - Wrong but TMS overrides it anyway
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(0x400, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x280-1, 0, 0xf0-1)
-//  MCFG_SCREEN_UPDATE(tms340x0)
-	MCFG_SCREEN_UPDATE(skimaxx)
+//  MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
+	MCFG_SCREEN_UPDATE_STATIC(skimaxx)
 
 	MCFG_VIDEO_START(skimaxx)
 

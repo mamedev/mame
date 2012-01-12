@@ -209,7 +209,7 @@ Offset:         Values:         Format:
 
 ------------------------------------------------------------------------ */
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	ginganin_state *state = machine.driver_data<ginganin_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -245,7 +245,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap,const recta
 }
 
 
-SCREEN_UPDATE( ginganin )
+SCREEN_UPDATE_IND16( ginganin )
 {
 	ginganin_state *state = screen.machine().driver_data<ginganin_state>();
 	int layers_ctrl1 = state->m_layers_ctrl;

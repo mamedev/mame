@@ -26,6 +26,6 @@ public:
 
 /*----------- defined in video/taito_h.c -----------*/
 
-SCREEN_UPDATE( syvalion );
-SCREEN_UPDATE( recordbr );
-SCREEN_UPDATE( dleague );
+SCREEN_UPDATE_IND16( syvalion );
+SCREEN_UPDATE_IND16( recordbr );
+SCREEN_UPDATE_IND16( dleague );

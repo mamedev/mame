@@ -25,7 +25,7 @@ PALETTE_INIT( flower )
 		colortable_entry_set_value(machine.colortable, i, i);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	flower_state *state = machine.driver_data<flower_state>();
 	const gfx_element *gfx = machine.gfx[1];
@@ -163,7 +163,7 @@ VIDEO_START(flower)
 	tilemap_set_scrolly(state->m_text_right_tilemap, 0, 16);
 }
 
-SCREEN_UPDATE( flower )
+SCREEN_UPDATE_IND16( flower )
 {
 	flower_state *state = screen.machine().driver_data<flower_state>();
 	rectangle myclip = cliprect;

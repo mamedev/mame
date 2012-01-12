@@ -182,7 +182,7 @@ WRITE16_HANDLER( shrike_io_68k_w );
 /*----------- defined in video/balsente.c -----------*/
 
 VIDEO_START( balsente );
-SCREEN_UPDATE( balsente );
+SCREEN_UPDATE_IND16( balsente );
 
 WRITE8_HANDLER( balsente_videoram_w );
 WRITE8_HANDLER( balsente_paletteram_w );

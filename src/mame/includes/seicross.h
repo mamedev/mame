@@ -29,4 +29,4 @@ WRITE8_HANDLER( seicross_colorram_w );
 
 PALETTE_INIT( seicross );
 VIDEO_START( seicross );
-SCREEN_UPDATE( seicross );
+SCREEN_UPDATE_IND16( seicross );

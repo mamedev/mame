@@ -28,6 +28,13 @@ static MACHINE_START( ___empty )
 }
 
 
+static SCREEN_UPDATE_RGB32( empty )
+{
+	bitmap.fill(RGB_BLACK);
+	return 0;
+}
+
+
 
 /*************************************
  *
@@ -41,7 +48,7 @@ static MACHINE_CONFIG_START( ___empty, driver_device )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_UPDATE_STATIC(empty)
 	MCFG_SCREEN_SIZE(640,480)
 	MCFG_SCREEN_VISIBLE_AREA(0,639, 0,479)
 	MCFG_SCREEN_REFRESH_RATE(30)

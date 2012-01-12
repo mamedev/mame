@@ -87,7 +87,7 @@ WRITE8_HANDLER( speedatk_6845_w )
 	}
 }
 
-SCREEN_UPDATE( speedatk )
+SCREEN_UPDATE_IND16( speedatk )
 {
 	speedatk_state *state = screen.machine().driver_data<speedatk_state>();
 	int x,y;

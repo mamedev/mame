@@ -1262,7 +1262,7 @@ static VIDEO_START(segac2_new)
 	megadrive_vdp_palette_lookup_highlight = auto_alloc_array(machine, UINT16, 0x1000/2);
 }
 
-static SCREEN_UPDATE(segac2_new)
+static SCREEN_UPDATE_RGB32(segac2_new)
 {
 	segac2_state *state = screen.machine().driver_data<segac2_state>();
 	if (!state->m_segac2_enable_display)
@@ -1271,7 +1271,7 @@ static SCREEN_UPDATE(segac2_new)
 		return 0;
 	}
 
-	SCREEN_UPDATE_CALL(megadriv);
+	SCREEN_UPDATE32_CALL(megadriv);
 	return 0;
 }
 
@@ -1292,12 +1292,11 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	//MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE(segac2_new)
+	MCFG_SCREEN_UPDATE_STATIC(segac2_new)
 	MCFG_SCREEN_EOF( megadriv )
 
 	MCFG_PALETTE_LENGTH(2048)

@@ -17,7 +17,7 @@ public:
 //  UINT16 *    m_spriteram;  // currently this uses generic buffered spriteram
 
 	/* video-related */
-	bitmap_t    *m_bitmap_f;
+	bitmap_ind16    *m_bitmap_f;
 	tilemap_t     *m_fix_tilemap;
 	int         m_flipscreen;
 	UINT16      m_scroll[2];
@@ -57,4 +57,4 @@ void karnov_flipscreen_w(running_machine &machine, int data);
 PALETTE_INIT( karnov );
 VIDEO_START( karnov );
 VIDEO_START( wndrplnt );
-SCREEN_UPDATE( karnov );
+SCREEN_UPDATE_IND16( karnov );

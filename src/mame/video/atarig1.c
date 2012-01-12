@@ -151,7 +151,7 @@ void atarig1_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE( atarig1 )
+SCREEN_UPDATE_IND16( atarig1 )
 {
 	atarig1_state *state = screen.machine().driver_data<atarig1_state>();
 

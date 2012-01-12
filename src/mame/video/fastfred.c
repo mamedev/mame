@@ -231,7 +231,7 @@ WRITE8_HANDLER( fastfred_flip_screen_y_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
@@ -296,7 +296,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( fastfred )
+SCREEN_UPDATE_IND16( fastfred )
 {
 	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
 	bitmap.fill(*state->m_background_color, cliprect);
@@ -366,7 +366,7 @@ VIDEO_START( imago )
 	palette_set_color(machine,256+64+1,MAKE_RGB(0x00,0x00,0x00));
 }
 
-SCREEN_UPDATE( imago )
+SCREEN_UPDATE_IND16( imago )
 {
 	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
 	tilemap_draw(bitmap,cliprect,state->m_web_tilemap,0,0);

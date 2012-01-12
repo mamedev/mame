@@ -225,11 +225,11 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_4_w );
 
 /*----------- defined in video/mw8080bw.c -----------*/
 
-SCREEN_UPDATE( mw8080bw );
+SCREEN_UPDATE_RGB32( mw8080bw );
 
-SCREEN_UPDATE( spcenctr );
+SCREEN_UPDATE_RGB32( spcenctr );
 
-SCREEN_UPDATE( phantom2 );
+SCREEN_UPDATE_RGB32( phantom2 );
 SCREEN_EOF( phantom2 );
 
-SCREEN_UPDATE( invaders );
+SCREEN_UPDATE_RGB32( invaders );

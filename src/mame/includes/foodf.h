@@ -32,4 +32,4 @@ WRITE16_HANDLER( foodf_paletteram_w );
 
 void foodf_set_flip(foodf_state *state, int flip);
 VIDEO_START( foodf );
-SCREEN_UPDATE( foodf );
+SCREEN_UPDATE_IND16( foodf );

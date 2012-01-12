@@ -148,8 +148,8 @@ static void hyhoo_gfxdraw(running_machine &machine)
 
 						pen = MAKE_RGB(pal6bit(r), pal5bit(g), pal5bit(b));
 
-						state->m_tmpbitmap->pix32(dy, dx1) = state->m_tmpbitmap->pix32(dy, dx1) | pen;
-						state->m_tmpbitmap->pix32(dy, dx2) = state->m_tmpbitmap->pix32(dy, dx2) | pen;
+						state->m_tmpbitmap.pix32(dy, dx1) = state->m_tmpbitmap.pix32(dy, dx1) | pen;
+						state->m_tmpbitmap.pix32(dy, dx2) = state->m_tmpbitmap.pix32(dy, dx2) | pen;
 					}
 					else
 					{
@@ -164,8 +164,8 @@ static void hyhoo_gfxdraw(running_machine &machine)
 
 						pen = MAKE_RGB(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
-						state->m_tmpbitmap->pix32(dy, dx1) = pen;
-						state->m_tmpbitmap->pix32(dy, dx2) = pen;
+						state->m_tmpbitmap.pix32(dy, dx1) = pen;
+						state->m_tmpbitmap.pix32(dy, dx2) = pen;
 					}
 				}
 			}
@@ -197,7 +197,7 @@ static void hyhoo_gfxdraw(running_machine &machine)
 
 					pen = MAKE_RGB(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
-					state->m_tmpbitmap->pix32(dy, dx1) = pen;
+					state->m_tmpbitmap.pix32(dy, dx1) = pen;
 				}
 
 				if (state->m_clut[color2])
@@ -211,7 +211,7 @@ static void hyhoo_gfxdraw(running_machine &machine)
 
 					pen = MAKE_RGB(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
-					state->m_tmpbitmap->pix32(dy, dx2) = pen;
+					state->m_tmpbitmap.pix32(dy, dx2) = pen;
 				}
 			}
 
@@ -227,15 +227,15 @@ static void hyhoo_gfxdraw(running_machine &machine)
 VIDEO_START( hyhoo )
 {
 	hyhoo_state *state = machine.driver_data<hyhoo_state>();
-	state->m_tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmpbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
 
-SCREEN_UPDATE( hyhoo )
+SCREEN_UPDATE_RGB32( hyhoo )
 {
 	hyhoo_state *state = screen.machine().driver_data<hyhoo_state>();
 	if (state->m_dispflag)
-		copybitmap(bitmap, *state->m_tmpbitmap, state->m_flipscreen, state->m_flipscreen, 0, 0, cliprect);
+		copybitmap(bitmap, state->m_tmpbitmap, state->m_flipscreen, state->m_flipscreen, 0, 0, cliprect);
 	else
 		bitmap.fill(RGB_BLACK, cliprect);
 

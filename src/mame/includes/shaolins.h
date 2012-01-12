@@ -29,4 +29,4 @@ WRITE8_HANDLER( shaolins_nmi_w );
 
 PALETTE_INIT( shaolins );
 VIDEO_START( shaolins );
-SCREEN_UPDATE( shaolins );
+SCREEN_UPDATE_IND16( shaolins );

@@ -104,7 +104,7 @@ static VIDEO_START(cabaret)
 }
 
 
-static SCREEN_UPDATE(cabaret)
+static SCREEN_UPDATE_IND16(cabaret)
 {
 	cabaret_state *state = screen.machine().driver_data<cabaret_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -338,10 +338,9 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(cabaret)
+	MCFG_SCREEN_UPDATE_STATIC(cabaret)
 
 	MCFG_GFXDECODE(cabaret)
 	MCFG_PALETTE_LENGTH(0x800)

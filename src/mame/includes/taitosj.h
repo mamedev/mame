@@ -33,11 +33,11 @@ public:
 	UINT8 m_spacecr_prot_value;
 	UINT8 m_protection_value;
 	UINT32 m_address;
-	bitmap_t *m_layer_bitmap[3];
-	bitmap_t *m_sprite_sprite_collbitmap1;
-	bitmap_t *m_sprite_sprite_collbitmap2;
-	bitmap_t *m_sprite_layer_collbitmap1;
-	bitmap_t *m_sprite_layer_collbitmap2[3];
+	bitmap_ind16 m_layer_bitmap[3];
+	bitmap_ind16 m_sprite_sprite_collbitmap1;
+	bitmap_ind16 m_sprite_sprite_collbitmap2;
+	bitmap_ind16 m_sprite_layer_collbitmap1;
+	bitmap_ind16 m_sprite_layer_collbitmap2[3];
 	int m_draw_order[32][4];
 };
 
@@ -72,5 +72,5 @@ WRITE8_HANDLER( taitosj_characterram_w );
 WRITE8_HANDLER( junglhbr_characterram_w );
 WRITE8_HANDLER( taitosj_collision_reg_clear_w );
 VIDEO_START( taitosj );
-SCREEN_UPDATE( taitosj );
-SCREEN_UPDATE( kikstart );
+SCREEN_UPDATE_IND16( taitosj );
+SCREEN_UPDATE_IND16( kikstart );

@@ -769,16 +769,15 @@ void sdl_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
    UniChar uni_char;
    CGGlyph glyph;
-   bitmap_t *bitmap = (bitmap_t *)NULL;
    CTFontRef ct_font = (CTFontRef)font;
    const CFIndex count = 1;
    CGRect bounding_rect, success_rect;
    CGContextRef context_ref;
-
+   
    if( chnum == ' ' )
    {
       uni_char = 'n';
@@ -814,9 +813,9 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
       color_space = CGColorSpaceCreateDeviceRGB();
       bits_per_component = 8;
 
-      bitmap = auto_alloc(machine(), bitmap_t(bitmap_width, bitmap_height, BITMAP_FORMAT_ARGB32));
+      bitmap.allocate(bitmap_width, bitmap_height);
 
-      context_ref = CGBitmapContextCreate( bitmap->raw_pixptr(0), bitmap_width, bitmap_height, bits_per_component, bitmap->rowpixels()*4, color_space, bitmap_info );
+      context_ref = CGBitmapContextCreate( bitmap.raw_pixptr(0), bitmap_width, bitmap_height, bits_per_component, bitmap.rowpixels()*4, color_space, bitmap_info );
 
       if( context_ref != NULL )
       {
@@ -834,7 +833,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
       CGColorSpaceRelease( color_space );
    }
 
-   return bitmap;
+   return bitmap.valid();
 }
 #else // UNIX but not OSX
 
@@ -1057,14 +1056,13 @@ void sdl_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	TTF_Font *ttffont;
-	bitmap_t *bitmap = (bitmap_t *)NULL;
 	SDL_Surface *drawsurf;
 	SDL_Color fcol = { 0xff, 0xff, 0xff };
 	UINT16 ustr[16];
-
+	
 	ttffont = (TTF_Font *)font;
 
 	memset(ustr,0,sizeof(ustr));
@@ -1075,12 +1073,12 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 	if (drawsurf)
 	{
 		// allocate a MAME destination bitmap
-		bitmap = auto_alloc(machine(), bitmap_t(drawsurf->w, drawsurf->h, BITMAP_FORMAT_ARGB32));
+		bitmap.allocate(drawsurf->w, drawsurf->h);
 
 		// copy the rendered character image into it
-		for (int y = 0; y < bitmap->height(); y++)
+		for (int y = 0; y < bitmap.height(); y++)
 		{
-			UINT32 *dstrow = &bitmap->pix32(y);
+			UINT32 *dstrow = &bitmap.pix32(y);
 			UINT8 *srcrow = (UINT8 *)drawsurf->pixels;
 
 			srcrow += (y * drawsurf->pitch);
@@ -1098,7 +1096,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 		SDL_FreeSurface(drawsurf);
 	}
 
-	return bitmap;
+	return bitmap.valid();
 }
 #endif	// not OSX
 #else	// not UNIX
@@ -1129,8 +1127,8 @@ void sdl_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
-	return (bitmap_t *)NULL;
+	return false;
 }
 #endif

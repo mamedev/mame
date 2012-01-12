@@ -335,9 +335,9 @@ VIDEO_START( segag80v )
 }
 
 
-SCREEN_UPDATE( segag80v )
+SCREEN_UPDATE_RGB32( segag80v )
 {
 	sega_generate_vector_list(screen.machine());
-	SCREEN_UPDATE_CALL(vector);
+	SCREEN_UPDATE32_CALL(vector);
 	return 0;
 }

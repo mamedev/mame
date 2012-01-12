@@ -92,6 +92,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <new>
 
 
 /***************************************************************************
@@ -106,8 +107,19 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct _avcomp_state
+struct avcomp_state
 {
+	avcomp_state()
+		: maxwidth(0),
+		  maxheight(0),
+		  maxchannels(0),
+		  audiodata(NULL),
+		  ycontext(NULL),
+		  cbcontext(NULL),
+		  crcontext(NULL),
+		  audiohicontext(NULL),
+		  audiolocontext(NULL) { }
+
 	/* video parameters */
 	UINT32				maxwidth, maxheight;
 
@@ -167,12 +179,9 @@ avcomp_state *avcomp_init(UINT32 maxwidth, UINT32 maxheight, UINT32 maxchannels)
 		return NULL;
 
 	/* allocate memory for state block */
-	state = (avcomp_state *)malloc(sizeof(*state));
+	state = new(std::nothrow) avcomp_state;
 	if (state == NULL)
 		return NULL;
-
-	/* clear the buffers */
-	memset(state, 0, sizeof(*state));
 
 	/* compute the core info */
 	state->maxwidth = maxwidth;
@@ -180,7 +189,7 @@ avcomp_state *avcomp_init(UINT32 maxwidth, UINT32 maxheight, UINT32 maxchannels)
 	state->maxchannels = maxchannels;
 
 	/* now allocate data buffers */
-	state->audiodata = (UINT8 *)malloc(65536 * state->maxchannels * 2);
+	state->audiodata = new(std::nothrow) UINT8[65536 * state->maxchannels * 2];
 	if (state->audiodata == NULL)
 		goto cleanup;
 
@@ -216,8 +225,7 @@ cleanup:
 void avcomp_free(avcomp_state *state)
 {
 	/* free the data buffers */
-	if (state->audiodata != NULL)
-		free(state->audiodata);
+	delete[] state->audiodata;
 
 	/* free the contexts */
 	if (state->ycontext != NULL)
@@ -231,7 +239,7 @@ void avcomp_free(avcomp_state *state)
 	if (state->audiolocontext != NULL)
 		huffman_free_context(state->audiolocontext);
 
-	free(state);
+	delete state;
 }
 
 
@@ -240,9 +248,14 @@ void avcomp_free(avcomp_state *state)
     parameters
 -------------------------------------------------*/
 
-void avcomp_config_compress(avcomp_state *state, const av_codec_compress_config *config)
+void avcomp_config_compress(avcomp_state *state, av_codec_compress_config *config)
 {
-	state->compress = *config;
+	state->compress.video.wrap(config->video, config->video.cliprect());
+	state->compress.channels = config->channels;
+	state->compress.samples = config->samples;
+	memcpy(state->compress.audio, config->audio, sizeof(state->compress.audio));
+	state->compress.metalength = config->metalength;
+	state->compress.metadata = config->metadata;
 }
 
 
@@ -251,9 +264,15 @@ void avcomp_config_compress(avcomp_state *state, const av_codec_compress_config 
     decompression parameters
 -------------------------------------------------*/
 
-void avcomp_config_decompress(avcomp_state *state, const av_codec_decompress_config *config)
+void avcomp_config_decompress(avcomp_state *state, av_codec_decompress_config *config)
 {
-	state->decompress = *config;
+	state->decompress.video.wrap(config->video, config->video.cliprect());
+	state->decompress.maxsamples = config->maxsamples;
+	state->decompress.actsamples = config->actsamples;
+	memcpy(state->decompress.audio, config->audio, sizeof(state->decompress.audio));
+	state->decompress.maxmetalength = config->maxmetalength;
+	state->decompress.actmetalength = config->actmetalength;
+	state->decompress.metadata = config->metadata;
 }
 
 
@@ -326,12 +345,12 @@ avcomp_error avcomp_encode_data(avcomp_state *state, const UINT8 *source, UINT8 
 		/* extract video information */
 		videostart = NULL;
 		videostride = width = height = 0;
-		if (state->compress.video != NULL)
+		if (state->compress.video.valid())
 		{
-			videostart = &state->compress.video->pix8(0);
-			videostride = state->compress.video->rowpixels() * 2;
-			width = state->compress.video->width();
-			height = state->compress.video->height();
+			videostart = reinterpret_cast<const UINT8 *>(&state->compress.video.pix(0));
+			videostride = state->compress.video.rowpixels() * 2;
+			width = state->compress.video.width();
+			height = state->compress.video.height();
 		}
 
 		/* data is assumed to be native-endian */
@@ -483,15 +502,15 @@ avcomp_error avcomp_decode_data(avcomp_state *state, const UINT8 *source, UINT32
 		metastart = state->decompress.metadata;
 		for (chnum = 0; chnum < channels; chnum++)
 			audiostart[chnum] = (UINT8 *)state->decompress.audio[chnum];
-		videostart = (state->decompress.video != NULL) ? &state->decompress.video->pix8(0) : NULL;
-		videostride = (state->decompress.video != NULL) ? state->decompress.video->rowpixels() * 2 : 0;
+		videostart = (state->decompress.video.valid()) ? reinterpret_cast<UINT8 *>(&state->decompress.video.pix(0)) : NULL;
+		videostride = (state->decompress.video.valid()) ? state->decompress.video.rowpixels() * 2 : 0;
 
 		/* data is assumed to be native-endian */
 		*(UINT8 *)&betest = 1;
 		audioxor = videoxor = (betest == 1) ? 1 : 0;
 
 		/* verify against sizes */
-		if (state->decompress.video != NULL && (state->decompress.video->width() < width || state->decompress.video->height() < height))
+		if (state->decompress.video.valid() && (state->decompress.video.width() < width || state->decompress.video.height() < height))
 			return AVCERR_VIDEO_TOO_LARGE;
 		for (chnum = 0; chnum < channels; chnum++)
 			if (state->decompress.audio[chnum] != NULL && state->decompress.maxsamples < samples)

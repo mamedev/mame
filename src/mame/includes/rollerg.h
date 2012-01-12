@@ -34,4 +34,4 @@ extern void rollerg_sprite_callback(running_machine &machine, int *code,int *col
 extern void rollerg_zoom_callback(running_machine &machine, int *code,int *color,int *flags);
 
 VIDEO_START( rollerg );
-SCREEN_UPDATE( rollerg );
+SCREEN_UPDATE_IND16( rollerg );

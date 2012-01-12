@@ -32,7 +32,7 @@ public:
 	UINT8 *		m_rightram;
 	UINT8 *		m_spriteram;
 
-	bitmap_t *	m_work_bitmap;
+	bitmap_ind16 m_work_bitmap;
 	tilemap_t *	m_text_tilemap;
 	tilemap_t *	m_left_tilemap;
 	tilemap_t *	m_center_tilemap;
@@ -60,7 +60,7 @@ DISCRETE_SOUND_EXTERN( grchamp );
 
 PALETTE_INIT( grchamp );
 VIDEO_START( grchamp );
-SCREEN_UPDATE( grchamp );
+SCREEN_UPDATE_RGB32( grchamp );
 WRITE8_HANDLER( grchamp_left_w );
 WRITE8_HANDLER( grchamp_center_w );
 WRITE8_HANDLER( grchamp_right_w );

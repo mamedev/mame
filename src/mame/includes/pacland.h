@@ -11,7 +11,7 @@ public:
 	const UINT8 *m_color_prom;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	bitmap_t *m_fg_bitmap;
+	bitmap_ind16 m_fg_bitmap;
 	UINT32 *m_transmask[3];
 	UINT16 m_scroll0;
 	UINT16 m_scroll1;
@@ -30,4 +30,4 @@ WRITE8_HANDLER( pacland_bankswitch_w );
 
 PALETTE_INIT( pacland );
 VIDEO_START( pacland );
-SCREEN_UPDATE( pacland );
+SCREEN_UPDATE_IND16( pacland );

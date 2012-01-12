@@ -92,7 +92,7 @@ VIDEO_START( kickgoal )
 
 
 
-static void kickgoal_draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
+static void kickgoal_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	kickgoal_state *state = machine.driver_data<kickgoal_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -122,7 +122,7 @@ static void kickgoal_draw_sprites( running_machine &machine, bitmap_t &bitmap,co
 }
 
 
-SCREEN_UPDATE( kickgoal )
+SCREEN_UPDATE_IND16( kickgoal )
 {
 	kickgoal_state *state = screen.machine().driver_data<kickgoal_state>();
 
@@ -225,7 +225,7 @@ VIDEO_START( actionhw )
 }
 
 
-static void actionhw_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void actionhw_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	kickgoal_state *state = machine.driver_data<kickgoal_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -253,7 +253,7 @@ static void actionhw_draw_sprites(running_machine &machine, bitmap_t &bitmap,con
 }
 
 
-SCREEN_UPDATE( actionhw )
+SCREEN_UPDATE_IND16( actionhw )
 {
 	kickgoal_state *state = screen.machine().driver_data<kickgoal_state>();
 	/* set scroll */

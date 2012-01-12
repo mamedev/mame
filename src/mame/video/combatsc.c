@@ -393,7 +393,7 @@ WRITE8_HANDLER( combatsc_scrollram_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
 {
 	combatsc_state *state = machine.driver_data<combatsc_state>();
 	device_t *k007121 = circuit ? state->m_k007121_2 : state->m_k007121_1;
@@ -403,7 +403,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-SCREEN_UPDATE( combatsc )
+SCREEN_UPDATE_IND16( combatsc )
 {
 	combatsc_state *state = screen.machine().driver_data<combatsc_state>();
 	int i;
@@ -515,7 +515,7 @@ byte #4:
 
 ***************************************************************************/
 
-static void bootleg_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit )
+static void bootleg_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	const gfx_element *gfx = machine.gfx[circuit + 2];
@@ -561,7 +561,7 @@ static void bootleg_draw_sprites( running_machine &machine, bitmap_t &bitmap, co
 	}
 }
 
-SCREEN_UPDATE( combatscb )
+SCREEN_UPDATE_IND16( combatscb )
 {
 	combatsc_state *state = screen.machine().driver_data<combatsc_state>();
 	int i;

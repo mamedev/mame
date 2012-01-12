@@ -13,7 +13,7 @@
 #include "includes/arcadecl.h"
 
 
-static void arcadecl_bitmap_render(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
+static void arcadecl_bitmap_render(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 /*************************************
  *
@@ -78,7 +78,7 @@ VIDEO_START( arcadecl )
  *
  *************************************/
 
-SCREEN_UPDATE( arcadecl )
+SCREEN_UPDATE_IND16( arcadecl )
 {
 	arcadecl_state *state = screen.machine().driver_data<arcadecl_state>();
 
@@ -89,7 +89,7 @@ SCREEN_UPDATE( arcadecl )
 	if (state->m_has_mo)
 	{
 		atarimo_rect_list rectlist;
-		bitmap_t *mobitmap;
+		bitmap_ind16 *mobitmap;
 		int x, y, r;
 
 		mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -121,7 +121,7 @@ SCREEN_UPDATE( arcadecl )
  *
  *************************************/
 
-static void arcadecl_bitmap_render(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void arcadecl_bitmap_render(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	arcadecl_state *state = machine.driver_data<arcadecl_state>();
 	int x, y;

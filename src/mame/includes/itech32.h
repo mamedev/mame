@@ -109,4 +109,4 @@ WRITE32_HANDLER( itech020_video_w );
 READ32_HANDLER( itech020_video_r );
 WRITE32_HANDLER( drivedge_zbuf_control_w );
 
-SCREEN_UPDATE( itech32 );
+SCREEN_UPDATE_IND16( itech32 );

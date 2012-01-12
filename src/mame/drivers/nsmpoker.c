@@ -122,7 +122,7 @@ static VIDEO_START( nsmpoker )
 }
 
 
-static SCREEN_UPDATE( nsmpoker )
+static SCREEN_UPDATE_IND16( nsmpoker )
 {
 	nsmpoker_state *state = screen.machine().driver_data<nsmpoker_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -399,10 +399,9 @@ static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(nsmpoker)
+	MCFG_SCREEN_UPDATE_STATIC(nsmpoker)
 
 	MCFG_GFXDECODE(nsmpoker)
 

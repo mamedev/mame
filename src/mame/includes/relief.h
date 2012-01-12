@@ -21,4 +21,4 @@ public:
 /*----------- defined in video/relief.c -----------*/
 
 VIDEO_START( relief );
-SCREEN_UPDATE( relief );
+SCREEN_UPDATE_IND16( relief );

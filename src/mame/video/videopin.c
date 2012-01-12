@@ -33,7 +33,7 @@ VIDEO_START( videopin )
 }
 
 
-SCREEN_UPDATE( videopin )
+SCREEN_UPDATE_IND16( videopin )
 {
 	videopin_state *state = screen.machine().driver_data<videopin_state>();
 	int col;

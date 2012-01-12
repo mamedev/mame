@@ -118,7 +118,7 @@ static TILE_GET_INFO( get_fg_tile_info )
     big object
  ********************************************/
 
-static void draw_object( running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_object( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 	int sx, sy, color;
@@ -141,7 +141,7 @@ static void draw_object( running_machine& machine, bitmap_t &bitmap, const recta
 	drawgfx_transpen(bitmap, cliprect, machine.gfx[3], 1, color, 0, 1, sx, sy - 64, 0);
 }
 
-static void draw_center( running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_center( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 	int sx, sy, x, y, color;
@@ -391,7 +391,7 @@ WRITE8_HANDLER( decocass_center_v_shift_w )
     memory handlers
  ********************************************/
 
-static void draw_sprites(running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect, int color,
+static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int color,
 						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
 						UINT8 *sprite_ram, int interleave)
 {
@@ -440,7 +440,7 @@ static void draw_sprites(running_machine& machine, bitmap_t &bitmap, const recta
 }
 
 
-static void draw_missiles(running_machine &machine,bitmap_t &bitmap, const rectangle &cliprect,
+static void draw_missiles(running_machine &machine,bitmap_ind16 &bitmap, const rectangle &cliprect,
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
 						UINT8 *missile_ram, int interleave)
 {
@@ -519,7 +519,7 @@ VIDEO_START( decocass )
 	gfx_element_decode(machine.gfx[2], 16);
 }
 
-SCREEN_UPDATE( decocass )
+SCREEN_UPDATE_IND16( decocass )
 {
 	decocass_state *state = screen.machine().driver_data<decocass_state>();
 	int scrollx, scrolly_l, scrolly_r;

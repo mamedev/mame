@@ -164,8 +164,8 @@ VIDEO_START(realbrk)
 	tilemap_set_transparent_pen(state->m_tilemap_1,0);
 	tilemap_set_transparent_pen(state->m_tilemap_2,0);
 
-	state->m_tmpbitmap0 = auto_bitmap_alloc(machine,32,32, machine.primary_screen->format());
-	state->m_tmpbitmap1 = auto_bitmap_alloc(machine,32,32, machine.primary_screen->format());
+	state->m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine,32,32);
+	state->m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine,32,32);
 }
 
 /***************************************************************************
@@ -213,7 +213,7 @@ VIDEO_START(realbrk)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	realbrk_state *state = machine.driver_data<realbrk_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -380,7 +380,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 
 /* DaiDaiKakumei */
 /* layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder */
-static void dai2kaku_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int layer)
+static void dai2kaku_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int layer)
 {
 	realbrk_state *state = machine.driver_data<realbrk_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -497,7 +497,7 @@ WRITE16_HANDLER( realbrk_vregs_w )
 	}
 }
 
-SCREEN_UPDATE(realbrk)
+SCREEN_UPDATE_IND16(realbrk)
 {
 	realbrk_state *state = screen.machine().driver_data<realbrk_state>();
 	int layers_ctrl = -1;
@@ -540,7 +540,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) )
 }
 
 /* DaiDaiKakumei */
-SCREEN_UPDATE(dai2kaku)
+SCREEN_UPDATE_IND16(dai2kaku)
 {
 	realbrk_state *state = screen.machine().driver_data<realbrk_state>();
 	int layers_ctrl = -1;

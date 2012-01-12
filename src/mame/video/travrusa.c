@@ -293,7 +293,7 @@ WRITE8_HANDLER( travrusa_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	travrusa_state *state = machine.driver_data<travrusa_state>();
 	int offs;
@@ -332,7 +332,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 }
 
 
-SCREEN_UPDATE( travrusa )
+SCREEN_UPDATE_IND16( travrusa )
 {
 	travrusa_state *state = screen.machine().driver_data<travrusa_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);

@@ -117,8 +117,8 @@ WRITE8_HANDLER( sprint8_video_ram_w )
 VIDEO_START( sprint8 )
 {
 	sprint8_state *state = machine.driver_data<sprint8_state>();
-	state->m_helper1 = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_helper2 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
 	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
@@ -128,7 +128,7 @@ VIDEO_START( sprint8 )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	sprint8_state *state = machine.driver_data<sprint8_state>();
 	int i;
@@ -158,7 +158,7 @@ static TIMER_CALLBACK( sprint8_collision_callback )
 }
 
 
-SCREEN_UPDATE( sprint8 )
+SCREEN_UPDATE_IND16( sprint8 )
 {
 	sprint8_state *state = screen.machine().driver_data<sprint8_state>();
 	set_pens(state, screen.machine().colortable);
@@ -175,16 +175,16 @@ SCREEN_EOF( sprint8 )
 	int y;
 	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-	tilemap_draw(*state->m_helper2, visarea, state->m_tilemap2, 0, 0);
+	tilemap_draw(state->m_helper2, visarea, state->m_tilemap2, 0, 0);
 
-	state->m_helper1->fill(0x20, visarea);
+	state->m_helper1.fill(0x20, visarea);
 
-	draw_sprites(screen.machine(), *state->m_helper1, visarea);
+	draw_sprites(screen.machine(), state->m_helper1, visarea);
 
 	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{
-		const UINT16* p1 = &state->m_helper1->pix16(y);
-		const UINT16* p2 = &state->m_helper2->pix16(y);
+		const UINT16* p1 = &state->m_helper1.pix16(y);
+		const UINT16* p2 = &state->m_helper2.pix16(y);
 
 		for (x = visarea.min_x; x <= visarea.max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)

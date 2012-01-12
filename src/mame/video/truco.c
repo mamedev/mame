@@ -31,7 +31,7 @@ PALETTE_INIT( truco )
 	}
 }
 
-SCREEN_UPDATE( truco )
+SCREEN_UPDATE_IND16( truco )
 {
 	truco_state *state = screen.machine().driver_data<truco_state>();
 	UINT8 *videoram = state->m_videoram;

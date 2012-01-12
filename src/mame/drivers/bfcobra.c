@@ -339,7 +339,7 @@ static VIDEO_START( bfcobra )
 	}
 }
 
-static SCREEN_UPDATE( bfcobra )
+static SCREEN_UPDATE_RGB32( bfcobra )
 {
 	bfcobra_state *state = screen.machine().driver_data<bfcobra_state>();
 	int x, y;
@@ -1785,10 +1785,9 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
-	MCFG_SCREEN_UPDATE(bfcobra)
+	MCFG_SCREEN_UPDATE_STATIC(bfcobra)
 
 	MCFG_PALETTE_LENGTH(256)
 

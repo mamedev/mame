@@ -12,10 +12,10 @@ public:
 	UINT8 *  m_spriteram;
 
 	/* video-related */
-	bitmap_t *m_obj0_bitmap;
-	bitmap_t *m_river_bitmap;
-	bitmap_t *m_tree0_bitmap;
-	bitmap_t *m_tree1_bitmap;
+	bitmap_ind16 m_obj0_bitmap;
+	bitmap_ind16 m_river_bitmap;
+	bitmap_ind16 m_tree0_bitmap;
+	bitmap_ind16 m_tree1_bitmap;
 	UINT8*   m_tree_ram;
 	UINT8*   m_memory_devices;
 	UINT32   m_mem_dev_selected;	/* an offset within memory_devices area */
@@ -60,7 +60,7 @@ public:
 /*----------- defined in video/changela.c -----------*/
 
 VIDEO_START( changela );
-SCREEN_UPDATE( changela );
+SCREEN_UPDATE_IND16( changela );
 
 WRITE8_HANDLER( changela_colors_w );
 WRITE8_HANDLER( changela_mem_device_select_w );

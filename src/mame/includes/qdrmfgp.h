@@ -20,7 +20,7 @@ public:
 
 VIDEO_START( qdrmfgp );
 VIDEO_START( qdrmfgp2 );
-SCREEN_UPDATE( qdrmfgp );
+SCREEN_UPDATE_IND16( qdrmfgp );
 
 void qdrmfgp_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 void qdrmfgp2_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);

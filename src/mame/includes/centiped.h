@@ -34,10 +34,10 @@ VIDEO_START( milliped );
 VIDEO_START( warlords );
 VIDEO_START( bullsdrt );
 
-SCREEN_UPDATE( centiped );
-SCREEN_UPDATE( milliped );
-SCREEN_UPDATE( warlords );
-SCREEN_UPDATE( bullsdrt );
+SCREEN_UPDATE_IND16( centiped );
+SCREEN_UPDATE_IND16( milliped );
+SCREEN_UPDATE_IND16( warlords );
+SCREEN_UPDATE_IND16( bullsdrt );
 
 WRITE8_HANDLER( centiped_paletteram_w );
 WRITE8_HANDLER( milliped_paletteram_w );

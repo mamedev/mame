@@ -37,4 +37,4 @@ WRITE8_HANDLER( blueprnt_flipscreen_w );
 
 PALETTE_INIT( blueprnt );
 VIDEO_START( blueprnt );
-SCREEN_UPDATE( blueprnt );
+SCREEN_UPDATE_IND16( blueprnt );

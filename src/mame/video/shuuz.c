@@ -89,11 +89,11 @@ VIDEO_START( shuuz )
  *
  *************************************/
 
-SCREEN_UPDATE( shuuz )
+SCREEN_UPDATE_IND16( shuuz )
 {
 	shuuz_state *state = screen.machine().driver_data<shuuz_state>();
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

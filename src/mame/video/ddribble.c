@@ -176,7 +176,7 @@ byte #4:    attributes
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8* source, int lenght, int gfxset, int flipscreen )
+static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* source, int lenght, int gfxset, int flipscreen )
 {
 	gfx_element *gfx = machine.gfx[gfxset];
 	const UINT8 *finish = source + lenght;
@@ -250,7 +250,7 @@ static void draw_sprites( running_machine& machine, bitmap_t &bitmap, const rect
 
 ***************************************************************************/
 
-SCREEN_UPDATE( ddribble )
+SCREEN_UPDATE_IND16( ddribble )
 {
 	ddribble_state *state = screen.machine().driver_data<ddribble_state>();
 	set_pens(screen.machine());

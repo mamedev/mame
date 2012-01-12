@@ -42,9 +42,9 @@ public:
 
 VIDEO_START( vsnes );
 PALETTE_INIT( vsnes );
-SCREEN_UPDATE( vsnes );
+SCREEN_UPDATE_IND16( vsnes );
 VIDEO_START( vsdual );
-SCREEN_UPDATE( vsnes_bottom );
+SCREEN_UPDATE_IND16( vsnes_bottom );
 PALETTE_INIT( vsdual );
 
 extern const ppu2c0x_interface vsnes_ppu_interface_1;

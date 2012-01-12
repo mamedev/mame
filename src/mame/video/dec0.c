@@ -45,7 +45,7 @@ WRITE16_HANDLER( dec0_paletteram_b_w )
 /******************************************************************************/
 
 
-SCREEN_UPDATE( hbarrel )
+SCREEN_UPDATE_IND16( hbarrel )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 
@@ -64,7 +64,7 @@ SCREEN_UPDATE( hbarrel )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( baddudes )
+SCREEN_UPDATE_IND16( baddudes )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
@@ -103,7 +103,7 @@ SCREEN_UPDATE( baddudes )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( robocop )
+SCREEN_UPDATE_IND16( robocop )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	int trans;
@@ -149,7 +149,7 @@ SCREEN_UPDATE( robocop )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( birdtry )
+SCREEN_UPDATE_IND16( birdtry )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 
@@ -166,7 +166,7 @@ SCREEN_UPDATE( birdtry )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( hippodrm )
+SCREEN_UPDATE_IND16( hippodrm )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
@@ -189,7 +189,7 @@ SCREEN_UPDATE( hippodrm )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( slyspy )
+SCREEN_UPDATE_IND16( slyspy )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
@@ -209,7 +209,7 @@ SCREEN_UPDATE( slyspy )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( midres )
+SCREEN_UPDATE_IND16( midres )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	int trans;

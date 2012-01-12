@@ -18,4 +18,4 @@ extern UINT8 pk8000_video_enable;
 
 PALETTE_INIT( pk8000 );
 
-UINT32 pk8000_video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, UINT8 *videomem);
+UINT32 pk8000_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *videomem);

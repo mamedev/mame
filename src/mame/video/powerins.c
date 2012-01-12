@@ -263,7 +263,7 @@ Offset:     Format:                 Value:
 #define SIGN_EXTEND_POS(_var_)	{_var_ &= 0x3ff; if (_var_ > 0x1ff) _var_ -= 0x400;}
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	powerins_state *state = machine.driver_data<powerins_state>();
 	UINT16 *source = state->m_spriteram + 0x8000/2;
@@ -340,7 +340,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 ***************************************************************************/
 
 
-SCREEN_UPDATE( powerins )
+SCREEN_UPDATE_IND16( powerins )
 {
 	powerins_state *state = screen.machine().driver_data<powerins_state>();
 	int layers_ctrl = -1;

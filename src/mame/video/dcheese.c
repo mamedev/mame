@@ -95,7 +95,7 @@ VIDEO_START( dcheese )
 	dcheese_state *state = machine.driver_data<dcheese_state>();
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	state->m_dstbitmap = auto_bitmap_alloc(machine, DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine.primary_screen->format());
+	state->m_dstbitmap = auto_bitmap_ind16_alloc(machine, DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
 
 	/* create a timer */
 	state->m_blitter_timer = machine.scheduler().timer_alloc(FUNC(blitter_scanline_callback));
@@ -116,7 +116,7 @@ VIDEO_START( dcheese )
  *
  *************************************/
 
-SCREEN_UPDATE( dcheese )
+SCREEN_UPDATE_IND16( dcheese )
 {
 	dcheese_state *state = screen.machine().driver_data<dcheese_state>();
 	int x, y;

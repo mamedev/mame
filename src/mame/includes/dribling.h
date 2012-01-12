@@ -35,4 +35,4 @@ public:
 
 PALETTE_INIT( dribling );
 WRITE8_HANDLER( dribling_colorram_w );
-SCREEN_UPDATE( dribling );
+SCREEN_UPDATE_IND16( dribling );

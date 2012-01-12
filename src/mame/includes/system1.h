@@ -19,7 +19,7 @@ public:
 	UINT8 m_mix_collide_summary;
 	UINT8 *m_sprite_collide;
 	UINT8 m_sprite_collide_summary;
-	bitmap_t *m_sprite_bitmap;
+	bitmap_ind16 *m_sprite_bitmap;
 	UINT8 m_video_mode;
 	UINT8 m_videoram_bank;
 	tilemap_t *m_tilemap_page[8];
@@ -48,6 +48,6 @@ READ8_HANDLER( system1_sprite_collision_r );
 WRITE8_HANDLER( system1_sprite_collision_w );
 WRITE8_HANDLER( system1_sprite_collision_reset_w );
 
-SCREEN_UPDATE( system1 );
-SCREEN_UPDATE( system2 );
-SCREEN_UPDATE( system2_rowscroll );
+SCREEN_UPDATE_IND16( system1 );
+SCREEN_UPDATE_IND16( system2 );
+SCREEN_UPDATE_IND16( system2_rowscroll );

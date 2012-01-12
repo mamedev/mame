@@ -182,14 +182,13 @@ VIDEO_START( yard )
 
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
-	bitmap_format format = machine.primary_screen->format();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	state->m_bg_tilemap = tilemap_create(machine, yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
 	tilemap_set_scrolldx(state->m_bg_tilemap, visarea.min_x, width - (visarea.max_x + 1));
 	tilemap_set_scrolldy(state->m_bg_tilemap, visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 
-	state->m_scroll_panel_bitmap = auto_bitmap_alloc(machine, SCROLL_PANEL_WIDTH, height, format);
+	state->m_scroll_panel_bitmap = auto_bitmap_ind16_alloc(machine, SCROLL_PANEL_WIDTH, height);
 }
 
 
@@ -219,7 +218,7 @@ WRITE8_HANDLER( yard_flipscreen_w )
 
 #define DRAW_SPRITE(code, sy) drawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, sx, sy, colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 512));
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	m58_state *state = machine.driver_data<m58_state>();
 	int offs;
@@ -274,7 +273,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
  *
  *************************************/
 
-static void draw_panel( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_panel( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	m58_state *state = machine.driver_data<m58_state>();
 
@@ -304,7 +303,7 @@ static void draw_panel( running_machine &machine, bitmap_t &bitmap, const rectan
  *
  *************************************/
 
-SCREEN_UPDATE( yard )
+SCREEN_UPDATE_IND16( yard )
 {
 	m58_state *state = screen.machine().driver_data<m58_state>();
 

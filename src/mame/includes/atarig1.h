@@ -38,6 +38,6 @@ WRITE16_HANDLER( atarig1_mo_control_w );
 
 VIDEO_START( atarig1 );
 SCREEN_EOF( atarig1 );
-SCREEN_UPDATE( atarig1 );
+SCREEN_UPDATE_IND16( atarig1 );
 
 void atarig1_scanline_update(screen_device &screen, int scanline);

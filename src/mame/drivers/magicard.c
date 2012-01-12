@@ -379,7 +379,7 @@ static VIDEO_START(magicard)
 
 }
 
-static SCREEN_UPDATE(magicard)
+static SCREEN_UPDATE_RGB32(magicard)
 {
 	magicard_state *state = screen.machine().driver_data<magicard_state>();
 	int x,y;
@@ -710,10 +710,9 @@ static MACHINE_CONFIG_START( magicard, magicard_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1) //dynamic resolution,TODO
-	MCFG_SCREEN_UPDATE(magicard)
+	MCFG_SCREEN_UPDATE_STATIC(magicard)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

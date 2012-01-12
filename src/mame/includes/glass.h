@@ -18,7 +18,7 @@ public:
 
 	/* video-related */
 	tilemap_t     *m_pant[2];
-	bitmap_t    *m_screen_bitmap;
+	bitmap_ind16    *m_screen_bitmap;
 
 	/* misc */
 	int         m_current_bit;
@@ -34,4 +34,4 @@ WRITE16_HANDLER( glass_vram_w );
 WRITE16_HANDLER( glass_blitter_w );
 
 VIDEO_START( glass );
-SCREEN_UPDATE( glass );
+SCREEN_UPDATE_IND16( glass );

@@ -50,7 +50,7 @@ WRITE16_HANDLER( vaportra_palette_24bit_b_w )
 /******************************************************************************/
 
 
-SCREEN_UPDATE( vaportra )
+SCREEN_UPDATE_IND16( vaportra )
 {
 	vaportra_state *state = screen.machine().driver_data<vaportra_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);

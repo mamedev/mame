@@ -17,7 +17,7 @@ public:
 	size_t     m_spriteram_size;
 
 	/* video-related */
-	bitmap_t  *m_pixbitmap;
+	bitmap_ind16 m_pixbitmap;
 	tilemap_t   *m_bg_tilemap;
 	UINT8     *m_bitmapram;
 	int       m_bm_plane;
@@ -46,4 +46,4 @@ WRITE8_HANDLER( dogfgt_1800_w );
 
 PALETTE_INIT( dogfgt );
 VIDEO_START( dogfgt );
-SCREEN_UPDATE( dogfgt );
+SCREEN_UPDATE_IND16( dogfgt );

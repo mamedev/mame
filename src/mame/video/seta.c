@@ -770,11 +770,11 @@ static void usclssic_set_pens(running_machine &machine)
 
 
 
-static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
+static void draw_tilemap_palette_effect(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
 {
 	int y;
 	const gfx_element *gfx_tilemap = machine.gfx[gfxnum];
-	const bitmap_t &src_bitmap = tilemap_get_pixmap(tilemap);
+	const bitmap_ind16 &src_bitmap = tilemap_get_pixmap(tilemap);
 	int width_mask, height_mask;
 	int opaque_mask = gfx_tilemap->color_granularity - 1;
 	int pixel_effect_mask = gfx_tilemap->color_base + (gfx_tilemap->total_colors - 1) * gfx_tilemap->color_granularity;
@@ -828,7 +828,7 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t &bitm
 
 
 /* For games without tilemaps */
-SCREEN_UPDATE( seta_no_layers )
+SCREEN_UPDATE_IND16( seta_no_layers )
 {
 	set_pens(screen.machine());
 	bitmap.fill(0x1f0, cliprect);
@@ -839,7 +839,7 @@ SCREEN_UPDATE( seta_no_layers )
 
 
 /* For games with 1 or 2 tilemaps */
-void seta_layers_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac )
+void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac )
 {
 	seta_state *state = screen.machine().driver_data<seta_state>();
 	int layers_ctrl = -1;
@@ -1046,14 +1046,14 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 }
 
-static SCREEN_UPDATE( seta_layers )
+static SCREEN_UPDATE_IND16( seta_layers )
 {
 	seta_layers_update(screen, bitmap, cliprect, 0x1000, 1 );
 	return 0;
 }
 
 
-SCREEN_UPDATE( setaroul )
+SCREEN_UPDATE_IND16( setaroul )
 {
 	bitmap.fill(0x0, cliprect);
 
@@ -1072,22 +1072,22 @@ SCREEN_EOF( setaroul )
 
 
 
-SCREEN_UPDATE( seta )
+SCREEN_UPDATE_IND16( seta )
 {
 	set_pens(screen.machine());
-	return SCREEN_UPDATE_CALL(seta_layers);
+	return SCREEN_UPDATE16_CALL(seta_layers);
 }
 
 
-SCREEN_UPDATE( usclssic )
+SCREEN_UPDATE_IND16( usclssic )
 {
 	usclssic_set_pens(screen.machine());
-	return SCREEN_UPDATE_CALL(seta_layers);
+	return SCREEN_UPDATE16_CALL(seta_layers);
 }
 
 
-SCREEN_UPDATE( inttoote )
+SCREEN_UPDATE_IND16( inttoote )
 {
 	/* no palette to set */
-	return SCREEN_UPDATE_CALL(seta_layers);
+	return SCREEN_UPDATE16_CALL(seta_layers);
 }

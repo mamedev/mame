@@ -69,7 +69,7 @@ static void leprechn_get_pens( pen_t *pens )
  *
  *************************************/
 
-static SCREEN_UPDATE( gameplan )
+static SCREEN_UPDATE_RGB32( gameplan )
 {
 	gameplan_state *state = screen.machine().driver_data<gameplan_state>();
 	pen_t pens[GAMEPLAN_NUM_PENS];
@@ -89,7 +89,7 @@ static SCREEN_UPDATE( gameplan )
 }
 
 
-static SCREEN_UPDATE( leprechn )
+static SCREEN_UPDATE_RGB32( leprechn )
 {
 	gameplan_state *state = screen.machine().driver_data<gameplan_state>();
 	pen_t pens[LEPRECHN_NUM_PENS];
@@ -344,21 +344,20 @@ MACHINE_CONFIG_FRAGMENT( gameplan_video )
 	MCFG_VIDEO_START(gameplan)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(GAMEPLAN_PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE(gameplan)
+	MCFG_SCREEN_UPDATE_STATIC(gameplan)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( leprechn_video )
 	MCFG_VIDEO_START(leprechn)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(leprechn)
+	MCFG_SCREEN_UPDATE_STATIC(leprechn)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( trvquest_video, gameplan_video )
 	MCFG_VIDEO_START(trvquest)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(gameplan)
+	MCFG_SCREEN_UPDATE_STATIC(gameplan)
 MACHINE_CONFIG_END

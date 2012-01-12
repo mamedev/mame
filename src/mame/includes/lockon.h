@@ -37,8 +37,8 @@ public:
 	UINT8	      m_ground_ctrl;
 	UINT16      m_scroll_h;
 	UINT16      m_scroll_v;
-	bitmap_t    *m_front_buffer;
-	bitmap_t    *m_back_buffer;
+	bitmap_ind16    *m_front_buffer;
+	bitmap_ind16    *m_back_buffer;
 	emu_timer   *m_bufend_timer;
 	emu_timer   *m_cursor_timer;
 
@@ -80,7 +80,7 @@ public:
 
 PALETTE_INIT( lockon );
 VIDEO_START( lockon );
-SCREEN_UPDATE( lockon );
+SCREEN_UPDATE_IND16( lockon );
 SCREEN_EOF( lockon );
 READ16_HANDLER( lockon_crtc_r );
 WRITE16_HANDLER( lockon_crtc_w );

@@ -104,9 +104,9 @@ static TILE_GET_INFO( tank8_get_tile_info )
 VIDEO_START( tank8 )
 {
 	tank8_state *state = machine.driver_data<tank8_state>();
-	state->m_helper1 = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_helper2 = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_helper3 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_helper3.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_tilemap = tilemap_create(machine, tank8_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
@@ -128,7 +128,7 @@ static int get_y_pos(tank8_state *state, int n)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	tank8_state *state = machine.driver_data<tank8_state>();
 	int i;
@@ -151,7 +151,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static void draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	tank8_state *state = machine.driver_data<tank8_state>();
 	int i;
@@ -190,7 +190,7 @@ static TIMER_CALLBACK( tank8_collision_callback )
 }
 
 
-SCREEN_UPDATE( tank8 )
+SCREEN_UPDATE_IND16( tank8 )
 {
 	tank8_state *state = screen.machine().driver_data<tank8_state>();
 	set_pens(state, screen.machine().colortable);
@@ -209,21 +209,21 @@ SCREEN_EOF( tank8 )
 	int y;
 	const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-	tilemap_draw(*state->m_helper1, visarea, state->m_tilemap, 0, 0);
+	tilemap_draw(state->m_helper1, visarea, state->m_tilemap, 0, 0);
 
-	state->m_helper2->fill(8, visarea);
-	state->m_helper3->fill(8, visarea);
+	state->m_helper2.fill(8, visarea);
+	state->m_helper3.fill(8, visarea);
 
-	draw_sprites(screen.machine(), *state->m_helper2, visarea);
-	draw_bullets(screen.machine(), *state->m_helper3, visarea);
+	draw_sprites(screen.machine(), state->m_helper2, visarea);
+	draw_bullets(screen.machine(), state->m_helper3, visarea);
 
 	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{
 		int _state = 0;
 
-		const UINT16* p1 = &state->m_helper1->pix16(y);
-		const UINT16* p2 = &state->m_helper2->pix16(y);
-		const UINT16* p3 = &state->m_helper3->pix16(y);
+		const UINT16* p1 = &state->m_helper1.pix16(y);
+		const UINT16* p2 = &state->m_helper2.pix16(y);
+		const UINT16* p3 = &state->m_helper3.pix16(y);
 
 		if (y % 2 != screen.machine().primary_screen->frame_number() % 2)
 			continue; /* video display is interlaced */

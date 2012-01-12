@@ -14,7 +14,7 @@ public:
 	int m_cocktail;
 	UINT8 m_palreg;
 	int m_bankreg;
-	bitmap_t m_tmpbitmap;
+	bitmap_ind16 m_tmpbitmap;
 };
 
 
@@ -25,4 +25,4 @@ WRITE8_HANDLER( popflame_videoreg_w );
 
 VIDEO_START( naughtyb );
 PALETTE_INIT( naughtyb );
-SCREEN_UPDATE( naughtyb );
+SCREEN_UPDATE_IND16( naughtyb );

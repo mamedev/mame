@@ -1090,7 +1090,7 @@ static TIMER_CALLBACK( bgcoll_irq_callback )
  *
  *************************************/
 
-SCREEN_UPDATE( victory )
+SCREEN_UPDATE_IND16( victory )
 {
 	victory_state *state = screen.machine().driver_data<victory_state>();
 	int bgcollmask = (state->m_video_control & 4) ? 4 : 7;

@@ -26,4 +26,4 @@ public:
 WRITE16_HANDLER( badlands_pf_bank_w );
 
 VIDEO_START( badlands );
-SCREEN_UPDATE( badlands );
+SCREEN_UPDATE_IND16( badlands );

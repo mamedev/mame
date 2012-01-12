@@ -59,7 +59,7 @@ VIDEO_START( homerun )
 	state->m_tilemap = tilemap_create(machine, get_homerun_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	homerun_state *state = machine.driver_data<homerun_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -82,7 +82,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE(homerun)
+SCREEN_UPDATE_IND16(homerun)
 {
 	homerun_state *state = screen.machine().driver_data<homerun_state>();
 	rectangle myclip = cliprect;

@@ -54,7 +54,7 @@ void _88games_zoom_callback( running_machine &machine, int *code, int *color, in
 
 ***************************************************************************/
 
-SCREEN_UPDATE( 88games )
+SCREEN_UPDATE_IND16( 88games )
 {
 	_88games_state *state = screen.machine().driver_data<_88games_state>();
 

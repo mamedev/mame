@@ -14,16 +14,16 @@ public:
 	size_t      m_spriteram2_size;
 
 	/* video-related */
-	bitmap_t    *m_tmp_bitmap1;
-	bitmap_t    *m_tmp_bitmap2;
+	bitmap_ind16    *m_tmp_bitmap1;
+	bitmap_ind16    *m_tmp_bitmap2;
 	tilemap_t     *m_bg_tilemap;
 	UINT8       m_flipscreen;
 	UINT8		m_pix_redraw;
 	UINT8       m_xoffset;
 	UINT8       *m_pixram1;
 	UINT8       *m_pixram2;
-	bitmap_t    *m_pixel_bitmap1;
-	bitmap_t    *m_pixel_bitmap2;
+	bitmap_ind16    *m_pixel_bitmap1;
+	bitmap_ind16    *m_pixel_bitmap2;
 	int         m_pixram_sel;
 
 	/* sound-related */
@@ -67,5 +67,5 @@ READ8_HANDLER( fortyl_pixram_r );
 WRITE8_HANDLER( fortyl_pixram_w );
 
 VIDEO_START( fortyl );
-SCREEN_UPDATE( fortyl );
+SCREEN_UPDATE_IND16( fortyl );
 PALETTE_INIT( fortyl );

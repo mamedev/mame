@@ -25,4 +25,4 @@ PALETTE_INIT( firebatl );
 PALETTE_INIT( clshroad );
 VIDEO_START( firebatl );
 VIDEO_START( clshroad );
-SCREEN_UPDATE( clshroad );
+SCREEN_UPDATE_IND16( clshroad );

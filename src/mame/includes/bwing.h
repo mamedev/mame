@@ -61,4 +61,4 @@ WRITE8_HANDLER( bwing_scrollram_w );
 READ8_HANDLER( bwing_scrollram_r );
 
 VIDEO_START( bwing );
-SCREEN_UPDATE( bwing );
+SCREEN_UPDATE_IND16( bwing );

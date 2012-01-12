@@ -105,13 +105,13 @@ WRITE8_HANDLER( megazone_flipscreen_w )
 VIDEO_START( megazone )
 {
 	megazone_state *state = machine.driver_data<megazone_state>();
-	state->m_tmpbitmap = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
+	state->m_tmpbitmap = auto_bitmap_ind16_alloc(machine, 256, 256);
 
 	state->save_item(NAME(*state->m_tmpbitmap));
 }
 
 
-SCREEN_UPDATE( megazone )
+SCREEN_UPDATE_IND16( megazone )
 {
 	megazone_state *state = screen.machine().driver_data<megazone_state>();
 	int offs;

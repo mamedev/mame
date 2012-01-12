@@ -78,8 +78,8 @@ PALETTE_INIT( profpac );
 VIDEO_START( astrocde );
 VIDEO_START( profpac );
 
-SCREEN_UPDATE( astrocde );
-SCREEN_UPDATE( profpac );
+SCREEN_UPDATE_IND16( astrocde );
+SCREEN_UPDATE_IND16( profpac );
 
 WRITE8_HANDLER( astrocade_pattern_board_w );
 READ8_HANDLER( astrocade_data_chip_register_r );

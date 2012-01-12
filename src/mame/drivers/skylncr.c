@@ -149,7 +149,7 @@ static VIDEO_START( skylncr )
 }
 
 
-static SCREEN_UPDATE( skylncr )
+static SCREEN_UPDATE_IND16( skylncr )
 {
 	skylncr_state *state = screen.machine().driver_data<skylncr_state>();
 	int i;
@@ -706,10 +706,9 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(skylncr)
+	MCFG_SCREEN_UPDATE_STATIC(skylncr)
 
 	MCFG_GFXDECODE(skylncr)
 	MCFG_PALETTE_LENGTH(0x200)

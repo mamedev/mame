@@ -110,7 +110,7 @@ VIDEO_START( mrjong )
 /*
 Note: First 0x40 entries in the videoram are actually spriteram
 */
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	mrjong_state *state = machine.driver_data<mrjong_state>();
 	int offs;
@@ -145,7 +145,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( mrjong )
+SCREEN_UPDATE_IND16( mrjong )
 {
 	mrjong_state *state = screen.machine().driver_data<mrjong_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

@@ -18,6 +18,6 @@ public:
 
 PALETTE_INIT( portrait );
 VIDEO_START( portrait );
-SCREEN_UPDATE( portrait );
+SCREEN_UPDATE_IND16( portrait );
 WRITE8_HANDLER( portrait_bgvideo_write );
 WRITE8_HANDLER( portrait_fgvideo_write );

@@ -17,7 +17,7 @@ VIDEO_START( warriorb )
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int x_offs, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs )
 {
 	warriorb_state *state = machine.driver_data<warriorb_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -84,7 +84,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
                 SCREEN REFRESH
 **************************************************************/
 
-static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
+static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
 {
 	UINT8 layer[3], nodraw;
 
@@ -116,5 +116,5 @@ static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const recta
 	return 0;
 }
 
-SCREEN_UPDATE( warriorb_left ) { return update_screen(screen, bitmap, cliprect, 40 * 8 * 0, screen.machine().driver_data<warriorb_state>()->m_tc0100scn_1); }
-SCREEN_UPDATE( warriorb_right ) { return update_screen(screen, bitmap, cliprect, 40 * 8 * 1, screen.machine().driver_data<warriorb_state>()->m_tc0100scn_2); }
+SCREEN_UPDATE_IND16( warriorb_left ) { return update_screen(screen, bitmap, cliprect, 40 * 8 * 0, screen.machine().driver_data<warriorb_state>()->m_tc0100scn_1); }
+SCREEN_UPDATE_IND16( warriorb_right ) { return update_screen(screen, bitmap, cliprect, 40 * 8 * 1, screen.machine().driver_data<warriorb_state>()->m_tc0100scn_2); }

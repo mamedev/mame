@@ -38,4 +38,4 @@ WRITE16_HANDLER( othldrby_vreg_w );
 
 VIDEO_START( othldrby );
 SCREEN_EOF( othldrby );
-SCREEN_UPDATE( othldrby );
+SCREEN_UPDATE_IND16( othldrby );

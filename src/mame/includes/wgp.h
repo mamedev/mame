@@ -56,4 +56,4 @@ WRITE16_HANDLER( wgp_piv_ctrl_word_w );
 
 VIDEO_START( wgp );
 VIDEO_START( wgp2 );
-SCREEN_UPDATE( wgp );
+SCREEN_UPDATE_IND16( wgp );

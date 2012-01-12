@@ -539,7 +539,7 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  draw_line - draw character line
 //-------------------------------------------------
 
-void cdp1869_device::draw_line(bitmap_t &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color)
+void cdp1869_device::draw_line(bitmap_ind16 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color)
 {
 	int i;
 
@@ -583,7 +583,7 @@ void cdp1869_device::draw_line(bitmap_t &bitmap, const rectangle &rect, int x, i
 //  draw_char - draw character
 //-------------------------------------------------
 
-void cdp1869_device::draw_char(bitmap_t &bitmap, const rectangle &rect, int x, int y, UINT16 pma)
+void cdp1869_device::draw_char(bitmap_ind16 &bitmap, const rectangle &rect, int x, int y, UINT16 pma)
 {
 	UINT8 pmd = read_page_ram_byte(pma);
 
@@ -907,7 +907,7 @@ READ_LINE_MEMBER( cdp1869_device::pal_ntsc_r )
 //  update_screen - update screen
 //-------------------------------------------------
 
-void cdp1869_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 cdp1869_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle screen_rect, outer;
 
@@ -973,4 +973,5 @@ void cdp1869_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 			}
 		}
 	}
+	return 0;
 }

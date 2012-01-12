@@ -47,9 +47,9 @@ WRITE16_HANDLER( rbisland_cchip_ram_w );
 
 /*----------- defined in video/rainbow.c -----------*/
 
-SCREEN_UPDATE( rbisland );
+SCREEN_UPDATE_IND16( rainbow );
 VIDEO_START( jumping );
-SCREEN_UPDATE( jumping );
+SCREEN_UPDATE_IND16( jumping );
 
 WRITE16_HANDLER( jumping_spritectrl_w );
 WRITE16_HANDLER( rbisland_spritectrl_w );

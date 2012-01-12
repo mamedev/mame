@@ -165,7 +165,7 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 		old2 += 0x40;				\
 	}
 
-static void blit_nf_z(bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_nf_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -179,7 +179,7 @@ static void blit_nf_z(bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *
 	}
 }
 
-static void blit_fy_z(bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_fy_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -193,7 +193,7 @@ static void blit_fy_z(bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *
 	}
 }
 
-static void blit_fx_z(bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_fx_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -207,7 +207,7 @@ static void blit_fx_z(bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *
 	}
 }
 
-static void blit_fxy_z(bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_fxy_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -221,14 +221,14 @@ static void blit_fxy_z(bitmap_t &bitmap, const rectangle &cliprect, const UINT8 
 	}
 }
 
-static void (*const blit_z[4])(bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour) = {
+static void (*const blit_z[4])(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour) = {
 	blit_nf_z,
 	blit_fy_z,
 	blit_fx_z,
 	blit_fxy_z,
 };
 
-void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
+void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
 {
 	/*- SPR RAM Format -**
 

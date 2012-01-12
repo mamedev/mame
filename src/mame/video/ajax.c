@@ -87,7 +87,7 @@ VIDEO_START( ajax )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( ajax )
+SCREEN_UPDATE_IND16( ajax )
 {
 	ajax_state *state = screen.machine().driver_data<ajax_state>();
 

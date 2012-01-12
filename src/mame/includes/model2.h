@@ -66,7 +66,7 @@ public:
 	poly_manager *m_poly;
 	raster_state *m_raster;
 	geo_state *m_geo;
-	bitmap_t *m_sys24_bitmap;
+	bitmap_rgb32 m_sys24_bitmap;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -75,6 +75,6 @@ public:
 /*----------- defined in video/model2.c -----------*/
 
 VIDEO_START(model2);
-SCREEN_UPDATE(model2);
+SCREEN_UPDATE_RGB32(model2);
 
 void model2_3d_set_zclip( running_machine &machine, UINT8 clip );

@@ -27,16 +27,16 @@
 gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 	: poly_manager<float, gaelco3d_object_data, 1, 2000>(state.machine()),
 	  m_state(state),
-	  m_screenbits(machine().primary_screen->alloc_compatible_bitmap()),
-	  m_zbuffer(auto_bitmap_alloc(state.machine(), state.machine().primary_screen->width(), state.machine().primary_screen->height(), BITMAP_FORMAT_INDEXED16)),
+	  m_screenbits(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
+	  m_zbuffer(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
 	  m_polygons(0),
 	  m_texture_size(state.machine().region("gfx1")->bytes()),
 	  m_texmask_size(state.machine().region("gfx2")->bytes() * 8),
 	  m_texture(auto_alloc_array(state.machine(), UINT8, m_texture_size)),
 	  m_texmask(auto_alloc_array(state.machine(), UINT8, m_texmask_size))
 {
-	state_save_register_global_bitmap(state.machine(), m_screenbits);
-	state_save_register_global_bitmap(state.machine(), m_zbuffer);
+	state_save_register_global_bitmap(state.machine(), &m_screenbits);
+	state_save_register_global_bitmap(state.machine(), &m_zbuffer);
 
 	/* first expand the pixel data */
 	UINT8 *src = state.machine().region("gfx1")->base();
@@ -212,8 +212,8 @@ void gaelco3d_renderer::render_noz_noperspective(INT32 scanline, const extent_t 
 	offs_t endmask = m_texture_size - 1;
 	const rgb_t *palsource = m_state.m_palette + object.color;
 	UINT32 tex = object.tex;
-	UINT16 *dest = &m_screenbits->pix16(scanline);
-	UINT16 *zbuf = &m_zbuffer->pix16(scanline);
+	UINT16 *dest = &m_screenbits.pix16(scanline);
+	UINT16 *zbuf = &m_zbuffer.pix16(scanline);
 	int startx = extent.startx;
 	float uoz = (object.uoz_base + scanline * object.uoz_dy + startx * object.uoz_dx) * zbase;
 	float voz = (object.voz_base + scanline * object.voz_dy + startx * object.voz_dx) * zbase;
@@ -251,8 +251,8 @@ void gaelco3d_renderer::render_normal(INT32 scanline, const extent_t &extent, co
 	const rgb_t *palsource = m_state.m_palette + object.color;
 	UINT32 tex = object.tex;
 	float z0 = object.z0;
-	UINT16 *dest = &m_screenbits->pix16(scanline);
-	UINT16 *zbuf = &m_zbuffer->pix16(scanline);
+	UINT16 *dest = &m_screenbits.pix16(scanline);
+	UINT16 *zbuf = &m_zbuffer.pix16(scanline);
 	int startx = extent.startx;
 	float ooz = object.ooz_base + scanline * object.ooz_dy + startx * ooz_dx;
 	float uoz = object.uoz_base + scanline * object.uoz_dy + startx * uoz_dx;
@@ -301,8 +301,8 @@ void gaelco3d_renderer::render_alphablend(INT32 scanline, const extent_t &extent
 	const rgb_t *palsource = m_state.m_palette + object.color;
 	UINT32 tex = object.tex;
 	float z0 = object.z0;
-	UINT16 *dest = &m_screenbits->pix16(scanline);
-	UINT16 *zbuf = &m_zbuffer->pix16(scanline);
+	UINT16 *dest = &m_screenbits.pix16(scanline);
+	UINT16 *zbuf = &m_zbuffer.pix16(scanline);
 	int startx = extent.startx;
 	float ooz = object.ooz_base + object.ooz_dy * scanline + startx * ooz_dx;
 	float uoz = object.uoz_base + object.uoz_dy * scanline + startx * uoz_dx;
@@ -431,7 +431,7 @@ WRITE32_HANDLER( gaelco3d_paletteram_020_w )
  *
  *************************************/
 
-SCREEN_UPDATE( gaelco3d )
+SCREEN_UPDATE_IND16( gaelco3d )
 {
 	gaelco3d_state *state = screen.machine().driver_data<gaelco3d_state>();
 	int ret;
@@ -476,7 +476,7 @@ SCREEN_UPDATE( gaelco3d )
     else*/
 	{
 		if (state->m_video_changed)
-			copybitmap(bitmap, *state->m_poly->screenbits(), 0,1, 0,0, cliprect);
+			copybitmap(bitmap, state->m_poly->screenbits(), 0,1, 0,0, cliprect);
 		ret = state->m_video_changed;
 		state->m_video_changed = FALSE;
 	}

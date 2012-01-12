@@ -130,7 +130,7 @@ VIDEO_START( hyperspt )
 	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	hyperspt_state *state = machine.driver_data<hyperspt_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -174,7 +174,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( hyperspt )
+SCREEN_UPDATE_IND16( hyperspt )
 {
 	hyperspt_state *state = screen.machine().driver_data<hyperspt_state>();
 	int row;

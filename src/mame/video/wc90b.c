@@ -98,7 +98,7 @@ WRITE8_HANDLER( wc90b_txvideoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	wc90b_state *state = machine.driver_data<wc90b_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -132,7 +132,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( wc90b )
+SCREEN_UPDATE_IND16( wc90b )
 {
 	wc90b_state *state = screen.machine().driver_data<wc90b_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap,0,8 * (state->m_scroll2x[0] & 0x7f) + 256 - 4 + (state->m_scroll_x_lo[0] & 0x07));

@@ -20,7 +20,7 @@ public:
 	int m_scroll;
 	int m_char_bank;
 	int m_color_select;
-	bitmap_t *m_tmp_bitmap[4];
+	bitmap_ind16 *m_tmp_bitmap[4];
 	tilemap_t *m_bg;
 	tilemap_t *m_fg;
 	UINT8 *m_spriteram;
@@ -57,4 +57,4 @@ WRITE8_HANDLER( pitnrun_scroll_w );
 
 PALETTE_INIT(pitnrun);
 VIDEO_START(pitnrun);
-SCREEN_UPDATE(pitnrun);
+SCREEN_UPDATE_IND16(pitnrun);

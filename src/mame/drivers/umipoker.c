@@ -108,7 +108,7 @@ static VIDEO_START( umipoker )
 
 }
 
-static SCREEN_UPDATE( umipoker )
+static SCREEN_UPDATE_IND16( umipoker )
 {
 	umipoker_state *state = screen.machine().driver_data<umipoker_state>();
 
@@ -662,10 +662,9 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(umipoker)
+	MCFG_SCREEN_UPDATE_STATIC(umipoker)
 
 	MCFG_GFXDECODE(umipoker)
 

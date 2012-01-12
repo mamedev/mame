@@ -121,7 +121,7 @@ static void videoram_alloc(running_machine& machine, int const size)
 		state->m_robokid_bg2_videoram = auto_alloc_array_clear(machine, UINT8, size);
 	}
 
-	state->m_sp_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_sp_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
 static int stencil_ninjakd2( UINT16 pal );
@@ -360,7 +360,7 @@ WRITE8_HANDLER( ninjakd2_sprite_overdraw_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine& machine, bitmap_t &bitmap)
+static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap)
 {
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	const gfx_element* const gfx = machine.gfx[1];
@@ -452,18 +452,18 @@ static int stencil_omegaf(   UINT16 pal ) { return( TRUE ); }
 // This is very hackish.
 // (Is there a possibility that software can't select it but hardware can?)
 
-static void erase_sprites(running_machine& machine, bitmap_t &bitmap)
+static void erase_sprites(running_machine& machine, bitmap_ind16 &bitmap)
 {
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	// if sprite overdraw is disabled, clear the sprite framebuffer
 	if (!state->m_next_sprite_overdraw_enabled)
-		state->m_sp_bitmap->fill(TRANSPARENTCODE);
+		state->m_sp_bitmap.fill(TRANSPARENTCODE);
 	else
-		for (int y = 0; y < state->m_sp_bitmap->height(); ++y)
+		for (int y = 0; y < state->m_sp_bitmap.height(); ++y)
 		{
-			for (int x = 0; x < state->m_sp_bitmap->width(); ++x)
+			for (int x = 0; x < state->m_sp_bitmap.width(); ++x)
 			{
-				UINT16* const ptr = &state->m_sp_bitmap->pix16(y, x);
+				UINT16* const ptr = &state->m_sp_bitmap.pix16(y, x);
 
 				if ( (*state->m_stencil_compare_function)(*ptr) ) *ptr = TRANSPARENTCODE ;
 			}
@@ -474,8 +474,8 @@ static void erase_sprites(running_machine& machine, bitmap_t &bitmap)
 static void update_sprites(running_machine& machine)
 {
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	erase_sprites(machine, *state->m_sp_bitmap);
-	draw_sprites(machine, *state->m_sp_bitmap);
+	erase_sprites(machine, state->m_sp_bitmap);
+	draw_sprites(machine, state->m_sp_bitmap);
 }
 	////// Before modified, this was written.
 		// we want to erase the sprites with the old setting and draw them with the
@@ -484,7 +484,7 @@ static void update_sprites(running_machine& machine)
 	////// The glitch is correct behavior.
 
 
-SCREEN_UPDATE( ninjakd2 )
+SCREEN_UPDATE_IND16( ninjakd2 )
 {
 	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
 	// updating sprites here instead than in screen_eof avoids a palette glitch
@@ -496,14 +496,14 @@ SCREEN_UPDATE( ninjakd2 )
 
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	copybitmap_trans(bitmap, *state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
+	copybitmap_trans(bitmap, state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }
 
-SCREEN_UPDATE( robokid )
+SCREEN_UPDATE_IND16( robokid )
 {
 	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
 	update_sprites(screen.machine());
@@ -515,7 +515,7 @@ SCREEN_UPDATE( robokid )
 
 	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
 
-	copybitmap_trans(bitmap, *state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
+	copybitmap_trans(bitmap, state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
 	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 
@@ -524,7 +524,7 @@ SCREEN_UPDATE( robokid )
 	return 0;
 }
 
-SCREEN_UPDATE( omegaf )
+SCREEN_UPDATE_IND16( omegaf )
 {
 	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
 	update_sprites(screen.machine());
@@ -538,7 +538,7 @@ SCREEN_UPDATE( omegaf )
 
 	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 
-	copybitmap_trans(bitmap, *state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
+	copybitmap_trans(bitmap, state->m_sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 

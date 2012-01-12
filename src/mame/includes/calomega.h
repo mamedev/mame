@@ -20,4 +20,4 @@ WRITE8_HANDLER( calomega_videoram_w );
 WRITE8_HANDLER( calomega_colorram_w );
 PALETTE_INIT( calomega );
 VIDEO_START( calomega );
-SCREEN_UPDATE( calomega );
+SCREEN_UPDATE_IND16( calomega );

@@ -429,10 +429,9 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(360, 262)	/* guess, need to see what the games write to the vid registers */
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(dcheese)
+	MCFG_SCREEN_UPDATE_STATIC(dcheese)
 
 	MCFG_PALETTE_LENGTH(65534)
 

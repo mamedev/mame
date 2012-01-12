@@ -388,7 +388,7 @@ static TILE_GET_INFO( powerbal_get_bg_tile_info )
 	SET_TILE_INFO(1, code, colr >> 12, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -428,7 +428,7 @@ static VIDEO_START( powerbal )
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_bg_yoffset);
 }
 
-static SCREEN_UPDATE( powerbal )
+static SCREEN_UPDATE_IND16( powerbal )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
@@ -498,10 +498,9 @@ static MACHINE_CONFIG_START( powerbal, playmark_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(61)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(powerbal)
+	MCFG_SCREEN_UPDATE_STATIC(powerbal)
 
 	MCFG_GFXDECODE(powerbal)
 	MCFG_PALETTE_LENGTH(512)
@@ -532,10 +531,9 @@ static MACHINE_CONFIG_START( magicstk, playmark_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(61)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(powerbal)
+	MCFG_SCREEN_UPDATE_STATIC(powerbal)
 
 	MCFG_GFXDECODE(powerbal)
 	MCFG_PALETTE_LENGTH(512)

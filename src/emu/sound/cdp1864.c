@@ -169,7 +169,7 @@ void cdp1864_device::device_start()
 	// find devices
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	m_screen = machine().device<screen_device>(m_screen_tag);
-	m_bitmap = auto_bitmap_alloc(machine(), m_screen->width(), m_screen->height(), m_screen->format());
+	m_bitmap.allocate(m_screen->width(), m_screen->height());
 
 	// register for state saving
 	save_item(NAME(m_disp));
@@ -422,7 +422,7 @@ WRITE8_MEMBER( cdp1864_device::dma_w )
 			color = (gdata << 2) | (bdata << 1) | rdata;
 		}
 
-		m_bitmap->pix16(y, sx + x) = color;
+		m_bitmap.pix16(y, sx + x) = color;
 
 		data <<= 1;
 	}
@@ -470,15 +470,16 @@ WRITE_LINE_MEMBER( cdp1864_device::evs_w )
 //  update_screen -
 //-------------------------------------------------
 
-void cdp1864_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 cdp1864_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_disp)
 	{
-		copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
-		m_bitmap->fill(CDP1864_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8, cliprect);
+		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+		m_bitmap.fill(CDP1864_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8, cliprect);
 	}
 	else
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
+	return 0;
 }

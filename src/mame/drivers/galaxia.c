@@ -41,7 +41,7 @@ public:
 
 
 
-static SCREEN_UPDATE( galaxia )
+static SCREEN_UPDATE_IND16( galaxia )
 {
 	galaxia_state *state = screen.machine().driver_data<galaxia_state>();
 	int x,y, count;
@@ -62,9 +62,9 @@ static SCREEN_UPDATE( galaxia )
 		}
 	}
 
-	bitmap_t &s2636_0_bitmap = s2636_update(s2636_0, cliprect);
-	bitmap_t &s2636_1_bitmap = s2636_update(s2636_1, cliprect);
-	bitmap_t &s2636_2_bitmap = s2636_update(s2636_2, cliprect);
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(s2636_0, cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(s2636_1, cliprect);
+	bitmap_ind16 &s2636_2_bitmap = s2636_update(s2636_2, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	{
@@ -276,10 +276,9 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(galaxia)
+	MCFG_SCREEN_UPDATE_STATIC(galaxia)
 
 	MCFG_GFXDECODE(galaxia)
 	MCFG_PALETTE_LENGTH(0x100)

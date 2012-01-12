@@ -17,7 +17,7 @@ public:
 /*----------- defined in video/hexion.c -----------*/
 
 VIDEO_START( hexion );
-SCREEN_UPDATE( hexion );
+SCREEN_UPDATE_IND16( hexion );
 
 WRITE8_HANDLER( hexion_bankswitch_w );
 READ8_HANDLER( hexion_bankedram_r );

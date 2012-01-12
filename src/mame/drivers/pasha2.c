@@ -332,7 +332,7 @@ static VIDEO_START( pasha2 )
 	state->save_item(NAME(state->m_bitmap1));
 }
 
-static SCREEN_UPDATE( pasha2 )
+static SCREEN_UPDATE_IND16( pasha2 )
 {
 	pasha2_state *state = screen.machine().driver_data<pasha2_state>();
 	int x, y, count;
@@ -413,10 +413,9 @@ static MACHINE_CONFIG_START( pasha2, pasha2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
-	MCFG_SCREEN_UPDATE(pasha2)
+	MCFG_SCREEN_UPDATE_STATIC(pasha2)
 
 	MCFG_PALETTE_LENGTH(0x200)
 

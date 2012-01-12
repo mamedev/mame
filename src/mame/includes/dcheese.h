@@ -17,7 +17,7 @@ public:
 	UINT16   m_blitter_yparam[16];
 	UINT16   m_blitter_vidparam[32];
 
-	bitmap_t *m_dstbitmap;
+	bitmap_ind16 *m_dstbitmap;
 	emu_timer *m_blitter_timer;
 
 	/* misc */
@@ -42,7 +42,7 @@ void dcheese_signal_irq(running_machine &machine, int which);
 
 PALETTE_INIT( dcheese );
 VIDEO_START( dcheese );
-SCREEN_UPDATE( dcheese );
+SCREEN_UPDATE_IND16( dcheese );
 
 WRITE16_HANDLER( madmax_blitter_color_w );
 WRITE16_HANDLER( madmax_blitter_xparam_w );

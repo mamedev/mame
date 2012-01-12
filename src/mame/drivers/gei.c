@@ -79,6 +79,12 @@ public:
 	gei_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void video_start();
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	bitmap_ind16 m_bitmap;
+
 	UINT8 m_drawctrl[3];
 	UINT8 m_color[8];
 	int m_prevoffset;
@@ -116,7 +122,7 @@ static WRITE8_HANDLER( gei_bitmap_w )
 
 
 	for (i = 0; i < 8; i++)
-		space->machine().primary_screen->default_bitmap().pix16(sy, sx+i) = state->m_color[8-i-1];
+		state->m_bitmap.pix16(sy, sx+i) = state->m_color[8-i-1];
 }
 
 static PALETTE_INIT(gei)
@@ -137,6 +143,17 @@ static PALETTE_INIT(quizvid)
 	{
 		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 1), pal1bit(i), pal1bit(i >> 2)));
 	}
+}
+
+void gei_state::video_start()
+{
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+}
+
+UINT32 gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
 }
 
 static WRITE8_DEVICE_HANDLER( lamps_w )
@@ -1084,7 +1101,7 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(gei_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
 

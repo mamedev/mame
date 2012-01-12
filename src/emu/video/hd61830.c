@@ -406,7 +406,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 //  draw_scanline - draw one graphics scanline
 //-------------------------------------------------
 
-void hd61830_device::draw_scanline(bitmap_t &bitmap, const rectangle &cliprect, int y, UINT16 ra)
+void hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra)
 {
 	for (int sx = 0; sx < m_hn; sx++)
 	{
@@ -424,7 +424,7 @@ void hd61830_device::draw_scanline(bitmap_t &bitmap, const rectangle &cliprect, 
 //  update_graphics - draw graphics mode screen
 //-------------------------------------------------
 
-void hd61830_device::update_graphics(bitmap_t &bitmap, const rectangle &cliprect)
+void hd61830_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < m_nx; y++)
 	{
@@ -444,7 +444,7 @@ void hd61830_device::update_graphics(bitmap_t &bitmap, const rectangle &cliprect
 //  draw_char - draw a char
 //-------------------------------------------------
 
-void hd61830_device::draw_char(bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md)
+void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md)
 {
 	for (int cl = 0; cl < m_vp; cl++)
 	{
@@ -515,7 +515,7 @@ void hd61830_device::draw_char(bitmap_t &bitmap, const rectangle &cliprect, UINT
 //  update_text - draw text mode screen
 //-------------------------------------------------
 
-void hd61830_device::update_text(bitmap_t &bitmap, const rectangle &cliprect)
+void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < (m_nx / m_vp); y++)
 	{
@@ -534,7 +534,7 @@ void hd61830_device::update_text(bitmap_t &bitmap, const rectangle &cliprect)
 //  update_screen - update screen
 //-------------------------------------------------
 
-void hd61830_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 hd61830_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_mcr & MODE_DISPLAY_ON)
 	{
@@ -559,4 +559,5 @@ void hd61830_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 		m_blink = 0;
 		m_cursor = !m_cursor;
 	}
+	return 0;
 }

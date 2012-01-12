@@ -339,7 +339,7 @@ VIDEO_START( gaelco2_dual )
 
 ***************************************************************************/
 
-static void draw_sprites(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int mask, int xoffs)
+static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs)
 {
 	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	UINT16 *buffered_spriteram16 = screen.machine().generic.buffered_spriteram.u16;
@@ -436,7 +436,7 @@ static void draw_sprites(screen_device &screen, bitmap_t &bitmap, const rectangl
 
 ***************************************************************************/
 
-SCREEN_UPDATE( gaelco2 )
+SCREEN_UPDATE_IND16( gaelco2 )
 {
 	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	int i;
@@ -466,7 +466,7 @@ SCREEN_UPDATE( gaelco2 )
 	return 0;
 }
 
-static UINT32 dual_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int index)
+static UINT32 dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
 {
 	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	int i;
@@ -496,8 +496,8 @@ static UINT32 dual_update(screen_device &screen, bitmap_t &bitmap, const rectang
 	return 0;
 }
 
-SCREEN_UPDATE( gaelco2_left ) { return dual_update(screen, bitmap, cliprect, 0); }
-SCREEN_UPDATE( gaelco2_right ) { return dual_update(screen, bitmap, cliprect, 1); }
+SCREEN_UPDATE_IND16( gaelco2_left ) { return dual_update(screen, bitmap, cliprect, 0); }
+SCREEN_UPDATE_IND16( gaelco2_right ) { return dual_update(screen, bitmap, cliprect, 1); }
 
 
 

@@ -19,7 +19,7 @@ public:
 /*----------- defined in video/cabal.c -----------*/
 
 extern VIDEO_START( cabal );
-extern SCREEN_UPDATE( cabal );
+extern SCREEN_UPDATE_IND16( cabal );
 WRITE16_HANDLER( cabal_flipscreen_w );
 WRITE16_HANDLER( cabal_background_videoram16_w );
 WRITE16_HANDLER( cabal_text_videoram16_w );

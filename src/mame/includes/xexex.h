@@ -55,4 +55,4 @@ extern void xexex_sprite_callback(running_machine &machine, int *code, int *colo
 extern void xexex_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 VIDEO_START( xexex );
-SCREEN_UPDATE( xexex );
+SCREEN_UPDATE_RGB32( xexex );

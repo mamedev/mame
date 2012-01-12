@@ -51,7 +51,7 @@ READ8_DEVICE_HANDLER ( i8275_r );
 WRITE8_DEVICE_HANDLER ( i8275_w );
 
 /* updates the screen */
-void i8275_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
+void i8275_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 WRITE8_DEVICE_HANDLER( i8275_dack_w );
 

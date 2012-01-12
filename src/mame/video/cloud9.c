@@ -36,7 +36,7 @@ VIDEO_START( cloud9 )
 			3,	resistances, state->m_bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	state->m_spritebitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_spritebitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	/* register for savestates */
 	state->save_pointer(NAME(state->m_videoram), 0x8000);
@@ -247,7 +247,7 @@ WRITE8_HANDLER( cloud9_bitmode_addr_w )
  *
  *************************************/
 
-SCREEN_UPDATE( cloud9 )
+SCREEN_UPDATE_IND16( cloud9 )
 {
 	cloud9_state *state = screen.machine().driver_data<cloud9_state>();
 	UINT8 *spriteaddr = state->m_spriteram;
@@ -256,7 +256,7 @@ SCREEN_UPDATE( cloud9 )
 	int x, y, offs;
 
 	/* draw the sprites */
-	state->m_spritebitmap->fill(0x00, cliprect);
+	state->m_spritebitmap.fill(0x00, cliprect);
 	for (offs = 0; offs < 0x20; offs++)
 		if (spriteaddr[offs + 0x00] != 0)
 		{
@@ -267,9 +267,9 @@ SCREEN_UPDATE( cloud9 )
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			drawgfx_transpen(*state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x, y, 0);
+			drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
-				drawgfx_transpen(*state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
+				drawgfx_transpen(state->m_spritebitmap, cliprect, screen.machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */
@@ -287,7 +287,7 @@ SCREEN_UPDATE( cloud9 )
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			UINT16 *mosrc = &state->m_spritebitmap->pix16(y);
+			UINT16 *mosrc = &state->m_spritebitmap.pix16(y);
 			int effy = y ^ flip;
 			UINT8 *src[2];
 

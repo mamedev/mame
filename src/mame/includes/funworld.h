@@ -17,4 +17,4 @@ WRITE8_HANDLER( funworld_colorram_w );
 PALETTE_INIT( funworld );
 VIDEO_START( funworld );
 VIDEO_START( magicrd2 );
-SCREEN_UPDATE( funworld );
+SCREEN_UPDATE_IND16( funworld );

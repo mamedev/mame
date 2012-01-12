@@ -90,7 +90,7 @@ static WRITE8_HANDLER( tugboat_score_w )
       if (offset<0x8 ) state->m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
 }
 
-static void draw_tilemap(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,
+static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,
 		int addr,int gfx0,int gfx1,int transparency)
 {
 	tugboat_state *state = machine.driver_data<tugboat_state>();
@@ -125,7 +125,7 @@ static void draw_tilemap(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-static SCREEN_UPDATE( tugboat )
+static SCREEN_UPDATE_IND16( tugboat )
 {
 	tugboat_state *state = screen.machine().driver_data<tugboat_state>();
 	int startaddr0 = state->m_hd46505_0_reg[0x0c]*256 + state->m_hd46505_0_reg[0x0d];
@@ -338,10 +338,9 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8,32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
-	MCFG_SCREEN_UPDATE(tugboat)
+	MCFG_SCREEN_UPDATE_STATIC(tugboat)
 
 	MCFG_GFXDECODE(tugboat)
 	MCFG_PALETTE_LENGTH(256)

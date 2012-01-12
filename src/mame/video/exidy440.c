@@ -302,7 +302,7 @@ static TIMER_CALLBACK( collide_firq_callback )
  *
  *************************************/
 
-static void draw_sprites(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect,
+static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,
 						 int scroll_offset, int check_collision)
 {
 	exidy440_state *state = screen.machine().driver_data<exidy440_state>();
@@ -403,7 +403,7 @@ static void draw_sprites(screen_device &screen, bitmap_t &bitmap, const rectangl
  *
  *************************************/
 
-static void update_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect,
+static void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,
 						  int scroll_offset, int check_collision)
 {
 	exidy440_state *state = screen.machine().driver_data<exidy440_state>();
@@ -433,7 +433,7 @@ static void update_screen(screen_device &screen, bitmap_t &bitmap, const rectang
  *
  *************************************/
 
-static SCREEN_UPDATE( exidy440 )
+static SCREEN_UPDATE_IND16( exidy440 )
 {
 	/* redraw the screen */
 	update_screen(screen, bitmap, cliprect, 0, TRUE);
@@ -465,7 +465,7 @@ static SCREEN_UPDATE( exidy440 )
 }
 
 
-static SCREEN_UPDATE( topsecex )
+static SCREEN_UPDATE_IND16( topsecex )
 {
 	exidy440_state *state = screen.machine().driver_data<exidy440_state>();
 	/* redraw the screen */
@@ -488,9 +488,8 @@ MACHINE_CONFIG_FRAGMENT( exidy440_video )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE(exidy440)
+	MCFG_SCREEN_UPDATE_STATIC(exidy440)
 MACHINE_CONFIG_END
 
 
@@ -500,5 +499,5 @@ MACHINE_CONFIG_FRAGMENT( topsecex_video )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, TOPSECEX_VBSTART)
-	MCFG_SCREEN_UPDATE(topsecex)
+	MCFG_SCREEN_UPDATE_STATIC(topsecex)
 MACHINE_CONFIG_END

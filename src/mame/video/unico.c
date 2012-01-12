@@ -221,7 +221,7 @@ VIDEO_START( zeropnt2 )
 
 ***************************************************************************/
 
-static void unico_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void unico_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	unico_state *state = machine.driver_data<unico_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -276,7 +276,7 @@ static void unico_draw_sprites(running_machine &machine, bitmap_t &bitmap,const 
 	}
 }
 
-static void zeropnt2_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void zeropnt2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	unico_state *state = machine.driver_data<unico_state>();
 	UINT32 *spriteram32 = (UINT32 *)state->m_spriteram;
@@ -341,7 +341,7 @@ static void zeropnt2_draw_sprites(running_machine &machine, bitmap_t &bitmap,con
 
 ***************************************************************************/
 
-SCREEN_UPDATE( unico )
+SCREEN_UPDATE_IND16( unico )
 {
 	unico_state *state = screen.machine().driver_data<unico_state>();
 	int layers_ctrl = -1;
@@ -381,7 +381,7 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	return 0;
 }
 
-SCREEN_UPDATE( zeropnt2 )
+SCREEN_UPDATE_IND16( zeropnt2 )
 {
 	unico_state *state = screen.machine().driver_data<unico_state>();
 	int layers_ctrl = -1;

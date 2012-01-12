@@ -70,7 +70,7 @@ public:
 /*----------- defined in video/esripsys.c -----------*/
 
 VIDEO_START( esripsys );
-SCREEN_UPDATE( esripsys );
+SCREEN_UPDATE_RGB32( esripsys );
 
 WRITE8_HANDLER( esripsys_bg_intensity_w );
 INTERRUPT_GEN( esripsys_vblank_irq );

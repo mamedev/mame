@@ -52,9 +52,9 @@ PALETTE_INIT( helifire );
 VIDEO_START( spacefev );
 VIDEO_START( sheriff );
 VIDEO_START( helifire );
-SCREEN_UPDATE( spacefev );
-SCREEN_UPDATE( sheriff );
-SCREEN_UPDATE( helifire );
+SCREEN_UPDATE_IND16( spacefev );
+SCREEN_UPDATE_IND16( sheriff );
+SCREEN_UPDATE_IND16( helifire );
 SCREEN_EOF( helifire );
 
 void spacefev_start_red_cannon(running_machine &machine);

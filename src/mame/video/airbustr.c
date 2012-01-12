@@ -121,7 +121,7 @@ VIDEO_START( airbustr )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	state->m_sprites_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_sprites_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
 	tilemap_set_scrolldx(state->m_bg_tilemap, 0x094, 0x06a);
@@ -129,11 +129,11 @@ VIDEO_START( airbustr )
 	tilemap_set_scrolldx(state->m_fg_tilemap, 0x094, 0x06a);
 	tilemap_set_scrolldy(state->m_fg_tilemap, 0x100, 0x1ff);
 
-	state->save_item(NAME(*state->m_sprites_bitmap));
+	state->save_item(NAME(state->m_sprites_bitmap));
 }
 
 
-SCREEN_UPDATE( airbustr )
+SCREEN_UPDATE_IND16( airbustr )
 {
 	airbustr_state *state = screen.machine().driver_data<airbustr_state>();
 

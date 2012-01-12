@@ -79,7 +79,7 @@ void pc_video_start(running_machine &machine, pc_video_update_proc (*choosevideo
 
 
 
-SCREEN_UPDATE( pc_video )
+SCREEN_UPDATE_IND16( pc_video )
 {
 	UINT32 rc = 0;
 	int w = 0, h = 0;
@@ -991,7 +991,7 @@ static VIDEO_RESET( vga )
 	pc_vga_reset(machine);
 }
 
-static void vga_vh_text(bitmap_t &bitmap)
+static void vga_vh_text(bitmap_ind16 &bitmap)
 {
 	UINT8 ch, attr;
 	UINT8 bits;
@@ -1058,7 +1058,7 @@ static void vga_vh_text(bitmap_t &bitmap)
 	}
 }
 
-static void vga_vh_ega(bitmap_t &bitmap)
+static void vga_vh_ega(bitmap_ind16 &bitmap)
 {
 	int pos, line, column, c, addr, i;
 	int height = CRTC_CHAR_HEIGHT;
@@ -1103,7 +1103,7 @@ static void vga_vh_ega(bitmap_t &bitmap)
 	}
 }
 
-static void vga_vh_vga(bitmap_t &bitmap)
+static void vga_vh_vga(bitmap_ind16 &bitmap)
 {
 	int pos, line, column, c, addr, curr_addr;
 	UINT16 *bitmapline;
@@ -1244,9 +1244,8 @@ size_t pc_vga_memory_size(void)
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,800,0,640,525,0,480)
-	MCFG_SCREEN_UPDATE(pc_video)
+	MCFG_SCREEN_UPDATE_STATIC(pc_video)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(vga)

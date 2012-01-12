@@ -21,8 +21,8 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	/* video-related */
-	bitmap_t *m_tmpbitmap0;
-	bitmap_t *m_tmpbitmap1;
+	bitmap_ind16 *m_tmpbitmap0;
+	bitmap_ind16 *m_tmpbitmap1;
 	int  m_flip_screen;
 	int  m_video_enable;
 	int  m_screen_redraw;
@@ -61,8 +61,8 @@ public:
 static VIDEO_START( mjsister )
 {
 	mjsister_state *state = machine.driver_data<mjsister_state>();
-	state->m_tmpbitmap0 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
-	state->m_tmpbitmap1 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
+	state->m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine, 256, 256);
+	state->m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine, 256, 256);
 
 	state->save_item(NAME(state->m_videoram0));
 	state->save_item(NAME(state->m_videoram1));
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( mjsister_videoram_w )
 	}
 }
 
-static SCREEN_UPDATE( mjsister )
+static SCREEN_UPDATE_IND16( mjsister )
 {
 	mjsister_state *state = screen.machine().driver_data<mjsister_state>();
 	int flip = state->m_flip_screen;
@@ -508,10 +508,9 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256+4, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+4, 8, 247)
-	MCFG_SCREEN_UPDATE(mjsister)
+	MCFG_SCREEN_UPDATE_STATIC(mjsister)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_PALETTE_LENGTH(256)

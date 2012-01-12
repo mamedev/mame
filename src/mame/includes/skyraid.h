@@ -15,7 +15,7 @@ public:
 	UINT8* m_pos_ram;
 	UINT8* m_obj_ram;
 
-	bitmap_t *m_helper;
+	bitmap_ind16 *m_helper;
 };
 
 
@@ -29,4 +29,4 @@ WRITE8_DEVICE_HANDLER( skyraid_sound_w );
 /*----------- defined in video/skyraid.c -----------*/
 
 VIDEO_START(skyraid);
-SCREEN_UPDATE(skyraid);
+SCREEN_UPDATE_IND16(skyraid);

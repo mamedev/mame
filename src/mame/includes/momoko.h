@@ -46,4 +46,4 @@ WRITE8_HANDLER( momoko_fg_select_w);
 WRITE8_HANDLER( momoko_bg_select_w);
 WRITE8_HANDLER( momoko_bg_priority_w);
 
-SCREEN_UPDATE( momoko );
+SCREEN_UPDATE_IND16( momoko );

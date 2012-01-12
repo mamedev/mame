@@ -171,7 +171,7 @@ WRITE8_HANDLER( vulgus_palette_bank_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	vulgus_state *state = machine.driver_data<vulgus_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -217,7 +217,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-SCREEN_UPDATE( vulgus )
+SCREEN_UPDATE_IND16( vulgus )
 {
 	vulgus_state *state = screen.machine().driver_data<vulgus_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_low[1] + 256 * state->m_scroll_high[1]);

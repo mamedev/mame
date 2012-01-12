@@ -46,8 +46,6 @@ public:
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ8_MEMBER(dedicated_switch_r);
-
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 static INPUT_PORTS_START( whitestar )
@@ -192,13 +190,13 @@ static INTERRUPT_GEN( whitestar_firq_interrupt )
 	MCFG_SCREEN_TYPE(LCD) \
     MCFG_SCREEN_REFRESH_RATE(60) \
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
+    MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update) \
 	MCFG_SCREEN_SIZE( _width * DMD_CHUNK_SIZE, _height *DMD_CHUNK_SIZE) \
 	MCFG_SCREEN_VISIBLE_AREA( 0, _width * DMD_CHUNK_SIZE-1, 0, _height*DMD_CHUNK_SIZE-1 ) \
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
 
-void dmd_put_pixel(bitmap_t &bitmap, int x, int y, int color)
+void dmd_put_pixel(bitmap_rgb32 &bitmap, int x, int y, rgb_t color)
 {
 	int midx = x * DMD_CHUNK_SIZE + DMD_CHUNK_SIZE/2;
 	int midy = y * DMD_CHUNK_SIZE + DMD_CHUNK_SIZE/2;
@@ -210,8 +208,8 @@ void dmd_put_pixel(bitmap_t &bitmap, int x, int y, int color)
 	// iterate over y
 	for (UINT32 y = 0; y <= width; y++)
 	{
-		UINT16 *d0 = &bitmap.pix16(midy - y);
-		UINT16 *d1 = &bitmap.pix16(midy + y);
+		UINT32 *d0 = &bitmap.pix32(midy - y);
+		UINT32 *d1 = &bitmap.pix32(midy + y);
 		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
 		INT32 left, right;
 
@@ -221,13 +219,14 @@ void dmd_put_pixel(bitmap_t &bitmap, int x, int y, int color)
 
 		// draw this scanline
 		for (UINT32 x = left; x < right; x++)
-			d0[x] = d1[x] = color + 1;
+			d0[x] = d1[x] = color;
 	}
 }
 
 MC6845_UPDATE_ROW( whitestar_update_row )
 {
 	whitestar_state *state = device->machine().driver_data<whitestar_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *vram  = state->m_vram + ((ma & 0x100)<<2) + (ra << 4);
 	int xi;
 
@@ -237,7 +236,7 @@ MC6845_UPDATE_ROW( whitestar_update_row )
 		val = BITSWAP16(val,15,7,14,6,13,5,12,4,11,3,10,2,9,1,8,0);
 
 		for(xi=0;xi<8;xi++)
-			dmd_put_pixel(bitmap, (x*8 + xi), ra, (val>>(14-xi*2)) & 0x03);
+			dmd_put_pixel(bitmap, (x*8 + xi), ra, palette[((val>>(14-xi*2)) & 0x03) + 1]);
 	}
 }
 
@@ -263,12 +262,6 @@ static PALETTE_INIT( whitestar )
 	palette_set_color(machine, 2, MAKE_RGB(84, 73, 10));
 	palette_set_color(machine, 3, MAKE_RGB(168, 147, 21));
 	palette_set_color(machine, 4, MAKE_RGB(255, 224, 32));
-}
-
-bool whitestar_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_mc6845->update(bitmap, cliprect);
-	return 0;
 }
 
 static MACHINE_CONFIG_START( whitestar, whitestar_state )

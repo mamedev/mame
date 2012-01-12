@@ -88,7 +88,7 @@ static void get_pens(jedi_state *state, pen_t *pens)
 }
 
 
-static void do_pen_lookup(jedi_state *state, bitmap_t &bitmap, const rectangle &cliprect)
+static void do_pen_lookup(jedi_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS];
@@ -132,7 +132,7 @@ WRITE8_HANDLER( jedi_hscroll_w )
  *
  *************************************/
 
-static void draw_background_and_text(running_machine &machine, jedi_state *state, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_background_and_text(running_machine &machine, jedi_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y;
 	int background_line_buffer[0x200];	/* RAM chip at 2A */
@@ -232,7 +232,7 @@ static void draw_background_and_text(running_machine &machine, jedi_state *state
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 	UINT8 *spriteram = state->m_spriteram;
@@ -327,7 +327,7 @@ static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_t &
  *
  *************************************/
 
-static SCREEN_UPDATE( jedi )
+static SCREEN_UPDATE_RGB32( jedi )
 {
 	jedi_state *state = screen.machine().driver_data<jedi_state>();
 
@@ -356,11 +356,10 @@ static SCREEN_UPDATE( jedi )
 
 MACHINE_CONFIG_FRAGMENT( jedi_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 262) /* verify vert size */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(jedi)
+	MCFG_SCREEN_UPDATE_STATIC(jedi)
 
 	MCFG_VIDEO_START(jedi)
 MACHINE_CONFIG_END

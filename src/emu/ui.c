@@ -163,7 +163,6 @@ static INT32 slider_overyoffset(running_machine &machine, void *arg, astring *st
 static INT32 slider_flicker(running_machine &machine, void *arg, astring *string, INT32 newval);
 static INT32 slider_beam(running_machine &machine, void *arg, astring *string, INT32 newval);
 static char *slider_get_screen_desc(screen_device &screen);
-static char *slider_get_laserdisc_desc(device_t *screen);
 #ifdef MAME_DEBUG
 static INT32 slider_crossscale(running_machine &machine, void *arg, astring *string, INT32 newval);
 static INT32 slider_crossoffset(running_machine &machine, void *arg, astring *string, INT32 newval);
@@ -1739,32 +1738,33 @@ static slider_state *slider_init(running_machine &machine)
 	}
 
 	for (device = machine.devicelist().first(); device != NULL; device = device->next())
-		if (device_is_laserdisc(device))
+	{
+		laserdisc_device *laserdisc = dynamic_cast<laserdisc_device *>(device);
+		if (laserdisc != NULL && laserdisc->overlay_configured())
 		{
-			const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_base *>(device)->inline_config();
-			if (config->overupdate != NULL)
-			{
-				int defxscale = floor(config->overscalex * 1000.0f + 0.5f);
-				int defyscale = floor(config->overscaley * 1000.0f + 0.5f);
-				int defxoffset = floor(config->overposx * 1000.0f + 0.5f);
-				int defyoffset = floor(config->overposy * 1000.0f + 0.5f);
-				void *param = (void *)device;
+			laserdisc_overlay_config config;
+			laserdisc->get_overlay_config(config);
+			int defxscale = floor(config.m_overscalex * 1000.0f + 0.5f);
+			int defyscale = floor(config.m_overscaley * 1000.0f + 0.5f);
+			int defxoffset = floor(config.m_overposx * 1000.0f + 0.5f);
+			int defyoffset = floor(config.m_overposy * 1000.0f + 0.5f);
+			void *param = (void *)laserdisc;
 
-				/* add scale and offset controls per-overlay */
-				string.printf("%s Horiz Stretch", slider_get_laserdisc_desc(device));
-				*tailptr = slider_alloc(machine, string, 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
-				tailptr = &(*tailptr)->next;
-				string.printf("%s Horiz Position", slider_get_laserdisc_desc(device));
-				*tailptr = slider_alloc(machine, string, -500, defxoffset, 500, 2, slider_overxoffset, param);
-				tailptr = &(*tailptr)->next;
-				string.printf("%s Vert Stretch", slider_get_laserdisc_desc(device));
-				*tailptr = slider_alloc(machine, string, 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
-				tailptr = &(*tailptr)->next;
-				string.printf("%s Vert Position", slider_get_laserdisc_desc(device));
-				*tailptr = slider_alloc(machine, string, -500, defyoffset, 500, 2, slider_overyoffset, param);
-				tailptr = &(*tailptr)->next;
-			}
+			/* add scale and offset controls per-overlay */
+			string.printf("Laserdisc '%s' Horiz Stretch", laserdisc->tag());
+			*tailptr = slider_alloc(machine, string, 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
+			tailptr = &(*tailptr)->next;
+			string.printf("Laserdisc '%s' Horiz Position", laserdisc->tag());
+			*tailptr = slider_alloc(machine, string, -500, defxoffset, 500, 2, slider_overxoffset, param);
+			tailptr = &(*tailptr)->next;
+			string.printf("Laserdisc '%s' Vert Stretch", laserdisc->tag());
+			*tailptr = slider_alloc(machine, string, 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
+			tailptr = &(*tailptr)->next;
+			string.printf("Laserdisc '%s' Vert Position", laserdisc->tag());
+			*tailptr = slider_alloc(machine, string, -500, defyoffset, 500, 2, slider_overyoffset, param);
+			tailptr = &(*tailptr)->next;
 		}
+	}
 
 	for (screen_device *screen = machine.first_screen(); screen != NULL; screen = screen->next_screen())
 		if (screen->screen_type() == SCREEN_TYPE_VECTOR)
@@ -2055,18 +2055,18 @@ static INT32 slider_yoffset(running_machine &machine, void *arg, astring *string
 
 static INT32 slider_overxscale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
-	device_t *laserdisc = (device_t *)arg;
-	laserdisc_config settings;
+	laserdisc_device *laserdisc = (laserdisc_device *)arg;
+	laserdisc_overlay_config settings;
 
-	laserdisc_get_config(laserdisc, &settings);
+	laserdisc->get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.overscalex = (float)newval * 0.001f;
-		laserdisc_set_config(laserdisc, &settings);
+		settings.m_overscalex = (float)newval * 0.001f;
+		laserdisc->set_overlay_config(settings);
 	}
 	if (string != NULL)
-		string->printf("%.3f", settings.overscalex);
-	return floor(settings.overscalex * 1000.0f + 0.5f);
+		string->printf("%.3f", settings.m_overscalex);
+	return floor(settings.m_overscalex * 1000.0f + 0.5f);
 }
 
 
@@ -2077,18 +2077,18 @@ static INT32 slider_overxscale(running_machine &machine, void *arg, astring *str
 
 static INT32 slider_overyscale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
-	device_t *laserdisc = (device_t *)arg;
-	laserdisc_config settings;
+	laserdisc_device *laserdisc = (laserdisc_device *)arg;
+	laserdisc_overlay_config settings;
 
-	laserdisc_get_config(laserdisc, &settings);
+	laserdisc->get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.overscaley = (float)newval * 0.001f;
-		laserdisc_set_config(laserdisc, &settings);
+		settings.m_overscaley = (float)newval * 0.001f;
+		laserdisc->set_overlay_config(settings);
 	}
 	if (string != NULL)
-		string->printf("%.3f", settings.overscaley);
-	return floor(settings.overscaley * 1000.0f + 0.5f);
+		string->printf("%.3f", settings.m_overscaley);
+	return floor(settings.m_overscaley * 1000.0f + 0.5f);
 }
 
 
@@ -2099,18 +2099,18 @@ static INT32 slider_overyscale(running_machine &machine, void *arg, astring *str
 
 static INT32 slider_overxoffset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
-	device_t *laserdisc = (device_t *)arg;
-	laserdisc_config settings;
+	laserdisc_device *laserdisc = (laserdisc_device *)arg;
+	laserdisc_overlay_config settings;
 
-	laserdisc_get_config(laserdisc, &settings);
+	laserdisc->get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.overposx = (float)newval * 0.001f;
-		laserdisc_set_config(laserdisc, &settings);
+		settings.m_overposx = (float)newval * 0.001f;
+		laserdisc->set_overlay_config(settings);
 	}
 	if (string != NULL)
-		string->printf("%.3f", settings.overposx);
-	return floor(settings.overposx * 1000.0f + 0.5f);
+		string->printf("%.3f", settings.m_overposx);
+	return floor(settings.m_overposx * 1000.0f + 0.5f);
 }
 
 
@@ -2121,18 +2121,18 @@ static INT32 slider_overxoffset(running_machine &machine, void *arg, astring *st
 
 static INT32 slider_overyoffset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
-	device_t *laserdisc = (device_t *)arg;
-	laserdisc_config settings;
+	laserdisc_device *laserdisc = (laserdisc_device *)arg;
+	laserdisc_overlay_config settings;
 
-	laserdisc_get_config(laserdisc, &settings);
+	laserdisc->get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.overposy = (float)newval * 0.001f;
-		laserdisc_set_config(laserdisc, &settings);
+		settings.m_overposy = (float)newval * 0.001f;
+		laserdisc->set_overlay_config(settings);
 	}
 	if (string != NULL)
-		string->printf("%.3f", settings.overposy);
-	return floor(settings.overposy * 1000.0f + 0.5f);
+		string->printf("%.3f", settings.m_overposy);
+	return floor(settings.m_overposy * 1000.0f + 0.5f);
 }
 
 
@@ -2181,24 +2181,6 @@ static char *slider_get_screen_desc(screen_device &screen)
 	else
 		strcpy(descbuf, "Screen");
 
-	return descbuf;
-}
-
-/*-------------------------------------------------
-    slider_get_laserdisc_desc - returns the
-    description for a given laseridsc
--------------------------------------------------*/
-static char *slider_get_laserdisc_desc(device_t *laserdisc)
-{
-	static char descbuf[256];
-	for (device_t *device = laserdisc->machine().devicelist().first(); device != NULL; device = device->next())
-		if (device_is_laserdisc(device) && device != laserdisc)
-		{
-			sprintf(descbuf, "Laserdisc '%s'", laserdisc->tag());
-			return descbuf;
-		}
-
-	strcpy(descbuf, "Laserdisc");
 	return descbuf;
 }
 

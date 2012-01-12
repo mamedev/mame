@@ -38,4 +38,4 @@ int suprridr_is_screen_flipped(running_machine &machine);
 WRITE8_HANDLER( suprridr_fgram_w );
 WRITE8_HANDLER( suprridr_bgram_w );
 
-SCREEN_UPDATE( suprridr );
+SCREEN_UPDATE_IND16( suprridr );

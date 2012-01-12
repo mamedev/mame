@@ -42,5 +42,5 @@ WRITE16_HANDLER( inufuku_tx_videoram_w );
 WRITE16_HANDLER( inufuku_palettereg_w );
 WRITE16_HANDLER( inufuku_scrollreg_w );
 
-SCREEN_UPDATE( inufuku );
+SCREEN_UPDATE_IND16( inufuku );
 VIDEO_START( inufuku );

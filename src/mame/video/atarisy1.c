@@ -500,11 +500,11 @@ static void update_timers(running_machine &machine, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE( atarisy1 )
+SCREEN_UPDATE_IND16( atarisy1 )
 {
 	atarisy1_state *state = screen.machine().driver_data<atarisy1_state>();
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

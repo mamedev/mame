@@ -36,4 +36,4 @@ WRITE8_HANDLER( graph_processor_w );
 WRITE8_HANDLER( cloak_clearbmp_w );
 
 VIDEO_START( cloak );
-SCREEN_UPDATE( cloak );
+SCREEN_UPDATE_IND16( cloak );

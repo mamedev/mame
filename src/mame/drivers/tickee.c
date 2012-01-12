@@ -141,7 +141,7 @@ static VIDEO_START( tickee )
  *
  *************************************/
 
-static void scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
+static void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
 	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
@@ -167,7 +167,7 @@ static void scanline_update(screen_device &screen, bitmap_t &bitmap, int scanlin
 }
 
 
-static void rapidfir_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
+static void rapidfir_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
 	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
@@ -725,7 +725,8 @@ static const tms34010_config tms_config =
 	"screen",						/* the screen operated on */
 	VIDEO_CLOCK/2,					/* pixel clock */
 	1,								/* pixels per clock */
-	scanline_update,				/* scanline callback */
+	NULL,							/* scanline callback (indexed16) */
+	scanline_update,				/* scanline callback (rgb32) */
 	NULL,							/* generate interrupt */
 	NULL,							/* write to shiftreg function */
 	NULL							/* read from shiftreg function */
@@ -738,7 +739,8 @@ static const tms34010_config rapidfir_tms_config =
 	"screen",						/* the screen operated on */
 	VIDEO_CLOCK/2,					/* pixel clock */
 	1,								/* pixels per clock */
-	rapidfir_scanline_update,		/* scanline callback */
+	NULL,							/* scanline callback (indexed16) */
+	rapidfir_scanline_update,		/* scanline callback (rgb32) */
 	NULL,							/* generate interrupt */
 	rapidfir_to_shiftreg,			/* write to shiftreg function */
 	rapidfir_from_shiftreg			/* read from shiftreg function */
@@ -771,9 +773,8 @@ static MACHINE_CONFIG_START( tickee, tickee_state )
 	MCFG_VIDEO_START(tickee)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -812,9 +813,8 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 	MCFG_VIDEO_START(tickee)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -841,9 +841,8 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

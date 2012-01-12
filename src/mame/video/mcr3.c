@@ -205,7 +205,7 @@ WRITE8_HANDLER( spyhunt_scroll_value_w )
  *
  *************************************/
 
-static void mcr3_update_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy)
+static void mcr3_update_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy)
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -280,7 +280,7 @@ static void mcr3_update_sprites(running_machine &machine, bitmap_t &bitmap, cons
  *
  *************************************/
 
-SCREEN_UPDATE( mcr3 )
+SCREEN_UPDATE_IND16( mcr3 )
 {
 	mcr3_state *state = screen.machine().driver_data<mcr3_state>();
 	/* update the flip state */
@@ -295,7 +295,7 @@ SCREEN_UPDATE( mcr3 )
 }
 
 
-SCREEN_UPDATE( spyhunt )
+SCREEN_UPDATE_IND16( spyhunt )
 {
 	mcr3_state *state = screen.machine().driver_data<mcr3_state>();
 	/* for every character in the Video RAM, check if it has been modified */

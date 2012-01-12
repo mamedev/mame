@@ -101,14 +101,14 @@ VIDEO_START( cheekyms )
 
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
-	state->m_bitmap_buffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_bitmap_buffer = auto_bitmap_ind16_alloc(machine, width, height);
 
 	state->m_cm_tilemap = tilemap_create(machine, cheekyms_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->m_cm_tilemap, 0);
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx, int flip )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx, int flip )
 {
 	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 	offs_t offs;
@@ -148,7 +148,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-SCREEN_UPDATE( cheekyms )
+SCREEN_UPDATE_IND16( cheekyms )
 {
 	cheekyms_state *state = screen.machine().driver_data<cheekyms_state>();
 	int y, x;

@@ -45,8 +45,8 @@ static VIDEO_START( taitob_core )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
 
-	state->m_framebuffer[0] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
-	state->m_framebuffer[1] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
+	state->m_framebuffer[0] = auto_bitmap_ind16_alloc(machine, 512, 256);
+	state->m_framebuffer[1] = auto_bitmap_ind16_alloc(machine, 512, 256);
 	state->m_pixel_bitmap = NULL;  /* only hitice needs this */
 
 	state->save_item(NAME(state->m_pixel_scroll));
@@ -97,7 +97,7 @@ VIDEO_START( hitice )
 
 	state->m_b_fg_color_base = 0x80;		/* hitice also uses this for the pixel_bitmap */
 
-	state->m_pixel_bitmap = auto_bitmap_alloc(machine, 1024, 512, machine.primary_screen->format());
+	state->m_pixel_bitmap = auto_bitmap_ind16_alloc(machine, 1024, 512);
 
 	state->save_item(NAME(*state->m_pixel_bitmap));
 }
@@ -113,7 +113,7 @@ VIDEO_START( realpunc )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
 
-	state->m_realpunc_bitmap = auto_bitmap_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height(), BITMAP_FORMAT_INDEXED16);
+	state->m_realpunc_bitmap = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
 
 	VIDEO_START_CALL(taitob_color_order0);
 }
@@ -141,7 +141,7 @@ WRITE16_HANDLER( tc0180vcu_framebuffer_word_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 /*  Sprite format: (16 bytes per sprite)
   offs:             bits:
@@ -270,7 +270,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-static void draw_framebuffer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_framebuffer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
 	rectangle myclip = cliprect;
@@ -375,7 +375,7 @@ g_profiler.start(PROFILER_USER1);
 g_profiler.stop();
 }
 
-SCREEN_UPDATE( taitob )
+SCREEN_UPDATE_IND16( taitob )
 {
 	taitob_state *state = screen.machine().driver_data<taitob_state>();
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
@@ -411,7 +411,7 @@ SCREEN_UPDATE( taitob )
 
 
 
-SCREEN_UPDATE( realpunc )
+SCREEN_UPDATE_RGB32( realpunc )
 {
 	taitob_state *state = screen.machine().driver_data<taitob_state>();
 	const rgb_t *palette = palette_entry_list_adjusted(screen.machine().palette);

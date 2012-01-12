@@ -48,8 +48,8 @@ public:
 	size_t m_paletteram_size;
 	size_t m_mainram_overlap_size;
 
-	bitmap_t* m_custom_priority_bitmap;
-	bitmap_t* m_secondary_render_bitmap;
+	bitmap_ind8 m_custom_priority_bitmap;
+	bitmap_ind16 m_secondary_render_bitmap;
 
 	tilemap_t *m_tx_tilemap;	/* Tilemap for extra-text-layer */
 	UINT8 m_tx_flip;
@@ -63,11 +63,11 @@ VIDEO_START( fixeightbl );
 VIDEO_START( bgaregga );
 VIDEO_START( batrider );
 
-SCREEN_UPDATE( toaplan2 );
-SCREEN_UPDATE( truxton2 );
-SCREEN_UPDATE( batrider );
-SCREEN_UPDATE( dogyuun );
-SCREEN_UPDATE( batsugun );
+SCREEN_UPDATE_IND16( toaplan2 );
+SCREEN_UPDATE_IND16( truxton2 );
+SCREEN_UPDATE_IND16( batrider );
+SCREEN_UPDATE_IND16( dogyuun );
+SCREEN_UPDATE_IND16( batsugun );
 
 SCREEN_EOF( toaplan2 );
 

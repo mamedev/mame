@@ -126,7 +126,7 @@ static void fcrash_update_transmasks( running_machine &machine )
 	}
 }
 
-static void fcrash_render_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void fcrash_render_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	int pos;
@@ -159,7 +159,7 @@ static void fcrash_render_sprites( running_machine &machine, bitmap_t &bitmap, c
 
 }
 
-static void fcrash_render_layer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int layer, int primask )
+static void fcrash_render_layer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 
@@ -176,10 +176,10 @@ static void fcrash_render_layer( running_machine &machine, bitmap_t &bitmap, con
 	}
 }
 
-static void fcrash_render_high_layer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int layer )
+static void fcrash_render_high_layer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
 	cps_state *state = machine.driver_data<cps_state>();
-	bitmap_t dummy_bitmap;
+	bitmap_ind16 dummy_bitmap;
 
 	switch (layer)
 	{
@@ -217,7 +217,7 @@ static void fcrash_build_palette( running_machine &machine )
 	}
 }
 
-static SCREEN_UPDATE( fcrash )
+static SCREEN_UPDATE_IND16( fcrash )
 {
 	cps_state *state = screen.machine().driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
@@ -298,7 +298,7 @@ static SCREEN_UPDATE( fcrash )
 }
 
 // doesn't have the scroll offsets like fcrash
-static SCREEN_UPDATE( kodb )
+static SCREEN_UPDATE_IND16( kodb )
 {
 	cps_state *state = screen.machine().driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
@@ -743,10 +743,9 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE(fcrash)
+	MCFG_SCREEN_UPDATE_STATIC(fcrash)
 	MCFG_SCREEN_EOF(cps1)
 
 	MCFG_GFXDECODE(cps1)
@@ -794,10 +793,9 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE(kodb)
+	MCFG_SCREEN_UPDATE_STATIC(kodb)
 	MCFG_SCREEN_EOF(cps1)
 
 	MCFG_GFXDECODE(cps1)

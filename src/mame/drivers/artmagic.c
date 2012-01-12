@@ -498,7 +498,8 @@ static const tms34010_config tms_config =
 	"screen",						/* the screen operated on */
 	MASTER_CLOCK_40MHz/6,			/* pixel clock */
 	1,								/* pixels per clock */
-	artmagic_scanline,				/* scanline update */
+	NULL,							/* scanline update (indexed16) */
+	artmagic_scanline,				/* scanline update (rgb32) */
 	m68k_gen_int,					/* generate interrupt */
 	artmagic_to_shiftreg,			/* write to shiftreg function */
 	artmagic_from_shiftreg			/* read from shiftreg function */
@@ -857,9 +858,8 @@ static MACHINE_CONFIG_START( artmagic, artmagic_state )
 	MCFG_VIDEO_START(artmagic)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

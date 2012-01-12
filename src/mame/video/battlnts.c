@@ -43,7 +43,7 @@ WRITE8_HANDLER( battlnts_spritebank_w )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( battlnts )
+SCREEN_UPDATE_IND16( battlnts )
 {
 	battlnts_state *state = screen.machine().driver_data<battlnts_state>();
 

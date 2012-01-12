@@ -302,7 +302,7 @@ VIDEO_START( pastelg )
 
 
 ******************************************************************************/
-SCREEN_UPDATE( pastelg )
+SCREEN_UPDATE_IND16( pastelg )
 {
 	pastelg_state *state = screen.machine().driver_data<pastelg_state>();
 	if (state->m_dispflag)

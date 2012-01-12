@@ -132,7 +132,7 @@ static VIDEO_START(dunhuang)
 	state->save_item(NAME(state->m_paldata));
 }
 
-static SCREEN_UPDATE( dunhuang )
+static SCREEN_UPDATE_IND16( dunhuang )
 {
 	dunhuang_state *state = screen.machine().driver_data<dunhuang_state>();
 	int layers_ctrl = -1;
@@ -829,10 +829,9 @@ static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0+8, 512-8-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE(dunhuang)
+	MCFG_SCREEN_UPDATE_STATIC(dunhuang)
 
 	MCFG_GFXDECODE(dunhuang)
 	MCFG_PALETTE_LENGTH(0x100)

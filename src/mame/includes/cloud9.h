@@ -24,7 +24,7 @@ public:
 	const UINT8 *m_syncprom;
 	const UINT8 *m_wpprom;
 	const UINT8 *m_priprom;
-	bitmap_t    *m_spritebitmap;
+	bitmap_ind16 m_spritebitmap;
 	double      m_rweights[3];
 	double		m_gweights[3];
 	double		m_bweights[3];
@@ -46,7 +46,7 @@ public:
 /*----------- defined in video/cloud9.c -----------*/
 
 VIDEO_START( cloud9 );
-SCREEN_UPDATE( cloud9 );
+SCREEN_UPDATE_IND16( cloud9 );
 
 WRITE8_HANDLER( cloud9_video_control_w );
 

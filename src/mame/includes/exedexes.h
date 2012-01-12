@@ -40,5 +40,5 @@ extern WRITE8_HANDLER( exedexes_gfxctrl_w );
 
 extern PALETTE_INIT( exedexes );
 extern VIDEO_START( exedexes );
-extern SCREEN_UPDATE( exedexes );
+extern SCREEN_UPDATE_IND16( exedexes );
 extern SCREEN_EOF( exedexes );

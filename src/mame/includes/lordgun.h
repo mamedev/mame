@@ -28,7 +28,7 @@ public:
 	int m_whitescreen;
 	lordgun_gun_data m_gun[2];
 	tilemap_t *m_tilemap[4];
-	bitmap_t *m_bitmaps[5];
+	bitmap_ind16 *m_bitmaps[5];
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
 };
@@ -46,4 +46,4 @@ float lordgun_crosshair_mapper(const input_field_config *field, float linear_val
 void lordgun_update_gun(running_machine &machine, int i);
 
 VIDEO_START( lordgun );
-SCREEN_UPDATE( lordgun );
+SCREEN_UPDATE_IND16( lordgun );

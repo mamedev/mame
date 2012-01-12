@@ -19,4 +19,4 @@ WRITE8_HANDLER( tankbatt_videoram_w );
 
 PALETTE_INIT( tankbatt );
 VIDEO_START( tankbatt );
-SCREEN_UPDATE( tankbatt );
+SCREEN_UPDATE_IND16( tankbatt );

@@ -29,7 +29,7 @@ WRITE8_HANDLER( vicdual_palette_bank_w )
 }
 
 
-SCREEN_UPDATE( vicdual_bw )
+SCREEN_UPDATE_RGB32( vicdual_bw )
 {
 	vicdual_state *state = screen.machine().driver_data<vicdual_state>();
 	UINT8 x = 0;
@@ -80,7 +80,7 @@ SCREEN_UPDATE( vicdual_bw )
 }
 
 
-SCREEN_UPDATE( vicdual_color )
+SCREEN_UPDATE_RGB32( vicdual_color )
 {
 	vicdual_state *state = screen.machine().driver_data<vicdual_state>();
 	UINT8 *color_prom = (UINT8 *)screen.machine().region("proms")->base();
@@ -139,12 +139,12 @@ SCREEN_UPDATE( vicdual_color )
 }
 
 
-SCREEN_UPDATE( vicdual_bw_or_color )
+SCREEN_UPDATE_RGB32( vicdual_bw_or_color )
 {
 	if (vicdual_is_cabinet_color(screen.machine()))
-		SCREEN_UPDATE_CALL(vicdual_color);
+		SCREEN_UPDATE32_CALL(vicdual_color);
 	else
-		SCREEN_UPDATE_CALL(vicdual_bw);
+		SCREEN_UPDATE32_CALL(vicdual_bw);
 
 	return 0;
 }

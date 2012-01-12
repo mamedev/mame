@@ -37,7 +37,7 @@ WRITE16_HANDLER( segaic16_paletteram_w );
 
 void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks);
 void segaic16_tilemap_reset(running_machine &machine, int which);
-void segaic16_tilemap_draw(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
+void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
 void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum, int offset);
 void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip);
 void segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int enable);
@@ -52,7 +52,7 @@ WRITE16_HANDLER( segaic16_textram_0_w );
 #define SEGAIC16_SPRITES_OUTRUN		4
 #define SEGAIC16_SPRITES_XBOARD		5
 
-void segaic16_sprites_draw(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int which);
+void segaic16_sprites_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
 void segaic16_sprites_set_bank(running_machine &machine, int which, int banknum, int offset);
 void segaic16_sprites_set_flip(running_machine &machine, int which, int flip);
 void segaic16_sprites_set_shadow(running_machine &machine, int which, int shadow);
@@ -71,7 +71,7 @@ WRITE16_HANDLER( segaic16_sprites_draw_1_w );
 #define SEGAIC16_ROAD_FOREGROUND	1
 
 void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);
-void segaic16_road_draw(int which, bitmap_t &bitmap, const rectangle &cliprect, int priority);
+void segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 READ16_HANDLER( segaic16_road_control_0_r );
 WRITE16_HANDLER( segaic16_road_control_0_w );
 
@@ -81,7 +81,7 @@ WRITE16_HANDLER( segaic16_road_control_0_w );
 #define SEGAIC16_ROTATE_YBOARD		0
 
 void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase);
-void segaic16_rotate_draw(running_machine &machine, int which, bitmap_t &bitmap, const rectangle &cliprect, bitmap_t *srcbitmap);
+void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 *srcbitmap);
 READ16_HANDLER( segaic16_rotate_control_0_r );
 
 /*************************************
@@ -118,7 +118,7 @@ struct tilemap_info
 	struct tilemap_callback_info tmap_info[16];		/* callback info for 16 tilemap pages */
 	struct tilemap_callback_info textmap_info;		/* callback info for a single textmap page */
 	void			(*reset)(running_machine &machine, struct tilemap_info *info);/* reset callback */
-	void			(*draw_layer)(running_machine &machine, struct tilemap_info *info, bitmap_t &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+	void			(*draw_layer)(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
 	UINT16 *		textram;						/* pointer to textram pointer */
 	UINT16 *		tileram;						/* pointer to tileram pointer */
 	emu_timer *		latch_timer;					/* timer for latching 16b tilemap scroll values */
@@ -133,7 +133,7 @@ struct road_info
 	UINT16			colorbase2;						/* color base for road background data */
 	UINT16			colorbase3;						/* color base for sky data */
 	INT32			xoffs;							/* X scroll offset */
-	void			(*draw)(struct road_info *info, bitmap_t &bitmap, const rectangle &cliprect, int priority);
+	void			(*draw)(struct road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	UINT16 *		roadram;						/* pointer to roadram pointer */
 	UINT16 *		buffer;							/* buffered roadram pointer */
 	UINT8 *			gfx;							/* expanded road graphics */
@@ -165,7 +165,7 @@ struct _sega16sp_interface
 	UINT16			colorbase;						/* base color index */
 	INT32			ramsize;						/* size of sprite RAM */
 	INT32			xoffs;							/* X scroll offset */
-	void			(*draw)(running_machine &machine, device_t* device, bitmap_t &bitmap, const rectangle &cliprect);
+	void			(*draw)(running_machine &machine, device_t* device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int				buffer;							/* should ram be buffered? */
 };
 
@@ -183,7 +183,7 @@ struct _sega16sp_state
 	UINT16			colorbase;						/* base color index */
 	INT32			ramsize;						/* size of sprite RAM */
 	INT32			xoffs;							/* X scroll offset */
-	void			(*draw)(running_machine &machine, device_t* device, bitmap_t &bitmap, const rectangle &cliprect);
+	void			(*draw)(running_machine &machine, device_t* device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT16 *		spriteram;						/* pointer to spriteram pointer */
 	UINT16 *		buffer;							/* buffered spriteram for those that use it */
 
@@ -195,17 +195,17 @@ struct _sega16sp_state
 
 DECLARE_LEGACY_DEVICE(SEGA16SP, sega16sp);
 
-void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_outrun_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
+void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_outrun_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 /* the various sprite configs */
 static const sega16sp_interface hangon_sega16sp_intf =

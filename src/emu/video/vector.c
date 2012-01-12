@@ -70,7 +70,7 @@ typedef struct _vector_texture vector_texture;
 struct _vector_texture
 {
 	render_texture *	texture;
-	bitmap_t *			bitmap;
+	bitmap_argb32 *		bitmap;
 };
 
 static vector_texture *vectortex[TEXTURE_INTENSITY_BUCKETS][TEXTURE_LENGTH_BUCKETS];
@@ -95,7 +95,7 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 		return tex->texture;
 
 	height = lbucket * VECTOR_WIDTH_DENOM / TEXTURE_LENGTH_BUCKETS;
-	tex->bitmap = global_alloc(bitmap_t(TEXTURE_WIDTH, height, BITMAP_FORMAT_ARGB32));
+	tex->bitmap = global_alloc(bitmap_argb32(TEXTURE_WIDTH, height));
 	tex->bitmap.fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
 
 	totalint = 1.0f;
@@ -254,7 +254,7 @@ void vector_clear_list (void)
 }
 
 
-SCREEN_UPDATE( vector )
+SCREEN_UPDATE_RGB32( vector )
 {
 	UINT32 flags = PRIMFLAG_ANTIALIAS(screen.machine().options().antialias() ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
 	const rectangle &visarea = screen.visible_area();

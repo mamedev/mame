@@ -169,14 +169,14 @@ VIDEO_START( cvs )
 	}
 
 	/* create helper bitmaps */
-	state->m_background_bitmap = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_collision_background = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_scrolled_collision_background = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_background_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_collision_background.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_scrolled_collision_background.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	/* register save */
-	state->save_item(NAME(*state->m_background_bitmap));
-	state->save_item(NAME(*state->m_collision_background));
-	state->save_item(NAME(*state->m_scrolled_collision_background));
+	state->save_item(NAME(state->m_background_bitmap));
+	state->save_item(NAME(state->m_collision_background));
+	state->save_item(NAME(state->m_scrolled_collision_background));
 }
 
 
@@ -187,7 +187,7 @@ void cvs_scroll_stars( running_machine &machine )
 }
 
 
-SCREEN_UPDATE( cvs )
+SCREEN_UPDATE_IND16( cvs )
 {
 	cvs_state *state = screen.machine().driver_data<cvs_state>();
 	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };
@@ -208,7 +208,7 @@ SCREEN_UPDATE( cvs )
 
 		int gfxnum = (code < ram_based_char_start_indices[state->m_character_banking_mode]) ? 0 : 1;
 
-		drawgfx_opaque(*state->m_background_bitmap, state->m_background_bitmap->cliprect(), screen.machine().gfx[gfxnum],
+		drawgfx_opaque(state->m_background_bitmap, state->m_background_bitmap.cliprect(), screen.machine().gfx[gfxnum],
 				code, color,
 				0, 0,
 				x, y);
@@ -224,7 +224,7 @@ SCREEN_UPDATE( cvs )
 				collision_color = 0x102;
 		}
 
-		drawgfx_opaque(*state->m_collision_background, state->m_collision_background->cliprect(), screen.machine().gfx[gfxnum],
+		drawgfx_opaque(state->m_collision_background, state->m_collision_background.cliprect(), screen.machine().gfx[gfxnum],
 				code, collision_color,
 				0, 0,
 				x, y);
@@ -241,13 +241,13 @@ SCREEN_UPDATE( cvs )
 	scroll[6] = 0;
 	scroll[7] = 0;
 
-	copyscrollbitmap(bitmap, *state->m_background_bitmap, 0, 0, 8, scroll, cliprect);
-	copyscrollbitmap(*state->m_scrolled_collision_background, *state->m_collision_background, 0, 0, 8, scroll, cliprect);
+	copyscrollbitmap(bitmap, state->m_background_bitmap, 0, 0, 8, scroll, cliprect);
+	copyscrollbitmap(state->m_scrolled_collision_background, state->m_collision_background, 0, 0, 8, scroll, cliprect);
 
 	/* update the S2636 chips */
-	bitmap_t &s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
-	bitmap_t &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
-	bitmap_t &s2636_2_bitmap = s2636_update(state->m_s2636_2, cliprect);
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
+	bitmap_ind16 &s2636_2_bitmap = s2636_update(state->m_s2636_2, cliprect);
 
 	/* Bullet Hardware */
 	for (offs = 8; offs < 256; offs++ )
@@ -266,7 +266,7 @@ SCREEN_UPDATE( cvs )
 					state->m_collision_register |= 0x08;
 
 				/* Bullet/Background Collision */
-				if (colortable_entry_get_value(screen.machine().colortable, state->m_scrolled_collision_background->pix16(offs, bx)))
+				if (colortable_entry_get_value(screen.machine().colortable, state->m_scrolled_collision_background.pix16(offs, bx)))
 					state->m_collision_register |= 0x80;
 
 				bitmap.pix16(offs, bx) = BULLET_STAR_PEN;
@@ -301,7 +301,7 @@ SCREEN_UPDATE( cvs )
 					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision_register |= 0x04;
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen.machine().colortable, state->m_scrolled_collision_background->pix16(y, x)))
+					if (colortable_entry_get_value(screen.machine().colortable, state->m_scrolled_collision_background.pix16(y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision_register |= 0x10;
 						if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision_register |= 0x20;

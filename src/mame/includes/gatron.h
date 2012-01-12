@@ -14,5 +14,5 @@ public:
 WRITE8_HANDLER( gat_videoram_w );
 PALETTE_INIT( gat );
 VIDEO_START( gat );
-SCREEN_UPDATE( gat );
+SCREEN_UPDATE_IND16( gat );
 

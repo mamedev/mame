@@ -219,7 +219,7 @@ VIDEO_START( dday )
 	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_sl_tilemap = tilemap_create(machine, get_sl_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	state->m_main_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_main_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	tilemap_set_transmask(state->m_bg_tilemap, 0, 0x00f0, 0xff0f); /* pens 0-3 have priority over the foreground layer */
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
@@ -315,26 +315,26 @@ WRITE8_HANDLER( dday_control_w )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( dday )
+SCREEN_UPDATE_IND16( dday )
 {
 	dday_state *state = screen.machine().driver_data<dday_state>();
 
-	tilemap_draw(*state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(*state->m_main_bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	tilemap_draw(*state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(*state->m_main_bitmap, cliprect, state->m_text_tilemap, 0, 0);
+	tilemap_draw(state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(state->m_main_bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	tilemap_draw(state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(state->m_main_bitmap, cliprect, state->m_text_tilemap, 0, 0);
 
 	if (state->m_sl_enable)
 	{
 		/* apply shadow */
 		int x, y;
 
-		bitmap_t &sl_bitmap = tilemap_get_pixmap(state->m_sl_tilemap);
+		bitmap_ind16 &sl_bitmap = tilemap_get_pixmap(state->m_sl_tilemap);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				UINT16 src_pixel = state->m_main_bitmap->pix16(y, x);
+				UINT16 src_pixel = state->m_main_bitmap.pix16(y, x);
 
 				if (sl_bitmap.pix16(y, x) == 0xff)
 					src_pixel += screen.machine().total_colors();
@@ -343,7 +343,7 @@ SCREEN_UPDATE( dday )
 			}
 	}
 	else
-		copybitmap(bitmap, *state->m_main_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, state->m_main_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

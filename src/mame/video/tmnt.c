@@ -576,7 +576,7 @@ WRITE16_HANDLER( tmnt_priority_w )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( mia )
+SCREEN_UPDATE_IND16( mia )
 {
 	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 
@@ -591,7 +591,7 @@ SCREEN_UPDATE( mia )
 	return 0;
 }
 
-SCREEN_UPDATE( tmnt )
+SCREEN_UPDATE_IND16( tmnt )
 {
 	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 
@@ -607,7 +607,7 @@ SCREEN_UPDATE( tmnt )
 }
 
 
-SCREEN_UPDATE( punkshot )
+SCREEN_UPDATE_IND16( punkshot )
 {
 	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 
@@ -637,7 +637,7 @@ SCREEN_UPDATE( punkshot )
 }
 
 
-SCREEN_UPDATE( lgtnfght )
+SCREEN_UPDATE_IND16( lgtnfght )
 {
 	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	int bg_colorbase;
@@ -684,7 +684,7 @@ popmessage("%04x", state->m_glfgreat_pixel);
 		return state->m_glfgreat_pixel & 0xff;
 }
 
-SCREEN_UPDATE( glfgreat )
+SCREEN_UPDATE_IND16( glfgreat )
 {
 	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	int bg_colorbase;
@@ -738,7 +738,7 @@ SCREEN_UPDATE( glfgreat )
 	return 0;
 }
 
-SCREEN_UPDATE( tmnt2 )
+SCREEN_UPDATE_IND16( tmnt2 )
 {
 	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	double brt;
@@ -786,12 +786,12 @@ SCREEN_UPDATE( tmnt2 )
 			palette_set_shadow_mode(screen.machine(), 0);
 	}
 
-	SCREEN_UPDATE_CALL(lgtnfght);
+	SCREEN_UPDATE16_CALL(lgtnfght);
 	return 0;
 }
 
 
-SCREEN_UPDATE( thndrx2 )
+SCREEN_UPDATE_IND16( thndrx2 )
 {
 	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 	int bg_colorbase;

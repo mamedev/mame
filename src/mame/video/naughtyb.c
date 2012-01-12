@@ -182,7 +182,7 @@ WRITE8_HANDLER( popflame_videoreg_w )
 
 
 ***************************************************************************/
-SCREEN_UPDATE( naughtyb )
+SCREEN_UPDATE_IND16( naughtyb )
 {
 	const rectangle scrollvisiblearea(2*8, 34*8-1, 0*8, 28*8-1);
 	const rectangle leftvisiblearea(0*8, 2*8-1, 0*8, 28*8-1);
@@ -190,7 +190,7 @@ SCREEN_UPDATE( naughtyb )
 
 	naughtyb_state *state = screen.machine().driver_data<naughtyb_state>();
 	UINT8 *videoram = state->m_videoram;
-	bitmap_t &tmpbitmap = state->m_tmpbitmap;
+	bitmap_ind16 &tmpbitmap = state->m_tmpbitmap;
 	int offs;
 
 	// for every character in the Video RAM

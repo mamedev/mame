@@ -77,7 +77,7 @@ typedef struct _ppu2c0x_state  ppu2c0x_state;
 struct _ppu2c0x_state
 {
 	address_space				*space;					/* memory space */
-	bitmap_t					*bitmap;			/* target bitmap */
+	bitmap_ind16			*bitmap;			/* target bitmap */
 	UINT8                       *spriteram;			/* sprite ram */
 	pen_t                       *colortable;			/* color table modified at run time */
 	pen_t                       *colortable_mono;		/* monochromatic color table modified at run time */
@@ -368,7 +368,7 @@ static void draw_background( device_t *device, UINT8 *line_priority )
 	ppu2c0x_state *ppu2c0x = get_token(device);
 
 	/* cache some values locally */
-	bitmap_t &bitmap = *ppu2c0x->bitmap;
+	bitmap_ind16 &bitmap = *ppu2c0x->bitmap;
 	const int *ppu_regs = &ppu2c0x->regs[0];
 	const int scanline = ppu2c0x->scanline;
 	const int refresh_data = ppu2c0x->refresh_data;
@@ -514,7 +514,7 @@ static void draw_sprites( device_t *device, UINT8 *line_priority )
 	ppu2c0x_state *ppu2c0x = get_token(device);
 
 	/* cache some values locally */
-	bitmap_t &bitmap = *ppu2c0x->bitmap;
+	bitmap_ind16 &bitmap = *ppu2c0x->bitmap;
 	const int scanline = ppu2c0x->scanline;
 	const int sprite_page = ppu2c0x->sprite_page;
 	const UINT8 *sprite_ram = ppu2c0x->spriteram;
@@ -733,7 +733,7 @@ static void render_scanline( device_t *device )
 		draw_background(device, line_priority);
 	else
 	{
-		bitmap_t &bitmap = *ppu2c0x->bitmap;
+		bitmap_ind16 &bitmap = *ppu2c0x->bitmap;
 		const int scanline = ppu2c0x->scanline;
 		UINT8 color_mask;
 		UINT16 back_pen;
@@ -781,7 +781,7 @@ static void update_scanline( device_t *device )
 		}
 		else
 		{
-			bitmap_t &bitmap = *ppu2c0x->bitmap;
+			bitmap_ind16 &bitmap = *ppu2c0x->bitmap;
 			UINT8 color_mask;
 			UINT16 back_pen;
 			int i;
@@ -1206,7 +1206,7 @@ void ppu2c0x_spriteram_dma( address_space *space, device_t *device, const UINT8 
  *
  *************************************/
 
-void ppu2c0x_render( device_t *device, bitmap_t &bitmap, int flipx, int flipy, int sx, int sy )
+void ppu2c0x_render( device_t *device, bitmap_ind16 &bitmap, int flipx, int flipy, int sx, int sy )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	copybitmap(bitmap, *ppu2c0x->bitmap, flipx, flipy, sx, sy, bitmap.cliprect());
@@ -1320,7 +1320,7 @@ static DEVICE_START( ppu2c0x )
 	ppu2c0x->color_base = intf->color_base;
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-	ppu2c0x->bitmap = auto_bitmap_alloc(device->machine(), VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, device->machine().primary_screen->format());
+	ppu2c0x->bitmap = auto_bitmap_ind16_alloc(device->machine(), VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
 	ppu2c0x->spriteram = auto_alloc_array_clear(device->machine(), UINT8, SPRITERAM_SIZE);
 	ppu2c0x->colortable = auto_alloc_array(device->machine(), pen_t, ARRAY_LENGTH(default_colortable));
 	ppu2c0x->colortable_mono = auto_alloc_array(device->machine(), pen_t, ARRAY_LENGTH(default_colortable_mono));

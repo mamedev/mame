@@ -35,4 +35,4 @@ WRITE8_HANDLER( homerun_color_w );
 WRITE8_DEVICE_HANDLER( homerun_banking_w );
 
 VIDEO_START(homerun);
-SCREEN_UPDATE(homerun);
+SCREEN_UPDATE_IND16(homerun);

@@ -59,7 +59,7 @@ WRITE8_HANDLER(speedspn_global_display_w)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	speedspn_state *state = machine.driver_data<speedspn_state>();
 	const gfx_element *gfx = machine.gfx[1];
@@ -93,7 +93,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE(speedspn)
+SCREEN_UPDATE_IND16(speedspn)
 {
 	speedspn_state *state = screen.machine().driver_data<speedspn_state>();
 	if (state->m_display_disable)

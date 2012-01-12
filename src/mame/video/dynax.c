@@ -1000,7 +1000,7 @@ VIDEO_START( neruton )
 
 ***************************************************************************/
 
-static void hanamai_copylayer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int i )
+static void hanamai_copylayer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int i )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	int color;
@@ -1064,7 +1064,7 @@ static void hanamai_copylayer( running_machine &machine, bitmap_t &bitmap, const
 }
 
 
-static void jantouki_copylayer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int i, int y )
+static void jantouki_copylayer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int y )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	int color, scrollx, scrolly, palettes, palbank;
@@ -1139,7 +1139,7 @@ static void jantouki_copylayer( running_machine &machine, bitmap_t &bitmap, cons
 }
 
 
-static void mjdialq2_copylayer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int i )
+static void mjdialq2_copylayer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int i )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	int color;
@@ -1227,7 +1227,7 @@ static int debug_mask( running_machine &machine )
     I,O        -  Change palette (-,+)
     J,K & N,M  -  Change "tile"  (-,+, slow & fast)
     R          -  move "tile" to the next 1/8th of the gfx  */
-static int debug_viewer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static int debug_viewer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 
 #ifdef MAME_DEBUG
@@ -1278,7 +1278,7 @@ static int debug_viewer( running_machine &machine, bitmap_t &bitmap, const recta
 
 
 
-SCREEN_UPDATE( hanamai )
+SCREEN_UPDATE_IND16( hanamai )
 {
 	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = ~state->m_layer_enable;
@@ -1314,7 +1314,7 @@ SCREEN_UPDATE( hanamai )
 }
 
 
-SCREEN_UPDATE( hnoridur )
+SCREEN_UPDATE_IND16( hnoridur )
 {
 	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = ~BITSWAP8(state->m_hanamai_priority, 7, 6, 5, 4, 0, 1, 2, 3);
@@ -1351,7 +1351,7 @@ SCREEN_UPDATE( hnoridur )
 }
 
 
-SCREEN_UPDATE( sprtmtch )
+SCREEN_UPDATE_IND16( sprtmtch )
 {
 	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = ~state->m_layer_enable;
@@ -1369,7 +1369,7 @@ SCREEN_UPDATE( sprtmtch )
 	return 0;
 }
 
-SCREEN_UPDATE( jantouki_top )
+SCREEN_UPDATE_IND16( jantouki_top )
 {
 	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = state->m_layer_enable;
@@ -1388,7 +1388,7 @@ SCREEN_UPDATE( jantouki_top )
 	return 0;
 }
 
-SCREEN_UPDATE( jantouki_bottom )
+SCREEN_UPDATE_IND16( jantouki_bottom )
 {
 	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = state->m_layer_enable;
@@ -1409,7 +1409,7 @@ SCREEN_UPDATE( jantouki_bottom )
 }
 
 
-SCREEN_UPDATE( mjdialq2 )
+SCREEN_UPDATE_IND16( mjdialq2 )
 {
 	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layers_ctrl = ~state->m_layer_enable;
@@ -1434,13 +1434,13 @@ VIDEO_START(htengoku)
 	VIDEO_START_CALL(hnoridur);
 }
 
-SCREEN_UPDATE(htengoku)
+SCREEN_UPDATE_IND16(htengoku)
 {
 	dynax_state *state = screen.machine().driver_data<dynax_state>();
 	int layer, x, y;
 
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
-	// format and let SCREEN_UPDATE(ddenlovr) do the final compositing (priorities + palettes)
+	// format and let SCREEN_UPDATE_IND16(ddenlovr) do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
 		bitmap.fill(0, cliprect);
@@ -1451,5 +1451,5 @@ SCREEN_UPDATE(htengoku)
 				state->m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (UINT8)(bitmap.pix16(y, x));
 	}
 
-	return SCREEN_UPDATE_CALL(ddenlovr);
+	return SCREEN_UPDATE16_CALL(ddenlovr);
 }

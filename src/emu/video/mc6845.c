@@ -688,7 +688,7 @@ void mc6845_device::update_cursor_state()
 }
 
 
-void mc6845_device::update(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	assert(bitmap.valid());
 
@@ -751,6 +751,7 @@ void mc6845_device::update(bitmap_t &bitmap, const rectangle &cliprect)
 	}
 	else
 		popmessage("Invalid MC6845 screen parameters - display disabled!!!");
+	return 0;
 }
 
 

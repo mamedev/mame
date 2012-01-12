@@ -24,16 +24,17 @@
 #include "cpu/z80/z80.h"
 #include "render.h"
 #include "sound/sn76496.h"
-#include "machine/laserdsc.h"
+#include "machine/ldv1000.h"
 #include "video/resnet.h"
 
 class superdq_state : public driver_device
 {
 public:
 	superdq_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
-	device_t *m_laserdisc;
+	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 m_ld_in_latch;
 	UINT8 m_ld_out_latch;
 
@@ -57,7 +58,7 @@ static VIDEO_START( superdq )
 	state->m_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static SCREEN_UPDATE( superdq )
+static SCREEN_UPDATE_IND16( superdq )
 {
 	superdq_state *state = screen.machine().driver_data<superdq_state>();
 
@@ -129,12 +130,12 @@ static INTERRUPT_GEN( superdq_vblank )
 	/* status is read when the STATUS line from the laserdisc
        toggles (600usec after the vblank). We could set up a
        timer to do that, but this works as well */
-	state->m_ld_in_latch = laserdisc_data_r(state->m_laserdisc);
+	state->m_ld_in_latch = state->m_laserdisc->status_r();
 
 	/* command is written when the COMMAND line from the laserdisc
        toggles (680usec after the vblank). We could set up a
        timer to do that, but this works as well */
-	laserdisc_data_w(state->m_laserdisc, state->m_ld_out_latch);
+	state->m_laserdisc->data_w(state->m_ld_out_latch);
 	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
@@ -316,9 +317,6 @@ GFXDECODE_END
 
 static MACHINE_START( superdq )
 {
-	superdq_state *state = machine.driver_data<superdq_state>();
-
-	state->m_laserdisc = machine.device("laserdisc");
 }
 
 
@@ -333,11 +331,11 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	MCFG_MACHINE_START(superdq)
 	MCFG_MACHINE_RESET(superdq)
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(superdq, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
+	MCFG_LASERDISC_OVERLAY(256, 256, superdq)
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_GFXDECODE(superdq)
 	MCFG_PALETTE_LENGTH(32)
@@ -351,7 +349,7 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

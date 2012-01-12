@@ -121,5 +121,5 @@ WRITE8_HANDLER( wardner_sprite_w );
 
 
 VIDEO_START( toaplan0 );
-SCREEN_UPDATE( toaplan0 );
+SCREEN_UPDATE_IND16( toaplan0 );
 SCREEN_EOF( toaplan0 );

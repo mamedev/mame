@@ -59,7 +59,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 #if !defined( MODEL2_TRANSLUCENT)
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	model2_state *state = extra->state;
-	bitmap_t *destmap = (bitmap_t *)dest;
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
 	UINT32 *p = &destmap->pix32(scanline);
 
 	/* extract color information */
@@ -112,7 +112,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	model2_state *state = extra->state;
-	bitmap_t *destmap = (bitmap_t *)dest;
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
 	UINT32 *p = &destmap->pix32(scanline);
 
 	UINT32	tex_width = extra->texwidth;

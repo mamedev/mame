@@ -1518,7 +1518,7 @@ static int K053936_wraparound[K053936_MAX_CHIPS];
 // there is another implementation of this in  machine/konamigx.c (!)
 //  why?
 
-static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_t &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
+static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
 	if (!tmap)
 		return;
@@ -1639,7 +1639,7 @@ if (machine.input().code_pressed(KEYCODE_D))
 }
 
 
-void K053936_0_zoom_draw(bitmap_t &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
+void K053936_0_zoom_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
 	K053936_zoom_draw(0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
 }
@@ -1735,7 +1735,7 @@ WRITE16_HANDLER( K054000_lsb_w )
 #define K056832_PAGE_COUNT 16
 
 static tilemap_t *K056832_tilemap[K056832_PAGE_COUNT];
-static bitmap_t *K056832_pixmap[K056832_PAGE_COUNT];
+static bitmap_ind16 *K056832_pixmap[K056832_PAGE_COUNT];
 
 static UINT16 K056832_regs[0x20];	// 157/832 regs group 1
 static UINT16 K056832_regsb[4];	// 157/832 regs group 2, board dependent
@@ -2563,7 +2563,7 @@ WRITE16_HANDLER( K056832_b_word_w )
 }
 
 
-static int K056832_update_linemap(running_machine &machine, bitmap_t &bitmap, int page, int flags)
+static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags)
 {
 
 	if (K056832_PageTileMode[page]) return(0);
@@ -2579,7 +2579,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_t &bitmap, in
 		UINT8 *xprdata;
 
 		tmap = K056832_tilemap[page];
-		bitmap_t &xprmap  = tilemap_get_flagsmap(tmap);
+		bitmap_ind8 &xprmap  = tilemap_get_flagsmap(tmap);
 		xprdata = tilemap_get_tile_flags(tmap);
 
 		dirty = K056832_LineDirty[page];
@@ -2610,7 +2610,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_t &bitmap, in
 		{
 
 
-			bitmap_t *pixmap;
+			bitmap_ind16 *pixmap;
 
 			UINT8 code_transparent, code_opaque;
 			const pen_t *pal_ptr;
@@ -2686,7 +2686,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_t &bitmap, in
 	return(0);
 }
 
-void K056832_tilemap_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority)
+void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority)
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -3153,7 +3153,7 @@ void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack
 
 #ifdef UNUSED_FUNCTION
 // K054338 BG color fill
-void K054338_fill_solid_bg(bitmap_t &bitmap)
+void K054338_fill_solid_bg(bitmap_ind16 &bitmap)
 {
 	UINT32 bgcolor;
 	UINT32 *pLine;
@@ -3174,7 +3174,7 @@ void K054338_fill_solid_bg(bitmap_t &bitmap)
 #endif
 
 // Unified K054338/K055555 BG color fill
-void K054338_fill_backcolor(running_machine &machine, bitmap_t &bitmap, int mode) // (see p.67)
+void K054338_fill_backcolor(running_machine &machine, bitmap_rgb32 &bitmap, int mode) // (see p.67)
 {
 	int clipx, clipy, clipw, cliph, i, dst_pitch;
 	int BGC_CBLK, BGC_SET;

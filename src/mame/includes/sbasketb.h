@@ -26,4 +26,4 @@ WRITE8_HANDLER( sbasketb_flipscreen_w );
 
 PALETTE_INIT( sbasketb );
 VIDEO_START( sbasketb );
-SCREEN_UPDATE( sbasketb );
+SCREEN_UPDATE_IND16( sbasketb );

@@ -44,4 +44,4 @@ WRITE8_HANDLER( K005885_1_w );
 
 PALETTE_INIT( ddribble );
 VIDEO_START( ddribble );
-SCREEN_UPDATE( ddribble );
+SCREEN_UPDATE_IND16( ddribble );

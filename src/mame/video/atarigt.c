@@ -98,8 +98,8 @@ VIDEO_START( atarigt )
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
 
-	state->m_pf_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	state->m_an_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_pf_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
+	state->m_an_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
 
 	/* map pens 1:1 */
 	substitute_pens = auto_alloc_array(machine, pen_t, 65536);
@@ -506,11 +506,11 @@ PrimRage GALs:
 */
 
 
-SCREEN_UPDATE( atarigt )
+SCREEN_UPDATE_RGB32( atarigt )
 {
 	atarigt_state *state = screen.machine().driver_data<atarigt_state>();
-	bitmap_t *mo_bitmap = atarirle_get_vram(state->m_rle, 0);
-	bitmap_t *tm_bitmap = atarirle_get_vram(state->m_rle, 1);
+	bitmap_ind16 *mo_bitmap = atarirle_get_vram(state->m_rle, 0);
+	bitmap_ind16 *tm_bitmap = atarirle_get_vram(state->m_rle, 1);
 	UINT16 *cram, *tram;
 	int color_latch;
 	UINT32 *mram;

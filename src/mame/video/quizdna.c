@@ -138,7 +138,7 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
 	palette_set_color_rgb(space->machine(),offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	quizdna_state *state = machine.driver_data<quizdna_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -192,7 +192,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( quizdna )
+SCREEN_UPDATE_IND16( quizdna )
 {
 	quizdna_state *state = screen.machine().driver_data<quizdna_state>();
 	if (state->m_video_enable)

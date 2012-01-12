@@ -70,6 +70,7 @@ typedef struct
     UINT8 region_flag_1[768];
 
     running_machine *m_machine;
+    bitmap_rgb32 m_bitmap;
 } mcd212_regs_t;
 
 #define MCD212_CURCNT_COLOR         0x00000f    // Cursor color
@@ -189,7 +190,7 @@ READ16_HANDLER( mcd212_r );
 WRITE16_HANDLER( mcd212_w );
 TIMER_CALLBACK( mcd212_perform_scan );
 VIDEO_START( cdimono1 );
-SCREEN_UPDATE( cdimono1 );
-SCREEN_UPDATE( cdimono1_lcd );
+SCREEN_UPDATE_RGB32( cdimono1 );
+SCREEN_UPDATE_RGB32( cdimono1_lcd );
 
 #endif // _VIDEO_MCD212_H_

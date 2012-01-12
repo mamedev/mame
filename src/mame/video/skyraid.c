@@ -12,11 +12,11 @@ VIDEO_START( skyraid )
 {
 	skyraid_state *state = machine.driver_data<skyraid_state>();
 
-	state->m_helper = auto_bitmap_alloc(machine, 128, 240, machine.primary_screen->format());
+	state->m_helper = auto_bitmap_ind16_alloc(machine, 128, 240);
 }
 
 
-static void draw_text(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_text(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	skyraid_state *state = machine.driver_data<skyraid_state>();
 	const UINT8* p = state->m_alpha_num_ram;
@@ -36,7 +36,7 @@ static void draw_text(running_machine &machine, bitmap_t &bitmap, const rectangl
 }
 
 
-static void draw_terrain(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_terrain(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	skyraid_state *state = machine.driver_data<skyraid_state>();
 	const UINT8* p = machine.region("user1")->base();
@@ -72,7 +72,7 @@ static void draw_terrain(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	skyraid_state *state = machine.driver_data<skyraid_state>();
 	int i;
@@ -94,7 +94,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static void draw_missiles(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_missiles(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	skyraid_state *state = machine.driver_data<skyraid_state>();
 	int i;
@@ -117,7 +117,7 @@ static void draw_missiles(running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-static void draw_trapezoid(running_machine &machine, bitmap_t& dst, bitmap_t& src)
+static void draw_trapezoid(running_machine &machine, bitmap_ind16& dst, bitmap_ind16& src)
 {
 	const UINT8* p = machine.region("user2")->base();
 
@@ -138,7 +138,7 @@ static void draw_trapezoid(running_machine &machine, bitmap_t& dst, bitmap_t& sr
 }
 
 
-SCREEN_UPDATE( skyraid )
+SCREEN_UPDATE_IND16( skyraid )
 {
 	skyraid_state *state = screen.machine().driver_data<skyraid_state>();
 

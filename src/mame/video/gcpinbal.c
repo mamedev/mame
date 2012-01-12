@@ -169,7 +169,7 @@ WRITE16_HANDLER( gcpinbal_ctrl_word_w )
 
 ****************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -248,7 +248,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
                         SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE( gcpinbal )
+SCREEN_UPDATE_IND16( gcpinbal )
 {
 	gcpinbal_state *state = screen.machine().driver_data<gcpinbal_state>();
 	int i;

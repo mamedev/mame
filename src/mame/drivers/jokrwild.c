@@ -153,7 +153,7 @@ static VIDEO_START( jokrwild )
 }
 
 
-static SCREEN_UPDATE( jokrwild )
+static SCREEN_UPDATE_IND16( jokrwild )
 {
 	jokrwild_state *state = screen.machine().driver_data<jokrwild_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -484,10 +484,9 @@ static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((32+1)*8, (32+1)*8)                  /* From MC6845, registers 00 & 04. (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 26*8-1)    /* From MC6845, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE(jokrwild)
+	MCFG_SCREEN_UPDATE_STATIC(jokrwild)
 
 	MCFG_GFXDECODE(jokrwild)
 	MCFG_PALETTE_INIT(jokrwild)

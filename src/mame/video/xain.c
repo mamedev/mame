@@ -172,7 +172,7 @@ WRITE8_HANDLER( xain_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	xain_state *state = machine.driver_data<xain_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -223,7 +223,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-SCREEN_UPDATE( xain )
+SCREEN_UPDATE_IND16( xain )
 {
 	xain_state *state = screen.machine().driver_data<xain_state>();
 	switch (state->m_pri&0x7)

@@ -104,11 +104,11 @@ VIDEO_START( xybots )
  *
  *************************************/
 
-SCREEN_UPDATE( xybots )
+SCREEN_UPDATE_IND16( xybots )
 {
 	xybots_state *state = screen.machine().driver_data<xybots_state>();
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

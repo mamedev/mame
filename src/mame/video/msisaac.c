@@ -161,7 +161,7 @@ WRITE8_HANDLER( msisaac_fg_videoram_w )
   Display refresh
 
 ***************************************************************************/
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	msisaac_state *state = machine.driver_data<msisaac_state>();
 	const UINT8 *source = state->m_spriteram + 32 * 4 - 4;
@@ -244,7 +244,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( msisaac )
+SCREEN_UPDATE_IND16( msisaac )
 {
 	msisaac_state *state = screen.machine().driver_data<msisaac_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

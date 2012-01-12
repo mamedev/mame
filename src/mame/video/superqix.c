@@ -58,8 +58,8 @@ VIDEO_START( pbillian )
 VIDEO_START( superqix )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_fg_bitmap[0] = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
-	state->m_fg_bitmap[1] = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
+	state->m_fg_bitmap[0] = auto_bitmap_ind16_alloc(machine, 256, 256);
+	state->m_fg_bitmap[1] = auto_bitmap_ind16_alloc(machine, 256, 256);
 	state->m_bg_tilemap = tilemap_create(machine, sqix_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
 	tilemap_set_transmask(state->m_bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
@@ -165,7 +165,7 @@ WRITE8_HANDLER( superqix_0410_w )
 
 ***************************************************************************/
 
-static void pbillian_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void pbillian_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -193,7 +193,7 @@ static void pbillian_draw_sprites(running_machine &machine, bitmap_t &bitmap, co
 	}
 }
 
-static void superqix_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -225,7 +225,7 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_t &bitmap,con
 	}
 }
 
-SCREEN_UPDATE( pbillian )
+SCREEN_UPDATE_IND16( pbillian )
 {
 	superqix_state *state = screen.machine().driver_data<superqix_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -234,7 +234,7 @@ SCREEN_UPDATE( pbillian )
 	return 0;
 }
 
-SCREEN_UPDATE( superqix )
+SCREEN_UPDATE_IND16( superqix )
 {
 	superqix_state *state = screen.machine().driver_data<superqix_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);

@@ -41,4 +41,4 @@ extern void spy_tile_callback(running_machine &machine, int layer,int bank,int *
 extern void spy_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask,int *shadow);
 
 VIDEO_START( spy );
-SCREEN_UPDATE( spy );
+SCREEN_UPDATE_IND16( spy );

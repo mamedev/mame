@@ -21,6 +21,6 @@ public:
 /*----------- defined in video/batman.c -----------*/
 
 VIDEO_START( batman );
-SCREEN_UPDATE( batman );
+SCREEN_UPDATE_IND16( batman );
 
 void batman_scanline_update(screen_device &screen, int scanline);

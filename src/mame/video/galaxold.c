@@ -33,29 +33,29 @@ static TIMER_CALLBACK( stars_blink_callback );
 static TIMER_CALLBACK( stars_scroll_callback );
 
        void galaxold_init_stars(running_machine &machine, int colors_offset);
-static void     noop_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-       void galaxold_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void scrambold_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void   rescue_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void  mariner_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
+static void     noop_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+       void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void scrambold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void   rescue_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void  mariner_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 static void start_stars_blink_timer(running_machine &machine, double ra, double rb, double c);
 static void start_stars_scroll_timer(running_machine &machine);
 
 /* bullets circuit */
-static void galaxold_draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y);
-static void scrambold_draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y);
-static void darkplnt_draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y);
-static void dambustr_draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y);
+static void galaxold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+static void scrambold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+static void darkplnt_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 
 /* background circuit */
-static void galaxold_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void scrambold_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void  ad2083_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void  mariner_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void stratgyx_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void  minefld_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void   rescue_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-static void dambustr_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
+static void galaxold_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void scrambold_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void  ad2083_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void  mariner_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void  minefld_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void   rescue_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
+static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
 
@@ -613,7 +613,7 @@ VIDEO_START( pisces )
 }
 
 #ifdef UNUSED_FUNCTION
-static void theend_draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y)
+static void theend_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
 	int i;
 
@@ -675,7 +675,7 @@ VIDEO_START( batman2 )
 
 
 
-static void rockclim_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void rockclim_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	tilemap_draw(bitmap,cliprect,state->m_rockclim_tilemap, 0,0);
@@ -833,7 +833,7 @@ VIDEO_START( dambustr )
 	state->m_draw_bullets = dambustr_draw_bullets;
 
 	/* allocate the temporary bitmap for the background priority */
-	state->m_dambustr_tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_dambustr_tmpbitmap = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
 
 	/* make a copy of the tilemap to emulate background priority */
 	state->m_dambustr_videoram2 = auto_alloc_array(machine, UINT8, 0x0400);
@@ -1134,7 +1134,7 @@ static void drivfrcg_modify_color(UINT8 *color)
 
 /* bullet drawing functions */
 
-static void galaxold_draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y)
+static void galaxold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
 	int i;
 
@@ -1156,7 +1156,7 @@ static void galaxold_draw_bullets(running_machine &machine, bitmap_t &bitmap, co
 	}
 }
 
-static void scrambold_draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y)
+static void scrambold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (state->m_flipscreen_x)  x++;
@@ -1168,7 +1168,7 @@ static void scrambold_draw_bullets(running_machine &machine, bitmap_t &bitmap, c
 		bitmap.pix16(y, x) = BULLETS_COLOR_BASE;
 }
 
-static void darkplnt_draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y)
+static void darkplnt_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (state->m_flipscreen_x)  x++;
@@ -1179,7 +1179,7 @@ static void darkplnt_draw_bullets(running_machine &machine, bitmap_t &bitmap, co
 		bitmap.pix16(y, x) = 32 + state->m_darkplnt_bullet_color;
 }
 
-static void dambustr_draw_bullets(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y)
+static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
 	int i, color;
 
@@ -1209,13 +1209,13 @@ static void dambustr_draw_bullets(running_machine &machine, bitmap_t &bitmap, co
 
 /* background drawing functions */
 
-static void galaxold_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void galaxold_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* plain black background */
 	bitmap.fill(0, cliprect);
 }
 
-static void scrambold_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void scrambold_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (state->m_background_enable)
@@ -1224,7 +1224,7 @@ static void scrambold_draw_background(running_machine &machine, bitmap_t &bitmap
 		bitmap.fill(0, cliprect);
 }
 
-static void ad2083_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void ad2083_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int color = (state->m_background_blue << 2) | (state->m_background_green << 1) | state->m_background_red;
@@ -1232,7 +1232,7 @@ static void ad2083_draw_background(running_machine &machine, bitmap_t &bitmap, c
 	bitmap.fill(BACKGROUND_COLOR_BASE + color, cliprect);
 }
 
-static void stratgyx_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	UINT8 x;
@@ -1269,7 +1269,7 @@ static void stratgyx_draw_background(running_machine &machine, bitmap_t &bitmap,
 	}
 }
 
-static void minefld_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void minefld_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (state->m_background_enable)
@@ -1290,7 +1290,7 @@ static void minefld_draw_background(running_machine &machine, bitmap_t &bitmap, 
 		bitmap.fill(0, cliprect);
 }
 
-static void rescue_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void rescue_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (state->m_background_enable)
@@ -1310,7 +1310,7 @@ static void rescue_draw_background(running_machine &machine, bitmap_t &bitmap, c
 		bitmap.fill(0, cliprect);
 }
 
-static void mariner_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void mariner_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int base = BACKGROUND_COLOR_BASE;
@@ -1354,7 +1354,7 @@ static void mariner_draw_background(running_machine &machine, bitmap_t &bitmap, 
 	}
 }
 
-static void dambustr_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int base = BACKGROUND_COLOR_BASE;
@@ -1374,7 +1374,7 @@ static void dambustr_draw_background(running_machine &machine, bitmap_t &bitmap,
 
 }
 
-static void dambustr_draw_upper_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void dambustr_draw_upper_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	rectangle clip;
@@ -1474,7 +1474,7 @@ void galaxold_init_stars(running_machine &machine, int colors_offset)
 	}
 }
 
-static void plot_star(galaxold_state *state, bitmap_t &bitmap, int x, int y, int color, const rectangle &cliprect)
+static void plot_star(galaxold_state *state, bitmap_ind16 &bitmap, int x, int y, int color, const rectangle &cliprect)
 {
 	if (state->m_flipscreen_x)
 		x = 255 - x;
@@ -1486,11 +1486,11 @@ static void plot_star(galaxold_state *state, bitmap_t &bitmap, int x, int y, int
 		bitmap.pix16(y, x) = state->m_stars_colors_start + color;
 }
 
-static void noop_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void noop_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 }
 
-void galaxold_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	struct star *stars = state->m_stars;
@@ -1519,7 +1519,7 @@ void galaxold_draw_stars(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-static void scrambold_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void scrambold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	struct star *stars = state->m_stars;
@@ -1565,7 +1565,7 @@ static void scrambold_draw_stars(running_machine &machine, bitmap_t &bitmap, con
 	}
 }
 
-static void rescue_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void rescue_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	struct star *stars = state->m_stars;
@@ -1613,7 +1613,7 @@ static void rescue_draw_stars(running_machine &machine, bitmap_t &bitmap, const 
 	}
 }
 
-static void mariner_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void mariner_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	struct star *stars = state->m_stars;
@@ -1712,7 +1712,7 @@ static TILE_GET_INFO( rockclim_get_tile_info )
 	SET_TILE_INFO(2, code, 0, 0);
 }
 
-static void draw_bullets_common(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_bullets_common(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int offs;
@@ -1732,7 +1732,7 @@ static void draw_bullets_common(running_machine &machine, bitmap_t &bitmap, cons
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, UINT8 *spriteram, size_t spriteram_size)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *spriteram, size_t spriteram_size)
 {
 	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8,   30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-2, 2*8, 30*8-1);
@@ -1801,7 +1801,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, UINT8 *spri
 }
 
 
-SCREEN_UPDATE( galaxold )
+SCREEN_UPDATE_IND16( galaxold )
 {
 	galaxold_state *state = screen.machine().driver_data<galaxold_state>();
 
@@ -1831,7 +1831,7 @@ SCREEN_UPDATE( galaxold )
 }
 
 
-SCREEN_UPDATE( dambustr )
+SCREEN_UPDATE_IND16( dambustr )
 {
 	galaxold_state *state = screen.machine().driver_data<galaxold_state>();
 	int i, j;

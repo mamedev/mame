@@ -187,7 +187,7 @@ spriteram format (4 bytes per sprite):
     offset  3   xxxxxxxx    x position (8 LSB bits)
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	tankbust_state *state = machine.driver_data<tankbust_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -232,7 +232,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( tankbust )
+SCREEN_UPDATE_IND16( tankbust )
 {
 	tankbust_state *state = screen.machine().driver_data<tankbust_state>();
 #if 0

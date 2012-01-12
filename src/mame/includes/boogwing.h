@@ -40,5 +40,5 @@ public:
 
 /*----------- defined in video/boogwing.c -----------*/
 
-SCREEN_UPDATE( boogwing );
+SCREEN_UPDATE_RGB32( boogwing );
 

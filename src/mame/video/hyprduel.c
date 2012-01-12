@@ -459,7 +459,7 @@ VIDEO_START( magerror_14220 )
 
 /* Draw sprites */
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	UINT8 *base_gfx	=	machine.region("gfx1")->base();
@@ -634,7 +634,7 @@ WRITE16_HANDLER( hyprduel_scrollreg_init_w )
 }
 
 
-static void draw_layers( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
+static void draw_layers( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
 {
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	UINT16 layers_pri = state->m_videoregs[0x10/2];
@@ -671,7 +671,7 @@ static void dirty_tiles( running_machine &machine, int layer, UINT16 *vram )
 }
 
 
-SCREEN_UPDATE( hyprduel )
+SCREEN_UPDATE_IND16( hyprduel )
 {
 	hyprduel_state *state = screen.machine().driver_data<hyprduel_state>();
 	int i, pri, layers_ctrl = -1;

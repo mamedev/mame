@@ -132,7 +132,7 @@ struct _voodoo_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int voodoo_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
+int voodoo_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 int voodoo_get_type(device_t *device);
 int voodoo_is_stalled(device_t *device);
 void voodoo_set_init_enable(device_t *device, UINT32 newval);

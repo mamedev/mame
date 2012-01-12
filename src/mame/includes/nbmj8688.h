@@ -19,7 +19,7 @@ public:
 	int m_mjsikaku_flipscreen;
 	int m_mjsikaku_screen_refresh;
 	int m_mjsikaku_gfxmode;
-	bitmap_t *m_mjsikaku_tmpbitmap;
+	bitmap_ind16 *m_mjsikaku_tmpbitmap;
 	UINT16 *m_mjsikaku_videoram;
 	UINT8 *m_clut;
 	UINT8 *m_HD61830B_ram[2];
@@ -34,9 +34,9 @@ public:
 PALETTE_INIT( mbmj8688_8bit );
 PALETTE_INIT( mbmj8688_12bit );
 PALETTE_INIT( mbmj8688_16bit );
-SCREEN_UPDATE( mbmj8688 );
-SCREEN_UPDATE( mbmj8688_lcd0 );
-SCREEN_UPDATE( mbmj8688_lcd1 );
+SCREEN_UPDATE_IND16( mbmj8688 );
+SCREEN_UPDATE_IND16( mbmj8688_lcd0 );
+SCREEN_UPDATE_IND16( mbmj8688_lcd1 );
 VIDEO_START( mbmj8688_8bit );
 VIDEO_START( mbmj8688_hybrid_12bit );
 VIDEO_START( mbmj8688_pure_12bit );

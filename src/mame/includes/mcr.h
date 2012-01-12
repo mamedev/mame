@@ -77,4 +77,4 @@ READ8_HANDLER( twotiger_videoram_r );
 WRITE8_HANDLER( twotiger_videoram_w );
 WRITE8_HANDLER( mcr_91490_videoram_w );
 
-SCREEN_UPDATE( mcr );
+SCREEN_UPDATE_IND16( mcr );

@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( triplhnt )
 {
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
-	state->m_helper = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 }
@@ -32,7 +32,7 @@ static TIMER_CALLBACK( triplhnt_hit_callback )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
 	int i;
@@ -74,7 +74,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 		/* render sprite to auxiliary bitmap */
 
-		drawgfx_opaque(*state->m_helper, cliprect, machine.gfx[state->m_sprite_zoom],
+		drawgfx_opaque(state->m_helper, cliprect, machine.gfx[state->m_sprite_zoom],
 			2 * code + state->m_sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y);
 
@@ -97,7 +97,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 			{
 				for (y = rect.min_y; y <= rect.max_y; y++)
 				{
-					pen_t a = state->m_helper->pix16(y, x);
+					pen_t a = state->m_helper.pix16(y, x);
 					pen_t b = bitmap.pix16(y, x);
 
 					if (a == 2 && b == 7)
@@ -118,7 +118,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( triplhnt )
+SCREEN_UPDATE_IND16( triplhnt )
 {
 	triplhnt_state *state = screen.machine().driver_data<triplhnt_state>();
 	device_t *discrete = screen.machine().device("discrete");

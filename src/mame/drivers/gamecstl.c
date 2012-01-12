@@ -117,7 +117,7 @@ static VIDEO_START(gamecstl)
 		palette_set_color(machine, i, cga_palette[i]);
 }
 
-static void draw_char(bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	const UINT8 *dp;
@@ -139,7 +139,7 @@ static void draw_char(bitmap_t &bitmap, const rectangle &cliprect, const gfx_ele
 	}
 }
 
-static SCREEN_UPDATE(gamecstl)
+static SCREEN_UPDATE_IND16(gamecstl)
 {
 	gamecstl_state *state = screen.machine().driver_data<gamecstl_state>();
 	int i, j;
@@ -719,10 +719,9 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MCFG_SCREEN_UPDATE(gamecstl)
+	MCFG_SCREEN_UPDATE_STATIC(gamecstl)
 
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(16)

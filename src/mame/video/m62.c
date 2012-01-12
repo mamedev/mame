@@ -353,7 +353,7 @@ WRITE8_HANDLER( m62_textram_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority )
 {
 	m62_state *state = machine.driver_data<m62_state>();
 	int offs;
@@ -472,7 +472,7 @@ VIDEO_START( kungfum )
 	m62_start(machine, get_kungfum_bg_tile_info, 32, 0, 8, 8, 64, 32);
 }
 
-SCREEN_UPDATE( kungfum )
+SCREEN_UPDATE_IND16( kungfum )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	int i;
@@ -521,7 +521,7 @@ VIDEO_START( ldrun )
 	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
-SCREEN_UPDATE( ldrun )
+SCREEN_UPDATE_IND16( ldrun )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
@@ -569,10 +569,10 @@ WRITE8_HANDLER( ldrun3_topbottom_mask_w )
 	state->m_ldrun3_topbottom_mask = data & 1;
 }
 
-SCREEN_UPDATE( ldrun3 )
+SCREEN_UPDATE_IND16( ldrun3 )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
-	SCREEN_UPDATE_CALL(ldrun);
+	SCREEN_UPDATE16_CALL(ldrun);
 
 	if (state->m_ldrun3_topbottom_mask)
 	{
@@ -630,7 +630,7 @@ VIDEO_START( battroad )
 	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
-SCREEN_UPDATE( battroad )
+SCREEN_UPDATE_IND16( battroad )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
@@ -665,7 +665,7 @@ VIDEO_START( ldrun4 )
 	m62_start(machine, get_ldrun4_bg_tile_info, 1, 0, 8, 8, 64, 32);
 }
 
-SCREEN_UPDATE( ldrun4 )
+SCREEN_UPDATE_IND16( ldrun4 )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll - 2);
@@ -708,7 +708,7 @@ VIDEO_START( lotlot )
 	m62_textlayer(machine, get_lotlot_fg_tile_info, 1, 1, 12, 10, 32, 64);
 }
 
-SCREEN_UPDATE( lotlot )
+SCREEN_UPDATE_IND16( lotlot )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll - 64);
@@ -780,7 +780,7 @@ VIDEO_START( kidniki )
 	m62_textlayer(machine, get_kidniki_fg_tile_info, 1, 1, 12, 8, 32, 64);
 }
 
-SCREEN_UPDATE( kidniki )
+SCREEN_UPDATE_IND16( kidniki )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
@@ -834,7 +834,7 @@ VIDEO_START( spelunkr )
 	m62_textlayer(machine, get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32);
 }
 
-SCREEN_UPDATE( spelunkr )
+SCREEN_UPDATE_IND16( spelunkr )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
@@ -879,7 +879,7 @@ VIDEO_START( spelunk2 )
 	m62_textlayer(machine, get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32);
 }
 
-SCREEN_UPDATE( spelunk2 )
+SCREEN_UPDATE_IND16( spelunk2 )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll - 1);
@@ -928,7 +928,7 @@ VIDEO_START( youjyudn )
 	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
-SCREEN_UPDATE( youjyudn )
+SCREEN_UPDATE_IND16( youjyudn )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
@@ -973,7 +973,7 @@ VIDEO_START( horizon )
 	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
-SCREEN_UPDATE( horizon )
+SCREEN_UPDATE_IND16( horizon )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
 	int i;

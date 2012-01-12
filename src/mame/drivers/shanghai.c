@@ -71,7 +71,7 @@ static VIDEO_START( shanghai )
 {
 }
 
-static SCREEN_UPDATE( shanghai )
+static SCREEN_UPDATE_IND16( shanghai )
 {
 	device_t *hd63484 = screen.machine().device("hd63484");
 	int x, y, b, src;
@@ -445,10 +445,9 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE(shanghai)
+	MCFG_SCREEN_UPDATE_STATIC(shanghai)
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -480,10 +479,9 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE(shanghai)
+	MCFG_SCREEN_UPDATE_STATIC(shanghai)
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -519,10 +517,9 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
-	MCFG_SCREEN_UPDATE(shanghai)
+	MCFG_SCREEN_UPDATE_STATIC(shanghai)
 
 	MCFG_PALETTE_LENGTH(256)
 

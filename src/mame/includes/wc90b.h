@@ -25,7 +25,7 @@ public:
 /*----------- defined in video/wc90b.c -----------*/
 
 VIDEO_START( wc90b );
-SCREEN_UPDATE( wc90b );
+SCREEN_UPDATE_IND16( wc90b );
 
 WRITE8_HANDLER( wc90b_bgvideoram_w );
 WRITE8_HANDLER( wc90b_fgvideoram_w );

@@ -48,7 +48,7 @@ public:
 /*----------- defined in video/gcpinbal.c -----------*/
 
 VIDEO_START( gcpinbal );
-SCREEN_UPDATE( gcpinbal );
+SCREEN_UPDATE_IND16( gcpinbal );
 
 READ16_HANDLER ( gcpinbal_tilemaps_word_r );
 WRITE16_HANDLER( gcpinbal_tilemaps_word_w );

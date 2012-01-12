@@ -58,9 +58,9 @@ void k053250_t::device_reset()
 }
 
 // utility function to render a clipped scanline vertically or horizontally
-inline void k053250_t::pdraw_scanline32(bitmap_t &bitmap, const pen_t *palette, UINT8 *source,
+inline void k053250_t::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *palette, UINT8 *source,
 									  const rectangle &cliprect, int linepos, int scroll, int zoom,
-									  UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_t &priority, UINT8 pri)
+									  UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_ind8 &priority, UINT8 pri)
 {
 // a sixteen-bit fixed point resolution should be adequate to our application
 #define FIXPOINT_PRECISION		16
@@ -221,7 +221,7 @@ inline void k053250_t::pdraw_scanline32(bitmap_t &bitmap, const pen_t *palette, 
 #undef FIXPOINT_PRECISION_HALF
 }
 
-void k053250_t::draw( bitmap_t &bitmap, const rectangle &cliprect, int colorbase, int flags, int priority )
+void k053250_t::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, int priority )
 {
 	UINT8 *pix_ptr;
 	const pen_t *pal_base, *pal_ptr;

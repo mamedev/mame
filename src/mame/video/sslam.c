@@ -22,7 +22,7 @@ WRITE16_HANDLER( sslam_paletteram_w )
 	palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	sslam_state *state = machine.driver_data<sslam_state>();
 	const gfx_element *gfx = machine.gfx[0];
@@ -191,7 +191,7 @@ VIDEO_START(powerbls)
 	state->save_item(NAME(state->m_sprites_x_offset));
 }
 
-SCREEN_UPDATE(sslam)
+SCREEN_UPDATE_IND16(sslam)
 {
 	sslam_state *state = screen.machine().driver_data<sslam_state>();
 
@@ -231,7 +231,7 @@ SCREEN_UPDATE(sslam)
 	return 0;
 }
 
-SCREEN_UPDATE(powerbls)
+SCREEN_UPDATE_IND16(powerbls)
 {
 	sslam_state *state = screen.machine().driver_data<sslam_state>();
 

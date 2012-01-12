@@ -73,7 +73,7 @@ static VIDEO_START(diverboy)
 {
 }
 
-static void draw_sprites( running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	diverboy_state *state = machine.driver_data<diverboy_state>();
 	UINT16 *source = state->m_spriteram;
@@ -109,7 +109,7 @@ static void draw_sprites( running_machine& machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static SCREEN_UPDATE(diverboy)
+static SCREEN_UPDATE_IND16(diverboy)
 {
 //  bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
@@ -265,10 +265,9 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 40*8+1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(diverboy)
+	MCFG_SCREEN_UPDATE_STATIC(diverboy)
 
 	MCFG_PALETTE_LENGTH(0x400)
 

@@ -60,7 +60,7 @@ VIDEO_START( bigrun );
 VIDEO_START( cischeat );
 VIDEO_START( f1gpstar );
 
-SCREEN_UPDATE( bigrun );
-SCREEN_UPDATE( cischeat );
-SCREEN_UPDATE( f1gpstar );
-SCREEN_UPDATE( scudhamm );
+SCREEN_UPDATE_IND16( bigrun );
+SCREEN_UPDATE_IND16( cischeat );
+SCREEN_UPDATE_IND16( f1gpstar );
+SCREEN_UPDATE_IND16( scudhamm );

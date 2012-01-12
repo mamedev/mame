@@ -84,11 +84,11 @@ WRITE8_HANDLER( battlane_bitmap_w )
 	{
 		if (data & 1 << i)
 		{
-			state->m_screen_bitmap->pix8(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
+			state->m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
 		}
 		else
 		{
-			state->m_screen_bitmap->pix8(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
+			state->m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
 		}
 	}
 }
@@ -145,10 +145,10 @@ VIDEO_START( battlane )
 {
 	battlane_state *state = machine.driver_data<battlane_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, battlane_tilemap_scan_rows_2x2, 16, 16, 32, 32);
-	state->m_screen_bitmap = auto_bitmap_alloc(machine, 32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
+	state->m_screen_bitmap.allocate(32 * 8, 32 * 8);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	battlane_state *state = machine.driver_data<battlane_state>();
 	int offs, attr, code, color, sx, sy, flipx, flipy, dy;
@@ -212,7 +212,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static void draw_fg_bitmap( running_machine &machine, bitmap_t &bitmap )
+static void draw_fg_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 {
 	battlane_state *state = machine.driver_data<battlane_state>();
 	int x, y, data;
@@ -221,7 +221,7 @@ static void draw_fg_bitmap( running_machine &machine, bitmap_t &bitmap )
 	{
 		for (x = 0; x < 32 * 8; x++)
 		{
-			data = state->m_screen_bitmap->pix8(y, x);
+			data = state->m_screen_bitmap.pix8(y, x);
 
 			if (data)
 			{
@@ -234,7 +234,7 @@ static void draw_fg_bitmap( running_machine &machine, bitmap_t &bitmap )
 	}
 }
 
-SCREEN_UPDATE( battlane )
+SCREEN_UPDATE_IND16( battlane )
 {
 	battlane_state *state = screen.machine().driver_data<battlane_state>();
 

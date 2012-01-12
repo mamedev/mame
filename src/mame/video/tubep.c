@@ -585,7 +585,7 @@ void tubep_vblank_end(running_machine &machine)
 }
 
 
-SCREEN_UPDATE( tubep )
+SCREEN_UPDATE_IND16( tubep )
 {
 	tubep_state *state = screen.machine().driver_data<tubep_state>();
 	int DISP_ = state->m_DISP^1;
@@ -743,7 +743,7 @@ WRITE8_HANDLER( rjammer_background_page_w )
 }
 
 
-SCREEN_UPDATE( rjammer )
+SCREEN_UPDATE_IND16( rjammer )
 {
 	tubep_state *state = screen.machine().driver_data<tubep_state>();
 	int DISP_ = state->m_DISP^1;

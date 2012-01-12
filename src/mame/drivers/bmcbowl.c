@@ -131,7 +131,7 @@ static VIDEO_START( bmcbowl )
 {
 }
 
-static SCREEN_UPDATE( bmcbowl )
+static SCREEN_UPDATE_IND16( bmcbowl )
 {
 	bmcbowl_state *state = screen.machine().driver_data<bmcbowl_state>();
 /*
@@ -495,10 +495,9 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(35*8, 30*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 0*8, 29*8-1)
-	MCFG_SCREEN_UPDATE(bmcbowl)
+	MCFG_SCREEN_UPDATE_STATIC(bmcbowl)
 
 	MCFG_PALETTE_LENGTH(256)
 

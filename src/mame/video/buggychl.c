@@ -15,11 +15,11 @@ PALETTE_INIT( buggychl )
 VIDEO_START( buggychl )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
-	state->m_tmp_bitmap1 = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_tmp_bitmap2 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmp_bitmap1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_tmp_bitmap2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
-	state->save_item(NAME(*state->m_tmp_bitmap1));
-	state->save_item(NAME(*state->m_tmp_bitmap2));
+	state->save_item(NAME(state->m_tmp_bitmap1));
+	state->save_item(NAME(state->m_tmp_bitmap2));
 
 	gfx_element_set_source(machine.gfx[0], state->m_charram);
 }
@@ -80,7 +80,7 @@ WRITE8_HANDLER( buggychl_bg_scrollx_w )
 }
 
 
-static void draw_sky( bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sky( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int x, y;
 
@@ -90,7 +90,7 @@ static void draw_sky( bitmap_t &bitmap, const rectangle &cliprect )
 }
 
 
-static void draw_bg( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_bg( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
 	int offs;
@@ -113,7 +113,7 @@ static void draw_bg( running_machine &machine, bitmap_t &bitmap, const rectangle
 		if (flip_screen_y_get(machine))
 			sy = 31 - sy;
 
-		drawgfx_opaque(*state->m_tmp_bitmap1, state->m_tmp_bitmap1->cliprect(), machine.gfx[0],
+		drawgfx_opaque(state->m_tmp_bitmap1, state->m_tmp_bitmap1.cliprect(), machine.gfx[0],
 				code,
 				2,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
@@ -124,17 +124,17 @@ static void draw_bg( running_machine &machine, bitmap_t &bitmap, const rectangle
 	for (offs = 0; offs < 256; offs++)
 		scroll[offs] = -state->m_scrollv[offs / 8];
 
-	copyscrollbitmap(*state->m_tmp_bitmap2, *state->m_tmp_bitmap1, 1, &state->m_bg_scrollx, 256, scroll, state->m_tmp_bitmap2->cliprect());
+	copyscrollbitmap(state->m_tmp_bitmap2, state->m_tmp_bitmap1, 1, &state->m_bg_scrollx, 256, scroll, state->m_tmp_bitmap2.cliprect());
 
 	/* then copy to the screen doing row scroll */
 	for (offs = 0; offs < 256; offs++)
 		scroll[offs] = -state->m_scrollh[offs];
 
-	copyscrollbitmap_trans(bitmap, *state->m_tmp_bitmap2, 256, scroll, 0, 0, clip, 32);
+	copyscrollbitmap_trans(bitmap, state->m_tmp_bitmap2, 256, scroll, 0, 0, clip, 32);
 }
 
 
-static void draw_fg( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_fg( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
 	int offs;
@@ -163,7 +163,7 @@ static void draw_fg( running_machine &machine, bitmap_t &bitmap, const rectangle
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -236,7 +236,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-SCREEN_UPDATE( buggychl )
+SCREEN_UPDATE_IND16( buggychl )
 {
 	buggychl_state *state = screen.machine().driver_data<buggychl_state>();
 

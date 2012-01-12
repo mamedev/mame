@@ -58,7 +58,7 @@ WRITE8_HANDLER( dribling_colorram_w )
  *
  *************************************/
 
-SCREEN_UPDATE( dribling )
+SCREEN_UPDATE_IND16( dribling )
 {
 	dribling_state *state = screen.machine().driver_data<dribling_state>();
 	UINT8 *prombase = screen.machine().region("proms")->base();

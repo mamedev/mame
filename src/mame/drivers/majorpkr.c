@@ -521,7 +521,7 @@ static VIDEO_START(majorpkr)
 }
 
 
-static SCREEN_UPDATE(majorpkr)
+static SCREEN_UPDATE_IND16(majorpkr)
 {
 	majorpkr_state *state = screen.machine().driver_data<majorpkr_state>();
 
@@ -1037,7 +1037,6 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(52.786)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((47+1)*16, (36+1)*8)				/* through CRTC registers: 768 x 296 */
 	MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1) /* through CRTC registers: 560(+16) x 224 */
 
@@ -1045,7 +1044,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_PALETTE_LENGTH(0x100 * 16)
 
 	MCFG_VIDEO_START(majorpkr)
-	MCFG_SCREEN_UPDATE(majorpkr)
+	MCFG_SCREEN_UPDATE_STATIC(majorpkr)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf) /* verified */
 

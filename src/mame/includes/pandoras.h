@@ -43,5 +43,5 @@ WRITE8_HANDLER( pandoras_flipscreen_w );
 WRITE8_HANDLER( pandoras_scrolly_w );
 
 VIDEO_START( pandoras );
-SCREEN_UPDATE( pandoras );
+SCREEN_UPDATE_IND16( pandoras );
 

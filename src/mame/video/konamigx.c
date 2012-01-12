@@ -42,15 +42,15 @@ static int gx_specialrozenable; // type 1 roz, with voxel height-map, rendered f
 static int gx_rushingheroes_hack;
 static int gx_le2_textcolour_hack;
 static tilemap_t *gx_psac_tilemap, *gx_psac_tilemap2;
-static bitmap_t* type3_roz_temp_bitmap;
+static bitmap_ind16* type3_roz_temp_bitmap;
 static tilemap_t* gx_psac_tilemap_alt;
 
 static int konamigx_has_dual_screen;
 int konamigx_current_frame;
 INLINE void set_color_555(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data);
 static int konamigx_palformat;
-static bitmap_t* dualscreen_left_tempbitmap;
-static bitmap_t* dualscreen_right_tempbitmap;
+static bitmap_rgb32* dualscreen_left_tempbitmap;
+static bitmap_rgb32* dualscreen_right_tempbitmap;
 
 /* On Type-1 the K053936 output is rendered to these temporary bitmaps as raw data
    the 'voxel' effect to give the pixels height is a post-process operation on the
@@ -69,8 +69,8 @@ static bitmap_t* dualscreen_right_tempbitmap;
 
 
    */
-static bitmap_t *gxtype1_roz_dstbitmap;
-static bitmap_t *gxtype1_roz_dstbitmap2;
+static bitmap_ind16 *gxtype1_roz_dstbitmap;
+static bitmap_ind16 *gxtype1_roz_dstbitmap2;
 static rectangle gxtype1_roz_dstbitmapclip;
 
 static void (*game_tile_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
@@ -97,7 +97,7 @@ void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy)
 }
 
 INLINE void K053936GP_copyroz32clip( running_machine &machine,
-		bitmap_t &dst_bitmap, bitmap_t &src_bitmap,
+		bitmap_rgb32 &dst_bitmap, bitmap_ind16 &src_bitmap,
 		const rectangle &dst_cliprect, const rectangle &src_cliprect,
 		UINT32 _startx,UINT32 _starty,int _incxx,int _incxy,int _incyx,int _incyy,
 		int tilebpp, int blend, int alpha, int clip, int pixeldouble_output )
@@ -280,7 +280,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 // adapted from generic K053936_zoom_draw()
 static void K053936GP_zoom_draw(running_machine &machine,
 		int chip, UINT16 *ctrl, UINT16 *linectrl,
-		bitmap_t &bitmap, const rectangle &cliprect, tilemap_t *tmap,
+		bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tmap,
 		int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	UINT16 *lineaddr;
@@ -289,7 +289,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy, y, maxy, clip;
 
-	bitmap_t &src_bitmap = tilemap_get_pixmap(tmap);
+	bitmap_ind16 &src_bitmap = tilemap_get_pixmap(tmap);
 	rectangle &src_cliprect = K053936_cliprect[chip];
 	clip = K053936_clip_enabled[chip];
 
@@ -348,13 +348,13 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	}
 }
 
-static void K053936GP_0_zoom_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+static void K053936GP_0_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	K053936GP_zoom_draw(machine, 0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
 }
 
-static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
@@ -380,7 +380,7 @@ static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_t &bitmap, co
 
 
 INLINE void zdrawgfxzoom32GP(
-		bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx,
+		bitmap_rgb32 &bitmap, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri)
 {
@@ -1158,10 +1158,10 @@ void konamigx_objdma(void)
 	if (gx_objdma && gx_spriteram && K053247_ram) memcpy(gx_spriteram, K053247_ram, 0x1000);
 }
 
-void konamigx_mixer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
-					int mixerflags, bitmap_t *extra_bitmap, int rushingheroes_hack)
+					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack)
 {
 	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
@@ -2151,8 +2151,8 @@ VIDEO_START(konamigx_type3)
 	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 1);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
-	dualscreen_left_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
-	dualscreen_right_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
+	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
 
 	_gxcommoninitnosprites(machine);
 
@@ -2164,7 +2164,7 @@ VIDEO_START(konamigx_type3)
 
 
 	/* set up tile layers */
-	type3_roz_temp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	type3_roz_temp_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
 
 
 	//tilemap_set_flip(gx_psac_tilemap, TILEMAP_FLIPX| TILEMAP_FLIPY);
@@ -2190,8 +2190,8 @@ VIDEO_START(konamigx_type4)
 	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -79, -24, konamigx_type2_sprite_callback); // -23 looks better in intro
 
-	dualscreen_left_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
-	dualscreen_right_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
+	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
 
 	_gxcommoninitnosprites(machine);
 
@@ -2221,8 +2221,8 @@ VIDEO_START(konamigx_type4_vsn)
 	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 2);   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
-	dualscreen_left_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
-	dualscreen_right_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
+	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
 
 	_gxcommoninitnosprites(machine);
 
@@ -2251,8 +2251,8 @@ VIDEO_START(konamigx_type4_sd2)
 	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -81, -23, konamigx_type2_sprite_callback);
 
-	dualscreen_left_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
-	dualscreen_right_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
+	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine, width, height);
 
 	_gxcommoninitnosprites(machine);
 
@@ -2315,8 +2315,8 @@ VIDEO_START(opengolf)
 	gx_rozenable = 0;
 	gx_specialrozenable = 1;
 
-	gxtype1_roz_dstbitmap =  auto_bitmap_alloc(machine,512,512,BITMAP_FORMAT_INDEXED16); // BITMAP_FORMAT_INDEXED16 because we NEED the raw pen data for post-processing
-	gxtype1_roz_dstbitmap2 = auto_bitmap_alloc(machine,512,512,BITMAP_FORMAT_INDEXED16); // BITMAP_FORMAT_INDEXED16 because we NEED the raw pen data for post-processing
+	gxtype1_roz_dstbitmap =  auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 
 	gxtype1_roz_dstbitmapclip.min_x = 0;
@@ -2330,7 +2330,7 @@ VIDEO_START(opengolf)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	machine.priority_bitmap.allocate(2048,2048,BITMAP_FORMAT_INDEXED16);
+	machine.priority_bitmap.allocate(2048,2048);
 
 }
 
@@ -2356,8 +2356,8 @@ VIDEO_START(racinfrc)
 	gx_rozenable = 0;
 	gx_specialrozenable = 1;
 
-	gxtype1_roz_dstbitmap =  auto_bitmap_alloc(machine,512,512,BITMAP_FORMAT_INDEXED16); // BITMAP_FORMAT_INDEXED16 because we NEED the raw pen data for post-processing
-	gxtype1_roz_dstbitmap2 = auto_bitmap_alloc(machine,512,512,BITMAP_FORMAT_INDEXED16); // BITMAP_FORMAT_INDEXED16 because we NEED the raw pen data for post-processing
+	gxtype1_roz_dstbitmap =  auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 
 	gxtype1_roz_dstbitmapclip.min_x = 0;
@@ -2371,12 +2371,12 @@ VIDEO_START(racinfrc)
 
 	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
 	// until there is a better solution, or priority bitmap can be specified manually.
-	machine.priority_bitmap.allocate(2048,2048,BITMAP_FORMAT_INDEXED16);
+	machine.priority_bitmap.allocate(2048,2048);
 
 
 }
 
-SCREEN_UPDATE(konamigx)
+SCREEN_UPDATE_RGB32(konamigx)
 {
 	int i, newbank, newbase, dirty, unchained;
 
@@ -2503,7 +2503,7 @@ SCREEN_UPDATE(konamigx)
 	return 0;
 }
 
-SCREEN_UPDATE(konamigx_left)
+SCREEN_UPDATE_RGB32(konamigx_left)
 {
 	/* the video gets demuxed by a board which plugs into the jamma connector */
 	konamigx_current_frame^=1;
@@ -2536,7 +2536,7 @@ SCREEN_UPDATE(konamigx_left)
 			}
 		}
 
-		SCREEN_UPDATE_NAME(konamigx)(screen, *dualscreen_left_tempbitmap, cliprect);
+		SCREEN_UPDATE_NAME(konamigx)(__dummy, screen, downcast<bitmap_rgb32 &>(*dualscreen_left_tempbitmap), cliprect);
 		copybitmap(bitmap, *dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
@@ -2547,7 +2547,7 @@ SCREEN_UPDATE(konamigx_left)
 	return 0;
 }
 
-SCREEN_UPDATE(konamigx_right)
+SCREEN_UPDATE_RGB32(konamigx_right)
 {
 	if (konamigx_current_frame==1)
 	{
@@ -2582,7 +2582,7 @@ SCREEN_UPDATE(konamigx_right)
 			}
 		}
 
-		SCREEN_UPDATE_NAME(konamigx)(screen, *dualscreen_right_tempbitmap, cliprect);
+		SCREEN_UPDATE_NAME(konamigx)(__dummy, screen, downcast<bitmap_rgb32 &>(*dualscreen_right_tempbitmap), cliprect);
 		copybitmap(bitmap, *dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 

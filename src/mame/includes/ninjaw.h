@@ -40,6 +40,6 @@ public:
 /*----------- defined in video/ninjaw.c -----------*/
 
 VIDEO_START( ninjaw );
-SCREEN_UPDATE( ninjaw_left );
-SCREEN_UPDATE( ninjaw_middle );
-SCREEN_UPDATE( ninjaw_right );
+SCREEN_UPDATE_IND16( ninjaw_left );
+SCREEN_UPDATE_IND16( ninjaw_middle );
+SCREEN_UPDATE_IND16( ninjaw_right );

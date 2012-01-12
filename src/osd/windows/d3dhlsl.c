@@ -196,7 +196,6 @@ hlsl_info::hlsl_info()
 	prescale_force_x = 0;
 	prescale_force_y = 0;
 	preset = -1;
-	shadow_bitmap = NULL;
 	shadow_texture = NULL;
 	registered_targets = 0;
 	cyclic_target_idx = 0;
@@ -214,12 +213,6 @@ hlsl_info::hlsl_info()
 hlsl_info::~hlsl_info()
 {
 	global_free(options);
-
-	if(shadow_bitmap != NULL)
-	{
-		global_free(shadow_bitmap);
-		shadow_bitmap = NULL;
-	}
 }
 
 
@@ -290,13 +283,9 @@ void hlsl_info::avi_update_snap(d3d_surface *surface)
 	D3DLOCKED_RECT rect;
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (avi_snap == NULL || (int)snap_width != avi_snap->width() || (int)snap_height != avi_snap->height())
+	if (!avi_snap.valid() || (int)snap_width != avi_snap.width() || (int)snap_height != avi_snap.height())
 	{
-		if (avi_snap != NULL)
-		{
-			auto_free(window->machine(), avi_snap);
-		}
-		avi_snap = auto_alloc(window->machine(), bitmap_t((int)snap_width, (int)snap_height, BITMAP_FORMAT_RGB32));
+		avi_snap.allocate((int)snap_width, (int)snap_height);
 	}
 
 	// copy the texture
@@ -318,16 +307,11 @@ void hlsl_info::avi_update_snap(d3d_surface *surface)
 	// loop over Y
 	for (int srcy = 0; srcy < (int)snap_height; srcy++)
 	{
-		BYTE *src = (BYTE *)rect.pBits + srcy * rect.Pitch;
-		BYTE *dst = &avi_snap->pix8(srcy * 4);
+		DWORD *src = (DWORD *)((BYTE *)rect.pBits + srcy * rect.Pitch);
+		UINT32 *dst = &avi_snap.pix32(srcy);
 
 		for(int x = 0; x < snap_width; x++)
-		{
 			*dst++ = *src++;
-			*dst++ = *src++;
-			*dst++ = *src++;
-			*dst++ = *src++;
-		}
 	}
 
 	// unlock
@@ -353,13 +337,9 @@ void hlsl_info::render_snapshot(d3d_surface *surface)
 	render_snap = false;
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
-	if (avi_snap == NULL || snap_width != (avi_snap->width() / 2) || snap_height != (avi_snap->height() / 2))
+	if (!avi_snap.valid() || snap_width != (avi_snap.width() / 2) || snap_height != (avi_snap.height() / 2))
 	{
-		if (avi_snap != NULL)
-		{
-			auto_free(window->machine(), avi_snap);
-		}
-		avi_snap = auto_alloc(window->machine(), bitmap_t(snap_width / 2, snap_height / 2, BITMAP_FORMAT_RGB32));
+		avi_snap.allocate(snap_width / 2, snap_height / 2);
 	}
 
 	// copy the texture
@@ -387,16 +367,11 @@ void hlsl_info::render_snapshot(d3d_surface *surface)
 			{
 				int toty = (srcy + cy * (snap_height / 2));
 				int totx = cx * (snap_width / 2);
-				BYTE *src = (BYTE *)rect.pBits + toty * rect.Pitch + totx * 4;
-				BYTE *dst = &avi_snap->pix8(srcy * 4);
+				DWORD *src = (DWORD *)((BYTE *)rect.pBits + toty * rect.Pitch + totx * 4);
+				UINT32 *dst = &avi_snap.pix32(srcy);
 
 				for(int x = 0; x < snap_width / 2; x++)
-				{
 					*dst++ = *src++;
-					*dst++ = *src++;
-					*dst++ = *src++;
-					*dst++ = *src++;
-				}
 			}
 
 			int idx = cy * 2 + cx;
@@ -414,7 +389,7 @@ void hlsl_info::render_snapshot(d3d_surface *surface)
 			png_add_text(&pnginfo, "System", text2);
 
 			// now do the actual work
-			png_error error = png_write_bitmap(file, &pnginfo, *avi_snap, 1 << 24, NULL);
+			png_error error = png_write_bitmap(file, &pnginfo, avi_snap, 1 << 24, NULL);
 			if (error != PNGERR_NONE)
 				mame_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
 
@@ -478,7 +453,7 @@ void hlsl_info::record_texture()
 	{
 		// handle an AVI recording
 		// write the next frame
-		avi_error avierr = avi_append_video_frame_rgb32(avi_output_file, *avi_snap);
+		avi_error avierr = avi_append_video_frame(avi_output_file, avi_snap);
 		if (avierr != AVIERR_NONE)
 		{
 			end_avi_recording();
@@ -928,18 +903,18 @@ int hlsl_info::create_resources()
 	// experimental: load a PNG to use for vector rendering; it is treated
 	// as a brightness map
 	emu_file file(window->machine().options().art_path(), OPEN_FLAG_READ);
-	shadow_bitmap = render_load_png(file, NULL, options->shadow_mask_texture, NULL, NULL);
 
 	// experimental: if we have a shadow bitmap, create a texture for it
-	if (shadow_bitmap != NULL)
+	render_load_png(shadow_bitmap, file, NULL, options->shadow_mask_texture);
+	if (shadow_bitmap.valid())
 	{
 		render_texinfo texture;
 
 		// fake in the basic data so it looks like it came from render.c
-		texture.base = shadow_bitmap->raw_pixptr(0);
-		texture.rowpixels = shadow_bitmap->rowpixels();
-		texture.width = shadow_bitmap->width();
-		texture.height = shadow_bitmap->height();
+		texture.base = shadow_bitmap.raw_pixptr(0);
+		texture.rowpixels = shadow_bitmap.rowpixels();
+		texture.width = shadow_bitmap.width();
+		texture.height = shadow_bitmap.height();
 		texture.palette = NULL;
 		texture.seqid = 0;
 
@@ -2277,11 +2252,7 @@ void hlsl_info::delete_resources()
 
 	registered_targets = 0;
 
-	if (shadow_bitmap != NULL)
-	{
-		global_free(shadow_bitmap);
-		shadow_bitmap = NULL;
-	}
+	shadow_bitmap.reset();
 }
 
 

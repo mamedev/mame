@@ -158,7 +158,7 @@ static VIDEO_START( olibochu )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	olibochu_state *state = machine.driver_data<olibochu_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -218,7 +218,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static SCREEN_UPDATE( olibochu )
+static SCREEN_UPDATE_IND16( olibochu )
 {
 	olibochu_state *state = screen.machine().driver_data<olibochu_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -458,10 +458,9 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(olibochu)
+	MCFG_SCREEN_UPDATE_STATIC(olibochu)
 
 	MCFG_GFXDECODE(olibochu)
 	MCFG_PALETTE_LENGTH(512)

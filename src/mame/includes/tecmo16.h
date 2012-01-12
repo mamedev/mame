@@ -12,9 +12,9 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
-	bitmap_t *m_sprite_bitmap;
-	bitmap_t *m_tile_bitmap_bg;
-	bitmap_t *m_tile_bitmap_fg;
+	bitmap_ind16 m_sprite_bitmap;
+	bitmap_ind16 m_tile_bitmap_bg;
+	bitmap_ind16 m_tile_bitmap_fg;
 	int m_flipscreen;
 	int m_game_is_riot;
 	UINT16 m_scroll_x_w;
@@ -47,4 +47,4 @@ WRITE16_HANDLER( tecmo16_scroll_char_y_w );
 VIDEO_START( fstarfrc );
 VIDEO_START( ginkun );
 VIDEO_START( riot );
-SCREEN_UPDATE( tecmo16 );
+SCREEN_UPDATE_RGB32( tecmo16 );

@@ -27,4 +27,4 @@ WRITE8_HANDLER( zaccaria_videoram_w );
 WRITE8_HANDLER( zaccaria_attributes_w );
 WRITE8_HANDLER( zaccaria_flip_screen_x_w );
 WRITE8_HANDLER( zaccaria_flip_screen_y_w );
-SCREEN_UPDATE( zaccaria );
+SCREEN_UPDATE_IND16( zaccaria );

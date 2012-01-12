@@ -182,7 +182,7 @@ VIDEO_START( tryout )
 	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	tryout_state *state = machine.driver_data<tryout_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -233,7 +233,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-SCREEN_UPDATE( tryout )
+SCREEN_UPDATE_IND16( tryout )
 {
 	tryout_state *state = screen.machine().driver_data<tryout_state>();
 	int scrollx = 0;

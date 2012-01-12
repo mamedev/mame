@@ -18,8 +18,8 @@ public:
 	size_t      m_spriteram_size;
 
 	/* video-related */
-	bitmap_t    *m_tmp_bitmap1;
-	bitmap_t    *m_tmp_bitmap2;
+	bitmap_ind16 m_tmp_bitmap1;
+	bitmap_ind16 m_tmp_bitmap2;
 	tilemap_t     *m_bg_tilemap;
 	int         m_sl_bank;
 	int         m_bg_on;
@@ -47,4 +47,4 @@ WRITE8_HANDLER( buggychl_bg_scrollx_w );
 
 PALETTE_INIT( buggychl );
 VIDEO_START( buggychl );
-SCREEN_UPDATE( buggychl );
+SCREEN_UPDATE_IND16( buggychl );

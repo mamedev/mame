@@ -161,7 +161,7 @@ VIDEO_START(sigma2k)
 		 8, 8, 64, 32);
 }
 
-SCREEN_UPDATE(ampoker2)
+SCREEN_UPDATE_IND16(ampoker2)
 {
 	ampoker2_state *state = screen.machine().driver_data<ampoker2_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

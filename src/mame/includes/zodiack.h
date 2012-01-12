@@ -31,8 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(attributes_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
-	void draw_bullets(bitmap_t &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_t &bitmap, const rectangle &cliprect);
+	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// devices
 	required_device<z80_device> m_maincpu;
@@ -61,6 +61,8 @@ public:
 	// misc
 	int       m_percuss_hardware;
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 
 	// driver_device overrides
@@ -68,7 +70,6 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 class percuss_state : public zodiack_state

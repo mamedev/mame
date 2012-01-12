@@ -38,7 +38,7 @@ public:
 	tilemap_t *m_layer1;
 	tilemap_t *m_layer2;
 	tilemap_t *m_layer3;
-	bitmap_t *m_temp_bitmap;
+	bitmap_rgb32 m_temp_bitmap;
 	UINT8 *m_apache3_road_x_ram;
 	UINT8 m_apache3_road_z;
 	UINT16* m_roundup5_vram;
@@ -101,8 +101,8 @@ VIDEO_START( roundup5 );
 VIDEO_START( cyclwarr );
 VIDEO_START( bigfight );
 
-SCREEN_UPDATE( roundup5 );
-SCREEN_UPDATE( apache3 );
-SCREEN_UPDATE( cyclwarr );
-SCREEN_UPDATE( bigfight );
+SCREEN_UPDATE_RGB32( roundup5 );
+SCREEN_UPDATE_RGB32( apache3 );
+SCREEN_UPDATE_RGB32( cyclwarr );
+SCREEN_UPDATE_RGB32( bigfight );
 

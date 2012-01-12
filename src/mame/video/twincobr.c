@@ -458,7 +458,7 @@ static void twincobr_log_vram(running_machine &machine)
     Sprite Handlers
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int offs;
@@ -494,10 +494,10 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 
 /***************************************************************************
-    Draw the game screen in the given bitmap_t.
+    Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-SCREEN_UPDATE( toaplan0 )
+SCREEN_UPDATE_IND16( toaplan0 )
 {
 	twincobr_state *state = screen.machine().driver_data<twincobr_state>();
 	twincobr_log_vram(screen.machine());

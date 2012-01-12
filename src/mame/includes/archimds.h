@@ -107,7 +107,7 @@ extern UINT8 vidc_interlace;
 /*----------- defined in video/archimds.c -----------*/
 
 extern VIDEO_START( archimds_vidc );
-extern SCREEN_UPDATE( archimds_vidc );
+extern SCREEN_UPDATE_RGB32( archimds_vidc );
 
 #define VIDC_HCR		0x80
 #define VIDC_HSWR		0x84

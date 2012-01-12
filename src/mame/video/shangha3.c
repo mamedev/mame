@@ -69,7 +69,7 @@ VIDEO_START( shangha3 )
 	shangha3_state *state = machine.driver_data<shangha3_state>();
 	int i;
 
-	state->m_rawbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_rawbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	for (i = 0;i < 14;i++)
 		state->m_drawmode_table[i] = DRAWMODE_SOURCE;
@@ -109,7 +109,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 {
 	shangha3_state *state = space->machine().driver_data<shangha3_state>();
 	UINT16 *shangha3_ram = state->m_ram;
-	bitmap_t &rawbitmap = *state->m_rawbitmap;
+	bitmap_ind16 &rawbitmap = state->m_rawbitmap;
 	UINT8 *drawmode_table = state->m_drawmode_table;
 	int offs;
 
@@ -261,10 +261,10 @@ else
 }
 
 
-SCREEN_UPDATE( shangha3 )
+SCREEN_UPDATE_IND16( shangha3 )
 {
 	shangha3_state *state = screen.machine().driver_data<shangha3_state>();
 
-	copybitmap(bitmap, *state->m_rawbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_rawbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

@@ -98,6 +98,11 @@ public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+	{
+		return 0;
+	}
+
 	int m_mod_number;
 	int m_mmtr_data;
 	int m_alpha_data_line;

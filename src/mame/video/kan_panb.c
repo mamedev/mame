@@ -4,7 +4,7 @@
 #include "kan_panb.h"
 #include "includes/snowbros.h"
 
-SCREEN_UPDATE( honeydol )
+SCREEN_UPDATE_IND16( honeydol )
 {
 	snowbros_state *state = screen.machine().driver_data<snowbros_state>();
 	UINT16 *spriteram16 = state->m_bootleg_spriteram16;
@@ -90,7 +90,7 @@ SCREEN_UPDATE( honeydol )
 }
 
 
-SCREEN_UPDATE( twinadv )
+SCREEN_UPDATE_IND16( twinadv )
 {
 	snowbros_state *state = screen.machine().driver_data<snowbros_state>();
 	UINT16 *spriteram16 = state->m_bootleg_spriteram16;
@@ -146,7 +146,7 @@ SCREEN_UPDATE( twinadv )
 }
 
 
-SCREEN_UPDATE( wintbob )
+SCREEN_UPDATE_IND16( wintbob )
 {
 	snowbros_state *state = screen.machine().driver_data<snowbros_state>();
 	UINT16 *spriteram16 = state->m_bootleg_spriteram16;
@@ -190,7 +190,7 @@ SCREEN_UPDATE( wintbob )
 }
 
 
-SCREEN_UPDATE( snowbro3 )
+SCREEN_UPDATE_IND16( snowbro3 )
 {
 	snowbros_state *state = screen.machine().driver_data<snowbros_state>();
 	UINT16 *spriteram16 = state->m_bootleg_spriteram16;

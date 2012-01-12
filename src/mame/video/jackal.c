@@ -79,7 +79,7 @@ VIDEO_START( jackal )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	jackal_state *state = machine.driver_data<jackal_state>();
 	UINT8 *RAM = machine.region("master")->base();
@@ -117,7 +117,7 @@ static void draw_background( running_machine &machine, bitmap_t &bitmap, const r
 
 #define DRAW_SPRITE(bank, code, sx, sy) drawgfx_transpen(bitmap, cliprect, machine.gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 
-static void draw_sprites_region( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank )
+static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank )
 {
 	int offs;
 
@@ -201,7 +201,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_t &bitmap, con
 	}
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	jackal_state *state = machine.driver_data<jackal_state>();
 	UINT8 *RAM = machine.region("master")->base();
@@ -222,7 +222,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	draw_sprites_region(machine, bitmap, cliprect, sr, 0x500, 1);
 }
 
-SCREEN_UPDATE( jackal )
+SCREEN_UPDATE_IND16( jackal )
 {
 	set_pens(screen.machine());
 	draw_background(screen.machine(), bitmap, cliprect);

@@ -168,10 +168,10 @@ static MC6845_UPDATE_ROW( cga_update_row );
 static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed );
 static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed );
 static VIDEO_START( pc1512 );
-static SCREEN_UPDATE( mc6845_pc1512 );
+static SCREEN_UPDATE_RGB32( mc6845_pc1512 );
 
 static VIDEO_START( cga_poisk2 );
-static SCREEN_UPDATE( cga_poisk2 );
+static SCREEN_UPDATE_RGB32( cga_poisk2 );
 
 static const mc6845_interface mc6845_cga_intf =
 {
@@ -193,9 +193,8 @@ static const mc6845_interface mc6845_cga_intf =
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_cga )
 	MCFG_SCREEN_ADD(CGA_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE( mc6845_cga )
+	MCFG_SCREEN_UPDATE_STATIC( mc6845_cga )
 
 	MCFG_PALETTE_LENGTH(/* CGA_PALETTE_SETS * 16*/ 65536 )
 	MCFG_PALETTE_INIT(pc_cga)
@@ -214,14 +213,14 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_poisk2 )
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_VIDEO_START( cga_poisk2 )
 	MCFG_SCREEN_MODIFY(CGA_SCREEN_NAME)
-	MCFG_SCREEN_UPDATE( cga_poisk2 )
+	MCFG_SCREEN_UPDATE_STATIC( cga_poisk2 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_pc1512 )
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_VIDEO_START( pc1512 )
 	MCFG_SCREEN_MODIFY(CGA_SCREEN_NAME)
-	MCFG_SCREEN_UPDATE( mc6845_pc1512 )
+	MCFG_SCREEN_UPDATE_STATIC( mc6845_pc1512 )
 MACHINE_CONFIG_END
 
 
@@ -385,11 +384,11 @@ static VIDEO_START( pc_cga32k )
 	memory_set_bankptr(machine,"bank11", cga.videoram);
 }
 
-SCREEN_UPDATE( mc6845_cga )
+SCREEN_UPDATE_RGB32( mc6845_cga )
 {
 	UINT8 *gfx = screen.machine().region("gfx1")->base();
 	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
-	mc6845->update( bitmap, cliprect);
+	mc6845->screen_update( screen, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
 	switch ( CGA_FONT & 0x01 )
@@ -411,11 +410,11 @@ static VIDEO_START( cga_poisk2 )
 	cga.chr_gen = machine.region( "gfx1" )->base() + 0x0000;
 }
 
-static SCREEN_UPDATE( cga_poisk2 )
+static SCREEN_UPDATE_RGB32( cga_poisk2 )
 {
 	UINT8 *gfx = screen.machine().region("gfx1")->base();
 	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
-	mc6845->update( bitmap, cliprect);
+	mc6845->screen_update( screen, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
 	switch ( CGA_FONT & 0x01 )
@@ -445,7 +444,8 @@ VIDEO_START( pc_cga_superimpose )
 static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 	running_machine &machine = device->machine();
 
@@ -464,14 +464,14 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 			data = 0xFF;
 		}
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 	}
 }
 
@@ -484,7 +484,8 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 	running_machine &machine = device->machine();
 
@@ -503,14 +504,14 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 			data = 0xFF;
 		}
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 	}
 }
 
@@ -522,7 +523,8 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 	running_machine &machine = device->machine();
 
@@ -540,14 +542,14 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 			data = 0xFF;
 		}
 
-		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x40 ) ? fg : 0; p++;
-		*p = ( data & 0x20 ) ? fg : 0; p++;
-		*p = ( data & 0x10 ) ? fg : 0; p++;
-		*p = ( data & 0x08 ) ? fg : 0; p++;
-		*p = ( data & 0x04 ) ? fg : 0; p++;
-		*p = ( data & 0x02 ) ? fg : 0; p++;
-		*p = ( data & 0x01 ) ? fg : 0; p++;
+		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
 	}
 }
 
@@ -560,7 +562,8 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16	*p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 	running_machine &machine = device->machine();
 
@@ -589,21 +592,22 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 			}
 		}
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 	}
 }
 
 static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16	*p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 	running_machine &machine = device->machine();
 
@@ -640,7 +644,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
 			dot = (data & (1 << (7-xi)));
 			pen_data = dot ? fg : bg;
 			if(pen_data || dot)
-				*p = pen_data;
+				*p = palette[pen_data];
 			p++;
 		}
 	}
@@ -654,7 +658,8 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
 static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 	running_machine &machine = device->machine();
 
@@ -684,14 +689,14 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 			}
 		}
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 	}
 }
 
@@ -701,7 +706,8 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 	running_machine &machine = device->machine();
 
@@ -711,17 +717,17 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
-		*p = data >> 4; p++;
-		*p = data >> 4; p++;
-		*p = data & 0x0F; p++;
-		*p = data & 0x0F; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data & 0x0F]; p++;
+		*p = palette[data & 0x0F]; p++;
 
 		data = videoram[ offset + 1 ];
 
-		*p = data >> 4; p++;
-		*p = data >> 4; p++;
-		*p = data & 0x0F; p++;
-		*p = data & 0x0F; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data & 0x0F]; p++;
+		*p = palette[data & 0x0F]; p++;
 	}
 }
 
@@ -758,7 +764,8 @@ static const UINT8 yc_lut[16][8] =
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 	running_machine &machine = device->machine();
 
@@ -769,25 +776,25 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
-		*p = data >> 4; p++;
-		*p = data >> 4; p++;
-		*p = data >> 4; p++;
-		*p = data >> 4; p++;
-		*p = data & 0x0F; p++;
-		*p = data & 0x0F; p++;
-		*p = data & 0x0F; p++;
-		*p = data & 0x0F; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data & 0x0F]; p++;
+		*p = palette[data & 0x0F]; p++;
+		*p = palette[data & 0x0F]; p++;
+		*p = palette[data & 0x0F]; p++;
 
 		data = videoram[ offset + 1 ];
 
-		*p = data >> 4; p++;
-		*p = data >> 4; p++;
-		*p = data >> 4; p++;
-		*p = data >> 4; p++;
-		*p = data & 0x0F; p++;
-		*p = data & 0x0F; p++;
-		*p = data & 0x0F; p++;
-		*p = data & 0x0F; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data >> 4]; p++;
+		*p = palette[data & 0x0F]; p++;
+		*p = palette[data & 0x0F]; p++;
+		*p = palette[data & 0x0F]; p++;
+		*p = palette[data & 0x0F]; p++;
 	}
 }
 
@@ -801,7 +808,8 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 	running_machine &machine = device->machine();
 
@@ -811,17 +819,17 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
-		*p = cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[   data        & 0x03 ]; p++;
+		*p = palette[cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
+		*p = palette[cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
+		*p = palette[cga.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]]; p++;
+		*p = palette[cga.palette_lut_2bpp[   data        & 0x03 ]]; p++;
 
 		data = videoram[ offset+1 ];
 
-		*p = cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]; p++;
-		*p = cga.palette_lut_2bpp[   data        & 0x03 ]; p++;
+		*p = palette[cga.palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
+		*p = palette[cga.palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
+		*p = palette[cga.palette_lut_2bpp[ ( data >> 2 ) & 0x03 ]]; p++;
+		*p = palette[cga.palette_lut_2bpp[   data        & 0x03 ]]; p++;
 	}
 }
 
@@ -836,7 +844,8 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8	fg = cga.color_select & 0x0F;
 	int i;
 	running_machine &machine = device->machine();
@@ -847,25 +856,25 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
-		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x40 ) ? fg : 0; p++;
-		*p = ( data & 0x20 ) ? fg : 0; p++;
-		*p = ( data & 0x10 ) ? fg : 0; p++;
-		*p = ( data & 0x08 ) ? fg : 0; p++;
-		*p = ( data & 0x04 ) ? fg : 0; p++;
-		*p = ( data & 0x02 ) ? fg : 0; p++;
-		*p = ( data & 0x01 ) ? fg : 0; p++;
+		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
 
 		data = videoram[ offset + 1 ];
 
-		*p = ( data & 0x80 ) ? fg : 0; p++;
-		*p = ( data & 0x40 ) ? fg : 0; p++;
-		*p = ( data & 0x20 ) ? fg : 0; p++;
-		*p = ( data & 0x10 ) ? fg : 0; p++;
-		*p = ( data & 0x08 ) ? fg : 0; p++;
-		*p = ( data & 0x04 ) ? fg : 0; p++;
-		*p = ( data & 0x02 ) ? fg : 0; p++;
-		*p = ( data & 0x01 ) ? fg : 0; p++;
+		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
 	}
 }
 
@@ -1218,7 +1227,7 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 //          proc = cga_pgfx_4bpp;
 //
 
-//INLINE void pgfx_plot_unit_4bpp(bitmap_t &bitmap,
+//INLINE void pgfx_plot_unit_4bpp(bitmap_ind16 &bitmap,
 //                           int x, int y, int offs)
 //{
 //  int color, values[2];
@@ -1253,7 +1262,7 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 //  Second plane at CGA_base + 0x4000 / 0x6000
 //***************************************************************************/
 //
-//static void cga_pgfx_4bpp(bitmap_t &bitmap, struct mscrtc6845 *crtc)
+//static void cga_pgfx_4bpp(bitmap_ind16 &bitmap, struct mscrtc6845 *crtc)
 //{
 //  int i, sx, sy, sh;
 //  int offs = mscrtc6845_get_start(crtc)*2;
@@ -1286,7 +1295,7 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 //
 //
 //
-//INLINE void pgfx_plot_unit_2bpp(bitmap_t &bitmap,
+//INLINE void pgfx_plot_unit_2bpp(bitmap_ind16 &bitmap,
 //                   int x, int y, const UINT16 *palette, int offs)
 //{
 //  int i;
@@ -1333,7 +1342,7 @@ static WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w
 //  cga fetches 2 byte per mscrtc6845 access (not modeled here)!
 //***************************************************************************/
 //
-//static void cga_pgfx_2bpp(bitmap_t &bitmap, struct mscrtc6845 *crtc)
+//static void cga_pgfx_2bpp(bitmap_ind16 &bitmap, struct mscrtc6845 *crtc)
 //{
 //  int i, sx, sy, sh;
 //  int offs = mscrtc6845_get_start(crtc)*2;
@@ -1417,7 +1426,8 @@ static struct
 static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT16	offset_base = ra << 13;
 	int j;
 	running_machine &machine = device->machine();
@@ -1431,14 +1441,14 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 		UINT16 g = ( cga.color_select & 2 ) ? videoram[ videoram_offset[1] | offset ] << 1 : 0;
 		UINT16 b = ( cga.color_select & 1 ) ? videoram[ videoram_offset[0] | offset ]      : 0;
 
-		*p = ( ( i & 0x400 ) | ( r & 0x200 ) | ( g & 0x100 ) | ( b & 0x80 ) ) >> 7; p++;
-		*p = ( ( i & 0x200 ) | ( r & 0x100 ) | ( g & 0x080 ) | ( b & 0x40 ) ) >> 6; p++;
-		*p = ( ( i & 0x100 ) | ( r & 0x080 ) | ( g & 0x040 ) | ( b & 0x20 ) ) >> 5; p++;
-		*p = ( ( i & 0x080 ) | ( r & 0x040 ) | ( g & 0x020 ) | ( b & 0x10 ) ) >> 4; p++;
-		*p = ( ( i & 0x040 ) | ( r & 0x020 ) | ( g & 0x010 ) | ( b & 0x08 ) ) >> 3; p++;
-		*p = ( ( i & 0x020 ) | ( r & 0x010 ) | ( g & 0x008 ) | ( b & 0x04 ) ) >> 2; p++;
-		*p = ( ( i & 0x010 ) | ( r & 0x008 ) | ( g & 0x004 ) | ( b & 0x02 ) ) >> 1; p++;
-		*p =   ( i & 0x008 ) | ( r & 0x004 ) | ( g & 0x002 ) | ( b & 0x01 )       ; p++;
+		*p = palette[( ( i & 0x400 ) | ( r & 0x200 ) | ( g & 0x100 ) | ( b & 0x80 ) ) >> 7]; p++;
+		*p = palette[( ( i & 0x200 ) | ( r & 0x100 ) | ( g & 0x080 ) | ( b & 0x40 ) ) >> 6]; p++;
+		*p = palette[( ( i & 0x100 ) | ( r & 0x080 ) | ( g & 0x040 ) | ( b & 0x20 ) ) >> 5]; p++;
+		*p = palette[( ( i & 0x080 ) | ( r & 0x040 ) | ( g & 0x020 ) | ( b & 0x10 ) ) >> 4]; p++;
+		*p = palette[( ( i & 0x040 ) | ( r & 0x020 ) | ( g & 0x010 ) | ( b & 0x08 ) ) >> 3]; p++;
+		*p = palette[( ( i & 0x020 ) | ( r & 0x010 ) | ( g & 0x008 ) | ( b & 0x04 ) ) >> 2]; p++;
+		*p = palette[( ( i & 0x010 ) | ( r & 0x008 ) | ( g & 0x004 ) | ( b & 0x02 ) ) >> 1]; p++;
+		*p = palette[  ( i & 0x008 ) | ( r & 0x004 ) | ( g & 0x002 ) | ( b & 0x01 )       ]; p++;
 	}
 }
 
@@ -1617,11 +1627,11 @@ static VIDEO_START( pc1512 )
 }
 
 
-static SCREEN_UPDATE( mc6845_pc1512 )
+static SCREEN_UPDATE_RGB32( mc6845_pc1512 )
 {
 	UINT8 *gfx = screen.machine().region("gfx1")->base();
 	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(CGA_MC6845_NAME);
-	mc6845->update(bitmap, cliprect);
+	mc6845->screen_update(screen, bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
 	switch ( CGA_FONT & 0x03 )

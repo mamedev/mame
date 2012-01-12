@@ -75,7 +75,7 @@ VIDEO_START( aliens )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( aliens )
+SCREEN_UPDATE_IND16( aliens )
 {
 	aliens_state *state = screen.machine().driver_data<aliens_state>();
 

@@ -240,7 +240,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	digdug_state *state =  machine.driver_data<digdug_state>();
 	UINT8 *spriteram = state->m_digdug_objram + 0x380;
@@ -310,7 +310,7 @@ static void draw_sprites(running_machine& machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( digdug )
+SCREEN_UPDATE_IND16( digdug )
 {
 	digdug_state *state =  screen.machine().driver_data<digdug_state>();
 

@@ -1245,7 +1245,7 @@ static VIDEO_START( halleys )
 }
 
 
-static void copy_scroll_op(bitmap_t &bitmap, UINT16 *source, int sx, int sy)
+static void copy_scroll_op(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
 
 //--------------------------------------------------------------------------
@@ -1283,7 +1283,7 @@ static void copy_scroll_op(bitmap_t &bitmap, UINT16 *source, int sx, int sy)
 }
 
 
-static void copy_scroll_xp(bitmap_t &bitmap, UINT16 *source, int sx, int sy)
+static void copy_scroll_xp(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
 
 //--------------------------------------------------------------------------
@@ -1342,7 +1342,7 @@ static void copy_scroll_xp(bitmap_t &bitmap, UINT16 *source, int sx, int sy)
 
 
 
-static void copy_fixed_xp(bitmap_t &bitmap, UINT16 *source)
+static void copy_fixed_xp(bitmap_ind16 &bitmap, UINT16 *source)
 {
 	UINT16 *esi, *edi;
 	int dst_pitch, ecx, edx;
@@ -1377,7 +1377,7 @@ static void copy_fixed_xp(bitmap_t &bitmap, UINT16 *source)
 }
 
 
-static void copy_fixed_2b(bitmap_t &bitmap, UINT16 *source)
+static void copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source)
 {
 	UINT16 *esi, *edi;
 	int dst_pitch, ecx, edx;
@@ -1424,7 +1424,7 @@ static void copy_fixed_2b(bitmap_t &bitmap, UINT16 *source)
 }
 
 
-static void filter_bitmap(running_machine &machine, bitmap_t &bitmap, int mask)
+static void filter_bitmap(running_machine &machine, bitmap_ind16 &bitmap, int mask)
 {
 	halleys_state *state = machine.driver_data<halleys_state>();
 	int dst_pitch;
@@ -1465,7 +1465,7 @@ static void filter_bitmap(running_machine &machine, bitmap_t &bitmap, int mask)
 }
 
 
-static SCREEN_UPDATE( halleys )
+static SCREEN_UPDATE_IND16( halleys )
 {
 	halleys_state *state = screen.machine().driver_data<halleys_state>();
 	int i, j;
@@ -1494,7 +1494,7 @@ static SCREEN_UPDATE( halleys )
 }
 
 
-static SCREEN_UPDATE( benberob )
+static SCREEN_UPDATE_IND16( benberob )
 {
 	halleys_state *state = screen.machine().driver_data<halleys_state>();
 	if (state->m_io_ram[0xa0] & 0x80)
@@ -1964,10 +1964,9 @@ static MACHINE_CONFIG_START( halleys, halleys_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.50)	/* verified on PCB */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(VIS_MINX, VIS_MAXX, VIS_MINY, VIS_MAXY)
-	MCFG_SCREEN_UPDATE(halleys)
+	MCFG_SCREEN_UPDATE_STATIC(halleys)
 
 	MCFG_PALETTE_LENGTH(PALETTE_SIZE)
 	MCFG_PALETTE_INIT(halleys)
@@ -1999,7 +1998,7 @@ static MACHINE_CONFIG_DERIVED( benberob, halleys )
 	MCFG_TIMER_CALLBACK(benberob_scanline)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(benberob)
+	MCFG_SCREEN_UPDATE_STATIC(benberob)
 MACHINE_CONFIG_END
 
 

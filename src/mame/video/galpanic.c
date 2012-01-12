@@ -6,7 +6,8 @@
 VIDEO_START( galpanic )
 {
 	galpanic_state *state = machine.driver_data<galpanic_state>();
-	state->m_sprites_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_sprites_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
 PALETTE_INIT( galpanic )
@@ -33,7 +34,7 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 	sy = offset / 256;
 	sx = offset % 256;
 
-	space->machine().primary_screen->default_bitmap().pix16(sy, sx) = 1024 + (data >> 1);
+	state->m_bitmap.pix16(sy, sx) = 1024 + (data >> 1);
 }
 
 WRITE16_HANDLER( galpanic_paletteram_w )
@@ -44,7 +45,7 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 }
 
 
-static void comad_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void comad_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galpanic_state *state = machine.driver_data<galpanic_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -82,7 +83,7 @@ static void comad_draw_sprites(running_machine &machine, bitmap_t &bitmap, const
 	}
 }
 
-static void draw_fgbitmap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_fgbitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galpanic_state *state = machine.driver_data<galpanic_state>();
 	int offs;
@@ -99,12 +100,13 @@ static void draw_fgbitmap(running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( galpanic )
+SCREEN_UPDATE_IND16( galpanic )
 {
+	galpanic_state *state = screen.machine().driver_data<galpanic_state>();
 	device_t *pandora = screen.machine().device("pandora");
 
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,screen.default_bitmap(),0,0,0,0,cliprect);
+	copybitmap(bitmap,state->m_bitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(screen.machine(), bitmap, cliprect);
 
@@ -113,18 +115,18 @@ SCREEN_UPDATE( galpanic )
 	return 0;
 }
 
-SCREEN_UPDATE( comad )
+SCREEN_UPDATE_IND16( comad )
 {
 	galpanic_state *state = screen.machine().driver_data<galpanic_state>();
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,screen.default_bitmap(),0,0,0,0,cliprect);
+	copybitmap(bitmap,state->m_bitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(screen.machine(), bitmap, cliprect);
 
 
 //  if(galpanic_clear_sprites)
 	{
-		state->m_sprites_bitmap->fill(0, cliprect);
+		state->m_sprites_bitmap.fill(0, cliprect);
 		comad_draw_sprites(screen.machine(),bitmap,cliprect);
 	}
 //  else

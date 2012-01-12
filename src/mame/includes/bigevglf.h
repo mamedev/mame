@@ -11,7 +11,7 @@ public:
 	UINT8 *  m_spriteram2;
 
 	/* video-related */
-	bitmap_t *m_tmp_bitmap[4];
+	bitmap_ind16 m_tmp_bitmap[4];
 	UINT8    *m_vidram;
 	UINT32   m_vidram_bank;
 	UINT32   m_plane_selected;
@@ -70,7 +70,7 @@ READ8_HANDLER( bigevglf_mcu_status_r );
 /*----------- defined in video/bigevglf.c -----------*/
 
 VIDEO_START( bigevglf );
-SCREEN_UPDATE( bigevglf );
+SCREEN_UPDATE_IND16( bigevglf );
 
 READ8_HANDLER( bigevglf_vidram_r );
 WRITE8_HANDLER( bigevglf_vidram_w );

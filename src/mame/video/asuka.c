@@ -19,7 +19,7 @@ WRITE16_HANDLER( asuka_spritectrl_w )
                         SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE( asuka )
+SCREEN_UPDATE_IND16( asuka )
 {
 	asuka_state *state = screen.machine().driver_data<asuka_state>();
 	UINT8 layer[3];
@@ -45,7 +45,7 @@ SCREEN_UPDATE( asuka )
 }
 
 
-SCREEN_UPDATE( bonzeadv )
+SCREEN_UPDATE_IND16( bonzeadv )
 {
 	asuka_state *state = screen.machine().driver_data<asuka_state>();
 	UINT8 layer[3];

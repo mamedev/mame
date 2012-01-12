@@ -414,7 +414,7 @@ ROM 3M,3L color replace table for sprite
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	xevious_state *state =  machine.driver_data<xevious_state>();
 
@@ -498,7 +498,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 }
 
 
-SCREEN_UPDATE( xevious )
+SCREEN_UPDATE_IND16( xevious )
 {
 	xevious_state *state =  screen.machine().driver_data<xevious_state>();
 

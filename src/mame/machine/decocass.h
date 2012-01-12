@@ -201,6 +201,6 @@ WRITE8_HANDLER( decocass_center_h_shift_space_w );
 WRITE8_HANDLER( decocass_center_v_shift_w );
 
 VIDEO_START( decocass );
-SCREEN_UPDATE( decocass );
+SCREEN_UPDATE_IND16( decocass );
 
 void decocass_video_state_save_init(running_machine &machine);

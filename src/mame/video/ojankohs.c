@@ -252,7 +252,7 @@ WRITE8_HANDLER( ojankoc_videoram_w )
 		px = x + (i ^ xx);
 		py = y;
 
-		state->m_tmpbitmap->pix16(py, px) = color;
+		state->m_tmpbitmap.pix16(py, px) = color;
 
 		color1 >>= 1;
 		color2 >>= 1;
@@ -296,13 +296,13 @@ VIDEO_START( ojankoc )
 {
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->m_tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmpbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 	state->m_videoram = auto_alloc_array(machine, UINT8, 0x8000);
 	state->m_paletteram = auto_alloc_array(machine, UINT8, 0x20);
 
 	state->save_pointer(NAME(state->m_videoram), 0x8000);
 	state->save_pointer(NAME(state->m_paletteram), 0x20);
-	state->save_item(NAME(*state->m_tmpbitmap));
+	state->save_item(NAME(state->m_tmpbitmap));
 }
 
 
@@ -312,7 +312,7 @@ VIDEO_START( ojankoc )
 
 ******************************************************************************/
 
-SCREEN_UPDATE( ojankohs )
+SCREEN_UPDATE_IND16( ojankohs )
 {
 	ojankohs_state *state = screen.machine().driver_data<ojankohs_state>();
 
@@ -323,7 +323,7 @@ SCREEN_UPDATE( ojankohs )
 	return 0;
 }
 
-SCREEN_UPDATE( ojankoc )
+SCREEN_UPDATE_IND16( ojankoc )
 {
 	ojankohs_state *state = screen.machine().driver_data<ojankohs_state>();
 	int offs;
@@ -340,6 +340,6 @@ SCREEN_UPDATE( ojankoc )
 		state->m_screen_refresh = 0;
 	}
 
-	copybitmap(bitmap, *state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

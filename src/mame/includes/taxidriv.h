@@ -28,4 +28,4 @@ public:
 
 WRITE8_DEVICE_HANDLER( taxidriv_spritectrl_w );
 
-SCREEN_UPDATE( taxidriv );
+SCREEN_UPDATE_IND16( taxidriv );

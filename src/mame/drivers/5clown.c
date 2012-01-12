@@ -521,7 +521,7 @@ static VIDEO_START(fclown)
 }
 
 
-static SCREEN_UPDATE( fclown )
+static SCREEN_UPDATE_IND16( fclown )
 {
 	_5clown_state *state = screen.machine().driver_data<_5clown_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -1068,10 +1068,9 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(fclown)
+	MCFG_SCREEN_UPDATE_STATIC(fclown)
 
 	MCFG_GFXDECODE(fclown)
 	MCFG_PALETTE_LENGTH(256)

@@ -34,4 +34,4 @@ extern WRITE8_HANDLER( battlex_scroll_starfield_w );
 extern WRITE8_HANDLER( battlex_flipscreen_w );
 
 extern VIDEO_START( battlex );
-extern SCREEN_UPDATE( battlex );
+extern SCREEN_UPDATE_IND16( battlex );

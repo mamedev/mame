@@ -42,4 +42,4 @@ WRITE8_HANDLER( fastlane_vram2_w );
 
 PALETTE_INIT( fastlane );
 VIDEO_START( fastlane );
-SCREEN_UPDATE( fastlane );
+SCREEN_UPDATE_IND16( fastlane );

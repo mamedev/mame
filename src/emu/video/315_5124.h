@@ -78,11 +78,11 @@ public:
 	DECLARE_READ8_MEMBER( hcount_latch_read );
 	DECLARE_WRITE8_MEMBER( hcount_latch_write );
 
-	bitmap_t *get_bitmap() { return m_tmpbitmap; };
-	bitmap_t *get_y1_bitmap() { return m_y1_bitmap; };
+	bitmap_rgb32 &get_bitmap() { return m_tmpbitmap; };
+	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; };
 
 	/* update the screen */
-	void update_video( bitmap_t &bitmap, const rectangle &cliprect );
+	UINT32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) { };
 
@@ -126,8 +126,8 @@ protected:
 	UINT8            m_hcounter;
 	memory_region    *m_CRAM;                    /* Pointer to CRAM */
 	const UINT8      *m_frame_timing;
-	bitmap_t         *m_tmpbitmap;
-	bitmap_t         *m_y1_bitmap;
+	bitmap_rgb32     m_tmpbitmap;
+	bitmap_ind8  m_y1_bitmap;
 	UINT8            m_collision_buffer[SEGA315_5124_WIDTH];
 	UINT8            m_palette_offset;
 	bool             m_supports_224_240;

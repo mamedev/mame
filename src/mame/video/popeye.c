@@ -247,7 +247,7 @@ VIDEO_START( skyskipr )
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	state->m_bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
-	state->m_tmpbitmap2 = auto_bitmap_alloc(machine,1024,1024,machine.primary_screen->format());	/* actually 1024x512 but not rolling over vertically? */
+	state->m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine,1024,1024);	/* actually 1024x512 but not rolling over vertically? */
 
 	state->m_bitmap_type = TYPE_SKYSKIPR;
 
@@ -265,7 +265,7 @@ VIDEO_START( popeye )
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	state->m_bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
-	state->m_tmpbitmap2 = auto_bitmap_alloc(machine,512,512,machine.primary_screen->format());
+	state->m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine,512,512);
 
 	state->m_bitmap_type = TYPE_POPEYE;
 
@@ -279,7 +279,7 @@ VIDEO_START( popeye )
     state_save_register_global_pointer(machine, state->m_bitmapram, popeye_bitmapram_size);
 }
 
-static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	int offs;
@@ -317,7 +317,7 @@ static void draw_background(running_machine &machine, bitmap_t &bitmap, const re
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -371,7 +371,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( popeye )
+SCREEN_UPDATE_IND16( popeye )
 {
 	popeye_state *state = screen.machine().driver_data<popeye_state>();
 	draw_background(screen.machine(), bitmap, cliprect);

@@ -55,7 +55,7 @@ VIDEO_START( blockhl )
 	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x800);
 }
 
-SCREEN_UPDATE( blockhl )
+SCREEN_UPDATE_IND16( blockhl )
 {
 	blockhl_state *state = screen.machine().driver_data<blockhl_state>();
 

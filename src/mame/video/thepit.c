@@ -231,7 +231,7 @@ READ8_HANDLER( thepit_input_port_0_r )
  *************************************/
 
 static void draw_sprites(running_machine &machine,
-						 bitmap_t &bitmap,
+						 bitmap_ind16 &bitmap,
 						 const rectangle &cliprect,
 						 int priority_to_draw)
 {
@@ -283,7 +283,7 @@ static void draw_sprites(running_machine &machine,
 }
 
 
-SCREEN_UPDATE( thepit )
+SCREEN_UPDATE_IND16( thepit )
 {
 	thepit_state *state = screen.machine().driver_data<thepit_state>();
 	offs_t offs;

@@ -198,7 +198,7 @@ WRITE8_HANDLER( c1942_c804_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	_1942_state *state = machine.driver_data<_1942_state>();
 	int offs;
@@ -240,7 +240,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 }
 
-SCREEN_UPDATE( 1942 )
+SCREEN_UPDATE_IND16( 1942 )
 {
 	_1942_state *state = screen.machine().driver_data<_1942_state>();
 

@@ -40,4 +40,4 @@ WRITE8_HANDLER( labyrunr_vram2_w );
 
 PALETTE_INIT( labyrunr );
 VIDEO_START( labyrunr );
-SCREEN_UPDATE( labyrunr );
+SCREEN_UPDATE_IND16( labyrunr );

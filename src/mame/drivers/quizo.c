@@ -73,7 +73,7 @@ static PALETTE_INIT(quizo)
 	}
 }
 
-static SCREEN_UPDATE( quizo )
+static SCREEN_UPDATE_IND16( quizo )
 {
 	quizo_state *state = screen.machine().driver_data<quizo_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -211,10 +211,9 @@ static MACHINE_CONFIG_START( quizo, quizo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 200-1)
-	MCFG_SCREEN_UPDATE(quizo)
+	MCFG_SCREEN_UPDATE_STATIC(quizo)
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(quizo)

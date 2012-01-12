@@ -44,7 +44,7 @@ public:
 /*----------- defined in video/aeroboto.c -----------*/
 
 VIDEO_START( aeroboto );
-SCREEN_UPDATE( aeroboto );
+SCREEN_UPDATE_IND16( aeroboto );
 
 READ8_HANDLER( aeroboto_in0_r );
 WRITE8_HANDLER( aeroboto_3000_w );

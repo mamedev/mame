@@ -16,8 +16,8 @@ public:
 
 VIDEO_START( runaway );
 VIDEO_START( qwak );
-SCREEN_UPDATE( runaway );
-SCREEN_UPDATE( qwak );
+SCREEN_UPDATE_IND16( runaway );
+SCREEN_UPDATE_IND16( qwak );
 
 WRITE8_HANDLER( runaway_paletteram_w );
 WRITE8_HANDLER( runaway_video_ram_w );

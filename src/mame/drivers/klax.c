@@ -182,11 +182,10 @@ static MACHINE_CONFIG_START( klax, klax_state )
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE(klax)
+	MCFG_SCREEN_UPDATE_STATIC(klax)
 
 	MCFG_VIDEO_START(klax)
 

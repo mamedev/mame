@@ -29,4 +29,4 @@ public:
 /*----------- defined in video/groundfx.c -----------*/
 
 VIDEO_START( groundfx );
-SCREEN_UPDATE( groundfx );
+SCREEN_UPDATE_IND16( groundfx );

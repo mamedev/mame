@@ -63,7 +63,7 @@ static void cosmo_get_pens( pen_t *pens )
 }
 
 
-INLINE void set_pixel( running_machine &machine, bitmap_t &bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color )
+INLINE void set_pixel( running_machine &machine, bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color )
 {
 	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 
@@ -77,7 +77,7 @@ INLINE void set_pixel( running_machine &machine, bitmap_t &bitmap, UINT8 y, UINT
 }
 
 
-INLINE void set_8_pixels( running_machine &machine, bitmap_t &bitmap, UINT8 y, UINT8 x, UINT8 data, pen_t *pens, UINT8 fore_color, UINT8 back_color )
+INLINE void set_8_pixels( running_machine &machine, bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, pen_t *pens, UINT8 fore_color, UINT8 back_color )
 {
 	int i;
 
@@ -92,7 +92,7 @@ INLINE void set_8_pixels( running_machine &machine, bitmap_t &bitmap, UINT8 y, U
 
 
 /* this is needed as this driver doesn't emulate the shift register like mw8080bw does */
-static void clear_extra_columns( running_machine &machine, bitmap_t &bitmap, pen_t *pens, UINT8 color )
+static void clear_extra_columns( running_machine &machine, bitmap_rgb32 &bitmap, pen_t *pens, UINT8 color )
 {
 	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 	UINT8 x;
@@ -112,7 +112,7 @@ static void clear_extra_columns( running_machine &machine, bitmap_t &bitmap, pen
 }
 
 
-SCREEN_UPDATE( invadpt2 )
+SCREEN_UPDATE_RGB32( invadpt2 )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -144,7 +144,7 @@ SCREEN_UPDATE( invadpt2 )
 }
 
 
-SCREEN_UPDATE( ballbomb )
+SCREEN_UPDATE_RGB32( ballbomb )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -177,7 +177,7 @@ SCREEN_UPDATE( ballbomb )
 }
 
 
-SCREEN_UPDATE( schaser )
+SCREEN_UPDATE_RGB32( schaser )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -218,7 +218,7 @@ SCREEN_UPDATE( schaser )
 }
 
 
-SCREEN_UPDATE( schasercv )
+SCREEN_UPDATE_RGB32( schasercv )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -244,7 +244,7 @@ SCREEN_UPDATE( schasercv )
 }
 
 
-SCREEN_UPDATE( rollingc )
+SCREEN_UPDATE_RGB32( rollingc )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -269,7 +269,7 @@ SCREEN_UPDATE( rollingc )
 }
 
 
-SCREEN_UPDATE( polaris )
+SCREEN_UPDATE_RGB32( polaris )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -341,7 +341,7 @@ SCREEN_UPDATE( polaris )
 }
 
 
-SCREEN_UPDATE( lupin3 )
+SCREEN_UPDATE_RGB32( lupin3 )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -366,7 +366,7 @@ SCREEN_UPDATE( lupin3 )
 }
 
 
-SCREEN_UPDATE( cosmo )
+SCREEN_UPDATE_RGB32( cosmo )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -393,7 +393,7 @@ SCREEN_UPDATE( cosmo )
 }
 
 
-SCREEN_UPDATE( indianbt )
+SCREEN_UPDATE_RGB32( indianbt )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -425,7 +425,7 @@ SCREEN_UPDATE( indianbt )
 }
 
 
-SCREEN_UPDATE( shuttlei )
+SCREEN_UPDATE_RGB32( shuttlei )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
@@ -456,7 +456,7 @@ SCREEN_UPDATE( shuttlei )
 }
 
 
-SCREEN_UPDATE( sflush )
+SCREEN_UPDATE_RGB32( sflush )
 {
 	_8080bw_state *state = screen.machine().driver_data<_8080bw_state>();
 	pen_t pens[NUM_PENS];

@@ -106,7 +106,7 @@ public:
 	UINT16 *m_spriteram;
 	UINT32 *m_spriteram32;
 	UINT32 *m_spc_regs;
-	bitmap_t *m_sprite_bitmap_1;
+	bitmap_ind16 *m_sprite_bitmap_1;
 	UINT16 *m_mcu_ram;
 	UINT16 m_mcu_com[4];
 	int m_regs1_i;
@@ -155,7 +155,7 @@ static VIDEO_START(galpani3)
 	machine.generic.spriteram_size = 0x4000;
 	state->m_spc_regs = auto_alloc_array(machine, UINT32, 0x40/4);
 
-	state->m_sprite_bitmap_1 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
+	state->m_sprite_bitmap_1 = auto_bitmap_ind16_alloc(machine,1024,1024);
 
 	state->m_spritegen = machine.device<sknsspr_device>("spritegen");
 	state->m_spritegen->skns_sprite_kludge(0,0);
@@ -201,7 +201,7 @@ static int gp3_is_alpha_pen(running_machine &machine, int pen)
 
 }
 
-static SCREEN_UPDATE(galpani3)
+static SCREEN_UPDATE_RGB32(galpani3)
 {
 	galpani3_state *state = screen.machine().driver_data<galpani3_state>();
 	int x,y;
@@ -960,11 +960,10 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
-	MCFG_SCREEN_UPDATE(galpani3)
+	MCFG_SCREEN_UPDATE_STATIC(galpani3)
 
 	MCFG_PALETTE_LENGTH(0x4303)
 

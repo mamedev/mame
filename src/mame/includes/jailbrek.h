@@ -37,4 +37,4 @@ WRITE8_HANDLER( jailbrek_colorram_w );
 
 PALETTE_INIT( jailbrek );
 VIDEO_START( jailbrek );
-SCREEN_UPDATE( jailbrek );
+SCREEN_UPDATE_IND16( jailbrek );

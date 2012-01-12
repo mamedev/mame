@@ -12,8 +12,8 @@ public:
 	UINT16 *m_vregs;
 	UINT16 *m_vram_0ras;
 	UINT16 *m_vram_1ras;
-	bitmap_t *m_tmpbitmap0;
-	bitmap_t *m_tmpbitmap1;
+	bitmap_ind16 *m_tmpbitmap0;
+	bitmap_ind16 *m_tmpbitmap1;
 	int m_disable_video;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
@@ -28,8 +28,8 @@ public:
 #define REALBRK_H
 
 VIDEO_START(realbrk);
-SCREEN_UPDATE(realbrk);
-SCREEN_UPDATE(dai2kaku);
+SCREEN_UPDATE_IND16(realbrk);
+SCREEN_UPDATE_IND16(dai2kaku);
 
 WRITE16_HANDLER( realbrk_vram_0_w );
 WRITE16_HANDLER( realbrk_vram_1_w );

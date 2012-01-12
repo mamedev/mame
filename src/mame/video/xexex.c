@@ -46,7 +46,7 @@ VIDEO_START( xexex )
 	k056832_set_layer_offs(state->m_k056832, 3,  6, 16);
 }
 
-SCREEN_UPDATE( xexex )
+SCREEN_UPDATE_RGB32( xexex )
 {
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	xexex_state *state = screen.machine().driver_data<xexex_state>();

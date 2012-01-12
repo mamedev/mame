@@ -403,7 +403,7 @@ static INPUT_PORTS_START( littlerb )
 INPUT_PORTS_END
 
 
-static void draw_sprite(running_machine &machine, bitmap_t &bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
+static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
 {
 	littlerb_state *state = machine.driver_data<littlerb_state>();
 	UINT16* spritegfx = state->m_region4;
@@ -442,7 +442,7 @@ static void draw_sprite(running_machine &machine, bitmap_t &bitmap, int xsize,in
 }
 
 /* sprite format / offset could be completely wrong, this is just based on our (currently incorrect) vram access */
-static SCREEN_UPDATE(littlerb)
+static SCREEN_UPDATE_IND16(littlerb)
 {
 	littlerb_state *state = screen.machine().driver_data<littlerb_state>();
 	int x,y,offs, code;
@@ -489,10 +489,9 @@ static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 256-1)
-	MCFG_SCREEN_UPDATE(littlerb)
+	MCFG_SCREEN_UPDATE_STATIC(littlerb)
 
 	MCFG_PALETTE_LENGTH(256)
 

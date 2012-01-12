@@ -236,7 +236,7 @@ VIDEO_START( ssrj )
 }
 
 
-static void draw_objects(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_objects(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int i,j,k,x,y;
@@ -280,7 +280,7 @@ PALETTE_INIT( ssrj )
 			palette_set_color_rgb(machine, i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
 }
 
-SCREEN_UPDATE( ssrj )
+SCREEN_UPDATE_IND16( ssrj )
 {
 	ssrj_state *state = screen.machine().driver_data<ssrj_state>();
 

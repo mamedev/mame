@@ -21,7 +21,7 @@ public:
 	size_t     m_spriteram_size;
 
 	/* video-related */
-	bitmap_t   *m_sprite_bitmap;
+	bitmap_ind16 m_sprite_bitmap;
 	UINT8      m_flipscreen;
 	int        m_punch_through_pen;
 	UINT8      m_irq_source;
@@ -37,4 +37,4 @@ WRITE8_HANDLER( ikki_scrn_ctrl_w );
 
 PALETTE_INIT( ikki );
 VIDEO_START( ikki );
-SCREEN_UPDATE( ikki );
+SCREEN_UPDATE_IND16( ikki );

@@ -22,7 +22,7 @@ public:
 /*----------- defined in video/mugsmash.c -----------*/
 
 VIDEO_START( mugsmash );
-SCREEN_UPDATE( mugsmash );
+SCREEN_UPDATE_IND16( mugsmash );
 
 WRITE16_HANDLER( mugsmash_reg_w );
 WRITE16_HANDLER( mugsmash_videoram2_w );

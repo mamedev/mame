@@ -59,7 +59,7 @@ static VIDEO_START( jongkyo )
 
 }
 
-static SCREEN_UPDATE( jongkyo )
+static SCREEN_UPDATE_IND16( jongkyo )
 {
 	jongkyo_state *state = screen.machine().driver_data<jongkyo_state>();
 	int y;
@@ -497,10 +497,9 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 8, 256-8-1)
-	MCFG_SCREEN_UPDATE(jongkyo)
+	MCFG_SCREEN_UPDATE_STATIC(jongkyo)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(jongkyo)

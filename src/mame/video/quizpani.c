@@ -79,7 +79,7 @@ VIDEO_START( quizpani )
 	tilemap_set_transparent_pen(state->m_txt_tilemap,15);
 }
 
-SCREEN_UPDATE( quizpani )
+SCREEN_UPDATE_IND16( quizpani )
 {
 	quizpani_state *state = screen.machine().driver_data<quizpani_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollreg[0] - 64);

@@ -248,7 +248,7 @@ static WRITE8_HANDLER( looping_colorram_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const UINT8 *source;
 	looping_state *state = machine.driver_data<looping_state>();
@@ -279,7 +279,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static SCREEN_UPDATE( looping )
+static SCREEN_UPDATE_IND16( looping )
 {
 	looping_state *state = screen.machine().driver_data<looping_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -637,9 +637,8 @@ static MACHINE_CONFIG_START( looping, looping_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE(looping)
+	MCFG_SCREEN_UPDATE_STATIC(looping)
 
 	MCFG_GFXDECODE(looping)
 	MCFG_PALETTE_LENGTH(32)

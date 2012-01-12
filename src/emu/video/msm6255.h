@@ -68,7 +68,7 @@ public:
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -79,9 +79,9 @@ protected:
 private:
 	inline UINT8 read_video_data(UINT16 ma, UINT8 ra);
 	void update_cursor();
-	void draw_scanline(bitmap_t &bitmap, const rectangle &cliprect, int y, UINT16 ma, UINT8 ra);
-	void update_graphics(bitmap_t &bitmap, const rectangle &cliprect);
-	void update_text(bitmap_t &bitmap, const rectangle &cliprect);
+	void draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ma, UINT8 ra);
+	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	screen_device *m_screen;
 

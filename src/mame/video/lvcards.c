@@ -112,7 +112,7 @@ VIDEO_START( lvcards )
 		 8, 8, 32, 32);
 }
 
-SCREEN_UPDATE( lvcards )
+SCREEN_UPDATE_IND16( lvcards )
 {
 	lvcards_state *state = screen.machine().driver_data<lvcards_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

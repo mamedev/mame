@@ -28,4 +28,4 @@ WRITE8_HANDLER( markham_flipscreen_w );
 
 PALETTE_INIT( markham );
 VIDEO_START( markham );
-SCREEN_UPDATE( markham );
+SCREEN_UPDATE_IND16( markham );

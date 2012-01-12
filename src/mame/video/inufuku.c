@@ -55,7 +55,7 @@ WRITE16_HANDLER( inufuku_scrollreg_w )
 
 ******************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	inufuku_state *state = machine.driver_data<inufuku_state>();
 	int offs;
@@ -234,7 +234,7 @@ VIDEO_START( inufuku )
 
 ******************************************************************************/
 
-SCREEN_UPDATE( inufuku )
+SCREEN_UPDATE_IND16( inufuku )
 {
 	inufuku_state *state = screen.machine().driver_data<inufuku_state>();
 	int i;

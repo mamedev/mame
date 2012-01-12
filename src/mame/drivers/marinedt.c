@@ -107,9 +107,9 @@ public:
 	UINT8 *     m_tx_tileram;
 
 	/* video-related */
-	bitmap_t *m_tile;
-	bitmap_t *m_obj1;
-	bitmap_t *m_obj2;
+	bitmap_ind16 *m_tile;
+	bitmap_ind16 *m_obj1;
+	bitmap_ind16 *m_obj2;
 	tilemap_t *m_tx_tilemap;
 
 	UINT8 m_obj1_a;
@@ -487,9 +487,9 @@ static VIDEO_START( marinedt )
 	tilemap_set_scrolldx(state->m_tx_tilemap, 0, 4*8);
 	tilemap_set_scrolldy(state->m_tx_tilemap, 0, -4*8);
 
-	state->m_tile = auto_bitmap_alloc(machine, 32 * 8, 32 * 8, machine.primary_screen->format());
-	state->m_obj1 = auto_bitmap_alloc(machine, 32, 32, machine.primary_screen->format());
-	state->m_obj2 = auto_bitmap_alloc(machine, 32, 32, machine.primary_screen->format());
+	state->m_tile = auto_bitmap_ind16_alloc(machine, 32 * 8, 32 * 8);
+	state->m_obj1 = auto_bitmap_ind16_alloc(machine, 32, 32);
+	state->m_obj2 = auto_bitmap_ind16_alloc(machine, 32, 32);
 }
 
 
@@ -506,7 +506,7 @@ static VIDEO_START( marinedt )
 #define OBJ_FLIPX(a)	((state->m_pf & 0x02) == 0)
 #define OBJ_FLIPY(a)	((a) & 0x80)
 
-static SCREEN_UPDATE( marinedt )
+static SCREEN_UPDATE_IND16( marinedt )
 {
 	marinedt_state *state = screen.machine().driver_data<marinedt_state>();
 	int sx, sy;
@@ -672,10 +672,9 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(4*8+32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(marinedt)
+	MCFG_SCREEN_UPDATE_STATIC(marinedt)
 
 	MCFG_GFXDECODE(marinedt)
 	MCFG_PALETTE_LENGTH(64)

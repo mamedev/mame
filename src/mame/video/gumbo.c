@@ -42,7 +42,7 @@ VIDEO_START( gumbo )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0xff);
 }
 
-SCREEN_UPDATE( gumbo )
+SCREEN_UPDATE_IND16( gumbo )
 {
 	gumbo_state *state = screen.machine().driver_data<gumbo_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

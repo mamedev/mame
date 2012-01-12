@@ -196,8 +196,8 @@ VIDEO_START( pacland )
 	pacland_state *state = machine.driver_data<pacland_state>();
 	int color;
 
-	state->m_fg_bitmap = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_fg_bitmap->fill(0xffff);
+	state->m_fg_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_fg_bitmap.fill(0xffff);
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
@@ -280,7 +280,7 @@ WRITE8_HANDLER( pacland_bankswitch_w )
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int whichmask)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichmask)
 {
 	pacland_state *state = machine.driver_data<pacland_state>();
 	UINT8 *spriteram = state->m_spriteram + 0x780;
@@ -340,7 +340,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static void draw_fg(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	pacland_state *state = machine.driver_data<pacland_state>();
 	int y, x;
@@ -348,13 +348,13 @@ static void draw_fg(running_machine &machine, bitmap_t &bitmap, const rectangle 
 	/* draw tilemap transparently over it; this will leave invalid pens (0xffff)
        anywhere where the fg_tilemap should be transparent; note that we assume
        the fg_bitmap has been pre-erased to 0xffff */
-	tilemap_draw(*state->m_fg_bitmap, cliprect, state->m_fg_tilemap, priority, 0);
+	tilemap_draw(state->m_fg_bitmap, cliprect, state->m_fg_tilemap, priority, 0);
 
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const UINT8 *pri = &machine.priority_bitmap.pix8(y);
-		UINT16 *src = &state->m_fg_bitmap->pix16(y);
+		UINT16 *src = &state->m_fg_bitmap.pix16(y);
 		UINT16 *dst = &bitmap.pix16(y);
 
 		/* only copy if the priority bitmap is 0 (no high priority sprite) and the
@@ -373,7 +373,7 @@ static void draw_fg(running_machine &machine, bitmap_t &bitmap, const rectangle 
 }
 
 
-SCREEN_UPDATE( pacland )
+SCREEN_UPDATE_IND16( pacland )
 {
 	pacland_state *state = screen.machine().driver_data<pacland_state>();
 	int row;

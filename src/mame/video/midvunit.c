@@ -525,7 +525,7 @@ READ32_HANDLER( midvunit_textureram_r )
  *
  *************************************/
 
-SCREEN_UPDATE( midvunit )
+SCREEN_UPDATE_IND16( midvunit )
 {
 	midvunit_state *state = screen.machine().driver_data<midvunit_state>();
 	int x, y, width, xoffs;

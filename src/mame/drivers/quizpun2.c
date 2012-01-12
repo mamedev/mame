@@ -147,7 +147,7 @@ static VIDEO_START(quizpun2)
 	tilemap_set_transparent_pen(state->m_fg_tmap, 0);
 }
 
-static SCREEN_UPDATE(quizpun2)
+static SCREEN_UPDATE_IND16(quizpun2)
 {
 	quizpun2_state *state = screen.machine().driver_data<quizpun2_state>();
 	int layers_ctrl = -1;
@@ -497,10 +497,9 @@ static MACHINE_CONFIG_START( quizpun2, quizpun2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(quizpun2)
+	MCFG_SCREEN_UPDATE_STATIC(quizpun2)
 
 	MCFG_GFXDECODE(quizpun2)
 	MCFG_PALETTE_LENGTH(0x200)

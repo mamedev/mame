@@ -317,7 +317,7 @@ void msm6255_device::update_cursor()
 //  draw_scanline -
 //-------------------------------------------------
 
-void msm6255_device::draw_scanline(bitmap_t &bitmap, const rectangle &cliprect, int y, UINT16 ma, UINT8 ra)
+void msm6255_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ma, UINT8 ra)
 {
 	UINT8 hp = (m_pr & PR_HP_MASK) + 1;
 	UINT8 hn = (m_hnr & HNR_HN_MASK) + 1;
@@ -358,7 +358,7 @@ void msm6255_device::draw_scanline(bitmap_t &bitmap, const rectangle &cliprect, 
 //  update_graphics -
 //-------------------------------------------------
 
-void msm6255_device::update_graphics(bitmap_t &bitmap, const rectangle &cliprect)
+void msm6255_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 hn = (m_hnr & HNR_HN_MASK) + 1;
 	UINT8 nx = (m_dvr & DVR_DN_MASK) + 1;
@@ -386,7 +386,7 @@ void msm6255_device::update_graphics(bitmap_t &bitmap, const rectangle &cliprect
 //  update_text -
 //-------------------------------------------------
 
-void msm6255_device::update_text(bitmap_t &bitmap, const rectangle &cliprect)
+void msm6255_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 hn = (m_hnr & HNR_HN_MASK) + 1;
 	UINT8 vp = (m_pr & PR_VP_MASK) + 1;
@@ -417,7 +417,7 @@ void msm6255_device::update_text(bitmap_t &bitmap, const rectangle &cliprect)
 //  update_screen - update screen
 //-------------------------------------------------
 
-void msm6255_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 msm6255_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_mor & MOR_DISPLAY_ON)
 	{
@@ -434,4 +434,5 @@ void msm6255_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
+	return 0;
 }

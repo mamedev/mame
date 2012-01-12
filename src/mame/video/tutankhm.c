@@ -59,7 +59,7 @@ static void get_pens( running_machine &machine, pen_t *pens )
  *
  *************************************/
 
-SCREEN_UPDATE( tutankhm )
+SCREEN_UPDATE_RGB32( tutankhm )
 {
 	tutankhm_state *state = screen.machine().driver_data<tutankhm_state>();
 	int xorx = state->m_flip_x ? 255 : 0;

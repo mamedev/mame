@@ -104,7 +104,7 @@ private:
 		const render_bounds &bounds() const { return m_bounds; }
 
 		// operations
-		void draw(running_machine &machine, bitmap_t &dest, const rectangle &bounds, int state);
+		void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 
 	private:
 		// component types
@@ -125,25 +125,25 @@ private:
 		};
 
 		// helpers
-		void draw_rect(bitmap_t &dest, const rectangle &bounds);
-		void draw_disk(bitmap_t &dest, const rectangle &bounds);
-		void draw_text(running_machine &machine, bitmap_t &dest, const rectangle &bounds);
-		bitmap_t *load_bitmap();
-		void draw_led7seg(bitmap_t &dest, const rectangle &bounds, int pattern);
-		void draw_led14seg(bitmap_t &dest, const rectangle &bounds, int pattern);
-		void draw_led14segsc(bitmap_t &dest, const rectangle &bounds, int pattern);
-		void draw_led16seg(bitmap_t &dest, const rectangle &bounds, int pattern);
-		void draw_led16segsc(bitmap_t &dest, const rectangle &bounds, int pattern);
-		void draw_dotmatrix(bitmap_t &dest, const rectangle &bounds, int pattern);
-		void draw_segment_horizontal_caps(bitmap_t &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
-		void draw_segment_horizontal(bitmap_t &dest, int minx, int maxx, int midy, int width, rgb_t color);
-		void draw_segment_vertical_caps(bitmap_t &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
-		void draw_segment_vertical(bitmap_t &dest, int miny, int maxy, int midx, int width, rgb_t color);
-		void draw_segment_diagonal_1(bitmap_t &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
-		void draw_segment_diagonal_2(bitmap_t &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
-		void draw_segment_decimal(bitmap_t &dest, int midx, int midy, int width, rgb_t color);
-		void draw_segment_comma(bitmap_t &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
-		void apply_skew(bitmap_t &dest, int skewwidth);
+		void draw_rect(bitmap_argb32 &dest, const rectangle &bounds);
+		void draw_disk(bitmap_argb32 &dest, const rectangle &bounds);
+		void draw_text(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds);
+		void load_bitmap();
+		void draw_led7seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
+		void draw_led14seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
+		void draw_led14segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
+		void draw_led16seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
+		void draw_led16segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
+		void draw_dotmatrix(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
+		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
+		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
+		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
+		void draw_segment_vertical(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, rgb_t color);
+		void draw_segment_diagonal_1(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
+		void draw_segment_diagonal_2(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
+		void draw_segment_decimal(bitmap_argb32 &dest, int midx, int midy, int width, rgb_t color);
+		void draw_segment_comma(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
+		void apply_skew(bitmap_argb32 &dest, int skewwidth);
 
 		// internal state
 		component *			m_next;			// link to next component
@@ -152,7 +152,7 @@ private:
 		render_bounds		m_bounds;		// bounds of the element
 		render_color		m_color;		// color of the element
 		astring				m_string;		// string for text components
-		bitmap_t *			m_bitmap;		// source bitmap for images
+		bitmap_argb32		m_bitmap;		// source bitmap for images
 		astring				m_dirname;		// directory name of image file (for lazy loading)
 		emu_file *			m_file;			// file object for reading image/alpha files
 		astring				m_imagefile;	// name of the image file (for lazy loading)
@@ -173,7 +173,7 @@ private:
 	};
 
 	// internal helpers
-	static void element_scale(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param);
+	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 	// internal state
 	layout_element *	m_next;				// link to next element

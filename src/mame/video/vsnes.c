@@ -55,7 +55,7 @@ VIDEO_START( vsdual )
   Display refresh
 
 ***************************************************************************/
-SCREEN_UPDATE( vsnes )
+SCREEN_UPDATE_IND16( vsnes )
 {
 	/* render the ppu */
 	ppu2c0x_render( screen.machine().device("ppu1"), bitmap, 0, 0, 0, 0 );
@@ -63,7 +63,7 @@ SCREEN_UPDATE( vsnes )
 }
 
 
-SCREEN_UPDATE( vsnes_bottom )
+SCREEN_UPDATE_IND16( vsnes_bottom )
 {
 	ppu2c0x_render(screen.machine().device("ppu2"), bitmap, 0, 0, 0, 0);
 	return 0;

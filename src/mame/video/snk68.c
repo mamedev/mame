@@ -199,7 +199,7 @@ WRITE16_HANDLER( pow_paletteram16_word_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int group)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int group)
 {
 	snk68_state *state = machine.driver_data<snk68_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -288,7 +288,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( pow )
+SCREEN_UPDATE_IND16( pow )
 {
 	snk68_state *state = screen.machine().driver_data<snk68_state>();
 

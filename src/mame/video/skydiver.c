@@ -168,7 +168,7 @@ WRITE8_HANDLER( skydiver_2000_201F_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	skydiver_state *state = machine.driver_data<skydiver_state>();
 	int pic;
@@ -206,7 +206,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( skydiver )
+SCREEN_UPDATE_IND16( skydiver )
 {
 	skydiver_state *state = screen.machine().driver_data<skydiver_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);

@@ -6,7 +6,7 @@
 
 
 static void blendbitmaps(running_machine &machine,
-		bitmap_t &dest,bitmap_t &src1,bitmap_t &src2,
+		bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,
 		const rectangle &cliprect)
 {
 	int y,x;
@@ -35,7 +35,7 @@ static void blendbitmaps(running_machine &machine,
 
 
 /* from gals pinball (which was in turn from ninja gaiden) */
-static int draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static int draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -114,16 +114,16 @@ VIDEO_START( spbactn )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	state->m_tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_tile_bitmap_bg.allocate(width, height);
+	state->m_tile_bitmap_fg.allocate(width, height);
 }
 
-SCREEN_UPDATE( spbactn )
+SCREEN_UPDATE_RGB32( spbactn )
 {
 	spbactn_state *state = screen.machine().driver_data<spbactn_state>();
 	int offs, sx, sy;
 
-	state->m_tile_bitmap_fg->fill(0, cliprect);
+	state->m_tile_bitmap_fg.fill(0, cliprect);
 
 	/* draw table bg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -135,7 +135,7 @@ SCREEN_UPDATE( spbactn )
 
 		color = ((attr & 0x00f0) >> 4) | 0x80;
 
-		drawgfx_transpen_raw(*state->m_tile_bitmap_bg, cliprect, screen.machine().gfx[1],
+		drawgfx_transpen_raw(state->m_tile_bitmap_bg, cliprect, screen.machine().gfx[1],
 					code,
 					screen.machine().gfx[1]->color_base + color * screen.machine().gfx[1]->color_granularity,
 					0, 0,
@@ -150,7 +150,7 @@ SCREEN_UPDATE( spbactn )
 		}
 	}
 
-	if (draw_sprites(screen.machine(), *state->m_tile_bitmap_bg, cliprect, 0))
+	if (draw_sprites(screen.machine(), state->m_tile_bitmap_bg, cliprect, 0))
 	{
 		/* kludge: draw table bg gfx again if priority 0 sprites are enabled */
 		for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -162,7 +162,7 @@ SCREEN_UPDATE( spbactn )
 
 			color = ((attr & 0x00f0) >> 4) | 0x80;
 
-			drawgfx_transpen_raw(*state->m_tile_bitmap_bg, cliprect, screen.machine().gfx[1],
+			drawgfx_transpen_raw(state->m_tile_bitmap_bg, cliprect, screen.machine().gfx[1],
 					code,
 					screen.machine().gfx[1]->color_base + color * screen.machine().gfx[1]->color_granularity,
 					0, 0,
@@ -178,7 +178,7 @@ SCREEN_UPDATE( spbactn )
 		}
 	}
 
-	draw_sprites(screen.machine(), *state->m_tile_bitmap_bg, cliprect, 1);
+	draw_sprites(screen.machine(), state->m_tile_bitmap_bg, cliprect, 1);
 
 	/* draw table fg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -196,7 +196,7 @@ SCREEN_UPDATE( spbactn )
 		else
 			color |= 0x0080;
 
-		drawgfx_transpen_raw(*state->m_tile_bitmap_fg, cliprect, screen.machine().gfx[0],
+		drawgfx_transpen_raw(state->m_tile_bitmap_fg, cliprect, screen.machine().gfx[0],
 					code,
 					screen.machine().gfx[0]->color_base + color * screen.machine().gfx[0]->color_granularity,
 					0, 0,
@@ -211,10 +211,10 @@ SCREEN_UPDATE( spbactn )
 		}
 	}
 
-	draw_sprites(screen.machine(), *state->m_tile_bitmap_fg, cliprect, 2);
-	draw_sprites(screen.machine(), *state->m_tile_bitmap_fg, cliprect, 3);
+	draw_sprites(screen.machine(), state->m_tile_bitmap_fg, cliprect, 2);
+	draw_sprites(screen.machine(), state->m_tile_bitmap_fg, cliprect, 3);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen.machine(), bitmap, *state->m_tile_bitmap_bg, *state->m_tile_bitmap_fg, cliprect);
+	blendbitmaps(screen.machine(), bitmap, state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, cliprect);
 	return 0;
 }

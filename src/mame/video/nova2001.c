@@ -270,7 +270,7 @@ WRITE8_HANDLER( pkunwar_flipscreen_w )
  *
  *************************************/
 
-static void nova2001_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void nova2001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -308,7 +308,7 @@ static void nova2001_draw_sprites(running_machine &machine, bitmap_t &bitmap, co
 	}
 }
 
-static void pkunwar_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void pkunwar_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -355,7 +355,7 @@ static void pkunwar_draw_sprites(running_machine &machine, bitmap_t &bitmap, con
 
 
 
-SCREEN_UPDATE( nova2001 )
+SCREEN_UPDATE_IND16( nova2001 )
 {
 	nova2001_state *state = screen.machine().driver_data<nova2001_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -370,7 +370,7 @@ SCREEN_UPDATE( nova2001 )
 	return 0;
 }
 
-SCREEN_UPDATE( pkunwar )
+SCREEN_UPDATE_IND16( pkunwar )
 {
 	nova2001_state *state = screen.machine().driver_data<nova2001_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
@@ -382,7 +382,7 @@ SCREEN_UPDATE( pkunwar )
 	return 0;
 }
 
-SCREEN_UPDATE( ninjakun )
+SCREEN_UPDATE_IND16( ninjakun )
 {
 	nova2001_state *state = screen.machine().driver_data<nova2001_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -396,7 +396,7 @@ SCREEN_UPDATE( ninjakun )
 	return 0;
 }
 
-SCREEN_UPDATE( raiders5 )
+SCREEN_UPDATE_IND16( raiders5 )
 {
 	nova2001_state *state = screen.machine().driver_data<nova2001_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

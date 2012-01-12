@@ -303,7 +303,7 @@ WRITE8_HANDLER( fromance_crtc_register_w )
  *
  *************************************/
 
-static void draw_sprites( screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int draw_priority )
+static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int draw_priority )
 {
 	fromance_state *state = screen.machine().driver_data<fromance_state>();
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
@@ -422,7 +422,7 @@ static void draw_sprites( screen_device &screen, bitmap_t &bitmap, const rectang
  *
  *************************************/
 
-SCREEN_UPDATE( fromance )
+SCREEN_UPDATE_IND16( fromance )
 {
 	fromance_state *state = screen.machine().driver_data<fromance_state>();
 
@@ -437,7 +437,7 @@ SCREEN_UPDATE( fromance )
 }
 
 
-SCREEN_UPDATE( pipedrm )
+SCREEN_UPDATE_IND16( pipedrm )
 {
 	fromance_state *state = screen.machine().driver_data<fromance_state>();
 

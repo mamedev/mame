@@ -90,19 +90,19 @@ enum
 #define NAMCOS21_NUM_COLORS 0x8000
 
 VIDEO_START( namcos2 );
-SCREEN_UPDATE( namcos2_default );
+SCREEN_UPDATE_IND16( namcos2_default );
 
 VIDEO_START( finallap );
-SCREEN_UPDATE( finallap );
+SCREEN_UPDATE_IND16( finallap );
 
 VIDEO_START( luckywld );
-SCREEN_UPDATE( luckywld );
+SCREEN_UPDATE_IND16( luckywld );
 
 VIDEO_START( metlhawk );
-SCREEN_UPDATE( metlhawk );
+SCREEN_UPDATE_IND16( metlhawk );
 
 VIDEO_START( sgunner );
-SCREEN_UPDATE( sgunner );
+SCREEN_UPDATE_IND16( sgunner );
 
 extern UINT16 *namcos2_sprite_ram;
 WRITE16_HANDLER( namcos2_sprite_ram_w );

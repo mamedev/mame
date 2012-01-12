@@ -34,7 +34,7 @@ public:
  *
  *************************************/
 
-static void xtheball_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
+static void xtheball_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	xtheball_state *state = screen.machine().driver_data<xtheball_state>();
 	UINT16 *srcbg = &state->m_vram_bg[(params->rowaddr << 8) & 0xff00];
@@ -314,7 +314,8 @@ static const tms34010_config tms_config =
 	"screen",						/* the screen operated on */
 	10000000,						/* pixel clock */
 	1,								/* pixels per clock */
-	xtheball_scanline_update,		/* scanline callback */
+	NULL,							/* scanline callback (indexed16) */
+	xtheball_scanline_update,		/* scanline callback (rgb32) */
 	NULL,							/* generate interrupt */
 	xtheball_to_shiftreg,			/* write to shiftreg function */
 	xtheball_from_shiftreg			/* read from shiftreg function */
@@ -343,9 +344,8 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(10000000, 640, 114, 626, 257, 24, 248)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

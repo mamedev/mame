@@ -234,11 +234,11 @@ void eprom_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE( eprom )
+SCREEN_UPDATE_IND16( eprom )
 {
 	eprom_state *state = screen.machine().driver_data<eprom_state>();
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	if (state->m_video_disable)
@@ -389,11 +389,11 @@ SCREEN_UPDATE( eprom )
 }
 
 
-SCREEN_UPDATE( guts )
+SCREEN_UPDATE_IND16( guts )
 {
 	eprom_state *state = screen.machine().driver_data<eprom_state>();
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	if (state->m_video_disable)

@@ -51,4 +51,4 @@ READ8_HANDLER( ladyfrog_videoram_r );
 
 VIDEO_START( ladyfrog );
 VIDEO_START( toucheme );
-SCREEN_UPDATE( ladyfrog );
+SCREEN_UPDATE_IND16( ladyfrog );

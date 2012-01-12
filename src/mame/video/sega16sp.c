@@ -76,7 +76,7 @@ INLINE const sega16sp_interface *get_interface( device_t *device )
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -241,7 +241,7 @@ void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bi
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
 	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
@@ -412,7 +412,7 @@ void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, 
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -573,7 +573,7 @@ void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitma
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks;
 	const UINT16 *spritebase;
@@ -739,7 +739,7 @@ void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitma
 		pri[x] = 0;															\
 	}																		\
 
-void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -917,7 +917,7 @@ void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int type)
+static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int type)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x40000;
 	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
@@ -1043,12 +1043,12 @@ static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device
 	}
 }
 
-void segaic16_sprites_outrun_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_outrun_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_OUTRUN);
 }
 
-void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_XBOARD);
 }
@@ -1088,7 +1088,7 @@ void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bi
 	if (x >= minx && x <= maxx && ind < 0x1fe)								\
 		dest[x] = ind | colorpri;											\
 
-void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx1")->bytes() / 0x80000;
 	const UINT64 *spritebase = (const UINT64 *)machine.region("gfx1")->base();
@@ -1382,7 +1382,7 @@ void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bi
 
 
 
-void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -1405,7 +1405,7 @@ void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t 
 }
 
 /* 4 player passing shot is different to this.. */
-void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -1427,7 +1427,7 @@ void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_
 	}
 }
 
-void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
@@ -1455,7 +1455,7 @@ void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device
  *
  *************************************/
 
-void segaic16_sprites_draw(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int which)
+void segaic16_sprites_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
 	device_t* device = 0;
 	sega16sp_state *sega16sp;

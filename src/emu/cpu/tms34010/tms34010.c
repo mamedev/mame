@@ -959,7 +959,7 @@ static TIMER_CALLBACK( scanline_callback )
 	{
 		/* only do this if we have an incoming pixel clock */
 		/* also, only do it if the HEBLNK/HSBLNK values are stable */
-		if (master && tms->config->scanline_callback != NULL)
+		if (master && (tms->config->scanline_callback_ind16 != NULL || tms->config->scanline_callback_rgb32 != NULL))
 		{
 			int htotal = SMART_IOREG(tms, HTOTAL);
 			if (htotal > 0 && vtotal > 0)
@@ -1003,7 +1003,7 @@ static TIMER_CALLBACK( scanline_callback )
 	}
 
 	/* force a partial update within the visible area */
-	if (vcount >= current_visarea.min_y && vcount <= current_visarea.max_y && tms->config->scanline_callback != NULL)
+	if (vcount >= current_visarea.min_y && vcount <= current_visarea.max_y && (tms->config->scanline_callback_ind16 != NULL || tms->config->scanline_callback_rgb32 != NULL))
 		tms->screen->update_partial(vcount);
 
 	/* if we are in the visible area, increment DPYADR by DUDATE */
@@ -1078,7 +1078,7 @@ void tms34010_get_display_params(device_t *cpu, tms34010_display_params *params)
 }
 
 
-SCREEN_UPDATE( tms340x0 )
+SCREEN_UPDATE_IND16( tms340x0_ind16 )
 {
 	pen_t blackpen = get_black_pen(screen.machine());
 	tms34010_display_params params;
@@ -1093,7 +1093,7 @@ SCREEN_UPDATE( tms340x0 )
 		if (type == TMS34010 || type == TMS34020)
 		{
 			tms = get_safe_token(cpu);
-			if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == &screen)
+			if (tms->config != NULL && tms->config->scanline_callback_ind16 != NULL && tms->screen == &screen)
 				break;
 			tms = NULL;
 		}
@@ -1109,7 +1109,7 @@ SCREEN_UPDATE( tms340x0 )
 	{
 		/* call through to the callback */
 		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect.min_y, params.rowaddr, params.coladdr));
-		(*tms->config->scanline_callback)(screen, bitmap, cliprect.min_y, &params);
+		(*tms->config->scanline_callback_ind16)(screen, bitmap, cliprect.min_y, &params);
 	}
 
 	/* otherwise, just blank the current scanline */
@@ -1117,22 +1117,59 @@ SCREEN_UPDATE( tms340x0 )
 		params.heblnk = params.hsblnk = cliprect.max_x + 1;
 
 	/* blank out the blank regions */
-	if (bitmap.bpp() == 16)
+	UINT16 *dest = &bitmap.pix16(cliprect.min_y);
+	for (x = cliprect.min_x; x < params.heblnk; x++)
+		dest[x] = blackpen;
+	for (x = params.hsblnk; x <= cliprect.max_y; x++)
+		dest[x] = blackpen;
+	return 0;
+
+}
+
+SCREEN_UPDATE_RGB32( tms340x0_rgb32 )
+{
+	pen_t blackpen = get_black_pen(screen.machine());
+	tms34010_display_params params;
+	tms34010_state *tms = NULL;
+	device_t *cpu;
+	int x;
+
+	/* find the owning CPU */
+	for (cpu = screen.machine().devicelist().first(); cpu != NULL; cpu = cpu->next())
 	{
-		UINT16 *dest = &bitmap.pix16(cliprect.min_y);
-		for (x = cliprect.min_x; x < params.heblnk; x++)
-			dest[x] = blackpen;
-		for (x = params.hsblnk; x <= cliprect.max_y; x++)
-			dest[x] = blackpen;
+		device_type type = cpu->type();
+		if (type == TMS34010 || type == TMS34020)
+		{
+			tms = get_safe_token(cpu);
+			if (tms->config != NULL && tms->config->scanline_callback_rgb32 != NULL && tms->screen == &screen)
+				break;
+			tms = NULL;
+		}
 	}
-	else if (bitmap.bpp() == 32)
+	if (tms == NULL)
+		fatalerror("Unable to locate matching CPU for screen '%s'\n", screen.tag());
+
+	/* get the display parameters for the screen */
+	tms34010_get_display_params(tms->device, &params);
+
+	/* if the display is enabled, call the scanline callback */
+	if (params.enabled)
 	{
-		UINT32 *dest = &bitmap.pix32(cliprect.min_y);
-		for (x = cliprect.min_x; x < params.heblnk; x++)
-			dest[x] = blackpen;
-		for (x = params.hsblnk; x <= cliprect.max_y; x++)
-			dest[x] = blackpen;
+		/* call through to the callback */
+		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect.min_y, params.rowaddr, params.coladdr));
+		(*tms->config->scanline_callback_rgb32)(screen, bitmap, cliprect.min_y, &params);
 	}
+
+	/* otherwise, just blank the current scanline */
+	else
+		params.heblnk = params.hsblnk = cliprect.max_x + 1;
+
+	/* blank out the blank regions */
+	UINT32 *dest = &bitmap.pix32(cliprect.min_y);
+	for (x = cliprect.min_x; x < params.heblnk; x++)
+		dest[x] = blackpen;
+	for (x = params.hsblnk; x <= cliprect.max_y; x++)
+		dest[x] = blackpen;
 	return 0;
 }
 

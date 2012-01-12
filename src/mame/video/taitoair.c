@@ -69,7 +69,7 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -182,7 +182,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static void fill_slope( bitmap_t &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
+static void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
 {
 	if (y1 > cliprect.max_y)
 		return;
@@ -257,7 +257,7 @@ static void fill_slope( bitmap_t &bitmap, const rectangle &cliprect, int color, 
 	*nx2 = x2;
 }
 
-static void fill_poly( bitmap_t &bitmap, const rectangle &cliprect, const struct taitoair_poly *q )
+static void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q )
 {
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
@@ -566,12 +566,12 @@ VIDEO_START( taitoair )
 
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
-	state->m_framebuffer[0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	state->m_framebuffer[1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	//state->m_buffer3d = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_framebuffer[0] = auto_bitmap_ind16_alloc(machine, width, height);
+	state->m_framebuffer[1] = auto_bitmap_ind16_alloc(machine, width, height);
+	//state->m_buffer3d = auto_bitmap_ind16_alloc(machine, width, height);
 }
 
-SCREEN_UPDATE( taitoair )
+SCREEN_UPDATE_IND16( taitoair )
 {
 	taitoair_state *state = screen.machine().driver_data<taitoair_state>();
 

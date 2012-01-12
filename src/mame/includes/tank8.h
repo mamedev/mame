@@ -36,9 +36,9 @@ public:
 	UINT8 *m_pos_d_ram;
 	UINT8 *m_team;
 	tilemap_t *m_tilemap;
-	bitmap_t *m_helper1;
-	bitmap_t *m_helper2;
-	bitmap_t *m_helper3;
+	bitmap_ind16 m_helper1;
+	bitmap_ind16 m_helper2;
+	bitmap_ind16 m_helper3;
 };
 
 
@@ -57,7 +57,7 @@ void tank8_set_collision(running_machine &machine, int index);
 PALETTE_INIT( tank8 );
 SCREEN_EOF( tank8 );
 VIDEO_START( tank8 );
-SCREEN_UPDATE( tank8 );
+SCREEN_UPDATE_IND16( tank8 );
 
 WRITE8_HANDLER( tank8_video_ram_w );
 

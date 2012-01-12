@@ -63,7 +63,7 @@ public:
 };
 
 #if !ENABLE_VGA
-static SCREEN_UPDATE( taitowlf )
+static SCREEN_UPDATE_RGB32( taitowlf )
 {
 	int x,y,count;
 	const UINT8 *blit_ram = screen.machine().region("user5")->base();
@@ -655,11 +655,10 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_SCREEN_UPDATE(taitowlf)
+	MCFG_SCREEN_UPDATE_STATIC(taitowlf)
 	MCFG_PALETTE_INIT(taitowlf)
 	#endif
 MACHINE_CONFIG_END

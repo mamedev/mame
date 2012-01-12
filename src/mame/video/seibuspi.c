@@ -218,7 +218,7 @@ WRITE32_HANDLER( video_dma_address_w )
 	COMBINE_DATA( &state->m_video_dma_address );
 }
 
-static void drawgfx_blend(bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
+static void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
 	seibuspi_state *state = gfx->machine().driver_data<seibuspi_state>();
 	const pen_t *pens = &gfx->machine().pens[gfx->color_base];
@@ -343,7 +343,7 @@ static const int sprite_ytable[2][8] =
 	{ 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 }
 };
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri_mask)
+static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri_mask)
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	INT16 xpos, ypos;
@@ -558,7 +558,7 @@ static void set_scroll(tilemap_t *layer, int scroll)
 #endif
 
 
-static void combine_tilemap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll)
+static void combine_tilemap(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll)
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int i,j;
@@ -567,8 +567,8 @@ static void combine_tilemap(running_machine &machine, bitmap_t &bitmap, const re
 	UINT8 *t;
 	UINT32 xscroll_mask, yscroll_mask;
 
-	bitmap_t &pen_bitmap = tilemap_get_pixmap(tile);
-	bitmap_t &flags_bitmap = tilemap_get_flagsmap(tile);
+	bitmap_ind16 &pen_bitmap = tilemap_get_pixmap(tile);
+	bitmap_ind8 &flags_bitmap = tilemap_get_flagsmap(tile);
 	xscroll_mask = pen_bitmap.width() - 1;
 	yscroll_mask = pen_bitmap.height() - 1;
 
@@ -605,7 +605,7 @@ static void combine_tilemap(running_machine &machine, bitmap_t &bitmap, const re
 
 
 
-SCREEN_UPDATE( spi )
+SCREEN_UPDATE_RGB32( spi )
 {
 	seibuspi_state *state = screen.machine().driver_data<seibuspi_state>();
 	INT16 *back_rowscroll, *mid_rowscroll, *fore_rowscroll;
@@ -668,7 +668,7 @@ VIDEO_START( sys386f2 )
 	memset(state->m_alpha_table, 0, 8192 * sizeof(UINT8));
 }
 
-SCREEN_UPDATE( sys386f2 )
+SCREEN_UPDATE_RGB32( sys386f2 )
 {
 	bitmap.fill(0, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);

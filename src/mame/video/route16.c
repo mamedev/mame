@@ -70,7 +70,7 @@ static pen_t ttmajng_make_pen(UINT8 color)
  *  a black output.
  */
 
-SCREEN_UPDATE( route16 )
+SCREEN_UPDATE_RGB32( route16 )
 {
 	route16_state *state = screen.machine().driver_data<route16_state>();
 	offs_t offs;
@@ -125,7 +125,7 @@ SCREEN_UPDATE( route16 )
  *  The Stratovox video connections have been verified from the schematics
  */
 
-static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_t &bitmap,
+static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_rgb32 &bitmap,
 										  const rectangle &cliprect,
 										  pen_t (*make_pen)(UINT8))
 {
@@ -177,13 +177,13 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_t &bi
 }
 
 
-SCREEN_UPDATE( stratvox )
+SCREEN_UPDATE_RGB32( stratvox )
 {
 	return video_update_stratvox_ttmahjng(screen.machine(), bitmap, cliprect, route16_make_pen);
 }
 
 
-SCREEN_UPDATE( ttmahjng )
+SCREEN_UPDATE_RGB32( ttmahjng )
 {
 	return video_update_stratvox_ttmahjng(screen.machine(), bitmap, cliprect, ttmajng_make_pen);
 }

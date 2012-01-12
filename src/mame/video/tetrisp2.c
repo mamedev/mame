@@ -380,7 +380,8 @@ VIDEO_START( rocknms )
 /* sprites should be able to create shadows too, how?
   -- it appears that sprites which should be shadows are often rendered *UNDER* the tilemaps, maybe related?
 */
-static void tetrisp2_draw_sprites(running_machine &machine, bitmap_t &bitmap, bitmap_t &bitmap_pri, const rectangle &cliprect, UINT8* priority_ram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip)
+template<class _BitmapClass>
+static void tetrisp2_draw_sprites(running_machine &machine, _BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT8* priority_ram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip)
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
@@ -459,7 +460,7 @@ static void tetrisp2_draw_sprites(running_machine &machine, bitmap_t &bitmap, bi
 
 ***************************************************************************/
 
-SCREEN_UPDATE( tetrisp2 )
+SCREEN_UPDATE_IND16( tetrisp2 )
 {
 	tetrisp2_state *state = screen.machine().driver_data<tetrisp2_state>();
 	int flipscreen;
@@ -544,7 +545,7 @@ SCREEN_UPDATE( tetrisp2 )
 	return 0;
 }
 
-SCREEN_UPDATE( rockntread )
+SCREEN_UPDATE_IND16( rockntread )
 {
 	tetrisp2_state *state = screen.machine().driver_data<tetrisp2_state>();
 	int flipscreen;
@@ -632,7 +633,7 @@ SCREEN_UPDATE( rockntread )
 
 
 
-SCREEN_UPDATE( rocknms_left )
+SCREEN_UPDATE_RGB32( rocknms_left )
 {
 	tetrisp2_state *state = screen.machine().driver_data<tetrisp2_state>();
 	int asc_pri;
@@ -692,7 +693,7 @@ SCREEN_UPDATE( rocknms_left )
 	return 0;
 }
 
-SCREEN_UPDATE( rocknms_right )
+SCREEN_UPDATE_RGB32( rocknms_right )
 {
 	tetrisp2_state *state = screen.machine().driver_data<tetrisp2_state>();
 	int asc_pri;

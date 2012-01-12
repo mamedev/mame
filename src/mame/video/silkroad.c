@@ -7,7 +7,7 @@
 /* Clean Up */
 /* is theres a bg colour register? */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	silkroad_state *state = machine.driver_data<silkroad_state>();
 	const gfx_element *gfx = machine.gfx[0];
@@ -141,7 +141,7 @@ VIDEO_START(silkroad)
 	tilemap_set_transparent_pen(state->m_fg3_tilemap, 0);
 }
 
-SCREEN_UPDATE(silkroad)
+SCREEN_UPDATE_IND16(silkroad)
 {
 	silkroad_state *state = screen.machine().driver_data<silkroad_state>();
 	screen.machine().priority_bitmap.fill(0, cliprect);

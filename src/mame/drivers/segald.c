@@ -20,7 +20,7 @@ Todo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "render.h"
-#include "machine/laserdsc.h"
+#include "machine/ldv1000.h"
 
 #define SCHEMATIC_CLOCK (20000000)
 
@@ -28,7 +28,8 @@ class segald_state : public driver_device
 {
 public:
 	segald_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
 	UINT8 m_nmi_enable;
 
@@ -37,14 +38,14 @@ public:
 	UINT8* m_fix_RAM;
 	UINT8* m_out_RAM;
 
-	device_t *m_laserdisc;
+	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 m_ldv1000_input_latch;
 	UINT8 m_ldv1000_output_latch;
 
 };
 
 /* VIDEO GOODS */
-static void astron_draw_characters(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void astron_draw_characters(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	segald_state *state = machine.driver_data<segald_state>();
 	UINT8 characterX, characterY;
@@ -60,7 +61,7 @@ static void astron_draw_characters(running_machine &machine, bitmap_t &bitmap,co
 	}
 }
 
-static void astron_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void astron_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Heisted from Daphne */
 	const UINT8 SPR_Y_TOP     = 0;
@@ -89,7 +90,7 @@ static void astron_draw_sprites(running_machine &machine, bitmap_t &bitmap, cons
 }
 
 
-static SCREEN_UPDATE( astron )
+static SCREEN_UPDATE_IND16( astron )
 {
 	bitmap.fill(0, cliprect);
 
@@ -108,7 +109,7 @@ static READ8_HANDLER( astron_DISC_read )
 	segald_state *state = space->machine().driver_data<segald_state>();
 
 	if (state->m_nmi_enable)
-		state->m_ldv1000_input_latch = laserdisc_data_r(state->m_laserdisc);
+		state->m_ldv1000_input_latch = state->m_laserdisc->status_r();
 
 	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", state->m_ldv1000_input_latch, offset, cpu_get_pc(&space->device()));
 
@@ -150,7 +151,7 @@ static WRITE8_HANDLER( astron_DISC_write )
 	state->m_ldv1000_output_latch = data;
 
 	if (state->m_nmi_enable)
-		laserdisc_data_w(state->m_laserdisc, state->m_ldv1000_output_latch);
+		state->m_laserdisc->data_w(state->m_ldv1000_output_latch);
 }
 
 static WRITE8_HANDLER( astron_OUT_write )
@@ -354,9 +355,6 @@ GFXDECODE_END
 
 static MACHINE_START( astron )
 {
-	segald_state *state = machine.driver_data<segald_state>();
-
-	state->m_laserdisc = machine.device("laserdisc");
 }
 
 
@@ -371,11 +369,11 @@ static MACHINE_CONFIG_START( astron, segald_state )
 
 	MCFG_MACHINE_START(astron)
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(astron, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
+	MCFG_LASERDISC_OVERLAY(256, 256, astron)
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_GFXDECODE(segald)
 	MCFG_PALETTE_LENGTH(256)
@@ -383,7 +381,7 @@ static MACHINE_CONFIG_START( astron, segald_state )
 	/* sound hardare */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

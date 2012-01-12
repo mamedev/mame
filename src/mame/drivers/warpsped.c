@@ -140,7 +140,7 @@ static VIDEO_START( warpspeed )
 	tilemap_mark_all_tiles_dirty(state->m_starfield_tilemap);
 }
 
-static void draw_circle_line(bitmap_t &bitmap, int x, int y, int l, int color)
+static void draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l, int color)
 {
 	if (y >= 0 && y <= bitmap.height() - 1)
 	{
@@ -159,7 +159,7 @@ static void draw_circle_line(bitmap_t &bitmap, int x, int y, int l, int color)
 	}
 }
 
-static void warpspeed_draw_circle(bitmap_t &bitmap, INT16 cx, INT16 cy, UINT16 radius, UINT8 color )
+static void warpspeed_draw_circle(bitmap_ind16 &bitmap, INT16 cx, INT16 cy, UINT16 radius, UINT8 color )
 {
 	/* Bresenham's circle algorithm */
 
@@ -184,7 +184,7 @@ static void warpspeed_draw_circle(bitmap_t &bitmap, INT16 cx, INT16 cy, UINT16 r
 	}
 }
 
-static void warpspeed_draw_circles(bitmap_t &bitmap, warpspeed_state *state)
+static void warpspeed_draw_circles(bitmap_ind16 &bitmap, warpspeed_state *state)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -203,7 +203,7 @@ static void warpspeed_draw_circles(bitmap_t &bitmap, warpspeed_state *state)
 	}
 }
 
-static SCREEN_UPDATE( warpspeed )
+static SCREEN_UPDATE_IND16( warpspeed )
 {
 	warpspeed_state *state = screen.machine().driver_data<warpspeed_state>();
 
@@ -310,12 +310,11 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 8*8, 32*8-1)
 
 	MCFG_VIDEO_START(warpspeed)
-	MCFG_SCREEN_UPDATE(warpspeed)
+	MCFG_SCREEN_UPDATE_STATIC(warpspeed)
 
 	MCFG_GFXDECODE(warpspeed)
 	MCFG_PALETTE_LENGTH(2+8)

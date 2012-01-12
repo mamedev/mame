@@ -2439,7 +2439,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
         //
         // src/emu/validity.c:validate_display() states,
         // an emulated driver can only produce
-        //      BITMAP_FORMAT_INDEXED16, BITMAP_FORMAT_RGB15 and BITMAP_FORMAT_RGB32
+        //      BITMAP_FORMAT_IND16 and BITMAP_FORMAT_RGB32
         // where only the first original paletted.
         //
         // other paletted formats, i.e.:
@@ -2462,12 +2462,6 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			break;
 		case TEXFORMAT_PALETTE16:
 			texture->format = SDL_TEXFORMAT_PALETTE16;
-			break;
-		case TEXFORMAT_RGB15:
-            if (texsource->palette != NULL)
-                texture->format = SDL_TEXFORMAT_RGB15_PALETTED;
-            else
-                texture->format = SDL_TEXFORMAT_RGB15;
 			break;
 		case TEXFORMAT_PALETTEA16:
 			texture->format = SDL_TEXFORMAT_PALETTE16A;

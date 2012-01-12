@@ -300,7 +300,7 @@ READ8_HANDLER( mgakuen_paletteram_r )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 	int offs, sx, sy;
@@ -328,7 +328,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( pang )
+SCREEN_UPDATE_IND16( pang )
 {
 	mitchell_state *state = screen.machine().driver_data<mitchell_state>();
 

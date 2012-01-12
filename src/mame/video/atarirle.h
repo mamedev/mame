@@ -88,6 +88,6 @@ WRITE32_DEVICE_HANDLER( atarirle_spriteram32_w );
 
 /* render helpers */
 void atarirle_eof(device_t *device);
-bitmap_t *atarirle_get_vram(device_t *device, int idx);
+bitmap_ind16 *atarirle_get_vram(device_t *device, int idx);
 
 #endif

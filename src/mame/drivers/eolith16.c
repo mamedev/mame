@@ -121,7 +121,7 @@ static VIDEO_START( eolith16 )
 	state->m_vram = auto_alloc_array(machine, UINT16, 0x10000);
 }
 
-static SCREEN_UPDATE( eolith16 )
+static SCREEN_UPDATE_IND16( eolith16 )
 {
 	eolith16_state *state = screen.machine().driver_data<eolith16_state>();
 	int x,y,count;
@@ -182,10 +182,9 @@ static MACHINE_CONFIG_START( eolith16, eolith16_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
-	MCFG_SCREEN_UPDATE(eolith16)
+	MCFG_SCREEN_UPDATE_STATIC(eolith16)
 
 	MCFG_PALETTE_LENGTH(256)
 

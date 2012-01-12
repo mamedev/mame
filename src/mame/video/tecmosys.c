@@ -117,14 +117,14 @@ WRITE16_HANDLER( bg2_tilemap_lineram_w )
 
 
 
-static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_t &bitmap, UINT16 extrax, UINT16 extray )
+static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_rgb32 &bitmap, UINT16 extrax, UINT16 extray )
 {
 	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 	UINT8 *gfxsrc    = machine.region       ( "gfx1" )->base();
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
-	state->m_sprite_bitmap->fill(0x0000);
+	state->m_sprite_bitmap.fill(0x0000);
 	/* there are multiple spritelists in here, to allow for buffering */
 	for (i=(state->m_spritelist*0x4000)/2;i<((state->m_spritelist+1)*0x4000)/2;i+=8)
 	{
@@ -194,7 +194,7 @@ static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_t
 				{
 					UINT8 data;
 
-					dstptr = &state->m_sprite_bitmap->pix16(drawy, drawx);
+					dstptr = &state->m_sprite_bitmap.pix16(drawy, drawx);
 
 
 					data =  (gfxsrc[address]);
@@ -216,8 +216,8 @@ static void tecmosys_tilemap_copy_to_compose(tecmosys_state *state, UINT16 pri)
 	UINT16 *dstptr;
 	for (y=0;y<240;y++)
 	{
-		srcptr = &state->m_tmp_tilemap_renderbitmap->pix16(y);
-		dstptr = &state->m_tmp_tilemap_composebitmap->pix16(y);
+		srcptr = &state->m_tmp_tilemap_renderbitmap.pix16(y);
+		dstptr = &state->m_tmp_tilemap_composebitmap.pix16(y);
 		for (x=0;x<320;x++)
 		{
 			if ((srcptr[x]&0xf)!=0x0)
@@ -226,7 +226,7 @@ static void tecmosys_tilemap_copy_to_compose(tecmosys_state *state, UINT16 pri)
 	}
 }
 
-static void tecmosys_do_final_mix(running_machine &machine, bitmap_t &bitmap)
+static void tecmosys_do_final_mix(running_machine &machine, bitmap_rgb32 &bitmap)
 {
 	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 	const pen_t *paldata = machine.pens;
@@ -237,8 +237,8 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_t &bitmap)
 
 	for (y=0;y<240;y++)
 	{
-		srcptr = &state->m_tmp_tilemap_composebitmap->pix16(y);
-		srcptr2 = &state->m_sprite_bitmap->pix16(y);
+		srcptr = &state->m_tmp_tilemap_composebitmap.pix16(y);
+		srcptr2 = &state->m_sprite_bitmap.pix16(y);
 
 		dstptr = &bitmap.pix32(y);
 		for (x=0;x<320;x++)
@@ -297,7 +297,7 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_t &bitmap)
 }
 
 
-SCREEN_UPDATE(tecmosys)
+SCREEN_UPDATE_RGB32(tecmosys)
 {
 	tecmosys_state *state = screen.machine().driver_data<tecmosys_state>();
 
@@ -313,22 +313,22 @@ SCREEN_UPDATE(tecmosys)
 	tilemap_set_scrolly( state->m_bg2tilemap, 0, state->m_b00000regs[1]+17);
 	tilemap_set_scrollx( state->m_bg2tilemap, 0, state->m_b00000regs[0]+106);
 
-	state->m_tmp_tilemap_composebitmap->fill(0, cliprect);
+	state->m_tmp_tilemap_composebitmap.fill(0, cliprect);
 
-	state->m_tmp_tilemap_renderbitmap->fill(0, cliprect);
-	tilemap_draw(*state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg0tilemap,0,0);
+	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
+	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg0tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x0000);
 
-	state->m_tmp_tilemap_renderbitmap->fill(0, cliprect);
-	tilemap_draw(*state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg1tilemap,0,0);
+	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
+	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg1tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x4000);
 
-	state->m_tmp_tilemap_renderbitmap->fill(0, cliprect);
-	tilemap_draw(*state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg2tilemap,0,0);
+	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
+	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg2tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x8000);
 
-	state->m_tmp_tilemap_renderbitmap->fill(0, cliprect);
-	tilemap_draw(*state->m_tmp_tilemap_renderbitmap,cliprect,state->m_txt_tilemap,0,0);
+	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
+	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_txt_tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0xc000);
 
 
@@ -343,14 +343,14 @@ SCREEN_UPDATE(tecmosys)
 VIDEO_START(tecmosys)
 {
 	tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	state->m_sprite_bitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
-	state->m_sprite_bitmap->fill(0x4000);
+	state->m_sprite_bitmap.allocate(320,240);
+	state->m_sprite_bitmap.fill(0x4000);
 
-	state->m_tmp_tilemap_composebitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
-	state->m_tmp_tilemap_renderbitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
+	state->m_tmp_tilemap_composebitmap.allocate(320,240);
+	state->m_tmp_tilemap_renderbitmap.allocate(320,240);
 
-	state->m_tmp_tilemap_composebitmap->fill(0x0000);
-	state->m_tmp_tilemap_renderbitmap->fill(0x0000);
+	state->m_tmp_tilemap_composebitmap.fill(0x0000);
+	state->m_tmp_tilemap_renderbitmap.fill(0x0000);
 
 
 	state->m_txt_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32*2,32*2);

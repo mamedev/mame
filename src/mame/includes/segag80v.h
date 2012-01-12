@@ -40,4 +40,4 @@ WRITE8_HANDLER( zektor2_sh_w );
 /*----------- defined in video/segag80v.c -----------*/
 
 VIDEO_START( segag80v );
-SCREEN_UPDATE( segag80v );
+SCREEN_UPDATE_RGB32( segag80v );

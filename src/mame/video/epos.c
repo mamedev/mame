@@ -72,7 +72,7 @@ WRITE8_HANDLER( epos_port_1_w )
 }
 
 
-SCREEN_UPDATE( epos )
+SCREEN_UPDATE_RGB32( epos )
 {
 	epos_state *state = screen.machine().driver_data<epos_state>();
 	pen_t pens[0x20];

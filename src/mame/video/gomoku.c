@@ -117,14 +117,14 @@ VIDEO_START( gomoku )
 	int bgdata;
 	int color;
 
-	state->m_bg_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_bg_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32, 32);
 
 	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
 
 	/* make background bitmap */
-	state->m_bg_bitmap->fill(0x20);
+	state->m_bg_bitmap.fill(0x20);
 
 	// board
 	for (y = 0; y < 256; y++)
@@ -138,7 +138,7 @@ VIDEO_START( gomoku )
 			if (bgdata & 0x01) color = 0x21;	// board (brown)
 			if (bgdata & 0x02) color = 0x20;	// frame line (while)
 
-			state->m_bg_bitmap->pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
+			state->m_bg_bitmap.pix16((255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 		}
 	}
 }
@@ -150,7 +150,7 @@ VIDEO_START( gomoku )
 
 ******************************************************************************/
 
-SCREEN_UPDATE( gomoku )
+SCREEN_UPDATE_IND16( gomoku )
 {
 	gomoku_state *state = screen.machine().driver_data<gomoku_state>();
 	UINT8 *GOMOKU_BG_X = screen.machine().region( "user1" )->base();
@@ -166,7 +166,7 @@ SCREEN_UPDATE( gomoku )
 	if (state->m_bg_dispsw)
 	{
 		/* copy bg bitmap */
-		copybitmap(bitmap, *state->m_bg_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, state->m_bg_bitmap, 0, 0, 0, 0, cliprect);
 
 		// stone
 		for (y = 0; y < 256; y++)

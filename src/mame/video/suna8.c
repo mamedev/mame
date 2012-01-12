@@ -202,7 +202,7 @@ VIDEO_START( suna8_textdim12 )	{ suna8_vh_start_common(machine, 12); }
 
 ***************************************************************************/
 
-static void draw_normal_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	suna8_state *state = machine.driver_data<suna8_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -336,7 +336,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_t &bitmap,const
 	}
 }
 
-static void draw_text_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	suna8_state *state = machine.driver_data<suna8_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -412,7 +412,7 @@ static void draw_text_sprites(running_machine &machine, bitmap_t &bitmap,const r
 
 ***************************************************************************/
 
-SCREEN_UPDATE( suna8 )
+SCREEN_UPDATE_IND16( suna8 )
 {
 	/* see hardhead, hardhea2 test mode (press button 2 for both players) */
 	bitmap.fill(0xff, cliprect);

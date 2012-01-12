@@ -30,7 +30,7 @@ public:
 
 /*----------- defined in video/mcatadv.c -----------*/
 
-SCREEN_UPDATE( mcatadv );
+SCREEN_UPDATE_IND16( mcatadv );
 VIDEO_START( mcatadv );
 SCREEN_EOF( mcatadv );
 

@@ -20,4 +20,4 @@ public:
 /*----------- defined in video/arcadecl.c -----------*/
 
 VIDEO_START( arcadecl );
-SCREEN_UPDATE( arcadecl );
+SCREEN_UPDATE_IND16( arcadecl );

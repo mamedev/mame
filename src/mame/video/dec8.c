@@ -222,7 +222,7 @@ WRITE8_HANDLER( gondo_scroll_w )
 /******************************************************************************/
 
 
-static void srdarwin_draw_sprites( running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
+static void srdarwin_draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
 	int offs;
@@ -272,7 +272,7 @@ static void srdarwin_draw_sprites( running_machine& machine, bitmap_t &bitmap, c
 
 /******************************************************************************/
 
-SCREEN_UPDATE( cobracom )
+SCREEN_UPDATE_IND16( cobracom )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 
@@ -318,7 +318,7 @@ VIDEO_START( cobracom )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( ghostb )
+SCREEN_UPDATE_IND16( ghostb )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
@@ -353,7 +353,7 @@ VIDEO_START( ghostb )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( oscar )
+SCREEN_UPDATE_IND16( oscar )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	flip_screen_set(screen.machine(), state->m_bg_control[1] >> 7);
@@ -394,7 +394,7 @@ VIDEO_START( oscar )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( lastmisn )
+SCREEN_UPDATE_IND16( lastmisn )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8)+ state->m_scroll2[1]));
@@ -406,7 +406,7 @@ SCREEN_UPDATE( lastmisn )
 	return 0;
 }
 
-SCREEN_UPDATE( shackled )
+SCREEN_UPDATE_IND16( shackled )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8) + state->m_scroll2[1]));
@@ -483,7 +483,7 @@ VIDEO_START( shackled )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( srdarwin )
+SCREEN_UPDATE_IND16( srdarwin )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, (state->m_scroll2[0] << 8) + state->m_scroll2[1]);
@@ -548,7 +548,7 @@ VIDEO_START( srdarwin )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( gondo )
+SCREEN_UPDATE_IND16( gondo )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8) + state->m_scroll2[1]));
@@ -562,7 +562,7 @@ SCREEN_UPDATE( gondo )
 	return 0;
 }
 
-SCREEN_UPDATE( garyoret )
+SCREEN_UPDATE_IND16( garyoret )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8) + state->m_scroll2[1]));

@@ -87,7 +87,7 @@ static const UINT16 cdi220_lcd_char[20*22] =
 static void cdi220_draw_lcd(running_machine &machine, int y)
 {
     cdi_state *state = machine.driver_data<cdi_state>();
-    bitmap_t &bitmap = *state->m_lcdbitmap;
+    bitmap_rgb32 &bitmap = state->m_lcdbitmap;
     UINT32 *scanline = &bitmap.pix32(y);
     int x = 0;
     int lcd = 0;
@@ -1331,8 +1331,7 @@ static void mcd212_draw_cursor(mcd212_regs_t *mcd212, UINT32 *scanline, int y)
 
 static void mcd212_draw_scanline(mcd212_regs_t *mcd212, int y)
 {
-    running_machine &machine = mcd212->machine();
-    bitmap_t &bitmap = machine.primary_screen->default_bitmap();
+    bitmap_rgb32 &bitmap = mcd212->m_bitmap;
     UINT8 plane_a_r[768], plane_a_g[768], plane_a_b[768];
     UINT8 plane_b_r[768], plane_b_g[768], plane_b_b[768];
     UINT32 out[768];
@@ -1512,6 +1511,7 @@ TIMER_CALLBACK( mcd212_perform_scan )
 void mcd212_init(running_machine &machine, mcd212_regs_t *mcd212)
 {
     mcd212->m_machine = &machine;
+    mcd212->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
     int index = 0;
     for(index = 0; index < 2; index++)
@@ -1657,18 +1657,20 @@ VIDEO_START( cdimono1 )
     state->m_mcd212_regs.scan_timer = machine.scheduler().timer_alloc(FUNC(mcd212_perform_scan));
     state->m_mcd212_regs.scan_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
 
-    state->m_lcdbitmap = downcast<screen_device *>(machine.device("lcd"))->alloc_compatible_bitmap();
+	screen_device *screen = downcast<screen_device *>(machine.device("lcd"));
+    state->m_lcdbitmap.allocate(screen->width(), screen->height());
 }
 
-SCREEN_UPDATE( cdimono1 )
+SCREEN_UPDATE_RGB32( cdimono1 )
 {
-    copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
+    cdi_state *state = screen.machine().driver_data<cdi_state>();
+    copybitmap(bitmap, state->m_mcd212_regs.m_bitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }
 
-SCREEN_UPDATE( cdimono1_lcd )
+SCREEN_UPDATE_RGB32( cdimono1_lcd )
 {
     cdi_state *state = screen.machine().driver_data<cdi_state>();
-    copybitmap(bitmap, *state->m_lcdbitmap, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, state->m_lcdbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }

@@ -28,7 +28,7 @@ VIDEO_START( blockade )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-SCREEN_UPDATE( blockade )
+SCREEN_UPDATE_IND16( blockade )
 {
 	blockade_state *state = screen.machine().driver_data<blockade_state>();
 

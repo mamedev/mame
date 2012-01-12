@@ -606,10 +606,10 @@ handle_error:
 
 /*-------------------------------------------------
     png_read_bitmap - load a PNG file into a
-    bitmap_t
+    bitmap
 -------------------------------------------------*/
 
-png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
+png_error png_read_bitmap(core_file *fp, bitmap_argb32 &bitmap)
 {
 	png_error result;
 	png_info png;
@@ -633,12 +633,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 	png_expand_buffer_8bit(&png);
 
 	/* allocate a bitmap of the appropriate size and copy it */
-	*bitmap = new(std::nothrow) bitmap_t(png.width, png.height, BITMAP_FORMAT_ARGB32);
-	if (*bitmap == NULL)
-	{
-		png_free(&png);
-		return PNGERR_OUT_OF_MEMORY;
-	}
+	bitmap.allocate(png.width, png.height);
 
 	/* handle 8bpp palettized case */
 	src = png.image;
@@ -650,7 +645,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 			{
 				/* determine alpha and expand to 32bpp */
 				UINT8 alpha = (*src < png.num_trans) ? png.trans[*src] : 0xff;
-				(*bitmap)->pix32(y, x) = (alpha << 24) | (png.palette[*src * 3] << 16) | (png.palette[*src * 3 + 1] << 8) | png.palette[*src * 3 + 2];
+				bitmap.pix32(y, x) = (alpha << 24) | (png.palette[*src * 3] << 16) | (png.palette[*src * 3 + 1] << 8) | png.palette[*src * 3 + 2];
 			}
 	}
 
@@ -659,7 +654,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 	{
 		for (y = 0; y < png.height; y++)
 			for (x = 0; x < png.width; x++, src++)
-				(*bitmap)->pix32(y, x) = 0xff000000 | (*src << 16) | (*src << 8) | *src;
+				bitmap.pix32(y, x) = 0xff000000 | (*src << 16) | (*src << 8) | *src;
 	}
 
 	/* handle 32bpp non-alpha case */
@@ -667,7 +662,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 	{
 		for (y = 0; y < png.height; y++)
 			for (x = 0; x < png.width; x++, src += 3)
-				(*bitmap)->pix32(y, x) = 0xff000000 | (src[0] << 16) | (src[1] << 8) | src[2];
+				bitmap.pix32(y, x) = 0xff000000 | (src[0] << 16) | (src[1] << 8) | src[2];
 	}
 
 	/* handle 32bpp alpha case */
@@ -675,7 +670,7 @@ png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
 	{
 		for (y = 0; y < png.height; y++)
 			for (x = 0; x < png.width; x++, src += 4)
-				(*bitmap)->pix32(y, x) = (src[3] << 24) | (src[0] << 16) | (src[1] << 8) | src[2];
+				bitmap.pix32(y, x) = (src[3] << 24) | (src[0] << 16) | (src[1] << 8) | src[2];
 	}
 
 	/* free our temporary data and return */
@@ -943,7 +938,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 	/* copy in the pixels, specifying a NULL filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
-		UINT16 *src = &bitmap.pix16(y);
+		UINT16 *src = reinterpret_cast<UINT16 *>(bitmap.raw_pixptr(y));
 		UINT8 *dst = pnginfo->image + y * (rowbytes + 1);
 
 		/* store the filter byte, then copy the data */
@@ -982,16 +977,15 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 	/* copy in the pixels, specifying a NULL filter */
 	for (y = 0; y < pnginfo->height; y++)
 	{
-		UINT32 *src32 = &bitmap.pix32(y);
-		UINT16 *src16 = &bitmap.pix16(y);
 		UINT8 *dst = pnginfo->image + y * (rowbytes + 1);
 
 		/* store the filter byte, then copy the data */
 		*dst++ = 0;
 
 		/* 16bpp palettized format */
-		if (bitmap.format() == BITMAP_FORMAT_INDEXED16)
+		if (bitmap.format() == BITMAP_FORMAT_IND16)
 		{
+			UINT16 *src16 = reinterpret_cast<UINT16 *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo->width; x++)
 			{
 				rgb_t color = palette[*src16++];
@@ -1001,21 +995,10 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 			}
 		}
 
-		/* RGB formats */
-		else if (bitmap.format() == BITMAP_FORMAT_RGB15)
-		{
-			for (x = 0; x < pnginfo->width; x++)
-			{
-				UINT16 raw = *src16++;
-				*dst++ = pal5bit(raw >> 10);
-				*dst++ = pal5bit(raw >> 5);
-				*dst++ = pal5bit(raw >> 0);
-			}
-		}
-
 		/* 32-bit RGB direct */
 		else if (bitmap.format() == BITMAP_FORMAT_RGB32)
 		{
+			UINT32 *src32 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo->width; x++)
 			{
 				UINT32 raw = *src32++;
@@ -1028,6 +1011,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 		/* 32-bit ARGB direct */
 		else if (bitmap.format() == BITMAP_FORMAT_ARGB32)
 		{
+			UINT32 *src32 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo->width; x++)
 			{
 				UINT32 raw = *src32++;
@@ -1059,7 +1043,7 @@ static png_error write_png_stream(core_file *fp, png_info *pnginfo, const bitmap
 	png_error error;
 
 	/* create an unfiltered image in either palette or RGB form */
-	if (bitmap.format() == BITMAP_FORMAT_INDEXED16 && palette_length <= 256)
+	if (bitmap.format() == BITMAP_FORMAT_IND16 && palette_length <= 256)
 		error = convert_bitmap_to_image_palette(pnginfo, bitmap, palette_length, palette);
 	else
 		error = convert_bitmap_to_image_rgb(pnginfo, bitmap, palette_length, palette);
@@ -1105,7 +1089,6 @@ static png_error write_png_stream(core_file *fp, png_info *pnginfo, const bitmap
 handle_error:
 	return error;
 }
-
 
 
 png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const UINT32 *palette)

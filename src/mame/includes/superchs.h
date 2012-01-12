@@ -28,4 +28,4 @@ public:
 /*----------- defined in video/superchs.c -----------*/
 
 VIDEO_START( superchs );
-SCREEN_UPDATE( superchs );
+SCREEN_UPDATE_IND16( superchs );

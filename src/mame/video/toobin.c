@@ -97,7 +97,7 @@ VIDEO_START( toobin )
 	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
 
 	/* allocate a playfield bitmap for rendering */
-	state->m_pfbitmap = auto_bitmap_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height(), BITMAP_FORMAT_INDEXED16);
+	state->m_pfbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->save_item(NAME(state->m_brightness));
 }
@@ -228,21 +228,21 @@ WRITE16_HANDLER( toobin_slip_w )
  *
  *************************************/
 
-SCREEN_UPDATE( toobin )
+SCREEN_UPDATE_RGB32( toobin )
 {
 	toobin_state *state = screen.machine().driver_data<toobin_state>();
-	bitmap_t &priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	const rgb_t *palette = palette_entry_list_adjusted(screen.machine().palette);
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y;
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	tilemap_draw(*state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 0, 0);
-	tilemap_draw(*state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 1, 1);
-	tilemap_draw(*state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 2, 2);
-	tilemap_draw(*state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 3, 3);
+	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 1, 1);
+	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 2, 2);
+	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 3, 3);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -250,7 +250,7 @@ SCREEN_UPDATE( toobin )
 	{
 		UINT32 *dest = &bitmap.pix32(y);
 		UINT16 *mo = &mobitmap->pix16(y);
-		UINT16 *pf = &state->m_pfbitmap->pix16(y);
+		UINT16 *pf = &state->m_pfbitmap.pix16(y);
 		UINT8 *pri = &priority_bitmap.pix8(y);
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

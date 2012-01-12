@@ -102,7 +102,7 @@ WRITE8_HANDLER(lethalen_palette_control)
 	}
 }
 
-SCREEN_UPDATE(lethalen)
+SCREEN_UPDATE_IND16(lethalen)
 {
 	lethal_state *state = screen.machine().driver_data<lethal_state>();
 

@@ -194,7 +194,7 @@ static VIDEO_START( safarir )
 }
 
 
-static SCREEN_UPDATE( safarir )
+static SCREEN_UPDATE_IND16( safarir )
 {
 	safarir_state *state = screen.machine().driver_data<safarir_state>();
 
@@ -412,11 +412,10 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 	MCFG_GFXDECODE(safarir)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE(safarir)
+	MCFG_SCREEN_UPDATE_STATIC(safarir)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(safarir_audio)

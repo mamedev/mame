@@ -14,8 +14,8 @@ public:
 	int m_vram_ptr;
 	UINT8 *m_HuC6270_vram;
 	UINT8 *m_vram_dirty;
-	bitmap_t *m_tile_bitmap;
-	bitmap_t *m_front_bitmap;
+	bitmap_ind16 *m_tile_bitmap;
+	bitmap_ind16 *m_front_bitmap;
 	UINT32 m_tile_dirtyseq;
 	int m_current_scanline;
 	int m_inc_value;
@@ -32,7 +32,7 @@ public:
 
 /*----------- defined in video/battlera.c -----------*/
 
-SCREEN_UPDATE( battlera );
+SCREEN_UPDATE_IND16( battlera );
 VIDEO_START( battlera );
 TIMER_DEVICE_CALLBACK( battlera_irq );
 

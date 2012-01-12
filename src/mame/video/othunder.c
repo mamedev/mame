@@ -63,7 +63,7 @@ spriteram is being tested, take no notice of that.]
 ********************************************************/
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
 {
 	othunder_state *state = machine.driver_data<othunder_state>();
 	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
@@ -200,7 +200,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE( othunder )
+SCREEN_UPDATE_IND16( othunder )
 {
 	othunder_state *state = screen.machine().driver_data<othunder_state>();
 	int layer[3];

@@ -107,7 +107,7 @@ VIDEO_START( grchamp )
 {
 	grchamp_state *state = machine.driver_data<grchamp_state>();
 
-	state->m_work_bitmap = auto_bitmap_alloc(machine,32,32,machine.primary_screen->format());
+	state->m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */
 	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8,8, 32,32);
@@ -117,7 +117,7 @@ VIDEO_START( grchamp )
 }
 
 #if 0
-static int collision_check(running_machine &machine, grchamp_state *state, bitmap_t &bitmap, int which )
+static int collision_check(running_machine &machine, grchamp_state *state, bitmap_ind16 &bitmap, int which )
 {
 	int bgcolor = machine.pens[0];
 	int sprite_transp = machine.pens[0x24];
@@ -132,7 +132,7 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 	{
 		/* draw the current player sprite into a work bitmap */
 		drawgfx_opaque( state->m_work_bitmap,
-			state->m_work_bitmap->cliprect(),
+			state->m_work_bitmap.cliprect(),
 			machine.gfx[4],
 			state->m_cpu0_out[4]&0xf,
 			1, /* color */
@@ -144,7 +144,7 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 	{
 		for( x = 0; x<32; x++ )
 		{
-			pixel = state->m_work_bitmap->pix16(y, x);
+			pixel = state->m_work_bitmap.pix16(y, x);
 			if( pixel != sprite_transp ){
 				sx = x+x0;
 				sy = y+y0;
@@ -168,7 +168,7 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 	return result?(1<<which):0;
 }
 
-static void draw_fog(grchamp_state *state, bitmap_t &bitmap, const rectangle &cliprect, int fog)
+static void draw_fog(grchamp_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect, int fog)
 {
 	int x,y,offs;
 
@@ -185,7 +185,7 @@ static void draw_fog(grchamp_state *state, bitmap_t &bitmap, const rectangle &cl
 	}
 }
 
-static void draw_sprites(running_machine &machine, grchamp_state *state, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, grchamp_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const gfx_element *gfx = machine.gfx[5];
 	int bank = (state->m_cpu0_out[0] & 0x20) ? 0x40 : 0x00;
@@ -352,7 +352,7 @@ static void draw_objects(running_machine &machine, grchamp_state *state, int y, 
 }
 
 
-SCREEN_UPDATE( grchamp )
+SCREEN_UPDATE_RGB32( grchamp )
 {
 	static const rgb_t objpix_lookup[8] =
 	{
@@ -370,9 +370,9 @@ SCREEN_UPDATE( grchamp )
 	const UINT8 *amedata = screen.machine().region("gfx5")->base();
 	const UINT8 *headdata = screen.machine().region("gfx6")->base();
 	const UINT8 *pldata = screen.machine().region("gfx7")->base();
-	bitmap_t &lpixmap = tilemap_get_pixmap(state->m_left_tilemap);
-	bitmap_t &rpixmap = tilemap_get_pixmap(state->m_right_tilemap);
-	bitmap_t &cpixmap = tilemap_get_pixmap(state->m_center_tilemap);
+	bitmap_ind16 &lpixmap = tilemap_get_pixmap(state->m_left_tilemap);
+	bitmap_ind16 &rpixmap = tilemap_get_pixmap(state->m_right_tilemap);
+	bitmap_ind16 &cpixmap = tilemap_get_pixmap(state->m_center_tilemap);
 	int lrxscroll, cxscroll, lyscroll, ryscroll, cyscroll;
 	int bgcolor = state->m_cpu1_out[3] & 0x10;
 	int amebase = state->m_cpu0_out[4] >> 4;
@@ -398,7 +398,7 @@ SCREEN_UPDATE( grchamp )
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		/* select either left or right tilemaps based on Y */
-		bitmap_t &lrpixmap = (y < 128) ? lpixmap : rpixmap;
+		bitmap_ind16 &lrpixmap = (y < 128) ? lpixmap : rpixmap;
 		int lryscroll = (y < 128) ? lyscroll : ryscroll;
 
 		/* get source/dest pointers */

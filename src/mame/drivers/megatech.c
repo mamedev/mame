@@ -442,15 +442,15 @@ static VIDEO_START(mtnew)
 }
 
 //attotime::never
-static SCREEN_UPDATE(mtnew)
+static SCREEN_UPDATE_RGB32(mtnew)
 {
 	mtech_state *state = screen.machine().driver_data<mtech_state>();
 
 	/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
 	if (!state->m_current_game_is_sms)
-		SCREEN_UPDATE_CALL(megadriv);
+		SCREEN_UPDATE32_CALL(megadriv);
 	else
-		SCREEN_UPDATE_CALL(megatech_md_sms);
+		SCREEN_UPDATE32_CALL(megatech_md_sms);
 	return 0;
 }
 
@@ -490,15 +490,14 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
 
 	MCFG_SCREEN_ADD("menu", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(342,262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE(megatech_bios)
+	MCFG_SCREEN_UPDATE_STATIC(megatech_bios)
 	MCFG_SCREEN_EOF(megatech_bios)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_UPDATE(mtnew)
+	MCFG_SCREEN_UPDATE_STATIC(mtnew)
 	MCFG_SCREEN_EOF(mtnew)
 
 	/* sound hardware */

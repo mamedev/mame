@@ -549,7 +549,7 @@ static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype)
 static void common_video_start(running_machine &machine)
 {
 	nbmj8688_state *state = machine.driver_data<nbmj8688_state>();
-	state->m_mjsikaku_tmpbitmap = auto_bitmap_alloc(machine, 512, 256, machine.primary_screen->format());
+	state->m_mjsikaku_tmpbitmap = auto_bitmap_ind16_alloc(machine, 512, 256);
 	state->m_mjsikaku_videoram = auto_alloc_array_clear(machine, UINT16, 512 * 256);
 	state->m_clut = auto_alloc_array(machine, UINT8, 0x20);
 
@@ -676,7 +676,7 @@ WRITE8_HANDLER( nbmj8688_HD61830B_both_data_w )
 ******************************************************************************/
 
 
-SCREEN_UPDATE( mbmj8688 )
+SCREEN_UPDATE_IND16( mbmj8688 )
 {
 	nbmj8688_state *state = screen.machine().driver_data<nbmj8688_state>();
 	int x, y;
@@ -710,7 +710,7 @@ SCREEN_UPDATE( mbmj8688 )
 
 
 
-SCREEN_UPDATE( mbmj8688_lcd0 )
+SCREEN_UPDATE_IND16( mbmj8688_lcd0 )
 {
 	nbmj8688_state *state = screen.machine().driver_data<nbmj8688_state>();
 	int x, y, b;
@@ -726,7 +726,7 @@ SCREEN_UPDATE( mbmj8688_lcd0 )
 	return 0;
 }
 
-SCREEN_UPDATE( mbmj8688_lcd1 )
+SCREEN_UPDATE_IND16( mbmj8688_lcd1 )
 {
 	nbmj8688_state *state = screen.machine().driver_data<nbmj8688_state>();
 	int x, y, b;

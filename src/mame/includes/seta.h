@@ -114,11 +114,11 @@ VIDEO_START( seta_1_layer);
 VIDEO_START( seta_2_layers);
 VIDEO_START( oisipuzl_2_layers );
 
-SCREEN_UPDATE( seta );
-SCREEN_UPDATE( seta_no_layers );
-SCREEN_UPDATE( usclssic );
-SCREEN_UPDATE( inttoote );
-SCREEN_UPDATE( setaroul );
+SCREEN_UPDATE_IND16( seta );
+SCREEN_UPDATE_IND16( seta_no_layers );
+SCREEN_UPDATE_IND16( usclssic );
+SCREEN_UPDATE_IND16( inttoote );
+SCREEN_UPDATE_IND16( setaroul );
 
 SCREEN_EOF( setaroul );
 

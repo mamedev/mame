@@ -92,7 +92,7 @@ WRITE8_HANDLER( sspeedr_track_ice_w )
 }
 
 
-static void draw_track(running_machine &machine, bitmap_t &bitmap)
+static void draw_track(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	sspeedr_state *state = machine.driver_data<sspeedr_state>();
 	const UINT8* p = machine.region("gfx3")->base();
@@ -181,7 +181,7 @@ static void draw_track(running_machine &machine, bitmap_t &bitmap)
 }
 
 
-static void draw_drones(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_drones(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	sspeedr_state *state = machine.driver_data<sspeedr_state>();
 	static const UINT8 code[6] =
@@ -221,7 +221,7 @@ static void draw_drones(running_machine &machine, bitmap_t &bitmap, const rectan
 }
 
 
-static void draw_driver(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_driver(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	sspeedr_state *state = machine.driver_data<sspeedr_state>();
 	int x;
@@ -258,7 +258,7 @@ VIDEO_START( sspeedr )
 }
 
 
-SCREEN_UPDATE( sspeedr )
+SCREEN_UPDATE_IND16( sspeedr )
 {
 	draw_track(screen.machine(), bitmap);
 	draw_drones(screen.machine(), bitmap, cliprect);

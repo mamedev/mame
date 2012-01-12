@@ -160,7 +160,7 @@ static INTERRUPT_GEN( attckufo_raster_interrupt )
 	mos6560_raster_interrupt_gen(state->m_mos6560);
 }
 
-static SCREEN_UPDATE( attckufo )
+static SCREEN_UPDATE_IND16( attckufo )
 {
 	attckufo_state *state = screen.machine().driver_data<attckufo_state>();
 	mos6560_video_update(state->m_mos6560, bitmap, cliprect);
@@ -200,10 +200,9 @@ static MACHINE_CONFIG_START( attckufo, attckufo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE)
 	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1)
-	MCFG_SCREEN_UPDATE(attckufo)
+	MCFG_SCREEN_UPDATE_STATIC(attckufo)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(attckufo_palette))
 	MCFG_PALETTE_INIT(attckufo)

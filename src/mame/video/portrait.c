@@ -129,7 +129,7 @@ PALETTE_INIT( portrait )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	portrait_state *state = machine.driver_data<portrait_state>();
 	UINT8 *source = state->m_spriteram;
@@ -188,7 +188,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( portrait )
+SCREEN_UPDATE_IND16( portrait )
 {
 	portrait_state *state = screen.machine().driver_data<portrait_state>();
 	rectangle cliprect_scroll, cliprect_no_scroll;

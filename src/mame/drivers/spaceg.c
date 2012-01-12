@@ -292,7 +292,7 @@ static READ8_HANDLER(spaceg_colorram_r)
 }
 
 
-static SCREEN_UPDATE( spaceg )
+static SCREEN_UPDATE_IND16( spaceg )
 {
 	spaceg_state *state = screen.machine().driver_data<spaceg_state>();
 	offs_t offs;
@@ -412,10 +412,9 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 32, 255)
-	MCFG_SCREEN_UPDATE( spaceg )
+	MCFG_SCREEN_UPDATE_STATIC( spaceg )
 
 	MCFG_PALETTE_LENGTH(16+128-16)
 	MCFG_PALETTE_INIT( spaceg )

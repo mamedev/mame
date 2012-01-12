@@ -304,7 +304,8 @@ static const tms34010_config tms_config =
 	"screen",						/* the screen operated on */
 	VIDEO_CLOCK/2,					/* pixel clock */
 	1,								/* pixels per clock */
-	btoads_state::static_scanline_update,			/* scanline callback */
+	NULL,							/* scanline callback (indexed16) */
+	btoads_state::static_scanline_update, /* scanline callback (rgb32) */
 	NULL,							/* generate interrupt */
 	btoads_state::static_to_shiftreg,				/* write to shiftreg function */
 	btoads_state::static_from_shiftreg			/* read from shiftreg function */
@@ -335,9 +336,8 @@ static MACHINE_CONFIG_START( btoads, btoads_state )
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

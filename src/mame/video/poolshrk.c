@@ -27,7 +27,7 @@ VIDEO_START( poolshrk )
 }
 
 
-SCREEN_UPDATE( poolshrk )
+SCREEN_UPDATE_IND16( poolshrk )
 {
 	poolshrk_state *state = screen.machine().driver_data<poolshrk_state>();
 	int i;

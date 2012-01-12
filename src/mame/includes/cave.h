@@ -58,7 +58,7 @@ public:
 	int          m_tiledim[4];
 	int          m_old_tiledim[4];
 
-	bitmap_t     *m_sprite_zbuf;
+	bitmap_ind8 m_sprite_zbuf;
 	UINT16       m_sprite_zbuf_baseval;
 
 	int          m_num_sprites;
@@ -138,7 +138,7 @@ VIDEO_START( cave_4_layers );
 
 VIDEO_START( sailormn_3_layers );
 
-SCREEN_UPDATE( cave );
+SCREEN_UPDATE_IND16( cave );
 
 void cave_get_sprite_info(running_machine &machine);
 void sailormn_tilebank_w(running_machine &machine, int bank);

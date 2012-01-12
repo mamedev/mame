@@ -50,6 +50,6 @@ VIDEO_START( lasso );
 VIDEO_START( wwjgtin );
 VIDEO_START( pinbo );
 
-SCREEN_UPDATE( lasso );
-SCREEN_UPDATE( chameleo );
-SCREEN_UPDATE( wwjgtin );
+SCREEN_UPDATE_IND16( lasso );
+SCREEN_UPDATE_IND16( chameleo );
+SCREEN_UPDATE_IND16( wwjgtin );

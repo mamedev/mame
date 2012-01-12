@@ -285,7 +285,7 @@ static VIDEO_START( cham24 )
 {
 }
 
-static SCREEN_UPDATE( cham24 )
+static SCREEN_UPDATE_IND16( cham24 )
 {
 	/* render the ppu */
 	ppu2c0x_render(screen.machine().device("ppu"), bitmap, 0, 0, 0, 0);
@@ -337,10 +337,9 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(cham24)
+	MCFG_SCREEN_UPDATE_STATIC(cham24)
 
 	MCFG_GFXDECODE(cham24)
 	MCFG_PALETTE_LENGTH(8*4*16)

@@ -401,7 +401,7 @@ or
 Offset+3
 -------x xxxxxxxx X offs
 */
-static void draw_sprites(screen_device &screen, bitmap_t &bitmap)
+static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 {
 	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -475,7 +475,7 @@ static void draw_sprites(screen_device &screen, bitmap_t &bitmap)
 	}
 }
 
-static void draw_sprites_aoh(screen_device &screen, bitmap_t &bitmap)
+static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 {
 	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -530,14 +530,14 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_t &bitmap)
 }
 
 
-static SCREEN_UPDATE( common )
+static SCREEN_UPDATE_IND16( common )
 {
 	bitmap.fill(0, cliprect);
 	draw_sprites(screen, bitmap);
 	return 0;
 }
 
-static SCREEN_UPDATE( aoh )
+static SCREEN_UPDATE_IND16( aoh )
 {
 	bitmap.fill(0, cliprect);
 	draw_sprites_aoh(screen, bitmap);
@@ -683,10 +683,9 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(31, 350, 16, 255)
-	MCFG_SCREEN_UPDATE(common)
+	MCFG_SCREEN_UPDATE_STATIC(common)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_GFXDECODE(vamphalf)
@@ -813,10 +812,9 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.185)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(64, 511-64, 16, 255-16)
-	MCFG_SCREEN_UPDATE(aoh)
+	MCFG_SCREEN_UPDATE_STATIC(aoh)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_GFXDECODE(vamphalf)

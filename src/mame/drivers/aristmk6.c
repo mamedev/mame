@@ -27,7 +27,7 @@ VIDEO_START(aristmk6)
 {
 }
 
-SCREEN_UPDATE(aristmk6)
+SCREEN_UPDATE_RGB32(aristmk6)
 {
 	aristmk6_state *state = screen.machine().driver_data<aristmk6_state>();
 
@@ -144,10 +144,9 @@ static MACHINE_CONFIG_START( aristmk6, aristmk6_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(aristmk6)
+	MCFG_SCREEN_UPDATE_STATIC(aristmk6)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 

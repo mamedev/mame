@@ -59,7 +59,7 @@ bitmap_t::bitmap_t()
 	  m_palette(NULL)
 {
 	// deallocate intializes all other fields
-	deallocate();
+	reset();
 }
 
 
@@ -89,6 +89,21 @@ bitmap_t::bitmap_t(void *base, int width, int height, int rowpixels, bitmap_form
 }
 
 
+bitmap_t::bitmap_t(bitmap_t &source, const rectangle &subrect)
+	: m_alloc(NULL),
+	  m_base(source.raw_pixptr(subrect.min_y, subrect.min_x)),
+	  m_rowpixels(source.m_rowpixels),
+	  m_width(subrect.width()),
+	  m_height(subrect.height()),
+	  m_format(source.m_format),
+	  m_bpp(source.m_bpp),
+	  m_palette(NULL),
+	  m_cliprect(0, subrect.width() - 1, 0, subrect.height() - 1)
+{
+	assert(source.cliprect().contains(subrect));
+}
+
+
 //-------------------------------------------------
 //  ~bitmap_t - basic destructor
 //-------------------------------------------------
@@ -96,7 +111,7 @@ bitmap_t::bitmap_t(void *base, int width, int height, int rowpixels, bitmap_form
 bitmap_t::~bitmap_t()
 {
 	// delete any existing stuff
-	deallocate();
+	reset();
 }
 
 
@@ -109,7 +124,7 @@ bitmap_t::~bitmap_t()
 void bitmap_t::allocate(int width, int height, bitmap_format format, int xslop, int yslop)
 {
 	// delete any existing stuff
-	deallocate();
+	reset();
 
 	// initialize fields
 	m_rowpixels = (width + 2 * xslop + 7) & ~7;
@@ -134,11 +149,11 @@ void bitmap_t::allocate(int width, int height, bitmap_format format, int xslop, 
 
 
 //-------------------------------------------------
-//  deallocate -- reset to an invalid bitmap,
-//  deleting all allocated stuff
+//  reset -- reset to an invalid bitmap, deleting
+//  all allocated stuff
 //-------------------------------------------------
 
-void bitmap_t::deallocate()
+void bitmap_t::reset()
 {
 	// delete any existing stuff
 	set_palette(NULL);
@@ -157,26 +172,47 @@ void bitmap_t::deallocate()
 
 
 //-------------------------------------------------
-//  clone_existing -- clone an existing bitmap by
-//  copying its fields; the target bitmap does not
-//  own the memory
+//  wrap -- wrap an array of memory; the target 
+//  bitmap does not own the memory
 //-------------------------------------------------
 
-void bitmap_t::clone_existing(const bitmap_t &srcbitmap)
+void bitmap_t::wrap(void *base, int width, int height, int rowpixels, bitmap_format format)
 {
-	// free any allocated storage
-	delete[] m_alloc;
-	m_alloc = NULL;
+	// delete any existing stuff
+	reset();
+	
+	// initialize relevant fields
+	m_base = base;
+	m_rowpixels = rowpixels;
+	m_width = width;
+	m_height = height;
+	m_format = format;
+	m_bpp = format_to_bpp(format);
+	m_cliprect.set(0, m_width - 1, 0, m_height - 1);
+}
 
+
+//-------------------------------------------------
+//  wrap -- wrap a subrectangle of an existing 
+//  bitmap by copying its fields; the target 
+//  bitmap does not own the memory
+//-------------------------------------------------
+
+void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect)
+{
+	// delete any existing stuff
+	reset();
+	
 	// copy relevant fields
-	m_base = srcbitmap.m_base;
-	m_rowpixels = srcbitmap.m_rowpixels;
-	m_width = srcbitmap.m_width;
-	m_height = srcbitmap.m_height;
-	m_format = srcbitmap.m_format;
-	m_bpp = srcbitmap.m_bpp;
-	m_palette = srcbitmap.m_palette;
-	m_cliprect = srcbitmap.m_cliprect;
+	assert(source.cliprect().contains(subrect));
+	m_base = source.raw_pixptr(subrect.min_y, subrect.min_x);
+	m_rowpixels = source.m_rowpixels;
+	m_width = subrect.width();
+	m_height = subrect.height();
+	m_format = source.m_format;
+	m_bpp = source.m_bpp;
+	set_palette(source.m_palette);
+	m_cliprect.set(0, m_width - 1, 0, m_height - 1);
 }
 
 
@@ -221,7 +257,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 		case 8:
 			// 8bpp always uses memset
 			for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-				memset(&pix8(y, fill.min_x), (UINT8)color, fill.max_x + 1 - fill.min_x);
+				memset(raw_pixptr(y, fill.min_x), (UINT8)color, fill.max_x + 1 - fill.min_x);
 			break;
 
 		case 16:
@@ -229,20 +265,20 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 			if ((UINT8)(color >> 8) == (UINT8)color)
 			{
 				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(&pix16(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 2);
+					memset(raw_pixptr(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 2);
 			}
 			else
 			{
 				// Fill the first line the hard way
-				UINT16 *destrow = &pix16(fill.min_y);
+				UINT16 *destrow = &pixt<UINT16>(fill.min_y);
 				for (INT32 x = fill.min_x; x <= fill.max_x; x++)
 					destrow[x] = (UINT16)color;
 
 				// For the other lines, just copy the first one
-				UINT16 *destrow0 = &pix16(fill.min_y, fill.min_x);
+				void *destrow0 = &pixt<UINT16>(fill.min_y, fill.min_x);
 				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
-					destrow = &pix16(y, fill.min_x);
+					destrow = &pixt<UINT16>(y, fill.min_x);
 					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 2);
 				}
 			}
@@ -253,20 +289,20 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 			if ((UINT8)(color >> 8) == (UINT8)color && (UINT16)(color >> 16) == (UINT16)color)
 			{
 				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(&pix32(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 4);
+					memset(&pixt<UINT32>(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 4);
 			}
 			else
 			{
 				// Fill the first line the hard way
-				UINT32 *destrow  = &pix32(fill.min_y);
+				UINT32 *destrow  = &pixt<UINT32>(fill.min_y);
 				for (INT32 x = fill.min_x; x <= fill.max_x; x++)
 					destrow[x] = (UINT32)color;
 
 				// For the other lines, just copy the first one
-				UINT32 *destrow0 = &pix32(fill.min_y, fill.min_x);
+				UINT32 *destrow0 = &pixt<UINT32>(fill.min_y, fill.min_x);
 				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
-					destrow = &pix32(y, fill.min_x);
+					destrow = &pixt<UINT32>(y, fill.min_x);
 					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 4);
 				}
 			}
@@ -277,20 +313,20 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 			if ((UINT8)(color >> 8) == (UINT8)color && (UINT16)(color >> 16) == (UINT16)color)
 			{
 				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(&pix64(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 8);
+					memset(&pixt<UINT64>(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 8);
 			}
 			else
 			{
 				// Fill the first line the hard way
-				UINT64 *destrow  = &pix64(fill.min_y);
+				UINT64 *destrow  = &pixt<UINT64>(fill.min_y);
 				for (INT32 x = fill.min_x; x <= fill.max_x; x++)
 					destrow[x] = (UINT64)color;
 
 				// For the other lines, just copy the first one
-				UINT64 *destrow0 = &pix64(fill.min_y, fill.min_x);
+				UINT64 *destrow0 = &pixt<UINT64>(fill.min_y, fill.min_x);
 				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
-					destrow = &pix64(y, fill.min_x);
+					destrow = &pixt<UINT64>(y, fill.min_x);
 					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 4);
 				}
 			}
@@ -308,20 +344,19 @@ UINT8 bitmap_t::format_to_bpp(bitmap_format format)
 	// choose a depth for the format
 	switch (format)
 	{
-		case BITMAP_FORMAT_INDEXED8:
+		case BITMAP_FORMAT_IND8:
 			return 8;
 
-		case BITMAP_FORMAT_INDEXED16:
-		case BITMAP_FORMAT_RGB15:
+		case BITMAP_FORMAT_IND16:
 		case BITMAP_FORMAT_YUY16:
 			return 16;
 
-		case BITMAP_FORMAT_INDEXED32:
+		case BITMAP_FORMAT_IND32:
 		case BITMAP_FORMAT_RGB32:
 		case BITMAP_FORMAT_ARGB32:
 			return 32;
 
-		case BITMAP_FORMAT_INDEXED64:
+		case BITMAP_FORMAT_IND64:
 			return 64;
 
 		default:

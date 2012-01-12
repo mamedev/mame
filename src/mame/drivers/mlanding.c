@@ -58,7 +58,7 @@ static VIDEO_START(mlanding)
 // 256: Cockpit
 // 512: control centre screen
 // 768: plane landing sequence
-static SCREEN_UPDATE(mlanding)
+static SCREEN_UPDATE_IND16(mlanding)
 {
 	mlanding_state *state = screen.machine().driver_data<mlanding_state>();
 	int x, y;
@@ -771,12 +771,11 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 14*8, 511)
-	MCFG_SCREEN_UPDATE(mlanding)
+	MCFG_SCREEN_UPDATE_STATIC(mlanding)
 
 	MCFG_PALETTE_LENGTH(512*16)
 

@@ -1,7 +1,7 @@
 #include "emu.h"
 #include "includes/lsasquad.h"
 
-static void draw_layer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 *scrollram )
+static void draw_layer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *scrollram )
 {
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 	int offs, scrollx, scrolly;
@@ -48,7 +48,7 @@ static void draw_layer( running_machine &machine, bitmap_t &bitmap, const rectan
 	}
 }
 
-static int draw_layer_daikaiju( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int  * previd, int type )
+static int draw_layer_daikaiju( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int  * previd, int type )
 {
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 	int id, scrollx, scrolly, initoffs, globalscrollx;
@@ -138,7 +138,7 @@ static int draw_layer_daikaiju( running_machine &machine, bitmap_t &bitmap, cons
 	return offs;
 }
 
-static void drawbg( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int type )
+static void drawbg( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int type )
 {
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 	int i = 0;
@@ -158,7 +158,7 @@ static void drawbg( running_machine &machine, bitmap_t &bitmap, const rectangle 
 	}
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -198,7 +198,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( lsasquad )
+SCREEN_UPDATE_IND16( lsasquad )
 {
 	lsasquad_state *state = screen.machine().driver_data<lsasquad_state>();
 	bitmap.fill(511, cliprect);
@@ -211,7 +211,7 @@ SCREEN_UPDATE( lsasquad )
 }
 
 
-SCREEN_UPDATE( daikaiju )
+SCREEN_UPDATE_IND16( daikaiju )
 {
 	bitmap.fill(511, cliprect);
 	drawbg(screen.machine(), bitmap, cliprect, 0); // bottom

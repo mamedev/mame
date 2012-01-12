@@ -60,8 +60,8 @@ VIDEO_START( fromance );
 VIDEO_START( nekkyoku );
 VIDEO_START( pipedrm );
 VIDEO_START( hatris );
-SCREEN_UPDATE( fromance );
-SCREEN_UPDATE( pipedrm );
+SCREEN_UPDATE_IND16( fromance );
+SCREEN_UPDATE_IND16( pipedrm );
 
 WRITE8_HANDLER( fromance_crtc_data_w );
 WRITE8_HANDLER( fromance_crtc_register_w );

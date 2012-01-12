@@ -321,7 +321,7 @@ static WRITE8_HANDLER( sbrkout_videoram_w )
  *
  *************************************/
 
-static SCREEN_UPDATE( sbrkout )
+static SCREEN_UPDATE_IND16( sbrkout )
 {
 	sbrkout_state *state = screen.machine().driver_data<sbrkout_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -510,8 +510,7 @@ static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_UPDATE(sbrkout)
+	MCFG_SCREEN_UPDATE_STATIC(sbrkout)
 
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_VIDEO_START(sbrkout)

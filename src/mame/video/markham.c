@@ -73,7 +73,7 @@ VIDEO_START( markham )
 	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	markham_state *state = machine.driver_data<markham_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -117,7 +117,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( markham )
+SCREEN_UPDATE_IND16( markham )
 {
 	markham_state *state = screen.machine().driver_data<markham_state>();
 	int i;

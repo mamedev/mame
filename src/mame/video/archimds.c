@@ -11,7 +11,7 @@ VIDEO_START( archimds_vidc )
 {
 }
 
-SCREEN_UPDATE( archimds_vidc )
+SCREEN_UPDATE_RGB32( archimds_vidc )
 {
 	int xstart,ystart,xend,yend;
 	int res_x,res_y;

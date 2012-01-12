@@ -303,7 +303,7 @@ WRITE8_HANDLER( alpha1v_flipscreen_w )
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
+static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
 	const rectangle &visarea = machine.primary_screen->visible_area();
@@ -360,7 +360,7 @@ static void draw_background(running_machine &machine, bitmap_t &bitmap, const re
  *
  *************************************/
 
-SCREEN_UPDATE( m52 )
+SCREEN_UPDATE_IND16( m52 )
 {
 	m52_state *state = screen.machine().driver_data<m52_state>();
 	int offs;

@@ -55,7 +55,7 @@ static tilemap_t *tilemap_B_cache_8[3];
 static tilemap_t *tilemap_B_cache_16[3];
 static tilemap_t *tilemap_A = NULL;
 static tilemap_t *tilemap_B = NULL;
-static bitmap_t *work_bitmap = NULL;
+static bitmap_ind16 *work_bitmap = NULL;
 
 static void HandleYGV608Reset( running_machine &machine );
 static void HandleRomTransfers( running_machine &machine );
@@ -547,7 +547,7 @@ VIDEO_START( ygv608 )
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ygv608_exit), &machine));
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef _ENABLE_SPRITES
 
@@ -731,7 +731,7 @@ static const char *const mode[] = {
 static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
 #endif
 
-SCREEN_UPDATE( ygv608 )
+SCREEN_UPDATE_IND16( ygv608 )
 {
 #ifdef _SHOW_VIDEO_DEBUG
     char buffer[64];
@@ -769,7 +769,7 @@ SCREEN_UPDATE( ygv608 )
 #endif
 
 		auto_free( screen.machine(), work_bitmap );
-		work_bitmap = screen.alloc_compatible_bitmap();
+		work_bitmap = auto_bitmap_ind16_alloc(screen.machine(), screen.width(), screen.height());
 
 		// reset resize flag
 		ygv608.screen_resize = 0;

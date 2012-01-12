@@ -108,7 +108,7 @@ static VIDEO_START(vroulet)
 		8, 8, 32, 32);
 }
 
-static SCREEN_UPDATE(vroulet)
+static SCREEN_UPDATE_IND16(vroulet)
 {
 	vroulet_state *state = screen.machine().driver_data<vroulet_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -292,10 +292,9 @@ static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(vroulet)
+	MCFG_SCREEN_UPDATE_STATIC(vroulet)
 
 	MCFG_GFXDECODE(vroulet)
 	MCFG_PALETTE_LENGTH(128*4)

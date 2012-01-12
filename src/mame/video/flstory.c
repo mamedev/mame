@@ -178,7 +178,7 @@ WRITE8_HANDLER( flstory_scrlram_w )
 }
 
 
-static void flstory_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
+static void flstory_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
 	int i;
@@ -223,7 +223,7 @@ static void flstory_draw_sprites( running_machine &machine, bitmap_t &bitmap, co
 	}
 }
 
-SCREEN_UPDATE( flstory )
+SCREEN_UPDATE_IND16( flstory )
 {
 	flstory_state *state = screen.machine().driver_data<flstory_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0 | TILEMAP_DRAW_LAYER1, 0);
@@ -235,7 +235,7 @@ SCREEN_UPDATE( flstory )
 	return 0;
 }
 
-static void victnine_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void victnine_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
 	int i;
@@ -280,7 +280,7 @@ static void victnine_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-SCREEN_UPDATE( victnine )
+SCREEN_UPDATE_IND16( victnine )
 {
 	flstory_state *state = screen.machine().driver_data<flstory_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -288,7 +288,7 @@ SCREEN_UPDATE( victnine )
 	return 0;
 }
 
-SCREEN_UPDATE( rumba )
+SCREEN_UPDATE_IND16( rumba )
 {
 	flstory_state *state = screen.machine().driver_data<flstory_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0 | TILEMAP_DRAW_LAYER1, 0);

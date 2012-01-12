@@ -29,4 +29,4 @@ VIDEO_START( lethalj );
 
 WRITE16_HANDLER( lethalj_blitter_w );
 
-void lethalj_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params);
+void lethalj_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);

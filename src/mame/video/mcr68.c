@@ -212,7 +212,7 @@ WRITE16_HANDLER( zwackery_spriteram_w )
  *
  *************************************/
 
-static void mcr68_update_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static void mcr68_update_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
 	rectangle sprite_clip = machine.primary_screen->visible_area();
@@ -266,7 +266,7 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_t &bitmap, con
 }
 
 
-static void zwackery_update_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static void zwackery_update_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -331,7 +331,7 @@ static void zwackery_update_sprites(running_machine &machine, bitmap_t &bitmap, 
  *
  *************************************/
 
-SCREEN_UPDATE( mcr68 )
+SCREEN_UPDATE_IND16( mcr68 )
 {
 	mcr68_state *state = screen.machine().driver_data<mcr68_state>();
 	/* draw the background */
@@ -349,7 +349,7 @@ SCREEN_UPDATE( mcr68 )
 }
 
 
-SCREEN_UPDATE( zwackery )
+SCREEN_UPDATE_IND16( zwackery )
 {
 	mcr68_state *state = screen.machine().driver_data<mcr68_state>();
 	/* draw the background */

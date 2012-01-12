@@ -774,7 +774,7 @@ static VIDEO_START(dwarfd)
 {
 }
 
-static void drawCrt( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
+static void drawCrt( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 	int x, y;
@@ -835,7 +835,7 @@ static void drawCrt( running_machine &machine, bitmap_t &bitmap,const rectangle 
 }
 
 
-static SCREEN_UPDATE( dwarfd )
+static SCREEN_UPDATE_IND16( dwarfd )
 {
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	drawCrt(screen.machine(), bitmap, cliprect);
@@ -1071,10 +1071,9 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(272*2, 200+4*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE(dwarfd)
+	MCFG_SCREEN_UPDATE_STATIC(dwarfd)
 
 	MCFG_GFXDECODE(dwarfd)
 	MCFG_PALETTE_LENGTH(0x100)

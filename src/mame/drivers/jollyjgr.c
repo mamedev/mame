@@ -445,7 +445,7 @@ static VIDEO_START( jollyjgr )
 	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
 }
 
-static void draw_bitmap( running_machine &machine, bitmap_t &bitmap )
+static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 {
 	jollyjgr_state *state = machine.driver_data<jollyjgr_state>();
 	int x, y, count;
@@ -482,7 +482,7 @@ static void draw_bitmap( running_machine &machine, bitmap_t &bitmap )
 	}
 }
 
-static SCREEN_UPDATE( jollyjgr )
+static SCREEN_UPDATE_IND16( jollyjgr )
 {
 	jollyjgr_state *state = screen.machine().driver_data<jollyjgr_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -538,12 +538,12 @@ static SCREEN_UPDATE( jollyjgr )
 	return 0;
 }
 
-static SCREEN_UPDATE( fspider )
+static SCREEN_UPDATE_IND16( fspider )
 {
 	jollyjgr_state *state = screen.machine().driver_data<jollyjgr_state>();
 
 	// Draw bg and sprites
-	SCREEN_UPDATE_CALL(jollyjgr);
+	SCREEN_UPDATE16_CALL(jollyjgr);
 
 	/* Draw bullets
     16 bytes, 2 bytes per bullet (y,x). 2 player bullets, 6 enemy bullets.
@@ -655,10 +655,9 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(jollyjgr)
+	MCFG_SCREEN_UPDATE_STATIC(jollyjgr)
 
 	MCFG_GFXDECODE(jollyjgr)
 	MCFG_PALETTE_LENGTH(32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
@@ -679,7 +678,7 @@ static MACHINE_CONFIG_DERIVED( fspider, jollyjgr )
 	MCFG_CPU_PROGRAM_MAP(fspider_map)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(fspider)
+	MCFG_SCREEN_UPDATE_STATIC(fspider)
 
 MACHINE_CONFIG_END
 

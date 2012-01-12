@@ -100,8 +100,8 @@ public:
 	int m_clr_offset;
 
 	UINT8 *m_colorram;
-	bitmap_t *m_bitmap_fg;
-	bitmap_t *m_bitmap_bg;
+	bitmap_rgb32 m_bitmap_fg;
+	bitmap_rgb32 m_bitmap_bg;
 
 	UINT16 m_tempbuf[8];
 
@@ -192,30 +192,16 @@ static const int gfxlookup[][4]=
 
 static void plot_pixel_rgb(sliver_state *state, int x, int y, UINT32 r, UINT32 g, UINT32 b)
 {
-	UINT16 color;
-
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	if (state->m_bitmap_bg->bpp() == 32)
-	{
-		state->m_bitmap_bg->pix32(y, x) = r | (g<<8) | (b<<16);
-	}
-	else
-	{
-		r>>=3;
-		g>>=3;
-		b>>=3;
-		color = r|(g<<5)|(b<<10);
-		state->m_bitmap_bg->pix16(y, x) = color;
-	}
+	state->m_bitmap_bg.pix32(y, x) = r | (g<<8) | (b<<16);
 }
 
 static void plot_pixel_pal(running_machine &machine, int x, int y, int addr)
 {
 	sliver_state *state = machine.driver_data<sliver_state>();
 	UINT32 r,g,b;
-	UINT16 color;
 
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
@@ -224,18 +210,7 @@ static void plot_pixel_pal(running_machine &machine, int x, int y, int addr)
 	g=(state->m_colorram[addr+0x100] << 2) | (state->m_colorram[addr+0x100] & 3);
 	r=(state->m_colorram[addr+0x200] << 2) | (state->m_colorram[addr+0x200] & 3);
 
-	if (state->m_bitmap_fg->bpp() == 32)
-	{
-		state->m_bitmap_fg->pix32(y, x) = r | (g<<8) | (b<<16);
-	}
-	else
-	{
-		r>>=3;
-		g>>=3;
-		b>>=3;
-		color = r|(g<<5)|(b<<10);
-		state->m_bitmap_fg->pix16(y, x) = color;
-	}
+	state->m_bitmap_fg.pix32(y, x) = r | (g<<8) | (b<<16);
 }
 
 static WRITE16_HANDLER( fifo_data_w )
@@ -299,7 +274,7 @@ static WRITE16_HANDLER( fifo_clear_w )
 {
 	sliver_state *state = space->machine().driver_data<sliver_state>();
 
-	state->m_bitmap_fg->fill(0);
+	state->m_bitmap_fg.fill(0);
 	state->m_fptr=0;
 	state->m_tmp_counter=0;
 }
@@ -324,7 +299,7 @@ static void render_jpeg(running_machine &machine)
 	int addr = state->m_jpeg_addr;
 	UINT8 *rom;
 
-	state->m_bitmap_bg->fill(0);
+	state->m_bitmap_bg.fill(0);
 	if (addr < 0)
 	{
 		return;
@@ -466,16 +441,16 @@ static VIDEO_START(sliver)
 {
 	sliver_state *state = machine.driver_data<sliver_state>();
 
-	state->m_bitmap_bg = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_bitmap_fg = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_bitmap_bg.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_bitmap_fg.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
-static SCREEN_UPDATE(sliver)
+static SCREEN_UPDATE_RGB32(sliver)
 {
 	sliver_state *state = screen.machine().driver_data<sliver_state>();
 
-	copybitmap      (bitmap, *state->m_bitmap_bg, 0, 0, 0, 0, cliprect);
-	copybitmap_trans(bitmap, *state->m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
+	copybitmap      (bitmap, state->m_bitmap_bg, 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, state->m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
 
@@ -579,10 +554,9 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
-	MCFG_SCREEN_UPDATE(sliver)
+	MCFG_SCREEN_UPDATE_STATIC(sliver)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 

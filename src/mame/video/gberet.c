@@ -131,7 +131,7 @@ VIDEO_START( gberet )
 	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 }
 
-static void gberet_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void gberet_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gberet_state *state = machine.driver_data<gberet_state>();
 	int offs;
@@ -168,7 +168,7 @@ static void gberet_draw_sprites( running_machine &machine, bitmap_t &bitmap, con
 	}
 }
 
-SCREEN_UPDATE( gberet )
+SCREEN_UPDATE_IND16( gberet )
 {
 	gberet_state *state = screen.machine().driver_data<gberet_state>();
 
@@ -192,7 +192,7 @@ WRITE8_HANDLER( gberetb_scroll_w )
 		tilemap_set_scrollx(state->m_bg_tilemap, offset, scroll + 64 - 8);
 }
 
-static void gberetb_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void gberetb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gberet_state *state = machine.driver_data<gberet_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -224,7 +224,7 @@ static void gberetb_draw_sprites( running_machine &machine, bitmap_t &bitmap, co
 	}
 }
 
-SCREEN_UPDATE( gberetb )
+SCREEN_UPDATE_IND16( gberetb )
 {
 	gberet_state *state = screen.machine().driver_data<gberet_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);

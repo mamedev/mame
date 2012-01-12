@@ -277,7 +277,7 @@ WRITE16_HANDLER( armedf_bg_scrolly_w )
 ***************************************************************************/
 
 /* custom code to handle color cycling effect, handled by m_spr_pal_clut */
-void armedf_drawgfx(running_machine &machine, bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+void armedf_drawgfx(running_machine &machine, bitmap_ind16 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 							UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
@@ -348,7 +348,7 @@ void armedf_drawgfx(running_machine &machine, bitmap_t &dest_bmp,const rectangle
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
 	armedf_state *state = machine.driver_data<armedf_state>();
@@ -383,7 +383,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( armedf )
+SCREEN_UPDATE_IND16( armedf )
 {
 	armedf_state *state = screen.machine().driver_data<armedf_state>();
 	int sprite_enable = state->m_vreg & 0x200;

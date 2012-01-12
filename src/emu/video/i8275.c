@@ -460,7 +460,7 @@ WRITE8_DEVICE_HANDLER( i8275_dack_w )
 }
 
 /* Screen Update */
-void i8275_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void i8275_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	i8275_t *i8275 = get_safe_token(device);
 	i8275->ypos = 0;

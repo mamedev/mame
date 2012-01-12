@@ -212,7 +212,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/*
     object ram :
@@ -488,7 +488,7 @@ VIDEO_START( st0016 )
 }
 
 
-static void draw_bgmap(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int priority)
+static void draw_bgmap(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int priority)
 {
 	gfx_element *gfx = machine.gfx[st0016_ramgfx];
 	int j;
@@ -584,14 +584,14 @@ static void draw_bgmap(running_machine &machine, bitmap_t &bitmap,const rectangl
 }
 
 
-void st0016_draw_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_bgmap(screen.machine(), bitmap,cliprect,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	draw_bgmap(screen.machine(), bitmap,cliprect,1);
 }
 
-SCREEN_UPDATE( st0016 )
+SCREEN_UPDATE_IND16( st0016 )
 {
 
 #ifdef MAME_DEBUG

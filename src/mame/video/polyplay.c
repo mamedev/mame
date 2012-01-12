@@ -47,7 +47,7 @@ VIDEO_START( polyplay )
 }
 
 
-SCREEN_UPDATE( polyplay )
+SCREEN_UPDATE_IND16( polyplay )
 {
 	polyplay_state *state = screen.machine().driver_data<polyplay_state>();
 	UINT8 *videoram = state->m_videoram;

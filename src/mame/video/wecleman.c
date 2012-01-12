@@ -169,7 +169,8 @@ static void sortsprite(int *idx_array, int *key_array, int size)
 }
 
 // draws a 8bpp palette sprites on a 16bpp direct RGB target (sub-par implementation)
-static void do_blit_zoom32(wecleman_state *state, bitmap_t &bitmap, const rectangle &cliprect, struct sprite *sprite)
+template<class _BitmapClass>
+static void do_blit_zoom32(wecleman_state *state, _BitmapClass &bitmap, const rectangle &cliprect, struct sprite *sprite)
 {
 #define PRECISION_X 20
 #define PRECISION_Y 20
@@ -256,11 +257,10 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t &bitmap, const rectan
 	{
 		UINT8 *row_base = sprite->pen_data + (src_f0y>>PRECISION_Y) * sprite->line_offset;
 		src_fpx = src_f0x;
+		typename _BitmapClass::pixel_t *dst_ptr = &bitmap.pix(sy);
 
 		if (bitmap.format() == BITMAP_FORMAT_RGB32)	// Wec Le Mans
 		{
-			UINT32 *dst_ptr = &bitmap.pix32(sy);
-
 			if (!sprite->shadow_mode)
 			{
 				for (sx = x1; sx != x2; sx += dx)
@@ -291,7 +291,6 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t &bitmap, const rectan
 		}
 		else	// Hot Chase
 		{
-			UINT16 *dst_ptr = &bitmap.pix16(sy);
 			pen_t base = sprite->pal_base;
 
 			if (!sprite->shadow_mode)
@@ -330,7 +329,8 @@ static void do_blit_zoom32(wecleman_state *state, bitmap_t &bitmap, const rectan
 	}
 }
 
-static void sprite_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+template<class _BitmapClass>
+static void sprite_draw(running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect)
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int i;
@@ -539,7 +539,7 @@ WRITE16_HANDLER( wecleman_pageram_w )
 
 ------------------------------------------------------------------------*/
 
-static void wecleman_draw_road(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
 // must be powers of 2
@@ -657,7 +657,7 @@ static void wecleman_draw_road(running_machine &machine, bitmap_t &bitmap, const
 ------------------------------------------------------------------------*/
 
 // blends two 8x8x16bpp direct RGB tilemaps
-static void draw_cloud(bitmap_t &bitmap,
+static void draw_cloud(bitmap_rgb32 &bitmap,
 				 const gfx_element *gfx,
 				 UINT16 *tm_base,
 				 int x0, int y0,				// target coordinate
@@ -792,7 +792,7 @@ static void draw_cloud(bitmap_t &bitmap,
 
 ------------------------------------------------------------------------*/
 
-static void hotchase_draw_road(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void hotchase_draw_road(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
 /* Referred to what's in the ROMs */
@@ -1022,7 +1022,7 @@ VIDEO_START( hotchase )
                             Video Updates
 ***************************************************************************/
 
-SCREEN_UPDATE( wecleman )
+SCREEN_UPDATE_RGB32( wecleman )
 {
 	wecleman_state *state = screen.machine().driver_data<wecleman_state>();
 	const pen_t *mrct;
@@ -1116,7 +1116,7 @@ SCREEN_UPDATE( wecleman )
                                 Hot Chase
 ***************************************************************************/
 
-SCREEN_UPDATE( hotchase )
+SCREEN_UPDATE_IND16( hotchase )
 {
 	wecleman_state *state = screen.machine().driver_data<wecleman_state>();
 	device_t *k051316_1 = screen.machine().device("k051316_1");

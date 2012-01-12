@@ -197,7 +197,7 @@ static VIDEO_START( photon )
 {
 }
 
-static SCREEN_UPDATE( photon )
+static SCREEN_UPDATE_IND16( photon )
 {
 	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().region("maincpu")->base());
 }
@@ -216,10 +216,9 @@ static MACHINE_CONFIG_START( photon, photon_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(256+32, 192+32)
     MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-    MCFG_SCREEN_UPDATE(photon)
+    MCFG_SCREEN_UPDATE_STATIC(photon)
     MCFG_PALETTE_LENGTH(16)
     MCFG_PALETTE_INIT(pk8000)
 

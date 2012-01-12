@@ -477,7 +477,7 @@ static void update_widget_irq(running_machine &machine);
  *
  *************************************/
 
-static SCREEN_UPDATE( seattle )
+static SCREEN_UPDATE_RGB32( seattle )
 {
 	seattle_state *state = screen.machine().driver_data<seattle_state>();
 	return voodoo_update(state->m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
@@ -2517,10 +2517,9 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE(seattle)
+	MCFG_SCREEN_UPDATE_STATIC(seattle)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

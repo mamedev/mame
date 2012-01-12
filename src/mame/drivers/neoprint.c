@@ -53,7 +53,7 @@ xxxx xxxx xxxx xxxx [2] scroll Y, signed
 ---- ---- --?? ??xx [6] map register
 */
 
-static void draw_layer(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int layer,int data_shift)
+static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift)
 {
 	neoprint_state *state = machine.driver_data<neoprint_state>();
 	int i, y, x;
@@ -91,7 +91,7 @@ static void draw_layer(running_machine &machine, bitmap_t &bitmap,const rectangl
 	}
 }
 
-SCREEN_UPDATE(neoprint)
+SCREEN_UPDATE_IND16(neoprint)
 {
 	bitmap.fill(0, cliprect);
 
@@ -101,7 +101,7 @@ SCREEN_UPDATE(neoprint)
 	return 0;
 }
 
-SCREEN_UPDATE(nprsp)
+SCREEN_UPDATE_IND16(nprsp)
 {
 	bitmap.fill(0, cliprect);
 
@@ -464,10 +464,9 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(neoprint)
+	MCFG_SCREEN_UPDATE_STATIC(neoprint)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
@@ -507,10 +506,9 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(nprsp)
+	MCFG_SCREEN_UPDATE_STATIC(nprsp)
 
 	MCFG_MACHINE_RESET(nprsp)
 

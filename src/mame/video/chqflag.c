@@ -71,7 +71,7 @@ VIDEO_START( chqflag )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( chqflag )
+SCREEN_UPDATE_IND16( chqflag )
 {
 	chqflag_state *state = screen.machine().driver_data<chqflag_state>();
 

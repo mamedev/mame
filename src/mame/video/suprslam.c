@@ -6,7 +6,7 @@
 
 
 /* todo, fix zooming correctly, it's _not_ like aerofgt */
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/* SPRITE INFO
 
@@ -152,7 +152,7 @@ VIDEO_START( suprslam )
 	tilemap_set_transparent_pen(state->m_screen_tilemap, 15);
 }
 
-SCREEN_UPDATE( suprslam )
+SCREEN_UPDATE_IND16( suprslam )
 {
 	suprslam_state *state = screen.machine().driver_data<suprslam_state>();
 	tilemap_set_scrollx( state->m_screen_tilemap,0, state->m_screen_vregs[0x04/2] );

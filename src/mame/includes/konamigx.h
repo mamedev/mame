@@ -73,10 +73,10 @@ extern UINT16 konamigx_wrport2;
 #define GXSUB_5BPP		0x05	//  32 colors
 #define GXSUB_8BPP		0x08	// 256 colors
 
-void konamigx_mixer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
-					int mixerflags, bitmap_t* extra_bitmap, int rushingheroes_hack);
+					int mixerflags, bitmap_ind16* extra_bitmap, int rushingheroes_hack);
 
 void konamigx_mixer_init(running_machine &machine, int objdma);
 void konamigx_mixer_primode(int mode);
@@ -97,9 +97,9 @@ VIDEO_START(dragoonj);
 VIDEO_START(winspike);
 VIDEO_START(opengolf);
 VIDEO_START(racinfrc);
-SCREEN_UPDATE(konamigx);
-SCREEN_UPDATE(konamigx_left);
-SCREEN_UPDATE(konamigx_right);
+SCREEN_UPDATE_RGB32(konamigx);
+SCREEN_UPDATE_RGB32(konamigx_left);
+SCREEN_UPDATE_RGB32(konamigx_right);
 
 WRITE32_HANDLER( konamigx_palette_w );
 #ifdef UNUSED_FUNCTION

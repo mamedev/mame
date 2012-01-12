@@ -165,7 +165,7 @@ static const UINT8 hw_sprite[16] =
 	0x22, 0x22, 0x22, 0x22, 0x22, 0x11, 0x22, 0x22
 };
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	kingdrby_state *state = machine.driver_data<kingdrby_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -210,7 +210,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-static SCREEN_UPDATE(kingdrby)
+static SCREEN_UPDATE_IND16(kingdrby)
 {
 	kingdrby_state *state = screen.machine().driver_data<kingdrby_state>();
 	const rectangle &visarea = screen.visible_area();
@@ -1037,10 +1037,9 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)	/* controlled by CRTC */
-	MCFG_SCREEN_UPDATE(kingdrby)
+	MCFG_SCREEN_UPDATE_STATIC(kingdrby)
 
 	MCFG_VIDEO_START(kingdrby)
 

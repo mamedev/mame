@@ -285,7 +285,7 @@ static VIDEO_START( trvmadns )
 	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
 }
 
-static SCREEN_UPDATE( trvmadns )
+static SCREEN_UPDATE_IND16( trvmadns )
 {
 	trvmadns_state *state = screen.machine().driver_data<trvmadns_state>();
 	int x,y,count;
@@ -350,10 +350,9 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(trvmadns)
+	MCFG_SCREEN_UPDATE_STATIC(trvmadns)
 
 	MCFG_GFXDECODE(trvmadns)
 	MCFG_PALETTE_LENGTH(16)

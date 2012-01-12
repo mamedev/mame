@@ -31,18 +31,19 @@ public:
 	DECLARE_READ8_MEMBER( bitmap_xy_r );
 	DECLARE_WRITE8_MEMBER( bitmap_xy_w );
 
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 protected:
 	struct planet;
 
 	virtual void machine_start();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	void init_planet(planet &liberatr_planet, UINT8 *planet_rom);
 	void get_pens(pen_t *pens);
-	void draw_planet(bitmap_t &bitmap, pen_t *pens);
-	void draw_bitmap(bitmap_t &bitmap, pen_t *pens);
+	void draw_planet(bitmap_rgb32 &bitmap, pen_t *pens);
+	void draw_bitmap(bitmap_rgb32 &bitmap, pen_t *pens);
 
 	required_shared_ptr<UINT8> m_base_ram;
 	required_shared_ptr<UINT8> m_planet_frame;

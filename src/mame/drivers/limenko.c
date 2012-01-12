@@ -48,8 +48,8 @@ public:
 	UINT32 *m_videoreg;
 	UINT32 *m_mainram;
 	int m_spriteram_bit;
-	bitmap_t *m_sprites_bitmap;
-	bitmap_t *m_sprites_bitmap_pri;
+	bitmap_ind16 m_sprites_bitmap;
+	bitmap_ind8 m_sprites_bitmap_pri;
 	int m_prev_sprites_count;
 	UINT8 m_spotty_sound_cmd;
 };
@@ -125,8 +125,8 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 	clip.min_y = 0;
 	clip.max_y = 239;
 
-	state->m_sprites_bitmap_pri->fill(0, clip);
-	state->m_sprites_bitmap->fill(0, clip);
+	state->m_sprites_bitmap_pri.fill(0, clip);
+	state->m_sprites_bitmap.fill(0, clip);
 
 	// toggle spriterams location in the memory map
 	state->m_spriteram_bit ^= 1;
@@ -256,7 +256,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0,tile,color,0);
 }
 
-static void draw_single_sprite(bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+static void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
@@ -331,7 +331,7 @@ static void draw_single_sprite(bitmap_t &dest_bmp,const rectangle &clip,const gf
 			{
 				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 				UINT16 *dest = &dest_bmp.pix16(y);
-				UINT8 *pri = &state->m_sprites_bitmap_pri->pix8(y);
+				UINT8 *pri = &state->m_sprites_bitmap_pri.pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -402,20 +402,20 @@ static void draw_sprites(running_machine &machine, UINT32 *sprites, const rectan
 		/* prepare GfxElement on the fly */
 		gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
 
-		draw_single_sprite(*state->m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
+		draw_single_sprite(state->m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
 
 		// wrap around x
-		draw_single_sprite(*state->m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y,pri);
+		draw_single_sprite(state->m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y,pri);
 
 		// wrap around y
-		draw_single_sprite(*state->m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y-512,pri);
+		draw_single_sprite(state->m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y-512,pri);
 
 		// wrap around x and y
-		draw_single_sprite(*state->m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y-512,pri);
+		draw_single_sprite(state->m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y-512,pri);
 	}
 }
 
-static void copy_sprites(running_machine &machine, bitmap_t &bitmap, bitmap_t &sprites_bitmap, bitmap_t &priority_bitmap, const rectangle &cliprect)
+static void copy_sprites(running_machine &machine, bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect)
 {
 	limenko_state *state = machine.driver_data<limenko_state>();
 	int y;
@@ -424,7 +424,7 @@ static void copy_sprites(running_machine &machine, bitmap_t &bitmap, bitmap_t &s
 		UINT16 *source = &sprites_bitmap.pix16(y);
 		UINT16 *dest = &bitmap.pix16(y);
 		UINT8 *dest_pri = &priority_bitmap.pix8(y);
-		UINT8 *source_pri = &state->m_sprites_bitmap_pri->pix8(y);
+		UINT8 *source_pri = &state->m_sprites_bitmap_pri.pix8(y);
 
 		int x;
 		for( x=cliprect.min_x; x<=cliprect.max_x; x++ )
@@ -448,11 +448,11 @@ static VIDEO_START( limenko )
 	tilemap_set_transparent_pen(state->m_md_tilemap,0);
 	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
 
-	state->m_sprites_bitmap     = auto_bitmap_alloc(machine,384,240,BITMAP_FORMAT_INDEXED16);
-	state->m_sprites_bitmap_pri = auto_bitmap_alloc(machine,384,240,BITMAP_FORMAT_INDEXED8);
+	state->m_sprites_bitmap.allocate(384,240);
+	state->m_sprites_bitmap_pri.allocate(384,240);
 }
 
-static SCREEN_UPDATE( limenko )
+static SCREEN_UPDATE_IND16( limenko )
 {
 	limenko_state *state = screen.machine().driver_data<limenko_state>();
 	// state->m_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
@@ -476,7 +476,7 @@ static SCREEN_UPDATE( limenko )
 	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);
 
 	if(state->m_videoreg[0] & 8)
-		copy_sprites(screen.machine(), bitmap, *state->m_sprites_bitmap, screen.machine().priority_bitmap, cliprect);
+		copy_sprites(screen.machine(), bitmap, state->m_sprites_bitmap, screen.machine().priority_bitmap, cliprect);
 
 	return 0;
 }
@@ -678,10 +678,9 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
-	MCFG_SCREEN_UPDATE(limenko)
+	MCFG_SCREEN_UPDATE_STATIC(limenko)
 
 	MCFG_GFXDECODE(limenko)
 	MCFG_PALETTE_LENGTH(0x1000)
@@ -706,10 +705,9 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
-	MCFG_SCREEN_UPDATE(limenko)
+	MCFG_SCREEN_UPDATE_STATIC(limenko)
 
 	MCFG_GFXDECODE(limenko)
 	MCFG_PALETTE_LENGTH(0x1000)

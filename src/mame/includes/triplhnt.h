@@ -34,7 +34,7 @@ public:
 	UINT8* m_orga_ram;
 	int m_sprite_zoom;
 	int m_sprite_bank;
-	bitmap_t* m_helper;
+	bitmap_ind16 m_helper;
 	tilemap_t* m_bg_tilemap;
 };
 
@@ -53,6 +53,6 @@ extern const samples_interface triplhnt_samples_interface;
 /*----------- defined in video/triplhnt.c -----------*/
 
 VIDEO_START( triplhnt );
-SCREEN_UPDATE( triplhnt );
+SCREEN_UPDATE_IND16( triplhnt );
 
 

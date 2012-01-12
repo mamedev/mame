@@ -30,7 +30,7 @@ PALETTE_INIT( pcktgal )
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pcktgal_state *state = machine.driver_data<pcktgal_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -64,7 +64,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( pcktgal )
+SCREEN_UPDATE_IND16( pcktgal )
 {
 //  flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
@@ -72,7 +72,7 @@ SCREEN_UPDATE( pcktgal )
 	return 0;
 }
 
-SCREEN_UPDATE( pcktgalb )
+SCREEN_UPDATE_IND16( pcktgalb )
 {
 	// the bootleg doesn't properly set the tilemap registers, because it's on non-original hardware, which probably doesn't have the flexible tilemaps.
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw_bootleg(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0, 2);

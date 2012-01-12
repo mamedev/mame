@@ -9,7 +9,7 @@ public:
 	UINT8 *m_spriteram;
 	UINT8 *m_videoram;
 	tilemap_t *m_fg_tilemap;
-	bitmap_t m_tmpbitmap;
+	bitmap_ind16 m_tmpbitmap;
 };
 
 
@@ -19,4 +19,4 @@ WRITE8_HANDLER( tunhunt_videoram_w );
 
 PALETTE_INIT( tunhunt );
 VIDEO_START( tunhunt );
-SCREEN_UPDATE( tunhunt );
+SCREEN_UPDATE_IND16( tunhunt );

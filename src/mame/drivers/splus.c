@@ -48,6 +48,11 @@ public:
 		m_p1_unknown = 0x00;
 	}
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+	{
+		return 0;
+	}
+
 	// Pointers to External RAM
 	required_shared_ptr<UINT8> m_cmosl_ram;
 	required_shared_ptr<UINT8> m_cmosh_ram;
@@ -682,7 +687,7 @@ static MACHINE_CONFIG_START( splus, splus_state )	// basic machine hardware
     MCFG_SCREEN_ADD("scrn", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(splus_state, screen_update)
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 

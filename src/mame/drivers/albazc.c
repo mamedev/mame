@@ -51,7 +51,7 @@ static VIDEO_START( hanaroku )
 {
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	albazc_state *state = machine.driver_data<albazc_state>();
 	int i;
@@ -77,7 +77,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static SCREEN_UPDATE(hanaroku)
+static SCREEN_UPDATE_IND16(hanaroku)
 {
 	bitmap.fill(0x1f0, cliprect);	// ???
 	draw_sprites(screen.machine(), bitmap, cliprect);
@@ -267,10 +267,9 @@ static MACHINE_CONFIG_START( hanaroku, albazc_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(hanaroku)
+	MCFG_SCREEN_UPDATE_STATIC(hanaroku)
 
 	MCFG_GFXDECODE(hanaroku)
 	MCFG_PALETTE_LENGTH(0x200)

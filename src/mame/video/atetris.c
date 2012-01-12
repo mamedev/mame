@@ -64,7 +64,7 @@ VIDEO_START( atetris )
  *
  *************************************/
 
-SCREEN_UPDATE( atetris )
+SCREEN_UPDATE_IND16( atetris )
 {
 	atetris_state *state = screen.machine().driver_data<atetris_state>();
 

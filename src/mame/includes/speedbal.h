@@ -16,6 +16,6 @@ public:
 /*----------- defined in video/speedbal.c -----------*/
 
 VIDEO_START( speedbal );
-SCREEN_UPDATE( speedbal );
+SCREEN_UPDATE_IND16( speedbal );
 WRITE8_HANDLER( speedbal_foreground_videoram_w );
 WRITE8_HANDLER( speedbal_background_videoram_w );

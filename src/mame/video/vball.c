@@ -114,7 +114,7 @@ void vb_mark_all_dirty( running_machine &machine )
 					cliprect,gfx, \
 					(which+order),color,flipx,flipy,sx,sy,0);
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	vball_state *state = machine.driver_data<vball_state>();
 	const gfx_element *gfx = machine.gfx[1];
@@ -161,7 +161,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 #undef DRAW_SPRITE
 
-SCREEN_UPDATE( vb )
+SCREEN_UPDATE_IND16( vb )
 {
 	vball_state *state = screen.machine().driver_data<vball_state>();
 	int i;

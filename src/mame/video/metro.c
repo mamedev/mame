@@ -439,7 +439,7 @@ VIDEO_START( gstrik2 )
 
 /* Draw sprites */
 
-void metro_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	UINT8 *base_gfx = machine.region("gfx1")->base();
@@ -590,13 +590,13 @@ void metro_draw_sprites( running_machine &machine, bitmap_t &bitmap, const recta
 /* copy a 'window' from the large 2048x2048 (or 4096x4096 for 16x16 tiles) tilemap */
 
 
-static void draw_tilemap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 pcode,
+static void draw_tilemap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 pcode,
 						 int sx, int sy, int wx, int wy, int big, UINT16* tilemapram, int layer )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	int y;
 
-	bitmap_t &priority_bitmap = machine.priority_bitmap;
+	bitmap_ind8 &priority_bitmap = machine.priority_bitmap;
 
 	int width = big ? 4096 : 2048;//pixdata->width;
 	int height = big ? 4096 : 2048;//pixdata->height;
@@ -687,7 +687,7 @@ static void draw_tilemap( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 /* Draw all the layers that match the given priority */
-static void draw_layers( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
+static void draw_layers( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	UINT16 layers_pri = state->m_videoregs[0x10 / 2];
@@ -721,7 +721,7 @@ static void draw_layers( running_machine &machine, bitmap_t &bitmap, const recta
 
 
 
-SCREEN_UPDATE( metro )
+SCREEN_UPDATE_IND16( metro )
 {
 	metro_state *state = screen.machine().driver_data<metro_state>();
 	int pri, layers_ctrl = -1;

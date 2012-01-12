@@ -30,15 +30,16 @@ class csplayh5_state : public driver_device
 public:
 	csplayh5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this,"maincpu"),
+		m_v9958(*this,"v9958")
 		{ }
 
-	bitmap_t *m_vdp0_bitmap;
 	UINT16 m_mux_data;
 	UINT8 m_pio_dir[5];
 	UINT8 m_pio_latch[5];
 
 	required_device<cpu_device> m_maincpu;
+	required_device<v9958_device> m_v9958;
 };
 
 
@@ -53,30 +54,11 @@ public:
 #define MSX2_VISIBLE_XBORDER_PIXELS	8 * 2
 #define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
 
-static void csplayh5_vdp0_interrupt(running_machine &machine, int i)
+static void csplayh5_vdp0_interrupt(device_t *, v99x8_device &device, int i)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
        interrupts seem to be fired quite randomly */
 }
-
-static VIDEO_START( csplayh5 )
-{
-	csplayh5_state *state = machine.driver_data<csplayh5_state>();
-	state->m_vdp0_bitmap = machine.primary_screen->alloc_compatible_bitmap();
-	v9938_init (machine, 0, *machine.primary_screen, *state->m_vdp0_bitmap, MODEL_V9958, 0x20000, csplayh5_vdp0_interrupt);
-	v9938_reset(0);
-}
-
-static SCREEN_UPDATE( csplayh5 )
-{
-	csplayh5_state *state = screen.machine().driver_data<csplayh5_state>();
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-
-	copybitmap(bitmap, *state->m_vdp0_bitmap, 0, 0, 0, 0, cliprect);
-
-	return 0;
-}
-
 
 static READ16_HANDLER( csplayh5_mux_r )
 {
@@ -112,10 +94,7 @@ static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x200200, 0x200201) AM_READWRITE(csplayh5_mux_r,csplayh5_mux_w)
 	AM_RANGE(0x200400, 0x200401) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x200600, 0x200601) AM_READWRITE8(v9938_0_vram_r, v9938_0_vram_w,0xff)
-	AM_RANGE(0x200602, 0x200603) AM_READWRITE8(v9938_0_status_r, v9938_0_command_w,0xff)
-	AM_RANGE(0x200604, 0x200605) AM_WRITE8(v9938_0_palette_w,0xff)
-	AM_RANGE(0x200606, 0x200607) AM_WRITE8(v9938_0_register_w,0xff)
+	AM_RANGE(0x200600, 0x200607) AM_DEVREADWRITE8_MODERN("v9958", v9958_device, read, write, 0x00ff)
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
 
@@ -611,9 +590,9 @@ static TIMER_DEVICE_CALLBACK( csplayh5_irq )
 
 	if((scanline % 2) == 0)
 	{
-		v9938_set_sprite_limit(0, 0);
-		v9938_set_resolution(0, RENDER_HIGH);
-		v9938_interrupt(timer.machine(), 0);
+		state->m_v9958->set_sprite_limit(0);
+		state->m_v9958->set_resolution(RENDER_HIGH);
+		state->m_v9958->interrupt();
 	}
 }
 
@@ -651,18 +630,18 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
+	MCFG_V9958_ADD("v9958", "screen", 0x20000)
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(csplayh5_vdp0_interrupt)
+
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_UPDATE(csplayh5)
+	MCFG_SCREEN_UPDATE_DEVICE("v9958", v9958_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT( v9958 )
-
-	MCFG_VIDEO_START(csplayh5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

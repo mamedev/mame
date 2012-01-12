@@ -34,21 +34,20 @@ void exidy_video_config(running_machine &machine, UINT8 _collision_mask, UINT8 _
 VIDEO_START( exidy )
 {
 	exidy_state *state = machine.driver_data<exidy_state>();
-	bitmap_format format = machine.primary_screen->format();
 
-	state->m_background_bitmap = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_motion_object_1_vid = auto_bitmap_alloc(machine, 16, 16, format);
-	state->m_motion_object_2_vid = auto_bitmap_alloc(machine, 16, 16, format);
-	state->m_motion_object_2_clip = auto_bitmap_alloc(machine, 16, 16, format);
+	state->m_background_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_motion_object_1_vid.allocate(16, 16);
+	state->m_motion_object_2_vid.allocate(16, 16);
+	state->m_motion_object_2_clip.allocate(16, 16);
 
 	state_save_register_global(machine, state->m_collision_mask);
 	state_save_register_global(machine, state->m_collision_invert);
 	state_save_register_global(machine, state->m_is_2bpp);
 	state_save_register_global(machine, state->m_int_condition);
-	state_save_register_global_bitmap(machine, state->m_background_bitmap);
-	state_save_register_global_bitmap(machine, state->m_motion_object_1_vid);
-	state_save_register_global_bitmap(machine, state->m_motion_object_2_vid);
-	state_save_register_global_bitmap(machine, state->m_motion_object_2_clip);
+	state_save_register_global_bitmap(machine, &state->m_background_bitmap);
+	state_save_register_global_bitmap(machine, &state->m_motion_object_1_vid);
+	state_save_register_global_bitmap(machine, &state->m_motion_object_2_vid);
+	state_save_register_global_bitmap(machine, &state->m_motion_object_2_clip);
 }
 
 
@@ -171,9 +170,9 @@ static void draw_background(running_machine &machine)
 				for (i = 0; i < 8; i++)
 				{
 					if (data1 & 0x80)
-						state->m_background_bitmap->pix16(y, x) = (data2 & 0x80) ? on_pen_2 : on_pen_1;
+						state->m_background_bitmap.pix16(y, x) = (data2 & 0x80) ? on_pen_2 : on_pen_1;
 					else
-						state->m_background_bitmap->pix16(y, x) = off_pen;
+						state->m_background_bitmap.pix16(y, x) = off_pen;
 
 					x = x + 1;
 					data1 = data1 << 1;
@@ -187,7 +186,7 @@ static void draw_background(running_machine &machine)
 
 				for (i = 0; i < 8; i++)
 				{
-					state->m_background_bitmap->pix16(y, x) = (data & 0x80) ? on_pen_1 : off_pen;
+					state->m_background_bitmap.pix16(y, x) = (data & 0x80) ? on_pen_1 : off_pen;
 
 					x = x + 1;
 					data = data << 1;
@@ -215,7 +214,7 @@ INLINE int sprite_1_enabled(exidy_state *state)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	exidy_state *state = machine.driver_data<exidy_state>();
 	/* draw sprite 2 first */
@@ -291,31 +290,31 @@ static void check_collision(running_machine &machine)
 		return;
 
 	/* draw sprite 1 */
-	state->m_motion_object_1_vid->fill(0xff, clip);
+	state->m_motion_object_1_vid.fill(0xff, clip);
 	if (sprite_1_enabled(state))
 	{
 		org_1_x = 236 - *state->m_sprite1_xpos - 4;
 		org_1_y = 244 - *state->m_sprite1_ypos - 4;
-		drawgfx_transpen(*state->m_motion_object_1_vid, clip, machine.gfx[0],
+		drawgfx_transpen(state->m_motion_object_1_vid, clip, machine.gfx[0],
 				(*state->m_spriteno & 0x0f) + 16 * sprite_set_1, 0,
 				0, 0, 0, 0, 0);
 	}
 
 	/* draw sprite 2 */
-	state->m_motion_object_2_vid->fill(0xff, clip);
+	state->m_motion_object_2_vid.fill(0xff, clip);
 	org_2_x = 236 - *state->m_sprite2_xpos - 4;
 	org_2_y = 244 - *state->m_sprite2_ypos - 4;
-	drawgfx_transpen(*state->m_motion_object_2_vid, clip, machine.gfx[0],
+	drawgfx_transpen(state->m_motion_object_2_vid, clip, machine.gfx[0],
 			((*state->m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
 			0, 0, 0, 0, 0);
 
 	/* draw sprite 2 clipped to sprite 1's location */
-	state->m_motion_object_2_clip->fill(0xff, clip);
+	state->m_motion_object_2_clip.fill(0xff, clip);
 	if (sprite_1_enabled(state))
 	{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
-		drawgfx_transpen(*state->m_motion_object_2_clip, clip, machine.gfx[0],
+		drawgfx_transpen(state->m_motion_object_2_clip, clip, machine.gfx[0],
 				((*state->m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
 				0, 0, sx, sy, 0);
 	}
@@ -324,16 +323,16 @@ static void check_collision(running_machine &machine)
 	for (sy = 0; sy < 16; sy++)
 		for (sx = 0; sx < 16; sx++)
 		{
-			if (state->m_motion_object_1_vid->pix16(sy, sx) != 0xff)
+			if (state->m_motion_object_1_vid.pix16(sy, sx) != 0xff)
 			{
 				UINT8 current_collision_mask = 0;
 
 				/* check for background collision (M1CHAR) */
-				if (state->m_background_bitmap->pix16(org_1_y + sy, org_1_x + sx) != 0)
+				if (state->m_background_bitmap.pix16(org_1_y + sy, org_1_x + sx) != 0)
 					current_collision_mask |= 0x04;
 
 				/* check for motion object collision (M1M2) */
-				if (state->m_motion_object_2_clip->pix16(sy, sx) != 0xff)
+				if (state->m_motion_object_2_clip.pix16(sy, sx) != 0xff)
 					current_collision_mask |= 0x10;
 
 				/* if we got one, trigger an interrupt */
@@ -341,10 +340,10 @@ static void check_collision(running_machine &machine)
 					machine.scheduler().timer_set(machine.primary_screen->time_until_pos(org_1_x + sx, org_1_y + sy), FUNC(collision_irq_callback), current_collision_mask);
 			}
 
-			if (state->m_motion_object_2_vid->pix16(sy, sx) != 0xff)
+			if (state->m_motion_object_2_vid.pix16(sy, sx) != 0xff)
 			{
 				/* check for background collision (M2CHAR) */
-				if (state->m_background_bitmap->pix16(org_2_y + sy, org_2_x + sx) != 0)
+				if (state->m_background_bitmap.pix16(org_2_y + sy, org_2_x + sx) != 0)
 					if ((state->m_collision_mask & 0x08) && (count++ < 128))
 						machine.scheduler().timer_set(machine.primary_screen->time_until_pos(org_2_x + sx, org_2_y + sy), FUNC(collision_irq_callback), 0x08);
 			}
@@ -359,7 +358,7 @@ static void check_collision(running_machine &machine)
  *
  *************************************/
 
-SCREEN_UPDATE( exidy )
+SCREEN_UPDATE_IND16( exidy )
 {
 	exidy_state *state = screen.machine().driver_data<exidy_state>();
 	/* refresh the colors from the palette (static or dynamic) */
@@ -367,7 +366,7 @@ SCREEN_UPDATE( exidy )
 
 	/* update the background and draw it */
 	draw_background(screen.machine());
-	copybitmap(bitmap, *state->m_background_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_background_bitmap, 0, 0, 0, 0, cliprect);
 
 	/* draw the sprites */
 	draw_sprites(screen.machine(), bitmap, cliprect);

@@ -66,7 +66,7 @@ void Processor::GetAlphaCvg(UINT8 *comb_alpha)
 
 /*****************************************************************************/
 
-void Processor::VideoUpdate(bitmap_t &bitmap)
+void Processor::VideoUpdate(bitmap_rgb32 &bitmap)
 {
 	switch(n64_vi_control & 0x3)
 	{
@@ -84,7 +84,7 @@ void Processor::VideoUpdate(bitmap_t &bitmap)
 	}
 }
 
-void Processor::VideoUpdate16(bitmap_t &bitmap)
+void Processor::VideoUpdate16(bitmap_rgb32 &bitmap)
 {
     int fsaa = (((n64_vi_control >> 8) & 3) < 2);
     int divot = (n64_vi_control >> 4) & 1;
@@ -218,7 +218,7 @@ void Processor::VideoUpdate16(bitmap_t &bitmap)
 	}
 }
 
-void Processor::VideoUpdate32(bitmap_t &bitmap)
+void Processor::VideoUpdate32(bitmap_rgb32 &bitmap)
 {
     int gamma = (n64_vi_control >> 3) & 1;
     int gamma_dither = (n64_vi_control >> 2) & 1;
@@ -3267,7 +3267,7 @@ VIDEO_START(n64)
 	}
 }
 
-SCREEN_UPDATE(n64)
+SCREEN_UPDATE_RGB32(n64)
 {
 	_n64_state *state = screen.machine().driver_data<_n64_state>();
 

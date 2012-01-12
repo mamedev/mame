@@ -114,14 +114,14 @@ SCREEN_EOF( taitof2_partial_buffer_delayed );
 SCREEN_EOF( taitof2_partial_buffer_delayed_thundfox );
 SCREEN_EOF( taitof2_partial_buffer_delayed_qzchikyu );
 
-SCREEN_UPDATE( taitof2 );
-SCREEN_UPDATE( taitof2_pri );
-SCREEN_UPDATE( taitof2_pri_roz );
-SCREEN_UPDATE( taitof2_ssi );
-SCREEN_UPDATE( taitof2_thundfox );
-SCREEN_UPDATE( taitof2_deadconx );
-SCREEN_UPDATE( taitof2_metalb );
-SCREEN_UPDATE( taitof2_yesnoj );
+SCREEN_UPDATE_IND16( taitof2 );
+SCREEN_UPDATE_IND16( taitof2_pri );
+SCREEN_UPDATE_IND16( taitof2_pri_roz );
+SCREEN_UPDATE_IND16( taitof2_ssi );
+SCREEN_UPDATE_IND16( taitof2_thundfox );
+SCREEN_UPDATE_IND16( taitof2_deadconx );
+SCREEN_UPDATE_IND16( taitof2_metalb );
+SCREEN_UPDATE_IND16( taitof2_yesnoj );
 
 WRITE16_HANDLER( taitof2_spritebank_w );
 WRITE16_HANDLER( koshien_spritebank_w );

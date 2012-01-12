@@ -118,16 +118,15 @@ VIDEO_START( matmania )
 	matmania_state *state = machine.driver_data<matmania_state>();
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
-	bitmap_format format = machine.primary_screen->format();
 
 	/* Mat Mania has a virtual screen twice as large as the visible screen */
-	state->m_tmpbitmap  = auto_bitmap_alloc(machine, width, 2 * height, format);
-	state->m_tmpbitmap2 = auto_bitmap_alloc(machine, width, 2 * height, format);
+	state->m_tmpbitmap  = auto_bitmap_ind16_alloc(machine, width, 2 * height);
+	state->m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine, width, 2 * height);
 }
 
 
 
-SCREEN_UPDATE( matmania )
+SCREEN_UPDATE_IND16( matmania )
 {
 	matmania_state *state = screen.machine().driver_data<matmania_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -199,7 +198,7 @@ SCREEN_UPDATE( matmania )
 	return 0;
 }
 
-SCREEN_UPDATE( maniach )
+SCREEN_UPDATE_IND16( maniach )
 {
 	matmania_state *state = screen.machine().driver_data<matmania_state>();
 	UINT8 *spriteram = state->m_spriteram;

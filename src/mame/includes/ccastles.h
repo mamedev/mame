@@ -24,7 +24,7 @@ public:
 	const UINT8 *m_syncprom;
 	const UINT8 *m_wpprom;
 	const UINT8 *m_priprom;
-	bitmap_t *m_spritebitmap;
+	bitmap_ind16 m_spritebitmap;
 	double m_rweights[3];
 	double m_gweights[3];
 	double m_bweights[3];
@@ -51,7 +51,7 @@ public:
 
 
 VIDEO_START( ccastles );
-SCREEN_UPDATE( ccastles );
+SCREEN_UPDATE_IND16( ccastles );
 
 WRITE8_HANDLER( ccastles_hscroll_w );
 WRITE8_HANDLER( ccastles_vscroll_w );

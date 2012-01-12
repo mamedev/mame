@@ -41,7 +41,7 @@ DECLARE_LEGACY_DEVICE(SAA5050, saa5050);
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-void saa5050_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
+void saa5050_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 void saa5050_frame_advance(device_t *device);
 
 GFXDECODE_EXTERN( saa5050 );

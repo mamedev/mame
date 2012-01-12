@@ -125,9 +125,9 @@ PALETTE_INIT( galpani2 )
 VIDEO_START( galpani2 )
 {
 	galpani2_state *state = machine.driver_data<galpani2_state>();
-	state->m_bg15_bitmap  = auto_bitmap_alloc(machine, 256*8, 256, BITMAP_FORMAT_INDEXED16);
-	state->m_bg8_bitmap[0] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
-	state->m_bg8_bitmap[1] = auto_bitmap_alloc(machine, 512, 256, BITMAP_FORMAT_INDEXED16);
+	state->m_bg15_bitmap  = auto_bitmap_ind16_alloc(machine, 256*8, 256);
+	state->m_bg8_bitmap[0] = auto_bitmap_ind16_alloc(machine, 512, 256);
+	state->m_bg8_bitmap[1] = auto_bitmap_ind16_alloc(machine, 512, 256);
 
 	VIDEO_START_CALL(kaneko16_sprites);
 }
@@ -141,7 +141,7 @@ VIDEO_START( galpani2 )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( galpani2 )
+SCREEN_UPDATE_IND16( galpani2 )
 {
 	galpani2_state *state = screen.machine().driver_data<galpani2_state>();
 	int layers_ctrl = -1;

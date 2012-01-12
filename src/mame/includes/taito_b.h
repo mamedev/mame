@@ -12,9 +12,9 @@ public:
 
 	/* video-related */
 	/* framebuffer is a raw bitmap, remapped as a last step */
-	bitmap_t      *m_framebuffer[2];
-	bitmap_t      *m_pixel_bitmap;
-	bitmap_t      *m_realpunc_bitmap;
+	bitmap_ind16      *m_framebuffer[2];
+	bitmap_ind16      *m_pixel_bitmap;
+	bitmap_ind16      *m_realpunc_bitmap;
 
 	UINT16        m_pixel_scroll[2];
 
@@ -56,7 +56,7 @@ VIDEO_START( realpunc );
 
 VIDEO_RESET( hitice );
 
-SCREEN_UPDATE( realpunc );
-SCREEN_UPDATE( taitob );
+SCREEN_UPDATE_RGB32( realpunc );
+SCREEN_UPDATE_IND16( taitob );
 
 SCREEN_EOF( taitob );

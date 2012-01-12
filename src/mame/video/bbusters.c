@@ -156,7 +156,7 @@ INLINE const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int 
 	return gfx_element_get_data(gfx, (sprite+code) % gfx->total_elements) + ((dy%16) * gfx->line_modulo);
 }
 
-static void bbusters_draw_block(running_machine &machine, bitmap_t &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
+static void bbusters_draw_block(running_machine &machine, bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
 	bbusters_state *state = machine.driver_data<bbusters_state>();
 	gfx_element *gfx = machine.gfx[bank];
@@ -203,7 +203,7 @@ static void bbusters_draw_block(running_machine &machine, bitmap_t &dest,int x,i
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const UINT16 *source, int bank, int colval, int colmask)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const UINT16 *source, int bank, int colval, int colmask)
 {
 	bbusters_state *state = machine.driver_data<bbusters_state>();
 	const UINT8 *scale_table=machine.region("user1")->base();
@@ -279,7 +279,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const UINT1
 
 /******************************************************************************/
 
-SCREEN_UPDATE( bbuster )
+SCREEN_UPDATE_IND16( bbuster )
 {
 	bbusters_state *state = screen.machine().driver_data<bbusters_state>();
 
@@ -297,7 +297,7 @@ SCREEN_UPDATE( bbuster )
 	return 0;
 }
 
-SCREEN_UPDATE( mechatt )
+SCREEN_UPDATE_IND16( mechatt )
 {
 	bbusters_state *state = screen.machine().driver_data<bbusters_state>();
 

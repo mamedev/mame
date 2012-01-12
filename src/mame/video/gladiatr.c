@@ -200,7 +200,7 @@ WRITE8_HANDLER( gladiatr_video_registers_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gladiatr_state *state = machine.driver_data<gladiatr_state>();
 	int offs;
@@ -251,7 +251,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 
 
-SCREEN_UPDATE( ppking )
+SCREEN_UPDATE_IND16( ppking )
 {
 	gladiatr_state *state = screen.machine().driver_data<gladiatr_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
@@ -263,7 +263,7 @@ SCREEN_UPDATE( ppking )
 		int sy = cliprect.min_y;
 
 		tilemap_get_pixmap( state->m_fg_tilemap );
-		bitmap_t &flagsbitmap = tilemap_get_flagsmap( state->m_fg_tilemap );
+		bitmap_ind8 &flagsbitmap = tilemap_get_flagsmap( state->m_fg_tilemap );
 
 		while( sy <= cliprect.max_y )
 		{
@@ -286,7 +286,7 @@ SCREEN_UPDATE( ppking )
 	return 0;
 }
 
-SCREEN_UPDATE( gladiatr )
+SCREEN_UPDATE_IND16( gladiatr )
 {
 	gladiatr_state *state = screen.machine().driver_data<gladiatr_state>();
 	if (state->m_video_attributes & 0x20)

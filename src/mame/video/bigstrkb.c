@@ -6,7 +6,7 @@
 
 /* Sprites */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/*- SPR RAM Format -**
 
@@ -128,7 +128,7 @@ VIDEO_START(bigstrkb)
 	tilemap_set_transparent_pen(state->m_tilemap3,15);
 }
 
-SCREEN_UPDATE(bigstrkb)
+SCREEN_UPDATE_IND16(bigstrkb)
 {
 	bigstrkb_state *state = screen.machine().driver_data<bigstrkb_state>();
 

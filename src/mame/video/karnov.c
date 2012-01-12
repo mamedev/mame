@@ -72,7 +72,7 @@ void karnov_flipscreen_w( running_machine &machine, int data )
 	tilemap_set_flip_all(machine, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
-static void draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	karnov_state *state = machine.driver_data<karnov_state>();
 	int my, mx, offs, color, tile, fx, fy;
@@ -123,7 +123,7 @@ static void draw_background( running_machine &machine, bitmap_t &bitmap, const r
 
 /******************************************************************************/
 
-SCREEN_UPDATE( karnov )
+SCREEN_UPDATE_IND16( karnov )
 {
 	karnov_state *state = screen.machine().driver_data<karnov_state>();
 	draw_background(screen.machine(), bitmap, cliprect);
@@ -166,7 +166,7 @@ VIDEO_START( karnov )
 	karnov_state *state = machine.driver_data<karnov_state>();
 
 	/* Allocate bitmap & tilemap */
-	state->m_bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine.primary_screen->format());
+	state->m_bitmap_f = auto_bitmap_ind16_alloc(machine, 512, 512);
 	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	state->save_item(NAME(*state->m_bitmap_f));
@@ -179,7 +179,7 @@ VIDEO_START( wndrplnt )
 	karnov_state *state = machine.driver_data<karnov_state>();
 
 	/* Allocate bitmap & tilemap */
-	state->m_bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine.primary_screen->format());
+	state->m_bitmap_f = auto_bitmap_ind16_alloc(machine, 512, 512);
 	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
 	state->save_item(NAME(*state->m_bitmap_f));

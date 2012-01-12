@@ -130,7 +130,7 @@ VIDEO_START( equites )
 VIDEO_START( splndrbt )
 {
 	equites_state *state = machine.driver_data<equites_state>();
-	assert(machine.primary_screen->format() == BITMAP_FORMAT_INDEXED16);
+	assert(machine.primary_screen->format() == BITMAP_FORMAT_IND16);
 
 	state->m_fg_videoram = auto_alloc_array(machine, UINT8, 0x800);
 	state->save_pointer(NAME(state->m_fg_videoram), 0x800);
@@ -258,7 +258,7 @@ WRITE16_HANDLER(splndrbt_bg_scrolly_w)
  *
  *************************************/
 
-static void equites_draw_sprites_block( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int start, int end )
+static void equites_draw_sprites_block( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end )
 {
 	equites_state *state = machine.driver_data<equites_state>();
 	int offs;
@@ -299,7 +299,7 @@ static void equites_draw_sprites_block( running_machine &machine, bitmap_t &bitm
 	}
 }
 
-static void equites_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void equites_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// note that we draw the sprites in three blocks; in each blocks, sprites at
 	// a lower address have priority. This gives good priorities in gekisou.
@@ -332,7 +332,7 @@ Also, note that sprites are 30x30, not 32x32.
 03020303 03030303 03030303 03030303
 */
 
-static void splndrbt_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void splndrbt_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	equites_state *state = machine.driver_data<equites_state>();
 	const UINT8 * const xrom = machine.region("user2")->base();
@@ -408,11 +408,11 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 }
 
 
-static void splndrbt_copy_bg( running_machine &machine, bitmap_t &dst_bitmap, const rectangle &cliprect )
+static void splndrbt_copy_bg( running_machine &machine, bitmap_ind16 &dst_bitmap, const rectangle &cliprect )
 {
 	equites_state *state = machine.driver_data<equites_state>();
-	bitmap_t &src_bitmap = tilemap_get_pixmap(state->m_bg_tilemap);
-	bitmap_t &flags_bitmap = tilemap_get_flagsmap(state->m_bg_tilemap);
+	bitmap_ind16 &src_bitmap = tilemap_get_pixmap(state->m_bg_tilemap);
+	bitmap_ind8 &flags_bitmap = tilemap_get_flagsmap(state->m_bg_tilemap);
 	const UINT8 * const xrom = machine.region("user1")->base();
 	const UINT8 * const yrom = xrom + 0x2000;
 	int scroll_x = state->m_splndrbt_bg_scrollx;
@@ -463,7 +463,7 @@ static void splndrbt_copy_bg( running_machine &machine, bitmap_t &dst_bitmap, co
 
 
 
-SCREEN_UPDATE( equites )
+SCREEN_UPDATE_IND16( equites )
 {
 	equites_state *state = screen.machine().driver_data<equites_state>();
 	bitmap.fill(state->m_bgcolor, cliprect);
@@ -477,7 +477,7 @@ SCREEN_UPDATE( equites )
 	return 0;
 }
 
-SCREEN_UPDATE( splndrbt )
+SCREEN_UPDATE_IND16( splndrbt )
 {
 	equites_state *state = screen.machine().driver_data<equites_state>();
 	bitmap.fill(state->m_bgcolor, cliprect);

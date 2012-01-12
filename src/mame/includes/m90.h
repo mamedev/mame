@@ -23,8 +23,8 @@ public:
 VIDEO_START( m90 );
 VIDEO_START( dynablsb );
 VIDEO_START( bomblord );
-SCREEN_UPDATE( m90 );
-SCREEN_UPDATE( dynablsb );
-SCREEN_UPDATE( bomblord );
+SCREEN_UPDATE_IND16( m90 );
+SCREEN_UPDATE_IND16( dynablsb );
+SCREEN_UPDATE_IND16( bomblord );
 WRITE16_HANDLER( m90_video_w );
 WRITE16_HANDLER( m90_video_control_w );

@@ -66,7 +66,7 @@ VIDEO_START( oneshot )
 	tilemap_set_transparent_pen(state->m_fg_tilemap,  0);
 }
 
-static void draw_crosshairs( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_crosshairs( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	oneshot_state *state = machine.driver_data<oneshot_state>();
 	//int xpos,ypos;
@@ -99,7 +99,7 @@ static void draw_crosshairs( running_machine &machine, bitmap_t &bitmap, const r
 		state->m_gun_x_p2 = 0;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	oneshot_state *state = machine.driver_data<oneshot_state>();
 	const UINT16 *source = state->m_sprites;
@@ -156,7 +156,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 }
 
-SCREEN_UPDATE( oneshot )
+SCREEN_UPDATE_IND16( oneshot )
 {
 	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 
@@ -173,7 +173,7 @@ SCREEN_UPDATE( oneshot )
 	return 0;
 }
 
-SCREEN_UPDATE( maddonna )
+SCREEN_UPDATE_IND16( maddonna )
 {
 	oneshot_state *state = screen.machine().driver_data<oneshot_state>();
 

@@ -203,7 +203,8 @@ class kas89_state : public driver_device
 {
 public:
 	kas89_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		  m_v9938(*this, "v9938")
 		{ }
 
 	UINT8 m_mux_data;
@@ -216,6 +217,7 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 
+	required_device<v9938_device> m_v9938;
 };
 
 #define VDP_MEM             0x40000
@@ -225,24 +227,18 @@ public:
 *      Interrupt handling & Video      *
 ***************************************/
 
-static void kas89_vdp_interrupt(running_machine &machine, int i)
+static void kas89_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-	cputag_set_input_line (machine, "maincpu", 0, (i ? ASSERT_LINE : CLEAR_LINE));
+	cputag_set_input_line (device.machine(), "maincpu", 0, (i ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static TIMER_DEVICE_CALLBACK( kas89_interrupt )
 {
+	kas89_state *state = timer.machine().driver_data<kas89_state>();
 	int scanline = param;
 
 	if((scanline % 2) == 0)
-		v9938_interrupt(timer.machine(), 0);
-}
-
-
-static VIDEO_START( kas89 )
-{
-	v9938_init (machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(), MODEL_V9938, VDP_MEM, kas89_vdp_interrupt);
-	v9938_reset(0);
+		state->m_v9938->interrupt();
 }
 
 
@@ -263,7 +259,6 @@ static MACHINE_RESET(kas89)
 {
 	kas89_state *state = machine.driver_data<kas89_state>();
 
-	v9938_reset(0);
 	state->m_main_nmi_enable = 0;
 }
 
@@ -521,10 +516,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kas89_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(v9938_0_vram_w) AM_READ(v9938_0_vram_r)
-	AM_RANGE(0x41, 0x41) AM_WRITE(v9938_0_command_w) AM_READ(v9938_0_status_r)
-	AM_RANGE(0x42, 0x42) AM_WRITE(v9938_0_palette_w)
-	AM_RANGE(0x43, 0x43) AM_WRITE(v9938_0_register_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_WRITE(mux_w)
 	AM_RANGE(0x81, 0x81) AM_READ(mux_r)
 	AM_RANGE(0x82, 0x82) AM_WRITE(control_w)	/* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
@@ -795,16 +787,18 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(kas89_vdp_interrupt)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(544, 524)
 	MCFG_SCREEN_VISIBLE_AREA(0, 544 - 1, 0, 480 - 1)
 
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT(v9938)
-	MCFG_VIDEO_START(kas89)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

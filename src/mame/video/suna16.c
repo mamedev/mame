@@ -122,7 +122,7 @@ WRITE16_HANDLER( suna16_paletteram16_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT16 *sprites, int gfx)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *sprites, int gfx)
 {
 	suna16_state *state = machine.driver_data<suna16_state>();
 	int offs;
@@ -221,7 +221,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 ***************************************************************************/
 
-SCREEN_UPDATE( suna16 )
+SCREEN_UPDATE_IND16( suna16 )
 {
 	suna16_state *state = screen.machine().driver_data<suna16_state>();
 
@@ -231,7 +231,7 @@ SCREEN_UPDATE( suna16 )
 	return 0;
 }
 
-SCREEN_UPDATE( bestbest )
+SCREEN_UPDATE_IND16( bestbest )
 {
 	suna16_state *state = screen.machine().driver_data<suna16_state>();
 	int layers_ctrl = -1;

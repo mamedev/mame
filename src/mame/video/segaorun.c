@@ -49,7 +49,7 @@ VIDEO_START( outrun )
  *
  *************************************/
 
-SCREEN_UPDATE( shangon )
+SCREEN_UPDATE_IND16( shangon )
 {
 	/* reset priorities */
 	screen.machine().priority_bitmap.fill(0, cliprect);
@@ -80,7 +80,7 @@ SCREEN_UPDATE( shangon )
 }
 
 
-SCREEN_UPDATE( outrun )
+SCREEN_UPDATE_IND16( outrun )
 {
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)

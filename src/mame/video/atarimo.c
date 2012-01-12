@@ -37,7 +37,7 @@ public:
 	gfx_element *		gfxelement[MAX_GFX_ELEMENTS]; /* local copy of graphics elements */
 	int					gfxgranularity[MAX_GFX_ELEMENTS];
 
-	bitmap_t			*bitmap;			/* temporary bitmap to render to */
+	bitmap_ind16			*bitmap;			/* temporary bitmap to render to */
 
 	int					linked;				/* are the entries linked? */
 	int					split;				/* are entries split or together? */
@@ -401,7 +401,7 @@ void atarimo_init(running_machine &machine, int map, const atarimo_desc *desc)
 	mo->slip_ram      = auto_alloc_array_clear(machine, UINT16, 0x80);
 
 	/* allocate the temp bitmap */
-	mo->bitmap        = auto_bitmap_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height(), BITMAP_FORMAT_INDEXED16);
+	mo->bitmap        = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
 	mo->bitmap->fill(desc->transpen);
 
 	/* allocate the spriteram */
@@ -636,7 +636,7 @@ static void convert_dirty_grid_to_rects(atarimo_data *mo, const rectangle &clipr
     destination bitmap.
 ---------------------------------------------------------------*/
 
-bitmap_t *atarimo_render(int map, const rectangle &cliprect, atarimo_rect_list *rectlist)
+bitmap_ind16 *atarimo_render(int map, const rectangle &cliprect, atarimo_rect_list *rectlist)
 {
 	atarimo_data *mo = atarimo[map];
 	int startband, stopband, band, i;
@@ -743,7 +743,7 @@ static int mo_render_object(atarimo_data *mo, const atarimo_entry *entry, const 
 {
 	int gfxindex = mo->gfxlookup[EXTRACT_DATA(entry, mo->gfxmask)];
 	const gfx_element *gfx = mo->gfxelement[gfxindex];
-	bitmap_t &bitmap = *mo->bitmap;
+	bitmap_ind16 &bitmap = *mo->bitmap;
 	int x, y, sx, sy;
 
 	/* extract data from the various words */
@@ -1142,7 +1142,7 @@ WRITE16_HANDLER( atarimo_1_slipram_w )
     or the end of line.
 ---------------------------------------------------------------*/
 
-void atarimo_mark_high_palette(bitmap_t &bitmap, UINT16 *pf, UINT16 *mo, int x, int y)
+void atarimo_mark_high_palette(bitmap_ind16 &bitmap, UINT16 *pf, UINT16 *mo, int x, int y)
 {
 	#define START_MARKER	((4 << ATARIMO_PRIORITY_SHIFT) | 2)
 	#define END_MARKER		((4 << ATARIMO_PRIORITY_SHIFT) | 4)

@@ -1001,7 +1001,6 @@ static MACHINE_CONFIG_START( cosmic, cosmic_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 MACHINE_CONFIG_END
@@ -1031,7 +1030,7 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 
 	MCFG_PALETTE_INIT(panic)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(panic)
+	MCFG_SCREEN_UPDATE_STATIC(panic)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1057,7 +1056,7 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 
 	MCFG_PALETTE_INIT(cosmica)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(cosmica)
+	MCFG_SCREEN_UPDATE_STATIC(cosmica)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1089,10 +1088,9 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE(cosmicg)
+	MCFG_SCREEN_UPDATE_STATIC(cosmicg)
 
 	MCFG_PALETTE_LENGTH(16)
 
@@ -1122,7 +1120,7 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 
 	MCFG_PALETTE_INIT(magspot)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(magspot)
+	MCFG_SCREEN_UPDATE_STATIC(magspot)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1138,7 +1136,7 @@ static MACHINE_CONFIG_DERIVED( devzone, magspot )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(devzone)
+	MCFG_SCREEN_UPDATE_STATIC(devzone)
 MACHINE_CONFIG_END
 
 
@@ -1154,7 +1152,7 @@ static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
 
 	MCFG_PALETTE_INIT(nomnlnd)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(nomnlnd)
+	MCFG_SCREEN_UPDATE_STATIC(nomnlnd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

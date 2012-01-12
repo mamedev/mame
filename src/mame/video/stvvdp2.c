@@ -104,6 +104,7 @@ In other words,the first three types uses the offset and not the color allocated
 #include "emu.h"
 #include "profiler.h"
 #include "includes/stv.h"
+#include "drawgfxm.h"
 
 static UINT8 get_vblank(running_machine &machine);
 static UINT8 get_hblank(running_machine &machine);
@@ -116,7 +117,7 @@ static void refresh_palette_data(running_machine &machine);
 static int stv_vdp2_window_process(running_machine &machine,int x,int y);
 static int stv_vdp2_apply_window_on_layer(running_machine &machine,rectangle &cliprect);
 static void stv_vdp2_get_window0_coordinates(running_machine &machine,UINT16 *s_x, UINT16 *e_x, UINT16 *s_y, UINT16 *e_y);
-static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
+static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 enum
 {
@@ -2433,21 +2434,18 @@ static UINT8 stv_vdp2_check_vram_cycle_pattern_registers(
 	return access_command_ok == 3 ? 1 : 0;
 }
 
-INLINE UINT16 stv_add_blend(UINT16 a, UINT16 b)
+INLINE UINT32 stv_add_blend(UINT32 a, UINT32 b)
 {
-	UINT16 _r = ((a & 0x7c00) >> 10) + ((b & 0x7c00) >> 10);
-	UINT16 _g = ((a & 0x03e0) >>  5) + ((b & 0x03e0) >>  5);
-	UINT16 _b = ((a & 0x001f) >>  0) + ((b & 0x001f) >>  0);
-
-	if ( _r > 0x1f ) _r = 0x1f;
-	if ( _g > 0x1f ) _g = 0x1f;
-	if ( _b > 0x1f ) _b = 0x1f;
-
-	return (_r<<10) | (_g<<5) | (_b<<0);
+	UINT32 rb = (a & 0xff00ff) + (b & 0xff00ff);
+	UINT32 g = (a & 0x00ff00) + (b & 0x00ff00);
+	if (rb & 0x1000000) rb |= 0xff0000;
+	if (g & 0x10000) g = 0xff00;
+	if (rb & 0x100) rb |= 0xff;
+	return (rb & 0xff00ff) | g;
 }
 
 static void stv_vdp2_drawgfxzoom(
-		bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,int scalex, int scaley,
 		int sprite_screen_width, int sprite_screen_height, int alpha)
@@ -2560,7 +2558,7 @@ static void stv_vdp2_drawgfxzoom(
 						for( y=sy; y<ey; y++ )
 						{
 							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT16 *dest = &dest_bmp.pix16(y);
+							UINT32 *dest = &dest_bmp.pix32(y);
 
 							int x, x_index = x_index_base;
 							for( x=sx; x<ex; x++ )
@@ -2577,7 +2575,7 @@ static void stv_vdp2_drawgfxzoom(
 						for( y=sy; y<ey; y++ )
 						{
 							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT16 *dest = &dest_bmp.pix16(y);
+							UINT32 *dest = &dest_bmp.pix32(y);
 
 							int x, x_index = x_index_base;
 							for( x=sx; x<ex; x++ )
@@ -2599,7 +2597,7 @@ static void stv_vdp2_drawgfxzoom(
 						for( y=sy; y<ey; y++ )
 						{
 							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT16 *dest = &dest_bmp.pix16(y);
+							UINT32 *dest = &dest_bmp.pix32(y);
 
 							int x, x_index = x_index_base;
 							for( x=sx; x<ex; x++ )
@@ -2617,7 +2615,7 @@ static void stv_vdp2_drawgfxzoom(
 						for( y=sy; y<ey; y++ )
 						{
 							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT16 *dest = &dest_bmp.pix16(y);
+							UINT32 *dest = &dest_bmp.pix32(y);
 
 							int x, x_index = x_index_base;
 							for( x=sx; x<ex; x++ )
@@ -2638,13 +2636,13 @@ static void stv_vdp2_drawgfxzoom(
 					for( y=sy; y<ey; y++ )
 					{
 						const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-						UINT16 *dest = &dest_bmp.pix16(y);
+						UINT32 *dest = &dest_bmp.pix32(y);
 
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
 						{
 							int c = source[x_index>>16];
-							if( c != transparent_color ) dest[x] = alpha_blend_r16(dest[x], pal[c], alpha);
+							if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
 							x_index += dx;
 						}
 
@@ -2660,7 +2658,7 @@ static void stv_vdp2_drawgfxzoom(
 						for( y=sy; y<ey; y++ )
 						{
 							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT16 *dest = &dest_bmp.pix16(y);
+							UINT32 *dest = &dest_bmp.pix32(y);
 
 							int x, x_index = x_index_base;
 							for( x=sx; x<ex; x++ )
@@ -2678,7 +2676,7 @@ static void stv_vdp2_drawgfxzoom(
 						for( y=sy; y<ey; y++ )
 						{
 							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT16 *dest = &dest_bmp.pix16(y);
+							UINT32 *dest = &dest_bmp.pix32(y);
 
 							int x, x_index = x_index_base;
 							for( x=sx; x<ex; x++ )
@@ -2699,12 +2697,9 @@ static void stv_vdp2_drawgfxzoom(
 
 }
 
-static void stv_vdp2_compute_color_offset_RGB555( running_machine &machine,int *r, int *g, int *b, int cor )
+static void stv_vdp2_compute_color_offset( running_machine &machine,int *r, int *g, int *b, int cor )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	*r <<= 3;
-	*g <<= 3;
-	*b <<= 3;
 	if ( cor == 0 )
 	{
 		*r = (STV_VDP2_COAR & 0x100) ? (*r - (0x100 - (STV_VDP2_COAR & 0xff))) : ((STV_VDP2_COAR & 0xff) + *r);
@@ -2723,18 +2718,14 @@ static void stv_vdp2_compute_color_offset_RGB555( running_machine &machine,int *
 	if(*g > 0xff)	{ *g = 0xff; }
 	if(*b < 0)		{ *b = 0; }
 	if(*b > 0xff)	{ *b = 0xff; }
-	*r >>= 3;
-	*g >>= 3;
-	*b >>= 3;
-
 }
 
-static void stv_vdp2_compute_color_offset_RGB555_UINT16(running_machine &machine,UINT16 *rgb, int cor)
+static void stv_vdp2_compute_color_offset_UINT32(running_machine &machine,UINT32 *rgb, int cor)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	int _r = (*rgb & 0x7c00) >> (10-3);
-	int _g = (*rgb & 0x03e0) >> (5-3);
-	int _b = (*rgb & 0x001f) << 3;
+	int _r = RGB_RED(*rgb);
+	int _g = RGB_GREEN(*rgb);
+	int _b = RGB_BLUE(*rgb);
 	if ( cor == 0 )
 	{
 		_r = (STV_VDP2_COAR & 0x100) ? (_r - (0x100 - (STV_VDP2_COAR & 0xff))) : ((STV_VDP2_COAR & 0xff) + _r);
@@ -2753,14 +2744,11 @@ static void stv_vdp2_compute_color_offset_RGB555_UINT16(running_machine &machine
 	if(_g > 0xff)	{ _g = 0xff; }
 	if(_b < 0)		{ _b = 0; }
 	if(_b > 0xff)	{ _b = 0xff; }
-	_r >>= 3;
-	_g >>= 3;
-	_b >>= 3;
 
-	*rgb = (_r << 10) |  (_g << 5) | _b;
+	*rgb = MAKE_RGB(_r, _g, _b);
 }
 
-static void stv_vdp2_drawgfx_rgb555( bitmap_t &dest_bmp, const rectangle &clip, running_machine &machine, UINT32 code, int flipx, int flipy,
+static void stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &clip, running_machine &machine, UINT32 code, int flipx, int flipy,
 									 int sx, int sy, int transparency, int alpha)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -2837,7 +2825,7 @@ static void stv_vdp2_drawgfx_rgb555( bitmap_t &dest_bmp, const rectangle &clip, 
 			for( y=sy; y<ey; y++ )
 			{
 				const UINT8 *source = gfxdata + (y_index>>16)*16;
-				UINT16 *dest = &dest_bmp.pix16(y);
+				UINT32 *dest = &dest_bmp.pix32(y);
 				UINT16 data;
 
 				int x, x_index = x_index_base;
@@ -2849,16 +2837,16 @@ static void stv_vdp2_drawgfx_rgb555( bitmap_t &dest_bmp, const rectangle &clip, 
 					t_pen = (data & 0x8000) || ( transparency == STV_TRANSPARENCY_NONE );
 					if (t_pen)
 					{
-						b = (data & 0x7c00) >> 10;
-						g = (data & 0x03e0) >> 5;
-						r = (data & 0x001f);
+						b = (data & 0x7c00) >> 7;
+						g = (data & 0x03e0) >> 2;
+						r = (data & 0x001f) << 3;
 						if(stv2_current_tilemap.fade_control & 1)
-							stv_vdp2_compute_color_offset_RGB555(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+							stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
 						if ( transparency == STV_TRANSPARENCY_ALPHA )
-							dest[x] = alpha_blend_r16( dest[x], b | g << 5 | r << 10, alpha );
+							dest[x] = alpha_blend_r32( dest[x], MAKE_RGB(r, g, b), alpha );
 						else
-							dest[x] = b | g << 5 | r << 10;
+							dest[x] = MAKE_RGB(r, g, b);
 					}
 					x_index += dx;
 				}
@@ -2873,7 +2861,7 @@ static void stv_vdp2_drawgfx_rgb555( bitmap_t &dest_bmp, const rectangle &clip, 
 }
 
 
-static void stv_vdp2_drawgfx_rgb888( bitmap_t &dest_bmp, const rectangle &clip, running_machine &machine, UINT32 code, int flipx, int flipy,
+static void stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectangle &clip, running_machine &machine, UINT32 code, int flipx, int flipy,
 									 int sx, int sy, int transparency, int alpha)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -2949,7 +2937,7 @@ static void stv_vdp2_drawgfx_rgb888( bitmap_t &dest_bmp, const rectangle &clip, 
 			for( y=sy; y<ey; y++ )
 			{
 				const UINT8 *source = gfxdata + (y_index>>16)*32;
-				UINT16 *dest = &dest_bmp.pix16(y);
+				UINT32 *dest = &dest_bmp.pix32(y);
 				UINT32 data;
 
 				int x, x_index = x_index_base;
@@ -2965,18 +2953,14 @@ static void stv_vdp2_drawgfx_rgb888( bitmap_t &dest_bmp, const rectangle &clip, 
 						b = (data & 0xff0000) >> 16;
 						g = (data & 0x00ff00) >> 8;
 						r = (data & 0x0000ff);
-						/* HACK: downscale because we don't yet do true color */
-						b >>= 3;
-						g >>= 3;
-						r >>= 3;
 
 						if(stv2_current_tilemap.fade_control & 1)
-							stv_vdp2_compute_color_offset_RGB555(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+							stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
 						if ( transparency == STV_TRANSPARENCY_ALPHA )
-							dest[x] = alpha_blend_r16( dest[x], b | g << 5 | r << 10, alpha );
+							dest[x] = alpha_blend_r32( dest[x], MAKE_RGB(r, g, b), alpha );
 						else
-							dest[x] = b | g << 5 | r << 10;
+							dest[x] = MAKE_RGB(r, g, b);
 					}
 					x_index += dx;
 				}
@@ -2990,7 +2974,7 @@ static void stv_vdp2_drawgfx_rgb888( bitmap_t &dest_bmp, const rectangle &clip, 
 
 }
 
-static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
@@ -3003,7 +2987,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 	int xlinesize = 0/*, xpixelsize = 0*/;
 	int xcnt,ycnt;
 	UINT8* gfxdata = state->m_vdp2.gfx_decode;
-	static UINT16 *destline;
+	static UINT32 *destline;
 	UINT16 pal_color_offset = 0;
 	UINT8* gfxdatalow, *gfxdatahigh;
 	/*Window effect 1=no draw*/
@@ -3081,9 +3065,9 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 							if (((xcnt + 1) <= screen_x) && (ycnt <= screen_y))
 							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-								bitmap.pix16(ycnt, xcnt+1) = machine.pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
+								bitmap.pix32(ycnt, xcnt+1) = machine.pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 							else
-								bitmap.pix16(ycnt, xcnt+1) = alpha_blend_r16(bitmap.pix16(ycnt, xcnt+1), machine.pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
+								bitmap.pix32(ycnt, xcnt+1) = alpha_blend_r32(bitmap.pix32(ycnt, xcnt+1), machine.pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
 							}
 						}
 					}
@@ -3097,9 +3081,9 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 							if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-								bitmap.pix16(ycnt, xcnt) = machine.pens[((gfxdata[0] & 0xf0) >> 4) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
+								bitmap.pix32(ycnt, xcnt) = machine.pens[((gfxdata[0] & 0xf0) >> 4) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 							else
-								bitmap.pix16(ycnt, xcnt) = alpha_blend_r16(bitmap.pix16(ycnt, xcnt), machine.pens[((gfxdata[0] & 0xf0) >> 4) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
+								bitmap.pix32(ycnt, xcnt) = alpha_blend_r32(bitmap.pix32(ycnt, xcnt), machine.pens[((gfxdata[0] & 0xf0) >> 4) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
 							}
 						}
 					}
@@ -3132,9 +3116,9 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 								if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-									bitmap.pix16(ycnt, xcnt) = machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
+									bitmap.pix32(ycnt, xcnt) = machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 								else
-									bitmap.pix16(ycnt, xcnt) = alpha_blend_r16(bitmap.pix16(ycnt, xcnt), machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
+									bitmap.pix32(ycnt, xcnt) = alpha_blend_r32(bitmap.pix32(ycnt, xcnt), machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
 								}
 							}
 						}
@@ -3163,7 +3147,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 					gfxdata += xlinesize*(yy>>16);
 					yy &= 0xffff;
 
-					destline = &bitmap.pix16(ycnt);
+					destline = &bitmap.pix32(ycnt);
 					xx = 0;
 					for (xcnt = cliprect.min_x; xcnt <= cliprect.max_x; xx+=stv2_current_tilemap.incx, xcnt++)
 					{
@@ -3178,9 +3162,9 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 								if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-									bitmap.pix16(ycnt, xcnt) = machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
+									bitmap.pix32(ycnt, xcnt) = machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 								else
-									bitmap.pix16(ycnt, xcnt) = alpha_blend_r16(bitmap.pix16(ycnt, xcnt), machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
+									bitmap.pix32(ycnt, xcnt) = alpha_blend_r32(bitmap.pix32(ycnt, xcnt), machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
 								}
 							}
 						}
@@ -3206,9 +3190,9 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 							if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-								bitmap.pix16(ycnt, xcnt) = machine.pens[((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff) | pal_color_offset];
+								bitmap.pix32(ycnt, xcnt) = machine.pens[((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff) | pal_color_offset];
 							else
-								bitmap.pix16(ycnt, xcnt) = alpha_blend_r16(bitmap.pix16(ycnt, xcnt), machine.pens[((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff) | pal_color_offset], stv2_current_tilemap.alpha);
+								bitmap.pix32(ycnt, xcnt) = alpha_blend_r32(bitmap.pix32(ycnt, xcnt), machine.pens[((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff) | pal_color_offset], stv2_current_tilemap.alpha);
 							}
 						}
 					}
@@ -3233,7 +3217,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 
 				for (ycnt = cliprect.min_y; ycnt <= cliprect.max_y; ycnt++)
 				{
-					destline = &bitmap.pix16(ycnt);
+					destline = &bitmap.pix32(ycnt);
 
 					for (xcnt = cliprect.min_x; xcnt <= cliprect.max_x; xcnt++)
 					{
@@ -3244,20 +3228,20 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 
 						if(t_pen)
 						{
-							b = ((gfxdata[2*xs] & 0x7c) >> 2);
-							g = ((gfxdata[2*xs] & 0x03) << 3) | ((gfxdata[2*xs+1] & 0xe0) >> 5);
-							r = ((gfxdata[2*xs+1] & 0x1f));
+							b = ((gfxdata[2*xs] & 0x7c) << 1);
+							g = ((gfxdata[2*xs] & 0x03) << 6) | ((gfxdata[2*xs+1] & 0xe0) >> 2);
+							r = ((gfxdata[2*xs+1] & 0x1f) << 3);
 							if(stv2_current_tilemap.fade_control & 1)
-								stv_vdp2_compute_color_offset_RGB555(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+								stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 							tw = stv_vdp2_window_process(machine,xcnt,ycnt);
 							if(tw == 0)
 							{
 								if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-									destline[xcnt] = b | g << 5 | r << 10;
+									destline[xcnt] = MAKE_RGB(r, g, b);
 								else
-									destline[xcnt] = alpha_blend_r16( destline[xcnt], b | g << 5 | r << 10, stv2_current_tilemap.alpha );
+									destline[xcnt] = alpha_blend_r32( destline[xcnt], MAKE_RGB(r, g, b), stv2_current_tilemap.alpha );
 								}
 							}
 						}
@@ -3279,7 +3263,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 					gfxdata += xlinesize*(yy>>16);
 					yy &= 0xffff;
 
-					destline = &bitmap.pix16(ycnt);
+					destline = &bitmap.pix32(ycnt);
 					xx = 0;
 					for (xcnt = cliprect.min_x; xcnt <= cliprect.max_x; xx+=stv2_current_tilemap.incx, xcnt++)
 					{
@@ -3288,11 +3272,11 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 						xs = xx >> 16;
 						t_pen = ((gfxdata[2*xs] & 0x80) >> 7);
 						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
-						b = ((gfxdata[2*xs] & 0x7c) >> 2);
-						g = ((gfxdata[2*xs] & 0x03) << 3) | ((gfxdata[2*xs+1] & 0xe0) >> 5);
-						r = ((gfxdata[2*xs+1] & 0x1f));
+						b = ((gfxdata[2*xs] & 0x7c) << 1);
+						g = ((gfxdata[2*xs] & 0x03) << 6) | ((gfxdata[2*xs+1] & 0xe0) >> 2);
+						r = ((gfxdata[2*xs+1] & 0x1f) << 3);
 						if(stv2_current_tilemap.fade_control & 1)
-							stv_vdp2_compute_color_offset_RGB555(machine, &r,&g,&b,stv2_current_tilemap.fade_control & 2);
+							stv_vdp2_compute_color_offset(machine, &r,&g,&b,stv2_current_tilemap.fade_control & 2);
 						tw = stv_vdp2_window_process(machine,xcnt,ycnt);
 						if(tw == 0)
 						{
@@ -3301,9 +3285,9 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 								if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 1 )
-									destline[xcnt] = alpha_blend_r16( destline[xcnt], b | g << 5 | r << 10, stv2_current_tilemap.alpha );
+									destline[xcnt] = alpha_blend_r32( destline[xcnt], MAKE_RGB(r, g, b), stv2_current_tilemap.alpha );
 								else
-									destline[xcnt] = b | g << 5 | r << 10;
+									destline[xcnt] = MAKE_RGB(r, g, b);
 								}
 							}
 						}
@@ -3329,7 +3313,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 
 			for (ycnt = cliprect.min_y; ycnt <= cliprect.max_y; ycnt++)
 			{
-				destline = &bitmap.pix16(ycnt);
+				destline = &bitmap.pix32(ycnt);
 
 				for (xcnt = cliprect.min_x; xcnt <= cliprect.max_x; xcnt++)
 				{
@@ -3347,21 +3331,18 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t &bitma
 						b = ((dot_data & 0x00ff0000) >> 16);
 						g = ((dot_data & 0x0000ff00) >> 8);
 						r = ((dot_data & 0x000000ff) >> 0);
-						b >>= 3;
-						g >>= 3;
-						r >>= 3;
 
 						if(stv2_current_tilemap.fade_control & 1)
-							stv_vdp2_compute_color_offset_RGB555(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+							stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 						tw = stv_vdp2_window_process(machine,xcnt,ycnt);
 						if(tw == 0)
 						{
 							if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 							{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-									destline[xcnt] = b | g << 5 | r << 10;
+									destline[xcnt] = MAKE_RGB(r, g, b);
 								else
-									destline[xcnt] = alpha_blend_r16( destline[xcnt], b | g << 5 | r << 10, stv2_current_tilemap.alpha );
+									destline[xcnt] = alpha_blend_r32( destline[xcnt], MAKE_RGB(r, g, b), stv2_current_tilemap.alpha );
 							}
 						}
 					}
@@ -3545,7 +3526,7 @@ static void stv_vdp2_get_map_page( int x, int y, int *_map, int *_page )
 	*_map = map;
 }
 
-static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	/* hopefully this is easier to follow than it is efficient .. */
@@ -4037,7 +4018,7 @@ static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_t &bitm
 	}
 
 
-static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	rectangle mycliprect;
@@ -4169,7 +4150,7 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bit
 	}
 }
 
-static void stv_vdp2_draw_line(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_draw_line(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int x,y;
@@ -4195,20 +4176,20 @@ static void stv_vdp2_draw_line(running_machine &machine, bitmap_t &bitmap, const
 				UINT16 pen;
 
 				pen = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
-				pix = bitmap.pix16(y, x);
+				pix = bitmap.pix32(y, x);
 
-				bitmap.pix16(y, x) = stv_add_blend(machine.pens[pen & 0x7ff],pix);
+				bitmap.pix32(y, x) = stv_add_blend(machine.pens[pen & 0x7ff],pix);
 			}
 		}
 	}
 }
 
-static void stv_vdp2_draw_mosaic(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 is_roz)
+static void stv_vdp2_draw_mosaic(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 is_roz)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int x,y,xi,yi;
 	UINT8 h_size,v_size;
-	UINT16 pix;
+	UINT32 pix;
 
 	h_size = STV_VDP2_MZSZH+1;
 	v_size = STV_VDP2_MZSZV+1;
@@ -4226,16 +4207,16 @@ static void stv_vdp2_draw_mosaic(running_machine &machine, bitmap_t &bitmap, con
 	{
 		for(x=cliprect.min_x;x<=cliprect.max_x;x+=h_size)
 		{
-			pix = bitmap.pix16(y, x);
+			pix = bitmap.pix32(y, x);
 
 			for(yi=0;yi<v_size;yi++)
 				for(xi=0;xi<h_size;xi++)
-					bitmap.pix16(y+yi, x+xi) = pix;
+					bitmap.pix32(y+yi, x+xi) = pix;
 		}
 	}
 }
 
-static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* the idea is here we check the tilemap capabilities / whats enabled and call an appropriate tilemap drawing routine, or
       at the very list throw up a few errors if the tilemaps want to do something we don't support yet */
@@ -4349,12 +4330,12 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int iRP);
+static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP);
 
 
-static void stv_vdp2_copy_roz_bitmap(bitmap_t &bitmap,
+static void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 									 running_machine &machine,
-									 bitmap_t *roz_bitmap,
+									 bitmap_rgb32 &roz_bitmap,
 									 const rectangle &cliprect,
 									 int iRP,
 									 int planesizex,
@@ -4373,8 +4354,8 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t &bitmap,
 	UINT32 *coeff_table_base, coeff_table_offset;
 	INT32 coeff_table_val;
 	UINT32 address;
-	UINT16 *line;
-	UINT16 pix;
+	UINT32 *line;
+	UINT32 pix;
 	//UINT32 coeff_line_color_screen_data;
 	INT32 clipxmask = 0, clipymask = 0;
 
@@ -4509,7 +4490,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t &bitmap,
 		//dx  = (RP.A * RP.dx) + (RP.B * RP.dy);
 		//dy  = (RP.D * RP.dx) + (RP.E * RP.dy);
 
-		line = &bitmap.pix16(vcnt);
+		line = &bitmap.pix32(vcnt);
 
 		if ( !use_coeff_table || RP.dkax == 0 )
 		{
@@ -4587,21 +4568,21 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t &bitmap,
 				y = ys >> 16;
 
 				if ( x & clipxmask || y & clipymask ) continue;
-				pix = roz_bitmap->pix16(y & planerenderedsizey, x & planerenderedsizex);
+				pix = roz_bitmap.pix32(y & planerenderedsizey, x & planerenderedsizex);
 				switch( stv2_current_tilemap.transparency )
 				{
 					case STV_TRANSPARENCY_PEN:
 						if ( pix != 0x0000 )
 						{
 							if(stv2_current_tilemap.fade_control & 1)
-								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
 
 							line[hcnt] = pix;
 						}
 						break;
 					case STV_TRANSPARENCY_NONE:
 						if(stv2_current_tilemap.fade_control & 1)
-							stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+							stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
 
 						line[hcnt] = pix;
 						break;
@@ -4609,16 +4590,16 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t &bitmap,
 						if ( pix != 0x000 )
 						{
 							if(stv2_current_tilemap.fade_control & 1)
-								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
 
-							line[hcnt] = alpha_blend_r16( line[hcnt], pix, stv2_current_tilemap.alpha );
+							line[hcnt] = alpha_blend_r32( line[hcnt], pix, stv2_current_tilemap.alpha );
 						}
 						break;
 					case STV_TRANSPARENCY_ADD_BLEND:
 						if ( pix != 0x0000 )
 						{
 							if(stv2_current_tilemap.fade_control & 1)
-								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
 
 							line[hcnt] = stv_add_blend( line[hcnt], pix );
 						}
@@ -4698,21 +4679,21 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t &bitmap,
 
 				if ( x & clipxmask || y & clipymask ) continue;
 
-				pix = roz_bitmap->pix16(y & planerenderedsizey, x & planerenderedsizex);
+				pix = roz_bitmap.pix32(y & planerenderedsizey, x & planerenderedsizex);
 				switch( stv2_current_tilemap.transparency )
 				{
 					case STV_TRANSPARENCY_PEN:
 						if ( pix != 0x0000 )
 						{
 							if(stv2_current_tilemap.fade_control & 1)
-								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
 
 							line[hcnt] = pix;
 						}
 						break;
 					case STV_TRANSPARENCY_NONE:
 						if(stv2_current_tilemap.fade_control & 1)
-							stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+							stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
 
 						line[hcnt] = pix;
 						break;
@@ -4720,16 +4701,16 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t &bitmap,
 						if ( pix != 0x000 )
 						{
 							if(stv2_current_tilemap.fade_control & 1)
-								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
 
-							line[hcnt] = alpha_blend_r16( line[hcnt], pix, stv2_current_tilemap.alpha );
+							line[hcnt] = alpha_blend_r32( line[hcnt], pix, stv2_current_tilemap.alpha );
 						}
 						break;
 					case STV_TRANSPARENCY_ADD_BLEND:
 						if ( pix != 0x0000 )
 						{
 							if(stv2_current_tilemap.fade_control & 1)
-								stv_vdp2_compute_color_offset_RGB555_UINT16(machine,&pix,stv2_current_tilemap.fade_control & 2);
+								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
 
 							line[hcnt] = stv_add_blend( line[hcnt], pix );
 						}
@@ -4740,7 +4721,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t &bitmap,
 	}
 }
 
-static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	UINT32 base_mask;
@@ -4842,7 +4823,7 @@ static void stv_vdp2_draw_NBG0(running_machine &machine, bitmap_t &bitmap, const
 		stv_vdp2_check_tilemap(machine, bitmap, cliprect);
 }
 
-static void stv_vdp2_draw_NBG1(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_draw_NBG1(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	UINT32 base_mask;
@@ -4940,7 +4921,7 @@ static void stv_vdp2_draw_NBG1(running_machine &machine, bitmap_t &bitmap, const
 	stv_vdp2_check_tilemap(machine, bitmap, cliprect);
 }
 
-static void stv_vdp2_draw_NBG2(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_draw_NBG2(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
@@ -5045,7 +5026,7 @@ static void stv_vdp2_draw_NBG2(running_machine &machine, bitmap_t &bitmap, const
 	stv_vdp2_check_tilemap(machine, bitmap, cliprect);
 }
 
-static void stv_vdp2_draw_NBG3(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_draw_NBG3(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	/*
@@ -5150,7 +5131,7 @@ static void stv_vdp2_draw_NBG3(running_machine &machine, bitmap_t &bitmap, const
 }
 
 
-static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int iRP)
+static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	rectangle roz_clip_rect, mycliprect;
@@ -5254,8 +5235,8 @@ static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t &bi
 	}
 	else
 	{
-		if ( state->m_vdp2.roz_bitmap[iRP-1] == NULL )
-			state->m_vdp2.roz_bitmap[iRP-1] = auto_alloc(machine, bitmap_t(4096, 4096, machine.primary_screen->format()));
+		if ( !state->m_vdp2.roz_bitmap[iRP-1].valid() )
+			state->m_vdp2.roz_bitmap[iRP-1].allocate(4096, 4096);
 
 		roz_clip_rect.min_x = roz_clip_rect.min_y = 0;
 		if ( (iRP == 1 && STV_VDP2_RAOVR == 3) ||
@@ -5292,8 +5273,8 @@ static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t &bi
 		if ( (stv_rbg_cache_data.is_cache_dirty & iRP) ||
 			memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)) != 0 )
 		{
-			state->m_vdp2.roz_bitmap[iRP-1]->fill(get_black_pen(machine), roz_clip_rect );
-			stv_vdp2_check_tilemap(machine, *state->m_vdp2.roz_bitmap[iRP-1], roz_clip_rect);
+			state->m_vdp2.roz_bitmap[iRP-1].fill(get_black_pen(machine), roz_clip_rect );
+			stv_vdp2_check_tilemap(machine, state->m_vdp2.roz_bitmap[iRP-1], roz_clip_rect);
 			// prepare cache data
 			stv_rbg_cache_data.watch_vdp2_vram_writes |= iRP;
 			stv_rbg_cache_data.is_cache_dirty &= ~iRP;
@@ -5334,7 +5315,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t &bi
 
 }
 
-static void stv_vdp2_draw_RBG0(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_draw_RBG0(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	/*
@@ -5437,7 +5418,7 @@ static void stv_vdp2_draw_RBG0(running_machine &machine, bitmap_t &bitmap, const
 
 }
 
-static void stv_vdp2_draw_back(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void stv_vdp2_draw_back(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int x,y;
@@ -5468,13 +5449,13 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t &bitmap, const
 				UINT16 dot;
 
 				dot = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
-				b = (dot & 0x7c00) >> 10;
-				g = (dot & 0x03e0) >> 5;
-				r = (dot & 0x001f) >> 0;
+				b = (dot & 0x7c00) >> 7;
+				g = (dot & 0x03e0) >> 2;
+				r = (dot & 0x001f) << 3;
 				if(STV_VDP2_BKCOEN)
-					stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_BKCOSL );
+					stv_vdp2_compute_color_offset( machine, &r, &g, &b, STV_VDP2_BKCOSL );
 
-				bitmap.pix16(y, x) = b | g << 5 | r << 10;
+				bitmap.pix32(y, x) = MAKE_RGB(r, g, b);
 			}
 		}
 	}
@@ -5907,7 +5888,8 @@ static void stv_vdp2_state_save_postload(running_machine &machine)
 static void stv_vdp2_exit (running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	state->m_vdp2.roz_bitmap[0] =  state->m_vdp2.roz_bitmap[1] = NULL;
+	state->m_vdp2.roz_bitmap[0].reset();
+	state->m_vdp2.roz_bitmap[1].reset();
 }
 
 static int stv_vdp2_start (running_machine &machine)
@@ -5939,7 +5921,7 @@ static int stv_vdp2_start (running_machine &machine)
 VIDEO_START( stv_vdp2 )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	state->m_vdp2.roz_bitmap[0] =  state->m_vdp2.roz_bitmap[1] = NULL;
+	state->m_tmpbitmap.allocate(704, 256);
 	stv_vdp2_start(machine);
 	stv_vdp1_start(machine);
 	debug.l_en = 0xff;
@@ -6267,14 +6249,14 @@ static int		stv_sprite_priorities_used[8];
 static int		stv_sprite_priorities_usage_valid;
 static UINT8	stv_sprite_priorities_in_fb_line[512][8];
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 pri)
+static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 pri)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int x,y,r,g,b;
 	int i;
 	UINT16 pix;
 	UINT16 *framebuffer_line;
-	UINT16 *bitmap_line, *bitmap_line2 = NULL;
+	UINT32 *bitmap_line, *bitmap_line2 = NULL;
 	UINT8  interlace_framebuffer;
 	UINT8  double_x;
 	static const UINT16 sprite_colormask_table[] = {
@@ -6398,7 +6380,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 						continue;
 
 				framebuffer_line = state->m_vdp1.framebuffer_display_lines[y];
-				bitmap_line = &bitmap.pix16(y);
+				bitmap_line = &bitmap.pix32(y);
 
 				for ( x = mycliprect.min_x; x <= mycliprect.max_x; x++ )
 				{
@@ -6415,16 +6397,16 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 						if(STV_VDP2_SPWINEN && pix == 0x8000) /* Pukunpa */
 							continue;
 
-						b = (pix & 0x7c00) >> 10;
-						g = (pix & 0x03e0) >> 5;
-						r = (pix & 0x1f);
+						b = (pix & 0x7c00) >> 7;
+						g = (pix & 0x03e0) >> 2;
+						r = (pix & 0x1f) << 3;
 
 						if ( color_offset_pal )
 						{
-							stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_SPCOSL );
+							stv_vdp2_compute_color_offset( machine, &r, &g, &b, STV_VDP2_SPCOSL );
 						}
 
-						bitmap_line[x] = b | g << 5 | r << 10;
+						bitmap_line[x] = MAKE_RGB(r, g, b);
 					}
 					else
 					{
@@ -6440,7 +6422,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 						{
 							if ( pix & ~sprite_shadow )
 							{
-								bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
+								bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
 							}
 						}
 						else
@@ -6451,7 +6433,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 								/*shadow - in reality, we should check from what layer pixel beneath comes...*/
 								if ( STV_VDP2_SDCTL & 0x3f )
 								{
-									bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
+									bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
 								}
 								/* note that when shadows are disabled, "shadow" palette entries are not drawn */
 							}
@@ -6476,7 +6458,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 						continue;
 
 				framebuffer_line = state->m_vdp1.framebuffer_display_lines[y];
-				bitmap_line = &bitmap.pix16(y);
+				bitmap_line = &bitmap.pix32(y);
 
 				for ( x = mycliprect.min_x; x <= mycliprect.max_x; x++ )
 				{
@@ -6490,21 +6472,21 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 							continue;
 						};
 
-						b = (pix & 0x7c00) >> 10;
-						g = (pix & 0x03e0) >> 5;
-						r = (pix & 0x1f);
+						b = (pix & 0x7c00) >> 7;
+						g = (pix & 0x03e0) >> 2;
+						r = (pix & 0x1f) << 3;
 						if ( color_offset_pal )
 						{
-							stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_SPCOSL );
+							stv_vdp2_compute_color_offset( machine, &r, &g, &b, STV_VDP2_SPCOSL );
 						}
 						ccr = sprite_ccr[0];
 						if ( STV_VDP2_CCMD )
 						{
-							bitmap_line[x] = stv_add_blend( bitmap_line[x], b | g << 5 | r << 10 );
+							bitmap_line[x] = stv_add_blend( bitmap_line[x], MAKE_RGB(r, g, b));
 						}
 						else
 						{
-							bitmap_line[x] = alpha_blend_r16( bitmap_line[x], b | g << 5 | r << 10, ((UINT16)(0x1f-ccr)*0xff)/0x1f);
+							bitmap_line[x] = alpha_blend_r32( bitmap_line[x], MAKE_RGB(r, g ,b), ((UINT16)(0x1f-ccr)*0xff)/0x1f);
 						}
 					}
 					else
@@ -6530,7 +6512,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 						{
 							if ( pix & ~sprite_shadow )
 							{
-								bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
+								bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
 							}
 						}
 						else
@@ -6541,7 +6523,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 								/*shadow - in reality, we should check from what layer pixel beneath comes...*/
 								if ( STV_VDP2_SDCTL & 0x3f )
 								{
-									bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
+									bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
 								}
 								/* note that when shadows are disabled, "shadow" palette entries are not drawn */
 							} else if ( pix )
@@ -6557,7 +6539,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 									}
 									else
 									{
-										bitmap_line[x] = alpha_blend_r16( bitmap_line[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										bitmap_line[x] = alpha_blend_r32( bitmap_line[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
 									}
 								}
 								else
@@ -6580,12 +6562,12 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 			framebuffer_line = state->m_vdp1.framebuffer_display_lines[y];
 			if ( interlace_framebuffer == 0 )
 			{
-				bitmap_line = &bitmap.pix16(y);
+				bitmap_line = &bitmap.pix32(y);
 			}
 			else
 			{
-				bitmap_line = &bitmap.pix16(2*y);
-				bitmap_line2 = &bitmap.pix16(2*y + 1);
+				bitmap_line = &bitmap.pix32(2*y);
+				bitmap_line2 = &bitmap.pix32(2*y + 1);
 			}
 
 			for ( x = mycliprect.min_x; x <= mycliprect.max_x /(double_x+1) ; x++ )
@@ -6599,26 +6581,26 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 						stv_sprite_priorities_in_fb_line[y][sprite_priorities[0]] = 1;
 						continue;
 					};
-					b = (pix & 0x7c00) >> 10;
-					g = (pix & 0x03e0) >> 5;
-					r = (pix & 0x1f);
+					b = (pix & 0x7c00) >> 7;
+					g = (pix & 0x03e0) >> 2;
+					r = (pix & 0x1f) << 3;
 					if ( color_offset_pal )
 					{
-						stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_SPCOSL );
+						stv_vdp2_compute_color_offset( machine, &r, &g, &b, STV_VDP2_SPCOSL );
 					}
 					if ( alpha_enabled == 0 )
 					{
 						if(double_x)
 						{
-							bitmap_line[x*2] = b | g << 5 | r << 10;
-							if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = b | g << 5 | r << 10;
-							bitmap_line[x*2+1] = b | g << 5 | r << 10;
-							if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = b | g << 5 | r << 10;
+							bitmap_line[x*2] = MAKE_RGB(r, g, b);
+							if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = MAKE_RGB(r, g, b);
+							bitmap_line[x*2+1] = MAKE_RGB(r, g, b);
+							if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = MAKE_RGB(r, g, b);
 						}
 						else
 						{
-							bitmap_line[x] = b | g << 5 | r << 10;
-							if ( interlace_framebuffer == 1 ) bitmap_line2[x] = b | g << 5 | r << 10;
+							bitmap_line[x] = MAKE_RGB(r, g, b);
+							if ( interlace_framebuffer == 1 ) bitmap_line2[x] = MAKE_RGB(r, g, b);
 						}
 					}
 					else // alpha_blend == 1
@@ -6629,30 +6611,30 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 						{
 							if(double_x)
 							{
-								bitmap_line[x*2] = stv_add_blend( bitmap_line[x*2], b | g << 5 | r << 10 );
-								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = stv_add_blend( bitmap_line2[x*2], b | g << 5 | r << 10 );
-								bitmap_line[x*2+1] = stv_add_blend( bitmap_line[x*2+1], b | g << 5 | r << 10 );
-								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = stv_add_blend( bitmap_line2[x*2+1], b | g << 5 | r << 10 );
+								bitmap_line[x*2] = stv_add_blend( bitmap_line[x*2], MAKE_RGB(r, g, b) );
+								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = stv_add_blend( bitmap_line2[x*2], MAKE_RGB(r, g, b) );
+								bitmap_line[x*2+1] = stv_add_blend( bitmap_line[x*2+1], MAKE_RGB(r, g, b) );
+								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = stv_add_blend( bitmap_line2[x*2+1], MAKE_RGB(r, g, b) );
 							}
 							else
 							{
-								bitmap_line[x] = stv_add_blend( bitmap_line[x], b | g << 5 | r << 10 );
-								if ( interlace_framebuffer == 1 ) bitmap_line2[x] = stv_add_blend( bitmap_line2[x], b | g << 5 | r << 10 );
+								bitmap_line[x] = stv_add_blend( bitmap_line[x], MAKE_RGB(r, g, b) );
+								if ( interlace_framebuffer == 1 ) bitmap_line2[x] = stv_add_blend( bitmap_line2[x], MAKE_RGB(r, g, b) );
 							}
 						}
 						else
 						{
 							if(double_x)
 							{
-								bitmap_line[x*2] = alpha_blend_r16( bitmap_line[x*2], b | g << 5 | r << 10, ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = alpha_blend_r16( bitmap_line2[x*2], b | g << 5 | r << 10, ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-								bitmap_line[x*2+1] = alpha_blend_r16( bitmap_line[x*2+1], b | g << 5 | r << 10, ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = alpha_blend_r16( bitmap_line2[x*2+1], b | g << 5 | r << 10, ((UINT16)(0x1f-ccr)*0xff)/0x1f);
+								bitmap_line[x*2] = alpha_blend_r32( bitmap_line[x*2], MAKE_RGB(r, g, b), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = alpha_blend_r32( bitmap_line2[x*2], MAKE_RGB(r, g, b), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+								bitmap_line[x*2+1] = alpha_blend_r32( bitmap_line[x*2+1], MAKE_RGB(r, g, b), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+								if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = alpha_blend_r32( bitmap_line2[x*2+1], MAKE_RGB(r, g, b), ((UINT16)(0x1f-ccr)*0xff)/0x1f);
 							}
 							else
 							{
-								bitmap_line[x] = alpha_blend_r16( bitmap_line[x], b | g << 5 | r << 10, ((UINT16)(0x1f-ccr)*0xff)/0x1f);
-								if ( interlace_framebuffer == 1 ) bitmap_line2[x] = alpha_blend_r16( bitmap_line2[x], b | g << 5 | r << 10, ((UINT16)(0x1f-ccr)*0xff)/0x1f);
+								bitmap_line[x] = alpha_blend_r32( bitmap_line[x], MAKE_RGB(r, g, b), ((UINT16)(0x1f-ccr)*0xff)/0x1f);
+								if ( interlace_framebuffer == 1 ) bitmap_line2[x] = alpha_blend_r32( bitmap_line2[x], MAKE_RGB(r, g, b), ((UINT16)(0x1f-ccr)*0xff)/0x1f);
 							}
 						}
 					}
@@ -6737,15 +6719,15 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 								{
 									if(double_x)
 									{
-										bitmap_line[x*2] = alpha_blend_r16( bitmap_line[x*2], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = alpha_blend_r16( bitmap_line2[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-										bitmap_line[x*2+1] = alpha_blend_r16( bitmap_line[x*2+1], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = alpha_blend_r16( bitmap_line2[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										bitmap_line[x*2] = alpha_blend_r32( bitmap_line[x*2], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = alpha_blend_r32( bitmap_line2[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										bitmap_line[x*2+1] = alpha_blend_r32( bitmap_line[x*2+1], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = alpha_blend_r32( bitmap_line2[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
 									}
 									else
 									{
-										bitmap_line[x] = alpha_blend_r16( bitmap_line[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-										if ( interlace_framebuffer == 1 ) bitmap_line2[x] = alpha_blend_r16( bitmap_line2[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										bitmap_line[x] = alpha_blend_r32( bitmap_line[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x] = alpha_blend_r32( bitmap_line2[x], machine.pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
 									}
 								}
 							}
@@ -6759,14 +6741,14 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	stv_sprite_priorities_usage_valid = 1;
 }
 
-SCREEN_UPDATE( stv_vdp2 )
+SCREEN_UPDATE_RGB32( stv_vdp2 )
 {
 	saturn_state *state = screen.machine().driver_data<saturn_state>();
 	static UINT8 pri;
 
 	stv_vdp2_fade_effects(screen.machine());
 
-	stv_vdp2_draw_back(screen.machine(), bitmap,cliprect);
+	stv_vdp2_draw_back(screen.machine(), state->m_tmpbitmap,cliprect);
 
 	#if DEBUG_MODE
 	if(screen.machine().input().code_pressed_once(KEYCODE_T))
@@ -6810,12 +6792,12 @@ SCREEN_UPDATE( stv_vdp2 )
 		/*If a plane has a priority value of zero it isn't shown at all.*/
 		for(pri=1;pri<8;pri++)
 		{
-			if (debug.l_en & 1)    { if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(screen.machine(), bitmap,cliprect); }
-			if (debug.l_en & 2)    { if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(screen.machine(), bitmap,cliprect); }
-			if (debug.l_en & 4)    { if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(screen.machine(), bitmap,cliprect); }
-			if (debug.l_en & 8)    { if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(screen.machine(), bitmap,cliprect); }
-			if (debug.l_en & 0x10) { if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(screen.machine(), bitmap,cliprect); }
-			if (debug.l_en & 0x20) { draw_sprites(screen.machine(),bitmap,cliprect,pri); }
+			if (debug.l_en & 1)    { if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (debug.l_en & 2)    { if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (debug.l_en & 4)    { if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (debug.l_en & 8)    { if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (debug.l_en & 0x10) { if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(screen.machine(), state->m_tmpbitmap,cliprect); }
+			if (debug.l_en & 0x20) { draw_sprites(screen.machine(),state->m_tmpbitmap,cliprect,pri); }
 		}
 	}
 
@@ -6896,7 +6878,7 @@ SCREEN_UPDATE( stv_vdp2 )
 
 #endif
 
-
+	copybitmap(bitmap, state->m_tmpbitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
@@ -7040,7 +7022,7 @@ static void saturn_vdp2_assign_variables(running_machine &machine,UINT32 offset,
 	}
 }
 
-static void vdp2_draw_back(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void vdp2_draw_back(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int x,y;
@@ -7077,7 +7059,7 @@ static void vdp2_draw_back(running_machine &machine, bitmap_t &bitmap, const rec
 				r <<= 3;
 
 				//if(STV_VDP2_BKCOEN)
-				//  stv_vdp2_compute_color_offset_RGB555( machine, &r, &g, &b, STV_VDP2_BKCOSL );
+				//  stv_vdp2_compute_color_offset( machine, &r, &g, &b, STV_VDP2_BKCOSL );
 
 				/* TODO: this needs post-processing too! */
 				bitmap.pix32(y, x) = b | g << 8 | r << 16;
@@ -7250,7 +7232,7 @@ static void vdp2_calc_color_offset(running_machine &machine, UINT8 layer_name, i
 }
 
 /* now copy the vram buffer to the screen buffer, apply post-processing at this stage */
-static void draw_normal_screen(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, UINT8 layer_name)
+static void draw_normal_screen(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect, UINT8 layer_name)
 {
 	int x,y;
 	int r,g,b;
@@ -7310,7 +7292,7 @@ static void vdp2_palette_entry(running_machine &machine, int *r, int *g, int *b,
 	}
 }
 
-SCREEN_UPDATE( saturn )
+SCREEN_UPDATE_RGB32( saturn )
 {
 	saturn_state *state = screen.machine().driver_data<saturn_state>();
 	static UINT8 disclaimer;

@@ -21,8 +21,8 @@ public:
 	int m_gfxdraw_mode;
 	int m_screen_height;
 	int m_screen_width;
-	bitmap_t *m_tmpbitmap0;
-	bitmap_t *m_tmpbitmap1;
+	bitmap_ind16 m_tmpbitmap0;
+	bitmap_ind16 m_tmpbitmap1;
 	UINT8 *m_videoram0;
 	UINT8 *m_videoram1;
 	UINT8 *m_palette;
@@ -33,7 +33,7 @@ public:
 
 /*----------- defined in video/nbmj8900.c -----------*/
 
-SCREEN_UPDATE( nbmj8900 );
+SCREEN_UPDATE_IND16( nbmj8900 );
 VIDEO_START( nbmj8900_2layer );
 
 READ8_HANDLER( nbmj8900_palette_type1_r );

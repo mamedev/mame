@@ -383,7 +383,6 @@ static MACHINE_CONFIG_START( tecfri, sauro_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.72)   /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))  // frames per second, vblank duration (otherwise sprites lag)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
 
@@ -407,7 +406,7 @@ static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 
 	MCFG_VIDEO_START(trckydoc)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(trckydoc)
+	MCFG_SCREEN_UPDATE_STATIC(trckydoc)
 
 MACHINE_CONFIG_END
 
@@ -425,7 +424,7 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 
 	MCFG_VIDEO_START(sauro)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(sauro)
+	MCFG_SCREEN_UPDATE_STATIC(sauro)
 
 	MCFG_SOUND_ADD("speech", SP0256, 3120000)
 	MCFG_SOUND_CONFIG(sauro_sp256)

@@ -166,7 +166,7 @@ WRITE8_HANDLER( suprridr_fgram_w )
  *
  *************************************/
 
-SCREEN_UPDATE( suprridr )
+SCREEN_UPDATE_IND16( suprridr )
 {
 	suprridr_state *state = screen.machine().driver_data<suprridr_state>();
 	UINT8 *spriteram = state->m_spriteram;

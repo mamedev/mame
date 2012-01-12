@@ -103,6 +103,17 @@ void device_sound_interface::static_reset_routes(device_t &device)
 
 
 //-------------------------------------------------
+//  stream_alloc - allocate a stream implicitly
+//  associated with this device
+//-------------------------------------------------
+
+sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int sample_rate)
+{
+	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate);
+}
+
+
+//-------------------------------------------------
 //  inputs - return the total number of inputs
 //  for the given device
 //-------------------------------------------------

@@ -36,6 +36,6 @@ WRITE8_HANDLER( wiz_flipy_w );
 
 VIDEO_START( wiz );
 PALETTE_INIT( wiz );
-SCREEN_UPDATE( wiz );
-SCREEN_UPDATE( stinger );
-SCREEN_UPDATE( kungfut );
+SCREEN_UPDATE_IND16( wiz );
+SCREEN_UPDATE_IND16( stinger );
+SCREEN_UPDATE_IND16( kungfut );

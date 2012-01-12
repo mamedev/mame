@@ -74,7 +74,7 @@ struct _render_font_char
 	INT32				width;				/* width from this character to the next */
 	INT32				xoffs, yoffs;		/* X and Y offset from baseline to top,left of bitmap */
 	INT32				bmwidth, bmheight;	/* width and height of bitmap */
-	bitmap_t *			bitmap;				/* pointer to the bitmap containing the raw data */
+	bitmap_argb32 *		bitmap;				/* pointer to the bitmap containing the raw data */
 };
 
 
@@ -93,7 +93,7 @@ struct _render_font
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE int pixel_is_set(bitmap_t &bitmap, int y, int x)
+INLINE int pixel_is_set(bitmap_argb32 &bitmap, int y, int x)
 {
 	return (bitmap.pix32(y, x) & 0xffffff) == 0;
 }
@@ -258,7 +258,7 @@ error:
     characters in the given font
 -------------------------------------------------*/
 
-static int bitmap_to_chars(bitmap_t &bitmap, render_font *font)
+static int bitmap_to_chars(bitmap_argb32 &bitmap, render_font *font)
 {
 	int rowstart = 0;
 	int x, y;
@@ -352,7 +352,7 @@ static int bitmap_to_chars(bitmap_t &bitmap, render_font *font)
 //              printf("  Character %X - width = %d\n", chstart, colend - colstart + 1);
 
 				/* allocate a bitmap */
-				ch->bitmap = new(std::nothrow) bitmap_t(colend - colstart + 1, font->height, BITMAP_FORMAT_ARGB32);
+				ch->bitmap = new(std::nothrow) bitmap_argb32(colend - colstart + 1, font->height);
 				if (ch->bitmap == NULL)
 				{
 					fprintf(stderr, "Error allocating character bitmap (%dx%d)\n", colend - colstart + 1, font->height);
@@ -414,21 +414,19 @@ int main(int argc, char *argv[])
 	/* iterate over input files */
 	for (curarg = 1; curarg < argc - 1; curarg++)
 	{
-		const char *pngname = argv[curarg];
-		file_error filerr;
-		png_error pngerr;
-		bitmap_t *bitmap;
-		core_file *file;
-
 	    /* load the png file */
-		filerr = core_fopen(pngname, OPEN_FLAG_READ, &file);
+		const char *pngname = argv[curarg];
+		core_file *file;
+		file_error filerr = core_fopen(pngname, OPEN_FLAG_READ, &file);
 		if (filerr != FILERR_NONE)
 	    {
 	    	fprintf(stderr, "Error %d attempting to open PNG file\n", filerr);
 	    	error = TRUE;
 	    	break;
 	    }
-		pngerr = png_read_bitmap(file, &bitmap);
+
+		bitmap_argb32 bitmap;
+		png_error pngerr = png_read_bitmap(file, bitmap);
 		core_fclose(file);
 		if (pngerr != PNGERR_NONE)
 		{
@@ -438,8 +436,7 @@ int main(int argc, char *argv[])
 		}
 
 		/* parse the PNG into characters */
-		error = bitmap_to_chars(*bitmap, font);
-		delete bitmap;
+		error = bitmap_to_chars(bitmap, font);
 		if (error)
 			break;
 	}

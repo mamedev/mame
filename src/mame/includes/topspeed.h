@@ -40,4 +40,4 @@ public:
 
 /*----------- defined in video/topspeed.c -----------*/
 
-SCREEN_UPDATE( topspeed );
+SCREEN_UPDATE_IND16( topspeed );

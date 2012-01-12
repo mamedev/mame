@@ -213,7 +213,7 @@ WRITE8_HANDLER( pacman_flipscreen_w )
 }
 
 
-SCREEN_UPDATE( pacman )
+SCREEN_UPDATE_IND16( pacman )
 {
 	pacman_state *state = screen.machine().driver_data<pacman_state>();
 	if (state->m_bgpriority != 0)
@@ -411,7 +411,7 @@ VIDEO_START( s2650games )
 	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
 }
 
-SCREEN_UPDATE( s2650games )
+SCREEN_UPDATE_IND16( s2650games )
 {
 	pacman_state *state = screen.machine().driver_data<pacman_state>();
 	UINT8 *spriteram = screen.machine().generic.spriteram.u8;

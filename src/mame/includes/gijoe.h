@@ -42,4 +42,4 @@ extern void gijoe_sprite_callback(running_machine &machine, int *code, int *colo
 extern void gijoe_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 VIDEO_START( gijoe );
-SCREEN_UPDATE( gijoe );
+SCREEN_UPDATE_IND16( gijoe );

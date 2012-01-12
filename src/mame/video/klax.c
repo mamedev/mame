@@ -101,11 +101,11 @@ WRITE16_HANDLER( klax_latch_w )
  *
  *************************************/
 
-SCREEN_UPDATE( klax )
+SCREEN_UPDATE_IND16( klax )
 {
 	klax_state *state = screen.machine().driver_data<klax_state>();
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

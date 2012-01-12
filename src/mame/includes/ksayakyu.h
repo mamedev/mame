@@ -32,4 +32,4 @@ WRITE8_HANDLER( ksayakyu_videoram_w );
 WRITE8_HANDLER( ksayakyu_videoctrl_w );
 PALETTE_INIT( ksayakyu );
 VIDEO_START( ksayakyu );
-SCREEN_UPDATE( ksayakyu );
+SCREEN_UPDATE_IND16( ksayakyu );

@@ -45,6 +45,7 @@
 #include <time.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <new>
 
 
 
@@ -205,8 +206,7 @@ struct _zlib_codec_data
 
 
 /* codec-private data for the A/V codec */
-typedef struct _av_codec_data av_codec_data;
-struct _av_codec_data
+struct av_codec_data
 {
 	avcomp_state *			compstate;
 	av_codec_compress_config compress;
@@ -2904,12 +2904,11 @@ static chd_error av_codec_init(chd_file *chd)
 	av_codec_data *data;
 
 	/* allocate memory for the 2 stream buffers */
-	data = (av_codec_data *)malloc(sizeof(*data));
+	data = new(std::nothrow) av_codec_data;
 	if (data == NULL)
 		return CHDERR_OUT_OF_MEMORY;
 
 	/* clear the buffers */
-	memset(data, 0, sizeof(*data));
 	chd->codecdata = data;
 
 	/* attempt to do a post-init now; if we're creating a new CHD, this won't work */
@@ -2933,7 +2932,7 @@ static void av_codec_free(chd_file *chd)
 	{
 		if (data->compstate != NULL)
 			avcomp_free(data->compstate);
-		free(data);
+		delete data;
 	}
 }
 
@@ -3025,7 +3024,13 @@ static chd_error av_codec_config(chd_file *chd, int param, void *config)
 	/* if we're getting the compression configuration, apply it now */
 	if (param == AV_CODEC_COMPRESS_CONFIG)
 	{
-		data->compress = *(av_codec_compress_config *)config;
+		av_codec_compress_config *configsrc = reinterpret_cast<av_codec_compress_config *>(config);
+		data->compress.video.wrap(configsrc->video, configsrc->video.cliprect());
+		data->compress.channels = configsrc->channels;
+		data->compress.samples = configsrc->samples;
+		memcpy(data->compress.audio, configsrc->audio, sizeof(data->compress.audio));
+		data->compress.metalength = configsrc->metalength;
+		data->compress.metadata = configsrc->metadata;
 		if (data->compstate != NULL)
 			avcomp_config_compress(data->compstate, &data->compress);
 		return CHDERR_NONE;
@@ -3034,7 +3039,14 @@ static chd_error av_codec_config(chd_file *chd, int param, void *config)
 	/* if we're getting the decompression configuration, apply it now */
 	else if (param == AV_CODEC_DECOMPRESS_CONFIG)
 	{
-		data->decompress = *(av_codec_decompress_config *)config;
+		av_codec_decompress_config *configsrc = reinterpret_cast<av_codec_decompress_config *>(config);
+		data->decompress.video.wrap(configsrc->video, configsrc->video.cliprect());
+		data->decompress.maxsamples = configsrc->maxsamples;
+		data->decompress.actsamples = configsrc->actsamples;
+		memcpy(data->decompress.audio, configsrc->audio, sizeof(data->decompress.audio));
+		data->decompress.maxmetalength = configsrc->maxmetalength;
+		data->decompress.actmetalength = configsrc->actmetalength;
+		data->decompress.metadata = configsrc->metadata;
 		if (data->compstate != NULL)
 			avcomp_config_decompress(data->compstate, &data->decompress);
 		return CHDERR_NONE;

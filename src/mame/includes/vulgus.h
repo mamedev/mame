@@ -25,4 +25,4 @@ WRITE8_HANDLER( vulgus_palette_bank_w );
 
 VIDEO_START( vulgus );
 PALETTE_INIT( vulgus );
-SCREEN_UPDATE( vulgus );
+SCREEN_UPDATE_IND16( vulgus );

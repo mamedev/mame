@@ -167,12 +167,12 @@ static const char p64x64[4][16] = {
 	{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 }
 };
 
-static void draw_sprite_16x16(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_16x16(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 	WC90_DRAW_SPRITE( code, sx, sy );
 }
 
-static void draw_sprite_16x32(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_16x32(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 	if ( bank & 2 ) {
 		WC90_DRAW_SPRITE( code+1, sx, sy+16 );
@@ -183,7 +183,7 @@ static void draw_sprite_16x32(running_machine &machine, bitmap_t &bitmap, const 
 	}
 }
 
-static void draw_sprite_16x64(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_16x64(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 	if ( bank & 2 ) {
 		WC90_DRAW_SPRITE( code+3, sx, sy+48 );
@@ -198,7 +198,7 @@ static void draw_sprite_16x64(running_machine &machine, bitmap_t &bitmap, const 
 	}
 }
 
-static void draw_sprite_32x16(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_32x16(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 	if ( bank & 1 ) {
 		WC90_DRAW_SPRITE( code+1, sx+16, sy );
@@ -209,7 +209,7 @@ static void draw_sprite_32x16(running_machine &machine, bitmap_t &bitmap, const 
 	}
 }
 
-static void draw_sprite_32x32(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_32x32(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 
 	const char *p = p32x32[ bank&3 ];
@@ -220,7 +220,7 @@ static void draw_sprite_32x32(running_machine &machine, bitmap_t &bitmap, const 
 	WC90_DRAW_SPRITE( code+p[3], sx+16, sy+16 );
 }
 
-static void draw_sprite_32x64(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_32x64(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 
 	const char *p = p32x64[ bank&3 ];
@@ -235,7 +235,7 @@ static void draw_sprite_32x64(running_machine &machine, bitmap_t &bitmap, const 
 	WC90_DRAW_SPRITE( code+p[7], sx+16, sy+48 );
 }
 
-static void draw_sprite_64x16(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_64x16(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 	if ( bank & 1 ) {
 		WC90_DRAW_SPRITE( code+3, sx+48, sy );
@@ -250,7 +250,7 @@ static void draw_sprite_64x16(running_machine &machine, bitmap_t &bitmap, const 
 	}
 }
 
-static void draw_sprite_64x32(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_64x32(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 
 	const char *p = p64x32[ bank&3 ];
@@ -265,7 +265,7 @@ static void draw_sprite_64x32(running_machine &machine, bitmap_t &bitmap, const 
 	WC90_DRAW_SPRITE( code+p[7], sx+48, sy+16 );
 }
 
-static void draw_sprite_64x64(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_64x64(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 
 	const char *p = p64x64[ bank&3 ];
@@ -289,12 +289,12 @@ static void draw_sprite_64x64(running_machine &machine, bitmap_t &bitmap, const 
 	WC90_DRAW_SPRITE( code+p[15], sx+48, sy+48 );
 }
 
-static void draw_sprite_invalid(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int code,
+static void draw_sprite_invalid(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 											int sx, int sy, int bank, int flags ) {
 	logerror("8 pixel sprite size not supported\n" );
 }
 
-typedef void (*draw_sprites_func)(running_machine &, bitmap_t &, const rectangle &, int, int, int, int, int );
+typedef void (*draw_sprites_func)(running_machine &, bitmap_ind16 &, const rectangle &, int, int, int, int, int );
 
 static const draw_sprites_func draw_sprites_proc[16] = {
 	draw_sprite_invalid,	/* 0000 = 08x08 */
@@ -315,7 +315,7 @@ static const draw_sprites_func draw_sprites_proc[16] = {
 	draw_sprite_64x64		/* 1111 = 64x64 */
 };
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	wc90_state *state = machine.driver_data<wc90_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -345,7 +345,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 #undef WC90_DRAW_SPRITE
 
 
-SCREEN_UPDATE( wc90 )
+SCREEN_UPDATE_IND16( wc90 )
 {
 	wc90_state *state = screen.machine().driver_data<wc90_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_scroll2xlo[0] + 256 * state->m_scroll2xhi[0]);

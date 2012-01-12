@@ -64,7 +64,7 @@ VIDEO_RESET( micro3d )
  *
  *************************************/
 
-void micro3d_scanline_update(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
+void micro3d_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	micro3d_state *state = screen.machine().driver_data<micro3d_state>();
 

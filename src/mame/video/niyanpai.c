@@ -170,7 +170,7 @@ static void update_pixel(running_machine &machine, int vram, int x, int y)
 {
 	niyanpai_state *state = machine.driver_data<niyanpai_state>();
 	UINT16 color = state->m_videoram[vram][(y * machine.primary_screen->width()) + x];
-	state->m_tmpbitmap[vram]->pix16(y, x) = color;
+	state->m_tmpbitmap[vram].pix16(y, x) = color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
@@ -365,9 +365,9 @@ VIDEO_START( niyanpai )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_tmpbitmap[0] = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_tmpbitmap[1] = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_tmpbitmap[2] = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmpbitmap[0].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_tmpbitmap[1].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_tmpbitmap[2].allocate(machine.primary_screen->width(), machine.primary_screen->height());
 	state->m_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->m_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->m_videoram[2] = auto_alloc_array_clear(machine, UINT16, width * height);
@@ -385,7 +385,7 @@ VIDEO_START( niyanpai )
 
 
 ******************************************************************************/
-SCREEN_UPDATE( niyanpai )
+SCREEN_UPDATE_IND16( niyanpai )
 {
 	niyanpai_state *state = screen.machine().driver_data<niyanpai_state>();
 	int i;
@@ -423,15 +423,15 @@ SCREEN_UPDATE( niyanpai )
 	}
 
 	if (state->m_dispflag[0])
-		copyscrollbitmap(bitmap, *state->m_tmpbitmap[0], 1, &scrollx[0], 1, &scrolly[0], cliprect);
+		copyscrollbitmap(bitmap, state->m_tmpbitmap[0], 1, &scrollx[0], 1, &scrolly[0], cliprect);
 	else
 		bitmap.fill(0x00ff);
 
 	if (state->m_dispflag[1])
-		copyscrollbitmap_trans(bitmap, *state->m_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, 0x01ff);
+		copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, 0x01ff);
 
 	if (state->m_dispflag[2])
-		copyscrollbitmap_trans(bitmap, *state->m_tmpbitmap[2], 1, &scrollx[2], 1, &scrolly[2], cliprect, 0x02ff);
+		copyscrollbitmap_trans(bitmap, state->m_tmpbitmap[2], 1, &scrollx[2], 1, &scrolly[2], cliprect, 0x02ff);
 
 	return 0;
 }

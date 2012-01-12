@@ -37,7 +37,7 @@ struct _crosshair_global
 	UINT8				used[MAX_PLAYERS];		/* usage per player */
 	UINT8				mode[MAX_PLAYERS];		/* visibility mode per player */
 	UINT8				visible[MAX_PLAYERS];	/* visibility per player */
-	bitmap_t *			bitmap[MAX_PLAYERS];	/* bitmap per player */
+	bitmap_argb32 *		bitmap[MAX_PLAYERS];	/* bitmap per player */
 	render_texture *	texture[MAX_PLAYERS];	/* texture per player */
 	device_t *screen[MAX_PLAYERS];	/* the screen on which this player's crosshair is drawn */
 	float				x[MAX_PLAYERS];			/* current X position */
@@ -155,7 +155,8 @@ static void create_bitmap(running_machine &machine, int player)
 	rgb_t color = crosshair_colors[player];
 
 	/* if we have a bitmap and texture for this player, kill it */
-	global_free(global.bitmap[player]);
+	if (global.bitmap[player] == NULL)
+		global.bitmap[player] = global_alloc(bitmap_argb32);
 	machine.render().texture_free(global.texture[player]);
 
 	emu_file crossfile(machine.options().crosshair_path(), OPEN_FLAG_READ);
@@ -163,24 +164,24 @@ static void create_bitmap(running_machine &machine, int player)
 	{
 		/* look for user specified file */
 		sprintf(filename, "%s.png", global.name[player]);
-		global.bitmap[player] = render_load_png(crossfile, NULL, filename, NULL, NULL);
+		render_load_png(*global.bitmap[player], crossfile, NULL, filename);
 	}
 	else
 	{
 		/* look for default cross?.png in crsshair\game dir */
 		sprintf(filename, "cross%d.png", player + 1);
-		global.bitmap[player] = render_load_png(crossfile, machine.system().name, filename, NULL, NULL);
+		render_load_png(*global.bitmap[player], crossfile, machine.system().name, filename);
 
 		/* look for default cross?.png in crsshair dir */
-		if (global.bitmap[player] == NULL)
-			global.bitmap[player] = render_load_png(crossfile, NULL, filename, NULL, NULL);
+		if (!global.bitmap[player]->valid())
+			render_load_png(*global.bitmap[player], crossfile, NULL, filename);
 	}
 
 	/* if that didn't work, use the built-in one */
-	if (global.bitmap[player] == NULL)
+	if (!global.bitmap[player]->valid())
 	{
 		/* allocate a blank bitmap to start with */
-		global.bitmap[player] = global_alloc(bitmap_t(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32));
+		global.bitmap[player]->allocate(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE);
 		global.bitmap[player]->fill(MAKE_ARGB(0x00,0xff,0xff,0xff));
 
 		/* extract the raw source data to it */
@@ -199,7 +200,7 @@ static void create_bitmap(running_machine &machine, int player)
 
 	/* create a texture to reference the bitmap */
 	global.texture[player] = machine.render().texture_alloc(render_texture::hq_scale);
-	global.texture[player]->set_bitmap(global.bitmap[player], NULL, TEXFORMAT_ARGB32);
+	global.texture[player]->set_bitmap(*global.bitmap[player], global.bitmap[player]->cliprect(), TEXFORMAT_ARGB32);
 }
 
 

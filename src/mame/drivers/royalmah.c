@@ -212,7 +212,7 @@ static WRITE8_HANDLER( mjderngr_palbank_w )
 }
 
 
-static SCREEN_UPDATE( royalmah )
+static SCREEN_UPDATE_IND16( royalmah )
 {
 	royalmah_state *state = screen.machine().driver_data<royalmah_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -3153,12 +3153,11 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 	MCFG_PALETTE_INIT(royalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE(royalmah)
+	MCFG_SCREEN_UPDATE_STATIC(royalmah)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

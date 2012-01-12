@@ -119,8 +119,7 @@ void palette_init(running_machine &machine)
 	/* determine the color mode */
 	switch (format)
 	{
-		case BITMAP_FORMAT_INDEXED16:
-		case BITMAP_FORMAT_RGB15:
+		case BITMAP_FORMAT_IND16:
 		case BITMAP_FORMAT_RGB32:
 			/* indexed and RGB modes are fine for everything */
 			break;
@@ -268,7 +267,7 @@ void palette_set_shadow_dRGB32(running_machine &machine, int mode, int dr, int d
 	int i;
 
 	/* only applies to RGB direct modes */
-	assert(palette->format != BITMAP_FORMAT_INDEXED16);
+	assert(palette->format != BITMAP_FORMAT_IND16);
 	assert(stable->base != NULL);
 
 	/* clamp the deltas (why?) */
@@ -614,19 +613,13 @@ static void allocate_palette(running_machine &machine, palette_private *palette)
 	switch (palette->format)
 	{
 		/* 16-bit paletteized case */
-		case BITMAP_FORMAT_INDEXED16:
+		case BITMAP_FORMAT_IND16:
 			palette->black_pen = palette_get_black_entry(machine.palette);
 			palette->white_pen = palette_get_white_entry(machine.palette);
 			if (palette->black_pen >= 65536)
 				palette->black_pen = 0;
 			if (palette->white_pen >= 65536)
 				palette->white_pen = 65536;
-			break;
-
-		/* 15-bit direct case */
-		case BITMAP_FORMAT_RGB15:
-			palette->black_pen = rgb_to_rgb15(MAKE_RGB(0x00,0x00,0x00));
-			palette->white_pen = rgb_to_rgb15(MAKE_RGB(0xff,0xff,0xff));
 			break;
 
 		/* 32-bit direct case */
@@ -657,15 +650,11 @@ static void allocate_color_tables(running_machine &machine, palette_private *pal
 	/* allocate memory for the pen table */
 	switch (palette->format)
 	{
-		case BITMAP_FORMAT_INDEXED16:
+		case BITMAP_FORMAT_IND16:
 			/* create a dummy 1:1 mapping */
 			machine.pens = pentable = auto_alloc_array(machine, pen_t, total_colors + 2);
 			for (i = 0; i < total_colors + 2; i++)
 				pentable[i] = i;
-			break;
-
-		case BITMAP_FORMAT_RGB15:
-			machine.pens = palette_entry_list_adjusted_rgb15(machine.palette);
 			break;
 
 		case BITMAP_FORMAT_RGB32:
@@ -693,7 +682,7 @@ static void allocate_shadow_tables(running_machine &machine, palette_private *pa
 		int i;
 
 		/* palettized mode gets a single 64k table in slots 0 and 2 */
-		if (palette->format == BITMAP_FORMAT_INDEXED16)
+		if (palette->format == BITMAP_FORMAT_IND16)
 		{
 			palette->shadow_table[0].base = palette->shadow_table[2].base = table;
 			for (i = 0; i < 65536; i++)
@@ -716,7 +705,7 @@ static void allocate_shadow_tables(running_machine &machine, palette_private *pa
 		int i;
 
 		/* palettized mode gets a single 64k table in slots 1 and 3 */
-		if (palette->format == BITMAP_FORMAT_INDEXED16)
+		if (palette->format == BITMAP_FORMAT_IND16)
 		{
 			palette->shadow_table[1].base = palette->shadow_table[3].base = table;
 			for (i = 0; i < 65536; i++)
@@ -750,7 +739,7 @@ static void configure_rgb_shadows(running_machine &machine, int mode, float fact
 	int i;
 
 	/* only applies to RGB direct modes */
-	assert(palette->format != BITMAP_FORMAT_INDEXED16);
+	assert(palette->format != BITMAP_FORMAT_IND16);
 	assert(stable->base != NULL);
 
 	/* regenerate the table */

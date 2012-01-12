@@ -55,7 +55,7 @@ deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *
 
 
 /* this implementation was originally from Mad Motor */
-void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
+void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
 {
 	int offs;
 

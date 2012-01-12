@@ -15,4 +15,4 @@ WRITE8_HANDLER( ampoker2_videoram_w );
 PALETTE_INIT( ampoker2 );
 VIDEO_START( ampoker2 );
 VIDEO_START( sigma2k );
-SCREEN_UPDATE( ampoker2 );
+SCREEN_UPDATE_IND16( ampoker2 );

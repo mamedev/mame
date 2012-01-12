@@ -27,6 +27,6 @@ public:
 /*----------- defined in video/sshangha.c -----------*/
 
 VIDEO_START( sshangha );
-SCREEN_UPDATE( sshangha );
+SCREEN_UPDATE_RGB32( sshangha );
 
 WRITE16_HANDLER( sshangha_video_w );

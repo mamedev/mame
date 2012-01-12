@@ -98,7 +98,7 @@ VIDEO_START( blueprnt )
 	state->save_item(NAME(state->m_gfx_bank));
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 	int offs;
@@ -124,7 +124,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( blueprnt )
+SCREEN_UPDATE_IND16( blueprnt )
 {
 	blueprnt_state *state = screen.machine().driver_data<blueprnt_state>();
 	int i;

@@ -29,4 +29,4 @@ WRITE8_HANDLER( lucky74_bg_videoram_w );
 WRITE8_HANDLER( lucky74_bg_colorram_w );
 PALETTE_INIT( lucky74 );
 VIDEO_START( lucky74 );
-SCREEN_UPDATE( lucky74 );
+SCREEN_UPDATE_IND16( lucky74 );

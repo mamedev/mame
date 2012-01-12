@@ -582,7 +582,7 @@ WRITE8_MEMBER( sed1330_device::data_w )
 //  draw_text_scanline -
 //-------------------------------------------------
 
-void sed1330_device::draw_text_scanline(bitmap_t &bitmap, const rectangle &cliprect, int y, UINT16 va)
+void sed1330_device::draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 va)
 {
 	int sx, x;
 
@@ -623,7 +623,7 @@ void sed1330_device::draw_text_scanline(bitmap_t &bitmap, const rectangle &clipr
 //  draw_graphics_scanline -
 //-------------------------------------------------
 
-void sed1330_device::draw_graphics_scanline(bitmap_t &bitmap, const rectangle &cliprect, int y, UINT16 va)
+void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 va)
 {
 	int sx, x;
 
@@ -644,7 +644,7 @@ void sed1330_device::draw_graphics_scanline(bitmap_t &bitmap, const rectangle &c
 //  update_graphics -
 //-------------------------------------------------
 
-void sed1330_device::update_graphics(bitmap_t &bitmap, const rectangle &cliprect)
+void sed1330_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 }
 
@@ -653,7 +653,7 @@ void sed1330_device::update_graphics(bitmap_t &bitmap, const rectangle &cliprect
 //  update_text -
 //-------------------------------------------------
 
-void sed1330_device::update_text(bitmap_t &bitmap, const rectangle &cliprect)
+void sed1330_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y;
 
@@ -683,10 +683,10 @@ void sed1330_device::update_text(bitmap_t &bitmap, const rectangle &cliprect)
 
 
 //-------------------------------------------------
-//  update_screen -
+//  screen_update -
 //-------------------------------------------------
 
-void sed1330_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 sed1330_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_d)
 	{
@@ -699,4 +699,5 @@ void sed1330_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 			update_text(bitmap, cliprect);
 		}
 	}
+	return 0;
 }

@@ -132,7 +132,7 @@ WRITE8_HANDLER( gundealr_flipscreen_w )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( gundealr )
+SCREEN_UPDATE_IND16( gundealr )
 {
 	gundealr_state *state = screen.machine().driver_data<gundealr_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

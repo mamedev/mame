@@ -38,4 +38,4 @@ WRITE16_HANDLER( blmbycar_vram_0_w );
 WRITE16_HANDLER( blmbycar_vram_1_w );
 
 VIDEO_START( blmbycar );
-SCREEN_UPDATE( blmbycar );
+SCREEN_UPDATE_IND16( blmbycar );

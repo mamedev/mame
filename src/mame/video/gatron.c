@@ -51,7 +51,7 @@ VIDEO_START( gat )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 8, 16, 48, 16);
 }
 
-SCREEN_UPDATE( gat )
+SCREEN_UPDATE_IND16( gat )
 {
 	gatron_state *state = screen.machine().driver_data<gatron_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

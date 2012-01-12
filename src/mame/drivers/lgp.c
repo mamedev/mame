@@ -66,16 +66,17 @@ Dumping Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "render.h"
-#include "machine/laserdsc.h"
+#include "machine/ldv1000.h"
 
 
 class lgp_state : public driver_device
 {
 public:
 	lgp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
-	device_t *m_laserdisc;
+	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 *m_tile_ram;
 	UINT8 *m_tile_control_ram;
 	emu_timer *m_irq_timer;
@@ -88,7 +89,7 @@ public:
 
 
 /* VIDEO GOODS */
-static SCREEN_UPDATE( lgp )
+static SCREEN_UPDATE_IND16( lgp )
 {
 	lgp_state *state = screen.machine().driver_data<lgp_state>();
 	int charx, chary;
@@ -124,13 +125,13 @@ static SCREEN_UPDATE( lgp )
 static READ8_HANDLER(ldp_read)
 {
 	lgp_state *state = space->machine().driver_data<lgp_state>();
-	return laserdisc_data_r(state->m_laserdisc);
+	return state->m_laserdisc->status_r();
 }
 
 static WRITE8_HANDLER(ldp_write)
 {
 	lgp_state *state = space->machine().driver_data<lgp_state>();
-	laserdisc_data_w(state->m_laserdisc,data);
+	state->m_laserdisc->data_w(data);
 }
 
 
@@ -346,7 +347,6 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 static MACHINE_START( lgp )
 {
 	lgp_state *state = machine.driver_data<lgp_state>();
-	state->m_laserdisc = machine.device("laserdisc");
 	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(irq_stop));
 }
 
@@ -366,11 +366,11 @@ static MACHINE_CONFIG_START( lgp, lgp_state )
 
 	MCFG_MACHINE_START(lgp)
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(lgp, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
+	MCFG_LASERDISC_OVERLAY(256, 256, lgp)
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_PALETTE_LENGTH(256)
 	/* MCFG_PALETTE_INIT(lgp) */
@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( lgp, lgp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

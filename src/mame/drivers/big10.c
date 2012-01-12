@@ -67,8 +67,10 @@ class big10_state : public driver_device
 {
 public:
 	big10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_v9938(*this, "v9938") { }
 
+	required_device<v9938_device> m_v9938;
 	UINT8 m_mux_data;
 };
 
@@ -80,21 +82,15 @@ public:
 *      Interrupt handling & Video      *
 ***************************************/
 
-static void big10_vdp_interrupt(running_machine &machine, int i)
+static void big10_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-	cputag_set_input_line (machine, "maincpu", 0, (i ? ASSERT_LINE : CLEAR_LINE));
+	cputag_set_input_line (device.machine(), "maincpu", 0, (i ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static TIMER_DEVICE_CALLBACK( big10_interrupt )
 {
-	v9938_interrupt(timer.machine(), 0);
-}
-
-
-static VIDEO_START( big10 )
-{
-	v9938_init (machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(), MODEL_V9938, VDP_MEM, big10_vdp_interrupt);
-	v9938_reset(0);
+	big10_state *state = timer.machine().driver_data<big10_state>();
+	state->m_v9938->interrupt();
 }
 
 
@@ -104,7 +100,6 @@ static VIDEO_START( big10 )
 
 static MACHINE_RESET(big10)
 {
-	v9938_reset(0);
 }
 
 
@@ -147,10 +142,7 @@ static ADDRESS_MAP_START( main_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(mux_r)			/* present in test mode */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")	/* coins and service */
-	AM_RANGE(0x98, 0x98) AM_WRITE(v9938_0_vram_w) AM_READ(v9938_0_vram_r)
-	AM_RANGE(0x99, 0x99) AM_WRITE(v9938_0_command_w) AM_READ(v9938_0_status_r)
-	AM_RANGE(0x9a, 0x9a) AM_WRITE(v9938_0_palette_w)
-	AM_RANGE(0x9b, 0x9b) AM_WRITE(v9938_0_register_w)
+	AM_RANGE(0x98, 0x9b) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write)
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r) /* Dip-Switches routes here. */
 ADDRESS_MAP_END
@@ -261,16 +253,18 @@ static MACHINE_CONFIG_START( big10, big10_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(big10_vdp_interrupt)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT(v9938)
-	MCFG_VIDEO_START(big10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

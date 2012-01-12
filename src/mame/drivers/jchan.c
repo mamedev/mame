@@ -183,8 +183,8 @@ public:
 		m_subcpu(*this,"sub")
 		{ }
 
-	bitmap_t *m_sprite_bitmap_1;
-	bitmap_t *m_sprite_bitmap_2;
+	bitmap_ind16 *m_sprite_bitmap_1;
+	bitmap_ind16 *m_sprite_bitmap_2;
 	UINT32* m_sprite_ram32_1;
 	UINT32* m_sprite_ram32_2;
 	UINT32* m_sprite_regs32_1;
@@ -339,8 +339,8 @@ static VIDEO_START(jchan)
 	state->m_sprite_regs32_1 = auto_alloc_array(machine, UINT32, 0x40/4);
 	state->m_sprite_regs32_2 = auto_alloc_array(machine, UINT32, 0x40/4);
 
-	state->m_sprite_bitmap_1 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
-	state->m_sprite_bitmap_2 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
+	state->m_sprite_bitmap_1 = auto_bitmap_ind16_alloc(machine,1024,1024);
+	state->m_sprite_bitmap_2 = auto_bitmap_ind16_alloc(machine,1024,1024);
 
 	state->m_spritegen1 = machine.device<sknsspr_device>("spritegen1");
 	state->m_spritegen2 = machine.device<sknsspr_device>("spritegen2");
@@ -358,7 +358,7 @@ static VIDEO_START(jchan)
 
 
 
-static SCREEN_UPDATE(jchan)
+static SCREEN_UPDATE_IND16(jchan)
 {
 	jchan_state *state = screen.machine().driver_data<jchan_state>();
 	int x,y;
@@ -370,7 +370,7 @@ static SCREEN_UPDATE(jchan)
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	SCREEN_UPDATE_CALL(jchan_view2);
+	SCREEN_UPDATE16_CALL(jchan_view2);
 
 	state->m_sprite_bitmap_1->fill(0x0000, cliprect);
 	state->m_sprite_bitmap_2->fill(0x0000, cliprect);
@@ -669,10 +669,9 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(jchan)
+	MCFG_SCREEN_UPDATE_STATIC(jchan)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 

@@ -36,4 +36,4 @@ WRITE16_HANDLER( crshrace_gfxctrl_w );
 
 VIDEO_START( crshrace );
 SCREEN_EOF( crshrace );
-SCREEN_UPDATE( crshrace );
+SCREEN_UPDATE_IND16( crshrace );

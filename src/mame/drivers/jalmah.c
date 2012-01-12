@@ -347,7 +347,7 @@ static void jalmah_priority_system(running_machine &machine)
 	//popmessage("%02x %02x %02x %02x",state->m_sc0_prin,state->m_sc1_prin,state->m_sc2_prin,state->m_sc3_prin);
 }
 
-static void draw_sc0_layer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sc0_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	switch(state->m_jm_vregs[0] & 3)
@@ -359,7 +359,7 @@ static void draw_sc0_layer(running_machine &machine, bitmap_t &bitmap, const rec
 	}
 }
 
-static void draw_sc1_layer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sc1_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	switch(state->m_jm_vregs[1] & 3)
@@ -371,7 +371,7 @@ static void draw_sc1_layer(running_machine &machine, bitmap_t &bitmap, const rec
 	}
 }
 
-static void draw_sc2_layer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sc2_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	switch(state->m_jm_vregs[2] & 3)
@@ -383,7 +383,7 @@ static void draw_sc2_layer(running_machine &machine, bitmap_t &bitmap, const rec
 	}
 }
 
-static void draw_sc3_layer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sc3_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
 	switch(state->m_jm_vregs[3] & 3)
@@ -395,7 +395,7 @@ static void draw_sc3_layer(running_machine &machine, bitmap_t &bitmap, const rec
 	}
 }
 
-static SCREEN_UPDATE( jalmah )
+static SCREEN_UPDATE_IND16( jalmah )
 {
 	jalmah_state *state = screen.machine().driver_data<jalmah_state>();
 	UINT16 *jm_scrollram = state->m_jm_scrollram;
@@ -456,7 +456,7 @@ static SCREEN_UPDATE( jalmah )
 	return 0;
 }
 
-static SCREEN_UPDATE( urashima )
+static SCREEN_UPDATE_IND16( urashima )
 {
 	jalmah_state *state = screen.machine().driver_data<jalmah_state>();
 	UINT16 *jm_scrollram = state->m_jm_scrollram;
@@ -1387,10 +1387,9 @@ static MACHINE_CONFIG_START( jalmah, jalmah_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(jalmah)
+	MCFG_SCREEN_UPDATE_STATIC(jalmah)
 
 	MCFG_PALETTE_LENGTH(0x400)
 	MCFG_MACHINE_RESET(jalmah)
@@ -1413,7 +1412,7 @@ static MACHINE_CONFIG_DERIVED( urashima, jalmah )
 
 	MCFG_VIDEO_START(urashima)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(urashima)
+	MCFG_SCREEN_UPDATE_STATIC(urashima)
 MACHINE_CONFIG_END
 
 /*

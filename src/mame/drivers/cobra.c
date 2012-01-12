@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE64_MEMBER(gfx_buf_w);
 
 
-	bitmap_t *framebuffer;
+	bitmap_rgb32 *framebuffer;
 	poly_manager *poly;
 
 	int polybuffer_ptr;
@@ -74,7 +74,7 @@ public:
 #if 0
 static void render_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	bitmap_t *destmap = (bitmap_t *)dest;
+	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
 	UINT32 *fb = &destmap->pix32(scanline);
 	int x;
 
@@ -87,7 +87,7 @@ static void render_scan(void *dest, INT32 scanline, const poly_extent *extent, c
 
 static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	bitmap_t *destmap = (bitmap_t *)dest;
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
 	float u = extent->param[0].start;
 	float v = extent->param[1].start;
 	float du = extent->param[0].dpdx;
@@ -136,10 +136,10 @@ VIDEO_START( cobra )
 	cobra->poly = poly_alloc(machine, 4000, 10, POLYFLAG_ALLOW_QUADS);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_video_exit), &machine));
 
-	cobra->framebuffer = auto_bitmap_alloc(machine, 64*8, 32*8, BITMAP_FORMAT_RGB32);
+	cobra->framebuffer = auto_bitmap_rgb32_alloc(machine, 64*8, 32*8);
 }
 
-SCREEN_UPDATE( cobra )
+SCREEN_UPDATE_RGB32( cobra )
 {
 	cobra_state *cobra = screen.machine().driver_data<cobra_state>();
 
@@ -2028,11 +2028,10 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 	MCFG_PALETTE_LENGTH(65536)
-	MCFG_SCREEN_UPDATE(cobra)
+	MCFG_SCREEN_UPDATE_STATIC(cobra)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

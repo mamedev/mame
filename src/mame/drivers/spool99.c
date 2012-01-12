@@ -126,7 +126,7 @@ static VIDEO_START(spool99)
 	state->m_sc0_tilemap = tilemap_create(machine, get_spool99_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
-static SCREEN_UPDATE(spool99)
+static SCREEN_UPDATE_IND16(spool99)
 {
 	spool99_state *state = screen.machine().driver_data<spool99_state>();
 
@@ -347,10 +347,9 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(7*8, 55*8-1, 1*8, 31*8-1) //384x240,raw guess
-	MCFG_SCREEN_UPDATE(spool99)
+	MCFG_SCREEN_UPDATE_STATIC(spool99)
 
 	MCFG_PALETTE_LENGTH(0x200)
 

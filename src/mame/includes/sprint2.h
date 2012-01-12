@@ -34,7 +34,7 @@ public:
 	UINT8 m_dial[2];
 	UINT8* m_video_ram;
 	tilemap_t* m_bg_tilemap;
-	bitmap_t* m_helper;
+	bitmap_ind16 m_helper;
 	int m_collision[2];
 };
 
@@ -56,7 +56,7 @@ WRITE8_HANDLER( sprint2_collision_reset2_w );
 WRITE8_HANDLER( sprint2_video_ram_w );
 
 PALETTE_INIT( sprint2 );
-SCREEN_UPDATE( sprint2 );
+SCREEN_UPDATE_IND16( sprint2 );
 VIDEO_START( sprint2 );
 SCREEN_EOF( sprint2 );
 

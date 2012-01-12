@@ -126,7 +126,7 @@ WRITE8_HANDLER( shrike_sprite_select_w )
  *
  *************************************/
 
-static void draw_one_sprite(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 *sprite)
+static void draw_one_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *sprite)
 {
 	balsente_state *state = machine.driver_data<balsente_state>();
 	int flags = sprite[0];
@@ -210,7 +210,7 @@ static void draw_one_sprite(running_machine &machine, bitmap_t &bitmap, const re
  *
  *************************************/
 
-SCREEN_UPDATE( balsente )
+SCREEN_UPDATE_IND16( balsente )
 {
 	balsente_state *state = screen.machine().driver_data<balsente_state>();
 	const pen_t *pens = &screen.machine().pens[state->m_palettebank_vis * 256];

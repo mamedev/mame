@@ -56,7 +56,7 @@ WRITE8_HANDLER( spacefb_port_1_w );
 /*----------- defined in video/spacefb.c -----------*/
 
 VIDEO_START( spacefb );
-SCREEN_UPDATE( spacefb );
+SCREEN_UPDATE_RGB32( spacefb );
 
 WRITE8_HANDLER( spacefb_port_0_w );
 WRITE8_HANDLER( spacefb_port_2_w );

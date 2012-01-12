@@ -70,7 +70,7 @@ static VIDEO_START( itgambl3 )
 }
 
 /* (dirty) debug code for looking 8bpps blitter-based gfxs */
-static SCREEN_UPDATE( itgambl3 )
+static SCREEN_UPDATE_RGB32( itgambl3 )
 {
 	itgambl3_state *state = screen.machine().driver_data<itgambl3_state>();
 	int x,y,count;
@@ -258,10 +258,9 @@ static MACHINE_CONFIG_START( itgambl3, itgambl3_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE( itgambl3 )
+	MCFG_SCREEN_UPDATE_STATIC( itgambl3 )
 
 	MCFG_MACHINE_RESET( itgambl3 )
 	MCFG_PALETTE_INIT( itgambl3 )

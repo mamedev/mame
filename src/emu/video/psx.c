@@ -116,7 +116,7 @@ void psxgpu_device::DebugMeshInit( void )
 	m_debug.b_clear = 1;
 	m_debug.n_coord = 0;
 	m_debug.n_skip = 0;
-	m_debug.mesh = auto_bitmap_alloc( machine(), width, height, BITMAP_FORMAT_INDEXED16 );
+	m_debug.mesh = auto_bitmap_ind16_alloc( machine(), width, height );
 }
 
 void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
@@ -317,7 +317,7 @@ void psxgpu_device::DebugCheckKeys( void )
 #endif
 }
 
-int psxgpu_device::DebugMeshDisplay( bitmap_t &bitmap, const rectangle &cliprect )
+int psxgpu_device::DebugMeshDisplay( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	if( m_debug.mesh )
 	{
@@ -327,7 +327,7 @@ int psxgpu_device::DebugMeshDisplay( bitmap_t &bitmap, const rectangle &cliprect
 	return m_debug.b_mesh;
 }
 
-int psxgpu_device::DebugTextureDisplay( bitmap_t &bitmap )
+int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 {
 	UINT32 n_y;
 
@@ -600,7 +600,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	machine().save().register_postload( save_prepost_delegate( FUNC( psxgpu_device::updatevisiblearea ), this ) );
 }
 
-void psxgpu_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT32 n_x;
 	UINT32 n_y;
@@ -617,11 +617,11 @@ void psxgpu_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 #if defined( MAME_DEBUG )
 	if( DebugMeshDisplay( bitmap, cliprect ) )
 	{
-		return;
+		return 0;
 	}
 	if( DebugTextureDisplay( bitmap ) )
 	{
-		return;
+		return 0;
 	}
 #endif
 
@@ -743,6 +743,7 @@ void psxgpu_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 			}
 		}
 	}
+	return 0;
 }
 
 #define WRITE_PIXEL( p ) *( p_vram ) = p
@@ -3688,21 +3689,19 @@ PALETTE_INIT( psx )
 	}
 }
 
-SCREEN_UPDATE( psx )
+SCREEN_UPDATE_IND16( psx )
 {
 	psxgpu_device *gpu = downcast<psxgpu_device *>(screen.owner());
-	gpu->update_screen( bitmap, cliprect );
-	return 0;
+	return gpu->update_screen( screen, bitmap, cliprect );
 }
 
 MACHINE_CONFIG_FRAGMENT( psxgpu )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE( 1024, 1024 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE( psx )
+	MCFG_SCREEN_UPDATE_STATIC( psx )
 	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(FUNC(psxgpu_device::vblank), (psxgpu_device *) owner));
 
 	MCFG_PALETTE_LENGTH( 65536 )

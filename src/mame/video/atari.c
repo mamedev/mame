@@ -712,6 +712,8 @@ VIDEO_START( atari )
 
 	LOG(("atari antic_vh_start\n"));
     memset(&antic, 0, sizeof(antic));
+    
+	antic.bitmap = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
 
 	antic.renderer = antic_mode_0_xx;
 	antic.cclk_expand = auto_alloc_array(machine, UINT32, 21 * 256);
@@ -766,11 +768,11 @@ VIDEO_START( atari )
  * Refresh screen bitmap.
  * Note: Actual drawing is done scanline wise during atari_interrupt
  ************************************************************************/
-SCREEN_UPDATE( atari )
+SCREEN_UPDATE_IND16( atari )
 {
 	UINT32 new_tv_artifacts;
 
-	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *antic.bitmap, 0, 0, 0, 0, cliprect);
 
 	new_tv_artifacts = input_port_read_safe(screen.machine(), "artifacts", 0);
 	if( tv_artifacts != new_tv_artifacts )
@@ -1041,7 +1043,7 @@ static void antic_linerefresh(running_machine &machine)
 	dst[2] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
 	dst[3] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
 
-	draw_scanline8(machine.primary_screen->default_bitmap(), 12, y, MIN(machine.primary_screen->default_bitmap().width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
+	draw_scanline8(*antic.bitmap, 12, y, MIN(antic.bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
 }
 
 static int cycle(running_machine &machine)

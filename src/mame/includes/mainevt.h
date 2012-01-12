@@ -40,5 +40,5 @@ extern void dv_sprite_callback(running_machine &machine, int *code,int *color,in
 VIDEO_START( mainevt );
 VIDEO_START( dv );
 
-SCREEN_UPDATE( mainevt );
-SCREEN_UPDATE( dv );
+SCREEN_UPDATE_IND16( mainevt );
+SCREEN_UPDATE_IND16( dv );

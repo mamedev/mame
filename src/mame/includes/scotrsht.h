@@ -26,4 +26,4 @@ WRITE8_HANDLER( scotrsht_palettebank_w );
 
 PALETTE_INIT( scotrsht );
 VIDEO_START( scotrsht );
-SCREEN_UPDATE( scotrsht );
+SCREEN_UPDATE_IND16( scotrsht );

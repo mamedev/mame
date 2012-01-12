@@ -49,4 +49,4 @@ WRITE8_HANDLER( angelkds_paletteram_w );
 WRITE8_HANDLER( angelkds_layer_ctrl_write );
 
 VIDEO_START( angelkds );
-SCREEN_UPDATE( angelkds );
+SCREEN_UPDATE_IND16( angelkds );

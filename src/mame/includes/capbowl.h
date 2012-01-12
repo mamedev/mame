@@ -31,7 +31,7 @@ public:
 /*----------- defined in video/capbowl.c -----------*/
 
 VIDEO_START( capbowl );
-SCREEN_UPDATE( capbowl );
+SCREEN_UPDATE_RGB32( capbowl );
 
 WRITE8_HANDLER( bowlrama_blitter_w );
 READ8_HANDLER( bowlrama_blitter_r );

@@ -228,7 +228,7 @@ public:
 
 	UINT8 m_communication_port[4];
 	UINT8 m_communication_port_status;
-	bitmap_t *m_bitmap;
+	bitmap_ind16 m_bitmap;
 	UINT8 m_vid_regs[7];
 };
 
@@ -456,7 +456,7 @@ static WRITE8_HANDLER(video_w)
 			for ( x = xstart; x < xstart + width; x++ )
 			{
 				if ( y < 256 )
-				state->m_bitmap->pix16(y, x) = color;
+				state->m_bitmap.pix16(y, x) = color;
 			}
 		}
 	}
@@ -465,16 +465,16 @@ static WRITE8_HANDLER(video_w)
 static VIDEO_START( sms )
 {
 	sms_state *state = machine.driver_data<sms_state>();
-	state->m_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state_save_register_global_array(machine, state->m_vid_regs);
-	state_save_register_global_bitmap(machine, state->m_bitmap);
+	state_save_register_global_bitmap(machine, &state->m_bitmap);
 }
 
-static SCREEN_UPDATE( sms )
+static SCREEN_UPDATE_IND16( sms )
 {
 	sms_state *state = screen.machine().driver_data<sms_state>();
-	copybitmap(bitmap, *state->m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -572,10 +572,9 @@ static MACHINE_CONFIG_START( sms, sms_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x1b0, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x1af, 0, 0xff)
-	MCFG_SCREEN_UPDATE(sms)
+	MCFG_SCREEN_UPDATE_STATIC(sms)
 
 	MCFG_PALETTE_LENGTH(8)
 

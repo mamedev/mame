@@ -13,7 +13,8 @@
 #include "emuopts.h"
 #include "uimenu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/laserdsc.h"
+#include "machine/pr8210.h"
+#include "machine/ldv1000.h"
 #include <ctype.h>
 
 #include "pr8210.lh"
@@ -617,30 +618,24 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ldplayer_core, ldplayer_state )
-
-	// audio hardware
+static MACHINE_CONFIG_START( ldplayer_ntsc, ldplayer_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( ldplayer_ntsc, ldplayer_core )
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED_CLASS( ldv1000, ldplayer_ntsc, ldv1000_state )
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
+	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 	MCFG_LASERDISC_GET_DISC(ldplayer_state::get_disc_static)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED_CLASS( pr8210, ldplayer_ntsc, pr8210_state )
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "screen", "ldsound")
+	MCFG_LASERDISC_PR8210_ADD("laserdisc")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 	MCFG_LASERDISC_GET_DISC(ldplayer_state::get_disc_static)
 MACHINE_CONFIG_END
 

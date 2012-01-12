@@ -24,4 +24,4 @@ WRITE16_HANDLER( prehisle_control16_w );
 READ16_HANDLER( prehisle_control16_r );
 
 VIDEO_START( prehisle );
-SCREEN_UPDATE( prehisle );
+SCREEN_UPDATE_IND16( prehisle );

@@ -116,7 +116,7 @@ VIDEO_START( wolfpack )
 
 	state->m_LFSR = auto_alloc_array(machine, UINT8, 0x8000);
 
-	state->m_helper = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	for (i = 0; i < 0x8000; i++)
 	{
@@ -131,7 +131,7 @@ VIDEO_START( wolfpack )
 }
 
 
-static void draw_ship(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_ship(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	static const UINT32 scaler[] =
@@ -167,7 +167,7 @@ static void draw_ship(running_machine &machine, bitmap_t &bitmap, const rectangl
 }
 
 
-static void draw_torpedo(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_torpedo(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	int count = 0;
@@ -201,7 +201,7 @@ static void draw_torpedo(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static void draw_pt(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_pt(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	rectangle rect = cliprect;
@@ -230,7 +230,7 @@ static void draw_pt(running_machine &machine, bitmap_t &bitmap, const rectangle 
 }
 
 
-static void draw_water(colortable_t *colortable, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle rect = cliprect;
 
@@ -250,7 +250,7 @@ static void draw_water(colortable_t *colortable, bitmap_t &bitmap, const rectang
 }
 
 
-SCREEN_UPDATE( wolfpack )
+SCREEN_UPDATE_IND16( wolfpack )
 {
 	wolfpack_state *state = screen.machine().driver_data<wolfpack_state>();
 	int i;
@@ -298,9 +298,9 @@ SCREEN_EOF( wolfpack )
 	int x;
 	int y;
 
-	state->m_helper->fill(0);
+	state->m_helper.fill(0);
 
-	draw_ship(screen.machine(), *state->m_helper, state->m_helper->cliprect());
+	draw_ship(screen.machine(), state->m_helper, state->m_helper.cliprect());
 
 	for (y = 128; y < 224 - state->m_torpedo_v; y++)
 	{
@@ -309,12 +309,12 @@ SCREEN_EOF( wolfpack )
 
 		for (x = 2 * x1; x < 2 * x2; x++)
 		{
-			if (x < 0 || x >= state->m_helper->width())
+			if (x < 0 || x >= state->m_helper.width())
 				continue;
-			if (y < 0 || y >= state->m_helper->height())
+			if (y < 0 || y >= state->m_helper.height())
 				continue;
 
-			if (state->m_helper->pix16(y, x))
+			if (state->m_helper.pix16(y, x))
 				state->m_collision = 1;
 		}
 	}

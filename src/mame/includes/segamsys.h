@@ -8,9 +8,9 @@ enum sms_mapper
 
 ADDRESS_MAP_EXTERN( sms_io_map, 8 );
 
-extern SCREEN_UPDATE(megatech_bios);
-extern SCREEN_UPDATE(megaplay_bios);
-extern SCREEN_UPDATE(megatech_md_sms);
+extern SCREEN_UPDATE_RGB32(megatech_bios);
+extern SCREEN_UPDATE_RGB32(megaplay_bios);
+extern SCREEN_UPDATE_RGB32(megatech_md_sms);
 extern DRIVER_INIT( megatech_bios );
 extern DRIVER_INIT( hazemd_segasyse );
 extern MACHINE_RESET(megatech_bios);
@@ -41,7 +41,7 @@ extern WRITE8_HANDLER( sms_vdp_2_data_w );
 extern READ8_HANDLER( sms_vdp_2_ctrl_r );
 extern WRITE8_HANDLER( sms_vdp_2_ctrl_w );
 extern SCREEN_EOF(systeme);
-extern SCREEN_UPDATE(systeme);
+extern SCREEN_UPDATE_RGB32(systeme);
 extern MACHINE_RESET(systeme);
 extern UINT8* sms_mainram;
 extern UINT8* vdp2_vram_bank0;

@@ -40,4 +40,4 @@ WRITE16_HANDLER( tail2nos_zoomdata_w );
 WRITE16_HANDLER( tail2nos_gfxbank_w );
 
 VIDEO_START( tail2nos );
-SCREEN_UPDATE( tail2nos );
+SCREEN_UPDATE_IND16( tail2nos );

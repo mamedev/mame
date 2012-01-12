@@ -51,7 +51,7 @@ DISCRETE_SOUND_EXTERN( polepos );
 
 VIDEO_START( polepos );
 PALETTE_INIT( polepos );
-SCREEN_UPDATE( polepos );
+SCREEN_UPDATE_IND16( polepos );
 
 WRITE16_HANDLER( polepos_view16_w );
 WRITE16_HANDLER( polepos_road16_w );

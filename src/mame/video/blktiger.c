@@ -199,7 +199,7 @@ WRITE8_HANDLER( blktiger_screen_layout_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 //  blktiger_state *state = machine.driver_data<blktiger_state>();
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
@@ -230,7 +230,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( blktiger )
+SCREEN_UPDATE_IND16( blktiger )
 {
 	blktiger_state *state = screen.machine().driver_data<blktiger_state>();
 

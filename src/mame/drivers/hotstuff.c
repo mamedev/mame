@@ -20,7 +20,7 @@ VIDEO_START( hotstuff )
 
 /* the first 0x20 bytes in every 0x200 (each line) of video ram are the colour data, providing a palette of 16 RGB444 colours for that line */
 
-SCREEN_UPDATE( hotstuff )
+SCREEN_UPDATE_RGB32( hotstuff )
 {
 	hotstuff_state *state = screen.machine().driver_data<hotstuff_state>();
 	int count, y,yyy,x,xxx;
@@ -82,10 +82,9 @@ static MACHINE_CONFIG_START( hotstuff, hotstuff_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA((0x10*4)+8, 101*8-1, 0*8, 33*8-1)
-	MCFG_SCREEN_UPDATE(hotstuff)
+	MCFG_SCREEN_UPDATE_STATIC(hotstuff)
 
 	MCFG_PALETTE_LENGTH(0x200)
 

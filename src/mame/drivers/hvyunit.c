@@ -154,7 +154,7 @@ static VIDEO_START( hvyunit )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 }
 
-static SCREEN_UPDATE( hvyunit )
+static SCREEN_UPDATE_IND16( hvyunit )
 {
 #define SX_POS	96
 #define SY_POS	0
@@ -669,10 +669,9 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE(hvyunit)
+	MCFG_SCREEN_UPDATE_STATIC(hvyunit)
 	MCFG_SCREEN_EOF(hvyunit)
 
 	MCFG_GFXDECODE(hvyunit)

@@ -56,7 +56,7 @@ DECLARE_LEGACY_SOUND_DEVICE(GRIDLEE, gridlee_sound);
 
 PALETTE_INIT( gridlee );
 VIDEO_START( gridlee );
-SCREEN_UPDATE( gridlee );
+SCREEN_UPDATE_IND16( gridlee );
 
 WRITE8_HANDLER( gridlee_cocktail_flip_w );
 WRITE8_HANDLER( gridlee_videoram_w );

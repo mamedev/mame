@@ -49,7 +49,7 @@ public:
     DECLARE_READ8_MEMBER( data_r );
     DECLARE_WRITE8_MEMBER( data_w );
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -64,10 +64,10 @@ protected:
 	inline void writebyte(offs_t address, UINT8 m_data);
 	inline void increment_csr();
 
-	void draw_text_scanline(bitmap_t &bitmap, const rectangle &cliprect, int y, UINT16 va);
-	void draw_graphics_scanline(bitmap_t &bitmap, const rectangle &cliprect, int y, UINT16 va);
-	void update_graphics(bitmap_t &bitmap, const rectangle &cliprect);
-	void update_text(bitmap_t &bitmap, const rectangle &cliprect);
+	void draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 va);
+	void draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 va);
+	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	int m_bf;					// busy flag

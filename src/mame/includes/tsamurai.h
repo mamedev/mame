@@ -39,7 +39,7 @@ WRITE8_HANDLER( tsamurai_fg_videoram_w );
 WRITE8_HANDLER( tsamurai_fg_colorram_w );
 
 VIDEO_START( tsamurai );
-SCREEN_UPDATE( tsamurai );
+SCREEN_UPDATE_IND16( tsamurai );
 
 VIDEO_START( vsgongf );
-SCREEN_UPDATE( vsgongf );
+SCREEN_UPDATE_IND16( vsgongf );

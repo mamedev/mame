@@ -143,12 +143,12 @@ VIDEO_START( fuuki32 )
 
 ***************************************************************************/
 
-static void draw_sprites( screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 	int offs;
 	const gfx_element *gfx = screen.machine().gfx[0];
-	bitmap_t &priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	const rectangle &visarea = screen.visible_area();
 	int max_x =	visarea.max_x + 1;
 	int max_y =	visarea.max_y + 1;
@@ -289,7 +289,7 @@ if (screen.machine().input().code_pressed(KEYCODE_X))
 ***************************************************************************/
 
 /* Wrapper to handle bg and bg2 ttogether */
-static void fuuki32_draw_layer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int i, int flag, int pri )
+static void fuuki32_draw_layer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
 	fuuki32_state *state = machine.driver_data<fuuki32_state>();
 	int buffer = ((state->m_vregs[0x1e / 4] & 0x0000ffff) & 0x40);
@@ -306,7 +306,7 @@ static void fuuki32_draw_layer( running_machine &machine, bitmap_t &bitmap, cons
 	}
 }
 
-SCREEN_UPDATE( fuuki32 )
+SCREEN_UPDATE_IND16( fuuki32 )
 {
 	fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 	UINT16 layer0_scrollx, layer0_scrolly;

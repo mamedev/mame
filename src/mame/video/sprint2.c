@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( sprint2 )
 {
 	sprint2_state *state = machine.driver_data<sprint2_state>();
-	state->m_helper = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 }
@@ -94,7 +94,7 @@ static UINT8 collision_check(sprint2_state *state, colortable_t *colortable, rec
 	for (y = rect.min_y; y <= rect.max_y; y++)
 		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(colortable, state->m_helper->pix16(y, x));
+			UINT16 a = colortable_entry_get_value(colortable, state->m_helper.pix16(y, x));
 
 			if (a == 0)
 				data |= 0x40;
@@ -121,7 +121,7 @@ INLINE int get_sprite_y(UINT8 *video_ram, int n)
 }
 
 
-SCREEN_UPDATE( sprint2 )
+SCREEN_UPDATE_IND16( sprint2 )
 {
 	sprint2_state *state = screen.machine().driver_data<sprint2_state>();
 	UINT8 *video_ram = state->m_video_ram;
@@ -180,9 +180,9 @@ SCREEN_EOF( sprint2 )
 
 		/* check for sprite-tilemap collisions */
 
-		tilemap_draw(*state->m_helper, rect, state->m_bg_tilemap, 0, 0);
+		tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
 
-		drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1],
+		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,
@@ -196,7 +196,7 @@ SCREEN_EOF( sprint2 )
 		for (j = 0; j < 4; j++)
 			if (j != i)
 			{
-				drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1],
+				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
 					get_sprite_code(video_ram, j),
 					1,
 					0, 0,
@@ -204,7 +204,7 @@ SCREEN_EOF( sprint2 )
 					get_sprite_y(video_ram, j), 0);
 			}
 
-		drawgfx_transpen(*state->m_helper, rect, screen.machine().gfx[1],
+		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,

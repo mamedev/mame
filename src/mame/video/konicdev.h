@@ -309,7 +309,7 @@ WRITE8_DEVICE_HANDLER( k007121_ctrl_w );
 
 /* shall we move source in the interface? */
 /* also notice that now we directly pass *gfx[chip] instead of **gfx !! */
-void k007121_sprites_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,
+void k007121_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,
 						  const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask );
 
 
@@ -321,7 +321,7 @@ WRITE8_DEVICE_HANDLER( k007342_scroll_w );
 WRITE8_DEVICE_HANDLER( k007342_vreg_w );
 
 void k007342_tilemap_update(device_t *device);
-void k007342_tilemap_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority);
+void k007342_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority);
 int k007342_is_int_enabled(device_t *device);
 
 
@@ -330,7 +330,7 @@ int k007342_is_int_enabled(device_t *device);
 
 READ8_DEVICE_HANDLER( k007420_r );
 WRITE8_DEVICE_HANDLER( k007420_w );
-void k007420_sprites_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, gfx_element *gfx);
+void k007420_sprites_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 
 
 /**  Konami 052109  **/
@@ -376,7 +376,7 @@ void k052109_tilemap_update(device_t *device);
 int k052109_is_irq_enabled(device_t *device);
 void k052109_set_layer_offsets(device_t *device, int layer, int dx, int dy);
 void k052109_tilemap_mark_dirty(device_t *device, int tmap_num);
-void k052109_tilemap_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority);
+void k052109_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority);
 
 
 /**  Konami 051960 / 051937  **/
@@ -404,7 +404,7 @@ WRITE8_DEVICE_HANDLER( k051937_w );
 READ16_DEVICE_HANDLER( k051937_word_r );
 WRITE16_DEVICE_HANDLER( k051937_word_w );
 
-void k051960_sprites_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int min_priority, int max_priority);
+void k051960_sprites_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int min_priority, int max_priority);
 int k051960_is_irq_enabled(device_t *device);
 int k051960_is_nmi_enabled(device_t *device);
 void k051960_set_sprite_offsets(device_t *device, int dx, int dy);
@@ -428,8 +428,8 @@ WRITE16_DEVICE_HANDLER( k053244_lsb_w );
 READ16_DEVICE_HANDLER( k053244_word_r );
 WRITE16_DEVICE_HANDLER( k053244_word_w );
 void k053244_bankselect(device_t *device, int bank);	/* used by TMNT2, Asterix and Premier Soccer for ROM testing */
-void k053245_sprites_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void k053245_sprites_draw_lethal(device_t *device, bitmap_t &bitmap, const rectangle &cliprect); /* for lethal enforcers */
+void k053245_sprites_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void k053245_sprites_draw_lethal(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect); /* for lethal enforcers */
 void k053245_clear_buffer(device_t *device);
 void k053245_set_sprite_offs(device_t *device, int offsx, int offsy);
 
@@ -463,7 +463,8 @@ WRITE32_DEVICE_HANDLER( k053247_long_w );
 WRITE16_DEVICE_HANDLER( k053247_reg_word_w ); // "OBJSET2" registers
 WRITE32_DEVICE_HANDLER( k053247_reg_long_w );
 
-void k053247_sprites_draw(device_t *device, bitmap_t &bitmap,const rectangle &cliprect);
+void k053247_sprites_draw(device_t *device, bitmap_ind16 &bitmap,const rectangle &cliprect);
+void k053247_sprites_draw(device_t *device, bitmap_rgb32 &bitmap,const rectangle &cliprect);
 int k053247_read_register(device_t *device, int regnum);
 void k053247_set_sprite_offs(device_t *device, int offsx, int offsy);
 void k053247_wraparound_enable(device_t *device, int status);
@@ -501,7 +502,7 @@ READ8_DEVICE_HANDLER( k051316_r );
 WRITE8_DEVICE_HANDLER( k051316_w );
 READ8_DEVICE_HANDLER( k051316_rom_r );
 WRITE8_DEVICE_HANDLER( k051316_ctrl_w );
-void k051316_zoom_draw(device_t *device, bitmap_t &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
+void k051316_zoom_draw(device_t *device, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
 void k051316_wraparound_enable(device_t *device, int status);
 
 
@@ -510,7 +511,7 @@ WRITE16_DEVICE_HANDLER( k053936_ctrl_w );
 READ16_DEVICE_HANDLER( k053936_ctrl_r );	// FIXME: this is probably unused... to be checked!
 WRITE16_DEVICE_HANDLER( k053936_linectrl_w );
 READ16_DEVICE_HANDLER( k053936_linectrl_r );
-void k053936_zoom_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack);
+void k053936_zoom_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack);
 void k053936_wraparound_enable(device_t *device, int status);	// shall we merge this into the configuration intf?
 void k053936_set_offset(device_t *device, int xoffs, int yoffs);	// shall we merge this into the configuration intf?
 
@@ -579,8 +580,9 @@ WRITE8_DEVICE_HANDLER( k056832_w );
 WRITE8_DEVICE_HANDLER( k056832_b_w );
 void k056832_mark_plane_dirty(device_t *device, int num);
 void k056832_mark_all_tmaps_dirty(device_t *device);
-void k056832_tilemap_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
-void k056832_tilemap_draw_dj(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
+void k056832_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+void k056832_tilemap_draw(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+void k056832_tilemap_draw_dj(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
 void k056832_set_layer_association(device_t *device, int status);
 int  k056832_get_layer_association(device_t *device);
 void k056832_set_layer_offs(device_t *device, int layer, int offsx, int offsy);
@@ -691,8 +693,8 @@ WRITE16_DEVICE_HANDLER( k054338_word_w ); // "CLCT" registers
 WRITE32_DEVICE_HANDLER( k054338_long_w );
 int k054338_register_r(device_t *device, int reg);
 void k054338_update_all_shadows(device_t *device, int rushingheroes_hack);			// called at the beginning of SCREEN_UPDATE()
-void k054338_fill_solid_bg(device_t *device, bitmap_t &bitmap);				// solid backcolor fill
-void k054338_fill_backcolor(device_t *device, bitmap_t &bitmap, int mode);	// unified fill, 0=solid, 1=gradient (by using a k055555)
+void k054338_fill_solid_bg(device_t *device, bitmap_ind16 &bitmap);				// solid backcolor fill
+void k054338_fill_backcolor(device_t *device, bitmap_rgb32 &bitmap, int mode);	// unified fill, 0=solid, 1=gradient (by using a k055555)
 int  k054338_set_alpha_level(device_t *device, int pblend);							// blend style 0-2
 void k054338_invert_alpha(device_t *device, int invert);								// 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
 //void K054338_export_config(device_t *device, int **shdRGB);
@@ -720,7 +722,7 @@ WRITE32_DEVICE_HANDLER( k001006_w );
 
 
 /**  Konami 001005  **/
-void k001005_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
+void k001005_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 void k001005_swap_buffers(device_t *device);
 void k001005_preprocess_texture_data(UINT8 *rom, int length, int gticlub);
 
@@ -729,8 +731,8 @@ WRITE32_DEVICE_HANDLER( k001005_w );
 
 
 /**  Konami 001604  **/
-void k001604_draw_back_layer( device_t *device, bitmap_t &bitmap, const rectangle &cliprect );
-void k001604_draw_front_layer( device_t *device, bitmap_t &bitmap, const rectangle &cliprect );
+void k001604_draw_back_layer( device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+void k001604_draw_front_layer( device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 WRITE32_DEVICE_HANDLER( k001604_tile_w );
 READ32_DEVICE_HANDLER( k001604_tile_r );
 WRITE32_DEVICE_HANDLER( k001604_char_w );
@@ -740,7 +742,7 @@ READ32_DEVICE_HANDLER( k001604_reg_r );
 
 
 /**  Konami 037122  **/
-void k037122_tile_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect );
+void k037122_tile_draw( device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 READ32_DEVICE_HANDLER( k037122_sram_r );
 WRITE32_DEVICE_HANDLER( k037122_sram_w );
 READ32_DEVICE_HANDLER( k037122_char_r );

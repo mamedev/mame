@@ -106,10 +106,10 @@ struct _d3d_info
 	int						last_wrap;					// previous wrap state
 	DWORD					last_modmode;				// previous texture modulation
 
-	bitmap_t *				vector_bitmap;				// experimental: bitmap for vectors
+	bitmap_argb32			vector_bitmap;				// experimental: bitmap for vectors
 	d3d_texture_info *		vector_texture;				// experimental: texture for vectors
 
-	bitmap_t *				default_bitmap;				// experimental: default bitmap
+	bitmap_rgb32			default_bitmap;				// experimental: default bitmap
 	d3d_texture_info *		default_texture;			// experimental: default texture
 
 	void *					hlsl_buf;					// HLSL vertex data

@@ -80,7 +80,7 @@ WRITE8_HANDLER( mosaic_bgvideoram_w )
 
 
 
-SCREEN_UPDATE( mosaic )
+SCREEN_UPDATE_IND16( mosaic )
 {
 	mosaic_state *state = screen.machine().driver_data<mosaic_state>();
 

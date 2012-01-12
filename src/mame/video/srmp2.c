@@ -50,7 +50,7 @@ int srmp3_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
 }
 
 
-SCREEN_UPDATE( srmp2 )
+SCREEN_UPDATE_IND16( srmp2 )
 {
 	srmp2_state *state = screen.machine().driver_data<srmp2_state>();
 	bitmap.fill(0x1ff, cliprect);
@@ -68,7 +68,7 @@ SCREEN_UPDATE( srmp2 )
 	return 0;
 }
 
-SCREEN_UPDATE( srmp3 )
+SCREEN_UPDATE_IND16( srmp3 )
 {
 	//srmp2_state *state = screen.machine().driver_data<srmp2_state>();
 	bitmap.fill(0x1f0, cliprect);
@@ -84,7 +84,7 @@ SCREEN_UPDATE( srmp3 )
 	return 0;
 }
 
-SCREEN_UPDATE( mjyuugi )
+SCREEN_UPDATE_IND16( mjyuugi )
 {
 	//srmp2_state *state = screen.machine().driver_data<srmp2_state>();
 	bitmap.fill(0x1f0, cliprect);

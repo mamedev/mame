@@ -32,9 +32,9 @@ public:
 //  size_t         m_spriteram_size;
 
 	/* video-related */
-	bitmap_t       *m_zoom_bitmap;
-	bitmap_t       *m_z_bitmap;
-	bitmap_t       *m_bg_bitmap;
+	bitmap_ind8 m_zoom_bitmap;
+	bitmap_ind16 m_z_bitmap;
+	bitmap_rgb32   m_bg_bitmap;
 	UINT16         *m_bg_zoom;
 	UINT8          m_alphatable[256];
 
@@ -45,5 +45,5 @@ public:
 /*----------- defined in video/psikyosh.c -----------*/
 
 VIDEO_START( psikyosh );
-SCREEN_UPDATE( psikyosh );
+SCREEN_UPDATE_RGB32( psikyosh );
 SCREEN_EOF( psikyosh );

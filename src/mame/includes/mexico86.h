@@ -59,5 +59,5 @@ WRITE8_HANDLER( mexico86_68705_ddr_b_w );
 
 WRITE8_HANDLER( mexico86_bankswitch_w );
 
-SCREEN_UPDATE( mexico86 );
-SCREEN_UPDATE( kikikai );
+SCREEN_UPDATE_IND16( mexico86 );
+SCREEN_UPDATE_IND16( kikikai );

@@ -7,7 +7,7 @@ public:
 	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 
-	void seta001_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bank_size, int setac);
+	void seta001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac);
 
 	void setac_eof( void );
 	void tnzs_eof( void );
@@ -52,8 +52,8 @@ protected:
 
 private:
 
-	void seta001_draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bank_size, int setac_type);
-	void seta001_draw_foreground( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bank_size);
+	void seta001_draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac_type);
+	void seta001_draw_foreground( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 
 };
 

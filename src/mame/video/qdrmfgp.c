@@ -57,7 +57,7 @@ VIDEO_START( qdrmfgp2 )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( qdrmfgp )
+SCREEN_UPDATE_IND16( qdrmfgp )
 {
 	device_t *k056832 = screen.machine().device("k056832");
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);

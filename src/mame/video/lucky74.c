@@ -241,7 +241,7 @@ VIDEO_START( lucky74 )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-SCREEN_UPDATE( lucky74 )
+SCREEN_UPDATE_IND16( lucky74 )
 {
 	lucky74_state *state = screen.machine().driver_data<lucky74_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

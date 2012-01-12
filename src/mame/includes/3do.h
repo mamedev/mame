@@ -197,6 +197,6 @@ void _3do_clio_init( running_machine &machine, screen_device *screen );
 
 
 VIDEO_START( _3do );
-SCREEN_UPDATE( _3do );
+SCREEN_UPDATE_RGB32( _3do );
 
 #endif /* _3DO_H_ */

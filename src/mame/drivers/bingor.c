@@ -457,7 +457,7 @@ static VIDEO_START(bingor)
 {
 }
 
-static SCREEN_UPDATE(bingor)
+static SCREEN_UPDATE_RGB32(bingor)
 {
 	bingor_state *state = screen.machine().driver_data<bingor_state>();
 	int x,y,count;
@@ -629,10 +629,9 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
-	MCFG_SCREEN_UPDATE(bingor)
+	MCFG_SCREEN_UPDATE_STATIC(bingor)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

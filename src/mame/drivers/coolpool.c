@@ -54,7 +54,7 @@ static const UINT16 nvram_unlock_seq[] =
  *
  *************************************/
 
-static void amerdart_scanline(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
+static void amerdart_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	coolpool_state *state = screen.machine().driver_data<coolpool_state>();
 
@@ -83,7 +83,7 @@ static void amerdart_scanline(screen_device &screen, bitmap_t &bitmap, int scanl
 }
 
 
-static void coolpool_scanline(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params)
+static void coolpool_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	coolpool_state *state = screen.machine().driver_data<coolpool_state>();
 
@@ -835,7 +835,8 @@ static const tms34010_config tms_config_amerdart =
 	"screen",						/* the screen operated on */
 	XTAL_40MHz/12,					/* pixel clock */
 	2,								/* pixels per clock */
-	amerdart_scanline,				/* scanline callback */
+	NULL,							/* scanline callback (indexed16) */
+	amerdart_scanline,				/* scanline callback (rgb32) */
 	NULL,							/* generate interrupt */
 	coolpool_to_shiftreg,			/* write to shiftreg function */
 	coolpool_from_shiftreg			/* read from shiftreg function */
@@ -848,7 +849,8 @@ static const tms34010_config tms_config_coolpool =
 	"screen",						/* the screen operated on */
 	XTAL_40MHz/6,					/* pixel clock */
 	1,								/* pixels per clock */
-	coolpool_scanline,				/* scanline callback */
+	NULL,							/* scanline callback (indexed16) */
+	coolpool_scanline,				/* scanline callback (rgb32) */
 	NULL,							/* generate interrupt */
 	coolpool_to_shiftreg,			/* write to shiftreg function */
 	coolpool_from_shiftreg			/* read from shiftreg function */
@@ -882,9 +884,8 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 212*2, 0, 161*2, 262, 0, 241)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -914,9 +915,8 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 424, 0, 320, 262, 0, 240)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_rgb32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

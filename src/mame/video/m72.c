@@ -430,7 +430,7 @@ WRITE16_HANDLER( majtitle_gfx_ctrl_w )
 
 ***************************************************************************/
 
-static void m72_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void m72_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	m72_state *state = machine.driver_data<m72_state>();
 	UINT16 *spriteram = state->m_buffered_spriteram;
@@ -484,7 +484,7 @@ static void m72_draw_sprites(running_machine &machine, bitmap_t &bitmap,const re
 	}
 }
 
-static void majtitle_draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void majtitle_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	m72_state *state = machine.driver_data<m72_state>();
 	UINT16 *spriteram16_2 = state->m_spriteram2;
@@ -535,7 +535,7 @@ static void majtitle_draw_sprites(running_machine &machine, bitmap_t &bitmap,con
 	}
 }
 
-SCREEN_UPDATE( m72 )
+SCREEN_UPDATE_IND16( m72 )
 {
 	m72_state *state = screen.machine().driver_data<m72_state>();
 	if (state->m_video_off)
@@ -558,7 +558,7 @@ SCREEN_UPDATE( m72 )
 	return 0;
 }
 
-SCREEN_UPDATE( majtitle )
+SCREEN_UPDATE_IND16( majtitle )
 {
 	m72_state *state = screen.machine().driver_data<m72_state>();
 	int i;

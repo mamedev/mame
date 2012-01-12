@@ -25,4 +25,4 @@ WRITE8_HANDLER( pingpong_colorram_w );
 
 PALETTE_INIT( pingpong );
 VIDEO_START( pingpong );
-SCREEN_UPDATE( pingpong );
+SCREEN_UPDATE_IND16( pingpong );

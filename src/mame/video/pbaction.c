@@ -84,7 +84,7 @@ VIDEO_START( pbaction )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	pbaction_state *state = machine.driver_data<pbaction_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -132,7 +132,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( pbaction )
+SCREEN_UPDATE_IND16( pbaction )
 {
 	pbaction_state *state = screen.machine().driver_data<pbaction_state>();
 

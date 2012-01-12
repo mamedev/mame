@@ -75,7 +75,7 @@ VIDEO_START( alpha68k )
 /******************************************************************************/
 
 //AT
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int j, int s, int e )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -128,7 +128,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 /******************************************************************************/
 
-SCREEN_UPDATE( alpha68k_II )
+SCREEN_UPDATE_IND16( alpha68k_II )
 {
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 
@@ -221,7 +221,7 @@ WRITE16_HANDLER( alpha68k_V_video_control_w )
 	}
 }
 
-static void draw_sprites_V( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask )
+static void draw_sprites_V( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -275,7 +275,7 @@ static void draw_sprites_V( running_machine &machine, bitmap_t &bitmap, const re
 	}
 }
 
-SCREEN_UPDATE( alpha68k_V )
+SCREEN_UPDATE_IND16( alpha68k_V )
 {
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -316,7 +316,7 @@ SCREEN_UPDATE( alpha68k_V )
 	return 0;
 }
 
-SCREEN_UPDATE( alpha68k_V_sb )
+SCREEN_UPDATE_IND16( alpha68k_V_sb )
 {
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 
@@ -340,7 +340,7 @@ SCREEN_UPDATE( alpha68k_V_sb )
 
 /******************************************************************************/
 //AT
-static void draw_sprites_I( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int c, int d, int yshift )
+static void draw_sprites_I( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d, int yshift )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -368,7 +368,7 @@ static void draw_sprites_I( running_machine &machine, bitmap_t &bitmap, const re
 	}
 }
 
-SCREEN_UPDATE( alpha68k_I )
+SCREEN_UPDATE_IND16( alpha68k_I )
 {
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 	int yshift = (state->m_microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
@@ -448,7 +448,7 @@ static void jongbou_video_banking(int *bank, int data)
 	*bank = (data >> 11 & 4) | (data >> 10 & 3);
 }
 
-static void kyros_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int c, int d )
+static void kyros_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -501,7 +501,7 @@ static void kyros_draw_sprites( running_machine &machine, bitmap_t &bitmap, cons
 	}
 }
 
-SCREEN_UPDATE( kyros )
+SCREEN_UPDATE_IND16( kyros )
 {
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 	colortable_entry_set_value(screen.machine().colortable, 0x100, *state->m_videoram & 0xff);
@@ -515,7 +515,7 @@ SCREEN_UPDATE( kyros )
 
 /******************************************************************************/
 
-static void sstingry_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int c, int d )
+static void sstingry_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d )
 {
 //AT
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
@@ -561,7 +561,7 @@ static void sstingry_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-SCREEN_UPDATE( sstingry )
+SCREEN_UPDATE_IND16( sstingry )
 {
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 	colortable_entry_set_value(screen.machine().colortable, 0x100, *state->m_videoram & 0xff);

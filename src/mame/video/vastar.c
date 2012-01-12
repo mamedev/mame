@@ -137,7 +137,7 @@ READ8_HANDLER( vastar_bg2videoram_r )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	vastar_state *state = machine.driver_data<vastar_state>();
 	UINT8 *spriteram = state->m_spriteram1;
@@ -196,7 +196,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-SCREEN_UPDATE( vastar )
+SCREEN_UPDATE_IND16( vastar )
 {
 	vastar_state *state = screen.machine().driver_data<vastar_state>();
 	int i;

@@ -92,7 +92,7 @@ WRITE8_HANDLER( m15_chargen_w )
 }
 
 
-INLINE void plot_pixel_m10( running_machine &machine, bitmap_t &bm, int x, int y, int col )
+INLINE void plot_pixel_m10( running_machine &machine, bitmap_ind16 &bm, int x, int y, int col )
 {
 	m10_state *state = machine.driver_data<m10_state>();
 
@@ -133,11 +133,11 @@ VIDEO_START( m15 )
 
 /***************************************************************************
 
-  Draw the game screen in the given bitmap_t.
+  Draw the game screen in the given bitmap_ind16.
 
 ***************************************************************************/
 
-SCREEN_UPDATE( m10 )
+SCREEN_UPDATE_IND16( m10 )
 {
 	m10_state *state = screen.machine().driver_data<m10_state>();
 	int offs;
@@ -173,11 +173,11 @@ SCREEN_UPDATE( m10 )
 
 /***************************************************************************
 
-  Draw the game screen in the given bitmap_t.
+  Draw the game screen in the given bitmap_ind16.
 
 ***************************************************************************/
 
-SCREEN_UPDATE( m15 )
+SCREEN_UPDATE_IND16( m15 )
 {
 	m10_state *state = screen.machine().driver_data<m10_state>();
 	int offs;

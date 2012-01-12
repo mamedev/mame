@@ -39,5 +39,5 @@ SAMPLES_START( polyplay_sh_start );
 
 PALETTE_INIT( polyplay );
 VIDEO_START( polyplay );
-SCREEN_UPDATE( polyplay );
+SCREEN_UPDATE_IND16( polyplay );
 WRITE8_HANDLER( polyplay_characterram_w );

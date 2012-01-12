@@ -244,7 +244,7 @@ static void init_savestate(running_machine &machine)
  *
  *************************************/
 
-SCREEN_UPDATE( astrocde )
+SCREEN_UPDATE_IND16( astrocde )
 {
 	astrocde_state *state = screen.machine().driver_data<astrocde_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -330,7 +330,7 @@ SCREEN_UPDATE( astrocde )
 }
 
 
-SCREEN_UPDATE( profpac )
+SCREEN_UPDATE_IND16( profpac )
 {
 	astrocde_state *state = screen.machine().driver_data<astrocde_state>();
 	int y;

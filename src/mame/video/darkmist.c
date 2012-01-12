@@ -127,7 +127,7 @@ VIDEO_START(darkmist)
 	tilemap_set_transparent_pen(state->m_txtilemap, 0);
 }
 
-SCREEN_UPDATE( darkmist)
+SCREEN_UPDATE_IND16( darkmist)
 {
 	darkmist_state *state = screen.machine().driver_data<darkmist_state>();
 	UINT8 *spriteram = state->m_spriteram;

@@ -276,7 +276,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 {
 	int vpos = m_screen->vpos();
 	UINT16 BackColour = m_Regs[7] & 15;
-	UINT16 *p = &m_tmpbmp->pix16(vpos);
+	UINT16 *p = &m_tmpbmp.pix16(vpos);
 
 	int y = vpos - m_top_border;
 
@@ -571,9 +571,10 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 
 
-void tms9928a_device::update( bitmap_t &bitmap, const rectangle &cliprect )
+UINT32 tms9928a_device::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	copybitmap( bitmap, *m_tmpbmp, 0, 0, 0, 0, cliprect );
+	copybitmap( bitmap, m_tmpbmp, 0, 0, 0, 0, cliprect );
+	return 0;
 }
 
 
@@ -608,7 +609,7 @@ void tms9928a_device::device_start()
 	m_vMem = auto_alloc_array_clear(machine(), UINT8, m_vram_size);
 
 	/* back bitmap */
-	m_tmpbmp = auto_bitmap_alloc(machine(), TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_PAL, m_screen->format());
+	m_tmpbmp.allocate(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_PAL);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
 

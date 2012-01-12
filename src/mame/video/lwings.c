@@ -184,7 +184,7 @@ INLINE int is_sprite_on( UINT8 *buffered_spriteram, int offs )
 	return sx || sy;
 }
 
-static void lwings_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void lwings_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
 	int offs;
@@ -220,7 +220,7 @@ static void lwings_draw_sprites( running_machine &machine, bitmap_t &bitmap, con
 	}
 }
 
-static void trojan_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void trojan_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lwings_state *state = machine.driver_data<lwings_state>();
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
@@ -269,7 +269,7 @@ static void trojan_draw_sprites( running_machine &machine, bitmap_t &bitmap, con
 	}
 }
 
-SCREEN_UPDATE( lwings )
+SCREEN_UPDATE_IND16( lwings )
 {
 	lwings_state *state = screen.machine().driver_data<lwings_state>();
 
@@ -279,7 +279,7 @@ SCREEN_UPDATE( lwings )
 	return 0;
 }
 
-SCREEN_UPDATE( trojan )
+SCREEN_UPDATE_IND16( trojan )
 {
 	lwings_state *state = screen.machine().driver_data<lwings_state>();
 

@@ -38,7 +38,7 @@ public:
 
 /*----------- defined in video/asterix.c -----------*/
 
-SCREEN_UPDATE( asterix );
+SCREEN_UPDATE_IND16( asterix );
 WRITE16_HANDLER( asterix_spritebank_w );
 
 extern void asterix_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);

@@ -12,7 +12,7 @@ public:
 	UINT8 m_last_wheel[4];
 	int m_collision[4];
 	tilemap_t* m_playfield;
-	bitmap_t* m_helper;
+	bitmap_ind16 m_helper;
 };
 
 
@@ -22,6 +22,6 @@ PALETTE_INIT( sprint4 );
 
 SCREEN_EOF( sprint4 );
 VIDEO_START( sprint4 );
-SCREEN_UPDATE( sprint4 );
+SCREEN_UPDATE_IND16( sprint4 );
 
 WRITE8_HANDLER( sprint4_video_ram_w );

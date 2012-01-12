@@ -65,7 +65,7 @@ WRITE16_HANDLER( sderby_fg_videoram_w )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int codeshift)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int codeshift)
 {
 	sderby_state *state = machine.driver_data<sderby_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -108,7 +108,7 @@ VIDEO_START( sderby )
 	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
 }
 
-SCREEN_UPDATE( sderby )
+SCREEN_UPDATE_IND16( sderby )
 {
 	sderby_state *state = screen.machine().driver_data<sderby_state>();
 
@@ -119,7 +119,7 @@ SCREEN_UPDATE( sderby )
 	return 0;
 }
 
-SCREEN_UPDATE( pmroulet )
+SCREEN_UPDATE_IND16( pmroulet )
 {
 	sderby_state *state = screen.machine().driver_data<sderby_state>();
 

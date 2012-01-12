@@ -163,7 +163,7 @@ static VIDEO_START(igs_majhong)
 	logerror("Video START OK!\n");
 }
 
-static SCREEN_UPDATE(igs_majhong)
+static SCREEN_UPDATE_IND16(igs_majhong)
 {
 	igs_m027_state *state = screen.machine().driver_data<igs_m027_state>();
 	//??????????
@@ -401,10 +401,9 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE( igs_majhong )
+	MCFG_SCREEN_UPDATE_STATIC( igs_majhong )
 
 	MCFG_PALETTE_LENGTH(0x200)
 

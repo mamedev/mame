@@ -451,7 +451,7 @@ static VIDEO_START( stisub )
 }
 
 
-static SCREEN_UPDATE( subsino )
+static SCREEN_UPDATE_IND16( subsino )
 {
 	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	bitmap.fill(0, cliprect);
@@ -459,7 +459,7 @@ static SCREEN_UPDATE( subsino )
 	return 0;
 }
 
-static SCREEN_UPDATE( subsino_reels )
+static SCREEN_UPDATE_IND16( subsino_reels )
 {
 	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
@@ -489,7 +489,7 @@ static SCREEN_UPDATE( subsino_reels )
 }
 
 
-static SCREEN_UPDATE( stisub_reels )
+static SCREEN_UPDATE_IND16( stisub_reels )
 {
 	subsino_state *state = screen.machine().driver_data<subsino_state>();
 	int i;
@@ -2629,10 +2629,9 @@ static MACHINE_CONFIG_START( victor21, subsino_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE(subsino)
+	MCFG_SCREEN_UPDATE_STATIC(subsino)
 
 	MCFG_GFXDECODE(subsino_depth3)
 
@@ -2670,10 +2669,9 @@ static MACHINE_CONFIG_START( crsbingo, subsino_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE(subsino)
+	MCFG_SCREEN_UPDATE_STATIC(subsino)
 
 	MCFG_GFXDECODE(subsino_depth4)
 
@@ -2700,10 +2698,9 @@ static MACHINE_CONFIG_START( srider, subsino_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE(subsino)
+	MCFG_SCREEN_UPDATE_STATIC(subsino)
 
 	MCFG_GFXDECODE(subsino_depth4)
 
@@ -2740,10 +2737,9 @@ static MACHINE_CONFIG_START( tisub, subsino_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE(subsino_reels)
+	MCFG_SCREEN_UPDATE_STATIC(subsino_reels)
 
 	MCFG_GFXDECODE(subsino_depth4_reels)
 
@@ -2769,10 +2765,9 @@ static MACHINE_CONFIG_START( stisub, subsino_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE(stisub_reels)
+	MCFG_SCREEN_UPDATE_STATIC(stisub_reels)
 
 	MCFG_GFXDECODE(subsino_stisub)
 

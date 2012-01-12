@@ -136,7 +136,7 @@ VIDEO_START( yunsun16 )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	yunsun16_state *state = machine.driver_data<yunsun16_state>();
 	int offs;
@@ -200,7 +200,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 ***************************************************************************/
 
 
-SCREEN_UPDATE( yunsun16 )
+SCREEN_UPDATE_IND16( yunsun16 )
 {
 	yunsun16_state *state = screen.machine().driver_data<yunsun16_state>();
 

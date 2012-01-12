@@ -13,7 +13,7 @@ public:
 	int m_next_sprite_overdraw_enabled;
 	int (*m_stencil_compare_function) (UINT16 pal);
 	int m_sprites_updated;
-	bitmap_t *m_sp_bitmap;
+	bitmap_ind16 m_sp_bitmap;
 	int m_robokid_sprites;
 	tilemap_t* m_fg_tilemap;
 	tilemap_t* m_bg_tilemap;
@@ -56,8 +56,8 @@ extern VIDEO_START( mnight );
 extern VIDEO_START( arkarea );
 extern VIDEO_START( robokid );
 extern VIDEO_START( omegaf );
-extern SCREEN_UPDATE( ninjakd2 );
-extern SCREEN_UPDATE( robokid );
-extern SCREEN_UPDATE( omegaf );
+extern SCREEN_UPDATE_IND16( ninjakd2 );
+extern SCREEN_UPDATE_IND16( robokid );
+extern SCREEN_UPDATE_IND16( omegaf );
 extern SCREEN_EOF( ninjakd2 );
 

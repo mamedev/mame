@@ -36,4 +36,4 @@ WRITE8_HANDLER( kopunch_gfxbank_w );
 
 PALETTE_INIT( kopunch );
 VIDEO_START( kopunch );
-SCREEN_UPDATE( kopunch );
+SCREEN_UPDATE_IND16( kopunch );

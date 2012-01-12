@@ -22,7 +22,7 @@ WRITE16_HANDLER( bloodbro_bgvideoram_w );
 WRITE16_HANDLER( bloodbro_fgvideoram_w );
 WRITE16_HANDLER( bloodbro_txvideoram_w );
 
-SCREEN_UPDATE( bloodbro );
-SCREEN_UPDATE( weststry );
-SCREEN_UPDATE( skysmash );
+SCREEN_UPDATE_IND16( bloodbro );
+SCREEN_UPDATE_IND16( weststry );
+SCREEN_UPDATE_IND16( skysmash );
 VIDEO_START( bloodbro );

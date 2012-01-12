@@ -129,8 +129,7 @@ VIDEO_START( bnj )
 	/* the background area is twice as wide as the screen */
 	int width = 256;
 	int height = 256;
-	bitmap_format format = machine.primary_screen->format();
-	state->m_background_bitmap = auto_bitmap_alloc(machine, 2 * width, height, format);
+	state->m_background_bitmap = auto_bitmap_ind16_alloc(machine, 2 * width, height);
 
 	state->save_item(NAME(*state->m_background_bitmap));
 
@@ -301,7 +300,7 @@ WRITE8_HANDLER( disco_video_control_w )
 }
 
 
-static void draw_chars( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 transparency, UINT8 color, int priority )
+static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 transparency, UINT8 color, int priority )
 {
 	btime_state *state = machine.driver_data<btime_state>();
 	offs_t offs;
@@ -332,7 +331,7 @@ static void draw_chars( running_machine &machine, bitmap_t &bitmap, const rectan
 	}
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 color,
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 color,
 						 UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
 						 UINT8 *sprite_ram, offs_t interleave )
 {
@@ -382,7 +381,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-static void draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8* tmap, UINT8 color )
+static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* tmap, UINT8 color )
 {
 	btime_state *state = machine.driver_data<btime_state>();
 	int i;
@@ -422,7 +421,7 @@ static void draw_background( running_machine &machine, bitmap_t &bitmap, const r
 }
 
 
-SCREEN_UPDATE( btime )
+SCREEN_UPDATE_IND16( btime )
 {
 	btime_state *state = screen.machine().driver_data<btime_state>();
 	if (state->m_bnj_scroll1 & 0x10)
@@ -453,7 +452,7 @@ SCREEN_UPDATE( btime )
 }
 
 
-SCREEN_UPDATE( eggs )
+SCREEN_UPDATE_IND16( eggs )
 {
 	btime_state *state = screen.machine().driver_data<btime_state>();
 	draw_chars(screen.machine(), bitmap, cliprect, FALSE, 0, -1);
@@ -463,7 +462,7 @@ SCREEN_UPDATE( eggs )
 }
 
 
-SCREEN_UPDATE( lnc )
+SCREEN_UPDATE_IND16( lnc )
 {
 	btime_state *state = screen.machine().driver_data<btime_state>();
 	draw_chars(screen.machine(), bitmap, cliprect, FALSE, 0, -1);
@@ -473,7 +472,7 @@ SCREEN_UPDATE( lnc )
 }
 
 
-SCREEN_UPDATE( zoar )
+SCREEN_UPDATE_IND16( zoar )
 {
 	btime_state *state = screen.machine().driver_data<btime_state>();
 	if (state->m_bnj_scroll1 & 0x04)
@@ -492,7 +491,7 @@ SCREEN_UPDATE( zoar )
 }
 
 
-SCREEN_UPDATE( bnj )
+SCREEN_UPDATE_IND16( bnj )
 {
 	btime_state *state = screen.machine().driver_data<btime_state>();
 	if (state->m_bnj_scroll1)
@@ -542,7 +541,7 @@ SCREEN_UPDATE( bnj )
 }
 
 
-SCREEN_UPDATE( cookrace )
+SCREEN_UPDATE_IND16( cookrace )
 {
 	btime_state *state = screen.machine().driver_data<btime_state>();
 	int offs;
@@ -574,7 +573,7 @@ SCREEN_UPDATE( cookrace )
 }
 
 
-SCREEN_UPDATE( disco )
+SCREEN_UPDATE_IND16( disco )
 {
 	btime_state *state = screen.machine().driver_data<btime_state>();
 	draw_chars(screen.machine(), bitmap, cliprect, FALSE, state->m_btime_palette, -1);

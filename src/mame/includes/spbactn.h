@@ -8,12 +8,12 @@ public:
 	UINT16 *m_fgvideoram;
 	UINT16 *m_spvideoram;
 
-	bitmap_t *m_tile_bitmap_bg;
-	bitmap_t *m_tile_bitmap_fg;
+	bitmap_ind16 m_tile_bitmap_bg;
+	bitmap_ind16 m_tile_bitmap_fg;
 };
 
 
 /*----------- defined in video/spbactn.c -----------*/
 
 VIDEO_START( spbactn );
-SCREEN_UPDATE( spbactn );
+SCREEN_UPDATE_RGB32( spbactn );

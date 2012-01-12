@@ -33,5 +33,5 @@ WRITE16_HANDLER( gaelco_vram_w );
 VIDEO_START( bigkarnk );
 VIDEO_START( maniacsq );
 
-SCREEN_UPDATE( bigkarnk );
-SCREEN_UPDATE( maniacsq );
+SCREEN_UPDATE_IND16( bigkarnk );
+SCREEN_UPDATE_IND16( maniacsq );

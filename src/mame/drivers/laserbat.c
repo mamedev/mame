@@ -503,7 +503,7 @@ static VIDEO_START( laserbat )
 	state->save_item(NAME(state->m_colorram));
 }
 
-static SCREEN_UPDATE( laserbat )
+static SCREEN_UPDATE_IND16( laserbat )
 {
 	laserbat_state *state = screen.machine().driver_data<laserbat_state>();
 	int y;
@@ -511,9 +511,9 @@ static SCREEN_UPDATE( laserbat )
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* update the S2636 chips */
-	bitmap_t &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
-	bitmap_t &s2636_2_bitmap = s2636_update(state->m_s2636_2, cliprect);
-	bitmap_t &s2636_3_bitmap = s2636_update(state->m_s2636_3, cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
+	bitmap_ind16 &s2636_2_bitmap = s2636_update(state->m_s2636_2, cliprect);
+	bitmap_ind16 &s2636_3_bitmap = s2636_update(state->m_s2636_3, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -777,10 +777,9 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(laserbat)
+	MCFG_SCREEN_UPDATE_STATIC(laserbat)
 
 	MCFG_GFXDECODE(laserbat)
 	MCFG_PALETTE_LENGTH(1024)
@@ -825,10 +824,9 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(laserbat)
+	MCFG_SCREEN_UPDATE_STATIC(laserbat)
 
 	MCFG_GFXDECODE(laserbat)
 	MCFG_PALETTE_LENGTH(1024)

@@ -34,7 +34,7 @@ VIDEO_START( xboard )
  *
  *************************************/
 
-SCREEN_UPDATE( xboard )
+SCREEN_UPDATE_IND16( xboard )
 {
 	segas1x_state *state = screen.machine().driver_data<segas1x_state>();
 

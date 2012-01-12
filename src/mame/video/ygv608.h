@@ -333,7 +333,7 @@ void ygv608_set_gfxbank(UINT8 gfxbank);
 
 INTERRUPT_GEN( ygv608_timed_interrupt );
 VIDEO_START( ygv608 );
-SCREEN_UPDATE( ygv608 );
+SCREEN_UPDATE_IND16( ygv608 );
 
 READ16_HANDLER( ygv608_r );
 WRITE16_HANDLER( ygv608_w );

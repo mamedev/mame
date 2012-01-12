@@ -60,7 +60,7 @@ WRITE16_HANDLER( drgnmst_md_videoram_w )
 	tilemap_mark_tile_dirty(state->m_md_tilemap, offset / 2);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	drgnmst_state *state = machine.driver_data<drgnmst_state>();
 	const gfx_element *gfx = machine.gfx[0];
@@ -139,7 +139,7 @@ VIDEO_START(drgnmst)
 	tilemap_set_scroll_rows(state->m_md_tilemap, 1024);
 }
 
-SCREEN_UPDATE(drgnmst)
+SCREEN_UPDATE_IND16(drgnmst)
 {
 	drgnmst_state *state = screen.machine().driver_data<drgnmst_state>();
 	int y, rowscroll_bank;

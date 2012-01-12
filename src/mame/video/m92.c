@@ -323,7 +323,7 @@ VIDEO_START( ppan )
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
 	UINT16 *source = machine.generic.buffered_spriteram.u16;
@@ -397,7 +397,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 // This needs a lot of work...
-static void ppan_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void ppan_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
 	UINT16 *source = machine.generic.spriteram.u16; // sprite buffer control is never triggered
@@ -521,7 +521,7 @@ static void m92_update_scroll_positions(running_machine &machine)
 
 /*****************************************************************************/
 
-static void m92_draw_tiles(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void m92_draw_tiles(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
 
@@ -545,7 +545,7 @@ static void m92_draw_tiles(running_machine &machine, bitmap_t &bitmap,const rect
 }
 
 
-SCREEN_UPDATE( m92 )
+SCREEN_UPDATE_IND16( m92 )
 {
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
@@ -562,7 +562,7 @@ SCREEN_UPDATE( m92 )
 	return 0;
 }
 
-SCREEN_UPDATE( ppan )
+SCREEN_UPDATE_IND16( ppan )
 {
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);

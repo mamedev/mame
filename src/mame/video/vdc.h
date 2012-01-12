@@ -2,7 +2,7 @@
 #include "video/generic.h"
 
 VIDEO_START( pce );
-SCREEN_UPDATE( pce );
+SCREEN_UPDATE_IND16( pce );
 WRITE8_HANDLER ( vdc_0_w );
 WRITE8_HANDLER ( vdc_1_w );
  READ8_HANDLER ( vdc_0_r );

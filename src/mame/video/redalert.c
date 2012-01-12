@@ -186,7 +186,7 @@ static VIDEO_START( ww3 )
  *
  *************************************/
 
-static SCREEN_UPDATE( redalert )
+static SCREEN_UPDATE_RGB32( redalert )
 {
 	redalert_state *state = screen.machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
@@ -259,7 +259,7 @@ static SCREEN_UPDATE( redalert )
  *
  *************************************/
 
-static SCREEN_UPDATE( demoneye )
+static SCREEN_UPDATE_RGB32( demoneye )
 {
 	redalert_state *state = screen.machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
@@ -334,7 +334,7 @@ static SCREEN_UPDATE( demoneye )
  *
  *************************************/
 
-static SCREEN_UPDATE( panther )
+static SCREEN_UPDATE_RGB32( panther )
 {
 	redalert_state *state = screen.machine().driver_data<redalert_state>();
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
@@ -408,12 +408,11 @@ static SCREEN_UPDATE( panther )
 
 static MACHINE_CONFIG_FRAGMENT( redalert_video_common )
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(redalert)
+	MCFG_SCREEN_UPDATE_STATIC(redalert)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( redalert_video )
@@ -441,12 +440,11 @@ MACHINE_CONFIG_FRAGMENT( demoneye_video )
 	MCFG_VIDEO_START(redalert)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(demoneye)
+	MCFG_SCREEN_UPDATE_STATIC(demoneye)
 MACHINE_CONFIG_END
 
 
@@ -455,11 +453,10 @@ MACHINE_CONFIG_FRAGMENT( panther_video )
 	MCFG_VIDEO_START(ww3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(panther)
+	MCFG_SCREEN_UPDATE_STATIC(panther)
 MACHINE_CONFIG_END
 

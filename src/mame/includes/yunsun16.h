@@ -37,4 +37,4 @@ WRITE16_HANDLER( yunsun16_vram_0_w );
 WRITE16_HANDLER( yunsun16_vram_1_w );
 
 VIDEO_START( yunsun16 );
-SCREEN_UPDATE( yunsun16 );
+SCREEN_UPDATE_IND16( yunsun16 );

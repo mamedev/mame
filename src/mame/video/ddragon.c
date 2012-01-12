@@ -154,7 +154,7 @@ WRITE8_HANDLER( ddragon_fgvideoram_w )
 					cliprect,gfx, \
 					(which + order),color,flipx,flipy,sx,sy,0);
 
-static void draw_sprites( running_machine& machine, bitmap_t &bitmap,const rectangle &cliprect )
+static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 	const gfx_element *gfx = machine.gfx[1];
@@ -240,7 +240,7 @@ static void draw_sprites( running_machine& machine, bitmap_t &bitmap,const recta
 #undef DRAW_SPRITE
 
 
-SCREEN_UPDATE( ddragon )
+SCREEN_UPDATE_IND16( ddragon )
 {
 	ddragon_state *state = screen.machine().driver_data<ddragon_state>();
 

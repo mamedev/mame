@@ -89,7 +89,7 @@ static VIDEO_START(spoker)
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-static SCREEN_UPDATE(spoker)
+static SCREEN_UPDATE_IND16(spoker)
 {
 	spoker_state *state = screen.machine().driver_data<spoker_state>();
 
@@ -539,10 +539,9 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE(spoker)
+	MCFG_SCREEN_UPDATE_STATIC(spoker)
 
 	MCFG_GFXDECODE(spoker)
 	MCFG_PALETTE_LENGTH(0x400)

@@ -11,7 +11,7 @@
 
 /******************************************************************************/
 
-static void draw_sprites( running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect, int pf_priority )
+static void draw_sprites( running_machine& machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pf_priority )
 {
 	dassault_state *state = machine.driver_data<dassault_state>();
 	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
@@ -173,7 +173,7 @@ static void draw_sprites( running_machine& machine, bitmap_t &bitmap, const rect
 
 /******************************************************************************/
 
-SCREEN_UPDATE( dassault )
+SCREEN_UPDATE_RGB32( dassault )
 {
 	dassault_state *state = screen.machine().driver_data<dassault_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);

@@ -177,7 +177,7 @@ WRITE16_HANDLER( f1gp2_gfxctrl_w )
 
 ***************************************************************************/
 
-static void f1gp_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int chip, int primask )
+static void f1gp_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int primask )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 	int attr_start, first;
@@ -250,7 +250,7 @@ static void f1gp_draw_sprites( running_machine &machine, bitmap_t &bitmap, const
 }
 
 
-SCREEN_UPDATE( f1gp )
+SCREEN_UPDATE_IND16( f1gp )
 {
 	f1gp_state *state = screen.machine().driver_data<f1gp_state>();
 
@@ -275,7 +275,7 @@ SCREEN_UPDATE( f1gp )
 }
 
 
-static void f1gpb_draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
+static void f1gpb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -343,7 +343,7 @@ static void f1gpb_draw_sprites( running_machine &machine, bitmap_t &bitmap,const
 	}
 }
 
-SCREEN_UPDATE( f1gpb )
+SCREEN_UPDATE_IND16( f1gpb )
 {
 	f1gp_state *state = screen.machine().driver_data<f1gp_state>();
 	UINT32 startx, starty;
@@ -372,7 +372,7 @@ SCREEN_UPDATE( f1gpb )
 }
 
 
-static void f1gp2_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void f1gp2_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 	int offs;
@@ -444,7 +444,7 @@ static void f1gp2_draw_sprites( running_machine &machine, bitmap_t &bitmap, cons
 }
 
 
-SCREEN_UPDATE( f1gp2 )
+SCREEN_UPDATE_IND16( f1gp2 )
 {
 	f1gp_state *state = screen.machine().driver_data<f1gp_state>();
 

@@ -39,7 +39,7 @@ public:
 	int m_gfxdraw_mode;
 	int m_nb19010_busyctr;
 	int m_nb19010_busyflag;
-	bitmap_t *m_tmpbitmap[VRAM_MAX];
+	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
 	UINT16 *m_videoram[VRAM_MAX];
 	UINT16 *m_videoworkram[VRAM_MAX];
 	UINT8 *m_palette;
@@ -51,7 +51,7 @@ public:
 
 /*----------- defined in video/nbmj9195.c -----------*/
 
-SCREEN_UPDATE( nbmj9195 );
+SCREEN_UPDATE_IND16( nbmj9195 );
 VIDEO_START( nbmj9195_1layer );
 VIDEO_START( nbmj9195_2layer );
 VIDEO_START( nbmj9195_nb22090 );

@@ -45,7 +45,7 @@ void parodius_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-SCREEN_UPDATE( parodius )
+SCREEN_UPDATE_IND16( parodius )
 {
 	parodius_state *state = screen.machine().driver_data<parodius_state>();
 	int layer[3], bg_colorbase;

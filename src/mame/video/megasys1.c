@@ -567,7 +567,7 @@ WRITE16_HANDLER( megasys1_vregs_D_w )
     0C      Y position
     0E      Code                                            */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	megasys1_state *state = machine.driver_data<megasys1_state>();
 	int color,code,sx,sy,flipx,flipy,attr,sprite,offs,color_mask;
@@ -920,11 +920,11 @@ PALETTE_INIT( megasys1 )
 
 
 /***************************************************************************
-              Draw the game screen in the given bitmap_t.
+              Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
 
-SCREEN_UPDATE( megasys1 )
+SCREEN_UPDATE_IND16( megasys1 )
 {
 	megasys1_state *state = screen.machine().driver_data<megasys1_state>();
 	int i,flag,pri,primask;

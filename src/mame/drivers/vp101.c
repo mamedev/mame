@@ -30,6 +30,8 @@ public:
 	DECLARE_READ32_MEMBER(tty_ready_r);
 	DECLARE_WRITE32_MEMBER(tty_w);
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 
 	// devices
@@ -37,7 +39,6 @@ protected:
 
 	// driver_device overrides
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -45,7 +46,7 @@ void vp10x_state::video_start()
 {
 }
 
-bool vp10x_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 vp10x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -89,7 +90,7 @@ static MACHINE_CONFIG_START( vp101, vp10x_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(vp10x_state, screen_update)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_PALETTE_LENGTH(32768)

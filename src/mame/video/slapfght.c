@@ -153,7 +153,7 @@ static void slapfght_log_vram(running_machine &machine)
   Render the Sprites
 
 ***************************************************************************/
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority_to_display )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
 	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
@@ -187,7 +187,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( perfrman )
+SCREEN_UPDATE_IND16( perfrman )
 {
 	slapfght_state *state = screen.machine().driver_data<slapfght_state>();
 	tilemap_set_flip( state->m_pf1_tilemap, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -209,7 +209,7 @@ SCREEN_UPDATE( perfrman )
 }
 
 
-SCREEN_UPDATE( slapfight )
+SCREEN_UPDATE_IND16( slapfight )
 {
 	slapfght_state *state = screen.machine().driver_data<slapfght_state>();
 	UINT8 *buffered_spriteram = screen.machine().generic.buffered_spriteram.u8;

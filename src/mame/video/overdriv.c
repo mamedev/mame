@@ -50,7 +50,7 @@ void overdriv_zoom_callback_1( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-SCREEN_UPDATE( overdriv )
+SCREEN_UPDATE_IND16( overdriv )
 {
 	overdriv_state *state = screen.machine().driver_data<overdriv_state>();
 

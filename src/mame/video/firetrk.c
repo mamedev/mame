@@ -225,8 +225,8 @@ static TILE_GET_INFO( montecar_get_tile_info2 )
 VIDEO_START( firetrk )
 {
 	firetrk_state *state = machine.driver_data<firetrk_state>();
-	state->m_helper1 = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_helper2 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_tilemap1 = tilemap_create(machine, firetrk_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
 	state->m_tilemap2 = tilemap_create(machine, firetrk_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
@@ -236,8 +236,8 @@ VIDEO_START( firetrk )
 VIDEO_START( superbug )
 {
 	firetrk_state *state = machine.driver_data<firetrk_state>();
-	state->m_helper1 = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_helper2 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_tilemap1 = tilemap_create(machine, superbug_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
 	state->m_tilemap2 = tilemap_create(machine, superbug_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
@@ -247,15 +247,15 @@ VIDEO_START( superbug )
 VIDEO_START( montecar )
 {
 	firetrk_state *state = machine.driver_data<firetrk_state>();
-	state->m_helper1 = machine.primary_screen->alloc_compatible_bitmap();
-	state->m_helper2 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	state->m_tilemap1 = tilemap_create(machine, montecar_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
 	state->m_tilemap2 = tilemap_create(machine, montecar_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
 }
 
 
-static void firetrk_draw_car(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int flash)
+static void firetrk_draw_car(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int flash)
 {
 	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int gfx_bank, code, color, flip_x, flip_y, x, y;
@@ -285,7 +285,7 @@ static void firetrk_draw_car(running_machine &machine, bitmap_t &bitmap, const r
 }
 
 
-static void superbug_draw_car(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, gfx_element **gfx, int flash)
+static void superbug_draw_car(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int flash)
 {
 	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int gfx_bank = (*state->m_car_rot & 0x10) ? 4 : 3;
@@ -298,7 +298,7 @@ static void superbug_draw_car(running_machine &machine, bitmap_t &bitmap, const 
 }
 
 
-static void montecar_draw_car(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int is_collision_detection)
+static void montecar_draw_car(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int is_collision_detection)
 {
 	firetrk_state *state = machine.driver_data<firetrk_state>();
 	int gfx_bank, code, color, flip_x, flip_y, x, y;
@@ -328,7 +328,7 @@ static void montecar_draw_car(running_machine &machine, bitmap_t &bitmap, const 
 }
 
 
-static void draw_text(bitmap_t &bitmap, const rectangle &cliprect, gfx_element **gfx, UINT8 *alpha_ram,
+static void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, UINT8 *alpha_ram,
 					  int x, int count, int height)
 {
 	int i;
@@ -345,8 +345,8 @@ static void check_collision(firetrk_state *state, int which)
 	for (y = playfield_window.min_y; y <= playfield_window.max_y; y++)
 		for (x = playfield_window.min_x; x <= playfield_window.max_x; x++)
 		{
-			pen_t a = state->m_helper1->pix16(y, x);
-			pen_t b = state->m_helper2->pix16(y, x);
+			pen_t a = state->m_helper1.pix16(y, x);
+			pen_t b = state->m_helper2.pix16(y, x);
 
 			if (b != 0xff && (state->m_color1_mask >> a) & 1)
 				state->m_crash[which] = 1;
@@ -357,7 +357,7 @@ static void check_collision(firetrk_state *state, int which)
 }
 
 
-SCREEN_UPDATE( firetrk )
+SCREEN_UPDATE_IND16( firetrk )
 {
 	firetrk_state *state = screen.machine().driver_data<firetrk_state>();
 	tilemap_mark_all_tiles_dirty_all(screen.machine());
@@ -375,14 +375,14 @@ SCREEN_UPDATE( firetrk )
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		tilemap_draw(*state->m_helper1, playfield_window, state->m_tilemap2, 0, 0);
+		tilemap_draw(state->m_helper1, playfield_window, state->m_tilemap2, 0, 0);
 
-		state->m_helper2->fill(0xff, playfield_window);
-		firetrk_draw_car(screen.machine(), *state->m_helper2, playfield_window, screen.machine().gfx, 0, FALSE);
+		state->m_helper2.fill(0xff, playfield_window);
+		firetrk_draw_car(screen.machine(), state->m_helper2, playfield_window, screen.machine().gfx, 0, FALSE);
 		check_collision(state, 0);
 
-		state->m_helper2->fill(0xff, playfield_window);
-		firetrk_draw_car(screen.machine(), *state->m_helper2, playfield_window, screen.machine().gfx, 1, FALSE);
+		state->m_helper2.fill(0xff, playfield_window);
+		firetrk_draw_car(screen.machine(), state->m_helper2, playfield_window, screen.machine().gfx, 1, FALSE);
 		check_collision(state, 1);
 
 		*state->m_blink = FALSE;
@@ -392,7 +392,7 @@ SCREEN_UPDATE( firetrk )
 }
 
 
-SCREEN_UPDATE( superbug )
+SCREEN_UPDATE_IND16( superbug )
 {
 	firetrk_state *state = screen.machine().driver_data<firetrk_state>();
 	tilemap_mark_all_tiles_dirty_all(screen.machine());
@@ -409,10 +409,10 @@ SCREEN_UPDATE( superbug )
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		tilemap_draw(*state->m_helper1, playfield_window, state->m_tilemap2, 0, 0);
+		tilemap_draw(state->m_helper1, playfield_window, state->m_tilemap2, 0, 0);
 
-		state->m_helper2->fill(0xff, playfield_window);
-		superbug_draw_car(screen.machine(), *state->m_helper2, playfield_window, screen.machine().gfx, FALSE);
+		state->m_helper2.fill(0xff, playfield_window);
+		superbug_draw_car(screen.machine(), state->m_helper2, playfield_window, screen.machine().gfx, FALSE);
 		check_collision(state, 0);
 
 		*state->m_blink = FALSE;
@@ -422,7 +422,7 @@ SCREEN_UPDATE( superbug )
 }
 
 
-SCREEN_UPDATE( montecar )
+SCREEN_UPDATE_IND16( montecar )
 {
 	firetrk_state *state = screen.machine().driver_data<firetrk_state>();
 	tilemap_mark_all_tiles_dirty_all(screen.machine());
@@ -440,14 +440,14 @@ SCREEN_UPDATE( montecar )
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		tilemap_draw(*state->m_helper1, playfield_window, state->m_tilemap2, 0, 0);
+		tilemap_draw(state->m_helper1, playfield_window, state->m_tilemap2, 0, 0);
 
-		state->m_helper2->fill(0xff, playfield_window);
-		montecar_draw_car(screen.machine(), *state->m_helper2, playfield_window, screen.machine().gfx, 0, TRUE);
+		state->m_helper2.fill(0xff, playfield_window);
+		montecar_draw_car(screen.machine(), state->m_helper2, playfield_window, screen.machine().gfx, 0, TRUE);
 		check_collision(state, 0);
 
-		state->m_helper2->fill(0xff, playfield_window);
-		montecar_draw_car(screen.machine(), *state->m_helper2, playfield_window, screen.machine().gfx, 1, TRUE);
+		state->m_helper2.fill(0xff, playfield_window);
+		montecar_draw_car(screen.machine(), state->m_helper2, playfield_window, screen.machine().gfx, 1, TRUE);
 		check_collision(state, 1);
 	}
 

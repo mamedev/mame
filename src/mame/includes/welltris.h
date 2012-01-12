@@ -30,4 +30,4 @@ WRITE16_HANDLER( welltris_charvideoram_w );
 WRITE16_HANDLER( welltris_scrollreg_w );
 
 VIDEO_START( welltris );
-SCREEN_UPDATE( welltris );
+SCREEN_UPDATE_IND16( welltris );

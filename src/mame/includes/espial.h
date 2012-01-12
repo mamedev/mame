@@ -42,4 +42,4 @@ WRITE8_HANDLER( espial_colorram_w );
 WRITE8_HANDLER( espial_attributeram_w );
 WRITE8_HANDLER( espial_scrollram_w );
 WRITE8_HANDLER( espial_flipscreen_w );
-SCREEN_UPDATE( espial );
+SCREEN_UPDATE_IND16( espial );

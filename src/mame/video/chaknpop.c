@@ -183,7 +183,7 @@ VIDEO_START( chaknpop )
   Screen refresh
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
 	int offs;
@@ -218,7 +218,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static void draw_bitmap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
 	int dx = state->m_flip_x ? -1 : 1;
@@ -258,7 +258,7 @@ static void draw_bitmap( running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( chaknpop )
+SCREEN_UPDATE_IND16( chaknpop )
 {
 	chaknpop_state *state = screen.machine().driver_data<chaknpop_state>();
 

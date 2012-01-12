@@ -98,7 +98,7 @@ namcos21_ClearPolyFrameBuffer( running_machine &machine )
 } /* namcos21_ClearPolyFrameBuffer */
 
 static void
-CopyVisiblePolyFrameBuffer( running_machine &machine, bitmap_t &bitmap, const rectangle &clip, int zlo, int zhi )
+CopyVisiblePolyFrameBuffer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>(); /* blit the visible framebuffer */
 	int sy;
@@ -172,7 +172,7 @@ update_palette( running_machine &machine )
 } /* update_palette */
 
 
-SCREEN_UPDATE( namcos21 )
+SCREEN_UPDATE_IND16( namcos21 )
 {
 	namcos21_state *state = screen.machine().driver_data<namcos21_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -236,7 +236,7 @@ SCREEN_UPDATE( namcos21 )
 		}
 	} /* winrun bitmap layer */
 	return 0;
-} /* SCREEN_UPDATE( namcos21 ) */
+} /* SCREEN_UPDATE_IND16( namcos21 ) */
 
 /*********************************************************************************************/
 

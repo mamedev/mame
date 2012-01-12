@@ -43,9 +43,9 @@ WRITE16_HANDLER( snowboar_protection_w );
 
 WRITE16_HANDLER( gaelco2_vram_w );
 WRITE16_HANDLER( gaelco2_palette_w );
-SCREEN_UPDATE( gaelco2 );
+SCREEN_UPDATE_IND16( gaelco2 );
 SCREEN_EOF( gaelco2 );
 VIDEO_START( gaelco2 );
-SCREEN_UPDATE( gaelco2_left );
-SCREEN_UPDATE( gaelco2_right );
+SCREEN_UPDATE_IND16( gaelco2_left );
+SCREEN_UPDATE_IND16( gaelco2_right );
 VIDEO_START( gaelco2_dual );

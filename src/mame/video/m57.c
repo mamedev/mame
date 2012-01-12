@@ -177,7 +177,7 @@ WRITE8_HANDLER( m57_flipscreen_w )
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m57_state *state = machine.driver_data<m57_state>();
 	int y,x;
@@ -221,7 +221,7 @@ static void draw_background(running_machine &machine, bitmap_t &bitmap, const re
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m57_state *state = machine.driver_data<m57_state>();
 	int offs;
@@ -267,7 +267,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
  *
  *************************************/
 
-SCREEN_UPDATE( m57 )
+SCREEN_UPDATE_IND16( m57 )
 {
 	draw_background(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);

@@ -138,7 +138,7 @@ static VIDEO_START(hotblock)
 	state->save_item(NAME(state->m_pal));
 }
 
-static SCREEN_UPDATE(hotblock)
+static SCREEN_UPDATE_IND16(hotblock)
 {
 	hotblock_state *state = screen.machine().driver_data<hotblock_state>();
 	int y, x, count;
@@ -219,10 +219,9 @@ static MACHINE_CONFIG_START( hotblock, hotblock_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE(hotblock)
+	MCFG_SCREEN_UPDATE_STATIC(hotblock)
 
 	MCFG_PALETTE_LENGTH(256)
 

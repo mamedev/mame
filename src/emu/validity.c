@@ -606,7 +606,7 @@ static bool validate_display(driver_enumerator &drivlist)
 	bool error = false;
 
 	for (const screen_device *scrconfig = config.first_screen(); scrconfig != NULL; scrconfig = scrconfig->next_screen())
-		if (scrconfig->format() == BITMAP_FORMAT_INDEXED16)
+		if (scrconfig->format() == BITMAP_FORMAT_IND16)
 			palette_modes = true;
 
 	/* check for empty palette */

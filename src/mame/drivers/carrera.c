@@ -244,7 +244,7 @@ static GFXDECODE_START( carrera )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-static SCREEN_UPDATE(carrera)
+static SCREEN_UPDATE_IND16(carrera)
 {
 	carrera_state *state = screen.machine().driver_data<carrera_state>();
 
@@ -332,10 +332,9 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(carrera)
+	MCFG_SCREEN_UPDATE_STATIC(carrera)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 

@@ -29,4 +29,4 @@ WRITE8_HANDLER( higemaru_c800_w );
 
 PALETTE_INIT( higemaru );
 VIDEO_START( higemaru );
-SCREEN_UPDATE( higemaru );
+SCREEN_UPDATE_IND16( higemaru );

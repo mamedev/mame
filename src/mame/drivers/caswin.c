@@ -79,7 +79,7 @@ static VIDEO_START(vvillage)
 	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
-static SCREEN_UPDATE(vvillage)
+static SCREEN_UPDATE_IND16(vvillage)
 {
 	caswin_state *state = screen.machine().driver_data<caswin_state>();
 	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
@@ -302,10 +302,9 @@ static MACHINE_CONFIG_START( vvillage, caswin_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE(vvillage)
+	MCFG_SCREEN_UPDATE_STATIC(vvillage)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -34,4 +34,4 @@ WRITE8_HANDLER( compgolf_video_w );
 WRITE8_HANDLER( compgolf_back_w );
 PALETTE_INIT ( compgolf );
 VIDEO_START  ( compgolf );
-SCREEN_UPDATE( compgolf );
+SCREEN_UPDATE_IND16( compgolf );

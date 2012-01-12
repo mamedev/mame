@@ -368,7 +368,7 @@ WRITE8_HANDLER( arabian_videoram_w )
  *
  *************************************/
 
-SCREEN_UPDATE( arabian )
+SCREEN_UPDATE_IND16( arabian )
 {
 	arabian_state *state = screen.machine().driver_data<arabian_state>();
 	const pen_t *pens = &screen.machine().pens[(state->m_video_control >> 3) << 8];

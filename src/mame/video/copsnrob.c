@@ -8,7 +8,7 @@
 #include "includes/copsnrob.h"
 
 
-SCREEN_UPDATE( copsnrob )
+SCREEN_UPDATE_IND16( copsnrob )
 {
 	copsnrob_state *state = screen.machine().driver_data<copsnrob_state>();
 	int offs, x, y;

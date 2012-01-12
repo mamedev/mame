@@ -15,7 +15,7 @@ public:
 	int m_da_latch;
 	int m_collision[4];
 	tilemap_t* m_playfield;
-	bitmap_t* m_helper;
+	bitmap_ind16 m_helper;
 };
 
 
@@ -23,7 +23,7 @@ public:
 
 PALETTE_INIT( ultratnk );
 VIDEO_START( ultratnk );
-SCREEN_UPDATE( ultratnk );
+SCREEN_UPDATE_IND16( ultratnk );
 SCREEN_EOF( ultratnk );
 
 WRITE8_HANDLER( ultratnk_video_ram_w );

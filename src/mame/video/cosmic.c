@@ -251,7 +251,7 @@ WRITE8_HANDLER( cosmic_background_enable_w )
 }
 
 
-static void draw_bitmap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs;
@@ -283,7 +283,7 @@ static void draw_bitmap( running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int color_mask, int extra_sprites )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int extra_sprites )
 {
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int offs;
@@ -317,7 +317,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-static void cosmica_draw_starfield( screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect )
+static void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 y = 0;
 	UINT8 map = 0;
@@ -366,7 +366,7 @@ static void cosmica_draw_starfield( screen_device &screen, bitmap_t &bitmap, con
 }
 
 
-static void devzone_draw_grid( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 y;
 	UINT8 *horz_PROM = machine.region("user2")->base();
@@ -424,7 +424,7 @@ static void devzone_draw_grid( running_machine &machine, bitmap_t &bitmap, const
 }
 
 
-static void nomnlnd_draw_background( screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect )
+static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 y = 0;
 	UINT8 water = screen.frame_number();
@@ -546,7 +546,7 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_t &bitmap, co
 }
 
 
-SCREEN_UPDATE( cosmicg )
+SCREEN_UPDATE_IND16( cosmicg )
 {
 	bitmap.fill(0, cliprect);
 	draw_bitmap(screen.machine(), bitmap, cliprect);
@@ -554,7 +554,7 @@ SCREEN_UPDATE( cosmicg )
 }
 
 
-SCREEN_UPDATE( panic )
+SCREEN_UPDATE_IND16( panic )
 {
 	bitmap.fill(0, cliprect);
 	draw_bitmap(screen.machine(), bitmap, cliprect);
@@ -563,7 +563,7 @@ SCREEN_UPDATE( panic )
 }
 
 
-SCREEN_UPDATE( cosmica )
+SCREEN_UPDATE_IND16( cosmica )
 {
 	bitmap.fill(0, cliprect);
 	cosmica_draw_starfield(screen, bitmap, cliprect);
@@ -573,7 +573,7 @@ SCREEN_UPDATE( cosmica )
 }
 
 
-SCREEN_UPDATE( magspot )
+SCREEN_UPDATE_IND16( magspot )
 {
 	bitmap.fill(0, cliprect);
 	draw_bitmap(screen.machine(), bitmap, cliprect);
@@ -582,7 +582,7 @@ SCREEN_UPDATE( magspot )
 }
 
 
-SCREEN_UPDATE( devzone )
+SCREEN_UPDATE_IND16( devzone )
 {
 	cosmic_state *state = screen.machine().driver_data<cosmic_state>();
 
@@ -597,7 +597,7 @@ SCREEN_UPDATE( devzone )
 }
 
 
-SCREEN_UPDATE( nomnlnd )
+SCREEN_UPDATE_IND16( nomnlnd )
 {
 	cosmic_state *state = screen.machine().driver_data<cosmic_state>();
 

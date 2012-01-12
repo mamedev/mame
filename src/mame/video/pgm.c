@@ -164,7 +164,7 @@ static void draw_sprite_line( running_machine &machine, int wide, UINT16* dest, 
 	}
 }
 
-static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_t &bitmap, bitmap_t &priority_bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
+static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
 {
 	int ycnt;
 	int ydrawpos;
@@ -429,7 +429,7 @@ static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* 
   simplified version for non-zoomed cases, a bit faster
 *************************************************************************/
 
-static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_t &bitmap, bitmap_t &priority_bitmap, int pri )
+static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, int pri )
 {
 	int ycnt;
 	int ydrawpos;
@@ -486,7 +486,7 @@ static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, i
 }
 
 
-static void draw_sprites( pgm_state *state, running_machine &machine, bitmap_t& spritebitmap, UINT16 *sprite_source, bitmap_t& priority_bitmap )
+static void draw_sprites( pgm_state *state, running_machine &machine, bitmap_ind16& spritebitmap, UINT16 *sprite_source, bitmap_ind8& priority_bitmap )
 {
 	/* ZZZZ Zxxx xxxx xxxx
        zzzz z-yy yyyy yyyy
@@ -643,7 +643,7 @@ VIDEO_START( pgm )
 	state->save_pointer(NAME(state->m_spritebufferram), 0xa00/2);
 }
 
-SCREEN_UPDATE( pgm )
+SCREEN_UPDATE_IND16( pgm )
 {
 	pgm_state *state = screen.machine().driver_data<pgm_state>();
 	int y;

@@ -54,7 +54,7 @@ WRITE8_HANDLER( mouser_flip_screen_y_w )
 	flip_screen_y_set(space->machine(), ~data & 1);
 }
 
-SCREEN_UPDATE( mouser )
+SCREEN_UPDATE_IND16( mouser )
 {
 	mouser_state *state = screen.machine().driver_data<mouser_state>();
 	UINT8 *spriteram = state->m_spriteram;

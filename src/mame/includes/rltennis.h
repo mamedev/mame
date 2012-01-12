@@ -24,7 +24,7 @@ public:
 
 	INT32 m_unk_counter;
 
-	bitmap_t *m_tmp_bitmap[RLT_NUM_BITMAPS];
+	bitmap_ind16 *m_tmp_bitmap[RLT_NUM_BITMAPS];
 
 	device_t *m_dac_1;
 	device_t *m_dac_2;
@@ -42,5 +42,5 @@ public:
 
 WRITE16_HANDLER( rlt_blitter_w );
 VIDEO_START( rltennis );
-SCREEN_UPDATE( rltennis );
+SCREEN_UPDATE_IND16( rltennis );
 

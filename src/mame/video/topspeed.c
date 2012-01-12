@@ -26,7 +26,7 @@
 
 ********************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -109,7 +109,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 /***************************************************************************/
 
-SCREEN_UPDATE( topspeed )
+SCREEN_UPDATE_IND16( topspeed )
 {
 	topspeed_state *state = screen.machine().driver_data<topspeed_state>();
 	UINT8 layer[4];

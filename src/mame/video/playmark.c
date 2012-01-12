@@ -396,7 +396,7 @@ WRITE16_HANDLER( hrdtimes_scroll_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int codeshift )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 	int offs, start_offset = state->m_spriteram_size / 2 - 4;
@@ -440,7 +440,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-static void bigtwinb_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int codeshift )
+static void bigtwinb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 	int offs, start_offset = state->m_spriteram_size / 2 - 4;
@@ -477,7 +477,7 @@ static void bigtwinb_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void draw_bitmap( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 	int x, y, count;
@@ -518,7 +518,7 @@ static void draw_bitmap( running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( bigtwin )
+SCREEN_UPDATE_IND16( bigtwin )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
@@ -533,7 +533,7 @@ SCREEN_UPDATE( bigtwin )
 }
 
 
-SCREEN_UPDATE( bigtwinb )
+SCREEN_UPDATE_IND16( bigtwinb )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
@@ -550,7 +550,7 @@ SCREEN_UPDATE( bigtwinb )
 	return 0;
 }
 
-SCREEN_UPDATE( excelsr )
+SCREEN_UPDATE_IND16( excelsr )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
@@ -564,7 +564,7 @@ SCREEN_UPDATE( excelsr )
 	return 0;
 }
 
-SCREEN_UPDATE( wbeachvl )
+SCREEN_UPDATE_IND16( wbeachvl )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
@@ -591,7 +591,7 @@ SCREEN_UPDATE( wbeachvl )
 	return 0;
 }
 
-SCREEN_UPDATE( hrdtimes )
+SCREEN_UPDATE_IND16( hrdtimes )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 

@@ -24,7 +24,7 @@ Todo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/laserdsc.h"
+#include "machine/ldv1000.h"
 #include "machine/nvram.h"
 
 
@@ -32,9 +32,10 @@ class esh_state : public driver_device
 {
 public:
 	esh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
-	device_t *m_laserdisc;
+	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 *m_tile_ram;
 	UINT8 *m_tile_control_ram;
 	UINT8 m_ld_video_visible;
@@ -46,7 +47,7 @@ public:
 
 
 /* VIDEO GOODS */
-static SCREEN_UPDATE( esh )
+static SCREEN_UPDATE_IND16( esh )
 {
 	esh_state *state = screen.machine().driver_data<esh_state>();
 	int charx, chary;
@@ -83,13 +84,13 @@ static SCREEN_UPDATE( esh )
 static READ8_HANDLER(ldp_read)
 {
 	esh_state *state = space->machine().driver_data<esh_state>();
-	return laserdisc_data_r(state->m_laserdisc);
+	return state->m_laserdisc->status_r();
 }
 
 static WRITE8_HANDLER(ldp_write)
 {
 	esh_state *state = space->machine().driver_data<esh_state>();
-	laserdisc_data_w(state->m_laserdisc,data);
+	state->m_laserdisc->data_w(data);
 }
 
 static WRITE8_HANDLER(misc_write)
@@ -283,8 +284,6 @@ static INTERRUPT_GEN( vblank_callback_esh )
 
 static MACHINE_START( esh )
 {
-	esh_state *state = machine.driver_data<esh_state>();
-	state->m_laserdisc = machine.device("laserdisc");
 }
 
 
@@ -301,11 +300,11 @@ static MACHINE_CONFIG_START( esh, esh_state )
 
 	MCFG_MACHINE_START(esh)
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(esh, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
+	MCFG_LASERDISC_OVERLAY(256, 256, esh)
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT(esh)
@@ -315,7 +314,7 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -111,12 +111,12 @@ static SCREEN_EOF( spectrum )
     }
 }
 
-INLINE void spectrum_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
 
-static SCREEN_UPDATE( spectrum )
+static SCREEN_UPDATE_IND16( spectrum )
 {
 	photon2_state *state = screen.machine().driver_data<photon2_state>();
     /* for now do a full-refresh */
@@ -322,10 +322,9 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50.08)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE( spectrum )
+	MCFG_SCREEN_UPDATE_STATIC( spectrum )
 	MCFG_SCREEN_EOF( spectrum )
 
 	MCFG_PALETTE_LENGTH(16)

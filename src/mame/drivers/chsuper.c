@@ -37,13 +37,14 @@ public:
 
 	required_device<z180_device> m_maincpu;
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 	// driver_device overrides
 	//virtual void machine_start();
 	//virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -53,7 +54,7 @@ void chsuper_state::video_start()
 	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 13);
 }
 
-bool chsuper_state::screen_update( screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect )
+UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	const gfx_element *gfx = machine().gfx[0];
 	int count = 0x0000;
@@ -205,7 +206,7 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(chsuper_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
 

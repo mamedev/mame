@@ -183,7 +183,7 @@ static MACHINE_START( clayshoo )
  *
  *************************************/
 
-static SCREEN_UPDATE( clayshoo )
+static SCREEN_UPDATE_RGB32( clayshoo )
 {
 	clayshoo_state *state = screen.machine().driver_data<clayshoo_state>();
 	offs_t offs;
@@ -334,12 +334,11 @@ static MACHINE_CONFIG_START( clayshoo, clayshoo_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 64, 255)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE(clayshoo)
+	MCFG_SCREEN_UPDATE_STATIC(clayshoo)
 
 	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )

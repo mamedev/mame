@@ -133,7 +133,7 @@ public:
 	DECLARE_WRITE8_MEMBER( fdc_w );
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct
 	{
@@ -150,7 +150,7 @@ void funkball_state::video_start()
 
 }
 
-bool funkball_state::screen_update( screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect )
+UINT32 funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
@@ -735,6 +735,12 @@ static MACHINE_RESET( funkball )
 	state->m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
+SCREEN_UPDATE_RGB32( funkball )
+{
+	voodoo_update(screen.machine().device("voodoo_0"), bitmap, cliprect);
+	return 0;
+}
+
 static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5/16) // 66,6 MHz x 3.5
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
@@ -765,7 +771,7 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_UPDATE_DRIVER(funkball_state, screen_update)
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
 MACHINE_CONFIG_END

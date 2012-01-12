@@ -21,7 +21,7 @@ public:
 /*----------- defined in video/skykid.c -----------*/
 
 VIDEO_START( skykid );
-SCREEN_UPDATE( skykid );
+SCREEN_UPDATE_IND16( skykid );
 PALETTE_INIT( skykid );
 
 READ8_HANDLER( skykid_videoram_r );

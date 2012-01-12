@@ -23,7 +23,7 @@ VIDEO_START( yboard )
 	segaic16_palette_init(0x2000);
 
 	/* allocate a bitmap for the yboard layer */
-	state->m_tmp_bitmap = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+	state->m_tmp_bitmap = auto_bitmap_ind16_alloc(machine, 512, 512);
 
 	/* initialize the rotation layer */
 	segaic16_rotate_init(machine, 0, SEGAIC16_ROTATE_YBOARD, 0x000);
@@ -39,7 +39,7 @@ VIDEO_START( yboard )
  *
  *************************************/
 
-SCREEN_UPDATE( yboard )
+SCREEN_UPDATE_IND16( yboard )
 {
 	segas1x_state *state = screen.machine().driver_data<segas1x_state>();
 	rectangle yboard_clip;

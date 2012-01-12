@@ -322,14 +322,14 @@ WRITE8_HANDLER( congo_sprite_custom_w )
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int skew)
+static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int skew)
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* only draw if enabled */
 	if (state->m_bg_enable)
 	{
-		bitmap_t &pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
+		bitmap_ind16 &pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
 		int colorbase = state->m_bg_color + (state->m_congo_color_bank << 8);
 		int xmask = pixmap.width() - 1;
 		int ymask = pixmap.height() - 1;
@@ -440,7 +440,7 @@ INLINE int find_minimum_x(UINT8 value, int flip)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -475,7 +475,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
  *
  *************************************/
 
-SCREEN_UPDATE( zaxxon )
+SCREEN_UPDATE_IND16( zaxxon )
 {
 	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
@@ -486,7 +486,7 @@ SCREEN_UPDATE( zaxxon )
 }
 
 
-SCREEN_UPDATE( futspy )
+SCREEN_UPDATE_IND16( futspy )
 {
 	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
@@ -497,7 +497,7 @@ SCREEN_UPDATE( futspy )
 }
 
 
-SCREEN_UPDATE( razmataz )
+SCREEN_UPDATE_IND16( razmataz )
 {
 	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 
@@ -508,7 +508,7 @@ SCREEN_UPDATE( razmataz )
 }
 
 
-SCREEN_UPDATE( congo )
+SCREEN_UPDATE_IND16( congo )
 {
 	zaxxon_state *state = screen.machine().driver_data<zaxxon_state>();
 

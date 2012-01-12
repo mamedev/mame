@@ -200,7 +200,7 @@ static WRITE32_HANDLER( ms32_bg1_ram_w )
 
 /* ROZ Layers */
 
-static void draw_roz(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority, int chip)
+static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip)
 {
 	bnstars_state *state = machine.driver_data<bnstars_state>();
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
@@ -351,7 +351,7 @@ static WRITE32_HANDLER( ms32_pal1_ram_w )
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region)
 {
 	bnstars_state *state = machine.driver_data<bnstars_state>();
 /***************************************************************************
@@ -511,7 +511,7 @@ static VIDEO_START(bnstars)
 
 
 
-static SCREEN_UPDATE(bnstars_left)
+static SCREEN_UPDATE_IND16(bnstars_left)
 {
 	bnstars_state *state = screen.machine().driver_data<bnstars_state>();
 
@@ -536,7 +536,7 @@ static SCREEN_UPDATE(bnstars_left)
 	return 0;
 }
 
-static SCREEN_UPDATE(bnstars_right)
+static SCREEN_UPDATE_IND16(bnstars_right)
 {
 	bnstars_state *state = screen.machine().driver_data<bnstars_state>();
 
@@ -1376,20 +1376,18 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE(bnstars_left)
+	MCFG_SCREEN_UPDATE_STATIC(bnstars_left)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE(bnstars_right)
+	MCFG_SCREEN_UPDATE_STATIC(bnstars_right)
 
 	MCFG_VIDEO_START(bnstars)
 

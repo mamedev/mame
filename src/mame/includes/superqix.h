@@ -27,7 +27,7 @@ public:
 	UINT8 *m_bitmapram;
 	UINT8 *m_bitmapram2;
 	int m_gfxbank;
-	bitmap_t *m_fg_bitmap[2];
+	bitmap_ind16 *m_fg_bitmap[2];
 	int m_show_bitmap;
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_spriteram;
@@ -47,6 +47,6 @@ WRITE8_HANDLER( pbillian_0410_w );
 WRITE8_HANDLER( superqix_0410_w );
 
 VIDEO_START( pbillian );
-SCREEN_UPDATE( pbillian );
+SCREEN_UPDATE_IND16( pbillian );
 VIDEO_START( superqix );
-SCREEN_UPDATE( superqix );
+SCREEN_UPDATE_IND16( superqix );

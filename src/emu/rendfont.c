@@ -89,7 +89,7 @@ inline render_font::glyph &render_font::get_char(unicode_char chnum)
 
 	// if the character isn't generated yet, do it now
 	glyph &gl = glyphtable[chnum % 256];
-	if (gl.bitmap == NULL)
+	if (!gl.bitmap.valid())
 		char_expand(chnum, gl);
 
 	// return the resulting character
@@ -161,7 +161,6 @@ render_font::~render_font()
 			{
 				glyph &gl = m_glyphs[tablenum][charnum];
 				m_manager.texture_free(gl.texture);
-				auto_free(m_manager.machine(), gl.bitmap);
 			}
 
 			// free the subtable itself
@@ -192,16 +191,16 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 			return;
 
 		// attempt to get the font bitmap; if we fail, set bmwidth to -1
-		gl.bitmap = m_manager.machine().osd().font_get_bitmap(m_osdfont, chnum, gl.width, gl.xoffs, gl.yoffs);
-		if (gl.bitmap == NULL)
+		if (!m_manager.machine().osd().font_get_bitmap(m_osdfont, chnum, gl.bitmap, gl.width, gl.xoffs, gl.yoffs))
 		{
+			gl.bitmap.reset();
 			gl.bmwidth = -1;
 			return;
 		}
 
 		// populate the bmwidth/bmheight fields
-		gl.bmwidth = gl.bitmap->width();
-		gl.bmheight = gl.bitmap->height();
+		gl.bmwidth = gl.bitmap.width();
+		gl.bmheight = gl.bitmap.height();
 	}
 
 	// other formats need to parse their data
@@ -212,8 +211,8 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 			return;
 
 		// allocate a new bitmap of the size we need
-		gl.bitmap = auto_alloc(m_manager.machine(), bitmap_t(gl.bmwidth, m_height, BITMAP_FORMAT_ARGB32));
-		gl.bitmap->fill(0);
+		gl.bitmap.allocate(gl.bmwidth, m_height);
+		gl.bitmap.fill(0);
 
 		// extract the data
 		const char *ptr = gl.rawdata;
@@ -221,7 +220,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 		for (int y = 0; y < gl.bmheight; y++)
 		{
 			int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-			UINT32 *dest = (desty >= 0 && desty < m_height) ? &gl.bitmap->pix32(desty) : NULL;
+			UINT32 *dest = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : NULL;
 
 			// text format
 			if (m_format == FF_TEXT)
@@ -274,7 +273,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 
 	// wrap a texture around the bitmap
 	gl.texture = m_manager.texture_alloc(render_texture::hq_scale);
-	gl.texture->set_bitmap(gl.bitmap, NULL, TEXFORMAT_ARGB32);
+	gl.texture->set_bitmap(gl.bitmap, gl.bitmap.cliprect(), TEXFORMAT_ARGB32);
 }
 
 
@@ -307,7 +306,7 @@ render_texture *render_font::get_char_texture_and_bounds(float height, float asp
 //  scaled bitmap and bounding rect for a char
 //-------------------------------------------------
 
-void render_font::get_scaled_bitmap_and_bounds(bitmap_t &dest, float height, float aspect, unicode_char chnum, rectangle &bounds)
+void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height, float aspect, unicode_char chnum, rectangle &bounds)
 {
 	glyph &gl = get_char(chnum);
 
@@ -333,8 +332,8 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_t &dest, float height, flo
 	}
 
 	// scale the font
-	bitmap_t tempbitmap(&dest.pix8(0), bounds.max_x - bounds.min_x, bounds.max_y - bounds.min_y, dest.rowpixels(), dest.format());
-	render_texture::hq_scale(tempbitmap, *gl.bitmap, gl.bitmap->cliprect(), NULL);
+	bitmap_argb32 tempbitmap(dest, bounds);
+	render_texture::hq_scale(tempbitmap, gl.bitmap, gl.bitmap.cliprect(), NULL);
 }
 
 
@@ -728,7 +727,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 			if (gl.width > 0)
 			{
 				// write out a bit-compressed bitmap if we have one
-				if (gl.bitmap != NULL)
+				if (gl.bitmap.valid())
 				{
 					// write the data to the tempbuffer
 					dest = tempbuffer;
@@ -739,7 +738,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 					for (int y = 0; y < gl.bmheight; y++)
 					{
 						int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-						const UINT32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap->pix32(desty) : NULL;
+						const UINT32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : NULL;
 						for (int x = 0; x < gl.bmwidth; x++)
 						{
 							if (src != NULL && RGB_ALPHA(src[x]) != 0)
@@ -764,9 +763,8 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 
 					// free the bitmap and texture
 					m_manager.texture_free(gl.texture);
-					auto_free(m_manager.machine(), gl.bitmap);
+					gl.bitmap.reset();
 					gl.texture = NULL;
-					gl.bitmap = NULL;
 				}
 
 				// compute the table entry

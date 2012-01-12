@@ -37,7 +37,7 @@ WRITE8_HANDLER( subs_invert2_w )
 }
 
 
-SCREEN_UPDATE( subs_left )
+SCREEN_UPDATE_IND16( subs_left )
 {
 	subs_state *state = screen.machine().driver_data<subs_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -119,7 +119,7 @@ SCREEN_UPDATE( subs_left )
 	return 0;
 }
 
-SCREEN_UPDATE( subs_right )
+SCREEN_UPDATE_IND16( subs_right )
 {
 	subs_state *state = screen.machine().driver_data<subs_state>();
 	UINT8 *videoram = state->m_videoram;

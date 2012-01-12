@@ -83,7 +83,7 @@ public:
 	int m_f3_skip_this_frame;
 	int m_sprite_lag;
 	UINT8 m_sprite_pri_usage;
-	bitmap_t *m_pri_alp_bitmap;
+	bitmap_ind8 m_pri_alp_bitmap;
 	int m_f3_alpha_level_2as;
 	int m_f3_alpha_level_2ad;
 	int m_f3_alpha_level_3as;
@@ -199,7 +199,7 @@ public:
 /*----------- defined in video/taito_f3.c -----------*/
 
 VIDEO_START( f3 );
-SCREEN_UPDATE( f3 );
+SCREEN_UPDATE_RGB32( f3 );
 SCREEN_EOF( f3 );
 
 WRITE16_HANDLER( f3_control_0_w );

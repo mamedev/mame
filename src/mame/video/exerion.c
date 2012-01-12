@@ -234,7 +234,7 @@ READ8_HANDLER( exerion_video_timing_r )
  *
  *************************************/
 
-static void draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	exerion_state *state = machine.driver_data<exerion_state>();
 	int x, y;
@@ -350,7 +350,7 @@ static void draw_background( running_machine &machine, bitmap_t &bitmap, const r
  *
  *************************************/
 
-SCREEN_UPDATE( exerion )
+SCREEN_UPDATE_IND16( exerion )
 {
 	exerion_state *state = screen.machine().driver_data<exerion_state>();
 	int sx, sy, offs, i;

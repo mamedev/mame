@@ -93,7 +93,7 @@ VIDEO_START( dv )
 
 /*****************************************************************************/
 
-SCREEN_UPDATE( mainevt )
+SCREEN_UPDATE_IND16( mainevt )
 {
 	mainevt_state *state = screen.machine().driver_data<mainevt_state>();
 
@@ -109,7 +109,7 @@ SCREEN_UPDATE( mainevt )
 	return 0;
 }
 
-SCREEN_UPDATE( dv )
+SCREEN_UPDATE_IND16( dv )
 {
 	mainevt_state *state = screen.machine().driver_data<mainevt_state>();
 

@@ -10,8 +10,8 @@ public:
 	UINT8 *    m_video_ram;
 
 	/* video-related */
-	bitmap_t   *m_bgbitmap;
-	bitmap_t   *m_fgbitmap;
+	bitmap_ind16   m_bgbitmap;
+	bitmap_ind16   m_fgbitmap;
 	UINT8      m_xpos;
 	UINT8      m_ypos;
 	int        m_current_color;
@@ -31,7 +31,7 @@ public:
 /*----------- defined in video/fgoal.c -----------*/
 
 VIDEO_START( fgoal );
-SCREEN_UPDATE( fgoal );
+SCREEN_UPDATE_IND16( fgoal );
 
 WRITE8_HANDLER( fgoal_color_w );
 WRITE8_HANDLER( fgoal_xpos_w );

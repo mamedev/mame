@@ -105,7 +105,7 @@ VIDEO_START( targeth )
       3  | xx------ -------- | not used?
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	targeth_state *state = machine.driver_data<targeth_state>();
 	int i;
@@ -133,7 +133,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 ***************************************************************************/
 
-SCREEN_UPDATE( targeth )
+SCREEN_UPDATE_IND16( targeth )
 {
 	targeth_state *state = screen.machine().driver_data<targeth_state>();
 	/* set scroll registers */

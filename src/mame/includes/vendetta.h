@@ -39,4 +39,4 @@ extern void vendetta_tile_callback(running_machine &machine, int layer,int bank,
 extern void esckids_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void vendetta_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 
-SCREEN_UPDATE( vendetta );
+SCREEN_UPDATE_IND16( vendetta );

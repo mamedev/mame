@@ -135,7 +135,7 @@ static VIDEO_START(cshooter)
 	tilemap_set_transparent_pen(state->m_txtilemap, 3);
 }
 
-static SCREEN_UPDATE(cshooter)
+static SCREEN_UPDATE_IND16(cshooter)
 {
 	cshooter_state *state = screen.machine().driver_data<cshooter_state>();
 	bitmap.fill(0/*get_black_pen(screen.screen.machine(, cliprect))*/);
@@ -437,10 +437,9 @@ static MACHINE_CONFIG_START( cshooter, cshooter_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE(cshooter)
+	MCFG_SCREEN_UPDATE_STATIC(cshooter)
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_PALETTE_LENGTH(0x1000)
@@ -465,10 +464,9 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE(cshooter)
+	MCFG_SCREEN_UPDATE_STATIC(cshooter)
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_PALETTE_LENGTH(0x1000)

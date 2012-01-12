@@ -81,7 +81,7 @@ static TILE_GET_INFO( get_text_tile_info )
 [3]
 */
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
 	const UINT8 *source = state->m_spriteram + state->m_spriteram_size - 4;
@@ -124,7 +124,7 @@ VIDEO_START(ksayakyu)
 	tilemap_set_transparent_pen(state->m_textmap, 0);
 }
 
-SCREEN_UPDATE(ksayakyu)
+SCREEN_UPDATE_IND16(ksayakyu)
 {
 	ksayakyu_state *state = screen.machine().driver_data<ksayakyu_state>();
 

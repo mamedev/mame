@@ -138,7 +138,7 @@ VIDEO_START( bioship )
 	tilemap_set_transparent_pen(state->m_tx_tilemap,15);
 
 	nmk16_video_init(machine);
-	state->m_background_bitmap = auto_bitmap_alloc(machine,8192,512,machine.primary_screen->format());
+	state->m_background_bitmap = auto_bitmap_ind16_alloc(machine,8192,512);
 	state->m_bioship_background_bank=0;
 	state->m_redraw_bitmap = 1;
 
@@ -425,7 +425,7 @@ WRITE16_HANDLER( bioship_bank_w )
 
 // manybloc uses extra flip bits on the sprites, but these break other games
 
-static void nmk16_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static void nmk16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 	int offs;
@@ -476,7 +476,7 @@ static void nmk16_draw_sprites(running_machine &machine, bitmap_t &bitmap, const
 	}
 }
 
-static void nmk16_draw_sprites_flipsupported(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static void nmk16_draw_sprites_flipsupported(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 	int offs;
@@ -540,7 +540,7 @@ static void nmk16_draw_sprites_flipsupported(running_machine &machine, bitmap_t 
 }
 
 
-SCREEN_UPDATE( macross )
+SCREEN_UPDATE_IND16( macross )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrollx(state->m_tx_tilemap,0,-state->m_videoshift);
@@ -556,7 +556,7 @@ SCREEN_UPDATE( macross )
 	return 0;
 }
 
-SCREEN_UPDATE( tdragon )
+SCREEN_UPDATE_IND16( tdragon )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 //  mcu_run(screen.machine(), 1);
@@ -574,7 +574,7 @@ SCREEN_UPDATE( tdragon )
 	return 0;
 }
 
-SCREEN_UPDATE( hachamf )
+SCREEN_UPDATE_IND16( hachamf )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 //  mcu_run(screen.machine(), 0);
@@ -592,7 +592,7 @@ SCREEN_UPDATE( hachamf )
 	return 0;
 }
 
-SCREEN_UPDATE( manybloc )
+SCREEN_UPDATE_IND16( manybloc )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrollx(state->m_tx_tilemap,0,-state->m_videoshift);
@@ -608,7 +608,7 @@ SCREEN_UPDATE( manybloc )
 	return 0;
 }
 
-SCREEN_UPDATE( tharrier )
+SCREEN_UPDATE_IND16( tharrier )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	/* I think the protection device probably copies this to the regs... */
@@ -627,7 +627,7 @@ SCREEN_UPDATE( tharrier )
 	return 0;
 }
 
-SCREEN_UPDATE( gunnail )
+SCREEN_UPDATE_IND16( gunnail )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	int y1;
@@ -706,7 +706,7 @@ SCREEN_UPDATE( gunnail )
 	return 0;
 }
 
-SCREEN_UPDATE( bioship )
+SCREEN_UPDATE_IND16( bioship )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	UINT16 *tilerom = (UINT16 *)screen.machine().region("gfx5")->base();
@@ -759,7 +759,7 @@ SCREEN_UPDATE( bioship )
 	return 0;
 }
 
-SCREEN_UPDATE( strahl )
+SCREEN_UPDATE_IND16( strahl )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrollx(state->m_tx_tilemap,0,-state->m_videoshift);
@@ -776,7 +776,7 @@ SCREEN_UPDATE( strahl )
 	return 0;
 }
 
-SCREEN_UPDATE( bjtwin )
+SCREEN_UPDATE_IND16( bjtwin )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap0,0,-state->m_videoshift);
@@ -898,7 +898,7 @@ VIDEO_START( firehawk )
 
 ***************************************************************************/
 
-static void video_update(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+static void video_update(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
 	int dsw_flipscreen,			// 1 = Horizontal and vertical screen flip are hardwired to 2 dip switches
 	int xoffset, int yoffset,	// bg_tilemap0 offsets
 	int attr_mask				// "sprite active" mask
@@ -933,7 +933,7 @@ static void video_update(running_machine &machine, bitmap_t &bitmap, const recta
 	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 }
 
-static void redhawki_video_update(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect	)
+static void redhawki_video_update(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect	)
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 
@@ -949,12 +949,12 @@ static void redhawki_video_update(running_machine &machine, bitmap_t &bitmap, co
 	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,0);
 }
 
-SCREEN_UPDATE( afega )		{	video_update(screen.machine(),bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
-SCREEN_UPDATE( bubl2000 )	{	video_update(screen.machine(),bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
-SCREEN_UPDATE( redhawkb )	{	video_update(screen.machine(),bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
-SCREEN_UPDATE( redhawki )	{	redhawki_video_update(screen.machine(),bitmap,cliprect); return 0;} // strange scroll regs
+SCREEN_UPDATE_IND16( afega )		{	video_update(screen.machine(),bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
+SCREEN_UPDATE_IND16( bubl2000 )	{	video_update(screen.machine(),bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
+SCREEN_UPDATE_IND16( redhawkb )	{	video_update(screen.machine(),bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
+SCREEN_UPDATE_IND16( redhawki )	{	redhawki_video_update(screen.machine(),bitmap,cliprect); return 0;} // strange scroll regs
 
-SCREEN_UPDATE( firehawk )
+SCREEN_UPDATE_IND16( firehawk )
 {
 	nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 	tilemap_set_scrolly(state->m_bg_tilemap0, 0, state->m_afega_scroll_1[1] + 0x100);

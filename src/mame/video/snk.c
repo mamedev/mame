@@ -744,7 +744,7 @@ WRITE8_HANDLER( tdfever_spriteram_w )
 
 /**************************************************************************************/
 
-static void marvins_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
 		const int scrollx, const int scrolly, const int from, const int to)
 {
 	snk_state *state = machine.driver_data<snk_state>();
@@ -789,7 +789,7 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_t &bitmap, con
 }
 
 
-static void tnk3_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll)
+static void tnk3_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll)
 {
 	snk_state *state = machine.driver_data<snk_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -854,7 +854,7 @@ static void tnk3_draw_sprites(running_machine &machine, bitmap_t &bitmap, const 
 }
 
 
-static void ikari_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+static void ikari_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
 		const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum )
 {
 	snk_state *state = machine.driver_data<snk_state>();
@@ -926,7 +926,7 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-static void tdfever_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
 		const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, const int hw_xflip, const int from, const int to )
 {
 	snk_state *state = machine.driver_data<snk_state>();
@@ -990,7 +990,7 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_t &bitmap, con
 
 /**************************************************************/
 
-SCREEN_UPDATE( marvins )
+SCREEN_UPDATE_IND16( marvins )
 {
 	snk_state *state = screen.machine().driver_data<snk_state>();
 
@@ -1009,7 +1009,7 @@ SCREEN_UPDATE( marvins )
 }
 
 
-SCREEN_UPDATE( tnk3 )
+SCREEN_UPDATE_IND16( tnk3 )
 {
 	snk_state *state = screen.machine().driver_data<snk_state>();
 
@@ -1024,7 +1024,7 @@ SCREEN_UPDATE( tnk3 )
 }
 
 
-SCREEN_UPDATE( ikari )
+SCREEN_UPDATE_IND16( ikari )
 {
 	snk_state *state = screen.machine().driver_data<snk_state>();
 
@@ -1042,7 +1042,7 @@ SCREEN_UPDATE( ikari )
 }
 
 
-SCREEN_UPDATE( gwar )
+SCREEN_UPDATE_IND16( gwar )
 {
 	snk_state *state = screen.machine().driver_data<snk_state>();
 
@@ -1061,7 +1061,7 @@ SCREEN_UPDATE( gwar )
 }
 
 
-SCREEN_UPDATE( tdfever )
+SCREEN_UPDATE_IND16( tdfever )
 {
 	snk_state *state = screen.machine().driver_data<snk_state>();
 

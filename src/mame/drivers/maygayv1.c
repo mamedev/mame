@@ -280,7 +280,7 @@ static VIDEO_START( maygayv1 )
 }
 
 
-static SCREEN_UPDATE( maygayv1 )
+static SCREEN_UPDATE_IND16( maygayv1 )
 {
 	maygayv1_state *state = screen.machine().driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->m_i82716;
@@ -1044,10 +1044,9 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
-	MCFG_SCREEN_UPDATE(maygayv1)
+	MCFG_SCREEN_UPDATE_STATIC(maygayv1)
 	MCFG_SCREEN_EOF(maygayv1)
 
 	MCFG_PALETTE_LENGTH(16)

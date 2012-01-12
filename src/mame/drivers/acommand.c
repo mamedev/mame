@@ -110,7 +110,7 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 			0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority, int pri_mask)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask)
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -203,7 +203,7 @@ g & 40
 /*                                    0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f*/
 static const UINT8 led_fill[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00,0x00,0x00,0x00,0x00,0x00};
 
-static void draw_led(bitmap_t &bitmap, int x, int y,UINT8 value)
+static void draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value)
 {
 	bitmap.plot_box(x, y, 6, 10, 0x00000000);
 
@@ -238,7 +238,7 @@ static void draw_led(bitmap_t &bitmap, int x, int y,UINT8 value)
 }
 
 
-static SCREEN_UPDATE( acommand )
+static SCREEN_UPDATE_IND16( acommand )
 {
 	acommand_state *state = screen.machine().driver_data<acommand_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
@@ -602,10 +602,9 @@ static MACHINE_CONFIG_START( acommand, acommand_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(acommand)
+	MCFG_SCREEN_UPDATE_STATIC(acommand)
 
 	MCFG_GFXDECODE(acommand)
 	MCFG_PALETTE_LENGTH(0x4000)

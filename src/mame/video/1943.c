@@ -221,7 +221,7 @@ VIDEO_START( 1943 )
 	state->save_item(NAME(state->m_bg2_on));
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	_1943_state *state = machine.driver_data<_1943_state>();
 	int offs;
@@ -254,7 +254,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( 1943 )
+SCREEN_UPDATE_IND16( 1943 )
 {
 	_1943_state *state = screen.machine().driver_data<_1943_state>();
 	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bgscrollx[0] + 256 * state->m_bgscrollx[1]);

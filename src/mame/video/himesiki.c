@@ -50,7 +50,7 @@ WRITE8_HANDLER( himesiki_flip_w )
 		logerror("p08_w %02x\n",data);
 }
 
-static void himesiki_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void himesiki_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	himesiki_state *state = machine.driver_data<himesiki_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -117,7 +117,7 @@ static void himesiki_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-SCREEN_UPDATE( himesiki )
+SCREEN_UPDATE_IND16( himesiki )
 {
 	himesiki_state *state = screen.machine().driver_data<himesiki_state>();
 	int x = -(state->m_scrollx[0] << 8 | state->m_scrollx[1]) & 0x1ff;

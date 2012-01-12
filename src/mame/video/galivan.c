@@ -306,7 +306,7 @@ WRITE8_HANDLER( galivan_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	galivan_state *state = machine.driver_data<galivan_state>();
 	const UINT8 *spritepalettebank = machine.region("user1")->base();
@@ -345,7 +345,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-SCREEN_UPDATE( galivan )
+SCREEN_UPDATE_IND16( galivan )
 {
 	galivan_state *state = screen.machine().driver_data<galivan_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_galivan_scrollx[0] + 256 * (state->m_galivan_scrollx[1] & 0x07));
@@ -372,7 +372,7 @@ SCREEN_UPDATE( galivan )
 	return 0;
 }
 
-SCREEN_UPDATE( ninjemak )
+SCREEN_UPDATE_IND16( ninjemak )
 {
 	galivan_state *state = screen.machine().driver_data<galivan_state>();
 

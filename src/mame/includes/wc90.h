@@ -34,4 +34,4 @@ VIDEO_START( wc90t );
 WRITE8_HANDLER( wc90_fgvideoram_w );
 WRITE8_HANDLER( wc90_bgvideoram_w );
 WRITE8_HANDLER( wc90_txvideoram_w );
-SCREEN_UPDATE( wc90 );
+SCREEN_UPDATE_IND16( wc90 );

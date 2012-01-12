@@ -310,11 +310,10 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE(relief)
+	MCFG_SCREEN_UPDATE_STATIC(relief)
 
 	MCFG_VIDEO_START(relief)
 

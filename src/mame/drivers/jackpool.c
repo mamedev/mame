@@ -37,7 +37,7 @@ static VIDEO_START(jackpool)
 {
 }
 
-static SCREEN_UPDATE(jackpool)
+static SCREEN_UPDATE_IND16(jackpool)
 {
 	jackpool_state *state = screen.machine().driver_data<jackpool_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -259,10 +259,9 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(jackpool)
+	MCFG_SCREEN_UPDATE_STATIC(jackpool)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

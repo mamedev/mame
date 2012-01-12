@@ -68,7 +68,7 @@ static VIDEO_START( blackt96 )
 {
 }
 
-static void draw_strip(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int stripnum, int xbase, int ybase, int bg)
+static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int stripnum, int xbase, int ybase, int bg)
 {
 	blackt96_state *state = machine.driver_data<blackt96_state>();
 	const gfx_element *gfxspr = machine.gfx[1];
@@ -98,7 +98,7 @@ static void draw_strip(running_machine &machine, bitmap_t &bitmap, const rectang
 
 }
 
-static void draw_main(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bg)
+static void draw_main(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bg)
 {
 	blackt96_state *state = machine.driver_data<blackt96_state>();
 
@@ -128,7 +128,7 @@ static void draw_main(running_machine &machine, bitmap_t &bitmap, const rectangl
 
 }
 
-static SCREEN_UPDATE( blackt96 )
+static SCREEN_UPDATE_IND16( blackt96 )
 {
 	blackt96_state *state = screen.machine().driver_data<blackt96_state>();
 	int count;
@@ -495,11 +495,10 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 16*32-1, 0*8, 16*32-1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 0*8, 208-1)
-	MCFG_SCREEN_UPDATE(blackt96)
+	MCFG_SCREEN_UPDATE_STATIC(blackt96)
 
 	MCFG_PALETTE_LENGTH(0x800)
 

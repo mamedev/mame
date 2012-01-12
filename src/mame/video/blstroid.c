@@ -144,11 +144,11 @@ void blstroid_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE( blstroid )
+SCREEN_UPDATE_IND16( blstroid )
 {
 	blstroid_state *state = screen.machine().driver_data<blstroid_state>();
 	atarimo_rect_list rectlist;
-	bitmap_t *mobitmap;
+	bitmap_ind16 *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

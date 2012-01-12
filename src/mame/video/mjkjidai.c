@@ -87,7 +87,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
 	UINT8 *spriteram = state->m_spriteram1;
@@ -129,7 +129,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 
 
 
-SCREEN_UPDATE( mjkjidai )
+SCREEN_UPDATE_IND16( mjkjidai )
 {
 	mjkjidai_state *state = screen.machine().driver_data<mjkjidai_state>();
 	if (!state->m_display_enable)

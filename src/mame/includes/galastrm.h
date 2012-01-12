@@ -26,8 +26,8 @@ public:
 	INT16 m_tc0610_ctrl_reg[2][8];
 	struct tempsprite *m_spritelist;
 	struct tempsprite *m_sprite_ptr_pre;
-	bitmap_t *m_tmpbitmaps;
-	bitmap_t *m_polybitmap;
+	bitmap_ind16 m_tmpbitmaps;
+	bitmap_ind16 m_polybitmap;
 	poly_manager *m_poly;
 	int m_rsxb;
 	int m_rsyb;
@@ -41,4 +41,4 @@ public:
 /*----------- defined in video/galastrm.c -----------*/
 
 VIDEO_START( galastrm );
-SCREEN_UPDATE( galastrm );
+SCREEN_UPDATE_IND16( galastrm );

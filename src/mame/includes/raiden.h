@@ -26,4 +26,4 @@ VIDEO_START( raiden );
 VIDEO_START( raidena );
 WRITE16_HANDLER( raiden_control_w );
 WRITE16_HANDLER( raidena_control_w );
-SCREEN_UPDATE( raiden );
+SCREEN_UPDATE_IND16( raiden );

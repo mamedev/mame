@@ -355,9 +355,10 @@ static TILE_GET_INFO_DEVICE( get_pf1_tile_info_b )
     by the Mame core.
 */
 
+template<class _BitmapClass>
 static void custom_tilemap_draw(
 	device_t *device,
-	bitmap_t &bitmap,
+	_BitmapClass &bitmap,
 	const rectangle &cliprect,
 	tilemap_t *tilemap0_8x8,
 	tilemap_t *tilemap0_16x16,
@@ -379,8 +380,8 @@ static void custom_tilemap_draw(
 	running_machine &machine = device->machine();
 	tilemap_t *tilemap0 = BIT(control1, 7) ? tilemap0_8x8 : tilemap0_16x16;
 	tilemap_t *tilemap1 = BIT(control1, 7) ? tilemap1_8x8 : tilemap1_16x16;
-	const bitmap_t *src_bitmap0 = tilemap0 ? &tilemap_get_pixmap(tilemap0) : NULL;
-	const bitmap_t *src_bitmap1 = tilemap1 ? &tilemap_get_pixmap(tilemap1) : NULL;
+	const bitmap_ind16 *src_bitmap0 = tilemap0 ? &tilemap_get_pixmap(tilemap0) : NULL;
+	const bitmap_ind16 *src_bitmap1 = tilemap1 ? &tilemap_get_pixmap(tilemap1) : NULL;
 	int width_mask, height_mask, x, y, p;
 	int column_offset, src_x = 0, src_y = 0;
 	int row_type = 1 << ((control0 >> 3) & 0xf);
@@ -410,73 +411,42 @@ static void custom_tilemap_draw(
 
 		src_x &= width_mask;
 
-		if (bitmap.bpp() == 16)
+		/* boogwing */
+		for (x = 0; x < 320; x++)
 		{
-			for (x = 0; x < 320; x++)
+			if (rowscroll_ptr && BIT(control1, 5))
+				column_offset = rowscroll_ptr[0x200 + ((src_x & 0x1ff) / col_type)];
+			else
+				column_offset = 0;
+
+			p = src_bitmap0->pix16((src_y + column_offset) & height_mask, src_x);
+
+			if (src_bitmap1)
 			{
-				if (rowscroll_ptr && BIT(control1, 5))
-					column_offset = rowscroll_ptr[0x200 + ((src_x & 0x1ff) / col_type)];
-				else
-					column_offset = 0;
-
-				p = src_bitmap0->pix16((src_y + column_offset) & height_mask, src_x);
-
-				if (src_bitmap1)
+				if (!is_tattoo)
 				{
+					// does boogie wings actually use this, or is the tattoo assassing code correct in this mode?
 					p |= (src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
 				}
-
-				src_x = (src_x + 1) & width_mask;
-
-				if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
-				{
-					bitmap.pix16(y, x) = machine.pens[p];
-					if (machine.priority_bitmap.valid())
-					{
-						UINT8 *pri = &machine.priority_bitmap.pix8(y);
-						pri[x] |= priority;
-					}
-				}
-			}
-		}
-		else
-		{
-			/* boogwing */
-			for (x = 0; x < 320; x++)
-			{
-				if (rowscroll_ptr && BIT(control1, 5))
-					column_offset = rowscroll_ptr[0x200 + ((src_x & 0x1ff) / col_type)];
 				else
-					column_offset = 0;
-
-				p = src_bitmap0->pix16((src_y + column_offset) & height_mask, src_x);
-
-				if (src_bitmap1)
 				{
-					if (!is_tattoo)
-					{
-						// does boogie wings actually use this, or is the tattoo assassing code correct in this mode?
-						p |= (src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
-					}
-					else
-					{
-						UINT16 p2 = src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x);
-						p = 0x200+( ((p&0x30)<<4) | (p&0x0f) | ((p2 & 0x0f)<<4));
-					}
+					UINT16 p2 = src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x);
+					p = 0x200+( ((p&0x30)<<4) | (p&0x0f) | ((p2 & 0x0f)<<4));
 				}
-				src_x = (src_x + 1) & width_mask;
+			}
+			src_x = (src_x + 1) & width_mask;
 
-				if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
+			if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
+			{
+				bitmap.pix(y, x) = machine.pens[p];
+				if (machine.priority_bitmap.valid())
 				{
-					bitmap.pix32(y, x) = machine.pens[p];
-					if (machine.priority_bitmap.valid())
-					{
-						UINT8 *pri = &machine.priority_bitmap.pix8(y);
-						pri[x] |= priority;
-					}
+					UINT8 *pri = &machine.priority_bitmap.pix8(y);
+					pri[x] |= priority;
 				}
 			}
 		}
+
 		src_y = (src_y + 1) & height_mask;
 	}
 }
@@ -841,7 +811,7 @@ void deco16ic_pf_update( device_t *device, const UINT16 *rowscroll_1_ptr, const 
 
 /*****************************************************************************************/
 
-void deco16ic_print_debug_info(device_t *device, bitmap_t &bitmap)
+void deco16ic_print_debug_info(device_t *device, bitmap_ind16 &bitmap)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	char buf[64*5];
@@ -862,7 +832,8 @@ void deco16ic_print_debug_info(device_t *device, bitmap_t &bitmap)
 
 /*****************************************************************************************/
 
-void deco16ic_tilemap_1_draw( device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+template<class _BitmapClass>
+void deco16ic_tilemap_1_draw_common( device_t *device, _BitmapClass &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -879,7 +850,15 @@ void deco16ic_tilemap_1_draw( device_t *device, bitmap_t &bitmap, const rectangl
 	}
 }
 
-void deco16ic_tilemap_2_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_1_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+{ deco16ic_tilemap_1_draw_common(device, bitmap, cliprect, flags, priority); }
+
+void deco16ic_tilemap_1_draw( device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+{ deco16ic_tilemap_1_draw_common(device, bitmap, cliprect, flags, priority); }
+
+
+template<class _BitmapClass>
+void deco16ic_tilemap_2_draw_common(device_t *device, _BitmapClass &bitmap, const rectangle &cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -896,11 +875,23 @@ void deco16ic_tilemap_2_draw(device_t *device, bitmap_t &bitmap, const rectangle
 	}
 }
 
+void deco16ic_tilemap_2_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+{ deco16ic_tilemap_2_draw_common(device, bitmap, cliprect, flags, priority); }
+
+void deco16ic_tilemap_2_draw( device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+{ deco16ic_tilemap_2_draw_common(device, bitmap, cliprect, flags, priority); }
+
 
 /*****************************************************************************************/
 
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
-void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo)
+void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo)
+{
+	deco16ic_state *deco16ic = get_safe_token(device);
+	custom_tilemap_draw(device, bitmap, cliprect, 0, deco16ic->pf1_tilemap_16x16, 0, deco16ic->pf2_tilemap_16x16, deco16ic->pf1_rowscroll_ptr, deco16ic->pf12_control[1], deco16ic->pf12_control[2], deco16ic->pf12_control[5] & 0xff, deco16ic->pf12_control[6] & 0xff, 0xf, 4, 0xff, flags, priority, is_tattoo);
+}
+
+void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	custom_tilemap_draw(device, bitmap, cliprect, 0, deco16ic->pf1_tilemap_16x16, 0, deco16ic->pf2_tilemap_16x16, deco16ic->pf1_rowscroll_ptr, deco16ic->pf12_control[1], deco16ic->pf12_control[2], deco16ic->pf12_control[5] & 0xff, deco16ic->pf12_control[6] & 0xff, 0xf, 4, 0xff, flags, priority, is_tattoo);

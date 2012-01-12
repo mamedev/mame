@@ -57,6 +57,6 @@ public:
 
 PALETTE_INIT( fcombat );
 VIDEO_START( fcombat );
-SCREEN_UPDATE( fcombat );
+SCREEN_UPDATE_IND16( fcombat );
 
 WRITE8_HANDLER( fcombat_videoreg_w );

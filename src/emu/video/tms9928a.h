@@ -56,14 +56,12 @@
 
 #define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
 	MCFG_SCREEN_ADD( _screen_tag, RASTER ) \
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
 	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12, \
 		 TMS9928A_TOTAL_VERT_NTSC, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC + 192 + 12 )
 
 
 #define MCFG_TMS9928A_SCREEN_ADD_PAL(_screen_tag) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER ) \
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
 	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12,	\
 		 TMS9928A_TOTAL_VERT_PAL, TMS9928A_VERT_DISPLAY_START_PAL - 12, TMS9928A_VERT_DISPLAY_START_PAL + 192 + 12 )
 
@@ -104,7 +102,8 @@ public:
 	DECLARE_WRITE8_MEMBER( register_write );
 
 	/* update the screen */
-	void update( bitmap_t &bitmap, const rectangle &cliprect );
+	UINT32 screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	bitmap_ind16 &get_bitmap() { return m_tmpbmp; }
 
 protected:
 	// device-level overrides
@@ -148,7 +147,7 @@ private:
 	const address_space_config		m_space_config;
 
 	UINT8		*m_vMem;
-	bitmap_t	*m_tmpbmp;
+	bitmap_ind16 m_tmpbmp;
 	emu_timer	*m_line_timer;
 	UINT8		m_mode;
 

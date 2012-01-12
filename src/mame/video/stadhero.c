@@ -19,7 +19,7 @@
 
 /******************************************************************************/
 
-SCREEN_UPDATE( stadhero )
+SCREEN_UPDATE_IND16( stadhero )
 {
 	stadhero_state *state = screen.machine().driver_data<stadhero_state>();
 //  tilemap_set_flip_all(screen.machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);

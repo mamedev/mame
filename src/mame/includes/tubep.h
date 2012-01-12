@@ -43,9 +43,9 @@ public:
 
 void tubep_vblank_end(running_machine &machine);
 PALETTE_INIT( tubep );
-SCREEN_UPDATE( tubep );
+SCREEN_UPDATE_IND16( tubep );
 PALETTE_INIT( rjammer );
-SCREEN_UPDATE( rjammer );
+SCREEN_UPDATE_IND16( rjammer );
 VIDEO_START( tubep );
 VIDEO_RESET( tubep );
 

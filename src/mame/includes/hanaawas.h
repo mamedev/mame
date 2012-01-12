@@ -30,4 +30,4 @@ WRITE8_DEVICE_HANDLER( hanaawas_portB_w );
 
 PALETTE_INIT( hanaawas );
 VIDEO_START( hanaawas );
-SCREEN_UPDATE( hanaawas );
+SCREEN_UPDATE_IND16( hanaawas );

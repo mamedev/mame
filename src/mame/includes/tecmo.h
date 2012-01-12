@@ -31,4 +31,4 @@ WRITE8_HANDLER( tecmo_bgscroll_w );
 WRITE8_HANDLER( tecmo_flipscreen_w );
 
 VIDEO_START( tecmo );
-SCREEN_UPDATE( tecmo );
+SCREEN_UPDATE_IND16( tecmo );

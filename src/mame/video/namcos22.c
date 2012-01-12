@@ -356,7 +356,7 @@ struct _poly_extra_data
 	rgbint fadeColor;
 	rgbint polyColor;
 	const pen_t *pens;
-	bitmap_t *priority_bitmap;
+	bitmap_ind8 *priority_bitmap;
 	int bn;
 	int flags;
 	int prioverchar;
@@ -390,7 +390,7 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	float du = extent->param[1].dpdx;
 	float dv = extent->param[2].dpdx;
 	float di = extent->param[3].dpdx;
-	bitmap_t *destmap = (bitmap_t *)destbase;
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)destbase;
 	int bn = extra->bn * 0x1000;
 	const pen_t *pens = extra->pens;
 	const UINT8 *czram = extra->czram;
@@ -522,7 +522,7 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	}
 } /* renderscanline_uvi_full */
 
-static void poly3d_DrawQuad(running_machine &machine, bitmap_t &bitmap, int textureBank, int color, Poly3dVertex pv[4], int flags, int cz_adjust, int direct, int cmode )
+static void poly3d_DrawQuad(running_machine &machine, bitmap_rgb32 &bitmap, int textureBank, int color, Poly3dVertex pv[4], int flags, int cz_adjust, int direct, int cmode )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
@@ -735,7 +735,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	int y_index = extent->param[1].start - extra->flipy;
 	float x_index = extent->param[0].start - extra->flipx;
 	float dx = extent->param[0].dpdx;
-	bitmap_t *destmap = (bitmap_t *)destbase;
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)destbase;
 	const pen_t *pal = extra->pens;
 	int prioverchar = extra->prioverchar;
 	int alphaFactor = extra->alpha;
@@ -779,7 +779,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 
 static void
 poly3d_DrawSprite(
-	bitmap_t &dest_bmp, const gfx_element *gfx, UINT32 code,
+	bitmap_rgb32 &dest_bmp, const gfx_element *gfx, UINT32 code,
 	UINT32 color, int flipx, int flipy, int sx, int sy,
 	int scalex, int scaley, int cz_factor, int prioverchar, int alpha )
 {
@@ -848,7 +848,7 @@ poly3d_DrawSprite(
 } /* poly3d_DrawSprite */
 
 static void
-ApplyGamma( running_machine &machine, bitmap_t &bitmap )
+ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int x,y;
@@ -1077,7 +1077,7 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 } /* NewSceneNode */
 
 
-static void RenderSprite(running_machine &machine, bitmap_t &bitmap, struct SceneNode *node )
+static void RenderSprite(running_machine &machine, bitmap_rgb32 &bitmap, struct SceneNode *node )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int tile = node->data.sprite.tile;
@@ -1113,7 +1113,7 @@ static void RenderSprite(running_machine &machine, bitmap_t &bitmap, struct Scen
 	} /* next row */
 } /* RenderSprite */
 
-static void RenderSceneHelper(running_machine &machine, bitmap_t &bitmap, struct SceneNode *node )
+static void RenderSceneHelper(running_machine &machine, bitmap_rgb32 &bitmap, struct SceneNode *node )
 {
 	if( node )
 	{
@@ -1174,7 +1174,7 @@ static void RenderSceneHelper(running_machine &machine, bitmap_t &bitmap, struct
 	}
 } /* RenderSceneHelper */
 
-static void RenderScene(running_machine &machine, bitmap_t &bitmap )
+static void RenderScene(running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	struct SceneNode *node = &mSceneRoot;
@@ -1506,7 +1506,7 @@ Prepare3dTexture( running_machine &machine, void *pTilemapROM, void *pTextureROM
 static void
 DrawSpritesHelper(
 	running_machine &machine,
-	bitmap_t &bitmap,
+	bitmap_rgb32 &bitmap,
 	const rectangle &cliprect,
 	UINT32 *pBase,
 	const UINT32 *pSource,
@@ -1641,7 +1641,7 @@ DrawSpritesHelper(
 } /* DrawSpritesHelper */
 
 static void
-DrawSprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -1957,7 +1957,7 @@ WRITE32_HANDLER( namcos22s_spotram_w )
 	}
 }
 
-static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int prival )
+static void namcos22s_mix_textlayer( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	const pen_t *pens = machine.pens;
@@ -2041,7 +2041,7 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t &bitmap,
 	}
 }
 
-static void namcos22_mix_textlayer( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void namcos22_mix_textlayer( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	const pen_t *pens = machine.pens;
@@ -2099,7 +2099,7 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_t &bitmap, 
 	}
 }
 
-static void DrawCharacterLayer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void DrawCharacterLayer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int scroll_x = (state->m_tilemapattr[0]>>16) - 0x35c;
@@ -2171,7 +2171,7 @@ Signed18( UINT32 value )
 static void
 BlitQuadHelper(
 		running_machine &machine,
-		bitmap_t &bitmap,
+		bitmap_rgb32 &bitmap,
 		unsigned color,
 		unsigned addr,
 		float m[4][4],
@@ -2339,7 +2339,7 @@ RegisterNormals( namcos22_state *state, INT32 addr, float m[4][4] )
 } /* RegisterNormals */
 
 static void
-BlitQuads( running_machine &machine, bitmap_t &bitmap, INT32 addr, float m[4][4], INT32 base )
+BlitQuads( running_machine &machine, bitmap_rgb32 &bitmap, INT32 addr, float m[4][4], INT32 base )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 //  int numAdditionalNormals = 0;
@@ -2430,7 +2430,7 @@ BlitQuads( running_machine &machine, bitmap_t &bitmap, INT32 addr, float m[4][4]
 } /* BlitQuads */
 
 static void
-BlitPolyObject( running_machine &machine, bitmap_t &bitmap, int code, float M[4][4] )
+BlitPolyObject( running_machine &machine, bitmap_rgb32 &bitmap, int code, float M[4][4] )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	unsigned addr1 = GetPolyData(state, code);
@@ -2561,7 +2561,7 @@ HandleBB0003( namcos22_state *state, const INT32 *pSource )
 } /* HandleBB0003 */
 
 static void
-Handle200002( running_machine &machine, bitmap_t &bitmap, const INT32 *pSource )
+Handle200002( running_machine &machine, bitmap_rgb32 &bitmap, const INT32 *pSource )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if( state->m_mPrimitiveID>=0x45 )
@@ -2630,7 +2630,7 @@ Handle233002( namcos22_state *state, const INT32 *pSource )
 } /* Handle233002 */
 
 static void
-SimulateSlaveDSP( running_machine &machine, bitmap_t &bitmap )
+SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	const INT32 *pSource = 0x300 + (INT32 *)state->m_polygonram;
@@ -2696,7 +2696,7 @@ SimulateSlaveDSP( running_machine &machine, bitmap_t &bitmap )
 } /* SimulateSlaveDSP */
 
 static void
-DrawPolygons( running_machine &machine, bitmap_t &bitmap )
+DrawPolygons( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if( state->m_mbDSPisActive )
@@ -2757,7 +2757,7 @@ static VIDEO_START( common )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int code;
 
-	state->m_mix_bitmap = auto_bitmap_alloc(machine,640,480,BITMAP_FORMAT_INDEXED16);
+	state->m_mix_bitmap = auto_bitmap_ind16_alloc(machine,640,480);
 	state->m_bgtilemap = tilemap_create( machine, TextTilemapGetInfo,tilemap_scan_rows,16,16,64,64 );
 	tilemap_set_transparent_pen(state->m_bgtilemap, 0xf);
 
@@ -2811,7 +2811,7 @@ VIDEO_START( namcos22s )
 	VIDEO_START_CALL(common);
 }
 
-SCREEN_UPDATE( namcos22s )
+SCREEN_UPDATE_RGB32( namcos22s )
 {
 	namcos22_state *state = screen.machine().driver_data<namcos22_state>();
 	UpdateVideoMixer(screen.machine());
@@ -2894,7 +2894,7 @@ SCREEN_UPDATE( namcos22s )
 	return 0;
 }
 
-SCREEN_UPDATE( namcos22 )
+SCREEN_UPDATE_RGB32( namcos22 )
 {
 	UpdateVideoMixer(screen.machine());
 	UpdatePalette(screen.machine());

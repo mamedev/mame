@@ -37,7 +37,7 @@ VIDEO_START( s3c2400 )
 	s3c24xx_video_start( device, machine);
 }
 
-SCREEN_UPDATE( s3c2400 )
+SCREEN_UPDATE_RGB32( s3c2400 )
 {
 	device_t *device = screen.machine().device( S3C2400_TAG);
 	return s3c24xx_video_update( device, screen, bitmap, cliprect);

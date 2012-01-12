@@ -39,10 +39,10 @@ public:
 	UINT8 m_collision_invert;
 	int m_is_2bpp;
 	UINT8 m_int_condition;
-	bitmap_t *m_background_bitmap;
-	bitmap_t *m_motion_object_1_vid;
-	bitmap_t *m_motion_object_2_vid;
-	bitmap_t *m_motion_object_2_clip;
+	bitmap_ind16 m_background_bitmap;
+	bitmap_ind16 m_motion_object_1_vid;
+	bitmap_ind16 m_motion_object_2_vid;
+	bitmap_ind16 m_motion_object_2_clip;
 };
 
 
@@ -50,7 +50,7 @@ public:
 
 void exidy_video_config(running_machine &machine, UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 VIDEO_START( exidy );
-SCREEN_UPDATE( exidy );
+SCREEN_UPDATE_IND16( exidy );
 
 INTERRUPT_GEN( exidy_vblank_interrupt );
 

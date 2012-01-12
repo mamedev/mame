@@ -207,7 +207,7 @@ WRITE8_HANDLER( appoooh_out_w )
 	/* bit 7 unknown (used) */
 }
 
-static void appoooh_draw_sprites( bitmap_t &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
+static void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
 {
 	int offs;
 	int flipy = flip_screen_get(gfx->machine());
@@ -238,7 +238,7 @@ static void appoooh_draw_sprites( bitmap_t &dest_bmp, const rectangle &cliprect,
 	}
 }
 
-static void robowres_draw_sprites( bitmap_t &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
+static void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
 {
 	int offs;
 	int flipy = flip_screen_get(gfx->machine());
@@ -270,7 +270,7 @@ static void robowres_draw_sprites( bitmap_t &dest_bmp, const rectangle &cliprect
 }
 
 
-SCREEN_UPDATE( appoooh )
+SCREEN_UPDATE_IND16( appoooh )
 {
 	appoooh_state *state = screen.machine().driver_data<appoooh_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -300,7 +300,7 @@ SCREEN_UPDATE( appoooh )
 	return 0;
 }
 
-SCREEN_UPDATE( robowres )
+SCREEN_UPDATE_IND16( robowres )
 {
 	appoooh_state *state = screen.machine().driver_data<appoooh_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

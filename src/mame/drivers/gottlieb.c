@@ -196,7 +196,6 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/6532riot.h"
-#include "machine/laserdsc.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
@@ -244,7 +243,6 @@ static MACHINE_START( gottlieb )
 	state_save_register_global_array(machine, state->m_track);
 
 	/* see if we have a laserdisc */
-	state->m_laserdisc = machine.devicelist().first(PIONEER_PR8210);
 	if (state->m_laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
@@ -436,7 +434,7 @@ static WRITE8_HANDLER( laserdisc_command_w )
 static TIMER_CALLBACK( laserdisc_philips_callback )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	int newcode = laserdisc_get_field_code(state->m_laserdisc, (param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
+	UINT32 newcode = state->m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
        board receives notification and latches the most recent frame number */
@@ -458,7 +456,7 @@ static TIMER_CALLBACK( laserdisc_bit_off_callback )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* deassert the control line */
-	laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
+	state->m_laserdisc->control_w(CLEAR_LINE);
 }
 
 
@@ -470,7 +468,7 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 	attotime duration;
 
 	/* assert the line and set a timer for deassertion */
-	laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
+	state->m_laserdisc->control_w(ASSERT_LINE);
 	machine.scheduler().timer_set(LASERDISC_CLOCK * 10, FUNC(laserdisc_bit_off_callback));
 
 	/* determine how long for the next command; there is a 555 timer with a
@@ -596,10 +594,10 @@ static void audio_handle_zero_crossing(gottlieb_state *state, attotime zerotime,
 }
 
 
-static void laserdisc_audio_process(device_t *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
+static void laserdisc_audio_process(device_t *dummy, laserdisc_device &device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
 {
-	gottlieb_state *state = device->machine().driver_data<gottlieb_state>();
-	int logit = LOG_AUDIO_DECODE && device->machine().input().code_pressed(KEYCODE_L);
+	gottlieb_state *state = device.machine().driver_data<gottlieb_state>();
+	int logit = LOG_AUDIO_DECODE && device.machine().input().code_pressed(KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
 	attotime curtime = state->m_laserdisc_last_time;
 	int cursamp;
@@ -680,10 +678,8 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 	/* if we have a laserdisc, update it */
 	if (state->m_laserdisc != NULL)
 	{
-		bitmap_t *dummy;
-
 		/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
-		if (!laserdisc_get_video(state->m_laserdisc, &dummy))
+		if (!state->m_laserdisc->video_active())
 			state->m_laserdisc_status &= ~0x20;
 		else
 			state->m_laserdisc_status |= 0x20;
@@ -1858,9 +1854,8 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK)
-	MCFG_SCREEN_UPDATE(gottlieb)
+	MCFG_SCREEN_UPDATE_STATIC(gottlieb)
 
 	MCFG_GFXDECODE(gfxdecode)
 	MCFG_PALETTE_LENGTH(16)
@@ -1885,15 +1880,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
 	MCFG_FRAGMENT_ADD(gottlieb_soundrev2)
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "screen", "ldsound")
-	MCFG_LASERDISC_AUDIO(laserdisc_audio_process)
-	MCFG_LASERDISC_OVERLAY(gottlieb, GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_PR8210_ADD("laserdisc")
+	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(laserdisc_audio_process), device))
+	MCFG_LASERDISC_OVERLAY(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	/* right channel is processed as data */
 MACHINE_CONFIG_END
@@ -1937,15 +1932,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
 	MCFG_FRAGMENT_ADD(gottlieb_cobram3_soundrev2)
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "screen", "ldsound")
-	MCFG_LASERDISC_AUDIO(laserdisc_audio_process)
-	MCFG_LASERDISC_OVERLAY(gottlieb, GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_PR8210_ADD("laserdisc")
+	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(laserdisc_audio_process), device))
+	MCFG_LASERDISC_OVERLAY(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	/* right channel is processed as data */
 

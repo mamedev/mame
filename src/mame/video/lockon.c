@@ -698,7 +698,7 @@ do {                                     \
 	if (carry) --CNT;                    \
 } while(0)
 
-static void rotate_draw( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void rotate_draw( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
 	UINT32 y;
@@ -803,7 +803,7 @@ static void rotate_draw( running_machine &machine, bitmap_t &bitmap, const recta
 
 *******************************************************************************************/
 
-static void hud_draw( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void hud_draw( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
 	UINT8	*tile_rom = machine.region("gfx3")->base();
@@ -911,8 +911,8 @@ VIDEO_START( lockon )
 	tilemap_set_transparent_pen(state->m_tilemap, 0);
 
 	/* Allocate the two frame buffers for rotation */
-	state->m_back_buffer = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
-	state->m_front_buffer = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+	state->m_back_buffer = auto_bitmap_ind16_alloc(machine, 512, 512);
+	state->m_front_buffer = auto_bitmap_ind16_alloc(machine, 512, 512);
 
 	/* 2kB of object ASIC palette RAM */
 	state->m_obj_pal_ram = auto_alloc_array(machine, UINT8, 2048);
@@ -929,7 +929,7 @@ VIDEO_START( lockon )
 	state->save_pointer(NAME(state->m_obj_pal_ram), 2048);
 }
 
-SCREEN_UPDATE( lockon )
+SCREEN_UPDATE_IND16( lockon )
 {
 	lockon_state *state = screen.machine().driver_data<lockon_state>();
 
@@ -957,7 +957,7 @@ SCREEN_EOF( lockon )
 	lockon_state *state = screen.machine().driver_data<lockon_state>();
 
 	/* Swap the frame buffers */
-	bitmap_t *tmp = state->m_front_buffer;
+	bitmap_ind16 *tmp = state->m_front_buffer;
 	state->m_front_buffer = state->m_back_buffer;
 	state->m_back_buffer = tmp;
 

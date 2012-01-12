@@ -104,4 +104,4 @@ extern void s24_fd1094_driver_init(running_machine &machine);
 
 /*----------- defined in video/segas24.c -----------*/
 
-SCREEN_UPDATE(system24);
+SCREEN_UPDATE_IND16(system24);

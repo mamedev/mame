@@ -53,8 +53,8 @@ public:
 	UINT8 m_flash;
 	UINT8 m_crash[2];
 	UINT8 m_skid[2];
-	bitmap_t *m_helper1;
-	bitmap_t *m_helper2;
+	bitmap_ind16 m_helper1;
+	bitmap_ind16 m_helper2;
 	UINT32 m_color1_mask;
 	UINT32 m_color2_mask;
 	tilemap_t *m_tilemap1;
@@ -84,8 +84,8 @@ PALETTE_INIT( montecar );
 VIDEO_START( firetrk );
 VIDEO_START( superbug );
 VIDEO_START( montecar );
-SCREEN_UPDATE( firetrk );
-SCREEN_UPDATE( superbug );
-SCREEN_UPDATE( montecar );
+SCREEN_UPDATE_IND16( firetrk );
+SCREEN_UPDATE_IND16( superbug );
+SCREEN_UPDATE_IND16( montecar );
 
 

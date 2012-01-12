@@ -46,7 +46,7 @@ extern WRITE8_HANDLER( circus_clown_y_w );
 extern WRITE8_HANDLER( circus_videoram_w );
 
 extern VIDEO_START( circus );
-extern SCREEN_UPDATE( crash );
-extern SCREEN_UPDATE( circus );
-extern SCREEN_UPDATE( robotbwl );
-extern SCREEN_UPDATE( ripcord );
+extern SCREEN_UPDATE_IND16( crash );
+extern SCREEN_UPDATE_IND16( circus );
+extern SCREEN_UPDATE_IND16( robotbwl );
+extern SCREEN_UPDATE_IND16( ripcord );

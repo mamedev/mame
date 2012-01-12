@@ -25,5 +25,5 @@ READ16_HANDLER ( suna16_paletteram16_r );
 WRITE16_HANDLER( suna16_paletteram16_w );
 
 VIDEO_START( suna16 );
-SCREEN_UPDATE( suna16 );
-SCREEN_UPDATE( bestbest );
+SCREEN_UPDATE_IND16( suna16 );
+SCREEN_UPDATE_IND16( bestbest );

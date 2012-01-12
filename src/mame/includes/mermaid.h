@@ -23,8 +23,8 @@ public:
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	bitmap_t* m_helper;
-	bitmap_t* m_helper2;
+	bitmap_ind16 m_helper;
+	bitmap_ind16 m_helper2;
 	int m_coll_bit0;
 	int m_coll_bit1;
 	int m_coll_bit2;
@@ -68,5 +68,5 @@ READ8_HANDLER( mermaid_collision_r );
 PALETTE_INIT( mermaid );
 PALETTE_INIT( rougien );
 VIDEO_START( mermaid );
-SCREEN_UPDATE( mermaid );
+SCREEN_UPDATE_IND16( mermaid );
 SCREEN_EOF( mermaid );

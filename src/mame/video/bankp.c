@@ -173,7 +173,7 @@ VIDEO_START( bankp )
 	state->save_item(NAME(state->m_priority));
 }
 
-SCREEN_UPDATE( bankp )
+SCREEN_UPDATE_IND16( bankp )
 {
 	bankp_state *state = screen.machine().driver_data<bankp_state>();
 

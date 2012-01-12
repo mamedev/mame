@@ -27,7 +27,7 @@ public:
 PALETTE_INIT( thepit );
 PALETTE_INIT( suprmous );
 VIDEO_START( thepit );
-SCREEN_UPDATE( thepit );
+SCREEN_UPDATE_IND16( thepit );
 WRITE8_HANDLER( thepit_videoram_w );
 WRITE8_HANDLER( thepit_colorram_w );
 WRITE8_HANDLER( thepit_flip_screen_x_w );

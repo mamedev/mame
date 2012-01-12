@@ -28,8 +28,8 @@ public:
 
 VIDEO_START( holeland );
 VIDEO_START( crzrally );
-SCREEN_UPDATE( holeland );
-SCREEN_UPDATE( crzrally );
+SCREEN_UPDATE_IND16( holeland );
+SCREEN_UPDATE_IND16( crzrally );
 
 WRITE8_HANDLER( holeland_videoram_w );
 WRITE8_HANDLER( holeland_colorram_w );

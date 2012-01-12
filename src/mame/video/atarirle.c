@@ -89,7 +89,7 @@ struct atarirle_data
 	atarirle_info *	info;				/* list of info records */
 	atarirle_entry *spriteram;			/* pointer to sprite RAM */
 
-	bitmap_t *		vram[2][2];			/* pointers to VRAM bitmaps and backbuffers */
+	bitmap_ind16 *		vram[2][2];			/* pointers to VRAM bitmaps and backbuffers */
 	int				partial_scanline;	/* partial update scanline */
 
 	UINT8			control_bits;		/* current control bits */
@@ -131,12 +131,12 @@ static int count_objects(const UINT16 *base, int length);
 static void prescan_rle(const atarirle_data *mo, int which);
 static void sort_and_render(running_machine &machine, atarirle_data *mo);
 static void compute_checksum(atarirle_data *mo);
-static void draw_rle(atarirle_data *mo, bitmap_t &bitmap, int code, int color, int hflip, int vflip,
+static void draw_rle(atarirle_data *mo, bitmap_ind16 &bitmap, int code, int color, int hflip, int vflip,
 		int x, int y, int xscale, int yscale, const rectangle &clip);
-static void draw_rle_zoom(bitmap_t &bitmap, const atarirle_info *gfx,
+static void draw_rle_zoom(bitmap_ind16 &bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle &clip);
-static void draw_rle_zoom_hflip(bitmap_t &bitmap, const atarirle_info *gfx,
+static void draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle &clip);
 
@@ -338,16 +338,16 @@ static DEVICE_START( atarirle )
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
 
-	mo->vram[0][0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	mo->vram[0][1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	mo->vram[0][0] = auto_bitmap_ind16_alloc(machine, width, height);
+	mo->vram[0][1] = auto_bitmap_ind16_alloc(machine, width, height);
 	mo->vram[0][0]->fill(0);
 	mo->vram[0][1]->fill(0);
 
 	/* allocate alternate bitmaps if needed */
 	if (mo->vrammask.mask != 0)
 	{
-		mo->vram[1][0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-		mo->vram[1][1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+		mo->vram[1][0] = auto_bitmap_ind16_alloc(machine, width, height);
+		mo->vram[1][1] = auto_bitmap_ind16_alloc(machine, width, height);
 		mo->vram[1][0]->fill(0);
 		mo->vram[1][1]->fill(0);
 	}
@@ -566,7 +566,7 @@ WRITE32_DEVICE_HANDLER( atarirle_spriteram32_w )
     atarirle_get_vram: Return the VRAM bitmap.
 ---------------------------------------------------------------*/
 
-bitmap_t *atarirle_get_vram(device_t *device, int idx)
+bitmap_ind16 *atarirle_get_vram(device_t *device, int idx)
 {
 	atarirle_data *mo = get_safe_token(device);
 //logerror("atarirle_get_vram (frame %d)\n", (mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2);
@@ -775,8 +775,8 @@ static void compute_checksum(atarirle_data *mo)
 
 static void sort_and_render(running_machine &machine, atarirle_data *mo)
 {
-	bitmap_t *bitmap1 = mo->vram[0][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
-	bitmap_t *bitmap2 = mo->vram[1][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
+	bitmap_ind16 *bitmap1 = mo->vram[0][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
+	bitmap_ind16 *bitmap2 = mo->vram[1][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
 	atarirle_entry *obj = mo->spriteram;
 	mo_sort_entry sort_entry[256];
 	mo_sort_entry *list_head[256];
@@ -946,7 +946,7 @@ fprintf(stderr, "   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d 
     object.
 ---------------------------------------------------------------*/
 
-void draw_rle(atarirle_data *mo, bitmap_t &bitmap, int code, int color, int hflip, int vflip,
+void draw_rle(atarirle_data *mo, bitmap_ind16 &bitmap, int code, int color, int hflip, int vflip,
 	int x, int y, int xscale, int yscale, const rectangle &clip)
 {
 	UINT32 palettebase = mo->palettebase + color;
@@ -987,7 +987,7 @@ void draw_rle(atarirle_data *mo, bitmap_t &bitmap, int code, int color, int hfli
     bitmap.
 ---------------------------------------------------------------*/
 
-void draw_rle_zoom(bitmap_t &bitmap, const atarirle_info *gfx,
+void draw_rle_zoom(bitmap_ind16 &bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle &clip)
 {
@@ -1177,7 +1177,7 @@ void draw_rle_zoom(bitmap_t &bitmap, const atarirle_info *gfx,
     16-bit bitmap with horizontal flip.
 ---------------------------------------------------------------*/
 
-void draw_rle_zoom_hflip(bitmap_t &bitmap, const atarirle_info *gfx,
+void draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle &clip)
 {

@@ -243,7 +243,7 @@ void liberatr_state::get_pens(pen_t *pens)
 }
 
 
-void liberatr_state::draw_planet(bitmap_t &bitmap, pen_t *pens)
+void liberatr_state::draw_planet(bitmap_rgb32 &bitmap, pen_t *pens)
 {
 	UINT8 latitude;
 
@@ -279,7 +279,7 @@ void liberatr_state::draw_planet(bitmap_t &bitmap, pen_t *pens)
 }
 
 
-void liberatr_state::draw_bitmap(bitmap_t &bitmap, pen_t *pens)
+void liberatr_state::draw_bitmap(bitmap_rgb32 &bitmap, pen_t *pens)
 {
 	offs_t offs;
 
@@ -296,7 +296,7 @@ void liberatr_state::draw_bitmap(bitmap_t &bitmap, pen_t *pens)
 }
 
 
-bool liberatr_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 liberatr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[NUM_PENS];
 	get_pens(pens);
@@ -305,5 +305,5 @@ bool liberatr_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 	draw_planet(bitmap, pens);
 	draw_bitmap(bitmap, pens);
 
-	return false;
+	return 0;
 }

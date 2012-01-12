@@ -109,7 +109,7 @@ WRITE8_HANDLER( holeland_flipscreen_w )
 }
 
 
-static void holeland_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void holeland_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	holeland_state *state = machine.driver_data<holeland_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -149,7 +149,7 @@ static void holeland_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void crzrally_draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
+static void crzrally_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	holeland_state *state = machine.driver_data<holeland_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -188,7 +188,7 @@ static void crzrally_draw_sprites( running_machine &machine, bitmap_t &bitmap,co
 	}
 }
 
-SCREEN_UPDATE( holeland )
+SCREEN_UPDATE_IND16( holeland )
 {
 	holeland_state *state = screen.machine().driver_data<holeland_state>();
 /*tilemap_mark_all_tiles_dirty(state->m_bg_tilemap); */
@@ -198,7 +198,7 @@ SCREEN_UPDATE( holeland )
 	return 0;
 }
 
-SCREEN_UPDATE( crzrally )
+SCREEN_UPDATE_IND16( crzrally )
 {
 	holeland_state *state = screen.machine().driver_data<holeland_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

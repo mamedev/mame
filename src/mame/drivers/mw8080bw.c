@@ -232,9 +232,8 @@ MACHINE_CONFIG_START( mw8080bw_root, mw8080bw_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART)
-	MCFG_SCREEN_UPDATE(mw8080bw)
+	MCFG_SCREEN_UPDATE_STATIC(mw8080bw)
 MACHINE_CONFIG_END
 
 
@@ -2286,7 +2285,7 @@ static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(spcenctr)
+	MCFG_SCREEN_UPDATE_STATIC(spcenctr)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(spcenctr_audio)
@@ -2374,7 +2373,7 @@ static MACHINE_CONFIG_DERIVED( phantom2, mw8080bw_root )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(phantom2)
+	MCFG_SCREEN_UPDATE_STATIC(phantom2)
 	MCFG_SCREEN_EOF(phantom2)
 
 	/* add shifter */
@@ -2730,7 +2729,7 @@ MACHINE_CONFIG_DERIVED( invaders, mw8080bw_root )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(invaders)
+	MCFG_SCREEN_UPDATE_STATIC(invaders)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")

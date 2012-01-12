@@ -156,7 +156,7 @@ WRITE8_HANDLER( pandoras_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8* sr )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* sr )
 {
 	int offs;
 
@@ -177,7 +177,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( pandoras )
+SCREEN_UPDATE_IND16( pandoras )
 {
 	pandoras_state *state = screen.machine().driver_data<pandoras_state>();
 	tilemap_draw(bitmap,cliprect, state->m_layer0, 1 ,0);

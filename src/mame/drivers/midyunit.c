@@ -969,7 +969,8 @@ static const tms34010_config zunit_tms_config =
 	"screen",						/* the screen operated on */
 	MEDRES_PIXEL_CLOCK,				/* pixel clock */
 	2,								/* pixels per clock */
-	midyunit_scanline_update,		/* scanline updater */
+	midyunit_scanline_update,		/* scanline updater (indexed16) */
+	NULL,							/* scanline updater (rgb32) */
 	NULL,							/* generate interrupt */
 	midyunit_to_shiftreg,			/* write to shiftreg function */
 	midyunit_from_shiftreg			/* read from shiftreg function */
@@ -981,7 +982,8 @@ static const tms34010_config yunit_tms_config =
 	"screen",						/* the screen operated on */
 	STDRES_PIXEL_CLOCK,				/* pixel clock */
 	2,								/* pixels per clock */
-	midyunit_scanline_update,		/* scanline updater */
+	midyunit_scanline_update,		/* scanline updater (indexed16) */
+	NULL,							/* scanline updater (rgb32) */
 	NULL,							/* generate interrupt */
 	midyunit_to_shiftreg,			/* write to shiftreg function */
 	midyunit_from_shiftreg			/* read from shiftreg function */
@@ -1010,9 +1012,8 @@ static MACHINE_CONFIG_START( zunit, midyunit_state )
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(MEDRES_PIXEL_CLOCK*2, 673, 0, 511, 433, 0, 399)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
 	MCFG_VIDEO_START(midzunit)
 
@@ -1043,9 +1044,8 @@ static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK*2, 505, 0, 399, 289, 0, 253)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 MACHINE_CONFIG_END
 
 

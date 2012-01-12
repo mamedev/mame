@@ -104,25 +104,26 @@ Sound processor - 6502
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "machine/laserdsc.h"
+#include "machine/ldv1000.h"
 
 
 class deco_ld_state : public driver_device
 {
 public:
 	deco_ld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
 	UINT8 *m_videoram;
 	UINT8 m_vram_bank;
-	device_t *m_laserdisc;
+	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 m_laserdisc_data;
 	int m_nmimask;
 };
 
 
 
-static SCREEN_UPDATE( rblaster )
+static SCREEN_UPDATE_IND16( rblaster )
 {
 	deco_ld_state *state = screen.machine().driver_data<deco_ld_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -163,7 +164,7 @@ static WRITE8_HANDLER( rblaster_vram_bank_w )
 static READ8_HANDLER( laserdisc_r )
 {
 	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
-	UINT8 result = laserdisc_data_r(state->m_laserdisc);
+	UINT8 result = state->m_laserdisc->status_r();
 //  mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
@@ -510,8 +511,6 @@ GFXDECODE_END
 
 static MACHINE_START( rblaster )
 {
-	deco_ld_state *state = machine.driver_data<deco_ld_state>();
-	state->m_laserdisc = machine.device("laserdisc");
 }
 
 static MACHINE_CONFIG_START( rblaster, deco_ld_state )
@@ -527,11 +526,11 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 //  MCFG_CPU_VBLANK_INT("screen",irq0_line_hold) //test
 	MCFG_CPU_PERIODIC_INT(sound_interrupt, 640)
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound") //Sony LDP-1000A, is it truly compatible with the Pioneer?
-	MCFG_LASERDISC_OVERLAY(rblaster, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_LDV1000_ADD("laserdisc") //Sony LDP-1000A, is it truly compatible with the Pioneer?
+	MCFG_LASERDISC_OVERLAY(256, 256, rblaster)
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_GFXDECODE(rblaster)
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_MACHINE_START(rblaster)
@@ -544,7 +543,7 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

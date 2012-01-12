@@ -51,7 +51,6 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { m_vis->update_screen(bitmap, cliprect); return false; }
 
 	DECLARE_WRITE8_MEMBER( cdp1869_w );
 	DECLARE_WRITE8_MEMBER( destryer_out1_w );

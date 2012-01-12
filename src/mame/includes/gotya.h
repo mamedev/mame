@@ -37,4 +37,4 @@ WRITE8_HANDLER( gotya_video_control_w );
 
 PALETTE_INIT( gotya );
 VIDEO_START( gotya );
-SCREEN_UPDATE( gotya );
+SCREEN_UPDATE_IND16( gotya );

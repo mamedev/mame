@@ -122,7 +122,7 @@ void simpsons_video_banking( running_machine &machine, int bank )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( simpsons )
+SCREEN_UPDATE_IND16( simpsons )
 {
 	simpsons_state *state = screen.machine().driver_data<simpsons_state>();
 	int layer[3], bg_colorbase;

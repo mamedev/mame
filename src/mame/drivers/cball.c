@@ -50,7 +50,7 @@ static VIDEO_START( cball )
 }
 
 
-static SCREEN_UPDATE( cball )
+static SCREEN_UPDATE_IND16( cball )
 {
 	cball_state *state = screen.machine().driver_data<cball_state>();
 
@@ -235,10 +235,9 @@ static MACHINE_CONFIG_START( cball, cball_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE(cball)
+	MCFG_SCREEN_UPDATE_STATIC(cball)
 
 	MCFG_GFXDECODE(cball)
 	MCFG_PALETTE_LENGTH(6)

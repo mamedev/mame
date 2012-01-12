@@ -66,4 +66,4 @@ WRITE8_HANDLER( bagman_flipscreen_w );
 
 PALETTE_INIT( bagman );
 VIDEO_START( bagman );
-SCREEN_UPDATE( bagman );
+SCREEN_UPDATE_IND16( bagman );

@@ -6,7 +6,8 @@ public:
 
 	UINT8 *m_videoram;
 	UINT8 *m_s2636_0_ram;
-	bitmap_t *m_spritebitmap;
+	bitmap_ind16 m_bitmap;
+	bitmap_ind16 m_spritebitmap;
 	int m_CollisionBackground;
 	int m_CollisionSprite;
 	tilemap_t *m_bg_tilemap;
@@ -21,5 +22,5 @@ WRITE8_HANDLER( zac_s2636_w );
 READ8_HANDLER( tinvader_port_0_r );
 
 VIDEO_START( tinvader );
-SCREEN_UPDATE( tinvader );
+SCREEN_UPDATE_IND16( tinvader );
 

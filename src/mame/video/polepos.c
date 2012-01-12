@@ -363,7 +363,7 @@ WRITE8_HANDLER( polepos_alpha_w )
 
 ***************************************************************************/
 
-static void draw_road(running_machine &machine, bitmap_t &bitmap)
+static void draw_road(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	polepos_state *state = machine.driver_data<polepos_state>();
 	const UINT8 *road_control = machine.region("gfx5")->base();
@@ -439,7 +439,7 @@ static void draw_road(running_machine &machine, bitmap_t &bitmap)
 	}
 }
 
-static void zoom_sprite(running_machine &machine, bitmap_t &bitmap,int big,
+static void zoom_sprite(running_machine &machine, bitmap_ind16 &bitmap,int big,
 		UINT32 code,UINT32 color,int flipx,int sx,int sy,
 		int sizex,int sizey)
 {
@@ -490,7 +490,7 @@ static void zoom_sprite(running_machine &machine, bitmap_t &bitmap,int big,
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	polepos_state *state = machine.driver_data<polepos_state>();
 	UINT16 *posmem = &state->m_sprite16_memory[0x380];
@@ -520,7 +520,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE( polepos )
+SCREEN_UPDATE_IND16( polepos )
 {
 	polepos_state *state = screen.machine().driver_data<polepos_state>();
 	rectangle clip = cliprect;

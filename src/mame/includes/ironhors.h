@@ -41,6 +41,6 @@ WRITE8_HANDLER( ironhors_flipscreen_w );
 
 PALETTE_INIT( ironhors );
 VIDEO_START( ironhors );
-SCREEN_UPDATE( ironhors );
+SCREEN_UPDATE_IND16( ironhors );
 VIDEO_START( farwest );
-SCREEN_UPDATE( farwest );
+SCREEN_UPDATE_IND16( farwest );

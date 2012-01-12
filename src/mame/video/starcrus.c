@@ -20,11 +20,11 @@ WRITE8_HANDLER( starcrus_p2_y_w ) { space->machine().driver_data<starcrus_state>
 VIDEO_START( starcrus )
 {
 	starcrus_state *state = machine.driver_data<starcrus_state>();
-	state->m_ship1_vid = auto_bitmap_alloc(machine, 16, 16, machine.primary_screen->format());
-	state->m_ship2_vid = auto_bitmap_alloc(machine, 16, 16, machine.primary_screen->format());
+	state->m_ship1_vid = auto_bitmap_ind16_alloc(machine, 16, 16);
+	state->m_ship2_vid = auto_bitmap_ind16_alloc(machine, 16, 16);
 
-	state->m_proj1_vid = auto_bitmap_alloc(machine, 16, 16, machine.primary_screen->format());
-	state->m_proj2_vid = auto_bitmap_alloc(machine, 16, 16, machine.primary_screen->format());
+	state->m_proj1_vid = auto_bitmap_ind16_alloc(machine, 16, 16);
+	state->m_proj2_vid = auto_bitmap_ind16_alloc(machine, 16, 16);
 }
 
 WRITE8_HANDLER( starcrus_ship_parm_1_w )
@@ -425,7 +425,7 @@ static int collision_check_s2p1p2(running_machine &machine)
 	return 0;
 }
 
-SCREEN_UPDATE( starcrus )
+SCREEN_UPDATE_IND16( starcrus )
 {
 	starcrus_state *state = screen.machine().driver_data<starcrus_state>();
 

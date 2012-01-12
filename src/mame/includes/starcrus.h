@@ -4,10 +4,10 @@ public:
 	starcrus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	bitmap_t *m_ship1_vid;
-	bitmap_t *m_ship2_vid;
-	bitmap_t *m_proj1_vid;
-	bitmap_t *m_proj2_vid;
+	bitmap_ind16 *m_ship1_vid;
+	bitmap_ind16 *m_ship2_vid;
+	bitmap_ind16 *m_proj1_vid;
+	bitmap_ind16 *m_proj2_vid;
 
 	int m_s1_x;
 	int m_s1_y;
@@ -55,4 +55,4 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w );
 WRITE8_HANDLER( starcrus_proj_parm_2_w );
 READ8_HANDLER( starcrus_coll_det_r );
 VIDEO_START( starcrus );
-SCREEN_UPDATE( starcrus );
+SCREEN_UPDATE_IND16( starcrus );

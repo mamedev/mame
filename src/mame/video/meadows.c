@@ -78,7 +78,7 @@ WRITE8_HANDLER( meadows_spriteram_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &clip)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &clip)
 {
 	meadows_state *state = machine.driver_data<meadows_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -105,7 +105,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
  *
  *************************************/
 
-SCREEN_UPDATE( meadows )
+SCREEN_UPDATE_IND16( meadows )
 {
 	meadows_state *state = screen.machine().driver_data<meadows_state>();
 	/* draw the background */

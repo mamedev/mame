@@ -25,7 +25,7 @@ public:
 /*----------- defined in video/rpunch.c -----------*/
 
 VIDEO_START( rpunch );
-SCREEN_UPDATE( rpunch );
+SCREEN_UPDATE_IND16( rpunch );
 
 WRITE16_HANDLER( rpunch_videoram_w );
 WRITE16_HANDLER( rpunch_videoreg_w );

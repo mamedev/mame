@@ -144,14 +144,6 @@ static TMS9928A_INTERFACE(kingpin_tms9928a_interface)
 	DEVCB_LINE(vdp_interrupt)
 };
 
-static SCREEN_UPDATE( kingpin )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
 static MACHINE_CONFIG_START( kingpin, kingpin_state )
 /*  MAIN CPU */
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)
@@ -166,7 +158,7 @@ static MACHINE_CONFIG_START( kingpin, kingpin_state )
 /*  VIDEO */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, kingpin_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( kingpin )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

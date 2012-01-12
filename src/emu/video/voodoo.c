@@ -329,7 +329,7 @@ INLINE voodoo_state *get_safe_token(device_t *device)
  *
  *************************************/
 
-int voodoo_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+int voodoo_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	voodoo_state *v = get_safe_token(device);
 	int changed = v->fbi.video_changed;

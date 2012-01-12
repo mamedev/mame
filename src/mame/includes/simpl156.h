@@ -38,4 +38,4 @@ public:
 /*----------- defined in video/simpl156.c -----------*/
 
 VIDEO_START( simpl156 );
-SCREEN_UPDATE( simpl156 );
+SCREEN_UPDATE_IND16( simpl156 );

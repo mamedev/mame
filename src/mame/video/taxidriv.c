@@ -10,7 +10,7 @@ WRITE8_DEVICE_HANDLER( taxidriv_spritectrl_w )
 
 
 
-SCREEN_UPDATE( taxidriv )
+SCREEN_UPDATE_IND16( taxidriv )
 {
 	taxidriv_state *state = screen.machine().driver_data<taxidriv_state>();
 	int offs;

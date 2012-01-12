@@ -26,7 +26,7 @@ static VIDEO_START(buster)
 {
 }
 
-static SCREEN_UPDATE(buster)
+static SCREEN_UPDATE_IND16(buster)
 {
 	buster_state *state = screen.machine().driver_data<buster_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -335,10 +335,9 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE(buster)
+	MCFG_SCREEN_UPDATE_STATIC(buster)
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_3_579545MHz/4, mc6845_intf) //unknown clock / type
 
 	MCFG_GFXDECODE(buster)

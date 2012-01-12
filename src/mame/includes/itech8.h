@@ -71,7 +71,7 @@ READ8_HANDLER( slikshot_z80_control_r );
 WRITE8_HANDLER( slikshot_z80_control_w );
 
 VIDEO_START( slikshot );
-SCREEN_UPDATE( slikshot );
+SCREEN_UPDATE_RGB32( slikshot );
 
 
 /*----------- defined in video/itech8.c -----------*/
@@ -92,7 +92,7 @@ WRITE8_HANDLER( grmatch_palette_w );
 WRITE8_HANDLER( grmatch_xscroll_w );
 TIMER_DEVICE_CALLBACK( grmatch_palette_update );
 
-SCREEN_UPDATE( itech8_2layer );
-SCREEN_UPDATE( itech8_grmatch );
-SCREEN_UPDATE( itech8_2page );
-SCREEN_UPDATE( itech8_2page_large );
+SCREEN_UPDATE_RGB32( itech8_2layer );
+SCREEN_UPDATE_RGB32( itech8_grmatch );
+SCREEN_UPDATE_RGB32( itech8_2page );
+SCREEN_UPDATE_RGB32( itech8_2page_large );

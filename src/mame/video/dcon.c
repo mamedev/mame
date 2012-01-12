@@ -151,7 +151,7 @@ VIDEO_START( dcon )
 	state->m_gfx_bank_select = 0;
 }
 
-static void draw_sprites(running_machine& machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	dcon_state *state = machine.driver_data<dcon_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -277,7 +277,7 @@ static void draw_sprites(running_machine& machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-SCREEN_UPDATE( dcon )
+SCREEN_UPDATE_IND16( dcon )
 {
 	dcon_state *state = screen.machine().driver_data<dcon_state>();
 	screen.machine().priority_bitmap.fill(0, cliprect);
@@ -303,7 +303,7 @@ SCREEN_UPDATE( dcon )
 	return 0;
 }
 
-SCREEN_UPDATE( sdgndmps )
+SCREEN_UPDATE_IND16( sdgndmps )
 {
 	dcon_state *state = screen.machine().driver_data<dcon_state>();
 

@@ -473,7 +473,7 @@ static VIDEO_START(gstream)
 	tilemap_set_transparent_pen(state->m_tilemap2, 0);
 }
 
-static SCREEN_UPDATE(gstream)
+static SCREEN_UPDATE_IND16(gstream)
 {
 	/* The tilemaps and sprite are interleaved together.
        Even Words are tilemap tiles
@@ -571,10 +571,9 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(gstream)
+	MCFG_SCREEN_UPDATE_STATIC(gstream)
 
 	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
 	MCFG_GFXDECODE(gstream)

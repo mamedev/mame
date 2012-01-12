@@ -63,7 +63,7 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
 {
 	groundfx_state *state = machine.driver_data<groundfx_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -199,7 +199,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
                 SCREEN REFRESH
 **************************************************************/
 
-SCREEN_UPDATE( groundfx )
+SCREEN_UPDATE_IND16( groundfx )
 {
 	groundfx_state *state = screen.machine().driver_data<groundfx_state>();
 	device_t *tc0100scn = screen.machine().device("tc0100scn");

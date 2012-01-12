@@ -19,7 +19,7 @@ public:
 /*----------- defined in video/xxmissio.c -----------*/
 
 VIDEO_START( xxmissio );
-SCREEN_UPDATE( xxmissio );
+SCREEN_UPDATE_IND16( xxmissio );
 
 WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w );
 WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w );

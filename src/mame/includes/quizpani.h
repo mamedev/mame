@@ -21,4 +21,4 @@ WRITE16_HANDLER( quizpani_txt_videoram_w );
 WRITE16_HANDLER( quizpani_tilesbank_w );
 
 VIDEO_START( quizpani );
-SCREEN_UPDATE( quizpani );
+SCREEN_UPDATE_IND16( quizpani );

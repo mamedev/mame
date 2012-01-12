@@ -30,4 +30,4 @@ WRITE8_HANDLER( pooyan_flipscreen_w );
 
 PALETTE_INIT( pooyan );
 VIDEO_START( pooyan );
-SCREEN_UPDATE( pooyan );
+SCREEN_UPDATE_IND16( pooyan );

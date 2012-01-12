@@ -214,7 +214,7 @@ WRITE16_HANDLER( deniam_coinctrl_w )
  *   c  | ---------------- | zoomy like in System 16?
  *   e  | ---------------- |
  */
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	deniam_state *state = machine.driver_data<deniam_state>();
 	int offs;
@@ -377,7 +377,7 @@ static void set_fg_page( running_machine &machine, int page, int value )
 	}
 }
 
-SCREEN_UPDATE( deniam )
+SCREEN_UPDATE_IND16( deniam )
 {
 	deniam_state *state = screen.machine().driver_data<deniam_state>();
 	int bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly;

@@ -100,7 +100,7 @@ VIDEO_START( mustache )
 	tilemap_set_scroll_rows(state->m_bg_tilemap, 4);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	mustache_state *state = machine.driver_data<mustache_state>();
 	rectangle clip = cliprect;
@@ -143,7 +143,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( mustache )
+SCREEN_UPDATE_IND16( mustache )
 {
 	mustache_state *state = screen.machine().driver_data<mustache_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

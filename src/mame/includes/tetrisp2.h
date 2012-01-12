@@ -62,13 +62,13 @@ WRITE16_HANDLER( rocknms_sub_vram_fg_w );
 WRITE16_HANDLER( rocknms_sub_vram_rot_w );
 
 VIDEO_START( tetrisp2 );
-SCREEN_UPDATE( tetrisp2 );
+SCREEN_UPDATE_IND16( tetrisp2 );
 
 VIDEO_START( rockntread );
-SCREEN_UPDATE( rockntread );
+SCREEN_UPDATE_IND16( rockntread );
 
 VIDEO_START( rocknms );
-SCREEN_UPDATE( rocknms_left );
-SCREEN_UPDATE( rocknms_right );
+SCREEN_UPDATE_RGB32( rocknms_left );
+SCREEN_UPDATE_RGB32( rocknms_right );
 
 VIDEO_START( nndmseal );

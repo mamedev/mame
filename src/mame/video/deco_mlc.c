@@ -13,7 +13,7 @@
 
 //extern int mlc_raster_table[9][256];
 //extern UINT32 mlc_clipper[32];
-//static bitmap_t *temp_bitmap;
+//static bitmap_rgb32 *temp_bitmap;
 
 /******************************************************************************/
 
@@ -27,12 +27,12 @@ VIDEO_START( mlc )
 	else
 		state->m_colour_mask=0x1f;
 
-//  temp_bitmap = auto_bitmap_alloc( machine, 512, 512, BITMAP_FORMAT_RGB32 );
+//  temp_bitmap = auto_bitmap_rgb32_alloc( machine, 512, 512 );
 	state->m_mlc_buffered_spriteram = auto_alloc_array(machine, UINT32, 0x3000/4);
 }
 
 #ifdef UNUSED_FUNCTION
-static void blitRaster(running_machine &machine, bitmap_t &bitmap, int rasterMode)
+static void blitRaster(running_machine &machine, bitmap_rgb32 &bitmap, int rasterMode)
 {
 	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	int x,y;
@@ -62,7 +62,7 @@ static void blitRaster(running_machine &machine, bitmap_t &bitmap, int rasterMod
 #endif
 
 static void mlc_drawgfxzoom(
-		bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,int use8bpp,
 		int scalex, int scaley,int alpha)
@@ -210,7 +210,7 @@ static void mlc_drawgfxzoom(
 	}
 }
 
-static void draw_sprites(running_machine& machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
 	UINT32 *index_ptr=0;
@@ -505,7 +505,7 @@ SCREEN_EOF( mlc )
 	memcpy(state->m_mlc_buffered_spriteram, state->m_spriteram, 0x3000);
 }
 
-SCREEN_UPDATE( mlc )
+SCREEN_UPDATE_RGB32( mlc )
 {
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(screen.machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */

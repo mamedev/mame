@@ -23,8 +23,8 @@ VIDEO_START( battlera )
 	memset(state->m_HuC6270_vram,0,0x20000);
 	memset(state->m_vram_dirty,1,0x1000);
 
-	state->m_tile_bitmap=auto_bitmap_alloc(machine,512,512,machine.primary_screen->format());
-	state->m_front_bitmap=auto_bitmap_alloc(machine,512,512,machine.primary_screen->format());
+	state->m_tile_bitmap=auto_bitmap_ind16_alloc(machine,512,512);
+	state->m_front_bitmap=auto_bitmap_ind16_alloc(machine,512,512);
 
 	state->m_vram_ptr=0;
 	state->m_inc_value=1;
@@ -241,7 +241,7 @@ WRITE8_HANDLER( HuC6270_data_w )
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &clip,int pri)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &clip,int pri)
 {
 	battlera_state *state = machine.driver_data<battlera_state>();
 	int offs,my,mx,code,code2,fx,fy,cgy=0,cgx,colour,i,yinc;
@@ -306,7 +306,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 
 /******************************************************************************/
 
-SCREEN_UPDATE( battlera )
+SCREEN_UPDATE_IND16( battlera )
 {
 	battlera_state *state = screen.machine().driver_data<battlera_state>();
 	int offs,code,scrollx,scrolly,mx,my;

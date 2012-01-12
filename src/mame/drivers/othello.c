@@ -79,6 +79,7 @@ public:
 static MC6845_UPDATE_ROW( update_row )
 {
 	othello_state *state = device->machine().driver_data<othello_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int cx, x;
 	UINT32 data_address;
 	UINT32 tmp;
@@ -92,7 +93,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 		for(x = 0; x < TILE_WIDTH; ++x)
 		{
-			bitmap.pix16(y, (cx * TILE_WIDTH + x) ^ 1) = tmp & 0x0f;
+			bitmap.pix32(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tmp & 0x0f];
 			tmp >>= 4;
 		}
 	}
@@ -114,14 +115,6 @@ static PALETTE_INIT( othello )
 	palette_set_color(machine, 0x0c, MAKE_RGB(0x00, 0x00, 0xff));
 	palette_set_color(machine, 0x0d, MAKE_RGB(0x7f, 0x7f, 0x00));
 	palette_set_color(machine, 0x0f, MAKE_RGB(0xff, 0xff, 0xff));
-}
-
-static SCREEN_UPDATE( othello )
-{
-	othello_state *state = screen.machine().driver_data<othello_state>();
-
-	state->m_mc6845->update(bitmap, cliprect);
-	return 0;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
@@ -432,10 +425,9 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*6, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*6-1, 0*8, 64*8-1)
-	MCFG_SCREEN_UPDATE(othello)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x10)
 	MCFG_PALETTE_INIT(othello)

@@ -106,7 +106,7 @@ WRITE8_HANDLER( citycon_background_w )
 
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	citycon_state *state = machine.driver_data<citycon_state>();
 	int offs;
@@ -140,7 +140,7 @@ INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, int color, i
 	palette_set_color_rgb(machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
-SCREEN_UPDATE( citycon )
+SCREEN_UPDATE_IND16( citycon )
 {
 	citycon_state *state = screen.machine().driver_data<citycon_state>();
 	int offs, scroll;

@@ -332,7 +332,7 @@ static void exit_handler(running_machine &machine)
  *
  *************************************/
 
-SCREEN_UPDATE( midzeus )
+SCREEN_UPDATE_IND16( midzeus )
 {
 	int x, y;
 

@@ -286,7 +286,7 @@ Offset:     Format:     Value:
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	clshroad_state *state = machine.driver_data<clshroad_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -327,7 +327,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 ***************************************************************************/
 
-SCREEN_UPDATE( clshroad )
+SCREEN_UPDATE_IND16( clshroad )
 {
 	clshroad_state *state = screen.machine().driver_data<clshroad_state>();
 	int scrollx  = state->m_vregs[ 0 ] + (state->m_vregs[ 1 ] << 8);

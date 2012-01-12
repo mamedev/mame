@@ -73,8 +73,8 @@ VIDEO_START( dogfgt )
 	state->m_bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
 	state->save_pointer(NAME(state->m_bitmapram), BITMAPRAM_SIZE);
 
-	state->m_pixbitmap = machine.primary_screen->alloc_compatible_bitmap();
-	state->save_item(NAME(*state->m_pixbitmap));
+	state->m_pixbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->save_item(NAME(state->m_pixbitmap));
 }
 
 
@@ -123,9 +123,9 @@ static WRITE8_HANDLER( internal_bitmapram_w )
 			color |= ((state->m_bitmapram[offset + BITMAPRAM_SIZE / 3 * i] >> subx) & 1) << i;
 
 		if (flip_screen_get(space->machine()))
-			state->m_pixbitmap->pix16(y ^ 0xff, (x + subx) ^ 0xff) = PIXMAP_COLOR_BASE + 8 * state->m_pixcolor + color;
+			state->m_pixbitmap.pix16(y ^ 0xff, (x + subx) ^ 0xff) = PIXMAP_COLOR_BASE + 8 * state->m_pixcolor + color;
 		else
-			state->m_pixbitmap->pix16(y, x + subx) = PIXMAP_COLOR_BASE + 8 * state->m_pixcolor + color;
+			state->m_pixbitmap.pix16(y, x + subx) = PIXMAP_COLOR_BASE + 8 * state->m_pixcolor + color;
 	}
 }
 
@@ -184,7 +184,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 	int offs;
@@ -217,7 +217,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap,const recta
 }
 
 
-SCREEN_UPDATE( dogfgt )
+SCREEN_UPDATE_IND16( dogfgt )
 {
 	dogfgt_state *state = screen.machine().driver_data<dogfgt_state>();
 	int offs;
@@ -238,6 +238,6 @@ SCREEN_UPDATE( dogfgt )
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	copybitmap_trans(bitmap, *state->m_pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * state->m_pixcolor);
+	copybitmap_trans(bitmap, state->m_pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * state->m_pixcolor);
 	return 0;
 }

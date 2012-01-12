@@ -349,13 +349,6 @@ static VIDEO_START( tapatune )
 {
 }
 
-static SCREEN_UPDATE( tapatune )
-{
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
-	mc6845->update(bitmap, cliprect);
-	return 0;
-}
-
 static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 {
 	cputag_set_input_line(device->machine(), "maincpu", 2, state ? ASSERT_LINE : CLEAR_LINE);
@@ -390,10 +383,9 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(tapatune)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(16)
 

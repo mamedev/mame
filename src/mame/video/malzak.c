@@ -18,7 +18,7 @@
 #include "includes/malzak.h"
 
 
-SCREEN_UPDATE( malzak )
+SCREEN_UPDATE_IND16( malzak )
 {
 	malzak_state *state = screen.machine().driver_data<malzak_state>();
 	int sx, sy;
@@ -45,8 +45,8 @@ SCREEN_UPDATE( malzak )
 		}
 
 	/* update the S2636 chips */
-	bitmap_t &s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
-	bitmap_t &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	{

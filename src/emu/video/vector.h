@@ -11,7 +11,7 @@
 	MAKE_RGB(pal4bit((c) >> 8), pal4bit((c) >> 4), pal4bit((c) >> 0))
 
 VIDEO_START( vector );
-SCREEN_UPDATE( vector );
+SCREEN_UPDATE_RGB32( vector );
 
 void vector_clear_list(void);
 void vector_add_point(running_machine &machine, int x, int y, rgb_t color, int intensity);

@@ -84,7 +84,7 @@ static void VS920A_set_gfx_region(gstriker_state *state, int numchip, int gfx_re
 	state->m_VS920A[numchip].gfx_region = gfx_region;
 }
 
-static void VS920A_draw(gstriker_state *state, int numchip, bitmap_t& screen, const rectangle &cliprect, int priority)
+static void VS920A_draw(gstriker_state *state, int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
 {
 	state->m_VS920A_cur_chip = &state->m_VS920A[numchip];
 
@@ -238,7 +238,7 @@ static void MB60553_set_gfx_region(gstriker_state *state, int numchip, int gfx_r
 }
 
 /* THIS IS STILL WRONG! */
-static void MB60553_draw(running_machine &machine, int numchip, bitmap_t& screen, const rectangle &cliprect, int priority)
+static void MB60553_draw(running_machine &machine, int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
 {
 	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int line;
@@ -383,7 +383,7 @@ Abstracts the VS9210
 */
 
 
-static void CG10103_draw_sprite(running_machine &machine, bitmap_t& screen, const rectangle &cliprect, UINT16* spr, int drawpri)
+static void CG10103_draw_sprite(running_machine &machine, bitmap_ind16& screen, const rectangle &cliprect, UINT16* spr, int drawpri)
 {
 	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int ypos = spr[0] & 0x1FF;
@@ -460,7 +460,7 @@ static void CG10103_draw_sprite(running_machine &machine, bitmap_t& screen, cons
 }
 
 
-static void CG10103_draw(running_machine &machine, int numchip, bitmap_t& screen, const rectangle &cliprect, int priority)
+static void CG10103_draw(running_machine &machine, int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
 {
 	gstriker_state *state = machine.driver_data<gstriker_state>();
 	UINT16* splist;
@@ -533,7 +533,7 @@ WRITE16_HANDLER( gsx_videoram3_w )
 #endif
 
 
-SCREEN_UPDATE(gstriker)
+SCREEN_UPDATE_IND16(gstriker)
 {
 	gstriker_state *state = screen.machine().driver_data<gstriker_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);

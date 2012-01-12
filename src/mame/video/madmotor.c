@@ -22,7 +22,7 @@ VIDEO_START( madmotor )
 
 /******************************************************************************/
 
-SCREEN_UPDATE( madmotor )
+SCREEN_UPDATE_IND16( madmotor )
 {
 	madmotor_state *state = screen.machine().driver_data<madmotor_state>();
 	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());

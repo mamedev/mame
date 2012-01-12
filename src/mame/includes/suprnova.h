@@ -35,11 +35,11 @@ public:
 	UINT32 *m_cache_ram;
 	hit_t m_hit;
 	UINT32 m_timer_0_temp[4];
-	bitmap_t *m_sprite_bitmap;
-	bitmap_t *m_tilemap_bitmap_lower;
-	bitmap_t *m_tilemap_bitmapflags_lower;
-	bitmap_t *m_tilemap_bitmap_higher;
-	bitmap_t *m_tilemap_bitmapflags_higher;
+	bitmap_ind16 m_sprite_bitmap;
+	bitmap_ind16 m_tilemap_bitmap_lower;
+	bitmap_ind8 m_tilemap_bitmapflags_lower;
+	bitmap_ind16 m_tilemap_bitmap_higher;
+	bitmap_ind8 m_tilemap_bitmapflags_higher;
 	int m_depthA;
 	int m_depthB;
 	int m_use_spc_bright;
@@ -74,7 +74,7 @@ public:
 
 void skns_sprite_kludge(int x, int y);
 void skns_draw_sprites(
-	running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,
+	running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
 	UINT32* spriteram_source, size_t spriteram_size,
 	UINT8* gfx_source, size_t gfx_length,
 	UINT32* sprite_regs );
@@ -87,4 +87,4 @@ WRITE32_HANDLER ( skns_palette_ram_w );
 VIDEO_START(skns);
 VIDEO_RESET(skns);
 SCREEN_EOF(skns);
-SCREEN_UPDATE(skns);
+SCREEN_UPDATE_RGB32(skns);

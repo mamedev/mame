@@ -5,7 +5,7 @@
 typedef struct _poly_extra_data poly_extra_data;
 struct _poly_extra_data
 {
-	bitmap_t *zbuffer;
+	bitmap_ind16 *zbuffer;
 	UINT8 *texture;
 
 	int tex_base_x;
@@ -97,7 +97,7 @@ WRITE32_HANDLER(taitojc_char_w)
 
 */
 
-static void draw_object(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type)
+static void draw_object(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type)
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 	int x, y, width, height, palette;
@@ -285,14 +285,14 @@ VIDEO_START( taitojc )
 
 	state->m_texture = auto_alloc_array(machine, UINT8, 0x400000);
 
-	state->m_framebuffer = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_framebuffer.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
-	state->m_zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_zbuffer.allocate(width, height);
 }
 
-static void draw_object_bank(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri)
+static void draw_object_bank(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri)
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
 	UINT16 start_offs;
@@ -319,7 +319,7 @@ static void draw_object_bank(running_machine &machine, bitmap_t &bitmap, const r
 }
 
 //static int tick = 0;
-SCREEN_UPDATE( taitojc )
+SCREEN_UPDATE_IND16( taitojc )
 {
 	taitojc_state *state = screen.machine().driver_data<taitojc_state>();
 
@@ -350,7 +350,7 @@ SCREEN_UPDATE( taitojc )
 	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 0);
 	draw_object_bank(screen.machine(), bitmap, cliprect, 2, 0);
 
-	copybitmap_trans(bitmap, *state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 
 	draw_object_bank(screen.machine(), bitmap, cliprect, 0, 1);
 	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 1);
@@ -396,7 +396,7 @@ SCREEN_UPDATE( taitojc )
 static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	bitmap_t *destmap = (bitmap_t *)dest;
+	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
 	float z = extent->param[0].start;
 	int color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
@@ -429,7 +429,7 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	bitmap_t *destmap = (bitmap_t *)dest;
+	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
 	float z = extent->param[0].start;
 	float color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
@@ -465,7 +465,7 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	bitmap_t *destmap = (bitmap_t *)dest;
+	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
 	float z = extent->param[0].start;
 	float u = extent->param[1].start;
 	float v = extent->param[2].start;
@@ -573,7 +573,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 
 				texbase = polygon_fifo[ptr++];
 
-				extra->zbuffer = state->m_zbuffer;
+				extra->zbuffer = &state->m_zbuffer;
 				extra->texture = state->m_texture;
 				extra->tex_base_x = ((texbase >> 0) & 0xff) << 4;
 				extra->tex_base_y = ((texbase >> 8) & 0xff) << 4;
@@ -593,7 +593,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 
 				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
 				{
-					poly_render_triangle(state->m_poly, state->m_framebuffer, machine.primary_screen->visible_area(), render_texture_scan, 4, &vert[0], &vert[1], &vert[2]);
+					poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_texture_scan, 4, &vert[0], &vert[1], &vert[2]);
 				}
 				break;
 			}
@@ -627,7 +627,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
                 */
 				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
 
-				extra->zbuffer = state->m_zbuffer;
+				extra->zbuffer = &state->m_zbuffer;
 
 				for (i=0; i < 4; i++)
 				{
@@ -644,11 +644,11 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 						vert[2].p[1] == vert[3].p[1])
 					{
 						// optimization: all colours the same -> render solid
-						poly_render_quad(state->m_poly, state->m_framebuffer, machine.primary_screen->visible_area(), render_solid_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
+						poly_render_quad(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_solid_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
 					}
 					else
 					{
-						poly_render_quad(state->m_poly, state->m_framebuffer, machine.primary_screen->visible_area(), render_shade_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
+						poly_render_quad(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_shade_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
 					}
 				}
 				break;
@@ -696,7 +696,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 
 				texbase = polygon_fifo[ptr++];
 
-				extra->zbuffer = state->m_zbuffer;
+				extra->zbuffer = &state->m_zbuffer;
 				extra->texture = state->m_texture;
 				extra->tex_base_x = ((texbase >> 0) & 0xff) << 4;
 				extra->tex_base_y = ((texbase >> 8) & 0xff) << 4;
@@ -716,7 +716,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 
 				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
 				{
-					poly_render_quad(state->m_poly, state->m_framebuffer, machine.primary_screen->visible_area(), render_texture_scan, 4, &vert[0], &vert[1], &vert[2], &vert[3]);
+					poly_render_quad(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_texture_scan, 4, &vert[0], &vert[1], &vert[2], &vert[3]);
 				}
 				break;
 			}
@@ -749,7 +749,7 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 			{
 				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
 
-				extra->zbuffer = state->m_zbuffer;
+				extra->zbuffer = &state->m_zbuffer;
 
 				for (i=0; i < 3; i++)
 				{
@@ -765,11 +765,11 @@ void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int
 						vert[1].p[1] == vert[2].p[1])
 					{
 						// optimization: all colours the same -> render solid
-						poly_render_triangle(state->m_poly, state->m_framebuffer, machine.primary_screen->visible_area(), render_solid_scan, 2, &vert[0], &vert[1], &vert[2]);
+						poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_solid_scan, 2, &vert[0], &vert[1], &vert[2]);
 					}
 					else
 					{
-						poly_render_triangle(state->m_poly, state->m_framebuffer, machine.primary_screen->visible_area(), render_shade_scan, 2, &vert[0], &vert[1], &vert[2]);
+						poly_render_triangle(state->m_poly, &state->m_framebuffer, machine.primary_screen->visible_area(), render_shade_scan, 2, &vert[0], &vert[1], &vert[2]);
 					}
 				}
 				break;
@@ -794,6 +794,6 @@ void taitojc_clear_frame(running_machine &machine)
 	cliprect.max_x = machine.primary_screen->width() - 1;
 	cliprect.max_y = machine.primary_screen->height() - 1;
 
-	state->m_framebuffer->fill(0, cliprect);
-	state->m_zbuffer->fill(0xffff, cliprect);
+	state->m_framebuffer.fill(0, cliprect);
+	state->m_zbuffer.fill(0xffff, cliprect);
 }

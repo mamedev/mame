@@ -39,6 +39,8 @@ public:
 	UINT16         m_tilebank;
 	tilemap_t     *m_zz_tilemap;
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 
 	// driver_device overrides
@@ -46,5 +48,4 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };

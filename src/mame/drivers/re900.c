@@ -370,14 +370,6 @@ static TMS9928A_INTERFACE(re900_tms9928a_interface)
 	DEVCB_LINE(vdp_interrupt)
 };
 
-static SCREEN_UPDATE( re900 )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9128" );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
 
 /*************************
 *    AY8910 Interfase    *
@@ -417,7 +409,7 @@ static MACHINE_CONFIG_START( re900, re900_state )
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9128", TMS9128, re900_tms9928a_interface )	/* TMS9128NL on pcb */
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( re900 )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9128", tms9128_device, screen_update )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

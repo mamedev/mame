@@ -15,7 +15,7 @@ public:
 //  UINT16 *  m_spriteram2;   // this currently uses generic buffered spriteram
 
 	/* video-related */
-	bitmap_t *m_bitmap0;
+	bitmap_ind16 *m_bitmap0;
 	tilemap_t *m_vram_tilemap;
 	UINT16 *m_sprite_triple_buffer_0;
 	UINT16 *m_sprite_triple_buffer_1;
@@ -34,4 +34,4 @@ WRITE16_HANDLER( lemmings_vram_w );
 
 VIDEO_START( lemmings );
 SCREEN_EOF( lemmings );
-SCREEN_UPDATE( lemmings );
+SCREEN_UPDATE_IND16( lemmings );

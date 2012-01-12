@@ -71,4 +71,4 @@ WRITE8_HANDLER( nitedrvr_hvc_w );
 WRITE8_HANDLER( nitedrvr_videoram_w );
 
 VIDEO_START( nitedrvr );
-SCREEN_UPDATE( nitedrvr );
+SCREEN_UPDATE_IND16( nitedrvr );

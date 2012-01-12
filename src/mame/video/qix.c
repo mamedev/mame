@@ -340,22 +340,6 @@ static MC6845_UPDATE_ROW( update_row )
 
 /*************************************
  *
- *  Standard video update
- *
- *************************************/
-
-static SCREEN_UPDATE( qix )
-{
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(MC6845_TAG);
-	mc6845->update(bitmap, cliprect);
-
-	return 0;
-}
-
-
-
-/*************************************
- *
  *  Memory handlers
  *
  *************************************/
@@ -452,9 +436,8 @@ MACHINE_CONFIG_FRAGMENT( qix_video )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, QIX_CHARACTER_CLOCK, mc6845_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
-	MCFG_SCREEN_UPDATE(qix)
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 MACHINE_CONFIG_END
 
 

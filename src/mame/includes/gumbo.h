@@ -27,4 +27,4 @@ WRITE16_HANDLER( gumbo_bg_videoram_w );
 WRITE16_HANDLER( gumbo_fg_videoram_w );
 
 VIDEO_START( gumbo );
-SCREEN_UPDATE( gumbo );
+SCREEN_UPDATE_IND16( gumbo );

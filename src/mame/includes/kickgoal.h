@@ -50,7 +50,7 @@ WRITE16_HANDLER( kickgoal_bgram_w  );
 WRITE16_HANDLER( kickgoal_bg2ram_w );
 
 VIDEO_START( kickgoal );
-SCREEN_UPDATE( kickgoal );
+SCREEN_UPDATE_IND16( kickgoal );
 
 VIDEO_START( actionhw );
-SCREEN_UPDATE( actionhw );
+SCREEN_UPDATE_IND16( actionhw );

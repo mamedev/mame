@@ -196,7 +196,8 @@ struct _tms34010_config
 	const char *screen_tag;						/* the screen operated on */
 	UINT32	pixclock;							/* the pixel clock (0 means don't adjust screen size) */
 	int		pixperclock;						/* pixels per clock */
-	void	(*scanline_callback)(screen_device &screen, bitmap_t &bitmap, int scanline, const tms34010_display_params *params);
+	void	(*scanline_callback_ind16)(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms34010_display_params *params);
+	void	(*scanline_callback_rgb32)(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params);
 	void	(*output_int)(device_t *device, int state);			/* output interrupt callback */
 	void	(*to_shiftreg)(address_space *space, offs_t, UINT16 *);	/* shift register write */
 	void	(*from_shiftreg)(address_space *space, offs_t, UINT16 *);	/* shift register read */
@@ -204,7 +205,8 @@ struct _tms34010_config
 
 
 /* PUBLIC FUNCTIONS - 34010 */
-SCREEN_UPDATE( tms340x0 );
+SCREEN_UPDATE_IND16( tms340x0_ind16 );
+SCREEN_UPDATE_RGB32( tms340x0_rgb32 );
 void tms34010_get_display_params(device_t *cpu, tms34010_display_params *params);
 
 DECLARE_LEGACY_CPU_DEVICE(TMS34010, tms34010);

@@ -36,4 +36,4 @@ WRITE16_HANDLER( aquarium_mid_videoram_w );
 WRITE16_HANDLER( aquarium_bak_videoram_w );
 
 VIDEO_START(aquarium);
-SCREEN_UPDATE(aquarium);
+SCREEN_UPDATE_IND16(aquarium);

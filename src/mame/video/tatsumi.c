@@ -205,7 +205,7 @@ VIDEO_START( apache3 )
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
 	state->m_tx_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->m_shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
-	state->m_temp_bitmap = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_RGB32);
+	state->m_temp_bitmap.allocate(512, 512);
 	state->m_apache3_road_x_ram = auto_alloc_array(machine, UINT8, 512);
 
 	tilemap_set_transparent_pen(state->m_tx_layer,0);
@@ -248,8 +248,9 @@ VIDEO_START( bigfight )
 
 /********************************************************************/
 
+template<class _BitmapClass>
 INLINE void roundupt_drawgfxzoomrotate(
-		bitmap_t &dest_bmp, const rectangle &clip, const gfx_element *gfx,
+		_BitmapClass &dest_bmp, const rectangle &clip, const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,UINT32 ssx,UINT32 ssy,
 		int scalex, int scaley, int rotate, int write_priority_only )
 {
@@ -419,8 +420,7 @@ INLINE void roundupt_drawgfxzoomrotate(
 							for( y=sy; y<ey; y++ )
 							{
 								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = &dest_bmp.pix32(y);
-								UINT8 *priority_dest = &dest_bmp.pix8(y);
+								typename _BitmapClass::pixel_t *dest = &dest_bmp.pix(y);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -430,7 +430,7 @@ INLINE void roundupt_drawgfxzoomrotate(
 									{
 										// Only draw shadow pens if writing priority buffer
 										if (write_priority_only)
-											priority_dest[x]=shadow_pens[c];
+											dest[x]=shadow_pens[c];
 										else if (!shadow_pens[c])
 											dest[x]=pal[c];
 									}
@@ -448,7 +448,12 @@ INLINE void roundupt_drawgfxzoomrotate(
 	}
 }
 
-static void mycopyrozbitmap_core(bitmap_t &bitmap,bitmap_t &srcbitmap,
+static void mycopyrozbitmap_core(bitmap_ind8 &bitmap,bitmap_rgb32 &srcbitmap,
+		int dstx,int dsty, int srcwidth, int srcheight,int incxx,int incxy,int incyx,int incyy,
+		const rectangle &clip,int transparent_color)
+{ }
+
+static void mycopyrozbitmap_core(bitmap_rgb32 &bitmap,bitmap_rgb32 &srcbitmap,
 		int dstx,int dsty, int srcwidth, int srcheight,int incxx,int incxy,int incyx,int incyy,
 		const rectangle &clip,int transparent_color)
 {
@@ -510,7 +515,8 @@ static void mycopyrozbitmap_core(bitmap_t &bitmap,bitmap_t &srcbitmap,
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+template<class _BitmapClass>
+static void draw_sprites(running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -597,7 +603,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 		if (rotate)
 		{
 			render_y = 0;
-			state->m_temp_bitmap->fill(0);
+			state->m_temp_bitmap.fill(0);
 		}
 
 		extent_x = extent_y = 0;
@@ -637,7 +643,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 				for (w = 0; w < x_width; w++) {
 					if (rotate)
 						roundupt_drawgfxzoomrotate(
-								*state->m_temp_bitmap,cliprect,machine.gfx[0],
+								state->m_temp_bitmap,cliprect,machine.gfx[0],
 								base,
 								color,flip_x,flip_y,x_pos,render_y,
 								scale,scale,0,write_priority_only);
@@ -692,12 +698,12 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 			extent_x = extent_x >> 16;
 			extent_y = extent_y >> 16;
 			if (extent_x > 2 && extent_y > 2)
-				mycopyrozbitmap_core(bitmap, *state->m_temp_bitmap, x/* + (extent_x/2)*/, y /*+ (extent_y/2)*/, extent_x, extent_y, incxx, incxy, incyx, incyy, cliprect, 0);
+				mycopyrozbitmap_core(bitmap, state->m_temp_bitmap, x/* + (extent_x/2)*/, y /*+ (extent_y/2)*/, extent_x, extent_y, incxx, incxy, incyx, incyy, cliprect, 0);
 		}
 	}
 }
 
-static void draw_sky(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int palette_base, int start_offset)
+static void draw_sky(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect, int palette_base, int start_offset)
 {
 	// all todo
 	int x,y;
@@ -719,7 +725,7 @@ start_offset-=48;
 	}
 }
 
-static void draw_road(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,bitmap_t &shadow_bitmap)
+static void draw_road(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect,bitmap_ind8 &shadow_bitmap)
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
 /*
@@ -973,14 +979,14 @@ static void update_cluts(running_machine &machine, int fake_palette_offset, int 
 
 /**********************************************************************/
 
-static void draw_bg(running_machine &machine, bitmap_t &dst, tilemap_t *src, const UINT16* scrollx, const UINT16* scrolly, const UINT16* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize)
+static void draw_bg(running_machine &machine, bitmap_rgb32 &dst, tilemap_t *src, const UINT16* scrollx, const UINT16* scrolly, const UINT16* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize)
 {
 	/*
         Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
         from sets of 8 bit palettes!
     */
 	const UINT8* tile_cluts = machine.region("gfx4")->base();
-	const bitmap_t &src_bitmap = tilemap_get_pixmap(src);
+	const bitmap_ind16 &src_bitmap = tilemap_get_pixmap(src);
 	int src_y_mask=ysize-1;
 	int src_x_mask=xsize-1;
 	int tile_y_mask=(ysize/8)-1;
@@ -1010,7 +1016,7 @@ static void draw_bg(running_machine &machine, bitmap_t &dst, tilemap_t *src, con
 
 /* Draw the sky and ground, applying rotation (eventually). Experimental! */
 #if 0
-static void draw_ground(running_machine &machine, bitmap_t &dst, const rectangle &cliprect)
+static void draw_ground(running_machine &machine, bitmap_rgb32 &dst, const rectangle &cliprect)
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
 	int x, y;
@@ -1075,7 +1081,7 @@ static void draw_ground(running_machine &machine, bitmap_t &dst, const rectangle
 #endif
 /**********************************************************************/
 
-SCREEN_UPDATE( apache3 )
+SCREEN_UPDATE_RGB32( apache3 )
 {
 	tatsumi_state *state = screen.machine().driver_data<tatsumi_state>();
 	update_cluts(screen.machine(), 1024, 0, 2048);
@@ -1090,7 +1096,7 @@ SCREEN_UPDATE( apache3 )
 	return 0;
 }
 
-SCREEN_UPDATE( roundup5 )
+SCREEN_UPDATE_RGB32( roundup5 )
 {
 	tatsumi_state *state = screen.machine().driver_data<tatsumi_state>();
 //  UINT16 bg_x_scroll=state->m_roundup5_unknown1[0];
@@ -1111,7 +1117,7 @@ SCREEN_UPDATE( roundup5 )
 	return 0;
 }
 
-SCREEN_UPDATE( cyclwarr )
+SCREEN_UPDATE_RGB32( cyclwarr )
 {
 	tatsumi_state *state = screen.machine().driver_data<tatsumi_state>();
 	state->m_bigfight_bank=state->m_bigfight_a40000[0];
@@ -1136,7 +1142,7 @@ SCREEN_UPDATE( cyclwarr )
 	return 0;
 }
 
-SCREEN_UPDATE( bigfight )
+SCREEN_UPDATE_RGB32( bigfight )
 {
 	tatsumi_state *state = screen.machine().driver_data<tatsumi_state>();
 	state->m_bigfight_bank=state->m_bigfight_a40000[0];

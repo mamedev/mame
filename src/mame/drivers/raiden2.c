@@ -629,7 +629,7 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 
 /* SPRITE DRAWING (move to video file) */
 
-void raiden2_state::draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect ,int pri_mask )
+void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect ,int pri_mask )
 {
 	UINT16 *source = sprites + sprites_cur_start/2 - 4;
 
@@ -884,9 +884,9 @@ static VIDEO_START( raiden2 )
 	tilemap_set_transparent_pen(state->text_layer, 15);
 }
 
-/* SCREEN_UPDATE (move to video file) */
+/* SCREEN_UPDATE_IND16 (move to video file) */
 
-static SCREEN_UPDATE( raiden2 )
+static SCREEN_UPDATE_IND16( raiden2 )
 {
 	raiden2_state *state = screen.machine().driver_data<raiden2_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -1665,10 +1665,9 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE(raiden2)
+	MCFG_SCREEN_UPDATE_STATIC(raiden2)
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 
@@ -1722,10 +1721,9 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE(raiden2)
+	MCFG_SCREEN_UPDATE_STATIC(raiden2)
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 

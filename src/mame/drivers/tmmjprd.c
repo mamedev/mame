@@ -78,7 +78,7 @@ static WRITE32_HANDLER( tmmjprd_tilemap3_w )
 	COMBINE_DATA(&state->m_tilemap_ram[3][offset]);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int screen)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen)
 {
 	tmmjprd_state *state = machine.driver_data<tmmjprd_state>();
 	int xpos,ypos,tileno,xflip,yflip, colr;
@@ -155,7 +155,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-static void ttmjprd_draw_tile(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom)
+static void ttmjprd_draw_tile(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom)
 {
 	/* note, it's tile address _NOT_ tile number, 'sub-tile' access is possible, hence using the custom rendering */
 	int tileaddr = (tiledata&0x000fffff)>>0;
@@ -234,7 +234,7 @@ static void ttmjprd_draw_tile(running_machine &machine, bitmap_t &bitmap, const 
 	}
 }
 
-static void ttmjprd_draw_tilemap(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom )
+static void ttmjprd_draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom )
 {
 	int y,x;
 	int count;
@@ -275,7 +275,7 @@ static void ttmjprd_draw_tilemap(running_machine &machine, bitmap_t &bitmap, con
 
 }
 
-static SCREEN_UPDATE( tmmjprd_left )
+static SCREEN_UPDATE_IND16( tmmjprd_left )
 {
 	tmmjprd_state *state = screen.machine().driver_data<tmmjprd_state>();
 	UINT8* gfxroms = screen.machine().region("gfx2")->base();
@@ -310,7 +310,7 @@ static SCREEN_UPDATE( tmmjprd_left )
 	return 0;
 }
 
-static SCREEN_UPDATE( tmmjprd_right )
+static SCREEN_UPDATE_IND16( tmmjprd_right )
 {
 	tmmjprd_state *state = screen.machine().driver_data<tmmjprd_state>();
 	UINT8* gfxroms = screen.machine().region("gfx2")->base();
@@ -752,7 +752,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 //  MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+//  MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update)
 //  MCFG_SCREEN_SIZE(64*16, 64*16)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_PALETTE_LENGTH(0x1000)
@@ -761,22 +761,20 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-	MCFG_SCREEN_UPDATE(tmmjprd_left)
+	MCFG_SCREEN_UPDATE_STATIC(tmmjprd_left)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-	MCFG_SCREEN_UPDATE(tmmjprd_right)
+	MCFG_SCREEN_UPDATE_STATIC(tmmjprd_right)
 
 	MCFG_VIDEO_START(tmmjprd)
 MACHINE_CONFIG_END

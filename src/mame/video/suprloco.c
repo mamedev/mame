@@ -161,7 +161,7 @@ READ8_HANDLER( suprloco_control_r )
 
 
 
-INLINE void draw_pixel(bitmap_t &bitmap,const rectangle &cliprect,int x,int y,int color,int flip)
+INLINE void draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip)
 {
 	if (flip)
 	{
@@ -179,7 +179,7 @@ INLINE void draw_pixel(bitmap_t &bitmap,const rectangle &cliprect,int x,int y,in
 }
 
 
-static void draw_sprite(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int spr_number)
+static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int spr_number)
 {
 	suprloco_state *state = machine.driver_data<suprloco_state>();
 	int flip = flip_screen_get(machine);
@@ -254,7 +254,7 @@ static void draw_sprite(running_machine &machine, bitmap_t &bitmap,const rectang
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	suprloco_state *state = machine.driver_data<suprloco_state>();
 	int spr_number;
@@ -269,7 +269,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( suprloco )
+SCREEN_UPDATE_IND16( suprloco )
 {
 	suprloco_state *state = screen.machine().driver_data<suprloco_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);

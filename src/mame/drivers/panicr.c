@@ -215,7 +215,7 @@ static VIDEO_START( panicr )
 	colortable_configure_tilemap_groups(machine.colortable, state->m_txttilemap, machine.gfx[0], 0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	panicr_state *state = machine.driver_data<panicr_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -239,7 +239,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 	}
 }
 
-static SCREEN_UPDATE( panicr)
+static SCREEN_UPDATE_IND16( panicr)
 {
 	panicr_state *state = screen.machine().driver_data<panicr_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -392,10 +392,9 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(panicr)
+	MCFG_SCREEN_UPDATE_STATIC(panicr)
 
 	MCFG_GFXDECODE(panicr)
 	MCFG_PALETTE_LENGTH(256*3)

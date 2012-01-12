@@ -21,4 +21,4 @@ WRITE8_HANDLER( lvcards_colorram_w );
 PALETTE_INIT( lvcards );
 PALETTE_INIT( ponttehk );
 VIDEO_START( lvcards );
-SCREEN_UPDATE( lvcards );
+SCREEN_UPDATE_IND16( lvcards );

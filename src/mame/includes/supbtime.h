@@ -29,4 +29,4 @@ public:
 
 /*----------- defined in video/supbtime.c -----------*/
 
-SCREEN_UPDATE( supbtime );
+SCREEN_UPDATE_IND16( supbtime );

@@ -259,6 +259,7 @@ typedef struct {
 	UINT8   *uc_g1;				/* used colors for gfx GTIA 1 */
 	UINT8   *uc_g2;				/* used colors for gfx GTIA 2 */
 	UINT8   *uc_g3;				/* used colors for gfx GTIA 3 */
+	bitmap_ind16 *bitmap;
 }   ANTIC;
 
 #define RDANTIC(space)		space->read_byte(antic.dpage+antic.doffs)
@@ -588,7 +589,7 @@ extern char atari_frame_message[64+1];
 extern int atari_frame_counter;
 
 extern VIDEO_START( atari );
-extern SCREEN_UPDATE( atari );
+extern SCREEN_UPDATE_IND16( atari );
 
 TIMER_DEVICE_CALLBACK( a400_interrupt );
 TIMER_DEVICE_CALLBACK( a800_interrupt );

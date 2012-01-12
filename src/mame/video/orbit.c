@@ -37,7 +37,7 @@ VIDEO_START( orbit )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	orbit_state *state = machine.driver_data<orbit_state>();
 	const UINT8* p = state->m_sprite_ram;
@@ -79,7 +79,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-SCREEN_UPDATE( orbit )
+SCREEN_UPDATE_IND16( orbit )
 {
 	orbit_state *state = screen.machine().driver_data<orbit_state>();
 

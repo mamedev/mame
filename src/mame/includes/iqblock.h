@@ -26,4 +26,4 @@ READ8_HANDLER( iqblock_bgvideoram_r );
 WRITE8_HANDLER( iqblock_fgscroll_w );
 
 VIDEO_START( iqblock );
-SCREEN_UPDATE( iqblock );
+SCREEN_UPDATE_IND16( iqblock );

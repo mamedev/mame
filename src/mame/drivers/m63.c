@@ -297,7 +297,7 @@ static VIDEO_START( m63 )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	m63_state *state = machine.driver_data<m63_state>();
 	int offs;
@@ -338,7 +338,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static SCREEN_UPDATE( m63 )
+static SCREEN_UPDATE_IND16( m63 )
 {
 	m63_state *state = screen.machine().driver_data<m63_state>();
 
@@ -772,10 +772,9 @@ static MACHINE_CONFIG_START( m63, m63_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(m63)
+	MCFG_SCREEN_UPDATE_STATIC(m63)
 
 	MCFG_GFXDECODE(m63)
 	MCFG_PALETTE_LENGTH(256+4)
@@ -817,10 +816,9 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(m63)
+	MCFG_SCREEN_UPDATE_STATIC(m63)
 
 	MCFG_GFXDECODE(fghtbskt)
 	MCFG_PALETTE_LENGTH(256)

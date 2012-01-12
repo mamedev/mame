@@ -146,7 +146,7 @@ static VIDEO_START( vega )
 	state->m_vega_vram = auto_alloc_array(machine, UINT32, 0x14000*2/4);
 }
 
-static SCREEN_UPDATE( vega )
+static SCREEN_UPDATE_IND16( vega )
 {
 	vegaeo_state *state = screen.machine().driver_data<vegaeo_state>();
 	int x,y,count;
@@ -187,10 +187,9 @@ static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(vega)
+	MCFG_SCREEN_UPDATE_STATIC(vega)
 
 	MCFG_PALETTE_LENGTH(256)
 

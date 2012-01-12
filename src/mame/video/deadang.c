@@ -87,7 +87,7 @@ VIDEO_START( deadang )
 	tilemap_set_transparent_pen(state->m_text_layer, 15);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	deadang_state *state = machine.driver_data<deadang_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -130,7 +130,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( deadang )
+SCREEN_UPDATE_IND16( deadang )
 {
 	deadang_state *state = screen.machine().driver_data<deadang_state>();
 	/* Setup the tilemaps */

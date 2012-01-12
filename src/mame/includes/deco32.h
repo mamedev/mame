@@ -32,7 +32,7 @@ public:
 	UINT8 *m_dirty_palette;
 
 	int m_pri;
-	bitmap_t *m_tilemap_alpha_bitmap;
+	bitmap_ind16 *m_tilemap_alpha_bitmap;
 
 
 	UINT16 m_spriteram16[0x1000];
@@ -81,10 +81,10 @@ VIDEO_START( nslasher );
 SCREEN_EOF( captaven );
 SCREEN_EOF( dragngun );
 
-SCREEN_UPDATE( captaven );
-SCREEN_UPDATE( fghthist );
-SCREEN_UPDATE( dragngun );
-SCREEN_UPDATE( nslasher );
+SCREEN_UPDATE_IND16( captaven );
+SCREEN_UPDATE_RGB32( fghthist );
+SCREEN_UPDATE_RGB32( dragngun );
+SCREEN_UPDATE_RGB32( nslasher );
 
 
 WRITE32_HANDLER( deco32_pf1_data_w );

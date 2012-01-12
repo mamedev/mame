@@ -97,7 +97,7 @@ public:
 ***************************************************************************/
 
 static VIDEO_START( darkhors );
-static SCREEN_UPDATE( darkhors );
+static SCREEN_UPDATE_IND16( darkhors );
 
 
 static TILE_GET_INFO( get_tile_info_0 )
@@ -129,7 +129,7 @@ static WRITE32_HANDLER( darkhors_tmapram2_w )
 	tilemap_mark_tile_dirty(state->m_tmap2, offset);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
 	UINT32 *s		=	state->m_spriteram;
@@ -179,7 +179,7 @@ static VIDEO_START( darkhors )
 	machine.gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
 
-static SCREEN_UPDATE( darkhors )
+static SCREEN_UPDATE_IND16( darkhors )
 {
 	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
 	int layers_ctrl = -1;
@@ -665,10 +665,9 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x190, 0x100+16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE(darkhors)
+	MCFG_SCREEN_UPDATE_STATIC(darkhors)
 
 	MCFG_GFXDECODE(darkhors)
 	MCFG_PALETTE_LENGTH(0x10000)
@@ -700,7 +699,7 @@ static VIDEO_START(jclub2)
 
 }
 
-static SCREEN_UPDATE(jclub2)
+static SCREEN_UPDATE_IND16(jclub2)
 {
 	return 0;
 }
@@ -716,10 +715,9 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x190, 0x100+16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE(jclub2)
+	MCFG_SCREEN_UPDATE_STATIC(jclub2)
 
 	MCFG_GFXDECODE(jclub2)
 	MCFG_PALETTE_LENGTH(0x10000)
@@ -756,7 +754,7 @@ static VIDEO_START(jclub2o)
 
 }
 
-static SCREEN_UPDATE(jclub2o)
+static SCREEN_UPDATE_IND16(jclub2o)
 {
 	return 0;
 }
@@ -776,10 +774,9 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x190, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE(jclub2o)
+	MCFG_SCREEN_UPDATE_STATIC(jclub2o)
 
 	MCFG_GFXDECODE(jclub2)
 	MCFG_PALETTE_LENGTH(0x10000)

@@ -164,8 +164,8 @@ static const int decode_x_zr107[8] = {  0, 16, 1, 17, 2, 18, 3, 19 };
 static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96, 104, 68, 76, 100, 108 };
 
 static UINT32 K001005_status = 0;
-static bitmap_t *K001005_bitmap[2];
-static bitmap_t *K001005_zbuffer;
+static bitmap_rgb32 *K001005_bitmap[2];
+static bitmap_ind32 *K001005_zbuffer;
 static rectangle K001005_cliprect;
 
 static void render_polygons(running_machine &machine);
@@ -203,12 +203,12 @@ void K001005_init(running_machine &machine)
 
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
-	K001005_zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
+	K001005_zbuffer = auto_bitmap_ind32_alloc(machine, width, height);
 
 	gfxrom = machine.region("gfx1")->base();
 
-	K001005_bitmap[0] = machine.primary_screen->alloc_compatible_bitmap();
-	K001005_bitmap[1] = machine.primary_screen->alloc_compatible_bitmap();
+	K001005_bitmap[0] = auto_bitmap_rgb32_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
+	K001005_bitmap[1] = auto_bitmap_rgb32_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
 
 	K001005_texture = auto_alloc_array(machine, UINT8, 0x800000);
 
@@ -454,7 +454,7 @@ WRITE32_HANDLER( K001005_w )
 static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	bitmap_t *destmap = (bitmap_t *)dest;
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
 	float z = extent->param[0].start;
 	float dz = extent->param[0].dpdx;
 	UINT32 *fb = &destmap->pix32(scanline);
@@ -482,7 +482,7 @@ static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent,
 static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	bitmap_t *destmap = (bitmap_t *)dest;
+	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
 	UINT8 *texrom = gfxrom + (extra->texture_page * 0x40000);
 	int pal_chip = (extra->texture_palette & 0x8) ? 1 : 0;
 	int palette_index = (extra->texture_palette & 0x7) * 256;
@@ -934,7 +934,7 @@ static void render_polygons(running_machine &machine)
 	}
 }
 
-void K001005_draw(bitmap_t &bitmap, const rectangle &cliprect)
+void K001005_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
@@ -981,7 +981,7 @@ VIDEO_START( gticlub )
 	K001005_init(machine);
 }
 
-SCREEN_UPDATE( gticlub )
+SCREEN_UPDATE_RGB32( gticlub )
 {
 	device_t *k001604 = screen.machine().device("k001604_1");
 
@@ -1049,7 +1049,7 @@ SCREEN_UPDATE( gticlub )
 	return 0;
 }
 
-SCREEN_UPDATE( hangplt )
+SCREEN_UPDATE_RGB32( hangplt )
 {
 	bitmap.fill(screen.machine().pens[0], cliprect);
 

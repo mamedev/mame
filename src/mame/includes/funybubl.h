@@ -23,4 +23,4 @@ public:
 WRITE8_HANDLER ( funybubl_paldatawrite );
 
 VIDEO_START(funybubl);
-SCREEN_UPDATE(funybubl);
+SCREEN_UPDATE_IND16(funybubl);

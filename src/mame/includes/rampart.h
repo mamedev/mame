@@ -20,4 +20,4 @@ public:
 /*----------- defined in video/rampart.c -----------*/
 
 VIDEO_START( rampart );
-SCREEN_UPDATE( rampart );
+SCREEN_UPDATE_IND16( rampart );

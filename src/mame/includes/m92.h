@@ -52,6 +52,6 @@ WRITE16_HANDLER( m92_pf3_control_w );
 WRITE16_HANDLER( m92_master_control_w );
 
 VIDEO_START( m92 );
-SCREEN_UPDATE( m92 );
+SCREEN_UPDATE_IND16( m92 );
 VIDEO_START( ppan );
-SCREEN_UPDATE( ppan );
+SCREEN_UPDATE_IND16( ppan );

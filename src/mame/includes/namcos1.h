@@ -102,5 +102,5 @@ READ8_HANDLER( namcos1_spriteram_r );
 WRITE8_HANDLER( namcos1_spriteram_w );
 
 VIDEO_START( namcos1 );
-SCREEN_UPDATE( namcos1 );
+SCREEN_UPDATE_IND16( namcos1 );
 SCREEN_EOF( namcos1 );

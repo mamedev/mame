@@ -59,7 +59,7 @@ VIDEO_START( rollerg )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( rollerg )
+SCREEN_UPDATE_IND16( rollerg )
 {
 	rollerg_state *state = screen.machine().driver_data<rollerg_state>();
 	int bg_colorbase = 16;

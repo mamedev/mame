@@ -334,7 +334,7 @@ VIDEO_START( nemesis )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/*
      *  16 bytes per sprite, in memory from 56000-56fff
@@ -425,7 +425,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 /******************************************************************************/
 
-SCREEN_UPDATE( nemesis )
+SCREEN_UPDATE_IND16( nemesis )
 {
 	nemesis_state *state = screen.machine().driver_data<nemesis_state>();
 	int offs;

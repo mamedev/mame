@@ -350,7 +350,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pollux_extensions)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pollux_extensions)
 {
 	/* Sprites take 32 bytes each in memory:
                      MSB   LSB
@@ -440,7 +440,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-static void rshark_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 
@@ -512,7 +512,7 @@ static void rshark_draw_sprites(running_machine &machine, bitmap_t &bitmap, cons
 }
 
 
-SCREEN_UPDATE( lastday )
+SCREEN_UPDATE_IND16( lastday )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -527,7 +527,7 @@ SCREEN_UPDATE( lastday )
 	return 0;
 }
 
-SCREEN_UPDATE( gulfstrm )
+SCREEN_UPDATE_IND16( gulfstrm )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -541,7 +541,7 @@ SCREEN_UPDATE( gulfstrm )
 	return 0;
 }
 
-SCREEN_UPDATE( pollux )
+SCREEN_UPDATE_IND16( pollux )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -555,7 +555,7 @@ SCREEN_UPDATE( pollux )
 	return 0;
 }
 
-SCREEN_UPDATE( flytiger )
+SCREEN_UPDATE_IND16( flytiger )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -578,7 +578,7 @@ SCREEN_UPDATE( flytiger )
 }
 
 
-SCREEN_UPDATE( bluehawk )
+SCREEN_UPDATE_IND16( bluehawk )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -593,7 +593,7 @@ SCREEN_UPDATE( bluehawk )
 	return 0;
 }
 
-SCREEN_UPDATE( primella )
+SCREEN_UPDATE_IND16( primella )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -605,7 +605,7 @@ SCREEN_UPDATE( primella )
 	return 0;
 }
 
-SCREEN_UPDATE( rshark )
+SCREEN_UPDATE_IND16( rshark )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -620,7 +620,7 @@ SCREEN_UPDATE( rshark )
 	return 0;
 }
 
-SCREEN_UPDATE( popbingo )
+SCREEN_UPDATE_IND16( popbingo )
 {
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);

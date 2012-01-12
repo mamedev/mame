@@ -62,14 +62,14 @@ WRITE8_HANDLER( ikki_scrn_ctrl_w )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	ikki_state *state = machine.driver_data<ikki_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	int y;
 	offs_t offs;
 
-	state->m_sprite_bitmap->fill(state->m_punch_through_pen, cliprect);
+	state->m_sprite_bitmap.fill(state->m_punch_through_pen, cliprect);
 
 	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
 	{
@@ -93,7 +93,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 		if (y > 240)
 			y = y - 256;
 
-		drawgfx_transmask(*state->m_sprite_bitmap,cliprect, machine.gfx[1],
+		drawgfx_transmask(state->m_sprite_bitmap,cliprect, machine.gfx[1],
 				code, color,
 				state->m_flipscreen,state->m_flipscreen,
 				x,y,
@@ -107,7 +107,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 pen = state->m_sprite_bitmap->pix16(y, x);
+			UINT16 pen = state->m_sprite_bitmap.pix16(y, x);
 
 			if (colortable_entry_get_value(machine.colortable, pen) != 0x100)
 				bitmap.pix16(y, x) = pen;
@@ -119,12 +119,12 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 VIDEO_START( ikki )
 {
 	ikki_state *state = machine.driver_data<ikki_state>();
-	state->m_sprite_bitmap = machine.primary_screen->alloc_compatible_bitmap();
-	state->save_item(NAME(*state->m_sprite_bitmap));
+	state->m_sprite_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	state->save_item(NAME(state->m_sprite_bitmap));
 }
 
 
-SCREEN_UPDATE( ikki )
+SCREEN_UPDATE_IND16( ikki )
 {
 	ikki_state *state = screen.machine().driver_data<ikki_state>();
 	offs_t offs;

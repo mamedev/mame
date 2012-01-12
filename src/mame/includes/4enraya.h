@@ -31,4 +31,4 @@ public:
 WRITE8_HANDLER( fenraya_videoram_w );
 
 VIDEO_START( 4enraya );
-SCREEN_UPDATE( 4enraya );
+SCREEN_UPDATE_IND16( 4enraya );

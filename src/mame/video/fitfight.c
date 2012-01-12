@@ -4,7 +4,7 @@
 #include "includes/fitfight.h"
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int layer )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
 	fitfight_state *state = machine.driver_data<fitfight_state>();
 	const gfx_element *gfx = machine.gfx[3];
@@ -114,7 +114,7 @@ VIDEO_START(fitfight)
 	tilemap_set_transparent_pen(state->m_fof_txt_tilemap, 0);
 }
 
-SCREEN_UPDATE(fitfight)
+SCREEN_UPDATE_IND16(fitfight)
 {
 	fitfight_state *state = screen.machine().driver_data<fitfight_state>();
 

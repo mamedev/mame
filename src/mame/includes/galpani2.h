@@ -20,8 +20,8 @@ public:
 	UINT16 m_old_mcu_nmi1;
 	UINT16 m_old_mcu_nmi2;
 	UINT16 *m_rombank;
-	bitmap_t *m_bg8_bitmap[2];
-	bitmap_t *m_bg15_bitmap;
+	bitmap_ind16 *m_bg8_bitmap[2];
+	bitmap_ind16 *m_bg15_bitmap;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -32,7 +32,7 @@ public:
 
 PALETTE_INIT( galpani2 );
 VIDEO_START( galpani2 );
-SCREEN_UPDATE( galpani2 );
+SCREEN_UPDATE_IND16( galpani2 );
 
 WRITE16_HANDLER( galpani2_palette_0_w );
 WRITE16_HANDLER( galpani2_palette_1_w );

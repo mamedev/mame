@@ -79,7 +79,7 @@ VIDEO_START( trucocl )
 	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32 );
 }
 
-SCREEN_UPDATE( trucocl )
+SCREEN_UPDATE_IND16( trucocl )
 {
 	trucocl_state *state = screen.machine().driver_data<trucocl_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

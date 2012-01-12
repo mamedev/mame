@@ -39,7 +39,7 @@ DECLARE_LEGACY_DEVICE(KANEKO_PANDORA, kaneko_pandora);
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-void pandora_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
+void pandora_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 void pandora_eof(device_t *device);
 void pandora_set_clear_bitmap(device_t *device, int clear);
 void pandora_set_bg_pen( device_t *device, int pen );

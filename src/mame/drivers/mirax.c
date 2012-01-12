@@ -90,7 +90,7 @@ static VIDEO_START(mirax)
 {
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	mirax_state *state = machine.driver_data<mirax_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -118,7 +118,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-static SCREEN_UPDATE(mirax)
+static SCREEN_UPDATE_IND16(mirax)
 {
 	mirax_state *state = screen.machine().driver_data<mirax_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -406,10 +406,9 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(mirax)
+	MCFG_SCREEN_UPDATE_STATIC(mirax)
 
 	MCFG_PALETTE_LENGTH(0x40)
 	MCFG_PALETTE_INIT(mirax)

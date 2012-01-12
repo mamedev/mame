@@ -28,8 +28,8 @@
 /* video extension callbacks */
 typedef void (*galaxian_extend_tile_info_func)(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
 typedef void (*galaxian_extend_sprite_info_func)(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-typedef void (*galaxian_draw_bullet_func)(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y);
-typedef void (*galaxian_draw_background_func)(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
+typedef void (*galaxian_draw_bullet_func)(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+typedef void (*galaxian_draw_background_func)(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
 class galaxian_state : public driver_device
@@ -84,8 +84,8 @@ PALETTE_INIT( galaxian );
 PALETTE_INIT( moonwar );
 
 VIDEO_START( galaxian );
-SCREEN_UPDATE( galaxian );
-SCREEN_UPDATE( zigzag );
+SCREEN_UPDATE_RGB32( galaxian );
+SCREEN_UPDATE_RGB32( zigzag );
 
 WRITE8_HANDLER( galaxian_videoram_w );
 WRITE8_HANDLER( galaxian_objram_w );
@@ -105,19 +105,19 @@ WRITE8_HANDLER( galaxian_gfxbank_w );
 TIMER_DEVICE_CALLBACK( galaxian_stars_blink_timer );
 
 /* special purpose background rendering */
-void galaxian_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-void frogger_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-//void amidar_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-void turtles_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-void scramble_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-void anteater_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
-void jumpbug_draw_background(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
+void galaxian_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+void frogger_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+//void amidar_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+void turtles_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+void scramble_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+void anteater_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+void jumpbug_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 /* special purpose bullet rendering */
-void galaxian_draw_bullet(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y);
-void mshuttle_draw_bullet(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y);
-void scramble_draw_bullet(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y);
-void theend_draw_bullet(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int offs, int x, int y);
+void galaxian_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+void mshuttle_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+void scramble_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+void theend_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 
 /* generic extensions */
 void upper_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);

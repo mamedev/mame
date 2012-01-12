@@ -179,7 +179,7 @@ static VIDEO_START(mil4000)
 	tilemap_set_transparent_pen(state->m_sc3_tilemap,0);
 }
 
-static SCREEN_UPDATE(mil4000)
+static SCREEN_UPDATE_IND16(mil4000)
 {
 	mil4000_state *state = screen.machine().driver_data<mil4000_state>();
 	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
@@ -374,10 +374,9 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE(mil4000)
+	MCFG_SCREEN_UPDATE_STATIC(mil4000)
 
 	MCFG_PALETTE_LENGTH(0x800)
 	MCFG_PALETTE_INIT(all_black)

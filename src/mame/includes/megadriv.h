@@ -66,7 +66,7 @@ extern UINT8 megadrive_io_ctrl_regs[3];
 MACHINE_START( megadriv );
 MACHINE_RESET( megadriv );
 VIDEO_START( megadriv );
-SCREEN_UPDATE( megadriv );
+SCREEN_UPDATE_RGB32( megadriv );
 SCREEN_EOF( megadriv );
 
 

@@ -8,7 +8,7 @@
 #include "includes/mw8080bw.h"
 
 
-SCREEN_UPDATE( mw8080bw )
+SCREEN_UPDATE_RGB32( mw8080bw )
 {
 	mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 	UINT8 x = 0;
@@ -75,7 +75,7 @@ SCREEN_UPDATE( mw8080bw )
 #define PHANTOM2_SIDE_TRENCH_LIGHT_RGB32_PEN     MAKE_RGB(0x72, 0x72, 0x72)
 
 
-SCREEN_UPDATE( spcenctr )
+SCREEN_UPDATE_RGB32( spcenctr )
 {
 	mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 	UINT8 line_buf[256]; /* 256x1 bit RAM */
@@ -219,7 +219,7 @@ SCREEN_UPDATE( spcenctr )
 #define PHANTOM2_RGB32_CLOUD_PEN          MAKE_RGB(0xc0, 0xc0, 0xc0)
 
 
-SCREEN_UPDATE( phantom2 )
+SCREEN_UPDATE_RGB32( phantom2 )
 {
 	mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 	UINT8 x = 0;
@@ -331,7 +331,7 @@ SCREEN_EOF( phantom2 )
 
 /* the flip screen circuit is just a couple of relays on the monitor PCB */
 
-SCREEN_UPDATE( invaders )
+SCREEN_UPDATE_RGB32( invaders )
 {
 	mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 	UINT8 x = 0;

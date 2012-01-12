@@ -25,7 +25,7 @@ public:
 /*----------- defined in video/pastelg.c -----------*/
 
 PALETTE_INIT( pastelg );
-SCREEN_UPDATE( pastelg );
+SCREEN_UPDATE_IND16( pastelg );
 VIDEO_START( pastelg );
 
 WRITE8_HANDLER( pastelg_clut_w );

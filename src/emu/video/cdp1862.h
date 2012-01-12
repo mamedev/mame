@@ -94,7 +94,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( bkg_w );
 	DECLARE_WRITE_LINE_MEMBER( con_w );
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -110,7 +110,7 @@ private:
 	devcb_resolved_read_line	m_in_gd_func;
 
 	screen_device *m_screen;		// screen
-	bitmap_t *m_bitmap;				// bitmap
+	bitmap_ind16 m_bitmap;				// bitmap
 
 	int m_bgcolor;					// background color
 	int m_con;						// color on

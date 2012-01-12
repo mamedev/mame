@@ -71,10 +71,149 @@ class render_texture;
 class screen_device;
 
 
+// ======================> screen_bitmap
+
+class screen_bitmap
+{
+private:
+	// internal helpers
+	bitmap_t &appropriate_bitmap()
+	{
+		switch (m_format)
+		{
+			case BITMAP_FORMAT_IND16: return m_ind16;
+			case BITMAP_FORMAT_RGB32: return m_rgb32;
+			default: throw emu_fatalerror("Invalid screen_bitmap format");
+		}
+	}
+
+	const bitmap_t &appropriate_bitmap() const
+	{
+		switch (m_format)
+		{
+			case BITMAP_FORMAT_IND16: return m_ind16;
+			case BITMAP_FORMAT_RGB32: return m_rgb32;
+			default: throw emu_fatalerror("Invalid screen_bitmap format");
+		}
+	}
+
+public:
+	// construction/destruction
+	screen_bitmap()
+		: m_format(BITMAP_FORMAT_INVALID),
+		  m_texformat(TEXFORMAT_UNDEFINED) { }
+	screen_bitmap(bitmap_ind16 &orig)
+		: m_format(BITMAP_FORMAT_IND16),
+		  m_texformat(TEXFORMAT_PALETTE16), 
+		  m_ind16(orig, orig.cliprect()) { }
+	screen_bitmap(bitmap_rgb32 &orig)
+		: m_format(BITMAP_FORMAT_RGB32),
+		  m_texformat(TEXFORMAT_RGB32), 
+		  m_rgb32(orig, orig.cliprect()) { }
+	
+	// allocation
+	void allocate(int width, int height)
+	{
+		switch (m_format)
+		{
+			case BITMAP_FORMAT_IND16: m_ind16.allocate(width, height); break;
+			case BITMAP_FORMAT_RGB32: m_rgb32.allocate(width, height); break;
+			default: throw emu_fatalerror("Invalid screen_bitmap format");
+		}
+	}
+
+	// conversion
+	operator bitmap_t &() { return appropriate_bitmap(); }
+	bitmap_ind16 &as_ind16() { assert(m_format == BITMAP_FORMAT_IND16); return m_ind16; }
+	bitmap_rgb32 &as_rgb32() { assert(m_format == BITMAP_FORMAT_RGB32); return m_rgb32; }
+	
+	// getters
+	INT32 width() const { return appropriate_bitmap().width(); }
+	INT32 height() const { return appropriate_bitmap().height(); }
+	INT32 rowpixels() const { return appropriate_bitmap().rowpixels(); }
+	INT32 rowbytes() const { return appropriate_bitmap().rowbytes(); }
+	UINT8 bpp() const { return appropriate_bitmap().bpp(); }
+	bitmap_format format() const { return m_format; }
+	texture_format texformat() const { return m_texformat; }
+	bool valid() const { return appropriate_bitmap().valid(); }
+	palette_t *palette() const { return appropriate_bitmap().palette(); }
+	const rectangle &cliprect() const { return appropriate_bitmap().cliprect(); }
+
+	// operations
+	void set_palette(palette_t *palette) { appropriate_bitmap().set_palette(palette); }
+	void set_format(bitmap_format format, texture_format texformat)
+	{
+		m_format = format;
+		m_texformat = texformat;
+		m_ind16.reset();
+		m_rgb32.reset();
+	}
+	
+private:
+	// internal state
+	bitmap_format		m_format;
+	texture_format		m_texformat;
+	bitmap_ind16	m_ind16;
+	bitmap_rgb32		m_rgb32;
+};
+
+
+// ======================> screen_update_delegate
+
+// composite "smart" delegate with late binding
+class screen_update_delegate
+{
+public:
+	// construction
+	screen_update_delegate() { }
+
+	screen_update_delegate(UINT32 (*callback)(screen_device *, screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+		: m_ind16(callback, name, (screen_device *)0) { }
+
+	screen_update_delegate(UINT32 (*callback)(screen_device *, screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+		: m_rgb32(callback, name, (screen_device *)0) { }
+	
+	template<class _FunctionClass>
+	screen_update_delegate(UINT32 (_FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+		: m_ind16(callback, name, (_FunctionClass *)0) { }
+
+	template<class _FunctionClass>
+	screen_update_delegate(UINT32 (_FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+		: m_rgb32(callback, name, (_FunctionClass *)0) { }
+
+	// queries
+	bool isnull() const { return m_ind16.isnull() && m_rgb32.isnull(); }
+	bitmap_format format() const { return (!m_ind16.isnull()) ? BITMAP_FORMAT_IND16 : (!m_rgb32.isnull()) ? BITMAP_FORMAT_RGB32 : BITMAP_FORMAT_INVALID; }
+	
+	// binding
+	void late_bind(delegate_late_bind &object)
+	{ 
+		if (!m_ind16.isnull()) m_ind16.late_bind(object);
+		if (!m_rgb32.isnull()) m_rgb32.late_bind(object);
+	}
+
+	// calling
+	UINT32 operator()(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &rectangle) const
+	{
+		return m_ind16.isnull() ? UPDATE_HAS_NOT_CHANGED : m_ind16(screen, bitmap, rectangle);
+	}
+	
+	UINT32 operator()(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &rectangle) const
+	{
+		return m_rgb32.isnull() ? UPDATE_HAS_NOT_CHANGED : m_rgb32(screen, bitmap, rectangle);
+	}
+
+private:
+	delegate<UINT32 (screen_device &, bitmap_ind16 &, const rectangle &)> m_ind16;
+	delegate<UINT32 (screen_device &, bitmap_rgb32 &, const rectangle &)> m_rgb32;
+};
+
+
 // callback that is called to notify of a change in the VBLANK state
 typedef delegate<void (screen_device &, bool)> vblank_state_delegate;
 
-typedef UINT32 (*screen_update_func)(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+typedef delegate<void (screen_device &)> screen_eof_delegate;
+
 typedef void (*screen_eof_func)(screen_device &screen);
 
 
@@ -97,15 +236,14 @@ public:
 	bool oldstyle_vblank_supplied() const { return m_oldstyle_vblank_supplied; }
 	attoseconds_t refresh_attoseconds() const { return m_refresh; }
 	attoseconds_t vblank_attoseconds() const { return m_vblank; }
-	bitmap_format format() const { return m_format; }
+	bitmap_format format() const { return m_screen_update.format(); }
 	float xoffset() const { return m_xoffset; }
 	float yoffset() const { return m_yoffset; }
 	float xscale() const { return m_xscale; }
 	float yscale() const { return m_yscale; }
-	bool have_screen_update() const { return m_screen_update != NULL; }
+	bool have_screen_update() const { return !m_screen_update.isnull(); }
 
 	// inline configuration helpers
-	static void static_set_format(device_t &device, bitmap_format format);
 	static void static_set_type(device_t &device, screen_type_enum type);
 	static void static_set_raw(device_t &device, UINT32 pixclock, UINT16 htotal, UINT16 hbend, UINT16 hbstart, UINT16 vtotal, UINT16 vbend, UINT16 vbstart);
 	static void static_set_refresh(device_t &device, attoseconds_t rate);
@@ -113,13 +251,12 @@ public:
 	static void static_set_size(device_t &device, UINT16 width, UINT16 height);
 	static void static_set_visarea(device_t &device, INT16 minx, INT16 maxx, INT16 miny, INT16 maxy);
 	static void static_set_default_position(device_t &device, double xscale, double xoffs, double yscale, double yoffs);
-	static void static_set_screen_update(device_t &device, screen_update_func callback);
+	static void static_set_screen_update(device_t &device, screen_update_delegate callback, const char *devicename = NULL);
 	static void static_set_screen_eof(device_t &device, screen_eof_func callback);
 
 	// information getters
 	screen_device *next_screen() const { return downcast<screen_device *>(typenext()); }
 	render_container &container() const { assert(m_container != NULL); return *m_container; }
-	bool screen_update(bitmap_t &bitmap, const rectangle &cliprect);
 	void screen_eof();
 
 	// dynamic configuration
@@ -146,11 +283,9 @@ public:
 	// updating
 	bool update_partial(int scanline);
 	void update_now();
-
+	
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
-	bitmap_t *alloc_compatible_bitmap(int width = 0, int height = 0) { return auto_bitmap_alloc(machine(), (width == 0) ? m_width : width, (height == 0) ? m_height : height, format()); }
-	bitmap_t &default_bitmap() { return m_default; }
 
 	// internal to the video system
 	bool update_quads();
@@ -193,10 +328,10 @@ private:
 	bool				m_oldstyle_vblank_supplied;	// MCFG_SCREEN_VBLANK_TIME macro used
 	attoseconds_t		m_refresh;					// default refresh period
 	attoseconds_t		m_vblank;					// duration of a VBLANK
-	bitmap_format		m_format;					// bitmap format
 	float				m_xoffset, m_yoffset;		// default X/Y offsets
 	float				m_xscale, m_yscale;			// default X/Y scale factor
-	screen_update_func	m_screen_update;			// screen update callback
+	screen_update_delegate m_screen_update;			// screen update callback (16-bit palette)
+	const char *		m_screen_update_device;		// device for resolving the screen update
 	screen_eof_func		m_screen_eof;				// screen eof callback
 
 	// internal state
@@ -208,16 +343,15 @@ private:
 	rectangle			m_visarea;					// current visible area (HBLANK end/start, VBLANK end/start)
 
 	// textures and bitmaps
+	texture_format		m_texformat;				// texture format
 	render_texture *	m_texture[2];				// 2x textures for the screen bitmap
-	bitmap_t			m_bitmap[2];				// 2x bitmaps for rendering
-	bitmap_t			m_default;					// default backing bitmap (copied by default)
-	bitmap_t			m_burnin;					// burn-in bitmap
+	screen_bitmap		m_bitmap[2];				// 2x bitmaps for rendering
+	bitmap_ind64		m_burnin;					// burn-in bitmap
 	UINT8				m_curbitmap;				// current bitmap index
 	UINT8				m_curtexture;				// current texture index
-	INT32				m_texture_format;			// texture format of bitmap for this screen
 	bool				m_changed;					// has this bitmap changed?
 	INT32				m_last_partial_scan;		// scanline of last partial update
-	bitmap_t			m_screen_overlay_bitmap;	// screen overlay bitmap
+	bitmap_argb32		m_screen_overlay_bitmap;	// screen overlay bitmap
 
 	// screen timing
 	attoseconds_t		m_frame_period;				// attoseconds per frame
@@ -257,8 +391,10 @@ extern const device_type SCREEN;
 //**************************************************************************
 
 #define SCREEN_UPDATE_NAME(name)		screen_update_##name
-#define SCREEN_UPDATE(name)				UINT32 SCREEN_UPDATE_NAME(name)(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-#define SCREEN_UPDATE_CALL(name)		SCREEN_UPDATE_NAME(name)(screen, bitmap, cliprect)
+#define SCREEN_UPDATE_IND16(name)	UINT32 SCREEN_UPDATE_NAME(name)(screen_device *__dummy, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE_RGB32(name)		UINT32 SCREEN_UPDATE_NAME(name)(screen_device *__dummy, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_CALL(name)		SCREEN_UPDATE_NAME(name)(__dummy, screen, bitmap, cliprect)
+#define SCREEN_UPDATE32_CALL(name)		SCREEN_UPDATE_NAME(name)(__dummy, screen, bitmap, cliprect)
 
 #define SCREEN_EOF_NAME(name)			screen_eof_##name
 #define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(screen_device &screen)
@@ -272,9 +408,6 @@ extern const device_type SCREEN;
 
 #define MCFG_SCREEN_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
-
-#define MCFG_SCREEN_FORMAT(_format) \
-	screen_device::static_set_format(*device, _format); \
 
 #define MCFG_SCREEN_TYPE(_type) \
 	screen_device::static_set_type(*device, SCREEN_TYPE_##_type); \
@@ -297,8 +430,14 @@ extern const device_type SCREEN;
 #define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
 	screen_device::static_set_default_position(*device, _xscale, _xoffs, _yscale, _yoffs); \
 
-#define MCFG_SCREEN_UPDATE(_func) \
-	screen_device::static_set_screen_update(*device, SCREEN_UPDATE_NAME(_func)); \
+#define MCFG_SCREEN_UPDATE_STATIC(_func) \
+	screen_device::static_set_screen_update(*device, screen_update_delegate(&screen_update_##_func, "screen_update_" #_func), device->tag()); \
+
+#define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
+	screen_device::static_set_screen_update(*device, screen_update_delegate(&_class::_method, #_class "::" #_method)); \
+
+#define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
+	screen_device::static_set_screen_update(*device, screen_update_delegate(&_class::_method, #_class "::" #_method), _device); \
 
 #define MCFG_SCREEN_EOF(_func) \
 	screen_device::static_set_screen_eof(*device, SCREEN_EOF_NAME(_func)); \

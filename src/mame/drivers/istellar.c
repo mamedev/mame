@@ -22,16 +22,17 @@ Todo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "render.h"
-#include "machine/laserdsc.h"
+#include "machine/ldv1000.h"
 
 
 class istellar_state : public driver_device
 {
 public:
 	istellar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_laserdisc(*this, "laserdisc") { }
 
-	device_t *m_laserdisc;
+	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 *m_tile_ram;
 	UINT8 *m_tile_control_ram;
 	UINT8 *m_sprite_ram;
@@ -46,7 +47,7 @@ public:
 
 
 /* VIDEO GOODS */
-static SCREEN_UPDATE( istellar )
+static SCREEN_UPDATE_IND16( istellar )
 {
 	istellar_state *state = screen.machine().driver_data<istellar_state>();
 	int charx, chary;
@@ -86,8 +87,6 @@ static SCREEN_UPDATE( istellar )
 
 static MACHINE_START( istellar )
 {
-	istellar_state *state = machine.driver_data<istellar_state>();
-	state->m_laserdisc = machine.device("laserdisc");
 }
 
 
@@ -124,7 +123,7 @@ static WRITE8_HANDLER(z80_0_latch2_write)
 static READ8_HANDLER(z80_2_ldp_read)
 {
 	istellar_state *state = space->machine().driver_data<istellar_state>();
-	UINT8 readResult = laserdisc_data_r(state->m_laserdisc);
+	UINT8 readResult = state->m_laserdisc->status_r();
 	logerror("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
 }
@@ -161,7 +160,7 @@ static WRITE8_HANDLER(z80_2_ldp_write)
 {
 	istellar_state *state = space->machine().driver_data<istellar_state>();
 	logerror("CPU2 : writing LDP : 0x%x\n", data);
-	laserdisc_data_w(state->m_laserdisc,data);
+	state->m_laserdisc->data_w(data);
 }
 
 
@@ -354,11 +353,11 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 
 	MCFG_MACHINE_START(istellar)
 
-	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-	MCFG_LASERDISC_OVERLAY(istellar, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
+	MCFG_LASERDISC_OVERLAY(256, 256, istellar)
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT(istellar)
@@ -368,7 +367,7 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -115,7 +115,7 @@ VIDEO_START( gotya )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_thehand, 8, 8, 64, 32);
 }
 
-static void draw_status_row( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int sx, int col )
+static void draw_status_row( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int col )
 {
 	gotya_state *state = machine.driver_data<gotya_state>();
 	int row;
@@ -143,7 +143,7 @@ static void draw_status_row( running_machine &machine, bitmap_t &bitmap, const r
 	}
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gotya_state *state = machine.driver_data<gotya_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -167,7 +167,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static void draw_status( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_status( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	draw_status_row(machine, bitmap, cliprect, 0,  1);
 	draw_status_row(machine, bitmap, cliprect, 1,  0);
@@ -177,7 +177,7 @@ static void draw_status( running_machine &machine, bitmap_t &bitmap, const recta
 	draw_status_row(machine, bitmap, cliprect, 34, 15);
 }
 
-SCREEN_UPDATE( gotya )
+SCREEN_UPDATE_IND16( gotya )
 {
 	gotya_state *state = screen.machine().driver_data<gotya_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, -(*state->m_scroll + (state->m_scroll_bit_8 * 256)) - 2 * 8);

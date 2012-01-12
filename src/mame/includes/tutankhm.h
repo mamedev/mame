@@ -28,4 +28,4 @@ public:
 WRITE8_HANDLER( tutankhm_flip_screen_x_w );
 WRITE8_HANDLER( tutankhm_flip_screen_y_w );
 
-SCREEN_UPDATE( tutankhm );
+SCREEN_UPDATE_RGB32( tutankhm );

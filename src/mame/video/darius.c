@@ -46,7 +46,7 @@ WRITE16_HANDLER( darius_fg_layer_w )
 
 /***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs )
 {
 	darius_state *state = machine.driver_data<darius_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -92,7 +92,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 
 
-static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect, int xoffs)
+static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs)
 {
 	darius_state *state = screen.machine().driver_data<darius_state>();
 
@@ -116,7 +116,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_t &bitmap, const recta
 	return 0;
 }
 
-SCREEN_UPDATE( darius_left ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 0); }
-SCREEN_UPDATE( darius_middle ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 1); }
-SCREEN_UPDATE( darius_right ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 2); }
+SCREEN_UPDATE_IND16( darius_left ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 0); }
+SCREEN_UPDATE_IND16( darius_middle ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 1); }
+SCREEN_UPDATE_IND16( darius_right ) { return update_screen(screen, bitmap, cliprect, 36 * 8 * 2); }
 

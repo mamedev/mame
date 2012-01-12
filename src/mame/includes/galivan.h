@@ -48,5 +48,5 @@ PALETTE_INIT( galivan );
 
 VIDEO_START( galivan );
 VIDEO_START( ninjemak );
-SCREEN_UPDATE( galivan );
-SCREEN_UPDATE( ninjemak );
+SCREEN_UPDATE_IND16( galivan );
+SCREEN_UPDATE_IND16( ninjemak );

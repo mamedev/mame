@@ -57,7 +57,7 @@ public:
 
 	int m_sbw_system;
 	tilemap_t *m_sb_tilemap;
-	bitmap_t *m_tmpbitmap;
+	bitmap_ind16 *m_tmpbitmap;
 	UINT32 m_color_prom_address;
 	UINT8 m_pix_sh;
 	UINT8 m_pix[2];
@@ -74,7 +74,7 @@ static TILE_GET_INFO( get_sb_tile_info )
 	SET_TILE_INFO(0, tileno, 0, 0);
 }
 
-static void plot_pixel_sbw(bitmap_t *tmpbitmap, int x, int y, int col, int flip)
+static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int flip)
 {
 	if (flip)
 	{
@@ -108,7 +108,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 	}
 }
 
-static SCREEN_UPDATE(sbowling)
+static SCREEN_UPDATE_IND16(sbowling)
 {
 	sbowling_state *state = screen.machine().driver_data<sbowling_state>();
 
@@ -122,7 +122,7 @@ static VIDEO_START(sbowling)
 {
 	sbowling_state *state = machine.driver_data<sbowling_state>();
 
-	state->m_tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,machine.primary_screen->format());
+	state->m_tmpbitmap = auto_bitmap_ind16_alloc(machine,32*8,32*8);
 	state->m_sb_tilemap = tilemap_create(machine, get_sb_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
@@ -386,10 +386,9 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(sbowling)
+	MCFG_SCREEN_UPDATE_STATIC(sbowling)
 
 	MCFG_GFXDECODE(sbowling)
 

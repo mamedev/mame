@@ -80,7 +80,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 }
 
 /* copied from Legionnaire */
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int pri)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -179,7 +179,7 @@ static VIDEO_START( rdx_v33 )
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 }
 
-static SCREEN_UPDATE( rdx_v33 )
+static SCREEN_UPDATE_IND16( rdx_v33 )
 {
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -667,10 +667,9 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(rdx_v33)
+	MCFG_SCREEN_UPDATE_STATIC(rdx_v33)
 
 	MCFG_GFXDECODE(rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
@@ -702,10 +701,9 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE(rdx_v33)
+	MCFG_SCREEN_UPDATE_STATIC(rdx_v33)
 	MCFG_GFXDECODE(rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
 

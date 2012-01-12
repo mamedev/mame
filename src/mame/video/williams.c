@@ -172,7 +172,7 @@ VIDEO_START( williams2 )
  *
  *************************************/
 
-SCREEN_UPDATE( williams )
+SCREEN_UPDATE_RGB32( williams )
 {
 	williams_state *state = screen.machine().driver_data<williams_state>();
 	rgb_t pens[16];
@@ -200,7 +200,7 @@ SCREEN_UPDATE( williams )
 }
 
 
-SCREEN_UPDATE( blaster )
+SCREEN_UPDATE_RGB32( blaster )
 {
 	williams_state *state = screen.machine().driver_data<williams_state>();
 	rgb_t pens[16];
@@ -243,7 +243,7 @@ SCREEN_UPDATE( blaster )
 }
 
 
-SCREEN_UPDATE( williams2 )
+SCREEN_UPDATE_RGB32( williams2 )
 {
 	williams_state *state = screen.machine().driver_data<williams_state>();
 	rgb_t pens[16];

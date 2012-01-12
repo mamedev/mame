@@ -208,7 +208,7 @@ VIDEO_START( kingofb )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-static void kingofb_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void kingofb_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	kingofb_state *state = machine.driver_data<kingofb_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -246,7 +246,7 @@ static void kingofb_draw_sprites(running_machine &machine, bitmap_t &bitmap, con
 	}
 }
 
-SCREEN_UPDATE( kingofb )
+SCREEN_UPDATE_IND16( kingofb )
 {
 	kingofb_state *state = screen.machine().driver_data<kingofb_state>();
 
@@ -277,7 +277,7 @@ VIDEO_START( ringking )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
-static void ringking_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void ringking_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	kingofb_state *state = machine.driver_data<kingofb_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -308,7 +308,7 @@ static void ringking_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-SCREEN_UPDATE( ringking )
+SCREEN_UPDATE_IND16( ringking )
 {
 	kingofb_state *state = screen.machine().driver_data<kingofb_state>();
 

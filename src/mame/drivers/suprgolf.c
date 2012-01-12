@@ -75,7 +75,7 @@ static VIDEO_START( suprgolf )
 	tilemap_set_transparent_pen(state->m_tilemap,15);
 }
 
-static SCREEN_UPDATE( suprgolf )
+static SCREEN_UPDATE_IND16( suprgolf )
 {
 	suprgolf_state *state = screen.machine().driver_data<suprgolf_state>();
 	int x,y,count,color;
@@ -520,10 +520,9 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
-	MCFG_SCREEN_UPDATE(suprgolf)
+	MCFG_SCREEN_UPDATE_STATIC(suprgolf)
 
 	MCFG_GFXDECODE(suprgolf)
 	MCFG_PALETTE_LENGTH(0x800)

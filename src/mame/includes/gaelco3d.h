@@ -27,15 +27,15 @@ class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 1, 20
 public:
 	gaelco3d_renderer(gaelco3d_state &state);
 
-	bitmap_t *screenbits() const { return m_screenbits; }
+	bitmap_ind16 &screenbits() { return m_screenbits; }
 	UINT32 polygons() { UINT32 result = m_polygons; m_polygons = 0; return result; }
 
 	void render_poly(screen_device &screen, UINT32 *polydata);
 
 private:
 	gaelco3d_state &m_state;
-	bitmap_t *m_screenbits;
-	bitmap_t *m_zbuffer;
+	bitmap_ind16 m_screenbits;
+	bitmap_ind16 m_zbuffer;
 	UINT32 m_polygons;
 	offs_t m_texture_size;
 	offs_t m_texmask_size;
@@ -87,4 +87,4 @@ WRITE16_HANDLER( gaelco3d_paletteram_w );
 WRITE32_HANDLER( gaelco3d_paletteram_020_w );
 
 VIDEO_START( gaelco3d );
-SCREEN_UPDATE( gaelco3d );
+SCREEN_UPDATE_IND16( gaelco3d );

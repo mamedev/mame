@@ -11,7 +11,7 @@ public:
 	int m_do_shadows;
 
 	UINT16 m_gfxlist_addr;
-	bitmap_t *m_rawbitmap;
+	bitmap_ind16 m_rawbitmap;
 
 	UINT8 m_drawmode_table[16];
 };
@@ -23,4 +23,4 @@ WRITE16_HANDLER( shangha3_flipscreen_w );
 WRITE16_HANDLER( shangha3_gfxlist_addr_w );
 WRITE16_HANDLER( shangha3_blitter_go_w );
 VIDEO_START( shangha3 );
-SCREEN_UPDATE( shangha3 );
+SCREEN_UPDATE_IND16( shangha3 );

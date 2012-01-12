@@ -151,7 +151,7 @@ VIDEO_START( esripsys )
 	state_save_register_global(machine, state->m_12sel);
 }
 
-SCREEN_UPDATE( esripsys )
+SCREEN_UPDATE_RGB32( esripsys )
 {
 	esripsys_state *state = screen.machine().driver_data<esripsys_state>();
 	struct line_buffer_t *line_buffer = state->m_line_buffer;

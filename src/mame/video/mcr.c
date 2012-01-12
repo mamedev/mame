@@ -255,7 +255,7 @@ WRITE8_HANDLER( mcr_91490_videoram_w )
  *
  *************************************/
 
-static void render_sprites_91399(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void render_sprites_91399(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = machine.generic.spriteram.u8;
 	const gfx_element *gfx = machine.gfx[1];
@@ -327,7 +327,7 @@ static void render_sprites_91399(running_machine &machine, bitmap_t &bitmap, con
  *
  *************************************/
 
-static void render_sprites_91464(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask)
+static void render_sprites_91464(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask)
 {
 	UINT8 *spriteram = machine.generic.spriteram.u8;
 	const gfx_element *gfx = machine.gfx[1];
@@ -401,7 +401,7 @@ static void render_sprites_91464(running_machine &machine, bitmap_t &bitmap, con
  *
  *************************************/
 
-SCREEN_UPDATE( mcr )
+SCREEN_UPDATE_IND16( mcr )
 {
 	/* update the flip state */
 	tilemap_set_flip(bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);

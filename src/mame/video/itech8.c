@@ -608,7 +608,7 @@ TIMER_DEVICE_CALLBACK( grmatch_palette_update )
  *
  *************************************/
 
-SCREEN_UPDATE( itech8_2layer )
+SCREEN_UPDATE_RGB32( itech8_2layer )
 {
 	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	struct tms34061_display &tms_state = state->m_tms_state;
@@ -646,7 +646,7 @@ SCREEN_UPDATE( itech8_2layer )
 }
 
 
-SCREEN_UPDATE( itech8_grmatch )
+SCREEN_UPDATE_RGB32( itech8_grmatch )
 {
 	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	struct tms34061_display &tms_state = state->m_tms_state;
@@ -695,7 +695,7 @@ SCREEN_UPDATE( itech8_grmatch )
 }
 
 
-SCREEN_UPDATE( itech8_2page )
+SCREEN_UPDATE_RGB32( itech8_2page )
 {
 	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	struct tms34061_display &tms_state = state->m_tms_state;
@@ -728,7 +728,7 @@ SCREEN_UPDATE( itech8_2page )
 }
 
 
-SCREEN_UPDATE( itech8_2page_large )
+SCREEN_UPDATE_RGB32( itech8_2page_large )
 {
 	itech8_state *state = screen.machine().driver_data<itech8_state>();
 	struct tms34061_display &tms_state = state->m_tms_state;

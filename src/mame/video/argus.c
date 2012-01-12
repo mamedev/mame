@@ -312,7 +312,7 @@ VIDEO_START( valtric )
 
 	tilemap_set_transparent_pen(state->m_tx_tilemap,  15);
 
-	state->m_mosaicbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_mosaicbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	jal_blend_init(machine, 1);
 }
@@ -851,7 +851,7 @@ static void argus_bg0_scroll_handle(running_machine &machine)
 	}
 }
 
-static void argus_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static void argus_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
 {
 	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -894,7 +894,7 @@ static void argus_draw_sprites(running_machine &machine, bitmap_t &bitmap, const
 }
 
 #if 1
-static void valtric_draw_mosaic(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+static void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	argus_state *state = screen.machine().driver_data<argus_state>();
 
@@ -909,7 +909,7 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t &bitmap, const r
 		tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
 	else
 	{
-		tilemap_draw(*state->m_mosaicbitmap, cliprect, state->m_bg1_tilemap, 0, 0);
+		tilemap_draw(state->m_mosaicbitmap, cliprect, state->m_bg1_tilemap, 0, 0);
 		{
 			int step=state->m_mosaic;
 			UINT32 *dest;
@@ -923,11 +923,11 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t &bitmap, const r
 				for (x=0;x<height+step;x+=step)
 				{
 					if (y < height && x < width)
-						c=state->m_mosaicbitmap->pix32(y, x);
+						c=state->m_mosaicbitmap.pix32(y, x);
 
 					if (state->m_mosaic<0)
 						if (y+step-1<height && x+step-1< width)
-							c = state->m_mosaicbitmap->pix32(y+step-1, x+step-1);
+							c = state->m_mosaicbitmap.pix32(y+step-1, x+step-1);
 
 					for (yy=0;yy<step;yy++)
 						for (xx=0;xx<step;xx++)
@@ -943,7 +943,7 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t &bitmap, const r
 	}
 }
 #else
-static void valtric_draw_mosaic(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+static void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	argus_state *state = screen.machine().driver_data<argus_state>();
 	int step = 0x10 - (state->m_valtric_mosaic & 0x0f);
@@ -963,11 +963,11 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t &bitmap, const r
 				for (x = 0; x < height+step; x += step)
 				{
 					if (y < height && x < width)
-						c = state->m_mosaicbitmap->pix32(y, x);
+						c = state->m_mosaicbitmap.pix32(y, x);
 
 					if (state->m_valtric_mosaic & 0x80)
 						if (y+step-1 < height && x+step-1 < width)
-							c = state->m_mosaicbitmap->pix32(y+step-1, x+step-1);
+							c = state->m_mosaicbitmap.pix32(y+step-1, x+step-1);
 
 					for (yy = 0; yy < step; yy++)
 						for (xx = 0; xx < step; xx++)
@@ -984,7 +984,7 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t &bitmap, const r
 }
 #endif
 
-static void valtric_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void valtric_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -1024,7 +1024,7 @@ static void valtric_draw_sprites(running_machine &machine, bitmap_t &bitmap, con
 	}
 }
 
-static void butasan_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void butasan_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -1189,7 +1189,7 @@ static void butasan_log_vram(running_machine &machine)
 #endif
 }
 
-SCREEN_UPDATE( argus )
+SCREEN_UPDATE_RGB32( argus )
 {
 	argus_state *state = screen.machine().driver_data<argus_state>();
 	bg_setting(screen.machine());
@@ -1206,7 +1206,7 @@ SCREEN_UPDATE( argus )
 	return 0;
 }
 
-SCREEN_UPDATE( valtric )
+SCREEN_UPDATE_RGB32( valtric )
 {
 	argus_state *state = screen.machine().driver_data<argus_state>();
 	bg_setting(screen.machine());
@@ -1220,7 +1220,7 @@ SCREEN_UPDATE( valtric )
 	return 0;
 }
 
-SCREEN_UPDATE( butasan )
+SCREEN_UPDATE_RGB32( butasan )
 {
 	argus_state *state = screen.machine().driver_data<argus_state>();
 	bg_setting(screen.machine());

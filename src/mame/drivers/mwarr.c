@@ -395,7 +395,7 @@ static VIDEO_START( mwarr )
 	state->save_item(NAME(state->m_sprites_buffer));
 }
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
 	const UINT16 *source = state->m_sprites_buffer + 0x800 - 4;
@@ -466,7 +466,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static SCREEN_UPDATE( mwarr )
+static SCREEN_UPDATE_IND16( mwarr )
 {
 	mwarr_state *state = screen.machine().driver_data<mwarr_state>();
 	int i;
@@ -555,10 +555,9 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(54)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8+1, 48*8-1-8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE(mwarr)
+	MCFG_SCREEN_UPDATE_STATIC(mwarr)
 
 	MCFG_GFXDECODE(mwarr)
 	MCFG_PALETTE_LENGTH(0x800)

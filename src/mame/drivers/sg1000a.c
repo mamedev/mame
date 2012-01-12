@@ -261,14 +261,6 @@ static I8255_INTERFACE( ppi8255_intf )
 	DEVCB_HANDLER(sg1000a_coin_counter_w)
 };
 
-static SCREEN_UPDATE( sg1000a )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
 /*************************************
  *
  *  Machine drivers
@@ -286,7 +278,7 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, sg1000a_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( sg1000a )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

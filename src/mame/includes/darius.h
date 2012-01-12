@@ -69,6 +69,6 @@ public:
 WRITE16_HANDLER( darius_fg_layer_w );
 
 VIDEO_START( darius );
-SCREEN_UPDATE( darius_left );
-SCREEN_UPDATE( darius_middle );
-SCREEN_UPDATE( darius_right );
+SCREEN_UPDATE_IND16( darius_left );
+SCREEN_UPDATE_IND16( darius_middle );
+SCREEN_UPDATE_IND16( darius_right );

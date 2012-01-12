@@ -1001,19 +1001,19 @@ static const sega315_5124_interface _315_5124_2_intf =
 };
 
 
-static SCREEN_UPDATE( systeme )
+static SCREEN_UPDATE_RGB32( systeme )
 {
 	systeme_state *state = screen.machine().driver_data<systeme_state>();
-	bitmap_t *vdp1_bitmap = state->m_vdp1->get_bitmap();
-	bitmap_t *vdp2_bitmap = state->m_vdp2->get_bitmap();
-	bitmap_t *vdp2_y1 = state->m_vdp2->get_y1_bitmap();
+	bitmap_rgb32 &vdp1_bitmap = state->m_vdp1->get_bitmap();
+	bitmap_rgb32 &vdp2_bitmap = state->m_vdp2->get_bitmap();
+	bitmap_ind8 &vdp2_y1 = state->m_vdp2->get_y1_bitmap();
 
 	for( int y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
 		UINT32 *dest_ptr = &bitmap.pix32(y);
-		UINT32 *vdp1_ptr = &vdp1_bitmap->pix32(y);
-		UINT32 *vdp2_ptr = &vdp2_bitmap->pix32(y);
-		UINT8 *y1_ptr = &vdp2_y1->pix8(y);
+		UINT32 *vdp1_ptr = &vdp1_bitmap.pix32(y);
+		UINT32 *vdp2_ptr = &vdp2_bitmap.pix32(y);
+		UINT8 *y1_ptr = &vdp2_y1.pix8(y);
 
 		for ( int x = cliprect.min_x; x <= cliprect.max_x; x++ )
 		{
@@ -1032,11 +1032,10 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
 		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 192)
-	MCFG_SCREEN_UPDATE( systeme )	/* Combines and copies a bitmap */
+	MCFG_SCREEN_UPDATE_STATIC( systeme )	/* Combines and copies a bitmap */
 
 	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
 	MCFG_PALETTE_INIT(sega315_5124)

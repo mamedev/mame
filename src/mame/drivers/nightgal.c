@@ -68,7 +68,7 @@ static VIDEO_START( nightgal )
 	state->save_item(NAME(state->m_blit_buffer));
 }
 
-static SCREEN_UPDATE( nightgal )
+static SCREEN_UPDATE_IND16( nightgal )
 {
 	nightgal_state *state = screen.machine().driver_data<nightgal_state>();
 	int x, y;
@@ -877,10 +877,9 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(nightgal)
+	MCFG_SCREEN_UPDATE_STATIC(nightgal)
 	MCFG_PALETTE_INIT(nightgal)
 
 	MCFG_PALETTE_LENGTH(0x10)

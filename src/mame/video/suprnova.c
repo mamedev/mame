@@ -6,11 +6,11 @@
 
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-static void suprnova_draw_roz(bitmap_t &bitmap, bitmap_t* bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
+static void suprnova_draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
 {
-	//bitmap_t *destbitmap = bitmap;
-	bitmap_t &srcbitmap = tilemap_get_pixmap(tmap);
-	bitmap_t &srcbitmapflags = tilemap_get_flagsmap(tmap);
+	//bitmap_ind16 *destbitmap = bitmap;
+	bitmap_ind16 &srcbitmap = tilemap_get_pixmap(tmap);
+	bitmap_ind8 &srcbitmapflags = tilemap_get_flagsmap(tmap);
 	const int xmask = srcbitmap.width()-1;
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
@@ -51,7 +51,7 @@ static void suprnova_draw_roz(bitmap_t &bitmap, bitmap_t* bitmapflags, const rec
 
 			/* get dest and priority pointers */
 			dest = &bitmap.pix16(sy, sx);
-			destflags = &bitmapflags->pix8(sy, sx);
+			destflags = &bitmapflags.pix8(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
@@ -365,13 +365,13 @@ VIDEO_START(skns)
 	state->m_tilemap_B = tilemap_create(machine, get_tilemap_B_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(state->m_tilemap_B,0);
 
-	state->m_sprite_bitmap = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
+	state->m_sprite_bitmap.allocate(1024,1024);
 
-	state->m_tilemap_bitmap_lower = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
-	state->m_tilemap_bitmapflags_lower = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED8);
+	state->m_tilemap_bitmap_lower.allocate(320,240);
+	state->m_tilemap_bitmapflags_lower.allocate(320,240);
 
-	state->m_tilemap_bitmap_higher = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
-	state->m_tilemap_bitmapflags_higher = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED8);
+	state->m_tilemap_bitmap_higher.allocate(320,240);
+	state->m_tilemap_bitmapflags_higher.allocate(320,240);
 
 	machine.gfx[2]->color_granularity=256;
 	machine.gfx[3]->color_granularity=256;
@@ -391,7 +391,7 @@ VIDEO_RESET( skns )
 	state->m_alt_enable_background = state->m_alt_enable_sprites = 1;
 }
 
-static void supernova_draw_a( running_machine &machine, bitmap_t &bitmap, bitmap_t* bitmap_flags, const rectangle &cliprect, int tran )
+static void supernova_draw_a( running_machine &machine, bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran )
 {
 	skns_state *state = machine.driver_data<skns_state>();
 	int enable_a  = (state->m_v3_regs[0x10/4] >> 0) & 0x0001;
@@ -422,7 +422,7 @@ static void supernova_draw_a( running_machine &machine, bitmap_t &bitmap, bitmap
 	}
 }
 
-static void supernova_draw_b( running_machine &machine, bitmap_t &bitmap, bitmap_t* bitmap_flags, const rectangle &cliprect, int tran )
+static void supernova_draw_b( running_machine &machine, bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran )
 {
 	skns_state *state = machine.driver_data<skns_state>();
 	int enable_b  = (state->m_v3_regs[0x34/4] >> 0) & 0x0001;
@@ -453,17 +453,17 @@ static void supernova_draw_b( running_machine &machine, bitmap_t &bitmap, bitmap
 	}
 }
 
-SCREEN_UPDATE(skns)
+SCREEN_UPDATE_RGB32(skns)
 {
 	skns_state *state = screen.machine().driver_data<skns_state>();
 
 	palette_update(screen.machine());
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	state->m_tilemap_bitmap_lower->fill(0);
-	state->m_tilemap_bitmapflags_lower->fill(0);
-	state->m_tilemap_bitmap_higher->fill(0);
-	state->m_tilemap_bitmapflags_higher->fill(0);
+	state->m_tilemap_bitmap_lower.fill(0);
+	state->m_tilemap_bitmapflags_lower.fill(0);
+	state->m_tilemap_bitmap_higher.fill(0);
+	state->m_tilemap_bitmapflags_higher.fill(0);
 
 	{
 		int supernova_pri_a;
@@ -476,8 +476,8 @@ SCREEN_UPDATE(skns)
 		//popmessage("pri %d %d\n", supernova_pri_a, supernova_pri_b);
 
 		/*if (!supernova_pri_b) { */
-		supernova_draw_b(screen.machine(), *state->m_tilemap_bitmap_lower, state->m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
-		supernova_draw_a(screen.machine(), *state->m_tilemap_bitmap_higher,state->m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
+		supernova_draw_b(screen.machine(), state->m_tilemap_bitmap_lower, state->m_tilemap_bitmapflags_lower, cliprect,tran);// tran = 1;
+		supernova_draw_a(screen.machine(), state->m_tilemap_bitmap_higher,state->m_tilemap_bitmapflags_higher,cliprect,tran);// tran = 1;
 
 		{
 			int x,y;
@@ -492,13 +492,13 @@ SCREEN_UPDATE(skns)
 
 			for (y=0;y<240;y++)
 			{
-				src = &state->m_tilemap_bitmap_lower->pix16(y);
-				srcflags = &state->m_tilemap_bitmapflags_lower->pix8(y);
+				src = &state->m_tilemap_bitmap_lower.pix16(y);
+				srcflags = &state->m_tilemap_bitmapflags_lower.pix8(y);
 
-				src2 = &state->m_tilemap_bitmap_higher->pix16(y);
-				src2flags = &state->m_tilemap_bitmapflags_higher->pix8(y);
+				src2 = &state->m_tilemap_bitmap_higher.pix16(y);
+				src2flags = &state->m_tilemap_bitmapflags_higher.pix8(y);
 
-				src3 = &state->m_sprite_bitmap->pix16(y);
+				src3 = &state->m_sprite_bitmap.pix16(y);
 
 				dst = &bitmap.pix32(y);
 
@@ -628,10 +628,10 @@ SCREEN_UPDATE(skns)
 		}
 	}
 
-	state->m_sprite_bitmap->fill(0x0000, cliprect);
+	state->m_sprite_bitmap.fill(0x0000, cliprect);
 
 	if (state->m_alt_enable_sprites)
-		state->m_spritegen->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap, cliprect, screen.machine().generic.spriteram.u32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
+		state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap, cliprect, screen.machine().generic.spriteram.u32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
 
 
 	return 0;

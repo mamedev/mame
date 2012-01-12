@@ -110,7 +110,7 @@ static VIDEO_START(tourvisn)
 
 }
 
-static SCREEN_UPDATE(tourvisn)
+static SCREEN_UPDATE_RGB32(tourvisn)
 {
 	highvdeo_state *state = screen.machine().driver_data<highvdeo_state>();
 	int x,y,count;
@@ -141,7 +141,7 @@ static SCREEN_UPDATE(tourvisn)
 }
 
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
-static SCREEN_UPDATE(brasil)
+static SCREEN_UPDATE_RGB32(brasil)
 {
 	highvdeo_state *state = screen.machine().driver_data<highvdeo_state>();
 	int x,y,count;
@@ -912,10 +912,9 @@ static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE(tourvisn)
+	MCFG_SCREEN_UPDATE_STATIC(tourvisn)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
@@ -979,10 +978,9 @@ static MACHINE_CONFIG_START( brasil, highvdeo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
-	MCFG_SCREEN_UPDATE(brasil)
+	MCFG_SCREEN_UPDATE_STATIC(brasil)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

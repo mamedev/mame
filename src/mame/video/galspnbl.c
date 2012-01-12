@@ -29,7 +29,7 @@ PALETTE_INIT( galspnbl )
  *    4    | xxxxxxxxxxxxxxxx | x position
  *    5,6,7|                  | unused
  */
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	galspnbl_state *state = machine.driver_data<galspnbl_state>();
 	UINT16 *spriteram = state->m_spriteram;
@@ -84,7 +84,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 }
 
 
-static void draw_background( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	galspnbl_state *state = machine.driver_data<galspnbl_state>();
 	offs_t offs;
@@ -101,7 +101,7 @@ static void draw_background( running_machine &machine, bitmap_t &bitmap, const r
 }
 
 
-SCREEN_UPDATE( galspnbl )
+SCREEN_UPDATE_IND16( galspnbl )
 {
 	galspnbl_state *state = screen.machine().driver_data<galspnbl_state>();
 	int offs;

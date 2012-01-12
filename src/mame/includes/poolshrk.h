@@ -35,5 +35,5 @@ DISCRETE_SOUND_EXTERN( poolshrk );
 /*----------- defined in video/poolshrk.c -----------*/
 
 VIDEO_START( poolshrk );
-SCREEN_UPDATE( poolshrk );
+SCREEN_UPDATE_IND16( poolshrk );
 

@@ -172,7 +172,7 @@ WRITE16_HANDLER( toypop_merged_background_w )
 		state->m_bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
-static void draw_background(running_machine &machine, bitmap_t &bitmap)
+static void draw_background(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	toypop_state *state = machine.driver_data<toypop_state>();
 	pen_t pen_base = 0x300 + 0x10*state->m_palettebank;
@@ -219,7 +219,7 @@ static void draw_background(running_machine &machine, bitmap_t &bitmap)
 ***************************************************************************/
 
 
-void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
+void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
@@ -275,7 +275,7 @@ void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &c
 }
 
 
-SCREEN_UPDATE( toypop )
+SCREEN_UPDATE_IND16( toypop )
 {
 	toypop_state *state = screen.machine().driver_data<toypop_state>();
 	draw_background(screen.machine(), bitmap);

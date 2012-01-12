@@ -215,13 +215,13 @@ WRITE8_HANDLER( warpwarp_videoram_w )
 
 ***************************************************************************/
 
-INLINE void geebee_plot(bitmap_t &bitmap, const rectangle &cliprect, int x, int y, pen_t pen)
+INLINE void geebee_plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen)
 {
 	if (x >= cliprect.min_x && x <= cliprect.max_x && y >= cliprect.min_y && y <= cliprect.max_y)
 		bitmap.pix16(y, x) = pen;
 }
 
-static void draw_ball(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect,pen_t pen)
+static void draw_ball(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen)
 {
 	warpwarp_state *state = machine.driver_data<warpwarp_state>();
 	if (state->m_ball_on)
@@ -243,7 +243,7 @@ static void draw_ball(running_machine &machine, bitmap_t &bitmap, const rectangl
 	}
 }
 
-SCREEN_UPDATE( geebee )
+SCREEN_UPDATE_IND16( geebee )
 {
 	warpwarp_state *state = screen.machine().driver_data<warpwarp_state>();
 	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);

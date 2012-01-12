@@ -257,7 +257,7 @@ public:
 	INT16 m_scanline_cnt;
 
 
-	bitmap_t *m_tmp_bitmap[2];
+	bitmap_ind16 *m_tmp_bitmap[2];
 
 	INT32 get_scale(INT32 index)
 	{
@@ -560,11 +560,11 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 static VIDEO_START(wheelfir)
 {
 	wheelfir_state *state = machine.driver_data<wheelfir_state>();
-	state->m_tmp_bitmap[0] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
-	state->m_tmp_bitmap[1] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+	state->m_tmp_bitmap[0] = auto_bitmap_ind16_alloc(machine, 512, 512);
+	state->m_tmp_bitmap[1] = auto_bitmap_ind16_alloc(machine, 512, 512);
 }
 
-static SCREEN_UPDATE(wheelfir)
+static SCREEN_UPDATE_IND16(wheelfir)
 {
 	wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
 
@@ -818,10 +818,9 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
 	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
-	MCFG_SCREEN_UPDATE(wheelfir)
+	MCFG_SCREEN_UPDATE_STATIC(wheelfir)
 	MCFG_SCREEN_EOF(wheelfir)
 
 	MCFG_PALETTE_LENGTH(NUM_COLORS)

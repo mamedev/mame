@@ -35,5 +35,5 @@ public:
 /*----------- defined in video/psikyo4.c -----------*/
 
 VIDEO_START( psikyo4 );
-SCREEN_UPDATE( psikyo4_left );
-SCREEN_UPDATE( psikyo4_right );
+SCREEN_UPDATE_IND16( psikyo4_left );
+SCREEN_UPDATE_IND16( psikyo4_right );

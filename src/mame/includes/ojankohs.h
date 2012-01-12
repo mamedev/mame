@@ -17,7 +17,7 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_tilemap;
-	bitmap_t   *m_tmpbitmap;
+	bitmap_ind16 m_tmpbitmap;
 	int       m_gfxreg;
 	int       m_flipscreen;
 	int       m_flipscreen_old;
@@ -54,8 +54,8 @@ VIDEO_START( ojankohs );
 VIDEO_START( ojankoy );
 VIDEO_START( ojankoc );
 
-SCREEN_UPDATE( ojankohs );
-SCREEN_UPDATE( ojankoc );
+SCREEN_UPDATE_IND16( ojankohs );
+SCREEN_UPDATE_IND16( ojankoc );
 
 void ojankoc_flipscreen(address_space *space, int data);
 

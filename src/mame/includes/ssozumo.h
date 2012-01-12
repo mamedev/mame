@@ -31,4 +31,4 @@ WRITE8_HANDLER( ssozumo_flipscreen_w );
 
 PALETTE_INIT( ssozumo );
 VIDEO_START( ssozumo );
-SCREEN_UPDATE( ssozumo );
+SCREEN_UPDATE_IND16( ssozumo );

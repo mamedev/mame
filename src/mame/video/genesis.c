@@ -221,7 +221,7 @@ void system18_vdp_start(running_machine &machine)
 
 ******************************************************************************/
 
-void system18_vdp_update( bitmap_t &bitmap, const rectangle &cliprect )
+void system18_vdp_update( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int y;
 

@@ -146,7 +146,7 @@ Sprite list:
 [2] xxxx xxxx X attribute
 [3] xxxx xxxx sprite number
 */
-static void zerotrgt_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void zerotrgt_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 	int offs;
@@ -204,7 +204,7 @@ static void zerotrgt_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
      ---- --xx tile bank
 */
 
-static void cntsteer_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void cntsteer_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 	int offs;
@@ -253,7 +253,7 @@ static void cntsteer_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static SCREEN_UPDATE( zerotrgt )
+static SCREEN_UPDATE_IND16( zerotrgt )
 {
 	cntsteer_state *state = screen.machine().driver_data<cntsteer_state>();
 
@@ -304,7 +304,7 @@ static SCREEN_UPDATE( zerotrgt )
 	return 0;
 }
 
-static SCREEN_UPDATE( cntsteer )
+static SCREEN_UPDATE_IND16( cntsteer )
 {
 	cntsteer_state *state = screen.machine().driver_data<cntsteer_state>();
 
@@ -891,10 +891,9 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(cntsteer)
+	MCFG_SCREEN_UPDATE_STATIC(cntsteer)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -941,10 +940,9 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(zerotrgt)
+	MCFG_SCREEN_UPDATE_STATIC(zerotrgt)
 
 	MCFG_GFXDECODE(zerotrgt)
 	MCFG_PALETTE_LENGTH(256)

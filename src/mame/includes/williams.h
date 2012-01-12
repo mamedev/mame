@@ -138,9 +138,9 @@ VIDEO_START( williams );
 VIDEO_START( blaster );
 VIDEO_START( williams2 );
 
-SCREEN_UPDATE( williams );
-SCREEN_UPDATE( blaster );
-SCREEN_UPDATE( williams2 );
+SCREEN_UPDATE_RGB32( williams );
+SCREEN_UPDATE_RGB32( blaster );
+SCREEN_UPDATE_RGB32( williams2 );
 
 
 WRITE8_HANDLER( williams2_tileram_w );

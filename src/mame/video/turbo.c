@@ -404,10 +404,10 @@ static UINT32 turbo_get_sprite_bits(running_machine &machine, UINT8 road, sprite
  *
  *************************************/
 
-SCREEN_UPDATE( turbo )
+SCREEN_UPDATE_IND16( turbo )
 {
 	turbo_state *state = screen.machine().driver_data<turbo_state>();
-	bitmap_t &fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
+	bitmap_ind16 &fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
 	const UINT8 *road_gfxdata = screen.machine().region("gfx3")->base();
 	const UINT8 *prom_base = screen.machine().region("proms")->base();
 	const UINT8 *pr1114 = prom_base + 0x000;
@@ -759,10 +759,10 @@ static UINT32 subroc3d_get_sprite_bits(running_machine &machine, sprite_info *sp
  *
  *************************************/
 
-SCREEN_UPDATE( subroc3d )
+SCREEN_UPDATE_IND16( subroc3d )
 {
 	turbo_state *state = screen.machine().driver_data<turbo_state>();
-	bitmap_t &fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
+	bitmap_ind16 &fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
 	const UINT8 *prom_base = screen.machine().region("proms")->base();
 	const UINT8 *pr1419 = prom_base + 0x000;
 	const UINT8 *pr1620 = prom_base + 0x200;
@@ -979,10 +979,10 @@ static UINT32 buckrog_get_sprite_bits(running_machine &machine, sprite_info *spr
  *
  *************************************/
 
-SCREEN_UPDATE( buckrog )
+SCREEN_UPDATE_IND16( buckrog )
 {
 	turbo_state *state = screen.machine().driver_data<turbo_state>();
-	bitmap_t &fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
+	bitmap_ind16 &fgpixmap = tilemap_get_pixmap(state->m_fg_tilemap);
 	const UINT8 *bgcolor = screen.machine().region("gfx3")->base();
 	const UINT8 *prom_base = screen.machine().region("proms")->base();
 	const UINT8 *pr5194 = prom_base + 0x000;

@@ -301,7 +301,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int bank )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank )
 {
 	contra_state *state = machine.driver_data<contra_state>();
 	device_t *k007121 = bank ? state->m_k007121_2 : state->m_k007121_1;
@@ -316,7 +316,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	k007121_sprites_draw(k007121, bitmap, cliprect, machine.gfx[bank], machine.colortable, source, base_color, 40, 0, (UINT32)-1);
 }
 
-SCREEN_UPDATE( contra )
+SCREEN_UPDATE_IND16( contra )
 {
 	contra_state *state = screen.machine().driver_data<contra_state>();
 	UINT8 ctrl_1_0 = k007121_ctrlram_r(state->m_k007121_1, 0);

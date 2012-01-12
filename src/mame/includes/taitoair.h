@@ -44,20 +44,20 @@ public:
 	UINT16 *      m_gradram;
 	UINT16 *      m_backregs;
 
-	bitmap_t *m_framebuffer[2];
+	bitmap_ind16 *m_framebuffer[2];
 
     /* 3d info */
     INT16 m_frustumLeft;
     INT16 m_frustumBottom;
     INT16 m_eyecoordBuffer[4];  /* homogeneous */
 
-    //bitmap_t *m_buffer3d;
+    //bitmap_ind16 *m_buffer3d;
 };
 
 
 /*----------- defined in video/taitoair.c -----------*/
 
-SCREEN_UPDATE( taitoair );
+SCREEN_UPDATE_IND16( taitoair );
 VIDEO_START( taitoair );
 
 WRITE16_HANDLER( dsp_flags_w );

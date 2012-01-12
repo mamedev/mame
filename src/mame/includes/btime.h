@@ -22,7 +22,7 @@ public:
 	size_t   m_bnj_backgroundram_size;
 
 	/* video-related */
-	bitmap_t *m_background_bitmap;
+	bitmap_ind16 *m_background_bitmap;
 	UINT8    m_btime_palette;
 	UINT8    m_bnj_scroll1;
 	UINT8    m_bnj_scroll2;
@@ -59,13 +59,13 @@ PALETTE_INIT( lnc );
 VIDEO_START( btime );
 VIDEO_START( bnj );
 
-SCREEN_UPDATE( btime );
-SCREEN_UPDATE( cookrace );
-SCREEN_UPDATE( bnj );
-SCREEN_UPDATE( lnc );
-SCREEN_UPDATE( zoar );
-SCREEN_UPDATE( disco );
-SCREEN_UPDATE( eggs );
+SCREEN_UPDATE_IND16( btime );
+SCREEN_UPDATE_IND16( cookrace );
+SCREEN_UPDATE_IND16( bnj );
+SCREEN_UPDATE_IND16( lnc );
+SCREEN_UPDATE_IND16( zoar );
+SCREEN_UPDATE_IND16( disco );
+SCREEN_UPDATE_IND16( eggs );
 
 WRITE8_HANDLER( btime_paletteram_w );
 WRITE8_HANDLER( bnj_background_w );

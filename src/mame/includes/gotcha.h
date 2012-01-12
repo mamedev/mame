@@ -33,7 +33,7 @@ public:
 
 
 VIDEO_START( gotcha );
-SCREEN_UPDATE( gotcha );
+SCREEN_UPDATE_IND16( gotcha );
 
 WRITE16_HANDLER( gotcha_fgvideoram_w );
 WRITE16_HANDLER( gotcha_bgvideoram_w );

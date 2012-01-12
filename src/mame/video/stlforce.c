@@ -99,7 +99,7 @@ WRITE16_HANDLER( stlforce_tx_videoram_w )
 
 /* sprites - quite a bit still needs doing .. */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	stlforce_state *state = machine.driver_data<stlforce_state>();
 	const UINT16 *source = state->m_spriteram+0x0;
@@ -131,7 +131,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( stlforce )
+SCREEN_UPDATE_IND16( stlforce )
 {
 	stlforce_state *state = screen.machine().driver_data<stlforce_state>();
 	int i;

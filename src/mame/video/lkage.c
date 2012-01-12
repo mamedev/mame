@@ -104,7 +104,7 @@ VIDEO_START( lkage )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
 	const UINT8 *source = state->m_spriteram;
@@ -172,7 +172,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( lkage )
+SCREEN_UPDATE_IND16( lkage )
 {
 	lkage_state *state = screen.machine().driver_data<lkage_state>();
 	int bank;

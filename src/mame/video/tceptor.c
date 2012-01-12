@@ -394,7 +394,7 @@ VIDEO_START( tceptor )
 	decode_sprite32(machine, "gfx4");
 
 	/* allocate temp bitmaps */
-	state->m_temp_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_temp_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 
 	namco_road_init(machine, gfx_index);
 
@@ -440,7 +440,7 @@ VIDEO_START( tceptor )
     z: zoom y
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int sprite_priority)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority)
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
 	UINT16 *mem1 = &state->m_sprite_ram_buffered[0x000/2];
@@ -481,7 +481,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 			{
 				if (!need_mask)
 					// backup previous bitmap
-					copybitmap(*state->m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+					copybitmap(state->m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
 				need_mask = 1;
 			}
@@ -515,12 +515,12 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 				if (colortable_entry_get_value(machine.colortable, bitmap.pix16(y, x)) == SPR_MASK_COLOR)
 					// restore pixel
-					bitmap.pix16(y, x) = state->m_temp_bitmap->pix16(y, x);
+					bitmap.pix16(y, x) = state->m_temp_bitmap.pix16(y, x);
 	}
 }
 
 
-SCREEN_UPDATE( tceptor_2d )
+SCREEN_UPDATE_IND16( tceptor_2d )
 {
 	tceptor_state *state = screen.machine().driver_data<tceptor_state>();
 	rectangle rect;
@@ -552,18 +552,18 @@ SCREEN_UPDATE( tceptor_2d )
 	return 0;
 }
 
-SCREEN_UPDATE( tceptor_3d_left )
+SCREEN_UPDATE_IND16( tceptor_3d_left )
 {
 	if ((screen.frame_number() & 1) == 1)
 		return UPDATE_HAS_NOT_CHANGED;
-	return SCREEN_UPDATE_CALL( tceptor_2d );
+	return SCREEN_UPDATE16_CALL( tceptor_2d );
 }
 
-SCREEN_UPDATE( tceptor_3d_right )
+SCREEN_UPDATE_IND16( tceptor_3d_right )
 {
 	if ((screen.frame_number() & 1) == 0)
 		return UPDATE_HAS_NOT_CHANGED;
-	return SCREEN_UPDATE_CALL( tceptor_2d );
+	return SCREEN_UPDATE16_CALL( tceptor_2d );
 }
 
 

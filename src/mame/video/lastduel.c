@@ -218,7 +218,7 @@ WRITE16_HANDLER( lastduel_palette_word_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	lastduel_state *state = machine.driver_data<lastduel_state>();
 
@@ -269,7 +269,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( lastduel )
+SCREEN_UPDATE_IND16( lastduel )
 {
 	lastduel_state *state = screen.machine().driver_data<lastduel_state>();
 
@@ -282,7 +282,7 @@ SCREEN_UPDATE( lastduel )
 	return 0;
 }
 
-SCREEN_UPDATE( madgear )
+SCREEN_UPDATE_IND16( madgear )
 {
 	lastduel_state *state = screen.machine().driver_data<lastduel_state>();
 

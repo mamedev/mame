@@ -114,7 +114,7 @@ VIDEO_START( gamtor )
 
 }
 
-SCREEN_UPDATE(gamtor)
+SCREEN_UPDATE_IND16(gamtor)
 {
 	gaminator_state *state = screen.machine().driver_data<gaminator_state>();
 
@@ -201,10 +201,9 @@ static MACHINE_CONFIG_START( gaminator, gaminator_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(gamtor)
+	MCFG_SCREEN_UPDATE_STATIC(gamtor)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

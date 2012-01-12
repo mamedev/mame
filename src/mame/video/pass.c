@@ -57,7 +57,7 @@ VIDEO_START( pass )
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 255);
 }
 
-SCREEN_UPDATE( pass )
+SCREEN_UPDATE_IND16( pass )
 {
 	pass_state *state = screen.machine().driver_data<pass_state>();
 

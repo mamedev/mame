@@ -28,7 +28,7 @@ public:
 	tilemap_t       *m_bg_tilemap;
 	tilemap_t     *m_tx_tilemap;
 	UINT16        *m_sprite_temp_render;
-	bitmap_t      *m_tmppgmbitmap;
+	bitmap_rgb32      m_tmppgmbitmap;
 
 	/* misc */
 	// kov2
@@ -172,4 +172,4 @@ WRITE16_HANDLER( pgm_bg_videoram_w );
 
 VIDEO_START( pgm );
 SCREEN_EOF( pgm );
-SCREEN_UPDATE( pgm );
+SCREEN_UPDATE_IND16( pgm );

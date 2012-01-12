@@ -158,13 +158,13 @@ private:
 	int						prescale_size_x;			// prescale size x
 	int						prescale_size_y;			// prescale size y
 	int						preset;						// preset, if relevant
-	bitmap_t *				shadow_bitmap;				// shadow mask bitmap for post-processing shader
+	bitmap_argb32			shadow_bitmap;				// shadow mask bitmap for post-processing shader
 	d3d_texture_info *		shadow_texture;				// shadow mask texture for post-processing shader
 	int						registered_targets;			// number of registered HLSL targets (i.e., screens)
 	int						cyclic_target_idx;			// cyclic index of next HLSL target slot
 	hlsl_options *			options;					// current uniform state
 	avi_file *				avi_output_file;			// AVI file
-	bitmap_t *				avi_snap;					// AVI snapshot
+	bitmap_rgb32			avi_snap;					// AVI snapshot
 	int						avi_frame;					// AVI frame
 	attotime				avi_frame_period;			// AVI frame period
 	attotime				avi_next_frame_time;		// AVI next frame time

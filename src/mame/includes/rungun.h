@@ -48,4 +48,4 @@ WRITE16_HANDLER( rng_ttl_ram_w );
 WRITE16_HANDLER( rng_936_videoram_w );
 
 VIDEO_START( rng );
-SCREEN_UPDATE( rng );
+SCREEN_UPDATE_IND16( rng );

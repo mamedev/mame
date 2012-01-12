@@ -72,7 +72,7 @@ struct _mos6560_state
 
 	UINT8 reg[16];
 
-	bitmap_t *bitmap;
+	bitmap_ind16 *bitmap;
 
 	int rasterline, lastline;
 	double lightpenreadtime;
@@ -509,7 +509,7 @@ void mos6560_raster_interrupt_gen( device_t *device )
      main screen bitmap
 -------------------------------------------------*/
 
-UINT32 mos6560_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
+UINT32 mos6560_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 
@@ -808,7 +808,7 @@ static DEVICE_START( mos6560 )
 
 	mos6560->type = intf->type;
 
-	mos6560->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
+	mos6560->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
 
 	assert(intf->dma_read != NULL);
 	assert(intf->dma_read_color != NULL);

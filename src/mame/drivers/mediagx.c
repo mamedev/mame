@@ -201,7 +201,7 @@ static VIDEO_START(mediagx)
 	}
 }
 
-static void draw_char(bitmap_t &bitmap, const rectangle &cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	const UINT8 *dp;
@@ -227,7 +227,7 @@ static void draw_char(bitmap_t &bitmap, const rectangle &cliprect, const gfx_ele
 	}
 }
 
-static void draw_framebuffer(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
@@ -320,7 +320,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_t &bitmap, const r
 	}
 }
 
-static void draw_cga(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_cga(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
@@ -344,7 +344,7 @@ static void draw_cga(running_machine &machine, bitmap_t &bitmap, const rectangle
 	}
 }
 
-static SCREEN_UPDATE(mediagx)
+static SCREEN_UPDATE_RGB32(mediagx)
 {
 	mediagx_state *state = screen.machine().driver_data<mediagx_state>();
 	bitmap.fill(0, cliprect);
@@ -1160,10 +1160,9 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_SCREEN_UPDATE(mediagx)
+	MCFG_SCREEN_UPDATE_STATIC(mediagx)
 
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(256)

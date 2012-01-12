@@ -359,13 +359,12 @@ render_texture::render_texture()
 	: m_manager(NULL),
 	  m_next(NULL),
 	  m_bitmap(NULL),
-	  m_palette(NULL),
 	  m_format(TEXFORMAT_ARGB32),
+	  m_bcglookup(NULL),
+	  m_bcglookup_entries(0),
 	  m_scaler(NULL),
 	  m_param(NULL),
-	  m_curseq(0),
-	  m_bcglookup(NULL),
-	  m_bcglookup_entries(0)
+	  m_curseq(0)
 {
 	m_sbounds.min_x = m_sbounds.min_y = m_sbounds.max_x = m_sbounds.max_y = 0;
 	memset(m_scaled, 0, sizeof(m_scaled));
@@ -390,8 +389,12 @@ render_texture::~render_texture()
 void render_texture::reset(render_manager &manager, texture_scaler_func scaler, void *param)
 {
 	m_manager = &manager;
-	m_scaler = scaler;
-	m_param = param;
+	if (scaler != NULL)
+	{
+		assert(m_format == TEXFORMAT_ARGB32);
+		m_scaler = scaler;
+		m_param = param;
+	}
 }
 
 
@@ -417,11 +420,6 @@ void render_texture::release()
 	m_format = TEXFORMAT_ARGB32;
 	m_curseq = 0;
 
-	// release palette references
-	if (m_palette != NULL)
-		palette_deref(m_palette);
-	m_palette = NULL;
-
 	// free any B/C/G lookup tables
 	auto_free(m_manager->machine(), m_bcglookup);
 	m_bcglookup = NULL;
@@ -433,32 +431,21 @@ void render_texture::release()
 //  set_bitmap - set a new source bitmap
 //-------------------------------------------------
 
-void render_texture::set_bitmap(bitmap_t *bitmap, const rectangle *sbounds, int format, palette_t *palette)
+void render_texture::set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, texture_format format)
 {
+	assert(bitmap.cliprect().contains(sbounds));
+
 	// ensure we have a valid palette for palettized modes
 	if (format == TEXFORMAT_PALETTE16 || format == TEXFORMAT_PALETTEA16)
-		assert(palette != NULL);
+		assert(bitmap.palette() != NULL);
 
 	// invalidate references to the old bitmap
-	if (bitmap != m_bitmap && m_bitmap != NULL)
+	if (&bitmap != m_bitmap && m_bitmap != NULL)
 		m_manager->invalidate_all(m_bitmap);
 
-	// if the palette is different, adjust references
-	if (palette != m_palette)
-	{
-		if (m_palette != NULL)
-			palette_deref(m_palette);
-		if (palette != NULL)
-			palette_ref(palette);
-	}
-
 	// set the new bitmap/palette
-	m_bitmap = bitmap;
-	m_sbounds.min_x = (sbounds != NULL) ? sbounds->min_x : 0;
-	m_sbounds.min_y = (sbounds != NULL) ? sbounds->min_y : 0;
-	m_sbounds.max_x = (sbounds != NULL) ? sbounds->max_x : (bitmap != NULL) ? bitmap->width() : 1000;
-	m_sbounds.max_y = (sbounds != NULL) ? sbounds->max_y : (bitmap != NULL) ? bitmap->height() : 1000;
-	m_palette = palette;
+	m_bitmap = &bitmap;
+	m_sbounds = sbounds;
 	m_format = format;
 
 	// invalidate all scaled versions
@@ -480,10 +467,11 @@ void render_texture::set_bitmap(bitmap_t *bitmap, const rectangle *sbounds, int 
 //  scaler
 //-------------------------------------------------
 
-void render_texture::hq_scale(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param)
+void render_texture::hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param)
 {
 	render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	render_resample_argb_bitmap_hq(&dest.pix32(0), dest.rowpixels(), dest.width(), dest.height(), &source, &sbounds, &color);
+	bitmap_argb32 sourcesub(source, sbounds);
+	render_resample_argb_bitmap_hq(dest, sourcesub, color);
 }
 
 
@@ -494,21 +482,20 @@ void render_texture::hq_scale(bitmap_t &dest, const bitmap_t &source, const rect
 bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist)
 {
 	// source width/height come from the source bounds
-	int swidth = m_sbounds.max_x - m_sbounds.min_x;
-	int sheight = m_sbounds.max_y - m_sbounds.min_y;
+	int swidth = m_sbounds.width();
+	int sheight = m_sbounds.height();
 
 	// ensure height/width are non-zero
 	if (dwidth < 1) dwidth = 1;
 	if (dheight < 1) dheight = 1;
 
 	// are we scaler-free? if so, just return the source bitmap
-	const rgb_t *palbase = (m_format == TEXFORMAT_PALETTE16 || m_format == TEXFORMAT_PALETTEA16) ? palette_entry_list_adjusted(m_palette) : NULL;
+	const rgb_t *palbase = (m_format == TEXFORMAT_PALETTE16 || m_format == TEXFORMAT_PALETTEA16) ? palette_entry_list_adjusted(m_bitmap->palette()) : NULL;
 	if (m_scaler == NULL || (m_bitmap != NULL && swidth == dwidth && sheight == dheight))
 	{
 		// add a reference and set up the source bitmap
 		primlist.add_reference(m_bitmap);
-		UINT8 bpp = (m_format == TEXFORMAT_PALETTE16 || m_format == TEXFORMAT_PALETTEA16 || m_format == TEXFORMAT_RGB15 || m_format == TEXFORMAT_YUY16) ? 16 : 32;
-		texinfo.base = &m_bitmap->pix8(m_sbounds.min_y * bpp / 8, m_sbounds.min_x * bpp / 8);
+		texinfo.base = m_bitmap->raw_pixptr(m_sbounds.min_y, m_sbounds.min_x);
 		texinfo.rowpixels = m_bitmap->rowpixels();
 		texinfo.width = swidth;
 		texinfo.height = sheight;
@@ -516,6 +503,9 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		texinfo.seqid = ++m_curseq;
 		return true;
 	}
+	
+	// make sure we can recover the original argb32 bitmap
+	bitmap_argb32 &srcbitmap = downcast<bitmap_argb32 &>(*m_bitmap);
 
 	// is it a size we already have?
 	scaled_texture *scaled = NULL;
@@ -549,11 +539,11 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		}
 
 		// allocate a new bitmap
-		scaled->bitmap = auto_alloc(m_manager->machine(), bitmap_t(dwidth, dheight, BITMAP_FORMAT_ARGB32));
+		scaled->bitmap = auto_alloc(m_manager->machine(), bitmap_argb32(dwidth, dheight));
 		scaled->seqid = ++m_curseq;
 
 		// let the scaler do the work
-		(*m_scaler)(*scaled->bitmap, *m_bitmap, m_sbounds, m_param);
+		(*m_scaler)(*scaled->bitmap, srcbitmap, m_sbounds, m_param);
 	}
 
 	// finally fill out the new info
@@ -585,18 +575,18 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 		case TEXFORMAT_PALETTEA16:
 
 			// if no adjustment necessary, return the raw palette
-			assert(m_palette != NULL);
-			adjusted = palette_entry_list_adjusted(m_palette);
+			assert(m_bitmap->palette() != NULL);
+			adjusted = palette_entry_list_adjusted(m_bitmap->palette());
 			if (!container.has_brightness_contrast_gamma_changes())
 				return adjusted;
 
 			// if this is the machine palette, return our precomputed adjusted palette
-			adjusted = container.bcg_lookup_table(m_format, m_palette);
+			adjusted = container.bcg_lookup_table(m_format, m_bitmap->palette());
 			if (adjusted != NULL)
 				return adjusted;
 
 			// otherwise, ensure we have memory allocated and compute the adjusted result ourself
-			numentries = palette_get_num_colors(m_palette) * palette_get_num_groups(m_palette);
+			numentries = palette_get_num_colors(m_bitmap->palette()) * palette_get_num_groups(m_bitmap->palette());
 			if (m_bcglookup == NULL || m_bcglookup_entries < numentries)
 			{
 				rgb_t *newlookup = auto_alloc_array(m_manager->machine(), rgb_t, numentries);
@@ -614,73 +604,14 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			}
 			return m_bcglookup;
 
-		case TEXFORMAT_RGB15:
-
-			// if no adjustment necessary, return NULL
-			if (!container.has_brightness_contrast_gamma_changes() && m_palette == NULL)
-				return NULL;
-
-			// if no palette, return the standard lookups
-			if (m_palette == NULL)
-				return container.bcg_lookup_table(m_format);
-
-			// otherwise, ensure we have memory allocated and compute the adjusted result ourself
-			assert(palette_get_num_colors(m_palette) == 32);
-			adjusted = palette_entry_list_adjusted(m_palette);
-			if (m_bcglookup == NULL || m_bcglookup_entries < 4 * 32)
-			{
-				rgb_t *newlookup = auto_alloc_array(m_manager->machine(), rgb_t, 4 * 32);
-				memcpy(newlookup, m_bcglookup, m_bcglookup_entries * sizeof(rgb_t));
-				auto_free(m_manager->machine(), m_bcglookup);
-				m_bcglookup = newlookup;
-				m_bcglookup_entries = 4 * 32;
-			}
-
-			// otherwise, return the 32-entry BCG lookups
-			for (int index = 0; index < 32; index++)
-			{
-				UINT8 val = container.apply_brightness_contrast_gamma(RGB_GREEN(adjusted[index]));
-				m_bcglookup[0x00 + index] = val << 0;
-				m_bcglookup[0x20 + index] = val << 8;
-				m_bcglookup[0x40 + index] = val << 16;
-				m_bcglookup[0x60 + index] = val << 24;
-			}
-			return m_bcglookup;
-
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
 
 			// if no adjustment necessary, return NULL
-			if (!container.has_brightness_contrast_gamma_changes() && m_palette == NULL)
+			if (!container.has_brightness_contrast_gamma_changes())
 				return NULL;
-
-			// if no palette, return the standard lookups
-			if (m_palette == NULL)
-				return container.bcg_lookup_table(m_format);
-
-			// otherwise, ensure we have memory allocated and compute the adjusted result ourself
-			assert(palette_get_num_colors(m_palette) == 256);
-			adjusted = palette_entry_list_adjusted(m_palette);
-			if (m_bcglookup == NULL || m_bcglookup_entries < 4 * 256)
-			{
-				rgb_t *newlookup = auto_alloc_array(m_manager->machine(), rgb_t, 4 * 256);
-				memcpy(newlookup, m_bcglookup, m_bcglookup_entries * sizeof(rgb_t));
-				auto_free(m_manager->machine(), m_bcglookup);
-				m_bcglookup = newlookup;
-				m_bcglookup_entries = 4 * 256;
-			}
-
-			// otherwise, return the 32-entry BCG lookups
-			for (int index = 0; index < 256; index++)
-			{
-				UINT8 val = container.apply_brightness_contrast_gamma(RGB_GREEN(adjusted[index]));
-				m_bcglookup[0x000 + index] = val << 0;
-				m_bcglookup[0x100 + index] = val << 8;
-				m_bcglookup[0x200 + index] = val << 16;
-				m_bcglookup[0x300 + index] = val << 24;
-			}
-			return m_bcglookup;
+			return container.bcg_lookup_table(m_format);
 
 		default:
 			assert(FALSE);
@@ -756,7 +687,7 @@ render_container::~render_container()
 //  container
 //-------------------------------------------------
 
-void render_container::set_overlay(bitmap_t *bitmap)
+void render_container::set_overlay(bitmap_argb32 *bitmap)
 {
 	// free any existing texture
 	m_manager.texture_free(m_overlaytexture);
@@ -766,7 +697,7 @@ void render_container::set_overlay(bitmap_t *bitmap)
 	if (m_overlaybitmap != NULL)
 	{
 		m_overlaytexture = m_manager.texture_alloc(render_container::overlay_scale);
-		m_overlaytexture->set_bitmap(bitmap, NULL, TEXFORMAT_ARGB32);
+		m_overlaytexture->set_bitmap(*bitmap, bitmap->cliprect(), TEXFORMAT_ARGB32);
 	}
 }
 
@@ -865,9 +796,6 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 		case TEXFORMAT_PALETTEA16:
 			return (palette != NULL && palette == palette_client_get_palette(m_palclient)) ? m_bcglookup : NULL;
 
-		case TEXFORMAT_RGB15:
-			return m_bcglookup32;
-
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
@@ -883,7 +811,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 //  overlay_scale - scaler for an overlay
 //-------------------------------------------------
 
-void render_container::overlay_scale(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param)
+void render_container::overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param)
 {
 	// simply replicate the source bitmap over the target
 	for (int y = 0; y < dest.height(); y++)
@@ -947,16 +875,6 @@ void render_container::recompute_lookups()
 		m_bcglookup256[i + 0x100] = adjustedval << 8;
 		m_bcglookup256[i + 0x200] = adjustedval << 16;
 		m_bcglookup256[i + 0x300] = adjustedval << 24;
-	}
-
-	// recompute the 32 entry lookup table
-	for (int i = 0; i < 0x20; i++)
-	{
-		UINT8 adjustedval = apply_brightness_contrast_gamma(pal5bit(i));
-		m_bcglookup32[i + 0x000] = adjustedval << 0;
-		m_bcglookup32[i + 0x020] = adjustedval << 8;
-		m_bcglookup32[i + 0x040] = adjustedval << 16;
-		m_bcglookup32[i + 0x060] = adjustedval << 24;
 	}
 
 	// recompute the palette entries
@@ -1336,7 +1254,7 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 	int screens_considered = 0;
 
 	// early exit in case we are called between device teardown and render teardown
-	if (m_manager.machine().devicelist().count() == 0)
+	if (m_manager.machine().phase() == MACHINE_PHASE_EXIT)
 	{
 		minwidth = 640;
 		minheight = 480;

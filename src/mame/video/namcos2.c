@@ -74,8 +74,8 @@ struct RozParam
 INLINE void
 DrawRozHelperBlock(const struct RozParam *rozInfo, int destx, int desty,
 	int srcx, int srcy, int width, int height,
-	bitmap_t &destbitmap, bitmap_t &flagsbitmap,
-	bitmap_t &srcbitmap, UINT32 size_mask)
+	bitmap_ind16 &destbitmap, bitmap_ind8 &flagsbitmap,
+	bitmap_ind16 &srcbitmap, UINT32 size_mask)
 {
 	int desty_end = desty + height;
 
@@ -123,7 +123,7 @@ DrawRozHelperBlock(const struct RozParam *rozInfo, int destx, int desty,
 
 static void
 DrawRozHelper(
-	bitmap_t &bitmap,
+	bitmap_ind16 &bitmap,
 	tilemap_t *tmap,
 	const rectangle &clip,
 	const struct RozParam *rozInfo )
@@ -162,8 +162,8 @@ DrawRozHelper(
 #define ROZ_BLOCK_SIZE 8
 
 		UINT32 size_mask = rozInfo->size - 1;
-		bitmap_t &srcbitmap = tilemap_get_pixmap(tmap);
-		bitmap_t &flagsbitmap = tilemap_get_flagsmap(tmap);
+		bitmap_ind16 &srcbitmap = tilemap_get_pixmap(tmap);
+		bitmap_ind8 &flagsbitmap = tilemap_get_flagsmap(tmap);
 		UINT32 srcx = (rozInfo->startx + (clip.min_x * rozInfo->incxx) +
 			(clip.min_y * rozInfo->incyx));
 		UINT32 srcy = (rozInfo->starty + (clip.min_x * rozInfo->incxy) +
@@ -245,7 +245,7 @@ DrawRozHelper(
 } /* DrawRozHelper */
 
 static void
-DrawROZ(bitmap_t &bitmap,const rectangle &cliprect)
+DrawROZ(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	const int xoffset = 38,yoffset = 0;
 	struct RozParam rozParam;
@@ -460,7 +460,7 @@ ApplyClip( rectangle &clip, const rectangle &cliprect )
 	clip &= cliprect;
 } /* ApplyClip */
 
-SCREEN_UPDATE( namcos2_default )
+SCREEN_UPDATE_IND16( namcos2_default )
 {
 	rectangle clip;
 	int pri;
@@ -497,7 +497,7 @@ VIDEO_START( finallap )
 	namco_road_init(machine, 3);
 }
 
-SCREEN_UPDATE( finallap )
+SCREEN_UPDATE_IND16( finallap )
 {
 	rectangle clip;
 	int pri;
@@ -534,7 +534,7 @@ VIDEO_START( luckywld )
 	}
 } /* luckywld */
 
-SCREEN_UPDATE( luckywld )
+SCREEN_UPDATE_IND16( luckywld )
 {
 	rectangle clip;
 	int pri;
@@ -567,7 +567,7 @@ VIDEO_START( sgunner )
 	namco_obj_init( machine, 0, 0x0, NULL );
 }
 
-SCREEN_UPDATE( sgunner )
+SCREEN_UPDATE_IND16( sgunner )
 {
 	rectangle clip;
 	int pri;
@@ -593,7 +593,7 @@ VIDEO_START( metlhawk )
 	namco_roz_init( machine, 1, "gfx5" );
 }
 
-SCREEN_UPDATE( metlhawk )
+SCREEN_UPDATE_IND16( metlhawk )
 {
 	rectangle clip;
 	int pri;

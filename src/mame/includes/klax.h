@@ -19,4 +19,4 @@ public:
 WRITE16_HANDLER( klax_latch_w );
 
 VIDEO_START( klax );
-SCREEN_UPDATE( klax );
+SCREEN_UPDATE_IND16( klax );

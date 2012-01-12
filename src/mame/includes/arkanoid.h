@@ -58,8 +58,8 @@ extern WRITE8_HANDLER( tetrsark_d008_w );
 extern WRITE8_HANDLER( hexa_d008_w );
 
 extern VIDEO_START( arkanoid );
-extern SCREEN_UPDATE( arkanoid );
-extern SCREEN_UPDATE( hexa );
+extern SCREEN_UPDATE_IND16( arkanoid );
+extern SCREEN_UPDATE_IND16( hexa );
 
 
 /*----------- defined in machine/arkanoid.c -----------*/

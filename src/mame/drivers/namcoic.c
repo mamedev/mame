@@ -89,7 +89,7 @@ namco_tilemap_init( running_machine &machine, int gfxbank, void *maskBaseAddr,
 } /* namco_tilemap_init */
 
 void
-namco_tilemap_draw( bitmap_t &bitmap, const rectangle &cliprect, int pri )
+namco_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	int i;
 	for( i=0; i<6; i++ )
@@ -266,7 +266,7 @@ WRITE32_HANDLER( namco_tilemapvideoram32_le_w )
 /**************************************************************************************/
 
 static void zdrawgfxzoom(
-		bitmap_t &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_ind16 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int scalex, int scaley, int zpos )
 {
@@ -338,7 +338,7 @@ static void zdrawgfxzoom(
 				if( ex>sx )
 				{ /* skip if inner loop doesn't draw anything */
 					int y;
-					bitmap_t &priority_bitmap = gfx->machine().priority_bitmap;
+					bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
 					if( priority_bitmap.valid() )
 					{
 						for( y=sy; y<ey; y++ )
@@ -407,8 +407,16 @@ static void zdrawgfxzoom(
 	}
 } /* zdrawgfxzoom */
 
+static void zdrawgfxzoom(
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
+		int scalex, int scaley, int zpos )
+{
+	/* nop */
+}
+
 void
-namcos2_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri, int control )
+namcos2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control )
 {
 	int offset = (control & 0x000f) * (128*4);
 	int loop;
@@ -488,7 +496,7 @@ namcos2_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle
 } /* namcos2_draw_sprites */
 
 void
-namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
+namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	/**
      * word#0
@@ -713,8 +721,9 @@ static int mGfxC355;	/* gfx bank for sprites */
  * 0x10000 sprite attr (page1)
  * 0x14000 sprite list (page1)
  */
+template<class _BitmapClass>
 static void
-draw_spriteC355(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, const UINT16 *pSource, int pri, int zpos )
+draw_spriteC355(running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, const UINT16 *pSource, int pri, int zpos )
 {
 	UINT16 *spriteram16 = machine.generic.spriteram.u16;
 	unsigned screen_height_remaining, screen_width_remaining;
@@ -920,9 +929,10 @@ namco_obj_init( running_machine &machine, int gfxbank, int palXOR, int (*codeToT
 	memset( mSpritePos,0x00,sizeof(mSpritePos) );
 } /* namcosC355_init */
 
+template<class _BitmapClass>
 static void
 DrawObjectList(running_machine &machine,
-		bitmap_t &bitmap,
+		_BitmapClass &bitmap,
 		const rectangle &cliprect,
 		int pri,
 		const UINT16 *pSpriteList16,
@@ -939,7 +949,25 @@ DrawObjectList(running_machine &machine,
 } /* DrawObjectList */
 
 void
-namco_obj_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
+namco_obj_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+{
+//  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
+	if( pri==0 )
+	{
+		machine.priority_bitmap.fill(0, cliprect );
+	}
+//  if( offs==0 )
+	{ /* boot */
+		DrawObjectList(machine, bitmap,cliprect,pri,&machine.generic.spriteram.u16[0x02000/2], &machine.generic.spriteram.u16[0x00000/2] );
+	}
+//  else
+	{
+		DrawObjectList(machine, bitmap,cliprect,pri,&machine.generic.spriteram.u16[0x14000/2], &machine.generic.spriteram.u16[0x10000/2] );
+	}
+} /* namco_obj_draw */
+
+void
+namco_obj_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri )
 {
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if( pri==0 )
@@ -1210,7 +1238,7 @@ UnpackRozParam( const UINT16 *pSource, struct RozParam *pRozParam )
 
 static void
 DrawRozHelper(
-	bitmap_t &bitmap,
+	bitmap_ind16 &bitmap,
 	tilemap_t *tmap,
 	const rectangle &clip,
 	const struct RozParam *rozInfo )
@@ -1221,8 +1249,8 @@ DrawRozHelper(
 	    (namcos2_gametype != NAMCOFL_FINAL_LAP_R))
 	{
 		UINT32 size_mask = rozInfo->size-1;
-		bitmap_t &srcbitmap = tilemap_get_pixmap( tmap );
-		bitmap_t &flagsbitmap = tilemap_get_flagsmap( tmap );
+		bitmap_ind16 &srcbitmap = tilemap_get_pixmap( tmap );
+		bitmap_ind8 &flagsbitmap = tilemap_get_flagsmap( tmap );
 		UINT32 startx = rozInfo->startx + clip.min_x * rozInfo->incxx + clip.min_y * rozInfo->incyx;
 		UINT32 starty = rozInfo->starty + clip.min_x * rozInfo->incxy + clip.min_y * rozInfo->incyy;
 		int sx = clip.min_x;
@@ -1268,7 +1296,7 @@ DrawRozHelper(
 } /* DrawRozHelper */
 
 static void
-DrawRozScanline( bitmap_t &bitmap, int line, int which, int pri, const rectangle &cliprect )
+DrawRozScanline( bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect )
 {
 	if( line>=cliprect.min_y && line<=cliprect.max_y )
 	{
@@ -1298,7 +1326,7 @@ DrawRozScanline( bitmap_t &bitmap, int line, int which, int pri, const rectangle
 } /* DrawRozScanline */
 
 void
-namco_roz_draw( bitmap_t &bitmap, const rectangle &cliprect, int pri )
+namco_roz_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	int mode = rozcontrol16[0]; /* 0x8000 or 0x1000 */
 	int which, special = 1;
@@ -1596,13 +1624,13 @@ namco_road_set_transparent_color(pen_t pen)
 }
 
 void
-namco_road_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
+namco_road_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	const UINT8 *clut = (const UINT8 *)machine.region("user3")->base();
 	unsigned yscroll;
 	int i;
 
-	bitmap_t &SourceBitmap = tilemap_get_pixmap(mpRoadTilemap);
+	bitmap_ind16 &SourceBitmap = tilemap_get_pixmap(mpRoadTilemap);
 	yscroll = mpRoadRAM[0x1fdfe/2];
 
 	for( i=cliprect.min_y; i<=cliprect.max_y; i++ )

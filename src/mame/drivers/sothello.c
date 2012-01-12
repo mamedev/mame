@@ -46,11 +46,13 @@ class sothello_state : public driver_device
 {
 public:
 	sothello_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_v9938(*this, "v9938") { }
 
 	int m_subcpu_status;
 	int m_soundcpu_busy;
 	int m_msm_data;
+	required_device<v9938_device> m_v9938;
 };
 
 
@@ -139,10 +141,7 @@ static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8 )
     AM_RANGE( 0x50, 0x50) AM_WRITE(bank_w)
     AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 						/* not sure, but the A1 line is ignored, code @ $8b8 */
-    AM_RANGE( 0x70, 0x70) AM_WRITE( v9938_0_vram_w ) AM_READ( v9938_0_vram_r )
-    AM_RANGE( 0x71, 0x71) AM_WRITE( v9938_0_command_w ) AM_READ( v9938_0_status_r )
-    AM_RANGE( 0x72, 0x72) AM_WRITE( v9938_0_palette_w )
-    AM_RANGE( 0x73, 0x73) AM_WRITE( v9938_0_register_w )
+    AM_RANGE( 0x70, 0x73) AM_DEVREADWRITE_MODERN( "v9938", v9938_device, read, write )
 ADDRESS_MAP_END
 
 /* sound Z80 */
@@ -311,14 +310,15 @@ static void irqhandler(device_t *device, int irq)
     cputag_set_input_line(device->machine(), "sub", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void sothello_vdp_interrupt(running_machine &machine, int i)
+static void sothello_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-    cputag_set_input_line(machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+    cputag_set_input_line(device.machine(), "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static TIMER_DEVICE_CALLBACK( sothello_interrupt )
 {
-    v9938_interrupt(timer.machine(), 0);
+	sothello_state *state = timer.machine().driver_data<sothello_state>();
+    state->m_v9938->interrupt();
 }
 
 static void adpcm_int(device_t *device)
@@ -336,15 +336,8 @@ static const msm5205_interface msm_interface =
     MSM5205_S48_4B  /* changed on the fly */
 };
 
-static VIDEO_START( sothello )
-{
-    v9938_init (machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(), MODEL_V9938, VDP_MEM, sothello_vdp_interrupt);
-    v9938_reset(0);
-}
-
 static MACHINE_RESET(sothello)
 {
-    v9938_reset(0);
 }
 
 static const ym2203_interface ym2203_config =
@@ -380,16 +373,18 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 
     MCFG_MACHINE_RESET(sothello)
 
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(sothello_vdp_interrupt)
+
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
     MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
     MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
     MCFG_PALETTE_LENGTH(512)
     MCFG_PALETTE_INIT( v9938 )
-    MCFG_VIDEO_START(sothello)
 
     /* sound hardware */
     MCFG_SPEAKER_STANDARD_MONO("mono")

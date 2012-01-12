@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "includes/gottlieb.h"
-#include "machine/laserdsc.h"
 #include "video/resnet.h"
 
 
@@ -75,7 +74,6 @@ WRITE8_HANDLER( gottlieb_video_control_w )
 WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 {
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
-	device_t *laserdisc = space->machine().devicelist().first(PIONEER_PR8210);
 
 	/* bit 0 works like the other games */
 	gottlieb_video_control_w(space, offset, data & 0x01);
@@ -85,8 +83,8 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 
 	/* bit 2 video enable (0 = black screen) */
 	/* bit 3 genlock control (1 = show laserdisc image) */
-	laserdisc_overlay_enable(laserdisc, (data & 0x04) ? TRUE : FALSE);
-	laserdisc_video_enable(laserdisc, ((data & 0x0c) == 0x0c) ? TRUE : FALSE);
+	state->m_laserdisc->overlay_enable((data & 0x04) ? TRUE : FALSE);
+	state->m_laserdisc->video_enable(((data & 0x0c) == 0x0c) ? TRUE : FALSE);
 
 	/* configure the palette if the laserdisc is enabled */
 	state->m_transparent0 = (data >> 3) & 1;
@@ -213,7 +211,7 @@ VIDEO_START( screwloo )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -251,7 +249,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
  *
  *************************************/
 
-SCREEN_UPDATE( gottlieb )
+SCREEN_UPDATE_IND16( gottlieb )
 {
 	gottlieb_state *state = screen.machine().driver_data<gottlieb_state>();
 	/* if the background has lower priority, render it first, else clear the screen */

@@ -152,5 +152,5 @@ SCREEN_EOF( toaplan1 );
 SCREEN_EOF( samesame );
 VIDEO_START( rallybik );
 VIDEO_START( toaplan1 );
-SCREEN_UPDATE( rallybik );
-SCREEN_UPDATE( toaplan1 );
+SCREEN_UPDATE_IND16( rallybik );
+SCREEN_UPDATE_IND16( toaplan1 );

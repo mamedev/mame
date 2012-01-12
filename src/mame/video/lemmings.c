@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "includes/lemmings.h"
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri )
 {
 	int offs;
 
@@ -87,7 +87,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( lemmings )
 {
 	lemmings_state *state = machine.driver_data<lemmings_state>();
-	state->m_bitmap0 = auto_bitmap_alloc(machine, 2048, 256, machine.primary_screen->format());
+	state->m_bitmap0 = auto_bitmap_ind16_alloc(machine, 2048, 256);
 	state->m_vram_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
 
 	state->m_vram_buffer = auto_alloc_array(machine, UINT8, 2048 * 64); /* 64 bytes per VRAM character */
@@ -166,7 +166,7 @@ WRITE16_HANDLER( lemmings_vram_w )
 	tilemap_mark_tile_dirty(state->m_vram_tilemap, offset);
 }
 
-SCREEN_UPDATE( lemmings )
+SCREEN_UPDATE_IND16( lemmings )
 {
 	lemmings_state *state = screen.machine().driver_data<lemmings_state>();
 	int x1 = -state->m_control_data[0];

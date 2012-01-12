@@ -923,7 +923,7 @@ static const poly_draw_scanline_func render_funcs[8] =
 	model2_3d_render_7	/* checker = 1, textured = 1, translucent = 1 */
 };
 
-static void model2_3d_render( model2_state *state, bitmap_t &bitmap, triangle *tri, const rectangle &cliprect )
+static void model2_3d_render( model2_state *state, bitmap_rgb32 &bitmap, triangle *tri, const rectangle &cliprect )
 {
 	poly_manager *poly = state->m_poly;
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
@@ -1022,7 +1022,7 @@ static void model2_3d_frame_start( model2_state *state )
 	raster->max_z = 0;
 }
 
-static void model2_3d_frame_end( model2_state *state, bitmap_t &bitmap, const rectangle &cliprect )
+static void model2_3d_frame_end( model2_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	raster_state *raster = state->m_raster;
 	INT32		z;
@@ -2715,7 +2715,7 @@ VIDEO_START(model2)
 	int	width = visarea.max_x - visarea.min_x;
 	int	height = visarea.max_y - visarea.min_y;
 
-	state->m_sys24_bitmap = auto_alloc(machine, bitmap_t(width, height+4, BITMAP_FORMAT_INDEXED16));
+	state->m_sys24_bitmap.allocate(width, height+4);
 
 	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model2_exit), &machine));
@@ -2727,38 +2727,21 @@ VIDEO_START(model2)
 	geo_init( machine, (UINT32*)machine.region("user2")->base() );
 }
 
-static void convert_bitmap( running_machine &machine, bitmap_t &dst, bitmap_t &src, const rectangle &rect )
-{
-	int	x, y;
-
-	for( y = rect.min_y; y < rect.max_y; y++ )
-	{
-		UINT32 *d = &dst.pix32(y);
-		UINT16 *s = &src.pix16(y);
-
-		for( x = rect.min_x; x < rect.max_x; x++ )
-		{
-			if ( s[x] )
-				d[x] = machine.pens[s[x]];
-		}
-	}
-}
-
-SCREEN_UPDATE(model2)
+SCREEN_UPDATE_RGB32(model2)
 {
 	model2_state *state = screen.machine().driver_data<model2_state>();
 	logerror("--- frame ---\n");
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
-	state->m_sys24_bitmap->fill(0, cliprect);
+	state->m_sys24_bitmap.fill(0, cliprect);
 
 	segas24_tile *tile = screen.machine().device<segas24_tile>("tile");
-	tile->draw(*state->m_sys24_bitmap, cliprect, 7, 0, 0);
-	tile->draw(*state->m_sys24_bitmap, cliprect, 6, 0, 0);
-	tile->draw(*state->m_sys24_bitmap, cliprect, 5, 0, 0);
-	tile->draw(*state->m_sys24_bitmap, cliprect, 4, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 7, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 6, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 5, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 4, 0, 0);
 
-	convert_bitmap(screen.machine(), bitmap, *state->m_sys24_bitmap, cliprect);
+	copybitmap_trans(bitmap, state->m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	/* tell the rasterizer we're starting a frame */
 	model2_3d_frame_start(state);
@@ -2769,13 +2752,13 @@ SCREEN_UPDATE(model2)
 	/* have the rasterizer output the frame */
 	model2_3d_frame_end( state, bitmap, cliprect );
 
-	state->m_sys24_bitmap->fill(0, cliprect);
-	tile->draw(*state->m_sys24_bitmap, cliprect, 3, 0, 0);
-	tile->draw(*state->m_sys24_bitmap, cliprect, 2, 0, 0);
-	tile->draw(*state->m_sys24_bitmap, cliprect, 1, 0, 0);
-	tile->draw(*state->m_sys24_bitmap, cliprect, 0, 0, 0);
+	state->m_sys24_bitmap.fill(0, cliprect);
+	tile->draw(state->m_sys24_bitmap, cliprect, 3, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 2, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 1, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 0, 0, 0);
 
-	convert_bitmap(screen.machine(), bitmap, *state->m_sys24_bitmap, cliprect);
+	copybitmap_trans(bitmap, state->m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }

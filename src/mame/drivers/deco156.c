@@ -56,7 +56,7 @@ static VIDEO_START( wcvol95 )
 }
 
 
-static SCREEN_UPDATE( wcvol95 )
+static SCREEN_UPDATE_RGB32( wcvol95 )
 {
 	//FIXME: flip_screen_x should not be written!
 	flip_screen_set_no_update(screen.machine(), 1);
@@ -69,7 +69,7 @@ static SCREEN_UPDATE( wcvol95 )
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, 0x800);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x800);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -350,10 +350,9 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(wcvol95)
+	MCFG_SCREEN_UPDATE_STATIC(wcvol95)
 
 	MCFG_GFXDECODE(hvysmsh)
 	MCFG_PALETTE_LENGTH(1024)
@@ -389,10 +388,9 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(wcvol95)
+	MCFG_SCREEN_UPDATE_STATIC(wcvol95)
 
 	MCFG_GFXDECODE(hvysmsh)
 	MCFG_PALETTE_LENGTH(1024)

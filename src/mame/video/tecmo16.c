@@ -63,11 +63,11 @@ VIDEO_START( fstarfrc )
 	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
-	state->m_tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	state->m_tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_tile_bitmap_bg.allocate(width, height);
+	state->m_tile_bitmap_fg.allocate(width, height);
 
 	/* set up sprites */
-	state->m_sprite_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_sprite_bitmap.allocate(width, height);
 
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,32,32);
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,32,32);
@@ -89,11 +89,11 @@ VIDEO_START( ginkun )
 	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
-	state->m_tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	state->m_tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_tile_bitmap_bg.allocate(width, height);
+	state->m_tile_bitmap_fg.allocate(width, height);
 
 	/* set up sprites */
-	state->m_sprite_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_sprite_bitmap.allocate(width, height);
 
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
@@ -113,11 +113,11 @@ VIDEO_START( riot )
 	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
-	state->m_tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	state->m_tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_tile_bitmap_bg.allocate(width, height);
+	state->m_tile_bitmap_fg.allocate(width, height);
 
 	/* set up sprites */
-	state->m_sprite_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_sprite_bitmap.allocate(width, height);
 
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
@@ -224,7 +224,7 @@ WRITE16_HANDLER( tecmo16_scroll_char_y_w )
 
 /* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
 static void blendbitmaps(running_machine &machine,
-		bitmap_t &dest,bitmap_t &src1,bitmap_t &src2,bitmap_t &src3,
+		bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,bitmap_ind16 &src3,
 		int sx,int sy,const rectangle &clip)
 {
 	int ox;
@@ -332,7 +332,7 @@ static void blendbitmaps(running_machine &machine,
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap_bg, bitmap_t &bitmap_fg, bitmap_t &bitmap_sp, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect)
 {
 	tecmo16_state *state = machine.driver_data<tecmo16_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
@@ -349,7 +349,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap_bg, bitmap_t
 		{42,43,46,47,58,59,62,63}
 	};
 
-	bitmap_t &bitmap = bitmap_bg;
+	bitmap_ind16 &bitmap = bitmap_bg;
 
 	for (offs = state->m_spriteram_size/2 - 8;offs >= 0;offs -= 8)
 	{
@@ -443,7 +443,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap_bg, bitmap_t
 			}
 			else
 			{
-				bitmap_t &bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
+				bitmap_ind16 &bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
 
 				for (y = 0;y < sizey;y++)
 				{
@@ -490,27 +490,27 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap_bg, bitmap_t
 
 /******************************************************************************/
 
-SCREEN_UPDATE( tecmo16 )
+SCREEN_UPDATE_RGB32( tecmo16 )
 {
 	tecmo16_state *state = screen.machine().driver_data<tecmo16_state>();
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_tile_bitmap_bg->fill(0x300, cliprect);
-	state->m_tile_bitmap_fg->fill(0, cliprect);
-	state->m_sprite_bitmap->fill(0, cliprect);
+	state->m_tile_bitmap_bg.fill(0x300, cliprect);
+	state->m_tile_bitmap_fg.fill(0, cliprect);
+	state->m_sprite_bitmap.fill(0, cliprect);
 
 	/* draw tilemaps into a 16-bit bitmap */
-	tilemap_draw(*state->m_tile_bitmap_bg, cliprect,state->m_bg_tilemap, 0, 1);
-	tilemap_draw(*state->m_tile_bitmap_fg, cliprect,state->m_fg_tilemap, 0, 2);
+	tilemap_draw(state->m_tile_bitmap_bg, cliprect,state->m_bg_tilemap, 0, 1);
+	tilemap_draw(state->m_tile_bitmap_fg, cliprect,state->m_fg_tilemap, 0, 2);
 	/* draw the blended tiles at a lower priority
        so sprites covered by them will still be drawn */
-	tilemap_draw(*state->m_tile_bitmap_fg, cliprect,state->m_fg_tilemap, 1, 0);
-	tilemap_draw(*state->m_tile_bitmap_fg, cliprect,state->m_tx_tilemap, 0, 4);
+	tilemap_draw(state->m_tile_bitmap_fg, cliprect,state->m_fg_tilemap, 1, 0);
+	tilemap_draw(state->m_tile_bitmap_fg, cliprect,state->m_tx_tilemap, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	draw_sprites(screen.machine(), *state->m_tile_bitmap_bg, *state->m_tile_bitmap_fg, *state->m_sprite_bitmap, cliprect);
+	draw_sprites(screen.machine(), state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, state->m_sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen.machine(), bitmap, *state->m_tile_bitmap_bg, *state->m_tile_bitmap_fg, *state->m_sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(screen.machine(), bitmap, state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, state->m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }

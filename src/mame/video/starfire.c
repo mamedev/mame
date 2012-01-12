@@ -19,7 +19,7 @@ VIDEO_START( starfire )
 {
 	starfire_state *state = machine.driver_data<starfire_state>();
 
-	state->m_starfire_screen = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_starfire_screen.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(starfire_scanline_callback));
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
 
@@ -250,14 +250,14 @@ static TIMER_CALLBACK( starfire_scanline_callback )
 		int data = pix[0];
 		int color = col[0];
 
-		state->m_starfire_screen->pix32(y, x + 0) = pens[color | ((data >> 2) & 0x20)];
-		state->m_starfire_screen->pix32(y, x + 1) = pens[color | ((data >> 1) & 0x20)];
-		state->m_starfire_screen->pix32(y, x + 2) = pens[color | ((data >> 0) & 0x20)];
-		state->m_starfire_screen->pix32(y, x + 3) = pens[color | ((data << 1) & 0x20)];
-		state->m_starfire_screen->pix32(y, x + 4) = pens[color | ((data << 2) & 0x20)];
-		state->m_starfire_screen->pix32(y, x + 5) = pens[color | ((data << 3) & 0x20)];
-		state->m_starfire_screen->pix32(y, x + 6) = pens[color | ((data << 4) & 0x20)];
-		state->m_starfire_screen->pix32(y, x + 7) = pens[color | ((data << 5) & 0x20)];
+		state->m_starfire_screen.pix32(y, x + 0) = pens[color | ((data >> 2) & 0x20)];
+		state->m_starfire_screen.pix32(y, x + 1) = pens[color | ((data >> 1) & 0x20)];
+		state->m_starfire_screen.pix32(y, x + 2) = pens[color | ((data >> 0) & 0x20)];
+		state->m_starfire_screen.pix32(y, x + 3) = pens[color | ((data << 1) & 0x20)];
+		state->m_starfire_screen.pix32(y, x + 4) = pens[color | ((data << 2) & 0x20)];
+		state->m_starfire_screen.pix32(y, x + 5) = pens[color | ((data << 3) & 0x20)];
+		state->m_starfire_screen.pix32(y, x + 6) = pens[color | ((data << 4) & 0x20)];
+		state->m_starfire_screen.pix32(y, x + 7) = pens[color | ((data << 5) & 0x20)];
 
 		pix += 256;
 		col += 256;
@@ -268,10 +268,10 @@ static TIMER_CALLBACK( starfire_scanline_callback )
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(y), y);
 }
 
-SCREEN_UPDATE( starfire )
+SCREEN_UPDATE_RGB32( starfire )
 {
 	starfire_state *state = screen.machine().driver_data<starfire_state>();
-    copybitmap(bitmap, *state->m_starfire_screen, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, state->m_starfire_screen, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

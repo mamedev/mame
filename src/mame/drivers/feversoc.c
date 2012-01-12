@@ -82,7 +82,7 @@ static VIDEO_START( feversoc )
 
 }
 
-static SCREEN_UPDATE( feversoc )
+static SCREEN_UPDATE_IND16( feversoc )
 {
 	feversoc_state *state = screen.machine().driver_data<feversoc_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -258,10 +258,9 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
-	MCFG_SCREEN_UPDATE(feversoc)
+	MCFG_SCREEN_UPDATE_STATIC(feversoc)
 
 	MCFG_GFXDECODE(feversoc)
 	MCFG_PALETTE_LENGTH(0x1000)

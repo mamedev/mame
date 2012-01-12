@@ -209,11 +209,10 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE(xybots)
+	MCFG_SCREEN_UPDATE_STATIC(xybots)
 
 	MCFG_VIDEO_START(xybots)
 

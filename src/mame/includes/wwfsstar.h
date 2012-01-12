@@ -18,6 +18,6 @@ public:
 /*----------- defined in video/wwfsstar.c -----------*/
 
 VIDEO_START( wwfsstar );
-SCREEN_UPDATE( wwfsstar );
+SCREEN_UPDATE_IND16( wwfsstar );
 WRITE16_HANDLER( wwfsstar_fg0_videoram_w );
 WRITE16_HANDLER( wwfsstar_bg0_videoram_w );

@@ -134,7 +134,7 @@ static WRITE8_HANDLER( spaceint_videoram_w )
  *
  *************************************/
 
-static void plot_byte( running_machine &machine, bitmap_t &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color )
+static void plot_byte( running_machine &machine, bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 	pen_t fore_pen = MAKE_RGB(pal1bit(color >> 0), pal1bit(color >> 2), pal1bit(color >> 1));
@@ -151,7 +151,7 @@ static void plot_byte( running_machine &machine, bitmap_t &bitmap, UINT8 y, UINT
 }
 
 
-static SCREEN_UPDATE( astinvad )
+static SCREEN_UPDATE_RGB32( astinvad )
 {
 	astinvad_state *state = screen.machine().driver_data<astinvad_state>();
 	const UINT8 *color_prom = screen.machine().region("proms")->base();
@@ -171,7 +171,7 @@ static SCREEN_UPDATE( astinvad )
 }
 
 
-static SCREEN_UPDATE( spaceint )
+static SCREEN_UPDATE_RGB32( spaceint )
 {
 	astinvad_state *state = screen.machine().driver_data<astinvad_state>();
 	const UINT8 *color_prom = screen.machine().region("proms")->base();
@@ -599,9 +599,8 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256)
-	MCFG_SCREEN_UPDATE(astinvad)
+	MCFG_SCREEN_UPDATE_STATIC(astinvad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -635,11 +634,10 @@ static MACHINE_CONFIG_START( spaceint, astinvad_state )
 	MCFG_VIDEO_START(spaceint)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE(spaceint)
+	MCFG_SCREEN_UPDATE_STATIC(spaceint)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

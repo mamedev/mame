@@ -36,7 +36,7 @@ public:
 
 /*----------- defined in video/xain.c -----------*/
 
-SCREEN_UPDATE( xain );
+SCREEN_UPDATE_IND16( xain );
 VIDEO_START( xain );
 WRITE8_HANDLER( xain_scrollxP0_w );
 WRITE8_HANDLER( xain_scrollyP0_w );

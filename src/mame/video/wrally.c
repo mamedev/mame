@@ -104,7 +104,7 @@ VIDEO_START( wrally )
     in the range 0x8-0xf are used.
 */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	wrally_state *state = machine.driver_data<wrally_state>();
 	int i, px, py;
@@ -176,7 +176,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 
 ***************************************************************************/
 
-SCREEN_UPDATE( wrally )
+SCREEN_UPDATE_IND16( wrally )
 {
 	wrally_state *state = screen.machine().driver_data<wrally_state>();
 	/* set scroll registers */

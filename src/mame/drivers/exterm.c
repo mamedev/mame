@@ -413,7 +413,8 @@ static const tms34010_config master_config =
 	"screen",					/* the screen operated on */
 	40000000/8,					/* pixel clock */
 	1,							/* pixels per clock */
-	exterm_scanline_update,		/* scanline updater */
+	exterm_scanline_update,		/* scanline updater (indexed16) */
+	NULL,						/* scanline updater (rgb32) */
 	NULL,						/* generate interrupt */
 	exterm_to_shiftreg_master,	/* write to shiftreg function */
 	exterm_from_shiftreg_master	/* read from shiftreg function */
@@ -425,7 +426,8 @@ static const tms34010_config slave_config =
 	"screen",					/* the screen operated on */
 	40000000/8,					/* pixel clock */
 	1,							/* pixels per clock */
-	NULL,						/* scanline updater */
+	NULL,						/* scanline updater (indexed16) */
+	NULL,						/* scanline updater (rgb32) */
 	NULL,						/* generate interrupt */
 	exterm_to_shiftreg_slave,	/* write to shiftreg function */
 	exterm_from_shiftreg_slave	/* read from shiftreg function */
@@ -466,9 +468,8 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 	MCFG_PALETTE_LENGTH(2048+32768)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)
-	MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE_STATIC(tms340x0_ind16)
 
 	MCFG_PALETTE_INIT(exterm)
 

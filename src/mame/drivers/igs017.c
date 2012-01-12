@@ -247,7 +247,7 @@ static VIDEO_START( igs017 )
 
 ***************************************************************************/
 
-static void draw_sprite(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
+static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
 	// prepare GfxElement on the fly
@@ -265,7 +265,7 @@ static void draw_sprite(running_machine &machine, bitmap_t &bitmap,const rectang
 				sx, sy, 0x1f	);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
 	UINT8 *s	=	state->m_spriteram;
@@ -301,7 +301,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap,const rectan
 }
 
 // A simple gfx viewer (toggle with T)
-static int debug_viewer(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static int debug_viewer(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
 	igs017_state *state = machine.driver_data<igs017_state>();
@@ -344,7 +344,7 @@ static int debug_viewer(running_machine &machine, bitmap_t &bitmap,const rectang
 	return 0;
 }
 
-static SCREEN_UPDATE( igs017 )
+static SCREEN_UPDATE_IND16( igs017 )
 {
 	igs017_state *state = screen.machine().driver_data<igs017_state>();
 	int layers_ctrl = -1;
@@ -2321,10 +2321,9 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE(igs017)
+	MCFG_SCREEN_UPDATE_STATIC(igs017)
 
 	MCFG_GFXDECODE(igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -2391,10 +2390,9 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE(igs017)
+	MCFG_SCREEN_UPDATE_STATIC(igs017)
 
 	MCFG_GFXDECODE(igs017_flipped)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -2436,10 +2434,9 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)	// VSync 60Hz, HSync 15.3kHz
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE(igs017)
+	MCFG_SCREEN_UPDATE_STATIC(igs017)
 
 	MCFG_GFXDECODE(igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -2492,10 +2489,9 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE(igs017)
+	MCFG_SCREEN_UPDATE_STATIC(igs017)
 
 	MCFG_GFXDECODE(igs017_swapped)
 	MCFG_PALETTE_LENGTH(0x100*2)
@@ -2526,10 +2522,9 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE(igs017)
+	MCFG_SCREEN_UPDATE_STATIC(igs017)
 
 	MCFG_GFXDECODE(igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)

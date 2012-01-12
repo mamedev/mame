@@ -39,4 +39,4 @@ WRITE16_HANDLER( pushman_videoram_w );
 
 VIDEO_START( pushman );
 
-SCREEN_UPDATE( pushman );
+SCREEN_UPDATE_IND16( pushman );

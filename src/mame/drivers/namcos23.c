@@ -1654,7 +1654,7 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 	float du = extent->param[1].dpdx;
 	float dv = extent->param[2].dpdx;
 	float dl = extent->param[3].dpdx;
-	bitmap_t *bitmap = (bitmap_t *)dest;
+	bitmap_rgb32 *bitmap = (bitmap_rgb32 *)dest;
 	UINT32 *img = &bitmap->pix32(scanline, extent->startx);
 
 	for(int x = extent->startx; x < extent->stopx; x++) {
@@ -2064,7 +2064,7 @@ static int render_poly_compare(const void *i1, const void *i2)
 	return p1->zkey < p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
 }
 
-static void render_flush(running_machine &machine, bitmap_t &bitmap)
+static void render_flush(running_machine &machine, bitmap_rgb32 &bitmap)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
 	render_t &render = state->m_render;
@@ -2088,7 +2088,7 @@ static void render_flush(running_machine &machine, bitmap_t &bitmap)
 	render.poly_count = 0;
 }
 
-static void render_run(running_machine &machine, bitmap_t &bitmap)
+static void render_run(running_machine &machine, bitmap_rgb32 &bitmap)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
 	render_t &render = state->m_render;
@@ -2133,7 +2133,7 @@ static VIDEO_START( ss23 )
 	state->m_render.polymgr = poly_alloc(machine, 10000, sizeof(namcos23_render_data), POLYFLAG_NO_WORK_QUEUE);
 }
 
-static SCREEN_UPDATE( ss23 )
+static SCREEN_UPDATE_RGB32( ss23 )
 {
 	namcos23_state *state = screen.machine().driver_data<namcos23_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -2897,10 +2897,9 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE(ss23)
+	MCFG_SCREEN_UPDATE_STATIC(ss23)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 
@@ -2943,10 +2942,9 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE(ss23)
+	MCFG_SCREEN_UPDATE_STATIC(ss23)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 
@@ -2985,10 +2983,9 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE(ss23)
+	MCFG_SCREEN_UPDATE_STATIC(ss23)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 

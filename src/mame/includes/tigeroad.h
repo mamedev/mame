@@ -18,5 +18,5 @@ WRITE16_HANDLER( tigeroad_videoram_w );
 WRITE16_HANDLER( tigeroad_videoctrl_w );
 WRITE16_HANDLER( tigeroad_scroll_w );
 VIDEO_START( tigeroad );
-SCREEN_UPDATE( tigeroad );
+SCREEN_UPDATE_IND16( tigeroad );
 SCREEN_EOF( tigeroad );

@@ -129,7 +129,7 @@ static VIDEO_START( vpoker )
 	state->m_videoram = auto_alloc_array(machine, UINT8, 0x200);
 }
 
-static SCREEN_UPDATE( vpoker )
+static SCREEN_UPDATE_IND16( vpoker )
 {
 	vpoker_state *state = screen.machine().driver_data<vpoker_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -659,11 +659,10 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
-	MCFG_SCREEN_UPDATE(vpoker)
+	MCFG_SCREEN_UPDATE_STATIC(vpoker)
 
 	MCFG_GFXDECODE(vpoker)
 	MCFG_PALETTE_LENGTH(8)

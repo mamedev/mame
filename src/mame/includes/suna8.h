@@ -61,4 +61,4 @@ WRITE8_HANDLER( brickzn_banked_paletteram_w );
 VIDEO_START( suna8_textdim0 );
 VIDEO_START( suna8_textdim8 );
 VIDEO_START( suna8_textdim12 );
-SCREEN_UPDATE( suna8 );
+SCREEN_UPDATE_IND16( suna8 );

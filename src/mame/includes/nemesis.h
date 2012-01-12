@@ -61,4 +61,4 @@ WRITE16_HANDLER( nemesis_colorram2_word_w );
 WRITE16_HANDLER( nemesis_charram_word_w );
 
 VIDEO_START( nemesis );
-SCREEN_UPDATE( nemesis );
+SCREEN_UPDATE_IND16( nemesis );

@@ -107,7 +107,7 @@ VIDEO_START( thief ){
 	state->m_coprocessor.context_ram = auto_alloc_array(machine, UINT8, 0x400 );
 }
 
-SCREEN_UPDATE( thief ){
+SCREEN_UPDATE_IND16( thief ){
 	thief_state *state = screen.machine().driver_data<thief_state>();
 	UINT8 *videoram = state->m_videoram;
 	UINT32 offs;

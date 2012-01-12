@@ -20,4 +20,4 @@ WRITE8_HANDLER( trucocl_videoram_w );
 WRITE8_HANDLER( trucocl_colorram_w );
 PALETTE_INIT( trucocl );
 VIDEO_START( trucocl );
-SCREEN_UPDATE( trucocl );
+SCREEN_UPDATE_IND16( trucocl );

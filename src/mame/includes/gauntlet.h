@@ -25,4 +25,4 @@ WRITE16_HANDLER( gauntlet_xscroll_w );
 WRITE16_HANDLER( gauntlet_yscroll_w );
 
 VIDEO_START( gauntlet );
-SCREEN_UPDATE( gauntlet );
+SCREEN_UPDATE_IND16( gauntlet );

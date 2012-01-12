@@ -8,8 +8,8 @@
 typedef void (*sys32_output_callback)(int which, UINT16 data);
 struct layer_info
 {
-	bitmap_t *	bitmap;
-	UINT8 *		transparent;
+	bitmap_ind16 *bitmap;
+	UINT8 *transparent;
 };
 
 
@@ -92,9 +92,9 @@ WRITE16_HANDLER( arescue_dsp_w );
 
 VIDEO_START(system32);
 VIDEO_START(multi32);
-SCREEN_UPDATE(system32);
-SCREEN_UPDATE(multi32_left);
-SCREEN_UPDATE(multi32_right);
+SCREEN_UPDATE_RGB32(system32);
+SCREEN_UPDATE_RGB32(multi32_left);
+SCREEN_UPDATE_RGB32(multi32_right);
 void system32_set_vblank(running_machine &machine, int state);
 
 READ16_HANDLER( system32_videoram_r );

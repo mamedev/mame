@@ -19,7 +19,7 @@ public:
 /*----------- defined in video/n64.c -----------*/
 
 extern VIDEO_START( n64 );
-extern SCREEN_UPDATE( n64 );
+extern SCREEN_UPDATE_RGB32( n64 );
 
 #define DACRATE_NTSC	(48681812)
 #define DACRATE_PAL	(49656530)

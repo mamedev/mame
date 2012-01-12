@@ -121,7 +121,7 @@ VIDEO_START( maniacsq )
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gaelco_state *state = machine.driver_data<gaelco_state>();
 	int i, x, y, ex, ey;
@@ -187,7 +187,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 
 ***************************************************************************/
 
-SCREEN_UPDATE( maniacsq )
+SCREEN_UPDATE_IND16( maniacsq )
 {
 	gaelco_state *state = screen.machine().driver_data<gaelco_state>();
 
@@ -216,7 +216,7 @@ SCREEN_UPDATE( maniacsq )
 	return 0;
 }
 
-SCREEN_UPDATE( bigkarnk )
+SCREEN_UPDATE_IND16( bigkarnk )
 {
 	gaelco_state *state = screen.machine().driver_data<gaelco_state>();
 

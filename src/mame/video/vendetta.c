@@ -52,7 +52,7 @@ void vendetta_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-SCREEN_UPDATE( vendetta )
+SCREEN_UPDATE_IND16( vendetta )
 {
 	vendetta_state *state = screen.machine().driver_data<vendetta_state>();
 	int layer[3];

@@ -18,7 +18,7 @@ public:
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
-	bitmap_t *m_tmpbitmap;
+	bitmap_ind16 m_tmpbitmap;
 	UINT8 m_palbank;
 	UINT8 m_priority;
 	UINT8 m_pixbank;
@@ -43,6 +43,6 @@ WRITE8_HANDLER( paradise_palbank_w );
 
 VIDEO_START( paradise );
 
-SCREEN_UPDATE( paradise );
-SCREEN_UPDATE( torus );
-SCREEN_UPDATE( madball );
+SCREEN_UPDATE_IND16( paradise );
+SCREEN_UPDATE_IND16( torus );
+SCREEN_UPDATE_IND16( madball );

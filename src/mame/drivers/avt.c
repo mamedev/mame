@@ -501,7 +501,7 @@ static VIDEO_START( avt )
 }
 
 
-static SCREEN_UPDATE( avt )
+static SCREEN_UPDATE_IND16( avt )
 {
 	avt_state *state = screen.machine().driver_data<avt_state>();
 	int x,y;
@@ -896,10 +896,9 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)	/* 240x224 (through CRTC) */
-	MCFG_SCREEN_UPDATE(avt)
+	MCFG_SCREEN_UPDATE_STATIC(avt)
 
 	MCFG_GFXDECODE(avt)
 

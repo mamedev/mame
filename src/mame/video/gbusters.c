@@ -47,7 +47,7 @@ VIDEO_START( gbusters )
 }
 
 
-SCREEN_UPDATE( gbusters )
+SCREEN_UPDATE_IND16( gbusters )
 {
 	gbusters_state *state = screen.machine().driver_data<gbusters_state>();
 

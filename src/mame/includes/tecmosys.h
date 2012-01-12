@@ -25,9 +25,9 @@ public:
 	UINT16* m_c80000regs;
 	UINT16* m_880000regs;
 	int m_spritelist;
-	bitmap_t *m_sprite_bitmap;
-	bitmap_t *m_tmp_tilemap_composebitmap;
-	bitmap_t *m_tmp_tilemap_renderbitmap;
+	bitmap_ind16 m_sprite_bitmap;
+	bitmap_ind16 m_tmp_tilemap_composebitmap;
+	bitmap_ind16 m_tmp_tilemap_renderbitmap;
 	tilemap_t *m_bg0tilemap;
 	tilemap_t *m_bg1tilemap;
 	tilemap_t *m_bg2tilemap;
@@ -60,5 +60,5 @@ WRITE16_HANDLER( bg0_tilemap_lineram_w );
 WRITE16_HANDLER( bg1_tilemap_lineram_w );
 WRITE16_HANDLER( bg2_tilemap_lineram_w );
 
-SCREEN_UPDATE(tecmosys);
+SCREEN_UPDATE_RGB32(tecmosys);
 VIDEO_START(tecmosys);

@@ -56,13 +56,13 @@ public:
 
 	UINT8 m_timer_adjusted;
 	UINT8 m_darkplnt_bullet_color;
-	void (*m_draw_bullets)(running_machine &,bitmap_t &,const rectangle &, int, int, int);	/* function to call to draw a bullet */
+	void (*m_draw_bullets)(running_machine &,bitmap_ind16 &,const rectangle &, int, int, int);	/* function to call to draw a bullet */
 
 	UINT8 m_background_enable;
 	UINT8 m_background_red;
 	UINT8 m_background_green;
 	UINT8 m_background_blue;
-	void (*m_draw_background)(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);	/* function to call to draw the background */
+	void (*m_draw_background)(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);	/* function to call to draw the background */
 	UINT16 m_rockclim_v;
 	UINT16 m_rockclim_h;
 	int m_dambustr_bg_split_line;
@@ -70,9 +70,9 @@ public:
 	int m_dambustr_bg_color_2;
 	int m_dambustr_bg_priority;
 	int m_dambustr_char_bank;
-	bitmap_t *m_dambustr_tmpbitmap;
+	bitmap_ind16 *m_dambustr_tmpbitmap;
 
-	void (*m_draw_stars)(running_machine &machine, bitmap_t &, const rectangle &);		/* function to call to draw the star layer */
+	void (*m_draw_stars)(running_machine &machine, bitmap_ind16 &, const rectangle &);		/* function to call to draw the star layer */
 	int m_stars_colors_start;
 	INT32 m_stars_scrollpos;
 	UINT8 m_stars_on;
@@ -142,10 +142,10 @@ VIDEO_START( racknrol );
 VIDEO_START( ad2083 );
 
 void galaxold_init_stars(running_machine &machine, int colors_offset);
-void galaxold_draw_stars(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
+void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-SCREEN_UPDATE( galaxold );
-SCREEN_UPDATE( dambustr );
+SCREEN_UPDATE_IND16( galaxold );
+SCREEN_UPDATE_IND16( dambustr );
 
 WRITE8_HANDLER( galaxold_gfxbank_w );
 WRITE8_HANDLER( galaxold_flip_screen_x_w );

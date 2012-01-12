@@ -71,4 +71,4 @@ WRITE8_HANDLER( mstworld_gfxctrl_w );
 WRITE8_HANDLER( mstworld_video_bank_w );
 
 VIDEO_START( pang );
-SCREEN_UPDATE( pang );
+SCREEN_UPDATE_IND16( pang );

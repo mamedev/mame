@@ -95,7 +95,7 @@ void crbaloon_set_clear_collision_address(running_machine &machine, int _crbaloo
 
 
 
-static void draw_sprite_and_check_collision(running_machine &machine, bitmap_t &bitmap)
+static void draw_sprite_and_check_collision(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	crbaloon_state *state = machine.driver_data<crbaloon_state>();
 	int y;
@@ -148,7 +148,7 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_t &
 }
 
 
-SCREEN_UPDATE( crbaloon )
+SCREEN_UPDATE_IND16( crbaloon )
 {
 	crbaloon_state *state = screen.machine().driver_data<crbaloon_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

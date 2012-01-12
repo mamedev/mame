@@ -46,4 +46,4 @@ extern void moo_tile_callback(running_machine &machine, int layer, int *code, in
 extern void moo_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 
 VIDEO_START(moo);
-SCREEN_UPDATE(moo);
+SCREEN_UPDATE_RGB32(moo);

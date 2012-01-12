@@ -123,8 +123,8 @@ INTERRUPT_GEN( getstar_interrupt );
 
 /*----------- defined in video/slapfght.c -----------*/
 
-SCREEN_UPDATE( slapfight );
-SCREEN_UPDATE( perfrman );
+SCREEN_UPDATE_IND16( slapfight );
+SCREEN_UPDATE_IND16( perfrman );
 VIDEO_START( slapfight );
 VIDEO_START( perfrman );
 

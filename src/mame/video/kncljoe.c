@@ -180,7 +180,7 @@ WRITE8_HANDLER( kncljoe_scroll_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	kncljoe_state *state = machine.driver_data<kncljoe_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -238,7 +238,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 		}
 }
 
-SCREEN_UPDATE( kncljoe )
+SCREEN_UPDATE_IND16( kncljoe )
 {
 	kncljoe_state *state = screen.machine().driver_data<kncljoe_state>();
 

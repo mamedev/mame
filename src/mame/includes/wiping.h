@@ -20,5 +20,5 @@ public:
 
 WRITE8_HANDLER( wiping_flipscreen_w );
 PALETTE_INIT( wiping );
-SCREEN_UPDATE( wiping );
+SCREEN_UPDATE_IND16( wiping );
 

@@ -44,5 +44,5 @@ extern WRITE16_HANDLER( ddragon3_scroll_w );
 extern READ16_HANDLER( ddragon3_scroll_r );
 
 extern VIDEO_START( ddragon3 );
-extern SCREEN_UPDATE( ddragon3 );
-extern SCREEN_UPDATE( ctribe );
+extern SCREEN_UPDATE_IND16( ddragon3 );
+extern SCREEN_UPDATE_IND16( ctribe );

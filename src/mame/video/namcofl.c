@@ -80,7 +80,7 @@ static void TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mas
 }
 
 
-SCREEN_UPDATE( namcofl )
+SCREEN_UPDATE_IND16( namcofl )
 {
 	int pri;
 

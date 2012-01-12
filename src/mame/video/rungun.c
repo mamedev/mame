@@ -103,7 +103,7 @@ VIDEO_START( rng )
 	state->m_sprite_colorbase = 0x20;
 }
 
-SCREEN_UPDATE(rng)
+SCREEN_UPDATE_IND16(rng)
 {
 	rungun_state *state = screen.machine().driver_data<rungun_state>();
 

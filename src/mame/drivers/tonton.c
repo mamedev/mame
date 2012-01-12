@@ -34,9 +34,10 @@ class tonton_state : public driver_device
 {
 public:
 	tonton_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-	bitmap_t *m_vdp0_bitmap;
+		: driver_device(mconfig, type, tag),
+		  m_v9938(*this, "v9938") { }
+	
+	required_device<v9938_device> m_v9938;
 };
 
 #define MAIN_CLOCK XTAL_21_4772MHz
@@ -55,27 +56,9 @@ public:
 *                Video Hardware                  *
 *************************************************/
 
-static void tonton_vdp0_interrupt(running_machine &machine, int i)
+static void tonton_vdp0_interrupt(device_t *, v99x8_device &device, int i)
 {
-	cputag_set_input_line (machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
-}
-
-static VIDEO_START( tonton )
-{
-	tonton_state *state = machine.driver_data<tonton_state>();
-	state->m_vdp0_bitmap = machine.primary_screen->alloc_compatible_bitmap();
-	v9938_init (machine, 0, *machine.primary_screen, *state->m_vdp0_bitmap, MODEL_V9938, 0x40000, tonton_vdp0_interrupt);
-	v9938_reset(0);
-}
-
-static SCREEN_UPDATE( tonton )
-{
-	tonton_state *state = screen.machine().driver_data<tonton_state>();
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-
-	copybitmap(bitmap, *state->m_vdp0_bitmap, 0, 0, 0, 0, cliprect);
-
-	return 0;
+	cputag_set_input_line (device.machine(), "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 
@@ -112,10 +95,7 @@ static ADDRESS_MAP_START( tonton_io, AS_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(tonton_outport_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x88, 0x88) AM_READWRITE( v9938_0_vram_r, v9938_0_vram_w )
-	AM_RANGE(0x89, 0x89) AM_READWRITE( v9938_0_status_r, v9938_0_command_w )
-	AM_RANGE(0x8a, 0x8a) AM_WRITE( v9938_0_palette_w )
-	AM_RANGE(0x8b, 0x8b) AM_WRITE( v9938_0_register_w )
+	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE_MODERN( "v9938", v9938_device, read, write )
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
@@ -210,7 +190,6 @@ static MACHINE_START( tonton )
 
 static MACHINE_RESET( tonton )
 {
-	v9938_reset(0);
 }
 
 
@@ -220,9 +199,10 @@ static MACHINE_RESET( tonton )
 
 static TIMER_DEVICE_CALLBACK( tonton_interrupt )
 {
-	v9938_set_sprite_limit(0, 0);
-	v9938_set_resolution(0, 0);
-	v9938_interrupt(timer.machine(), 0);
+	tonton_state *state = timer.machine().driver_data<tonton_state>();
+	state->m_v9938->set_sprite_limit(0);
+	state->m_v9938->set_resolution(0);
+	state->m_v9938->interrupt();
 }
 
 
@@ -280,19 +260,19 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
+	MCFG_V9938_ADD("v9938", "screen", 0x40000)
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(tonton_vdp0_interrupt)
+
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_UPDATE(tonton)
+	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT( v9938 )
-
-	MCFG_VIDEO_START(tonton)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -258,7 +258,7 @@ static VIDEO_START(gp98)
 }
 
 
-static SCREEN_UPDATE(jingbell)
+static SCREEN_UPDATE_IND16(jingbell)
 {
 	igs009_state *state = screen.machine().driver_data<igs009_state>();
 	int layers_ctrl = state->m_video_enable ? -1 : 0;
@@ -686,10 +686,9 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE(jingbell)
+	MCFG_SCREEN_UPDATE_STATIC(jingbell)
 
 	MCFG_GFXDECODE(jingbell)
 	MCFG_PALETTE_LENGTH(0x400)

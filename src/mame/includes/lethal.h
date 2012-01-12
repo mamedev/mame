@@ -37,4 +37,4 @@ extern void lethalen_tile_callback(running_machine &machine, int layer, int *cod
 WRITE8_HANDLER(lethalen_palette_control);
 
 VIDEO_START(lethalen);
-SCREEN_UPDATE(lethalen);
+SCREEN_UPDATE_IND16(lethalen);

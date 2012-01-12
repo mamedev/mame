@@ -125,7 +125,7 @@ WRITE8_HANDLER( mainsnk_bgram_w )
 
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int scrollx, int scrolly )
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly )
 {
 	mainsnk_state *state = machine.driver_data<mainsnk_state>();
 	const gfx_element *gfx = machine.gfx[1];
@@ -168,7 +168,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 }
 
 
-SCREEN_UPDATE(mainsnk)
+SCREEN_UPDATE_IND16(mainsnk)
 {
 	mainsnk_state *state = screen.machine().driver_data<mainsnk_state>();
 

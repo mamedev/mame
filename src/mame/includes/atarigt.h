@@ -22,8 +22,8 @@ public:
 	UINT8			m_is_primrage;
 	UINT16 *		m_colorram;
 
-	bitmap_t *		m_pf_bitmap;
-	bitmap_t *		m_an_bitmap;
+	bitmap_ind16 *		m_pf_bitmap;
+	bitmap_ind16 *		m_an_bitmap;
 
 	UINT8			m_playfield_tile_bank;
 	UINT8			m_playfield_color_bank;
@@ -56,6 +56,6 @@ UINT16 atarigt_colorram_r(atarigt_state *state, offs_t address);
 
 VIDEO_START( atarigt );
 SCREEN_EOF( atarigt );
-SCREEN_UPDATE( atarigt );
+SCREEN_UPDATE_RGB32( atarigt );
 
 void atarigt_scanline_update(screen_device &screen, int scanline);

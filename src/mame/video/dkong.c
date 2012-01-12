@@ -555,11 +555,11 @@ WRITE8_HANDLER( dkong_spritebank_w )
 
 /***************************************************************************
 
-  Draw the game screen in the given bitmap_t.
+  Draw the game screen in the given bitmap_ind16.
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32 mask_bank, UINT32 shift_bits)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 mask_bank, UINT32 shift_bits)
 {
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int offs;
@@ -805,7 +805,7 @@ static void radarscp_step(running_machine &machine, int line_cnt)
 
 }
 
-static void radarscp_draw_background(running_machine &machine, dkong_state *state, bitmap_t &bitmap, const rectangle &cliprect)
+static void radarscp_draw_background(running_machine &machine, dkong_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const UINT8 	*htable = NULL;
 	int 			x,y;
@@ -826,7 +826,7 @@ static void radarscp_draw_background(running_machine &machine, dkong_state *stat
 			if (state->m_hardware_type == HARDWARE_TRS01) /*  Check again from schematics */
 				draw_ok = draw_ok  && !((htable[ (!state->m_rflip_sig<<7) | (x>>2)] >>2) & 0x01);
 			if (draw_ok)
-				*pixel = *(&state->m_bg_bits->pix16(y, x));
+				*pixel = *(&state->m_bg_bits.pix16(y, x));
 			x++;
 		}
 		y++;
@@ -850,7 +850,7 @@ static void radarscp_scanline(running_machine &machine, int scanline)
 	x = 0;
 	while (x < machine.primary_screen->width())
 	{
-		pixel = &state->m_bg_bits->pix16(y, x);
+		pixel = &state->m_bg_bits.pix16(y, x);
 		if ((state->m_counter < table_len) && (x == 4 * (table[state->m_counter|offset] & 0x7f)))
 		{
 			if ( state->m_star_ff && (table[state->m_counter|offset] & 0x80) )	/* star */
@@ -947,7 +947,7 @@ VIDEO_START( dkong )
 	switch (state->m_hardware_type)
 	{
 		case HARDWARE_TRS02:
-			state->m_bg_bits = machine.primary_screen->alloc_compatible_bitmap();
+			state->m_bg_bits.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 			state->m_gfx3 = machine.region("gfx3")->base();
 			state->m_gfx3_len = machine.region("gfx3")->bytes();
 		    /* fall through */
@@ -960,7 +960,7 @@ VIDEO_START( dkong )
 			state->m_bg_tilemap = tilemap_create(machine, radarscp1_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 			tilemap_set_scrolldx(state->m_bg_tilemap, 0, 128);
 
-			state->m_bg_bits = machine.primary_screen->alloc_compatible_bitmap();
+			state->m_bg_bits.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 			state->m_gfx4 = machine.region("gfx4")->base();
 			state->m_gfx3 = machine.region("gfx3")->base();
 			state->m_gfx3_len = machine.region("gfx3")->bytes();
@@ -971,7 +971,7 @@ VIDEO_START( dkong )
 	}
 }
 
-SCREEN_UPDATE( dkong )
+SCREEN_UPDATE_IND16( dkong )
 {
 	dkong_state *state = screen.machine().driver_data<dkong_state>();
 
@@ -999,7 +999,7 @@ SCREEN_UPDATE( dkong )
 	return 0;
 }
 
-SCREEN_UPDATE( pestplce )
+SCREEN_UPDATE_IND16( pestplce )
 {
 	dkong_state *state = screen.machine().driver_data<dkong_state>();
 	int offs;
@@ -1021,7 +1021,7 @@ SCREEN_UPDATE( pestplce )
 	return 0;
 }
 
-SCREEN_UPDATE( spclforc )
+SCREEN_UPDATE_IND16( spclforc )
 {
 	dkong_state *state = screen.machine().driver_data<dkong_state>();
 

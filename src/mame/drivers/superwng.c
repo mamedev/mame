@@ -102,7 +102,7 @@ static VIDEO_START( superwng )
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, 64);
 }
 
-static SCREEN_UPDATE( superwng )
+static SCREEN_UPDATE_IND16( superwng )
 {
 	superwng_state *state = screen.machine().driver_data<superwng_state>();
 	int flip=flip_screen_get(screen.machine());
@@ -476,7 +476,6 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
@@ -485,7 +484,7 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 	MCFG_PALETTE_LENGTH(0x40)
 	MCFG_PALETTE_INIT(superwng)
 	MCFG_VIDEO_START( superwng )
-	MCFG_SCREEN_UPDATE(superwng)
+	MCFG_SCREEN_UPDATE_STATIC(superwng)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

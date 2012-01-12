@@ -268,7 +268,7 @@ void neogeo_set_fixed_layer_source( running_machine &machine, UINT8 data )
 }
 
 
-static void draw_fixed_layer( running_machine &machine, bitmap_t &bitmap, int scanline )
+static void draw_fixed_layer( running_machine &machine, bitmap_rgb32 &bitmap, int scanline )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int x;
@@ -401,7 +401,7 @@ INLINE int sprite_on_scanline(int scanline, int y, int rows)
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, int scanline )
+static void draw_sprites( running_machine &machine, bitmap_rgb32 &bitmap, int scanline )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int sprite_index;
@@ -920,7 +920,7 @@ VIDEO_RESET( neogeo )
  *
  *************************************/
 
-SCREEN_UPDATE( neogeo )
+SCREEN_UPDATE_RGB32( neogeo )
 {
 	neogeo_state *state = screen.machine().driver_data<neogeo_state>();
 

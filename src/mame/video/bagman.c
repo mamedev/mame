@@ -111,7 +111,7 @@ VIDEO_START( bagman )
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bagman_state *state = machine.driver_data<bagman_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -146,7 +146,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
 	}
 }
 
-SCREEN_UPDATE( bagman )
+SCREEN_UPDATE_IND16( bagman )
 {
 	bagman_state *state = screen.machine().driver_data<bagman_state>();
 	bitmap.fill(0, cliprect);

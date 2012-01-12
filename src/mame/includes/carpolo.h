@@ -40,11 +40,11 @@ public:
 	ttl7474_device *m_ttl7474_1c_2;
 	ttl7474_device *m_ttl7474_1a_1;
 	ttl7474_device *m_ttl7474_1a_2;
-	bitmap_t *m_sprite_sprite_collision_bitmap1;
-	bitmap_t *m_sprite_sprite_collision_bitmap2;
-	bitmap_t *m_sprite_goal_collision_bitmap1;
-	bitmap_t *m_sprite_goal_collision_bitmap2;
-	bitmap_t *m_sprite_border_collision_bitmap;
+	bitmap_ind16 *m_sprite_sprite_collision_bitmap1;
+	bitmap_ind16 *m_sprite_sprite_collision_bitmap2;
+	bitmap_ind16 *m_sprite_goal_collision_bitmap1;
+	bitmap_ind16 *m_sprite_goal_collision_bitmap2;
+	bitmap_ind16 *m_sprite_border_collision_bitmap;
 };
 
 
@@ -93,5 +93,5 @@ void carpolo_generate_car_border_interrupt(running_machine &machine, int car, in
 
 PALETTE_INIT( carpolo );
 VIDEO_START( carpolo );
-SCREEN_UPDATE( carpolo );
+SCREEN_UPDATE_IND16( carpolo );
 SCREEN_EOF( carpolo );

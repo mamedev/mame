@@ -24,6 +24,6 @@ public:
 /*----------- defined in video/atetris.c -----------*/
 
 VIDEO_START( atetris );
-SCREEN_UPDATE( atetris );
+SCREEN_UPDATE_IND16( atetris );
 
 WRITE8_HANDLER( atetris_videoram_w );

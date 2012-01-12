@@ -247,7 +247,7 @@ VIDEO_START( bwing )
 //****************************************************************************
 // Realtime
 
-static void draw_sprites( running_machine &machine, bitmap_t &bmp, const rectangle &clip, UINT8 *ram, int pri )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bmp, const rectangle &clip, UINT8 *ram, int pri )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
 	int attrib, fx, fy, code, x, y, color, i;
@@ -289,7 +289,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bmp, const rectang
 }
 
 
-SCREEN_UPDATE( bwing )
+SCREEN_UPDATE_IND16( bwing )
 {
 	bwing_state *state = screen.machine().driver_data<bwing_state>();
 	unsigned x, y, shiftx;

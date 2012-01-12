@@ -180,10 +180,10 @@ void atarig42_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-SCREEN_UPDATE( atarig42 )
+SCREEN_UPDATE_IND16( atarig42 )
 {
 	atarig42_state *state = screen.machine().driver_data<atarig42_state>();
-	bitmap_t &priority_bitmap = screen.machine().priority_bitmap;
+	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
@@ -198,7 +198,7 @@ SCREEN_UPDATE( atarig42 )
 
 	/* copy the motion objects on top */
 	{
-		bitmap_t *mo_bitmap = atarirle_get_vram(state->m_rle, 0);
+		bitmap_ind16 *mo_bitmap = atarirle_get_vram(state->m_rle, 0);
 		int left	= cliprect.min_x;
 		int top		= cliprect.min_y;
 		int right	= cliprect.max_x + 1;

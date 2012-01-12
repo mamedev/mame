@@ -48,5 +48,5 @@ WRITE32_HANDLER( fuuki32_vram_2_w );
 WRITE32_HANDLER( fuuki32_vram_3_w );
 
 VIDEO_START( fuuki32 );
-SCREEN_UPDATE( fuuki32 );
+SCREEN_UPDATE_IND16( fuuki32 );
 SCREEN_EOF( fuuki32 );

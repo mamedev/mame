@@ -30,7 +30,7 @@ struct _ui_gfx_state
 
 	/* intermediate bitmaps */
 	UINT8			bitmap_dirty;		/* is the bitmap dirty? */
-	bitmap_t *		bitmap;				/* bitmap for drawing gfx and tilemaps */
+	bitmap_rgb32 *	bitmap;				/* bitmap for drawing gfx and tilemaps */
 	render_texture *texture;			/* texture for rendering the above bitmap */
 
 	/* palette-specific data */
@@ -84,7 +84,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 
 /* graphics set handling */
 static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, int xcells, int ycells);
-static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_t &bitmap, int dstx, int dsty, int color, int rotate);
+static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate);
 static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, int xcells, int ycells, gfx_element *gfx);
 static void gfxset_handler(running_machine &machine, render_container *container, ui_gfx_state *state);
 
@@ -700,9 +700,9 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 		global_free(state->bitmap);
 
 		/* allocate new stuff */
-		state->bitmap = global_alloc(bitmap_t(cellxpix * xcells, cellypix * ycells, BITMAP_FORMAT_ARGB32));
+		state->bitmap = global_alloc(bitmap_rgb32(cellxpix * xcells, cellypix * ycells));
 		state->texture = machine.render().texture_alloc();
-		state->texture->set_bitmap(state->bitmap, NULL, TEXFORMAT_ARGB32);
+		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_ARGB32);
 
 		/* force a redraw */
 		state->bitmap_dirty = TRUE;
@@ -750,7 +750,7 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 		}
 
 		/* reset the texture to force an update */
-		state->texture->set_bitmap(state->bitmap, NULL, TEXFORMAT_ARGB32);
+		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_ARGB32);
 		state->bitmap_dirty = FALSE;
 	}
 }
@@ -761,7 +761,7 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
     the view
 -------------------------------------------------*/
 
-static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_t &bitmap, int dstx, int dsty, int color, int rotate)
+static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate)
 {
 	static const pen_t default_palette[] =
 	{
@@ -1030,34 +1030,21 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state *state, i
 
 static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state, int width, int height)
 {
-	bitmap_format screen_format = machine.primary_screen->format();
-	palette_t *palette = NULL;
-	int screen_texformat;
-
-	/* convert the screen format to a texture format */
-	switch (screen_format)
-	{
-		case BITMAP_FORMAT_INDEXED16:	screen_texformat = TEXFORMAT_PALETTE16;	palette = machine.palette;	break;
-		case BITMAP_FORMAT_RGB15:		screen_texformat = TEXFORMAT_RGB15;		palette = NULL;				break;
-		case BITMAP_FORMAT_RGB32:		screen_texformat = TEXFORMAT_RGB32;		palette = NULL;				break;
-		default:						fatalerror("Invalid bitmap format!");								break;
-	}
-
 	/* swap the coordinates back if they were talking about a rotated surface */
 	if (state->tilemap.rotate & ORIENTATION_SWAP_XY)
 		{ UINT32 temp = width; width = height; height = temp; }
 
 	/* realloc the bitmap if it is too small */
-	if (state->bitmap == NULL || state->texture == NULL || state->bitmap->format() != screen_format || state->bitmap->width() != width || state->bitmap->height() != height)
+	if (state->bitmap == NULL || state->texture == NULL || state->bitmap->width() != width || state->bitmap->height() != height)
 	{
 		/* free the old stuff */
 		machine.render().texture_free(state->texture);
 		global_free(state->bitmap);
 
 		/* allocate new stuff */
-		state->bitmap = global_alloc(bitmap_t(width, height, screen_format));
+		state->bitmap = global_alloc(bitmap_rgb32(width, height));
 		state->texture = machine.render().texture_alloc();
-		state->texture->set_bitmap(state->bitmap, NULL, screen_texformat, palette);
+		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_RGB32);
 
 		/* force a redraw */
 		state->bitmap_dirty = TRUE;
@@ -1069,7 +1056,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state,
 		tilemap_draw_by_index(machine, *state->bitmap, state->tilemap.which, state->tilemap.xoffs, state->tilemap.yoffs);
 
 		/* reset the texture to force an update */
-		state->texture->set_bitmap(state->bitmap, NULL, screen_texformat, palette);
+		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_RGB32);
 		state->bitmap_dirty = FALSE;
 	}
 }

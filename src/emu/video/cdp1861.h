@@ -70,9 +70,9 @@
 	MCFG_DEVICE_CONFIG(_config)
 
 
-#define MCFG_CDP1861_SCREEN_ADD(_tag, _clock) \
+#define MCFG_CDP1861_SCREEN_ADD(_cdptag, _tag, _clock) \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
+	MCFG_SCREEN_UPDATE_DEVICE(_cdptag, cdp1861_device, screen_update) \
 	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
 
@@ -113,7 +113,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( disp_on_w );
 	DECLARE_WRITE_LINE_MEMBER( disp_off_w );
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -132,7 +132,7 @@ private:
 	devcb_resolved_write_line	m_out_efx_func;
 
 	screen_device *m_screen;		// screen
-	bitmap_t *m_bitmap;				// bitmap
+	bitmap_ind16 m_bitmap;				// bitmap
 
 	int m_disp;						// display enabled
 	int m_dispon;					// display on latch

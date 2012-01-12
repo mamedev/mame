@@ -24,4 +24,4 @@ WRITE8_HANDLER( news_bgram_w );
 WRITE8_HANDLER( news_bgpic_w );
 
 VIDEO_START( news );
-SCREEN_UPDATE( news );
+SCREEN_UPDATE_IND16( news );

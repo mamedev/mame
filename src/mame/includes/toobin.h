@@ -15,7 +15,7 @@ public:
 	UINT16 *		m_interrupt_scan;
 
 	double			m_brightness;
-	bitmap_t *		m_pfbitmap;
+	bitmap_ind16 m_pfbitmap;
 };
 
 
@@ -28,4 +28,4 @@ WRITE16_HANDLER( toobin_yscroll_w );
 WRITE16_HANDLER( toobin_slip_w );
 
 VIDEO_START( toobin );
-SCREEN_UPDATE( toobin );
+SCREEN_UPDATE_RGB32( toobin );

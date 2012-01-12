@@ -338,7 +338,7 @@ static VIDEO_START(dderby)
 
 }
 
-static SCREEN_UPDATE(dderby)
+static SCREEN_UPDATE_IND16(dderby)
 {
 	dmndrby_state *state = screen.machine().driver_data<dmndrby_state>();
 	int x,y,count;
@@ -517,10 +517,9 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE(dderby)
+	MCFG_SCREEN_UPDATE_STATIC(dderby)
 
 	MCFG_GFXDECODE(dmndrby)
 	MCFG_PALETTE_LENGTH(0x300)

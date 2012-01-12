@@ -159,7 +159,7 @@ static void *open_avi(const char *filename, movie_info *info)
     read_avi - read a frame from an AVI file
 -------------------------------------------------*/
 
-static int read_avi(void *file, int frame, bitmap_t &bitmap, INT16 *lsound, INT16 *rsound, int *samples)
+static int read_avi(void *file, int frame, bitmap_yuy16 &bitmap, INT16 *lsound, INT16 *rsound, int *samples)
 {
 	const avi_movie_info *aviinfo = avi_get_movie_info((avi_file *)file);
 	UINT32 firstsample = ((UINT64)aviinfo->audio_samplerate * (UINT64)frame * (UINT64)aviinfo->video_sampletime + aviinfo->video_timescale - 1) / (UINT64)aviinfo->video_timescale;
@@ -167,7 +167,7 @@ static int read_avi(void *file, int frame, bitmap_t &bitmap, INT16 *lsound, INT1
 	avi_error avierr;
 
 	/* read the frame */
-	avierr = avi_read_video_frame_yuy16((avi_file *)file, frame, bitmap);
+	avierr = avi_read_video_frame((avi_file *)file, frame, bitmap);
 	if (avierr != AVIERR_NONE)
 		return FALSE;
 
@@ -258,11 +258,11 @@ static void *open_chd(const char *filename, movie_info *info)
     read_chd - read a frame from a CHD file
 -------------------------------------------------*/
 
-static int read_chd(void *file, int frame, bitmap_t &bitmap, INT16 *lsound, INT16 *rsound, int *samples)
+static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, INT16 *lsound, INT16 *rsound, int *samples)
 {
-	av_codec_decompress_config avconfig = { 0 };
+	av_codec_decompress_config avconfig;
 	int interlace_factor = chdinterlaced ? 2 : 1;
-	bitmap_t fakebitmap;
+	bitmap_yuy16 fakebitmap;
 	UINT32 numsamples;
 	chd_error chderr;
 	int fieldnum;
@@ -272,7 +272,7 @@ static int read_chd(void *file, int frame, bitmap_t &bitmap, INT16 *lsound, INT1
 	for (fieldnum = 0; fieldnum < interlace_factor; fieldnum++)
 	{
 		/* make a fake bitmap for this field */
-		avconfig.video = new(&fakebitmap) bitmap_t(&bitmap.pix16(fieldnum), bitmap.width(), bitmap.height() / interlace_factor, bitmap.rowpixels() * interlace_factor, bitmap.format());
+		avconfig.video.wrap(&bitmap.pix16(fieldnum), bitmap.width(), bitmap.height() / interlace_factor, bitmap.rowpixels() * interlace_factor);
 
 		/* configure the codec */
 		avconfig.maxsamples = 48000;
@@ -342,7 +342,7 @@ static void init_video(video_info *video)
     verify_video - verify video frame
 -------------------------------------------------*/
 
-static void verify_video(video_info *video, int frame, bitmap_t &bitmap)
+static void verify_video(video_info *video, int frame, bitmap_yuy16 &bitmap)
 {
 	const int fields_per_frame = 2;
 	int fieldnum;
@@ -613,7 +613,7 @@ static void verify_video(video_info *video, int frame, bitmap_t &bitmap)
     verify_video_final - final verification
 -------------------------------------------------*/
 
-static void verify_video_final(video_info *video, int frame, bitmap_t &bitmap)
+static void verify_video_final(video_info *video, int frame, bitmap_yuy16 &bitmap)
 {
 	int fields_per_frame = (bitmap.height() >= 288) ? 2 : 1;
 	int field = frame * fields_per_frame;
@@ -741,108 +741,108 @@ static int usage(void)
 
 int main(int argc, char *argv[])
 {
-	movie_info info = { 0 };
-	INT16 *lsound, *rsound;
-	const char *srcfile;
-	bitmap_t *bitmap;
-	int srcfilelen;
-	int samples = 0;
-	void *file;
-	int isavi;
-	int frame;
-	audio_info audio;
-	video_info video;
-
-	/* init globals */
-	init_audio(&audio);
-	init_video(&video);
-
-	/* verify arguments */
-	if (argc < 2)
-		return usage();
-	srcfile = argv[1];
-
-	/* check extension of file */
-	srcfilelen = strlen(srcfile);
-	if (srcfilelen < 4)
-		return usage();
-	if (tolower((UINT8)srcfile[srcfilelen-3]) == 'a' && tolower((UINT8)srcfile[srcfilelen-2]) == 'v' && tolower((UINT8)srcfile[srcfilelen-1]) == 'i')
-		isavi = TRUE;
-	else if (tolower((UINT8)srcfile[srcfilelen-3]) == 'c' && tolower((UINT8)srcfile[srcfilelen-2]) == 'h' && tolower((UINT8)srcfile[srcfilelen-1]) == 'd')
-		isavi = FALSE;
-	else
-		return usage();
-
-	/* open the file */
-	printf("Processing file: %s\n", srcfile);
-	file = isavi ? open_avi(srcfile, &info) : open_chd(srcfile, &info);
-	if (file == NULL)
+	try
 	{
-		fprintf(stderr, "Unable to open file '%s'\n", srcfile);
-		return 1;
-	}
+		movie_info info = { 0 };
+		INT16 *lsound, *rsound;
+		const char *srcfile;
+		bitmap_yuy16 bitmap;
+		int srcfilelen;
+		int samples = 0;
+		void *file;
+		int isavi;
+		int frame;
+		audio_info audio;
+		video_info video;
 
-	/* comment on the video dimensions */
-	printf("Video dimensions: %dx%d\n", info.width, info.height);
-	if (info.width != 720)
-		printf("WARNING: Unexpected video width (should be 720)\n");
-	if (info.height != 524)
-		printf("WARNING: Unexpected video height (should be 262 or 524)\n");
+		/* init globals */
+		init_audio(&audio);
+		init_video(&video);
 
-	/* comment on the video frame rate */
-	printf("Video frame rate: %.2fHz\n", info.framerate);
-	if ((int)(info.framerate * 100.0 + 0.5) != 2997)
-		printf("WARNING: Unexpected frame rate (should be 29.97Hz)\n");
+		/* verify arguments */
+		if (argc < 2)
+			return usage();
+		srcfile = argv[1];
 
-	/* comment on the sample rate */
-	printf("Sample rate: %dHz\n", info.samplerate);
-	if (info.samplerate != 48000)
-		printf("WARNING: Unexpected sampele rate (should be 48000Hz)\n");
+		/* check extension of file */
+		srcfilelen = strlen(srcfile);
+		if (srcfilelen < 4)
+			return usage();
+		if (tolower((UINT8)srcfile[srcfilelen-3]) == 'a' && tolower((UINT8)srcfile[srcfilelen-2]) == 'v' && tolower((UINT8)srcfile[srcfilelen-1]) == 'i')
+			isavi = TRUE;
+		else if (tolower((UINT8)srcfile[srcfilelen-3]) == 'c' && tolower((UINT8)srcfile[srcfilelen-2]) == 'h' && tolower((UINT8)srcfile[srcfilelen-1]) == 'd')
+			isavi = FALSE;
+		else
+			return usage();
 
-	/* allocate a bitmap */
-	bitmap = new(std::nothrow) bitmap_t(info.width, info.height, BITMAP_FORMAT_YUY16);
-	if (bitmap == NULL)
-	{
+		/* open the file */
+		printf("Processing file: %s\n", srcfile);
+		file = isavi ? open_avi(srcfile, &info) : open_chd(srcfile, &info);
+		if (file == NULL)
+		{
+			fprintf(stderr, "Unable to open file '%s'\n", srcfile);
+			return 1;
+		}
+
+		/* comment on the video dimensions */
+		printf("Video dimensions: %dx%d\n", info.width, info.height);
+		if (info.width != 720)
+			printf("WARNING: Unexpected video width (should be 720)\n");
+		if (info.height != 524)
+			printf("WARNING: Unexpected video height (should be 262 or 524)\n");
+
+		/* comment on the video frame rate */
+		printf("Video frame rate: %.2fHz\n", info.framerate);
+		if ((int)(info.framerate * 100.0 + 0.5) != 2997)
+			printf("WARNING: Unexpected frame rate (should be 29.97Hz)\n");
+
+		/* comment on the sample rate */
+		printf("Sample rate: %dHz\n", info.samplerate);
+		if (info.samplerate != 48000)
+			printf("WARNING: Unexpected sampele rate (should be 48000Hz)\n");
+
+		/* allocate a bitmap */
+		bitmap.allocate(info.width, info.height);
+
+		/* allocate sound buffers */
+		lsound = (INT16 *)malloc(info.samplerate * sizeof(*lsound));
+		rsound = (INT16 *)malloc(info.samplerate * sizeof(*rsound));
+		if (lsound == NULL || rsound == NULL)
+		{
+			isavi ? close_avi(file) : close_chd(file);
+			if (rsound != NULL)
+				free(rsound);
+			if (lsound != NULL)
+				free(lsound);
+			fprintf(stderr, "Out of memory allocating sound buffers of %d bytes\n", (INT32)(info.samplerate * sizeof(*rsound)));
+			return 1;
+		}
+
+		/* loop over frames */
+		frame = 0;
+		while (isavi ? read_avi(file, frame, bitmap, lsound, rsound, &samples) : read_chd(file, frame, bitmap, lsound, rsound, &samples))
+		{
+			verify_video(&video, frame, bitmap);
+			verify_audio(&audio, lsound, rsound, samples);
+			frame++;
+		}
+
+		/* close the files */
 		isavi ? close_avi(file) : close_chd(file);
-		fprintf(stderr, "Out of memory creating %dx%d bitmap\n", info.width, info.height);
+
+		/* final output */
+		verify_video_final(&video, frame, bitmap);
+		verify_audio_final(&audio);
+
+		/* free memory */
+		free(lsound);
+		free(rsound);
+	}
+	catch (std::bad_alloc &)
+	{
+		fprintf(stderr, "Out of memory allocating memory\n");
 		return 1;
 	}
-
-	/* allocate sound buffers */
-	lsound = (INT16 *)malloc(info.samplerate * sizeof(*lsound));
-	rsound = (INT16 *)malloc(info.samplerate * sizeof(*rsound));
-	if (lsound == NULL || rsound == NULL)
-	{
-		isavi ? close_avi(file) : close_chd(file);
-		delete bitmap;
-		if (rsound != NULL)
-			free(rsound);
-		if (lsound != NULL)
-			free(lsound);
-		fprintf(stderr, "Out of memory allocating sound buffers of %d bytes\n", (INT32)(info.samplerate * sizeof(*rsound)));
-		return 1;
-	}
-
-	/* loop over frames */
-	frame = 0;
-	while (isavi ? read_avi(file, frame, *bitmap, lsound, rsound, &samples) : read_chd(file, frame, *bitmap, lsound, rsound, &samples))
-	{
-		verify_video(&video, frame, *bitmap);
-		verify_audio(&audio, lsound, rsound, samples);
-		frame++;
-	}
-
-	/* close the files */
-	isavi ? close_avi(file) : close_chd(file);
-
-	/* final output */
-	verify_video_final(&video, frame, *bitmap);
-	verify_audio_final(&audio);
-
-	/* free memory */
-	delete bitmap;
-	free(lsound);
-	free(rsound);
 
 	return 0;
 }

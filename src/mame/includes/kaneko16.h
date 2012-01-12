@@ -104,8 +104,8 @@ public:
 	UINT16 m_disp_enable;
 	tilemap_t *m_tmap[4];
 	int m_keep_sprites;
-	bitmap_t *m_bg15_bitmap;
-	bitmap_t *m_sprites_bitmap;
+	bitmap_ind16 m_bg15_bitmap;
+	bitmap_ind16 m_sprites_bitmap;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -165,7 +165,7 @@ WRITE16_HANDLER( kaneko16_layers_1_regs_w );
 READ16_HANDLER ( kaneko16_sprites_regs_r );
 WRITE16_HANDLER( kaneko16_sprites_regs_w );
 
-void kaneko16_draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect);
+void kaneko16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 READ16_HANDLER ( kaneko16_bg15_select_r );
 WRITE16_HANDLER( kaneko16_bg15_select_w );
@@ -183,12 +183,12 @@ VIDEO_START( berlwall );
 VIDEO_START( sandscrp_1xVIEW2 );
 
 
-SCREEN_UPDATE( kaneko16 );
-SCREEN_UPDATE( sandscrp );
-SCREEN_UPDATE( berlwall );
-SCREEN_UPDATE( jchan_view2 );
+SCREEN_UPDATE_IND16( kaneko16 );
+SCREEN_UPDATE_IND16( sandscrp );
+SCREEN_UPDATE_IND16( berlwall );
+SCREEN_UPDATE_IND16( jchan_view2 );
 
 VIDEO_START( galsnew );
-SCREEN_UPDATE( galsnew );
+SCREEN_UPDATE_IND16( galsnew );
 
 #endif

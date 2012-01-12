@@ -86,7 +86,7 @@ WRITE8_HANDLER( wiping_flipscreen_w )
 }
 
 
-SCREEN_UPDATE( wiping )
+SCREEN_UPDATE_IND16( wiping )
 {
 	wiping_state *state = screen.machine().driver_data<wiping_state>();
 	UINT8 *spriteram = state->m_spriteram;

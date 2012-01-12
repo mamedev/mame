@@ -77,8 +77,7 @@ protected:
 
 
 	// driver_device overrides
-//  virtual void video_start();
-//  virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+//	virtual void video_start();
 };
 
 // Intel 82439TX System Controller (MXTC)

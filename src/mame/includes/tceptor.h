@@ -22,7 +22,7 @@ public:
 	INT32 m_bg1_scroll_y;
 	INT32 m_bg2_scroll_x;
 	INT32 m_bg2_scroll_y;
-	bitmap_t *m_temp_bitmap;
+	bitmap_ind16 m_temp_bitmap;
 	UINT16 *m_sprite_ram_buffered;
 	int m_is_mask_spr[1024/16];
 };
@@ -32,9 +32,9 @@ public:
 
 PALETTE_INIT( tceptor );
 VIDEO_START( tceptor );
-SCREEN_UPDATE( tceptor_2d );
-SCREEN_UPDATE( tceptor_3d_left );
-SCREEN_UPDATE( tceptor_3d_right );
+SCREEN_UPDATE_IND16( tceptor_2d );
+SCREEN_UPDATE_IND16( tceptor_3d_left );
+SCREEN_UPDATE_IND16( tceptor_3d_right );
 SCREEN_EOF( tceptor );
 
 WRITE8_HANDLER( tceptor_tile_ram_w );

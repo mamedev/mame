@@ -37,10 +37,10 @@ WRITE8_HANDLER( punchout_spr2_videoram_w );
 
 VIDEO_START( punchout );
 VIDEO_START( armwrest );
-SCREEN_UPDATE( punchout_top );
-SCREEN_UPDATE( punchout_bottom );
-SCREEN_UPDATE( armwrest_top );
-SCREEN_UPDATE( armwrest_bottom );
+SCREEN_UPDATE_IND16( punchout_top );
+SCREEN_UPDATE_IND16( punchout_bottom );
+SCREEN_UPDATE_IND16( armwrest_top );
+SCREEN_UPDATE_IND16( armwrest_bottom );
 
 DRIVER_INIT( punchout );
 DRIVER_INIT( spnchout );

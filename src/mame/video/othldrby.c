@@ -136,7 +136,7 @@ WRITE16_HANDLER( othldrby_vreg_w )
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int priority )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	othldrby_state *state = machine.driver_data<othldrby_state>();
 	int offs;
@@ -180,7 +180,7 @@ static void draw_sprites( running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-SCREEN_UPDATE( othldrby )
+SCREEN_UPDATE_IND16( othldrby )
 {
 	othldrby_state *state = screen.machine().driver_data<othldrby_state>();
 	int layer;

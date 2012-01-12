@@ -24,4 +24,4 @@ WRITE8_HANDLER( speedatk_colorram_w );
 WRITE8_HANDLER( speedatk_6845_w );
 PALETTE_INIT( speedatk );
 VIDEO_START( speedatk );
-SCREEN_UPDATE( speedatk );
+SCREEN_UPDATE_IND16( speedatk );

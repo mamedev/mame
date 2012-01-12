@@ -32,7 +32,7 @@ WRITE16_HANDLER ( shadfrce_bg0scrolly_w );
 WRITE16_HANDLER ( shadfrce_bg1scrolly_w );
 VIDEO_START( shadfrce );
 SCREEN_EOF(shadfrce);
-SCREEN_UPDATE( shadfrce );
+SCREEN_UPDATE_IND16( shadfrce );
 WRITE16_HANDLER( shadfrce_fgvideoram_w );
 WRITE16_HANDLER( shadfrce_bg0videoram_w );
 WRITE16_HANDLER( shadfrce_bg1videoram_w );

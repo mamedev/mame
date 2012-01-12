@@ -80,7 +80,7 @@ static VIDEO_START( rmhaihai )
 		8, 8, 64, 32);
 }
 
-static SCREEN_UPDATE( rmhaihai )
+static SCREEN_UPDATE_IND16( rmhaihai )
 {
 	rmhaihai_state *state = screen.machine().driver_data<rmhaihai_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
@@ -467,10 +467,9 @@ static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(rmhaihai)
+	MCFG_SCREEN_UPDATE_STATIC(rmhaihai)
 
 	MCFG_GFXDECODE(rmhaihai)
 	MCFG_PALETTE_LENGTH(0x100)

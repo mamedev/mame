@@ -31,7 +31,7 @@ public:
 	tilemap_t *m_tilemap_fg;
 	tilemap_t *m_tilemap_edge1[4];
 	tilemap_t *m_tilemap_edge2[4];
-	bitmap_t *m_headlight_bitmap;
+	bitmap_ind16 *m_headlight_bitmap;
 };
 
 

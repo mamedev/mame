@@ -182,7 +182,7 @@ void bsmt2000_device::device_start()
 	// in theory we should generate a 24MHz stream, but that's certainly overkill
 	// internally at 24MHz the max output sample rate is 32kHz
 	// divided by 128 gives us 6x the max output rate which is plenty for oversampling
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 128);
+	m_stream = stream_alloc(0, 2, clock() / 128);
 
 	// register for save states
 	save_item(NAME(m_register_select));

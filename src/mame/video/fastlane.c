@@ -155,7 +155,7 @@ WRITE8_HANDLER( fastlane_vram2_w )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( fastlane )
+SCREEN_UPDATE_IND16( fastlane )
 {
 	fastlane_state *state = screen.machine().driver_data<fastlane_state>();
 	rectangle finalclip0 = state->m_clip0, finalclip1 = state->m_clip1;

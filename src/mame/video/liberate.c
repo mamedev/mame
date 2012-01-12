@@ -14,7 +14,7 @@
 #include "includes/liberate.h"
 
 #if 0
-void debug_print(bitmap_t &bitmap)
+void debug_print(bitmap_ind16 &bitmap)
 {
 	int i, j;
 	char buf[20 * 16];
@@ -290,7 +290,7 @@ PALETTE_INIT( liberate )
 
 /***************************************************************************/
 
-static void liberate_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void liberate_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -359,7 +359,7 @@ static void liberate_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void prosport_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void prosport_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
 	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color, gfx_region;
@@ -424,7 +424,7 @@ static void prosport_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void boomrang_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int pri )
+static void boomrang_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -485,7 +485,7 @@ static void boomrang_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 	}
 }
 
-static void prosoccr_draw_sprites( running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect )
+static void prosoccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -512,7 +512,7 @@ static void prosoccr_draw_sprites( running_machine &machine, bitmap_t &bitmap, c
 
 /***************************************************************************/
 
-SCREEN_UPDATE( prosoccr )
+SCREEN_UPDATE_IND16( prosoccr )
 {
 	liberate_state *state = screen.machine().driver_data<liberate_state>();
 	tilemap_set_scrolly(state->m_back_tilemap, 0,  state->m_io_ram[1]);
@@ -529,7 +529,7 @@ SCREEN_UPDATE( prosoccr )
 	return 0;
 }
 
-SCREEN_UPDATE( prosport )
+SCREEN_UPDATE_IND16( prosport )
 {
 	liberate_state *state = screen.machine().driver_data<liberate_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -573,7 +573,7 @@ SCREEN_UPDATE( prosport )
 	return 0;
 }
 
-SCREEN_UPDATE( boomrang )
+SCREEN_UPDATE_IND16( boomrang )
 {
 	liberate_state *state = screen.machine().driver_data<liberate_state>();
 	tilemap_set_scrolly(state->m_back_tilemap, 0,  state->m_io_ram[1]);
@@ -593,7 +593,7 @@ SCREEN_UPDATE( boomrang )
 	return 0;
 }
 
-SCREEN_UPDATE( liberate )
+SCREEN_UPDATE_IND16( liberate )
 {
 	liberate_state *state = screen.machine().driver_data<liberate_state>();
 	tilemap_set_scrolly(state->m_back_tilemap, 0,  state->m_io_ram[1]);

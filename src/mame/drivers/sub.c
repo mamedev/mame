@@ -130,7 +130,7 @@ static VIDEO_START(sub)
 {
 }
 
-static SCREEN_UPDATE(sub)
+static SCREEN_UPDATE_IND16(sub)
 {
 	sub_state *state = screen.machine().driver_data<sub_state>();
 	const gfx_element *gfx = screen.machine().gfx[0];
@@ -435,10 +435,9 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE(sub)
+	MCFG_SCREEN_UPDATE_STATIC(sub)
 
 	MCFG_GFXDECODE(sub)
 	MCFG_PALETTE_LENGTH(0x400)

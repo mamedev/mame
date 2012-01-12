@@ -341,11 +341,10 @@ static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
-	MCFG_SCREEN_UPDATE(arcadecl)
+	MCFG_SCREEN_UPDATE_STATIC(arcadecl)
 
 	MCFG_VIDEO_START(arcadecl)
 

@@ -20,6 +20,6 @@ public:
 
 WRITE8_HANDLER( route16_out0_w );
 WRITE8_HANDLER( route16_out1_w );
-SCREEN_UPDATE( route16 );
-SCREEN_UPDATE( stratvox );
-SCREEN_UPDATE( ttmahjng );
+SCREEN_UPDATE_RGB32( route16 );
+SCREEN_UPDATE_RGB32( stratvox );
+SCREEN_UPDATE_RGB32( ttmahjng );

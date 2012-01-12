@@ -26,9 +26,9 @@ public:
 	UINT32 *m_tx_scroll;
 	UINT32 *m_bg_scroll;
 	UINT32 *m_mainram;
-	bitmap_t* m_temp_bitmap_tilemaps;
-	bitmap_t* m_temp_bitmap_sprites;
-	bitmap_t* m_temp_bitmap_sprites_pri;
+	bitmap_ind16 m_temp_bitmap_tilemaps;
+	bitmap_ind16 m_temp_bitmap_sprites;
+	bitmap_ind8 m_temp_bitmap_sprites_pri;
 	int m_reverse_sprite_order;
 	int m_flipscreen;
 	UINT32 m_brt[4];
@@ -48,4 +48,4 @@ WRITE32_HANDLER( ms32_brightness_w );
 WRITE32_HANDLER( ms32_gfxctrl_w );
 VIDEO_START( ms32 );
 VIDEO_START( f1superb );
-SCREEN_UPDATE( ms32 );
+SCREEN_UPDATE_RGB32( ms32 );

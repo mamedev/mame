@@ -50,14 +50,14 @@ public:
 
 
 PALETTE_INIT( ghostb );
-SCREEN_UPDATE( cobracom );
-SCREEN_UPDATE( ghostb );
-SCREEN_UPDATE( srdarwin );
-SCREEN_UPDATE( gondo );
-SCREEN_UPDATE( garyoret );
-SCREEN_UPDATE( lastmisn );
-SCREEN_UPDATE( shackled );
-SCREEN_UPDATE( oscar );
+SCREEN_UPDATE_IND16( cobracom );
+SCREEN_UPDATE_IND16( ghostb );
+SCREEN_UPDATE_IND16( srdarwin );
+SCREEN_UPDATE_IND16( gondo );
+SCREEN_UPDATE_IND16( garyoret );
+SCREEN_UPDATE_IND16( lastmisn );
+SCREEN_UPDATE_IND16( shackled );
+SCREEN_UPDATE_IND16( oscar );
 VIDEO_START( cobracom );
 VIDEO_START( oscar );
 VIDEO_START( ghostb );

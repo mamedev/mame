@@ -73,7 +73,7 @@ WRITE16_HANDLER( MB60553_1_regs_w );
 WRITE16_HANDLER( MB60553_0_vram_w );
 WRITE16_HANDLER( MB60553_1_vram_w );
 
-SCREEN_UPDATE( gstriker );
+SCREEN_UPDATE_IND16( gstriker );
 VIDEO_START( gstriker );
 VIDEO_START( twrldc94 );
 VIDEO_START( vgoalsoc );

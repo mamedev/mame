@@ -92,9 +92,9 @@ do																					\
 while (0)																			\
 
 
-static void pdrawgfx_transpen_additive(bitmap_t &dest, const rectangle &cliprect, const gfx_element *gfx,
+static void pdrawgfx_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		bitmap_t &priority, UINT32 pmask, UINT32 transpen)
+		bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen)
 {
 	const pen_t *paldata;
 
@@ -125,9 +125,9 @@ static void pdrawgfx_transpen_additive(bitmap_t &dest, const rectangle &cliprect
 }
 
 
-static void pdrawgfxzoom_transpen_additive(bitmap_t &dest, const rectangle &cliprect, const gfx_element *gfx,
+static void pdrawgfxzoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		UINT32 scalex, UINT32 scaley, bitmap_t &priority, UINT32 pmask,
+		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		UINT32 transpen)
 {
 	const pen_t *paldata;
@@ -207,7 +207,7 @@ static void pdrawgfxzoom_transpen_additive(bitmap_t &dest, const rectangle &clip
  * 0x0e0 in Samurai Shodown/Xrally games, 0x1c0 in all the others, zooming factor?
  */
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 	const gfx_element *gfx;
@@ -431,7 +431,7 @@ static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const recta
  */
 
 /* this is broken for the 'How to Play' screen in Buriki after attract, disabled for now */
-static void transition_control(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 	UINT32 *hng64_tcram = state->m_tcram;
@@ -694,7 +694,7 @@ typedef enum
 typedef struct _blit_parameters blit_parameters;
 struct _blit_parameters
 {
-	bitmap_t *			bitmap;
+	bitmap_rgb32 *			bitmap;
 	rectangle			cliprect;
 	UINT32				tilemap_priority_code;
 	UINT8				mask;
@@ -705,7 +705,7 @@ struct _blit_parameters
 
 
 
-static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_t &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
+static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
 {
 	/* start with nothing */
 	memset(blit, 0, sizeof(*blit));
@@ -785,10 +785,10 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
 	const pen_t *clut = &machine.pens[blit->tilemap_priority_code >> 16];
-	bitmap_t &priority_bitmap = machine.priority_bitmap;
-	bitmap_t &destbitmap = *blit->bitmap;
-	bitmap_t &srcbitmap = tilemap_get_pixmap(tmap);
-	bitmap_t &flagsmap = tilemap_get_flagsmap(tmap);
+	bitmap_ind8 &priority_bitmap = machine.priority_bitmap;
+	bitmap_rgb32 &destbitmap = *blit->bitmap;
+	bitmap_ind16 &srcbitmap = tilemap_get_pixmap(tmap);
+	bitmap_ind8 &flagsmap = tilemap_get_flagsmap(tmap);
 	const int xmask = srcbitmap.width()-1;
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
@@ -804,11 +804,10 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 	int sy;
 	int ex;
 	int ey;
-	void *dest;
+	UINT32 *dest;
 	UINT8 *pri;
 	const UINT16 *src;
 	const UINT8 *maskptr;
-	int destadvance = destbitmap.bpp() / 8;
 
 	/* pre-advance based on the cliprect */
 	startx += blit->cliprect.min_x * incxx + blit->cliprect.min_y * incyx;
@@ -849,7 +848,7 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 				pri = &priority_bitmap.pix8(sy, sx);
 				src = &srcbitmap.pix16(cy);
 				maskptr = &flagsmap.pix8(cy);
-				dest = &destbitmap.pix8(sy * destadvance, sx * destadvance);
+				dest = &destbitmap.pix32(sy, sx);
 
 				/* loop over columns */
 				while (x <= ex && cx < widthshifted)
@@ -864,7 +863,7 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 					/* advance in X */
 					cx += incxx;
 					x++;
-					dest = (UINT8 *)dest + destadvance;
+					dest++;
 					pri++;
 				}
 			}
@@ -887,7 +886,7 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 			cy = starty;
 
 			/* get dest and priority pointers */
-			dest = &destbitmap.pix8(sy * destadvance, sx * destadvance);
+			dest = &destbitmap.pix32(sy, sx);
 			pri = &priority_bitmap.pix8(sy, sx);
 
 			/* loop over columns */
@@ -904,7 +903,7 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 				cx += incxx;
 				cy += incxy;
 				x++;
-				dest = (UINT8 *)dest + destadvance;
+				dest++;
 				pri++;
 			}
 
@@ -927,7 +926,7 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 			cy = starty;
 
 			/* get dest and priority pointers */
-			dest = &destbitmap.pix8(sy * destadvance, sx * destadvance);
+			dest = &destbitmap.pix32(sy, sx);
 			pri = &priority_bitmap.pix8(sy, sx);
 
 			/* loop over columns */
@@ -945,7 +944,7 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 				cx += incxx;
 				cy += incxy;
 				x++;
-				dest = (UINT8 *)dest + destadvance;
+				dest++;
 				pri++;
 			}
 
@@ -959,7 +958,7 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 
 
 
-static void hng64_tilemap_draw_roz_primask(running_machine& machine, bitmap_t &dest, const rectangle &cliprect, tilemap_t *tmap,
+static void hng64_tilemap_draw_roz_primask(running_machine& machine, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
 {
@@ -987,7 +986,7 @@ g_profiler.stop();
 }
 
 
-INLINE void hng64_tilemap_draw_roz(running_machine& machine, bitmap_t &dest, const rectangle &cliprect, tilemap_t *tmap,
+INLINE void hng64_tilemap_draw_roz(running_machine& machine, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat)
 {
@@ -996,7 +995,7 @@ INLINE void hng64_tilemap_draw_roz(running_machine& machine, bitmap_t &dest, con
 
 
 
-static void hng64_drawtilemap(running_machine& machine, bitmap_t &bitmap, const rectangle &cliprect, int tm )
+static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm )
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 	UINT32 *hng64_videoregs = state->m_videoregs;
@@ -1231,7 +1230,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t &bitmap, const 
 			/* manual copy = slooow */
 			if (MAKE_MAME_REEEEAAALLLL_SLOW)
 			{
-				bitmap_t &bm = tilemap_get_pixmap(tilemap);
+				bitmap_ind16 &bm = tilemap_get_pixmap(tilemap);
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
 				const pen_t *paldata = machine.pens;
@@ -1329,7 +1328,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t &bitmap, const 
 			/* manual copy = slooow */
 			if (MAKE_MAME_REEEEAAALLLL_SLOW)
 			{
-				bitmap_t &bm = tilemap_get_pixmap(tilemap);
+				bitmap_ind16 &bm = tilemap_get_pixmap(tilemap);
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
 				const pen_t *paldata = machine.pens;
@@ -1437,7 +1436,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t &bitmap, const 
 
 #define IMPORTANT_DIRTY_TILEFLAG_MASK (0x0600)
 
-SCREEN_UPDATE( hng64 )
+SCREEN_UPDATE_RGB32( hng64 )
 {
 	hng64_state *state = screen.machine().driver_data<hng64_state>();
 	UINT32 *hng64_videoregs = state->m_videoregs;

@@ -25,22 +25,22 @@
 class mc6845_device;
 
 /* callback definitions */
-typedef void * (*mc6845_begin_update_func)(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect);
-#define MC6845_BEGIN_UPDATE(name)	void *name(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect)
+typedef void * (*mc6845_begin_update_func)(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+#define MC6845_BEGIN_UPDATE(name)	void *name(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 
-typedef void (*mc6845_update_row_func)(mc6845_device *device, bitmap_t &bitmap,
+typedef void (*mc6845_update_row_func)(mc6845_device *device, bitmap_rgb32 &bitmap,
 									   const rectangle &cliprect, UINT16 ma, UINT8 ra,
 									   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 
 
-#define MC6845_UPDATE_ROW(name)		void name(mc6845_device *device, bitmap_t &bitmap,	\
+#define MC6845_UPDATE_ROW(name)		void name(mc6845_device *device, bitmap_rgb32 &bitmap,	\
 											  const rectangle &cliprect, UINT16 ma, UINT8 ra,	\
 											  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 
 
-typedef void (*mc6845_end_update_func)(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, void *param);
-#define MC6845_END_UPDATE(name)		void name(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, void *param)
+typedef void (*mc6845_end_update_func)(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param);
+#define MC6845_END_UPDATE(name)		void name(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param)
 
 
 typedef void (*mc6845_on_update_addr_changed_func)(mc6845_device *device, int address, int strobe);
@@ -148,7 +148,7 @@ public:
 	/* updates the screen -- this will call begin_update(),
        followed by update_row() reapeatedly and after all row
        updating is complete, end_update() */
-	void update(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides

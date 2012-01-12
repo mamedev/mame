@@ -153,13 +153,13 @@ static TIMER_CALLBACK(vectrex_refresh)
 {
 	vectrex_state *state = machine.driver_data<vectrex_state>();
 	/* Refresh only marks the range of vectors which will be drawn
-     * during the next SCREEN_UPDATE. */
+     * during the next SCREEN_UPDATE_RGB32. */
 	state->m_display_start = state->m_display_end;
 	state->m_display_end = state->m_point_index;
 }
 
 
-SCREEN_UPDATE(vectrex)
+SCREEN_UPDATE_RGB32(vectrex)
 {
 	vectrex_state *state = screen.machine().driver_data<vectrex_state>();
 	int i;
@@ -182,7 +182,7 @@ SCREEN_UPDATE(vectrex)
 						 state->m_points[i].intensity);
 	}
 
-	SCREEN_UPDATE_CALL(vector);
+	SCREEN_UPDATE32_CALL(vector);
 	vector_clear_list();
 	return 0;
 }
