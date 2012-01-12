@@ -5,7 +5,7 @@
     - Space Fever
     - Space Fever High Splitter
     - Space Launcher
-    - Sheriff / Bandido
+    - Sheriff / Bandido / Western Gun 2
     - Helifire
 
 ***************************************************************************/
@@ -315,6 +315,46 @@ static INPUT_PORTS_START( bandido )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( westgun2 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_COCKTAIL
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ))
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* enables diagnostic ROM at $2400 */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("IN3")
+
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( helifire )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
@@ -563,6 +603,17 @@ static MACHINE_CONFIG_START( sheriff, n8080_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD( sheriff_sound )
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( westgun2, sheriff )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", I8080, XTAL_19_968MHz / 10)
+	MCFG_CPU_CONFIG(n8080_cpu_config)
+	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
+	MCFG_CPU_IO_MAP(main_io_map)
+
 MACHINE_CONFIG_END
 
 
@@ -873,6 +924,21 @@ ROM_START( bandido )
 	ROM_LOAD( "82s137.3l", 0x0000, 0x0400, CRC(820f8cdd) SHA1(197eeb008c140558e7c1ab2b2bd0f6a27096877c) )
 ROM_END
 
+ROM_START( westgun2 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "rf01.ic36",    0x0000, 0x0800, CRC(7eabc538) SHA1(8f0540a5cb391b83aafc0365b44686628eae5c77) )
+	ROM_LOAD( "rf02.ic35",    0x0800, 0x0800, CRC(3344d6a5) SHA1(ea2a8413401b53c9d1b9c653ac3a98855a35cce6) )
+	ROM_LOAD( "rf03.ic34",    0x1000, 0x0800, CRC(d4bb08fd) SHA1(92c0821f259037b193658997289b6b41c6f67215) )
+	ROM_LOAD( "rf04.ic33",    0x1800, 0x0800, CRC(60b71f0d) SHA1(10650426972afb0ccb964548a52879ed3f0b316a) )
+	ROM_LOAD( "rf05.ic32",    0x2000, 0x0800, CRC(81e650fb) SHA1(e600567125294d1411fcad3a015edb98cee36ff8) )
+
+	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_LOAD( "rf06.ic35",   0x0000, 0x0800, CRC(4eafe957) SHA1(78e03402219c0ad814f63ae507eadc636d95f755) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "82s137.3l", 0x0000, 0x0400, CRC(820f8cdd) SHA1(197eeb008c140558e7c1ab2b2bd0f6a27096877c) ) // rf07 not dumped, taken from parent
+ROM_END
+
 ROM_START( helifire )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "hf.f1",    0x0000, 0x0400, CRC(032f89ca) SHA1(63b0310875ed78a6385e44eea781ddcc4a63557c) )
@@ -917,5 +983,6 @@ GAME( 1979, highspltb,  highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Sp
 GAME( 1979, spacelnc,   0,        spacefev, spacelnc, 0, ROT270, "Nintendo", "Space Launcher", GAME_SUPPORTS_SAVE )
 GAME( 1979, sheriff,    0,        sheriff,  sheriff,  0, ROT270, "Nintendo", "Sheriff", GAME_SUPPORTS_SAVE )
 GAME( 1980, bandido,    sheriff,  sheriff,  bandido,  0, ROT270, "Nintendo (Exidy license)", "Bandido", GAME_SUPPORTS_SAVE )
+GAME( 1980, westgun2,   sheriff,  westgun2, westgun2, 0, ROT270, "Nintendo (Taito Corporation license)", "Western Gun Part II", GAME_SUPPORTS_SAVE ) // official Taito PCBs, but title/copyright not shown
 GAME( 1980, helifire,   0,        helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1980, helifirea,  helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
