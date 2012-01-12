@@ -65,7 +65,7 @@ SCREEN_UPDATE( rbisland )
 /***************************************************************************
 
 Jumping uses different sprite controller
-than rbisland island. - values are remapped
+than Rainbow Island. - values are remapped
 at address 0x2EA in the code. Apart from
 physical layout, the main change is that
 the Y settings are active low.

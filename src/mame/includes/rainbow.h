@@ -35,7 +35,7 @@ public:
 };
 
 
-/*----------- defined in machine/rbisland.c -----------*/
+/*----------- defined in machine/rainbow.c -----------*/
 
 void rbisland_cchip_init(running_machine &machine, int version);
 READ16_HANDLER( rbisland_cchip_ctrl_r );
@@ -45,7 +45,7 @@ WRITE16_HANDLER( rbisland_cchip_bank_w );
 WRITE16_HANDLER( rbisland_cchip_ram_w );
 
 
-/*----------- defined in video/rbisland.c -----------*/
+/*----------- defined in video/rainbow.c -----------*/
 
 SCREEN_UPDATE( rbisland );
 VIDEO_START( jumping );
