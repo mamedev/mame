@@ -1492,7 +1492,9 @@ static void I386OP(popfd)(i386_state *cpustate)				// Opcode 0x9d
 	UINT32 value = POP32(cpustate);
 	UINT32 current = get_flags(cpustate);
 	UINT8 IOPL = (current >> 12) & 0x03;
-	UINT32 mask = 0x00007fd5;  // VM and RF are not affected by POPF or POPFD, same for higher (486+) bits?
+	UINT32 mask = 0x00257fd5;  // VM, VIP and VIF cannot be set by POPF/POPFD
+
+	value &= ~0x00010000;  // RF will always return zero
 
 	// IOPL can only change if CPL is 0
 	if(cpustate->CPL != 0)
@@ -1502,6 +1504,15 @@ static void I386OP(popfd)(i386_state *cpustate)				// Opcode 0x9d
 	if(cpustate->CPL > IOPL)
 		mask &= ~0x00000200;
 
+	if(V8086_MODE)
+	{
+		if(IOPL < 3)
+		{
+			logerror("POPFD(%08x): IOPL < 3 while in V86 mode.\n",cpustate->pc);
+			FAULT(FAULT_GP,0)  // #GP(0)
+		}
+		mask &= ~0x00003000;  // IOPL cannot be changed while in V8086 mode
+	}
 	set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
 	CYCLES(cpustate,CYCLES_POPF);
 }

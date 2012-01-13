@@ -225,7 +225,12 @@ struct _i386_state
 	UINT8 IOP1;
 	UINT8 IOP2;
 	UINT8 NT;
+	UINT8 RF;
 	UINT8 VM;
+	UINT8 AC;
+	UINT8 VIF;
+	UINT8 VIP;
+	UINT8 ID;
 
 	UINT8 CPL;  // current privilege level
 
