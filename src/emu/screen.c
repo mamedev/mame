@@ -302,6 +302,7 @@ void screen_device::device_start()
 	if (!m_screen_update.isnull())
 	{
 		device_t *device = (m_screen_update_device == NULL) ? machine().driver_data() : machine().device(m_screen_update_device);
+		if ((device == NULL) && (m_screen_update_device!=NULL)) device = siblingdevice(m_screen_update_device);
 		if (device == NULL) throw emu_fatalerror("Unable to find screen update device '%s' for screen '%s'\n", m_screen_update_device, tag());
 		m_screen_update.late_bind(*device);
 	}
