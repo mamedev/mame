@@ -1618,7 +1618,7 @@ static void test(esrip_state *cpustate, UINT16 inst)
 		default:   INVALID;
 	}
 
-	cpustate->ct = res && 1;
+	cpustate->ct = res ? 1 : 0;
 }
 
 
