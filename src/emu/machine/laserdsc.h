@@ -92,7 +92,7 @@ enum laserdisc_field_code
 	laserdisc_device::static_set_audio(*device, _func); \
 
 #define MCFG_LASERDISC_OVERLAY_STATIC(_width, _height, _func) \
-	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func, device->tag())); \
+	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func)); \
 
 #define MCFG_LASERDISC_OVERLAY_DRIVER(_width, _height, _class, _method) \
 	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL)); \
@@ -127,6 +127,7 @@ enum laserdisc_field_code
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 704, 525.0/2, 0, 480/2) \
 	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update) \
+
 
 
 //**************************************************************************

@@ -341,16 +341,14 @@ extern const device_type SCREEN;
 //**************************************************************************
 
 #define SCREEN_UPDATE_NAME(name)		screen_update_##name
-#define SCREEN_UPDATE_IND16(name)		UINT32 SCREEN_UPDATE_NAME(name)(screen_device *__dummy, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-#define SCREEN_UPDATE_RGB32(name)		UINT32 SCREEN_UPDATE_NAME(name)(screen_device *__dummy, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-#define SCREEN_UPDATE16_CALL(name)		SCREEN_UPDATE_NAME(name)(__dummy, screen, bitmap, cliprect)
-#define SCREEN_UPDATE32_CALL(name)		SCREEN_UPDATE_NAME(name)(__dummy, screen, bitmap, cliprect)
+#define SCREEN_UPDATE_IND16(name)		UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE_RGB32(name)		UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_CALL(name)		SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
+#define SCREEN_UPDATE32_CALL(name)		SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
 
 #define SCREEN_EOF_NAME(name)			screen_eof_##name
-#define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(screen_device *__dummy, screen_device &screen)
-#define SCREEN_EOF_CALL(name)			SCREEN_EOF_NAME(name)(__dummy, screen)
-
-#define screen_eof_0					NULL
+#define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(device_t *, screen_device &screen)
+#define SCREEN_EOF_CALL(name)			SCREEN_EOF_NAME(name)(NULL, screen)
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
@@ -381,7 +379,7 @@ extern const device_type SCREEN;
 	screen_device::static_set_default_position(*device, _xscale, _xoffs, _yscale, _yoffs); \
 
 #define MCFG_SCREEN_UPDATE_STATIC(_func) \
-	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func, device->tag())); \
+	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func)); \
 
 #define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
 	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL)); \
@@ -393,7 +391,7 @@ extern const device_type SCREEN;
 	screen_device::static_set_screen_eof(*device, screen_eof_delegate()); \
 
 #define MCFG_SCREEN_EOF_STATIC(_func) \
-	screen_device::static_set_screen_eof(*device, screen_eof_delegate(&screen_eof_##_func, "screen_eof_" #_func, (screen_device *)0, device->tag())); \
+	screen_device::static_set_screen_eof(*device, screen_eof_delegate(&screen_eof_##_func, "screen_eof_" #_func)); \
 
 #define MCFG_SCREEN_EOF_DRIVER(_class, _method) \
 	screen_device::static_set_screen_eof(*device, screen_eof_delegate(&_class::_method, #_class "::" #_method, NULL)); \
@@ -414,26 +412,26 @@ extern const device_type SCREEN;
 //	function type
 //-------------------------------------------------
 
-inline screen_update_ind16_delegate screen_update_delegate_smart(UINT32 (*callback)(screen_device *, screen_device &, bitmap_ind16 &, const rectangle &), const char *name, const char *devname)
+inline screen_update_ind16_delegate screen_update_delegate_smart(UINT32 (*callback)(device_t *, screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
 {
-	return screen_update_ind16_delegate(callback, name, (screen_device *)0, devname);
+	return screen_update_ind16_delegate(callback, name);
 }
 
-inline screen_update_rgb32_delegate screen_update_delegate_smart(UINT32 (*callback)(screen_device *, screen_device &, bitmap_rgb32 &, const rectangle &), const char *name, const char *devname)
+inline screen_update_rgb32_delegate screen_update_delegate_smart(UINT32 (*callback)(device_t *, screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
 {
-	return screen_update_rgb32_delegate(callback, name, (screen_device *)0, devname);
+	return screen_update_rgb32_delegate(callback, name);
 }
 
 template<class _FunctionClass>
 inline screen_update_ind16_delegate screen_update_delegate_smart(UINT32 (_FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name, const char *devname)
 {
-	return screen_update_ind16_delegate(callback, name, (_FunctionClass *)0, devname);
+	return screen_update_ind16_delegate(callback, name, devname, (_FunctionClass *)0);
 }
 
 template<class _FunctionClass>
 inline screen_update_rgb32_delegate screen_update_delegate_smart(UINT32 (_FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name, const char *devname)
 {
-	return screen_update_rgb32_delegate(callback, name, (_FunctionClass *)0, devname);
+	return screen_update_rgb32_delegate(callback, name, devname, (_FunctionClass *)0);
 }
 
 

@@ -113,9 +113,9 @@ public:
 	device_delegate(const basetype &src) : basetype(src), m_device_name(src.m_device_name) { }
 	device_delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object), m_device_name(src.m_device_name) { }
 	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
+	device_delegate(typename basetype::template traits<device_t>::static_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)0), m_device_name(NULL) { }
+	device_delegate(typename basetype::template traits<device_t>::static_ref_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)0), m_device_name(NULL) { }
 	device_delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; m_device_name = src.m_device_name; return *this; }
 
 	// perform the binding
@@ -563,6 +563,11 @@ inline astring &device_t::siblingtag(astring &dest, const char *_tag) const
 }
 
 
+//-------------------------------------------------
+//  first - return the first device in the list
+//  with the given interface
+//-------------------------------------------------
+
 template<class _InterfaceClass>
 bool device_list::first(_InterfaceClass *&intf) const
 {
@@ -573,13 +578,18 @@ bool device_list::first(_InterfaceClass *&intf) const
 }
 
 
+//-------------------------------------------------
+//  bind_relative_to - perform a late binding of
+//  a device_delegate
+//-------------------------------------------------
+
 template<typename _Signature>
 void device_delegate<_Signature>::bind_relative_to(device_t &search_root)
 {
 	if (!basetype::isnull())
 	{
-		device_t *device = search_root.subdevice(m_device_name);
-		assert(device != NULL);
+		device_t *device = (m_device_name == NULL) ? &search_root : search_root.subdevice(m_device_name);
+		if (device == NULL) throw emu_fatalerror("Unable to locate device '%s' relative to '%s'\n", m_device_name, search_root.tag());
 		basetype::late_bind(*device);
 	}
 }

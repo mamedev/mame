@@ -2536,7 +2536,7 @@ SCREEN_UPDATE_RGB32(konamigx_left)
 			}
 		}
 
-		SCREEN_UPDATE_NAME(konamigx)(__dummy, screen, downcast<bitmap_rgb32 &>(*dualscreen_left_tempbitmap), cliprect);
+		SCREEN_UPDATE_NAME(konamigx)(NULL, screen, downcast<bitmap_rgb32 &>(*dualscreen_left_tempbitmap), cliprect);
 		copybitmap(bitmap, *dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
@@ -2582,7 +2582,7 @@ SCREEN_UPDATE_RGB32(konamigx_right)
 			}
 		}
 
-		SCREEN_UPDATE_NAME(konamigx)(__dummy, screen, downcast<bitmap_rgb32 &>(*dualscreen_right_tempbitmap), cliprect);
+		SCREEN_UPDATE_NAME(konamigx)(NULL, screen, downcast<bitmap_rgb32 &>(*dualscreen_right_tempbitmap), cliprect);
 		copybitmap(bitmap, *dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 
