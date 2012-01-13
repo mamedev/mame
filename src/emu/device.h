@@ -97,6 +97,36 @@ class emu_timer;
 typedef struct _input_device_default input_device_default;
 
 
+// ======================> device_delegate
+
+// device_delegate is a delegate that wraps with a device tag and can be easily
+// late bound without replicating logic everywhere
+template<typename _Signature>
+class device_delegate : public delegate<_Signature>
+{
+	typedef delegate<_Signature> basetype;
+
+public:
+	// provide same set of constructors as the base class, with additional device name
+	// parameter
+	device_delegate() : basetype(), m_device_name(NULL) { }
+	device_delegate(const basetype &src) : basetype(src), m_device_name(src.m_device_name) { }
+	device_delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object), m_device_name(src.m_device_name) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
+	device_delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; m_device_name = src.m_device_name; return *this; }
+
+	// perform the binding
+	void bind_relative_to(device_t &search_root);
+
+private:
+	// internal state
+	const char *m_device_name;
+};
+
+
 // exception classes
 class device_missing_dependencies : public emu_exception { };
 
@@ -540,6 +570,18 @@ bool device_list::first(_InterfaceClass *&intf) const
 		if (cur->interface(intf))
 			return true;
 	return false;
+}
+
+
+template<typename _Signature>
+void device_delegate<_Signature>::bind_relative_to(device_t &search_root)
+{
+	if (!basetype::isnull())
+	{
+		device_t *device = search_root.subdevice(m_device_name);
+		assert(device != NULL);
+		basetype::late_bind(*device);
+	}
 }
 
 #endif	/* __DEVINTRF_H__ */

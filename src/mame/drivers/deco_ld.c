@@ -527,7 +527,7 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	MCFG_CPU_PERIODIC_INT(sound_interrupt, 640)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc") //Sony LDP-1000A, is it truly compatible with the Pioneer?
-	MCFG_LASERDISC_OVERLAY(256, 256, rblaster)
+	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, rblaster)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

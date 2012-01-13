@@ -92,7 +92,6 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 	  m_overwidth(0),
 	  m_overheight(0),
 	  m_overclip(0, -1, 0, -1),
-	  m_overupdate_device(NULL),
 	  m_disc(NULL),
 	  m_vbidata(NULL),
 	  m_width(0),
@@ -183,7 +182,7 @@ UINT32 laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 {
 	// handle the overlay if present
 	screen_bitmap &overbitmap = m_overbitmap[m_overindex];
-	if (overbitmap.valid() && !m_overupdate.isnull())
+	if (overbitmap.valid() && (!m_overupdate_ind16.isnull() || !m_overupdate_rgb32.isnull()))
 	{
 		// scale the cliprect to the overlay size
 		rectangle clip(m_overclip);
@@ -193,12 +192,10 @@ UINT32 laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		clip.max_y = (cliprect.max_y + 1) * overbitmap.height() / bitmap.height() - 1;
 
 		// call the update callback
-		switch (m_overupdate.format())
-		{
-			case BITMAP_FORMAT_IND16:	m_overupdate(screen, overbitmap.as_ind16(), clip);	break;
-			case BITMAP_FORMAT_RGB32:		m_overupdate(screen, overbitmap.as_rgb32(), clip);		break;
-			default: throw emu_fatalerror("Invalid bitmap format!");
-		}
+		if (!m_overupdate_ind16.isnull())
+			m_overupdate_ind16(screen, overbitmap.as_ind16(), clip);
+		else
+			m_overupdate_rgb32(screen, overbitmap.as_rgb32(), clip);
 	}
 
 	// if this is the last update, do the rendering
@@ -272,14 +269,24 @@ void laserdisc_device::static_set_audio(device_t &device, laserdisc_audio_delega
 //  static_set_overlay - set the overlay parameters
 //-------------------------------------------------
 
-void laserdisc_device::static_set_overlay(device_t &device, UINT32 width, UINT32 height, screen_update_delegate update, const char *update_device)
+void laserdisc_device::static_set_overlay(device_t &device, UINT32 width, UINT32 height, screen_update_ind16_delegate update)
 {
 	laserdisc_device &ld = downcast<laserdisc_device &>(device);
 	ld.m_overwidth = width;
 	ld.m_overheight = height;
 	ld.m_overclip.set(0, width - 1, 0, height - 1);
-	ld.m_overupdate = update;
-	ld.m_overupdate_device = update_device;
+	ld.m_overupdate_ind16 = update;
+	ld.m_overupdate_rgb32 = screen_update_rgb32_delegate();
+}
+
+void laserdisc_device::static_set_overlay(device_t &device, UINT32 width, UINT32 height, screen_update_rgb32_delegate update)
+{
+	laserdisc_device &ld = downcast<laserdisc_device &>(device);
+	ld.m_overwidth = width;
+	ld.m_overheight = height;
+	ld.m_overclip.set(0, width - 1, 0, height - 1);
+	ld.m_overupdate_ind16 = screen_update_ind16_delegate();
+	ld.m_overupdate_rgb32 = update;
 }
 
 
@@ -846,23 +853,17 @@ void laserdisc_device::init_video()
 	if (m_overenable)
 	{
 		// bind our handlers
-		device_t *device = (m_overupdate_device == NULL) ? machine().driver_data() : machine().device(m_overupdate_device);
-		if (device == NULL) throw emu_fatalerror("Unable to find overlay update device '%s' for laserdisc '%s'\n", m_overupdate_device, tag());
-		m_overupdate.late_bind(*device);
+		m_overupdate_ind16.bind_relative_to(*owner());
+		m_overupdate_rgb32.bind_relative_to(*owner());
 	
 		// configure bitmap formats
-		texture_format texformat;
-		switch (m_overupdate.format())
-		{
-			default:
-			case BITMAP_FORMAT_IND16:	texformat = TEXFORMAT_PALETTEA16;	break;
-			case BITMAP_FORMAT_RGB32:		texformat = TEXFORMAT_ARGB32;		break;
-		}
+		bitmap_format format = !m_overupdate_ind16.isnull() ? BITMAP_FORMAT_IND16 : BITMAP_FORMAT_RGB32;
+		texture_format texformat = !m_overupdate_ind16.isnull() ? TEXFORMAT_PALETTEA16 : TEXFORMAT_ARGB32;
 
 		// allocate overlay bitmaps
 		for (int index = 0; index < ARRAY_LENGTH(m_overbitmap); index++)
 		{
-			m_overbitmap[index].set_format(m_overupdate.format(), texformat);
+			m_overbitmap[index].set_format(format, texformat);
 			m_overbitmap[index].allocate(m_overwidth, m_overheight);
 			m_overbitmap[index].set_palette(machine().palette);
 		}

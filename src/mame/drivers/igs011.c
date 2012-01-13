@@ -3696,7 +3696,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	// irq 4 points to an apparently unneeded routine
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_EOF(vbowl)	// trackball
+	MCFG_SCREEN_EOF_STATIC(vbowl)	// trackball
 //  MCFG_GFXDECODE(igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")

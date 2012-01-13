@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( gpworld, gpworld_state )
 	MCFG_MACHINE_START(gpworld)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY(512, 256, gpworld)
+	MCFG_LASERDISC_OVERLAY_STATIC(512, 256, gpworld)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

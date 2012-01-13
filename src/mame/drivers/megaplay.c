@@ -666,7 +666,7 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_VIDEO_START(megplay)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_UPDATE_STATIC(megplay)
-	MCFG_SCREEN_EOF( megaplay )
+	MCFG_SCREEN_EOF_STATIC( megaplay )
 MACHINE_CONFIG_END
 
 

@@ -82,8 +82,6 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	  m_yoffset(0.0f),
 	  m_xscale(1.0f),
 	  m_yscale(1.0f),
-	  m_screen_update_device(NULL),
-	  m_screen_eof(NULL),
 	  m_container(NULL),
 	  m_width(100),
 	  m_height(100),
@@ -125,8 +123,7 @@ screen_device::~screen_device()
 
 void screen_device::static_set_type(device_t &device, screen_type_enum type)
 {
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_type = type;
+	downcast<screen_device &>(device).m_type = type;
 }
 
 
@@ -156,8 +153,7 @@ void screen_device::static_set_raw(device_t &device, UINT32 pixclock, UINT16 hto
 
 void screen_device::static_set_refresh(device_t &device, attoseconds_t rate)
 {
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_refresh = rate;
+	downcast<screen_device &>(device).m_refresh = rate;
 }
 
 
@@ -194,11 +190,7 @@ void screen_device::static_set_size(device_t &device, UINT16 width, UINT16 heigh
 
 void screen_device::static_set_visarea(device_t &device, INT16 minx, INT16 maxx, INT16 miny, INT16 maxy)
 {
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_visarea.min_x = minx;
-	screen.m_visarea.max_x = maxx;
-	screen.m_visarea.min_y = miny;
-	screen.m_visarea.max_y = maxy;
+	downcast<screen_device &>(device).m_visarea.set(minx, maxx, miny, maxy);
 }
 
 
@@ -224,11 +216,18 @@ void screen_device::static_set_default_position(device_t &device, double xscale,
 //  configuration
 //-------------------------------------------------
 
-void screen_device::static_set_screen_update(device_t &device, screen_update_delegate callback, const char *devicename)
+void screen_device::static_set_screen_update(device_t &device, screen_update_ind16_delegate callback)
 {
 	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_screen_update = callback;
-	screen.m_screen_update_device = devicename;
+	screen.m_screen_update_ind16 = callback;
+	screen.m_screen_update_rgb32 = screen_update_rgb32_delegate();
+}
+
+void screen_device::static_set_screen_update(device_t &device, screen_update_rgb32_delegate callback)
+{
+	screen_device &screen = downcast<screen_device &>(device);
+	screen.m_screen_update_ind16 = screen_update_ind16_delegate();
+	screen.m_screen_update_rgb32 = callback;
 }
 
 
@@ -238,7 +237,7 @@ void screen_device::static_set_screen_update(device_t &device, screen_update_del
 //  configuration
 //-------------------------------------------------
 
-void screen_device::static_set_screen_eof(device_t &device, screen_eof_func callback)
+void screen_device::static_set_screen_eof(device_t &device, screen_eof_delegate callback)
 {
 	downcast<screen_device &>(device).m_screen_eof = callback;
 }
@@ -273,10 +272,9 @@ bool screen_device::device_validity_check(emu_options &options, const game_drive
 		}
 
 		// sanity check screen formats
-		if (m_screen_update.format() != BITMAP_FORMAT_IND16 &&
-			m_screen_update.format() != BITMAP_FORMAT_RGB32)
+		if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull())
 		{
-			mame_printf_error("%s: %s screen '%s' has unsupported format\n", driver.source_file, driver.name, tag());
+			mame_printf_error("%s: %s screen '%s' has no SCREEN_UPDATE function\n", driver.source_file, driver.name, tag());
 			error = true;
 		}
 	}
@@ -299,24 +297,14 @@ bool screen_device::device_validity_check(emu_options &options, const game_drive
 void screen_device::device_start()
 {
 	// bind our handlers
-	if (!m_screen_update.isnull())
-	{
-		device_t *device = (m_screen_update_device == NULL) ? machine().driver_data() : machine().device(m_screen_update_device);
-		if ((device == NULL) && (m_screen_update_device!=NULL)) device = siblingdevice(m_screen_update_device);
-		if (device == NULL) throw emu_fatalerror("Unable to find screen update device '%s' for screen '%s'\n", m_screen_update_device, tag());
-		m_screen_update.late_bind(*device);
-	}
+	m_screen_update_ind16.bind_relative_to(*owner());
+	m_screen_update_rgb32.bind_relative_to(*owner());
+	m_screen_eof.bind_relative_to(*owner());
 	
 	// configure bitmap formats
-	texture_format texformat;
-	switch (m_screen_update.format())
-	{
-		default:
-		case BITMAP_FORMAT_IND16:	texformat = TEXFORMAT_PALETTE16;	break;
-		case BITMAP_FORMAT_RGB32:		texformat = TEXFORMAT_RGB32;		break;
-	}
+	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	for (int index = 0; index < ARRAY_LENGTH(m_bitmap); index++)
-		m_bitmap[index].set_format(m_screen_update.format(), texformat);
+		m_bitmap[index].set_format(format(), texformat);
 
 	// configure the default cliparea
 	render_container::user_settings settings;
@@ -612,8 +600,8 @@ bool screen_device::update_partial(int scanline)
 		switch (curbitmap.format())
 		{
 			default:
-			case BITMAP_FORMAT_IND16:	flags = m_screen_update(*this, curbitmap.as_ind16(), clip);	break;
-			case BITMAP_FORMAT_RGB32:		flags = m_screen_update(*this, curbitmap.as_rgb32(), clip);		break;
+			case BITMAP_FORMAT_IND16:	flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);	break;
+			case BITMAP_FORMAT_RGB32:	flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);	break;
 		}
 
 		m_partial_updates_this_frame++;
@@ -1061,6 +1049,6 @@ void screen_device::load_effect_overlay(const char *filename)
 
 void screen_device::screen_eof()
 {
-	if (m_screen_eof != NULL)
-		return (*m_screen_eof)(*this);
+	if (!m_screen_eof.isnull())
+		m_screen_eof(*this);
 }

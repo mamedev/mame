@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	MCFG_MACHINE_START(esh)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY(256, 256, esh)
+	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, esh)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

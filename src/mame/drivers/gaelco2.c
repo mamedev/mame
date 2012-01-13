@@ -169,7 +169,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2)
-	MCFG_SCREEN_EOF(gaelco2)
+	MCFG_SCREEN_EOF_STATIC(gaelco2)
 
 	MCFG_GFXDECODE(0x0080000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( bang, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2)
-	MCFG_SCREEN_EOF(gaelco2)
+	MCFG_SCREEN_EOF_STATIC(gaelco2)
 
 	MCFG_GFXDECODE(0x0200000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
@@ -543,7 +543,7 @@ static MACHINE_CONFIG_START( alighunt, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2)
-	MCFG_SCREEN_EOF(gaelco2)
+	MCFG_SCREEN_EOF_STATIC(gaelco2)
 
 	MCFG_GFXDECODE(0x0400000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
@@ -795,7 +795,7 @@ static MACHINE_CONFIG_START( touchgo, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2_right)
-	MCFG_SCREEN_EOF(gaelco2)
+	MCFG_SCREEN_EOF_STATIC(gaelco2)
 
 	MCFG_VIDEO_START(gaelco2_dual)
 
@@ -979,7 +979,7 @@ static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2)
-	MCFG_SCREEN_EOF(gaelco2)
+	MCFG_SCREEN_EOF_STATIC(gaelco2)
 
 	MCFG_GFXDECODE(0x0400000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
@@ -1230,7 +1230,7 @@ static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	MCFG_SCREEN_SIZE(384, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2_right)
-	MCFG_SCREEN_EOF(gaelco2)
+	MCFG_SCREEN_EOF_STATIC(gaelco2)
 
 
 	MCFG_VIDEO_START(gaelco2_dual)

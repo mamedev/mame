@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	/* note: these parameters are from published specs, not derived */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_STATIC(atarig1)
-	MCFG_SCREEN_EOF(atarig1)
+	MCFG_SCREEN_EOF_STATIC(atarig1)
 
 	MCFG_VIDEO_START(atarig1)
 

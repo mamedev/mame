@@ -1729,7 +1729,7 @@ MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 	MCFG_SCREEN_UPDATE_STATIC(megatech_md_sms) /* Copies a bitmap */
-	MCFG_SCREEN_EOF(sms) /* Used to Sync the timing */
+	MCFG_SCREEN_EOF_STATIC(sms) /* Used to Sync the timing */
 
 	MCFG_PALETTE_LENGTH(0x200)
 

@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_MACHINE_RESET(dlair)
 
 	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
-	MCFG_LASERDISC_OVERLAY(256, 256, dleuro)
+	MCFG_LASERDISC_OVERLAY_STATIC(256, 256, dleuro)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")

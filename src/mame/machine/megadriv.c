@@ -9565,7 +9565,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_EOF(megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_EOF_STATIC(megadriv) /* Used to Sync the timing */
 
 	MCFG_NVRAM_HANDLER(megadriv)
 
@@ -9613,7 +9613,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_EOF(megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_EOF_STATIC(megadriv) /* Used to Sync the timing */
 
 	MCFG_NVRAM_HANDLER(megadriv)
 

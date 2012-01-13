@@ -2374,7 +2374,7 @@ static MACHINE_CONFIG_DERIVED( phantom2, mw8080bw_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(phantom2)
-	MCFG_SCREEN_EOF(phantom2)
+	MCFG_SCREEN_EOF_STATIC(phantom2)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")

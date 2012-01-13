@@ -91,14 +91,14 @@ enum laserdisc_field_code
 #define MCFG_LASERDISC_AUDIO(_func) \
 	laserdisc_device::static_set_audio(*device, _func); \
 
-#define MCFG_LASERDISC_OVERLAY(_width, _height, _func) \
-	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate(&screen_update_##_func, "screen_update_" #_func), device->tag()); \
+#define MCFG_LASERDISC_OVERLAY_STATIC(_width, _height, _func) \
+	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func, device->tag())); \
 
 #define MCFG_LASERDISC_OVERLAY_DRIVER(_width, _height, _class, _method) \
-	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate(&_class::_method, #_class "::" #_method)); \
+	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL)); \
 
 #define MCFG_LASERDISC_OVERLAY_DEVICE(_width, _height, _device, _class, _method) \
-	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate(&_class::_method, #_class "::" #_method), _device); \
+	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device)); \
 
 #define MCFG_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \
 	laserdisc_device::static_set_overlay_clip(*device, _minx, _maxx, _miny, _maxy); \
@@ -189,7 +189,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// configuration
-	bool overlay_configured() const { return (m_overwidth > 0 && m_overheight > 0 && !m_overupdate.isnull()); }
+	bool overlay_configured() const { return (m_overwidth > 0 && m_overheight > 0 && (!m_overupdate_ind16.isnull() || !m_overupdate_rgb32.isnull())); }
 	void get_overlay_config(laserdisc_overlay_config &config) { config = static_cast<laserdisc_overlay_config &>(*this); }
 	void set_overlay_config(const laserdisc_overlay_config &config) { static_cast<laserdisc_overlay_config &>(*this) = config; }
 
@@ -197,7 +197,8 @@ public:
 	static void static_set_screen(device_t &device, const char *screen);
 	static void static_set_get_disc(device_t &device, laserdisc_get_disc_delegate callback);
 	static void static_set_audio(device_t &device, laserdisc_audio_delegate callback);
-	static void static_set_overlay(device_t &device, UINT32 width, UINT32 height, screen_update_delegate update, const char *update_device = NULL);
+	static void static_set_overlay(device_t &device, UINT32 width, UINT32 height, screen_update_ind16_delegate update);
+	static void static_set_overlay(device_t &device, UINT32 width, UINT32 height, screen_update_rgb32_delegate update);
 	static void static_set_overlay_clip(device_t &device, INT32 minx, INT32 maxx, INT32 miny, INT32 maxy);
 	static void static_set_overlay_position(device_t &device, float posx, float posy);
 	static void static_set_overlay_scale(device_t &device, float scalex, float scaley);
@@ -325,8 +326,8 @@ private:
 	UINT32				m_overwidth;			// overlay screen width
 	UINT32				m_overheight;			// overlay screen height
 	rectangle			m_overclip;				// overlay visarea
-	screen_update_delegate m_overupdate;		// overlay update delegate
-	const char *		m_overupdate_device;	// device for the overlay update
+	screen_update_ind16_delegate m_overupdate_ind16; // overlay update delegate
+	screen_update_rgb32_delegate m_overupdate_rgb32; // overlay update delegate
 
 	// disc parameters
 	chd_file *			m_disc;					// handle to the disc itself
