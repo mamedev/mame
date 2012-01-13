@@ -249,12 +249,11 @@ VIDEO_START( bigfight )
 /********************************************************************/
 
 template<class _BitmapClass>
-INLINE void roundupt_drawgfxzoomrotate(
+INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 		_BitmapClass &dest_bmp, const rectangle &clip, const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,UINT32 ssx,UINT32 ssy,
 		int scalex, int scaley, int rotate, int write_priority_only )
 {
-	tatsumi_state *state = gfx->machine().driver_data<tatsumi_state>();
 	rectangle myclip;
 
 	if (!scalex || !scaley) return;
@@ -642,13 +641,13 @@ static void draw_sprites(running_machine &machine, _BitmapClass &bitmap, const r
 
 				for (w = 0; w < x_width; w++) {
 					if (rotate)
-						roundupt_drawgfxzoomrotate(
+						roundupt_drawgfxzoomrotate(state,
 								state->m_temp_bitmap,cliprect,machine.gfx[0],
 								base,
 								color,flip_x,flip_y,x_pos,render_y,
 								scale,scale,0,write_priority_only);
 					else
-						roundupt_drawgfxzoomrotate(
+						roundupt_drawgfxzoomrotate(state,
 								bitmap,cliprect,machine.gfx[0],
 								base,
 								color,flip_x,flip_y,x_pos,render_y,
