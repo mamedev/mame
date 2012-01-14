@@ -75,7 +75,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				total_time += v & 0x7f;
 				if((v & 0x80) && !index_time)
 					index_time = total_time;
-			}					
+			}
 		}
 
 		if(!index_time)

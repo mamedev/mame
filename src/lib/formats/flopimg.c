@@ -1034,6 +1034,7 @@ bool floppy_image_format_t::type_no_data(int type) const
 {
 	return type == CRC_CCITT_START ||
 		type == CRC_AMIGA_START ||
+		type == CRC_MACHEAD_START ||
 		type == CRC_END ||
 		type == SECTOR_LOOP_START ||
 		type == SECTOR_LOOP_END ||
@@ -1062,6 +1063,9 @@ void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 		case CRC_AMIGA_START:
 			crcs[desc[i].p1].type = CRC_AMIGA;
 			break;
+		case CRC_MACHEAD_START:
+			crcs[desc[i].p1].type = CRC_MACHEAD;
+			break;
 		}
 
 	for(int i=0; desc[i].type != END; i++)
@@ -1077,6 +1081,7 @@ int floppy_image_format_t::crc_cells_size(int type) const
 	switch(type) {
 	case CRC_CCITT: return 32;
 	case CRC_AMIGA: return 64;
+	case CRC_MACHEAD: return 8;
 	default: return 0;
 	}
 }
@@ -1084,6 +1089,14 @@ int floppy_image_format_t::crc_cells_size(int type) const
 bool floppy_image_format_t::bit_r(const UINT32 *buffer, int offset)
 {
 	return (buffer[offset] & floppy_image::MG_MASK) == MG_1;
+}
+
+UINT32 floppy_image_format_t::bitn_r(const UINT32 *buffer, int offset, int count)
+{
+	UINT32 r = 0;
+	for(int i=0; i<count; i++)
+		r = (r << 1) | bit_r(buffer, offset+i);
+	return r;
 }
 
 void floppy_image_format_t::bit_w(UINT32 *buffer, int offset, bool val, UINT32 size)
@@ -1151,13 +1164,23 @@ void floppy_image_format_t::fixup_crc_ccitt(UINT32 *buffer, const gen_crc_info *
 	mfm_w(buffer, offset, 16, calc_crc_ccitt(buffer, crc->start, crc->end));
 }
 
+void floppy_image_format_t::fixup_crc_machead(UINT32 *buffer, const gen_crc_info *crc)
+{
+	UINT8 v = 0;
+	for(int o = crc->start; o < crc->end; o+=8)
+		v = v ^ gcr6bw_tb[bitn_r(buffer, o, 8)];
+	int offset = crc->write;
+	raw_w(buffer, offset, 8, gcr6fw_tb[v]);
+}
+
 void floppy_image_format_t::fixup_crcs(UINT32 *buffer, gen_crc_info *crcs)
 {
 	for(int i=0; i != MAX_CRC_COUNT; i++)
 		if(crcs[i].write != -1) {
 			switch(crcs[i].type) {
-			case CRC_AMIGA: fixup_crc_amiga(buffer, crcs+i); break;
-			case CRC_CCITT: fixup_crc_ccitt(buffer, crcs+i); break;
+			case CRC_AMIGA:   fixup_crc_amiga(buffer, crcs+i); break;
+			case CRC_CCITT:   fixup_crc_ccitt(buffer, crcs+i); break;
+			case CRC_MACHEAD: fixup_crc_machead(buffer, crcs+i); break;
 			}
 			if(crcs[i].fixup_mfm_clock) {
 				int offset = crcs[i].write + crc_cells_size(crcs[i].type);
@@ -1165,6 +1188,28 @@ void floppy_image_format_t::fixup_crcs(UINT32 *buffer, gen_crc_info *crcs)
 			}
 			crcs[i].write = -1;
 		}
+}
+
+UINT32 floppy_image_format_t::gcr6_encode(UINT8 va, UINT8 vb, UINT8 vc)
+{
+	UINT32 r;
+	r = gcr6fw_tb[((va >> 2) & 0x30) | ((vb >> 4) & 0x0c) | ((vc >> 6) & 0x03)] << 24;
+	r |= gcr6fw_tb[va & 0x3f] << 16;
+	r |= gcr6fw_tb[vb & 0x3f] << 8;
+	r |= gcr6fw_tb[vc & 0x3f];
+	return r;
+}
+
+void floppy_image_format_t::gcr6_decode(UINT8 e0, UINT8 e1, UINT8 e2, UINT8 e3, UINT8 &va, UINT8 &vb, UINT8 &vc)
+{
+	e0 = gcr6bw_tb[e0];
+	e1 = gcr6bw_tb[e1];
+	e2 = gcr6bw_tb[e2];
+	e3 = gcr6bw_tb[e3];
+
+	va = ((e0 << 2) & 0xc0) | e1;
+	vb = ((e0 << 4) & 0xc0) | e2;
+	vc = ((e0 << 6) & 0xc0) | e3;
 }
 
 int floppy_image_format_t::calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head)
@@ -1227,12 +1272,24 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			mfm_w(buffer, offset, 8, track);
 			break;
 
+		case TRACK_ID_GCR6:
+			raw_w(buffer, offset, 8, gcr6fw_tb[track & 0x3f]);
+			break;
+
 		case HEAD_ID:
 			mfm_w(buffer, offset, 8, head);
 			break;
 
+		case TRACK_HEAD_ID_GCR6:
+			raw_w(buffer, offset, 8, gcr6fw_tb[(track & 0x40 ? 1 : 0) | (head ? 0x20 : 0)]);
+			break;
+
 		case SECTOR_ID:
 			mfm_w(buffer, offset, 8, sect[sector_idx].sector_id);
+			break;
+
+		case SECTOR_ID_GCR6:
+			raw_w(buffer, offset, 8, gcr6fw_tb[sect[sector_idx].sector_id]);
 			break;
 
 		case SIZE_ID: {
@@ -1242,6 +1299,10 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			mfm_w(buffer, offset, 8, id);
 			break;
 		}
+
+		case SECTOR_INFO_GCR6:
+			raw_w(buffer, offset, 8, gcr6fw_tb[sect[sector_idx].sector_info]);
+			break;
 
 		case OFFSET_ID_O:
 			mfm_half_w(buffer, offset, 7, track*2+head);
@@ -1272,7 +1333,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			sector_loop_start = index;
 			sector_idx = desc[index].p1;
 			sector_cnt = sector_idx;
-			sector_limit = desc[index].p2;
+			sector_limit = desc[index].p2 == -1 ? sector_idx+sect_count-1 : desc[index].p2;
 			sector_idx = calc_sector_index(sector_cnt,sector_interleave,sector_skew,sector_limit+1,track*2 + head);
 			break;
 
@@ -1292,6 +1353,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 
 		case CRC_AMIGA_START:
 		case CRC_CCITT_START:
+		case CRC_MACHEAD_START:
 			crcs[desc[index].p1].start = offset;
 			break;
 
@@ -1322,6 +1384,34 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
 			for(int i=0; i != csect->size; i++)
 				mfm_half_w(buffer, offset, 6, csect->data[i]);
+			break;
+		}
+
+		case SECTOR_DATA_MAC: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
+			const UINT8 *data = csect->data;
+			int size = csect->size;
+			UINT8 ca = 0, cb = 0, cc = 0;
+			for(int i=0; i < size; i+=3) {
+				int dt = size-i;
+				UINT8 va = data[i];
+				UINT8 vb = dt > 1 ? data[i+1] : 0;
+				UINT8 vc = dt > 2 ? data[i+2] : 0;
+
+				cc = (cc << 1) | (cc >> 7);
+				int suma = ca + va + (cc & 1);
+				ca = suma;
+				va = va ^ cc;
+				int sumb = cb + vb + (suma >> 8);
+				cb = sumb;
+				vb = vb ^ ca;
+				cc = cc + vc + (sumb >> 8);
+				vc = vc ^ cb;
+
+				int nb = dt > 2 ? 32 : dt > 1 ? 24 : 16;
+				raw_w(buffer, offset, nb, gcr6_encode(va, vb, vc) >> (32-nb));
+			}
+			raw_w(buffer, offset, 32, gcr6_encode(ca, cb, cc));
 			break;
 		}
 
@@ -1466,6 +1556,39 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT
 	image->set_track_size(track, head, size);
 	image->set_write_splice_position(track, head, splice_angular_pos);
 }
+
+const UINT8 floppy_image_format_t::gcr6fw_tb[0x40] =
+{
+	0x96, 0x97, 0x9a, 0x9b, 0x9d, 0x9e, 0x9f, 0xa6,
+	0xa7, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb2, 0xb3,
+	0xb4, 0xb5, 0xb6, 0xb7, 0xb9, 0xba, 0xbb, 0xbc,
+	0xbd, 0xbe, 0xbf, 0xcb, 0xcd, 0xce, 0xcf, 0xd3,
+	0xd6, 0xd7, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde,
+	0xdf, 0xe5, 0xe6, 0xe7, 0xe9, 0xea, 0xeb, 0xec,
+	0xed, 0xee, 0xef, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6,
+	0xf7, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
+};
+
+const UINT8 floppy_image_format_t::gcr6bw_tb[0x100] =
+{
+	// 0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x02, 0x03, 0x00, 0x04, 0x05, 0x06,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x08, 0x00, 0x00, 0x00, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+	0x00, 0x00, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x00, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1b, 0x00, 0x1c, 0x1d, 0x1e,
+	0x00, 0x00, 0x00, 0x1f, 0x00, 0x00, 0x20, 0x21, 0x00, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x2a, 0x2b, 0x00, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32,
+	0x00, 0x00, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x00, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+};
 
 //  Atari ST Fastcopy Pro layouts
 

@@ -21,5 +21,27 @@ int apple35_sectors_per_track(floppy_image_legacy *image, int track);
 LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_mac);
 LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_iigs);
 
+class dc42_format : public floppy_image_format_t
+{
+public:
+	dc42_format();
+
+	virtual int identify(io_generic *io, UINT32 form_factor);
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
+	virtual bool save(io_generic *io, floppy_image *image);
+
+	virtual const char *name() const;
+	virtual const char *description() const;
+	virtual const char *extensions() const;
+	virtual bool supports_save() const;
+
+private:
+	static const desc_e mac_gcr[];
+
+	UINT8 gb(const UINT8 *buf, int ts, int &pos, int &wrap);
+	void update_chk(const UINT8 *data, int size, UINT32 &chk);
+};
+
+extern const floppy_format_type FLOPPY_DC42_FORMAT;
 
 #endif /* AP_DSK35_H */

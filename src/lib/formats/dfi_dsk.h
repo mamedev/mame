@@ -10,7 +10,7 @@ public:
 
 	virtual int identify(io_generic *io, UINT32 form_factor);
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	//	virtual bool save(io_generic *io, floppy_image *image);
+	//  virtual bool save(io_generic *io, floppy_image *image);
 
 	virtual const char *name() const;
 	virtual const char *description() const;
