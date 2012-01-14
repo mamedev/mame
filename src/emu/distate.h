@@ -161,7 +161,7 @@ public:
 
 	// state setters
 	void set_state(int index, UINT64 value);
-	void set_state(int index, const char *string);
+	void set_state_string(int index, const char *string);
 
 public:	// protected eventually
 

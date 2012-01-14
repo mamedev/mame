@@ -144,6 +144,7 @@ typedef int (*device_irq_callback)(device_t *device, int irqnum);
 class device_execute_interface : public device_interface
 {
 	friend class device_scheduler;
+	friend class testcpu_state;
 
 public:
 	// construction/destruction

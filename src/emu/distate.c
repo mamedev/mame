@@ -489,7 +489,7 @@ void device_state_interface::set_state(int index, UINT64 value)
 //  of indexed state from a string
 //-------------------------------------------------
 
-void device_state_interface::set_state(int index, const char *string)
+void device_state_interface::set_state_string(int index, const char *string)
 {
 	// NULL or out-of-range entry is a no-op
 	const device_state_entry *entry = state_find_entry(index);
