@@ -35,7 +35,7 @@ VIDEO_START( tceptor );
 SCREEN_UPDATE_IND16( tceptor_2d );
 SCREEN_UPDATE_IND16( tceptor_3d_left );
 SCREEN_UPDATE_IND16( tceptor_3d_right );
-SCREEN_EOF( tceptor );
+SCREEN_VBLANK( tceptor );
 
 WRITE8_HANDLER( tceptor_tile_ram_w );
 WRITE8_HANDLER( tceptor_tile_attr_w );

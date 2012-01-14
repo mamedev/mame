@@ -144,73 +144,77 @@ SCREEN_UPDATE_IND16( sprint2 )
 }
 
 
-SCREEN_EOF( sprint2 )
+SCREEN_VBLANK( sprint2 )
 {
-	sprint2_state *state = screen.machine().driver_data<sprint2_state>();
-	UINT8 *video_ram = state->m_video_ram;
-	int i;
-	int j;
-	const rectangle &visarea = screen.machine().primary_screen->visible_area();
-
-	/*
-     * Collisions are detected for both player cars:
-     *
-     * D7 => state->m_collision w/ white playfield
-     * D6 => state->m_collision w/ black playfield or another car
-     *
-     */
-
-	for (i = 0; i < 2; i++)
+	// rising edge
+	if (vblank_on)
 	{
-		rectangle rect;
+		sprint2_state *state = screen.machine().driver_data<sprint2_state>();
+		UINT8 *video_ram = state->m_video_ram;
+		int i;
+		int j;
+		const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-		rect.min_x = get_sprite_x(video_ram, i);
-		rect.min_y = get_sprite_y(video_ram, i);
-		rect.max_x = get_sprite_x(video_ram, i) + screen.machine().gfx[1]->width - 1;
-		rect.max_y = get_sprite_y(video_ram, i) + screen.machine().gfx[1]->height - 1;
+		/*
+	     * Collisions are detected for both player cars:
+	     *
+	     * D7 => state->m_collision w/ white playfield
+	     * D6 => state->m_collision w/ black playfield or another car
+	     *
+	     */
 
-		if (rect.min_x < visarea.min_x)
-			rect.min_x = visarea.min_x;
-		if (rect.min_y < visarea.min_y)
-			rect.min_y = visarea.min_y;
-		if (rect.max_x > visarea.max_x)
-			rect.max_x = visarea.max_x;
-		if (rect.max_y > visarea.max_y)
-			rect.max_y = visarea.max_y;
+		for (i = 0; i < 2; i++)
+		{
+			rectangle rect;
 
-		/* check for sprite-tilemap collisions */
+			rect.min_x = get_sprite_x(video_ram, i);
+			rect.min_y = get_sprite_y(video_ram, i);
+			rect.max_x = get_sprite_x(video_ram, i) + screen.machine().gfx[1]->width - 1;
+			rect.max_y = get_sprite_y(video_ram, i) + screen.machine().gfx[1]->height - 1;
 
-		tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
+			if (rect.min_x < visarea.min_x)
+				rect.min_x = visarea.min_x;
+			if (rect.min_y < visarea.min_y)
+				rect.min_y = visarea.min_y;
+			if (rect.max_x > visarea.max_x)
+				rect.max_x = visarea.max_x;
+			if (rect.max_y > visarea.max_y)
+				rect.max_y = visarea.max_y;
 
-		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
-			get_sprite_code(video_ram, i),
-			0,
-			0, 0,
-			get_sprite_x(video_ram, i),
-			get_sprite_y(video_ram, i), 1);
+			/* check for sprite-tilemap collisions */
 
-		state->m_collision[i] |= collision_check(state, screen.machine().colortable, rect);
+			tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
 
-		/* check for sprite-sprite collisions */
+			drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+				get_sprite_code(video_ram, i),
+				0,
+				0, 0,
+				get_sprite_x(video_ram, i),
+				get_sprite_y(video_ram, i), 1);
 
-		for (j = 0; j < 4; j++)
-			if (j != i)
-			{
-				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
-					get_sprite_code(video_ram, j),
-					1,
-					0, 0,
-					get_sprite_x(video_ram, j),
-					get_sprite_y(video_ram, j), 0);
-			}
+			state->m_collision[i] |= collision_check(state, screen.machine().colortable, rect);
 
-		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
-			get_sprite_code(video_ram, i),
-			0,
-			0, 0,
-			get_sprite_x(video_ram, i),
-			get_sprite_y(video_ram, i), 1);
+			/* check for sprite-sprite collisions */
 
-		state->m_collision[i] |= collision_check(state, screen.machine().colortable, rect);
+			for (j = 0; j < 4; j++)
+				if (j != i)
+				{
+					drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+						get_sprite_code(video_ram, j),
+						1,
+						0, 0,
+						get_sprite_x(video_ram, j),
+						get_sprite_y(video_ram, j), 0);
+				}
+
+			drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+				get_sprite_code(video_ram, i),
+				0,
+				0, 0,
+				get_sprite_x(video_ram, i),
+				get_sprite_y(video_ram, i), 1);
+
+			state->m_collision[i] |= collision_check(state, screen.machine().colortable, rect);
+		}
 	}
 }

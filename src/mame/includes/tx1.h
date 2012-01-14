@@ -164,7 +164,7 @@ VIDEO_START( tx1 );
 SCREEN_UPDATE_IND16( tx1_left );
 SCREEN_UPDATE_IND16( tx1_middle );
 SCREEN_UPDATE_IND16( tx1_right );
-SCREEN_EOF( tx1 );
+SCREEN_VBLANK( tx1 );
 WRITE16_HANDLER( tx1_slincs_w );
 WRITE16_HANDLER( tx1_slock_w );
 WRITE16_HANDLER( tx1_scolst_w );
@@ -176,7 +176,7 @@ VIDEO_START( buggyboy );
 SCREEN_UPDATE_IND16( buggyboy_left );
 SCREEN_UPDATE_IND16( buggyboy_middle );
 SCREEN_UPDATE_IND16( buggyboy_right );
-SCREEN_EOF( buggyboy );
+SCREEN_VBLANK( buggyboy );
 
 VIDEO_START( buggybjr );
 SCREEN_UPDATE_IND16( buggybjr );

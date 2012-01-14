@@ -55,7 +55,7 @@ VIDEO_START( helifire );
 SCREEN_UPDATE_IND16( spacefev );
 SCREEN_UPDATE_IND16( sheriff );
 SCREEN_UPDATE_IND16( helifire );
-SCREEN_EOF( helifire );
+SCREEN_VBLANK( helifire );
 
 void spacefev_start_red_cannon(running_machine &machine);
 

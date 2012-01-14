@@ -45,4 +45,4 @@ VIDEO_START( trojan );
 VIDEO_START( avengers );
 SCREEN_UPDATE_IND16( lwings );
 SCREEN_UPDATE_IND16( trojan );
-SCREEN_EOF( lwings );
+SCREEN_VBLANK( lwings );

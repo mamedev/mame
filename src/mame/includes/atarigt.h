@@ -55,7 +55,7 @@ void atarigt_colorram_w(atarigt_state *state, offs_t address, UINT16 data, UINT1
 UINT16 atarigt_colorram_r(atarigt_state *state, offs_t address);
 
 VIDEO_START( atarigt );
-SCREEN_EOF( atarigt );
+SCREEN_VBLANK( atarigt );
 SCREEN_UPDATE_RGB32( atarigt );
 
 void atarigt_scanline_update(screen_device &screen, int scanline);

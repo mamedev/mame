@@ -2032,7 +2032,7 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_STATIC(seta2)
-	MCFG_SCREEN_EOF_STATIC(seta2)
+	MCFG_SCREEN_VBLANK_STATIC(seta2)
 
 	MCFG_GFXDECODE(seta2)
 	MCFG_PALETTE_LENGTH(0x8000+0xf0)	// extra 0xf0 because we might draw 256-color object with 16-color granularity
@@ -2228,7 +2228,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_STATIC(seta2)
-	MCFG_SCREEN_EOF_STATIC(seta2)
+	MCFG_SCREEN_VBLANK_STATIC(seta2)
 
 	MCFG_GFXDECODE(funcube)
 	MCFG_PALETTE_LENGTH(0x8000+0xf0)	// extra 0xf0 because we might draw 256-color object with 16-color granularity
@@ -2264,7 +2264,7 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_STATIC(seta2)
-	MCFG_SCREEN_EOF_STATIC(seta2)
+	MCFG_SCREEN_VBLANK_STATIC(seta2)
 
 	MCFG_GFXDECODE(funcube)
 	MCFG_PALETTE_LENGTH(0x8000+0xf0)	// extra 0xf0 because we might draw 256-color object with 16-color granularity

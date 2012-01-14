@@ -38,4 +38,4 @@ WRITE8_HANDLER( sspeedr_track_ice_w );
 
 VIDEO_START( sspeedr );
 SCREEN_UPDATE_IND16( sspeedr );
-SCREEN_EOF( sspeedr );
+SCREEN_VBLANK( sspeedr );

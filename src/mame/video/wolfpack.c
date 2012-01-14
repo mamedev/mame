@@ -291,33 +291,37 @@ SCREEN_UPDATE_IND16( wolfpack )
 }
 
 
-SCREEN_EOF( wolfpack )
+SCREEN_VBLANK( wolfpack )
 {
-	wolfpack_state *state = screen.machine().driver_data<wolfpack_state>();
-
-	int x;
-	int y;
-
-	state->m_helper.fill(0);
-
-	draw_ship(screen.machine(), state->m_helper, state->m_helper.cliprect());
-
-	for (y = 128; y < 224 - state->m_torpedo_v; y++)
+	// rising edge
+	if (vblank_on)
 	{
-		int x1 = 248 - state->m_torpedo_h - 1;
-		int x2 = 248 - state->m_torpedo_h + 1;
+		wolfpack_state *state = screen.machine().driver_data<wolfpack_state>();
 
-		for (x = 2 * x1; x < 2 * x2; x++)
+		int x;
+		int y;
+
+		state->m_helper.fill(0);
+
+		draw_ship(screen.machine(), state->m_helper, state->m_helper.cliprect());
+
+		for (y = 128; y < 224 - state->m_torpedo_v; y++)
 		{
-			if (x < 0 || x >= state->m_helper.width())
-				continue;
-			if (y < 0 || y >= state->m_helper.height())
-				continue;
+			int x1 = 248 - state->m_torpedo_h - 1;
+			int x2 = 248 - state->m_torpedo_h + 1;
 
-			if (state->m_helper.pix16(y, x))
-				state->m_collision = 1;
+			for (x = 2 * x1; x < 2 * x2; x++)
+			{
+				if (x < 0 || x >= state->m_helper.width())
+					continue;
+				if (y < 0 || y >= state->m_helper.height())
+					continue;
+
+				if (state->m_helper.pix16(y, x))
+					state->m_collision = 1;
+			}
 		}
-	}
 
-	state->m_current_index += 0x300 * 262;
+		state->m_current_index += 0x300 * 262;
+	}
 }

@@ -396,20 +396,24 @@ SCREEN_UPDATE_IND16( namcos86 )
 }
 
 
-SCREEN_EOF( namcos86 )
+SCREEN_VBLANK( namcos86 )
 {
-	namcos86_state *state = screen.machine().driver_data<namcos86_state>();
-	if (state->m_copy_sprites)
+	// rising edge
+	if (vblank_on)
 	{
-		UINT8 *spriteram = state->m_spriteram;
-		int i,j;
-
-		for (i = 0;i < 0x800;i += 16)
+		namcos86_state *state = screen.machine().driver_data<namcos86_state>();
+		if (state->m_copy_sprites)
 		{
-			for (j = 10;j < 16;j++)
-				spriteram[i+j] = spriteram[i+j - 6];
-		}
+			UINT8 *spriteram = state->m_spriteram;
+			int i,j;
 
-		state->m_copy_sprites = 0;
+			for (i = 0;i < 0x800;i += 16)
+			{
+				for (j = 10;j < 16;j++)
+					spriteram[i+j] = spriteram[i+j - 6];
+			}
+
+			state->m_copy_sprites = 0;
+		}
 	}
 }

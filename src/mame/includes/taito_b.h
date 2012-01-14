@@ -59,4 +59,4 @@ VIDEO_RESET( hitice );
 SCREEN_UPDATE_RGB32( realpunc );
 SCREEN_UPDATE_IND16( taitob );
 
-SCREEN_EOF( taitob );
+SCREEN_VBLANK( taitob );

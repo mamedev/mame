@@ -69,7 +69,7 @@ SCREEN_UPDATE_IND16( batrider );
 SCREEN_UPDATE_IND16( dogyuun );
 SCREEN_UPDATE_IND16( batsugun );
 
-SCREEN_EOF( toaplan2 );
+SCREEN_VBLANK( toaplan2 );
 
 /* non-vdp text layer */
 WRITE16_HANDLER( toaplan2_txvideoram16_w );

@@ -42,6 +42,6 @@ READ16_HANDLER( twin16_sprite_status_r );
 
 VIDEO_START( twin16 );
 SCREEN_UPDATE_IND16( twin16 );
-SCREEN_EOF( twin16 );
+SCREEN_VBLANK( twin16 );
 
 void twin16_spriteram_process( running_machine &machine );

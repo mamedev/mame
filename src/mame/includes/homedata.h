@@ -70,4 +70,4 @@ SCREEN_UPDATE_IND16( mrokumei );
 SCREEN_UPDATE_IND16( reikaids );
 SCREEN_UPDATE_IND16( pteacher );
 SCREEN_UPDATE_IND16( mirderby );
-SCREEN_EOF( homedata );
+SCREEN_VBLANK( homedata );

@@ -251,9 +251,13 @@ SCREEN_UPDATE_IND16( dynduke )
 	return 0;
 }
 
-SCREEN_EOF( dynduke )
+SCREEN_VBLANK( dynduke )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	buffer_spriteram16_w(space, 0, 0, 0xffff); // Could be a memory location instead
+		buffer_spriteram16_w(space, 0, 0, 0xffff); // Could be a memory location instead
+	}
 }

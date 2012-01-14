@@ -311,14 +311,18 @@ SCREEN_UPDATE_RGB32( phantom2 )
 }
 
 
-SCREEN_EOF( phantom2 )
+SCREEN_VBLANK( phantom2 )
 {
-	mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 
-	state->m_phantom2_cloud_counter += MW8080BW_VTOTAL;
+		state->m_phantom2_cloud_counter += MW8080BW_VTOTAL;
 
-	if (state->m_phantom2_cloud_counter >= PHANTOM2_CLOUD_COUNTER_END)
-		state->m_phantom2_cloud_counter = PHANTOM2_CLOUD_COUNTER_START + (state->m_phantom2_cloud_counter - PHANTOM2_CLOUD_COUNTER_END);
+		if (state->m_phantom2_cloud_counter >= PHANTOM2_CLOUD_COUNTER_END)
+			state->m_phantom2_cloud_counter = PHANTOM2_CLOUD_COUNTER_START + (state->m_phantom2_cloud_counter - PHANTOM2_CLOUD_COUNTER_END);
+	}
 }
 
 

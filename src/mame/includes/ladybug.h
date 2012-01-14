@@ -58,7 +58,7 @@ SCREEN_UPDATE_IND16( ladybug );
 PALETTE_INIT( sraider );
 VIDEO_START( sraider );
 SCREEN_UPDATE_IND16( sraider );
-SCREEN_EOF( sraider );
+SCREEN_VBLANK( sraider );
 
 /*----------- defined in video/redclash.c -----------*/
 
@@ -74,7 +74,7 @@ WRITE8_HANDLER( redclash_star_reset_w );
 PALETTE_INIT( redclash );
 VIDEO_START( redclash );
 SCREEN_UPDATE_IND16( redclash );
-SCREEN_EOF( redclash );
+SCREEN_VBLANK( redclash );
 
 /* sraider uses the zerohour star generator board */
 void redclash_set_stars_enable(running_machine &machine, UINT8 on);

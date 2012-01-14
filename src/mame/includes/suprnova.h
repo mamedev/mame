@@ -86,5 +86,5 @@ WRITE32_HANDLER ( skns_pal_regs_w );
 WRITE32_HANDLER ( skns_palette_ram_w );
 VIDEO_START(skns);
 VIDEO_RESET(skns);
-SCREEN_EOF(skns);
+SCREEN_VBLANK(skns);
 SCREEN_UPDATE_RGB32(skns);

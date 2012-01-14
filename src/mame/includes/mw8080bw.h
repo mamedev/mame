@@ -230,6 +230,6 @@ SCREEN_UPDATE_RGB32( mw8080bw );
 SCREEN_UPDATE_RGB32( spcenctr );
 
 SCREEN_UPDATE_RGB32( phantom2 );
-SCREEN_EOF( phantom2 );
+SCREEN_VBLANK( phantom2 );
 
 SCREEN_UPDATE_RGB32( invaders );

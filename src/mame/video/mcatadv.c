@@ -269,9 +269,13 @@ VIDEO_START( mcatadv )
 	state->save_pointer(NAME(state->m_vidregs_old), (0x0f + 1) / 2);
 }
 
-SCREEN_EOF( mcatadv )
+SCREEN_VBLANK( mcatadv )
 {
-	mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
-	memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram_size);
-	memcpy(state->m_vidregs_old, state->m_vidregs, 0xf);
+	// rising edge
+	if (vblank_on)
+	{
+		mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
+		memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_vidregs_old, state->m_vidregs, 0xf);
+	}
 }

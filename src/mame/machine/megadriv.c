@@ -9396,23 +9396,26 @@ void megadriv_stop_scanline_timer(void)
 
 /* VIDEO_EOF is used to resync the scanline counters */
 
-SCREEN_EOF(megadriv)
+SCREEN_VBLANK(megadriv)
 {
-	rectangle visarea;
-	int scr_width = 320;
+	// rising edge
+	if (vblank_on)
+	{
+		rectangle visarea;
+		int scr_width = 320;
 
-	megadrive_vblank_flag = 0;
-	//megadrive_irq6_pending = 0; /* NO! (breaks warlock) */
+		megadrive_vblank_flag = 0;
+		//megadrive_irq6_pending = 0; /* NO! (breaks warlock) */
 
-	/* Set it to -1 here, so it becomes 0 when the first timer kicks in */
-	genesis_scanline_counter = -1;
-	megadrive_sprite_collision=0;//? when to reset this ..
-	megadrive_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
-	megadrive_imode_odd_frame^=1;
-//  cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
+		/* Set it to -1 here, so it becomes 0 when the first timer kicks in */
+		genesis_scanline_counter = -1;
+		megadrive_sprite_collision=0;//? when to reset this ..
+		megadrive_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
+		megadrive_imode_odd_frame^=1;
+//  	cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-	if (input_port_read_safe(screen.machine(), "RESET", 0x00) & 0x01)
-		cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		if (input_port_read_safe(screen.machine(), "RESET", 0x00) & 0x01)
+			cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 /*
 int megadrive_total_scanlines = 262;
@@ -9424,88 +9427,89 @@ int megadrive_z80irq_hpos = 320;
 */
 
 
-	if (MEGADRIVE_REG01_240_LINE)
-	{
-		if (!megadrive_region_pal)
+		if (MEGADRIVE_REG01_240_LINE)
 		{
-			/* this is invalid! */
-			megadrive_visible_scanlines = 240;
-			megadrive_total_scanlines = 262;
-			megadrive_irq6_scanline = 240;
-			megadrive_z80irq_scanline = 240;
+			if (!megadrive_region_pal)
+			{
+				/* this is invalid! */
+				megadrive_visible_scanlines = 240;
+				megadrive_total_scanlines = 262;
+				megadrive_irq6_scanline = 240;
+				megadrive_z80irq_scanline = 240;
+			}
+			else
+			{
+				megadrive_visible_scanlines = 240;
+				megadrive_total_scanlines = 313;
+				megadrive_irq6_scanline = 240;
+				megadrive_z80irq_scanline = 240;
+			}
 		}
 		else
 		{
-			megadrive_visible_scanlines = 240;
-			megadrive_total_scanlines = 313;
-			megadrive_irq6_scanline = 240;
-			megadrive_z80irq_scanline = 240;
+			if (!megadrive_region_pal)
+			{
+				megadrive_visible_scanlines = 224;
+				megadrive_total_scanlines=262;
+				megadrive_irq6_scanline = 224;
+				megadrive_z80irq_scanline = 224;
+			}
+			else
+			{
+				megadrive_visible_scanlines = 224;
+				megadrive_total_scanlines=313;
+				megadrive_irq6_scanline = 224;
+				megadrive_z80irq_scanline = 224;
+			}
 		}
-	}
-	else
-	{
-		if (!megadrive_region_pal)
+
+		if (megadrive_imode==3)
 		{
-			megadrive_visible_scanlines = 224;
-			megadrive_total_scanlines=262;
-			megadrive_irq6_scanline = 224;
-			megadrive_z80irq_scanline = 224;
+			megadrive_visible_scanlines<<=1;
+			megadrive_total_scanlines<<=1;
+			megadrive_irq6_scanline <<=1;
+			megadrive_z80irq_scanline <<=1;
 		}
-		else
+
+
+		//get_hposition();
+		switch (MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1))
 		{
-			megadrive_visible_scanlines = 224;
-			megadrive_total_scanlines=313;
-			megadrive_irq6_scanline = 224;
-			megadrive_z80irq_scanline = 224;
+			 /* note, add 240 mode + init new timings! */
+			case 0:scr_width = 256;break;// configure_screen(0, 256-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break;
+			case 1:scr_width = 256;break;// configure_screen(0, 256-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); mame_printf_debug("invalid screenmode!\n"); break;
+			case 2:scr_width = 320;break;// configure_screen(0, 320-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break; /* technically invalid, but used in rare cases */
+			case 3:scr_width = 320;break;// configure_screen(0, 320-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break;
 		}
+//  	mame_printf_debug("my mode %02x", megadrive_vdp_register[0x0c]);
+
+		visarea.min_x = 0;
+		visarea.max_x = scr_width-1;
+		visarea.min_y = 0;
+		visarea.max_y = megadrive_visible_scanlines-1;
+
+		screen.machine().primary_screen->configure(scr_width, megadrive_visible_scanlines, visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
+
+		if (0)
+		{
+			//int xxx;
+//      	UINT64 frametime;
+
+		//  /* reference */
+//      	frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
+
+			//time_elapsed_since_crap = frame_timer->time_elapsed();
+			//xxx = screen.machine().device<cpudevice>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);
+			//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
+			//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
+			frame_timer->adjust(attotime::zero);
+		}
+
+		scanline_timer->adjust(attotime::zero);
+
+		if(_32x_is_connected)
+			_32x_hcount_compare_val = -1;
 	}
-
-	if (megadrive_imode==3)
-	{
-		megadrive_visible_scanlines<<=1;
-		megadrive_total_scanlines<<=1;
-		megadrive_irq6_scanline <<=1;
-		megadrive_z80irq_scanline <<=1;
-	}
-
-
-	//get_hposition();
-	switch (MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1))
-	{
-		 /* note, add 240 mode + init new timings! */
-		case 0:scr_width = 256;break;// configure_screen(0, 256-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break;
-		case 1:scr_width = 256;break;// configure_screen(0, 256-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); mame_printf_debug("invalid screenmode!\n"); break;
-		case 2:scr_width = 320;break;// configure_screen(0, 320-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break; /* technically invalid, but used in rare cases */
-		case 3:scr_width = 320;break;// configure_screen(0, 320-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break;
-	}
-//  mame_printf_debug("my mode %02x", megadrive_vdp_register[0x0c]);
-
-	visarea.min_x = 0;
-	visarea.max_x = scr_width-1;
-	visarea.min_y = 0;
-	visarea.max_y = megadrive_visible_scanlines-1;
-
-	screen.machine().primary_screen->configure(scr_width, megadrive_visible_scanlines, visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
-
-	if (0)
-	{
-		//int xxx;
-//      UINT64 frametime;
-
-	//  /* reference */
-//      frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
-
-		//time_elapsed_since_crap = frame_timer->time_elapsed();
-		//xxx = screen.machine().device<cpudevice>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);
-		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
-		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
-		frame_timer->adjust(attotime::zero);
-	}
-
-	scanline_timer->adjust(attotime::zero);
-
-	if(_32x_is_connected)
-		_32x_hcount_compare_val = -1;
 }
 
 
@@ -9565,7 +9569,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_EOF_STATIC(megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_VBLANK_STATIC(megadriv) /* Used to Sync the timing */
 
 	MCFG_NVRAM_HANDLER(megadriv)
 
@@ -9613,7 +9617,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_EOF_STATIC(megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_VBLANK_STATIC(megadriv) /* Used to Sync the timing */
 
 	MCFG_NVRAM_HANDLER(megadriv)
 

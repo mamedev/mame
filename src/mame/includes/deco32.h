@@ -78,8 +78,8 @@ VIDEO_START( dragngun );
 VIDEO_START( lockload );
 VIDEO_START( nslasher );
 
-SCREEN_EOF( captaven );
-SCREEN_EOF( dragngun );
+SCREEN_VBLANK( captaven );
+SCREEN_VBLANK( dragngun );
 
 SCREEN_UPDATE_IND16( captaven );
 SCREEN_UPDATE_RGB32( fghthist );

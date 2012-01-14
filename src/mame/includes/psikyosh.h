@@ -46,4 +46,4 @@ public:
 
 VIDEO_START( psikyosh );
 SCREEN_UPDATE_RGB32( psikyosh );
-SCREEN_EOF( psikyosh );
+SCREEN_VBLANK( psikyosh );

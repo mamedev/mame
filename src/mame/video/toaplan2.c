@@ -485,9 +485,13 @@ SCREEN_UPDATE_IND16( batsugun )
 	return 0;
 }
 
-SCREEN_EOF( toaplan2 )
+SCREEN_VBLANK( toaplan2 )
 {
-	toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
-	if (state->m_vdp0) state->m_vdp0->gp9001_screen_eof();
-	if (state->m_vdp1) state->m_vdp1->gp9001_screen_eof();
+	// rising edge
+	if (vblank_on)
+	{
+		toaplan2_state *state = screen.machine().driver_data<toaplan2_state>();
+		if (state->m_vdp0) state->m_vdp0->gp9001_screen_eof();
+		if (state->m_vdp1) state->m_vdp1->gp9001_screen_eof();
+	}
 }

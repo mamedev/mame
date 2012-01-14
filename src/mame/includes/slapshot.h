@@ -59,4 +59,4 @@ public:
 
 VIDEO_START( slapshot );
 SCREEN_UPDATE_IND16( slapshot );
-SCREEN_EOF( taito_no_buffer );
+SCREEN_VBLANK( taito_no_buffer );

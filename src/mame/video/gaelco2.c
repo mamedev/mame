@@ -501,10 +501,14 @@ SCREEN_UPDATE_IND16( gaelco2_right ) { return dual_update(screen, bitmap, clipre
 
 
 
-SCREEN_EOF( gaelco2 )
+SCREEN_VBLANK( gaelco2 )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	/* sprites are one frame ahead */
-	buffer_spriteram16_w(space, 0, 0, 0xffff);
+		/* sprites are one frame ahead */
+		buffer_spriteram16_w(space, 0, 0, 0xffff);
+	}
 }

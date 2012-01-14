@@ -494,15 +494,19 @@ static void draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap,const re
 	}
 }
 
-SCREEN_EOF( mlc )
+SCREEN_VBLANK( mlc )
 {
-	deco_mlc_state *state = screen.machine().driver_data<deco_mlc_state>();
-	/* Spriteram is definitely double buffered, as the vram lookup tables
-    are often updated a frame after spriteram is setup to point to a new
-    lookup table.  Without buffering incorrect one frame glitches are seen
-    in several places, especially in Hoops.
-    */
-	memcpy(state->m_mlc_buffered_spriteram, state->m_spriteram, 0x3000);
+	// rising edge
+	if (vblank_on)
+	{
+		deco_mlc_state *state = screen.machine().driver_data<deco_mlc_state>();
+		/* Spriteram is definitely double buffered, as the vram lookup tables
+	    are often updated a frame after spriteram is setup to point to a new
+	    lookup table.  Without buffering incorrect one frame glitches are seen
+	    in several places, especially in Hoops.
+	    */
+		memcpy(state->m_mlc_buffered_spriteram, state->m_spriteram, 0x3000);
+	}
 }
 
 SCREEN_UPDATE_RGB32( mlc )

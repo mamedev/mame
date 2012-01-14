@@ -52,4 +52,4 @@ WRITE32_HANDLER( macrossp_text_videoram_w );
 
 VIDEO_START(macrossp);
 SCREEN_UPDATE_RGB32(macrossp);
-SCREEN_EOF(macrossp);
+SCREEN_VBLANK(macrossp);

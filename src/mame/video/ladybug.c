@@ -306,9 +306,11 @@ SCREEN_UPDATE_IND16( ladybug )
 	return 0;
 }
 
-SCREEN_EOF( sraider )	/* update starfield position */
+SCREEN_VBLANK( sraider )	/* update starfield position */
 {
-	redclash_update_stars_state(screen.machine());
+	// rising edge
+	if (vblank_on)
+		redclash_update_stars_state(screen.machine());
 }
 
 SCREEN_UPDATE_IND16( sraider )

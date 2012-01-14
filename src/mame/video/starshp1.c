@@ -386,33 +386,37 @@ SCREEN_UPDATE_IND16( starshp1 )
 }
 
 
-SCREEN_EOF( starshp1 )
+SCREEN_VBLANK( starshp1 )
 {
-	starshp1_state *state = screen.machine().driver_data<starshp1_state>();
-	rectangle rect;
-	const rectangle &visarea = screen.machine().primary_screen->visible_area();
+	// rising edge
+	if (vblank_on)
+	{
+		starshp1_state *state = screen.machine().driver_data<starshp1_state>();
+		rectangle rect;
+		const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-	rect.min_x = get_sprite_hpos(state, 13);
-	rect.min_y = get_sprite_vpos(state, 13);
-	rect.max_x = rect.min_x + screen.machine().gfx[1]->width - 1;
-	rect.max_y = rect.min_y + screen.machine().gfx[1]->height - 1;
-	
-	rect &= state->m_helper.cliprect();
+		rect.min_x = get_sprite_hpos(state, 13);
+		rect.min_y = get_sprite_vpos(state, 13);
+		rect.max_x = rect.min_x + screen.machine().gfx[1]->width - 1;
+		rect.max_y = rect.min_y + screen.machine().gfx[1]->height - 1;
+		
+		rect &= state->m_helper.cliprect();
 
-	state->m_helper.fill(0, visarea);
+		state->m_helper.fill(0, visarea);
 
-	if (state->m_attract == 0)
-		draw_spaceship(screen.machine(), state->m_helper, visarea);
+		if (state->m_attract == 0)
+			draw_spaceship(screen.machine(), state->m_helper, visarea);
 
-	if (circle_collision(state, visarea))
-		state->m_collision_latch |= 1;
+		if (circle_collision(state, visarea))
+			state->m_collision_latch |= 1;
 
-	if (circle_collision(state, rect))
-		state->m_collision_latch |= 2;
+		if (circle_collision(state, rect))
+			state->m_collision_latch |= 2;
 
-	if (spaceship_collision(screen.machine(), state->m_helper, rect))
-		state->m_collision_latch |= 4;
+		if (spaceship_collision(screen.machine(), state->m_helper, rect))
+			state->m_collision_latch |= 4;
 
-	if (spaceship_collision(screen.machine(), state->m_helper, visarea))
-		state->m_collision_latch |= 8;
+		if (spaceship_collision(screen.machine(), state->m_helper, visarea))
+			state->m_collision_latch |= 8;
+	}
 }

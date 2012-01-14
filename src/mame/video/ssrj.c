@@ -294,9 +294,13 @@ SCREEN_UPDATE_IND16( ssrj )
 	return 0;
 }
 
-SCREEN_EOF( ssrj )
+SCREEN_VBLANK( ssrj )
 {
-	ssrj_state *state = screen.machine().driver_data<ssrj_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		ssrj_state *state = screen.machine().driver_data<ssrj_state>();
 
-	memcpy(state->m_buffer_spriteram, state->m_scrollram, 0x800);
+		memcpy(state->m_buffer_spriteram, state->m_scrollram, 0x800);
+	}
 }

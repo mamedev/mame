@@ -1217,26 +1217,38 @@ SCREEN_UPDATE_IND16( toaplan1 )
     assume it happens automatically every frame, at the end of vblank
 ****************************************************************************/
 
-SCREEN_EOF( rallybik )
+SCREEN_VBLANK( rallybik )
 {
-	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
-	memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+	}
 }
 
-SCREEN_EOF( toaplan1 )
+SCREEN_VBLANK( toaplan1 )
 {
-	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
-	memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
-	memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
+		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
+	}
 }
 
-SCREEN_EOF( samesame )
+SCREEN_VBLANK( samesame )
 {
-	toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
-	memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
-	memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
-	cputag_set_input_line(screen.machine(), "maincpu", M68K_IRQ_2, HOLD_LINE);	/* Frame done */
+		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
+		cputag_set_input_line(screen.machine(), "maincpu", M68K_IRQ_2, HOLD_LINE);	/* Frame done */
+	}
 }

@@ -272,11 +272,15 @@ static VIDEO_START( dreamwld )
 
 }
 
-SCREEN_EOF( dreamwld )
+SCREEN_VBLANK( dreamwld )
 {
-	dreamwld_state *state = screen.machine().driver_data<dreamwld_state>();
-	memcpy(state->m_spritebuf2, state->m_spritebuf1, 0x2000);
-	memcpy(state->m_spritebuf1, state->m_spriteram, 0x2000);
+	// rising edge
+	if (vblank_on)
+	{
+		dreamwld_state *state = screen.machine().driver_data<dreamwld_state>();
+		memcpy(state->m_spritebuf2, state->m_spritebuf1, 0x2000);
+		memcpy(state->m_spritebuf1, state->m_spriteram, 0x2000);
+	}
 }
 
 
@@ -587,7 +591,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_SIZE(512,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(dreamwld)
-	MCFG_SCREEN_EOF_STATIC(dreamwld)
+	MCFG_SCREEN_VBLANK_STATIC(dreamwld)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_GFXDECODE(dreamwld)

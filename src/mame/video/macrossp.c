@@ -429,11 +429,15 @@ state->m_scrc_videoregs[2]);// 08 - 0b
 	return 0;
 }
 
-SCREEN_EOF( macrossp )
+SCREEN_VBLANK( macrossp )
 {
-	macrossp_state *state = screen.machine().driver_data<macrossp_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		macrossp_state *state = screen.machine().driver_data<macrossp_state>();
 
-	/* looks like sprites are *two* frames ahead, like nmk16 */
-	memcpy(state->m_spriteram_old2, state->m_spriteram_old, state->m_spriteram_size);
-	memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram_size);
+		/* looks like sprites are *two* frames ahead, like nmk16 */
+		memcpy(state->m_spriteram_old2, state->m_spriteram_old, state->m_spriteram_size);
+		memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram_size);
+	}
 }

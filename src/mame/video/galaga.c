@@ -578,18 +578,22 @@ SCREEN_UPDATE_IND16( galaga )
 
 
 
-SCREEN_EOF( galaga )
+SCREEN_VBLANK( galaga )
 {
-	galaga_state *state =  screen.machine().driver_data<galaga_state>();
-	/* this function is called by galaga_interrupt_1() */
-	int s0,s1,s2;
-	static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
+	// rising edge
+	if (vblank_on)
+	{
+		galaga_state *state =  screen.machine().driver_data<galaga_state>();
+		/* this function is called by galaga_interrupt_1() */
+		int s0,s1,s2;
+		static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
 
-	s0 = (state->m_galaga_starcontrol[0] & 1);
-	s1 = (state->m_galaga_starcontrol[1] & 1);
-	s2 = (state->m_galaga_starcontrol[2] & 1);
+		s0 = (state->m_galaga_starcontrol[0] & 1);
+		s1 = (state->m_galaga_starcontrol[1] & 1);
+		s2 = (state->m_galaga_starcontrol[2] & 1);
 
-	state->m_stars_scrollx += speeds[s0 + s1*2 + s2*4];
+		state->m_stars_scrollx += speeds[s0 + s1*2 + s2*4];
+	}
 }
 
 

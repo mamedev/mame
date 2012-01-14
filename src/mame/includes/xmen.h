@@ -46,4 +46,4 @@ VIDEO_START( xmen6p );
 SCREEN_UPDATE_IND16( xmen );
 SCREEN_UPDATE_IND16( xmen6p_left );
 SCREEN_UPDATE_IND16( xmen6p_right );
-SCREEN_EOF( xmen6p );
+SCREEN_VBLANK( xmen6p );

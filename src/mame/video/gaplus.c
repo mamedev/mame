@@ -329,78 +329,82 @@ SCREEN_UPDATE_IND16( gaplus )
 }
 
 
-SCREEN_EOF( gaplus )	/* update starfields */
+SCREEN_VBLANK( gaplus )	/* update starfields */
 {
-	gaplus_state *state = screen.machine().driver_data<gaplus_state>();
-	struct star *stars = state->m_stars;
-	int i;
+	// rising edge
+	if (vblank_on)
+	{
+		gaplus_state *state = screen.machine().driver_data<gaplus_state>();
+		struct star *stars = state->m_stars;
+		int i;
 
-	int width = screen.machine().primary_screen->width();
-	int height = screen.machine().primary_screen->height();
+		int width = screen.machine().primary_screen->width();
+		int height = screen.machine().primary_screen->height();
 
-	/* check if we're running */
-	if ( ( state->m_starfield_control[0] & 1 ) == 0 )
-		return;
+		/* check if we're running */
+		if ( ( state->m_starfield_control[0] & 1 ) == 0 )
+			return;
 
-	/* update the starfields */
-	for ( i = 0; i < state->m_total_stars; i++ ) {
-		switch( state->m_starfield_control[stars[i].set + 1] ) {
-			case 0x87:
-				/* stand still */
-			break;
+		/* update the starfields */
+		for ( i = 0; i < state->m_total_stars; i++ ) {
+			switch( state->m_starfield_control[stars[i].set + 1] ) {
+				case 0x87:
+					/* stand still */
+				break;
 
-			case 0x86:
-				/* scroll down (speed 1) */
-				stars[i].x += SPEED_1;
-			break;
+				case 0x86:
+					/* scroll down (speed 1) */
+					stars[i].x += SPEED_1;
+				break;
 
-			case 0x85:
-				/* scroll down (speed 2) */
-				stars[i].x += SPEED_2;
-			break;
+				case 0x85:
+					/* scroll down (speed 2) */
+					stars[i].x += SPEED_2;
+				break;
 
-			case 0x06:
-				/* scroll down (speed 3) */
-				stars[i].x += SPEED_3;
-			break;
+				case 0x06:
+					/* scroll down (speed 3) */
+					stars[i].x += SPEED_3;
+				break;
 
-			case 0x80:
-				/* scroll up (speed 1) */
-				stars[i].x -= SPEED_1;
-			break;
+				case 0x80:
+					/* scroll up (speed 1) */
+					stars[i].x -= SPEED_1;
+				break;
 
-			case 0x82:
-				/* scroll up (speed 2) */
-				stars[i].x -= SPEED_2;
-			break;
+				case 0x82:
+					/* scroll up (speed 2) */
+					stars[i].x -= SPEED_2;
+				break;
 
-			case 0x81:
-				/* scroll up (speed 3) */
-				stars[i].x -= SPEED_3;
-			break;
+				case 0x81:
+					/* scroll up (speed 3) */
+					stars[i].x -= SPEED_3;
+				break;
 
-			case 0x9f:
-				/* scroll left (speed 2) */
-				stars[i].y += SPEED_2;
-			break;
+				case 0x9f:
+					/* scroll left (speed 2) */
+					stars[i].y += SPEED_2;
+				break;
 
-			case 0xaf:
-				/* scroll left (speed 1) */
-				stars[i].y += SPEED_1;
-			break;
+				case 0xaf:
+					/* scroll left (speed 1) */
+					stars[i].y += SPEED_1;
+				break;
+			}
+
+			/* wrap */
+			if ( stars[i].x < 0 )
+				stars[i].x = ( float )( width*2 ) + stars[i].x;
+
+			if ( stars[i].x >= ( float )( width*2 ) )
+				stars[i].x -= ( float )( width*2 );
+
+			if ( stars[i].y < 0 )
+				stars[i].y = ( float )( height ) + stars[i].y;
+
+			if ( stars[i].y >= ( float )( height ) )
+				stars[i].y -= ( float )( height );
 		}
-
-		/* wrap */
-		if ( stars[i].x < 0 )
-			stars[i].x = ( float )( width*2 ) + stars[i].x;
-
-		if ( stars[i].x >= ( float )( width*2 ) )
-			stars[i].x -= ( float )( width*2 );
-
-		if ( stars[i].y < 0 )
-			stars[i].y = ( float )( height ) + stars[i].y;
-
-		if ( stars[i].y >= ( float )( height ) )
-			stars[i].y -= ( float )( height );
 	}
 }

@@ -95,13 +95,17 @@ TODO:
  *
  *************************************/
 
-static SCREEN_EOF( champbas )
+static SCREEN_VBLANK( champbas )
 {
-	champbas_state *state = screen.machine().driver_data<champbas_state>();
-	state->m_watchdog_count++;
+	// rising edge
+	if (vblank_on)
+	{
+		champbas_state *state = screen.machine().driver_data<champbas_state>();
+		state->m_watchdog_count++;
 
-	if (state->m_watchdog_count == 0x10)
-		screen.machine().schedule_soft_reset();
+		if (state->m_watchdog_count == 0x10)
+			screen.machine().schedule_soft_reset();
+	}
 }
 
 
@@ -625,7 +629,7 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(champbas)
-	MCFG_SCREEN_EOF_STATIC(champbas)
+	MCFG_SCREEN_VBLANK_STATIC(champbas)
 
 	MCFG_GFXDECODE(talbot)
 	MCFG_PALETTE_LENGTH(0x200)
@@ -660,7 +664,7 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(champbas)
-	MCFG_SCREEN_EOF_STATIC(champbas)
+	MCFG_SCREEN_VBLANK_STATIC(champbas)
 
 	MCFG_GFXDECODE(champbas)
 	MCFG_PALETTE_LENGTH(0x200)
@@ -717,7 +721,7 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(exctsccr)
-	MCFG_SCREEN_EOF_STATIC(champbas)
+	MCFG_SCREEN_VBLANK_STATIC(champbas)
 
 	MCFG_GFXDECODE(exctsccr)
 	MCFG_PALETTE_LENGTH(0x200)
@@ -768,7 +772,7 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(exctsccr)
-	MCFG_SCREEN_EOF_STATIC(champbas)
+	MCFG_SCREEN_VBLANK_STATIC(champbas)
 
 	MCFG_GFXDECODE(exctsccr)
 	MCFG_PALETTE_LENGTH(0x200)

@@ -568,12 +568,12 @@ VIDEO_START( nslasher )
 
 /******************************************************************************/
 
-SCREEN_EOF( captaven )
+SCREEN_VBLANK( captaven )
 {
 
 }
 
-SCREEN_EOF( dragngun )
+SCREEN_VBLANK( dragngun )
 {
 
 }

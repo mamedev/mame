@@ -262,304 +262,307 @@ static UINT8 collision_check( running_machine &machine, rectangle& rect )
 	return data;
 }
 
-SCREEN_EOF( mermaid )
+SCREEN_VBLANK( mermaid )
 {
-	mermaid_state *state = screen.machine().driver_data<mermaid_state>();
-	const rectangle &visarea = screen.machine().primary_screen->visible_area();
-	UINT8 *spriteram = state->m_spriteram;
-
-	int offs, offs2;
-
-	state->m_coll_bit0 = 0;
-	state->m_coll_bit1 = 0;
-	state->m_coll_bit2 = 0;
-	state->m_coll_bit3 = 0;
-	state->m_coll_bit6 = 0;
-
-	// check for bit 0 (sprite-sprite), 1 (sprite-foreground), 2 (sprite-background)
-
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	// rising edge
+	if (vblank_on)
 	{
-		int attr = spriteram[offs + 2];
-		int bank = (attr & 0x30) >> 4;
-		int coll = (attr & 0xc0) >> 6;
-		int code = (spriteram[offs] & 0x3f) | (bank << 6);
-		int flipx = spriteram[offs] & 0x40;
-		int flipy = spriteram[offs] & 0x80;
-		int sx = spriteram[offs + 3] + 1;
-		int sy = 240 - spriteram[offs + 1];
+		mermaid_state *state = screen.machine().driver_data<mermaid_state>();
+		const rectangle &visarea = screen.machine().primary_screen->visible_area();
+		UINT8 *spriteram = state->m_spriteram;
 
-		rectangle rect;
+		int offs, offs2;
 
-		if (coll != 1) continue;
+		state->m_coll_bit0 = 0;
+		state->m_coll_bit1 = 0;
+		state->m_coll_bit2 = 0;
+		state->m_coll_bit3 = 0;
+		state->m_coll_bit6 = 0;
 
-		code |= state->m_rougien_gfxbank1 * 0x2800;
-		code |= state->m_rougien_gfxbank2 * 0x2400;
+		// check for bit 0 (sprite-sprite), 1 (sprite-foreground), 2 (sprite-background)
 
-		if (flip_screen_x_get(screen.machine()))
+		for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 		{
-			flipx = !flipx;
-			sx = 240 - sx;
-		}
+			int attr = spriteram[offs + 2];
+			int bank = (attr & 0x30) >> 4;
+			int coll = (attr & 0xc0) >> 6;
+			int code = (spriteram[offs] & 0x3f) | (bank << 6);
+			int flipx = spriteram[offs] & 0x40;
+			int flipy = spriteram[offs] & 0x80;
+			int sx = spriteram[offs + 3] + 1;
+			int sy = 240 - spriteram[offs + 1];
 
-		if (flip_screen_y_get(screen.machine()))
-		{
-			flipy = !flipy;
-			sy = 240 - sy;
-		}
+			rectangle rect;
 
-		rect.min_x = sx;
-		rect.min_y = sy;
-		rect.max_x = sx + screen.machine().gfx[1]->width - 1;
-		rect.max_y = sy + screen.machine().gfx[1]->height - 1;
+			if (coll != 1) continue;
 
-		if (rect.min_x < visarea.min_x)
-			rect.min_x = visarea.min_x;
-		if (rect.min_y < visarea.min_y)
-			rect.min_y = visarea.min_y;
-		if (rect.max_x > visarea.max_x)
-			rect.max_x = visarea.max_x;
-		if (rect.max_y > visarea.max_y)
-			rect.max_y = visarea.max_y;
+			code |= state->m_rougien_gfxbank1 * 0x2800;
+			code |= state->m_rougien_gfxbank2 * 0x2400;
 
-		// check collision sprite - background
-
-		state->m_helper.fill(0, rect);
-		state->m_helper2.fill(0, rect);
-
-		tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
-
-		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
-
-		state->m_coll_bit2 |= collision_check(screen.machine(), rect);
-
-		// check collision sprite - foreground
-
-		state->m_helper.fill(0, rect);
-		state->m_helper2.fill(0, rect);
-
-		tilemap_draw(state->m_helper, rect, state->m_fg_tilemap, 0, 0);
-
-		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
-
-		state->m_coll_bit1 |= collision_check(screen.machine(), rect);
-
-		// check collision sprite - sprite
-
-		state->m_helper.fill(0, rect);
-		state->m_helper2.fill(0, rect);
-
-		for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
-			if (offs != offs2)
+			if (flip_screen_x_get(screen.machine()))
 			{
-				int attr2 = spriteram[offs2 + 2];
-				int bank2 = (attr2 & 0x30) >> 4;
-				int coll2 = (attr2 & 0xc0) >> 6;
-				int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
-				int flipx2 = spriteram[offs2] & 0x40;
-				int flipy2 = spriteram[offs2] & 0x80;
-				int sx2 = spriteram[offs2 + 3] + 1;
-				int sy2 = 240 - spriteram[offs2 + 1];
-
-				if (coll2 != 0) continue;
-
-				code2 |= state->m_rougien_gfxbank1 * 0x2800;
-				code2 |= state->m_rougien_gfxbank2 * 0x2400;
-
-				if (flip_screen_x_get(screen.machine()))
-				{
-					flipx2 = !flipx2;
-					sx2 = 240 - sx2;
-				}
-
-				if (flip_screen_y_get(screen.machine()))
-				{
-					flipy2 = !flipy2;
-					sy2 = 240 - sy2;
-				}
-
-				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				flipx = !flipx;
+				sx = 240 - sx;
 			}
 
-		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
-
-		state->m_coll_bit0 |= collision_check(screen.machine(), rect);
-	}
-
-	// check for bit 3 (sprite-sprite)
-
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
-	{
-		int attr = spriteram[offs + 2];
-		int bank = (attr & 0x30) >> 4;
-		int coll = (attr & 0xc0) >> 6;
-		int code = (spriteram[offs] & 0x3f) | (bank << 6);
-		int flipx = spriteram[offs] & 0x40;
-		int flipy = spriteram[offs] & 0x80;
-		int sx = spriteram[offs + 3] + 1;
-		int sy = 240 - spriteram[offs + 1];
-
-		rectangle rect;
-
-		if (coll != 2) continue;
-
-		code |= state->m_rougien_gfxbank1 * 0x2800;
-		code |= state->m_rougien_gfxbank2 * 0x2400;
-
-		if (flip_screen_x_get(screen.machine()))
-		{
-			flipx = !flipx;
-			sx = 240 - sx;
-		}
-
-		if (flip_screen_y_get(screen.machine()))
-		{
-			flipy = !flipy;
-			sy = 240 - sy;
-		}
-
-		rect.min_x = sx;
-		rect.min_y = sy;
-		rect.max_x = sx + screen.machine().gfx[1]->width - 1;
-		rect.max_y = sy + screen.machine().gfx[1]->height - 1;
-
-		if (rect.min_x < visarea.min_x)
-			rect.min_x = visarea.min_x;
-		if (rect.min_y < visarea.min_y)
-			rect.min_y = visarea.min_y;
-		if (rect.max_x > visarea.max_x)
-			rect.max_x = visarea.max_x;
-		if (rect.max_y > visarea.max_y)
-			rect.max_y = visarea.max_y;
-
-		// check collision sprite - sprite
-
-		state->m_helper.fill(0, rect);
-		state->m_helper2.fill(0, rect);
-
-		for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
-			if (offs != offs2)
+			if (flip_screen_y_get(screen.machine()))
 			{
-				int attr2 = spriteram[offs2 + 2];
-				int bank2 = (attr2 & 0x30) >> 4;
-				int coll2 = (attr2 & 0xc0) >> 6;
-				int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
-				int flipx2 = spriteram[offs2] & 0x40;
-				int flipy2 = spriteram[offs2] & 0x80;
-				int sx2 = spriteram[offs2 + 3] + 1;
-				int sy2 = 240 - spriteram[offs2 + 1];
-
-				if (coll2 != 0) continue;
-
-				code2 |= state->m_rougien_gfxbank1 * 0x2800;
-				code2 |= state->m_rougien_gfxbank2 * 0x2400;
-
-				if (flip_screen_x_get(screen.machine()))
-				{
-					flipx2 = !flipx2;
-					sx2 = 240 - sx2;
-				}
-
-				if (flip_screen_y_get(screen.machine()))
-				{
-					flipy2 = !flipy2;
-					sy2 = 240 - sy2;
-				}
-
-				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				flipy = !flipy;
+				sy = 240 - sy;
 			}
 
-		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+			rect.min_x = sx;
+			rect.min_y = sy;
+			rect.max_x = sx + screen.machine().gfx[1]->width - 1;
+			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
 
-		state->m_coll_bit3 |= collision_check(screen.machine(), rect);
-	}
+			if (rect.min_x < visarea.min_x)
+				rect.min_x = visarea.min_x;
+			if (rect.min_y < visarea.min_y)
+				rect.min_y = visarea.min_y;
+			if (rect.max_x > visarea.max_x)
+				rect.max_x = visarea.max_x;
+			if (rect.max_y > visarea.max_y)
+				rect.max_y = visarea.max_y;
 
-	// check for bit 6
+			// check collision sprite - background
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
-	{
-		int attr = spriteram[offs + 2];
-		int bank = (attr & 0x30) >> 4;
-		int coll = (attr & 0xc0) >> 6;
-		int code = (spriteram[offs] & 0x3f) | (bank << 6);
-		int flipx = spriteram[offs] & 0x40;
-		int flipy = spriteram[offs] & 0x80;
-		int sx = spriteram[offs + 3] + 1;
-		int sy = 240 - spriteram[offs + 1];
+			state->m_helper.fill(0, rect);
+			state->m_helper2.fill(0, rect);
 
-		rectangle rect;
+			tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
 
-		if (coll != 1) continue;
+			drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-		code |= state->m_rougien_gfxbank1 * 0x2800;
-		code |= state->m_rougien_gfxbank2 * 0x2400;
+			state->m_coll_bit2 |= collision_check(screen.machine(), rect);
 
-		if (flip_screen_x_get(screen.machine()))
-		{
-			flipx = !flipx;
-			sx = 240 - sx;
+			// check collision sprite - foreground
+
+			state->m_helper.fill(0, rect);
+			state->m_helper2.fill(0, rect);
+
+			tilemap_draw(state->m_helper, rect, state->m_fg_tilemap, 0, 0);
+
+			drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+
+			state->m_coll_bit1 |= collision_check(screen.machine(), rect);
+
+			// check collision sprite - sprite
+
+			state->m_helper.fill(0, rect);
+			state->m_helper2.fill(0, rect);
+
+			for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+				if (offs != offs2)
+				{
+					int attr2 = spriteram[offs2 + 2];
+					int bank2 = (attr2 & 0x30) >> 4;
+					int coll2 = (attr2 & 0xc0) >> 6;
+					int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
+					int flipx2 = spriteram[offs2] & 0x40;
+					int flipy2 = spriteram[offs2] & 0x80;
+					int sx2 = spriteram[offs2 + 3] + 1;
+					int sy2 = 240 - spriteram[offs2 + 1];
+
+					if (coll2 != 0) continue;
+
+					code2 |= state->m_rougien_gfxbank1 * 0x2800;
+					code2 |= state->m_rougien_gfxbank2 * 0x2400;
+
+					if (flip_screen_x_get(screen.machine()))
+					{
+						flipx2 = !flipx2;
+						sx2 = 240 - sx2;
+					}
+
+					if (flip_screen_y_get(screen.machine()))
+					{
+						flipy2 = !flipy2;
+						sy2 = 240 - sy2;
+					}
+
+					drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				}
+
+			drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+
+			state->m_coll_bit0 |= collision_check(screen.machine(), rect);
 		}
 
-		if (flip_screen_y_get(screen.machine()))
+		// check for bit 3 (sprite-sprite)
+
+		for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 		{
-			flipy = !flipy;
-			sy = 240 - sy;
-		}
+			int attr = spriteram[offs + 2];
+			int bank = (attr & 0x30) >> 4;
+			int coll = (attr & 0xc0) >> 6;
+			int code = (spriteram[offs] & 0x3f) | (bank << 6);
+			int flipx = spriteram[offs] & 0x40;
+			int flipy = spriteram[offs] & 0x80;
+			int sx = spriteram[offs + 3] + 1;
+			int sy = 240 - spriteram[offs + 1];
 
-		rect.min_x = sx;
-		rect.min_y = sy;
-		rect.max_x = sx + screen.machine().gfx[1]->width - 1;
-		rect.max_y = sy + screen.machine().gfx[1]->height - 1;
+			rectangle rect;
 
-		if (rect.min_x < visarea.min_x)
-			rect.min_x = visarea.min_x;
-		if (rect.min_y < visarea.min_y)
-			rect.min_y = visarea.min_y;
-		if (rect.max_x > visarea.max_x)
-			rect.max_x = visarea.max_x;
-		if (rect.max_y > visarea.max_y)
-			rect.max_y = visarea.max_y;
+			if (coll != 2) continue;
 
-		// check collision sprite - sprite
+			code |= state->m_rougien_gfxbank1 * 0x2800;
+			code |= state->m_rougien_gfxbank2 * 0x2400;
 
-		state->m_helper.fill(0, rect);
-		state->m_helper2.fill(0, rect);
-
-		for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
-			if (offs != offs2)
+			if (flip_screen_x_get(screen.machine()))
 			{
-				int attr2 = spriteram[offs2 + 2];
-				int bank2 = (attr2 & 0x30) >> 4;
-				int coll2 = (attr2 & 0xc0) >> 6;
-				int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
-				int flipx2 = spriteram[offs2] & 0x40;
-				int flipy2 = spriteram[offs2] & 0x80;
-				int sx2 = spriteram[offs2 + 3] + 1;
-				int sy2 = 240 - spriteram[offs2 + 1];
-
-				if (coll2 != 2) continue;
-
-				code2 |= state->m_rougien_gfxbank1 * 0x2800;
-				code2 |= state->m_rougien_gfxbank2 * 0x2400;
-
-				if (flip_screen_x_get(screen.machine()))
-				{
-					flipx2 = !flipx2;
-					sx2 = 240 - sx2;
-				}
-
-				if (flip_screen_y_get(screen.machine()))
-				{
-					flipy2 = !flipy2;
-					sy2 = 240 - sy2;
-				}
-
-				drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				flipx = !flipx;
+				sx = 240 - sx;
 			}
 
-		drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+			if (flip_screen_y_get(screen.machine()))
+			{
+				flipy = !flipy;
+				sy = 240 - sy;
+			}
 
-		state->m_coll_bit6 |= collision_check(screen.machine(), rect);
+			rect.min_x = sx;
+			rect.min_y = sy;
+			rect.max_x = sx + screen.machine().gfx[1]->width - 1;
+			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
+
+			if (rect.min_x < visarea.min_x)
+				rect.min_x = visarea.min_x;
+			if (rect.min_y < visarea.min_y)
+				rect.min_y = visarea.min_y;
+			if (rect.max_x > visarea.max_x)
+				rect.max_x = visarea.max_x;
+			if (rect.max_y > visarea.max_y)
+				rect.max_y = visarea.max_y;
+
+			// check collision sprite - sprite
+
+			state->m_helper.fill(0, rect);
+			state->m_helper2.fill(0, rect);
+
+			for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+				if (offs != offs2)
+				{
+					int attr2 = spriteram[offs2 + 2];
+					int bank2 = (attr2 & 0x30) >> 4;
+					int coll2 = (attr2 & 0xc0) >> 6;
+					int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
+					int flipx2 = spriteram[offs2] & 0x40;
+					int flipy2 = spriteram[offs2] & 0x80;
+					int sx2 = spriteram[offs2 + 3] + 1;
+					int sy2 = 240 - spriteram[offs2 + 1];
+
+					if (coll2 != 0) continue;
+
+					code2 |= state->m_rougien_gfxbank1 * 0x2800;
+					code2 |= state->m_rougien_gfxbank2 * 0x2400;
+
+					if (flip_screen_x_get(screen.machine()))
+					{
+						flipx2 = !flipx2;
+						sx2 = 240 - sx2;
+					}
+
+					if (flip_screen_y_get(screen.machine()))
+					{
+						flipy2 = !flipy2;
+						sy2 = 240 - sy2;
+					}
+
+					drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				}
+
+			drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+
+			state->m_coll_bit3 |= collision_check(screen.machine(), rect);
+		}
+
+		// check for bit 6
+
+		for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+		{
+			int attr = spriteram[offs + 2];
+			int bank = (attr & 0x30) >> 4;
+			int coll = (attr & 0xc0) >> 6;
+			int code = (spriteram[offs] & 0x3f) | (bank << 6);
+			int flipx = spriteram[offs] & 0x40;
+			int flipy = spriteram[offs] & 0x80;
+			int sx = spriteram[offs + 3] + 1;
+			int sy = 240 - spriteram[offs + 1];
+
+			rectangle rect;
+
+			if (coll != 1) continue;
+
+			code |= state->m_rougien_gfxbank1 * 0x2800;
+			code |= state->m_rougien_gfxbank2 * 0x2400;
+
+			if (flip_screen_x_get(screen.machine()))
+			{
+				flipx = !flipx;
+				sx = 240 - sx;
+			}
+
+			if (flip_screen_y_get(screen.machine()))
+			{
+				flipy = !flipy;
+				sy = 240 - sy;
+			}
+
+			rect.min_x = sx;
+			rect.min_y = sy;
+			rect.max_x = sx + screen.machine().gfx[1]->width - 1;
+			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
+
+			if (rect.min_x < visarea.min_x)
+				rect.min_x = visarea.min_x;
+			if (rect.min_y < visarea.min_y)
+				rect.min_y = visarea.min_y;
+			if (rect.max_x > visarea.max_x)
+				rect.max_x = visarea.max_x;
+			if (rect.max_y > visarea.max_y)
+				rect.max_y = visarea.max_y;
+
+			// check collision sprite - sprite
+
+			state->m_helper.fill(0, rect);
+			state->m_helper2.fill(0, rect);
+
+			for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+				if (offs != offs2)
+				{
+					int attr2 = spriteram[offs2 + 2];
+					int bank2 = (attr2 & 0x30) >> 4;
+					int coll2 = (attr2 & 0xc0) >> 6;
+					int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
+					int flipx2 = spriteram[offs2] & 0x40;
+					int flipy2 = spriteram[offs2] & 0x80;
+					int sx2 = spriteram[offs2 + 3] + 1;
+					int sy2 = 240 - spriteram[offs2 + 1];
+
+					if (coll2 != 2) continue;
+
+					code2 |= state->m_rougien_gfxbank1 * 0x2800;
+					code2 |= state->m_rougien_gfxbank2 * 0x2400;
+
+					if (flip_screen_x_get(screen.machine()))
+					{
+						flipx2 = !flipx2;
+						sx2 = 240 - sx2;
+					}
+
+					if (flip_screen_y_get(screen.machine()))
+					{
+						flipy2 = !flipy2;
+						sy2 = 240 - sy2;
+					}
+
+					drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1], code2, 0, flipx2, flipy2, sx2, sy2, 0);
+				}
+
+			drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
+
+			state->m_coll_bit6 |= collision_check(screen.machine(), rect);
+		}
 	}
-
 }

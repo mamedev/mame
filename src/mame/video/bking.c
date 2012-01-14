@@ -278,80 +278,84 @@ SCREEN_UPDATE_IND16( bking )
 }
 
 
-SCREEN_EOF( bking )
+SCREEN_VBLANK( bking )
 {
-	bking_state *state = screen.machine().driver_data<bking_state>();
-	const rectangle rect(0, 7, 0, 15);
-
-	int xld = 0;
-	int yld = 0;
-
-	UINT32 latch = 0;
-
-	if (state->m_pc3259_mask == 6)	/* player 1 */
+	// rising edge
+	if (vblank_on)
 	{
-		xld = state->m_xld1;
-		yld = state->m_yld1;
+		bking_state *state = screen.machine().driver_data<bking_state>();
+		const rectangle rect(0, 7, 0, 15);
 
-		drawgfx_opaque(state->m_tmp_bitmap2, rect, screen.machine().gfx[2],
-			state->m_ball1_pic,
-			0,
-			0, 0,
-			0, 0);
+		int xld = 0;
+		int yld = 0;
 
-		latch = 0x0c00;
-	}
+		UINT32 latch = 0;
 
-	if (state->m_pc3259_mask == 3)	/* player 2 */
-	{
-		xld = state->m_xld2;
-		yld = state->m_yld2;
-
-		drawgfx_opaque(state->m_tmp_bitmap2, rect, screen.machine().gfx[3],
-			state->m_ball2_pic,
-			0,
-			0, 0,
-			0, 0);
-
-		latch = 0x0400;
-	}
-
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? -xld : xld);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? -yld : yld);
-
-	tilemap_draw(state->m_tmp_bitmap1, rect, state->m_bg_tilemap, 0, 0);
-
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);
-
-	if (latch != 0)
-	{
-		const UINT8* MASK = screen.machine().region("user1")->base() + 8 * state->m_hit;
-
-		int x;
-		int y;
-
-		for (y = rect.min_y; y <= rect.max_y; y++)
+		if (state->m_pc3259_mask == 6)	/* player 1 */
 		{
-			const UINT16* p0 = &state->m_tmp_bitmap1.pix16(y);
-			const UINT16* p1 = &state->m_tmp_bitmap2.pix16(y);
+			xld = state->m_xld1;
+			yld = state->m_yld1;
 
-			for (x = rect.min_x; x <= rect.max_x; x++)
+			drawgfx_opaque(state->m_tmp_bitmap2, rect, screen.machine().gfx[2],
+				state->m_ball1_pic,
+				0,
+				0, 0,
+				0, 0);
+
+			latch = 0x0c00;
+		}
+
+		if (state->m_pc3259_mask == 3)	/* player 2 */
+		{
+			xld = state->m_xld2;
+			yld = state->m_yld2;
+
+			drawgfx_opaque(state->m_tmp_bitmap2, rect, screen.machine().gfx[3],
+				state->m_ball2_pic,
+				0,
+				0, 0,
+				0, 0);
+
+			latch = 0x0400;
+		}
+
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? -xld : xld);
+		tilemap_set_scrolly(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? -yld : yld);
+
+		tilemap_draw(state->m_tmp_bitmap1, rect, state->m_bg_tilemap, 0, 0);
+
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
+		tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);
+
+		if (latch != 0)
+		{
+			const UINT8* MASK = screen.machine().region("user1")->base() + 8 * state->m_hit;
+
+			int x;
+			int y;
+
+			for (y = rect.min_y; y <= rect.max_y; y++)
 			{
-				if (MASK[p0[x] & 7] && p1[x])
+				const UINT16* p0 = &state->m_tmp_bitmap1.pix16(y);
+				const UINT16* p1 = &state->m_tmp_bitmap2.pix16(y);
+
+				for (x = rect.min_x; x <= rect.max_x; x++)
 				{
-					int col = (xld + x) / 8 + 1;
-					int row = (yld + y) / 8 + 0;
+					if (MASK[p0[x] & 7] && p1[x])
+					{
+						int col = (xld + x) / 8 + 1;
+						int row = (yld + y) / 8 + 0;
 
-					latch |= (flip_screen_get(screen.machine()) ? 31 - col : col) << 0;
-					latch |= (flip_screen_get(screen.machine()) ? 31 - row : row) << 5;
+						latch |= (flip_screen_get(screen.machine()) ? 31 - col : col) << 0;
+						latch |= (flip_screen_get(screen.machine()) ? 31 - row : row) << 5;
 
-					state->m_pc3259_output[0] = (latch >> 0x0) & 0xf;
-					state->m_pc3259_output[1] = (latch >> 0x4) & 0xf;
-					state->m_pc3259_output[2] = (latch >> 0x8) & 0xf;
-					state->m_pc3259_output[3] = (latch >> 0xc) & 0xf;
+						state->m_pc3259_output[0] = (latch >> 0x0) & 0xf;
+						state->m_pc3259_output[1] = (latch >> 0x4) & 0xf;
+						state->m_pc3259_output[2] = (latch >> 0x8) & 0xf;
+						state->m_pc3259_output[3] = (latch >> 0xc) & 0xf;
 
-					return;
+						return;
+					}
 				}
 			}
 		}

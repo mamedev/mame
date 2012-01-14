@@ -41,4 +41,4 @@ WRITE8_HANDLER( commando_c804_w );
 
 VIDEO_START( commando );
 SCREEN_UPDATE_IND16( commando );
-SCREEN_EOF( commando );
+SCREEN_VBLANK( commando );

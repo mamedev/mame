@@ -428,13 +428,17 @@ static void taito_update_sprites_active_area( running_machine &machine )
 	}
 }
 
-SCREEN_EOF( taito_no_buffer )
+SCREEN_VBLANK( taito_no_buffer )
 {
-	slapshot_state *state = screen.machine().driver_data<slapshot_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		slapshot_state *state = screen.machine().driver_data<slapshot_state>();
 
-	taito_update_sprites_active_area(screen.machine());
+		taito_update_sprites_active_area(screen.machine());
 
-	state->m_prepare_sprites = 1;
+		state->m_prepare_sprites = 1;
+	}
 }
 
 

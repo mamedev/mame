@@ -38,4 +38,4 @@ VIDEO_START( seta2 );
 VIDEO_START( seta2_xoffset );
 VIDEO_START( seta2_yoffset );
 SCREEN_UPDATE_IND16( seta2 );
-SCREEN_EOF( seta2 );
+SCREEN_VBLANK( seta2 );

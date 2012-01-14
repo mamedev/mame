@@ -202,91 +202,95 @@ SCREEN_UPDATE_IND16( tank8 )
 }
 
 
-SCREEN_EOF( tank8 )
+SCREEN_VBLANK( tank8 )
 {
-	tank8_state *state = screen.machine().driver_data<tank8_state>();
-	int x;
-	int y;
-	const rectangle &visarea = screen.machine().primary_screen->visible_area();
-
-	tilemap_draw(state->m_helper1, visarea, state->m_tilemap, 0, 0);
-
-	state->m_helper2.fill(8, visarea);
-	state->m_helper3.fill(8, visarea);
-
-	draw_sprites(screen.machine(), state->m_helper2, visarea);
-	draw_bullets(screen.machine(), state->m_helper3, visarea);
-
-	for (y = visarea.min_y; y <= visarea.max_y; y++)
+	// on falling edge
+	if (!vblank_on)
 	{
-		int _state = 0;
+		tank8_state *state = screen.machine().driver_data<tank8_state>();
+		int x;
+		int y;
+		const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-		const UINT16* p1 = &state->m_helper1.pix16(y);
-		const UINT16* p2 = &state->m_helper2.pix16(y);
-		const UINT16* p3 = &state->m_helper3.pix16(y);
+		tilemap_draw(state->m_helper1, visarea, state->m_tilemap, 0, 0);
 
-		if (y % 2 != screen.machine().primary_screen->frame_number() % 2)
-			continue; /* video display is interlaced */
+		state->m_helper2.fill(8, visarea);
+		state->m_helper3.fill(8, visarea);
 
-		for (x = visarea.min_x; x <= visarea.max_x; x++)
+		draw_sprites(screen.machine(), state->m_helper2, visarea);
+		draw_bullets(screen.machine(), state->m_helper3, visarea);
+
+		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
-			UINT8 index;
+			int _state = 0;
 
-			/* neither wall nor mine */
-			if ((p1[x] != 0x11) && (p1[x] != 0x13))
+			const UINT16* p1 = &state->m_helper1.pix16(y);
+			const UINT16* p2 = &state->m_helper2.pix16(y);
+			const UINT16* p3 = &state->m_helper3.pix16(y);
+
+			if (y % 2 != screen.machine().primary_screen->frame_number() % 2)
+				continue; /* video display is interlaced */
+
+			for (x = visarea.min_x; x <= visarea.max_x; x++)
 			{
-				_state = 0;
-				continue;
+				UINT8 index;
+
+				/* neither wall nor mine */
+				if ((p1[x] != 0x11) && (p1[x] != 0x13))
+				{
+					_state = 0;
+					continue;
+				}
+
+				/* neither tank nor bullet */
+				if ((p2[x] == 8) && (p3[x] == 8))
+				{
+					_state = 0;
+					continue;
+				}
+
+				/* bullets cannot hit mines */
+				if ((p3[x] != 8) && (p1[x] == 0x13))
+				{
+					_state = 0;
+					continue;
+				}
+
+				if (_state)
+					continue;
+
+				if (p3[x] != 8)
+				{
+					index = ((p3[x] & ~0x01) >> 1) | 0x18;
+
+					if (1)
+						index |= 0x20;
+
+					if (0)
+						index |= 0x40;
+
+					if (1)
+						index |= 0x80;
+				}
+				else
+				{
+					int sprite_num = (p2[x] & ~0x01) >> 1;
+					index = sprite_num | 0x10;
+
+					if (p1[x] == 0x11)
+						index |= 0x20;
+
+					if (y - get_y_pos(state, sprite_num) >= 8)
+						index |= 0x40; /* collision on bottom side */
+
+					if (x - get_x_pos(state, sprite_num) >= 8)
+						index |= 0x80; /* collision on right side */
+				}
+
+				screen.machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(tank8_collision_callback), index);
+
+				_state = 1;
 			}
-
-			/* neither tank nor bullet */
-			if ((p2[x] == 8) && (p3[x] == 8))
-			{
-				_state = 0;
-				continue;
-			}
-
-			/* bullets cannot hit mines */
-			if ((p3[x] != 8) && (p1[x] == 0x13))
-			{
-				_state = 0;
-				continue;
-			}
-
-			if (_state)
-				continue;
-
-			if (p3[x] != 8)
-			{
-				index = ((p3[x] & ~0x01) >> 1) | 0x18;
-
-				if (1)
-					index |= 0x20;
-
-				if (0)
-					index |= 0x40;
-
-				if (1)
-					index |= 0x80;
-			}
-			else
-			{
-				int sprite_num = (p2[x] & ~0x01) >> 1;
-				index = sprite_num | 0x10;
-
-				if (p1[x] == 0x11)
-					index |= 0x20;
-
-				if (y - get_y_pos(state, sprite_num) >= 8)
-					index |= 0x40; /* collision on bottom side */
-
-				if (x - get_x_pos(state, sprite_num) >= 8)
-					index |= 0x80; /* collision on right side */
-			}
-
-			screen.machine().scheduler().timer_set(screen.time_until_pos(y, x), FUNC(tank8_collision_callback), index);
-
-			_state = 1;
 		}
 	}
 }

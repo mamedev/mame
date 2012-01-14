@@ -1124,7 +1124,7 @@ VIDEO_START( tx1 )
 	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
-SCREEN_EOF( tx1 )
+SCREEN_VBLANK( tx1 )
 {
 	tx1_state *state = screen.machine().driver_data<tx1_state>();
 	/* /VSYNC: Update TZ113 */
@@ -3027,15 +3027,19 @@ VIDEO_START( buggybjr )
 	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
-SCREEN_EOF( buggyboy )
+SCREEN_VBLANK( buggyboy )
 {
-	tx1_state *state = screen.machine().driver_data<tx1_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		tx1_state *state = screen.machine().driver_data<tx1_state>();
 
-	/* /VSYNC: Update TZ113 @ 219 */
-	state->m_vregs.slin_val += state->m_vregs.slin_inc;
+		/* /VSYNC: Update TZ113 @ 219 */
+		state->m_vregs.slin_val += state->m_vregs.slin_inc;
 
-	/* /VSYNC: Clear wave LFSR */
-	state->m_vregs.wave_lfsr = 0;
+		/* /VSYNC: Clear wave LFSR */
+		state->m_vregs.wave_lfsr = 0;
+	}
 }
 
 

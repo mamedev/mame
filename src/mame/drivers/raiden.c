@@ -242,10 +242,14 @@ static INTERRUPT_GEN( raiden_interrupt )
 	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
-static SCREEN_EOF( raiden )
+static SCREEN_VBLANK( raiden )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
+	}
 }
 
 static MACHINE_CONFIG_START( raiden, raiden_state )
@@ -274,7 +278,7 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(raiden)
-	MCFG_SCREEN_EOF_STATIC(raiden)
+	MCFG_SCREEN_VBLANK_STATIC(raiden)
 
 	MCFG_GFXDECODE(raiden)
 	MCFG_PALETTE_LENGTH(2048)

@@ -267,16 +267,7 @@ void video_manager::frame_update(bool debug)
 	{
 		// reset partial updates if we're paused or if the debugger is active
 		if (machine().primary_screen != NULL && (machine().paused() || debug || debugger_within_instruction_hook(machine())))
-			machine().primary_screen->scanline0_callback();
-
-		// otherwise, call the video EOF callback
-		else
-		{
-			g_profiler.start(PROFILER_VIDEO);
-			for (screen_device *screen = machine().first_screen(); screen != NULL; screen = screen->next_screen())
-				screen->screen_eof();
-			g_profiler.stop();
-		}
+			machine().primary_screen->reset_partial_updates();
 	}
 }
 

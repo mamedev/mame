@@ -100,15 +100,19 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-static SCREEN_EOF( spectrum )
+static SCREEN_VBLANK( spectrum )
 {
-	photon2_state *state = screen.machine().driver_data<photon2_state>();
-    state->m_spectrum_frame_number++;
-    if (state->m_spectrum_frame_number >= 25)
-    {
-        state->m_spectrum_frame_number = 0;
-        state->m_spectrum_flash_invert = !state->m_spectrum_flash_invert;
-    }
+	// rising edge
+	if (vblank_on)
+	{
+		photon2_state *state = screen.machine().driver_data<photon2_state>();
+	    state->m_spectrum_frame_number++;
+	    if (state->m_spectrum_frame_number >= 25)
+	    {
+	        state->m_spectrum_frame_number = 0;
+	        state->m_spectrum_flash_invert = !state->m_spectrum_flash_invert;
+	    }
+	}
 }
 
 INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
@@ -325,7 +329,7 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_STATIC( spectrum )
-	MCFG_SCREEN_EOF_STATIC( spectrum )
+	MCFG_SCREEN_VBLANK_STATIC( spectrum )
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT( spectrum )

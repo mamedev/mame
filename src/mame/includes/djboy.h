@@ -54,4 +54,4 @@ WRITE8_HANDLER( djboy_paletteram_w );
 
 VIDEO_START( djboy );
 SCREEN_UPDATE_IND16( djboy );
-SCREEN_EOF( djboy );
+SCREEN_VBLANK( djboy );

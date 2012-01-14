@@ -306,12 +306,16 @@ SCREEN_UPDATE_IND16( madgear )
 	return 0;
 }
 
-SCREEN_EOF( lastduel )
+SCREEN_VBLANK( lastduel )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	/* Spriteram is always 1 frame ahead, suggesting buffering.  I can't find
-        a register to control this so I assume it happens automatically
-        every frame at the end of vblank */
-	buffer_spriteram16_w(space, 0, 0, 0xffff);
+		/* Spriteram is always 1 frame ahead, suggesting buffering.  I can't find
+	        a register to control this so I assume it happens automatically
+	        every frame at the end of vblank */
+		buffer_spriteram16_w(space, 0, 0, 0xffff);
+	}
 }

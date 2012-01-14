@@ -1049,8 +1049,12 @@ SCREEN_UPDATE_IND16( mirderby )
 }
 
 
-SCREEN_EOF( homedata )
+SCREEN_VBLANK( homedata )
 {
-	homedata_state *state = screen.machine().driver_data<homedata_state>();
-	state->m_visible_page ^= 1;
+	// rising edge
+	if (vblank_on)
+	{
+		homedata_state *state = screen.machine().driver_data<homedata_state>();
+		state->m_visible_page ^= 1;
+	}
 }

@@ -70,4 +70,4 @@ VIDEO_START( sngkace );
 VIDEO_START( psikyo );
 SCREEN_UPDATE_IND16( psikyo );
 SCREEN_UPDATE_IND16( psikyo_bootleg );
-SCREEN_EOF( psikyo );
+SCREEN_VBLANK( psikyo );

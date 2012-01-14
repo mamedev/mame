@@ -50,4 +50,4 @@ WRITE8_HANDLER( airbustr_scrollregs_w );
 
 VIDEO_START( airbustr );
 SCREEN_UPDATE_IND16( airbustr );
-SCREEN_EOF( airbustr );
+SCREEN_VBLANK( airbustr );

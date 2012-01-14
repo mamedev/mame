@@ -81,8 +81,12 @@ SCREEN_UPDATE_IND16( djboy )
 	return 0;
 }
 
-SCREEN_EOF( djboy )
+SCREEN_VBLANK( djboy )
 {
-	djboy_state *state = screen.machine().driver_data<djboy_state>();
-	pandora_eof(state->m_pandora);
+	// rising edge
+	if (vblank_on)
+	{
+		djboy_state *state = screen.machine().driver_data<djboy_state>();
+		pandora_eof(state->m_pandora);
+	}
 }

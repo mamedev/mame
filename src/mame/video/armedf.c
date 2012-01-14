@@ -431,9 +431,13 @@ SCREEN_UPDATE_IND16( armedf )
 }
 
 
-SCREEN_EOF( armedf )
+SCREEN_VBLANK( armedf )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	buffer_spriteram16_w(space, 0, 0, 0xffff);
+		buffer_spriteram16_w(space, 0, 0, 0xffff);
+	}
 }

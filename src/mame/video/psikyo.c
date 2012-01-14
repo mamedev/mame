@@ -865,9 +865,13 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 }
 
 
-SCREEN_EOF( psikyo )
+SCREEN_VBLANK( psikyo )
 {
-	psikyo_state *state = screen.machine().driver_data<psikyo_state>();
-	memcpy(state->m_spritebuf2, state->m_spritebuf1, 0x2000);
-	memcpy(state->m_spritebuf1, state->m_spriteram, 0x2000);
+	// rising edge
+	if (vblank_on)
+	{
+		psikyo_state *state = screen.machine().driver_data<psikyo_state>();
+		memcpy(state->m_spritebuf2, state->m_spritebuf1, 0x2000);
+		memcpy(state->m_spritebuf1, state->m_spriteram, 0x2000);
+	}
 }

@@ -73,7 +73,7 @@ WRITE8_HANDLER( starshp1_playfield_w );
 
 PALETTE_INIT( starshp1 );
 SCREEN_UPDATE_IND16( starshp1 );
-SCREEN_EOF( starshp1 );
+SCREEN_VBLANK( starshp1 );
 VIDEO_START( starshp1 );
 
 

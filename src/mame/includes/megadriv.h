@@ -67,7 +67,7 @@ MACHINE_START( megadriv );
 MACHINE_RESET( megadriv );
 VIDEO_START( megadriv );
 SCREEN_UPDATE_RGB32( megadriv );
-SCREEN_EOF( megadriv );
+SCREEN_VBLANK( megadriv );
 
 
 extern UINT16* megadrive_vdp_palette_lookup;

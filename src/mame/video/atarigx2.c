@@ -220,9 +220,13 @@ SCREEN_UPDATE_IND16( atarigx2 )
 	return 0;
 }
 
-SCREEN_EOF( atarigx2 )
+SCREEN_VBLANK( atarigx2 )
 {
-	atarigx2_state *state = screen.machine().driver_data<atarigx2_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		atarigx2_state *state = screen.machine().driver_data<atarigx2_state>();
 
-	atarirle_eof(state->m_rle);
+		atarirle_eof(state->m_rle);
+	}
 }

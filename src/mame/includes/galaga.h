@@ -94,7 +94,7 @@ WRITE8_HANDLER( bosco_starclr_w );
 VIDEO_START( bosco );
 SCREEN_UPDATE_IND16( bosco );
 PALETTE_INIT( bosco );
-SCREEN_EOF( bosco );	/* update starfield */
+SCREEN_VBLANK( bosco );	/* update starfield */
 
 /*----------- defined in audio/galaga.c -----------*/
 
@@ -117,7 +117,7 @@ WRITE8_HANDLER( galaga_videoram_w );
 WRITE8_HANDLER( gatsbee_bank_w );
 VIDEO_START( galaga );
 SCREEN_UPDATE_IND16( galaga );
-SCREEN_EOF( galaga );	/* update starfield */
+SCREEN_VBLANK( galaga );	/* update starfield */
 
 /*----------- defined in video/xevious.c -----------*/
 

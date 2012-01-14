@@ -317,12 +317,16 @@ SCREEN_UPDATE_IND16( bosco )
 }
 
 
-SCREEN_EOF( bosco )
+SCREEN_VBLANK( bosco )
 {
-	bosco_state *state =  screen.machine().driver_data<bosco_state>();
-	static const int speedsx[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
-	static const int speedsy[8] = { 0, -1, -2, -3, 0, 3, 2, 1 };
+	// rising edge
+	if (vblank_on)
+	{
+		bosco_state *state =  screen.machine().driver_data<bosco_state>();
+		static const int speedsx[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
+		static const int speedsy[8] = { 0, -1, -2, -3, 0, 3, 2, 1 };
 
-	state->m_stars_scrollx += speedsx[state->m_bosco_starcontrol[0] & 0x07];
-	state->m_stars_scrolly += speedsy[(state->m_bosco_starcontrol[0] & 0x38) >> 3];
+		state->m_stars_scrollx += speedsx[state->m_bosco_starcontrol[0] & 0x07];
+		state->m_stars_scrolly += speedsy[(state->m_bosco_starcontrol[0] & 0x38) >> 3];
+	}
 }

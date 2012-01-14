@@ -26,4 +26,4 @@ WRITE16_HANDLER( taotaido_tileregs_w );
 WRITE16_HANDLER( taotaido_bgvideoram_w );
 VIDEO_START( taotaido );
 SCREEN_UPDATE_IND16( taotaido );
-SCREEN_EOF( taotaido );
+SCREEN_VBLANK( taotaido );

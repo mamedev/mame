@@ -124,7 +124,7 @@ static SCREEN_UPDATE_IND16(psattack)
 	return 0;
 }
 
-static SCREEN_EOF(psattack)
+static SCREEN_VBLANK(psattack)
 {
 
 }
@@ -184,7 +184,7 @@ static MACHINE_CONFIG_START( psattack, psattack_state )
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_STATIC(psattack)
-	MCFG_SCREEN_EOF_STATIC(psattack)
+	MCFG_SCREEN_VBLANK_STATIC(psattack)
 
 	MCFG_VIDEO_START(psattack)
 

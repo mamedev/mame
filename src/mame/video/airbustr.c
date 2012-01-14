@@ -146,11 +146,15 @@ SCREEN_UPDATE_IND16( airbustr )
 	return 0;
 }
 
-SCREEN_EOF( airbustr )
+SCREEN_VBLANK( airbustr )
 {
-	airbustr_state *state = screen.machine().driver_data<airbustr_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		airbustr_state *state = screen.machine().driver_data<airbustr_state>();
 
-	// update the sprite bitmap
-	pandora_eof(state->m_pandora);
+		// update the sprite bitmap
+		pandora_eof(state->m_pandora);
+	}
 }
 

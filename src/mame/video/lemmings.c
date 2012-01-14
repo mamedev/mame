@@ -105,12 +105,16 @@ VIDEO_START( lemmings )
 	state->save_pointer(NAME(state->m_sprite_triple_buffer_1), 0x800 / 2);
 }
 
-SCREEN_EOF( lemmings )
+SCREEN_VBLANK( lemmings )
 {
-	lemmings_state *state = screen.machine().driver_data<lemmings_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		lemmings_state *state = screen.machine().driver_data<lemmings_state>();
 
-	memcpy(state->m_sprite_triple_buffer_0, screen.machine().generic.buffered_spriteram.u16, 0x800);
-	memcpy(state->m_sprite_triple_buffer_1, screen.machine().generic.buffered_spriteram2.u16, 0x800);
+		memcpy(state->m_sprite_triple_buffer_0, screen.machine().generic.buffered_spriteram.u16, 0x800);
+		memcpy(state->m_sprite_triple_buffer_1, screen.machine().generic.buffered_spriteram2.u16, 0x800);
+	}
 }
 
 /******************************************************************************/

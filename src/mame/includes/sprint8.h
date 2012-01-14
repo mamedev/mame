@@ -31,7 +31,7 @@ void sprint8_set_collision(running_machine &machine, int n);
 /*----------- defined in video/sprint8.c -----------*/
 
 PALETTE_INIT( sprint8 );
-SCREEN_EOF( sprint8 );
+SCREEN_VBLANK( sprint8 );
 VIDEO_START( sprint8 );
 SCREEN_UPDATE_IND16( sprint8 );
 

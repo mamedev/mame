@@ -200,7 +200,7 @@ public:
 
 VIDEO_START( f3 );
 SCREEN_UPDATE_RGB32( f3 );
-SCREEN_EOF( f3 );
+SCREEN_VBLANK( f3 );
 
 WRITE16_HANDLER( f3_control_0_w );
 WRITE16_HANDLER( f3_control_1_w );

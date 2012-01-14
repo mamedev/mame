@@ -1020,16 +1020,20 @@ SCREEN_UPDATE_IND16( megasys1 )
 	return 0;
 }
 
-SCREEN_EOF( megasys1 )
+SCREEN_VBLANK( megasys1 )
 {
-	megasys1_state *state = screen.machine().driver_data<megasys1_state>();
-	/* Sprite are TWO frames ahead, like NMK16 HW. */
-//state->m_objectram
-	memcpy(state->m_buffer2_objectram,state->m_buffer_objectram, 0x2000);
-	memcpy(state->m_buffer_objectram, state->m_objectram, 0x2000);
-//spriteram16
-	memcpy(state->m_buffer2_spriteram16, state->m_buffer_spriteram16, 0x2000);
-	memcpy(state->m_buffer_spriteram16, state->m_spriteram, 0x2000);
+	// rising edge
+	if (vblank_on)
+	{
+		megasys1_state *state = screen.machine().driver_data<megasys1_state>();
+		/* Sprite are TWO frames ahead, like NMK16 HW. */
+	//state->m_objectram
+		memcpy(state->m_buffer2_objectram,state->m_buffer_objectram, 0x2000);
+		memcpy(state->m_buffer_objectram, state->m_objectram, 0x2000);
+	//spriteram16
+		memcpy(state->m_buffer2_spriteram16, state->m_buffer_spriteram16, 0x2000);
+		memcpy(state->m_buffer_spriteram16, state->m_spriteram, 0x2000);
+	}
 
 }
 

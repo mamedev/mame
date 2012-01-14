@@ -21,7 +21,7 @@ public:
 
 VIDEO_START( baraduke );
 SCREEN_UPDATE_IND16( baraduke );
-SCREEN_EOF( baraduke );
+SCREEN_VBLANK( baraduke );
 READ8_HANDLER( baraduke_videoram_r );
 WRITE8_HANDLER( baraduke_videoram_w );
 READ8_HANDLER( baraduke_textram_r );

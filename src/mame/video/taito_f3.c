@@ -515,22 +515,25 @@ static TILE_GET_INFO( get_tile_info_pixel )
 
 /******************************************************************************/
 
-SCREEN_EOF( f3 )
+SCREEN_VBLANK( f3 )
 {
-	taito_f3_state *state = screen.machine().driver_data<taito_f3_state>();
-	if (state->m_sprite_lag==2)
+	if (vblank_on)
 	{
-		if (screen.machine().video().skip_this_frame() == 0)
+		taito_f3_state *state = screen.machine().driver_data<taito_f3_state>();
+		if (state->m_sprite_lag==2)
 		{
-			get_sprite_info(screen.machine(), state->m_spriteram16_buffered);
+			if (screen.machine().video().skip_this_frame() == 0)
+			{
+				get_sprite_info(screen.machine(), state->m_spriteram16_buffered);
+			}
+			memcpy(state->m_spriteram16_buffered,state->m_spriteram,0x10000);
 		}
-		memcpy(state->m_spriteram16_buffered,state->m_spriteram,0x10000);
-	}
-	else if (state->m_sprite_lag==1)
-	{
-		if (screen.machine().video().skip_this_frame() == 0)
+		else if (state->m_sprite_lag==1)
 		{
-			get_sprite_info(screen.machine(), state->m_spriteram);
+			if (screen.machine().video().skip_this_frame() == 0)
+			{
+				get_sprite_info(screen.machine(), state->m_spriteram);
+			}
 		}
 	}
 }

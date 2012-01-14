@@ -227,14 +227,18 @@ SCREEN_UPDATE_IND16(taotaido)
 	return 0;
 }
 
-SCREEN_EOF( taotaido )
+SCREEN_VBLANK( taotaido )
 {
-	taotaido_state *state = screen.machine().driver_data<taotaido_state>();
-	/* sprites need to be delayed by 2 frames? */
+	// rising edge
+	if (vblank_on)
+	{
+		taotaido_state *state = screen.machine().driver_data<taotaido_state>();
+		/* sprites need to be delayed by 2 frames? */
 
-	memcpy(state->m_spriteram2_older,state->m_spriteram2_old,0x10000);
-	memcpy(state->m_spriteram2_old,state->m_spriteram2,0x10000);
+		memcpy(state->m_spriteram2_older,state->m_spriteram2_old,0x10000);
+		memcpy(state->m_spriteram2_old,state->m_spriteram2,0x10000);
 
-	memcpy(state->m_spriteram_older,state->m_spriteram_old,0x2000);
-	memcpy(state->m_spriteram_old,state->m_spriteram,0x2000);
+		memcpy(state->m_spriteram_older,state->m_spriteram_old,0x2000);
+		memcpy(state->m_spriteram_old,state->m_spriteram,0x2000);
+	}
 }

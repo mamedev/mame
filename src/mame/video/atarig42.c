@@ -227,9 +227,13 @@ SCREEN_UPDATE_IND16( atarig42 )
 	return 0;
 }
 
-SCREEN_EOF( atarig42 )
+SCREEN_VBLANK( atarig42 )
 {
-	atarig42_state *state = screen.machine().driver_data<atarig42_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		atarig42_state *state = screen.machine().driver_data<atarig42_state>();
 
-	atarirle_eof(state->m_rle);
+		atarirle_eof(state->m_rle);
+	}
 }

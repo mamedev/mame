@@ -24,6 +24,6 @@ public:
 PALETTE_INIT( ultratnk );
 VIDEO_START( ultratnk );
 SCREEN_UPDATE_IND16( ultratnk );
-SCREEN_EOF( ultratnk );
+SCREEN_VBLANK( ultratnk );
 
 WRITE8_HANDLER( ultratnk_video_ram_w );

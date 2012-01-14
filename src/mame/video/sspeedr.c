@@ -267,8 +267,12 @@ SCREEN_UPDATE_IND16( sspeedr )
 }
 
 
-SCREEN_EOF( sspeedr )
+SCREEN_VBLANK( sspeedr )
 {
-	sspeedr_state *state = screen.machine().driver_data<sspeedr_state>();
-	state->m_toggle ^= 1;
+	// rising edge
+	if (vblank_on)
+	{
+		sspeedr_state *state = screen.machine().driver_data<sspeedr_state>();
+		state->m_toggle ^= 1;
+	}
 }

@@ -81,7 +81,7 @@ public:
 PALETTE_INIT( lockon );
 VIDEO_START( lockon );
 SCREEN_UPDATE_IND16( lockon );
-SCREEN_EOF( lockon );
+SCREEN_VBLANK( lockon );
 READ16_HANDLER( lockon_crtc_r );
 WRITE16_HANDLER( lockon_crtc_w );
 WRITE16_HANDLER( lockon_rotate_w );

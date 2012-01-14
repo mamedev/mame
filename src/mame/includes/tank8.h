@@ -55,7 +55,7 @@ void tank8_set_collision(running_machine &machine, int index);
 /*----------- defined in video/tank8.c -----------*/
 
 PALETTE_INIT( tank8 );
-SCREEN_EOF( tank8 );
+SCREEN_VBLANK( tank8 );
 VIDEO_START( tank8 );
 SCREEN_UPDATE_IND16( tank8 );
 

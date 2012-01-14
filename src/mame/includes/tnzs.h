@@ -88,4 +88,4 @@ MACHINE_START( jpopnics );
 
 PALETTE_INIT( arknoid2 );
 SCREEN_UPDATE_IND16( tnzs );
-SCREEN_EOF( tnzs );
+SCREEN_VBLANK( tnzs );

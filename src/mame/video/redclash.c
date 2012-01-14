@@ -315,7 +315,7 @@ void redclash_set_stars_enable( running_machine &machine, UINT8 on )
 }
 
 /* This sets up which starfield to draw and the offset, */
-/* To be called from SCREEN_EOF() */
+/* To be called from SCREEN_VBLANK() */
 
 void redclash_update_stars_state( running_machine &machine )
 {
@@ -418,9 +418,11 @@ void redclash_draw_stars( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-SCREEN_EOF( redclash )
+SCREEN_VBLANK( redclash )
 {
-	redclash_update_stars_state(screen.machine());
+	// rising edge
+	if (vblank_on)
+		redclash_update_stars_state(screen.machine());
 }
 
 SCREEN_UPDATE_IND16( redclash )

@@ -1545,10 +1545,14 @@ static READ8_DEVICE_HANDLER( dsw2_r )
  Sprites Buffering
 
 */
-static SCREEN_EOF( seta_buffer_sprites )
+static SCREEN_VBLANK( seta_buffer_sprites )
 {
-	//seta_state *state = machine.driver_data<seta_state>();
-	screen.machine().device<seta001_device>("spritegen")->setac_eof();
+	// rising edge
+	if (vblank_on)
+	{
+		//seta_state *state = machine.driver_data<seta_state>();
+		screen.machine().device<seta001_device>("spritegen")->setac_eof();
+	}
 }
 
 
@@ -7665,7 +7669,7 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(seta)
-	MCFG_SCREEN_EOF_STATIC(seta_buffer_sprites)		/* Blandia uses sprite buffering */
+	MCFG_SCREEN_VBLANK_STATIC(seta_buffer_sprites)		/* Blandia uses sprite buffering */
 
 	MCFG_GFXDECODE(blandia)
 	MCFG_PALETTE_LENGTH((16*32+64*32*4)*2)	/* sprites, layer1, layer2, palette effect */
@@ -7698,7 +7702,7 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(seta)
-	MCFG_SCREEN_EOF_STATIC(seta_buffer_sprites)		/* Blandia uses sprite buffering */
+	MCFG_SCREEN_VBLANK_STATIC(seta_buffer_sprites)		/* Blandia uses sprite buffering */
 
 	MCFG_GFXDECODE(blandia)
 	MCFG_PALETTE_LENGTH((16*32+64*32*4)*2)	/* sprites, layer1, layer2, palette effect */
@@ -7813,7 +7817,7 @@ static MACHINE_CONFIG_START( drgnunit, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(seta)
-	MCFG_SCREEN_EOF_STATIC(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
+	MCFG_SCREEN_VBLANK_STATIC(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
 
 	MCFG_GFXDECODE(downtown)
 	MCFG_PALETTE_LENGTH(512)
@@ -7848,7 +7852,7 @@ static MACHINE_CONFIG_START( qzkklgy2, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(seta)
-	MCFG_SCREEN_EOF_STATIC(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
+	MCFG_SCREEN_VBLANK_STATIC(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
 
 	MCFG_GFXDECODE(qzkklgy2)
 	MCFG_PALETTE_LENGTH(512)
@@ -7899,7 +7903,7 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(setaroul)
-	MCFG_SCREEN_EOF_STATIC(setaroul)	/* qzkklogy uses sprite buffering */
+	MCFG_SCREEN_VBLANK_STATIC(setaroul)	/* qzkklogy uses sprite buffering */
 
 	MCFG_GFXDECODE(setaroul)
 	MCFG_PALETTE_LENGTH(512)
@@ -8352,7 +8356,7 @@ static MACHINE_CONFIG_START( msgundam, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(seta)
-	MCFG_SCREEN_EOF_STATIC(seta_buffer_sprites)	/* msgundam uses sprite buffering */
+	MCFG_SCREEN_VBLANK_STATIC(seta_buffer_sprites)	/* msgundam uses sprite buffering */
 
 	MCFG_GFXDECODE(msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */

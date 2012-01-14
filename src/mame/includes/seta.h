@@ -120,5 +120,5 @@ SCREEN_UPDATE_IND16( usclssic );
 SCREEN_UPDATE_IND16( inttoote );
 SCREEN_UPDATE_IND16( setaroul );
 
-SCREEN_EOF( setaroul );
+SCREEN_VBLANK( setaroul );
 

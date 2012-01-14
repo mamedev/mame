@@ -82,8 +82,8 @@ SCREEN_UPDATE_IND16( bjtwin );
 SCREEN_UPDATE_IND16( tharrier );
 SCREEN_UPDATE_IND16( hachamf );
 SCREEN_UPDATE_IND16( tdragon );
-SCREEN_EOF( nmk );
-SCREEN_EOF( strahl );
+SCREEN_VBLANK( nmk );
+SCREEN_VBLANK( strahl );
 
 VIDEO_START( afega );
 VIDEO_START( grdnstrm );

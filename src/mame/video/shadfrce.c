@@ -182,10 +182,14 @@ SCREEN_UPDATE_IND16( shadfrce )
 	return 0;
 }
 
-SCREEN_EOF( shadfrce )
+SCREEN_VBLANK( shadfrce )
 {
-	shadfrce_state *state = screen.machine().driver_data<shadfrce_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		shadfrce_state *state = screen.machine().driver_data<shadfrce_state>();
 
-	/* looks like sprites are *two* frames ahead */
-	memcpy(state->m_spvideoram_old, state->m_spvideoram, state->m_spvideoram_size);
+		/* looks like sprites are *two* frames ahead */
+		memcpy(state->m_spvideoram_old, state->m_spvideoram, state->m_spvideoram_size);
+	}
 }

@@ -35,4 +35,4 @@ WRITE8_HANDLER( gng_flipscreen_w );
 
 VIDEO_START( gng );
 SCREEN_UPDATE_IND16( gng );
-SCREEN_EOF( gng );
+SCREEN_VBLANK( gng );

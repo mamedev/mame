@@ -831,8 +831,12 @@ SCREEN_UPDATE_IND16( thndrx2 )
 
 ***************************************************************************/
 
-SCREEN_EOF( blswhstl )
+SCREEN_VBLANK( blswhstl )
 {
-	tmnt_state *state = screen.machine().driver_data<tmnt_state>();
-	k053245_clear_buffer(state->m_k053245);
+	// on falling edge
+	if (!vblank_on)
+	{
+		tmnt_state *state = screen.machine().driver_data<tmnt_state>();
+		k053245_clear_buffer(state->m_k053245);
+	}
 }

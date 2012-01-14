@@ -65,10 +65,14 @@ static WRITE8_HANDLER( dec8_mxc06_karn_buffer_spriteram_w)
 }
 
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
-static SCREEN_EOF( dec8 )
+static SCREEN_VBLANK( dec8 )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-	dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
+	}
 }
 
 static READ8_HANDLER( i8751_h_r )
@@ -2075,7 +2079,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(ghostb)
-	MCFG_SCREEN_EOF_STATIC(dec8)
+	MCFG_SCREEN_VBLANK_STATIC(dec8)
 
 	MCFG_GFXDECODE(ghostb)
 	MCFG_PALETTE_LENGTH(1024)
@@ -2224,7 +2228,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(gondo)
-	MCFG_SCREEN_EOF_STATIC(dec8)
+	MCFG_SCREEN_VBLANK_STATIC(dec8)
 
 	MCFG_GFXDECODE(gondo)
 	MCFG_PALETTE_LENGTH(1024)
@@ -2423,7 +2427,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(garyoret)
-	MCFG_SCREEN_EOF_STATIC(dec8)
+	MCFG_SCREEN_VBLANK_STATIC(dec8)
 
 	MCFG_GFXDECODE(gondo)
 	MCFG_PALETTE_LENGTH(1024)

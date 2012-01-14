@@ -1274,7 +1274,7 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	// visible area can be changed at runtime
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(mrokumei)
-	MCFG_SCREEN_EOF_STATIC(homedata)
+	MCFG_SCREEN_VBLANK_STATIC(homedata)
 
 	MCFG_GFXDECODE(mrokumei)
 	MCFG_PALETTE_LENGTH(0x8000)
@@ -1342,7 +1342,7 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_STATIC(reikaids)
-	MCFG_SCREEN_EOF_STATIC(homedata)
+	MCFG_SCREEN_VBLANK_STATIC(homedata)
 
 	MCFG_GFXDECODE(reikaids)
 	MCFG_PALETTE_LENGTH(0x8000)
@@ -1393,7 +1393,7 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	// visible area can be changed at runtime
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(pteacher)
-	MCFG_SCREEN_EOF_STATIC(homedata)
+	MCFG_SCREEN_VBLANK_STATIC(homedata)
 
 	MCFG_GFXDECODE(pteacher)
 	MCFG_PALETTE_LENGTH(0x8000)

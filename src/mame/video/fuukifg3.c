@@ -367,13 +367,17 @@ SCREEN_UPDATE_IND16( fuuki32 )
 	return 0;
 }
 
-SCREEN_EOF( fuuki32 )
+SCREEN_VBLANK( fuuki32 )
 {
-	fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 
-	/* Buffer sprites and tilebank by 2 frames */
-	state->m_spr_buffered_tilebank[1] = state->m_spr_buffered_tilebank[0];
-	state->m_spr_buffered_tilebank[0] = state->m_tilebank[0];
-	memcpy(state->m_buf_spriteram2, state->m_buf_spriteram, state->m_spriteram_size);
-	memcpy(state->m_buf_spriteram, state->m_spriteram, state->m_spriteram_size);
+		/* Buffer sprites and tilebank by 2 frames */
+		state->m_spr_buffered_tilebank[1] = state->m_spr_buffered_tilebank[0];
+		state->m_spr_buffered_tilebank[0] = state->m_tilebank[0];
+		memcpy(state->m_buf_spriteram2, state->m_buf_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buf_spriteram, state->m_spriteram, state->m_spriteram_size);
+	}
 }

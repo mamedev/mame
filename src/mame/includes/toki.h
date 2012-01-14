@@ -19,8 +19,8 @@ public:
 /*----------- defined in video/toki.c -----------*/
 
 VIDEO_START( toki );
-SCREEN_EOF( toki );
-SCREEN_EOF( tokib );
+SCREEN_VBLANK( toki );
+SCREEN_VBLANK( tokib );
 SCREEN_UPDATE_IND16( toki );
 SCREEN_UPDATE_IND16( tokib );
 WRITE16_HANDLER( toki_background1_videoram16_w );

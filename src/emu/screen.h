@@ -161,9 +161,10 @@ private:
 // ======================> other delegate types
 
 typedef delegate<void (screen_device &, bool)> vblank_state_delegate;
-typedef device_delegate<void (screen_device &)> screen_eof_delegate;
+
 typedef device_delegate<UINT32 (screen_device &, bitmap_ind16 &, const rectangle &)> screen_update_ind16_delegate;
 typedef device_delegate<UINT32 (screen_device &, bitmap_rgb32 &, const rectangle &)> screen_update_rgb32_delegate;
+typedef device_delegate<void (screen_device &, bool)> screen_vblank_delegate;
 
 
 // ======================> screen_device
@@ -202,12 +203,11 @@ public:
 	static void static_set_default_position(device_t &device, double xscale, double xoffs, double yscale, double yoffs);
 	static void static_set_screen_update(device_t &device, screen_update_ind16_delegate callback);
 	static void static_set_screen_update(device_t &device, screen_update_rgb32_delegate callback);
-	static void static_set_screen_eof(device_t &device, screen_eof_delegate callback);
+	static void static_set_screen_vblank(device_t &device, screen_vblank_delegate callback);
 
 	// information getters
 	screen_device *next_screen() const { return downcast<screen_device *>(typenext()); }
 	render_container &container() const { assert(m_container != NULL); return *m_container; }
-	void screen_eof();
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -228,11 +228,12 @@ public:
 	attotime scan_period() const { return attotime(0, m_scantime); }
 	attotime frame_period() const { return (this == NULL) ? DEFAULT_FRAME_PERIOD : attotime(0, m_frame_period); };
 	UINT64 frame_number() const { return m_frame_number; }
-	int partial_updates() const { return m_partial_updates_this_frame; }
 
 	// updating
+	int partial_updates() const { return m_partial_updates_this_frame; }
 	bool update_partial(int scanline);
 	void update_now();
+	void reset_partial_updates();
 	
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
@@ -246,30 +247,27 @@ public:
 	static const attotime DEFAULT_FRAME_PERIOD;
 
 private:
+	// timer IDs
+	enum
+	{
+		TID_VBLANK_START,
+		TID_VBLANK_END,
+		TID_SCANLINE0,
+		TID_SCANLINE
+	};
+
 	// device-level overrides
 	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 	virtual void device_start();
 	virtual void device_stop();
 	virtual void device_post_load();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// internal helpers
 	void set_container(render_container &container) { m_container = &container; }
 	void realloc_screen_bitmaps();
-
-	static TIMER_CALLBACK( static_vblank_begin_callback ) { reinterpret_cast<screen_device *>(ptr)->vblank_begin_callback(); }
-	void vblank_begin_callback();
-
-	static TIMER_CALLBACK( static_vblank_end_callback ) { reinterpret_cast<screen_device *>(ptr)->vblank_end_callback(); }
-	void vblank_end_callback();
-
-	static TIMER_CALLBACK( static_scanline0_callback ) { reinterpret_cast<screen_device *>(ptr)->scanline0_callback(); }
-public:	// temporary
-	void scanline0_callback();
-private:
-
-	static TIMER_CALLBACK( static_scanline_update_callback ) { reinterpret_cast<screen_device *>(ptr)->scanline_update_callback(param); }
-	void scanline_update_callback(int scanline);
-
+	void vblank_begin();
+	void vblank_end();
 	void finalize_burnin();
 	void load_effect_overlay(const char *filename);
 
@@ -282,7 +280,7 @@ private:
 	float				m_xscale, m_yscale;			// default X/Y scale factor
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
-	screen_eof_delegate	m_screen_eof;				// screen eof callback
+	screen_vblank_delegate m_screen_vblank;			// screen vblank callback
 
 	// internal state
 	render_container *	m_container;				// pointer to our container
@@ -346,9 +344,9 @@ extern const device_type SCREEN;
 #define SCREEN_UPDATE16_CALL(name)		SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
 #define SCREEN_UPDATE32_CALL(name)		SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
 
-#define SCREEN_EOF_NAME(name)			screen_eof_##name
-#define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(device_t *, screen_device &screen)
-#define SCREEN_EOF_CALL(name)			SCREEN_EOF_NAME(name)(NULL, screen)
+#define SCREEN_VBLANK_NAME(name)		screen_vblank_##name
+#define SCREEN_VBLANK(name)				void SCREEN_VBLANK_NAME(name)(device_t *, screen_device &screen, bool vblank_on)
+#define SCREEN_VBLANK_CALL(name)		SCREEN_VBLANK_NAME(name)(NULL, screen, vblank_on)
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
@@ -387,17 +385,17 @@ extern const device_type SCREEN;
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
 	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device)); \
 
-#define MCFG_SCREEN_EOF_NONE() \
-	screen_device::static_set_screen_eof(*device, screen_eof_delegate()); \
+#define MCFG_SCREEN_VBLANK_NONE() \
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate()); \
 
-#define MCFG_SCREEN_EOF_STATIC(_func) \
-	screen_device::static_set_screen_eof(*device, screen_eof_delegate(&screen_eof_##_func, "screen_eof_" #_func)); \
+#define MCFG_SCREEN_VBLANK_STATIC(_func) \
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&screen_vblank_##_func, "screen_vblank_" #_func)); \
 
-#define MCFG_SCREEN_EOF_DRIVER(_class, _method) \
-	screen_device::static_set_screen_eof(*device, screen_eof_delegate(&_class::_method, #_class "::" #_method, NULL)); \
+#define MCFG_SCREEN_VBLANK_DRIVER(_class, _method) \
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, NULL)); \
 
-#define MCFG_SCREEN_EOF_DEVICE(_device, _class, _method) \
-	screen_device::static_set_screen_eof(*device, screen_eof_delegate(&_class::_method, #_class "::" #_method, _device)); \
+#define MCFG_SCREEN_VBLANK_DEVICE(_device, _class, _method) \
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, _device)); \
 
 
 

@@ -232,14 +232,13 @@ void screen_device::static_set_screen_update(device_t &device, screen_update_rgb
 
 
 //-------------------------------------------------
-//  static_set_screen_eof - set the legacy
-//  screen eof callback in the device
-//  configuration
+//  static_set_screen_vblank - set the screen 
+//  VBLANK callback in the device configuration
 //-------------------------------------------------
 
-void screen_device::static_set_screen_eof(device_t &device, screen_eof_delegate callback)
+void screen_device::static_set_screen_vblank(device_t &device, screen_vblank_delegate callback)
 {
-	downcast<screen_device &>(device).m_screen_eof = callback;
+	downcast<screen_device &>(device).m_screen_vblank = callback;
 }
 
 
@@ -299,7 +298,7 @@ void screen_device::device_start()
 	// bind our handlers
 	m_screen_update_ind16.bind_relative_to(*owner());
 	m_screen_update_rgb32.bind_relative_to(*owner());
-	m_screen_eof.bind_relative_to(*owner());
+	m_screen_vblank.bind_relative_to(*owner());
 	
 	// configure bitmap formats
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
@@ -316,15 +315,15 @@ void screen_device::device_start()
 	m_container->set_user_settings(settings);
 
 	// allocate the VBLANK timers
-	m_vblank_begin_timer = machine().scheduler().timer_alloc(FUNC(static_vblank_begin_callback), (void *)this);
-	m_vblank_end_timer = machine().scheduler().timer_alloc(FUNC(static_vblank_end_callback), (void *)this);
+	m_vblank_begin_timer = timer_alloc(TID_VBLANK_START);
+	m_vblank_end_timer = timer_alloc(TID_VBLANK_END);
 
 	// allocate a timer to reset partial updates
-	m_scanline0_timer = machine().scheduler().timer_alloc(FUNC(static_scanline0_callback), (void *)this);
+	m_scanline0_timer = timer_alloc(TID_SCANLINE0);
 
 	// allocate a timer to generate per-scanline updates
 	if ((machine().config().m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
-		m_scanline_timer = machine().scheduler().timer_alloc(FUNC(static_scanline_update_callback), (void *)this);
+		m_scanline_timer = timer_alloc(TID_SCANLINE);
 
 	// configure the screen with the default parameters
 	configure(m_width, m_height, m_visarea, m_refresh);
@@ -396,6 +395,46 @@ void screen_device::device_post_load()
 
 
 //-------------------------------------------------
+//  device_timer - called whenever a device timer
+//  fires
+//-------------------------------------------------
+
+void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		// signal VBLANK start
+		case TID_VBLANK_START:
+			vblank_begin();
+			break;
+		
+		// signal VBLANK end
+		case TID_VBLANK_END:
+			vblank_end();
+			break;
+		
+		// first visible scanline
+		case TID_SCANLINE0:
+			reset_partial_updates();
+			break;
+		
+		// subsequent scanlines when scanline updates are enabled
+		case TID_SCANLINE:
+
+			// force a partial update to the current scanline
+			update_partial(param);
+
+			// compute the next visible scanline
+			param++;
+			if (param > m_visarea.max_y)
+				param = m_visarea.min_y;
+			m_scanline_timer->adjust(time_until_pos(param), param);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
 //  configure - configure screen parameters
 //-------------------------------------------------
 
@@ -460,14 +499,14 @@ void screen_device::reset_origin(int beamy, int beamx)
 	// if we are resetting relative to (0,0) == VBLANK end, call the
 	// scanline 0 timer by hand now; otherwise, adjust it for the future
 	if (beamy == 0 && beamx == 0)
-		scanline0_callback();
+		reset_partial_updates();
 	else
 		m_scanline0_timer->adjust(time_until_pos(0));
 
 	// if we are resetting relative to (visarea.max_y + 1, 0) == VBLANK start,
 	// call the VBLANK start timer now; otherwise, adjust it for the future
 	if (beamy == m_visarea.max_y + 1 && beamx == 0)
-		vblank_begin_callback();
+		vblank_begin();
 	else
 		m_vblank_begin_timer->adjust(time_until_vblank_start());
 }
@@ -644,6 +683,19 @@ void screen_device::update_now()
 
 
 //-------------------------------------------------
+//  reset_partial_updates - reset the partial
+//  updating state
+//-------------------------------------------------
+
+void screen_device::reset_partial_updates()
+{
+	m_last_partial_scan = 0;
+	m_partial_updates_this_frame = 0;
+	m_scanline0_timer->adjust(time_until_pos(0));
+}
+
+
+//-------------------------------------------------
 //  vpos - returns the current vertical position
 //  of the beam
 //-------------------------------------------------
@@ -758,11 +810,11 @@ void screen_device::register_vblank_callback(vblank_state_delegate vblank_callba
 
 
 //-------------------------------------------------
-//  vblank_begin_callback - call any external
-//  callbacks to signal the VBLANK period has begun
+//  vblank_begin - call any external callbacks to 
+//  signal the VBLANK period has begun
 //-------------------------------------------------
 
-void screen_device::vblank_begin_callback()
+void screen_device::vblank_begin()
 {
 	// reset the starting VBLANK time
 	m_vblank_start_time = machine().time();
@@ -771,6 +823,8 @@ void screen_device::vblank_begin_callback()
 	// call the screen specific callbacks
 	for (callback_item *item = m_callback_list.first(); item != NULL; item = item->next())
 		item->m_callback(*this, true);
+	if (!m_screen_vblank.isnull())
+		m_screen_vblank(*this, true);
 
 	// if this is the primary screen and we need to update now
 	if (this == machine().primary_screen && !(machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
@@ -781,22 +835,24 @@ void screen_device::vblank_begin_callback()
 
 	// if no VBLANK period, call the VBLANK end callback immedietely, otherwise reset the timer
 	if (m_vblank_period == 0)
-		vblank_end_callback();
+		vblank_end();
 	else
 		m_vblank_end_timer->adjust(time_until_vblank_end());
 }
 
 
 //-------------------------------------------------
-//  vblank_end_callback - call any external
-//  callbacks to signal the VBLANK period has ended
+//  vblank_end - call any external callbacks to 
+//  signal the VBLANK period has ended
 //-------------------------------------------------
 
-void screen_device::vblank_end_callback()
+void screen_device::vblank_end()
 {
 	// call the screen specific callbacks
 	for (callback_item *item = m_callback_list.first(); item != NULL; item = item->next())
 		item->m_callback(*this, false);
+	if (!m_screen_vblank.isnull())
+		m_screen_vblank(*this, false);
 
 	// if this is the primary screen and we need to update now
 	if (this == machine().primary_screen && (machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
@@ -804,39 +860,6 @@ void screen_device::vblank_end_callback()
 
 	// increment the frame number counter
 	m_frame_number++;
-}
-
-
-//-------------------------------------------------
-//  scanline0_callback - reset partial updates
-//  for a screen
-//-------------------------------------------------
-
-void screen_device::scanline0_callback()
-{
-	// reset partial updates
-	m_last_partial_scan = 0;
-	m_partial_updates_this_frame = 0;
-
-	m_scanline0_timer->adjust(time_until_pos(0));
-}
-
-
-//-------------------------------------------------
-//  scanline_update_callback - perform partial
-//  updates on each scanline
-//-------------------------------------------------
-
-void screen_device::scanline_update_callback(int scanline)
-{
-	// force a partial update to the current scanline
-	update_partial(scanline);
-
-	// compute the next visible scanline
-	scanline++;
-	if (scanline > m_visarea.max_y)
-		scanline = m_visarea.min_y;
-	m_scanline_timer->adjust(time_until_pos(scanline), scanline);
 }
 
 
@@ -1039,16 +1062,4 @@ void screen_device::load_effect_overlay(const char *filename)
 		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else
 		mame_printf_warning("Unable to load effect PNG file '%s'\n", fullname.cstr());
-}
-
-
-//-------------------------------------------------
-//  screen_eof - default implementation which
-//  calls to the legacy screen_update function
-//-------------------------------------------------
-
-void screen_device::screen_eof()
-{
-	if (!m_screen_eof.isnull())
-		m_screen_eof(*this);
 }

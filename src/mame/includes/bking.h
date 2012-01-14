@@ -72,4 +72,4 @@ READ8_HANDLER( bking_pos_r );
 PALETTE_INIT( bking );
 VIDEO_START( bking );
 SCREEN_UPDATE_IND16( bking );
-SCREEN_EOF( bking );
+SCREEN_VBLANK( bking );

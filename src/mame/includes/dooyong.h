@@ -77,5 +77,5 @@ VIDEO_START( primella );
 VIDEO_START( rshark );
 VIDEO_START( popbingo );
 
-SCREEN_EOF( dooyong );
-SCREEN_EOF( rshark );
+SCREEN_VBLANK( dooyong );
+SCREEN_VBLANK( rshark );

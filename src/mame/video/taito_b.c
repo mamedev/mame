@@ -503,20 +503,24 @@ SCREEN_UPDATE_RGB32( realpunc )
 
 
 
-SCREEN_EOF( taitob )
+SCREEN_VBLANK( taitob )
 {
-	taitob_state *state = screen.machine().driver_data<taitob_state>();
-	UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
-	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->m_tc0180vcu, 0);
-
-	if (~video_control & 0x01)
-		state->m_framebuffer[framebuffer_page]->fill(0, screen.machine().primary_screen->visible_area());
-
-	if (~video_control & 0x80)
+	// rising edge
+	if (vblank_on)
 	{
-		framebuffer_page ^= 1;
-		tc0180vcu_set_fb_page(state->m_tc0180vcu, 0, framebuffer_page);
-	}
+		taitob_state *state = screen.machine().driver_data<taitob_state>();
+		UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);
+		UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->m_tc0180vcu, 0);
 
-	draw_sprites(screen.machine(), *state->m_framebuffer[framebuffer_page], screen.machine().primary_screen->visible_area());
+		if (~video_control & 0x01)
+			state->m_framebuffer[framebuffer_page]->fill(0, screen.machine().primary_screen->visible_area());
+
+		if (~video_control & 0x80)
+		{
+			framebuffer_page ^= 1;
+			tc0180vcu_set_fb_page(state->m_tc0180vcu, 0, framebuffer_page);
+		}
+
+		draw_sprites(screen.machine(), *state->m_framebuffer[framebuffer_page], screen.machine().primary_screen->visible_area());
+	}
 }

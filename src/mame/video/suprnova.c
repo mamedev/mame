@@ -637,7 +637,7 @@ SCREEN_UPDATE_RGB32(skns)
 	return 0;
 }
 
-SCREEN_EOF(skns)
+SCREEN_VBLANK(skns)
 {
 
 }

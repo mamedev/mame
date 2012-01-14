@@ -63,7 +63,7 @@ public:
 
 /*----------- defined in video/taito_l.c -----------*/
 
-SCREEN_EOF( taitol );
+SCREEN_VBLANK( taitol );
 VIDEO_START( taitol );
 SCREEN_UPDATE_IND16( taitol );
 

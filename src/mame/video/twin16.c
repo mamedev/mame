@@ -537,24 +537,28 @@ SCREEN_UPDATE_IND16( twin16 )
 	return 0;
 }
 
-SCREEN_EOF( twin16 )
+SCREEN_VBLANK( twin16 )
 {
-	twin16_state *state = screen.machine().driver_data<twin16_state>();
-	twin16_set_sprite_timer(screen.machine());
+	// rising edge
+	if (vblank_on)
+	{
+		twin16_state *state = screen.machine().driver_data<twin16_state>();
+		twin16_set_sprite_timer(screen.machine());
 
-	if (twin16_spriteram_process_enable(screen.machine())) {
-		if (state->m_need_process_spriteram) twin16_spriteram_process(screen.machine());
-		state->m_need_process_spriteram = 1;
+		if (twin16_spriteram_process_enable(screen.machine())) {
+			if (state->m_need_process_spriteram) twin16_spriteram_process(screen.machine());
+			state->m_need_process_spriteram = 1;
 
-		/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
-        as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
-        more to it than that */
-		memcpy(&screen.machine().generic.buffered_spriteram.u16[0x1800],state->m_sprite_buffer,0x800*sizeof(UINT16));
-		memcpy(state->m_sprite_buffer,&screen.machine().generic.spriteram.u16[0x1800],0x800*sizeof(UINT16));
-	}
-	else {
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		buffer_spriteram16_w(space,0,0,0xffff);
+			/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
+	        as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
+	        more to it than that */
+			memcpy(&screen.machine().generic.buffered_spriteram.u16[0x1800],state->m_sprite_buffer,0x800*sizeof(UINT16));
+			memcpy(state->m_sprite_buffer,&screen.machine().generic.spriteram.u16[0x1800],0x800*sizeof(UINT16));
+		}
+		else {
+			address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+			buffer_spriteram16_w(space,0,0,0xffff);
+		}
 	}
 }
 

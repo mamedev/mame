@@ -134,13 +134,17 @@ static INTERRUPT_GEN( sandscrp_interrupt )
 }
 
 
-static SCREEN_EOF( sandscrp )
+static SCREEN_VBLANK( sandscrp )
 {
-	sandscrp_state *state = screen.machine().driver_data<sandscrp_state>();
-	device_t *pandora = screen.machine().device("pandora");
-	state->m_sprite_irq = 1;
-	update_irq_state(screen.machine());
-	pandora_eof(pandora);
+	// rising edge
+	if (vblank_on)
+	{
+		sandscrp_state *state = screen.machine().driver_data<sandscrp_state>();
+		device_t *pandora = screen.machine().device("pandora");
+		state->m_sprite_irq = 1;
+		update_irq_state(screen.machine());
+		pandora_eof(pandora);
+	}
 }
 
 /* Reads the cause of the interrupt */
@@ -483,7 +487,7 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_STATIC(sandscrp)
-	MCFG_SCREEN_EOF_STATIC(sandscrp)
+	MCFG_SCREEN_VBLANK_STATIC(sandscrp)
 
 	MCFG_GFXDECODE(sandscrp)
 	MCFG_PALETTE_LENGTH(2048)

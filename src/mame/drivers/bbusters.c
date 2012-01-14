@@ -664,18 +664,26 @@ static const ym2610_interface ym2610_config =
 
 /******************************************************************************/
 
-static SCREEN_EOF( bbuster )
+static SCREEN_VBLANK( bbuster )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	buffer_spriteram16_w(space,0,0,0xffff);
-	buffer_spriteram16_2_w(space,0,0,0xffff);
+		buffer_spriteram16_w(space,0,0,0xffff);
+		buffer_spriteram16_2_w(space,0,0,0xffff);
+	}
 }
 
-static SCREEN_EOF( mechatt )
+static SCREEN_VBLANK( mechatt )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-	buffer_spriteram16_w(space,0,0,0xffff);
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		buffer_spriteram16_w(space,0,0,0xffff);
+	}
 }
 
 static MACHINE_CONFIG_START( bbusters, bbusters_state )
@@ -699,7 +707,7 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(bbuster)
-	MCFG_SCREEN_EOF_STATIC(bbuster)
+	MCFG_SCREEN_VBLANK_STATIC(bbuster)
 
 	MCFG_GFXDECODE(bbusters)
 	MCFG_PALETTE_LENGTH(2048)
@@ -736,7 +744,7 @@ static MACHINE_CONFIG_START( mechatt, bbusters_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(mechatt)
-	MCFG_SCREEN_EOF_STATIC(mechatt)
+	MCFG_SCREEN_VBLANK_STATIC(mechatt)
 
 	MCFG_GFXDECODE(mechatt)
 	MCFG_PALETTE_LENGTH(1024)

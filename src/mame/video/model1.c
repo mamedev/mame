@@ -1537,9 +1537,13 @@ SCREEN_UPDATE_RGB32(model1)
 	return 0;
 }
 
-SCREEN_EOF(model1)
+SCREEN_VBLANK(model1)
 {
-	tgp_scan(screen.machine());
-	end_frame(screen.machine());
-	LOG_TGP(("TGP: vsync\n"));
+	// on falling edge
+	if (!vblank_on)
+	{
+		tgp_scan(screen.machine());
+		end_frame(screen.machine());
+		LOG_TGP(("TGP: vsync\n"));
+	}
 }

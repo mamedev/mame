@@ -638,10 +638,14 @@ static WRITE8_HANDLER( vblank_w )
 	state->m_vblank = (state->m_vblank & ~0x03) | (data & 0x03);
 }
 
-static SCREEN_EOF( sammymdl )
+static SCREEN_VBLANK( sammymdl )
 {
-	sigmab98_state *state = screen.machine().driver_data<sigmab98_state>();
-	state->m_vblank &= ~0x01;
+	// rising edge
+	if (vblank_on)
+	{
+		sigmab98_state *state = screen.machine().driver_data<sigmab98_state>();
+		state->m_vblank &= ~0x01;
+	}
 }
 
 static void show_3_outputs(sigmab98_state *state)
@@ -1741,7 +1745,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_STATIC(sigmab98)
-	MCFG_SCREEN_EOF_STATIC(sammymdl)
+	MCFG_SCREEN_VBLANK_STATIC(sammymdl)
 
 	MCFG_GFXDECODE(sigmab98)
 	MCFG_PALETTE_LENGTH(0x100)

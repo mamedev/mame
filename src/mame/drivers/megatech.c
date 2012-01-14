@@ -454,13 +454,13 @@ static SCREEN_UPDATE_RGB32(mtnew)
 	return 0;
 }
 
-static SCREEN_EOF(mtnew)
+static SCREEN_VBLANK(mtnew)
 {
 	mtech_state *state = screen.machine().driver_data<mtech_state>();
 	if (!state->m_current_game_is_sms)
-		SCREEN_EOF_CALL(megadriv);
+		SCREEN_VBLANK_CALL(megadriv);
 	else
-		SCREEN_EOF_CALL(megatech_md_sms);
+		SCREEN_VBLANK_CALL(megatech_md_sms);
 }
 
 static MACHINE_RESET(mtnew)
@@ -494,11 +494,11 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_SCREEN_SIZE(342,262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(megatech_bios)
-	MCFG_SCREEN_EOF_STATIC(megatech_bios)
+	MCFG_SCREEN_VBLANK_STATIC(megatech_bios)
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_UPDATE_STATIC(mtnew)
-	MCFG_SCREEN_EOF_STATIC(mtnew)
+	MCFG_SCREEN_VBLANK_STATIC(mtnew)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)

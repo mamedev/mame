@@ -673,10 +673,14 @@ SCREEN_UPDATE_IND16( pgm )
 
 }
 
-SCREEN_EOF( pgm )
+SCREEN_VBLANK( pgm )
 {
-	pgm_state *state = screen.machine().driver_data<pgm_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		pgm_state *state = screen.machine().driver_data<pgm_state>();
 
-	/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
-	memcpy(state->m_spritebufferram, pgm_mainram, 0xa00);
+		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
+		memcpy(state->m_spritebufferram, pgm_mainram, 0xa00);
+	}
 }

@@ -595,10 +595,14 @@ static SCREEN_UPDATE_IND16(wheelfir)
 	return 0;
 }
 
-static SCREEN_EOF( wheelfir )
+static SCREEN_VBLANK( wheelfir )
 {
-	wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
-	state->m_tmp_bitmap[LAYER_FG]->fill(0, screen.visible_area());
+	// rising edge
+	if (vblank_on)
+	{
+		wheelfir_state *state = screen.machine().driver_data<wheelfir_state>();
+		state->m_tmp_bitmap[LAYER_FG]->fill(0, screen.visible_area());
+	}
 }
 
 
@@ -821,7 +825,7 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
 	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
 	MCFG_SCREEN_UPDATE_STATIC(wheelfir)
-	MCFG_SCREEN_EOF_STATIC(wheelfir)
+	MCFG_SCREEN_VBLANK_STATIC(wheelfir)
 
 	MCFG_PALETTE_LENGTH(NUM_COLORS)
 

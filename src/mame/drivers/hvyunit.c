@@ -169,10 +169,14 @@ static SCREEN_UPDATE_IND16( hvyunit )
 	return 0;
 }
 
-static SCREEN_EOF( hvyunit )
+static SCREEN_VBLANK( hvyunit )
 {
-	hvyunit_state *state = screen.machine().driver_data<hvyunit_state>();
-	pandora_eof(state->m_pandora);
+	// rising edge
+	if (vblank_on)
+	{
+		hvyunit_state *state = screen.machine().driver_data<hvyunit_state>();
+		pandora_eof(state->m_pandora);
+	}
 }
 
 
@@ -672,7 +676,7 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_STATIC(hvyunit)
-	MCFG_SCREEN_EOF_STATIC(hvyunit)
+	MCFG_SCREEN_VBLANK_STATIC(hvyunit)
 
 	MCFG_GFXDECODE(hvyunit)
 	MCFG_PALETTE_LENGTH(0x800)

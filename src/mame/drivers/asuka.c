@@ -874,10 +874,13 @@ static MACHINE_RESET( asuka )
 	memset(state->m_cval, 0, 26);
 }
 
-static SCREEN_EOF( asuka )
+static SCREEN_VBLANK( asuka )
 {
-	asuka_state *state = screen.machine().driver_data<asuka_state>();
-	pc090oj_eof_callback(state->m_pc090oj);
+	if (vblank_on)
+	{
+		asuka_state *state = screen.machine().driver_data<asuka_state>();
+		pc090oj_eof_callback(state->m_pc090oj);
+	}
 }
 
 static const tc0220ioc_interface asuka_io_intf =
@@ -914,7 +917,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(bonzeadv)
-	MCFG_SCREEN_EOF_STATIC(asuka)
+	MCFG_SCREEN_VBLANK_STATIC(asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)
@@ -959,7 +962,7 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(asuka)
-	MCFG_SCREEN_EOF_STATIC(asuka)
+	MCFG_SCREEN_VBLANK_STATIC(asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)
@@ -1011,7 +1014,7 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(bonzeadv)
-	MCFG_SCREEN_EOF_STATIC(asuka)
+	MCFG_SCREEN_VBLANK_STATIC(asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)
@@ -1055,7 +1058,7 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(asuka)
-	MCFG_SCREEN_EOF_STATIC(asuka)
+	MCFG_SCREEN_VBLANK_STATIC(asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
@@ -1103,7 +1106,7 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(asuka)
-	MCFG_SCREEN_EOF_STATIC(asuka)
+	MCFG_SCREEN_VBLANK_STATIC(asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
@@ -1147,7 +1150,7 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(asuka)
-	MCFG_SCREEN_EOF_STATIC(asuka)
+	MCFG_SCREEN_VBLANK_STATIC(asuka)
 
 	MCFG_GFXDECODE(asuka)
 	MCFG_PALETTE_LENGTH(4096)

@@ -108,4 +108,4 @@ SCREEN_UPDATE_IND16( glfgreat );
 SCREEN_UPDATE_IND16( tmnt2 );
 SCREEN_UPDATE_IND16( thndrx2 );
 
-SCREEN_EOF( blswhstl );
+SCREEN_VBLANK( blswhstl );

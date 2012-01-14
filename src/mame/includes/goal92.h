@@ -47,4 +47,4 @@ READ16_HANDLER( goal92_fg_bank_r );
 
 VIDEO_START( goal92 );
 SCREEN_UPDATE_IND16( goal92 );
-SCREEN_EOF( goal92 );
+SCREEN_VBLANK( goal92 );

@@ -327,10 +327,14 @@ SCREEN_UPDATE_IND16( taitol )
 
 
 
-SCREEN_EOF( taitol )
+SCREEN_VBLANK( taitol )
 {
-	taitol_state *state = screen.machine().driver_data<taitol_state>();
-	UINT8 *spriteram = state->m_rambanks + 0xb000;
+	// rising edge
+	if (vblank_on)
+	{
+		taitol_state *state = screen.machine().driver_data<taitol_state>();
+		UINT8 *spriteram = state->m_rambanks + 0xb000;
 
-	memcpy(state->m_buff_spriteram, spriteram, TAITOL_SPRITERAM_SIZE);
+		memcpy(state->m_buff_spriteram, spriteram, TAITOL_SPRITERAM_SIZE);
+	}
 }

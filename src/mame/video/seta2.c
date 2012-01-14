@@ -491,10 +491,14 @@ SCREEN_UPDATE_IND16( seta2 )
 	return 0;
 }
 
-SCREEN_EOF( seta2 )
+SCREEN_VBLANK( seta2 )
 {
-	seta2_state *state = screen.machine().driver_data<seta2_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		seta2_state *state = screen.machine().driver_data<seta2_state>();
 
-	// Buffer sprites by 1 frame
-	memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		// Buffer sprites by 1 frame
+		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+	}
 }

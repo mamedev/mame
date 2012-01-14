@@ -59,5 +59,5 @@ extern VIDEO_START( omegaf );
 extern SCREEN_UPDATE_IND16( ninjakd2 );
 extern SCREEN_UPDATE_IND16( robokid );
 extern SCREEN_UPDATE_IND16( omegaf );
-extern SCREEN_EOF( ninjakd2 );
+extern SCREEN_VBLANK( ninjakd2 );
 

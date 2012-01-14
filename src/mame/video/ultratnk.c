@@ -90,58 +90,62 @@ SCREEN_UPDATE_IND16( ultratnk )
 }
 
 
-SCREEN_EOF( ultratnk )
+SCREEN_VBLANK( ultratnk )
 {
-	ultratnk_state *state = screen.machine().driver_data<ultratnk_state>();
-	int i;
-	UINT16 BG = colortable_entry_get_value(screen.machine().colortable, 0);
-	device_t *discrete = screen.machine().device("discrete");
-	UINT8 *videoram = state->m_videoram;
-
-	/* check for sprite-playfield collisions */
-
-	for (i = 0; i < 4; i++)
+	// rising edge
+	if (vblank_on)
 	{
-		rectangle rect;
+		ultratnk_state *state = screen.machine().driver_data<ultratnk_state>();
+		int i;
+		UINT16 BG = colortable_entry_get_value(screen.machine().colortable, 0);
+		device_t *discrete = screen.machine().device("discrete");
+		UINT8 *videoram = state->m_videoram;
 
-		int x;
-		int y;
+		/* check for sprite-playfield collisions */
 
-		int bank = 0;
+		for (i = 0; i < 4; i++)
+		{
+			rectangle rect;
 
-		UINT8 horz = videoram[0x390 + 2 * i + 0];
-		UINT8 vert = videoram[0x398 + 2 * i + 0];
-		UINT8 code = videoram[0x398 + 2 * i + 1];
+			int x;
+			int y;
 
-		rect.min_x = horz - 15;
-		rect.min_y = vert - 15;
-		rect.max_x = horz - 15 + screen.machine().gfx[1]->width - 1;
-		rect.max_y = vert - 15 + screen.machine().gfx[1]->height - 1;
+			int bank = 0;
 
-		rect &= screen.machine().primary_screen->visible_area();
+			UINT8 horz = videoram[0x390 + 2 * i + 0];
+			UINT8 vert = videoram[0x398 + 2 * i + 0];
+			UINT8 code = videoram[0x398 + 2 * i + 1];
 
-		tilemap_draw(state->m_helper, rect, state->m_playfield, 0, 0);
+			rect.min_x = horz - 15;
+			rect.min_y = vert - 15;
+			rect.max_x = horz - 15 + screen.machine().gfx[1]->width - 1;
+			rect.max_y = vert - 15 + screen.machine().gfx[1]->height - 1;
 
-		if (code & 4)
-			bank = 32;
+			rect &= screen.machine().primary_screen->visible_area();
 
-		drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
-			(code >> 3) | bank,
-			4,
-			0, 0,
-			horz - 15,
-			vert - 15, 1);
+			tilemap_draw(state->m_helper, rect, state->m_playfield, 0, 0);
 
-		for (y = rect.min_y; y <= rect.max_y; y++)
-			for (x = rect.min_x; x <= rect.max_x; x++)
-				if (colortable_entry_get_value(screen.machine().colortable, state->m_helper.pix16(y, x)) != BG)
-					state->m_collision[i] = 1;
+			if (code & 4)
+				bank = 32;
+
+			drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
+				(code >> 3) | bank,
+				4,
+				0, 0,
+				horz - 15,
+				vert - 15, 1);
+
+			for (y = rect.min_y; y <= rect.max_y; y++)
+				for (x = rect.min_x; x <= rect.max_x; x++)
+					if (colortable_entry_get_value(screen.machine().colortable, state->m_helper.pix16(y, x)) != BG)
+						state->m_collision[i] = 1;
+		}
+
+		/* update sound status */
+
+		discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
+		discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
 	}
-
-	/* update sound status */
-
-	discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
-	discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
 }
 
 

@@ -108,11 +108,11 @@ VIDEO_START( taitof2_yesnoj );
 VIDEO_START( taitof2_deadconx );
 VIDEO_START( taitof2_deadconxj );
 VIDEO_START( taitof2_dinorex );
-SCREEN_EOF( taitof2_no_buffer );
-SCREEN_EOF( taitof2_full_buffer_delayed );
-SCREEN_EOF( taitof2_partial_buffer_delayed );
-SCREEN_EOF( taitof2_partial_buffer_delayed_thundfox );
-SCREEN_EOF( taitof2_partial_buffer_delayed_qzchikyu );
+SCREEN_VBLANK( taitof2_no_buffer );
+SCREEN_VBLANK( taitof2_full_buffer_delayed );
+SCREEN_VBLANK( taitof2_partial_buffer_delayed );
+SCREEN_VBLANK( taitof2_partial_buffer_delayed_thundfox );
+SCREEN_VBLANK( taitof2_partial_buffer_delayed_qzchikyu );
 
 SCREEN_UPDATE_IND16( taitof2 );
 SCREEN_UPDATE_IND16( taitof2_pri );

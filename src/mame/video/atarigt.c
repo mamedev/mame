@@ -632,9 +632,13 @@ SCREEN_UPDATE_RGB32( atarigt )
 	return 0;
 }
 
-SCREEN_EOF( atarigt )
+SCREEN_VBLANK( atarigt )
 {
-	atarigt_state *state = screen.machine().driver_data<atarigt_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		atarigt_state *state = screen.machine().driver_data<atarigt_state>();
 
-	atarirle_eof(state->m_rle);
+		atarirle_eof(state->m_rle);
+	}
 }

@@ -1643,9 +1643,11 @@ SCREEN_UPDATE_RGB32( hng64 )
 	return 0;
 }
 
-SCREEN_EOF( hng64 )
+SCREEN_VBLANK( hng64 )
 {
-	clear3d(screen.machine());
+	// rising edge
+	if (vblank_on)
+		clear3d(screen.machine());
 }
 
 VIDEO_START( hng64 )

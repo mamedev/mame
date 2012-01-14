@@ -69,4 +69,4 @@ PALETTE_INIT( mermaid );
 PALETTE_INIT( rougien );
 VIDEO_START( mermaid );
 SCREEN_UPDATE_IND16( mermaid );
-SCREEN_EOF( mermaid );
+SCREEN_VBLANK( mermaid );

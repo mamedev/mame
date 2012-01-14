@@ -20,7 +20,7 @@ public:
 
 PALETTE_INIT( sprint4 );
 
-SCREEN_EOF( sprint4 );
+SCREEN_VBLANK( sprint4 );
 VIDEO_START( sprint4 );
 SCREEN_UPDATE_IND16( sprint4 );
 

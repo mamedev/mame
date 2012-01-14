@@ -260,9 +260,13 @@ SCREEN_UPDATE_IND16( bionicc )
 	return 0;
 }
 
-SCREEN_EOF( bionicc )
+SCREEN_VBLANK( bionicc )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	buffer_spriteram16_w(space, 0, 0, 0xffff);
+		buffer_spriteram16_w(space, 0, 0, 0xffff);
+	}
 }

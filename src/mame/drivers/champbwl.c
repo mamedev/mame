@@ -460,9 +460,11 @@ SCREEN_UPDATE_IND16( champbwl )
 	return 0;
 }
 
-SCREEN_EOF( champbwl )
+SCREEN_VBLANK( champbwl )
 {
-	screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
+	// rising edge
+	if (vblank_on)
+		screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
 }
 
 
@@ -487,7 +489,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(champbwl)
-	MCFG_SCREEN_EOF_STATIC(champbwl)
+	MCFG_SCREEN_VBLANK_STATIC(champbwl)
 
 	MCFG_GFXDECODE(champbwl)
 	MCFG_PALETTE_LENGTH(512)
@@ -517,9 +519,11 @@ static SCREEN_UPDATE_IND16( doraemon )
 	return 0;
 }
 
-static SCREEN_EOF( doraemon )
+static SCREEN_VBLANK( doraemon )
 {
-	screen.machine().device<seta001_device>("spritegen")->setac_eof();
+	// rising edge
+	if (vblank_on)
+		screen.machine().device<seta001_device>("spritegen")->setac_eof();
 }
 
 static MACHINE_START( doraemon )
@@ -548,7 +552,7 @@ static MACHINE_CONFIG_START( doraemon, tnzs_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_STATIC(doraemon)
-	MCFG_SCREEN_EOF_STATIC(doraemon)
+	MCFG_SCREEN_VBLANK_STATIC(doraemon)
 
 	MCFG_GFXDECODE(champbwl)
 	MCFG_PALETTE_LENGTH(512)

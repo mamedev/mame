@@ -32,7 +32,7 @@ public:
 
 SCREEN_UPDATE_IND16( mcatadv );
 VIDEO_START( mcatadv );
-SCREEN_EOF( mcatadv );
+SCREEN_VBLANK( mcatadv );
 
 WRITE16_HANDLER( mcatadv_videoram1_w );
 WRITE16_HANDLER( mcatadv_videoram2_w );

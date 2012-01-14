@@ -188,8 +188,12 @@ SCREEN_UPDATE_IND16( goal92 )
 	return 0;
 }
 
-SCREEN_EOF( goal92 )
+SCREEN_VBLANK( goal92 )
 {
-	goal92_state *state = screen.machine().driver_data<goal92_state>();
-	memcpy(state->m_buffered_spriteram, state->m_spriteram, 0x400 * 2);
+	// rising edge
+	if (vblank_on)
+	{
+		goal92_state *state = screen.machine().driver_data<goal92_state>();
+		memcpy(state->m_buffered_spriteram, state->m_spriteram, 0x400 * 2);
+	}
 }

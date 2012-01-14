@@ -2388,11 +2388,15 @@ static READ16_HANDLER( vbowl_unk_r )
 	return 0xffff;
 }
 
-static SCREEN_EOF( vbowl )
+static SCREEN_VBLANK( vbowl )
 {
-	igs011_state *state = screen.machine().driver_data<igs011_state>();
-	state->m_vbowl_trackball[0] = state->m_vbowl_trackball[1];
-	state->m_vbowl_trackball[1] = (input_port_read(screen.machine(), "AN1") << 8) | input_port_read(screen.machine(), "AN0");
+	// rising edge
+	if (vblank_on)
+	{
+		igs011_state *state = screen.machine().driver_data<igs011_state>();
+		state->m_vbowl_trackball[0] = state->m_vbowl_trackball[1];
+		state->m_vbowl_trackball[1] = (input_port_read(screen.machine(), "AN1") << 8) | input_port_read(screen.machine(), "AN0");
+	}
 }
 
 static WRITE16_HANDLER( vbowl_pen_hi_w )
@@ -3696,7 +3700,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	// irq 4 points to an apparently unneeded routine
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_EOF_STATIC(vbowl)	// trackball
+	MCFG_SCREEN_VBLANK_STATIC(vbowl)	// trackball
 //  MCFG_GFXDECODE(igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")

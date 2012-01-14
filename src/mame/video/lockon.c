@@ -952,17 +952,21 @@ SCREEN_UPDATE_IND16( lockon )
 	return 0;
 }
 
-SCREEN_EOF( lockon )
+SCREEN_VBLANK( lockon )
 {
-	lockon_state *state = screen.machine().driver_data<lockon_state>();
+	// on falling edge
+	if (!vblank_on)
+	{
+		lockon_state *state = screen.machine().driver_data<lockon_state>();
 
-	/* Swap the frame buffers */
-	bitmap_ind16 *tmp = state->m_front_buffer;
-	state->m_front_buffer = state->m_back_buffer;
-	state->m_back_buffer = tmp;
+		/* Swap the frame buffers */
+		bitmap_ind16 *tmp = state->m_front_buffer;
+		state->m_front_buffer = state->m_back_buffer;
+		state->m_back_buffer = tmp;
 
-	/* Draw the frame buffer layers */
-	scene_draw(screen.machine());
-	ground_draw(screen.machine());
-	objects_draw(screen.machine());
+		/* Draw the frame buffer layers */
+		scene_draw(screen.machine());
+		ground_draw(screen.machine());
+		objects_draw(screen.machine());
+	}
 }

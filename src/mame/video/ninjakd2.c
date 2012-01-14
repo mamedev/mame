@@ -546,11 +546,15 @@ SCREEN_UPDATE_IND16( omegaf )
 }
 
 
-SCREEN_EOF( ninjakd2 )
+SCREEN_VBLANK( ninjakd2 )
 {
-	ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
-	if (!state->m_sprites_updated)
-		update_sprites(screen.machine());
+	// rising edge
+	if (vblank_on)
+	{
+		ninjakd2_state *state = screen.machine().driver_data<ninjakd2_state>();
+		if (!state->m_sprites_updated)
+			update_sprites(screen.machine());
 
-	state->m_sprites_updated = 0;
+		state->m_sprites_updated = 0;
+	}
 }

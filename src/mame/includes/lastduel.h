@@ -49,4 +49,4 @@ VIDEO_START( lastduel );
 VIDEO_START( madgear );
 SCREEN_UPDATE_IND16( lastduel );
 SCREEN_UPDATE_IND16( madgear );
-SCREEN_EOF( lastduel );
+SCREEN_VBLANK( lastduel );

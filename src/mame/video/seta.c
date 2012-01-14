@@ -1065,9 +1065,11 @@ SCREEN_UPDATE_IND16( setaroul )
 	return 0;
 }
 
-SCREEN_EOF( setaroul )
+SCREEN_VBLANK( setaroul )
 {
-	screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
+	// rising edge
+	if (vblank_on)
+		screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
 }
 
 

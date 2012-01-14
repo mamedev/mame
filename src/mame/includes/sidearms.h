@@ -37,4 +37,4 @@ WRITE8_HANDLER( sidearms_gfxctrl_w );
 
 VIDEO_START( sidearms );
 SCREEN_UPDATE_IND16( sidearms );
-SCREEN_EOF( sidearms );
+SCREEN_VBLANK( sidearms );

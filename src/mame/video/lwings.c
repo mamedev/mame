@@ -291,9 +291,13 @@ SCREEN_UPDATE_IND16( trojan )
 	return 0;
 }
 
-SCREEN_EOF( lwings )
+SCREEN_VBLANK( lwings )
 {
-	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	// rising edge
+	if (vblank_on)
+	{
+		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	buffer_spriteram_w(space, 0, 0);
+		buffer_spriteram_w(space, 0, 0);
+	}
 }

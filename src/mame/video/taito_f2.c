@@ -891,87 +891,107 @@ static void taitof2_update_sprites_active_area( running_machine &machine )
 }
 
 
-SCREEN_EOF( taitof2_no_buffer )
+SCREEN_VBLANK( taitof2_no_buffer )
 {
-	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
-
-	taitof2_update_sprites_active_area(screen.machine());
-
-	state->m_prepare_sprites = 1;
-}
-
-SCREEN_EOF( taitof2_full_buffer_delayed )
-{
-	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int i;
-
-	taitof2_update_sprites_active_area(screen.machine());
-
-	state->m_prepare_sprites = 0;
-	memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
-	for (i = 0; i < state->m_spriteram_size / 2; i++)
-		state->m_spriteram_buffered[i] = spriteram[i];
-	memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
-}
-
-SCREEN_EOF( taitof2_partial_buffer_delayed )
-{
-	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int i;
-
-	taitof2_update_sprites_active_area(screen.machine());
-
-	state->m_prepare_sprites = 0;
-	memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
-	for (i = 0;i < state->m_spriteram_size / 2; i += 4)
-		state->m_spriteram_buffered[i] = spriteram[i];
-	memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
-}
-
-SCREEN_EOF( taitof2_partial_buffer_delayed_thundfox )
-{
-	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int i;
-
-	taitof2_update_sprites_active_area(screen.machine());
-
-	state->m_prepare_sprites = 0;
-	memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
-	for (i = 0; i < state->m_spriteram_size / 2; i += 8)
+	// rising edge
+	if (vblank_on)
 	{
-		state->m_spriteram_buffered[i]     = spriteram[i];
-		state->m_spriteram_buffered[i + 1] = spriteram[i + 1];
-		state->m_spriteram_buffered[i + 4] = spriteram[i + 4];
+		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
+
+		taitof2_update_sprites_active_area(screen.machine());
+
+		state->m_prepare_sprites = 1;
 	}
-	memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
 }
 
-SCREEN_EOF( taitof2_partial_buffer_delayed_qzchikyu )
+SCREEN_VBLANK( taitof2_full_buffer_delayed )
 {
-	/* spriteram[2] and [3] are 1 frame behind...
-       probably thundfox_eof_callback would work fine */
-
-	taitof2_state *state = screen.machine().driver_data<taitof2_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int i;
-
-	taitof2_update_sprites_active_area(screen.machine());
-
-	state->m_prepare_sprites = 0;
-	memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
-	for (i = 0; i < state->m_spriteram_size / 2; i += 8)
+	// rising edge
+	if (vblank_on)
 	{
-		state->m_spriteram_buffered[i]     = spriteram[i];
-		state->m_spriteram_buffered[i + 1] = spriteram[i + 1];
-		state->m_spriteram_buffered[i + 4] = spriteram[i + 4];
-		state->m_spriteram_buffered[i + 5] = spriteram[i + 5];	// not needed?
-		state->m_spriteram_buffered[i + 6] = spriteram[i + 6];	// not needed?
-		state->m_spriteram_buffered[i + 7] = spriteram[i + 7];	// not needed?
+		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
+		UINT16 *spriteram = state->m_spriteram;
+		int i;
+
+		taitof2_update_sprites_active_area(screen.machine());
+
+		state->m_prepare_sprites = 0;
+		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
+		for (i = 0; i < state->m_spriteram_size / 2; i++)
+			state->m_spriteram_buffered[i] = spriteram[i];
+		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
 	}
-	memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
+}
+
+SCREEN_VBLANK( taitof2_partial_buffer_delayed )
+{
+	// rising edge
+	if (vblank_on)
+	{
+		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
+		UINT16 *spriteram = state->m_spriteram;
+		int i;
+
+		taitof2_update_sprites_active_area(screen.machine());
+
+		state->m_prepare_sprites = 0;
+		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
+		for (i = 0;i < state->m_spriteram_size / 2; i += 4)
+			state->m_spriteram_buffered[i] = spriteram[i];
+		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
+	}
+}
+
+SCREEN_VBLANK( taitof2_partial_buffer_delayed_thundfox )
+{
+	// rising edge
+	if (vblank_on)
+	{
+		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
+		UINT16 *spriteram = state->m_spriteram;
+		int i;
+
+		taitof2_update_sprites_active_area(screen.machine());
+
+		state->m_prepare_sprites = 0;
+		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
+		for (i = 0; i < state->m_spriteram_size / 2; i += 8)
+		{
+			state->m_spriteram_buffered[i]     = spriteram[i];
+			state->m_spriteram_buffered[i + 1] = spriteram[i + 1];
+			state->m_spriteram_buffered[i + 4] = spriteram[i + 4];
+		}
+		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
+	}
+}
+
+SCREEN_VBLANK( taitof2_partial_buffer_delayed_qzchikyu )
+{
+	// rising edge
+	if (vblank_on)
+	{
+		/* spriteram[2] and [3] are 1 frame behind...
+	       probably thundfox_eof_callback would work fine */
+
+		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
+		UINT16 *spriteram = state->m_spriteram;
+		int i;
+
+		taitof2_update_sprites_active_area(screen.machine());
+
+		state->m_prepare_sprites = 0;
+		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
+		for (i = 0; i < state->m_spriteram_size / 2; i += 8)
+		{
+			state->m_spriteram_buffered[i]     = spriteram[i];
+			state->m_spriteram_buffered[i + 1] = spriteram[i + 1];
+			state->m_spriteram_buffered[i + 4] = spriteram[i + 4];
+			state->m_spriteram_buffered[i + 5] = spriteram[i + 5];	// not needed?
+			state->m_spriteram_buffered[i + 6] = spriteram[i + 6];	// not needed?
+			state->m_spriteram_buffered[i + 7] = spriteram[i + 7];	// not needed?
+		}
+		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
+	}
 }
 
 

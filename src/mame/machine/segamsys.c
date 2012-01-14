@@ -1181,14 +1181,17 @@ static void end_of_frame(running_machine &machine, struct sms_vdp *chip)
 }
 
 
-SCREEN_EOF(sms)
+SCREEN_VBLANK(sms)
 {
-	end_of_frame(screen.machine(), md_sms_vdp);
+	// rising edge
+	if (vblank_on)
+	{
+		end_of_frame(screen.machine(), md_sms_vdp);
 
-	// the SMS has a 'RESET' button on the machine, it generates an NMI
-	if (input_port_read_safe(screen.machine(),"PAUSE",0x00))
-		cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-
+		// the SMS has a 'RESET' button on the machine, it generates an NMI
+		if (input_port_read_safe(screen.machine(),"PAUSE",0x00))
+			cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	}
 }
 
 
@@ -1250,21 +1253,29 @@ MACHINE_RESET(megatech_bios)
 	vdp1->sms_scanline_timer->adjust(attotime::zero);
 }
 
-SCREEN_EOF(systeme)
+SCREEN_VBLANK(systeme)
 {
-	end_of_frame(screen.machine(), vdp1);
-	end_of_frame(screen.machine(), vdp2);
+	// rising edge
+	if (vblank_on)
+	{
+		end_of_frame(screen.machine(), vdp1);
+		end_of_frame(screen.machine(), vdp2);
+	}
 }
 
 
-SCREEN_EOF(megatech_md_sms)
+SCREEN_VBLANK(megatech_md_sms)
 {
-	end_of_frame(screen.machine(), md_sms_vdp);
+	// rising edge
+	if (vblank_on)
+		end_of_frame(screen.machine(), md_sms_vdp);
 }
 
-SCREEN_EOF(megatech_bios)
+SCREEN_VBLANK(megatech_bios)
 {
-	end_of_frame(screen.machine(), vdp1);
+	// rising edge
+	if (vblank_on)
+		end_of_frame(screen.machine(), vdp1);
 }
 
 SCREEN_UPDATE_RGB32(megatech_md_sms)
@@ -1729,7 +1740,7 @@ MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 	MCFG_SCREEN_UPDATE_STATIC(megatech_md_sms) /* Copies a bitmap */
-	MCFG_SCREEN_EOF_STATIC(sms) /* Used to Sync the timing */
+	MCFG_SCREEN_VBLANK_STATIC(sms) /* Used to Sync the timing */
 
 	MCFG_PALETTE_LENGTH(0x200)
 

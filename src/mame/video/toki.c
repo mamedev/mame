@@ -33,14 +33,18 @@ WRITE16_HANDLER( toki_control_w )
 	COMBINE_DATA(&state->m_scrollram16[offset]);
 }
 
-SCREEN_EOF( toki )
+SCREEN_VBLANK( toki )
 {
-	buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
+	// rising edge
+	if (vblank_on)
+		buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 }
 
-SCREEN_EOF( tokib )
+SCREEN_VBLANK( tokib )
 {
-	buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
+	// rising edge
+	if (vblank_on)
+		buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 }
 
 static TILE_GET_INFO( get_text_tile_info )

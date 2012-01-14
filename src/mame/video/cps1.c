@@ -2950,17 +2950,21 @@ if (0 && screen.machine().input().code_pressed(KEYCODE_Z))
 	return 0;
 }
 
-SCREEN_EOF( cps1 )
+SCREEN_VBLANK( cps1 )
 {
-	cps_state *state = screen.machine().driver_data<cps_state>();
-
-	/* Get video memory base registers */
-	cps1_get_video_base(screen.machine());
-
-	if (state->m_cps_version == 1)
+	// rising edge
+	if (vblank_on)
 	{
-		/* CPS1 sprites have to be delayed one frame */
-		memcpy(state->m_buffered_obj, state->m_obj, state->m_obj_size);
+		cps_state *state = screen.machine().driver_data<cps_state>();
+
+		/* Get video memory base registers */
+		cps1_get_video_base(screen.machine());
+
+		if (state->m_cps_version == 1)
+		{
+			/* CPS1 sprites have to be delayed one frame */
+			memcpy(state->m_buffered_obj, state->m_obj, state->m_obj_size);
+		}
 	}
 }
 

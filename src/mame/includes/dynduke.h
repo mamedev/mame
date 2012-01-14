@@ -32,4 +32,4 @@ WRITE16_HANDLER( dynduke_control_w );
 WRITE16_HANDLER( dynduke_paletteram_w );
 VIDEO_START( dynduke );
 SCREEN_UPDATE_IND16( dynduke );
-SCREEN_EOF( dynduke );
+SCREEN_VBLANK( dynduke );
