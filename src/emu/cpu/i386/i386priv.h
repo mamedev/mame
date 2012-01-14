@@ -307,7 +307,8 @@ INLINE i386_state *get_safe_token(device_t *device)
 
 extern int i386_parity_table[256];
 
-#define FAULT_THROW(fault,error) { if(fault == FAULT_PF) cpustate->cr[2] = address; throw (UINT64)(fault | (UINT64)error << 32); }
+#define FAULT_THROW(fault,error) { throw (UINT64)(fault | (UINT64)error << 32); }
+#define PF_THROW(error) { cpustate->cr[2] = address; FAULT_THROW(FAULT_PF,error); }
 
 #define PROTECTED_MODE		(cpustate->cr[0] & 0x1)
 #define STACK_32BIT			(cpustate->sreg[SS].d)
@@ -462,7 +463,7 @@ INLINE UINT8 FETCH(i386_state *cpustate)
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
 		if(!translate_address(cpustate,0,&address,&error))
-			FAULT_THROW(FAULT_PF,error);
+			PF_THROW(error);
 	}
 
 	value = cpustate->direct->read_decrypted_byte(address & cpustate->a20_mask);
@@ -482,7 +483,7 @@ INLINE UINT16 FETCH16(i386_state *cpustate)
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
 			if(!translate_address(cpustate,0,&address,&error))
-				FAULT_THROW(FAULT_PF,error);
+				PF_THROW(error);
 		}
 		address &= cpustate->a20_mask;
 		value = cpustate->direct->read_decrypted_word(address);
@@ -505,7 +506,7 @@ INLINE UINT32 FETCH32(i386_state *cpustate)
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
 			if(!translate_address(cpustate,0,&address,&error))
-				FAULT_THROW(FAULT_PF,error);
+				PF_THROW(error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -523,7 +524,7 @@ INLINE UINT8 READ8(i386_state *cpustate,UINT32 ea)
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
 		if(!translate_address(cpustate,0,&address,&error))
-			FAULT_THROW(FAULT_PF,error);
+			PF_THROW(error);
 	}
 
 	address &= cpustate->a20_mask;
@@ -541,7 +542,7 @@ INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
 			if(!translate_address(cpustate,0,&address,&error))
-				FAULT_THROW(FAULT_PF,error);
+				PF_THROW(error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -563,7 +564,7 @@ INLINE UINT32 READ32(i386_state *cpustate,UINT32 ea)
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
 			if(!translate_address(cpustate,0,&address,&error))
-				FAULT_THROW(FAULT_PF,error);
+				PF_THROW(error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -590,7 +591,7 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
 			if(!translate_address(cpustate,0,&address,&error))
-				FAULT_THROW(FAULT_PF,error);
+				PF_THROW(error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -607,7 +608,7 @@ INLINE void WRITE8(i386_state *cpustate,UINT32 ea, UINT8 value)
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
 		if(!translate_address(cpustate,1,&address,&error))
-			FAULT_THROW(FAULT_PF,error);
+			PF_THROW(error);
 	}
 
 	address &= cpustate->a20_mask;
@@ -624,7 +625,7 @@ INLINE void WRITE16(i386_state *cpustate,UINT32 ea, UINT16 value)
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
 			if(!translate_address(cpustate,1,&address,&error))
-				FAULT_THROW(FAULT_PF,error);
+				PF_THROW(error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -644,7 +645,7 @@ INLINE void WRITE32(i386_state *cpustate,UINT32 ea, UINT32 value)
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
 			if(!translate_address(cpustate,1,&address,&error))
-				FAULT_THROW(FAULT_PF,error);
+				PF_THROW(error);
 		}
 
 		ea &= cpustate->a20_mask;
@@ -669,7 +670,7 @@ INLINE void WRITE64(i386_state *cpustate,UINT32 ea, UINT64 value)
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
 			if(!translate_address(cpustate,1,&address,&error))
-				FAULT_THROW(FAULT_PF,error);
+				PF_THROW(error);
 		}
 
 		ea &= cpustate->a20_mask;
@@ -967,13 +968,42 @@ INLINE void BUMP_DI(i386_state *cpustate,int adjustment)
     I/O ACCESS
 ***********************************************************************************/
 
+INLINE void check_ioperm(i386_state *cpustate, offs_t port, UINT8 mask)
+{
+	UINT8 IOPL, map;
+	UINT16 IOPB;
+	UINT32 address;
+
+	if(!PROTECTED_MODE)
+		return;
+
+	IOPL = cpustate->IOP1 | (cpustate->IOP2 << 1);
+	if(!V8086_MODE && (cpustate->CPL <= IOPL))
+		return;
+
+	if((cpustate->task.limit < 0x67) || ((cpustate->task.flags & 0xd) != 9))
+		FAULT_THROW(FAULT_GP,0);
+
+	address = cpustate->task.base;
+	IOPB = READ16(cpustate, address+0x66);
+	if((IOPB+(port/8)) >= cpustate->task.limit)
+		FAULT_THROW(FAULT_GP,0);
+
+	map = READ8(cpustate, address+IOPB+(port/8));
+	map >>= (port%8);
+	if(map & mask)
+		FAULT_THROW(FAULT_GP,0);
+}
+
 INLINE UINT8 READPORT8(i386_state *cpustate, offs_t port)
 {
+	check_ioperm(cpustate, port, 1);
 	return cpustate->io->read_byte(port);
 }
 
 INLINE void WRITEPORT8(i386_state *cpustate, offs_t port, UINT8 value)
 {
+	check_ioperm(cpustate, port, 1);
 	cpustate->io->write_byte(port, value);
 }
 
@@ -986,6 +1016,7 @@ INLINE UINT16 READPORT16(i386_state *cpustate, offs_t port)
 	}
 	else
 	{
+		check_ioperm(cpustate, port, 3);
 		return cpustate->io->read_word(port);
 	}
 }
@@ -999,6 +1030,7 @@ INLINE void WRITEPORT16(i386_state *cpustate, offs_t port, UINT16 value)
 	}
 	else
 	{
+		check_ioperm(cpustate, port, 3);
 		cpustate->io->write_word(port, value);
 	}
 }
@@ -1014,6 +1046,7 @@ INLINE UINT32 READPORT32(i386_state *cpustate, offs_t port)
 	}
 	else
 	{
+		check_ioperm(cpustate, port, 0xf);
 		return cpustate->io->read_dword(port);
 	}
 }
@@ -1029,6 +1062,7 @@ INLINE void WRITEPORT32(i386_state *cpustate, offs_t port, UINT32 value)
 	}
 	else
 	{
+		check_ioperm(cpustate, port, 0xf);
 		cpustate->io->write_dword(port, value);
 	}
 }
