@@ -27,7 +27,7 @@
 #define P	cpustate->p
 #define S	cpustate->sp.b.l
 
-#define TRANSLATED(addr)	((cpustate->mmr[(addr)>>13] << 13) | ((addr)&0x1fff))
+#define TRANSLATED(addr)	((cpustate->mmr[(addr)>>13&7] << 13) | ((addr)&0x1fff))
 #define H6280_CYCLES(cyc)											\
 	{																\
 		cpustate->ICount -= ((cyc) * cpustate->clocks_per_cycle);		\
