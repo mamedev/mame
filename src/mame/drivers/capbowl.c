@@ -374,7 +374,7 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 
 	MCFG_MACHINE_START(capbowl)
 	MCFG_MACHINE_RESET(capbowl)
-	MCFG_NVRAM_ADD_CUSTOM("nvram", capbowl_state, init_nvram)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", capbowl_state, init_nvram)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 

@@ -95,8 +95,7 @@ void nvram_device::static_set_custom_handler(device_t &device, nvram_init_delega
 void nvram_device::device_start()
 {
 	// bind our handler
-	if (!m_custom_handler.isnull())
-		m_custom_handler = nvram_init_delegate(m_custom_handler, *m_owner);
+	m_custom_handler.bind_relative_to(*owner());
 }
 
 

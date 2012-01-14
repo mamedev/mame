@@ -1709,7 +1709,7 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_RESET(itech32)
-	MCFG_NVRAM_ADD_CUSTOM("nvram", itech32_state, nvram_init)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", itech32_state, nvram_init)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
