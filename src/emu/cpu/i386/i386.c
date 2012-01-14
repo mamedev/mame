@@ -3050,7 +3050,15 @@ static CPU_EXECUTE( i386 )
 			cpustate->IF = 1;
 			cpustate->delayed_interrupt_enable = 0;
 		}
-		I386OP(decode_opcode)(cpustate);
+		try
+		{
+			I386OP(decode_opcode)(cpustate);
+		}
+		catch(UINT64 e)
+		{
+			cpustate->ext = 1;
+			i386_trap_with_error(cpustate,e&0xffffffff,0,0,e>>32);
+		}
 	}
 	cpustate->tsc += (cycles - cpustate->cycles);
 }
@@ -3061,10 +3069,11 @@ static CPU_TRANSLATE( i386 )
 {
 	i386_state *cpustate = get_safe_token(device);
 	int result = 1;
+	UINT32 error;
 	if (space == AS_PROGRAM)
 	{
 		if (cpustate->cr[0] & 0x80000000)
-			result = translate_address(cpustate,address);
+			result = translate_address(cpustate,0,address,&error);
 		*address &= cpustate->a20_mask;
 	}
 	return result;

@@ -307,6 +307,8 @@ INLINE i386_state *get_safe_token(device_t *device)
 
 extern int i386_parity_table[256];
 
+#define FAULT_THROW(fault,error) { if(fault == FAULT_PF) cpustate->cr[2] = address; throw (UINT64)(fault | (UINT64)error << 32); }
+
 #define PROTECTED_MODE		(cpustate->cr[0] & 0x1)
 #define STACK_32BIT			(cpustate->sreg[SS].d)
 #define V8086_MODE			(cpustate->VM)
@@ -378,7 +380,7 @@ INLINE UINT32 i386_translate(i386_state *cpustate, int segment, UINT32 ip)
 	return cpustate->sreg[segment].base + ip;
 }
 
-INLINE int translate_address(i386_state *cpustate, UINT32 *address)
+INLINE int translate_address(i386_state *cpustate, bool rw, UINT32 *address, UINT32 *error)
 {
 	UINT32 a = *address;
 	UINT32 pdbr = cpustate->cr[3] & 0xfffff000;
@@ -386,6 +388,7 @@ INLINE int translate_address(i386_state *cpustate, UINT32 *address)
 	UINT32 table = (a >> 12) & 0x3ff;
 	UINT32 offset = a & 0xfff;
 	UINT32 page_entry;
+	UINT32 ret = 1;
 
 	// TODO: 4MB pages
 	UINT32 page_dir = cpustate->program->read_dword(pdbr + directory * 4);
@@ -393,44 +396,52 @@ INLINE int translate_address(i386_state *cpustate, UINT32 *address)
 	{
 		page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
 		if(!(page_entry & 1))
-			return 0;
-		*address = (page_entry & 0xfffff000) | offset;
+			ret = 0;
+		else
+			*address = (page_entry & 0xfffff000) | offset;
 	}
 	else
 	{
 		if (page_dir & 0x80)
 		{
 			if(!(page_dir & 1))
-				return 0;
-			*address = (page_dir & 0xffc00000) | (a & 0x003fffff);
+				ret = 0;
+			else
+				*address = (page_dir & 0xffc00000) | (a & 0x003fffff);
 		}
 		else
 		{
 			page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
 			if(!(page_entry & 1))
-				return 0;
-			*address = (page_entry & 0xfffff000) | offset;
+				ret = 0;
+			else
+				*address = (page_entry & 0xfffff000) | offset;
 		}
+	}
+	if(!ret) 
+	{
+		*error = ((rw && 1)<<1) | ((cpustate->CPL==3)?1<<2:0);
+		return 0;
 	}
 	return 1;
 }
 
 INLINE void CHANGE_PC(i386_state *cpustate, UINT32 pc)
 {
-	UINT32 address;
+	UINT32 address, error;
 	cpustate->pc = i386_translate(cpustate, CS, pc );
 
 	address = cpustate->pc;
 
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
-		translate_address(cpustate,&address);
+		translate_address(cpustate,0,&address,&error);
 	}
 }
 
 INLINE void NEAR_BRANCH(i386_state *cpustate, INT32 offs)
 {
-	UINT32 address;
+	UINT32 address, error;
 	/* TODO: limit */
 	cpustate->eip += offs;
 	cpustate->pc += offs;
@@ -439,18 +450,19 @@ INLINE void NEAR_BRANCH(i386_state *cpustate, INT32 offs)
 
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
-		translate_address(cpustate,&address);
+		translate_address(cpustate,0,&address,&error);
 	}
 }
 
 INLINE UINT8 FETCH(i386_state *cpustate)
 {
 	UINT8 value;
-	UINT32 address = cpustate->pc;
+	UINT32 address = cpustate->pc, error;
 
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
-		translate_address(cpustate,&address);
+		if(!translate_address(cpustate,0,&address,&error))
+			FAULT_THROW(FAULT_PF,error);
 	}
 
 	value = cpustate->direct->read_decrypted_byte(address & cpustate->a20_mask);
@@ -461,7 +473,7 @@ INLINE UINT8 FETCH(i386_state *cpustate)
 INLINE UINT16 FETCH16(i386_state *cpustate)
 {
 	UINT16 value;
-	UINT32 address = cpustate->pc;
+	UINT32 address = cpustate->pc, error;
 
 	if( address & 0x1 ) {		/* Unaligned read */
 		value = (FETCH(cpustate) << 0) |
@@ -469,7 +481,8 @@ INLINE UINT16 FETCH16(i386_state *cpustate)
 	} else {
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
-			translate_address(cpustate,&address);
+			if(!translate_address(cpustate,0,&address,&error))
+				FAULT_THROW(FAULT_PF,error);
 		}
 		address &= cpustate->a20_mask;
 		value = cpustate->direct->read_decrypted_word(address);
@@ -481,7 +494,7 @@ INLINE UINT16 FETCH16(i386_state *cpustate)
 INLINE UINT32 FETCH32(i386_state *cpustate)
 {
 	UINT32 value;
-	UINT32 address = cpustate->pc;
+	UINT32 address = cpustate->pc, error;
 
 	if( cpustate->pc & 0x3 ) {		/* Unaligned read */
 		value = (FETCH(cpustate) << 0) |
@@ -491,7 +504,8 @@ INLINE UINT32 FETCH32(i386_state *cpustate)
 	} else {
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
-			translate_address(cpustate,&address);
+			if(!translate_address(cpustate,0,&address,&error))
+				FAULT_THROW(FAULT_PF,error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -504,11 +518,12 @@ INLINE UINT32 FETCH32(i386_state *cpustate)
 
 INLINE UINT8 READ8(i386_state *cpustate,UINT32 ea)
 {
-	UINT32 address = ea;
+	UINT32 address = ea, error;
 
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
-		translate_address(cpustate,&address);
+		if(!translate_address(cpustate,0,&address,&error))
+			FAULT_THROW(FAULT_PF,error);
 	}
 
 	address &= cpustate->a20_mask;
@@ -517,7 +532,7 @@ INLINE UINT8 READ8(i386_state *cpustate,UINT32 ea)
 INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 {
 	UINT16 value;
-	UINT32 address = ea;
+	UINT32 address = ea, error;
 
 	if( ea & 0x1 ) {		/* Unaligned read */
 		value = (READ8( cpustate, address+0 ) << 0) |
@@ -525,7 +540,8 @@ INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 	} else {
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
-			translate_address(cpustate,&address);
+			if(!translate_address(cpustate,0,&address,&error))
+				FAULT_THROW(FAULT_PF,error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -536,7 +552,7 @@ INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 INLINE UINT32 READ32(i386_state *cpustate,UINT32 ea)
 {
 	UINT32 value;
-	UINT32 address = ea;
+	UINT32 address = ea, error;
 
 	if( ea & 0x3 ) {		/* Unaligned read */
 		value = (READ8( cpustate, address+0 ) << 0) |
@@ -546,7 +562,8 @@ INLINE UINT32 READ32(i386_state *cpustate,UINT32 ea)
 	} else {
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
-			translate_address(cpustate,&address);
+			if(!translate_address(cpustate,0,&address,&error))
+				FAULT_THROW(FAULT_PF,error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -558,7 +575,7 @@ INLINE UINT32 READ32(i386_state *cpustate,UINT32 ea)
 INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 {
 	UINT64 value;
-	UINT32 address = ea;
+	UINT32 address = ea, error;
 
 	if( ea & 0x7 ) {		/* Unaligned read */
 		value = (((UINT64) READ8( cpustate, address+0 )) << 0) |
@@ -572,7 +589,8 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 	} else {
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
-			translate_address(cpustate,&address);
+			if(!translate_address(cpustate,0,&address,&error))
+				FAULT_THROW(FAULT_PF,error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -584,11 +602,12 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 
 INLINE void WRITE8(i386_state *cpustate,UINT32 ea, UINT8 value)
 {
-	UINT32 address = ea;
+	UINT32 address = ea, error;
 
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
-		translate_address(cpustate,&address);
+		if(!translate_address(cpustate,1,&address,&error))
+			FAULT_THROW(FAULT_PF,error);
 	}
 
 	address &= cpustate->a20_mask;
@@ -596,7 +615,7 @@ INLINE void WRITE8(i386_state *cpustate,UINT32 ea, UINT8 value)
 }
 INLINE void WRITE16(i386_state *cpustate,UINT32 ea, UINT16 value)
 {
-	UINT32 address = ea;
+	UINT32 address = ea, error;
 
 	if( ea & 0x1 ) {		/* Unaligned write */
 		WRITE8( cpustate, address+0, value & 0xff );
@@ -604,7 +623,8 @@ INLINE void WRITE16(i386_state *cpustate,UINT32 ea, UINT16 value)
 	} else {
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
-			translate_address(cpustate,&address);
+			if(!translate_address(cpustate,1,&address,&error))
+				FAULT_THROW(FAULT_PF,error);
 		}
 
 		address &= cpustate->a20_mask;
@@ -613,7 +633,7 @@ INLINE void WRITE16(i386_state *cpustate,UINT32 ea, UINT16 value)
 }
 INLINE void WRITE32(i386_state *cpustate,UINT32 ea, UINT32 value)
 {
-	UINT32 address = ea;
+	UINT32 address = ea, error;
 
 	if( ea & 0x3 ) {		/* Unaligned write */
 		WRITE8( cpustate, address+0, value & 0xff );
@@ -623,7 +643,8 @@ INLINE void WRITE32(i386_state *cpustate,UINT32 ea, UINT32 value)
 	} else {
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
-			translate_address(cpustate,&address);
+			if(!translate_address(cpustate,1,&address,&error))
+				FAULT_THROW(FAULT_PF,error);
 		}
 
 		ea &= cpustate->a20_mask;
@@ -633,7 +654,7 @@ INLINE void WRITE32(i386_state *cpustate,UINT32 ea, UINT32 value)
 
 INLINE void WRITE64(i386_state *cpustate,UINT32 ea, UINT64 value)
 {
-	UINT32 address = ea;
+	UINT32 address = ea, error;
 
 	if( ea & 0x7 ) {		/* Unaligned write */
 		WRITE8( cpustate, address+0, value & 0xff );
@@ -647,7 +668,8 @@ INLINE void WRITE64(i386_state *cpustate,UINT32 ea, UINT64 value)
 	} else {
 		if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 		{
-			translate_address(cpustate,&address);
+			if(!translate_address(cpustate,1,&address,&error))
+				FAULT_THROW(FAULT_PF,error);
 		}
 
 		ea &= cpustate->a20_mask;

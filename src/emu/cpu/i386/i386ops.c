@@ -278,6 +278,12 @@ static void I386OP(cld)(i386_state *cpustate)				// Opcode 0xfc
 
 static void I386OP(cli)(i386_state *cpustate)				// Opcode 0xfa
 {
+	if(PROTECTED_MODE)
+	{
+		UINT8 IOPL = cpustate->IOP1 | (cpustate->IOP2 << 1);
+		if(cpustate->CPL > IOPL)
+			FAULT(FAULT_GP,0);
+	}
 	cpustate->IF = 0;
 	CYCLES(cpustate,CYCLES_CLI);
 }
@@ -1578,6 +1584,12 @@ static void I386OP(std)(i386_state *cpustate)				// Opcode 0xfd
 
 static void I386OP(sti)(i386_state *cpustate)				// Opcode 0xfb
 {
+	if(PROTECTED_MODE)
+	{
+		UINT8 IOPL = cpustate->IOP1 | (cpustate->IOP2 << 1);
+		if(cpustate->CPL > IOPL)
+			FAULT(FAULT_GP,0);
+	}
 	cpustate->delayed_interrupt_enable = 1;  // IF is set after the next instruction.
 	CYCLES(cpustate,CYCLES_STI);
 }
@@ -2275,8 +2287,8 @@ static void I386OP(escape)(i386_state *cpustate)			// Opcodes 0xd8 - 0xdf
 
 static void I386OP(hlt)(i386_state *cpustate)				// Opcode 0xf4
 {
-	// TODO: We need to raise an exception in protected mode and when
-	// the current privilege level is not zero
+	if(PROTECTED_MODE && cpustate->CPL != 0)
+		FAULT(FAULT_GP,0);
 	cpustate->halted = 1;
 	CYCLES(cpustate,CYCLES_HLT);
 	if (cpustate->cycles > 0)
@@ -2392,6 +2404,12 @@ static void I386OP(wait)(i386_state *cpustate)				// Opcode 0x9B
 
 static void I386OP(lock)(i386_state *cpustate)				// Opcode 0xf0
 {
+	if(PROTECTED_MODE)
+	{
+		UINT8 IOPL = cpustate->IOP1 | (cpustate->IOP2 << 1);
+		if(cpustate->CPL > IOPL)
+			FAULT(FAULT_GP,0);
+	}
 	CYCLES(cpustate,CYCLES_LOCK);		// TODO: Determine correct cycle count
 	I386OP(decode_opcode)(cpustate);
 }
