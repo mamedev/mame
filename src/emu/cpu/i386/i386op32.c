@@ -1463,7 +1463,9 @@ static void I386OP(pop_ss32)(i386_state *cpustate)			// Opcode 0x17
 static void I386OP(pop_rm32)(i386_state *cpustate)			// Opcode 0x8f
 {
 	UINT8 modrm = FETCH(cpustate);
-	UINT32 value = POP32(cpustate);
+	UINT32 value;
+
+	value = POP32(cpustate);
 
 	if( modrm >= 0xc0 ) {
 		STORE_RM32(modrm, value);
@@ -1489,12 +1491,10 @@ static void I386OP(popad)(i386_state *cpustate)				// Opcode 0x61
 
 static void I386OP(popfd)(i386_state *cpustate)				// Opcode 0x9d
 {
-	UINT32 value = POP32(cpustate);
+	UINT32 value;
 	UINT32 current = get_flags(cpustate);
 	UINT8 IOPL = (current >> 12) & 0x03;
 	UINT32 mask = 0x00257fd5;  // VM, VIP and VIF cannot be set by POPF/POPFD
-
-	value &= ~0x00010000;  // RF will always return zero
 
 	// IOPL can only change if CPL is 0
 	if(cpustate->CPL != 0)
@@ -1513,6 +1513,9 @@ static void I386OP(popfd)(i386_state *cpustate)				// Opcode 0x9d
 		}
 		mask &= ~0x00003000;  // IOPL cannot be changed while in V8086 mode
 	}
+
+	value = POP32(cpustate);
+	value &= ~0x00010000;  // RF will always return zero
 	set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
 	CYCLES(cpustate,CYCLES_POPF);
 }

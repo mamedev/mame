@@ -393,6 +393,27 @@ static void i386_check_sreg_validity(i386_state* cpustate, int reg)
 	}
 }
 
+#if 0
+// this will be more useful once expand-down segments are supported (the FM-Towns uses these for the stack)
+static void i386_stack_check(i386_state *cpustate, INT16 offset)
+{
+	if(PROTECTED_MODE && !V8086_MODE)
+	{
+		// Check that both current and eventual stack pointers are within the segment limits
+		if(REG32(ESP) > cpustate->sreg[SS].limit)
+		{
+			logerror("Stack (%08x): ESP is outside stack segment limit.\n",cpustate->pc);
+			FAULT(FAULT_SS,0);
+		}
+		if(REG32(ESP) + offset > cpustate->sreg[SS].limit)
+		{
+			logerror("Stack (%08x): ESP + offset (%i) is outside stack segment limit.\n",cpustate->pc,offset);
+			FAULT(FAULT_SS,0);
+		}
+	}
+}
+#endif
+
 static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector, UINT8 reg)
 {
 	// Checks done when MOV changes a segment register in protected mode
@@ -623,6 +644,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			tempflags = get_flags(cpustate);
 			cpustate->VM = 0;
 			cpustate->TF = 0;
+			cpustate->NT = 0;
 			if(type == 0x0e || type == 0x06)
 				cpustate->IF = 0;
 			tempSS = cpustate->sreg[SS].selector;
