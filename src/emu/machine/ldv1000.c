@@ -107,22 +107,22 @@ ADDRESS_MAP_END
 
 static const ppi8255_interface ppi0intf =
 {
-	DEVCB_NULL,						
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portb_r),	
+	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portb_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portc_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_porta_w),	
-	DEVCB_NULL,						
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_porta_w),
+	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi0_portc_w)
 };
 
 
 static const ppi8255_interface ppi1intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_porta_r),	
-	DEVCB_NULL,						
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_porta_r),
 	DEVCB_NULL,
-	DEVCB_NULL,						
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_portb_w),	
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_portb_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pioneer_ldv1000_device, ppi1_portc_w)
 };
 
@@ -193,7 +193,7 @@ pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, co
 
 
 //-------------------------------------------------
-//  data_w - handle a parallel data write to the 
+//  data_w - handle a parallel data write to the
 //  LD-V1000
 //-------------------------------------------------
 
@@ -222,7 +222,7 @@ void pioneer_ldv1000_device::device_start()
 {
 	// pass through to the parent
 	laserdisc_device::device_start();
-	
+
 	// allocate timers
 	m_multitimer = timer_alloc(TID_MULTIJUMP);
 }
@@ -273,11 +273,11 @@ void pioneer_ldv1000_device::device_timer(emu_timer &timer, device_timer_id id, 
 				timer.adjust(MULTIJUMP_TRACK_TIME);
 			break;
 		}
-	
+
 		case TID_VSYNC_OFF:
 			m_vsync = false;
 			break;
-		
+
 		case TID_VBI_DATA_FETCH:
 		{
 			// appears to return data in reverse order
@@ -315,7 +315,7 @@ void pioneer_ldv1000_device::device_timer(emu_timer &timer, device_timer_id id, 
 			m_vbiindex = 0;
 			break;
 		}
-		
+
 		// pass everything else onto the parent
 		default:
 			laserdisc_device::device_timer(timer, id, param, ptr);
@@ -398,7 +398,7 @@ WRITE_LINE_MEMBER( pioneer_ldv1000_device::ctc_interrupt )
 
 
 //-------------------------------------------------
-//  z80_decoder_display_port_w - handle writes to 
+//  z80_decoder_display_port_w - handle writes to
 //  the decoder/display chips
 //-------------------------------------------------
 

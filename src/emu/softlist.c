@@ -2015,11 +2015,11 @@ void validate_softlists(emu_options &options)
 								mame_printf_error("%s: %s has a part (%s) with no data\n", list->file->filename(), swinfo->shortname, swpart->name);
 								error = TRUE;
 							}
-							
+
 							if (part_names.add(swpart->name, swinfo, FALSE) == TMERR_DUPLICATE)
 							{
 								mame_printf_error("%s: %s has a part (%s) whose name is duplicate\n", list->file->filename(), swinfo->shortname, swpart->name);
-								error = TRUE; 
+								error = TRUE;
 							}
 
 							for (struct rom_entry *swdata = software_find_romdata(swpart, NULL); swdata != NULL;  swdata = software_romdata_next(swdata))

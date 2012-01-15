@@ -387,7 +387,7 @@ static WRITE8_HANDLER( laserdsc_control_w )
 
 	if (BIT(data, 5))
 	{
-		if (state->m_ldv1000 != NULL) 
+		if (state->m_ldv1000 != NULL)
 		{
 			state->m_ldv1000->data_w(state->m_laserdisc_data);
 			state->m_ldv1000->enter_w(BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -760,8 +760,8 @@ static MACHINE_RESET( thayers )
 	state->m_cart_present = 0;
 	state->m_pr7820_enter = 0;
 
-//	newtype = (input_port_read(machine, "DSWB") & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
-//	laserdisc_set_type(state->m_laserdisc, newtype);
+//  newtype = (input_port_read(machine, "DSWB") & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
+//  laserdisc_set_type(state->m_laserdisc, newtype);
 }
 
 /* COP400 Interface */

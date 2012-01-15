@@ -798,10 +798,10 @@ SCREEN_VBLANK( nmk )
 	{
 		nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 		/* sprites are DMA'd from Main RAM to a private buffer automatically
-	       (or at least this is how I interpret the datasheet) */
+           (or at least this is how I interpret the datasheet) */
 
 		/* -- I actually see little evidence to support this, sprite lag
-	          in some games should be checked on real boards */
+              in some games should be checked on real boards */
 
 	//  memcpy(state->m_spriteram_old2,state->m_spriteram_old,0x1000);
 		memcpy(state->m_spriteram_old2,state->m_mainram+0x8000/2,0x1000);
@@ -815,10 +815,10 @@ SCREEN_VBLANK( strahl )
 	{
 		nmk16_state *state = screen.machine().driver_data<nmk16_state>();
 		/* sprites are DMA'd from Main RAM to a private buffer automatically
-	       (or at least this is how I interpret the datasheet) */
+           (or at least this is how I interpret the datasheet) */
 
 		/* -- I actually see little evidence to support this, sprite lag
-	          in some games should be checked on real boards */
+              in some games should be checked on real boards */
 
 		/* strahl sprites are allocated in memory range FF000-FFFFF */
 

@@ -278,7 +278,7 @@ class delegate_base
 
 public:
 	// define our traits
-	template<class _FunctionClass> 
+	template<class _FunctionClass>
 	struct traits
 	{
 		typedef typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type>::member_func_type member_func_type;
@@ -530,7 +530,7 @@ class delegate_base
 
 public:
 	// define our traits
-	template<class _FunctionClass> 
+	template<class _FunctionClass>
 	struct traits
 	{
 		typedef typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type>::member_func_type member_func_type;

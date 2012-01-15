@@ -550,8 +550,8 @@ SCREEN_VBLANK( twin16 )
 			state->m_need_process_spriteram = 1;
 
 			/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
-	        as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
-	        more to it than that */
+            as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
+            more to it than that */
 			memcpy(&screen.machine().generic.buffered_spriteram.u16[0x1800],state->m_sprite_buffer,0x800*sizeof(UINT16));
 			memcpy(state->m_sprite_buffer,&screen.machine().generic.spriteram.u16[0x1800],0x800*sizeof(UINT16));
 		}

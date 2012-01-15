@@ -77,7 +77,7 @@ protected:
 
 
 	// driver_device overrides
-//	virtual void video_start();
+//  virtual void video_start();
 };
 
 // Intel 82439TX System Controller (MXTC)

@@ -1954,7 +1954,7 @@ static READ16_HANDLER( mrdig_speedup_r )
 static READ16_HANDLER( toyland_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	
+
 	if (cpu_get_pc(&space->device()) == 0x130c2)
 		device_spin_until_interrupt(&space->device());
 

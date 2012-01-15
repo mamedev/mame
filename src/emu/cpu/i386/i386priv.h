@@ -419,7 +419,7 @@ INLINE int translate_address(i386_state *cpustate, bool rw, UINT32 *address, UIN
 				*address = (page_entry & 0xfffff000) | offset;
 		}
 	}
-	if(!ret) 
+	if(!ret)
 	{
 		*error = ((rw && 1)<<1) | ((cpustate->CPL==3)?1<<2:0);
 		return 0;

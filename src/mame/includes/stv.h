@@ -118,7 +118,7 @@ public:
 	legacy_cpu_device* m_maincpu;
 	legacy_cpu_device* m_slave;
 	legacy_cpu_device* m_audiocpu;
-	
+
 	bitmap_rgb32 m_tmpbitmap;
 };
 

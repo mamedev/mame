@@ -181,7 +181,7 @@ static VIDEO_RESET( vga );
 
 void pc_video_start(running_machine &machine)
 {
-//	pc_choosevideomode = choosevideomode;
+//  pc_choosevideomode = choosevideomode;
 	pc_current_height = -1;
 	pc_current_width = -1;
 }

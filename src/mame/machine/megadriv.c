@@ -9412,7 +9412,7 @@ SCREEN_VBLANK(megadriv)
 		megadrive_sprite_collision=0;//? when to reset this ..
 		megadrive_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
 		megadrive_imode_odd_frame^=1;
-//  	cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
+//      cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
 		if (input_port_read_safe(screen.machine(), "RESET", 0x00) & 0x01)
 			cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
@@ -9481,7 +9481,7 @@ int megadrive_z80irq_hpos = 320;
 			case 2:scr_width = 320;break;// configure_screen(0, 320-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break; /* technically invalid, but used in rare cases */
 			case 3:scr_width = 320;break;// configure_screen(0, 320-1, megadrive_visible_scanlines-1,(double)megadriv_framerate); break;
 		}
-//  	mame_printf_debug("my mode %02x", megadrive_vdp_register[0x0c]);
+//      mame_printf_debug("my mode %02x", megadrive_vdp_register[0x0c]);
 
 		visarea.min_x = 0;
 		visarea.max_x = scr_width-1;
@@ -9493,10 +9493,10 @@ int megadrive_z80irq_hpos = 320;
 		if (0)
 		{
 			//int xxx;
-//      	UINT64 frametime;
+//          UINT64 frametime;
 
 		//  /* reference */
-//      	frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
+//          frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
 
 			//time_elapsed_since_crap = frame_timer->time_elapsed();
 			//xxx = screen.machine().device<cpudevice>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);

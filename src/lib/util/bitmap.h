@@ -211,7 +211,7 @@ protected:
 public:
 	// getters
 	UINT8 bpp() const { return 8; }
-	
+
 	// pixel accessors
 	typedef UINT8 pixel_t;
 	pixel_t &pix(INT32 y, INT32 x = 0) const { return pixt<pixel_t>(y, x); }
@@ -234,7 +234,7 @@ protected:
 public:
 	// getters
 	UINT8 bpp() const { return 16; }
-	
+
 	// pixel accessors
 	typedef UINT16 pixel_t;
 	pixel_t &pix(INT32 y, INT32 x = 0) const { return pixt<pixel_t>(y, x); }
@@ -257,7 +257,7 @@ protected:
 public:
 	// getters
 	UINT8 bpp() const { return 32; }
-	
+
 	// pixel accessors
 	typedef UINT32 pixel_t;
 	pixel_t &pix(INT32 y, INT32 x = 0) const { return pixt<pixel_t>(y, x); }
@@ -280,7 +280,7 @@ protected:
 public:
 	// getters
 	UINT8 bpp() const { return 64; }
-	
+
 	// pixel accessors
 	typedef UINT64 pixel_t;
 	pixel_t &pix(INT32 y, INT32 x = 0) const { return pixt<pixel_t>(y, x); }
@@ -294,7 +294,7 @@ public:
 class bitmap_ind8 : public bitmap8_t
 {
 	static const bitmap_format k_bitmap_format = BITMAP_FORMAT_IND8;
-	
+
 public:
 	// construction/destruction
 	bitmap_ind8(int width = 0, int height = 0, int xslop = 0, int yslop = 0) : bitmap8_t(k_bitmap_format, width, height, xslop, yslop) { }

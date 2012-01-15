@@ -79,7 +79,7 @@ public:
 	int get_transpen();
 	bitmap_ind16 &get_bitmap() { return m_bitmap; }
 	void update_mouse_state(int mx_delta, int my_delta, int button_state);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( read );
@@ -98,7 +98,7 @@ public:
 
 protected:
 	int m_model;
-	
+
 	// device overrides
 	virtual void device_start();
 	virtual void device_reset();
@@ -110,7 +110,7 @@ private:
 	int vram_read (int offset);
 	void check_int ();
 	void register_write (int reg, int data);
-	
+
 	template<typename _PixelType, int _Width> void default_border(const pen_t *pens, _PixelType *ln);
 	template<typename _PixelType, int _Width> void graphic7_border(const pen_t *pens, _PixelType *ln);
 	template<typename _PixelType, int _Width> void graphic5_border(const pen_t *pens, _PixelType *ln);
@@ -135,7 +135,7 @@ private:
 	void refresh_line (int line);
 
 	void interrupt_start_vblank ();
-	
+
 	UINT8 *VDPVRMP(UINT8 M, int MX, int X, int Y);
 
 	UINT8 VDPpoint5(int MXS, int SX, int SY);

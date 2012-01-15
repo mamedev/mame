@@ -503,7 +503,7 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		texinfo.seqid = ++m_curseq;
 		return true;
 	}
-	
+
 	// make sure we can recover the original argb32 bitmap
 	bitmap_argb32 &srcbitmap = downcast<bitmap_argb32 &>(*m_bitmap);
 

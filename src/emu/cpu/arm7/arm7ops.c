@@ -1840,7 +1840,7 @@ const void arm7ops_0123(arm_state *cpustate, UINT32 insn)
 			HandleALU(cpustate, insn);
 		}
 	}
-//	break;
+//  break;
 }
 
 const void arm7ops_4567(arm_state *cpustate, UINT32 insn) /* Data Transfer - Single Data Access */
@@ -1851,16 +1851,16 @@ const void arm7ops_4567(arm_state *cpustate, UINT32 insn) /* Data Transfer - Sin
 //case 7:
 	HandleMemSingle(cpustate, insn);
 	R15 += 4;
-//	break;
+//  break;
 }
-	
+
 const void arm7ops_89(arm_state *cpustate, UINT32 insn) /* Block Data Transfer/Access */
 {
 //case 8:
 //case 9:
 	HandleMemBlock(cpustate, insn);
 	R15 += 4;
-//	break;
+//  break;
 }
 
 const void arm7ops_ab(arm_state *cpustate, UINT32 insn) /* Branch or Branch & Link */
@@ -1868,7 +1868,7 @@ const void arm7ops_ab(arm_state *cpustate, UINT32 insn) /* Branch or Branch & Li
 //case 0xa:
 //case 0xb:
 	HandleBranch(cpustate, insn);
-//	break;
+//  break;
 }
 
 const void arm7ops_cd(arm_state *cpustate, UINT32 insn) /* Co-Processor Data Transfer */
@@ -1877,7 +1877,7 @@ const void arm7ops_cd(arm_state *cpustate, UINT32 insn) /* Co-Processor Data Tra
 //case 0xd:
 	HandleCoProcDT(cpustate, insn);
 	R15 += 4;
-//	break;
+//  break;
 }
 
 const void arm7ops_e(arm_state *cpustate, UINT32 insn) /* Co-Processor Data Operation or Register Transfer */
@@ -1888,7 +1888,7 @@ const void arm7ops_e(arm_state *cpustate, UINT32 insn) /* Co-Processor Data Oper
 	else
 		HandleCoProcDO(cpustate, insn);
 	R15 += 4;
-//	break;
+//  break;
 }
 
 const void arm7ops_f(arm_state *cpustate, UINT32 insn) /* Software Interrupt */
@@ -1896,5 +1896,5 @@ const void arm7ops_f(arm_state *cpustate, UINT32 insn) /* Software Interrupt */
 	cpustate->pendingSwi = 1;
 	ARM7_CHECKIRQ;
 	//couldn't find any cycle counts for SWI
-//	break;
+//  break;
 }

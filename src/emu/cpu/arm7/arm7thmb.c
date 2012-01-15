@@ -29,11 +29,11 @@ arm7thumb_ophandler thumb_handler[0x40*0x10] =
 // #define THUMB_RELADDR_SP    ((UINT16)0x0800)
 	tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_0,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,		tg0a_1,
 // #define THUMB_STACKOP_TYPE  ((UINT16)0x0f00)
-	tg0b_0,		tg0b_0,		tg0b_0,		tg0b_0,		tg0b_1,		tg0b_1,		tg0b_1,		tg0b_1,		tg0b_2,		tg0b_2,		tg0b_2,		tg0b_2,		tg0b_3,		tg0b_3,		tg0b_3,		tg0b_3,		tg0b_4,		tg0b_4,		tg0b_4,		tg0b_4,		tg0b_5,		tg0b_5,		tg0b_5,		tg0b_5,		tg0b_6,		tg0b_6,		tg0b_6,		tg0b_6,		tg0b_7,		tg0b_7,		tg0b_7,		tg0b_7,		tg0b_8,		tg0b_8,		tg0b_8,		tg0b_8,		tg0b_9,		tg0b_9,		tg0b_9,		tg0b_9,		tg0b_a,		tg0b_a,		tg0b_a,		tg0b_a,		tg0b_b,		tg0b_b,		tg0b_b,		tg0b_b,		tg0b_c,		tg0b_c,		tg0b_c,		tg0b_c,		tg0b_d,		tg0b_d,		tg0b_d,		tg0b_d,		tg0b_e,		tg0b_e,		tg0b_e,		tg0b_e,		tg0b_f,		tg0b_f,		tg0b_f,		tg0b_f,		
+	tg0b_0,		tg0b_0,		tg0b_0,		tg0b_0,		tg0b_1,		tg0b_1,		tg0b_1,		tg0b_1,		tg0b_2,		tg0b_2,		tg0b_2,		tg0b_2,		tg0b_3,		tg0b_3,		tg0b_3,		tg0b_3,		tg0b_4,		tg0b_4,		tg0b_4,		tg0b_4,		tg0b_5,		tg0b_5,		tg0b_5,		tg0b_5,		tg0b_6,		tg0b_6,		tg0b_6,		tg0b_6,		tg0b_7,		tg0b_7,		tg0b_7,		tg0b_7,		tg0b_8,		tg0b_8,		tg0b_8,		tg0b_8,		tg0b_9,		tg0b_9,		tg0b_9,		tg0b_9,		tg0b_a,		tg0b_a,		tg0b_a,		tg0b_a,		tg0b_b,		tg0b_b,		tg0b_b,		tg0b_b,		tg0b_c,		tg0b_c,		tg0b_c,		tg0b_c,		tg0b_d,		tg0b_d,		tg0b_d,		tg0b_d,		tg0b_e,		tg0b_e,		tg0b_e,		tg0b_e,		tg0b_f,		tg0b_f,		tg0b_f,		tg0b_f,
 // #define THUMB_MULTLS        ((UINT16)0x0800)
 	tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_0,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,		tg0c_1,
 // #define THUMB_COND_TYPE     ((UINT16)0x0f00)
-	tg0d_0,		tg0d_0,		tg0d_0,		tg0d_0,		tg0d_1,		tg0d_1,		tg0d_1,		tg0d_1,		tg0d_2,		tg0d_2,		tg0d_2,		tg0d_2,		tg0d_3,		tg0d_3,		tg0d_3,		tg0d_3,		tg0d_4,		tg0d_4,		tg0d_4,		tg0d_4,		tg0d_5,		tg0d_5,		tg0d_5,		tg0d_5,		tg0d_6,		tg0d_6,		tg0d_6,		tg0d_6,		tg0d_7,		tg0d_7,		tg0d_7,		tg0d_7,		tg0d_8,		tg0d_8,		tg0d_8,		tg0d_8,		tg0d_9,		tg0d_9,		tg0d_9,		tg0d_9,		tg0d_a,		tg0d_a,		tg0d_a,		tg0d_a,		tg0d_b,		tg0d_b,		tg0d_b,		tg0d_b,		tg0d_c,		tg0d_c,		tg0d_c,		tg0d_c,		tg0d_d,		tg0d_d,		tg0d_d,		tg0d_d,		tg0d_e,		tg0d_e,		tg0d_e,		tg0d_e,		tg0d_f,		tg0d_f,		tg0d_f,		tg0d_f,		
+	tg0d_0,		tg0d_0,		tg0d_0,		tg0d_0,		tg0d_1,		tg0d_1,		tg0d_1,		tg0d_1,		tg0d_2,		tg0d_2,		tg0d_2,		tg0d_2,		tg0d_3,		tg0d_3,		tg0d_3,		tg0d_3,		tg0d_4,		tg0d_4,		tg0d_4,		tg0d_4,		tg0d_5,		tg0d_5,		tg0d_5,		tg0d_5,		tg0d_6,		tg0d_6,		tg0d_6,		tg0d_6,		tg0d_7,		tg0d_7,		tg0d_7,		tg0d_7,		tg0d_8,		tg0d_8,		tg0d_8,		tg0d_8,		tg0d_9,		tg0d_9,		tg0d_9,		tg0d_9,		tg0d_a,		tg0d_a,		tg0d_a,		tg0d_a,		tg0d_b,		tg0d_b,		tg0d_b,		tg0d_b,		tg0d_c,		tg0d_c,		tg0d_c,		tg0d_c,		tg0d_d,		tg0d_d,		tg0d_d,		tg0d_d,		tg0d_e,		tg0d_e,		tg0d_e,		tg0d_e,		tg0d_f,		tg0d_f,		tg0d_f,		tg0d_f,
 // #define THUMB_BLOP_LO       ((UINT16)0x0800)
 	tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_0,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,		tg0e_1,
 // #define THUMB_BLOP_LO       ((UINT16)0x0800)
@@ -116,7 +116,7 @@ const void tg00_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Shift right */
 
 /* Arithmetic */
 
-const void tg01_0(arm_state *cpustate, UINT32 pc, UINT32 insn) 
+const void tg01_0(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
 	UINT32 rs, rd, rrs;
 	INT32 offs;
@@ -168,7 +168,7 @@ const void tg01_10(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* ADD Rd, Rs, 
 {
 	UINT32 rn, rs, rd;
 
- 
+
     rn = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT);
     rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
     rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
@@ -180,7 +180,7 @@ const void tg01_10(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* ADD Rd, Rs, 
 const void tg01_11(arm_state *cpustate, UINT32 pc, UINT32 insn) /* SUB Rd, Rs, Rn */
 {
 	UINT32 rn, rs, rd;
- 
+
     rn = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT);
     rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
     rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
@@ -192,7 +192,7 @@ const void tg01_11(arm_state *cpustate, UINT32 pc, UINT32 insn) /* SUB Rd, Rs, R
 const void tg01_12(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD Rd, Rs, #imm */
 {
 	UINT32 rs, rd, imm;
- 
+
     imm = (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
     rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
     rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
@@ -204,7 +204,7 @@ const void tg01_12(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD Rd, Rs, #
 const void tg01_13(arm_state *cpustate, UINT32 pc, UINT32 insn) /* SUB Rd, Rs, #imm */
 {
 	UINT32 rs, rd, imm;
- 
+
     imm = (insn & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
     rs = GET_REGISTER(cpustate, (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT);
     rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
@@ -215,7 +215,7 @@ const void tg01_13(arm_state *cpustate, UINT32 pc, UINT32 insn) /* SUB Rd, Rs, #
 
 /* CMP / MOV */
 
-const void tg02_0(arm_state *cpustate, UINT32 pc, UINT32 insn) 
+const void tg02_0(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
 	UINT32 rd, op2;
 
@@ -227,7 +227,7 @@ const void tg02_0(arm_state *cpustate, UINT32 pc, UINT32 insn)
 	R15 += 2;
 }
 
-const void tg02_1(arm_state *cpustate, UINT32 pc, UINT32 insn) 
+const void tg02_1(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
 	UINT32 rn, rd, op2;
 
@@ -273,7 +273,7 @@ const void tg03_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* SUB Rd, #Offse
 const void tg04_00_00(arm_state *cpustate, UINT32 pc, UINT32 insn) /* AND Rd, Rs */
 {
 	UINT32 rs, rd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	SET_REGISTER(cpustate, rd, GET_REGISTER(cpustate, rd) & GET_REGISTER(cpustate, rs));
@@ -286,7 +286,7 @@ const void tg04_00_00(arm_state *cpustate, UINT32 pc, UINT32 insn) /* AND Rd, Rs
 const void tg04_00_01(arm_state *cpustate, UINT32 pc, UINT32 insn) /* EOR Rd, Rs */
 {
 	UINT32 rs, rd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	SET_REGISTER(cpustate, rd, GET_REGISTER(cpustate, rd) ^ GET_REGISTER(cpustate, rs));
@@ -300,7 +300,7 @@ const void tg04_00_02(arm_state *cpustate, UINT32 pc, UINT32 insn) /* LSL Rd, Rs
 {
 	UINT32 rs, rd, rrd;
 	INT32 offs;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	rrd = GET_REGISTER(cpustate, rd);
@@ -347,7 +347,7 @@ const void tg04_00_03(arm_state *cpustate, UINT32 pc, UINT32 insn) /* LSR Rd, Rs
 {
 	UINT32 rs, rd, rrd;
 	INT32 offs;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	rrd = GET_REGISTER(cpustate, rd);
@@ -393,7 +393,7 @@ const void tg04_00_03(arm_state *cpustate, UINT32 pc, UINT32 insn) /* LSR Rd, Rs
 const void tg04_00_04(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ASR Rd, Rs */
 {
 	UINT32 rs, rd, rrs, rrd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	rrs = GET_REGISTER(cpustate, rs)&0xff;
@@ -436,7 +436,7 @@ const void tg04_00_04(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ASR Rd, Rs
 const void tg04_00_05(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADC Rd, Rs */
 {
 	UINT32 rn, rs, rd, op2;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	op2=(GET_CPSR & C_MASK) ? 1 : 0;
@@ -462,7 +462,7 @@ const void tg04_00_06(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* SBC Rd, R
 const void tg04_00_07(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ROR Rd, Rs */
 {
 	UINT32 rs, rd, imm, rrd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	rrd = GET_REGISTER(cpustate, rd);
@@ -485,7 +485,7 @@ const void tg04_00_07(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ROR Rd, Rs
 const void tg04_00_08(arm_state *cpustate, UINT32 pc, UINT32 insn) /* TST Rd, Rs */
 {
 	UINT32 rs, rd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	SET_CPSR(GET_CPSR & ~(Z_MASK | N_MASK));
@@ -497,7 +497,7 @@ const void tg04_00_08(arm_state *cpustate, UINT32 pc, UINT32 insn) /* TST Rd, Rs
 const void tg04_00_09(arm_state *cpustate, UINT32 pc, UINT32 insn) /* NEG Rd, Rs */
 {
 	UINT32 rn, rs, rd, rrs;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	rrs = GET_REGISTER(cpustate, rs);
@@ -510,7 +510,7 @@ const void tg04_00_09(arm_state *cpustate, UINT32 pc, UINT32 insn) /* NEG Rd, Rs
 const void tg04_00_0a(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMP Rd, Rs */
 {
 	UINT32 rn, rs, rd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	rn = GET_REGISTER(cpustate, rd) - GET_REGISTER(cpustate, rs);
@@ -522,7 +522,7 @@ const void tg04_00_0a(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMP Rd, Rs
 const void tg04_00_0b(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMN Rd, Rs - check flags, add dasm */
 {
 	UINT32 rn, rs, rd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	rn = GET_REGISTER(cpustate, rd) + GET_REGISTER(cpustate, rs);
@@ -533,7 +533,7 @@ const void tg04_00_0b(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMN Rd, Rs
 const void tg04_00_0c(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ORR Rd, Rs */
 {
 	UINT32 rs, rd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	SET_REGISTER(cpustate, rd, GET_REGISTER(cpustate, rd) | GET_REGISTER(cpustate, rs));
@@ -546,7 +546,7 @@ const void tg04_00_0c(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ORR Rd, Rs
 const void tg04_00_0d(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MUL Rd, Rs */
 {
 	UINT32 rn, rs, rd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	rn = GET_REGISTER(cpustate, rd) * GET_REGISTER(cpustate, rs);
@@ -560,7 +560,7 @@ const void tg04_00_0d(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MUL Rd, Rs
 const void tg04_00_0e(arm_state *cpustate, UINT32 pc, UINT32 insn) /* BIC Rd, Rs */
 {
 	UINT32 rs, rd;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	SET_REGISTER(cpustate, rd, GET_REGISTER(cpustate, rd) & (~GET_REGISTER(cpustate, rs)));
@@ -572,7 +572,7 @@ const void tg04_00_0e(arm_state *cpustate, UINT32 pc, UINT32 insn) /* BIC Rd, Rs
 const void tg04_00_0f(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MVN Rd, Rs */
 {
 	UINT32 rs, rd, op2;
- 
+
 	rs = (insn & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (insn & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	op2 = GET_REGISTER(cpustate, rs);
@@ -587,9 +587,9 @@ const void tg04_00_0f(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MVN Rd, Rs
 
 const void tg04_01_00(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 rs, rd;
-//	rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
-//	rd = insn & THUMB_HIREG_RD;
+//  UINT32 rs, rd;
+//  rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
+//  rd = insn & THUMB_HIREG_RD;
 
 
 	fatalerror("%08x: G4-1-0 Undefined Thumb instruction: %04x %x\n", pc, insn, (insn & THUMB_HIREG_H) >> THUMB_HIREG_H_SHIFT);
@@ -604,7 +604,7 @@ const void tg04_01_01(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD Rd, HR
 	rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
 	rd = insn & THUMB_HIREG_RD;
 
- 
+
 	SET_REGISTER(cpustate, rd, GET_REGISTER(cpustate, rd) + GET_REGISTER(cpustate, rs+8));
 	// emulate the effects of pre-fetch
 	if (rs == 7)
@@ -621,7 +621,7 @@ const void tg04_01_02(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD HRd, R
 	rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
 	rd = insn & THUMB_HIREG_RD;
 
- 
+
 	SET_REGISTER(cpustate, rd+8, GET_REGISTER(cpustate, rd+8) + GET_REGISTER(cpustate, rs));
 	if (rd == 7)
 	{
@@ -637,7 +637,7 @@ const void tg04_01_03(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Add HRd, H
 	rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
 	rd = insn & THUMB_HIREG_RD;
 
- 
+
 	SET_REGISTER(cpustate, rd+8, GET_REGISTER(cpustate, rd+8) + GET_REGISTER(cpustate, rs+8));
 	// emulate the effects of pre-fetch
 	if (rs == 7)
@@ -667,7 +667,7 @@ const void tg04_01_10(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* CMP Rd, R
 const void tg04_01_11(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMP Rd, Hs */
 {
 	UINT32 rn, rs, rd;
- 
+
 	rs = GET_REGISTER(cpustate, ((insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT) + 8);
 	rd = GET_REGISTER(cpustate, insn & THUMB_HIREG_RD);
 	rn = rd - rs;
@@ -678,7 +678,7 @@ const void tg04_01_11(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMP Rd, Hs
 const void tg04_01_12(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMP Hd, Rs */
 {
 	UINT32 rn, rs, rd;
- 
+
 	rs = GET_REGISTER(cpustate, ((insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT));
 	rd = GET_REGISTER(cpustate, (insn & THUMB_HIREG_RD) + 8);
 	rn = rd - rs;
@@ -689,7 +689,7 @@ const void tg04_01_12(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMP Hd, Rs
 const void tg04_01_13(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMP Hd, Hs */
 {
 	UINT32 rn, rs, rd;
- 
+
 	rs = GET_REGISTER(cpustate, ((insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT) + 8);
 	rd = GET_REGISTER(cpustate, (insn & THUMB_HIREG_RD) + 8);
 	rn = rd - rs;
@@ -703,8 +703,8 @@ const void tg04_01_13(arm_state *cpustate, UINT32 pc, UINT32 insn) /* CMP Hd, Hs
 const void tg04_01_20(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MOV Rd, Rs (undefined) */
 {
 	UINT32 rs, rd;
-      
-	
+
+
 	rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
 	rd = insn & THUMB_HIREG_RD;
 	SET_REGISTER(cpustate, rd, GET_REGISTER(cpustate, rs));
@@ -715,7 +715,7 @@ const void tg04_01_20(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MOV Rd, Rs
 const void tg04_01_21(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MOV Rd, Hs */
 {
 	UINT32 rs, rd;
-       
+
 	rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
 	rd = insn & THUMB_HIREG_RD;
 	if (rs == 7)
@@ -733,7 +733,7 @@ const void tg04_01_21(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MOV Rd, Hs
 const void tg04_01_22(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MOV Hd, Rs */
 {
 	UINT32 rs, rd;
- 
+
 	rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
 	rd = insn & THUMB_HIREG_RD;
 	SET_REGISTER(cpustate, rd + 8, GET_REGISTER(cpustate, rs));
@@ -751,7 +751,7 @@ const void tg04_01_22(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MOV Hd, Rs
 const void tg04_01_23(arm_state *cpustate, UINT32 pc, UINT32 insn) /* MOV Hd, Hs */
 {
 	UINT32 rs, rd;
-  
+
 	rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
 	rd = insn & THUMB_HIREG_RD;
 	if (rs == 7)
@@ -826,8 +826,8 @@ const void tg04_01_31(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg04_01_32(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	UINT32 rd;
+//  UINT32 addr;
+//  UINT32 rd;
 
 
 	fatalerror("%08x: G4-3 Undefined Thumb instruction: %04x\n", pc, insn);
@@ -837,8 +837,8 @@ const void tg04_01_32(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg04_01_33(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	UINT32 rd;
+//  UINT32 addr;
+//  UINT32 rd;
 
 
 	fatalerror("%08x: G4-3 Undefined Thumb instruction: %04x\n", pc, insn);
@@ -851,7 +851,7 @@ const void tg04_01_33(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 
 
-const void tg04_0203(arm_state *cpustate, UINT32 pc, UINT32 insn) 
+const void tg04_0203(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
 	UINT32 readword;
 
@@ -866,21 +866,21 @@ const void tg05_0(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* STR Rd, [Rn, 
 {
 	UINT32 addr;
 	UINT32 rm, rn, rd;
- 
+
     rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
     rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
     rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
     addr = GET_REGISTER(cpustate, rn) + GET_REGISTER(cpustate, rm);
     WRITE32(addr, GET_REGISTER(cpustate, rd));
     R15 += 2;
- 
+
 }
 
 const void tg05_1(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* STRH Rd, [Rn, Rm] */
 {
 	UINT32 addr;
 	UINT32 rm, rn, rd;
- 
+
     rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
     rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
     rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
@@ -894,7 +894,7 @@ const void tg05_2(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* STRB Rd, [Rn,
 {
 	UINT32 addr;
 	UINT32 rm, rn, rd;
- 
+
     rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
     rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
     rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
@@ -908,7 +908,7 @@ const void tg05_3(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDSB Rd, [Rn,
 {
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
- 
+
     rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
     rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
     rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
@@ -927,7 +927,7 @@ const void tg05_4(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDR Rd, [Rn, 
 {
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
- 
+
     rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
     rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
     rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
@@ -942,7 +942,7 @@ const void tg05_5(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDRH Rd, [Rn,
 {
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
- 
+
     rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
     rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
     rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
@@ -957,7 +957,7 @@ const void tg05_6(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDRB Rd, [Rn,
 {
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
- 
+
     rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
     rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
     rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
@@ -972,7 +972,7 @@ const void tg05_7(arm_state *cpustate, UINT32 pc, UINT32 insn)  /* LDSH Rd, [Rn,
 {
 	UINT32 addr;
 	UINT32 rm, rn, rd, op2;
- 
+
     rm = (insn & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
     rn = (insn & THUMB_GROUP5_RN) >> THUMB_GROUP5_RN_SHIFT;
     rd = (insn & THUMB_GROUP5_RD) >> THUMB_GROUP5_RD_SHIFT;
@@ -1119,7 +1119,7 @@ const void tg0b_0(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD SP, #imm *
 {
 	UINT32 addr;
 
- 
+
     addr = (insn & THUMB_INSN_IMM);
     addr &= ~THUMB_INSN_IMM_S;
     SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) + ((insn & THUMB_INSN_IMM_S) ? -(addr << 2) : (addr << 2)));
@@ -1129,8 +1129,8 @@ const void tg0b_0(arm_state *cpustate, UINT32 pc, UINT32 insn) /* ADD SP, #imm *
 
 const void tg0b_1(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1139,8 +1139,8 @@ const void tg0b_1(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg0b_2(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1149,8 +1149,8 @@ const void tg0b_2(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg0b_3(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1160,7 +1160,7 @@ const void tg0b_3(arm_state *cpustate, UINT32 pc, UINT32 insn)
 const void tg0b_4(arm_state *cpustate, UINT32 pc, UINT32 insn) /* PUSH {Rlist} */
 {
 	INT32 offs;
- 
+
     for (offs = 7; offs >= 0; offs--)
     {
         if (insn & (1 << offs))
@@ -1176,7 +1176,7 @@ const void tg0b_4(arm_state *cpustate, UINT32 pc, UINT32 insn) /* PUSH {Rlist} *
 const void tg0b_5(arm_state *cpustate, UINT32 pc, UINT32 insn) /* PUSH {Rlist}{LR} */
 {
 	INT32 offs;
- 
+
     SET_REGISTER(cpustate, 13, GET_REGISTER(cpustate, 13) - 4);
     WRITE32(GET_REGISTER(cpustate, 13), GET_REGISTER(cpustate, 14));
     for (offs = 7; offs >= 0; offs--)
@@ -1193,8 +1193,8 @@ const void tg0b_5(arm_state *cpustate, UINT32 pc, UINT32 insn) /* PUSH {Rlist}{L
 
 const void tg0b_6(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1203,8 +1203,8 @@ const void tg0b_6(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg0b_7(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1213,8 +1213,8 @@ const void tg0b_7(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg0b_8(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1223,8 +1223,8 @@ const void tg0b_8(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg0b_9(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1233,8 +1233,8 @@ const void tg0b_9(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg0b_a(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1243,8 +1243,8 @@ const void tg0b_a(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg0b_b(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1254,7 +1254,7 @@ const void tg0b_b(arm_state *cpustate, UINT32 pc, UINT32 insn)
 const void tg0b_c(arm_state *cpustate, UINT32 pc, UINT32 insn) /* POP {Rlist} */
 {
 	INT32 offs;
- 
+
     for (offs = 0; offs < 8; offs++)
     {
         if (insn & (1 << offs))
@@ -1270,7 +1270,7 @@ const void tg0b_c(arm_state *cpustate, UINT32 pc, UINT32 insn) /* POP {Rlist} */
 const void tg0b_d(arm_state *cpustate, UINT32 pc, UINT32 insn) /* POP {Rlist}{PC} */
 {
 	INT32 offs;
- 
+
     for (offs = 0; offs < 8; offs++)
     {
         if (insn & (1 << offs))
@@ -1286,8 +1286,8 @@ const void tg0b_d(arm_state *cpustate, UINT32 pc, UINT32 insn) /* POP {Rlist}{PC
 
 const void tg0b_e(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1296,8 +1296,8 @@ const void tg0b_e(arm_state *cpustate, UINT32 pc, UINT32 insn)
 
 const void tg0b_f(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
-//	UINT32 addr;
-//	INT32 offs;
+//  UINT32 addr;
+//  INT32 offs;
 
     fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, insn);
     R15 += 2;
@@ -1361,10 +1361,10 @@ const void tg0c_1(arm_state *cpustate, UINT32 pc, UINT32 insn) /* Load */
             ld_st_address += 4;
         }
     }
-    
+
 	if (!rd_in_list)
         SET_REGISTER(cpustate, rd, ld_st_address);
-    
+
 	R15 += 2;
 }
 
@@ -1375,7 +1375,7 @@ const void tg0d_0(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_EQ:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (Z_IS_SET(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1392,7 +1392,7 @@ const void tg0d_1(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_NE:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (Z_IS_CLEAR(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1409,7 +1409,7 @@ const void tg0d_2(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_CS:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (C_IS_SET(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1426,7 +1426,7 @@ const void tg0d_3(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_CC:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (C_IS_CLEAR(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1443,7 +1443,7 @@ const void tg0d_4(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_MI:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (N_IS_SET(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1460,7 +1460,7 @@ const void tg0d_5(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_PL:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (N_IS_CLEAR(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1477,7 +1477,7 @@ const void tg0d_6(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_VS:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (V_IS_SET(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1494,7 +1494,7 @@ const void tg0d_7(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_VC:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (V_IS_CLEAR(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1511,7 +1511,7 @@ const void tg0d_8(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_HI:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (C_IS_SET(GET_CPSR) && Z_IS_CLEAR(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1528,7 +1528,7 @@ const void tg0d_9(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_LS:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (C_IS_CLEAR(GET_CPSR) || Z_IS_SET(GET_CPSR))
     {
         R15 += 4 + (offs << 1);
@@ -1545,7 +1545,7 @@ const void tg0d_a(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_GE:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (!(GET_CPSR & N_MASK) == !(GET_CPSR & V_MASK))
     {
         R15 += 4 + (offs << 1);
@@ -1562,7 +1562,7 @@ const void tg0d_b(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_LT:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (!(GET_CPSR & N_MASK) != !(GET_CPSR & V_MASK))
     {
         R15 += 4 + (offs << 1);
@@ -1579,7 +1579,7 @@ const void tg0d_c(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_GT:
 	INT32 offs;
 
     offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     if (Z_IS_CLEAR(GET_CPSR) && !(GET_CPSR & N_MASK) == !(GET_CPSR & V_MASK))
     {
         R15 += 4 + (offs << 1);
@@ -1610,10 +1610,10 @@ const void tg0d_d(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_LE:
 
 const void tg0d_e(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_AL:
 {
-//	INT32 offs;
+//  INT32 offs;
 
 //    offs = (INT8)(insn & THUMB_INSN_IMM);
-//case 
+//case
     fatalerror("%08x: Undefined Thumb instruction: %04x (ARM9 reserved)\n", pc, insn);
     R15 += 2;
 
@@ -1621,11 +1621,11 @@ const void tg0d_e(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_AL:
 
 const void tg0d_f(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_NV:   // SWI (this is sort of a "hole" in the opcode encoding)
 {
-//	INT32 offs;
+//  INT32 offs;
 
 //    offs = (INT8)(insn & THUMB_INSN_IMM);
 
-//case 
+//case
     cpustate->pendingSwi = 1;
     ARM7_CHECKIRQ;
 
@@ -1633,7 +1633,7 @@ const void tg0d_f(arm_state *cpustate, UINT32 pc, UINT32 insn) // COND_NV:   // 
 
  /* B #offs */
 
-const void tg0e_0(arm_state *cpustate, UINT32 pc, UINT32 insn) 
+const void tg0e_0(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
 	INT32 offs;
 
@@ -1649,7 +1649,7 @@ const void tg0e_0(arm_state *cpustate, UINT32 pc, UINT32 insn)
 const void tg0e_1(arm_state *cpustate, UINT32 pc, UINT32 insn)
 {
 	UINT32 addr;
-	
+
     addr = GET_REGISTER(cpustate, 14);
     addr += (insn & THUMB_BLOP_OFFS) << 1;
     addr &= 0xfffffffc;

@@ -143,7 +143,7 @@ laserdisc_device::~laserdisc_device()
 //**************************************************************************
 
 //-------------------------------------------------
-//  get_field_code - return raw field information 
+//  get_field_code - return raw field information
 //  read from the disc
 //-------------------------------------------------
 
@@ -244,7 +244,7 @@ void laserdisc_device::static_set_screen(device_t &device, const char *screen)
 
 
 //-------------------------------------------------
-//  static_set_get_disc - set the get disc 
+//  static_set_get_disc - set the get disc
 //  delegate
 //-------------------------------------------------
 
@@ -255,7 +255,7 @@ void laserdisc_device::static_set_get_disc(device_t &device, laserdisc_get_disc_
 
 
 //-------------------------------------------------
-//  static_set_get_disc - set the audio interceptor 
+//  static_set_get_disc - set the audio interceptor
 //  delegate
 //-------------------------------------------------
 
@@ -292,7 +292,7 @@ void laserdisc_device::static_set_overlay(device_t &device, UINT32 width, UINT32
 
 //-------------------------------------------------
 //  static_set_overlay - set the overlay visible
-//	subregion
+//  subregion
 //-------------------------------------------------
 
 void laserdisc_device::static_set_overlay_clip(device_t &device, INT32 minx, INT32 maxx, INT32 miny, INT32 maxy)
@@ -302,7 +302,7 @@ void laserdisc_device::static_set_overlay_clip(device_t &device, INT32 minx, INT
 
 
 //-------------------------------------------------
-//  static_set_overlay_position - set the overlay 
+//  static_set_overlay_position - set the overlay
 //  position parameters
 //-------------------------------------------------
 
@@ -316,7 +316,7 @@ void laserdisc_device::static_set_overlay_position(device_t &device, float posx,
 
 //-------------------------------------------------
 //  static_set_overlay_scale - set the overlay
-//	scale parameters
+//  scale parameters
 //-------------------------------------------------
 
 void laserdisc_device::static_set_overlay_scale(device_t &device, float scalex, float scaley)
@@ -528,7 +528,7 @@ void laserdisc_device::advance_slider(INT32 numtracks)
 {
 	// first update to the current time
 	update_slider_pos();
-	
+
 	// then update the track position
 	add_and_clamp_track(numtracks);
 	if (LOG_SLIDER)
@@ -729,7 +729,7 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, at
 					advanceby = 1;
 			}
 			break;
-		
+
 		default:
 			// do nothing
 			break;
@@ -855,7 +855,7 @@ void laserdisc_device::init_video()
 		// bind our handlers
 		m_overupdate_ind16.bind_relative_to(*owner());
 		m_overupdate_rgb32.bind_relative_to(*owner());
-	
+
 		// configure bitmap formats
 		bitmap_format format = !m_overupdate_ind16.isnull() ? BITMAP_FORMAT_IND16 : BITMAP_FORMAT_RGB32;
 		texture_format texformat = !m_overupdate_ind16.isnull() ? TEXFORMAT_PALETTEA16 : TEXFORMAT_ARGB32;
@@ -867,7 +867,7 @@ void laserdisc_device::init_video()
 			m_overbitmap[index].set_palette(machine().palette);
 			m_overbitmap[index].resize(m_overwidth, m_overheight);
 		}
-		
+
 		// allocate overlay texture
 		m_overtex = machine().render().texture_alloc();
 		if (m_overtex == NULL)
@@ -930,7 +930,7 @@ void laserdisc_device::fillbitmap_yuy16(bitmap_yuy16 &bitmap, UINT8 yval, UINT8 
 void laserdisc_device::update_slider_pos()
 {
 	attotime curtime = machine().time();
-	
+
 	// if not moving, update to now
 	if (m_attospertrack == 0)
 		m_sliderupdate = curtime;

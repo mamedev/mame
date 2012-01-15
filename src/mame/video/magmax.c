@@ -71,7 +71,7 @@ VIDEO_START( magmax )
 	state_save_register_global(machine, state->m_flipscreen);
 
 	state->m_prom_tab = auto_alloc_array(machine, UINT32, 256);
-	
+
 	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 
 	/* Allocate temporary bitmap */

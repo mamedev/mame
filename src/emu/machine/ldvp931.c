@@ -146,7 +146,7 @@ void phillips_22vp931_device::reset_w(UINT8 data)
 {
 	// control the CPU state
 	m_i8049_cpu->set_input_line(INPUT_LINE_RESET, data);
-	
+
 	// on an assert, reset the device state as well
 	if (data == ASSERT_LINE)
 		reset();
@@ -154,7 +154,7 @@ void phillips_22vp931_device::reset_w(UINT8 data)
 
 
 //-------------------------------------------------
-//  data_r - handle a parallel data read from the 
+//  data_r - handle a parallel data read from the
 //  22VP931
 //-------------------------------------------------
 
@@ -182,7 +182,7 @@ void phillips_22vp931_device::device_start()
 {
 	// pass through to the parent
 	laserdisc_device::device_start();
-	
+
 	// allocate a timer
 	m_tracktimer = timer_alloc(TID_HALF_TRACK);
 }
@@ -201,19 +201,19 @@ void phillips_22vp931_device::device_reset()
 	m_i8049_out0 = 0;
 	m_i8049_out1 = 0;
 	m_i8049_port1 = 0;
-	
+
 	m_daticval = 0;
 	m_daticerp = 0;
 	m_datastrobe = 0;
-	
+
 	m_fromcontroller = 0;
 	m_fromcontroller_pending = false;
 	m_tocontroller = 0;
 	m_tocontroller_pending = false;
-	
+
 	m_trackdir = 0;
 	m_trackstate = 0;
-	
+
 	m_cmdcount = 0;
 	m_advanced = 0;
 }
@@ -263,7 +263,7 @@ void phillips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id,
 				timer_set(screen().time_until_pos(line*2, which * 2 * screen().width() / 4), TID_VBI_DATA_FETCH, (line << 2) + which);
 			break;
 		}
-		
+
 		case TID_DEFERRED_DATA:
 			// set the value and mark it pending
 			if (LOG_COMMANDS && m_fromcontroller_pending)
@@ -279,19 +279,19 @@ void phillips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id,
 					printf("Cmd: %02X %02X %02X\n", m_cmdbuf[0], m_cmdbuf[1], m_cmdbuf[2]);
 			}
 			break;
-		
+
 		case TID_IRQ_OFF:
 			m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
 			break;
-		
+
 		case TID_DATA_STROBE_OFF:
 			m_datastrobe = 0;
 			break;
-		
+
 		case TID_ERP_OFF:
 			m_daticerp = 0;
 			break;
-		
+
 		case TID_HALF_TRACK:
 			// advance by the count and toggle the state
 			m_trackstate ^= 1;
@@ -301,7 +301,7 @@ void phillips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id,
 				m_advanced += m_trackdir;
 			}
 			break;
-	
+
 		// pass everything else onto the parent
 		default:
 			laserdisc_device::device_timer(timer, id, param, ptr);
@@ -471,7 +471,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_unknown_r )
 
 
 //-------------------------------------------------
-//  i8049_keypad_r - vestigial keypad/button 
+//  i8049_keypad_r - vestigial keypad/button
 //  controls
 //-------------------------------------------------
 
@@ -517,7 +517,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_from_controller_r )
 
 
 //-------------------------------------------------
-//  i8049_to_controller_w - write a value back to 
+//  i8049_to_controller_w - write a value back to
 //  the external controller
 //-------------------------------------------------
 
@@ -672,7 +672,7 @@ READ8_MEMBER( phillips_22vp931_device::i8049_t0_r )
 
 
 //-------------------------------------------------
-//  i8049_t1_r - return the T1 line status, which 
+//  i8049_t1_r - return the T1 line status, which
 //  is connected to the tracking state and is used
 //  to count the number of tracks advanced
 //-------------------------------------------------

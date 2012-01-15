@@ -524,8 +524,8 @@ SCREEN_VBLANK( toaplan0 )
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* Spriteram is always 1 frame ahead, suggesting spriteram buffering.
-	        There are no CPU output registers that control this so we
-	        assume it happens automatically every frame, at the end of vblank */
+            There are no CPU output registers that control this so we
+            assume it happens automatically every frame, at the end of vblank */
 		buffer_spriteram16_w(space,0,0,0xffff);
 	}
 }

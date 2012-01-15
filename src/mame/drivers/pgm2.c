@@ -116,7 +116,7 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 20000000)	// ?? unknown CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
-//	MCFG_DEVICE_DISABLE()
+//  MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_START( pgm2 )
 	MCFG_MACHINE_RESET( pgm2 )
@@ -152,7 +152,7 @@ ROM_START( orleg2 )
 	ROM_REGION( 0x1000000, "bgtile", 0 )
 	ROM_LOAD16_BYTE( "ig-a.u35",  0x000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
 	ROM_LOAD16_BYTE( "ig-a.u36",  0x000001, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
-	
+
 	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a.u12",  0x000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
 	ROM_LOAD32_WORD( "ig-a.u16",  0x000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
@@ -175,7 +175,7 @@ ROM_START( orleg2o )
 	ROM_REGION( 0x1000000, "bgtile", 0 )
 	ROM_LOAD16_BYTE( "ig-a.u35",  0x000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
 	ROM_LOAD16_BYTE( "ig-a.u36",  0x000001, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
-	
+
 	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a.u12",  0x000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
 	ROM_LOAD32_WORD( "ig-a.u16",  0x000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
@@ -198,7 +198,7 @@ ROM_START( kov2nl )
 	ROM_REGION( 0x1000000, "bgtile", 0 )
 	ROM_LOAD16_BYTE( "ig-a3.u35",  0x000000, 0x0800000, CRC(2d46b1f6) SHA1(ea8c805eda6292e86a642e9633d8fee7054d10b1) )
 	ROM_LOAD16_BYTE( "ig-a3.u36",  0x000001, 0x0800000, CRC(df710c36) SHA1(f826c3f496c4f17b46d18af1d8e02cac7b7027ac) )
-	
+
 	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a3.u12",  0x000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
 	ROM_LOAD32_WORD( "ig-a3.u16",  0x000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
@@ -221,7 +221,7 @@ ROM_START( kov2nlo )
 	ROM_REGION( 0x1000000, "bgtile", 0 )
 	ROM_LOAD16_BYTE( "ig-a3.u35",  0x000000, 0x0800000, CRC(2d46b1f6) SHA1(ea8c805eda6292e86a642e9633d8fee7054d10b1) )
 	ROM_LOAD16_BYTE( "ig-a3.u36",  0x000001, 0x0800000, CRC(df710c36) SHA1(f826c3f496c4f17b46d18af1d8e02cac7b7027ac) )
-	
+
 	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a3.u12",  0x000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
 	ROM_LOAD32_WORD( "ig-a3.u16",  0x000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
@@ -240,7 +240,7 @@ static void iga_u16_decode(UINT16 *rom, int len, int ixor)
 
 	for (i = 1; i < len / 2; i+=2)
 	{
-		UINT16 x = ixor; 
+		UINT16 x = ixor;
 
 		if ( (i>>1) & 0x000001) x ^= 0x0010;
 		if ( (i>>1) & 0x000002) x ^= 0x2004;
@@ -265,7 +265,7 @@ static void iga_u12_decode(UINT16* rom, int len, int ixor)
 
 	for (i = 0; i < len / 2; i+=2)
 	{
-		UINT16 x = ixor; 
+		UINT16 x = ixor;
 
 		if ( (i>>1) & 0x000001) x ^= 0x9004;
 		if ( (i>>1) & 0x000002) x ^= 0x0028;

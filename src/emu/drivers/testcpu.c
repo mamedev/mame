@@ -80,14 +80,14 @@ public:
 			0x986a0070		// stb r3,0x0070(r10)
 		};
 
-		// iterate over instructions		
+		// iterate over instructions
 		for (int instnum = 0; instnum < ARRAY_LENGTH(sample_instructions); instnum++)
 		{
 			// write the instruction to execute, followed by a BLR which will terminate the
 			// basic block in the DRC
 			m_space->write_dword(RAM_BASE, sample_instructions[instnum]);
 			m_space->write_dword(RAM_BASE + 4, 0x4e800020);
-			
+
 			// initialize the register state
 			m_cpu->set_state(PPC_PC, RAM_BASE);
 			for (int regnum = 0; regnum < 32; regnum++)
@@ -110,29 +110,29 @@ public:
 			// execute one instruction
 			*m_cpu->m_icountptr = 0;
 			m_cpu->run();
-			
+
 			// dump the final register state
 			printf("Final state:\n");
 			dump_state(false);
 		}
-		
+
 		// all done; just bail
 		throw emu_fatalerror(0, "All done");
 	}
-	
+
 	// startup code; do basic configuration and set a timer to go off immediately
 	virtual void machine_start()
 	{
 		// find the CPU's address space
 		m_space = m_cpu->space(AS_PROGRAM);
-		
+
 		// configure DRC in the most compatible mode
 		ppcdrc_set_options(m_cpu, PPCDRC_COMPATIBLE_OPTIONS);
 
 		// set a timer to go off right away
 		timer_set(attotime::zero);
 	}
-	
+
 	// dump the current CPU state
 	void dump_state(bool disassemble)
 	{
@@ -147,10 +147,10 @@ public:
 			for (int bytenum = 0; bytenum < maxbytes; bytenum++)
 				instruction[bytenum] = m_space->read_byte(RAM_BASE + bytenum);
 
-			// disassemble the current instruction			
+			// disassemble the current instruction
 			bytes = m_cpu->disassemble(buffer, RAM_BASE, instruction, instruction) & DASMFLAG_LENGTHMASK;
 		}
-		
+
 		// output the registers
 		printf("PC : %08X", UINT32(m_cpu->state(PPC_PC)));
 		if (disassemble && bytes > 0)
@@ -167,7 +167,7 @@ public:
 			if (regnum % 4 == 3) printf("\n");
 		}
 		printf("CR : %08X   LR : %08X   CTR: %08X   XER: %08X\n",
-				UINT32(m_cpu->state(PPC_CR)), UINT32(m_cpu->state(PPC_LR)), 
+				UINT32(m_cpu->state(PPC_CR)), UINT32(m_cpu->state(PPC_LR)),
 				UINT32(m_cpu->state(PPC_CTR)), UINT32(m_cpu->state(PPC_XER)));
 		for (int regnum = 0; regnum < 32; regnum++)
 		{
@@ -175,7 +175,7 @@ public:
 			if (regnum % 4 == 3) printf("\n");
 		}
 	}
-	
+
 	// report reads from anywhere
 	READ64_MEMBER( general_r )
 	{

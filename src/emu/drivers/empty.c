@@ -61,7 +61,7 @@ public:
 		// force the UI to show the game select screen
 		ui_menu_force_game_select(machine(), &machine().render().ui_container());
 	}
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		bitmap.fill(RGB_BLACK);

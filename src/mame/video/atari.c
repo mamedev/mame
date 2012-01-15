@@ -712,7 +712,7 @@ VIDEO_START( atari )
 
 	LOG(("atari antic_vh_start\n"));
     memset(&antic, 0, sizeof(antic));
-    
+
 	antic.bitmap = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
 
 	antic.renderer = antic_mode_0_xx;

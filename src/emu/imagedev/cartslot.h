@@ -40,9 +40,9 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { 	load_software_part_region( this, swlist, swname, start_entry ); return TRUE; }
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) {	load_software_part_region( this, swlist, swname, start_entry ); return TRUE; }
 	virtual device_image_partialhash_func get_partial_hash() const { return m_device_partialhash; }
-	
+
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 
 	virtual bool is_readable()  const { return 1; }
@@ -53,7 +53,7 @@ public:
 	virtual const char *image_interface() const { return m_interface; }
 	virtual const char *file_extensions() const { return m_extensions; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	void set_extensions(const char *_extensions) { m_extensions = _extensions; }
 	void set_interface(const char *_interface) { m_interface = _interface; }
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
@@ -67,10 +67,10 @@ protected:
 	// device-level overrides
     virtual void device_config_complete();
 	virtual void device_start();
-	
+
 	int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, bool load);
 	int process_cartridge(bool load);
-	
+
 
 	const char *					m_extensions;
 	const char *					m_interface;

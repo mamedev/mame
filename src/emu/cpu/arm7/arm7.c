@@ -551,7 +551,7 @@ static CPU_EXECUTE( arm7 )
 
 			insn = cpustate->direct->read_decrypted_word(raddr);
 			thumb_handler[(insn & 0xffc0) >> 6](cpustate, pc, insn);
-          
+
         }
         else
         {

@@ -85,7 +85,7 @@ public:
 		if (m_ldv1000 != NULL) return m_ldv1000->status_strobe_r();
 		return CLEAR_LINE;
 	}
-	
+
 	UINT8 laserdisc_ready_r()
 	{
 		if (m_ldv1000 != NULL) return m_ldv1000->command_strobe_r();
@@ -968,15 +968,15 @@ ROM_END
 
 static DRIVER_INIT( fixed )
 {
-//	dlair_state *state = machine.driver_data<dlair_state>();
-//	state->m_laserdisc_type = LASERDISC_TYPE_FIXED;
+//  dlair_state *state = machine.driver_data<dlair_state>();
+//  state->m_laserdisc_type = LASERDISC_TYPE_FIXED;
 }
 
 
 static DRIVER_INIT( variable )
 {
-//	dlair_state *state = machine.driver_data<dlair_state>();
-//	state->m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
+//  dlair_state *state = machine.driver_data<dlair_state>();
+//  state->m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
 
 

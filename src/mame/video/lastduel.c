@@ -314,8 +314,8 @@ SCREEN_VBLANK( lastduel )
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* Spriteram is always 1 frame ahead, suggesting buffering.  I can't find
-	        a register to control this so I assume it happens automatically
-	        every frame at the end of vblank */
+            a register to control this so I assume it happens automatically
+            every frame at the end of vblank */
 		buffer_spriteram16_w(space, 0, 0, 0xffff);
 	}
 }

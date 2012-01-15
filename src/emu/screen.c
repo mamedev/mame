@@ -232,7 +232,7 @@ void screen_device::static_set_screen_update(device_t &device, screen_update_rgb
 
 
 //-------------------------------------------------
-//  static_set_screen_vblank - set the screen 
+//  static_set_screen_vblank - set the screen
 //  VBLANK callback in the device configuration
 //-------------------------------------------------
 
@@ -284,7 +284,7 @@ bool screen_device::device_validity_check(emu_options &options, const game_drive
 		mame_printf_error("%s: %s screen '%s' has a zero refresh rate\n", driver.source_file, driver.name, tag());
 		error = true;
 	}
-	
+
 	return error;
 }
 
@@ -299,7 +299,7 @@ void screen_device::device_start()
 	m_screen_update_ind16.bind_relative_to(*owner());
 	m_screen_update_rgb32.bind_relative_to(*owner());
 	m_screen_vblank.bind_relative_to(*owner());
-	
+
 	// configure bitmap formats and allocate screen bitmaps
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	for (int index = 0; index < ARRAY_LENGTH(m_bitmap); index++)
@@ -414,17 +414,17 @@ void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		case TID_VBLANK_START:
 			vblank_begin();
 			break;
-		
+
 		// signal VBLANK end
 		case TID_VBLANK_END:
 			vblank_end();
 			break;
-		
+
 		// first visible scanline
 		case TID_SCANLINE0:
 			reset_partial_updates();
 			break;
-		
+
 		// subsequent scanlines when scanline updates are enabled
 		case TID_SCANLINE:
 
@@ -797,7 +797,7 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 
 //-------------------------------------------------
-//  vblank_begin - call any external callbacks to 
+//  vblank_begin - call any external callbacks to
 //  signal the VBLANK period has begun
 //-------------------------------------------------
 
@@ -829,7 +829,7 @@ void screen_device::vblank_begin()
 
 
 //-------------------------------------------------
-//  vblank_end - call any external callbacks to 
+//  vblank_end - call any external callbacks to
 //  signal the VBLANK period has ended
 //-------------------------------------------------
 
@@ -908,7 +908,7 @@ void screen_device::update_burnin()
 	int ystart = ((UINT32)rand() % 32767) * ystep / 32767;
 	int srcx, srcy;
 	int x, y;
-	
+
 	switch (curbitmap.format())
 	{
 		default:
@@ -929,7 +929,7 @@ void screen_device::update_burnin()
 			}
 			break;
 		}
-		
+
 		case BITMAP_FORMAT_RGB32:
 		{
 			// iterate over rows in the destination

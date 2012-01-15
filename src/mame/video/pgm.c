@@ -31,8 +31,8 @@ INLINE void pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, U
 			{
 				if (!(destpri[xdrawpos]&2))
 				{
-					dest[xdrawpos] = srcdat;	
-				}						
+					dest[xdrawpos] = srcdat;
+				}
 			}
 		}
 
@@ -60,8 +60,8 @@ INLINE void pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16
 		{
 			if (!(destpri[xdrawpos]&2))
 			{
-				dest[xdrawpos] = srcdat;	
-			}	
+				dest[xdrawpos] = srcdat;
+			}
 		}
 		destpri[xdrawpos]|=1;
 	}
@@ -114,7 +114,7 @@ static void draw_sprite_line( running_machine &machine, int wide, UINT16* dest, 
 							xdrawpos = xpos + xcntdraw;
 						else
 							xdrawpos = xpos + realxsize - xcntdraw;
-			
+
 						pgm_draw_pix(xdrawpos, pri, dest, destpri, srcdat);
 
 						xcntdraw++;
@@ -125,7 +125,7 @@ static void draw_sprite_line( running_machine &machine, int wide, UINT16* dest, 
 							xdrawpos = xpos + realxsize - xcntdraw;
 
 						pgm_draw_pix(xdrawpos, pri, dest, destpri, srcdat);
-					
+
 						xcntdraw++;
 					}
 					else if (xzoombit == 1 && xgrow == 0)
@@ -140,7 +140,7 @@ static void draw_sprite_line( running_machine &machine, int wide, UINT16* dest, 
 							xdrawpos = xpos + realxsize - xcntdraw;
 
 						pgm_draw_pix(xdrawpos, pri, dest, destpri, srcdat);
-						
+
 						xcntdraw++;
 					}
 				}
@@ -184,8 +184,8 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 
 	/* precalculate where drawing will end, for flipped zoomed cases. */
 	/* if we're to avoid pre-decoding the data for each sprite each time we draw then we have to draw the sprite data
-	   in the order it is in ROM due to the nature of the compresson scheme.  This means drawing upwards from the end point
-	   in the case of flipped sprites */
+       in the order it is in ROM due to the nature of the compresson scheme.  This means drawing upwards from the end point
+       in the case of flipped sprites */
 	ycnt = 0;
 	ycntdraw = 0;
 	int realysize = 0;
@@ -227,7 +227,7 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 		{
 			int temp_aoffset = state->m_aoffset;
 			int temp_boffset = state->m_boffset;
-			
+
 			if (!(flip & 0x02))
 				ydrawpos = ypos + ycntdraw;
 			else
@@ -245,7 +245,7 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 			}
 
 			ycntdraw++;
-		
+
 			// we need to draw this line again, so restore our pointers to previous values
 			state->m_aoffset = temp_aoffset;
 			state->m_boffset = temp_boffset;
@@ -301,7 +301,7 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 			else
 			{
 				draw_sprite_line(machine, wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
-			
+
 				if (!(flip & 0x02))
 				{
 					if (ydrawpos>224)
@@ -312,7 +312,7 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 					if (ydrawpos<0)
 						return;
 				}
-			
+
 			}
 
 			ycntdraw++;
@@ -363,7 +363,7 @@ static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* 
 							xdrawpos = xpos + realxsize - xcntdraw;
 
 						pgm_draw_pix_nopri(xdrawpos, dest, destpri, srcdat);
-						
+
 						xcntdraw++;
 					}
 
@@ -405,7 +405,7 @@ static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* 
 							xdrawpos = xpos + realxsize - xcntdraw;
 
 						pgm_draw_pix_pri(xdrawpos, dest, destpri, srcdat);
-						
+
 						xcntdraw++;
 					}
 
@@ -452,7 +452,7 @@ static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, i
 
 	while (ycnt < high)
 	{
-	
+
 		if (!(flip & 0x02))
 			ydrawpos = ypos + ycntdraw;
 		else
@@ -467,7 +467,7 @@ static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, i
 		else
 		{
 			draw_sprite_line_basic(machine, wide, NULL, NULL, flip, xpos, pri, realxsize, palt, 0);
-			
+
 			if (!(flip & 0x02))
 			{
 				if (ydrawpos>224)
@@ -626,7 +626,7 @@ VIDEO_START( pgm )
 	state->m_bdatasize = machine.region("sprmask")->bytes() - 1;
 	state->m_aoffset = 0;
 	state->m_boffset = 0;
-	
+
 	state->m_tx_tilemap = tilemap_create(machine, get_pgm_tx_tilemap_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
 

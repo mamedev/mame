@@ -257,7 +257,7 @@ PALETTE_INIT( v9958 )
 
 	// init v9938 512-color palette
 	PALETTE_INIT_CALL(v9938);
-	
+
 	if (v99x8_device::s_pal_indYJK == NULL)
 		v99x8_device::s_pal_indYJK = global_alloc_array(UINT16, 0x20000);
 
@@ -585,7 +585,7 @@ void v99x8_device::device_start()
 	assert(m_screen != NULL);
 	if (!m_screen->started())
 		throw device_missing_dependencies();
-	
+
 	if (!m_int_callback.isnull())
 	{
 		device_t *device = (m_int_callback_device_name != NULL) ? machine().device(m_int_callback_device_name) : NULL;
@@ -1867,7 +1867,7 @@ skip_first_cc_set:
 
 #define SHORT_WIDTH (256 + 16)
 #define LONG_WIDTH (512 + 32)
-  
+
 const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 	{ 0x02,
 		&v99x8_device::mode_text1<UINT16, LONG_WIDTH>,
@@ -2274,10 +2274,10 @@ void v99x8_device::interrupt_start_vblank ()
 #define CM_HMMC  0xF
 
 /*************************************************************/
-// Many VDP commands are executed in some kind of loop but  
-// essentially, there are only a few basic loop structures  
-// that are re-used. We define the loop structures that are 
-// re-used here so that they have to be entered only once   
+// Many VDP commands are executed in some kind of loop but
+// essentially, there are only a few basic loop structures
+// that are re-used. We define the loop structures that are
+// re-used here so that they have to be entered only once
 /*************************************************************/
 #define pre_loop \
     while ((cnt-=delta) > 0) {
@@ -2331,7 +2331,7 @@ static const int  PPL[4]  = { 256,512,512,256 };
 //  ScrOf ScrOn ScrOf ScrOn
 static const int srch_timing[8]={
   818, 1025,  818,  830, // ntsc
-  696,  854,  696,  684  // pal 
+  696,  854,  696,  684  // pal
 };
 static const int line_timing[8]={
   1063, 1259, 1063, 1161,
@@ -3106,7 +3106,7 @@ UINT8 v99x8_device::command_unit_w (UINT8 Op)
   if (ScrMode<5)
     return(0);
 
-  SM = ScrMode-5;         // Screen mode index 0..3 
+  SM = ScrMode-5;         // Screen mode index 0..3
 
   m_mmc.CM = Op>>4;
   if ((m_mmc.CM & 0x0C) != 0x0C && m_mmc.CM != 0)

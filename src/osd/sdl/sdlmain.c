@@ -777,7 +777,7 @@ bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitma
    const CFIndex count = 1;
    CGRect bounding_rect, success_rect;
    CGContextRef context_ref;
-   
+
    if( chnum == ' ' )
    {
       uni_char = 'n';
@@ -1062,7 +1062,7 @@ bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitma
 	SDL_Surface *drawsurf;
 	SDL_Color fcol = { 0xff, 0xff, 0xff };
 	UINT16 ustr[16];
-	
+
 	ttffont = (TTF_Font *)font;
 
 	memset(ustr,0,sizeof(ustr));

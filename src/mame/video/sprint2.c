@@ -156,12 +156,12 @@ SCREEN_VBLANK( sprint2 )
 		const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
 		/*
-	     * Collisions are detected for both player cars:
-	     *
-	     * D7 => state->m_collision w/ white playfield
-	     * D6 => state->m_collision w/ black playfield or another car
-	     *
-	     */
+         * Collisions are detected for both player cars:
+         *
+         * D7 => state->m_collision w/ white playfield
+         * D6 => state->m_collision w/ black playfield or another car
+         *
+         */
 
 		for (i = 0; i < 2; i++)
 		{

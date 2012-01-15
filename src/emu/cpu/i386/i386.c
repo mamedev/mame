@@ -2260,7 +2260,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 	{
 		if(newflags & 0x00020000) // if returning to virtual 8086 mode
 		{
-//			UINT8 SSRPL,SSDPL;
+//          UINT8 SSRPL,SSDPL;
 			memset(&desc, 0, sizeof(desc));
 			desc.selector = newCS;
 			i386_load_protected_mode_segment(cpustate,&desc);
@@ -2275,118 +2275,118 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			/* Return to v86 mode */
 			logerror("IRET (%08x): Returning to Virtual 8086 mode.\n",cpustate->pc);
 			// Should these be done at this point?  The 386 programmers' reference is a bit confusing about this
-/*			if(RPL != 3)
-			{
-				logerror("IRET to V86 (%08x): Return CS RPL is not 3\n",cpustate->pc);
-				FAULT(FAULT_GP,newCS);
-			}
-			if(operand32 == 0)
-			{
-				if(REG16(SP)+36 > cpustate->sreg[SS].limit)
-				{
-					logerror("IRET to V86 (%08x): Stack does not have enough room left\n",cpustate->pc);
-					FAULT(FAULT_SS,0);
-				}
-			}
-			else
-			{
-				if(REG32(ESP)+36 > cpustate->sreg[SS].limit)
-				{
-					logerror("IRET to V86 (%08x): Stack does not have enough space left\n",cpustate->pc);
-					FAULT(FAULT_SS,0);
-				}
-			}
-			// code segment checks
-			if((newCS & ~0x07) == 0)
-			{
-				logerror("IRET to V86 (%08x): Return CS selector is null\n",cpustate->pc);
-				FAULT(FAULT_GP,newCS);
-			}
-			if(desc.flags & 0x04)
-			{  // LDT
-				if(newCS > cpustate->ldtr.limit)
-				{
-					logerror("IRET to V86 (%08x): Return CS selector is past LDT limit\n",cpustate->pc);
-					FAULT(FAULT_GP,newCS);
-				}
-			}
-			else
-			{  // GDT
-				if(newCS > cpustate->gdtr.limit)
-				{
-					logerror("IRET to V86 (%08x): Return CS selector is past GDT limit\n",cpustate->pc);
-					FAULT(FAULT_GP,newCS);
-				}
-			}
-			if((desc.flags & 0x18) != 0x18)
-			{
-				logerror("IRET to V86 (%08x): Return CS segment is not a code segment\n",cpustate->pc);
-				FAULT(FAULT_GP,newCS);
-			}
-			if(DPL != 3)
-			{
-				logerror("IRET to V86 (%08x): Return CS segment does not have a DPL of 3\n",cpustate->pc);
-				FAULT(FAULT_GP,newCS);
-			}
-			if(!(desc.flags & 0x0080))
-			{
-				logerror("IRET to V86 (%08x): Return CS segment is not present\n",cpustate->pc);
-				FAULT(FAULT_NP,newCS);
-			}
-			// Stack segment checks
-			if((newSS & ~0x07) == 0)
-			{
-				logerror("IRET to V86 (%08x): Return SS segment is null\n",cpustate->pc);
-				FAULT(FAULT_GP,newSS);
-			}
-			if(desc.flags & 0x04)
-			{  // LDT
-				if(newSS > cpustate->ldtr.limit)
-				{
-					logerror("IRET to V86 (%08x): Return SS selector is past LDT limit\n",cpustate->pc);
-					FAULT(FAULT_GP,newSS);
-				}
-			}
-			else
-			{  // GDT
-				if(newSS > cpustate->gdtr.limit)
-				{
-					logerror("IRET to V86 (%08x): Return SS selector is past GDT limit\n",cpustate->pc);
-					FAULT(FAULT_GP,newSS);
-				}
-			}
-			if(SSRPL != RPL)
-			{
-				logerror("IRET to V86 (%08x): Return SS selector RPL is not equal to CS selector RPL\n",cpustate->pc);
-				FAULT(FAULT_GP,newSS);
-			}
-			if(((stack.flags & 0x0018) != 0x10) && (!(stack.flags & 0x02)))
-			{
-				logerror("IRET to V86 (%08x): Return SS segment is not a writable data segment\n",cpustate->pc);
-				FAULT(FAULT_GP,newSS);
-			}
-			if(SSDPL != RPL)
-			{
-				logerror("IRET to V86 (%08x): Return SS segment DPL is not equal to CS selector RPL\n",cpustate->pc);
-				FAULT(FAULT_GP,newSS);
-			}
-			if(!(stack.flags & 0x0080))
-			{
-				logerror("IRET to V86 (%08x): Return SS segment is not present\n",cpustate->pc);
-				FAULT(FAULT_NP,newSS);
-			}
+/*          if(RPL != 3)
+            {
+                logerror("IRET to V86 (%08x): Return CS RPL is not 3\n",cpustate->pc);
+                FAULT(FAULT_GP,newCS);
+            }
+            if(operand32 == 0)
+            {
+                if(REG16(SP)+36 > cpustate->sreg[SS].limit)
+                {
+                    logerror("IRET to V86 (%08x): Stack does not have enough room left\n",cpustate->pc);
+                    FAULT(FAULT_SS,0);
+                }
+            }
+            else
+            {
+                if(REG32(ESP)+36 > cpustate->sreg[SS].limit)
+                {
+                    logerror("IRET to V86 (%08x): Stack does not have enough space left\n",cpustate->pc);
+                    FAULT(FAULT_SS,0);
+                }
+            }
+            // code segment checks
+            if((newCS & ~0x07) == 0)
+            {
+                logerror("IRET to V86 (%08x): Return CS selector is null\n",cpustate->pc);
+                FAULT(FAULT_GP,newCS);
+            }
+            if(desc.flags & 0x04)
+            {  // LDT
+                if(newCS > cpustate->ldtr.limit)
+                {
+                    logerror("IRET to V86 (%08x): Return CS selector is past LDT limit\n",cpustate->pc);
+                    FAULT(FAULT_GP,newCS);
+                }
+            }
+            else
+            {  // GDT
+                if(newCS > cpustate->gdtr.limit)
+                {
+                    logerror("IRET to V86 (%08x): Return CS selector is past GDT limit\n",cpustate->pc);
+                    FAULT(FAULT_GP,newCS);
+                }
+            }
+            if((desc.flags & 0x18) != 0x18)
+            {
+                logerror("IRET to V86 (%08x): Return CS segment is not a code segment\n",cpustate->pc);
+                FAULT(FAULT_GP,newCS);
+            }
+            if(DPL != 3)
+            {
+                logerror("IRET to V86 (%08x): Return CS segment does not have a DPL of 3\n",cpustate->pc);
+                FAULT(FAULT_GP,newCS);
+            }
+            if(!(desc.flags & 0x0080))
+            {
+                logerror("IRET to V86 (%08x): Return CS segment is not present\n",cpustate->pc);
+                FAULT(FAULT_NP,newCS);
+            }
+            // Stack segment checks
+            if((newSS & ~0x07) == 0)
+            {
+                logerror("IRET to V86 (%08x): Return SS segment is null\n",cpustate->pc);
+                FAULT(FAULT_GP,newSS);
+            }
+            if(desc.flags & 0x04)
+            {  // LDT
+                if(newSS > cpustate->ldtr.limit)
+                {
+                    logerror("IRET to V86 (%08x): Return SS selector is past LDT limit\n",cpustate->pc);
+                    FAULT(FAULT_GP,newSS);
+                }
+            }
+            else
+            {  // GDT
+                if(newSS > cpustate->gdtr.limit)
+                {
+                    logerror("IRET to V86 (%08x): Return SS selector is past GDT limit\n",cpustate->pc);
+                    FAULT(FAULT_GP,newSS);
+                }
+            }
+            if(SSRPL != RPL)
+            {
+                logerror("IRET to V86 (%08x): Return SS selector RPL is not equal to CS selector RPL\n",cpustate->pc);
+                FAULT(FAULT_GP,newSS);
+            }
+            if(((stack.flags & 0x0018) != 0x10) && (!(stack.flags & 0x02)))
+            {
+                logerror("IRET to V86 (%08x): Return SS segment is not a writable data segment\n",cpustate->pc);
+                FAULT(FAULT_GP,newSS);
+            }
+            if(SSDPL != RPL)
+            {
+                logerror("IRET to V86 (%08x): Return SS segment DPL is not equal to CS selector RPL\n",cpustate->pc);
+                FAULT(FAULT_GP,newSS);
+            }
+            if(!(stack.flags & 0x0080))
+            {
+                logerror("IRET to V86 (%08x): Return SS segment is not present\n",cpustate->pc);
+                FAULT(FAULT_NP,newSS);
+            }
 
-			if(newEIP > desc.limit)
-			{
-				logerror("IRET to V86 (%08x): New EIP is past CS segment limit\n",cpustate->pc);
-				FAULT(FAULT_GP,0);
-			}
-			*/
+            if(newEIP > desc.limit)
+            {
+                logerror("IRET to V86 (%08x): New EIP is past CS segment limit\n",cpustate->pc);
+                FAULT(FAULT_GP,0);
+            }
+            */
 			set_flags(cpustate,newflags);
 			cpustate->eip = POP32(cpustate) & 0xffff;  // high 16 bits are ignored
 			cpustate->sreg[CS].selector = POP32(cpustate) & 0xffff;
 			POP32(cpustate);  // already set flags
-//			if(RPL > CPL)
+//          if(RPL > CPL)
 			{
 				newESP = POP32(cpustate);
 				newSS = POP32(cpustate) & 0xffff;
@@ -2649,10 +2649,10 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 					FAULT(FAULT_GP,0)
 				}
 
-//				if(operand32 == 0)
-//					REG16(SP) += 10;
-//				else
-//					REG32(ESP) += 20;
+//              if(operand32 == 0)
+//                  REG16(SP) += 10;
+//              else
+//                  REG32(ESP) += 20;
 
 				if(operand32 == 0)
 				{

@@ -4432,7 +4432,7 @@ static DRIVER_INIT( kov )
 static DRIVER_INIT( kovboot )
 {
 	pgm_basic_init(machine);
-//	pgm_kov_decrypt(machine);
+//  pgm_kov_decrypt(machine);
 	kovsh_latch_init(machine);
 	install_protection_asic_sim_kov(machine);
 }

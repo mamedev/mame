@@ -59,7 +59,7 @@ const UINT32 BITMAP_ROWBYTES_ALIGN = 128;
 //**************************************************************************
 
 //-------------------------------------------------
-//  compute_rowpixels - compute an aligned 
+//  compute_rowpixels - compute an aligned
 //  rowpixels value
 //-------------------------------------------------
 
@@ -161,7 +161,7 @@ void bitmap_t::allocate(int width, int height, int xslop, int yslop)
 
 	// delete any existing stuff
 	reset();
-	
+
 	// handle empty requests cleanly
 	if (width <= 0 || height <= 0)
 		return;
@@ -204,7 +204,7 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 	int new_rowpixels = compute_rowpixels(width, xslop);
 	UINT32 new_allocbytes = new_rowpixels * (height + 2 * yslop) * m_bpp / 8;
 	new_allocbytes += BITMAP_OVERALL_ALIGN - 1;
-	
+
 	// if we need more memory, just realloc
 	if (new_allocbytes > m_allocbytes)
 	{
@@ -213,7 +213,7 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 		set_palette(palette);
 		return;
 	}
-	
+
 	// otherwise, reconfigure
 	m_rowpixels = new_rowpixels;
 	m_width = width;
@@ -247,7 +247,7 @@ void bitmap_t::reset()
 
 
 //-------------------------------------------------
-//  wrap -- wrap an array of memory; the target 
+//  wrap -- wrap an array of memory; the target
 //  bitmap does not own the memory
 //-------------------------------------------------
 
@@ -255,7 +255,7 @@ void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
 {
 	// delete any existing stuff
 	reset();
-	
+
 	// initialize relevant fields
 	m_base = base;
 	m_rowpixels = rowpixels;
@@ -266,8 +266,8 @@ void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
 
 
 //-------------------------------------------------
-//  wrap -- wrap a subrectangle of an existing 
-//  bitmap by copying its fields; the target 
+//  wrap -- wrap a subrectangle of an existing
+//  bitmap by copying its fields; the target
 //  bitmap does not own the memory
 //-------------------------------------------------
 
@@ -279,7 +279,7 @@ void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect)
 
 	// delete any existing stuff
 	reset();
-	
+
 	// copy relevant fields
 	m_base = source.raw_pixptr(subrect.min_y, subrect.min_x);
 	m_rowpixels = source.m_rowpixels;

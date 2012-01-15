@@ -240,10 +240,10 @@ pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, devi
 	  m_i8049_port2(0)
 {
 }
-	
+
 
 //-------------------------------------------------
-//  control_w - write callback when the CONTROL 
+//  control_w - write callback when the CONTROL
 //  line is toggled
 //-------------------------------------------------
 
@@ -252,7 +252,7 @@ void pioneer_pr8210_device::control_w(UINT8 data)
 	// set the new value and remember the last
 	UINT8 prev = m_control;
 	m_control = data;
-	
+
 	// handle rising edge
 	if (prev != ASSERT_LINE && data == ASSERT_LINE)
 	{
@@ -351,7 +351,7 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 	switch (id)
 	{
 		// update the VBI data in the PIA as soon as it is ready;
-		// this must happen early in the frame because the player 
+		// this must happen early in the frame because the player
 		// logic relies on fetching it here
 		case TID_VBI_DATA_FETCH:
 
@@ -396,12 +396,12 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 				}
 			}
 			break;
-		
+
 		// clear the VSYNC flag
 		case TID_VSYNC_OFF:
 			m_vsync = false;
 			break;
-	
+
 		// pass everything else onto the parent
 		default:
 			laserdisc_device::device_timer(timer, id, param, ptr);
@@ -458,7 +458,7 @@ void pioneer_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, 
 
 
 //-------------------------------------------------
-//  player_update - update callback, called on the 
+//  player_update - update callback, called on the
 //  first visible line of the frame
 //-------------------------------------------------
 
@@ -639,7 +639,7 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_bus_r )
        $04 = (in) SIZE 8/12
        $02 = (in) FG via op-amp (spindle motor stop detector)
        $01 = (in) SLOW TIMER OUT
-	*/
+    */
 
 	UINT8 result = 0x00;
 
@@ -684,7 +684,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port1_w )
        $02 = (out) SCAN A (/SCAN)
        $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
     */
-    
+
 	// set the new value
 	UINT8 prev = m_i8049_port1;
 	m_i8049_port1 = data;
@@ -933,7 +933,7 @@ simutrek_special_device::simutrek_special_device(const machine_config &mconfig, 
 
 
 //-------------------------------------------------
-//  data_w - write callback when the parallel data 
+//  data_w - write callback when the parallel data
 //  port is written to
 //-------------------------------------------------
 
@@ -1028,7 +1028,7 @@ void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id,
 		case TID_IRQ_OFF:
 			m_i8748_cpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
 			break;
-		
+
 		// latch data
 		case TID_LATCH_DATA:
 			m_data = param;

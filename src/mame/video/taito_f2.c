@@ -971,7 +971,7 @@ SCREEN_VBLANK( taitof2_partial_buffer_delayed_qzchikyu )
 	if (vblank_on)
 	{
 		/* spriteram[2] and [3] are 1 frame behind...
-	       probably thundfox_eof_callback would work fine */
+           probably thundfox_eof_callback would work fine */
 
 		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 		UINT16 *spriteram = state->m_spriteram;

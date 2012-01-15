@@ -120,11 +120,11 @@ struct _ide_device
 	UINT16			num_cylinders;
 	UINT8			num_sectors;
 	UINT8			num_heads;
-	
+
 	chd_file       *handle;
 	hard_disk_file *disk;
-	bool			is_image_device;	
-};	
+	bool			is_image_device;
+};
 
 
 typedef struct _ide_state ide_state;
@@ -173,7 +173,7 @@ struct _ide_state
 
 	UINT8			gnetreadlock;
 	ide_hardware *	hardware;
-	
+
 	UINT8			cur_drive;
 	ide_device		drive[2];
 };
@@ -1872,7 +1872,7 @@ static DEVICE_START( ide_controller )
 
 	/* set MAME harddisk handle */
 	config = (const ide_config *)downcast<const legacy_device_base *>(device)->inline_config();
-	
+
 	ide->drive[0].handle = get_disk_handle(device->machine(), (config->master != NULL) ? config->master : device->tag());
 	ide->drive[0].disk = hard_disk_open(ide->drive[0].handle);
 	ide->drive[0].is_image_device = false;
@@ -1914,7 +1914,7 @@ static DEVICE_START( ide_controller )
 
 		/* build the features page */
 		ide_build_features(ide,0);
-	} 
+	}
 	if (ide->drive[1].disk != NULL)
 	{
 		hdinfo = hard_disk_get_info(ide->drive[1].disk);
@@ -1928,7 +1928,7 @@ static DEVICE_START( ide_controller )
 
 		/* build the features page */
 		ide_build_features(ide,1);
-	}	
+	}
 	if (config->hardware != NULL) {
 		ide->hardware = (ide_hardware *)config->hardware;
 		ide->hardware->get_info(ide->device, ide->drive[0].features, ide->drive[0].num_cylinders, ide->drive[0].num_sectors, ide->drive[0].num_heads);
@@ -2055,7 +2055,7 @@ static DEVICE_RESET( ide_controller )
 				}
 			}
 		}
-	} 
+	}
 	if (device->machine().device( hardtag_slave.cstr() )) {
 		if (!ide->drive[1].disk)
 		{
@@ -2084,7 +2084,7 @@ static DEVICE_RESET( ide_controller )
 				}
 			}
 		}
-	} 	
+	}
 	if (ide->hardware != NULL) {
 		ide->hardware->get_info(ide->device, ide->drive[0].features, ide->drive[0].num_cylinders, ide->drive[0].num_sectors, ide->drive[0].num_heads);
 		ide_generate_features (ide,0);

@@ -378,7 +378,7 @@ WRITE32_MEMBER( n64_periphs::open_w )
 
 // RDRAM Interface (RI)
 
-#define RDRAM_CONFIG 		(0)
+#define RDRAM_CONFIG		(0)
 #define RDRAM_DEVICE_ID 	(1)
 #define RDRAM_DELAY			(2)
 #define RDRAM_MODE			(3)
@@ -1336,9 +1336,9 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 0;
 			pi_status |= 1;
 
-   			attotime dma_period = attotime::from_hz(93750000) * (pi_rd_len + 1) * 3;
-   			//printf("want read dma in %d\n", (pi_rd_len + 1));
-   			pi_dma_timer->adjust(dma_period);
+			attotime dma_period = attotime::from_hz(93750000) * (pi_rd_len + 1) * 3;
+			//printf("want read dma in %d\n", (pi_rd_len + 1));
+			pi_dma_timer->adjust(dma_period);
 			break;
 		}
 
@@ -1348,9 +1348,9 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 1;
 			pi_status |= 1;
 
-   			attotime dma_period = attotime::from_hz(93750000) * (pi_wr_len + 1) * 3;
-   			//printf("want write dma in %d\n", (pi_wr_len + 1));
-   			pi_dma_timer->adjust(dma_period);
+			attotime dma_period = attotime::from_hz(93750000) * (pi_wr_len + 1) * 3;
+			//printf("want write dma in %d\n", (pi_wr_len + 1));
+			pi_dma_timer->adjust(dma_period);
 			break;
 		}
 
