@@ -138,7 +138,10 @@ static void I386OP(fpu_group_d8)(i386_state *cpustate)		// Opcode 0xd8
 	if (modrm < 0xc0)
 	{
 		UINT32 ea = GetEA(cpustate,modrm);
-		UINT32 src = READ32(cpustate,ea);
+		UINT32 tmp32 = READ32(cpustate,ea);
+		float  src;
+
+		src = *((float *) &tmp32); /* must bypass type conversion */
 
 		switch ((modrm >> 3) & 0x7)
 		{
@@ -306,8 +309,10 @@ static void I386OP(fpu_group_d9)(i386_state *cpustate)		// Opcode 0xd9
 		{
 			case 0:			// FLD single-precision
 			{
+				UINT32 tmp32;
 				X87_REG t;
-				t.i = READ32(cpustate,ea);
+				tmp32 = READ32(cpustate,ea);
+				t.f = *((float *) &tmp32); /* must bypass type conversion */
 				FPU_PUSH(cpustate,t);
 				CYCLES(cpustate,3);
 				break;
