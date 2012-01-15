@@ -6,8 +6,8 @@
 VIDEO_START( galpanic )
 {
 	galpanic_state *state = machine.driver_data<galpanic_state>();
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_sprites_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	machine.primary_screen->register_screen_bitmap(state->m_sprites_bitmap);
 }
 
 PALETTE_INIT( galpanic )

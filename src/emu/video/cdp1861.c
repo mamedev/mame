@@ -82,7 +82,7 @@ void cdp1861_device::device_start()
 	// find devices
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	m_screen =  machine().device<screen_device>(m_screen_tag);
-	m_bitmap.allocate(m_screen->width(), m_screen->height(), m_screen->format());
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	// register for state saving
 	save_item(NAME(m_disp));

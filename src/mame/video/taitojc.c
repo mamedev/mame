@@ -261,7 +261,6 @@ static void taitojc_exit(running_machine &machine)
 VIDEO_START( taitojc )
 {
 	taitojc_state *state = machine.driver_data<taitojc_state>();
-	int width, height;
 
 	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitojc_exit), &machine));
@@ -285,11 +284,8 @@ VIDEO_START( taitojc )
 
 	state->m_texture = auto_alloc_array(machine, UINT8, 0x400000);
 
-	state->m_framebuffer.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-
-	width = machine.primary_screen->width();
-	height = machine.primary_screen->height();
-	state->m_zbuffer.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_framebuffer);
+	machine.primary_screen->register_screen_bitmap(state->m_zbuffer);
 }
 
 static void draw_object_bank(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri)

@@ -296,7 +296,7 @@ VIDEO_START( nbmj8991 )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_tmpbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
 	state->m_videoram = auto_alloc_array(machine, UINT8, width * height);
 	state->m_clut = auto_alloc_array(machine, UINT8, 0x800);
 	memset(state->m_videoram, 0x00, (width * height * sizeof(UINT8)));

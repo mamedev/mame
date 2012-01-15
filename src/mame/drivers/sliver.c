@@ -441,8 +441,8 @@ static VIDEO_START(sliver)
 {
 	sliver_state *state = machine.driver_data<sliver_state>();
 
-	state->m_bitmap_bg.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_bitmap_fg.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap_bg);
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap_fg);
 }
 
 static SCREEN_UPDATE_RGB32(sliver)

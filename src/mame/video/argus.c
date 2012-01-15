@@ -312,7 +312,7 @@ VIDEO_START( valtric )
 
 	tilemap_set_transparent_pen(state->m_tx_tilemap,  15);
 
-	state->m_mosaicbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_mosaicbitmap);
 
 	jal_blend_init(machine, 1);
 }

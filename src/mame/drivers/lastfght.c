@@ -114,7 +114,7 @@ static VIDEO_START( lastfght )
 	lastfght_state *state = machine.driver_data<lastfght_state>();
 	int i;
 	for (i = 0; i < 2; i++)
-		state->m_bitmap[i].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+		machine.primary_screen->register_screen_bitmap(state->m_bitmap[i]);
 
 	state->save_item(NAME(state->m_bitmap[0]));
 	state->save_item(NAME(state->m_bitmap[1]));

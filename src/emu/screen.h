@@ -77,74 +77,58 @@ class screen_bitmap
 {
 private:
 	// internal helpers
-	bitmap_t &appropriate_bitmap()
-	{
-		switch (m_format)
-		{
-			case BITMAP_FORMAT_IND16: return m_ind16;
-			case BITMAP_FORMAT_RGB32: return m_rgb32;
-			default: throw emu_fatalerror("Invalid screen_bitmap format");
-		}
-	}
-
-	const bitmap_t &appropriate_bitmap() const
-	{
-		switch (m_format)
-		{
-			case BITMAP_FORMAT_IND16: return m_ind16;
-			case BITMAP_FORMAT_RGB32: return m_rgb32;
-			default: throw emu_fatalerror("Invalid screen_bitmap format");
-		}
-	}
+	bitmap_t &live() { assert(m_live != NULL); return *m_live; }
+	const bitmap_t &live() const { assert(m_live != NULL); return *m_live; }
 
 public:
 	// construction/destruction
 	screen_bitmap()
 		: m_format(BITMAP_FORMAT_INVALID),
-		  m_texformat(TEXFORMAT_UNDEFINED) { }
+		  m_texformat(TEXFORMAT_UNDEFINED),
+		  m_live(NULL) { }
 	screen_bitmap(bitmap_ind16 &orig)
 		: m_format(BITMAP_FORMAT_IND16),
 		  m_texformat(TEXFORMAT_PALETTE16), 
+		  m_live(&m_ind16),
 		  m_ind16(orig, orig.cliprect()) { }
 	screen_bitmap(bitmap_rgb32 &orig)
 		: m_format(BITMAP_FORMAT_RGB32),
 		  m_texformat(TEXFORMAT_RGB32), 
+		  m_live(&m_rgb32),
 		  m_rgb32(orig, orig.cliprect()) { }
 	
-	// allocation
-	void allocate(int width, int height)
-	{
-		switch (m_format)
-		{
-			case BITMAP_FORMAT_IND16: m_ind16.allocate(width, height); break;
-			case BITMAP_FORMAT_RGB32: m_rgb32.allocate(width, height); break;
-			default: throw emu_fatalerror("Invalid screen_bitmap format");
-		}
-	}
+	// resizing
+	void resize(int width, int height) { live().resize(width, height); }
 
 	// conversion
-	operator bitmap_t &() { return appropriate_bitmap(); }
+	operator bitmap_t &() { return live(); }
 	bitmap_ind16 &as_ind16() { assert(m_format == BITMAP_FORMAT_IND16); return m_ind16; }
 	bitmap_rgb32 &as_rgb32() { assert(m_format == BITMAP_FORMAT_RGB32); return m_rgb32; }
 	
 	// getters
-	INT32 width() const { return appropriate_bitmap().width(); }
-	INT32 height() const { return appropriate_bitmap().height(); }
-	INT32 rowpixels() const { return appropriate_bitmap().rowpixels(); }
-	INT32 rowbytes() const { return appropriate_bitmap().rowbytes(); }
-	UINT8 bpp() const { return appropriate_bitmap().bpp(); }
+	INT32 width() const { return live().width(); }
+	INT32 height() const { return live().height(); }
+	INT32 rowpixels() const { return live().rowpixels(); }
+	INT32 rowbytes() const { return live().rowbytes(); }
+	UINT8 bpp() const { return live().bpp(); }
 	bitmap_format format() const { return m_format; }
 	texture_format texformat() const { return m_texformat; }
-	bool valid() const { return appropriate_bitmap().valid(); }
-	palette_t *palette() const { return appropriate_bitmap().palette(); }
-	const rectangle &cliprect() const { return appropriate_bitmap().cliprect(); }
+	bool valid() const { return live().valid(); }
+	palette_t *palette() const { return live().palette(); }
+	const rectangle &cliprect() const { return live().cliprect(); }
 
 	// operations
-	void set_palette(palette_t *palette) { appropriate_bitmap().set_palette(palette); }
+	void set_palette(palette_t *palette) { live().set_palette(palette); }
 	void set_format(bitmap_format format, texture_format texformat)
 	{
 		m_format = format;
 		m_texformat = texformat;
+		switch (format)
+		{
+			case BITMAP_FORMAT_IND16:	m_live = &m_ind16;	break;
+			case BITMAP_FORMAT_RGB32:	m_live = &m_rgb32;	break;
+			default:					m_live = NULL;		break;
+		}
 		m_ind16.reset();
 		m_rgb32.reset();
 	}
@@ -153,6 +137,7 @@ private:
 	// internal state
 	bitmap_format		m_format;
 	texture_format		m_texformat;
+	bitmap_t *			m_live;
 	bitmap_ind16		m_ind16;
 	bitmap_rgb32		m_rgb32;
 };
@@ -237,6 +222,7 @@ public:
 	
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
+	void register_screen_bitmap(bitmap_t &bitmap);
 
 	// internal to the video system
 	bool update_quads();
@@ -315,6 +301,7 @@ private:
 	UINT64				m_frame_number;				// the current frame number
 	UINT32				m_partial_updates_this_frame;// partial update counter this frame
 
+	// VBLANK callbacks
 	class callback_item
 	{
 	public:
@@ -327,6 +314,20 @@ private:
 		vblank_state_delegate		m_callback;
 	};
 	simple_list<callback_item> m_callback_list;		// list of VBLANK callbacks
+
+	// auto-sizing bitmaps
+	class auto_bitmap_item
+	{
+	public:
+		auto_bitmap_item(bitmap_t &bitmap)
+			: m_next(NULL),
+			  m_bitmap(bitmap) { }
+		auto_bitmap_item *next() const { return m_next; }
+		
+		auto_bitmap_item *			m_next;
+		bitmap_t &					m_bitmap;
+	};
+	simple_list<auto_bitmap_item> m_auto_bitmap_list; // list of registered bitmaps
 };
 
 // device type definition

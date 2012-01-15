@@ -158,10 +158,10 @@ static VIDEO_START( mazerbla )
 	state->m_dbg_lookup = 4;
 #endif
 
-	state->m_tmpbitmaps[0].allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmpbitmaps[1].allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmpbitmaps[2].allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmpbitmaps[3].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmaps[0]);
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmaps[1]);
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmaps[2]);
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmaps[3]);
 
 	state->save_item(NAME(state->m_tmpbitmaps[0]));
 	state->save_item(NAME(state->m_tmpbitmaps[1]));

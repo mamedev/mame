@@ -97,7 +97,7 @@ VIDEO_START( toobin )
 	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
 
 	/* allocate a playfield bitmap for rendering */
-	state->m_pfbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_pfbitmap);
 
 	state->save_item(NAME(state->m_brightness));
 }

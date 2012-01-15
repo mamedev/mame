@@ -75,12 +75,10 @@ static TILE_GET_INFO( get_tx_tile_info )
 VIDEO_START( gaiden )
 {
 	gaiden_state *state = machine.driver_data<gaiden_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
-	state->m_tile_bitmap_bg.allocate(width, height);
-	state->m_tile_bitmap_fg.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
 
 	state->m_background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info_raiga, tilemap_scan_rows, 16, 16, 64, 32);
@@ -99,19 +97,17 @@ VIDEO_START( gaiden )
 	tilemap_set_scrolldx(state->m_text_layer, 0, -1);
 
 	/* set up sprites */
-	state->m_sprite_bitmap.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 }
 
 VIDEO_START( mastninj )
 {
 
 	gaiden_state *state = machine.driver_data<gaiden_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
-	state->m_tile_bitmap_bg.allocate(width, height);
-	state->m_tile_bitmap_fg.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
 
 	state->m_background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info_raiga, tilemap_scan_rows, 16, 16, 64, 32);
@@ -122,7 +118,7 @@ VIDEO_START( mastninj )
 	tilemap_set_transparent_pen(state->m_text_layer, 15);
 
 	/* set up sprites */
-	state->m_sprite_bitmap.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
 	tilemap_set_scrolldx(state->m_background, -248, 248);
 	tilemap_set_scrolldx(state->m_foreground, -252, 252);
@@ -131,12 +127,10 @@ VIDEO_START( mastninj )
 VIDEO_START( raiga )
 {
 	gaiden_state *state = machine.driver_data<gaiden_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
-	state->m_tile_bitmap_bg.allocate(width, height);
-	state->m_tile_bitmap_fg.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
 
 	state->m_background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info_raiga, tilemap_scan_rows, 16, 16, 64, 32);
@@ -147,7 +141,7 @@ VIDEO_START( raiga )
 	tilemap_set_transparent_pen(state->m_text_layer, 0);
 
 	/* set up sprites */
-	state->m_sprite_bitmap.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 }
 
 VIDEO_START( drgnbowl )

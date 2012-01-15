@@ -300,10 +300,17 @@ void screen_device::device_start()
 	m_screen_update_rgb32.bind_relative_to(*owner());
 	m_screen_vblank.bind_relative_to(*owner());
 	
-	// configure bitmap formats
+	// configure bitmap formats and allocate screen bitmaps
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	for (int index = 0; index < ARRAY_LENGTH(m_bitmap); index++)
+	{
 		m_bitmap[index].set_format(format(), texformat);
+		register_screen_bitmap(m_bitmap[index]);
+	}
+
+	// allocate raw textures
+	m_texture[0] = machine().render().texture_alloc();
+	m_texture[1] = machine().render().texture_alloc();
 
 	// configure the default cliparea
 	render_container::user_settings settings;
@@ -522,39 +529,13 @@ void screen_device::realloc_screen_bitmaps()
 	if (m_type == SCREEN_TYPE_VECTOR)
 		return;
 
-	// extract the current width/height from the bitmap
-	int curwidth = 0, curheight = 0;
-	if (m_bitmap[0].valid())
-	{
-		curwidth = m_bitmap[0].width();
-		curheight = m_bitmap[0].height();
-	}
+	// reize all registered screen bitmaps
+	for (auto_bitmap_item *item = m_auto_bitmap_list.first(); item != NULL; item = item->next())
+		item->m_bitmap.resize(m_width, m_height);
 
-	// if we're too small to contain this width/height, reallocate our bitmaps and textures
-	if (m_width > curwidth || m_height > curheight)
-	{
-		// free what we have currently
-		machine().render().texture_free(m_texture[0]);
-		machine().render().texture_free(m_texture[1]);
-
-		// compute new width/height
-		curwidth = MAX(m_width, curwidth);
-		curheight = MAX(m_height, curheight);
-
-		// allocate raw textures
-		m_texture[0] = machine().render().texture_alloc();
-		m_texture[1] = machine().render().texture_alloc();
-
-		// allocate bitmaps
-		m_bitmap[0].allocate(curwidth, curheight);
-		m_bitmap[0].set_palette(machine().palette);
-		m_bitmap[1].allocate(curwidth, curheight);
-		m_bitmap[1].set_palette(machine().palette);
-
-		// set up textures
-		m_texture[0]->set_bitmap(m_bitmap[0], m_visarea, m_bitmap[0].texformat());
-		m_texture[1]->set_bitmap(m_bitmap[1], m_visarea, m_bitmap[1].texformat());
-	}
+	// re-set up textures
+	m_texture[0]->set_bitmap(m_bitmap[0], m_visarea, m_bitmap[0].texformat());
+	m_texture[1]->set_bitmap(m_bitmap[1], m_visarea, m_bitmap[1].texformat());
 }
 
 
@@ -564,18 +545,8 @@ void screen_device::realloc_screen_bitmaps()
 
 void screen_device::set_visible_area(int min_x, int max_x, int min_y, int max_y)
 {
-	// validate arguments
-	assert(min_x >= 0);
-	assert(min_y >= 0);
-	assert(min_x < max_x);
-	assert(min_y < max_y);
-
-	rectangle visarea;
-	visarea.min_x = min_x;
-	visarea.max_x = max_x;
-	visarea.min_y = min_y;
-	visarea.max_y = max_y;
-
+	rectangle visarea(min_x, max_x, min_y, max_y);
+	assert(!visarea.empty());
 	configure(m_width, m_height, visarea, m_frame_period);
 }
 
@@ -806,6 +777,22 @@ void screen_device::register_vblank_callback(vblank_state_delegate vblank_callba
 	// if not found, register
 	if (item == NULL)
 		m_callback_list.append(*global_alloc(callback_item(vblank_callback)));
+}
+
+
+//-------------------------------------------------
+//  register_screen_bitmap - registers a bitmap
+//  that should track the screen size
+//-------------------------------------------------
+
+void screen_device::register_screen_bitmap(bitmap_t &bitmap)
+{
+	// append to the list
+	m_auto_bitmap_list.append(*global_alloc(auto_bitmap_item(bitmap)));
+
+	// if allocating now, just do it
+	bitmap.allocate(width(), height());
+	bitmap.set_palette(machine().palette);
 }
 
 

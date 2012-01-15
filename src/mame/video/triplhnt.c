@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( triplhnt )
 {
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
-	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_helper);
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 }

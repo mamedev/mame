@@ -116,7 +116,7 @@ VIDEO_START( wolfpack )
 
 	state->m_LFSR = auto_alloc_array(machine, UINT8, 0x8000);
 
-	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_helper);
 
 	for (i = 0; i < 0x8000; i++)
 	{

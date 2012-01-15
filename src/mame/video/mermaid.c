@@ -184,8 +184,8 @@ VIDEO_START( mermaid )
 	tilemap_set_scroll_cols(state->m_fg_tilemap, 32);
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
-	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_helper);
+	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

@@ -117,15 +117,12 @@ static void model3_exit(running_machine &machine)
 VIDEO_START( model3 )
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	int width, height;
 
 	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine));
 
-	width = machine.primary_screen->width();
-	height = machine.primary_screen->height();
-	state->m_bitmap3d.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_zbuffer.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap3d);
+	machine.primary_screen->register_screen_bitmap(state->m_zbuffer);
 
 	state->m_m3_char_ram = auto_alloc_array_clear(machine, UINT64, 0x100000/8);
 	state->m_m3_tile_ram = auto_alloc_array_clear(machine, UINT64, 0x8000/8);

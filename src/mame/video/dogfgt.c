@@ -73,7 +73,7 @@ VIDEO_START( dogfgt )
 	state->m_bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
 	state->save_pointer(NAME(state->m_bitmapram), BITMAPRAM_SIZE);
 
-	state->m_pixbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_pixbitmap);
 	state->save_item(NAME(state->m_pixbitmap));
 }
 

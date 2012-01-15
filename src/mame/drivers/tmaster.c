@@ -299,7 +299,7 @@ static VIDEO_START( tmaster )
 	{
 		for (buffer = 0; buffer < 2; buffer++)
 		{
-			state->m_bitmap[layer][buffer].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+			machine.primary_screen->register_screen_bitmap(state->m_bitmap[layer][buffer]);
 			state->m_bitmap[layer][buffer].fill(0xff);
 		}
 	}

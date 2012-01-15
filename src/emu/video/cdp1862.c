@@ -122,7 +122,7 @@ void cdp1862_device::device_start()
 
 	// find devices
 	m_screen =  machine().device<screen_device>(m_screen_tag);
-	m_bitmap.allocate(m_screen->width(), m_screen->height(), m_screen->format());
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	// init palette
 	initialize_palette();

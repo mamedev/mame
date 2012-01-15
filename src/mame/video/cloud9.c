@@ -36,7 +36,7 @@ VIDEO_START( cloud9 )
 			3,	resistances, state->m_bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	state->m_spritebitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_spritebitmap);
 
 	/* register for savestates */
 	state->save_pointer(NAME(state->m_videoram), 0x8000);

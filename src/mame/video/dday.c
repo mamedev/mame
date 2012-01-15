@@ -219,7 +219,7 @@ VIDEO_START( dday )
 	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_sl_tilemap = tilemap_create(machine, get_sl_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	state->m_main_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_main_bitmap);
 
 	tilemap_set_transmask(state->m_bg_tilemap, 0, 0x00f0, 0xff0f); /* pens 0-3 have priority over the foreground layer */
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);

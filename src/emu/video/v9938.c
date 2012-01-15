@@ -596,7 +596,7 @@ void v99x8_device::device_start()
 	m_vdp_ops_count = 1;
 	m_vdp_engine = NULL;
 
-	m_bitmap.allocate(m_screen->width(), m_screen->height());
+	m_screen->register_screen_bitmap(m_bitmap);
 	m_size_old = -1;
 
 	// allocate VRAM
@@ -2212,7 +2212,6 @@ void v99x8_device::interrupt_start_vblank ()
 		else
 			m_screen->set_visible_area (0, 256 + 16 - 1, 0, 212 + 28 - 1);
 
-		m_bitmap.allocate(m_screen->width(), m_screen->height());
 		m_size_old = m_size;
 	}
 

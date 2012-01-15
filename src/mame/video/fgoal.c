@@ -32,8 +32,8 @@ WRITE8_HANDLER( fgoal_xpos_w )
 VIDEO_START( fgoal )
 {
 	fgoal_state *state = machine.driver_data<fgoal_state>();
-	state->m_fgbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_bgbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_fgbitmap);
+	machine.primary_screen->register_screen_bitmap(state->m_bgbitmap);
 
 	state->save_item(NAME(state->m_fgbitmap));
 	state->save_item(NAME(state->m_bgbitmap));

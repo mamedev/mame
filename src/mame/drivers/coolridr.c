@@ -293,10 +293,7 @@ public:
 static VIDEO_START(coolridr)
 {
 	coolridr_state *state = machine.driver_data<coolridr_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
-
-	state->m_temp_bitmap_sprites.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites);
 	state->m_test_offs = 0x2000;
 }
 

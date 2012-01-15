@@ -1511,7 +1511,7 @@ TIMER_CALLBACK( mcd212_perform_scan )
 void mcd212_init(running_machine &machine, mcd212_regs_t *mcd212)
 {
     mcd212->m_machine = &machine;
-    mcd212->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+    machine.primary_screen->register_screen_bitmap(mcd212->m_bitmap);
 
     int index = 0;
     for(index = 0; index < 2; index++)
@@ -1658,7 +1658,7 @@ VIDEO_START( cdimono1 )
     state->m_mcd212_regs.scan_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
 
 	screen_device *screen = downcast<screen_device *>(machine.device("lcd"));
-    state->m_lcdbitmap.allocate(screen->width(), screen->height());
+    screen->register_screen_bitmap(state->m_lcdbitmap);
 }
 
 SCREEN_UPDATE_RGB32( cdimono1 )

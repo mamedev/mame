@@ -864,8 +864,8 @@ void laserdisc_device::init_video()
 		for (int index = 0; index < ARRAY_LENGTH(m_overbitmap); index++)
 		{
 			m_overbitmap[index].set_format(format, texformat);
-			m_overbitmap[index].allocate(m_overwidth, m_overheight);
 			m_overbitmap[index].set_palette(machine().palette);
+			m_overbitmap[index].resize(m_overwidth, m_overheight);
 		}
 		
 		// allocate overlay texture

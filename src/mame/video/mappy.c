@@ -323,7 +323,7 @@ VIDEO_START( superpac )
 	mappy_state *state = machine.driver_data<mappy_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, superpac_get_tile_info,superpac_tilemap_scan,8,8,36,28);
-	state->m_sprite_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 31);
 }

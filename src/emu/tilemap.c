@@ -291,19 +291,11 @@ INLINE int gfx_elements_changed(tilemap_t *tmap)
 
 void tilemap_init(running_machine &machine)
 {
-	UINT32 screen_width, screen_height;
-
-	if (machine.primary_screen == NULL)
+	if (machine.primary_screen == NULL || machine.primary_screen->width() == 0)
 		return;
 
-	screen_width  = machine.primary_screen->width();
-	screen_height = machine.primary_screen->height();
-
-	if (screen_width != 0 && screen_height != 0)
-	{
-		machine.priority_bitmap.allocate(screen_width, screen_height);
-		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tilemap_exit), &machine));
-	}
+	machine.primary_screen->register_screen_bitmap(machine.priority_bitmap);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tilemap_exit), &machine));
 }
 
 

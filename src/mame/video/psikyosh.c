@@ -1227,10 +1227,8 @@ VIDEO_START( psikyosh )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	UINT8 *alphatable = state->m_alphatable;
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
 
-	state->m_z_bitmap.allocate(width, height); /* z-buffer */
+	machine.primary_screen->register_screen_bitmap(state->m_z_bitmap); /* z-buffer */
 	state->m_zoom_bitmap.allocate(16*16, 16*16); /* temp buffer for assembling sprites */
 	state->m_bg_bitmap.allocate(32*16, 32*16); /* temp buffer for assembling tilemaps */
 	state->m_bg_zoom = auto_alloc_array(machine, UINT16, 256);

@@ -69,8 +69,6 @@ static TILE_GET_INFO( get_ms32_extra_tile_info )
 VIDEO_START( ms32 )
 {
 	ms32_state *state = machine.driver_data<ms32_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
 
 	state->m_priram_8   = auto_alloc_array_clear(machine, UINT8, 0x2000);
 	state->m_palram_16  = auto_alloc_array_clear(machine, UINT16, 0x20000);
@@ -87,9 +85,9 @@ VIDEO_START( ms32 )
 
 
 	/* set up tile layers */
-	state->m_temp_bitmap_tilemaps.allocate(width, height);
-	state->m_temp_bitmap_sprites.allocate(width, height);
-	state->m_temp_bitmap_sprites_pri.allocate(width, height); // not actually being used for rendering, we embed pri info in the raw colour bitmap
+	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_tilemaps);
+	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites);
+	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites_pri); // not actually being used for rendering, we embed pri info in the raw colour bitmap
 
 	state->m_temp_bitmap_tilemaps.fill(0);
 	state->m_temp_bitmap_sprites.fill(0);

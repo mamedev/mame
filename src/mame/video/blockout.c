@@ -66,7 +66,7 @@ VIDEO_START( blockout )
 	blockout_state *state = machine.driver_data<blockout_state>();
 
 	/* Allocate temporary bitmaps */
-	state->m_tmpbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
 	state->save_item(NAME(state->m_tmpbitmap));
 }
 

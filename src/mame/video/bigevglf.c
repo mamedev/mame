@@ -58,10 +58,10 @@ VIDEO_START( bigevglf )
 {
 	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
-	state->m_tmp_bitmap[0].allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmp_bitmap[1].allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmp_bitmap[2].allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmp_bitmap[3].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap[0]);
+	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap[1]);
+	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap[2]);
+	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap[3]);
 	state->save_item(NAME(state->m_tmp_bitmap[0]));
 	state->save_item(NAME(state->m_tmp_bitmap[1]));
 	state->save_item(NAME(state->m_tmp_bitmap[2]));

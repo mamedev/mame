@@ -82,15 +82,13 @@ static void truxton2_postload(running_machine &machine)
 VIDEO_START( toaplan2 )
 {
 	toaplan2_state *state = machine.driver_data<toaplan2_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
 
 	/* cache the VDP device */
 	state->m_vdp0 = machine.device<gp9001vdp_device>("gp9001vdp0");
 	state->m_vdp1 = machine.device<gp9001vdp_device>("gp9001vdp1");
 
 	/* our current VDP implementation needs this bitmap to work with */
-	state->m_custom_priority_bitmap.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_custom_priority_bitmap);
 
 	if (state->m_vdp0 != NULL)
 	{
@@ -100,7 +98,7 @@ VIDEO_START( toaplan2 )
 
 	if (state->m_vdp1 != NULL)
 	{
-		state->m_secondary_render_bitmap.allocate(width, height);
+		machine.primary_screen->register_screen_bitmap(state->m_secondary_render_bitmap);
 		state->m_vdp1->custom_priority_bitmap = &state->m_custom_priority_bitmap;
 	}
 

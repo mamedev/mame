@@ -394,7 +394,7 @@ VIDEO_START( tceptor )
 	decode_sprite32(machine, "gfx4");
 
 	/* allocate temp bitmaps */
-	state->m_temp_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap);
 
 	namco_road_init(machine, gfx_index);
 

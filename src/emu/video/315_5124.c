@@ -1609,8 +1609,6 @@ void sega315_5124_device::device_config_complete()
 void sega315_5124_device::device_start()
 {
 	m_screen = machine().device<screen_device>( m_screen_tag );
-	int width = m_screen->width();
-	int height = m_screen->height();
 
 	/* Resolve callbacks */
 	m_cb_int.resolve( m_int_callback, *this );
@@ -1624,8 +1622,8 @@ void sega315_5124_device::device_start()
 	m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
 
 	/* Make temp bitmap for rendering */
-	m_tmpbitmap.allocate(width, height);
-	m_y1_bitmap.allocate(width, height);
+	m_screen->register_screen_bitmap(m_tmpbitmap);
+	m_screen->register_screen_bitmap(m_y1_bitmap);
 
 	m_display_timer = timer_alloc(TIMER_LINE);
 	m_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());

@@ -394,7 +394,7 @@ VIDEO_START( nbmj9195_1layer )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_tmpbitmap[0].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[0]);
 	state->m_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);
 	state->m_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
@@ -409,8 +409,8 @@ VIDEO_START( nbmj9195_2layer )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_tmpbitmap[0].allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmpbitmap[1].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[0]);
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[1]);
 	state->m_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->m_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);
@@ -427,8 +427,8 @@ VIDEO_START( nbmj9195_nb22090 )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->m_tmpbitmap[0].allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmpbitmap[1].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[0]);
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap[1]);
 	state->m_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->m_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
 	state->m_videoworkram[0] = auto_alloc_array_clear(machine, UINT16, width * height);

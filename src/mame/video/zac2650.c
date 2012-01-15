@@ -144,8 +144,8 @@ VIDEO_START( tinvader )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 24, 24, 32, 32);
 
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_spritebitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
+	machine.primary_screen->register_screen_bitmap(state->m_spritebitmap);
 
 	gfx_element_set_source(machine.gfx[1], state->m_s2636_0_ram);
 	gfx_element_set_source(machine.gfx[2], state->m_s2636_0_ram);

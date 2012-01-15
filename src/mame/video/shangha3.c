@@ -69,7 +69,7 @@ VIDEO_START( shangha3 )
 	shangha3_state *state = machine.driver_data<shangha3_state>();
 	int i;
 
-	state->m_rawbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_rawbitmap);
 
 	for (i = 0;i < 14;i++)
 		state->m_drawmode_table[i] = DRAWMODE_SOURCE;

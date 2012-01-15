@@ -465,7 +465,7 @@ static WRITE8_HANDLER(video_w)
 static VIDEO_START( sms )
 {
 	sms_state *state = machine.driver_data<sms_state>();
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 
 	state_save_register_global_array(machine, state->m_vid_regs);
 	state_save_register_global_bitmap(machine, &state->m_bitmap);

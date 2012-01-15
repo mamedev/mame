@@ -207,7 +207,12 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 	
 	// if we need more memory, just realloc
 	if (new_allocbytes > m_allocbytes)
-		return allocate(width, height, xslop, yslop);
+	{
+		palette_t *palette = m_palette;
+		allocate(width, height, xslop, yslop);
+		set_palette(palette);
+		return;
+	}
 	
 	// otherwise, reconfigure
 	m_rowpixels = new_rowpixels;

@@ -107,7 +107,7 @@ static VIDEO_START( taitotz )
 {
 	taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	state->framebuffer.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->framebuffer);
 }
 
 static SCREEN_UPDATE_RGB32( taitotz )

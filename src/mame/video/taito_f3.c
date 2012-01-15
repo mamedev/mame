@@ -542,7 +542,7 @@ VIDEO_START( f3 )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const struct F3config *pCFG=&f3_config_table[0];
-	int width, height, i;
+	int i;
 
 	state->m_f3_alpha_level_2as=127;
 	state->m_f3_alpha_level_2ad=127;
@@ -647,9 +647,7 @@ VIDEO_START( f3 )
 	state->m_pixel_layer = tilemap_create(machine, get_tile_info_pixel,tilemap_scan_cols,8,8,64,32);
 	state->m_pf_line_inf = auto_alloc_array(machine, struct f3_playfield_line_inf, 5);
 	state->m_sa_line_inf = auto_alloc_array(machine, struct f3_spritealpha_line_inf, 1);
-	width = machine.primary_screen->width();
-	height = machine.primary_screen->height();
-	state->m_pri_alp_bitmap.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_pri_alp_bitmap);
 	state->m_tile_opaque_sp = auto_alloc_array(machine, UINT8, machine.gfx[2]->total_elements);
 	for (i=0; i<8; i++)
 		state->m_tile_opaque_pf[i] = auto_alloc_array(machine, UINT8, machine.gfx[1]->total_elements);

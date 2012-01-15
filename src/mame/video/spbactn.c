@@ -111,11 +111,8 @@ VIDEO_START( spbactn )
 	spbactn_state *state = machine.driver_data<spbactn_state>();
 
 	/* allocate bitmaps */
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
-
-	state->m_tile_bitmap_bg.allocate(width, height);
-	state->m_tile_bitmap_fg.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
 }
 
 SCREEN_UPDATE_RGB32( spbactn )

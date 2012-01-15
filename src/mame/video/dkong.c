@@ -947,7 +947,7 @@ VIDEO_START( dkong )
 	switch (state->m_hardware_type)
 	{
 		case HARDWARE_TRS02:
-			state->m_bg_bits.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);
 			state->m_gfx3 = machine.region("gfx3")->base();
 			state->m_gfx3_len = machine.region("gfx3")->bytes();
 		    /* fall through */
@@ -960,7 +960,7 @@ VIDEO_START( dkong )
 			state->m_bg_tilemap = tilemap_create(machine, radarscp1_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 			tilemap_set_scrolldx(state->m_bg_tilemap, 0, 128);
 
-			state->m_bg_bits.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);
 			state->m_gfx4 = machine.region("gfx4")->base();
 			state->m_gfx3 = machine.region("gfx3")->base();
 			state->m_gfx3_len = machine.region("gfx3")->bytes();

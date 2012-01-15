@@ -196,7 +196,7 @@ VIDEO_START( pacland )
 	pacland_state *state = machine.driver_data<pacland_state>();
 	int color;
 
-	state->m_fg_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_fg_bitmap);
 	state->m_fg_bitmap.fill(0xffff);
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);

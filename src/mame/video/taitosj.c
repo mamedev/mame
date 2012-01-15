@@ -180,8 +180,8 @@ VIDEO_START( taitosj )
 
 	for (i = 0; i < 3; i++)
 	{
-		state->m_layer_bitmap[i].allocate(machine.primary_screen->width(), machine.primary_screen->height());
-		state->m_sprite_layer_collbitmap2[i].allocate(machine.primary_screen->width(), machine.primary_screen->height());
+		machine.primary_screen->register_screen_bitmap(state->m_layer_bitmap[i]);
+		machine.primary_screen->register_screen_bitmap(state->m_sprite_layer_collbitmap2[i]);
 	}
 
 	state->m_sprite_sprite_collbitmap1.allocate(32,32);

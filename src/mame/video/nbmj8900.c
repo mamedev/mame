@@ -383,8 +383,8 @@ VIDEO_START( nbmj8900_2layer )
 	state->m_screen_width = machine.primary_screen->width();
 	state->m_screen_height = machine.primary_screen->height();
 
-	state->m_tmpbitmap0.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmpbitmap1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap0);
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap1);
 	state->m_videoram0 = auto_alloc_array(machine, UINT8, state->m_screen_width * state->m_screen_height);
 	state->m_videoram1 = auto_alloc_array(machine, UINT8, state->m_screen_width * state->m_screen_height);
 	state->m_palette = auto_alloc_array(machine, UINT8, 0x200);

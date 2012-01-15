@@ -225,8 +225,8 @@ static TILE_GET_INFO( montecar_get_tile_info2 )
 VIDEO_START( firetrk )
 {
 	firetrk_state *state = machine.driver_data<firetrk_state>();
-	state->m_helper1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_helper1);
+	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
 	state->m_tilemap1 = tilemap_create(machine, firetrk_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
 	state->m_tilemap2 = tilemap_create(machine, firetrk_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
@@ -236,8 +236,8 @@ VIDEO_START( firetrk )
 VIDEO_START( superbug )
 {
 	firetrk_state *state = machine.driver_data<firetrk_state>();
-	state->m_helper1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_helper1);
+	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
 	state->m_tilemap1 = tilemap_create(machine, superbug_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
 	state->m_tilemap2 = tilemap_create(machine, superbug_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
@@ -247,8 +247,8 @@ VIDEO_START( superbug )
 VIDEO_START( montecar )
 {
 	firetrk_state *state = machine.driver_data<firetrk_state>();
-	state->m_helper1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_helper2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_helper1);
+	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
 	state->m_tilemap1 = tilemap_create(machine, montecar_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
 	state->m_tilemap2 = tilemap_create(machine, montecar_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);

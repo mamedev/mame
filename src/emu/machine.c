@@ -450,6 +450,10 @@ int running_machine::run(bool firstrun)
 		error = MAMERR_FATALERROR;
 	}
 
+	// make sure our phase is set properly before cleaning up,
+	// in case we got here via exception
+	m_current_phase = MACHINE_PHASE_EXIT;
+
 	// call all exit callbacks registered
 	call_notifiers(MACHINE_NOTIFY_EXIT);
 	zip_file_cache_clear();

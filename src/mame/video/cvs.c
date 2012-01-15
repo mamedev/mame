@@ -169,9 +169,9 @@ VIDEO_START( cvs )
 	}
 
 	/* create helper bitmaps */
-	state->m_background_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_collision_background.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_scrolled_collision_background.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_background_bitmap);
+	machine.primary_screen->register_screen_bitmap(state->m_collision_background);
+	machine.primary_screen->register_screen_bitmap(state->m_scrolled_collision_background);
 
 	/* register save */
 	state->save_item(NAME(state->m_background_bitmap));

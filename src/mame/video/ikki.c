@@ -119,7 +119,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 VIDEO_START( ikki )
 {
 	ikki_state *state = machine.driver_data<ikki_state>();
-	state->m_sprite_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 	state->save_item(NAME(state->m_sprite_bitmap));
 }
 

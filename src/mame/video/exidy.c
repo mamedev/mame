@@ -35,7 +35,7 @@ VIDEO_START( exidy )
 {
 	exidy_state *state = machine.driver_data<exidy_state>();
 
-	state->m_background_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_background_bitmap);
 	state->m_motion_object_1_vid.allocate(16, 16);
 	state->m_motion_object_2_vid.allocate(16, 16);
 	state->m_motion_object_2_clip.allocate(16, 16);

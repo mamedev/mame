@@ -24,10 +24,10 @@ VIDEO_START( changela )
 	state->m_memory_devices = auto_alloc_array(machine, UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
 	state->m_tree_ram = auto_alloc_array(machine, UINT8, 2 * 0x20);
 
-	state->m_obj0_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_river_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tree0_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tree1_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_obj0_bitmap);
+	machine.primary_screen->register_screen_bitmap(state->m_river_bitmap);
+	machine.primary_screen->register_screen_bitmap(state->m_tree0_bitmap);
+	machine.primary_screen->register_screen_bitmap(state->m_tree1_bitmap);
 
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(changela_scanline_callback));
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(30), 30);

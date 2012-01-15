@@ -59,15 +59,13 @@ static TILE_GET_INFO( tx_get_tile_info )
 VIDEO_START( fstarfrc )
 {
 	tecmo16_state *state = machine.driver_data<tecmo16_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
-	state->m_tile_bitmap_bg.allocate(width, height);
-	state->m_tile_bitmap_fg.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
 
 	/* set up sprites */
-	state->m_sprite_bitmap.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,32,32);
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,32,32);
@@ -85,15 +83,13 @@ VIDEO_START( fstarfrc )
 VIDEO_START( ginkun )
 {
 	tecmo16_state *state = machine.driver_data<tecmo16_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
-	state->m_tile_bitmap_bg.allocate(width, height);
-	state->m_tile_bitmap_fg.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
 
 	/* set up sprites */
-	state->m_sprite_bitmap.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
@@ -109,15 +105,13 @@ VIDEO_START( ginkun )
 VIDEO_START( riot )
 {
 	tecmo16_state *state = machine.driver_data<tecmo16_state>();
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
 
 	/* set up tile layers */
-	state->m_tile_bitmap_bg.allocate(width, height);
-	state->m_tile_bitmap_fg.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_bg);
+	machine.primary_screen->register_screen_bitmap(state->m_tile_bitmap_fg);
 
 	/* set up sprites */
-	state->m_sprite_bitmap.allocate(width, height);
+	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);

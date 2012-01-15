@@ -227,7 +227,7 @@ static void hyhoo_gfxdraw(running_machine &machine)
 VIDEO_START( hyhoo )
 {
 	hyhoo_state *state = machine.driver_data<hyhoo_state>();
-	state->m_tmpbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
 }
 
 

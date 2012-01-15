@@ -81,7 +81,7 @@ VIDEO_START( starshp1 )
 		val = (val << 1) | (bit & 1);
 	}
 
-	state->m_helper.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_helper);
 }
 
 

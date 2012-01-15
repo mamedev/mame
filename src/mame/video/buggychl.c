@@ -15,8 +15,8 @@ PALETTE_INIT( buggychl )
 VIDEO_START( buggychl )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
-	state->m_tmp_bitmap1.allocate(machine.primary_screen->width(), machine.primary_screen->height());
-	state->m_tmp_bitmap2.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap1);
+	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap2);
 
 	state->save_item(NAME(state->m_tmp_bitmap1));
 	state->save_item(NAME(state->m_tmp_bitmap2));

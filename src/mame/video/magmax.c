@@ -72,7 +72,7 @@ VIDEO_START( magmax )
 
 	state->m_prom_tab = auto_alloc_array(machine, UINT32, 256);
 	
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 
 	/* Allocate temporary bitmap */
 	for (i=0; i<256; i++)

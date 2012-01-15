@@ -61,7 +61,7 @@ static VIDEO_START( astrocorp )
 {
 	astrocorp_state *state = machine.driver_data<astrocorp_state>();
 
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 
 	state->save_item(NAME(state->m_bitmap));
 	state->save_item       (NAME(state->m_screen_enable));

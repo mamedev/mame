@@ -730,8 +730,6 @@ static void get_sprite_info_donpachi( running_machine &machine )
 static void sprite_init_cave( running_machine &machine )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	int screen_width = machine.primary_screen->width();
-	int screen_height = machine.primary_screen->height();
 
 	if (state->m_spritetype[0] == 0 || state->m_spritetype[0] == 2)	// most of the games
 	{
@@ -745,7 +743,7 @@ static void sprite_init_cave( running_machine &machine )
 	}
 
 	state->m_sprite_zbuf_baseval = 0x10000 - MAX_SPRITE_NUM;
-	state->m_sprite_zbuf.allocate(screen_width, screen_height);
+	machine.primary_screen->register_screen_bitmap(state->m_sprite_zbuf);
 	state->m_blit.baseaddr_zbuf = &state->m_sprite_zbuf.pix8(0);
 	state->m_blit.line_offset_zbuf = state->m_sprite_zbuf.rowpixels() * state->m_sprite_zbuf.bpp() / 8;
 

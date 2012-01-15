@@ -117,7 +117,7 @@ VIDEO_START( gomoku )
 	int bgdata;
 	int color;
 
-	state->m_bg_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bg_bitmap);
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32, 32);
 

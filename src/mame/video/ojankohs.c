@@ -296,7 +296,7 @@ VIDEO_START( ojankoc )
 {
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->m_tmpbitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
 	state->m_videoram = auto_alloc_array(machine, UINT8, 0x8000);
 	state->m_paletteram = auto_alloc_array(machine, UINT8, 0x20);
 

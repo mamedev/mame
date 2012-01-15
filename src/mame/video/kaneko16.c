@@ -122,7 +122,7 @@ VIDEO_START( kaneko16_1xVIEW2_tilemaps )
 
 	state->m_tmap[3] = 0;
 
-	state->m_sprites_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_sprites_bitmap);
 
 	{
 		int dx, dy;
@@ -294,7 +294,7 @@ VIDEO_START( galsnew )
 
 	state->m_tmap[3] = 0;
 
-	state->m_sprites_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_sprites_bitmap);
 
 	{
 		int dx = 0x5b, dy = 8;

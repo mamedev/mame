@@ -165,7 +165,7 @@ void decospr_device::decospr_sprite_kludge(int x, int y)
 
 void decospr_device::alloc_sprite_bitmap()
 {
-	m_sprite_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
 }
 
 void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
