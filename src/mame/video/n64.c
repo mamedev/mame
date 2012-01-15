@@ -66,16 +66,16 @@ void Processor::GetAlphaCvg(UINT8 *comb_alpha)
 
 /*****************************************************************************/
 
-void Processor::VideoUpdate(bitmap_rgb32 &bitmap)
+void Processor::VideoUpdate(n64_periphs *n64, bitmap_rgb32 &bitmap)
 {
-	switch(n64_vi_control & 0x3)
+	switch(n64->vi_control & 0x3)
 	{
 		case PIXEL_SIZE_16BIT:
-			VideoUpdate16(bitmap);
+			VideoUpdate16(n64, bitmap);
 			break;
 
 		case PIXEL_SIZE_32BIT:
-			VideoUpdate32(bitmap);
+			VideoUpdate32(n64, bitmap);
 			break;
 
 		default:
@@ -84,27 +84,27 @@ void Processor::VideoUpdate(bitmap_rgb32 &bitmap)
 	}
 }
 
-void Processor::VideoUpdate16(bitmap_rgb32 &bitmap)
+void Processor::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 {
-    int fsaa = (((n64_vi_control >> 8) & 3) < 2);
-    int divot = (n64_vi_control >> 4) & 1;
+    int fsaa = (((n64->vi_control >> 8) & 3) < 2);
+    int divot = (n64->vi_control >> 4) & 1;
 
 	UINT32 prev_cvg = 0;
 	UINT32 next_cvg = 0;
-    //int dither_filter = (n64_vi_control >> 16) & 1;
-    //int vibuffering = ((n64_vi_control & 2) && fsaa && divot);
+    //int dither_filter = (n64->vi_control >> 16) & 1;
+    //int vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
-	UINT16 *frame_buffer = (UINT16*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
-	UINT32 hb = ((n64_vi_origin & 0xffffff) >> 2) >> 1;
+	UINT16 *frame_buffer = (UINT16*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
+	UINT32 hb = ((n64->vi_origin & 0xffffff) >> 2) >> 1;
 	UINT8* hidden_buffer = &m_hidden_bits[hb];
 
-	INT32 hdiff = (n64_vi_hstart & 0x3ff) - ((n64_vi_hstart >> 16) & 0x3ff);
-	float hcoeff = ((float)(n64_vi_xscale & 0xfff) / (1 << 10));
+	INT32 hdiff = (n64->vi_hstart & 0x3ff) - ((n64->vi_hstart >> 16) & 0x3ff);
+	float hcoeff = ((float)(n64->vi_xscale & 0xfff) / (1 << 10));
 	UINT32 hres = ((float)hdiff * hcoeff);
-	INT32 invisiblewidth = n64_vi_width - hres;
+	INT32 invisiblewidth = n64->vi_width - hres;
 
-	INT32 vdiff = ((n64_vi_vstart & 0x3ff) - ((n64_vi_vstart >> 16) & 0x3ff)) >> 1;
-	float vcoeff = ((float)(n64_vi_yscale & 0xfff) / (1 << 10));
+	INT32 vdiff = ((n64->vi_vstart & 0x3ff) - ((n64->vi_vstart >> 16) & 0x3ff)) >> 1;
+	float vcoeff = ((float)(n64->vi_yscale & 0xfff) / (1 << 10));
 	UINT32 vres = ((float)vdiff * vcoeff);
 
 	if (vdiff <= 0 || hdiff <= 0)
@@ -150,18 +150,18 @@ void Processor::VideoUpdate16(bitmap_rgb32 &bitmap)
 				{
 					//if (/*!vibuffering &&*/ state->m_rdp.GetMiscState()->m_curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2))
 					//{
-						//video_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR],&hidden_buffer[pixels ^ BYTE_ADDR_XOR], n64_vi_width);
+						//video_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR],&hidden_buffer[pixels ^ BYTE_ADDR_XOR], n64->vi_width);
 					//}
 				}
 				//else if (dither_filter && state->m_rdp.GetMiscState()->m_curpixel_cvg == 7 && i > 0 && j > 0 && i < (hres - 1) && j < (vres - 1))
 				//{
 					//if (vibuffering)
 					//{
-					//  restore_filter16_buffer(&r, &g, &b, &ViBuffer[i][j], n64_vi_width);
+					//  restore_filter16_buffer(&r, &g, &b, &ViBuffer[i][j], n64->vi_width);
 					//}
 					//else
 					//{
-						//restore_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR, n64_vi_width);
+						//restore_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR, n64->vi_width);
 					//}
 				//}
 				if(divot)
@@ -218,21 +218,21 @@ void Processor::VideoUpdate16(bitmap_rgb32 &bitmap)
 	}
 }
 
-void Processor::VideoUpdate32(bitmap_rgb32 &bitmap)
+void Processor::VideoUpdate32(n64_periphs *n64, bitmap_rgb32 &bitmap)
 {
-    int gamma = (n64_vi_control >> 3) & 1;
-    int gamma_dither = (n64_vi_control >> 2) & 1;
-    //int vibuffering = ((n64_vi_control & 2) && fsaa && divot);
+    int gamma = (n64->vi_control >> 3) & 1;
+    int gamma_dither = (n64->vi_control >> 2) & 1;
+    //int vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
-    UINT32 *frame_buffer32 = (UINT32*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
+    UINT32 *frame_buffer32 = (UINT32*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
 
-	const INT32 hdiff = (n64_vi_hstart & 0x3ff) - ((n64_vi_hstart >> 16) & 0x3ff);
-	const float hcoeff = ((float)(n64_vi_xscale & 0xfff) / (1 << 10));
+	const INT32 hdiff = (n64->vi_hstart & 0x3ff) - ((n64->vi_hstart >> 16) & 0x3ff);
+	const float hcoeff = ((float)(n64->vi_xscale & 0xfff) / (1 << 10));
 	UINT32 hres = ((float)hdiff * hcoeff);
-	INT32 invisiblewidth = n64_vi_width - hres;
+	INT32 invisiblewidth = n64->vi_width - hres;
 
-	const INT32 vdiff = ((n64_vi_vstart & 0x3ff) - ((n64_vi_vstart >> 16) & 0x3ff)) >> 1;
-	const float vcoeff = ((float)(n64_vi_yscale & 0xfff) / (1 << 10));
+	const INT32 vdiff = ((n64->vi_vstart & 0x3ff) - ((n64->vi_vstart >> 16) & 0x3ff)) >> 1;
+	const float vcoeff = ((float)(n64->vi_yscale & 0xfff) / (1 << 10));
 	const UINT32 vres = ((float)vdiff * vcoeff);
 
 	if (vdiff <= 0 || hdiff <= 0)
@@ -3270,16 +3270,17 @@ VIDEO_START(n64)
 SCREEN_UPDATE_RGB32(n64)
 {
 	_n64_state *state = screen.machine().driver_data<_n64_state>();
+	n64_periphs *n64 = screen.machine().device<n64_periphs>("rcp");
 
     int height = state->m_rdp.GetMiscState()->m_fb_height;
-	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
-	//UINT8  *cvg_buffer = &state->m_rdp.GetHiddenBits()[((n64_vi_origin & 0xffffff) >> 2) >> 1];
-    //int vibuffering = ((n64_vi_control & 2) && fsaa && divot);
+	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
+	//UINT8  *cvg_buffer = &state->m_rdp.GetHiddenBits()[((n64->vi_origin & 0xffffff) >> 2) >> 1];
+    //int vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
 	//vibuffering = 0; // Disabled for now
 
 	/*
-    if (vibuffering && ((n64_vi_control & 3) == 2))
+    if (vibuffering && ((n64->vi_control & 3) == 2))
     {
         if (frame_buffer)
         {
@@ -3292,7 +3293,7 @@ SCREEN_UPDATE_RGB32(n64)
                     curpixel_cvg = ((pix & 1) << 2) | (cvg_buffer[pixels ^ BYTE_ADDR_XOR] & 3); // Reuse of this variable
                     if (curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2) && fsaa)
                     {
-                        newc = video_filter16(&frame_buffer[pixels ^ WORD_ADDR_XOR], &cvg_buffer[pixels ^ BYTE_ADDR_XOR], n64_vi_width);
+                        newc = video_filter16(&frame_buffer[pixels ^ WORD_ADDR_XOR], &cvg_buffer[pixels ^ BYTE_ADDR_XOR], n64->vi_width);
                         ViBuffer[i][j] = newc;
                     }
                     else
@@ -3310,7 +3311,7 @@ SCREEN_UPDATE_RGB32(n64)
     }
     */
 
-    if (n64_vi_blank)
+    if (n64->vi_blank)
     {
         for (int j = 0; j <height; j++)
         {
@@ -3323,7 +3324,7 @@ SCREEN_UPDATE_RGB32(n64)
         return 0;
     }
 
-	state->m_rdp.VideoUpdate(bitmap);
+	state->m_rdp.VideoUpdate(n64, bitmap);
 
 	return 0;
 }
