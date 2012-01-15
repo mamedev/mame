@@ -388,21 +388,26 @@ bool ipf_format::generate_track(track_info *t, floppy_image *image)
 		return false;
 
 	UINT32 *track = global_alloc_array(UINT32, t->size_cells);
-
-	UINT32 *data_pos = new UINT32[t->block_count+1];
-	UINT32 *gap_pos  = new UINT32[t->block_count];
-	UINT32 *splice_pos  = new UINT32[t->block_count];
+	UINT32 *data_pos = global_alloc_array(UINT32, t->block_count+1);
+	UINT32 *gap_pos  = global_alloc_array(UINT32, t->block_count);
+	UINT32 *splice_pos  = global_alloc_array(UINT32, t->block_count);
 
 	bool context = false;
 	UINT32 pos = 0;
 	for(UINT32 i = 0; i != t->block_count; i++) {
 		if(!generate_block(t, i, i == t->block_count-1 ? t->size_cells - t->index_cells : 0xffffffff, track, pos, data_pos[i], gap_pos[i], splice_pos[i], context)) {
 			global_free(track);
+			global_free(data_pos);
+			global_free(gap_pos);
+			global_free(splice_pos);
 			return false;
 		}
 	}
 	if(pos != t->size_cells) {
 		global_free(track);
+		global_free(data_pos);
+		global_free(gap_pos);
+		global_free(splice_pos);
 		return false;
 	}
 
@@ -412,6 +417,9 @@ bool ipf_format::generate_track(track_info *t, floppy_image *image)
 
 	if(!generate_timings(t, track, data_pos, gap_pos)) {
 		global_free(track);
+		global_free(data_pos);
+		global_free(gap_pos);
+		global_free(splice_pos);
 		return false;
 	}
 
@@ -419,7 +427,11 @@ bool ipf_format::generate_track(track_info *t, floppy_image *image)
 		rotate(track, t->size_cells - t->index_cells, t->size_cells);
 
 	generate_track_from_levels(t->cylinder, t->head, track, t->size_cells, splice_pos[t->block_count-1] + t->index_cells, image);
+
 	global_free(track);
+	global_free(data_pos);
+	global_free(gap_pos);
+	global_free(splice_pos);
 
 	return true;
 }
