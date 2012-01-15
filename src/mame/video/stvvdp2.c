@@ -5921,7 +5921,7 @@ static int stv_vdp2_start (running_machine &machine)
 VIDEO_START( stv_vdp2 )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	state->m_tmpbitmap.allocate(704, 256);
+	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
 	stv_vdp2_start(machine);
 	stv_vdp1_start(machine);
 	debug.l_en = 0xff;

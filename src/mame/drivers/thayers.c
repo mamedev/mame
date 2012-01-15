@@ -38,7 +38,7 @@ public:
 	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_pr7820(*this, "laserdisc"),
-		  m_ldv1000(*this, "laserdisc") { }
+		  m_ldv1000(*this, "ldv1000") { }
 
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;

@@ -83,9 +83,9 @@ private:
 public:
 	// construction/destruction
 	screen_bitmap()
-		: m_format(BITMAP_FORMAT_INVALID),
-		  m_texformat(TEXFORMAT_UNDEFINED),
-		  m_live(NULL) { }
+		: m_format(BITMAP_FORMAT_RGB32),
+		  m_texformat(TEXFORMAT_RGB32),
+		  m_live(&m_rgb32) { }
 	screen_bitmap(bitmap_ind16 &orig)
 		: m_format(BITMAP_FORMAT_IND16),
 		  m_texformat(TEXFORMAT_PALETTE16), 

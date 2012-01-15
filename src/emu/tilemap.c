@@ -1674,7 +1674,7 @@ static void tilemap_draw_instance(_BitmapClass &dest, tilemap_t *tmap, const bli
 				{
 					for (cury = y; cury < nexty; cury++)
 					{
-						if (dest0 == NULL)
+						if (dest_baseaddr == NULL)
 							scanline_draw_opaque_null(x_end - x_start, pmap0, blit->tilemap_priority_code);
 						else if (sizeof(*dest0) == 2)
 							scanline_draw_opaque_ind16(reinterpret_cast<UINT16 *>(dest0), source0, x_end - x_start, pmap0, blit->tilemap_priority_code);
@@ -1695,7 +1695,7 @@ static void tilemap_draw_instance(_BitmapClass &dest, tilemap_t *tmap, const bli
 					const UINT8 *mask0 = mask_baseaddr + x_start;
 					for (cury = y; cury < nexty; cury++)
 					{
-						if (dest0 == NULL)
+						if (dest_baseaddr == NULL)
 							scanline_draw_masked_null(mask0, blit->mask, blit->value, x_end - x_start, pmap0, blit->tilemap_priority_code);
 						else if (sizeof(*dest0) == 2)
 							scanline_draw_masked_ind16(reinterpret_cast<UINT16 *>(dest0), source0, mask0, blit->mask, blit->value, x_end - x_start, pmap0, blit->tilemap_priority_code);
