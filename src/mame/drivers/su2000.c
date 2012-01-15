@@ -174,8 +174,6 @@ static READ8_HANDLER( vga_setting )
 /* TODO */
 static const struct pc_vga_interface vga_interface =
 {
-	NULL,
-	NULL,
 	vga_setting,
 	AS_PROGRAM,
 	0xa0000,

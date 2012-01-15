@@ -455,11 +455,10 @@ SCREEN_UPDATE_RGB32( pc_video )
 	switch(cur_mode)
 	{
 		case 0: bitmap.fill(get_black_pen(screen.machine()), cliprect);break;
-		case 1: vga_vh_text(screen.machine(), bitmap,cliprect); break;
-		case 2: vga_vh_vga (screen.machine(), bitmap,cliprect); break;
-		case 3: vga_vh_ega (screen.machine(), bitmap,cliprect); break;
-		/* Nothing uses this so far, to be nuked */
-		case 4: vga.svga_intf.choosevideomode(vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
+		case 1: vga_vh_text(screen.machine(), bitmap, cliprect); break;
+		case 2: vga_vh_vga (screen.machine(), bitmap, cliprect); break;
+		case 3: vga_vh_ega (screen.machine(), bitmap, cliprect); break;
+		case 4: vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
 	}
 
 	return 0;
@@ -692,72 +691,45 @@ static void vga_cpu_interface(running_machine &machine)
 
 	/* remap the VGA memory */
 
-	if (vga.vga_intf.map_vga_memory)
+	buswidth = downcast<legacy_cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
 	{
-		sel = vga.gc.data[6] & 0x0c;
-		switch(sel)
-		{
-			case 0x00:
-				if (vga.vga_intf.vga_memory_bank != NULL)
-				{
-					vga.vga_intf.map_vga_memory(machine, vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x1FFFF, read_handler, read_handler_name, write_handler, write_handler_name);
-					memory_set_bankptr(machine, vga.vga_intf.vga_memory_bank, vga.memory);
-				}
-				break;
-			case 0x04:
-				vga.vga_intf.map_vga_memory(machine, vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0FFFF, read_handler, read_handler_name, write_handler, write_handler_name);
-				break;
-			case 0x08:
-				vga.vga_intf.map_vga_memory(machine, vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17FFF, read_handler, read_handler_name, write_handler, write_handler_name);
-				break;
-			case 0x0C:
-				vga.vga_intf.map_vga_memory(machine, vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1FFFF, read_handler, read_handler_name, write_handler, write_handler_name);
-				break;
-		}
+		case 8:
+			mask = 0;
+			break;
+
+		case 16:
+			mask = 0xffff;
+			break;
+
+		case 32:
+			mask = 0xffffffff;
+			break;
+
+		case 64:
+			mask = -1;
+			break;
+
+		default:
+			fatalerror("VGA: Bus width %d not supported", buswidth);
+			break;
+	}
+
+	sel = vga.gc.data[6] & 0x0c;
+	if (sel)
+	{
+		if (sel == 0x04) space->install_legacy_read_handler(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff, read_handler, read_handler_name, mask); else space->nop_read(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff);
+		if (sel == 0x08) space->install_legacy_read_handler(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff, read_handler, read_handler_name, mask); else space->nop_read(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff);
+		if (sel == 0x0C) space->install_legacy_read_handler(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff, read_handler, read_handler_name, mask); else space->nop_read(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff);
+		if (sel == 0x04) space->install_legacy_write_handler(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff, write_handler, write_handler_name, mask); else space->nop_write(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff);
+		if (sel == 0x08) space->install_legacy_write_handler(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff, write_handler, write_handler_name, mask); else space->nop_write(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff);
+		if (sel == 0x0C) space->install_legacy_write_handler(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff, write_handler, write_handler_name, mask); else space->nop_write(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff);
 	}
 	else
 	{
-		buswidth = downcast<legacy_cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-		switch(buswidth)
-		{
-			case 8:
-				mask = 0;
-				break;
-
-			case 16:
-				mask = 0xffff;
-				break;
-
-			case 32:
-				mask = 0xffffffff;
-				break;
-
-			case 64:
-				mask = -1;
-				break;
-
-			default:
-				fatalerror("VGA: Bus width %d not supported", buswidth);
-				break;
-		}
-
-		sel = vga.gc.data[6] & 0x0c;
-		if (sel)
-		{
-			if (sel == 0x04) space->install_legacy_read_handler(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff, read_handler, read_handler_name, mask); else space->nop_read(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff);
-			if (sel == 0x08) space->install_legacy_read_handler(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff, read_handler, read_handler_name, mask); else space->nop_read(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff);
-			if (sel == 0x0C) space->install_legacy_read_handler(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff, read_handler, read_handler_name, mask); else space->nop_read(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff);
-			if (sel == 0x04) space->install_legacy_write_handler(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff, write_handler, write_handler_name, mask); else space->nop_write(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff);
-			if (sel == 0x08) space->install_legacy_write_handler(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff, write_handler, write_handler_name, mask); else space->nop_write(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff);
-			if (sel == 0x0C) space->install_legacy_write_handler(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff, write_handler, write_handler_name, mask); else space->nop_write(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff);
-		}
-		else
-		{
-			memory_set_bankptr(machine,"bank1", vga.memory);
-			space->install_read_bank(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x1ffff, "bank1" );
-			space->install_write_bank(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x1ffff, "bank1" );
-		}
-
+		space->install_read_bank(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x1ffff, "vga_bank" );
+		space->install_write_bank(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x1ffff, "vga_bank" );
+		memory_set_bankptr(machine, "vga_bank", vga.memory);
 	}
 }
 
