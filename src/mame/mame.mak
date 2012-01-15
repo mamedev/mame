@@ -1733,6 +1733,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/homedata.o $(VIDEO)/homedata.o \
 	$(DRIVERS)/hotblock.o \
 	$(DRIVERS)/hotstuff.o \
+	$(DRIVERS)/ichiban.o \
 	$(DRIVERS)/imolagp.o \
 	$(DRIVERS)/intrscti.o \
 	$(DRIVERS)/istellar.o \
