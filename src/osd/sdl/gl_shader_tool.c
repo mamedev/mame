@@ -134,13 +134,13 @@ int gl_check_error(GLSLCheckMode m, const char *file, const int line)
 
 int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, const char *file, const int line)
 {
-        GLsizei length;
-        GLcharARB buffer[255];
-        GLenum glerr;
-	GLint  param;
-	int    res=0;
+    GLsizei length;
+    GLcharARB buffer[255];
+    GLenum glerr;
+    GLint  param;
+    int    res=0;
 
-        glerr = gl_check_error(m, file, line);
+    glerr = gl_check_error(m, file, line);
 
 	if(!obj)
 		return glerr;
@@ -164,57 +164,57 @@ int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, co
 		if( param!=GL_PROGRAM_OBJECT_ARB && param!=GL_SHADER_OBJECT_ARB )
 		{
 			if ( CHECK_VERBOSE <= m )
-				mame_printf_warning("%s:%d: GL Error: object type 0x%X generation failed\n", file, line, (unsigned int)obj);
+				mame_printf_warning("%s:%d: GL Error: object type 0x%X generation failed\n", file, line, (unsigned int)(FPTR)obj);
 			res=-1;
 		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
 			if(param==GL_PROGRAM_OBJECT_ARB)
-				mame_printf_warning("%s:%d: GL Error: object type 0x%X is PROGRAM, successful\n", file, line, (unsigned int)obj);
+				mame_printf_warning("%s:%d: GL Error: object type 0x%X is PROGRAM, successful\n", file, line, (unsigned int)(FPTR)obj);
 			else
-				mame_printf_warning("%s:%d: GL Info: object type 0x%X is SHADER, successful\n", file, line, (unsigned int)obj);
+				mame_printf_warning("%s:%d: GL Info: object type 0x%X is SHADER, successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
 	  case GL_OBJECT_DELETE_STATUS_ARB:
 		if(param!=1)
 		{
 			if ( CHECK_ALWAYS_VERBOSE <= m )
-				mame_printf_warning("%s:%d: GL Info: object 0x%X not yet marked for deletion\n", file, line, (unsigned int)obj);
+				mame_printf_warning("%s:%d: GL Info: object 0x%X not yet marked for deletion\n", file, line, (unsigned int)(FPTR)obj);
 		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
-			mame_printf_warning("%s:%d: GL Info: object 0x%X deletion successful\n", file, line, (unsigned int)obj);
+			mame_printf_warning("%s:%d: GL Info: object 0x%X deletion successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
 	  case GL_OBJECT_COMPILE_STATUS_ARB:
 		if(param!=1)
 		{
 			if ( CHECK_VERBOSE <= m )
-				mame_printf_warning("%s:%d: GL Error: object 0x%X compilation failed\n", file, line, (unsigned int)obj);
+				mame_printf_warning("%s:%d: GL Error: object 0x%X compilation failed\n", file, line, (unsigned int)(FPTR)obj);
 			res=-1;
 		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
-			mame_printf_warning("%s:%d: GL Info: object 0x%X compiled successful\n", file, line, (unsigned int)obj);
+			mame_printf_warning("%s:%d: GL Info: object 0x%X compiled successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
 	  case GL_OBJECT_LINK_STATUS_ARB:
 		if(param!=1)
 		{
 			if ( CHECK_VERBOSE <= m )
-				mame_printf_warning("%s:%d: GL Error: object 0x%X linking failed\n", file, line, (unsigned int)obj);
+				mame_printf_warning("%s:%d: GL Error: object 0x%X linking failed\n", file, line, (unsigned int)(FPTR)obj);
 			res=-1;
 		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
-			mame_printf_warning("%s:%d: GL Info: object 0x%X linked successful\n", file, line, (unsigned int)obj);
+			mame_printf_warning("%s:%d: GL Info: object 0x%X linked successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
 	  case GL_OBJECT_VALIDATE_STATUS_ARB:
 		if(param!=1)
 		{
 			if ( CHECK_VERBOSE <= m )
-				mame_printf_warning("%s:%d: GL Error: object 0x%X validation failed\n", file, line, (unsigned int)obj);
+				mame_printf_warning("%s:%d: GL Error: object 0x%X validation failed\n", file, line, (unsigned int)(FPTR)obj);
 			res=-1;
 		} else if ( CHECK_ALWAYS_VERBOSE <= m )
 		{
-			mame_printf_warning("%s:%d: GL Info: object 0x%X validation successful\n", file, line, (unsigned int)obj);
+			mame_printf_warning("%s:%d: GL Info: object 0x%X validation successful\n", file, line, (unsigned int)(FPTR)obj);
 		}
 		break;
 	 }
