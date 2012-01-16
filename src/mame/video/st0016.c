@@ -380,7 +380,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 									if (drawxpos > cliprect.max_x)
 										drawxpos -= 512; // wrap around
 
-									if ((drawxpos >= cliprect.min_x) && (drawxpos <= cliprect.max_x) && (drawypos >= cliprect.min_y) && (drawypos <= cliprect.max_y) )
+									if (cliprect.contains(drawxpos, drawypos))
 									{
 										if(st0016_spriteram[offset+5]&0x40)
 										{
@@ -546,7 +546,7 @@ static void draw_bgmap(running_machine &machine, bitmap_ind16 &bitmap,const rect
 									if (drawxpos > cliprect.max_x)
 										drawxpos -= 512; // wrap around
 
-									if ((drawxpos >= cliprect.min_x) && (drawxpos <= cliprect.max_x) && (drawypos >= cliprect.min_y) && (drawypos <= cliprect.max_y) )
+									if (cliprect.contains(drawxpos, drawypos))
 									{
 
 										if(st0016_vregs[j+7]==0x12)

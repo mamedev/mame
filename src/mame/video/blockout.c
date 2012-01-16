@@ -77,7 +77,7 @@ static void update_pixels( running_machine &machine, int x, int y )
 	int color;
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	if (x < visarea.min_x || x > visarea.max_x || y < visarea.min_y || y > visarea.max_y)
+	if (!visarea.contains(x, y))
 		return;
 
 	front = state->m_videoram[y * 256 + x / 2];

@@ -362,10 +362,7 @@ do {																					\
 		assert(dest.valid());															\
 		assert(gfx != NULL);															\
 		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());						\
-		assert(cliprect.min_x >= 0);													\
-		assert(cliprect.max_x < dest.width());											\
-		assert(cliprect.min_y >= 0);													\
-		assert(cliprect.max_y < dest.height());											\
+		assert(dest.cliprect().contains(cliprect));										\
 		assert(code < gfx->total_elements);												\
 																						\
 		/* ignore empty/invalid cliprects */											\
@@ -632,10 +629,7 @@ do {																					\
 		assert(dest.valid());															\
 		assert(gfx != NULL);															\
 		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());						\
-		assert(cliprect.min_x >= 0);													\
-		assert(cliprect.max_x < dest.width());											\
-		assert(cliprect.min_y >= 0);													\
-		assert(cliprect.max_y < dest.height());										\
+		assert(dest.cliprect().contains(cliprect));										\
 																						\
 		/* ignore empty/invalid cliprects */											\
 		if (cliprect.empty())															\
@@ -807,10 +801,7 @@ do {																					\
 		assert(dest.valid());															\
 		assert(src.valid());															\
 		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());						\
-		assert(cliprect.min_x >= 0);													\
-		assert(cliprect.max_x < dest.width());											\
-		assert(cliprect.min_y >= 0);													\
-		assert(cliprect.max_y < dest.height());										\
+		assert(dest.cliprect().contains(cliprect));										\
 																						\
 		/* ignore empty/invalid cliprects */											\
 		if (cliprect.empty())															\
@@ -981,11 +972,8 @@ do {																				\
 	assert(dest.valid());															\
 	assert(dest.valid());															\
 	assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());						\
-	assert(cliprect.min_x >= 0);													\
-	assert(cliprect.max_x < dest.width());											\
-	assert(cliprect.min_y >= 0);													\
-	assert(cliprect.max_y < dest.height());										\
-	assert(!wraparound || (src.width() & (src.width() - 1)) == 0);				\
+	assert(dest.cliprect().contains(cliprect));										\
+	assert(!wraparound || (src.width() & (src.width() - 1)) == 0);					\
 	assert(!wraparound || (src.height() & (src.height() - 1)) == 0);				\
 																					\
 	/* ignore empty/invalid cliprects */											\
@@ -997,12 +985,12 @@ do {																				\
 	srcfixheight = src.height() << 16;												\
 																					\
 	/* advance the starting coordinates to the top-left of the cliprect */			\
-	startx += cliprect.min_x * incxx + cliprect.min_y * incyx;					\
-	starty += cliprect.min_x * incxy + cliprect.min_y * incyy;					\
+	startx += cliprect.min_x * incxx + cliprect.min_y * incyx;						\
+	starty += cliprect.min_x * incxy + cliprect.min_y * incyy;						\
 																					\
 	/* compute how many blocks of 4 pixels we have */								\
-	numblocks = (cliprect.max_x + 1 - cliprect.min_x) / 4;						\
-	leftovers = (cliprect.max_x + 1 - cliprect.min_x) - 4 * numblocks;			\
+	numblocks = cliprect.width() / 4;												\
+	leftovers = cliprect.width() - 4 * numblocks;									\
 																					\
 	/* if incxy and incyx are 0, then we aren't rotating, just zooming */			\
 	if (incxy == 0 && incyx == 0)													\

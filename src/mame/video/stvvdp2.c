@@ -4223,11 +4223,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_rgb32 &bitma
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 //  int window_applied = 0;
-	rectangle mycliprect;
-	mycliprect.min_x = cliprect.min_x;
-	mycliprect.max_x = cliprect.max_x;
-	mycliprect.min_y = cliprect.min_y;
-	mycliprect.max_y = cliprect.max_y;
+	rectangle mycliprect = cliprect;
 
 	if ( stv2_current_tilemap.linescroll_enable ||
 		 stv2_current_tilemap.vertical_linescroll_enable ||
@@ -5295,10 +5291,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_rgb32
 			stv2_current_tilemap.transparency = STV_TRANSPARENCY_ALPHA;
 		}
 
-		mycliprect.min_x = cliprect.min_x;
-		mycliprect.max_x = cliprect.max_x;
-		mycliprect.min_y = cliprect.min_y;
-		mycliprect.max_y = cliprect.max_y;
+		mycliprect = cliprect;
 
 		if ( window_control )
 		{
@@ -5962,12 +5955,8 @@ void stv_vdp2_dynamic_res_change(running_machine &machine)
 
 	{
 		int vblank_period,hblank_period;
-		rectangle visarea = machine.primary_screen->visible_area();
 		attoseconds_t refresh;;
-		visarea.min_x = 0;
-		visarea.max_x = horz_res-1;
-		visarea.min_y = 0;
-		visarea.max_y = vert_res-1;
+		rectangle visarea(0, horz_res-1, 0, vert_res-1);
 
 		vblank_period = get_vblank_duration(machine);
 		hblank_period = get_hblank_duration(machine);
@@ -6362,10 +6351,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 										  (STV_VDP2_SPW0A * 0x10) |
 										  (STV_VDP2_SPW1A * 0x20) |
 										  (STV_VDP2_SPSWA * 0x40);
-	mycliprect.min_x = cliprect.min_x;
-	mycliprect.max_x = cliprect.max_x;
-	mycliprect.min_y = cliprect.min_y;
-	mycliprect.max_y = cliprect.max_y;
+	mycliprect = cliprect;
 
 	stv_vdp2_apply_window_on_layer(machine,mycliprect);
 

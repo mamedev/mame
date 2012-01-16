@@ -251,10 +251,7 @@ static void draw_polygon(atarisy4_state *state, UINT16 color)
 	poly_vertex v1, v2, v3;
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
 
-	clip.min_x = 0;
-	clip.min_y = 0;
-	clip.max_x = 511;
-	clip.max_y = 511;
+	clip.set(0, 511, 0, 511);
 
 	extra->color = color;
 	extra->screen_ram = state->m_screen_ram;

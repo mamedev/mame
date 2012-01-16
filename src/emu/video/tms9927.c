@@ -240,10 +240,7 @@ static void recompute_parameters(tms9927_state *tms, int postload)
 
 	/* create a visible area */
 	/* fix me: how do the offsets fit in here? */
-	visarea.min_x = 0;
-	visarea.max_x = tms->visible_hpix - 1;
-	visarea.min_y = 0;
-	visarea.max_y = tms->visible_vpix - 1;
+	visarea.set(0, tms->visible_hpix - 1, 0, tms->visible_vpix - 1);
 
 	refresh = HZ_TO_ATTOSECONDS(tms->clock) * tms->total_hpix * tms->total_vpix;
 

@@ -167,12 +167,7 @@ static int collision_check_s1s2(running_machine &machine)
 	starcrus_state *state = machine.driver_data<starcrus_state>();
 	int org_x, org_y;
 	int sx, sy;
-	rectangle clip;
-
-	clip.min_x=0;
-	clip.max_x=15;
-	clip.min_y=0;
-	clip.max_y=15;
+	rectangle clip(0, 15, 0, 15);
 
 	state->m_ship1_vid->fill(0, clip);
 	state->m_ship2_vid->fill(0, clip);
@@ -215,7 +210,7 @@ static int collision_check_p1p2(running_machine &machine)
 	starcrus_state *state = machine.driver_data<starcrus_state>();
 	int org_x, org_y;
 	int sx, sy;
-	rectangle clip;
+	rectangle clip(0, 15, 0, 15);
 
 	/* if both are scores, return */
 	if ( ((state->m_p1_sprite & 0x08) == 0) &&
@@ -223,11 +218,6 @@ static int collision_check_p1p2(running_machine &machine)
 	{
 		return 0;
 	}
-
-	clip.min_x=0;
-	clip.max_x=15;
-	clip.min_y=0;
-	clip.max_y=15;
 
 	state->m_proj1_vid->fill(0, clip);
 	state->m_proj2_vid->fill(0, clip);
@@ -276,7 +266,7 @@ static int collision_check_s1p1p2(running_machine &machine)
 	starcrus_state *state = machine.driver_data<starcrus_state>();
 	int org_x, org_y;
 	int sx, sy;
-	rectangle clip;
+	rectangle clip(0, 15, 0, 15);
 
 	/* if both are scores, return */
 	if ( ((state->m_p1_sprite & 0x08) == 0) &&
@@ -284,11 +274,6 @@ static int collision_check_s1p1p2(running_machine &machine)
 	{
 		return 0;
 	}
-
-	clip.min_x=0;
-	clip.max_x=15;
-	clip.min_y=0;
-	clip.max_y=15;
 
 	state->m_ship1_vid->fill(0, clip);
 	state->m_proj1_vid->fill(0, clip);
@@ -353,7 +338,7 @@ static int collision_check_s2p1p2(running_machine &machine)
 	starcrus_state *state = machine.driver_data<starcrus_state>();
 	int org_x, org_y;
 	int sx, sy;
-	rectangle clip;
+	rectangle clip(0, 15, 0, 15);
 
 	/* if both are scores, return */
 	if ( ((state->m_p1_sprite & 0x08) == 0) &&
@@ -361,11 +346,6 @@ static int collision_check_s2p1p2(running_machine &machine)
 	{
 		return 0;
 	}
-
-	clip.min_x=0;
-	clip.max_x=15;
-	clip.min_y=0;
-	clip.max_y=15;
 
 	state->m_ship2_vid->fill(0, clip);
 	state->m_proj1_vid->fill(0, clip);

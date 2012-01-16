@@ -532,10 +532,8 @@ static SCREEN_UPDATE_IND16(majorpkr)
 	/* The following custom_clip is to exclude the last char column (unused)
        form the render. We need more proof about how the video is working.
     */
-	custom_clip.min_x=cliprect.min_x;
-	custom_clip.max_x=cliprect.max_x-16;
-	custom_clip.min_y=cliprect.min_y;
-	custom_clip.max_y=cliprect.max_y;
+	custom_clip = cliprect;
+	custom_clip.max_x -= 16;
 
 	tilemap_draw(bitmap, custom_clip, state->m_bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, custom_clip, state->m_fg_tilemap, 0, 0);

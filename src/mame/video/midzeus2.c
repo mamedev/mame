@@ -187,14 +187,14 @@ INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
 #ifdef UNUSED_FUNCTION
 INLINE void waveram_plot(int y, int x, UINT32 color)
 {
-	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
+	if (zeus_cliprect.contains(x, y))
 		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 }
 #endif
 
 INLINE void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
 {
-	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
+	if (zeus_cliprect.contains(x, y))
 	{
 		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 		WAVERAM_WRITEDEPTH(zeus_renderbase, y, x, depth);
@@ -204,7 +204,7 @@ INLINE void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
 #ifdef UNUSED_FUNCTION
 INLINE void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
 {
-	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
+	if (zeus_cliprect.contains(x, y))
 	{
 		UINT16 *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
 		if (depth <= *depthptr)
@@ -219,7 +219,7 @@ INLINE void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
 #ifdef UNUSED_FUNCTION
 INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT32 color, UINT16 depth)
 {
-	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
+	if (zeus_cliprect.contains(x, y))
 	{
 		UINT16 *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
 		if (depth <= *depthptr)
@@ -564,12 +564,8 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 			{
 				int vtotal = zeusbase[0x37] & 0xffff;
 				int htotal = zeusbase[0x34] >> 16;
-				rectangle visarea;
 
-				visarea.min_x = zeusbase[0x33] >> 16;
-				visarea.max_x = (zeusbase[0x34] & 0xffff) - 1;
-				visarea.min_y = 0;
-				visarea.max_y = zeusbase[0x35] & 0xffff;
+				rectangle visarea(zeusbase[0x33] >> 16, (zeusbase[0x34] & 0xffff) - 1, 0, zeusbase[0x35] & 0xffff);
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
 					machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 4.0 / (htotal * vtotal)));

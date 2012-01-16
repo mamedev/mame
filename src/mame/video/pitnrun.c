@@ -259,17 +259,8 @@ SCREEN_UPDATE_IND16( pitnrun )
 		if (flip_screen_y_get(screen.machine()))
 			dy=128-dy;
 
-		myclip.min_x=dx;
-		myclip.min_y=dy;
-		myclip.max_x=dx+127;
-		myclip.max_y=dy+127;
-
-
-		if(myclip.min_y<cliprect.min_y)myclip.min_y=cliprect.min_y;
-		if(myclip.min_x<cliprect.min_x)myclip.min_x=cliprect.min_x;
-
-		if(myclip.max_y>cliprect.max_y)myclip.max_y=cliprect.max_y;
-		if(myclip.max_x>cliprect.max_x)myclip.max_x=cliprect.max_x;
+		myclip.set(dx, dx+127, dy, dy+127);
+		myclip &= cliprect;
 
 		tilemap_draw(bitmap,myclip,state->m_bg, 0,0);
 	}

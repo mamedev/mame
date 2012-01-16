@@ -681,8 +681,8 @@ void info_xml_creator::output_display()
 		if (device->screen_type() != SCREEN_TYPE_VECTOR)
 		{
 			const rectangle &visarea = device->visible_area();
-			fprintf(m_output, " width=\"%d\"", visarea.max_x - visarea.min_x + 1);
-			fprintf(m_output, " height=\"%d\"", visarea.max_y - visarea.min_y + 1);
+			fprintf(m_output, " width=\"%d\"", visarea.width());
+			fprintf(m_output, " height=\"%d\"", visarea.height());
 		}
 
 		// output refresh rate

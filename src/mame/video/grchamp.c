@@ -148,8 +148,7 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 			if( pixel != sprite_transp ){
 				sx = x+x0;
 				sy = y+y0;
-				if( (sx >= visarea->min_x) && (sx <= visarea->max_x) &&
-					(sy >= visarea->min_y) && (sy <= visarea->max_y) )
+				if(visarea->contains(sx, sy))
 				{
 					// Collision check uses only 16 pens!
 					pixel = bitmap.pix16(sy, sx) % 16;

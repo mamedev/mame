@@ -547,7 +547,7 @@ static SCREEN_UPDATE_IND16( marinedt )
 				int x = OBJ_X(state->m_obj1_x) + sx;
 				int y = OBJ_Y(state->m_obj1_y) + sy;
 
-				if (x < cliprect.min_x || x > cliprect.max_x || y < cliprect.min_y || y > cliprect.max_y)
+				if (!cliprect.contains(x, y))
 					continue;
 
 				if (state->m_obj1->pix16(sy, sx) == 0)

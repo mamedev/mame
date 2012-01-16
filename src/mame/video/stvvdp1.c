@@ -2002,18 +2002,12 @@ static void stv_vdp1_process_list(running_machine &machine)
 
 				case 0x0008:
 					if (VDP1_LOG) logerror ("Sprite List Set Command for User Clipping (%d,%d),(%d,%d)\n", stv2_current_sprite.CMDXA, stv2_current_sprite.CMDYA, stv2_current_sprite.CMDXC, stv2_current_sprite.CMDYC);
-					state->m_vdp1.user_cliprect.min_x = stv2_current_sprite.CMDXA;
-					state->m_vdp1.user_cliprect.min_y = stv2_current_sprite.CMDYA;
-					state->m_vdp1.user_cliprect.max_x = stv2_current_sprite.CMDXC;
-					state->m_vdp1.user_cliprect.max_y = stv2_current_sprite.CMDYC;
+					state->m_vdp1.user_cliprect.set(stv2_current_sprite.CMDXA, stv2_current_sprite.CMDXC, stv2_current_sprite.CMDYA, stv2_current_sprite.CMDYC);
 					break;
 
 				case 0x0009:
 					if (VDP1_LOG) logerror ("Sprite List Set Command for System Clipping (0,0),(%d,%d)\n", stv2_current_sprite.CMDXC, stv2_current_sprite.CMDYC);
-					state->m_vdp1.system_cliprect.min_x = 0;
-					state->m_vdp1.system_cliprect.min_y = 0;
-					state->m_vdp1.system_cliprect.max_x = stv2_current_sprite.CMDXC;
-					state->m_vdp1.system_cliprect.max_y = stv2_current_sprite.CMDYC;
+					state->m_vdp1.system_cliprect.set(0, stv2_current_sprite.CMDXC, 0, stv2_current_sprite.CMDYC);
 					break;
 
 				case 0x000a:
@@ -2178,13 +2172,9 @@ int stv_vdp1_start ( running_machine &machine )
 	stv_clear_framebuffer(machine, state->m_vdp1.framebuffer_current_draw);
 	state->m_vdp1.framebuffer_clear_on_next_frame = 0;
 
-	state->m_vdp1.system_cliprect.min_x = state->m_vdp1.system_cliprect.max_x = 0;
-	state->m_vdp1.system_cliprect.min_y = state->m_vdp1.system_cliprect.max_y = 0;
+	state->m_vdp1.system_cliprect.set(0, 0, 0, 0);
 	/* Kidou Senshi Z Gundam - Zenpen Zeta no Kodou loves to use the user cliprect vars in an undefined state ... */
-	state->m_vdp1.user_cliprect.min_x = 0;
-	state->m_vdp1.user_cliprect.min_y = 0;
-	state->m_vdp1.user_cliprect.max_x = 512;
-	state->m_vdp1.user_cliprect.max_y = 256;
+	state->m_vdp1.user_cliprect.set(0, 512, 0, 256);
 
 	// save state
 	state_save_register_global_pointer(machine, state->m_vdp1_regs, 0x020/2);

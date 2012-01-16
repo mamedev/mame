@@ -1094,9 +1094,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			{
 				const rectangle &visarea = machine.primary_screen->visible_area();
 
-				sx_base = ((visarea.max_x + 1) - visarea.min_x) - (sx_base + 8);	/* visarea.x = 320 */
-				sy_base = ((visarea.max_y + 1) - visarea.min_y) - (sy_base + 8);	/* visarea.y = 240 */
-				sy_base += ((visarea.max_y + 1) - ((visarea.max_y + 1) - visarea.min_y)) * 2;	/* Horizontal games are offset so adjust by +0x20 */
+				sx_base = visarea.width() - (sx_base + 8);	/* visarea.x = 320 */
+				sy_base = visarea.height() - (sy_base + 8);	/* visarea.y = 240 */
+				sy_base += ((visarea.max_y + 1) - visarea.height()) * 2;	/* Horizontal games are offset so adjust by +0x20 */
 			}
 
 			for (dim_y = 0; dim_y < sprite_sizey; dim_y += 8)

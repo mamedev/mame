@@ -928,21 +928,13 @@ static void model2_3d_render( model2_state *state, bitmap_rgb32 &bitmap, triangl
 	poly_manager *poly = state->m_poly;
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 	UINT8		renderer;
-	rectangle	vp;
 
 	/* select renderer based on attributes (bit15 = checker, bit14 = textured, bit13 = transparent */
 	renderer = (tri->texheader[0] >> 13) & 7;
 
 	/* calculate and clip to viewport */
-	vp.min_x = tri->viewport[0] - 8;
-	vp.max_x = tri->viewport[2] - 8;
-	vp.min_y = (384-tri->viewport[3])+90;
-	vp.max_y = (384-tri->viewport[1])+90;
-
-	if ( vp.min_x < cliprect.min_x ) vp.min_x = cliprect.min_x;
-	if ( vp.max_x > cliprect.max_x ) vp.max_x = cliprect.max_x;
-	if ( vp.min_y < cliprect.min_y ) vp.min_y = cliprect.min_y;
-	if ( vp.max_y > cliprect.max_y ) vp.max_y = cliprect.max_y;
+	rectangle vp(tri->viewport[0] - 8, tri->viewport[2] - 8, (384-tri->viewport[3])+90, (384-tri->viewport[1])+90);
+	vp &= cliprect;
 
 	extra->state = state;
 	extra->lumabase = ((tri->texheader[1] & 0xFF) << 7) + ((tri->luma >> 5) ^ 0x7);
@@ -2712,8 +2704,8 @@ VIDEO_START(model2)
 {
 	model2_state *state = machine.driver_data<model2_state>();
 	const rectangle &visarea = machine.primary_screen->visible_area();
-	int	width = visarea.max_x - visarea.min_x;
-	int	height = visarea.max_y - visarea.min_y;
+	int	width = visarea.width();
+	int	height = visarea.height();
 
 	state->m_sys24_bitmap.allocate(width, height+4);
 

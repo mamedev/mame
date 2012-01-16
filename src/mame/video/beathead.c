@@ -182,7 +182,7 @@ UINT32 beathead_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		}
 
 		/* then draw it */
-		draw_scanline16(bitmap, cliprect.min_x, y, cliprect.max_x - cliprect.min_x + 1, &scanline[cliprect.min_x], NULL);
+		draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], NULL);
 	}
 	return 0;
 }

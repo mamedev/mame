@@ -1105,7 +1105,7 @@ void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bi
 	/* clear out any scanlines we might be using */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		if (!(rotatebase[y & ~1] & 0xc000))
-			memset(&bitmap.pix16(y, cliprect.min_x), 0xff, (cliprect.max_x - cliprect.min_x + 1) * sizeof(UINT16));
+			memset(&bitmap.pix16(y, cliprect.min_x), 0xff, cliprect.width() * sizeof(UINT16));
 
 	/* now scan backwards and render the sprites in order */
 	for (data = sega16sp->spriteram; !(data[0] & 0x8000) && !visited[next]; data = sega16sp->spriteram + next * 8)

@@ -1120,7 +1120,7 @@ SCREEN_UPDATE_IND16( tms340x0_ind16 )
 	UINT16 *dest = &bitmap.pix16(cliprect.min_y);
 	for (x = cliprect.min_x; x < params.heblnk; x++)
 		dest[x] = blackpen;
-	for (x = params.hsblnk; x <= cliprect.max_y; x++)
+	for (x = params.hsblnk; x <= cliprect.max_x; x++)
 		dest[x] = blackpen;
 	return 0;
 
@@ -1168,7 +1168,7 @@ SCREEN_UPDATE_RGB32( tms340x0_rgb32 )
 	UINT32 *dest = &bitmap.pix32(cliprect.min_y);
 	for (x = cliprect.min_x; x < params.heblnk; x++)
 		dest[x] = blackpen;
-	for (x = params.hsblnk; x <= cliprect.max_y; x++)
+	for (x = params.hsblnk; x <= cliprect.max_x; x++)
 		dest[x] = blackpen;
 	return 0;
 }

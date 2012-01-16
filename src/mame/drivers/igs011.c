@@ -436,7 +436,7 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 			}
 
 			// plot it
-			if (x >= clip.min_x && x <= clip.max_x && y >= clip.min_y && y <= clip.max_y)
+			if (clip.contains(x, y))
 			{
 				if      (clear)				dest[x + y * 512] = clear_pen;
 				else if (pen != trans_pen)	dest[x + y * 512] = pen | pen_hi;

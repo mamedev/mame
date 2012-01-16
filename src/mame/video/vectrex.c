@@ -284,8 +284,8 @@ VIDEO_START(vectrex)
 	screen_device *screen = machine.first_screen();
 	const rectangle &visarea = screen->visible_area();
 
-	state->m_x_center=((visarea.max_x - visarea.min_x) / 2) << 16;
-	state->m_y_center=((visarea.max_y - visarea.min_y) / 2) << 16;
+	state->m_x_center=(visarea.width() / 2) << 16;
+	state->m_y_center=(visarea.height() / 2) << 16;
 	state->m_x_max = visarea.max_x << 16;
 	state->m_y_max = visarea.max_y << 16;
 
@@ -484,8 +484,8 @@ VIDEO_START(raaspec)
 	screen_device *screen = machine.first_screen();
 	const rectangle &visarea = screen->visible_area();
 
-	state->m_x_center=((visarea.max_x - visarea.min_x) / 2) << 16;
-	state->m_y_center=((visarea.max_y - visarea.min_y) / 2) << 16;
+	state->m_x_center=(visarea.width() / 2) << 16;
+	state->m_y_center=(visarea.height() / 2) << 16;
 	state->m_x_max = visarea.max_x << 16;
 	state->m_y_max = visarea.max_y << 16;
 

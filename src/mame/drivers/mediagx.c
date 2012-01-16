@@ -251,9 +251,7 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 		state->m_frame_width = width;
 		state->m_frame_height = height;
 
-		visarea.min_x = visarea.min_y = 0;
-		visarea.max_x = width - 1;
-		visarea.max_y = height - 1;
+		visarea.set(0, width - 1, 0, height - 1);
 		machine.primary_screen->configure(width, height * 262 / 240, visarea, machine.primary_screen->frame_period().attoseconds);
 	}
 

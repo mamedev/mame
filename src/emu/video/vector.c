@@ -258,8 +258,8 @@ SCREEN_UPDATE_RGB32( vector )
 {
 	UINT32 flags = PRIMFLAG_ANTIALIAS(screen.machine().options().antialias() ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
 	const rectangle &visarea = screen.visible_area();
-	float xscale = 1.0f / (65536 * (visarea.max_x - visarea.min_x));
-	float yscale = 1.0f / (65536 * (visarea.max_y - visarea.min_y));
+	float xscale = 1.0f / (65536 * visarea.width());
+	float yscale = 1.0f / (65536 * visarea.height());
 	float xoffs = (float)visarea.min_x;
 	float yoffs = (float)visarea.min_y;
 	point *curpoint;

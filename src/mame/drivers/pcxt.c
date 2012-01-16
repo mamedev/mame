@@ -120,7 +120,7 @@ static SCREEN_UPDATE_RGB32( tetriskr )
 					for(pen_i = 0;pen_i<4;pen_i++)
 						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+state->m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
 
-					if((x+xi)<screen.visible_area().max_x && ((y)+yi)<screen.visible_area().max_y)
+					if(cliprect.contains(x*8+xi, y*8+yi))
 						bitmap.pix32(y*8+yi, x*8+xi) = screen.machine().pens[color];
 				}
 			}

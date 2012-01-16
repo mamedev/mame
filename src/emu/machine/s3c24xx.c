@@ -937,10 +937,7 @@ static int s3c24xx_lcd_configure_stn( device_t *device)
 	}
 	height = lineval + 1;
 	s3c24xx->lcd.framerate = framerate;
-	visarea.min_x = 0;
-	visarea.min_y = 0;
-	visarea.max_x = width - 1;
-	visarea.max_y = height - 1;
+	visarea.set(0, width - 1, 0, height - 1);
 	verboselog( device->machine(), 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	verboselog( device->machine(), 3, "video_screen_configure %d %d %f\n", width, height, s3c24xx->lcd.framerate);
 	s3c24xx->lcd.hpos_min = 0;

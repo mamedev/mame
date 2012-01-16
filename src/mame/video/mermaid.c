@@ -316,14 +316,7 @@ SCREEN_VBLANK( mermaid )
 			rect.max_x = sx + screen.machine().gfx[1]->width - 1;
 			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
 
-			if (rect.min_x < visarea.min_x)
-				rect.min_x = visarea.min_x;
-			if (rect.min_y < visarea.min_y)
-				rect.min_y = visarea.min_y;
-			if (rect.max_x > visarea.max_x)
-				rect.max_x = visarea.max_x;
-			if (rect.max_y > visarea.max_y)
-				rect.max_y = visarea.max_y;
+			rect &= visarea;
 
 			// check collision sprite - background
 
@@ -426,14 +419,7 @@ SCREEN_VBLANK( mermaid )
 			rect.max_x = sx + screen.machine().gfx[1]->width - 1;
 			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
 
-			if (rect.min_x < visarea.min_x)
-				rect.min_x = visarea.min_x;
-			if (rect.min_y < visarea.min_y)
-				rect.min_y = visarea.min_y;
-			if (rect.max_x > visarea.max_x)
-				rect.max_x = visarea.max_x;
-			if (rect.max_y > visarea.max_y)
-				rect.max_y = visarea.max_y;
+			rect &= visarea;
 
 			// check collision sprite - sprite
 
@@ -514,15 +500,8 @@ SCREEN_VBLANK( mermaid )
 			rect.max_x = sx + screen.machine().gfx[1]->width - 1;
 			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
 
-			if (rect.min_x < visarea.min_x)
-				rect.min_x = visarea.min_x;
-			if (rect.min_y < visarea.min_y)
-				rect.min_y = visarea.min_y;
-			if (rect.max_x > visarea.max_x)
-				rect.max_x = visarea.max_x;
-			if (rect.max_y > visarea.max_y)
-				rect.max_y = visarea.max_y;
-
+			rect &= visarea;
+			
 			// check collision sprite - sprite
 
 			state->m_helper.fill(0, rect);

@@ -90,10 +90,7 @@ void K053936GP_clip_enable(int chip, int status) { K053936_clip_enabled[chip] = 
 void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy)
 {
 	rectangle &cliprect = K053936_cliprect[chip];
-	cliprect.min_x = minx;
-	cliprect.max_x = maxx;
-	cliprect.min_y = miny;
-	cliprect.max_y = maxy;
+	cliprect.set(minx, maxx, miny, maxy);
 }
 
 INLINE void K053936GP_copyroz32clip( running_machine &machine,
@@ -1056,8 +1053,8 @@ static void gx_wipezbuf(running_machine &machine, int noshadow)
 {
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	int w = visarea.max_x - visarea.min_x + 1;
-	int h = visarea.max_y - visarea.min_y + 1;
+	int w = visarea.width();
+	int h = visarea.height();
 
 	UINT8 *zptr = gx_objzbuf;
 	int ecx = h;
@@ -1575,7 +1572,7 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 					{
 						int pixeldouble_output = 0;
 						const rectangle &visarea = machine.primary_screen->visible_area();
-						int width = visarea.max_x - visarea.min_x + 1;
+						int width = visarea.width();
 
 						if (width>512) // vsnetscr case
 							pixeldouble_output = 1;
@@ -2319,10 +2316,7 @@ VIDEO_START(opengolf)
 	gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 
-	gxtype1_roz_dstbitmapclip.min_x = 0;
-	gxtype1_roz_dstbitmapclip.max_x = 512-1;
-	gxtype1_roz_dstbitmapclip.min_y = 0;
-	gxtype1_roz_dstbitmapclip.max_y = 512-1;
+	gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
 
 
 	K053936_wraparound_enable(0, 1);
@@ -2360,10 +2354,7 @@ VIDEO_START(racinfrc)
 	gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine,512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 
-	gxtype1_roz_dstbitmapclip.min_x = 0;
-	gxtype1_roz_dstbitmapclip.max_x = 512-1;
-	gxtype1_roz_dstbitmapclip.min_y = 0;
-	gxtype1_roz_dstbitmapclip.max_y = 512-1;
+	gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
 
 
 	K053936_wraparound_enable(0, 1);
@@ -2447,10 +2438,8 @@ SCREEN_UPDATE_RGB32(konamigx)
 	{
 		// we're going to throw half of this away anyway in post-process, so only render what's needed
 		rectangle temprect;
-		temprect.min_x = cliprect.min_x;
+		temprect = cliprect;
 		temprect.max_x = cliprect.min_x+320;
-		temprect.min_y = cliprect.min_y;
-		temprect.max_y = cliprect.max_y;
 
 		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(*type3_roz_temp_bitmap, temprect,gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
 		else K053936_0_zoom_draw(*type3_roz_temp_bitmap, temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield

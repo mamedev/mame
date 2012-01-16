@@ -184,13 +184,13 @@ INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
 
 INLINE void waveram_plot(int y, int x, UINT16 color)
 {
-	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
+	if (zeus_cliprect.contains(x, y))
 		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 }
 
 INLINE void waveram_plot_depth(int y, int x, UINT16 color, UINT16 depth)
 {
-	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
+	if (zeus_cliprect.contains(x, y))
 	{
 		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 		WAVERAM_WRITEDEPTH(zeus_renderbase, y, x, depth);
@@ -199,7 +199,7 @@ INLINE void waveram_plot_depth(int y, int x, UINT16 color, UINT16 depth)
 
 INLINE void waveram_plot_check_depth(int y, int x, UINT16 color, UINT16 depth)
 {
-	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
+	if (zeus_cliprect.contains(x, y))
 	{
 		UINT16 *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
 		if (depth <= *depthptr)
@@ -213,7 +213,7 @@ INLINE void waveram_plot_check_depth(int y, int x, UINT16 color, UINT16 depth)
 #ifdef UNUSED_FUNCTION
 INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 depth)
 {
-	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
+	if (zeus_cliprect.contains(x, y))
 	{
 		UINT16 *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
 		if (depth <= *depthptr)
@@ -743,12 +743,8 @@ static void zeus_register_update(running_machine &machine, offs_t offset)
 			{
 				int vtotal = zeusbase[0xca] >> 16;
 				int htotal = zeusbase[0xc6] >> 16;
-				rectangle visarea;
 
-				visarea.min_x = zeusbase[0xc6] & 0xffff;
-				visarea.max_x = htotal - 3;
-				visarea.min_y = 0;
-				visarea.max_y = zeusbase[0xc8] & 0xffff;
+				rectangle visarea(zeusbase[0xc6] & 0xffff, htotal - 3, 0, zeusbase[0xc8] & 0xffff);
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
 					machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));

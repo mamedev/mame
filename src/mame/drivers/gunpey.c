@@ -89,7 +89,7 @@ static SCREEN_UPDATE_RGB32( gunpey )
 			g = (color & 0x03e0) >> 2;
 			r = (color & 0x7c00) >> 7;
 
-			if(x<screen.visible_area().max_x && y<screen.visible_area().max_y)
+			if(cliprect.contains(x, y))
 				bitmap.pix32(y, x) = b | (g<<8) | (r<<16);
 
 

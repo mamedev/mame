@@ -405,7 +405,7 @@ static void draw_background(running_machine &machine, bitmap_rgb32 &bitmap, cons
 		switch (state->m_bg_clip_mode)
 		{
 		case  0: case  4: case  8: case 12: case 16:
-			clip.min_x = clip.max_x = clip.min_y = clip.max_y = 0;
+			clip.set(0, 0, 0, 0);
 			break;
 		case  1: clip.min_y = state->m_sy1; break;
 		case  3: clip.max_y = state->m_sy2; break;
@@ -416,17 +416,7 @@ static void draw_background(running_machine &machine, bitmap_rgb32 &bitmap, cons
 		}
 
 		if (flip_screen_get(machine))
-		{
-			int min_x,max_x,min_y,max_y;
-			min_x = 255 - clip.max_x;
-			max_x = 255 - clip.min_x;
-			min_y = 255 - clip.max_y;
-			max_y = 255 - clip.min_y;
-			clip.min_x = min_x;
-			clip.max_x = max_x;
-			clip.min_y = min_y;
-			clip.max_y = max_y;
-		}
+			clip.set(255 - clip.max_x, 255 - clip.min_x, 255 - clip.max_y, 255 - clip.min_y);
 	}
 
 	tilemap_draw(bitmap, clip, state->m_bg_tilemap, 0, 0);

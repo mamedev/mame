@@ -284,7 +284,7 @@ UINT32 hd44102_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			int sy = m_sy + z;
 			int sx = m_sx + y;
 
-			if ((sy >= cliprect.min_y) && (sy <= cliprect.max_y) && (sx >= cliprect.min_x) && (sx <= cliprect.max_x))
+			if (cliprect.contains(sx, sy))
 			{
 				int color = (m_status & STATUS_DISPLAY_OFF) ? 0 : BIT(data, z % 8);
 

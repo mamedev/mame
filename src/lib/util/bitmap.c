@@ -331,7 +331,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 		case 8:
 			// 8bpp always uses memset
 			for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-				memset(raw_pixptr(y, fill.min_x), (UINT8)color, fill.max_x + 1 - fill.min_x);
+				memset(raw_pixptr(y, fill.min_x), (UINT8)color, fill.width());
 			break;
 
 		case 16:
@@ -339,7 +339,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 			if ((UINT8)(color >> 8) == (UINT8)color)
 			{
 				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(raw_pixptr(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 2);
+					memset(raw_pixptr(y, fill.min_x), (UINT8)color, fill.width() * 2);
 			}
 			else
 			{
@@ -353,7 +353,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
 					destrow = &pixt<UINT16>(y, fill.min_x);
-					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 2);
+					memcpy(destrow, destrow0, fill.width() * 2);
 				}
 			}
 			break;
@@ -363,7 +363,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 			if ((UINT8)(color >> 8) == (UINT8)color && (UINT16)(color >> 16) == (UINT16)color)
 			{
 				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(&pixt<UINT32>(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 4);
+					memset(&pixt<UINT32>(y, fill.min_x), (UINT8)color, fill.width() * 4);
 			}
 			else
 			{
@@ -377,7 +377,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
 					destrow = &pixt<UINT32>(y, fill.min_x);
-					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 4);
+					memcpy(destrow, destrow0, fill.width() * 4);
 				}
 			}
 			break;
@@ -387,7 +387,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 			if ((UINT8)(color >> 8) == (UINT8)color && (UINT16)(color >> 16) == (UINT16)color)
 			{
 				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(&pixt<UINT64>(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 8);
+					memset(&pixt<UINT64>(y, fill.min_x), (UINT8)color, fill.width() * 8);
 			}
 			else
 			{
@@ -401,7 +401,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
 					destrow = &pixt<UINT64>(y, fill.min_x);
-					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 4);
+					memcpy(destrow, destrow0, fill.width() * 8);
 				}
 			}
 			break;

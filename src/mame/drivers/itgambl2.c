@@ -126,7 +126,7 @@ static SCREEN_UPDATE_RGB32( itgambl2 )
 
 			color = (blit_ram[count] & 0xff)>>0;
 
-			if((x)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+			if(cliprect.contains(x, y))
 				bitmap.pix32(y, x) = screen.machine().pens[color];
 
 			count++;

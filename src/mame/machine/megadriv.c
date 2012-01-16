@@ -9483,10 +9483,7 @@ int megadrive_z80irq_hpos = 320;
 		}
 //      mame_printf_debug("my mode %02x", megadrive_vdp_register[0x0c]);
 
-		visarea.min_x = 0;
-		visarea.max_x = scr_width-1;
-		visarea.min_y = 0;
-		visarea.max_y = megadrive_visible_scanlines-1;
+		visarea.set(0, scr_width-1, 0, megadrive_visible_scanlines-1);
 
 		screen.machine().primary_screen->configure(scr_width, megadrive_visible_scanlines, visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
 

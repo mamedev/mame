@@ -232,8 +232,7 @@ static void draw_radar(running_machine &machine,bitmap_ind16 &bitmap,const recta
 					sy = 255 - sy;
 				}
 
-				if (sy >= cliprect.min_y && sy <= cliprect.max_y &&
-					sx >= cliprect.min_x && sx <= cliprect.max_x)
+				if (cliprect.contains(sx, sy))
 					bitmap.pix16(sy, sx) = offs < 0x200 ? 512 : 513;
 			}
 }

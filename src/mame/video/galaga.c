@@ -557,7 +557,7 @@ static void draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rec
 				x = (star_seed_tab[star_cntr].x + state->m_stars_scrollx) % 256 + x_align;
 				y = (y_align + star_seed_tab[star_cntr].y + state->m_stars_scrolly) % 256;
 
-				if (x >= cliprect.min_x && x <= cliprect.max_x && y >= cliprect.min_y && y <= cliprect.max_y)
+				if (cliprect.contains(x, y))
 					bitmap.pix16(y, x) = STARS_COLOR_BASE + star_seed_tab[ star_cntr ].col;
 			}
 

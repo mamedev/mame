@@ -211,10 +211,7 @@ void lordgun_update_gun(running_machine &machine, int i)
 
 	lorddgun_calc_gun_scr(machine, i);
 
-	if (	(state->m_gun[i].scr_x < visarea.min_x)	||
-			(state->m_gun[i].scr_x > visarea.max_x)	||
-			(state->m_gun[i].scr_y < visarea.min_y)	||
-			(state->m_gun[i].scr_y > visarea.max_y)	)
+	if (!visarea.contains(state->m_gun[i].scr_x, state->m_gun[i].scr_y))
 		state->m_gun[i].hw_x = state->m_gun[i].hw_y = 0;
 }
 

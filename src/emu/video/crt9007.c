@@ -420,11 +420,7 @@ inline void crt9007_device::recompute_parameters()
 	// visible area
 	rectangle visarea;
 
-	visarea.min_x = m_hsync_end;
-	visarea.max_x = horiz_pix_total - 1;
-
-	visarea.min_y = m_vsync_end;
-	visarea.max_y = vert_pix_total - 1;
+	visarea.set(m_hsync_end, horiz_pix_total - 1, m_vsync_end, vert_pix_total - 1);
 
 	if (LOG)
 	{

@@ -2723,8 +2723,7 @@ static void cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, cons
 
 				col = ((col & 0xe0) >> 1) + (screen.frame_number() / 16 & 0x0f);
 
-				if (sx >= cliprect.min_x && sx <= cliprect.max_x &&
-					sy >= cliprect.min_y && sy <= cliprect.max_y)
+				if (cliprect.contains(sx, sy))
 					bitmap.pix16(sy, sx) = 0xa00 + col;
 			}
 		}
@@ -2749,8 +2748,7 @@ static void cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, cons
 
 				col = ((col & 0xe0) >> 1) + (screen.frame_number() / 16 & 0x0f);
 
-				if (sx >= cliprect.min_x && sx <= cliprect.max_x &&
-					sy >= cliprect.min_y && sy <= cliprect.max_y)
+				if (cliprect.contains(sx, sy))
 					bitmap.pix16(sy, sx) = 0x800 + col;
 			}
 		}

@@ -935,10 +935,7 @@ static WRITE32_HANDLER( tcram_w )
 
 		state->m_screen_dis = 0;
 
-		visarea.min_x = min_x;
-		visarea.max_x = min_x + max_x - 1;
-		visarea.min_y = min_y;
-		visarea.max_y = min_y + max_y - 1;
+		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
 		space->machine().primary_screen->configure(HTOTAL, VTOTAL, visarea, space->machine().primary_screen->frame_period().attoseconds );
 	}
 }

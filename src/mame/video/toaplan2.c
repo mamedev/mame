@@ -446,10 +446,7 @@ SCREEN_UPDATE_IND16( batrider )
 	rectangle clip;
 	const rectangle &visarea = screen.visible_area();
 
-	clip.min_x = visarea.min_x;
-	clip.max_x = visarea.max_x;
-	clip.min_y = visarea.min_y;
-	clip.max_y = visarea.max_y;
+	clip = visarea;
 
 	/* used for 'for use in' and '8ing' screen on bbakraid, raizing on batrider */
 	for (line = 0; line < 256;line++)

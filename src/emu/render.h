@@ -190,6 +190,9 @@ struct render_bounds
 	float				y0;					// topmost Y coordinate
 	float				x1;					// rightmost X coordinate
 	float				y1;					// bottommost Y coordinate
+	
+	float width() const { return x1 - x0; }
+	float height() const { return y1 - y0; }
 };
 
 

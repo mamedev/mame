@@ -222,11 +222,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	int max_x = machine.primary_screen->width();
 	int max_y = machine.primary_screen->height();
 
-	rectangle spritetile_clip;
-	spritetile_clip.min_x = 0;
-	spritetile_clip.min_y = 0;
-	spritetile_clip.max_x = 31;
-	spritetile_clip.max_y = 31;
+	rectangle spritetile_clip(0, 31, 0, 31);
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{

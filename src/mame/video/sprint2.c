@@ -172,14 +172,7 @@ SCREEN_VBLANK( sprint2 )
 			rect.max_x = get_sprite_x(video_ram, i) + screen.machine().gfx[1]->width - 1;
 			rect.max_y = get_sprite_y(video_ram, i) + screen.machine().gfx[1]->height - 1;
 
-			if (rect.min_x < visarea.min_x)
-				rect.min_x = visarea.min_x;
-			if (rect.min_y < visarea.min_y)
-				rect.min_y = visarea.min_y;
-			if (rect.max_x > visarea.max_x)
-				rect.max_x = visarea.max_x;
-			if (rect.max_y > visarea.max_y)
-				rect.max_y = visarea.max_y;
+			rect &= visarea;
 
 			/* check for sprite-tilemap collisions */
 

@@ -628,10 +628,7 @@ static void draw_row(running_machine &machine, bitmap_ind16 &bitmap, const recta
 
 	/* Set up a clipping region for the tilemap slice .. */
 
-	clip.min_x = sx;
-	clip.max_x = sx + xnum * 0x10 - 1;
-	clip.min_y = sy;
-	clip.max_y = sy + ynum * 0x8  - 1;
+	clip.set(sx, sx + xnum * 0x10 - 1, sy, sy + ynum * 0x8  - 1);
 
 	/* .. and clip it against the visible screen */
 

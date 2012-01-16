@@ -196,10 +196,7 @@ static SCREEN_UPDATE_IND16(jackie)
 		int rowenable = state->m_bg_scroll2[j];
 
 		/* draw top of screen */
-		clip.min_x = visarea.min_x;
-		clip.max_x = visarea.max_x;
-		clip.min_y = startclipmin;
-		clip.max_y = startclipmin+1;
+		clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin+1);
 
 		if (rowenable==0)
 		{

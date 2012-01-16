@@ -84,18 +84,13 @@ static SCREEN_UPDATE_IND16( mogura )
 	const rectangle &visarea = screen.visible_area();
 
 	/* tilemap layout is a bit strange ... */
-	rectangle clip;
-	clip.min_x = visarea.min_x;
+	rectangle clip = visarea;
 	clip.max_x = 256 - 1;
-	clip.min_y = visarea.min_y;
-	clip.max_y = visarea.max_y;
 	tilemap_set_scrollx(state->m_tilemap, 0, 256);
 	tilemap_draw(bitmap, clip, state->m_tilemap, 0, 0);
 
 	clip.min_x = 256;
 	clip.max_x = 512 - 1;
-	clip.min_y = visarea.min_y;
-	clip.max_y = visarea.max_y;
 	tilemap_set_scrollx(state->m_tilemap, 0, -128);
 	tilemap_draw(bitmap, clip, state->m_tilemap, 0, 0);
 

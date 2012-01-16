@@ -57,12 +57,7 @@ static void draw_terrain(running_machine &machine, bitmap_ind16 &bitmap, const r
 			int color = val / 32;
 			int count = val % 32;
 
-			rectangle r;
-
-			r.min_y = y;
-			r.min_x = x;
-			r.max_y = y + 1;
-			r.max_x = x + 31 - count;
+			rectangle r(x, x + 31 - count, y, y+ 1);
 
 			bitmap.fill(color, r);
 

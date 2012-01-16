@@ -444,13 +444,9 @@ SCREEN_UPDATE_IND16( galastrm )
 	UINT8 pivlayer[3];
 	UINT16 priority;
 	static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
-	rectangle clip;
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 
-	clip.min_x = 0;
-	clip.min_y = 0;
-	clip.max_x = screen.width() -1;
-	clip.max_y = screen.height() -1;
+	rectangle clip(0, screen.width() -1, 0, screen.height() -1);
 
 	tc0100scn_tilemap_update(tc0100scn);
 	tc0480scp_tilemap_update(tc0480scp);

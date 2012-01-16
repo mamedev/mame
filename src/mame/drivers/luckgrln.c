@@ -269,12 +269,7 @@ static SCREEN_UPDATE_IND16(luckgrln)
 	const rectangle &visarea = screen.visible_area();
 	int i;
 
-	rectangle clip;
-
-	clip.min_x = visarea.min_x;
-	clip.max_x = visarea.max_x;
-	clip.min_y = visarea.min_y;
-	clip.max_y = visarea.max_y;
+	rectangle clip = visarea;
 
 	bitmap.fill(0, cliprect);
 

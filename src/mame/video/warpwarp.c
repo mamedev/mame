@@ -217,7 +217,7 @@ WRITE8_HANDLER( warpwarp_videoram_w )
 
 INLINE void geebee_plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen)
 {
-	if (x >= cliprect.min_x && x <= cliprect.max_x && y >= cliprect.min_y && y <= cliprect.max_y)
+	if (cliprect.contains(x, y))
 		bitmap.pix16(y, x) = pen;
 }
 

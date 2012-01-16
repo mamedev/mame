@@ -119,11 +119,7 @@ static CUSTOM_INPUT( spriteram_bit_r )
 static WRITE32_HANDLER( spriteram_buffer_w )
 {
 	limenko_state *state = space->machine().driver_data<limenko_state>();
-	rectangle clip;
-	clip.min_x = 0;
-	clip.max_x = 383;
-	clip.min_y = 0;
-	clip.max_y = 239;
+	rectangle clip(0, 383, 0, 239);
 
 	state->m_sprites_bitmap_pri.fill(0, clip);
 	state->m_sprites_bitmap.fill(0, clip);

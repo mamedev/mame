@@ -208,10 +208,7 @@ SCREEN_UPDATE_IND16(taotaido)
 	rectangle clip;
 
 	const rectangle &visarea = screen.visible_area();
-	clip.min_x = visarea.min_x;
-	clip.max_x = visarea.max_x;
-	clip.min_y = visarea.min_y;
-	clip.max_y = visarea.max_y;
+	clip = visarea;
 
 	for (line = 0; line < 224;line++)
 	{

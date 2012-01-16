@@ -201,10 +201,7 @@ static void i8275_recompute_parameters(device_t *device)
 		vert_pix_total *= 2; // Use of spaced rows
 	}
 
-	visarea.min_x = 0;
-	visarea.min_y = 0;
-	visarea.max_x = horiz_pix_total - 1;
-	visarea.max_y = vert_pix_total - 1;
+	visarea.set(0, horiz_pix_total - 1, 0, vert_pix_total - 1);
 
 	i8275->screen->configure(horiz_pix_total, vert_pix_total, visarea,
 				i8275->screen->frame_period().attoseconds);

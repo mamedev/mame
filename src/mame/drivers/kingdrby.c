@@ -222,10 +222,7 @@ static SCREEN_UPDATE_IND16(kingdrby)
 	tilemap_set_scrolly( state->m_sc0w_tilemap,0, 32);
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
-	clip.min_x = visarea.min_x;
-	clip.max_x = 256;
-	clip.min_y = 192;
-	clip.max_y = visarea.max_y;
+	clip.set(visarea.min_x, 256, 192, visarea.max_y);
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
 	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);

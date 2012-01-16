@@ -538,7 +538,7 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, 
 	int flipscreen = 0;	/* n/a */
 	int machine_flip = 0;	/* for  ROT 180 ? */
 
-	UINT16 screen_width = cliprect.max_x - cliprect.min_x + 1;
+	UINT16 screen_width = cliprect.width();
 	UINT16 min_y = cliprect.min_y;
 	UINT16 max_y = cliprect.max_y;
 

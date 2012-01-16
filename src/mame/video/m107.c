@@ -319,10 +319,7 @@ static void m107_tilemap_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 	int line;
 	rectangle clip;
 	const rectangle &visarea = machine.primary_screen->visible_area();
-	clip.min_x = visarea.min_x;
-	clip.max_x = visarea.max_x;
-	clip.min_y = visarea.min_y;
-	clip.max_y = visarea.max_y;
+	clip = visarea;
 
 	if (state->m_control[0x08 + laynum] & 0x02)
 	{

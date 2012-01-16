@@ -86,7 +86,7 @@ SCREEN_UPDATE_RGB32(aristmk6)
 				g = (g << 2) | (g & 3);
 				b = (b << 3) | (b & 0x7);
 
-				if((x)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				if(cliprect.contains(x, y))
 					bitmap.pix32(y, x) = r | g<<8 | b<<16;
 
 				count+=2;
@@ -97,7 +97,7 @@ SCREEN_UPDATE_RGB32(aristmk6)
 
 				color = blit_ram[count];
 
-				if((x)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				if(cliprect.contains(x, y))
 					bitmap.pix32(y, x) = screen.machine().pens[color];
 
 				count++;

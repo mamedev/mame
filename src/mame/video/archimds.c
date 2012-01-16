@@ -64,20 +64,14 @@ SCREEN_UPDATE_RGB32( archimds_vidc )
 
 							if(vidc_interlace)
 							{
-								if ((res_x) >= 0 &&
-									(res_y) >= 0 &&
-									(res_x) <= screen.visible_area().max_x && (res_y) <= screen.visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
+								if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
 									bitmap.pix32(res_y, res_x) = screen.machine().pens[(pen>>(xi))&0x1];
-								if ((res_x) >= 0 &&
-									(res_y) >= 0 &&
-									(res_x) <= screen.visible_area().max_x && (res_y+1) <= screen.visible_area().max_y && (res_x) <= xend && (res_y+1) <= yend)
+								if (cliprect.contains(res_x, res_y+1) && (res_x) <= xend && (res_y+1) <= yend)
 									bitmap.pix32(res_y+1, res_x) = screen.machine().pens[(pen>>(xi))&0x1];
 							}
 							else
 							{
-								if ((res_x) >= 0 &&
-									(res_y) >= 0 &&
-									(res_x) <= screen.visible_area().max_x && (res_y) <= screen.visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
+								if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
 									bitmap.pix32(res_y, res_x) = screen.machine().pens[(pen>>(xi))&0x1];
 							}
 						}
@@ -100,20 +94,14 @@ SCREEN_UPDATE_RGB32( archimds_vidc )
 
 						if(vidc_interlace)
 						{
-							if ((res_x) >= 0 &&
-								(res_y) >= 0 &&
-								(res_x) <= screen.visible_area().max_x && (res_y) <= screen.visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
+							if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
 								bitmap.pix32(res_y, res_x) = screen.machine().pens[(pen&0xff)+0x100];
-							if ((res_x) >= 0 &&
-								(res_y) >= 0 &&
-								(res_x) <= screen.visible_area().max_x && (res_y+1) <= screen.visible_area().max_y && (res_x) <= xend && (res_y+1) <= yend)
+							if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y+1) <= yend)
 								bitmap.pix32(res_y+1, res_x) = screen.machine().pens[(pen&0xff)+0x100];
 						}
 						else
 						{
-							if ((res_x) >= 0 &&
-								(res_y) >= 0 &&
-								(res_x) <= screen.visible_area().max_x && (res_y) <= screen.visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
+							if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
 								bitmap.pix32(res_y, res_x) = screen.machine().pens[(pen&0xff)+0x100];
 						}
 

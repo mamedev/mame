@@ -179,10 +179,7 @@ static MACHINE_START( cloud9 )
 	assert(state->m_vblank_end < state->m_vblank_start);
 
 	/* reconfigure the visible area to match */
-	visarea.min_x = 0;
-	visarea.max_x = 255;
-	visarea.min_y = state->m_vblank_end + 1;
-	visarea.max_y = state->m_vblank_start;
+	visarea.set(0, 255, state->m_vblank_end + 1, state->m_vblank_start);
 	machine.primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */

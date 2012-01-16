@@ -283,8 +283,7 @@ static void draw_bullets( running_machine &machine, bitmap_ind16 &bitmap, const 
 			sx = 240 - sx;
 		}
 
-		if (sx >= cliprect.min_x && sx <= cliprect.max_x &&
-			sy >= cliprect.min_y && sy <= cliprect.max_y)
+		if (cliprect.contains(sx, sy))
 			bitmap.pix16(sy, sx) = 0x19;
 	}
 }
@@ -396,7 +395,7 @@ void redclash_draw_stars( running_machine &machine, bitmap_ind16 &bitmap, const 
 		else
 			vcond = yloc & 0x01;
 
-		if (xloc >= cliprect.min_x && xloc <= cliprect.max_x && yloc >= cliprect.min_y && yloc <= cliprect.max_y)
+		if (cliprect.contains(xloc, yloc))
 		{
 			if ((hcond ^ vcond) == 0)
 			{

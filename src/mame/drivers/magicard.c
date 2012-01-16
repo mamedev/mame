@@ -402,22 +402,22 @@ static SCREEN_UPDATE_RGB32(magicard)
 
 				color = ((state->m_magicram[count]) & 0x000f)>>0;
 
-				if(((x*4)+3)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				if(cliprect.contains((x*4)+3, y))
 					bitmap.pix32(y, (x*4)+3) = screen.machine().pens[color];
 
 				color = ((state->m_magicram[count]) & 0x00f0)>>4;
 
-				if(((x*4)+2)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				if(cliprect.contains((x*4)+2, y))
 					bitmap.pix32(y, (x*4)+2) = screen.machine().pens[color];
 
 				color = ((state->m_magicram[count]) & 0x0f00)>>8;
 
-				if(((x*4)+1)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				if(cliprect.contains((x*4)+1, y))
 					bitmap.pix32(y, (x*4)+1) = screen.machine().pens[color];
 
 				color = ((state->m_magicram[count]) & 0xf000)>>12;
 
-				if(((x*4)+0)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				if(cliprect.contains((x*4)+0, y))
 					bitmap.pix32(y, (x*4)+0) = screen.machine().pens[color];
 
 				count++;
@@ -434,12 +434,12 @@ static SCREEN_UPDATE_RGB32(magicard)
 
 				color = ((state->m_magicram[count]) & 0x00ff)>>0;
 
-				if(((x*2)+1)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				if(cliprect.contains((x*2)+1, y))
 					bitmap.pix32(y, (x*2)+1) = screen.machine().pens[color];
 
 				color = ((state->m_magicram[count]) & 0xff00)>>8;
 
-				if(((x*2)+0)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+				if(cliprect.contains((x*2)+0, y))
 					bitmap.pix32(y, (x*2)+0) = screen.machine().pens[color];
 
 				count++;

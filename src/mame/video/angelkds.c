@@ -281,10 +281,7 @@ SCREEN_UPDATE_IND16( angelkds )
 	bitmap.fill(0x3f, cliprect); /* is there a register controling the colour?, we currently use the last colour of the tx palette */
 
 	/* draw top of screen */
-	clip.min_x = 8*0;
-	clip.max_x = 8*16-1;
-	clip.min_y = visarea.min_y;
-	clip.max_y = visarea.max_y;
+	clip.set(8*0, 8*16-1, visarea.min_y, visarea.max_y);
 
 	if ((state->m_layer_ctrl & 0x80) == 0x00)
 		tilemap_draw(bitmap, clip, state->m_bgtop_tilemap, 0, 0);
@@ -295,10 +292,7 @@ SCREEN_UPDATE_IND16( angelkds )
 		tilemap_draw(bitmap, clip, state->m_tx_tilemap, 0, 0);
 
 	/* draw bottom of screen */
-	clip.min_x = 8*16;
-	clip.max_x = 8*32-1;
-	clip.min_y = visarea.min_y;
-	clip.max_y = visarea.max_y;
+	clip.set(8*16, 8*32-1, visarea.min_y, visarea.max_y);
 
 	if ((state->m_layer_ctrl & 0x40) == 0x00)
 		tilemap_draw(bitmap, clip, state->m_bgbot_tilemap, 0, 0);

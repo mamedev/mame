@@ -80,7 +80,7 @@ static SCREEN_UPDATE_RGB32( taitowlf )
 
 			color = (blit_ram[count] & 0xff);
 
-			if((x)+0<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+			if(cliprect.contains(x+0, y))
 				bitmap.pix32(y, x+0) = screen.machine().pens[color];
 
 			count++;

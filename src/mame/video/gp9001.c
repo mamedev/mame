@@ -914,7 +914,7 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 							{
 								int drawxx = xx+sx;
 
-								if (drawxx>=cliprect.min_x && drawxx<=cliprect.max_x && drawyy>=cliprect.min_y && drawyy<=cliprect.max_y)
+								if (cliprect.contains(drawxx, drawyy))
 								{
 									UINT8 pix = srcdata[count];
 									UINT16* dstptr = &bitmap.pix16(drawyy, drawxx);

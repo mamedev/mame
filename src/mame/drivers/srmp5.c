@@ -92,7 +92,6 @@ static SCREEN_UPDATE_RGB32( srmp5 )
 	UINT16 *sprite_list=state->m_sprram;
 	UINT16 *sprite_list_end=&state->m_sprram[0x4000]; //guess
 	UINT8 *pixels=(UINT8 *)state->m_tileram;
-	const rectangle &visarea = screen.visible_area();
 
 //Table surface seems to be tiles, but display corrupts when switching the scene if always ON.
 //Currently the tiles are OFF.
@@ -168,7 +167,7 @@ static SCREEN_UPDATE_RGB32( srmp5 )
 								xs2 = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (sizex - xs) : xs;
 								if(pen)
 								{
-									if(xb+xs2<=visarea.max_x && xb+xs2>=visarea.min_x && yb+ys2<=visarea.max_y && yb+ys2>=visarea.min_y )
+									if(cliprect.contains(xb+xs2, yb+ys2))
 									{
 										UINT16 pixdata=state->m_palram[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
 										bitmap.pix32(yb+ys2, xb+xs2) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);

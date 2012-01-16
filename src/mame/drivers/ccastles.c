@@ -210,10 +210,7 @@ static MACHINE_START( ccastles )
 	assert(state->m_vblank_end < state->m_vblank_start);
 
 	/* reconfigure the visible area to match */
-	visarea.min_x = 0;
-	visarea.max_x = 255;
-	visarea.min_y = state->m_vblank_end;
-	visarea.max_y = state->m_vblank_start - 1;
+	visarea.set(0, 255, state->m_vblank_end, state->m_vblank_start - 1);
 	machine.primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */

@@ -584,15 +584,8 @@ namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_ind16 &bitmap, c
 			}
 
 			/* Set the clipping rect to mask off the other portion of the sprite */
-			rect.min_x=sx;
-			rect.max_x=sx+(sizex-1);
-			rect.min_y=sy;
-			rect.max_y=sy+(sizey-1);
-
-			if (cliprect.min_x > rect.min_x) rect.min_x = cliprect.min_x;
-			if (cliprect.max_x < rect.max_x) rect.max_x = cliprect.max_x;
-			if (cliprect.min_y > rect.min_y) rect.min_y = cliprect.min_y;
-			if (cliprect.max_y < rect.max_y) rect.max_y = cliprect.max_y;
+			rect.set(sx, sx+(sizex-1), sy, sy+(sizey-1));
+			rect &= cliprect;
 
 			if( !bBigSprite )
 			{
@@ -604,10 +597,7 @@ namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_ind16 &bitmap, c
 				sx -= (tile&1)?16:0;
 				sy -= (tile&2)?16:0;
 
-				rect.min_x=sx;
-				rect.max_x=sx+(sizex-1);
-				rect.min_y=sy;
-				rect.max_y=sy+(sizey-1);
+				rect.set(sx, sx+(sizex-1), sy, sy+(sizey-1));
 				rect.min_x += (tile&1)?16:0;
 				rect.max_x += (tile&1)?16:0;
 				rect.min_y += (tile&2)?16:0;
@@ -804,14 +794,8 @@ draw_spriteC355(running_machine &machine, _BitmapClass &bitmap, const rectangle 
 	hpos -= xscroll;
 	vpos -= yscroll;
 	pWinAttr = &spriteram16[0x2400/2+((palette>>8)&0xf)*4];
-	clip.min_x = pWinAttr[0] - xscroll;
-	clip.max_x = pWinAttr[1] - xscroll;
-	clip.min_y = pWinAttr[2] - yscroll;
-	clip.max_y = pWinAttr[3] - yscroll;
-	if( clip.min_x < cliprect.min_x ){ clip.min_x = cliprect.min_x; }
-	if( clip.min_y < cliprect.min_y ){ clip.min_y = cliprect.min_y; }
-	if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
-	if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
+	clip.set(pWinAttr[0] - xscroll, pWinAttr[1] - xscroll, pWinAttr[2] - yscroll, pWinAttr[3] - yscroll);
+	clip &= cliprect;
 	hpos&=0x7ff; if( hpos&0x400 ) hpos |= ~0x7ff; /* sign extend */
 	vpos&=0x7ff; if( vpos&0x400 ) vpos |= ~0x7ff; /* sign extend */
 
@@ -1310,14 +1294,8 @@ DrawRozScanline( bitmap_ind16 &bitmap, int line, int which, int pri, const recta
 			UnpackRozParam( pSource, &rozInfo );
 			if( pri == rozInfo.priority )
 			{
-				clip.min_x = 0;
-				clip.max_x = bitmap.width()-1;
-				clip.min_y = clip.max_y = line;
-
-				if( clip.min_x < cliprect.min_x ){ clip.min_x = cliprect.min_x; }
-				if( clip.min_y < cliprect.min_y ){ clip.min_y = cliprect.min_y; }
-				if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
-				if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
+				clip.set(0, bitmap.width()-1, line, line);
+				clip &= cliprect;
 
 				DrawRozHelper( bitmap, mRozTilemap[which], clip, &rozInfo );
 			} /* priority */

@@ -208,12 +208,8 @@ static VIDEO_START( cybertnk )
 
 static void draw_pixel( bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, int pen)
 {
-	if (x>cliprect.max_x) return;
-	if (x<cliprect.min_x) return;
-	if (y>cliprect.max_y) return;
-	if (y<cliprect.min_y) return;
-
-	bitmap.pix16(y, x) = pen;
+	if (cliprect.contains(x, y))
+		bitmap.pix16(y, x) = pen;
 }
 
 static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)

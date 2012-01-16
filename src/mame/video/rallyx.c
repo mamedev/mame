@@ -448,8 +448,7 @@ WRITE8_HANDLER( tactcian_starson_w )
 
 static void plot_star( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, int color )
 {
-	if (y < cliprect.min_y || y > cliprect.max_y ||
-		x < cliprect.min_x || x > cliprect.max_x)
+	if (!cliprect.contains(x, y))
 		return;
 
 	if (flip_screen_x_get(machine))

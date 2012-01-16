@@ -79,15 +79,8 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 	    {
 		    for (y = fy; y < fy + machine.gfx[expand]->height; y++)
             {
-			    if ((x < visarea.min_x) ||
-			        (x > visarea.max_x) ||
-			        (y < visarea.min_y) ||
-			        (y > visarea.max_y))
-			    {
-				    continue;
-			    }
-
-        	    Checksum += state->m_spritebitmap.pix16(y, x);
+			    if (visarea.contains(x, y))
+	        	    Checksum += state->m_spritebitmap.pix16(y, x);
             }
 	    }
 
@@ -105,15 +98,8 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 	    {
 		    for (y = fy; y < fy + machine.gfx[expand]->height; y++)
             {
-			    if ((x < visarea.min_x) ||
-			        (x > visarea.max_x) ||
-			        (y < visarea.min_y) ||
-			        (y > visarea.max_y))
-			    {
-				    continue;
-			    }
-
-        	    Checksum -= state->m_spritebitmap.pix16(y, x);
+			    if (visarea.contains(x, y))
+	        	    Checksum -= state->m_spritebitmap.pix16(y, x);
             }
 	    }
 
@@ -194,19 +180,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	        {
 		        for (y = by; y < by + machine.gfx[expand]->height; y++)
                 {
-			        if ((x < visarea.min_x) ||
-			            (x > visarea.max_x) ||
-			            (y < visarea.min_y) ||
-			            (y > visarea.max_y))
-			        {
-				        continue;
-			        }
-
-        	        if (bitmap.pix16(y, x) != state->m_bitmap.pix16(y, x))
-        	        {
-                    	state->m_CollisionBackground = 0x80;
-				        break;
-			        }
+			        if (visarea.contains(x, y))
+	        	        if (bitmap.pix16(y, x) != state->m_bitmap.pix16(y, x))
+	        	        {
+	                    	state->m_CollisionBackground = 0x80;
+					        break;
+				        }
                 }
 	        }
 

@@ -52,8 +52,7 @@ SCREEN_UPDATE_IND16( yboard )
 	}
 
 	/* draw the yboard sprites */
-	yboard_clip.min_x = yboard_clip.min_y = 0;
-	yboard_clip.max_x = yboard_clip.max_y = 511;
+	yboard_clip.set(0, 511, 0, 511);
 	segaic16_sprites_draw(screen, *state->m_tmp_bitmap, yboard_clip, 1);
 
 	/* apply rotation */

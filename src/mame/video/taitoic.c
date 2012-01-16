@@ -506,7 +506,7 @@ INLINE void taitoic_drawscanline( bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	UINT16 *dsti = &bitmap.pix16(y, x);
 	UINT8 *dstp = &priority.pix8(y, x);
-	int length = cliprect.max_x - cliprect.min_x + 1;
+	int length = cliprect.width();
 
 	src += cliprect.min_x;
 	dsti += cliprect.min_x;
@@ -2352,7 +2352,7 @@ static void tc0100scn_tilemap_draw_fg( device_t *device, bitmap_ind16 &bitmap, c
 			src_x = (256 - 64 - src_x) & width_mask;
 
 		// Col offsets are 'tilemap' space 0-511, and apply to blocks of 8 pixels at once
-		for (x = 0; x <= (cliprect.max_x - cliprect.min_x); x++)
+		for (x = 0; x < cliprect.width(); x++)
 		{
 			column_offset = tc0100scn->colscroll_ram[(src_x & 0x3ff) / 8];
 			p = src_bitmap.pix16((src_y - column_offset) & height_mask, src_x);
@@ -3264,7 +3264,7 @@ static void tc0480scp_bg01_draw( device_t *device, bitmap_ind16 &bitmap, const r
 		int x_index, x_step;
 		int machine_flip = 0;	/* for  ROT 180 ? */
 
-		UINT16 screen_width = 512; //cliprect.max_x - cliprect.min_x + 1;
+		UINT16 screen_width = 512; //cliprect.width();
 		UINT16 min_y = cliprect.min_y;
 		UINT16 max_y = cliprect.max_y;
 
@@ -3400,7 +3400,7 @@ static void tc0480scp_bg23_draw( device_t *device, bitmap_ind16 &bitmap, const r
 	int flipscreen = tc0480scp->pri_reg & 0x40;
 	int machine_flip = 0;	/* for  ROT 180 ? */
 
-	UINT16 screen_width = 512; //cliprect.max_x - cliprect.min_x + 1;
+	UINT16 screen_width = 512; //cliprect.width();
 	UINT16 min_y = cliprect.min_y;
 	UINT16 max_y = cliprect.max_y;
 

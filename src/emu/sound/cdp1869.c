@@ -953,7 +953,7 @@ UINT32 cdp1869_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		}
 
 		int cols = m_freshorz ? CDP1869_COLUMNS_FULL : CDP1869_COLUMNS_HALF;
-		int rows = (screen_rect.max_y - screen_rect.min_y + 1) / height;
+		int rows = screen_rect.height() / height;
 
 		UINT16 pmemsize = get_pmemsize(cols, rows);
 		UINT16 addr = m_hma;

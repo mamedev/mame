@@ -321,8 +321,8 @@ static void handle_lightpen( device_t *device )
     const rectangle &vis_area = device->machine().primary_screen->visible_area();
     int xt, yt;
 
-    xt = x_val * (vis_area.max_x - vis_area.min_x) / 1024 + vis_area.min_x;
-    yt = y_val * (vis_area.max_y - vis_area.min_y) / 1024 + vis_area.min_y;
+    xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
+    yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
 
      device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(yt, xt), FUNC(assert_lp_cb), 0, device);
 }

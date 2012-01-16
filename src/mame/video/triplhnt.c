@@ -59,17 +59,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		if (state->m_sprite_zoom)
 		{
-			rect.min_x = hpos - 16;
-			rect.min_y = 196 - vpos;
-			rect.max_x = rect.min_x + 63;
-			rect.max_y = rect.min_y + 63;
+			rect.set(hpos - 16, hpos - 16 + 63, 196 - vpos, 196 - vpos + 63);
 		}
 		else
 		{
-			rect.min_x = hpos - 16;
-			rect.min_y = 224 - vpos;
-			rect.max_x = rect.min_x + 31;
-			rect.max_y = rect.min_y + 31;
+			rect.set(hpos - 16, hpos - 16 + 31, 224 - vpos, 224 - vpos + 31);
 		}
 
 		/* render sprite to auxiliary bitmap */
@@ -78,14 +72,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			2 * code + state->m_sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y);
 
-		if (rect.min_x < cliprect.min_x)
-			rect.min_x = cliprect.min_x;
-		if (rect.min_y < cliprect.min_y)
-			rect.min_y = cliprect.min_y;
-		if (rect.max_x > cliprect.max_x)
-			rect.max_x = cliprect.max_x;
-		if (rect.max_y > cliprect.max_y)
-			rect.max_y = cliprect.max_y;
+		rect &= cliprect;
 
 		/* check for collisions and copy sprite */
 

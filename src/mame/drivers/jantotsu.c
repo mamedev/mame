@@ -158,7 +158,7 @@ static SCREEN_UPDATE_RGB32(jantotsu)
 				for(pen_i = 0;pen_i<4;pen_i++)
 					color |= (((state->m_bitmap[count + pen_i*0x2000]) >> (7 - i)) & 1) << pen_i;
 
-				if ((x + i) <= screen.visible_area().max_x && (y + 0) < screen.visible_area().max_y)
+				if (cliprect.contains(x + i, y))
 					bitmap.pix32(y, x + i) = screen.machine().pens[color];
 			}
 

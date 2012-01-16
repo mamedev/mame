@@ -10,10 +10,7 @@ VIDEO_START( groundfx )
 	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 
 	/* Hack */
-	state->m_hack_cliprect.min_x = 69;
-	state->m_hack_cliprect.max_x = 250;
-	state->m_hack_cliprect.min_y = 24 + 5;
-	state->m_hack_cliprect.max_y = 24 + 44;
+	state->m_hack_cliprect.set(69, 250, 24 + 5, 24 + 44);
 }
 
 /***************************************************************

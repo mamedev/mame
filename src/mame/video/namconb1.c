@@ -143,10 +143,7 @@ SCREEN_UPDATE_IND16( namconb1 )
 	clip.min_y = (yclip>>16)    - 0x21;
 	clip.max_y = (yclip&0xffff) - 0x21 - 1;
 	/* intersect with master clip rectangle */
-	if( clip.min_x < cliprect.min_x ){ clip.min_x = cliprect.min_x; }
-	if( clip.min_y < cliprect.min_y ){ clip.min_y = cliprect.min_y; }
-	if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
-	if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
+	clip &= cliprect;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 
@@ -184,10 +181,7 @@ SCREEN_UPDATE_IND16( namconb2 )
 	clip.min_y = (yclip>>16)    - 0x21;
 	clip.max_y = (yclip&0xffff) - 0x21 - 1;
 	/* intersect with master clip rectangle */
-	if( clip.min_x < cliprect.min_x ){ clip.min_x = cliprect.min_x; }
-	if( clip.min_y < cliprect.min_y ){ clip.min_y = cliprect.min_y; }
-	if( clip.max_x > cliprect.max_x ){ clip.max_x = cliprect.max_x; }
-	if( clip.max_y > cliprect.max_y ){ clip.max_y = cliprect.max_y; }
+	clip &= cliprect;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 

@@ -192,7 +192,7 @@ static void ttmjprd_draw_tile(running_machine &machine, bitmap_ind16 &bitmap, co
 
 			if (!depth)
 			{
-				if ((drawx < cliprect.max_x) && (drawx > cliprect.min_x) && (drawy < cliprect.max_y) && (drawy > cliprect.min_y))
+				if (cliprect.contains(drawx, drawy))
 				{
 					dat = (rom[(tileaddr*32)+count] & 0xf0)>>4;
 					if (dat!=15)
@@ -203,7 +203,7 @@ static void ttmjprd_draw_tile(running_machine &machine, bitmap_ind16 &bitmap, co
 					}
 				}
 				drawx++;
-				if ((drawx < cliprect.max_x) && (drawx > cliprect.min_x) && (drawy < cliprect.max_y) && (drawy > cliprect.min_y))
+				if (cliprect.contains(drawx, drawy))
 				{
 					dat = (rom[(tileaddr*32)+count] & 0x0f);
 					if (dat!=15)
@@ -218,7 +218,7 @@ static void ttmjprd_draw_tile(running_machine &machine, bitmap_ind16 &bitmap, co
 			}
 			else
 			{
-				if ((drawx < cliprect.max_x) && (drawx > cliprect.min_x) && (drawy < cliprect.max_y) && (drawy > cliprect.min_y))
+				if (cliprect.contains(drawx, drawy))
 				{
 					dat = (rom[(tileaddr*32)+count] & 0xff);
 					if (dat!=255)

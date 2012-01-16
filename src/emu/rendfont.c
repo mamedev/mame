@@ -290,11 +290,11 @@ render_texture *render_font::get_char_texture_and_bounds(float height, float asp
 	// on entry, assume x0,y0 are the top,left coordinate of the cell and add
 	// the character bounding box to that position
 	float scale = m_scale * height;
-	bounds.x0 += (float)gl.xoffs * scale * aspect;
+	bounds.x0 += float(gl.xoffs) * scale * aspect;
 
 	// compute x1,y1 from there based on the bitmap size
-	bounds.x1 = bounds.x0 + (float)gl.bmwidth * scale * aspect;
-	bounds.y1 = bounds.y0 + (float)m_height * scale;
+	bounds.x1 = bounds.x0 + float(gl.bmwidth) * scale * aspect;
+	bounds.y1 = bounds.y0 + float(m_height) * scale;
 
 	// return the texture
 	return gl.texture;
@@ -313,15 +313,15 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 	// on entry, assume x0,y0 are the top,left coordinate of the cell and add
 	// the character bounding box to that position
 	float scale = m_scale * height;
-	bounds.min_x = (float)gl.xoffs * scale * aspect;
+	bounds.min_x = float(gl.xoffs) * scale * aspect;
 	bounds.min_y = 0;
 
 	// compute x1,y1 from there based on the bitmap size
-	bounds.max_x = bounds.min_x + (float)gl.bmwidth * scale * aspect;
-	bounds.max_y = bounds.min_y + (float)m_height * scale;
+	bounds.set_width(float(gl.bmwidth) * scale * aspect);
+	bounds.set_height(float(m_height) * scale);
 
 	// if the bitmap isn't big enough, bail
-	if (dest.width() < bounds.max_x - bounds.min_x || dest.height() < bounds.max_y - bounds.min_y)
+	if (dest.width() < bounds.width() || dest.height() < bounds.height())
 		return;
 
 	// if no texture, fill the target
@@ -332,7 +332,7 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 	}
 
 	// scale the font
-	bitmap_argb32 tempbitmap(dest, bounds);
+	bitmap_argb32 tempbitmap(&dest.pix(0), bounds.width(), bounds.height(), dest.rowpixels());
 	render_texture::hq_scale(tempbitmap, gl.bitmap, gl.bitmap.cliprect(), NULL);
 }
 
@@ -344,7 +344,7 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 
 float render_font::char_width(float height, float aspect, unicode_char ch)
 {
-	return (float)get_char(ch).width * m_scale * height * aspect;
+	return float(get_char(ch).width) * m_scale * height * aspect;
 }
 
 
@@ -361,7 +361,7 @@ float render_font::string_width(float height, float aspect, const char *string)
 		totwidth += get_char(*ptr).width;
 
 	// scale the final result based on height
-	return (float)totwidth * m_scale * height * aspect;
+	return float(totwidth) * m_scale * height * aspect;
 }
 
 
@@ -388,7 +388,7 @@ float render_font::utf8string_width(float height, float aspect, const char *utf8
 	}
 
 	// scale the final result based on height
-	return (float)totwidth * m_scale * height * aspect;
+	return float(totwidth) * m_scale * height * aspect;
 }
 
 

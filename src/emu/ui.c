@@ -1110,8 +1110,7 @@ astring &game_info_astring(running_machine &machine, astring &string)
 				const rectangle &visarea = screen->visible_area();
 
 				string.catprintf("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
-						visarea.max_x - visarea.min_x + 1,
-						visarea.max_y - visarea.min_y + 1,
+						visarea.width(), visarea.height(),
 						(machine.system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
 						ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds));
 			}

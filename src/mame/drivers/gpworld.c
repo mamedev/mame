@@ -97,13 +97,8 @@ INLINE void draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int 
 		y = bitmap.height() - y - 1;
 	}
 
-	if (x < cliprect.min_x ||
-		x > cliprect.max_x ||
-		y < cliprect.min_y ||
-		y > cliprect.max_y)
-		return;
-
-	bitmap.pix16(y, x) = color;
+	if (cliprect.contains(x, y))
+		bitmap.pix16(y, x) = color;
 }
 
 static void gpworld_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -830,10 +830,7 @@ static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 		//printf("%04x %04x %d\n",zz, xxxscroll, line/8);
 
 		/* draw top of screen */
-		clip.min_x = visarea.min_x;
-		clip.max_x = 511;
-		clip.min_y = startclipmin;
-		clip.max_y = startclipmin;
+		clip.set(visarea.min_x, 511, startclipmin, startclipmin);
 
 
 

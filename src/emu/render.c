@@ -366,7 +366,7 @@ render_texture::render_texture()
 	  m_param(NULL),
 	  m_curseq(0)
 {
-	m_sbounds.min_x = m_sbounds.min_y = m_sbounds.max_x = m_sbounds.max_y = 0;
+	m_sbounds.set(0, -1, 0, -1);
 	memset(m_scaled, 0, sizeof(m_scaled));
 }
 
@@ -416,7 +416,7 @@ void render_texture::release()
 	// invalidate references to the original bitmap as well
 	m_manager->invalidate_all(m_bitmap);
 	m_bitmap = NULL;
-	m_sbounds.min_x = m_sbounds.min_y = m_sbounds.max_x = m_sbounds.max_y = 0;
+	m_sbounds.set(0, -1, 0, -1);
 	m_format = TEXFORMAT_ARGB32;
 	m_curseq = 0;
 
@@ -505,7 +505,8 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 	}
 
 	// make sure we can recover the original argb32 bitmap
-	bitmap_argb32 &srcbitmap = downcast<bitmap_argb32 &>(*m_bitmap);
+	bitmap_argb32 dummy;
+	bitmap_argb32 &srcbitmap = (m_bitmap != NULL) ? downcast<bitmap_argb32 &>(*m_bitmap) : dummy;
 
 	// is it a size we already have?
 	scaled_texture *scaled = NULL;
@@ -1285,13 +1286,13 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 				float xscale, yscale;
 				if (!(orientation_add(m_orientation, screen->container().orientation()) & ORIENTATION_SWAP_XY))
 				{
-					xscale = (float)(visarea.max_x + 1 - visarea.min_x) / (bounds.x1 - bounds.x0);
-					yscale = (float)(visarea.max_y + 1 - visarea.min_y) / (bounds.y1 - bounds.y0);
+					xscale = float(visarea.width()) / bounds.width();
+					yscale = float(visarea.height()) / bounds.height();
 				}
 				else
 				{
-					xscale = (float)(visarea.max_y + 1 - visarea.min_y) / (bounds.x1 - bounds.x0);
-					yscale = (float)(visarea.max_x + 1 - visarea.min_x) / (bounds.y1 - bounds.y0);
+					xscale = float(visarea.height()) / bounds.width();
+					yscale = float(visarea.width()) / bounds.height();
 				}
 
 				// pick the greater

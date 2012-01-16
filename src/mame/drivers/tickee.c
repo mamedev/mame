@@ -60,8 +60,8 @@ INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *
 {
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	*x = (((input_port_read(machine, player ? "GUNX2" : "GUNX1") & 0xff) * (visarea.max_x - visarea.min_x)) >> 8) + visarea.min_x;
-	*y = (((input_port_read(machine, player ? "GUNY2" : "GUNY1") & 0xff) * (visarea.max_y - visarea.min_y)) >> 8) + visarea.min_y;
+	*x = (((input_port_read(machine, player ? "GUNX2" : "GUNX1") & 0xff) * visarea.width()) >> 8) + visarea.min_x;
+	*y = (((input_port_read(machine, player ? "GUNY2" : "GUNY1") & 0xff) * visarea.height()) >> 8) + visarea.min_y;
 }
 
 

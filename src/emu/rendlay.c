@@ -211,8 +211,8 @@ static int get_variable_value(running_machine &machine, const char *string, char
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			int num = device->visible_area().max_x + 1 - device->visible_area().min_x;
-			int den = device->visible_area().max_y + 1 - device->visible_area().min_y;
+			int num = device->visible_area().width();
+			int den = device->visible_area().height();
 			reduce_fraction(num, den);
 			*outputptr += sprintf(*outputptr, "%d", num);
 			return strlen(temp);
@@ -222,8 +222,8 @@ static int get_variable_value(running_machine &machine, const char *string, char
 		sprintf(temp, "~scr%dnativeyaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			int num = device->visible_area().max_x + 1 - device->visible_area().min_x;
-			int den = device->visible_area().max_y + 1 - device->visible_area().min_y;
+			int num = device->visible_area().width();
+			int den = device->visible_area().height();
 			reduce_fraction(num, den);
 			*outputptr += sprintf(*outputptr, "%d", den);
 			return strlen(temp);
@@ -233,7 +233,7 @@ static int get_variable_value(running_machine &machine, const char *string, char
 		sprintf(temp, "~scr%dwidth~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", device->visible_area().max_x + 1 - device->visible_area().min_x);
+			*outputptr += sprintf(*outputptr, "%d", device->visible_area().width());
 			return strlen(temp);
 		}
 
@@ -241,7 +241,7 @@ static int get_variable_value(running_machine &machine, const char *string, char
 		sprintf(temp, "~scr%dheight~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", device->visible_area().max_y + 1 - device->visible_area().min_y);
+			*outputptr += sprintf(*outputptr, "%d", device->visible_area().height());
 			return strlen(temp);
 		}
 	}
@@ -749,8 +749,8 @@ void layout_element::component::draw_rect(bitmap_argb32 &dest, const rectangle &
 	UINT32 inva = (1.0f - m_color.a) * 255.0;
 
 	// iterate over X and Y
-	for (UINT32 y = bounds.min_y; y < bounds.max_y; y++)
-		for (UINT32 x = bounds.min_x; x < bounds.max_x; x++)
+	for (UINT32 y = bounds.min_y; y <= bounds.max_y; y++)
+		for (UINT32 x = bounds.min_x; x <= bounds.max_x; x++)
 		{
 			UINT32 finalr = r;
 			UINT32 finalg = g;
@@ -785,14 +785,14 @@ void layout_element::component::draw_disk(bitmap_argb32 &dest, const rectangle &
 	UINT32 inva = (1.0f - m_color.a) * 255.0;
 
 	// find the center
-	float xcenter = (float)(bounds.min_x + bounds.max_x) * 0.5f;
-	float ycenter = (float)(bounds.min_y + bounds.max_y) * 0.5f;
-	float xradius = (float)(bounds.max_x - bounds.min_x) * 0.5f;
-	float yradius = (float)(bounds.max_y - bounds.min_y) * 0.5f;
+	float xcenter = float(bounds.xcenter()) * 0.5f;
+	float ycenter = float(bounds.ycenter()) * 0.5f;
+	float xradius = float(bounds.width()) * 0.5f;
+	float yradius = float(bounds.height()) * 0.5f;
 	float ooyradius2 = 1.0f / (yradius * yradius);
 
 	// iterate over y
-	for (UINT32 y = bounds.min_y; y < bounds.max_y; y++)
+	for (UINT32 y = bounds.min_y; y <= bounds.max_y; y++)
 	{
 		float ycoord = ycenter - ((float)y + 0.5f);
 		float xval = xradius * sqrt(1.0f - (ycoord * ycoord) * ooyradius2);
@@ -842,12 +842,12 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 	INT32 width;
 	while (1)
 	{
-		width = font->string_width(bounds.max_y - bounds.min_y, aspect, m_string);
-		if (width < bounds.max_x - bounds.min_x)
+		width = font->string_width(bounds.height(), aspect, m_string);
+		if (width < bounds.width())
 			break;
 		aspect *= 0.9f;
 	}
-	INT32 curx = bounds.min_x + (bounds.max_x - bounds.min_x - width) / 2;
+	INT32 curx = bounds.min_x + (bounds.width() - width) / 2;
 
 	// allocate a temporary bitmap
 	bitmap_argb32 tempbitmap(dest.width(), dest.height());
@@ -857,17 +857,17 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 	{
 		// get the font bitmap
 		rectangle chbounds;
-		font->get_scaled_bitmap_and_bounds(tempbitmap, bounds.max_y - bounds.min_y, aspect, *s, chbounds);
+		font->get_scaled_bitmap_and_bounds(tempbitmap, bounds.height(), aspect, *s, chbounds);
 
 		// copy the data into the target
-		for (int y = 0; y < chbounds.max_y - chbounds.min_y; y++)
+		for (int y = 0; y < chbounds.height(); y++)
 		{
 			int effy = bounds.min_y + y;
 			if (effy >= bounds.min_y && effy <= bounds.max_y)
 			{
 				UINT32 *src = &tempbitmap.pix32(y);
 				UINT32 *d = &dest.pix32(effy);
-				for (int x = 0; x < chbounds.max_x - chbounds.min_x; x++)
+				for (int x = 0; x < chbounds.width(); x++)
 				{
 					int effx = curx + x + chbounds.min_x;
 					if (effx >= bounds.min_x && effx <= bounds.max_x)
@@ -888,7 +888,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 		}
 
 		// advance in the X direction
-		curx += font->char_width(bounds.max_y - bounds.min_y, aspect, *s);
+		curx += font->char_width(bounds.height(), aspect, *s);
 	}
 
 	// free the temporary bitmap and font

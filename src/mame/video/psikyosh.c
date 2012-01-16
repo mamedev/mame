@@ -342,10 +342,7 @@ static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, 
 	{
 		rectangle cliprect;
 
-		cliprect.min_x = 0;
-		cliprect.max_x = state->m_bg_bitmap.width() - 1;
-		cliprect.min_y = sy * 16;
-		cliprect.max_y = cliprect.min_y + 16 - 1;
+		cliprect.set(0, state->m_bg_bitmap.width() - 1, sy * 16, cliprect.min_y + 16 - 1);
 
 		state->m_bg_bitmap.fill(BG_TRANSPEN, cliprect);
 		int width = size * 16;
@@ -391,8 +388,8 @@ static void draw_bglayerscroll( running_machine &machine, int layer, bitmap_rgb3
 	int last_bank[32]; // corresponds to bank of bitmap in state->m_bg_bitmap. bg_bitmap is split into 16/32-rows of one-tile high each
 	for(int ii = 0; ii < 32; ii++) last_bank[ii] = -1;
 
-	int scr_width = (cliprect.max_x-cliprect.min_x + 1);
-	int scr_height = (cliprect.max_y-cliprect.min_y + 1);
+	int scr_width = cliprect.width();
+	int scr_height = cliprect.height();
 	UINT32 *scroll_reg = &state->m_bgram[(linebank * 0x800) / 4 - 0x4000 / 4];
 	UINT32 *pzab_reg   = &state->m_bgram[(linebank * 0x800) / 4 - 0x4000 / 4 + 0x400 / 4]; // pri, zoom, alpha, bank
 

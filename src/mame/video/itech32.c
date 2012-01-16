@@ -140,12 +140,8 @@ INLINE offs_t compute_safe_address(itech32_state *state, int x, int y)
 INLINE void disable_clipping(itech32_state *state)
 {
 	state->m_clip_save = state->m_clip_rect;
-
-	state->m_clip_rect.min_x = state->m_clip_rect.min_y = 0;
-	state->m_clip_rect.max_x = state->m_clip_rect.max_y = 0xfff;
-
-	state->m_scaled_clip_rect.min_x = state->m_scaled_clip_rect.min_y = 0;
-	state->m_scaled_clip_rect.max_x = state->m_scaled_clip_rect.max_y = 0xfff << 8;
+	state->m_clip_rect.set(0, 0xfff, 0, 0xfff);
+	state->m_scaled_clip_rect.set(0, 0xfff << 8, 0, 0xfff << 8);
 }
 
 INLINE void enable_clipping(itech32_state *state)
@@ -561,8 +557,7 @@ static void draw_raw(itech32_state *state, UINT16 *base, UINT16 color)
 			/* render all pixels */
 			sx = startx;
 			for (x = 0; x < width && sx < state->m_scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
-				if (ty >= state->m_scaled_clip_rect.min_y && ty < state->m_scaled_clip_rect.max_y &&
-					sx >= state->m_scaled_clip_rect.min_x && sx < state->m_scaled_clip_rect.max_x)
+				if (state->m_scaled_clip_rect.contains(sx, ty))
 				{
 					int pixel = rowsrc[x >> 8];
 					if (pixel != transparent_pen)
@@ -747,8 +742,7 @@ static void draw_raw_drivedge(itech32_state *state, UINT16 *base, UINT16 *zbase,
 			if (state->m_drivedge_zbuf_control[3] & 0x8000)
 			{
 				for (x = 0; x < width && sx < state->m_scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
-					if (ty >= state->m_scaled_clip_rect.min_y && ty < state->m_scaled_clip_rect.max_y &&
-						sx >= state->m_scaled_clip_rect.min_x && sx < state->m_scaled_clip_rect.max_x)
+					if (state->m_scaled_clip_rect.contains(sx, ty))
 					{
 						int pixel = rowsrc[x >> 8];
 						if (pixel != transparent_pen)
@@ -762,8 +756,7 @@ static void draw_raw_drivedge(itech32_state *state, UINT16 *base, UINT16 *zbase,
 			else if (state->m_drivedge_zbuf_control[3] & 0x4000)
 			{
 				for (x = 0; x < width && sx < state->m_scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
-					if (ty >= state->m_scaled_clip_rect.min_y && ty < state->m_scaled_clip_rect.max_y &&
-						sx >= state->m_scaled_clip_rect.min_x && sx < state->m_scaled_clip_rect.max_x)
+					if (state->m_scaled_clip_rect.contains(sx, ty))
 					{
 						int pixel = rowsrc[x >> 8];
 						UINT16 *zbuf = &zbase[compute_safe_address(state, sx >> 8, ty >> 8)];
@@ -778,8 +771,7 @@ static void draw_raw_drivedge(itech32_state *state, UINT16 *base, UINT16 *zbase,
 			else
 			{
 				for (x = 0; x < width && sx < state->m_scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
-					if (ty >= state->m_scaled_clip_rect.min_y && ty < state->m_scaled_clip_rect.max_y &&
-						sx >= state->m_scaled_clip_rect.min_x && sx < state->m_scaled_clip_rect.max_x)
+					if (state->m_scaled_clip_rect.contains(sx, ty))
 					{
 						int pixel = rowsrc[x >> 8];
 						UINT16 *zbuf = &zbase[compute_safe_address(state, sx >> 8, ty >> 8)];
@@ -1457,12 +1449,12 @@ SCREEN_UPDATE_IND16( itech32 )
 			}
 
 			/* draw from the buffer */
-			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.max_x - cliprect.min_x + 1, &scanline[cliprect.min_x], NULL);
+			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], NULL);
 		}
 
 		/* otherwise, draw directly from VRAM */
 		else
-			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.max_x - cliprect.min_x + 1, &src1[cliprect.min_x], NULL);
+			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &src1[cliprect.min_x], NULL);
 	}
 	return 0;
 }

@@ -435,9 +435,7 @@ void psxgpu_device::updatevisiblearea()
 		n_screenwidth = 640;
 		break;
 	}
-	visarea.min_x = visarea.min_y = 0;
-	visarea.max_x = n_screenwidth - 1;
-	visarea.max_y = n_screenheight - 1;
+	visarea.set(0, n_screenwidth - 1, 0, n_screenheight - 1);
 	machine().primary_screen->configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 

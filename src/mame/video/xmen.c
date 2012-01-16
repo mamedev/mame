@@ -154,15 +154,9 @@ SCREEN_VBLANK( xmen6p )
 		int offset;
 
 	//  const rectangle *visarea = screen.machine().primary_screen->visible_area();
-	//  cliprect.min_x = visarea->min_x;
-	//  cliprect.max_x = visarea->max_x;
-	//  cliprect.min_y = visarea->min_y;
-	//  cliprect.max_y = visarea->max_y;
+	//  cliprect = *visarea;
 
-		cliprect.min_x = 0;
-		cliprect.max_x = 64 * 8 - 1;
-		cliprect.min_y = 2 * 8;
-		cliprect.max_y = 30 * 8 - 1;
+		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
 
 		if (screen.machine().primary_screen->frame_number() & 0x01)

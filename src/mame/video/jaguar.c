@@ -237,8 +237,8 @@ INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *
 {
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	int width = visarea.max_x + 1 - visarea.min_x;
-	int height = visarea.max_y + 1 - visarea.min_y;
+	int width = visarea.width();
+	int height = visarea.height();
 	/* only 2 lightguns are connected */
 	*x = visarea.min_x + (((input_port_read(machine, player ? "FAKE2_X" : "FAKE1_X") & 0xff) * width) >> 8);
 	*y = visarea.min_y + (((input_port_read(machine, player ? "FAKE2_Y" : "FAKE1_Y") & 0xff) * height) >> 8);
@@ -751,11 +751,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 					/* adjust for the half-lines */
 					if (hperiod != 0 && vperiod != 0 && hbend < hbstart && vbend < vbstart && hbstart < hperiod)
 					{
-						rectangle visarea;
-						visarea.min_x = hbend / 2;
-						visarea.max_x = hbstart / 2 - 1;
-						visarea.min_y = vbend / 2;
-						visarea.max_y = vbstart / 2 - 1;
+						rectangle visarea(hbend / 2, hbstart / 2 - 1, vbend / 2, vbstart / 2 - 1);
 						space->machine().primary_screen->configure(hperiod / 2, vperiod / 2, visarea, HZ_TO_ATTOSECONDS((double)pixel_clock * 2 / hperiod / vperiod));
 					}
 				}

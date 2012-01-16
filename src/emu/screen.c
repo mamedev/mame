@@ -139,10 +139,7 @@ void screen_device::static_set_raw(device_t &device, UINT32 pixclock, UINT16 hto
 	screen.m_vblank = screen.m_refresh / vtotal * (vtotal - (vbstart - vbend));
 	screen.m_width = htotal;
 	screen.m_height = vtotal;
-	screen.m_visarea.min_x = hbend;
-	screen.m_visarea.max_x = hbstart - 1;
-	screen.m_visarea.min_y = vbend;
-	screen.m_visarea.max_y = vbstart - 1;
+	screen.m_visarea.set(hbend, hbstart - 1, vbend, vbstart - 1);
 }
 
 
@@ -261,10 +258,7 @@ bool screen_device::device_validity_check(emu_options &options, const game_drive
 	// sanity check display area
 	if (m_type != SCREEN_TYPE_VECTOR)
 	{
-		if ((m_visarea.max_x < m_visarea.min_x) ||
-			(m_visarea.max_y < m_visarea.min_y) ||
-			(m_visarea.max_x >= m_width) ||
-			(m_visarea.max_y >= m_height))
+		if (m_visarea.empty() || m_visarea.max_x >= m_width || m_visarea.max_y >= m_height)
 		{
 			mame_printf_error("%s: %s screen '%s' has an invalid display area\n", driver.source_file, driver.name, tag());
 			error = true;
@@ -472,7 +466,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	// if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
     // from the visible area, otherwise just used the supplied value
 	if (m_vblank == 0 && !m_oldstyle_vblank_supplied)
-		m_vblank_period = m_scantime * (height - (visarea.max_y + 1 - visarea.min_y));
+		m_vblank_period = m_scantime * (height - visarea.height());
 	else
 		m_vblank_period = m_vblank;
 
@@ -967,7 +961,7 @@ void screen_device::finalize_burnin()
 	scaledvis.max_y = m_visarea.max_y * m_burnin.height() / m_height;
 
 	// wrap a bitmap around the subregion we care about
-	bitmap_argb32 finalmap(scaledvis.max_x + 1 - scaledvis.min_x, scaledvis.max_y + 1 - scaledvis.min_y);
+	bitmap_argb32 finalmap(scaledvis.width(), scaledvis.height());
 	int srcwidth = m_burnin.width();
 	int srcheight = m_burnin.height();
 	int dstwidth = finalmap.width();

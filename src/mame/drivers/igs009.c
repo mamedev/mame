@@ -298,10 +298,7 @@ static SCREEN_UPDATE_IND16(jingbell)
 			int rowenable = state->m_bg_scroll2[zz];
 
 			/* draw top of screen */
-			clip.min_x = visarea.min_x;
-			clip.max_x = visarea.max_x;
-			clip.min_y = startclipmin;
-			clip.max_y = startclipmin+2;
+			clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin+2);
 
 			bitmap.fill(screen.machine().pens[rowenable], clip);
 

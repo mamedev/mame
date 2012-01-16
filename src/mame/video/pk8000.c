@@ -100,10 +100,7 @@ UINT32 pk8000_video_update(screen_device &screen, bitmap_ind16 &bitmap, const re
 	int x,y,j,b;
 	UINT16 offset = (pk8000_video_mode & 0xc0) << 8;
 	rectangle my_rect;
-	my_rect.min_x = 0;
-	my_rect.max_x = 256+32-1;
-	my_rect.min_y = 0;
-	my_rect.max_y = 192+32-1;
+	my_rect.set(0, 256+32-1, 0, 192+32-1);
 
 	if (pk8000_video_enable) {
 		bitmap.fill((pk8000_video_color >> 4) & 0x0f, my_rect);

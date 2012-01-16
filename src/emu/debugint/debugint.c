@@ -166,10 +166,7 @@ public:
 		this->state = flags | VIEW_STATE_NEEDS_UPDATE;
 
 		// initial size
-		this->bounds.min_x = 0;
-		this->bounds.min_y = 0;
-		this->bounds.max_x = 300;
-		this->bounds.max_y = 300;
+		this->bounds.set(0, 300, 0, 300);
 
 		/* specials */
 		switch (type)
@@ -377,7 +374,7 @@ static int dview_xy_in_rect(DView *dv, int type, int x, int y)
 	rectangle r;
 
 	dview_get_rect(dv, type, r);
-	if (x >= r.min_x && x <= r.max_x && y >= r.min_y && y <= r.max_y)
+	if (r.contains(x, y))
 		return TRUE;
 	return FALSE;
 }
@@ -396,7 +393,7 @@ static void dview_draw_hsb(DView *dv)
 	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, 0, 0, VSB_WIDTH,HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
 	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, r.width() - VSB_WIDTH, 0, VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
 
-	ts = (r.max_x - r.min_x + 1) - 2 * VSB_WIDTH;
+	ts = (r.width()) - 2 * VSB_WIDTH;
 
 	sz = (ts * (sb->page_size)) / (sb->upper - sb->lower);
 	ts = ts - sz;
@@ -420,7 +417,7 @@ static void dview_draw_vsb(DView *dv)
 	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, r.height() - HSB_HEIGHT, VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
 	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, 0,                       VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
 
-	ts = (r.max_y - r.min_y + 1) - 2 * HSB_HEIGHT;
+	ts = r.height() - 2 * HSB_HEIGHT;
 
 	sz = (ts * (sb->page_size)) / (sb->upper - sb->lower);
 	ts = ts - sz;

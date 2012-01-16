@@ -1110,10 +1110,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 		int xinc,yinc;
 
 		const rectangle &visarea = machine.primary_screen->visible_area();
-		clip.min_x = visarea.min_x;
-		clip.max_x = visarea.max_x;
-		clip.min_y = visarea.min_y;
-		clip.max_y = visarea.max_y;
+		clip = visarea;
 
 		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
 		{
@@ -1541,7 +1538,7 @@ SCREEN_UPDATE_RGB32( hng64 )
 		// Blit the color buffer into the primary bitmap
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *src = &state->m_colorBuffer3d[y * (cliprect.max_x-cliprect.min_x)];
+			UINT32 *src = &state->m_colorBuffer3d[y * cliprect.width()];
 			UINT32 *dst = &bitmap.pix32(y, cliprect.min_x);
 
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -1698,8 +1695,8 @@ VIDEO_START( hng64 )
 	state->m_additive_tilemap_debug = 0;
 
 	// 3d Buffer Allocation
-	state->m_depthBuffer3d = auto_alloc_array(machine, float,  (visarea.max_x)*(visarea.max_y));
-	state->m_colorBuffer3d = auto_alloc_array(machine, UINT32, (visarea.max_x)*(visarea.max_y));
+	state->m_depthBuffer3d = auto_alloc_array(machine, float,  (visarea.max_x + 1)*(visarea.max_y + 1));
+	state->m_colorBuffer3d = auto_alloc_array(machine, UINT32, (visarea.max_x + 1)*(visarea.max_y + 1));
 }
 
 

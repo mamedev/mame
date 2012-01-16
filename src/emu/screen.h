@@ -168,6 +168,7 @@ public:
 	int width() const { return m_width; }
 	int height() const { return m_height; }
 	const rectangle &visible_area() const { return m_visarea; }
+	const rectangle &cliprect() const { return m_bitmap[0].cliprect(); }
 	bool oldstyle_vblank_supplied() const { return m_oldstyle_vblank_supplied; }
 	attoseconds_t refresh_attoseconds() const { return m_refresh; }
 	attoseconds_t vblank_attoseconds() const { return m_vblank; }

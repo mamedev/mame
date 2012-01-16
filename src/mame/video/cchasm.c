@@ -124,8 +124,8 @@ VIDEO_START( cchasm )
 	cchasm_state *state = machine.driver_data<cchasm_state>();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	state->m_xcenter=((visarea.max_x + visarea.min_x)/2) << 16;
-	state->m_ycenter=((visarea.max_y + visarea.min_y)/2) << 16;
+	state->m_xcenter=visarea.xcenter() << 16;
+	state->m_ycenter=visarea.ycenter() << 16;
 
 	VIDEO_START_CALL(vector);
 }

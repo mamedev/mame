@@ -747,9 +747,7 @@ SCREEN_UPDATE_IND16( ygv608 )
 	const rectangle &visarea = screen.visible_area();
 
 	// clip to the current bitmap
-	finalclip.min_x = finalclip.min_y = 0;
-	finalclip.max_x = screen.width() - 1;
-	finalclip.max_y = screen.height() - 1;
+	finalclip.set(0, screen.width() - 1, 0, screen.height() - 1);
 	finalclip &= cliprect;
 
 	// punt if not initialized

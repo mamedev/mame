@@ -269,8 +269,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					{
 						if (rom[i] & 0x0f)
 						{
-							if (sx + x >= cliprect.min_x && sx + x <= cliprect.max_x &&
-								y >= cliprect.min_y && y <= cliprect.max_y)
+							if (cliprect.contains(sx + x, y))
 							{
 								if ((machine.priority_bitmap.pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
@@ -289,8 +288,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					{
 						if (rom[i] & 0xf0)
 						{
-							if (sx + x >= cliprect.min_x && sx + x <= cliprect.max_x &&
-								y >= cliprect.min_y && y <= cliprect.max_y)
+							if (cliprect.contains(sx + x, y))
 							{
 								if ((machine.priority_bitmap.pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16+(rom[i] >> 4);
@@ -313,8 +311,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					{
 						if (rom[i] & 0xf0)
 						{
-							if (sx + x >= cliprect.min_x && sx + x <= cliprect.max_x &&
-								y >= cliprect.min_y && y <= cliprect.max_y)
+							if (cliprect.contains(sx + x, y))
 							{
 								if ((machine.priority_bitmap.pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] >> 4);
@@ -333,8 +330,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					{
 						if (rom[i] & 0x0f)
 						{
-							if (sx + x >= cliprect.min_x && sx + x <= cliprect.max_x &&
-								y >= cliprect.min_y && y <= cliprect.max_y)
+							if (cliprect.contains(sx + x, y))
 							{
 								if ((machine.priority_bitmap.pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);

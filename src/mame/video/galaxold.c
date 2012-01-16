@@ -623,7 +623,7 @@ static void theend_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, 
 	{
 		x--;
 
-		if ((x >= cliprect.min_x) && (x <= cliprect.max_x) && (y >= cliprect.min_y) && (y <= cliprect.max_y))
+		if (cliprect.contains(x, y))
 			bitmap.pix16(y, x) = BULLETS_COLOR_BASE;
 	}
 }
@@ -1143,7 +1143,7 @@ static void galaxold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 	{
 		x--;
 
-		if ((x >= cliprect.min_x) && (x <= cliprect.max_x) && (y >= cliprect.min_y) && (y <= cliprect.max_y))
+		if (cliprect.contains(x, y))
 		{
 			int color;
 
@@ -1163,7 +1163,7 @@ static void scrambold_draw_bullets(running_machine &machine, bitmap_ind16 &bitma
 
 	x = x - 6;
 
-	if ((x >= cliprect.min_x) && (x <= cliprect.max_x) && (y >= cliprect.min_y) && (y <= cliprect.max_y))
+	if (cliprect.contains(x, y))
 		/* yellow bullets */
 		bitmap.pix16(y, x) = BULLETS_COLOR_BASE;
 }
@@ -1175,7 +1175,7 @@ static void darkplnt_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 
 	x = x - 6;
 
-	if ((x >= cliprect.min_x) && (x <= cliprect.max_x) && (y >= cliprect.min_y) && (y <= cliprect.max_y))
+	if (cliprect.contains(x, y))
 		bitmap.pix16(y, x) = 32 + state->m_darkplnt_bullet_color;
 }
 
@@ -1200,7 +1200,7 @@ static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 			x--;
 		}
 
-		if ((x >= cliprect.min_x) && (x <= cliprect.max_x) && (y >= cliprect.min_y) && (y <= cliprect.max_y))
+		if (cliprect.contains(x, y))
 			bitmap.pix16(y, x) = color;
 	}
 }
@@ -1377,22 +1377,15 @@ static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bit
 static void dambustr_draw_upper_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
-	rectangle clip;
 
 	if (flip_screen_x_get(machine))
 	{
-		clip.min_x = 254 - state->m_dambustr_bg_split_line;
-		clip.max_x = state->m_dambustr_bg_split_line;
-		clip.min_y = 0;
-		clip.max_y = 255;
+		rectangle clip(254 - state->m_dambustr_bg_split_line, state->m_dambustr_bg_split_line, 0, 255);
 		copybitmap(bitmap, *state->m_dambustr_tmpbitmap, 0, 0, 0, 0, clip);
 	}
 	else
 	{
-		clip.min_x = 0;
-		clip.max_x = 254 - state->m_dambustr_bg_split_line;
-		clip.min_y = 0;
-		clip.max_y = 255;
+		rectangle clip(0, 254 - state->m_dambustr_bg_split_line, 0, 255);
 		copybitmap(bitmap, *state->m_dambustr_tmpbitmap, 0, 0, 0, 0, clip);
 	}
 }
@@ -1482,7 +1475,7 @@ static void plot_star(galaxold_state *state, bitmap_ind16 &bitmap, int x, int y,
 	if (state->m_flipscreen_y)
 		y = 255 - y;
 
-	if ((x >= cliprect.min_x) && (x <= cliprect.max_x) && (y >= cliprect.min_y) && (y <= cliprect.max_y))
+	if (cliprect.contains(x, y))
 		bitmap.pix16(y, x) = state->m_stars_colors_start + color;
 }
 

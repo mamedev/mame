@@ -717,10 +717,7 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 			rectangle cellbounds;
 
 			/* make a rect that covers this row */
-			cellbounds.min_x = 0;
-			cellbounds.max_x = state->bitmap->width() - 1;
-			cellbounds.min_y = y * cellypix;
-			cellbounds.max_y = (y + 1) * cellypix - 1;
+			cellbounds.set(0, state->bitmap->width() - 1, y * cellypix, (y + 1) * cellypix - 1);
 
 			/* only display if there is data to show */
 			if (state->gfxset.offset[set] + y * xcells < gfx->total_elements)

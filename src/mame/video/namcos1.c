@@ -395,7 +395,7 @@ SCREEN_UPDATE_IND16( namcos1 )
 	i = ((state->m_cus116[6] << 8) | state->m_cus116[7]) - 0x11 - 1;	// max y
 	if (new_clip.max_y > i) new_clip.max_y = i;
 
-	if (new_clip.max_x < new_clip.min_x || new_clip.max_y < new_clip.min_y)
+	if (new_clip.empty())
 		return 0;
 
 

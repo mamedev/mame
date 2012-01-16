@@ -162,10 +162,7 @@ static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or
 					int tx = x + sx * (expand + 1) + ex;
 
 					/* get out if outside the drawing region */
-					if ((tx < cliprect.min_x) ||
-						(tx > cliprect.max_x) ||
-						(ty < cliprect.min_y) ||
-						(ty > cliprect.max_y))
+					if (!cliprect.contains(tx, ty))
 						continue;
 
 					/* get out if current image bit is transparent */
@@ -221,8 +218,7 @@ static int check_collision( device_t *device, int spriteno1, int spriteno2, cons
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
 			{
-				if ((x < cliprect.min_x) || (x > cliprect.max_x) ||
-					(y < cliprect.min_y) || (y > cliprect.max_y))
+				if (!cliprect.contains(x, y))
 					continue;
 
 				checksum = checksum + s2636->collision_bitmap->pix16(y, x);
@@ -235,8 +231,7 @@ static int check_collision( device_t *device, int spriteno1, int spriteno2, cons
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
 			{
-				if ((x < cliprect.min_x) || (x > cliprect.max_x) ||
-					(y < cliprect.min_y) || (y > cliprect.max_y))
+				if (!cliprect.contains(x, y))
 					continue;
 
 				checksum = checksum - s2636->collision_bitmap->pix16(y, x);

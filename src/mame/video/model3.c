@@ -357,10 +357,7 @@ SCREEN_UPDATE_IND16( model3 )
 #endif
 	state->m_screen_clip = (rectangle*)&cliprect;
 
-	state->m_clip3d.min_x = cliprect.min_x;
-	state->m_clip3d.max_x = cliprect.max_x;
-	state->m_clip3d.min_y = cliprect.min_y;
-	state->m_clip3d.max_y = cliprect.max_y;
+	state->m_clip3d = cliprect;
 
 	/* layer disable debug keys */
 	state->m_tick++;

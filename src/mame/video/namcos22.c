@@ -293,10 +293,7 @@ poly3d_Clip( float vx, float vy, float vw, float vh )
 	int cy = 240+vy;
 	mClip.cx = cx;
 	mClip.cy = cy;
-	mClip.scissor.min_x = cx + vw;
-	mClip.scissor.max_x = cx - vw;
-	mClip.scissor.min_y = cy + vh;
-	mClip.scissor.max_y = cy - vh;
+	mClip.scissor.set(cx + vw, cx - vw, cy + vh, cy - vh);
 	if( mClip.scissor.min_x<0 )   mClip.scissor.min_x = 0;
 	if( mClip.scissor.max_x>639 ) mClip.scissor.max_x = 639;
 	if( mClip.scissor.min_y<0 )   mClip.scissor.min_y = 0;
@@ -307,10 +304,7 @@ static void
 sprite_Clip( int min_x, int max_x, int min_y, int max_y )
 {
 	// cx/cy not used
-	mClip.scissor.min_x = min_x;
-	mClip.scissor.max_x = max_x;
-	mClip.scissor.min_y = min_y;
-	mClip.scissor.max_y = max_y;
+	mClip.scissor.set(min_x, max_x, min_y, max_y);
 	if( mClip.scissor.min_x<0 )   mClip.scissor.min_x = 0;
 	if( mClip.scissor.max_x>639 ) mClip.scissor.max_x = 639;
 	if( mClip.scissor.min_y<0 )   mClip.scissor.min_y = 0;
@@ -322,10 +316,7 @@ poly3d_NoClip( void )
 {
 	mClip.cx = 320;
 	mClip.cy = 240;
-	mClip.scissor.min_x = 0;
-	mClip.scissor.max_x = 639;
-	mClip.scissor.min_y = 0;
-	mClip.scissor.max_y = 479;
+	mClip.scissor.set(0, 639, 0, 479);
 }
 
 typedef struct

@@ -377,10 +377,7 @@ static VIDEO_START(rabbit)
     tilemap_map_pen_to_layer(state->m_tilemap[3], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
 	state->m_sprite_bitmap = auto_bitmap_ind16_alloc(machine,0x1000,0x1000);
-	state->m_sprite_clip.min_x = 0;
-	state->m_sprite_clip.max_x = 0x1000-1;
-	state->m_sprite_clip.min_y = 0;
-	state->m_sprite_clip.max_y = 0x1000-1;
+	state->m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
 }
 
 /*

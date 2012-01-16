@@ -169,10 +169,7 @@ inline void upd3301_device::recompute_parameters()
 
 	rectangle visarea;
 
-	visarea.min_x = 0;
-	visarea.min_y = 0;
-	visarea.max_x = (m_h * m_width) - 1;
-	visarea.max_y = (m_l * m_r) - 1;
+	visarea.set(0, (m_h * m_width) - 1, 0, (m_l * m_r) - 1);
 
 	if (LOG)
 	{

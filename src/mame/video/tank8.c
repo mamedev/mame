@@ -158,26 +158,13 @@ static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	for (i = 0; i < 8; i++)
 	{
-		rectangle rect;
-
 		int x = get_x_pos(state, 8 + i);
 		int y = get_y_pos(state, 8 + i);
 
 		x -= 4; /* ? */
 
-		rect.min_x = x;
-		rect.min_y = y;
-		rect.max_x = rect.min_x + 3;
-		rect.max_y = rect.min_y + 4;
-
-		if (rect.min_x < cliprect.min_x)
-			rect.min_x = cliprect.min_x;
-		if (rect.min_y < cliprect.min_y)
-			rect.min_y = cliprect.min_y;
-		if (rect.max_x > cliprect.max_x)
-			rect.max_x = cliprect.max_x;
-		if (rect.max_y > cliprect.max_y)
-			rect.max_y = cliprect.max_y;
+		rectangle rect(x, x + 3, y, y + 4);
+		rect &= cliprect;
 
 		bitmap.fill((i << 1) | 0x01, rect);
 	}

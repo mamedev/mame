@@ -24,8 +24,8 @@ INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *
 {
 	static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
 	const rectangle &visarea = machine.primary_screen->visible_area();
-	int width = visarea.max_x + 1 - visarea.min_x;
-	int height = visarea.max_y + 1 - visarea.min_y;
+	int width = visarea.width();
+	int height = visarea.height();
 
 	*x = ((input_port_read_safe(machine, gunnames[player * 2], 0x00) & 0xff) * width) / 255;
 	*y = ((input_port_read_safe(machine, gunnames[1 + player * 2], 0x00) & 0xff) * height) / 255;

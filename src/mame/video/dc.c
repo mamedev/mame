@@ -1085,8 +1085,6 @@ WRITE64_HANDLER( pvr_ta_w )
 		{
 			if ((state_ta.grab[a].ispbase == state->pvrta_regs[PARAM_BASE]) && (state_ta.grab[a].valid == 1) && (state_ta.grab[a].busy == 0))
 			{
-				rectangle clip;
-
 				state_ta.grab[a].busy = 1;
 				state_ta.renderselect = a;
 				state_ta.start_render_received=1;
@@ -1095,10 +1093,7 @@ WRITE64_HANDLER( pvr_ta_w )
 				state_ta.grab[a].fbwsof1=state->pvrta_regs[FB_W_SOF1];
 				state_ta.grab[a].fbwsof2=state->pvrta_regs[FB_W_SOF2];
 
-				clip.min_x = 0;
-				clip.max_x = 1023;
-				clip.min_y = 0;
-				clip.max_y = 1023;
+				rectangle clip(0, 1023, 0, 1023);
 
 				// we've got a request to draw, so, draw to the accumulation buffer!
 				// this should really be done for each tile!

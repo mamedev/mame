@@ -1150,23 +1150,14 @@ static void end_of_frame(running_machine &machine, struct sms_vdp *chip)
 
 	if (chip->vdp_type!=GG_VDP) /* In GG mode the Game Gear resolution is fixed */
 	{
-		rectangle visarea;
-
-		visarea.min_x = 0;
-		visarea.max_x = 256-1;
-		visarea.min_y = 0;
-		visarea.max_y = sms_mode_table[chip->screen_mode].sms2_height-1;
+		rectangle visarea(0, 256-1, 0, sms_mode_table[chip->screen_mode].sms2_height-1);
 
 		if (chip->chip_id==3) machine.primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 
 	}
 	else /* 160x144 */
 	{
-		rectangle visarea;
-		visarea.min_x = (256-160)/2;
-		visarea.max_x = (256-160)/2+160-1;
-		visarea.min_y = (192-144)/2;
-		visarea.max_y = (192-144)/2+144-1;
+		rectangle visarea((256-160)/2, (256-160)/2+160-1, (192-144)/2, (192-144)/2+144-1);
 
 		machine.primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 	}
