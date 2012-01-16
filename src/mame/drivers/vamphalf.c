@@ -21,16 +21,16 @@
     Final Godori               (c) 2001 SemiCom            (version 2.20.5915)
     Wyvern Wings               (c) 2001 SemiCom
     Mr. Kicker                 (c) 2001 SemiCom [1]
-    Toy Land Adventure         (c) 2001 SemiCom [2]
+    Toy Land Adventure         (c) 2001 SemiCom
     Age Of Heroes - Silkroad 2 (c) 2001 Unico              (v0.63 - 2001/02/07)
 
  Real games bugs:
  - dquizgo2: bugged video test
 
  Notes:
- [1]    Mr. Kicker game code crashes if the eeprom values are empty, because it replaces the SP register with a bogus value at PC = $18D0 before crashing.
-        It could be an original game bug or a hyperstone core bug
- [2]    Toy Land Adventure is currently missing graphics roms which makes it non-working.
+ [1]    Mr. Kicker game code crashes if the eeprom values are empty, because it replaces
+        the SP register with a bogus value at PC = $18D0 before crashing. It could be an
+        original game bug or a hyperstone core bug. Also happens with High Score update.
 
  Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB that
    Semicom also used for Toy Land Adventure & SemiComDate Quiz Go Go Episode 2 game.
