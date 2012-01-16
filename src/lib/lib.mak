@@ -19,6 +19,7 @@ OBJDIRS += \
 	$(LIBOBJ)/formats \
 	$(LIBOBJ)/zlib \
 	$(LIBOBJ)/softfloat \
+	$(LIBOBJ)/libjpeg \
 
 
 
@@ -205,3 +206,63 @@ $(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
 
 $(LIBOBJ)/softfloat/softfloat.o: $(LIBSRC)/softfloat/softfloat.c $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
 $(LIBOBJ)/softfloat/fsincos.o: $(LIBSRC)/softfloat/fsincos.c $(LIBSRC)/softfloat/fpu_constant.h $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
+
+#-------------------------------------------------
+# libJPEG library objects
+#-------------------------------------------------
+
+LIBJPEGOBJS= \
+	$(LIBOBJ)/libjpeg/jaricom.o \
+	$(LIBOBJ)/libjpeg/jcapimin.o \
+	$(LIBOBJ)/libjpeg/jcapistd.o \
+	$(LIBOBJ)/libjpeg/jcarith.o \
+	$(LIBOBJ)/libjpeg/jccoefct.o \
+	$(LIBOBJ)/libjpeg/jccolor.o \
+	$(LIBOBJ)/libjpeg/jcdctmgr.o \
+	$(LIBOBJ)/libjpeg/jchuff.o \
+	$(LIBOBJ)/libjpeg/jcinit.o \
+	$(LIBOBJ)/libjpeg/jcmainct.o \
+	$(LIBOBJ)/libjpeg/jcmarker.o \
+	$(LIBOBJ)/libjpeg/jcmaster.o \
+	$(LIBOBJ)/libjpeg/jcomapi.o \
+	$(LIBOBJ)/libjpeg/jcparam.o \
+	$(LIBOBJ)/libjpeg/jcprepct.o \
+	$(LIBOBJ)/libjpeg/jcsample.o \
+	$(LIBOBJ)/libjpeg/jctrans.o \
+	$(LIBOBJ)/libjpeg/jdapimin.o \
+	$(LIBOBJ)/libjpeg/jdapistd.o \
+	$(LIBOBJ)/libjpeg/jdarith.o \
+	$(LIBOBJ)/libjpeg/jdatadst.o \
+	$(LIBOBJ)/libjpeg/jdatasrc.o \
+	$(LIBOBJ)/libjpeg/jdcoefct.o \
+	$(LIBOBJ)/libjpeg/jdcolor.o \
+	$(LIBOBJ)/libjpeg/jddctmgr.o \
+	$(LIBOBJ)/libjpeg/jdhuff.o \
+	$(LIBOBJ)/libjpeg/jdinput.o \
+	$(LIBOBJ)/libjpeg/jdmainct.o \
+	$(LIBOBJ)/libjpeg/jdmarker.o \
+	$(LIBOBJ)/libjpeg/jdmaster.o \
+	$(LIBOBJ)/libjpeg/jdmerge.o \
+	$(LIBOBJ)/libjpeg/jdpostct.o \
+	$(LIBOBJ)/libjpeg/jdsample.o \
+	$(LIBOBJ)/libjpeg/jdtrans.o \
+	$(LIBOBJ)/libjpeg/jerror.o \
+	$(LIBOBJ)/libjpeg/jfdctflt.o \
+	$(LIBOBJ)/libjpeg/jfdctfst.o \
+	$(LIBOBJ)/libjpeg/jfdctint.o \
+	$(LIBOBJ)/libjpeg/jidctflt.o \
+	$(LIBOBJ)/libjpeg/jidctfst.o \
+	$(LIBOBJ)/libjpeg/jidctint.o \
+	$(LIBOBJ)/libjpeg/jquant1.o \
+	$(LIBOBJ)/libjpeg/jquant2.o \
+	$(LIBOBJ)/libjpeg/jutils.o \
+	$(LIBOBJ)/libjpeg/jmemmgr.o \
+	$(LIBOBJ)/libjpeg/jmemansi.o \
+
+$(OBJ)/libjpeg.a: $(LIBJPEGOBJS)
+
+$(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/libjpeg -c $< -o $@
+
+
