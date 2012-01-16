@@ -149,7 +149,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  debug_flags(0),
 	  memory_data(NULL),
 	  palette_data(NULL),
-	  tilemap_data(NULL),
 	  romload_data(NULL),
 	  input_data(NULL),
 	  input_port_data(NULL),
@@ -170,6 +169,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_input(NULL),
 	  m_sound(NULL),
 	  m_video(NULL),
+	  m_tilemap(NULL),
 	  m_debug_view(NULL),
 	  m_driver_device(NULL),
 	  m_current_phase(MACHINE_PHASE_PREINIT),
@@ -305,7 +305,7 @@ void running_machine::start()
 
 	// initialize image devices
 	image_init(*this);
-	tilemap_init(*this);
+	m_tilemap = auto_alloc(*this, tilemap_manager(*this));
 	crosshair_init(*this);
 	network_init(*this);
 

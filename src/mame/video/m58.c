@@ -159,7 +159,7 @@ static TILE_GET_INFO( yard_get_bg_tile_info )
 }
 
 
-static UINT32 yard_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( yard_tilemap_scan_rows )
 {
 	/* logical (col,row) -> memory offset */
 	if (col >= 32)

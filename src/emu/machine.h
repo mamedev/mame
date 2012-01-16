@@ -179,12 +179,12 @@ class cheat_manager;
 class render_manager;
 class sound_manager;
 class video_manager;
+class tilemap_manager;
 class debug_view_manager;
 class osd_interface;
 
 typedef struct _memory_private memory_private;
 typedef struct _palette_private palette_private;
-typedef struct _tilemap_private tilemap_private;
 typedef struct _romload_private romload_private;
 typedef struct _input_private input_private;
 typedef struct _input_port_private input_port_private;
@@ -342,6 +342,7 @@ public:
 	input_manager &input() const { assert(m_input != NULL); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != NULL); return *m_sound; }
 	video_manager &video() const { assert(m_video != NULL); return *m_video; }
+	tilemap_manager &tilemap() const { assert(m_tilemap != NULL); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }
 	driver_device *driver_data() const { return m_driver_device; }
 	template<class _DriverClass> _DriverClass *driver_data() const { return downcast<_DriverClass *>(m_driver_device); }
@@ -429,7 +430,6 @@ public:
 	// internal core information
 	memory_private *		memory_data;		// internal data from memory.c
 	palette_private *		palette_data;		// internal data from palette.c
-	tilemap_private *		tilemap_data;		// internal data from tilemap.c
 	romload_private *		romload_data;		// internal data from romload.c
 	input_private *			input_data;			// internal data from input.c
 	input_port_private *	input_port_data;	// internal data from inptport.c
@@ -466,6 +466,7 @@ private:
 	input_manager *			m_input;				// internal data from input.c
 	sound_manager *			m_sound;				// internal data from sound.c
 	video_manager *			m_video;				// internal data from video.c
+	tilemap_manager *		m_tilemap;				// internal data from tilemap.c
 	debug_view_manager *	m_debug_view;			// internal data from debugvw.c
 
 	// driver state

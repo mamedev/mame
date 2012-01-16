@@ -47,7 +47,7 @@ SCREEN_UPDATE_IND16( videopin )
 	{
 		for (col = 0; col < 48; col++)
 		{
-			UINT32 offset = get_memory_offset(col, row, 48, 32);
+			UINT32 offset = state->m_bg_tilemap->memory_index(col, row);
 
 			if (state->m_video_ram[offset] & 0x80)   /* ball bit found */
 			{

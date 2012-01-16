@@ -52,7 +52,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, color, 0);
 }
 
-static UINT32 tilemap_scan_cols_flipy( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_cols_flipy )
 {
 	/* logical (col,row) -> memory offset */
 	return (col * num_rows) + (num_rows - 1 - row);

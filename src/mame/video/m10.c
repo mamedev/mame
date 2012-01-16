@@ -42,7 +42,7 @@ static const gfx_layout charlayout =
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
-static UINT32 tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan )
 {
 	return (31 - col) * 32 + row;
 }

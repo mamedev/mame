@@ -154,7 +154,7 @@ UINT32 ui_gfx_ui_handler(running_machine &machine, render_container *container, 
 	ui_gfx_state *state = &ui_gfx;
 
 	/* if we have nothing, implicitly cancel */
-	if (machine.total_colors() == 0 && machine.colortable == NULL && machine.gfx[0] == NULL && tilemap_count(machine) == 0)
+	if (machine.total_colors() == 0 && machine.colortable == NULL && machine.gfx[0] == NULL && machine.tilemap().count() == 0)
 		goto cancel;
 
 	/* if we're not paused, mark the bitmap dirty */
@@ -189,7 +189,7 @@ again:
 
 		case 2:
 			/* if we have tilemaps, display them */
-			if (tilemap_count(machine) > 0)
+			if (machine.tilemap().count() > 0)
 			{
 				tilemap_handler(machine, container, state);
 				break;
@@ -854,7 +854,9 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 	char title[100];
 
 	/* get the size of the tilemap itself */
-	tilemap_size_by_index(machine, state->tilemap.which, &mapwidth, &mapheight);
+	tilemap_t *tilemap = machine.tilemap().find(state->tilemap.which);
+	mapwidth = tilemap->width();
+	mapheight = tilemap->height();
 	if (state->tilemap.rotate & ORIENTATION_SWAP_XY)
 		{ UINT32 temp = mapwidth; mapwidth = mapheight; mapheight = temp; }
 
@@ -906,7 +908,7 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 	boxbounds.y1 = mapboxbounds.y1 + 0.5f * chheight;
 
 	/* figure out the title and expand the outer box to fit */
-	sprintf(title, "TMAP %d/%d %dx%d OFFS %d,%d", state->tilemap.which, tilemap_count(machine) - 1, mapwidth, mapheight, state->tilemap.xoffs, state->tilemap.yoffs);
+	sprintf(title, "TMAP %d/%d %dx%d OFFS %d,%d", state->tilemap.which, machine.tilemap().count() - 1, mapwidth, mapheight, state->tilemap.xoffs, state->tilemap.yoffs);
 	titlewidth = ui_font->string_width(chheight, machine.render().ui_aspect(), title);
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 	{
@@ -960,11 +962,13 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state *state, i
 	/* clamp within range */
 	if (state->tilemap.which < 0)
 		state->tilemap.which = 0;
-	if (state->tilemap.which >= tilemap_count(machine))
-		state->tilemap.which = tilemap_count(machine) - 1;
+	if (state->tilemap.which >= machine.tilemap().count())
+		state->tilemap.which = machine.tilemap().count() - 1;
 
 	/* cache some info in locals */
-	tilemap_size_by_index(machine, state->tilemap.which, &mapwidth, &mapheight);
+	tilemap_t *tilemap = machine.tilemap().find(state->tilemap.which);
+	mapwidth = tilemap->width();
+	mapheight = tilemap->height();
 
 	/* handle zoom (minus,plus) */
 	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT))
@@ -1053,7 +1057,8 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state,
 	/* handle the redraw */
 	if (state->bitmap_dirty)
 	{
-		tilemap_draw_by_index(machine, *state->bitmap, state->tilemap.which, state->tilemap.xoffs, state->tilemap.yoffs);
+		tilemap_t *tilemap = machine.tilemap().find(state->tilemap.which);
+		tilemap->draw_debug(*state->bitmap, state->tilemap.xoffs, state->tilemap.yoffs);
 
 		/* reset the texture to force an update */
 		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_RGB32);
