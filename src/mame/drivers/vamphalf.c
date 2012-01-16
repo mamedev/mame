@@ -1328,20 +1328,24 @@ ROMs:
 ROM_START( toyland )
 	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* ROM1 empty */
-	ROM_LOAD( "rom2",         0x80000, 0x080000, CRC(e3455002) SHA1(5ad7884f82fb125d70829accec02f238e7d9593c) )
+	ROM_LOAD( "rom2.bin",         0x80000, 0x080000, CRC(e3455002) SHA1(5ad7884f82fb125d70829accec02f238e7d9593c) )
 
 	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "romu00", 0x000002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, NO_DUMP )
+	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, CRC(06f5673d) SHA1(23769015fc9a37d36b0fe4924964650aeca77573) )
+	ROM_LOAD32_WORD( "romu00.bin", 0x000002, 0x200000, CRC(8c3db0e4) SHA1(6101ec550ae165338333fb04e0762edee65ca253) )
+	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, CRC(076a84e1) SHA1(f58cb4cd874e1f3f266a5ccbf8ffb5e0111034d3) )
+	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, CRC(1bc33d01) SHA1(a2a3e6b473cefe463dbd60bda98cb5a4df2bc81b) )
 	/* roml02 empty */
 	/* romu02 empty */
 	/* roml03 empty */
 	/* romu03 empty */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
-	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(d7e6fc5d) SHA1(ab5bca4035299214d98b222320276fbcaedb0898) )
+	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(d7e6fc5d) SHA1(ab5bca4035299214d98b222320276fbcaedb0898) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM */
+	ROM_LOAD( "epr1.ic3", 0x0000, 0x0080, CRC(812f3d87) SHA1(744919ff4b44eaa3c4dcc75a1cc2f231ccbb4a3e) )
+
 ROM_END
 
 /*
@@ -2138,6 +2142,6 @@ GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",    
 GAME( 2000, mrdig,    0,        mrdig,    common,   mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
 GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_NOT_WORKING ) // game stops booting / working properly after you get a high score, or if you don't have a default eeprom with 'valid data.  It's never worked properly, CPU core issue?
-GAME( 2001, toyland,  0,        coolmini, common,   toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", GAME_NOT_WORKING ) /* Missing GRFX roms */
+GAME( 2001, toyland,  0,        coolmini, common,   toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", GAME_IMPERFECT_GRAPHICS)
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings", GAME_NO_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
