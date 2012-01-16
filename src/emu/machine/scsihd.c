@@ -15,8 +15,9 @@ typedef struct
 	UINT32 lba;
 	UINT32 blocks;
 	int sectorbytes;
+	chd_file       *handle;
 	hard_disk_file *disk;
-	bool is_file;
+	bool is_image_device;
 } SCSIHd;
 
 
@@ -253,43 +254,58 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	our_this->blocks = 0;
 	our_this->sectorbytes = 512;
 
+	// Attempt to register save state entry after state registration is closed!
 	state_save_register_item( machine, "scsihd", diskregion, 0, our_this->lba );
 	state_save_register_item( machine, "scsihd", diskregion, 0, our_this->blocks );
-
-	if (machine.device( diskregion )) {
-		our_this->is_file = TRUE;
-		our_this->disk = machine.device<harddisk_image_device>(diskregion)->get_hard_disk_file();
-	} else {
-		for (device_t *device = machine.devicelist().first(); device != NULL; device = device->next())
+	
+	// try to locate the CHD from a DISK_REGION
+	our_this->handle = get_disk_handle(machine, diskregion);
+	our_this->disk = hard_disk_open(our_this->handle);
+	our_this->is_image_device = false;
+	
+	if (our_this->disk == NULL)
+	{
+		// try to locate the CHD from an image device
+		harddisk_image_device *image_device = machine.device<harddisk_image_device>(diskregion);
+		
+		if (image_device != NULL)
 		{
-			if (device->subdevice(diskregion)) {
-				our_this->is_file = TRUE;
-				our_this->disk = device->subdevice<harddisk_image_device>(diskregion)->get_hard_disk_file();
-			}
-		}
-
-		if (!our_this->disk)
-		{
-			our_this->is_file = FALSE;
-			our_this->disk = hard_disk_open(get_disk_handle( machine, diskregion ));
+			our_this->handle = image_device->get_chd_file();
+			our_this->disk = hard_disk_open(our_this->handle);
+			our_this->is_image_device = true;
 		}
 	}
-
-	if (!our_this->disk)
+	
+	if (our_this->disk == NULL)
 	{
-		logerror("SCSIHD: no HD found!\n");
+		// try to locate the CHD from an image subdevice
+		for (device_t *device = machine.devicelist().first(); device != NULL; device = device->next())
+		{
+			if (device->subdevice(diskregion) != NULL)
+			{
+				our_this->handle = device->subdevice<harddisk_image_device>(diskregion)->get_chd_file();
+				our_this->disk = hard_disk_open(our_this->handle);
+				our_this->is_image_device = true;
+			}
+		}
+	}
+	
+	if (our_this->disk != NULL)
+	{
+		// get hard disk sector size from CHD metadata
+		const hard_disk_info *hdinfo = hard_disk_get_info(our_this->disk);
+		our_this->sectorbytes = hdinfo->sectorbytes;
 	}
 	else
 	{
-		const hard_disk_info *hdinfo = hard_disk_get_info(our_this->disk);
-		our_this->sectorbytes = hdinfo->sectorbytes;
+		logerror("SCSIHD: no HD found!\n");
 	}
 }
 
 static void scsihd_delete_instance( SCSIInstance *scsiInstance )
 {
 	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
-	if (!our_this->is_file) {
+	if (!our_this->is_image_device) {
 		if( our_this->disk )
 		{
 			hard_disk_close( our_this->disk );

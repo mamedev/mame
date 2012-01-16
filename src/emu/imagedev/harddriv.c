@@ -76,7 +76,9 @@ const device_type HARDDISK = &device_creator<harddisk_image_device>;
 
 harddisk_image_device::harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, HARDDISK, "Harddisk", tag, owner, clock),
-	  device_image_interface(mconfig, *this)
+	  device_image_interface(mconfig, *this),
+	  m_chd(NULL),
+	  m_hard_disk_handle(NULL)
 {
 
 }
