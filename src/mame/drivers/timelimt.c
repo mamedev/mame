@@ -202,12 +202,6 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( timelimt )
 	GFXDECODE_ENTRY( "tiles_1", 0, charlayout,   32, 1 )	/* seems correct */
 	GFXDECODE_ENTRY( "tiles_2", 0, charlayout,    0, 1 )	/* seems correct */
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout,  0, 8 )	/* ?? */
-GFXDECODE_END
-
-static GFXDECODE_START( progress )
-	GFXDECODE_ENTRY( "tiles_1", 0, charlayout,   32, 1 )	/* seems correct */
-	GFXDECODE_ENTRY( "tiles_2", 0, charlayout,    0, 1 )	/* seems correct */
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 64, 4 )	/* seems correct */
 GFXDECODE_END
 
@@ -259,7 +253,7 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 	MCFG_SCREEN_UPDATE_STATIC(timelimt)
 
 	MCFG_GFXDECODE(timelimt)
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_PALETTE_LENGTH(64+32)
 
 	MCFG_PALETTE_INIT(timelimt)
 	MCFG_VIDEO_START(timelimt)
@@ -273,15 +267,6 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 	MCFG_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( progress, timelimt )
-
-	/* basic machine hardware */
-
-	MCFG_GFXDECODE(progress)
-	MCFG_PALETTE_LENGTH(96)
-
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -314,10 +299,10 @@ ROM_START( timelimt )
 	ROM_LOAD( "tl2",    0x2000, 0x2000, CRC(4693b849) SHA1(fbebedde53599fb1eaedc648bd704b321ab096b5) )
 	ROM_LOAD( "tl1",    0x4000, 0x2000, CRC(c4007caf) SHA1(ae05af3319545d5ca98a046bfc100138a5a3ed96) )
 
-	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "clr.35", 0x0000, 0x0020, CRC(9c9e6073) SHA1(98496175bf19a8cdb0018705bc1a2193b8a782e1) )
-	ROM_LOAD( "clr.48", 0x0020, 0x0020, BAD_DUMP CRC(a0bcac59) SHA1(e5832831b21981363509b79d89766757bd9273b0)  )	/* FIXED BITS (xxxxxx1x) */
-	/* missing a prom? */
+	ROM_LOAD( "clr.48", 0x0020, 0x0020, BAD_DUMP CRC(a0bcac59) SHA1(e5832831b21981363509b79d89766757bd9273b0) )	/* FIXED BITS (xxxxxx1x) */
+	ROM_LOAD( "clr.57", 0x0040, 0x0020, NO_DUMP )	/* missing sprite color prom? */
 ROM_END
 
 ROM_START( progress )
@@ -350,4 +335,4 @@ ROM_START( progress )
 ROM_END
 
 GAME( 1983, timelimt, 0, timelimt, timelimt, 0, ROT90, "Chuo Co. Ltd", "Time Limit", GAME_IMPERFECT_COLORS )
-GAME( 1984, progress, 0, progress, progress, 0, ROT90, "Chuo Co. Ltd", "Progress", 0 )
+GAME( 1984, progress, 0, timelimt, progress, 0, ROT90, "Chuo Co. Ltd", "Progress", 0 )
