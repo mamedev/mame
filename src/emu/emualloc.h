@@ -331,9 +331,6 @@ extern const zeromem_t zeromem;
 #define calloc(x,y)		__error_use_auto_alloc_clear_or_global_alloc_clear_instead__
 #define realloc(x,y)	__error_realloc_is_dangerous__
 #define free(x)			free_file_line(x, __FILE__, __LINE__)
-
-// disable direct deletion
-#define delete			__error_use_pool_free_mechanisms__
 #endif
 
 #endif	/* __EMUALLOC_H__ */

@@ -3810,7 +3810,7 @@ public:
 		m_count++;
 		return &m_arr[m_count-1];
 	}
-	inline void delete(int index)
+	inline void remove(int index)
 	{
 		for (int i=index+1; i < m_count; i++)
 			m_arr[i-1] = m_arr[i];

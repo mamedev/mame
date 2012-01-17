@@ -95,6 +95,8 @@ struct file_entry
 	dependency *	deplist;
 };
 
+typedef tagmap_t<UINT8> dependency_map;
+
 
 
 /***************************************************************************
@@ -210,7 +212,7 @@ static int compare_list_entries(const void *p1, const void *p2)
     unless we already exist in the map
 -------------------------------------------------*/
 
-static void recurse_dependencies(file_entry &file, tagmap_t<astring *> &map)
+static void recurse_dependencies(file_entry &file, dependency_map &map)
 {
 	// skip if we're in an exclude path
 	int filelen = file.name.len();
@@ -220,7 +222,7 @@ static void recurse_dependencies(file_entry &file, tagmap_t<astring *> &map)
 				return;
 
 	// attempt to add; if we get an error, we're already present
-	if (map.add(file.name, &file.name) != TMERR_NONE)
+	if (map.add(file.name, 0) != TMERR_NONE)
 		return;
 
 	// recurse the list from there
@@ -304,7 +306,7 @@ static int recurse_dir(int srcrootlen, astring &srcdir)
 				// make sure we care, first
 				if (core_filename_ends_with(curlist->name, ".c"))
 				{
-					tagmap_t<astring *> depend_map;
+					dependency_map depend_map;
 
 					// find dependencies
 					file_entry &file = compute_dependencies(srcrootlen, srcfile);
@@ -317,9 +319,8 @@ static int recurse_dir(int srcrootlen, astring &srcdir)
 					printf("\n%s : \\\n", target.cstr());
 
 					// iterate over the hashed dependencies and output them as well
-					for (int taghash = 0; taghash < TAGMAP_HASH_SIZE; taghash++)
-						for (tagmap_entry *map_entry = depend_map.table[taghash]; map_entry != NULL; map_entry = map_entry->next)
-							printf("\t%s \\\n", ((astring *)map_entry->object)->cstr());
+					for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry))
+						printf("\t%s \\\n", entry->tag().cstr());
 				}
 			}
 

@@ -541,7 +541,7 @@ void discrete_device::discrete_build_list(const discrete_block *intf, sound_bloc
 				}
 			}
 			for_each (int *, i, &deletethem)
-				block_list.delete(*i);
+				block_list.remove(*i);
 		}
 		else
 		{
