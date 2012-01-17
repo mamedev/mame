@@ -18,14 +18,18 @@
 
     TODO:
     - modernize
-    - convert to a device.
+    - convert to an ISA device.
     - fix pixel clock
     - add emulated mc6845 hook-up
     - fix resolution change
     - fix video update.
-    - fix partial updates (The Incredible Machine)
-    - check doublescan condition (Robotron)
+	- rewrite video drawing functions (they are horrible)
+	- add emulated CGA
+	- add VESA etc.
     - (and many more ...)
+
+	per-game issues:
+	- fix partial updates (The Incredible Machine)
 
     ROM declarations:
 
@@ -124,7 +128,8 @@ static struct
 #define CRTC_CURSOR_TOP	(REG(0xa)&0x1f)
 #define CRTC_CURSOR_BOTTOM REG(0xb)
 
-#define DOUBLESCAN ((vga.crtc.data[9]&0x80)||((vga.crtc.data[9]&0x1f)!=0))
+#define DOUBLESCAN ((vga.crtc.data[9]&0x80)>>7)
+#define MAX_SCAN_LINES ((vga.crtc.data[9]&0x1f)+1)
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
 #define CRTC_ON (vga.crtc.data[0x17]&0x80)
@@ -133,7 +138,7 @@ static struct
 				|((vga.crtc.data[7]&2)<<7) \
 				|((vga.crtc.data[7]&0x40)<<3))+1 )
 //#define TEXT_LINES (LINES_HELPER)
-#define LINES (DOUBLESCAN?LINES_HELPER>>1:LINES_HELPER)
+#define LINES (LINES_HELPER)
 #define TEXT_LINES (LINES_HELPER >> ((vga.crtc.data[9]&0x80) ? 1 : 0))
 
 #define GRAPHIC_MODE (vga.gc.data[6]&1) /* else textmodus */
@@ -255,45 +260,41 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 
 static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 {
-	int pos, line, column, c, addr, i;
-	int height = CRTC_CHAR_HEIGHT;
+	int pos, line, column, c, addr, i, yi;
+	int height = MAX_SCAN_LINES * (DOUBLESCAN + 1);
 	UINT32 *bitmapline;
-	UINT32 *newbitmapline;
 	pen_t pen;
 
-	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES * (DOUBLESCAN+1);
+	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES;
 		 line += height, addr=(addr+EGA_LINE_LENGTH)&0x3ffff)
 	{
-		bitmapline = &bitmap.pix32(line >> DOUBLESCAN);
-
-		for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+4)&0x3ffff)
+		for(yi=0;yi<height;yi++)
 		{
-			int data[4];
+			if(!machine.primary_screen->visible_area().contains(0, line + yi))
+				return;
 
-			data[0]=vga.memory[pos];
-			data[1]=vga.memory[pos+1]<<1;
-			data[2]=vga.memory[pos+2]<<2;
-			data[3]=vga.memory[pos+3]<<3;
+			bitmapline = &bitmap.pix32(line + yi);
 
-			for (i = 7; i >= 0; i--)
+			for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+4)&0x3ffff)
 			{
-				pen = vga.pens[(data[0]&1) | (data[1]&2) | (data[2]&4) | (data[3]&8)];
-				bitmapline[c+i] = pen;
+				int data[4];
 
-				data[0]>>=1;
-				data[1]>>=1;
-				data[2]>>=1;
-				data[3]>>=1;
+				data[0]=vga.memory[pos];
+				data[1]=vga.memory[pos+1]<<1;
+				data[2]=vga.memory[pos+2]<<2;
+				data[3]=vga.memory[pos+3]<<3;
+
+				for (i = 7; i >= 0; i--)
+				{
+					pen = vga.pens[(data[0]&1) | (data[1]&2) | (data[2]&4) | (data[3]&8)];
+					bitmapline[c+i] = pen;
+
+					data[0]>>=1;
+					data[1]>>=1;
+					data[2]>>=1;
+					data[3]>>=1;
+				}
 			}
-		}
-
-		for (i = 1; i < height; i++)
-		{
-			if (line + i >= LINES)
-				break;
-
-			newbitmapline = &bitmap.pix32(line+i);
-			memcpy(newbitmapline, bitmapline, EGA_COLUMNS * 8 * sizeof(UINT16));
 		}
 	}
 }
@@ -303,58 +304,66 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	int pos, line, column, c, addr, curr_addr;
 	UINT32 *bitmapline;
 	UINT16 mask_comp;
+	int height = MAX_SCAN_LINES * (DOUBLESCAN + 1);
+	int yi;
 
 	/* line compare is screen sensitive */
-	mask_comp = 0xff | (LINES & 0x300);
+	mask_comp = 0x0ff | (LINES & 0x300);
 
 	curr_addr = 0;
 	if(vga.sequencer.data[4] & 0x08)
 	{
-		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line++, addr+=VGA_LINE_LENGTH, curr_addr+=VGA_LINE_LENGTH)
+		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=VGA_LINE_LENGTH, curr_addr+=VGA_LINE_LENGTH)
 		{
-			if(line < (vga.line_compare & mask_comp))
-				curr_addr = addr;
-			if(line == (vga.line_compare & mask_comp))
-				curr_addr = 0;
-			bitmapline = &bitmap.pix32(line);
-			addr %= vga.svga_intf.vram_size;
-			for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x20)
+			for(yi = 0;yi < height; yi++)
 			{
-				if(pos + 0x20 > vga.svga_intf.vram_size)
-					return;
-				bitmapline[c+0] = machine.pens[vga.memory[pos+0]];
-				bitmapline[c+1] = machine.pens[vga.memory[pos+1]];
-				bitmapline[c+2] = machine.pens[vga.memory[pos+2]];
-				bitmapline[c+3] = machine.pens[vga.memory[pos+3]];
-				bitmapline[c+4] = machine.pens[vga.memory[pos+0x10]];
-				bitmapline[c+5] = machine.pens[vga.memory[pos+0x11]];
-				bitmapline[c+6] = machine.pens[vga.memory[pos+0x12]];
-				bitmapline[c+7] = machine.pens[vga.memory[pos+0x13]];
+				if((line + yi) < (vga.line_compare & mask_comp))
+					curr_addr = addr;
+				if((line + yi) == (vga.line_compare & mask_comp))
+					curr_addr = 0;
+				bitmapline = &bitmap.pix32(line + yi);
+				addr %= vga.svga_intf.vram_size;
+				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x20)
+				{
+					if(pos + 0x20 > vga.svga_intf.vram_size)
+						return;
+					bitmapline[c+0] = machine.pens[vga.memory[pos+0]];
+					bitmapline[c+1] = machine.pens[vga.memory[pos+1]];
+					bitmapline[c+2] = machine.pens[vga.memory[pos+2]];
+					bitmapline[c+3] = machine.pens[vga.memory[pos+3]];
+					bitmapline[c+4] = machine.pens[vga.memory[pos+0x10]];
+					bitmapline[c+5] = machine.pens[vga.memory[pos+0x11]];
+					bitmapline[c+6] = machine.pens[vga.memory[pos+0x12]];
+					bitmapline[c+7] = machine.pens[vga.memory[pos+0x13]];
+				}
 			}
 		}
 	}
 	else
 	{
-		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line++, addr+=VGA_LINE_LENGTH/4, curr_addr+=VGA_LINE_LENGTH/4)
+		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=VGA_LINE_LENGTH/4, curr_addr+=VGA_LINE_LENGTH/4)
 		{
-			if(line < (vga.line_compare & mask_comp))
-				curr_addr = addr;
-			if(line == (vga.line_compare & mask_comp))
-				curr_addr = 0;
-			bitmapline = &bitmap.pix32(line);
-			addr %= vga.svga_intf.vram_size;
-			for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x08)
+			for(yi = 0;yi < height; yi++)
 			{
-				if(pos + 0x08 > vga.svga_intf.vram_size)
-					return;
-				bitmapline[c+0] = machine.pens[vga.memory[pos+0]];
-				bitmapline[c+1] = machine.pens[vga.memory[pos+1]];
-				bitmapline[c+2] = machine.pens[vga.memory[pos+2]];
-				bitmapline[c+3] = machine.pens[vga.memory[pos+3]];
-				bitmapline[c+4] = machine.pens[vga.memory[pos+4]];
-				bitmapline[c+5] = machine.pens[vga.memory[pos+5]];
-				bitmapline[c+6] = machine.pens[vga.memory[pos+6]];
-				bitmapline[c+7] = machine.pens[vga.memory[pos+7]];
+				if((line + yi) < (vga.line_compare & mask_comp))
+					curr_addr = addr;
+				if((line + yi) == (vga.line_compare & mask_comp))
+					curr_addr = 0;
+				bitmapline = &bitmap.pix32(line + yi);
+				addr %= vga.svga_intf.vram_size;
+				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x08)
+				{
+					if(pos + 0x08 > vga.svga_intf.vram_size)
+						return;
+					bitmapline[c+0] = machine.pens[vga.memory[pos+0]];
+					bitmapline[c+1] = machine.pens[vga.memory[pos+1]];
+					bitmapline[c+2] = machine.pens[vga.memory[pos+2]];
+					bitmapline[c+3] = machine.pens[vga.memory[pos+3]];
+					bitmapline[c+4] = machine.pens[vga.memory[pos+4]];
+					bitmapline[c+5] = machine.pens[vga.memory[pos+5]];
+					bitmapline[c+6] = machine.pens[vga.memory[pos+6]];
+					bitmapline[c+7] = machine.pens[vga.memory[pos+7]];
+				}
 			}
 		}
 	}
@@ -799,7 +808,7 @@ static WRITE8_HANDLER(vga_crtc_w)
 					data);
 			}
 			if(vga.crtc.index == 0x18 || vga.crtc.index == 0x07 || vga.crtc.index == 0x19 ) // Line compare
-				vga.line_compare = (((vga.crtc.data[0x09] & 0x40) << 3) | ((vga.crtc.data[0x07] & 0x10) << 4) | vga.crtc.data[0x18])/2;
+				vga.line_compare = (((vga.crtc.data[0x09] & 0x40) << 3) | ((vga.crtc.data[0x07] & 0x10) << 4) | vga.crtc.data[0x18]);
 			if (vga.crtc.index < vga.svga_intf.crtc_regcount)
 				vga.crtc.data[vga.crtc.index] = data;
 
