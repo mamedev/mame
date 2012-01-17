@@ -99,7 +99,7 @@ static VIDEO_START( superwng )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, 64);
+	state->m_bg_tilemap->set_scrollx(0, 64);
 }
 
 static SCREEN_UPDATE_IND16( superwng )
@@ -107,18 +107,18 @@ static SCREEN_UPDATE_IND16( superwng )
 	superwng_state *state = screen.machine().driver_data<superwng_state>();
 	int flip=flip_screen_get(screen.machine());
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	rectangle tmp=cliprect;
 
 	if(flip)
 	{
 		tmp.min_x+=32;
-		tilemap_draw(bitmap, tmp, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, tmp, 0, 0);
 	}
 	else
 	{
 		tmp.max_x-=32;
-		tilemap_draw(bitmap, tmp, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, tmp, 0, 0);
 	}
 
 	{
@@ -234,44 +234,44 @@ static WRITE8_HANDLER(superwng_bg_vram_w)
 {
 	superwng_state *state = space->machine().driver_data<superwng_state>();
 	state->m_videoram_bg[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER(superwng_bg_cram_w)
 {
 	superwng_state *state = space->machine().driver_data<superwng_state>();
 	state->m_colorram_bg[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER(superwng_fg_vram_w)
 {
 	superwng_state *state = space->machine().driver_data<superwng_state>();
 	state->m_videoram_fg[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER(superwng_fg_cram_w)
 {
 	superwng_state *state = space->machine().driver_data<superwng_state>();
 	state->m_colorram_fg[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER(superwng_tilebank_w)
 {
 	superwng_state *state = space->machine().driver_data<superwng_state>();
 	state->m_tile_bank = data;
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
+	state->m_fg_tilemap->mark_all_dirty();
 }
 
 static WRITE8_HANDLER( superwng_flip_screen_w )
 {
 	superwng_state *state = space->machine().driver_data<superwng_state>();
 	flip_screen_set(space->machine(), ~data & 0x01);
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
+	state->m_fg_tilemap->mark_all_dirty();
 }
 
 static WRITE8_HANDLER(superwng_cointcnt1_w)

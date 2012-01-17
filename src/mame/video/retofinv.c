@@ -86,7 +86,7 @@ static TILE_GET_INFO( fg_get_tile_info )
 	retofinv_state *state = machine.driver_data<retofinv_state>();
 	int color = state->m_fg_videoram[0x400 + tile_index];
 
-	tileinfo->group = color;
+	tileinfo.group = color;
 
 	SET_TILE_INFO(
 			0,
@@ -124,14 +124,14 @@ WRITE8_HANDLER( retofinv_bg_videoram_w )
 {
 	retofinv_state *state = space->machine().driver_data<retofinv_state>();
 	state->m_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( retofinv_fg_videoram_w )
 {
 	retofinv_state *state = space->machine().driver_data<retofinv_state>();
 	state->m_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x3ff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( retofinv_gfx_ctrl_w )
@@ -147,7 +147,7 @@ WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 			if (state->m_fg_bank != (data & 1))
 			{
 				state->m_fg_bank = data & 1;
-				tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+				state->m_fg_tilemap->mark_all_dirty();
 			}
 			break;
 
@@ -155,7 +155,7 @@ WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 			if (state->m_bg_bank != (data & 1))
 			{
 				state->m_bg_bank = data & 1;
-				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+				state->m_bg_tilemap->mark_all_dirty();
 			}
 			break;
 	}
@@ -228,8 +228,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 SCREEN_UPDATE_IND16( retofinv )
 {
 	retofinv_state *state = screen.machine().driver_data<retofinv_state>();
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

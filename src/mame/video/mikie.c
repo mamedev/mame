@@ -92,7 +92,7 @@ WRITE8_HANDLER( mikie_videoram_w )
 	mikie_state *state = space->machine().driver_data<mikie_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( mikie_colorram_w )
@@ -100,7 +100,7 @@ WRITE8_HANDLER( mikie_colorram_w )
 	mikie_state *state = space->machine().driver_data<mikie_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( mikie_palettebank_w )
@@ -110,7 +110,7 @@ WRITE8_HANDLER( mikie_palettebank_w )
 	if (state->m_palettebank != (data & 0x07))
 	{
 		state->m_palettebank = data & 0x07;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -119,7 +119,7 @@ WRITE8_HANDLER( mikie_flipscreen_w )
 	if (flip_screen_get(space->machine()) != (data & 0x01))
 	{
 		flip_screen_set(space->machine(), data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -130,9 +130,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = (state->m_colorram[tile_index] & 0x0f) + 16 * state->m_palettebank;
 	int flags = ((state->m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((state->m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 	if (state->m_colorram[tile_index] & 0x10)
-		tileinfo->category = 1;
+		tileinfo.category = 1;
 	else
-		tileinfo->category = 0;
+		tileinfo.category = 0;
 
 	SET_TILE_INFO(0, code, color, flags);
 
@@ -178,8 +178,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( mikie )
 {
 	mikie_state *state = screen.machine().driver_data<mikie_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_CATEGORY(0), 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_CATEGORY(1), 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 	return 0;
 }

@@ -299,14 +299,14 @@ INLINE void scrollram_w(address_space *space, offs_t offset, UINT16 data, UINT16
 	{
 		if (state->m_scroll_flag[which] & 0x10)	/* tiles are 8x8 */
 		{
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset );
+			state->m_tmap[which]->mark_tile_dirty(offset );
 		}
 		else
 		{
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset*4 + 0);
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset*4 + 1);
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset*4 + 2);
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset*4 + 3);
+			state->m_tmap[which]->mark_tile_dirty(offset*4 + 0);
+			state->m_tmap[which]->mark_tile_dirty(offset*4 + 1);
+			state->m_tmap[which]->mark_tile_dirty(offset*4 + 2);
+			state->m_tmap[which]->mark_tile_dirty(offset*4 + 3);
 		}
 	}
 }
@@ -395,8 +395,8 @@ static void create_tilemaps(running_machine &machine)
 		/* set user data and transparency */
 		for (i = 0; i < 8; i++)
 		{
-			tilemap_set_user_data(state->m_tilemap[layer][i/4][i%4], (void *)(FPTR)layer);
-			tilemap_set_transparent_pen(state->m_tilemap[layer][i/4][i%4], 15);
+			state->m_tilemap[layer][i/4][i%4]->set_user_data((void *)(FPTR)layer);
+			state->m_tilemap[layer][i/4][i%4]->set_transparent_pen(15);
 		}
 	}
 }
@@ -407,7 +407,7 @@ static void megasys1_set_vreg_flag(megasys1_state *state, int which, int data)
 	{
 		state->m_scroll_flag[which] = data;
 		state->m_tmap[which] = state->m_tilemap[which][(data >> 4) & 1][data & 3];
-		tilemap_mark_all_tiles_dirty(state->m_tmap[which]);
+		state->m_tmap[which]->mark_all_dirty();
 	}
 }
 
@@ -960,16 +960,16 @@ SCREEN_UPDATE_IND16( megasys1 )
 		active_layers |= 1 << ((pri & 0xf0000) >> 16);	// bottom layer can't be disabled
 	}
 
-	tilemap_set_flip_all( screen.machine(), (state->m_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0 );
+	screen.machine().tilemap().set_flip_all((state->m_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0 );
 
 	for (i = 0;i < 3;i++)
 	{
 		if (state->m_tmap[i])
 		{
-			tilemap_set_enable(state->m_tmap[i],active_layers & (1 << i));
+			state->m_tmap[i]->enable(active_layers & (1 << i));
 
-			tilemap_set_scrollx(state->m_tmap[i],0,state->m_scrollx[i]);
-			tilemap_set_scrolly(state->m_tmap[i],0,state->m_scrolly[i]);
+			state->m_tmap[i]->set_scrollx(0,state->m_scrollx[i]);
+			state->m_tmap[i]->set_scrolly(0,state->m_scrolly[i]);
 		}
 	}
 
@@ -990,7 +990,7 @@ SCREEN_UPDATE_IND16( megasys1 )
 			case 2:
 				if ( (state->m_tmap[layer]) && (active_layers & (1 << layer) ) )
 				{
-					tilemap_draw(bitmap,cliprect,state->m_tmap[layer],flag,primask);
+					state->m_tmap[layer]->draw(bitmap, cliprect, flag,primask);
 					flag = 0;
 				}
 				break;

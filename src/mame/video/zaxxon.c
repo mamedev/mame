@@ -135,9 +135,9 @@ static void video_start_common(running_machine &machine, tile_get_info_func fg_t
 	state->m_fg_tilemap = tilemap_create(machine, fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	/* configure the foreground tilemap */
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	tilemap_set_scrolldx(state->m_fg_tilemap, 0, machine.primary_screen->width() - 256);
-	tilemap_set_scrolldy(state->m_fg_tilemap, 0, machine.primary_screen->height() - 256);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_scrolldx(0, machine.primary_screen->width() - 256);
+	state->m_fg_tilemap->set_scrolldy(0, machine.primary_screen->height() - 256);
 
 	/* register for save states */
 	state->save_item(NAME(state->m_bg_enable));
@@ -189,7 +189,7 @@ WRITE8_HANDLER( zaxxon_flipscreen_w )
 
 	/* low bit controls flip; background and sprite flip are handled at render time */
 	flip_screen_set_no_update(space->machine(), ~data & 1);
-	tilemap_set_flip(state->m_fg_tilemap, flip_screen_get(space->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	state->m_fg_tilemap->set_flip(flip_screen_get(space->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 
@@ -199,7 +199,7 @@ WRITE8_HANDLER( zaxxon_fg_color_w )
 
 	/* low bit selects high color palette index */
 	state->m_fg_color = (data & 1) * 0x80;
-	tilemap_set_palette_offset(state->m_fg_tilemap, state->m_fg_color + (state->m_congo_color_bank << 8));
+	state->m_fg_tilemap->set_palette_offset(state->m_fg_color + (state->m_congo_color_bank << 8));
 }
 
 
@@ -239,7 +239,7 @@ WRITE8_HANDLER( congo_fg_bank_w )
 
 	/* low bit controls the topmost character bit */
 	state->m_congo_fg_bank = data & 1;
-	tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+	state->m_fg_tilemap->mark_all_dirty();
 }
 
 
@@ -249,7 +249,7 @@ WRITE8_HANDLER( congo_color_bank_w )
 
 	/* low bit controls the topmost bit into the color PROM */
 	state->m_congo_color_bank = data & 1;
-	tilemap_set_palette_offset(state->m_fg_tilemap, state->m_fg_color + (state->m_congo_color_bank << 8));
+	state->m_fg_tilemap->set_palette_offset(state->m_fg_color + (state->m_congo_color_bank << 8));
 }
 
 
@@ -265,7 +265,7 @@ WRITE8_HANDLER( zaxxon_videoram_w )
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -274,7 +274,7 @@ WRITE8_HANDLER( congo_colorram_w )
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -329,7 +329,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	/* only draw if enabled */
 	if (state->m_bg_enable)
 	{
-		bitmap_ind16 &pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
+		bitmap_ind16 &pixmap = state->m_bg_tilemap->pixmap();
 		int colorbase = state->m_bg_color + (state->m_congo_color_bank << 8);
 		int xmask = pixmap.width() - 1;
 		int ymask = pixmap.height() - 1;
@@ -481,7 +481,7 @@ SCREEN_UPDATE_IND16( zaxxon )
 
 	draw_background(screen.machine(), bitmap, cliprect, TRUE);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x140, 0x180);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -492,7 +492,7 @@ SCREEN_UPDATE_IND16( futspy )
 
 	draw_background(screen.machine(), bitmap, cliprect, TRUE);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x180, 0x180);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -503,7 +503,7 @@ SCREEN_UPDATE_IND16( razmataz )
 
 	draw_background(screen.machine(), bitmap, cliprect, FALSE);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x140, 0x180);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -514,6 +514,6 @@ SCREEN_UPDATE_IND16( congo )
 
 	draw_background(screen.machine(), bitmap, cliprect, TRUE);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x280, 0x180);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

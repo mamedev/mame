@@ -136,8 +136,8 @@ WRITE8_HANDLER( clshroad_vram_0_w )
 	int tile_index = offset / 2;
 	int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
 	state->m_vram_0[offset] = data;
-	if (tile_index & 0x20)	tilemap_mark_tile_dirty(state->m_tilemap_0a, tile);
-	else					tilemap_mark_tile_dirty(state->m_tilemap_0b, tile);
+	if (tile_index & 0x20)	state->m_tilemap_0a->mark_tile_dirty(tile);
+	else					state->m_tilemap_0b->mark_tile_dirty(tile);
 }
 
 /***************************************************************************
@@ -180,7 +180,7 @@ static TILE_GET_INFO( get_tile_info_fb1 )
 	clshroad_state *state = machine.driver_data<clshroad_state>();
 	UINT8 code	=	state->m_vram_1[ tile_index + 0x000 ];
 	UINT8 color	=	state->m_vram_1[ tile_index + 0x400 ] & 0x3f;
-	tileinfo->group = color;
+	tileinfo.group = color;
 	SET_TILE_INFO(
 			2,
 			code,
@@ -204,7 +204,7 @@ WRITE8_HANDLER( clshroad_vram_1_w )
 {
 	clshroad_state *state = space->machine().driver_data<clshroad_state>();
 	state->m_vram_1[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap_1, offset % 0x400);
+	state->m_tilemap_1->mark_tile_dirty(offset % 0x400);
 }
 
 
@@ -217,18 +217,18 @@ VIDEO_START( firebatl )
 	/* Text (No scrolling) */
 	state->m_tilemap_1  = tilemap_create(machine, get_tile_info_fb1,tilemap_scan_rows_extra,8,8,0x24,0x20);
 
-	tilemap_set_scroll_rows( state->m_tilemap_0a, 1);
-	tilemap_set_scroll_rows( state->m_tilemap_0b, 1);
-	tilemap_set_scroll_rows( state->m_tilemap_1,  1);
+	state->m_tilemap_0a->set_scroll_rows(1);
+	state->m_tilemap_0b->set_scroll_rows(1);
+	state->m_tilemap_1->set_scroll_rows(1);
 
-	tilemap_set_scroll_cols( state->m_tilemap_0a, 1);
-	tilemap_set_scroll_cols( state->m_tilemap_0b, 1);
-	tilemap_set_scroll_cols( state->m_tilemap_1,  1);
+	state->m_tilemap_0a->set_scroll_cols(1);
+	state->m_tilemap_0b->set_scroll_cols(1);
+	state->m_tilemap_1->set_scroll_cols(1);
 
-	tilemap_set_scrolldx( state->m_tilemap_0a, -0x30, -0xb5);
-	tilemap_set_scrolldx( state->m_tilemap_0b, -0x30, -0xb5);
+	state->m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
+	state->m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
 
-	tilemap_set_transparent_pen( state->m_tilemap_0b, 0 );
+	state->m_tilemap_0b->set_transparent_pen(0 );
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tilemap_1, machine.gfx[2], 0x0f);
 }
 
@@ -241,19 +241,19 @@ VIDEO_START( clshroad )
 	/* Text (No scrolling) */
 	state->m_tilemap_1  = tilemap_create(machine, get_tile_info_1,tilemap_scan_rows_extra,8,8,0x24,0x20);
 
-	tilemap_set_scroll_rows( state->m_tilemap_0a, 1);
-	tilemap_set_scroll_rows( state->m_tilemap_0b, 1);
-	tilemap_set_scroll_rows( state->m_tilemap_1,  1);
+	state->m_tilemap_0a->set_scroll_rows(1);
+	state->m_tilemap_0b->set_scroll_rows(1);
+	state->m_tilemap_1->set_scroll_rows(1);
 
-	tilemap_set_scroll_cols( state->m_tilemap_0a, 1);
-	tilemap_set_scroll_cols( state->m_tilemap_0b, 1);
-	tilemap_set_scroll_cols( state->m_tilemap_1,  1);
+	state->m_tilemap_0a->set_scroll_cols(1);
+	state->m_tilemap_0b->set_scroll_cols(1);
+	state->m_tilemap_1->set_scroll_cols(1);
 
-	tilemap_set_scrolldx( state->m_tilemap_0a, -0x30, -0xb5);
-	tilemap_set_scrolldx( state->m_tilemap_0b, -0x30, -0xb5);
+	state->m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
+	state->m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
 
-	tilemap_set_transparent_pen( state->m_tilemap_0b, 0x0f );
-	tilemap_set_transparent_pen( state->m_tilemap_1,  0x0f );
+	state->m_tilemap_0b->set_transparent_pen(0x0f );
+	state->m_tilemap_1->set_transparent_pen(0x0f );
 }
 
 
@@ -334,12 +334,12 @@ SCREEN_UPDATE_IND16( clshroad )
 //  int priority = state->m_vregs[ 2 ];
 
 	/* Only horizontal scrolling (these 2 layers use the same value) */
-	tilemap_set_scrollx(state->m_tilemap_0a, 0, scrollx);
-	tilemap_set_scrollx(state->m_tilemap_0b, 0, scrollx);
+	state->m_tilemap_0a->set_scrollx(0, scrollx);
+	state->m_tilemap_0b->set_scrollx(0, scrollx);
 
-	tilemap_draw(bitmap,cliprect,state->m_tilemap_0a,0,0);	// Opaque
-	tilemap_draw(bitmap,cliprect,state->m_tilemap_0b,0,0);
+	state->m_tilemap_0a->draw(bitmap, cliprect, 0,0);	// Opaque
+	state->m_tilemap_0b->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_tilemap_1,0,0);
+	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_tile_info )
 			state->m_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,
 			0);
-	tileinfo->category = (attr & 0x20) >> 5;
+	tileinfo.category = (attr & 0x20) >> 5;
 }
 
 
@@ -99,7 +99,7 @@ VIDEO_START( suprloco )
 	suprloco_state *state = machine.driver_data<suprloco_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_scroll_rows(state->m_bg_tilemap,32);
+	state->m_bg_tilemap->set_scroll_rows(32);
 }
 
 
@@ -114,7 +114,7 @@ WRITE8_HANDLER( suprloco_videoram_w )
 {
 	suprloco_state *state = space->machine().driver_data<suprloco_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset/2);
+	state->m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_HANDLER( suprloco_scrollram_w )
@@ -123,7 +123,7 @@ WRITE8_HANDLER( suprloco_scrollram_w )
 	int adj = flip_screen_get(space->machine()) ? -8 : 8;
 
 	state->m_scrollram[offset] = data;
-	tilemap_set_scrollx(state->m_bg_tilemap,offset, data - adj);
+	state->m_bg_tilemap->set_scrollx(offset, data - adj);
 }
 
 WRITE8_HANDLER( suprloco_control_w )
@@ -267,8 +267,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( suprloco )
 {
 	suprloco_state *state = screen.machine().driver_data<suprloco_state>();
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,1,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 1,0);
 	return 0;
 }

@@ -341,7 +341,7 @@ static WRITE8_HANDLER( peplus_crtc_display_w )
 	state->m_palette_ram[state->m_vid_address] = state->m_io_port[1];
 	state->m_palette_ram2[state->m_vid_address] = state->m_io_port[3];
 
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, state->m_vid_address);
+	state->m_bg_tilemap->mark_tile_dirty(state->m_vid_address);
 
 	/* An access here triggers a device read !*/
 	space->machine().device<mc6845_device>("crtc")->register_r(*space, 0);
@@ -675,7 +675,7 @@ static VIDEO_START( peplus )
 static SCREEN_UPDATE_IND16( peplus )
 {
 	peplus_state *state = screen.machine().driver_data<peplus_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -19,8 +19,8 @@ WRITE16_HANDLER( bestri_tilebank_w)
 	state->m_bestri_tilebank = (data>>10) & 0xf;
 	//printf("bestri %04x\n", data);
 
-	tilemap_mark_all_tiles_dirty(state->m_fg_layer);
-	tilemap_mark_all_tiles_dirty(state->m_bg_layer);
+	state->m_fg_layer->mark_all_dirty();
+	state->m_bg_layer->mark_all_dirty();
 }
 
 
@@ -30,7 +30,7 @@ WRITE16_HANDLER ( bestri_bg_scrolly_w )
 
 	/* Very Strange */
 	int scroll =  (data & 0x3ff) ^ 0x0155;
-	tilemap_set_scrolly(state->m_bg_layer, 0, -scroll + 7);
+	state->m_bg_layer->set_scrolly(0, -scroll + 7);
 }
 
 WRITE16_HANDLER ( bestri_fg_scrolly_w )
@@ -39,7 +39,7 @@ WRITE16_HANDLER ( bestri_fg_scrolly_w )
 
 	/* Very Strange */
 	int scroll = (data & 0x3ff) ^ 0x00ab;
-	tilemap_set_scrolly(state->m_fg_layer, 0, -scroll + 7);
+	state->m_fg_layer->set_scrolly(0, -scroll + 7);
 }
 
 WRITE16_HANDLER ( bestri_fg_scrollx_w )
@@ -47,7 +47,7 @@ WRITE16_HANDLER ( bestri_fg_scrollx_w )
 	crospang_state *state = space->machine().driver_data<crospang_state>();
 
 	// printf("fg_layer x %04x\n",data);
-	tilemap_set_scrollx(state->m_fg_layer, 0, data + 32);
+	state->m_fg_layer->set_scrollx(0, data + 32);
 }
 
 WRITE16_HANDLER ( bestri_bg_scrollx_w )
@@ -55,32 +55,32 @@ WRITE16_HANDLER ( bestri_bg_scrollx_w )
 	crospang_state *state = space->machine().driver_data<crospang_state>();
 
 	// printf("bg_layer x %04x\n",data);
-	tilemap_set_scrollx(state->m_bg_layer, 0, data - 60);
+	state->m_bg_layer->set_scrollx(0, data - 60);
 }
 
 
 WRITE16_HANDLER ( crospang_fg_scrolly_w )
 {
 	crospang_state *state = space->machine().driver_data<crospang_state>();
-	tilemap_set_scrolly(state->m_fg_layer, 0, data + 8);
+	state->m_fg_layer->set_scrolly(0, data + 8);
 }
 
 WRITE16_HANDLER ( crospang_bg_scrolly_w )
 {
 	crospang_state *state = space->machine().driver_data<crospang_state>();
-	tilemap_set_scrolly(state->m_bg_layer, 0, data + 8);
+	state->m_bg_layer->set_scrolly(0, data + 8);
 }
 
 WRITE16_HANDLER ( crospang_fg_scrollx_w )
 {
 	crospang_state *state = space->machine().driver_data<crospang_state>();
-	tilemap_set_scrollx(state->m_fg_layer, 0, data);
+	state->m_fg_layer->set_scrollx(0, data);
 }
 
 WRITE16_HANDLER ( crospang_bg_scrollx_w )
 {
 	crospang_state *state = space->machine().driver_data<crospang_state>();
-	tilemap_set_scrollx(state->m_bg_layer, 0, data + 4);
+	state->m_bg_layer->set_scrollx(0, data + 4);
 }
 
 
@@ -88,14 +88,14 @@ WRITE16_HANDLER ( crospang_fg_videoram_w )
 {
 	crospang_state *state = space->machine().driver_data<crospang_state>();
 	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_layer, offset);
+	state->m_fg_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER ( crospang_bg_videoram_w )
 {
 	crospang_state *state = space->machine().driver_data<crospang_state>();
 	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_layer, offset);
+	state->m_bg_layer->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -212,14 +212,14 @@ VIDEO_START( crospang )
 	state->m_bg_layer = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_fg_layer = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_layer, 0);
+	state->m_fg_layer->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16( crospang )
 {
 	crospang_state *state = screen.machine().driver_data<crospang_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_layer, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_layer, 0, 0);
+	state->m_bg_layer->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_layer->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

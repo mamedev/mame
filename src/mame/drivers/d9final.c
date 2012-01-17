@@ -60,7 +60,7 @@ static VIDEO_START(d9final)
 static SCREEN_UPDATE_IND16(d9final)
 {
 	d9final_state *state = screen.machine().driver_data<d9final_state>();
-	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
+	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -68,21 +68,21 @@ static WRITE8_HANDLER( sc0_lovram )
 {
 	d9final_state *state = space->machine().driver_data<d9final_state>();
 	state->m_lo_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
+	state->m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( sc0_hivram )
 {
 	d9final_state *state = space->machine().driver_data<d9final_state>();
 	state->m_hi_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
+	state->m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( sc0_cram )
 {
 	d9final_state *state = space->machine().driver_data<d9final_state>();
 	state->m_cram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
+	state->m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( d9final_bank_w )

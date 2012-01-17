@@ -43,7 +43,7 @@ static WRITE8_HANDLER( mgolf_vram_w )
 {
 	mgolf_state *state = space->machine().driver_data<mgolf_state>();
 	state->m_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -60,7 +60,7 @@ static SCREEN_UPDATE_IND16( mgolf )
 	int i;
 
 	/* draw playfield */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
 	for (i = 0; i < 2; i++)

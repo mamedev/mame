@@ -106,7 +106,7 @@ static TILE_GET_INFO( gyruss_get_tile_info )
 	int color = state->m_colorram[tile_index] & 0x0f;
 	int flags = TILE_FLIPYX(state->m_colorram[tile_index] >> 6);
 
-	tileinfo->group = (state->m_colorram[tile_index] & 0x10) ? 0 : 1;
+	tileinfo.group = (state->m_colorram[tile_index] & 0x10) ? 0 : 1;
 
 	SET_TILE_INFO(2, code, color, flags);
 }
@@ -116,8 +116,8 @@ VIDEO_START( gyruss )
 {
 	gyruss_state *state = machine.driver_data<gyruss_state>();
 	state->m_tilemap = tilemap_create(machine, gyruss_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transmask(state->m_tilemap, 0, 0x00, 0);	/* opaque */
-	tilemap_set_transmask(state->m_tilemap, 1, 0x0f, 0);  /* transparent */
+	state->m_tilemap->set_transmask(0, 0x00, 0);	/* opaque */
+	state->m_tilemap->set_transmask(1, 0x0f, 0);  /* transparent */
 }
 
 
@@ -156,13 +156,13 @@ SCREEN_UPDATE_IND16( gyruss )
 
 	if (cliprect.min_y == screen.visible_area().min_y)
 	{
-		tilemap_mark_all_tiles_dirty_all(screen.machine());
-		tilemap_set_flip_all(screen.machine(), (*state->m_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		screen.machine().tilemap().mark_all_dirty();
+		screen.machine().tilemap().set_flip_all((*state->m_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	state->m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().gfx);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

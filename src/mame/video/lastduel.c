@@ -37,7 +37,7 @@ static TILE_GET_INFO( ld_get_fg_tile_info )
 			tile,
 			color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
-	tileinfo->group = (color & 0x80) >> 7;
+	tileinfo.group = (color & 0x80) >> 7;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			tile,
 			color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
-	tileinfo->group = (color & 0x10) >> 4;
+	tileinfo.group = (color & 0x10) >> 4;
 }
 
 static TILE_GET_INFO( get_fix_info )
@@ -91,9 +91,9 @@ VIDEO_START( lastduel )
 	state->m_fg_tilemap = tilemap_create(machine, ld_get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->m_tx_tilemap = tilemap_create(machine, get_fix_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transmask(state->m_fg_tilemap, 0, 0xffff, 0x0001);
-	tilemap_set_transmask(state->m_fg_tilemap, 1, 0xf07f, 0x0f81);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 3);
+	state->m_fg_tilemap->set_transmask(0, 0xffff, 0x0001);
+	state->m_fg_tilemap->set_transmask(1, 0xf07f, 0x0f81);
+	state->m_tx_tilemap->set_transparent_pen(3);
 
 	state->m_sprite_flipy_mask = 0x40;
 	state->m_sprite_pri_mask = 0x00;
@@ -107,10 +107,10 @@ VIDEO_START( madgear )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,64,32);
 	state->m_tx_tilemap = tilemap_create(machine, get_fix_info,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transmask(state->m_fg_tilemap, 0, 0xffff, 0x8000);
-	tilemap_set_transmask(state->m_fg_tilemap, 1, 0x80ff, 0xff00);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 3);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 15);
+	state->m_fg_tilemap->set_transmask(0, 0xffff, 0x8000);
+	state->m_fg_tilemap->set_transmask(1, 0x80ff, 0xff00);
+	state->m_tx_tilemap->set_transparent_pen(3);
+	state->m_bg_tilemap->set_transparent_pen(15);
 
 	state->m_sprite_flipy_mask = 0x80;
 	state->m_sprite_pri_mask = 0x10;
@@ -144,10 +144,10 @@ WRITE16_HANDLER( lastduel_scroll_w )
 	data = COMBINE_DATA(&state->m_scroll[offset]);
 	switch (offset)
 	{
-		case 0: tilemap_set_scrolly(state->m_fg_tilemap, 0, data); break;
-		case 1: tilemap_set_scrollx(state->m_fg_tilemap, 0, data); break;
-		case 2: tilemap_set_scrolly(state->m_bg_tilemap, 0, data); break;
-		case 3: tilemap_set_scrollx(state->m_bg_tilemap, 0, data); break;
+		case 0: state->m_fg_tilemap->set_scrolly(0, data); break;
+		case 1: state->m_fg_tilemap->set_scrollx(0, data); break;
+		case 2: state->m_bg_tilemap->set_scrolly(0, data); break;
+		case 3: state->m_bg_tilemap->set_scrollx(0, data); break;
 		case 7: state->m_tilemap_priority = data; break;
 		default:
 			logerror("Unmapped video write %d %04x\n", offset, data);
@@ -160,7 +160,7 @@ WRITE16_HANDLER( lastduel_scroll1_w )
 	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->m_scroll1[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset / 2);
+	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( lastduel_scroll2_w )
@@ -168,7 +168,7 @@ WRITE16_HANDLER( lastduel_scroll2_w )
 	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->m_scroll2[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( lastduel_vram_w )
@@ -176,7 +176,7 @@ WRITE16_HANDLER( lastduel_vram_w )
 	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->m_vram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( madgear_scroll1_w )
@@ -184,7 +184,7 @@ WRITE16_HANDLER( madgear_scroll1_w )
 	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->m_scroll1[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x7ff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 WRITE16_HANDLER( madgear_scroll2_w )
@@ -192,7 +192,7 @@ WRITE16_HANDLER( madgear_scroll2_w )
 	lastduel_state *state = space->machine().driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->m_scroll2[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x7ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 WRITE16_HANDLER( lastduel_palette_word_w )
@@ -273,12 +273,12 @@ SCREEN_UPDATE_IND16( lastduel )
 {
 	lastduel_state *state = screen.machine().driver_data<lastduel_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -288,21 +288,21 @@ SCREEN_UPDATE_IND16( madgear )
 
 	if (state->m_tilemap_priority)
 	{
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_OPAQUE, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	}
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

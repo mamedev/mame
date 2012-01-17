@@ -60,7 +60,7 @@ static WRITE8_HANDLER( gp98_reel1_ram_w )
 {
 	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->m_gp98_reel1_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_gp98_reel1_tilemap,offset);
+	state->m_gp98_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jingbell_reel1_tile_info )
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( gp98_reel2_ram_w )
 {
 	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->m_gp98_reel2_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_gp98_reel2_tilemap,offset);
+	state->m_gp98_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jingbell_reel2_tile_info )
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( gp98_reel3_ram_w )
 {
 	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->m_gp98_reel3_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_gp98_reel3_tilemap,offset);
+	state->m_gp98_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jingbell_reel3_tile_info )
@@ -159,7 +159,7 @@ static WRITE8_HANDLER( gp98_reel4_ram_w )
 {
 	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->m_gp98_reel4_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_gp98_reel4_tilemap,offset);
+	state->m_gp98_reel4_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jingbell_reel4_tile_info )
@@ -196,7 +196,7 @@ static WRITE8_HANDLER( bg_scroll_w )
 {
 	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->m_bg_scroll[offset] = data;
-//  tilemap_set_scrolly(bg_tilemap,offset,data);
+//  bg_tilemap->set_scrolly(offset,data);
 }
 
 
@@ -211,31 +211,31 @@ static WRITE8_HANDLER( fg_tile_w )
 {
 	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->m_fg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( fg_color_w )
 {
 	igs009_state *state = space->machine().driver_data<igs009_state>();
 	state->m_fg_color_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static VIDEO_START(jingbell)
 {
 	igs009_state *state = machine.driver_data<igs009_state>();
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->m_gp98_reel1_tilemap = tilemap_create(machine,get_jingbell_reel1_tile_info,tilemap_scan_rows,8,32, 128, 8);
 	state->m_gp98_reel2_tilemap = tilemap_create(machine,get_jingbell_reel2_tile_info,tilemap_scan_rows,8,32, 128, 8);
 	state->m_gp98_reel3_tilemap = tilemap_create(machine,get_jingbell_reel3_tile_info,tilemap_scan_rows,8,32, 128, 8);
 	state->m_gp98_reel4_tilemap = tilemap_create(machine,get_jingbell_reel4_tile_info,tilemap_scan_rows,8,32, 128, 8);
 
-	tilemap_set_scroll_cols(state->m_gp98_reel1_tilemap, 128);
-	tilemap_set_scroll_cols(state->m_gp98_reel2_tilemap, 128);
-	tilemap_set_scroll_cols(state->m_gp98_reel3_tilemap, 128);
-	tilemap_set_scroll_cols(state->m_gp98_reel4_tilemap, 128);
+	state->m_gp98_reel1_tilemap->set_scroll_cols(128);
+	state->m_gp98_reel2_tilemap->set_scroll_cols(128);
+	state->m_gp98_reel3_tilemap->set_scroll_cols(128);
+	state->m_gp98_reel4_tilemap->set_scroll_cols(128);
 }
 
 
@@ -243,17 +243,17 @@ static VIDEO_START(gp98)
 {
 	igs009_state *state = machine.driver_data<igs009_state>();
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->m_gp98_reel1_tilemap = tilemap_create(machine,get_gp98_reel1_tile_info,tilemap_scan_rows,8,32, 128, 8);
 	state->m_gp98_reel2_tilemap = tilemap_create(machine,get_gp98_reel2_tile_info,tilemap_scan_rows,8,32, 128, 8);
 	state->m_gp98_reel3_tilemap = tilemap_create(machine,get_gp98_reel3_tile_info,tilemap_scan_rows,8,32, 128, 8);
 	state->m_gp98_reel4_tilemap = tilemap_create(machine,get_gp98_reel4_tile_info,tilemap_scan_rows,8,32, 128, 8);
 
-	tilemap_set_scroll_cols(state->m_gp98_reel1_tilemap, 128);
-	tilemap_set_scroll_cols(state->m_gp98_reel2_tilemap, 128);
-	tilemap_set_scroll_cols(state->m_gp98_reel3_tilemap, 128);
-	tilemap_set_scroll_cols(state->m_gp98_reel4_tilemap, 128);
+	state->m_gp98_reel1_tilemap->set_scroll_cols(128);
+	state->m_gp98_reel2_tilemap->set_scroll_cols(128);
+	state->m_gp98_reel3_tilemap->set_scroll_cols(128);
+	state->m_gp98_reel4_tilemap->set_scroll_cols(128);
 
 }
 
@@ -283,10 +283,10 @@ static SCREEN_UPDATE_IND16(jingbell)
 
 		for (i= 0;i < 0x80;i++)
 		{
-			tilemap_set_scrolly(state->m_gp98_reel1_tilemap, i, state->m_bg_scroll[i]*2);
-			tilemap_set_scrolly(state->m_gp98_reel2_tilemap, i, state->m_bg_scroll[i+0x80]*2);
-			tilemap_set_scrolly(state->m_gp98_reel3_tilemap, i, state->m_bg_scroll[i+0x100]*2);
-			tilemap_set_scrolly(state->m_gp98_reel4_tilemap, i, state->m_bg_scroll[i+0x180]*2);
+			state->m_gp98_reel1_tilemap->set_scrolly(i, state->m_bg_scroll[i]*2);
+			state->m_gp98_reel2_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x80]*2);
+			state->m_gp98_reel3_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x100]*2);
+			state->m_gp98_reel4_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x180]*2);
 		}
 
 
@@ -304,19 +304,19 @@ static SCREEN_UPDATE_IND16(jingbell)
 
 			if (rowenable==0)
 			{ // 0 and 1 are the same? or is there a global switchoff?
-				tilemap_draw(bitmap,clip,state->m_gp98_reel1_tilemap,0,0);
+				state->m_gp98_reel1_tilemap->draw(bitmap, clip, 0,0);
 			}
 			else if (rowenable==1)
 			{
-				tilemap_draw(bitmap,clip,state->m_gp98_reel2_tilemap,0,0);
+				state->m_gp98_reel2_tilemap->draw(bitmap, clip, 0,0);
 			}
 			else if (rowenable==2)
 			{
-				tilemap_draw(bitmap,clip,state->m_gp98_reel3_tilemap,0,0);
+				state->m_gp98_reel3_tilemap->draw(bitmap, clip, 0,0);
 			}
 			else if (rowenable==3)
 			{
-				tilemap_draw(bitmap,clip,state->m_gp98_reel4_tilemap,0,0);
+				state->m_gp98_reel4_tilemap->draw(bitmap, clip, 0,0);
 			}
 
 
@@ -327,7 +327,7 @@ static SCREEN_UPDATE_IND16(jingbell)
 	else					bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 
-	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	if (layers_ctrl & 2)	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

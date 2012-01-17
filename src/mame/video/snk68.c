@@ -54,10 +54,10 @@ static void common_video_start(running_machine &machine)
 {
 	snk68_state *state = machine.driver_data<snk68_state>();
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap, 0, machine.primary_screen->width() - 256);
-	tilemap_set_scrolldy(state->m_fg_tilemap, 0, machine.primary_screen->height() - 256);
+	state->m_fg_tilemap->set_scrolldx(0, machine.primary_screen->width() - 256);
+	state->m_fg_tilemap->set_scrolldy(0, machine.primary_screen->height() - 256);
 }
 
 VIDEO_START( pow )
@@ -133,7 +133,7 @@ WRITE16_HANDLER( pow_fg_videoram_w )
 
 	data |= 0xff00;
 	COMBINE_DATA(&state->m_pow_fg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset >> 1);
+	state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_HANDLER( searchar_fg_videoram_w )
@@ -142,7 +142,7 @@ WRITE16_HANDLER( searchar_fg_videoram_w )
 
 	// RAM is full 16-bit, though only half of it is used by the hardware
 	COMBINE_DATA(&state->m_pow_fg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset >> 1);
+	state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_HANDLER( pow_flipscreen16_w )
@@ -151,14 +151,14 @@ WRITE16_HANDLER( pow_flipscreen16_w )
 	{
 		snk68_state *state = space->machine().driver_data<snk68_state>();
 		state->m_flipscreen = data & 0x08;
-		tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		state->m_sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
 
 		if (state->m_fg_tile_offset != ((data & 0x70) << 4))
 		{
 			state->m_fg_tile_offset = (data & 0x70) << 4;
-			tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+			state->m_fg_tilemap->mark_all_dirty();
 		}
 	}
 }
@@ -170,7 +170,7 @@ WRITE16_HANDLER( searchar_flipscreen16_w )
 		snk68_state *state = space->machine().driver_data<snk68_state>();
 
 		state->m_flipscreen = data & 0x08;
-		tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		state->m_sprite_flip_axis = data & 0x04;
 	}
@@ -299,6 +299,6 @@ SCREEN_UPDATE_IND16( pow )
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

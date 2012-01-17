@@ -177,8 +177,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int color = ((attr & 0x1e) >> 1) + ((code & 0x1e0) >> 1);
 	int flags = TILE_FLIPYX(attr >> 6);
 
-	tileinfo->category = (attr & 0x20) ? 1 : 0;
-	tileinfo->group = color;
+	tileinfo.category = (attr & 0x20) ? 1 : 0;
+	tileinfo.group = color;
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -202,7 +202,7 @@ VIDEO_START( pacland )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_scroll_rows(state->m_fg_tilemap, 32);
+	state->m_fg_tilemap->set_scroll_rows(32);
 
 	/* create one group per color code; for each group, set the transparency mask
        to correspond to the pens that are 0x7f or 0xff */
@@ -211,7 +211,7 @@ VIDEO_START( pacland )
 	{
 		UINT32 mask = colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0x7f);
 		mask |= colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0xff);
-		tilemap_set_transmask(state->m_fg_tilemap, color, mask, 0);
+		state->m_fg_tilemap->set_transmask(color, mask, 0);
 	}
 
 	state_save_register_global(machine, state->m_palette_bank);
@@ -231,14 +231,14 @@ WRITE8_HANDLER( pacland_videoram_w )
 {
 	pacland_state *state = space->machine().driver_data<pacland_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset / 2);
+	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( pacland_videoram2_w )
 {
 	pacland_state *state = space->machine().driver_data<pacland_state>();
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( pacland_scroll0_w )
@@ -348,7 +348,7 @@ static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 	/* draw tilemap transparently over it; this will leave invalid pens (0xffff)
        anywhere where the fg_tilemap should be transparent; note that we assume
        the fg_bitmap has been pre-erased to 0xffff */
-	tilemap_draw(state->m_fg_bitmap, cliprect, state->m_fg_tilemap, priority, 0);
+	state->m_fg_tilemap->draw(state->m_fg_bitmap, cliprect, priority, 0);
 
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -379,8 +379,8 @@ SCREEN_UPDATE_IND16( pacland )
 	int row;
 
 	for (row = 5; row < 29; row++)
-		tilemap_set_scrollx(state->m_fg_tilemap, row, flip_screen_get(screen.machine()) ? state->m_scroll0-7 : state->m_scroll0);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? state->m_scroll1-4 : state->m_scroll1-3);
+		state->m_fg_tilemap->set_scrollx(row, flip_screen_get(screen.machine()) ? state->m_scroll0-7 : state->m_scroll0);
+	state->m_bg_tilemap->set_scrollx(0, flip_screen_get(screen.machine()) ? state->m_scroll1-4 : state->m_scroll1-3);
 
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
        wherever there is a high-priority pixel; note that we draw to the bitmap
@@ -389,7 +389,7 @@ SCREEN_UPDATE_IND16( pacland )
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	/* draw background */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw low priority fg tiles */
 	draw_fg(screen.machine(), bitmap, cliprect, 0);

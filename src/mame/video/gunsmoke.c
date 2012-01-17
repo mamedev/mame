@@ -62,14 +62,14 @@ WRITE8_HANDLER( gunsmoke_videoram_w )
 {
 	gunsmoke_state *state = space->machine().driver_data<gunsmoke_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( gunsmoke_colorram_w )
 {
 	gunsmoke_state *state = space->machine().driver_data<gunsmoke_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( gunsmoke_c804_w )
@@ -126,7 +126,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = state->m_videoram[tile_index] + ((attr & 0xe0) << 2);
 	int color = attr & 0x1f;
 
-	tileinfo->group = color;
+	tileinfo.group = color;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -177,11 +177,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 SCREEN_UPDATE_IND16( gunsmoke )
 {
 	gunsmoke_state *state = screen.machine().driver_data<gunsmoke_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[0]);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly[0]);
 
 	if (state->m_bgon)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -189,7 +189,7 @@ SCREEN_UPDATE_IND16( gunsmoke )
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
 	if (state->m_chon)
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -476,7 +476,7 @@ void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap_t *tmap, 
 
 	/* iterate over all colors in the tilemap */
 	for (color = 0; color < gfx->total_colors; color++)
-		tilemap_set_transmask(tmap, color, colortable_get_transpen_mask(ctable, gfx, color, transcolor), 0);
+		tmap->set_transmask(color, colortable_get_transpen_mask(ctable, gfx, color, transcolor), 0);
 }
 
 

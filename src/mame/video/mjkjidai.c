@@ -45,7 +45,7 @@ WRITE8_HANDLER( mjkjidai_videoram_w )
 	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x7ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 WRITE8_HANDLER( mjkjidai_ctrl_w )
@@ -136,7 +136,7 @@ SCREEN_UPDATE_IND16( mjkjidai )
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	else
 	{
-		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
 	}
 	return 0;

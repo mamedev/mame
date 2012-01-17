@@ -13,7 +13,7 @@
 
 ***************************************************************************/
 
-INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int plane )
+INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int plane )
 {
 	othldrby_state *state = machine.driver_data<othldrby_state>();
 	UINT16 attr;
@@ -25,7 +25,7 @@ INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int ti
 			state->m_vram[tile_index + 1],
 			attr & 0x7f,
 			0);
-	tileinfo->category = (attr & 0x0600) >> 9;
+	tileinfo.category = (attr & 0x0600) >> 9;
 }
 
 static TILE_GET_INFO( get_tile_info0 )
@@ -63,9 +63,9 @@ VIDEO_START( othldrby )
 	state->m_buf_spriteram = auto_alloc_array(machine, UINT16, 2 * SPRITERAM_SIZE);
 	state->m_buf_spriteram2 = state->m_buf_spriteram + SPRITERAM_SIZE;
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0], 0);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1], 0);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[2], 0);
+	state->m_bg_tilemap[0]->set_transparent_pen(0);
+	state->m_bg_tilemap[1]->set_transparent_pen(0);
+	state->m_bg_tilemap[2]->set_transparent_pen(0);
 
 	state->save_pointer(NAME(state->m_vram), VIDEORAM_SIZE);
 	state->save_pointer(NAME(state->m_buf_spriteram), 2 * SPRITERAM_SIZE);
@@ -105,7 +105,7 @@ WRITE16_HANDLER( othldrby_videoram_w )
 	if (state->m_vram_addr < VIDEORAM_SIZE)
 	{
 		if (state->m_vram_addr < SPRITERAM_START)
-			tilemap_mark_tile_dirty(state->m_bg_tilemap[state->m_vram_addr / 0x800], (state->m_vram_addr & 0x7ff) / 2);
+			state->m_bg_tilemap[state->m_vram_addr / 0x800]->mark_tile_dirty((state->m_vram_addr & 0x7ff) / 2);
 		state->m_vram[state->m_vram_addr++] = data;
 	}
 	else
@@ -191,13 +191,13 @@ SCREEN_UPDATE_IND16( othldrby )
 	{
 		if (flip_screen_get(screen.machine()))
 		{
-			tilemap_set_scrollx(state->m_bg_tilemap[layer], 0, state->m_vreg[2 * layer] + 59);
-			tilemap_set_scrolly(state->m_bg_tilemap[layer], 0, state->m_vreg[2 * layer + 1] + 248);
+			state->m_bg_tilemap[layer]->set_scrollx(0, state->m_vreg[2 * layer] + 59);
+			state->m_bg_tilemap[layer]->set_scrolly(0, state->m_vreg[2 * layer + 1] + 248);
 		}
 		else
 		{
-			tilemap_set_scrollx(state->m_bg_tilemap[layer], 0, state->m_vreg[2 * layer] - 58);
-			tilemap_set_scrolly(state->m_bg_tilemap[layer], 0, state->m_vreg[2 * layer+1] + 9);
+			state->m_bg_tilemap[layer]->set_scrollx(0, state->m_vreg[2 * layer] - 58);
+			state->m_bg_tilemap[layer]->set_scrolly(0, state->m_vreg[2 * layer+1] + 9);
 		}
 	}
 
@@ -206,19 +206,19 @@ SCREEN_UPDATE_IND16( othldrby )
 	bitmap.fill(0, cliprect);
 
 	for (layer = 0; layer < 3; layer++)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 0, 0);
+		state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	for (layer = 0; layer < 3; layer++)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 1, 0);
+		state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	for (layer = 0; layer < 3; layer++)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 2, 0);
+		state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 2, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 
 	for (layer = 0; layer < 3; layer++)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer], 3, 0);
+		state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 3, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
 
 	return 0;

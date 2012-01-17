@@ -138,7 +138,7 @@ static WRITE8_HANDLER( tx_tileram_w )
 	marinedt_state *state = space->machine().driver_data<marinedt_state>();
 
 	state->m_tx_tileram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 static READ8_HANDLER( marinedt_port1_r )
@@ -287,9 +287,9 @@ static WRITE8_HANDLER( marinedt_pf_w )
 			mame_printf_debug("tile non-flip\n");
 
 		if (data & 0x02)
-			tilemap_set_flip(state->m_tx_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+			state->m_tx_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 		else
-			tilemap_set_flip(state->m_tx_tilemap, 0);
+			state->m_tx_tilemap->set_flip(0);
 	}
 
 	state->m_pf = data;
@@ -483,9 +483,9 @@ static VIDEO_START( marinedt )
 	marinedt_state *state = machine.driver_data<marinedt_state>();
 	state->m_tx_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
-	tilemap_set_scrolldx(state->m_tx_tilemap, 0, 4*8);
-	tilemap_set_scrolldy(state->m_tx_tilemap, 0, -4*8);
+	state->m_tx_tilemap->set_transparent_pen(0);
+	state->m_tx_tilemap->set_scrolldx(0, 4*8);
+	state->m_tx_tilemap->set_scrolldy(0, -4*8);
 
 	state->m_tile = auto_bitmap_ind16_alloc(machine, 32 * 8, 32 * 8);
 	state->m_obj1 = auto_bitmap_ind16_alloc(machine, 32, 32);
@@ -512,7 +512,7 @@ static SCREEN_UPDATE_IND16( marinedt )
 	int sx, sy;
 
 	state->m_tile->fill(0);
-	tilemap_draw(*state->m_tile, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(*state->m_tile, cliprect, 0, 0);
 
 	state->m_obj1->fill(0);
 	drawgfx_transpen(*state->m_obj1, state->m_obj1->cliprect(), screen.machine().gfx[1],

@@ -91,14 +91,14 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 #define cischeat_tmap_SET_SCROLL(_n_) \
 	if (state->m_tmap[_n_]) \
 	{ \
-		tilemap_set_scrollx(state->m_tmap[_n_], 0, state->m_scrollx[_n_]); \
-		tilemap_set_scrolly(state->m_tmap[_n_], 0, state->m_scrolly[_n_]); \
+		state->m_tmap[_n_]->set_scrollx(0, state->m_scrollx[_n_]); \
+		state->m_tmap[_n_]->set_scrolly(0, state->m_scrolly[_n_]); \
 	}
 
 #define cischeat_tmap_DRAW(_n_) \
 	if ( (state->m_tmap[_n_]) && (state->m_active_layers & (1 << _n_) ) ) \
 	{ \
-		tilemap_draw(bitmap, cliprect, state->m_tmap[_n_], flag, 0 ); \
+		state->m_tmap[_n_]->draw(bitmap, cliprect, flag, 0 ); \
 		flag = 0; \
 	}
 
@@ -137,14 +137,14 @@ INLINE void scrollram_w(address_space *space, offs_t offset, UINT16 data, UINT16
 	{
 		if (state->m_scroll_flag[which] & 0x10)	/* tiles are 8x8 */
 		{
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset);
+			state->m_tmap[which]->mark_tile_dirty(offset);
 		}
 		else
 		{
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset*4 + 0);
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset*4 + 1);
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset*4 + 2);
-			tilemap_mark_tile_dirty(state->m_tmap[which], offset*4 + 3);
+			state->m_tmap[which]->mark_tile_dirty(offset*4 + 0);
+			state->m_tmap[which]->mark_tile_dirty(offset*4 + 1);
+			state->m_tmap[which]->mark_tile_dirty(offset*4 + 2);
+			state->m_tmap[which]->mark_tile_dirty(offset*4 + 3);
 		}
 	}
 }
@@ -213,8 +213,8 @@ static void create_tilemaps(running_machine &machine)
 		/* set user data and transparency */
 		for (i = 0; i < 8; i++)
 		{
-			tilemap_set_user_data(state->m_tilemap[layer][i/4][i%4], (void *)(FPTR)layer);
-			tilemap_set_transparent_pen(state->m_tilemap[layer][i/4][i%4], 15);
+			state->m_tilemap[layer][i/4][i%4]->set_user_data((void *)(FPTR)layer);
+			state->m_tilemap[layer][i/4][i%4]->set_transparent_pen(15);
 		}
 	}
 }
@@ -225,7 +225,7 @@ static void cischeat_set_vreg_flag(cischeat_state *state, int which, int data)
 	{
 		state->m_scroll_flag[which] = data;
 		state->m_tmap[which] = state->m_tilemap[which][(data >> 4) & 1][data & 3];
-		tilemap_mark_all_tiles_dirty(state->m_tmap[which]);
+		state->m_tmap[which]->mark_all_dirty();
 	}
 }
 

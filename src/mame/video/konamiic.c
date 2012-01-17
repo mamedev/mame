@@ -1581,7 +1581,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_ind
 			startx -= K053936_offset[chip][0] * incxx;
 			starty -= K053936_offset[chip][0] * incxy;
 
-			tilemap_draw_roz(bitmap,my_clip,tmap,startx << 5,starty << 5,
+			tmap->draw_roz(bitmap, my_clip, startx << 5,starty << 5,
 					incxx << 5,incxy << 5,0,0,
 					K053936_wraparound[chip],
 					flags,priority);
@@ -1610,7 +1610,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_ind
 		startx -= K053936_offset[chip][0] * incxx;
 		starty -= K053936_offset[chip][0] * incxy;
 
-		tilemap_draw_roz(bitmap,cliprect,tmap,startx << 5,starty << 5,
+		tmap->draw_roz(bitmap, cliprect, startx << 5,starty << 5,
 				incxx << 5,incxy << 5,incyx << 5,incyy << 5,
 				K053936_wraparound[chip],
 				flags,priority);
@@ -1785,7 +1785,7 @@ static int K056832_djmain_hack;
 static void K056832_mark_page_dirty(int page)
 {
 	if (K056832_PageTileMode[page])
-		tilemap_mark_all_tiles_dirty(K056832_tilemap[page]);
+		K056832_tilemap[page]->mark_all_dirty();
 	else
 		K056832_mark_all_lines_dirty(page);
 }
@@ -1875,7 +1875,7 @@ if (!(K056832_djmain_hack==1) || K056832_LayerAssociatedWithPage[pageIndex] == -
 
 static void (*K056832_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
 
-INLINE void K056832_get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int pageIndex )
+INLINE void K056832_get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int pageIndex )
 {
 	static const struct K056832_SHIFTMASKS
 	{
@@ -2179,9 +2179,9 @@ void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, i
 	{
 		tmap = K056832_tilemap[i];
 
-		K056832_pixmap[i] = &tilemap_get_pixmap(tmap);
+		K056832_pixmap[i] = &tmap->pixmap();
 
-		tilemap_set_transparent_pen(tmap, 0);
+		tmap->set_transparent_pen(0);
 	}
 
 	memset(K056832_videoram, 0x00, 0x20000);
@@ -2400,7 +2400,7 @@ WRITE16_HANDLER( K056832_ram_word_w )
 		*tile_ptr = data;
 
 		if (K056832_PageTileMode[K056832_SelectedPage])
-			tilemap_mark_tile_dirty(K056832_tilemap[K056832_SelectedPage], offset);
+			K056832_tilemap[K056832_SelectedPage]->mark_tile_dirty(offset);
 		else
 			K056832_mark_line_dirty(K056832_SelectedPage, offset);
 	}
@@ -2423,7 +2423,7 @@ WRITE32_HANDLER( K056832_ram_long_w )
 		tile_ptr[1] = data;
 
 		if (K056832_PageTileMode[K056832_SelectedPage])
-			tilemap_mark_tile_dirty(K056832_tilemap[K056832_SelectedPage], offset);
+			K056832_tilemap[K056832_SelectedPage]->mark_tile_dirty(offset);
 		else
 			K056832_mark_line_dirty(K056832_SelectedPage, offset);
 	}
@@ -2455,7 +2455,7 @@ WRITE16_HANDLER( K056832_word_w )
 					if (new_data & 0x10) flip |= TILEMAP_FLIPX;
 					for (i=0; i<K056832_PAGE_COUNT; i++)
 					{
-						tilemap_set_flip(K056832_tilemap[i], flip);
+						K056832_tilemap[i]->set_flip(flip);
 					}
 				}
 
@@ -2579,8 +2579,8 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 		UINT8 *xprdata;
 
 		tmap = K056832_tilemap[page];
-		bitmap_ind8 &xprmap  = tilemap_get_flagsmap(tmap);
-		xprdata = tilemap_get_tile_flags(tmap);
+		bitmap_ind8 &xprmap  = tmap->flagsmap();
+		xprdata = tmap->tile_flags();
 
 		dirty = K056832_LineDirty[page];
 		all_dirty = K056832_AllLinesDirty[page];
@@ -2593,7 +2593,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 			// force tilemap into a clean, static state
 			// *really ugly but it minimizes alteration to tilemap.c
 			memset (&zerorect, 0, sizeof(rectangle));	// zero dimension
-			tilemap_draw(bitmap, zerorect, tmap, 0, 0);	// dummy call to reset tile_dirty_map
+			tmap->draw(bitmap, zerorect, 0, 0);	// dummy call to reset tile_dirty_map
 			xprmap.fill(0);						// reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
 		}
@@ -2889,7 +2889,7 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 		if (K056832_update_linemap(machine, bitmap, pageIndex, flags)) continue;
 
 		tmap = K056832_tilemap[pageIndex];
-		tilemap_set_scrolly(tmap, 0, ay);
+		tmap->set_scrolly(0, ay);
 
 		last_dx = 0x100000;
 		last_visible = 0;
@@ -2962,10 +2962,10 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 			// logic, but it works.
 			if ((drawrect.min_x>0) && (drawrect.max_x==511)) drawrect.max_x=cliprect.max_x;
 
-			tilemap_set_scrollx(tmap, 0, dx);
+			tmap->set_scrollx(0, dx);
 
 			LINE_SHORTCIRCUIT:
-			tilemap_draw(bitmap, drawrect, tmap, flags, priority);
+			tmap->draw(bitmap, drawrect, flags, priority);
 
 		} // end of line loop
 	} // end of column loop

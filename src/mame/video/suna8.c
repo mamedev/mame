@@ -123,7 +123,7 @@ WRITE8_HANDLER( suna8_spriteram_w )
 
 	state->m_spriteram[offset] = data;
 #if TILEMAPS
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset/2);
+	state->m_bg_tilemap->mark_tile_dirty(offset/2);
 #endif
 }
 
@@ -134,7 +134,7 @@ WRITE8_HANDLER( suna8_banked_spriteram_w )
 	offset += state->m_spritebank * 0x2000;
 	state->m_spriteram[offset] = data;
 #if TILEMAPS
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset/2);
+	state->m_bg_tilemap->mark_tile_dirty(offset/2);
 #endif
 }
 
@@ -186,7 +186,7 @@ static void suna8_vh_start_common(running_machine &machine, int dim)
 
 								8, 8, 0x20*((state->m_text_dim > 0)?4:8), 0x20);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 15);
+	state->m_bg_tilemap->set_transparent_pen(15);
 #endif
 }
 
@@ -424,21 +424,21 @@ SCREEN_UPDATE_IND16( suna8 )
 		suna8_state *state = screen.machine().driver_data<suna8_state>();
 		int max_tiles = screen.machine().region("gfx1")->bytes() / (0x400 * 0x20);
 
-		if (screen.machine().input().code_pressed_once(KEYCODE_Q))	{ state->m_page--;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_W))	{ state->m_page++;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_E))	{ state->m_tiles--;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_R))	{ state->m_tiles++;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_A))	{ state->m_trombank--;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
-		if (screen.machine().input().code_pressed_once(KEYCODE_S))	{ state->m_trombank++;	tilemap_mark_all_tiles_dirty_all(screen.machine());	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_Q))	{ state->m_page--;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_W))	{ state->m_page++;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_E))	{ state->m_tiles--;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_R))	{ state->m_tiles++;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_A))	{ state->m_trombank--;	screen.machine().tilemap().mark_all_dirty();	}
+		if (screen.machine().input().code_pressed_once(KEYCODE_S))	{ state->m_trombank++;	screen.machine().tilemap().mark_all_dirty();	}
 
 		state->m_rombank  &= 0xf;
 		state->m_page  &= (state->m_text_dim > 0)?3:7;
 		state->m_tiles %= max_tiles;
 		if (state->m_tiles < 0) state->m_tiles += max_tiles;
 
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0x100 * state->m_page);
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->set_scrollx(0, 0x100 * state->m_page);
+		state->m_bg_tilemap->set_scrolly(0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 #if 1
 	popmessage("%02X %02X %02X %02X - p%2X g%02X r%02X",
 						state->m_rombank, state->m_palettebank, state->m_spritebank, state->m_unknown,

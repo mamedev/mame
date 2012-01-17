@@ -188,14 +188,14 @@ void atarigt_scanline_update(screen_device &screen, int scanline)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_set_scrollx(state->m_playfield_tilemap, 0, newscroll);
+				state->m_playfield_tilemap->set_scrollx(0, newscroll);
 				state->m_playfield_xscroll = newscroll;
 			}
 			if (newbank != state->m_playfield_color_bank)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_set_palette_offset(state->m_playfield_tilemap, (newbank & 0x1f) << 8);
+				state->m_playfield_tilemap->set_palette_offset((newbank & 0x1f) << 8);
 				state->m_playfield_color_bank = newbank;
 			}
 		}
@@ -208,14 +208,14 @@ void atarigt_scanline_update(screen_device &screen, int scanline)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_set_scrolly(state->m_playfield_tilemap, 0, newscroll);
+				state->m_playfield_tilemap->set_scrolly(0, newscroll);
 				state->m_playfield_yscroll = newscroll;
 			}
 			if (newbank != state->m_playfield_tile_bank)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+				state->m_playfield_tilemap->mark_all_dirty();
 				state->m_playfield_tile_bank = newbank;
 			}
 		}
@@ -517,10 +517,10 @@ SCREEN_UPDATE_RGB32( atarigt )
 	int x, y;
 
 	/* draw the playfield */
-	tilemap_draw(*state->m_pf_bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	state->m_playfield_tilemap->draw(*state->m_pf_bitmap, cliprect, 0, 0);
 
 	/* draw the alpha layer */
-	tilemap_draw(*state->m_an_bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(*state->m_an_bitmap, cliprect, 0, 0);
 
 	/* cache pointers */
 	color_latch = state->m_colorram[0x30000/2];

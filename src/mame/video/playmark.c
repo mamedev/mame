@@ -120,7 +120,7 @@ VIDEO_START( bigtwin )
 	state->m_tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	state->m_fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
+	state->m_tx_tilemap->set_transparent_pen(0);
 
 	state->m_xoffset = 0;
 	state->m_yoffset = 0;
@@ -140,10 +140,10 @@ VIDEO_START( bigtwinb )
 	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_tx_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap, -4, -4);
+	state->m_bg_tilemap->set_scrolldx(-4, -4);
 
 	state->m_xoffset = 1;
 	state->m_yoffset = 0;
@@ -163,8 +163,8 @@ VIDEO_START( wbeachvl )
 	state->m_fg_tilemap = tilemap_create(machine, wbeachvl_get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_bg_tilemap = tilemap_create(machine, wbeachvl_get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_tx_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->m_xoffset = 0;
 	state->m_yoffset = 0;
@@ -182,7 +182,7 @@ VIDEO_START( excelsr )
 	state->m_tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
+	state->m_tx_tilemap->set_transparent_pen(0);
 
 	state->m_xoffset = 0;
 	state->m_yoffset = 0;
@@ -201,12 +201,12 @@ VIDEO_START( hotmind )
 	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_tx_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_tx_tilemap, -14, -14);
-	tilemap_set_scrolldx(state->m_fg_tilemap, -14, -14);
-	tilemap_set_scrolldx(state->m_bg_tilemap, -14, -14);
+	state->m_tx_tilemap->set_scrolldx(-14, -14);
+	state->m_fg_tilemap->set_scrolldx(-14, -14);
+	state->m_bg_tilemap->set_scrolldx(-14, -14);
 
 	state->m_xoffset = -9;
 	state->m_yoffset = -8;
@@ -225,12 +225,12 @@ VIDEO_START( hrdtimes )
 	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_tx_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_tx_tilemap, -14, -14);
-	tilemap_set_scrolldx(state->m_fg_tilemap, -10, -10);
-	tilemap_set_scrolldx(state->m_bg_tilemap, -12, -12);
+	state->m_tx_tilemap->set_scrolldx(-14, -14);
+	state->m_fg_tilemap->set_scrolldx(-10, -10);
+	state->m_bg_tilemap->set_scrolldx(-12, -12);
 
 	state->m_xoffset = -8;
 	state->m_yoffset = -8;
@@ -252,7 +252,7 @@ WRITE16_HANDLER( wbeachvl_txvideoram_w )
 	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->m_videoram1[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset / 2);
+	state->m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( wbeachvl_fgvideoram_w )
@@ -260,7 +260,7 @@ WRITE16_HANDLER( wbeachvl_fgvideoram_w )
 	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->m_videoram2[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset / 2);
+	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( wbeachvl_bgvideoram_w )
@@ -268,7 +268,7 @@ WRITE16_HANDLER( wbeachvl_bgvideoram_w )
 	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->m_videoram3[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( hrdtimes_txvideoram_w )
@@ -276,7 +276,7 @@ WRITE16_HANDLER( hrdtimes_txvideoram_w )
 	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->m_videoram1[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( hrdtimes_fgvideoram_w )
@@ -284,7 +284,7 @@ WRITE16_HANDLER( hrdtimes_fgvideoram_w )
 	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->m_videoram2[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( hrdtimes_bgvideoram_w )
@@ -292,7 +292,7 @@ WRITE16_HANDLER( hrdtimes_bgvideoram_w )
 	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->m_videoram3[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -322,15 +322,15 @@ WRITE16_HANDLER( bigtwin_scroll_w )
 
 	switch (offset)
 	{
-		case 0: 	tilemap_set_scrollx(state->m_tx_tilemap, 0, data + 2); break;
-		case 1: 	tilemap_set_scrolly(state->m_tx_tilemap, 0, data);   break;
+		case 0: 	state->m_tx_tilemap->set_scrollx(0, data + 2); break;
+		case 1: 	state->m_tx_tilemap->set_scrolly(0, data);   break;
 		case 2: 	state->m_bgscrollx = -(data + 4);                    break;
 		case 3: 	state->m_bgscrolly = (-data) & 0x1ff;
 				state->m_bg_enable = data & 0x0200;
 				state->m_bg_full_size = data & 0x0400;
 				break;
-		case 4: 	tilemap_set_scrollx(state->m_fg_tilemap, 0, data + 6); break;
-		case 5: 	tilemap_set_scrolly(state->m_fg_tilemap, 0, data);   break;
+		case 4: 	state->m_fg_tilemap->set_scrollx(0, data + 6); break;
+		case 5: 	state->m_fg_tilemap->set_scrolly(0, data);   break;
 	}
 }
 
@@ -342,14 +342,14 @@ WRITE16_HANDLER( wbeachvl_scroll_w )
 
 	switch (offset)
 	{
-		case 0: 	tilemap_set_scrollx(state->m_tx_tilemap, 0, data + 2); break;
-		case 1: 	tilemap_set_scrolly(state->m_tx_tilemap, 0, data);   break;
+		case 0: 	state->m_tx_tilemap->set_scrollx(0, data + 2); break;
+		case 1: 	state->m_tx_tilemap->set_scrolly(0, data);   break;
 		case 2: 	state->m_fgscrollx = data + 4;break;
-		case 3: 	tilemap_set_scrolly(state->m_fg_tilemap, 0, data & 0x3ff);
+		case 3: 	state->m_fg_tilemap->set_scrolly(0, data & 0x3ff);
 				state->m_fg_rowscroll_enable = data & 0x0800;
 				break;
-		case 4: 	tilemap_set_scrollx(state->m_bg_tilemap, 0, data + 6); break;
-		case 5: 	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);   break;
+		case 4: 	state->m_bg_tilemap->set_scrollx(0, data + 6); break;
+		case 5: 	state->m_bg_tilemap->set_scrolly(0, data);   break;
 	}
 }
 
@@ -361,15 +361,15 @@ WRITE16_HANDLER( excelsr_scroll_w )
 
 	switch (offset)
 	{
-		case 0:	tilemap_set_scrollx(state->m_tx_tilemap, 0, data + 2); break;
-		case 1: 	tilemap_set_scrolly(state->m_tx_tilemap, 0, data);   break;
+		case 0:	state->m_tx_tilemap->set_scrollx(0, data + 2); break;
+		case 1: 	state->m_tx_tilemap->set_scrolly(0, data);   break;
 		case 2: 	state->m_bgscrollx = -data;	break;
 		case 3: 	state->m_bgscrolly = (-data + 2)& 0x1ff;
 				state->m_bg_enable = data & 0x0200;
 				state->m_bg_full_size = data & 0x0400;
 				break;
-		case 4:	tilemap_set_scrollx(state->m_fg_tilemap, 0, data + 6); break;
-		case 5:	tilemap_set_scrolly(state->m_fg_tilemap, 0, data);   break;
+		case 4:	state->m_fg_tilemap->set_scrollx(0, data + 6); break;
+		case 5:	state->m_fg_tilemap->set_scrolly(0, data);   break;
 	}
 }
 
@@ -381,12 +381,12 @@ WRITE16_HANDLER( hrdtimes_scroll_w )
 
 	switch (offset)
 	{
-		case 0: tilemap_set_scrollx(state->m_tx_tilemap, 0, data); break;
-		case 1: tilemap_set_scrolly(state->m_tx_tilemap, 0, data); break;
-		case 2: tilemap_set_scrollx(state->m_fg_tilemap, 0, data); break;
-		case 3: tilemap_set_scrolly(state->m_fg_tilemap, 0, data); break;
-		case 4: tilemap_set_scrollx(state->m_bg_tilemap, 0, data); break;
-		case 5: tilemap_set_scrolly(state->m_bg_tilemap, 0, data); break;
+		case 0: state->m_tx_tilemap->set_scrollx(0, data); break;
+		case 1: state->m_tx_tilemap->set_scrolly(0, data); break;
+		case 2: state->m_fg_tilemap->set_scrollx(0, data); break;
+		case 3: state->m_fg_tilemap->set_scrolly(0, data); break;
+		case 4: state->m_bg_tilemap->set_scrollx(0, data); break;
+		case 5: state->m_bg_tilemap->set_scrolly(0, data); break;
 	}
 }
 
@@ -524,11 +524,11 @@ SCREEN_UPDATE_IND16( bigtwin )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	if (state->m_bg_enable)
 		draw_bitmap(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 4);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -540,10 +540,10 @@ SCREEN_UPDATE_IND16( bigtwinb )
 	// video enabled
 	if (state->m_scroll[6] & 1)
 	{
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		bigtwinb_draw_sprites(screen.machine(), bitmap, cliprect, 4);
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
@@ -556,10 +556,10 @@ SCREEN_UPDATE_IND16( excelsr )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 1);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
 	if (state->m_bg_enable)
 		draw_bitmap(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 	return 0;
 }
@@ -572,22 +572,22 @@ SCREEN_UPDATE_IND16( wbeachvl )
 	{
 		int i;
 
-		tilemap_set_scroll_rows(state->m_fg_tilemap, 512);
+		state->m_fg_tilemap->set_scroll_rows(512);
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->m_fg_tilemap, i + 1, state->m_rowscroll[8 * i]);
+			state->m_fg_tilemap->set_scrollx(i + 1, state->m_rowscroll[8 * i]);
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->m_fg_tilemap, 1);
-		tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_fgscrollx);
+		state->m_fg_tilemap->set_scroll_rows(1);
+		state->m_fg_tilemap->set_scrollx(0, state->m_fgscrollx);
 	}
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -600,10 +600,10 @@ SCREEN_UPDATE_IND16( hrdtimes )
 	// video enabled
 	if (state->m_scroll[6] & 1)
 	{
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 		draw_sprites(screen.machine(), bitmap, cliprect, 2);
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);

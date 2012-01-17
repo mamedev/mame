@@ -102,7 +102,7 @@ static TILE_GET_INFO( get_tile_info )
 {
 	circusc_state *state = machine.driver_data<circusc_state>();
 	UINT8 attr = state->m_colorram[tile_index];
-	tileinfo->category = (attr & 0x10) >> 4;
+	tileinfo.category = (attr & 0x10) >> 4;
 
 	SET_TILE_INFO(0,
 				  state->m_videoram[tile_index] + ((attr & 0x20) << 3),
@@ -123,7 +123,7 @@ VIDEO_START( circusc )
 	circusc_state *state = machine.driver_data<circusc_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_scroll_cols(32);
 }
 
 
@@ -138,14 +138,14 @@ WRITE8_HANDLER( circusc_videoram_w )
 {
 	circusc_state *state = space->machine().driver_data<circusc_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( circusc_colorram_w )
 {
 	circusc_state *state = space->machine().driver_data<circusc_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( circusc_flipscreen_w )
@@ -204,13 +204,13 @@ SCREEN_UPDATE_IND16( circusc )
 	int i;
 
 	for (i = 0; i < 10; i++)
-		tilemap_set_scrolly(state->m_bg_tilemap, i, 0);
+		state->m_bg_tilemap->set_scrolly(i, 0);
 	for (i = 10; i < 32; i++)
-		tilemap_set_scrolly(state->m_bg_tilemap, i, *state->m_scroll);
+		state->m_bg_tilemap->set_scrolly(i, *state->m_scroll);
 
 	bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

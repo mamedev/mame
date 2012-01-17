@@ -113,7 +113,7 @@ static SCREEN_UPDATE_IND16(sbowling)
 	sbowling_state *state = screen.machine().driver_data<sbowling_state>();
 
 	bitmap.fill(0x18, cliprect);
-	tilemap_draw(bitmap, cliprect,state->m_sb_tilemap, 0, 0);
+	state->m_sb_tilemap->draw(bitmap, cliprect, 0, 0);
 	copybitmap_trans(bitmap, *state->m_tmpbitmap, 0, 0, 0, 0, cliprect, state->m_color_prom_address);
 	return 0;
 }
@@ -206,7 +206,7 @@ static WRITE8_HANDLER(graph_control_w)
 	state->m_color_prom_address = ((data&0x07)<<7) | ((data&0xc0)>>3);
 
 	state->m_bgmap = ((data>>4)^3) & 0x3;
-	tilemap_mark_all_tiles_dirty(state->m_sb_tilemap);
+	state->m_sb_tilemap->mark_all_dirty();
 }
 
 static READ8_HANDLER (controls_r)

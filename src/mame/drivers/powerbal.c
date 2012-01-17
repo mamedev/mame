@@ -50,7 +50,7 @@ static WRITE16_HANDLER( magicstk_bgvideoram_w )
 	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->m_videoram1[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER( tile_banking_w )
@@ -60,7 +60,7 @@ static WRITE16_HANDLER( tile_banking_w )
 	if (((data >> 12) & 0x0f) != state->m_tilebank)
 	{
 		state->m_tilebank = (data >> 12) & 0x0f;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -425,14 +425,14 @@ static VIDEO_START( powerbal )
 
 	state->m_xoffset = -20;
 
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_bg_yoffset);
+	state->m_bg_tilemap->set_scrolly(0, state->m_bg_yoffset);
 }
 
 static SCREEN_UPDATE_IND16( powerbal )
 {
 	playmark_state *state = screen.machine().driver_data<playmark_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

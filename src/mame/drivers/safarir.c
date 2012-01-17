@@ -85,7 +85,7 @@ static WRITE8_HANDLER( ram_w )
 	else
 		state->m_ram_1[offset] = data;
 
-	tilemap_mark_tile_dirty((offset & 0x0400) ? state->m_bg_tilemap : state->m_fg_tilemap, offset & 0x03ff);
+	((offset & 0x0400) ? state->m_bg_tilemap : state->m_fg_tilemap)->mark_tile_dirty(offset & 0x03ff);
 }
 
 
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( ram_bank_w )
 
 	state->m_ram_bank = data & 0x01;
 
-	tilemap_mark_all_tiles_dirty_all(space->machine());
+	space->machine().tilemap().mark_all_dirty();
 }
 
 
@@ -190,7 +190,7 @@ static VIDEO_START( safarir )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -198,10 +198,10 @@ static SCREEN_UPDATE_IND16( safarir )
 {
 	safarir_state *state = screen.machine().driver_data<safarir_state>();
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, *state->m_bg_scroll);
+	state->m_bg_tilemap->set_scrollx(0, *state->m_bg_scroll);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

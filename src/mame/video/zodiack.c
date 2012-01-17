@@ -12,13 +12,13 @@
 WRITE8_MEMBER( zodiack_state::videoram_w )
 {
 	m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(m_fg_tilemap, offset);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER( zodiack_state::videoram2_w )
 {
 	m_videoram_2[offset] = data;
-	tilemap_mark_tile_dirty(m_bg_tilemap, offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER( zodiack_state::attributes_w )
@@ -29,8 +29,8 @@ WRITE8_MEMBER( zodiack_state::attributes_w )
 
 		for (i = offset / 2; i < m_videoram_size; i += 32)
 		{
-			tilemap_mark_tile_dirty(m_bg_tilemap, i);
-			tilemap_mark_tile_dirty(m_fg_tilemap, i);
+			m_bg_tilemap->mark_tile_dirty(i);
+			m_fg_tilemap->mark_tile_dirty(i);
 		}
 	}
 
@@ -42,7 +42,7 @@ WRITE8_MEMBER( zodiack_state::flipscreen_w )
 	if (flip_screen_get(machine()) != (~data & 0x01))
 	{
 		flip_screen_set(machine(), ~data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(machine());
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -123,8 +123,8 @@ void zodiack_state::video_start()
 	m_bg_tilemap = tilemap_create(machine(), get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	m_fg_tilemap = tilemap_create(machine(), get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(m_fg_tilemap, 0);
-	tilemap_set_scroll_cols(m_fg_tilemap, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scroll_cols(32);
 
 	/* FIXME: flip_screen_x should not be written. */
 	flip_screen_set_no_update(machine(), 0);
@@ -184,10 +184,10 @@ void zodiack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 UINT32 zodiack_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	for (int i = 0; i < 32; i++)
-		tilemap_set_scrolly(m_fg_tilemap, i, m_attributeram[i * 2]);
+		m_fg_tilemap->set_scrolly(i, m_attributeram[i * 2]);
 
-	tilemap_draw(bitmap, cliprect, m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, m_fg_tilemap, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_bullets(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	return 0;

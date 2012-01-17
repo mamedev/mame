@@ -38,14 +38,14 @@ WRITE8_HANDLER( jailbrek_videoram_w )
 {
 	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( jailbrek_colorram_w )
 {
 	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -62,7 +62,7 @@ VIDEO_START( jailbrek )
 {
 	jailbrek_state *state = machine.driver_data<jailbrek_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 396 - 256);
+	state->m_bg_tilemap->set_scrolldx(0, 396 - 256);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -104,24 +104,24 @@ SCREEN_UPDATE_IND16( jailbrek )
 	// bit 2 appears to be horizontal/vertical scroll control
 	if (state->m_scroll_dir[0] & 0x04)
 	{
-		tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
-		tilemap_set_scroll_rows(state->m_bg_tilemap, 1);
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->set_scroll_cols(32);
+		state->m_bg_tilemap->set_scroll_rows(1);
+		state->m_bg_tilemap->set_scrollx(0, 0);
 
 		for (i = 0; i < 32; i++)
-			tilemap_set_scrolly(state->m_bg_tilemap, i, ((state->m_scroll_x[i + 32] << 8) + state->m_scroll_x[i]));
+			state->m_bg_tilemap->set_scrolly(i, ((state->m_scroll_x[i + 32] << 8) + state->m_scroll_x[i]));
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
-		tilemap_set_scroll_cols(state->m_bg_tilemap, 1);
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->set_scroll_rows(32);
+		state->m_bg_tilemap->set_scroll_cols(1);
+		state->m_bg_tilemap->set_scrolly(0, 0);
 
 		for (i = 0; i < 32; i++)
-			tilemap_set_scrollx(state->m_bg_tilemap, i, ((state->m_scroll_x[i + 32] << 8) + state->m_scroll_x[i]));
+			state->m_bg_tilemap->set_scrollx(i, ((state->m_scroll_x[i + 32] << 8) + state->m_scroll_x[i]));
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

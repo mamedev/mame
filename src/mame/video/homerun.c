@@ -12,7 +12,7 @@ WRITE8_DEVICE_HANDLER(homerun_banking_w)
 	else
 		state->m_gc_up = data & 3;
 
-	tilemap_mark_all_tiles_dirty(state->m_tilemap);
+	state->m_tilemap->mark_all_dirty();
 
 	data >>= 5;
 	memory_set_bank(device->machine(), "bank1", data & 0x07);
@@ -22,7 +22,7 @@ WRITE8_HANDLER( homerun_videoram_w )
 {
 	homerun_state *state = space->machine().driver_data<homerun_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset & 0xfff);
+	state->m_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
 WRITE8_HANDLER(homerun_color_w)
@@ -88,19 +88,19 @@ SCREEN_UPDATE_IND16(homerun)
 	rectangle myclip = cliprect;
 
 	/* upper part */
-	tilemap_set_scrollx(state->m_tilemap, 0, state->m_xpc + ((state->m_xpa & 2) << 7) );
-	tilemap_set_scrolly(state->m_tilemap, 0, state->m_xpb + ((state->m_xpa & 1) << 8) );
+	state->m_tilemap->set_scrollx(0, state->m_xpc + ((state->m_xpa & 2) << 7) );
+	state->m_tilemap->set_scrolly(0, state->m_xpb + ((state->m_xpa & 1) << 8) );
 
 	myclip.max_y /= 2;
 	state->m_gfx_ctrl = state->m_gc_up;
-	tilemap_draw(bitmap, myclip, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, myclip, 0, 0);
 	draw_sprites(screen.machine(), bitmap, myclip);
 
 	/* lower part */
 	myclip.min_y += myclip.max_y;
 	myclip.max_y *= 2;
 	state->m_gfx_ctrl = state->m_gc_down;
-	tilemap_draw(bitmap, myclip, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, myclip, 0, 0);
 	draw_sprites(screen.machine(), bitmap, myclip);
 
 	state->m_gc_down = state->m_gc_up;

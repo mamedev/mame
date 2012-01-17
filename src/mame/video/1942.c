@@ -130,7 +130,7 @@ VIDEO_START( 1942 )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 16);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -145,7 +145,7 @@ WRITE8_HANDLER( c1942_fgvideoram_w )
 	_1942_state *state = space->machine().driver_data<_1942_state>();
 
 	state->m_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x3ff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( c1942_bgvideoram_w )
@@ -153,7 +153,7 @@ WRITE8_HANDLER( c1942_bgvideoram_w )
 	_1942_state *state = space->machine().driver_data<_1942_state>();
 
 	state->m_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, (offset & 0x0f) | ((offset >> 1) & 0x01f0));
+	state->m_bg_tilemap->mark_tile_dirty((offset & 0x0f) | ((offset >> 1) & 0x01f0));
 }
 
 
@@ -164,7 +164,7 @@ WRITE8_HANDLER( c1942_palette_bank_w )
 	if (state->m_palette_bank != data)
 	{
 		state->m_palette_bank = data;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -173,7 +173,7 @@ WRITE8_HANDLER( c1942_scroll_w )
 	_1942_state *state = space->machine().driver_data<_1942_state>();
 
 	state->m_scroll[offset] = data;
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll[0] | (state->m_scroll[1] << 8));
+	state->m_bg_tilemap->set_scrollx(0, state->m_scroll[0] | (state->m_scroll[1] << 8));
 }
 
 
@@ -244,8 +244,8 @@ SCREEN_UPDATE_IND16( 1942 )
 {
 	_1942_state *state = screen.machine().driver_data<_1942_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

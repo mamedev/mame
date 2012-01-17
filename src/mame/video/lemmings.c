@@ -94,7 +94,7 @@ VIDEO_START( lemmings )
 	state->m_sprite_triple_buffer_0 = auto_alloc_array(machine, UINT16, 0x800 / 2);
 	state->m_sprite_triple_buffer_1 = auto_alloc_array(machine, UINT16, 0x800 / 2);
 
-	tilemap_set_transparent_pen(state->m_vram_tilemap, 0);
+	state->m_vram_tilemap->set_transparent_pen(0);
 	state->m_bitmap0->fill(0x100);
 
 	gfx_element_set_source(machine.gfx[2], state->m_vram_buffer);
@@ -167,7 +167,7 @@ WRITE16_HANDLER( lemmings_vram_w )
 {
 	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	COMBINE_DATA(&state->m_vram_data[offset]);
-	tilemap_mark_tile_dirty(state->m_vram_tilemap, offset);
+	state->m_vram_tilemap->mark_tile_dirty(offset);
 }
 
 SCREEN_UPDATE_IND16( lemmings )
@@ -197,7 +197,7 @@ SCREEN_UPDATE_IND16( lemmings )
 	}
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_0, 0, 0x0000);
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x2000);
-	tilemap_draw(bitmap, cliprect, state->m_vram_tilemap, 0, 0);
+	state->m_vram_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_0, 0, 0x2000);
 	return 0;
 }

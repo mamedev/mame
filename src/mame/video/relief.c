@@ -94,7 +94,7 @@ VIDEO_START( relief )
 
 	/* initialize the second playfield */
 	state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, tilemap_scan_cols,  8,8, 64,64);
-	tilemap_set_transparent_pen(state->m_playfield2_tilemap, 0);
+	state->m_playfield2_tilemap->set_transparent_pen(0);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -118,8 +118,8 @@ SCREEN_UPDATE_IND16( relief )
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 0, 1);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_playfield2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

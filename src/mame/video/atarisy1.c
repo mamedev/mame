@@ -178,7 +178,7 @@ VIDEO_START( atarisy1 )
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* modify the motion object code lookup */
 	codelookup = atarimo_get_code_lookup(0, &size);
@@ -242,7 +242,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 	if (diff & 0x0004)
 	{
 		state->m_playfield_tile_bank = (newselect >> 2) & 1;
-		tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+		state->m_playfield_tilemap->mark_all_dirty();
 	}
 
 	/* stash the new value */
@@ -290,7 +290,7 @@ WRITE16_HANDLER( atarisy1_xscroll_w )
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	/* set the new scroll value */
-	tilemap_set_scrollx(state->m_playfield_tilemap, 0, newscroll);
+	state->m_playfield_tilemap->set_scrollx(0, newscroll);
 
 	/* update the data */
 	*state->m_xscroll = newscroll;
@@ -307,7 +307,7 @@ WRITE16_HANDLER( atarisy1_xscroll_w )
 TIMER_DEVICE_CALLBACK( atarisy1_reset_yscroll_callback )
 {
 	atarisy1_state *state = timer.machine().driver_data<atarisy1_state>();
-	tilemap_set_scrolly(state->m_playfield_tilemap, 0, param);
+	state->m_playfield_tilemap->set_scrolly(0, param);
 }
 
 
@@ -328,7 +328,7 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 	adjusted_scroll = newscroll;
 	if (scanline <= space->machine().primary_screen->visible_area().max_y)
 		adjusted_scroll -= (scanline + 1);
-	tilemap_set_scrolly(state->m_playfield_tilemap, 0, adjusted_scroll);
+	state->m_playfield_tilemap->set_scrolly(0, adjusted_scroll);
 
 	/* but since we've adjusted it, we must reset it to the normal value
        once we hit scanline 0 again */
@@ -508,7 +508,7 @@ SCREEN_UPDATE_IND16( atarisy1 )
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -542,7 +542,7 @@ SCREEN_UPDATE_IND16( atarisy1 )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

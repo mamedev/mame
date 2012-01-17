@@ -15,7 +15,7 @@ WRITE16_HANDLER( prehisle_bg_videoram16_w )
 	prehisle_state *state = space->machine().driver_data<prehisle_state>();
 
 	COMBINE_DATA(&state->m_bg_videoram16[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( prehisle_fg_videoram16_w )
@@ -23,7 +23,7 @@ WRITE16_HANDLER( prehisle_fg_videoram16_w )
 	prehisle_state *state = space->machine().driver_data<prehisle_state>();
 
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 READ16_HANDLER( prehisle_control16_r )
@@ -50,10 +50,10 @@ WRITE16_HANDLER( prehisle_control16_w )
 
 	switch (offset)
 	{
-	case 0x00: tilemap_set_scrolly(state->m_bg_tilemap, 0, scroll); break;
-	case 0x08: tilemap_set_scrollx(state->m_bg_tilemap, 0, scroll); break;
-	case 0x10: tilemap_set_scrolly(state->m_bg2_tilemap, 0, scroll); break;
-	case 0x18: tilemap_set_scrollx(state->m_bg2_tilemap, 0, scroll); break;
+	case 0x00: state->m_bg_tilemap->set_scrolly(0, scroll); break;
+	case 0x08: state->m_bg_tilemap->set_scrollx(0, scroll); break;
+	case 0x10: state->m_bg2_tilemap->set_scrolly(0, scroll); break;
+	case 0x18: state->m_bg2_tilemap->set_scrollx(0, scroll); break;
 	case 0x23: state->m_invert_controls = data ? 0x00ff : 0x0000; break;
 	case 0x28: coin_counter_w(space->machine(), 0, data & 1); break;
 	case 0x29: coin_counter_w(space->machine(), 1, data & 1); break;
@@ -108,8 +108,8 @@ VIDEO_START( prehisle )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
+	state->m_bg_tilemap->set_transparent_pen(15);
+	state->m_fg_tilemap->set_transparent_pen(15);
 
 	/* register for saving */
 	state->save_item(NAME(state->m_invert_controls));
@@ -168,10 +168,10 @@ SCREEN_UPDATE_IND16( prehisle )
 {
 	prehisle_state *state = screen.machine().driver_data<prehisle_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
+	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -14,7 +14,7 @@
  *
  *************************************/
 
-static void get_tile_info_common( running_machine &machine, tile_data *tileinfo, tilemap_memory_index tile_index, UINT8 *alpha_videoram )
+static void get_tile_info_common( running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, UINT8 *alpha_videoram )
 {
 	int code = alpha_videoram[tile_index] & 0x3f;
 	int flip = alpha_videoram[tile_index] & 0x40;
@@ -64,7 +64,7 @@ WRITE8_HANDLER( atarifb_alpha1_videoram_w )
 	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
 	state->m_alphap1_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_alpha1_tilemap, offset);
+	state->m_alpha1_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -73,7 +73,7 @@ WRITE8_HANDLER( atarifb_alpha2_videoram_w )
 	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
 	state->m_alphap2_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_alpha2_tilemap, offset);
+	state->m_alpha2_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -82,7 +82,7 @@ WRITE8_HANDLER( atarifb_field_videoram_w )
 	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
 	state->m_field_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_field_tilemap, offset);
+	state->m_field_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -115,9 +115,9 @@ static void draw_playfield_and_alpha( running_machine &machine, bitmap_ind16 &bi
 	scroll_x[0] = - *state->m_scroll_register + 32 + playfield_x_offset;
 	scroll_y[0] = 8 + playfield_y_offset;
 
-	copybitmap(bitmap, tilemap_get_pixmap(state->m_alpha1_tilemap), 0, 0, 35*8, 1*8, cliprect);
-	copybitmap(bitmap, tilemap_get_pixmap(state->m_alpha2_tilemap), 0, 0,  0*8, 1*8, cliprect);
-	copyscrollbitmap(bitmap, tilemap_get_pixmap(state->m_field_tilemap),  1, scroll_x, 1, scroll_y, bigfield_area);
+	copybitmap(bitmap, state->m_alpha1_tilemap->pixmap(), 0, 0, 35*8, 1*8, cliprect);
+	copybitmap(bitmap, state->m_alpha2_tilemap->pixmap(), 0, 0,  0*8, 1*8, cliprect);
+	copyscrollbitmap(bitmap, state->m_field_tilemap->pixmap(),  1, scroll_x, 1, scroll_y, bigfield_area);
 }
 
 

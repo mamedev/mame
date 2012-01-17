@@ -441,7 +441,7 @@ WRITE16_HANDLER( wecleman_txtram_w )
 				state->m_bgpage[1] = (new_data >> 0x0) & 3;
 				state->m_bgpage[2] = (new_data >> 0xc) & 3;
 				state->m_bgpage[3] = (new_data >> 0x8) & 3;
-				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+				state->m_bg_tilemap->mark_all_dirty();
 			}
 
 			/* pages selector for the foreground */
@@ -451,13 +451,13 @@ WRITE16_HANDLER( wecleman_txtram_w )
 				state->m_fgpage[1] = (new_data >> 0x0) & 3;
 				state->m_fgpage[2] = (new_data >> 0xc) & 3;
 				state->m_fgpage[3] = (new_data >> 0x8) & 3;
-				tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+				state->m_fg_tilemap->mark_all_dirty();
 			}
 
 			/* Parallactic horizontal scroll registers follow */
 		}
 		else
-			tilemap_mark_tile_dirty(state->m_txt_tilemap, offset);
+			state->m_txt_tilemap->mark_tile_dirty(offset);
 	}
 }
 
@@ -506,16 +506,16 @@ WRITE16_HANDLER( wecleman_pageram_w )
 		row  = ( offset / PAGE_NX ) % PAGE_NY;
 
 		/* background */
-		if (state->m_bgpage[0] == page) tilemap_mark_tile_dirty(state->m_bg_tilemap, (col+PAGE_NX*0) + (row+PAGE_NY*0)*PAGE_NX*2 );
-		if (state->m_bgpage[1] == page) tilemap_mark_tile_dirty(state->m_bg_tilemap, (col+PAGE_NX*1) + (row+PAGE_NY*0)*PAGE_NX*2 );
-		if (state->m_bgpage[2] == page) tilemap_mark_tile_dirty(state->m_bg_tilemap, (col+PAGE_NX*0) + (row+PAGE_NY*1)*PAGE_NX*2 );
-		if (state->m_bgpage[3] == page) tilemap_mark_tile_dirty(state->m_bg_tilemap, (col+PAGE_NX*1) + (row+PAGE_NY*1)*PAGE_NX*2 );
+		if (state->m_bgpage[0] == page) state->m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*0)*PAGE_NX*2 );
+		if (state->m_bgpage[1] == page) state->m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*0)*PAGE_NX*2 );
+		if (state->m_bgpage[2] == page) state->m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*1)*PAGE_NX*2 );
+		if (state->m_bgpage[3] == page) state->m_bg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*1)*PAGE_NX*2 );
 
 		/* foreground */
-		if (state->m_fgpage[0] == page) tilemap_mark_tile_dirty(state->m_fg_tilemap, (col+PAGE_NX*0) + (row+PAGE_NY*0)*PAGE_NX*2 );
-		if (state->m_fgpage[1] == page) tilemap_mark_tile_dirty(state->m_fg_tilemap, (col+PAGE_NX*1) + (row+PAGE_NY*0)*PAGE_NX*2 );
-		if (state->m_fgpage[2] == page) tilemap_mark_tile_dirty(state->m_fg_tilemap, (col+PAGE_NX*0) + (row+PAGE_NY*1)*PAGE_NX*2 );
-		if (state->m_fgpage[3] == page) tilemap_mark_tile_dirty(state->m_fg_tilemap, (col+PAGE_NX*1) + (row+PAGE_NY*1)*PAGE_NX*2 );
+		if (state->m_fgpage[0] == page) state->m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*0)*PAGE_NX*2 );
+		if (state->m_fgpage[1] == page) state->m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*0)*PAGE_NX*2 );
+		if (state->m_fgpage[2] == page) state->m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*0) + (row+PAGE_NY*1)*PAGE_NX*2 );
+		if (state->m_fgpage[3] == page) state->m_fg_tilemap->mark_tile_dirty((col+PAGE_NX*1) + (row+PAGE_NY*1)*PAGE_NX*2 );
 	}
 }
 
@@ -954,20 +954,20 @@ VIDEO_START( wecleman )
 								 8,8,
 								 PAGE_NX * 1, PAGE_NY * 1);
 
-	tilemap_set_scroll_rows(state->m_bg_tilemap, TILEMAP_DIMY);	/* Screen-wise scrolling */
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 1);
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
+	state->m_bg_tilemap->set_scroll_rows(TILEMAP_DIMY);	/* Screen-wise scrolling */
+	state->m_bg_tilemap->set_scroll_cols(1);
+	state->m_bg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scroll_rows(state->m_fg_tilemap, TILEMAP_DIMY);	/* Screen-wise scrolling */
-	tilemap_set_scroll_cols(state->m_fg_tilemap, 1);
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	state->m_fg_tilemap->set_scroll_rows(TILEMAP_DIMY);	/* Screen-wise scrolling */
+	state->m_fg_tilemap->set_scroll_cols(1);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scroll_rows(state->m_txt_tilemap, 1);
-	tilemap_set_scroll_cols(state->m_txt_tilemap, 1);
-	tilemap_set_transparent_pen(state->m_txt_tilemap,0);
+	state->m_txt_tilemap->set_scroll_rows(1);
+	state->m_txt_tilemap->set_scroll_cols(1);
+	state->m_txt_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrollx(state->m_txt_tilemap, 0, 512-320-16 -BMP_PAD);
-	tilemap_set_scrolly(state->m_txt_tilemap, 0, -BMP_PAD );
+	state->m_txt_tilemap->set_scrollx(0, 512-320-16 -BMP_PAD);
+	state->m_txt_tilemap->set_scrolly(0, -BMP_PAD );
 
 	// patches out a mysterious pixel floating in the sky (tile decoding bug?)
 	*(machine.gfx[0]->gfxdata + (machine.gfx[0]->char_modulo*0xaca+7)) = 0;
@@ -1043,8 +1043,8 @@ SCREEN_UPDATE_RGB32( wecleman )
 	cloud_sx = state->m_txtram[0xfee>>1] + 0xb0;
 	cloud_sy = bg_y;
 
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, bg_y -BMP_PAD);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, fg_y -BMP_PAD);
+	state->m_bg_tilemap->set_scrolly(0, bg_y -BMP_PAD);
+	state->m_fg_tilemap->set_scrolly(0, fg_y -BMP_PAD);
 
 	for (i=0; i<(28<<2); i+=4)
 	{
@@ -1054,8 +1054,8 @@ SCREEN_UPDATE_RGB32( wecleman )
 		k = i<<1;
 		for (j=0; j<8; j++)
 		{
-			tilemap_set_scrollx(state->m_fg_tilemap, (fg_y + k + j) & (TILEMAP_DIMY - 1), fg_x);
-			tilemap_set_scrollx(state->m_bg_tilemap, (bg_y + k + j) & (TILEMAP_DIMY - 1), bg_x);
+			state->m_fg_tilemap->set_scrollx((fg_y + k + j) & (TILEMAP_DIMY - 1), fg_x);
+			state->m_bg_tilemap->set_scrollx((bg_y + k + j) & (TILEMAP_DIMY - 1), bg_x);
 		}
 	}
 
@@ -1071,7 +1071,7 @@ SCREEN_UPDATE_RGB32( wecleman )
 	if (video_on) wecleman_draw_road(screen.machine(), bitmap, cliprect, 0x02);
 
 	/* Draw the background */
-	if (video_on) tilemap_draw(bitmap,cliprect, state->m_bg_tilemap, 0, 0);
+	if (video_on) state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	// draws the cloud layer; needs work
 	if (state->m_cloud_visible)
@@ -1099,7 +1099,7 @@ SCREEN_UPDATE_RGB32( wecleman )
 	}
 
 	/* Draw the foreground */
-	if (video_on) tilemap_draw(bitmap,cliprect, state->m_fg_tilemap, 0, 0);
+	if (video_on) state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the road (lines which have priority 0x04) */
 	if (video_on) wecleman_draw_road(screen.machine(), bitmap,cliprect, 0x04);
@@ -1108,7 +1108,7 @@ SCREEN_UPDATE_RGB32( wecleman )
 	if (video_on) sprite_draw(screen.machine(), bitmap,cliprect);
 
 	/* Draw the text layer */
-	if (video_on) tilemap_draw(bitmap,cliprect, state->m_txt_tilemap, 0, 0);
+	if (video_on) state->m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

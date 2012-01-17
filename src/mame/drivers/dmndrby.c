@@ -334,7 +334,7 @@ static VIDEO_START(dderby)
 	dmndrby_state *state = machine.driver_data<dmndrby_state>();
 	state->m_racetrack_tilemap_rom = machine.region("user1")->base();
 	state->m_racetrack_tilemap = tilemap_create(machine,get_dmndrby_tile_info,tilemap_scan_rows,16,16, 16, 512);
-	tilemap_mark_all_tiles_dirty(state->m_racetrack_tilemap);
+	state->m_racetrack_tilemap->mark_all_dirty();
 
 }
 

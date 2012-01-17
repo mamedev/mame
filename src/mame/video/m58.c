@@ -108,7 +108,7 @@ WRITE8_HANDLER( yard_videoram_w )
 	m58_state *state = space->machine().driver_data<m58_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -185,8 +185,8 @@ VIDEO_START( yard )
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	state->m_bg_tilemap = tilemap_create(machine, yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
-	tilemap_set_scrolldx(state->m_bg_tilemap, visarea.min_x, width - (visarea.max_x + 1));
-	tilemap_set_scrolldy(state->m_bg_tilemap, visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
+	state->m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
+	state->m_bg_tilemap->set_scrolldy(visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 
 	state->m_scroll_panel_bitmap = auto_bitmap_ind16_alloc(machine, SCROLL_PANEL_WIDTH, height);
 }
@@ -307,10 +307,10 @@ SCREEN_UPDATE_IND16( yard )
 {
 	m58_state *state = screen.machine().driver_data<m58_state>();
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, (*state->m_yard_scroll_x_high * 0x100) + *state->m_yard_scroll_x_low);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_yard_scroll_y_low);
+	state->m_bg_tilemap->set_scrollx(0, (*state->m_yard_scroll_x_high * 0x100) + *state->m_yard_scroll_x_low);
+	state->m_bg_tilemap->set_scrolly(0, *state->m_yard_scroll_y_low);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	draw_panel(screen.machine(), bitmap, cliprect);
 	return 0;

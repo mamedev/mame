@@ -93,14 +93,14 @@ static WRITE8_HANDLER( fg_tile_w )
 {
 	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->m_fg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( fg_color_w )
 {
 	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->m_fg_color_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -117,7 +117,7 @@ static WRITE8_HANDLER( jackie_reel1_ram_w )
 {
 	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->m_reel1_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel1_tilemap,offset);
+	state->m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel1_tile_info )
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( jackie_reel2_ram_w )
 {
 	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->m_reel2_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel2_tilemap,offset);
+	state->m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel2_tile_info )
@@ -148,7 +148,7 @@ static WRITE8_HANDLER( jackie_reel3_ram_w )
 {
 	jackie_state *state = space->machine().driver_data<jackie_state>();
 	state->m_reel3_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel3_tilemap,offset);
+	state->m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel3_tile_info )
@@ -165,12 +165,12 @@ static VIDEO_START(jackie)
 	state->m_reel2_tilemap = tilemap_create(machine,get_jackie_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
 	state->m_reel3_tilemap = tilemap_create(machine,get_jackie_reel3_tile_info,tilemap_scan_rows,8,32, 64, 8);
 
-	tilemap_set_scroll_cols(state->m_reel1_tilemap, 64);
-	tilemap_set_scroll_cols(state->m_reel2_tilemap, 64);
-	tilemap_set_scroll_cols(state->m_reel3_tilemap, 64);
+	state->m_reel1_tilemap->set_scroll_cols(64);
+	state->m_reel2_tilemap->set_scroll_cols(64);
+	state->m_reel3_tilemap->set_scroll_cols(64);
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -185,9 +185,9 @@ static SCREEN_UPDATE_IND16(jackie)
 
 	for (i=0;i < 0x40;i++)
 	{
-		tilemap_set_scrolly(state->m_reel1_tilemap, i, state->m_bg_scroll[i+0x000]);
-		tilemap_set_scrolly(state->m_reel2_tilemap, i, state->m_bg_scroll[i+0x040]);
-		tilemap_set_scrolly(state->m_reel3_tilemap, i, state->m_bg_scroll[i+0x080]);
+		state->m_reel1_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x000]);
+		state->m_reel2_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x040]);
+		state->m_reel3_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x080]);
 	}
 
 	for (j=0; j < 0x100-1; j++)
@@ -200,15 +200,15 @@ static SCREEN_UPDATE_IND16(jackie)
 
 		if (rowenable==0)
 		{
-			tilemap_draw(bitmap,clip,state->m_reel1_tilemap,0,0);
+			state->m_reel1_tilemap->draw(bitmap, clip, 0,0);
 		}
 		else if (rowenable==1)
 		{
-			tilemap_draw(bitmap,clip,state->m_reel2_tilemap,0,0);
+			state->m_reel2_tilemap->draw(bitmap, clip, 0,0);
 		}
 		else if (rowenable==2)
 		{
-			tilemap_draw(bitmap,clip,state->m_reel3_tilemap,0,0);
+			state->m_reel3_tilemap->draw(bitmap, clip, 0,0);
 		}
 		else if (rowenable==3)
 		{
@@ -217,7 +217,7 @@ static SCREEN_UPDATE_IND16(jackie)
 		startclipmin+=1;
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -85,7 +85,7 @@ WRITE16_HANDLER( mugsmash_videoram1_w )
 	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
 	state->m_videoram1[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap1, offset / 2);
+	state->m_tilemap1->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_mugsmash_tile_info2 )
@@ -114,7 +114,7 @@ WRITE16_HANDLER( mugsmash_videoram2_w )
 	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap2, offset / 2);
+	state->m_tilemap2->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER (mugsmash_reg_w)
@@ -127,16 +127,16 @@ WRITE16_HANDLER (mugsmash_reg_w)
 	switch (offset)
 	{
 	case 0:
-		tilemap_set_scrollx(state->m_tilemap2, 0, state->m_regs1[2] + 7);
+		state->m_tilemap2->set_scrollx(0, state->m_regs1[2] + 7);
 		break;
 	case 1:
-		tilemap_set_scrolly(state->m_tilemap2, 0, state->m_regs1[3] + 4);
+		state->m_tilemap2->set_scrolly(0, state->m_regs1[3] + 4);
 		break;
 	case 2:
-		tilemap_set_scrollx(state->m_tilemap1, 0, state->m_regs1[0] + 3);
+		state->m_tilemap1->set_scrollx(0, state->m_regs1[0] + 3);
 		break;
 	case 3:
-		tilemap_set_scrolly(state->m_tilemap1, 0, state->m_regs1[1] + 4);
+		state->m_tilemap1->set_scrolly(0, state->m_regs1[1] + 4);
 		break;
 	}
 }
@@ -146,7 +146,7 @@ VIDEO_START( mugsmash )
 	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 
 	state->m_tilemap1 = tilemap_create(machine, get_mugsmash_tile_info1, tilemap_scan_rows, 16, 16, 32, 32);
-	tilemap_set_transparent_pen(state->m_tilemap1, 0);
+	state->m_tilemap1->set_transparent_pen(0);
 
 	state->m_tilemap2 = tilemap_create(machine, get_mugsmash_tile_info2, tilemap_scan_rows, 16, 16, 32, 32);
 }
@@ -155,8 +155,8 @@ SCREEN_UPDATE_IND16( mugsmash )
 {
 	mugsmash_state *state = screen.machine().driver_data<mugsmash_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap2, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap1, 0, 0);
+	state->m_tilemap2->draw(bitmap, cliprect, 0, 0);
+	state->m_tilemap1->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -135,7 +135,7 @@ static VIDEO_START(koikoi)
 static SCREEN_UPDATE_IND16(koikoi)
 {
 	koikoi_state *state = screen.machine().driver_data<koikoi_state>();
-	tilemap_draw(bitmap, cliprect, state->m_tmap, 0, 0);
+	state->m_tmap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -149,7 +149,7 @@ static WRITE8_HANDLER( vram_w )
 {
 	koikoi_state *state = space->machine().driver_data<koikoi_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tmap, offset & 0x3ff);
+	state->m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
 static READ8_DEVICE_HANDLER( input_r )

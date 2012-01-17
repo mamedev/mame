@@ -53,7 +53,7 @@ VIDEO_START( pushman )
 	state->m_bg_tilemap = tilemap_create(machine, get_back_tile_info, background_scan_rows, 32, 32, 128, 64);
 	state->m_tx_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 3);
+	state->m_tx_tilemap->set_transparent_pen(3);
 }
 
 
@@ -74,7 +74,7 @@ WRITE16_HANDLER( pushman_videoram_w )
 {
 	pushman_state *state = space->machine().driver_data<pushman_state>();
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -125,11 +125,11 @@ SCREEN_UPDATE_IND16( pushman )
 	pushman_state *state = screen.machine().driver_data<pushman_state>();
 
 	/* Setup the tilemaps */
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_control[0]);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, 0xf00 - state->m_control[1]);
+	state->m_bg_tilemap->set_scrollx(0, state->m_control[0]);
+	state->m_bg_tilemap->set_scrolly(0, 0xf00 - state->m_control[1]);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

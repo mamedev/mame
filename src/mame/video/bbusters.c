@@ -56,7 +56,7 @@ WRITE16_HANDLER( bbusters_video_w )
 	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fix_tilemap, offset);
+	state->m_fix_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( bbusters_pf1_w )
@@ -64,7 +64,7 @@ WRITE16_HANDLER( bbusters_pf1_w )
 	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
 	COMBINE_DATA(&state->m_pf1_data[offset]);
-	tilemap_mark_tile_dirty(state->m_pf1_tilemap, offset);
+	state->m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( bbusters_pf2_w )
@@ -72,7 +72,7 @@ WRITE16_HANDLER( bbusters_pf2_w )
 	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
 	COMBINE_DATA(&state->m_pf2_data[offset]);
-	tilemap_mark_tile_dirty(state->m_pf2_tilemap, offset);
+	state->m_pf2_tilemap->mark_tile_dirty(offset);
 }
 
 /******************************************************************************/
@@ -85,8 +85,8 @@ VIDEO_START( bbuster )
 	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, tilemap_scan_cols, 16, 16, 128, 32);
 	state->m_pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, tilemap_scan_cols, 16, 16, 128, 32);
 
-	tilemap_set_transparent_pen(state->m_pf1_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_fix_tilemap, 15);
+	state->m_pf1_tilemap->set_transparent_pen(15);
+	state->m_fix_tilemap->set_transparent_pen(15);
 }
 
 VIDEO_START( mechatt )
@@ -97,8 +97,8 @@ VIDEO_START( mechatt )
 	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, tilemap_scan_cols, 16, 16, 256, 32);
 	state->m_pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, tilemap_scan_cols, 16, 16, 256, 32);
 
-	tilemap_set_transparent_pen(state->m_pf1_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_fix_tilemap, 15);
+	state->m_pf1_tilemap->set_transparent_pen(15);
+	state->m_fix_tilemap->set_transparent_pen(15);
 }
 
 /******************************************************************************/
@@ -283,17 +283,17 @@ SCREEN_UPDATE_IND16( bbuster )
 {
 	bbusters_state *state = screen.machine().driver_data<bbusters_state>();
 
-	tilemap_set_scrollx(state->m_pf1_tilemap, 0, state->m_pf1_scroll_data[0]);
-	tilemap_set_scrolly(state->m_pf1_tilemap, 0, state->m_pf1_scroll_data[1]);
-	tilemap_set_scrollx(state->m_pf2_tilemap, 0, state->m_pf2_scroll_data[0]);
-	tilemap_set_scrolly(state->m_pf2_tilemap, 0, state->m_pf2_scroll_data[1]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_pf1_scroll_data[0]);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_pf1_scroll_data[1]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_pf2_scroll_data[0]);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_pf2_scroll_data[1]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 	//draw_sprites(screen.machine(), bitmap, screen.machine().generic.buffered_spriteram2.u16, 2, 0x8, 0x8);
-	tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+	state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, screen.machine().generic.buffered_spriteram2.u16, 2, 0, 0);
 	draw_sprites(screen.machine(), bitmap, screen.machine().generic.buffered_spriteram.u16, 1, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
+	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -301,14 +301,14 @@ SCREEN_UPDATE_IND16( mechatt )
 {
 	bbusters_state *state = screen.machine().driver_data<bbusters_state>();
 
-	tilemap_set_scrollx(state->m_pf1_tilemap, 0, state->m_pf1_scroll_data[0]);
-	tilemap_set_scrolly(state->m_pf1_tilemap, 0, state->m_pf1_scroll_data[1]);
-	tilemap_set_scrollx(state->m_pf2_tilemap, 0, state->m_pf2_scroll_data[0]);
-	tilemap_set_scrolly(state->m_pf2_tilemap, 0, state->m_pf2_scroll_data[1]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_pf1_scroll_data[0]);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_pf1_scroll_data[1]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_pf2_scroll_data[0]);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_pf2_scroll_data[1]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, screen.machine().generic.buffered_spriteram.u16, 1, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
+	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -51,7 +51,7 @@ WRITE8_HANDLER( blueprnt_videoram_w )
 	blueprnt_state *state = space->machine().driver_data<blueprnt_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( blueprnt_colorram_w )
@@ -59,7 +59,7 @@ WRITE8_HANDLER( blueprnt_colorram_w )
 	blueprnt_state *state = space->machine().driver_data<blueprnt_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( blueprnt_flipscreen_w )
@@ -71,7 +71,7 @@ WRITE8_HANDLER( blueprnt_flipscreen_w )
 	if (state->m_gfx_bank != ((data & 0x04) >> 2))
 	{
 		state->m_gfx_bank = ((data & 0x04) >> 2);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = state->m_videoram[tile_index] + 256 * state->m_gfx_bank;
 	int color = attr & 0x7f;
 
-	tileinfo->category = (attr & 0x80) ? 1 : 0;
+	tileinfo.category = (attr & 0x80) ? 1 : 0;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -92,8 +92,8 @@ VIDEO_START( blueprnt )
 	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_x, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->save_item(NAME(state->m_gfx_bank));
 }
@@ -131,14 +131,14 @@ SCREEN_UPDATE_IND16( blueprnt )
 
 	if (flip_screen_get(screen.machine()))
 		for (i = 0; i < 32; i++)
-			tilemap_set_scrolly(state->m_bg_tilemap, i, state->m_scrollram[32 - i]);
+			state->m_bg_tilemap->set_scrolly(i, state->m_scrollram[32 - i]);
 	else
 		for (i = 0; i < 32; i++)
-			tilemap_set_scrolly(state->m_bg_tilemap, i, state->m_scrollram[30 - i]);
+			state->m_bg_tilemap->set_scrolly(i, state->m_scrollram[30 - i]);
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	return 0;
 }

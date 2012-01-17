@@ -62,7 +62,7 @@ VIDEO_START( darkseal )
 SCREEN_UPDATE_IND16( darkseal )
 {
 	darkseal_state *state = screen.machine().driver_data<darkseal_state>();
-	tilemap_set_flip_all(screen.machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 

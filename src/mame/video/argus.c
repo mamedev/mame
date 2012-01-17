@@ -283,8 +283,8 @@ VIDEO_START( argus )
 	state->m_bg1_tilemap = tilemap_create(machine, argus_get_bg1_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
 	state->m_tx_tilemap  = tilemap_create(machine, argus_get_tx_tile_info,  tilemap_scan_cols,  8,  8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg1_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap,  15);
+	state->m_bg1_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	/* dummy RAM for back ground */
 	state->m_dummy_bg0ram = auto_alloc_array(machine, UINT8, 0x800);
@@ -310,7 +310,7 @@ VIDEO_START( valtric )
 	state->m_bg1_tilemap = tilemap_create(machine, valtric_get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
 	state->m_tx_tilemap  = tilemap_create(machine, valtric_get_tx_tile_info, tilemap_scan_cols,  8,  8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap,  15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	machine.primary_screen->register_screen_bitmap(state->m_mosaicbitmap);
 
@@ -332,8 +332,8 @@ VIDEO_START( butasan )
 	state->m_bg1_tilemap = tilemap_create(machine, butasan_get_bg1_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_tx_tilemap  = tilemap_create(machine, butasan_get_tx_tile_info,  tilemap_scan_rows,  8,  8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg1_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap,  15);
+	state->m_bg1_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	state->m_butasan_pagedram[0] = auto_alloc_array(machine, UINT8, 0x1000);
 	state->m_butasan_pagedram[1] = auto_alloc_array(machine, UINT8, 0x1000);
@@ -381,7 +381,7 @@ static void argus_write_dummy_rams(running_machine &machine, int dramoffs, int v
 	{
 		state->m_dummy_bg0ram[dramoffs]     = VROM2[voffs];
 		state->m_dummy_bg0ram[dramoffs + 1] = VROM2[voffs + 1];
-		tilemap_mark_tile_dirty(state->m_bg0_tilemap, dramoffs >> 1);
+		state->m_bg0_tilemap->mark_tile_dirty(dramoffs >> 1);
 		dramoffs += 2;
 		voffs += 2;
 	}
@@ -455,7 +455,7 @@ WRITE8_HANDLER( argus_txram_w )
 {
 	argus_state *state = space->machine().driver_data<argus_state>();
 	state->m_txram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset >> 1);
+	state->m_tx_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 READ8_HANDLER( argus_bg1ram_r )
@@ -468,7 +468,7 @@ WRITE8_HANDLER( argus_bg1ram_w )
 {
 	argus_state *state = space->machine().driver_data<argus_state>();
 	state->m_bg1ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg1_tilemap, offset >> 1);
+	state->m_bg1_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE8_HANDLER( argus_bg_status_w )
@@ -525,7 +525,7 @@ WRITE8_HANDLER( butasan_bg1_status_w )
 		state->m_butasan_bg1_status = data;
 
 		/* Bank changed */
-		tilemap_mark_all_tiles_dirty(state->m_bg1_tilemap);
+		state->m_bg1_tilemap->mark_all_dirty();
 	}
 }
 
@@ -667,7 +667,7 @@ WRITE8_HANDLER( butasan_bg1ram_w )
 	idx = (offset & 0x00f) | ((offset & 0x200) >> 5) | ((offset & 0x1f0) << 1);
 	idx ^= 0x0f0;
 
-	tilemap_mark_tile_dirty(state->m_bg1_tilemap, idx);
+	state->m_bg1_tilemap->mark_tile_dirty(idx);
 }
 
 WRITE8_HANDLER( butasan_pageselect_w )
@@ -697,13 +697,13 @@ WRITE8_HANDLER( butasan_pagedram_w )
 			int idx;
 			idx = ((offset & 0x01e) >> 1) | ((offset & 0x400) >> 6) | (offset & 0x3e0);
 			idx ^= 0x1e0;
-			tilemap_mark_tile_dirty(state->m_bg0_tilemap, idx);
+			state->m_bg0_tilemap->mark_tile_dirty(idx);
 		}
 	}
 	else
 	{
 		if (offset <= 0x07ff)
-			tilemap_mark_tile_dirty(state->m_tx_tilemap, (offset ^ 0x7c0) >> 1);
+			state->m_tx_tilemap->mark_tile_dirty((offset ^ 0x7c0) >> 1);
 	}
 }
 
@@ -732,27 +732,27 @@ WRITE8_HANDLER( butasan_unknown_w )
 static void bg_setting(running_machine &machine)
 {
 	argus_state *state = machine.driver_data<argus_state>();
-	tilemap_set_flip_all(machine, state->m_flipscreen ? TILEMAP_FLIPY|TILEMAP_FLIPX : 0);
+	machine.tilemap().set_flip_all(state->m_flipscreen ? TILEMAP_FLIPY|TILEMAP_FLIPX : 0);
 
 	if (!state->m_flipscreen)
 	{
 		if (state->m_bg0_tilemap != NULL)
 		{
-			tilemap_set_scrollx(state->m_bg0_tilemap, 0, bg0_scrollx & 0x1ff);
-			tilemap_set_scrolly(state->m_bg0_tilemap, 0, bg0_scrolly & 0x1ff);
+			state->m_bg0_tilemap->set_scrollx(0, bg0_scrollx & 0x1ff);
+			state->m_bg0_tilemap->set_scrolly(0, bg0_scrolly & 0x1ff);
 		}
-		tilemap_set_scrollx(state->m_bg1_tilemap, 0, bg1_scrollx & 0x1ff);
-		tilemap_set_scrolly(state->m_bg1_tilemap, 0, bg1_scrolly & 0x1ff);
+		state->m_bg1_tilemap->set_scrollx(0, bg1_scrollx & 0x1ff);
+		state->m_bg1_tilemap->set_scrolly(0, bg1_scrolly & 0x1ff);
 	}
 	else
 	{
 		if (state->m_bg0_tilemap != NULL)
 		{
-			tilemap_set_scrollx(state->m_bg0_tilemap, 0, (bg0_scrollx + 256) & 0x1ff);
-			tilemap_set_scrolly(state->m_bg0_tilemap, 0, (bg0_scrolly + 256) & 0x1ff);
+			state->m_bg0_tilemap->set_scrollx(0, (bg0_scrollx + 256) & 0x1ff);
+			state->m_bg0_tilemap->set_scrolly(0, (bg0_scrolly + 256) & 0x1ff);
 		}
-		tilemap_set_scrollx(state->m_bg1_tilemap, 0, (bg1_scrollx + 256) & 0x1ff);
-		tilemap_set_scrolly(state->m_bg1_tilemap, 0, (bg1_scrolly + 256) & 0x1ff);
+		state->m_bg1_tilemap->set_scrollx(0, (bg1_scrollx + 256) & 0x1ff);
+		state->m_bg1_tilemap->set_scrolly(0, (bg1_scrolly + 256) & 0x1ff);
 	}
 }
 
@@ -906,10 +906,10 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, con
 	}
 
 	if (state->m_mosaic==0)
-		tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
+		state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 	{
-		tilemap_draw(state->m_mosaicbitmap, cliprect, state->m_bg1_tilemap, 0, 0);
+		state->m_bg1_tilemap->draw(state->m_mosaicbitmap, cliprect, 0, 0);
 		{
 			int step=state->m_mosaic;
 			UINT32 *dest;
@@ -949,10 +949,10 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, con
 	int step = 0x10 - (state->m_valtric_mosaic & 0x0f);
 
 	if (step == 1)
-		tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
+		state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 	{
-		tilemap_draw(state->m_mosaicbitmap, cliprect, state->m_bg1_tilemap, 0, 0);
+		state->m_bg1_tilemap->draw(state->m_mosaicbitmap, cliprect, 0, 0);
 		{
 			UINT32 *dest;
 			int x,y,xx,yy,c=0;
@@ -1197,12 +1197,12 @@ SCREEN_UPDATE_RGB32( argus )
 	/* scroll BG0 and render tile at proper position */
 	argus_bg0_scroll_handle(screen.machine());
 
-	tilemap_draw(bitmap, cliprect, state->m_bg0_tilemap, 0, 0);
+	state->m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
 	argus_draw_sprites(screen.machine(), bitmap, cliprect, 0);
 	if (state->m_bg_status & 1)	/* Backgound enable */
-		tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
+		state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	argus_draw_sprites(screen.machine(), bitmap, cliprect, 1);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap,  0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -1216,7 +1216,7 @@ SCREEN_UPDATE_RGB32( valtric )
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	valtric_draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap,  0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -1226,12 +1226,12 @@ SCREEN_UPDATE_RGB32( butasan )
 	bg_setting(screen.machine());
 
 	if (state->m_bg_status & 1)	/* Backgound enable */
-		tilemap_draw(bitmap, cliprect, state->m_bg0_tilemap, 0, 0);
+		state->m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	if (state->m_butasan_bg1_status & 1) tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
+	if (state->m_butasan_bg1_status & 1) state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	butasan_draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap,  0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	butasan_log_vram(screen.machine());
 	return 0;

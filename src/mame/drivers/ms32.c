@@ -290,7 +290,7 @@ static WRITE16_HANDLER( ms32_rozram_w16 )
 {
 	ms32_state *state = space->machine().driver_data<ms32_state>();
 	COMBINE_DATA(&state->m_rozram_16[offset]);
-	tilemap_mark_tile_dirty(state->m_roz_tilemap,offset/2);
+	state->m_roz_tilemap->mark_tile_dirty(offset/2);
 }
 
 static READ16_HANDLER(  ms32_lineram_r16 )
@@ -327,7 +327,7 @@ static WRITE16_HANDLER( ms32_txram_w16 )
 {
 	ms32_state *state = space->machine().driver_data<ms32_state>();
 	COMBINE_DATA(&state->m_txram_16[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset/2);
+	state->m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
 static READ16_HANDLER(  ms32_bgram_r16 )
@@ -340,8 +340,8 @@ static WRITE16_HANDLER( ms32_bgram_w16 )
 {
 	ms32_state *state = space->machine().driver_data<ms32_state>();
 	COMBINE_DATA(&state->m_bgram_16[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset/2);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap_alt,offset/2);
+	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	state->m_bg_tilemap_alt->mark_tile_dirty(offset/2);
 }
 
 static WRITE32_HANDLER( pip_w )
@@ -402,7 +402,7 @@ static WRITE16_HANDLER( ms32_extra_w16 )
 {
 	ms32_state *state = space->machine().driver_data<ms32_state>();
 	COMBINE_DATA(&state->m_f1superb_extraram_16[offset]);
-	tilemap_mark_tile_dirty(state->m_extra_tilemap,offset/2);
+	state->m_extra_tilemap->mark_tile_dirty(offset/2);
 }
 static READ16_HANDLER( ms32_extra_r16 )
 {

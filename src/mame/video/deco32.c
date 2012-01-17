@@ -587,7 +587,7 @@ SCREEN_UPDATE_IND16( captaven )
 	state->m_deco_tilegen1 = screen.machine().device("tilegen1");
 	state->m_deco_tilegen2 = screen.machine().device("tilegen2");
 
-	tilemap_set_flip_all(screen.machine(),flip_screen_get(screen.machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(flip_screen_get(screen.machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(screen.machine().pens[0x000], cliprect); // Palette index not confirmed

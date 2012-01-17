@@ -136,7 +136,7 @@ WRITE16_HANDLER( lockon_char_w )
 {
 	lockon_state *state = space->machine().driver_data<lockon_state>();
 	state->m_char_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_lockon_tile_info )
@@ -908,7 +908,7 @@ VIDEO_START( lockon )
 	lockon_state *state = machine.driver_data<lockon_state>();
 
 	state->m_tilemap = tilemap_create(machine, get_lockon_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	tilemap_set_transparent_pen(state->m_tilemap, 0);
+	state->m_tilemap->set_transparent_pen(0);
 
 	/* Allocate the two frame buffers for rotation */
 	state->m_back_buffer = auto_bitmap_ind16_alloc(machine, 512, 512);
@@ -944,7 +944,7 @@ SCREEN_UPDATE_IND16( lockon )
 	rotate_draw(screen.machine(), bitmap, cliprect);
 
 	/* Draw the character tilemap */
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the HUD */
 	hud_draw(screen.machine(), bitmap, cliprect);

@@ -109,8 +109,8 @@ WRITE8_HANDLER( sprint8_video_ram_w )
 {
 	sprint8_state *state = space->machine().driver_data<sprint8_state>();
 	state->m_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap1, offset);
-	tilemap_mark_tile_dirty(state->m_tilemap2, offset);
+	state->m_tilemap1->mark_tile_dirty(offset);
+	state->m_tilemap2->mark_tile_dirty(offset);
 }
 
 
@@ -123,8 +123,8 @@ VIDEO_START( sprint8 )
 	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
 	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
 
-	tilemap_set_scrolly(state->m_tilemap1, 0, +24);
-	tilemap_set_scrolly(state->m_tilemap2, 0, +24);
+	state->m_tilemap1->set_scrolly(0, +24);
+	state->m_tilemap2->set_scrolly(0, +24);
 }
 
 
@@ -162,7 +162,7 @@ SCREEN_UPDATE_IND16( sprint8 )
 {
 	sprint8_state *state = screen.machine().driver_data<sprint8_state>();
 	set_pens(state, screen.machine().colortable);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap1, 0, 0);
+	state->m_tilemap1->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -178,7 +178,7 @@ SCREEN_VBLANK( sprint8 )
 		int y;
 		const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-		tilemap_draw(state->m_helper2, visarea, state->m_tilemap2, 0, 0);
+		state->m_tilemap2->draw(state->m_helper2, visarea, 0, 0);
 
 		state->m_helper1.fill(0x20, visarea);
 

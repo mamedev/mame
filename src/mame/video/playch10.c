@@ -11,7 +11,7 @@ WRITE8_HANDLER( playch10_videoram_w )
 	if (state->m_pc10_sdcs)
 	{
 		videoram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+		state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 }
 
@@ -145,7 +145,7 @@ SCREEN_UPDATE_IND16( playch10_single )
 	{
 		/* When the bios is accessing vram, the video circuitry can't access it */
 		if ( !state->m_pc10_sdcs )
-			tilemap_draw(bitmap, top_monitor, state->m_bg_tilemap, 0, 0);
+			state->m_bg_tilemap->draw(bitmap, top_monitor, 0, 0);
 	}
 	return 0;
 }
@@ -179,7 +179,7 @@ SCREEN_UPDATE_IND16( playch10_bottom )
 	/* When the bios is accessing vram, the video circuitry can't access it */
 
 	if ( !state->m_pc10_sdcs )
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 

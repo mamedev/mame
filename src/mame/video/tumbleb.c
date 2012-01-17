@@ -224,9 +224,9 @@ WRITE16_HANDLER( bcstory_tilebank_w )
 	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	state->m_tilebank = data;
-	tilemap_mark_all_tiles_dirty(state->m_pf1_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf1_alt_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf2_tilemap);
+	state->m_pf1_tilemap->mark_all_dirty();
+	state->m_pf1_alt_tilemap->mark_all_dirty();
+	state->m_pf2_tilemap->mark_all_dirty();
 }
 
 WRITE16_HANDLER( chokchok_tilebank_w )
@@ -234,9 +234,9 @@ WRITE16_HANDLER( chokchok_tilebank_w )
 	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	state->m_tilebank = data << 1;
-	tilemap_mark_all_tiles_dirty(state->m_pf1_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf1_alt_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf2_tilemap);
+	state->m_pf1_tilemap->mark_all_dirty();
+	state->m_pf1_alt_tilemap->mark_all_dirty();
+	state->m_pf2_tilemap->mark_all_dirty();
 }
 
 WRITE16_HANDLER( wlstar_tilebank_w )
@@ -245,9 +245,9 @@ WRITE16_HANDLER( wlstar_tilebank_w )
 
 	/* it just writes 0000 or ffff */
 	state->m_tilebank = data & 0x4000;
-	tilemap_mark_all_tiles_dirty(state->m_pf1_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf1_alt_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf2_tilemap);
+	state->m_pf1_tilemap->mark_all_dirty();
+	state->m_pf1_alt_tilemap->mark_all_dirty();
+	state->m_pf2_tilemap->mark_all_dirty();
 }
 
 
@@ -256,9 +256,9 @@ WRITE16_HANDLER( suprtrio_tilebank_w )
 	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	state->m_tilebank = data << 14; // shift it here, makes using bcstory_tilebank easier
-	tilemap_mark_all_tiles_dirty(state->m_pf1_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf1_alt_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf2_tilemap);
+	state->m_pf1_tilemap->mark_all_dirty();
+	state->m_pf1_alt_tilemap->mark_all_dirty();
+	state->m_pf2_tilemap->mark_all_dirty();
 }
 
 
@@ -267,8 +267,8 @@ WRITE16_HANDLER( tumblepb_pf1_data_w )
 	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->m_pf1_data[offset]);
-	tilemap_mark_tile_dirty(state->m_pf1_tilemap, offset);
-	tilemap_mark_tile_dirty(state->m_pf1_alt_tilemap, offset);
+	state->m_pf1_tilemap->mark_tile_dirty(offset);
+	state->m_pf1_alt_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( tumblepb_pf2_data_w )
@@ -276,10 +276,10 @@ WRITE16_HANDLER( tumblepb_pf2_data_w )
 	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->m_pf2_data[offset]);
-	tilemap_mark_tile_dirty(state->m_pf2_tilemap, offset);
+	state->m_pf2_tilemap->mark_tile_dirty(offset);
 
 	if (state->m_pf2_alt_tilemap)
-		tilemap_mark_tile_dirty(state->m_pf2_alt_tilemap, offset);
+		state->m_pf2_alt_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( fncywld_pf1_data_w )
@@ -287,8 +287,8 @@ WRITE16_HANDLER( fncywld_pf1_data_w )
 	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->m_pf1_data[offset]);
-	tilemap_mark_tile_dirty(state->m_pf1_tilemap, offset / 2);
-	tilemap_mark_tile_dirty(state->m_pf1_alt_tilemap, offset / 2);
+	state->m_pf1_tilemap->mark_tile_dirty(offset / 2);
+	state->m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( fncywld_pf2_data_w )
@@ -296,7 +296,7 @@ WRITE16_HANDLER( fncywld_pf2_data_w )
 	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->m_pf2_data[offset]);
-	tilemap_mark_tile_dirty(state->m_pf2_tilemap, offset / 2);
+	state->m_pf2_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( tumblepb_control_0_w )
@@ -311,8 +311,8 @@ WRITE16_HANDLER( pangpang_pf1_data_w )
 	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->m_pf1_data[offset]);
-	tilemap_mark_tile_dirty(state->m_pf1_tilemap, offset / 2);
-	tilemap_mark_tile_dirty(state->m_pf1_alt_tilemap, offset / 2);
+	state->m_pf1_tilemap->mark_tile_dirty(offset / 2);
+	state->m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( pangpang_pf2_data_w )
@@ -320,10 +320,10 @@ WRITE16_HANDLER( pangpang_pf2_data_w )
 	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->m_pf2_data[offset]);
-	tilemap_mark_tile_dirty(state->m_pf2_tilemap, offset / 2);
+	state->m_pf2_tilemap->mark_tile_dirty(offset / 2);
 
 	if (state->m_pf2_alt_tilemap)
-		tilemap_mark_tile_dirty(state->m_pf2_alt_tilemap, offset / 2);
+		state->m_pf2_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
 /******************************************************************************/
@@ -334,7 +334,7 @@ static TILEMAP_MAPPER( tumblep_scan )
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
-INLINE void get_bg_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base)
+INLINE void get_bg_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base)
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	int data = gfx_base[tile_index];
@@ -361,7 +361,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0);
 }
 
-INLINE void get_fncywld_bg_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base)
+INLINE void get_fncywld_bg_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base)
 {
 	int data = gfx_base[tile_index * 2];
 	int attr = gfx_base[tile_index * 2 + 1];
@@ -440,7 +440,7 @@ static TILE_GET_INFO( get_jumppop_fg_tile_info )
 			0);
 }
 
-INLINE void pangpang_get_bg_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base )
+INLINE void pangpang_get_bg_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base )
 {
 	int data = gfx_base[tile_index * 2 + 1];
 	int attr = gfx_base[tile_index * 2];
@@ -452,7 +452,7 @@ INLINE void pangpang_get_bg_tile_info( running_machine &machine, tile_data *tile
 			0);
 }
 
-INLINE void pangpang_get_bg2x_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base )
+INLINE void pangpang_get_bg2x_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base )
 {
 	int data = gfx_base[tile_index * 2 + 1];
 	int attr = gfx_base[tile_index * 2];
@@ -486,11 +486,11 @@ static void tumbleb_tilemap_redraw(running_machine &machine)
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	tilemap_mark_all_tiles_dirty(state->m_pf1_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf1_alt_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_pf2_tilemap);
+	state->m_pf1_tilemap->mark_all_dirty();
+	state->m_pf1_alt_tilemap->mark_all_dirty();
+	state->m_pf2_tilemap->mark_all_dirty();
 	if (state->m_pf2_alt_tilemap)
-		tilemap_mark_all_tiles_dirty(state->m_pf2_alt_tilemap);
+		state->m_pf2_alt_tilemap->mark_all_dirty();
 }
 
 VIDEO_START( pangpang )
@@ -501,8 +501,8 @@ VIDEO_START( pangpang )
 	state->m_pf1_alt_tilemap = tilemap_create(machine, pangpang_get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, pangpang_get_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_pf1_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_pf1_alt_tilemap, 0);
+	state->m_pf1_tilemap->set_transparent_pen(0);
+	state->m_pf1_alt_tilemap->set_transparent_pen(0);
 
 	state->m_sprite_xoffset = -1;
 	state->m_sprite_yoffset = 0;
@@ -519,8 +519,8 @@ VIDEO_START( tumblepb )
 	state->m_pf1_alt_tilemap = tilemap_create(machine, get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, get_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_pf1_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_pf1_alt_tilemap, 0);
+	state->m_pf1_tilemap->set_transparent_pen(0);
+	state->m_pf1_alt_tilemap->set_transparent_pen(0);
 
 	state->m_sprite_xoffset = -1;
 	state->m_sprite_yoffset = 0;
@@ -536,8 +536,8 @@ VIDEO_START( sdfight )
 	state->m_pf1_alt_tilemap = tilemap_create(machine, get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, get_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_pf1_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_pf1_alt_tilemap, 0);
+	state->m_pf1_tilemap->set_transparent_pen(0);
+	state->m_pf1_alt_tilemap->set_transparent_pen(0);
 
 	/* aligned to monitor test */
 	state->m_sprite_xoffset = 0;
@@ -554,8 +554,8 @@ VIDEO_START( fncywld )
 	state->m_pf1_alt_tilemap = tilemap_create(machine, get_fncywld_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, get_fncywld_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_pf1_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_pf1_alt_tilemap, 15);
+	state->m_pf1_tilemap->set_transparent_pen(15);
+	state->m_pf1_alt_tilemap->set_transparent_pen(15);
 
 	state->m_sprite_xoffset = -1;
 	state->m_sprite_yoffset = 0;
@@ -572,13 +572,13 @@ VIDEO_START( jumppop )
 	state->m_pf2_tilemap =     tilemap_create(machine, get_jumppop_bg2_tile_info,     tilemap_scan_rows,    16, 16,  64, 64);
 	state->m_pf2_alt_tilemap = tilemap_create(machine, get_jumppop_bg2_alt_tile_info, tilemap_scan_rows,     8,  8, 128, 64);
 
-	tilemap_set_transparent_pen(state->m_pf1_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_pf1_alt_tilemap, 0);
+	state->m_pf1_tilemap->set_transparent_pen(0);
+	state->m_pf1_alt_tilemap->set_transparent_pen(0);
 
-	tilemap_set_flip(state->m_pf1_tilemap, TILEMAP_FLIPX);
-	tilemap_set_flip(state->m_pf1_alt_tilemap, TILEMAP_FLIPX);
-	tilemap_set_flip(state->m_pf2_tilemap, TILEMAP_FLIPX);
-	tilemap_set_flip(state->m_pf2_alt_tilemap, TILEMAP_FLIPX);
+	state->m_pf1_tilemap->set_flip(TILEMAP_FLIPX);
+	state->m_pf1_alt_tilemap->set_flip(TILEMAP_FLIPX);
+	state->m_pf2_tilemap->set_flip(TILEMAP_FLIPX);
+	state->m_pf2_alt_tilemap->set_flip(TILEMAP_FLIPX);
 
 	state->m_sprite_xoffset = -1;
 	state->m_sprite_yoffset = 0;
@@ -595,7 +595,7 @@ VIDEO_START( suprtrio )
 	state->m_pf1_alt_tilemap = tilemap_create(machine, get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, get_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_pf1_alt_tilemap, 0);
+	state->m_pf1_alt_tilemap->set_transparent_pen(0);
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
 }
@@ -609,7 +609,7 @@ SCREEN_UPDATE_IND16( tumblepb )
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -621,19 +621,19 @@ SCREEN_UPDATE_IND16( tumblepb )
 	else
 		offs2 = -5;
 
-	tilemap_set_scrollx(state->m_pf1_tilemap,     0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_tilemap,     0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf2_tilemap,     0, state->m_control_0[3] + offs);
-	tilemap_set_scrolly(state->m_pf2_tilemap,     0, state->m_control_0[4]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_control_0[6] & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	tumblepb_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -645,7 +645,7 @@ SCREEN_UPDATE_IND16( jumpkids )
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -657,19 +657,19 @@ SCREEN_UPDATE_IND16( jumpkids )
 	else
 		offs2 = -5;
 
-	tilemap_set_scrollx(state->m_pf1_tilemap,     0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_tilemap,     0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf2_tilemap,     0, state->m_control_0[3] + offs);
-	tilemap_set_scrolly(state->m_pf2_tilemap,     0, state->m_control_0[4]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_control_0[6] & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -681,7 +681,7 @@ SCREEN_UPDATE_IND16( semicom )
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -693,19 +693,19 @@ SCREEN_UPDATE_IND16( semicom )
 	else
 		offs2 = -5;
 
-	tilemap_set_scrollx(state->m_pf1_tilemap,     0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_tilemap,     0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf2_tilemap,     0, state->m_control_0[3] + offs);
-	tilemap_set_scrolly(state->m_pf2_tilemap,     0, state->m_control_0[4]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_control_0[6] & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -722,19 +722,19 @@ SCREEN_UPDATE_IND16( semicom_altoffsets )
 	offsy = 2;
 	offsx2 = -5;
 
-	tilemap_set_scrollx(state->m_pf1_tilemap,     0, state->m_control_0[1] + offsx2);
-	tilemap_set_scrolly(state->m_pf1_tilemap,     0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control_0[1] + offsx2);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf2_tilemap,     0, state->m_control_0[3] + offsx);
-	tilemap_set_scrolly(state->m_pf2_tilemap,     0, state->m_control_0[4] + offsy);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offsx2);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offsx2);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offsx);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4] + offsy);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_control_0[6] & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -746,7 +746,7 @@ SCREEN_UPDATE_IND16( bcstory )
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* not sure of this */
 	if (state->m_flipscreen)
@@ -760,19 +760,19 @@ SCREEN_UPDATE_IND16( bcstory )
 	else
 		offs2 = 8;
 
-	tilemap_set_scrollx(state->m_pf1_tilemap,     0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_tilemap,     0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf2_tilemap,     0, state->m_control_0[3] + offs);
-	tilemap_set_scrolly(state->m_pf2_tilemap,     0, state->m_control_0[4]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_control_0[6] & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -784,24 +784,24 @@ SCREEN_UPDATE_IND16( semibase )
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	offs = -1;
 	offs2 = -2;
 
 	/* sprites need an offset too */
-	tilemap_set_scrollx(state->m_pf1_tilemap,     0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_tilemap,     0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf2_tilemap,     0, state->m_control_0[3] + offs);
-	tilemap_set_scrolly(state->m_pf2_tilemap,     0, state->m_control_0[4]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_control_0[6] & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -813,23 +813,23 @@ SCREEN_UPDATE_IND16( sdfight )
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	offs = -1;
 	offs2 = -5; // foreground scroll..
 
 	/* sprites need an offset too */
-	tilemap_set_scrollx(state->m_pf1_tilemap,     0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_tilemap,     0, state->m_control_0[2] - 16); // needed for the ground ...
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control_0[2] - 16);
-	tilemap_set_scrollx(state->m_pf2_tilemap,     0, state->m_control_0[3] + offs);
-	tilemap_set_scrolly(state->m_pf2_tilemap,     0, state->m_control_0[4]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2] - 16); // needed for the ground ...
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2] - 16);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 	if (state->m_control_0[6] & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -843,7 +843,7 @@ SCREEN_UPDATE_IND16( fncywld )
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -855,19 +855,19 @@ SCREEN_UPDATE_IND16( fncywld )
 	else
 		offs2 = -5;
 
-	tilemap_set_scrollx(state->m_pf1_tilemap,     0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_tilemap,     0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf2_tilemap,     0, state->m_control_0[3] + offs);
-	tilemap_set_scrolly(state->m_pf2_tilemap,     0, state->m_control_0[4]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_control_0[6] & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	fncywld_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -880,24 +880,24 @@ SCREEN_UPDATE_IND16( jumppop )
 
 	//  bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	tilemap_set_scrollx(state->m_pf1_tilemap, 0, state->m_control[2] - 0x3a0);
-	tilemap_set_scrolly(state->m_pf1_tilemap, 0, state->m_control[3]);
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control[2] - 0x3a0);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control[3]);
-	tilemap_set_scrollx(state->m_pf2_tilemap, 0, state->m_control[0] - 0x3a2);
-	tilemap_set_scrolly(state->m_pf2_tilemap, 0, state->m_control[1]);
-	tilemap_set_scrollx(state->m_pf2_alt_tilemap, 0, state->m_control[0] - 0x3a2);
-	tilemap_set_scrolly(state->m_pf2_alt_tilemap, 0, state->m_control[1]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control[2] - 0x3a0);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control[3]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control[2] - 0x3a0);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control[3]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control[0] - 0x3a2);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control[1]);
+	state->m_pf2_alt_tilemap->set_scrollx(0, state->m_control[0] - 0x3a2);
+	state->m_pf2_alt_tilemap->set_scrolly(0, state->m_control[1]);
 
 	if (state->m_control[7] & 1)
-		tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+		state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf2_alt_tilemap, 0, 0);
+		state->m_pf2_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_control[7] & 2)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 
 //popmessage("%04x %04x %04x %04x %04x %04x %04x %04x", state->m_control[0],state->m_control[1],state->m_control[2],state->m_control[3],state->m_control[4],state->m_control[5],state->m_control[6],state->m_control[7]);
 
@@ -910,13 +910,13 @@ SCREEN_UPDATE_IND16( suprtrio )
 {
 	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
 
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, -state->m_control[1] - 6);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, -state->m_control[2]);
-	tilemap_set_scrollx(state->m_pf2_tilemap, 0, -state->m_control[3] - 2);
-	tilemap_set_scrolly(state->m_pf2_tilemap, 0, -state->m_control[4]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, -state->m_control[1] - 6);
+	state->m_pf1_alt_tilemap->set_scrolly(0, -state->m_control[2]);
+	state->m_pf2_tilemap->set_scrollx(0, -state->m_control[3] - 2);
+	state->m_pf2_tilemap->set_scrolly(0, -state->m_control[4]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 #if 0
@@ -940,7 +940,7 @@ SCREEN_UPDATE_IND16( pangpang )
 	int offs, offs2;
 
 	state->m_flipscreen = state->m_control_0[0] & 0x80;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (state->m_flipscreen)
 		offs = 1;
@@ -952,19 +952,19 @@ SCREEN_UPDATE_IND16( pangpang )
 	else
 		offs2 = -5;
 
-	tilemap_set_scrollx(state->m_pf1_tilemap,     0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_tilemap,     0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf1_alt_tilemap, 0, state->m_control_0[1] + offs2);
-	tilemap_set_scrolly(state->m_pf1_alt_tilemap, 0, state->m_control_0[2]);
-	tilemap_set_scrollx(state->m_pf2_tilemap,     0, state->m_control_0[3] + offs);
-	tilemap_set_scrolly(state->m_pf2_tilemap,     0, state->m_control_0[4]);
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf2_tilemap, 0, 0);
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_control_0[6] & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_pf1_tilemap, 0, 0);
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf1_alt_tilemap, 0, 0);
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

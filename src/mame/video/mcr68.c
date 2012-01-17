@@ -26,7 +26,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = (~data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 	if (machine.gfx[0]->total_elements < 0x1000)
-		tileinfo->category = (data >> 15) & 1;
+		tileinfo.category = (data >> 15) & 1;
 }
 
 
@@ -47,7 +47,7 @@ static TILE_GET_INFO( zwackery_get_fg_tile_info )
 	int data = videoram[tile_index];
 	int color = (data >> 13) & 7;
 	SET_TILE_INFO(2, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
-	tileinfo->category = (color != 0);
+	tileinfo.category = (color != 0);
 }
 
 
@@ -63,7 +63,7 @@ VIDEO_START( mcr68 )
 	mcr68_state *state = machine.driver_data<mcr68_state>();
 	/* initialize the background tilemap */
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16,16, 32,32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -82,7 +82,7 @@ VIDEO_START( zwackery )
 
 	/* initialize the foreground tilemap */
 	state->m_fg_tilemap = tilemap_create(machine, zwackery_get_fg_tile_info, tilemap_scan_rows,  16,16, 32,32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	/* allocate memory for the assembled gfx data */
 	srcdata0 = auto_alloc_array(machine, UINT8, gfx0->total_elements * gfx0->width * gfx0->height);
@@ -181,7 +181,7 @@ WRITE16_HANDLER( mcr68_videoram_w )
 	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -190,8 +190,8 @@ WRITE16_HANDLER( zwackery_videoram_w )
 	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -335,13 +335,13 @@ SCREEN_UPDATE_IND16( mcr68 )
 {
 	mcr68_state *state = screen.machine().driver_data<mcr68_state>();
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	/* draw the low-priority sprites */
 	mcr68_update_sprites(screen.machine(), bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 
 	/* draw the high-priority sprites */
 	mcr68_update_sprites(screen.machine(), bitmap, cliprect, 1);
@@ -353,13 +353,13 @@ SCREEN_UPDATE_IND16( zwackery )
 {
 	mcr68_state *state = screen.machine().driver_data<mcr68_state>();
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the low-priority sprites */
 	zwackery_update_sprites(screen.machine(), bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 1, 0);
 
 	/* draw the high-priority sprites */
 	zwackery_update_sprites(screen.machine(), bitmap, cliprect, 1);

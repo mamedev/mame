@@ -10,7 +10,7 @@
 WRITE16_MEMBER( zerozone_state::tilemap_w )
 {
 	COMBINE_DATA(&m_vram[offset]);
-	tilemap_mark_tile_dirty(m_zz_tilemap,offset);
+	m_zz_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -18,7 +18,7 @@ WRITE16_MEMBER( zerozone_state::tilebank_w )
 {
 //  popmessage ("Data %04x",data);
 	m_tilebank = data & 0x07;
-	tilemap_mark_all_tiles_dirty(m_zz_tilemap);
+	m_zz_tilemap->mark_all_dirty();
 }
 
 static TILE_GET_INFO( get_zerozone_tile_info )
@@ -42,6 +42,6 @@ void zerozone_state::video_start()
 
 UINT32 zerozone_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tilemap_draw(bitmap, cliprect, m_zz_tilemap, 0, 0);
+	m_zz_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

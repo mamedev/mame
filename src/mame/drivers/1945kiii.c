@@ -74,7 +74,7 @@ static WRITE16_HANDLER( k3_bgram_w )
 {
 	k3_state *state = space->machine().driver_data<k3_state>();
 	COMBINE_DATA(&state->m_bgram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_k3_bg_tile_info )
@@ -119,7 +119,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 static SCREEN_UPDATE_IND16(k3)
 {
 	k3_state *state = screen.machine().driver_data<k3_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -128,13 +128,13 @@ static SCREEN_UPDATE_IND16(k3)
 static WRITE16_HANDLER( k3_scrollx_w )
 {
 	k3_state *state = space->machine().driver_data<k3_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrollx(0, data);
 }
 
 static WRITE16_HANDLER( k3_scrolly_w )
 {
 	k3_state *state = space->machine().driver_data<k3_state>();
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrolly(0, data);
 }
 
 static WRITE16_HANDLER( k3_soundbanks_w )

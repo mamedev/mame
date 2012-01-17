@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	else
 	{
 		SET_TILE_INFO( 0, 0, 0x00, 0 );
-		tileinfo->pen_data = state->m_blank_tile;
+		tileinfo.pen_data = state->m_blank_tile;
 	}
 
 	mask = (code & 0x1000) >> 12;
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (mask && !layer)
 		layer = 1;
 
-	tileinfo->category = mask | (layer << 1);
+	tileinfo.category = mask | (layer << 1);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	else
 	{
 		SET_TILE_INFO( 0, 0, 0x00, 0 );
-		tileinfo->pen_data = state->m_blank_tile;
+		tileinfo.pen_data = state->m_blank_tile;
 	}
 
 	mask = (code & 0x1000) >> 12;
@@ -90,7 +90,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	if (mask && !layer)
 		layer = 1;
 
-	tileinfo->category = mask | (layer << 1);
+	tileinfo.category = mask | (layer << 1);
 }
 
 
@@ -107,7 +107,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
 		else
 			state->m_tilemap_flip &= ~TILEMAP_FLIPX;
 
-		tilemap_set_flip_all(space->machine(), state->m_tilemap_flip);
+		space->machine().tilemap().set_flip_all(state->m_tilemap_flip);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -128,7 +128,7 @@ WRITE16_HANDLER( nemesis_gfx_flipy_word_w )
 		else
 			state->m_tilemap_flip &= ~TILEMAP_FLIPY;
 
-		tilemap_set_flip_all(space->machine(), state->m_tilemap_flip);
+		space->machine().tilemap().set_flip_all(state->m_tilemap_flip);
 	}
 }
 
@@ -156,7 +156,7 @@ WRITE16_HANDLER( salamand_control_port_word_w )
 			state->m_tilemap_flip &= ~TILEMAP_FLIPY;
 
 		if (accessing_bits & 0x0c)
-			tilemap_set_flip_all(space->machine(), state->m_tilemap_flip);
+			space->machine().tilemap().set_flip_all(state->m_tilemap_flip);
 
 		state->m_irq_port_last = data;
 	}
@@ -233,7 +233,7 @@ WRITE16_HANDLER( nemesis_videoram1_word_w )
 	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->m_videoram1 + offset);
-	tilemap_mark_tile_dirty(state->m_foreground, offset);
+	state->m_foreground->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( nemesis_videoram2_word_w )
@@ -241,7 +241,7 @@ WRITE16_HANDLER( nemesis_videoram2_word_w )
 	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->m_videoram2 + offset);
-	tilemap_mark_tile_dirty(state->m_background, offset);
+	state->m_background->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( nemesis_colorram1_word_w )
@@ -249,7 +249,7 @@ WRITE16_HANDLER( nemesis_colorram1_word_w )
 	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->m_colorram1 + offset);
-	tilemap_mark_tile_dirty(state->m_foreground, offset);
+	state->m_foreground->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( nemesis_colorram2_word_w )
@@ -257,7 +257,7 @@ WRITE16_HANDLER( nemesis_colorram2_word_w )
 	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->m_colorram2 + offset);
-	tilemap_mark_tile_dirty(state->m_background, offset);
+	state->m_background->mark_tile_dirty(offset);
 }
 
 
@@ -297,8 +297,8 @@ static void nemesis_postload(running_machine &machine)
 			gfx_element_mark_dirty(machine.gfx[sprite_data[i].char_type], offs * 4 / (w * h));
 		}
 	}
-	tilemap_mark_all_tiles_dirty(state->m_background);
-	tilemap_mark_all_tiles_dirty(state->m_foreground);
+	state->m_background->mark_all_dirty();
+	state->m_foreground->mark_all_dirty();
 }
 
 
@@ -312,10 +312,10 @@ VIDEO_START( nemesis )
 	state->m_background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_background, 0);
-	tilemap_set_transparent_pen(state->m_foreground, 0);
-	tilemap_set_scroll_rows(state->m_background, 256);
-	tilemap_set_scroll_rows(state->m_foreground, 256);
+	state->m_background->set_transparent_pen(0);
+	state->m_foreground->set_transparent_pen(0);
+	state->m_background->set_scroll_rows(256);
+	state->m_foreground->set_scroll_rows(256);
 
 	memset(state->m_charram, 0, state->m_charram_size);
 	memset(state->m_blank_tile, 0, ARRAY_LENGTH(state->m_blank_tile));
@@ -437,10 +437,10 @@ SCREEN_UPDATE_IND16( nemesis )
 	clip.min_x = 0;
 	clip.max_x = 255;
 
-	tilemap_set_scroll_cols(state->m_background, 64);
-	tilemap_set_scroll_cols(state->m_foreground, 64);
-	tilemap_set_scroll_rows(state->m_background, 1);
-	tilemap_set_scroll_rows(state->m_foreground, 1);
+	state->m_background->set_scroll_cols(64);
+	state->m_foreground->set_scroll_cols(64);
+	state->m_background->set_scroll_rows(1);
+	state->m_foreground->set_scroll_rows(1);
 
 	for (offs = 0; offs < 64; offs++)
 	{
@@ -449,8 +449,8 @@ SCREEN_UPDATE_IND16( nemesis )
 		if (state->m_flipscreen)
 			offset_x = (offs + 0x20) & 0x3f;
 
-		tilemap_set_scrolly(state->m_background, offs, state->m_yscroll2[offset_x]);
-		tilemap_set_scrolly(state->m_foreground, offs, state->m_yscroll1[offset_x]);
+		state->m_background->set_scrolly(offs, state->m_yscroll2[offset_x]);
+		state->m_foreground->set_scrolly(offs, state->m_yscroll1[offset_x]);
 	}
 
 	for (offs = cliprect.min_y; offs <= cliprect.max_y; offs++)
@@ -464,15 +464,15 @@ SCREEN_UPDATE_IND16( nemesis )
 		if (state->m_flipscreen)
 			offset_y = 255 - offs;
 
-		tilemap_set_scrollx(state->m_background, 0, (state->m_xscroll2[offset_y] & 0xff) + ((state->m_xscroll2[0x100 + offset_y] & 0x01) << 8) - (state->m_flipscreen ? 0x107 : 0));
-		tilemap_set_scrollx(state->m_foreground, 0, (state->m_xscroll1[offset_y] & 0xff) + ((state->m_xscroll1[0x100 + offset_y] & 0x01) << 8) - (state->m_flipscreen ? 0x107 : 0));
+		state->m_background->set_scrollx(0, (state->m_xscroll2[offset_y] & 0xff) + ((state->m_xscroll2[0x100 + offset_y] & 0x01) << 8) - (state->m_flipscreen ? 0x107 : 0));
+		state->m_foreground->set_scrollx(0, (state->m_xscroll1[offset_y] & 0xff) + ((state->m_xscroll1[0x100 + offset_y] & 0x01) << 8) - (state->m_flipscreen ? 0x107 : 0));
 
 		for (i = 0; i < 4; i += 2)
 		{
-			tilemap_draw(bitmap, clip, state->m_background, TILEMAP_DRAW_CATEGORY(i + 0), 1);
-			tilemap_draw(bitmap, clip, state->m_background, TILEMAP_DRAW_CATEGORY(i + 1), 2);
-			tilemap_draw(bitmap, clip, state->m_foreground, TILEMAP_DRAW_CATEGORY(i + 0), 1);
-			tilemap_draw(bitmap, clip, state->m_foreground, TILEMAP_DRAW_CATEGORY(i + 1), 2);
+			state->m_background->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
+			state->m_background->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
+			state->m_foreground->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
+			state->m_foreground->draw(bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
 		}
 	}
 

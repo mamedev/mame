@@ -15,14 +15,14 @@ WRITE8_HANDLER( bagman_videoram_w )
 {
 	bagman_state *state = space->machine().driver_data<bagman_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( bagman_colorram_w )
 {
 	bagman_state *state = space->machine().driver_data<bagman_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /***************************************************************************
@@ -87,7 +87,7 @@ WRITE8_HANDLER( bagman_flipscreen_w )
 	if ((flip_screen_get(space->machine()) ^ data) & 1)
 	{
 		flip_screen_set(space->machine(), data & 0x01);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -107,7 +107,7 @@ VIDEO_START( bagman )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_scrolldy(state->m_bg_tilemap, -1, -1);
+	state->m_bg_tilemap->set_scrolldy(-1, -1);
 }
 
 
@@ -153,7 +153,7 @@ SCREEN_UPDATE_IND16( bagman )
 	if (*state->m_video_enable == 0)
 		return 0;
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

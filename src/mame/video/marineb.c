@@ -70,7 +70,7 @@ VIDEO_START( marineb )
 	marineb_state *state = machine.driver_data<marineb_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->save_item(NAME(state->m_palette_bank));
 	state->save_item(NAME(state->m_column_scroll));
@@ -91,7 +91,7 @@ WRITE8_HANDLER( marineb_videoram_w )
 	marineb_state *state = space->machine().driver_data<marineb_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -100,7 +100,7 @@ WRITE8_HANDLER( marineb_colorram_w )
 	marineb_state *state = space->machine().driver_data<marineb_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -120,7 +120,7 @@ WRITE8_HANDLER( marineb_palette_bank_0_w )
 
 	if (old != state->m_palette_bank)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -134,7 +134,7 @@ WRITE8_HANDLER( marineb_palette_bank_1_w )
 
 	if (old != state->m_palette_bank)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -144,7 +144,7 @@ WRITE8_HANDLER( marineb_flipscreen_x_w )
 	marineb_state *state = space->machine().driver_data<marineb_state>();
 
 	state->m_flipscreen_x = data ^ state->m_marineb_active_low_flipscreen;
-	tilemap_set_flip(state->m_bg_tilemap, (state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+	state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
 
@@ -153,7 +153,7 @@ WRITE8_HANDLER( marineb_flipscreen_y_w )
 	marineb_state *state = space->machine().driver_data<marineb_state>();
 
 	state->m_flipscreen_y = data ^ state->m_marineb_active_low_flipscreen;
-	tilemap_set_flip(state->m_bg_tilemap, (state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+	state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
 
@@ -170,10 +170,10 @@ static void set_tilemap_scrolly( running_machine &machine, int cols )
 	int col;
 
 	for (col = 0; col < cols; col++)
-		tilemap_set_scrolly(state->m_bg_tilemap, col, state->m_column_scroll);
+		state->m_bg_tilemap->set_scrolly(col, state->m_column_scroll);
 
 	for (; col < 32; col++)
-		tilemap_set_scrolly(state->m_bg_tilemap, col, 0);
+		state->m_bg_tilemap->set_scrolly(col, 0);
 }
 
 
@@ -183,7 +183,7 @@ SCREEN_UPDATE_IND16( marineb )
 	int offs;
 
 	set_tilemap_scrolly(screen.machine(), 24);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x0f; offs >= 0; offs--)
@@ -245,7 +245,7 @@ SCREEN_UPDATE_IND16( changes )
 	int offs, sx, sy, code, col, flipx, flipy;
 
 	set_tilemap_scrolly(screen.machine(), 26);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the small sprites */
 	for (offs = 0x05; offs >= 0; offs--)
@@ -324,7 +324,7 @@ SCREEN_UPDATE_IND16( springer )
 	int offs;
 
 	set_tilemap_scrolly(screen.machine(), 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x0f; offs >= 0; offs--)
@@ -384,7 +384,7 @@ SCREEN_UPDATE_IND16( hoccer )
 	int offs;
 
 	set_tilemap_scrolly(screen.machine(), 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x07; offs >= 0; offs--)
@@ -428,7 +428,7 @@ SCREEN_UPDATE_IND16( hopprobo )
 	int offs;
 
 	set_tilemap_scrolly(screen.machine(), 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x0f; offs >= 0; offs--)

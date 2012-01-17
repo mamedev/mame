@@ -6,7 +6,7 @@ WRITE8_HANDLER( sichuan2_videoram_w )
 	shisen_state *state = space->machine().driver_data<shisen_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( sichuan2_bankswitch_w )
@@ -28,7 +28,7 @@ WRITE8_HANDLER( sichuan2_bankswitch_w )
 	if (state->m_gfxbank != bank)
 	{
 		state->m_gfxbank = bank;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* bits 6-7 unknown */
@@ -72,6 +72,6 @@ SCREEN_UPDATE_IND16( sichuan2 )
 	flip_screen_set(screen.machine(), ~input_port_read(screen.machine(), "DSW2") & 1);
 
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

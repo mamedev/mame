@@ -159,7 +159,7 @@ VIDEO_START( williams2 )
 
 	/* create the tilemap */
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols,  24,16, 128,16);
-	tilemap_set_scrolldx(state->m_bg_tilemap, 2, 0);
+	state->m_bg_tilemap->set_scrolldx(2, 0);
 
 	state_save_register(machine);
 }
@@ -250,7 +250,7 @@ SCREEN_UPDATE_RGB32( williams2 )
 	int x, y;
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* fetch the relevant pens */
 	for (x = 1; x < 16; x++)
@@ -428,7 +428,7 @@ WRITE8_HANDLER( williams2_bg_select_w )
 			data &= 0x3f;
 			break;
 	}
-	tilemap_set_palette_offset(state->m_bg_tilemap, data * 16);
+	state->m_bg_tilemap->set_palette_offset(data * 16);
 }
 
 
@@ -436,7 +436,7 @@ WRITE8_HANDLER( williams2_tileram_w )
 {
 	williams_state *state = space->machine().driver_data<williams_state>();
 	state->m_williams2_tileram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -444,7 +444,7 @@ WRITE8_HANDLER( williams2_xscroll_low_w )
 {
 	williams_state *state = space->machine().driver_data<williams_state>();
 	state->m_tilemap_xscroll = (state->m_tilemap_xscroll & ~0x00f) | ((data & 0x80) >> 4) | (data & 0x07);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, (state->m_tilemap_xscroll & 7) + ((state->m_tilemap_xscroll >> 3) * 6));
+	state->m_bg_tilemap->set_scrollx(0, (state->m_tilemap_xscroll & 7) + ((state->m_tilemap_xscroll >> 3) * 6));
 }
 
 
@@ -452,7 +452,7 @@ WRITE8_HANDLER( williams2_xscroll_high_w )
 {
 	williams_state *state = space->machine().driver_data<williams_state>();
 	state->m_tilemap_xscroll = (state->m_tilemap_xscroll & 0x00f) | (data << 4);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, (state->m_tilemap_xscroll & 7) + ((state->m_tilemap_xscroll >> 3) * 6));
+	state->m_bg_tilemap->set_scrollx(0, (state->m_tilemap_xscroll & 7) + ((state->m_tilemap_xscroll >> 3) * 6));
 }
 
 

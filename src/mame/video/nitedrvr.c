@@ -12,7 +12,7 @@ WRITE8_HANDLER( nitedrvr_videoram_w )
 	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( nitedrvr_hvc_w )
@@ -77,7 +77,7 @@ SCREEN_UPDATE_IND16( nitedrvr )
 {
 	nitedrvr_state *state = screen.machine().driver_data<nitedrvr_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_roadway(screen.machine(), bitmap);
 	return 0;
 }

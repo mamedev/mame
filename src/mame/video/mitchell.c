@@ -39,7 +39,7 @@ VIDEO_START( pang )
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 15);
+	state->m_bg_tilemap->set_transparent_pen(15);
 
 	/* OBJ RAM */
 	state->m_objram = auto_alloc_array_clear(machine, UINT8, state->m_videoram_size);
@@ -85,7 +85,7 @@ WRITE8_HANDLER( mgakuen_videoram_w )
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 READ8_HANDLER( mgakuen_videoram_r )
@@ -135,7 +135,7 @@ WRITE8_HANDLER( pang_colorram_w )
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 READ8_HANDLER( pang_colorram_r )
@@ -170,7 +170,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space->device()),data);
 	if (state->m_flipscreen != (data & 0x04))
 	{
 		state->m_flipscreen = data & 0x04;
-		tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
 
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
@@ -210,7 +210,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space->device()),data);
 	if (state->m_flipscreen != (data & 0x04))
 	{
 		state->m_flipscreen = data & 0x04;
-		tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
 
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
@@ -246,7 +246,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space->device()),data);
 	if (state->m_flipscreen != (data & 0x04))
 	{
 		state->m_flipscreen = data & 0x04;
-		tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
 
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
@@ -333,7 +333,7 @@ SCREEN_UPDATE_IND16( pang )
 	mitchell_state *state = screen.machine().driver_data<mitchell_state>();
 
 	bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -12,7 +12,7 @@ WRITE8_HANDLER( canyon_videoram_w )
 {
 	canyon_state *state = space->machine().driver_data<canyon_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -77,7 +77,7 @@ SCREEN_UPDATE_IND16( canyon )
 {
 	canyon_state *state = screen.machine().driver_data<canyon_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 

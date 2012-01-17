@@ -53,7 +53,7 @@ WRITE8_HANDLER( tunhunt_videoram_w )
 	tunhunt_state *state = space->machine().driver_data<tunhunt_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -80,8 +80,8 @@ VIDEO_START( tunhunt )
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, 64);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_scrollx(0, 64);
 }
 
 PALETTE_INIT( tunhunt )
@@ -401,6 +401,6 @@ SCREEN_UPDATE_IND16( tunhunt )
 		state->m_workram[SHL1ST],	/* vstretch */
 		state->m_control&0x10 ); /* hstretch */
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

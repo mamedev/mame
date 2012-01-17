@@ -12,7 +12,7 @@ WRITE32_HANDLER( macrossp_scra_videoram_w )
 
 	COMBINE_DATA(&state->m_scra_videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_scra_tilemap, offset);
+	state->m_scra_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -50,7 +50,7 @@ WRITE32_HANDLER( macrossp_scrb_videoram_w )
 
 	COMBINE_DATA(&state->m_scrb_videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_scrb_tilemap, offset);
+	state->m_scrb_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -88,7 +88,7 @@ WRITE32_HANDLER( macrossp_scrc_videoram_w )
 
 	COMBINE_DATA(&state->m_scrc_videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_scrc_tilemap, offset);
+	state->m_scrc_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -126,7 +126,7 @@ WRITE32_HANDLER( macrossp_text_videoram_w )
 
 	COMBINE_DATA(&state->m_text_videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_text_tilemap, offset);
+	state->m_text_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -157,10 +157,10 @@ VIDEO_START( macrossp )
 	state->m_scrb_tilemap = tilemap_create(machine, get_macrossp_scrb_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->m_scrc_tilemap = tilemap_create(machine, get_macrossp_scrc_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_text_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_scra_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_scrb_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_scrc_tilemap, 0);
+	state->m_text_tilemap->set_transparent_pen(0);
+	state->m_scra_tilemap->set_transparent_pen(0);
+	state->m_scrb_tilemap->set_transparent_pen(0);
+	state->m_scrc_tilemap->set_transparent_pen(0);
 
 	machine.gfx[0]->color_granularity = 64;
 	machine.gfx[1]->color_granularity = 64;
@@ -358,16 +358,16 @@ static void draw_layer( running_machine &machine, bitmap_rgb32 &bitmap, const re
 		startx -= (368/2) * inc;
 		starty -= (240/2) * inc;
 
-		tilemap_draw_roz(bitmap,cliprect,tm,
+		tm->draw_roz(bitmap, cliprect, 
 				startx,starty,inc,0,0,inc,
 				1,	/* wraparound */
 				0,0);
 	}
 	else
 	{
-		tilemap_set_scrollx( tm, 0, ((vr[0] & 0x000003ff) >> 0 ) );
-		tilemap_set_scrolly( tm, 0, ((vr[0] & 0x03ff0000) >> 16) );
-		tilemap_draw(bitmap, cliprect, tm, 0, 0);
+		tm->set_scrollx(0, ((vr[0] & 0x000003ff) >> 0 ) );
+		tm->set_scrolly(0, ((vr[0] & 0x03ff0000) >> 16) );
+		tm->draw(bitmap, cliprect, 0, 0);
 	}
 }
 
@@ -410,7 +410,7 @@ SCREEN_UPDATE_RGB32( macrossp )
 	draw_layer(screen.machine(), bitmap, cliprect, layers[2]);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
-	tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
+	state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 
 #if 0
 popmessage	("scra - %08x %08x %08x\nscrb - %08x %08x %08x\nscrc - %08x %08x %08x",

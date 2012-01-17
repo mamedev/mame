@@ -140,11 +140,11 @@ SCREEN_UPDATE_IND16( fcombat )
 	int sx, sy, offs, i;
 
 	/* draw background */
-	tilemap_set_scrolly(state->m_bgmap, 0, state->m_fcombat_sh);
-	tilemap_set_scrollx(state->m_bgmap, 0, state->m_fcombat_sv - 24);
+	state->m_bgmap->set_scrolly(0, state->m_fcombat_sh);
+	state->m_bgmap->set_scrollx(0, state->m_fcombat_sv - 24);
 
-	tilemap_mark_all_tiles_dirty(state->m_bgmap);
-	tilemap_draw(bitmap, cliprect, state->m_bgmap, 0, 0);
+	state->m_bgmap->mark_all_dirty();
+	state->m_bgmap->draw(bitmap, cliprect, 0, 0);
 	//draw_background(bitmap, cliprect);
 
 	/* draw sprites */

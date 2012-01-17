@@ -9,8 +9,8 @@
 static void suprnova_draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
 {
 	//bitmap_ind16 *destbitmap = bitmap;
-	bitmap_ind16 &srcbitmap = tilemap_get_pixmap(tmap);
-	bitmap_ind8 &srcbitmapflags = tilemap_get_flagsmap(tmap);
+	bitmap_ind16 &srcbitmap = tmap->pixmap();
+	bitmap_ind8 &srcbitmapflags = tmap->flagsmap();
 	const int xmask = srcbitmap.width()-1;
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
@@ -291,7 +291,7 @@ static TILE_GET_INFO( get_tilemap_A_tile_info )
 			code,
 			0x40+colr,
 			flags);
-	tileinfo->category = pri;
+	tileinfo.category = pri;
 
 	//if (pri) popmessage("pri A!! %02x\n", pri);
 }
@@ -300,7 +300,7 @@ WRITE32_HANDLER ( skns_tilemapA_w )
 {
 	skns_state *state = space->machine().driver_data<skns_state>();
 	COMBINE_DATA(&state->m_tilemapA_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_A,offset);
+	state->m_tilemap_A->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_tilemap_B_tile_info )
@@ -320,7 +320,7 @@ static TILE_GET_INFO( get_tilemap_B_tile_info )
 			code,
 			0x40+colr,
 			flags);
-	tileinfo->category = pri;
+	tileinfo.category = pri;
 
 	//if (pri) popmessage("pri B!! %02x\n", pri); // 02 on cyvern
 }
@@ -329,7 +329,7 @@ WRITE32_HANDLER ( skns_tilemapB_w )
 {
 	skns_state *state = space->machine().driver_data<skns_state>();
 	COMBINE_DATA(&state->m_tilemapB_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_B,offset);
+	state->m_tilemap_B->mark_tile_dirty(offset);
 }
 
 WRITE32_HANDLER ( skns_v3_regs_w )
@@ -346,8 +346,8 @@ WRITE32_HANDLER ( skns_v3_regs_w )
 		state->m_depthA = (state->m_v3_regs[0x0c/4] & 0x0001) << 1;
 		state->m_depthB = (state->m_v3_regs[0x0c/4] & 0x0100) >> 7;
 
-		if (old_depthA != state->m_depthA)	tilemap_mark_all_tiles_dirty (state->m_tilemap_A);
-		if (old_depthB != state->m_depthB)	tilemap_mark_all_tiles_dirty (state->m_tilemap_B);
+		if (old_depthA != state->m_depthA)	state->m_tilemap_A->mark_all_dirty();
+		if (old_depthB != state->m_depthB)	state->m_tilemap_B->mark_all_dirty();
 
 	}
 }
@@ -360,10 +360,10 @@ VIDEO_START(skns)
 	state->m_spritegen = machine.device<sknsspr_device>("spritegen");
 
 	state->m_tilemap_A = tilemap_create(machine, get_tilemap_A_tile_info,tilemap_scan_rows,16,16,64, 64);
-		tilemap_set_transparent_pen(state->m_tilemap_A,0);
+		state->m_tilemap_A->set_transparent_pen(0);
 
 	state->m_tilemap_B = tilemap_create(machine, get_tilemap_B_tile_info,tilemap_scan_rows,16,16,64, 64);
-		tilemap_set_transparent_pen(state->m_tilemap_B,0);
+		state->m_tilemap_B->set_transparent_pen(0);
 
 	state->m_sprite_bitmap.allocate(1024,1024);
 

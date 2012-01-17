@@ -55,7 +55,7 @@ static VIDEO_START( wink )
 static SCREEN_UPDATE_IND16( wink )
 {
 	wink_state *state = screen.machine().driver_data<wink_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -64,7 +64,7 @@ static WRITE8_HANDLER( bgram_w )
 	wink_state *state = space->machine().driver_data<wink_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( player_mux_w )
@@ -77,7 +77,7 @@ static WRITE8_HANDLER( tile_banking_w )
 {
 	wink_state *state = space->machine().driver_data<wink_state>();
 	state->m_tile_bank = data & 1;
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 }
 
 static WRITE8_HANDLER( wink_coin_counter_w )

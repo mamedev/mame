@@ -79,7 +79,7 @@ WRITE8_HANDLER( snk6502_videoram_w )
 	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( snk6502_videoram2_w )
@@ -87,7 +87,7 @@ WRITE8_HANDLER( snk6502_videoram2_w )
 	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( snk6502_colorram_w )
@@ -95,8 +95,8 @@ WRITE8_HANDLER( snk6502_colorram_w )
 	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( snk6502_charram_w )
@@ -135,7 +135,7 @@ WRITE8_HANDLER( snk6502_flipscreen_w )
 	if (state->m_charbank != bank)
 	{
 		state->m_charbank = bank;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 7 flips screen */
@@ -143,7 +143,7 @@ WRITE8_HANDLER( snk6502_flipscreen_w )
 	if (flip_screen_get(space->machine()) != (data & 0x80))
 	{
 		flip_screen_set(space->machine(), data & 0x80);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -151,14 +151,14 @@ WRITE8_HANDLER( snk6502_scrollx_w )
 {
 	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrollx(0, data);
 }
 
 WRITE8_HANDLER( snk6502_scrolly_w )
 {
 	snk6502_state *state = space->machine().driver_data<snk6502_state>();
 
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrolly(0, data);
 }
 
 
@@ -187,7 +187,7 @@ VIDEO_START( snk6502 )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	gfx_element_set_source(machine.gfx[0], state->m_charram);
 }
@@ -198,8 +198,8 @@ VIDEO_START( pballoon )
 
 	VIDEO_START_CALL( snk6502 );
 
-	tilemap_set_scrolldy(state->m_bg_tilemap, -24, 0);
-	tilemap_set_scrolldy(state->m_fg_tilemap, -24, 0);
+	state->m_bg_tilemap->set_scrolldy(-24, 0);
+	state->m_fg_tilemap->set_scrolldy(-24, 0);
 }
 
 
@@ -207,8 +207,8 @@ SCREEN_UPDATE_IND16( snk6502 )
 {
 	snk6502_state *state = screen.machine().driver_data<snk6502_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -274,7 +274,7 @@ WRITE8_HANDLER( satansat_b002_w )
 	if (flip_screen_get(space->machine()) != (data & 0x01))
 	{
 		flip_screen_set(space->machine(), data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 1 enables interrupts */
@@ -325,7 +325,7 @@ VIDEO_START( satansat )
 	state->m_bg_tilemap = tilemap_create(machine, satansat_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, satansat_get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	gfx_element_set_source(machine.gfx[0], state->m_charram);
 }

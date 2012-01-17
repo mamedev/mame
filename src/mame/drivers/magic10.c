@@ -111,21 +111,21 @@ static WRITE16_HANDLER( layer0_videoram_w )
 {
 	magic10_state *state = space->machine().driver_data<magic10_state>();
 	COMBINE_DATA(&state->m_layer0_videoram[offset]);
-	tilemap_mark_tile_dirty( state->m_layer0_tilemap, offset >> 1);
+	state->m_layer0_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 static WRITE16_HANDLER( layer1_videoram_w )
 {
 	magic10_state *state = space->machine().driver_data<magic10_state>();
 	COMBINE_DATA(&state->m_layer1_videoram[offset]);
-	tilemap_mark_tile_dirty( state->m_layer1_tilemap, offset >> 1);
+	state->m_layer1_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 static WRITE16_HANDLER( layer2_videoram_w )
 {
 	magic10_state *state = space->machine().driver_data<magic10_state>();
 	COMBINE_DATA(&state->m_layer2_videoram[offset]);
-	tilemap_mark_tile_dirty( state->m_layer2_tilemap, offset >> 1);
+	state->m_layer2_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 static WRITE16_HANDLER( paletteram_w )
@@ -179,27 +179,27 @@ static VIDEO_START( magic10 )
 	state->m_layer1_tilemap = tilemap_create(machine, get_layer1_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_layer2_tilemap = tilemap_create(machine, get_layer2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_layer1_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_layer2_tilemap, 0);
+	state->m_layer1_tilemap->set_transparent_pen(0);
+	state->m_layer2_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( magic10 )
 {
 	magic10_state *state = screen.machine().driver_data<magic10_state>();
 	/*TODO: understand where this comes from. */
-	tilemap_set_scrollx(state->m_layer2_tilemap, 0, state->m_layer2_offset[0]);
-	tilemap_set_scrolly(state->m_layer2_tilemap, 0, state->m_layer2_offset[1]);
+	state->m_layer2_tilemap->set_scrollx(0, state->m_layer2_offset[0]);
+	state->m_layer2_tilemap->set_scrolly(0, state->m_layer2_offset[1]);
 
 	/*
     4 and 6 are y/x global register writes.
     0 and 2 are y/x writes for the scrolling layer.
     */
-	tilemap_set_scrolly(state->m_layer1_tilemap, 0, (state->m_vregs[0/2] - state->m_vregs[4/2])+0);
-	tilemap_set_scrollx(state->m_layer1_tilemap, 0, (state->m_vregs[2/2] - state->m_vregs[6/2])+4);
+	state->m_layer1_tilemap->set_scrolly(0, (state->m_vregs[0/2] - state->m_vregs[4/2])+0);
+	state->m_layer1_tilemap->set_scrollx(0, (state->m_vregs[2/2] - state->m_vregs[6/2])+4);
 
-	tilemap_draw(bitmap, cliprect, state->m_layer0_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_layer1_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_layer2_tilemap, 0, 0);
+	state->m_layer0_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_layer1_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_layer2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -146,14 +146,14 @@ WRITE8_HANDLER( funworld_videoram_w )
 {
 	funworld_state *state = space->machine().driver_data<funworld_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( funworld_colorram_w )
 {
 	funworld_state *state = space->machine().driver_data<funworld_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -198,6 +198,6 @@ VIDEO_START(magicrd2)
 SCREEN_UPDATE_IND16(funworld)
 {
 	funworld_state *state = screen.machine().driver_data<funworld_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

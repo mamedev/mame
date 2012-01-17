@@ -39,9 +39,9 @@ SCREEN_UPDATE_IND16( videopin )
 	int col;
 	int row;
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, -8);   /* account for delayed loading of shift reg C6 */
+	state->m_bg_tilemap->set_scrollx(0, -8);   /* account for delayed loading of shift reg C6 */
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (row = 0; row < 32; row++)
 	{
@@ -99,5 +99,5 @@ WRITE8_HANDLER( videopin_video_ram_w )
 {
 	videopin_state *state = space->machine().driver_data<videopin_state>();
 	state->m_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }

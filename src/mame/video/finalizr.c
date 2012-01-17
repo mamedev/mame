@@ -90,11 +90,11 @@ SCREEN_UPDATE_IND16( finalizr )
 	finalizr_state *state = screen.machine().driver_data<finalizr_state>();
 	int offs;
 
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
-	tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
+	state->m_fg_tilemap->mark_all_dirty();
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, *state->m_scroll - 32);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->set_scrollx(0, *state->m_scroll - 32);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
 	{
@@ -219,8 +219,8 @@ SCREEN_UPDATE_IND16( finalizr )
 		/* draw top status region */
 		clip.min_x = visarea.min_x;
 		clip.max_x = visarea.min_x + 31;
-		tilemap_set_scrolldx(state->m_fg_tilemap,  0,-32);
-		tilemap_draw(bitmap, clip, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->set_scrolldx(0,-32);
+		state->m_fg_tilemap->draw(bitmap, clip, 0, 0);
 	}
 	return 0;
 }

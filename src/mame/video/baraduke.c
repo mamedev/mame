@@ -122,12 +122,12 @@ VIDEO_START( baraduke )
 	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
 	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap,3);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0],7);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1],7);
+	state->m_tx_tilemap->set_transparent_pen(3);
+	state->m_bg_tilemap[0]->set_transparent_pen(7);
+	state->m_bg_tilemap[1]->set_transparent_pen(7);
 
-	tilemap_set_scrolldx(state->m_tx_tilemap,0,512-288);
-	tilemap_set_scrolldy(state->m_tx_tilemap,16,16);
+	state->m_tx_tilemap->set_scrolldx(0,512-288);
+	state->m_tx_tilemap->set_scrolldy(16,16);
 }
 
 
@@ -148,7 +148,7 @@ WRITE8_HANDLER( baraduke_videoram_w )
 {
 	baraduke_state *state = space->machine().driver_data<baraduke_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap[offset/0x1000],(offset&0xfff)/2);
+	state->m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset&0xfff)/2);
 }
 
 READ8_HANDLER( baraduke_textram_r )
@@ -161,7 +161,7 @@ WRITE8_HANDLER( baraduke_textram_w )
 {
 	baraduke_state *state = space->machine().driver_data<baraduke_state>();
 	state->m_textram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset & 0x3ff);
+	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -307,8 +307,8 @@ static void set_scroll(running_machine &machine, int layer)
 		scrolly = -scrolly;
 	}
 
-	tilemap_set_scrollx(state->m_bg_tilemap[layer], 0, scrollx);
-	tilemap_set_scrolly(state->m_bg_tilemap[layer], 0, scrolly);
+	state->m_bg_tilemap[layer]->set_scrollx(0, scrollx);
+	state->m_bg_tilemap[layer]->set_scrolly(0, scrolly);
 }
 
 
@@ -321,7 +321,7 @@ SCREEN_UPDATE_IND16( baraduke )
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set(screen.machine(), ) because the visible area is asymmetrical */
 	flip_screen_set_no_update(screen.machine(), spriteram[0x07f6] & 0x01);
-	tilemap_set_flip_all(screen.machine(),flip_screen_get(screen.machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	screen.machine().tilemap().set_flip_all(flip_screen_get(screen.machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	set_scroll(screen.machine(), 0);
 	set_scroll(screen.machine(), 1);
 
@@ -330,12 +330,12 @@ SCREEN_UPDATE_IND16( baraduke )
 	else
 		back = 0;
 
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap[back],TILEMAP_DRAW_OPAQUE,0);
+	state->m_bg_tilemap[back]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap[back ^ 1],0,0);
+	state->m_bg_tilemap[back ^ 1]->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,1);
 
-	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

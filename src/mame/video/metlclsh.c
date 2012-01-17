@@ -44,7 +44,7 @@ WRITE8_HANDLER( metlclsh_gfxbank_w )
 
 	if (!(data & 4) && (state->m_gfxbank != data))
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 		state->m_gfxbank = data & 3;
 	}
 }
@@ -98,7 +98,7 @@ WRITE8_HANDLER( metlclsh_bgram_w )
 	{
 		/* tilemap */
 		state->m_bgram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x1ff);
+		state->m_bg_tilemap->mark_tile_dirty(offset & 0x1ff);
 	}
 }
 
@@ -121,14 +121,14 @@ static TILE_GET_INFO( get_fg_tile_info )
 	UINT8 code = state->m_fgram[tile_index + 0x000];
 	UINT8 attr = state->m_fgram[tile_index + 0x400];
 	SET_TILE_INFO(2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0);
-	tileinfo->category = ((attr & 0x80) ? 1 : 2);
+	tileinfo.category = ((attr & 0x80) ? 1 : 2);
 }
 
 WRITE8_HANDLER( metlclsh_fgram_w )
 {
 	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
 	state->m_fgram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x3ff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -147,8 +147,8 @@ VIDEO_START( metlclsh )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, metlclsh_bgtilemap_scan, 16, 16, 32, 16);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->save_pointer(NAME(state->m_otherram), 0x800);
 }
@@ -248,17 +248,17 @@ SCREEN_UPDATE_IND16( metlclsh )
 
 	bitmap.fill(0x10, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);	// low priority tiles of foreground
+	state->m_fg_tilemap->draw(bitmap, cliprect, 1, 0);	// low priority tiles of foreground
 
 	if (state->m_scrollx[0] & 0x08)					// background (if enabled)
 	{
 		/* The background seems to be always flipped along x */
-		tilemap_set_flip(state->m_bg_tilemap, (flip_screen_get(screen.machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[1] + ((state->m_scrollx[0] & 0x02) << 7) );
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->set_flip((flip_screen_get(screen.machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
+		state->m_bg_tilemap->set_scrollx(0, state->m_scrollx[1] + ((state->m_scrollx[0] & 0x02) << 7) );
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	draw_sprites(screen.machine(), bitmap, cliprect);			// sprites
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 2, 0);	// high priority tiles of foreground
+	state->m_fg_tilemap->draw(bitmap, cliprect, 2, 0);	// high priority tiles of foreground
 
 //  popmessage("%02X", state->m_scrollx[0]);
 	return 0;

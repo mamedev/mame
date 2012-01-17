@@ -479,7 +479,7 @@ WRITE8_HANDLER( dkong_videoram_w )
 	if (state->m_video_ram[offset] != data)
 	{
 		state->m_video_ram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+		state->m_bg_tilemap->mark_tile_dirty(offset);
 	}
 }
 
@@ -490,7 +490,7 @@ WRITE8_HANDLER( dkongjr_gfxbank_w )
 	if (state->m_gfx_bank != (data & 0x01))
 	{
 		state->m_gfx_bank = data & 0x01;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -501,7 +501,7 @@ WRITE8_HANDLER( dkong3_gfxbank_w )
 	if (state->m_gfx_bank != (~data & 0x01))
 	{
 		state->m_gfx_bank = ~data & 0x01;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -520,7 +520,7 @@ WRITE8_HANDLER( dkong_palettebank_w )
 	if (state->m_palette_bank != newbank)
 	{
 		state->m_palette_bank = newbank;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -954,11 +954,11 @@ VIDEO_START( dkong )
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
 			state->m_bg_tilemap = tilemap_create(machine, dkong_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-			tilemap_set_scrolldx(state->m_bg_tilemap, 0, 128);
+			state->m_bg_tilemap->set_scrolldx(0, 128);
 			break;
 		case HARDWARE_TRS01:
 			state->m_bg_tilemap = tilemap_create(machine, radarscp1_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-			tilemap_set_scrolldx(state->m_bg_tilemap, 0, 128);
+			state->m_bg_tilemap->set_scrolldx(0, 128);
 
 			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);
 			state->m_gfx4 = machine.region("gfx4")->base();
@@ -975,21 +975,21 @@ SCREEN_UPDATE_IND16( dkong )
 {
 	dkong_state *state = screen.machine().driver_data<dkong_state>();
 
-	tilemap_set_flip_all(screen.machine(), state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_flip ?  0 : 0);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_flip ? -8 : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_flip ?  0 : 0);
+	state->m_bg_tilemap->set_scrolly(0, state->m_flip ? -8 : 0);
 
 	switch (state->m_hardware_type)
 	{
 		case HARDWARE_TKG02:
 		case HARDWARE_TKG04:
 			check_palette(screen.machine());
-			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 			draw_sprites(screen.machine(), bitmap, cliprect, 0x40, 1);
 			break;
 		case HARDWARE_TRS01:
 		case HARDWARE_TRS02:
-			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 			draw_sprites(screen.machine(), bitmap, cliprect, 0x40, 1);
 			radarscp_draw_background(screen.machine(), state, bitmap, cliprect);
 			break;
@@ -1004,7 +1004,7 @@ SCREEN_UPDATE_IND16( pestplce )
 	dkong_state *state = screen.machine().driver_data<dkong_state>();
 	int offs;
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
 	for (offs = 0;offs < state->m_sprite_ram_size;offs += 4)
@@ -1025,7 +1025,7 @@ SCREEN_UPDATE_IND16( spclforc )
 {
 	dkong_state *state = screen.machine().driver_data<dkong_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* it uses sprite_ram[offs + 2] & 0x10 for sprite bank */
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x10, 3);

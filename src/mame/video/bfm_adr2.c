@@ -218,8 +218,8 @@ SCREEN_UPDATE_IND16( adder2 )
 {
 	const rectangle visible1(0, 400-1,  0,  280-1);  //minx,maxx, miny,maxy
 
-	if (adder2_screen_page_reg & SL_DISPLAY) tilemap_draw(bitmap, visible1, tilemap1, 0, 0);
-	else                                     tilemap_draw(bitmap, visible1, tilemap0, 0, 0);
+	if (adder2_screen_page_reg & SL_DISPLAY) tilemap1->draw(bitmap, visible1, 0, 0);
+	else                                     tilemap0->draw(bitmap, visible1, 0, 0);
 
 	return 0;
 }
@@ -295,13 +295,13 @@ static WRITE8_HANDLER( screen_ram_w )
 	if ( adder2_screen_page_reg & SL_ACCESS )
 	{
 		adder_screen_ram[1][offset] = data;
-		tilemap_mark_tile_dirty(tilemap1, dirty_off);
+		tilemap1->mark_tile_dirty(dirty_off);
 	}
 
 	else
 	{
 		adder_screen_ram[0][offset] = data;
-		tilemap_mark_tile_dirty(tilemap0, dirty_off);
+		tilemap0->mark_tile_dirty(dirty_off);
 	}
 }
 

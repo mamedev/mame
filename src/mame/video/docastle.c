@@ -66,21 +66,21 @@ WRITE8_HANDLER( docastle_videoram_w )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_do_tilemap, offset);
+	state->m_do_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( docastle_colorram_w )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_do_tilemap, offset);
+	state->m_do_tilemap->mark_tile_dirty(offset);
 }
 
 READ8_HANDLER( docastle_flipscreen_off_r )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
 	flip_screen_set(space->machine(), 0);
-	tilemap_mark_all_tiles_dirty(state->m_do_tilemap);
+	state->m_do_tilemap->mark_all_dirty();
 	return 0;
 }
 
@@ -88,7 +88,7 @@ READ8_HANDLER( docastle_flipscreen_on_r )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
 	flip_screen_set(space->machine(), 1);
-	tilemap_mark_all_tiles_dirty(state->m_do_tilemap);
+	state->m_do_tilemap->mark_all_dirty();
 	return 1;
 }
 
@@ -96,14 +96,14 @@ WRITE8_HANDLER( docastle_flipscreen_off_w )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
 	flip_screen_set(space->machine(), 0);
-	tilemap_mark_all_tiles_dirty(state->m_do_tilemap);
+	state->m_do_tilemap->mark_all_dirty();
 }
 
 WRITE8_HANDLER( docastle_flipscreen_on_w )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
 	flip_screen_set(space->machine(), 1);
-	tilemap_mark_all_tiles_dirty(state->m_do_tilemap);
+	state->m_do_tilemap->mark_all_dirty();
 }
 
 static TILE_GET_INFO( get_tile_info )
@@ -119,7 +119,7 @@ static void video_start_common( running_machine &machine, UINT32 tile_transmask 
 {
 	docastle_state *state = machine.driver_data<docastle_state>();
 	state->m_do_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	tilemap_set_transmask(state->m_do_tilemap, 0, tile_transmask, 0x0000);
+	state->m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
 }
 
 VIDEO_START( docastle )
@@ -228,8 +228,8 @@ SCREEN_UPDATE_IND16( docastle )
 {
 	docastle_state *state = screen.machine().driver_data<docastle_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_do_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	state->m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_do_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	state->m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

@@ -739,7 +739,7 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 
 	// call the get info callback for the associated memory index
 	tilemap_memory_index memindex = m_logical_to_memory[logindex];
-	m_tile_get_info(&m_tileinfo, memindex, m_user_data);
+	m_tile_get_info(m_tileinfo, memindex, m_user_data);
 
 	// apply the global tilemap flip to the returned flip flags
 	UINT32 flags = m_tileinfo.flags ^ (m_attributes & 0x03);

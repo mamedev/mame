@@ -219,8 +219,8 @@ static WRITE32_HANDLER( dreamwld_bg_videoram_w )
 {
 	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
 	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset * 2);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset * 2 + 1);
+	state->m_bg_tilemap->mark_tile_dirty(offset * 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
 static TILE_GET_INFO( get_dreamwld_bg_tile_info )
@@ -238,8 +238,8 @@ static WRITE32_HANDLER( dreamwld_bg2_videoram_w )
 {
 	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
 	COMBINE_DATA(&state->m_bg2_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset * 2);
-	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset * 2 + 1);
+	state->m_bg2_tilemap->mark_tile_dirty(offset * 2);
+	state->m_bg2_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
 static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
@@ -258,13 +258,13 @@ static VIDEO_START( dreamwld )
 
 	state->m_bg_tilemap = tilemap_create(machine, get_dreamwld_bg_tile_info,tilemap_scan_rows, 16, 16, 64,32);
 	state->m_bg2_tilemap = tilemap_create(machine, get_dreamwld_bg2_tile_info,tilemap_scan_rows, 16, 16, 64,32);
-	tilemap_set_transparent_pen(state->m_bg2_tilemap,0);
+	state->m_bg2_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 256);	// line scrolling
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 1);
+	state->m_bg_tilemap->set_scroll_rows(256);	// line scrolling
+	state->m_bg_tilemap->set_scroll_cols(1);
 
-	tilemap_set_scroll_rows(state->m_bg2_tilemap, 256);	// line scrolling
-	tilemap_set_scroll_cols(state->m_bg2_tilemap, 1);
+	state->m_bg2_tilemap->set_scroll_rows(256);	// line scrolling
+	state->m_bg2_tilemap->set_scroll_cols(1);
 
 	state->m_spritebuf1 = auto_alloc_array(machine, UINT32, 0x2000 / 4);
 	state->m_spritebuf2 = auto_alloc_array(machine, UINT32, 0x2000 / 4);
@@ -302,8 +302,8 @@ static SCREEN_UPDATE_IND16( dreamwld )
 	UINT32 layer0_ctrl = state->m_vregs[0x412 / 4];
 	UINT32 layer1_ctrl = state->m_vregs[0x416 / 4];
 
-	tilemap_set_scrolly(tmptilemap0, 0, layer0_scrolly);
-	tilemap_set_scrolly(tmptilemap1, 0, layer1_scrolly);
+	tmptilemap0->set_scrolly(0, layer0_scrolly);
+	tmptilemap1->set_scrolly(0, layer1_scrolly);
 
 	// not on this hw?
 #if 0
@@ -340,8 +340,8 @@ static SCREEN_UPDATE_IND16( dreamwld )
 				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + ((i + layer0_scrolly)&0xff))]; // different handling to psikyo.c? ( + scrolly )
 		}
 
-		tilemap_set_scrollx(
-			tmptilemap0,
+		
+			tmptilemap0->set_scrollx(
 			(i + layer0_scrolly) % 256 /*tilemap_width(tm0size) */,
 			layer0_scrollx + x0 );
 
@@ -357,8 +357,8 @@ static SCREEN_UPDATE_IND16( dreamwld )
 				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + ((i + layer1_scrolly)&0xff))];  // different handling to psikyo.c? ( + scrolly )
 		}
 
-		tilemap_set_scrollx(
-			tmptilemap1,
+		
+			tmptilemap1->set_scrollx(
 			(i + layer1_scrolly) % 256 /* tilemap_width(tm1size) */,
 			layer1_scrollx + x1 );
 	}
@@ -370,17 +370,17 @@ static SCREEN_UPDATE_IND16( dreamwld )
 	if (state->m_tilebank[0] != state->m_tilebankold[0])
 	{
 		state->m_tilebankold[0] = state->m_tilebank[0];
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	if (state->m_tilebank[1] != state->m_tilebankold[1])
 	{
 		state->m_tilebankold[1] = state->m_tilebank[1];
-		tilemap_mark_all_tiles_dirty(state->m_bg2_tilemap);
+		state->m_bg2_tilemap->mark_all_dirty();
 	}
 
-	tilemap_draw(bitmap, cliprect, tmptilemap0, 0, 0);
-	tilemap_draw(bitmap, cliprect, tmptilemap1, 0, 0);
+	tmptilemap0->draw(bitmap, cliprect, 0, 0);
+	tmptilemap1->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 

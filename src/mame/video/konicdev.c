@@ -1377,7 +1377,7 @@ WRITE8_DEVICE_HANDLER( k007121_ctrl_w )
 	case 6:
 		/* palette bank change */
 		if ((k007121->ctrlram[offset] & 0x30) != (data & 0x30))
-			tilemap_mark_all_tiles_dirty_all(device->machine());
+			device->machine().tilemap().mark_all_dirty();
 		break;
 	case 7:
 		k007121->flipscreen = data & 0x08;
@@ -1638,9 +1638,9 @@ WRITE8_DEVICE_HANDLER( k007342_w )
 	k007342->ram[offset] = data;
 
 	if (offset < 0x1000)	/* layer 0 */
-		tilemap_mark_tile_dirty(k007342->tilemap[0], offset & 0x7ff);
+		k007342->tilemap[0]->mark_tile_dirty(offset & 0x7ff);
 	else				/* layer 1 */
-		tilemap_mark_tile_dirty(k007342->tilemap[1], offset & 0x7ff);
+		k007342->tilemap[1]->mark_tile_dirty(offset & 0x7ff);
 }
 
 READ8_DEVICE_HANDLER( k007342_scroll_r )
@@ -1664,12 +1664,12 @@ WRITE8_DEVICE_HANDLER( k007342_vreg_w )
 			/* bit 1: INT control */
 			k007342->int_enabled = data & 0x02;
 			k007342->flipscreen = data & 0x10;
-			tilemap_set_flip(k007342->tilemap[0], k007342->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			tilemap_set_flip(k007342->tilemap[1], k007342->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			k007342->tilemap[0]->set_flip(k007342->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			k007342->tilemap[1]->set_flip(k007342->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			break;
 		case 0x01:  /* used for banking in Rock'n'Rage */
 			if (data != k007342->regs[1])
-				tilemap_mark_all_tiles_dirty_all(device->machine());
+				device->machine().tilemap().mark_all_dirty();
 		case 0x02:
 			k007342->scrollx[0] = (k007342->scrollx[0] & 0xff) | ((data & 0x01) << 8);
 			k007342->scrollx[1] = (k007342->scrollx[1] & 0xff) | ((data & 0x02) << 7);
@@ -1701,27 +1701,27 @@ void k007342_tilemap_update( device_t *device )
 	{
 		case 0x00:
 		case 0x08:	/* unknown, blades of steel shootout between periods */
-			tilemap_set_scroll_rows(k007342->tilemap[0], 1);
-			tilemap_set_scroll_cols(k007342->tilemap[0], 1);
-			tilemap_set_scrollx(k007342->tilemap[0], 0, k007342->scrollx[0]);
-			tilemap_set_scrolly(k007342->tilemap[0], 0, k007342->scrolly[0]);
+			k007342->tilemap[0]->set_scroll_rows(1);
+			k007342->tilemap[0]->set_scroll_cols(1);
+			k007342->tilemap[0]->set_scrollx(0, k007342->scrollx[0]);
+			k007342->tilemap[0]->set_scrolly(0, k007342->scrolly[0]);
 			break;
 
 		case 0x0c:	/* 32 columns */
-			tilemap_set_scroll_rows(k007342->tilemap[0], 1);
-			tilemap_set_scroll_cols(k007342->tilemap[0], 512);
-			tilemap_set_scrollx(k007342->tilemap[0], 0, k007342->scrollx[0]);
+			k007342->tilemap[0]->set_scroll_rows(1);
+			k007342->tilemap[0]->set_scroll_cols(512);
+			k007342->tilemap[0]->set_scrollx(0, k007342->scrollx[0]);
 			for (offs = 0; offs < 256; offs++)
-				tilemap_set_scrolly(k007342->tilemap[0], (offs + k007342->scrollx[0]) & 0x1ff,
+				k007342->tilemap[0]->set_scrolly((offs + k007342->scrollx[0]) & 0x1ff,
 						k007342->scroll_ram[2 * (offs / 8)] + 256 * k007342->scroll_ram[2 * (offs / 8) + 1]);
 			break;
 
 		case 0x14:	/* 256 rows */
-			tilemap_set_scroll_rows(k007342->tilemap[0], 256);
-			tilemap_set_scroll_cols(k007342->tilemap[0], 1);
-			tilemap_set_scrolly(k007342->tilemap[0], 0, k007342->scrolly[0]);
+			k007342->tilemap[0]->set_scroll_rows(256);
+			k007342->tilemap[0]->set_scroll_cols(1);
+			k007342->tilemap[0]->set_scrolly(0, k007342->scrolly[0]);
 			for (offs = 0; offs < 256; offs++)
-				tilemap_set_scrollx(k007342->tilemap[0], (offs + k007342->scrolly[0]) & 0xff,
+				k007342->tilemap[0]->set_scrollx((offs + k007342->scrolly[0]) & 0xff,
 						k007342->scroll_ram[2 * offs] + 256 * k007342->scroll_ram[2 * offs + 1]);
 			break;
 
@@ -1730,16 +1730,16 @@ void k007342_tilemap_update( device_t *device )
 			break;
 	}
 
-	tilemap_set_scrollx(k007342->tilemap[1], 0, k007342->scrollx[1]);
-	tilemap_set_scrolly(k007342->tilemap[1], 0, k007342->scrolly[1]);
+	k007342->tilemap[1]->set_scrollx(0, k007342->scrollx[1]);
+	k007342->tilemap[1]->set_scrolly(0, k007342->scrolly[1]);
 
 #if 0
 	{
 		static int current_layer = 0;
 
 		if (machine.input().code_pressed_once(KEYCODE_Z)) current_layer = !current_layer;
-		tilemap_set_enable(k007342->tilemap[current_layer], 1);
-		tilemap_set_enable(k007342->tilemap[!current_layer], 0);
+		k007342->tilemap[current_layer]->enable(1);
+		k007342->tilemap[!current_layer]->enable(0);
 
 		popmessage("regs:%02x %02x %02x %02x-%02x %02x %02x %02x:%02x",
 			k007342->regs[0], k007342->regs[1], k007342->regs[2], k007342->regs[3],
@@ -1752,7 +1752,7 @@ void k007342_tilemap_update( device_t *device )
 void k007342_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority )
 {
 	k007342_state *k007342 = k007342_get_safe_token(device);
-	tilemap_draw(bitmap, cliprect, k007342->tilemap[num], flags, priority);
+	k007342->tilemap[num]->draw(bitmap, cliprect, flags, priority);
 }
 
 int k007342_is_int_enabled( device_t *device )
@@ -1784,7 +1784,7 @@ static TILEMAP_MAPPER( k007342_scan )
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
 }
 
-INLINE void k007342_get_tile_info( device_t *device, tile_data *tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram )
+INLINE void k007342_get_tile_info( device_t *device, tile_data &tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram )
 {
 	k007342_state *k007342 = k007342_get_safe_token(device);
 	int color, code, flags;
@@ -1793,7 +1793,7 @@ INLINE void k007342_get_tile_info( device_t *device, tile_data *tileinfo, int ti
 	code = vram[tile_index];
 	flags = TILE_FLIPYX((color & 0x30) >> 4);
 
-	tileinfo->category = (color & 0x80) >> 7;
+	tileinfo.category = (color & 0x80) >> 7;
 
 	k007342->callback(device->machine(), layer, k007342->regs[1], &code, &color, &flags);
 
@@ -1840,8 +1840,8 @@ static DEVICE_START( k007342 )
 	k007342->videoram_0 = &k007342->ram[0x0800];
 	k007342->videoram_1 = &k007342->ram[0x1800];
 
-	tilemap_set_transparent_pen(k007342->tilemap[0], 0);
-	tilemap_set_transparent_pen(k007342->tilemap[1], 0);
+	k007342->tilemap[0]->set_transparent_pen(0);
+	k007342->tilemap[1]->set_transparent_pen(0);
 
 	device->save_pointer(NAME(k007342->ram), 0x2000);
 	device->save_pointer(NAME(k007342->scroll_ram), 0x0200);
@@ -2246,7 +2246,7 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 			k052109->has_extra_video_ram = 1;  /* kludge for X-Men */
 
 		k052109->ram[offset] = data;
-		tilemap_mark_tile_dirty(k052109->tilemap[(offset & 0x1800) >> 11],offset & 0x7ff);
+		k052109->tilemap[(offset & 0x1800) >> 11]->mark_tile_dirty(offset & 0x7ff);
 	}
 	else	/* control registers */
 	{
@@ -2293,7 +2293,7 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 					int bank = (k052109->ram[i]&0x0c) >> 2;
 					if ((bank == 0 && (dirty & 1)) || (bank == 1 && (dirty & 2)))
 					{
-						tilemap_mark_tile_dirty(k052109->tilemap[(i & 0x1800) >> 11], i & 0x7ff);
+						k052109->tilemap[(i & 0x1800) >> 11]->mark_tile_dirty(i & 0x7ff);
 					}
 				}
 			}
@@ -2306,16 +2306,16 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 		else if (offset == 0x1e80)
 		{
 //if ((data & 0xfe)) logerror("%04x: 052109 register 1e80 = %02x\n",cpu_get_pc(&space->device()),data);
-			tilemap_set_flip(k052109->tilemap[0], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			tilemap_set_flip(k052109->tilemap[1], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			tilemap_set_flip(k052109->tilemap[2], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			k052109->tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			k052109->tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			k052109->tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			if (k052109->tileflip_enable != ((data & 0x06) >> 1))
 			{
 				k052109->tileflip_enable = ((data & 0x06) >> 1);
 
-				tilemap_mark_all_tiles_dirty(k052109->tilemap[0]);
-				tilemap_mark_all_tiles_dirty(k052109->tilemap[1]);
-				tilemap_mark_all_tiles_dirty(k052109->tilemap[2]);
+				k052109->tilemap[0]->mark_all_dirty();
+				k052109->tilemap[1]->mark_all_dirty();
+				k052109->tilemap[2]->mark_all_dirty();
 			}
 		}
 		else if (offset == 0x1f00)
@@ -2339,7 +2339,7 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 				{
 					int bank = (k052109->ram[i] & 0x0c) >> 2;
 					if ((bank == 2 && (dirty & 1)) || (bank == 3 && (dirty & 2)))
-						tilemap_mark_tile_dirty(k052109->tilemap[(i & 0x1800) >> 11],i & 0x7ff);
+						k052109->tilemap[(i & 0x1800) >> 11]->mark_tile_dirty(i & 0x7ff);
 				}
 			}
 		}
@@ -2404,7 +2404,7 @@ int k052109_get_rmrd_line(device_t *device )
 void k052109_tilemap_mark_dirty( device_t *device, int tmap_num )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
-	tilemap_mark_all_tiles_dirty(k052109->tilemap[tmap_num]);
+	k052109->tilemap[tmap_num]->mark_all_dirty();
 }
 
 
@@ -2427,116 +2427,116 @@ popmessage("%x %x %x %x",
 	{
 		UINT8 *scrollram = &k052109->ram[0x1a00];
 
-		tilemap_set_scroll_rows(k052109->tilemap[1], 256);
-		tilemap_set_scroll_cols(k052109->tilemap[1], 1);
+		k052109->tilemap[1]->set_scroll_rows(256);
+		k052109->tilemap[1]->set_scroll_cols(1);
 		yscroll = k052109->ram[0x180c];
-		tilemap_set_scrolly(k052109->tilemap[1], 0, yscroll + k052109->dy[1]);
+		k052109->tilemap[1]->set_scrolly(0, yscroll + k052109->dy[1]);
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * (offs & 0xfff8) + 0] + 256 * scrollram[2 * (offs & 0xfff8) + 1];
 			xscroll -= 6;
-			tilemap_set_scrollx(k052109->tilemap[1], (offs + yscroll) & 0xff, xscroll + k052109->dx[1]);
+			k052109->tilemap[1]->set_scrollx((offs + yscroll) & 0xff, xscroll + k052109->dx[1]);
 		}
 	}
 	else if ((k052109->scrollctrl & 0x03) == 0x03)
 	{
 		UINT8 *scrollram = &k052109->ram[0x1a00];
 
-		tilemap_set_scroll_rows(k052109->tilemap[1], 256);
-		tilemap_set_scroll_cols(k052109->tilemap[1], 1);
+		k052109->tilemap[1]->set_scroll_rows(256);
+		k052109->tilemap[1]->set_scroll_cols(1);
 		yscroll = k052109->ram[0x180c];
-		tilemap_set_scrolly(k052109->tilemap[1], 0, yscroll + k052109->dy[1]);
+		k052109->tilemap[1]->set_scrolly(0, yscroll + k052109->dy[1]);
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * offs + 0] + 256 * scrollram[2 * offs + 1];
 			xscroll -= 6;
-			tilemap_set_scrollx(k052109->tilemap[1], (offs + yscroll) & 0xff, xscroll + k052109->dx[1]);
+			k052109->tilemap[1]->set_scrollx((offs + yscroll) & 0xff, xscroll + k052109->dx[1]);
 		}
 	}
 	else if ((k052109->scrollctrl & 0x04) == 0x04)
 	{
 		UINT8 *scrollram = &k052109->ram[0x1800];
 
-		tilemap_set_scroll_rows(k052109->tilemap[1], 1);
-		tilemap_set_scroll_cols(k052109->tilemap[1], 512);
+		k052109->tilemap[1]->set_scroll_rows(1);
+		k052109->tilemap[1]->set_scroll_cols(512);
 		xscroll = k052109->ram[0x1a00] + 256 * k052109->ram[0x1a01];
 		xscroll -= 6;
-		tilemap_set_scrollx(k052109->tilemap[1], 0, xscroll + k052109->dx[1]);
+		k052109->tilemap[1]->set_scrollx(0, xscroll + k052109->dx[1]);
 		for (offs = 0; offs < 512; offs++)
 		{
 			yscroll = scrollram[offs / 8];
-			tilemap_set_scrolly(k052109->tilemap[1], (offs + xscroll) & 0x1ff, yscroll + k052109->dy[1]);
+			k052109->tilemap[1]->set_scrolly((offs + xscroll) & 0x1ff, yscroll + k052109->dy[1]);
 		}
 	}
 	else
 	{
 		UINT8 *scrollram = &k052109->ram[0x1a00];
 
-		tilemap_set_scroll_rows(k052109->tilemap[1], 1);
-		tilemap_set_scroll_cols(k052109->tilemap[1], 1);
+		k052109->tilemap[1]->set_scroll_rows(1);
+		k052109->tilemap[1]->set_scroll_cols(1);
 		xscroll = scrollram[0] + 256 * scrollram[1];
 		xscroll -= 6;
 		yscroll = k052109->ram[0x180c];
-		tilemap_set_scrollx(k052109->tilemap[1], 0, xscroll + k052109->dx[1]);
-		tilemap_set_scrolly(k052109->tilemap[1], 0, yscroll + k052109->dy[1]);
+		k052109->tilemap[1]->set_scrollx(0, xscroll + k052109->dx[1]);
+		k052109->tilemap[1]->set_scrolly(0, yscroll + k052109->dy[1]);
 	}
 
 	if ((k052109->scrollctrl & 0x18) == 0x10)
 	{
 		UINT8 *scrollram = &k052109->ram[0x3a00];
 
-		tilemap_set_scroll_rows(k052109->tilemap[2], 256);
-		tilemap_set_scroll_cols(k052109->tilemap[2], 1);
+		k052109->tilemap[2]->set_scroll_rows(256);
+		k052109->tilemap[2]->set_scroll_cols(1);
 		yscroll = k052109->ram[0x380c];
-		tilemap_set_scrolly(k052109->tilemap[2], 0, yscroll + k052109->dy[2]);
+		k052109->tilemap[2]->set_scrolly(0, yscroll + k052109->dy[2]);
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * (offs & 0xfff8) + 0] + 256 * scrollram[2 * (offs & 0xfff8) + 1];
 			xscroll -= 6;
-			tilemap_set_scrollx(k052109->tilemap[2], (offs + yscroll) & 0xff, xscroll + k052109->dx[2]);
+			k052109->tilemap[2]->set_scrollx((offs + yscroll) & 0xff, xscroll + k052109->dx[2]);
 		}
 	}
 	else if ((k052109->scrollctrl & 0x18) == 0x18)
 	{
 		UINT8 *scrollram = &k052109->ram[0x3a00];
 
-		tilemap_set_scroll_rows(k052109->tilemap[2], 256);
-		tilemap_set_scroll_cols(k052109->tilemap[2], 1);
+		k052109->tilemap[2]->set_scroll_rows(256);
+		k052109->tilemap[2]->set_scroll_cols(1);
 		yscroll = k052109->ram[0x380c];
-		tilemap_set_scrolly(k052109->tilemap[2], 0, yscroll + k052109->dy[2]);
+		k052109->tilemap[2]->set_scrolly(0, yscroll + k052109->dy[2]);
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * offs + 0] + 256 * scrollram[2 * offs + 1];
 			xscroll -= 6;
-			tilemap_set_scrollx(k052109->tilemap[2], (offs + yscroll) & 0xff, xscroll + k052109->dx[2]);
+			k052109->tilemap[2]->set_scrollx((offs + yscroll) & 0xff, xscroll + k052109->dx[2]);
 		}
 	}
 	else if ((k052109->scrollctrl & 0x20) == 0x20)
 	{
 		UINT8 *scrollram = &k052109->ram[0x3800];
 
-		tilemap_set_scroll_rows(k052109->tilemap[2], 1);
-		tilemap_set_scroll_cols(k052109->tilemap[2], 512);
+		k052109->tilemap[2]->set_scroll_rows(1);
+		k052109->tilemap[2]->set_scroll_cols(512);
 		xscroll = k052109->ram[0x3a00] + 256 * k052109->ram[0x3a01];
 		xscroll -= 6;
-		tilemap_set_scrollx(k052109->tilemap[2], 0, xscroll + k052109->dx[2]);
+		k052109->tilemap[2]->set_scrollx(0, xscroll + k052109->dx[2]);
 		for (offs = 0; offs < 512; offs++)
 		{
 			yscroll = scrollram[offs / 8];
-			tilemap_set_scrolly(k052109->tilemap[2], (offs + xscroll) & 0x1ff, yscroll + k052109->dy[2]);
+			k052109->tilemap[2]->set_scrolly((offs + xscroll) & 0x1ff, yscroll + k052109->dy[2]);
 		}
 	}
 	else
 	{
 		UINT8 *scrollram = &k052109->ram[0x3a00];
 
-		tilemap_set_scroll_rows(k052109->tilemap[2], 1);
-		tilemap_set_scroll_cols(k052109->tilemap[2], 1);
+		k052109->tilemap[2]->set_scroll_rows(1);
+		k052109->tilemap[2]->set_scroll_cols(1);
 		xscroll = scrollram[0] + 256 * scrollram[1];
 		xscroll -= 6;
 		yscroll = k052109->ram[0x380c];
-		tilemap_set_scrollx(k052109->tilemap[2], 0, xscroll + k052109->dx[2]);
-		tilemap_set_scrolly(k052109->tilemap[2], 0, yscroll + k052109->dy[2]);
+		k052109->tilemap[2]->set_scrollx(0, xscroll + k052109->dx[2]);
+		k052109->tilemap[2]->set_scrolly(0, yscroll + k052109->dy[2]);
 	}
 
 #if 0
@@ -2564,7 +2564,7 @@ if (machine.input().code_pressed(KEYCODE_F))
 void k052109_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
-	tilemap_draw(bitmap, cliprect, k052109->tilemap[tmap_num], flags, priority);
+	k052109->tilemap[tmap_num]->draw(bitmap, cliprect, flags, priority);
 }
 
 int k052109_is_irq_enabled( device_t *device )
@@ -2600,7 +2600,7 @@ void k052109_set_layer_offsets( device_t *device, int layer, int dx, int dy )
   color RAM    ------xx  depends on external connections (usually banking, flip)
 */
 
-INLINE void k052109_get_tile_info( device_t *device, tile_data *tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram1, UINT8 *vram2 )
+INLINE void k052109_get_tile_info( device_t *device, tile_data &tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram1, UINT8 *vram2 )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	int flipy = 0;
@@ -2633,7 +2633,7 @@ INLINE void k052109_get_tile_info( device_t *device, tile_data *tileinfo, int ti
 			color,
 			flags);
 
-	tileinfo->category = priority;
+	tileinfo.category = priority;
 }
 
 static TILE_GET_INFO_DEVICE( k052109_get_tile_info0 )
@@ -2658,9 +2658,9 @@ static TILE_GET_INFO_DEVICE( k052109_get_tile_info2 )
 static void k052109_tileflip_reset(k052109_state *k052109)
 {
 	int data = k052109->ram[0x1e80];
-	tilemap_set_flip(k052109->tilemap[0], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	tilemap_set_flip(k052109->tilemap[1], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	tilemap_set_flip(k052109->tilemap[2], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	k052109->tilemap[0]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	k052109->tilemap[1]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	k052109->tilemap[2]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	k052109->tileflip_enable = ((data & 0x06) >> 1);
 }
 
@@ -2732,9 +2732,9 @@ static DEVICE_START( k052109 )
 	k052109->videoram2_A = &k052109->ram[0x4800];
 	k052109->videoram2_B = &k052109->ram[0x5000];
 
-	tilemap_set_transparent_pen(k052109->tilemap[0], 0);
-	tilemap_set_transparent_pen(k052109->tilemap[1], 0);
-	tilemap_set_transparent_pen(k052109->tilemap[2], 0);
+	k052109->tilemap[0]->set_transparent_pen(0);
+	k052109->tilemap[1]->set_transparent_pen(0);
+	k052109->tilemap[2]->set_transparent_pen(0);
 
 	device->save_pointer(NAME(k052109->ram), 0x6000);
 	device->save_item(NAME(k052109->rmrd_line));
@@ -5162,7 +5162,7 @@ WRITE8_DEVICE_HANDLER( k051316_w )
 	k051316_state *k051316= k051316_get_safe_token(device);
 
 	k051316->ram[offset] = data;
-	tilemap_mark_tile_dirty(k051316->tmap, offset & 0x3ff);
+	k051316->tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -5208,7 +5208,7 @@ void k051316_wraparound_enable( device_t *device, int status )
 
 ***************************************************************************/
 
-INLINE void k051316_get_tile_info( device_t *device, tile_data *tileinfo, int tile_index )
+INLINE void k051316_get_tile_info( device_t *device, tile_data &tileinfo, int tile_index )
 {
 	k051316_state *k051316 = k051316_get_safe_token(device);
 	int code = k051316->ram[tile_index];
@@ -5247,7 +5247,7 @@ void k051316_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 	startx -= (89 + k051316->offset[0]) * incxx;
 	starty -= (89 + k051316->offset[0]) * incxy;
 
-	tilemap_draw_roz(bitmap,cliprect,k051316->tmap,startx << 5,starty << 5,
+	k051316->tmap->draw_roz(bitmap, cliprect, startx << 5,starty << 5,
 			incxx << 5,incxy << 5,incyx << 5,incyy << 5,
 			k051316->wraparound,
 			flags,priority);
@@ -5377,11 +5377,11 @@ static DEVICE_START( k051316 )
 	k051316->ram = auto_alloc_array(machine, UINT8, 0x800);
 
 	if (!intf->pen_is_mask)
-		tilemap_set_transparent_pen(k051316->tmap, intf->transparent_pen);
+		k051316->tmap->set_transparent_pen(intf->transparent_pen);
 	else
 	{
-		tilemap_map_pens_to_layer(k051316->tmap, 0, 0, 0, TILEMAP_PIXEL_LAYER1);
-		tilemap_map_pens_to_layer(k051316->tmap, 0, intf->transparent_pen, intf->transparent_pen, TILEMAP_PIXEL_LAYER0);
+		k051316->tmap->map_pens_to_layer(0, 0, 0, TILEMAP_PIXEL_LAYER1);
+		k051316->tmap->map_pens_to_layer(0, intf->transparent_pen, intf->transparent_pen, TILEMAP_PIXEL_LAYER0);
 	}
 
 	k051316->wraparound = intf->wrap;
@@ -5532,7 +5532,7 @@ void k053936_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 			startx -= k053936->offset[0] * incxx;
 			starty -= k053936->offset[0] * incxy;
 
-			tilemap_draw_roz(bitmap,my_clip,tmap,startx << 5,starty << 5,
+			tmap->draw_roz(bitmap, my_clip, startx << 5,starty << 5,
 					incxx << 5,incxy << 5,0,0,
 					k053936->wraparound,
 					flags,priority);
@@ -5570,7 +5570,7 @@ void k053936_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 		startx -= k053936->offset[0] * incxx;
 		starty -= k053936->offset[0] * incxy;
 
-		tilemap_draw_roz(bitmap,cliprect,tmap,startx << 5,starty << 5,
+		tmap->draw_roz(bitmap, cliprect, startx << 5,starty << 5,
 				incxx << 5,incxy << 5,incyx << 5,incyy << 5,
 				k053936->wraparound,
 				flags,priority);
@@ -5681,7 +5681,7 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 			}
 
 			if (!k053251->tilemaps_set)
-				tilemap_mark_all_tiles_dirty_all(device->machine());
+				device->machine().tilemap().mark_all_dirty();
 		}
 		else if (offset == 10)
 		{
@@ -5697,7 +5697,7 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 			}
 
 			if (!k053251->tilemaps_set)
-				tilemap_mark_all_tiles_dirty_all(device->machine());
+				device->machine().tilemap().mark_all_dirty();
 		}
 	}
 }
@@ -6139,7 +6139,7 @@ INLINE const k056832_interface *k056832_get_interface( device_t *device )
 static void k056832_mark_page_dirty( k056832_state *k056832, int page )
 {
 	if (k056832->page_tile_mode[page])
-		tilemap_mark_all_tiles_dirty(k056832->tilemap[page]);
+		k056832->tilemap[page]->mark_all_dirty();
 	else
 		k056832_mark_all_lines_dirty(page);
 }
@@ -6248,7 +6248,7 @@ int k056832_get_lookup( device_t *device, int bits )
 	return res;
 }
 
-INLINE void k056832_get_tile_info( device_t *device, tile_data *tileinfo, int tile_index, int pageIndex )
+INLINE void k056832_get_tile_info( device_t *device, tile_data &tileinfo, int tile_index, int pageIndex )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	static const struct K056832_SHIFTMASKS
@@ -6656,7 +6656,7 @@ WRITE8_DEVICE_HANDLER( k056832_ram_code_lo_w )
 	if (!(k056832->regs[0] & 0x02))	// external linescroll enable
 	{
 		if (k056832->page_tile_mode[k056832->selected_page])
-			tilemap_mark_tile_dirty(k056832->tilemap[k056832->selected_page], offset);
+			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
 		else
 			k056832_mark_line_dirty(k056832->selected_page, offset);
 	}
@@ -6673,7 +6673,7 @@ WRITE8_DEVICE_HANDLER( k056832_ram_code_hi_w )
 	if (!(k056832->regs[0] & 0x02))	// external linescroll enable
 	{
 		if (k056832->page_tile_mode[k056832->selected_page])
-			tilemap_mark_tile_dirty(k056832->tilemap[k056832->selected_page], offset);
+			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
 		else
 			k056832_mark_line_dirty(k056832->selected_page, offset);
 	}
@@ -6690,7 +6690,7 @@ WRITE8_DEVICE_HANDLER( k056832_ram_attr_lo_w )
 	if (!(k056832->regs[0] & 0x02))	// external linescroll enable
 	{
 		if (k056832->page_tile_mode[k056832->selected_page])
-			tilemap_mark_tile_dirty(k056832->tilemap[k056832->selected_page], offset);
+			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
 		else
 			k056832_mark_line_dirty(k056832->selected_page, offset);
 	}
@@ -6707,7 +6707,7 @@ WRITE8_DEVICE_HANDLER( k056832_ram_attr_hi_w )
 	if (!(k056832->regs[0] & 0x02))	// external linescroll enable
 	{
 		if (k056832->page_tile_mode[k056832->selected_page])
-			tilemap_mark_tile_dirty(k056832->tilemap[k056832->selected_page], offset);
+			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
 		else
 			k056832_mark_line_dirty(k056832->selected_page, offset);
 	}
@@ -6730,7 +6730,7 @@ WRITE16_DEVICE_HANDLER( k056832_ram_word_w )
 		*tile_ptr = data;
 
 		if (k056832->page_tile_mode[k056832->selected_page])
-			tilemap_mark_tile_dirty(k056832->tilemap[k056832->selected_page], offset);
+			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
 		else
 			k056832_mark_line_dirty(k056832->selected_page, offset);
 	}
@@ -6750,7 +6750,7 @@ WRITE16_DEVICE_HANDLER( k056832_ram_half_word_w )
 		dofs >>= 1;
 
 		if (k056832->page_tile_mode[k056832->selected_page])
-			tilemap_mark_tile_dirty(k056832->tilemap[k056832->selected_page], dofs);
+			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(dofs);
 		else
     		k056832_mark_line_dirty(k056832->selected_page, dofs);
 	}
@@ -6773,7 +6773,7 @@ WRITE32_DEVICE_HANDLER( k056832_ram_long_w )
 		tile_ptr[1] = data;
 
 		if (k056832->page_tile_mode[k056832->selected_page])
-			tilemap_mark_tile_dirty(k056832->tilemap[k056832->selected_page], offset);
+			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
 		else
 			k056832_mark_line_dirty(k056832->selected_page, offset);
 	}
@@ -6796,7 +6796,7 @@ WRITE32_DEVICE_HANDLER( k056832_unpaged_ram_long_w )
 		tile_ptr[1] = data;
 
 		if (k056832->page_tile_mode[offset/0x800])
-			tilemap_mark_tile_dirty(k056832->tilemap[offset/0x800], offset&0x7ff);
+			k056832->tilemap[offset/0x800]->mark_tile_dirty(offset&0x7ff);
 		else
 			k056832_mark_line_dirty(offset/0x800, (offset&0x7ff));
 	}
@@ -6829,7 +6829,7 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 					if (new_data & 0x10) flip |= TILEMAP_FLIPX;
 					for (i = 0; i < K056832_PAGE_COUNT; i++)
 					{
-						tilemap_set_flip(k056832->tilemap[i], flip);
+						k056832->tilemap[i]->set_flip(flip);
 					}
 				}
 
@@ -6991,8 +6991,8 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 		UINT8 *xprdata;
 
 		tmap = k056832->tilemap[page];
-		bitmap_ind8 &xprmap  = tilemap_get_flagsmap(tmap);
-		xprdata = tilemap_get_tile_flags(tmap);
+		bitmap_ind8 &xprmap  = tmap->flagsmap();
+		xprdata = tmap->tile_flags();
 
 		dirty = k056832->line_dirty[page];
 		all_dirty = k056832->all_lines_dirty[page];
@@ -7005,7 +7005,7 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 			// force tilemap into a clean, static state
 			// *really ugly but it minimizes alteration to tilemap.c
 			memset(&zerorect, 0, sizeof(rectangle));	// zero dimension
-			tilemap_draw(bitmap, zerorect, tmap, 0, 0);	// dummy call to reset tile_dirty_map
+			tmap->draw(bitmap, zerorect, 0, 0);	// dummy call to reset tile_dirty_map
 			xprmap.fill(0);						// reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
 		}
@@ -7330,7 +7330,7 @@ printf("\nend\n");
 
 			tmap = k056832->tilemap[pageIndex];
 
-			tilemap_set_scrolly(tmap, 0, ay);
+			tmap->set_scrolly(0, ay);
 
 			last_dx = 0x100000;
 			last_visible = 0;
@@ -7408,10 +7408,10 @@ printf("\nend\n");
 				if ((drawrect.min_x>0) && (drawrect.max_x==511))
 					drawrect.max_x=cliprect.max_x;
 
-				tilemap_set_scrollx(tmap, 0, dx);
+				tmap->set_scrollx(0, dx);
 
 				LINE_SHORTCIRCUIT:
-					tilemap_draw(bitmap, drawrect, tmap, flags, priority);
+					tmap->draw(bitmap, drawrect, flags, priority);
 
 			} // end of line loop
 		} // end of column loop
@@ -7611,7 +7611,7 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_rgb32 &bitmap, const rect
 				continue;
 
 			tmap = k056832->tilemap[pageIndex];
-			tilemap_set_scrolly(tmap, 0, ay);
+			tmap->set_scrolly(0, ay);
 
 			last_dx = 0x100000;
 			last_visible = 0;
@@ -7682,10 +7682,10 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_rgb32 &bitmap, const rect
 				drawrect.min_x = (dminx < cminx ) ? cminx : dminx;
 				drawrect.max_x = (dmaxx > cmaxx ) ? cmaxx : dmaxx;
 
-				tilemap_set_scrollx(tmap, 0, dx);
+				tmap->set_scrollx(0, dx);
 
 				LINE_SHORTCIRCUIT:
-					tilemap_draw(bitmap, drawrect, tmap, flags, priority);
+					tmap->draw(bitmap, drawrect, flags, priority);
 
 			} // end of line loop
 		} // end of column loop
@@ -7956,9 +7956,9 @@ static DEVICE_START( k056832 )
 	{
 		tmap = k056832->tilemap[i];
 
-		k056832->pixmap[i] = &tilemap_get_pixmap(tmap);
+		k056832->pixmap[i] = &tmap->pixmap();
 
-		tilemap_set_transparent_pen(tmap, 0);
+		tmap->set_transparent_pen(0);
 	}
 
 	memset(k056832->videoram, 0x00, 0x20000);
@@ -9738,7 +9738,7 @@ void k001604_draw_back_layer( device_t *device, bitmap_rgb32 &bitmap, const rect
 
 		if ((k001604->reg[0x6c / 4] & (0x08 >> layer)) != 0)
 		{
-			tilemap_draw_roz(bitmap, cliprect, k001604->layer_roz[layer],
+			k001604->layer_roz[layer]->draw_roz(bitmap, cliprect, 
 							 x << 5, y << 5, xx << 5, xy << 5, yx << 5, yy << 5, 1, 0, 0);
 		}
 	}
@@ -9748,8 +9748,8 @@ void k001604_draw_front_layer( device_t *device, bitmap_rgb32 &bitmap, const rec
 {
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
-	//tilemap_draw(bitmap, cliprect, k001604->layer_8x8[1], 0,0);
-	tilemap_draw(bitmap, cliprect, k001604->layer_8x8[0], 0,0);
+	//k001604->layer_8x8[1]->draw(bitmap, cliprect, 0,0);
+	k001604->layer_8x8[0]->draw(bitmap, cliprect, 0,0);
 }
 
 READ32_DEVICE_HANDLER( k001604_tile_r )
@@ -9813,32 +9813,32 @@ WRITE32_DEVICE_HANDLER( k001604_tile_w )
 	{
 		if (x < 64)
 		{
-			tilemap_mark_tile_dirty(k001604->layer_8x8[0], offset);
+			k001604->layer_8x8[0]->mark_tile_dirty(offset);
 		}
 		else if (x < 128)
 		{
-			tilemap_mark_tile_dirty(k001604->layer_8x8[1], offset);
+			k001604->layer_8x8[1]->mark_tile_dirty(offset);
 		}
 		else if (x < 192)
 		{
-			tilemap_mark_tile_dirty(k001604->layer_roz[0], offset);
+			k001604->layer_roz[0]->mark_tile_dirty(offset);
 		}
 		else
 		{
-			tilemap_mark_tile_dirty(k001604->layer_roz[1], offset);
+			k001604->layer_roz[1]->mark_tile_dirty(offset);
 		}
 	}
 	else
 	{
 		if (x < 64)
 		{
-			tilemap_mark_tile_dirty(k001604->layer_8x8[0], offset);
-			tilemap_mark_tile_dirty(k001604->layer_roz[0], offset);
+			k001604->layer_8x8[0]->mark_tile_dirty(offset);
+			k001604->layer_roz[0]->mark_tile_dirty(offset);
 		}
 		else
 		{
-			tilemap_mark_tile_dirty(k001604->layer_8x8[1], offset);
-			tilemap_mark_tile_dirty(k001604->layer_roz[1], offset);
+			k001604->layer_8x8[1]->mark_tile_dirty(offset);
+			k001604->layer_roz[1]->mark_tile_dirty(offset);
 		}
 	}
 }
@@ -9934,8 +9934,8 @@ static DEVICE_START( k001604 )
 		k001604->layer_roz[1] = tilemap_create_device(device, k001604_tile_info_layer_roz, k001604_scan_layer_roz_1_size0, roz_tile_size, roz_tile_size, 64, 64);
 	}
 
-	tilemap_set_transparent_pen(k001604->layer_8x8[0], 0);
-	tilemap_set_transparent_pen(k001604->layer_8x8[1], 0);
+	k001604->layer_8x8[0]->set_transparent_pen(0);
+	k001604->layer_8x8[1]->set_transparent_pen(0);
 
 	device->machine().gfx[k001604->gfx_index[0]] = gfx_element_alloc(device->machine(), &k001604_char_layout_layer_8x8, (UINT8*)&k001604->char_ram[0], device->machine().total_colors() / 16, 0);
 	device->machine().gfx[k001604->gfx_index[1]] = gfx_element_alloc(device->machine(), &k001604_char_layout_layer_16x16, (UINT8*)&k001604->char_ram[0], device->machine().total_colors() / 16, 0);
@@ -10052,15 +10052,15 @@ void k037122_tile_draw( device_t *device, bitmap_rgb32 &bitmap, const rectangle 
 
 	if (k037122->reg[0xc] & 0x10000)
 	{
-		tilemap_set_scrolldx(k037122->layer[1], visarea.min_x, visarea.min_x);
-		tilemap_set_scrolldy(k037122->layer[1], visarea.min_y, visarea.min_y);
-		tilemap_draw(bitmap, cliprect, k037122->layer[1], 0, 0);
+		k037122->layer[1]->set_scrolldx(visarea.min_x, visarea.min_x);
+		k037122->layer[1]->set_scrolldy(visarea.min_y, visarea.min_y);
+		k037122->layer[1]->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		tilemap_set_scrolldx(k037122->layer[0], visarea.min_x, visarea.min_x);
-		tilemap_set_scrolldy(k037122->layer[0], visarea.min_y, visarea.min_y);
-		tilemap_draw(bitmap, cliprect, k037122->layer[0], 0, 0);
+		k037122->layer[0]->set_scrolldx(visarea.min_x, visarea.min_x);
+		k037122->layer[0]->set_scrolldy(visarea.min_y, visarea.min_y);
+		k037122->layer[0]->draw(bitmap, cliprect, 0, 0);
 	}
 }
 
@@ -10089,11 +10089,11 @@ WRITE32_DEVICE_HANDLER( k037122_sram_w )
 	{
 		if (offset < 0x8000 / 4)
 		{
-			tilemap_mark_tile_dirty(k037122->layer[1], offset);
+			k037122->layer[1]->mark_tile_dirty(offset);
 		}
 		else if (offset >= 0x8000 / 4 && offset < 0x18000 / 4)
 		{
-			tilemap_mark_tile_dirty(k037122->layer[0], offset - (0x8000 / 4));
+			k037122->layer[0]->mark_tile_dirty(offset - (0x8000 / 4));
 		}
 		else if (offset >= 0x18000 / 4)
 		{
@@ -10108,11 +10108,11 @@ WRITE32_DEVICE_HANDLER( k037122_sram_w )
 		}
 		else if (offset >= 0x8000 / 4 && offset < 0x18000 / 4)
 		{
-			tilemap_mark_tile_dirty(k037122->layer[0], offset - (0x8000 / 4));
+			k037122->layer[0]->mark_tile_dirty(offset - (0x8000 / 4));
 		}
 		else if (offset >= 0x18000 / 4)
 		{
-			tilemap_mark_tile_dirty(k037122->layer[1], offset - (0x18000 / 4));
+			k037122->layer[1]->mark_tile_dirty(offset - (0x18000 / 4));
 		}
 	}
 }
@@ -10176,8 +10176,8 @@ static DEVICE_START( k037122 )
 	k037122->layer[0] = tilemap_create_device(device, k037122_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
 	k037122->layer[1] = tilemap_create_device(device, k037122_tile_info_layer1, tilemap_scan_rows, 8, 8, 128, 64);
 
-	tilemap_set_transparent_pen(k037122->layer[0], 0);
-	tilemap_set_transparent_pen(k037122->layer[1], 0);
+	k037122->layer[0]->set_transparent_pen(0);
+	k037122->layer[1]->set_transparent_pen(0);
 
 	device->machine().gfx[k037122->gfx_index] = gfx_element_alloc(device->machine(), &k037122_char_layout, (UINT8*)k037122->char_ram, device->machine().total_colors() / 16, 0);
 

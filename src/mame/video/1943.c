@@ -123,7 +123,7 @@ WRITE8_HANDLER( c1943_videoram_w )
 	_1943_state *state = space->machine().driver_data<_1943_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( c1943_colorram_w )
@@ -131,7 +131,7 @@ WRITE8_HANDLER( c1943_colorram_w )
 	_1943_state *state = space->machine().driver_data<_1943_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( c1943_c804_w )
@@ -191,7 +191,7 @@ static TILE_GET_INFO( c1943_get_bg_tile_info )
 	int color = (attr & 0x3c) >> 2;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
-	tileinfo->group = color;
+	tileinfo.group = color;
 	SET_TILE_INFO(1, code, color, flags);
 }
 
@@ -213,7 +213,7 @@ VIDEO_START( 1943 )
 	state->m_fg_tilemap = tilemap_create(machine, c1943_get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[1], 0x0f);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->save_item(NAME(state->m_char_on));
 	state->save_item(NAME(state->m_obj_on));
@@ -257,12 +257,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 SCREEN_UPDATE_IND16( 1943 )
 {
 	_1943_state *state = screen.machine().driver_data<_1943_state>();
-	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bgscrollx[0] + 256 * state->m_bgscrollx[1]);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[0]);
+	state->m_bg2_tilemap->set_scrollx(0, state->m_bgscrollx[0] + 256 * state->m_bgscrollx[1]);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly[0]);
 
 	if (state->m_bg2_on)
-		tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
+		state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -270,13 +270,13 @@ SCREEN_UPDATE_IND16( 1943 )
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	if (state->m_bg1_on)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_obj_on)
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
 	if (state->m_char_on)
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -19,7 +19,7 @@ WRITE16_HANDLER( sderby_videoram_w )
 	sderby_state *state = space->machine().driver_data<sderby_state>();
 
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap,offset/2);
+	state->m_tilemap->mark_tile_dirty(offset/2);
 }
 
 /* MD Layer */
@@ -40,7 +40,7 @@ WRITE16_HANDLER( sderby_md_videoram_w )
 	sderby_state *state = space->machine().driver_data<sderby_state>();
 
 	COMBINE_DATA(&state->m_md_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_md_tilemap,offset/2);
+	state->m_md_tilemap->mark_tile_dirty(offset/2);
 }
 
 /* FG Layer */
@@ -61,7 +61,7 @@ WRITE16_HANDLER( sderby_fg_videoram_w )
 	sderby_state *state = space->machine().driver_data<sderby_state>();
 
 	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset/2);
+	state->m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
 
@@ -102,20 +102,20 @@ VIDEO_START( sderby )
 	state->m_tilemap = tilemap_create(machine, get_sderby_tile_info,tilemap_scan_rows, 16, 16,32,32);
 	state->m_md_tilemap = tilemap_create(machine, get_sderby_md_tile_info,tilemap_scan_rows, 16, 16,32,32);
 
-	tilemap_set_transparent_pen(state->m_md_tilemap,0);
+	state->m_md_tilemap->set_transparent_pen(0);
 
 	state->m_fg_tilemap = tilemap_create(machine, get_sderby_fg_tile_info,tilemap_scan_rows, 8, 8,64,32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16( sderby )
 {
 	sderby_state *state = screen.machine().driver_data<sderby_state>();
 
-	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
+	state->m_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,state->m_md_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_md_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -123,10 +123,10 @@ SCREEN_UPDATE_IND16( pmroulet )
 {
 	sderby_state *state = screen.machine().driver_data<sderby_state>();
 
-	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_md_tilemap,0,0);
+	state->m_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_md_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -139,11 +139,11 @@ WRITE16_HANDLER( sderby_scroll_w )
 
 	switch (offset)
 	{
-		case 0: tilemap_set_scrollx(state->m_fg_tilemap,0,data+2);break;
-		case 1: tilemap_set_scrolly(state->m_fg_tilemap,0,data-8);break;
-		case 2: tilemap_set_scrollx(state->m_md_tilemap,0,data+4);break;
-		case 3: tilemap_set_scrolly(state->m_md_tilemap,0,data-8);break;
-		case 4: tilemap_set_scrollx(state->m_tilemap,0,data+6);   break;
-		case 5: tilemap_set_scrolly(state->m_tilemap,0,data-8);   break;
+		case 0: state->m_fg_tilemap->set_scrollx(0,data+2);break;
+		case 1: state->m_fg_tilemap->set_scrolly(0,data-8);break;
+		case 2: state->m_md_tilemap->set_scrollx(0,data+4);break;
+		case 3: state->m_md_tilemap->set_scrolly(0,data-8);break;
+		case 4: state->m_tilemap->set_scrollx(0,data+6);   break;
+		case 5: state->m_tilemap->set_scrolly(0,data-8);   break;
 	}
 }

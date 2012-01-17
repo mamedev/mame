@@ -130,7 +130,7 @@ static SCREEN_UPDATE_IND16(spool99)
 {
 	spool99_state *state = screen.machine().driver_data<spool99_state>();
 
-	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
+	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -139,7 +139,7 @@ static WRITE8_HANDLER( spool99_vram_w )
 	spool99_state *state = space->machine().driver_data<spool99_state>();
 
 	state->m_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset/2);
+	state->m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
 static WRITE8_HANDLER( spool99_cram_w )
@@ -147,7 +147,7 @@ static WRITE8_HANDLER( spool99_cram_w )
 	spool99_state *state = space->machine().driver_data<spool99_state>();
 
 	state->m_cram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset/2);
+	state->m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
 

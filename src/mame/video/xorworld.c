@@ -53,7 +53,7 @@ WRITE16_HANDLER( xorworld_videoram16_w )
 	xorworld_state *state = space->machine().driver_data<xorworld_state>();
 	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /*
@@ -116,7 +116,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( xorworld )
 {
 	xorworld_state *state = screen.machine().driver_data<xorworld_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

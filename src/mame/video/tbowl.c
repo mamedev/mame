@@ -24,7 +24,7 @@ WRITE8_HANDLER( tbowl_txvideoram_w )
 {
 	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->m_txvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset & 0x7ff);
+	state->m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 /* Bottom BG Layer (bg) Tilemap */
@@ -45,7 +45,7 @@ WRITE8_HANDLER( tbowl_bg2videoram_w )
 {
 	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->m_bg2videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg2_tilemap,offset & 0xfff);
+	state->m_bg2_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
 WRITE8_HANDLER (tbowl_bgxscroll_lo)
@@ -91,7 +91,7 @@ WRITE8_HANDLER( tbowl_bgvideoram_w )
 {
 	tbowl_state *state = space->machine().driver_data<tbowl_state>();
 	state->m_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0xfff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
 WRITE8_HANDLER (tbowl_bg2xscroll_lo)
@@ -208,9 +208,9 @@ VIDEO_START( tbowl )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows, 16, 16,128,32);
 	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,tilemap_scan_rows, 16, 16,128,32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_bg2_tilemap,0);
+	state->m_tx_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg2_tilemap->set_transparent_pen(0);
 }
 
 
@@ -218,18 +218,18 @@ SCREEN_UPDATE_IND16( tbowl_left )
 {
 	tbowl_state *state = screen.machine().driver_data<tbowl_state>();
 
-	tilemap_set_scrollx(state->m_bg_tilemap,  0, state->m_xscroll );
-	tilemap_set_scrolly(state->m_bg_tilemap,  0, state->m_yscroll );
-	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg2xscroll );
-	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg2yscroll );
-	tilemap_set_scrollx(state->m_tx_tilemap,  0, 0 );
-	tilemap_set_scrolly(state->m_tx_tilemap,  0, 0 );
+	state->m_bg_tilemap->set_scrollx(0, state->m_xscroll );
+	state->m_bg_tilemap->set_scrolly(0, state->m_yscroll );
+	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2xscroll );
+	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2yscroll );
+	state->m_tx_tilemap->set_scrollx(0, 0 );
+	state->m_tx_tilemap->set_scrolly(0, 0 );
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect, 0);
-	tilemap_draw(bitmap,cliprect,state->m_bg2_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+	state->m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }
@@ -238,18 +238,18 @@ SCREEN_UPDATE_IND16( tbowl_right )
 {
 	tbowl_state *state = screen.machine().driver_data<tbowl_state>();
 
-	tilemap_set_scrollx(state->m_bg_tilemap,  0, state->m_xscroll+32*8 );
-	tilemap_set_scrolly(state->m_bg_tilemap,  0, state->m_yscroll );
-	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg2xscroll+32*8 );
-	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg2yscroll );
-	tilemap_set_scrollx(state->m_tx_tilemap,  0, 32*8 );
-	tilemap_set_scrolly(state->m_tx_tilemap,  0, 0 );
+	state->m_bg_tilemap->set_scrollx(0, state->m_xscroll+32*8 );
+	state->m_bg_tilemap->set_scrolly(0, state->m_yscroll );
+	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2xscroll+32*8 );
+	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2yscroll );
+	state->m_tx_tilemap->set_scrollx(0, 32*8 );
+	state->m_tx_tilemap->set_scrolly(0, 0 );
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect, 32*8);
-	tilemap_draw(bitmap,cliprect,state->m_bg2_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+	state->m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

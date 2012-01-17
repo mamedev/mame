@@ -45,8 +45,8 @@ VIDEO_START(pirates)
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,     8,8,64,32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	state->m_tx_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -55,21 +55,21 @@ WRITE16_HANDLER( pirates_tx_tileram_w )
 {
 	pirates_state *state = space->machine().driver_data<pirates_state>();
 	COMBINE_DATA(state->m_tx_tileram+offset);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset/2);
+	state->m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_HANDLER( pirates_fg_tileram_w )
 {
 	pirates_state *state = space->machine().driver_data<pirates_state>();
 	COMBINE_DATA(state->m_fg_tileram+offset);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset/2);
+	state->m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_HANDLER( pirates_bg_tileram_w )
 {
 	pirates_state *state = space->machine().driver_data<pirates_state>();
 	COMBINE_DATA(state->m_bg_tileram+offset);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset/2);
+	state->m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
 
@@ -110,11 +110,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16(pirates)
 {
 	pirates_state *state = screen.machine().driver_data<pirates_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_scroll[0]);
-	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scroll[0]);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_bg_tilemap->set_scrollx(0,state->m_scroll[0]);
+	state->m_fg_tilemap->set_scrollx(0,state->m_scroll[0]);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

@@ -60,8 +60,8 @@ VIDEO_START( sf )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, 2048, 16);
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 3);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(3);
 }
 
 
@@ -76,21 +76,21 @@ WRITE16_HANDLER( sf_videoram_w )
 {
 	sf_state *state = space->machine().driver_data<sf_state>();
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( sf_bg_scroll_w )
 {
 	sf_state *state = space->machine().driver_data<sf_state>();
 	COMBINE_DATA(&state->m_bgscroll);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bgscroll);
+	state->m_bg_tilemap->set_scrollx(0, state->m_bgscroll);
 }
 
 WRITE16_HANDLER( sf_fg_scroll_w )
 {
 	sf_state *state = space->machine().driver_data<sf_state>();
 	COMBINE_DATA(&state->m_fgscroll);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_fgscroll);
+	state->m_fg_tilemap->set_scrollx(0, state->m_fgscroll);
 }
 
 WRITE16_HANDLER( sf_gfxctrl_w )
@@ -109,9 +109,9 @@ WRITE16_HANDLER( sf_gfxctrl_w )
 	{
 		state->m_sf_active = data & 0xff;
 		flip_screen_set(space->machine(), data & 0x04);
-		tilemap_set_enable(state->m_tx_tilemap, data & 0x08);
-		tilemap_set_enable(state->m_bg_tilemap, data & 0x20);
-		tilemap_set_enable(state->m_fg_tilemap, data & 0x40);
+		state->m_tx_tilemap->enable(data & 0x08);
+		state->m_bg_tilemap->enable(data & 0x20);
+		state->m_fg_tilemap->enable(data & 0x40);
 	}
 }
 
@@ -223,15 +223,15 @@ SCREEN_UPDATE_IND16( sf )
 	sf_state *state = screen.machine().driver_data<sf_state>();
 
 	if (state->m_sf_active & 0x20)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_sf_active & 0x80)
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

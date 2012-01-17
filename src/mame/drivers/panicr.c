@@ -162,7 +162,7 @@ static TILE_GET_INFO( get_txttile_info )
 	int attr=videoram[tile_index*4+2];
 	int color = attr & 0x07;
 
-	tileinfo->group = color;
+	tileinfo.group = color;
 
 	SET_TILE_INFO(
 		0,
@@ -243,11 +243,11 @@ static SCREEN_UPDATE_IND16( panicr)
 {
 	panicr_state *state = screen.machine().driver_data<panicr_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	tilemap_mark_all_tiles_dirty( state->m_txttilemap );
-	tilemap_set_scrollx( state->m_bgtilemap,0, ((state->m_scrollram[0x02]&0x0f)<<12)+((state->m_scrollram[0x02]&0xf0)<<4)+((state->m_scrollram[0x04]&0x7f)<<1)+((state->m_scrollram[0x04]&0x80)>>7) );
-	tilemap_draw(bitmap,cliprect,state->m_bgtilemap,0,0);
+	state->m_txttilemap ->mark_all_dirty();
+	state->m_bgtilemap->set_scrollx(0, ((state->m_scrollram[0x02]&0x0f)<<12)+((state->m_scrollram[0x02]&0xf0)<<4)+((state->m_scrollram[0x04]&0x7f)<<1)+((state->m_scrollram[0x04]&0x80)>>7) );
+	state->m_bgtilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_txttilemap,0,0);
+	state->m_txttilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

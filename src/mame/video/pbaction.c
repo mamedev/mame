@@ -13,28 +13,28 @@ WRITE8_HANDLER( pbaction_videoram_w )
 {
 	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( pbaction_colorram_w )
 {
 	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( pbaction_videoram2_w )
 {
 	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( pbaction_colorram2_w )
 {
 	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 	state->m_colorram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( pbaction_scroll_w )
@@ -44,8 +44,8 @@ WRITE8_HANDLER( pbaction_scroll_w )
 	if (flip_screen_get(space->machine()))
 		state->m_scroll = -state->m_scroll;
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_scroll);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scroll);
+	state->m_fg_tilemap->set_scrollx(0, state->m_scroll);
 }
 
 WRITE8_HANDLER( pbaction_flipscreen_w )
@@ -81,7 +81,7 @@ VIDEO_START( pbaction )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -136,8 +136,8 @@ SCREEN_UPDATE_IND16( pbaction )
 {
 	pbaction_state *state = screen.machine().driver_data<pbaction_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

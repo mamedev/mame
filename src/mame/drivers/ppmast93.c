@@ -155,14 +155,14 @@ static WRITE8_HANDLER( ppmast93_fgram_w )
 {
 	ppmast93_state *state = space->machine().driver_data<ppmast93_state>();
 	state->m_fgram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset/2);
+	state->m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
 static WRITE8_HANDLER( ppmast93_bgram_w )
 {
 	ppmast93_state *state = space->machine().driver_data<ppmast93_state>();
 	state->m_bgram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset/2);
+	state->m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
 static WRITE8_HANDLER( ppmast93_port4_w )
@@ -346,14 +346,14 @@ static VIDEO_START( ppmast93 )
 	state->m_bg_tilemap = tilemap_create(machine, get_ppmast93_bg_tile_info,tilemap_scan_rows,8,8,32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_ppmast93_fg_tile_info,tilemap_scan_rows,8,8,32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( ppmast93 )
 {
 	ppmast93_state *state = screen.machine().driver_data<ppmast93_state>();
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

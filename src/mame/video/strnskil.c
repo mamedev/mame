@@ -46,7 +46,7 @@ WRITE8_HANDLER( strnskil_videoram_w )
 	strnskil_state *state = space->machine().driver_data<strnskil_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( strnskil_scrl_ctrl_w )
@@ -57,7 +57,7 @@ WRITE8_HANDLER( strnskil_scrl_ctrl_w )
 	if (flip_screen_get(space->machine()) != (data & 0x08))
 	{
 		flip_screen_set(space->machine(), data & 0x08);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -78,7 +78,7 @@ VIDEO_START( strnskil )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 8, 8, 32, 32);
 
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_scroll_rows(32);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -136,16 +136,16 @@ SCREEN_UPDATE_IND16( strnskil )
 			switch (usr1[state->m_scrl_ctrl * 32 + row])
 			{
 			case 2:
-				tilemap_set_scrollx(state->m_bg_tilemap, row, -~state->m_xscroll[1]);
+				state->m_bg_tilemap->set_scrollx(row, -~state->m_xscroll[1]);
 				break;
 			case 4:
-				tilemap_set_scrollx(state->m_bg_tilemap, row, -~state->m_xscroll[0]);
+				state->m_bg_tilemap->set_scrollx(row, -~state->m_xscroll[0]);
 				break;
 			}
 		}
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

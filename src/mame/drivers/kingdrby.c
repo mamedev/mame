@@ -146,7 +146,7 @@ static TILE_GET_INFO( get_sc1_tile_info )
 			color|0x40,
 			0);
 
-	tileinfo->category = (state->m_attr[tile_index] & 0x08)>>3;
+	tileinfo.category = (state->m_attr[tile_index] & 0x08)>>3;
 }
 
 static VIDEO_START(kingdrby)
@@ -156,7 +156,7 @@ static VIDEO_START(kingdrby)
 	state->m_sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,tilemap_scan_rows,8,8,32,24);
 	state->m_sc0w_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_sc1_tilemap,0);
+	state->m_sc1_tilemap->set_transparent_pen(0);
 }
 
 static const UINT8 hw_sprite[16] =
@@ -215,20 +215,20 @@ static SCREEN_UPDATE_IND16(kingdrby)
 	kingdrby_state *state = screen.machine().driver_data<kingdrby_state>();
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
-	tilemap_set_scrollx( state->m_sc0_tilemap,0, state->m_vram[0x342]);
-	tilemap_set_scrolly( state->m_sc0_tilemap,0, state->m_vram[0x341]);
-	tilemap_set_scrollx( state->m_sc1_tilemap,0, state->m_vram[0x342]);
-	tilemap_set_scrolly( state->m_sc1_tilemap,0, state->m_vram[0x341]);
-	tilemap_set_scrolly( state->m_sc0w_tilemap,0, 32);
+	state->m_sc0_tilemap->set_scrollx(0, state->m_vram[0x342]);
+	state->m_sc0_tilemap->set_scrolly(0, state->m_vram[0x341]);
+	state->m_sc1_tilemap->set_scrollx(0, state->m_vram[0x342]);
+	state->m_sc1_tilemap->set_scrolly(0, state->m_vram[0x341]);
+	state->m_sc0w_tilemap->set_scrolly(0, 32);
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
 	clip.set(visarea.min_x, 256, 192, visarea.max_y);
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
-	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
+	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_sc1_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
-	tilemap_draw(bitmap,clip,state->m_sc0w_tilemap,0,0);
+	state->m_sc1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
+	state->m_sc0w_tilemap->draw(bitmap, clip, 0,0);
 
 	return 0;
 }
@@ -237,18 +237,18 @@ static WRITE8_HANDLER( sc0_vram_w )
 {
 	kingdrby_state *state = space->machine().driver_data<kingdrby_state>();
 	state->m_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
-	tilemap_mark_tile_dirty(state->m_sc0w_tilemap,offset);
-	tilemap_mark_tile_dirty(state->m_sc1_tilemap,offset);
+	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	state->m_sc0w_tilemap->mark_tile_dirty(offset);
+	state->m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( sc0_attr_w )
 {
 	kingdrby_state *state = space->machine().driver_data<kingdrby_state>();
 	state->m_attr[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
-	tilemap_mark_tile_dirty(state->m_sc0w_tilemap,offset);
-	tilemap_mark_tile_dirty(state->m_sc1_tilemap,offset);
+	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	state->m_sc0w_tilemap->mark_tile_dirty(offset);
+	state->m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
 /*************************************

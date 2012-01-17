@@ -52,7 +52,7 @@ WRITE8_HANDLER( meadows_videoram_w )
 	meadows_state *state = space->machine().driver_data<meadows_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -109,7 +109,7 @@ SCREEN_UPDATE_IND16( meadows )
 {
 	meadows_state *state = screen.machine().driver_data<meadows_state>();
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	if (screen.machine().gfx[1])

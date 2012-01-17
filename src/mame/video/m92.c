@@ -155,9 +155,9 @@ static TILE_GET_INFO( get_pf_tile_info )
 			tile,
 			attrib & 0x7f,
 			TILE_FLIPYX(attrib >> 9));
-	if (attrib & 0x100) tileinfo->group = 2;
-	else if (attrib & 0x80) tileinfo->group = 1;
-	else tileinfo->group = 0;
+	if (attrib & 0x100) tileinfo.group = 2;
+	else if (attrib & 0x80) tileinfo.group = 1;
+	else tileinfo.group = 0;
 }
 
 /*****************************************************************************/
@@ -173,11 +173,11 @@ WRITE16_HANDLER( m92_vram_w )
 	{
 		if ((offset & 0x6000) == state->m_pf_layer[laynum].vram_base)
 		{
-			tilemap_mark_tile_dirty(state->m_pf_layer[laynum].tmap, (offset & 0x1fff) / 2);
-			tilemap_mark_tile_dirty(state->m_pf_layer[laynum].wide_tmap, (offset & 0x3fff) / 2);
+			state->m_pf_layer[laynum].tmap->mark_tile_dirty((offset & 0x1fff) / 2);
+			state->m_pf_layer[laynum].wide_tmap->mark_tile_dirty((offset & 0x3fff) / 2);
 		}
 		if ((offset & 0x6000) == state->m_pf_layer[laynum].vram_base + 0x2000)
-			tilemap_mark_tile_dirty(state->m_pf_layer[laynum].wide_tmap, (offset & 0x3fff) / 2);
+			state->m_pf_layer[laynum].wide_tmap->mark_tile_dirty((offset & 0x3fff) / 2);
 	}
 }
 
@@ -222,20 +222,20 @@ WRITE16_HANDLER( m92_master_control_w )
 			/* update size (bit 2) */
 			if (state->m_pf_master_control[offset] & 0x04)
 			{
-				tilemap_set_enable(layer->tmap, FALSE);
-				tilemap_set_enable(layer->wide_tmap, (~state->m_pf_master_control[offset] >> 4) & 1);
+				layer->tmap->enable(FALSE);
+				layer->wide_tmap->enable((~state->m_pf_master_control[offset] >> 4) & 1);
 			}
 			else
 			{
-				tilemap_set_enable(layer->tmap, (~state->m_pf_master_control[offset] >> 4) & 1);
-				tilemap_set_enable(layer->wide_tmap, FALSE);
+				layer->tmap->enable((~state->m_pf_master_control[offset] >> 4) & 1);
+				layer->wide_tmap->enable(FALSE);
 			}
 
 			/* mark everything dirty of the VRAM base or size changes */
 			if ((old ^ state->m_pf_master_control[offset]) & 0x07)
 			{
-				tilemap_mark_all_tiles_dirty(layer->tmap);
-				tilemap_mark_all_tiles_dirty(layer->wide_tmap);
+				layer->tmap->mark_all_dirty();
+				layer->wide_tmap->mark_all_dirty();
 			}
 			break;
 
@@ -262,26 +262,26 @@ VIDEO_START( m92 )
 		layer->wide_tmap = tilemap_create(machine, get_pf_tile_info, tilemap_scan_rows,  8,8, 128,64);
 
 		/* set the user data for each one to point to the layer */
-		tilemap_set_user_data(layer->tmap, &state->m_pf_layer[laynum]);
-		tilemap_set_user_data(layer->wide_tmap, &state->m_pf_layer[laynum]);
+		layer->tmap->set_user_data(&state->m_pf_layer[laynum]);
+		layer->wide_tmap->set_user_data(&state->m_pf_layer[laynum]);
 
 		/* set scroll offsets */
-		tilemap_set_scrolldx(layer->tmap, 2 * laynum, -2 * laynum + 8);
-		tilemap_set_scrolldy(layer->tmap, -128, -128);
-		tilemap_set_scrolldx(layer->wide_tmap, 2 * laynum - 256, -2 * laynum + 8 - 256);
-		tilemap_set_scrolldy(layer->wide_tmap, -128, -128);
+		layer->tmap->set_scrolldx(2 * laynum, -2 * laynum + 8);
+		layer->tmap->set_scrolldy(-128, -128);
+		layer->wide_tmap->set_scrolldx(2 * laynum - 256, -2 * laynum + 8 - 256);
+		layer->wide_tmap->set_scrolldy(-128, -128);
 
 		/* layer group 0 - totally transparent in front half */
-		tilemap_set_transmask(layer->tmap, 0, 0xffff, (laynum == 2) ? 0x0000 : 0x0001);
-		tilemap_set_transmask(layer->wide_tmap, 0, 0xffff, (laynum == 2) ? 0x0000 : 0x0001);
+		layer->tmap->set_transmask(0, 0xffff, (laynum == 2) ? 0x0000 : 0x0001);
+		layer->wide_tmap->set_transmask(0, 0xffff, (laynum == 2) ? 0x0000 : 0x0001);
 
 		/* layer group 1 - pens 0-7 transparent in front half */
-		tilemap_set_transmask(layer->tmap, 1, 0x00ff, (laynum == 2) ? 0xff00 : 0xff01);
-		tilemap_set_transmask(layer->wide_tmap, 1, 0x00ff, (laynum == 2) ? 0xff00 : 0xff01);
+		layer->tmap->set_transmask(1, 0x00ff, (laynum == 2) ? 0xff00 : 0xff01);
+		layer->wide_tmap->set_transmask(1, 0x00ff, (laynum == 2) ? 0xff00 : 0xff01);
 
 		/* layer group 2 - pen 0 transparent in front half */
-		tilemap_set_transmask(layer->tmap, 2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
-		tilemap_set_transmask(layer->wide_tmap, 2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
+		layer->tmap->set_transmask(2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
+		layer->wide_tmap->set_transmask(2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 
 		state_save_register_item(machine, "layer", NULL, laynum, layer->vram_base);
 		state_save_register_item_array(machine, "layer", NULL, laynum, layer->control);
@@ -314,10 +314,10 @@ VIDEO_START( ppan )
 		pf_layer_info *layer = &state->m_pf_layer[laynum];
 
 		/* set scroll offsets */
-		tilemap_set_scrolldx(layer->tmap, 2 * laynum + 11, -2 * laynum + 11);
-		tilemap_set_scrolldy(layer->tmap, -8, -8);
-		tilemap_set_scrolldx(layer->wide_tmap, 2 * laynum - 256 + 11, -2 * laynum + 11 - 256);
-		tilemap_set_scrolldy(layer->wide_tmap, -8, -8);
+		layer->tmap->set_scrolldx(2 * laynum + 11, -2 * laynum + 11);
+		layer->tmap->set_scrolldy(-8, -8);
+		layer->wide_tmap->set_scrolldx(2 * laynum - 256 + 11, -2 * laynum + 11 - 256);
+		layer->wide_tmap->set_scrolldy(-8, -8);
 	}
 }
 
@@ -498,24 +498,24 @@ static void m92_update_scroll_positions(running_machine &machine)
 		{
 			const UINT16 *scrolldata = state->m_vram_data + (0xf400 + 0x400 * laynum) / 2;
 
-			tilemap_set_scroll_rows(layer->tmap, 512);
-			tilemap_set_scroll_rows(layer->wide_tmap, 512);
+			layer->tmap->set_scroll_rows(512);
+			layer->wide_tmap->set_scroll_rows(512);
 			for (i = 0; i < 512; i++)
 			{
-				tilemap_set_scrollx(layer->tmap, i, scrolldata[i]);
-				tilemap_set_scrollx(layer->wide_tmap, i, scrolldata[i]);
+				layer->tmap->set_scrollx(i, scrolldata[i]);
+				layer->wide_tmap->set_scrollx(i, scrolldata[i]);
 			}
 		}
 		else
 		{
-			tilemap_set_scroll_rows(layer->tmap, 1);
-			tilemap_set_scroll_rows(layer->wide_tmap, 1);
-			tilemap_set_scrollx(layer->tmap, 0, layer->control[2]);
-			tilemap_set_scrollx(layer->wide_tmap, 0, layer->control[2]);
+			layer->tmap->set_scroll_rows(1);
+			layer->wide_tmap->set_scroll_rows(1);
+			layer->tmap->set_scrollx(0, layer->control[2]);
+			layer->wide_tmap->set_scrollx(0, layer->control[2]);
 		}
 
-		tilemap_set_scrolly(layer->tmap, 0, layer->control[0]);
-		tilemap_set_scrolly(layer->wide_tmap, 0, layer->control[0]);
+		layer->tmap->set_scrolly(0, layer->control[0]);
+		layer->wide_tmap->set_scrolly(0, layer->control[0]);
 	}
 }
 
@@ -527,21 +527,21 @@ static void m92_draw_tiles(running_machine &machine, bitmap_ind16 &bitmap,const 
 
 	if ((~state->m_pf_master_control[2] >> 4) & 1)
 	{
-		tilemap_draw(bitmap, cliprect, state->m_pf_layer[2].wide_tmap, TILEMAP_DRAW_LAYER1, 0);
-		tilemap_draw(bitmap, cliprect, state->m_pf_layer[2].tmap,      TILEMAP_DRAW_LAYER1, 0);
-		tilemap_draw(bitmap, cliprect, state->m_pf_layer[2].wide_tmap, TILEMAP_DRAW_LAYER0, 1);
-		tilemap_draw(bitmap, cliprect, state->m_pf_layer[2].tmap,      TILEMAP_DRAW_LAYER0, 1);
+		state->m_pf_layer[2].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+		state->m_pf_layer[2].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+		state->m_pf_layer[2].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+		state->m_pf_layer[2].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_pf_layer[1].wide_tmap, TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(bitmap, cliprect, state->m_pf_layer[1].tmap,      TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(bitmap, cliprect, state->m_pf_layer[1].wide_tmap, TILEMAP_DRAW_LAYER0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_pf_layer[1].tmap,      TILEMAP_DRAW_LAYER0, 1);
+	state->m_pf_layer[1].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	state->m_pf_layer[1].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	state->m_pf_layer[1].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	state->m_pf_layer[1].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf_layer[0].wide_tmap, TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(bitmap, cliprect, state->m_pf_layer[0].tmap,      TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(bitmap, cliprect, state->m_pf_layer[0].wide_tmap, TILEMAP_DRAW_LAYER0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_pf_layer[0].tmap,      TILEMAP_DRAW_LAYER0, 1);
+	state->m_pf_layer[0].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	state->m_pf_layer[0].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	state->m_pf_layer[0].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	state->m_pf_layer[0].tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 }
 
 

@@ -41,21 +41,21 @@ static TILE_GET_INFO( get_tile_info )
 {
 	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 	int pal = state->m_videoram[tile_index * 2 + 1] & 0x0f;
-	tileinfo->category = (state->m_videoram[tile_index * 2 + 1] & 0x30) >> 4;
+	tileinfo.category = (state->m_videoram[tile_index * 2 + 1] & 0x30) >> 4;
 
-	tileinfo->group = 0;
+	tileinfo.group = 0;
 
 	if ((!nycaptor_spot(machine)) && (pal == 6))
-		tileinfo->group = 1;
+		tileinfo.group = 1;
 
 	if (((nycaptor_spot(machine) == 3) && (pal == 8)) || ((nycaptor_spot(machine) == 1) && (pal == 0xc)))
-		tileinfo->group = 2;
+		tileinfo.group = 2;
 
-	if ((nycaptor_spot(machine) == 1) && (tileinfo->category == 2))
-		tileinfo->group = 3;
+	if ((nycaptor_spot(machine) == 1) && (tileinfo.category == 2))
+		tileinfo.group = 3;
 
 #if NYCAPTOR_DEBUG
-	if (state->m_mask & (1 << tileinfo->category))
+	if (state->m_mask & (1 << tileinfo.category))
 	{
 		if (nycaptor_spot(machine))
 			pal = 0xe;
@@ -79,14 +79,14 @@ VIDEO_START( nycaptor )
 	state->m_spriteram = auto_alloc_array(machine, UINT8, 160);
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32 );
 
-	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xf800, 0x7ff); //split 0
-	tilemap_set_transmask(state->m_bg_tilemap, 1, 0xfe00, 0x01ff);//split 1
-	tilemap_set_transmask(state->m_bg_tilemap, 2, 0xfffc, 0x0003);//split 2
-	tilemap_set_transmask(state->m_bg_tilemap, 3, 0xfff0, 0x000f);//split 3
+	state->m_bg_tilemap->set_transmask(0, 0xf800, 0x7ff); //split 0
+	state->m_bg_tilemap->set_transmask(1, 0xfe00, 0x01ff);//split 1
+	state->m_bg_tilemap->set_transmask(2, 0xfffc, 0x0003);//split 2
+	state->m_bg_tilemap->set_transmask(3, 0xfff0, 0x000f);//split 3
 
 	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
 	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->save_pointer(NAME(state->m_spriteram), 160);
 	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
@@ -97,7 +97,7 @@ WRITE8_HANDLER( nycaptor_videoram_w )
 {
 	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset >> 1);
+	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 READ8_HANDLER( nycaptor_videoram_r )
@@ -141,7 +141,7 @@ WRITE8_HANDLER( nycaptor_gfxctrl_w )
 	if (state->m_char_bank != ((data & 0x18) >> 3))
 	{
 		state->m_char_bank = ((data & 0x18) >> 3);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	state->m_palette_bank = BIT(data, 5);
@@ -164,7 +164,7 @@ WRITE8_HANDLER( nycaptor_scrlram_w )
 {
 	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
 	state->m_scrlram[offset] = data;
-	tilemap_set_scrolly(state->m_bg_tilemap, offset, data);
+	state->m_bg_tilemap->set_scrolly(offset, data);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
@@ -224,7 +224,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
    x - no bg/sprite pri.
 */
 
-#define mKEY_MASK(x,y) if (machine.input().code_pressed_once(x)) { state->m_mask |= y; tilemap_mark_all_tiles_dirty(state->m_bg_tilemap); }
+#define mKEY_MASK(x,y) if (machine.input().code_pressed_once(x)) { state->m_mask |= y; state->m_bg_tilemap->mark_all_dirty(); }
 
 static void nycaptor_setmask( running_machine &machine )
 {
@@ -244,8 +244,8 @@ static void nycaptor_setmask( running_machine &machine )
 	mKEY_MASK(KEYCODE_J, 0x400);
 	mKEY_MASK(KEYCODE_K, 0x800);
 
-	if (machine.input().code_pressed_once(KEYCODE_Z)){state->m_mask = 0; tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);} /* disable */
-	if (machine.input().code_pressed_once(KEYCODE_X)){state->m_mask |= 0x1000; tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);} /* no layers */
+	if (machine.input().code_pressed_once(KEYCODE_Z)){state->m_mask = 0; state->m_bg_tilemap->mark_all_dirty();} /* disable */
+	if (machine.input().code_pressed_once(KEYCODE_X)){state->m_mask |= 0x1000; state->m_bg_tilemap->mark_all_dirty();} /* no layers */
 }
 #endif
 
@@ -257,14 +257,14 @@ SCREEN_UPDATE_IND16( nycaptor )
 	nycaptor_setmask(screen.machine());
 	if (state->m_mask & 0x1000)
 	{
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 3, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 3, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 2, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 2, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 1, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 1, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 		draw_sprites(screen.machine(), bitmap, cliprect, 2);
@@ -279,56 +279,56 @@ SCREEN_UPDATE_IND16( nycaptor )
 	switch (nycaptor_spot(screen.machine()) & 3)
 	{
 	case 0:
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 3, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 6);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 3, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 2, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 2, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 3);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 2);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
 		break;
 
 	case 1:
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 3, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 3);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 3, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 2);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 2, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 1, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 2, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
 		break;
 
 	case 2:
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 3, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 3, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 1, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 2, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 2, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
 		break;
 
 	case 3:
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 1, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
 		break;
 	}
 

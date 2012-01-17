@@ -152,10 +152,10 @@ VIDEO_START( m52 )
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
-	tilemap_set_scrolldx(state->m_bg_tilemap, 128 - 1, -1);
-	tilemap_set_scrolldy(state->m_bg_tilemap, 16, 16);
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 4); /* only lines 192-256 scroll */
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scrolldx(128 - 1, -1);
+	state->m_bg_tilemap->set_scrolldy(16, 16);
+	state->m_bg_tilemap->set_scroll_rows(4); /* only lines 192-256 scroll */
 
 	state->save_item(NAME(state->m_bg1xpos));
 	state->save_item(NAME(state->m_bg1ypos));
@@ -182,10 +182,10 @@ WRITE8_HANDLER( m52_scroll_w )
 
     So we set the first 3 quarters to 255 and the last to the scroll value
 */
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, 255);
-	tilemap_set_scrollx(state->m_bg_tilemap, 1, 255);
-	tilemap_set_scrollx(state->m_bg_tilemap, 2, 255);
-	tilemap_set_scrollx(state->m_bg_tilemap, 3, -data);
+	state->m_bg_tilemap->set_scrollx(0, 255);
+	state->m_bg_tilemap->set_scrollx(1, 255);
+	state->m_bg_tilemap->set_scrollx(2, 255);
+	state->m_bg_tilemap->set_scrollx(3, -data);
 }
 
 
@@ -201,7 +201,7 @@ WRITE8_HANDLER( m52_videoram_w )
 	m52_state *state = space->machine().driver_data<m52_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -210,7 +210,7 @@ WRITE8_HANDLER( m52_colorram_w )
 	m52_state *state = space->machine().driver_data<m52_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -379,9 +379,9 @@ SCREEN_UPDATE_IND16( m52 )
 			draw_background(screen.machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 4); /* cityscape */
 	}
 
-	tilemap_set_flip(state->m_bg_tilemap, flip_screen_get(screen.machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_bg_tilemap->set_flip(flip_screen_get(screen.machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0xfc; offs >= 0; offs -= 4)

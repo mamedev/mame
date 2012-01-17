@@ -61,7 +61,7 @@ SCREEN_UPDATE_IND16( ultratnk )
 	UINT8 *videoram = state->m_videoram;
 	int i;
 
-	tilemap_draw(bitmap, cliprect, state->m_playfield, 0, 0);
+	state->m_playfield->draw(bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -123,7 +123,7 @@ SCREEN_VBLANK( ultratnk )
 
 			rect &= screen.machine().primary_screen->visible_area();
 
-			tilemap_draw(state->m_helper, rect, state->m_playfield, 0, 0);
+			state->m_playfield->draw(state->m_helper, rect, 0, 0);
 
 			if (code & 4)
 				bank = 32;
@@ -154,5 +154,5 @@ WRITE8_HANDLER( ultratnk_video_ram_w )
 	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_playfield, offset);
+	state->m_playfield->mark_tile_dirty(offset);
 }

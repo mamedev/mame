@@ -181,7 +181,7 @@ static TILE_GET_INFO( tx_get_tile_info )
 			code,
 			color,
 			0);
-	tileinfo->group = color;
+	tileinfo.group = color;
 }
 
 
@@ -287,7 +287,7 @@ WRITE16_HANDLER( polepos_view16_w )
 	polepos_state *state = space->machine().driver_data<polepos_state>();
 	COMBINE_DATA(&state->m_view16_memory[offset]);
 	if (offset < 0x400)
-		tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+		state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 READ8_HANDLER( polepos_view_r )
@@ -301,7 +301,7 @@ WRITE8_HANDLER( polepos_view_w )
 	polepos_state *state = space->machine().driver_data<polepos_state>();
 	state->m_view16_memory[offset] = (state->m_view16_memory[offset] & 0xff00) | data;
 	if (offset < 0x400)
-		tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+		state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( polepos_view16_hscroll_w )
@@ -309,7 +309,7 @@ WRITE16_HANDLER( polepos_view16_hscroll_w )
 	polepos_state *state = space->machine().driver_data<polepos_state>();
 
 	COMBINE_DATA(&state->m_scroll);
-	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_scroll);
+	state->m_bg_tilemap->set_scrollx(0,state->m_scroll);
 }
 
 WRITE8_HANDLER( polepos_chacl_w )
@@ -318,7 +318,7 @@ WRITE8_HANDLER( polepos_chacl_w )
 	if (state->m_chacl != (data & 1))
 	{
 		state->m_chacl = data & 1;
-		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
+		state->m_tx_tilemap->mark_all_dirty();
 	}
 }
 
@@ -339,7 +339,7 @@ WRITE16_HANDLER( polepos_alpha16_w )
 {
 	polepos_state *state = space->machine().driver_data<polepos_state>();
 	COMBINE_DATA(&state->m_alpha16_memory[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 READ8_HANDLER( polepos_alpha_r )
@@ -352,7 +352,7 @@ WRITE8_HANDLER( polepos_alpha_w )
 {
 	polepos_state *state = space->machine().driver_data<polepos_state>();
 	state->m_alpha16_memory[offset] = (state->m_alpha16_memory[offset] & 0xff00) | data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -525,9 +525,9 @@ SCREEN_UPDATE_IND16( polepos )
 	polepos_state *state = screen.machine().driver_data<polepos_state>();
 	rectangle clip = cliprect;
 	clip.max_y = 127;
-	tilemap_draw(bitmap,clip,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, clip, 0,0);
 	draw_road(screen.machine(), bitmap);
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

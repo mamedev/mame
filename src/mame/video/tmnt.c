@@ -275,7 +275,7 @@ VIDEO_START( glfgreat )
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	state->m_roz_tilemap = tilemap_create(machine, glfgreat_get_roz_tile_info, tilemap_scan_rows, 16, 16, 512, 512);
-	tilemap_set_transparent_pen(state->m_roz_tilemap,0);
+	state->m_roz_tilemap->set_transparent_pen(0);
 
 	state->m_glfgreat_roz_rom_bank = 0;
 	state->m_glfgreat_roz_char_bank = 0;
@@ -290,7 +290,7 @@ VIDEO_START( prmrsocr )
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 
 	state->m_roz_tilemap = tilemap_create(machine, prmrsocr_get_roz_tile_info, tilemap_scan_rows, 16, 16, 512, 256);
-	tilemap_set_transparent_pen(state->m_roz_tilemap,0);
+	state->m_roz_tilemap->set_transparent_pen(0);
 
 	state->m_prmrsocr_sprite_bank = 0;
 	state->m_glfgreat_roz_char_bank = 0;
@@ -408,7 +408,7 @@ WRITE16_HANDLER( blswhstl_700300_w )
 		if (state->m_blswhstl_rombank != ((data & 0x80) >> 7))
 		{
 			state->m_blswhstl_rombank = (data & 0x80) >> 7;
-			tilemap_mark_all_tiles_dirty_all(space->machine());
+			space->machine().tilemap().mark_all_dirty();
 		}
 
 		/* other bits unknown */
@@ -448,7 +448,7 @@ WRITE16_HANDLER( glfgreat_122000_w )
 		if (state->m_glfgreat_roz_rom_bank != (data & 0x20) >> 5)
 		{
 			state->m_glfgreat_roz_rom_bank = (data & 0x20) >> 5;
-			tilemap_mark_all_tiles_dirty(state->m_roz_tilemap);
+			state->m_roz_tilemap->mark_all_dirty();
 		}
 
 		/* bit 6,7 = 53596 char bank selection for ROM test */

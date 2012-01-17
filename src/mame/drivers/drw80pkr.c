@@ -134,7 +134,7 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 			state->m_video_ram[n_offs] += ((data & 0xf0) << 4 ); // high address
 		}
 
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, n_offs);
+		state->m_bg_tilemap->mark_tile_dirty(n_offs);
 	}
 
 	if (state->m_p2 == 0xc7)
@@ -340,7 +340,7 @@ static VIDEO_START( drw80pkr )
 static SCREEN_UPDATE_IND16( drw80pkr )
 {
 	drw80pkr_state *state = screen.machine().driver_data<drw80pkr_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

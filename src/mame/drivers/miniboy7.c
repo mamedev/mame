@@ -172,14 +172,14 @@ static WRITE8_HANDLER( miniboy7_videoram_w )
 {
 	miniboy7_state *state = space->machine().driver_data<miniboy7_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( miniboy7_colorram_w )
 {
 	miniboy7_state *state = space->machine().driver_data<miniboy7_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -211,7 +211,7 @@ static VIDEO_START( miniboy7 )
 static SCREEN_UPDATE_IND16( miniboy7 )
 {
 	miniboy7_state *state = screen.machine().driver_data<miniboy7_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

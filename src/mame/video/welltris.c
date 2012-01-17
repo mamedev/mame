@@ -148,7 +148,7 @@ static void setbank(welltris_state *state, int num, int bank)
 	if (state->m_gfxbank[num] != bank)
 	{
 		state->m_gfxbank[num] = bank;
-		tilemap_mark_all_tiles_dirty(state->m_char_tilemap);
+		state->m_char_tilemap->mark_all_dirty();
 	}
 }
 
@@ -164,7 +164,7 @@ WRITE16_HANDLER( welltris_palette_bank_w )
 		if (state->m_charpalettebank != (data & 0x03))
 		{
 			state->m_charpalettebank = (data & 0x03);
-			tilemap_mark_all_tiles_dirty(state->m_char_tilemap);
+			state->m_char_tilemap->mark_all_dirty();
 		}
 
 		flip_screen_set(space->machine(), data & 0x80);
@@ -213,7 +213,7 @@ WRITE16_HANDLER( welltris_charvideoram_w )
 	welltris_state *state = space->machine().driver_data<welltris_state>();
 
 	COMBINE_DATA(&state->m_charvideoram[offset]);
-	tilemap_mark_tile_dirty(state->m_char_tilemap, offset);
+	state->m_char_tilemap->mark_tile_dirty(offset);
 }
 
 VIDEO_START( welltris )
@@ -221,7 +221,7 @@ VIDEO_START( welltris )
 	welltris_state *state = machine.driver_data<welltris_state>();
 	state->m_char_tilemap = tilemap_create(machine, get_welltris_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_char_tilemap, 15);
+	state->m_char_tilemap->set_transparent_pen(15);
 }
 
 static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -243,11 +243,11 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 SCREEN_UPDATE_IND16( welltris )
 {
 	welltris_state *state = screen.machine().driver_data<welltris_state>();
-	tilemap_set_scrollx(state->m_char_tilemap, 0, state->m_scrollx);
-	tilemap_set_scrolly(state->m_char_tilemap, 0, state->m_scrolly);
+	state->m_char_tilemap->set_scrollx(0, state->m_scrollx);
+	state->m_char_tilemap->set_scrolly(0, state->m_scrolly);
 
 	draw_background(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_char_tilemap, 0, 0);
+	state->m_char_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

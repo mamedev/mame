@@ -21,7 +21,7 @@ WRITE16_HANDLER( drgnmst_fg_videoram_w )
 {
 	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
 	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset / 2);
+	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_drgnmst_bg_tile_info )
@@ -39,7 +39,7 @@ WRITE16_HANDLER( drgnmst_bg_videoram_w )
 {
 	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
 	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_drgnmst_md_tile_info )
@@ -57,7 +57,7 @@ WRITE16_HANDLER( drgnmst_md_videoram_w )
 {
 	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
 	COMBINE_DATA(&state->m_md_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_md_tilemap, offset / 2);
+	state->m_md_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
@@ -127,16 +127,16 @@ VIDEO_START(drgnmst)
 {
 	drgnmst_state *state = machine.driver_data<drgnmst_state>();
 	state->m_fg_tilemap = tilemap_create(machine, get_drgnmst_fg_tile_info, drgnmst_fg_tilemap_scan_cols, 8, 8, 64,64);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
+	state->m_fg_tilemap->set_transparent_pen(15);
 
 	state->m_md_tilemap = tilemap_create(machine, get_drgnmst_md_tile_info, drgnmst_md_tilemap_scan_cols, 16, 16, 64,64);
-	tilemap_set_transparent_pen(state->m_md_tilemap, 15);
+	state->m_md_tilemap->set_transparent_pen(15);
 
 	state->m_bg_tilemap = tilemap_create(machine, get_drgnmst_bg_tile_info, drgnmst_bg_tilemap_scan_cols, 32, 32, 64,64);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 15);
+	state->m_bg_tilemap->set_transparent_pen(15);
 
 	// do the other tilemaps have rowscroll too? probably not ..
-	tilemap_set_scroll_rows(state->m_md_tilemap, 1024);
+	state->m_md_tilemap->set_scroll_rows(1024);
 }
 
 SCREEN_UPDATE_IND16(drgnmst)
@@ -144,19 +144,19 @@ SCREEN_UPDATE_IND16(drgnmst)
 	drgnmst_state *state = screen.machine().driver_data<drgnmst_state>();
 	int y, rowscroll_bank;
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_vidregs[10] - 18); // verify
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_vidregs[11]); // verify
+	state->m_bg_tilemap->set_scrollx(0, state->m_vidregs[10] - 18); // verify
+	state->m_bg_tilemap->set_scrolly(0, state->m_vidregs[11]); // verify
 
-//  tilemap_set_scrollx(state->m_md_tilemap,0, state->m_vidregs[8] - 16); // rowscrolled
-	tilemap_set_scrolly(state->m_md_tilemap,0, state->m_vidregs[9]); // verify
+//  state->m_md_tilemap->set_scrollx(0, state->m_vidregs[8] - 16); // rowscrolled
+	state->m_md_tilemap->set_scrolly(0, state->m_vidregs[9]); // verify
 
-	tilemap_set_scrollx(state->m_fg_tilemap,0, state->m_vidregs[6] - 18); // verify (test mode colour test needs it)
-	tilemap_set_scrolly(state->m_fg_tilemap,0, state->m_vidregs[7]); // verify
+	state->m_fg_tilemap->set_scrollx(0, state->m_vidregs[6] - 18); // verify (test mode colour test needs it)
+	state->m_fg_tilemap->set_scrolly(0, state->m_vidregs[7]); // verify
 
 	rowscroll_bank = (state->m_vidregs[4] & 0x30) >> 4;
 
 	for (y = 0; y < 1024; y++)
-		tilemap_set_scrollx(state->m_md_tilemap, y, state->m_vidregs[8] - 16 + state->m_rowscrollram[y + 0x800 * rowscroll_bank]);
+		state->m_md_tilemap->set_scrollx(y, state->m_vidregs[8] - 16 + state->m_rowscrollram[y + 0x800 * rowscroll_bank]);
 
 	// todo: figure out which bits relate to the order
 	switch (state->m_vidregs2[0])
@@ -165,31 +165,31 @@ SCREEN_UPDATE_IND16(drgnmst)
 		case 0x2d9a: // fg unsure
 		case 0x2440: // all ok
 		case 0x245a: // fg unsure, title screen
-			tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-			tilemap_draw(bitmap, cliprect, state->m_md_tilemap, 0, 0);
-			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+			state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 			break;
 		case 0x23c0: // all ok
-			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-			tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-			tilemap_draw(bitmap, cliprect, state->m_md_tilemap, 0, 0);
+			state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+			state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
 			break;
 		case 0x38da: // fg unsure
 		case 0x215a: // fg unsure
 		case 0x2140: // all ok
-			tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-			tilemap_draw(bitmap, cliprect, state->m_md_tilemap, 0, 0);
+			state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
 			break;
 		case 0x2d80: // all ok
-			tilemap_draw(bitmap, cliprect, state->m_md_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-			tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+			state->m_md_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+			state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 			break;
 		default:
-			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-			tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-			tilemap_draw(bitmap, cliprect, state->m_md_tilemap, 0, 0);
+			state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+			state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
 			logerror ("unknown video priority regs %04x\n", state->m_vidregs2[0]);
 
 	}

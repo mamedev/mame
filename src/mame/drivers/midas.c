@@ -88,7 +88,7 @@ static VIDEO_START( midas )
 	state->m_tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_cols,
 							8,8, 0x80,0x20	);
 
-	tilemap_set_transparent_pen(state->m_tmap, 0);
+	state->m_tmap->set_transparent_pen(0);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -193,7 +193,7 @@ static SCREEN_UPDATE_IND16( midas )
 	bitmap.fill(4095, cliprect);
 
 	if (layers_ctrl & 2)	draw_sprites(screen.machine(), bitmap,cliprect);
-	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);
+	if (layers_ctrl & 1)	state->m_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -232,7 +232,7 @@ static WRITE16_HANDLER( midas_gfxregs_w )
 			state->m_gfxram[addr] = data;
 			state->m_gfxregs[0] += state->m_gfxregs[2];
 
-			if ( addr >= 0x7000 && addr <= 0x7fff )	tilemap_mark_tile_dirty(state->m_tmap, addr - 0x7000);
+			if ( addr >= 0x7000 && addr <= 0x7fff )	state->m_tmap->mark_tile_dirty(addr - 0x7000);
 
 			break;
 		}

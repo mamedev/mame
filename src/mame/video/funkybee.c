@@ -43,14 +43,14 @@ WRITE8_HANDLER( funkybee_videoram_w )
 {
 	funkybee_state *state = space->machine().driver_data<funkybee_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( funkybee_colorram_w )
 {
 	funkybee_state *state = space->machine().driver_data<funkybee_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( funkybee_gfx_bank_w )
@@ -59,14 +59,14 @@ WRITE8_HANDLER( funkybee_gfx_bank_w )
 	if (state->m_gfx_bank != (data & 0x01))
 	{
 		state->m_gfx_bank = data & 0x01;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
 WRITE8_HANDLER( funkybee_scroll_w )
 {
 	funkybee_state *state = space->machine().driver_data<funkybee_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(space->machine()) ? -data : data);
+	state->m_bg_tilemap->set_scrollx(0, flip_screen_get(space->machine()) ? -data : data);
 }
 
 WRITE8_HANDLER( funkybee_flipscreen_w )
@@ -163,7 +163,7 @@ static void draw_columns( running_machine &machine, bitmap_ind16 &bitmap, const 
 SCREEN_UPDATE_IND16( funkybee )
 {
 	funkybee_state *state = screen.machine().driver_data<funkybee_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	draw_columns(screen.machine(), bitmap, cliprect);
 	return 0;

@@ -43,7 +43,7 @@ VIDEO_START( vb )
 	vball_state *state = machine.driver_data<vball_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan, 8, 8,64,64);
 
-	tilemap_set_scroll_rows(state->m_bg_tilemap,32);
+	state->m_bg_tilemap->set_scroll_rows(32);
 	state->m_gfxset=0;
 	state->m_vb_bgprombank=0xff;
 	state->m_vb_spprombank=0xff;
@@ -53,7 +53,7 @@ WRITE8_HANDLER( vb_videoram_w )
 {
 	vball_state *state = space->machine().driver_data<vball_state>();
 	state->m_vb_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -68,7 +68,7 @@ WRITE8_HANDLER( vb_attrib_w )
 {
 	vball_state *state = space->machine().driver_data<vball_state>();
 	state->m_vb_attribram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 void vb_bgprombank_w( running_machine &machine, int bank )
@@ -107,7 +107,7 @@ void vb_spprombank_w( running_machine &machine, int bank )
 void vb_mark_all_dirty( running_machine &machine )
 {
 	vball_state *state = machine.driver_data<vball_state>();
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 }
 
 #define DRAW_SPRITE( order, sx, sy ) drawgfx_transpen( bitmap, \
@@ -166,14 +166,14 @@ SCREEN_UPDATE_IND16( vb )
 	vball_state *state = screen.machine().driver_data<vball_state>();
 	int i;
 
-	tilemap_set_scrolly(state->m_bg_tilemap,0,state->m_vb_scrolly_hi + *state->m_vb_scrolly_lo);
+	state->m_bg_tilemap->set_scrolly(0,state->m_vb_scrolly_hi + *state->m_vb_scrolly_lo);
 
 	/*To get linescrolling to work properly, we must ignore the 1st two scroll values, no idea why! -SJE */
 	for (i = 2; i < 256; i++) {
-		tilemap_set_scrollx(state->m_bg_tilemap,i,state->m_vb_scrollx[i-2]);
+		state->m_bg_tilemap->set_scrollx(i,state->m_vb_scrollx[i-2]);
 		//logerror("scrollx[%d] = %d\n",i,state->m_vb_scrollx[i]);
 	}
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

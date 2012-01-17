@@ -419,7 +419,7 @@ static TILE_GET_INFO( get_tile_info )
 			(state->m_videoram[tile_index] & 0x7f) | (flip_screen_get(machine) ? 0x80 : 0) | (state->m_galaga_gfxbank << 8),
 			color,
 			flip_screen_get(machine) ? TILE_FLIPX : 0);
-	tileinfo->group = color;
+	tileinfo.group = color;
 }
 
 
@@ -457,7 +457,7 @@ WRITE8_HANDLER( galaga_videoram_w )
 	galaga_state *state =  space->machine().driver_data<galaga_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x3ff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER ( gatsbee_bank_w )
@@ -465,7 +465,7 @@ WRITE8_HANDLER ( gatsbee_bank_w )
 	galaga_state *state =  space->machine().driver_data<galaga_state>();
 
 	state->m_galaga_gfxbank = data & 0x1;
-	tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+	state->m_fg_tilemap->mark_all_dirty();
 }
 
 
@@ -572,7 +572,7 @@ SCREEN_UPDATE_IND16( galaga )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	draw_stars(screen.machine(),bitmap,cliprect);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

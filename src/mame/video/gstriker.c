@@ -43,14 +43,14 @@ WRITE16_HANDLER( VS920A_0_vram_w )
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	COMBINE_DATA(&state->m_VS920A[0].vram[offset]);
-	tilemap_mark_tile_dirty(state->m_VS920A[0].tmap, offset);
+	state->m_VS920A[0].tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( VS920A_1_vram_w )
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	COMBINE_DATA(&state->m_VS920A[1].vram[offset]);
-	tilemap_mark_tile_dirty(state->m_VS920A[1].tmap, offset);
+	state->m_VS920A[1].tmap->mark_tile_dirty(offset);
 }
 
 static void VS920A_init(running_machine &machine, int numchips)
@@ -65,7 +65,7 @@ static void VS920A_init(running_machine &machine, int numchips)
 	{
 		state->m_VS920A[i].tmap = tilemap_create(machine, VS920A_get_tile_info,tilemap_scan_rows,8,8,64,32);
 
-		tilemap_set_transparent_pen(state->m_VS920A[i].tmap, 0);
+		state->m_VS920A[i].tmap->set_transparent_pen(0);
 	}
 }
 
@@ -88,7 +88,7 @@ static void VS920A_draw(gstriker_state *state, int numchip, bitmap_ind16& screen
 {
 	state->m_VS920A_cur_chip = &state->m_VS920A[numchip];
 
-	tilemap_draw(screen, cliprect, state->m_VS920A_cur_chip->tmap, 0, priority);
+	state->m_VS920A_cur_chip->tmap->draw(screen, cliprect, 0, priority);
 }
 
 
@@ -163,11 +163,11 @@ static void MB60553_reg_written(gstriker_state *state, int numchip, int num_reg)
 	switch (num_reg)
 	{
 	case 0:
-		tilemap_set_scrollx(cur->tmap, 0, cur->regs[0]>>4);
+		cur->tmap->set_scrollx(0, cur->regs[0]>>4);
 		break;
 
 	case 1:
-		tilemap_set_scrolly(cur->tmap, 0, cur->regs[1]>>4);
+		cur->tmap->set_scrolly(0, cur->regs[1]>>4);
 		break;
 
 	case 2:
@@ -181,25 +181,25 @@ static void MB60553_reg_written(gstriker_state *state, int numchip, int num_reg)
 	case 4:
 		cur->bank[0] = (cur->regs[4] >> 8) & 0x1F;
 		cur->bank[1] = (cur->regs[4] >> 0) & 0x1F;
-		tilemap_mark_all_tiles_dirty(cur->tmap);
+		cur->tmap->mark_all_dirty();
 		break;
 
 	case 5:
 		cur->bank[2] = (cur->regs[5] >> 8) & 0x1F;
 		cur->bank[3] = (cur->regs[5] >> 0) & 0x1F;
-		tilemap_mark_all_tiles_dirty(cur->tmap);
+		cur->tmap->mark_all_dirty();
 		break;
 
 	case 6:
 		cur->bank[4] = (cur->regs[6] >> 8) & 0x1F;
 		cur->bank[5] = (cur->regs[6] >> 0) & 0x1F;
-		tilemap_mark_all_tiles_dirty(cur->tmap);
+		cur->tmap->mark_all_dirty();
 		break;
 
 	case 7:
 		cur->bank[6] = (cur->regs[7] >> 8) & 0x1F;
 		cur->bank[7] = (cur->regs[7] >> 0) & 0x1F;
-		tilemap_mark_all_tiles_dirty(cur->tmap);
+		cur->tmap->mark_all_dirty();
 		break;
 	}
 }
@@ -223,7 +223,7 @@ static void MB60553_init(running_machine &machine, int numchips)
 	{
 		state->m_MB60553[i].tmap = tilemap_create(machine, MB60553_get_tile_info,twc94_scan, 16,16,128,64);
 
-		tilemap_set_transparent_pen(state->m_MB60553[i].tmap, 0);
+		state->m_MB60553[i].tmap->set_transparent_pen(0);
 	}
 }
 
@@ -269,7 +269,7 @@ static void MB60553_draw(running_machine &machine, int numchip, bitmap_ind16& sc
 
 		clip.min_y = clip.max_y = line;
 
-		tilemap_draw_roz(screen,clip,state->m_MB60553_cur_chip->tmap,startx<<12,starty<<12,
+		state->m_MB60553_cur_chip->tmap->draw_roz(screen, clip, startx<<12,starty<<12,
 				incxx,0,0,incyy,
 				1,
 				0,priority);
@@ -313,7 +313,7 @@ WRITE16_HANDLER(MB60553_0_vram_w)
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	COMBINE_DATA(&state->m_MB60553[0].vram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_MB60553[0].tmap, offset);
+	state->m_MB60553[0].tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER(MB60553_1_vram_w)
@@ -321,7 +321,7 @@ WRITE16_HANDLER(MB60553_1_vram_w)
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	COMBINE_DATA(&state->m_MB60553[1].vram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_MB60553[1].tmap, offset);
+	state->m_MB60553[1].tmap->mark_tile_dirty(offset);
 }
 
 
@@ -574,13 +574,13 @@ VIDEO_START(gstriker)
 	VS920A_init(machine, 1);
 	VS920A_set_gfx_region(state, 0, 0);
 	VS920A_set_pal_base(state, 0, 0x30);
-	tilemap_set_transparent_pen(VS920A_get_tilemap(state, 0),  0xf);
+	VS920A_get_tilemap(state, 0)->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
 	MB60553_init(machine, 1);
 	MB60553_set_gfx_region(state, 0, 1);
 	MB60553_set_pal_base(state, 0, 0);
-	tilemap_set_transparent_pen(MB60553_get_tilemap(state, 0), 0xf);
+	MB60553_get_tilemap(state, 0)->set_transparent_pen(0xf);
 
 	// Initialize the sprite generator
 	CG10103_init(1);
@@ -599,13 +599,13 @@ VIDEO_START(twrldc94)
 	VS920A_init(machine, 1);
 	VS920A_set_gfx_region(state, 0, 0);
 	VS920A_set_pal_base(state, 0, 0x40);
-	tilemap_set_transparent_pen(VS920A_get_tilemap(state, 0),  0xf);
+	VS920A_get_tilemap(state, 0)->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
 	MB60553_init(machine, 1);
 	MB60553_set_gfx_region(state, 0, 1);
 	MB60553_set_pal_base(state, 0, 0x50);
-	tilemap_set_transparent_pen(MB60553_get_tilemap(state, 0), 0xf);
+	MB60553_get_tilemap(state, 0)->set_transparent_pen(0xf);
 
 	// Initialize the sprite generator
 	CG10103_init(1);
@@ -624,13 +624,13 @@ VIDEO_START(vgoalsoc)
 	VS920A_init(machine, 1);
 	VS920A_set_gfx_region(state, 0, 0);
 	VS920A_set_pal_base(state, 0, 0x30);
-	tilemap_set_transparent_pen(VS920A_get_tilemap(state, 0),  0xf);
+	VS920A_get_tilemap(state, 0)->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
 	MB60553_init(machine, 1);
 	MB60553_set_gfx_region(state, 0, 1);
 	MB60553_set_pal_base(state, 0, 0x20);
-	tilemap_set_transparent_pen(MB60553_get_tilemap(state, 0), 0xf);
+	MB60553_get_tilemap(state, 0)->set_transparent_pen(0xf);
 
 	// Initialize the sprite generator
 	CG10103_init(1);

@@ -73,16 +73,16 @@ static VIDEO_START( cultures )
 	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
 	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
 
-	tilemap_set_transparent_pen(state->m_bg1_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_bg0_tilemap, 0);
+	state->m_bg1_tilemap->set_transparent_pen(0);
+	state->m_bg0_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_bg0_tilemap, 502, 10);
-	tilemap_set_scrolldx(state->m_bg1_tilemap, 502, 10);
-	tilemap_set_scrolldx(state->m_bg2_tilemap, 502, 10);
+	state->m_bg0_tilemap->set_scrolldx(502, 10);
+	state->m_bg1_tilemap->set_scrolldx(502, 10);
+	state->m_bg2_tilemap->set_scrolldx(502, 10);
 
-	tilemap_set_scrolldy(state->m_bg0_tilemap, 255, 0);
-	tilemap_set_scrolldy(state->m_bg1_tilemap, 255, 0);
-	tilemap_set_scrolldy(state->m_bg2_tilemap, 255, 0);
+	state->m_bg0_tilemap->set_scrolldy(255, 0);
+	state->m_bg1_tilemap->set_scrolldy(255, 0);
+	state->m_bg2_tilemap->set_scrolldy(255, 0);
 }
 
 static SCREEN_UPDATE_IND16( cultures )
@@ -92,25 +92,25 @@ static SCREEN_UPDATE_IND16( cultures )
 
 	// tilemaps attributes
 	attr = (state->m_bg0_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg0_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
-	tilemap_set_flip(state->m_bg0_tilemap, attr);
+	state->m_bg0_tilemap->set_flip(attr);
 
 	attr = (state->m_bg1_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg1_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
-	tilemap_set_flip(state->m_bg1_tilemap, attr);
+	state->m_bg1_tilemap->set_flip(attr);
 
 	attr = (state->m_bg2_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg2_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
-	tilemap_set_flip(state->m_bg2_tilemap, attr);
+	state->m_bg2_tilemap->set_flip(attr);
 
 	// tilemaps scrolls
-	tilemap_set_scrollx(state->m_bg0_tilemap, 0, (state->m_bg0_regs_x[2] << 8) + state->m_bg0_regs_x[0]);
-	tilemap_set_scrollx(state->m_bg1_tilemap, 0, (state->m_bg1_regs_x[2] << 8) + state->m_bg1_regs_x[0]);
-	tilemap_set_scrollx(state->m_bg2_tilemap, 0, (state->m_bg2_regs_x[2] << 8) + state->m_bg2_regs_x[0]);
-	tilemap_set_scrolly(state->m_bg0_tilemap, 0, (state->m_bg0_regs_y[2] << 8) + state->m_bg0_regs_y[0]);
-	tilemap_set_scrolly(state->m_bg1_tilemap, 0, (state->m_bg1_regs_y[2] << 8) + state->m_bg1_regs_y[0]);
-	tilemap_set_scrolly(state->m_bg2_tilemap, 0, (state->m_bg2_regs_y[2] << 8) + state->m_bg2_regs_y[0]);
+	state->m_bg0_tilemap->set_scrollx(0, (state->m_bg0_regs_x[2] << 8) + state->m_bg0_regs_x[0]);
+	state->m_bg1_tilemap->set_scrollx(0, (state->m_bg1_regs_x[2] << 8) + state->m_bg1_regs_x[0]);
+	state->m_bg2_tilemap->set_scrollx(0, (state->m_bg2_regs_x[2] << 8) + state->m_bg2_regs_x[0]);
+	state->m_bg0_tilemap->set_scrolly(0, (state->m_bg0_regs_y[2] << 8) + state->m_bg0_regs_y[0]);
+	state->m_bg1_tilemap->set_scrolly(0, (state->m_bg1_regs_y[2] << 8) + state->m_bg1_regs_y[0]);
+	state->m_bg2_tilemap->set_scrolly(0, (state->m_bg2_regs_y[2] << 8) + state->m_bg2_regs_y[0]);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg0_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
+	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_bg0_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -141,7 +141,7 @@ static WRITE8_HANDLER( bg0_videoram_w )
 	else
 	{
 		state->m_bg0_videoram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_bg0_tilemap, offset >> 1);
+		state->m_bg0_tilemap->mark_tile_dirty(offset >> 1);
 	}
 }
 
@@ -169,13 +169,13 @@ static WRITE8_HANDLER( bg_bank_w )
 	if (state->m_bg1_bank != (data & 3))
 	{
 		state->m_bg1_bank = data & 3;
-		tilemap_mark_all_tiles_dirty(state->m_bg1_tilemap);
+		state->m_bg1_tilemap->mark_all_dirty();
 	}
 
 	if (state->m_bg2_bank != ((data & 0xc) >> 2))
 	{
 		state->m_bg2_bank = (data & 0xc) >> 2;
-		tilemap_mark_all_tiles_dirty(state->m_bg2_tilemap);
+		state->m_bg2_tilemap->mark_all_dirty();
 	}
 	coin_counter_w(space->machine(), 0, data & 0x10);
 }

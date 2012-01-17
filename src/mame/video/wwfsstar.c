@@ -20,7 +20,7 @@ WRITE16_HANDLER( wwfsstar_fg0_videoram_w )
 	wwfsstar_state *state = space->machine().driver_data<wwfsstar_state>();
 
 	COMBINE_DATA(&state->m_fg0_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg0_tilemap,offset/2);
+	state->m_fg0_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_HANDLER( wwfsstar_bg0_videoram_w )
@@ -28,7 +28,7 @@ WRITE16_HANDLER( wwfsstar_bg0_videoram_w )
 	wwfsstar_state *state = space->machine().driver_data<wwfsstar_state>();
 
 	COMBINE_DATA(&state->m_bg0_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg0_tilemap,offset/2);
+	state->m_bg0_tilemap->mark_tile_dirty(offset/2);
 }
 
 /*******************************************************************************
@@ -214,22 +214,22 @@ VIDEO_START( wwfsstar )
 	wwfsstar_state *state = machine.driver_data<wwfsstar_state>();
 
 	state->m_fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,tilemap_scan_rows, 8, 8,32,32);
-	tilemap_set_transparent_pen(state->m_fg0_tilemap,0);
+	state->m_fg0_tilemap->set_transparent_pen(0);
 
 	state->m_bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,bg0_scan, 16, 16,32,32);
-	tilemap_set_transparent_pen(state->m_fg0_tilemap,0);
+	state->m_fg0_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16( wwfsstar )
 {
 	wwfsstar_state *state = screen.machine().driver_data<wwfsstar_state>();
 
-	tilemap_set_scrolly( state->m_bg0_tilemap, 0, state->m_scrolly  );
-	tilemap_set_scrollx( state->m_bg0_tilemap, 0, state->m_scrollx  );
+	state->m_bg0_tilemap->set_scrolly(0, state->m_scrolly  );
+	state->m_bg0_tilemap->set_scrollx(0, state->m_scrollx  );
 
-	tilemap_draw(bitmap,cliprect,state->m_bg0_tilemap,0,0);
+	state->m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect );
-	tilemap_draw(bitmap,cliprect,state->m_fg0_tilemap,0,0);
+	state->m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

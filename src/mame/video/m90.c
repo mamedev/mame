@@ -30,7 +30,7 @@
 #include "includes/m90.h"
 
 
-INLINE void get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int layer,int page_mask)
+INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int layer,int page_mask)
 {
 	m90_state *state = machine.driver_data<m90_state>();
 	int tile,color;
@@ -43,10 +43,10 @@ INLINE void get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_
 			tile,
 			color&0xf,
 			TILE_FLIPYX((color & 0xc0) >> 6));
-			tileinfo->category = (color & 0x30) ? 1 : 0;
+			tileinfo.category = (color & 0x30) ? 1 : 0;
 }
 
-INLINE void bomblord_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int layer)
+INLINE void bomblord_get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int layer)
 {
 	m90_state *state = machine.driver_data<m90_state>();
 	int tile,color;
@@ -59,10 +59,10 @@ INLINE void bomblord_get_tile_info(running_machine &machine,tile_data *tileinfo,
 			tile,
 			color&0xf,
 			TILE_FLIPYX((color & 0xc0) >> 6));
-			tileinfo->category = (color & 0x30) ? 1 : 0;
+			tileinfo.category = (color & 0x30) ? 1 : 0;
 }
 
-INLINE void dynablsb_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int layer)
+INLINE void dynablsb_get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int layer)
 {
 	m90_state *state = machine.driver_data<m90_state>();
 	int tile,color;
@@ -75,7 +75,7 @@ INLINE void dynablsb_get_tile_info(running_machine &machine,tile_data *tileinfo,
 			tile,
 			color&0xf,
 			TILE_FLIPYX((color & 0xc0) >> 6));
-			tileinfo->category = (color & 0x30) ? 1 : 0;
+			tileinfo.category = (color & 0x30) ? 1 : 0;
 }
 
 static TILE_GET_INFO( get_pf1_tile_info ) { get_tile_info(machine,tileinfo,tile_index,0,0x3); }
@@ -101,8 +101,8 @@ VIDEO_START( m90 )
 	state->m_pf2_layer =      tilemap_create(machine, get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
 	state->m_pf2_wide_layer = tilemap_create(machine, get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
 
-	tilemap_set_transparent_pen(state->m_pf1_layer,0);
-	tilemap_set_transparent_pen(state->m_pf1_wide_layer,0);
+	state->m_pf1_layer->set_transparent_pen(0);
+	state->m_pf1_wide_layer->set_transparent_pen(0);
 
 	state_save_register_global_array(machine, state->m_video_control_data);
 	state_save_register_global(machine, state->m_last_pf1);
@@ -117,10 +117,10 @@ VIDEO_START( bomblord )
 	state->m_pf2_layer =      tilemap_create(machine, bomblord_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
 	state->m_pf2_wide_layer = tilemap_create(machine, bomblord_get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
 
-	tilemap_set_transparent_pen(state->m_pf2_layer,0);
-	tilemap_set_transparent_pen(state->m_pf2_wide_layer,0);
-	tilemap_set_transparent_pen(state->m_pf1_layer,0);
-	tilemap_set_transparent_pen(state->m_pf1_wide_layer,0);
+	state->m_pf2_layer->set_transparent_pen(0);
+	state->m_pf2_wide_layer->set_transparent_pen(0);
+	state->m_pf1_layer->set_transparent_pen(0);
+	state->m_pf1_wide_layer->set_transparent_pen(0);
 
 	state_save_register_global_array(machine, state->m_video_control_data);
 }
@@ -133,8 +133,8 @@ VIDEO_START( dynablsb )
 	state->m_pf2_layer =      tilemap_create(machine, dynablsb_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
 	state->m_pf2_wide_layer = tilemap_create(machine, dynablsb_get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
 
-	tilemap_set_transparent_pen(state->m_pf2_layer,0);
-	tilemap_set_transparent_pen(state->m_pf2_wide_layer,0);
+	state->m_pf2_layer->set_transparent_pen(0);
+	state->m_pf2_wide_layer->set_transparent_pen(0);
 
 	state_save_register_global_array(machine, state->m_video_control_data);
 }
@@ -283,7 +283,7 @@ static void markdirty(tilemap_t *tmap,int page,offs_t offset)
 	offset -= page * 0x2000;
 
 	if (offset >= 0 && offset < 0x2000)
-		tilemap_mark_tile_dirty(tmap,offset/2);
+		tmap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_HANDLER( m90_video_w )
@@ -308,21 +308,21 @@ SCREEN_UPDATE_IND16( m90 )
 	if (state->m_video_control_data[5]&0x10) pf1_enable=0; else pf1_enable=1;
 	if (state->m_video_control_data[6]&0x10) pf2_enable=0; else pf2_enable=1;
 
-// tilemap_set_enable(state->m_pf1_layer,pf1_enable);
-// tilemap_set_enable(state->m_pf2_layer,pf2_enable);
-// tilemap_set_enable(state->m_pf1_wide_layer,pf1_enable);
-// tilemap_set_enable(state->m_pf2_wide_layer,pf2_enable);
+// state->m_pf1_layer->enable(pf1_enable);
+// state->m_pf2_layer->enable(pf2_enable);
+// state->m_pf1_wide_layer->enable(pf1_enable);
+// state->m_pf2_wide_layer->enable(pf2_enable);
 
 	/* Dirty tilemaps if VRAM base changes */
 	if (pf1_base!=state->m_last_pf1)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_pf1_layer);
-		tilemap_mark_all_tiles_dirty(state->m_pf1_wide_layer);
+		state->m_pf1_layer->mark_all_dirty();
+		state->m_pf1_wide_layer->mark_all_dirty();
 	}
 	if (pf2_base!=state->m_last_pf2)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_pf2_layer);
-		tilemap_mark_all_tiles_dirty(state->m_pf2_wide_layer);
+		state->m_pf2_layer->mark_all_dirty();
+		state->m_pf2_wide_layer->mark_all_dirty();
 	}
 	state->m_last_pf1=pf1_base;
 	state->m_last_pf2=pf2_base;
@@ -330,37 +330,37 @@ SCREEN_UPDATE_IND16( m90 )
 	/* Setup scrolling */
 	if (state->m_video_control_data[5]&0x20)
 	{
-		tilemap_set_scroll_rows(state->m_pf1_layer,512);
-		tilemap_set_scroll_rows(state->m_pf1_wide_layer,512);
+		state->m_pf1_layer->set_scroll_rows(512);
+		state->m_pf1_wide_layer->set_scroll_rows(512);
 
 		for (i=0; i<512; i++)
-			tilemap_set_scrollx( state->m_pf1_layer,i, state->m_video_data[0xf000/2+i]+2);
+			state->m_pf1_layer->set_scrollx(i, state->m_video_data[0xf000/2+i]+2);
 		for (i=0; i<512; i++)
-			tilemap_set_scrollx( state->m_pf1_wide_layer,i, state->m_video_data[0xf000/2+i]+256+2);
+			state->m_pf1_wide_layer->set_scrollx(i, state->m_video_data[0xf000/2+i]+256+2);
 
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->m_pf1_layer,1);
-		tilemap_set_scroll_rows(state->m_pf1_wide_layer,1);
-		tilemap_set_scrollx( state->m_pf1_layer,0, state->m_video_control_data[1]+2);
-		tilemap_set_scrollx( state->m_pf1_wide_layer,0, state->m_video_control_data[1]+256+2);
+		state->m_pf1_layer->set_scroll_rows(1);
+		state->m_pf1_wide_layer->set_scroll_rows(1);
+		state->m_pf1_layer->set_scrollx(0, state->m_video_control_data[1]+2);
+		state->m_pf1_wide_layer->set_scrollx(0, state->m_video_control_data[1]+256+2);
 	}
 
 	/* Setup scrolling */
 	if (state->m_video_control_data[6]&0x20)
 	{
-		tilemap_set_scroll_rows(state->m_pf2_layer,512);
-		tilemap_set_scroll_rows(state->m_pf2_wide_layer,512);
+		state->m_pf2_layer->set_scroll_rows(512);
+		state->m_pf2_wide_layer->set_scroll_rows(512);
 		for (i=0; i<512; i++)
-			tilemap_set_scrollx( state->m_pf2_layer,i, state->m_video_data[0xf400/2+i]-2);
+			state->m_pf2_layer->set_scrollx(i, state->m_video_data[0xf400/2+i]-2);
 		for (i=0; i<512; i++)
-			tilemap_set_scrollx( state->m_pf2_wide_layer,i, state->m_video_data[0xf400/2+i]+256-2);
+			state->m_pf2_wide_layer->set_scrollx(i, state->m_video_data[0xf400/2+i]+256-2);
 	} else {
-		tilemap_set_scroll_rows(state->m_pf2_layer,1);
-		tilemap_set_scroll_rows(state->m_pf2_wide_layer,1);
-		tilemap_set_scrollx( state->m_pf2_layer,0, state->m_video_control_data[3]-2);
-		tilemap_set_scrollx( state->m_pf2_wide_layer,0, state->m_video_control_data[3]+256-2 );
+		state->m_pf2_layer->set_scroll_rows(1);
+		state->m_pf2_wide_layer->set_scroll_rows(1);
+		state->m_pf2_layer->set_scrollx(0, state->m_video_control_data[3]-2);
+		state->m_pf2_wide_layer->set_scrollx(0, state->m_video_control_data[3]+256-2 );
 	}
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
@@ -384,13 +384,13 @@ SCREEN_UPDATE_IND16( m90 )
 
 					if (state->m_video_control_data[6] & 0x4)
 					{
-						tilemap_set_scrolly(state->m_pf2_wide_layer, 0, 0x200 + state->m_video_data[0xfc00/2 + line]);
-						tilemap_draw(bitmap,clip,state->m_pf2_wide_layer,0,0);
-						tilemap_draw(bitmap,clip,state->m_pf2_wide_layer,1,1);
+						state->m_pf2_wide_layer->set_scrolly(0, 0x200 + state->m_video_data[0xfc00/2 + line]);
+						state->m_pf2_wide_layer->draw(bitmap, clip, 0,0);
+						state->m_pf2_wide_layer->draw(bitmap, clip, 1,1);
 					} else {
-						tilemap_set_scrolly(state->m_pf2_layer, 0, 0x200 + state->m_video_data[0xfc00/2 + line]);
-						tilemap_draw(bitmap,clip,state->m_pf2_layer,0,0);
-						tilemap_draw(bitmap,clip,state->m_pf2_layer,1,1);
+						state->m_pf2_layer->set_scrolly(0, 0x200 + state->m_video_data[0xfc00/2 + line]);
+						state->m_pf2_layer->draw(bitmap, clip, 0,0);
+						state->m_pf2_layer->draw(bitmap, clip, 1,1);
 					}
 				}
 			}
@@ -398,13 +398,13 @@ SCREEN_UPDATE_IND16( m90 )
 			{
 				if (state->m_video_control_data[6] & 0x4)
 				{
-					tilemap_set_scrolly( state->m_pf2_wide_layer,0, state->m_video_control_data[2] );
-					tilemap_draw(bitmap,cliprect,state->m_pf2_wide_layer,0,0);
-					tilemap_draw(bitmap,cliprect,state->m_pf2_wide_layer,1,1);
+					state->m_pf2_wide_layer->set_scrolly(0, state->m_video_control_data[2] );
+					state->m_pf2_wide_layer->draw(bitmap, cliprect, 0,0);
+					state->m_pf2_wide_layer->draw(bitmap, cliprect, 1,1);
 				} else {
-					tilemap_set_scrolly( state->m_pf2_layer,0, state->m_video_control_data[2] );
-					tilemap_draw(bitmap,cliprect,state->m_pf2_layer,0,0);
-					tilemap_draw(bitmap,cliprect,state->m_pf2_layer,1,1);
+					state->m_pf2_layer->set_scrolly(0, state->m_video_control_data[2] );
+					state->m_pf2_layer->draw(bitmap, cliprect, 0,0);
+					state->m_pf2_layer->draw(bitmap, cliprect, 1,1);
 				}
 			}
 		}
@@ -429,13 +429,13 @@ SCREEN_UPDATE_IND16( m90 )
 
 					if (state->m_video_control_data[5] & 0x4)
 					{
-						tilemap_set_scrolly(state->m_pf1_wide_layer, 0, 0x200 + state->m_video_data[0xf800/2 + line]);
-						tilemap_draw(bitmap,clip,state->m_pf1_wide_layer,0,0);
-						tilemap_draw(bitmap,clip,state->m_pf1_wide_layer,1,1);
+						state->m_pf1_wide_layer->set_scrolly(0, 0x200 + state->m_video_data[0xf800/2 + line]);
+						state->m_pf1_wide_layer->draw(bitmap, clip, 0,0);
+						state->m_pf1_wide_layer->draw(bitmap, clip, 1,1);
 					} else {
-						tilemap_set_scrolly(state->m_pf1_layer, 0, 0x200 + state->m_video_data[0xf800/2 + line]);
-						tilemap_draw(bitmap,clip,state->m_pf1_layer,0,0);
-						tilemap_draw(bitmap,clip,state->m_pf1_layer,1,1);
+						state->m_pf1_layer->set_scrolly(0, 0x200 + state->m_video_data[0xf800/2 + line]);
+						state->m_pf1_layer->draw(bitmap, clip, 0,0);
+						state->m_pf1_layer->draw(bitmap, clip, 1,1);
 					}
 				}
 			}
@@ -443,13 +443,13 @@ SCREEN_UPDATE_IND16( m90 )
 			{
 				if (state->m_video_control_data[5] & 0x4)
 				{
-					tilemap_set_scrolly( state->m_pf1_wide_layer,0, state->m_video_control_data[0] );
-					tilemap_draw(bitmap,cliprect,state->m_pf1_wide_layer,0,0);
-					tilemap_draw(bitmap,cliprect,state->m_pf1_wide_layer,1,1);
+					state->m_pf1_wide_layer->set_scrolly(0, state->m_video_control_data[0] );
+					state->m_pf1_wide_layer->draw(bitmap, cliprect, 0,0);
+					state->m_pf1_wide_layer->draw(bitmap, cliprect, 1,1);
 				} else {
-					tilemap_set_scrolly( state->m_pf1_layer,0, state->m_video_control_data[0] );
-					tilemap_draw(bitmap,cliprect,state->m_pf1_layer,0,0);
-					tilemap_draw(bitmap,cliprect,state->m_pf1_layer,1,1);
+					state->m_pf1_layer->set_scrolly(0, state->m_video_control_data[0] );
+					state->m_pf1_layer->draw(bitmap, cliprect, 0,0);
+					state->m_pf1_layer->draw(bitmap, cliprect, 1,1);
 				}
 			}
 		}
@@ -472,43 +472,43 @@ SCREEN_UPDATE_IND16( bomblord )
 
 	/* Setup scrolling */
 	if (state->m_video_control_data[6]&0x20) {
-		tilemap_set_scroll_rows(state->m_pf1_layer,512);
-		tilemap_set_scroll_rows(state->m_pf1_wide_layer,512);
+		state->m_pf1_layer->set_scroll_rows(512);
+		state->m_pf1_wide_layer->set_scroll_rows(512);
 		for (i=0; i<512; i++)
-			tilemap_set_scrollx( state->m_pf1_layer,i, state->m_video_data[0xf400/2+i]-12);
+			state->m_pf1_layer->set_scrollx(i, state->m_video_data[0xf400/2+i]-12);
 		for (i=0; i<512; i++)
-			tilemap_set_scrollx( state->m_pf1_wide_layer,i, state->m_video_data[0xf400/2+i]-12+256);
+			state->m_pf1_wide_layer->set_scrollx(i, state->m_video_data[0xf400/2+i]-12+256);
 	} else {
-		tilemap_set_scroll_rows(state->m_pf1_layer,1);
-		tilemap_set_scroll_rows(state->m_pf1_wide_layer,1);
-		tilemap_set_scrollx( state->m_pf1_layer,0,  state->m_video_data[0xf004/2]-12);
-		tilemap_set_scrollx( state->m_pf1_wide_layer,0, state->m_video_data[0xf004/2]-12 );
+		state->m_pf1_layer->set_scroll_rows(1);
+		state->m_pf1_wide_layer->set_scroll_rows(1);
+		state->m_pf1_layer->set_scrollx(0,  state->m_video_data[0xf004/2]-12);
+		state->m_pf1_wide_layer->set_scrollx(0, state->m_video_data[0xf004/2]-12 );
 	}
 
 	if (state->m_video_control_data[6] & 0x02) {
-		tilemap_mark_all_tiles_dirty(state->m_pf2_wide_layer);
-		tilemap_set_scrollx( state->m_pf2_wide_layer,0, state->m_video_data[0xf000/2]-16 );
-		tilemap_set_scrolly( state->m_pf2_wide_layer,0, state->m_video_data[0xf008/2]+388 );
-		tilemap_draw(bitmap,cliprect,state->m_pf2_wide_layer,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_pf2_wide_layer,1,1);
+		state->m_pf2_wide_layer->mark_all_dirty();
+		state->m_pf2_wide_layer->set_scrollx(0, state->m_video_data[0xf000/2]-16 );
+		state->m_pf2_wide_layer->set_scrolly(0, state->m_video_data[0xf008/2]+388 );
+		state->m_pf2_wide_layer->draw(bitmap, cliprect, 0,0);
+		state->m_pf2_wide_layer->draw(bitmap, cliprect, 1,1);
 	} else {
-		tilemap_mark_all_tiles_dirty(state->m_pf2_layer);
-		tilemap_set_scrollx( state->m_pf2_layer,0, state->m_video_data[0xf000/2]-16 );
-		tilemap_set_scrolly( state->m_pf2_layer,0, state->m_video_data[0xf008/2]-120 );
-		tilemap_draw(bitmap,cliprect,state->m_pf2_layer,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_pf2_layer,1,1);
+		state->m_pf2_layer->mark_all_dirty();
+		state->m_pf2_layer->set_scrollx(0, state->m_video_data[0xf000/2]-16 );
+		state->m_pf2_layer->set_scrolly(0, state->m_video_data[0xf008/2]-120 );
+		state->m_pf2_layer->draw(bitmap, cliprect, 0,0);
+		state->m_pf2_layer->draw(bitmap, cliprect, 1,1);
 	}
 
 	if (state->m_video_control_data[6] & 0x04) {
-		tilemap_mark_all_tiles_dirty(state->m_pf1_wide_layer);
-		tilemap_set_scrolly( state->m_pf1_wide_layer,0, state->m_video_data[0xf00c/2]+392 );
-		tilemap_draw(bitmap,cliprect,state->m_pf1_wide_layer,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_pf1_wide_layer,1,1);
+		state->m_pf1_wide_layer->mark_all_dirty();
+		state->m_pf1_wide_layer->set_scrolly(0, state->m_video_data[0xf00c/2]+392 );
+		state->m_pf1_wide_layer->draw(bitmap, cliprect, 0,0);
+		state->m_pf1_wide_layer->draw(bitmap, cliprect, 1,1);
 	} else {
-		tilemap_mark_all_tiles_dirty(state->m_pf1_layer);
-		tilemap_set_scrolly( state->m_pf1_layer,0, state->m_video_data[0xf00c/2]-116 );
-		tilemap_draw(bitmap,cliprect,state->m_pf1_layer,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_pf1_layer,1,1);
+		state->m_pf1_layer->mark_all_dirty();
+		state->m_pf1_layer->set_scrolly(0, state->m_video_data[0xf00c/2]-116 );
+		state->m_pf1_layer->draw(bitmap, cliprect, 0,0);
+		state->m_pf1_layer->draw(bitmap, cliprect, 1,1);
 	}
 
 	bomblord_draw_sprites(screen.machine(),bitmap,cliprect);
@@ -523,35 +523,35 @@ SCREEN_UPDATE_IND16( dynablsb )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if (!(state->m_video_data[0xf008/2] & 0x4000)) {
-		tilemap_mark_all_tiles_dirty(state->m_pf1_wide_layer);
-		tilemap_set_scroll_rows(state->m_pf1_wide_layer,1);
-		tilemap_set_scrollx( state->m_pf1_wide_layer,0, state->m_video_data[0xf004/2]+64);
-		tilemap_set_scrolly( state->m_pf1_wide_layer,0, state->m_video_data[0xf006/2]+512);
-		tilemap_draw(bitmap,cliprect,state->m_pf1_wide_layer,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_pf1_wide_layer,1,1);
+		state->m_pf1_wide_layer->mark_all_dirty();
+		state->m_pf1_wide_layer->set_scroll_rows(1);
+		state->m_pf1_wide_layer->set_scrollx(0, state->m_video_data[0xf004/2]+64);
+		state->m_pf1_wide_layer->set_scrolly(0, state->m_video_data[0xf006/2]+512);
+		state->m_pf1_wide_layer->draw(bitmap, cliprect, 0,0);
+		state->m_pf1_wide_layer->draw(bitmap, cliprect, 1,1);
 	} else {
-		tilemap_mark_all_tiles_dirty(state->m_pf1_layer);
-		tilemap_set_scroll_rows(state->m_pf1_layer,1);
-		tilemap_set_scrollx( state->m_pf1_layer,0, state->m_video_data[0xf004/2]+64);
-		tilemap_set_scrolly( state->m_pf1_layer,0, state->m_video_data[0xf006/2]+4);
-		tilemap_draw(bitmap,cliprect,state->m_pf1_layer,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_pf1_layer,1,1);
+		state->m_pf1_layer->mark_all_dirty();
+		state->m_pf1_layer->set_scroll_rows(1);
+		state->m_pf1_layer->set_scrollx(0, state->m_video_data[0xf004/2]+64);
+		state->m_pf1_layer->set_scrolly(0, state->m_video_data[0xf006/2]+4);
+		state->m_pf1_layer->draw(bitmap, cliprect, 0,0);
+		state->m_pf1_layer->draw(bitmap, cliprect, 1,1);
 	}
 
 	if (!(state->m_video_data[0xf008/2] & 0x8000)) {
-		tilemap_mark_all_tiles_dirty(state->m_pf2_wide_layer);
-		tilemap_set_scroll_rows(state->m_pf2_wide_layer,1);
-		tilemap_set_scrollx( state->m_pf2_wide_layer,0, state->m_video_data[0xf000/2]+68);
-		tilemap_set_scrolly( state->m_pf2_wide_layer,0, state->m_video_data[0xf002/2]+512);
-		tilemap_draw(bitmap,cliprect,state->m_pf2_wide_layer,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_pf2_wide_layer,1,1);
+		state->m_pf2_wide_layer->mark_all_dirty();
+		state->m_pf2_wide_layer->set_scroll_rows(1);
+		state->m_pf2_wide_layer->set_scrollx(0, state->m_video_data[0xf000/2]+68);
+		state->m_pf2_wide_layer->set_scrolly(0, state->m_video_data[0xf002/2]+512);
+		state->m_pf2_wide_layer->draw(bitmap, cliprect, 0,0);
+		state->m_pf2_wide_layer->draw(bitmap, cliprect, 1,1);
 	} else {
-		tilemap_mark_all_tiles_dirty(state->m_pf2_layer);
-		tilemap_set_scroll_rows(state->m_pf2_layer,1);
-		tilemap_set_scrollx( state->m_pf2_layer,0, state->m_video_data[0xf000/2]+68);
-		tilemap_set_scrolly( state->m_pf2_layer,0, state->m_video_data[0xf002/2]+4);
-		tilemap_draw(bitmap,cliprect,state->m_pf2_layer,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_pf2_layer,1,1);
+		state->m_pf2_layer->mark_all_dirty();
+		state->m_pf2_layer->set_scroll_rows(1);
+		state->m_pf2_layer->set_scrollx(0, state->m_video_data[0xf000/2]+68);
+		state->m_pf2_layer->set_scrolly(0, state->m_video_data[0xf002/2]+4);
+		state->m_pf2_layer->draw(bitmap, cliprect, 0,0);
+		state->m_pf2_layer->draw(bitmap, cliprect, 1,1);
 	}
 
 	dynablsb_draw_sprites(screen.machine(),bitmap,cliprect);

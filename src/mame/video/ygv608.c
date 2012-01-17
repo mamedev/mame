@@ -789,20 +789,20 @@ SCREEN_UPDATE_IND16( ygv608 )
 			tilemap_A = tilemap_A_cache_8[index];
 		else
 			tilemap_A = tilemap_A_cache_16[index];
-		tilemap_mark_all_tiles_dirty(tilemap_A);
+		tilemap_A->mark_all_dirty();
 
-		tilemap_set_transparent_pen( tilemap_A, 0 );
+		tilemap_A->set_transparent_pen(0 );
 		// for NCV1 it's sufficient to scroll only columns
-		tilemap_set_scroll_cols( tilemap_A, ygv608.page_x );
+		tilemap_A->set_scroll_cols(ygv608.page_x );
 
 		if ((ygv608.regs.s.r9 & r9_pts) == PTS_8X8 )
 			tilemap_B = tilemap_B_cache_8[index];
 		else
 			tilemap_B = tilemap_B_cache_16[index];
-		tilemap_mark_all_tiles_dirty(tilemap_B);
+		tilemap_B->mark_all_dirty();
 
 		// for NCV1 it's sufficient to scroll only columns
-		tilemap_set_scroll_cols( tilemap_B, ygv608.page_x );
+		tilemap_B->set_scroll_cols(ygv608.page_x );
 
 		// now clear the screen in case we change to 1-plane mode
 		work_bitmap->fill(0, finalclip );
@@ -815,11 +815,11 @@ SCREEN_UPDATE_IND16( ygv608 )
 
   for( col=0; col<ygv608.page_x; col++ )
   {
-    tilemap_set_scrolly( tilemap_B, col,
+    tilemap_B->set_scrolly(col,
 			   ( (int)ygv608.scroll_data_table[1][(col>>ygv608.col_shift)<<1] +
 			     ( (int)ygv608.scroll_data_table[1][((col>>ygv608.col_shift)<<1)+1] << 8 ) ) );
 
-    tilemap_set_scrolly( tilemap_A, col,
+    tilemap_A->set_scrolly(col,
 			 ( (int)ygv608.scroll_data_table[0][(col>>ygv608.col_shift)<<1] +
 			   ( (int)ygv608.scroll_data_table[0][((col>>ygv608.col_shift)<<1)+1] << 8 ) ) );
   }
@@ -828,24 +828,24 @@ SCREEN_UPDATE_IND16( ygv608 )
 
 #ifdef _ENABLE_SCROLLX
 
-    tilemap_set_scrollx( tilemap_B, 0,
+    tilemap_B->set_scrollx(0,
 			   ( (int)ygv608.scroll_data_table[1][0x80] +
 			     ( (int)ygv608.scroll_data_table[1][0x81] << 8 ) ) );
 
-    tilemap_set_scrollx( tilemap_A, 0,
+    tilemap_A->set_scrollx(0,
 			 ( (int)ygv608.scroll_data_table[0][0x80] +
 			   ( (int)ygv608.scroll_data_table[0][0x81] << 8 ) ) );
 
 #endif
 
-	tilemap_set_enable( tilemap_A, ygv608.regs.s.r7 & r7_dspe);
+	tilemap_A->enable(ygv608.regs.s.r7 & r7_dspe);
 	if((ygv608.regs.s.r7 & r7_md) & MD_1PLANE )
-		tilemap_set_enable( tilemap_B, 0 );
+		tilemap_B->enable(0 );
 	else
-		tilemap_set_enable( tilemap_B, ygv608.regs.s.r7 & r7_dspe);
+		tilemap_B->enable(ygv608.regs.s.r7 & r7_dspe);
 
-	tilemap_mark_all_tiles_dirty( tilemap_A );
-	tilemap_mark_all_tiles_dirty( tilemap_B );
+	tilemap_A ->mark_all_dirty();
+	tilemap_B ->mark_all_dirty();
 
 
 	/*
@@ -863,7 +863,7 @@ SCREEN_UPDATE_IND16( ygv608 )
 	}
 	else
 #endif
-		tilemap_draw( *work_bitmap,finalclip, tilemap_B, 0, 0 );
+		tilemap_B->draw(*work_bitmap, finalclip, 0, 0 );
 
 #ifdef _ENABLE_ROTATE_ZOOM
 
@@ -900,7 +900,7 @@ SCREEN_UPDATE_IND16( ygv608 )
 		(ygv608.regs.s.r11 & r11_prm) == PRM_ASEBDX )
 		draw_sprites(screen.machine(), bitmap,finalclip );
 
-	tilemap_draw( *work_bitmap,finalclip, tilemap_A, 0, 0 );
+	tilemap_A->draw(*work_bitmap, finalclip, 0, 0 );
 
 #ifdef _ENABLE_ROTATE_ZOOM
   if( ygv608.regs.s.zron )

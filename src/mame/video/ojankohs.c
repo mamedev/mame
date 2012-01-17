@@ -114,14 +114,14 @@ WRITE8_HANDLER( ojankohs_videoram_w )
 {
 	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( ojankohs_colorram_w )
 {
 	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( ojankohs_gfxreg_w )
@@ -131,7 +131,7 @@ WRITE8_HANDLER( ojankohs_gfxreg_w )
 	if (state->m_gfxreg != data)
 	{
 		state->m_gfxreg = data;
-		tilemap_mark_all_tiles_dirty(state->m_tilemap);
+		state->m_tilemap->mark_all_dirty();
 	}
 }
 
@@ -144,7 +144,7 @@ WRITE8_HANDLER( ojankohs_flipscreen_w )
 
 		state->m_flipscreen = BIT(data, 0);
 
-		tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 		if (state->m_flipscreen)
 		{
@@ -316,10 +316,10 @@ SCREEN_UPDATE_IND16( ojankohs )
 {
 	ojankohs_state *state = screen.machine().driver_data<ojankohs_state>();
 
-	tilemap_set_scrollx(state->m_tilemap, 0, state->m_scrollx);
-	tilemap_set_scrolly(state->m_tilemap, 0, state->m_scrolly);
+	state->m_tilemap->set_scrollx(0, state->m_scrollx);
+	state->m_tilemap->set_scrolly(0, state->m_scrolly);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

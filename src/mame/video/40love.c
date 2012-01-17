@@ -90,7 +90,7 @@ static void redraw_pixels(running_machine &machine)
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
 	state->m_pix_redraw = 1;
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 }
 
 
@@ -113,8 +113,8 @@ VIDEO_START( fortyl )
 
 	state->m_xoffset = 128;	// this never changes
 
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_bg_tilemap->set_scroll_rows(32);
+	state->m_bg_tilemap->set_transparent_pen(0);
 
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_pix_color));
@@ -147,7 +147,7 @@ static void fortyl_set_scroll_x( running_machine &machine, int offset )
 	x &= 0x1ff;
 	if (x & 0x100) x -= 0x200;				/* sign extend */
 
-	tilemap_set_scrollx(state->m_bg_tilemap, offset / 2, x);
+	state->m_bg_tilemap->set_scrollx(offset / 2, x);
 }
 
 WRITE8_HANDLER( fortyl_pixram_sel_w )
@@ -223,7 +223,7 @@ WRITE8_HANDLER( fortyl_bg_videoram_w )
 {
 	fortyl_state *state = space->machine().driver_data<fortyl_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 READ8_HANDLER( fortyl_bg_videoram_r )
@@ -241,7 +241,7 @@ WRITE8_HANDLER( fortyl_bg_colorram_w )
 
 		state->m_colorram[offset] = data;
 		for (i = (offset / 2) * 64; i < (offset / 2) * 64 + 64; i++)
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, i);
+			state->m_bg_tilemap->mark_tile_dirty(i);
 
 		fortyl_set_scroll_x(space->machine(), offset);
 	}
@@ -363,8 +363,8 @@ SCREEN_UPDATE_IND16( fortyl )
 	fortyl_state *state = screen.machine().driver_data<fortyl_state>();
 	draw_pixram(screen.machine(), bitmap, cliprect);
 
-	tilemap_set_scrolldy(state->m_bg_tilemap, - state->m_video_ctrl[1] + 1, - state->m_video_ctrl[1] - 1 );
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->set_scrolldy(- state->m_video_ctrl[1] + 1, - state->m_video_ctrl[1] - 1 );
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

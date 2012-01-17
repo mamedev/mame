@@ -39,8 +39,8 @@ VIDEO_START( crshrace )
 	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 16, 64, 64);
 	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 8, 8, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_tilemap1, 0x0f);
-	tilemap_set_transparent_pen(state->m_tilemap2, 0xff);
+	state->m_tilemap1->set_transparent_pen(0x0f);
+	state->m_tilemap2->set_transparent_pen(0xff);
 }
 
 
@@ -55,7 +55,7 @@ WRITE16_HANDLER( crshrace_videoram1_w )
 	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
 	COMBINE_DATA(&state->m_videoram1[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap1, offset);
+	state->m_tilemap1->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( crshrace_videoram2_w )
@@ -63,7 +63,7 @@ WRITE16_HANDLER( crshrace_videoram2_w )
 	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
 	COMBINE_DATA(&state->m_videoram2[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap2, offset);
+	state->m_tilemap2->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( crshrace_roz_bank_w )
@@ -75,7 +75,7 @@ WRITE16_HANDLER( crshrace_roz_bank_w )
 		if (state->m_roz_bank != (data & 0xff))
 		{
 			state->m_roz_bank = data & 0xff;
-			tilemap_mark_all_tiles_dirty(state->m_tilemap1);
+			state->m_tilemap1->mark_all_dirty();
 		}
 	}
 }
@@ -174,7 +174,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 static void draw_bg( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
-	tilemap_draw(bitmap, cliprect, state->m_tilemap2, 0, 0);
+	state->m_tilemap2->draw(bitmap, cliprect, 0, 0);
 }
 
 

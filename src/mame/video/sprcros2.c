@@ -64,7 +64,7 @@ WRITE8_HANDLER( sprcros2_fgvideoram_w )
 	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
 	state->m_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fgtilemap, offset&0x3ff);
+	state->m_fgtilemap->mark_tile_dirty(offset&0x3ff);
 }
 
 WRITE8_HANDLER( sprcros2_bgvideoram_w )
@@ -72,7 +72,7 @@ WRITE8_HANDLER( sprcros2_bgvideoram_w )
 	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
 	state->m_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bgtilemap, offset&0x3ff);
+	state->m_bgtilemap->mark_tile_dirty(offset&0x3ff);
 }
 
 WRITE8_HANDLER( sprcros2_bgscrollx_w )
@@ -80,16 +80,16 @@ WRITE8_HANDLER( sprcros2_bgscrollx_w )
 	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
 	if(state->m_port7&0x02)
-		tilemap_set_scrollx(state->m_bgtilemap, 0, 0x100-data);
+		state->m_bgtilemap->set_scrollx(0, 0x100-data);
 	else
-		tilemap_set_scrollx(state->m_bgtilemap, 0, data);
+		state->m_bgtilemap->set_scrollx(0, data);
 }
 
 WRITE8_HANDLER( sprcros2_bgscrolly_w )
 {
 	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
-	tilemap_set_scrolly(state->m_bgtilemap, 0, data);
+	state->m_bgtilemap->set_scrolly(0, data);
 }
 
 static TILE_GET_INFO( get_sprcros2_bgtile_info )
@@ -120,7 +120,7 @@ static TILE_GET_INFO( get_sprcros2_fgtile_info )
 	UINT8 attr = state->m_fgvideoram[tile_index + 0x400];
 	int color = (attr&0xfc)>>2;
 
-	tileinfo->group = color;
+	tileinfo.group = color;
 
 	//attr
 	//76543210
@@ -198,8 +198,8 @@ SCREEN_UPDATE_IND16( sprcros2 )
 {
 	sprcros2_state *state = screen.machine().driver_data<sprcros2_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bgtilemap, 0, 0);
+	state->m_bgtilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fgtilemap, 0, 0);
+	state->m_fgtilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

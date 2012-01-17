@@ -221,7 +221,7 @@ WRITE16_HANDLER( gdfs_tmapram_w )
 	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	COMBINE_DATA(&state->m_gdfs_tmapram[offset]);
-	tilemap_mark_tile_dirty(state->m_gdfs_tmap, offset);
+	state->m_gdfs_tmap->mark_tile_dirty(offset);
 }
 
 VIDEO_START( gdfs )
@@ -238,7 +238,7 @@ VIDEO_START( gdfs )
 	state->m_gdfs_tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 											 16,16, 0x100,0x100	);
 
-	tilemap_set_transparent_pen(state->m_gdfs_tmap, 0);
+	state->m_gdfs_tmap->set_transparent_pen(0);
 }
 
 /***************************************************************************
@@ -1172,9 +1172,9 @@ SCREEN_UPDATE_IND16( gdfs )
 	for (pri = 0; pri <= 0xf; pri++)
 		gdfs_draw_zooming_sprites(screen.machine(), bitmap, cliprect, pri);
 
-	tilemap_set_scrollx(state->m_gdfs_tmap, 0, state->m_gdfs_tmapscroll[0x0c/2]);
-	tilemap_set_scrolly(state->m_gdfs_tmap, 0, state->m_gdfs_tmapscroll[0x10/2]);
-	tilemap_draw(bitmap,cliprect, state->m_gdfs_tmap, 0, 0);
+	state->m_gdfs_tmap->set_scrollx(0, state->m_gdfs_tmapscroll[0x0c/2]);
+	state->m_gdfs_tmap->set_scrolly(0, state->m_gdfs_tmapscroll[0x10/2]);
+	state->m_gdfs_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

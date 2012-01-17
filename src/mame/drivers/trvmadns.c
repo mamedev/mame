@@ -204,7 +204,7 @@ static WRITE8_HANDLER( trvmadns_tileram_w )
 	}
 
 	state->m_tileram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset >> 1);
+	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 
@@ -272,7 +272,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	SET_TILE_INFO(0,tile,color,flag);
 
-	tileinfo->category = (attr & 0x20)>>5;
+	tileinfo.category = (attr & 0x20)>>5;
 }
 
 static VIDEO_START( trvmadns )
@@ -280,7 +280,7 @@ static VIDEO_START( trvmadns )
 	trvmadns_state *state = machine.driver_data<trvmadns_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-//  tilemap_set_transparent_pen(fg_tilemap,1);
+//  fg_tilemap->set_transparent_pen(1);
 
 	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
 }

@@ -56,21 +56,21 @@ WRITE8_HANDLER( grchamp_left_w )
 {
 	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	state->m_leftram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_left_tilemap, offset);
+	state->m_left_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( grchamp_center_w )
 {
 	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	state->m_centerram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_center_tilemap, offset);
+	state->m_center_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( grchamp_right_w )
 {
 	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 	state->m_rightram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_right_tilemap, offset);
+	state->m_right_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -369,9 +369,9 @@ SCREEN_UPDATE_RGB32( grchamp )
 	const UINT8 *amedata = screen.machine().region("gfx5")->base();
 	const UINT8 *headdata = screen.machine().region("gfx6")->base();
 	const UINT8 *pldata = screen.machine().region("gfx7")->base();
-	bitmap_ind16 &lpixmap = tilemap_get_pixmap(state->m_left_tilemap);
-	bitmap_ind16 &rpixmap = tilemap_get_pixmap(state->m_right_tilemap);
-	bitmap_ind16 &cpixmap = tilemap_get_pixmap(state->m_center_tilemap);
+	bitmap_ind16 &lpixmap = state->m_left_tilemap->pixmap();
+	bitmap_ind16 &rpixmap = state->m_right_tilemap->pixmap();
+	bitmap_ind16 &cpixmap = state->m_center_tilemap->pixmap();
 	int lrxscroll, cxscroll, lyscroll, ryscroll, cyscroll;
 	int bgcolor = state->m_cpu1_out[3] & 0x10;
 	int amebase = state->m_cpu0_out[4] >> 4;

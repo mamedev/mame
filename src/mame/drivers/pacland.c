@@ -189,7 +189,7 @@ static WRITE8_HANDLER( pacland_flipscreen_w )
 	int bit = !BIT(offset,11);
 	/* can't use flip_screen_set(space->machine(), ) because the visible area is asymmetrical */
 	flip_screen_set_no_update(space->machine(), bit);
-	tilemap_set_flip_all(space->machine(),flip_screen_get(space->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	space->machine().tilemap().set_flip_all(flip_screen_get(space->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 

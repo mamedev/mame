@@ -54,14 +54,14 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	if ((attr & 0xc0) == 0xc0)
 	{
-		tileinfo->category = 1;
-		tileinfo->group = 0;
+		tileinfo.category = 1;
+		tileinfo.group = 0;
 		flags = 0;
 	}
 	else
 	{
-		tileinfo->category = 0;
-		tileinfo->group = (attr & 0x20) >> 5;
+		tileinfo.category = 0;
+		tileinfo.group = (attr & 0x20) >> 5;
 		flags = TILE_FLIPXY((attr & 0xc0) >> 6);
 	}
 
@@ -100,10 +100,10 @@ VIDEO_START( bionicc )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 3);
-	tilemap_set_transmask(state->m_fg_tilemap, 0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */
-	tilemap_set_transmask(state->m_fg_tilemap, 1, 0xffc1, 0x803e); /* split type 1 has pens 1-5 opaque in front half */
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 15);
+	state->m_tx_tilemap->set_transparent_pen(3);
+	state->m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */
+	state->m_fg_tilemap->set_transmask(1, 0xffc1, 0x803e); /* split type 1 has pens 1-5 opaque in front half */
+	state->m_bg_tilemap->set_transparent_pen(15);
 }
 
 
@@ -119,7 +119,7 @@ WRITE16_HANDLER( bionicc_bgvideoram_w )
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	COMBINE_DATA(&state->m_bgvideoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( bionicc_fgvideoram_w )
@@ -127,7 +127,7 @@ WRITE16_HANDLER( bionicc_fgvideoram_w )
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	COMBINE_DATA(&state->m_fgvideoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset / 2);
+	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( bionicc_txvideoram_w )
@@ -135,7 +135,7 @@ WRITE16_HANDLER( bionicc_txvideoram_w )
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	COMBINE_DATA(&state->m_txvideoram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x3ff);
+	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE16_HANDLER( bionicc_paletteram_w )
@@ -169,16 +169,16 @@ WRITE16_HANDLER( bionicc_scroll_w )
 	switch (offset)
 	{
 		case 0:
-			tilemap_set_scrollx(state->m_fg_tilemap, 0, data);
+			state->m_fg_tilemap->set_scrollx(0, data);
 			break;
 		case 1:
-			tilemap_set_scrolly(state->m_fg_tilemap, 0, data);
+			state->m_fg_tilemap->set_scrolly(0, data);
 			break;
 		case 2:
-			tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
+			state->m_bg_tilemap->set_scrollx(0, data);
 			break;
 		case 3:
-			tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+			state->m_bg_tilemap->set_scrolly(0, data);
 			break;
 	}
 }
@@ -191,8 +191,8 @@ WRITE16_HANDLER( bionicc_gfxctrl_w )
 	{
 		flip_screen_set(space->machine(), data & 0x0100);
 
-		tilemap_set_enable(state->m_bg_tilemap, data & 0x2000);	/* guess */
-		tilemap_set_enable(state->m_fg_tilemap, data & 0x1000);	/* guess */
+		state->m_bg_tilemap->enable(data & 0x2000);	/* guess */
+		state->m_fg_tilemap->enable(data & 0x1000);	/* guess */
 
 		coin_counter_w(space->machine(), 0, data & 0x8000);
 		coin_counter_w(space->machine(), 1, data & 0x4000);
@@ -251,12 +251,12 @@ SCREEN_UPDATE_IND16( bionicc )
 	bionicc_state *state = screen.machine().driver_data<bionicc_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1 | TILEMAP_DRAW_LAYER1, 0);	/* nothing in FRONT */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0 | TILEMAP_DRAW_LAYER1, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);	/* nothing in FRONT */
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0 | TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

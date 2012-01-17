@@ -23,19 +23,19 @@ WRITE16_HANDLER( dcon_control_w )
 	{
 		state->m_enable=data;
 		if ((state->m_enable&4)==4)
-			tilemap_set_enable(state->m_foreground_layer,0);
+			state->m_foreground_layer->enable(0);
 		else
-			tilemap_set_enable(state->m_foreground_layer,1);
+			state->m_foreground_layer->enable(1);
 
 		if ((state->m_enable&2)==2)
-			tilemap_set_enable(state->m_midground_layer,0);
+			state->m_midground_layer->enable(0);
 		else
-			tilemap_set_enable(state->m_midground_layer,1);
+			state->m_midground_layer->enable(1);
 
 		if ((state->m_enable&1)==1)
-			tilemap_set_enable(state->m_background_layer,0);
+			state->m_background_layer->enable(0);
 		else
-			tilemap_set_enable(state->m_background_layer,1);
+			state->m_background_layer->enable(1);
 	}
 }
 
@@ -52,28 +52,28 @@ WRITE16_HANDLER( dcon_background_w )
 {
 	dcon_state *state = space->machine().driver_data<dcon_state>();
 	COMBINE_DATA(&state->m_back_data[offset]);
-	tilemap_mark_tile_dirty(state->m_background_layer,offset);
+	state->m_background_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( dcon_foreground_w )
 {
 	dcon_state *state = space->machine().driver_data<dcon_state>();
 	COMBINE_DATA(&state->m_fore_data[offset]);
-	tilemap_mark_tile_dirty(state->m_foreground_layer,offset);
+	state->m_foreground_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( dcon_midground_w )
 {
 	dcon_state *state = space->machine().driver_data<dcon_state>();
 	COMBINE_DATA(&state->m_mid_data[offset]);
-	tilemap_mark_tile_dirty(state->m_midground_layer,offset);
+	state->m_midground_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( dcon_text_w )
 {
 	dcon_state *state = space->machine().driver_data<dcon_state>();
 	COMBINE_DATA(&state->m_textram[offset]);
-	tilemap_mark_tile_dirty(state->m_text_layer,offset);
+	state->m_text_layer->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_back_tile_info )
@@ -144,9 +144,9 @@ VIDEO_START( dcon )
 	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info, tilemap_scan_rows,16,16,32,32);
 	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
-	tilemap_set_transparent_pen(state->m_midground_layer,15);
-	tilemap_set_transparent_pen(state->m_foreground_layer,15);
-	tilemap_set_transparent_pen(state->m_text_layer,15);
+	state->m_midground_layer->set_transparent_pen(15);
+	state->m_foreground_layer->set_transparent_pen(15);
+	state->m_text_layer->set_transparent_pen(15);
 
 	state->m_gfx_bank_select = 0;
 }
@@ -283,21 +283,21 @@ SCREEN_UPDATE_IND16( dcon )
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	/* Setup the tilemaps */
-	tilemap_set_scrollx( state->m_background_layer,0, state->m_scroll_ram[0] );
-	tilemap_set_scrolly( state->m_background_layer,0, state->m_scroll_ram[1] );
-	tilemap_set_scrollx( state->m_midground_layer, 0, state->m_scroll_ram[2] );
-	tilemap_set_scrolly( state->m_midground_layer, 0, state->m_scroll_ram[3] );
-	tilemap_set_scrollx( state->m_foreground_layer,0, state->m_scroll_ram[4] );
-	tilemap_set_scrolly( state->m_foreground_layer,0, state->m_scroll_ram[5] );
+	state->m_background_layer->set_scrollx(0, state->m_scroll_ram[0] );
+	state->m_background_layer->set_scrolly(0, state->m_scroll_ram[1] );
+	state->m_midground_layer->set_scrollx(0, state->m_scroll_ram[2] );
+	state->m_midground_layer->set_scrolly(0, state->m_scroll_ram[3] );
+	state->m_foreground_layer->set_scrollx(0, state->m_scroll_ram[4] );
+	state->m_foreground_layer->set_scrolly(0, state->m_scroll_ram[5] );
 
 	if ((state->m_enable&1)!=1)
-		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
+		state->m_background_layer->draw(bitmap, cliprect, 0,0);
 	else
 		bitmap.fill(15, cliprect); /* Should always be black, not pen 15 */
 
-	tilemap_draw(bitmap,cliprect,state->m_midground_layer,0,1);
-	tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,2);
-	tilemap_draw(bitmap,cliprect,state->m_text_layer,0,4);
+	state->m_midground_layer->draw(bitmap, cliprect, 0,1);
+	state->m_foreground_layer->draw(bitmap, cliprect, 0,2);
+	state->m_text_layer->draw(bitmap, cliprect, 0,4);
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
@@ -312,28 +312,28 @@ SCREEN_UPDATE_IND16( sdgndmps )
 	/* Gfx banking */
 	if (state->m_last_gfx_bank!=state->m_gfx_bank_select)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_midground_layer);
+		state->m_midground_layer->mark_all_dirty();
 		state->m_last_gfx_bank=state->m_gfx_bank_select;
 	}
 
 	/* Setup the tilemaps */
-	tilemap_set_scrollx( state->m_background_layer,0, state->m_scroll_ram[0]+128 );
-	tilemap_set_scrolly( state->m_background_layer,0, state->m_scroll_ram[1] );
-	tilemap_set_scrollx( state->m_midground_layer, 0, state->m_scroll_ram[2]+128 );
-	tilemap_set_scrolly( state->m_midground_layer, 0, state->m_scroll_ram[3] );
-	tilemap_set_scrollx( state->m_foreground_layer,0, state->m_scroll_ram[4]+128 );
-	tilemap_set_scrolly( state->m_foreground_layer,0, state->m_scroll_ram[5] );
-	tilemap_set_scrollx( state->m_text_layer,0, /*state->m_scroll_ram[6] + */ 128 );
-	tilemap_set_scrolly( state->m_text_layer,0, /*state->m_scroll_ram[7] + */ 0 );
+	state->m_background_layer->set_scrollx(0, state->m_scroll_ram[0]+128 );
+	state->m_background_layer->set_scrolly(0, state->m_scroll_ram[1] );
+	state->m_midground_layer->set_scrollx(0, state->m_scroll_ram[2]+128 );
+	state->m_midground_layer->set_scrolly(0, state->m_scroll_ram[3] );
+	state->m_foreground_layer->set_scrollx(0, state->m_scroll_ram[4]+128 );
+	state->m_foreground_layer->set_scrolly(0, state->m_scroll_ram[5] );
+	state->m_text_layer->set_scrollx(0, /*state->m_scroll_ram[6] + */ 128 );
+	state->m_text_layer->set_scrolly(0, /*state->m_scroll_ram[7] + */ 0 );
 
 	if ((state->m_enable&1)!=1)
-		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
+		state->m_background_layer->draw(bitmap, cliprect, 0,0);
 	else
 		bitmap.fill(15, cliprect); /* Should always be black, not pen 15 */
 
-	tilemap_draw(bitmap,cliprect,state->m_midground_layer,0,1);
-	tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,2);
-	tilemap_draw(bitmap,cliprect,state->m_text_layer,0,4);
+	state->m_midground_layer->draw(bitmap, cliprect, 0,1);
+	state->m_foreground_layer->draw(bitmap, cliprect, 0,2);
+	state->m_text_layer->draw(bitmap, cliprect, 0,4);
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;

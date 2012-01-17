@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_pf_tile_info )
 			TILE_FLIPYX(attrib >> 10));
 
 	/* Priority 1 = tile appears above sprites */
-	tileinfo->category = (attrib >> 9) & 1;
+	tileinfo.category = (attrib >> 9) & 1;
 }
 
 /*****************************************************************************/
@@ -72,7 +72,7 @@ WRITE16_HANDLER( m107_vram_w )
 	COMBINE_DATA(&state->m_vram_data[offset]);
 	for (laynum = 0; laynum < 4; laynum++)
 		if ((offset & 0x6000) == state->m_pf_layer[laynum].vram_base)
-			tilemap_mark_tile_dirty(state->m_pf_layer[laynum].tmap, (offset & 0x1fff) / 2);
+			state->m_pf_layer[laynum].tmap->mark_tile_dirty((offset & 0x1fff) / 2);
 }
 
 /*****************************************************************************/
@@ -97,11 +97,11 @@ WRITE16_HANDLER( m107_control_w )
 			layer->vram_base = ((state->m_control[offset] >> 8) & 15) * 0x800;
 
 			/* update enable (bit 7) */
-			tilemap_set_enable(layer->tmap, (~state->m_control[offset] >> 7) & 1);
+			layer->tmap->enable((~state->m_control[offset] >> 7) & 1);
 
 			/* mark everything dirty of the VRAM base changes */
 			if ((old ^ state->m_control[offset]) & 0x0f00)
-				tilemap_mark_all_tiles_dirty(layer->tmap);
+				layer->tmap->mark_all_dirty();
 
 			if(state->m_control[offset] & 0xf07c)
 				printf("%04x %02x\n",state->m_control[offset],offset*2);
@@ -134,15 +134,15 @@ VIDEO_START( m107 )
 		layer->tmap = tilemap_create(machine, get_pf_tile_info, tilemap_scan_rows,  8,8, 64,64);
 
 		/* set the user data to point to the layer */
-		tilemap_set_user_data(layer->tmap, &state->m_pf_layer[laynum]);
+		layer->tmap->set_user_data(&state->m_pf_layer[laynum]);
 
 		/* set scroll offsets */
-		tilemap_set_scrolldx(layer->tmap, -3 + 2 * laynum, -3 + 2 * laynum);
-		tilemap_set_scrolldy(layer->tmap, -128, -128);
+		layer->tmap->set_scrolldx(-3 + 2 * laynum, -3 + 2 * laynum);
+		layer->tmap->set_scrolldy(-128, -128);
 
 		/* set pen 0 to transparent for all tilemaps except #4 */
 		if (laynum != 3)
-			tilemap_set_transparent_pen(layer->tmap, 0);
+			layer->tmap->set_transparent_pen(0);
 	}
 
 	state->m_buffered_spriteram = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
@@ -296,18 +296,18 @@ static void m107_update_scroll_positions(running_machine &machine)
 		{
 			const UINT16 *scrolldata = state->m_vram_data + (0xe000 + 0x200 * laynum) / 2;
 
-			tilemap_set_scroll_rows(layer->tmap, 512);
+			layer->tmap->set_scroll_rows(512);
 			for (i = 0; i < 512; i++)
-				tilemap_set_scrollx(layer->tmap, i, scrolldata[((i+0xff80)-(scrolly))&0x1ff] + scrollx);
+				layer->tmap->set_scrollx(i, scrolldata[((i+0xff80)-(scrolly))&0x1ff] + scrollx);
 
 		}
 		else
 		{
-			tilemap_set_scroll_rows(layer->tmap, 1);
-			tilemap_set_scrollx(layer->tmap, 0, scrollx);
+			layer->tmap->set_scroll_rows(1);
+			layer->tmap->set_scrollx(0, scrollx);
 		}
 
-		tilemap_set_scrolly(layer->tmap, 0,scrolly);
+		layer->tmap->set_scrolly(0,scrolly);
 	}
 }
 
@@ -328,14 +328,14 @@ static void m107_tilemap_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 			const UINT16 *scrolldata = state->m_vram_data + (0xe800 + 0x200 * laynum) / 2;
 			clip.min_y = clip.max_y = line;
 
-			tilemap_set_scrollx(state->m_pf_layer[laynum].tmap,0,  state->m_control[1 + 2 * laynum]);
-			tilemap_set_scrolly(state->m_pf_layer[laynum].tmap,0,  (state->m_control[0 + 2 * laynum] + scrolldata[line]));
+			state->m_pf_layer[laynum].tmap->set_scrollx(0,  state->m_control[1 + 2 * laynum]);
+			state->m_pf_layer[laynum].tmap->set_scrolly(0,  (state->m_control[0 + 2 * laynum] + scrolldata[line]));
 
-			tilemap_draw(bitmap, clip, state->m_pf_layer[laynum].tmap, category | opaque, category);
+			state->m_pf_layer[laynum].tmap->draw(bitmap, clip, category | opaque, category);
 		}
 	}
 	else
-		tilemap_draw(bitmap, cliprect, state->m_pf_layer[laynum].tmap, category | opaque, category);
+		state->m_pf_layer[laynum].tmap->draw(bitmap, cliprect, category | opaque, category);
 }
 
 

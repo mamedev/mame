@@ -481,14 +481,14 @@ static WRITE8_HANDLER( fclown_videoram_w )
 {
 	_5clown_state *state = space->machine().driver_data<_5clown_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( fclown_colorram_w )
 {
 	_5clown_state *state = space->machine().driver_data<_5clown_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -524,7 +524,7 @@ static VIDEO_START(fclown)
 static SCREEN_UPDATE_IND16( fclown )
 {
 	_5clown_state *state = screen.machine().driver_data<_5clown_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

@@ -133,7 +133,7 @@ WRITE8_HANDLER( bking_cont1_w )
 
 	flip_screen_set_no_update(space->machine(), data & 0x04);
 
-	tilemap_set_flip_all(space->machine(), flip_screen_get(space->machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	space->machine().tilemap().set_flip_all(flip_screen_get(space->machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	state->m_controller = data & 0x02;
 
@@ -167,7 +167,7 @@ WRITE8_HANDLER( bking_cont3_w )
 
 	if (state->m_palette_bank != ((data >> 1) & 0x03))
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	state->m_palette_bank = (data >> 1) & 0x03;
@@ -199,7 +199,7 @@ WRITE8_HANDLER( bking_playfield_w )
 {
 	bking_state *state = space->machine().driver_data<bking_state>();
 	state->m_playfield_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -253,7 +253,7 @@ SCREEN_UPDATE_IND16( bking )
 {
 	bking_state *state = screen.machine().driver_data<bking_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the balls */
 	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2],
@@ -319,13 +319,13 @@ SCREEN_VBLANK( bking )
 			latch = 0x0400;
 		}
 
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? -xld : xld);
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, flip_screen_get(screen.machine()) ? -yld : yld);
+		state->m_bg_tilemap->set_scrollx(0, flip_screen_get(screen.machine()) ? -xld : xld);
+		state->m_bg_tilemap->set_scrolly(0, flip_screen_get(screen.machine()) ? -yld : yld);
 
-		tilemap_draw(state->m_tmp_bitmap1, rect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(state->m_tmp_bitmap1, rect, 0, 0);
 
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->set_scrollx(0, 0);
+		state->m_bg_tilemap->set_scrolly(0, 0);
 
 		if (latch != 0)
 		{

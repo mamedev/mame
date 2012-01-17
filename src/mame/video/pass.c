@@ -21,7 +21,7 @@ WRITE16_HANDLER( pass_bg_videoram_w )
 	pass_state *state = space->machine().driver_data<pass_state>();
 
 	state->m_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /* foreground 'sprites' tilemap stuff */
@@ -42,7 +42,7 @@ WRITE16_HANDLER( pass_fg_videoram_w )
 {
 	pass_state *state = space->machine().driver_data<pass_state>();
 	state->m_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 /* video update / start */
@@ -54,15 +54,15 @@ VIDEO_START( pass )
 	state->m_bg_tilemap = tilemap_create(machine, get_pass_bg_tile_info, tilemap_scan_rows, 8, 8,  64, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_pass_fg_tile_info, tilemap_scan_rows, 4, 4, 128, 64);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 255);
+	state->m_fg_tilemap->set_transparent_pen(255);
 }
 
 SCREEN_UPDATE_IND16( pass )
 {
 	pass_state *state = screen.machine().driver_data<pass_state>();
 
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

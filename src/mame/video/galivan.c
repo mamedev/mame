@@ -141,7 +141,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 			code,
 			(attr & 0xe0) >> 5,		/* not sure */
 			0);
-	tileinfo->category = attr & 8 ? 0 : 1;	/* seems correct */
+	tileinfo.category = attr & 8 ? 0 : 1;	/* seems correct */
 }
 
 static TILE_GET_INFO( ninjemak_get_bg_tile_info )
@@ -187,7 +187,7 @@ VIDEO_START( galivan )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 128, 128);
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 }
 
 VIDEO_START( ninjemak )
@@ -197,7 +197,7 @@ VIDEO_START( ninjemak )
 	state->m_bg_tilemap = tilemap_create(machine, ninjemak_get_bg_tile_info, tilemap_scan_cols, 16, 16, 512, 32);
 	state->m_tx_tilemap = tilemap_create(machine, ninjemak_get_tx_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 }
 
 
@@ -212,7 +212,7 @@ WRITE8_HANDLER( galivan_videoram_w )
 {
 	galivan_state *state = space->machine().driver_data<galivan_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x3ff);
+	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 /* Written through port 40 */
@@ -226,8 +226,8 @@ WRITE8_HANDLER( galivan_gfxbank_w )
 
 	/* bit 2 flip screen */
 	state->m_flipscreen = data & 0x04;
-	tilemap_set_flip (state->m_bg_tilemap, state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	tilemap_set_flip (state->m_tx_tilemap, state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_bg_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_tx_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	/* bit 7 selects one of two ROM banks for c000-dfff */
 	memory_set_bank(space->machine(), "bank1", (data & 0x80) >> 7);
@@ -245,8 +245,8 @@ WRITE8_HANDLER( ninjemak_gfxbank_w )
 
 	/* bit 2 flip screen */
 	state->m_flipscreen = data & 0x04;
-	tilemap_set_flip (state->m_bg_tilemap, state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	tilemap_set_flip (state->m_tx_tilemap, state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_bg_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_tx_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	/* bit 3 unknown */
 
@@ -348,25 +348,25 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 SCREEN_UPDATE_IND16( galivan )
 {
 	galivan_state *state = screen.machine().driver_data<galivan_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_galivan_scrollx[0] + 256 * (state->m_galivan_scrollx[1] & 0x07));
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_galivan_scrolly[0] + 256 * (state->m_galivan_scrolly[1] & 0x07));
+	state->m_bg_tilemap->set_scrollx(0, state->m_galivan_scrollx[0] + 256 * (state->m_galivan_scrollx[1] & 0x07));
+	state->m_bg_tilemap->set_scrolly(0, state->m_galivan_scrolly[0] + 256 * (state->m_galivan_scrolly[1] & 0x07));
 
 	if (state->m_layers & 0x40)
 		bitmap.fill(0, cliprect);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_layers & 0x20)
 	{
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 1, 0);
+		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		state->m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect);
 	}
 	else
 	{
 		draw_sprites(screen.machine(), bitmap, cliprect);
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 1, 0);
+		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+		state->m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
 	}
 
 	return 0;
@@ -377,15 +377,15 @@ SCREEN_UPDATE_IND16( ninjemak )
 	galivan_state *state = screen.machine().driver_data<galivan_state>();
 
 	/* (scrollx[1] & 0x40) does something */
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly);
 
 	if (state->m_ninjemak_dispdisable)
 		bitmap.fill(0, cliprect);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

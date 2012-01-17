@@ -513,7 +513,7 @@ static VIDEO_START(majorpkr)
 
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows, 16, 8, 36, 28);
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, tilemap_scan_rows, 16, 8, 36, 28);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->machine().generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 4 * 0x800);
 
@@ -535,13 +535,13 @@ static SCREEN_UPDATE_IND16(majorpkr)
 	custom_clip = cliprect;
 	custom_clip.max_x -= 16;
 
-	tilemap_draw(bitmap, custom_clip, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, custom_clip, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, custom_clip, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, custom_clip, 0, 0);
 
 	if (state->m_flip_state == 1)
 	{
-		tilemap_set_flip(state->m_bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
-		tilemap_set_flip(state->m_fg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+		state->m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
+		state->m_fg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 	}
 
 	return 0;
@@ -602,13 +602,13 @@ static WRITE8_HANDLER(vram_w)
 
 	if (state->m_vram_bank == 0)
 	{
-		tilemap_mark_tile_dirty(state->m_fg_tilemap, offset >> 1);
+		state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
 	}
 	else
 	{
 		if (state->m_vram_bank == 1)
 		{
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, offset >> 1);
+			state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
 		}
 		else
 		{

@@ -28,7 +28,7 @@ WRITE8_HANDLER( angelkds_txvideoram_w )
 	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
 	state->m_txvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( angelkds_txbank_write )
@@ -38,7 +38,7 @@ WRITE8_HANDLER( angelkds_txbank_write )
 	if (state->m_txbank != data)
 	{
 		state->m_txbank = data;
-		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
+		state->m_tx_tilemap->mark_all_dirty();
 	}
 }
 
@@ -62,7 +62,7 @@ WRITE8_HANDLER( angelkds_bgtopvideoram_w )
 	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
 	state->m_bgtopvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bgtop_tilemap, offset);
+	state->m_bgtop_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( angelkds_bgtopbank_write )
@@ -72,7 +72,7 @@ WRITE8_HANDLER( angelkds_bgtopbank_write )
 	if (state->m_bgtopbank != data)
 	{
 		state->m_bgtopbank = data;
-		tilemap_mark_all_tiles_dirty(state->m_bgtop_tilemap);
+		state->m_bgtop_tilemap->mark_all_dirty();
 	}
 }
 
@@ -80,7 +80,7 @@ WRITE8_HANDLER( angelkds_bgtopscroll_write )
 {
 	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	tilemap_set_scrollx(state->m_bgtop_tilemap, 0, data);
+	state->m_bgtop_tilemap->set_scrollx(0, data);
 }
 
 /*** Bottom Half Background Tilemap
@@ -103,7 +103,7 @@ WRITE8_HANDLER( angelkds_bgbotvideoram_w )
 	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
 	state->m_bgbotvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bgbot_tilemap, offset);
+	state->m_bgbot_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -114,7 +114,7 @@ WRITE8_HANDLER( angelkds_bgbotbank_write )
 	if (state->m_bgbotbank != data)
 	{
 		state->m_bgbotbank = data;
-		tilemap_mark_all_tiles_dirty(state->m_bgbot_tilemap);
+		state->m_bgbot_tilemap->mark_all_dirty();
 	}
 }
 
@@ -122,7 +122,7 @@ WRITE8_HANDLER( angelkds_bgbotscroll_write )
 {
 	angelkds_state *state = space->machine().driver_data<angelkds_state>();
 
-	tilemap_set_scrollx(state->m_bgbot_tilemap, 0, data);
+	state->m_bgbot_tilemap->set_scrollx(0, data);
 }
 
 
@@ -261,13 +261,13 @@ VIDEO_START( angelkds )
 	angelkds_state *state = machine.driver_data<angelkds_state>();
 
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
+	state->m_tx_tilemap->set_transparent_pen(0);
 
 	state->m_bgbot_tilemap = tilemap_create(machine, get_bgbot_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_bgbot_tilemap, 15);
+	state->m_bgbot_tilemap->set_transparent_pen(15);
 
 	state->m_bgtop_tilemap = tilemap_create(machine, get_bgtop_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_bgtop_tilemap, 15);
+	state->m_bgtop_tilemap->set_transparent_pen(15);
 }
 
 /* enable bits are uncertain */
@@ -284,23 +284,23 @@ SCREEN_UPDATE_IND16( angelkds )
 	clip.set(8*0, 8*16-1, visarea.min_y, visarea.max_y);
 
 	if ((state->m_layer_ctrl & 0x80) == 0x00)
-		tilemap_draw(bitmap, clip, state->m_bgtop_tilemap, 0, 0);
+		state->m_bgtop_tilemap->draw(bitmap, clip, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, clip, 0x80);
 
 	if ((state->m_layer_ctrl & 0x20) == 0x00)
-		tilemap_draw(bitmap, clip, state->m_tx_tilemap, 0, 0);
+		state->m_tx_tilemap->draw(bitmap, clip, 0, 0);
 
 	/* draw bottom of screen */
 	clip.set(8*16, 8*32-1, visarea.min_y, visarea.max_y);
 
 	if ((state->m_layer_ctrl & 0x40) == 0x00)
-		tilemap_draw(bitmap, clip, state->m_bgbot_tilemap, 0, 0);
+		state->m_bgbot_tilemap->draw(bitmap, clip, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, clip, 0x40);
 
 	if ((state->m_layer_ctrl & 0x20) == 0x00)
-		tilemap_draw(bitmap, clip, state->m_tx_tilemap, 0, 0);
+		state->m_tx_tilemap->draw(bitmap, clip, 0, 0);
 
 	return 0;
 }

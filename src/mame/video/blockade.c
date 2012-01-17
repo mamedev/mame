@@ -5,7 +5,7 @@ WRITE8_HANDLER( blockade_videoram_w )
 {
 	blockade_state *state = space->machine().driver_data<blockade_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 
 	if (input_port_read(space->machine(), "IN3") & 0x80)
 	{
@@ -32,6 +32,6 @@ SCREEN_UPDATE_IND16( blockade )
 {
 	blockade_state *state = screen.machine().driver_data<blockade_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

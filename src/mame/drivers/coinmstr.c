@@ -51,7 +51,7 @@ static WRITE8_HANDLER( quizmstr_bg_w )
 	videoram[offset] = data;
 
 	if(offset >= 0x0240)
-		tilemap_mark_tile_dirty(state->m_bg_tilemap,offset - 0x0240);
+		state->m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 }
 
 
@@ -97,7 +97,7 @@ static WRITE8_HANDLER( quizmstr_attr1_w )
 	{
 		// the later games also use attr3 for something..
 		UINT32	paldata = (state->m_attr_ram1[offset] & 0x7f) | ((state->m_attr_ram2[offset] & 0x7f) << 7);
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset - 0x0240);
+		state->m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
 		coinmstr_set_pal(space->machine(), paldata, offset - 0x240);
 
@@ -113,7 +113,7 @@ static WRITE8_HANDLER( quizmstr_attr2_w )
 	{
 		// the later games also use attr3 for something..
 		UINT32	paldata = (state->m_attr_ram1[offset] & 0x7f) | ((state->m_attr_ram2[offset] & 0x7f) << 7);
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset - 0x0240);
+		state->m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
 		coinmstr_set_pal(space->machine(), paldata, offset - 0x240);
 
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( quizmstr_attr3_w )
 	state->m_attr_ram3[offset] = data;
 
 	if(offset >= 0x0240)
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset - 0x0240);
+		state->m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
 }
 
@@ -917,7 +917,7 @@ static VIDEO_START( coinmstr )
 static SCREEN_UPDATE_IND16( coinmstr )
 {
 	coinmstr_state *state = screen.machine().driver_data<coinmstr_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

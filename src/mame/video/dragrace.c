@@ -52,7 +52,7 @@ SCREEN_UPDATE_IND16( dragrace )
 	dragrace_state *state = screen.machine().driver_data<dragrace_state>();
 	int y;
 
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 
 	for (y = 0; y < 256; y += 4)
 	{
@@ -63,13 +63,13 @@ SCREEN_UPDATE_IND16( dragrace )
 		int yl = state->m_position_ram[y + 2] & 15;
 		int yh = state->m_position_ram[y + 3] & 15;
 
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, 16 * xh + xl - 8);
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, 16 * yh + yl);
+		state->m_bg_tilemap->set_scrollx(0, 16 * xh + xl - 8);
+		state->m_bg_tilemap->set_scrolly(0, 16 * yh + yl);
 
 		if (rect.min_y < y + 0) rect.min_y = y + 0;
 		if (rect.max_y > y + 3) rect.max_y = y + 3;
 
-		tilemap_draw(bitmap, rect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, rect, 0, 0);
 	}
 	return 0;
 }

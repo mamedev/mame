@@ -57,7 +57,7 @@ WRITE16_HANDLER(  fof_bak_tileram_w )
 	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 
 	COMBINE_DATA(&state->m_fof_bak_tileram[offset]);
-	tilemap_mark_tile_dirty(state->m_fof_bak_tilemap, offset / 2);
+	state->m_fof_bak_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -77,7 +77,7 @@ WRITE16_HANDLER( fof_mid_tileram_w )
 	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 
 	COMBINE_DATA(&state->m_fof_mid_tileram[offset]);
-	tilemap_mark_tile_dirty(state->m_fof_mid_tilemap, offset / 2);
+	state->m_fof_mid_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_fof_txt_tile_info )
@@ -96,7 +96,7 @@ WRITE16_HANDLER( fof_txt_tileram_w )
 	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 
 	COMBINE_DATA(&state->m_fof_txt_tileram[offset]);
-	tilemap_mark_tile_dirty(state->m_fof_txt_tilemap, offset / 2);
+	state->m_fof_txt_tilemap->mark_tile_dirty(offset / 2);
 }
 
 /* video start / update */
@@ -108,10 +108,10 @@ VIDEO_START(fitfight)
 	/* opaque */
 
 	state->m_fof_mid_tilemap = tilemap_create(machine, get_fof_mid_tile_info, tilemap_scan_cols, 8, 8, 128, 32);
-	tilemap_set_transparent_pen(state->m_fof_mid_tilemap, 0);
+	state->m_fof_mid_tilemap->set_transparent_pen(0);
 
 	state->m_fof_txt_tilemap = tilemap_create(machine, get_fof_txt_tile_info, tilemap_scan_cols, 8, 8, 128, 32);
-	tilemap_set_transparent_pen(state->m_fof_txt_tilemap, 0);
+	state->m_fof_txt_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16(fitfight)
@@ -138,9 +138,9 @@ SCREEN_UPDATE_IND16(fitfight)
 //          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x0038) >> 3);
 //      else
 		scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5);
-		tilemap_set_scrollx(state->m_fof_bak_tilemap,0, scrollbak );
-		tilemap_set_scrolly(state->m_fof_bak_tilemap,0, state->m_fof_a00000[0] & 0xff);
-		tilemap_draw(bitmap, cliprect, state->m_fof_bak_tilemap, 0, 0);
+		state->m_fof_bak_tilemap->set_scrollx(0, scrollbak );
+		state->m_fof_bak_tilemap->set_scrolly(0, state->m_fof_a00000[0] & 0xff);
+		state->m_fof_bak_tilemap->draw(bitmap, cliprect, 0, 0);
 
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
@@ -154,14 +154,14 @@ SCREEN_UPDATE_IND16(fitfight)
 //          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x01c0) >> 6);
 //      else
 		scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5);
-		tilemap_set_scrollx(state->m_fof_mid_tilemap, 0, scrollmid );
-		tilemap_set_scrolly(state->m_fof_mid_tilemap, 0, state->m_fof_900000[0] & 0xff);
+		state->m_fof_mid_tilemap->set_scrollx(0, scrollmid );
+		state->m_fof_mid_tilemap->set_scrolly(0, state->m_fof_900000[0] & 0xff);
 //      if (!screen.machine().input().code_pressed(KEYCODE_F))
-		tilemap_draw(bitmap, cliprect, state->m_fof_mid_tilemap, 0, 0);
+		state->m_fof_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
 
-		tilemap_draw(bitmap, cliprect, state->m_fof_txt_tilemap, 0, 0);
+		state->m_fof_txt_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 /*  popmessage ("Regs %04x %04x %04x %04x %04x %04x",
             state->m_fof_100000[0], state->m_fof_600000[0], state->m_fof_700000[0],

@@ -82,14 +82,14 @@ WRITE8_HANDLER( ironhors_videoram_w )
 {
 	ironhors_state *state = space->machine().driver_data<ironhors_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( ironhors_colorram_w )
 {
 	ironhors_state *state = space->machine().driver_data<ironhors_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( ironhors_charbank_w )
@@ -98,7 +98,7 @@ WRITE8_HANDLER( ironhors_charbank_w )
 	if (state->m_charbank != (data & 0x03))
 	{
 		state->m_charbank = data & 0x03;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	state->m_spriterambank = data & 0x08;
@@ -112,7 +112,7 @@ WRITE8_HANDLER( ironhors_palettebank_w )
 	if (state->m_palettebank != (data & 0x07))
 	{
 		state->m_palettebank = data & 0x07;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	coin_counter_w(space->machine(), 0, data & 0x10);
@@ -129,7 +129,7 @@ WRITE8_HANDLER( ironhors_flipscreen_w )
 	if (flip_screen_get(space->machine()) != (~data & 0x08))
 	{
 		flip_screen_set(space->machine(), ~data & 0x08);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* other bits are used too, but unknown */
@@ -152,7 +152,7 @@ VIDEO_START( ironhors )
 	ironhors_state *state = machine.driver_data<ironhors_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_scroll_rows(32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -245,9 +245,9 @@ SCREEN_UPDATE_IND16( ironhors )
 	int row;
 
 	for (row = 0; row < 32; row++)
-		tilemap_set_scrollx(state->m_bg_tilemap, row, state->m_scroll[row]);
+		state->m_bg_tilemap->set_scrollx(row, state->m_scroll[row]);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -268,7 +268,7 @@ VIDEO_START( farwest )
 	ironhors_state *state = machine.driver_data<ironhors_state>();
 	state->m_bg_tilemap = tilemap_create(machine, farwest_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_scroll_rows(32);
 }
 
 static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -358,9 +358,9 @@ SCREEN_UPDATE_IND16( farwest)
 	int row;
 
 	for (row = 0; row < 32; row++)
-		tilemap_set_scrollx(state->m_bg_tilemap, row, state->m_scroll[row]);
+		state->m_bg_tilemap->set_scrollx(row, state->m_scroll[row]);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	farwest_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -79,7 +79,7 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 	if((state->m_port7^data)&0x40)
 		memory_set_bankptr(space->machine(), "bank1",&RAM[0x10000+((data&0x40)<<7)]);
 
-	tilemap_set_flip_all( space->machine(),data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
+	space->machine().tilemap().set_flip_all(data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
 	state->m_port7 = data;
 }

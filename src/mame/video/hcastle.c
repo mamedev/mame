@@ -135,7 +135,7 @@ VIDEO_START( hcastle )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan, 8, 8, 64, 32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -150,14 +150,14 @@ WRITE8_HANDLER( hcastle_pf1_video_w )
 {
 	hcastle_state *state = space->machine().driver_data<hcastle_state>();
 	state->m_pf1_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0xbff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
 WRITE8_HANDLER( hcastle_pf2_video_w )
 {
 	hcastle_state *state = space->machine().driver_data<hcastle_state>();
 	state->m_pf2_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0xbff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
 WRITE8_HANDLER( hcastle_gfxbank_w )
@@ -185,7 +185,7 @@ WRITE8_HANDLER( hcastle_pf1_control_w )
 	}
 	else if (offset == 7)
 	{
-		tilemap_set_flip(state->m_fg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		state->m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
 	k007121_ctrl_w(state->m_k007121_1, offset, data);
 }
@@ -203,7 +203,7 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 	}
 	else if (offset == 7)
 	{
-		tilemap_set_flip(state->m_bg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		state->m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
 	k007121_ctrl_w(state->m_k007121_2, offset, data);
 }
@@ -246,32 +246,32 @@ SCREEN_UPDATE_IND16( hcastle )
 		state->m_pf2_bankbase += 0x2000;
 
 	if (state->m_pf1_bankbase != state->m_old_pf1)
-		tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+		state->m_fg_tilemap->mark_all_dirty();
 
 	if (state->m_pf2_bankbase != state->m_old_pf2)
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 
 	state->m_old_pf1 = state->m_pf1_bankbase;
 	state->m_old_pf2 = state->m_pf2_bankbase;
 
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, ctrl_2_2);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((ctrl_2_1 << 8) + ctrl_2_0));
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, ctrl_1_2);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, ((ctrl_1_1 << 8) + ctrl_1_0));
+	state->m_bg_tilemap->set_scrolly(0, ctrl_2_2);
+	state->m_bg_tilemap->set_scrollx(0, ((ctrl_2_1 << 8) + ctrl_2_0));
+	state->m_fg_tilemap->set_scrolly(0, ctrl_1_2);
+	state->m_fg_tilemap->set_scrollx(0, ((ctrl_1_1 << 8) + ctrl_1_0));
 
 //  /* Sprite priority */
 //  if (ctrl_1_3 & 0x20)
 	if ((state->m_gfx_bank & 0x04) == 0)
 	{
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u8, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u8, 1);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u8, 0);
 		draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u8, 1);
 	}

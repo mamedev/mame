@@ -43,7 +43,7 @@ void K053936_set_offset(int chip, int xoffs, int yoffs);
 
 
 /*
-  Note: K053251_w() automatically does a tilemap_mark_all_tiles_dirty(ALL_TILEMAPS)
+  Note: K053251_w() automatically does a ALL_TILEMAPS->mark_all_dirty()
   when some palette index changes. If ALL_TILEMAPS is too expensive, use
   K053251_set_tilemaps() to indicate which tilemap is associated with each index.
  */

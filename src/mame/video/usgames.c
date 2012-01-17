@@ -54,7 +54,7 @@ WRITE8_HANDLER( usgames_videoram_w )
 {
 	usgames_state *state = space->machine().driver_data<usgames_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap,offset/2);
+	state->m_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_HANDLER( usgames_charram_w )
@@ -68,6 +68,6 @@ WRITE8_HANDLER( usgames_charram_w )
 SCREEN_UPDATE_IND16(usgames)
 {
 	usgames_state *state = screen.machine().driver_data<usgames_state>();
-	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
+	state->m_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

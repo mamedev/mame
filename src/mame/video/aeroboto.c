@@ -45,8 +45,8 @@ VIDEO_START( aeroboto )
 	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 64);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 64);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scroll_rows(64);
 
 	state->save_item(NAME(state->m_charbank));
 	state->save_item(NAME(state->m_starsoff));
@@ -94,7 +94,7 @@ WRITE8_HANDLER( aeroboto_3000_w )
 	/* bit 1 = char bank select */
 	if (state->m_charbank != ((data & 0x02) >> 1))
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 		state->m_charbank = (data & 0x02) >> 1;
 	}
 
@@ -107,7 +107,7 @@ WRITE8_HANDLER( aeroboto_videoram_w )
 	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( aeroboto_tilecolor_w )
@@ -117,7 +117,7 @@ WRITE8_HANDLER( aeroboto_tilecolor_w )
 	if (state->m_tilecolor[offset] != data)
 	{
 		state->m_tilecolor[offset] = data;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -214,16 +214,16 @@ SCREEN_UPDATE_IND16( aeroboto )
 	}
 
 	for (y = 0; y < 64; y++)
-		tilemap_set_scrollx(state->m_bg_tilemap, y, state->m_hscroll[y]);
+		state->m_bg_tilemap->set_scrollx(y, state->m_hscroll[y]);
 
 	// the playfield is part of a splitscreen and should not overlap with status display
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_vscroll);
-	tilemap_draw(bitmap, splitrect2, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->set_scrolly(0, *state->m_vscroll);
+	state->m_bg_tilemap->draw(bitmap, splitrect2, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, splitrect1, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->set_scrolly(0, 0);
+	state->m_bg_tilemap->draw(bitmap, splitrect1, 0, 0);
 	return 0;
 }

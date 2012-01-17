@@ -109,7 +109,7 @@ static WRITE16_HANDLER(hedpanic_platform_w)
 	int offsets = state->m_headpanic_platform_x[0] + 0x40 * state->m_headpanic_platform_y[0];
 
 	state->m_vram_1[offsets] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap_1_16x16, offsets);
+	state->m_tilemap_1_16x16->mark_tile_dirty(offsets);
 }
 
 

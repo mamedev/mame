@@ -77,7 +77,7 @@ VIDEO_START( rpunch )
 	state->m_background[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_cols,8,8,64,64);
 
 	/* configure the tilemaps */
-	tilemap_set_transparent_pen(state->m_background[1],15);
+	state->m_background[1]->set_transparent_pen(15);
 
 	if (state->m_bitmapram)
 		memset(state->m_bitmapram, 0xff, state->m_bitmapram_size);
@@ -101,7 +101,7 @@ WRITE16_HANDLER( rpunch_videoram_w )
 	int tmap = offset >> 12;
 	int tile_index = offset & 0xfff;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_background[tmap],tile_index);
+	state->m_background[tmap]->mark_tile_dirty(tile_index);
 }
 
 
@@ -115,9 +115,9 @@ WRITE16_HANDLER( rpunch_videoreg_w )
 	{
 		/* invalidate tilemaps */
 		if ((oldword ^ state->m_videoflags) & 0x0410)
-			tilemap_mark_all_tiles_dirty(state->m_background[0]);
+			state->m_background[0]->mark_all_dirty();
 		if ((oldword ^ state->m_videoflags) & 0x0820)
-			tilemap_mark_all_tiles_dirty(state->m_background[1]);
+			state->m_background[1]->mark_all_dirty();
 	}
 }
 
@@ -129,19 +129,19 @@ WRITE16_HANDLER( rpunch_scrollreg_w )
 		switch (offset)
 		{
 			case 0:
-				tilemap_set_scrolly(state->m_background[0], 0, data & 0x1ff);
+				state->m_background[0]->set_scrolly(0, data & 0x1ff);
 				break;
 
 			case 1:
-				tilemap_set_scrollx(state->m_background[0], 0, data & 0x1ff);
+				state->m_background[0]->set_scrollx(0, data & 0x1ff);
 				break;
 
 			case 2:
-				tilemap_set_scrolly(state->m_background[1], 0, data & 0x1ff);
+				state->m_background[1]->set_scrolly(0, data & 0x1ff);
 				break;
 
 			case 3:
-				tilemap_set_scrollx(state->m_background[1], 0, data & 0x1ff);
+				state->m_background[1]->set_scrollx(0, data & 0x1ff);
 				break;
 		}
 }
@@ -280,9 +280,9 @@ SCREEN_UPDATE_IND16( rpunch )
 	/* this seems like the most plausible explanation */
 	effbins = (state->m_bins > state->m_gins) ? state->m_gins : state->m_bins;
 
-	tilemap_draw(bitmap, cliprect, state->m_background[0], 0,0);
+	state->m_background[0]->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0, effbins);
-	tilemap_draw(bitmap, cliprect, state->m_background[1], 0,0);
+	state->m_background[1]->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect, effbins, state->m_gins);
 	if (state->m_bitmapram)
 		draw_bitmap(screen.machine(), bitmap, cliprect);

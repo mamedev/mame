@@ -116,7 +116,7 @@ WRITE8_HANDLER( ampoker2_videoram_w )
 	ampoker2_state *state = space->machine().driver_data<ampoker2_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -164,6 +164,6 @@ VIDEO_START(sigma2k)
 SCREEN_UPDATE_IND16(ampoker2)
 {
 	ampoker2_state *state = screen.machine().driver_data<ampoker2_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

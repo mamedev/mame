@@ -93,7 +93,7 @@ VIDEO_START( xybots )
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 }
 
 
@@ -112,7 +112,7 @@ SCREEN_UPDATE_IND16( xybots )
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -166,6 +166,6 @@ SCREEN_UPDATE_IND16( xybots )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

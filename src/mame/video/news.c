@@ -49,7 +49,7 @@ VIDEO_START( news )
 	news_state *state = machine.driver_data<news_state>();
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
@@ -67,7 +67,7 @@ WRITE8_HANDLER( news_fgram_w )
 	news_state *state = space->machine().driver_data<news_state>();
 
 	state->m_fgram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset / 2);
+	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( news_bgram_w )
@@ -75,7 +75,7 @@ WRITE8_HANDLER( news_bgram_w )
 	news_state *state = space->machine().driver_data<news_state>();
 
 	state->m_bgram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( news_bgpic_w )
@@ -85,7 +85,7 @@ WRITE8_HANDLER( news_bgpic_w )
 	if (state->m_bgpic != data)
 	{
 		state->m_bgpic = data;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -100,7 +100,7 @@ WRITE8_HANDLER( news_bgpic_w )
 SCREEN_UPDATE_IND16( news )
 {
 	news_state *state = screen.machine().driver_data<news_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

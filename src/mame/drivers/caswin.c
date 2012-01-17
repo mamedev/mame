@@ -82,7 +82,7 @@ static VIDEO_START(vvillage)
 static SCREEN_UPDATE_IND16(vvillage)
 {
 	caswin_state *state = screen.machine().driver_data<caswin_state>();
-	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
+	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -90,14 +90,14 @@ static WRITE8_HANDLER( sc0_vram_w )
 {
 	caswin_state *state = space->machine().driver_data<caswin_state>();
 	state->m_sc0_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
+	state->m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( sc0_attr_w )
 {
 	caswin_state *state = space->machine().driver_data<caswin_state>();
 	state->m_sc0_attr[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
+	state->m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 /*These two are tested during the two cherry sub-games.I really don't know what is supposed to do...*/

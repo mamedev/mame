@@ -37,7 +37,7 @@ WRITE8_HANDLER( ladyfrog_videoram_w )
 {
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset >> 1);
+	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 READ8_HANDLER( ladyfrog_videoram_r )
@@ -76,7 +76,7 @@ WRITE8_HANDLER( ladyfrog_gfxctrl2_w )
 {
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 	state->m_tilebank = ((data & 0x18) >> 3) ^ 3;
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 }
 
 
@@ -100,7 +100,7 @@ WRITE8_HANDLER( ladyfrog_scrlram_w )
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 
 	state->m_scrlram[offset] = data;
-	tilemap_set_scrolly(state->m_bg_tilemap, offset, data);
+	state->m_bg_tilemap->set_scrolly(offset, data);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -147,8 +147,8 @@ static VIDEO_START( ladyfrog_common )
 
 	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
 	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
-	tilemap_set_scrolldy(state->m_bg_tilemap, 15, 15);
+	state->m_bg_tilemap->set_scroll_cols(32);
+	state->m_bg_tilemap->set_scrolldy(15, 15);
 
 	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
 	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
@@ -177,7 +177,7 @@ SCREEN_UPDATE_IND16( ladyfrog )
 {
 	ladyfrog_state *state = screen.machine().driver_data<ladyfrog_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

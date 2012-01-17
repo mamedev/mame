@@ -24,7 +24,7 @@ WRITE16_HANDLER( wrally_vram_w )
 	data = gaelco_decrypt(space, offset, data, 0x1f, 0x522a);
 	COMBINE_DATA(&state->m_videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_pant[(offset & 0x1fff) >> 12], ((offset << 1) & 0x1fff) >> 2);
+	state->m_pant[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 }
 
 WRITE16_HANDLER( wrally_flipscreen_w )

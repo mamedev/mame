@@ -124,7 +124,7 @@ static SCREEN_UPDATE_IND16( m14 )
 {
 	m14_state *state = screen.machine().driver_data<m14_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_m14_tilemap, 0, 0);
+	state->m_m14_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( m14_vram_w )
 	m14_state *state = space->machine().driver_data<m14_state>();
 
 	state->m_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_m14_tilemap, offset);
+	state->m_m14_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( m14_cram_w )
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( m14_cram_w )
 	m14_state *state = space->machine().driver_data<m14_state>();
 
 	state->m_color_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_m14_tilemap, offset);
+	state->m_m14_tilemap->mark_tile_dirty(offset);
 }
 
 /*************************************

@@ -38,7 +38,7 @@ WRITE8_HANDLER( atetris_videoram_w )
 	UINT8 *videoram = state->m_videoram;
 
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -68,6 +68,6 @@ SCREEN_UPDATE_IND16( atetris )
 {
 	atetris_state *state = screen.machine().driver_data<atetris_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

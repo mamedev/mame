@@ -220,11 +220,11 @@ static TILEMAP_MAPPER( fg_tilemap_scan )
 }
 
 
-INLINE void rallyx_get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int ram_offs)
+INLINE void rallyx_get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int ram_offs)
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 	UINT8 attr = state->m_videoram[ram_offs + tile_index + 0x800];
-	tileinfo->category = (attr & 0x20) >> 5;
+	tileinfo.category = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			state->m_videoram[ram_offs + tile_index],
@@ -243,13 +243,13 @@ static TILE_GET_INFO( rallyx_fg_get_tile_info )
 }
 
 
-INLINE void locomotn_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int ram_offs)
+INLINE void locomotn_get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int ram_offs)
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 	UINT8 attr = state->m_videoram[ram_offs + tile_index + 0x800];
 	int code = state->m_videoram[ram_offs + tile_index];
 	code = (code & 0x7f) + 2 * (attr & 0x40) + 2 * (code & 0x80);
-	tileinfo->category = (attr & 0x20) >> 5;
+	tileinfo.category = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			code,
@@ -345,7 +345,7 @@ VIDEO_START( rallyx )
 	state->m_fg_tilemap = tilemap_create(machine, rallyx_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
 
 	/* the scrolling tilemap is slightly misplaced in Rally X */
-	tilemap_set_scrolldx(state->m_bg_tilemap, 3, 3);
+	state->m_bg_tilemap->set_scrolldx(3, 3);
 
 	state->m_spriteram_base = 0x14;
 
@@ -377,8 +377,8 @@ VIDEO_START( locomotn )
 	/* handle reduced visible area in some games */
 	if (machine.primary_screen->visible_area().max_x == 32 * 8 - 1)
 	{
-		tilemap_set_scrolldx(state->m_bg_tilemap, 0, 32);
-		tilemap_set_scrolldx(state->m_fg_tilemap, 0, 32);
+		state->m_bg_tilemap->set_scrolldx(0, 32);
+		state->m_fg_tilemap->set_scrolldx(0, 32);
 	}
 
 	state->m_spriteram_base = 0x14;
@@ -398,8 +398,8 @@ VIDEO_START( commsega )
 	/* handle reduced visible area in some games */
 	if (machine.primary_screen->visible_area().max_x == 32 * 8 - 1)
 	{
-		tilemap_set_scrolldx(state->m_bg_tilemap, 0, 32);
-		tilemap_set_scrolldx(state->m_fg_tilemap, 0, 32);
+		state->m_bg_tilemap->set_scrolldx(0, 32);
+		state->m_fg_tilemap->set_scrolldx(0, 32);
 	}
 
 	/* commsega has more sprites and bullets than the other games */
@@ -422,21 +422,21 @@ WRITE8_HANDLER( rallyx_videoram_w )
 
 	state->m_videoram[offset] = data;
 	if (offset & 0x400)
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x3ff);
+		state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 	else
-		tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x3ff);
+		state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( rallyx_scrollx_w )
 {
 	rallyx_state *state = space->machine().driver_data<rallyx_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrollx(0, data);
 }
 
 WRITE8_HANDLER( rallyx_scrolly_w )
 {
 	rallyx_state *state = space->machine().driver_data<rallyx_state>();
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrolly(0, data);
 }
 
 WRITE8_HANDLER( tactcian_starson_w )
@@ -647,10 +647,10 @@ SCREEN_UPDATE_IND16( rallyx )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, bg_clip, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, fg_clip, state->m_fg_tilemap, 0, 0);
-	tilemap_draw(bitmap, bg_clip, state->m_bg_tilemap, 1, 1);
-	tilemap_draw(bitmap, fg_clip, state->m_fg_tilemap, 1, 1);
+	state->m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, bg_clip, 1, 1);
+	state->m_fg_tilemap->draw(bitmap, fg_clip, 1, 1);
 
 	rallyx_draw_bullets(screen.machine(), bitmap, cliprect, TRUE);
 	rallyx_draw_sprites(screen.machine(), bitmap, cliprect, 1);
@@ -682,10 +682,10 @@ SCREEN_UPDATE_IND16( jungler )
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	/* tile priority doesn't seem to be supported in Jungler */
-	tilemap_draw(bitmap,bg_clip, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap,fg_clip, state->m_fg_tilemap, 0, 0);
-	tilemap_draw(bitmap,bg_clip, state->m_bg_tilemap, 1, 0);
-	tilemap_draw(bitmap,fg_clip, state->m_fg_tilemap, 1, 0);
+	state->m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, bg_clip, 1, 0);
+	state->m_fg_tilemap->draw(bitmap, fg_clip, 1, 0);
 
 	jungler_draw_bullets(screen.machine(), bitmap, cliprect, TRUE);
 	rallyx_draw_sprites(screen.machine(), bitmap, cliprect, 0);
@@ -728,10 +728,10 @@ SCREEN_UPDATE_IND16( locomotn )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, bg_clip, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, fg_clip, state->m_fg_tilemap, 0, 0);
-	tilemap_draw(bitmap, bg_clip, state->m_bg_tilemap, 1, 1);
-	tilemap_draw(bitmap, fg_clip, state->m_fg_tilemap, 1, 1);
+	state->m_bg_tilemap->draw(bitmap, bg_clip, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, fg_clip, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, bg_clip, 1, 1);
+	state->m_fg_tilemap->draw(bitmap, fg_clip, 1, 1);
 
 	locomotn_draw_bullets(screen.machine(), bitmap, cliprect, TRUE);
 	locomotn_draw_sprites(screen.machine(), bitmap, cliprect, 0);

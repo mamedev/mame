@@ -100,7 +100,7 @@ WRITE16_HANDLER( aquarium_txt_videoram_w )
 {
 	aquarium_state *state = space->machine().driver_data<aquarium_state>();
 	state->m_txt_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_txt_tilemap, offset);
+	state->m_txt_tilemap->mark_tile_dirty(offset);
 }
 
 /* MID Layer */
@@ -115,14 +115,14 @@ static TILE_GET_INFO( get_aquarium_mid_tile_info )
 
 	SET_TILE_INFO(1, tileno, colour, flag);
 
-	tileinfo->category = (state->m_mid_videoram[tile_index * 2 + 1] & 0x20) >> 5;
+	tileinfo.category = (state->m_mid_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
 
 WRITE16_HANDLER( aquarium_mid_videoram_w )
 {
 	aquarium_state *state = space->machine().driver_data<aquarium_state>();
 	state->m_mid_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_mid_tilemap, offset / 2);
+	state->m_mid_tilemap->mark_tile_dirty(offset / 2);
 }
 
 /* BAK Layer */
@@ -137,14 +137,14 @@ static TILE_GET_INFO( get_aquarium_bak_tile_info )
 
 	SET_TILE_INFO(3, tileno, colour, flag);
 
-	tileinfo->category = (state->m_bak_videoram[tile_index * 2 + 1] & 0x20) >> 5;
+	tileinfo.category = (state->m_bak_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
 
 WRITE16_HANDLER( aquarium_bak_videoram_w )
 {
 	aquarium_state *state = space->machine().driver_data<aquarium_state>();
 	state->m_bak_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bak_tilemap, offset / 2);
+	state->m_bak_tilemap->mark_tile_dirty(offset / 2);
 }
 
 VIDEO_START(aquarium)
@@ -154,27 +154,27 @@ VIDEO_START(aquarium)
 	state->m_bak_tilemap = tilemap_create(machine, get_aquarium_bak_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_mid_tilemap = tilemap_create(machine, get_aquarium_mid_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_txt_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_mid_tilemap, 0);
+	state->m_txt_tilemap->set_transparent_pen(0);
+	state->m_mid_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16(aquarium)
 {
 	aquarium_state *state = screen.machine().driver_data<aquarium_state>();
-	tilemap_set_scrollx(state->m_mid_tilemap, 0, state->m_scroll[0]);
-	tilemap_set_scrolly(state->m_mid_tilemap, 0, state->m_scroll[1]);
-	tilemap_set_scrollx(state->m_bak_tilemap, 0, state->m_scroll[2]);
-	tilemap_set_scrolly(state->m_bak_tilemap, 0, state->m_scroll[3]);
-	tilemap_set_scrollx(state->m_txt_tilemap, 0, state->m_scroll[4]);
-	tilemap_set_scrolly(state->m_txt_tilemap, 0, state->m_scroll[5]);
+	state->m_mid_tilemap->set_scrollx(0, state->m_scroll[0]);
+	state->m_mid_tilemap->set_scrolly(0, state->m_scroll[1]);
+	state->m_bak_tilemap->set_scrollx(0, state->m_scroll[2]);
+	state->m_bak_tilemap->set_scrolly(0, state->m_scroll[3]);
+	state->m_txt_tilemap->set_scrollx(0, state->m_scroll[4]);
+	state->m_txt_tilemap->set_scrolly(0, state->m_scroll[5]);
 
-	tilemap_draw(bitmap, cliprect, state->m_bak_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_mid_tilemap, 0, 0);
+	state->m_bak_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 16);
 
-	tilemap_draw(bitmap, cliprect, state->m_bak_tilemap, 1, 0);
-	tilemap_draw(bitmap, cliprect, state->m_mid_tilemap, 1, 0);
-	tilemap_draw(bitmap, cliprect, state->m_txt_tilemap, 0, 0);
+	state->m_bak_tilemap->draw(bitmap, cliprect, 1, 0);
+	state->m_mid_tilemap->draw(bitmap, cliprect, 1, 0);
+	state->m_txt_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

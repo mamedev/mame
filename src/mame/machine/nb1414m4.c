@@ -300,5 +300,5 @@ void nb_1414m4_exec(address_space *space,UINT16 mcu_cmd,UINT8 *vram,UINT16 &scro
 	}
 
 	/* mark tiles dirty */
-	tilemap_mark_all_tiles_dirty(tilemap);
+	tilemap->mark_all_dirty();
 }

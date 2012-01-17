@@ -103,8 +103,8 @@ VIDEO_START( fastfred )
 	fastfred_state *state = machine.driver_data<fastfred_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scroll_cols(32);
 }
 
 
@@ -118,7 +118,7 @@ WRITE8_HANDLER( fastfred_videoram_w )
 {
 	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -133,12 +133,12 @@ WRITE8_HANDLER( fastfred_attributes_w )
 			int i;
 
 			for (i = offset / 2; i < 0x0400; i += 32)
-				tilemap_mark_tile_dirty(state->m_bg_tilemap, i);
+				state->m_bg_tilemap->mark_tile_dirty(i);
 		}
 		else
 		{
 			/* coloumn scroll */
-			tilemap_set_scrolly(state->m_bg_tilemap, offset / 2, data);
+			state->m_bg_tilemap->set_scrolly(offset / 2, data);
 		}
 
 		state->m_attributesram[offset] = data;
@@ -153,7 +153,7 @@ WRITE8_HANDLER( fastfred_charbank1_w )
 
 	if (new_data != state->m_charbank)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 
 		state->m_charbank = new_data;
 	}
@@ -166,7 +166,7 @@ WRITE8_HANDLER( fastfred_charbank2_w )
 
 	if (new_data != state->m_charbank)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 
 		state->m_charbank = new_data;
 	}
@@ -180,7 +180,7 @@ WRITE8_HANDLER( fastfred_colorbank1_w )
 
 	if (new_data != state->m_colorbank)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 
 		state->m_colorbank = new_data;
 	}
@@ -193,7 +193,7 @@ WRITE8_HANDLER( fastfred_colorbank2_w )
 
 	if (new_data != state->m_colorbank)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 
 		state->m_colorbank = new_data;
 	}
@@ -208,7 +208,7 @@ WRITE8_HANDLER( fastfred_flip_screen_x_w )
 	{
 		flip_screen_x_set(space->machine(), data & 0x01);
 
-		tilemap_set_flip(state->m_bg_tilemap, (flip_screen_x_get(space->machine()) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine()) ? TILEMAP_FLIPY : 0));
+		state->m_bg_tilemap->set_flip((flip_screen_x_get(space->machine()) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine()) ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -219,7 +219,7 @@ WRITE8_HANDLER( fastfred_flip_screen_y_w )
 	{
 		flip_screen_y_set(space->machine(), data & 0x01);
 
-		tilemap_set_flip(state->m_bg_tilemap, (flip_screen_x_get(space->machine()) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine()) ? TILEMAP_FLIPY : 0));
+		state->m_bg_tilemap->set_flip((flip_screen_x_get(space->machine()) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine()) ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -300,7 +300,7 @@ SCREEN_UPDATE_IND16( fastfred )
 {
 	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
 	bitmap.fill(*state->m_background_color, cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;
@@ -334,7 +334,7 @@ WRITE8_HANDLER( imago_fg_videoram_w )
 {
 	fastfred_state *state = space->machine().driver_data<fastfred_state>();
 	state->m_imago_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( imago_charbank_w )
@@ -343,7 +343,7 @@ WRITE8_HANDLER( imago_charbank_w )
 	if( state->m_charbank != data )
 	{
 		state->m_charbank = data;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -354,8 +354,8 @@ VIDEO_START( imago )
 	state->m_bg_tilemap   = tilemap_create(machine, imago_get_tile_info_bg, tilemap_scan_rows,8,8,32,32);
 	state->m_fg_tilemap   = tilemap_create(machine, imago_get_tile_info_fg, tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	/* the game has a galaxian starfield */
 	galaxold_init_stars(machine, 256);
@@ -369,11 +369,11 @@ VIDEO_START( imago )
 SCREEN_UPDATE_IND16( imago )
 {
 	fastfred_state *state = screen.machine().driver_data<fastfred_state>();
-	tilemap_draw(bitmap,cliprect,state->m_web_tilemap,0,0);
+	state->m_web_tilemap->draw(bitmap, cliprect, 0,0);
 	galaxold_draw_stars(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

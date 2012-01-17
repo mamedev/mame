@@ -63,8 +63,8 @@ static void tx_tilemap_mark_all_dirty( running_machine &machine )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
 
-	tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
-	tilemap_set_flip(state->m_tx_tilemap, state->m_flip_x | state->m_flip_y);
+	state->m_tx_tilemap->mark_all_dirty();
+	state->m_tx_tilemap->set_flip(state->m_flip_x | state->m_flip_y);
 }
 
 READ8_HANDLER( chaknpop_gfxmode_r )
@@ -106,7 +106,7 @@ WRITE8_HANDLER( chaknpop_txram_w )
 	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
 
 	state->m_tx_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( chaknpop_attrram_w )
@@ -262,7 +262,7 @@ SCREEN_UPDATE_IND16( chaknpop )
 {
 	chaknpop_state *state = screen.machine().driver_data<chaknpop_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	draw_bitmap(screen.machine(), bitmap, cliprect);
 	return 0;

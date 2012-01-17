@@ -91,9 +91,9 @@ WRITE8_HANDLER( flkatck_k007121_w )
 	if (offset < 0x1000)	/* tiles */
 	{
 		if (offset & 0x800)	/* score */
-			tilemap_mark_tile_dirty(state->m_k007121_tilemap[1], offset & 0x3ff);
+			state->m_k007121_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
 		else
-			tilemap_mark_tile_dirty(state->m_k007121_tilemap[0], offset & 0x3ff);
+			state->m_k007121_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
 	}
 }
 
@@ -105,12 +105,12 @@ WRITE8_HANDLER( flkatck_k007121_regs_w )
 	{
 		case 0x04:	/* ROM bank select */
 			if (data != k007121_ctrlram_r(state->m_k007121, 4))
-				tilemap_mark_all_tiles_dirty_all(space->machine());
+				space->machine().tilemap().mark_all_dirty();
 			break;
 
 		case 0x07:	/* flip screen + IRQ control */
 			state->m_flipscreen = data & 0x08;
-			tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			state->m_irq_enabled = data & 0x02;
 			break;
 	}
@@ -146,9 +146,9 @@ SCREEN_UPDATE_IND16( flkatck )
 		clip[1] = visarea;
 		clip[1].min_x = clip[1].max_x - 40;
 
-		tilemap_set_scrollx(state->m_k007121_tilemap[0], 0, k007121_ctrlram_r(state->m_k007121, 0) - 56 );
-		tilemap_set_scrolly(state->m_k007121_tilemap[0], 0, k007121_ctrlram_r(state->m_k007121, 2));
-		tilemap_set_scrollx(state->m_k007121_tilemap[1], 0, -16);
+		state->m_k007121_tilemap[0]->set_scrollx(0, k007121_ctrlram_r(state->m_k007121, 0) - 56 );
+		state->m_k007121_tilemap[0]->set_scrolly(0, k007121_ctrlram_r(state->m_k007121, 2));
+		state->m_k007121_tilemap[1]->set_scrollx(0, -16);
 	}
 	else
 	{
@@ -159,9 +159,9 @@ SCREEN_UPDATE_IND16( flkatck )
 		clip[1].max_x = 39;
 		clip[1].min_x = 0;
 
-		tilemap_set_scrollx(state->m_k007121_tilemap[0], 0, k007121_ctrlram_r(state->m_k007121, 0) - 40 );
-		tilemap_set_scrolly(state->m_k007121_tilemap[0], 0, k007121_ctrlram_r(state->m_k007121, 2));
-		tilemap_set_scrollx(state->m_k007121_tilemap[1], 0, 0);
+		state->m_k007121_tilemap[0]->set_scrollx(0, k007121_ctrlram_r(state->m_k007121, 0) - 40 );
+		state->m_k007121_tilemap[0]->set_scrolly(0, k007121_ctrlram_r(state->m_k007121, 2));
+		state->m_k007121_tilemap[1]->set_scrollx(0, 0);
 	}
 
 	/* compute clipping */
@@ -169,8 +169,8 @@ SCREEN_UPDATE_IND16( flkatck )
 	clip[1] &= cliprect;
 
 	/* draw the graphics */
-	tilemap_draw(bitmap, clip[0], state->m_k007121_tilemap[0], 0, 0);
+	state->m_k007121_tilemap[0]->draw(bitmap, clip[0], 0, 0);
 	k007121_sprites_draw(state->m_k007121, bitmap, cliprect, screen.machine().gfx[0], NULL, &state->m_k007121_ram[0x1000], 0, 40, 0, (UINT32)-1);
-	tilemap_draw(bitmap, clip[1], state->m_k007121_tilemap[1], 0, 0);
+	state->m_k007121_tilemap[1]->draw(bitmap, clip[1], 0, 0);
 	return 0;
 }

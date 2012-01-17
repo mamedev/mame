@@ -128,16 +128,16 @@ static WRITE8_HANDLER( warpspeed_vidram_w )
 	warpspeed_state *state = space->machine().driver_data<warpspeed_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_text_tilemap, offset);
+	state->m_text_tilemap->mark_tile_dirty(offset);
 }
 
 static VIDEO_START( warpspeed )
 {
 	warpspeed_state *state = machine.driver_data<warpspeed_state>();
 	state->m_text_tilemap = tilemap_create(machine, get_warpspeed_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_text_tilemap, 0);
+	state->m_text_tilemap->set_transparent_pen(0);
 	state->m_starfield_tilemap = tilemap_create(machine, get_warpspeed_starfield_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_mark_all_tiles_dirty(state->m_starfield_tilemap);
+	state->m_starfield_tilemap->mark_all_dirty();
 }
 
 static void draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l, int color)
@@ -207,9 +207,9 @@ static SCREEN_UPDATE_IND16( warpspeed )
 {
 	warpspeed_state *state = screen.machine().driver_data<warpspeed_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_starfield_tilemap, 0, 0);
+	state->m_starfield_tilemap->draw(bitmap, cliprect, 0, 0);
 	warpspeed_draw_circles(bitmap, state);
-	tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
+	state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

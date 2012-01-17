@@ -61,7 +61,7 @@ WRITE16_HANDLER( powerins_tilebank_w )
 		if (data != state->m_tile_bank)
 		{
 			state->m_tile_bank = data;		// Tiles Bank (VRAM 0)
-			tilemap_mark_all_tiles_dirty(state->m_tilemap_0);
+			state->m_tilemap_0->mark_all_dirty();
 		}
 	}
 }
@@ -134,7 +134,7 @@ WRITE16_HANDLER( powerins_vram_0_w )
 {
 	powerins_state *state = space->machine().driver_data<powerins_state>();
 	COMBINE_DATA(&state->m_vram_0[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_0, offset);
+	state->m_tilemap_0->mark_tile_dirty(offset);
 }
 
 static TILEMAP_MAPPER( powerins_get_memory_offset_0 )
@@ -176,7 +176,7 @@ WRITE16_HANDLER( powerins_vram_1_w )
 {
 	powerins_state *state = space->machine().driver_data<powerins_state>();
 	COMBINE_DATA(&state->m_vram_1[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_1, offset);
+	state->m_tilemap_1->mark_tile_dirty(offset);
 }
 
 
@@ -206,12 +206,12 @@ VIDEO_START( powerins )
 								8,8,
 								DIM_NX_1, DIM_NY_1 );
 
-		tilemap_set_scroll_rows(state->m_tilemap_0,1);
-		tilemap_set_scroll_cols(state->m_tilemap_0,1);
+		state->m_tilemap_0->set_scroll_rows(1);
+		state->m_tilemap_0->set_scroll_cols(1);
 
-		tilemap_set_scroll_rows(state->m_tilemap_1,1);
-		tilemap_set_scroll_cols(state->m_tilemap_1,1);
-		tilemap_set_transparent_pen(state->m_tilemap_1,15);
+		state->m_tilemap_1->set_scroll_rows(1);
+		state->m_tilemap_1->set_scroll_cols(1);
+		state->m_tilemap_1->set_transparent_pen(15);
 }
 
 
@@ -348,11 +348,11 @@ SCREEN_UPDATE_IND16( powerins )
 	int scrollx = (state->m_vctrl_0[2/2]&0xff) + (state->m_vctrl_0[0/2]&0xff)*256;
 	int scrolly = (state->m_vctrl_0[6/2]&0xff) + (state->m_vctrl_0[4/2]&0xff)*256;
 
-	tilemap_set_scrollx( state->m_tilemap_0, 0, scrollx - 0x20);
-	tilemap_set_scrolly( state->m_tilemap_0, 0, scrolly );
+	state->m_tilemap_0->set_scrollx(0, scrollx - 0x20);
+	state->m_tilemap_0->set_scrolly(0, scrolly );
 
-	tilemap_set_scrollx( state->m_tilemap_1, 0, -0x20);	// fixed offset
-	tilemap_set_scrolly( state->m_tilemap_1, 0,  0x00);
+	state->m_tilemap_1->set_scrollx(0, -0x20);	// fixed offset
+	state->m_tilemap_1->set_scrolly(0,  0x00);
 
 #ifdef MAME_DEBUG
 if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -367,9 +367,9 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	if (layers_ctrl&1)		tilemap_draw(bitmap,cliprect, state->m_tilemap_0, 0, 0);
+	if (layers_ctrl&1)		state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	else					bitmap.fill(0, cliprect);
 	if (layers_ctrl&8)		draw_sprites(screen.machine(),bitmap,cliprect);
-	if (layers_ctrl&2)		tilemap_draw(bitmap,cliprect, state->m_tilemap_1, 0, 0);
+	if (layers_ctrl&2)		state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

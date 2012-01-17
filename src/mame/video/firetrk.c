@@ -360,14 +360,14 @@ static void check_collision(firetrk_state *state, int which)
 SCREEN_UPDATE_IND16( firetrk )
 {
 	firetrk_state *state = screen.machine().driver_data<firetrk_state>();
-	tilemap_mark_all_tiles_dirty_all(screen.machine());
-	tilemap_set_scrollx(state->m_tilemap1, 0, *state->m_scroll_x - 37);
-	tilemap_set_scrollx(state->m_tilemap2, 0, *state->m_scroll_x - 37);
-	tilemap_set_scrolly(state->m_tilemap1, 0, *state->m_scroll_y);
-	tilemap_set_scrolly(state->m_tilemap2, 0, *state->m_scroll_y);
+	screen.machine().tilemap().mark_all_dirty();
+	state->m_tilemap1->set_scrollx(0, *state->m_scroll_x - 37);
+	state->m_tilemap2->set_scrollx(0, *state->m_scroll_x - 37);
+	state->m_tilemap1->set_scrolly(0, *state->m_scroll_y);
+	state->m_tilemap2->set_scrolly(0, *state->m_scroll_y);
 
 	bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap, playfield_window, state->m_tilemap1, 0, 0);
+	state->m_tilemap1->draw(bitmap, playfield_window, 0, 0);
 	firetrk_draw_car(screen.machine(), bitmap, playfield_window, screen.machine().gfx, 0, state->m_flash);
 	firetrk_draw_car(screen.machine(), bitmap, playfield_window, screen.machine().gfx, 1, state->m_flash);
 	draw_text(bitmap, cliprect, screen.machine().gfx, state->m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
@@ -375,7 +375,7 @@ SCREEN_UPDATE_IND16( firetrk )
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		tilemap_draw(state->m_helper1, playfield_window, state->m_tilemap2, 0, 0);
+		state->m_tilemap2->draw(state->m_helper1, playfield_window, 0, 0);
 
 		state->m_helper2.fill(0xff, playfield_window);
 		firetrk_draw_car(screen.machine(), state->m_helper2, playfield_window, screen.machine().gfx, 0, FALSE);
@@ -395,21 +395,21 @@ SCREEN_UPDATE_IND16( firetrk )
 SCREEN_UPDATE_IND16( superbug )
 {
 	firetrk_state *state = screen.machine().driver_data<firetrk_state>();
-	tilemap_mark_all_tiles_dirty_all(screen.machine());
-	tilemap_set_scrollx(state->m_tilemap1, 0, *state->m_scroll_x - 37);
-	tilemap_set_scrollx(state->m_tilemap2, 0, *state->m_scroll_x - 37);
-	tilemap_set_scrolly(state->m_tilemap1, 0, *state->m_scroll_y);
-	tilemap_set_scrolly(state->m_tilemap2, 0, *state->m_scroll_y);
+	screen.machine().tilemap().mark_all_dirty();
+	state->m_tilemap1->set_scrollx(0, *state->m_scroll_x - 37);
+	state->m_tilemap2->set_scrollx(0, *state->m_scroll_x - 37);
+	state->m_tilemap1->set_scrolly(0, *state->m_scroll_y);
+	state->m_tilemap2->set_scrolly(0, *state->m_scroll_y);
 
 	bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap, playfield_window, state->m_tilemap1, 0, 0);
+	state->m_tilemap1->draw(bitmap, playfield_window, 0, 0);
 	superbug_draw_car(screen.machine(), bitmap, playfield_window, screen.machine().gfx, state->m_flash);
 	draw_text(bitmap, cliprect, screen.machine().gfx, state->m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
 	draw_text(bitmap, cliprect, screen.machine().gfx, state->m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		tilemap_draw(state->m_helper1, playfield_window, state->m_tilemap2, 0, 0);
+		state->m_tilemap2->draw(state->m_helper1, playfield_window, 0, 0);
 
 		state->m_helper2.fill(0xff, playfield_window);
 		superbug_draw_car(screen.machine(), state->m_helper2, playfield_window, screen.machine().gfx, FALSE);
@@ -425,14 +425,14 @@ SCREEN_UPDATE_IND16( superbug )
 SCREEN_UPDATE_IND16( montecar )
 {
 	firetrk_state *state = screen.machine().driver_data<firetrk_state>();
-	tilemap_mark_all_tiles_dirty_all(screen.machine());
-	tilemap_set_scrollx(state->m_tilemap1, 0, *state->m_scroll_x - 37);
-	tilemap_set_scrollx(state->m_tilemap2, 0, *state->m_scroll_x - 37);
-	tilemap_set_scrolly(state->m_tilemap1, 0, *state->m_scroll_y);
-	tilemap_set_scrolly(state->m_tilemap2, 0, *state->m_scroll_y);
+	screen.machine().tilemap().mark_all_dirty();
+	state->m_tilemap1->set_scrollx(0, *state->m_scroll_x - 37);
+	state->m_tilemap2->set_scrollx(0, *state->m_scroll_x - 37);
+	state->m_tilemap1->set_scrolly(0, *state->m_scroll_y);
+	state->m_tilemap2->set_scrolly(0, *state->m_scroll_y);
 
 	bitmap.fill(0x2c, cliprect);
-	tilemap_draw(bitmap, playfield_window, state->m_tilemap1, 0, 0);
+	state->m_tilemap1->draw(bitmap, playfield_window, 0, 0);
 	montecar_draw_car(screen.machine(), bitmap, playfield_window, screen.machine().gfx, 0, FALSE);
 	montecar_draw_car(screen.machine(), bitmap, playfield_window, screen.machine().gfx, 1, FALSE);
 	draw_text(bitmap, cliprect, screen.machine().gfx, state->m_alpha_num_ram + 0x00, 24, 0x20, 0x08);
@@ -440,7 +440,7 @@ SCREEN_UPDATE_IND16( montecar )
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
-		tilemap_draw(state->m_helper1, playfield_window, state->m_tilemap2, 0, 0);
+		state->m_tilemap2->draw(state->m_helper1, playfield_window, 0, 0);
 
 		state->m_helper2.fill(0xff, playfield_window);
 		montecar_draw_car(screen.machine(), state->m_helper2, playfield_window, screen.machine().gfx, 0, TRUE);

@@ -52,8 +52,8 @@ VIDEO_START( tsamurai )
 	state->m_background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_background,0);
-	tilemap_set_transparent_pen(state->m_foreground,0);
+	state->m_background->set_transparent_pen(0);
+	state->m_foreground->set_transparent_pen(0);
 }
 
 
@@ -66,13 +66,13 @@ VIDEO_START( tsamurai )
 WRITE8_HANDLER( tsamurai_scrolly_w )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	tilemap_set_scrolly( state->m_background, 0, data );
+	state->m_background->set_scrolly(0, data );
 }
 
 WRITE8_HANDLER( tsamurai_scrollx_w )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	tilemap_set_scrollx( state->m_background, 0, data );
+	state->m_background->set_scrollx(0, data );
 }
 
 WRITE8_HANDLER( tsamurai_bgcolor_w )
@@ -87,7 +87,7 @@ WRITE8_HANDLER( tsamurai_textbank1_w )
 	if( state->m_textbank1!=data )
 	{
 		state->m_textbank1 = data;
-		tilemap_mark_all_tiles_dirty( state->m_foreground );
+		state->m_foreground ->mark_all_dirty();
 	}
 }
 
@@ -97,7 +97,7 @@ WRITE8_HANDLER( tsamurai_textbank2_w )
 	if( state->m_textbank2!=data )
 	{
 		state->m_textbank2 = data;
-		tilemap_mark_all_tiles_dirty( state->m_foreground );
+		state->m_foreground ->mark_all_dirty();
 	}
 }
 
@@ -106,13 +106,13 @@ WRITE8_HANDLER( tsamurai_bg_videoram_w )
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	state->m_bg_videoram[offset]=data;
 	offset = offset/2;
-	tilemap_mark_tile_dirty(state->m_background,offset);
+	state->m_background->mark_tile_dirty(offset);
 }
 WRITE8_HANDLER( tsamurai_fg_videoram_w )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
 	state->m_videoram[offset]=data;
-	tilemap_mark_tile_dirty(state->m_foreground,offset);
+	state->m_foreground->mark_tile_dirty(offset);
 }
 WRITE8_HANDLER( tsamurai_fg_colorram_w )
 {
@@ -125,7 +125,7 @@ WRITE8_HANDLER( tsamurai_fg_colorram_w )
 			int col = offset/2;
 			int row;
 			for (row = 0;row < 32;row++)
-				tilemap_mark_tile_dirty(state->m_foreground,32*row+col);
+				state->m_foreground->mark_tile_dirty(32*row+col);
 		}
 	}
 }
@@ -203,10 +203,10 @@ SCREEN_UPDATE_IND16( tsamurai )
 	int i;
 
 /* Do the column scroll used for the "660" logo on the title screen */
-	tilemap_set_scroll_cols(state->m_foreground, 32);
+	state->m_foreground->set_scroll_cols(32);
 	for (i = 0 ; i < 32 ; i++)
 	{
-		tilemap_set_scrolly(state->m_foreground, i, state->m_colorram[i*2]);
+		state->m_foreground->set_scrolly(i, state->m_colorram[i*2]);
 	}
 /* end of column scroll code */
 
@@ -219,9 +219,9 @@ SCREEN_UPDATE_IND16( tsamurai )
         (screenshots would be helpful)
     */
 	bitmap.fill(state->m_bgcolor, cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_background,0,0);
+	state->m_background->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_foreground,0,0);
+	state->m_foreground->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -238,7 +238,7 @@ WRITE8_HANDLER( vsgongf_color_w )
 	if( state->m_vsgongf_color != data )
 	{
 		state->m_vsgongf_color = data;
-		tilemap_mark_all_tiles_dirty( state->m_foreground );
+		state->m_foreground ->mark_all_dirty();
 	}
 }
 
@@ -270,12 +270,12 @@ SCREEN_UPDATE_IND16( vsgongf )
 		while( screen.machine().input().code_pressed( KEYCODE_Q ) ){
 			state->m_key_count++;
 			state->m_vsgongf_color = state->m_key_count;
-			tilemap_mark_all_tiles_dirty( state->m_foreground );
+			state->m_foreground ->mark_all_dirty();
 		}
 	}
 	#endif
 
-	tilemap_draw(bitmap,cliprect,state->m_foreground,0,0);
+	state->m_foreground->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

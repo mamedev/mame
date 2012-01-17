@@ -53,17 +53,17 @@ static void gcpinbal_core_vh_start( running_machine &machine )
 	state->m_tilemap[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows,16,16,32,32);
 	state->m_tilemap[2] = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,8,8,64,64);
 
-	tilemap_set_transparent_pen(state->m_tilemap[0], 0);
-	tilemap_set_transparent_pen(state->m_tilemap[1], 0);
-	tilemap_set_transparent_pen(state->m_tilemap[2], 0);
+	state->m_tilemap[0]->set_transparent_pen(0);
+	state->m_tilemap[1]->set_transparent_pen(0);
+	state->m_tilemap[2]->set_transparent_pen(0);
 
 	/* flipscreen n/a */
-	tilemap_set_scrolldx(state->m_tilemap[0], -xoffs, 0);
-	tilemap_set_scrolldx(state->m_tilemap[1], -xoffs, 0);
-	tilemap_set_scrolldx(state->m_tilemap[2], -xoffs, 0);
-	tilemap_set_scrolldy(state->m_tilemap[0], -yoffs, 0);
-	tilemap_set_scrolldy(state->m_tilemap[1], -yoffs, 0);
-	tilemap_set_scrolldy(state->m_tilemap[2], -yoffs, 0);
+	state->m_tilemap[0]->set_scrolldx(-xoffs, 0);
+	state->m_tilemap[1]->set_scrolldx(-xoffs, 0);
+	state->m_tilemap[2]->set_scrolldx(-xoffs, 0);
+	state->m_tilemap[0]->set_scrolldy(-yoffs, 0);
+	state->m_tilemap[1]->set_scrolldy(-yoffs, 0);
+	state->m_tilemap[2]->set_scrolldy(-yoffs, 0);
 }
 
 VIDEO_START( gcpinbal )
@@ -88,11 +88,11 @@ WRITE16_HANDLER( gcpinbal_tilemaps_word_w )
 	COMBINE_DATA(&state->m_tilemapram[offset]);
 
 	if (offset < 0x800)	/* BG0 */
-		tilemap_mark_tile_dirty(state->m_tilemap[0], offset / 2);
+		state->m_tilemap[0]->mark_tile_dirty(offset / 2);
 	else if ((offset < 0x1000))	/* BG1 */
-		tilemap_mark_tile_dirty(state->m_tilemap[1], (offset % 0x800) / 2);
+		state->m_tilemap[1]->mark_tile_dirty((offset % 0x800) / 2);
 	else if ((offset < 0x1800))	/* FG */
-		tilemap_mark_tile_dirty(state->m_tilemap[2], (offset % 0x800));
+		state->m_tilemap[2]->mark_tile_dirty((offset % 0x800));
 }
 
 
@@ -288,8 +288,8 @@ SCREEN_UPDATE_IND16( gcpinbal )
 
 	for (i = 0; i < 3; i++)
 	{
-		tilemap_set_scrollx(state->m_tilemap[i], 0, state->m_scrollx[i]);
-		tilemap_set_scrolly(state->m_tilemap[i], 0, state->m_scrolly[i]);
+		state->m_tilemap[i]->set_scrollx(0, state->m_scrollx[i]);
+		state->m_tilemap[i]->set_scrolly(0, state->m_scrolly[i]);
 	}
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
@@ -303,17 +303,17 @@ SCREEN_UPDATE_IND16( gcpinbal )
 #ifdef MAME_DEBUG
 	if (state->m_dislayer[layer[0]] == 0)
 #endif
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[layer[0]], TILEMAP_DRAW_OPAQUE, 1);
+	state->m_tilemap[layer[0]]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
 	if (state->m_dislayer[layer[1]] == 0)
 #endif
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[layer[1]], 0, 2);
+	state->m_tilemap[layer[1]]->draw(bitmap, cliprect, 0, 2);
 
 #ifdef MAME_DEBUG
 	if (state->m_dislayer[layer[2]] == 0)
 #endif
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[layer[2]], 0, 4);
+	state->m_tilemap[layer[2]]->draw(bitmap, cliprect, 0, 4);
 
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 16);

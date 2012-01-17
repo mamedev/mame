@@ -15,7 +15,7 @@
 
 ******************************************************************************/
 
-INLINE void fromanc2_get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int vram, int layer )
+INLINE void fromanc2_get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int vram, int layer )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 	int tile, color;
@@ -36,7 +36,7 @@ static TILE_GET_INFO( fromanc2_get_v1_l2_tile_info ) { fromanc2_get_tile_info(ma
 static TILE_GET_INFO( fromanc2_get_v1_l3_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 1, 3); }
 
 
-INLINE void fromancr_get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int vram, int layer )
+INLINE void fromancr_get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int vram, int layer )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 	int tile, color;
@@ -178,7 +178,7 @@ INLINE void fromanc2_dispvram_w( running_machine &machine, offs_t offset, UINT16
 	layer += (offset < 0x1000) ? 0 : 1;
 
 	COMBINE_DATA(&state->m_videoram[vram][layer][offset & 0x0fff]);
-	tilemap_mark_tile_dirty(state->m_tilemap[vram][layer], offset & 0x0fff);
+	state->m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
 WRITE16_HANDLER( fromanc2_videoram_0_w ) { fromanc2_dispvram_w(space->machine(), offset, data, mem_mask, 0, 0); }
@@ -249,10 +249,10 @@ WRITE16_HANDLER( fromanc2_gfxbank_0_w )
 	state->m_gfxbank[0][1] = (data & 0x00f0) >>  4;
 	state->m_gfxbank[0][2] = (data & 0x0f00) >>  8;
 	state->m_gfxbank[0][3] = (data & 0xf000) >> 12;
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[0][0]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[0][1]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[0][2]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[0][3]);
+	state->m_tilemap[0][0]->mark_all_dirty();
+	state->m_tilemap[0][1]->mark_all_dirty();
+	state->m_tilemap[0][2]->mark_all_dirty();
+	state->m_tilemap[0][3]->mark_all_dirty();
 }
 
 WRITE16_HANDLER( fromanc2_gfxbank_1_w )
@@ -262,10 +262,10 @@ WRITE16_HANDLER( fromanc2_gfxbank_1_w )
 	state->m_gfxbank[1][1] = (data & 0x00f0) >>  4;
 	state->m_gfxbank[1][2] = (data & 0x0f00) >>  8;
 	state->m_gfxbank[1][3] = (data & 0xf000) >> 12;
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[1][0]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[1][1]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[1][2]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[1][3]);
+	state->m_tilemap[1][0]->mark_all_dirty();
+	state->m_tilemap[1][1]->mark_all_dirty();
+	state->m_tilemap[1][2]->mark_all_dirty();
+	state->m_tilemap[1][3]->mark_all_dirty();
 }
 
 
@@ -275,7 +275,7 @@ INLINE void fromancr_vram_w(running_machine &machine, offs_t offset, UINT16 data
 	int vram = (offset < 0x1000) ? 0 : 1;
 
 	COMBINE_DATA(&state->m_videoram[vram][layer][offset & 0x0fff]);
-	tilemap_mark_tile_dirty(state->m_tilemap[vram][layer], offset & 0x0fff);
+	state->m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
 WRITE16_HANDLER( fromancr_videoram_0_w ) { fromancr_vram_w(space->machine(), offset, data, mem_mask, 1); }
@@ -318,10 +318,10 @@ void fromancr_gfxbank_w( running_machine &machine, int data )
 	state->m_gfxbank[0][1] = (data & 0xf000) >> 12;	// FG (1P)
 	state->m_gfxbank[1][0] = (data & 0x0008) >>  3;	// BG (2P)
 	state->m_gfxbank[1][1] = (data & 0x0f00) >>  8;	// FG (2P)
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[0][0]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[0][1]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[1][0]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap[1][1]);
+	state->m_tilemap[0][0]->mark_all_dirty();
+	state->m_tilemap[0][1]->mark_all_dirty();
+	state->m_tilemap[1][0]->mark_all_dirty();
+	state->m_tilemap[1][1]->mark_all_dirty();
 }
 
 
@@ -331,7 +331,7 @@ INLINE void fromanc4_vram_w( running_machine &machine, offs_t offset, UINT16 dat
 	int vram = (offset < 0x4000) ? 0 : 1;
 
 	COMBINE_DATA(&state->m_videoram[vram][layer][offset & 0x3fff]);
-	tilemap_mark_tile_dirty(state->m_tilemap[vram][layer], offset & 0x3fff);
+	state->m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x3fff);
 }
 
 WRITE16_HANDLER( fromanc4_videoram_0_w ) { fromanc4_vram_w(space->machine(), offset, data, mem_mask, 2); }
@@ -349,8 +349,8 @@ WRITE16_HANDLER( fromanc4_gfxreg_0_w )
 		case 0x03:	state->m_scrolly[1][2] = -(data - 0x1e4); break;
 		case 0x05:	state->m_gfxbank[0][2] = (data & 0x000f) >> 0;
 				state->m_gfxbank[1][2] = (data & 0x0f00) >> 8;
-				tilemap_mark_all_tiles_dirty(state->m_tilemap[0][2]);
-				tilemap_mark_all_tiles_dirty(state->m_tilemap[1][2]);
+				state->m_tilemap[0][2]->mark_all_dirty();
+				state->m_tilemap[1][2]->mark_all_dirty();
 				break;
 		// offset 0x04, 0x06 - 0x11 unknown
 		default:	break;
@@ -368,8 +368,8 @@ WRITE16_HANDLER( fromanc4_gfxreg_1_w )
 		case 0x03:	state->m_scrolly[1][1] = -(data - 0x1e4); break;
 		case 0x05:	state->m_gfxbank[0][1] = (data & 0x000f) >> 0;
 				state->m_gfxbank[1][1] = (data & 0x0f00) >> 8;
-				tilemap_mark_all_tiles_dirty(state->m_tilemap[0][1]);
-				tilemap_mark_all_tiles_dirty(state->m_tilemap[1][1]);
+				state->m_tilemap[0][1]->mark_all_dirty();
+				state->m_tilemap[1][1]->mark_all_dirty();
 				break;
 		// offset 0x04, 0x06 - 0x11 unknown
 		default:	break;
@@ -387,8 +387,8 @@ WRITE16_HANDLER( fromanc4_gfxreg_2_w )
 		case 0x03:	state->m_scrolly[1][0] = -(data - 0x1e4); break;
 		case 0x05:	state->m_gfxbank[0][0] = (data & 0x000f) >> 0;
 				state->m_gfxbank[1][0] = (data & 0x0f00) >> 8;
-				tilemap_mark_all_tiles_dirty(state->m_tilemap[0][0]);
-				tilemap_mark_all_tiles_dirty(state->m_tilemap[1][0]);
+				state->m_tilemap[0][0]->mark_all_dirty();
+				state->m_tilemap[1][0]->mark_all_dirty();
 				break;
 		// offset 0x04, 0x06 - 0x11 unknown
 		default:	break;
@@ -415,12 +415,12 @@ VIDEO_START( fromanc2 )
 	state->m_tilemap[1][2] = tilemap_create(machine, fromanc2_get_v1_l2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 	state->m_tilemap[1][3] = tilemap_create(machine, fromanc2_get_v1_l3_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_tilemap[0][1], 0x000);
-	tilemap_set_transparent_pen(state->m_tilemap[0][2], 0x000);
-	tilemap_set_transparent_pen(state->m_tilemap[0][3], 0x000);
-	tilemap_set_transparent_pen(state->m_tilemap[1][1], 0x000);
-	tilemap_set_transparent_pen(state->m_tilemap[1][2], 0x000);
-	tilemap_set_transparent_pen(state->m_tilemap[1][3], 0x000);
+	state->m_tilemap[0][1]->set_transparent_pen(0x000);
+	state->m_tilemap[0][2]->set_transparent_pen(0x000);
+	state->m_tilemap[0][3]->set_transparent_pen(0x000);
+	state->m_tilemap[1][1]->set_transparent_pen(0x000);
+	state->m_tilemap[1][2]->set_transparent_pen(0x000);
+	state->m_tilemap[1][3]->set_transparent_pen(0x000);
 
 	state->m_videoram[0][0] = auto_alloc_array(machine, UINT16, (64 * 64));
 	state->m_videoram[0][1] = auto_alloc_array(machine, UINT16, (64 * 64));
@@ -465,10 +465,10 @@ VIDEO_START( fromancr )
 	state->m_tilemap[1][2] = tilemap_create(machine, fromancr_get_v1_l2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 	state->m_tilemap[1][3] = 0;
 
-	tilemap_set_transparent_pen(state->m_tilemap[0][1], 0x0ff);
-	tilemap_set_transparent_pen(state->m_tilemap[0][2], 0x0ff);
-	tilemap_set_transparent_pen(state->m_tilemap[1][1], 0x0ff);
-	tilemap_set_transparent_pen(state->m_tilemap[1][2], 0x0ff);
+	state->m_tilemap[0][1]->set_transparent_pen(0x0ff);
+	state->m_tilemap[0][2]->set_transparent_pen(0x0ff);
+	state->m_tilemap[1][1]->set_transparent_pen(0x0ff);
+	state->m_tilemap[1][2]->set_transparent_pen(0x0ff);
 
 	state->m_videoram[0][0] = auto_alloc_array(machine, UINT16, (64 * 64));
 	state->m_videoram[0][1] = auto_alloc_array(machine, UINT16, (64 * 64));
@@ -510,10 +510,10 @@ VIDEO_START( fromanc4 )
 	state->m_tilemap[1][2] = tilemap_create(machine, fromancr_get_v1_l2_tile_info, tilemap_scan_rows, 8, 8, 256, 64);
 	state->m_tilemap[1][3] = 0;
 
-	tilemap_set_transparent_pen(state->m_tilemap[0][1], 0x000);
-	tilemap_set_transparent_pen(state->m_tilemap[0][2], 0x000);
-	tilemap_set_transparent_pen(state->m_tilemap[1][1], 0x000);
-	tilemap_set_transparent_pen(state->m_tilemap[1][2], 0x000);
+	state->m_tilemap[0][1]->set_transparent_pen(0x000);
+	state->m_tilemap[0][2]->set_transparent_pen(0x000);
+	state->m_tilemap[1][1]->set_transparent_pen(0x000);
+	state->m_tilemap[1][2]->set_transparent_pen(0x000);
 
 	state->m_videoram[0][0] = auto_alloc_array(machine, UINT16, (256 * 64));
 	state->m_videoram[0][1] = auto_alloc_array(machine, UINT16, (256 * 64));
@@ -556,9 +556,9 @@ SCREEN_UPDATE_IND16( fromanc2_left )
 	{
 		if (state->m_tilemap[0][i])
 		{
-			tilemap_set_scrollx(state->m_tilemap[0][i], 0, -state->m_scrollx[0][i]);
-			tilemap_set_scrolly(state->m_tilemap[0][i], 0, -state->m_scrolly[0][i]);
-			tilemap_draw(bitmap, cliprect, state->m_tilemap[0][i], 0, 0);
+			state->m_tilemap[0][i]->set_scrollx(0, -state->m_scrollx[0][i]);
+			state->m_tilemap[0][i]->set_scrolly(0, -state->m_scrolly[0][i]);
+			state->m_tilemap[0][i]->draw(bitmap, cliprect, 0, 0);
 		}
 	}
 
@@ -574,9 +574,9 @@ SCREEN_UPDATE_IND16( fromanc2_right )
 	{
 		if (state->m_tilemap[1][i])
 		{
-			tilemap_set_scrollx(state->m_tilemap[1][i], 0, -state->m_scrollx[1][i]);
-			tilemap_set_scrolly(state->m_tilemap[1][i], 0, -state->m_scrolly[1][i]);
-			tilemap_draw(bitmap, cliprect, state->m_tilemap[1][i], 0, 0);
+			state->m_tilemap[1][i]->set_scrollx(0, -state->m_scrollx[1][i]);
+			state->m_tilemap[1][i]->set_scrolly(0, -state->m_scrolly[1][i]);
+			state->m_tilemap[1][i]->draw(bitmap, cliprect, 0, 0);
 		}
 	}
 

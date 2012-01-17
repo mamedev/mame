@@ -224,7 +224,7 @@ static void set_pens( running_machine &machine )
 
 ***************************************************************************/
 
-INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int GFX )
+INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int GFX )
 {
 	cave_state *state = machine.driver_data<cave_state>();
 	UINT16 *VRAM = state->m_vram[GFX];
@@ -253,7 +253,7 @@ INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int ti
 	}
 
 	SET_TILE_INFO( GFX, code, color, 0 );
-	tileinfo->category = pri;
+	tileinfo.category = pri;
 }
 
 
@@ -265,7 +265,7 @@ void sailormn_tilebank_w( running_machine &machine, int bank )
 	if (state->m_sailormn_tilebank != bank)
 	{
 		state->m_sailormn_tilebank = bank;
-		tilemap_mark_all_tiles_dirty(state->m_tilemap[2]);
+		state->m_tilemap[2]->mark_all_dirty();
 	}
 }
 
@@ -299,7 +299,7 @@ static TILE_GET_INFO( sailormn_get_tile_info_2 )
 	}
 
 	SET_TILE_INFO( 2, code, color, 0 );
-	tileinfo->category = pri;
+	tileinfo.category = pri;
 }
 
 
@@ -317,13 +317,13 @@ INLINE void vram_w( address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED
 	if (offset < 0x1000 / 4)	// 16x16 tilemap
 	{
 		offset = (offset % (512 / 16)) * 2 + (offset / (512 / 16)) * (512 / 8) * 2;
-		tilemap_mark_tile_dirty(TILEMAP, offset + 0);
-		tilemap_mark_tile_dirty(TILEMAP, offset + 1);
-		tilemap_mark_tile_dirty(TILEMAP, offset + 0 + 512 / 8);
-		tilemap_mark_tile_dirty(TILEMAP, offset + 1 + 512 / 8);
+		TILEMAP->mark_tile_dirty(offset + 0);
+		TILEMAP->mark_tile_dirty(offset + 1);
+		TILEMAP->mark_tile_dirty(offset + 0 + 512 / 8);
+		TILEMAP->mark_tile_dirty(offset + 1 + 512 / 8);
 	}
 	else if (offset >= 0x4000 / 4)		// 8x8 tilemap
-		tilemap_mark_tile_dirty(TILEMAP, offset - 0x4000 / 4);
+		TILEMAP->mark_tile_dirty(offset - 0x4000 / 4);
 }
 
 /*  Some games, that only ever use the 8x8 tiles and no line scroll,
@@ -343,7 +343,7 @@ INLINE void vram_8x8_w( address_space *space, ATTR_UNUSED offs_t offset, ATTR_UN
 
 	COMBINE_DATA(&VRAM[offset + 0x0000 / 2]);
 	COMBINE_DATA(&VRAM[offset + 0x4000 / 2]);
-	tilemap_mark_tile_dirty(TILEMAP,offset / 2);
+	TILEMAP->mark_tile_dirty(offset / 2);
 }
 
 
@@ -399,33 +399,33 @@ static void cave_vh_start( running_machine &machine, int num )
 	{
 		case 4:
 			state->m_tilemap[3] = tilemap_create(machine, get_tile_info_3, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
-			tilemap_set_transparent_pen(state->m_tilemap[3], 0);
-			tilemap_set_scroll_rows(state->m_tilemap[3], 1);
-			tilemap_set_scroll_cols(state->m_tilemap[3], 1);
+			state->m_tilemap[3]->set_transparent_pen(0);
+			state->m_tilemap[3]->set_scroll_rows(1);
+			state->m_tilemap[3]->set_scroll_cols(1);
 			state->save_item(NAME(state->m_tiledim[3]));
 			state->save_item(NAME(state->m_old_tiledim[3]));
 
 		case 3:
 			state->m_tilemap[2] = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
-			tilemap_set_transparent_pen(state->m_tilemap[2], 0);
-			tilemap_set_scroll_rows(state->m_tilemap[2], 1);
-			tilemap_set_scroll_cols(state->m_tilemap[2], 1);
+			state->m_tilemap[2]->set_transparent_pen(0);
+			state->m_tilemap[2]->set_scroll_rows(1);
+			state->m_tilemap[2]->set_scroll_cols(1);
 			state->save_item(NAME(state->m_tiledim[2]));
 			state->save_item(NAME(state->m_old_tiledim[2]));
 
 		case 2:
 			state->m_tilemap[1] = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
-			tilemap_set_transparent_pen(state->m_tilemap[1], 0);
-			tilemap_set_scroll_rows(state->m_tilemap[1], 1);
-			tilemap_set_scroll_cols(state->m_tilemap[1], 1);
+			state->m_tilemap[1]->set_transparent_pen(0);
+			state->m_tilemap[1]->set_scroll_rows(1);
+			state->m_tilemap[1]->set_scroll_cols(1);
 			state->save_item(NAME(state->m_tiledim[1]));
 			state->save_item(NAME(state->m_old_tiledim[1]));
 
 		case 1:
 			state->m_tilemap[0] = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
-			tilemap_set_transparent_pen(state->m_tilemap[0], 0);
-			tilemap_set_scroll_rows(state->m_tilemap[0], 1);
-			tilemap_set_scroll_cols(state->m_tilemap[0], 1);
+			state->m_tilemap[0]->set_transparent_pen(0);
+			state->m_tilemap[0]->set_scroll_rows(1);
+			state->m_tilemap[0]->set_scroll_cols(1);
 			state->save_item(NAME(state->m_tiledim[0]));
 			state->save_item(NAME(state->m_old_tiledim[0]));
 
@@ -474,9 +474,9 @@ VIDEO_START( sailormn_3_layers )
 	/* Layer 2 (8x8) needs to be handled differently */
 	state->m_tilemap[2] = tilemap_create(machine, sailormn_get_tile_info_2, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8 );
 
-	tilemap_set_transparent_pen(state->m_tilemap[2], 0);
-	tilemap_set_scroll_rows(state->m_tilemap[2], 1);
-	tilemap_set_scroll_cols(state->m_tilemap[2], 1);
+	state->m_tilemap[2]->set_transparent_pen(0);
+	state->m_tilemap[2]->set_scroll_rows(1);
+	state->m_tilemap[2]->set_scroll_cols(1);
 }
 
 /***************************************************************************
@@ -1434,7 +1434,7 @@ INLINE void cave_tilemap_draw(
 
 	flipx = ~VCTRL[0] & 0x8000;
 	flipy = ~VCTRL[1] & 0x8000;
-	tilemap_set_flip(TILEMAP, (flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0) );
+	TILEMAP->set_flip((flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0) );
 
 	offs_x	=	state->m_layers_offs_x;
 	offs_y	=	state->m_layers_offs_y;
@@ -1475,7 +1475,7 @@ INLINE void cave_tilemap_draw(
 			for(endline = startline + 1; endline <= cliprect.max_y; endline++)
 				if((++vramdata1) != VRAM[(0x1002 + (((sy + offs_row + endline) * 4) & 0x7ff)) / 2]) break;
 
-			tilemap_set_scrolly(TILEMAP, 0, vramdata0 - startline);
+			TILEMAP->set_scrolly(0, vramdata0 - startline);
 
 			if (VCTRL[0] & 0x4000)	// row-scroll, row-select
 			{
@@ -1489,15 +1489,15 @@ INLINE void cave_tilemap_draw(
                     tilemap_draw just once.
                 */
 
-				tilemap_set_scroll_rows(TILEMAP, 512);
+				TILEMAP->set_scroll_rows(512);
 				for(line = startline; line < endline; line++)
-					tilemap_set_scrollx(TILEMAP, (vramdata0 - startline + line) & 511,
+					TILEMAP->set_scrollx((vramdata0 - startline + line) & 511,
 										sx + VRAM[(0x1000 + (((sy + offs_row + line) * 4) & 0x7ff)) / 2]);
 			}
 			else					// no row-scroll, row-select
 			{
-				tilemap_set_scroll_rows(TILEMAP, 1);
-				tilemap_set_scrollx(TILEMAP, 0, sx);
+				TILEMAP->set_scroll_rows(1);
+				TILEMAP->set_scrollx(0, sx);
 			}
 
 			if (flipy)
@@ -1511,7 +1511,7 @@ INLINE void cave_tilemap_draw(
 				clip.max_y = endline - 1;
 			}
 
-			tilemap_draw(bitmap, clip, TILEMAP, flags, priority);
+			TILEMAP->draw(bitmap, clip, flags, priority);
 
 			startline = endline;
 		}
@@ -1519,21 +1519,21 @@ INLINE void cave_tilemap_draw(
 	else if (VCTRL[0] & 0x4000)	// row-scroll, no row-select
 	{
 		int line;
-		tilemap_set_scroll_rows(TILEMAP, 512);
+		TILEMAP->set_scroll_rows(512);
 		for(line = cliprect.min_y; line <= cliprect.max_y; line++)
-			tilemap_set_scrollx(TILEMAP, (line + sy) & 511,
+			TILEMAP->set_scrollx((line + sy) & 511,
 							sx + VRAM[(0x1000+(((sy + offs_row + line) * 4) & 0x7ff)) / 2] );
-		tilemap_set_scrolly(TILEMAP, 0, sy);
-		tilemap_draw(bitmap, cliprect, TILEMAP, flags, priority);
+		TILEMAP->set_scrolly(0, sy);
+		TILEMAP->draw(bitmap, cliprect, flags, priority);
 	}
 	else
 	{
 		/* DEF_STR( Normal ) scrolling */
-		tilemap_set_scroll_rows(TILEMAP, 1);
-		tilemap_set_scroll_cols(TILEMAP, 1);
-		tilemap_set_scrollx(TILEMAP, 0, sx);
-		tilemap_set_scrolly(TILEMAP, 0, sy);
-		tilemap_draw(bitmap, cliprect, TILEMAP, flags, priority);
+		TILEMAP->set_scroll_rows(1);
+		TILEMAP->set_scroll_cols(1);
+		TILEMAP->set_scrollx(0, sx);
+		TILEMAP->set_scrolly(0, sy);
+		TILEMAP->draw(bitmap, cliprect, flags, priority);
 	}
 }
 
@@ -1556,7 +1556,7 @@ SCREEN_UPDATE_IND16( cave )
 		{
 			state->m_tiledim[GFX] = state->m_vctrl[GFX][1] & 0x2000;
 			if (state->m_tiledim[GFX] != state->m_old_tiledim[GFX])
-				tilemap_mark_all_tiles_dirty(state->m_tilemap[GFX]);
+				state->m_tilemap[GFX]->mark_all_dirty();
 			state->m_old_tiledim[GFX] = state->m_tiledim[GFX];
 		}
 	}

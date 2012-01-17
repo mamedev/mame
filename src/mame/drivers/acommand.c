@@ -177,7 +177,7 @@ static VIDEO_START( acommand )
 
 	state->m_ac_vregs = auto_alloc_array(machine, UINT16, 0x80/2);
 
-	tilemap_set_transparent_pen(state->m_tx_tilemap,15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 }
 
 
@@ -241,9 +241,9 @@ static void draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value)
 static SCREEN_UPDATE_IND16( acommand )
 {
 	acommand_state *state = screen.machine().driver_data<acommand_state>();
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/*Order might be wrong,but these for sure are the led numbers tested*/
 	draw_led(bitmap,  0, 20, (state->m_led0 & 0x0f00) >> 8);
@@ -261,14 +261,14 @@ static WRITE16_HANDLER( ac_bgvram_w )
 {
 	acommand_state *state = space->machine().driver_data<acommand_state>();
 	COMBINE_DATA(&state->m_ac_bgvram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER( ac_txvram_w )
 {
 	acommand_state *state = space->machine().driver_data<acommand_state>();
 	COMBINE_DATA(&state->m_ac_txvram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER(ac_bgscroll_w)
@@ -276,8 +276,8 @@ static WRITE16_HANDLER(ac_bgscroll_w)
 	acommand_state *state = space->machine().driver_data<acommand_state>();
 	switch(offset)
 	{
-		case 0: tilemap_set_scrollx(state->m_bg_tilemap,0,data); break;
-		case 1: tilemap_set_scrolly(state->m_bg_tilemap,0,data); break;
+		case 0: state->m_bg_tilemap->set_scrollx(0,data); break;
+		case 1: state->m_bg_tilemap->set_scrolly(0,data); break;
 		case 2: /*BG_TILEMAP priority?*/ break;
 	}
 }
@@ -287,8 +287,8 @@ static WRITE16_HANDLER(ac_txscroll_w)
 	acommand_state *state = space->machine().driver_data<acommand_state>();
 	switch(offset)
 	{
-		case 0: tilemap_set_scrollx(state->m_tx_tilemap,0,data); break;
-		case 1: tilemap_set_scrolly(state->m_tx_tilemap,0,data); break;
+		case 0: state->m_tx_tilemap->set_scrollx(0,data); break;
+		case 1: state->m_tx_tilemap->set_scrolly(0,data); break;
 		case 2: /*TX_TILEMAP priority?*/ break;
 	}
 }

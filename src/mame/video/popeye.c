@@ -172,14 +172,14 @@ WRITE8_HANDLER( popeye_videoram_w )
 {
 	popeye_state *state = space->machine().driver_data<popeye_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( popeye_colorram_w )
 {
 	popeye_state *state = space->machine().driver_data<popeye_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( popeye_bitmap_w )
@@ -252,7 +252,7 @@ VIDEO_START( skyskipr )
 	state->m_bitmap_type = TYPE_SKYSKIPR;
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
     state->m_lastflip = 0;
 
@@ -270,7 +270,7 @@ VIDEO_START( popeye )
 	state->m_bitmap_type = TYPE_POPEYE;
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
     state->m_lastflip = 0;
 
@@ -376,6 +376,6 @@ SCREEN_UPDATE_IND16( popeye )
 	popeye_state *state = screen.machine().driver_data<popeye_state>();
 	draw_background(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

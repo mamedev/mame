@@ -72,14 +72,14 @@ WRITE8_HANDLER( gomoku_videoram_w )
 {
 	gomoku_state *state = space->machine().driver_data<gomoku_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( gomoku_colorram_w )
 {
 	gomoku_state *state = space->machine().driver_data<gomoku_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( gomoku_bgram_w )
@@ -121,7 +121,7 @@ VIDEO_START( gomoku )
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	/* make background bitmap */
 	state->m_bg_bitmap.fill(0x20);
@@ -229,6 +229,6 @@ SCREEN_UPDATE_IND16( gomoku )
 		bitmap.fill(0x20);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -430,7 +430,7 @@ static void tmmjprd_do_blit(running_machine &machine)
 					blt_source+=2;
 					writeoffs=blt_oddflg+blt_column;
 					state->m_tilemap_ram[blt_tilemp][writeoffs]=(state->m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
-					tilemap_mark_tile_dirty(tmmjprd_tilemap[blt_tilemp],writeoffs);
+					tmmjprd_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
 
 					blt_column++;
 					blt_column&=0x7f;
@@ -447,7 +447,7 @@ static void tmmjprd_do_blit(running_machine &machine)
 				{
 					writeoffs=blt_oddflg+blt_column;
 					state->m_tilemap_ram[blt_tilemp][writeoffs]=(state->m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
-					tilemap_mark_tile_dirty(tmmjprd_tilemap[blt_tilemp],writeoffs);
+					tmmjprd_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
 					blt_column++;
 					blt_column&=0x7f;
 				}

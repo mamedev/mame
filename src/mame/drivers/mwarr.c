@@ -89,7 +89,7 @@ static WRITE16_HANDLER( bg_videoram_w )
 	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER( mlow_videoram_w )
@@ -97,7 +97,7 @@ static WRITE16_HANDLER( mlow_videoram_w )
 	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->m_mlow_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_mlow_tilemap,offset);
+	state->m_mlow_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER( mhigh_videoram_w )
@@ -105,7 +105,7 @@ static WRITE16_HANDLER( mhigh_videoram_w )
 	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->m_mhigh_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_mhigh_tilemap,offset);
+	state->m_mhigh_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER( tx_videoram_w )
@@ -113,7 +113,7 @@ static WRITE16_HANDLER( tx_videoram_w )
 	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->m_tx_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_DEVICE_HANDLER( oki1_bank_w )
@@ -384,13 +384,13 @@ static VIDEO_START( mwarr )
 	state->m_mhigh_tilemap = tilemap_create(machine, get_mhigh_tile_info, tilemap_scan_cols, 16, 16, 64, 16);
 	state->m_tx_tilemap    = tilemap_create(machine, get_tx_tile_info,    tilemap_scan_rows,  8,  8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_mlow_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_mhigh_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
+	state->m_mlow_tilemap->set_transparent_pen(0);
+	state->m_mhigh_tilemap->set_transparent_pen(0);
+	state->m_tx_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 256);
-	tilemap_set_scroll_rows(state->m_mlow_tilemap, 256);
-	tilemap_set_scroll_rows(state->m_mhigh_tilemap, 256);
+	state->m_bg_tilemap->set_scroll_rows(256);
+	state->m_mlow_tilemap->set_scroll_rows(256);
+	state->m_mhigh_tilemap->set_scroll_rows(256);
 
 	state->save_item(NAME(state->m_sprites_buffer));
 }
@@ -476,47 +476,47 @@ static SCREEN_UPDATE_IND16( mwarr )
 	if (BIT(state->m_vidattrram[6], 0))
 	{
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_bg_scrollram[i] + 20);
+			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[i] + 20);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_bg_scrollram[0] + 19);
+			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[0] + 19);
 	}
 
 	if (BIT(state->m_vidattrram[6], 2))
 	{
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->m_mlow_tilemap, i, state->m_mlow_scrollram[i] + 19);
+			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[i] + 19);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->m_mlow_tilemap, i, state->m_mlow_scrollram[0] + 19);
+			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[0] + 19);
 	}
 
 	if (BIT(state->m_vidattrram[6], 4))
 	{
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->m_mhigh_tilemap, i, state->m_mhigh_scrollram[i] + 19);
+			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[i] + 19);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->m_mhigh_tilemap, i, state->m_mhigh_scrollram[0] + 19);
+			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[0] + 19);
 	}
 
-	tilemap_set_scrolly(state->m_bg_tilemap,    0, state->m_vidattrram[1] + 1);
-	tilemap_set_scrolly(state->m_mlow_tilemap,  0, state->m_vidattrram[2] + 1);
-	tilemap_set_scrolly(state->m_mhigh_tilemap, 0, state->m_vidattrram[3] + 1);
+	state->m_bg_tilemap->set_scrolly(0, state->m_vidattrram[1] + 1);
+	state->m_mlow_tilemap->set_scrolly(0, state->m_vidattrram[2] + 1);
+	state->m_mhigh_tilemap->set_scrolly(0, state->m_vidattrram[3] + 1);
 
-	tilemap_set_scrollx(state->m_tx_tilemap, 0, state->m_vidattrram[0] + 16);
-	tilemap_set_scrolly(state->m_tx_tilemap, 0, state->m_vidattrram[4] + 1);
+	state->m_tx_tilemap->set_scrollx(0, state->m_vidattrram[0] + 16);
+	state->m_tx_tilemap->set_scrolly(0, state->m_vidattrram[4] + 1);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap,    0, 0x01);
-	tilemap_draw(bitmap, cliprect, state->m_mlow_tilemap,  0, 0x02);
-	tilemap_draw(bitmap, cliprect, state->m_mhigh_tilemap, 0, 0x04);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap,    0, 0x10);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0x01);
+	state->m_mlow_tilemap->draw(bitmap, cliprect, 0, 0x02);
+	state->m_mhigh_tilemap->draw(bitmap, cliprect, 0, 0x04);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0x10);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

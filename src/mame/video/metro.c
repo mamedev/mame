@@ -83,7 +83,7 @@ WRITE16_HANDLER( metro_k053936_w )
 {
 	metro_state *state = space->machine().driver_data<metro_state>();
 	COMBINE_DATA(&state->m_k053936_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_k053936_tilemap, offset);
+	state->m_k053936_tilemap->mark_tile_dirty(offset);
 }
 
 static TILEMAP_MAPPER( tilemap_scan_gstrik2 )

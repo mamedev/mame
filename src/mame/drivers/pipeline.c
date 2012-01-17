@@ -121,14 +121,14 @@ static VIDEO_START ( pipeline )
 	state->m_palram=auto_alloc_array(machine, UINT8, 0x1000);
 	state->m_tilemap1 = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,64,32 );
 	state->m_tilemap2 = tilemap_create( machine, get_tile_info2,tilemap_scan_rows,8,8,64,32 );
-	tilemap_set_transparent_pen(state->m_tilemap2,0);
+	state->m_tilemap2->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( pipeline )
 {
 	pipeline_state *state = screen.machine().driver_data<pipeline_state>();
-	tilemap_draw(bitmap,cliprect,state->m_tilemap1, 0,0);
-	tilemap_draw(bitmap,cliprect,state->m_tilemap2, 0,0);
+	state->m_tilemap1->draw(bitmap, cliprect, 0,0);
+	state->m_tilemap2->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -144,7 +144,7 @@ static WRITE8_HANDLER(vram2_w)
 	pipeline_state *state = space->machine().driver_data<pipeline_state>();
 	if(!(state->m_vidctrl&1))
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap1,offset&0x7ff);
+		state->m_tilemap1->mark_tile_dirty(offset&0x7ff);
 		state->m_vram2[offset]=data;
 	}
 	else
@@ -161,7 +161,7 @@ static WRITE8_HANDLER(vram2_w)
 static WRITE8_HANDLER(vram1_w)
 {
 	pipeline_state *state = space->machine().driver_data<pipeline_state>();
-	tilemap_mark_tile_dirty(state->m_tilemap2,offset&0x7ff);
+	state->m_tilemap2->mark_tile_dirty(offset&0x7ff);
 	state->m_vram1[offset]=data;
 }
 

@@ -119,7 +119,7 @@ WRITE16_HANDLER( roundup5_text_w )
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty( state->m_tx_layer,offset);
+	state->m_tx_layer->mark_tile_dirty(offset);
 }
 
 READ16_HANDLER( cyclwarr_videoram0_r )
@@ -140,8 +140,8 @@ WRITE16_HANDLER( cyclwarr_videoram0_w )
 	COMBINE_DATA(&state->m_cyclwarr_videoram0[offset]);
 	if (offset>=0x400)
 	{
-		tilemap_mark_tile_dirty( state->m_layer0, offset-0x400);
-		tilemap_mark_tile_dirty( state->m_layer1, offset-0x400);
+		state->m_layer0->mark_tile_dirty(offset-0x400);
+		state->m_layer1->mark_tile_dirty(offset-0x400);
 	}
 }
 
@@ -151,8 +151,8 @@ WRITE16_HANDLER( cyclwarr_videoram1_w )
 	COMBINE_DATA(&state->m_cyclwarr_videoram1[offset]);
 	if (offset>=0x400)
 	{
-		tilemap_mark_tile_dirty( state->m_layer2, offset-0x400);
-		tilemap_mark_tile_dirty( state->m_layer3, offset-0x400);
+		state->m_layer2->mark_tile_dirty(offset-0x400);
+		state->m_layer3->mark_tile_dirty(offset-0x400);
 	}
 }
 
@@ -208,7 +208,7 @@ VIDEO_START( apache3 )
 	state->m_temp_bitmap.allocate(512, 512);
 	state->m_apache3_road_x_ram = auto_alloc_array(machine, UINT8, 512);
 
-	tilemap_set_transparent_pen(state->m_tx_layer,0);
+	state->m_tx_layer->set_transparent_pen(0);
 }
 
 VIDEO_START( roundup5 )
@@ -218,7 +218,7 @@ VIDEO_START( roundup5 )
 	state->m_shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
 	state->m_roundup5_vram = auto_alloc_array(machine, UINT16, (0x48000 * 4)/2);
 
-	tilemap_set_transparent_pen(state->m_tx_layer,0);
+	state->m_tx_layer->set_transparent_pen(0);
 
 	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->m_roundup5_vram);
 }
@@ -985,7 +985,7 @@ static void draw_bg(running_machine &machine, bitmap_rgb32 &dst, tilemap_t *src,
         from sets of 8 bit palettes!
     */
 	const UINT8* tile_cluts = machine.region("gfx4")->base();
-	const bitmap_ind16 &src_bitmap = tilemap_get_pixmap(src);
+	const bitmap_ind16 &src_bitmap = src->pixmap();
 	int src_y_mask=ysize-1;
 	int src_x_mask=xsize-1;
 	int tile_y_mask=(ysize/8)-1;
@@ -1085,13 +1085,13 @@ SCREEN_UPDATE_RGB32( apache3 )
 	tatsumi_state *state = screen.machine().driver_data<tatsumi_state>();
 	update_cluts(screen.machine(), 1024, 0, 2048);
 
-	tilemap_set_scrollx(state->m_tx_layer,0,24);
+	state->m_tx_layer->set_scrollx(0,24);
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
 	draw_sky(screen.machine(), bitmap, cliprect, 256, state->m_apache3_rotate_ctrl[1]);
 //  draw_ground(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap,cliprect,0, (state->m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
-	tilemap_draw(bitmap,cliprect,state->m_tx_layer,0,0);
+	state->m_tx_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -1103,8 +1103,8 @@ SCREEN_UPDATE_RGB32( roundup5 )
 
 	update_cluts(screen.machine(), 1024, 512, 4096);
 
-	tilemap_set_scrollx(state->m_tx_layer,0,24);
-	tilemap_set_scrolly(state->m_tx_layer,0,0); //(((state->m_roundupt_crt_reg[0xe]<<8)|state->m_roundupt_crt_reg[0xf])>>5) + 96);
+	state->m_tx_layer->set_scrollx(0,24);
+	state->m_tx_layer->set_scrolly(0,0); //(((state->m_roundupt_crt_reg[0xe]<<8)|state->m_roundupt_crt_reg[0xf])>>5) + 96);
 
 	bitmap.fill(screen.machine().pens[384], cliprect); // todo
 	screen.machine().priority_bitmap.fill(0, cliprect);
@@ -1112,7 +1112,7 @@ SCREEN_UPDATE_RGB32( roundup5 )
 	draw_sprites(screen.machine(), screen.machine().priority_bitmap,cliprect,1,(state->m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 	draw_road(screen.machine(), bitmap,cliprect,screen.machine().priority_bitmap);
 	draw_sprites(screen.machine(), bitmap,cliprect,0,(state->m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
-	tilemap_draw(bitmap,cliprect,state->m_tx_layer,0,0);
+	state->m_tx_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -1122,10 +1122,10 @@ SCREEN_UPDATE_RGB32( cyclwarr )
 	state->m_bigfight_bank=state->m_bigfight_a40000[0];
 	if (state->m_bigfight_bank!=state->m_bigfight_last_bank)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_layer0);
-		tilemap_mark_all_tiles_dirty(state->m_layer1);
-		tilemap_mark_all_tiles_dirty(state->m_layer2);
-		tilemap_mark_all_tiles_dirty(state->m_layer3);
+		state->m_layer0->mark_all_dirty();
+		state->m_layer1->mark_all_dirty();
+		state->m_layer2->mark_all_dirty();
+		state->m_layer3->mark_all_dirty();
 		state->m_bigfight_last_bank=state->m_bigfight_bank;
 	}
 
@@ -1147,10 +1147,10 @@ SCREEN_UPDATE_RGB32( bigfight )
 	state->m_bigfight_bank=state->m_bigfight_a40000[0];
 	if (state->m_bigfight_bank!=state->m_bigfight_last_bank)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_layer0);
-		tilemap_mark_all_tiles_dirty(state->m_layer1);
-		tilemap_mark_all_tiles_dirty(state->m_layer2);
-		tilemap_mark_all_tiles_dirty(state->m_layer3);
+		state->m_layer0->mark_all_dirty();
+		state->m_layer1->mark_all_dirty();
+		state->m_layer2->mark_all_dirty();
+		state->m_layer3->mark_all_dirty();
 		state->m_bigfight_last_bank=state->m_bigfight_bank;
 	}
 

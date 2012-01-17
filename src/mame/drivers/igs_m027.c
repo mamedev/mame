@@ -100,7 +100,7 @@ static WRITE32_HANDLER( igs_tx_videoram_w )
 {
 	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
 	COMBINE_DATA(&state->m_igs_tx_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_igs_tx_tilemap,offset);
+	state->m_igs_tx_tilemap->mark_tile_dirty(offset);
 	//if(data!=0)
 	//logerror( "TX VIDEO RAM OFFSET %x ,data %x!\n",offset ,state->m_igs_tx_videoram[offset]);
 }
@@ -121,7 +121,7 @@ static WRITE32_HANDLER( igs_bg_videoram_w )
 {
 	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
 	COMBINE_DATA(&state->m_igs_bg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_igs_bg_tilemap,offset);
+	state->m_igs_bg_tilemap->mark_tile_dirty(offset);
 	//if(data!=0)
 	logerror("BG VIDEO RAM OFFSET %x ,data %x!\n",offset ,state->m_igs_bg_videoram[offset]);
 }
@@ -156,10 +156,10 @@ static VIDEO_START(igs_majhong)
 {
 	igs_m027_state *state = machine.driver_data<igs_m027_state>();
 	state->m_igs_tx_tilemap= tilemap_create(machine, get_tx_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
-	tilemap_set_transparent_pen(state->m_igs_tx_tilemap,15);
+	state->m_igs_tx_tilemap->set_transparent_pen(15);
 	state->m_igs_bg_tilemap= tilemap_create(machine, get_bg_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	//state->m_igs_bg_tilemap= tilemap_create(machine, get_bg_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
-	//tilemap_set_transparent_pen(state->m_igs_bg_tilemap,15);
+	//state->m_igs_bg_tilemap->set_transparent_pen(15);
 	logerror("Video START OK!\n");
 }
 
@@ -170,12 +170,12 @@ static SCREEN_UPDATE_IND16(igs_majhong)
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	//??????
-	tilemap_draw(bitmap,cliprect,state->m_igs_bg_tilemap,0,0);
+	state->m_igs_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	//CG??????
 
 	//??????
-	tilemap_draw(bitmap,cliprect,state->m_igs_tx_tilemap,0,0);
+	state->m_igs_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	//fprintf(stdout,"Video UPDATE OK!\n");
 	return 0;
 }

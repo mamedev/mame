@@ -128,7 +128,7 @@ DrawRozHelper(
 	const rectangle &clip,
 	const struct RozParam *rozInfo )
 {
-	tilemap_set_palette_offset( tmap, rozInfo->color );
+	tmap->set_palette_offset(rozInfo->color );
 
 	if( bitmap.bpp() == 16 )
 	{
@@ -162,8 +162,8 @@ DrawRozHelper(
 #define ROZ_BLOCK_SIZE 8
 
 		UINT32 size_mask = rozInfo->size - 1;
-		bitmap_ind16 &srcbitmap = tilemap_get_pixmap(tmap);
-		bitmap_ind8 &flagsbitmap = tilemap_get_flagsmap(tmap);
+		bitmap_ind16 &srcbitmap = tmap->pixmap();
+		bitmap_ind8 &flagsbitmap = tmap->flagsmap();
 		UINT32 srcx = (rozInfo->startx + (clip.min_x * rozInfo->incxx) +
 			(clip.min_y * rozInfo->incyx));
 		UINT32 srcy = (rozInfo->starty + (clip.min_x * rozInfo->incxy) +
@@ -235,8 +235,8 @@ DrawRozHelper(
 	}
 	else
 	{
-		tilemap_draw_roz(
-			bitmap, clip, tmap,
+		tmap->draw_roz(
+			bitmap, clip, 
 			rozInfo->startx, rozInfo->starty,
 			rozInfo->incxx, rozInfo->incxy,
 			rozInfo->incyx, rozInfo->incyy,
@@ -313,7 +313,7 @@ READ16_HANDLER( namcos2_68k_roz_ram_r )
 WRITE16_HANDLER( namcos2_68k_roz_ram_w )
 {
 	COMBINE_DATA(&namcos2_68k_roz_ram[offset]);
-	tilemap_mark_tile_dirty(tilemap_roz,offset);
+	tilemap_roz->mark_tile_dirty(offset);
 //      if( space->machine().input().code_pressed(KEYCODE_Q) )
 //      {
 //          debugger_break(space->machine());
@@ -445,7 +445,7 @@ VIDEO_START( namcos2 )
 {
 	namco_tilemap_init(machine,2,machine.region("gfx4")->base(),TilemapCB);
 	tilemap_roz = tilemap_create(machine, get_tile_info_roz,tilemap_scan_rows,8,8,256,256);
-	tilemap_set_transparent_pen(tilemap_roz,0xff);
+	tilemap_roz->set_transparent_pen(0xff);
 	DrawSpriteInit(machine);
 }
 
@@ -470,7 +470,7 @@ SCREEN_UPDATE_IND16( namcos2_default )
 	ApplyClip( clip, cliprect );
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
-	tilemap_set_enable(tilemap_roz,(namcos2_gfx_ctrl & 0x7000) ? 1 : 0);
+	tilemap_roz->enable((namcos2_gfx_ctrl & 0x7000) ? 1 : 0);
 
 	for( pri=0; pri<16; pri++ )
 	{

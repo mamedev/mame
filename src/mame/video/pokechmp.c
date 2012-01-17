@@ -9,7 +9,7 @@ WRITE8_HANDLER( pokechmp_videoram_w )
 	pokechmp_state *state = space->machine().driver_data<pokechmp_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( pokechmp_flipscreen_w )
@@ -17,7 +17,7 @@ WRITE8_HANDLER( pokechmp_flipscreen_w )
 	if (flip_screen_get(space->machine()) != (data & 0x80))
 	{
 		flip_screen_set(space->machine(), data & 0x80);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -75,7 +75,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( pokechmp )
 {
 	pokechmp_state *state = screen.machine().driver_data<pokechmp_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

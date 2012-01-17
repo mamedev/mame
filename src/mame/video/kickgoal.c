@@ -8,21 +8,21 @@ WRITE16_HANDLER( kickgoal_fgram_w )
 {
 	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
 	state->m_fgram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fgtm, offset / 2);
+	state->m_fgtm->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( kickgoal_bgram_w )
 {
 	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
 	state->m_bgram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bgtm, offset / 2);
+	state->m_bgtm->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( kickgoal_bg2ram_w )
 {
 	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
 	state->m_bg2ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg2tm, offset / 2);
+	state->m_bg2tm->mark_tile_dirty(offset / 2);
 }
 
 
@@ -86,8 +86,8 @@ VIDEO_START( kickgoal )
 	state->m_bgtm = tilemap_create(machine, get_kickgoal_bg_tile_info, tilemap_scan_kicksbg, 16, 32, 64, 64);
 	state->m_bg2tm = tilemap_create(machine, get_kickgoal_bg2_tile_info, tilemap_scan_kicksbg2, 32, 64, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_fgtm, 15);
-	tilemap_set_transparent_pen(state->m_bgtm, 15);
+	state->m_fgtm->set_transparent_pen(15);
+	state->m_bgtm->set_transparent_pen(15);
 }
 
 
@@ -127,20 +127,20 @@ SCREEN_UPDATE_IND16( kickgoal )
 	kickgoal_state *state = screen.machine().driver_data<kickgoal_state>();
 
 	/* set scroll */
-	tilemap_set_scrollx(state->m_fgtm, 0, state->m_scrram[0]);
-	tilemap_set_scrolly(state->m_fgtm, 0, state->m_scrram[1] * 2);
-	tilemap_set_scrollx(state->m_bgtm, 0, state->m_scrram[2]);
-	tilemap_set_scrolly(state->m_bgtm, 0, state->m_scrram[3] * 2);
-	tilemap_set_scrollx(state->m_bg2tm, 0, state->m_scrram[4]);
-	tilemap_set_scrolly(state->m_bg2tm, 0, state->m_scrram[5] * 2);
+	state->m_fgtm->set_scrollx(0, state->m_scrram[0]);
+	state->m_fgtm->set_scrolly(0, state->m_scrram[1] * 2);
+	state->m_bgtm->set_scrollx(0, state->m_scrram[2]);
+	state->m_bgtm->set_scrolly(0, state->m_scrram[3] * 2);
+	state->m_bg2tm->set_scrollx(0, state->m_scrram[4]);
+	state->m_bg2tm->set_scrolly(0, state->m_scrram[5] * 2);
 
 	/* draw */
-	tilemap_draw(bitmap, cliprect, state->m_bg2tm, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_bgtm, 0, 0);
+	state->m_bg2tm->draw(bitmap, cliprect, 0, 0);
+	state->m_bgtm->draw(bitmap, cliprect, 0, 0);
 
 	kickgoal_draw_sprites(screen.machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_fgtm, 0, 0);
+	state->m_fgtm->draw(bitmap, cliprect, 0, 0);
 
 	/*
     popmessage ("Regs %04x %04x %04x %04x %04x %04x %04x %04x",
@@ -220,8 +220,8 @@ VIDEO_START( actionhw )
 	state->m_bgtm = tilemap_create(machine, get_actionhw_bg_tile_info, tilemap_scan_actionhwbg, 16, 16, 64, 64);
 	state->m_bg2tm = tilemap_create(machine, get_actionhw_bg2_tile_info, tilemap_scan_actionhwbg2, 16, 16, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_fgtm, 15);
-	tilemap_set_transparent_pen(state->m_bgtm, 15);
+	state->m_fgtm->set_transparent_pen(15);
+	state->m_bgtm->set_transparent_pen(15);
 }
 
 
@@ -257,19 +257,19 @@ SCREEN_UPDATE_IND16( actionhw )
 {
 	kickgoal_state *state = screen.machine().driver_data<kickgoal_state>();
 	/* set scroll */
-	tilemap_set_scrollx(state->m_fgtm, 0, state->m_scrram[0]);
-	tilemap_set_scrolly(state->m_fgtm, 0, state->m_scrram[1]);
-	tilemap_set_scrollx(state->m_bgtm, 0, state->m_scrram[2]);
-	tilemap_set_scrolly(state->m_bgtm, 0, state->m_scrram[3]);
-	tilemap_set_scrollx(state->m_bg2tm, 0, state->m_scrram[4]);
-	tilemap_set_scrolly(state->m_bg2tm, 0, state->m_scrram[5]);
+	state->m_fgtm->set_scrollx(0, state->m_scrram[0]);
+	state->m_fgtm->set_scrolly(0, state->m_scrram[1]);
+	state->m_bgtm->set_scrollx(0, state->m_scrram[2]);
+	state->m_bgtm->set_scrolly(0, state->m_scrram[3]);
+	state->m_bg2tm->set_scrollx(0, state->m_scrram[4]);
+	state->m_bg2tm->set_scrolly(0, state->m_scrram[5]);
 
 	/* draw */
-	tilemap_draw(bitmap, cliprect, state->m_bg2tm, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_bgtm, 0, 0);
+	state->m_bg2tm->draw(bitmap, cliprect, 0, 0);
+	state->m_bgtm->draw(bitmap, cliprect, 0, 0);
 
 	actionhw_draw_sprites(screen.machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_fgtm, 0, 0);
+	state->m_fgtm->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

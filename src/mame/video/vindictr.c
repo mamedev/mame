@@ -92,7 +92,7 @@ VIDEO_START( vindictr )
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* save states */
 	state->save_item(NAME(state->m_playfield_tile_bank));
@@ -162,7 +162,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 				{
 					screen.update_partial(scanline - 1);
 					state->m_playfield_tile_bank = data & 7;
-					tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+					state->m_playfield_tilemap->mark_all_dirty();
 				}
 				break;
 
@@ -170,7 +170,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 				if (state->m_playfield_xscroll != (data & 0x1ff))
 				{
 					screen.update_partial(scanline - 1);
-					tilemap_set_scrollx(state->m_playfield_tilemap, 0, data);
+					state->m_playfield_tilemap->set_scrollx(0, data);
 					state->m_playfield_xscroll = data & 0x1ff;
 				}
 				break;
@@ -201,7 +201,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 				if (state->m_playfield_yscroll != ((data - offset) & 0x1ff))
 				{
 					screen.update_partial(scanline - 1);
-					tilemap_set_scrolly(state->m_playfield_tilemap, 0, data - offset);
+					state->m_playfield_tilemap->set_scrolly(0, data - offset);
 					atarimo_set_yscroll(0, (data - offset) & 0x1ff);
 				}
 				break;
@@ -226,7 +226,7 @@ SCREEN_UPDATE_IND16( vindictr )
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -267,7 +267,7 @@ SCREEN_UPDATE_IND16( vindictr )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;

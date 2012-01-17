@@ -38,7 +38,7 @@ static TILE_GET_INFO( get_tile_info_gaelco_screen0 )
 	int data2 = state->m_videoram[(tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
 
-	tileinfo->category = (data2 >> 6) & 0x03;
+	tileinfo.category = (data2 >> 6) & 0x03;
 
 	SET_TILE_INFO(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
 }
@@ -51,7 +51,7 @@ static TILE_GET_INFO( get_tile_info_gaelco_screen1 )
 	int data2 = state->m_videoram[(0x1000 / 2) + (tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
 
-	tileinfo->category = (data2 >> 6) & 0x03;
+	tileinfo.category = (data2 >> 6) & 0x03;
 
 	SET_TILE_INFO(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
 }
@@ -66,7 +66,7 @@ WRITE16_HANDLER( gaelco_vram_w )
 {
 	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap[offset >> 11], ((offset << 1) & 0x0fff) >> 2);
+	state->m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
 /***************************************************************************
@@ -81,8 +81,8 @@ VIDEO_START( bigkarnk )
 	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_gaelco_screen0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_gaelco_screen1, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transmask(state->m_tilemap[0], 0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
-	tilemap_set_transmask(state->m_tilemap[1], 0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
+	state->m_tilemap[0]->set_transmask(0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
+	state->m_tilemap[1]->set_transmask(0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 }
 
 VIDEO_START( maniacsq )
@@ -91,8 +91,8 @@ VIDEO_START( maniacsq )
 	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_gaelco_screen0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_gaelco_screen1, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tilemap[0], 0);
-	tilemap_set_transparent_pen(state->m_tilemap[1], 0);
+	state->m_tilemap[0]->set_transparent_pen(0);
+	state->m_tilemap[1]->set_transparent_pen(0);
 }
 
 
@@ -192,25 +192,25 @@ SCREEN_UPDATE_IND16( maniacsq )
 	gaelco_state *state = screen.machine().driver_data<gaelco_state>();
 
 	/* set scroll registers */
-	tilemap_set_scrolly(state->m_tilemap[0], 0, state->m_vregs[0]);
-	tilemap_set_scrollx(state->m_tilemap[0], 0, state->m_vregs[1] + 4);
-	tilemap_set_scrolly(state->m_tilemap[1], 0, state->m_vregs[2]);
-	tilemap_set_scrollx(state->m_tilemap[1], 0, state->m_vregs[3]);
+	state->m_tilemap[0]->set_scrolly(0, state->m_vregs[0]);
+	state->m_tilemap[0]->set_scrollx(0, state->m_vregs[1] + 4);
+	state->m_tilemap[1]->set_scrolly(0, state->m_vregs[2]);
+	state->m_tilemap[1]->set_scrollx(0, state->m_vregs[3]);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], 3, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], 3, 0);
+	state->m_tilemap[1]->draw(bitmap, cliprect, 3, 0);
+	state->m_tilemap[0]->draw(bitmap, cliprect, 3, 0);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], 2, 1);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], 2, 1);
+	state->m_tilemap[1]->draw(bitmap, cliprect, 2, 1);
+	state->m_tilemap[0]->draw(bitmap, cliprect, 2, 1);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], 1, 2);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], 1, 2);
+	state->m_tilemap[1]->draw(bitmap, cliprect, 1, 2);
+	state->m_tilemap[0]->draw(bitmap, cliprect, 1, 2);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], 0, 4);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], 0, 4);
+	state->m_tilemap[1]->draw(bitmap, cliprect, 0, 4);
+	state->m_tilemap[0]->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -221,37 +221,37 @@ SCREEN_UPDATE_IND16( bigkarnk )
 	gaelco_state *state = screen.machine().driver_data<gaelco_state>();
 
 	/* set scroll registers */
-	tilemap_set_scrolly(state->m_tilemap[0], 0, state->m_vregs[0]);
-	tilemap_set_scrollx(state->m_tilemap[0], 0, state->m_vregs[1] + 4);
-	tilemap_set_scrolly(state->m_tilemap[1], 0, state->m_vregs[2]);
-	tilemap_set_scrollx(state->m_tilemap[1], 0, state->m_vregs[3]);
+	state->m_tilemap[0]->set_scrolly(0, state->m_vregs[0]);
+	state->m_tilemap[0]->set_scrollx(0, state->m_vregs[1] + 4);
+	state->m_tilemap[1]->set_scrolly(0, state->m_vregs[2]);
+	state->m_tilemap[1]->set_scrollx(0, state->m_vregs[3]);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], TILEMAP_DRAW_LAYER1 | 3, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], TILEMAP_DRAW_LAYER1 | 3, 0);
+	state->m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
+	state->m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], TILEMAP_DRAW_LAYER0 | 3, 1);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], TILEMAP_DRAW_LAYER0 | 3, 1);
+	state->m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 1);
+	state->m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 1);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], TILEMAP_DRAW_LAYER1 | 2, 1);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], TILEMAP_DRAW_LAYER1 | 2, 1);
+	state->m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 1);
+	state->m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 1);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], TILEMAP_DRAW_LAYER0 | 2, 2);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], TILEMAP_DRAW_LAYER0 | 2, 2);
+	state->m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 2);
+	state->m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 2, 2);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], TILEMAP_DRAW_LAYER1 | 1, 2);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], TILEMAP_DRAW_LAYER1 | 1, 2);
+	state->m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 2);
+	state->m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 2);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], TILEMAP_DRAW_LAYER0 | 1, 4);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], TILEMAP_DRAW_LAYER0 | 1, 4);
+	state->m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 4);
+	state->m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 4);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], TILEMAP_DRAW_LAYER1 | 0, 4);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], TILEMAP_DRAW_LAYER1 | 0, 4);
+	state->m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 4);
+	state->m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 4);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[1], TILEMAP_DRAW_LAYER0 | 0, 8);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], TILEMAP_DRAW_LAYER0 | 0, 8);
+	state->m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
+	state->m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

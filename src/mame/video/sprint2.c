@@ -80,7 +80,7 @@ WRITE8_HANDLER( sprint2_video_ram_w )
 {
 	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	state->m_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -127,7 +127,7 @@ SCREEN_UPDATE_IND16( sprint2 )
 	UINT8 *video_ram = state->m_video_ram;
 	int i;
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 
@@ -176,7 +176,7 @@ SCREEN_VBLANK( sprint2 )
 
 			/* check for sprite-tilemap collisions */
 
-			tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
+			state->m_bg_tilemap->draw(state->m_helper, rect, 0, 0);
 
 			drawgfx_transpen(state->m_helper, rect, screen.machine().gfx[1],
 				get_sprite_code(video_ram, i),

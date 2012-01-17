@@ -221,9 +221,9 @@ VIDEO_START( dday )
 
 	machine.primary_screen->register_screen_bitmap(state->m_main_bitmap);
 
-	tilemap_set_transmask(state->m_bg_tilemap, 0, 0x00f0, 0xff0f); /* pens 0-3 have priority over the foreground layer */
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_text_tilemap, 0);
+	state->m_bg_tilemap->set_transmask(0, 0x00f0, 0xff0f); /* pens 0-3 have priority over the foreground layer */
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_text_tilemap->set_transparent_pen(0);
 
 	start_countdown_timer(machine);
 }
@@ -233,7 +233,7 @@ WRITE8_HANDLER( dday_bgvideoram_w )
 	dday_state *state = space->machine().driver_data<dday_state>();
 
 	state->m_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( dday_fgvideoram_w )
@@ -241,8 +241,8 @@ WRITE8_HANDLER( dday_fgvideoram_w )
 	dday_state *state = space->machine().driver_data<dday_state>();
 
 	state->m_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset ^ 0x1f);  /* for flipx case */
+	state->m_fg_tilemap->mark_tile_dirty(offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset ^ 0x1f);  /* for flipx case */
 }
 
 WRITE8_HANDLER( dday_textvideoram_w )
@@ -250,7 +250,7 @@ WRITE8_HANDLER( dday_textvideoram_w )
 	dday_state *state = space->machine().driver_data<dday_state>();
 
 	state->m_textvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_text_tilemap, offset);
+	state->m_text_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( dday_colorram_w )
@@ -263,7 +263,7 @@ WRITE8_HANDLER( dday_colorram_w )
 	state->m_colorram[offset & 0x3e0] = data;
 
 	for (i = 0; i < 0x20; i++)
-		tilemap_mark_tile_dirty(state->m_fg_tilemap, offset + i);
+		state->m_fg_tilemap->mark_tile_dirty(offset + i);
 }
 
 READ8_HANDLER( dday_colorram_r )
@@ -280,7 +280,7 @@ WRITE8_HANDLER( dday_sl_control_w )
 	if (state->m_sl_image != data)
 	{
 		state->m_sl_image = data;
-		tilemap_mark_all_tiles_dirty(state->m_sl_tilemap);
+		state->m_sl_tilemap->mark_all_dirty();
 	}
 }
 
@@ -319,17 +319,17 @@ SCREEN_UPDATE_IND16( dday )
 {
 	dday_state *state = screen.machine().driver_data<dday_state>();
 
-	tilemap_draw(state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(state->m_main_bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	tilemap_draw(state->m_main_bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(state->m_main_bitmap, cliprect, state->m_text_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(state->m_main_bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	state->m_fg_tilemap->draw(state->m_main_bitmap, cliprect, 0, 0);
+	state->m_bg_tilemap->draw(state->m_main_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	state->m_text_tilemap->draw(state->m_main_bitmap, cliprect, 0, 0);
 
 	if (state->m_sl_enable)
 	{
 		/* apply shadow */
 		int x, y;
 
-		bitmap_ind16 &sl_bitmap = tilemap_get_pixmap(state->m_sl_tilemap);
+		bitmap_ind16 &sl_bitmap = state->m_sl_tilemap->pixmap();
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			for (y = cliprect.min_y; y <= cliprect.max_y; y++)

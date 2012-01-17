@@ -71,14 +71,14 @@ WRITE8_HANDLER( thedeep_vram_0_w )
 {
 	thedeep_state *state = space->machine().driver_data<thedeep_state>();
 	state->m_vram_0[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap_0, offset / 2);
+	state->m_tilemap_0->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( thedeep_vram_1_w )
 {
 	thedeep_state *state = space->machine().driver_data<thedeep_state>();
 	state->m_vram_1[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap_1, offset / 2);
+	state->m_tilemap_1->mark_tile_dirty(offset / 2);
 }
 
 
@@ -107,10 +107,10 @@ VIDEO_START( thedeep )
 	state->m_tilemap_0  = tilemap_create(machine, get_tile_info_0,tilemap_scan_rows_back,16,16,0x20,0x20);
 	state->m_tilemap_1  = tilemap_create(machine, get_tile_info_1,tilemap_scan_rows,8,8,0x20,0x20);
 
-	tilemap_set_transparent_pen( state->m_tilemap_0,  0 );
-	tilemap_set_transparent_pen( state->m_tilemap_1,  0 );
+	state->m_tilemap_0->set_transparent_pen(0 );
+	state->m_tilemap_1->set_transparent_pen(0 );
 
-	tilemap_set_scroll_cols(state->m_tilemap_0, 0x20);	// column scroll for the background
+	state->m_tilemap_0->set_scroll_cols(0x20);	// column scroll for the background
 }
 
 /***************************************************************************
@@ -216,18 +216,18 @@ SCREEN_UPDATE_IND16( thedeep )
 	int scrolly = state->m_scroll[2] + (state->m_scroll[3]<<8);
 	int x;
 
-	tilemap_set_scrollx(state->m_tilemap_0, 0, scrollx);
+	state->m_tilemap_0->set_scrollx(0, scrollx);
 
 	for (x = 0; x < 0x20; x++)
 	{
 		int y = state->m_scroll2[x*2+0] + (state->m_scroll2[x*2+1]<<8);
-		tilemap_set_scrolly(state->m_tilemap_0, x, y + scrolly);
+		state->m_tilemap_0->set_scrolly(x, y + scrolly);
 	}
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	tilemap_draw(bitmap,cliprect,state->m_tilemap_0,0,0);
+	state->m_tilemap_0->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_tilemap_1,0,0);
+	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

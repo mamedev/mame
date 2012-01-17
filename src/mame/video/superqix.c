@@ -38,7 +38,7 @@ static TILE_GET_INFO( sqix_get_bg_tile_info )
 	if (bank) code += 1024 * state->m_gfxbank;
 
 	SET_TILE_INFO(bank, code, color, 0);
-	tileinfo->group = (attr & 0x08) >> 3;
+	tileinfo.group = (attr & 0x08) >> 3;
 }
 
 
@@ -62,8 +62,8 @@ VIDEO_START( superqix )
 	state->m_fg_bitmap[1] = auto_bitmap_ind16_alloc(machine, 256, 256);
 	state->m_bg_tilemap = tilemap_create(machine, sqix_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
-	tilemap_set_transmask(state->m_bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->m_bg_tilemap,1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
+	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
+	state->m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
 
 	state->save_item(NAME(state->m_gfxbank));
 	state->save_item(NAME(state->m_show_bitmap));
@@ -83,7 +83,7 @@ WRITE8_HANDLER( superqix_videoram_w )
 {
 	superqix_state *state = space->machine().driver_data<superqix_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x3ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( superqix_bitmapram_w )
@@ -144,7 +144,7 @@ WRITE8_HANDLER( superqix_0410_w )
 	if (state->m_gfxbank != (data & 0x03))
 	{
 		state->m_gfxbank = data & 0x03;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 2 selects which of the two bitmaps to display (for 2 players game) */
@@ -228,7 +228,7 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 SCREEN_UPDATE_IND16( pbillian )
 {
 	superqix_state *state = screen.machine().driver_data<superqix_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	pbillian_draw_sprites(screen.machine(), bitmap,cliprect);
 
 	return 0;
@@ -237,9 +237,9 @@ SCREEN_UPDATE_IND16( pbillian )
 SCREEN_UPDATE_IND16( superqix )
 {
 	superqix_state *state = screen.machine().driver_data<superqix_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	copybitmap_trans(bitmap,*state->m_fg_bitmap[state->m_show_bitmap],flip_screen_get(screen.machine()),flip_screen_get(screen.machine()),0,0,cliprect,0);
 	superqix_draw_sprites(screen.machine(), bitmap,cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

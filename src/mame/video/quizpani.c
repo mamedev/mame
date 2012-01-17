@@ -42,14 +42,14 @@ WRITE16_HANDLER( quizpani_bg_videoram_w )
 {
 	quizpani_state *state = space->machine().driver_data<quizpani_state>();
 	state->m_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( quizpani_txt_videoram_w )
 {
 	quizpani_state *state = space->machine().driver_data<quizpani_state>();
 	state->m_txt_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_txt_tilemap, offset);
+	state->m_txt_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( quizpani_tilesbank_w )
@@ -60,13 +60,13 @@ WRITE16_HANDLER( quizpani_tilesbank_w )
 		if(state->m_txtbank != (data & 0x30)>>4)
 		{
 			state->m_txtbank = (data & 0x30)>>4;
-			tilemap_mark_all_tiles_dirty(state->m_txt_tilemap);
+			state->m_txt_tilemap->mark_all_dirty();
 		}
 
 		if(state->m_bgbank != (data & 3))
 		{
 			state->m_bgbank = data & 3;
-			tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+			state->m_bg_tilemap->mark_all_dirty();
 		}
 	}
 }
@@ -76,18 +76,18 @@ VIDEO_START( quizpani )
 	quizpani_state *state = machine.driver_data<quizpani_state>();
 	state->m_bg_tilemap  = tilemap_create(machine, bg_tile_info, bg_scan,16,16,256,32);
 	state->m_txt_tilemap = tilemap_create(machine, txt_tile_info,bg_scan,16,16,256,32);
-	tilemap_set_transparent_pen(state->m_txt_tilemap,15);
+	state->m_txt_tilemap->set_transparent_pen(15);
 }
 
 SCREEN_UPDATE_IND16( quizpani )
 {
 	quizpani_state *state = screen.machine().driver_data<quizpani_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollreg[0] - 64);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrollreg[1] + 16);
-	tilemap_set_scrollx(state->m_txt_tilemap, 0, state->m_scrollreg[2] - 64);
-	tilemap_set_scrolly(state->m_txt_tilemap, 0, state->m_scrollreg[3] + 16);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scrollreg[0] - 64);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scrollreg[1] + 16);
+	state->m_txt_tilemap->set_scrollx(0, state->m_scrollreg[2] - 64);
+	state->m_txt_tilemap->set_scrolly(0, state->m_scrollreg[3] + 16);
 
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_txt_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_txt_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

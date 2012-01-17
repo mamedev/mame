@@ -15,7 +15,7 @@ WRITE8_HANDLER( fenraya_videoram_w )
 
 	state->m_videoram[(offset & 0x3ff) * 2] = data;
 	state->m_videoram[(offset & 0x3ff) * 2 + 1] = (offset & 0xc00) >> 10;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x3ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 static TILE_GET_INFO( get_tile_info )
@@ -41,6 +41,6 @@ SCREEN_UPDATE_IND16( 4enraya )
 {
 	_4enraya_state *state = screen.machine().driver_data<_4enraya_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

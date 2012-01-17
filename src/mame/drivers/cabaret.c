@@ -55,14 +55,14 @@ static WRITE8_HANDLER( bg_scroll_w )
 {
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
 	state->m_bg_scroll[offset] = data;
-	tilemap_set_scrolly(state->m_bg_tilemap,offset,data);
+	state->m_bg_tilemap->set_scrolly(offset,data);
 }
 
 static WRITE8_HANDLER( bg_tile_w )
 {
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
 	state->m_bg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -84,14 +84,14 @@ static WRITE8_HANDLER( fg_tile_w )
 {
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
 	state->m_fg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( fg_color_w )
 {
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
 	state->m_fg_color_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static VIDEO_START(cabaret)
@@ -99,8 +99,8 @@ static VIDEO_START(cabaret)
 	cabaret_state *state = machine.driver_data<cabaret_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8,  32,	64, 8);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 64);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scroll_cols(64);
 }
 
 
@@ -109,9 +109,9 @@ static SCREEN_UPDATE_IND16(cabaret)
 	cabaret_state *state = screen.machine().driver_data<cabaret_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

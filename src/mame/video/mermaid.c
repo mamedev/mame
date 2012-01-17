@@ -67,21 +67,21 @@ WRITE8_HANDLER( mermaid_videoram2_w )
 {
 	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( mermaid_videoram_w )
 {
 	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( mermaid_colorram_w )
 {
 	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( mermaid_flip_screen_x_w )
@@ -98,14 +98,14 @@ WRITE8_HANDLER( mermaid_bg_scroll_w )
 {
 	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->m_bg_scrollram[offset] = data;
-	tilemap_set_scrolly(state->m_bg_tilemap, offset, data);
+	state->m_bg_tilemap->set_scrolly(offset, data);
 }
 
 WRITE8_HANDLER( mermaid_fg_scroll_w )
 {
 	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 	state->m_fg_scrollram[offset] = data;
-	tilemap_set_scrolly(state->m_fg_tilemap, offset, data);
+	state->m_fg_tilemap->set_scrolly(offset, data);
 }
 
 WRITE8_HANDLER( rougien_gfxbankswitch1_w )
@@ -178,11 +178,11 @@ VIDEO_START( mermaid )
 	mermaid_state *state = machine.driver_data<mermaid_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_cols(state->m_fg_tilemap, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_scroll_cols(32);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	machine.primary_screen->register_screen_bitmap(state->m_helper);
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
@@ -234,8 +234,8 @@ SCREEN_UPDATE_IND16( mermaid )
 {
 	mermaid_state *state = screen.machine().driver_data<mermaid_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -323,7 +323,7 @@ SCREEN_VBLANK( mermaid )
 			state->m_helper.fill(0, rect);
 			state->m_helper2.fill(0, rect);
 
-			tilemap_draw(state->m_helper, rect, state->m_bg_tilemap, 0, 0);
+			state->m_bg_tilemap->draw(state->m_helper, rect, 0, 0);
 
 			drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
@@ -334,7 +334,7 @@ SCREEN_VBLANK( mermaid )
 			state->m_helper.fill(0, rect);
 			state->m_helper2.fill(0, rect);
 
-			tilemap_draw(state->m_helper, rect, state->m_fg_tilemap, 0, 0);
+			state->m_fg_tilemap->draw(state->m_helper, rect, 0, 0);
 
 			drawgfx_transpen(state->m_helper2, rect, screen.machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 

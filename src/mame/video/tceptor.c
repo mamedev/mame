@@ -110,7 +110,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 	int code = state->m_tile_ram[offset];
 	int color = state->m_tile_attr[offset];
 
-	tileinfo->group = color;
+	tileinfo.group = color;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -138,7 +138,7 @@ static void tile_mark_dirty(tceptor_state *state, int offset)
 	}
 
 	if (x >= 0)
-		tilemap_mark_tile_dirty(state->m_tx_tilemap, x * 28 + y);
+		state->m_tx_tilemap->mark_tile_dirty(x * 28 + y);
 }
 
 
@@ -192,9 +192,9 @@ WRITE8_HANDLER( tceptor_bg_ram_w )
 
 	offset /= 2;
 	if (offset < 0x800)
-		tilemap_mark_tile_dirty(state->m_bg1_tilemap, offset);
+		state->m_bg1_tilemap->mark_tile_dirty(offset);
 	else
-		tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset - 0x800);
+		state->m_bg2_tilemap->mark_tile_dirty(offset - 0x800);
 }
 
 WRITE8_HANDLER( tceptor_bg_scroll_w )
@@ -402,8 +402,8 @@ VIDEO_START( tceptor )
 
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,  8, 8, 34, 28);
 
-	tilemap_set_scrollx(state->m_tx_tilemap, 0, -2*8);
-	tilemap_set_scrolly(state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->set_scrollx(0, -2*8);
+	state->m_tx_tilemap->set_scrolly(0, 0);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 7);
 
 	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
@@ -530,16 +530,16 @@ SCREEN_UPDATE_IND16( tceptor_2d )
 	// left background
 	rect = cliprect;
 	rect.max_x = bg_center;
-	tilemap_set_scrollx(state->m_bg1_tilemap, 0, state->m_bg1_scroll_x + 12);
-	tilemap_set_scrolly(state->m_bg1_tilemap, 0, state->m_bg1_scroll_y + 20); //32?
-	tilemap_draw(bitmap, rect, state->m_bg1_tilemap, 0, 0);
+	state->m_bg1_tilemap->set_scrollx(0, state->m_bg1_scroll_x + 12);
+	state->m_bg1_tilemap->set_scrolly(0, state->m_bg1_scroll_y + 20); //32?
+	state->m_bg1_tilemap->draw(bitmap, rect, 0, 0);
 
 	// right background
 	rect.min_x = bg_center;
 	rect.max_x = cliprect.max_x;
-	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg2_scroll_x + 20);
-	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg2_scroll_y + 20); // 32?
-	tilemap_draw(bitmap, rect, state->m_bg2_tilemap, 0, 0);
+	state->m_bg2_tilemap->set_scrollx(0, state->m_bg2_scroll_x + 20);
+	state->m_bg2_tilemap->set_scrolly(0, state->m_bg2_scroll_y + 20); // 32?
+	state->m_bg2_tilemap->draw(bitmap, rect, 0, 0);
 
 	for (pri = 0; pri < 8; pri++)
 	{
@@ -548,7 +548,7 @@ SCREEN_UPDATE_IND16( tceptor_2d )
 		draw_sprites(screen.machine(), bitmap, cliprect, pri);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

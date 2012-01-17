@@ -216,15 +216,15 @@ static WRITE32_HANDLER( gstream_vram_w )
 	{
 		if (offset >= 0x000 / 4 && offset < 0x400 / 4)
 		{
-			tilemap_mark_tile_dirty(state->m_tilemap1, offset - (0x000 / 4));
+			state->m_tilemap1->mark_tile_dirty(offset - (0x000 / 4));
 		}
 		else if (offset >= 0x400 / 4 && offset < 0x800 / 4)
 		{
-			tilemap_mark_tile_dirty(state->m_tilemap2, offset - (0x400 / 4));
+			state->m_tilemap2->mark_tile_dirty(offset - (0x400 / 4));
 		}
 		else if (offset >= 0x800 / 4 && offset < 0xc00 / 4)
 		{
-			tilemap_mark_tile_dirty(state->m_tilemap3, offset - (0x800 / 4));
+			state->m_tilemap3->mark_tile_dirty(offset - (0x800 / 4));
 		}
 	}
 }
@@ -469,8 +469,8 @@ static VIDEO_START(gstream)
 	state->m_tilemap2 = tilemap_create(machine, get_gs2_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
 	state->m_tilemap3 = tilemap_create(machine, get_gs3_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
 
-	tilemap_set_transparent_pen(state->m_tilemap1, 0);
-	tilemap_set_transparent_pen(state->m_tilemap2, 0);
+	state->m_tilemap1->set_transparent_pen(0);
+	state->m_tilemap2->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16(gstream)
@@ -494,18 +494,18 @@ static SCREEN_UPDATE_IND16(gstream)
 
 	//popmessage("(1) %08x %08x (2) %08x %08x (3) %08x %08x", state->m_tmap1_scrollx, state->m_tmap1_scrolly, state->m_tmap2_scrollx, state->m_tmap2_scrolly, state->m_tmap3_scrollx, state->m_tmap3_scrolly );
 
-	tilemap_set_scrollx(state->m_tilemap3, 0, state->m_tmap3_scrollx >> 16);
-	tilemap_set_scrolly(state->m_tilemap3, 0, state->m_tmap3_scrolly >> 16);
+	state->m_tilemap3->set_scrollx(0, state->m_tmap3_scrollx >> 16);
+	state->m_tilemap3->set_scrolly(0, state->m_tmap3_scrolly >> 16);
 
-	tilemap_set_scrollx(state->m_tilemap1, 0, state->m_tmap1_scrollx >> 16);
-	tilemap_set_scrolly(state->m_tilemap1, 0, state->m_tmap1_scrolly >> 16);
+	state->m_tilemap1->set_scrollx(0, state->m_tmap1_scrollx >> 16);
+	state->m_tilemap1->set_scrolly(0, state->m_tmap1_scrolly >> 16);
 
-	tilemap_set_scrollx(state->m_tilemap2, 0, state->m_tmap2_scrollx >> 16);
-	tilemap_set_scrolly(state->m_tilemap2, 0, state->m_tmap2_scrolly >> 16);
+	state->m_tilemap2->set_scrollx(0, state->m_tmap2_scrollx >> 16);
+	state->m_tilemap2->set_scrolly(0, state->m_tmap2_scrolly >> 16);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap3, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap2, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap1, 0, 0);
+	state->m_tilemap3->draw(bitmap, cliprect, 0, 0);
+	state->m_tilemap2->draw(bitmap, cliprect, 0, 0);
+	state->m_tilemap1->draw(bitmap, cliprect, 0, 0);
 
 	for (i = 0x0000 / 4; i < 0x4000 / 4; i += 4)
 	{

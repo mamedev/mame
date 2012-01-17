@@ -48,7 +48,7 @@ private:
 
 	static const gfx_layout char_layout;
 
-	void tile_info(int offset, tile_data *tileinfo, tilemap_memory_index tile_index);
+	void tile_info(int offset, tile_data &tileinfo, tilemap_memory_index tile_index);
 	static TILE_GET_INFO_DEVICE(tile_info_0s);
 	static TILE_GET_INFO_DEVICE(tile_info_0w);
 	static TILE_GET_INFO_DEVICE(tile_info_1s);

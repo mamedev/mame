@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
-	tileinfo->category = (data2 >> 4) & 3;
+	tileinfo.category = (data2 >> 4) & 3;
 }
 
 
@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_playfield2_tile_info )
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
-	tileinfo->category = (data2 >> 4) & 3;
+	tileinfo.category = (data2 >> 4) & 3;
 }
 
 
@@ -103,14 +103,14 @@ VIDEO_START( batman )
 
 	/* initialize the second playfield */
 	state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, tilemap_scan_cols,  8,8, 64,64);
-	tilemap_set_transparent_pen(state->m_playfield2_tilemap, 0);
+	state->m_playfield2_tilemap->set_transparent_pen(0);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 }
 
 
@@ -149,8 +149,8 @@ void batman_scanline_update(screen_device &screen, int scanline)
 							screen.update_partial(scanline - 1);
 						state->m_atarivc_state.pf1_xscroll_raw = (data >> 7) & 0x1ff;
 						atarivc_update_pf_xscrolls(state);
-						tilemap_set_scrollx(state->m_playfield_tilemap, 0, state->m_atarivc_state.pf0_xscroll);
-						tilemap_set_scrollx(state->m_playfield2_tilemap, 0, state->m_atarivc_state.pf1_xscroll);
+						state->m_playfield_tilemap->set_scrollx(0, state->m_atarivc_state.pf0_xscroll);
+						state->m_playfield2_tilemap->set_scrollx(0, state->m_atarivc_state.pf1_xscroll);
 						break;
 
 					case 11:
@@ -158,7 +158,7 @@ void batman_scanline_update(screen_device &screen, int scanline)
 							screen.update_partial(scanline - 1);
 						state->m_atarivc_state.pf0_xscroll_raw = (data >> 7) & 0x1ff;
 						atarivc_update_pf_xscrolls(state);
-						tilemap_set_scrollx(state->m_playfield_tilemap, 0, state->m_atarivc_state.pf0_xscroll);
+						state->m_playfield_tilemap->set_scrollx(0, state->m_atarivc_state.pf0_xscroll);
 						break;
 
 					case 13:
@@ -172,14 +172,14 @@ void batman_scanline_update(screen_device &screen, int scanline)
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
 						state->m_atarivc_state.pf1_yscroll = (data >> 7) & 0x1ff;
-						tilemap_set_scrolly(state->m_playfield2_tilemap, 0, state->m_atarivc_state.pf1_yscroll);
+						state->m_playfield2_tilemap->set_scrolly(0, state->m_atarivc_state.pf1_yscroll);
 						break;
 
 					case 15:
 						if (scanline > 0)
 							screen.update_partial(scanline - 1);
 						state->m_atarivc_state.pf0_yscroll = (data >> 7) & 0x1ff;
-						tilemap_set_scrolly(state->m_playfield_tilemap, 0, state->m_atarivc_state.pf0_yscroll);
+						state->m_playfield_tilemap->set_scrolly(0, state->m_atarivc_state.pf0_yscroll);
 						break;
 				}
 			}
@@ -204,14 +204,14 @@ SCREEN_UPDATE_IND16( batman )
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0x00);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 0x01);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 0x02);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 3, 0x03);
-	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 0, 0x80);
-	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 1, 0x84);
-	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 2, 0x88);
-	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 3, 0x8c);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0x00);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 1, 0x01);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 2, 0x02);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 3, 0x03);
+	state->m_playfield2_tilemap->draw(bitmap, cliprect, 0, 0x80);
+	state->m_playfield2_tilemap->draw(bitmap, cliprect, 1, 0x84);
+	state->m_playfield2_tilemap->draw(bitmap, cliprect, 2, 0x88);
+	state->m_playfield2_tilemap->draw(bitmap, cliprect, 3, 0x8c);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -284,7 +284,7 @@ SCREEN_UPDATE_IND16( batman )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;

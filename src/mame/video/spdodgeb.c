@@ -126,7 +126,7 @@ WRITE8_HANDLER( spdodgeb_ctrl_w )
 	if (state->m_tile_palbank != ((data & 0x30) >> 4))
 	{
 		state->m_tile_palbank = ((data & 0x30) >> 4);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 	state->m_sprite_palbank = (data & 0xc0) >> 6;
 }
@@ -135,7 +135,7 @@ WRITE8_HANDLER( spdodgeb_videoram_w )
 {
 	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x7ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 
@@ -211,8 +211,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( spdodgeb )
 {
 	spdodgeb_state *state = screen.machine().driver_data<spdodgeb_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_lastscroll+5);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->set_scrollx(0,state->m_lastscroll+5);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

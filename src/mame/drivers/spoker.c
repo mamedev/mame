@@ -47,7 +47,7 @@ static WRITE8_HANDLER( bg_tile_w )
 	spoker_state *state = space->machine().driver_data<spoker_state>();
 
 	state->m_bg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -69,7 +69,7 @@ static WRITE8_HANDLER( fg_tile_w )
 	spoker_state *state = space->machine().driver_data<spoker_state>();
 
 	state->m_fg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( fg_color_w )
@@ -77,7 +77,7 @@ static WRITE8_HANDLER( fg_color_w )
 	spoker_state *state = space->machine().driver_data<spoker_state>();
 
 	state->m_fg_color_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static VIDEO_START(spoker)
@@ -86,7 +86,7 @@ static VIDEO_START(spoker)
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8,  32,	128, 8);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	128, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16(spoker)
@@ -94,8 +94,8 @@ static SCREEN_UPDATE_IND16(spoker)
 	spoker_state *state = screen.machine().driver_data<spoker_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

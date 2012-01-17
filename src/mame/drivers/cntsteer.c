@@ -117,9 +117,9 @@ static VIDEO_START( cntsteer )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 64);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	//tilemap_set_flip(state->m_bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+	//state->m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 static VIDEO_START( zerotrgt )
@@ -128,9 +128,9 @@ static VIDEO_START( zerotrgt )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	//tilemap_set_flip(state->m_bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+	//state->m_bg_tilemap->set_flip(TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 /*
@@ -290,7 +290,7 @@ static SCREEN_UPDATE_IND16( zerotrgt )
 		x = -256 - (state->m_scrollx | state->m_scrollx_hi);
 		y = 256 + (state->m_scrolly | state->m_scrolly_hi);
 
-		tilemap_draw_roz(bitmap, cliprect, state->m_bg_tilemap,
+		state->m_bg_tilemap->draw_roz(bitmap, cliprect, 
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -299,7 +299,7 @@ static SCREEN_UPDATE_IND16( zerotrgt )
 	}
 
 	zerotrgt_draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -339,7 +339,7 @@ static SCREEN_UPDATE_IND16( cntsteer )
 		x = 256 + (state->m_scrollx | state->m_scrollx_hi);
 		y = 256 - (state->m_scrolly | state->m_scrolly_hi);
 
-		tilemap_draw_roz(bitmap, cliprect, state->m_bg_tilemap,
+		state->m_bg_tilemap->draw_roz(bitmap, cliprect, 
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -348,7 +348,7 @@ static SCREEN_UPDATE_IND16( cntsteer )
 	}
 
 	cntsteer_draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -380,7 +380,7 @@ static WRITE8_HANDLER(zerotrgt_vregs_w)
 		case 2:	state->m_bg_bank = (data & 0x30) << 4;
 				state->m_bg_color_bank = (data & 7);
 				state->m_disable_roz = (data & 0x40);
-				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+				state->m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3:	state->m_rotation_sign = (data & 1);
 				flip_screen_set(space->machine(), !(data & 4));
@@ -405,7 +405,7 @@ static WRITE8_HANDLER(cntsteer_vregs_w)
 		case 1:	state->m_scrollx = data; break;
 		case 2:	state->m_bg_bank = (data & 0x01) << 8;
 				state->m_bg_color_bank = (data & 6) >> 1;
-				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+				state->m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3:	state->m_rotation_sign = (data & 7);
 				state->m_disable_roz = (~data & 0x08);
@@ -420,21 +420,21 @@ static WRITE8_HANDLER( cntsteer_foreground_vram_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( cntsteer_foreground_attr_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( cntsteer_background_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /*************************************

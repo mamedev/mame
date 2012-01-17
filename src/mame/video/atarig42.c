@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 	int code = (state->m_playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (state->m_playfield_base >> 5) + ((state->m_playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
 	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
-	tileinfo->category = (state->m_playfield_color_bank >> 2) & 7;
+	tileinfo.category = (state->m_playfield_color_bank >> 2) & 7;
 }
 
 
@@ -82,7 +82,7 @@ VIDEO_START( atarig42 )
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* save states */
 	state->save_item(NAME(state->m_current_control));
@@ -137,14 +137,14 @@ void atarig42_scanline_update(screen_device &screen, int scanline)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_set_scrollx(state->m_playfield_tilemap, 0, newscroll);
+				state->m_playfield_tilemap->set_scrollx(0, newscroll);
 				state->m_playfield_xscroll = newscroll;
 			}
 			if (newbank != state->m_playfield_color_bank)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+				state->m_playfield_tilemap->mark_all_dirty();
 				state->m_playfield_color_bank = newbank;
 			}
 		}
@@ -158,14 +158,14 @@ void atarig42_scanline_update(screen_device &screen, int scanline)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_set_scrolly(state->m_playfield_tilemap, 0, newscroll);
+				state->m_playfield_tilemap->set_scrolly(0, newscroll);
 				state->m_playfield_yscroll = newscroll;
 			}
 			if (newbank != state->m_playfield_tile_bank)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+				state->m_playfield_tilemap->mark_all_dirty();
 				state->m_playfield_tile_bank = newbank;
 			}
 		}
@@ -187,14 +187,14 @@ SCREEN_UPDATE_IND16( atarig42 )
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 1);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 2);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 3, 3);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 4, 4);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 5, 5);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 6, 6);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 7, 7);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 1, 1);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 2, 2);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 3, 3);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 4, 4);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 5, 5);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 6, 6);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 7, 7);
 
 	/* copy the motion objects on top */
 	{
@@ -223,7 +223,7 @@ SCREEN_UPDATE_IND16( atarig42 )
 	}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

@@ -99,7 +99,7 @@ WRITE16_HANDLER( badlands_pf_bank_w )
 		{
 			space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 			state->m_playfield_tile_bank = data & 1;
-			tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+			state->m_playfield_tilemap->mark_all_dirty();
 		}
 }
 
@@ -119,7 +119,7 @@ SCREEN_UPDATE_IND16( badlands )
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

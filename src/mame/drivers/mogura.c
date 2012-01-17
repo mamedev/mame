@@ -86,13 +86,13 @@ static SCREEN_UPDATE_IND16( mogura )
 	/* tilemap layout is a bit strange ... */
 	rectangle clip = visarea;
 	clip.max_x = 256 - 1;
-	tilemap_set_scrollx(state->m_tilemap, 0, 256);
-	tilemap_draw(bitmap, clip, state->m_tilemap, 0, 0);
+	state->m_tilemap->set_scrollx(0, 256);
+	state->m_tilemap->draw(bitmap, clip, 0, 0);
 
 	clip.min_x = 256;
 	clip.max_x = 512 - 1;
-	tilemap_set_scrollx(state->m_tilemap, 0, -128);
-	tilemap_draw(bitmap, clip, state->m_tilemap, 0, 0);
+	state->m_tilemap->set_scrollx(0, -128);
+	state->m_tilemap->draw(bitmap, clip, 0, 0);
 
 	return 0;
 }
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( mogura_tileram_w )
 {
 	mogura_state *state = space->machine().driver_data<mogura_state>();
 	state->m_tileram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset & 0x7ff);
+	state->m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 static WRITE8_HANDLER(mogura_dac_w)

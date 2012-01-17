@@ -113,7 +113,7 @@ static WRITE16_HANDLER( latch_w )
 	if ((oldword ^ state->m_latch_data) & 0x7000)
 	{
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-		tilemap_mark_all_tiles_dirty(state->m_alpha_tilemap);
+		state->m_alpha_tilemap->mark_all_dirty();
 		state->m_alpha_tile_bank = (state->m_latch_data >> 12) & 7;
 	}
 }

@@ -137,9 +137,9 @@ VIDEO_START( appoooh )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	tilemap_set_scrolldy(state->m_fg_tilemap, 8, 8);
-	tilemap_set_scrolldy(state->m_bg_tilemap, 8, 8);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_scrolldy(8, 8);
+	state->m_bg_tilemap->set_scrolldy(8, 8);
 
 	state->save_item(NAME(state->m_scroll_x));
 	state->save_item(NAME(state->m_priority));
@@ -156,28 +156,28 @@ WRITE8_HANDLER( appoooh_fg_videoram_w )
 {
 	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 	state->m_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( appoooh_fg_colorram_w )
 {
 	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 	state->m_fg_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( appoooh_bg_videoram_w )
 {
 	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 	state->m_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( appoooh_bg_colorram_w )
 {
 	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 	state->m_bg_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( appoooh_out_w )
@@ -273,10 +273,10 @@ static void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &clip
 SCREEN_UPDATE_IND16( appoooh )
 {
 	appoooh_state *state = screen.machine().driver_data<appoooh_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_priority == 0)	/* fg behind sprites */
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
 	if (state->m_priority == 1)
@@ -295,7 +295,7 @@ SCREEN_UPDATE_IND16( appoooh )
 	}
 
 	if (state->m_priority != 0)	/* fg in front of sprites */
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -303,10 +303,10 @@ SCREEN_UPDATE_IND16( appoooh )
 SCREEN_UPDATE_IND16( robowres )
 {
 	appoooh_state *state = screen.machine().driver_data<appoooh_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_priority == 0)	/* fg behind sprites */
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw sprites */
 	if (state->m_priority == 1)
@@ -325,7 +325,7 @@ SCREEN_UPDATE_IND16( robowres )
 	}
 
 	if (state->m_priority != 0)	/* fg in front of sprites */
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

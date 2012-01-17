@@ -91,13 +91,13 @@ static TILEMAP_MAPPER( fg_tilemap_scan )
 }
 
 
-INLINE void get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,int ram_offs)
+INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int ram_offs)
 {
 	bosco_state *state =  machine.driver_data<bosco_state>();
 
 	UINT8 attr = state->m_videoram[ram_offs + tile_index + 0x800];
-	tileinfo->category = (attr & 0x20) >> 5;
-	tileinfo->group = attr & 0x3f;
+	tileinfo.category = (attr & 0x20) >> 5;
+	tileinfo.group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
 			state->m_videoram[ram_offs + tile_index],
@@ -133,7 +133,7 @@ VIDEO_START( bosco )
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 0x1f);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x1f);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap,3,3);
+	state->m_bg_tilemap->set_scrolldx(3,3);
 
 	machine.generic.spriteram_size = 0x0c;
 	machine.generic.spriteram.u8 = state->m_videoram + 0x03d4;
@@ -159,22 +159,22 @@ WRITE8_HANDLER( bosco_videoram_w )
 
 	state->m_videoram[offset] = data;
 	if (offset & 0x400)
-		tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
+		state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 	else
-		tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x3ff);
+		state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( bosco_scrollx_w )
 {
 	bosco_state *state =  space->machine().driver_data<bosco_state>();
 
-	tilemap_set_scrollx(state->m_bg_tilemap,0,data);
+	state->m_bg_tilemap->set_scrollx(0,data);
 }
 
 WRITE8_HANDLER( bosco_scrolly_w )
 {
 	bosco_state *state =  space->machine().driver_data<bosco_state>();
-	tilemap_set_scrolly(state->m_bg_tilemap,0,data);
+	state->m_bg_tilemap->set_scrolly(0,data);
 }
 
 WRITE8_HANDLER( bosco_starclr_w )
@@ -302,14 +302,14 @@ SCREEN_UPDATE_IND16( bosco )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	draw_stars(screen.machine(),bitmap,cliprect,flip_screen_get(screen.machine()));
 
-	tilemap_draw(bitmap,bg_clip,state->m_bg_tilemap,0,0);
-	tilemap_draw(bitmap,fg_clip,state->m_fg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, bg_clip, 0,0);
+	state->m_fg_tilemap->draw(bitmap, fg_clip, 0,0);
 
 	draw_sprites(screen.machine(), bitmap,cliprect);
 
 	/* draw the high priority characters */
-	tilemap_draw(bitmap,bg_clip,state->m_bg_tilemap,1,0);
-	tilemap_draw(bitmap,fg_clip,state->m_fg_tilemap,1,0);
+	state->m_bg_tilemap->draw(bitmap, bg_clip, 1,0);
+	state->m_fg_tilemap->draw(bitmap, fg_clip, 1,0);
 
 	draw_bullets(screen.machine(), bitmap,cliprect);
 

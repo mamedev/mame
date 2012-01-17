@@ -18,14 +18,14 @@ WRITE16_HANDLER( dynduke_background_w )
 {
 	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 	COMBINE_DATA(&state->m_back_data[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_layer,offset);
+	state->m_bg_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( dynduke_foreground_w )
 {
 	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 	COMBINE_DATA(&state->m_fore_data[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_layer,offset);
+	state->m_fg_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( dynduke_text_w )
@@ -33,7 +33,7 @@ WRITE16_HANDLER( dynduke_text_w )
 	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_layer,offset);
+	state->m_tx_layer->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -89,8 +89,8 @@ VIDEO_START( dynduke )
 	state->m_fg_layer = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,32,32);
 	state->m_tx_layer = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
 
-	tilemap_set_transparent_pen(state->m_fg_layer,15);
-	tilemap_set_transparent_pen(state->m_tx_layer,15);
+	state->m_fg_layer->set_transparent_pen(15);
+	state->m_tx_layer->set_transparent_pen(15);
 }
 
 WRITE16_HANDLER( dynduke_gfxbank_w )
@@ -103,9 +103,9 @@ WRITE16_HANDLER( dynduke_gfxbank_w )
 		if (data&0x10) state->m_fore_bankbase=0x1000; else state->m_fore_bankbase=0;
 
 		if (state->m_back_bankbase!=state->m_old_back)
-			tilemap_mark_all_tiles_dirty(state->m_bg_layer);
+			state->m_bg_layer->mark_all_dirty();
 		if (state->m_fore_bankbase!=state->m_old_fore)
-			tilemap_mark_all_tiles_dirty(state->m_fg_layer);
+			state->m_fg_layer->mark_all_dirty();
 
 		state->m_old_back=state->m_back_bankbase;
 		state->m_old_fore=state->m_fore_bankbase;
@@ -179,7 +179,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 {
 	dynduke_state *state = machine.driver_data<dynduke_state>();
 	/* The transparency / palette handling on the background layer is very strange */
-	bitmap_ind16 &bm = tilemap_get_pixmap(state->m_bg_layer);
+	bitmap_ind16 &bm = state->m_bg_layer->pixmap();
 	int scrolly, scrollx;
 	int x,y;
 
@@ -232,10 +232,10 @@ SCREEN_UPDATE_IND16( dynduke )
 {
 	dynduke_state *state = screen.machine().driver_data<dynduke_state>();
 	/* Setup the tilemaps */
-	tilemap_set_scrolly( state->m_fg_layer,0, ((state->m_scroll_ram[0x11]&0x30)<<4)+((state->m_scroll_ram[0x12]&0x7f)<<1)+((state->m_scroll_ram[0x12]&0x80)>>7) );
-	tilemap_set_scrollx( state->m_fg_layer,0, ((state->m_scroll_ram[0x19]&0x30)<<4)+((state->m_scroll_ram[0x1a]&0x7f)<<1)+((state->m_scroll_ram[0x1a]&0x80)>>7) );
-	tilemap_set_enable( state->m_fg_layer,state->m_fore_enable);
-	tilemap_set_enable( state->m_tx_layer,state->m_txt_enable);
+	state->m_fg_layer->set_scrolly(0, ((state->m_scroll_ram[0x11]&0x30)<<4)+((state->m_scroll_ram[0x12]&0x7f)<<1)+((state->m_scroll_ram[0x12]&0x80)>>7) );
+	state->m_fg_layer->set_scrollx(0, ((state->m_scroll_ram[0x19]&0x30)<<4)+((state->m_scroll_ram[0x1a]&0x7f)<<1)+((state->m_scroll_ram[0x1a]&0x80)>>7) );
+	state->m_fg_layer->enable(state->m_fore_enable);
+	state->m_tx_layer->enable(state->m_txt_enable);
 
 
 	draw_background(screen.machine(), bitmap, cliprect,0x00);
@@ -244,9 +244,9 @@ SCREEN_UPDATE_IND16( dynduke )
 	draw_background(screen.machine(), bitmap, cliprect,0x20);
 
 	draw_sprites(screen.machine(),bitmap,cliprect,2);
-	tilemap_draw(bitmap,cliprect,state->m_fg_layer,0,0);
+	state->m_fg_layer->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect,3);
-	tilemap_draw(bitmap,cliprect,state->m_tx_layer,0,0);
+	state->m_tx_layer->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }

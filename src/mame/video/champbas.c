@@ -165,7 +165,7 @@ WRITE8_HANDLER( champbas_bg_videoram_w )
 {
 	champbas_state *state = space->machine().driver_data<champbas_state>();
 	state->m_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x3ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( champbas_gfxbank_w )
@@ -175,7 +175,7 @@ WRITE8_HANDLER( champbas_gfxbank_w )
 	if (state->m_gfx_bank != data)
 	{
 		state->m_gfx_bank = data;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -183,7 +183,7 @@ WRITE8_HANDLER( champbas_palette_bank_w )
 {
 	champbas_state *state = space->machine().driver_data<champbas_state>();
 	state->m_palette_bank = data & 1;
-	tilemap_set_palette_offset(state->m_bg_tilemap, state->m_palette_bank << 8);
+	state->m_bg_tilemap->set_palette_offset(state->m_palette_bank << 8);
 }
 
 WRITE8_HANDLER( champbas_flipscreen_w )
@@ -285,7 +285,7 @@ static void exctsccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 SCREEN_UPDATE_IND16( champbas )
 {
 	champbas_state *state = screen.machine().driver_data<champbas_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	champbas_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -293,7 +293,7 @@ SCREEN_UPDATE_IND16( champbas )
 SCREEN_UPDATE_IND16( exctsccr )
 {
 	champbas_state *state = screen.machine().driver_data<champbas_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	exctsccr_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

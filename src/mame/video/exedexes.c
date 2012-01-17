@@ -85,7 +85,7 @@ WRITE8_HANDLER( exedexes_videoram_w )
 	exedexes_state *state = space->machine().driver_data<exedexes_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( exedexes_colorram_w )
@@ -93,7 +93,7 @@ WRITE8_HANDLER( exedexes_colorram_w )
 	exedexes_state *state = space->machine().driver_data<exedexes_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( exedexes_c804_w )
@@ -155,7 +155,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 	int code = state->m_videoram[tile_index] + 2 * (state->m_colorram[tile_index] & 0x80);
 	int color = state->m_colorram[tile_index] & 0x3f;
 
-	tileinfo->group = color;
+	tileinfo.group = color;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -180,7 +180,7 @@ VIDEO_START( exedexes )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, exedexes_fg_tilemap_scan, 16, 16, 128, 128);
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 0xcf);
 }
 
@@ -222,8 +222,8 @@ SCREEN_UPDATE_IND16( exedexes )
 	exedexes_state *state = screen.machine().driver_data<exedexes_state>();
 	if (state->m_sc2on)
 	{
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_bg_scroll[1]) << 8) + state->m_bg_scroll[0]);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->set_scrollx(0, ((state->m_bg_scroll[1]) << 8) + state->m_bg_scroll[0]);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(0, cliprect);
@@ -232,15 +232,15 @@ SCREEN_UPDATE_IND16( exedexes )
 
 	if (state->m_sc1on)
 	{
-		tilemap_set_scrollx(state->m_fg_tilemap, 0, ((state->m_nbg_yscroll[1]) << 8) + state->m_nbg_yscroll[0]);
-		tilemap_set_scrolly(state->m_fg_tilemap, 0, ((state->m_nbg_xscroll[1]) << 8) + state->m_nbg_xscroll[0]);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->set_scrollx(0, ((state->m_nbg_yscroll[1]) << 8) + state->m_nbg_yscroll[0]);
+		state->m_fg_tilemap->set_scrolly(0, ((state->m_nbg_xscroll[1]) << 8) + state->m_nbg_xscroll[0]);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
 	if (state->m_chon)
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

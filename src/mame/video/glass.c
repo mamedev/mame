@@ -117,7 +117,7 @@ WRITE16_HANDLER( glass_vram_w )
 {
 	glass_state *state = space->machine().driver_data<glass_state>();
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_pant[offset >> 11], ((offset << 1) & 0x0fff) >> 2);
+	state->m_pant[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
 
@@ -136,8 +136,8 @@ VIDEO_START( glass )
 
 	state->save_item(NAME(*state->m_screen_bitmap));
 
-	tilemap_set_transparent_pen(state->m_pant[0], 0);
-	tilemap_set_transparent_pen(state->m_pant[1], 0);
+	state->m_pant[0]->set_transparent_pen(0);
+	state->m_pant[1]->set_transparent_pen(0);
 }
 
 
@@ -199,16 +199,16 @@ SCREEN_UPDATE_IND16( glass )
 {
 	glass_state *state = screen.machine().driver_data<glass_state>();
 	/* set scroll registers */
-	tilemap_set_scrolly(state->m_pant[0], 0, state->m_vregs[0]);
-	tilemap_set_scrollx(state->m_pant[0], 0, state->m_vregs[1] + 0x04);
-	tilemap_set_scrolly(state->m_pant[1], 0, state->m_vregs[2]);
-	tilemap_set_scrollx(state->m_pant[1], 0, state->m_vregs[3]);
+	state->m_pant[0]->set_scrolly(0, state->m_vregs[0]);
+	state->m_pant[0]->set_scrollx(0, state->m_vregs[1] + 0x04);
+	state->m_pant[1]->set_scrolly(0, state->m_vregs[2]);
+	state->m_pant[1]->set_scrollx(0, state->m_vregs[3]);
 
 	/* draw layers + sprites */
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	copybitmap(bitmap, *state->m_screen_bitmap, 0, 0, 0x18, 0x24, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_pant[1], 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_pant[0], 0, 0);
+	state->m_pant[1]->draw(bitmap, cliprect, 0, 0);
+	state->m_pant[0]->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

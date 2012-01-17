@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_tile_info0 )
 			state->m_videoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
-	tileinfo->category = (attr & 0x20) >> 5;
+	tileinfo.category = (attr & 0x20) >> 5;
 }
 
 /***************************************************************************
@@ -123,7 +123,7 @@ WRITE8_HANDLER( pandoras_vram_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	tilemap_mark_tile_dirty(state->m_layer0, offset);
+	state->m_layer0->mark_tile_dirty(offset);
 	state->m_videoram[offset] = data;
 }
 
@@ -131,7 +131,7 @@ WRITE8_HANDLER( pandoras_cram_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	tilemap_mark_tile_dirty(state->m_layer0, offset);
+	state->m_layer0->mark_tile_dirty(offset);
 	state->m_colorram[offset] = data;
 }
 
@@ -139,7 +139,7 @@ WRITE8_HANDLER( pandoras_scrolly_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	tilemap_set_scrolly(state->m_layer0, 0, data);
+	state->m_layer0->set_scrolly(0, data);
 }
 
 WRITE8_HANDLER( pandoras_flipscreen_w )
@@ -147,7 +147,7 @@ WRITE8_HANDLER( pandoras_flipscreen_w )
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
 	state->m_flipscreen = data;
-	tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 /***************************************************************************
@@ -180,8 +180,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 SCREEN_UPDATE_IND16( pandoras )
 {
 	pandoras_state *state = screen.machine().driver_data<pandoras_state>();
-	tilemap_draw(bitmap,cliprect, state->m_layer0, 1 ,0);
+	state->m_layer0->draw(bitmap, cliprect, 1 ,0);
 	draw_sprites(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x800] );
-	tilemap_draw(bitmap,cliprect, state->m_layer0, 0 ,0);
+	state->m_layer0->draw(bitmap, cliprect, 0 ,0);
 	return 0;
 }

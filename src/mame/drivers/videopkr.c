@@ -496,8 +496,8 @@ static VIDEO_START( vidadcba )
 static SCREEN_UPDATE_IND16( videopkr )
 {
 	videopkr_state *state = screen.machine().driver_data<videopkr_state>();
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->mark_all_dirty();
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -600,7 +600,7 @@ static WRITE8_HANDLER( videopkr_io_w )
 			state->m_n_offs = ((state->m_p1 & 0xc0) << 2 ) + offset;
 			state->m_color_ram[state->m_n_offs] = data & 0x0f;
 			state->m_video_ram[state->m_n_offs] = data;
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, state->m_n_offs);
+			state->m_bg_tilemap->mark_tile_dirty(state->m_n_offs);
 			break;
 		}
 
@@ -617,7 +617,7 @@ static WRITE8_HANDLER( videopkr_io_w )
 		{
 			state->m_n_offs = ((state->m_p1 & 0xc0) << 2 ) + offset;
 			state->m_color_ram[state->m_n_offs] = data & 0x0f;
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, state->m_n_offs);
+			state->m_bg_tilemap->mark_tile_dirty(state->m_n_offs);
 			break;
 		}
 
@@ -628,7 +628,7 @@ static WRITE8_HANDLER( videopkr_io_w )
 		{
 			state->m_n_offs = ((state->m_p1 & 0xc0) << 2 ) + offset;
 			state->m_video_ram[state->m_n_offs] = data;
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, state->m_n_offs);
+			state->m_bg_tilemap->mark_tile_dirty(state->m_n_offs);
 			break;
 		}
 

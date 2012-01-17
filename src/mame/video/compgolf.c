@@ -37,14 +37,14 @@ WRITE8_HANDLER( compgolf_video_w )
 {
 	compgolf_state *state = space->machine().driver_data<compgolf_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_text_tilemap, offset / 2);
+	state->m_text_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( compgolf_back_w )
 {
 	compgolf_state *state = space->machine().driver_data<compgolf_state>();
 	state->m_bg_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_text_info )
@@ -76,7 +76,7 @@ VIDEO_START( compgolf )
 	state->m_bg_tilemap = tilemap_create(machine, get_back_info, back_scan, 16, 16, 32, 32);
 	state->m_text_tilemap = tilemap_create(machine, get_text_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_text_tilemap, 0);
+	state->m_text_tilemap->set_transparent_pen(0);
 }
 
 /*
@@ -124,11 +124,11 @@ SCREEN_UPDATE_IND16( compgolf )
 	int scrollx = state->m_scrollx_hi + state->m_scrollx_lo;
 	int scrolly = state->m_scrolly_hi + state->m_scrolly_lo;
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, scrollx);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, scrolly);
+	state->m_bg_tilemap->set_scrollx(0, scrollx);
+	state->m_bg_tilemap->set_scrolly(0, scrolly);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

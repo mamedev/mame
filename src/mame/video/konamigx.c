@@ -286,7 +286,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy, y, maxy, clip;
 
-	bitmap_ind16 &src_bitmap = tilemap_get_pixmap(tmap);
+	bitmap_ind16 &src_bitmap = tmap->pixmap();
 	rectangle &src_cliprect = K053936_cliprect[chip];
 	clip = K053936_clip_enabled[chip];
 
@@ -1849,7 +1849,7 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 	/* handle this by creating 2 roz tilemaps instead, otherwise performance dies completely on dual screen mode
     if (konamigx_type3_psac2_actual_bank!=konamigx_type3_psac2_actual_last_bank)
     {
-        tilemap_mark_all_tiles_dirty (gx_psac_tilemap);
+        gx_psac_tilemap->mark_all_dirty();
         konamigx_type3_psac2_actual_last_bank = konamigx_type3_psac2_actual_bank;
     }
     */
@@ -2164,7 +2164,7 @@ VIDEO_START(konamigx_type3)
 	type3_roz_temp_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
 
 
-	//tilemap_set_flip(gx_psac_tilemap, TILEMAP_FLIPX| TILEMAP_FLIPY);
+	//gx_psac_tilemap->set_flip(TILEMAP_FLIPX| TILEMAP_FLIPY);
 
 	K053936_wraparound_enable(0, 1);
 //  K053936GP_set_offset(0, -30, -1);
@@ -2306,8 +2306,8 @@ VIDEO_START(opengolf)
 	gx_psac_tilemap2 = tilemap_create(machine, get_gx_psac1b_tile_info, tilemap_scan_cols,  16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
-	//tilemap_set_transparent_pen(gx_psac_tilemap, 0);
-	//tilemap_set_transparent_pen(gx_psac_tilemap2, 0);
+	//gx_psac_tilemap->set_transparent_pen(0);
+	//gx_psac_tilemap2->set_transparent_pen(0);
 
 	gx_rozenable = 0;
 	gx_specialrozenable = 1;
@@ -2344,8 +2344,8 @@ VIDEO_START(racinfrc)
 	gx_psac_tilemap2 = tilemap_create(machine, get_gx_psac1b_tile_info, tilemap_scan_cols,  16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
-	//tilemap_set_transparent_pen(gx_psac_tilemap, 0);
-	//tilemap_set_transparent_pen(gx_psac_tilemap2, 0);
+	//gx_psac_tilemap->set_transparent_pen(0);
+	//gx_psac_tilemap2->set_transparent_pen(0);
 
 	gx_rozenable = 0;
 	gx_specialrozenable = 1;
@@ -2409,10 +2409,10 @@ SCREEN_UPDATE_RGB32(konamigx)
 
 		if (psac_colorbase != last_psac_colorbase)
 		{
-			tilemap_mark_all_tiles_dirty(gx_psac_tilemap);
+			gx_psac_tilemap->mark_all_dirty();
 			if (gx_rozenable == 3)
 			{
-				tilemap_mark_all_tiles_dirty(gx_psac_tilemap2);
+				gx_psac_tilemap2->mark_all_dirty();
 			}
 		}
 	}
@@ -2658,8 +2658,8 @@ WRITE32_HANDLER( konamigx_tilebank_w )
 WRITE32_HANDLER(konamigx_t1_psacmap_w)
 {
 	COMBINE_DATA(&gx_psacram[offset]);
-	tilemap_mark_tile_dirty(gx_psac_tilemap, offset/2);
-	tilemap_mark_tile_dirty(gx_psac_tilemap2, offset/2);
+	gx_psac_tilemap->mark_tile_dirty(offset/2);
+	gx_psac_tilemap2->mark_tile_dirty(offset/2);
 }
 
 // type 4 RAM-based PSAC tilemap
@@ -2667,7 +2667,7 @@ WRITE32_HANDLER( konamigx_t4_psacmap_w )
 {
 	COMBINE_DATA(&gx_psacram[offset]);
 
-	tilemap_mark_tile_dirty(gx_psac_tilemap, offset*2);
-	tilemap_mark_tile_dirty(gx_psac_tilemap, (offset*2)+1);
+	gx_psac_tilemap->mark_tile_dirty(offset*2);
+	gx_psac_tilemap->mark_tile_dirty((offset*2)+1);
 }
 

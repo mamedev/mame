@@ -138,7 +138,7 @@ static WRITE8_HANDLER( jollyjgr_videoram_w )
 {
 	jollyjgr_state *state = space->machine().driver_data<jollyjgr_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( jollyjgr_attrram_w )
@@ -151,11 +151,11 @@ static WRITE8_HANDLER( jollyjgr_attrram_w )
 		int i;
 
 		for (i = offset >> 1; i < 0x0400; i += 32)
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, i);
+			state->m_bg_tilemap->mark_tile_dirty(i);
 	}
 	else
 	{
-		tilemap_set_scrolly(state->m_bg_tilemap, offset >> 1, data);
+		state->m_bg_tilemap->set_scrolly(offset >> 1, data);
 	}
 
 	state->m_colorram[offset] = data;
@@ -175,7 +175,7 @@ static WRITE8_HANDLER( jollyjgr_misc_w )
 
 	state->m_pri = data & 4;
 
-	tilemap_set_flip(state->m_bg_tilemap, (state->m_flip_x ? TILEMAP_FLIPX : 0) | (state->m_flip_y ? TILEMAP_FLIPY : 0));
+	state->m_bg_tilemap->set_flip((state->m_flip_x ? TILEMAP_FLIPX : 0) | (state->m_flip_y ? TILEMAP_FLIPY : 0));
 
 	state->m_nmi_enable = data & 0x80;
 }
@@ -441,8 +441,8 @@ static VIDEO_START( jollyjgr )
 	jollyjgr_state *state = machine.driver_data<jollyjgr_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scroll_cols(32);
 }
 
 static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
@@ -495,11 +495,11 @@ static SCREEN_UPDATE_IND16( jollyjgr )
 		if(!(state->m_bitmap_disable))
 			draw_bitmap(screen.machine(), bitmap);
 
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 		if(!(state->m_bitmap_disable))
 			draw_bitmap(screen.machine(), bitmap);

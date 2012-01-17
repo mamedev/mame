@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-INLINE void get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,UINT8 *ram)
+INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,UINT8 *ram)
 {
 	tile_index *= 4;
 	SET_TILE_INFO(
@@ -46,9 +46,9 @@ VIDEO_START( hexion )
 	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
 	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,     8,8,64,32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0],0);
-	tilemap_set_scrollx(state->m_bg_tilemap[1],0,-4);
-	tilemap_set_scrolly(state->m_bg_tilemap[1],0,4);
+	state->m_bg_tilemap[0]->set_transparent_pen(0);
+	state->m_bg_tilemap[1]->set_scrollx(0,-4);
+	state->m_bg_tilemap[1]->set_scrolly(0,4);
 
 	state->m_vram[0] = machine.region("maincpu")->base() + 0x30000;
 	state->m_vram[1] = state->m_vram[0] + 0x2000;
@@ -76,7 +76,7 @@ WRITE8_HANDLER( hexion_bankswitch_w )
 	{
 		int bank = state->m_unkram[0]&1;
 		memset(state->m_vram[bank],state->m_unkram[1],0x2000);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap[bank]);
+		state->m_bg_tilemap[bank]->mark_all_dirty();
 	}
 	/* bit 7 = PMC-BK */
 	state->m_pmcbank = (data & 0x80) >> 7;
@@ -124,7 +124,7 @@ WRITE8_HANDLER( hexion_bankedram_w )
 		{
 //logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",cpu_get_pc(&space->device()),offset,data,state->m_bankctrl);
 			state->m_vram[state->m_rambank][offset] = data;
-			tilemap_mark_tile_dirty(state->m_bg_tilemap[state->m_rambank],offset/4);
+			state->m_bg_tilemap[state->m_rambank]->mark_tile_dirty(offset/4);
 		}
 		else
 			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(&space->device()),offset,data);
@@ -168,7 +168,7 @@ WRITE8_HANDLER( hexion_gfxrom_select_w )
 SCREEN_UPDATE_IND16( hexion )
 {
 	hexion_state *state = screen.machine().driver_data<hexion_state>();
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap[1],0,0);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap[0],0,0);
+	state->m_bg_tilemap[1]->draw(bitmap, cliprect, 0,0);
+	state->m_bg_tilemap[0]->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

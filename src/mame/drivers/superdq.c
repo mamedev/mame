@@ -62,7 +62,7 @@ static SCREEN_UPDATE_IND16( superdq )
 {
 	superdq_state *state = screen.machine().driver_data<superdq_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -144,7 +144,7 @@ static WRITE8_HANDLER( superdq_videoram_w )
 	superdq_state *state = space->machine().driver_data<superdq_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap,offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( superdq_io_w )

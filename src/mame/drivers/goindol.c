@@ -32,7 +32,7 @@ static WRITE8_HANDLER( goindol_bankswitch_w )
 	if (state->m_char_bank != ((data & 0x10) >> 4))
 	{
 		state->m_char_bank = (data & 0x10) >> 4;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	flip_screen_set(space->machine(), data & 0x20);

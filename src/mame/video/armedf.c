@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_nb1414m4_tx_tile_info )
 	}
 
 	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */
-	tileinfo->category = (attributes & 0x8) >> 3;
+	tileinfo.category = (attributes & 0x8) >> 3;
 
 	SET_TILE_INFO(
 			0,
@@ -76,7 +76,7 @@ static TILE_GET_INFO( get_armedf_tx_tile_info )
 	//}
 
 	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */
-	tileinfo->category = (attributes & 0x8) >> 3;
+	tileinfo.category = (attributes & 0x8) >> 3;
 
 	SET_TILE_INFO(
 			0,
@@ -128,12 +128,12 @@ VIDEO_START( terraf )
 
 	state->m_tx_tilemap = tilemap_create(machine, get_nb1414m4_tx_tile_info, (state->m_scroll_type == 2) ? armedf_scan_type3 : armedf_scan_type2, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0xf);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0xf);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0xf);
+	state->m_bg_tilemap->set_transparent_pen(0xf);
+	state->m_fg_tilemap->set_transparent_pen(0xf);
+	state->m_tx_tilemap->set_transparent_pen(0xf);
 
 	if (state->m_scroll_type != 1)
-		tilemap_set_scrollx(state->m_tx_tilemap, 0, -128);
+		state->m_tx_tilemap->set_scrollx(0, -128);
 
 	state->m_text_videoram = auto_alloc_array(machine, UINT8, 0x1000);
 }
@@ -149,12 +149,12 @@ VIDEO_START( armedf )
 
 	state->m_tx_tilemap = tilemap_create(machine, get_armedf_tx_tile_info, armedf_scan_type1, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0xf);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0xf);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0xf);
+	state->m_bg_tilemap->set_transparent_pen(0xf);
+	state->m_fg_tilemap->set_transparent_pen(0xf);
+	state->m_tx_tilemap->set_transparent_pen(0xf);
 
 	if (state->m_scroll_type != 1)
-		tilemap_set_scrollx(state->m_tx_tilemap, 0, -128);
+		state->m_tx_tilemap->set_scrollx(0, -128);
 
 	state->m_text_videoram = auto_alloc_array(machine, UINT8, 0x1000);
 }
@@ -177,7 +177,7 @@ WRITE8_HANDLER( nb1414m4_text_videoram_w )
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	state->m_text_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x7ff);
+	state->m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 READ8_HANDLER( armedf_text_videoram_r )
@@ -191,21 +191,21 @@ WRITE8_HANDLER( armedf_text_videoram_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 	state->m_text_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x7ff);
+	state->m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 WRITE16_HANDLER( armedf_fg_videoram_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( armedf_bg_videoram_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( terraf_fg_scrolly_w )
@@ -258,14 +258,14 @@ WRITE16_HANDLER( armedf_bg_scrollx_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 	COMBINE_DATA(&state->m_bg_scrollx);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bg_scrollx);
+	state->m_bg_tilemap->set_scrollx(0, state->m_bg_scrollx);
 }
 
 WRITE16_HANDLER( armedf_bg_scrolly_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 	COMBINE_DATA(&state->m_bg_scrolly);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_bg_scrolly);
+	state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);
 }
 
 
@@ -388,36 +388,36 @@ SCREEN_UPDATE_IND16( armedf )
 	armedf_state *state = screen.machine().driver_data<armedf_state>();
 	int sprite_enable = state->m_vreg & 0x200;
 
-	tilemap_set_enable(state->m_bg_tilemap, state->m_vreg & 0x800);
-	tilemap_set_enable(state->m_fg_tilemap, state->m_vreg & 0x400);
-	tilemap_set_enable(state->m_tx_tilemap, state->m_vreg & 0x100);
+	state->m_bg_tilemap->enable(state->m_vreg & 0x800);
+	state->m_fg_tilemap->enable(state->m_vreg & 0x400);
+	state->m_tx_tilemap->enable(state->m_vreg & 0x100);
 
 	switch (state->m_scroll_type)
 	{
 		case 0:	/* terra force, kozure ookami */
 		case 2: /* legion */
 		case 3:	/* crazy climber */
-			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_fg_scrollx & 0x3ff));
-			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_fg_scrolly & 0x3ff));
+			state->m_fg_tilemap->set_scrollx(0, (state->m_fg_scrollx & 0x3ff));
+			state->m_fg_tilemap->set_scrolly(0, (state->m_fg_scrolly & 0x3ff));
 			break;
 
 		case 1: /* armed formation */
-			tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_fg_scrollx);
-			tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_fg_scrolly);
+			state->m_fg_tilemap->set_scrollx(0, state->m_fg_scrollx);
+			state->m_fg_tilemap->set_scrolly(0, state->m_fg_scrolly);
 			break;
 
 	}
 
 	bitmap.fill(0xff, cliprect );
 
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, TILEMAP_DRAW_CATEGORY(1), 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (sprite_enable)
 		draw_sprites(screen.machine(), bitmap, cliprect, 2);
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (sprite_enable)
 		draw_sprites(screen.machine(), bitmap, cliprect, 1);
@@ -425,7 +425,7 @@ SCREEN_UPDATE_IND16( armedf )
 	if (sprite_enable)
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
 
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, TILEMAP_DRAW_CATEGORY(0), 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 
 	return 0;
 }

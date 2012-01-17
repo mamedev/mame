@@ -384,7 +384,7 @@ static void updateflip(running_machine &machine)
 	attoseconds_t period = machine.primary_screen->frame_period().attoseconds;
 	rectangle visarea = machine.primary_screen->visible_area();
 
-	tilemap_set_flip_all(machine,(TILEMAP_FLIPX & state->flip_screen_x) | (TILEMAP_FLIPY & state->flip_screen_y));
+	machine.tilemap().set_flip_all((TILEMAP_FLIPX & state->flip_screen_x) | (TILEMAP_FLIPY & state->flip_screen_y));
 
 	if (state->flip_screen_x)
 	{

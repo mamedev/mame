@@ -31,7 +31,7 @@ static TILE_GET_INFO( holeland_get_tile_info )
 			tile_number,
 			state->m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
-	tileinfo->group = (attr >> 4) & 1;
+	tileinfo.group = (attr >> 4) & 1;
 }
 
 static TILE_GET_INFO( crzrally_get_tile_info )
@@ -45,7 +45,7 @@ static TILE_GET_INFO( crzrally_get_tile_info )
 			tile_number,
 			state->m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
-	tileinfo->group = (attr >> 4) & 1;
+	tileinfo.group = (attr >> 4) & 1;
 }
 
 /***************************************************************************
@@ -59,8 +59,8 @@ VIDEO_START( holeland )
 	holeland_state *state = machine.driver_data<holeland_state>();
 	state->m_bg_tilemap = tilemap_create(machine, holeland_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x01, 0xfe); /* split type 1 has pen 0? transparent in front half */
+	state->m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
+	state->m_bg_tilemap->set_transmask(1, 0x01, 0xfe); /* split type 1 has pen 0? transparent in front half */
 }
 
 VIDEO_START( crzrally )
@@ -73,14 +73,14 @@ WRITE8_HANDLER( holeland_videoram_w )
 {
 	holeland_state *state = space->machine().driver_data<holeland_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( holeland_colorram_w )
 {
 	holeland_state *state = space->machine().driver_data<holeland_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( holeland_pal_offs_w )
@@ -90,14 +90,14 @@ WRITE8_HANDLER( holeland_pal_offs_w )
 	{
 		state->m_po[offset] = data & 1;
 		state->m_palette_offset = (state->m_po[0] + (state->m_po[1] << 1)) << 4;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
 WRITE8_HANDLER( holeland_scroll_w )
 {
 	holeland_state *state = space->machine().driver_data<holeland_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrollx(0, data);
 }
 
 WRITE8_HANDLER( holeland_flipscreen_w )
@@ -191,17 +191,17 @@ static void crzrally_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 SCREEN_UPDATE_IND16( holeland )
 {
 	holeland_state *state = screen.machine().driver_data<holeland_state>();
-/*tilemap_mark_all_tiles_dirty(state->m_bg_tilemap); */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+/*state->m_bg_tilemap->mark_all_dirty(); */
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	holeland_draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE_IND16( crzrally )
 {
 	holeland_state *state = screen.machine().driver_data<holeland_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	crzrally_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

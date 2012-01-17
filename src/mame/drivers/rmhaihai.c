@@ -53,14 +53,14 @@ static WRITE8_HANDLER( rmhaihai_videoram_w )
 {
 	rmhaihai_state *state = space->machine().driver_data<rmhaihai_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( rmhaihai_colorram_w )
 {
 	rmhaihai_state *state = space->machine().driver_data<rmhaihai_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -83,7 +83,7 @@ static VIDEO_START( rmhaihai )
 static SCREEN_UPDATE_IND16( rmhaihai )
 {
 	rmhaihai_state *state = screen.machine().driver_data<rmhaihai_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

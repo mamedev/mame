@@ -89,7 +89,7 @@ static VIDEO_START( dacholer )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 static WRITE8_HANDLER( bg_scroll_x_w )
@@ -142,18 +142,18 @@ static SCREEN_UPDATE_IND16(dacholer)
 
 	if (flip_screen_get(screen.machine()))
 	{
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, 256 - state->m_scroll_x);
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, 256 - state->m_scroll_y);
+		state->m_bg_tilemap->set_scrollx(0, 256 - state->m_scroll_x);
+		state->m_bg_tilemap->set_scrolly(0, 256 - state->m_scroll_y);
 	}
 	else
 	{
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_x);
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll_y);
+		state->m_bg_tilemap->set_scrollx(0, state->m_scroll_x);
+		state->m_bg_tilemap->set_scrolly(0, state->m_scroll_y);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -161,14 +161,14 @@ static WRITE8_HANDLER( background_w )
 {
 	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	state->m_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( foreground_w )
 {
 	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	state->m_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( bg_bank_w )
@@ -177,7 +177,7 @@ static WRITE8_HANDLER( bg_bank_w )
 	if ((data & 3) != state->m_bg_bank)
 	{
 		state->m_bg_bank = data & 3;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	flip_screen_set(space->machine(), data & 0xc); // probably one bit for flipx and one for flipy

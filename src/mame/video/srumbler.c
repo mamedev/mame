@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			state->m_backgroundram[2*tile_index + 1] + ((attr & 0x07) << 8),
 			(attr & 0xe0) >> 5,
 			((attr & 0x08) ? TILE_FLIPY : 0));
-	tileinfo->group = (attr & 0x10) >> 4;
+	tileinfo.group = (attr & 0x10) >> 4;
 }
 
 
@@ -53,10 +53,10 @@ VIDEO_START( srumbler )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,    16,16,64,64);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,3);
+	state->m_fg_tilemap->set_transparent_pen(3);
 
-	tilemap_set_transmask(state->m_bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->m_bg_tilemap,1,0x07ff,0xf800); /* split type 1 has pens 0-10 transparent in front half */
+	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
+	state->m_bg_tilemap->set_transmask(1,0x07ff,0xf800); /* split type 1 has pens 0-10 transparent in front half */
 }
 
 
@@ -71,14 +71,14 @@ WRITE8_HANDLER( srumbler_foreground_w )
 {
 	srumbler_state *state = space->machine().driver_data<srumbler_state>();
 	state->m_foregroundram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset/2);
+	state->m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_HANDLER( srumbler_background_w )
 {
 	srumbler_state *state = space->machine().driver_data<srumbler_state>();
 	state->m_backgroundram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset/2);
+	state->m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
 
@@ -101,8 +101,8 @@ WRITE8_HANDLER( srumbler_scroll_w )
 
 	state->m_scroll[offset] = data;
 
-	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_scroll[0] | (state->m_scroll[1] << 8));
-	tilemap_set_scrolly(state->m_bg_tilemap,0,state->m_scroll[2] | (state->m_scroll[3] << 8));
+	state->m_bg_tilemap->set_scrollx(0,state->m_scroll[0] | (state->m_scroll[1] << 8));
+	state->m_bg_tilemap->set_scrolly(0,state->m_scroll[2] | (state->m_scroll[3] << 8));
 }
 
 
@@ -163,10 +163,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( srumbler )
 {
 	srumbler_state *state = screen.machine().driver_data<srumbler_state>();
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_LAYER0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

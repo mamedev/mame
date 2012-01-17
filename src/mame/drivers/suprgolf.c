@@ -72,7 +72,7 @@ static VIDEO_START( suprgolf )
 	state->m_bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
 	state->m_fg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
 
-	tilemap_set_transparent_pen(state->m_tilemap,15);
+	state->m_tilemap->set_transparent_pen(15);
 }
 
 static SCREEN_UPDATE_IND16( suprgolf )
@@ -115,7 +115,7 @@ static SCREEN_UPDATE_IND16( suprgolf )
 		}
 	}
 
-	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
+	state->m_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }
@@ -150,7 +150,7 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 	else
 	{
 		state->m_videoram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_tilemap, (offset & 0x7fe) >> 1);
+		state->m_tilemap->mark_tile_dirty((offset & 0x7fe) >> 1);
 	}
 }
 

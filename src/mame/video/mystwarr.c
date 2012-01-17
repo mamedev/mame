@@ -186,7 +186,7 @@ VIDEO_START(gaiapols)
 	K053936GP_set_offset(0, -10,  0); // floor tiles in demo loop2 (Elaine vs. boss)
 
 	state->m_ult_936_tilemap = tilemap_create(machine, get_gai_936_tile_info, tilemap_scan_rows,  16, 16, 512, 512);
-	tilemap_set_transparent_pen(state->m_ult_936_tilemap, 0);
+	state->m_ult_936_tilemap->set_transparent_pen(0);
 }
 
 static TILE_GET_INFO( get_ult_936_tile_info )
@@ -230,7 +230,7 @@ VIDEO_START(dadandrn)
 	K053936GP_set_offset(0, -8, 0); // Brainy's laser
 
 	state->m_ult_936_tilemap = tilemap_create(machine, get_ult_936_tile_info, tilemap_scan_rows,  16, 16, 512, 512);
-	tilemap_set_transparent_pen(state->m_ult_936_tilemap, 0);
+	state->m_ult_936_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START(mystwarr)
@@ -547,7 +547,7 @@ SCREEN_UPDATE_RGB32(dadandrn) /* and gaiapols */
 
 	if (state->m_last_psac_colorbase != state->m_sub1_colorbase)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_ult_936_tilemap);
+		state->m_ult_936_tilemap->mark_all_dirty();
 
 		if (MW_VERBOSE)
 			popmessage("K053936: PSAC colorbase changed");

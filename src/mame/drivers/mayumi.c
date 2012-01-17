@@ -58,13 +58,13 @@ static WRITE8_HANDLER( mayumi_videoram_w )
 {
 	mayumi_state *state = space->machine().driver_data<mayumi_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset & 0x7ff);
+	state->m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 static SCREEN_UPDATE_IND16( mayumi )
 {
 	mayumi_state *state = screen.machine().driver_data<mayumi_state>();
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

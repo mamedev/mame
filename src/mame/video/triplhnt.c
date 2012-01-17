@@ -110,9 +110,9 @@ SCREEN_UPDATE_IND16( triplhnt )
 	triplhnt_state *state = screen.machine().driver_data<triplhnt_state>();
 	device_t *discrete = screen.machine().device("discrete");
 
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 

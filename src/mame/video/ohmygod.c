@@ -45,7 +45,7 @@ WRITE16_HANDLER( ohmygod_videoram_w )
 {
 	ohmygod_state *state = space->machine().driver_data<ohmygod_state>();
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( ohmygod_spritebank_w )
@@ -59,14 +59,14 @@ WRITE16_HANDLER( ohmygod_scrollx_w )
 {
 	ohmygod_state *state = space->machine().driver_data<ohmygod_state>();
 	COMBINE_DATA(&state->m_scrollx);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx - 0x81ec);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx - 0x81ec);
 }
 
 WRITE16_HANDLER( ohmygod_scrolly_w )
 {
 	ohmygod_state *state = space->machine().driver_data<ohmygod_state>();
 	COMBINE_DATA(&state->m_scrolly);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly - 0x81ef);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly - 0x81ef);
 }
 
 
@@ -109,7 +109,7 @@ SCREEN_UPDATE_IND16( ohmygod )
 {
 	ohmygod_state *state = screen.machine().driver_data<ohmygod_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

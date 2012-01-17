@@ -315,14 +315,14 @@ static WRITE8_HANDLER( megadpkr_videoram_w )
 {
 	blitz_state *state = space->machine().driver_data<blitz_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( megadpkr_colorram_w )
 {
 	blitz_state *state = space->machine().driver_data<blitz_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -355,7 +355,7 @@ static VIDEO_START( megadpkr )
 static SCREEN_UPDATE_IND16( megadpkr )
 {
 	blitz_state *state = screen.machine().driver_data<blitz_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

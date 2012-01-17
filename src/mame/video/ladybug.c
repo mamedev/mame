@@ -139,14 +139,14 @@ WRITE8_HANDLER( ladybug_videoram_w )
 {
 	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( ladybug_colorram_w )
 {
 	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( ladybug_flipscreen_w )
@@ -154,7 +154,7 @@ WRITE8_HANDLER( ladybug_flipscreen_w )
 	if (flip_screen_get(space->machine()) != (data & 0x01))
 	{
 		flip_screen_set(space->machine(), data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -172,7 +172,7 @@ WRITE8_HANDLER( sraider_io_w )
 	if (flip_screen_get(space->machine()) != (data & 0x80))
 	{
 		flip_screen_set(space->machine(), data & 0x80);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	state->m_grid_color = data & 0x70;
@@ -214,8 +214,8 @@ VIDEO_START( ladybug )
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_bg_tilemap->set_scroll_rows(32);
+	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START( sraider )
@@ -223,12 +223,12 @@ VIDEO_START( sraider )
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
 	state->m_grid_tilemap = tilemap_create(machine, get_grid_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_rows(state->m_grid_tilemap, 32);
-	tilemap_set_transparent_pen(state->m_grid_tilemap, 0);
+	state->m_grid_tilemap->set_scroll_rows(32);
+	state->m_grid_tilemap->set_transparent_pen(0);
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_bg_tilemap->set_scroll_rows(32);
+	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -296,12 +296,12 @@ SCREEN_UPDATE_IND16( ladybug )
 		int sy = offs / 4;
 
 		if (flip_screen_get(screen.machine()))
-			tilemap_set_scrollx(state->m_bg_tilemap, offs, -state->m_videoram[32 * sx + sy]);
+			state->m_bg_tilemap->set_scrollx(offs, -state->m_videoram[32 * sx + sy]);
 		else
-			tilemap_set_scrollx(state->m_bg_tilemap, offs, state->m_videoram[32 * sx + sy]);
+			state->m_bg_tilemap->set_scrollx(offs, state->m_videoram[32 * sx + sy]);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -329,9 +329,9 @@ SCREEN_UPDATE_IND16( sraider )
 		int sy = offs / 4;
 
 		if (flip_screen_get(screen.machine()))
-			tilemap_set_scrollx(state->m_bg_tilemap, offs, -state->m_videoram[32 * sx + sy]);
+			state->m_bg_tilemap->set_scrollx(offs, -state->m_videoram[32 * sx + sy]);
 		else
-			tilemap_set_scrollx(state->m_bg_tilemap, offs, state->m_videoram[32 * sx + sy]);
+			state->m_bg_tilemap->set_scrollx(offs, state->m_videoram[32 * sx + sy]);
 	}
 
 	// clear the bg bitmap
@@ -347,7 +347,7 @@ SCREEN_UPDATE_IND16( sraider )
 	colortable_palette_set_color(screen.machine().colortable, 0x40, MAKE_RGB(state->m_grid_color & 0x40 ? 0xff : 0,
 		            														 state->m_grid_color & 0x20 ? 0xff : 0,
 		            														 state->m_grid_color & 0x10 ? 0xff : 0));
-	tilemap_draw(bitmap, cliprect, state->m_grid_tilemap, 0, flip_screen_get(screen.machine()));
+	state->m_grid_tilemap->draw(bitmap, cliprect, 0, flip_screen_get(screen.machine()));
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -364,7 +364,7 @@ SCREEN_UPDATE_IND16( sraider )
 	}
 
 	// now the chars
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, flip_screen_get(screen.machine()));
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, flip_screen_get(screen.machine()));
 
 	// now the sprites
 	draw_sprites(screen.machine(), bitmap, cliprect);

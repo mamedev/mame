@@ -40,7 +40,7 @@ WRITE8_HANDLER( bogeyman_videoram_w )
 	bogeyman_state *state = space->machine().driver_data<bogeyman_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( bogeyman_colorram_w )
@@ -48,7 +48,7 @@ WRITE8_HANDLER( bogeyman_colorram_w )
 	bogeyman_state *state = space->machine().driver_data<bogeyman_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( bogeyman_videoram2_w )
@@ -56,7 +56,7 @@ WRITE8_HANDLER( bogeyman_videoram2_w )
 	bogeyman_state *state = space->machine().driver_data<bogeyman_state>();
 
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( bogeyman_colorram2_w )
@@ -64,7 +64,7 @@ WRITE8_HANDLER( bogeyman_colorram2_w )
 	bogeyman_state *state = space->machine().driver_data<bogeyman_state>();
 
 	state->m_colorram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( bogeyman_paletteram_w )
@@ -101,7 +101,7 @@ VIDEO_START( bogeyman )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -155,8 +155,8 @@ SCREEN_UPDATE_IND16( bogeyman )
 {
 	bogeyman_state *state = screen.machine().driver_data<bogeyman_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

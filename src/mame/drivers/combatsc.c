@@ -140,11 +140,11 @@ static WRITE8_HANDLER( combatsc_vreg_w )
 	combatsc_state *state = space->machine().driver_data<combatsc_state>();
 	if (data != state->m_vreg)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_textlayer);
+		state->m_textlayer->mark_all_dirty();
 		if ((data & 0x0f) != (state->m_vreg & 0x0f))
-			tilemap_mark_all_tiles_dirty(state->m_bg_tilemap[0]);
+			state->m_bg_tilemap[0]->mark_all_dirty();
 		if ((data >> 4) != (state->m_vreg >> 4))
-			tilemap_mark_all_tiles_dirty(state->m_bg_tilemap[1]);
+			state->m_bg_tilemap[1]->mark_all_dirty();
 		state->m_vreg = data;
 	}
 }

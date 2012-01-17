@@ -104,7 +104,7 @@ WRITE8_HANDLER( redclash_videoram_w )
 	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( redclash_gfxbank_w )
@@ -114,7 +114,7 @@ WRITE8_HANDLER( redclash_gfxbank_w )
 	if (state->m_gfxbank != (data & 0x01))
 	{
 		state->m_gfxbank = data & 0x01;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -180,7 +180,7 @@ VIDEO_START( redclash )
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -432,6 +432,6 @@ SCREEN_UPDATE_IND16( redclash )
 	redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 0, 0x00, 0xff);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	draw_bullets(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

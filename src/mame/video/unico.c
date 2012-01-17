@@ -110,7 +110,7 @@ WRITE16_HANDLER( unico_vram_w )
 	UINT16 *vram = state->m_vram;
 	int tile = ((offset / 0x2000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap[tile],(offset & 0x3fff)/2);
+	state->m_tilemap[tile]->mark_tile_dirty((offset & 0x3fff)/2);
 }
 
 WRITE32_HANDLER( unico_vram32_w )
@@ -119,7 +119,7 @@ WRITE32_HANDLER( unico_vram32_w )
 	UINT32 *vram = state->m_vram32;
 	int tile = ((offset / 0x1000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap[tile],(offset & 0x3fff));
+	state->m_tilemap[tile]->mark_tile_dirty((offset & 0x3fff));
 }
 
 
@@ -145,24 +145,24 @@ VIDEO_START( unico )
 	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info,tilemap_scan_rows,
 									16,16,	0x40, 0x40);
 
-	tilemap_set_user_data(state->m_tilemap[0], &state->m_vram[0x8000/2]);
-	tilemap_set_user_data(state->m_tilemap[1], &state->m_vram[0x0000/2]);
-	tilemap_set_user_data(state->m_tilemap[2], &state->m_vram[0x4000/2]);
+	state->m_tilemap[0]->set_user_data(&state->m_vram[0x8000/2]);
+	state->m_tilemap[1]->set_user_data(&state->m_vram[0x0000/2]);
+	state->m_tilemap[2]->set_user_data(&state->m_vram[0x4000/2]);
 
 	state->m_sprites_scrolldx = -0x3f;
 	state->m_sprites_scrolldy = -0x0e;
 
-	tilemap_set_scrolldx(state->m_tilemap[0],-0x32,0);
-	tilemap_set_scrolldx(state->m_tilemap[1],-0x30,0);
-	tilemap_set_scrolldx(state->m_tilemap[2],-0x2e,0);
+	state->m_tilemap[0]->set_scrolldx(-0x32,0);
+	state->m_tilemap[1]->set_scrolldx(-0x30,0);
+	state->m_tilemap[2]->set_scrolldx(-0x2e,0);
 
-	tilemap_set_scrolldy(state->m_tilemap[0],-0x0f,0);
-	tilemap_set_scrolldy(state->m_tilemap[1],-0x0f,0);
-	tilemap_set_scrolldy(state->m_tilemap[2],-0x0f,0);
+	state->m_tilemap[0]->set_scrolldy(-0x0f,0);
+	state->m_tilemap[1]->set_scrolldy(-0x0f,0);
+	state->m_tilemap[2]->set_scrolldy(-0x0f,0);
 
-	tilemap_set_transparent_pen(state->m_tilemap[0],0x00);
-	tilemap_set_transparent_pen(state->m_tilemap[1],0x00);
-	tilemap_set_transparent_pen(state->m_tilemap[2],0x00);
+	state->m_tilemap[0]->set_transparent_pen(0x00);
+	state->m_tilemap[1]->set_transparent_pen(0x00);
+	state->m_tilemap[2]->set_transparent_pen(0x00);
 }
 
 VIDEO_START( zeropnt2 )
@@ -177,24 +177,24 @@ VIDEO_START( zeropnt2 )
 	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info32,tilemap_scan_rows,
 									16,16,	0x40, 0x40);
 
-	tilemap_set_user_data(state->m_tilemap[0], &state->m_vram32[0x8000/4]);
-	tilemap_set_user_data(state->m_tilemap[1], &state->m_vram32[0x0000/4]);
-	tilemap_set_user_data(state->m_tilemap[2], &state->m_vram32[0x4000/4]);
+	state->m_tilemap[0]->set_user_data(&state->m_vram32[0x8000/4]);
+	state->m_tilemap[1]->set_user_data(&state->m_vram32[0x0000/4]);
+	state->m_tilemap[2]->set_user_data(&state->m_vram32[0x4000/4]);
 
 	state->m_sprites_scrolldx = -0x3f;
 	state->m_sprites_scrolldy = -0x0e;
 
-	tilemap_set_scrolldx(state->m_tilemap[0],-0x32,0);
-	tilemap_set_scrolldx(state->m_tilemap[1],-0x30,0);
-	tilemap_set_scrolldx(state->m_tilemap[2],-0x2e,0);
+	state->m_tilemap[0]->set_scrolldx(-0x32,0);
+	state->m_tilemap[1]->set_scrolldx(-0x30,0);
+	state->m_tilemap[2]->set_scrolldx(-0x2e,0);
 
-	tilemap_set_scrolldy(state->m_tilemap[0],-0x0f,0);
-	tilemap_set_scrolldy(state->m_tilemap[1],-0x0f,0);
-	tilemap_set_scrolldy(state->m_tilemap[2],-0x0f,0);
+	state->m_tilemap[0]->set_scrolldy(-0x0f,0);
+	state->m_tilemap[1]->set_scrolldy(-0x0f,0);
+	state->m_tilemap[2]->set_scrolldy(-0x0f,0);
 
-	tilemap_set_transparent_pen(state->m_tilemap[0],0x00);
-	tilemap_set_transparent_pen(state->m_tilemap[1],0x00);
-	tilemap_set_transparent_pen(state->m_tilemap[2],0x00);
+	state->m_tilemap[0]->set_transparent_pen(0x00);
+	state->m_tilemap[1]->set_transparent_pen(0x00);
+	state->m_tilemap[2]->set_transparent_pen(0x00);
 }
 
 
@@ -346,14 +346,14 @@ SCREEN_UPDATE_IND16( unico )
 	unico_state *state = screen.machine().driver_data<unico_state>();
 	int layers_ctrl = -1;
 
-	tilemap_set_scrollx(state->m_tilemap[0], 0, state->m_scroll[0x00]);
-	tilemap_set_scrolly(state->m_tilemap[0], 0, state->m_scroll[0x01]);
+	state->m_tilemap[0]->set_scrollx(0, state->m_scroll[0x00]);
+	state->m_tilemap[0]->set_scrolly(0, state->m_scroll[0x01]);
 
-	tilemap_set_scrollx(state->m_tilemap[1], 0, state->m_scroll[0x05]);
-	tilemap_set_scrolly(state->m_tilemap[1], 0, state->m_scroll[0x0a]);
+	state->m_tilemap[1]->set_scrollx(0, state->m_scroll[0x05]);
+	state->m_tilemap[1]->set_scrolly(0, state->m_scroll[0x0a]);
 
-	tilemap_set_scrollx(state->m_tilemap[2], 0, state->m_scroll[0x04]);
-	tilemap_set_scrolly(state->m_tilemap[2], 0, state->m_scroll[0x02]);
+	state->m_tilemap[2]->set_scrollx(0, state->m_scroll[0x04]);
+	state->m_tilemap[2]->set_scrolly(0, state->m_scroll[0x02]);
 
 #ifdef MAME_DEBUG
 if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X) )
@@ -371,9 +371,9 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	bitmap.fill(0x1f00, cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->m_tilemap[0],0,1);
-	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->m_tilemap[1],0,2);
-	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,state->m_tilemap[2],0,4);
+	if (layers_ctrl & 1)	state->m_tilemap[0]->draw(bitmap, cliprect, 0,1);
+	if (layers_ctrl & 2)	state->m_tilemap[1]->draw(bitmap, cliprect, 0,2);
+	if (layers_ctrl & 4)	state->m_tilemap[2]->draw(bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
 	if (layers_ctrl & 8)	unico_draw_sprites(screen.machine(), bitmap,cliprect);
@@ -386,14 +386,14 @@ SCREEN_UPDATE_IND16( zeropnt2 )
 	unico_state *state = screen.machine().driver_data<unico_state>();
 	int layers_ctrl = -1;
 
-	tilemap_set_scrollx(state->m_tilemap[0], 0, state->m_scroll32[0] >> 16);
-	tilemap_set_scrolly(state->m_tilemap[0], 0, state->m_scroll32[0] & 0xffff);
+	state->m_tilemap[0]->set_scrollx(0, state->m_scroll32[0] >> 16);
+	state->m_tilemap[0]->set_scrolly(0, state->m_scroll32[0] & 0xffff);
 
-	tilemap_set_scrollx(state->m_tilemap[1], 0, state->m_scroll32[2] & 0xffff);
-	tilemap_set_scrolly(state->m_tilemap[1], 0, state->m_scroll32[5] >> 16);
+	state->m_tilemap[1]->set_scrollx(0, state->m_scroll32[2] & 0xffff);
+	state->m_tilemap[1]->set_scrolly(0, state->m_scroll32[5] >> 16);
 
-	tilemap_set_scrollx(state->m_tilemap[2], 0, state->m_scroll32[2] >> 16);
-	tilemap_set_scrolly(state->m_tilemap[2], 0, state->m_scroll32[1] >> 16);
+	state->m_tilemap[2]->set_scrollx(0, state->m_scroll32[2] >> 16);
+	state->m_tilemap[2]->set_scrolly(0, state->m_scroll32[1] >> 16);
 
 #ifdef MAME_DEBUG
 if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X) )
@@ -411,9 +411,9 @@ if ( screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input(
 	bitmap.fill(0x1f00, cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,state->m_tilemap[0],0,1);
-	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,state->m_tilemap[1],0,2);
-	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,state->m_tilemap[2],0,4);
+	if (layers_ctrl & 1)	state->m_tilemap[0]->draw(bitmap, cliprect, 0,1);
+	if (layers_ctrl & 2)	state->m_tilemap[1]->draw(bitmap, cliprect, 0,2);
+	if (layers_ctrl & 4)	state->m_tilemap[2]->draw(bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
 	if (layers_ctrl & 8)	zeropnt2_draw_sprites(screen.machine(), bitmap,cliprect);

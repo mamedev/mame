@@ -151,10 +151,10 @@ static WRITE8_HANDLER( ddayjlc_bgram_w )
 	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
 	if (!offset)
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, data + 8);
+		state->m_bg_tilemap->set_scrollx(0, data + 8);
 
 	state->m_bgram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x3ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 static WRITE8_HANDLER( ddayjlc_videoram_w )
@@ -384,7 +384,7 @@ static SCREEN_UPDATE_IND16( ddayjlc )
 {
 	ddayjlc_state *state = screen.machine().driver_data<ddayjlc_state>();
 	UINT32 i;
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 0x400; i += 4)
 	{

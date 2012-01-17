@@ -39,10 +39,10 @@ VIDEO_START( foodf )
 
 	/* initialize the playfield */
 	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 32,32);
-	tilemap_set_transparent_pen(state->m_playfield_tilemap, 0);
+	state->m_playfield_tilemap->set_transparent_pen(0);
 
 	/* adjust the playfield for the 8 pixel offset */
-	tilemap_set_scrollx(state->m_playfield_tilemap, 0, -8);
+	state->m_playfield_tilemap->set_scrollx(0, -8);
 	state->save_item(NAME(state->m_playfield_flip));
 
 	/* compute the color output resistor weights */
@@ -65,7 +65,7 @@ void foodf_set_flip(foodf_state *state, int flip)
 	if (flip != state->m_playfield_flip)
 	{
 		state->m_playfield_flip = flip;
-		tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+		state->m_playfield_tilemap->mark_all_dirty();
 	}
 }
 
@@ -123,11 +123,11 @@ SCREEN_UPDATE_IND16( foodf )
 	UINT16 *spriteram16 = state->m_spriteram;
 
 	/* first draw the playfield opaquely */
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* then draw the non-transparent parts with a priority of 1 */
 	priority_bitmap.fill(0);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 1);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* draw the motion objects front-to-back */
 	for (offs = 0x80-2; offs >= 0x20; offs -= 2)

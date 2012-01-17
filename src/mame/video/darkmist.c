@@ -123,8 +123,8 @@ VIDEO_START(darkmist)
 	state->m_bgtilemap = tilemap_create( machine, get_bgtile_info,tilemap_scan_rows,16,16,512,64 );
 	state->m_fgtilemap = tilemap_create( machine, get_fgtile_info,tilemap_scan_rows,16,16,64,256 );
 	state->m_txtilemap = tilemap_create( machine, get_txttile_info,tilemap_scan_rows,8,8,32,32 );
-	tilemap_set_transparent_pen(state->m_fgtilemap, 0);
-	tilemap_set_transparent_pen(state->m_txtilemap, 0);
+	state->m_fgtilemap->set_transparent_pen(0);
+	state->m_txtilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16( darkmist)
@@ -136,18 +136,18 @@ SCREEN_UPDATE_IND16( darkmist)
 
 	set_pens(screen.machine());
 
-	tilemap_set_scrollx(state->m_bgtilemap, 0, DM_GETSCROLL(0x2));
-	tilemap_set_scrolly(state->m_bgtilemap, 0, DM_GETSCROLL(0x6));
-	tilemap_set_scrollx(state->m_fgtilemap, 0, DM_GETSCROLL(0xa));
-	tilemap_set_scrolly(state->m_fgtilemap, 0, DM_GETSCROLL(0xe));
+	state->m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
+	state->m_bgtilemap->set_scrolly(0, DM_GETSCROLL(0x6));
+	state->m_fgtilemap->set_scrollx(0, DM_GETSCROLL(0xa));
+	state->m_fgtilemap->set_scrolly(0, DM_GETSCROLL(0xe));
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if(state->m_hw & DISPLAY_BG)
-		tilemap_draw(bitmap,cliprect,state->m_bgtilemap, 0,0);
+		state->m_bgtilemap->draw(bitmap, cliprect, 0,0);
 
 	if(state->m_hw & DISPLAY_FG)
-		tilemap_draw(bitmap,cliprect,state->m_fgtilemap, 0,0);
+		state->m_fgtilemap->draw(bitmap, cliprect, 0,0);
 
 	if(state->m_hw & DISPLAY_SPR)
 	{
@@ -192,8 +192,8 @@ SCREEN_UPDATE_IND16( darkmist)
 
 	if(state->m_hw & DISPLAY_TXT)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_txtilemap);
-		tilemap_draw(bitmap,cliprect,state->m_txtilemap, 0,0);
+		state->m_txtilemap->mark_all_dirty();
+		state->m_txtilemap->draw(bitmap, cliprect, 0,0);
 	}
 
 

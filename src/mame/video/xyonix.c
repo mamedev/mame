@@ -46,7 +46,7 @@ WRITE8_HANDLER( xyonix_vidram_w )
 	xyonix_state *state = space->machine().driver_data<xyonix_state>();
 
 	state->m_vidram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap,(offset-1)&0x0fff);
+	state->m_tilemap->mark_tile_dirty((offset-1)&0x0fff);
 }
 
 VIDEO_START(xyonix)
@@ -60,6 +60,6 @@ SCREEN_UPDATE_IND16(xyonix)
 {
 	xyonix_state *state = screen.machine().driver_data<xyonix_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

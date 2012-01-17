@@ -44,11 +44,11 @@ const gfx_layout segas24_tile::char_layout = {
 	8*32
 };
 
-void segas24_tile::tile_info(int offset, tile_data *tileinfo, tilemap_memory_index tile_index)
+void segas24_tile::tile_info(int offset, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	UINT16 val = tile_ram[tile_index|offset];
-	tileinfo->category = (val & 0x8000) != 0;
-	tileinfo_set(machine(), tileinfo, char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
+	tileinfo.category = (val & 0x8000) != 0;
+	tileinfo.set(machine(), char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
 }
 
 TILE_GET_INFO_DEVICE( segas24_tile::tile_info_0s )
@@ -86,10 +86,10 @@ void segas24_tile::device_start()
 	tile_layer[2] = tilemap_create_device(this, tile_info_1s, tilemap_scan_rows,  8, 8, 64, 64);
 	tile_layer[3] = tilemap_create_device(this, tile_info_1w, tilemap_scan_rows,  8, 8, 64, 64);
 
-	tilemap_set_transparent_pen(tile_layer[0], 0);
-	tilemap_set_transparent_pen(tile_layer[1], 0);
-	tilemap_set_transparent_pen(tile_layer[2], 0);
-	tilemap_set_transparent_pen(tile_layer[3], 0);
+	tile_layer[0]->set_transparent_pen(0);
+	tile_layer[1]->set_transparent_pen(0);
+	tile_layer[2]->set_transparent_pen(0);
+	tile_layer[3]->set_transparent_pen(0);
 
 	memset(char_ram, 0, 0x80000);
 	memset(tile_ram, 0, 0x10000);
@@ -367,8 +367,8 @@ void segas24_tile::draw_common(_BitmapClass &bitmap, const rectangle &cliprect, 
 		if(layer & 1)
 			return;
 
-		tilemap_set_scrolly(tile_layer[layer],   0, vscr & 0x1ff);
-		tilemap_set_scrolly(tile_layer[layer|1], 0, vscr & 0x1ff);
+		tile_layer[layer]->set_scrolly(0, vscr & 0x1ff);
+		tile_layer[layer|1]->set_scrolly(0, vscr & 0x1ff);
 
 		if(hscr & 0x8000) {
 			UINT16 *hscrtb = tile_ram + 0x4000 + 0x200*layer;
@@ -391,8 +391,8 @@ void segas24_tile::draw_common(_BitmapClass &bitmap, const rectangle &cliprect, 
 					hscr = hscrtb[y];
 
 					h = hscr & 0x1ff;
-					tilemap_set_scrollx(tile_layer[l1], 0, -h);
-					tilemap_draw(bitmap, c, tile_layer[l1], tpri, lpri);
+					tile_layer[l1]->set_scrollx(0, -h);
+					tile_layer[l1]->draw(bitmap, c, tpri, lpri);
 				}
 				break;
 			}
@@ -407,8 +407,8 @@ void segas24_tile::draw_common(_BitmapClass &bitmap, const rectangle &cliprect, 
 					hscr = hscrtb[y];
 
 					h = hscr & 0x1ff;
-					tilemap_set_scrollx(tile_layer[layer],   0, -h);
-					tilemap_set_scrollx(tile_layer[layer|1], 0, -h);
+					tile_layer[layer]->set_scrollx(0, -h);
+					tile_layer[layer|1]->set_scrollx(0, -h);
 
 					if(c1.max_x >= h)
 						c1.max_x = h-1;
@@ -419,16 +419,16 @@ void segas24_tile::draw_common(_BitmapClass &bitmap, const rectangle &cliprect, 
 
 					c1.min_y = c1.max_y = c2.min_y = c2.max_y = y;
 
-					tilemap_draw(bitmap, c1, tile_layer[l1],   tpri, lpri);
-					tilemap_draw(bitmap, c2, tile_layer[l1^1], tpri, lpri);
+					tile_layer[l1]->draw(bitmap, c1, tpri, lpri);
+					tile_layer[l1^1]->draw(bitmap, c2, tpri, lpri);
 				}
 				break;
 			}
 			}
 
 		} else {
-			tilemap_set_scrollx(tile_layer[layer],   0, -(hscr & 0x1ff));
-			tilemap_set_scrollx(tile_layer[layer|1], 0, -(hscr & 0x1ff));
+			tile_layer[layer]->set_scrollx(0, -(hscr & 0x1ff));
+			tile_layer[layer|1]->set_scrollx(0, -(hscr & 0x1ff));
 
 			switch((ctrl & 0x6000) >> 13) {
 			case 1: {
@@ -443,8 +443,8 @@ void segas24_tile::draw_common(_BitmapClass &bitmap, const rectangle &cliprect, 
 				if(!((-vscr) & 0x200))
 					layer ^= 1;
 
-				tilemap_draw(bitmap, c1, tile_layer[layer],   tpri, lpri);
-				tilemap_draw(bitmap, c2, tile_layer[layer^1], tpri, lpri);
+				tile_layer[layer]->draw(bitmap, c1, tpri, lpri);
+				tile_layer[layer^1]->draw(bitmap, c2, tpri, lpri);
 				break;
 			}
 			case 2: case 3: {
@@ -459,8 +459,8 @@ void segas24_tile::draw_common(_BitmapClass &bitmap, const rectangle &cliprect, 
 				if(!((+hscr) & 0x200))
 					layer ^= 1;
 
-				tilemap_draw(bitmap, c1, tile_layer[layer],   tpri, lpri);
-				tilemap_draw(bitmap, c2, tile_layer[layer^1], tpri, lpri);
+				tile_layer[layer]->draw(bitmap, c1, tpri, lpri);
+				tile_layer[layer^1]->draw(bitmap, c2, tpri, lpri);
 				break;
 			}
 			}
@@ -469,8 +469,8 @@ void segas24_tile::draw_common(_BitmapClass &bitmap, const rectangle &cliprect, 
 	} else {
 		int win = layer & 1;
 
-		bitmap_ind16 &bm = tilemap_get_pixmap(tile_layer[layer]);
-		bitmap_ind8 &tm = tilemap_get_flagsmap(tile_layer[layer]);
+		bitmap_ind16 &bm = tile_layer[layer]->pixmap();
+		bitmap_ind8 &tm = tile_layer[layer]->flagsmap();
 
 		if(hscr & 0x8000) {
 			int y;
@@ -542,7 +542,7 @@ WRITE16_MEMBER(segas24_tile::tile_w)
 {
 	COMBINE_DATA(tile_ram + offset);
 	if(offset < 0x4000)
-		tilemap_mark_tile_dirty(tile_layer[offset >> 12], offset & 0xfff);
+		tile_layer[offset >> 12]->mark_tile_dirty(offset & 0xfff);
 }
 
 WRITE16_MEMBER(segas24_tile::char_w)

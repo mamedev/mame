@@ -171,7 +171,7 @@ static WRITE8_HANDLER( tileram_w )
 {
 	firefox_state *state = space->machine().driver_data<firefox_state>();
 	state->m_tileram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bgtiles, offset);
+	state->m_bgtiles->mark_tile_dirty(offset);
 }
 
 
@@ -179,8 +179,8 @@ static VIDEO_START( firefox )
 {
 	firefox_state *state = machine.driver_data<firefox_state>();
 	state->m_bgtiles = tilemap_create(machine, bgtile_get_info, tilemap_scan_rows, 8,8, 64,64);
-	tilemap_set_transparent_pen(state->m_bgtiles, 0);
-	tilemap_set_scrolldy(state->m_bgtiles, machine.primary_screen->visible_area().min_y, 0);
+	state->m_bgtiles->set_transparent_pen(0);
+	state->m_bgtiles->set_scrolldy(machine.primary_screen->visible_area().min_y, 0);
 }
 
 
@@ -215,7 +215,7 @@ static SCREEN_UPDATE_RGB32( firefox )
 		}
 	}
 
-	tilemap_draw( bitmap, cliprect, state->m_bgtiles, 0, 0 );
+	state->m_bgtiles->draw(bitmap, cliprect, 0, 0 );
 
 	return 0;
 }

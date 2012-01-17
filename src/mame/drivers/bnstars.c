@@ -150,14 +150,14 @@ static WRITE32_HANDLER( ms32_tx0_ram_w )
 {
 	bnstars_state *state = space->machine().driver_data<bnstars_state>();
 	COMBINE_DATA(&state->m_ms32_tx0_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_ms32_tx_tilemap[0],offset/2);
+	state->m_ms32_tx_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
 static WRITE32_HANDLER( ms32_tx1_ram_w )
 {
 	bnstars_state *state = space->machine().driver_data<bnstars_state>();
 	COMBINE_DATA(&state->m_ms32_tx1_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_ms32_tx_tilemap[1],offset/2);
+	state->m_ms32_tx_tilemap[1]->mark_tile_dirty(offset/2);
 }
 
 /* BG Layers */
@@ -188,14 +188,14 @@ static WRITE32_HANDLER( ms32_bg0_ram_w )
 {
 	bnstars_state *state = space->machine().driver_data<bnstars_state>();
 	COMBINE_DATA(&state->m_ms32_bg0_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_ms32_bg_tilemap[0],offset/2);
+	state->m_ms32_bg_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
 static WRITE32_HANDLER( ms32_bg1_ram_w )
 {
 	bnstars_state *state = space->machine().driver_data<bnstars_state>();
 	COMBINE_DATA(&state->m_ms32_bg1_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_ms32_bg_tilemap[1],offset/2);
+	state->m_ms32_bg_tilemap[1]->mark_tile_dirty(offset/2);
 }
 
 /* ROZ Layers */
@@ -245,7 +245,7 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
             if (incxx & 0x10000) incxx |= ~0x1ffff;
             if (incxy & 0x10000) incxy |= ~0x1ffff;
 
-            tilemap_draw_roz(bitmap, &my_clip, state->m_ms32_roz_tilemap,
+            state->m_ms32_roz_tilemap->draw_roz(bitmap, &my_clip, 
                     (start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
                     incxx<<8, incxy<<8, 0, 0,
                     1, // Wrap
@@ -277,7 +277,7 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 		if (incyy & 0x10000) incyy |= ~0x1ffff;
 		if (incyx & 0x10000) incyx |= ~0x1ffff;
 
-		tilemap_draw_roz(bitmap, cliprect, state->m_ms32_roz_tilemap[chip],
+		state->m_ms32_roz_tilemap[chip]->draw_roz(bitmap, cliprect, 
 				(startx+offsx)<<16, (starty+offsy)<<16,
 				incxx<<8, incxy<<8, incyx<<8, incyy<<8,
 				1, // Wrap
@@ -312,14 +312,14 @@ static WRITE32_HANDLER( ms32_roz0_ram_w )
 {
 	bnstars_state *state = space->machine().driver_data<bnstars_state>();
 	COMBINE_DATA(&state->m_ms32_roz0_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_ms32_roz_tilemap[0],offset/2);
+	state->m_ms32_roz_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
 static WRITE32_HANDLER( ms32_roz1_ram_w )
 {
 	bnstars_state *state = space->machine().driver_data<bnstars_state>();
 	COMBINE_DATA(&state->m_ms32_roz1_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_ms32_roz_tilemap[1],offset/2);
+	state->m_ms32_roz_tilemap[1]->mark_tile_dirty(offset/2);
 }
 
 
@@ -491,18 +491,18 @@ static VIDEO_START(bnstars)
 	bnstars_state *state = machine.driver_data<bnstars_state>();
 	state->m_ms32_tx_tilemap[0] = tilemap_create(machine, get_ms32_tx0_tile_info,tilemap_scan_rows, 8, 8,64,64);
 	state->m_ms32_tx_tilemap[1] = tilemap_create(machine, get_ms32_tx1_tile_info,tilemap_scan_rows, 8, 8,64,64);
-	tilemap_set_transparent_pen(state->m_ms32_tx_tilemap[0],0);
-	tilemap_set_transparent_pen(state->m_ms32_tx_tilemap[1],0);
+	state->m_ms32_tx_tilemap[0]->set_transparent_pen(0);
+	state->m_ms32_tx_tilemap[1]->set_transparent_pen(0);
 
 	state->m_ms32_bg_tilemap[0] = tilemap_create(machine, get_ms32_bg0_tile_info,tilemap_scan_rows,16,16,64,64);
 	state->m_ms32_bg_tilemap[1] = tilemap_create(machine, get_ms32_bg1_tile_info,tilemap_scan_rows,16,16,64,64);
-	tilemap_set_transparent_pen(state->m_ms32_bg_tilemap[0],0);
-	tilemap_set_transparent_pen(state->m_ms32_bg_tilemap[1],0);
+	state->m_ms32_bg_tilemap[0]->set_transparent_pen(0);
+	state->m_ms32_bg_tilemap[1]->set_transparent_pen(0);
 
 	state->m_ms32_roz_tilemap[0] = tilemap_create(machine, get_ms32_roz0_tile_info,tilemap_scan_rows,16,16,128,128);
 	state->m_ms32_roz_tilemap[1] = tilemap_create(machine, get_ms32_roz1_tile_info,tilemap_scan_rows,16,16,128,128);
-	tilemap_set_transparent_pen(state->m_ms32_roz_tilemap[0],0);
-	tilemap_set_transparent_pen(state->m_ms32_roz_tilemap[1],0);
+	state->m_ms32_roz_tilemap[0]->set_transparent_pen(0);
+	state->m_ms32_roz_tilemap[1]->set_transparent_pen(0);
 
 
 }
@@ -520,15 +520,15 @@ static SCREEN_UPDATE_IND16(bnstars_left)
 	bitmap.fill(0, cliprect);	/* bg color */
 
 
-	tilemap_set_scrollx(state->m_ms32_bg_tilemap[0], 0, state->m_ms32_bg0_scroll[0x00/4] + state->m_ms32_bg0_scroll[0x08/4] + 0x10 );
-	tilemap_set_scrolly(state->m_ms32_bg_tilemap[0], 0, state->m_ms32_bg0_scroll[0x0c/4] + state->m_ms32_bg0_scroll[0x14/4] );
-	tilemap_draw(bitmap,cliprect,state->m_ms32_bg_tilemap[0],0,1);
+	state->m_ms32_bg_tilemap[0]->set_scrollx(0, state->m_ms32_bg0_scroll[0x00/4] + state->m_ms32_bg0_scroll[0x08/4] + 0x10 );
+	state->m_ms32_bg_tilemap[0]->set_scrolly(0, state->m_ms32_bg0_scroll[0x0c/4] + state->m_ms32_bg0_scroll[0x14/4] );
+	state->m_ms32_bg_tilemap[0]->draw(bitmap, cliprect, 0,1);
 
 	draw_roz(screen.machine(),bitmap,cliprect,2,0);
 
-	tilemap_set_scrollx(state->m_ms32_tx_tilemap[0], 0, state->m_ms32_tx0_scroll[0x00/4] + state->m_ms32_tx0_scroll[0x08/4] + 0x18);
-	tilemap_set_scrolly(state->m_ms32_tx_tilemap[0], 0, state->m_ms32_tx0_scroll[0x0c/4] + state->m_ms32_tx0_scroll[0x14/4]);
-	tilemap_draw(bitmap,cliprect,state->m_ms32_tx_tilemap[0],0,4);
+	state->m_ms32_tx_tilemap[0]->set_scrollx(0, state->m_ms32_tx0_scroll[0x00/4] + state->m_ms32_tx0_scroll[0x08/4] + 0x18);
+	state->m_ms32_tx_tilemap[0]->set_scrolly(0, state->m_ms32_tx0_scroll[0x0c/4] + state->m_ms32_tx0_scroll[0x14/4]);
+	state->m_ms32_tx_tilemap[0]->draw(bitmap, cliprect, 0,4);
 
 
 	draw_sprites(screen.machine(),bitmap,cliprect, state->m_ms32_spram, 0x20000, 0);
@@ -545,15 +545,15 @@ static SCREEN_UPDATE_IND16(bnstars_right)
 	bitmap.fill(0x8000+0, cliprect);	/* bg color */
 
 
-	tilemap_set_scrollx(state->m_ms32_bg_tilemap[1], 0, state->m_ms32_bg1_scroll[0x00/4] + state->m_ms32_bg1_scroll[0x08/4] + 0x10 );
-	tilemap_set_scrolly(state->m_ms32_bg_tilemap[1], 0, state->m_ms32_bg1_scroll[0x0c/4] + state->m_ms32_bg1_scroll[0x14/4] );
-	tilemap_draw(bitmap,cliprect,state->m_ms32_bg_tilemap[1],0,1);
+	state->m_ms32_bg_tilemap[1]->set_scrollx(0, state->m_ms32_bg1_scroll[0x00/4] + state->m_ms32_bg1_scroll[0x08/4] + 0x10 );
+	state->m_ms32_bg_tilemap[1]->set_scrolly(0, state->m_ms32_bg1_scroll[0x0c/4] + state->m_ms32_bg1_scroll[0x14/4] );
+	state->m_ms32_bg_tilemap[1]->draw(bitmap, cliprect, 0,1);
 
 	draw_roz(screen.machine(),bitmap,cliprect,2,1);
 
-	tilemap_set_scrollx(state->m_ms32_tx_tilemap[1], 0, state->m_ms32_tx1_scroll[0x00/4] + state->m_ms32_tx1_scroll[0x08/4] + 0x18);
-	tilemap_set_scrolly(state->m_ms32_tx_tilemap[1], 0, state->m_ms32_tx1_scroll[0x0c/4] + state->m_ms32_tx1_scroll[0x14/4]);
-	tilemap_draw(bitmap,cliprect,state->m_ms32_tx_tilemap[1],0,4);
+	state->m_ms32_tx_tilemap[1]->set_scrollx(0, state->m_ms32_tx1_scroll[0x00/4] + state->m_ms32_tx1_scroll[0x08/4] + 0x18);
+	state->m_ms32_tx_tilemap[1]->set_scrolly(0, state->m_ms32_tx1_scroll[0x0c/4] + state->m_ms32_tx1_scroll[0x14/4]);
+	state->m_ms32_tx_tilemap[1]->draw(bitmap, cliprect, 0,4);
 
 	draw_sprites(screen.machine(),bitmap,cliprect, state->m_ms32_spram+(0x20000/4), 0x20000, 4);
 

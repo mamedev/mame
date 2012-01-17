@@ -402,7 +402,7 @@ static void print_debug_info(running_machine &machine, bitmap_rgb32 &bitmap)
 
 /******************************************************************************/
 
-INLINE void get_tile_info(running_machine &machine, tile_data *tileinfo, int tile_index, UINT16 *gfx_base)
+INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, int tile_index, UINT16 *gfx_base)
 {
 	UINT32 tile=(gfx_base[tile_index*2+0]<<16)|(gfx_base[tile_index*2+1]&0xffff);
 	UINT8 abtype=(tile>>(16+9)) & 1;
@@ -416,8 +416,8 @@ INLINE void get_tile_info(running_machine &machine, tile_data *tileinfo, int til
 			tile&0xffff,
 			(tile>>16) & 0x1ff & (~extra_planes),
 			TILE_FLIPYX( tile >> 30 ));
-	tileinfo->category =  abtype&1;		/* alpha blending type */
-	tileinfo->pen_mask = (extra_planes << 4) | 0x0f;
+	tileinfo.category =  abtype&1;		/* alpha blending type */
+	tileinfo.pen_mask = (extra_planes << 4) | 0x0f;
 }
 
 static TILE_GET_INFO( get_tile_info1 )
@@ -601,10 +601,10 @@ VIDEO_START( f3 )
 		state->m_twidth_mask=0x7f;
 		state->m_twidth_mask_bit=7;
 
-		tilemap_set_transparent_pen(state->m_pf1_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf2_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf3_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf4_tilemap,0);
+		state->m_pf1_tilemap->set_transparent_pen(0);
+		state->m_pf2_tilemap->set_transparent_pen(0);
+		state->m_pf3_tilemap->set_transparent_pen(0);
+		state->m_pf4_tilemap->set_transparent_pen(0);
 
 
 	} else {
@@ -630,14 +630,14 @@ VIDEO_START( f3 )
 		state->m_twidth_mask=0x3f;
 		state->m_twidth_mask_bit=6;
 
-		tilemap_set_transparent_pen(state->m_pf1_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf2_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf3_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf4_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf5_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf6_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf7_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf8_tilemap,0);
+		state->m_pf1_tilemap->set_transparent_pen(0);
+		state->m_pf2_tilemap->set_transparent_pen(0);
+		state->m_pf3_tilemap->set_transparent_pen(0);
+		state->m_pf4_tilemap->set_transparent_pen(0);
+		state->m_pf5_tilemap->set_transparent_pen(0);
+		state->m_pf6_tilemap->set_transparent_pen(0);
+		state->m_pf7_tilemap->set_transparent_pen(0);
+		state->m_pf8_tilemap->set_transparent_pen(0);
 	}
 
 	state->m_spriteram16_buffered = auto_alloc_array(machine, UINT16, 0x10000/2);
@@ -653,8 +653,8 @@ VIDEO_START( f3 )
 		state->m_tile_opaque_pf[i] = auto_alloc_array(machine, UINT8, machine.gfx[1]->total_elements);
 
 
-	tilemap_set_transparent_pen(state->m_vram_layer,0);
-	tilemap_set_transparent_pen(state->m_pixel_layer,0);
+	state->m_vram_layer->set_transparent_pen(0);
+	state->m_pixel_layer->set_transparent_pen(0);
 
 	/* Palettes have 4 bpp indexes despite up to 6 bpp data. The unused */
 	/* top bits in the gfx data are cleared later.                      */
@@ -747,19 +747,19 @@ WRITE16_HANDLER( f3_pf_data_w )
 	COMBINE_DATA(&state->m_f3_pf_data[offset]);
 
 	if (state->m_f3_game_config->extend) {
-		if		(offset<0x1000) tilemap_mark_tile_dirty(state->m_pf1_tilemap,(offset & 0xfff) >> 1);
-		else if (offset<0x2000) tilemap_mark_tile_dirty(state->m_pf2_tilemap,(offset & 0xfff) >> 1);
-		else if (offset<0x3000) tilemap_mark_tile_dirty(state->m_pf3_tilemap,(offset & 0xfff) >> 1);
-		else if (offset<0x4000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,(offset & 0xfff) >> 1);
+		if		(offset<0x1000) state->m_pf1_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
+		else if (offset<0x2000) state->m_pf2_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
+		else if (offset<0x3000) state->m_pf3_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
+		else if (offset<0x4000) state->m_pf4_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
 	} else {
-		if		(offset<0x0800) tilemap_mark_tile_dirty(state->m_pf1_tilemap,(offset & 0x7ff) >> 1);
-		else if (offset<0x1000) tilemap_mark_tile_dirty(state->m_pf2_tilemap,(offset & 0x7ff) >> 1);
-		else if (offset<0x1800) tilemap_mark_tile_dirty(state->m_pf3_tilemap,(offset & 0x7ff) >> 1);
-		else if (offset<0x2000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,(offset & 0x7ff) >> 1);
-		else if (offset<0x2800) tilemap_mark_tile_dirty(state->m_pf5_tilemap,(offset & 0x7ff) >> 1);
-		else if (offset<0x3000) tilemap_mark_tile_dirty(state->m_pf6_tilemap,(offset & 0x7ff) >> 1);
-		else if (offset<0x3800) tilemap_mark_tile_dirty(state->m_pf7_tilemap,(offset & 0x7ff) >> 1);
-		else if (offset<0x4000) tilemap_mark_tile_dirty(state->m_pf8_tilemap,(offset & 0x7ff) >> 1);
+		if		(offset<0x0800) state->m_pf1_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x1000) state->m_pf2_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x1800) state->m_pf3_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x2000) state->m_pf4_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x2800) state->m_pf5_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x3000) state->m_pf6_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x3800) state->m_pf7_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
+		else if (offset<0x4000) state->m_pf8_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
 	}
 }
 
@@ -799,16 +799,16 @@ WRITE16_HANDLER( f3_videoram_w )
 	int tile,col_off;
 	COMBINE_DATA(&state->m_videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_vram_layer,offset);
-	//tilemap_mark_tile_dirty(state->m_vram_layer,offset+1);
+	state->m_vram_layer->mark_tile_dirty(offset);
+	//state->m_vram_layer->mark_tile_dirty(offset+1);
 
 	if (offset>0x7ff) offset-=0x800;
 
 	tile=offset;
 	col_off=((tile&0x3f)*32)+((tile&0xfc0)>>6);
 
-	tilemap_mark_tile_dirty(state->m_pixel_layer,col_off);
-	//tilemap_mark_tile_dirty(state->m_pixel_layer,col_off+32);
+	state->m_pixel_layer->mark_tile_dirty(col_off);
+	//state->m_pixel_layer->mark_tile_dirty(col_off+32);
 }
 
 
@@ -2009,8 +2009,8 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 		}
 
 		/* set pixmap pointer */
-		bitmap_ind16 &srcbitmap = tilemap_get_pixmap(tmap);
-		bitmap_ind8 &flagsbitmap = tilemap_get_flagsmap(tmap);
+		bitmap_ind16 &srcbitmap = tmap->pixmap();
+		bitmap_ind8 &flagsbitmap = tmap->flagsmap();
 
 		if(line_t->alpha_mode[y]!=0)
 		{
@@ -2124,10 +2124,10 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 	sx&=0x1ff;
 
 	/* set pixmap pointer */
-	bitmap_ind16 &srcbitmap_pixel = tilemap_get_pixmap(pixel_tilemap);
-	bitmap_ind8 &flagsbitmap_pixel = tilemap_get_flagsmap(pixel_tilemap);
-	bitmap_ind16 &srcbitmap_vram = tilemap_get_pixmap(vram_tilemap);
-	bitmap_ind8 &flagsbitmap_vram = tilemap_get_flagsmap(vram_tilemap);
+	bitmap_ind16 &srcbitmap_pixel = pixel_tilemap->pixmap();
+	bitmap_ind8 &flagsbitmap_pixel = pixel_tilemap->flagsmap();
+	bitmap_ind16 &srcbitmap_vram = vram_tilemap->pixmap();
+	bitmap_ind8 &flagsbitmap_vram = vram_tilemap->flagsmap();
 
 	y=y_start;
 	while(y!=y_end)
@@ -3178,7 +3178,7 @@ SCREEN_UPDATE_RGB32( f3 )
 	UINT32 sy_fix[5],sx_fix[5];
 
 	state->m_f3_skip_this_frame=0;
-	tilemap_set_flip_all(screen.machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */
 	sy_fix[0]=((state->m_f3_control_0[4]&0xffff)<< 9) + (1<<16);

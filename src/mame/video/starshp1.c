@@ -63,9 +63,9 @@ VIDEO_START( starshp1 )
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  16, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_bg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, -8);
+	state->m_bg_tilemap->set_scrollx(0, -8);
 
 	state->m_LSFR = auto_alloc_array(machine, UINT16, 0x10000);
 
@@ -142,7 +142,7 @@ WRITE8_HANDLER( starshp1_playfield_w )
 	{
 		offset ^= 0x1f;
 		state->m_playfield_ram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+		state->m_bg_tilemap->mark_tile_dirty(offset);
 	}
 }
 
@@ -377,7 +377,7 @@ SCREEN_UPDATE_IND16( starshp1 )
 	if (state->m_circle_kill == 0 && state->m_circle_mod == 0)
 		draw_circle(screen.machine(), bitmap);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_phasor != 0)
 		draw_phasor(state, bitmap);

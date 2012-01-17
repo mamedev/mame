@@ -107,7 +107,7 @@ WRITE16_HANDLER( ginganin_fgram16_w )
 {
 	ginganin_state *state = space->machine().driver_data<ginganin_state>();
 	COMBINE_DATA(&state->m_fgram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -132,7 +132,7 @@ WRITE16_HANDLER( ginganin_txtram16_w )
 {
 	ginganin_state *state = space->machine().driver_data<ginganin_state>();
 	COMBINE_DATA(&state->m_txtram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -143,8 +143,8 @@ VIDEO_START( ginganin )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, FG_NX, FG_NY);
 	state->m_tx_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows, 8, 8, TXT_NX, TXT_NY);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 }
 
 
@@ -157,16 +157,16 @@ WRITE16_HANDLER( ginganin_vregs16_w )
 	switch (offset)
 	{
 	case 0:
-		tilemap_set_scrolly(state->m_fg_tilemap, 0, data);
+		state->m_fg_tilemap->set_scrolly(0, data);
 		break;
 	case 1:
-		tilemap_set_scrollx(state->m_fg_tilemap, 0, data);
+		state->m_fg_tilemap->set_scrollx(0, data);
 		break;
 	case 2:
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+		state->m_bg_tilemap->set_scrolly(0, data);
 		break;
 	case 3:
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
+		state->m_bg_tilemap->set_scrollx(0, data);
 		break;
 	case 4:
 		state->m_layers_ctrl = data;
@@ -176,7 +176,7 @@ WRITE16_HANDLER( ginganin_vregs16_w )
  */
 	case 6:
 		state->m_flipscreen = !(data & 1);
-		tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
 		soundlatch_w(space, 0, data);
@@ -262,10 +262,10 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	if (msk != 0) layers_ctrl1 &= msk;
 
 #define SETSCROLL \
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_posx); \
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_posy); \
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_posx); \
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_posy); \
+	state->m_bg_tilemap->set_scrollx(0, state->m_posx); \
+	state->m_bg_tilemap->set_scrolly(0, state->m_posy); \
+	state->m_fg_tilemap->set_scrollx(0, state->m_posx); \
+	state->m_fg_tilemap->set_scrolly(0, state->m_posy); \
 	popmessage("B>%04X:%04X F>%04X:%04X",state->m_posx%(BG_NX*16),state->m_posy%(BG_NY*16),state->m_posx%(FG_NX*16),state->m_posy%(FG_NY*16));
 
 	if (screen.machine().input().code_pressed(KEYCODE_L))	{ state->m_posx +=8; SETSCROLL }
@@ -279,16 +279,16 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 
 	if (layers_ctrl1 & 1)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl1 & 2)
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	if (layers_ctrl1 & 8)
 		draw_sprites(screen.machine(), bitmap, cliprect);
 	if (layers_ctrl1 & 4)
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

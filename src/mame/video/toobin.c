@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 	int code = data2 & 0x3fff;
 	int color = data1 & 0x0f;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX(data2 >> 14));
-	tileinfo->category = (data1 >> 4) & 3;
+	tileinfo.category = (data1 >> 4) & 3;
 }
 
 
@@ -94,7 +94,7 @@ VIDEO_START( toobin )
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* allocate a playfield bitmap for rendering */
 	machine.primary_screen->register_screen_bitmap(state->m_pfbitmap);
@@ -171,7 +171,7 @@ WRITE16_HANDLER( toobin_xscroll_w )
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
-	tilemap_set_scrollx(state->m_playfield_tilemap, 0, newscroll >> 6);
+	state->m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
 	atarimo_set_xscroll(0, newscroll >> 6);
 
 	/* update the data */
@@ -191,7 +191,7 @@ WRITE16_HANDLER( toobin_yscroll_w )
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
-	tilemap_set_scrolly(state->m_playfield_tilemap, 0, newscroll >> 6);
+	state->m_playfield_tilemap->set_scrolly(0, newscroll >> 6);
 	atarimo_set_yscroll(0, (newscroll >> 6) & 0x1ff);
 
 	/* update the data */
@@ -239,10 +239,10 @@ SCREEN_UPDATE_RGB32( toobin )
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 0, 0);
-	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 1, 1);
-	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 2, 2);
-	tilemap_draw(state->m_pfbitmap, cliprect, state->m_playfield_tilemap, 3, 3);
+	state->m_playfield_tilemap->draw(state->m_pfbitmap, cliprect, 0, 0);
+	state->m_playfield_tilemap->draw(state->m_pfbitmap, cliprect, 1, 1);
+	state->m_playfield_tilemap->draw(state->m_pfbitmap, cliprect, 2, 2);
+	state->m_playfield_tilemap->draw(state->m_pfbitmap, cliprect, 3, 3);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -275,6 +275,6 @@ SCREEN_UPDATE_RGB32( toobin )
 	}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

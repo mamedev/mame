@@ -120,13 +120,13 @@ static WRITE32_HANDLER( darkhors_tmapram_w )
 {
 	darkhors_state *state = space->machine().driver_data<darkhors_state>();
 	COMBINE_DATA(&state->m_tmapram[offset]);
-	tilemap_mark_tile_dirty(state->m_tmap, offset);
+	state->m_tmap->mark_tile_dirty(offset);
 }
 static WRITE32_HANDLER( darkhors_tmapram2_w )
 {
 	darkhors_state *state = space->machine().driver_data<darkhors_state>();
 	COMBINE_DATA(&state->m_tmapram2[offset]);
-	tilemap_mark_tile_dirty(state->m_tmap2, offset);
+	state->m_tmap2->mark_tile_dirty(offset);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -173,8 +173,8 @@ static VIDEO_START( darkhors )
 	state->m_tmap2			=	tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 												16,16, 0x40,0x40	);
 
-	tilemap_set_transparent_pen(state->m_tmap, 0);
-	tilemap_set_transparent_pen(state->m_tmap2, 0);
+	state->m_tmap->set_transparent_pen(0);
+	state->m_tmap2->set_transparent_pen(0);
 
 	machine.gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
@@ -197,13 +197,13 @@ static SCREEN_UPDATE_IND16( darkhors )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	tilemap_set_scrollx(state->m_tmap,0, (state->m_tmapscroll[0] >> 16) - 5);
-	tilemap_set_scrolly(state->m_tmap,0, (state->m_tmapscroll[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->m_tmap, TILEMAP_DRAW_OPAQUE, 0);
+	state->m_tmap->set_scrollx(0, (state->m_tmapscroll[0] >> 16) - 5);
+	state->m_tmap->set_scrolly(0, (state->m_tmapscroll[0] & 0xffff) - 0xff );
+	if (layers_ctrl & 1)	state->m_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
-	tilemap_set_scrollx(state->m_tmap2,0, (state->m_tmapscroll2[0] >> 16) - 5);
-	tilemap_set_scrolly(state->m_tmap2,0, (state->m_tmapscroll2[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, state->m_tmap2, 0, 0);
+	state->m_tmap2->set_scrollx(0, (state->m_tmapscroll2[0] >> 16) - 5);
+	state->m_tmap2->set_scrolly(0, (state->m_tmapscroll2[0] & 0xffff) - 0xff );
+	if (layers_ctrl & 2)	state->m_tmap2->draw(bitmap, cliprect, 0, 0);
 
 	if (layers_ctrl & 4)	draw_sprites(screen.machine(),bitmap,cliprect);
 

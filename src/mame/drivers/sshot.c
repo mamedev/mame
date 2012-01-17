@@ -192,7 +192,7 @@ static VIDEO_START( supershot )
 static SCREEN_UPDATE_IND16( supershot )
 {
 	supershot_state *state = screen.machine().driver_data<supershot_state>();
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( supershot_vidram_w )
 	supershot_state *state = space->machine().driver_data<supershot_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 /*************************************

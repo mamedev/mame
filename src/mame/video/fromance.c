@@ -19,7 +19,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen );
  *
  *************************************/
 
-INLINE void get_fromance_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int layer )
+INLINE void get_fromance_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int layer )
 {
 	fromance_state *state = machine.driver_data<fromance_state>();
 	int tile = ((state->m_local_videoram[layer][0x0000 + tile_index] & 0x80) << 9) |
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_fromance_bg_tile_info ) { get_fromance_tile_info(machi
 static TILE_GET_INFO( get_fromance_fg_tile_info ) { get_fromance_tile_info(machine, tileinfo, tile_index, 1); }
 
 
-INLINE void get_nekkyoku_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int layer )
+INLINE void get_nekkyoku_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int layer )
 {
 	fromance_state *state = machine.driver_data<fromance_state>();
 	int tile = (state->m_local_videoram[layer][0x0000 + tile_index] << 8) |
@@ -67,7 +67,7 @@ static void init_common( running_machine &machine )
 	state->m_local_paletteram = auto_alloc_array(machine, UINT8, 0x800 * 2);
 
 	/* configure tilemaps */
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
+	state->m_fg_tilemap->set_transparent_pen(15);
 
 	/* reset the timer */
 	state->m_crtc_timer = machine.scheduler().timer_alloc(FUNC(crtc_interrupt_gen));
@@ -146,7 +146,7 @@ WRITE8_HANDLER( fromance_gfxreg_w )
 	if (state->m_flipscreen != state->m_flipscreen_old)
 	{
 		state->m_flipscreen_old = state->m_flipscreen;
-		tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 }
 
@@ -201,7 +201,7 @@ WRITE8_HANDLER( fromance_videoram_w )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
 	state->m_local_videoram[state->m_selected_videoram][offset] = data;
-	tilemap_mark_tile_dirty(state->m_selected_videoram ? state->m_fg_tilemap : state->m_bg_tilemap, offset & 0x0fff);
+	(state->m_selected_videoram ? state->m_fg_tilemap : state->m_bg_tilemap)->mark_tile_dirty(offset & 0x0fff);
 }
 
 
@@ -426,13 +426,13 @@ SCREEN_UPDATE_IND16( fromance )
 {
 	fromance_state *state = screen.machine().driver_data<fromance_state>();
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0]);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[0]);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_scrollx[1]);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_scrolly[1]);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx[0]);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly[0]);
+	state->m_fg_tilemap->set_scrollx(0, state->m_scrollx[1]);
+	state->m_fg_tilemap->set_scrolly(0, state->m_scrolly[1]);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -442,11 +442,11 @@ SCREEN_UPDATE_IND16( pipedrm )
 	fromance_state *state = screen.machine().driver_data<fromance_state>();
 
 	/* there seems to be no logical mapping for the X scroll register -- maybe it's gone */
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[1]);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_scrolly[0]);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly[1]);
+	state->m_fg_tilemap->set_scrolly(0, state->m_scrolly[0]);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen, bitmap, cliprect, 0);
 	draw_sprites(screen, bitmap, cliprect, 1);

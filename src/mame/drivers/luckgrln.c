@@ -118,14 +118,14 @@ static WRITE8_HANDLER( luckgrln_reel1_ram_w )
 {
 	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->m_reel1_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel1_tilemap,offset);
+	state->m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( luckgrln_reel1_attr_w )
 {
 	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->m_reel1_attr[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel1_tilemap,offset);
+	state->m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -152,14 +152,14 @@ static WRITE8_HANDLER( luckgrln_reel2_ram_w )
 {
 	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->m_reel2_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel2_tilemap,offset);
+	state->m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( luckgrln_reel2_attr_w )
 {
 	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->m_reel2_attr[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel2_tilemap,offset);
+	state->m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -184,14 +184,14 @@ static WRITE8_HANDLER( luckgrln_reel3_ram_w )
 {
 	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->m_reel3_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel3_tilemap,offset);
+	state->m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( luckgrln_reel3_attr_w )
 {
 	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->m_reel3_attr[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel3_tilemap,offset);
+	state->m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -215,14 +215,14 @@ static WRITE8_HANDLER( luckgrln_reel4_ram_w )
 {
 	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->m_reel4_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel4_tilemap,offset);
+	state->m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( luckgrln_reel4_attr_w )
 {
 	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	state->m_reel4_attr[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel4_tilemap,offset);
+	state->m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -250,15 +250,15 @@ static VIDEO_START(luckgrln)
 	state->m_reel3_tilemap = tilemap_create(machine,get_luckgrln_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 	state->m_reel4_tilemap = tilemap_create(machine,get_luckgrln_reel4_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 
-	tilemap_set_scroll_cols(state->m_reel1_tilemap, 64);
-	tilemap_set_scroll_cols(state->m_reel2_tilemap, 64);
-	tilemap_set_scroll_cols(state->m_reel3_tilemap, 64);
-	tilemap_set_scroll_cols(state->m_reel4_tilemap, 64);
+	state->m_reel1_tilemap->set_scroll_cols(64);
+	state->m_reel2_tilemap->set_scroll_cols(64);
+	state->m_reel3_tilemap->set_scroll_cols(64);
+	state->m_reel4_tilemap->set_scroll_cols(64);
 
-	tilemap_set_transparent_pen( state->m_reel1_tilemap, 0 );
-	tilemap_set_transparent_pen( state->m_reel2_tilemap, 0 );
-	tilemap_set_transparent_pen( state->m_reel3_tilemap, 0 );
-	tilemap_set_transparent_pen( state->m_reel4_tilemap, 0 );
+	state->m_reel1_tilemap->set_transparent_pen(0 );
+	state->m_reel2_tilemap->set_transparent_pen(0 );
+	state->m_reel3_tilemap->set_transparent_pen(0 );
+	state->m_reel4_tilemap->set_transparent_pen(0 );
 }
 
 static SCREEN_UPDATE_IND16(luckgrln)
@@ -275,10 +275,10 @@ static SCREEN_UPDATE_IND16(luckgrln)
 
 	for (i= 0;i < 64;i++)
 	{
-		tilemap_set_scrolly(state->m_reel1_tilemap, i, state->m_reel1_scroll[i]);
-		tilemap_set_scrolly(state->m_reel2_tilemap, i, state->m_reel2_scroll[i]);
-		tilemap_set_scrolly(state->m_reel3_tilemap, i, state->m_reel3_scroll[i]);
-		tilemap_set_scrolly(state->m_reel4_tilemap, i, state->m_reel4_scroll[i]);
+		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
+		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
+		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
+		state->m_reel4_tilemap->set_scrolly(i, state->m_reel4_scroll[i]);
 	}
 
 
@@ -330,10 +330,10 @@ static SCREEN_UPDATE_IND16(luckgrln)
 #if 0 // treat bit as fg enable
 			if (tileattr&0x04)
 			{
-				if (bgenable==0) tilemap_draw(bitmap, clip, state->m_reel1_tilemap, 0, 0);
-				if (bgenable==1) tilemap_draw(bitmap, clip, state->m_reel2_tilemap, 0, 0);
-				if (bgenable==2) tilemap_draw(bitmap, clip, state->m_reel3_tilemap, 0, 0);
-				if (bgenable==3) tilemap_draw(bitmap, clip, state->m_reel4_tilemap, 0, 0);
+				if (bgenable==0) state->m_reel1_tilemap->draw(bitmap, clip, 0, 0);
+				if (bgenable==1) state->m_reel2_tilemap->draw(bitmap, clip, 0, 0);
+				if (bgenable==2) state->m_reel3_tilemap->draw(bitmap, clip, 0, 0);
+				if (bgenable==3) state->m_reel4_tilemap->draw(bitmap, clip, 0, 0);
 			}
 
 			if (tileattr&0x08) drawgfx_transpen(bitmap,clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
@@ -343,10 +343,10 @@ static SCREEN_UPDATE_IND16(luckgrln)
 
 			if (tileattr&0x04)
 			{
-				if (bgenable==0) tilemap_draw(bitmap, clip, state->m_reel1_tilemap, 0, 0);
-				if (bgenable==1) tilemap_draw(bitmap, clip, state->m_reel2_tilemap, 0, 0);
-				if (bgenable==2) tilemap_draw(bitmap, clip, state->m_reel3_tilemap, 0, 0);
-				if (bgenable==3) tilemap_draw(bitmap, clip, state->m_reel4_tilemap, 0, 0);
+				if (bgenable==0) state->m_reel1_tilemap->draw(bitmap, clip, 0, 0);
+				if (bgenable==1) state->m_reel2_tilemap->draw(bitmap, clip, 0, 0);
+				if (bgenable==2) state->m_reel3_tilemap->draw(bitmap, clip, 0, 0);
+				if (bgenable==3) state->m_reel4_tilemap->draw(bitmap, clip, 0, 0);
 			}
 
 			if ((tileattr&0x08)) drawgfx_transpen(bitmap,clip,screen.machine().gfx[region],tile,col,0,0,x*8,y*8, 0);

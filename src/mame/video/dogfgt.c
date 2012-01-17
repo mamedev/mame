@@ -147,7 +147,7 @@ WRITE8_HANDLER( dogfgt_bgvideoram_w )
 	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
 	state->m_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x3ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( dogfgt_scroll_w )
@@ -155,8 +155,8 @@ WRITE8_HANDLER( dogfgt_scroll_w )
 	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
 	state->m_scroll[offset] = data;
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll[0] + 256 * state->m_scroll[1] + 256);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll[2] + 256 * state->m_scroll[3]);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scroll[0] + 256 * state->m_scroll[1] + 256);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scroll[2] + 256 * state->m_scroll[3]);
 }
 
 WRITE8_HANDLER( dogfgt_1800_w )
@@ -234,7 +234,7 @@ SCREEN_UPDATE_IND16( dogfgt )
 	}
 
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 

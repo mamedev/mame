@@ -26,7 +26,7 @@ WRITE8_HANDLER( freek_videoram_w )
 {
 	freekick_state *state = space->machine().driver_data<freekick_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_freek_tilemap, offset & 0x3ff);
+	state->m_freek_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 static void gigas_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -137,7 +137,7 @@ static void freekick_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 SCREEN_UPDATE_IND16( gigas )
 {
 	freekick_state *state = screen.machine().driver_data<freekick_state>();
-	tilemap_draw(bitmap, cliprect, state->m_freek_tilemap, 0, 0);
+	state->m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
 	gigas_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -145,7 +145,7 @@ SCREEN_UPDATE_IND16( gigas )
 SCREEN_UPDATE_IND16( pbillrd )
 {
 	freekick_state *state = screen.machine().driver_data<freekick_state>();
-	tilemap_draw(bitmap, cliprect, state->m_freek_tilemap, 0, 0);
+	state->m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
 	pbillrd_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -153,7 +153,7 @@ SCREEN_UPDATE_IND16( pbillrd )
 SCREEN_UPDATE_IND16( freekick )
 {
 	freekick_state *state = screen.machine().driver_data<freekick_state>();
-	tilemap_draw(bitmap, cliprect, state->m_freek_tilemap, 0, 0);
+	state->m_freek_tilemap->draw(bitmap, cliprect, 0, 0);
 	freekick_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

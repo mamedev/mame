@@ -29,9 +29,9 @@ WRITE8_HANDLER( tiamc1_videoram_w )
 	if(!(state->m_layers_ctrl & 1)) {
 		state->m_tileram[offset] = data;
 		if (offset < 1024)
-			tilemap_mark_tile_dirty(state->m_bg_tilemap1, offset & 0x3ff);
+			state->m_bg_tilemap1->mark_tile_dirty(offset & 0x3ff);
 		else
-			tilemap_mark_tile_dirty(state->m_bg_tilemap2, offset & 0x3ff);
+			state->m_bg_tilemap2->mark_tile_dirty(offset & 0x3ff);
 	}
 }
 
@@ -39,7 +39,7 @@ WRITE8_HANDLER( tiamc1_bankswitch_w )
 {
 	tiamc1_state *state = space->machine().driver_data<tiamc1_state>();
 	if ((data & 128) != (state->m_layers_ctrl & 128))
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 
 	state->m_layers_ctrl = data;
 }
@@ -197,21 +197,21 @@ SCREEN_UPDATE_IND16( tiamc1 )
 
 	for (i = 0; i < 32; i++)
 	{
-		tilemap_set_scrolly(state->m_bg_tilemap1, i, state->m_bg_vshift ^ 0xff);
-		tilemap_set_scrolly(state->m_bg_tilemap2, i, state->m_bg_vshift ^ 0xff);
+		state->m_bg_tilemap1->set_scrolly(i, state->m_bg_vshift ^ 0xff);
+		state->m_bg_tilemap2->set_scrolly(i, state->m_bg_vshift ^ 0xff);
 	}
 
 	for (i = 0; i < 32; i++)
 	{
-		tilemap_set_scrollx(state->m_bg_tilemap1, i, state->m_bg_hshift ^ 0xff);
-		tilemap_set_scrollx(state->m_bg_tilemap2, i, state->m_bg_hshift ^ 0xff);
+		state->m_bg_tilemap1->set_scrollx(i, state->m_bg_hshift ^ 0xff);
+		state->m_bg_tilemap2->set_scrollx(i, state->m_bg_hshift ^ 0xff);
 	}
 #endif
 
 	if (state->m_layers_ctrl & 0x80)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap2, 0, 0);
+		state->m_bg_tilemap2->draw(bitmap, cliprect, 0, 0);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap1, 0, 0);
+		state->m_bg_tilemap1->draw(bitmap, cliprect, 0, 0);
 
 
 	draw_sprites(screen.machine(), bitmap, cliprect);

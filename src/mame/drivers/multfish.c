@@ -205,7 +205,7 @@ static TILE_GET_INFO( get_multfish_tile_info )
 	int code = state->m_vid[tile_index*2+0x0000] | (state->m_vid[tile_index*2+0x0001] << 8);
 	int attr = state->m_vid[tile_index*2+0x1000] | (state->m_vid[tile_index*2+0x1001] << 8);
 
-	tileinfo->category = (attr&0x100)>>8;
+	tileinfo.category = (attr&0x100)>>8;
 
 	SET_TILE_INFO(
 			0,
@@ -234,11 +234,11 @@ static VIDEO_START(multfish)
 	state->save_item(NAME(state->m_vid));
 
 	state->m_tilemap = tilemap_create(machine,get_multfish_tile_info,tilemap_scan_rows,16,16, 64, 32);
-	tilemap_set_transparent_pen(state->m_tilemap,255);
+	state->m_tilemap->set_transparent_pen(255);
 
 	state->m_reel_tilemap = tilemap_create(machine,get_multfish_reel_tile_info,tilemap_scan_rows,16,16, 64, 64);
-	tilemap_set_transparent_pen(state->m_reel_tilemap,255);
-	tilemap_set_scroll_cols(state->m_reel_tilemap, 64);
+	state->m_reel_tilemap->set_transparent_pen(255);
+	state->m_reel_tilemap->set_scroll_cols(64);
 }
 
 static SCREEN_UPDATE_IND16(multfish)
@@ -251,18 +251,18 @@ static SCREEN_UPDATE_IND16(multfish)
 	if (!state->m_disp_enable) return 0;
 
 	/* Draw lower part of static tilemap (low pri tiles) */
-	tilemap_draw(bitmap,cliprect,state->m_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
+	state->m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
 
 	/* Setup the column scroll and draw the reels */
 	for (i=0;i<64;i++)
 	{
 		int colscroll = (state->m_vid[i*2] | state->m_vid[i*2+1] << 8);
-		tilemap_set_scrolly(state->m_reel_tilemap, i, colscroll );
+		state->m_reel_tilemap->set_scrolly(i, colscroll );
 	}
-	tilemap_draw(bitmap,cliprect,state->m_reel_tilemap,0,0);
+	state->m_reel_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/* Draw upper part of static tilemap (high pri tiles) */
-	tilemap_draw(bitmap,cliprect,state->m_tilemap,TILEMAP_DRAW_CATEGORY(0),0);
+	state->m_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0),0);
 
 	return 0;
 }
@@ -276,13 +276,13 @@ static WRITE8_HANDLER( multfish_vid_w )
 	// 0x0000 - 0x1fff is normal tilemap
 	if (offset < 0x2000)
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap,(offset&0xfff)/2);
+		state->m_tilemap->mark_tile_dirty((offset&0xfff)/2);
 
 	}
 	// 0x2000 - 0x2fff is for the reels
 	else if (offset < 0x4000)
 	{
-		tilemap_mark_tile_dirty(state->m_reel_tilemap,(offset&0x1fff)/2);
+		state->m_reel_tilemap->mark_tile_dirty((offset&0x1fff)/2);
 	}
 	else if (offset < 0x6000)
 	{

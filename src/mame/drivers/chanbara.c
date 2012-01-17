@@ -94,7 +94,7 @@ static WRITE8_HANDLER( chanbara_videoram_w )
 	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( chanbara_colorram_w )
@@ -102,7 +102,7 @@ static WRITE8_HANDLER( chanbara_colorram_w )
 	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( chanbara_videoram2_w )
@@ -110,7 +110,7 @@ static WRITE8_HANDLER( chanbara_videoram2_w )
 	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset);
+	state->m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( chanbara_colorram2_w )
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( chanbara_colorram2_w )
 	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
 	state->m_colorram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset);
+	state->m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -145,7 +145,7 @@ static VIDEO_START(chanbara )
 	chanbara_state *state = machine.driver_data<chanbara_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,8, 8, 32, 32);
 	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,16, 16, 16, 32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -196,10 +196,10 @@ static SCREEN_UPDATE_IND16( chanbara )
 {
 	chanbara_state *state = screen.machine().driver_data<chanbara_state>();
 
-	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_scroll | (state->m_scrollhi << 8));
-	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
+	state->m_bg2_tilemap->set_scrolly(0, state->m_scroll | (state->m_scrollhi << 8));
+	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

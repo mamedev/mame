@@ -90,7 +90,7 @@ WRITE16_HANDLER( ultraman_gfxctrl_w )
 		if (state->m_bank0 != ((data & 0x02) >> 1))
 		{
 			state->m_bank0 = (data & 0x02) >> 1;
-			tilemap_mark_all_tiles_dirty_all(space->machine());	/* should mark only zoom0 */
+			space->machine().tilemap().mark_all_dirty();	/* should mark only zoom0 */
 		}
 
 		k051316_wraparound_enable(state->m_k051316_2, data & 0x04);
@@ -98,7 +98,7 @@ WRITE16_HANDLER( ultraman_gfxctrl_w )
 		if (state->m_bank1 != ((data & 0x08) >> 3))
 		{
 			state->m_bank1 = (data & 0x08) >> 3;
-			tilemap_mark_all_tiles_dirty_all(space->machine());	/* should mark only zoom1 */
+			space->machine().tilemap().mark_all_dirty();	/* should mark only zoom1 */
 		}
 
 		k051316_wraparound_enable(state->m_k051316_3, data & 0x10);
@@ -106,7 +106,7 @@ WRITE16_HANDLER( ultraman_gfxctrl_w )
 		if (state->m_bank2 != ((data & 0x20) >> 5))
 		{
 			state->m_bank2 = (data & 0x20) >> 5;
-			tilemap_mark_all_tiles_dirty_all(space->machine());	/* should mark only zoom2 */
+			space->machine().tilemap().mark_all_dirty();	/* should mark only zoom2 */
 		}
 
 		coin_counter_w(space->machine(), 0, data & 0x40);

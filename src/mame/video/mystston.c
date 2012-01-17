@@ -225,7 +225,7 @@ static VIDEO_START( mystston )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_x, 16, 16, 16, 32);
 
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols_flip_x,  8,  8, 32, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	/* create the interrupt timer */
 	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
@@ -262,13 +262,13 @@ static SCREEN_UPDATE_IND16( mystston )
 
 	set_palette(screen.machine(), state);
 
-	tilemap_mark_all_tiles_dirty_all(screen.machine());
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_scroll);
-	tilemap_set_flip_all(screen.machine(), flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().mark_all_dirty();
+	state->m_bg_tilemap->set_scrolly(0, *state->m_scroll);
+	screen.machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, screen.machine().gfx[2], flip);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

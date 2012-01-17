@@ -127,14 +127,14 @@ static WRITE8_HANDLER( bg_ram_w )
 {
 	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	state->m_bg_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tmap, offset/2);
+	state->m_bg_tmap->mark_tile_dirty(offset/2);
 }
 
 static WRITE8_HANDLER( fg_ram_w )
 {
 	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
 	state->m_fg_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tmap, offset/4);
+	state->m_fg_tmap->mark_tile_dirty(offset/4);
 }
 
 static VIDEO_START(quizpun2)
@@ -143,8 +143,8 @@ static VIDEO_START(quizpun2)
 	state->m_bg_tmap = tilemap_create(	machine, get_bg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
 	state->m_fg_tmap = tilemap_create(	machine, get_fg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
 
-	tilemap_set_transparent_pen(state->m_bg_tmap, 0);
-	tilemap_set_transparent_pen(state->m_fg_tmap, 0);
+	state->m_bg_tmap->set_transparent_pen(0);
+	state->m_fg_tmap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16(quizpun2)
@@ -162,11 +162,11 @@ static SCREEN_UPDATE_IND16(quizpun2)
 	}
 #endif
 
-	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->m_bg_tmap,  TILEMAP_DRAW_OPAQUE, 0);
+	if (layers_ctrl & 1)	state->m_bg_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	else					bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, state->m_fg_tmap, 0, 0);
+	if (layers_ctrl & 2)	state->m_fg_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

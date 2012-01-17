@@ -58,7 +58,7 @@ WRITE32_HANDLER(taitojc_tile_w)
 	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
 	COMBINE_DATA(state->m_tile_ram + offset);
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE32_HANDLER(taitojc_char_w)
@@ -274,7 +274,7 @@ VIDEO_START( taitojc )
 
 	state->m_tilemap = tilemap_create(machine, taitojc_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_tilemap, 0);
+	state->m_tilemap->set_transparent_pen(0);
 
 	state->m_char_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
 	state->m_tile_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
@@ -352,7 +352,7 @@ SCREEN_UPDATE_IND16( taitojc )
 	draw_object_bank(screen.machine(), bitmap, cliprect, 1, 1);
 	draw_object_bank(screen.machine(), bitmap, cliprect, 2, 1);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0,0);
+	state->m_tilemap->draw(bitmap, cliprect, 0,0);
 
 #if 0
     if (debug_tex_pal > 0)

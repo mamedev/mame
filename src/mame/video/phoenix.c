@@ -186,12 +186,12 @@ VIDEO_START( phoenix )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap, 0, (HTOTAL - HBSTART));
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, (HTOTAL - HBSTART));
-	tilemap_set_scrolldy(state->m_fg_tilemap, 0, (VTOTAL - VBSTART));
-	tilemap_set_scrolldy(state->m_bg_tilemap, 0, (VTOTAL - VBSTART));
+	state->m_fg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
+	state->m_bg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
+	state->m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
+	state->m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
 
 	state_save_register_global_pointer(machine, state->m_videoram_pg[0], 0x1000);
 	state_save_register_global_pointer(machine, state->m_videoram_pg[1], 0x1000);
@@ -231,9 +231,9 @@ WRITE8_HANDLER( phoenix_videoram_w )
 	if ((offset & 0x7ff) < 0x340)
 	{
 		if (offset & 0x800)
-			tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
+			state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 		else
-			tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x3ff);
+			state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 	}
 
 	/* as part of the protecion, Survival executes code from $43a4 */
@@ -252,8 +252,8 @@ WRITE8_HANDLER( phoenix_videoreg_w )
 
 		state->m_cocktail_mode = state->m_videoram_pg_index && (input_port_read(space->machine(), "CAB") & 0x01);
 
-		tilemap_set_flip_all(space->machine(), state->m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().set_flip_all(state->m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* Phoenix has only one palette select effecting both layers */
@@ -261,7 +261,7 @@ WRITE8_HANDLER( phoenix_videoreg_w )
 	{
 		state->m_palette_bank = (data >> 1) & 1;
 
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -276,8 +276,8 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 
 		state->m_cocktail_mode = state->m_videoram_pg_index && (input_port_read(space->machine(), "CAB") & 0x01);
 
-		tilemap_set_flip_all(space->machine(), state->m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().set_flip_all(state->m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 
@@ -289,7 +289,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 	{
 		state->m_palette_bank = ((data >> 1) & 3);
 
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 
 		logerror("Palette: %02X\n", (data & 0x06) >> 1);
 	}
@@ -304,7 +304,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 WRITE8_HANDLER( phoenix_scroll_w )
 {
 	phoenix_state *state = space->machine().driver_data<phoenix_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap,0,data);
+	state->m_bg_tilemap->set_scrollx(0,data);
 }
 
 
@@ -453,7 +453,7 @@ READ_LINE_DEVICE_HANDLER( survival_sid_callback )
 SCREEN_UPDATE_IND16( phoenix )
 {
 	phoenix_state *state = screen.machine().driver_data<phoenix_state>();
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

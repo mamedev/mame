@@ -31,19 +31,19 @@ void rf2_set_layer_banks(running_machine &machine, int banks)
 	if (state->m_rf2_layer_bank[0] != BIT(banks,0))
 	{
 		state->m_rf2_layer_bank[0] = BIT(banks,0);
-		tilemap_mark_all_tiles_dirty(state->m_back_layer);
+		state->m_back_layer->mark_all_dirty();
 	}
 
 	if (state->m_rf2_layer_bank[1] != BIT(banks,1))
 	{
 		state->m_rf2_layer_bank[1] = BIT(banks,1);
-		tilemap_mark_all_tiles_dirty(state->m_mid_layer);
+		state->m_mid_layer->mark_all_dirty();
 	}
 
 	if (state->m_rf2_layer_bank[2] != BIT(banks,2))
 	{
 		state->m_rf2_layer_bank[2] = BIT(banks,2);
-		tilemap_mark_all_tiles_dirty(state->m_fore_layer);
+		state->m_fore_layer->mark_all_dirty();
 	}
 }
 
@@ -59,9 +59,9 @@ WRITE32_HANDLER( spi_layer_enable_w )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	COMBINE_DATA( &state->m_layer_enable );
-	tilemap_set_enable(state->m_back_layer, (state->m_layer_enable & 0x1) ^ 0x1);
-	tilemap_set_enable(state->m_mid_layer, ((state->m_layer_enable >> 1) & 0x1) ^ 0x1);
-	tilemap_set_enable(state->m_fore_layer, ((state->m_layer_enable >> 2) & 0x1) ^ 0x1);
+	state->m_back_layer->enable((state->m_layer_enable & 0x1) ^ 0x1);
+	state->m_mid_layer->enable(((state->m_layer_enable >> 1) & 0x1) ^ 0x1);
+	state->m_fore_layer->enable(((state->m_layer_enable >> 2) & 0x1) ^ 0x1);
 }
 
 WRITE32_HANDLER( tilemap_dma_start_w )
@@ -79,8 +79,8 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 				UINT32 tile = state->m_spimainram[index];
 				if (state->m_tilemap_ram[i] != tile) {
 					state->m_tilemap_ram[i] = tile;
-					tilemap_mark_tile_dirty( state->m_back_layer, (i * 2) );
-					tilemap_mark_tile_dirty( state->m_back_layer, (i * 2) + 1 );
+					state->m_back_layer->mark_tile_dirty((i * 2) );
+					state->m_back_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -94,8 +94,8 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 				UINT32 tile = state->m_spimainram[index];
 				if (state->m_tilemap_ram[i+state->m_fore_layer_offset] != tile) {
 					state->m_tilemap_ram[i+state->m_fore_layer_offset] = tile;
-					tilemap_mark_tile_dirty( state->m_fore_layer, (i * 2) );
-					tilemap_mark_tile_dirty( state->m_fore_layer, (i * 2) + 1 );
+					state->m_fore_layer->mark_tile_dirty((i * 2) );
+					state->m_fore_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -109,8 +109,8 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 				UINT32 tile = state->m_spimainram[index];
 				if (state->m_tilemap_ram[i+state->m_mid_layer_offset] != tile) {
 					state->m_tilemap_ram[i+state->m_mid_layer_offset] = tile;
-					tilemap_mark_tile_dirty( state->m_mid_layer, (i * 2) );
-					tilemap_mark_tile_dirty( state->m_mid_layer, (i * 2) + 1 );
+					state->m_mid_layer->mark_tile_dirty((i * 2) );
+					state->m_mid_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -124,8 +124,8 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 				UINT32 tile = state->m_spimainram[index];
 				if (state->m_tilemap_ram[i+state->m_text_layer_offset] != tile) {
 					state->m_tilemap_ram[i+state->m_text_layer_offset] = tile;
-					tilemap_mark_tile_dirty( state->m_text_layer, (i * 2) );
-					tilemap_mark_tile_dirty( state->m_text_layer, (i * 2) + 1 );
+					state->m_text_layer->mark_tile_dirty((i * 2) );
+					state->m_text_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -137,8 +137,8 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 				UINT32 tile = state->m_spimainram[index];
 				if (state->m_tilemap_ram[i] != tile) {
 					state->m_tilemap_ram[i] = tile;
-					tilemap_mark_tile_dirty( state->m_back_layer, (i * 2) );
-					tilemap_mark_tile_dirty( state->m_back_layer, (i * 2) + 1 );
+					state->m_back_layer->mark_tile_dirty((i * 2) );
+					state->m_back_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -148,8 +148,8 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 				UINT32 tile = state->m_spimainram[index];
 				if (state->m_tilemap_ram[i+state->m_fore_layer_offset] != tile) {
 					state->m_tilemap_ram[i+state->m_fore_layer_offset] = tile;
-					tilemap_mark_tile_dirty( state->m_fore_layer, (i * 2) );
-					tilemap_mark_tile_dirty( state->m_fore_layer, (i * 2) + 1 );
+					state->m_fore_layer->mark_tile_dirty((i * 2) );
+					state->m_fore_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -159,8 +159,8 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 				UINT32 tile = state->m_spimainram[index];
 				if (state->m_tilemap_ram[i+state->m_mid_layer_offset] != tile) {
 					state->m_tilemap_ram[i+state->m_mid_layer_offset] = tile;
-					tilemap_mark_tile_dirty( state->m_mid_layer, (i * 2) );
-					tilemap_mark_tile_dirty( state->m_mid_layer, (i * 2) + 1 );
+					state->m_mid_layer->mark_tile_dirty((i * 2) );
+					state->m_mid_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -170,8 +170,8 @@ WRITE32_HANDLER( tilemap_dma_start_w )
 				UINT32 tile = state->m_spimainram[index];
 				if (state->m_tilemap_ram[i+state->m_text_layer_offset] != tile) {
 					state->m_tilemap_ram[i+state->m_text_layer_offset] = tile;
-					tilemap_mark_tile_dirty( state->m_text_layer, (i * 2) );
-					tilemap_mark_tile_dirty( state->m_text_layer, (i * 2) + 1 );
+					state->m_text_layer->mark_tile_dirty((i * 2) );
+					state->m_text_layer->mark_tile_dirty((i * 2) + 1 );
 				}
 				index++;
 			}
@@ -481,9 +481,9 @@ VIDEO_START( spi )
 	state->m_mid_layer	= tilemap_create( machine, get_mid_tile_info, tilemap_scan_cols,  16,16,32,32 );
 	state->m_fore_layer	= tilemap_create( machine, get_fore_tile_info, tilemap_scan_cols,  16,16,32,32 );
 
-	tilemap_set_transparent_pen(state->m_text_layer, 31);
-	tilemap_set_transparent_pen(state->m_mid_layer, 63);
-	tilemap_set_transparent_pen(state->m_fore_layer, 63);
+	state->m_text_layer->set_transparent_pen(31);
+	state->m_mid_layer->set_transparent_pen(63);
+	state->m_fore_layer->set_transparent_pen(63);
 
 	state->m_tilemap_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
 	state->m_palette_ram = auto_alloc_array_clear(machine, UINT32, 0x3000/4);
@@ -540,11 +540,11 @@ static void set_rowscroll(tilemap_t *layer, int scroll, INT16* rows)
 	int i;
 	int x = state->m_spi_scrollram[scroll] & 0xffff;
 	int y = (state->m_spi_scrollram[scroll] >> 16) & 0xffff;
-	tilemap_set_scroll_rows(layer, 512);
+	layer->set_scroll_rows(512);
 	for( i=0; i < 512; i++ ) {
-		tilemap_set_scrollx(layer, i, x + rows[i]);
+		layer->set_scrollx(i, x + rows[i]);
 	}
-	tilemap_set_scrolly(layer, 0, y);
+	layer->set_scrolly(0, y);
 }
 
 static void set_scroll(tilemap_t *layer, int scroll)
@@ -552,8 +552,8 @@ static void set_scroll(tilemap_t *layer, int scroll)
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int x = state->m_spi_scrollram[scroll] & 0xffff;
 	int y = (state->m_spi_scrollram[scroll] >> 16) & 0xffff;
-	tilemap_set_scrollx(layer, 0, x);
-	tilemap_set_scrolly(layer, 0, y);
+	layer->set_scrollx(0, x);
+	layer->set_scrolly(0, y);
 }
 #endif
 
@@ -567,8 +567,8 @@ static void combine_tilemap(running_machine &machine, bitmap_rgb32 &bitmap, cons
 	UINT8 *t;
 	UINT32 xscroll_mask, yscroll_mask;
 
-	bitmap_ind16 &pen_bitmap = tilemap_get_pixmap(tile);
-	bitmap_ind8 &flags_bitmap = tilemap_get_flagsmap(tile);
+	bitmap_ind16 &pen_bitmap = tile->pixmap();
+	bitmap_ind8 &flags_bitmap = tile->flagsmap();
 	xscroll_mask = pen_bitmap.width() - 1;
 	yscroll_mask = pen_bitmap.height() - 1;
 

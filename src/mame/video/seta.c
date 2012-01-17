@@ -360,7 +360,7 @@ Offset + 0x4:
 
 ***************************************************************************/
 
-INLINE void twineagl_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int offset )
+INLINE void twineagl_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int offset )
 {
 	seta_state *state = machine.driver_data<seta_state>();
 	UINT16 *vram = state->m_vram_0 + offset;
@@ -375,7 +375,7 @@ static TILE_GET_INFO( twineagl_get_tile_info_0 ) { twineagl_tile_info( machine, 
 static TILE_GET_INFO( twineagl_get_tile_info_1 ) { twineagl_tile_info( machine, tileinfo, tile_index, 0x1000 ); }
 
 
-INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int layer, int offset )
+INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int layer, int offset )
 {
 	seta_state *state = machine.driver_data<seta_state>();
 	int gfx = 1 + layer;
@@ -408,9 +408,9 @@ WRITE16_HANDLER( seta_vram_0_w )
 
 	COMBINE_DATA(&state->m_vram_0[offset]);
 	if (offset & 0x1000)
-		tilemap_mark_tile_dirty(state->m_tilemap_1, offset & 0x7ff);
+		state->m_tilemap_1->mark_tile_dirty(offset & 0x7ff);
 	else
-		tilemap_mark_tile_dirty(state->m_tilemap_0, offset & 0x7ff);
+		state->m_tilemap_0->mark_tile_dirty(offset & 0x7ff);
 }
 
 WRITE16_HANDLER( seta_vram_2_w )
@@ -419,9 +419,9 @@ WRITE16_HANDLER( seta_vram_2_w )
 
 	COMBINE_DATA(&state->m_vram_2[offset]);
 	if (offset & 0x1000)
-		tilemap_mark_tile_dirty(state->m_tilemap_3, offset & 0x7ff);
+		state->m_tilemap_3->mark_tile_dirty(offset & 0x7ff);
 	else
-		tilemap_mark_tile_dirty(state->m_tilemap_2, offset & 0x7ff);
+		state->m_tilemap_2->mark_tile_dirty(offset & 0x7ff);
 }
 
 WRITE16_HANDLER( twineagl_tilebank_w )
@@ -433,7 +433,7 @@ WRITE16_HANDLER( twineagl_tilebank_w )
 		if (state->m_twineagl_tilebank[offset] != data)
 		{
 			state->m_twineagl_tilebank[offset] = data;
-			tilemap_mark_all_tiles_dirty_all(space->machine());
+			space->machine().tilemap().mark_all_dirty();
 		}
 	}
 }
@@ -468,10 +468,10 @@ VIDEO_START( seta_2_layers )
 	state->m_tilemaps_flip = 0;
 	state->m_color_mode_shift = 3;
 
-	tilemap_set_transparent_pen(state->m_tilemap_0, 0);
-	tilemap_set_transparent_pen(state->m_tilemap_1, 0);
-	tilemap_set_transparent_pen(state->m_tilemap_2, 0);
-	tilemap_set_transparent_pen(state->m_tilemap_3, 0);
+	state->m_tilemap_0->set_transparent_pen(0);
+	state->m_tilemap_1->set_transparent_pen(0);
+	state->m_tilemap_2->set_transparent_pen(0);
+	state->m_tilemap_3->set_transparent_pen(0);
 }
 
 
@@ -494,8 +494,8 @@ VIDEO_START( seta_1_layer )
 
 	state->m_color_mode_shift = 4;
 
-	tilemap_set_transparent_pen(state->m_tilemap_0, 0);
-	tilemap_set_transparent_pen(state->m_tilemap_1, 0);
+	state->m_tilemap_0->set_transparent_pen(0);
+	state->m_tilemap_1->set_transparent_pen(0);
 }
 
 VIDEO_START( twineagl_1_layer )
@@ -514,8 +514,8 @@ VIDEO_START( twineagl_1_layer )
 	state->m_tilemap_1 = tilemap_create(	machine, twineagl_get_tile_info_1, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-	tilemap_set_transparent_pen(state->m_tilemap_0, 0);
-	tilemap_set_transparent_pen(state->m_tilemap_1, 0);
+	state->m_tilemap_0->set_transparent_pen(0);
+	state->m_tilemap_1->set_transparent_pen(0);
 }
 
 int setac_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
@@ -774,7 +774,7 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_ind16 &
 {
 	int y;
 	const gfx_element *gfx_tilemap = machine.gfx[gfxnum];
-	const bitmap_ind16 &src_bitmap = tilemap_get_pixmap(tilemap);
+	const bitmap_ind16 &src_bitmap = tilemap->pixmap();
 	int width_mask, height_mask;
 	int opaque_mask = gfx_tilemap->color_granularity - 1;
 	int pixel_effect_mask = gfx_tilemap->color_base + (gfx_tilemap->total_colors - 1) * gfx_tilemap->color_granularity;
@@ -856,8 +856,8 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 	if(state->m_current_tilemap_mode[0] != (state->m_vctrl_0[ 4/2 ] & 0x10))
 	{
 		state->m_current_tilemap_mode[0] = state->m_vctrl_0[ 4/2 ] & 0x10;
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_0);
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_1);
+		state->m_tilemap_0->mark_all_dirty();
+		state->m_tilemap_1->mark_all_dirty();
 	}
 
 	if(state->m_tilemap_2 != NULL && state->m_tilemap_3 != NULL)
@@ -865,22 +865,22 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 		if(state->m_current_tilemap_mode[1] != (state->m_vctrl_2[ 4/2 ] & 0x10))
 		{
 			state->m_current_tilemap_mode[1] = state->m_vctrl_2[ 4/2 ] & 0x10;
-			tilemap_mark_all_tiles_dirty(state->m_tilemap_2);
-			tilemap_mark_all_tiles_dirty(state->m_tilemap_3);
+			state->m_tilemap_2->mark_all_dirty();
+			state->m_tilemap_3->mark_all_dirty();
 		}
 	}
 
 	flip ^= state->m_tilemaps_flip;
 
-	tilemap_set_flip_all(screen.machine(), flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
+	screen.machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
 
 	x_0		=	state->m_vctrl_0[ 0/2 ];
 	y_0		=	state->m_vctrl_0[ 2/2 ];
 	enab_0	=	state->m_vctrl_0[ 4/2 ];
 
 	/* Only one tilemap per layer is enabled! */
-	tilemap_set_enable(state->m_tilemap_0, (!(enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
-	tilemap_set_enable(state->m_tilemap_1, ( (enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
+	state->m_tilemap_0->enable((!(enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
+	state->m_tilemap_1->enable(( (enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
 
 	/* the hardware wants different scroll values when flipped */
 
@@ -898,10 +898,10 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 		y_0 = y_0 - vis_dimy;
 	}
 
-	tilemap_set_scrollx(state->m_tilemap_0, 0, x_0);
-	tilemap_set_scrollx(state->m_tilemap_1, 0, x_0);
-	tilemap_set_scrolly(state->m_tilemap_0, 0, y_0);
-	tilemap_set_scrolly(state->m_tilemap_1, 0, y_0);
+	state->m_tilemap_0->set_scrollx(0, x_0);
+	state->m_tilemap_1->set_scrollx(0, x_0);
+	state->m_tilemap_0->set_scrolly(0, y_0);
+	state->m_tilemap_1->set_scrolly(0, y_0);
 
 	if (state->m_tilemap_2)
 	{
@@ -909,8 +909,8 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 		y_1		=	state->m_vctrl_2[ 2/2 ];
 		enab_1	=	state->m_vctrl_2[ 4/2 ];
 
-		tilemap_set_enable(state->m_tilemap_2, (!(enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
-		tilemap_set_enable(state->m_tilemap_3, ( (enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
+		state->m_tilemap_2->enable((!(enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
+		state->m_tilemap_3->enable(( (enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
 
 		x_1 += 0x10 - state->m_global_offsets->tilemap_offs[flip ? 1 : 0];
 		y_1 -= (256 - vis_dimy)/2;
@@ -920,10 +920,10 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 			y_1 = y_1 - vis_dimy;
 		}
 
-		tilemap_set_scrollx(state->m_tilemap_2, 0, x_1);
-		tilemap_set_scrollx(state->m_tilemap_3, 0, x_1);
-		tilemap_set_scrolly(state->m_tilemap_2, 0, y_1);
-		tilemap_set_scrolly(state->m_tilemap_3, 0, y_1);
+		state->m_tilemap_2->set_scrollx(0, x_1);
+		state->m_tilemap_3->set_scrollx(0, x_1);
+		state->m_tilemap_2->set_scrolly(0, y_1);
+		state->m_tilemap_3->set_scrolly(0, y_1);
 
 		order	=	state->m_vregs[ 2/2 ];
 	}
@@ -950,8 +950,8 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	{
 		if (state->m_tilemap_2)
 		{
-			if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_2, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_3, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)	state->m_tilemap_2->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)	state->m_tilemap_3->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		}
 
 		if (order & 2)	// layer-sprite priority?
@@ -963,8 +963,8 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
 
-			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
-			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
+			if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)	state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 		}
 		else
 		{
@@ -973,16 +973,16 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
 
-			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0,  0, 0);
-			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1,  0, 0);
+			if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)	state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 
 			if (layers_ctrl & 8)		screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 	else
 	{
-		if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0,  TILEMAP_DRAW_OPAQUE, 0);
-		if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1,  TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)	state->m_tilemap_1->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 		if (order & 2)	// layer-sprite priority?
 		{
@@ -990,7 +990,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 			if((order & 4) && state->m_paletteram2 != NULL)
 			{
-				if(tilemap_get_enable(state->m_tilemap_2))
+				if(state->m_tilemap_2->enabled())
 				{
 					draw_tilemap_palette_effect(screen.machine(), bitmap, cliprect, state->m_tilemap_2, x_1, y_1, 2 + ((state->m_vctrl_2[ 4/2 ] & 0x10) >> state->m_color_mode_shift), flip);
 				}
@@ -1008,8 +1008,8 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 				if (state->m_tilemap_2)
 				{
-					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
-					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_3, 0, 0);
+					if (layers_ctrl & 2)	state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)	state->m_tilemap_3->draw(bitmap, cliprect, 0, 0);
 				}
 			}
 		}
@@ -1017,7 +1017,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 		{
 			if((order & 4) && state->m_paletteram2 != NULL)
 			{
-				if(tilemap_get_enable(state->m_tilemap_2))
+				if(state->m_tilemap_2->enabled())
 				{
 					draw_tilemap_palette_effect(screen.machine(), bitmap, cliprect, state->m_tilemap_2, x_1, y_1, 2 + ((state->m_vctrl_2[ 4/2 ] & 0x10) >> state->m_color_mode_shift), flip);
 				}
@@ -1035,8 +1035,8 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 				if (state->m_tilemap_2)
 				{
-					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
-					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_3, 0, 0);
+					if (layers_ctrl & 2)	state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)	state->m_tilemap_3->draw(bitmap, cliprect, 0, 0);
 				}
 			}
 

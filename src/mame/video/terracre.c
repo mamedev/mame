@@ -155,7 +155,7 @@ WRITE16_HANDLER( amazon_background_w )
 {
 	terracre_state *state = space->machine().driver_data<terracre_state>();
 	COMBINE_DATA( &state->m_amazon_videoram[offset] );
-	tilemap_mark_tile_dirty( state->m_background, offset );
+	state->m_background->mark_tile_dirty(offset );
 }
 
 WRITE16_HANDLER( amazon_foreground_w )
@@ -163,7 +163,7 @@ WRITE16_HANDLER( amazon_foreground_w )
 	terracre_state *state = space->machine().driver_data<terracre_state>();
 	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA( &videoram[offset] );
-	tilemap_mark_tile_dirty( state->m_foreground, offset );
+	state->m_foreground->mark_tile_dirty(offset );
 }
 
 WRITE16_HANDLER( amazon_flipscreen_w )
@@ -180,14 +180,14 @@ WRITE16_HANDLER( amazon_scrolly_w )
 {
 	terracre_state *state = space->machine().driver_data<terracre_state>();
 	COMBINE_DATA(&state->m_yscroll);
-	tilemap_set_scrolly(state->m_background,0,state->m_yscroll);
+	state->m_background->set_scrolly(0,state->m_yscroll);
 }
 
 WRITE16_HANDLER( amazon_scrollx_w )
 {
 	terracre_state *state = space->machine().driver_data<terracre_state>();
 	COMBINE_DATA(&state->m_xscroll);
-	tilemap_set_scrollx(state->m_background,0,state->m_xscroll);
+	state->m_background->set_scrollx(0,state->m_xscroll);
 }
 
 VIDEO_START( amazon )
@@ -195,7 +195,7 @@ VIDEO_START( amazon )
 	terracre_state *state = machine.driver_data<terracre_state>();
 	state->m_background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
-	tilemap_set_transparent_pen(state->m_foreground,0xf);
+	state->m_foreground->set_transparent_pen(0xf);
 
 	/* register for saving */
 	state_save_register_global(machine, state->m_xscroll);
@@ -208,9 +208,9 @@ SCREEN_UPDATE_IND16( amazon )
 	if( state->m_xscroll&0x2000 )
 		bitmap.fill(get_black_pen(screen.machine()), cliprect );
 	else
-		tilemap_draw( bitmap,cliprect, state->m_background, 0, 0 );
+		state->m_background->draw(bitmap, cliprect, 0, 0 );
 
 	draw_sprites(screen.machine(), bitmap,cliprect );
-	tilemap_draw( bitmap,cliprect, state->m_foreground, 0, 0 );
+	state->m_foreground->draw(bitmap, cliprect, 0, 0 );
 	return 0;
 }

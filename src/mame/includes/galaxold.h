@@ -52,7 +52,6 @@ public:
 	void (*m_modify_spritecode)(running_machine &machine, UINT8 *spriteram, int*, int*, int*, int);	/* function to call to do sprite banking */
 	void (*m_modify_color)(UINT8 *color);	/* function to call to do modify how the color codes map to the PROM */
 	void (*m_modify_ypos)(UINT8*);	/* function to call to do modify how vertical positioning bits are connected */
-	void (*m_tilemap_set_scroll)( tilemap_t *, int col, int value );
 
 	UINT8 m_timer_adjusted;
 	UINT8 m_darkplnt_bullet_color;

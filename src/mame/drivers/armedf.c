@@ -725,7 +725,7 @@ static WRITE8_HANDLER( blitter_txram_w )
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	state->m_text_videoram[offset] = (data & 0xff) | (state->m_text_videoram[offset] & 0xff00);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( fg_scrollx_w )

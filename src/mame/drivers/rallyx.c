@@ -247,7 +247,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 
 		case 0x03:	/* FLIP */
 			flip_screen_set_no_update(space->machine(), bit);
-			tilemap_set_flip_all(space->machine(), bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
+			space->machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
 
 		case 0x04:
@@ -290,7 +290,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 
 		case 0x03:	/* FLIP */
 			flip_screen_set_no_update(space->machine(), bit);
-			tilemap_set_flip_all(space->machine(), bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
+			space->machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
 
 		case 0x04:	/* OUT1 */

@@ -12,27 +12,27 @@ static void hng64_mark_all_tiles_dirty( hng64_state *state, int tilemap )
 {
 	if (tilemap == 0)
 	{
-		tilemap_mark_all_tiles_dirty (state->m_tilemap0_8x8);
-		tilemap_mark_all_tiles_dirty (state->m_tilemap0_16x16);
-		tilemap_mark_all_tiles_dirty (state->m_tilemap0_16x16_alt);
+		state->m_tilemap0_8x8->mark_all_dirty();
+		state->m_tilemap0_16x16->mark_all_dirty();
+		state->m_tilemap0_16x16_alt->mark_all_dirty();
 	}
 	else if (tilemap == 1)
 	{
-		tilemap_mark_all_tiles_dirty (state->m_tilemap1_8x8);
-		tilemap_mark_all_tiles_dirty (state->m_tilemap1_16x16);
-		tilemap_mark_all_tiles_dirty (state->m_tilemap1_16x16_alt);
+		state->m_tilemap1_8x8->mark_all_dirty();
+		state->m_tilemap1_16x16->mark_all_dirty();
+		state->m_tilemap1_16x16_alt->mark_all_dirty();
 	}
 	else if (tilemap == 2)
 	{
-		tilemap_mark_all_tiles_dirty (state->m_tilemap2_8x8);
-		tilemap_mark_all_tiles_dirty (state->m_tilemap2_16x16);
-		tilemap_mark_all_tiles_dirty (state->m_tilemap2_16x16_alt);
+		state->m_tilemap2_8x8->mark_all_dirty();
+		state->m_tilemap2_16x16->mark_all_dirty();
+		state->m_tilemap2_16x16_alt->mark_all_dirty();
 	}
 	else if (tilemap == 3)
 	{
-		tilemap_mark_all_tiles_dirty (state->m_tilemap3_8x8);
-		tilemap_mark_all_tiles_dirty (state->m_tilemap3_16x16);
-		tilemap_mark_all_tiles_dirty (state->m_tilemap3_16x16_alt);
+		state->m_tilemap3_8x8->mark_all_dirty();
+		state->m_tilemap3_16x16->mark_all_dirty();
+		state->m_tilemap3_16x16_alt->mark_all_dirty();
 	}
 }
 
@@ -40,27 +40,27 @@ static void hng64_mark_tile_dirty( hng64_state *state, int tilemap, int tile_ind
 {
 	if (tilemap == 0)
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap0_8x8, tile_index);
-		tilemap_mark_tile_dirty(state->m_tilemap0_16x16, tile_index);
-		tilemap_mark_tile_dirty(state->m_tilemap0_16x16_alt, tile_index);
+		state->m_tilemap0_8x8->mark_tile_dirty(tile_index);
+		state->m_tilemap0_16x16->mark_tile_dirty(tile_index);
+		state->m_tilemap0_16x16_alt->mark_tile_dirty(tile_index);
 	}
 	else if (tilemap == 1)
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap1_8x8, tile_index);
-		tilemap_mark_tile_dirty(state->m_tilemap1_16x16, tile_index);
-		tilemap_mark_tile_dirty(state->m_tilemap1_16x16_alt, tile_index);
+		state->m_tilemap1_8x8->mark_tile_dirty(tile_index);
+		state->m_tilemap1_16x16->mark_tile_dirty(tile_index);
+		state->m_tilemap1_16x16_alt->mark_tile_dirty(tile_index);
 	}
 	else if (tilemap == 2)
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap2_8x8, tile_index);
-		tilemap_mark_tile_dirty(state->m_tilemap2_16x16, tile_index);
-		tilemap_mark_tile_dirty(state->m_tilemap2_16x16_alt, tile_index);
+		state->m_tilemap2_8x8->mark_tile_dirty(tile_index);
+		state->m_tilemap2_16x16->mark_tile_dirty(tile_index);
+		state->m_tilemap2_16x16_alt->mark_tile_dirty(tile_index);
 	}
 	else if (tilemap == 3)
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap3_8x8, tile_index);
-		tilemap_mark_tile_dirty(state->m_tilemap3_16x16, tile_index);
-		tilemap_mark_tile_dirty(state->m_tilemap3_16x16_alt, tile_index);
+		state->m_tilemap3_8x8->mark_tile_dirty(tile_index);
+		state->m_tilemap3_16x16->mark_tile_dirty(tile_index);
+		state->m_tilemap3_16x16_alt->mark_tile_dirty(tile_index);
 	}
 }
 
@@ -787,8 +787,8 @@ static void hng64_tilemap_draw_roz_core(running_machine& machine, tilemap_t *tma
 	const pen_t *clut = &machine.pens[blit->tilemap_priority_code >> 16];
 	bitmap_ind8 &priority_bitmap = machine.priority_bitmap;
 	bitmap_rgb32 &destbitmap = *blit->bitmap;
-	bitmap_ind16 &srcbitmap = tilemap_get_pixmap(tmap);
-	bitmap_ind8 &flagsmap = tilemap_get_flagsmap(tmap);
+	bitmap_ind16 &srcbitmap = tmap->pixmap();
+	bitmap_ind8 &flagsmap = tmap->flagsmap();
 	const int xmask = srcbitmap.width()-1;
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
@@ -978,7 +978,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	hng64_configure_blit_parameters(&blit, tmap, dest, cliprect, flags, priority, priority_mask, drawformat);
 
 	/* get the full pixmap for the tilemap */
-	tilemap_get_pixmap(tmap);
+	tmap->pixmap();
 
 	/* then do the roz copy */
 	hng64_tilemap_draw_roz_core(machine, tmap, &blit, startx, starty, incxx, incxy, incyx, incyy, wraparound);
@@ -1227,7 +1227,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 			/* manual copy = slooow */
 			if (MAKE_MAME_REEEEAAALLLL_SLOW)
 			{
-				bitmap_ind16 &bm = tilemap_get_pixmap(tilemap);
+				bitmap_ind16 &bm = tilemap->pixmap();
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
 				const pen_t *paldata = machine.pens;
@@ -1325,7 +1325,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 			/* manual copy = slooow */
 			if (MAKE_MAME_REEEEAAALLLL_SLOW)
 			{
-				bitmap_ind16 &bm = tilemap_get_pixmap(tilemap);
+				bitmap_ind16 &bm = tilemap->pixmap();
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
 				const pen_t *paldata = machine.pens;
@@ -1675,21 +1675,21 @@ VIDEO_START( hng64 )
 	state->m_tilemap3_16x16     = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
 	state->m_tilemap3_16x16_alt = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	tilemap_set_transparent_pen(state->m_tilemap0_8x8, 0);
-	tilemap_set_transparent_pen(state->m_tilemap0_16x16, 0);
-	tilemap_set_transparent_pen(state->m_tilemap0_16x16_alt, 0);
+	state->m_tilemap0_8x8->set_transparent_pen(0);
+	state->m_tilemap0_16x16->set_transparent_pen(0);
+	state->m_tilemap0_16x16_alt->set_transparent_pen(0);
 
-	tilemap_set_transparent_pen(state->m_tilemap1_8x8, 0);
-	tilemap_set_transparent_pen(state->m_tilemap1_16x16, 0);
-	tilemap_set_transparent_pen(state->m_tilemap1_16x16_alt, 0);
+	state->m_tilemap1_8x8->set_transparent_pen(0);
+	state->m_tilemap1_16x16->set_transparent_pen(0);
+	state->m_tilemap1_16x16_alt->set_transparent_pen(0);
 
-	tilemap_set_transparent_pen(state->m_tilemap2_8x8, 0);
-	tilemap_set_transparent_pen(state->m_tilemap2_16x16, 0);
-	tilemap_set_transparent_pen(state->m_tilemap2_16x16_alt, 0);
+	state->m_tilemap2_8x8->set_transparent_pen(0);
+	state->m_tilemap2_16x16->set_transparent_pen(0);
+	state->m_tilemap2_16x16_alt->set_transparent_pen(0);
 
-	tilemap_set_transparent_pen(state->m_tilemap3_8x8, 0);
-	tilemap_set_transparent_pen(state->m_tilemap3_16x16, 0);
-	tilemap_set_transparent_pen(state->m_tilemap3_16x16_alt, 0);
+	state->m_tilemap3_8x8->set_transparent_pen(0);
+	state->m_tilemap3_16x16->set_transparent_pen(0);
+	state->m_tilemap3_16x16_alt->set_transparent_pen(0);
 
 	// Debug switch, turn on / off additive blending on a per-tilemap basis
 	state->m_additive_tilemap_debug = 0;

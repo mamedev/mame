@@ -125,21 +125,21 @@ static WRITE8_HANDLER(cshooter_txram_w)
 {
 	cshooter_state *state = space->machine().driver_data<cshooter_state>();
 	state->m_txram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_txtilemap,offset/2);
+	state->m_txtilemap->mark_tile_dirty(offset/2);
 }
 
 static VIDEO_START(cshooter)
 {
 	cshooter_state *state = machine.driver_data<cshooter_state>();
 	state->m_txtilemap = tilemap_create(machine, get_cstx_tile_info,tilemap_scan_rows, 8,8,32, 32);
-	tilemap_set_transparent_pen(state->m_txtilemap, 3);
+	state->m_txtilemap->set_transparent_pen(3);
 }
 
 static SCREEN_UPDATE_IND16(cshooter)
 {
 	cshooter_state *state = screen.machine().driver_data<cshooter_state>();
 	bitmap.fill(0/*get_black_pen(screen.screen.machine(, cliprect))*/);
-	tilemap_mark_all_tiles_dirty(state->m_txtilemap);
+	state->m_txtilemap->mark_all_dirty();
 
 	//sprites
 	{
@@ -178,8 +178,8 @@ static SCREEN_UPDATE_IND16(cshooter)
 		}
 	}
 
-	tilemap_mark_all_tiles_dirty(state->m_txtilemap);
-	tilemap_draw(bitmap,cliprect,state->m_txtilemap,0,0);
+	state->m_txtilemap->mark_all_dirty();
+	state->m_txtilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

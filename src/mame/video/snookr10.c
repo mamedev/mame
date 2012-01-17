@@ -46,14 +46,14 @@ WRITE8_HANDLER( snookr10_videoram_w )
 {
 	snookr10_state *state = space->machine().driver_data<snookr10_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( snookr10_colorram_w )
 {
 	snookr10_state *state = space->machine().driver_data<snookr10_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -190,6 +190,6 @@ VIDEO_START( apple10 )
 SCREEN_UPDATE_IND16( snookr10 )
 {
 	snookr10_state *state = screen.machine().driver_data<snookr10_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

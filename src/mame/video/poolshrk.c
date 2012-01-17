@@ -23,7 +23,7 @@ VIDEO_START( poolshrk )
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -32,7 +32,7 @@ SCREEN_UPDATE_IND16( poolshrk )
 	poolshrk_state *state = screen.machine().driver_data<poolshrk_state>();
 	int i;
 
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 
 	bitmap.fill(0, cliprect);
 
@@ -49,6 +49,6 @@ SCREEN_UPDATE_IND16( poolshrk )
 
 	/* draw playfield */
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

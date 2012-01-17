@@ -44,12 +44,12 @@ static TILE_GET_INFO( get_fg_tile_info_raiga )
 	UINT16 *videoram2 = state->m_videoram2;
 
 	/* bit 3 controls blending */
-	tileinfo->category = (videoram2[tile_index] & 0x08) >> 3;
+	tileinfo.category = (videoram2[tile_index] & 0x08) >> 3;
 
 	SET_TILE_INFO(
 			2,
 			videoram1[tile_index] & 0x0fff,
-			((videoram2[tile_index] & 0xf0) >> 4) | (tileinfo->category ? 0x80 : 0x00),
+			((videoram2[tile_index] & 0xf0) >> 4) | (tileinfo.category ? 0x80 : 0x00),
 			0);
 }
 
@@ -84,17 +84,17 @@ VIDEO_START( gaiden )
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info_raiga, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_text_layer = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_background, 0);
-	tilemap_set_transparent_pen(state->m_foreground, 0);
-	tilemap_set_transparent_pen(state->m_text_layer, 0);
+	state->m_background->set_transparent_pen(0);
+	state->m_foreground->set_transparent_pen(0);
+	state->m_text_layer->set_transparent_pen(0);
 
-	tilemap_set_scrolldy(state->m_background, 0, 33);
-	tilemap_set_scrolldy(state->m_foreground, 0, 33);
-	tilemap_set_scrolldy(state->m_text_layer, 0, 31);
+	state->m_background->set_scrolldy(0, 33);
+	state->m_foreground->set_scrolldy(0, 33);
+	state->m_text_layer->set_scrolldy(0, 31);
 
-	tilemap_set_scrolldx(state->m_background, 0, -1);
-	tilemap_set_scrolldx(state->m_foreground, 0, -1);
-	tilemap_set_scrolldx(state->m_text_layer, 0, -1);
+	state->m_background->set_scrolldx(0, -1);
+	state->m_foreground->set_scrolldx(0, -1);
+	state->m_text_layer->set_scrolldx(0, -1);
 
 	/* set up sprites */
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
@@ -113,15 +113,15 @@ VIDEO_START( mastninj )
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info_raiga, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_text_layer = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-//  tilemap_set_transparent_pen(state->m_background, 15);
-	tilemap_set_transparent_pen(state->m_foreground, 15);
-	tilemap_set_transparent_pen(state->m_text_layer, 15);
+//  state->m_background->set_transparent_pen(15);
+	state->m_foreground->set_transparent_pen(15);
+	state->m_text_layer->set_transparent_pen(15);
 
 	/* set up sprites */
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
-	tilemap_set_scrolldx(state->m_background, -248, 248);
-	tilemap_set_scrolldx(state->m_foreground, -252, 252);
+	state->m_background->set_scrolldx(-248, 248);
+	state->m_foreground->set_scrolldx(-252, 252);
 }
 
 VIDEO_START( raiga )
@@ -136,9 +136,9 @@ VIDEO_START( raiga )
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info_raiga, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_text_layer = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_background, 0);
-	tilemap_set_transparent_pen(state->m_foreground, 0);
-	tilemap_set_transparent_pen(state->m_text_layer, 0);
+	state->m_background->set_transparent_pen(0);
+	state->m_foreground->set_transparent_pen(0);
+	state->m_text_layer->set_transparent_pen(0);
 
 	/* set up sprites */
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
@@ -152,11 +152,11 @@ VIDEO_START( drgnbowl )
 	state->m_foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_text_layer = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_foreground, 15);
-	tilemap_set_transparent_pen(state->m_text_layer, 15);
+	state->m_foreground->set_transparent_pen(15);
+	state->m_text_layer->set_transparent_pen(15);
 
-	tilemap_set_scrolldx(state->m_background, -248, 248);
-	tilemap_set_scrolldx(state->m_foreground, -252, 252);
+	state->m_background->set_scrolldx(-248, 248);
+	state->m_foreground->set_scrolldx(-252, 252);
 }
 
 
@@ -177,42 +177,42 @@ WRITE16_HANDLER( gaiden_txscrollx_w )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->m_tx_scroll_x);
-	tilemap_set_scrollx(state->m_text_layer, 0, state->m_tx_scroll_x);
+	state->m_text_layer->set_scrollx(0, state->m_tx_scroll_x);
 }
 
 WRITE16_HANDLER( gaiden_txscrolly_w )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->m_tx_scroll_y);
-	tilemap_set_scrolly(state->m_text_layer, 0, (state->m_tx_scroll_y - state->m_tx_offset_y) & 0xffff);
+	state->m_text_layer->set_scrolly(0, (state->m_tx_scroll_y - state->m_tx_offset_y) & 0xffff);
 }
 
 WRITE16_HANDLER( gaiden_fgscrollx_w )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->m_fg_scroll_x);
-	tilemap_set_scrollx(state->m_foreground, 0, state->m_fg_scroll_x);
+	state->m_foreground->set_scrollx(0, state->m_fg_scroll_x);
 }
 
 WRITE16_HANDLER( gaiden_fgscrolly_w )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->m_fg_scroll_y);
-	tilemap_set_scrolly(state->m_foreground, 0, (state->m_fg_scroll_y - state->m_fg_offset_y) & 0xffff);
+	state->m_foreground->set_scrolly(0, (state->m_fg_scroll_y - state->m_fg_offset_y) & 0xffff);
 }
 
 WRITE16_HANDLER( gaiden_bgscrollx_w )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->m_bg_scroll_x);
-	tilemap_set_scrollx(state->m_background, 0, state->m_bg_scroll_x);
+	state->m_background->set_scrollx(0, state->m_bg_scroll_x);
 }
 
 WRITE16_HANDLER( gaiden_bgscrolly_w )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->m_bg_scroll_y);
-	tilemap_set_scrolly(state->m_background, 0, (state->m_bg_scroll_y - state->m_bg_offset_y) & 0xffff);
+	state->m_background->set_scrolly(0, (state->m_bg_scroll_y - state->m_bg_offset_y) & 0xffff);
 }
 
 WRITE16_HANDLER( gaiden_txoffsety_w )
@@ -221,7 +221,7 @@ WRITE16_HANDLER( gaiden_txoffsety_w )
 
 	if (ACCESSING_BITS_0_7) {
 		state->m_tx_offset_y = data;
-		tilemap_set_scrolly(state->m_text_layer, 0, (state->m_tx_scroll_y - state->m_tx_offset_y) & 0xffff);
+		state->m_text_layer->set_scrolly(0, (state->m_tx_scroll_y - state->m_tx_offset_y) & 0xffff);
 	}
 }
 
@@ -231,7 +231,7 @@ WRITE16_HANDLER( gaiden_fgoffsety_w )
 
 	if (ACCESSING_BITS_0_7) {
 		state->m_fg_offset_y = data;
-		tilemap_set_scrolly(state->m_foreground, 0, (state->m_fg_scroll_y - state->m_fg_offset_y) & 0xffff);
+		state->m_foreground->set_scrolly(0, (state->m_fg_scroll_y - state->m_fg_offset_y) & 0xffff);
 	}
 }
 
@@ -241,7 +241,7 @@ WRITE16_HANDLER( gaiden_bgoffsety_w )
 
 	if (ACCESSING_BITS_0_7) {
 		state->m_bg_offset_y = data;
-		tilemap_set_scrolly(state->m_background, 0, (state->m_bg_scroll_y - state->m_bg_offset_y) & 0xffff);
+		state->m_background->set_scrolly(0, (state->m_bg_scroll_y - state->m_bg_offset_y) & 0xffff);
 	}
 }
 
@@ -260,7 +260,7 @@ WRITE16_HANDLER( gaiden_videoram3_w )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->m_videoram3[offset]);
-	tilemap_mark_tile_dirty(state->m_background, offset & 0x07ff);
+	state->m_background->mark_tile_dirty(offset & 0x07ff);
 }
 
 READ16_HANDLER( gaiden_videoram3_r )
@@ -273,7 +273,7 @@ WRITE16_HANDLER( gaiden_videoram2_w )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->m_videoram2[offset]);
-	tilemap_mark_tile_dirty(state->m_foreground, offset & 0x07ff);
+	state->m_foreground->mark_tile_dirty(offset & 0x07ff);
 }
 
 READ16_HANDLER( gaiden_videoram2_r )
@@ -286,7 +286,7 @@ WRITE16_HANDLER( gaiden_videoram_w )
 {
 	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_text_layer, offset & 0x03ff);
+	state->m_text_layer->mark_tile_dirty(offset & 0x03ff);
 }
 
 
@@ -674,12 +674,12 @@ SCREEN_UPDATE_RGB32( gaiden )
 	state->m_sprite_bitmap.fill(0, cliprect);
 
 	/* draw tilemaps into a 16-bit bitmap */
-	tilemap_draw(state->m_tile_bitmap_bg, cliprect, state->m_background, 0, 1);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_foreground, 0, 2);
+	state->m_background->draw(state->m_tile_bitmap_bg, cliprect, 0, 1);
+	state->m_foreground->draw(state->m_tile_bitmap_fg, cliprect, 0, 2);
 	/* draw the blended tiles at a lower priority
        so sprites covered by them will still be drawn */
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_foreground, 1, 0);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_text_layer, 0, 4);
+	state->m_foreground->draw(state->m_tile_bitmap_fg, cliprect, 1, 0);
+	state->m_text_layer->draw(state->m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
 	gaiden_draw_sprites(screen.machine(), state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, state->m_sprite_bitmap, cliprect);
@@ -700,12 +700,12 @@ SCREEN_UPDATE_RGB32( raiga )
 	state->m_sprite_bitmap.fill(0, cliprect);
 
 	/* draw tilemaps into a 16-bit bitmap */
-	tilemap_draw(state->m_tile_bitmap_bg, cliprect, state->m_background, 0, 1);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_foreground, 0, 2);
+	state->m_background->draw(state->m_tile_bitmap_bg, cliprect, 0, 1);
+	state->m_foreground->draw(state->m_tile_bitmap_fg, cliprect, 0, 2);
 	/* draw the blended tiles at a lower priority
        so sprites covered by them will still be drawn */
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_foreground, 1, 0);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect, state->m_text_layer, 0, 4);
+	state->m_foreground->draw(state->m_tile_bitmap_fg, cliprect, 1, 0);
+	state->m_text_layer->draw(state->m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
 	raiga_draw_sprites(screen.machine(), state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, state->m_sprite_bitmap, cliprect);
@@ -720,9 +720,9 @@ SCREEN_UPDATE_IND16( drgnbowl )
 	gaiden_state *state = screen.machine().driver_data<gaiden_state>();
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_background, 0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_foreground, 0, 2);
-	tilemap_draw(bitmap, cliprect, state->m_text_layer, 0, 4);
+	state->m_background->draw(bitmap, cliprect, 0, 1);
+	state->m_foreground->draw(bitmap, cliprect, 0, 2);
+	state->m_text_layer->draw(bitmap, cliprect, 0, 4);
 	drgnbowl_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

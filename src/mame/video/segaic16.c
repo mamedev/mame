@@ -623,9 +623,9 @@ static void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilem
 		if (pageclip.min_x <= pageclip.max_x && pageclip.min_y <= pageclip.max_y)
 		{
 			page = (pages >> 0) & 0xf;
-			tilemap_set_scrollx(info->tilemaps[page], 0, xscroll);
-			tilemap_set_scrolly(info->tilemaps[page], 0, yscroll);
-			tilemap_draw(bitmap, pageclip, info->tilemaps[page], flags, priority);
+			info->tilemaps[page]->set_scrollx(0, xscroll);
+			info->tilemaps[page]->set_scrolly(0, yscroll);
+			info->tilemaps[page]->draw(bitmap, pageclip, flags, priority);
 		}
 	}
 
@@ -639,9 +639,9 @@ static void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilem
 		if (pageclip.min_x <= pageclip.max_x && pageclip.min_y <= pageclip.max_y)
 		{
 			page = (pages >> 4) & 0xf;
-			tilemap_set_scrollx(info->tilemaps[page], 0, xscroll);
-			tilemap_set_scrolly(info->tilemaps[page], 0, yscroll);
-			tilemap_draw(bitmap, pageclip, info->tilemaps[page], flags, priority);
+			info->tilemaps[page]->set_scrollx(0, xscroll);
+			info->tilemaps[page]->set_scrolly(0, yscroll);
+			info->tilemaps[page]->draw(bitmap, pageclip, flags, priority);
 		}
 	}
 
@@ -655,9 +655,9 @@ static void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilem
 		if (pageclip.min_x <= pageclip.max_x && pageclip.min_y <= pageclip.max_y)
 		{
 			page = (pages >> 8) & 0xf;
-			tilemap_set_scrollx(info->tilemaps[page], 0, xscroll);
-			tilemap_set_scrolly(info->tilemaps[page], 0, yscroll);
-			tilemap_draw(bitmap, pageclip, info->tilemaps[page], flags, priority);
+			info->tilemaps[page]->set_scrollx(0, xscroll);
+			info->tilemaps[page]->set_scrolly(0, yscroll);
+			info->tilemaps[page]->draw(bitmap, pageclip, flags, priority);
 		}
 	}
 
@@ -671,9 +671,9 @@ static void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilem
 		if (pageclip.min_x <= pageclip.max_x && pageclip.min_y <= pageclip.max_y)
 		{
 			page = (pages >> 12) & 0xf;
-			tilemap_set_scrollx(info->tilemaps[page], 0, xscroll);
-			tilemap_set_scrolly(info->tilemaps[page], 0, yscroll);
-			tilemap_draw(bitmap, pageclip, info->tilemaps[page], flags, priority);
+			info->tilemaps[page]->set_scrollx(0, xscroll);
+			info->tilemaps[page]->set_scrolly(0, yscroll);
+			info->tilemaps[page]->draw(bitmap, pageclip, flags, priority);
 		}
 	}
 }
@@ -728,7 +728,7 @@ static TILE_GET_INFO( segaic16_tilemap_16a_tile_info )
 	int color = (data >> 5) & 0x7f;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tileinfo->category = (data >> 12) & 1;
+	tileinfo.category = (data >> 12) & 1;
 }
 
 
@@ -740,7 +740,7 @@ static TILE_GET_INFO( segaic16_tilemap_16a_text_info )
 	int code = data & 0xff;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tileinfo->category = (data >> 11) & 1;
+	tileinfo.category = (data >> 11) & 1;
 }
 
 
@@ -942,7 +942,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_tile_info )
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tileinfo->category = (data >> 15) & 1;
+	tileinfo.category = (data >> 15) & 1;
 }
 
 
@@ -955,7 +955,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_text_info )
 	int code = data & 0x1ff;
 
 	SET_TILE_INFO(0, bank * info->banksize + code, color, 0);
-	tileinfo->category = (data >> 15) & 1;
+	tileinfo.category = (data >> 15) & 1;
 }
 
 
@@ -969,7 +969,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_alt_tile_info )
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tileinfo->category = (data >> 15) & 1;
+	tileinfo.category = (data >> 15) & 1;
 }
 
 
@@ -982,7 +982,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_alt_text_info )
 	int code = data & 0xff;
 
 	SET_TILE_INFO(0, bank * info->banksize + code, color, 0);
-	tileinfo->category = (data >> 15) & 1;
+	tileinfo.category = (data >> 15) & 1;
 }
 
 
@@ -1192,11 +1192,11 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 	info->textmap_info.rambase = info->textram;
 	info->textmap_info.bank = info->bank;
 	info->textmap_info.banksize = info->banksize;
-	tilemap_set_user_data(info->textmap, &info->textmap_info);
-	tilemap_set_palette_offset(info->textmap, colorbase);
-	tilemap_set_transparent_pen(info->textmap, 0);
-	tilemap_set_scrolldx(info->textmap, -192 + xoffs, -170 + xoffs);
-	tilemap_set_scrolldy(info->textmap, 0, 38);
+	info->textmap->set_user_data(&info->textmap_info);
+	info->textmap->set_palette_offset(colorbase);
+	info->textmap->set_transparent_pen(0);
+	info->textmap->set_scrolldx(-192 + xoffs, -170 + xoffs);
+	info->textmap->set_scrolldy(0, 38);
 
 	/* create the tilemaps for the tile pages */
 	for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1208,11 +1208,11 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 		info->tmap_info[pagenum].rambase = info->tileram + pagenum * 64*32;
 		info->tmap_info[pagenum].bank = info->bank;
 		info->tmap_info[pagenum].banksize = info->banksize;
-		tilemap_set_user_data(info->tilemaps[pagenum], &info->tmap_info[pagenum]);
-		tilemap_set_palette_offset(info->tilemaps[pagenum], colorbase);
-		tilemap_set_transparent_pen(info->tilemaps[pagenum], 0);
-		tilemap_set_scrolldx(info->tilemaps[pagenum], 0, 22);
-		tilemap_set_scrolldy(info->tilemaps[pagenum], 0, 38);
+		info->tilemaps[pagenum]->set_user_data(&info->tmap_info[pagenum]);
+		info->tilemaps[pagenum]->set_palette_offset(colorbase);
+		info->tilemaps[pagenum]->set_transparent_pen(0);
+		info->tilemaps[pagenum]->set_scrolldx(0, 22);
+		info->tilemaps[pagenum]->set_scrolldy(0, 38);
 	}
 }
 
@@ -1231,7 +1231,7 @@ void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const re
 
 	/* text layer is a special common case */
 	if (map == SEGAIC16_TILEMAP_TEXT)
-		tilemap_draw(bitmap, cliprect, info->textmap, priority, priority_mark);
+		info->textmap->draw(bitmap, cliprect, priority, priority_mark);
 
 	/* other layers are handled differently per-system */
 	else
@@ -1271,7 +1271,7 @@ void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum,
 		screen_device &screen = *machine.primary_screen;
 		screen.update_partial(screen.vpos());
 		info->bank[banknum] = offset;
-		tilemap_mark_all_tiles_dirty_all(machine);
+		machine.tilemap().mark_all_dirty();
 	}
 }
 
@@ -1294,9 +1294,9 @@ void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip)
 		screen_device &screen = *machine.primary_screen;
 		screen.update_partial(screen.vpos());
 		info->flip = flip;
-		tilemap_set_flip(info->textmap, flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		info->textmap->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		for (pagenum = 0; pagenum < info->numpages; pagenum++)
-			tilemap_set_flip(info->tilemaps[pagenum], flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+			info->tilemaps[pagenum]->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 }
 
@@ -1353,7 +1353,7 @@ void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int ena
 WRITE16_HANDLER( segaic16_tileram_0_w )
 {
 	COMBINE_DATA(&segaic16_tileram_0[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap[0].tilemaps[offset / (64*32)], offset % (64*32));
+	bg_tilemap[0].tilemaps[offset / (64*32)]->mark_tile_dirty(offset % (64*32));
 }
 
 
@@ -1364,7 +1364,7 @@ WRITE16_HANDLER( segaic16_textram_0_w )
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	COMBINE_DATA(&segaic16_textram_0[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap[0].textmap, offset);
+	bg_tilemap[0].textmap->mark_tile_dirty(offset);
 }
 
 

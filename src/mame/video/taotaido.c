@@ -150,7 +150,7 @@ WRITE16_HANDLER( taotaido_tileregs_w )
 				state->m_video_bank_select[(offset-4)*2] = data >> 8;
 			if(ACCESSING_BITS_0_7)
 				state->m_video_bank_select[(offset-4)*2+1] = data &0xff;
-				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+				state->m_bg_tilemap->mark_all_dirty();
 			break;
 	}
 }
@@ -159,7 +159,7 @@ WRITE16_HANDLER( taotaido_bgvideoram_w )
 {
 	taotaido_state *state = space->machine().driver_data<taotaido_state>();
 	COMBINE_DATA(&state->m_bgram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( taotaido_bg_tile_info )
@@ -200,8 +200,8 @@ VIDEO_START(taotaido)
 SCREEN_UPDATE_IND16(taotaido)
 {
 	taotaido_state *state = screen.machine().driver_data<taotaido_state>();
-//  tilemap_set_scrollx(state->m_bg_tilemap,0,(state->m_scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
-//  tilemap_set_scrolly(state->m_bg_tilemap,0,(state->m_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
+//  state->m_bg_tilemap->set_scrollx(0,(state->m_scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
+//  state->m_bg_tilemap->set_scrolly(0,(state->m_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
 
 	/* not amazingly efficient however it should be functional for row select and linescroll */
 	int line;
@@ -214,10 +214,10 @@ SCREEN_UPDATE_IND16(taotaido)
 	{
 		clip.min_y = clip.max_y = line;
 
-		tilemap_set_scrollx(state->m_bg_tilemap,0,((state->m_scrollram[(0x00+4*line)/2])>>4)+30);
-		tilemap_set_scrolly(state->m_bg_tilemap,0,((state->m_scrollram[(0x02+4*line)/2])>>4)-line);
+		state->m_bg_tilemap->set_scrollx(0,((state->m_scrollram[(0x00+4*line)/2])>>4)+30);
+		state->m_bg_tilemap->set_scrolly(0,((state->m_scrollram[(0x02+4*line)/2])>>4)-line);
 
-		tilemap_draw(bitmap,clip,state->m_bg_tilemap,0,0);
+		state->m_bg_tilemap->draw(bitmap, clip, 0,0);
 	}
 
 	draw_sprites(screen.machine(), bitmap,cliprect);

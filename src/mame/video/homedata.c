@@ -400,7 +400,7 @@ PALETTE_INIT( mirderby )
 
 ***************************************************************************/
 
-INLINE void mrokumei_info0( running_machine &machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
+INLINE void mrokumei_info0( running_machine &machine, tile_data &tileinfo, int tile_index, int page, int gfxbank )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 	int addr  = tile_index * 2 + 0x2000 * page;
@@ -410,7 +410,7 @@ INLINE void mrokumei_info0( running_machine &machine, tile_data *tileinfo, int t
 
 	SET_TILE_INFO( 0, code, color, state->m_flipscreen );
 }
-INLINE void mrokumei_info1( running_machine &machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
+INLINE void mrokumei_info1( running_machine &machine, tile_data &tileinfo, int tile_index, int page, int gfxbank )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 	int addr  = tile_index * 2 + 0x1000 + 0x2000 * page;
@@ -446,7 +446,7 @@ static TILE_GET_INFO( mrokumei_get_info1_1 )
 }
 
 
-INLINE void reikaids_info( running_machine &machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxbank )
+INLINE void reikaids_info( running_machine &machine, tile_data &tileinfo, int tile_index, int page, int layer, int gfxbank )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 	int addr  = tile_index * 4 + layer + 0x2000 * page;
@@ -517,7 +517,7 @@ static TILE_GET_INFO( reikaids_get_info1_3 )
 }
 
 
-INLINE void pteacher_info( running_machine &machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxbank )
+INLINE void pteacher_info( running_machine &machine, tile_data &tileinfo, int tile_index, int page, int layer, int gfxbank )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 	int addr  = tile_index * 2 + 0x1000 * layer + 0x2000 * page;
@@ -553,7 +553,7 @@ static TILE_GET_INFO( pteacher_get_info1_1 )
 }
 
 
-INLINE void lemnangl_info( running_machine &machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank )
+INLINE void lemnangl_info( running_machine &machine, tile_data &tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 	int addr  = tile_index * 2 + 0x1000 * layer + 0x2000 * page;
@@ -590,7 +590,7 @@ static TILE_GET_INFO( lemnangl_get_info1_1 )
 }
 
 
-INLINE void mirderby_info0( running_machine &machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
+INLINE void mirderby_info0( running_machine &machine, tile_data &tileinfo, int tile_index, int page, int gfxbank )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 	int addr  = tile_index * 2 + 0x2000 * page;
@@ -600,7 +600,7 @@ INLINE void mirderby_info0( running_machine &machine, tile_data *tileinfo, int t
 
 	SET_TILE_INFO( 0, code, color, state->m_flipscreen );
 }
-INLINE void mirderby_info1( running_machine &machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
+INLINE void mirderby_info1( running_machine &machine, tile_data &tileinfo, int tile_index, int page, int gfxbank )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 	int addr  = tile_index * 2 + 0x1000 + 0x2000 * page;
@@ -651,8 +651,8 @@ VIDEO_START( mrokumei )
 	state->m_bg_tilemap[1][0] = tilemap_create( machine, mrokumei_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32 );
 	state->m_bg_tilemap[1][1] = tilemap_create( machine, mrokumei_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32 );
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0][1], 0);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1][1], 0);
+	state->m_bg_tilemap[0][1]->set_transparent_pen(0);
+	state->m_bg_tilemap[1][1]->set_transparent_pen(0);
 }
 
 VIDEO_START( reikaids )
@@ -667,14 +667,14 @@ VIDEO_START( reikaids )
 	state->m_bg_tilemap[1][2] = tilemap_create(machine, reikaids_get_info1_2, tilemap_scan_rows,  8, 8, 32, 32);
 	state->m_bg_tilemap[1][3] = tilemap_create(machine, reikaids_get_info1_3, tilemap_scan_rows,  8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0][0], 0xff);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0][1], 0xff);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0][2], 0xff);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0][3], 0xff);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1][0], 0xff);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1][1], 0xff);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1][2], 0xff);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1][3], 0xff);
+	state->m_bg_tilemap[0][0]->set_transparent_pen(0xff);
+	state->m_bg_tilemap[0][1]->set_transparent_pen(0xff);
+	state->m_bg_tilemap[0][2]->set_transparent_pen(0xff);
+	state->m_bg_tilemap[0][3]->set_transparent_pen(0xff);
+	state->m_bg_tilemap[1][0]->set_transparent_pen(0xff);
+	state->m_bg_tilemap[1][1]->set_transparent_pen(0xff);
+	state->m_bg_tilemap[1][2]->set_transparent_pen(0xff);
+	state->m_bg_tilemap[1][3]->set_transparent_pen(0xff);
 }
 
 VIDEO_START( pteacher )
@@ -685,8 +685,8 @@ VIDEO_START( pteacher )
 	state->m_bg_tilemap[1][0] = tilemap_create(machine, pteacher_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32);
 	state->m_bg_tilemap[1][1] = tilemap_create(machine, pteacher_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0][1], 0xff);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1][1], 0xff);
+	state->m_bg_tilemap[0][1]->set_transparent_pen(0xff);
+	state->m_bg_tilemap[1][1]->set_transparent_pen(0xff);
 }
 
 VIDEO_START( lemnangl )
@@ -697,8 +697,8 @@ VIDEO_START( lemnangl )
 	state->m_bg_tilemap[1][0] = tilemap_create(machine, lemnangl_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32);
 	state->m_bg_tilemap[1][1] = tilemap_create(machine, lemnangl_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0][1], 0x0f);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1][1], 0x0f);
+	state->m_bg_tilemap[0][1]->set_transparent_pen(0x0f);
+	state->m_bg_tilemap[1][1]->set_transparent_pen(0x0f);
 }
 
 VIDEO_START( mirderby )
@@ -709,8 +709,8 @@ VIDEO_START( mirderby )
 	state->m_bg_tilemap[1][0] = tilemap_create( machine, mirderby_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32 );
 	state->m_bg_tilemap[1][1] = tilemap_create( machine, mirderby_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32 );
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap[0][1], 0);
-	tilemap_set_transparent_pen(state->m_bg_tilemap[1][1], 0);
+	state->m_bg_tilemap[0][1]->set_transparent_pen(0);
+	state->m_bg_tilemap[1][1]->set_transparent_pen(0);
 }
 
 /***************************************************************************
@@ -723,14 +723,14 @@ WRITE8_HANDLER( mrokumei_videoram_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1);
+	state->m_bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12]->mark_tile_dirty((offset & 0xffe) >> 1);
 }
 
 WRITE8_HANDLER( reikaids_videoram_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap[(offset & 0x2000) >> 13][offset & 3], (offset & 0xffc) >> 2);
+	state->m_bg_tilemap[(offset & 0x2000) >> 13][offset & 3]->mark_tile_dirty((offset & 0xffc) >> 2);
 }
 
 
@@ -742,7 +742,7 @@ WRITE8_HANDLER( reikaids_gfx_bank_w )
 	if (state->m_gfx_bank[state->m_reikaids_which] != data)
 	{
 		state->m_gfx_bank[state->m_reikaids_which] = data;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	state->m_reikaids_which ^= 1;
@@ -755,7 +755,7 @@ WRITE8_HANDLER( pteacher_gfx_bank_w )
 	if (state->m_gfx_bank[0] != data)
 	{
 		state->m_gfx_bank[0] = data;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -777,7 +777,7 @@ WRITE8_HANDLER( mrokumei_blitter_bank_w )
      */
 
 	if ((state->m_blitter_bank ^ data) & 0x3b)
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 
 	state->m_blitter_bank = data;
 }
@@ -802,7 +802,7 @@ WRITE8_HANDLER( pteacher_blitter_bank_w )
      */
 
 	if ((state->m_blitter_bank ^ data) & 0x03)
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 
 	state->m_blitter_bank = data;
 }
@@ -853,7 +853,7 @@ SCREEN_UPDATE_IND16( mrokumei )
 	if (flags != state->m_flipscreen)
 	{
 		state->m_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all(screen.machine());
+		screen.machine().tilemap().mark_all_dirty();
 	}
 
 	switch (state->m_vreg[0x3])
@@ -874,10 +874,10 @@ SCREEN_UPDATE_IND16( mrokumei )
 	}
 	screen.set_visible_area(0*8, width*8-1, 2*8, 30*8-1);
 
-	tilemap_set_scrollx(state->m_bg_tilemap[state->m_visible_page][0], 0, state->m_vreg[0xc] << 1);
+	state->m_bg_tilemap[state->m_visible_page][0]->set_scrollx(0, state->m_vreg[0xc] << 1);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[state->m_visible_page][0], 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[state->m_visible_page][1], 0, 0);
+	state->m_bg_tilemap[state->m_visible_page][0]->draw(bitmap, cliprect, 0, 0);
+	state->m_bg_tilemap[state->m_visible_page][1]->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -904,7 +904,7 @@ SCREEN_UPDATE_IND16( reikaids )
 	if (flags != state->m_flipscreen)
 	{
 		state->m_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all(screen.machine());
+		screen.machine().tilemap().mark_all_dirty();
 	}
 
 
@@ -912,7 +912,7 @@ SCREEN_UPDATE_IND16( reikaids )
 
 	pri = (state->m_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[state->m_visible_page][pritable[pri][3 - i]], 0, 0);
+		state->m_bg_tilemap[state->m_visible_page][pritable[pri][3 - i]]->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 #endif
@@ -951,7 +951,7 @@ SCREEN_UPDATE_IND16( reikaids )
 	if (flags != state->m_flipscreen)
 	{
 		state->m_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all(screen.machine());
+		screen.machine().tilemap().mark_all_dirty();
 	}
 
 
@@ -959,7 +959,7 @@ SCREEN_UPDATE_IND16( reikaids )
 
 	pri = (state->m_blitter_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[state->m_visible_page][pritable[state->m_priority][pri][3 - i]], 0, 0);
+		state->m_bg_tilemap[state->m_visible_page][pritable[state->m_priority][pri][3 - i]]->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -981,7 +981,7 @@ SCREEN_UPDATE_IND16( pteacher )
 	if (flags != state->m_flipscreen)
 	{
 		state->m_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all(screen.machine());
+		screen.machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 2 of blitter_bank stretches characters horizontally by 3/2,
@@ -1035,11 +1035,11 @@ SCREEN_UPDATE_IND16( pteacher )
 	}
 	scroll_high = state->m_vreg[0xb] >> 2;
 
-	tilemap_set_scrollx(state->m_bg_tilemap[state->m_visible_page][0], 0, scroll_high * 8 + scroll_low);
-	tilemap_set_scrollx(state->m_bg_tilemap[state->m_visible_page][1], 0, scroll_high * 8 + scroll_low);
+	state->m_bg_tilemap[state->m_visible_page][0]->set_scrollx(0, scroll_high * 8 + scroll_low);
+	state->m_bg_tilemap[state->m_visible_page][1]->set_scrollx(0, scroll_high * 8 + scroll_low);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[state->m_visible_page][0], 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[state->m_visible_page][1], 0, 0);
+	state->m_bg_tilemap[state->m_visible_page][0]->draw(bitmap, cliprect, 0, 0);
+	state->m_bg_tilemap[state->m_visible_page][1]->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

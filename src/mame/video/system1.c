@@ -131,8 +131,8 @@ static void video_start_common(running_machine &machine, int pagecount)
 	for (pagenum = 0; pagenum < pagecount; pagenum++)
 	{
 		state->m_tilemap_page[pagenum] = tilemap_create(machine, tile_get_info, tilemap_scan_rows, 8,8, 32,32);
-		tilemap_set_transparent_pen(state->m_tilemap_page[pagenum], 0);
-		tilemap_set_user_data(state->m_tilemap_page[pagenum], state->m_videoram + 0x800 * pagenum);
+		state->m_tilemap_page[pagenum]->set_transparent_pen(0);
+		state->m_tilemap_page[pagenum]->set_user_data(state->m_videoram + 0x800 * pagenum);
 	}
 
 	/* allocate a temporary bitmap for sprite rendering */
@@ -277,7 +277,7 @@ WRITE8_HANDLER( system1_videoram_w )
 	offset |= 0x1000 * ((state->m_videoram_bank >> 1) % (state->m_tilemap_pages / 2));
 	videoram[offset] = data;
 
-	tilemap_mark_tile_dirty(state->m_tilemap_page[offset / 0x800], (offset % 0x800) / 2);
+	state->m_tilemap_page[offset / 0x800]->mark_tile_dirty((offset % 0x800) / 2);
 
 	/* force a partial update if the page is changing */
 	if (state->m_tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
@@ -577,10 +577,10 @@ SCREEN_UPDATE_IND16( system1 )
 	int y;
 
 	/* all 4 background pages are the same, fixed to page 0 */
-	bgpixmaps[0] = bgpixmaps[1] = bgpixmaps[2] = bgpixmaps[3] = &tilemap_get_pixmap(state->m_tilemap_page[0]);
+	bgpixmaps[0] = bgpixmaps[1] = bgpixmaps[2] = bgpixmaps[3] = &state->m_tilemap_page[0]->pixmap();
 
 	/* foreground is fixed to page 1 */
-	bitmap_ind16 &fgpixmap = tilemap_get_pixmap(state->m_tilemap_page[1]);
+	bitmap_ind16 &fgpixmap = state->m_tilemap_page[1]->pixmap();
 
 	/* get fixed scroll offsets */
 	xscroll = (INT16)((videoram[0xffc] | (videoram[0xffd] << 8)) + 28);
@@ -614,13 +614,13 @@ SCREEN_UPDATE_IND16( system2 )
 	int y;
 
 	/* 4 independent background pages */
-	bgpixmaps[0] = &tilemap_get_pixmap(state->m_tilemap_page[videoram[0x740] & 7]);
-	bgpixmaps[1] = &tilemap_get_pixmap(state->m_tilemap_page[videoram[0x742] & 7]);
-	bgpixmaps[2] = &tilemap_get_pixmap(state->m_tilemap_page[videoram[0x744] & 7]);
-	bgpixmaps[3] = &tilemap_get_pixmap(state->m_tilemap_page[videoram[0x746] & 7]);
+	bgpixmaps[0] = &state->m_tilemap_page[videoram[0x740] & 7]->pixmap();
+	bgpixmaps[1] = &state->m_tilemap_page[videoram[0x742] & 7]->pixmap();
+	bgpixmaps[2] = &state->m_tilemap_page[videoram[0x744] & 7]->pixmap();
+	bgpixmaps[3] = &state->m_tilemap_page[videoram[0x746] & 7]->pixmap();
 
 	/* foreground is fixed to page 0 */
-	bitmap_ind16 &fgpixmap = tilemap_get_pixmap(state->m_tilemap_page[0]);
+	bitmap_ind16 &fgpixmap = state->m_tilemap_page[0]->pixmap();
 
 	/* get scroll offsets */
 	if (!flip_screen_get(screen.machine()))
@@ -657,13 +657,13 @@ SCREEN_UPDATE_IND16( system2_rowscroll )
 	int y;
 
 	/* 4 independent background pages */
-	bgpixmaps[0] = &tilemap_get_pixmap(state->m_tilemap_page[videoram[0x740] & 7]);
-	bgpixmaps[1] = &tilemap_get_pixmap(state->m_tilemap_page[videoram[0x742] & 7]);
-	bgpixmaps[2] = &tilemap_get_pixmap(state->m_tilemap_page[videoram[0x744] & 7]);
-	bgpixmaps[3] = &tilemap_get_pixmap(state->m_tilemap_page[videoram[0x746] & 7]);
+	bgpixmaps[0] = &state->m_tilemap_page[videoram[0x740] & 7]->pixmap();
+	bgpixmaps[1] = &state->m_tilemap_page[videoram[0x742] & 7]->pixmap();
+	bgpixmaps[2] = &state->m_tilemap_page[videoram[0x744] & 7]->pixmap();
+	bgpixmaps[3] = &state->m_tilemap_page[videoram[0x746] & 7]->pixmap();
 
 	/* foreground is fixed to page 0 */
-	bitmap_ind16 &fgpixmap = tilemap_get_pixmap(state->m_tilemap_page[0]);
+	bitmap_ind16 &fgpixmap = state->m_tilemap_page[0]->pixmap();
 
 	/* get scroll offsets */
 	if (!flip_screen_get(screen.machine()))

@@ -34,7 +34,7 @@ WRITE8_HANDLER( runaway_video_ram_w )
 {
 	runaway_state *state = space->machine().driver_data<runaway_state>();
 	state->m_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -44,7 +44,7 @@ WRITE8_HANDLER( runaway_tile_bank_w )
 	runaway_state *state = space->machine().driver_data<runaway_state>();
 	if ((data & 1) != state->m_tile_bank)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	state->m_tile_bank = data & 1;
@@ -94,7 +94,7 @@ SCREEN_UPDATE_IND16( runaway )
 	runaway_state *state = screen.machine().driver_data<runaway_state>();
 	int i;
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 16; i++)
 	{
@@ -129,7 +129,7 @@ SCREEN_UPDATE_IND16( qwak )
 	runaway_state *state = screen.machine().driver_data<runaway_state>();
 	int i;
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (i = 0; i < 16; i++)
 	{

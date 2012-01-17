@@ -475,10 +475,9 @@ VIDEO_START( galaxold_plain )
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	video_start_common(machine);
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
+	state->m_bg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
-	state->m_tilemap_set_scroll = tilemap_set_scrolly;
+	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->m_color_mask = (machine.gfx[0]->color_granularity == 4) ? 7 : 3;
 }
@@ -501,7 +500,7 @@ VIDEO_START( scrambold )
 	/* FIXME: This most probably needs to be adjusted
      * again when RAW video params are added to scramble
      */
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->set_scrolldx(0, 0);
 
 	state->m_draw_stars = scrambold_draw_stars;
 
@@ -515,7 +514,7 @@ VIDEO_START( darkplnt )
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	VIDEO_START_CALL(galaxold_plain);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->set_scrolldx(0, 0);
 	state->m_draw_bullets = darkplnt_draw_bullets;
 }
 
@@ -678,7 +677,7 @@ VIDEO_START( batman2 )
 static void rockclim_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
-	tilemap_draw(bitmap,cliprect,state->m_rockclim_tilemap, 0,0);
+	state->m_rockclim_tilemap->draw(bitmap, cliprect, 0,0);
 }
 
 static void rockclim_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
@@ -722,9 +721,8 @@ VIDEO_START( drivfrcg )
 	video_start_common(machine);
 	state->m_bg_tilemap = tilemap_create(machine, drivfrcg_get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
-	state->m_tilemap_set_scroll = tilemap_set_scrolly;
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->m_modify_spritecode = mshuttle_modify_spritecode;
 	state->m_modify_color = drivfrcg_modify_color;
@@ -738,9 +736,8 @@ VIDEO_START( ad2083 )
 	video_start_common(machine);
 	state->m_bg_tilemap = tilemap_create(machine, drivfrcg_get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
-	state->m_tilemap_set_scroll = tilemap_set_scrolly;
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->m_modify_spritecode = ad2083_modify_spritecode;
 
@@ -756,7 +753,7 @@ WRITE8_HANDLER( racknrol_tiles_bank_w )
 {
 	galaxold_state *state = space->machine().driver_data<galaxold_state>();
 	state->m_racknrol_tiles_bank[offset] = data;
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 }
 
 static TILE_GET_INFO( racknrol_get_tile_info )
@@ -778,9 +775,8 @@ VIDEO_START( racknrol )
 	video_start_common(machine);
 	state->m_bg_tilemap = tilemap_create(machine, racknrol_get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
-	state->m_tilemap_set_scroll = tilemap_set_scrolly;
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->m_color_mask = 0xff;
 }
@@ -839,7 +835,7 @@ VIDEO_START( dambustr )
 	state->m_dambustr_videoram2 = auto_alloc_array(machine, UINT8, 0x0400);
 	state->m_dambustr_tilemap2 = tilemap_create(machine, dambustr_get_tile_info2,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_dambustr_tilemap2,0);
+	state->m_dambustr_tilemap2->set_transparent_pen(0);
 }
 
 
@@ -847,7 +843,7 @@ WRITE8_HANDLER( galaxold_videoram_w )
 {
 	galaxold_state *state = space->machine().driver_data<galaxold_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 READ8_HANDLER( galaxold_videoram_r )
@@ -868,7 +864,7 @@ WRITE8_HANDLER( galaxold_attributesram_w )
 			int i;
 
 			for (i = offset >> 1; i < 0x0400; i += 32)
-				tilemap_mark_tile_dirty(state->m_bg_tilemap, i);
+				state->m_bg_tilemap->mark_tile_dirty(i);
 		}
 		else
 		{
@@ -877,7 +873,7 @@ WRITE8_HANDLER( galaxold_attributesram_w )
 				(*state->m_modify_ypos)(&data);
 			}
 
-			(*state->m_tilemap_set_scroll)(state->m_bg_tilemap, offset >> 1, data);
+			state->m_bg_tilemap->set_scrolly(offset >> 1, data);
 		}
 
 		state->m_attributesram[offset] = data;
@@ -892,7 +888,7 @@ WRITE8_HANDLER( galaxold_flip_screen_x_w )
 	{
 		state->m_flipscreen_x = data & 0x01;
 
-		tilemap_set_flip(state->m_bg_tilemap, (state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -903,7 +899,7 @@ WRITE8_HANDLER( galaxold_flip_screen_y_w )
 	{
 		state->m_flipscreen_y = data & 0x01;
 
-		tilemap_set_flip(state->m_bg_tilemap, (state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -980,7 +976,7 @@ WRITE8_HANDLER( galaxold_gfxbank_w )
 	{
 		state->m_gfxbank[offset] = data;
 
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -988,7 +984,7 @@ WRITE8_HANDLER( rockclim_videoram_w )
 {
 	galaxold_state *state = space->machine().driver_data<galaxold_state>();
 	state->m_rockclim_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_rockclim_tilemap, offset);
+	state->m_rockclim_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( rockclim_scroll_w )
@@ -996,10 +992,10 @@ WRITE8_HANDLER( rockclim_scroll_w )
 	galaxold_state *state = space->machine().driver_data<galaxold_state>();
 	switch(offset&3)
 	{
-		case 0: state->m_rockclim_h=(state->m_rockclim_h&0xff00)|data;tilemap_set_scrollx(state->m_rockclim_tilemap , 0, state->m_rockclim_h );break;
-		case 1:	state->m_rockclim_h=(state->m_rockclim_h&0xff)|(data<<8);tilemap_set_scrollx(state->m_rockclim_tilemap , 0, state->m_rockclim_h );break;
-		case 2:	state->m_rockclim_v=(state->m_rockclim_v&0xff00)|data;tilemap_set_scrolly(state->m_rockclim_tilemap , 0, state->m_rockclim_v );break;
-		case 3:	state->m_rockclim_v=(state->m_rockclim_v&0xff)|(data<<8);tilemap_set_scrolly(state->m_rockclim_tilemap , 0, state->m_rockclim_v );break;
+		case 0: state->m_rockclim_h=(state->m_rockclim_h&0xff00)|data;state->m_rockclim_tilemap ->set_scrollx(0, state->m_rockclim_h );break;
+		case 1:	state->m_rockclim_h=(state->m_rockclim_h&0xff)|(data<<8);state->m_rockclim_tilemap ->set_scrollx(0, state->m_rockclim_h );break;
+		case 2:	state->m_rockclim_v=(state->m_rockclim_v&0xff00)|data;state->m_rockclim_tilemap ->set_scrolly(0, state->m_rockclim_v );break;
+		case 3:	state->m_rockclim_v=(state->m_rockclim_v&0xff)|(data<<8);state->m_rockclim_tilemap ->set_scrolly(0, state->m_rockclim_v );break;
 	}
 
 }
@@ -1026,7 +1022,7 @@ WRITE8_HANDLER( dambustr_bg_color_w )
 	state->m_dambustr_bg_color_2 = (BIT(data,6)<<2) | (BIT(data,5)<<1) | BIT(data,4);
 	state->m_dambustr_bg_priority = BIT(data,3);
 	state->m_dambustr_char_bank = BIT(data,7);
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 }
 
 
@@ -1806,7 +1802,7 @@ SCREEN_UPDATE_IND16( galaxold )
 	}
 
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_draw_bullets)
 	{
@@ -1840,7 +1836,7 @@ SCREEN_UPDATE_IND16( dambustr )
 	/* save the background for drawing it again later, if background has priority over characters */
 	copybitmap(*state->m_dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, state->m_dambustr_tmpbitmap->cliprect());
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_draw_bullets)
 	{
@@ -1863,8 +1859,8 @@ SCREEN_UPDATE_IND16( dambustr )
 					state->m_dambustr_videoram2[32*j+i] = state->m_videoram[32*j+i];
 			};
 		};
-		tilemap_mark_all_tiles_dirty(state->m_dambustr_tilemap2);
-		tilemap_draw(bitmap, cliprect, state->m_dambustr_tilemap2, 0, 0);
+		state->m_dambustr_tilemap2->mark_all_dirty();
+		state->m_dambustr_tilemap2->draw(bitmap, cliprect, 0, 0);
 	};
 
 	return 0;

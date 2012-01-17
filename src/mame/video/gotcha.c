@@ -12,7 +12,7 @@ static TILEMAP_MAPPER( gotcha_tilemap_scan )
 	return (col & 0x1f) | (row << 5) | ((col & 0x20) << 5);
 }
 
-INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index ,UINT16 *vram, int color_offs)
+INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index ,UINT16 *vram, int color_offs)
 {
 	gotcha_state *state = machine.driver_data<gotcha_state>();
 	UINT16 data = vram[tile_index];
@@ -47,10 +47,10 @@ VIDEO_START( gotcha )
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, gotcha_tilemap_scan, 16, 16, 64, 32);
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, gotcha_tilemap_scan, 16, 16, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap, -1, 0);
-	tilemap_set_scrolldx(state->m_bg_tilemap, -5, 0);
+	state->m_fg_tilemap->set_scrolldx(-1, 0);
+	state->m_bg_tilemap->set_scrolldx(-5, 0);
 }
 
 
@@ -58,14 +58,14 @@ WRITE16_HANDLER( gotcha_fgvideoram_w )
 {
 	gotcha_state *state = space->machine().driver_data<gotcha_state>();
 	COMBINE_DATA(&state->m_fgvideoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( gotcha_bgvideoram_w )
 {
 	gotcha_state *state = space->machine().driver_data<gotcha_state>();
 	COMBINE_DATA(&state->m_bgvideoram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( gotcha_gfxbank_select_w )
@@ -83,7 +83,7 @@ WRITE16_HANDLER( gotcha_gfxbank_w )
 		if (state->m_gfxbank[state->m_banksel] != ((data & 0x0f00) >> 8))
 		{
 			state->m_gfxbank[state->m_banksel] = (data & 0x0f00) >> 8;
-			tilemap_mark_all_tiles_dirty_all(space->machine());
+			space->machine().tilemap().mark_all_dirty();
 		}
 	}
 }
@@ -95,10 +95,10 @@ WRITE16_HANDLER( gotcha_scroll_w )
 
 	switch (offset)
 	{
-		case 0: tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_scroll[0]); break;
-		case 1: tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_scroll[1]); break;
-		case 2: tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll[2]); break;
-		case 3: tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll[3]); break;
+		case 0: state->m_fg_tilemap->set_scrollx(0, state->m_scroll[0]); break;
+		case 1: state->m_fg_tilemap->set_scrolly(0, state->m_scroll[1]); break;
+		case 2: state->m_bg_tilemap->set_scrollx(0, state->m_scroll[2]); break;
+		case 3: state->m_bg_tilemap->set_scrolly(0, state->m_scroll[3]); break;
 	}
 }
 
@@ -138,8 +138,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 SCREEN_UPDATE_IND16( gotcha )
 {
 	gotcha_state *state = screen.machine().driver_data<gotcha_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

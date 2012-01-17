@@ -105,7 +105,7 @@ WRITE16_HANDLER( sslam_tx_tileram_w )
 	sslam_state *state = space->machine().driver_data<sslam_state>();
 
 	COMBINE_DATA(&state->m_tx_tileram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 /* Middle Layer */
@@ -124,7 +124,7 @@ WRITE16_HANDLER( sslam_md_tileram_w )
 	sslam_state *state = space->machine().driver_data<sslam_state>();
 
 	COMBINE_DATA(&state->m_md_tileram[offset]);
-	tilemap_mark_tile_dirty(state->m_md_tilemap,offset);
+	state->m_md_tilemap->mark_tile_dirty(offset);
 }
 
 /* Background Layer */
@@ -143,7 +143,7 @@ WRITE16_HANDLER( sslam_bg_tileram_w )
 	sslam_state *state = space->machine().driver_data<sslam_state>();
 
 	COMBINE_DATA(&state->m_bg_tileram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_powerbls_bg_tile_info )
@@ -163,7 +163,7 @@ WRITE16_HANDLER( powerbls_bg_tileram_w )
 	sslam_state *state = space->machine().driver_data<sslam_state>();
 
 	COMBINE_DATA(&state->m_bg_tileram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset>>1);
+	state->m_bg_tilemap->mark_tile_dirty(offset>>1);
 }
 
 VIDEO_START(sslam)
@@ -174,8 +174,8 @@ VIDEO_START(sslam)
 	state->m_md_tilemap = tilemap_create(machine, get_sslam_md_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_tx_tilemap = tilemap_create(machine, get_sslam_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_md_tilemap,0);
-	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
+	state->m_md_tilemap->set_transparent_pen(0);
+	state->m_tx_tilemap->set_transparent_pen(0);
 
 	state->m_sprites_x_offset = 0;
 	state->save_item(NAME(state->m_sprites_x_offset));
@@ -201,14 +201,14 @@ SCREEN_UPDATE_IND16(sslam)
 		return 0;
 	}
 
-	tilemap_set_scrollx(state->m_tx_tilemap,0, state->m_regs[0]+1);	/* +0 looks better, but the real board has the left most pixel at the left edge shifted off screen */
-	tilemap_set_scrolly(state->m_tx_tilemap,0, (state->m_regs[1] & 0xff)+8);
-	tilemap_set_scrollx(state->m_md_tilemap,0, state->m_regs[2]+2);
-	tilemap_set_scrolly(state->m_md_tilemap,0, state->m_regs[3]+8);
-	tilemap_set_scrollx(state->m_bg_tilemap,0, state->m_regs[4]+4);
-	tilemap_set_scrolly(state->m_bg_tilemap,0, state->m_regs[5]+8);
+	state->m_tx_tilemap->set_scrollx(0, state->m_regs[0]+1);	/* +0 looks better, but the real board has the left most pixel at the left edge shifted off screen */
+	state->m_tx_tilemap->set_scrolly(0, (state->m_regs[1] & 0xff)+8);
+	state->m_md_tilemap->set_scrollx(0, state->m_regs[2]+2);
+	state->m_md_tilemap->set_scrolly(0, state->m_regs[3]+8);
+	state->m_bg_tilemap->set_scrollx(0, state->m_regs[4]+4);
+	state->m_bg_tilemap->set_scrolly(0, state->m_regs[5]+8);
 
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/* remove wraparound from the tilemap (used on title screen) */
 	if (state->m_regs[2]+2 > 0x8c8)
@@ -219,15 +219,15 @@ SCREEN_UPDATE_IND16(sslam)
 		md_clip.min_y = cliprect.min_y;
 		md_clip.max_y = cliprect.max_y;
 
-		tilemap_draw(bitmap,md_clip,state->m_md_tilemap,0,0);
+		state->m_md_tilemap->draw(bitmap, md_clip, 0,0);
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,state->m_md_tilemap,0,0);
+		state->m_md_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -241,10 +241,10 @@ SCREEN_UPDATE_IND16(powerbls)
 		return 0;
 	}
 
-	tilemap_set_scrollx(state->m_bg_tilemap,0, state->m_regs[0]+21);
-	tilemap_set_scrolly(state->m_bg_tilemap,0, state->m_regs[1]-240);
+	state->m_bg_tilemap->set_scrollx(0, state->m_regs[0]+21);
+	state->m_bg_tilemap->set_scrolly(0, state->m_regs[1]-240);
 
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;
 }

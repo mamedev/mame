@@ -93,7 +93,7 @@ static VIDEO_START( onetwo )
 static SCREEN_UPDATE_IND16( onetwo )
 {
 	onetwo_state *state = screen.machine().driver_data<onetwo_state>();
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -107,7 +107,7 @@ static WRITE8_HANDLER( onetwo_fgram_w )
 {
 	onetwo_state *state = space->machine().driver_data<onetwo_state>();
 	state->m_fgram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset / 2);
+	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static WRITE8_HANDLER( onetwo_cpubank_w )

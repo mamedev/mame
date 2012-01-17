@@ -75,7 +75,7 @@ VIDEO_START( timelimt )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 /***************************************************************************/
@@ -85,14 +85,14 @@ WRITE8_HANDLER( timelimt_videoram_w )
 	timelimt_state *state = space->machine().driver_data<timelimt_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( timelimt_bg_videoram_w )
 {
 	timelimt_state *state = space->machine().driver_data<timelimt_state>();
 	state->m_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( timelimt_scroll_x_lsb_w )
@@ -146,12 +146,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( timelimt )
 {
 	timelimt_state *state = screen.machine().driver_data<timelimt_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scrollx);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scrolly);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

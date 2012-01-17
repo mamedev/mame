@@ -84,14 +84,14 @@ WRITE8_HANDLER( lvcards_videoram_w )
 {
 	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( lvcards_colorram_w )
 {
 	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -115,6 +115,6 @@ VIDEO_START( lvcards )
 SCREEN_UPDATE_IND16( lvcards )
 {
 	lvcards_state *state = screen.machine().driver_data<lvcards_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

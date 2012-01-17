@@ -5703,12 +5703,12 @@ static int segacd_get_active_stampmap_tilemap(void)
 #if 0
 static void segacd_mark_stampmaps_dirty(void)
 {
-	tilemap_mark_all_tiles_dirty(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
+	segacd_stampmap[segacd_get_active_stampmap_tilemap(->mark_all_dirty()]);
 
-	//tilemap_mark_all_tiles_dirty(segacd_stampmap[0]);
-	//tilemap_mark_all_tiles_dirty(segacd_stampmap[1]);
-	//tilemap_mark_all_tiles_dirty(segacd_stampmap[2]);
-	//tilemap_mark_all_tiles_dirty(segacd_stampmap[3]);
+	//segacd_stampmap[0]->mark_all_dirty();
+	//segacd_stampmap[1]->mark_all_dirty();
+	//segacd_stampmap[2]->mark_all_dirty();
+	//segacd_stampmap[3]->mark_all_dirty();
 }
 #endif
 
@@ -6514,7 +6514,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 
 
 		int line;
-		//bitmap_ind16 *srcbitmap = tilemap_get_pixmap(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
+		//bitmap_ind16 *srcbitmap = segacd_stampmap[segacd_get_active_stampmap_tilemap(->pixmap()]);
 		bitmap_ind16 *srcbitmap = 0;
 		UINT32 bufferstart = ((segacd_imagebuffer_start_address&0xfff8)*2)<<3;
 

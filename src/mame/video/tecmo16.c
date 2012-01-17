@@ -21,12 +21,12 @@ static TILE_GET_INFO( fg_get_tile_info )
 	int color = state->m_colorram[tile_index] & 0x0f;
 
 	/* bit 4 controls blending */
-	tileinfo->category = (state->m_colorram[tile_index] & 0x10) >> 4;
+	tileinfo.category = (state->m_colorram[tile_index] & 0x10) >> 4;
 
 	SET_TILE_INFO(
 			1,
 			tile,
-			color | (tileinfo->category ? 0x70 : 0x00),
+			color | (tileinfo.category ? 0x70 : 0x00),
 			0);
 }
 
@@ -71,11 +71,11 @@ VIDEO_START( fstarfrc )
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,32,32);
 	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan_rows, 8, 8,64,32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_tx_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolly(state->m_tx_tilemap,0,-16);
+	state->m_tx_tilemap->set_scrolly(0,-16);
 	state->m_flipscreen = 0;
 	state->m_game_is_riot = 0;
 }
@@ -95,9 +95,9 @@ VIDEO_START( ginkun )
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
 	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan_rows, 8, 8,64,32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_flipscreen = 0;
 	state->m_game_is_riot = 0;
 }
@@ -117,10 +117,10 @@ VIDEO_START( riot )
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
 	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan_rows, 8, 8,64,32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
-	tilemap_set_scrolldy(state->m_tx_tilemap,-16,-16);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_tx_tilemap->set_transparent_pen(0);
+	state->m_tx_tilemap->set_scrolldy(-16,-16);
 	state->m_flipscreen = 0;
 	state->m_game_is_riot = 1;
 }
@@ -131,28 +131,28 @@ WRITE16_HANDLER( tecmo16_videoram_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_videoram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( tecmo16_colorram_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_colorram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( tecmo16_videoram2_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_videoram2[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( tecmo16_colorram2_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_colorram2[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -160,7 +160,7 @@ WRITE16_HANDLER( tecmo16_charram_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_charram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( tecmo16_flipscreen_w )
@@ -176,42 +176,42 @@ WRITE16_HANDLER( tecmo16_scroll_x_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_scroll_x_w);
-	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scroll_x_w);
+	state->m_fg_tilemap->set_scrollx(0,state->m_scroll_x_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll_y_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_scroll_y_w);
-	tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_scroll_y_w);
+	state->m_fg_tilemap->set_scrolly(0,state->m_scroll_y_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll2_x_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_scroll2_x_w);
-	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_scroll2_x_w);
+	state->m_bg_tilemap->set_scrollx(0,state->m_scroll2_x_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll2_y_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_scroll2_y_w);
-	tilemap_set_scrolly(state->m_bg_tilemap,0,state->m_scroll2_y_w);
+	state->m_bg_tilemap->set_scrolly(0,state->m_scroll2_y_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll_char_x_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_scroll_char_x_w);
-	tilemap_set_scrollx(state->m_tx_tilemap,0,state->m_scroll_char_x_w);
+	state->m_tx_tilemap->set_scrollx(0,state->m_scroll_char_x_w);
 }
 
 WRITE16_HANDLER( tecmo16_scroll_char_y_w )
 {
 	tecmo16_state *state = space->machine().driver_data<tecmo16_state>();
 	COMBINE_DATA(&state->m_scroll_char_y_w);
-	tilemap_set_scrolly(state->m_tx_tilemap,0,state->m_scroll_char_y_w-16);
+	state->m_tx_tilemap->set_scrolly(0,state->m_scroll_char_y_w-16);
 }
 
 /******************************************************************************/
@@ -494,12 +494,12 @@ SCREEN_UPDATE_RGB32( tecmo16 )
 	state->m_sprite_bitmap.fill(0, cliprect);
 
 	/* draw tilemaps into a 16-bit bitmap */
-	tilemap_draw(state->m_tile_bitmap_bg, cliprect,state->m_bg_tilemap, 0, 1);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect,state->m_fg_tilemap, 0, 2);
+	state->m_bg_tilemap->draw(state->m_tile_bitmap_bg, cliprect, 0, 1);
+	state->m_fg_tilemap->draw(state->m_tile_bitmap_fg, cliprect, 0, 2);
 	/* draw the blended tiles at a lower priority
        so sprites covered by them will still be drawn */
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect,state->m_fg_tilemap, 1, 0);
-	tilemap_draw(state->m_tile_bitmap_fg, cliprect,state->m_tx_tilemap, 0, 4);
+	state->m_fg_tilemap->draw(state->m_tile_bitmap_fg, cliprect, 1, 0);
+	state->m_tx_tilemap->draw(state->m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
 	draw_sprites(screen.machine(), state->m_tile_bitmap_bg, state->m_tile_bitmap_fg, state->m_sprite_bitmap, cliprect);

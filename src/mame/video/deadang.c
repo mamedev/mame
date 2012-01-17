@@ -8,7 +8,7 @@ WRITE16_HANDLER( deadang_foreground_w )
 {
 	deadang_state *state = space->machine().driver_data<deadang_state>();
 	COMBINE_DATA(&state->m_video_data[offset]);
-	tilemap_mark_tile_dirty( state->m_pf1_layer, offset );
+	state->m_pf1_layer->mark_tile_dirty(offset );
 }
 
 WRITE16_HANDLER( deadang_text_w )
@@ -16,7 +16,7 @@ WRITE16_HANDLER( deadang_text_w )
 	deadang_state *state = space->machine().driver_data<deadang_state>();
 	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty( state->m_text_layer, offset );
+	state->m_text_layer->mark_tile_dirty(offset );
 }
 
 WRITE16_HANDLER( deadang_bank_w )
@@ -28,7 +28,7 @@ WRITE16_HANDLER( deadang_bank_w )
 		if (state->m_deadangle_tilebank!=state->m_deadangle_oldtilebank)
 		{
 			state->m_deadangle_oldtilebank = state->m_deadangle_tilebank;
-			tilemap_mark_all_tiles_dirty (state->m_pf1_layer);
+			state->m_pf1_layer->mark_all_dirty();
 		}
 	}
 }
@@ -82,9 +82,9 @@ VIDEO_START( deadang )
 	state->m_pf1_layer = tilemap_create(machine, get_pf1_tile_info,tilemap_scan_cols,16,16, 32, 32);
 	state->m_text_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_pf2_layer, 15);
-	tilemap_set_transparent_pen(state->m_pf1_layer, 15);
-	tilemap_set_transparent_pen(state->m_text_layer, 15);
+	state->m_pf2_layer->set_transparent_pen(15);
+	state->m_pf1_layer->set_transparent_pen(15);
+	state->m_text_layer->set_transparent_pen(15);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -134,12 +134,12 @@ SCREEN_UPDATE_IND16( deadang )
 {
 	deadang_state *state = screen.machine().driver_data<deadang_state>();
 	/* Setup the tilemaps */
-	tilemap_set_scrolly( state->m_pf3_layer,0, ((state->m_scroll_ram[0x01]&0xf0)<<4)+((state->m_scroll_ram[0x02]&0x7f)<<1)+((state->m_scroll_ram[0x02]&0x80)>>7) );
-	tilemap_set_scrollx( state->m_pf3_layer,0, ((state->m_scroll_ram[0x09]&0xf0)<<4)+((state->m_scroll_ram[0x0a]&0x7f)<<1)+((state->m_scroll_ram[0x0a]&0x80)>>7) );
-	tilemap_set_scrolly( state->m_pf1_layer,0, ((state->m_scroll_ram[0x11]&0x10)<<4)+((state->m_scroll_ram[0x12]&0x7f)<<1)+((state->m_scroll_ram[0x12]&0x80)>>7) );
-	tilemap_set_scrollx( state->m_pf1_layer,0, ((state->m_scroll_ram[0x19]&0x10)<<4)+((state->m_scroll_ram[0x1a]&0x7f)<<1)+((state->m_scroll_ram[0x1a]&0x80)>>7) );
-	tilemap_set_scrolly( state->m_pf2_layer,0, ((state->m_scroll_ram[0x21]&0xf0)<<4)+((state->m_scroll_ram[0x22]&0x7f)<<1)+((state->m_scroll_ram[0x22]&0x80)>>7) );
-	tilemap_set_scrollx( state->m_pf2_layer,0, ((state->m_scroll_ram[0x29]&0xf0)<<4)+((state->m_scroll_ram[0x2a]&0x7f)<<1)+((state->m_scroll_ram[0x2a]&0x80)>>7) );
+	state->m_pf3_layer->set_scrolly(0, ((state->m_scroll_ram[0x01]&0xf0)<<4)+((state->m_scroll_ram[0x02]&0x7f)<<1)+((state->m_scroll_ram[0x02]&0x80)>>7) );
+	state->m_pf3_layer->set_scrollx(0, ((state->m_scroll_ram[0x09]&0xf0)<<4)+((state->m_scroll_ram[0x0a]&0x7f)<<1)+((state->m_scroll_ram[0x0a]&0x80)>>7) );
+	state->m_pf1_layer->set_scrolly(0, ((state->m_scroll_ram[0x11]&0x10)<<4)+((state->m_scroll_ram[0x12]&0x7f)<<1)+((state->m_scroll_ram[0x12]&0x80)>>7) );
+	state->m_pf1_layer->set_scrollx(0, ((state->m_scroll_ram[0x19]&0x10)<<4)+((state->m_scroll_ram[0x1a]&0x7f)<<1)+((state->m_scroll_ram[0x1a]&0x80)>>7) );
+	state->m_pf2_layer->set_scrolly(0, ((state->m_scroll_ram[0x21]&0xf0)<<4)+((state->m_scroll_ram[0x22]&0x7f)<<1)+((state->m_scroll_ram[0x22]&0x80)>>7) );
+	state->m_pf2_layer->set_scrollx(0, ((state->m_scroll_ram[0x29]&0xf0)<<4)+((state->m_scroll_ram[0x2a]&0x7f)<<1)+((state->m_scroll_ram[0x2a]&0x80)>>7) );
 
 	/* Control byte:
         0x01: Background playfield disable
@@ -151,17 +151,17 @@ SCREEN_UPDATE_IND16( deadang )
         0x40: Flipscreen
         0x80: Always set?
     */
-	tilemap_set_enable(state->m_pf3_layer,!(state->m_scroll_ram[0x34]&1));
-	tilemap_set_enable(state->m_pf1_layer,!(state->m_scroll_ram[0x34]&2));
-	tilemap_set_enable(state->m_pf2_layer,!(state->m_scroll_ram[0x34]&4));
+	state->m_pf3_layer->enable(!(state->m_scroll_ram[0x34]&1));
+	state->m_pf1_layer->enable(!(state->m_scroll_ram[0x34]&2));
+	state->m_pf2_layer->enable(!(state->m_scroll_ram[0x34]&4));
 	flip_screen_set(screen.machine(),  state->m_scroll_ram[0x34]&0x40 );
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_pf3_layer,0,1);
-	tilemap_draw(bitmap,cliprect,state->m_pf1_layer,0,2);
-	tilemap_draw(bitmap,cliprect,state->m_pf2_layer,0,4);
+	state->m_pf3_layer->draw(bitmap, cliprect, 0,1);
+	state->m_pf1_layer->draw(bitmap, cliprect, 0,2);
+	state->m_pf2_layer->draw(bitmap, cliprect, 0,4);
 	if (!(state->m_scroll_ram[0x34]&0x10)) draw_sprites(screen.machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_text_layer,0,0);
+	state->m_text_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

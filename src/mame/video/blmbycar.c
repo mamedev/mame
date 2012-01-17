@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 			attr & 0x1f,
 			TILE_FLIPYX((attr >> 6) & 3));
 
-	tileinfo->category = (attr >> 5) & 1;
+	tileinfo.category = (attr >> 5) & 1;
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 			attr & 0x1f,
 			TILE_FLIPYX((attr >> 6) & 3));
 
-	tileinfo->category = (attr >> 5) & 1;
+	tileinfo.category = (attr >> 5) & 1;
 }
 
 
@@ -104,14 +104,14 @@ WRITE16_HANDLER( blmbycar_vram_0_w )
 {
 	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
 	COMBINE_DATA(&state->m_vram_0[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_0, offset / 2);
+	state->m_tilemap_0->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_HANDLER( blmbycar_vram_1_w )
 {
 	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
 	COMBINE_DATA(&state->m_vram_1[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_1, offset / 2);
+	state->m_tilemap_1->mark_tile_dirty(offset / 2);
 }
 
 
@@ -130,12 +130,12 @@ VIDEO_START( blmbycar )
 	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, DIM_NX, DIM_NY );
 	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, DIM_NX, DIM_NY );
 
-	tilemap_set_scroll_rows(state->m_tilemap_0, 1);
-	tilemap_set_scroll_cols(state->m_tilemap_0, 1);
+	state->m_tilemap_0->set_scroll_rows(1);
+	state->m_tilemap_0->set_scroll_cols(1);
 
-	tilemap_set_scroll_rows(state->m_tilemap_1, 1);
-	tilemap_set_scroll_cols(state->m_tilemap_1, 1);
-	tilemap_set_transparent_pen(state->m_tilemap_1, 0);
+	state->m_tilemap_1->set_scroll_rows(1);
+	state->m_tilemap_1->set_scroll_cols(1);
+	state->m_tilemap_1->set_transparent_pen(0);
 }
 
 
@@ -224,11 +224,11 @@ SCREEN_UPDATE_IND16( blmbycar )
 	blmbycar_state *state = screen.machine().driver_data<blmbycar_state>();
 	int i, layers_ctrl = -1;
 
-	tilemap_set_scrolly(state->m_tilemap_0, 0, state->m_scroll_0[0]);
-	tilemap_set_scrollx(state->m_tilemap_0, 0, state->m_scroll_0[1]);
+	state->m_tilemap_0->set_scrolly(0, state->m_scroll_0[0]);
+	state->m_tilemap_0->set_scrollx(0, state->m_scroll_0[1]);
 
-	tilemap_set_scrolly(state->m_tilemap_1, 0, state->m_scroll_1[0] + 1);
-	tilemap_set_scrollx(state->m_tilemap_1, 0, state->m_scroll_1[1] + 5);
+	state->m_tilemap_1->set_scrolly(0, state->m_scroll_1[0] + 1);
+	state->m_tilemap_1->set_scrollx(0, state->m_scroll_1[1] + 5);
 
 #ifdef MAME_DEBUG
 if (screen.machine().input().code_pressed(KEYCODE_Z))
@@ -247,13 +247,13 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl & 1)
 		for (i = 0; i <= 1; i++)
-			tilemap_draw(bitmap, cliprect, state->m_tilemap_0, i, i);
+			state->m_tilemap_0->draw(bitmap, cliprect, i, i);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 2)
 		for (i = 0; i <= 1; i++)
-			tilemap_draw(bitmap, cliprect, state->m_tilemap_1, i, i);
+			state->m_tilemap_1->draw(bitmap, cliprect, i, i);
 
 	if (layers_ctrl & 8)
 		draw_sprites(screen.machine(), bitmap, cliprect);

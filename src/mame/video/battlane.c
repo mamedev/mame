@@ -48,20 +48,20 @@ WRITE8_HANDLER( battlane_palette_w )
 WRITE8_HANDLER( battlane_scrollx_w )
 {
 	battlane_state *state = space->machine().driver_data<battlane_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_video_ctrl & 0x01) << 8) + data);
+	state->m_bg_tilemap->set_scrollx(0, ((state->m_video_ctrl & 0x01) << 8) + data);
 }
 
 WRITE8_HANDLER( battlane_scrolly_w )
 {
 	battlane_state *state = space->machine().driver_data<battlane_state>();
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_cpu_control & 0x01) << 8) + data);
+	state->m_bg_tilemap->set_scrolly(0, ((state->m_cpu_control & 0x01) << 8) + data);
 }
 
 WRITE8_HANDLER( battlane_tileram_w )
 {
 	battlane_state *state = space->machine().driver_data<battlane_state>();
 	state->m_tileram[offset] = data;
-	//tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	//state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( battlane_spriteram_w )
@@ -238,9 +238,9 @@ SCREEN_UPDATE_IND16( battlane )
 {
 	battlane_state *state = screen.machine().driver_data<battlane_state>();
 
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap); // HACK
+	state->m_bg_tilemap->mark_all_dirty(); // HACK
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	draw_fg_bitmap(screen.machine(), bitmap);
 	return 0;

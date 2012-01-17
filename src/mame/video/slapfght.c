@@ -72,7 +72,7 @@ VIDEO_START( perfrman )
 	slapfght_state *state = machine.driver_data<slapfght_state>();
 	state->m_pf1_tilemap = tilemap_create(machine, get_pf_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transparent_pen(state->m_pf1_tilemap,0);
+	state->m_pf1_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START( slapfight )
@@ -81,7 +81,7 @@ VIDEO_START( slapfight )
 	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,tilemap_scan_rows,8,8,64,32);
 	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transparent_pen(state->m_fix_tilemap,0);
+	state->m_fix_tilemap->set_transparent_pen(0);
 }
 
 
@@ -95,28 +95,28 @@ WRITE8_HANDLER( slapfight_videoram_w )
 {
 	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->m_slapfight_videoram[offset]=data;
-	tilemap_mark_tile_dirty(state->m_pf1_tilemap,offset);
+	state->m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( slapfight_colorram_w )
 {
 	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->m_slapfight_colorram[offset]=data;
-	tilemap_mark_tile_dirty(state->m_pf1_tilemap,offset);
+	state->m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( slapfight_fixram_w )
 {
 	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->m_slapfight_fixvideoram[offset]=data;
-	tilemap_mark_tile_dirty(state->m_fix_tilemap,offset);
+	state->m_fix_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( slapfight_fixcol_w )
 {
 	slapfght_state *state = space->machine().driver_data<slapfght_state>();
 	state->m_slapfight_fixcolorram[offset]=data;
-	tilemap_mark_tile_dirty(state->m_fix_tilemap,offset);
+	state->m_fix_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( slapfight_flipscreen_w )
@@ -190,18 +190,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( perfrman )
 {
 	slapfght_state *state = screen.machine().driver_data<slapfght_state>();
-	tilemap_set_flip( state->m_pf1_tilemap, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	tilemap_set_scrolly( state->m_pf1_tilemap ,0 , 0 );
+	state->m_pf1_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	state->m_pf1_tilemap ->set_scrolly(0 , 0 );
 	if (state->m_flipscreen) {
-		tilemap_set_scrollx( state->m_pf1_tilemap ,0 , 264 );
+		state->m_pf1_tilemap ->set_scrollx(0 , 264 );
 	}
 	else {
-		tilemap_set_scrollx( state->m_pf1_tilemap ,0 , -16 );
+		state->m_pf1_tilemap ->set_scrollx(0 , -16 );
 	}
 
-	tilemap_draw(bitmap,cliprect,state->m_pf1_tilemap,TILEMAP_DRAW_OPAQUE,0);
+	state->m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,state->m_pf1_tilemap,0,0);
+	state->m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect,0x80);
 
 	slapfght_log_vram(screen.machine());
@@ -215,21 +215,21 @@ SCREEN_UPDATE_IND16( slapfight )
 	UINT8 *buffered_spriteram = screen.machine().generic.buffered_spriteram.u8;
 	int offs;
 
-	tilemap_set_flip_all(screen.machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	if (state->m_flipscreen) {
-		tilemap_set_scrollx( state->m_fix_tilemap,0,296);
-		tilemap_set_scrollx( state->m_pf1_tilemap,0,(*state->m_slapfight_scrollx_lo + 256 * *state->m_slapfight_scrollx_hi)+296 );
-		tilemap_set_scrolly( state->m_pf1_tilemap,0, (*state->m_slapfight_scrolly)+15 );
-		tilemap_set_scrolly( state->m_fix_tilemap,0, -1 ); /* Glitch in Tiger Heli otherwise */
+		state->m_fix_tilemap->set_scrollx(0,296);
+		state->m_pf1_tilemap->set_scrollx(0,(*state->m_slapfight_scrollx_lo + 256 * *state->m_slapfight_scrollx_hi)+296 );
+		state->m_pf1_tilemap->set_scrolly(0, (*state->m_slapfight_scrolly)+15 );
+		state->m_fix_tilemap->set_scrolly(0, -1 ); /* Glitch in Tiger Heli otherwise */
 	}
 	else {
-		tilemap_set_scrollx( state->m_fix_tilemap,0,0);
-		tilemap_set_scrollx( state->m_pf1_tilemap,0,(*state->m_slapfight_scrollx_lo + 256 * *state->m_slapfight_scrollx_hi) );
-		tilemap_set_scrolly( state->m_pf1_tilemap,0, (*state->m_slapfight_scrolly)-1 );
-		tilemap_set_scrolly( state->m_fix_tilemap,0, -1 ); /* Glitch in Tiger Heli otherwise */
+		state->m_fix_tilemap->set_scrollx(0,0);
+		state->m_pf1_tilemap->set_scrollx(0,(*state->m_slapfight_scrollx_lo + 256 * *state->m_slapfight_scrollx_hi) );
+		state->m_pf1_tilemap->set_scrolly(0, (*state->m_slapfight_scrolly)-1 );
+		state->m_fix_tilemap->set_scrolly(0, -1 ); /* Glitch in Tiger Heli otherwise */
 	}
 
-	tilemap_draw(bitmap,cliprect,state->m_pf1_tilemap,0,0);
+	state->m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/* Draw the sprites */
 	for (offs = 0;offs < screen.machine().generic.spriteram_size;offs += 4)
@@ -248,7 +248,7 @@ SCREEN_UPDATE_IND16( slapfight )
 				(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) - 13,buffered_spriteram[offs+3],0);
 	}
 
-	tilemap_draw(bitmap,cliprect,state->m_fix_tilemap,0,0);
+	state->m_fix_tilemap->draw(bitmap, cliprect, 0,0);
 
 	slapfght_log_vram(screen.machine());
 	return 0;

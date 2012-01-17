@@ -61,7 +61,7 @@ WRITE16_HANDLER( alpha68k_videoram_w )
 	else
 		state->m_videoram[offset] = (data >> 8) & 0xff;
 
-	tilemap_mark_tile_dirty(state->m_fix_tilemap, offset / 2);
+	state->m_fix_tilemap->mark_tile_dirty(offset / 2);
 }
 
 VIDEO_START( alpha68k )
@@ -69,7 +69,7 @@ VIDEO_START( alpha68k )
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
 	state->m_fix_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_fix_tilemap, 0);
+	state->m_fix_tilemap->set_transparent_pen(0);
 }
 
 /******************************************************************************/
@@ -133,10 +133,10 @@ SCREEN_UPDATE_IND16( alpha68k_II )
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 
 	if (state->m_last_bank != state->m_bank_base)
-		tilemap_mark_all_tiles_dirty_all(screen.machine());
+		screen.machine().tilemap().mark_all_dirty();
 
 	state->m_last_bank = state->m_bank_base;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(2047, cliprect);
 //AT
@@ -145,7 +145,7 @@ SCREEN_UPDATE_IND16( alpha68k_II )
 	draw_sprites(screen.machine(), bitmap, cliprect, 2, 0x0000, 0x0800);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0, 0x0000, 0x07c0);
 //ZT
-	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
+	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -281,10 +281,10 @@ SCREEN_UPDATE_IND16( alpha68k_V )
 	UINT16 *spriteram = state->m_spriteram;
 
 	if (state->m_last_bank != state->m_bank_base)
-		tilemap_mark_all_tiles_dirty_all(screen.machine());
+		screen.machine().tilemap().mark_all_dirty();
 
 	state->m_last_bank = state->m_bank_base;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(4095, cliprect);
 
@@ -312,7 +312,7 @@ SCREEN_UPDATE_IND16( alpha68k_V )
 		draw_sprites_V(screen.machine(), bitmap, cliprect, 0, 0x0000, 0x07c0, 0x8000, 0, 0x7fff);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
+	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -321,10 +321,10 @@ SCREEN_UPDATE_IND16( alpha68k_V_sb )
 	alpha68k_state *state = screen.machine().driver_data<alpha68k_state>();
 
 	if (state->m_last_bank != state->m_bank_base)
-		tilemap_mark_all_tiles_dirty_all(screen.machine());
+		screen.machine().tilemap().mark_all_dirty();
 
 	state->m_last_bank = state->m_bank_base;
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(4095, cliprect);
 
@@ -334,7 +334,7 @@ SCREEN_UPDATE_IND16( alpha68k_V_sb )
 	draw_sprites_V(screen.machine(), bitmap, cliprect, 2, 0x0000, 0x0800, 0x4000, 0x8000, 0x3fff);
 	draw_sprites_V(screen.machine(), bitmap, cliprect, 0, 0x0000, 0x07c0, 0x4000, 0x8000, 0x3fff);
 
-	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
+	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

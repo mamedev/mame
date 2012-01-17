@@ -74,7 +74,7 @@ WRITE16_HANDLER( bsb_videoram_w )
 {
 	bigstrkb_state *state = space->machine().driver_data<bigstrkb_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap,offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bsb_tile2_info )
@@ -92,7 +92,7 @@ WRITE16_HANDLER( bsb_videoram2_w )
 {
 	bigstrkb_state *state = space->machine().driver_data<bigstrkb_state>();
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap2,offset);
+	state->m_tilemap2->mark_tile_dirty(offset);
 }
 
 
@@ -111,7 +111,7 @@ WRITE16_HANDLER( bsb_videoram3_w )
 {
 	bigstrkb_state *state = space->machine().driver_data<bigstrkb_state>();
 	state->m_videoram3[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap3,offset);
+	state->m_tilemap3->mark_tile_dirty(offset);
 }
 
 /* Video Start / Update */
@@ -123,9 +123,9 @@ VIDEO_START(bigstrkb)
 	state->m_tilemap2 = tilemap_create(machine, get_bsb_tile2_info,bsb_bg_scan, 16, 16,128,64);
 	state->m_tilemap3 = tilemap_create(machine, get_bsb_tile3_info,bsb_bg_scan, 16, 16,128,64);
 
-	tilemap_set_transparent_pen(state->m_tilemap,15);
-	//tilemap_set_transparent_pen(state->m_tilemap2,15);
-	tilemap_set_transparent_pen(state->m_tilemap3,15);
+	state->m_tilemap->set_transparent_pen(15);
+	//state->m_tilemap2->set_transparent_pen(15);
+	state->m_tilemap3->set_transparent_pen(15);
 }
 
 SCREEN_UPDATE_IND16(bigstrkb)
@@ -134,17 +134,17 @@ SCREEN_UPDATE_IND16(bigstrkb)
 
 //  bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	tilemap_set_scrollx(state->m_tilemap2,0, state->m_vidreg1[0]+(256-14));
-	tilemap_set_scrolly(state->m_tilemap2,0, state->m_vidreg2[0]);
+	state->m_tilemap2->set_scrollx(0, state->m_vidreg1[0]+(256-14));
+	state->m_tilemap2->set_scrolly(0, state->m_vidreg2[0]);
 
-	tilemap_set_scrollx(state->m_tilemap3,0, state->m_vidreg1[1]+(256-14));
-	tilemap_set_scrolly(state->m_tilemap3,0, state->m_vidreg2[1]);
+	state->m_tilemap3->set_scrollx(0, state->m_vidreg1[1]+(256-14));
+	state->m_tilemap3->set_scrolly(0, state->m_vidreg2[1]);
 
-	tilemap_draw(bitmap,cliprect,state->m_tilemap2,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_tilemap3,0,0);
+	state->m_tilemap2->draw(bitmap, cliprect, 0,0);
+	state->m_tilemap3->draw(bitmap, cliprect, 0,0);
 
 	draw_sprites(screen.machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
+	state->m_tilemap->draw(bitmap, cliprect, 0,0);
 
 //  popmessage ("Regs %08x %08x %08x %08x",bsb_vidreg2[0],bsb_vidreg2[1],bsb_vidreg2[2],bsb_vidreg2[3]);
 	return 0;

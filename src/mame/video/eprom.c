@@ -139,7 +139,7 @@ VIDEO_START( eprom )
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* save states */
 	state->save_item(NAME(state->m_screen_intensity));
@@ -195,7 +195,7 @@ VIDEO_START( guts )
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* save states */
 	state->save_item(NAME(state->m_screen_intensity));
@@ -219,8 +219,8 @@ void eprom_scanline_update(screen_device &screen, int scanline)
 	{
 		int xscroll = (state->m_alpha[0x780] >> 7) & 0x1ff;
 		int yscroll = (state->m_alpha[0x781] >> 7) & 0x1ff;
-		tilemap_set_scrollx(state->m_playfield_tilemap, 0, xscroll);
-		tilemap_set_scrolly(state->m_playfield_tilemap, 0, yscroll);
+		state->m_playfield_tilemap->set_scrollx(0, xscroll);
+		state->m_playfield_tilemap->set_scrolly(0, yscroll);
 		atarimo_set_xscroll(0, xscroll);
 		atarimo_set_yscroll(0, yscroll);
 	}
@@ -250,7 +250,7 @@ SCREEN_UPDATE_IND16( eprom )
 	update_palette(screen.machine());
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -359,7 +359,7 @@ SCREEN_UPDATE_IND16( eprom )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;
@@ -405,7 +405,7 @@ SCREEN_UPDATE_IND16( guts )
 	update_palette(screen.machine());
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -433,7 +433,7 @@ SCREEN_UPDATE_IND16( guts )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;

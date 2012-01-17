@@ -5,7 +5,7 @@
 
 /*******************************************************************/
 
-INLINE void common_get_piv_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, int num )
+INLINE void common_get_piv_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int num )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
 	UINT16 tilenum = state->m_pivram[tile_index + num * 0x1000];	/* 3 blocks of $2000 */
@@ -45,17 +45,17 @@ static void wgp_core_vh_start( running_machine &machine, int piv_xoffs, int piv_
 	state->m_piv_xoffs = piv_xoffs;
 	state->m_piv_yoffs = piv_yoffs;
 
-	tilemap_set_transparent_pen(state->m_piv_tilemap[0], 0);
-	tilemap_set_transparent_pen(state->m_piv_tilemap[1], 0);
-	tilemap_set_transparent_pen(state->m_piv_tilemap[2], 0);
+	state->m_piv_tilemap[0]->set_transparent_pen(0);
+	state->m_piv_tilemap[1]->set_transparent_pen(0);
+	state->m_piv_tilemap[2]->set_transparent_pen(0);
 
 	/* flipscreen n/a */
-	tilemap_set_scrolldx(state->m_piv_tilemap[0], -piv_xoffs, 0);
-	tilemap_set_scrolldx(state->m_piv_tilemap[1], -piv_xoffs, 0);
-	tilemap_set_scrolldx(state->m_piv_tilemap[2], -piv_xoffs, 0);
-	tilemap_set_scrolldy(state->m_piv_tilemap[0], -piv_yoffs, 0);
-	tilemap_set_scrolldy(state->m_piv_tilemap[1], -piv_yoffs, 0);
-	tilemap_set_scrolldy(state->m_piv_tilemap[2], -piv_yoffs, 0);
+	state->m_piv_tilemap[0]->set_scrolldx(-piv_xoffs, 0);
+	state->m_piv_tilemap[1]->set_scrolldx(-piv_xoffs, 0);
+	state->m_piv_tilemap[2]->set_scrolldx(-piv_xoffs, 0);
+	state->m_piv_tilemap[0]->set_scrolldy(-piv_yoffs, 0);
+	state->m_piv_tilemap[1]->set_scrolldy(-piv_yoffs, 0);
+	state->m_piv_tilemap[2]->set_scrolldy(-piv_yoffs, 0);
 
 	/* We don't need tilemap_set_scroll_rows, as the custom draw routine applies rowscroll manually */
 	tc0100scn_set_colbanks(state->m_tc0100scn, 0x80, 0xc0, 0x40);
@@ -136,7 +136,7 @@ WRITE16_HANDLER( wgp_pivram_word_w )
 
 	if (offset < 0x3000)
 	{
-		tilemap_mark_tile_dirty(state->m_piv_tilemap[(offset / 0x1000)], (offset % 0x1000));
+		state->m_piv_tilemap[(offset / 0x1000)]->mark_tile_dirty((offset % 0x1000));
 	}
 	else if ((offset >= 0x3400) && (offset < 0x4000))
 	{
@@ -144,7 +144,7 @@ WRITE16_HANDLER( wgp_pivram_word_w )
 	}
 	else if ((offset >= 0x8000) && (offset < 0xb000))
 	{
-		tilemap_mark_tile_dirty(state->m_piv_tilemap[((offset - 0x8000)/ 0x1000)], (offset % 0x1000));
+		state->m_piv_tilemap[((offset - 0x8000)/ 0x1000)]->mark_tile_dirty((offset % 0x1000));
 	}
 }
 
@@ -521,8 +521,8 @@ INLINE void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int length,
 static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	bitmap_ind16 &srcbitmap = tilemap_get_pixmap(state->m_piv_tilemap[layer]);
-	bitmap_ind8 &flagsbitmap = tilemap_get_flagsmap(state->m_piv_tilemap[layer]);
+	bitmap_ind16 &srcbitmap = state->m_piv_tilemap[layer]->pixmap();
+	bitmap_ind8 &flagsbitmap = state->m_piv_tilemap[layer]->flagsmap();
 
 	UINT16 *dst16,*src16;
 	UINT8 *tsrc;
@@ -677,8 +677,8 @@ SCREEN_UPDATE_IND16( wgp )
 
 	for (i = 0; i < 3; i++)
 	{
-		tilemap_set_scrollx(state->m_piv_tilemap[i], 0, state->m_piv_scrollx[i]);
-		tilemap_set_scrolly(state->m_piv_tilemap[i], 0, state->m_piv_scrolly[i]);
+		state->m_piv_tilemap[i]->set_scrollx(0, state->m_piv_scrollx[i]);
+		state->m_piv_tilemap[i]->set_scrolly(0, state->m_piv_scrolly[i]);
 	}
 
 	tc0100scn_tilemap_update(state->m_tc0100scn);

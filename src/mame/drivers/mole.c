@@ -104,7 +104,7 @@ static WRITE8_HANDLER( mole_videoram_w )
 	mole_state *state = space->machine().driver_data<mole_state>();
 
 	state->m_tileram[offset] = data | (state->m_tile_bank << 8);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( mole_tilebank_w )
@@ -112,7 +112,7 @@ static WRITE8_HANDLER( mole_tilebank_w )
 	mole_state *state = space->machine().driver_data<mole_state>();
 
 	state->m_tile_bank = data;
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 }
 
 static WRITE8_HANDLER( mole_flipscreen_w )
@@ -124,7 +124,7 @@ static SCREEN_UPDATE_IND16( mole )
 {
 	mole_state *state = screen.machine().driver_data<mole_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

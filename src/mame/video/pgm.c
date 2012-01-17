@@ -559,7 +559,7 @@ WRITE16_HANDLER( pgm_tx_videoram_w )
 {
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 	state->m_tx_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset / 2);
+	state->m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_pgm_tx_tilemap_tile_info )
@@ -595,7 +595,7 @@ WRITE16_HANDLER( pgm_bg_videoram_w )
 {
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 	state->m_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
@@ -628,11 +628,11 @@ VIDEO_START( pgm )
 	state->m_boffset = 0;
 
 	state->m_tx_tilemap = tilemap_create(machine, get_pgm_tx_tilemap_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	state->m_bg_tilemap = tilemap_create(machine, get_pgm_bg_tilemap_tile_info, tilemap_scan_rows, 32, 32, 64, 16);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 31);
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 16 * 32);
+	state->m_bg_tilemap->set_transparent_pen(31);
+	state->m_bg_tilemap->set_scroll_rows(16 * 32);
 
 	for (i = 0; i < 0x1200 / 2; i++)
 		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
@@ -652,21 +652,21 @@ SCREEN_UPDATE_IND16( pgm )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_set_scrolly(state->m_bg_tilemap,0, state->m_videoregs[0x2000/2]);
+	state->m_bg_tilemap->set_scrolly(0, state->m_videoregs[0x2000/2]);
 
 	for (y = 0; y < 224; y++)
-		tilemap_set_scrollx(state->m_bg_tilemap, (y + state->m_videoregs[0x2000 / 2]) & 0x1ff, state->m_videoregs[0x3000 / 2] + state->m_rowscrollram[y]);
+		state->m_bg_tilemap->set_scrollx((y + state->m_videoregs[0x2000 / 2]) & 0x1ff, state->m_videoregs[0x3000 / 2] + state->m_rowscrollram[y]);
 
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 2);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 2);
 
 	draw_sprites(state, screen.machine(), bitmap, state->m_spritebufferram, screen.machine().priority_bitmap);
 
-	tilemap_set_scrolly(state->m_tx_tilemap, 0, state->m_videoregs[0x5000/2]);
-	tilemap_set_scrollx(state->m_tx_tilemap, 0, state->m_videoregs[0x6000/2]); // Check
+	state->m_tx_tilemap->set_scrolly(0, state->m_videoregs[0x5000/2]);
+	state->m_tx_tilemap->set_scrollx(0, state->m_videoregs[0x6000/2]); // Check
 
 
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 
 	return 0;

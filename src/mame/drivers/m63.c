@@ -218,7 +218,7 @@ static WRITE8_HANDLER( m63_videoram_w )
 	m63_state *state = space->machine().driver_data<m63_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( m63_colorram_w )
@@ -226,7 +226,7 @@ static WRITE8_HANDLER( m63_colorram_w )
 	m63_state *state = space->machine().driver_data<m63_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( m63_videoram2_w )
@@ -234,7 +234,7 @@ static WRITE8_HANDLER( m63_videoram2_w )
 	m63_state *state = space->machine().driver_data<m63_state>();
 
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( m63_palbank_w )
@@ -244,7 +244,7 @@ static WRITE8_HANDLER( m63_palbank_w )
 	if (state->m_pal_bank != (data & 0x01))
 	{
 		state->m_pal_bank = data & 0x01;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -253,7 +253,7 @@ static WRITE8_HANDLER( m63_flipscreen_w )
 	if (flip_screen_get(space->machine()) != (~data & 0x01))
 	{
 		flip_screen_set(space->machine(), ~data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -293,8 +293,8 @@ static VIDEO_START( m63 )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg_tilemap->set_scroll_cols(32);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -345,11 +345,11 @@ static SCREEN_UPDATE_IND16( m63 )
 	int col;
 
 	for (col = 0; col < 32; col++)
-		tilemap_set_scrolly(state->m_bg_tilemap, col, state->m_scrollram[col * 8]);
+		state->m_bg_tilemap->set_scrolly(col, state->m_scrollram[col * 8]);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

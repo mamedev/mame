@@ -111,11 +111,11 @@ VIDEO_START( senjyo )
 		state->m_bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,      tilemap_scan_rows, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
 	}
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_bg1_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_bg2_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_bg3_tilemap, 0);
-	tilemap_set_scroll_cols(state->m_fg_tilemap, 32);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_bg1_tilemap->set_transparent_pen(0);
+	state->m_bg2_tilemap->set_transparent_pen(0);
+	state->m_bg3_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_scroll_cols(32);
 }
 
 
@@ -131,35 +131,35 @@ WRITE8_HANDLER( senjyo_fgvideoram_w )
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
 	state->m_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 WRITE8_HANDLER( senjyo_fgcolorram_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
 	state->m_fgcolorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 WRITE8_HANDLER( senjyo_bg1videoram_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
 	state->m_bg1videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg1_tilemap, offset);
+	state->m_bg1_tilemap->mark_tile_dirty(offset);
 }
 WRITE8_HANDLER( senjyo_bg2videoram_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
 	state->m_bg2videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset);
+	state->m_bg2_tilemap->mark_tile_dirty(offset);
 }
 WRITE8_HANDLER( senjyo_bg3videoram_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
 	state->m_bg3videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg3_tilemap, offset);
+	state->m_bg3_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( senjyo_bgstripes_w )
@@ -303,14 +303,14 @@ SCREEN_UPDATE_IND16( senjyo )
 		int scrollx,scrolly;
 
 		for (i = 0;i < 32;i++)
-			tilemap_set_scrolly(state->m_fg_tilemap, i, state->m_fgscroll[i]);
+			state->m_fg_tilemap->set_scrolly(i, state->m_fgscroll[i]);
 
 		scrollx = state->m_scrollx1[0];
 		scrolly = state->m_scrolly1[0] + 256 * state->m_scrolly1[1];
 		if (flip)
 			scrollx = -scrollx;
-		tilemap_set_scrollx(state->m_bg1_tilemap, 0, scrollx);
-		tilemap_set_scrolly(state->m_bg1_tilemap, 0, scrolly);
+		state->m_bg1_tilemap->set_scrollx(0, scrollx);
+		state->m_bg1_tilemap->set_scrolly(0, scrolly);
 
 		scrollx = state->m_scrollx2[0];
 		scrolly = state->m_scrolly2[0] + 256 * state->m_scrolly2[1];
@@ -321,26 +321,26 @@ SCREEN_UPDATE_IND16( senjyo )
 		}
 		if (flip)
 			scrollx = -scrollx;
-		tilemap_set_scrollx(state->m_bg2_tilemap, 0, scrollx);
-		tilemap_set_scrolly(state->m_bg2_tilemap, 0, scrolly);
+		state->m_bg2_tilemap->set_scrollx(0, scrollx);
+		state->m_bg2_tilemap->set_scrolly(0, scrolly);
 
 		scrollx = state->m_scrollx3[0];
 		scrolly = state->m_scrolly3[0] + 256 * state->m_scrolly3[1];
 		if (flip)
 			scrollx = -scrollx;
-		tilemap_set_scrollx(state->m_bg3_tilemap, 0, scrollx);
-		tilemap_set_scrolly(state->m_bg3_tilemap, 0, scrolly);
+		state->m_bg3_tilemap->set_scrollx(0, scrollx);
+		state->m_bg3_tilemap->set_scrolly(0, scrolly);
 	}
 
 	draw_bgbitmap(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg3_tilemap, 0, 0);
+	state->m_bg3_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
-	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
+	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
-	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
+	state->m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_radar(screen.machine(), bitmap, cliprect);
 
 #if 0

@@ -33,7 +33,7 @@ WRITE8_HANDLER( battlex_videoram_w )
 {
 	battlex_state *state = space->machine().driver_data<battlex_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( battlex_flipscreen_w )
@@ -44,7 +44,7 @@ WRITE8_HANDLER( battlex_flipscreen_w )
 	if (flip_screen_get(space->machine()) != (data >> 7))
 	{
 		flip_screen_set(space->machine(), data & 0x80);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -99,8 +99,8 @@ SCREEN_UPDATE_IND16(battlex)
 {
 	battlex_state *state = screen.machine().driver_data<battlex_state>();
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_lsb | (state->m_scroll_msb << 8));
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scroll_lsb | (state->m_scroll_msb << 8));
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	return 0;

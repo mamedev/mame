@@ -115,7 +115,7 @@ public:
 
 
 /* call with tilesize = 0 for 8x8 or 1 for 16x16 */
-INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data *tileinfo, int tile_index, int whichtilemap, int tilesize)
+INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize)
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int tileno,colour,flipxy, depth;
@@ -147,7 +147,7 @@ INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data *tileinf
 		tileno >>=(1+tilesize*2);
 		colour&=0x0f;
 		colour+=0x20;
-		tileinfo->group = 1;
+		tileinfo.group = 1;
 		SET_TILE_INFO(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 	else
@@ -155,7 +155,7 @@ INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data *tileinf
 		tileno >>=(0+tilesize*2);
 		//colour&=0x3f; // fixes status bar.. but breaks other stuff
 		colour+=0x200;
-		tileinfo->group = 0;
+		tileinfo.group = 0;
 		SET_TILE_INFO(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 }
@@ -186,21 +186,21 @@ static WRITE32_HANDLER( rabbit_tilemap0_w )
 {
 	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	COMBINE_DATA(&state->m_tilemap_ram[0][offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap[0],offset);
+	state->m_tilemap[0]->mark_tile_dirty(offset);
 }
 
 static WRITE32_HANDLER( rabbit_tilemap1_w )
 {
 	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	COMBINE_DATA(&state->m_tilemap_ram[1][offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap[1],offset);
+	state->m_tilemap[1]->mark_tile_dirty(offset);
 }
 
 static WRITE32_HANDLER( rabbit_tilemap2_w )
 {
 	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	COMBINE_DATA(&state->m_tilemap_ram[2][offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap[2],offset);
+	state->m_tilemap[2]->mark_tile_dirty(offset);
 }
 
 
@@ -208,7 +208,7 @@ static WRITE32_HANDLER( rabbit_tilemap3_w )
 {
 	rabbit_state *state = space->machine().driver_data<rabbit_state>();
 	COMBINE_DATA(&state->m_tilemap_ram[3][offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap[3],offset);
+	state->m_tilemap[3]->mark_tile_dirty(offset);
 }
 
 /*
@@ -367,14 +367,14 @@ static VIDEO_START(rabbit)
 	state->m_tilemap[3] = tilemap_create(machine, get_rabbit_tilemap3_tile_info,tilemap_scan_rows, 8,  8, 128,32);
 
 	/* the tilemaps mix 4bpp and 8bbp tiles, we split these into 2 groups, and set a different transpen for each group */
-    tilemap_map_pen_to_layer(state->m_tilemap[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    tilemap_map_pen_to_layer(state->m_tilemap[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-    tilemap_map_pen_to_layer(state->m_tilemap[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    tilemap_map_pen_to_layer(state->m_tilemap[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-    tilemap_map_pen_to_layer(state->m_tilemap[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    tilemap_map_pen_to_layer(state->m_tilemap[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-    tilemap_map_pen_to_layer(state->m_tilemap[3], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-    tilemap_map_pen_to_layer(state->m_tilemap[3], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    state->m_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    state->m_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    state->m_tilemap[1]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    state->m_tilemap[1]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    state->m_tilemap[2]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    state->m_tilemap[2]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
+    state->m_tilemap[3]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    state->m_tilemap[3]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
 	state->m_sprite_bitmap = auto_bitmap_ind16_alloc(machine,0x1000,0x1000);
 	state->m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
@@ -420,7 +420,7 @@ static void rabbit_drawtilemap( running_machine &machine, bitmap_ind16 &bitmap, 
        startx/starty are also 16.16 scrolling
       */
 
-	tilemap_draw_roz(bitmap,cliprect,state->m_tilemap[whichtilemap],startx << 12,starty << 12,
+	state->m_tilemap[whichtilemap]->draw_roz(bitmap, cliprect, startx << 12,starty << 12,
 			incxx << 5,incxy << 8,incyx << 8,incyy << 5,
 			1,	/* wraparound */
 			tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
@@ -663,7 +663,7 @@ static void rabbit_do_blit(running_machine &machine)
 					blt_source+=2;
 					writeoffs=blt_oddflg+blt_column;
 					state->m_tilemap_ram[blt_tilemp][writeoffs]=(state->m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
-					tilemap_mark_tile_dirty(state->m_tilemap[blt_tilemp],writeoffs);
+					state->m_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
 
 					blt_column++;
 					blt_column&=0x7f;
@@ -680,7 +680,7 @@ static void rabbit_do_blit(running_machine &machine)
 				{
 					writeoffs=blt_oddflg+blt_column;
 					state->m_tilemap_ram[blt_tilemp][writeoffs]=(state->m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
-					tilemap_mark_tile_dirty(state->m_tilemap[blt_tilemp],writeoffs);
+					state->m_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
 					blt_column++;
 					blt_column&=0x7f;
 				}

@@ -128,14 +128,14 @@ static WRITE8_HANDLER( fg_w )
 {
 	igs017_state *state = space->machine().driver_data<igs017_state>();
 	state->m_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset/4);
+	state->m_fg_tilemap->mark_tile_dirty(offset/4);
 }
 
 static WRITE8_HANDLER( bg_w )
 {
 	igs017_state *state = space->machine().driver_data<igs017_state>();
 	state->m_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset/4);
+	state->m_bg_tilemap->mark_tile_dirty(offset/4);
 }
 
 // 16-bit handlers for an 8-bit chip
@@ -204,8 +204,8 @@ static VIDEO_START( igs017 )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0xf);
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0xf);
+	state->m_fg_tilemap->set_transparent_pen(0xf);
+	state->m_bg_tilemap->set_transparent_pen(0xf);
 
 	state->m_toggle = 0;
 	state->m_debug_addr = 0;
@@ -368,11 +368,11 @@ static SCREEN_UPDATE_IND16( igs017 )
 	if (state->m_video_disable)
 		return 0;
 
-	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	if (layers_ctrl & 1)	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	if (layers_ctrl & 4)	draw_sprites(screen.machine(), bitmap, cliprect);
 
-	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	if (layers_ctrl & 2)	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -44,7 +44,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 	int code = state->m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
 	int color = (data >> 11) & 7;
 	SET_TILE_INFO(0, code, color, 0);
-	tileinfo->category = (~data >> 14) & 3;
+	tileinfo.category = (~data >> 14) & 3;
 }
 
 
@@ -107,7 +107,7 @@ VIDEO_START( atarisy2 )
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* reset the statics */
 	state->m_yscroll_reset_timer = machine.scheduler().timer_alloc(FUNC(reset_yscroll_callback));
@@ -139,13 +139,13 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
-	tilemap_set_scrollx(state->m_playfield_tilemap, 0, newscroll >> 6);
+	state->m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
 
 	/* update the playfield banking */
 	if (state->m_playfield_tile_bank[0] != (newscroll & 0x0f) * 0x400)
 	{
 		state->m_playfield_tile_bank[0] = (newscroll & 0x0f) * 0x400;
-		tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+		state->m_playfield_tilemap->mark_all_dirty();
 	}
 
 	/* update the data */
@@ -156,7 +156,7 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 static TIMER_CALLBACK( reset_yscroll_callback )
 {
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	tilemap_set_scrolly(state->m_playfield_tilemap, 0, param);
+	state->m_playfield_tilemap->set_scrolly(0, param);
 }
 
 
@@ -173,7 +173,7 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	if (!(newscroll & 0x10))
-		tilemap_set_scrolly(state->m_playfield_tilemap, 0, (newscroll >> 6) - space->machine().primary_screen->vpos());
+		state->m_playfield_tilemap->set_scrolly(0, (newscroll >> 6) - space->machine().primary_screen->vpos());
 	else
 		state->m_yscroll_reset_timer->adjust(space->machine().primary_screen->time_until_pos(0), newscroll >> 6);
 
@@ -181,7 +181,7 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 	if (state->m_playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
 	{
 		state->m_playfield_tile_bank[1] = (newscroll & 0x0f) * 0x400;
-		tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+		state->m_playfield_tilemap->mark_all_dirty();
 	}
 
 	/* update the data */
@@ -283,7 +283,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	if (offs < 0x0c00)
 	{
 		COMBINE_DATA(&state->m_alpha[offs]);
-		tilemap_mark_tile_dirty(state->m_alpha_tilemap, offs);
+		state->m_alpha_tilemap->mark_tile_dirty(offs);
 	}
 
 	/* spriteram? */
@@ -300,7 +300,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	{
 		offs -= 0x2000;
 		COMBINE_DATA(&state->m_playfield[offs]);
-		tilemap_mark_tile_dirty(state->m_playfield_tilemap, offs);
+		state->m_playfield_tilemap->mark_tile_dirty(offs);
 	}
 
 	/* generic case */
@@ -328,10 +328,10 @@ SCREEN_UPDATE_IND16( atarisy2 )
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 1);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 2);
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 3, 3);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 1, 1);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 2, 2);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 3, 3);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -364,6 +364,6 @@ SCREEN_UPDATE_IND16( atarisy2 )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

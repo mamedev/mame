@@ -365,21 +365,21 @@ static SCREEN_UPDATE_RGB32(cb2001)
 					scroll >>=8;
 				scroll &=0xff;
 
-				tilemap_set_scrolly(state->m_reel2_tilemap, i, scroll);
+				state->m_reel2_tilemap->set_scrolly(i, scroll);
 
 				scroll = state->m_vram_bg[0x800/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
-				tilemap_set_scrolly(state->m_reel1_tilemap, i, scroll);
+				state->m_reel1_tilemap->set_scrolly(i, scroll);
 
 				scroll = state->m_vram_bg[0xc00/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
-				tilemap_set_scrolly(state->m_reel3_tilemap, i, scroll);
+				state->m_reel3_tilemap->set_scrolly(i, scroll);
 
 			}
 
@@ -388,9 +388,9 @@ static SCREEN_UPDATE_RGB32(cb2001)
 			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
-			tilemap_draw(bitmap, visible1, state->m_reel1_tilemap, 0, 0);
-			tilemap_draw(bitmap, visible2, state->m_reel2_tilemap, 0, 0);
-			tilemap_draw(bitmap, visible3, state->m_reel3_tilemap, 0, 0);
+			state->m_reel1_tilemap->draw(bitmap, visible1, 0, 0);
+			state->m_reel2_tilemap->draw(bitmap, visible2, 0, 0);
+			state->m_reel3_tilemap->draw(bitmap, visible3, 0, 0);
 		}
 	}
 
@@ -518,9 +518,9 @@ static VIDEO_START(cb2001)
 	state->m_reel2_tilemap = tilemap_create(machine,get_cb2001_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 	state->m_reel3_tilemap = tilemap_create(machine,get_cb2001_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 
-	tilemap_set_scroll_cols(state->m_reel1_tilemap, 64);
-	tilemap_set_scroll_cols(state->m_reel2_tilemap, 64);
-	tilemap_set_scroll_cols(state->m_reel3_tilemap, 64);
+	state->m_reel1_tilemap->set_scroll_cols(64);
+	state->m_reel2_tilemap->set_scroll_cols(64);
+	state->m_reel3_tilemap->set_scroll_cols(64);
 }
 
 WRITE16_HANDLER( cb2001_bg_w )
@@ -532,24 +532,24 @@ WRITE16_HANDLER( cb2001_bg_w )
 /*
     if (offset<0x200/2)
     {
-        tilemap_mark_tile_dirty(state->m_reel1_tilemap,(offset&0xff)/2);
+        state->m_reel1_tilemap->mark_tile_dirty((offset&0xff)/2);
     }
     else if (offset<0x400/2)
     {
-        tilemap_mark_tile_dirty(state->m_reel2_tilemap,(offset&0xff)/2);
+        state->m_reel2_tilemap->mark_tile_dirty((offset&0xff)/2);
     }
     else if (offset<0x600/2)
     {
-        tilemap_mark_tile_dirty(state->m_reel3_tilemap,(offset&0xff)/2);
+        state->m_reel3_tilemap->mark_tile_dirty((offset&0xff)/2);
     }
     else if (offset<0x800/2)
     {
-    //  tilemap_mark_tile_dirty(reel4_tilemap,(offset&0xff)/2);
+    //  reel4_tilemap->mark_tile_dirty((offset&0xff)/2);
     }
 */
-	tilemap_mark_all_tiles_dirty (state->m_reel1_tilemap);
-	tilemap_mark_all_tiles_dirty (state->m_reel2_tilemap);
-	tilemap_mark_all_tiles_dirty (state->m_reel3_tilemap);
+	state->m_reel1_tilemap->mark_all_dirty();
+	state->m_reel2_tilemap->mark_all_dirty();
+	state->m_reel3_tilemap->mark_all_dirty();
 
 
 }

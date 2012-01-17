@@ -57,28 +57,28 @@ WRITE16_HANDLER( bg0_tilemap_w )
 {
 	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->m_bg0tilemap_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg0tilemap,offset/2);
+	state->m_bg0tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_HANDLER( bg1_tilemap_w )
 {
 	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->m_bg1tilemap_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg1tilemap,offset/2);
+	state->m_bg1tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_HANDLER( bg2_tilemap_w )
 {
 	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->m_bg2tilemap_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_bg2tilemap,offset/2);
+	state->m_bg2tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_HANDLER( fg_tilemap_w )
 {
 	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	COMBINE_DATA(&state->m_fgtilemap_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_txt_tilemap,offset/2);
+	state->m_txt_tilemap->mark_tile_dirty(offset/2);
 }
 
 
@@ -304,31 +304,31 @@ SCREEN_UPDATE_RGB32(tecmosys)
 	bitmap.fill(screen.machine().pens[0x4000], cliprect);
 
 
-	tilemap_set_scrolly( state->m_bg0tilemap, 0, state->m_c80000regs[1]+16);
-	tilemap_set_scrollx( state->m_bg0tilemap, 0, state->m_c80000regs[0]+104);
+	state->m_bg0tilemap->set_scrolly(0, state->m_c80000regs[1]+16);
+	state->m_bg0tilemap->set_scrollx(0, state->m_c80000regs[0]+104);
 
-	tilemap_set_scrolly( state->m_bg1tilemap, 0, state->m_a80000regs[1]+17);
-	tilemap_set_scrollx( state->m_bg1tilemap, 0, state->m_a80000regs[0]+106);
+	state->m_bg1tilemap->set_scrolly(0, state->m_a80000regs[1]+17);
+	state->m_bg1tilemap->set_scrollx(0, state->m_a80000regs[0]+106);
 
-	tilemap_set_scrolly( state->m_bg2tilemap, 0, state->m_b00000regs[1]+17);
-	tilemap_set_scrollx( state->m_bg2tilemap, 0, state->m_b00000regs[0]+106);
+	state->m_bg2tilemap->set_scrolly(0, state->m_b00000regs[1]+17);
+	state->m_bg2tilemap->set_scrollx(0, state->m_b00000regs[0]+106);
 
 	state->m_tmp_tilemap_composebitmap.fill(0, cliprect);
 
 	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg0tilemap,0,0);
+	state->m_bg0tilemap->draw(state->m_tmp_tilemap_renderbitmap, cliprect, 0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x0000);
 
 	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg1tilemap,0,0);
+	state->m_bg1tilemap->draw(state->m_tmp_tilemap_renderbitmap, cliprect, 0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x4000);
 
 	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_bg2tilemap,0,0);
+	state->m_bg2tilemap->draw(state->m_tmp_tilemap_renderbitmap, cliprect, 0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0x8000);
 
 	state->m_tmp_tilemap_renderbitmap.fill(0, cliprect);
-	tilemap_draw(state->m_tmp_tilemap_renderbitmap,cliprect,state->m_txt_tilemap,0,0);
+	state->m_txt_tilemap->draw(state->m_tmp_tilemap_renderbitmap, cliprect, 0,0);
 	tecmosys_tilemap_copy_to_compose(state, 0xc000);
 
 
@@ -354,14 +354,14 @@ VIDEO_START(tecmosys)
 
 
 	state->m_txt_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
-	tilemap_set_transparent_pen(state->m_txt_tilemap,0);
+	state->m_txt_tilemap->set_transparent_pen(0);
 
 	state->m_bg0tilemap = tilemap_create(machine, get_bg0tile_info,tilemap_scan_rows,16,16,32,32);
-	tilemap_set_transparent_pen(state->m_bg0tilemap,0);
+	state->m_bg0tilemap->set_transparent_pen(0);
 
 	state->m_bg1tilemap = tilemap_create(machine, get_bg1tile_info,tilemap_scan_rows,16,16,32,32);
-	tilemap_set_transparent_pen(state->m_bg1tilemap,0);
+	state->m_bg1tilemap->set_transparent_pen(0);
 
 	state->m_bg2tilemap = tilemap_create(machine, get_bg2tile_info,tilemap_scan_rows,16,16,32,32);
-	tilemap_set_transparent_pen(state->m_bg2tilemap,0);
+	state->m_bg2tilemap->set_transparent_pen(0);
 }

@@ -92,7 +92,7 @@ WRITE8_HANDLER( bankp_videoram_w )
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( bankp_colorram_w )
@@ -100,7 +100,7 @@ WRITE8_HANDLER( bankp_colorram_w )
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( bankp_videoram2_w )
@@ -108,7 +108,7 @@ WRITE8_HANDLER( bankp_videoram2_w )
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( bankp_colorram2_w )
@@ -116,7 +116,7 @@ WRITE8_HANDLER( bankp_colorram2_w )
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 
 	state->m_colorram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( bankp_out_w )
@@ -145,7 +145,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int flags = (state->m_colorram2[tile_index] & 0x08) ? TILE_FLIPX : 0;
 
 	SET_TILE_INFO(1, code, color, flags);
-	tileinfo->group = color;
+	tileinfo.group = color;
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -156,7 +156,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int flags = (state->m_colorram[tile_index] & 0x04) ? TILE_FLIPX : 0;
 
 	SET_TILE_INFO(0, code, color, flags);
-	tileinfo->group = color;
+	tileinfo.group = color;
 }
 
 VIDEO_START( bankp )
@@ -179,13 +179,13 @@ SCREEN_UPDATE_IND16( bankp )
 
 	if (flip_screen_get(screen.machine()))
 	{
-		tilemap_set_scrollx(state->m_fg_tilemap, 0, -state->m_scroll_x);
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
+		state->m_fg_tilemap->set_scrollx(0, -state->m_scroll_x);
+		state->m_bg_tilemap->set_scrollx(0, 0);
 	}
 	else
 	{
-		tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_scroll_x);
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
+		state->m_fg_tilemap->set_scrollx(0, state->m_scroll_x);
+		state->m_bg_tilemap->set_scrollx(0, 0);
 	}
 
 
@@ -193,20 +193,20 @@ SCREEN_UPDATE_IND16( bankp )
 	switch (state->m_priority)
 	{
 	case 0: // combat hawk uses this
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		break;
 	case 1:
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		break;
 	case 2:
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		break;
 	case 3:
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_OPAQUE, 0); // just a guess
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // just a guess
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		break;
 	}
 	return 0;

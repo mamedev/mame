@@ -306,9 +306,9 @@ WRITE8_HANDLER( m62_flipscreen_w )
 
 	state->m_flipscreen = data & 0x01;
 	if (state->m_flipscreen)
-		tilemap_set_flip_all(space->machine(), TILEMAP_FLIPX | TILEMAP_FLIPY);
+		space->machine().tilemap().set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
 	else
-		tilemap_set_flip_all(space->machine(), 0);
+		space->machine().tilemap().set_flip_all(0);
 
 	coin_counter_w(space->machine(), 0, data & 2);
 	coin_counter_w(space->machine(), 1, data & 4);
@@ -342,14 +342,14 @@ WRITE8_HANDLER( m62_tileram_w )
 {
 	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m_m62_tileram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset >> 1);
+	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE8_HANDLER( m62_textram_w )
 {
 	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m_m62_textram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset >> 1);
+	state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 
@@ -420,10 +420,10 @@ static void m62_start( running_machine &machine, tile_get_info_func tile_get_inf
 	register_savestate(machine);
 
 	if (rows != 0)
-		tilemap_set_scroll_rows(state->m_bg_tilemap, rows);
+		state->m_bg_tilemap->set_scroll_rows(rows);
 
 	if (cols != 0)
-		tilemap_set_scroll_cols(state->m_bg_tilemap, cols);
+		state->m_bg_tilemap->set_scroll_cols(cols);
 }
 
 static void m62_textlayer( running_machine &machine, tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
@@ -432,17 +432,17 @@ static void m62_textlayer( running_machine &machine, tile_get_info_func tile_get
 	state->m_fg_tilemap = tilemap_create(machine, tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2);
 
 	if (rows != 0)
-		tilemap_set_scroll_rows(state->m_fg_tilemap, rows);
+		state->m_fg_tilemap->set_scroll_rows(rows);
 
 	if (cols != 0)
-		tilemap_set_scroll_cols(state->m_fg_tilemap, cols);
+		state->m_fg_tilemap->set_scroll_cols(cols);
 }
 
 WRITE8_HANDLER( kungfum_tileram_w )
 {
 	m62_state *state = space->machine().driver_data<m62_state>();
 	state->m_m62_tileram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x7ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 static TILE_GET_INFO( get_kungfum_bg_tile_info )
@@ -462,9 +462,9 @@ static TILE_GET_INFO( get_kungfum_bg_tile_info )
 
 	/* is the following right? */
 	if ((tile_index / 64) < 6 || ((color & 0x1f) >> 1) > 0x0c)
-		tileinfo->category = 1;
+		tileinfo.category = 1;
 	else
-		tileinfo->category = 0;
+		tileinfo.category = 0;
 }
 
 VIDEO_START( kungfum )
@@ -478,15 +478,15 @@ SCREEN_UPDATE_IND16( kungfum )
 	int i;
 	for (i = 0; i < 6; i++)
 	{
-		tilemap_set_scrollx(state->m_bg_tilemap, i, 0);
+		state->m_bg_tilemap->set_scrollx(i, 0);
 	}
 	for (i = 6; i < 32; i++)
 	{
-		tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_m62_background_hscroll);
+		state->m_bg_tilemap->set_scrollx(i, state->m_m62_background_hscroll);
 	}
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	return 0;
 }
 
@@ -507,9 +507,9 @@ static TILE_GET_INFO( get_ldrun_bg_tile_info )
 	}
 	SET_TILE_INFO(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
 	if (((color & 0x1f) >> 1) >= 0x0c)
-		tileinfo->group = 1;
+		tileinfo.group = 1;
 	else
-		tileinfo->group = 0;
+		tileinfo.group = 0;
 }
 
 VIDEO_START( ldrun )
@@ -517,19 +517,19 @@ VIDEO_START( ldrun )
 	m62_state *state = machine.driver_data<m62_state>();
 
 	m62_start(machine, get_ldrun_bg_tile_info, 1, 1, 8, 8, 64, 32);
-	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 SCREEN_UPDATE_IND16( ldrun )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll);
+	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
+	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
 	return 0;
 }
@@ -549,17 +549,17 @@ static TILE_GET_INFO( get_ldrun2_bg_tile_info )
 	}
 	SET_TILE_INFO(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
 	if (((color & 0x1f) >> 1) >= 0x04)
-		tileinfo->group = 1;
+		tileinfo.group = 1;
 	else
-		tileinfo->group = 0;
+		tileinfo.group = 0;
 }
 
 VIDEO_START( ldrun2 )
 {
 	m62_state *state = machine.driver_data<m62_state>();
 	m62_start(machine, get_ldrun2_bg_tile_info, 1, 1, 8, 8, 64, 32);
-	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 
@@ -606,9 +606,9 @@ static TILE_GET_INFO( get_battroad_bg_tile_info )
 	}
 	SET_TILE_INFO(0, code | ((color & 0x40) << 3) | ((color & 0x10) << 4), color & 0x0f, flags);
 	if (((color & 0x1f) >> 1) >= 0x04)
-		tileinfo->group = 1;
+		tileinfo.group = 1;
 	else
-		tileinfo->group = 0;
+		tileinfo.group = 0;
 }
 
 static TILE_GET_INFO( get_battroad_fg_tile_info )
@@ -626,24 +626,24 @@ VIDEO_START( battroad )
 	m62_state *state = machine.driver_data<m62_state>();
 	m62_start(machine, get_battroad_bg_tile_info, 1, 1, 8, 8, 64, 32);
 	m62_textlayer(machine, get_battroad_fg_tile_info, 1, 1, 8, 8, 32, 32);
-	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 SCREEN_UPDATE_IND16( battroad )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, 128);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
+	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll);
+	state->m_fg_tilemap->set_scrollx(0, 128);
+	state->m_fg_tilemap->set_scrolly(0, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x00);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x0f, 0x10, 0x10);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -668,9 +668,9 @@ VIDEO_START( ldrun4 )
 SCREEN_UPDATE_IND16( ldrun4 )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll - 2);
+	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll - 2);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	return 0;
 }
@@ -711,14 +711,14 @@ VIDEO_START( lotlot )
 SCREEN_UPDATE_IND16( lotlot )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll - 64);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll + 32);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, -64);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, 32);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll - 64);
+	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll + 32);
+	state->m_fg_tilemap->set_scrollx(0, -64);
+	state->m_fg_tilemap->set_scrolly(0, 32);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
 	return 0;
 }
@@ -742,7 +742,7 @@ WRITE8_HANDLER( kidniki_background_bank_w )
 	if (state->m_kidniki_background_bank != (data & 1))
 	{
 		state->m_kidniki_background_bank = data & 1;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -754,7 +754,7 @@ static TILE_GET_INFO( get_kidniki_bg_tile_info )
 	code = state->m_m62_tileram[tile_index << 1];
 	color = state->m_m62_tileram[(tile_index << 1) | 1];
 	SET_TILE_INFO(0, code | ((color & 0xe0) << 3) | (state->m_kidniki_background_bank << 11), color & 0x1f, 0);
-	tileinfo->group = ((color & 0xe0) == 0xe0) ? 1 : 0;
+	tileinfo.group = ((color & 0xe0) == 0xe0) ? 1 : 0;
 }
 
 static TILE_GET_INFO( get_kidniki_fg_tile_info )
@@ -772,8 +772,8 @@ VIDEO_START( kidniki )
 	m62_state *state = machine.driver_data<m62_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_kidniki_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
-	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 
 	register_savestate(machine);
 
@@ -783,15 +783,15 @@ VIDEO_START( kidniki )
 SCREEN_UPDATE_IND16( kidniki )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, -64);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_kidniki_text_vscroll + 128);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
+	state->m_fg_tilemap->set_scrollx(0, -64);
+	state->m_fg_tilemap->set_scrolly(0, state->m_kidniki_text_vscroll + 128);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -802,8 +802,8 @@ WRITE8_HANDLER( spelunkr_palbank_w )
 	if (state->m_spelunkr_palbank != (data & 0x01))
 	{
 		state->m_spelunkr_palbank = data & 0x01;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
-		tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
+		state->m_fg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -837,15 +837,15 @@ VIDEO_START( spelunkr )
 SCREEN_UPDATE_IND16( spelunkr )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll + 128);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, -64);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
+	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll + 128);
+	state->m_fg_tilemap->set_scrollx(0, -64);
+	state->m_fg_tilemap->set_scrolly(0, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -858,8 +858,8 @@ WRITE8_HANDLER( spelunk2_gfxport_w )
 	if (state->m_spelunkr_palbank != ((data & 0x0c) >> 2))
 	{
 		state->m_spelunkr_palbank = (data & 0x0c) >> 2;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
-		tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
+		state->m_fg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -882,15 +882,15 @@ VIDEO_START( spelunk2 )
 SCREEN_UPDATE_IND16( spelunk2 )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll - 1);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_m62_background_vscroll + 128);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, -65);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll - 1);
+	state->m_bg_tilemap->set_scrolly(0, state->m_m62_background_vscroll + 128);
+	state->m_fg_tilemap->set_scrollx(0, -65);
+	state->m_fg_tilemap->set_scrolly(0, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -904,9 +904,9 @@ static TILE_GET_INFO( get_youjyudn_bg_tile_info )
 	color = state->m_m62_tileram[(tile_index << 1) | 1];
 	SET_TILE_INFO( 0, code | ((color & 0x60) << 3), color & 0x1f, 0);
 	if (((color & 0x1f) >> 1) >= 0x08)
-		tileinfo->group = 1;
+		tileinfo.group = 1;
 	else
-		tileinfo->group = 0;
+		tileinfo.group = 0;
 }
 
 static TILE_GET_INFO( get_youjyudn_fg_tile_info )
@@ -924,22 +924,22 @@ VIDEO_START( youjyudn )
 	m62_state *state = machine.driver_data<m62_state>();
 	m62_start(machine, get_youjyudn_bg_tile_info, 1, 0, 8, 16, 64, 16);
 	m62_textlayer(machine, get_youjyudn_fg_tile_info, 1, 1, 12, 8, 32, 32);
-	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 SCREEN_UPDATE_IND16( youjyudn )
 {
 	m62_state *state = screen.machine().driver_data<m62_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_m62_background_hscroll);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, -64);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_m62_background_hscroll);
+	state->m_fg_tilemap->set_scrollx(0, -64);
+	state->m_fg_tilemap->set_scrolly(0, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -960,17 +960,17 @@ static TILE_GET_INFO( get_horizon_bg_tile_info )
 	SET_TILE_INFO(0, code | ((color & 0xc0) << 2) | ((color & 0x20) << 5), color & 0x1f, 0);
 
 	if (((color & 0x1f) >> 1) >= 0x08)
-		tileinfo->group = 1;
+		tileinfo.group = 1;
 	else
-		tileinfo->group = 0;
+		tileinfo.group = 0;
 }
 
 VIDEO_START( horizon )
 {
 	m62_state *state = machine.driver_data<m62_state>();
 	m62_start(machine, get_horizon_bg_tile_info, 32, 0, 8, 8, 64, 32);
-	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
+	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
+	state->m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
 
 SCREEN_UPDATE_IND16( horizon )
@@ -979,10 +979,10 @@ SCREEN_UPDATE_IND16( horizon )
 	int i;
 	for (i = 0; i < 32; i++)
 	{
-		tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_scrollram[i << 1] | (state->m_scrollram[(i << 1) | 1] << 8));
+		state->m_bg_tilemap->set_scrollx(i, state->m_scrollram[i << 1] | (state->m_scrollram[(i << 1) | 1] << 8));
 	}
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x1f, 0x00, 0x00);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

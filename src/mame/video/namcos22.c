@@ -1821,8 +1821,8 @@ WRITE32_HANDLER( namcos22_textram_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	COMBINE_DATA( &state->m_textram[offset] );
-	tilemap_mark_tile_dirty( state->m_bgtilemap, offset*2 );
-	tilemap_mark_tile_dirty( state->m_bgtilemap, offset*2+1 );
+	state->m_bgtilemap->mark_tile_dirty(offset*2 );
+	state->m_bgtilemap->mark_tile_dirty(offset*2+1 );
 }
 
 READ32_HANDLER( namcos22_tilemapattr_r )
@@ -2096,18 +2096,18 @@ static void DrawCharacterLayer(running_machine &machine, bitmap_rgb32 &bitmap, c
 	int scroll_x = (state->m_tilemapattr[0]>>16) - 0x35c;
 	int scroll_y = state->m_tilemapattr[0]&0xffff;
 
-	tilemap_set_scrollx( state->m_bgtilemap,0, scroll_x & 0x3ff );
-	tilemap_set_scrolly( state->m_bgtilemap,0, scroll_y & 0x3ff );
-	tilemap_set_palette_offset( state->m_bgtilemap, mixer.palBase*256 );
+	state->m_bgtilemap->set_scrollx(0, scroll_x & 0x3ff );
+	state->m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff );
+	state->m_bgtilemap->set_palette_offset(mixer.palBase*256 );
 
 	if (state->m_mbSuperSystem22)
 	{
-		tilemap_draw_primask(*state->m_mix_bitmap, cliprect, state->m_bgtilemap, 0, 4, 4);
+		state->m_bgtilemap->draw(*state->m_mix_bitmap, cliprect, 0, 4, 4);
 		namcos22s_mix_textlayer(machine, bitmap, cliprect, 4);
 	}
 	else
 	{
-		tilemap_draw_primask(*state->m_mix_bitmap, cliprect, state->m_bgtilemap, 0, 2, 3);
+		state->m_bgtilemap->draw(*state->m_mix_bitmap, cliprect, 0, 2, 3);
 		namcos22_mix_textlayer(machine, bitmap, cliprect);
 	}
 }
@@ -2750,7 +2750,7 @@ static VIDEO_START( common )
 
 	state->m_mix_bitmap = auto_bitmap_ind16_alloc(machine,640,480);
 	state->m_bgtilemap = tilemap_create( machine, TextTilemapGetInfo,tilemap_scan_rows,16,16,64,64 );
-	tilemap_set_transparent_pen(state->m_bgtilemap, 0xf);
+	state->m_bgtilemap->set_transparent_pen(0xf);
 
 	state->m_mbDSPisActive = 0;
 	memset( state->m_polygonram, 0xcc, 0x20000 );

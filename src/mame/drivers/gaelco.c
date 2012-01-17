@@ -80,7 +80,7 @@ static WRITE16_HANDLER( gaelco_vram_encrypted_w )
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&state->m_videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_tilemap[offset >> 11], ((offset << 1) & 0x0fff) >> 2);
+	state->m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
 
@@ -103,7 +103,7 @@ static WRITE16_HANDLER( thoop_vram_encrypted_w )
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&state->m_videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_tilemap[offset >> 11], ((offset << 1) & 0x0fff) >> 2);
+	state->m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
 static WRITE16_HANDLER(thoop_encrypted_w)

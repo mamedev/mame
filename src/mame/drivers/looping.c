@@ -184,7 +184,7 @@ static VIDEO_START( looping )
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8,8, 32,32);
 
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 0x20);
+	state->m_bg_tilemap->set_scroll_cols(0x20);
 }
 
 
@@ -199,7 +199,7 @@ static WRITE8_HANDLER( flip_screen_x_w )
 {
 	looping_state *state = space->machine().driver_data<looping_state>();
 	flip_screen_x_set(space->machine(), ~data & 0x01);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(space->machine()) ? 128 : 0);
+	state->m_bg_tilemap->set_scrollx(0, flip_screen_get(space->machine()) ? 128 : 0);
 }
 
 
@@ -207,7 +207,7 @@ static WRITE8_HANDLER( flip_screen_y_w )
 {
 	looping_state *state = space->machine().driver_data<looping_state>();
 	flip_screen_y_set(space->machine(), ~data & 0x01);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, flip_screen_get(space->machine()) ? 128 : 0);
+	state->m_bg_tilemap->set_scrollx(0, flip_screen_get(space->machine()) ? 128 : 0);
 }
 
 
@@ -215,7 +215,7 @@ static WRITE8_HANDLER( looping_videoram_w )
 {
 	looping_state *state = space->machine().driver_data<looping_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -232,12 +232,12 @@ static WRITE8_HANDLER( looping_colorram_w )
 		/* mark the whole column dirty */
 		offs_t offs = (offset/2);
 		for (i = 0; i < 0x20; i++)
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, i * 0x20 + offs);
+			state->m_bg_tilemap->mark_tile_dirty(i * 0x20 + offs);
 	}
 
 	/* even bytes are column scroll */
 	else
-		tilemap_set_scrolly(state->m_bg_tilemap, offset/2, data);
+		state->m_bg_tilemap->set_scrolly(offset/2, data);
 }
 
 
@@ -282,7 +282,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static SCREEN_UPDATE_IND16( looping )
 {
 	looping_state *state = screen.machine().driver_data<looping_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

@@ -150,7 +150,7 @@ WRITE8_HANDLER( cloak_videoram_w )
 	UINT8 *videoram = state->m_videoram;
 
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( cloak_flipscreen_w )
@@ -233,7 +233,7 @@ SCREEN_UPDATE_IND16( cloak )
 {
 	cloak_state *state = screen.machine().driver_data<cloak_state>();
 	set_pens(screen.machine());
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_bitmap(screen.machine(), bitmap, cliprect);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-INLINE void m72_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
+INLINE void m72_get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
 {
 	int code,attr,color,pri;
 
@@ -28,10 +28,10 @@ INLINE void m72_get_tile_info(running_machine &machine,tile_data *tileinfo,int t
 			code + ((attr & 0x3f) << 8),
 			color & 0x0f,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
-	tileinfo->group = pri;
+	tileinfo.group = pri;
 }
 
-INLINE void rtype2_get_tile_info(running_machine &machine,tile_data *tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
+INLINE void rtype2_get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
 {
 	int code,attr,color,pri;
 
@@ -53,7 +53,7 @@ INLINE void rtype2_get_tile_info(running_machine &machine,tile_data *tileinfo,in
 			code,
 			color & 0x0f,
 			TILE_FLIPYX((color & 0x60) >> 5));
-	tileinfo->group = pri;
+	tileinfo.group = pri;
 }
 
 
@@ -122,22 +122,22 @@ VIDEO_START( m72 )
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
 
-	tilemap_set_transmask(state->m_fg_tilemap,0,0xffff,0x0001);
-	tilemap_set_transmask(state->m_fg_tilemap,1,0x00ff,0xff01);
-	tilemap_set_transmask(state->m_fg_tilemap,2,0x0001,0xffff);
+	state->m_fg_tilemap->set_transmask(0,0xffff,0x0001);
+	state->m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
+	state->m_fg_tilemap->set_transmask(2,0x0001,0xffff);
 
-	tilemap_set_transmask(state->m_bg_tilemap,0,0xffff,0x0000);
-	tilemap_set_transmask(state->m_bg_tilemap,1,0x00ff,0xff00);
-	//tilemap_set_transmask(state->m_bg_tilemap,2,0x0001,0xfffe);
-	tilemap_set_transmask(state->m_bg_tilemap,2,0x0007,0xfff8);
+	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000);
+	state->m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
+	//state->m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
+	state->m_bg_tilemap->set_transmask(2,0x0007,0xfff8);
 
 	memset(state->m_buffered_spriteram,0,state->m_spriteram_size);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap,0,0);
-	tilemap_set_scrolldy(state->m_fg_tilemap,-128,16);
+	state->m_fg_tilemap->set_scrolldx(0,0);
+	state->m_fg_tilemap->set_scrolldy(-128,16);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap,0,0);
-	tilemap_set_scrolldy(state->m_bg_tilemap,-128,16);
+	state->m_bg_tilemap->set_scrolldx(0,0);
+	state->m_bg_tilemap->set_scrolldy(-128,16);
 
 	register_savestate(machine);
 }
@@ -147,8 +147,8 @@ VIDEO_START( xmultipl )
 	m72_state *state = machine.driver_data<m72_state>();
 	VIDEO_START_CALL(m72);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap,4,0);
-	tilemap_set_scrolldx(state->m_bg_tilemap,6,0);
+	state->m_fg_tilemap->set_scrolldx(4,0);
+	state->m_bg_tilemap->set_scrolldx(6,0);
 }
 
 VIDEO_START( rtype2 )
@@ -159,21 +159,21 @@ VIDEO_START( rtype2 )
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
 
-	tilemap_set_transmask(state->m_fg_tilemap,0,0xffff,0x0001);
-	tilemap_set_transmask(state->m_fg_tilemap,1,0x00ff,0xff01);
-	tilemap_set_transmask(state->m_fg_tilemap,2,0x0001,0xffff);
+	state->m_fg_tilemap->set_transmask(0,0xffff,0x0001);
+	state->m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
+	state->m_fg_tilemap->set_transmask(2,0x0001,0xffff);
 
-	tilemap_set_transmask(state->m_bg_tilemap,0,0xffff,0x0000);
-	tilemap_set_transmask(state->m_bg_tilemap,1,0x00ff,0xff00);
-	tilemap_set_transmask(state->m_bg_tilemap,2,0x0001,0xfffe);
+	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000);
+	state->m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
+	state->m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 
 	memset(state->m_buffered_spriteram,0,state->m_spriteram_size);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap,4,0);
-	tilemap_set_scrolldy(state->m_fg_tilemap,-128,16);
+	state->m_fg_tilemap->set_scrolldx(4,0);
+	state->m_fg_tilemap->set_scrolldy(-128,16);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap,4,0);
-	tilemap_set_scrolldy(state->m_bg_tilemap,-128,16);
+	state->m_bg_tilemap->set_scrolldx(4,0);
+	state->m_bg_tilemap->set_scrolldy(-128,16);
 
 	register_savestate(machine);
 }
@@ -183,8 +183,8 @@ VIDEO_START( poundfor )
 	m72_state *state = machine.driver_data<m72_state>();
 	VIDEO_START_CALL(rtype2);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap,6,0);
-	tilemap_set_scrolldx(state->m_bg_tilemap,6,0);
+	state->m_fg_tilemap->set_scrolldx(6,0);
+	state->m_bg_tilemap->set_scrolldx(6,0);
 }
 
 VIDEO_START( hharryu )
@@ -192,8 +192,8 @@ VIDEO_START( hharryu )
 	m72_state *state = machine.driver_data<m72_state>();
 	VIDEO_START_CALL(rtype2);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap,4,0);
-	tilemap_set_scrolldx(state->m_bg_tilemap,6,0);
+	state->m_fg_tilemap->set_scrolldx(4,0);
+	state->m_bg_tilemap->set_scrolldx(6,0);
 }
 
 /* Major Title has a larger background RAM, and rowscroll */
@@ -208,21 +208,21 @@ VIDEO_START( majtitle )
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
 
-	tilemap_set_transmask(state->m_fg_tilemap,0,0xffff,0x0001);
-	tilemap_set_transmask(state->m_fg_tilemap,1,0x00ff,0xff01);
-	tilemap_set_transmask(state->m_fg_tilemap,2,0x0001,0xffff);
+	state->m_fg_tilemap->set_transmask(0,0xffff,0x0001);
+	state->m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
+	state->m_fg_tilemap->set_transmask(2,0x0001,0xffff);
 
-	tilemap_set_transmask(state->m_bg_tilemap,0,0xffff,0x0000);
-	tilemap_set_transmask(state->m_bg_tilemap,1,0x00ff,0xff00);
-	tilemap_set_transmask(state->m_bg_tilemap,2,0x0001,0xfffe);
+	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000);
+	state->m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
+	state->m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 
 	memset(state->m_buffered_spriteram,0,state->m_spriteram_size);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap,4,0);
-	tilemap_set_scrolldy(state->m_fg_tilemap,-128,16);
+	state->m_fg_tilemap->set_scrolldx(4,0);
+	state->m_fg_tilemap->set_scrolldy(-128,16);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap,4,0);
-	tilemap_set_scrolldy(state->m_bg_tilemap,-128,16);
+	state->m_bg_tilemap->set_scrolldx(4,0);
+	state->m_bg_tilemap->set_scrolldy(-128,16);
 
 	register_savestate(machine);
 }
@@ -235,21 +235,21 @@ VIDEO_START( hharry )
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
 
-	tilemap_set_transmask(state->m_fg_tilemap,0,0xffff,0x0001);
-	tilemap_set_transmask(state->m_fg_tilemap,1,0x00ff,0xff01);
-	tilemap_set_transmask(state->m_fg_tilemap,2,0x0001,0xffff);
+	state->m_fg_tilemap->set_transmask(0,0xffff,0x0001);
+	state->m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
+	state->m_fg_tilemap->set_transmask(2,0x0001,0xffff);
 
-	tilemap_set_transmask(state->m_bg_tilemap,0,0xffff,0x0000);
-	tilemap_set_transmask(state->m_bg_tilemap,1,0x00ff,0xff00);
-	tilemap_set_transmask(state->m_bg_tilemap,2,0x0001,0xfffe);
+	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000);
+	state->m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
+	state->m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 
 	memset(state->m_buffered_spriteram,0,state->m_spriteram_size);
 
-	tilemap_set_scrolldx(state->m_fg_tilemap,4,0);
-	tilemap_set_scrolldy(state->m_fg_tilemap,-128,16);
+	state->m_fg_tilemap->set_scrolldx(4,0);
+	state->m_fg_tilemap->set_scrolldy(-128,16);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap,6,0);
-	tilemap_set_scrolldy(state->m_bg_tilemap,-128,16);
+	state->m_bg_tilemap->set_scrolldx(6,0);
+	state->m_bg_tilemap->set_scrolldy(-128,16);
 
 	register_savestate(machine);
 }
@@ -314,14 +314,14 @@ WRITE16_HANDLER( m72_videoram1_w )
 {
 	m72_state *state = space->machine().driver_data<m72_state>();
 	COMBINE_DATA(&state->m_videoram1[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset/2);
+	state->m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_HANDLER( m72_videoram2_w )
 {
 	m72_state *state = space->machine().driver_data<m72_state>();
 	COMBINE_DATA(&state->m_videoram2[offset]);
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset/2);
+	state->m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_HANDLER( m72_irq_line_w )
@@ -544,17 +544,17 @@ SCREEN_UPDATE_IND16( m72 )
 		return 0;
 	}
 
-	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scrollx1);
-	tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_scrolly1);
+	state->m_fg_tilemap->set_scrollx(0,state->m_scrollx1);
+	state->m_fg_tilemap->set_scrolly(0,state->m_scrolly1);
 
-	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_scrollx2);
-	tilemap_set_scrolly(state->m_bg_tilemap,0,state->m_scrolly2);
+	state->m_bg_tilemap->set_scrollx(0,state->m_scrollx2);
+	state->m_bg_tilemap->set_scrolly(0,state->m_scrolly2);
 
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	m72_draw_sprites(screen.machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_LAYER0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,TILEMAP_DRAW_LAYER0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }
 
@@ -570,28 +570,28 @@ SCREEN_UPDATE_IND16( majtitle )
 		return 0;
 	}
 
-	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_scrollx1);
-	tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_scrolly1);
+	state->m_fg_tilemap->set_scrollx(0,state->m_scrollx1);
+	state->m_fg_tilemap->set_scrolly(0,state->m_scrolly1);
 
 	if (state->m_majtitle_rowscroll)
 	{
-		tilemap_set_scroll_rows(state->m_bg_tilemap,512);
+		state->m_bg_tilemap->set_scroll_rows(512);
 		for (i = 0;i < 512;i++)
-			tilemap_set_scrollx(state->m_bg_tilemap,(i+state->m_scrolly2)&0x1ff,
+			state->m_bg_tilemap->set_scrollx((i+state->m_scrolly2)&0x1ff,
 					256 + state->m_majtitle_rowscrollram[i]);
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->m_bg_tilemap,1);
-		tilemap_set_scrollx(state->m_bg_tilemap,0,256 + state->m_scrollx2);
+		state->m_bg_tilemap->set_scroll_rows(1);
+		state->m_bg_tilemap->set_scrollx(0,256 + state->m_scrollx2);
 	}
-	tilemap_set_scrolly(state->m_bg_tilemap,0,state->m_scrolly2);
+	state->m_bg_tilemap->set_scrolly(0,state->m_scrolly2);
 
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	majtitle_draw_sprites(screen.machine(), bitmap,cliprect);
 	m72_draw_sprites(screen.machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_LAYER0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,TILEMAP_DRAW_LAYER0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }

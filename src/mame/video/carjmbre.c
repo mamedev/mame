@@ -47,7 +47,7 @@ WRITE8_HANDLER( carjmbre_flipscreen_w )
 	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
 	state->m_flipscreen = (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-	tilemap_set_flip_all(space->machine(), state->m_flipscreen);
+	space->machine().tilemap().set_flip_all(state->m_flipscreen);
 }
 
 WRITE8_HANDLER( carjmbre_bgcolor_w )
@@ -80,7 +80,7 @@ WRITE8_HANDLER( carjmbre_videoram_w )
 	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_cj_tilemap, offset & 0x3ff);
+	state->m_cj_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -119,7 +119,7 @@ SCREEN_UPDATE_IND16( carjmbre )
 	//-xxx---- unused
 	//----xxxx colour
 
-	tilemap_draw(bitmap, cliprect, state->m_cj_tilemap, 0, 0);
+	state->m_cj_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	//spriteram[offs]
 	//+0       y pos

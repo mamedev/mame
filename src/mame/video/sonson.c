@@ -98,14 +98,14 @@ WRITE8_HANDLER( sonson_videoram_w )
 {
 	sonson_state *state = space->machine().driver_data<sonson_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( sonson_colorram_w )
 {
 	sonson_state *state = space->machine().driver_data<sonson_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( sonson_scrollx_w )
@@ -114,7 +114,7 @@ WRITE8_HANDLER( sonson_scrollx_w )
 	int row;
 
 	for (row = 5; row < 32; row++)
-		tilemap_set_scrollx(state->m_bg_tilemap, row, data);
+		state->m_bg_tilemap->set_scrollx(row, data);
 }
 
 WRITE8_HANDLER( sonson_flipscreen_w )
@@ -137,7 +137,7 @@ VIDEO_START( sonson )
 	sonson_state *state = machine.driver_data<sonson_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_scroll_rows(32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -178,7 +178,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 SCREEN_UPDATE_IND16( sonson )
 {
 	sonson_state *state = screen.machine().driver_data<sonson_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

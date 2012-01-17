@@ -44,7 +44,7 @@ static WRITE8_HANDLER( hitme_vidram_w )
 
 	/* mark this tile dirty */
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -84,7 +84,7 @@ static SCREEN_UPDATE_IND16( hitme )
 	offs_t offs = 0;
 
 	/* start by drawing the tilemap */
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* now loop over and invert anything */
 	for (y = 0; y < 19; y++)
@@ -120,7 +120,7 @@ static SCREEN_UPDATE_IND16( hitme )
 static SCREEN_UPDATE_IND16( barricad )
 {
 	hitme_state *state = screen.machine().driver_data<hitme_state>();
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

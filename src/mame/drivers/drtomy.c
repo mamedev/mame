@@ -120,15 +120,15 @@ static VIDEO_START( drtomy )
 	state->m_tilemap_bg = tilemap_create(machine, get_tile_info_bg, tilemap_scan_rows, 16, 16, 32, 32);
 	state->m_tilemap_fg = tilemap_create(machine, get_tile_info_fg, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_tilemap_fg, 0);
+	state->m_tilemap_fg->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16( drtomy )
 {
 	drtomy_state *state = screen.machine().driver_data<drtomy_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap_bg, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap_fg, 0, 0);
+	state->m_tilemap_bg->draw(bitmap, cliprect, 0, 0);
+	state->m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -137,14 +137,14 @@ static WRITE16_HANDLER( drtomy_vram_fg_w )
 {
 	drtomy_state *state = space->machine().driver_data<drtomy_state>();
 	COMBINE_DATA(&state->m_videoram_fg[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_fg, offset);
+	state->m_tilemap_fg->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER( drtomy_vram_bg_w )
 {
 	drtomy_state *state = space->machine().driver_data<drtomy_state>();
 	COMBINE_DATA(&state->m_videoram_bg[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_bg, offset);
+	state->m_tilemap_bg->mark_tile_dirty(offset);
 }
 
 static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )

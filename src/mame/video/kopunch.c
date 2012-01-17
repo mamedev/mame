@@ -36,26 +36,26 @@ WRITE8_HANDLER( kopunch_videoram_w )
 {
 	kopunch_state *state = space->machine().driver_data<kopunch_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( kopunch_videoram2_w )
 {
 	kopunch_state *state = space->machine().driver_data<kopunch_state>();
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( kopunch_scroll_x_w )
 {
 	kopunch_state *state = space->machine().driver_data<kopunch_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrollx(0, data);
 }
 
 WRITE8_HANDLER( kopunch_scroll_y_w )
 {
 	kopunch_state *state = space->machine().driver_data<kopunch_state>();
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrolly(0, data);
 }
 
 WRITE8_HANDLER( kopunch_gfxbank_w )
@@ -64,10 +64,10 @@ WRITE8_HANDLER( kopunch_gfxbank_w )
 	if (state->m_gfxbank != (data & 0x07))
 	{
 		state->m_gfxbank = data & 0x07;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
-	tilemap_set_flip(state->m_bg_tilemap, (data & 0x08) ? TILEMAP_FLIPY : 0);
+	state->m_bg_tilemap->set_flip((data & 0x08) ? TILEMAP_FLIPY : 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -92,17 +92,17 @@ VIDEO_START( kopunch )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8,  8, 32, 32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap, 16, 16);
+	state->m_bg_tilemap->set_scrolldx(16, 16);
 }
 
 SCREEN_UPDATE_IND16( kopunch )
 {
 	kopunch_state *state = screen.machine().driver_data<kopunch_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -149,7 +149,7 @@ VIDEO_START( digdug )
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan,     8,8,36,28);
 	state->m_fg_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan,8,8,36,28);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->save_item(NAME(state->m_bg_select));
 	state->save_item(NAME(state->m_tx_color_mode));
@@ -170,7 +170,7 @@ WRITE8_HANDLER( digdug_videoram_w )
 	digdug_state *state =  space->machine().driver_data<digdug_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x3ff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( digdug_PORT_w )
@@ -188,7 +188,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 				if ((state->m_bg_select & mask) != ((data & 1) << shift))
 				{
 					state->m_bg_select = (state->m_bg_select & ~mask) | ((data & 1) << shift);
-					tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+					state->m_bg_tilemap->mark_all_dirty();
 				}
 			}
 			break;
@@ -197,7 +197,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 			if (state->m_tx_color_mode != (data & 1))
 			{
 				state->m_tx_color_mode = data & 1;
-				tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+				state->m_fg_tilemap->mark_all_dirty();
 			}
 			break;
 
@@ -205,7 +205,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 			if (state->m_bg_disable != (data & 1))
 			{
 				state->m_bg_disable = data & 1;
-				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+				state->m_bg_tilemap->mark_all_dirty();
 			}
 			break;
 
@@ -218,7 +218,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 				if ((state->m_bg_color_bank & mask) != ((data & 1) << shift))
 				{
 					state->m_bg_color_bank = (state->m_bg_color_bank & ~mask) | ((data & 1) << shift);
-					tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+					state->m_bg_tilemap->mark_all_dirty();
 				}
 			}
 			break;
@@ -314,8 +314,8 @@ SCREEN_UPDATE_IND16( digdug )
 {
 	digdug_state *state =  screen.machine().driver_data<digdug_state>();
 
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	return 0;
 }

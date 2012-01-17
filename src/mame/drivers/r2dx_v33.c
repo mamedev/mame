@@ -173,23 +173,23 @@ static VIDEO_START( rdx_v33 )
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,16,16,32,32);
 	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,8, 8, 64,32);
 
-	tilemap_set_transparent_pen(bg_tilemap, 15);
-	tilemap_set_transparent_pen(md_tilemap, 15);
-	tilemap_set_transparent_pen(fg_tilemap, 15);
-	tilemap_set_transparent_pen(tx_tilemap, 15);
+	bg_tilemap->set_transparent_pen(15);
+	md_tilemap->set_transparent_pen(15);
+	fg_tilemap->set_transparent_pen(15);
+	tx_tilemap->set_transparent_pen(15);
 }
 
 static SCREEN_UPDATE_IND16( rdx_v33 )
 {
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, md_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	md_tilemap->draw(bitmap, cliprect, 0, 0);
+	fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(),bitmap,cliprect,0);
 
-	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
+	tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* debug DMA processing */
 	if(0)
@@ -223,7 +223,7 @@ static SCREEN_UPDATE_IND16( rdx_v33 )
 			}
 
 			popmessage("%08x 1",src_addr);
-			tilemap_mark_all_tiles_dirty(bg_tilemap);
+			bg_tilemap->mark_all_dirty();
 			frame = 0;
 			src_addr+=0x800;
 		}
@@ -288,25 +288,25 @@ WRITE16_HANDLER( mcu_prog_offs_w )
 static WRITE16_HANDLER( rdx_bg_vram_w )
 {
 	COMBINE_DATA(&bg_vram[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER( rdx_md_vram_w )
 {
 	COMBINE_DATA(&md_vram[offset]);
-	tilemap_mark_tile_dirty(md_tilemap, offset);
+	md_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER( rdx_fg_vram_w )
 {
 	COMBINE_DATA(&fg_vram[offset]);
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_HANDLER( rdx_tx_vram_w )
 {
 	COMBINE_DATA(&tx_vram[offset]);
-	tilemap_mark_tile_dirty(tx_tilemap, offset);
+	tx_tilemap->mark_tile_dirty(offset);
 }
 
 static READ16_HANDLER( rdx_v33_unknown_r )

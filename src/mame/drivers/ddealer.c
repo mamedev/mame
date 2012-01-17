@@ -252,9 +252,9 @@ static void ddealer_draw_video_layer( running_machine &machine, UINT16* vreg_bas
 static SCREEN_UPDATE_IND16( ddealer )
 {
 	ddealer_state *state = screen.machine().driver_data<ddealer_state>();
-	tilemap_set_scrollx(state->m_back_tilemap, 0, state->m_flipscreen ? -192 : -64);
-	tilemap_set_flip(state->m_back_tilemap, state->m_flipscreen ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
-	tilemap_draw(bitmap, cliprect, state->m_back_tilemap, 0, 0);
+	state->m_back_tilemap->set_scrollx(0, state->m_flipscreen ? -192 : -64);
+	state->m_back_tilemap->set_flip(state->m_flipscreen ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
+	state->m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* the fg tilemap handling is a little hacky right now,
        i'm not sure if it should be a single tilemap with
@@ -362,7 +362,7 @@ static WRITE16_HANDLER( back_vram_w )
 {
 	ddealer_state *state = space->machine().driver_data<ddealer_state>();
 	COMBINE_DATA(&state->m_back_vram[offset]);
-	tilemap_mark_tile_dirty(state->m_back_tilemap, offset);
+	state->m_back_tilemap->mark_tile_dirty(offset);
 }
 
 

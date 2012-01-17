@@ -11,19 +11,19 @@ INLINE void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_
 		if (map != NULL) switch (offset)
 		{
 		case 0:	/* Low byte of x scroll - scroll tilemap */
-			tilemap_set_scrollx(map, 0, data);
+			map->set_scrollx(0, data);
 			break;
 		case 1:	/* High byte of x scroll - mark tilemap dirty so new tile gfx will be loaded */
-			tilemap_mark_all_tiles_dirty(map);
+			map->mark_all_dirty();
 			break;
 		case 3:	/* Low byte of y scroll */
 		case 4:	/* High byte of y scroll */
-			tilemap_set_scrolly(map, 0, (int)scroll[3] | ((int)scroll[4] << 8));
+			map->set_scrolly(0, (int)scroll[3] | ((int)scroll[4] << 8));
 			break;
 		case 6:	/* Tilemap enable and mode control */
-			tilemap_set_enable(map, !(data & 0x10));
+			map->enable(!(data & 0x10));
 			if ((data & 0x20) != (old & 0x20))	// This sets the tilemap data format
-				tilemap_mark_all_tiles_dirty(map);
+				map->mark_all_dirty();
 			break;
 		default:	/* Other addresses are used but function is unknown */
 			/* 0x05 and 0x07 are initialised on startup */
@@ -102,9 +102,9 @@ WRITE8_HANDLER( dooyong_txvideoram8_w )
 	{
 		state->m_txvideoram[offset] = data;
 		if (state->m_tx_tilemap_mode == 0)
-			tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x07ff);
+			state->m_tx_tilemap->mark_tile_dirty(offset & 0x07ff);
 		else
-			tilemap_mark_tile_dirty(state->m_tx_tilemap, offset >> 1);
+			state->m_tx_tilemap->mark_tile_dirty(offset >> 1);
 	}
 }
 
@@ -213,7 +213,7 @@ WRITE16_HANDLER( rshark_ctrl_w )
    when the x scroll moves out of range (trying to decode the whole lot
    at once uses hundreds of megabytes of RAM). */
 
-INLINE void lastday_get_tile_info(running_machine &machine, tile_data *tileinfo, int tile_index,
+INLINE void lastday_get_tile_info(running_machine &machine, tile_data &tileinfo, int tile_index,
 		const UINT8 *tilerom, UINT8 *scroll, int graphics)
 {
 	int offs = (tile_index + ((int)scroll[1] << 6)) * 2;
@@ -251,7 +251,7 @@ INLINE void lastday_get_tile_info(running_machine &machine, tile_data *tileinfo,
 	SET_TILE_INFO(graphics, code, color, flags);
 }
 
-INLINE void rshark_get_tile_info(running_machine &machine, tile_data *tileinfo, int tile_index,
+INLINE void rshark_get_tile_info(running_machine &machine, tile_data &tileinfo, int tile_index,
 		const UINT8 *tilerom1, const UINT8 *tilerom2, UINT8 *scroll, int graphics)
 {
 		/* Tiles take two bytes in tile ROM 1:
@@ -518,9 +518,9 @@ SCREEN_UPDATE_IND16( lastday )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	if (!state->m_sprites_disabled)
 		draw_sprites(screen.machine(), bitmap, cliprect, 0);
@@ -533,9 +533,9 @@ SCREEN_UPDATE_IND16( gulfstrm )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 1);
 	return 0;
@@ -547,9 +547,9 @@ SCREEN_UPDATE_IND16( pollux )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 2);
 	return 0;
@@ -563,15 +563,15 @@ SCREEN_UPDATE_IND16( flytiger )
 
 	if (state->m_flytiger_pri)
 	{
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 1);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 2);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 2);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	}
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 4);
 	return 0;
@@ -584,10 +584,10 @@ SCREEN_UPDATE_IND16( bluehawk )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
-	tilemap_draw(bitmap, cliprect, state->m_fg2_tilemap, 0, 4);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	state->m_fg2_tilemap->draw(bitmap, cliprect, 0, 4);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect, 3);
 	return 0;
@@ -598,10 +598,10 @@ SCREEN_UPDATE_IND16( primella )
 	dooyong_state *state = screen.machine().driver_data<dooyong_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	if (state->m_tx_pri) tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-	if (!state->m_tx_pri) tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (state->m_tx_pri) state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (!state->m_tx_pri) state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -611,10 +611,10 @@ SCREEN_UPDATE_IND16( rshark )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, (state->m_rshark_pri ? 2 : 1));
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
-	tilemap_draw(bitmap, cliprect, state->m_fg2_tilemap, 0, 2);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, (state->m_rshark_pri ? 2 : 1));
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	state->m_fg2_tilemap->draw(bitmap, cliprect, 0, 2);
 
 	rshark_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -626,7 +626,7 @@ SCREEN_UPDATE_IND16( popbingo )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	rshark_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
@@ -654,11 +654,11 @@ VIDEO_START( lastday )
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	/* Text layer is offset on this machine */
-	tilemap_set_scrolly(state->m_tx_tilemap, 0, 8);
+	state->m_tx_tilemap->set_scrolly(0, 8);
 
 	memset(state->m_bgscroll8, 0, 0x10);
 	memset(state->m_bg2scroll8, 0, 0x10);
@@ -694,11 +694,11 @@ VIDEO_START( gulfstrm )
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	/* Text layer is offset on this machine */
-	tilemap_set_scrolly(state->m_tx_tilemap, 0, 8);
+	state->m_tx_tilemap->set_scrolly(0, 8);
 
 	memset(state->m_bgscroll8, 0, 0x10);
 	memset(state->m_bg2scroll8, 0, 0x10);
@@ -733,8 +733,8 @@ VIDEO_START( pollux )
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	memset(state->m_bgscroll8, 0, 0x10);
 	memset(state->m_bg2scroll8, 0, 0x10);
@@ -774,9 +774,9 @@ VIDEO_START( bluehawk )
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_fg2_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_fg2_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	memset(state->m_bgscroll8, 0, 0x10);
 	memset(state->m_bg2scroll8, 0, 0x10);
@@ -810,9 +810,9 @@ VIDEO_START( flytiger )
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_bg_tilemap->set_transparent_pen(15);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	memset(state->m_bgscroll8, 0, 0x10);
 	memset(state->m_bg2scroll8, 0, 0x10);
@@ -846,8 +846,8 @@ VIDEO_START( primella )
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 15);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 
 	memset(state->m_bgscroll8, 0, 0x10);
 	memset(state->m_bg2scroll8, 0, 0x10);
@@ -888,9 +888,9 @@ VIDEO_START( rshark )
 		 16, 16, 64, 32);
 
 	/* Configure tilemap transparency */
-	tilemap_set_transparent_pen(state->m_bg2_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
-	tilemap_set_transparent_pen(state->m_fg2_tilemap, 15);
+	state->m_bg2_tilemap->set_transparent_pen(15);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_fg2_tilemap->set_transparent_pen(15);
 
 	memset(state->m_bgscroll8, 0, 0x10);
 	memset(state->m_bg2scroll8, 0, 0x10);

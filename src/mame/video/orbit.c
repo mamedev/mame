@@ -11,7 +11,7 @@ WRITE8_HANDLER( orbit_playfield_w )
 {
 	orbit_state *state = space->machine().driver_data<orbit_state>();
 	state->m_playfield_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -85,7 +85,7 @@ SCREEN_UPDATE_IND16( orbit )
 
 	state->m_flip_screen = input_port_read(screen.machine(), "DSW2") & 8;
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

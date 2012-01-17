@@ -400,7 +400,7 @@ static TILE_GET_INFO( cclimber_get_bs_tile_info )
 	int code, color;
 
 	/* only the lower right is visible */
-	tileinfo->group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
+	tileinfo.group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
 
 	/* the address doesn't use A4 of the coordinates, giving a 16x16 map */
 	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
@@ -418,7 +418,7 @@ static TILE_GET_INFO( toprollr_get_bs_tile_info )
 	int code, color;
 
 	/* only the lower right is visible */
-	tileinfo->group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
+	tileinfo.group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
 
 	/* the address doesn't use A4 of the coordinates, giving a 16x16 map */
 	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
@@ -444,14 +444,14 @@ VIDEO_START( cclimber )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
 	state->m_pf_tilemap = tilemap_create(machine, cclimber_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_pf_tilemap, 0);
-	tilemap_set_scroll_cols(state->m_pf_tilemap, 32);
+	state->m_pf_tilemap->set_transparent_pen(0);
+	state->m_pf_tilemap->set_scroll_cols(32);
 
 	state->m_bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_cols(state->m_bs_tilemap, 1);
-	tilemap_set_scroll_rows(state->m_bs_tilemap, 1);
-	tilemap_set_transmask(state->m_bs_tilemap, 0, 0x01, 0);	/* pen 0 is transaprent */
-	tilemap_set_transmask(state->m_bs_tilemap, 1, 0x0f, 0);  /* all 4 pens are transparent */
+	state->m_bs_tilemap->set_scroll_cols(1);
+	state->m_bs_tilemap->set_scroll_rows(1);
+	state->m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
+	state->m_bs_tilemap->set_transmask(1, 0x0f, 0);  /* all 4 pens are transparent */
 }
 
 
@@ -459,14 +459,14 @@ VIDEO_START( swimmer )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
 	state->m_pf_tilemap = tilemap_create(machine, swimmer_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_pf_tilemap, 0);
-	tilemap_set_scroll_cols(state->m_pf_tilemap, 32);
+	state->m_pf_tilemap->set_transparent_pen(0);
+	state->m_pf_tilemap->set_scroll_cols(32);
 
 	state->m_bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_cols(state->m_bs_tilemap, 1);
-	tilemap_set_scroll_rows(state->m_bs_tilemap, 1);
-	tilemap_set_transmask(state->m_bs_tilemap, 0, 0x01, 0);	/* pen 0 is transaprent */
-	tilemap_set_transmask(state->m_bs_tilemap, 1, 0xff, 0);  /* all 8 pens are transparent */
+	state->m_bs_tilemap->set_scroll_cols(1);
+	state->m_bs_tilemap->set_scroll_rows(1);
+	state->m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
+	state->m_bs_tilemap->set_transmask(1, 0xff, 0);  /* all 8 pens are transparent */
 }
 
 
@@ -474,16 +474,16 @@ VIDEO_START( toprollr )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
 	state->m_pf_tilemap = tilemap_create(machine, toprollr_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_pf_tilemap, 0);
+	state->m_pf_tilemap->set_transparent_pen(0);
 
 	state->m_toproller_bg_tilemap = tilemap_create(machine, toproller_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_rows(state->m_toproller_bg_tilemap, 1);
+	state->m_toproller_bg_tilemap->set_scroll_rows(1);
 
 	state->m_bs_tilemap = tilemap_create(machine, toprollr_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_cols(state->m_bs_tilemap, 1);
-	tilemap_set_scroll_rows(state->m_bs_tilemap, 1);
-	tilemap_set_transmask(state->m_bs_tilemap, 0, 0x01, 0);	/* pen 0 is transaprent */
-	tilemap_set_transmask(state->m_bs_tilemap, 1, 0x0f, 0);  /* all 4 pens are transparent */
+	state->m_bs_tilemap->set_scroll_cols(1);
+	state->m_bs_tilemap->set_scroll_rows(1);
+	state->m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
+	state->m_bs_tilemap->set_transmask(1, 0x0f, 0);  /* all 4 pens are transparent */
 }
 
 
@@ -492,13 +492,13 @@ static void draw_playfield(running_machine &machine, bitmap_ind16 &bitmap, const
 	cclimber_state *state = machine.driver_data<cclimber_state>();
 	int i;
 
-	tilemap_mark_all_tiles_dirty(state->m_pf_tilemap);
-	tilemap_set_flip(state->m_pf_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
+	state->m_pf_tilemap->mark_all_dirty();
+	state->m_pf_tilemap->set_flip((CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
 								 (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
 	for (i = 0; i < 32; i++)
-		tilemap_set_scrolly(state->m_pf_tilemap, i, state->m_column_scroll[i]);
+		state->m_pf_tilemap->set_scrolly(i, state->m_column_scroll[i]);
 
-	tilemap_draw(bitmap, cliprect, state->m_pf_tilemap, 0, 0);
+	state->m_pf_tilemap->draw(bitmap, cliprect, 0, 0);
 }
 
 
@@ -516,15 +516,15 @@ static void cclimber_draw_bigsprite(running_machine &machine, bitmap_ind16 &bitm
 	if (bigsprite_flip_y)
 		y = 0x80 - y;
 
-	tilemap_mark_all_tiles_dirty(state->m_bs_tilemap);
+	state->m_bs_tilemap->mark_all_dirty();
 
-	tilemap_set_flip(state->m_bs_tilemap, (bigsprite_flip_x ? TILEMAP_FLIPX : 0) |
+	state->m_bs_tilemap->set_flip((bigsprite_flip_x ? TILEMAP_FLIPX : 0) |
 								 (CCLIMBER_FLIP_Y ^ bigsprite_flip_y ? TILEMAP_FLIPY : 0));
 
-	tilemap_set_scrollx(state->m_bs_tilemap, 0, x);
-	tilemap_set_scrolly(state->m_bs_tilemap, 0, y);
+	state->m_bs_tilemap->set_scrollx(0, x);
+	state->m_bs_tilemap->set_scrolly(0, y);
 
-	tilemap_draw(bitmap, cliprect, state->m_bs_tilemap, 0, 0);
+	state->m_bs_tilemap->draw(bitmap, cliprect, 0, 0);
 }
 
 
@@ -534,14 +534,14 @@ static void toprollr_draw_bigsprite(running_machine &machine, bitmap_ind16 &bitm
 	UINT8 x = state->m_bigsprite_control[3] - 8;
 	UINT8 y = state->m_bigsprite_control[2];
 
-	tilemap_mark_all_tiles_dirty(state->m_bs_tilemap);
+	state->m_bs_tilemap->mark_all_dirty();
 
-	tilemap_set_flip(state->m_bs_tilemap, CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0);
+	state->m_bs_tilemap->set_flip(CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0);
 
-	tilemap_set_scrollx(state->m_bs_tilemap, 0, x);
-	tilemap_set_scrolly(state->m_bs_tilemap, 0, y);
+	state->m_bs_tilemap->set_scrollx(0, x);
+	state->m_bs_tilemap->set_scrolly(0, y);
 
-	tilemap_draw(bitmap, cliprect, state->m_bs_tilemap, 0, 0);
+	state->m_bs_tilemap->draw(bitmap, cliprect, 0, 0);
 }
 
 
@@ -783,11 +783,11 @@ SCREEN_UPDATE_IND16( toprollr )
 
 	bitmap.fill(CCLIMBER_BG_PEN, cliprect);
 
-	tilemap_set_scrollx(state->m_toproller_bg_tilemap, 0, state->m_toprollr_bg_videoram[0]);
-	tilemap_set_flip(state->m_toproller_bg_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
+	state->m_toproller_bg_tilemap->set_scrollx(0, state->m_toprollr_bg_videoram[0]);
+	state->m_toproller_bg_tilemap->set_flip((CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
 										   (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
-	tilemap_mark_all_tiles_dirty(state->m_toproller_bg_tilemap);
-	tilemap_draw(bitmap, scroll_area_clip, state->m_toproller_bg_tilemap, 0, 0);
+	state->m_toproller_bg_tilemap->mark_all_dirty();
+	state->m_toproller_bg_tilemap->draw(bitmap, scroll_area_clip, 0, 0);
 
 	/* draw the "big sprite" over the regular sprites */
 	if ((state->m_bigsprite_control[1] & 0x20))
@@ -803,10 +803,10 @@ SCREEN_UPDATE_IND16( toprollr )
 		toprollr_draw_sprites(bitmap, scroll_area_clip, screen.machine().gfx[1]);
 	}
 
-	tilemap_mark_all_tiles_dirty(state->m_pf_tilemap);
-	tilemap_set_flip(state->m_pf_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
+	state->m_pf_tilemap->mark_all_dirty();
+	state->m_pf_tilemap->set_flip((CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
 								 (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
-	tilemap_draw(bitmap, cliprect, state->m_pf_tilemap, 0, 0);
+	state->m_pf_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

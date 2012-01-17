@@ -116,7 +116,7 @@ WRITE8_HANDLER( madalien_videoram_w )
 {
 	madalien_state *state = space->machine().driver_data<madalien_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap_fg, offset);
+	state->m_tilemap_fg->mark_tile_dirty(offset);
 }
 
 
@@ -136,19 +136,19 @@ static VIDEO_START( madalien )
 	};
 
 	state->m_tilemap_fg = tilemap_create(machine, get_tile_info_FG, tilemap_scan_cols_flip_x, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_tilemap_fg, 0);
-	tilemap_set_scrolldx(state->m_tilemap_fg, 0, 0x50);
-	tilemap_set_scrolldy(state->m_tilemap_fg, 0, 0x20);
+	state->m_tilemap_fg->set_transparent_pen(0);
+	state->m_tilemap_fg->set_scrolldx(0, 0x50);
+	state->m_tilemap_fg->set_scrolldy(0, 0x20);
 
 	for (i = 0; i < 4; i++)
 	{
 		state->m_tilemap_edge1[i] = tilemap_create(machine, get_tile_info_BG_1, scan_functions[i], 16, 16, tilemap_cols[i], 8);
-		tilemap_set_scrolldx(state->m_tilemap_edge1[i], 0, 0x50);
-		tilemap_set_scrolldy(state->m_tilemap_edge1[i], 0, 0x20);
+		state->m_tilemap_edge1[i]->set_scrolldx(0, 0x50);
+		state->m_tilemap_edge1[i]->set_scrolldy(0, 0x20);
 
 		state->m_tilemap_edge2[i] = tilemap_create(machine, get_tile_info_BG_2, scan_functions[i], 16, 16, tilemap_cols[i], 8);
-		tilemap_set_scrolldx(state->m_tilemap_edge2[i], 0, 0x50);
-		tilemap_set_scrolldy(state->m_tilemap_edge2[i], 0, machine.primary_screen->height() - 256);
+		state->m_tilemap_edge2[i]->set_scrolldx(0, 0x50);
+		state->m_tilemap_edge2[i]->set_scrolldy(0, machine.primary_screen->height() - 256);
 	}
 
 	state->m_headlight_bitmap = auto_bitmap_ind16_alloc(machine, 128, 128);
@@ -183,19 +183,19 @@ static void draw_edges(running_machine &machine, bitmap_ind16 &bitmap, const rec
 	clip_edge1 &= cliprect;
 	clip_edge2 &= cliprect;
 
-	tilemap_mark_all_tiles_dirty(state->m_tilemap_edge1[scroll_mode]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap_edge2[scroll_mode]);
+	state->m_tilemap_edge1[scroll_mode]->mark_all_dirty();
+	state->m_tilemap_edge2[scroll_mode]->mark_all_dirty();
 
-	tilemap_set_flip(state->m_tilemap_edge1[scroll_mode], flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	tilemap_set_scrollx(state->m_tilemap_edge1[scroll_mode], 0, -(*state->m_scroll & 0xfc));
-	tilemap_set_scrolly(state->m_tilemap_edge1[scroll_mode], 0, *state->m_edge1_pos & 0x7f);
+	state->m_tilemap_edge1[scroll_mode]->set_flip(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_tilemap_edge1[scroll_mode]->set_scrollx(0, -(*state->m_scroll & 0xfc));
+	state->m_tilemap_edge1[scroll_mode]->set_scrolly(0, *state->m_edge1_pos & 0x7f);
 
-	tilemap_set_flip(state->m_tilemap_edge2[scroll_mode], flip ? TILEMAP_FLIPX : TILEMAP_FLIPY);
-	tilemap_set_scrollx(state->m_tilemap_edge2[scroll_mode], 0, -(*state->m_scroll & 0xfc));
-	tilemap_set_scrolly(state->m_tilemap_edge2[scroll_mode], 0, *state->m_edge2_pos & 0x7f);
+	state->m_tilemap_edge2[scroll_mode]->set_flip(flip ? TILEMAP_FLIPX : TILEMAP_FLIPY);
+	state->m_tilemap_edge2[scroll_mode]->set_scrollx(0, -(*state->m_scroll & 0xfc));
+	state->m_tilemap_edge2[scroll_mode]->set_scrolly(0, *state->m_edge2_pos & 0x7f);
 
-	tilemap_draw(bitmap, clip_edge1, state->m_tilemap_edge1[scroll_mode], 0, 0);
-	tilemap_draw(bitmap, clip_edge2, state->m_tilemap_edge2[scroll_mode], 0, 0);
+	state->m_tilemap_edge1[scroll_mode]->draw(bitmap, clip_edge1, 0, 0);
+	state->m_tilemap_edge2[scroll_mode]->draw(bitmap, clip_edge2, 0, 0);
 }
 
 
@@ -238,8 +238,8 @@ static void draw_headlight(running_machine &machine, bitmap_ind16 &bitmap, const
 static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
-	tilemap_set_flip(state->m_tilemap_fg, flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap_fg, 0, 0);
+	state->m_tilemap_fg->set_flip(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
 }
 
 

@@ -93,7 +93,7 @@ WRITE8_HANDLER( shaolins_videoram_w )
 	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( shaolins_colorram_w )
@@ -101,7 +101,7 @@ WRITE8_HANDLER( shaolins_colorram_w )
 	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( shaolins_palettebank_w )
@@ -111,7 +111,7 @@ WRITE8_HANDLER( shaolins_palettebank_w )
 	if (state->m_palettebank != (data & 0x07))
 	{
 		state->m_palettebank = data & 0x07;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -121,7 +121,7 @@ WRITE8_HANDLER( shaolins_scroll_w )
 	int col;
 
 	for (col = 4; col < 32; col++)
-		tilemap_set_scrolly(state->m_bg_tilemap, col, data + 1);
+		state->m_bg_tilemap->set_scrolly(col, data + 1);
 }
 
 WRITE8_HANDLER( shaolins_nmi_w )
@@ -133,7 +133,7 @@ WRITE8_HANDLER( shaolins_nmi_w )
 	if (flip_screen_get(space->machine()) != (data & 0x01))
 	{
 		flip_screen_set(space->machine(), data & 0x01);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -155,7 +155,7 @@ VIDEO_START( shaolins )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
+	state->m_bg_tilemap->set_scroll_cols(32);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -196,7 +196,7 @@ SCREEN_UPDATE_IND16( shaolins )
 {
 	shaolins_state *state = screen.machine().driver_data<shaolins_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

@@ -67,7 +67,7 @@ static WRITE8_HANDLER( skyarmy_videoram_w )
 	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap,offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( skyarmy_colorram_w )
@@ -75,7 +75,7 @@ static WRITE8_HANDLER( skyarmy_colorram_w )
 	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap,offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 static PALETTE_INIT( skyarmy )
@@ -111,7 +111,7 @@ static VIDEO_START( skyarmy )
 	skyarmy_state *state = machine.driver_data<skyarmy_state>();
 
 	state->m_tilemap = tilemap_create(machine, get_skyarmy_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_cols(state->m_tilemap,32);
+	state->m_tilemap->set_scroll_cols(32);
 }
 
 
@@ -123,9 +123,9 @@ static SCREEN_UPDATE_IND16( skyarmy )
 	int i;
 
 	for(i=0;i<0x20;i++)
-		tilemap_set_scrolly( state->m_tilemap,i,state->m_scrollram[i]);
+		state->m_tilemap->set_scrolly(i,state->m_scrollram[i]);
 
-	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
+	state->m_tilemap->draw(bitmap, cliprect, 0,0);
 
 	for (offs = 0 ; offs < 0x40; offs+=4)
 	{

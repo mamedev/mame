@@ -77,7 +77,7 @@ WRITE8_HANDLER( paradise_vram_0_w )
 {
 	paradise_state *state = space->machine().driver_data<paradise_state>();
 	state->m_vram_0[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap_0, offset % 0x400);
+	state->m_tilemap_0->mark_tile_dirty(offset % 0x400);
 }
 
 /* 16 color tiles with paradise_palbank as color code */
@@ -94,7 +94,7 @@ WRITE8_HANDLER( paradise_palbank_w )
 	if (state->m_palbank != bank1)
 	{
 		state->m_palbank = bank1;
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_0);
+		state->m_tilemap_0->mark_all_dirty();
 	}
 }
 
@@ -111,7 +111,7 @@ WRITE8_HANDLER( paradise_vram_1_w )
 {
 	paradise_state *state = space->machine().driver_data<paradise_state>();
 	state->m_vram_1[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap_1, offset % 0x400);
+	state->m_tilemap_1->mark_tile_dirty(offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -127,7 +127,7 @@ WRITE8_HANDLER( paradise_vram_2_w )
 {
 	paradise_state *state = space->machine().driver_data<paradise_state>();
 	state->m_vram_2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap_2, offset % 0x400);
+	state->m_tilemap_2->mark_tile_dirty(offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_2 )
@@ -171,9 +171,9 @@ VIDEO_START( paradise )
 	/* pixmap */
 	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
 
-	tilemap_set_transparent_pen(state->m_tilemap_0, 0x0f);
-	tilemap_set_transparent_pen(state->m_tilemap_1, 0xff);
-	tilemap_set_transparent_pen(state->m_tilemap_2, 0xff);
+	state->m_tilemap_0->set_transparent_pen(0x0f);
+	state->m_tilemap_1->set_transparent_pen(0xff);
+	state->m_tilemap_2->set_transparent_pen(0xff);
 
 	state->save_item(NAME(state->m_tmpbitmap));
 }
@@ -268,8 +268,8 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 		if (layers_ctrl & 16)
 			draw_sprites(screen.machine(), bitmap, cliprect);
 
-	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
-	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
+	if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 2)	state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 4)	copybitmap_trans(bitmap, state->m_tmpbitmap, flip_screen_get(screen.machine()), flip_screen_get(screen.machine()), 0, 0, cliprect, 0x80f);
 
 	if (state->m_priority & 2)
@@ -278,12 +278,12 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 			if (layers_ctrl & 16)
 				draw_sprites(screen.machine(), bitmap, cliprect);
 		if (layers_ctrl & 8)
-			tilemap_draw(bitmap,cliprect, state->m_tilemap_2, 0, 0);
+			state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		if (layers_ctrl & 8)
-			tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
+			state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 		if (!(state->m_priority & 1))
 			if (layers_ctrl & 16)
 				draw_sprites(screen.machine(), bitmap, cliprect);
@@ -304,18 +304,18 @@ SCREEN_UPDATE_IND16( torus )
 	if (state->m_priority & 1)
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0,0);
+	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
 
 	if (state->m_priority & 4)
 	{
 		if (!(state->m_priority & 1))
 			draw_sprites(screen.machine(), bitmap, cliprect);
 
-		tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
+		state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
+		state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 
 		if (!(state->m_priority & 1))
 			draw_sprites(screen.machine(), bitmap,cliprect);
@@ -329,9 +329,9 @@ SCREEN_UPDATE_IND16( madball )
 	paradise_state *state = screen.machine().driver_data<paradise_state>();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
+	state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+	state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+	state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

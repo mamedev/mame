@@ -101,18 +101,18 @@ WRITE32_HANDLER( psikyo_vram_0_w )
 	COMBINE_DATA(&state->m_vram_0[offset]);
 	if (ACCESSING_BITS_16_31)
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap_0_size0, offset * 2);
-		tilemap_mark_tile_dirty(state->m_tilemap_0_size1, offset * 2);
-		tilemap_mark_tile_dirty(state->m_tilemap_0_size2, offset * 2);
-		tilemap_mark_tile_dirty(state->m_tilemap_0_size3, offset * 2);
+		state->m_tilemap_0_size0->mark_tile_dirty(offset * 2);
+		state->m_tilemap_0_size1->mark_tile_dirty(offset * 2);
+		state->m_tilemap_0_size2->mark_tile_dirty(offset * 2);
+		state->m_tilemap_0_size3->mark_tile_dirty(offset * 2);
 	}
 
 	if (ACCESSING_BITS_0_15)
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap_0_size0, offset * 2 + 1);
-		tilemap_mark_tile_dirty(state->m_tilemap_0_size1, offset * 2 + 1);
-		tilemap_mark_tile_dirty(state->m_tilemap_0_size2, offset * 2 + 1);
-		tilemap_mark_tile_dirty(state->m_tilemap_0_size3, offset * 2 + 1);
+		state->m_tilemap_0_size0->mark_tile_dirty(offset * 2 + 1);
+		state->m_tilemap_0_size1->mark_tile_dirty(offset * 2 + 1);
+		state->m_tilemap_0_size2->mark_tile_dirty(offset * 2 + 1);
+		state->m_tilemap_0_size3->mark_tile_dirty(offset * 2 + 1);
 	}
 }
 
@@ -123,18 +123,18 @@ WRITE32_HANDLER( psikyo_vram_1_w )
 	COMBINE_DATA(&state->m_vram_1[offset]);
 	if (ACCESSING_BITS_16_31)
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap_1_size0, offset * 2);
-		tilemap_mark_tile_dirty(state->m_tilemap_1_size1, offset * 2);
-		tilemap_mark_tile_dirty(state->m_tilemap_1_size2, offset * 2);
-		tilemap_mark_tile_dirty(state->m_tilemap_1_size3, offset * 2);
+		state->m_tilemap_1_size0->mark_tile_dirty(offset * 2);
+		state->m_tilemap_1_size1->mark_tile_dirty(offset * 2);
+		state->m_tilemap_1_size2->mark_tile_dirty(offset * 2);
+		state->m_tilemap_1_size3->mark_tile_dirty(offset * 2);
 	}
 
 	if (ACCESSING_BITS_0_15)
 	{
-		tilemap_mark_tile_dirty(state->m_tilemap_1_size0, offset * 2 + 1);
-		tilemap_mark_tile_dirty(state->m_tilemap_1_size1, offset * 2 + 1);
-		tilemap_mark_tile_dirty(state->m_tilemap_1_size2, offset * 2 + 1);
-		tilemap_mark_tile_dirty(state->m_tilemap_1_size3, offset * 2 + 1);
+		state->m_tilemap_1_size0->mark_tile_dirty(offset * 2 + 1);
+		state->m_tilemap_1_size1->mark_tile_dirty(offset * 2 + 1);
+		state->m_tilemap_1_size2->mark_tile_dirty(offset * 2 + 1);
+		state->m_tilemap_1_size3->mark_tile_dirty(offset * 2 + 1);
 	}
 }
 
@@ -145,18 +145,18 @@ void psikyo_switch_banks( running_machine &machine, int tmap, int bank )
 	if ((tmap == 0) && (bank != state->m_tilemap_0_bank))
 	{
 		state->m_tilemap_0_bank = bank;
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_0_size0);
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_0_size1);
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_0_size2);
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_0_size3);
+		state->m_tilemap_0_size0->mark_all_dirty();
+		state->m_tilemap_0_size1->mark_all_dirty();
+		state->m_tilemap_0_size2->mark_all_dirty();
+		state->m_tilemap_0_size3->mark_all_dirty();
 	}
 	else if ((tmap == 1) && (bank != state->m_tilemap_1_bank))
 	{
 		state->m_tilemap_1_bank = bank;
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_1_size0);
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_1_size1);
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_1_size2);
-		tilemap_mark_all_tiles_dirty(state->m_tilemap_1_size3);
+		state->m_tilemap_1_size0->mark_all_dirty();
+		state->m_tilemap_1_size1->mark_all_dirty();
+		state->m_tilemap_1_size2->mark_all_dirty();
+		state->m_tilemap_1_size3->mark_all_dirty();
 	}
 }
 
@@ -181,29 +181,29 @@ VIDEO_START( psikyo )
 	state->m_spritebuf1 = auto_alloc_array(machine, UINT32, 0x2000 / 4);
 	state->m_spritebuf2 = auto_alloc_array(machine, UINT32, 0x2000 / 4);
 
-	tilemap_set_scroll_rows(state->m_tilemap_0_size0, 0x80 * 16);	// line scrolling
-	tilemap_set_scroll_cols(state->m_tilemap_0_size0, 1);
+	state->m_tilemap_0_size0->set_scroll_rows(0x80 * 16);	// line scrolling
+	state->m_tilemap_0_size0->set_scroll_cols(1);
 
-	tilemap_set_scroll_rows(state->m_tilemap_0_size1, 0x40 * 16);	// line scrolling
-	tilemap_set_scroll_cols(state->m_tilemap_0_size1, 1);
+	state->m_tilemap_0_size1->set_scroll_rows(0x40 * 16);	// line scrolling
+	state->m_tilemap_0_size1->set_scroll_cols(1);
 
-	tilemap_set_scroll_rows(state->m_tilemap_0_size2, 0x20 * 16);	// line scrolling
-	tilemap_set_scroll_cols(state->m_tilemap_0_size2, 1);
+	state->m_tilemap_0_size2->set_scroll_rows(0x20 * 16);	// line scrolling
+	state->m_tilemap_0_size2->set_scroll_cols(1);
 
-	tilemap_set_scroll_rows(state->m_tilemap_0_size3, 0x10 * 16);	// line scrolling
-	tilemap_set_scroll_cols(state->m_tilemap_0_size3, 1);
+	state->m_tilemap_0_size3->set_scroll_rows(0x10 * 16);	// line scrolling
+	state->m_tilemap_0_size3->set_scroll_cols(1);
 
-	tilemap_set_scroll_rows(state->m_tilemap_1_size0, 0x80 * 16);	// line scrolling
-	tilemap_set_scroll_cols(state->m_tilemap_1_size0, 1);
+	state->m_tilemap_1_size0->set_scroll_rows(0x80 * 16);	// line scrolling
+	state->m_tilemap_1_size0->set_scroll_cols(1);
 
-	tilemap_set_scroll_rows(state->m_tilemap_1_size1, 0x40 * 16);	// line scrolling
-	tilemap_set_scroll_cols(state->m_tilemap_1_size1, 1);
+	state->m_tilemap_1_size1->set_scroll_rows(0x40 * 16);	// line scrolling
+	state->m_tilemap_1_size1->set_scroll_cols(1);
 
-	tilemap_set_scroll_rows(state->m_tilemap_1_size2, 0x20 * 16);	// line scrolling
-	tilemap_set_scroll_cols(state->m_tilemap_1_size2, 1);
+	state->m_tilemap_1_size2->set_scroll_rows(0x20 * 16);	// line scrolling
+	state->m_tilemap_1_size2->set_scroll_cols(1);
 
-	tilemap_set_scroll_rows(state->m_tilemap_1_size3, 0x10 * 16);	// line scrolling
-	tilemap_set_scroll_cols(state->m_tilemap_1_size3, 1);
+	state->m_tilemap_1_size3->set_scroll_rows(0x10 * 16);	// line scrolling
+	state->m_tilemap_1_size3->set_scroll_cols(1);
 
 	state->save_pointer(NAME(state->m_spritebuf1), 0x2000 / 4);
 	state->save_pointer(NAME(state->m_spritebuf2), 0x2000 / 4);
@@ -612,8 +612,8 @@ SCREEN_UPDATE_IND16( psikyo )
 	else
 		tmptilemap1 = state->m_tilemap_1_size3;
 
-	tilemap_set_enable(tmptilemap0, ~layer0_ctrl & 1);
-	tilemap_set_enable(tmptilemap1, ~layer1_ctrl & 1);
+	tmptilemap0->enable(~layer0_ctrl & 1);
+	tmptilemap1->enable(~layer1_ctrl & 1);
 
 	/* Layers scrolling */
 
@@ -622,9 +622,9 @@ SCREEN_UPDATE_IND16( psikyo )
 	layer1_scrolly = state->m_vregs[0x40a / 4];
 	layer1_scrollx = state->m_vregs[0x40e / 4];
 
-	tilemap_set_scrolly(tmptilemap0, 0, layer0_scrolly);
+	tmptilemap0->set_scrolly(0, layer0_scrolly);
 
-	tilemap_set_scrolly(tmptilemap1, 0, layer1_scrolly);
+	tmptilemap1->set_scrolly(0, layer1_scrolly);
 
 	for (i = 0; i < 256; i++)	/* 256 screen lines */
 	{
@@ -641,8 +641,8 @@ SCREEN_UPDATE_IND16( psikyo )
 				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i)];
 		}
 
-		tilemap_set_scrollx(
-			tmptilemap0,
+		
+			tmptilemap0->set_scrollx(
 			(i + layer0_scrolly) % tilemap_width(tm0size),
 			layer0_scrollx + x0 );
 
@@ -658,31 +658,31 @@ SCREEN_UPDATE_IND16( psikyo )
 				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i)];
 		}
 
-		tilemap_set_scrollx(
-			tmptilemap1,
+		
+			tmptilemap1->set_scrollx(
 			(i + layer1_scrolly) % tilemap_width(tm1size),
 			layer1_scrollx + x1 );
 	}
 
-	tilemap_set_transparent_pen(state->m_tilemap_0_size0, (layer0_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_0_size1, (layer0_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_0_size2, (layer0_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_0_size3, (layer0_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_0_size0->set_transparent_pen((layer0_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_0_size1->set_transparent_pen((layer0_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_0_size2->set_transparent_pen((layer0_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_0_size3->set_transparent_pen((layer0_ctrl & 8 ? 0 : 15));
 
-	tilemap_set_transparent_pen(state->m_tilemap_1_size0, (layer1_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_1_size1, (layer1_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_1_size2, (layer1_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_1_size3, (layer1_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_1_size0->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_1_size1->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_1_size2->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_1_size3->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 1)
-		tilemap_draw(bitmap, cliprect, tmptilemap0, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
+		tmptilemap0->draw(bitmap, cliprect, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
 
 	if (layers_ctrl & 2)
-		tilemap_draw(bitmap, cliprect, tmptilemap1, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
+		tmptilemap1->draw(bitmap, cliprect, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
 		draw_sprites(screen.machine(), bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));
@@ -786,8 +786,8 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 	else
 		tmptilemap1 = state->m_tilemap_1_size3;
 
-	tilemap_set_enable(tmptilemap0, ~layer0_ctrl & 1);
-	tilemap_set_enable(tmptilemap1, ~layer1_ctrl & 1);
+	tmptilemap0->enable(~layer0_ctrl & 1);
+	tmptilemap1->enable(~layer1_ctrl & 1);
 
 	/* Layers scrolling */
 
@@ -796,9 +796,9 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 	layer1_scrolly = state->m_vregs[0x40a / 4];
 	layer1_scrollx = state->m_vregs[0x40e / 4];
 
-	tilemap_set_scrolly(tmptilemap0, 0, layer0_scrolly);
+	tmptilemap0->set_scrolly(0, layer0_scrolly);
 
-	tilemap_set_scrolly(tmptilemap1, 0, layer1_scrolly);
+	tmptilemap1->set_scrolly(0, layer1_scrolly);
 
 	for (i = 0; i < 256; i++)	/* 256 screen lines */
 	{
@@ -815,8 +815,8 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i)];
 		}
 
-		tilemap_set_scrollx(
-			tmptilemap0,
+		
+			tmptilemap0->set_scrollx(
 			(i + layer0_scrolly) % tilemap_width(tm0size),
 			layer0_scrollx + x0 );
 
@@ -832,31 +832,31 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i)];
 		}
 
-		tilemap_set_scrollx(
-			tmptilemap1,
+		
+			tmptilemap1->set_scrollx(
 			(i + layer1_scrolly) % tilemap_width(tm1size),
 			layer1_scrollx + x1 );
 	}
 
-	tilemap_set_transparent_pen(state->m_tilemap_0_size0, (layer0_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_0_size1, (layer0_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_0_size2, (layer0_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_0_size3, (layer0_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_0_size0->set_transparent_pen((layer0_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_0_size1->set_transparent_pen((layer0_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_0_size2->set_transparent_pen((layer0_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_0_size3->set_transparent_pen((layer0_ctrl & 8 ? 0 : 15));
 
-	tilemap_set_transparent_pen(state->m_tilemap_1_size0, (layer1_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_1_size1, (layer1_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_1_size2, (layer1_ctrl & 8 ? 0 : 15));
-	tilemap_set_transparent_pen(state->m_tilemap_1_size3, (layer1_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_1_size0->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_1_size1->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_1_size2->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
+	state->m_tilemap_1_size3->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 1)
-		tilemap_draw(bitmap, cliprect, tmptilemap0, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
+		tmptilemap0->draw(bitmap, cliprect, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
 
 	if (layers_ctrl & 2)
-		tilemap_draw(bitmap, cliprect, tmptilemap1, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
+		tmptilemap1->draw(bitmap, cliprect, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
 		draw_sprites_bootleg(screen.machine(), bitmap, cliprect, (spr_ctrl & 4 ? 0 : 15));

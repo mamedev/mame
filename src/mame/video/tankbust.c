@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 #endif
 
 	/* priority bg/sprites (1 = this bg tile on top of sprites) */
-	tileinfo->category = (attr & 0x08) >> 3;
+	tileinfo.category = (attr & 0x08) >> 3;
 
 	SET_TILE_INFO(	1,
 			code,
@@ -86,7 +86,7 @@ VIDEO_START( tankbust )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
 
-	tilemap_set_transparent_pen(state->m_txt_tilemap, 0);
+	state->m_txt_tilemap->set_transparent_pen(0);
 }
 
 
@@ -100,7 +100,7 @@ WRITE8_HANDLER( tankbust_background_videoram_w )
 {
 	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 READ8_HANDLER( tankbust_background_videoram_r )
 {
@@ -112,7 +112,7 @@ WRITE8_HANDLER( tankbust_background_colorram_w )
 {
 	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 READ8_HANDLER( tankbust_background_colorram_r )
 {
@@ -124,7 +124,7 @@ WRITE8_HANDLER( tankbust_txtram_w )
 {
 	tankbust_state *state = space->machine().driver_data<tankbust_state>();
 	state->m_txtram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_txt_tilemap, offset);
+	state->m_txt_tilemap->mark_tile_dirty(offset);
 }
 READ8_HANDLER( tankbust_txtram_r )
 {
@@ -145,7 +145,7 @@ WRITE8_HANDLER( tankbust_xscroll_w )
 
 		x = state->m_xscroll[0] + 256 * (state->m_xscroll[1]&1);
 		if (x>=0x100) x-=0x200;
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, x );
+		state->m_bg_tilemap->set_scrollx(0, x );
 	}
 //popmessage("x=%02x %02x", state->m_xscroll[0], state->m_xscroll[1]);
 }
@@ -161,7 +161,7 @@ WRITE8_HANDLER( tankbust_yscroll_w )
 		state->m_yscroll[offset] = data;
 		y = state->m_yscroll[0];
 		if (y>=0x80) y-=0x100;
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, y );
+		state->m_bg_tilemap->set_scrolly(0, y );
 	}
 //popmessage("y=%02x %02x", state->m_yscroll[0], state->m_yscroll[1]);
 }
@@ -244,15 +244,15 @@ SCREEN_UPDATE_IND16( tankbust )
 
 		if ( (tile_attrib&8) || (tile_attrib&0x80) )
 		{
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, i);
+			state->m_bg_tilemap->mark_tile_dirty(i);
 		}
 	}
 #endif
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 
-	tilemap_draw(bitmap, cliprect, state->m_txt_tilemap, 0,0);
+	state->m_txt_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

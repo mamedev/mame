@@ -101,10 +101,10 @@ static VIDEO_START( umipoker )
 	state->m_tilemap_2 = tilemap_create(machine, get_tile_info_2,tilemap_scan_rows,8,8,64,32);
 	state->m_tilemap_3 = tilemap_create(machine, get_tile_info_3,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transparent_pen(state->m_tilemap_0,0);
-	tilemap_set_transparent_pen(state->m_tilemap_1,0);
-	tilemap_set_transparent_pen(state->m_tilemap_2,0);
-	tilemap_set_transparent_pen(state->m_tilemap_3,0);
+	state->m_tilemap_0->set_transparent_pen(0);
+	state->m_tilemap_1->set_transparent_pen(0);
+	state->m_tilemap_2->set_transparent_pen(0);
+	state->m_tilemap_3->set_transparent_pen(0);
 
 }
 
@@ -112,17 +112,17 @@ static SCREEN_UPDATE_IND16( umipoker )
 {
 	umipoker_state *state = screen.machine().driver_data<umipoker_state>();
 
-	tilemap_set_scrolly(state->m_tilemap_0, 0, state->m_umipoker_scrolly[0]);
-	tilemap_set_scrolly(state->m_tilemap_1, 0, state->m_umipoker_scrolly[1]);
-	tilemap_set_scrolly(state->m_tilemap_2, 0, state->m_umipoker_scrolly[2]);
-	tilemap_set_scrolly(state->m_tilemap_3, 0, state->m_umipoker_scrolly[3]);
+	state->m_tilemap_0->set_scrolly(0, state->m_umipoker_scrolly[0]);
+	state->m_tilemap_1->set_scrolly(0, state->m_umipoker_scrolly[1]);
+	state->m_tilemap_2->set_scrolly(0, state->m_umipoker_scrolly[2]);
+	state->m_tilemap_3->set_scrolly(0, state->m_umipoker_scrolly[3]);
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	tilemap_draw(bitmap,cliprect,state->m_tilemap_0,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_tilemap_1,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_tilemap_2,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_tilemap_3,0,0);
+	state->m_tilemap_0->draw(bitmap, cliprect, 0,0);
+	state->m_tilemap_1->draw(bitmap, cliprect, 0,0);
+	state->m_tilemap_2->draw(bitmap, cliprect, 0,0);
+	state->m_tilemap_3->draw(bitmap, cliprect, 0,0);
 
 	return 0;
 }
@@ -171,7 +171,7 @@ static WRITE16_HANDLER( umipoker_vram_0_w )
 	umipoker_state *state = space->machine().driver_data<umipoker_state>();
 
 	COMBINE_DATA(&state->m_vram_0[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_0,offset >> 1);
+	state->m_tilemap_0->mark_tile_dirty(offset >> 1);
 }
 
 static WRITE16_HANDLER( umipoker_vram_1_w )
@@ -179,7 +179,7 @@ static WRITE16_HANDLER( umipoker_vram_1_w )
 	umipoker_state *state = space->machine().driver_data<umipoker_state>();
 
 	COMBINE_DATA(&state->m_vram_1[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_1,offset >> 1);
+	state->m_tilemap_1->mark_tile_dirty(offset >> 1);
 }
 
 
@@ -188,7 +188,7 @@ static WRITE16_HANDLER( umipoker_vram_2_w )
 	umipoker_state *state = space->machine().driver_data<umipoker_state>();
 
 	COMBINE_DATA(&state->m_vram_2[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_2,offset >> 1);
+	state->m_tilemap_2->mark_tile_dirty(offset >> 1);
 }
 
 static WRITE16_HANDLER( umipoker_vram_3_w )
@@ -196,7 +196,7 @@ static WRITE16_HANDLER( umipoker_vram_3_w )
 	umipoker_state *state = space->machine().driver_data<umipoker_state>();
 
 	COMBINE_DATA(&state->m_vram_3[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_3,offset >> 1);
+	state->m_tilemap_3->mark_tile_dirty(offset >> 1);
 }
 
 static WRITE16_HANDLER( lamps_w )

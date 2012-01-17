@@ -56,14 +56,14 @@ WRITE8_HANDLER( gottlieb_video_control_w )
 	if (flip_screen_x_get(space->machine()) != (data & 0x02))
 	{
 		flip_screen_x_set(space->machine(), data & 0x02);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 2 controls horizonal flip screen */
 	if (flip_screen_y_get(space->machine()) != (data & 0x04))
 	{
 		flip_screen_y_set(space->machine(), data & 0x04);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* in Q*Bert Qubes only, bit 4 controls the sprite bank */
@@ -104,7 +104,7 @@ WRITE8_HANDLER( gottlieb_videoram_w )
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -165,8 +165,8 @@ VIDEO_START( gottlieb )
 
 	/* configure the background tilemap */
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 318 - 256);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
 	gfx_element_set_source(machine.gfx[0], state->m_charram);
 
@@ -192,8 +192,8 @@ VIDEO_START( screwloo )
 
 	/* configure the background tilemap */
 	state->m_bg_tilemap = tilemap_create(machine, get_screwloo_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 318 - 256);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
 	gfx_element_set_source(machine.gfx[0], state->m_charram);
 
@@ -254,7 +254,7 @@ SCREEN_UPDATE_IND16( gottlieb )
 	gottlieb_state *state = screen.machine().driver_data<gottlieb_state>();
 	/* if the background has lower priority, render it first, else clear the screen */
 	if (!state->m_background_priority)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	else
 		bitmap.fill(0, cliprect);
 
@@ -263,7 +263,7 @@ SCREEN_UPDATE_IND16( gottlieb )
 
 	/* if the background has higher priority, render it now */
 	if (state->m_background_priority)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

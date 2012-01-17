@@ -176,18 +176,18 @@ static void update_page( running_machine &machine )
 	{
 		all_dirty = 1;
 		state->m_old_tile_bank0 = state->m_tile_bank0;
-		tilemap_mark_all_tiles_dirty(state->m_text_layer);
+		state->m_text_layer->mark_all_dirty();
 	}
 
 	if (all_dirty)
 	{
-		tilemap_mark_all_tiles_dirty(state->m_background);
-		tilemap_mark_all_tiles_dirty(state->m_foreground);
+		state->m_background->mark_all_dirty();
+		state->m_foreground->mark_all_dirty();
 
 		if (state->m_system18)
 		{
-			tilemap_mark_all_tiles_dirty(state->m_background2);
-			tilemap_mark_all_tiles_dirty(state->m_foreground2);
+			state->m_background2->mark_all_dirty();
+			state->m_foreground2->mark_all_dirty();
 		}
 	}
 	else {
@@ -199,7 +199,7 @@ static void update_page( running_machine &machine )
 				state->m_old_bg_page[i] = state->m_bg_page[i];
 				for (offset = page0; offset < page0 + 64 * 32; offset++)
 				{
-					tilemap_mark_tile_dirty(state->m_background, offset);
+					state->m_background->mark_tile_dirty(offset);
 				}
 			}
 
@@ -208,7 +208,7 @@ static void update_page( running_machine &machine )
 				state->m_old_fg_page[i] = state->m_fg_page[i];
 				for (offset = page0; offset < page0 + 64 * 32; offset++)
 				{
-					tilemap_mark_tile_dirty(state->m_foreground, offset);
+					state->m_foreground->mark_tile_dirty(offset);
 				}
 			}
 
@@ -219,7 +219,7 @@ static void update_page( running_machine &machine )
 					state->m_old_bg2_page[i] = state->m_bg2_page[i];
 					for (offset = page0; offset < page0 + 64 * 32; offset++)
 					{
-						tilemap_mark_tile_dirty(state->m_background2, offset);
+						state->m_background2->mark_tile_dirty(offset);
 					}
 				}
 
@@ -228,7 +228,7 @@ static void update_page( running_machine &machine )
 					state->m_old_fg2_page[i] = state->m_fg2_page[i];
 					for (offset = page0; offset < page0 + 64 * 32; offset++)
 					{
-						tilemap_mark_tile_dirty(state->m_foreground2, offset);
+						state->m_foreground2->mark_tile_dirty(offset);
 					}
 				}
 			}
@@ -304,27 +304,27 @@ WRITE16_HANDLER( sys16_tileram_w )
 		int page = offset / (64 * 32);
 		offset = offset % (64 * 32);
 
-		if (state->m_bg_page[0] == page) tilemap_mark_tile_dirty(state->m_background, offset + 64 * 32 * 0);
-		if (state->m_bg_page[1] == page) tilemap_mark_tile_dirty(state->m_background, offset + 64 * 32 * 1);
-		if (state->m_bg_page[2] == page) tilemap_mark_tile_dirty(state->m_background, offset + 64 * 32 * 2);
-		if (state->m_bg_page[3] == page) tilemap_mark_tile_dirty(state->m_background, offset + 64 * 32 * 3);
+		if (state->m_bg_page[0] == page) state->m_background->mark_tile_dirty(offset + 64 * 32 * 0);
+		if (state->m_bg_page[1] == page) state->m_background->mark_tile_dirty(offset + 64 * 32 * 1);
+		if (state->m_bg_page[2] == page) state->m_background->mark_tile_dirty(offset + 64 * 32 * 2);
+		if (state->m_bg_page[3] == page) state->m_background->mark_tile_dirty(offset + 64 * 32 * 3);
 
-		if (state->m_fg_page[0] == page) tilemap_mark_tile_dirty(state->m_foreground, offset + 64 * 32 * 0);
-		if (state->m_fg_page[1] == page) tilemap_mark_tile_dirty(state->m_foreground, offset + 64 * 32 * 1);
-		if (state->m_fg_page[2] == page) tilemap_mark_tile_dirty(state->m_foreground, offset + 64 * 32 * 2);
-		if (state->m_fg_page[3] == page) tilemap_mark_tile_dirty(state->m_foreground, offset + 64 * 32 * 3);
+		if (state->m_fg_page[0] == page) state->m_foreground->mark_tile_dirty(offset + 64 * 32 * 0);
+		if (state->m_fg_page[1] == page) state->m_foreground->mark_tile_dirty(offset + 64 * 32 * 1);
+		if (state->m_fg_page[2] == page) state->m_foreground->mark_tile_dirty(offset + 64 * 32 * 2);
+		if (state->m_fg_page[3] == page) state->m_foreground->mark_tile_dirty(offset + 64 * 32 * 3);
 
 		if (state->m_system18)
 		{
-			if (state->m_bg2_page[0] == page) tilemap_mark_tile_dirty(state->m_background2, offset + 64 * 32 * 0);
-			if (state->m_bg2_page[1] == page) tilemap_mark_tile_dirty(state->m_background2, offset + 64 * 32 * 1);
-			if (state->m_bg2_page[2] == page) tilemap_mark_tile_dirty(state->m_background2, offset + 64 * 32 * 2);
-			if (state->m_bg2_page[3] == page) tilemap_mark_tile_dirty(state->m_background2, offset + 64 * 32 * 3);
+			if (state->m_bg2_page[0] == page) state->m_background2->mark_tile_dirty(offset + 64 * 32 * 0);
+			if (state->m_bg2_page[1] == page) state->m_background2->mark_tile_dirty(offset + 64 * 32 * 1);
+			if (state->m_bg2_page[2] == page) state->m_background2->mark_tile_dirty(offset + 64 * 32 * 2);
+			if (state->m_bg2_page[3] == page) state->m_background2->mark_tile_dirty(offset + 64 * 32 * 3);
 
-			if (state->m_fg2_page[0] == page) tilemap_mark_tile_dirty(state->m_foreground2, offset + 64 * 32 * 0);
-			if (state->m_fg2_page[1] == page) tilemap_mark_tile_dirty(state->m_foreground2, offset + 64 * 32 * 1);
-			if (state->m_fg2_page[2] == page) tilemap_mark_tile_dirty(state->m_foreground2, offset + 64 * 32 * 2);
-			if (state->m_fg2_page[3] == page) tilemap_mark_tile_dirty(state->m_foreground2, offset + 64 * 32 * 3);
+			if (state->m_fg2_page[0] == page) state->m_foreground2->mark_tile_dirty(offset + 64 * 32 * 0);
+			if (state->m_fg2_page[1] == page) state->m_foreground2->mark_tile_dirty(offset + 64 * 32 * 1);
+			if (state->m_fg2_page[2] == page) state->m_foreground2->mark_tile_dirty(offset + 64 * 32 * 2);
+			if (state->m_fg2_page[3] == page) state->m_foreground2->mark_tile_dirty(offset + 64 * 32 * 3);
 		}
 	}
 }
@@ -356,9 +356,9 @@ static TILE_GET_INFO( get_text_tile_info )
 	}
 
 	if (pri >= state->m_textlayer_lo_min && pri <= state->m_textlayer_lo_max)
-		tileinfo->category = 1;
+		tileinfo.category = 1;
 	if (pri >= state->m_textlayer_hi_min && pri <= state->m_textlayer_hi_max)
-		tileinfo->category = 0;
+		tileinfo.category = 0;
 }
 
 WRITE16_HANDLER( sys16_textram_w )
@@ -366,7 +366,7 @@ WRITE16_HANDLER( sys16_textram_w )
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
 	COMBINE_DATA(&state->m_textram[offset]);
-	tilemap_mark_tile_dirty(state->m_text_layer, offset);
+	state->m_text_layer->mark_tile_dirty(offset);
 }
 
 /***************************************************************************/
@@ -407,9 +407,9 @@ VIDEO_START( system16 )
 		40,28 );
 
 	{
-		if (state->m_bg1_trans) tilemap_set_transparent_pen(state->m_background, 0);
-		tilemap_set_transparent_pen(state->m_foreground, 0);
-		tilemap_set_transparent_pen(state->m_text_layer, 0);
+		if (state->m_bg1_trans) state->m_background->set_transparent_pen(0);
+		state->m_foreground->set_transparent_pen(0);
+		state->m_text_layer->set_transparent_pen(0);
 
 		state->m_tile_bank0 = 0;
 		state->m_tile_bank1 = 1;
@@ -456,18 +456,18 @@ VIDEO_START( system18old )
 		8,8,
 		64*2,32*2 );
 
-	tilemap_set_transparent_pen(state->m_foreground2, 0);
+	state->m_foreground2->set_transparent_pen(0);
 
 	if (state->m_splittab_fg_x)
 	{
-		tilemap_set_scroll_rows(state->m_foreground , 64);
-		tilemap_set_scroll_rows(state->m_foreground2 , 64);
+		state->m_foreground ->set_scroll_rows(64);
+		state->m_foreground2 ->set_scroll_rows(64);
 	}
 
 	if (state->m_splittab_bg_x)
 	{
-		tilemap_set_scroll_rows(state->m_background , 64);
-		tilemap_set_scroll_rows(state->m_background2 , 64);
+		state->m_background ->set_scroll_rows(64);
+		state->m_background2 ->set_scroll_rows(64);
 	}
 
 	state->m_textlayer_lo_min = 0;
@@ -602,9 +602,9 @@ VIDEO_START( s16a_bootleg )
 	state->m_bg_tilemaps[0] = tilemap_create(machine, get_s16a_bootleg_tile_info0, tilemap_scan_rows, 8,8, 64,32 );
 	state->m_bg_tilemaps[1] = tilemap_create(machine, get_s16a_bootleg_tile_info1, tilemap_scan_rows, 8,8, 64,32 );
 
-	tilemap_set_transparent_pen(state->m_text_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_bg_tilemaps[0], 0);
-	tilemap_set_transparent_pen(state->m_bg_tilemaps[1], 0);
+	state->m_text_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemaps[0]->set_transparent_pen(0);
+	state->m_bg_tilemaps[1]->set_transparent_pen(0);
 
 	segaic16_palette_init(0x800);
 
@@ -644,40 +644,40 @@ SCREEN_UPDATE_IND16( s16a_bootleg )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemaps[0]);
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemaps[1]);
-	tilemap_mark_all_tiles_dirty(state->m_text_tilemap);
+	state->m_bg_tilemaps[0]->mark_all_dirty();
+	state->m_bg_tilemaps[1]->mark_all_dirty();
+	state->m_text_tilemap->mark_all_dirty();
 
-	tilemap_set_scrollx(state->m_text_tilemap, 0, offset_txtx);
-	tilemap_set_scrolly(state->m_text_tilemap, 0, offset_txty);
+	state->m_text_tilemap->set_scrollx(0, offset_txtx);
+	state->m_text_tilemap->set_scrolly(0, offset_txty);
 
 	if ((state->m_tilemapselect & 0xff) == 0x12)
 	{
-		tilemap_set_scrollx(state->m_bg_tilemaps[1], 0, state->m_bg_scrollx + offset_bg1x);
-		tilemap_set_scrolly(state->m_bg_tilemaps[1], 0, state->m_bg_scrolly + offset_bg1y + state->m_back_yscroll);
-		tilemap_set_scrollx(state->m_bg_tilemaps[0], 0, state->m_fg_scrollx + offset_bg0x);
-		tilemap_set_scrolly(state->m_bg_tilemaps[0], 0, state->m_fg_scrolly + offset_bg0y + state->m_fore_yscroll);
+		state->m_bg_tilemaps[1]->set_scrollx(0, state->m_bg_scrollx + offset_bg1x);
+		state->m_bg_tilemaps[1]->set_scrolly(0, state->m_bg_scrolly + offset_bg1y + state->m_back_yscroll);
+		state->m_bg_tilemaps[0]->set_scrollx(0, state->m_fg_scrollx + offset_bg0x);
+		state->m_bg_tilemaps[0]->set_scrolly(0, state->m_fg_scrolly + offset_bg0y + state->m_fore_yscroll);
 
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemaps[0], TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemaps[1], 0, 0);
+		state->m_bg_tilemaps[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		state->m_bg_tilemaps[1]->draw(bitmap, cliprect, 0, 0);
 
-		tilemap_set_scrolly(state->m_text_tilemap, 0, state->m_text_yscroll);
+		state->m_text_tilemap->set_scrolly(0, state->m_text_yscroll);
 
-		tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
+		state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else if ((state->m_tilemapselect & 0xff) == 0x21)
 	{
-		tilemap_set_scrollx(state->m_bg_tilemaps[0], 0, state->m_bg_scrollx + 187 );
-		tilemap_set_scrolly(state->m_bg_tilemaps[0], 0, state->m_bg_scrolly + state->m_back_yscroll );
-		tilemap_set_scrollx(state->m_bg_tilemaps[1], 0, state->m_fg_scrollx + 187 );
-		tilemap_set_scrolly(state->m_bg_tilemaps[1], 0, state->m_fg_scrolly + 1 + state->m_fore_yscroll );
+		state->m_bg_tilemaps[0]->set_scrollx(0, state->m_bg_scrollx + 187 );
+		state->m_bg_tilemaps[0]->set_scrolly(0, state->m_bg_scrolly + state->m_back_yscroll );
+		state->m_bg_tilemaps[1]->set_scrollx(0, state->m_fg_scrollx + 187 );
+		state->m_bg_tilemaps[1]->set_scrolly(0, state->m_fg_scrolly + 1 + state->m_fore_yscroll );
 
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemaps[1], TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemaps[0], 0, 0);
+		state->m_bg_tilemaps[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		state->m_bg_tilemaps[0]->draw(bitmap, cliprect, 0, 0);
 
-		tilemap_set_scrolly(state->m_text_tilemap, 0, state->m_text_yscroll);
+		state->m_text_tilemap->set_scrolly(0, state->m_text_yscroll);
 
-		tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
+		state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	/* draw the sprites */
@@ -702,23 +702,23 @@ SCREEN_UPDATE_IND16( s16a_bootleg_passht4b )
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemaps[0]);
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemaps[1]);
-	tilemap_mark_all_tiles_dirty(state->m_text_tilemap);
+	state->m_bg_tilemaps[0]->mark_all_dirty();
+	state->m_bg_tilemaps[1]->mark_all_dirty();
+	state->m_text_tilemap->mark_all_dirty();
 
-	tilemap_set_scrollx(state->m_text_tilemap, 0, offset_txtx);
-	tilemap_set_scrolly(state->m_text_tilemap, 0, offset_txty);
+	state->m_text_tilemap->set_scrollx(0, offset_txtx);
+	state->m_text_tilemap->set_scrolly(0, offset_txty);
 
 	if ((state->m_tilemapselect & 0xff) == 0x12)
 	{
-		tilemap_set_scrollx(state->m_bg_tilemaps[1], 0, (state->m_bg_scrollx ^ 0x7) + offset_bg1x);
-		tilemap_set_scrolly(state->m_bg_tilemaps[1], 0, state->m_bg_scrolly + offset_bg1y);
-		tilemap_set_scrollx(state->m_bg_tilemaps[0], 0, (state->m_fg_scrollx ^ 0x7) + offset_bg0x);
-		tilemap_set_scrolly(state->m_bg_tilemaps[0], 0, state->m_fg_scrolly + offset_bg0y);
+		state->m_bg_tilemaps[1]->set_scrollx(0, (state->m_bg_scrollx ^ 0x7) + offset_bg1x);
+		state->m_bg_tilemaps[1]->set_scrolly(0, state->m_bg_scrolly + offset_bg1y);
+		state->m_bg_tilemaps[0]->set_scrollx(0, (state->m_fg_scrollx ^ 0x7) + offset_bg0x);
+		state->m_bg_tilemaps[0]->set_scrolly(0, state->m_fg_scrolly + offset_bg0y);
 
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemaps[0], TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemaps[1], 0, 0);
-		tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
+		state->m_bg_tilemaps[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		state->m_bg_tilemaps[1]->draw(bitmap, cliprect, 0, 0);
+		state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
 	/* draw the sprites */
@@ -744,29 +744,29 @@ SCREEN_UPDATE_IND16( system16 )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_set_scrollx(state->m_background, 0, -320 - state->m_bg_scrollx);
-	tilemap_set_scrolly(state->m_background, 0, -256 + state->m_bg_scrolly + state->m_back_yscroll);
-	tilemap_set_scrollx(state->m_foreground, 0, -320 - state->m_fg_scrollx);
-	tilemap_set_scrolly(state->m_foreground, 0, -256 + state->m_fg_scrolly + state->m_fore_yscroll);
+	state->m_background->set_scrollx(0, -320 - state->m_bg_scrollx);
+	state->m_background->set_scrolly(0, -256 + state->m_bg_scrolly + state->m_back_yscroll);
+	state->m_foreground->set_scrollx(0, -320 - state->m_fg_scrollx);
+	state->m_foreground->set_scrolly(0, -256 + state->m_fg_scrolly + state->m_fore_yscroll);
 
-	tilemap_set_scrollx(state->m_text_layer, 0, 0);
-	tilemap_set_scrolly(state->m_text_layer, 0, 0 + state->m_text_yscroll);
+	state->m_text_layer->set_scrollx(0, 0);
+	state->m_text_layer->set_scrolly(0, 0 + state->m_text_yscroll);
 
 	/* Background */
-	tilemap_draw(bitmap, cliprect, state->m_background, TILEMAP_DRAW_OPAQUE, 0x00);
+	state->m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0x00);
 
 	/* Foreground */
-	tilemap_draw(bitmap, cliprect, state->m_foreground, 0, 0x03);
-	tilemap_draw(bitmap, cliprect, state->m_foreground, 1, 0x07);
+	state->m_foreground->draw(bitmap, cliprect, 0, 0x03);
+	state->m_foreground->draw(bitmap, cliprect, 1, 0x07);
 
 
 	/* Text Layer */
 	if (state->m_textlayer_lo_max != 0)
 	{
-		tilemap_draw(bitmap, cliprect, state->m_text_layer, 1, 7);// needed for Body Slam
+		state->m_text_layer->draw(bitmap, cliprect, 1, 7);// needed for Body Slam
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_text_layer, 0, 0xf);
+	state->m_text_layer->draw(bitmap, cliprect, 0, 0xf);
 
 	//draw_sprites(screen.machine(), bitmap, cliprect,0);
 
@@ -792,17 +792,17 @@ SCREEN_UPDATE_IND16( system18old )
 
 	bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_background, TILEMAP_DRAW_OPAQUE, 0);
-	tilemap_draw(bitmap, cliprect, state->m_background, TILEMAP_DRAW_OPAQUE | 1, 0);	//??
-	tilemap_draw(bitmap, cliprect, state->m_background, TILEMAP_DRAW_OPAQUE | 2, 0);	//??
-	tilemap_draw(bitmap, cliprect, state->m_background, 1, 0x1);
-	tilemap_draw(bitmap, cliprect, state->m_background, 2, 0x3);
+	state->m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	state->m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);	//??
+	state->m_background->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 2, 0);	//??
+	state->m_background->draw(bitmap, cliprect, 1, 0x1);
+	state->m_background->draw(bitmap, cliprect, 2, 0x3);
 
-	tilemap_draw(bitmap, cliprect, state->m_foreground, 0, 0x3);
-	tilemap_draw(bitmap, cliprect, state->m_foreground, 1, 0x7);
+	state->m_foreground->draw(bitmap, cliprect, 0, 0x3);
+	state->m_foreground->draw(bitmap, cliprect, 1, 0x7);
 
-	tilemap_draw(bitmap, cliprect, state->m_text_layer, 1, 0x7);
-	tilemap_draw(bitmap, cliprect, state->m_text_layer, 0, 0xf);
+	state->m_text_layer->draw(bitmap, cliprect, 1, 0x7);
+	state->m_text_layer->draw(bitmap, cliprect, 0, 0xf);
 
 	/* draw the sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);

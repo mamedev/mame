@@ -97,7 +97,7 @@ static TILE_GET_INFO( get_tile_info )
 	int color = attr & 0x1f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
-	tileinfo->category = (attr & 0x10) >> 4;
+	tileinfo.category = (attr & 0x10) >> 4;
 	SET_TILE_INFO(0, code, color, flags);
 }
 
@@ -109,7 +109,7 @@ static TILE_GET_INFO( get_chkun_tile_info )
 	int color = attr & 0x1f;
 	int flags = 0;//TILE_FLIPYX(attr >> 6);
 
-	tileinfo->category = (attr & 0x80) >> 7;
+	tileinfo.category = (attr & 0x80) >> 7;
 	SET_TILE_INFO(0, code, color, flags);
 }
 
@@ -145,7 +145,7 @@ WRITE8_HANDLER( timeplt_videoram_w )
 {
 	timeplt_state *state = space->machine().driver_data<timeplt_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -153,7 +153,7 @@ WRITE8_HANDLER( timeplt_colorram_w )
 {
 	timeplt_state *state = space->machine().driver_data<timeplt_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -213,8 +213,8 @@ SCREEN_UPDATE_IND16( timeplt )
 {
 	timeplt_state *state = screen.machine().driver_data<timeplt_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	return 0;
 }

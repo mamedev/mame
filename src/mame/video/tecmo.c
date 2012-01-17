@@ -99,12 +99,12 @@ VIDEO_START( tecmo )
 	}
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_tx_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap,-48,256+48);
-	tilemap_set_scrolldx(state->m_fg_tilemap,-48,256+48);
+	state->m_bg_tilemap->set_scrolldx(-48,256+48);
+	state->m_fg_tilemap->set_scrolldx(-48,256+48);
 }
 
 
@@ -119,21 +119,21 @@ WRITE8_HANDLER( tecmo_txvideoram_w )
 {
 	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 	state->m_txvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset & 0x3ff);
+	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( tecmo_fgvideoram_w )
 {
 	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 	state->m_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x1ff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
 WRITE8_HANDLER( tecmo_bgvideoram_w )
 {
 	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 	state->m_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x1ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
 WRITE8_HANDLER( tecmo_fgscroll_w )
@@ -142,8 +142,8 @@ WRITE8_HANDLER( tecmo_fgscroll_w )
 
 	state->m_fgscroll[offset] = data;
 
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_fgscroll[0] + 256 * state->m_fgscroll[1]);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_fgscroll[2]);
+	state->m_fg_tilemap->set_scrollx(0, state->m_fgscroll[0] + 256 * state->m_fgscroll[1]);
+	state->m_fg_tilemap->set_scrolly(0, state->m_fgscroll[2]);
 }
 
 WRITE8_HANDLER( tecmo_bgscroll_w )
@@ -152,8 +152,8 @@ WRITE8_HANDLER( tecmo_bgscroll_w )
 
 	state->m_bgscroll[offset] = data;
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bgscroll[0] + 256 * state->m_bgscroll[1]);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_bgscroll[2]);
+	state->m_bg_tilemap->set_scrollx(0, state->m_bgscroll[0] + 256 * state->m_bgscroll[1]);
+	state->m_bg_tilemap->set_scrolly(0, state->m_bgscroll[2]);
 }
 
 WRITE8_HANDLER( tecmo_flipscreen_w )
@@ -253,9 +253,9 @@ SCREEN_UPDATE_IND16( tecmo )
 	tecmo_state *state = screen.machine().driver_data<tecmo_state>();
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0x100, cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,1);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,2);
-	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,4);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,1);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,2);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0,4);
 
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;

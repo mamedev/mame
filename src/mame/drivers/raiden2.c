@@ -724,25 +724,25 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 WRITE16_MEMBER(raiden2_state::raiden2_background_w)
 {
 	COMBINE_DATA(&back_data[offset]);
-	tilemap_mark_tile_dirty(background_layer, offset);
+	background_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_midground_w)
 {
 	COMBINE_DATA(&mid_data[offset]);
-	tilemap_mark_tile_dirty(midground_layer,offset);
+	midground_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_foreground_w)
 {
 	COMBINE_DATA(&fore_data[offset]);
-	tilemap_mark_tile_dirty(foreground_layer,offset);
+	foreground_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_text_w)
 {
 	COMBINE_DATA(&text_data[offset]);
-	tilemap_mark_tile_dirty(text_layer, offset);
+	text_layer->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(raiden2_state::tilemap_enable_w)
@@ -762,9 +762,9 @@ WRITE16_MEMBER(raiden2_state::tile_scroll_w)
 	case 2: tm = foreground_layer; break;
 	}
 	if(offset & 1)
-		tilemap_set_scrolly(tm, 0, data);
+		tm->set_scrolly(0, data);
 	else
-		tilemap_set_scrollx(tm, 0, data);
+		tm->set_scrollx(0, data);
 }
 
 WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
@@ -774,13 +774,13 @@ WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
 		new_bank = 0 | ((data & 1)<<1);
 		if(new_bank != bg_bank) {
 			bg_bank = new_bank;
-			tilemap_mark_all_tiles_dirty(background_layer);
+			background_layer->mark_all_dirty();
 		}
 
 		new_bank = 1 | (data & 2);
 		if(new_bank != mid_bank) {
 			mid_bank = new_bank;
-			tilemap_mark_all_tiles_dirty(midground_layer);
+			midground_layer->mark_all_dirty();
 		}
 	}
 }
@@ -798,7 +798,7 @@ WRITE16_MEMBER(raiden2_state::cop_tile_bank_2_w)
 		int new_bank = 4 | (data >> 14);
 		if(new_bank != fg_bank) {
 			fg_bank = new_bank;
-			tilemap_mark_all_tiles_dirty(foreground_layer);
+			foreground_layer->mark_all_dirty();
 		}
 	}
 }
@@ -811,7 +811,7 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 		int new_bank = 4 | ((cop_bank >> 10) & 3);
 		if(new_bank != fg_bank) {
 			fg_bank = new_bank;
-			tilemap_mark_all_tiles_dirty(foreground_layer);
+			foreground_layer->mark_all_dirty();
 		}
 
 		/* probably bit 3 is from 6c9 */
@@ -879,9 +879,9 @@ static VIDEO_START( raiden2 )
 	state->midground_layer  = tilemap_create(machine, get_mid_tile_info,  tilemap_scan_rows, 16,16, 32,32 );
 	state->foreground_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16,16, 32,32 );
 
-	tilemap_set_transparent_pen(state->midground_layer, 15);
-	tilemap_set_transparent_pen(state->foreground_layer, 15);
-	tilemap_set_transparent_pen(state->text_layer, 15);
+	state->midground_layer->set_transparent_pen(15);
+	state->foreground_layer->set_transparent_pen(15);
+	state->text_layer->set_transparent_pen(15);
 }
 
 /* SCREEN_UPDATE_IND16 (move to video file) */
@@ -894,19 +894,19 @@ static SCREEN_UPDATE_IND16( raiden2 )
 	//if (!screen.machine().input().code_pressed(KEYCODE_Q))
 	{
 		if (!(state->raiden2_tilemap_enable & 1))
-			tilemap_draw(bitmap, cliprect, state->background_layer, 0, 0);
+			state->background_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_W))
 	{
 		if (!(state->raiden2_tilemap_enable & 2))
-			tilemap_draw(bitmap, cliprect, state->midground_layer, 0, 0);
+			state->midground_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_E))
 	{
 		if (!(state->raiden2_tilemap_enable & 4))
-			tilemap_draw(bitmap, cliprect, state->foreground_layer, 0, 0);
+			state->foreground_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
 	//if (!screen.machine().input().code_pressed(KEYCODE_S))
@@ -918,7 +918,7 @@ static SCREEN_UPDATE_IND16( raiden2 )
 	//if (!screen.machine().input().code_pressed(KEYCODE_A))
 	{
 		if (!(state->raiden2_tilemap_enable & 8))
-			tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0);
+			state->text_layer->draw(bitmap, cliprect, 0, 0);
 	}
 
 	return 0;

@@ -227,7 +227,7 @@ static WRITE8_DEVICE_HANDLER( bogeyman_colbank_w )
 	if((data & 1) != (state->m_colbank & 1))
 	{
 		state->m_colbank = data & 1;
-		tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+		state->m_fg_tilemap->mark_all_dirty();
 	}
 }
 

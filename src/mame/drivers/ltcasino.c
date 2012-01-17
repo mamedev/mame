@@ -56,14 +56,14 @@ static WRITE8_HANDLER( ltcasino_tile_num_w )
 {
 	ltcasino_state *state = space->machine().driver_data<ltcasino_state>();
 	state->m_tile_num_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap,offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( ltcasino_tile_atr_w )
 {
 	ltcasino_state *state = space->machine().driver_data<ltcasino_state>();
 	state->m_tile_atr_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap,offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -635,7 +635,7 @@ GFXDECODE_END
 static SCREEN_UPDATE_IND16(ltcasino)
 {
 	ltcasino_state *state = screen.machine().driver_data<ltcasino_state>();
-	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
+	state->m_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 

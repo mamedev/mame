@@ -77,11 +77,11 @@ VIDEO_START( xxmissio )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 
-	tilemap_set_scroll_cols(state->m_bg_tilemap, 1);
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 1);
-	tilemap_set_scrolldx(state->m_bg_tilemap, 2, 12);
+	state->m_bg_tilemap->set_scroll_cols(1);
+	state->m_bg_tilemap->set_scroll_rows(1);
+	state->m_bg_tilemap->set_scrolldx(2, 12);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -139,15 +139,15 @@ static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const 
 SCREEN_UPDATE_IND16( xxmissio )
 {
 	xxmissio_state *state = screen.machine().driver_data<xxmissio_state>();
-	tilemap_mark_all_tiles_dirty_all(screen.machine());
-	tilemap_set_flip_all(screen.machine(), state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	screen.machine().tilemap().mark_all_dirty();
+	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_xscroll * 2);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_yscroll);
+	state->m_bg_tilemap->set_scrollx(0, state->m_xscroll * 2);
+	state->m_bg_tilemap->set_scrolly(0, state->m_yscroll);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, screen.machine().gfx[1]);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

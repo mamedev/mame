@@ -12,7 +12,7 @@ TODO:
 
 static void tilemap_get_info(
 	running_machine &machine,
-	tile_data *tileinfo,
+	tile_data &tileinfo,
 	int tile_index,
 	const UINT16 *tilemap_videoram,
 	int tilemap_color,
@@ -44,7 +44,7 @@ static void tilemap_get_info(
 	{
 		SET_TILE_INFO( gfx,tile,tilemap_color,0 );
 		if (ENDIANNESS_NATIVE == ENDIANNESS_BIG)
-			tileinfo->mask_data = (UINT8 *)(state->m_shaperam+4*tile);
+			tileinfo.mask_data = (UINT8 *)(state->m_shaperam+4*tile);
 		else
 		{
 			UINT8 *mask_data = state->m_mask_data;
@@ -57,7 +57,7 @@ static void tilemap_get_info(
 			mask_data[5] = source[2]&0xff;
 			mask_data[6] = source[3]>>8;
 			mask_data[7] = source[3]&0xff;
-			tileinfo->mask_data = mask_data;
+			tileinfo.mask_data = mask_data;
 		}
 	}
 } /* tilemap_get_info */
@@ -130,7 +130,7 @@ static TILE_GET_INFO( roz_get_info )
 			mask_data = conv_data;
 		}
 		SET_TILE_INFO( gfx,tile,tilemap_color,0 );
-		tileinfo->mask_data = mask_data;
+		tileinfo.mask_data = mask_data;
 	}
 } /* roz_get_info */
 
@@ -143,11 +143,11 @@ WRITE16_HANDLER( namcona1_videoram_w )
 	COMBINE_DATA( &videoram[offset] );
 	if( offset<0x8000/2 )
 	{
-		tilemap_mark_tile_dirty( state->m_bg_tilemap[offset/0x1000], offset&0xfff );
+		state->m_bg_tilemap[offset/0x1000]->mark_tile_dirty(offset&0xfff );
 	}
 	else if( offset<0xa000/2 )
 	{
-		tilemap_mark_all_tiles_dirty( state->m_roz_tilemap );
+		state->m_roz_tilemap ->mark_all_dirty();
 	}
 } /* namcona1_videoram_w */
 
@@ -621,14 +621,14 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 					int dy = -8; /* vertical adjust */
 					UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
 					UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
-					tilemap_draw_roz_primask(bitmap, clip, state->m_roz_tilemap,
+					state->m_roz_tilemap->draw_roz(bitmap, clip, 
 						startx, starty, incxx, incxy, incyx, incyy, 0, 0, primask, 0);
 				}
 				else
 				{
-					tilemap_set_scrollx( state->m_bg_tilemap[which], 0, scrollx );
-					tilemap_set_scrolly( state->m_bg_tilemap[which], 0, scrolly );
-					tilemap_draw_primask( bitmap, clip, state->m_bg_tilemap[which], 0, primask, 0 );
+					state->m_bg_tilemap[which]->set_scrollx(0, scrollx );
+					state->m_bg_tilemap[which]->set_scrolly(0, scrolly );
+					state->m_bg_tilemap[which]->draw(bitmap, clip, 0, primask, 0 );
 				}
 			}
 		}
@@ -660,7 +660,7 @@ SCREEN_UPDATE_IND16( namcona1 )
 			int tilemap_color = state->m_vreg[0xb0/2+(which&3)]&0xf;
 			if( tilemap_color!=state->m_tilemap_palette_bank[which] )
 			{
-				tilemap_mark_all_tiles_dirty( state->m_bg_tilemap[which] );
+				state->m_bg_tilemap[which] ->mark_all_dirty();
 				state->m_tilemap_palette_bank[which] = tilemap_color;
 			}
 		} /* next tilemap */
@@ -669,7 +669,7 @@ SCREEN_UPDATE_IND16( namcona1 )
 			int color = state->m_vreg[0xba/2]&0xf;
 			if( color != state->m_roz_palette )
 			{
-				tilemap_mark_all_tiles_dirty( state->m_roz_tilemap );
+				state->m_roz_tilemap ->mark_all_dirty();
 				state->m_roz_palette = color;
 			}
 		}

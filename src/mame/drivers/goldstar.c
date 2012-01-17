@@ -396,7 +396,7 @@ static WRITE8_HANDLER( magodds_outb850_w )
 
 	//popmessage("magodds_outb850_w %02x\n", data);
 
-	tilemap_mark_all_tiles_dirty (state->m_fg_tilemap);
+	state->m_fg_tilemap->mark_all_dirty();
 
 }
 

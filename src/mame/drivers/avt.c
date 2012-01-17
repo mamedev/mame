@@ -467,14 +467,14 @@ public:
 WRITE8_MEMBER( avt_state::avt_videoram_w )
 {
 	m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(m_bg_tilemap, offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
 WRITE8_MEMBER( avt_state::avt_colorram_w )
 {
 	m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(m_bg_tilemap, offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -522,7 +522,7 @@ static SCREEN_UPDATE_IND16( avt )
 			count++;
 		}
 	}
-	//tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	//state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

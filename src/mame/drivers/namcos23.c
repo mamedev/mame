@@ -1154,8 +1154,8 @@ static WRITE32_HANDLER( namcos23_textram_w )
 {
 	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	COMBINE_DATA( &state->m_textram[offset] );
-	tilemap_mark_tile_dirty(state->m_bgtilemap, offset*2);
-	tilemap_mark_tile_dirty(state->m_bgtilemap, (offset*2)+1);
+	state->m_bgtilemap->mark_tile_dirty(offset*2);
+	state->m_bgtilemap->mark_tile_dirty((offset*2)+1);
 }
 
 static WRITE32_HANDLER( s23_txtchar_w )
@@ -1470,11 +1470,11 @@ static WRITE16_HANDLER(s23_c361_w)
 
 	switch(offset) {
 	case 0:
-		tilemap_set_scrollx(state->m_bgtilemap, 0, data&0xfff);
+		state->m_bgtilemap->set_scrollx(0, data&0xfff);
 		break;
 
 	case 1:
-		tilemap_set_scrolly(state->m_bgtilemap, 0, data&0xfff);
+		state->m_bgtilemap->set_scrolly(0, data&0xfff);
 		break;
 
 	case 4:	// interrupt control
@@ -2117,18 +2117,18 @@ static VIDEO_START( ss23 )
 	namcos23_state *state = machine.driver_data<namcos23_state>();
 	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_charram);
 	state->m_bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
-	tilemap_set_transparent_pen(state->m_bgtilemap, 0xf);
+	state->m_bgtilemap->set_transparent_pen(0xf);
 
 	// Gorgon's tilemap offset is 0, S23/SS23's is 860
 	if ((!strcmp(machine.system().name, "rapidrvr")) ||
 	    (!strcmp(machine.system().name, "rapidrvr2")) ||
 	    (!strcmp(machine.system().name, "finlflng")))
 	{
-		tilemap_set_scrolldx(state->m_bgtilemap, 0, 0);
+		state->m_bgtilemap->set_scrolldx(0, 0);
 	}
 	else
 	{
-		tilemap_set_scrolldx(state->m_bgtilemap, 860, 860);
+		state->m_bgtilemap->set_scrolldx(860, 860);
 	}
 	state->m_render.polymgr = poly_alloc(machine, 10000, sizeof(namcos23_render_data), POLYFLAG_NO_WORK_QUEUE);
 }
@@ -2143,7 +2143,7 @@ static SCREEN_UPDATE_RGB32( ss23 )
 	gfx_element *gfx = screen.machine().gfx[0];
 	memset(gfx->dirty, 1, gfx->total_elements);
 
-	tilemap_draw( bitmap, cliprect, state->m_bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
+	state->m_bgtilemap->draw(bitmap, cliprect, 0/*flags*/, 0/*priority*/ ); /* opaque */
 	return 0;
 }
 

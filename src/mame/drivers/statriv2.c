@@ -166,7 +166,7 @@ static WRITE8_HANDLER( statriv2_videoram_w )
 	statriv2_state *state = space->machine().driver_data<statriv2_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset & 0x3ff);
+	state->m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -183,7 +183,7 @@ static SCREEN_UPDATE_IND16( statriv2 )
 	if (tms9927_screen_reset(screen.machine().device("tms")))
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	else
-		tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+		state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

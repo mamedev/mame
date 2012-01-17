@@ -59,8 +59,8 @@ VIDEO_START( msisaac )
 	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_fg_tilemap  = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_bg2_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_bg2_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -73,37 +73,37 @@ VIDEO_START( msisaac )
 WRITE8_HANDLER( msisaac_fg_scrolly_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, data);
+	state->m_fg_tilemap->set_scrolly(0, data);
 }
 
 WRITE8_HANDLER( msisaac_fg_scrollx_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, 9 + data);
+	state->m_fg_tilemap->set_scrollx(0, 9 + data);
 }
 
 WRITE8_HANDLER( msisaac_bg2_scrolly_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	tilemap_set_scrolly(state->m_bg2_tilemap, 0, data);
+	state->m_bg2_tilemap->set_scrolly(0, data);
 }
 
 WRITE8_HANDLER( msisaac_bg2_scrollx_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	tilemap_set_scrollx(state->m_bg2_tilemap, 0, 9 + 2 + data);
+	state->m_bg2_tilemap->set_scrollx(0, 9 + 2 + data);
 }
 
 WRITE8_HANDLER( msisaac_bg_scrolly_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrolly(0, data);
 }
 
 WRITE8_HANDLER( msisaac_bg_scrollx_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, 9 + 4 + data);
+	state->m_bg_tilemap->set_scrollx(0, 9 + 4 + data);
 }
 
 
@@ -113,7 +113,7 @@ WRITE8_HANDLER( msisaac_textbank1_w )
 	if (textbank1!=data)
 	{
 		textbank1 = data;
-		tilemap_mark_all_tiles_dirty(fg_tilemap);
+		fg_tilemap->mark_all_dirty();
 	}
 }
 #endif
@@ -124,7 +124,7 @@ WRITE8_HANDLER( msisaac_bg2_textbank_w )
 	if (state->m_bg2_textbank != data )
 	{
 		state->m_bg2_textbank = data;
-		tilemap_mark_all_tiles_dirty(state->m_bg2_tilemap);
+		state->m_bg2_tilemap->mark_all_dirty();
 
 		//check if we are correct on this one
 		if ((data != 8) && (data != 0))
@@ -138,21 +138,21 @@ WRITE8_HANDLER( msisaac_bg_videoram_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( msisaac_bg2_videoram_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	state->m_videoram3[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset);
+	state->m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( msisaac_fg_videoram_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -247,9 +247,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 SCREEN_UPDATE_IND16( msisaac )
 {
 	msisaac_state *state = screen.machine().driver_data<msisaac_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

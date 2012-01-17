@@ -93,9 +93,9 @@ VIDEO_START( xain )
 	state->m_bgram1_tilemap = tilemap_create(machine, get_bgram1_tile_info,back_scan,    16,16,32,32);
 	state->m_char_tilemap = tilemap_create(machine, get_char_tile_info,tilemap_scan_rows, 8, 8,32,32);
 
-	tilemap_set_transparent_pen(state->m_bgram0_tilemap,0);
-	tilemap_set_transparent_pen(state->m_bgram1_tilemap,0);
-	tilemap_set_transparent_pen(state->m_char_tilemap,0);
+	state->m_bgram0_tilemap->set_transparent_pen(0);
+	state->m_bgram1_tilemap->set_transparent_pen(0);
+	state->m_char_tilemap->set_transparent_pen(0);
 }
 
 
@@ -110,21 +110,21 @@ WRITE8_HANDLER( xain_bgram0_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
 	state->m_bgram0[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bgram0_tilemap,offset & 0x3ff);
+	state->m_bgram0_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( xain_bgram1_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
 	state->m_bgram1[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bgram1_tilemap,offset & 0x3ff);
+	state->m_bgram1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( xain_charram_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
 	state->m_charram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_char_tilemap,offset & 0x3ff);
+	state->m_char_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( xain_scrollxP0_w )
@@ -132,7 +132,7 @@ WRITE8_HANDLER( xain_scrollxP0_w )
 	xain_state *state = space->machine().driver_data<xain_state>();
 
 	state->m_scrollxP0[offset] = data;
-	tilemap_set_scrollx(state->m_bgram0_tilemap, 0, state->m_scrollxP0[0]|(state->m_scrollxP0[1]<<8));
+	state->m_bgram0_tilemap->set_scrollx(0, state->m_scrollxP0[0]|(state->m_scrollxP0[1]<<8));
 }
 
 WRITE8_HANDLER( xain_scrollyP0_w )
@@ -140,7 +140,7 @@ WRITE8_HANDLER( xain_scrollyP0_w )
 	xain_state *state = space->machine().driver_data<xain_state>();
 
 	state->m_scrollyP0[offset] = data;
-	tilemap_set_scrolly(state->m_bgram0_tilemap, 0, state->m_scrollyP0[0]|(state->m_scrollyP0[1]<<8));
+	state->m_bgram0_tilemap->set_scrolly(0, state->m_scrollyP0[0]|(state->m_scrollyP0[1]<<8));
 }
 
 WRITE8_HANDLER( xain_scrollxP1_w )
@@ -148,7 +148,7 @@ WRITE8_HANDLER( xain_scrollxP1_w )
 	xain_state *state = space->machine().driver_data<xain_state>();
 
 	state->m_scrollxP1[offset] = data;
-	tilemap_set_scrollx(state->m_bgram1_tilemap, 0, state->m_scrollxP1[0]|(state->m_scrollxP1[1]<<8));
+	state->m_bgram1_tilemap->set_scrollx(0, state->m_scrollxP1[0]|(state->m_scrollxP1[1]<<8));
 }
 
 WRITE8_HANDLER( xain_scrollyP1_w )
@@ -156,7 +156,7 @@ WRITE8_HANDLER( xain_scrollyP1_w )
 	xain_state *state = space->machine().driver_data<xain_state>();
 
 	state->m_scrollyP1[offset] = data;
-	tilemap_set_scrolly(state->m_bgram1_tilemap, 0, state->m_scrollyP1[0]|(state->m_scrollyP1[1]<<8));
+	state->m_bgram1_tilemap->set_scrolly(0, state->m_scrollyP1[0]|(state->m_scrollyP1[1]<<8));
 }
 
 
@@ -229,52 +229,52 @@ SCREEN_UPDATE_IND16( xain )
 	switch (state->m_pri&0x7)
 	{
 	case 0:
-		tilemap_draw(bitmap,cliprect,state->m_bgram0_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->m_bgram1_tilemap,0,0);
+		state->m_bgram0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		tilemap_draw(bitmap,cliprect,state->m_char_tilemap,0,0);
+		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 1:
-		tilemap_draw(bitmap,cliprect,state->m_bgram1_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->m_bgram0_tilemap,0,0);
+		state->m_bgram1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		tilemap_draw(bitmap,cliprect,state->m_char_tilemap,0,0);
+		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 2:
-		tilemap_draw(bitmap,cliprect,state->m_char_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->m_bgram0_tilemap,0,0);
+		state->m_char_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		tilemap_draw(bitmap,cliprect,state->m_bgram1_tilemap,0,0);
+		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 3:
-		tilemap_draw(bitmap,cliprect,state->m_char_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->m_bgram1_tilemap,0,0);
+		state->m_char_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		tilemap_draw(bitmap,cliprect,state->m_bgram0_tilemap,0,0);
+		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 4:
-		tilemap_draw(bitmap,cliprect,state->m_bgram0_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->m_char_tilemap,0,0);
+		state->m_bgram0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		tilemap_draw(bitmap,cliprect,state->m_bgram1_tilemap,0,0);
+		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 5:
-		tilemap_draw(bitmap,cliprect,state->m_bgram1_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->m_char_tilemap,0,0);
+		state->m_bgram1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		tilemap_draw(bitmap,cliprect,state->m_bgram0_tilemap,0,0);
+		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 6:
-		tilemap_draw(bitmap,cliprect,state->m_bgram0_tilemap,TILEMAP_DRAW_OPAQUE,0);
+		state->m_bgram0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		tilemap_draw(bitmap,cliprect,state->m_bgram1_tilemap,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_char_tilemap,0,0);
+		state->m_bgram1_tilemap->draw(bitmap, cliprect, 0,0);
+		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	case 7:
-		tilemap_draw(bitmap,cliprect,state->m_bgram1_tilemap,TILEMAP_DRAW_OPAQUE,0);
+		state->m_bgram1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(screen.machine(), bitmap,cliprect);
-		tilemap_draw(bitmap,cliprect,state->m_bgram0_tilemap,0,0);
-		tilemap_draw(bitmap,cliprect,state->m_char_tilemap,0,0);
+		state->m_bgram0_tilemap->draw(bitmap, cliprect, 0,0);
+		state->m_char_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 	}
 	return 0;

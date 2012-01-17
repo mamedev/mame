@@ -51,14 +51,14 @@ WRITE8_HANDLER( crbaloon_videoram_w )
 {
 	crbaloon_state *state = space->machine().driver_data<crbaloon_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( crbaloon_colorram_w )
 {
 	crbaloon_state *state = space->machine().driver_data<crbaloon_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -151,7 +151,7 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_ind
 SCREEN_UPDATE_IND16( crbaloon )
 {
 	crbaloon_state *state = screen.machine().driver_data<crbaloon_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprite_and_check_collision(screen.machine(), bitmap);
 

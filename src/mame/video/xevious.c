@@ -222,11 +222,11 @@ VIDEO_START( xevious )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     8,8,64,32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap,-20,288+27);
-	tilemap_set_scrolldy(state->m_bg_tilemap,-16,-16);
-	tilemap_set_scrolldx(state->m_fg_tilemap,-32,288+32);
-	tilemap_set_scrolldy(state->m_fg_tilemap,-18,-10);
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	state->m_bg_tilemap->set_scrolldx(-20,288+27);
+	state->m_bg_tilemap->set_scrolldy(-16,-16);
+	state->m_fg_tilemap->set_scrolldx(-32,288+32);
+	state->m_fg_tilemap->set_scrolldy(-18,-10);
+	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_xevious_bs[0] = 0;
 	state->m_xevious_bs[1] = 0;
 
@@ -246,7 +246,7 @@ WRITE8_HANDLER( xevious_fg_videoram_w )
 	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	state->m_xevious_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( xevious_fg_colorram_w )
@@ -254,7 +254,7 @@ WRITE8_HANDLER( xevious_fg_colorram_w )
 	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	state->m_xevious_fg_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( xevious_bg_videoram_w )
@@ -262,7 +262,7 @@ WRITE8_HANDLER( xevious_bg_videoram_w )
 	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	state->m_xevious_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( xevious_bg_colorram_w )
@@ -270,7 +270,7 @@ WRITE8_HANDLER( xevious_bg_colorram_w )
 	xevious_state *state =  space->machine().driver_data<xevious_state>();
 
 	state->m_xevious_bg_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( xevious_vh_latch_w )
@@ -285,16 +285,16 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 	switch (reg)
 	{
 	case 0:
-		tilemap_set_scrollx(state->m_bg_tilemap,0,scroll);
+		state->m_bg_tilemap->set_scrollx(0,scroll);
 		break;
 	case 1:
-		tilemap_set_scrollx(state->m_fg_tilemap,0,scroll);
+		state->m_fg_tilemap->set_scrollx(0,scroll);
 		break;
 	case 2:
-		tilemap_set_scrolly(state->m_bg_tilemap,0,scroll);
+		state->m_bg_tilemap->set_scrolly(0,scroll);
 		break;
 	case 3:
-		tilemap_set_scrolly(state->m_fg_tilemap,0,scroll);
+		state->m_fg_tilemap->set_scrolly(0,scroll);
 		break;
 	case 7:
 		flip_screen_set(space->machine(), scroll & 1);
@@ -502,8 +502,8 @@ SCREEN_UPDATE_IND16( xevious )
 {
 	xevious_state *state =  screen.machine().driver_data<xevious_state>();
 
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

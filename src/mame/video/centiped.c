@@ -153,7 +153,7 @@ WRITE8_HANDLER( centiped_videoram_w )
 	UINT8 *videoram = state->m_videoram;
 
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -184,7 +184,7 @@ WRITE8_HANDLER( bullsdrt_tilesbank_w )
 	centiped_state *state = space->machine().driver_data<centiped_state>();
 
 	state->m_bullsdrt_tiles_bankram[offset] = data;
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 }
 
 
@@ -437,7 +437,7 @@ SCREEN_UPDATE_IND16( centiped )
 	int offs;
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* apply the sprite clip */
 	if (state->m_flipscreen)
@@ -472,12 +472,12 @@ SCREEN_UPDATE_IND16( warlords )
 	if (state->m_flipscreen != upright_mode)
 	{
 		state->m_flipscreen = upright_mode;
-		tilemap_set_flip(state->m_bg_tilemap, upright_mode ? TILEMAP_FLIPX : 0);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->set_flip(upright_mode ? TILEMAP_FLIPX : 0);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0; offs < 0x10; offs++)
@@ -516,7 +516,7 @@ SCREEN_UPDATE_IND16( bullsdrt )
 	int offs;
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* apply the sprite clip */
 	if (state->m_flipscreen)
@@ -550,7 +550,7 @@ SCREEN_UPDATE_IND16( milliped )
 	int offs;
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* apply the sprite clip */
 	if (state->m_flipscreen)

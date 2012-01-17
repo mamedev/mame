@@ -95,10 +95,10 @@ static SCREEN_UPDATE_IND16( flyball )
 	int x;
 	int y;
 
-	tilemap_mark_all_tiles_dirty(state->m_tmap);
+	state->m_tmap->mark_all_dirty();
 
 	/* draw playfield */
-	tilemap_draw(bitmap, cliprect, state->m_tmap, 0, 0);
+	state->m_tmap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw pitcher */
 	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], state->m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);

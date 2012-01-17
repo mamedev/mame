@@ -257,7 +257,7 @@ static void common_start(running_machine &machine, int multi32)
 		entry->page = 0xff;
 		entry->bank = 0;
 		entry->next = state->m_cache_head;
-		tilemap_set_user_data(entry->tmap, entry);
+		entry->tmap->set_user_data(entry);
 
 		state->m_cache_head = entry;
 	}
@@ -507,7 +507,7 @@ WRITE16_HANDLER( system32_videoram_w )
 		/* scan the cache for a matching pages */
 		for (entry = state->m_cache_head; entry != NULL; entry = entry->next)
 			if (entry->page == page)
-				tilemap_mark_tile_dirty(entry->tmap, offset);
+				entry->tmap->mark_tile_dirty(offset);
 	}
 }
 
@@ -743,7 +743,7 @@ static tilemap_t *find_cache_entry(segas32_state *state, int page, int bank)
 	/* okay, we didn't find one; take over this last entry */
 	entry->page = page;
 	entry->bank = bank;
-	tilemap_mark_all_tiles_dirty(entry->tmap);
+	entry->tmap->mark_all_dirty();
 
 	/* move it to the head */
 	prev->next = entry->next;
@@ -996,8 +996,8 @@ static void update_tilemap_zoom(screen_device &screen, struct layer_info *layer,
 			UINT16 *src[2];
 
 			/* look up the pages and get their source pixmaps */
-			bitmap_ind16 &tm0 = tilemap_get_pixmap(tilemaps[((srcy >> 27) & 2) + 0]);
-			bitmap_ind16 &tm1 = tilemap_get_pixmap(tilemaps[((srcy >> 27) & 2) + 1]);
+			bitmap_ind16 &tm0 = tilemaps[((srcy >> 27) & 2) + 0]->pixmap();
+			bitmap_ind16 &tm1 = tilemaps[((srcy >> 27) & 2) + 1]->pixmap();
 			src[0] = &tm0.pix16((srcy >> 20) & 0xff);
 			src[1] = &tm1.pix16((srcy >> 20) & 0xff);
 
@@ -1154,8 +1154,8 @@ static void update_tilemap_rowscroll(screen_device &screen, struct layer_info *l
 			}
 
 			/* look up the pages and get their source pixmaps */
-			bitmap_ind16 &tm0 = tilemap_get_pixmap(tilemaps[((srcy >> 7) & 2) + 0]);
-			bitmap_ind16 &tm1 = tilemap_get_pixmap(tilemaps[((srcy >> 7) & 2) + 1]);
+			bitmap_ind16 &tm0 = tilemaps[((srcy >> 7) & 2) + 0]->pixmap();
+			bitmap_ind16 &tm1 = tilemaps[((srcy >> 7) & 2) + 1]->pixmap();
 			src[0] = &tm0.pix16(srcy & 0xff);
 			src[1] = &tm1.pix16(srcy & 0xff);
 

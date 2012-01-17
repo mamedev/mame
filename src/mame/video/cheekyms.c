@@ -104,7 +104,7 @@ VIDEO_START( cheekyms )
 	state->m_bitmap_buffer = auto_bitmap_ind16_alloc(machine, width, height);
 
 	state->m_cm_tilemap = tilemap_create(machine, cheekyms_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->m_cm_tilemap, 0);
+	state->m_cm_tilemap->set_transparent_pen(0);
 }
 
 
@@ -155,8 +155,8 @@ SCREEN_UPDATE_IND16( cheekyms )
 	int scrolly = ((*state->m_port_80 >> 3) & 0x07);
 	int flip = *state->m_port_80 & 0x80;
 
-	tilemap_mark_all_tiles_dirty_all(screen.machine());
-	tilemap_set_flip_all(screen.machine(), flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	screen.machine().tilemap().mark_all_dirty();
+	screen.machine().tilemap().set_flip_all(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	bitmap.fill(0, cliprect);
 	state->m_bitmap_buffer->fill(0, cliprect);
@@ -165,7 +165,7 @@ SCREEN_UPDATE_IND16( cheekyms )
 	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().gfx[1], flip);
 
 	/* draw the tilemap to a temp bitmap */
-	tilemap_draw(*state->m_bitmap_buffer, cliprect, state->m_cm_tilemap, 0, 0);
+	state->m_cm_tilemap->draw(*state->m_bitmap_buffer, cliprect, 0, 0);
 
 	/* draw the tilemap to the final bitmap applying the scroll to the man character */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)

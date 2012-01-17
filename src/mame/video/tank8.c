@@ -65,7 +65,7 @@ WRITE8_HANDLER( tank8_video_ram_w )
 {
 	tank8_state *state = space->machine().driver_data<tank8_state>();
 	state->m_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -112,7 +112,7 @@ VIDEO_START( tank8 )
 
 	/* VBLANK starts on scanline #256 and ends on scanline #24 */
 
-	tilemap_set_scrolly(state->m_tilemap, 0, 2 * 24);
+	state->m_tilemap->set_scrolly(0, 2 * 24);
 }
 
 
@@ -181,7 +181,7 @@ SCREEN_UPDATE_IND16( tank8 )
 {
 	tank8_state *state = screen.machine().driver_data<tank8_state>();
 	set_pens(state, screen.machine().colortable);
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	draw_bullets(screen.machine(), bitmap, cliprect);
@@ -199,7 +199,7 @@ SCREEN_VBLANK( tank8 )
 		int y;
 		const rectangle &visarea = screen.machine().primary_screen->visible_area();
 
-		tilemap_draw(state->m_helper1, visarea, state->m_tilemap, 0, 0);
+		state->m_tilemap->draw(state->m_helper1, visarea, 0, 0);
 
 		state->m_helper2.fill(8, visarea);
 		state->m_helper3.fill(8, visarea);

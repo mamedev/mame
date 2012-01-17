@@ -126,7 +126,7 @@ static TILE_GET_INFO_DEVICE( get_pf8x8_tile_info )
 	int tile=dev->pf_data[tile_index];
 	int colourpri=(tile>>12);
 	SET_TILE_INFO_DEVICE(dev->tile_region,tile&0xfff,0,0);
-	tileinfo->category = colourpri;
+	tileinfo.category = colourpri;
 }
 
 static TILE_GET_INFO_DEVICE( get_pf16x16_tile_info )
@@ -136,7 +136,7 @@ static TILE_GET_INFO_DEVICE( get_pf16x16_tile_info )
 	int tile=dev->pf_data[tile_index];
 	int colourpri=(tile>>12);
 	SET_TILE_INFO_DEVICE(dev->tile_region,tile&0xfff,0,0);
-	tileinfo->category = colourpri;
+	tileinfo.category = colourpri;
 }
 
 
@@ -205,8 +205,8 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 								UINT16 colpricondition
 								)
 {
-	const bitmap_ind16 &src_bitmap = tilemap_get_pixmap(tilemap_ptr);
-	const bitmap_ind8 &flags_bitmap = tilemap_get_flagsmap(tilemap_ptr);
+	const bitmap_ind16 &src_bitmap = tilemap_ptr->pixmap();
+	const bitmap_ind8 &flags_bitmap = tilemap_ptr->flagsmap();
 	int x, y, p, colpri;
 	int column_offset=0, src_x=0, src_y=0;
 	UINT32 scrollx = 0;
@@ -348,12 +348,12 @@ WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w )
 				printf("tilemap ram bank change to %d\n", newbank&1);
 
 			dev->m_rambank = newbank&1;
-			tilemap_mark_all_tiles_dirty(dev->pf8x8_tilemap[0]);
-			tilemap_mark_all_tiles_dirty(dev->pf8x8_tilemap[1]);
-			tilemap_mark_all_tiles_dirty(dev->pf8x8_tilemap[2]);
-			tilemap_mark_all_tiles_dirty(dev->pf16x16_tilemap[0]);
-			tilemap_mark_all_tiles_dirty(dev->pf16x16_tilemap[1]);
-			tilemap_mark_all_tiles_dirty(dev->pf16x16_tilemap[2]);
+			dev->pf8x8_tilemap[0]->mark_all_dirty();
+			dev->pf8x8_tilemap[1]->mark_all_dirty();
+			dev->pf8x8_tilemap[2]->mark_all_dirty();
+			dev->pf16x16_tilemap[0]->mark_all_dirty();
+			dev->pf16x16_tilemap[1]->mark_all_dirty();
+			dev->pf16x16_tilemap[2]->mark_all_dirty();
 		}
 	}
 }
@@ -379,12 +379,12 @@ WRITE16_DEVICE_HANDLER( deco_bac06_pf_data_w )
 	if (dev->m_rambank&1) offset+=0x1000;
 
 	COMBINE_DATA(&dev->pf_data[offset]);
-	tilemap_mark_tile_dirty(dev->pf8x8_tilemap[0],offset);
-	tilemap_mark_tile_dirty(dev->pf8x8_tilemap[1],offset);
-	tilemap_mark_tile_dirty(dev->pf8x8_tilemap[2],offset);
-	tilemap_mark_tile_dirty(dev->pf16x16_tilemap[0],offset);
-	tilemap_mark_tile_dirty(dev->pf16x16_tilemap[1],offset);
-	tilemap_mark_tile_dirty(dev->pf16x16_tilemap[2],offset);
+	dev->pf8x8_tilemap[0]->mark_tile_dirty(offset);
+	dev->pf8x8_tilemap[1]->mark_tile_dirty(offset);
+	dev->pf8x8_tilemap[2]->mark_tile_dirty(offset);
+	dev->pf16x16_tilemap[0]->mark_tile_dirty(offset);
+	dev->pf16x16_tilemap[1]->mark_tile_dirty(offset);
+	dev->pf16x16_tilemap[2]->mark_tile_dirty(offset);
 }
 
 READ16_DEVICE_HANDLER( deco_bac06_pf_data_r )

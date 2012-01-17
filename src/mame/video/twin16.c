@@ -44,7 +44,7 @@ WRITE16_HANDLER( twin16_text_ram_w )
 {
 	twin16_state *state = space->machine().driver_data<twin16_state>();
 	COMBINE_DATA(&state->m_text_ram[offset]);
-	tilemap_mark_tile_dirty(state->m_text_tilemap, offset);
+	state->m_text_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER( twin16_paletteram_word_w )
@@ -500,7 +500,7 @@ VIDEO_START( twin16 )
 {
 	twin16_state *state = machine.driver_data<twin16_state>();
 	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	tilemap_set_transparent_pen(state->m_text_tilemap, 0);
+	state->m_text_tilemap->set_transparent_pen(0);
 
 	palette_set_shadow_factor(machine,0.4); // screenshots estimate
 
@@ -532,8 +532,8 @@ SCREEN_UPDATE_IND16( twin16 )
 	draw_layer( screen.machine(), bitmap, 0 );
 	draw_sprites( screen.machine(), bitmap );
 
-	if (text_flip) tilemap_set_flip(state->m_text_tilemap, text_flip);
-	tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
+	if (text_flip) state->m_text_tilemap->set_flip(text_flip);
+	state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

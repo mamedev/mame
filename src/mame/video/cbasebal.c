@@ -48,7 +48,7 @@ VIDEO_START( cbasebal )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 3);
+	state->m_fg_tilemap->set_transparent_pen(3);
 
 	state->save_pointer(NAME(state->m_textram), 0x1000);
 	state->save_pointer(NAME(state->m_scrollram), 0x1000);
@@ -67,7 +67,7 @@ WRITE8_HANDLER( cbasebal_textram_w )
 	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
 	state->m_textram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x7ff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 READ8_HANDLER( cbasebal_textram_r )
@@ -81,7 +81,7 @@ WRITE8_HANDLER( cbasebal_scrollram_w )
 	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
 	state->m_scrollram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 READ8_HANDLER( cbasebal_scrollram_r )
@@ -98,7 +98,7 @@ WRITE8_HANDLER( cbasebal_gfxctrl_w )
 
 	/* bit 1 is flip screen */
 	state->m_flipscreen = data & 0x02;
-	tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* bit 2 is unknown - unused? */
 
@@ -106,7 +106,7 @@ WRITE8_HANDLER( cbasebal_gfxctrl_w )
 	if (state->m_tilebank != ((data & 0x08) >> 3))
 	{
 		state->m_tilebank = (data & 0x08) >> 3;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 4 is sprite bank */
@@ -126,14 +126,14 @@ WRITE8_HANDLER( cbasebal_scrollx_w )
 {
 	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 	state->m_scroll_x[offset] = data;
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_x[0] + 256 * state->m_scroll_x[1]);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scroll_x[0] + 256 * state->m_scroll_x[1]);
 }
 
 WRITE8_HANDLER( cbasebal_scrolly_w )
 {
 	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 	state->m_scroll_y[offset] = data;
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll_y[0] + 256 * state->m_scroll_y[1]);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scroll_y[0] + 256 * state->m_scroll_y[1]);
 }
 
 
@@ -183,7 +183,7 @@ SCREEN_UPDATE_IND16( cbasebal )
 	cbasebal_state *state = screen.machine().driver_data<cbasebal_state>();
 
 	if (state->m_bg_on)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(768, cliprect);
 
@@ -191,6 +191,6 @@ SCREEN_UPDATE_IND16( cbasebal )
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
 	if (state->m_text_on)
-		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

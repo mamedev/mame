@@ -135,15 +135,15 @@ VIDEO_START( punchout )
 	punchout_state *state = machine.driver_data<punchout_state>();
 	state->m_bg_top_tilemap = tilemap_create(machine, top_get_info, tilemap_scan_rows,  8,8, 32,32);
 	state->m_bg_bot_tilemap = tilemap_create(machine, bot_get_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_scroll_rows(state->m_bg_bot_tilemap, 32);
+	state->m_bg_bot_tilemap->set_scroll_rows(32);
 
 	state->m_spr1_tilemap = tilemap_create(machine, bs1_get_info, tilemap_scan_rows,  8,8, 16,32);
 	state->m_spr2_tilemap = tilemap_create(machine, bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
 
 	state->m_fg_tilemap = NULL;
 
-	tilemap_set_transparent_pen(state->m_spr1_tilemap, 0x07);
-	tilemap_set_transparent_pen(state->m_spr2_tilemap, 0x03);
+	state->m_spr1_tilemap->set_transparent_pen(0x07);
+	state->m_spr2_tilemap->set_transparent_pen(0x03);
 }
 
 
@@ -158,10 +158,10 @@ VIDEO_START( armwrest )
 	state->m_spr2_tilemap = tilemap_create(machine, bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
 	state->m_fg_tilemap = tilemap_create(machine, armwrest_fg_get_info, tilemap_scan_rows,  8,8, 32,32);
 
-	tilemap_set_transparent_pen(state->m_spr1_tilemap, 0x07);
-	tilemap_set_transparent_pen(state->m_spr1_tilemap_flipx, 0x07);
-	tilemap_set_transparent_pen(state->m_spr2_tilemap, 0x03);
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0x07);
+	state->m_spr1_tilemap->set_transparent_pen(0x07);
+	state->m_spr1_tilemap_flipx->set_transparent_pen(0x07);
+	state->m_spr2_tilemap->set_transparent_pen(0x03);
+	state->m_fg_tilemap->set_transparent_pen(0x07);
 }
 
 
@@ -170,37 +170,37 @@ WRITE8_HANDLER( punchout_bg_top_videoram_w )
 {
 	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->m_bg_top_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_top_tilemap, offset/2);
+	state->m_bg_top_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_HANDLER( punchout_bg_bot_videoram_w )
 {
 	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->m_bg_bot_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_bot_tilemap, offset/2);
+	state->m_bg_bot_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_HANDLER( armwrest_fg_videoram_w )
 {
 	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->m_armwrest_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset/2);
+	state->m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_HANDLER( punchout_spr1_videoram_w )
 {
 	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->m_spr1_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_spr1_tilemap, offset/4);
+	state->m_spr1_tilemap->mark_tile_dirty(offset/4);
 	if (state->m_spr1_tilemap_flipx)
-		tilemap_mark_tile_dirty(state->m_spr1_tilemap_flipx, offset/4);
+		state->m_spr1_tilemap_flipx->mark_tile_dirty(offset/4);
 }
 
 WRITE8_HANDLER( punchout_spr2_videoram_w )
 {
 	punchout_state *state = space->machine().driver_data<punchout_state>();
 	state->m_spr2_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_spr2_tilemap, offset/4);
+	state->m_spr2_tilemap->mark_tile_dirty(offset/4);
 }
 
 
@@ -238,9 +238,9 @@ static void draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, cons
 			incxx = -incxx;
 		}
 
-		tilemap_set_palette_offset(state->m_spr1_tilemap, 0x100 * palette);
+		state->m_spr1_tilemap->set_palette_offset(0x100 * palette);
 
-		tilemap_draw_roz(bitmap,cliprect,state->m_spr1_tilemap,
+		state->m_spr1_tilemap->draw_roz(bitmap, cliprect, 
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,	/* zoom, no rotation */
 			0,	/* no wraparound */
@@ -286,9 +286,9 @@ static void armwrest_draw_big_sprite(running_machine &machine, bitmap_ind16 &bit
 		else
 			_tilemap = state->m_spr1_tilemap;
 
-		tilemap_set_palette_offset(_tilemap, 0x100 * palette);
+		_tilemap->set_palette_offset(0x100 * palette);
 
-		tilemap_draw_roz(bitmap,cliprect,_tilemap,
+		_tilemap->draw_roz(bitmap, cliprect, 
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,	/* zoom, no rotation */
 			0,	/* no wraparound */
@@ -321,7 +321,7 @@ static void drawbs2(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 		incxx = 1;
 
 	// this tilemap doesn't actually zoom, but draw_roz is the only way to draw it without wraparound
-	tilemap_draw_roz(bitmap,cliprect,state->m_spr2_tilemap,
+	state->m_spr2_tilemap->draw_roz(bitmap, cliprect, 
 		sx, sy, incxx << 16, 0, 0, 1 << 16,
 		0, 0, 0);
 }
@@ -375,7 +375,7 @@ SCREEN_UPDATE_IND16( punchout_top )
 
 	punchout_copy_top_palette(screen.machine(), BIT(*state->m_palettebank,1));
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_top_tilemap, 0, 0);
+	state->m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_spr1_ctrlram[7] & 1)	/* display in top monitor */
 		draw_big_sprite(screen.machine(), bitmap, cliprect, 0);
@@ -392,9 +392,9 @@ SCREEN_UPDATE_IND16( punchout_bottom )
 
 	/* copy the character mapped graphics */
 	for (offs = 0;offs < 32;offs++)
-		tilemap_set_scrollx(state->m_bg_bot_tilemap, offs, 58 + state->m_bg_bot_videoram[2*offs] + 256 * (state->m_bg_bot_videoram[2*offs + 1] & 0x01));
+		state->m_bg_bot_tilemap->set_scrollx(offs, 58 + state->m_bg_bot_videoram[2*offs] + 256 * (state->m_bg_bot_videoram[2*offs + 1] & 0x01));
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_bot_tilemap, 0, 0);
+	state->m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
 		draw_big_sprite(screen.machine(), bitmap, cliprect, 1);
@@ -410,7 +410,7 @@ SCREEN_UPDATE_IND16( armwrest_top )
 
 	punchout_copy_top_palette(screen.machine(), BIT(*state->m_palettebank,1));
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_top_tilemap, 0, 0);
+	state->m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_spr1_ctrlram[7] & 1)	/* display in top monitor */
 		armwrest_draw_big_sprite(screen.machine(), bitmap, cliprect, 0);
@@ -424,13 +424,13 @@ SCREEN_UPDATE_IND16( armwrest_bottom )
 
 	punchout_copy_bot_palette(screen.machine(), BIT(*state->m_palettebank,0));
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_bot_tilemap, 0, 0);
+	state->m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (state->m_spr1_ctrlram[7] & 2)	/* display in bottom monitor */
 		armwrest_draw_big_sprite(screen.machine(), bitmap, cliprect, 1);
 	drawbs2(screen.machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -51,8 +51,8 @@ WRITE32_HANDLER( polygonet_ttl_ram_w )
 
 	COMBINE_DATA(&vram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_ttl_tilemap, offset*2);
-	tilemap_mark_tile_dirty(state->m_ttl_tilemap, offset*2+1);
+	state->m_ttl_tilemap->mark_tile_dirty(offset*2);
+	state->m_ttl_tilemap->mark_tile_dirty(offset*2+1);
 }
 
 READ32_HANDLER( polygonet_roz_ram_r )
@@ -70,8 +70,8 @@ WRITE32_HANDLER( polygonet_roz_ram_w )
 
 	COMBINE_DATA(&vram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_roz_tilemap, offset*2);
-	tilemap_mark_tile_dirty(state->m_roz_tilemap, offset*2+1);
+	state->m_roz_tilemap->mark_tile_dirty(offset*2);
+	state->m_roz_tilemap->mark_tile_dirty(offset*2+1);
 }
 
 static TILEMAP_MAPPER( plygonet_scan )
@@ -111,11 +111,11 @@ VIDEO_START( polygonet )
 	/* create the tilemap */
 	state->m_ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, plygonet_scan,  8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_ttl_tilemap, 0);
+	state->m_ttl_tilemap->set_transparent_pen(0);
 
 	/* set up the roz t-map too */
 	state->m_roz_tilemap = tilemap_create(machine, roz_get_tile_info, plygonet_scan_cols, 16, 16, 32, 64);
-	tilemap_set_transparent_pen(state->m_roz_tilemap, 0);
+	state->m_roz_tilemap->set_transparent_pen(0);
 
 	/* save states */
 	state->save_item(NAME(state->m_ttl_gfx_index));
@@ -132,7 +132,7 @@ SCREEN_UPDATE_IND16( polygonet )
 
 	k053936_zoom_draw(k053936, bitmap, cliprect, state->m_roz_tilemap, 0, 0, 0);
 
-	tilemap_draw(bitmap, cliprect, state->m_ttl_tilemap, 0, 1<<0);
+	state->m_ttl_tilemap->draw(bitmap, cliprect, 0, 1<<0);
 	return 0;
 }
 

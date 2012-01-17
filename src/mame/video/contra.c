@@ -184,7 +184,7 @@ VIDEO_START( contra )
 	state->m_tx_clip.max_x = 39;
 	state->m_tx_clip.min_x = 0;
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->save_pointer(NAME(state->m_buffered_spriteram), 0x800);
 	state->save_pointer(NAME(state->m_buffered_spriteram_2), 0x800);
@@ -202,7 +202,7 @@ WRITE8_HANDLER( contra_fg_vram_w )
 	contra_state *state = space->machine().driver_data<contra_state>();
 
 	state->m_fg_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( contra_fg_cram_w )
@@ -210,7 +210,7 @@ WRITE8_HANDLER( contra_fg_cram_w )
 	contra_state *state = space->machine().driver_data<contra_state>();
 
 	state->m_fg_cram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( contra_bg_vram_w )
@@ -218,7 +218,7 @@ WRITE8_HANDLER( contra_bg_vram_w )
 	contra_state *state = space->machine().driver_data<contra_state>();
 
 	state->m_bg_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( contra_bg_cram_w )
@@ -226,7 +226,7 @@ WRITE8_HANDLER( contra_bg_cram_w )
 	contra_state *state = space->machine().driver_data<contra_state>();
 
 	state->m_bg_cram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( contra_text_vram_w )
@@ -234,7 +234,7 @@ WRITE8_HANDLER( contra_text_vram_w )
 	contra_state *state = space->machine().driver_data<contra_state>();
 
 	state->m_tx_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( contra_text_cram_w )
@@ -242,7 +242,7 @@ WRITE8_HANDLER( contra_text_cram_w )
 	contra_state *state = space->machine().driver_data<contra_state>();
 
 	state->m_tx_cram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( contra_K007121_ctrl_0_w )
@@ -261,11 +261,11 @@ WRITE8_HANDLER( contra_K007121_ctrl_0_w )
 	if (offset == 6)
 	{
 		if (ctrl_6 != data)
-			tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+			state->m_fg_tilemap->mark_all_dirty();
 	}
 
 	if (offset == 7)
-		tilemap_set_flip(state->m_fg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		state->m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	k007121_ctrl_w(state->m_k007121_1, offset, data);
 }
@@ -285,10 +285,10 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 	if (offset == 6)
 	{
 		if (ctrl_6 != data )
-			tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+			state->m_bg_tilemap->mark_all_dirty();
 	}
 	if (offset == 7)
-		tilemap_set_flip(state->m_bg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		state->m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	k007121_ctrl_w(state->m_k007121_2, offset, data);
 }
@@ -333,15 +333,15 @@ SCREEN_UPDATE_IND16( contra )
 
 	set_pens(screen.machine());
 
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, ctrl_1_0 - 40);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, ctrl_1_2);
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, ctrl_2_0 - 40);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, ctrl_2_2);
+	state->m_fg_tilemap->set_scrollx(0, ctrl_1_0 - 40);
+	state->m_fg_tilemap->set_scrolly(0, ctrl_1_2);
+	state->m_bg_tilemap->set_scrollx(0, ctrl_2_0 - 40);
+	state->m_bg_tilemap->set_scrolly(0, ctrl_2_2);
 
-	tilemap_draw(bitmap, bg_finalclip, state->m_bg_tilemap, 0 ,0);
-	tilemap_draw(bitmap, fg_finalclip, state->m_fg_tilemap, 0 ,0);
+	state->m_bg_tilemap->draw(bitmap, bg_finalclip, 0 ,0);
+	state->m_fg_tilemap->draw(bitmap, fg_finalclip, 0 ,0);
 	draw_sprites(screen.machine(),bitmap,cliprect, 0);
 	draw_sprites(screen.machine(),bitmap,cliprect, 1);
-	tilemap_draw(bitmap, tx_finalclip, state->m_tx_tilemap, 0 ,0);
+	state->m_tx_tilemap->draw(bitmap, tx_finalclip, 0 ,0);
 	return 0;
 }

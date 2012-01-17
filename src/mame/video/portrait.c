@@ -12,18 +12,18 @@
 WRITE8_HANDLER( portrait_bgvideo_write )
 {
 	portrait_state *state = space->machine().driver_data<portrait_state>();
-	tilemap_mark_tile_dirty(state->m_background,offset/2);
+	state->m_background->mark_tile_dirty(offset/2);
 	state->m_bgvideoram[offset] = data;
 }
 
 WRITE8_HANDLER( portrait_fgvideo_write )
 {
 	portrait_state *state = space->machine().driver_data<portrait_state>();
-	tilemap_mark_tile_dirty(state->m_foreground,offset/2);
+	state->m_foreground->mark_tile_dirty(offset/2);
 	state->m_fgvideoram[offset] = data;
 }
 
-INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, const UINT8 *source )
+INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, const UINT8 *source )
 {
 	int attr    = source[tile_index*2+0];
 	int tilenum = source[tile_index*2+1];
@@ -72,7 +72,7 @@ VIDEO_START( portrait )
 	state->m_background = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,       16, 16, 32, 32 );
 	state->m_foreground = tilemap_create( machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 32, 32 );
 
-	tilemap_set_transparent_pen( state->m_foreground, 7 );
+	state->m_foreground->set_transparent_pen(7 );
 }
 
 
@@ -198,15 +198,15 @@ SCREEN_UPDATE_IND16( portrait )
 	cliprect_no_scroll.min_x = cliprect_no_scroll.max_x - 111;
 	cliprect_scroll.max_x    = cliprect_scroll.min_x    + 319;
 
-	tilemap_set_scrolly(state->m_background, 0, 0);
-	tilemap_set_scrolly(state->m_foreground, 0, 0);
-	tilemap_draw(bitmap, cliprect_no_scroll, state->m_background, 0, 0);
-	tilemap_draw(bitmap, cliprect_no_scroll, state->m_foreground, 0, 0);
+	state->m_background->set_scrolly(0, 0);
+	state->m_foreground->set_scrolly(0, 0);
+	state->m_background->draw(bitmap, cliprect_no_scroll, 0, 0);
+	state->m_foreground->draw(bitmap, cliprect_no_scroll, 0, 0);
 
-	tilemap_set_scrolly(state->m_background, 0, state->m_scroll);
-	tilemap_set_scrolly(state->m_foreground, 0, state->m_scroll);
-	tilemap_draw(bitmap, cliprect_scroll, state->m_background, 0, 0);
-	tilemap_draw(bitmap, cliprect_scroll, state->m_foreground, 0, 0);
+	state->m_background->set_scrolly(0, state->m_scroll);
+	state->m_foreground->set_scrolly(0, state->m_scroll);
+	state->m_background->draw(bitmap, cliprect_scroll, 0, 0);
+	state->m_foreground->draw(bitmap, cliprect_scroll, 0, 0);
 
 	draw_sprites(screen.machine(), bitmap,cliprect);
 	return 0;

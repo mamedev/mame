@@ -120,9 +120,9 @@ static void fcrash_update_transmasks( running_machine &machine )
 		else
 			mask = 0xffff;	/* completely transparent if priority masks not defined (mercs, qad) */
 
-		tilemap_set_transmask(state->m_bg_tilemap[0], i, mask, 0x8000);
-		tilemap_set_transmask(state->m_bg_tilemap[1], i, mask, 0x8000);
-		tilemap_set_transmask(state->m_bg_tilemap[2], i, mask, 0x8000);
+		state->m_bg_tilemap[0]->set_transmask(i, mask, 0x8000);
+		state->m_bg_tilemap[1]->set_transmask(i, mask, 0x8000);
+		state->m_bg_tilemap[2]->set_transmask(i, mask, 0x8000);
 	}
 }
 
@@ -171,7 +171,7 @@ static void fcrash_render_layer( running_machine &machine, bitmap_ind16 &bitmap,
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer - 1], TILEMAP_DRAW_LAYER1, primask);
+			state->m_bg_tilemap[layer - 1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, primask);
 			break;
 	}
 }
@@ -189,7 +189,7 @@ static void fcrash_render_high_layer( running_machine &machine, bitmap_ind16 &bi
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(dummy_bitmap, cliprect, state->m_bg_tilemap[layer - 1], TILEMAP_DRAW_LAYER0, 1);
+			state->m_bg_tilemap[layer - 1]->draw(dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }
@@ -236,8 +236,8 @@ static SCREEN_UPDATE_IND16( fcrash )
 
 	fcrash_update_transmasks(screen.machine());
 
-	tilemap_set_scrollx(state->m_bg_tilemap[0], 0, state->m_scroll1x - 62);
-	tilemap_set_scrolly(state->m_bg_tilemap[0], 0, state->m_scroll1y);
+	state->m_bg_tilemap[0]->set_scrollx(0, state->m_scroll1x - 62);
+	state->m_bg_tilemap[0]->set_scrolly(0, state->m_scroll1y);
 
 	if (videocontrol & 0x01)	/* linescroll enable */
 	{
@@ -245,28 +245,28 @@ static SCREEN_UPDATE_IND16( fcrash )
 		int i;
 		int otheroffs;
 
-		tilemap_set_scroll_rows(state->m_bg_tilemap[1], 1024);
+		state->m_bg_tilemap[1]->set_scroll_rows(1024);
 
 		otheroffs = state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->m_bg_tilemap[1], (i - scrly) & 0x3ff, state->m_scroll2x + state->m_other[(i + otheroffs) & 0x3ff]);
+			state->m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, state->m_scroll2x + state->m_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->m_bg_tilemap[1], 1);
-		tilemap_set_scrollx(state->m_bg_tilemap[1], 0, state->m_scroll2x - 60);
+		state->m_bg_tilemap[1]->set_scroll_rows(1);
+		state->m_bg_tilemap[1]->set_scrollx(0, state->m_scroll2x - 60);
 	}
-	tilemap_set_scrolly(state->m_bg_tilemap[1], 0, state->m_scroll2y);
-	tilemap_set_scrollx(state->m_bg_tilemap[2], 0, state->m_scroll3x - 64);
-	tilemap_set_scrolly(state->m_bg_tilemap[2], 0, state->m_scroll3y);
+	state->m_bg_tilemap[1]->set_scrolly(0, state->m_scroll2y);
+	state->m_bg_tilemap[2]->set_scrollx(0, state->m_scroll3x - 64);
+	state->m_bg_tilemap[2]->set_scrolly(0, state->m_scroll3y);
 
 
 	/* turn all tilemaps on regardless of settings in get_video_base() */
 	/* write a custom get_video_base for this bootleg hardware? */
-	tilemap_set_enable(state->m_bg_tilemap[0], 1);
-	tilemap_set_enable(state->m_bg_tilemap[1], 1);
-	tilemap_set_enable(state->m_bg_tilemap[2], 1);
+	state->m_bg_tilemap[0]->enable(1);
+	state->m_bg_tilemap[1]->enable(1);
+	state->m_bg_tilemap[2]->enable(1);
 
 	/* Blank screen */
 	bitmap.fill(0xbff, cliprect);
@@ -316,8 +316,8 @@ static SCREEN_UPDATE_IND16( kodb )
 
 	fcrash_update_transmasks(screen.machine());
 
-	tilemap_set_scrollx(state->m_bg_tilemap[0], 0, state->m_scroll1x);
-	tilemap_set_scrolly(state->m_bg_tilemap[0], 0, state->m_scroll1y);
+	state->m_bg_tilemap[0]->set_scrollx(0, state->m_scroll1x);
+	state->m_bg_tilemap[0]->set_scrolly(0, state->m_scroll1y);
 
 	if (videocontrol & 0x01)	/* linescroll enable */
 	{
@@ -325,29 +325,29 @@ static SCREEN_UPDATE_IND16( kodb )
 		int i;
 		int otheroffs;
 
-		tilemap_set_scroll_rows(state->m_bg_tilemap[1], 1024);
+		state->m_bg_tilemap[1]->set_scroll_rows(1024);
 
 		otheroffs = state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->m_bg_tilemap[1], (i - scrly) & 0x3ff, state->m_scroll2x + state->m_other[(i + otheroffs) & 0x3ff]);
+			state->m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, state->m_scroll2x + state->m_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->m_bg_tilemap[1], 1);
-		tilemap_set_scrollx(state->m_bg_tilemap[1], 0, state->m_scroll2x);
+		state->m_bg_tilemap[1]->set_scroll_rows(1);
+		state->m_bg_tilemap[1]->set_scrollx(0, state->m_scroll2x);
 	}
 
-	tilemap_set_scrolly(state->m_bg_tilemap[1], 0, state->m_scroll2y);
-	tilemap_set_scrollx(state->m_bg_tilemap[2], 0, state->m_scroll3x);
-	tilemap_set_scrolly(state->m_bg_tilemap[2], 0, state->m_scroll3y);
+	state->m_bg_tilemap[1]->set_scrolly(0, state->m_scroll2y);
+	state->m_bg_tilemap[2]->set_scrollx(0, state->m_scroll3x);
+	state->m_bg_tilemap[2]->set_scrolly(0, state->m_scroll3y);
 
 
 	/* turn all tilemaps on regardless of settings in get_video_base() */
 	/* write a custom get_video_base for this bootleg hardware? */
-	tilemap_set_enable(state->m_bg_tilemap[0], 1);
-	tilemap_set_enable(state->m_bg_tilemap[1], 1);
-	tilemap_set_enable(state->m_bg_tilemap[2], 1);
+	state->m_bg_tilemap[0]->enable(1);
+	state->m_bg_tilemap[1]->enable(1);
+	state->m_bg_tilemap[2]->enable(1);
 
 	/* Blank screen */
 	bitmap.fill(0xbff, cliprect);

@@ -131,7 +131,7 @@ WRITE8_HANDLER( m57_videoram_w )
 	m57_state *state = space->machine().driver_data<m57_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -146,7 +146,7 @@ VIDEO_START( m57 )
 	m57_state *state = machine.driver_data<m57_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	tilemap_set_scroll_rows(state->m_bg_tilemap, 256);
+	state->m_bg_tilemap->set_scroll_rows(256);
 
 	state->save_item(NAME(state->m_flipscreen));
 }
@@ -164,7 +164,7 @@ WRITE8_HANDLER( m57_flipscreen_w )
 
 	/* screen flip is handled both by software and hardware */
 	state->m_flipscreen = (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01);
-	tilemap_set_flip(state->m_bg_tilemap, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	state->m_bg_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	coin_counter_w(space->machine(), 0,data & 0x02);
 	coin_counter_w(space->machine(), 1,data & 0x20);
@@ -185,9 +185,9 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 	// from 64 to 127: not wrapped
 	for (y = 64; y < 128; y++)
-		tilemap_set_scrollx(state->m_bg_tilemap, y, state->m_scrollram[0x40]);
+		state->m_bg_tilemap->set_scrollx(y, state->m_scrollram[0x40]);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	// from 128 to 255: wrapped
 	for (y = 128; y <= cliprect.max_y; y++)

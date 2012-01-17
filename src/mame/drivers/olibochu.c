@@ -120,14 +120,14 @@ static WRITE8_HANDLER( olibochu_videoram_w )
 {
 	olibochu_state *state = space->machine().driver_data<olibochu_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( olibochu_colorram_w )
 {
 	olibochu_state *state = space->machine().driver_data<olibochu_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( olibochu_flipscreen_w )
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( olibochu_flipscreen_w )
 	if (flip_screen_get(space->machine()) != (data & 0x80))
 	{
 		flip_screen_set(space->machine(), data & 0x80);
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* other bits are used, but unknown */
@@ -221,7 +221,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 static SCREEN_UPDATE_IND16( olibochu )
 {
 	olibochu_state *state = screen.machine().driver_data<olibochu_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

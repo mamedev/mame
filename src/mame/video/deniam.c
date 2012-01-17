@@ -112,8 +112,8 @@ VIDEO_START( deniam )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, scan_pages, 8, 8, 128, 64);
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_tx_tilemap->set_transparent_pen(0);
 }
 
 
@@ -134,9 +134,9 @@ WRITE16_HANDLER( deniam_videoram_w )
 	for (i = 0; i < 4; i++)
 	{
 		if (state->m_bg_page[i] == page)
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, i * 0x800 + (offset & 0x7ff));
+			state->m_bg_tilemap->mark_tile_dirty(i * 0x800 + (offset & 0x7ff));
 		if (state->m_fg_page[i] == page)
-			tilemap_mark_tile_dirty(state->m_fg_tilemap, i * 0x800 + (offset & 0x7ff));
+			state->m_fg_tilemap->mark_tile_dirty(i * 0x800 + (offset & 0x7ff));
 	}
 }
 
@@ -145,7 +145,7 @@ WRITE16_HANDLER( deniam_textram_w )
 {
 	deniam_state *state = space->machine().driver_data<deniam_state>();
 	COMBINE_DATA(&state->m_textram[offset]);
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -356,7 +356,7 @@ static void set_bg_page( running_machine &machine, int page, int value )
 	{
 		state->m_bg_page[page] = value;
 		for (tile_index = page * 0x800; tile_index < (page + 1) * 0x800; tile_index++)
-			tilemap_mark_tile_dirty(state->m_bg_tilemap, tile_index);
+			state->m_bg_tilemap->mark_tile_dirty(tile_index);
 	}
 }
 
@@ -369,7 +369,7 @@ static void set_fg_page( running_machine &machine, int page, int value )
 	{
 		state->m_fg_page[page] = value;
 		for (tile_index = page * 0x800; tile_index < (page + 1) * 0x800; tile_index++)
-			tilemap_mark_tile_dirty(state->m_fg_tilemap, tile_index);
+			state->m_fg_tilemap->mark_tile_dirty(tile_index);
 	}
 }
 
@@ -398,16 +398,16 @@ SCREEN_UPDATE_IND16( deniam )
 	set_fg_page(screen.machine(), 1, (page >> 4) & 0x0f);
 	set_fg_page(screen.machine(), 0, (page >> 0) & 0x0f);
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, bg_scrollx & 0x1ff);
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, bg_scrolly & 0x0ff);
-	tilemap_set_scrollx(state->m_fg_tilemap, 0, fg_scrollx & 0x1ff);
-	tilemap_set_scrolly(state->m_fg_tilemap, 0, fg_scrolly & 0x0ff);
+	state->m_bg_tilemap->set_scrollx(0, bg_scrollx & 0x1ff);
+	state->m_bg_tilemap->set_scrolly(0, bg_scrolly & 0x0ff);
+	state->m_fg_tilemap->set_scrollx(0, fg_scrollx & 0x1ff);
+	state->m_fg_tilemap->set_scrolly(0, fg_scrolly & 0x0ff);
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 1);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
-	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 4);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

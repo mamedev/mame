@@ -131,7 +131,7 @@ static WRITE8_HANDLER( wallc_videoram_w )
 	wallc_state *state = space->machine().driver_data<wallc_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -150,7 +150,7 @@ static VIDEO_START( wallc )
 static SCREEN_UPDATE_IND16( wallc )
 {
 	wallc_state *state = screen.machine().driver_data<wallc_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

@@ -396,19 +396,19 @@ VIDEO_START( galaxian )
 	{
 		/* normal galaxian hardware is row-based and individually scrolling columns */
 		state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows, GALAXIAN_XSCALE*8,8, 32,32);
-		tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
-		tilemap_set_scrolldx(state->m_bg_tilemap, 0, -GALAXIAN_XSCALE * 128);
-		tilemap_set_scrolldy(state->m_bg_tilemap, 0, 8);
+		state->m_bg_tilemap->set_scroll_cols(32);
+		state->m_bg_tilemap->set_scrolldx(0, -GALAXIAN_XSCALE * 128);
+		state->m_bg_tilemap->set_scrolldy(0, 8);
 	}
 	else
 	{
 		/* sfx hardware is column-based and individually scrolling rows */
 		state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_cols, GALAXIAN_XSCALE*8,8, 32,32);
-		tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
-		tilemap_set_scrolldx(state->m_bg_tilemap, 0, -GALAXIAN_XSCALE * 128);
-		tilemap_set_scrolldy(state->m_bg_tilemap, 0, 8);
+		state->m_bg_tilemap->set_scroll_rows(32);
+		state->m_bg_tilemap->set_scrolldx(0, -GALAXIAN_XSCALE * 128);
+		state->m_bg_tilemap->set_scrolldy(0, 8);
 	}
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_bg_tilemap->set_transparent_pen(0);
 
 	/* initialize globals */
 	state->m_flipscreen_x = 0;
@@ -459,7 +459,7 @@ SCREEN_UPDATE_RGB32( galaxian )
 	(*state->m_draw_background_ptr)(screen.machine(), bitmap, cliprect);
 
 	/* draw the tilemap characters over top */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* render the sprites next */
 	sprites_draw(screen.machine(), bitmap, cliprect, &screen.machine().generic.spriteram.u8[0x40]);
@@ -516,7 +516,7 @@ WRITE8_HANDLER( galaxian_videoram_w )
 
 	/* store the data and mark the corresponding tile dirty */
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -539,16 +539,16 @@ WRITE8_HANDLER( galaxian_objram_w )
 			if (state->m_frogger_adjust)
 				data = (data >> 4) | (data << 4);
 			if (!state->m_sfx_tilemap)
-				tilemap_set_scrolly(state->m_bg_tilemap, offset >> 1, data);
+				state->m_bg_tilemap->set_scrolly(offset >> 1, data);
 			else
-				tilemap_set_scrollx(state->m_bg_tilemap, offset >> 1, GALAXIAN_XSCALE*data);
+				state->m_bg_tilemap->set_scrollx(offset >> 1, GALAXIAN_XSCALE*data);
 		}
 
 		/* odd entries control the color base for the row */
 		else
 		{
 			for (offset >>= 1; offset < 0x0400; offset += 32)
-				tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+				state->m_bg_tilemap->mark_tile_dirty(offset);
 		}
 	}
 }
@@ -682,7 +682,7 @@ WRITE8_HANDLER( galaxian_flip_screen_x_w )
 		stars_update_origin(space->machine());
 
 		state->m_flipscreen_x = data & 0x01;
-		tilemap_set_flip(state->m_bg_tilemap, (state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -693,7 +693,7 @@ WRITE8_HANDLER( galaxian_flip_screen_y_w )
 	{
 		space->machine().primary_screen->update_now();
 		state->m_flipscreen_y = data & 0x01;
-		tilemap_set_flip(state->m_bg_tilemap, (state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -783,7 +783,7 @@ WRITE8_HANDLER( galaxian_gfxbank_w )
 	{
 		space->machine().primary_screen->update_now();
 		state->m_gfxbank[offset] = data;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 }
 

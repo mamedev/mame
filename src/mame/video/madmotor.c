@@ -27,7 +27,7 @@ SCREEN_UPDATE_IND16( madmotor )
 	madmotor_state *state = screen.machine().driver_data<madmotor_state>();
 	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
-//  tilemap_set_flip_all(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+//  screen.machine().tilemap().set_flip_all(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	screen.machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	screen.machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);

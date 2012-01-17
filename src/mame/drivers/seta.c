@@ -1740,7 +1740,7 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 		state->m_usclssic_port_select = (data & 0x40) >> 6;
 
 		if (tiles_offset != state->m_tiles_offset)
-			tilemap_mark_all_tiles_dirty_all(space->machine());
+			space->machine().tilemap().mark_all_dirty();
 		state->m_tiles_offset = tiles_offset;
 
 		seta_coin_lockout_w(space->machine(), data);

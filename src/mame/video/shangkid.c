@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
 				(attributes&0x80)?TILE_FLIPX:0);
 	}
 
-	tileinfo->category =
+	tileinfo.category =
 		(machine.region( "proms" )->base()[0x800+color*4]==2)?1:0;
 }
 
@@ -57,7 +57,7 @@ WRITE8_HANDLER( shangkid_videoram_w )
 	shangkid_state *state = space->machine().driver_data<shangkid_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty( state->m_background, offset&0x7ff );
+	state->m_background->mark_tile_dirty(offset&0x7ff );
 }
 
 static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -189,13 +189,13 @@ SCREEN_UPDATE_IND16( shangkid )
 {
 	shangkid_state *state = screen.machine().driver_data<shangkid_state>();
 	int flipscreen = state->m_videoreg[1]&0x80;
-	tilemap_set_flip( state->m_background, flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
-	tilemap_set_scrollx( state->m_background,0,state->m_videoreg[0]-40 );
-	tilemap_set_scrolly( state->m_background,0,state->m_videoreg[2]+0x10 );
+	state->m_background->set_flip(flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
+	state->m_background->set_scrollx(0,state->m_videoreg[0]-40 );
+	state->m_background->set_scrolly(0,state->m_videoreg[2]+0x10 );
 
-	tilemap_draw( bitmap,cliprect,state->m_background,0,0 );
+	state->m_background->draw(bitmap, cliprect, 0,0 );
 	shangkid_draw_sprites(screen.machine(), bitmap,cliprect );
-	tilemap_draw( bitmap,cliprect,state->m_background,1,0 ); /* high priority tiles */
+	state->m_background->draw(bitmap, cliprect, 1,0 ); /* high priority tiles */
 	return 0;
 }
 

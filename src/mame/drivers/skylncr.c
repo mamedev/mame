@@ -78,14 +78,14 @@ static WRITE8_HANDLER( skylncr_videoram_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tmap, offset);
+	state->m_tmap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( skylncr_colorram_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tmap, offset);
+	state->m_tmap->mark_tile_dirty(offset);
 }
 
 
@@ -136,16 +136,16 @@ static VIDEO_START( skylncr )
 	state->m_reel_3_tilemap = tilemap_create(machine, get_reel_3_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
 	state->m_reel_4_tilemap = tilemap_create(machine, get_reel_4_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
 
-	tilemap_set_scroll_cols(state->m_reel_2_tilemap, 0x40);
-	tilemap_set_scroll_cols(state->m_reel_3_tilemap, 0x40);
-	tilemap_set_scroll_cols(state->m_reel_4_tilemap, 0x40);
+	state->m_reel_2_tilemap->set_scroll_cols(0x40);
+	state->m_reel_3_tilemap->set_scroll_cols(0x40);
+	state->m_reel_4_tilemap->set_scroll_cols(0x40);
 
-	tilemap_set_transparent_pen(state->m_reel_2_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_reel_3_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_reel_4_tilemap, 0);
+	state->m_reel_2_tilemap->set_transparent_pen(0);
+	state->m_reel_3_tilemap->set_transparent_pen(0);
+	state->m_reel_4_tilemap->set_transparent_pen(0);
 
 
-	tilemap_set_transparent_pen(state->m_tmap, 0);
+	state->m_tmap->set_transparent_pen(0);
 }
 
 
@@ -155,7 +155,7 @@ static SCREEN_UPDATE_IND16( skylncr )
 	int i;
 
 	bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap,cliprect, state->m_reel_1_tilemap, 0, 0);
+	state->m_reel_1_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	// are these hardcoded, or registers?
 	const rectangle visible1(0*8, (20+48)*8-1,  4*8,  (4+7)*8-1);
@@ -164,17 +164,17 @@ static SCREEN_UPDATE_IND16( skylncr )
 
 	for (i= 0;i < 64;i++)
 	{
-		tilemap_set_scrolly(state->m_reel_2_tilemap, i, state->m_reelscroll2[i]);
-		tilemap_set_scrolly(state->m_reel_3_tilemap, i, state->m_reelscroll3[i]);
-		tilemap_set_scrolly(state->m_reel_4_tilemap, i, state->m_reelscroll4[i]);
+		state->m_reel_2_tilemap->set_scrolly(i, state->m_reelscroll2[i]);
+		state->m_reel_3_tilemap->set_scrolly(i, state->m_reelscroll3[i]);
+		state->m_reel_4_tilemap->set_scrolly(i, state->m_reelscroll4[i]);
 	}
 
-	tilemap_draw(bitmap,visible1,state->m_reel_2_tilemap, 0, 0);
-	tilemap_draw(bitmap,visible2,state->m_reel_3_tilemap, 0, 0);
-	tilemap_draw(bitmap,visible3,state->m_reel_4_tilemap, 0, 0);
+	state->m_reel_2_tilemap->draw(bitmap, visible1, 0, 0);
+	state->m_reel_3_tilemap->draw(bitmap, visible2, 0, 0);
+	state->m_reel_4_tilemap->draw(bitmap, visible3, 0, 0);
 
 
-	tilemap_draw(bitmap,cliprect, state->m_tmap, 0, 0);
+	state->m_tmap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -182,56 +182,56 @@ static WRITE8_HANDLER( reeltiles_1_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_reeltiles_1_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel_1_tilemap, offset);
+	state->m_reel_1_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( reeltiles_2_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_reeltiles_2_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel_2_tilemap, offset);
+	state->m_reel_2_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( reeltiles_3_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_reeltiles_3_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel_3_tilemap, offset);
+	state->m_reel_3_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( reeltiles_4_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_reeltiles_4_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel_4_tilemap, offset);
+	state->m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( reeltileshigh_1_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_reeltileshigh_1_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel_1_tilemap, offset);
+	state->m_reel_1_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( reeltileshigh_2_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_reeltileshigh_2_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel_2_tilemap, offset);
+	state->m_reel_2_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( reeltileshigh_3_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_reeltileshigh_3_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel_3_tilemap, offset);
+	state->m_reel_3_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE8_HANDLER( reeltileshigh_4_w )
 {
 	skylncr_state *state = space->machine().driver_data<skylncr_state>();
 	state->m_reeltileshigh_4_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_reel_4_tilemap, offset);
+	state->m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
 

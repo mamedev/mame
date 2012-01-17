@@ -150,7 +150,7 @@ static WRITE8_HANDLER( egghunt_bgram_w )
 	else
 	{
 		state->m_bgram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+		state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 }
 
@@ -158,7 +158,7 @@ static WRITE8_HANDLER( egghunt_atram_w )
 {
 	egghunt_state *state = space->machine().driver_data<egghunt_state>();
 	state->m_atram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -175,7 +175,7 @@ static VIDEO_START(egghunt)
 static SCREEN_UPDATE_IND16(egghunt)
 {
 	egghunt_state *state = screen.machine().driver_data<egghunt_state>();
-	tilemap_draw(bitmap,cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -187,7 +187,7 @@ static WRITE8_HANDLER( egghunt_gfx_banking_w )
 	// data & 0x30 is used for sprites banking
 	state->m_gfx_banking = data & 0x33;
 
-	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	state->m_bg_tilemap->mark_all_dirty();
 }
 
 static WRITE8_HANDLER( egghunt_vidram_bank_w )

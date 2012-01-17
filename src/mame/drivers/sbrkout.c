@@ -310,7 +310,7 @@ static WRITE8_HANDLER( sbrkout_videoram_w )
 	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -327,7 +327,7 @@ static SCREEN_UPDATE_IND16( sbrkout )
 	UINT8 *videoram = state->m_videoram;
 	int ball;
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (ball = 2; ball >= 0; ball--)
 	{

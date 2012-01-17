@@ -115,7 +115,7 @@ VIDEO_START( toypop )
 	toypop_state *state = machine.driver_data<toypop_state>();
 	state->m_bg_tilemap = tilemap_create(machine,get_tile_info,tilemap_scan,8,8,36,28);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -130,7 +130,7 @@ WRITE8_HANDLER( toypop_videoram_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( toypop_palettebank_w )
@@ -139,7 +139,7 @@ WRITE8_HANDLER( toypop_palettebank_w )
 	if (state->m_palettebank != (offset & 1))
 	{
 		state->m_palettebank = offset & 1;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -279,7 +279,7 @@ SCREEN_UPDATE_IND16( toypop )
 {
 	toypop_state *state = screen.machine().driver_data<toypop_state>();
 	draw_background(screen.machine(), bitmap);
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram);
 	return 0;
 }

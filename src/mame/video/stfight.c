@@ -138,7 +138,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 	UINT8 attr = state->m_text_attr_ram[tile_index];
 	int color = attr & 0x0f;
 
-	tileinfo->group = color;
+	tileinfo.group = color;
 
 	SET_TILE_INFO(
 			0,
@@ -161,7 +161,7 @@ VIDEO_START( stfight )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,fg_scan,16,16,128,256);
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0x0f);
+	state->m_fg_tilemap->set_transparent_pen(0x0f);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 0xcf);
 }
 
@@ -177,14 +177,14 @@ WRITE8_HANDLER( stfight_text_char_w )
 {
 	stfight_state *state = space->machine().driver_data<stfight_state>();
 	state->m_text_char_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( stfight_text_attr_w )
 {
 	stfight_state *state = space->machine().driver_data<stfight_state>();
 	state->m_text_attr_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
+	state->m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( stfight_sprite_bank_w )
@@ -207,32 +207,32 @@ WRITE8_HANDLER( stfight_vh_latch_w )
 		case 0x00:
 		case 0x01:
 			scroll = (state->m_vh_latch_ram[1] << 8) | state->m_vh_latch_ram[0];
-			tilemap_set_scrollx(state->m_fg_tilemap,0,scroll);
+			state->m_fg_tilemap->set_scrollx(0,scroll);
 			break;
 
 		case 0x02:
 		case 0x03:
 			scroll = (state->m_vh_latch_ram[3] << 8) | state->m_vh_latch_ram[2];
-			tilemap_set_scrolly(state->m_fg_tilemap,0,scroll);
+			state->m_fg_tilemap->set_scrolly(0,scroll);
 			break;
 
 		case 0x04:
 		case 0x05:
 			scroll = (state->m_vh_latch_ram[5] << 8) | state->m_vh_latch_ram[4];
-			tilemap_set_scrollx(state->m_bg_tilemap,0,scroll);
+			state->m_bg_tilemap->set_scrollx(0,scroll);
 			break;
 
 		case 0x06:
 		case 0x08:
 			scroll = (state->m_vh_latch_ram[8] << 8) | state->m_vh_latch_ram[6];
-			tilemap_set_scrolly(state->m_bg_tilemap,0,scroll);
+			state->m_bg_tilemap->set_scrolly(0,scroll);
 			break;
 
 		case 0x07:
-			tilemap_set_enable(state->m_tx_tilemap,data & 0x80);
+			state->m_tx_tilemap->enable(data & 0x80);
 			/* 0x40 = sprites */
-			tilemap_set_enable(state->m_bg_tilemap,data & 0x20);
-			tilemap_set_enable(state->m_fg_tilemap,data & 0x10);
+			state->m_bg_tilemap->enable(data & 0x20);
+			state->m_fg_tilemap->enable(data & 0x10);
 			flip_screen_set(space->machine(), data & 0x01);
 			break;
 	}
@@ -300,13 +300,13 @@ SCREEN_UPDATE_IND16( stfight )
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);	/* in case state->m_bg_tilemap is disabled */
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,1);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,1);
 
 	/* Draw sprites (may be obscured by foreground layer) */
 	if (state->m_vh_latch_ram[0x07] & 0x40)
 		draw_sprites(screen.machine(), bitmap,cliprect);
 
-	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

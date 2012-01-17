@@ -170,13 +170,13 @@ VIDEO_START( mrdo )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->m_bg_tilemap,0);
-	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 
-	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 56);
-	tilemap_set_scrolldx(state->m_fg_tilemap, 0, 56);
-	tilemap_set_scrolldy(state->m_bg_tilemap, 0, 6);
-	tilemap_set_scrolldy(state->m_fg_tilemap, 0, 6);
+	state->m_bg_tilemap->set_scrolldx(0, 56);
+	state->m_fg_tilemap->set_scrolldx(0, 56);
+	state->m_bg_tilemap->set_scrolldy(0, 6);
+	state->m_fg_tilemap->set_scrolldy(0, 6);
 
 	state->m_flipscreen = 0;
 
@@ -195,21 +195,21 @@ WRITE8_HANDLER( mrdo_bgvideoram_w )
 {
 	mrdo_state *state = space->machine().driver_data<mrdo_state>();
 	state->m_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x3ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( mrdo_fgvideoram_w )
 {
 	mrdo_state *state = space->machine().driver_data<mrdo_state>();
 	state->m_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x3ff);
+	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
 WRITE8_HANDLER( mrdo_scrollx_w )
 {
 	mrdo_state *state = space->machine().driver_data<mrdo_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrollx(0, data);
 }
 
 WRITE8_HANDLER( mrdo_scrolly_w )
@@ -218,9 +218,9 @@ WRITE8_HANDLER( mrdo_scrolly_w )
 
 	/* This is NOT affected by flipscreen (so stop it happening) */
 	if (state->m_flipscreen)
-		tilemap_set_scrolly(state->m_bg_tilemap, 0,((256 - data) & 0xff));
+		state->m_bg_tilemap->set_scrolly(0,((256 - data) & 0xff));
 	else
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+		state->m_bg_tilemap->set_scrolly(0, data);
 }
 
 
@@ -232,7 +232,7 @@ WRITE8_HANDLER( mrdo_flipscreen_w )
 	/* Mr. Do! so we don't emulate them */
 
 	state->m_flipscreen = data & 0x01;
-	tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 
@@ -266,8 +266,8 @@ SCREEN_UPDATE_IND16( mrdo )
 	mrdo_state *state = screen.machine().driver_data<mrdo_state>();
 
 	bitmap.fill(0, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

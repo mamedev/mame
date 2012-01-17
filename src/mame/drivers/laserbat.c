@@ -34,12 +34,12 @@ static WRITE8_HANDLER( laserbat_videoram_w )
 	if (state->m_video_page == 0)
 	{
 		state->m_videoram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+		state->m_bg_tilemap->mark_tile_dirty(offset);
 	}
 	else if (state->m_video_page == 1)
 	{
 		state->m_colorram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset); // wrong!
+		state->m_bg_tilemap->mark_tile_dirty(offset); // wrong!
 	}
 }
 
@@ -508,7 +508,7 @@ static SCREEN_UPDATE_IND16( laserbat )
 	laserbat_state *state = screen.machine().driver_data<laserbat_state>();
 	int y;
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* update the S2636 chips */
 	bitmap_ind16 &s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);

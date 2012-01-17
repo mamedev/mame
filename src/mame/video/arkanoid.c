@@ -14,7 +14,7 @@ WRITE8_HANDLER( arkanoid_videoram_w )
 {
 	arkanoid_state *state = space->machine().driver_data<arkanoid_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( arkanoid_d008_w )
@@ -26,13 +26,13 @@ WRITE8_HANDLER( arkanoid_d008_w )
 	if (flip_screen_x_get(space->machine()) != (data & 0x01))
 	{
 		flip_screen_x_set(space->machine(), data & 0x01);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	if (flip_screen_y_get(space->machine()) != (data & 0x02))
 	{
 		flip_screen_y_set(space->machine(), data & 0x02);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 2 selects the input paddle */
@@ -51,7 +51,7 @@ WRITE8_HANDLER( arkanoid_d008_w )
 	if (state->m_gfxbank != bank)
 	{
 		state->m_gfxbank = bank;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	bank = (data & 0x40) >> 6;
@@ -59,7 +59,7 @@ WRITE8_HANDLER( arkanoid_d008_w )
 	if (state->m_palettebank != bank)
 	{
 		state->m_palettebank = bank;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* BM:  bit 7 is suspected to be MCU reset, the evidence for this is that
@@ -82,13 +82,13 @@ WRITE8_HANDLER( tetrsark_d008_w )
 	if (flip_screen_x_get(space->machine()) != (data & 0x01))
 	{
 		flip_screen_x_set(space->machine(), data & 0x01);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	if (flip_screen_y_get(space->machine()) != (data & 0x02))
 	{
 		flip_screen_y_set(space->machine(), data & 0x02);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 2 selects the input paddle? */
@@ -103,7 +103,7 @@ WRITE8_HANDLER( tetrsark_d008_w )
 	if (state->m_gfxbank != bank)
 	{
 		state->m_gfxbank = bank;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	bank = (data & 0x40) >> 6;
@@ -111,7 +111,7 @@ WRITE8_HANDLER( tetrsark_d008_w )
 	if (state->m_palettebank != bank)
 	{
 		state->m_palettebank = bank;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 7 is coin lockout (but not the service coin) */
@@ -128,14 +128,14 @@ WRITE8_HANDLER( hexa_d008_w )
 	if (flip_screen_x_get(space->machine()) != (data & 0x01))
 	{
 		flip_screen_x_set(space->machine(), data & 0x01);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 1 = flipy (or x?) */
 	if (flip_screen_y_get(space->machine()) != (data & 0x02))
 	{
 		flip_screen_y_set(space->machine(), data & 0x02);
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 2 - 3 unknown */
@@ -147,7 +147,7 @@ WRITE8_HANDLER( hexa_d008_w )
 	if (state->m_gfxbank != ((data & 0x20) >> 5))
 	{
 		state->m_gfxbank = (data & 0x20) >> 5;
-		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 6 - 7 unknown */
@@ -206,7 +206,7 @@ SCREEN_UPDATE_IND16( arkanoid )
 {
 	arkanoid_state *state = screen.machine().driver_data<arkanoid_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
@@ -215,6 +215,6 @@ SCREEN_UPDATE_IND16( hexa )
 {
 	arkanoid_state *state = screen.machine().driver_data<arkanoid_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

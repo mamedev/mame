@@ -59,7 +59,7 @@ VIDEO_START( atarig1 )
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
+	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* reset statics */
 	state->m_pfscroll_xoffset = state->m_is_pitfight ? 2 : 0;
@@ -116,7 +116,7 @@ void atarig1_scanline_update(screen_device &screen, int scanline)
 			if (newscroll != state->m_playfield_xscroll)
 			{
 				screen.update_partial(MAX(scanline + i - 1, 0));
-				tilemap_set_scrollx(state->m_playfield_tilemap, 0, newscroll);
+				state->m_playfield_tilemap->set_scrollx(0, newscroll);
 				state->m_playfield_xscroll = newscroll;
 			}
 		}
@@ -130,13 +130,13 @@ void atarig1_scanline_update(screen_device &screen, int scanline)
 			if (newscroll != state->m_playfield_yscroll)
 			{
 				screen.update_partial(MAX(scanline + i - 1, 0));
-				tilemap_set_scrolly(state->m_playfield_tilemap, 0, newscroll);
+				state->m_playfield_tilemap->set_scrolly(0, newscroll);
 				state->m_playfield_yscroll = newscroll;
 			}
 			if (newbank != state->m_playfield_tile_bank)
 			{
 				screen.update_partial(MAX(scanline + i - 1, 0));
-				tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
+				state->m_playfield_tilemap->mark_all_dirty();
 				state->m_playfield_tile_bank = newbank;
 			}
 		}
@@ -156,13 +156,13 @@ SCREEN_UPDATE_IND16( atarig1 )
 	atarig1_state *state = screen.machine().driver_data<atarig1_state>();
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	state->m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* copy the motion objects on top */
 	copybitmap_trans(bitmap, *atarirle_get_vram(state->m_rle, 0), 0, 0, 0, 0, cliprect, 0);
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
+	state->m_alpha_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

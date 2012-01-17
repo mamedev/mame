@@ -78,7 +78,7 @@ WRITE32_HANDLER( silkroad_fgram_w )
 	silkroad_state *state = space->machine().driver_data<silkroad_state>();
 
 	COMBINE_DATA(&state->m_vidram[offset]);
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_fg2_tile_info )
@@ -102,7 +102,7 @@ WRITE32_HANDLER( silkroad_fgram2_w )
 	silkroad_state *state = space->machine().driver_data<silkroad_state>();
 
 	COMBINE_DATA(&state->m_vidram2[offset]);
-	tilemap_mark_tile_dirty(state->m_fg2_tilemap,offset);
+	state->m_fg2_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_fg3_tile_info )
@@ -126,7 +126,7 @@ WRITE32_HANDLER( silkroad_fgram3_w )
 	silkroad_state *state = space->machine().driver_data<silkroad_state>();
 
 	COMBINE_DATA(&state->m_vidram3[offset]);
-	tilemap_mark_tile_dirty(state->m_fg3_tilemap,offset);
+	state->m_fg3_tilemap->mark_tile_dirty(offset);
 }
 
 VIDEO_START(silkroad)
@@ -136,9 +136,9 @@ VIDEO_START(silkroad)
 	state->m_fg2_tilemap = tilemap_create(machine, get_fg2_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->m_fg3_tilemap = tilemap_create(machine, get_fg3_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_fg2_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_fg3_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_fg2_tilemap->set_transparent_pen(0);
+	state->m_fg3_tilemap->set_transparent_pen(0);
 }
 
 SCREEN_UPDATE_IND16(silkroad)
@@ -147,18 +147,18 @@ SCREEN_UPDATE_IND16(silkroad)
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0x7c0, cliprect);
 
-	tilemap_set_scrollx( state->m_fg_tilemap, 0, ((state->m_regs[0] & 0xffff0000) >> 16) );
-	tilemap_set_scrolly( state->m_fg_tilemap, 0, (state->m_regs[0] & 0x0000ffff) >> 0 );
+	state->m_fg_tilemap->set_scrollx(0, ((state->m_regs[0] & 0xffff0000) >> 16) );
+	state->m_fg_tilemap->set_scrolly(0, (state->m_regs[0] & 0x0000ffff) >> 0 );
 
-	tilemap_set_scrolly( state->m_fg3_tilemap, 0, (state->m_regs[1] & 0xffff0000) >> 16 );
-	tilemap_set_scrollx( state->m_fg3_tilemap, 0, (state->m_regs[2] & 0xffff0000) >> 16 );
+	state->m_fg3_tilemap->set_scrolly(0, (state->m_regs[1] & 0xffff0000) >> 16 );
+	state->m_fg3_tilemap->set_scrollx(0, (state->m_regs[2] & 0xffff0000) >> 16 );
 
-	tilemap_set_scrolly( state->m_fg2_tilemap, 0, ((state->m_regs[5] & 0xffff0000) >> 16));
-	tilemap_set_scrollx( state->m_fg2_tilemap, 0, (state->m_regs[2] & 0x0000ffff) >> 0 );
+	state->m_fg2_tilemap->set_scrolly(0, ((state->m_regs[5] & 0xffff0000) >> 16));
+	state->m_fg2_tilemap->set_scrollx(0, (state->m_regs[2] & 0x0000ffff) >> 0 );
 
-	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap, 0,0);
-	tilemap_draw(bitmap,cliprect,state->m_fg2_tilemap,0,1);
-	tilemap_draw(bitmap,cliprect,state->m_fg3_tilemap,0,2);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_fg2_tilemap->draw(bitmap, cliprect, 0,1);
+	state->m_fg3_tilemap->draw(bitmap, cliprect, 0,2);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 
 	if (0)

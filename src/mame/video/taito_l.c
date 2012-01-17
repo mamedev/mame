@@ -69,15 +69,15 @@ VIDEO_START( taitol )
 	state->m_bg19_tilemap = tilemap_create(machine, get_bg19_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	state->m_ch1a_tilemap = tilemap_create(machine, get_ch1a_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_bg18_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_ch1a_tilemap, 0);
+	state->m_bg18_tilemap->set_transparent_pen(0);
+	state->m_ch1a_tilemap->set_transparent_pen(0);
 
 	for (i = 0; i < 256; i++)
 		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
 
-	tilemap_set_scrolldx(state->m_ch1a_tilemap, -8, -8);
-	tilemap_set_scrolldx(state->m_bg18_tilemap, 28, -11);
-	tilemap_set_scrolldx(state->m_bg19_tilemap, 38, -21);
+	state->m_ch1a_tilemap->set_scrolldx(-8, -8);
+	state->m_bg18_tilemap->set_scrolldx(28, -11);
+	state->m_bg19_tilemap->set_scrolldx(38, -21);
 }
 
 
@@ -96,8 +96,8 @@ WRITE8_HANDLER( horshoes_bankg_w )
 	{
 		state->m_horshoes_gfxbank = data;
 
-		tilemap_mark_all_tiles_dirty(state->m_bg18_tilemap);
-		tilemap_mark_all_tiles_dirty(state->m_bg19_tilemap);
+		state->m_bg18_tilemap->mark_all_dirty();
+		state->m_bg19_tilemap->mark_all_dirty();
 	}
 }
 
@@ -110,8 +110,8 @@ WRITE8_HANDLER( taitol_bankc_w )
 		state->m_bankc[offset] = data;
 //      logerror("Bankc %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
 
-		tilemap_mark_all_tiles_dirty(state->m_bg18_tilemap);
-		tilemap_mark_all_tiles_dirty(state->m_bg19_tilemap);
+		state->m_bg18_tilemap->mark_all_dirty();
+		state->m_bg19_tilemap->mark_all_dirty();
 	}
 }
 
@@ -139,7 +139,7 @@ WRITE8_HANDLER( taitol_control_w )
 
 	/* bit 4 flip screen */
 	state->m_flipscreen = data & 0x10;
-	tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* bit 5 display enable - handled in vh_screenrefresh() */
 }
@@ -195,19 +195,19 @@ void taitol_chardef1f_m( running_machine &machine, int offset )
 void taitol_bg18_m( running_machine &machine, int offset )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
-	tilemap_mark_tile_dirty(state->m_bg18_tilemap, offset / 2);
+	state->m_bg18_tilemap->mark_tile_dirty(offset / 2);
 }
 
 void taitol_bg19_m( running_machine &machine, int offset )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
-	tilemap_mark_tile_dirty(state->m_bg19_tilemap, offset / 2);
+	state->m_bg19_tilemap->mark_tile_dirty(offset / 2);
 }
 
 void taitol_char1a_m( running_machine &machine, int offset )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
-	tilemap_mark_tile_dirty(state->m_ch1a_tilemap, offset / 2);
+	state->m_ch1a_tilemap->mark_tile_dirty(offset / 2);
 }
 
 void taitol_obj1b_m( running_machine &machine, int offset )
@@ -294,31 +294,31 @@ SCREEN_UPDATE_IND16( taitol )
 		dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
 	dy = state->m_rambanks[0xb3f6];
 
-	tilemap_set_scrollx(state->m_bg18_tilemap, 0, -dx);
-	tilemap_set_scrolly(state->m_bg18_tilemap, 0, -dy);
+	state->m_bg18_tilemap->set_scrollx(0, -dx);
+	state->m_bg18_tilemap->set_scrolly(0, -dy);
 
 	dx = state->m_rambanks[0xb3fc] | (state->m_rambanks[0xb3fd] << 8);
 	if (state->m_flipscreen)
 		dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
 	dy = state->m_rambanks[0xb3fe];
 
-	tilemap_set_scrollx(state->m_bg19_tilemap, 0, -dx);
-	tilemap_set_scrolly(state->m_bg19_tilemap, 0, -dy);
+	state->m_bg19_tilemap->set_scrollx(0, -dx);
+	state->m_bg19_tilemap->set_scrolly(0, -dy);
 
 	if (state->m_cur_ctrl & 0x20)	/* display enable */
 	{
 		screen.machine().priority_bitmap.fill(0, cliprect);
 
-		tilemap_draw(bitmap, cliprect, state->m_bg19_tilemap, 0, 0);
+		state->m_bg19_tilemap->draw(bitmap, cliprect, 0, 0);
 
 		if (state->m_cur_ctrl & 0x08)	/* sprites always over BG1 */
-			tilemap_draw(bitmap, cliprect, state->m_bg18_tilemap, 0, 0);
+			state->m_bg18_tilemap->draw(bitmap, cliprect, 0, 0);
 		else					/* split priority */
-			tilemap_draw(bitmap, cliprect, state->m_bg18_tilemap,0,1);
+			state->m_bg18_tilemap->draw(bitmap, cliprect, 0,1);
 
 		draw_sprites(screen.machine(), bitmap, cliprect);
 
-		tilemap_draw(bitmap, cliprect, state->m_ch1a_tilemap, 0, 0);
+		state->m_ch1a_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(screen.machine().pens[0], cliprect);

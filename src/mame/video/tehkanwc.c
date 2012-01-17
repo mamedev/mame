@@ -19,21 +19,21 @@ WRITE8_HANDLER( tehkanwc_videoram_w )
 {
 	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( tehkanwc_colorram_w )
 {
 	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( tehkanwc_videoram2_w )
 {
 	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
 	state->m_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( tehkanwc_scroll_x_w )
@@ -45,7 +45,7 @@ WRITE8_HANDLER( tehkanwc_scroll_x_w )
 WRITE8_HANDLER( tehkanwc_scroll_y_w )
 {
 	tehkanwc_state *state = space->machine().driver_data<tehkanwc_state>();
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrolly(0, data);
 }
 
 WRITE8_HANDLER( tehkanwc_flipscreen_x_w )
@@ -89,7 +89,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	tileinfo->category = (attr & 0x20) ? 0 : 1;
+	tileinfo.category = (attr & 0x20) ? 0 : 1;
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -103,7 +103,7 @@ VIDEO_START( tehkanwc )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
 /*
@@ -167,11 +167,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( tehkanwc )
 {
 	tehkanwc_state *state = screen.machine().driver_data<tehkanwc_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_x[0] + 256 * state->m_scroll_x[1]);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scroll_x[0] + 256 * state->m_scroll_x[1]);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 1, 0);
 	gridiron_draw_led(screen.machine(), bitmap, cliprect, state->m_led0, 0);
 	gridiron_draw_led(screen.machine(), bitmap, cliprect, state->m_led1, 1);
 	return 0;

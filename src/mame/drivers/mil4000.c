@@ -174,18 +174,18 @@ static VIDEO_START(mil4000)
 	state->m_sc2_tilemap = tilemap_create(machine, get_sc2_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->m_sc3_tilemap = tilemap_create(machine, get_sc3_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	tilemap_set_transparent_pen(state->m_sc1_tilemap,0);
-	tilemap_set_transparent_pen(state->m_sc2_tilemap,0);
-	tilemap_set_transparent_pen(state->m_sc3_tilemap,0);
+	state->m_sc1_tilemap->set_transparent_pen(0);
+	state->m_sc2_tilemap->set_transparent_pen(0);
+	state->m_sc3_tilemap->set_transparent_pen(0);
 }
 
 static SCREEN_UPDATE_IND16(mil4000)
 {
 	mil4000_state *state = screen.machine().driver_data<mil4000_state>();
-	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_sc1_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_sc2_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->m_sc3_tilemap,0,0);
+	state->m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_sc1_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_sc2_tilemap->draw(bitmap, cliprect, 0,0);
+	state->m_sc3_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -216,28 +216,28 @@ static WRITE16_HANDLER( sc0_vram_w )
 {
 	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	state->m_sc0_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset/2);
+	state->m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
 static WRITE16_HANDLER( sc1_vram_w )
 {
 	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	state->m_sc1_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc1_tilemap,offset/2);
+	state->m_sc1_tilemap->mark_tile_dirty(offset/2);
 }
 
 static WRITE16_HANDLER( sc2_vram_w )
 {
 	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	state->m_sc2_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc2_tilemap,offset/2);
+	state->m_sc2_tilemap->mark_tile_dirty(offset/2);
 }
 
 static WRITE16_HANDLER( sc3_vram_w )
 {
 	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	state->m_sc3_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_sc3_tilemap,offset/2);
+	state->m_sc3_tilemap->mark_tile_dirty(offset/2);
 }
 
 /*end of video stuff*/

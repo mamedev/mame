@@ -98,8 +98,8 @@ static TILE_GET_INFO( get_tile_info )
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
 	UINT8 attr = state->m_videoram[tile_index + 0x400];
-	tileinfo->category = (attr & 0x40) >> 6;
-	tileinfo->group = attr & 0x3f;
+	tileinfo.category = (attr & 0x40) >> 6;
+	tileinfo.group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
 			state->m_videoram[tile_index] + ((attr & 0x80) << 1),
@@ -207,7 +207,7 @@ WRITE8_HANDLER( gaplus_videoram_w )
 {
 	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
+	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_HANDLER( gaplus_starfield_control_w )
@@ -318,13 +318,13 @@ SCREEN_UPDATE_IND16( gaplus )
 	starfield_render(screen.machine(), bitmap);
 
 	/* draw the low priority characters */
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */
-	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,1,0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 1,0);
 	return 0;
 }
 

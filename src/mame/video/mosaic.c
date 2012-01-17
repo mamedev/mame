@@ -52,7 +52,7 @@ VIDEO_START( mosaic )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0xff);
+	state->m_fg_tilemap->set_transparent_pen(0xff);
 }
 
 
@@ -67,7 +67,7 @@ WRITE8_HANDLER( mosaic_fgvideoram_w )
 	mosaic_state *state = space->machine().driver_data<mosaic_state>();
 
 	state->m_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset / 2);
+	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_HANDLER( mosaic_bgvideoram_w )
@@ -75,7 +75,7 @@ WRITE8_HANDLER( mosaic_bgvideoram_w )
 	mosaic_state *state = space->machine().driver_data<mosaic_state>();
 
 	state->m_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -84,7 +84,7 @@ SCREEN_UPDATE_IND16( mosaic )
 {
 	mosaic_state *state = screen.machine().driver_data<mosaic_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -183,27 +183,27 @@ SCREEN_UPDATE_IND16( tp84 )
 
 	if (cliprect.min_y == screen.visible_area().min_y)
 	{
-		tilemap_mark_all_tiles_dirty_all(screen.machine());
+		screen.machine().tilemap().mark_all_dirty();
 
-		tilemap_set_scrollx(state->m_bg_tilemap, 0, *state->m_scroll_x);
-		tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_scroll_y);
+		state->m_bg_tilemap->set_scrollx(0, *state->m_scroll_x);
+		state->m_bg_tilemap->set_scrolly(0, *state->m_scroll_y);
 
-		tilemap_set_flip_all(screen.machine(), ((*state->m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
+		screen.machine().tilemap().set_flip_all(((*state->m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
 									   ((*state->m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
 	}
 
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 
 	/* draw top status region */
 	clip.min_x = visarea.min_x;
 	clip.max_x = visarea.min_x + 15;
-	tilemap_draw(bitmap, clip, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, clip, 0, 0);
 
 	/* draw bottom status region */
 	clip.min_x = visarea.max_x - 15;
 	clip.max_x = visarea.max_x;
-	tilemap_draw(bitmap, clip, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, clip, 0, 0);
 
 	return 0;
 }

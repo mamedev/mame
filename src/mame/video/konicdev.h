@@ -518,7 +518,7 @@ void k053936_set_offset(device_t *device, int xoffs, int yoffs);	// shall we mer
 
 /**  Konami 053251 **/
 /*
-  Note: k053251_w() automatically does a tilemap_mark_all_tiles_dirty(ALL_TILEMAPS)
+  Note: k053251_w() automatically does a ALL_TILEMAPS->mark_all_dirty()
   when some palette index changes. If ALL_TILEMAPS is too expensive, use
   k053251_set_tilemaps() to indicate which tilemap is associated with each index.
  */

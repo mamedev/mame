@@ -95,7 +95,7 @@ WRITE8_HANDLER( gsword_videoram_w )
 	gsword_state *state = space->machine().driver_data<gsword_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( gsword_charbank_w )
@@ -104,7 +104,7 @@ WRITE8_HANDLER( gsword_charbank_w )
 	if (state->m_charbank != data)
 	{
 		state->m_charbank = data;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -121,7 +121,7 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 	if (state->m_charpalbank != ((data & 0x60) >> 5))
 	{
 		state->m_charpalbank = (data & 0x60) >> 5;
-		tilemap_mark_all_tiles_dirty_all(space->machine());
+		space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 4 is flip screen */
@@ -129,7 +129,7 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 	if (state->m_flipscreen != (data & 0x10))
 	{
 		state->m_flipscreen = data & 0x10;
-	    tilemap_mark_all_tiles_dirty_all(space->machine());
+	    space->machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 0 could be used but unknown */
@@ -140,7 +140,7 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 WRITE8_HANDLER( gsword_scroll_w )
 {
 	gsword_state *state = space->machine().driver_data<gsword_state>();
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
+	state->m_bg_tilemap->set_scrolly(0, data);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -208,7 +208,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( gsword )
 {
 	gsword_state *state = screen.machine().driver_data<gsword_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }

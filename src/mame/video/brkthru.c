@@ -91,7 +91,7 @@ WRITE8_HANDLER( brkthru_bgram_w )
 	brkthru_state *state = space->machine().driver_data<brkthru_state>();
 
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
+	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -107,7 +107,7 @@ WRITE8_HANDLER( brkthru_fgram_w )
 	brkthru_state *state = space->machine().driver_data<brkthru_state>();
 
 	state->m_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
+	state->m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 VIDEO_START( brkthru )
@@ -117,8 +117,8 @@ VIDEO_START( brkthru )
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 16);
 
-	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	state->m_fg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -137,15 +137,15 @@ WRITE8_HANDLER( brkthru_1800_w )
 		if (((data & 0x38) >> 2) != state->m_bgbasecolor)
 		{
 			state->m_bgbasecolor = (data & 0x38) >> 2;
-			tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+			state->m_bg_tilemap->mark_all_dirty();
 		}
 
 		/* bit 6 = screen flip */
 		if (state->m_flipscreen != (data & 0x40))
 		{
 			state->m_flipscreen = data & 0x40;
-			tilemap_set_flip(state->m_bg_tilemap, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			tilemap_set_flip(state->m_fg_tilemap, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			state->m_bg_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			state->m_fg_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 		}
 
@@ -254,20 +254,20 @@ SCREEN_UPDATE_IND16( brkthru )
 {
 	brkthru_state *state = screen.machine().driver_data<brkthru_state>();
 
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bgscroll);
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	state->m_bg_tilemap->set_scrollx(0, state->m_bgscroll);
+	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* low priority sprites */
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x01);
 
 	/* draw background over low priority sprites */
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* high priority sprites */
 	draw_sprites(screen.machine(), bitmap, cliprect, 0x09);
 
 	/* fg layer */
-	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 /*  show_register(bitmap, 8, 8, (UINT32)state->m_flipscreen); */
 
