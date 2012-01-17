@@ -887,7 +887,7 @@ static MC6845_UPDATE_ROW( cga_update_row )
 	}
 }
 
-
+// bit 0 is actually display enable (vblank OR hblank enabled)
 static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed )
 {
 	cga.hsync = state ? 1 : 0;
@@ -896,7 +896,7 @@ static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed )
 
 static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed )
 {
-	cga.vsync = state ? 8 : 0;
+	cga.vsync = state ? 9 : 0;
 	if ( state )
 	{
 		cga.frame++;

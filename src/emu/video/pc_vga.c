@@ -755,10 +755,16 @@ static READ8_HANDLER(vga_crtc_r)
 			data = vga.crtc.data[vga.crtc.index];
 		break;
 	case 0xa:
+		UINT8 hsync,vsync;
 		vga.attribute.state = 0;
 		data = 0;/*4; */
-		data |= (space->machine().primary_screen->hblank() & 1) << 0;
-		data |= (space->machine().primary_screen->vblank() & 1) << 3;
+
+		hsync = space->machine().primary_screen->hblank() & 1;
+		vsync = space->machine().primary_screen->vblank() & 1;
+
+		data |= (hsync | vsync) & 1; // DD - display disable register
+		data |= (vsync & 1) << 3; // VRetrace register
+
 		/* ega diagnostic readback enough for oak bios */
 		switch (vga.attribute.data[0x12]&0x30) {
 		case 0:
@@ -812,7 +818,8 @@ static WRITE8_HANDLER(vga_crtc_w)
 			if (vga.crtc.index < vga.svga_intf.crtc_regcount)
 				vga.crtc.data[vga.crtc.index] = data;
 
-			//printf("%02x %02x\n",vga.crtc.index,data);
+			//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+			//printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
 			break;
 	}
 }
