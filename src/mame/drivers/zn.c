@@ -2815,11 +2815,11 @@ ROM_START( ts2 )
 	ROM_LOAD( "ts2-10m.4k", 0x0c00000, 0x200000, CRC(ad90679a) SHA1(19dd30764f892ee7f89c78ccbccdaf4d6b0e6e09) )
 
 	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "ts2-02.2e",  0x00000, 0x08000, CRC(2f45c461) SHA1(513b6b9b5a2f7c567c30c958e0e13834cd9bd266) )
-	ROM_CONTINUE(        0x10000, 0x18000 )
+	ROM_LOAD( "ts2_02.2e",  0x00000, 0x08000, CRC(2f45c461) SHA1(513b6b9b5a2f7c567c30c958e0e13834cd9bd266) )
+	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
-	ROM_LOAD16_WORD_SWAP( "ts2-01m.3b",  0x0000000, 0x400000, CRC(d7a505e0) SHA1(f1b0cdea712101f695bd326eccd753eb79a07490) )
+	ROM_LOAD16_WORD_SWAP( "ts2-01m.3b", 0x0000000, 0x400000, CRC(d7a505e0) SHA1(f1b0cdea712101f695bd326eccd753eb79a07490) )
 ROM_END
 
 /* 95681-2 */
@@ -2838,7 +2838,7 @@ ROM_START( ts2a )
 	ROM_LOAD( "ts2-10m.4k", 0x0c00000, 0x200000, CRC(ad90679a) SHA1(19dd30764f892ee7f89c78ccbccdaf4d6b0e6e09) )
 
 	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "ts2-02.2e",  0x00000, 0x08000, CRC(2f45c461) SHA1(513b6b9b5a2f7c567c30c958e0e13834cd9bd266) )
+	ROM_LOAD( "ts2_02.2e",  0x00000, 0x08000, CRC(2f45c461) SHA1(513b6b9b5a2f7c567c30c958e0e13834cd9bd266) )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
@@ -2859,7 +2859,7 @@ ROM_START( ts2j )
 	ROM_LOAD( "ts2-10m.4k", 0x0c00000, 0x200000, CRC(ad90679a) SHA1(19dd30764f892ee7f89c78ccbccdaf4d6b0e6e09) )
 
 	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "ts2-02.2e",  0x00000, 0x08000, CRC(2f45c461) SHA1(513b6b9b5a2f7c567c30c958e0e13834cd9bd266) )
+	ROM_LOAD( "ts2_02.2e",  0x00000, 0x08000, CRC(2f45c461) SHA1(513b6b9b5a2f7c567c30c958e0e13834cd9bd266) )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
