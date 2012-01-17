@@ -351,9 +351,23 @@ static void hyprduel_postload(running_machine &machine)
 }
 
 
+static void expand_gfx1(hyprduel_state &state)
+{
+	UINT8 *base_gfx = state.machine().region("gfx1")->base();
+	UINT32 length = 2 * state.machine().region("gfx1")->bytes();
+	state.m_expanded_gfx1 = auto_alloc_array(state.machine(), UINT8, length);
+	for (int i = 0; i < length; i += 2)
+	{
+		UINT8 src = base_gfx[i / 2];
+		state.m_expanded_gfx1[i+0] = src & 15;
+		state.m_expanded_gfx1[i+1] = src >> 4;
+	}
+}
+
 static VIDEO_START( common_14220 )
 {
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
+	expand_gfx1(*state);
 	alloc_empty_tiles(machine);
 	state->m_tiletable_old = auto_alloc_array(machine, UINT16, state->m_tiletable_size / 2);
 	state->m_dirtyindex = auto_alloc_array(machine, UINT8, state->m_tiletable_size / 4);
@@ -462,8 +476,9 @@ VIDEO_START( magerror_14220 )
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	UINT8 *base_gfx	=	machine.region("gfx1")->base();
-	UINT8 *gfx_max	=	base_gfx + machine.region("gfx1")->bytes();
+	UINT8 *base_gfx4 = state->m_expanded_gfx1;
+	UINT8 *base_gfx8 = machine.region("gfx1")->base();
+	UINT32 gfx_size = machine.region("gfx1")->bytes();
 
 	int max_x = machine.primary_screen->width();
 	int max_y = machine.primary_screen->height();
@@ -498,7 +513,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		for (j = 0; j < sprites; j++)
 		{
 			int x, y, attr, code, color, flipx, flipy, zoom, curr_pri, width, height;
-			UINT8 *gfxdata;
 
 			/* Exponential zoom table extracted from daitoride */
 			static const int zoomtable[0x40] =
@@ -546,7 +560,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			width = (((attr >> 11) & 0x7) + 1) * 8;
 			height = (((attr >>  8) & 0x7) + 1) * 8;
 
-			gfxdata = base_gfx + (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
+			UINT32 gfxstart = (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
 			if (flip_screen_get(machine))
 			{
@@ -557,10 +571,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			if (color == 0xf)	/* 8bpp */
 			{
 				/* Bounds checking */
-				if ((gfxdata + width * height - 1) >= gfx_max)
+				if ((gfxstart + width * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
+				gfx_element_build_temporary(&gfx, machine, base_gfx8 + gfxstart, width, height, width, 0, 256, 0);
 
 				pdrawgfxzoom_transpen(bitmap,cliprect, &gfx,
 								0,
@@ -573,10 +587,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			else
 			{
 				/* Bounds checking */
-				if ( (gfxdata + width / 2 * height - 1) >= gfx_max )
+				if ((gfxstart + width / 2 * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width / 2, 0, 16, GFX_ELEMENT_PACKED);
+				gfx_element_build_temporary(&gfx, machine, base_gfx4 + 2 * gfxstart, width, height, width, 0, 16, 0);
 
 				pdrawgfxzoom_transpen(bitmap,cliprect, &gfx,
 								0,

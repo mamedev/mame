@@ -31,8 +31,7 @@
 #define EXTENDED_XOFFS			{ 0 }
 #define EXTENDED_YOFFS			{ 0 }
 
-#define GFX_ELEMENT_PACKED		1	/* two 4bpp pixels are packed in one byte of gfxdata */
-#define GFX_ELEMENT_DONT_FREE	2	/* gfxdata was not malloc()ed, so don't free it on exit */
+#define GFX_ELEMENT_DONT_FREE	1	/* gfxdata was not malloc()ed, so don't free it on exit */
 
 #define GFX_RAW 				0x12345678
 /* When planeoffset[0] is set to GFX_RAW, the gfx data is left as-is, with no conversion.
@@ -41,7 +40,6 @@
    xoffset[0] is an optional displacement (*8) from the beginning of the source data, while
    yoffset[0] is the line modulo (*8) and charincrement the char modulo (*8). They are *8
    for consistency with the usual behaviour, but the bottom 3 bits are not used.
-   GFX_ELEMENT_PACKED is automatically set if planes is <= 4.
 
    This special mode can be used to save memory in games that require several different
    handlings of the same ROM data (e.g. metro.c can use both 4bpp and 8bpp tiles, and both
@@ -92,8 +90,8 @@ enum
 #define GFXDECODE_END { 0 } };
 
 /* these macros are used for declaring gfx_layout structures. */
-#define GFXLAYOUT_RAW( name, planes, width, height, linemod, charmod ) \
-const gfx_layout name = { width, height, RGN_FRAC(1,1), planes, { GFX_RAW }, { 0 }, { linemod }, charmod };
+#define GFXLAYOUT_RAW( name, width, height, linemod, charmod ) \
+const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, { linemod }, charmod };
 
 
 
@@ -142,7 +140,7 @@ public:
 
 	UINT32 *		pen_usage;			/* bitmask of pens that are used (pens 0-31 only) */
 
-	UINT8 *			gfxdata;			/* pixel data, 8bpp or 4bpp (if GFX_ELEMENT_PACKED) */
+	UINT8 *			gfxdata;			/* pixel data, 8bpp */
 	UINT32			line_modulo;		/* bytes between each row of data */
 	UINT32			char_modulo;		/* bytes between each element */
 	const UINT8 *	srcdata;			/* pointer to the source data for decoding */

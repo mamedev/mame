@@ -215,21 +215,10 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 		switch (flipxy)
 		{
 			default:
-			case 0x0: *pix = data[(y              * (big?8:4)) + (x>>1)];             break;
-			case 0x1: *pix = data[(((big?15:7)-y) * (big?8:4)) + (x>>1)];             break;
-			case 0x2: *pix = data[(y              * (big?8:4)) + ((big?7:3)-(x>>1))]; break;
-			case 0x3: *pix = data[(((big?15:7)-y) * (big?8:4)) + ((big?7:3)-(x>>1))]; break;
-		}
-
-		if (!(flipxy&2))
-		{
-			if (x&1) *pix >>= 4;
-			else *pix &= 0xf;
-		}
-		else
-		{
-			if (x&1) *pix  &= 0xf;
-			else *pix >>= 4;
+			case 0x0: *pix = data[(y              * (big?16:8)) + x];             break;
+			case 0x1: *pix = data[(((big?15:7)-y) * (big?16:8)) + x];             break;
+			case 0x2: *pix = data[(y              * (big?16:8)) + ((big?15:7)-x)]; break;
+			case 0x3: *pix = data[(((big?15:7)-y) * (big?16:8)) + ((big?15:7)-x)]; break;
 		}
 
 		*pix |= (((((tile & 0x0ff00000) >> 20)) + 0x100)*0x10);
@@ -284,9 +273,23 @@ WRITE16_HANDLER( metro_window_w )
 
 /* Dirty tilemaps when the tiles set changes */
 
+static void expand_gfx1(metro_state &state)
+{
+	UINT8 *base_gfx = state.machine().region("gfx1")->base();
+	UINT32 length = 2 * state.machine().region("gfx1")->bytes();
+	state.m_expanded_gfx1 = auto_alloc_array(state.machine(), UINT8, length);
+	for (int i = 0; i < length; i += 2)
+	{
+		UINT8 src = base_gfx[i / 2];
+		state.m_expanded_gfx1[i+0] = src & 15;
+		state.m_expanded_gfx1[i+1] = src >> 4;
+	}
+}
+
 VIDEO_START( metro_14100 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
+	expand_gfx1(*state);
 
 	state->m_support_8bpp = 0;
 	state->m_support_16x16 = 0;
@@ -308,6 +311,7 @@ VIDEO_START( metro_14100 )
 VIDEO_START( metro_14220 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
+	expand_gfx1(*state);
 
 	state->m_support_8bpp = 1;
 	state->m_support_16x16 = 0;
@@ -329,6 +333,7 @@ VIDEO_START( metro_14220 )
 VIDEO_START( metro_14300 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
+	expand_gfx1(*state);
 
 	state->m_support_8bpp = 1;
 	state->m_support_16x16 = 1;
@@ -442,8 +447,9 @@ VIDEO_START( gstrik2 )
 void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	metro_state *state = machine.driver_data<metro_state>();
-	UINT8 *base_gfx = machine.region("gfx1")->base();
-	UINT8 *gfx_max  = base_gfx + machine.region("gfx1")->bytes();
+	UINT8 *base_gfx4 = state->m_expanded_gfx1;
+	UINT8 *base_gfx8 = machine.region("gfx1")->base();
+	UINT32 gfx_size = machine.region("gfx1")->bytes();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	int max_x = visarea.max_x + 1;
@@ -479,7 +485,6 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 		for (j = 0; j < sprites; j++)
 		{
 			int x, y, attr, code, color, flipx, flipy, zoom, curr_pri, width, height;
-			UINT8 *gfxdata;
 
 			/* Exponential zoom table extracted from daitoride */
 			static const int zoomtable[0x40] =
@@ -525,7 +530,7 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 			width  = (((attr >> 11) & 0x7) + 1) * 8;
 			height = (((attr >>  8) & 0x7) + 1) * 8;
 
-			gfxdata = base_gfx + (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
+			UINT32 gfxstart = (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
 			if (state->m_flip_screen)
 			{
@@ -536,10 +541,10 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 			if (state->m_support_8bpp && color == 0xf)	/* 8bpp */
 			{
 				/* Bounds checking */
-				if ((gfxdata + width * height - 1) >= gfx_max)
+				if ((gfxstart + width * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
+				gfx_element_build_temporary(&gfx, machine, base_gfx8 + gfxstart, width, height, width, 0, 256, 0);
 
 				pdrawgfxzoom_transpen(	bitmap,cliprect, &gfx,
 								0,
@@ -552,10 +557,10 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 			else
 			{
 				/* Bounds checking */
-				if ((gfxdata + width / 2 * height - 1) >= gfx_max)
+				if ((gfxstart + width / 2 * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width/2, 0, 16, GFX_ELEMENT_PACKED);
+				gfx_element_build_temporary(&gfx, machine, base_gfx4 + 2 * gfxstart, width, height, width, 0, 16, 0);
 
 				pdrawgfxzoom_transpen(	bitmap,cliprect, &gfx,
 								0,

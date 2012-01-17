@@ -606,10 +606,19 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /* 8x8x4 tiles */
-static GFXLAYOUT_RAW( layout_8x8x4, 4, 8, 8, 4*8, 32*8 )
+static const gfx_layout layout_8x8x4 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 4*1,4*0, 4*3,4*2, 4*5,4*4, 4*7,4*6 },
+	{ STEP8(0,4*8) },
+	4*8*8
+};
 
 /* 8x8x8 tiles for later games */
-static GFXLAYOUT_RAW( layout_8x8x8h, 8, 8, 8, 8*8, 32*8 )
+static GFXLAYOUT_RAW( layout_8x8x8h, 8, 8, 8*8, 32*8 )
 
 static GFXDECODE_START( 14220 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x200 ) // [0] 4 Bit Tiles

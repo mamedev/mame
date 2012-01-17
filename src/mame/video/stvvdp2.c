@@ -2553,80 +2553,39 @@ static void stv_vdp2_drawgfxzoom(
 				/* case 0: STV_TRANSPARENCY_NONE */
 				if (transparency == STV_TRANSPARENCY_NONE)
 				{
-					if (gfx->flags & GFX_ELEMENT_PACKED)
+					for( y=sy; y<ey; y++ )
 					{
-						for( y=sy; y<ey; y++ )
+						const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+						UINT32 *dest = &dest_bmp.pix32(y);
+
+						int x, x_index = x_index_base;
+						for( x=sx; x<ex; x++ )
 						{
-							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT32 *dest = &dest_bmp.pix32(y);
-
-							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
-							{
-								dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
-								x_index += dx;
-							}
-
-							y_index += dy;
+							dest[x] = pal[source[x_index>>16]];
+							x_index += dx;
 						}
-					}
-					else
-					{
-						for( y=sy; y<ey; y++ )
-						{
-							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT32 *dest = &dest_bmp.pix32(y);
 
-							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
-							{
-								dest[x] = pal[source[x_index>>16]];
-								x_index += dx;
-							}
-
-							y_index += dy;
-						}
+						y_index += dy;
 					}
 				}
 
 				/* case 1: STV_TRANSPARENCY_PEN */
 				if (transparency == STV_TRANSPARENCY_PEN)
 				{
-					if (gfx->flags & GFX_ELEMENT_PACKED)
+					for( y=sy; y<ey; y++ )
 					{
-						for( y=sy; y<ey; y++ )
+						const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+						UINT32 *dest = &dest_bmp.pix32(y);
+
+						int x, x_index = x_index_base;
+						for( x=sx; x<ex; x++ )
 						{
-							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT32 *dest = &dest_bmp.pix32(y);
-
-							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
-							{
-								int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
-								if( c != transparent_color ) dest[x] = pal[c];
-								x_index += dx;
-							}
-
-							y_index += dy;
+							int c = source[x_index>>16];
+							if( c != transparent_color ) dest[x] = pal[c];
+							x_index += dx;
 						}
-					}
-					else
-					{
-						for( y=sy; y<ey; y++ )
-						{
-							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT32 *dest = &dest_bmp.pix32(y);
 
-							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
-							{
-								int c = source[x_index>>16];
-								if( c != transparent_color ) dest[x] = pal[c];
-								x_index += dx;
-							}
-
-							y_index += dy;
-						}
+						y_index += dy;
 					}
 				}
 
@@ -2653,41 +2612,20 @@ static void stv_vdp2_drawgfxzoom(
 				/* case : STV_TRANSPARENCY_ADD_BLEND */
 				if (transparency == STV_TRANSPARENCY_ADD_BLEND )
 				{
-					if (gfx->flags & GFX_ELEMENT_PACKED)
+					for( y=sy; y<ey; y++ )
 					{
-						for( y=sy; y<ey; y++ )
+						const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+						UINT32 *dest = &dest_bmp.pix32(y);
+
+						int x, x_index = x_index_base;
+						for( x=sx; x<ex; x++ )
 						{
-							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT32 *dest = &dest_bmp.pix32(y);
-
-							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
-							{
-								int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
-								if( c != transparent_color ) dest[x] = stv_add_blend(dest[x],pal[c]);
-								x_index += dx;
-							}
-
-							y_index += dy;
+							int c = source[x_index>>16];
+							if( c != transparent_color ) dest[x] = stv_add_blend(dest[x],pal[c]);
+							x_index += dx;
 						}
-					}
-					else
-					{
-						for( y=sy; y<ey; y++ )
-						{
-							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-							UINT32 *dest = &dest_bmp.pix32(y);
 
-							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
-							{
-								int c = source[x_index>>16];
-								if( c != transparent_color ) dest[x] = stv_add_blend(dest[x],pal[c]);
-								x_index += dx;
-							}
-
-							y_index += dy;
-						}
+						y_index += dy;
 					}
 				}
 

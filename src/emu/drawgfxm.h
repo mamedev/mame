@@ -418,175 +418,82 @@ do {																					\
 		/* fetch the source data */														\
 		srcdata = gfx_element_get_data(gfx, code);										\
 																						\
-		/* draw normal 8bpp source data */												\
-		if (!(gfx->flags & GFX_ELEMENT_PACKED))											\
-		{																				\
-			/* compute how many blocks of 4 pixels we have */							\
-			UINT32 numblocks = (destendx + 1 - destx) / 4;								\
-			UINT32 leftovers = (destendx + 1 - destx) - 4 * numblocks;					\
-																						\
-			/* adjust srcdata to point to the first source pixel of the row */			\
-			srcdata += srcy * gfx->line_modulo + srcx;									\
-																						\
-			/* non-flipped 8bpp case */													\
-			if (!flipx)																	\
-			{																			\
-				/* iterate over pixels in Y */											\
-				for (cury = desty; cury <= destendy; cury++)							\
-				{																		\
-					PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-					PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
-					const UINT8 *srcptr = srcdata;										\
-					srcdata += dy;														\
-																						\
-					/* iterate over unrolled blocks of 4 */								\
-					for (curx = 0; curx < numblocks; curx++)							\
-					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);						\
-						PIXEL_OP(destptr[1], priptr[1], srcptr[1]);						\
-						PIXEL_OP(destptr[2], priptr[2], srcptr[2]);						\
-						PIXEL_OP(destptr[3], priptr[3], srcptr[3]);						\
-																						\
-						srcptr += 4;													\
-						destptr += 4;													\
-						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);						\
-					}																	\
-																						\
-					/* iterate over leftover pixels */									\
-					for (curx = 0; curx < leftovers; curx++)							\
-					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);						\
-						srcptr++;														\
-						destptr++;														\
-						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
-					}																	\
-				}																		\
-			}																			\
-																						\
-			/* flipped 8bpp case */														\
-			else																		\
-			{																			\
-				/* iterate over pixels in Y */											\
-				for (cury = desty; cury <= destendy; cury++)							\
-				{																		\
-					PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-					PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
-					const UINT8 *srcptr = srcdata;										\
-					srcdata += dy;														\
-																						\
-					/* iterate over unrolled blocks of 4 */								\
-					for (curx = 0; curx < numblocks; curx++)							\
-					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[ 0]);					\
-						PIXEL_OP(destptr[1], priptr[1], srcptr[-1]);					\
-						PIXEL_OP(destptr[2], priptr[2], srcptr[-2]);					\
-						PIXEL_OP(destptr[3], priptr[3], srcptr[-3]);					\
-																						\
-						srcptr -= 4;													\
-						destptr += 4;													\
-						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);						\
-					}																	\
-																						\
-					/* iterate over leftover pixels */									\
-					for (curx = 0; curx < leftovers; curx++)							\
-					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0]); 					\
-						srcptr--;														\
-						destptr++;														\
-						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
-					}																	\
-				}																		\
-			}																			\
-		}																				\
-																						\
-		/* draw packed 4bpp source data */												\
-		else																			\
-		{																				\
-			/* adjust srcdata to point to the first source pixel of the row */			\
-			srcdata += srcy * gfx->line_modulo + srcx / 2;								\
-																						\
-			/* non-flipped 4bpp case */													\
-			if (!flipx)																	\
-			{																			\
-				/* compute how many blocks of 2 pixels we have */						\
-				UINT32 oddstart = srcx & 1;												\
-				UINT32 numblocks = (destendx + 1 - destx - oddstart) / 2;				\
-				UINT32 leftovers = (destendx + 1 - destx - oddstart) - 2 * numblocks;	\
-																						\
-				/* iterate over pixels in Y */											\
-				for (cury = desty; cury <= destendy; cury++)							\
-				{																		\
-					PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-					PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
-					const UINT8 *srcptr = srcdata;										\
-					srcdata += dy;														\
-																						\
-					/* odd starting pixel */											\
-					if (oddstart)														\
-					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0] >> 4);				\
-						srcptr++;														\
-						destptr++;														\
-						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
-					}																	\
-																						\
-					/* iterate over unrolled blocks of 2 */								\
-					for (curx = 0; curx < numblocks; curx++)							\
-					{																	\
-						UINT8 srcbyte = *srcptr++;										\
-						PIXEL_OP(destptr[0], priptr[0], srcbyte & 15);					\
-						PIXEL_OP(destptr[1], priptr[1], srcbyte >> 4);					\
-						destptr += 2;													\
-						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 2);						\
-					}																	\
-																						\
-					/* iterate over leftover pixels */									\
-					if (leftovers > 0)													\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0] & 15);				\
-				}																		\
-			}																			\
-																						\
-			/* flipped 4bpp case */														\
-			else																		\
-			{																			\
-				/* compute how many blocks of 2 pixels we have */						\
-				UINT32 oddstart = ~srcx & 1;											\
-				UINT32 numblocks = (destendx + 1 - destx - oddstart) / 2;				\
-				UINT32 leftovers = (destendx + 1 - destx - oddstart) - 2 * numblocks;	\
-																						\
-				/* iterate over pixels in Y */											\
-				for (cury = desty; cury <= destendy; cury++)							\
-				{																		\
-					PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-					PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
-					const UINT8 *srcptr = srcdata;										\
-					srcdata += dy;														\
-																						\
-					/* odd right pixel */												\
-					if (oddstart)														\
-					{																	\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0] & 15);				\
-						srcptr--;														\
-						destptr++;														\
-						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
-					}																	\
-																						\
-					/* middle pixels */													\
-					for (curx = 0; curx < numblocks; curx++)							\
-					{																	\
-						UINT8 srcbyte = *srcptr--;										\
-						PIXEL_OP(destptr[0], priptr[0], srcbyte >> 4);					\
-						PIXEL_OP(destptr[1], priptr[1], srcbyte & 15);					\
-						destptr += 2;													\
-						PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 2);						\
-					}																	\
-																						\
-					/* odd left pixel */												\
-					if (leftovers > 0)													\
-						PIXEL_OP(destptr[0], priptr[0], srcptr[0] >> 4);				\
-				}																		\
-			}																			\
-		}																				\
+		/* compute how many blocks of 4 pixels we have */							\
+		UINT32 numblocks = (destendx + 1 - destx) / 4;								\
+		UINT32 leftovers = (destendx + 1 - destx) - 4 * numblocks;					\
+																					\
+		/* adjust srcdata to point to the first source pixel of the row */			\
+		srcdata += srcy * gfx->line_modulo + srcx;									\
+																					\
+		/* non-flipped 8bpp case */													\
+		if (!flipx)																	\
+		{																			\
+			/* iterate over pixels in Y */											\
+			for (cury = desty; cury <= destendy; cury++)							\
+			{																		\
+				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
+				const UINT8 *srcptr = srcdata;										\
+				srcdata += dy;														\
+																					\
+				/* iterate over unrolled blocks of 4 */								\
+				for (curx = 0; curx < numblocks; curx++)							\
+				{																	\
+					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);						\
+					PIXEL_OP(destptr[1], priptr[1], srcptr[1]);						\
+					PIXEL_OP(destptr[2], priptr[2], srcptr[2]);						\
+					PIXEL_OP(destptr[3], priptr[3], srcptr[3]);						\
+																					\
+					srcptr += 4;													\
+					destptr += 4;													\
+					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);						\
+				}																	\
+																					\
+				/* iterate over leftover pixels */									\
+				for (curx = 0; curx < leftovers; curx++)							\
+				{																	\
+					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);						\
+					srcptr++;														\
+					destptr++;														\
+					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
+				}																	\
+			}																		\
+		}																			\
+																					\
+		/* flipped 8bpp case */														\
+		else																		\
+		{																			\
+			/* iterate over pixels in Y */											\
+			for (cury = desty; cury <= destendy; cury++)							\
+			{																		\
+				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);			\
+				const UINT8 *srcptr = srcdata;										\
+				srcdata += dy;														\
+																					\
+				/* iterate over unrolled blocks of 4 */								\
+				for (curx = 0; curx < numblocks; curx++)							\
+				{																	\
+					PIXEL_OP(destptr[0], priptr[0], srcptr[ 0]);					\
+					PIXEL_OP(destptr[1], priptr[1], srcptr[-1]);					\
+					PIXEL_OP(destptr[2], priptr[2], srcptr[-2]);					\
+					PIXEL_OP(destptr[3], priptr[3], srcptr[-3]);					\
+																					\
+					srcptr -= 4;													\
+					destptr += 4;													\
+					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);						\
+				}																	\
+																					\
+				/* iterate over leftover pixels */									\
+				for (curx = 0; curx < leftovers; curx++)							\
+				{																	\
+					PIXEL_OP(destptr[0], priptr[0], srcptr[0]); 					\
+					srcptr--;														\
+					destptr++;														\
+					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);						\
+				}																	\
+			}																		\
+		}																			\
 	} while (0);																		\
 	g_profiler.stop();																	\
 } while (0)
@@ -699,71 +606,44 @@ do {																					\
 		/* fetch the source data */														\
 		srcdata = gfx_element_get_data(gfx, code);										\
 																						\
-		/* draw normal */																\
-		if (!(gfx->flags & GFX_ELEMENT_PACKED))											\
-		{																				\
-			/* compute how many blocks of 4 pixels we have */							\
-			UINT32 numblocks = (destendx + 1 - destx) / 4;								\
-			UINT32 leftovers = (destendx + 1 - destx) - 4 * numblocks;					\
-																						\
-			/* iterate over pixels in Y */												\
-			for (cury = desty; cury <= destendy; cury++)								\
-			{																			\
-				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);				\
-				const UINT8 *srcptr = srcdata + (srcy >> 16) * gfx->line_modulo;		\
-				INT32 cursrcx = srcx;													\
-				srcy += dy;																\
-																						\
-				/* iterate over unrolled blocks of 4 */									\
-				for (curx = 0; curx < numblocks; curx++)								\
-				{																		\
-					PIXEL_OP(destptr[0], priptr[0], srcptr[cursrcx >> 16]); 			\
-					cursrcx += dx;														\
-					PIXEL_OP(destptr[1], priptr[1], srcptr[cursrcx >> 16]); 			\
-					cursrcx += dx;														\
-					PIXEL_OP(destptr[2], priptr[2], srcptr[cursrcx >> 16]); 			\
-					cursrcx += dx;														\
-					PIXEL_OP(destptr[3], priptr[3], srcptr[cursrcx >> 16]); 			\
-					cursrcx += dx;														\
-																						\
-					destptr += 4;														\
-					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);							\
-				}																		\
-																						\
-				/* iterate over leftover pixels */										\
-				for (curx = 0; curx < leftovers; curx++)								\
-				{																		\
-					PIXEL_OP(destptr[0], priptr[0], srcptr[cursrcx >> 16]); 			\
-					cursrcx += dx;														\
-					destptr++;															\
-					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);							\
-				}																		\
-			}																			\
-		}																				\
-																						\
-		/* draw packed */																\
-		else																			\
-		{																				\
-			/* iterate over pixels in Y */												\
-			for (cury = desty; cury <= destendy; cury++)								\
-			{																			\
-				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);				\
-				const UINT8 *srcptr = srcdata + (srcy >> 16) * gfx->line_modulo;		\
-				INT32 cursrcx = srcx;													\
-				srcy += dy;																\
-																						\
-				/* iterate over pixels in X */											\
-				for (curx = destx; curx <= destendx; curx++)							\
-				{																		\
-					PIXEL_OP(destptr[0], priptr[0], (srcptr[cursrcx >> 17] >> ((cursrcx >> 14) & 4)) & 15); \
-					cursrcx += dx;														\
-					destptr++;															\
-					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);							\
-				}																		\
-			}																			\
-		}																				\
+		/* compute how many blocks of 4 pixels we have */							\
+		UINT32 numblocks = (destendx + 1 - destx) / 4;								\
+		UINT32 leftovers = (destendx + 1 - destx) - 4 * numblocks;					\
+																					\
+		/* iterate over pixels in Y */												\
+		for (cury = desty; cury <= destendy; cury++)								\
+		{																			\
+			PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
+			PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);				\
+			const UINT8 *srcptr = srcdata + (srcy >> 16) * gfx->line_modulo;		\
+			INT32 cursrcx = srcx;													\
+			srcy += dy;																\
+																					\
+			/* iterate over unrolled blocks of 4 */									\
+			for (curx = 0; curx < numblocks; curx++)								\
+			{																		\
+				PIXEL_OP(destptr[0], priptr[0], srcptr[cursrcx >> 16]); 			\
+				cursrcx += dx;														\
+				PIXEL_OP(destptr[1], priptr[1], srcptr[cursrcx >> 16]); 			\
+				cursrcx += dx;														\
+				PIXEL_OP(destptr[2], priptr[2], srcptr[cursrcx >> 16]); 			\
+				cursrcx += dx;														\
+				PIXEL_OP(destptr[3], priptr[3], srcptr[cursrcx >> 16]); 			\
+				cursrcx += dx;														\
+																					\
+				destptr += 4;														\
+				PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);							\
+			}																		\
+																					\
+			/* iterate over leftover pixels */										\
+			for (curx = 0; curx < leftovers; curx++)								\
+			{																		\
+				PIXEL_OP(destptr[0], priptr[0], srcptr[cursrcx >> 16]); 			\
+				cursrcx += dx;														\
+				destptr++;															\
+				PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);							\
+			}																		\
+		}																			\
 	} while (0);																		\
 	g_profiler.stop();														\
 } while (0)

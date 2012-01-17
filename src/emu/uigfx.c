@@ -789,7 +789,6 @@ static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, i
 		for (x = 0; x < width; x++)
 		{
 			int effx = x, effy = y;
-			rgb_t pixel;
 			const UINT8 *s;
 
 			/* compute effective x,y values after rotation */
@@ -814,11 +813,7 @@ static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, i
 			s = src + effy * gfx->line_modulo;
 
 			/* extract the pixel */
-			if (gfx->flags & GFX_ELEMENT_PACKED)
-				pixel = (s[effx/2] >> ((effx & 1) * 4)) & 0xf;
-			else
-				pixel = s[effx];
-			*dest++ = 0xff000000 | palette[pixel & palette_mask];
+			*dest++ = 0xff000000 | palette[s[effx] & palette_mask];
 		}
 	}
 }

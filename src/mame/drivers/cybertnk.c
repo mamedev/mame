@@ -839,7 +839,19 @@ static const gfx_layout tile_8x8x4 =
     8*8
 };
 
-static GFXLAYOUT_RAW( roadlayout, 4, 1024, 1, 1024*4, 1024*4 ) // could be wrong.. needs to be 512 wide, might not be 8bpp
+// could be wrong.. needs to be 512 wide, might not be 8bpp
+static const UINT32 xoffsets[] = { STEP1024(0,4) };
+static const gfx_layout roadlayout =
+{
+	1024,1,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	EXTENDED_XOFFS,
+	{ 0 },
+	1024*4,
+	xoffsets
+}; 
 
 static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8x4,     0x1400, 16 ) /*Pal offset???*/

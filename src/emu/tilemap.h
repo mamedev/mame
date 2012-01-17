@@ -78,9 +78,6 @@
 
                 TILE_FLIPY means render the tile flipped vertically
 
-                TILE_4BPP means pen_data is actually packed 4bpp pixels
-                    (low 4 bits first, then upper 4 bits)
-
                 TILE_FORCE_LAYERn means all pixels are forced to be in
                     layer n, where n = 0,1,2
 
@@ -357,7 +354,6 @@ const UINT8 TILEMAP_PIXEL_LAYER2 = 0x40;			// pixel is opaque in layer 2
 // per-tile flags, set by get_tile_info callback
 const UINT8 TILE_FLIPX = 0x01;						// draw this tile horizontally flipped
 const UINT8 TILE_FLIPY = 0x02;						// draw this tile vertically flipped
-const UINT8 TILE_4BPP = 0x04;						// tile data is packed 4bpp
 const UINT8 TILE_FORCE_LAYER0 = TILEMAP_PIXEL_LAYER0; // force all pixels to be layer 0 (no transparency)
 const UINT8 TILE_FORCE_LAYER1 = TILEMAP_PIXEL_LAYER1; // force all pixels to be layer 1 (no transparency)
 const UINT8 TILE_FORCE_LAYER2 = TILEMAP_PIXEL_LAYER2; // force all pixels to be layer 2 (no transparency)
@@ -403,8 +399,6 @@ struct tile_data
 		pen_data = gfx_element_get_data(gfx, code);
 		palette_base = gfx->color_base + gfx->color_granularity * rawcolor;
 		flags = _flags;
-		if (gfx->flags & GFX_ELEMENT_PACKED)
-			flags |= TILE_4BPP;
 		gfxnum = _gfxnum;
 	}
 };

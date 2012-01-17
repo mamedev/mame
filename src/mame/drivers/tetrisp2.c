@@ -995,7 +995,7 @@ static const gfx_layout layout_16x16x8 =
 
 
 /* sprites are contained in 256x256 "tiles" */
-static GFXLAYOUT_RAW( spritelayout, 8, 256, 256, 256*8, 256*256*8 )
+static GFXLAYOUT_RAW( spritelayout, 256, 256, 256*8, 256*256*8 )
 
 
 static GFXDECODE_START( tetrisp2 )

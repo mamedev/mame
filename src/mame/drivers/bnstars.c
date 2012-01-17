@@ -1203,9 +1203,9 @@ INPUT_PORTS_END
 
 
 /* sprites are contained in 256x256 "tiles" */
-static GFXLAYOUT_RAW( spritelayout, 8, 256, 256, 256*8, 256*256*8 )
-static GFXLAYOUT_RAW( bglayout, 8, 16, 16, 16*8, 16*16*8 )
-static GFXLAYOUT_RAW( txlayout, 8, 8, 8, 8*8, 8*8*8 )
+static GFXLAYOUT_RAW( spritelayout, 256, 256, 256*8, 256*256*8 )
+static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
+static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
 static GFXDECODE_START( bnstars )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
@@ -1413,7 +1413,7 @@ ROM_START( bnstars1 )
 	ROM_LOAD32_BYTE( "mb-93142.39", 0x000000, 0x80000, CRC(56b98539) SHA1(5eb0e77729b31e6a100c1b43813a39fea57bedee) )
 
 	/* Sprites - shared by both screens? */
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr96004-01.20",   0x0000000, 0x200000, CRC(3366d104) SHA1(2de0cabe2ead777b5b02cade7f2003ef7f90b75b) )
 	ROM_LOAD32_WORD( "mr96004-02.28",   0x0000002, 0x200000, CRC(ad556664) SHA1(4b36f8d8d9efa37cf515af41d14433e7eafa27a2) )
 	ROM_LOAD32_WORD( "mr96004-03.21",   0x0400000, 0x200000, CRC(b399e2b1) SHA1(9b6a00a219db8d66dcf592160b7b5f7a86b8f0c9) )
@@ -1424,27 +1424,27 @@ ROM_START( bnstars1 )
 	ROM_LOAD32_WORD( "mr96004-08.31",   0x0c00002, 0x200000, CRC(f6df27b2) SHA1(60590976020d86bdccd4eaf57b349ea31bec6830) )
 
 	/* Roz Tiles #1 (Screen 1) */
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
 	ROM_LOAD( "mr96004-09.1", 0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
 	/* Roz Tiles #2 (Screen 2) */
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x400000, "gfx3", 0 ) /* roz tiles */
 	ROM_LOAD( "mr96004-09.7", 0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
 	/* BG Tiles #1 (Screen 1?) */
-	ROM_REGION( 0x200000, "gfx4", 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x200000, "gfx4", 0 ) /* bg tiles */
 	ROM_LOAD( "mr96004-11.11", 0x000000, 0x200000,  CRC(e6da552c) SHA1(69a5af3015883793c7d1343243ccae23db9ef77c) )
 
 	/* TX Tiles #1 (Screen 1?) */
-	ROM_REGION( 0x080000, "gfx5", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x080000, "gfx5", 0 ) /* tx tiles */
 	ROM_LOAD( "vsjanshi6.5", 0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
 	/* BG Tiles #2 (Screen 2?) */
-	ROM_REGION( 0x200000, "gfx6", 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x200000, "gfx6", 0 ) /* bg tiles */
 	ROM_LOAD( "mr96004-11.13", 0x000000, 0x200000, CRC(e6da552c) SHA1(69a5af3015883793c7d1343243ccae23db9ef77c) )
 
 	/* TX Tiles #2 (Screen 2?) */
-	ROM_REGION( 0x080000, "gfx7", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x080000, "gfx7", 0 ) /* tx tiles */
 	ROM_LOAD( "vsjanshi5.6", 0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
 	/* Sound Program (one, driving both screen sound) */

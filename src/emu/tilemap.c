@@ -793,14 +793,6 @@ UINT8 tilemap_t::tile_draw(const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 pa
 		dx0 = -1;
 	}
 
-	// in 4bpp mode, we draw in groups of 2 pixels, so halve the width now
-	int width = m_tilewidth;
-	if (flags & TILE_4BPP)
-	{
-		assert(width % 2 == 0);
-		width /= 2;
-	}
-
 	// iterate over rows
 	const UINT8 *penmap = m_pen_to_flags + group * MAX_PEN_TO_FLAGS;
 	UINT8 andmask = ~0, ormask = 0;
@@ -813,43 +805,14 @@ UINT8 tilemap_t::tile_draw(const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 pa
 		y0 += dy0;
 
 		// 8bpp data
-		if (!(flags & TILE_4BPP))
+		for (int tx = 0, xoffs = 0; tx < m_tilewidth; tx++, xoffs += dx0)
 		{
-			for (int tx = 0, xoffs = 0; tx < width; tx++, xoffs += dx0)
-			{
-				UINT8 pen = (*pendata++) & pen_mask;
-				UINT8 map = penmap[pen];
-				pixptr[xoffs] = palette_base + pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-			}
-		}
-
-		// 4bpp data
-		else
-		{
-			for (int tx = 0, xoffs = 0; tx < width; tx++)
-			{
-				UINT8 data = *pendata++;
-				UINT8 pen, map;
-
-				pen = (data & 0x0f) & pen_mask;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_base + pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
-
-				pen = (data >> 4) & pen_mask;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_base + pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
-			}
+			UINT8 pen = (*pendata++) & pen_mask;
+			UINT8 map = penmap[pen];
+			pixptr[xoffs] = palette_base + pen;
+			flagsptr[xoffs] = map | category;
+			andmask &= map;
+			ormask |= map;
 		}
 	}
 	return andmask ^ ormask;

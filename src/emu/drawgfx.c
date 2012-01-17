@@ -295,8 +295,6 @@ gfx_element *gfx_element_alloc(running_machine &machine, const gfx_layout *gl, c
 
 		// don't free the data because we will get a pointer at decode time
 		gfx->flags |= GFX_ELEMENT_DONT_FREE;
-		if (planes <= 4)
-			gfx->flags |= GFX_ELEMENT_PACKED;
 
 		// RAW graphics must have a pointer up front
 		gfx->gfxdata = (UINT8 *)gfx->srcdata;
@@ -398,25 +396,13 @@ static void calc_penusage(const gfx_element *gfx, UINT32 code)
 	if (gfx->pen_usage == NULL)
 		return;
 
-	// packed case
-	if (gfx->flags & GFX_ELEMENT_PACKED)
-		for (y = 0; y < gfx->origheight; y++)
-		{
-			for (x = 0; x < gfx->origwidth/2; x++)
-				usage |= (1 << (dp[x] & 0x0f)) | (1 << (dp[x] >> 4));
+	for (y = 0; y < gfx->origheight; y++)
+	{
+		for (x = 0; x < gfx->origwidth; x++)
+			usage |= 1 << dp[x];
 
-			dp += gfx->line_modulo;
-		}
-
-	// unpacked case
-	else
-		for (y = 0; y < gfx->origheight; y++)
-		{
-			for (x = 0; x < gfx->origwidth; x++)
-				usage |= 1 << dp[x];
-
-			dp += gfx->line_modulo;
-		}
+		dp += gfx->line_modulo;
+	}
 
 	// store the final result
 	gfx->pen_usage[code] = usage;
@@ -444,46 +430,21 @@ static void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
 	{
 		// zap the data to 0
 		memset(dp, 0, gfx->char_modulo);
+		for (plane = 0; plane < planes; plane++)
+		{
+			int planebit = 1 << (planes - 1 - plane);
+			int planeoffs = code * charincrement + poffset[plane];
 
-		// packed case
-		if (gfx->flags & GFX_ELEMENT_PACKED)
-			for (plane = 0; plane < planes; plane++)
+			for (y = 0; y < gfx->origheight; y++)
 			{
-				int planebit = 1 << (planes - 1 - plane);
-				int planeoffs = code * charincrement + poffset[plane];
+				int yoffs = planeoffs + yoffset[y];
 
-				for (y = 0; y < gfx->origheight; y++)
-				{
-					int yoffs = planeoffs + yoffset[y];
-
-					dp = gfx->gfxdata + code * gfx->char_modulo + y * gfx->line_modulo;
-					for (x = 0; x < gfx->origwidth; x += 2)
-					{
-						if (readbit(src, yoffs + xoffset[x+0]))
-							dp[x+0] |= planebit;
-						if (readbit(src, yoffs + xoffset[x+1]))
-							dp[x+1] |= planebit;
-					}
-				}
+				dp = gfx->gfxdata + code * gfx->char_modulo + y * gfx->line_modulo;
+				for (x = 0; x < gfx->origwidth; x++)
+					if (readbit(src, yoffs + xoffset[x]))
+						dp[x] |= planebit;
 			}
-
-		// unpacked case
-		else
-			for (plane = 0; plane < planes; plane++)
-			{
-				int planebit = 1 << (planes - 1 - plane);
-				int planeoffs = code * charincrement + poffset[plane];
-
-				for (y = 0; y < gfx->origheight; y++)
-				{
-					int yoffs = planeoffs + yoffset[y];
-
-					dp = gfx->gfxdata + code * gfx->char_modulo + y * gfx->line_modulo;
-					for (x = 0; x < gfx->origwidth; x++)
-						if (readbit(src, yoffs + xoffset[x]))
-							dp[x] |= planebit;
-				}
-			}
+		}
 	}
 
 	// compute pen usage
