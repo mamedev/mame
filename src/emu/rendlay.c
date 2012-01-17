@@ -785,8 +785,8 @@ void layout_element::component::draw_disk(bitmap_argb32 &dest, const rectangle &
 	UINT32 inva = (1.0f - m_color.a) * 255.0;
 
 	// find the center
-	float xcenter = float(bounds.xcenter()) * 0.5f;
-	float ycenter = float(bounds.ycenter()) * 0.5f;
+	float xcenter = float(bounds.xcenter());
+	float ycenter = float(bounds.ycenter());
 	float xradius = float(bounds.width()) * 0.5f;
 	float yradius = float(bounds.height()) * 0.5f;
 	float ooyradius2 = 1.0f / (yradius * yradius);
