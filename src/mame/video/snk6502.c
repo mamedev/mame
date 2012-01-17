@@ -198,8 +198,8 @@ VIDEO_START( pballoon )
 
 	VIDEO_START_CALL( snk6502 );
 
-	state->m_bg_tilemap->set_scrolldy(-24, 0);
-	state->m_fg_tilemap->set_scrolldy(-24, 0);
+	state->m_bg_tilemap->set_scrolldy(-16, 0);
+	state->m_fg_tilemap->set_scrolldy(-16, 0);
 }
 
 
