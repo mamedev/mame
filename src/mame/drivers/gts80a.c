@@ -661,7 +661,7 @@ ROM_END
 /* cust  */GAME(1983,	krullp,		0,		gts80a_ss,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Krull (Pinball)",				GAME_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1982,	punk,		0,		gts80a_ss,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Punk!",				GAME_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1983,	qbquest,	0,		gts80a_ss,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Q*Bert's Quest",			GAME_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,	rackempp,	0,		gts80a_s,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Rack 'Em Up (Pinball)",			GAME_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,	rackempp,	0,		gts80a_s,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Rack 'em Up! (Pinball)",			GAME_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1983,	raimfire,	0,		gts80a_s,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Ready...Aim...Fire!",		GAME_IS_SKELETON_MECHANICAL)
 /* cust  */GAME(1982,	rocky,		0,		gts80a_ss,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Rocky",				GAME_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1983,	rflshdlx,	0,		gts80a_ss,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Royal Flush Deluxe",		GAME_IS_SKELETON_MECHANICAL)
