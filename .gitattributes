@@ -2663,6 +2663,7 @@ src/mame/drivers/poo.c svneol=native#text/plain
 src/mame/drivers/poolshrk.c svneol=native#text/plain
 src/mame/drivers/pooyan.c svneol=native#text/plain
 src/mame/drivers/popeye.c svneol=native#text/plain
+src/mame/drivers/popobear.c svneol=native#text/plain
 src/mame/drivers/popper.c svneol=native#text/plain
 src/mame/drivers/portrait.c svneol=native#text/plain
 src/mame/drivers/powerbal.c svneol=native#text/plain

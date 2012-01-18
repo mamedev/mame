@@ -524,6 +524,7 @@ $(MAMEOBJ)/bfm.a: \
 $(MAMEOBJ)/bmc.a: \
 	$(DRIVERS)/bmcbowl.o \
 	$(DRIVERS)/koftball.o \
+	$(DRIVERS)/popobear.o \
 
 $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/1942.o $(VIDEO)/1942.o \
