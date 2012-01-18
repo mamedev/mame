@@ -337,8 +337,10 @@ static void I386OP(bt_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f a3
 		CYCLES(cpustate,CYCLES_BT_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		UINT16 dst = READ16(cpustate,ea);
 		UINT16 bit = LOAD_REG16(modrm);
+		ea += 2*(bit/16);
+		bit %= 16;
+		UINT16 dst = READ16(cpustate,ea);
 
 		if( dst & (1 << bit) )
 			cpustate->CF = 1;
@@ -366,8 +368,10 @@ static void I386OP(btc_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f bb
 		CYCLES(cpustate,CYCLES_BTC_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		UINT16 dst = READ16(cpustate,ea);
 		UINT16 bit = LOAD_REG16(modrm);
+		ea += 2*(bit/16);
+		bit %= 16;
+		UINT16 dst = READ16(cpustate,ea);
 
 		if( dst & (1 << bit) )
 			cpustate->CF = 1;
@@ -397,8 +401,10 @@ static void I386OP(btr_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f b3
 		CYCLES(cpustate,CYCLES_BTR_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		UINT16 dst = READ16(cpustate,ea);
 		UINT16 bit = LOAD_REG16(modrm);
+		ea += 2*(bit/16);
+		bit %= 16;
+		UINT16 dst = READ16(cpustate,ea);
 
 		if( dst & (1 << bit) )
 			cpustate->CF = 1;
@@ -428,8 +434,10 @@ static void I386OP(bts_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f ab
 		CYCLES(cpustate,CYCLES_BTS_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		UINT16 dst = READ16(cpustate,ea);
 		UINT16 bit = LOAD_REG16(modrm);
+		ea += 2*(bit/16);
+		bit %= 16;
+		UINT16 dst = READ16(cpustate,ea);
 
 		if( dst & (1 << bit) )
 			cpustate->CF = 1;

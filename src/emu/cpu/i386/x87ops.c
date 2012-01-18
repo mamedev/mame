@@ -1529,6 +1529,16 @@ static void I386OP(fpu_group_df)(i386_state *cpustate)		// Opcode 0xdf
 				break;
 			}
 
+			case 2:		// FIST
+			{
+				X87_REG t;
+
+				t = X87_FROUND(cpustate,ST(0));
+				WRITE16(cpustate,ea,(INT16)t.i);
+				CYCLES(cpustate,1); // TODO
+				break;
+
+			}
 			case 3:		// FISTP short
 			{
 				X87_REG t;
@@ -1539,7 +1549,30 @@ static void I386OP(fpu_group_df)(i386_state *cpustate)		// Opcode 0xdf
 				CYCLES(cpustate,29);
 				break;
 			}
+			case 4:		// FBLD
+			{
+				int i;
+				double bcd_data = 0.0;
+				UINT8 byte;
+				X87_REG t;
 
+				for(i=0;i<9;i++)
+				{
+					byte = READ8(cpustate,ea+i);
+					bcd_data += floor(fmod((byte & 0x0f),10.0));
+					bcd_data *= 10.0;
+					byte >>= 4;
+					bcd_data += floor(fmod((byte & 0x0f),10.0));
+					bcd_data *= 10.0;
+				}
+				byte = READ8(cpustate,ea+9);
+				if(byte & 0x80)
+					bcd_data -= bcd_data;
+
+				t.f = bcd_data;
+				FPU_PUSH(cpustate,t);
+				CYCLES(cpustate,1); // TODO
+			}
 			case 5:		// FILD long
 			{
 				X87_REG t;
@@ -1563,7 +1596,7 @@ static void I386OP(fpu_group_df)(i386_state *cpustate)		// Opcode 0xdf
 					res = (UINT8)floor(fmod(bcd_data,10.0));
 					bcd_data -= floor(fmod(bcd_data,10.0));
 					bcd_data /= 10.0;
-					res = (UINT8)floor(fmod(bcd_data,10.0))<<4;
+					res |= (UINT8)floor(fmod(bcd_data,10.0))<<4;
 					bcd_data -= floor(fmod(bcd_data,10.0));
 					bcd_data /= 10.0;
 					WRITE8(cpustate,ea+i,res);

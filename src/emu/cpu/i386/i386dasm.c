@@ -2002,7 +2002,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 	int i;
 	UINT8 op2;
 
-	if (op->flags & SPECIAL64)
+	if ((op->flags & SPECIAL64) && (address_size == 2))
 		op = &x64_opcode_alt[op->flags >> 24];
 
 	switch( op->flags & FLAGS_MASK )

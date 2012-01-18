@@ -338,8 +338,10 @@ static void I386OP(bt_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f a3
 		CYCLES(cpustate,CYCLES_BT_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		UINT32 dst = READ32(cpustate,ea);
 		UINT32 bit = LOAD_REG32(modrm);
+		ea += 4*(bit/32);
+		bit %= 32;
+		UINT32 dst = READ32(cpustate,ea);
 
 		if( dst & (1 << bit) )
 			cpustate->CF = 1;
@@ -367,8 +369,10 @@ static void I386OP(btc_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f bb
 		CYCLES(cpustate,CYCLES_BTC_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		UINT32 dst = READ32(cpustate,ea);
 		UINT32 bit = LOAD_REG32(modrm);
+		ea += 4*(bit/32);
+		bit %= 32;
+		UINT32 dst = READ32(cpustate,ea);
 
 		if( dst & (1 << bit) )
 			cpustate->CF = 1;
@@ -398,8 +402,10 @@ static void I386OP(btr_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f b3
 		CYCLES(cpustate,CYCLES_BTR_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		UINT32 dst = READ32(cpustate,ea);
 		UINT32 bit = LOAD_REG32(modrm);
+		ea += 4*(bit/32);
+		bit %= 32;
+		UINT32 dst = READ32(cpustate,ea);
 
 		if( dst & (1 << bit) )
 			cpustate->CF = 1;
@@ -429,8 +435,10 @@ static void I386OP(bts_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f ab
 		CYCLES(cpustate,CYCLES_BTS_REG_REG);
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
-		UINT32 dst = READ32(cpustate,ea);
 		UINT32 bit = LOAD_REG32(modrm);
+		ea += 4*(bit/32);
+		bit %= 32;
+		UINT32 dst = READ32(cpustate,ea);
 
 		if( dst & (1 << bit) )
 			cpustate->CF = 1;
@@ -468,7 +476,6 @@ static void I386OP(call_abs32)(i386_state *cpustate)		// Opcode 0x9a
 static void I386OP(call_rel32)(i386_state *cpustate)		// Opcode 0xe8
 {
 	INT32 disp = FETCH32(cpustate);
-
 	PUSH32(cpustate, cpustate->eip );
 	cpustate->eip += disp;
 	CHANGE_PC(cpustate,cpustate->eip);
