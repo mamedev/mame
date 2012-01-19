@@ -502,8 +502,8 @@ INLINE void zdrawgfxzoom32GP(
 
 	// adjust insertion points and pre-entry constants
 	eax = (dst_y - dst_miny) * GX_ZBUFW + (dst_x - dst_minx) + dst_w;
-//  db0 = z8 = (UINT8)zcode;
-//  db1 = p8 = (UINT8)pri;
+	z8 = (UINT8)zcode;
+	p8 = (UINT8)pri;
 	ozbuf_ptr += eax;
 	szbuf_ptr += eax << 1;
 	dst_ptr += dst_y * dst_pitch + dst_x + dst_w;
