@@ -289,9 +289,9 @@ static void I386OP(bsf_r32_rm32)(i386_state *cpustate)		// Opcode 0x0f bc
 			dst = temp;
 			CYCLES(cpustate,CYCLES_BSF);
 		}
+		STORE_REG32(modrm, dst);
 	}
 	CYCLES(cpustate,CYCLES_BSF_BASE);
-	STORE_REG32(modrm, dst);
 }
 
 static void I386OP(bsr_r32_rm32)(i386_state *cpustate)		// Opcode 0x0f bd
@@ -318,9 +318,9 @@ static void I386OP(bsr_r32_rm32)(i386_state *cpustate)		// Opcode 0x0f bd
 			dst = temp;
 			CYCLES(cpustate,CYCLES_BSR);
 		}
+		STORE_REG32(modrm, dst);
 	}
 	CYCLES(cpustate,CYCLES_BSR_BASE);
-	STORE_REG32(modrm, dst);
 }
 
 static void I386OP(bt_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f a3
@@ -548,7 +548,7 @@ static void I386OP(cmpsd)(i386_state *cpustate)				// Opcode 0xa7
 	ead = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI) );
 	src = READ32(cpustate,eas);
 	dst = READ32(cpustate,ead);
-	SUB32(cpustate,dst, src);
+	SUB32(cpustate,src,dst);
 	BUMP_SI(cpustate,4);
 	BUMP_DI(cpustate,4);
 	CYCLES(cpustate,CYCLES_CMPS);
