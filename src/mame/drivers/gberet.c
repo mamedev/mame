@@ -145,6 +145,12 @@ static WRITE8_HANDLER( gberet_flipscreen_w )
 	flip_screen_set(space->machine(), data & 0x08);
 }
 
+static WRITE8_HANDLER( gberet_sound_w )
+{
+	gberet_state *state = space->machine().driver_data<gberet_state>();
+	sn76496_w(space->machine().device("snsnd"), 0, *state->m_soundlatch);
+}
+
 static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 {
 	/* bits 0/1 = coin counters */
@@ -182,13 +188,12 @@ static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(gberet_coin_counter_w)
-	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITENOP			// Loads the snd command into the snd latch
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_DEVWRITE("snsnd", sn76496_w)	// This address triggers the SN chip to read the data port.
-	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(gberet_state, m_soundlatch)
+	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_WRITE(gberet_sound_w)
+	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("P2")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
 	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf600, 0xf600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8 )
@@ -224,8 +229,8 @@ static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(mrgoemon_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mrgoemon_coin_counter_w)
-	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITENOP				// Loads the snd command into the snd latch
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_DEVWRITE("snsnd", sn76496_w)		// This address triggers the SN chip to read the data port.
+	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(gberet_state, m_soundlatch)
+	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_WRITE(gberet_sound_w)
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("P2")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
@@ -241,7 +246,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gberet )
 	PORT_START("P1")
-	KONAMI8_MONO_B12_UNK					// button 1 = knife, button 2 = shoot
+	KONAMI8_MONO_B12_UNK
 
 	PORT_START("P2")
 	KONAMI8_COCKTAIL_B12_UNK
@@ -256,7 +261,7 @@ static INPUT_PORTS_START( gberet )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )		// factory default
+	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
@@ -264,12 +269,12 @@ static INPUT_PORTS_START( gberet )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "30K, 70K, Every 70K" )
-	PORT_DIPSETTING(    0x10, "40K, 80K, Every 80K" )		// Japanese default
-	PORT_DIPSETTING(    0x08, "50K, 100K, Every 100K" )		// US default
+	PORT_DIPSETTING(    0x10, "40K, 80K, Every 80K" )	// Japanese default
+	PORT_DIPSETTING(    0x08, "50K, 100K, Every 100K" )	// US default
 	PORT_DIPSETTING(    0x00, "50K, 200K, Every 200K" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )			// factory default
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
@@ -309,7 +314,7 @@ static INPUT_PORTS_START( mrgoemon )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "20K, Every 60K" )	// factory default
+	PORT_DIPSETTING(    0x18, "20K, Every 60K" )
 	PORT_DIPSETTING(    0x10, "30K, Every 70K" )
 	PORT_DIPSETTING(    0x08, "40K, Every 80K" )
 	PORT_DIPSETTING(    0x00, "50K, Every 90K" )
