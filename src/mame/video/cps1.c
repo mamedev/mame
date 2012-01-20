@@ -2950,8 +2950,8 @@ if (0 && screen.machine().input().code_pressed(KEYCODE_Z))
 
 SCREEN_VBLANK( cps1 )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		cps_state *state = screen.machine().driver_data<cps_state>();
 

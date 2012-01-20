@@ -867,8 +867,8 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 
 SCREEN_VBLANK( psikyo )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		psikyo_state *state = screen.machine().driver_data<psikyo_state>();
 		memcpy(state->m_spritebuf2, state->m_spritebuf1, 0x2000);
