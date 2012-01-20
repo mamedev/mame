@@ -2719,8 +2719,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
 				if( modrm >= 0xc0 ) {
-					address = LOAD_RM32(modrm);
-					STORE_RM32(address, cpustate->ldtr.segment);
+					STORE_RM32(modrm, cpustate->ldtr.segment);
 					CYCLES(cpustate,CYCLES_SLDT_REG);
 				} else {
 					ea = GetEA(cpustate,modrm);
@@ -2737,8 +2736,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
 				if( modrm >= 0xc0 ) {
-					address = LOAD_RM32(modrm);
-					STORE_RM32(address, cpustate->task.segment);
+					STORE_RM32(modrm, cpustate->task.segment);
 					CYCLES(cpustate,CYCLES_STR_REG);
 				} else {
 					ea = GetEA(cpustate,modrm);
