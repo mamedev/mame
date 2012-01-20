@@ -190,6 +190,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/i8255.o		\
 	$(EMUMACHINE)/i8355.o		\
 	$(EMUMACHINE)/idectrl.o		\
+	$(EMUMACHINE)/im6402.o		\
 	$(EMUMACHINE)/ins8154.o		\
 	$(EMUMACHINE)/ins8250.o		\
 	$(EMUMACHINE)/intelfsh.o	\
