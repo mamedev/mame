@@ -152,8 +152,8 @@ SCREEN_UPDATE_IND16( gng )
 
 SCREEN_VBLANK( gng )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 

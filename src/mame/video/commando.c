@@ -147,8 +147,8 @@ SCREEN_UPDATE_IND16( commando )
 
 SCREEN_VBLANK( commando )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
