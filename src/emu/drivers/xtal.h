@@ -176,6 +176,7 @@ enum
 	XTAL_36MHz  		= 36000000,		/* Sega Model 1 video board */
 	XTAL_38_76922MHz	= 38769220,		/* Namco System 21 video board */
 	XTAL_40MHz  		= 40000000,
+        XTAL_42MHz  		= 42000000,		/* BMC A-00211 - Popo Bear */
 	XTAL_42_9545MHz 	= 42954545,		/* CPS3 */
 	XTAL_44_1MHz		= 44100000,		/* Subsino's Bishou Jan */
 	XTAL_45MHz  		= 45000000,		/* Eolith with Hyperstone CPUs */

@@ -1,4 +1,60 @@
-/* Popo Bear */
+/* Popo Bear - BMC-A00211
+(c) 2000 - Bao Ma Technology Co., LTD
+
+|-----------------------------------------|
+| DIP2 DIP4  UM3567(YM2413)               |J  
+| DIP1 DIP3                               |A 
+|           TA-A-901                      |M
+| EN-A-701  EN-A-801  U6295(OKI)          |M 
+| EN-A-501  EN-A-601                      |A
+| EN-A-301  EN-A-401                      |
+|                                         |C
+|                   AIA90610              |O
+|                   BMC-68pin  AIA90423   |N
+|                   plcc (68k) BMC-160pin |N 
+|                                         |E 
+|                                    OSC  |C
+|                                 42.000  |T 
+|-----------------------------------------|
+
+1 - BMC AIA90423 - 160-Pin ASIC, FGPA, Video?
+1 - BMC AIA90610 - 68 Pin CPU (Likely 16 MHz, 68-lead plastic LCC 68000)
+1 - UM3567 (YM2413) Sound
+1 - U6295 (OKI6295) Sound
+1 - 42.000MHz XTAL
+4 - 8 Position DIP switches
+
+JAMMA CONNECTOR
+Component Side   A   B   Solder Side
+           GND   1   1   GND
+           GND   2   2   GND
+           +5v   3   3   +5v
+           +5v   4   4   +5v
+                 5   5
+          +12v   6   6   +12v
+                 7   7
+    Coin Meter   8   8
+                 9   9
+       Speaker  10   10  GND
+                11   11
+           Red  12   12  Green
+          Blue  13   13  Syn
+           GND  14   14
+          Test  15   15
+         Coin1  16   16  Coin2
+      1P Start  17   17  2P Start
+         1P Up  18   18  2P Up
+       1P Down  19   19  2P Down
+       1P Left  20   20  2P Left
+      1P Right  21   21  2P Right
+          1P A  22   22  2P A
+          1P B  23   23  2P B
+          1P C  24   24  2P C
+                25   25
+                26   26
+           GND  27   27  GND
+           GND  28   28  GND
+*/
 
 // looks like some kind of blitter
 // IGS-like?
@@ -6,7 +62,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
+#include "sound/2413intf.h"
 
 class popobear_state : public driver_device
 {
@@ -82,6 +138,109 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( popobear )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e, 0x00, "Coin_A" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0e, "Freeplay" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x30, "5" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Hard ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "Arrow" )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW2:2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW2:3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "DSW2:4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "DSW2:5" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "DSW2:6" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "DSW2:7" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "DSW2:8" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, "DSW3:1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW3:2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW3:3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "DSW3:4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "DSW3:5" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "DSW3:6" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "DSW3:7" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "DSW3:8" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x00, "DSW4:1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW4:2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW4:3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "DSW4:4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "DSW4:5" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "DSW4:6" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "DSW4:7" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "DSW4:8" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 
@@ -155,7 +314,7 @@ static TIMER_DEVICE_CALLBACK( popobear_irq )
 }
 
 static MACHINE_CONFIG_START( popobear, popobear_state )
-	MCFG_CPU_ADD("maincpu", M68000, 10000000 )
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_CPU_PROGRAM_MAP(popobear_mem) 
 	// levels 2,3,5 look interesting
 	//MCFG_CPU_VBLANK_INT("screen",irq3_line_hold)
@@ -176,7 +335,11 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_42MHz/10)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_42MHz/10/4, OKIM6295_PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
