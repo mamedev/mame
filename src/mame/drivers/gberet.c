@@ -15,8 +15,8 @@
     gberetb is a bootleg hacked to run on different hardware.
 
     TODO
-        - Dump Green Beret Bootleg proms.  Bootleg has four proms while the original has three
-          and correct the locations.
+        - Measure IRQ and NMI frequency (of an original board), is IRQ really tied to the same timer that triggers NMI?
+        - Dump Green Beret Bootleg proms and correct the locations. Bootleg has four proms while the original has three.
         - Dump Green Beret Bootleg PAL
 
 ****************************************************************************
@@ -442,7 +442,6 @@ static MACHINE_CONFIG_DERIVED( mrgoemon, gberet )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mrgoemon_map)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_START( gberetb, gberet_state )
 
