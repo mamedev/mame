@@ -1219,8 +1219,8 @@ SCREEN_UPDATE_IND16( toaplan1 )
 
 SCREEN_VBLANK( rallybik )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
@@ -1230,8 +1230,8 @@ SCREEN_VBLANK( rallybik )
 
 SCREEN_VBLANK( toaplan1 )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 
@@ -1242,8 +1242,8 @@ SCREEN_VBLANK( toaplan1 )
 
 SCREEN_VBLANK( samesame )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		toaplan1_state *state = screen.machine().driver_data<toaplan1_state>();
 

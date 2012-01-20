@@ -35,15 +35,15 @@ WRITE16_HANDLER( toki_control_w )
 
 SCREEN_VBLANK( toki )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 		buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 }
 
 SCREEN_VBLANK( tokib )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 		buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 }
 
