@@ -18,7 +18,6 @@
         - Dump Green Beret Bootleg proms.  Bootleg has four proms while the original has three
           and correct the locations.
         - Dump Green Beret Bootleg PAL
-        - Green Beret bootleg xtal is 20.000 MHz
 
 ****************************************************************************
 
@@ -77,36 +76,35 @@
 #include "includes/konamipt.h"
 #include "includes/gberet.h"
 
-#define MASTER_CLOCK XTAL_18_432MHz
-
 /*************************************
  *
  *  Interrupt generators
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( gberet_interrupt_tick )
+static INTERRUPT_GEN( gberet_interrupt_tick )
 {
-	gberet_state *state = timer.machine().driver_data<gberet_state>();
+	gberet_state *state = device->machine().driver_data<gberet_state>();
 	UINT8 ticks_mask = ~state->m_interrupt_ticks & (state->m_interrupt_ticks + 1); // 0->1
 	state->m_interrupt_ticks++;
 
 	// NMI on d0
 	if (ticks_mask & state->m_interrupt_mask & 1)
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 	
 	// IRQ on d3 (used by mrgoemon)
 	if (ticks_mask & state->m_interrupt_mask<<2 & 8)
-		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+		device_set_input_line(device, 0, ASSERT_LINE);
 
 	// IRQ on d4 (used by gberet)
 	if (ticks_mask & state->m_interrupt_mask<<2 & 16)
-		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+		device_set_input_line(device, 0, ASSERT_LINE);
 }
+
 
 /*************************************
  *
- *  Memory handlers
+ *  Address maps / Memory handlers
  *
  *************************************/
 
@@ -120,8 +118,8 @@ static WRITE8_HANDLER( gberet_coin_counter_w )
 static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 
 	/* bits 5-7 = ROM bank select */
 	memory_set_bank(space->machine(), "bank1", ((data & 0xe0) >> 5));
@@ -151,12 +149,6 @@ static WRITE8_HANDLER( gberet_sound_w )
 	gberet_state *state = space->machine().driver_data<gberet_state>();
 	sn76496_w(space->machine().device("snsnd"), 0, *state->m_soundlatch);
 }
-
-/*************************************
- *
- *  Address maps
- *
- *************************************/
 
 static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -199,6 +191,23 @@ static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
+
+static WRITE8_HANDLER( gberetb_flipscreen_w )
+{
+	flip_screen_set(space->machine(), data & 8);
+}
+
+static READ8_HANDLER( gberetb_irq_ack_r )
+{
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	return 0xff;
+}
+
+static WRITE8_HANDLER( gberetb_nmi_ack_w )
+{
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, m_colorram)
@@ -206,19 +215,20 @@ static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM
 	AM_RANGE(0xe040, 0xe043) AM_WRITENOP // ???
-	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
+	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberetb_flipscreen_w) // did hw even support flipscreen?
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM
 	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_BASE_SIZE_MEMBER(gberet_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP				// coin counter not supported
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP // coin counter not supported
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("snsnd", sn76496_w)
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("P2")
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
 	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf800, 0xf800) AM_NOP						// IRQ/NMI acknowledge
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(gberetb_irq_ack_r, gberetb_nmi_ack_w)
 	AM_RANGE(0xf900, 0xf901) AM_WRITE(gberetb_scroll_w)
 ADDRESS_MAP_END
+
 
 /*************************************
  *
@@ -305,6 +315,7 @@ static INPUT_PORTS_START( mrgoemon )
 	PORT_SERVICE_DIPLOC(   0x04, IP_ACTIVE_LOW, "SW3:3" )
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Graphics definitions
@@ -372,7 +383,7 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Machine driver
+ *  Machine drivers
  *
  *************************************/
 
@@ -397,9 +408,9 @@ static MACHINE_RESET( gberet )
 static MACHINE_CONFIG_START( gberet, gberet_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	// X1S (generated by a custom IC)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)		// X1S (generated by a custom IC)
 	MCFG_CPU_PROGRAM_MAP(gberet_map)
-	MCFG_TIMER_ADD_PERIODIC("int_timer", gberet_interrupt_tick, attotime::from_hz(1000))	// period unknown, estimated with pcb recording
+	MCFG_CPU_PERIODIC_INT(gberet_interrupt_tick, 1000)	// period unknown, estimated with pcb recording
 
 	MCFG_MACHINE_START(gberet)
 	MCFG_MACHINE_RESET(gberet)
@@ -421,7 +432,7 @@ static MACHINE_CONFIG_START( gberet, gberet_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, MASTER_CLOCK/12) /* type verified on real and bootleg pcb */
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12) /* type verified on real and bootleg pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -432,18 +443,39 @@ static MACHINE_CONFIG_DERIVED( mrgoemon, gberet )
 	MCFG_CPU_PROGRAM_MAP(mrgoemon_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gberetb, gberet )
+
+static MACHINE_CONFIG_START( gberetb, gberet_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(gberetb_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_PERIODIC_INT(nmi_line_assert, XTAL_20MHz/0x8000) // divider guessed
+
+	MCFG_MACHINE_START(gberet)
+	MCFG_MACHINE_RESET(gberet)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(gberetb)
 
 	MCFG_GFXDECODE(gberetb)
+	MCFG_PALETTE_LENGTH(2*16*16)
+
+	MCFG_PALETTE_INIT(gberet)
+	MCFG_VIDEO_START(gberet)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_20MHz/12) // divider guessed
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
+
 
 /*************************************
  *
@@ -548,9 +580,10 @@ static DRIVER_INIT( mrgoemon )
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x800);
 }
 
+
 /*************************************
  *
- *  Game driver(s)
+ *  Game drivers
  *
  *************************************/
 
