@@ -70,6 +70,24 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+//-------------------------------------------------
+//  global helpers for float base types
+//-------------------------------------------------
+
+inline float poly_floor(float x) { return floorf(x); }
+inline float poly_abs(float x) { return fabsf(x); }
+inline float poly_recip(float x) { return 1.0f / x; }
+
+
+//-------------------------------------------------
+//  global helpers for double base types
+//-------------------------------------------------
+
+inline double poly_floor(double x) { return floor(x); }
+inline double poly_abs(double x) { return fabs(x); }
+inline double poly_recip(double x) { return 1.0 / x; }
+
+
 // poly_manager is a template class
 template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 class poly_manager
@@ -251,24 +269,6 @@ private:
 	UINT32				m_resolved[WORK_MAX_THREADS];	// number of conflicts resolved, per thread
 #endif
 };
-
-
-//-------------------------------------------------
-//  global helpers for float base types
-//-------------------------------------------------
-
-inline float poly_floor(float x) { return floorf(x); }
-inline float poly_abs(float x) { return fabsf(x); }
-inline float poly_recip(float x) { return 1.0f / x; }
-
-
-//-------------------------------------------------
-//  global helpers for double base types
-//-------------------------------------------------
-
-inline double poly_floor(double x) { return floor(x); }
-inline double poly_abs(double x) { return fabs(x); }
-inline double poly_recip(double x) { return 1.0 / x; }
 
 
 //-------------------------------------------------
