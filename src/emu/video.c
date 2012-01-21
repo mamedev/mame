@@ -540,8 +540,8 @@ void video_manager::exit()
 	machine().render().target_free(m_snap_target);
 	m_snap_bitmap.reset();
 
-	// print a final result if we have at least 5 seconds' worth of data
-	if (m_overall_emutime.seconds >= 5)
+	// print a final result if we have at least 2 seconds' worth of data
+	if (m_overall_emutime.seconds >= 1)
 	{
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)m_overall_real_seconds + (double)m_overall_real_ticks / (double)tps;
