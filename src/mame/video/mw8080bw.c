@@ -313,8 +313,8 @@ SCREEN_UPDATE_RGB32( phantom2 )
 
 SCREEN_VBLANK( phantom2 )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		mw8080bw_state *state = screen.machine().driver_data<mw8080bw_state>();
 

@@ -319,8 +319,8 @@ SCREEN_UPDATE_IND16( bosco )
 
 SCREEN_VBLANK( bosco )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		bosco_state *state =  screen.machine().driver_data<bosco_state>();
 		static const int speedsx[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };

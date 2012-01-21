@@ -308,8 +308,8 @@ SCREEN_UPDATE_IND16( ladybug )
 
 SCREEN_VBLANK( sraider )	/* update starfield position */
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 		redclash_update_stars_state(screen.machine());
 }
 

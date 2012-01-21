@@ -580,8 +580,8 @@ SCREEN_UPDATE_IND16( galaga )
 
 SCREEN_VBLANK( galaga )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		galaga_state *state =  screen.machine().driver_data<galaga_state>();
 		/* this function is called by galaga_interrupt_1() */

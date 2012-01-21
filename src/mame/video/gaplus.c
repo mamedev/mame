@@ -331,8 +331,8 @@ SCREEN_UPDATE_IND16( gaplus )
 
 SCREEN_VBLANK( gaplus )	/* update starfields */
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		gaplus_state *state = screen.machine().driver_data<gaplus_state>();
 		struct star *stars = state->m_stars;
