@@ -1072,7 +1072,8 @@ static void I386OP(jz_rel16)(i386_state *cpustate)			// Opcode 0x0f 84
 static void I386OP(jcxz16)(i386_state *cpustate)			// Opcode 0xe3
 {
 	INT8 disp = FETCH(cpustate);
-	if( REG16(CX) == 0 ) {
+	int val = (cpustate->address_size)?(REG32(ECX) == 0):(REG16(CX) == 0);
+	if( val ) {
 		if (cpustate->sreg[CS].d)
 		{
 			cpustate->eip += disp;
@@ -3472,14 +3473,21 @@ static void I386OP(xlat16)(i386_state *cpustate)			// Opcode 0xd7
 static void I386OP(load_far_pointer16)(i386_state *cpustate, int s)
 {
 	UINT8 modrm = FETCH(cpustate);
+	UINT16 selector;
 
 	if( modrm >= 0xc0 ) {
 		fatalerror("i386: load_far_pointer16 NYI");
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm);
 		STORE_REG16(modrm, READ16(cpustate,ea + 0));
-		cpustate->sreg[s].selector = READ16(cpustate,ea + 2);
-		i386_load_segment_descriptor(cpustate, s );
+		selector = READ16(cpustate,ea + 2);
+		if(PROTECTED_MODE && !(V8086_MODE))
+			i386_protected_mode_sreg_load(cpustate,selector,s);
+		else
+		{
+			cpustate->sreg[s].selector = selector;
+			i386_load_segment_descriptor(cpustate, s );
+		}
 	}
 }
 
