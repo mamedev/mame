@@ -833,8 +833,8 @@ SCREEN_UPDATE_IND16( thndrx2 )
 
 SCREEN_VBLANK( blswhstl )
 {
-	// on falling edge
-	if (!vblank_on)
+	// on rising edge
+	if (vblank_on)
 	{
 		tmnt_state *state = screen.machine().driver_data<tmnt_state>();
 		k053245_clear_buffer(state->m_k053245);
