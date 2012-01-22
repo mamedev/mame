@@ -149,10 +149,11 @@
 #define CHDFLAGS_UNDEFINED			0xfffffffc
 
 /* compression types */
-#define CHDCOMPRESSION_NONE			0
-#define CHDCOMPRESSION_ZLIB			1
-#define CHDCOMPRESSION_ZLIB_PLUS	2
-#define CHDCOMPRESSION_AV			3
+#define CHDCOMPRESSION_NONE			        0
+#define CHDCOMPRESSION_ZLIB			        1
+#define CHDCOMPRESSION_ZLIB_PLUS	        2
+#define CHDCOMPRESSION_AV			        3
+#define CHDCOMPRESSION_ZLIB_PLUS_WITH_FLAC  4
 
 /* A/V codec configuration parameters */
 #define AV_CODEC_COMPRESS_CONFIG	1
@@ -358,7 +359,7 @@ chd_error chd_clone_metadata(chd_file *source, chd_file *dest);
 chd_error chd_compress_begin(chd_file *chd);
 
 /* compress the next hunk of data */
-chd_error chd_compress_hunk(chd_file *chd, const void *data, double *curratio);
+chd_error chd_compress_hunk(chd_file *chd, const void *data, double *curratio, int is_half_hunk = 0);
 
 /* finish compressing data to a CHD */
 chd_error chd_compress_finish(chd_file *chd, int write_protect);
