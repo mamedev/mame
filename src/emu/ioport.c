@@ -4528,7 +4528,7 @@ static void inputx_postn_coded_rate(running_machine &machine, const char *text, 
 				key_len = strlen(codes[j].key);
 				if (i + key_len + 2 <= text_len)
 				{
-					if (!memcmp(codes[j].key, &text[i + 1], key_len) && (text[i + key_len + 1] == '}'))
+					if (!core_strnicmp(codes[j].key, &text[i + 1], key_len) && (text[i + key_len + 1] == '}'))
 					{
 						ch = codes[j].code;
 						increment = key_len + 2;
