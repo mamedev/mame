@@ -381,7 +381,8 @@ INLINE UINT32 i386_translate(i386_state *cpustate, int segment, UINT32 ip)
 	return cpustate->sreg[segment].base + ip;
 }
 
-INLINE int translate_address(i386_state *cpustate, bool rw, UINT32 *address, UINT32 *error)
+// rwn; read = 0, write = 1, none = -1
+INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UINT32 *error)
 {
 	UINT32 a = *address;
 	UINT32 pdbr = cpustate->cr[3] & 0xfffff000;
@@ -390,38 +391,80 @@ INLINE int translate_address(i386_state *cpustate, bool rw, UINT32 *address, UIN
 	UINT32 offset = a & 0xfff;
 	UINT32 page_entry;
 	UINT32 ret = 1;
+	*error = 0;
 
-	// TODO: 4MB pages
+	// TODO: cr0 wp bit, 486 and higher
 	UINT32 page_dir = cpustate->program->read_dword(pdbr + directory * 4);
-	if (!(cpustate->cr[4] & 0x10))
+	if(page_dir & 1)
 	{
-		page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
-		if(!(page_entry & 1))
-			ret = 0;
-		else
-			*address = (page_entry & 0xfffff000) | offset;
-	}
-	else
-	{
-		if (page_dir & 0x80)
-		{
-			if(!(page_dir & 1))
-				ret = 0;
-			else
-				*address = (page_dir & 0xffc00000) | (a & 0x003fffff);
-		}
-		else
+		if (!(cpustate->cr[4] & 0x10))
 		{
 			page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
 			if(!(page_entry & 1))
 				ret = 0;
+			else if(!(page_entry & 2) && cpustate->CPL && (rwn == 1))
+			{
+				*error = 1;
+				ret = 0;
+			}
 			else
+			{
+				if(!(page_dir & 0x20) && (rwn != -1))
+					cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);
+				if(!(page_entry & 0x40) && (rwn == 1))
+					cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x60);
+				else if(!(page_entry & 0x20) && (rwn != -1))
+					cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x20);
 				*address = (page_entry & 0xfffff000) | offset;
+			}
+		}
+		else
+		{
+			if (page_dir & 0x80)
+			{
+				if(!(page_dir & 2) && cpustate->CPL && (rwn == 1))
+				{
+					*error = 1;
+					ret = 0;
+				}
+				else
+				{
+					if(!(page_dir & 0x40) && (rwn == 1))
+						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x60);
+					else if(!(page_dir & 0x20) && (rwn != -1))
+						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);						
+					*address = (page_dir & 0xffc00000) | (a & 0x003fffff);
+				}
+			}
+			else
+			{
+				page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
+				if(!(page_entry & 1))
+					ret = 0;
+				else if(!(page_entry & 2) && cpustate->CPL && (rwn == 1))
+				{
+					*error = 1;
+					ret = 0;
+				}
+				else
+				{
+					if(!(page_dir & 0x20) && (rwn != -1))
+						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);
+					if(!(page_entry & 0x40) && (rwn == 1))
+						cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x60);
+					else if(!(page_entry & 0x20) && (rwn != -1))
+						cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x20);
+					*address = (page_entry & 0xfffff000) | offset;
+				}
+			}
 		}
 	}
+	else
+		ret = 0;
 	if(!ret)
 	{
-		*error = ((rw && 1)<<1) | ((cpustate->CPL==3)?1<<2:0);
+		if(rwn != -1)
+			*error |= ((rwn && 1)<<1) | ((cpustate->CPL==3)?1<<2:0);
 		return 0;
 	}
 	return 1;
@@ -436,7 +479,7 @@ INLINE void CHANGE_PC(i386_state *cpustate, UINT32 pc)
 
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
-		translate_address(cpustate,0,&address,&error);
+		translate_address(cpustate,-1,&address,&error);
 	}
 }
 
@@ -451,7 +494,7 @@ INLINE void NEAR_BRANCH(i386_state *cpustate, INT32 offs)
 
 	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
 	{
-		translate_address(cpustate,0,&address,&error);
+		translate_address(cpustate,-1,&address,&error);
 	}
 }
 

@@ -3099,7 +3099,7 @@ static CPU_TRANSLATE( i386 )
 	if (space == AS_PROGRAM)
 	{
 		if (cpustate->cr[0] & 0x80000000)
-			result = translate_address(cpustate,0,address,&error);
+			result = translate_address(cpustate,-1,address,&error);
 		*address &= cpustate->a20_mask;
 	}
 	return result;
