@@ -1361,110 +1361,172 @@ static void I386OP(out_eax_dx)(i386_state *cpustate)		// Opcode 0xef
 
 static void I386OP(pop_eax)(i386_state *cpustate)			// Opcode 0x58
 {
-	REG32(EAX) = POP32(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+		REG32(EAX) = POP32(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_ecx)(i386_state *cpustate)			// Opcode 0x59
 {
-	REG32(ECX) = POP32(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+		REG32(ECX) = POP32(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_edx)(i386_state *cpustate)			// Opcode 0x5a
 {
-	REG32(EDX) = POP32(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+		REG32(EDX) = POP32(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_ebx)(i386_state *cpustate)			// Opcode 0x5b
 {
-	REG32(EBX) = POP32(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+		REG32(EBX) = POP32(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_esp)(i386_state *cpustate)			// Opcode 0x5c
 {
-	REG32(ESP) = POP32(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+		REG32(ESP) = POP32(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_ebp)(i386_state *cpustate)			// Opcode 0x5d
 {
-	REG32(EBP) = POP32(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+		REG32(EBP) = POP32(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_esi)(i386_state *cpustate)			// Opcode 0x5e
 {
-	REG32(ESI) = POP32(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+		REG32(ESI) = POP32(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_edi)(i386_state *cpustate)			// Opcode 0x5f
 {
-	REG32(EDI) = POP32(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+		REG32(EDI) = POP32(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_ds32)(i386_state *cpustate)			// Opcode 0x1f
 {
-	cpustate->sreg[DS].selector = POP32(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,DS);
-	} else {
-		i386_load_segment_descriptor(cpustate,DS);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+	{
+		cpustate->sreg[DS].selector = POP32(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,DS);
+		} else {
+			i386_load_segment_descriptor(cpustate,DS);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
 static void I386OP(pop_es32)(i386_state *cpustate)			// Opcode 0x07
 {
-	cpustate->sreg[ES].selector = POP32(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,ES);
-	} else {
-		i386_load_segment_descriptor(cpustate,ES);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+	{
+		cpustate->sreg[ES].selector = POP32(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,ES);
+		} else {
+			i386_load_segment_descriptor(cpustate,ES);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
 static void I386OP(pop_fs32)(i386_state *cpustate)			// Opcode 0x0f a1
 {
-	cpustate->sreg[FS].selector = POP32(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,FS);
-	} else {
-		i386_load_segment_descriptor(cpustate,FS);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+	{
+		cpustate->sreg[FS].selector = POP32(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,FS);
+		} else {
+			i386_load_segment_descriptor(cpustate,FS);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
 static void I386OP(pop_gs32)(i386_state *cpustate)			// Opcode 0x0f a9
 {
-	cpustate->sreg[GS].selector = POP32(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,GS);
-	} else {
-		i386_load_segment_descriptor(cpustate,GS);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+	{
+		cpustate->sreg[GS].selector = POP32(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,GS);
+		} else {
+			i386_load_segment_descriptor(cpustate,GS);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
 static void I386OP(pop_ss32)(i386_state *cpustate)			// Opcode 0x17
 {
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(cpustate->IF != 0) // if external interrupts are enabled
 	{
 		cpustate->IF = 0;  // reset IF for the next instruction
 		cpustate->delayed_interrupt_enable = 1;
 	}
 
-	cpustate->sreg[SS].selector = POP32(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,SS);
-	} else {
-		i386_load_segment_descriptor(cpustate,SS);
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+	{
+		cpustate->sreg[SS].selector = POP32(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,SS);
+		} else {
+			i386_load_segment_descriptor(cpustate,SS);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
@@ -1472,28 +1534,39 @@ static void I386OP(pop_rm32)(i386_state *cpustate)			// Opcode 0x8f
 {
 	UINT8 modrm = FETCH(cpustate);
 	UINT32 value;
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+	{
+		value = POP32(cpustate);
 
-	value = POP32(cpustate);
-
-	if( modrm >= 0xc0 ) {
-		STORE_RM32(modrm, value);
-	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
-		WRITE32(cpustate,ea, value);
+		if( modrm >= 0xc0 ) {
+			STORE_RM32(modrm, value);
+		} else {
+			UINT32 ea = GetEA(cpustate,modrm);
+			WRITE32(cpustate,ea, value);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_RM);
 }
 
 static void I386OP(popad)(i386_state *cpustate)				// Opcode 0x61
 {
-	REG32(EDI) = POP32(cpustate);
-	REG32(ESI) = POP32(cpustate);
-	REG32(EBP) = POP32(cpustate);
-	REG32(ESP) += 4;
-	REG32(EBX) = POP32(cpustate);
-	REG32(EDX) = POP32(cpustate);
-	REG32(ECX) = POP32(cpustate);
-	REG32(EAX) = POP32(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+31) == 0)
+	{
+		REG32(EDI) = POP32(cpustate);
+		REG32(ESI) = POP32(cpustate);
+		REG32(EBP) = POP32(cpustate);
+		REG32(ESP) += 4;
+		REG32(EBX) = POP32(cpustate);
+		REG32(EDX) = POP32(cpustate);
+		REG32(ECX) = POP32(cpustate);
+		REG32(EAX) = POP32(cpustate);
+	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POPA);
 }
 
@@ -1503,6 +1576,7 @@ static void I386OP(popfd)(i386_state *cpustate)				// Opcode 0x9d
 	UINT32 current = get_flags(cpustate);
 	UINT8 IOPL = (current >> 12) & 0x03;
 	UINT32 mask = 0x00257fd5;  // VM, VIP and VIF cannot be set by POPF/POPFD
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 
 	// IOPL can only change if CPL is 0
 	if(cpustate->CPL != 0)
@@ -1522,120 +1596,195 @@ static void I386OP(popfd)(i386_state *cpustate)				// Opcode 0x9d
 		mask &= ~0x00003000;  // IOPL cannot be changed while in V8086 mode
 	}
 
-	value = POP32(cpustate);
-	value &= ~0x00010000;  // RF will always return zero
-	set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
+	if(i386_limit_check(cpustate,SS,offset+3) == 0)
+	{
+		value = POP32(cpustate);
+		value &= ~0x00010000;  // RF will always return zero
+		set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
+	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POPF);
 }
 
 static void I386OP(push_eax)(i386_state *cpustate)			// Opcode 0x50
 {
-	PUSH32(cpustate, REG32(EAX) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, REG32(EAX) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_ecx)(i386_state *cpustate)			// Opcode 0x51
 {
-	PUSH32(cpustate, REG32(ECX) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, REG32(ECX) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_edx)(i386_state *cpustate)			// Opcode 0x52
 {
-	PUSH32(cpustate, REG32(EDX) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, REG32(EDX) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_ebx)(i386_state *cpustate)			// Opcode 0x53
 {
-	PUSH32(cpustate, REG32(EBX) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, REG32(EBX) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_esp)(i386_state *cpustate)			// Opcode 0x54
 {
-	PUSH32(cpustate, REG32(ESP) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, REG32(ESP) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_ebp)(i386_state *cpustate)			// Opcode 0x55
 {
-	PUSH32(cpustate, REG32(EBP) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, REG32(EBP) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_esi)(i386_state *cpustate)			// Opcode 0x56
 {
-	PUSH32(cpustate, REG32(ESI) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, REG32(ESI) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_edi)(i386_state *cpustate)			// Opcode 0x57
 {
-	PUSH32(cpustate, REG32(EDI) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, REG32(EDI) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_cs32)(i386_state *cpustate)			// Opcode 0x0e
 {
-	PUSH32(cpustate, cpustate->sreg[CS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, cpustate->sreg[CS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_ds32)(i386_state *cpustate)			// Opcode 0x1e
 {
-	PUSH32(cpustate, cpustate->sreg[DS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, cpustate->sreg[DS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_es32)(i386_state *cpustate)			// Opcode 0x06
 {
-	PUSH32(cpustate, cpustate->sreg[ES].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, cpustate->sreg[ES].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_fs32)(i386_state *cpustate)			// Opcode 0x0f a0
 {
-	PUSH32(cpustate, cpustate->sreg[FS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, cpustate->sreg[FS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_gs32)(i386_state *cpustate)			// Opcode 0x0f a8
 {
-	PUSH32(cpustate, cpustate->sreg[GS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, cpustate->sreg[GS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_ss32)(i386_state *cpustate)			// Opcode 0x16
 {
-	PUSH32(cpustate, cpustate->sreg[SS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, cpustate->sreg[SS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_i32)(i386_state *cpustate)			// Opcode 0x68
 {
 	UINT32 value = FETCH32(cpustate);
-	PUSH32(cpustate,value);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate,value);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_IMM);
 }
 
 static void I386OP(pushad)(i386_state *cpustate)			// Opcode 0x60
 {
 	UINT32 temp = REG32(ESP);
-	PUSH32(cpustate, REG32(EAX) );
-	PUSH32(cpustate, REG32(ECX) );
-	PUSH32(cpustate, REG32(EDX) );
-	PUSH32(cpustate, REG32(EBX) );
-	PUSH32(cpustate, temp );
-	PUSH32(cpustate, REG32(EBP) );
-	PUSH32(cpustate, REG32(ESI) );
-	PUSH32(cpustate, REG32(EDI) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-32) == 0)
+	{
+		PUSH32(cpustate, REG32(EAX) );
+		PUSH32(cpustate, REG32(ECX) );
+		PUSH32(cpustate, REG32(EDX) );
+		PUSH32(cpustate, REG32(EBX) );
+		PUSH32(cpustate, temp );
+		PUSH32(cpustate, REG32(EBP) );
+		PUSH32(cpustate, REG32(ESI) );
+		PUSH32(cpustate, REG32(EDI) );
+	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSHA);
 }
 
 static void I386OP(pushfd)(i386_state *cpustate)			// Opcode 0x9c
 {
-	PUSH32(cpustate, get_flags(cpustate) & 0x00fcffff );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-4) == 0)
+		PUSH32(cpustate, get_flags(cpustate) & 0x00fcffff );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSHF);
 }
 
@@ -2021,8 +2170,8 @@ static void I386OP(xchg_r32_rm32)(i386_state *cpustate)		// Opcode 0x87
 		UINT32 ea = GetEA(cpustate,modrm);
 		UINT32 src = READ32(cpustate,ea);
 		UINT32 dst = LOAD_REG32(modrm);
-		STORE_REG32(modrm, src);
 		WRITE32(cpustate,ea, dst);
+		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_XCHG_REG_MEM);
 	}
 }
@@ -2526,7 +2675,9 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 						REG32(EAX) = (UINT32)result;
 					}
 				} else {
-					/* TODO: Divide by zero */
+					cpustate->ext = 0;
+					i386_trap(cpustate, 0, 0, 0);
+					cpustate->ext = 1;
 				}
 			}
 			break;
@@ -2554,7 +2705,9 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 						REG32(EAX) = (UINT32)result;
 					}
 				} else {
-					/* TODO: Divide by zero */
+					cpustate->ext = 0;
+					i386_trap(cpustate, 0, 0, 0);
+					cpustate->ext = 1;
 				}
 			}
 			break;
@@ -2753,6 +2906,8 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 		case 2:			/* LLDT */
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
+				if(cpustate->CPL)
+					FAULT(FAULT_GP,0)
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
 					cpustate->ldtr.segment = address;
@@ -2778,6 +2933,8 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 		case 3:			/* LTR */
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
+				if(cpustate->CPL)
+					FAULT(FAULT_GP,0)
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
 					cpustate->task.segment = address;
@@ -2965,6 +3122,8 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 			}
 		case 2:			/* LGDT */
 			{
+				if(PROTECTED_MODE && cpustate->CPL)
+					FAULT(FAULT_GP,0) 
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
 					ea = i386_translate(cpustate, CS, address );
@@ -2978,6 +3137,8 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 			}
 		case 3:			/* LIDT */
 			{
+				if(PROTECTED_MODE && cpustate->CPL)
+					FAULT(FAULT_GP,0) 
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
 					ea = i386_translate(cpustate, CS, address );

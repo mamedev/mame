@@ -1701,8 +1701,8 @@ static void I386OP(xchg_r8_rm8)(i386_state *cpustate)		// Opcode 0x86
 		UINT32 ea = GetEA(cpustate,modrm);
 		UINT8 src = READ8(cpustate,ea);
 		UINT8 dst = LOAD_REG8(modrm);
-		STORE_REG8(modrm, src);
 		WRITE8(cpustate,ea, dst);
+		STORE_REG8(modrm, src);
 		CYCLES(cpustate,CYCLES_XCHG_REG_MEM);
 	}
 }
@@ -2071,7 +2071,9 @@ static void I386OP(groupF6_8)(i386_state *cpustate)			// Opcode 0xf6
 							cpustate->CF = 1;
 					}
 				} else {
-					/* TODO: Divide by zero */
+					cpustate->ext = 0;
+					i386_trap(cpustate, 0, 0, 0);
+					cpustate->ext = 1;
 				}
 			}
 			break;
@@ -2103,7 +2105,9 @@ static void I386OP(groupF6_8)(i386_state *cpustate)			// Opcode 0xf6
 							cpustate->CF = 1;
 					}
 				} else {
-					/* TODO: Divide by zero */
+					cpustate->ext = 0;
+					i386_trap(cpustate, 0, 0, 0);
+					cpustate->ext = 1;
 				}
 			}
 			break;

@@ -363,12 +363,12 @@ static void i386_check_sreg_validity(i386_state* cpustate, int reg)
 	/* Must be within the relevant descriptor table limits */
 	if(selector & 0x04)
 	{
-		if((selector & ~0x07) > cpustate->ldtr.limit)
+		if((selector & ~0x07) >= cpustate->ldtr.limit)
 			invalid = 1;
 	}
 	else
 	{
-		if((selector & ~0x07) > cpustate->gdtr.limit)
+		if((selector & ~0x07) >= cpustate->gdtr.limit)
 			invalid = 1;
 	}
 
@@ -393,26 +393,29 @@ static void i386_check_sreg_validity(i386_state* cpustate, int reg)
 	}
 }
 
-#if 0
-// this will be more useful once expand-down segments are supported (the FM-Towns uses these for the stack)
-static void i386_stack_check(i386_state *cpustate, INT16 offset)
+static int i386_limit_check(i386_state *cpustate, int seg, UINT32 offset)
 {
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
-		// Check that both current and eventual stack pointers are within the segment limits
-		if(REG32(ESP) > cpustate->sreg[SS].limit)
+		if((cpustate->sreg[seg].flags & 0x0018) == 0x0010 && cpustate->sreg[seg].flags & 0x0004) // if expand-down data segment
 		{
-			logerror("Stack (%08x): ESP is outside stack segment limit.\n",cpustate->pc);
-			FAULT(FAULT_SS,0);
+			if(offset <= cpustate->sreg[seg].limit)
+			{
+				logerror("Limit check at 0x%08x failed. Segment %04x, limit %08x, offset %08x (expand-down)\n",cpustate->pc,cpustate->sreg[seg].selector,cpustate->sreg[seg].limit,offset);
+				return 1;
+			}
 		}
-		if(REG32(ESP) + offset > cpustate->sreg[SS].limit)
+		else
 		{
-			logerror("Stack (%08x): ESP + offset (%i) is outside stack segment limit.\n",cpustate->pc,offset);
-			FAULT(FAULT_SS,0);
+			if(offset > cpustate->sreg[seg].limit)
+			{
+				logerror("Limit check at 0x%08x failed. Segment %04x, limit %08x, offset %08x\n",cpustate->pc,cpustate->sreg[seg].selector,cpustate->sreg[seg].limit,offset);
+				return 1;
+			}
 		}
 	}
+	return 0;
 }
-#endif
 
 static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector, UINT8 reg)
 {
@@ -431,14 +434,14 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 		i386_load_protected_mode_segment(cpustate,&stack);
 		DPL = (stack.flags >> 5) & 0x03;
 
-		if((selector & ~0x0007) == 0)
+		if((selector & ~0x0003) == 0)
 		{
 			logerror("SReg Load (%08x): Selector is null.\n",cpustate->pc);
 			FAULT(FAULT_GP,0)
 		}
 		if(selector & 0x0004)  // LDT
 		{
-			if((selector & ~0x0007) > cpustate->ldtr.limit)
+			if((selector & ~0x0007) >= cpustate->ldtr.limit)
 			{
 				logerror("SReg Load (%08x): Selector is out of LDT bounds.\n",cpustate->pc);
 				FAULT(FAULT_GP,selector & ~0x03)
@@ -446,7 +449,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 		}
 		else  // GDT
 		{
-			if((selector & ~0x0007) > cpustate->gdtr.limit)
+			if((selector & ~0x0007) >= cpustate->gdtr.limit)
 			{
 				logerror("SReg Load (%08x): Selector is out of GDT bounds.\n",cpustate->pc);
 				FAULT(FAULT_GP,selector & ~0x03)
@@ -477,7 +480,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 	{
 		I386_SREG desc;
 
-		if((selector & ~0x0007) == 0)
+		if((selector & ~0x0003) == 0)
 		{
 			cpustate->sreg[reg].selector = selector;
 			i386_load_segment_descriptor(cpustate, reg );
@@ -492,7 +495,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 
 		if(selector & 0x0004)  // LDT
 		{
-			if((selector & ~0x0007) > cpustate->ldtr.limit)
+			if((selector & ~0x0007) >= cpustate->ldtr.limit)
 			{
 				logerror("SReg Load (%08x): Selector is out of LDT bounds.\n",cpustate->pc);
 				FAULT(FAULT_GP,selector & ~0x03)
@@ -500,7 +503,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 		}
 		else  // GDT
 		{
-			if((selector & ~0x0007) > cpustate->gdtr.limit)
+			if((selector & ~0x0007) >= cpustate->gdtr.limit)
 			{
 				logerror("SReg Load (%08x): Selector is out of GDT bounds.\n",cpustate->pc);
 				FAULT(FAULT_GP,selector & ~0x03)
@@ -607,7 +610,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		}
 
 		/* segment privilege checks */
-		if(entry > cpustate->idtr.limit)
+		if(entry >= cpustate->idtr.limit)
 		{
 			logerror("IRQ (%08x): Vector %02xh is past IDT limit.\n",cpustate->pc,entry);
 			FAULT_EXP(FAULT_GP,entry+2)
@@ -700,7 +703,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			}
 			else
 			{
-				if(segment > cpustate->gdtr.limit)
+				if(segment >= cpustate->gdtr.limit)
 				{
 					logerror("IRQ: Task gate: TSS is past GDT limit.\n");
 					FAULT_EXP(FAULT_TS,segment & ~0x07);
@@ -739,7 +742,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			}
 			if(segment & 0x04)
 			{
-				if((segment & ~0x07) > cpustate->ldtr.limit)
+				if((segment & ~0x07) >= cpustate->ldtr.limit)
 				{
 					logerror("IRQ: Gate segment is past LDT limit.\n");
 					FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
@@ -747,7 +750,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			}
 			else
 			{
-				if((segment & ~0x07) > cpustate->gdtr.limit)
+				if((segment & ~0x07) >= cpustate->gdtr.limit)
 				{
 					logerror("IRQ: Gate segment is past GDT limit.\n");
 					FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
@@ -788,7 +791,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 				if(stack.selector & 0x04)
 				{
-					if((stack.selector & ~0x07) > cpustate->ldtr.base)
+					if((stack.selector & ~0x07) >= cpustate->ldtr.base)
 					{
 						logerror("IRQ: New stack selector is past LDT limit.\n");
 						FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
@@ -796,7 +799,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 				else
 				{
-					if((stack.selector & ~0x07) > cpustate->gdtr.base)
+					if((stack.selector & ~0x07) >= cpustate->gdtr.base)
 					{
 						logerror("IRQ: New stack selector is past GDT limit.\n");
 						FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
@@ -1198,7 +1201,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 	UINT32 offset = off;
 
 	/* Check selector is not null */
-	if((segment & ~0x07) == 0)
+	if((segment & ~0x03) == 0)
 	{
 		logerror("JMP: Segment is null.\n");
 		FAULT(FAULT_GP,0)
@@ -1207,7 +1210,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 	if((segment & 0x04) == 0)
 	{
 		/* check GDT limit */
-		if((segment & ~0x07) > (cpustate->gdtr.limit))
+		if((segment & ~0x07) >= (cpustate->gdtr.limit))
 		{
 			logerror("JMP: Segment is past GDT limit.\n");
 			FAULT(FAULT_GP,segment & 0xfffc)
@@ -1216,7 +1219,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 	else
 	{
 		/* check LDT limit */
-		if((segment & ~0x07) > (cpustate->ldtr.limit))
+		if((segment & ~0x07) >= (cpustate->ldtr.limit))
 		{
 			logerror("JMP: Segment is past LDT limit.\n");
 			FAULT(FAULT_GP,segment & 0xfffc)
@@ -1474,14 +1477,14 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 	UINT32 offset = off;
 	int x;
 
-	if((selector & ~0x07) == 0)
+	if((selector & ~0x03) == 0)
 	{
 		logerror("CALL (%08x): Selector is null.\n",cpustate->pc);
 		FAULT(FAULT_GP,0)  // #GP(0)
 	}
 	if(selector & 0x04)
 	{
-		if((selector & ~0x07) > cpustate->ldtr.limit)
+		if((selector & ~0x07) >= cpustate->ldtr.limit)
 		{
 			logerror("CALL: Selector is past LDT limit.\n");
 			FAULT(FAULT_GP,selector & ~0x03)  // #GP(selector)
@@ -1489,7 +1492,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 	}
 	else
 	{
-		if((selector & ~0x07) > cpustate->gdtr.limit)
+		if((selector & ~0x07) >= cpustate->gdtr.limit)
 		{
 			logerror("CALL: Selector is past GDT limit.\n");
 			FAULT(FAULT_GP,selector & ~0x03)  // #GP(selector)
@@ -1942,14 +1945,14 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 	if(RPL == CPL)
 	{
 		/* same privilege level */
-		if((newCS & ~0x07) == 0)
+		if((newCS & ~0x03) == 0)
 		{
 			logerror("RETF: Return segment is null.\n");
 			FAULT(FAULT_GP,0)
 		}
 		if(newCS & 0x04)
 		{
-			if((newCS & ~0x07) > cpustate->ldtr.limit)
+			if((newCS & ~0x07) >= cpustate->ldtr.limit)
 			{
 				logerror("RETF: Return segment is past LDT limit.\n");
 				FAULT(FAULT_GP,newCS & ~0x03)
@@ -1957,7 +1960,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		else
 		{
-			if((newCS & ~0x07) > cpustate->gdtr.limit)
+			if((newCS & ~0x07) >= cpustate->gdtr.limit)
 			{
 				logerror("RETF: Return segment is past GDT limit.\n");
 				FAULT(FAULT_GP,newCS & ~0x03)
@@ -1996,7 +1999,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		if(operand32 == 0)
 		{
-			if(REG16(SP) > (cpustate->sreg[SS].limit & 0xffff)+1)
+			if(i386_limit_check(cpustate,SS,REG16(SP)+count+3) != 0)
 			{
 				logerror("RETF (%08x): SP is past stack segment limit.\n",cpustate->pc);
 				FAULT(FAULT_SS,0)
@@ -2004,7 +2007,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		else
 		{
-			if(REG32(ESP) > cpustate->sreg[SS].limit+1)
+			if(i386_limit_check(cpustate,SS,REG32(ESP)+count+7) != 0)
 			{
 				logerror("RETF: ESP is past stack segment limit.\n");
 				FAULT(FAULT_SS,0)
@@ -2020,7 +2023,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		/* outer privilege level */
 		if(operand32 == 0)
 		{
-			if(REG16(SP)+8+count > cpustate->sreg[SS].limit+1)
+			if(i386_limit_check(cpustate,SS,REG16(SP)+count+7) != 0)
 			{
 				logerror("RETF (%08x): SP is past stack segment limit.\n",cpustate->pc);
 				FAULT(FAULT_SS,0)
@@ -2028,7 +2031,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		else
 		{
-			if(REG32(ESP)+16+count > cpustate->sreg[SS].limit+1)
+			if(i386_limit_check(cpustate,SS,REG32(SP)+count+15) != 0)
 			{
 				logerror("RETF: ESP is past stack segment limit.\n");
 				FAULT(FAULT_SS,0)
@@ -2036,14 +2039,14 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 
 		/* Check CS selector and descriptor */
-		if((newCS & ~0x07) == 0)
+		if((newCS & ~0x03) == 0)
 		{
 			logerror("RETF: CS segment is null.\n");
 			FAULT(FAULT_GP,0)
 		}
 		if(newCS & 0x04)
 		{
-			if((newCS & ~0x07) > cpustate->ldtr.limit)
+			if((newCS & ~0x07) >= cpustate->ldtr.limit)
 			{
 				logerror("RETF: CS segment selector is past LDT limit.\n");
 				FAULT(FAULT_GP,newCS & ~0x07)
@@ -2051,7 +2054,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		else
 		{
-			if((newCS & ~0x07) > cpustate->gdtr.limit)
+			if((newCS & ~0x07) >= cpustate->gdtr.limit)
 			{
 				logerror("RETF: CS segment selector is past GDT limit.\n");
 				FAULT(FAULT_GP,newCS & ~0x07)
@@ -2232,7 +2235,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			logerror("IRET: Task return: Back-linked TSS is not in GDT.\n");
 			FAULT(FAULT_TS,task & ~0x07)
 		}
-		if((task & ~0x07) > cpustate->gdtr.limit)
+		if((task & ~0x07) >= cpustate->gdtr.limit)
 		{
 			logerror("IRET: Task return: Back-linked TSS is not in GDT.\n");
 			FAULT(FAULT_TS,task & ~0x07)
@@ -2408,7 +2411,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		{
 			if(operand32 == 0)
 			{
-				if(REG16(SP)+4 > cpustate->sreg[SS].limit+1)
+				if(i386_limit_check(cpustate,SS,REG16(SP)+3) != 0)
 				{
 					logerror("IRET: Data on stack is past SS limit.\n");
 					FAULT(FAULT_SS,0)
@@ -2416,7 +2419,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			}
 			else
 			{
-				if(REG32(ESP)+6 > cpustate->sreg[SS].limit+1)
+				if(i386_limit_check(cpustate,SS,REG32(ESP)+7) != 0)
 				{
 					logerror("IRET: Data on stack is past SS limit.\n");
 					FAULT(FAULT_SS,0)
@@ -2433,7 +2436,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				/* return to same privilege level */
 				if(operand32 == 0)
 				{
-					if(REG16(SP)+6 > cpustate->sreg[SS].limit+1)
+					if(i386_limit_check(cpustate,SS,REG16(SP)+5) != 0)
 					{
 						logerror("IRET (%08x): Data on stack is past SS limit.\n",cpustate->pc);
 						FAULT(FAULT_SS,0)
@@ -2441,20 +2444,20 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 				else
 				{
-					if(REG32(ESP)+12 > cpustate->sreg[SS].limit+1)
+					if(i386_limit_check(cpustate,SS,REG32(ESP)+11) != 0)
 					{
 						logerror("IRET (%08x): Data on stack is past SS limit.\n",cpustate->pc);
 						FAULT(FAULT_SS,0)
 					}
 				}
-				if((newCS & ~0x07) == 0)
+				if((newCS & ~0x03) == 0)
 				{
 					logerror("IRET: Return CS selector is null.\n");
 					FAULT(FAULT_GP,0)
 				}
 				if(newCS & 0x04)
 				{
-					if((newCS & ~0x07) > cpustate->ldtr.limit)
+					if((newCS & ~0x07) >= cpustate->ldtr.limit)
 					{
 						logerror("IRET: Return CS selector (%04x) is past LDT limit.\n",newCS);
 						FAULT(FAULT_GP,newCS & ~0x07)
@@ -2462,7 +2465,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 				else
 				{
-					if((newCS & ~0x07) > cpustate->gdtr.limit)
+					if((newCS & ~0x07) >= cpustate->gdtr.limit)
 					{
 						logerror("IRET: Return CS selector is past GDT limit.\n");
 						FAULT(FAULT_GP,newCS & ~0x07)
@@ -2533,28 +2536,29 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				i386_load_protected_mode_segment(cpustate,&stack);
 				if(operand32 == 0)
 				{
-					if(REG16(SP)+10 > cpustate->sreg[SS].limit+1)
+					if(i386_limit_check(cpustate,SS,REG16(SP)+9) != 0)
 					{
 						logerror("IRET: SP is past SS limit.\n");
-						FAULT(FAULT_SS,0)					}
+						FAULT(FAULT_SS,0)
+					}
 				}
 				else
 				{
-					if(REG32(ESP)+20 > cpustate->sreg[SS].limit+1)
+					if(i386_limit_check(cpustate,SS,REG32(ESP)+19) != 0)
 					{
 						logerror("IRET: ESP is past SS limit.\n");
 						FAULT(FAULT_SS,0)
 					}
 				}
 				/* Check CS selector and descriptor */
-				if((newCS & ~0x07) == 0)
+				if((newCS & ~0x03) == 0)
 				{
 					logerror("IRET: Return CS selector is null.\n");
 					FAULT(FAULT_GP,0)
 				}
 				if(newCS & 0x04)
 				{
-					if((newCS & ~0x07) > cpustate->ldtr.limit)
+					if((newCS & ~0x07) >= cpustate->ldtr.limit)
 					{
 						logerror("IRET: Return CS selector is past LDT limit.\n");
 						FAULT(FAULT_GP,newCS & ~0x07);
@@ -2562,7 +2566,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 				else
 				{
-					if((newCS & ~0x07) > cpustate->gdtr.limit)
+					if((newCS & ~0x07) >= cpustate->gdtr.limit)
 					{
 						logerror("IRET: Return CS selector is past GDT limit.\n");
 						FAULT(FAULT_GP,newCS & ~0x07);
@@ -2597,14 +2601,14 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 
 				/* Check SS selector and descriptor */
 				DPL = (stack.flags >> 5) & 0x03;
-				if((newSS & ~0x07) == 0)
+				if((newSS & ~0x03) == 0)
 				{
 					logerror("IRET: Return SS selector is null.\n");
 					FAULT(FAULT_GP,0)
 				}
 				if(newSS & 0x04)
 				{
-					if((newSS & ~0x07) > cpustate->ldtr.limit)
+					if((newSS & ~0x07) >= cpustate->ldtr.limit)
 					{
 						logerror("IRET: Return SS selector is past LDT limit.\n");
 						FAULT(FAULT_GP,newSS & ~0x07);
@@ -2612,7 +2616,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 				else
 				{
-					if((newSS & ~0x07) > cpustate->gdtr.limit)
+					if((newSS & ~0x07) >= cpustate->gdtr.limit)
 					{
 						logerror("IRET: Return SS selector is past GDT limit.\n");
 						FAULT(FAULT_GP,newSS & ~0x07);

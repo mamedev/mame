@@ -1189,8 +1189,8 @@ static void I386OP(lodsw)(i386_state *cpustate)				// Opcode 0xad
 static void I386OP(loop16)(i386_state *cpustate)			// Opcode 0xe2
 {
 	INT8 disp = FETCH(cpustate);
-	REG16(CX)--;
-	if( REG16(CX) != 0 ) {
+	INT32 val = (cpustate->address_size)?(--REG32(ECX)):(--REG16(CX));
+	if( val != 0 ) {
 		if (cpustate->sreg[CS].d)
 		{
 			cpustate->eip += disp;
@@ -1207,8 +1207,8 @@ static void I386OP(loop16)(i386_state *cpustate)			// Opcode 0xe2
 static void I386OP(loopne16)(i386_state *cpustate)			// Opcode 0xe0
 {
 	INT8 disp = FETCH(cpustate);
-	REG16(CX)--;
-	if( REG16(CX) != 0 && cpustate->ZF == 0 ) {
+	INT32 val = (cpustate->address_size)?(--REG32(ECX)):(--REG16(CX));
+	if( val != 0 && cpustate->ZF == 0 ) {
 		if (cpustate->sreg[CS].d)
 		{
 			cpustate->eip += disp;
@@ -1225,8 +1225,8 @@ static void I386OP(loopne16)(i386_state *cpustate)			// Opcode 0xe0
 static void I386OP(loopz16)(i386_state *cpustate)			// Opcode 0xe1
 {
 	INT8 disp = FETCH(cpustate);
-	REG16(CX)--;
-	if( REG16(CX) != 0 && cpustate->ZF != 0 ) {
+	INT32 val = (cpustate->address_size)?(--REG32(ECX)):(--REG16(CX));
+	if( val != 0 && cpustate->ZF != 0 ) {
 		if (cpustate->sreg[CS].d)
 		{
 			cpustate->eip += disp;
@@ -1486,110 +1486,172 @@ static void I386OP(out_ax_dx)(i386_state *cpustate)			// Opcode 0xef
 
 static void I386OP(pop_ax)(i386_state *cpustate)			// Opcode 0x58
 {
-	REG16(AX) = POP16(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+		REG16(AX) = POP16(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_cx)(i386_state *cpustate)			// Opcode 0x59
 {
-	REG16(CX) = POP16(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+		REG16(CX) = POP16(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_dx)(i386_state *cpustate)			// Opcode 0x5a
 {
-	REG16(DX) = POP16(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+		REG16(DX) = POP16(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_bx)(i386_state *cpustate)			// Opcode 0x5b
 {
-	REG16(BX) = POP16(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+		REG16(BX) = POP16(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_sp)(i386_state *cpustate)			// Opcode 0x5c
 {
-	REG16(SP) = POP16(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+		REG16(SP) = POP16(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_bp)(i386_state *cpustate)			// Opcode 0x5d
 {
-	REG16(BP) = POP16(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+		REG16(BP) = POP16(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_si)(i386_state *cpustate)			// Opcode 0x5e
 {
-	REG16(SI) = POP16(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+		REG16(SI) = POP16(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_di)(i386_state *cpustate)			// Opcode 0x5f
 {
-	REG16(DI) = POP16(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+		REG16(DI) = POP16(cpustate);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_REG_SHORT);
 }
 
 static void I386OP(pop_ds16)(i386_state *cpustate)			// Opcode 0x1f
 {
-	cpustate->sreg[DS].selector = POP16(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,DS);
-	} else {
-		i386_load_segment_descriptor(cpustate,DS);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+	{
+		cpustate->sreg[DS].selector = POP16(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,DS);
+		} else {
+			i386_load_segment_descriptor(cpustate,DS);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
 static void I386OP(pop_es16)(i386_state *cpustate)			// Opcode 0x07
 {
-	cpustate->sreg[ES].selector = POP16(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,ES);
-	} else {
-		i386_load_segment_descriptor(cpustate,ES);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+	{
+		cpustate->sreg[ES].selector = POP16(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,ES);
+		} else {
+			i386_load_segment_descriptor(cpustate,ES);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
 static void I386OP(pop_fs16)(i386_state *cpustate)			// Opcode 0x0f a1
 {
-	cpustate->sreg[FS].selector = POP16(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,FS);
-	} else {
-		i386_load_segment_descriptor(cpustate,FS);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+	{
+		cpustate->sreg[FS].selector = POP16(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,FS);
+		} else {
+			i386_load_segment_descriptor(cpustate,FS);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
 static void I386OP(pop_gs16)(i386_state *cpustate)			// Opcode 0x0f a9
 {
-	cpustate->sreg[GS].selector = POP16(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,GS);
-	} else {
-		i386_load_segment_descriptor(cpustate,GS);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+	{
+		cpustate->sreg[GS].selector = POP16(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,GS);
+		} else {
+			i386_load_segment_descriptor(cpustate,GS);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
 static void I386OP(pop_ss16)(i386_state *cpustate)			// Opcode 0x17
 {
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 	if(cpustate->IF != 0) // if external interrupts are enabled
 	{
 		cpustate->IF = 0;  // reset IF for the next instruction
 		cpustate->delayed_interrupt_enable = 1;
 	}
 
-	cpustate->sreg[SS].selector = POP16(cpustate);
-	if( PROTECTED_MODE ) {
-		i386_load_segment_descriptor(cpustate,SS);
-	} else {
-		i386_load_segment_descriptor(cpustate,SS);
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+	{
+		cpustate->sreg[SS].selector = POP16(cpustate);
+		if( PROTECTED_MODE ) {
+			i386_load_segment_descriptor(cpustate,SS);
+		} else {
+			i386_load_segment_descriptor(cpustate,SS);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_SREG);
 }
 
@@ -1597,28 +1659,41 @@ static void I386OP(pop_rm16)(i386_state *cpustate)			// Opcode 0x8f
 {
 	UINT8 modrm = FETCH(cpustate);
 	UINT16 value;
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 
-	value = POP16(cpustate);
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+	{
+		value = POP16(cpustate);
 
-	if( modrm >= 0xc0 ) {
-		STORE_RM16(modrm, value);
-	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
-		WRITE16(cpustate,ea, value);
+		if( modrm >= 0xc0 ) {
+			STORE_RM16(modrm, value);
+		} else {
+			UINT32 ea = GetEA(cpustate,modrm);
+			WRITE16(cpustate,ea, value);
+		}
 	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POP_RM);
 }
 
 static void I386OP(popa)(i386_state *cpustate)				// Opcode 0x61
 {
-	REG16(DI) = POP16(cpustate);
-	REG16(SI) = POP16(cpustate);
-	REG16(BP) = POP16(cpustate);
-	REG16(SP) += 2;
-	REG16(BX) = POP16(cpustate);
-	REG16(DX) = POP16(cpustate);
-	REG16(CX) = POP16(cpustate);
-	REG16(AX) = POP16(cpustate);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+
+	if(i386_limit_check(cpustate,SS,offset+15) == 0)
+	{
+		REG16(DI) = POP16(cpustate);
+		REG16(SI) = POP16(cpustate);
+		REG16(BP) = POP16(cpustate);
+		REG16(SP) += 2;
+		REG16(BX) = POP16(cpustate);
+		REG16(DX) = POP16(cpustate);
+		REG16(CX) = POP16(cpustate);
+		REG16(AX) = POP16(cpustate);
+	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POPA);
 }
 
@@ -1628,6 +1703,7 @@ static void I386OP(popf)(i386_state *cpustate)				// Opcode 0x9d
 	UINT32 current = get_flags(cpustate);
 	UINT8 IOPL = (current >> 12) & 0x03;
 	UINT32 mask = 0x7fd5;
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 
 	// IOPL can only change if CPL is 0
 	if(cpustate->CPL != 0)
@@ -1647,119 +1723,194 @@ static void I386OP(popf)(i386_state *cpustate)				// Opcode 0x9d
 		mask &= ~0x00003000;  // IOPL cannot be changed while in V8086 mode
 	}
 
-	value = POP16(cpustate);
-	set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
+	if(i386_limit_check(cpustate,SS,offset+1) == 0)
+	{
+		value = POP16(cpustate);
+		set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
+	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_POPF);
 }
 
 static void I386OP(push_ax)(i386_state *cpustate)			// Opcode 0x50
 {
-	PUSH16(cpustate, REG16(AX) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, REG16(AX) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_cx)(i386_state *cpustate)			// Opcode 0x51
 {
-	PUSH16(cpustate, REG16(CX) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, REG16(CX) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_dx)(i386_state *cpustate)			// Opcode 0x52
 {
-	PUSH16(cpustate, REG16(DX) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, REG16(DX) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_bx)(i386_state *cpustate)			// Opcode 0x53
 {
-	PUSH16(cpustate, REG16(BX) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, REG16(BX) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_sp)(i386_state *cpustate)			// Opcode 0x54
 {
-	PUSH16(cpustate, REG16(SP) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, REG16(SP) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_bp)(i386_state *cpustate)			// Opcode 0x55
 {
-	PUSH16(cpustate, REG16(BP) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, REG16(BP) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_si)(i386_state *cpustate)			// Opcode 0x56
 {
-	PUSH16(cpustate, REG16(SI) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, REG16(SI) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_di)(i386_state *cpustate)			// Opcode 0x57
 {
-	PUSH16(cpustate, REG16(DI) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, REG16(DI) );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_REG_SHORT);
 }
 
 static void I386OP(push_cs16)(i386_state *cpustate)			// Opcode 0x0e
 {
-	PUSH16(cpustate, cpustate->sreg[CS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, cpustate->sreg[CS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_ds16)(i386_state *cpustate)			// Opcode 0x1e
 {
-	PUSH16(cpustate, cpustate->sreg[DS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, cpustate->sreg[DS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_es16)(i386_state *cpustate)			// Opcode 0x06
 {
-	PUSH16(cpustate, cpustate->sreg[ES].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, cpustate->sreg[ES].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_fs16)(i386_state *cpustate)			// Opcode 0x0f a0
 {
-	PUSH16(cpustate, cpustate->sreg[FS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, cpustate->sreg[FS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_gs16)(i386_state *cpustate)			// Opcode 0x0f a8
 {
-	PUSH16(cpustate, cpustate->sreg[GS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, cpustate->sreg[GS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_ss16)(i386_state *cpustate)			// Opcode 0x16
 {
-	PUSH16(cpustate, cpustate->sreg[SS].selector );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, cpustate->sreg[SS].selector );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_SREG);
 }
 
 static void I386OP(push_i16)(i386_state *cpustate)			// Opcode 0x68
 {
 	UINT16 value = FETCH16(cpustate);
-	PUSH16(cpustate,value);
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate,value);
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSH_IMM);
 }
 
 static void I386OP(pusha)(i386_state *cpustate)				// Opcode 0x60
 {
 	UINT16 temp = REG16(SP);
-	PUSH16(cpustate, REG16(AX) );
-	PUSH16(cpustate, REG16(CX) );
-	PUSH16(cpustate, REG16(DX) );
-	PUSH16(cpustate, REG16(BX) );
-	PUSH16(cpustate, temp );
-	PUSH16(cpustate, REG16(BP) );
-	PUSH16(cpustate, REG16(SI) );
-	PUSH16(cpustate, REG16(DI) );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-16) == 0)
+	{
+		PUSH16(cpustate, REG16(AX) );
+		PUSH16(cpustate, REG16(CX) );
+		PUSH16(cpustate, REG16(DX) );
+		PUSH16(cpustate, REG16(BX) );
+		PUSH16(cpustate, temp );
+		PUSH16(cpustate, REG16(BP) );
+		PUSH16(cpustate, REG16(SI) );
+		PUSH16(cpustate, REG16(DI) );
+	}
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSHA);
 }
 
 static void I386OP(pushf)(i386_state *cpustate)				// Opcode 0x9c
 {
-	PUSH16(cpustate, get_flags(cpustate) & 0xffff );
+	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+	if(i386_limit_check(cpustate,SS,offset-2) == 0)
+		PUSH16(cpustate, get_flags(cpustate) & 0xffff );
+	else
+		FAULT(FAULT_SS,0)
 	CYCLES(cpustate,CYCLES_PUSHF);
 }
 
@@ -2672,7 +2823,9 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 							cpustate->CF = 1;
 					}
 				} else {
-					/* TODO: Divide by zero */
+					cpustate->ext = 0;
+					i386_trap(cpustate, 0, 0, 0);
+					cpustate->ext = 1;
 				}
 			}
 			break;
@@ -2704,7 +2857,9 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 							cpustate->CF = 1;
 					}
 				} else {
-					/* TODO: Divide by zero */
+					cpustate->ext = 0;
+					i386_trap(cpustate, 0, 0, 0);
+					cpustate->ext = 1;
 				}
 			}
 			break;
@@ -2904,6 +3059,8 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 		case 2:			/* LLDT */
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
+				if(cpustate->CPL)
+					FAULT(FAULT_GP,0)
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM16(modrm);
 					cpustate->ldtr.segment = address;
@@ -2929,6 +3086,8 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 		case 3:			/* LTR */
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
+				if(cpustate->CPL)
+					FAULT(FAULT_GP,0)
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM16(modrm);
 					cpustate->task.segment = address;
@@ -3117,6 +3276,8 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 			}
 		case 2:			/* LGDT */
 			{
+				if(PROTECTED_MODE && cpustate->CPL)
+					FAULT(FAULT_GP,0) 
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM16(modrm);
 					ea = i386_translate(cpustate, CS, address );
@@ -3130,6 +3291,8 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 			}
 		case 3:			/* LIDT */
 			{
+				if(PROTECTED_MODE && cpustate->CPL)
+					FAULT(FAULT_GP,0) 
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM16(modrm);
 					ea = i386_translate(cpustate, CS, address );
@@ -3155,7 +3318,8 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 			}
 		case 6:			/* LMSW */
 			{
-				// TODO: Check for protection fault
+				if(PROTECTED_MODE && cpustate->CPL)
+					FAULT(FAULT_GP,0)
 				UINT16 b;
 				if( modrm >= 0xc0 ) {
 					b = LOAD_RM16(modrm);
