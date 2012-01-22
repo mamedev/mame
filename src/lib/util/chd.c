@@ -2074,6 +2074,9 @@ static chd_error hunk_write_from_memory(chd_file *chd, UINT32 hunknum, const UIN
 		chd->maxhunk = hunknum;
 
 	/* first compute the CRC of the original data */
+    newentry.flags = 0;
+    newentry.length = 0;
+    newentry.offset = 0;
 	newentry.crc = 0;
 	if (src != NULL)
 		newentry.crc = crc32(0, &src[0], chd->header.hunkbytes);
