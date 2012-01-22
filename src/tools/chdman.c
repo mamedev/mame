@@ -717,6 +717,7 @@ static int do_createcd(int argc, char *argv[], int param)
 		toc.tracks[i].extraframes = hunks * CD_FRAMES_PER_HUNK - toc.tracks[i].frames;
 	}
 
+
 	/* count up the total number of frames */
 	origtotalsectors = totalsectors = 0;
 	for (i = 0; i < toc.numtrks; i++)
@@ -727,7 +728,8 @@ static int do_createcd(int argc, char *argv[], int param)
 	printf("\nCD-ROM %s has %d tracks and %d total frames\n", inputfile, toc.numtrks, origtotalsectors);
 
 	/* create the new CHD file */
-	err = chd_create(outputfile, (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_ZLIB_PLUS, NULL);
+	if (param) err = chd_create(outputfile, (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_ZLIB_PLUS_WITH_FLAC, NULL);
+	else err = chd_create(outputfile, (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_ZLIB_PLUS, NULL);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error creating CHD file: %s\n", chd_error_string(err));
@@ -816,8 +818,14 @@ static int do_createcd(int argc, char *argv[], int param)
 				frames++;
 			}
 
+			int is_half_hunk = 0;
+			if ((curhunk == trackhunks-1) && (toc.tracks[i].extraframes>3))
+				is_half_hunk = 1;
+
+
 			/* compress the current hunk */
-			err = chd_compress_hunk(chd, cache, &ratio);
+
+			err = chd_compress_hunk(chd, cache, &ratio, is_half_hunk);
 			if (err != CHDERR_NONE)
 			{
 				fprintf(stderr, "Error during compression: %s\n", chd_error_string(err));
@@ -3402,6 +3410,7 @@ int CLIB_DECL main(int argc, char *argv[])
 		{ "-createuncomphd",	do_createhd_uncomp, 0 },
 		{ "-createraw",		do_createraw, 0 },
 		{ "-createcd",		do_createcd, 0 },
+		{ "-createcdflac",	do_createcd, 1 },
 		{ "-createblankhd",	do_createblankhd, 0 },
 		{ "-createav",		do_createav, 0 },
 		{ "-copydata",		do_copydata, 0 },

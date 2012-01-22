@@ -20,6 +20,8 @@ OBJDIRS += \
 	$(LIBOBJ)/zlib \
 	$(LIBOBJ)/softfloat \
 	$(LIBOBJ)/libjpeg \
+	$(LIBOBJ)/libflac \
+	$(LIBOBJ)/libflacpp \
 
 
 
@@ -264,4 +266,11 @@ $(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/libjpeg -c $< -o $@
 
+
+#-------------------------------------------------
+# libflac library objects
+#-------------------------------------------------
+
+include $(LIBSRC)/libflac/libflac.mak
+include $(LIBSRC)/libflac/libflac++.mak
 
