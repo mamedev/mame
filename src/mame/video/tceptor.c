@@ -569,8 +569,8 @@ SCREEN_UPDATE_IND16( tceptor_3d_right )
 
 SCREEN_VBLANK( tceptor )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		tceptor_state *state = screen.machine().driver_data<tceptor_state>();
 		memcpy(state->m_sprite_ram_buffered, state->m_sprite_ram, 0x200);

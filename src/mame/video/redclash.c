@@ -419,8 +419,8 @@ void redclash_draw_stars( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 SCREEN_VBLANK( redclash )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 		redclash_update_stars_state(screen.machine());
 }
 
