@@ -1999,7 +1999,8 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		if(operand32 == 0)
 		{
-			if(i386_limit_check(cpustate,SS,REG16(SP)+count+3) != 0)
+			UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+			if(i386_limit_check(cpustate,SS,offset+count+3) != 0)
 			{
 				logerror("RETF (%08x): SP is past stack segment limit.\n",cpustate->pc);
 				FAULT(FAULT_SS,0)
@@ -2007,7 +2008,8 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		else
 		{
-			if(i386_limit_check(cpustate,SS,REG32(ESP)+count+7) != 0)
+			UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+			if(i386_limit_check(cpustate,SS,offset+count+7) != 0)
 			{
 				logerror("RETF: ESP is past stack segment limit.\n");
 				FAULT(FAULT_SS,0)
@@ -2023,7 +2025,8 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		/* outer privilege level */
 		if(operand32 == 0)
 		{
-			if(i386_limit_check(cpustate,SS,REG16(SP)+count+7) != 0)
+			UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+			if(i386_limit_check(cpustate,SS,offset+count+7) != 0)
 			{
 				logerror("RETF (%08x): SP is past stack segment limit.\n",cpustate->pc);
 				FAULT(FAULT_SS,0)
@@ -2031,7 +2034,8 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		else
 		{
-			if(i386_limit_check(cpustate,SS,REG32(SP)+count+15) != 0)
+			UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+			if(i386_limit_check(cpustate,SS,offset+count+15) != 0)
 			{
 				logerror("RETF: ESP is past stack segment limit.\n");
 				FAULT(FAULT_SS,0)
@@ -2411,7 +2415,8 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		{
 			if(operand32 == 0)
 			{
-				if(i386_limit_check(cpustate,SS,REG16(SP)+3) != 0)
+				UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+				if(i386_limit_check(cpustate,SS,offset+3) != 0)
 				{
 					logerror("IRET: Data on stack is past SS limit.\n");
 					FAULT(FAULT_SS,0)
@@ -2419,7 +2424,8 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			}
 			else
 			{
-				if(i386_limit_check(cpustate,SS,REG32(ESP)+7) != 0)
+				UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+				if(i386_limit_check(cpustate,SS,offset+7) != 0)
 				{
 					logerror("IRET: Data on stack is past SS limit.\n");
 					FAULT(FAULT_SS,0)
@@ -2436,7 +2442,8 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				/* return to same privilege level */
 				if(operand32 == 0)
 				{
-					if(i386_limit_check(cpustate,SS,REG16(SP)+5) != 0)
+					UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+					if(i386_limit_check(cpustate,SS,offset+5) != 0)
 					{
 						logerror("IRET (%08x): Data on stack is past SS limit.\n",cpustate->pc);
 						FAULT(FAULT_SS,0)
@@ -2444,7 +2451,8 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 				else
 				{
-					if(i386_limit_check(cpustate,SS,REG32(ESP)+11) != 0)
+					UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+					if(i386_limit_check(cpustate,SS,offset+11) != 0)
 					{
 						logerror("IRET (%08x): Data on stack is past SS limit.\n",cpustate->pc);
 						FAULT(FAULT_SS,0)
@@ -2536,7 +2544,8 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				i386_load_protected_mode_segment(cpustate,&stack);
 				if(operand32 == 0)
 				{
-					if(i386_limit_check(cpustate,SS,REG16(SP)+9) != 0)
+					UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+					if(i386_limit_check(cpustate,SS,offset+9) != 0)
 					{
 						logerror("IRET: SP is past SS limit.\n");
 						FAULT(FAULT_SS,0)
@@ -2544,7 +2553,8 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 				else
 				{
-					if(i386_limit_check(cpustate,SS,REG32(ESP)+19) != 0)
+					UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+					if(i386_limit_check(cpustate,SS,offset+19) != 0)
 					{
 						logerror("IRET: ESP is past SS limit.\n");
 						FAULT(FAULT_SS,0)
