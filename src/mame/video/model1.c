@@ -1539,8 +1539,8 @@ SCREEN_UPDATE_RGB32(model1)
 
 SCREEN_VBLANK(model1)
 {
-	// on falling edge
-	if (!vblank_on)
+	// on rising edge
+	if (vblank_on)
 	{
 		tgp_scan(screen.machine());
 		end_frame(screen.machine());

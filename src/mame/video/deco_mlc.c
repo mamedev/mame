@@ -496,8 +496,8 @@ static void draw_sprites(running_machine& machine, bitmap_rgb32 &bitmap,const re
 
 SCREEN_VBLANK( mlc )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		deco_mlc_state *state = screen.machine().driver_data<deco_mlc_state>();
 		/* Spriteram is definitely double buffered, as the vram lookup tables

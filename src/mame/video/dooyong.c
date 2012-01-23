@@ -933,8 +933,8 @@ VIDEO_START( popbingo )
 
 SCREEN_VBLANK( dooyong )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
@@ -944,8 +944,8 @@ SCREEN_VBLANK( dooyong )
 
 SCREEN_VBLANK( rshark )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
