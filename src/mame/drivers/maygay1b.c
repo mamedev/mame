@@ -969,6 +969,16 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "supersleuth.p1", 0x000000, 0x080000, CRC(2417208f) SHA1(5c51bdcfa566aa8b2379d529441d37b2145864bb) )\
 	ROM_LOAD( "supersleuth.p2", 0x080000, 0x080000, CRC(892d3a4d) SHA1(bb585a9fda56f2f0859707973f771d60c5dfa080) )\
 
+#define m1_coderd_sound \
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )\
+	ROM_LOAD( "code_red.s1", 0x000000, 0x080000, CRC(616b939d) SHA1(1a94747efe430e508086fdb66da3f3e7daf7c4f3) )\
+	ROM_LOAD( "code_red.s2", 0x080000, 0x080000, CRC(bee44524) SHA1(dd3837559b375e1055e6aa6c984bfd88102a5825) )\
+
+#define m1_coro_sound \
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )\
+	ROM_LOAD( "digi0421.bin", 0x000000, 0x080000, CRC(9489c9cd) SHA1(1a858b2a6f41898bbf95611e9f13d668c8a05c9c) )\
+	ROM_LOAD( "digi0422.bin", 0x080000, 0x080000, CRC(cf17088e) SHA1(54c9a52ccdd1ca622367367e1304fe4e4037b0b9) )\
+
 ROM_START( m1albsq )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "sa5-056", 0x0000, 0x010000, CRC(6f3bc318) SHA1(6dbe6e02ca762a8ffaed9c89a0da5f6a10d829cc) )//4.1 Normal Token
@@ -1850,68 +1860,177 @@ ROM_END_M1A_MCU
 
 
 
-
-
-
-
-
-
-
-
-
-
 ROM_START( m1coderd )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "sc991130", 0x0000, 0x020000, CRC(d3add67f) SHA1(f7387978f18680921a2aff0296de2b9609f3215d) )
-
-	ROM_REGION( 0x20000, "altrevs", ROMREGION_ERASE00  )
-	ROM_LOAD( "sc991131", 0x0000, 0x020000, CRC(d5b90a02) SHA1(18a5642175ee330832ce95ac2fcb3a662cfe4273) )
-
-	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
-	ROM_LOAD( "code_red.s1", 0x000000, 0x080000, CRC(616b939d) SHA1(1a94747efe430e508086fdb66da3f3e7daf7c4f3) )
-	ROM_LOAD( "code_red.s2", 0x080000, 0x080000, CRC(bee44524) SHA1(dd3837559b375e1055e6aa6c984bfd88102a5825) )
+	ROM_LOAD( "sc991130", 0x0000, 0x020000, CRC(d3add67f) SHA1(f7387978f18680921a2aff0296de2b9609f3215d) )//ncr21
+	m1_coderd_sound
 ROM_END_M1A_MCU
 
+ROM_START( m1coderdp )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sc991131", 0x0000, 0x020000, CRC(d5b90a02) SHA1(18a5642175ee330832ce95ac2fcb3a662cfe4273) )//pcr21
+	m1_coderd_sound
+ROM_END_M1A_MCU
+
+
+
+//1996
 ROM_START( m1coro )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "cns58c", 0x0000, 0x010000, CRC(e254a369) SHA1(10c03b108f9fb9ffb16c4cf47fac74625d2e7877) )
+	ROM_LOAD( "sa6-192", 0x0000, 0x010000, CRC(5a4b0f17) SHA1(04ae2db3a29485672faaedd22c5780dd71176c96) )//CORO
+	m1_coro_sound
+ROM_END_M1A_MCU
 
-	ROM_REGION( 0x20000, "altrevs", ROMREGION_ERASE00  )
-	ROM_LOAD( "cns58t", 0x0000, 0x010000, CRC(1b2c1306) SHA1(7fa7c0238685dc2a91354ae47674247e95707613) )
-	ROM_LOAD( "coro2010", 0x0000, 0x010000, CRC(a7cfd3e9) SHA1(1b8fee6397d137cfae8bcd93b6a3b8e36b2716b8) )
-	ROM_LOAD( "cst5p5bin", 0x0000, 0x010000, CRC(0ab4535b) SHA1(fc334b9da2736f8d57adb76095df8e957fb7667d) )
-	ROM_LOAD( "sa4-450", 0x0000, 0x010000, CRC(355e10f4) SHA1(5de193ea05988e6eb1190cff357581671a87c82f) )
-	ROM_LOAD( "sa4-451", 0x0000, 0x010000, CRC(ddb68d12) SHA1(b399504a8a17129b88e9f95ab1942c7448e5fbb3) )
-	ROM_LOAD( "sa4-529", 0x0000, 0x010000, CRC(ca486f81) SHA1(001669f92d9d548854b3c2c9e9c5b7141c9d2b32) )
-	ROM_LOAD( "sa4-530", 0x0000, 0x010000, CRC(4ade92e9) SHA1(2d5d18cfab8ff5a5f5790168375548a56b6903b0) )
-	ROM_LOAD( "sa5-048", 0x0000, 0x010000, CRC(fbd5c2ae) SHA1(c05959664fcee7f3f05c6f81c1a98d2fc6b59141) )
-	ROM_LOAD( "sa5-049", 0x0000, 0x010000, CRC(133d5f48) SHA1(b4f89e5cf1d4ef60f73be18d372c38b22126e651) )
-	ROM_LOAD( "sa5-208.bin", 0x0000, 0x010000, CRC(66f06d18) SHA1(fd14b09280815c03126d113e6be791a20483aae9) )
-	ROM_LOAD( "sa5-209", 0x0000, 0x010000, CRC(8e18f0fe) SHA1(8d6c0fbd05484dc42b976228b7575e0ca0eea239) )
-	ROM_LOAD( "sa5-393", 0x0000, 0x010000, CRC(abbdfe46) SHA1(a6e005849b6da9801331155eb73fa169f6f42265) )
-	ROM_LOAD( "sa5-394", 0x0000, 0x010000, CRC(a7a5a6ff) SHA1(0805d3f1148e0aa83f8c0c804c08df3624a3af72) )
-	ROM_LOAD( "sa5-395", 0x0000, 0x010000, CRC(980a56ba) SHA1(372744f165e0105346c567013b0c8ddec2ec0f7d) )
-	ROM_LOAD( "sa5-396", 0x0000, 0x010000, CRC(2cb28869) SHA1(0dc78252b8e56a4b18342e5d1583ed4a0ea1db38) )
-	ROM_LOAD( "sa5-397", 0x0000, 0x010000, CRC(6b91fff5) SHA1(e29ae21bfd7d7e3139bfb65b60bd4bafcece5b24) )
-	ROM_LOAD( "sa5-399", 0x0000, 0x010000, CRC(0e290f63) SHA1(a5c8f2b125836ca76a7707d09d8e4a2f3058a9df) )
-	ROM_LOAD( "sa6-192", 0x0000, 0x010000, CRC(5a4b0f17) SHA1(04ae2db3a29485672faaedd22c5780dd71176c96) )
-	ROM_LOAD( "sa6-193", 0x0000, 0x010000, CRC(b2a392f1) SHA1(d7b908373eb3e225e399c36847ef2481ea3ad65a) )
+ROM_START( m1corop )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa6-193", 0x0000, 0x010000, CRC(b2a392f1) SHA1(d7b908373eb3e225e399c36847ef2481ea3ad65a) )//PCORO
+	m1_coro_sound
+ROM_END_M1A_MCU
 
-	ROM_LOAD( "cns5.10", 0x0000, 0x010000, CRC(91dc8625) SHA1(525c4311355bb3aa3052160bc439c49f5cecbcc6) )
-	ROM_LOAD( "cnst5.5v2", 0x0000, 0x010000, CRC(a5b2589e) SHA1(cabd5abf996c1bb9ca7a0ffcc5d666aa632f6789) )
-	ROM_LOAD( "sa5-306", 0x0000, 0x010000, CRC(a94a8f48) SHA1(56d5723d8087f523061280d9afe15a1bf8b269f5) )
-	ROM_LOAD( "sa5-307", 0x0000, 0x010000, CRC(41a212ae) SHA1(463a7d93f3b8b073cb83bda2a957dab37070ba8b) )
-	ROM_LOAD( "sa5-447", 0x0000, 0x010000, CRC(5b292c6e) SHA1(584a5d64ee47054870785222f85a58a721165530) )
-	ROM_LOAD( "sa5-448", 0x0000, 0x010000, CRC(e0e481c3) SHA1(062b8f58a7d9fa9163fd98892a6cc8099d4d234c) )
-	ROM_LOAD( "sa6-049", 0x0000, 0x010000, CRC(dfa086ae) SHA1(c5fa5d435a603851ab6bbe5860ee38e41aea814e) )
+//1995
+ROM_START( m1coro32g )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa6-049", 0x0000, 0x010000, CRC(dfa086ae) SHA1(c5fa5d435a603851ab6bbe5860ee38e41aea814e) )//3.2 G?
+	m1_coro_sound
+ROM_END_M1A_MCU
 
-	// BWB Set
-	ROM_LOAD( "cs______.1_1", 0x0000, 0x010000, CRC(5b292c6e) SHA1(584a5d64ee47054870785222f85a58a721165530) )
+ROM_START( m1coro32gh )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "cns58c", 0x0000, 0x010000, CRC(e254a369) SHA1(10c03b108f9fb9ffb16c4cf47fac74625d2e7877) )//sa6-049 alt 3.2
+	m1_coro_sound
+ROM_END_M1A_MCU
 
+ROM_START( m1coro12a )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "cns58t", 0x0000, 0x010000, CRC(1b2c1306) SHA1(7fa7c0238685dc2a91354ae47674247e95707613) )//1.2 sa5-447 alt
+	m1_coro_sound
+ROM_END_M1A_MCU
 
-	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00  )
-	ROM_LOAD( "digi0421.bin", 0x000000, 0x080000, CRC(9489c9cd) SHA1(1a858b2a6f41898bbf95611e9f13d668c8a05c9c) )
-	ROM_LOAD( "digi0422.bin", 0x080000, 0x080000, CRC(cf17088e) SHA1(54c9a52ccdd1ca622367367e1304fe4e4037b0b9) )
+ROM_START( m1coro12g )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-447", 0x0000, 0x010000, CRC(5b292c6e) SHA1(584a5d64ee47054870785222f85a58a721165530) )//1.2 Gala? BwB labelled
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro12gp )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-448", 0x0000, 0x010000, CRC(e0e481c3) SHA1(062b8f58a7d9fa9163fd98892a6cc8099d4d234c) )//1.2 Gala? protocol
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro10h1 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "cns5.10", 0x0000, 0x010000, CRC(91dc8625) SHA1(525c4311355bb3aa3052160bc439c49f5cecbcc6) )//1.0 G hack
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro10h2 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "cst5p5bin", 0x0000, 0x010000, CRC(0ab4535b) SHA1(fc334b9da2736f8d57adb76095df8e957fb7667d) )//1.0 hack 5p 5GBP
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro10h3 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "cnst5.5v2", 0x0000, 0x010000, CRC(a5b2589e) SHA1(cabd5abf996c1bb9ca7a0ffcc5d666aa632f6789) )//1.0 Gala hack 2
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+//1993
+ROM_START( m1coro81 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-048", 0x0000, 0x010000, CRC(fbd5c2ae) SHA1(c05959664fcee7f3f05c6f81c1a98d2fc6b59141) )//8.1
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro81p )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-049", 0x0000, 0x010000, CRC(133d5f48) SHA1(b4f89e5cf1d4ef60f73be18d372c38b22126e651) )//8.1 Protocol
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro32n )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-399", 0x0000, 0x010000, CRC(0e290f63) SHA1(a5c8f2b125836ca76a7707d09d8e4a2f3058a9df) )//3.2 newer
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro32np )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-397", 0x0000, 0x010000, CRC(6b91fff5) SHA1(e29ae21bfd7d7e3139bfb65b60bd4bafcece5b24) )//3.2 newer protocol (Poss mislabel)
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro22n )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-395", 0x0000, 0x010000, CRC(980a56ba) SHA1(372744f165e0105346c567013b0c8ddec2ec0f7d) )//2.2 newer
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro21n )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-208", 0x0000, 0x010000, CRC(66f06d18) SHA1(fd14b09280815c03126d113e6be791a20483aae9) )//2.1 newer
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro21np )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-209", 0x0000, 0x010000, CRC(8e18f0fe) SHA1(8d6c0fbd05484dc42b976228b7575e0ca0eea239) )//2.1 newer protocol
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro12n )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-393", 0x0000, 0x010000, CRC(abbdfe46) SHA1(a6e005849b6da9801331155eb73fa169f6f42265) )//1.2 newer
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro12np )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-394", 0x0000, 0x010000, CRC(a7a5a6ff) SHA1(0805d3f1148e0aa83f8c0c804c08df3624a3af72) )//1.2 newer protocol
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro11n )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-306", 0x0000, 0x010000, CRC(a94a8f48) SHA1(56d5723d8087f523061280d9afe15a1bf8b269f5) )//1.1 newer
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro11np )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa5-307", 0x0000, 0x010000, CRC(41a212ae) SHA1(463a7d93f3b8b073cb83bda2a957dab37070ba8b) )//1.1 newer protocol
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro31 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa4-450", 0x0000, 0x010000, CRC(355e10f4) SHA1(5de193ea05988e6eb1190cff357581671a87c82f) )//3.1 Normal
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro31p )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa4-451", 0x0000, 0x010000, CRC(ddb68d12) SHA1(b399504a8a17129b88e9f95ab1942c7448e5fbb3) )//3.1 Protocol
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro30h )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "coro2010", 0x0000, 0x010000, CRC(a7cfd3e9) SHA1(1b8fee6397d137cfae8bcd93b6a3b8e36b2716b8) )//sa5-399 hack 20GBP?
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro21v )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa4-529", 0x0000, 0x010000, CRC(ca486f81) SHA1(001669f92d9d548854b3c2c9e9c5b7141c9d2b32) )//2.1 Multivend
+	m1_coro_sound
+ROM_END_M1A_MCU
+
+ROM_START( m1coro21vp )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "sa4-530", 0x0000, 0x010000, CRC(4ade92e9) SHA1(2d5d18cfab8ff5a5f5790168375548a56b6903b0) )//2.1 Multivend Protocol
+	m1_coro_sound
 ROM_END_M1A_MCU
 
 ROM_START( m1cororr )
@@ -4031,8 +4150,36 @@ GAME( 1996, m1cluessrp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth
 GAME( 1996, m1cluesss	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1? (Older, alternate) (M1A/B)",GAME_FLAGS )
 GAME( 1996, m1cluesssp	,m1cluess	,m1,m1,m1, ROT0, "Maygay", "Cluedo Super Sleuth (Maygay) v4.1? (Older, alternate) (Protocol) (M1A/B)",GAME_FLAGS )
 
-GAME( 199?, m1coderd	,0			,m1,m1,m1, ROT0, "Maygay", "Code Red Club (Maygay) (M1A/B)",GAME_FLAGS )
-GAME( 199?, m1coro		,0			,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1coderd	,0			,m1,m1,m1, ROT0, "Maygay", "Code Red Club (Maygay) v2.1 (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1coderdp	,m1coderd	,m1,m1,m1, ROT0, "Maygay", "Code Red Club (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS )
+
+GAME( 1996, m1coro		,0			,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1corop		,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1coro32g	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer, G?) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1coro32gh	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer, G?) (Hack) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1coro12g	,m1coro		,m1,m1,m1, ROT0, "Maygay/BwB?", "Coronation Street (Maygay) v1.2 (Newer, G?) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1coro12gp	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer, G?) (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1coro12a	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer, G?) (Alternate) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1coro10h1	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.0 (Hack 1) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1coro10h2	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.0 (Hack 2) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1coro10h3	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.0 (Hack 3) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro81	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v8.1 (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro81p	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v8.1 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro32n	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer)	(M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro32np	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.2 (Newer)	(Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro22n	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.2 (Newer)	(M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro21n	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Newer)	(M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro21np	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Newer)	(Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro12n	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer)	(M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro12np	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.2 (Newer)	(Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro11n	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.1 (Newer)	(M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro11np	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v1.1 (Newer)	(Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro31	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.1 (Older) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro31p	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.1 (Older)	(Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro30h	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v3.0 (Hack) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro21v	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Multivend) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coro21vp	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Multivend) (Protocol)(M1A/B)",GAME_FLAGS )
+
 GAME( 199?, m1cororr	,0			,m1,m1,m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (M1A/B)",GAME_FLAGS )
 GAME( 199?, m1corocb	,0			,m1,m1,m1, ROT0, "Maygay", "Coronation Street Club (Maygay) (M1A/B)",GAME_FLAGS )
 GAME( 199?, m1corosh	,0			,m1,m1,m1, ROT0, "Maygay", "Coronation Street Showcase (Maygay) (M1A/B)",GAME_FLAGS )
