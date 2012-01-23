@@ -156,8 +156,8 @@ static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x9C000018, 0x9C00001b) AM_WRITE8( n3d_flash_addr_w, 0xffffffff)
 
 	// lots of accesses in this range
-	AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE( nexus3d_unk2_r, nexus3d_unk2_w ) // often
-	AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE( nexus3d_unk3_r, nexus3d_unk3_w ) // often
+//	AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE( nexus3d_unk2_r, nexus3d_unk2_w ) // often
+//	AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE( nexus3d_unk3_r, nexus3d_unk3_w ) // often
 
 	AM_RANGE(0xE0000014, 0xE0000017) AM_READ( nexus3d_unk_r ) // sits waiting for this
 
@@ -205,7 +205,7 @@ static MACHINE_CONFIG_START( nexus3d, nexus3d_state )
 MACHINE_CONFIG_END
 
 
-// The u1 flash on this is clearly recycled from a Happy Fish or Blue Elf multigame.
+// The u1 flash on achertf is clearly recycled from a Happy Fish or Blue Elf multigame.
 // Around 75% of the rom is NeoGeo, CPS2, Semicom etc. MAME romsets used by said multigame bootlegs
 // which explains why the 1Gb flash rom hardly compresses, it's already compressed data.
 //
@@ -215,9 +215,32 @@ MACHINE_CONFIG_END
 //
 // It's possible this set should be marked as a bootleg due to this although I imagine the actual valid
 // part of the data will match a clean dump.
+//
+// also the types of flash used on both these should probably be double the size they are, I believe this
+// to be a software bug with the tools used to read them, hence the weird 0x898 bytes appended to
+// the end..  this was at least the case with the actual Happy Fish roms.  In this case it shouldn't
+// matter because all the data needed by the game is in the first part of the ROM.
+
+
+ROM_START( acheart )
+	ROM_REGION( 0x42000898, "user1", 0 ) /* ARM 32 bit code */
+	ROM_LOAD( "arcanaheart.u1",     0x000000, 0x42000898, BAD_DUMP CRC(53b7b482) SHA1(28799f8e332966f81fa501ead678d21e3e1c9e2c) )
+
+	ROM_REGION( 0x200000, "user2", 0 ) // QDSP stuff
+	ROM_LOAD( "u38.bin",     0x000000, 0x200000, CRC(29ecfba3) SHA1(ab02c7a579a3c05a19b79e42342fd5ed84c7b046) )
+	ROM_LOAD( "u39.bin",     0x000000, 0x200000, CRC(eef0b1ee) SHA1(5508e6b2f0ae1555662793313a05e94a87599890) )
+	ROM_LOAD( "u44.bin",     0x000000, 0x200000, CRC(b9723bdf) SHA1(769090ada7375ecb3d0bc10e89fe74a8e89129f2) )
+	ROM_LOAD( "u45.bin",     0x000000, 0x200000, CRC(1c6a3169) SHA1(34a2ca00a403dc1e3909ed1c55320cf2bbd9d49e) )
+	ROM_LOAD( "u46.bin",     0x000000, 0x200000, CRC(1e8a7e73) SHA1(3270bc359b266e57debf8fd4283a46e08d679ae2) )
+
+	ROM_REGION( 0x080000, "wavetable", ROMREGION_ERASEFF ) /* QDSP wavetable rom */
+//  ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) // missing from this set, but should be the same
+ROM_END
+
+
 ROM_START( acheartf )
 	ROM_REGION( 0x42000898, "user1", 0 ) /* ARM 32 bit code */
-	ROM_LOAD( "arcana_heart_full.u1",     0x000000, 0x42000898, CRC(1a171ca3) SHA1(774f3b8d5fb366901d819b5dc15ca49b0cd177b9) )
+	ROM_LOAD( "arcana_heart_full.u1",     0x000000, 0x42000898, BAD_DUMP CRC(1a171ca3) SHA1(774f3b8d5fb366901d819b5dc15ca49b0cd177b9) )
 
 	ROM_REGION( 0x200000, "user2", 0 ) // QDSP stuff
 	ROM_LOAD( "u38.bin",     0x000000, 0x200000, CRC(29ecfba3) SHA1(ab02c7a579a3c05a19b79e42342fd5ed84c7b046) )
@@ -238,4 +261,5 @@ static DRIVER_INIT( nexus3d )
 	state->m_flash_region = machine.region("user1")->base();
 }
 
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d, ROT0, "Examu", "Arcana Heart",GAME_IS_SKELETON )
 GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d, ROT0, "Examu", "Arcana Heart Full",GAME_IS_SKELETON )
