@@ -2389,6 +2389,11 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
                 FAULT(FAULT_GP,0);
             }
             */
+			if(CPL != 0)
+			{
+				UINT32 oldflags = get_flags(cpustate);
+				newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+			}
 			set_flags(cpustate,newflags);
 			cpustate->eip = POP32(cpustate) & 0xffff;  // high 16 bits are ignored
 			cpustate->sreg[CS].selector = POP32(cpustate) & 0xffff;
@@ -2513,7 +2518,14 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				if(newEIP > desc.limit)
 				{
 					logerror("IRET: Return EIP is past return CS limit.\n");
-					FAULT(FAULT_GP,0)				}
+					FAULT(FAULT_GP,0)
+				}
+
+				if(CPL != 0)
+				{
+					UINT32 oldflags = get_flags(cpustate);
+					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+				}
 
 				if(operand32 == 0)
 				{
@@ -2667,6 +2679,13 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 //                  REG16(SP) += 10;
 //              else
 //                  REG32(ESP) += 20;
+
+				// IOPL can only change if CPL is zero
+				if(CPL != 0)
+				{
+					UINT32 oldflags = get_flags(cpustate);
+					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+				}
 
 				if(operand32 == 0)
 				{
