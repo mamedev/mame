@@ -1134,7 +1134,6 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 #ifdef MAME_DEBUG
 	if (m_scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		screen_device *screen = device->machine().primary_screen;
 		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, m_scanline, m_screen->vpos(), m_screen->hpos());
 	}
 #endif
