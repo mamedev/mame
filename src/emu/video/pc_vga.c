@@ -22,7 +22,8 @@
     - add emulated mc6845 hook-up
     - fix video update.
 	- rewrite video drawing functions (they are horrible)
-	- add emulated CGA
+	- fix RAM read/writes, CGA and Mono has video bugs due of corrupted vga.memory
+	- fix emulated CGA and Mono modes
 	- add VESA etc.
     - (and many more ...)
 
@@ -255,7 +256,11 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 						pen = vga.pens[attr & 0x0f];
 					else
 						pen = vga.pens[attr >> 4];
+
+					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
+						continue;
 					bitmapline[column*width+w] = pen;
+
 				}
 				if (w<width)
 				{
@@ -264,6 +269,9 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 						pen = vga.pens[attr & 0x0f];
 					else
 						pen = vga.pens[attr >> 4];
+
+					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
+						continue;
 					bitmapline[column*width+w] = pen;
 				}
 			}
@@ -274,6 +282,8 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 					 (h<=CRTC_CURSOR_BOTTOM)&&(h<height)&&(line+h<TEXT_LINES);
 					 h++)
 				{
+					if(!machine.primary_screen->visible_area().contains(column*width, line+h))
+						continue;
 					bitmap.plot_box(column*width, line+h, width, 1, vga.pens[attr&0xf]);
 				}
 			}
@@ -293,9 +303,6 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 	{
 		for(yi=0;yi<height;yi++)
 		{
-			if(!machine.primary_screen->visible_area().contains(0, line + yi))
-				return;
-
 			bitmapline = &bitmap.pix32(line + yi);
 
 			for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+4)&0x3ffff)
@@ -310,6 +317,8 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 				for (i = 7; i >= 0; i--)
 				{
 					pen = vga.pens[(data[0]&1) | (data[1]&2) | (data[2]&4) | (data[3]&8)];
+					if(!machine.primary_screen->visible_area().contains(c+i, line + yi))
+						continue;
 					bitmapline[c+i] = pen;
 
 					data[0]>>=1;
@@ -356,6 +365,8 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					for(xi=0;xi<0x10;xi++)
 					{
 						xi_h = ((xi & 6) >> 1) | ((xi & 8) << 1);
+						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+							continue;
 						bitmapline[c+xi] = machine.pens[vga.memory[pos+xi_h]];
 					}
 				}
@@ -382,6 +393,8 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					for(xi=0;xi<0x10;xi++)
 					{
 						xi_h = (xi & 0xe) >> 1;
+						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+							continue;
 						bitmapline[c+xi] = machine.pens[vga.memory[pos+xi_h]];
 					}
 				}
@@ -389,6 +402,106 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 		}
 	}
 }
+
+static void vga_vh_cga(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	UINT32 *bitmapline;
+	//int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int x,y,yi;
+	UINT32 addr;
+	pen_t pen;
+
+	addr = 0;
+
+	for(y=0;y<200;y++)
+	{
+		//addr = (y) * test;
+
+		for(x=0;x<640;x+=16)
+		{
+			for(yi=0;yi<1;yi++)
+			{
+				bitmapline = &bitmap.pix32(y + yi);
+
+				/* TODO: debug dirty assignment */
+				{
+					pen = vga.pens[(vga.memory[addr] >> (6)) & 3];
+					bitmapline[x+0] = pen;
+					pen = vga.pens[(vga.memory[addr] >> (4)) & 3];
+					bitmapline[x+1] = pen;
+					pen = vga.pens[(vga.memory[addr] >> (2)) & 3];
+					bitmapline[x+2] = pen;
+					pen = vga.pens[(vga.memory[addr] >> (0)) & 3];
+					bitmapline[x+3] = pen;
+					pen = vga.pens[(vga.memory[addr+0x4000] >> (6)) & 3];
+					bitmapline[x+4] = pen;
+					pen = vga.pens[(vga.memory[addr+0x4000] >> (4)) & 3];
+					bitmapline[x+5] = pen;
+					pen = vga.pens[(vga.memory[addr+0x4000] >> (2)) & 3];
+					bitmapline[x+6] = pen;
+					pen = vga.pens[(vga.memory[addr+0x4000] >> (0)) & 3];
+					bitmapline[x+7] = pen;
+					pen = vga.pens[(vga.memory[addr+1] >> (6)) & 3];
+					bitmapline[x+8] = pen;
+					pen = vga.pens[(vga.memory[addr+1] >> (4)) & 3];
+					bitmapline[x+9] = pen;
+					pen = vga.pens[(vga.memory[addr+1] >> (2)) & 3];
+					bitmapline[x+10] = pen;
+					pen = vga.pens[(vga.memory[addr+1] >> (0)) & 3];
+					bitmapline[x+11] = pen;
+					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (6)) & 3];
+					bitmapline[x+12] = pen;
+					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (4)) & 3];
+					bitmapline[x+13] = pen;
+					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (2)) & 3];
+					bitmapline[x+14] = pen;
+					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (0)) & 3];
+					bitmapline[x+15] = pen;
+				}
+			}
+
+			//popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",vga.memory[0],vga.memory[1],vga.memory[2],vga.memory[3],vga.memory[4],vga.memory[5],vga.memory[6],vga.memory[7]);
+
+			addr+=2;
+		}
+	}
+}
+
+static void vga_vh_mono(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	UINT32 *bitmapline;
+	//int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int x,xi,y,yi;
+	UINT32 addr;
+	pen_t pen;
+
+	addr = 0;
+
+	for(y=0;y<200;y++)
+	{
+		//addr = (y) * test;
+
+		for(x=0;x<640;x+=8)
+		{
+			for(yi=0;yi<1;yi++)
+			{
+				bitmapline = &bitmap.pix32(y + yi);
+
+				for(xi=0;xi<8;xi++)
+				{
+					pen = vga.pens[(vga.memory[addr] >> (xi)) & 1];
+					bitmapline[x+xi] = pen;
+				}
+			}
+
+			//popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",vga.memory[0],vga.memory[1],vga.memory[2],vga.memory[3],vga.memory[4],vga.memory[5],vga.memory[6],vga.memory[7]);
+
+			addr++;
+		}
+	}
+}
+
+
 
 static UINT8 pc_vga_choosevideomode(running_machine &machine)
 {
@@ -426,7 +539,7 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 
 		if (vga.svga_intf.choosevideomode)
 		{
-			return 4;
+			return 6;
 		}
 		else if (!GRAPHIC_MODE)
 		{
@@ -445,12 +558,20 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 			//*width = VGA_COLUMNS * 8;
 			return 2;
 		}
+		else if (vga.gc.data[5]&0x20)
+		{
+			return 3;
+		}
+		else if ((vga.gc.data[6]&0x0c) == 0x0c)
+		{
+			return 4;
+		}
 		else
 		{
 			//proc = vga_vh_ega;
 			//*height = LINES;
 			//*width = EGA_COLUMNS * 8;
-			return 3;
+			return 5;
 		}
 	}
 
@@ -471,8 +592,10 @@ SCREEN_UPDATE_RGB32( pc_video )
 		case 0: bitmap.fill(get_black_pen(screen.machine()), cliprect);break;
 		case 1: vga_vh_text(screen.machine(), bitmap, cliprect); break;
 		case 2: vga_vh_vga (screen.machine(), bitmap, cliprect); break;
-		case 3: vga_vh_ega (screen.machine(), bitmap, cliprect); break;
-		case 4: vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
+		case 3: vga_vh_cga (screen.machine(), bitmap, cliprect); break;
+		case 4: vga_vh_mono(screen.machine(), bitmap, cliprect); break;
+		case 5: vga_vh_ega (screen.machine(), bitmap, cliprect); break;
+		case 6: vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
 	}
 
 	return 0;
@@ -725,6 +848,10 @@ static void recompute_params(running_machine &machine)
 	int pixel_clock;
 
 	hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
+
+	/* safety check */
+	if(!vga.crtc.horz_disp_end || !vga.crtc.vert_disp_end || !vga.crtc.horz_total || !vga.crtc.vert_total)
+		return;
 
 	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * hclock_m)-1, 0, vga.crtc.vert_disp_end);
 
@@ -1247,10 +1374,6 @@ void pc_vga_reset(running_machine &machine)
 
 	/* TODO: real defaults */
 	vga.crtc.line_compare = 0x3ff;
-	vga.crtc.horz_total = 0xff;
-	vga.crtc.vert_total = 0xff;
-	vga.crtc.horz_disp_end = 0xff;
-	vga.crtc.vert_disp_end = 0x3ff;
 }
 
 void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf)
