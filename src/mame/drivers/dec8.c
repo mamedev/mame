@@ -2065,7 +2065,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM | VIDEO_UPDATE_AFTER_VBLANK)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
@@ -2217,7 +2217,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM | VIDEO_UPDATE_AFTER_VBLANK)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
