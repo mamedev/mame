@@ -32,12 +32,18 @@ public:
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_image_device();
 
+	virtual void handled_variants(UINT32 *variants, int &var_count) const = 0;
+
 	void set_formats(const floppy_format_type *formats);
+	floppy_image_format_t *get_formats() const;
+	floppy_image_format_t *get_load_format() const;
+	floppy_image_format_t *identify(astring filename) const;
 	void set_rpm(float rpm);
 
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
+	virtual bool call_create(int format_type, option_resolution *format_options);
 	virtual void call_display_info() {}
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
@@ -50,6 +56,7 @@ public:
 	virtual bool is_reset_on_load() const { return false; }
 	virtual const char *file_extensions() const { return extension_list; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
+	void setup_write(floppy_image_format_t *output_format);
 
 	void setup_load_cb(load_cb cb);
 	void setup_unload_cb(unload_cb cb);
@@ -79,6 +86,8 @@ public:
 	UINT32 get_form_factor() const;
 	UINT32 get_variant() const;
 
+	virtual ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -89,6 +98,8 @@ protected:
 	virtual void setup_characteristics() = 0;
 
 	image_device_format   format;
+	floppy_image_format_t *input_format;
+	floppy_image_format_t *output_format;
 	floppy_image		  *image;
 	char				  extension_list[256];
 	floppy_image_format_t *fif_list;
@@ -119,6 +130,8 @@ protected:
 	UINT32 revolution_count;
 	int cyl;
 
+	bool image_dirty;
+
 	load_cb cur_load_cb;
 	unload_cb cur_unload_cb;
 	index_pulse_cb cur_index_pulse_cb;
@@ -126,12 +139,42 @@ protected:
 	UINT32 find_position(attotime &base, attotime when);
 	int find_index(UINT32 position, const UINT32 *buf, int buf_size);
 	void write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg);
+	void commit_image();
+};
+
+class ui_menu_control_floppy_image : public ui_menu_control_device_image {
+public:
+	ui_menu_control_floppy_image(running_machine &machine, render_container *container, device_image_interface *image);
+	virtual ~ui_menu_control_floppy_image();
+
+	virtual void handle();
+
+protected:
+	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_RW };
+
+	floppy_image_format_t **format_array;
+	floppy_image_format_t *input_format, *output_format;
+	astring input_filename, output_filename;
+
+	void do_load_create();
+	virtual void hook_load(astring filename, bool softlist);
 };
 
 class floppy_35_dd : public floppy_image_device {
 public:
 	floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_35_dd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+
+protected:
+	virtual void setup_characteristics();
+};
+
+class floppy_35_dd_nosd : public floppy_image_device {
+public:
+	floppy_35_dd_nosd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_35_dd_nosd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
 
 protected:
 	virtual void setup_characteristics();
@@ -141,6 +184,7 @@ class floppy_35_hd : public floppy_image_device {
 public:
 	floppy_35_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_35_hd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
 
 protected:
 	virtual void setup_characteristics();
@@ -150,6 +194,7 @@ class floppy_35_ed : public floppy_image_device {
 public:
 	floppy_35_ed(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_35_ed();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
 
 protected:
 	virtual void setup_characteristics();
@@ -159,6 +204,7 @@ class floppy_525_dd : public floppy_image_device {
 public:
 	floppy_525_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_525_dd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
 
 protected:
 	virtual void setup_characteristics();
@@ -186,6 +232,7 @@ private:
 // device type definition
 extern const device_type FLOPPY_CONNECTOR;
 extern const device_type FLOPPY_35_DD;
+extern const device_type FLOPPY_35_DD_NOSD;
 extern const device_type FLOPPY_35_HD;
 extern const device_type FLOPPY_35_ED;
 extern const device_type FLOPPY_525_DD;

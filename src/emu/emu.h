@@ -88,6 +88,9 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "ioport.h"
 #include "output.h"
 
+// diimage requires uimenu
+#include "uimenu.h"
+
 // devices and callbacks
 #include "device.h"
 #include "distate.h"

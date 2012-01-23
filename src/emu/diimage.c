@@ -649,6 +649,60 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
     return err;
 }
 
+int device_image_interface::reopen_for_write(const char *path)
+{
+	if(m_file)
+		core_fclose(m_file);
+
+    file_error filerr = FILERR_NOT_FOUND;
+    image_error_t err = IMAGE_ERROR_FILENOTFOUND;
+    astring revised_path;
+
+    /* attempt to open the file for writing*/
+    filerr = zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
+
+    /* did the open succeed? */
+    switch(filerr)
+    {
+        case FILERR_NONE:
+            /* success! */
+            m_readonly = 0;
+            m_created = 1;
+            err = IMAGE_ERROR_SUCCESS;
+            break;
+
+        case FILERR_NOT_FOUND:
+        case FILERR_ACCESS_DENIED:
+            /* file not found (or otherwise cannot open); continue */
+            err = IMAGE_ERROR_FILENOTFOUND;
+            break;
+
+        case FILERR_OUT_OF_MEMORY:
+            /* out of memory */
+            err = IMAGE_ERROR_OUTOFMEMORY;
+            break;
+
+        case FILERR_ALREADY_OPEN:
+            /* this shouldn't happen */
+            err = IMAGE_ERROR_ALREADYOPEN;
+            break;
+
+        case FILERR_FAILURE:
+        case FILERR_TOO_MANY_FILES:
+        case FILERR_INVALID_DATA:
+        default:
+            /* other errors */
+            err = IMAGE_ERROR_INTERNAL;
+            break;
+    }
+
+    /* if successful, set the file name */
+    if (filerr == FILERR_NONE)
+        set_image_filename(revised_path);
+
+    return err;
+}
+
 /*-------------------------------------------------
     determine_open_plan - determines which open
     flags to use, and in what order
@@ -1040,35 +1094,6 @@ void device_image_interface::update_names()
     for ui-level image selection
 -------------------------------------------------*/
 
-class ui_menu_control_device_image : public ui_menu {
-public:
-	ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *image);
-	virtual ~ui_menu_control_device_image();
-	virtual void populate();
-	virtual void handle();
-
-private:
-	enum {
-		START_FILE, START_OTHER_PART, START_SOFTLIST, SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, DO_CREATE, SELECT_SOFTLIST
-	};
-	int state;
-
-	device_image_interface *image;
-	astring current_directory;
-	astring current_file;
-	int submenu_result;
-	bool create_confirmed;
-	bool softlist_done;
-	const software_list *swl;
-	const software_info *swi;
-	const software_part *swp;
-	const software_list_config *slc;
-	astring software_info_name;
-
-	void test_create(bool &can_create, bool &need_confirm);
-	void load_software_part();
-};
-
 ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
 {
 	return auto_alloc_clear(machine, ui_menu_control_device_image(machine, container, this));
@@ -1128,8 +1153,6 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 	/* does a file or a directory exist at the path */
 	entry = osd_stat(path);
 	file_type = (entry != NULL) ? entry->type : ENTTYPE_NONE;
-	if (entry != NULL)
-		free(entry);
 
 	switch(file_type)
 	{
@@ -1165,7 +1188,13 @@ void ui_menu_control_device_image::load_software_part()
 	astring temp_name(swi->shortname);
 	temp_name.cat(":");
 	temp_name.cat(swp->name);
-	image->load(temp_name.cstr());
+	hook_load(temp_name, true);
+}
+
+void ui_menu_control_device_image::hook_load(astring name, bool softlist)
+{
+	image->load(name);
+	ui_menu::stack_pop(machine());
 }
 
 void ui_menu_control_device_image::populate()
@@ -1249,7 +1278,6 @@ void ui_menu_control_device_image::handle()
 		switch(submenu_result) {
 		case ui_menu_software_parts::T_ENTRY: {
 			load_software_part();
-			ui_menu::stack_pop(machine());
 			break;
 		}
 
@@ -1273,8 +1301,7 @@ void ui_menu_control_device_image::handle()
 			break;
 
 		case ui_menu_file_selector::R_FILE:
-			image->load(current_file);
-			ui_menu::stack_pop(machine());
+			hook_load(current_file, false);
 			break;
 
 		case ui_menu_file_selector::R_CREATE:
@@ -1301,12 +1328,8 @@ void ui_menu_control_device_image::handle()
 				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_confirm_save_as(machine(), container, &create_confirmed)));
 				state = CREATE_CONFIRM;
 			} else {
-				astring path;
-				zippath_combine(path, current_directory, current_file);
-				int err = image->create(path, 0, NULL);
-				if (err != 0)
-					popmessage("Error: %s", image->error());
-				ui_menu::stack_pop(machine());
+				state = DO_CREATE;
+				handle();
 			}
 		} else {
 			state = START_FILE;

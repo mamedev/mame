@@ -1008,6 +1008,18 @@ void floppy_image::ensure_alloc(int track, int head)
 	}
 }
 
+const char *floppy_image::get_variant_name(UINT32 form_factor, UINT32 variant)
+{
+	switch(variant) {
+	case SSSD: return "Single side, single density";
+	case SSDD: return "Single side, double density";
+	case DSDD: return "Double side, double density";
+	case DSHD: return "Double side, high density";
+	case DSED: return "Double side, extended density";
+	}
+	return "Unknown";
+}
+
 floppy_image_format_t::floppy_image_format_t()
 {
 	next = 0;
@@ -1027,6 +1039,27 @@ void floppy_image_format_t::append(floppy_image_format_t *_next)
 
 bool floppy_image_format_t::save(io_generic *, floppy_image *)
 {
+	return false;
+}
+
+bool floppy_image_format_t::extension_matches(const char *file_name) const
+{
+	const char *ext = strrchr(file_name, '.');
+	if(!ext)
+		return false;
+	ext++;
+	int elen = strlen(ext);
+	const char *rext = extensions();
+	for(;;) {
+		const char *next = strchr(rext, ',');
+		int rlen = next ? next - rext : strlen(rext);
+		if(rlen == elen && !memcmp(ext, rext, rlen))
+			return true;
+		if(next)
+			rext = next+1;
+		else
+			break;			
+	}
 	return false;
 }
 
@@ -2178,6 +2211,11 @@ void floppy_image_format_t::get_geometry_mfm_pc(floppy_image *image, int cell_si
 {
 	image->get_actual_geometry(track_count, head_count);
 
+	if(!track_count) {
+		sector_count = 0;
+		return;
+	}
+
 	UINT8 bitstream[500000/8];
 	UINT8 sectdata[50000];
 	desc_xs sectors[256];
@@ -2190,7 +2228,7 @@ void floppy_image_format_t::get_geometry_mfm_pc(floppy_image *image, int cell_si
 	// 0-10, not near the end like 70+, no special effects on sync
 	// like 33
 
-	generate_bitstream_from_track(20, 0, cell_size, bitstream, track_size, image);
+	generate_bitstream_from_track(track_count > 20 ? 20 : 0, 0, cell_size, bitstream, track_size, image);
 	extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
 
 	for(sector_count = 44; sector_count > 0 && !sectors[sector_count].data; sector_count--);

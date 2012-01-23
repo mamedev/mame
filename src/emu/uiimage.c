@@ -25,6 +25,7 @@
 #include "uiimage.h"
 #include "zippath.h"
 #include "unicode.h"
+#include "imagedev/floppy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
 
@@ -521,9 +522,6 @@ void ui_menu_file_selector::populate()
 	const char *volume_name;
 	const char *path = current_directory;
 
-	if(path[0])
-		fprintf(stderr, "curdir=%s\n", path);
-
 	/* open the directory */
 	err = zippath_opendir(path, &directory);
 	if (err != FILERR_NONE)
@@ -875,6 +873,86 @@ void ui_menu_image_info::handle()
 {
 	/* process the menu */
 	process(0);
+}
+
+/*-------------------------------------------------
+    ui_menu_select_format - floppy image format
+    selection menu
+-------------------------------------------------*/
+
+ui_menu_select_format::ui_menu_select_format(running_machine &machine, render_container *container,
+											 floppy_image_format_t **_formats, int _ext_match, int _total_usable, int *_result)
+	: ui_menu(machine, container)
+{
+	formats = _formats;
+	ext_match = _ext_match;
+	total_usable = _total_usable;
+	result = _result;
+}
+
+void ui_menu_select_format::populate()
+{
+	item_append("Select image format", NULL, MENU_FLAG_DISABLE, NULL);
+	for(int i=0; i<total_usable; i++) {
+		const floppy_image_format_t *fmt = formats[i];
+
+		if(i && i == ext_match)
+			item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+		item_append(fmt->description(), fmt->name(), 0, (void *)i);
+	}
+}
+
+ui_menu_select_format::~ui_menu_select_format()
+{
+}
+
+void ui_menu_select_format::handle()
+{
+	/* process the menu */
+	const ui_menu_event *event = process(0);
+	if (event != NULL && event->iptkey == IPT_UI_SELECT)
+	{
+		*result = int(FPTR(event->itemref));
+		ui_menu::stack_pop(machine());
+	}
+}
+
+/*-------------------------------------------------
+    ui_menu_select_rw - floppy read/write
+    selection menu
+-------------------------------------------------*/
+
+ui_menu_select_rw::ui_menu_select_rw(running_machine &machine, render_container *container,
+									 bool _can_in_place, int *_result)
+	: ui_menu(machine, container)
+{
+	can_in_place = _can_in_place;
+	result = _result;
+}
+
+void ui_menu_select_rw::populate()
+{
+	item_append("Select access mode", NULL, MENU_FLAG_DISABLE, NULL);
+	item_append("Read-only", 0, 0, (void *)READONLY);
+	if(can_in_place)
+		item_append("Read-write", 0, 0, (void *)READWRITE);
+	item_append("Read this image, write to another image", 0, 0, (void *)WRITE_OTHER);
+	item_append("Read this image, write to diff", 0, 0, (void *)WRITE_DIFF);
+}
+
+ui_menu_select_rw::~ui_menu_select_rw()
+{
+}
+
+void ui_menu_select_rw::handle()
+{
+	/* process the menu */
+	const ui_menu_event *event = process(0);
+	if (event != NULL && event->iptkey == IPT_UI_SELECT)
+	{
+		*result = int(FPTR(event->itemref));
+		ui_menu::stack_pop(machine());
+	}
 }
 
 /***************************************************************************

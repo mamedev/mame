@@ -129,4 +129,32 @@ private:
 	void append_entry_menu_item(const file_selector_entry *entry);
 };
 
+class ui_menu_select_format : public ui_menu {
+public:
+	ui_menu_select_format(running_machine &machine, render_container *container,
+						  class floppy_image_format_t **formats, int ext_match, int total_usable, int *result);
+	virtual ~ui_menu_select_format();
+	virtual void populate();
+	virtual void handle();
+
+private:
+	floppy_image_format_t **formats;
+	int ext_match, total_usable;
+	int *result;
+};
+
+class ui_menu_select_rw : public ui_menu {
+public:
+	enum { READONLY, READWRITE, WRITE_OTHER, WRITE_DIFF };
+	ui_menu_select_rw(running_machine &machine, render_container *container,
+					  bool can_in_place, int *result);
+	virtual ~ui_menu_select_rw();
+	virtual void populate();
+	virtual void handle();
+
+private:
+	bool can_in_place;
+	int *result;
+};
+
 #endif	/* __UIIMAGE_H__ */

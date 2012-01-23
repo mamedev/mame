@@ -237,6 +237,8 @@ public:
 	floppy_image_format_t *next;
 	void append(floppy_image_format_t *_next);
 
+	bool extension_matches(const char *file_name) const;
+
 protected:
 	// Input for convert_to_edge
 	enum {
@@ -522,6 +524,8 @@ public:
 
 	// Variants
 	enum {
+		SSSD  = 0x44535353, // "SSSD",
+		SSDD  = 0x44445353, // "DSSD",
 		DSDD  = 0x44445344, // "DSDD",
 		DSHD  = 0x44485344, // "DSHD",
 		DSED  = 0x44455344, // "DSED",
@@ -542,6 +546,8 @@ public:
 	UINT32 get_write_splice_position(int track, int head) const { return write_splice[track][head]; }
 	void get_maximal_geometry(int &tracks, int &heads);
 	void get_actual_geometry(int &tracks, int &heads);
+
+	static const char *get_variant_name(UINT32 form_factor, UINT32 variant);
 
 private:
 	enum {

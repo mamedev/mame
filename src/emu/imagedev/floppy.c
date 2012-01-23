@@ -5,12 +5,15 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "zippath.h"
 #include "floppy.h"
 #include "formats/imageutl.h"
+#include "uiimage.h"
 
 // device type definition
 const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
 const device_type FLOPPY_35_DD = &device_creator<floppy_35_dd>;
+const device_type FLOPPY_35_DD_NOSD = &device_creator<floppy_35_dd_nosd>;
 const device_type FLOPPY_35_HD = &device_creator<floppy_35_hd>;
 const device_type FLOPPY_35_ED = &device_creator<floppy_35_ed>;
 const device_type FLOPPY_525_DD = &device_creator<floppy_525_dd>;
@@ -115,6 +118,16 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 	update_names();
 }
 
+floppy_image_format_t *floppy_image_device::get_formats() const
+{
+	return fif_list;
+}
+
+floppy_image_format_t *floppy_image_device::get_load_format() const
+{
+	return input_format;
+}
+
 void floppy_image_device::device_config_complete()
 {
 	update_names();
@@ -129,6 +142,24 @@ void floppy_image_device::set_rpm(float _rpm)
 	rev_time = attotime::from_double(60/rpm);
 }
 
+void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
+{
+	output_format = _output_format;
+	commit_image();
+}
+
+void floppy_image_device::commit_image()
+{
+	image_dirty = false;
+	if(!output_format)
+		return;
+	io_generic io;
+	// Do _not_ remove this cast otherwise the pointer will be incorrect when used by the ioprocs.
+	io.file = (device_image_interface *)this;
+	io.procs = &image_ioprocs;
+	io.filler = 0xff;
+	output_format->save(&io, image);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -151,6 +182,7 @@ void floppy_image_device::device_start()
 	stp = 1;
 	dskchg = 0;
 	index_timer = timer_alloc(0);
+	image_dirty = false;
 }
 
 void floppy_image_device::device_reset()
@@ -163,6 +195,30 @@ void floppy_image_device::device_reset()
 void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	index_resync();
+}
+
+floppy_image_format_t *floppy_image_device::identify(astring filename) const
+{
+	FILE *fd;
+	fd = fopen(filename.cstr(), "r");
+	if(!fd)
+		return 0;
+	
+	io_generic io;
+	io.file = fd;
+	io.procs = &stdio_ioprocs_noclose;
+	io.filler = 0xff;
+	int best = 0;
+	floppy_image_format_t *best_format = 0;
+	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
+		int score = format->identify(&io, form_factor);
+		if(score > best) {
+			best = score;
+			best_format = format;
+		}
+	}
+	fclose(fd);
+	return best_format;
 }
 
 bool floppy_image_device::call_load()
@@ -192,6 +248,8 @@ bool floppy_image_device::call_load()
 	revolution_count = 0;
 
 	index_resync();
+	image_dirty = false;
+	output_format = 0;
 
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
@@ -203,11 +261,20 @@ void floppy_image_device::call_unload()
 	dskchg = 0;
 
 	if (image) {
+		if(image_dirty)
+			commit_image();
 		global_free(image);
 		image = 0;
 	}
 	if (!cur_unload_cb.isnull())
 		cur_unload_cb(this);
+}
+
+bool floppy_image_device::call_create(int format_type, option_resolution *format_options)
+{
+	image = global_alloc(floppy_image(tracks, sides, form_factor));
+	output_format = 0;
+	return IMAGE_INIT_PASS;
 }
 
 /* motor on, active low */
@@ -227,6 +294,8 @@ void floppy_image_device::mon_w(int state)
 
 	/* on -> off */
 	else {
+		if(image_dirty)
+			commit_image();
 		revolution_start_time = attotime::never;
 		index_timer->adjust(attotime::zero);
 	}
@@ -377,6 +446,8 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 
 void floppy_image_device::write_flux(attotime start, attotime end, int transition_count, const attotime *transitions)
 {
+	image_dirty = true;
+
 	attotime base;
 	int start_pos = find_position(base, start);
 	int end_pos   = find_position(base, end);
@@ -395,7 +466,7 @@ void floppy_image_device::write_flux(attotime start, attotime end, int transitio
 		index = 0;
 		image->set_track_size(cyl, ss, 1);
 		buf = image->get_buffer(cyl, ss);
-		buf[cells++] = floppy_image::MG_N | 200000000;
+		buf[cells++] = floppy_image::MG_N;
 	}
 
 	if(index && (buf[index] & floppy_image::TIME_MASK) == start_pos)
@@ -408,8 +479,10 @@ void floppy_image_device::write_flux(attotime start, attotime end, int transitio
 	UINT32 pos = start_pos;
 	int ti = 0;
 	while(pos != end_pos) {
-		if(image->get_track_size(cyl, ss) < cells+10)
+		if(image->get_track_size(cyl, ss) < cells+10) {
 			image->set_track_size(cyl, ss, cells+200);
+			buf = image->get_buffer(cyl, ss);
+		}
 		UINT32 next_pos;
 		if(ti != transition_count)
 			next_pos = trans_pos[ti++];
@@ -530,6 +603,152 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 	}
 }
 
+ui_menu *floppy_image_device::get_selection_menu(running_machine &machine, render_container *container)
+{
+	return auto_alloc_clear(machine, ui_menu_control_floppy_image(machine, container, this));
+}
+
+ui_menu_control_floppy_image::ui_menu_control_floppy_image(running_machine &machine, render_container *container, device_image_interface *_image) : ui_menu_control_device_image(machine, container, _image)
+{
+	floppy_image_device *fd = static_cast<floppy_image_device *>(image);	
+	const floppy_image_format_t *fif_list = fd->get_formats();
+	int fcnt = 0;
+	for(const floppy_image_format_t *i = fif_list; i; i = i->next)
+		fcnt++;
+	
+	format_array = global_alloc_array(floppy_image_format_t *, fcnt);
+	input_format = output_format = 0;
+	input_filename = output_filename = "";
+}
+
+ui_menu_control_floppy_image::~ui_menu_control_floppy_image()
+{
+	global_free(format_array);
+}
+
+void ui_menu_control_floppy_image::do_load_create()
+{
+	floppy_image_device *fd = static_cast<floppy_image_device *>(image);	
+	if(input_filename == "") {
+		int err = fd->create(output_filename, 0, NULL);
+		if (err != 0) {
+			popmessage("Error: %s", fd->error());
+			return;
+		}
+		fd->setup_write(output_format);
+	} else {
+		int err = fd->load(input_filename);
+		if(!err && output_filename != "")
+			err = fd->reopen_for_write(output_filename);
+		if(err != 0) {
+			popmessage("Error: %s", fd->error());
+			return;
+		}
+		if(output_format)
+			fd->setup_write(output_format);
+	}
+}
+
+void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
+{
+	input_filename = filename;
+	input_format = static_cast<floppy_image_device *>(image)->identify(filename);
+	if(!input_format) {
+		popmessage("Error: %s\n", image->error());
+		ui_menu::stack_pop(machine());
+		return;
+	}
+
+	bool can_in_place = input_format->supports_save();
+	if(can_in_place) {
+		file_error filerr = FILERR_NOT_FOUND;
+		astring tmp_path;
+		core_file *tmp_file;
+		/* attempt to open the file for writing but *without* create */
+		filerr = zippath_fopen(filename, OPEN_FLAG_READ|OPEN_FLAG_WRITE, tmp_file, tmp_path);
+		if(!filerr)
+			core_fclose(tmp_file);
+		else
+			can_in_place = false;
+	}
+	submenu_result = -1;
+	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_rw(machine(), container, can_in_place, &submenu_result)));
+	state = SELECT_RW;
+}
+
+void ui_menu_control_floppy_image::handle()
+{
+	floppy_image_device *fd = static_cast<floppy_image_device *>(image);	
+	switch(state) {
+	case DO_CREATE: {
+		floppy_image_format_t *fif_list = fd->get_formats();
+		int ext_match = 0, total_usable = 0;
+		for(floppy_image_format_t *i = fif_list; i; i = i->next) {
+			if(!i->supports_save())
+				continue;
+			if(i->extension_matches(current_file))
+				format_array[total_usable++] = i;
+		}
+		ext_match = total_usable;
+		for(floppy_image_format_t *i = fif_list; i; i = i->next) {
+			if(!i->supports_save())
+				continue;
+			if(!i->extension_matches(current_file))
+				format_array[total_usable++] = i;
+		}
+		submenu_result = -1;
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_format(machine(), container, format_array, ext_match, total_usable, &submenu_result)));
+
+		state = SELECT_FORMAT;
+		break;
+	}
+
+	case SELECT_FORMAT:
+		if(submenu_result == -1) {
+			state = START_FILE;
+			handle();
+		} else {
+			zippath_combine(output_filename, current_directory, current_file);
+			output_format = format_array[submenu_result];
+			do_load_create();
+			ui_menu::stack_pop(machine());
+		}
+		break;
+
+	case SELECT_RW:
+		switch(submenu_result) {
+		case ui_menu_select_rw::READONLY:
+			do_load_create();
+			ui_menu::stack_pop(machine());
+			break;
+
+		case ui_menu_select_rw::READWRITE:
+			output_format = input_format;
+			do_load_create();
+			ui_menu::stack_pop(machine());
+			break;
+
+		case ui_menu_select_rw::WRITE_DIFF:
+			popmessage("Sorry, diffs are not supported yet\n");
+			ui_menu::stack_pop(machine());
+			break;
+
+		case ui_menu_select_rw::WRITE_OTHER:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file)));
+			state = CREATE_FILE;
+			break;
+
+		case -1:
+			ui_menu::stack_pop(machine());
+			break;
+		}
+		break;
+
+	default:
+		ui_menu_control_device_image::handle();
+	}
+}
+
 floppy_35_dd::floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	floppy_image_device(mconfig, FLOPPY_35_DD, "3.5\" double density floppy drive", tag, owner, clock)
 {
@@ -545,6 +764,38 @@ void floppy_35_dd::setup_characteristics()
 	tracks = 84;
 	sides = 2;
 	set_rpm(300);
+}
+
+void floppy_35_dd::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::DSDD;
+}
+
+floppy_35_dd_nosd::floppy_35_dd_nosd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, FLOPPY_35_DD_NOSD, "3.5\" double density floppy drive", tag, owner, clock)
+{
+}
+
+floppy_35_dd_nosd::~floppy_35_dd_nosd()
+{
+}
+
+void floppy_35_dd_nosd::setup_characteristics()
+{
+	form_factor = floppy_image::FF_35;
+	tracks = 84;
+	sides = 2;
+	set_rpm(300);
+}
+
+void floppy_35_dd_nosd::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
 }
 
 floppy_35_hd::floppy_35_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -564,6 +815,15 @@ void floppy_35_hd::setup_characteristics()
 	set_rpm(300);
 }
 
+void floppy_35_hd::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::DSDD;
+	variants[var_count++] = floppy_image::DSHD;
+}
+
 floppy_35_ed::floppy_35_ed(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	floppy_image_device(mconfig, FLOPPY_35_ED, "3.5\" extended density floppy drive", tag, owner, clock)
 {
@@ -581,6 +841,15 @@ void floppy_35_ed::setup_characteristics()
 	set_rpm(300);
 }
 
+void floppy_35_ed::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::DSDD;
+	variants[var_count++] = floppy_image::DSHD;
+	variants[var_count++] = floppy_image::DSED;
+}
 
 floppy_525_dd::floppy_525_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	floppy_image_device(mconfig, FLOPPY_525_DD, "5.25\" double density floppy drive", tag, owner, clock)
@@ -597,4 +866,11 @@ void floppy_525_dd::setup_characteristics()
 	tracks = 42;
 	sides = 1;
 	set_rpm(300);
+}
+
+void floppy_525_dd::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
 }

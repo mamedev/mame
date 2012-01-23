@@ -23,7 +23,7 @@ const char *dfi_format::extensions() const
 
 bool dfi_format::supports_save() const
 {
-	return true;
+	return false;
 }
 
 int dfi_format::identify(io_generic *io, UINT32 form_factor)

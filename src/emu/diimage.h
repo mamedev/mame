@@ -182,7 +182,7 @@ public:
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
 
-	virtual class ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
+	virtual ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
 
 	const image_device_format *device_get_indexed_creatable_format(int index);
 	const image_device_format *device_get_named_creatable_format(const char *format_name);
@@ -249,6 +249,8 @@ public:
 	void unload();
 	bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
 	bool load_software(char *swlist, char *swname, rom_entry *entry);
+	int reopen_for_write(const char *path);
+
 protected:
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
@@ -322,5 +324,35 @@ protected:
 	bool m_is_loading;
 };
 
+class ui_menu_control_device_image : public ui_menu {
+public:
+	ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *image);
+	virtual ~ui_menu_control_device_image();
+	virtual void populate();
+	virtual void handle();
+		
+protected:
+	enum {
+		START_FILE, START_OTHER_PART, START_SOFTLIST, SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, DO_CREATE, SELECT_SOFTLIST,
+		LAST_ID
+	};
+	int state;
+
+	device_image_interface *image;
+	astring current_directory;
+	astring current_file;
+	int submenu_result;
+	bool create_confirmed;
+	bool softlist_done;
+	const class software_list *swl;
+	const class software_info *swi;
+	const class software_part *swp;
+	const class software_list_config *slc;
+	astring software_info_name;
+
+	void test_create(bool &can_create, bool &need_confirm);
+	void load_software_part();
+	virtual void hook_load(astring filename, bool softlist);
+};
 
 #endif	/* __DIIMAGE_H__ */
