@@ -696,8 +696,8 @@ static SCREEN_UPDATE_IND16( crystal )
 
 static SCREEN_VBLANK(crystal)
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		crystal_state *state = screen.machine().driver_data<crystal_state>();
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
