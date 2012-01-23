@@ -898,7 +898,7 @@ void ui_menu_select_format::populate()
 
 		if(i && i == ext_match)
 			item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-		item_append(fmt->description(), fmt->name(), 0, (void *)i);
+		item_append(fmt->description(), fmt->name(), 0, (void *)(FPTR)i);
 	}
 }
 
