@@ -329,8 +329,8 @@ SCREEN_UPDATE_IND16( taitol )
 
 SCREEN_VBLANK( taitol )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		taitol_state *state = screen.machine().driver_data<taitol_state>();
 		UINT8 *spriteram = state->m_rambanks + 0xb000;

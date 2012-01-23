@@ -354,8 +354,8 @@ SCREEN_UPDATE_IND16( helifire )
 
 SCREEN_VBLANK( helifire )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		n8080_state *state = screen.machine().driver_data<n8080_state>();
 		int n = (screen.machine().primary_screen->frame_number() >> 1) % sizeof state->m_helifire_LSFR;

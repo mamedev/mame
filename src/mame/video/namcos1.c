@@ -442,8 +442,8 @@ SCREEN_UPDATE_IND16( namcos1 )
 
 SCREEN_VBLANK( namcos1 )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		namcos1_state *state = screen.machine().driver_data<namcos1_state>();
 		if (state->m_copy_sprites)
