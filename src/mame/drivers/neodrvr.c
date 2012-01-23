@@ -8869,6 +8869,29 @@ ROM_START( diggerma ) /* Unlicensed Prototype, no official game ID # */
 	ROM_LOAD16_BYTE( "dig-c2.bin", 0x000001, 0x080000, CRC(3e632161) SHA1(83711c4286fb1d9f3f91414ac6e5fed36618033e) ) /* Plane 2,3 */
 ROM_END
 
+// this doesn't boot, protection like kof98?
+// you can force it to boot with a simple debugger trick, but then it resets when starting a game
+ROM_START( sbp ) /* Unlicensed, no official game ID # */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "2a.bin", 0x000000, 0x080000, CRC(d054d264) SHA1(d1b4bc626d000e0679def0545940fa75035921ab) )
+
+	ROM_REGION( 0x80000, "fixed", 0 )
+	ROM_LOAD( "2b.bin",       0x000000, 0x80000, CRC(2fd04b2a) SHA1(1acb446704ab56d0a33df7c48855aa8d00fd5a3c) )
+	ROM_REGION( 0x20000, "fixedbios", 0 )
+	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )																												
+	ROM_Y_ZOOM
+
+	NEO_BIOS_AUDIO_512K( "1b.bin", CRC(7b1f86f7) SHA1(15b6af7f9fbd0f1f6a1ecd912200ca8d0af2da2a) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_LOAD( "sbp.snd", 0x000000, 0x080000, NO_DUMP )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "3b.bin", 0x000000, 0x200000, CRC(44791317) SHA1(9e773eb9aae5ee767213bd17348ff8a312e9cb16) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "4b.bin", 0x000001, 0x200000, CRC(a3a1c0df) SHA1(3b1e5be673f7cbb04199a805b0e0de93dad8cb8c) ) /* Plane 2,3 */
+ROM_END
 
 
 /****************************************************************************/
@@ -10166,6 +10189,8 @@ GAME( 2002, rotd,      neogeo,   neogeo,   neogeo,   rotd,     ROT0, "Evoga / Pl
 GAME( 2002, matrim,    neogeo,   neogeo,   neogeo,   matrim,   ROT0, "Noise Factory / Atlus", "Matrimelee / Shin Gouketsuji Ichizoku Toukon (NGM-2660) (NGH-2660)", GAME_SUPPORTS_SAVE )
 GAME( 2002, matrimbl,  matrim,   neogeo,   neogeo,   matrimbl, ROT0, "bootleg", "Matrimelee / Shin Gouketsuji Ichizoku Toukon (bootleg)", GAME_SUPPORTS_SAVE )
 
+/***** Unlicensed commercial releases *****/
+
 /* BrezzaSoft */
 GAME( 2001, jockeygp,  neogeo,   neogeo,   jockeygp, jockeygp, ROT0, "Sun Amusement / BrezzaSoft", "Jockey Grand Prix (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 2001, jockeygpa, jockeygp, neogeo,   jockeygp, jockeygp, ROT0, "Sun Amusement / BrezzaSoft", "Jockey Grand Prix (set 2)", GAME_SUPPORTS_SAVE )
@@ -10174,3 +10199,13 @@ GAME( 2001, vlinero,   vliner,   neogeo,   vliner,   vliner,   ROT0, "Dyna / Bre
 
 /* Kyle Hodgetts */
 GAME( 2000, diggerma,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Kyle Hodgetts", "Digger Man (prototype)", GAME_SUPPORTS_SAVE )
+
+/* Vektorlogic */
+GAME( 2004, sbp,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Vektorlogic", "Super Bubble Pop", GAME_NOT_WORKING )
+
+/* NG.DEV.TEAM */
+// Last Hope (c)2006 - AES / NEOCD (has no MVS mode)
+// Last Hope Pink Bullets (c)2008 - MVS / AES
+// Fast Striker (c)2010 - MVS/AES
+// Fast Striker 1.5 (c)2010 - MVS/AES
+// GunLord (c)2012 - MVS/AES

@@ -7009,14 +7009,16 @@ samsh5sp		// 0272 (c) 2004 Playmore
 samsh5sph		// 0272 (c) 2004 Playmore
 samsh5spn		// 0272 (c) 2004 Playmore
 
-// The BrezzaSoft games don't have proper ID codes
+// Unlicensed commercial releases (no game ID)
 jockeygp
 jockeygpa
 vliner
 vlinero
 
-// Nor does Digger Man
 diggerma		// No Game ID (unlicensed), (c) 2000 Kyle Hodgetts, prototype
+
+sbp				// (c)2004 Vektorlogik
+
 
 // Hyper NeoGeo 64 uses a 3 digit rom code?
 
