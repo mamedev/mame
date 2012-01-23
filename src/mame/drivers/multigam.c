@@ -205,7 +205,8 @@ static void set_videoram_bank(running_machine& machine, int start, int count, in
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = (data & 7);
-	ppu2c0x_spriteram_dma(space, space->machine().device("ppu"), source);
+	ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
+	ppu->spriteram_dma(space, source);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -328,7 +329,7 @@ static WRITE8_HANDLER(multigam_mapper2_w)
 static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
@@ -348,7 +349,7 @@ static ADDRESS_MAP_START( multigmt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(multigam_switch_prg_rom)
 	AM_RANGE(0x3fff, 0x3fff) AM_WRITE(multigam_switch_gfx_rom)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
@@ -384,7 +385,7 @@ static void multigam3_mmc3_scanline_cb( device_t *device, int scanline, int vbla
 static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
-	device_t *ppu = space->machine().device("ppu");
+	ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
 
 	/* basically, a MMC3 mapper from the nes */
 	int bankmask = state->m_multigam3_mmc3_prg_size == 0x40000 ? 0x1f : 0x0f;
@@ -521,11 +522,11 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 		break;
 
 		case 0x6000: /* disable irqs */
-			ppu2c0x_set_scanline_callback(ppu, 0);
+			ppu->set_scanline_callback(0);
 		break;
 
 		case 0x6001: /* enable irqs */
-			ppu2c0x_set_scanline_callback(ppu, multigam3_mmc3_scanline_cb);
+			ppu->set_scanline_callback(multigam3_mmc3_scanline_cb);
 		break;
 	}
 }
@@ -617,7 +618,7 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 static ADDRESS_MAP_START( multigm3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
@@ -651,14 +652,14 @@ static WRITE8_HANDLER(multigam3_mapper02_rom_switch_w)
 static void multigam_init_mapper02(running_machine &machine, UINT8* prg_base, int prg_size)
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
+	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
 	UINT8* mem = machine.region("maincpu")->base();
 	memcpy(mem + 0x8000, prg_base + prg_size - 0x8000, 0x8000);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(multigam3_mapper02_rom_switch_w) );
 
 	state->m_mapper02_prg_base = prg_base;
 	state->m_mapper02_prg_size = prg_size;
-
-	ppu2c0x_set_scanline_callback(machine.device("ppu"), 0);
+	ppu->set_scanline_callback(0);
 }
 
 /******************************************************
@@ -807,6 +808,7 @@ static void multigam_init_mmc1(running_machine &machine, UINT8 *prg_base, int pr
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
 	UINT8* dst = machine.region("maincpu")->base();
+	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
 
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x8000), 0x8000);
 
@@ -818,8 +820,7 @@ static void multigam_init_mmc1(running_machine &machine, UINT8 *prg_base, int pr
 	state->m_mmc1_prg_size = prg_size;
 	state->m_mmc1_chr_bank_base = chr_bank_base;
 
-	ppu2c0x_set_scanline_callback(machine.device("ppu"), 0);
-
+	ppu->set_scanline_callback(0);
 };
 
 
@@ -848,7 +849,7 @@ static void multigam_init_mmc1(running_machine &machine, UINT8 *prg_base, int pr
 static void supergm3_set_bank(running_machine &machine)
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
-	device_t *ppu = machine.device("ppu");
+	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
 	UINT8* mem = machine.region("maincpu")->base();
 
 	// video bank
@@ -884,7 +885,7 @@ static void supergm3_set_bank(running_machine &machine)
 		// title screen
 		memcpy(mem + 0x8000, mem + 0x18000, 0x8000);
 		memory_set_bankptr(machine, "bank10", mem + 0x6000);
-		ppu2c0x_set_scanline_callback(ppu, 0);
+		ppu->set_scanline_callback(0);
 	}
 	else if ((state->m_supergm3_prg_bank & 0x40) == 0)
 	{
@@ -933,7 +934,7 @@ static WRITE8_HANDLER(supergm3_chr_bank_w)
 static ADDRESS_MAP_START( supergm3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
@@ -1069,7 +1070,8 @@ static const nes_interface multigam_interface_1 =
 
 static PALETTE_INIT( multigam )
 {
-	ppu2c0x_init_palette(machine, 0);
+	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
+	ppu->init_palette(machine, 0);
 }
 
 static void ppu_irq( device_t *device, int *ppu_regs )
@@ -1080,6 +1082,8 @@ static void ppu_irq( device_t *device, int *ppu_regs )
 /* our ppu interface                                            */
 static const ppu2c0x_interface ppu_interface =
 {
+	"maincpu",
+	"screen",
 	0,					/* gfxlayout num */
 	0,					/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
@@ -1093,7 +1097,8 @@ static VIDEO_START( multigam )
 static SCREEN_UPDATE_IND16( multigam )
 {
 	/* render the ppu */
-	ppu2c0x_render(screen.machine().device("ppu"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
+	ppu->render(bitmap, 0, 0, 0, 0);
 	return 0;
 }
 

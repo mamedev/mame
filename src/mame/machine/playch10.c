@@ -267,7 +267,7 @@ READ8_HANDLER( pc10_in1_r )
 	/* do the gun thing */
 	if (state->m_pc10_gun_controller)
 	{
-		device_t *ppu = space->machine().device("ppu");
+		ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
 		int trigger = input_port_read(space->machine(), "P1");
 		int x = input_port_read(space->machine(), "GUNX");
 		int y = input_port_read(space->machine(), "GUNY");
@@ -277,10 +277,10 @@ READ8_HANDLER( pc10_in1_r )
 		ret |= 0x08;
 
 		/* get the pixel at the gun position */
-		pix = ppu2c0x_get_pixel(ppu, x, y);
+		pix = ppu->get_pixel(x, y);
 
 		/* get the color base from the ppu */
-		color_base = ppu2c0x_get_colorbase(ppu);
+		color_base = ppu->get_colorbase();
 
 		/* look at the screen and see if the cursor is over a bright pixel */
 		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
@@ -799,6 +799,7 @@ static WRITE8_HANDLER( eboard_rom_switch_w )
 DRIVER_INIT( pceboard )
 {
 	playch10_state *state = machine.driver_data<playch10_state>();
+	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
 	UINT8 *prg = machine.region("cart")->base();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
@@ -812,7 +813,7 @@ DRIVER_INIT( pceboard )
 	machine.device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(eboard_rom_switch_w) );
 
 	/* ppu_latch callback */
-	ppu2c0x_set_latch(machine.device("ppu"), mapper9_latch);
+	ppu->set_latch(mapper9_latch);
 
 	/* nvram at $6000-$6fff */
 	machine.device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
@@ -879,7 +880,7 @@ static void gboard_scanline_cb( device_t *device, int scanline, int vblank, int 
 static WRITE8_HANDLER( gboard_rom_switch_w )
 {
 	playch10_state *state = space->machine().driver_data<playch10_state>();
-	device_t *ppu = space->machine().device("ppu");
+	ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
 
 	/* basically, a MMC3 mapper from the nes */
 
@@ -1003,11 +1004,11 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 		break;
 
 		case 0x6000: /* disable irqs */
-			ppu2c0x_set_scanline_callback(ppu, 0);
+			ppu->set_scanline_callback(0);
 		break;
 
 		case 0x6001: /* enable irqs */
-			ppu2c0x_set_scanline_callback(ppu, gboard_scanline_cb);
+			ppu->set_scanline_callback(gboard_scanline_cb);
 		break;
 	}
 }

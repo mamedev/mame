@@ -156,8 +156,9 @@ static READ8_HANDLER (famibox_nt_r)
 
 static WRITE8_HANDLER( sprite_dma_w )
 {
+	ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
 	int source = (data & 7);
-	ppu2c0x_spriteram_dma(space, space->machine().device("ppu"), source);
+	ppu->spriteram_dma(space, source);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -373,7 +374,7 @@ static WRITE8_HANDLER( famibox_system_w )
 
 static ADDRESS_MAP_START( famibox_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
@@ -502,7 +503,8 @@ static const nes_interface famibox_interface_1 =
 
 static PALETTE_INIT( famibox )
 {
-	ppu2c0x_init_palette(machine, 0);
+	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
+	ppu->init_palette(machine, 0);
 }
 
 static void ppu_irq( device_t *device, int *ppu_regs )
@@ -513,6 +515,8 @@ static void ppu_irq( device_t *device, int *ppu_regs )
 /* our ppu interface                                            */
 static const ppu2c0x_interface ppu_interface =
 {
+	"maincpu",
+	"screen",
 	0,					/* gfxlayout num */
 	0,					/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
@@ -526,7 +530,8 @@ static VIDEO_START( famibox )
 static SCREEN_UPDATE_IND16( famibox )
 {
 	/* render the ppu */
-	ppu2c0x_render(screen.machine().device("ppu"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
+	ppu->render(bitmap, 0, 0, 0, 0);
 	return 0;
 }
 

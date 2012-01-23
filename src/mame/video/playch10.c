@@ -17,6 +17,7 @@ WRITE8_HANDLER( playch10_videoram_w )
 
 PALETTE_INIT( playch10 )
 {
+	ppu2c0x_device *ppu = machine.device<ppu2c0x_device>("ppu");
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -54,7 +55,7 @@ PALETTE_INIT( playch10 )
 		color_prom++;
 	}
 
-	ppu2c0x_init_palette_rgb(machine, 256 );
+	ppu->init_palette_rgb(machine, 256);
 }
 
 static void ppu_irq( device_t *device, int *ppu_regs )
@@ -70,14 +71,8 @@ static void ppu_irq( device_t *device, int *ppu_regs )
 
 const ppu2c0x_interface playch10_ppu_interface =
 {
-	1,					/* gfxlayout num */
-	256,				/* color base */
-	PPU_MIRROR_NONE,	/* mirroring */
-	ppu_irq				/* irq */
-};
-
-const ppu2c0x_interface playch10_ppu_interface_hboard =
-{
+	"cart",
+	"bottom",
 	1,					/* gfxlayout num */
 	256,				/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
@@ -124,7 +119,7 @@ VIDEO_START( playch10_hboard )
 SCREEN_UPDATE_IND16( playch10_single )
 {
 	playch10_state *state = screen.machine().driver_data<playch10_state>();
-	device_t *ppu = screen.machine().device("ppu");
+	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
 
 	rectangle top_monitor = screen.visible_area();
 
@@ -140,7 +135,7 @@ SCREEN_UPDATE_IND16( playch10_single )
 
 	if ( state->m_pc10_game_mode )
 		/* render the ppu */
-		ppu2c0x_render( ppu, bitmap, 0, 0, 0, 0 );
+		ppu->render(bitmap, 0, 0, 0, 0 );
 	else
 	{
 		/* When the bios is accessing vram, the video circuitry can't access it */
@@ -153,15 +148,15 @@ SCREEN_UPDATE_IND16( playch10_single )
 SCREEN_UPDATE_IND16( playch10_top )
 {
 	playch10_state *state = screen.machine().driver_data<playch10_state>();
-	device_t *ppu = screen.machine().device("ppu");
+	ppu2c0x_device *ppu = screen.machine().device<ppu2c0x_device>("ppu");
 
 	/* Single Monitor version */
 	if (state->m_pc10_bios != 1)
 		return SCREEN_UPDATE16_CALL(playch10_single);
 
-	if ( !state->m_pc10_dispmask )
+	if (!state->m_pc10_dispmask)
 		/* render the ppu */
-		ppu2c0x_render( ppu, bitmap, 0, 0, 0, 0 );
+		ppu->render(bitmap, 0, 0, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 

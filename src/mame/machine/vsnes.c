@@ -363,7 +363,7 @@ DRIVER_INIT( vsnormal )
 static WRITE8_HANDLER( gun_in0_w )
 {
 	vsnes_state *state = space->machine().driver_data<vsnes_state>();
-	device_t *ppu1 = space->machine().device("ppu1");
+	ppu2c0x_device *ppu1 = space->machine().device<ppu2c0x_device>("ppu1");
 
 	if (state->m_do_vrom_bank)
 	{
@@ -384,10 +384,10 @@ static WRITE8_HANDLER( gun_in0_w )
 		UINT32 pix, color_base;
 
 		/* get the pixel at the gun position */
-		pix = ppu2c0x_get_pixel(ppu1, x, y);
+		pix = ppu1->get_pixel(x, y);
 
 		/* get the color base from the ppu */
-		color_base = ppu2c0x_get_colorbase(ppu1);
+		color_base = ppu1->get_colorbase();
 
 		/* look at the screen and see if the cursor is over a bright pixel */
 		if ((pix == color_base + 0x20 ) || (pix == color_base + 0x30) ||
@@ -700,7 +700,7 @@ static void mapper4_irq( device_t *device, int scanline, int vblank, int blanked
 static WRITE8_HANDLER( mapper4_w )
 {
 	vsnes_state *state = space->machine().driver_data<vsnes_state>();
-	device_t *ppu1 = space->machine().device("ppu1");
+	ppu2c0x_device *ppu1 = space->machine().device<ppu2c0x_device>("ppu1");
 	UINT8 MMC3_helper, cmd;
 
 	switch (offset & 0x6001)
@@ -765,13 +765,13 @@ static WRITE8_HANDLER( mapper4_w )
 			state->m_IRQ_enable = 0;
 			state->m_IRQ_count = state->m_IRQ_count_latch;
 
-			ppu2c0x_set_scanline_callback (ppu1, 0);
+			ppu1->set_scanline_callback(0);
 
 			break;
 
 		case 0x6001: /* $e001 - Enable IRQs */
 			state->m_IRQ_enable = 1;
-			ppu2c0x_set_scanline_callback (ppu1, mapper4_irq);
+			ppu1->set_scanline_callback(mapper4_irq);
 
 			break;
 

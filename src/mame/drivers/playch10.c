@@ -334,7 +334,8 @@ static WRITE8_HANDLER( ram_8w_w )
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, space->machine().device("ppu"), source );
+	ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
+	ppu->spriteram_dma(space, source);
 }
 
 /* Only used in single monitor bios */
@@ -396,7 +397,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_BASE_MEMBER(playch10_state, m_work_ram)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
@@ -728,9 +729,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( playch10_hboard, playch10 )
 	MCFG_VIDEO_START(playch10_hboard)
 	MCFG_MACHINE_START(playch10_hboard)
-
-	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_PPU2C03B_ADD("ppu", playch10_ppu_interface)
 MACHINE_CONFIG_END
 
 /***************************************************************************
