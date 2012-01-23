@@ -1823,12 +1823,60 @@ static void do_frestore_null(m68ki_cpu_core *m68k)
 	m68k->fpu_just_reset = 1;
 }
 
+static void m68040_do_fsave(m68ki_cpu_core *m68k, UINT32 addr, int reg, int inc)
+{
+	if (m68k->fpu_just_reset)
+	{
+			m68ki_write_32(m68k, addr, 0);
+	}
+	else
+	{
+		// we normally generate an IDLE frame
+		if(reg != -1)
+			REG_A(m68k)[reg] += inc ? 6*4 : -6*4;
+		perform_fsave(m68k, addr, inc);
+	}
+}
+
+static void m68040_do_frestore(m68ki_cpu_core *m68k, UINT32 addr, int reg)
+{
+	UINT32 temp = m68ki_read_32(m68k, addr);
+
+	// check for NULL frame
+	if (temp & 0xff000000)
+	{
+		// we don't handle non-NULL frames
+		m68k->fpu_just_reset = 0;
+
+		if (reg != -1)
+		{
+			// how about an IDLE frame?
+			if ((temp & 0x00ff0000) == 0x00180000)
+			{
+				REG_A(m68k)[reg] += 6*4;
+			} // check UNIMP
+			else if ((temp & 0x00ff0000) == 0x00380000)
+			{
+				REG_A(m68k)[reg] += 14*4;
+			} // check BUSY
+			else if ((temp & 0x00ff0000) == 0x00b40000)
+			{
+				REG_A(m68k)[reg] += 45*4;
+			}
+		}
+	}
+	else
+	{
+		do_frestore_null(m68k);
+	}
+}
+
 void m68040_fpu_op1(m68ki_cpu_core *m68k)
 {
 	int ea = m68k->ir & 0x3f;
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
-	UINT32 addr, temp;
+	UINT32 addr;
 
 	switch ((m68k->ir >> 6) & 0x3)
 	{
@@ -1838,50 +1886,47 @@ void m68040_fpu_op1(m68ki_cpu_core *m68k)
 			{
 			case 2: // (An)
 				addr = REG_A(m68k)[reg];
-
-				if (m68k->fpu_just_reset)
-				{
-					m68ki_write_32(m68k, addr, 0);
-				}
-				else
-				{
-					// we normally generate an IDLE frame
-					perform_fsave(m68k, addr, 1);
-				}
+				m68040_do_fsave(m68k, addr, -1, 1);
 				break;
 
 			case 3:	// (An)+
-		    			addr = EA_AY_PI_32(m68k);
+				addr = EA_AY_PI_32(m68k);
+				m68040_do_fsave(m68k, addr, reg, 1);
+				break;
 
-					if (m68k->fpu_just_reset)
-					{
-						m68ki_write_32(m68k, addr, 0);
-					}
-					else
-					{
-						// we normally generate an IDLE frame
-						REG_A(m68k)[reg] += 6*4;
-						perform_fsave(m68k, addr, 1);
-					}
-					break;
+			case 4: // -(An)
+				addr = EA_AY_PD_32(m68k);
+				m68040_do_fsave(m68k, addr, reg, 0);
+				break;
 
-				case 4: // -(An)
-		    			addr = EA_AY_PD_32(m68k);
+			case 5: // (D16, An)
+				addr = EA_AY_DI_16(m68k);
+				m68040_do_fsave(m68k, addr, -1, 0);
+				break;
 
-					if (m68k->fpu_just_reset)
+			case 7: //
+				switch (reg)
+				{
+					case 1:		// (abs32)
 					{
-						m68ki_write_32(m68k, addr, 0);
+						addr = EA_AL_32(m68k);
+						m68040_do_fsave(m68k, addr, -1, 1);
+						break;
 					}
-					else
+					case 2:		// (d16, PC)
 					{
-						// we normally generate an IDLE frame
-						REG_A(m68k)[reg] -= 6*4;
-						perform_fsave(m68k, addr, 0);
+						addr = EA_PCDI_16(m68k);
+						m68040_do_fsave(m68k, addr, -1, 1);
+						break;
 					}
-					break;
+					default:
+						fatalerror("M68kFPU: FSAVE unhandled mode %d reg %d at %x\n", mode, reg, REG_PC(m68k));
+				}
 
-				default:
-					fatalerror("M68kFPU: FSAVE unhandled mode %d reg %d at %x\n", mode, reg, REG_PC(m68k));
+				break;
+
+			default:
+				fatalerror("M68kFPU: FSAVE unhandled mode %d reg %d at %x\n", mode, reg, REG_PC(m68k));
 			}
 			break;
 		}
@@ -1891,95 +1936,44 @@ void m68040_fpu_op1(m68ki_cpu_core *m68k)
 		{
 			switch (mode)
 			{
-				case 2: // (An)
-					addr = REG_A(m68k)[reg];
-					temp = m68ki_read_32(m68k, addr);
+			case 2: // (An)
+				addr = REG_A(m68k)[reg];
+				m68040_do_frestore(m68k, addr, -1);
+				break;
 
-					// check for NULL frame
-					if (temp & 0xff000000)
+			case 3:	// (An)+
+				addr = EA_AY_PI_32(m68k);
+				m68040_do_frestore(m68k, addr, reg);
+				break;
+
+			case 5: // (D16, An)
+				addr = EA_AY_DI_16(m68k);
+				m68040_do_frestore(m68k, addr, -1);
+				break;
+
+			case 7: //
+				switch (reg)
+				{
+					case 1:		// (abs32)
 					{
-						// we don't handle non-NULL frames and there's no pre/post inc/dec to do here
-						m68k->fpu_just_reset = 0;
+						addr = EA_AL_32(m68k);
+						m68040_do_frestore(m68k, addr, -1);
+						break;
 					}
-					else
+					case 2:		// (d16, PC)
 					{
-						do_frestore_null(m68k);
+						addr = EA_PCDI_16(m68k);
+						m68040_do_frestore(m68k, addr, -1);
+						break;
 					}
-					break;
+					default:
+						fatalerror("M68kFPU: FRESTORE unhandled mode %d reg %d at %x\n", mode, reg, REG_PC(m68k));
+				}
 
-				case 3:	// (An)+
-		    			addr = EA_AY_PI_32(m68k);
-					temp = m68ki_read_32(m68k, addr);
+				break;
 
-					// check for NULL frame
-					if (temp & 0xff000000)
-					{
-						m68k->fpu_just_reset = 0;
-
-						// how about an IDLE frame?
-						if ((temp & 0x00ff0000) == 0x00180000)
-						{
-							REG_A(m68k)[reg] += 6*4;
-						} // check UNIMP
-						else if ((temp & 0x00ff0000) == 0x00380000)
-						{
-							REG_A(m68k)[reg] += 14*4;
-						} // check BUSY
-						else if ((temp & 0x00ff0000) == 0x00b40000)
-						{
-							REG_A(m68k)[reg] += 45*4;
-						}
-					}
-					else
-					{
-						do_frestore_null(m68k);
-					}
-					break;
-
-				case 5: // (D16, An)
-					addr = EA_AY_DI_16(m68k);
-					temp = m68ki_read_32(m68k, addr);
-
-					// check for NULL frame
-					if (temp & 0xff000000)
-					{
-						// we don't handle non-NULL frames and there's no pre/post inc/dec to do here
-						m68k->fpu_just_reset = 0;
-					}
-					else
-					{
-						do_frestore_null(m68k);
-					}
-					break;
-
-				case 7: //
-					switch (reg)
-					{
-						case 2:		// (d16, PC)
-						{
-							addr = EA_PCDI_16(m68k);;
-							temp = m68ki_read_32(m68k, addr);
-
-							// check for NULL frame
-							if (temp & 0xff000000)
-							{
-								// we don't handle non-NULL frames and there's no pre/post inc/dec to do here
-								m68k->fpu_just_reset = 0;
-							}
-							else
-							{
-								do_frestore_null(m68k);
-							}
-							break;
-						}
-						default:
-							fatalerror("M68kFPU: FRESTORE unhandled mode %d reg %d at %x\n", mode, reg, REG_PC(m68k));
-					}
-
-					break;
-
-				default:
-					fatalerror("M68kFPU: FRESTORE unhandled mode %d reg %d at %x\n", mode, reg, REG_PC(m68k));
+			default:
+				fatalerror("M68kFPU: FRESTORE unhandled mode %d reg %d at %x\n", mode, reg, REG_PC(m68k));
 			}
 			break;
 		}

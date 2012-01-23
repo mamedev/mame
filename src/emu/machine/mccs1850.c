@@ -131,7 +131,8 @@ inline void mccs1850_device::check_interrupt()
 		m_ram[REGISTER_STATUS] &= ~STATUS_IT;
 	}
 
-	m_out_int_func(interrupt ? ASSERT_LINE : CLEAR_LINE);
+	if(!int_cb.isnull())
+		int_cb(interrupt);
 }
 
 
@@ -139,11 +140,12 @@ inline void mccs1850_device::check_interrupt()
 //  set_pse_line -
 //-------------------------------------------------
 
-inline void mccs1850_device::set_pse_line(int state)
+inline void mccs1850_device::set_pse_line(bool state)
 {
 	m_pse = state;
 
-	m_out_pse_func(m_pse);
+	if(!pse_cb.isnull())
+		pse_cb(m_pse);
 }
 
 
@@ -156,6 +158,7 @@ inline UINT8 mccs1850_device::read_register(offs_t offset)
 	switch (offset)
 	{
 	case REGISTER_COUNTER_LATCH:
+	case REGISTER_COUNTER_LATCH+3: // Required by the NeXT power on test
 		// load counter value into latch
 		m_ram[REGISTER_COUNTER_LATCH] = m_counter >> 24;
 		m_ram[REGISTER_COUNTER_LATCH + 1] = m_counter >> 16;
@@ -195,7 +198,7 @@ inline void mccs1850_device::write_register(offs_t offset, UINT8 data)
 		if (data & CONTROL_PD)
 		{
 			if (LOG) logerror("MCCS1850 '%s' Power Down\n", tag());
-			set_pse_line(0);
+			set_pse_line(false);
 		}
 
 		if (data & CONTROL_AR)
@@ -262,7 +265,7 @@ inline void mccs1850_device::advance_seconds()
 		else
 		{
 			// wake up
-			set_pse_line(1);
+			set_pse_line(true);
 		}
 	}
 }
@@ -291,27 +294,11 @@ mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mccs1850_device::device_config_complete()
+void mccs1850_device::set_cb(cb_t _int_cb, cb_t _pse_cb, cb_t _nuc_cb)
 {
-	// inherit a copy of the static data
-	const mccs1850_interface *intf = reinterpret_cast<const mccs1850_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mccs1850_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_pse_cb, 0, sizeof(m_out_pse_cb));
-		memset(&m_out_nuc_cb, 0, sizeof(m_out_nuc_cb));
-	}
+	int_cb = _int_cb;
+	pse_cb = _pse_cb;
+	nuc_cb = _nuc_cb;
 }
 
 
@@ -321,11 +308,6 @@ void mccs1850_device::device_config_complete()
 
 void mccs1850_device::device_start()
 {
-	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_pse_func.resolve(m_out_pse_cb, *this);
-	m_out_nuc_func.resolve(m_out_nuc_cb, *this);
-
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
@@ -456,7 +438,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 
 			if (m_bits == 8)
 			{
-				if (LOG) logerror("MCCS1850 '%s' %s Address %u\n", tag(), BIT(m_address, 7) ? "Write" : "Read", m_address & 0x7f);
+				if (LOG) logerror("MCCS1850 '%s' %s Address %02x\n", tag(), BIT(m_address, 7) ? "Write" : "Read", m_address & 0x7f);
 
 				m_bits = 0;
 				m_state = STATE_DATA;
@@ -559,7 +541,7 @@ WRITE_LINE_MEMBER( mccs1850_device::pwrsw_w )
 			check_interrupt();
 		}
 
-		set_pse_line(1);
+		set_pse_line(true);
 	}
 }
 

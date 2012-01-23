@@ -761,5 +761,8 @@ public:
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
+// Some useful delegates
+
+typedef delegate<void (bool state)> line_cb_t;
 
 #endif	/* __DELEGATE_H__ */

@@ -213,34 +213,71 @@ UINT64 floppy_image_size(floppy_image_legacy *floppy);
 /* misc */
 const char *floppy_error(floperr_t err);
 
+
 //////////////////////////////////////////////////////////
-/// New implementation
+// New implementation
 //////////////////////////////////////////////////////////
 
 class floppy_image;
 
+//! Class representing a floppy image format.
 class floppy_image_format_t
 {
 public:
 	floppy_image_format_t();
 	virtual ~floppy_image_format_t();
-
+	
+	/*! @brief Identify an image.
+	  The identify function tests if the image is valid
+	  for this particular format.
+	  @param io buffer containing the image data.
+	  @param form_factor Physical form factor of disk, from the enum
+	  in floppy_image
+	  @return 1 if image valid, 0 otherwise.
+	*/
 	virtual int identify(io_generic *io, UINT32 form_factor) = 0;
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) = 0;
+	
+	/*! @brief Load an image.
+	  The load function opens an image file and converts it to the
+	  internal MESS floppy representation.
+	  @param io source buffer containing the image data.
+	  @param form_factor Physical form factor of disk, from the enum
+	  in floppy_image
+	  @param image output buffer for data in MESS internal format.
+	  @return true on success, false otherwise.
+	*/
+    virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) = 0;
+    
+    /*! @brief Save an image.
+      The save function writes back an image from the MESS internal
+      floppy representation to the appropriate format on disk.
+      @param io output buffer for the data in the on-disk format.
+      @param image source buffer containing data in MESS internal format.
+	  @return true on success, false otherwise.
+    */
 	virtual bool save(io_generic *io, floppy_image *image);
 
+	//! @returns string containing name of format.
 	virtual const char *name() const = 0;
+	//! @returns string containing description of format.
 	virtual const char *description() const = 0;
+	//! @returns string containing comma-separated list of file
+	//! extensions the format may use.
 	virtual const char *extensions() const = 0;
+	//! @returns true if format supports saving.
 	virtual bool supports_save() const = 0;
 
+	//! Used if a linked list of formats is needed
 	floppy_image_format_t *next;
+	//! This appends a format to the linked list of formats, needed for floppy_image_device().
 	void append(floppy_image_format_t *_next);
-
+	//! This checks if the file has the proper extension for this format.
+	//! @param file_name
+	//! @returns true if file matches the extension.
 	bool extension_matches(const char *file_name) const;
-
+	
 protected:
-	// Input for convert_to_edge
+	//! Input for convert_to_edge
 	enum {
 		MG_SHIFT  = 28,
 
@@ -251,85 +288,105 @@ protected:
 
 	// **** Reader helpers ****
 
-	// Struct designed for easy track data description
-	// Optional, you can always do things by hand, but useful nevertheless
-	// A vector of these structures describes one track.
-
+	//! Struct designed for easy track data description. Contains an opcode and two params.
+	
+	//! Optional, you can always do things by hand, but useful nevertheless.
+	//! A vector of these structures describes one track.
+	
 	struct desc_e {
-		int type, p1, p2;
+		int type,	//!< An opcode
+			p1,  	//!< first param
+			p2;  	//!< second param
 	};
-
+	
+	//! Opcodes of the format description language used by generate_track()
 	enum {
-		END,                    // End of description
-		MFM,                    // One byte in p1 to be mfm-encoded, msb first, repeated p2 times
-		MFMBITS,                // A value of p2 bits in p1 to be mfm-encoded, msb first
-		RAW,                    // One 16 bits word in p1 to be written raw, msb first, repeated p2 times
-		RAWBITS,                // A value of p2 bits in p1 to be copied as-is, msb first
-		TRACK_ID,               // Track id byte, mfm-encoded
-		TRACK_ID_GCR6,          // Track id low 6 bits, gcr6-encoded
-		HEAD_ID,                // Head id byte, mfm-encoded
-		TRACK_HEAD_ID_GCR6,     // Track id 7th bit + head, gc6-encoded
-		SECTOR_ID,              // Sector id byte, mfm-encoded
-		SECTOR_ID_GCR6,         // Sector id byte, gcr6-encoded
-		SIZE_ID,                // Sector size code on one byte [log2(size/128)], mfm-encoded
-		SECTOR_INFO_GCR6,       // Sector info byte, gcr6-encoded
-		OFFSET_ID_O,            // Offset (track*2+head) byte, odd bits, mfm-encoded
-		OFFSET_ID_E,            // Offset (track*2+head) byte, even bits, mfm-encoded
-		SECTOR_ID_O,            // Sector id byte, odd bits, mfm-encoded
-		SECTOR_ID_E,            // Sector id byte, even bits, mfm-encoded
-		REMAIN_O,               // Remaining sector count, odd bits, mfm-encoded, total sector count in p1
-		REMAIN_E,               // Remaining sector count, even bits, mfm-encoded, total sector count in p1
+		END,                    //!< End of description
+		MFM,                    //!< One byte in p1 to be mfm-encoded, msb first, repeated p2 times
+		MFMBITS,                //!< A value of p2 bits in p1 to be mfm-encoded, msb first
+		RAW,                    //!< One 16 bits word in p1 to be written raw, msb first, repeated p2 times
+		RAWBITS,                //!< A value of p2 bits in p1 to be copied as-is, msb first
+		TRACK_ID,               //!< Track id byte, mfm-encoded
+		TRACK_ID_GCR6,          //!< Track id low 6 bits, gcr6-encoded
+		HEAD_ID,                //!< Head id byte, mfm-encoded
+		TRACK_HEAD_ID_GCR6,     //!< Track id 7th bit + head, gc6-encoded
+		SECTOR_ID,              //!< Sector id byte, mfm-encoded
+		SECTOR_ID_GCR6,         //!< Sector id byte, gcr6-encoded
+		SIZE_ID,                //!< Sector size code on one byte [log2(size/128)], mfm-encoded
+		SECTOR_INFO_GCR6,       //!< Sector info byte, gcr6-encoded
+		OFFSET_ID_O,            //!< Offset (track*2+head) byte, odd bits, mfm-encoded
+		OFFSET_ID_E,            //!< Offset (track*2+head) byte, even bits, mfm-encoded
+		SECTOR_ID_O,            //!< Sector id byte, odd bits, mfm-encoded
+		SECTOR_ID_E,            //!< Sector id byte, even bits, mfm-encoded
+		REMAIN_O,               //!< Remaining sector count, odd bits, mfm-encoded, total sector count in p1
+		REMAIN_E,               //!< Remaining sector count, even bits, mfm-encoded, total sector count in p1
 
-		SECTOR_DATA,            // Sector data to mfm-encode, which in p1, -1 for the current one per the sector id
-		SECTOR_DATA_O,          // Sector data to mfm-encode, odd bits only, which in p1, -1 for the current one per the sector id
-		SECTOR_DATA_E,          // Sector data to mfm-encode, even bits only, which in p1, -1 for the current one per the sector id
-		SECTOR_DATA_MAC,        // Transformed sector data + checksum, mac style, id in p1, -1 for the current one per the sector id
+		SECTOR_DATA,            //!< Sector data to mfm-encode, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_O,          //!< Sector data to mfm-encode, odd bits only, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_E,          //!< Sector data to mfm-encode, even bits only, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_MAC,        //!< Transformed sector data + checksum, mac style, id in p1, -1 for the current one per the sector id
 
-		CRC_CCITT_START,        // Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
-		CRC_AMIGA_START,        // Start an amiga checksum calculation, p1 = crc id
-		CRC_MACHEAD_START,      // Start of the mac gcr6 sector header checksum calculation (xor of pre-encode 6-bits values, gcr6-encoded)
-		CRC_END,                // End the checksum, p1 = crc id
-		CRC,                    // Write a checksum in the apporpriate format, p1 = crc id
+		CRC_CCITT_START,        //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
+		CRC_AMIGA_START,        //!< Start an amiga checksum calculation, p1 = crc id
+		CRC_MACHEAD_START,      //!< Start of the mac gcr6 sector header checksum calculation (xor of pre-encode 6-bits values, gcr6-encoded)
+		CRC_END,                //!< End the checksum, p1 = crc id
+		CRC,                    //!< Write a checksum in the apporpriate format, p1 = crc id
 
-		SECTOR_LOOP_START,      // Start of the per-sector loop, sector number goes from p1 to p2 inclusive
-		SECTOR_LOOP_END,        // End of the per-sector loop
-		SECTOR_INTERLEAVE_SKEW, // Defines interleave and skew for sector counting
+		SECTOR_LOOP_START,      //!< Start of the per-sector loop, sector number goes from p1 to p2 inclusive
+		SECTOR_LOOP_END,        //!< End of the per-sector loop
+		SECTOR_INTERLEAVE_SKEW, //!< Defines interleave and skew for sector counting
 	};
 
-	// Sector data description
+	//! Sector data description
 	struct desc_s {
-		int size;          // Sector size, int bytes
-		const UINT8 *data; // Sector data
-		UINT8 sector_id;   // Sector ID
-		UINT8 sector_info; // Sector free byte
+		int size;          //!< Sector size, int bytes
+		const UINT8 *data; //!< Sector data
+		UINT8 sector_id;   //!< Sector ID
+		UINT8 sector_info; //!< Sector free byte
 	};
 
 
-	// Generate one track according to the description vector
-	// "sect" is a vector indexed by sector id
-	// "track_size" is in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm
-
+	/*! @brief Generate one track according to the description vector.
+	    @param desc track data description
+	    @param track
+	    @param head
+	    @param sect a vector indexed by sector id.
+	    @param sect_count number of sectors.
+	    @param track_size in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm.
+	    @param image
+	*/
 	void generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
 
-	// Generate a track from cell binary values, MSB-first, size in cells and not bytes
+	/*! @brief Generate a track from cell binary values, MSB-first.
+	    @param track
+	    @param head
+	    @param trackbuf track input buffer.
+	    @param track_size in cells, not bytes.
+	    @param image
+	*/
 	void generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image);
 
-	// Generate a track from cell level values (0/1/W/D/N)
-	//
-	// Splice pos is the position of the track splice.  For normal
-	// formats, use -1.  For protected formats, you're supposed to
-	// know. trackbuf may be modified at that position or after.
-	//
-	// Note that this function needs to be able to split cells in two,
-	// so no time value should be less than 2, and even values are a
-	// good idea.
-
+	//! @brief Generate a track from cell level values (0/1/W/D/N).
+	
+	/*! Note that this function needs to be able to split cells in two,
+	    so no time value should be less than 2, and even values are a
+	    good idea.
+	*/
+	/*! @param track
+		@param head
+	    @param trackbuf track input buffer.
+	    @param track_size in cells, not bytes.
+		@param splice_pos is the position of the track splice.  For normal
+	    formats, use -1.  For protected formats, you're supposed to
+	    know. trackbuf may be modified at that position or after.
+	    @param image
+	*/
 	void generate_track_from_levels(int track, int head, UINT32 *trackbuf, int track_size, int splice_pos, floppy_image *image);
 
-	// Normalize the times in a cell buffer to sum up to 200000000
+	//! Normalize the times in a cell buffer to sum up to 200000000
 	void normalize_times(UINT32 *buffer, int bitlen);
 
-	// Some conversion tables
+	// Some conversion tables for gcr6
 	static const UINT8 gcr6fw_tb[0x40], gcr6bw_tb[0x100];
 
 	// Some useful descriptions shared by multiple formats
@@ -343,7 +400,7 @@ protected:
 
 	//   Fastcopy Pro optimized formats, with fake sector header for
 	//   faster verify and skew/interleave where appropriate
-	static const desc_e atari_st_fcp_9[];
+	static const desc_e atari_st_fcp_9[]; 
 	static const desc_e *const atari_st_fcp_10[10];
 	static const desc_e atari_st_fcp_11[];
 
@@ -363,83 +420,108 @@ protected:
 
 	// **** Writer helpers ****
 
-	// Rebuild a cell bitstream for a track.  Takes the cell standard
-	// angular size as a parameter, gives out a msb-first bitstream.
-	// Beware that fuzzy bits will always give out the same value.
-	//
-	// Output buffer size should be 34% more than the nominal number
-	// of cells (the dpll tolerates a cell size down to 75% of the
-	// nominal one, with gives a cell count of 1/0.75=1.333... times
-	// the nominal one).
-	//
-	// Output size is given in bits (cells).
-	//
-	// Computing the standard angular size of a cell is
-	// simple. Noting:
-	//   d = standard cell duration in microseconds
-	//   r = motor rotational speed in rpm
-	// then:
-	//   a = r * d * 10 / 3
-	//
-	// Some values:
-	//   Type           Cell    RPM    Size
+	/*! @brief Rebuild a cell bitstream for a track.
+	    Takes the cell standard
+	    angular size as a parameter, gives out a msb-first bitstream.
 
-	// C1541 tr  1-17   3.25    300    3250
-	// C1541 tr 18-24   3.50    300    3500
-	// C1541 tr 25-30   3.75    300    3750
-	// C1541 tr 31+     4.00    300    4000
-	// 5.25" SD         4       300    4000
-	// 5.25" DD         2       300    2000
-	// 5.25" HD         1       360    1200
-	// 3.5" SD          4       300    4000
-	// 3.5" DD          2       300    2000
-	// 3.5" HD          1       300    1000
-	// 3.5" ED          0.5     300     500
+	    Beware that fuzzy bits will always give out the same value.
+	    @param track
+	    @param head
+	    @param cell_size
+	    @param trackbuf Output buffer size should be 34% more than the nominal number
+	    of cells (the dpll tolerates a cell size down to 75% of the
+	    nominal one, with gives a cell count of 1/0.75=1.333... times
+	    the nominal one).
+	    @param track_size Output size is given in bits (cells).
+	    @param image
+	*/
+	/*! @verbatim
+	 Computing the standard angular size of a cell is
+	 simple. Noting:
+	   d = standard cell duration in microseconds
+	   r = motor rotational speed in rpm
+	 then:
+	   a = r * d * 10 / 3.
+	 Some values:
+	   Type           Cell    RPM    Size
+
+	 C1541 tr  1-17   3.25    300    3250
+	 C1541 tr 18-24   3.50    300    3500
+	 C1541 tr 25-30   3.75    300    3750
+	 C1541 tr 31+     4.00    300    4000
+	 5.25" SD         4       300    4000
+	 5.25" DD         2       300    2000
+	 5.25" HD         1       360    1200
+	 3.5" SD          4       300    4000
+	 3.5" DD          2       300    2000
+	 3.5" HD          1       300    1000
+	 3.5" ED          0.5     300     500
+	 @endverbatim
+	 */
 
 	void generate_bitstream_from_track(int track, int head, int cell_size,  UINT8 *trackbuf, int &track_size, floppy_image *image);
-
+	
+	//! Defines a standard sector for extracting.
 	struct desc_xs {
-		int track, head, size;
-		const UINT8 *data;
+		int track,	//!< Track for this sector
+		    head,	//!< Head for this sector
+		    size;	//!< Size of this sector
+		const UINT8 *data; //!< Data within this sector
 	};
 
-	// Extract standard sectors from a regenerated bitstream
-	// sectors must point to an array of 256 desc_xs
-	// An existing sector is reconizable by having ->data non-null
-	// Sector data is written in sectdata up to sectdata_size bytes
+	//! @brief Extract standard sectors from a regenerated bitstream.
+	//! Sectors must point to an array of 256 desc_xs.
 
-	// The ones implemented here are the ones used by multiple
-	// systems.
+	//! An existing sector is recognizable by having ->data non-null.
+	//! Sector data is written in sectdata up to sectdata_size bytes.
 
-	//   PC-type sectors with MFM encoding, sector size can go from 128 bytes to 16K
+	//! The ones implemented here are the ones used by multiple
+	//! systems.
+
+	//! PC-type sectors with MFM encoding, sector size can go from 128 bytes to 16K.
 	void extract_sectors_from_bitstream_mfm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
 
 
-	// Get a geometry (including sectors) from an image
-	//   PC-type sectors with MFM encoding
+	//! @brief Get a geometry (including sectors) from an image.
+	
+    //!   PC-type sectors with MFM encoding
 	void get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
 
 
-	// Regenerate the data for a full track
-	//   PC-type sectors with MFM encoding and fixed-size
+	//!  Regenerate the data for a full track.
+	//!  PC-type sectors with MFM encoding and fixed-size.
 	void get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata);
 
+	//! Look up a bit in a level-type stream.
 	bool bit_r(const UINT32 *buffer, int offset);
+	//! Look up multiple bits
 	UINT32 bitn_r(const UINT32 *buffer, int offset, int count);
+	//! Write a bit with a given size.
 	void bit_w(UINT32 *buffer, int offset, bool val, UINT32 size = 1000);
+	//! Calculate a CCITT-type CRC.
 	UINT16 calc_crc_ccitt(const UINT32 *buffer, int start, int end);
+	//! Write a series of (raw) bits and increment the offset.
 	void raw_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	//! MFM-encode and write a series of bits
 	void mfm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	//! MFM-encode every two bits and write
 	void mfm_half_w(UINT32 *buffer, int &offset, int start_bit, UINT32 val, UINT32 size = 1000);
+	//! GCR6 encode (Apple II 16-sector and Mac-style GCR)
 	UINT32 gcr6_encode(UINT8 va, UINT8 vb, UINT8 vc);
+	//! GCR6 decode
 	void gcr6_decode(UINT8 e0, UINT8 e1, UINT8 e2, UINT8 e3, UINT8 &va, UINT8 &vb, UINT8 &vc);
 
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CCITT, CRC_MACHEAD };
 	enum { MAX_CRC_COUNT = 64 };
+	
+	//! Holds data used internally for generating CRCs.
 	struct gen_crc_info {
-		int type, start, end, write;
-		bool fixup_mfm_clock;
+		int type, //!< Type of CRC
+			start, //!< Start position
+			end, //!< End position
+			write; //!< where to write the CRC
+		bool fixup_mfm_clock; //!< would the MFM clock bit after the CRC need to be fixed?
 	};
 
 	bool type_no_data(int type) const;
@@ -459,7 +541,7 @@ private:
 	int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);
 };
 
-// a device_type is simply a pointer to its alloc function
+// a dce_type is simply a pointer to its alloc function
 typedef floppy_image_format_t *(*floppy_format_type)();
 
 // this template function creates a stub which constructs a image format
@@ -471,85 +553,132 @@ floppy_image_format_t *floppy_image_format_creator()
 
 // ======================> floppy_image
 
-// class representing floppy image
+//! Class representing floppy image
+
+//! Internal format is close but not identical to the mfi format.
+//!
+//!
+//! Track data consists of a series of 32-bits lsb-first values
+//! representing magnetic cells.  Bits 0-27 indicate the absolute
+//! position of the start of the cell (not the size), and bits
+//! 28-31 the type.  Type can be:
+//! - 0, MG_A -> Magnetic orientation A
+//! - 1, MG_B -> Magnetic orientation B
+//! - 2, MG_N -> Non-magnetized zone (neutral)
+//! - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
+//!
+//! The position is in angular units of 1/200,000,000th of a turn.
+//! The last cell implicit end position is of course 200,000,000.
+//!
+//! Unformatted tracks are encoded as zero-size.
+//!
+//! The "track splice" information indicates where to start writing
+//! if you try to rewrite a physical disk with the data.  Some
+//! preservation formats encode that information, it is guessed for
+//! others.  The write track function of fdcs should set it.  The
+//! representation is the angular position relative to the index.
+//!
+//! The media type is divided in two parts.  The first half
+//! indicates the physical form factor, i.e. all medias with that
+//! form factor can be physically inserted in a reader that handles
+//! it.  The second half indicates the variants which are usually
+//! detectable by the reader, such as density and number of sides.
+
+
 class floppy_image
 {
 public:
-	// Internal format is close but not identical to the mfi format.
-	//
-	//
-	// Track data consists of a series of 32-bits lsb-first values
-	// representing magnetic cells.  Bits 0-27 indicate the absolute
-	// position of the start of the cell (not the size), and bits
-	// 28-31 the type.  Type can be:
-	// - 0, MG_A -> Magnetic orientation A
-	// - 1, MG_B -> Magnetic orientation B
-	// - 2, MG_N -> Non-magnetized zone (neutral)
-	// - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
-	//
-	// The position is in angular units of 1/200,000,000th of a turn.
-	// The last cell implicit end position is of course 200,000,000.
-	//
-	// Unformatted tracks are encoded as zero-size.
-	//
-	// The "track splice" information indicates where to start writing
-	// if you try to rewrite a physical disk with the data.  Some
-	// preservation formats encode that information, it is guessed for
-	// others.  The write track function of fdcs should set it.  The
-	// representation is the angular position relative to the index.
-	//
-	// The media type is divided in two parts.  The first half
-	// indicate the physical form factor, i.e. all medias with that
-	// form factor can be physically inserted in a reader that handles
-	// it.  The second half indicates the variants which are usually
-	// detectable by the reader, such as density and number of sides.
-
+	//! Floppy format data
 	enum {
 		TIME_MASK = 0x0fffffff,
 		MG_MASK   = 0xf0000000,
-		MG_SHIFT  = 28,
-
-		MG_A      = (0 << MG_SHIFT),
-		MG_B      = (1 << MG_SHIFT),
-		MG_N      = (2 << MG_SHIFT),
-		MG_D      = (3 << MG_SHIFT)
+		MG_SHIFT  = 28,	//!< Bitshift constant for magnetic orientation data
+		MG_A      = (0 << MG_SHIFT),  	//!< - 0, MG_A -> Magnetic orientation A
+		MG_B      = (1 << MG_SHIFT),	//!< - 1, MG_B -> Magnetic orientation B
+		MG_N      = (2 << MG_SHIFT),	//!< - 2, MG_N -> Non-magnetized zone (neutral)
+		MG_D      = (3 << MG_SHIFT) 	//!< - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
 	};
 
-	// Form factors
+
+	//! Form factors
 	enum {
-		FF_UNKNOWN  = 0x00000000, // Unknown, useful when converting
-		FF_35       = 0x20203533, // "35  "
-		FF_525      = 0x20353235, // "525 "
+		FF_UNKNOWN  = 0x00000000, //!< Unknown, useful when converting
+		FF_35       = 0x20203533, //!< "35  " 3.5 inch disk
+		FF_525      = 0x20353235, //!< "525 " 5.25 inch disk
 	};
 
-	// Variants
+	//! Variants
 	enum {
-		SSSD  = 0x44535353, // "SSSD",
-		SSDD  = 0x44445353, // "DSSD",
-		DSDD  = 0x44445344, // "DSDD",
-		DSHD  = 0x44485344, // "DSHD",
-		DSED  = 0x44455344, // "DSED",
+		SSSD  = 0x44535353, //!< "SSSD", Single-sided single-density
+		SSDD  = 0x44445353, //!< "DSSD", Double-sided single-density
+		DSDD  = 0x44445344, //!< "DSDD", Double-sided double-density (720K)
+		DSHD  = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
+		DSED  = 0x44455344, //!< "DSED", Double-sided extra-density (2880K)
 	};
 
-	// construction/destruction
+// construction/destruction
+
+
+	//! floppy_image constructor
+	/*!
+	  @param _tracks number of tracks.
+	  @param _heads number of heads.
+	  @param _form_factor form factor of drive (from enum)
+	*/
 	floppy_image(int tracks, int heads, UINT32 form_factor);
 	virtual ~floppy_image();
-
+	
+	//! @return the form factor.
 	UINT32 get_form_factor() { return form_factor; }
+	//! @return the variant.
 	UINT32 get_variant() { return variant; }
-	void set_variant(UINT32 v) { variant = v; }
+	//! @param v the variant.
+	void set_variant(UINT32 v) { variant = v; }  
 
+	/*!
+	  @param track
+	  @param head
+	  @param size size of this track
+	*/
 	void set_track_size(int track, int head, UINT32 size) { track_size[track][head] = size; ensure_alloc(track, head); }
+	
+    /*!
+      @param track track number
+      @param head head number 
+      @return a pointer to the data buffer for this track and head
+    */
 	UINT32 *get_buffer(int track, int head) { return cell_data[track][head]; }
+	//! @return the track size
+	//! @param track
+	//! @param head
 	UINT32 get_track_size(int track, int head) { return track_size[track][head]; }
-	void set_write_splice_position(int track, int head, UINT32 pos) { write_splice[track][head] = pos; }
-	UINT32 get_write_splice_position(int track, int head) const { return write_splice[track][head]; }
-	void get_maximal_geometry(int &tracks, int &heads);
-	void get_actual_geometry(int &tracks, int &heads);
+	
+	//! Sets the write splice position.
+	//! The "track splice" information indicates where to start writing
+	//! if you try to rewrite a physical disk with the data.  Some
+	//! preservation formats encode that information, it is guessed for
+	//! others.  The write track function of fdcs should set it.  The
+	//! representation is the angular position relative to the index.
 
+	/*! @param track
+	    @param head
+	    @param pos the position
+	*/
+	void set_write_splice_position(int track, int head, UINT32 pos) { write_splice[track][head] = pos; }
+	//! @return the current write splice position.
+	UINT32 get_write_splice_position(int track, int head) const { return write_splice[track][head]; }
+	//! @return the maximal geometry supported by thie format.
+	void get_maximal_geometry(int &tracks, int &heads);
+	//! @return the current geometry of the loaded image.
+	void get_actual_geometry(int &tracks, int &heads);
+	//! Returns the variant name for the particular disk form factor/variant
+	//! @param form_factor
+	//! @param variant
+	//! @param returns a string containing the variant name.
 	static const char *get_variant_name(UINT32 form_factor, UINT32 variant);
 
 private:
+	
 	enum {
 		MAX_FLOPPY_HEADS = 2,
 		MAX_FLOPPY_TRACKS = 84

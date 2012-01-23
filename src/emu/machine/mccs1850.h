@@ -31,41 +31,27 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MCCS1850_ADD(_tag, _clock, _config) \
+#define MCFG_MCCS1850_ADD(_tag, _clock, _int_cb, _pse_cb, _nuc_cb)	\
 	MCFG_DEVICE_ADD(_tag, MCCS1850, _clock)	\
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define MCCS1850_INTERFACE(name) \
-	const mccs1850_interface (name) =
-
+	downcast<mccs1850_device *>(device)->set_cb(_int_cb, _pse_cb, _nuc_cb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mccs1850_interface
-
-struct mccs1850_interface
-{
-	devcb_write_line		m_out_int_cb;
-	devcb_write_line		m_out_pse_cb;
-	devcb_write_line		m_out_nuc_cb;
-};
-
-
-
 // ======================> mccs1850_device
 
 class mccs1850_device :	public device_t,
 						public device_rtc_interface,
-						public device_nvram_interface,
-                        public mccs1850_interface
+						public device_nvram_interface
 {
 public:
+	typedef delegate<void (bool state)> cb_t;
+
     // construction/destruction
     mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void set_cb(cb_t int_cb, cb_t pse_cb, cb_t nuc_cb);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( sck_w );
@@ -77,7 +63,6 @@ public:
 
 protected:
     // device-level overrides
-	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -93,16 +78,14 @@ protected:
 
 private:
 	inline void check_interrupt();
-	inline void set_pse_line(int state);
+	inline void set_pse_line(bool state);
 	inline UINT8 read_register(offs_t offset);
 	inline void write_register(offs_t offset, UINT8 data);
 	inline void advance_seconds();
 
 	static const device_timer_id TIMER_CLOCK = 0;
 
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_pse_func;
-	devcb_resolved_write_line	m_out_nuc_func;
+	cb_t int_cb, pse_cb, nuc_cb;
 
 	UINT8 m_ram[0x80];			// RAM
 
