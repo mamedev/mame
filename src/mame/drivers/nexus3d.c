@@ -125,25 +125,25 @@ static READ32_HANDLER( nexus3d_unk_r )
 	return space->machine().rand() ^ (space->machine().rand() << 16);
 }
 
-static READ32_HANDLER( nexus3d_unk2_r )
-{
-	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
-}
-
-static READ32_HANDLER( nexus3d_unk3_r )
-{
-	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
-}
-
-static WRITE32_HANDLER( nexus3d_unk2_w )
-{
-
-}
-
-static WRITE32_HANDLER( nexus3d_unk3_w )
-{
-
-}
+//static READ32_HANDLER( nexus3d_unk2_r )
+//{
+//	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
+//}
+//
+//static READ32_HANDLER( nexus3d_unk3_r )
+//{
+//	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
+//}
+//
+//static WRITE32_HANDLER( nexus3d_unk2_w )
+//{
+//
+//}
+//
+//static WRITE32_HANDLER( nexus3d_unk3_w )
+//{
+//
+//}
 
 static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(nexus3d_state, m_mainram)
