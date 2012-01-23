@@ -94,8 +94,8 @@ static SCREEN_UPDATE_IND16( snowbros )
 
 static SCREEN_VBLANK( snowbros )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		device_t *pandora = screen.machine().device("pandora");
 		pandora_eof(pandora);

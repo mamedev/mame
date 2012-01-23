@@ -1067,8 +1067,8 @@ SCREEN_UPDATE_IND16( setaroul )
 
 SCREEN_VBLANK( setaroul )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 		screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
 }
 

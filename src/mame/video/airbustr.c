@@ -148,8 +148,8 @@ SCREEN_UPDATE_IND16( airbustr )
 
 SCREEN_VBLANK( airbustr )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		airbustr_state *state = screen.machine().driver_data<airbustr_state>();
 

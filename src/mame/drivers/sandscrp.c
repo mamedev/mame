@@ -136,8 +136,8 @@ static INTERRUPT_GEN( sandscrp_interrupt )
 
 static SCREEN_VBLANK( sandscrp )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 	{
 		sandscrp_state *state = screen.machine().driver_data<sandscrp_state>();
 		device_t *pandora = screen.machine().device("pandora");

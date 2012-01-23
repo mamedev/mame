@@ -55,7 +55,7 @@ SCREEN_UPDATE_IND16( tnzs )
 
 SCREEN_VBLANK( tnzs )
 {
-	// rising edge
-	if (vblank_on)
+	// falling edge
+	if (!vblank_on)
 		screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
 }
