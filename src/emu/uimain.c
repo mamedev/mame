@@ -149,8 +149,8 @@ void ui_menu_main::populate()
 	menu_text.printf("%s Information",emulator_info::get_capstartgamenoun());
 	item_append(menu_text.cstr(), NULL, 0, (void *)GAME_INFO);
 
-	device_image_interface *image = NULL;
-	if (machine().devicelist().first(image))
+	image_interface_iterator imgiter(machine().root_device());
+	if (imgiter.first() != NULL)
 	{
 		/* add image info menu */
 		item_append("Image Information", NULL, 0, (void *)IMAGE_MENU_IMAGE_INFO);
@@ -159,23 +159,25 @@ void ui_menu_main::populate()
 		item_append("File Manager", NULL, 0, (void *)IMAGE_MENU_FILE_MANAGER);
 
 		/* add tape control menu */
-		if (machine().devicelist().first(CASSETTE))
+		cassette_device_iterator cassiter(machine().root_device());
+		if (cassiter.first() != NULL)
 			item_append("Tape Control", NULL, 0, (void *)MESS_MENU_TAPE_CONTROL);
 
 		/* add bitbanger control menu */
-		if (machine().devicelist().first(BITBANGER))
+		bitbanger_device_iterator bititer(machine().root_device());
+		if (bititer.first() != NULL)
 			item_append("Bitbanger Control", NULL, 0, (void *)MESS_MENU_BITBANGER_CONTROL);
 	}
 
-	device_slot_interface *slot = NULL;
-	if (machine().devicelist().first(slot))
+	slot_interface_iterator slotiter(machine().root_device());
+	if (slotiter.first() != NULL)
 	{
 		/* add image info menu */
 		item_append("Slot Devices", NULL, 0, (void *)SLOT_DEVICES);
 	}
 
-	device_network_interface *network = NULL;
-	if (machine().devicelist().first(network))
+	network_interface_iterator netiter(machine().root_device());
+	if (netiter.first() != NULL)
 	{
 		/* add image info menu */
 		item_append("Network Devices", NULL, 0, (void*)NETWORK_DEVICES);
@@ -427,10 +429,9 @@ ui_menu_slot_devices::ui_menu_slot_devices(running_machine &machine, render_cont
 
 void ui_menu_slot_devices::populate()
 {
-	device_slot_interface *slot = NULL;
-
 	/* cycle through all devices for this system */
-	for (bool gotone = machine().devicelist().first(slot); gotone; gotone = slot->next(slot))
+	slot_interface_iterator iter(machine().root_device());
+	for (device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
 		/* record the menu item */
 		const char *title = get_slot_device(slot);
@@ -481,10 +482,9 @@ ui_menu_network_devices::~ui_menu_network_devices()
 
 void ui_menu_network_devices::populate()
 {
-	device_network_interface *network = NULL;
-
 	/* cycle through all devices for this system */
-	for (bool gotone = machine().devicelist().first(network); gotone; gotone = network->next(network))
+	network_interface_iterator iter(machine().root_device());
+	for (device_network_interface *network = iter.first(); network != NULL; network = iter.next())
 	{
 		int curr = network->get_interface();
 		const char *title = NULL;

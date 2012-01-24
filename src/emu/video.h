@@ -137,7 +137,7 @@ private:
 	void recompute_speed(attotime emutime);
 
 	// snapshot/movie helpers
-	void create_snapshot_bitmap(device_t *screen);
+	void create_snapshot_bitmap(screen_device *screen);
 	file_error open_next(emu_file &file, const char *extension);
 	void record_frame();
 

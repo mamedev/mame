@@ -1266,7 +1266,7 @@ static MACHINE_CONFIG_DERIVED( dodge, pitboss )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dodge_map)
 
-	MCFG_NVRAM_REPLACE_CUSTOM_DRIVER("nvram", merit_state, dodge_nvram_init)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", merit_state, dodge_nvram_init)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tictac, pitboss )

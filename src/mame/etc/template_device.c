@@ -37,11 +37,10 @@ xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t 
 //  on this device
 //-------------------------------------------------
 
-bool xxx_device::device_validity_check(emu_options &options, const game_driver &driver) const
+void xxx_device::device_validity_check(validity_checker &valid) const
 {
-	bool error = false;
-	return error;
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup

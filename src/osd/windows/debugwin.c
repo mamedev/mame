@@ -2399,7 +2399,6 @@ enum
 
 static void image_update_menu(debugwin_info *info)
 {
-	device_image_interface *img = NULL;
 	UINT32 cnt = 0;
 	HMENU devicesmenu;
 
@@ -2407,7 +2406,8 @@ static void image_update_menu(debugwin_info *info)
 
 	// create the image menu
 	devicesmenu = CreatePopupMenu();
-	for (bool gotone = info->machine().devicelist().first(img); gotone; gotone = img->next(img))
+	image_interface_iterator iter(info->machine().root_device());
+	for (device_image_interface *img = iter.first(); img != NULL; img = iter.next())
 	{
 		astring temp;
 		UINT flags_for_exists;
@@ -2465,7 +2465,6 @@ void console_create_window(running_machine &machine)
 	RECT bounds, work_bounds;
 	HMENU optionsmenu;
 	UINT32 conchars;
-	device_image_interface *img = NULL;
 
 	// create the window
 	info = debugwin_window_create(machine, "Debug", NULL);
@@ -2492,9 +2491,12 @@ void console_create_window(running_machine &machine)
 	AppendMenu(GetMenu(info->wnd), MF_ENABLED | MF_POPUP, (UINT_PTR)optionsmenu, TEXT("Options"));
 
 	// Add image menu only if image devices exist
-	if (info->machine().devicelist().first(img))	{
-		info->update_menu = image_update_menu;
-		image_update_menu(info);
+	{
+		image_interface_iterator iter(machine.root_device());
+		if (iter.first() != NULL) {
+			info->update_menu = image_update_menu;
+			image_update_menu(info);
+		}
 	}
 
 	// set the handlers
@@ -2888,13 +2890,8 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 		}
 		if (LOWORD(wparam) >= ID_DEVICE_OPTIONS) {
 			UINT32 devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
-			device_image_interface *img = NULL;
-			UINT32 cnt = 0;
-			for (bool gotone = info->machine().devicelist().first(img); gotone; gotone = img->next(img))
-			{
-				if (cnt==devid) break;
-				cnt++;
-			}
+			image_interface_iterator iter(info->machine().root_device());
+			device_image_interface *img = iter.byindex(devid);
 			if (img!=NULL) {
 				switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 				{

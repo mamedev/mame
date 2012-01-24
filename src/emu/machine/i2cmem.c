@@ -125,10 +125,8 @@ void i2cmem_device::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool i2cmem_device::device_validity_check( emu_options &options, const game_driver &driver ) const
+void i2cmem_device::device_validity_check(validity_checker &valid) const
 {
-	bool error = false;
-	return error;
 }
 
 

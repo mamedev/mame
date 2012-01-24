@@ -1174,8 +1174,8 @@ void cheat_manager::reload()
 
 	// load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
     // and MAME will load gamename.xml
-	device_image_interface *image = NULL;
-	for (bool gotone = machine().devicelist().first(image); gotone; gotone = image->next(image))
+    image_interface_iterator iter(machine().root_device());
+	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 		if (image->exists())
 		{
 			// if we are loading through software lists, try to load shortname.xml

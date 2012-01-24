@@ -232,30 +232,21 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 //  constructed
 //-------------------------------------------------
 
-bool device_sound_interface::interface_validity_check(emu_options &options, const game_driver &driver) const
+void device_sound_interface::interface_validity_check(validity_checker &valid) const
 {
-	bool error = false;
-
 	// loop over all the routes
 	for (const sound_route *route = first_route(); route != NULL; route = route->next())
 	{
 		// find a device with the requested tag
-		const device_t *target = device().mconfig().devicelist().find(route->m_target.cstr());
+		const device_t *target = device().siblingdevice(route->m_target.cstr());
 		if (target == NULL)
-		{
-			mame_printf_error("%s: %s attempting to route sound to non-existant device '%s'\n", driver.source_file, driver.name, route->m_target.cstr());
-			error = true;
-		}
+			mame_printf_error("Attempting to route sound to non-existant device '%s'\n", route->m_target.cstr());
 
 		// if it's not a speaker or a sound device, error
 		const device_sound_interface *sound;
 		if (target != NULL && target->type() != SPEAKER && !target->interface(sound))
-		{
-			mame_printf_error("%s: %s attempting to route sound to a non-sound device '%s' (%s)\n", driver.source_file, driver.name, route->m_target.cstr(), target->name());
-			error = true;
-		}
+			mame_printf_error("Attempting to route sound to a non-sound device '%s' (%s)\n", route->m_target.cstr(), target->name());
 	}
-	return error;
 }
 
 
@@ -267,8 +258,8 @@ bool device_sound_interface::interface_validity_check(emu_options &options, cons
 void device_sound_interface::interface_pre_start()
 {
 	// scan all the sound devices
-	device_sound_interface *sound = NULL;
-	for (bool gotone = m_device.machine().devicelist().first(sound); gotone; gotone = sound->next(sound))
+	sound_interface_iterator iter(m_device.machine().root_device());
+	for (device_sound_interface *sound = iter.first(); sound != NULL; sound = iter.next())
 	{
 		// scan each route on the device
 		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
@@ -282,7 +273,7 @@ void device_sound_interface::interface_pre_start()
 
 	// now iterate through devices again and assign any auto-allocated inputs
 	m_auto_allocated_inputs = 0;
-	for (bool gotone = m_device.machine().devicelist().first(sound); gotone; gotone = sound->next(sound))
+	for (device_sound_interface *sound = iter.first(); sound != NULL; sound = iter.next())
 	{
 		// scan each route on the device
 		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
@@ -307,8 +298,8 @@ void device_sound_interface::interface_pre_start()
 void device_sound_interface::interface_post_start()
 {
 	// iterate over all the sound devices
-	device_sound_interface *sound = NULL;
-	for (bool gotone = m_device.machine().devicelist().first(sound); gotone; gotone = sound->next(sound))
+	sound_interface_iterator iter(m_device.machine().root_device());
+	for (device_sound_interface *sound = iter.first(); sound != NULL; sound = iter.next())
 	{
 		// scan each route on the device
 		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())

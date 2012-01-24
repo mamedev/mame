@@ -224,10 +224,8 @@ void gp9001vdp_device::static_set_gfx_region(device_t &device, int gfxregion)
 	vdp.m_gfxregion = gfxregion;
 }
 
-bool gp9001vdp_device::device_validity_check(emu_options &options, const game_driver &driver) const
+void gp9001vdp_device::device_validity_check(validity_checker &valid) const
 {
-	bool error = false;
-	return error;
 }
 
 const address_space_config *gp9001vdp_device::memory_space_config(address_spacenum spacenum) const

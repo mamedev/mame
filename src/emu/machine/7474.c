@@ -86,7 +86,7 @@ void ttl7474_device::static_set_output_cb(device_t &device, write_line_device_fu
 	if (callback != NULL)
 	{
 		ttl7474.m_output_cb.type = DEVCB_TYPE_DEVICE;
-		ttl7474.m_output_cb.index = DEVCB_DEVICE_OTHER;
+		ttl7474.m_output_cb.index = 0;
 		ttl7474.m_output_cb.writeline = callback;
 	}
 	else
@@ -105,7 +105,7 @@ void ttl7474_device::static_set_comp_output_cb(device_t &device, write_line_devi
 	if (callback != NULL)
 	{
 		ttl7474.m_comp_output_cb.type = DEVCB_TYPE_DEVICE;
-		ttl7474.m_comp_output_cb.index = DEVCB_DEVICE_OTHER;
+		ttl7474.m_comp_output_cb.index = 0;
 		ttl7474.m_comp_output_cb.writeline = callback;
 	}
 	else

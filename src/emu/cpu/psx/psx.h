@@ -105,10 +105,10 @@ enum
 //**************************************************************************
 
 #define MCFG_PSX_DMA_CHANNEL_READ( cputag, channel, handler ) \
-	downcast<psxdma_device *>( psxcpu_device::getcpu( *owner, cputag )->subdevice("dma") )->install_read_handler( channel, handler );
+	psxcpu_device::getcpu( *owner, cputag )->subdevice<psxdma_device>("dma")->install_read_handler( channel, handler );
 
 #define MCFG_PSX_DMA_CHANNEL_WRITE( cputag, channel, handler ) \
-	downcast<psxdma_device *>( psxcpu_device::getcpu( *owner, cputag )->subdevice("dma") )->install_write_handler( channel, handler );
+	psxcpu_device::getcpu( *owner, cputag )->subdevice<psxdma_device>("dma")->install_write_handler( channel, handler );
 
 
 

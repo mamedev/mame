@@ -766,11 +766,8 @@ void mc6845_device::device_start()
 	/* get the screen device */
 	if ( m_screen_tag != NULL )
 	{
-		m_screen = downcast<screen_device *>(machine().device(m_screen_tag));
-		if (m_screen == NULL) {
-			astring tempstring;
-			m_screen = downcast<screen_device *>(machine().device(owner()->subtag(tempstring,m_screen_tag)));
-		}
+		astring tempstring;
+		m_screen = downcast<screen_device *>(machine().device(siblingtag(tempstring,m_screen_tag)));
 		assert(m_screen != NULL);
 	}
 	else

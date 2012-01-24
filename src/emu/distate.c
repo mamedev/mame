@@ -517,7 +517,7 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 	assert(symbol != NULL);
 
 	// allocate new entry
-	device_state_entry *entry = auto_alloc(device().machine(), device_state_entry(index, symbol, data, size));
+	device_state_entry *entry = global_alloc(device_state_entry(index, symbol, data, size));
 
 	// append to the end of the list
 	m_state_list.append(*entry);

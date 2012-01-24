@@ -1120,17 +1120,15 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 	}
 
 	// if we don't have a match, default to the nth view
-	int scrcount = m_manager.machine().devicelist().count(SCREEN);
+	screen_device_iterator iter(m_manager.machine().root_device());
+	int scrcount = iter.count();
 	if (view == NULL && scrcount > 0)
 	{
 		// if we have enough targets to be one per screen, assign in order
 		if (numtargets >= scrcount)
 		{
 			int ourindex = index() % scrcount;
-			screen_device *screen;
-			for (screen = m_manager.machine().first_screen(); screen != NULL; screen = screen->next_screen())
-				if (ourindex-- == 0)
-					break;
+			screen_device *screen = iter.byindex(ourindex);
 
 			// find the first view with this screen and this screen only
 			for (view = view_by_index(viewindex = 0); view != NULL; view = view_by_index(++viewindex))
@@ -1157,7 +1155,7 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 				if (viewscreens.count() >= scrcount)
 				{
 					screen_device *screen;
-					for (screen = m_manager.machine().first_screen(); screen != NULL; screen = screen->next_screen())
+					for (screen = iter.first(); screen != NULL; screen = iter.next())
 						if (!viewscreens.contains(*screen))
 							break;
 					if (screen == NULL)
@@ -1576,7 +1574,8 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 		else
 			have_default |= true;
 	}
-	int screens = m_manager.machine().devicelist().count(SCREEN);
+	screen_device_iterator iter(m_manager.machine().root_device());
+	int screens = iter.count();
 	// now do the built-in layouts for single-screen games
 	if (screens == 1)
 	{
@@ -2432,7 +2431,8 @@ render_manager::render_manager(running_machine &machine)
 	config_register(machine, "video", config_saveload_delegate(FUNC(render_manager::config_load), this), config_saveload_delegate(FUNC(render_manager::config_save), this));
 
 	// create one container per screen
-	for (screen_device *screen = machine.first_screen(); screen != NULL; screen = screen->next_screen())
+	screen_device_iterator iter(machine.root_device());
+	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
 		screen->set_container(*container_alloc(screen));
 }
 

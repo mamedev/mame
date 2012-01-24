@@ -226,11 +226,11 @@ bool emu_options::add_slot_options(bool isfirst)
 	// iterate through all slot devices
 	options_entry entry[2] = { { 0 }, { 0 } };
 	bool first = true;
-	const device_slot_interface *slot = NULL;
 	// create the configuration
 	machine_config config(*cursystem, *this);
 	bool added = false;
-	for (bool gotone = config.devicelist().first(slot); gotone; gotone = slot->next(slot))
+	slot_interface_iterator iter(config.root_device());
+	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
 		// first device? add the header as to be pretty
 		if (first && isfirst)
@@ -253,7 +253,7 @@ bool emu_options::add_slot_options(bool isfirst)
 			entry[0].name = slot->device().tag();
 			entry[0].description = NULL;
 			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
-			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card(config.devicelist(),*this) : NULL;
+			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card(config,*this) : NULL;
 			add_entries(entry, true);
 
 			added = true;
@@ -275,10 +275,10 @@ void emu_options::update_slot_options()
 		return;
 
 	// iterate through all slot devices
-	const device_slot_interface *slot = NULL;
 	// create the configuration
 	machine_config config(*cursystem, *this);
-	for (bool gotone = config.devicelist().first(slot); gotone; gotone = slot->next(slot))
+	slot_interface_iterator iter(config.root_device());
+	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
 		// retrieve info about the device instance
 		astring option_name;
@@ -286,7 +286,7 @@ void emu_options::update_slot_options()
 
 		if (exists(slot->device().tag())) {
 			if (slot->get_slot_interfaces() != NULL) {
-				const char *def = slot->get_default_card_software(config.devicelist(),*this);
+				const char *def = slot->get_default_card_software(config,*this);
 				if (def) set_default_value(slot->device().tag(),def);
 			}
 		}
@@ -308,9 +308,9 @@ void emu_options::add_device_options(bool isfirst)
 	options_entry entry[2] = { { 0 }, { 0 } };
 	bool first = true;
 	// iterate through all image devices
-	const device_image_interface *image = NULL;
 	machine_config config(*cursystem, *this);
-	for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
+	image_interface_iterator iter(config.root_device());
+	for (const device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
 		// first device? add the header as to be pretty
 		if (first && isfirst)
@@ -438,7 +438,8 @@ void emu_options::parse_standard_inis(astring &error_string)
 	// parse "vector.ini" for vector games
 	{
 		machine_config config(*cursystem, *this);
-		for (const screen_device *device = config.first_screen(); device != NULL; device = device->next_screen())
+		screen_device_iterator iter(config.root_device());
+		for (const screen_device *device = iter.first(); device != NULL; device = iter.next())
 			if (device->screen_type() == SCREEN_TYPE_VECTOR)
 			{
 				parse_one_ini("vector", OPTION_PRIORITY_VECTOR_INI, &error_string);

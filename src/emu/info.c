@@ -266,13 +266,13 @@ void info_xml_creator::output_devices()
 	m_drivlist.reset();
 	m_drivlist.next();
 	machine_config &config = m_drivlist.config();
-	device_t *owner = config.devicelist().first();
+	device_t &owner = config.root_device();
 	// check if all are listed, note that empty one is included
 	bool display_all = driver_list::total() == (m_drivlist.count()+1);
 	for(int i=0;i<m_device_count;i++) {
 		if (display_all || (m_device_used[i]!=0)) {
 			device_type type = *s_devices_sorted[i];
-			device_t *dev = (*type)(config, "dummy", owner, 0);
+			device_t *dev = (*type)(config, "dummy", &owner, 0);
 			dev->config_complete();
 
 			// print the header and the game name
@@ -311,7 +311,8 @@ void info_xml_creator::output_one()
 	machine_config &config = m_drivlist.config();
 	ioport_list portlist;
 	astring errors;
-	for (device_t *device = config.devicelist().first(); device != NULL; device = device->next())
+	device_iterator iter(config.root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 		input_port_list_init(*device, portlist, errors);
 
 	// print the header and the game name
@@ -407,7 +408,8 @@ void info_xml_creator::output_device_roms()
 void info_xml_creator::output_sampleof()
 {
 	// iterate over sample devices
-	for (const device_t *device = m_drivlist.config().devicelist().first(SAMPLES); device != NULL; device = device->typenext())
+	samples_device_iterator iter(m_drivlist.config().root_device());
+	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
 	{
 		const char *const *samplenames = ((const samples_interface *)device->static_config())->samplenames;
 		if (samplenames != NULL)
@@ -566,7 +568,8 @@ void info_xml_creator::output_rom(const rom_source *source)
 void info_xml_creator::output_sample()
 {
 	// iterate over sample devices
-	for (const device_t *device = m_drivlist.config().devicelist().first(SAMPLES); device != NULL; device = device->typenext())
+	samples_device_iterator iter(m_drivlist.config().root_device());
+	for (const device_t *device = iter.first(); device != NULL; device = iter.next())
 	{
 		const char *const *samplenames = ((const samples_interface *)device->static_config())->samplenames;
 		if (samplenames != NULL)
@@ -602,8 +605,8 @@ void info_xml_creator::output_sample()
 void info_xml_creator::output_chips()
 {
 	// iterate over executable devices
-	device_execute_interface *exec = NULL;
-	for (bool gotone = m_drivlist.config().devicelist().first(exec); gotone; gotone = exec->next(exec))
+	execute_interface_iterator execiter(m_drivlist.config().root_device());
+	for (device_execute_interface *exec = execiter.first(); exec != NULL; exec = execiter.next())
 	{
 		fprintf(m_output, "\t\t<chip");
 		fprintf(m_output, " type=\"cpu\"");
@@ -614,8 +617,8 @@ void info_xml_creator::output_chips()
 	}
 
 	// iterate over sound devices
-	device_sound_interface *sound = NULL;
-	for (bool gotone = m_drivlist.config().devicelist().first(sound); gotone; gotone = sound->next(sound))
+	sound_interface_iterator sounditer(m_drivlist.config().root_device());
+	for (device_sound_interface *sound = sounditer.first(); sound != NULL; sound = sounditer.next())
 	{
 		fprintf(m_output, "\t\t<chip");
 		fprintf(m_output, " type=\"audio\"");
@@ -636,7 +639,8 @@ void info_xml_creator::output_chips()
 void info_xml_creator::output_display()
 {
 	// iterate over screens
-	for (const screen_device *device = m_drivlist.config().first_screen(); device != NULL; device = device->next_screen())
+	screen_device_iterator iter(m_drivlist.config().root_device());
+	for (const screen_device *device = iter.first(); device != NULL; device = iter.next())
 	{
 		fprintf(m_output, "\t\t<display");
 
@@ -714,11 +718,12 @@ void info_xml_creator::output_display()
 
 void info_xml_creator::output_sound()
 {
-	int speakers = m_drivlist.config().devicelist().count(SPEAKER);
+	speaker_device_iterator spkiter(m_drivlist.config().root_device());
+	int speakers = spkiter.count();
 
 	// if we have no sound, zero m_output the speaker count
-	const device_sound_interface *sound = NULL;
-	if (!m_drivlist.config().devicelist().first(sound))
+	sound_interface_iterator snditer(m_drivlist.config().root_device());
+	if (snditer.first() == NULL)
 		speakers = 0;
 
 	fprintf(m_output, "\t\t<sound channels=\"%d\"/>\n", speakers);
@@ -1144,8 +1149,8 @@ void info_xml_creator::output_driver()
 
 void info_xml_creator::output_images()
 {
-	const device_image_interface *dev = NULL;
-	for (bool gotone = m_drivlist.config().devicelist().first(dev); gotone; gotone = dev->next(dev))
+	image_interface_iterator iter(m_drivlist.config().root_device());
+	for (const device_image_interface *dev = iter.first(); dev != NULL; dev = iter.next())
 	{
 		// print m_output device type
 		fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(dev->image_type_name()));
@@ -1194,8 +1199,8 @@ void info_xml_creator::output_images()
 
 void info_xml_creator::output_slots()
 {
-	const device_slot_interface *slot = NULL;
-	for (bool gotone = m_drivlist.config().devicelist().first(slot); gotone; gotone = slot->next(slot))
+	slot_interface_iterator iter(m_drivlist.config().root_device());
+	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
 		// print m_output device type
 		fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(slot->device().tag()));
@@ -1210,9 +1215,9 @@ void info_xml_creator::output_slots()
 		{
 			fprintf(m_output, "\t\t\t<slotoption");
 			fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
-			if (slot->get_default_card(m_drivlist.config().devicelist(), m_drivlist.options()))
+			if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()))
 			{
-				if (slot->get_default_card(m_drivlist.config().devicelist(), m_drivlist.options()) == intf[i].name)
+				if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()) == intf[i].name)
 					fprintf(m_output, " default=\"yes\"");
 			}
 			fprintf(m_output, "/>\n");
@@ -1230,13 +1235,13 @@ void info_xml_creator::output_slots()
 
 void info_xml_creator::output_software_list()
 {
-	for (const device_t *dev = m_drivlist.config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	software_list_device_iterator iter(m_drivlist.config().root_device());
+	for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
 	{
-		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
-		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist->list_name);
-		fprintf(m_output, "status=\"%s\" ", (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
-		if (swlist->filter) {
-			fprintf(m_output, "filter=\"%s\" ", swlist->filter);
+		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist->list_name());
+		fprintf(m_output, "status=\"%s\" ", (swlist->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
+		if (swlist->filter()) {
+			fprintf(m_output, "filter=\"%s\" ", swlist->filter());
 		}
 		fprintf(m_output, "/>\n");
 	}
@@ -1251,10 +1256,9 @@ void info_xml_creator::output_software_list()
 
 void info_xml_creator::output_ramoptions()
 {
-	for (const device_t *device = m_drivlist.config().devicelist().first(RAM); device != NULL; device = device->typenext())
+	ram_device_iterator iter(m_drivlist.config().root_device());
+	for (const ram_device *ram = iter.first(); ram != NULL; ram = iter.next())
 	{
-		const ram_device *ram = downcast<const ram_device *>(device);
-
 		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram->default_size());
 
 		if (ram->extra_options() != NULL)

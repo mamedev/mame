@@ -410,6 +410,10 @@ ifdef USE_NETWORK
 DEFS += -DUSE_NETWORK
 endif
 
+# need to ensure FLAC functions are statically linked
+DEFS += -DFLAC__NO_DLL
+
+
 
 #-------------------------------------------------
 # compile flags
@@ -634,7 +638,6 @@ all: default tools
 
 FLAC_LIB = $(OBJ)/libflac.a $(OBJ)/libflac++.a
 
-FLAC_LIB = $(OBJ)/libflac.a $(OBJ)/libflac++.a
 
 #-------------------------------------------------
 # defines needed by multiple make files 

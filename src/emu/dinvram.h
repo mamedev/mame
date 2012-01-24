@@ -74,5 +74,8 @@ protected:
 	virtual void nvram_write(emu_file &file) = 0;
 };
 
+// iterator
+typedef device_interface_iterator<device_nvram_interface> nvram_interface_iterator;
+
 
 #endif	/* __DINVRAM_H__ */

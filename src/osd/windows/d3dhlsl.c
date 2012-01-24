@@ -1928,14 +1928,8 @@ int hlsl_info::register_prescaled_texture(d3d_texture_info *texture, int scwidth
 //============================================================
 void hlsl_info::enumerate_screens()
 {
-	screen_device *screen = window->machine().first_screen();
-	num_screens = 0;
-	while(screen != NULL)
-	{
-		num_screens++;
-		screen = screen->next_screen();
-		//printf("Encountered %d screens\n", num_screens);
-	}
+	screen_device_iterator iter(window->machine().root_device());
+	num_screens = iter.count();
 }
 
 //============================================================
@@ -2792,8 +2786,8 @@ static file_error open_next(d3d_info *d3d, emu_file &file, const char *templ, co
 			snapdevname.cpysubstr(snapstr, pos + 3, end - pos - 3);
 
 			// verify that there is such a device for this system
-			device_image_interface *image = NULL;
-			for (bool gotone = d3d->window->machine().devicelist().first(image); gotone; gotone = image->next(image))
+			image_interface_iterator iter(d3d->window->machine().root_device());
+			for (device_image_interface *image = iter.first(); image != NULL; iter.next())
 			{
 				// get the device name
 				astring tempdevname(image->brief_instance_name());

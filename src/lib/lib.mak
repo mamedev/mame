@@ -208,6 +208,8 @@ $(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
 $(LIBOBJ)/softfloat/softfloat.o: $(LIBSRC)/softfloat/softfloat.c $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
 $(LIBOBJ)/softfloat/fsincos.o: $(LIBSRC)/softfloat/fsincos.c $(LIBSRC)/softfloat/fpu_constant.h $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
 
+
+
 #-------------------------------------------------
 # libJPEG library objects
 #-------------------------------------------------
@@ -262,7 +264,7 @@ LIBJPEGOBJS= \
 
 $(OBJ)/libjpeg.a: $(LIBJPEGOBJS)
 
-$(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c
+$(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/libjpeg -c $< -o $@
 
@@ -271,6 +273,39 @@ $(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c
 # libflac library objects
 #-------------------------------------------------
 
-include $(LIBSRC)/libflac/libflac.mak
-include $(LIBSRC)/libflac/libflac++.mak
+FLACOPTS=-DFLAC__NO_ASM -DHAVE_INTTYPES_H -DHAVE_ICONV -DHAVE_LANGINFO_CODESET -DHAVE_SOCKLEN_T -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+ 
+LIBFLACOBJS = \
+	$(LIBOBJ)/libflac/bitmath.o \
+	$(LIBOBJ)/libflac/bitreader.o \
+	$(LIBOBJ)/libflac/bitwriter.o \
+	$(LIBOBJ)/libflac/cpu.o \
+	$(LIBOBJ)/libflac/crc.o \
+	$(LIBOBJ)/libflac/fixed.o \
+	$(LIBOBJ)/libflac/float.o \
+	$(LIBOBJ)/libflac/format.o \
+	$(LIBOBJ)/libflac/lpc.o \
+	$(LIBOBJ)/libflac/md5.o \
+	$(LIBOBJ)/libflac/memory.o \
+	$(LIBOBJ)/libflac/stream_decoder.o \
+	$(LIBOBJ)/libflac/stream_encoder.o \
+	$(LIBOBJ)/libflac/stream_encoder_framing.o \
+	$(LIBOBJ)/libflac/window.o
 
+$(OBJ)/libflac.a: $(LIBFLACOBJS)
+
+$(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libflac/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(FLACOPTS) $(CONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
+
+
+LIBFLACPPOBJS = \
+	$(LIBOBJ)/libflacpp/metadata.o \
+	$(LIBOBJ)/libflacpp/stream_decoder.o \
+	$(LIBOBJ)/libflacpp/stream_encoder.o
+
+$(OBJ)/libflac++.a: $(LIBFLACPPOBJS)
+
+$(LIBOBJ)/libflacpp/%.o: $(LIBSRC)/libflac/libflac++/%.cpp | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(FLACOPTS) $(CPPONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@

@@ -86,7 +86,7 @@ public:
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	virtual void device_config_complete();
-	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
+	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
@@ -109,10 +109,8 @@ void janshi_vdp_device::device_config_complete()
 //  m_space_config = address_space_config("janshi_vdp", ENDIANNESS_BIG, 8,  address_bits, 0, *ADDRESS_MAP_NAME(janshi_vdp_map8));
 }
 
-bool janshi_vdp_device::device_validity_check(emu_options &options, const game_driver &driver) const
+void janshi_vdp_device::device_validity_check(validity_checker &valid) const
 {
-	bool error = false;
-	return error;
 }
 
 void janshi_vdp_device::device_start()

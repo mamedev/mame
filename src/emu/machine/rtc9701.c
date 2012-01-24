@@ -81,10 +81,8 @@ TIMER_CALLBACK( rtc9701_device::rtc_inc_callback )
 //  on this device
 //-------------------------------------------------
 
-bool rtc9701_device::device_validity_check(emu_options &options, const game_driver &driver) const
+void rtc9701_device::device_validity_check(validity_checker &valid) const
 {
-	bool error = false;
-	return error;
 }
 
 //-------------------------------------------------

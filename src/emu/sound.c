@@ -788,7 +788,10 @@ sound_manager::sound_manager(running_machine &machine)
 		machine.m_sample_rate = 11025;
 
 	// count the speakers
-	VPRINTF(("total speakers = %d\n", machine.devicelist().count(SPEAKER)));
+#if VERBOSE
+	speaker_device_iterator iter(machine.root_device());
+	VPRINTF(("total speakers = %d\n", iter.count()));
+#endif
 
 	// allocate memory for mix buffers
 	m_leftmix = auto_alloc_array(machine, INT32, machine.sample_rate());
@@ -862,7 +865,8 @@ void sound_manager::set_attenuation(int attenuation)
 bool sound_manager::indexed_speaker_input(int index, speaker_input &info) const
 {
 	// scan through the speakers until we find the indexed input
-	for (info.speaker = downcast<speaker_device *>(machine().devicelist().first(SPEAKER)); info.speaker != NULL; info.speaker = info.speaker->next_speaker())
+	speaker_device_iterator iter(machine().root_device());
+	for (info.speaker = iter.first(); info.speaker != NULL; info.speaker = iter.next())
 	{
 		if (index < info.speaker->inputs())
 		{
@@ -899,8 +903,8 @@ void sound_manager::mute(bool mute, UINT8 reason)
 void sound_manager::reset()
 {
 	// reset all the sound chips
-	device_sound_interface *sound = NULL;
-	for (bool gotone = machine().devicelist().first(sound); gotone; gotone = sound->next(sound))
+	sound_interface_iterator iter(machine().root_device());
+	for (device_sound_interface *sound = iter.first(); sound != NULL; sound = iter.next())
 		sound->device().reset();
 }
 
@@ -1003,7 +1007,8 @@ void sound_manager::update()
 
 	// force all the speaker streams to generate the proper number of samples
 	int samples_this_update = 0;
-	for (speaker_device *speaker = downcast<speaker_device *>(machine().devicelist().first(SPEAKER)); speaker != NULL; speaker = speaker->next_speaker())
+	speaker_device_iterator iter(machine().root_device());
+	for (speaker_device *speaker = iter.first(); speaker != NULL; speaker = iter.next())
 		speaker->mix(m_leftmix, m_rightmix, samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// now downmix the final result

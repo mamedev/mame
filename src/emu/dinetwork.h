@@ -28,4 +28,9 @@ protected:
 	class netdev *m_dev;
 	int m_intf;
 };
+
+
+// iterator
+typedef device_interface_iterator<device_network_interface> network_interface_iterator;
+
 #endif

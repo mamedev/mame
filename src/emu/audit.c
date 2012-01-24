@@ -76,7 +76,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 // temporary hack until romload is update: get the driver path and support it for
 // all searches
-const char *driverpath = m_enumerator.config().devicelist().find("root")->searchpath();
+const char *driverpath = m_enumerator.config().root_device().searchpath();
 
 	// iterate over ROM sources and regions
 	int found = 0;
@@ -234,49 +234,49 @@ media_auditor::summary media_auditor::audit_samples()
 	int found = 0;
 
 	// iterate over sample entries
-	for (const device_t *device = m_enumerator.config().first_device(); device != NULL; device = device->next())
-		if (device->type() == SAMPLES)
+	samples_device_iterator iter(m_enumerator.config().root_device()); 
+	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
+	{
+		const samples_interface *intf = reinterpret_cast<const samples_interface *>(device->static_config());
+		if (intf->samplenames != NULL)
 		{
-			const samples_interface *intf = reinterpret_cast<const samples_interface *>(device->static_config());
-			if (intf->samplenames != NULL)
+			// by default we just search using the driver name
+			astring searchpath(m_enumerator.driver().name);
+
+			// iterate over samples in this entry
+			for (int sampnum = 0; intf->samplenames[sampnum] != NULL; sampnum++)
 			{
-				// by default we just search using the driver name
-				astring searchpath(m_enumerator.driver().name);
-
-				// iterate over samples in this entry
-				for (int sampnum = 0; intf->samplenames[sampnum] != NULL; sampnum++)
+				// starred entries indicate an additional searchpath
+				if (intf->samplenames[sampnum][0] == '*')
 				{
-					// starred entries indicate an additional searchpath
-					if (intf->samplenames[sampnum][0] == '*')
+					searchpath.cat(";").cat(&intf->samplenames[sampnum][1]);
+					continue;
+				}
+
+				required++;
+
+				// create a new record
+				audit_record &record = m_record_list.append(*global_alloc(audit_record(intf->samplenames[sampnum], audit_record::MEDIA_SAMPLE)));
+
+				// look for the files
+				emu_file file(m_enumerator.options().sample_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
+				path_iterator path(searchpath);
+				astring curpath;
+				while (path.next(curpath, intf->samplenames[sampnum]))
+				{
+					// attempt to access the file
+					file_error filerr = file.open(curpath);
+					if (filerr == FILERR_NONE)
 					{
-						searchpath.cat(";").cat(&intf->samplenames[sampnum][1]);
-						continue;
+						record.set_status(audit_record::STATUS_GOOD, audit_record::SUBSTATUS_GOOD);
+						found++;
 					}
-
-					required++;
-
-					// create a new record
-					audit_record &record = m_record_list.append(*global_alloc(audit_record(intf->samplenames[sampnum], audit_record::MEDIA_SAMPLE)));
-
-					// look for the files
-					emu_file file(m_enumerator.options().sample_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
-					path_iterator path(searchpath);
-					astring curpath;
-					while (path.next(curpath, intf->samplenames[sampnum]))
-					{
-						// attempt to access the file
-						file_error filerr = file.open(curpath);
-						if (filerr == FILERR_NONE)
-						{
-							record.set_status(audit_record::STATUS_GOOD, audit_record::SUBSTATUS_GOOD);
-							found++;
-						}
-						else
-							record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND);
-					}
+					else
+						record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND);
 				}
 			}
 		}
+	}
 
 	if (found == 0 && required > 0)
 	{

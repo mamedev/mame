@@ -469,7 +469,8 @@ void riot6532_device::device_start()
 	assert(this != NULL);
 
 	/* set static values */
-	m_index = machine().devicelist().indexof(RIOT6532, tag());
+	device_type_iterator<&device_creator<riot6532_device>, riot6532_device> iter(machine().root_device());
+	m_index = iter.indexof(*this);
 
 	/* configure the ports */
 	m_port[0].m_in_func.resolve(m_in_a_cb, *this);

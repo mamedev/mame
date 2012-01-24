@@ -646,7 +646,8 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 			COMBINE_DATA( &state->m_gcu[chip].visible_area );
 			if (ACCESSING_BITS_0_15)
 			{
-				screen_device *screen = downcast<screen_device *>(machine.devicelist().find(SCREEN, chip));
+				screen_device_iterator iter(machine.root_device());
+				screen_device *screen = iter.byindex(chip);
 
 				if (screen != NULL)
 				{

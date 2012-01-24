@@ -75,38 +75,32 @@ void ram_device::device_start()
 //  checks
 //-------------------------------------------------
 
-bool ram_device::device_validity_check(emu_options &options, const game_driver &driver) const
+void ram_device::device_validity_check(validity_checker &valid) const
 {
 	const char *ramsize_string = NULL;
 	int is_valid = FALSE;
 	UINT32 specified_ram = 0;
-	bool error = FALSE;
 	const char *gamename_option = NULL;
 
 	/* verify default ram value */
 	if (default_size() == 0)
-	{
-		mame_printf_error("%s: '%s' has an invalid default RAM option: %s\n", driver.source_file, driver.name, m_default_size);
-		error = TRUE;
-	}
+		mame_printf_error("Invalid default RAM option: %s\n", m_default_size);
 
 	/* command line options are only parsed for the device named RAM_TAG */
 	if (tag() != NULL && strcmp(tag(), RAM_TAG) == 0)
 	{
 		/* verify command line ram option */
-		ramsize_string = options.ram_size();
-		gamename_option = options.system_name();
+		ramsize_string = mconfig().options().ram_size();
+		gamename_option = mconfig().options().system_name();
 
 		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
 		{
 			specified_ram = parse_string(ramsize_string);
 
 			if (specified_ram == 0)
-			{
-				mame_printf_error("%s: '%s' cannot recognize the RAM option %s\n", driver.source_file, driver.name, ramsize_string);
-				error = TRUE;
-			}
-			if (gamename_option != NULL && *gamename_option != 0 && strcmp(gamename_option, driver.name) == 0)
+				mame_printf_error("Cannot recognize the RAM option %s\n", ramsize_string);
+
+			if (gamename_option != NULL && *gamename_option != 0 && strcmp(gamename_option, mconfig().gamedrv().name) == 0)
 			{
 				/* compare command line option to default value */
 				if (default_size() == specified_ram)
@@ -130,10 +124,7 @@ bool ram_device::device_validity_check(emu_options &options, const game_driver &
 						UINT32 option_ram_size = parse_string(p);
 
 						if (option_ram_size == 0)
-						{
-							mame_printf_error("%s: '%s' has an invalid RAM option: %s\n", driver.source_file, driver.name, p);
-							error = TRUE;
-						}
+							mame_printf_error("Invalid RAM option: %s\n", p);
 
 						if (option_ram_size == specified_ram)
 							is_valid = TRUE;
@@ -163,18 +154,17 @@ bool ram_device::device_validity_check(emu_options &options, const game_driver &
 
 	if (!is_valid)
 	{
-		mame_printf_error("%s: '%s' cannot recognize the RAM option %s", driver.source_file, driver.name, ramsize_string);
-		mame_printf_error(" (valid options are %s", m_default_size);
+		astring output;
+		output.catprintf("Cannot recognize the RAM option %s", ramsize_string);
+		output.catprintf(" (valid options are %s", m_default_size);
 
 		if (m_extra_options != NULL)
-			mame_printf_error(",%s).\n", m_extra_options);
+			output.catprintf(",%s).\n", m_extra_options);
 		else
-			mame_printf_error(").\n");
+			output.catprintf(").\n");
 
-		error = TRUE;
+		mame_printf_error("%s", output.cstr());
 	}
-
-	return error;
 }
 
 

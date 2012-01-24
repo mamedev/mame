@@ -116,8 +116,9 @@ void atarigen_init(running_machine &machine)
 	int i;
 
 	/* allocate timers for all screens */
-	assert(machine.devicelist().count(SCREEN) <= ARRAY_LENGTH(state->m_screen_timer));
-	for (i = 0, screen = machine.first_screen(); screen != NULL; i++, screen = screen->next_screen())
+	screen_device_iterator iter(machine.root_device());
+	assert(iter.count() < ARRAY_LENGTH(state->m_screen_timer));
+	for (i = 0, screen = iter.first(); screen != NULL; i++, screen = iter.next())
 	{
 		state->m_screen_timer[i].screen = screen;
 		state->m_screen_timer[i].scanline_interrupt_timer = machine.scheduler().timer_alloc(FUNC(scanline_interrupt_callback), (void *)screen);
@@ -838,8 +839,8 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
 
 void atarigen_set_vol(running_machine &machine, int volume, device_type type)
 {
-	device_sound_interface *sound = NULL;
-	for (bool gotone = machine.devicelist().first(sound); gotone; gotone = sound->next(sound))
+	sound_interface_iterator iter(machine.root_device());
+	for (device_sound_interface *sound = iter.first(); sound != NULL; sound = iter.next())
 		if (sound->device().type() == type)
 			sound->set_output_gain(ALL_OUTPUTS, volume / 100.0);
 }

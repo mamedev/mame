@@ -1087,7 +1087,8 @@ SCREEN_UPDATE_IND16( tms340x0_ind16 )
 	int x;
 
 	/* find the owning CPU */
-	for (cpu = screen.machine().devicelist().first(); cpu != NULL; cpu = cpu->next())
+	device_iterator iter(screen.machine().root_device());
+	for (cpu = iter.first(); cpu != NULL; cpu = iter.next())
 	{
 		device_type type = cpu->type();
 		if (type == TMS34010 || type == TMS34020)
@@ -1135,7 +1136,8 @@ SCREEN_UPDATE_RGB32( tms340x0_rgb32 )
 	int x;
 
 	/* find the owning CPU */
-	for (cpu = screen.machine().devicelist().first(); cpu != NULL; cpu = cpu->next())
+	device_iterator iter(screen.machine().root_device());
+	for (cpu = iter.first(); cpu != NULL; cpu = iter.next())
 	{
 		device_type type = cpu->type();
 		if (type == TMS34010 || type == TMS34020)

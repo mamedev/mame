@@ -163,4 +163,7 @@ private:
 // device type definition
 extern const device_type BITBANGER;
 
+// device iterator
+typedef device_type_iterator<&device_creator<bitbanger_device>, bitbanger_device> bitbanger_device_iterator;
+
 #endif /* __BITBNGR_H__ */

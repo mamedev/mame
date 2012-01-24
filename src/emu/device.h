@@ -91,40 +91,12 @@ class device_interface;
 class device_execute_interface;
 class device_memory_interface;
 class device_state_interface;
+class validity_checker;
 struct rom_entry;
 class machine_config;
 class emu_timer;
 typedef struct _input_device_default input_device_default;
 
-
-// ======================> device_delegate
-
-// device_delegate is a delegate that wraps with a device tag and can be easily
-// late bound without replicating logic everywhere
-template<typename _Signature>
-class device_delegate : public delegate<_Signature>
-{
-	typedef delegate<_Signature> basetype;
-
-public:
-	// provide same set of constructors as the base class, with additional device name
-	// parameter
-	device_delegate() : basetype(), m_device_name(NULL) { }
-	device_delegate(const basetype &src) : basetype(src), m_device_name(src.m_device_name) { }
-	device_delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object), m_device_name(src.m_device_name) { }
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
-	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
-	device_delegate(typename basetype::template traits<device_t>::static_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)0), m_device_name(NULL) { }
-	device_delegate(typename basetype::template traits<device_t>::static_ref_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)0), m_device_name(NULL) { }
-	device_delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; m_device_name = src.m_device_name; return *this; }
-
-	// perform the binding
-	void bind_relative_to(device_t &search_root);
-
-private:
-	// internal state
-	const char *m_device_name;
-};
 
 
 // exception classes
@@ -153,56 +125,6 @@ typedef void (*write_line_device_func)(device_t *device, int state);
 
 
 
-// ======================> tagged_device_list
-
-// tagged_device_list is a tagged_list with additional searching based on type
-class device_list : public tagged_list<device_t>
-{
-	typedef tagged_list<device_t> super;
-
-public:
-	// construction/destruction
-	device_list(resource_pool &pool = global_resource_pool);
-
-	// getters
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
-
-	// bulk operations
-	void set_machine_all(running_machine &machine);
-	void start_all();
-	void start_new_devices();
-	void reset_all();
-	void stop_all();
-
-	// pull the generic forms forward
-	using super::first;
-	using super::count;
-	using super::indexof;
-	using super::find;
-
-	// provide type-specific overrides
-	device_t *first(device_type type) const;
-	int count(device_type type) const;
-	int indexof(device_type type, device_t &object) const;
-	int indexof(device_type type, const char *tag) const;
-	device_t *find(device_type type, int index) const;
-
-	// provide interface-specific overrides
-	template<class _InterfaceClass>
-	bool first(_InterfaceClass *&intf) const;
-
-private:
-	// internal helpers
-	void exit();
-	void presave_all();
-	void postload_all();
-
-	// internal state
-	running_machine *m_machine;
-};
-
-
-
 // ======================> device_t
 
 // device_t represents a device
@@ -216,6 +138,8 @@ class device_t : public delegate_late_bind
 	friend class device_execute_interface;
 	friend class simple_list<device_t>;
 	friend class device_list;
+	friend class machine_config;
+	friend class running_machine;
 
 protected:
 	// construction/destruction
@@ -226,12 +150,15 @@ protected:
 public:
 	// getters
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	const char *tag() const { return m_tag; }
+	const char *basetag() const { return m_basetag; }
 	device_type type() const { return m_type; }
-	UINT32 configured_clock() const { return m_configured_clock; }
 	const char *name() const { return m_name; }
 	const char *shortname() const { return m_shortname; }
 	const char *searchpath() const { return m_searchpath; }
-	const char *tag() const { return m_tag; }
+	device_t *owner() const { return m_owner; }
+	device_t *next() const { return m_next; }
+	UINT32 configured_clock() const { return m_configured_clock; }
 	const void *static_config() const { return m_static_config; }
 	const machine_config &mconfig() const { return m_machine_config; }
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
@@ -239,21 +166,9 @@ public:
 	machine_config_constructor machine_config_additions() const { return device_mconfig_additions(); }
 	ioport_constructor input_ports() const { return device_input_ports(); }
 
-	// iteration helpers
-	device_t *next() const { return m_next; }
-	device_t *typenext() const;
-	device_t *owner() const { return m_owner; }
-
 	// interface helpers
 	template<class _DeviceClass> bool interface(_DeviceClass *&intf) { intf = dynamic_cast<_DeviceClass *>(this); return (intf != NULL); }
 	template<class _DeviceClass> bool interface(_DeviceClass *&intf) const { intf = dynamic_cast<const _DeviceClass *>(this); return (intf != NULL); }
-	template<class _DeviceClass> bool next(_DeviceClass *&intf) const
-	{
-		for (device_t *cur = m_next; cur != NULL; cur = cur->m_next)
-			if (cur->interface(intf))
-				return true;
-		return false;
-	}
 
 	// specialized helpers for common core interfaces
 	bool interface(device_execute_interface *&intf) { intf = m_execute; return (intf != NULL); }
@@ -266,13 +181,14 @@ public:
 	device_memory_interface &memory() const { assert(m_memory != NULL); return *m_memory; }
 
 	// owned object helpers
+	device_t *first_subdevice() const { return m_subdevice_list.first(); }
 	astring &subtag(astring &dest, const char *tag) const;
-	astring &siblingtag(astring &dest, const char *tag) const;
+	astring &siblingtag(astring &dest, const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(dest, tag) : dest.cpy(tag); }
 	const memory_region *subregion(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
-	device_t *siblingdevice(const char *tag) const;
-	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) { return downcast<_DeviceClass *>(subdevice(tag)); }
-	template<class _DeviceClass> inline _DeviceClass *siblingdevice(const char *tag) { return downcast<_DeviceClass *>(siblingdevice(tag)); }
+	device_t *siblingdevice(const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subdevice(tag) : NULL; }
+	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) const { return downcast<_DeviceClass *>(subdevice(tag)); }
+	template<class _DeviceClass> inline _DeviceClass *siblingdevice(const char *tag) const { return downcast<_DeviceClass *>(siblingdevice(tag)); }
 	const memory_region *region() const { return m_region; }
 
 	// configuration helpers
@@ -283,7 +199,7 @@ public:
 	// state helpers
 	void config_complete();
 	bool configured() const { return m_config_complete; }
-	bool validity_check(emu_options &options, const game_driver &driver) const;
+	void validity_check(validity_checker &valid) const;
 	bool started() const { return m_started; }
 	void reset();
 
@@ -328,7 +244,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();
-	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const ATTR_COLD;
+	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
 	virtual void device_start() ATTR_COLD = 0;
 	virtual void device_stop() ATTR_COLD;
 	virtual void device_reset() ATTR_COLD;
@@ -340,36 +256,36 @@ protected:
 
 	//------------------- end derived class overrides
 
-	device_debug *			m_debug;
-
-	// core device interfaces for speed
-	device_execute_interface *m_execute;
-	device_memory_interface *m_memory;
-	device_state_interface *m_state;
-
-	// device relationships
-	device_t *				m_next;					// next device (of any type/class)
-	device_t *				m_owner;				// device that owns us, or NULL if nobody
-	device_interface *		m_interface_list;		// head of interface list
-
+	// core device properties
 	const device_type		m_type;					// device type
-	UINT32					m_configured_clock;		// originally configured device clock
-
-	const machine_config &	m_machine_config;		// reference to the machine's configuration
-	const void *			m_static_config;		// static device configuration
-	const input_device_default *m_input_defaults;   // devices input ports default overrides
-
 	astring					m_name;					// name of the device
 	astring					m_shortname;			// short name of the device
 	astring					m_searchpath;			// search path, used for media loading
 
-	bool					m_started;				// true if the start function has succeeded
-	UINT32					m_clock;				// device clock
-	const memory_region *	m_region;				// our device-local region
+	// device relationships
+	device_t *				m_owner;				// device that owns us
+	device_t *				m_next;					// next device by the same owner (of any type/class)
+	simple_list<device_t>	m_subdevice_list;		// list of sub-devices we own
+	mutable tagmap_t<device_t *> m_device_map;		// map of device names looked up and found
 
-	UINT32					m_unscaled_clock;		// unscaled clock
+	// device interfaces
+	device_interface *		m_interface_list;		// head of interface list
+	device_execute_interface *m_execute;			// pre-cached pointer to execute interface
+	device_memory_interface *m_memory;				// pre-cached pointer to memory interface
+	device_state_interface *m_state;				// pre-cached pointer to state interface
+
+	// device clocks
+	UINT32					m_configured_clock;		// originally configured device clock
+	UINT32					m_unscaled_clock;		// current unscaled device clock
+	UINT32					m_clock;				// current device clock, after scaling
 	double					m_clock_scale;			// clock scale factor
 	attoseconds_t			m_attoseconds_per_clock;// period in attoseconds
+
+	device_debug *			m_debug;
+	const memory_region *	m_region;				// our device-local region
+	const machine_config &	m_machine_config;		// reference to the machine's configuration
+	const void *			m_static_config;		// static device configuration
+	const input_device_default *m_input_defaults;   // devices input ports default overrides
 
 	// helper class to request auto-object discovery in the constructor of a derived class
 	class auto_finder_base
@@ -480,11 +396,19 @@ protected:
 	auto_finder_base *		m_auto_finder_list;
 
 private:
+	// private helpers
+	device_t *add_subdevice(device_type type, const char *tag, UINT32 clock);
+	device_t *replace_subdevice(device_t &old, device_type type, const char *tag, UINT32 clock);
+	void remove_subdevice(device_t &device);
+	device_t *subdevice_slow(const char *tag) const;
+
 	// private state; accessor use required
 	running_machine *		m_machine;
 	save_manager *			m_save;
-	astring 				m_tag;					// tag for this instance
+	astring 				m_tag;					// full tag for this instance
+	astring 				m_basetag;				// base part of the tag
 	bool					m_config_complete;		// have we completed our configuration?
+	bool					m_started;				// true if the start function has succeeded
 };
 
 
@@ -514,7 +438,7 @@ public:
 
 	// optional operation overrides
 	virtual void interface_config_complete();
-	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
+	virtual void interface_validity_check(validity_checker &valid) const;
 	virtual void interface_pre_start();
 	virtual void interface_post_start();
 	virtual void interface_pre_reset();
@@ -533,48 +457,299 @@ protected:
 };
 
 
+// ======================> device_iterator
+
+// helper class to iterate over the hierarchy of devices depth-first
+class device_iterator
+{
+public:
+	// construction
+	device_iterator(device_t &root, int maxdepth = 255)
+		: m_root(&root),
+		  m_current(NULL),
+		  m_curdepth(0),
+		  m_maxdepth(maxdepth) { }
+	
+	// getters
+	device_t *current() const { return m_current; }
+
+	// setters
+	void set_current(device_t &current) { m_current = &current; }
+
+	// reset and return first item
+	device_t *first()
+	{
+		m_current = m_root; 
+		return m_current;
+	}
+
+	// advance depth-first
+	device_t *next()
+	{
+		// remember our starting position, and end immediately if we're NULL
+		device_t *start = m_current;
+		if (start == NULL)
+			return NULL;
+
+		// search down first
+		if (m_curdepth < m_maxdepth)
+		{
+			m_current = start->first_subdevice();
+			if (m_current != NULL)
+			{
+				m_curdepth++;
+				return m_current;
+			}
+		}
+		
+		// search next for neighbors up the ownership chain
+		while (m_curdepth > 0)
+		{
+			// found a neighbor? great!
+			m_current = start->next();
+			if (m_current != NULL)
+				return m_current;
+
+			// no? try our parent			
+			start = start->owner();
+			m_curdepth--;
+		}
+		
+		// returned to the top; we're done
+		return m_current = NULL;
+	}
+	
+	// return the number of items available
+	int count()
+	{
+		int result = 0; 
+		for (device_t *item = first(); item != NULL; item = next())
+			result++;
+		return result;
+	}
+	
+	// return the index of a given item in the virtual list
+	int indexof(device_t &device)
+	{
+		int index = 0;
+		for (device_t *item = first(); item != NULL; item = next(), index++)
+			if (item == &device)
+				return index;
+		return -1;
+	}
+
+	// return the indexed item in the list
+	device_t *byindex(int index)
+	{
+		for (device_t *item = first(); item != NULL; item = next(), index--)
+			if (index == 0)
+				return item;
+		return NULL;
+	}
+
+private:
+	// internal state
+	device_t *		m_root;
+	device_t *		m_current;
+	int				m_curdepth;
+	int				m_maxdepth;
+};
+
+
+// ======================> device_type_iterator
+
+// helper class to find devices of a given type in the device hierarchy
+template<device_type _DeviceType, class _DeviceClass = device_t>
+class device_type_iterator
+{
+public:
+	// construction
+	device_type_iterator(device_t &root, int maxdepth = 255)
+		: m_iterator(root, maxdepth) { }
+
+	// getters
+	_DeviceClass *current() const { return downcast<_DeviceClass *>(m_iterator.current()); }
+
+	// setters
+	void set_current(_DeviceClass &current) { m_iterator.set_current(current); }
+
+	// reset and return first item
+	_DeviceClass *first()
+	{
+		for (device_t *device = m_iterator.first(); device != NULL; device = m_iterator.next())
+			if (device->type() == _DeviceType)
+				return downcast<_DeviceClass *>(device);
+		return NULL;
+	}
+
+	// advance depth-first
+	_DeviceClass *next()
+	{
+		for (device_t *device = m_iterator.next(); device != NULL; device = m_iterator.next())
+			if (device->type() == _DeviceType)
+				return downcast<_DeviceClass *>(device);
+		return NULL;
+	}
+	
+	// return the number of items available
+	int count()
+	{
+		int result = 0; 
+		for (_DeviceClass *item = first(); item != NULL; item = next())
+			result++;
+		return result;
+	}
+	
+	// return the index of a given item in the virtual list
+	int indexof(_DeviceClass &device)
+	{
+		int index = 0;
+		for (_DeviceClass *item = first(); item != NULL; item = next(), index++)
+			if (item == &device)
+				return index;
+		return -1;
+	}
+
+	// return the indexed item in the list
+	_DeviceClass *byindex(int index)
+	{
+		for (_DeviceClass *item = first(); item != NULL; item = next(), index--)
+			if (index == 0)
+				return item;
+		return NULL;
+	}
+
+private:
+	// internal state
+	device_iterator 	m_iterator;
+};
+
+
+// ======================> device_interface_iterator
+
+// helper class to find devices with a given interface in the device hierarchy
+// also works for findnig devices derived from a given subclass
+template<class _InterfaceClass>
+class device_interface_iterator
+{
+public:
+	// construction
+	device_interface_iterator(device_t &root, int maxdepth = 255)
+		: m_iterator(root, maxdepth),
+		  m_current(NULL) { }
+
+	// getters
+	_InterfaceClass *current() const { return m_current; }
+	
+	// setters
+	void set_current(_InterfaceClass &current) { m_current = &current; m_iterator.set_current(current.device()); }
+
+	// reset and return first item
+	_InterfaceClass *first()
+	{
+		for (device_t *device = m_iterator.first(); device != NULL; device = m_iterator.next())
+			if (device->interface(m_current))
+				return m_current;
+		return NULL;
+	}
+
+	// advance depth-first
+	_InterfaceClass *next()
+	{
+		for (device_t *device = m_iterator.next(); device != NULL; device = m_iterator.next())
+			if (device->interface(m_current))
+				return m_current;
+		return NULL;
+	}
+	
+	// return the number of items available
+	int count()
+	{
+		int result = 0; 
+		for (_InterfaceClass *item = first(); item != NULL; item = next())
+			result++;
+		return result;
+	}
+	
+	// return the index of a given item in the virtual list
+	int indexof(_InterfaceClass &intrf)
+	{
+		int index = 0;
+		for (_InterfaceClass *item = first(); item != NULL; item = next(), index++)
+			if (item == &intrf)
+				return index;
+		return -1;
+	}
+
+	// return the indexed item in the list
+	_InterfaceClass *byindex(int index)
+	{
+		for (_InterfaceClass *item = first(); item != NULL; item = next(), index--)
+			if (index == 0)
+				return item;
+		return NULL;
+	}
+
+private:
+	// internal state
+	device_iterator 	m_iterator;
+	_InterfaceClass *	m_current;
+};
+
+
+// ======================> device_delegate
+
+// device_delegate is a delegate that wraps with a device tag and can be easily
+// late bound without replicating logic everywhere
+template<typename _Signature>
+class device_delegate : public delegate<_Signature>
+{
+	typedef delegate<_Signature> basetype;
+
+public:
+	// provide same set of constructors as the base class, with additional device name
+	// parameter
+	device_delegate() : basetype(), m_device_name(NULL) { }
+	device_delegate(const basetype &src) : basetype(src), m_device_name(src.m_device_name) { }
+	device_delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object), m_device_name(src.m_device_name) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
+	template<class _FunctionClass> device_delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, const char *devname, _FunctionClass *object) : basetype(funcptr, name, (_FunctionClass *)0), m_device_name(devname) { }
+	device_delegate(typename basetype::template traits<device_t>::static_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)0), m_device_name(NULL) { }
+	device_delegate(typename basetype::template traits<device_t>::static_ref_func_type funcptr, const char *name) : basetype(funcptr, name, (device_t *)0), m_device_name(NULL) { }
+	device_delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; m_device_name = src.m_device_name; return *this; }
+
+	// perform the binding
+	void bind_relative_to(device_t &search_root);
+
+private:
+	// internal state
+	const char *m_device_name;
+};
+
+
 
 //**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************
 
-
-// ======================> device config helpers
-
-// find the next device_t of the same type
-inline device_t *device_t::typenext() const
-{
-	device_t *cur;
-	for (cur = m_next; cur != NULL && cur->m_type != m_type; cur = cur->m_next) ;
-	return cur;
-}
-
-// create a tag for an object that is owned by this device
-inline astring &device_t::subtag(astring &dest, const char *_tag) const
-{
-	// temp. for now: don't include the root tag in the full tag name
-	return (this != NULL && m_owner != NULL) ? dest.cpy(m_tag).cat(":").cat(_tag) : dest.cpy(_tag);
-}
-
-// create a tag for an object that a sibling to this device
-inline astring &device_t::siblingtag(astring &dest, const char *_tag) const
-{
-	return (this != NULL && m_owner != NULL) ? m_owner->subtag(dest, _tag) : dest.cpy(_tag);
-}
-
-
 //-------------------------------------------------
-//  first - return the first device in the list
-//  with the given interface
+//  subdevice - given a tag, find the device by
+//  name relative to this device
 //-------------------------------------------------
 
-template<class _InterfaceClass>
-bool device_list::first(_InterfaceClass *&intf) const
+inline device_t *device_t::subdevice(const char *tag) const
 {
-	for (device_t *cur = super::first(); cur != NULL; cur = cur->next())
-		if (cur->interface(intf))
-			return true;
-	return false;
+	// safety first
+	if (this == NULL)
+		return NULL;
+
+	// empty string or NULL means this device
+	if (tag == NULL || *tag == 0)
+		return const_cast<device_t *>(this);
+
+	// do a quick lookup and return that if possible
+	device_t *quick = m_device_map.find(tag);
+	return (quick != NULL) ? quick : subdevice_slow(tag);
 }
 
 
@@ -588,8 +763,9 @@ void device_delegate<_Signature>::bind_relative_to(device_t &search_root)
 {
 	if (!basetype::isnull())
 	{
-		device_t *device = (m_device_name == NULL) ? &search_root : search_root.subdevice(m_device_name);
-		if (device == NULL) throw emu_fatalerror("Unable to locate device '%s' relative to '%s'\n", m_device_name, search_root.tag());
+		device_t *device = search_root.subdevice(m_device_name);
+		if (device == NULL)
+			throw emu_fatalerror("Unable to locate device '%s' relative to '%s'\n", m_device_name, search_root.tag());
 		basetype::late_bind(*device);
 	}
 }

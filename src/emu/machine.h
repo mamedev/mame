@@ -186,7 +186,6 @@ class osd_interface;
 typedef struct _memory_private memory_private;
 typedef struct _palette_private palette_private;
 typedef struct _romload_private romload_private;
-typedef struct _input_private input_private;
 typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
 typedef struct _debugcpu_private debugcpu_private;
@@ -331,7 +330,7 @@ public:
 
 	// getters
 	const machine_config &config() const { return m_config; }
-	const device_list &devicelist() const { return m_config.devicelist(); }
+	device_t &root_device() const { return m_config.root_device(); }
 	const game_driver &system() const { return m_system; }
 	osd_interface &osd() const { return m_osd; }
 	resource_pool &respool() { return m_respool; }
@@ -344,8 +343,8 @@ public:
 	video_manager &video() const { assert(m_video != NULL); return *m_video; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != NULL); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }
-	driver_device *driver_data() const { return m_driver_device; }
-	template<class _DriverClass> _DriverClass *driver_data() const { return downcast<_DriverClass *>(m_driver_device); }
+	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
+	template<class _DriverClass> _DriverClass *driver_data() const { return &downcast<_DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != MACHINE_PHASE_RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
@@ -364,7 +363,7 @@ public:
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 
 	// fetch items by name
-	inline device_t *device(const char *tag);
+	inline device_t *device(const char *tag) { return root_device().subdevice(tag); }
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
 	inline const input_port_config *port(const char *tag);
 	inline const memory_region *region(const char *tag);
@@ -408,7 +407,7 @@ public:
 	ioport_list				m_portlist;			// points to a list of input port configurations
 
 	// CPU information
-	cpu_device *			firstcpu;			// first CPU (allows for quick iteration via typenext)
+	cpu_device *			firstcpu;			// first CPU
 
 	// video-related information
 	gfx_element *			gfx[MAX_GFX_ELEMENTS];// array of pointers to graphic sets (chars, sprites)
@@ -419,7 +418,7 @@ public:
 	const pen_t *			pens;				// remapped palette pen numbers
 	colortable_t *			colortable;			// global colortable for remapping
 	pen_t *					shadow_table;		// table for looking up a shadowed pen
-	bitmap_ind8			priority_bitmap;	// priority bitmap
+	bitmap_ind8				priority_bitmap;	// priority bitmap
 
 	// debugger-related information
 	UINT32					debug_flags;		// the current debug flags
@@ -431,7 +430,6 @@ public:
 	memory_private *		memory_data;		// internal data from memory.c
 	palette_private *		palette_data;		// internal data from palette.c
 	romload_private *		romload_data;		// internal data from romload.c
-	input_private *			input_data;			// internal data from input.c
 	input_port_private *	input_port_data;	// internal data from inptport.c
 	ui_input_private *		ui_input_data;		// internal data from uiinput.c
 	debugcpu_private *		debugcpu_data;		// internal data from debugcpu.c
@@ -446,9 +444,16 @@ private:
 	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
 	void soft_reset(void *ptr = NULL, INT32 param = 0);
-
+	
 	// internal callbacks
 	static void logfile_callback(running_machine &machine, const char *buffer);
+
+	// internal device helpers
+	void start_all_devices();
+	void reset_all_devices();
+	void stop_all_devices();
+	void presave_all_devices();
+	void postload_all_devices();
 
 	// internal state
 	const machine_config &	m_config;				// reference to the constructed machine_config
@@ -468,9 +473,6 @@ private:
 	video_manager *			m_video;				// internal data from video.c
 	tilemap_manager *		m_tilemap;				// internal data from tilemap.c
 	debug_view_manager *	m_debug_view;			// internal data from debugvw.c
-
-	// driver state
-	driver_device *			m_driver_device;		// pointer to the current driver device
 
 	// system state
 	machine_phase			m_current_phase;		// current execution phase
@@ -716,25 +718,26 @@ device_t *driver_device_creator(const machine_config &mconfig, const char *tag, 
 //  INLINE FUNCTIONS
 //**************************************************************************
 
-inline device_t *running_machine::device(const char *tag)
-{
-	return devicelist().find(tag);
-}
-
 inline const input_port_config *running_machine::port(const char *tag)
 {
-	return m_portlist.find(tag);
+	// if tag begins with a :, it's absolute
+	if (tag[0] == ':')
+		return m_portlist.find(tag);
+
+	// otherwise, compute it relative to the root device
+	astring fulltag;
+	return m_portlist.find(root_device().subtag(fulltag, tag).cstr());
 }
 
 inline const memory_region *running_machine::region(const char *tag)
 {
 	// if tag begins with a :, it's absolute
 	if (tag[0] == ':')
-	{
-		return m_regionlist.find(&tag[1]);
-	}
+		return m_regionlist.find(tag);
 
-	return m_regionlist.find(tag);
+	// otherwise, compute it relative to the root device
+	astring fulltag;
+	return m_regionlist.find(root_device().subtag(fulltag, tag).cstr());
 }
 
 

@@ -203,10 +203,10 @@ static int get_variable_value(running_machine &machine, const char *string, char
 	char temp[100];
 
 	// screen 0 parameters
-	for (const screen_device *device = machine.first_screen(); device != NULL; device = device->next_screen())
+	screen_device_iterator iter(machine.root_device());
+	int scrnum = 0;
+	for (const screen_device *device = iter.first(); device != NULL; device = iter.next(), scrnum++)
 	{
-		int scrnum = machine.devicelist().indexof(SCREEN, device->tag());
-
 		// native X aspect factor
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
@@ -1863,7 +1863,10 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	// fetch common data
 	int index = xml_get_attribute_int_with_subst(machine, itemnode, "index", -1);
 	if (index != -1)
-		m_screen = downcast<screen_device *>(machine.devicelist().find(SCREEN, index));
+	{
+		screen_device_iterator iter(machine.root_device());
+		m_screen = iter.byindex(index);
+	}
 	m_input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
 	if (m_output_name[0] != 0 && m_element != NULL)
 		output_set_value(m_output_name, m_element->default_state());

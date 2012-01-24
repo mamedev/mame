@@ -23,7 +23,6 @@
 static void network_load(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
-	device_network_interface *network = NULL;
 	if ((config_type == CONFIG_TYPE_GAME) && (parentnode != NULL))
 	{
 		for (node = xml_get_sibling(parentnode->child, "device"); node; node = xml_get_sibling(node->next, "device"))
@@ -32,7 +31,8 @@ static void network_load(running_machine &machine, int config_type, xml_data_nod
 
 			if ((tag != NULL) && (tag[0] != '\0'))
 			{
-				for (bool gotone = machine.devicelist().first(network); gotone; gotone = network->next(network))
+				network_interface_iterator iter(machine.root_device());
+				for (device_network_interface *network = iter.first(); network != NULL; network = iter.next())
 				{
 					if (!strcmp(tag, network->device().tag())) {
 						int interface = xml_get_attribute_int(node, "interface", 0);
@@ -56,12 +56,12 @@ static void network_load(running_machine &machine, int config_type, xml_data_nod
 static void network_save(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
-	device_network_interface *network = NULL;
 
 	/* only care about game-specific data */
 	if (config_type == CONFIG_TYPE_GAME)
 	{
-		for (bool gotone = machine.devicelist().first(network); gotone; gotone = network->next(network))
+		network_interface_iterator iter(machine.root_device());
+		for (device_network_interface *network = iter.first(); network != NULL; network = iter.next())
 		{
 			node = xml_add_child(parentnode, "device", NULL);
 			if (node != NULL)

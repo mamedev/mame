@@ -41,7 +41,8 @@ void i8243_device::static_set_read_handler(device_t &device, read8_device_func c
 	if(callback != NULL)
 	{
 		i8243.m_readhandler_cb.type = DEVCB_TYPE_DEVICE;
-		i8243.m_readhandler_cb.index = DEVCB_DEVICE_SELF;
+		i8243.m_readhandler_cb.index = 0;
+		i8243.m_readhandler_cb.tag = "";
 		i8243.m_readhandler_cb.readdevice = callback;
 	}
 	else
@@ -62,7 +63,8 @@ void i8243_device::static_set_write_handler(device_t &device, write8_device_func
 	if(callback != NULL)
 	{
 		i8243.m_writehandler_cb.type = DEVCB_TYPE_DEVICE;
-		i8243.m_writehandler_cb.index = DEVCB_DEVICE_SELF;
+		i8243.m_writehandler_cb.index = 0;
+		i8243.m_writehandler_cb.tag = "";
 		i8243.m_writehandler_cb.writedevice = callback;
 	}
 	else

@@ -94,9 +94,9 @@ void generic_machine_init(running_machine &machine)
 
 	// map devices to the interrupt state
 	memset(state->interrupt_device, 0, sizeof(state->interrupt_device));
-	device_execute_interface *exec = NULL;
+	execute_interface_iterator iter(machine.root_device());
 	int index = 0;
-	for (bool gotone = machine.devicelist().first(exec); gotone && index < ARRAY_LENGTH(state->interrupt_device); gotone = exec->next(exec))
+	for (device_execute_interface *exec = iter.first(); exec != NULL && index < ARRAY_LENGTH(state->interrupt_device); exec = iter.next())
 		state->interrupt_device[index++] = &exec->device();
 
 	/* register coin save state */
@@ -364,23 +364,18 @@ void nvram_load(running_machine &machine)
 		}
 	}
 
-	device_nvram_interface *nvram = NULL;
-	if (machine.devicelist().first(nvram))
+	nvram_interface_iterator iter(machine.root_device());
+	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
 	{
-		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
+		astring filename;
+		emu_file file(machine.options().nvram_directory(), OPEN_FLAG_READ);
+		if (file.open(nvram_filename(nvram->device(),filename)) == FILERR_NONE)
 		{
-			astring filename;
-			emu_file file(machine.options().nvram_directory(), OPEN_FLAG_READ);
-			if (file.open(nvram_filename(nvram->device(),filename)) == FILERR_NONE)
-			{
-				nvram->nvram_load(file);
-				file.close();
-			}
-			else
-			{
-				nvram->nvram_reset();
-			}
+			nvram->nvram_load(file);
+			file.close();
 		}
+		else
+			nvram->nvram_reset();
 	}
 }
 
@@ -402,18 +397,15 @@ void nvram_save(running_machine &machine)
 		}
 	}
 
-	device_nvram_interface *nvram = NULL;
-	if (machine.devicelist().first(nvram))
+	nvram_interface_iterator iter(machine.root_device());
+	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
 	{
-		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
+		astring filename;
+		emu_file file(machine.options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file.open(nvram_filename(nvram->device(),filename)) == FILERR_NONE)
 		{
-			astring filename;
-			emu_file file(machine.options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			if (file.open(nvram_filename(nvram->device(),filename)) == FILERR_NONE)
-			{
-				nvram->nvram_save(file);
-				file.close();
-			}
+			nvram->nvram_save(file);
+			file.close();
 		}
 	}
 }

@@ -228,7 +228,7 @@ protected:
 	virtual void execute_set_input(int linenum, int state);
 
 	// interface-level overrides
-	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
+	virtual void interface_validity_check(validity_checker &valid) const;
 	virtual void interface_pre_start();
 	virtual void interface_post_start();
 	virtual void interface_pre_reset();
@@ -321,6 +321,9 @@ private:
 
 	attoseconds_t minimum_quantum() const;
 };
+
+// iterator
+typedef device_interface_iterator<device_execute_interface> execute_interface_iterator;
 
 
 

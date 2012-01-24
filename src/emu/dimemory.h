@@ -134,12 +134,15 @@ protected:
 	virtual bool memory_readop(offs_t offset, int size, UINT64 &value);
 
 	// interface-level overrides
-	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
+	virtual void interface_validity_check(validity_checker &valid) const;
 
 	// configuration
 	address_map_constructor	m_address_map[ADDRESS_SPACES]; // address maps for each address space
 	address_space *		m_addrspace[ADDRESS_SPACES]; // reported address spaces
 };
+
+// iterator
+typedef device_interface_iterator<device_memory_interface> memory_interface_iterator;
 
 
 

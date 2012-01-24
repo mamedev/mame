@@ -22,7 +22,6 @@
 static STREAM_UPDATE( wave_sound_update )
 {
 	cassette_image_device *cass = (cassette_image_device *)param;
-	int speakers = cass->machine().devicelist().count(SPEAKER);
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
@@ -31,6 +30,8 @@ static STREAM_UPDATE( wave_sound_update )
 	stream_sample_t *right_buffer = NULL;
 	int i;
 
+	speaker_device_iterator spkiter(cass->machine().root_device());
+	int speakers = spkiter.count();
 	if (speakers>1)
 		right_buffer = outputs[1];
 
@@ -71,7 +72,8 @@ static DEVICE_START( wave )
 
 	assert( device != NULL );
 	assert( device->static_config() != NULL );
-	int speakers = device->machine().config().devicelist().count(SPEAKER);
+	speaker_device_iterator spkiter(device->machine().root_device());
+	int speakers = spkiter.count();
 	image = dynamic_cast<cassette_image_device *>(device->machine().device( (const char *)device->static_config()));
 	if (speakers > 1)
 		device->machine().sound().stream_alloc(*device, 0, 2, device->machine().sample_rate(), (void *)image, wave_sound_update);

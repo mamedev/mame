@@ -96,17 +96,7 @@ const input_port_config *devcb_resolver::resolve_port(const char *tag, device_t 
 
 device_t *devcb_resolver::resolve_device(int index, const char *tag, device_t &current)
 {
-	device_t *result = NULL;
-
-	if (index == DEVCB_DEVICE_SELF)
-		result = &current;
-	else if (index == DEVCB_DEVICE_DRIVER)
-		result = current.machine().driver_data();
-	else if (strcmp(tag, DEVICE_SELF_OWNER) == 0)
-		result = current.owner();
-	else
-		result = current.siblingdevice(tag);
-
+	device_t *result = current.siblingdevice(tag);
 	if (result == NULL)
 		throw emu_fatalerror("Unable to resolve device '%s' (requested by callback to %s '%s')", tag, current.name(), current.tag());
 	return result;

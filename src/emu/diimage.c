@@ -1067,17 +1067,9 @@ void device_image_interface::unload()
 
 void device_image_interface::update_names()
 {
-	const device_image_interface *image = NULL;
-	int count = 0;
-	int index = -1;
-
-	for (bool gotone = device().mconfig().devicelist().first(image); gotone; gotone = image->next(image))
-	{
-		if (this == image)
-			index = count;
-		if (image->image_type() == image_type())
-			count++;
-	}
+	image_interface_iterator iter(device().mconfig().root_device());
+	int count = iter.count();
+	int index = iter.indexof(*this);
 	if (count > 1) {
 		m_instance_name.printf("%s%d", device_typename(image_type()), index + 1);
 		m_brief_instance_name.printf("%s%d", device_brieftypename(image_type()), index + 1);
@@ -1103,7 +1095,7 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 {
 	image = _image;
 
-	slc = 0;
+	sld = 0;
 	swi = image->software_entry();
 	swp = image->part_entry();
 
@@ -1220,8 +1212,8 @@ void ui_menu_control_device_image::handle()
 	}
 
 	case START_SOFTLIST:
-		slc = 0;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software(machine(), container, image->image_interface(), &slc)));
+		sld = 0;
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software(machine(), container, image->image_interface(), &sld)));
 		state = SELECT_SOFTLIST;
 		break;
 
@@ -1233,17 +1225,17 @@ void ui_menu_control_device_image::handle()
 	}
 
 	case SELECT_SOFTLIST:
-		if(!slc) {
+		if(!sld) {
 			ui_menu::stack_pop(machine());
 			break;
 		}
 		software_info_name = "";
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, slc, image->image_interface(), software_info_name)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, sld, image->image_interface(), software_info_name)));
 		state = SELECT_PARTLIST;
 		break;
 
 	case SELECT_PARTLIST:
-		swl = software_list_open(machine().options(), slc->list_name, false, NULL);
+		swl = software_list_open(machine().options(), sld->list_name(), false, NULL);
 		swi = software_list_find(swl, software_info_name, NULL);
 		if(swinfo_has_multiple_parts(swi, image->image_interface())) {
 			submenu_result = -1;

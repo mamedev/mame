@@ -157,7 +157,7 @@ ui_menu_software_list::entry_info *ui_menu_software_list::append_software_entry(
 	return entry;
 }
 
-ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, const software_list_config *_swlist, const char *_interface, astring &_result) : ui_menu(machine, container), result(_result)
+ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, const software_list_device *_swlist, const char *_interface, astring &_result) : ui_menu(machine, container), result(_result)
 {
 	swlist = _swlist;
 	interface = _interface;
@@ -171,7 +171,7 @@ ui_menu_software_list::~ui_menu_software_list()
 
 void ui_menu_software_list::populate()
 {
-	const software_list *list = software_list_open(machine().options(), swlist->list_name, false, NULL);
+	const software_list *list = software_list_open(machine().options(), swlist->list_name(), false, NULL);
 
 	// build up the list of entries for the menu
 	if (list)
@@ -313,7 +313,7 @@ void ui_menu_software_list::handle()
 }
 
 /* list of available software lists - i.e. cartridges, floppies */
-ui_menu_software::ui_menu_software(running_machine &machine, render_container *container, const char *_interface, const software_list_config **_result) : ui_menu(machine, container)
+ui_menu_software::ui_menu_software(running_machine &machine, render_container *container, const char *_interface, const software_list_device **_result) : ui_menu(machine, container)
 {
 	interface = _interface;
 	result = _result;
@@ -324,13 +324,12 @@ void ui_menu_software::populate()
 	bool haveCompatible = false;
 
 	// Add original software lists for this system
-	for (const device_t *dev = machine().config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	software_list_device_iterator iter(machine().config().root_device());
+	for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
 	{
-		const software_list_config *swlist = (const software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
-
-		if (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+		if (swlist->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
 		{
-			const software_list *list = software_list_open(machine().options(), swlist->list_name, false, NULL);
+			const software_list *list = software_list_open(machine().options(), swlist->list_name(), false, NULL);
 
 			if (list)
 			{
@@ -352,13 +351,11 @@ void ui_menu_software::populate()
 	}
 
 	// Add compatible software lists for this system
-	for (const device_t *dev = machine().config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
 	{
-		const software_list_config *swlist = (const software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
-
-		if (swlist->list_type == SOFTWARE_LIST_COMPATIBLE_SYSTEM)
+		if (swlist->list_type() == SOFTWARE_LIST_COMPATIBLE_SYSTEM)
 		{
-			const software_list *list = software_list_open(machine().options(), swlist->list_name, false, NULL);
+			const software_list *list = software_list_open(machine().options(), swlist->list_name(), false, NULL);
 
 			if (list)
 			{
@@ -396,7 +393,7 @@ void ui_menu_software::handle()
 
 	if (event != NULL && event->iptkey == IPT_UI_SELECT) {
 		//      ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, (software_list_config *)event->itemref, image)));
-		*result = (software_list_config *)event->itemref;
+		*result = (software_list_device *)event->itemref;
 		ui_menu::stack_pop(machine());
 	}
 }

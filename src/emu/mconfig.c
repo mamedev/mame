@@ -62,14 +62,15 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	  m_total_colors(0),
 	  m_default_layout(NULL),
 	  m_gamedrv(gamedrv),
-	  m_options(options)
+	  m_options(options),
+	  m_root_device(NULL)
 {
 	// construct the config
 	(*gamedrv.machine_config)(*this, NULL);
 
 	// intialize slot devices - make sure that any required devices have been allocated
-	device_slot_interface *slot = NULL;
-    for (bool gotone = m_devicelist.first(slot); gotone; gotone = slot->next(slot))
+	slot_interface_iterator slotiter(root_device());
+    for (device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
 	{
 		const slot_interface *intf = slot->get_slot_interfaces();
 		if (intf != NULL)
@@ -77,16 +78,19 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 			device_t &owner = slot->device();
 			const char *selval = options.value(owner.tag());
 			if (!options.exists(owner.tag()))
-				selval = slot->get_default_card(devicelist(), options);
+				selval = slot->get_default_card(*this, options);
 
-			if (selval != NULL && strlen(selval)!=0) {
+			if (selval != NULL && strlen(selval) != 0) 
+			{
 				bool found = false;
-				for (int i = 0; intf[i].name != NULL; i++) {
-					if (strcmp(selval, intf[i].name) == 0) {
+				for (int i = 0; intf[i].name != NULL; i++) 
+				{
+					if (strcmp(selval, intf[i].name) == 0)
+					{
 						device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, 0);
 						found = true;
-						const char *def = slot->get_default_card(devicelist(), options);
-						if ((def!=NULL) && (strcmp(def,selval)==0))
+						const char *def = slot->get_default_card(*this, options);
+						if (def != NULL && strcmp(def, selval) == 0)
 							device_t::static_set_input_default(*new_dev, slot->input_ports_defaults());
 					}
 				}
@@ -97,13 +101,11 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	}
 
 	// when finished, set the game driver
-	device_t *root = m_devicelist.find("root");
-	if (root == NULL)
-		throw emu_fatalerror("Machine configuration missing driver_device");
-	driver_device::static_set_game(*root, gamedrv);
+	driver_device::static_set_game(*m_root_device, gamedrv);
 
 	// then notify all devices that their configuration is complete
-	for (device_t *device = m_devicelist.first(); device != NULL; device = device->next())
+	device_iterator iter(root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 		if (!device->configured())
 			device->config_complete();
 }
@@ -115,6 +117,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 machine_config::~machine_config()
 {
+	global_free(m_root_device);
 }
 
 
@@ -125,46 +128,8 @@ machine_config::~machine_config()
 
 screen_device *machine_config::first_screen() const
 {
-	return downcast<screen_device *>(m_devicelist.first(SCREEN));
-}
-
-
-//-------------------------------------------------
-//  device_add_subdevices - helper to add
-//  devices owned by the device
-//-------------------------------------------------
-
-void machine_config::device_add_subdevices(device_t *device)
-{
-	machine_config_constructor additions = device->machine_config_additions();
-	if (additions != NULL)
-		(*additions)(*this, device);
-}
-
-
-//-------------------------------------------------
-//  device_remove_subdevices - helper to remove
-//  devices owned by the device
-//-------------------------------------------------
-
-void machine_config::device_remove_subdevices(const device_t *device)
-{
-	if (device != NULL)
-	{
-		device_t *sub_device = m_devicelist.first();
-		while (sub_device != NULL)
-		{
-			if (sub_device->owner() == device)
-				device_remove_subdevices(sub_device);
-
-			device_t *next_device = sub_device->next();
-
-			if (sub_device->owner() == device)
-				m_devicelist.remove(*sub_device);
-
-			sub_device = next_device;
-		}
-	}
+	screen_device_iterator iter(root_device());
+	return iter.first();
 }
 
 
@@ -175,11 +140,19 @@ void machine_config::device_remove_subdevices(const device_t *device)
 
 device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, UINT32 clock)
 {
-	astring tempstring;
-	const char *fulltag = owner->subtag(tempstring, tag);
-	device_t *device = &m_devicelist.append(fulltag, *(*type)(*this, fulltag, owner, clock));
-	device_add_subdevices(device);
-	return device;
+	// if there's an owner, let the owner do the work
+	if (owner != NULL)
+		return owner->add_subdevice(type, tag, clock);
+		
+	// otherwise, allocate the device directly
+	assert(m_root_device == NULL);
+	m_root_device = (*type)(*this, tag, owner, clock);
+
+	// apply any machine configuration owned by the device now
+	machine_config_constructor additions = m_root_device->machine_config_additions();
+	if (additions != NULL)
+		(*additions)(*this, m_root_device);
+	return m_root_device;
 }
 
 
@@ -190,12 +163,17 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 
 device_t *machine_config::device_replace(device_t *owner, const char *tag, device_type type, UINT32 clock)
 {
-	astring tempstring;
-	const char *fulltag = owner->subtag(tempstring, tag);
-	device_remove_subdevices(m_devicelist.find(fulltag));
-	device_t *device = &m_devicelist.replace_and_remove(fulltag, *(*type)(*this, fulltag, owner, clock));
-	device_add_subdevices(device);
-	return device;
+	// find the original device by this name (must exist)
+	assert(owner != NULL);
+	device_t *device = owner->subdevice(tag);
+	if (device == NULL)
+	{
+		mame_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
+		return device_add(owner, tag, type, clock);
+	}
+	
+	// let the device's owner do the work
+	return device->owner()->replace_subdevice(*device, type, tag, clock);
 }
 
 
@@ -206,11 +184,17 @@ device_t *machine_config::device_replace(device_t *owner, const char *tag, devic
 
 device_t *machine_config::device_remove(device_t *owner, const char *tag)
 {
-	astring tempstring;
-	const char *fulltag = owner->subtag(tempstring, tag);
-	device_t *device=m_devicelist.find(fulltag);
-	device_remove_subdevices(device);
-	m_devicelist.remove(*device);
+	// find the original device by this name (must exist)
+	assert(owner != NULL);
+	device_t *device = owner->subdevice(tag);
+	if (device == NULL)
+	{
+		mame_printf_warning("Warning: attempting to remove non-existent device '%s'\n", tag);
+		return NULL;
+	}
+
+	// let the device's owner do the work
+	device->owner()->remove_subdevice(*device);
 	return NULL;
 }
 
@@ -222,10 +206,13 @@ device_t *machine_config::device_remove(device_t *owner, const char *tag)
 
 device_t *machine_config::device_find(device_t *owner, const char *tag)
 {
-	astring tempstring;
-	const char *fulltag = owner->subtag(tempstring, tag);
-	device_t *device = m_devicelist.find(fulltag);
+	// find the original device by this name (must exist)
+	assert(owner != NULL);
+	device_t *device = owner->subdevice(tag);
+	assert(device != NULL);
 	if (device == NULL)
-		throw emu_fatalerror("Unable to find device: tag=%s\n", fulltag);
+		throw emu_fatalerror("Unable to find device '%s'\n", tag);
+
+	// return the device
 	return device;
 }

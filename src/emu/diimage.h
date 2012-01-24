@@ -324,6 +324,9 @@ protected:
 	bool m_is_loading;
 };
 
+// iterator
+typedef device_interface_iterator<device_image_interface> image_interface_iterator;
+
 class ui_menu_control_device_image : public ui_menu {
 public:
 	ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *image);
@@ -344,10 +347,10 @@ protected:
 	int submenu_result;
 	bool create_confirmed;
 	bool softlist_done;
-	const class software_list *swl;
-	const class software_info *swi;
-	const class software_part *swp;
-	const class software_list_config *slc;
+	const struct software_list *swl;
+	const software_info *swi;
+	const software_part *swp;
+	const class software_list_device *sld;
 	astring software_info_name;
 
 	void test_create(bool &can_create, bool &need_confirm);

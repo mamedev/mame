@@ -279,7 +279,8 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	if (our_this->disk == NULL)
 	{
 		// try to locate the CHD from an image subdevice
-		for (device_t *device = machine.devicelist().first(); device != NULL; device = device->next())
+		device_iterator iter(machine.root_device());
+		for (device_t *device = iter.first(); device != NULL; device = iter.next())
 		{
 			if (device->subdevice(diskregion) != NULL)
 			{

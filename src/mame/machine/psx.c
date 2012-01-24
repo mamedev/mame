@@ -51,19 +51,19 @@ READ32_HANDLER( psx_com_delay_r )
 
 void psx_irq_set( running_machine &machine, UINT32 data )
 {
-	psxcpu_device::irq_set( *machine.device("maincpu"), "maincpu", data );
+	psxcpu_device::irq_set( *machine.device("maincpu^"), "maincpu", data );
 }
 
 /* SIO */
 
 void psx_sio_install_handler( running_machine &machine, int n_port, psx_sio_handler p_f_sio_handler )
 {
-	psxcpu_device::install_sio_handler( *machine.device("maincpu"), "maincpu", n_port, p_f_sio_handler );
+	psxcpu_device::install_sio_handler( *machine.device("maincpu^"), "maincpu", n_port, p_f_sio_handler );
 }
 
 void psx_sio_input( running_machine &machine, int n_port, int n_mask, int n_data )
 {
-	psxcpu_device::sio_input( *machine.device("maincpu"), "maincpu", n_port, n_mask, n_data );
+	psxcpu_device::sio_input( *machine.device("maincpu^"), "maincpu", n_port, n_mask, n_data );
 }
 
 /* GPU */

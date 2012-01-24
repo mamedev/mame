@@ -14,6 +14,84 @@
 #include "pool.h"
 
 
+
+#define SOFTWARE_SUPPORTED_YES		0
+#define SOFTWARE_SUPPORTED_PARTIAL	1
+#define SOFTWARE_SUPPORTED_NO		2
+
+enum softlist_type
+{
+	SOFTWARE_LIST_ORIGINAL_SYSTEM,
+	SOFTWARE_LIST_COMPATIBLE_SYSTEM
+};
+
+#define MCFG_SOFTWARE_LIST_CONFIG(_list,_list_type) \
+	software_list_device::static_set_config(*device, _list, _list_type);
+
+#define MCFG_SOFTWARE_LIST_ADD( _tag, _list ) \
+	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 ) \
+	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
+
+#define MCFG_SOFTWARE_LIST_COMPATIBLE_ADD( _tag, _list ) \
+	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 ) \
+	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
+
+#define MCFG_SOFTWARE_LIST_MODIFY( _tag, _list ) \
+	MCFG_DEVICE_MODIFY( _tag ) \
+	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
+
+#define MCFG_SOFTWARE_LIST_COMPATIBLE_MODIFY( _tag, _list ) \
+	MCFG_DEVICE_MODIFY( _tag ) \
+	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
+
+#define MCFG_SOFTWARE_LIST_FILTER( _tag, _filter ) \
+	MCFG_DEVICE_MODIFY( _tag ) \
+	software_list_device::static_set_filter(*device, _filter);
+
+
+// ======================> software_list_device
+
+class software_list_device : public device_t
+{
+public:
+	// construction/destruction
+	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_config(device_t &device, const char *list, softlist_type list_type);
+	static void static_set_filter(device_t &device, const char *filter);
+	
+	// getters
+	const char *list_name() const { return m_list_name; }
+	softlist_type list_type() const { return m_list_type; }
+	const char *filter() const { return m_filter; }
+	
+	// validation helpers
+	static void reset_checked_lists() { s_checked_lists.reset(); }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
+
+	// configuration state
+	const char *				m_list_name;
+	softlist_type 				m_list_type;
+	const char *				m_filter;
+	
+	// static state
+	static tagmap_t<UINT8>		s_checked_lists;
+};
+
+
+// device type definition
+extern const device_type SOFTWARE_LIST;
+
+// device type iterator
+typedef device_type_iterator<&device_creator<software_list_device>, software_list_device> software_list_device_iterator;
+
+
+
 /*********************************************************************
 
     Internal structures and XML file handling
@@ -95,13 +173,6 @@ struct software_list
 	int list_entries;
 };
 
-struct software_list_config
-{
-	char *list_name;
-	UINT32 list_type;
-	const char *filter;
-};
-
 /* Handling a software list */
 software_list *software_list_open(emu_options &options, const char *listname, int is_preload, void (*error_proc)(const char *message));
 void software_list_close(const software_list *swlist);
@@ -123,53 +194,11 @@ const char *software_part_get_feature(const software_part *part, const char *fea
 
 bool load_software_part(emu_options &options, device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
 
-void software_display_matches(const device_list &devlist, emu_options &options,const char *interface,const char *swname_bckp);
+void software_display_matches(const machine_config &config, emu_options &options,const char *interface,const char *swname_bckp);
 
-const char *software_get_default_slot(const device_list &devlist, emu_options &options, const device_image_interface *image, const char* default_card_slot);
+const char *software_get_default_slot(const machine_config &config, emu_options &options, const device_image_interface *image, const char* default_card_slot);
 
-void validate_softlists(emu_options &options);
-
-bool is_software_compatible(const software_part *swpart, const software_list_config *swlist);
+bool is_software_compatible(const software_part *swpart, const software_list_device *swlist);
 bool swinfo_has_multiple_parts(const software_info *swinfo, const char *interface);
-
-/*********************************************************************
-
-    Driver software list configuration
-
-*********************************************************************/
-DECLARE_LEGACY_DEVICE(SOFTWARE_LIST, software_list);
-
-#define SOFTWARE_SUPPORTED_YES		0
-#define SOFTWARE_SUPPORTED_PARTIAL	1
-#define SOFTWARE_SUPPORTED_NO		2
-
-#define SOFTWARE_LIST_ORIGINAL_SYSTEM		0
-#define SOFTWARE_LIST_COMPATIBLE_SYSTEM		1
-
-#define MCFG_SOFTWARE_LIST_CONFIG(_list,_list_type)								\
-	MCFG_DEVICE_CONFIG_DATAPTR(software_list_config, list_name, _list)	\
-	MCFG_DEVICE_CONFIG_DATA32(software_list_config, list_type, _list_type)
-
-#define MCFG_SOFTWARE_LIST_ADD( _tag, _list )										\
-	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 )				\
-	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
-
-
-#define MCFG_SOFTWARE_LIST_COMPATIBLE_ADD( _tag, _list )										\
-	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 )				\
-	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
-
-
-#define MCFG_SOFTWARE_LIST_MODIFY( _tag, _list )									\
-	MCFG_DEVICE_MODIFY( _tag )								\
-	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
-
-#define MCFG_SOFTWARE_LIST_COMPATIBLE_MODIFY( _tag, _list )									\
-	MCFG_DEVICE_MODIFY( _tag )								\
-	MCFG_SOFTWARE_LIST_CONFIG(_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
-
-#define MCFG_SOFTWARE_LIST_FILTER( _tag, _filter )									\
-	MCFG_DEVICE_MODIFY( _tag )								\
-	MCFG_DEVICE_CONFIG_DATAPTR(software_list_config, filter, _filter)
 
 #endif

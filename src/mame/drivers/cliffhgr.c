@@ -708,7 +708,6 @@ static MACHINE_CONFIG_START( cliffhgr, cliffhgr_state )
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9128, cliffhgr_tms9928a_interface )	/* TMS9128NL on the board */
 
 	/* override video rendering and raw screen info */
-	MCFG_DEVICE_REMOVE("screen")
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* sound hardware */

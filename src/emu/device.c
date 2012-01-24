@@ -87,234 +87,6 @@ resource_pool &machine_get_pool(running_machine &machine)
 
 
 //**************************************************************************
-//  DEVICE LIST MANAGEMENT
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_list - device list constructor
-//-------------------------------------------------
-
-device_list::device_list(resource_pool &pool)
-	: tagged_list<device_t>(pool)
-{
-}
-
-
-//-------------------------------------------------
-//  set_machine_all - once the machine is created,
-//  tell every device about it
-//-------------------------------------------------
-
-void device_list::set_machine_all(running_machine &machine)
-{
-	// add exit and reset callbacks
-	m_machine = &machine;
-
-	// iterate over devices and set their machines as well
-	for (device_t *device = first(); device != NULL; device = device->next())
-		device->set_machine(machine);
-}
-
-
-//-------------------------------------------------
-//  start_all - start all the devices in the
-//  list
-//-------------------------------------------------
-
-void device_list::start_all()
-{
-	// add exit and reset callbacks
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(device_list::reset_all), this));
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(device_list::exit), this));
-
-	// add pre-save and post-load callbacks
-	machine().save().register_presave(save_prepost_delegate(FUNC(device_list::presave_all), this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(device_list::postload_all), this));
-
-	// start_new_devices does all the necessary work
-	start_new_devices();
-}
-
-
-//-------------------------------------------------
-//  start_new_devices - start any unstarted devices
-//-------------------------------------------------
-
-void device_list::start_new_devices()
-{
-	assert(m_machine != NULL);
-
-	// iterate through the devices
-	device_t *nextdevice;
-	for (device_t *device = first(); device != NULL; device = nextdevice)
-	{
-		// see if this device is what we want
-		nextdevice = device->next();
-		if (!device->started())
-		{
-			// attempt to start the device, catching any expected exceptions
-			try
-			{
-				// if the device doesn't have a machine yet, set it first
-				if (device->m_machine == NULL)
-					device->set_machine(machine());
-
-				// now start the device
-				mame_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
-				device->start();
-			}
-
-			// handle missing dependencies by moving the device to the end
-			catch (device_missing_dependencies &)
-			{
-				// if we're the end, fail
-				mame_printf_verbose("  (missing dependencies; rescheduling)\n");
-				if (nextdevice == NULL)
-					throw emu_fatalerror("Circular dependency in device startup; unable to start %s '%s'\n", device->name(), device->tag());
-				detach(*device);
-				append(device->tag(), *device);
-			}
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  reset_all - reset all devices in the list
-//-------------------------------------------------
-
-void device_list::reset_all()
-{
-	// iterate over devices and reset them
-	for (device_t *device = first(); device != NULL; device = device->next())
-		device->reset();
-}
-
-
-//-------------------------------------------------
-//  stop_all - stop all the devices in the
-//  list
-//-------------------------------------------------
-
-void device_list::stop_all()
-{
-	// iterate over devices and stop them
-	for (device_t *device = first(); device != NULL; device = device->next())
-		device->stop();
-
-	// leave with no machine
-	m_machine = NULL;
-}
-
-
-//-------------------------------------------------
-//  first - return the first device of the given
-//  type
-//-------------------------------------------------
-
-device_t *device_list::first(device_type type) const
-{
-	device_t *cur;
-	for (cur = super::first(); cur != NULL && cur->type() != type; cur = cur->next()) ;
-	return cur;
-}
-
-
-//-------------------------------------------------
-//  count - count the number of devices of the
-//  given type
-//-------------------------------------------------
-
-int device_list::count(device_type type) const
-{
-	int num = 0;
-	for (const device_t *curdev = first(type); curdev != NULL; curdev = curdev->typenext()) num++;
-	return num;
-}
-
-
-//-------------------------------------------------
-//  indexof - return the index of the given device
-//  among its kind
-//-------------------------------------------------
-
-int device_list::indexof(device_type type, device_t &object) const
-{
-	int num = 0;
-	for (device_t *cur = first(type); cur != NULL; cur = cur->typenext(), num++)
-		if (cur == &object) return num;
-	return -1;
-}
-
-
-//-------------------------------------------------
-//  indexof - return the index of the given device
-//  among its kind
-//-------------------------------------------------
-
-int device_list::indexof(device_type type, const char *tag) const
-{
-	device_t *object = find(tag);
-	return (object != NULL && object->type() == type) ? indexof(type, *object) : -1;
-}
-
-
-//-------------------------------------------------
-//  find - find a device by type + index
-//-------------------------------------------------
-
-device_t *device_list::find(device_type type, int index) const
-{
-	for (device_t *cur = first(type); cur != NULL; cur = cur->typenext())
-		if (index-- == 0) return cur;
-	return NULL;
-}
-
-
-//-------------------------------------------------
-//  static_exit - tear down all the devices
-//-------------------------------------------------
-
-void device_list::exit()
-{
-	// first let the debugger save comments
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_comment_save(machine());
-
-	// stop all the devices before we go away
-	stop_all();
-
-	// then nuke the devices
-	reset();
-}
-
-
-//-------------------------------------------------
-//  presave_all - tell all the devices we are
-//  about to save
-//-------------------------------------------------
-
-void device_list::presave_all()
-{
-	for (device_t *device = first(); device != NULL; device = device->next())
-		device->pre_save();
-}
-
-
-//-------------------------------------------------
-//  postload_all - tell all the devices we just
-//  completed a load
-//-------------------------------------------------
-
-void device_list::postload_all()
-{
-	for (device_t *device = first(); device != NULL; device = device->next())
-		device->post_load();
-}
-
-
-
-//**************************************************************************
 //  LIVE DEVICE MANAGEMENT
 //**************************************************************************
 
@@ -325,63 +97,75 @@ void device_list::postload_all()
 //-------------------------------------------------
 
 device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: m_debug(NULL),
+	: m_type(type),
+	  m_name(name),
+	  m_owner(owner),
+	  m_next(NULL),
+	  m_interface_list(NULL),
 	  m_execute(NULL),
 	  m_memory(NULL),
 	  m_state(NULL),
-	  m_next(NULL),
-	  m_owner(owner),
-	  m_interface_list(NULL),
-	  m_type(type),
 	  m_configured_clock(clock),
+	  m_unscaled_clock(clock),
+	  m_clock(clock),
+	  m_clock_scale(1.0),
+	  m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
+	  
+	  m_debug(NULL),
+	  m_region(NULL),
 	  m_machine_config(mconfig),
 	  m_static_config(NULL),
 	  m_input_defaults(NULL),
-	  m_name(name),
-	  m_started(false),
-	  m_clock(clock),
-	  m_region(NULL),
-	  m_unscaled_clock(clock),
-	  m_clock_scale(1.0),
-	  m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
 	  m_auto_finder_list(NULL),
 	  m_machine(NULL),
 	  m_save(NULL),
-	  m_tag(tag),
-	  m_config_complete(false)
+	  m_basetag(tag),
+	  m_config_complete(false),
+	  m_started(false)
 {
+	if (owner != NULL)
+		m_tag.cpy((owner->owner() == NULL) ? "" : owner->tag()).cat(":").cat(tag);
+	else
+		m_tag.cpy(":");
+	mame_printf_verbose("device '%s' created\n", this->tag());
 	static_set_clock(*this, clock);
 }
 
 
 device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
-	: m_debug(NULL),
-	  m_execute(NULL),
-	  m_memory(NULL),
-	  m_state(NULL),
-	  m_next(NULL),
-	  m_owner(owner),
-	  m_interface_list(NULL),
-	  m_type(type),
-	  m_configured_clock(clock),
-	  m_machine_config(mconfig),
-	  m_static_config(NULL),
-	  m_input_defaults(NULL),
+	: m_type(type),
 	  m_name(name),
 	  m_shortname(shortname),
 	  m_searchpath(shortname),
-	  m_started(false),
-	  m_clock(clock),
-	  m_region(NULL),
+	  m_owner(owner),
+	  m_next(NULL),
+	  m_interface_list(NULL),
+	  m_execute(NULL),
+	  m_memory(NULL),
+	  m_state(NULL),
+	  m_configured_clock(clock),
 	  m_unscaled_clock(clock),
+	  m_clock(clock),
 	  m_clock_scale(1.0),
 	  m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
+	  
+	  m_debug(NULL),
+	  m_region(NULL),
+	  m_machine_config(mconfig),
+	  m_static_config(NULL),
+	  m_input_defaults(NULL),
 	  m_auto_finder_list(NULL),
 	  m_machine(NULL),
 	  m_save(NULL),
-	  m_tag(tag),
-	  m_config_complete(false)
+	  m_basetag(tag),
+	  m_config_complete(false),
+	  m_started(false)
 {
+	if (owner != NULL)
+		m_tag.cpy((owner->owner() == NULL) ? "" : owner->tag()).cat(":").cat(tag);
+	else
+		m_tag.cpy(":");
+	mame_printf_verbose("device '%s' created\n", this->tag());
 	static_set_clock(*this, clock);
 }
 
@@ -406,43 +190,9 @@ const memory_region *device_t::subregion(const char *_tag) const
 	if (this == NULL)
 		return NULL;
 
-	// build a fully-qualified name
-	astring tempstring;
-	return machine().region(subtag(tempstring, _tag));
-}
-
-
-//-------------------------------------------------
-//  subdevice - return a pointer to the given
-//  device that is owned by us
-//-------------------------------------------------
-
-device_t *device_t::subdevice(const char *_tag) const
-{
-	// safety first
-	if (this == NULL)
-		return NULL;
-
-	// build a fully-qualified name
-	astring tempstring;
-	return mconfig().devicelist().find((const char *)subtag(tempstring, _tag));
-}
-
-
-//-------------------------------------------------
-//  siblingdevice - return a pointer to the given
-//  device that is owned by our same owner
-//-------------------------------------------------
-
-device_t *device_t::siblingdevice(const char *_tag) const
-{
-	// safety first
-	if (this == NULL)
-		return NULL;
-
-	// build a fully-qualified name
-	astring tempstring;
-	return mconfig().devicelist().find((const char *)siblingtag(tempstring, _tag));
+	// build a fully-qualified name and look it up
+	astring fullpath;
+	return machine().region(subtag(fullpath, _tag));
 }
 
 
@@ -489,20 +239,14 @@ void device_t::config_complete()
 //  configuration has been constructed
 //-------------------------------------------------
 
-bool device_t::validity_check(emu_options &options, const game_driver &driver) const
+void device_t::validity_check(validity_checker &valid) const
 {
-	bool error = false;
-
 	// validate via the interfaces
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
-		if (intf->interface_validity_check(options, driver))
-			error = true;
+		intf->interface_validity_check(valid);
 
 	// let the device itself validate
-	if (device_validity_check(options, driver))
-		error = true;
-
-	return error;
+	device_validity_check(valid);
 }
 
 
@@ -780,10 +524,9 @@ void device_t::device_config_complete()
 //  the configuration has been constructed
 //-------------------------------------------------
 
-bool device_t::device_validity_check(emu_options &options, const game_driver &driver) const
+void device_t::device_validity_check(validity_checker &valid) const
 {
-	// indicate no error by default
-	return false;
+	// do nothing by default
 }
 
 
@@ -810,7 +553,6 @@ machine_config_constructor device_t::device_mconfig_additions() const
 	// none by default
 	return NULL;
 }
-
 
 
 //-------------------------------------------------
@@ -904,6 +646,157 @@ void device_t::device_debug_setup()
 void device_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  subdevice_slow - perform a slow name lookup,
+//  caching the results
+//-------------------------------------------------
+
+device_t *device_t::subdevice_slow(const char *tag) const
+{
+	// resolve the full path
+	astring fulltag;
+	subtag(fulltag, tag);
+
+	// we presume the result is a rooted path; also doubled colons mess up our
+	// tree walk, so catch them early
+	assert(fulltag[0] == ':');
+	assert(fulltag.find("::") == -1);
+
+	// walk the device list to the final path
+	device_t *curdevice = &mconfig().root_device();
+	if (fulltag.len() > 1)
+		for (int start = 1, end = fulltag.chr(start, ':'); start != 0 && curdevice != NULL; start = end + 1, end = fulltag.chr(start, ':'))
+		{
+			astring part(fulltag, start, (end == -1) ? -1 : end - start);
+			for (curdevice = curdevice->m_subdevice_list.first(); curdevice != NULL; curdevice = curdevice->next())
+				if (part == curdevice->m_basetag)
+					break;
+		}
+	
+	// if we got a match, add to the fast map
+	if (curdevice != NULL)
+	{
+		m_device_map.add(tag, curdevice);
+		mame_printf_verbose("device '%s' adding mapping for '%s' => '%s'\n", this->tag(), tag, fulltag.cstr());
+	}
+	return curdevice;
+}
+
+
+//-------------------------------------------------
+//  subtag - create a fully resolved path relative
+//  to our device based on the provided tag
+//-------------------------------------------------
+
+astring &device_t::subtag(astring &result, const char *tag) const
+{
+	// if the tag begins with a colon, ignore our path and start from the root
+	if (*tag == ':')
+	{
+		tag++;
+		result.cpy(":");
+	}
+	
+	// otherwise, start with our path
+	else
+	{
+		result.cpy(m_tag);
+		if (result != ":")
+			result.cat(":");
+	}
+
+	// iterate over the tag, look for special path characters to resolve
+	const char *caret;
+	while ((caret = strchr(tag, '^')) != NULL)
+	{
+		// copy everything up to there
+		result.cat(tag, caret - tag);
+		tag = caret + 1;
+		
+		// strip trailing colons
+		int len = result.len();
+		while (result[--len] == ':')
+			result.substr(0, len);
+	
+		// remove the last path part, leaving the last colon
+		if (result != ":")
+		{
+			int lastcolon = result.rchr(0, ':');
+			if (lastcolon != -1)
+				result.substr(0, lastcolon + 1);
+		}
+	}
+
+	// copy everything else
+	result.cat(tag);
+
+	// strip trailing colons up to the root
+	int len = result.len();
+	while (len > 1 && result[--len] == ':')
+		result.substr(0, len);
+	return result;
+}
+
+
+//-------------------------------------------------
+//  add_subdevice - create a new device and add it
+//  as a subdevice
+//-------------------------------------------------
+
+device_t *device_t::add_subdevice(device_type type, const char *tag, UINT32 clock)
+{
+	// allocate the device and append to our list
+	device_t *device = (*type)(mconfig(), tag, this, clock);
+	m_subdevice_list.append(*device);
+
+	// apply any machine configuration owned by the device now
+	machine_config_constructor additions = device->machine_config_additions();
+	if (additions != NULL)
+		(*additions)(const_cast<machine_config &>(mconfig()), device);
+	return device;
+}
+
+
+//-------------------------------------------------
+//  add_subdevice - create a new device and use it
+//  to replace an existing subdevice
+//-------------------------------------------------
+
+device_t *device_t::replace_subdevice(device_t &old, device_type type, const char *tag, UINT32 clock)
+{
+	// iterate over all devices and remove any references to the old device
+	device_iterator iter(mconfig().root_device());
+	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
+		scan->m_device_map.remove(&old);
+
+	// create a new device, and substitute it for the old one	
+	device_t *device = (*type)(mconfig(), tag, this, clock);
+	m_subdevice_list.replace_and_remove(*device, old);
+
+	// apply any machine configuration owned by the device now
+	machine_config_constructor additions = device->machine_config_additions();
+	if (additions != NULL)
+		(*additions)(const_cast<machine_config &>(mconfig()), device);
+	return device;
+}
+
+
+//-------------------------------------------------
+//  remove_subdevice - remove a given subdevice
+//-------------------------------------------------
+
+void device_t::remove_subdevice(device_t &device)
+{
+	// iterate over all devices and remove any references
+	device_iterator iter(mconfig().root_device());
+	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
+		scan->m_device_map.remove(&device);
+
+	// remove from our list
+	m_subdevice_list.remove(device);
 }
 
 
@@ -1022,9 +915,8 @@ void device_interface::interface_config_complete()
 //  constructed
 //-------------------------------------------------
 
-bool device_interface::interface_validity_check(emu_options &options, const game_driver &driver) const
+void device_interface::interface_validity_check(validity_checker &valid) const
 {
-	return false;
 }
 
 

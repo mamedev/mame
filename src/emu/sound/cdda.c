@@ -90,9 +90,8 @@ void cdda_set_cdrom(device_t *device, void *file)
 
 device_t *cdda_from_cdrom(running_machine &machine, void *file)
 {
-	device_sound_interface *sound = NULL;
-
-	for (bool gotone = machine.devicelist().first(sound); gotone; gotone = sound->next(sound))
+	sound_interface_iterator iter(machine.root_device());
+	for (device_sound_interface *sound = iter.first(); sound != NULL; sound = iter.next())
 		if (sound->device().type() == CDDA)
 		{
 			cdda_info *info = get_safe_token(*sound);

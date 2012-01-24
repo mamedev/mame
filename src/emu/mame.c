@@ -104,8 +104,21 @@ static bool print_verbose = false;
 static running_machine *global_machine;
 
 /* output channels */
-static output_callback_func output_cb[OUTPUT_CHANNEL_COUNT];
-static void *output_cb_param[OUTPUT_CHANNEL_COUNT];
+static output_delegate output_cb[OUTPUT_CHANNEL_COUNT] =
+{
+	output_delegate(FUNC(mame_file_output_callback), stderr),	// OUTPUT_CHANNEL_ERROR
+	output_delegate(FUNC(mame_file_output_callback), stderr),	// OUTPUT_CHANNEL_WARNING
+	output_delegate(FUNC(mame_file_output_callback), stdout),	// OUTPUT_CHANNEL_INFO
+#ifdef MAME_DEBUG
+	output_delegate(FUNC(mame_file_output_callback), stdout),	// OUTPUT_CHANNEL_DEBUG
+#else
+	output_delegate(FUNC(mame_null_output_callback), stdout),	// OUTPUT_CHANNEL_DEBUG
+#endif
+	output_delegate(FUNC(mame_file_output_callback), stdout),	// OUTPUT_CHANNEL_VERBOSE
+	output_delegate(FUNC(mame_file_output_callback), stdout)	// OUTPUT_CHANNEL_LOG
+};
+
+
 
 /***************************************************************************
     CORE IMPLEMENTATION
@@ -151,7 +164,10 @@ int mame_execute(emu_options &options, osd_interface &osd)
 
 		// otherwise, perform validity checks before anything else
 		else
-			validate_drivers(options, system);
+		{
+			validity_checker valid(options);
+			valid.check_shared_source(*system);
+		}
 
 		firstgame = false;
 
@@ -203,20 +219,17 @@ int mame_execute(emu_options &options, osd_interface &osd)
     channel
 -------------------------------------------------*/
 
-void mame_set_output_channel(output_channel channel, output_callback_func callback, void *param, output_callback_func *prevcb, void **prevparam)
+output_delegate mame_set_output_channel(output_channel channel, output_delegate callback)
 {
 	assert(channel < OUTPUT_CHANNEL_COUNT);
-	assert(callback != NULL);
+	assert(!callback.isnull());
 
 	/* return the originals if requested */
-	if (prevcb != NULL)
-		*prevcb = output_cb[channel];
-	if (prevparam != NULL)
-		*prevparam = output_cb_param[channel];
+	output_delegate prevcb = output_cb[channel];
 
 	/* set the new ones */
 	output_cb[channel] = callback;
-	output_cb_param[channel] = param;
+	return prevcb;
 }
 
 
@@ -225,9 +238,9 @@ void mame_set_output_channel(output_channel channel, output_callback_func callba
     for file output
 -------------------------------------------------*/
 
-void mame_file_output_callback(void *param, const char *format, va_list argptr)
+void mame_file_output_callback(FILE *param, const char *format, va_list argptr)
 {
-	vfprintf((FILE *)param, format, argptr);
+	vfprintf(param, format, argptr);
 }
 
 
@@ -236,7 +249,7 @@ void mame_file_output_callback(void *param, const char *format, va_list argptr)
     for no output
 -------------------------------------------------*/
 
-void mame_null_output_callback(void *param, const char *format, va_list argptr)
+void mame_null_output_callback(FILE *param, const char *format, va_list argptr)
 {
 }
 
@@ -250,16 +263,9 @@ void mame_printf_error(const char *format, ...)
 {
 	va_list argptr;
 
-	/* by default, we go to stderr */
-	if (output_cb[OUTPUT_CHANNEL_ERROR] == NULL)
-	{
-		output_cb[OUTPUT_CHANNEL_ERROR] = mame_file_output_callback;
-		output_cb_param[OUTPUT_CHANNEL_ERROR] = stderr;
-	}
-
 	/* do the output */
 	va_start(argptr, format);
-	(*output_cb[OUTPUT_CHANNEL_ERROR])(output_cb_param[OUTPUT_CHANNEL_ERROR], format, argptr);
+	output_cb[OUTPUT_CHANNEL_ERROR](format, argptr);
 	va_end(argptr);
 }
 
@@ -273,16 +279,9 @@ void mame_printf_warning(const char *format, ...)
 {
 	va_list argptr;
 
-	/* by default, we go to stderr */
-	if (output_cb[OUTPUT_CHANNEL_WARNING] == NULL)
-	{
-		output_cb[OUTPUT_CHANNEL_WARNING] = mame_file_output_callback;
-		output_cb_param[OUTPUT_CHANNEL_WARNING] = stderr;
-	}
-
 	/* do the output */
 	va_start(argptr, format);
-	(*output_cb[OUTPUT_CHANNEL_WARNING])(output_cb_param[OUTPUT_CHANNEL_WARNING], format, argptr);
+	output_cb[OUTPUT_CHANNEL_WARNING](format, argptr);
 	va_end(argptr);
 }
 
@@ -296,16 +295,9 @@ void mame_printf_info(const char *format, ...)
 {
 	va_list argptr;
 
-	/* by default, we go to stdout */
-	if (output_cb[OUTPUT_CHANNEL_INFO] == NULL)
-	{
-		output_cb[OUTPUT_CHANNEL_INFO] = mame_file_output_callback;
-		output_cb_param[OUTPUT_CHANNEL_INFO] = stdout;
-	}
-
 	/* do the output */
 	va_start(argptr, format);
-	(*output_cb[OUTPUT_CHANNEL_INFO])(output_cb_param[OUTPUT_CHANNEL_INFO], format, argptr);
+	output_cb[OUTPUT_CHANNEL_INFO](format, argptr);
 	va_end(argptr);
 }
 
@@ -323,16 +315,9 @@ void mame_printf_verbose(const char *format, ...)
 	if (!print_verbose)
 		return;
 
-	/* by default, we go to stdout */
-	if (output_cb[OUTPUT_CHANNEL_VERBOSE] == NULL)
-	{
-		output_cb[OUTPUT_CHANNEL_VERBOSE] = mame_file_output_callback;
-		output_cb_param[OUTPUT_CHANNEL_VERBOSE] = stdout;
-	}
-
 	/* do the output */
 	va_start(argptr, format);
-	(*output_cb[OUTPUT_CHANNEL_VERBOSE])(output_cb_param[OUTPUT_CHANNEL_VERBOSE], format, argptr);
+	output_cb[OUTPUT_CHANNEL_VERBOSE](format, argptr);
 	va_end(argptr);
 }
 
@@ -346,21 +331,9 @@ void mame_printf_debug(const char *format, ...)
 {
 	va_list argptr;
 
-	/* by default, we go to stderr */
-	if (output_cb[OUTPUT_CHANNEL_DEBUG] == NULL)
-	{
-#ifdef MAME_DEBUG
-		output_cb[OUTPUT_CHANNEL_DEBUG] = mame_file_output_callback;
-		output_cb_param[OUTPUT_CHANNEL_DEBUG] = stdout;
-#else
-		output_cb[OUTPUT_CHANNEL_DEBUG] = mame_null_output_callback;
-		output_cb_param[OUTPUT_CHANNEL_DEBUG] = NULL;
-#endif
-	}
-
 	/* do the output */
 	va_start(argptr, format);
-	(*output_cb[OUTPUT_CHANNEL_DEBUG])(output_cb_param[OUTPUT_CHANNEL_DEBUG], format, argptr);
+	output_cb[OUTPUT_CHANNEL_DEBUG](format, argptr);
 	va_end(argptr);
 }
 
@@ -375,16 +348,9 @@ void mame_printf_log(const char *format, ...)
 {
 	va_list argptr;
 
-	/* by default, we go to stderr */
-	if (output_cb[OUTPUT_CHANNEL_LOG] == NULL)
-	{
-		output_cb[OUTPUT_CHANNEL_LOG] = mame_file_output_callback;
-		output_cb_param[OUTPUT_CHANNEL_LOG] = stderr;
-	}
-
 	/* do the output */
 	va_start(argptr, format);
-	(*output_cb[OUTPUT_CHANNEL_LOG])(output_cb_param[OUTPUT_CHANNEL_LOG], format, argptr);
+	output_cb[OUTPUT_CHANNEL_LOG])(format, argptr);
 	va_end(argptr);
 }
 #endif

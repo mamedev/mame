@@ -770,11 +770,11 @@ ui_menu_file_manager::ui_menu_file_manager(running_machine &machine, render_cont
 void ui_menu_file_manager::populate()
 {
 	char buffer[2048];
-	device_image_interface *image = NULL;
 	astring tmp_name;
 
 	/* cycle through all devices for this system */
-	for (bool gotone = machine().devicelist().first(image); gotone; gotone = image->next(image))
+	image_interface_iterator iter(machine().root_device());
+	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
 		/* get the image type/id */
 		snprintf(buffer, ARRAY_LENGTH(buffer),
@@ -1000,15 +1000,8 @@ ui_menu_mess_bitbanger_control::~ui_menu_mess_bitbanger_control()
 
 int ui_menu_mess_tape_control::cassette_count()
 {
-	int count = 0;
-	device_t *device = machine().devicelist().first(CASSETTE);
-
-	while ( device )
-	{
-		count++;
-		device = device->typenext();
-	}
-	return count;
+	cassette_device_iterator iter(machine().root_device());
+	return iter.count();
 }
 
 /*-------------------------------------------------
@@ -1018,15 +1011,8 @@ int ui_menu_mess_tape_control::cassette_count()
 
 int ui_menu_mess_bitbanger_control::bitbanger_count()
 {
-	int count = 0;
-	device_t *device = machine().devicelist().first(BITBANGER);
-
-	while ( device )
-	{
-		count++;
-		device = device->typenext();
-	}
-	return count;
+	bitbanger_device_iterator iter(machine().root_device());
+	return iter.count();
 }
 
 /*-------------------------------------------------
@@ -1197,14 +1183,8 @@ void ui_menu_mess_tape_control::handle()
 	/* do we have to load the device? */
 	if (device == NULL)
 	{
-		int cindex = index;
-		for (bool gotone = machine().devicelist().first(device); gotone; gotone = device->next(device))
-		{
-			if(device->device().type() == CASSETTE) {
-				if (cindex==0) break;
-				cindex--;
-			}
-		}
+		cassette_device_iterator iter(machine().root_device());
+		device = iter.byindex(index);
 		reset((ui_menu_reset_options)0);
 	}
 
@@ -1286,14 +1266,8 @@ void ui_menu_mess_bitbanger_control::handle()
 	/* do we have to load the device? */
 	if (device == NULL)
 	{
-		int cindex = index;
-		for (bool gotone = machine().devicelist().first(device); gotone; gotone = device->next(device))
-		{
-			if(device->device().type() == BITBANGER) {
-				if (cindex==0) break;
-				cindex--;
-			}
-		}
+		bitbanger_device_iterator iter(machine().root_device());
+		device = iter.byindex(index);
 		reset((ui_menu_reset_options)0);
 	}
 

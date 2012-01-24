@@ -195,6 +195,9 @@ protected:
 																	// fast access to common entries
 };
 
+// iterator
+typedef device_interface_iterator<device_state_interface> state_interface_iterator;
+
 
 
 //**************************************************************************

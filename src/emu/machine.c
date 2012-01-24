@@ -150,7 +150,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  memory_data(NULL),
 	  palette_data(NULL),
 	  romload_data(NULL),
-	  input_data(NULL),
 	  input_port_data(NULL),
 	  ui_input_data(NULL),
 	  debugcpu_data(NULL),
@@ -171,7 +170,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_video(NULL),
 	  m_tilemap(NULL),
 	  m_debug_view(NULL),
-	  m_driver_device(NULL),
 	  m_current_phase(MACHINE_PHASE_PREINIT),
 	  m_paused(false),
 	  m_hard_reset_pending(false),
@@ -194,21 +192,19 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	memset(&m_base_time, 0, sizeof(m_base_time));
 
 	// set the machine on all devices
-	const_cast<device_list &>(devicelist()).set_machine_all(*this);
-
-	// find the driver device config and tell it which game
-	m_driver_device = device<driver_device>("root");
-	if (m_driver_device == NULL)
-		throw emu_fatalerror("Machine configuration missing driver_device");
+	device_iterator iter(root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+		device->set_machine(*this);
 
 	// find devices
-	primary_screen = downcast<screen_device *>(devicelist().first(SCREEN));
-	for (device_t *device = devicelist().first(); device != NULL; device = device->next())
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 		if (dynamic_cast<cpu_device *>(device) != NULL)
 		{
 			firstcpu = downcast<cpu_device *>(device);
 			break;
 		}
+	screen_device_iterator screeniter(root_device());
+	primary_screen = screeniter.first();
 
 	// fetch core options
 	if (options().debug())
@@ -318,8 +314,12 @@ void running_machine::start()
 	// so this location in the init order is important
 	ui_set_startup_text(*this, "Initializing...", true);
 
-	// start up the devices
-	const_cast<device_list &>(devicelist()).start_all();
+	// register callbacks for the devices, then start them
+	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(running_machine::reset_all_devices), this));
+	add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(running_machine::stop_all_devices), this));
+	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
+	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
+	start_all_devices();
 
 	// if we're coming in with a savegame request, process it now
 	const char *savegame = options().state();
@@ -344,25 +344,15 @@ void running_machine::start()
 
 device_t &running_machine::add_dynamic_device(device_t &owner, device_type type, const char *tag, UINT32 clock)
 {
-	// allocate and append this device
-	astring fulltag;
-	owner.subtag(fulltag, tag);
-	device_t &device = const_cast<device_list &>(devicelist()).append(fulltag, *type(m_config, fulltag, &owner, clock));
+	// add the device in a standard manner
+	device_t *device = const_cast<machine_config &>(m_config).device_add(&owner, tag, type, clock);
 
-	// append any machine config additions from new devices
-	for (device_t *curdevice = devicelist().first(); curdevice != NULL; curdevice = curdevice->next())
-		if (!curdevice->configured())
-		{
-			machine_config_constructor machconfig = curdevice->machine_config_additions();
-			if (machconfig != NULL)
-		    	(*machconfig)(const_cast<machine_config &>(m_config), curdevice);
-		}
-
-	// notify any new devices that their configurations are complete
-	for (device_t *curdevice = devicelist().first(); curdevice != NULL; curdevice = curdevice->next())
-		if (!curdevice->configured())
-			curdevice->config_complete();
-	return device;
+	// notify this device and all its subdevices that they are now configured
+	device_iterator iter(root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+		if (!device->configured())
+			device->config_complete();
+	return *device;
 }
 
 
@@ -633,6 +623,7 @@ void running_machine::resume()
 
 memory_region *running_machine::region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian)
 {
+mame_printf_verbose("Region '%s' created\n", name);
     // make sure we don't have a region of the same name; also find the end of the list
     memory_region *info = m_regionlist.find(name);
     if (info != NULL)
@@ -886,6 +877,115 @@ void running_machine::logfile_callback(running_machine &machine, const char *buf
 	if (machine.m_logfile != NULL)
 		machine.m_logfile->puts(buffer);
 }
+
+
+//-------------------------------------------------
+//  start_all_devices - start any unstarted devices
+//-------------------------------------------------
+
+void running_machine::start_all_devices()
+{
+	// iterate through the devices
+	int last_failed_starts = -1;
+	while (last_failed_starts != 0)
+	{
+		// iterate over all devices
+		int failed_starts = 0;
+		device_iterator iter(root_device());
+		for (device_t *device = iter.first(); device != NULL; device = iter.next())
+			if (!device->started())
+			{
+				// attempt to start the device, catching any expected exceptions
+				try
+				{
+					// if the device doesn't have a machine yet, set it first
+					if (device->m_machine == NULL)
+						device->set_machine(*this);
+
+					// now start the device
+					mame_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
+					device->start();
+				}
+
+				// handle missing dependencies by moving the device to the end
+				catch (device_missing_dependencies &)
+				{
+					// if we're the end, fail
+					mame_printf_verbose("  (missing dependencies; rescheduling)\n");
+					failed_starts++;
+				}
+			}
+		
+		// each iteration should reduce the number of failed starts; error if
+		// this doesn't happen
+		if (failed_starts == last_failed_starts)
+			throw emu_fatalerror("Circular dependency in device startup!");
+		last_failed_starts = failed_starts;
+	}
+}
+
+
+//-------------------------------------------------
+//  reset_all_devices - reset all devices in the
+//  hierarchy
+//-------------------------------------------------
+
+void running_machine::reset_all_devices()
+{
+	// iterate over devices and reset them
+	device_iterator iter(root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+		device->reset();
+}
+
+
+//-------------------------------------------------
+//  stop_all_devices - stop all the devices in the
+//  hierarchy
+//-------------------------------------------------
+
+void running_machine::stop_all_devices()
+{
+	// first let the debugger save comments
+	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_comment_save(*this);
+
+	// iterate over devices and stop them
+	device_iterator iter(root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+		device->stop();
+
+	// then nuke the device tree
+//	global_free(m_root_device);
+}
+
+
+//-------------------------------------------------
+//  presave_all_devices - tell all the devices we 
+//  are about to save
+//-------------------------------------------------
+
+void running_machine::presave_all_devices()
+{
+	device_iterator iter(root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+		device->pre_save();
+}
+
+
+//-------------------------------------------------
+//  postload_all_devices - tell all the devices we 
+//  just completed a load
+//-------------------------------------------------
+
+void running_machine::postload_all_devices()
+{
+	device_iterator iter(root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+		device->post_load();
+}
+
+
 
 /***************************************************************************
     MEMORY REGIONS
@@ -1143,8 +1243,10 @@ ioport_constructor driver_device::device_input_ports() const
 void driver_device::device_start()
 {
 	// reschedule ourselves to be last
-	if (next() != NULL)
-		throw device_missing_dependencies();
+	device_iterator iter(*this);
+	for (device_t *test = iter.first(); test != NULL; test = iter.next())
+		if (test != this && !test->started())
+			throw device_missing_dependencies();
 
 	// call the game-specific init
 	if (m_system->driver_init != NULL)

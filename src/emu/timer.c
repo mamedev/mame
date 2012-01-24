@@ -176,54 +176,40 @@ void timer_device::static_set_ptr(device_t &device, void *ptr)
 //  configuration
 //-------------------------------------------------
 
-bool timer_device::device_validity_check(emu_options &options, const game_driver &driver) const
+void timer_device::device_validity_check(validity_checker &valid) const
 {
-	bool error = false;
-
 	// type based configuration
 	switch (m_type)
 	{
 		case TIMER_TYPE_GENERIC:
 			if (m_screen_tag != NULL || m_first_vpos != 0 || m_start_delay != attotime::zero)
-				mame_printf_warning("%s: %s generic timer '%s' specified parameters for a scanline timer\n", driver.source_file, driver.name, tag());
+				mame_printf_warning("Generic timer specified parameters for a scanline timer\n");
 			if (m_period != attotime::zero || m_start_delay != attotime::zero)
-				mame_printf_warning("%s: %s generic timer '%s' specified parameters for a periodic timer\n", driver.source_file, driver.name, tag());
+				mame_printf_warning("Generic timer specified parameters for a periodic timer\n");
 			break;
 
 		case TIMER_TYPE_PERIODIC:
 			if (m_screen_tag != NULL || m_first_vpos != 0)
-				mame_printf_warning("%s: %s periodic timer '%s' specified parameters for a scanline timer\n", driver.source_file, driver.name, tag());
+				mame_printf_warning("Periodic timer specified parameters for a scanline timer\n");
 			if (m_period <= attotime::zero)
-			{
-				mame_printf_error("%s: %s periodic timer '%s' specified invalid period\n", driver.source_file, driver.name, tag());
-				error = true;
-			}
+				mame_printf_error("Periodic timer specified invalid period\n");
 			break;
 
 		case TIMER_TYPE_SCANLINE:
 			if (m_period != attotime::zero || m_start_delay != attotime::zero)
-				mame_printf_warning("%s: %s scanline timer '%s' specified parameters for a periodic timer\n", driver.source_file, driver.name, tag());
+				mame_printf_warning("Scanline timer specified parameters for a periodic timer\n");
 			if (m_param != 0)
-				mame_printf_warning("%s: %s scanline timer '%s' specified parameter which is ignored\n", driver.source_file, driver.name, tag());
+				mame_printf_warning("Scanline timer specified parameter which is ignored\n");
 			if (m_first_vpos < 0)
-			{
-				mame_printf_error("%s: %s scanline timer '%s' specified invalid initial position\n", driver.source_file, driver.name, tag());
-				error = true;
-			}
+				mame_printf_error("Scanline timer specified invalid initial position\n");
 			if (m_increment < 0)
-			{
-				mame_printf_error("%s: %s scanline timer '%s' specified invalid increment\n", driver.source_file, driver.name, tag());
-				error = true;
-			}
+				mame_printf_error("Scanline timer specified invalid increment\n");
 			break;
 
 		default:
-			mame_printf_error("%s: %s timer '%s' has an invalid type\n", driver.source_file, driver.name, tag());
-			error = true;
+			mame_printf_error("Invalid type specified\n");
 			break;
 	}
-
-	return error;
 }
 
 

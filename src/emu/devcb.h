@@ -93,14 +93,6 @@ enum
 	DEVCB_TYPE_CONSTANT				// constant value read
 };
 
-// for DEVCB_TYPE_DEVICE, some further differentiation
-enum
-{
-	DEVCB_DEVICE_SELF,				// ignore 'tag', refers to the device itself
-	DEVCB_DEVICE_DRIVER,			// ignore 'tag', refers to the driver device
-	DEVCB_DEVICE_OTHER				// device specified by 'tag'
-};
-
 
 
 //**************************************************************************
@@ -158,20 +150,20 @@ void devcb_stub16(device_t *device, offs_t offset, UINT16 data)
 #define DEVCB_NULL								{ DEVCB_TYPE_NULL }
 
 // standard line or read/write handlers with the calling device passed
-#define DEVCB_LINE(func)						{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, #func, func, NULL, NULL }
-#define DEVCB_LINE_MEMBER(cls,memb)				{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_HANDLER(func)						{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, #func, NULL, func, NULL }
-#define DEVCB_MEMBER(cls,memb)					{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_LINE(func)						{ DEVCB_TYPE_DEVICE, 0, "", #func, func, NULL, NULL }
+#define DEVCB_LINE_MEMBER(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_HANDLER(func)						{ DEVCB_TYPE_DEVICE, 0, "", #func, NULL, func, NULL }
+#define DEVCB_MEMBER(cls,memb)					{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for the driver device
-#define DEVCB_DRIVER_LINE_MEMBER(cls,memb)		{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_DRIVER, NULL, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_DRIVER_MEMBER(cls,memb)			{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_DRIVER, NULL, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_LINE_MEMBER(cls,memb)		{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_DRIVER_MEMBER(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for another device
-#define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, #func, func, NULL, NULL }
-#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_DEVICE_HANDLER(tag,func)			{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, #func, NULL, func, NULL }
-#define DEVCB_DEVICE_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, 0, tag, #func, func, NULL, NULL }
+#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_DEVICE_HANDLER(tag,func)			{ DEVCB_TYPE_DEVICE, 0, tag, #func, NULL, func, NULL }
+#define DEVCB_DEVICE_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 // constant values
 #define DEVCB_CONSTANT(value)					{ DEVCB_TYPE_CONSTANT, value, NULL, NULL, NULL, NULL }

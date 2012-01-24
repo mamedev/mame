@@ -49,7 +49,7 @@ enum
 //**************************************************************************
 
 // output channel callback
-typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
+typedef delegate<void (const char *, va_list)> output_delegate;
 
 class emulator_info
 {
@@ -75,6 +75,8 @@ public:
 	static const char * get_state_magic_num();
 	static void printf_usage(const char *par1, const char *par2);
 };
+
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -102,11 +104,11 @@ int mame_is_valid_machine(running_machine &machine);
 /* ----- output management ----- */
 
 /* set the output handler for a channel, returns the current one */
-void mame_set_output_channel(output_channel channel, output_callback_func callback, void *param, output_callback_func *prevcb, void **prevparam);
+output_delegate mame_set_output_channel(output_channel channel, output_delegate callback);
 
 /* built-in default callbacks */
-void mame_file_output_callback(void *param, const char *format, va_list argptr);
-void mame_null_output_callback(void *param, const char *format, va_list argptr);
+void mame_file_output_callback(FILE *file, const char *format, va_list argptr);
+void mame_null_output_callback(FILE *param, const char *format, va_list argptr);
 
 /* calls to be used by the code */
 void mame_printf_error(const char *format, ...) ATTR_PRINTF(1,2);

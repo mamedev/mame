@@ -152,8 +152,8 @@ void debug_view_memory::enumerate_sources()
 	astring name;
 
 	// first add all the devices' address spaces
-	device_memory_interface *memintf = NULL;
-	for (bool gotone = machine().devicelist().first(memintf); gotone; gotone = memintf->next(memintf))
+	memory_interface_iterator iter(machine().root_device());
+	for (device_memory_interface *memintf = iter.first(); memintf != NULL; memintf = iter.next())
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			address_space *space = memintf->space(spacenum);

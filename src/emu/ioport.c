@@ -903,7 +903,8 @@ time_t input_port_init(running_machine &machine)
 	init_port_types(machine);
 
 	/* if we have a token list, proceed */
-	for (device_t *device = machine.devicelist().first(); device != NULL; device = device->next())
+	device_iterator iter(machine.root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 	{
 		astring errors;
 		input_port_list_init(*device, machine.m_portlist, errors);
@@ -1500,10 +1501,10 @@ input_port_value input_port_read(running_machine &machine, const char *tag)
     a device input port specified by tag
 -------------------------------------------------*/
 
-input_port_value input_port_read(device_t *device, const char *tag)
+input_port_value input_port_read(device_t &device, const char *tag)
 {
-	astring tempstring;
-	const input_port_config *port = device->machine().port(device->subtag(tempstring, tag));
+	astring fullpath;
+	const input_port_config *port = device.machine().port(device.subtag(fullpath, tag));
 	if (port == NULL)
 		fatalerror("Unable to locate input port '%s'", tag);
 	return input_port_read_direct(port);
@@ -1721,7 +1722,7 @@ void input_port_write_safe(running_machine &machine, const char *tag, input_port
     if the given condition attached is true
 -------------------------------------------------*/
 
-int input_condition_true(running_machine &machine, const input_condition *condition,device_t &owner)
+int input_condition_true(running_machine &machine, const input_condition *condition, device_t &owner)
 {
 	input_port_value condvalue;
 
@@ -1939,20 +1940,6 @@ static astring &get_keyboard_key_name(astring &name, const input_field_config *f
     states based on the tokens
 -------------------------------------------------*/
 
-inline const char *get_device_tag(const device_t &device, const char *tag, astring &finaltag)
-{
-	if (strcmp(tag, DEVICE_SELF) == 0)
-		finaltag.cpy(device.tag());
-	else if (strcmp(tag, DEVICE_SELF_OWNER) == 0)
-	{
-		assert(device.owner() != NULL);
-		finaltag.cpy(device.owner()->tag());
-	}
-	else
-		device.subtag(finaltag, tag);
-	return finaltag;
-}
-
 static void init_port_state(running_machine &machine)
 {
 	const char *joystick_map_default = machine.options().joystick_map();
@@ -2012,7 +1999,7 @@ static void init_port_state(running_machine &machine)
 			astring devicetag;
 			if (!field->read.isnull())
 			{
-				*readdevicetail = init_field_device_info(field, get_device_tag(port->owner(), field->read_device, devicetag));
+				*readdevicetail = init_field_device_info(field, port->owner().subtag(devicetag, field->read_device));
 				field->read.late_bind(*(*readdevicetail)->device);
 				readdevicetail = &(*readdevicetail)->next;
 			}
@@ -2020,7 +2007,7 @@ static void init_port_state(running_machine &machine)
 			/* if this entry has device output, allocate memory for the tracking structure */
 			if (!field->write.isnull())
 			{
-				*writedevicetail = init_field_device_info(field, get_device_tag(port->owner(), field->write_device, devicetag));
+				*writedevicetail = init_field_device_info(field, port->owner().subtag(devicetag, field->write_device));
 				field->write.late_bind(*(*writedevicetail)->device);
 				writedevicetail = &(*writedevicetail)->next;
 			}
@@ -2028,7 +2015,7 @@ static void init_port_state(running_machine &machine)
 			/* if this entry has device output, allocate memory for the tracking structure */
 			if (!field->crossmapper.isnull())
 			{
-				device_t *device = machine.device(get_device_tag(port->owner(), field->crossmapper_device, devicetag));
+				device_t *device = machine.device(port->owner().subtag(devicetag, field->crossmapper_device));
 				field->crossmapper.late_bind(*device);
 			}
 
@@ -2842,16 +2829,13 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 
 UINT32 port_default_value(const char *fulltag, UINT32 mask, UINT32 defval, device_t &owner)
 {
-	astring tempstring;
-	const input_device_default *def = NULL;
-	def = owner.input_ports_defaults();
-	if (def!=NULL) {
-		while (def->tag!=NULL) {
-			if ((strcmp(fulltag,owner.subtag(tempstring,def->tag))==0) &&  (def->mask == mask)) {
+	const input_device_default *def = owner.input_ports_defaults();
+	if (def != NULL)
+	{
+		astring fullpath;
+		for ( ; def->tag != NULL; def++)
+			if (owner.subtag(fullpath, def->tag) == fulltag && def->mask == mask)
 				return def->defvalue;
-			}
-			def++;
-		}
 	}
 	return defval;
 }
@@ -4830,6 +4814,7 @@ input_port_config *ioconfig_alloc_port(ioport_list &portlist, device_t &device, 
 {
 	astring fulltag;
 	device.subtag(fulltag, tag);
+mame_printf_verbose("ioport '%s' created\n", fulltag.cstr());
 	return &portlist.append(fulltag, *global_alloc(input_port_config(device, fulltag)));
 }
 

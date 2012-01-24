@@ -131,10 +131,11 @@ public:
 
 	// getters
 	const game_driver &gamedrv() const { return m_gamedrv; }
-	const device_list &devicelist() const { return m_devicelist; }
-	const device_t *first_device() const { return m_devicelist.first(); }
+	device_t &root_device() const { assert(m_root_device != NULL); return *m_root_device; }
 	screen_device *first_screen() const;
 	emu_options &options() const { return m_options; }
+	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
+	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) const { return downcast<_DeviceClass *>(device(tag)); }
 
 	// public state
 	attotime				m_minimum_quantum;			// minimum scheduling quantum
@@ -142,9 +143,11 @@ public:
 	INT32					m_watchdog_vblank_count;	// number of VBLANKs until the watchdog kills us
 	attotime				m_watchdog_time;			// length of time until the watchdog kills us
 
+	// legacy callbacks
 	nvram_handler_func		m_nvram_handler;			// NVRAM save/load callback
 	memcard_handler_func	m_memcard_handler;			// memory card save/load callback
 
+	// other parameters
 	UINT32					m_video_attributes;			// flags describing the video system
 	const gfx_decode_entry *m_gfxdecodeinfo;			// pointer to array of graphics decoding information
 	UINT32					m_total_colors;				// total number of colors in the palette
@@ -157,12 +160,10 @@ public:
 	device_t *device_find(device_t *owner, const char *tag);
 
 private:
-	void device_add_subdevices(device_t *device);
-	void device_remove_subdevices(const device_t *device);
-
+	// internal state
 	const game_driver &		m_gamedrv;
 	emu_options &			m_options;
-	device_list				m_devicelist;				// list of device configs
+	device_t *				m_root_device;
 };
 
 

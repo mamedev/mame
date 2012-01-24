@@ -85,17 +85,13 @@ public:
 		: m_type(AMH_NONE),
 		  m_bits(0),
 		  m_mask(0),
-		  m_name(NULL),
-		  m_tag(NULL) { }
+		  m_name(NULL) { }
 
 	map_handler_type		m_type;				// type of the handler
 	UINT8					m_bits;				// width of the handler in bits, or 0 for default
 	UINT64					m_mask;				// mask for which lanes apply
 	const char *			m_name;				// name of the handler
-	const char *			m_tag;				// tag pointing to a reference
-	astring					m_derived_tag;		// string used to hold derived names
-
-	void set_tag(const device_t &device, const char *tag);
+	astring					m_tag;				// path to the target tag
 };
 
 

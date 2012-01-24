@@ -46,4 +46,6 @@ loaded_samples *readsamples(running_machine &machine, const char *const *samplen
 
 DECLARE_LEGACY_SOUND_DEVICE(SAMPLES, samples);
 
+typedef device_type_iterator<&legacy_device_creator<samples_device>, samples_device> samples_device_iterator;
+
 #endif /* __SAMPLES_H__ */

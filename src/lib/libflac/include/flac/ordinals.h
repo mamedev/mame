@@ -77,4 +77,7 @@ typedef FLAC__uint8 FLAC__byte;
 #define false 0
 #endif
 
+// MAME addition -- seems lame to make this a command-line parameter
+#define VERSION "1.2.1"
+
 #endif

@@ -188,7 +188,8 @@ void set_disk_handle(running_machine &machine, const char *region, emu_file &fil
 const rom_source *rom_first_source(const machine_config &config)
 {
 	/* look through devices */
-	for (const device_t *device = config.devicelist().first(); device != NULL; device = device->next())
+	device_iterator iter(config.root_device());
+	for (const device_t *device = iter.first(); device != NULL; device = iter.next())
 		if (device->rom_region() != NULL)
 			return device;
 
@@ -204,9 +205,16 @@ const rom_source *rom_first_source(const machine_config &config)
 const rom_source *rom_next_source(const rom_source &previous)
 {
 	/* look for further devices with ROM definitions */
-	for (const device_t *device = previous.next(); device != NULL; device = device->next())
+// fixme: this is awful
+	device_iterator iter(previous.mconfig().root_device());
+	const device_t *device;
+	for (device = iter.first(); device != NULL; device = iter.next())
+		if (device == &previous)
+			break;
+
+	for (device = iter.next(); device != NULL; device = iter.next())
 		if (device->rom_region() != NULL)
-			return (rom_source *)device;
+			return device;
 
 	return NULL;
 }
@@ -273,7 +281,7 @@ const rom_entry *rom_next_file(const rom_entry *romp)
 
 astring &rom_region_name(astring &result, const game_driver *drv, const rom_source *source, const rom_entry *romp)
 {
-	return source->subtag(result, ROMREGION_GETTAG(romp));
+	return source->subtag(result, ROM_GETNAME(romp));
 }
 
 

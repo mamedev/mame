@@ -173,7 +173,7 @@ machine_config_constructor bsmt2000_device::device_mconfig_additions() const
 void bsmt2000_device::device_start()
 {
 	// find our CPU
-	m_cpu = downcast<tms32015_device*>(subdevice("bsmt2000"));
+	m_cpu = subdevice<tms32015_device>("bsmt2000");
 
 	// find our direct access
 	m_direct = &space()->direct();

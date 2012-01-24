@@ -65,7 +65,7 @@ public:
 
 protected:
 	virtual void device_start(void);
-	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
+	virtual void device_validity_check(validity_checker &valid) const;
 
 private:
 	// device state
@@ -81,5 +81,8 @@ private:
 
 // device type definition
 extern const device_type RAM;
+
+// device iterator
+typedef device_type_iterator<&device_creator<ram_device>, ram_device> ram_device_iterator;
 
 #endif /* __RAM_H__ */

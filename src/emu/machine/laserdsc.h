@@ -380,6 +380,9 @@ private:
 	render_texture *	m_overtex;				// texture for the overlay
 };
 
+// iterator - interface iterator works for subclasses too
+typedef device_interface_iterator<laserdisc_device> laserdisc_device_iterator;
+
 
 
 //**************************************************************************

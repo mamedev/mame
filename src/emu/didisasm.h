@@ -98,5 +98,8 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) = 0;
 };
 
+// iterator
+typedef device_interface_iterator<device_disasm_interface> disasm_interface_iterator;
+
 
 #endif	/* __DIDISASM_H__ */

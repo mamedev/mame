@@ -200,12 +200,11 @@ void legacy_device_base::static_set_inline_float(device_t &device, UINT32 offset
 //  checks on a device configuration
 //-------------------------------------------------
 
-bool legacy_device_base::device_validity_check(emu_options &options, const game_driver &driver) const
+void legacy_device_base::device_validity_check(validity_checker &valid) const
 {
 	device_validity_check_func validity_func = reinterpret_cast<device_validity_check_func>(get_legacy_fct(DEVINFO_FCT_VALIDITY_CHECK));
 	if (validity_func != NULL)
-		return (*validity_func)(&driver, this, options);
-	return false;
+		(*validity_func)(&mconfig().gamedrv(), this, mconfig().options());
 }
 
 
@@ -239,7 +238,7 @@ void legacy_device_base::device_reset()
 
 void legacy_device_base::device_stop()
 {
-	if (m_started)
+	if (started())
 	{
 		device_stop_func stop_func = reinterpret_cast<device_stop_func>(get_legacy_fct(DEVINFO_FCT_STOP));
 		if (stop_func != NULL)

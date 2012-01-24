@@ -1726,8 +1726,8 @@ void memory_init(running_machine &machine)
 	memdata->banknext = STATIC_BANK1;
 
 	// loop over devices and spaces within each device
-	device_memory_interface *memory = NULL;
-	for (bool gotone = machine.devicelist().first(memory); gotone; gotone = memory->next(memory))
+	memory_interface_iterator iter(machine.root_device());
+	for (device_memory_interface *memory = iter.first(); memory != NULL; memory = iter.next())
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			// if there is a configuration for this space, we need an address space
@@ -1781,10 +1781,22 @@ address_space *memory_nonspecific_space(running_machine &machine)
 
 void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
+	memory_configure_bank(machine.root_device(), tag, startentry, numentries, base, stride);
+}
+
+
+//-------------------------------------------------
+//  memory_configure_bank - configure the
+//  addresses for a bank
+//-------------------------------------------------
+
+void memory_configure_bank(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
+{
 	// validation checks
-	memory_bank *bank = machine.memory_data->bankmap.find_hash_only(tag);
+	astring fulltag;
+	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
 	if (bank == NULL)
-		fatalerror("memory_configure_bank called for unknown bank '%s'", tag);
+		fatalerror("memory_configure_bank called for unknown bank '%s'", fulltag.cstr());
 	if (base == NULL)
 		fatalerror("memory_configure_bank called NULL base");
 
@@ -1795,14 +1807,13 @@ void memory_configure_bank(running_machine &machine, const char *tag, int starte
 
 
 //-------------------------------------------------
-//  memory_configure_bank - configure the
-//  addresses for a bank
+//  memory_configure_bank_decrypted - configure
+//  the decrypted addresses for a bank
 //-------------------------------------------------
 
-void memory_configure_bank(device_t *device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
+void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
-	astring tempstring;
-	memory_configure_bank(device->machine(), device->subtag(tempstring, tag), startentry, numentries, base, stride);
+	memory_configure_bank_decrypted(machine.root_device(), tag, startentry, numentries, base, stride);
 }
 
 
@@ -1811,12 +1822,13 @@ void memory_configure_bank(device_t *device, const char *tag, int startentry, in
 //  the decrypted addresses for a bank
 //-------------------------------------------------
 
-void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
+void memory_configure_bank_decrypted(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
 	// validation checks
-	memory_bank *bank = machine.memory_data->bankmap.find_hash_only(tag);
+	astring fulltag;
+	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
 	if (bank == NULL)
-		fatalerror("memory_configure_bank_decrypted called for unknown bank '%s'", tag);
+		fatalerror("memory_configure_bank_decrypted called for unknown bank '%s'", fulltag.cstr());
 	if (base == NULL)
 		fatalerror("memory_configure_bank_decrypted called NULL base");
 
@@ -1827,31 +1839,13 @@ void memory_configure_bank_decrypted(running_machine &machine, const char *tag, 
 
 
 //-------------------------------------------------
-//  memory_configure_bank_decrypted - configure
-//  the decrypted addresses for a bank
-//-------------------------------------------------
-
-void memory_configure_bank_decrypted(device_t *device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
-{
-	astring tempstring;
-	memory_configure_bank_decrypted(device->machine(), device->subtag(tempstring, tag), startentry, numentries, base, stride);
-}
-
-
-//-------------------------------------------------
 //  memory_set_bank - select one pre-configured
 //  entry to be the new bank base
 //-------------------------------------------------
 
 void memory_set_bank(running_machine &machine, const char *tag, int entrynum)
 {
-	// validation checks
-	memory_bank *bank = machine.memory_data->bankmap.find_hash_only(tag);
-	if (bank == NULL)
-		fatalerror("memory_set_bank called for unknown bank '%s'", tag);
-
-	// set the base
-	bank->set_entry(entrynum);
+	memory_set_bank(machine.root_device(), tag, entrynum);
 }
 
 
@@ -1860,10 +1854,16 @@ void memory_set_bank(running_machine &machine, const char *tag, int entrynum)
 //  entry to be the new bank base
 //-------------------------------------------------
 
-void memory_set_bank(device_t *device, const char *tag, int entrynum)
+void memory_set_bank(device_t &device, const char *tag, int entrynum)
 {
-	astring tempstring;
-	memory_set_bank(device->machine(), device->subtag(tempstring, tag), entrynum);
+	// validation checks
+	astring fulltag;
+	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
+	if (bank == NULL)
+		fatalerror("memory_set_bank called for unknown bank '%s'", fulltag.cstr());
+
+	// set the base
+	bank->set_entry(entrynum);
 }
 
 
@@ -1874,13 +1874,7 @@ void memory_set_bank(device_t *device, const char *tag, int entrynum)
 
 int memory_get_bank(running_machine &machine, const char *tag)
 {
-	// validation checks
-	memory_bank *bank = machine.memory_data->bankmap.find_hash_only(tag);
-	if (bank == NULL)
-		fatalerror("memory_get_bank called for unknown bank '%s'", tag);
-
-	// return the current entry
-	return bank->entry();
+	return memory_get_bank(machine.root_device(), tag);
 }
 
 
@@ -1889,10 +1883,16 @@ int memory_get_bank(running_machine &machine, const char *tag)
 //  selected bank
 //-------------------------------------------------
 
-int memory_get_bank(device_t *device, const char *tag)
+int memory_get_bank(device_t &device, const char *tag)
 {
-	astring tempstring;
-	return memory_get_bank(device->machine(), device->subtag(tempstring, tag));
+	// validation checks
+	astring fulltag;
+	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
+	if (bank == NULL)
+		fatalerror("memory_get_bank called for unknown bank '%s'", fulltag.cstr());
+
+	// return the current entry
+	return bank->entry();
 }
 
 
@@ -1902,13 +1902,7 @@ int memory_get_bank(device_t *device, const char *tag)
 
 void memory_set_bankptr(running_machine &machine, const char *tag, void *base)
 {
-	// validation checks
-	memory_bank *bank = machine.memory_data->bankmap.find_hash_only(tag);
-	if (bank == NULL)
-		throw emu_fatalerror("memory_set_bankptr called for unknown bank '%s'", tag);
-
-	// set the base
-	bank->set_base(base);
+	memory_set_bankptr(machine.root_device(), tag, base);
 }
 
 
@@ -1916,10 +1910,16 @@ void memory_set_bankptr(running_machine &machine, const char *tag, void *base)
 //  memory_set_bankptr - set the base of a bank
 //-------------------------------------------------
 
-void memory_set_bankptr(device_t *device, const char *tag, void *base)
+void memory_set_bankptr(device_t &device, const char *tag, void *base)
 {
-	astring tempstring;
-	return memory_set_bankptr(device->machine(), device->subtag(tempstring, tag), base);
+	// validation checks
+	astring fulltag;
+	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
+	if (bank == NULL)
+		throw emu_fatalerror("memory_set_bankptr called for unknown bank '%s'", fulltag.cstr());
+
+	// set the base
+	bank->set_base(base);
 }
 
 
@@ -1936,7 +1936,8 @@ void *memory_get_shared(running_machine &machine, const char *tag)
 
 void *memory_get_shared(running_machine &machine, const char *tag, size_t &length)
 {
-	memory_share *share = machine.memory_data->sharemap.find(tag);
+	astring fulltag;
+	memory_share *share = machine.memory_data->sharemap.find(machine.root_device().subtag(fulltag, tag));
 	if (share == NULL)
 		return NULL;
 	length = share->size();
@@ -2186,11 +2187,16 @@ void address_space::prepare_map()
 		adjust_addresses(entry->m_bytestart, entry->m_byteend, entry->m_bytemask, entry->m_bytemirror);
 
 		// if we have a share entry, add it to our map
-		if (entry->m_share != NULL && machine().memory_data->sharemap.find(entry->m_share) == NULL)
+		if (entry->m_share != NULL)
 		{
-			VPRINTF(("Creating share '%s' of length 0x%X\n", entry->m_share, entry->m_byteend + 1 - entry->m_bytestart));
-			memory_share *share = auto_alloc(machine(), memory_share(entry->m_byteend + 1 - entry->m_bytestart));
-			machine().memory_data->sharemap.add(entry->m_share, share, false);
+			// if we can't find it, add it to our map
+			astring fulltag;
+			if (machine().memory_data->sharemap.find(device().siblingtag(fulltag, entry->m_share)) == NULL)
+			{
+				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.cstr(), entry->m_byteend + 1 - entry->m_bytestart));
+				memory_share *share = auto_alloc(machine(), memory_share(entry->m_byteend + 1 - entry->m_bytestart));
+				machine().memory_data->sharemap.add(fulltag, share, false);
+			}
 		}
 
 		// if this is a ROM handler without a specified region, attach it to the implicit region
@@ -2207,22 +2213,12 @@ void address_space::prepare_map()
 		// validate adjusted addresses against implicit regions
 		if (entry->m_region != NULL && entry->m_share == NULL && entry->m_baseptr == NULL)
 		{
-			astring regiontag;
+			// determine full tag
+			astring fulltag;
+			device().siblingtag(fulltag, entry->m_region);
 
-			// a leading : on a region name indicates an absolute region, so fix up accordingly
-			if (entry->m_region[0] == ':')
-			{
-				regiontag = &entry->m_region[1];
-			}
-			else
-			{
-				if (strchr(entry->m_region,':')) {
-					regiontag = entry->m_region;
-				} else {
-					m_device.siblingtag(regiontag, entry->m_region);
-				}
-			}
-			const memory_region *region = machine().region(regiontag.cstr());
+			// find the region
+			const memory_region *region = machine().region(fulltag);
 			if (region == NULL)
 				fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
 
@@ -2232,14 +2228,14 @@ void address_space::prepare_map()
 		}
 
 		// convert any region-relative entries to their memory pointers
-		if (entry->m_region != NULL) {
-			astring regiontag;
-			if (strchr(entry->m_region,':')) {
-				regiontag = entry->m_region;
-			} else {
-				m_device.siblingtag(regiontag, entry->m_region);
-			}
-			entry->m_memory = machine().region(regiontag.cstr())->base() + entry->m_rgnoffs;
+		if (entry->m_region != NULL)
+		{
+			// determine full tag
+			astring fulltag;
+			device().siblingtag(fulltag, entry->m_region);
+			
+			// set the memory address
+			entry->m_memory = machine().region(fulltag.cstr())->base() + entry->m_rgnoffs;
 		}
 	}
 
@@ -2286,7 +2282,8 @@ void address_space::populate_from_map()
 void address_space::populate_map_entry(const address_map_entry &entry, read_or_write readorwrite)
 {
 	const map_handler_data &data = (readorwrite == ROW_READ) ? entry.m_read : entry.m_write;
-	device_t *device;
+	device_t *target_device;
+	astring fulltag;
 
 	// based on the handler type, alter the bits, name, funcptr, and object
 	switch (data.m_type)
@@ -2313,25 +2310,25 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			break;
 
 		case AMH_DEVICE_DELEGATE:
-			device = machine().device(data.m_tag);
-			if (device == NULL)
-				throw emu_fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", data.m_tag, m_name, m_device.tag());
+			target_device = device().siblingdevice(data.m_tag);
+			if (target_device == NULL)
+				throw emu_fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", data.m_tag.cstr(), m_name, m_device.tag());
 
 			if (readorwrite == ROW_READ)
 				switch (data.m_bits)
 				{
-					case 8:		install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, *device), data.m_mask);		break;
-					case 16:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, *device), data.m_mask);		break;
-					case 32:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, *device), data.m_mask);		break;
-					case 64:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, *device), data.m_mask);		break;
+					case 8:		install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, *target_device), data.m_mask);		break;
+					case 16:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, *target_device), data.m_mask);		break;
+					case 32:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, *target_device), data.m_mask);		break;
+					case 64:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, *target_device), data.m_mask);		break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:		install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, *device), data.m_mask);		break;
-					case 16:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, *device), data.m_mask);	break;
-					case 32:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, *device), data.m_mask);	break;
-					case 64:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, *device), data.m_mask);	break;
+					case 8:		install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, *target_device), data.m_mask);		break;
+					case 16:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, *target_device), data.m_mask);	break;
+					case 32:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, *target_device), data.m_mask);	break;
+					case 64:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, *target_device), data.m_mask);	break;
 				}
 			break;
 
@@ -2355,42 +2352,42 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			break;
 
 		case AMH_LEGACY_DEVICE_HANDLER:
-			device = machine().device(data.m_tag);
-			if (device == NULL)
-				fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", data.m_tag, m_name, m_device.tag());
+			target_device = device().siblingdevice(data.m_tag);
+			if (target_device == NULL)
+				fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", data.m_tag.cstr(), m_name, m_device.tag());
 
 			if (readorwrite == ROW_READ)
 				switch (data.m_bits)
 				{
-					case 8:		install_legacy_read_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice8, data.m_name, data.m_mask);	break;
-					case 16:	install_legacy_read_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice16, data.m_name, data.m_mask);	break;
-					case 32:	install_legacy_read_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice32, data.m_name, data.m_mask);	break;
-					case 64:	install_legacy_read_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice64, data.m_name, data.m_mask);	break;
+					case 8:		install_legacy_read_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice8, data.m_name, data.m_mask);	break;
+					case 16:	install_legacy_read_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice16, data.m_name, data.m_mask);	break;
+					case 32:	install_legacy_read_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice32, data.m_name, data.m_mask);	break;
+					case 64:	install_legacy_read_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice64, data.m_name, data.m_mask);	break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:		install_legacy_write_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice8, data.m_name, data.m_mask);	break;
-					case 16:	install_legacy_write_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice16, data.m_name, data.m_mask);	break;
-					case 32:	install_legacy_write_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice32, data.m_name, data.m_mask);	break;
-					case 64:	install_legacy_write_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice64, data.m_name, data.m_mask);	break;
+					case 8:		install_legacy_write_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice8, data.m_name, data.m_mask);	break;
+					case 16:	install_legacy_write_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice16, data.m_name, data.m_mask);	break;
+					case 32:	install_legacy_write_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice32, data.m_name, data.m_mask);	break;
+					case 64:	install_legacy_write_handler(*target_device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice64, data.m_name, data.m_mask);	break;
 				}
 			break;
 
 		case AMH_PORT:
 			install_readwrite_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
-							(readorwrite == ROW_READ) ? data.m_tag : NULL,
-							(readorwrite == ROW_WRITE) ? data.m_tag : NULL);
+							(readorwrite == ROW_READ) ? data.m_tag.cstr() : NULL,
+							(readorwrite == ROW_WRITE) ? data.m_tag.cstr() : NULL);
 			break;
 
 		case AMH_BANK:
 			install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
-							(readorwrite == ROW_READ) ? data.m_tag : NULL,
-							(readorwrite == ROW_WRITE) ? data.m_tag : NULL);
+							(readorwrite == ROW_READ) ? data.m_tag.cstr() : NULL,
+							(readorwrite == ROW_WRITE) ? data.m_tag.cstr() : NULL);
 			break;
 
 		case AMH_DEVICE_SUBMAP:
-			throw emu_fatalerror("Internal mapping error: leftover mapping of '%s'.\n", data.m_tag);
+			throw emu_fatalerror("Internal mapping error: leftover mapping of '%s'.\n", data.m_tag.cstr());
 	}
 }
 
@@ -2478,13 +2475,13 @@ void address_space::locate_memory()
 		if (entry->m_baseptr != NULL)
 			*entry->m_baseptr = entry->m_memory;
 		if (entry->m_baseptroffs_plus1 != 0)
-			*(void **)(reinterpret_cast<UINT8 *>(machine().driver_data<void>()) + entry->m_baseptroffs_plus1 - 1) = entry->m_memory;
+			*(void **)(reinterpret_cast<UINT8 *>(machine().driver_data()) + entry->m_baseptroffs_plus1 - 1) = entry->m_memory;
 		if (entry->m_genbaseptroffs_plus1 != 0)
 			*(void **)((UINT8 *)&machine().generic + entry->m_genbaseptroffs_plus1 - 1) = entry->m_memory;
 		if (entry->m_sizeptr != NULL)
 			*entry->m_sizeptr = entry->m_byteend - entry->m_bytestart + 1;
 		if (entry->m_sizeptroffs_plus1 != 0)
-			*(size_t *)(reinterpret_cast<UINT8 *>(machine().driver_data<void>()) + entry->m_sizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
+			*(size_t *)(reinterpret_cast<UINT8 *>(machine().driver_data()) + entry->m_sizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
 		if (entry->m_gensizeptroffs_plus1 != 0)
 			*(size_t *)((UINT8 *)&machine().generic + entry->m_gensizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
 	}
@@ -2562,7 +2559,8 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		// if we haven't assigned this block yet, see if we have a mapped shared pointer for it
 		if (entry->m_memory == NULL && entry->m_share != NULL)
 		{
-			memory_share *share = memdata->sharemap.find(entry->m_share);
+			astring fulltag;
+			memory_share *share = memdata->sharemap.find(device().siblingtag(fulltag, entry->m_share));
 			if (share != NULL && share->ptr() != NULL)
 			{
 				entry->m_memory = share->ptr();
@@ -2584,7 +2582,8 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		// if we're the first match on a shared pointer, assign it now
 		if (entry->m_memory != NULL && entry->m_share != NULL)
 		{
-			memory_share *share = memdata->sharemap.find(entry->m_share);
+			astring fulltag;
+			memory_share *share = memdata->sharemap.find(device().siblingtag(fulltag, entry->m_share));
 			if (share != NULL && share->ptr() == NULL)
 			{
 				share->set_ptr(entry->m_memory);
@@ -2685,7 +2684,9 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 	if (rtag != NULL)
 	{
 		// find the port
-		const input_port_config *port = machine().port(rtag);
+		astring fulltag;
+		device().siblingtag(fulltag, rtag);
+		const input_port_config *port = machine().port(fulltag);
 		if (port == NULL)
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
 
@@ -2696,7 +2697,9 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 	if (wtag != NULL)
 	{
 		// find the port
-		const input_port_config *port = machine().port(wtag);
+		astring fulltag;
+		device().siblingtag(fulltag, wtag);
+		const input_port_config *port = machine().port(fulltag);
 		if (port == NULL)
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
 
@@ -2724,14 +2727,18 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 	// map the read bank
 	if (rtag != NULL)
 	{
-		memory_bank &bank = bank_find_or_allocate(rtag, addrstart, addrend, addrmask, addrmirror, ROW_READ);
+		astring fulltag;
+		device().siblingtag(fulltag, rtag);
+		memory_bank &bank = bank_find_or_allocate(fulltag, addrstart, addrend, addrmask, addrmirror, ROW_READ);
 		read().map_range(addrstart, addrend, addrmask, addrmirror, bank.index());
 	}
 
 	// map the write bank
 	if (wtag != NULL)
 	{
-		memory_bank &bank = bank_find_or_allocate(wtag, addrstart, addrend, addrmask, addrmirror, ROW_WRITE);
+		astring fulltag;
+		device().siblingtag(fulltag, wtag);
+		memory_bank &bank = bank_find_or_allocate(fulltag, addrstart, addrend, addrmask, addrmirror, ROW_WRITE);
 		write().map_range(addrstart, addrend, addrmask, addrmirror, bank.index());
 	}
 
@@ -3224,7 +3231,8 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 	// if we are sharing, and we don't have a pointer yet, create one
 	if (entry->m_share != NULL)
 	{
-		memory_share *share = machine().memory_data->sharemap.find(entry->m_share);
+		astring fulltag;
+		memory_share *share = machine().memory_data->sharemap.find(device().siblingtag(fulltag, entry->m_share));
 		if (share != NULL && share->ptr() == NULL)
 			return true;
 	}
