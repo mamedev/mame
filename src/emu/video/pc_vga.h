@@ -28,6 +28,7 @@ void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t m
 void pc_vga_reset(running_machine &machine);
 void *pc_vga_memory(void);
 size_t pc_vga_memory_size(void);
+void pc_video_start(running_machine &machine);
 
 READ8_HANDLER(vga_port_03b0_r);
 READ8_HANDLER(vga_port_03c0_r);

@@ -185,8 +185,6 @@ static struct
 #define FONT1 (  ((vga.sequencer.data[3]&0x3)    |((vga.sequencer.data[3]&0x10)<<2))*0x2000 )
 #define FONT2 ( (((vga.sequencer.data[3]&0xc)>>2)|((vga.sequencer.data[3]&0x20)<<3))*0x2000 )
 
-static int pc_current_height;
-static int pc_current_width;
 
 /***************************************************************************
 
@@ -207,9 +205,7 @@ static VIDEO_RESET( vga );
 
 void pc_video_start(running_machine &machine)
 {
-//  pc_choosevideomode = choosevideomode;
-	pc_current_height = -1;
-	pc_current_width = -1;
+	// ...
 }
 
 static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -403,63 +399,35 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 static void vga_vh_cga(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *bitmapline;
-	//int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	int x,y,yi;
+	int height = (vga.crtc.scan_doubling + 1);
+	int x,xi,y,yi;
 	UINT32 addr;
 	pen_t pen;
+	int width;
 
 	addr = 0;
+	width = (vga.crtc.horz_disp_end + 1) * 8;
 
-	for(y=0;y<200;y++)
+	for(y=0;y<LINES;y++)
 	{
-		//addr = (y) * test;
+		addr = ((y & 1) * 0x2000) + (((y & ~1) >> 1) * width/4);
 
-		for(x=0;x<640;x+=16)
+		for(x=0;x<width;x+=4)
 		{
-			for(yi=0;yi<1;yi++)
+			for(yi=0;yi<height;yi++)
 			{
-				bitmapline = &bitmap.pix32(y + yi);
+				bitmapline = &bitmap.pix32(y * height + yi);
 
-				/* TODO: debug dirty assignment */
+				for(xi=0;xi<4;xi++)
 				{
-					pen = vga.pens[(vga.memory[addr] >> (6)) & 3];
-					bitmapline[x+0] = pen;
-					pen = vga.pens[(vga.memory[addr] >> (4)) & 3];
-					bitmapline[x+1] = pen;
-					pen = vga.pens[(vga.memory[addr] >> (2)) & 3];
-					bitmapline[x+2] = pen;
-					pen = vga.pens[(vga.memory[addr] >> (0)) & 3];
-					bitmapline[x+3] = pen;
-					pen = vga.pens[(vga.memory[addr+0x4000] >> (6)) & 3];
-					bitmapline[x+4] = pen;
-					pen = vga.pens[(vga.memory[addr+0x4000] >> (4)) & 3];
-					bitmapline[x+5] = pen;
-					pen = vga.pens[(vga.memory[addr+0x4000] >> (2)) & 3];
-					bitmapline[x+6] = pen;
-					pen = vga.pens[(vga.memory[addr+0x4000] >> (0)) & 3];
-					bitmapline[x+7] = pen;
-					pen = vga.pens[(vga.memory[addr+1] >> (6)) & 3];
-					bitmapline[x+8] = pen;
-					pen = vga.pens[(vga.memory[addr+1] >> (4)) & 3];
-					bitmapline[x+9] = pen;
-					pen = vga.pens[(vga.memory[addr+1] >> (2)) & 3];
-					bitmapline[x+10] = pen;
-					pen = vga.pens[(vga.memory[addr+1] >> (0)) & 3];
-					bitmapline[x+11] = pen;
-					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (6)) & 3];
-					bitmapline[x+12] = pen;
-					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (4)) & 3];
-					bitmapline[x+13] = pen;
-					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (2)) & 3];
-					bitmapline[x+14] = pen;
-					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (0)) & 3];
-					bitmapline[x+15] = pen;
+					pen = vga.pens[(vga.memory[addr] >> (6-xi*2)) & 3];
+					if(!machine.primary_screen->visible_area().contains(x+xi, y * height + yi))
+						continue;
+					bitmapline[x+xi] = pen;
 				}
 			}
 
-			//popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",vga.memory[0],vga.memory[1],vga.memory[2],vga.memory[3],vga.memory[4],vga.memory[5],vga.memory[6],vga.memory[7]);
-
-			addr+=2;
+			addr++;
 		}
 	}
 }
@@ -557,10 +525,12 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 		}
 		else if (vga.gc.data[5]&0x20)
 		{
+			// cga
 			return 3;
 		}
 		else if ((vga.gc.data[6]&0x0c) == 0x0c)
 		{
+			// mono
 			return 4;
 		}
 		else
@@ -609,6 +579,21 @@ INLINE WRITE8_HANDLER(vga_dirty_w)
 {
 	vga.memory[offset] = data;
 }
+
+static READ8_HANDLER(vga_cga_r)
+{
+	int data;
+	data=vga.memory[offset];
+
+	return data;
+}
+
+static WRITE8_HANDLER(vga_cga_w)
+{
+	vga.memory[offset] = data;
+}
+
+
 
 static READ8_HANDLER(vga_text_r)
 {
@@ -1288,6 +1273,10 @@ READ8_HANDLER(vga_mem_r)
 	{
 		read_handler = vga_ega_r;
 	}
+	else if (vga.gc.data[5]&0x20)
+	{
+		read_handler = vga_cga_r;
+	}
 	else
 	{
 		read_handler = vga_text_r;
@@ -1305,6 +1294,7 @@ READ8_HANDLER(vga_mem_r)
 WRITE8_HANDLER(vga_mem_w)
 {
 	write8_space_func write_handler;
+
 	if (vga.sequencer.data[4]&8)
 	{
 		write_handler = vga_vga_w;
@@ -1312,6 +1302,10 @@ WRITE8_HANDLER(vga_mem_w)
 	else if (vga.sequencer.data[4] & 4)
 	{
 		write_handler = vga_ega_w;
+	}
+	else if (vga.gc.data[5]&0x20)
+	{
+		write_handler = vga_cga_w;
 	}
 	else
 	{
@@ -1413,7 +1407,7 @@ VIDEO_START( vga )
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
-		palette_set_color_rgb(machine, i, 0, 0, 0);	
+		palette_set_color_rgb(machine, i, 0, 0, 0);
 	pc_video_start(machine);
 }
 
@@ -1447,7 +1441,6 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 	MCFG_VIDEO_RESET(vga)
 MACHINE_CONFIG_END
 
-
 MACHINE_CONFIG_FRAGMENT( pcvideo_vga_isa )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
@@ -1455,3 +1448,4 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_vga_isa )
 
 	MCFG_PALETTE_LENGTH(0x100)
 MACHINE_CONFIG_END
+
