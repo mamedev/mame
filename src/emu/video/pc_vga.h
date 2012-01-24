@@ -29,7 +29,7 @@ size_t pc_vga_memory_size(void);
 READ8_HANDLER(vga_port_03b0_r);
 READ8_HANDLER(vga_port_03c0_r);
 READ8_HANDLER(vga_port_03d0_r);
-READ8_HANDLER(vga_mem_w);
+READ8_HANDLER(vga_mem_r);
 WRITE8_HANDLER(vga_port_03b0_w);
 WRITE8_HANDLER(vga_port_03c0_w);
 WRITE8_HANDLER(vga_port_03d0_w);
