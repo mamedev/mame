@@ -1058,7 +1058,7 @@ bool floppy_image_format_t::extension_matches(const char *file_name) const
 		if(next)
 			rext = next+1;
 		else
-			break;			
+			break;
 	}
 	return false;
 }
