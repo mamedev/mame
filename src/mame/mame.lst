@@ -2374,6 +2374,7 @@ fshark			// B02 / TP-007 (c) 1987 Taito Corporation (World)
 skyshark		// B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
 hishouza		// B02 / TP-007 (c) 1987 Taito Corporation (Japan)
 fsharkbt		// bootleg
+fsharkbla
 wardner			// B25 / TP-009 (c) 1987 Taito Corporation Japan (World)
 pyros			// B25 / TP-009 (c) 1987 Taito America Corporation (US)
 wardnerj		// B25 / TP-009 (c) 1987 Taito Corporation (Japan)
@@ -2813,6 +2814,7 @@ cawing			// 12/10/1990 (c) 1990 (World)
 cawingr1		// 09/10/1990 (c) 1990 (World)
 cawingu			// 12/10/1990 (c) 1990 (USA)
 cawingj			// 12/10/1990 (c) 1990 (Japan)
+cawingbl
 nemo			// 30/11/1990 (c) 1990 (World)
 nemoj			// 20/11/1990 (c) 1990 (Japan)
 sf2				// 22/05/1991 (c) 1991 (World)
@@ -10148,6 +10150,7 @@ su2000			// (c) 1993 Virtuality
 
 // Nexus 3D
 
+acheart
 acheartf		// (c) 2006 Examu
 
 // Multi Amenity Cassette System
