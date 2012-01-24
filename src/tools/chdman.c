@@ -3410,7 +3410,7 @@ int CLIB_DECL main(int argc, char *argv[])
 		{ "-createuncomphd",	do_createhd_uncomp, 0 },
 		{ "-createraw",		do_createraw, 0 },
 		{ "-createcd",		do_createcd, 0 },
-		{ "-createcdflac",	do_createcd, 1 },
+//		{ "-createcdflac",	do_createcd, 1 },
 		{ "-createblankhd",	do_createblankhd, 0 },
 		{ "-createav",		do_createav, 0 },
 		{ "-copydata",		do_copydata, 0 },
