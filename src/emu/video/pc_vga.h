@@ -26,6 +26,14 @@ void pc_vga_reset(running_machine &machine);
 void *pc_vga_memory(void);
 size_t pc_vga_memory_size(void);
 
+READ8_HANDLER(vga_port_03b0_r);
+READ8_HANDLER(vga_port_03c0_r);
+READ8_HANDLER(vga_port_03d0_r);
+READ8_HANDLER(vga_mem_w);
+WRITE8_HANDLER(vga_port_03b0_w);
+WRITE8_HANDLER(vga_port_03c0_w);
+WRITE8_HANDLER(vga_port_03d0_w);
+WRITE8_HANDLER(vga_mem_w);
 /*
   pega notes (paradise)
   build in amstrad pc1640

@@ -1286,7 +1286,7 @@ void pc_vga_reset(running_machine &machine)
 	vga.crtc.line_compare = 0x3ff;
 }
 
-static READ8_HANDLER(vga_mem_r)
+READ8_HANDLER(vga_mem_r)
 {
 	read8_space_func read_handler;
 	if (vga.sequencer.data[4]&8)
@@ -1311,7 +1311,7 @@ static READ8_HANDLER(vga_mem_r)
 	return 0;
 }
 
-static WRITE8_HANDLER(vga_mem_w)
+WRITE8_HANDLER(vga_mem_w)
 {
 	write8_space_func write_handler;
 	if (vga.sequencer.data[4]&8)
