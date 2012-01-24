@@ -55,11 +55,10 @@ static UINT8 color_bitplane_to_packed[4/*plane*/][8/*pixel*/][256];
 
 static struct
 {
-	struct pc_vga_interface vga_intf;
+	read8_space_func read_dipswitch;
 	struct pc_svga_interface svga_intf;
 
 	UINT8 *memory;
-	UINT8 *fontdirty;
 	UINT32 pens[16]; /* the current 16 pens */
 
 	UINT8 miscellaneous_output;
@@ -620,16 +619,6 @@ INLINE WRITE8_HANDLER(vga_dirty_w)
 	vga.memory[offset] = data;
 }
 
-INLINE WRITE8_HANDLER(vga_dirty_font_w)
-{
-	if (vga.memory[offset] != data)
-	{
-		vga.memory[offset] = data;
-		if ((offset&3)==2)
-			vga.fontdirty[offset>>7]=1;
-	}
-}
-
 static READ8_HANDLER(vga_text_r)
 {
 	int data;
@@ -729,7 +718,7 @@ static WRITE8_HANDLER(vga_ega_w)
 	if (vga.sequencer.data[2]&2)
 		vga_dirty_w(space, (offset<<2)+1, vga_latch_write(1,data));
 	if (vga.sequencer.data[2]&4)
-		vga_dirty_font_w(space, (offset<<2)+2, vga_latch_write(2,data));
+		vga_dirty_w(space, (offset<<2)+2, vga_latch_write(2,data));
 	if (vga.sequencer.data[2]&8)
 		vga_dirty_w(space, (offset<<2)+3, vga_latch_write(3,data));
 	if ((offset==0xffff)&&(data==0)) vga.log=1;
@@ -745,82 +734,7 @@ static  READ8_HANDLER(vga_vga_r)
 
 static WRITE8_HANDLER(vga_vga_w)
 {
-	vga_dirty_font_w(space, ((offset&~3)<<2)|(offset&3),data);
-}
-
-static void vga_cpu_interface(running_machine &machine)
-{
-	address_space *space = machine.firstcpu->memory().space(vga.vga_intf.mem_addressspace);
-	static int sequencer, gc;
-	read8_space_func read_handler; const char *read_handler_name;
-	write8_space_func write_handler; const char *write_handler_name;
-	UINT8 sel;
-	int buswidth;
-	UINT64 mask = 0;
-
-	if ((gc==vga.gc.data[6])&&(sequencer==vga.sequencer.data[4])) return;
-
-	gc=vga.gc.data[6];
-	sequencer=vga.sequencer.data[4];
-
-	if (vga.sequencer.data[4]&8)
-	{
-		read_handler = vga_vga_r; read_handler_name = "vga_vga_r";
-		write_handler = vga_vga_w; write_handler_name = "vga_vga_w";
-	}
-	else if (vga.sequencer.data[4] & 4)
-	{
-		read_handler = vga_ega_r; read_handler_name = "vga_ega_r";
-		write_handler = vga_ega_w; write_handler_name = "vga_ega_w";
-	}
-	else
-	{
-		read_handler = vga_text_r; read_handler_name = "vga_text_r";
-		write_handler = vga_text_w; write_handler_name = "vga_text_w";
-	}
-
-	/* remap the VGA memory */
-
-	buswidth = downcast<legacy_cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			mask = 0;
-			break;
-
-		case 16:
-			mask = 0xffff;
-			break;
-
-		case 32:
-			mask = 0xffffffff;
-			break;
-
-		case 64:
-			mask = -1;
-			break;
-
-		default:
-			fatalerror("VGA: Bus width %d not supported", buswidth);
-			break;
-	}
-
-	sel = vga.gc.data[6] & 0x0c;
-	if (sel)
-	{
-		if (sel == 0x04) space->install_legacy_read_handler(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff, read_handler, read_handler_name, mask); else space->nop_read(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff);
-		if (sel == 0x08) space->install_legacy_read_handler(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff, read_handler, read_handler_name, mask); else space->nop_read(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff);
-		if (sel == 0x0C) space->install_legacy_read_handler(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff, read_handler, read_handler_name, mask); else space->nop_read(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff);
-		if (sel == 0x04) space->install_legacy_write_handler(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff, write_handler, write_handler_name, mask); else space->nop_write(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x0ffff);
-		if (sel == 0x08) space->install_legacy_write_handler(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff, write_handler, write_handler_name, mask); else space->nop_write(vga.vga_intf.mem_offset + 0x10000, vga.vga_intf.mem_offset + 0x17fff);
-		if (sel == 0x0C) space->install_legacy_write_handler(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff, write_handler, write_handler_name, mask); else space->nop_write(vga.vga_intf.mem_offset + 0x18000, vga.vga_intf.mem_offset + 0x1ffff);
-	}
-	else
-	{
-		space->install_read_bank(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x1ffff, "vga_bank" );
-		space->install_write_bank(vga.vga_intf.mem_offset + 0x00000, vga.vga_intf.mem_offset + 0x1ffff, "vga_bank" );
-		memory_set_bankptr(machine, "vga_bank", vga.memory);
-	}
+	vga_dirty_w(space, ((offset&~3)<<2)|(offset&3),data);
 }
 
 #if 0
@@ -1112,19 +1026,19 @@ READ8_HANDLER( vga_port_03c0_r )
 			switch ((vga.miscellaneous_output>>2)&3)
 			{
 				case 3:
-					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(space, 0) & 0x01)
+					if (vga.read_dipswitch && vga.read_dipswitch(space, 0) & 0x01)
 						data |= 0x10;
 					break;
 				case 2:
-					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(space, 0) & 0x02)
+					if (vga.read_dipswitch && vga.read_dipswitch(space, 0) & 0x02)
 						data |= 0x10;
 					break;
 				case 1:
-					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(space, 0) & 0x04)
+					if (vga.read_dipswitch && vga.read_dipswitch(space, 0) & 0x04)
 						data |= 0x10;
 					break;
 				case 0:
-					if (vga.vga_intf.read_dipswitch && vga.vga_intf.read_dipswitch(space, 0) & 0x08)
+					if (vga.read_dipswitch && vga.read_dipswitch(space, 0) & 0x08)
 						data |= 0x10;
 					break;
 			}
@@ -1265,8 +1179,6 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		if (vga.sequencer.index < vga.svga_intf.seq_regcount)
 		{
 			vga.sequencer.data[vga.sequencer.index] = data;
-			vga_cpu_interface(space->machine());
-
 			recompute_params(space->machine());
 		}
 		break;
@@ -1329,7 +1241,6 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		if (vga.gc.index < vga.svga_intf.gc_regcount)
 		{
 			vga.gc.data[vga.gc.index] = data;
-			vga_cpu_interface(space->machine());
 		}
 		break;
 	}
@@ -1370,16 +1281,64 @@ void pc_vga_reset(running_machine &machine)
    the video memory area,
    so I introduced the reset to switch to b8000 area */
 	vga.sequencer.data[4] = 0;
-	vga_cpu_interface(machine);
 
 	/* TODO: real defaults */
 	vga.crtc.line_compare = 0x3ff;
 }
 
-void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf)
+static READ8_HANDLER(vga_mem_r)
 {
-	int i, j, k, mask1, buswidth;
-	address_space *io_space; // , mem_space;
+	read8_space_func read_handler;
+	if (vga.sequencer.data[4]&8)
+	{
+		read_handler = vga_vga_r;
+	}
+	else if (vga.sequencer.data[4] & 4)
+	{
+		read_handler = vga_ega_r;
+	}
+	else
+	{
+		read_handler = vga_text_r;
+	}
+	switch((vga.gc.data[6] >> 2) & 0x03)
+	{
+		case 0: return vga.memory[offset & 0x1ffff];
+		case 1: return read_handler(space,(offset - 0x00000) & 0x0ffff);
+		case 2: return read_handler(space,(offset - 0x10000) & 0x0ffff);
+		case 3: return read_handler(space,(offset - 0x18000) & 0x0ffff);
+	}
+	return 0;
+}
+
+static WRITE8_HANDLER(vga_mem_w)
+{
+	write8_space_func write_handler;
+	if (vga.sequencer.data[4]&8)
+	{
+		write_handler = vga_vga_w;
+	}
+	else if (vga.sequencer.data[4] & 4)
+	{
+		write_handler = vga_ega_w;
+	}
+	else
+	{
+		write_handler = vga_text_w;
+	}
+	switch((vga.gc.data[6] >> 2) & 0x03)
+	{
+		case 0: vga.memory[offset & 0x1ffff] = data; break;
+		case 1: write_handler(space,(offset - 0x00000) & 0x0ffff,data); break;
+		case 2: write_handler(space,(offset - 0x10000) & 0x0ffff,data); break;
+		case 3: write_handler(space,(offset - 0x18000) & 0x0ffff,data); break;
+	}
+
+}
+
+void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, const struct pc_svga_interface *svga_intf)
+{
+	int i, j, k, mask1;
 
 	memset(&vga, 0, sizeof(vga));
 
@@ -1391,9 +1350,8 @@ void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_in
 				color_bitplane_to_packed[k][j][i]=(i&mask1)?(1<<k):0;
 		}
 	}
-	UINT64 mask = 0;
 	/* copy over interfaces */
-	vga.vga_intf = *vga_intf;
+	vga.read_dipswitch = read_dipswitch;
 	if (svga_intf)
 	{
 		vga.svga_intf = *svga_intf;
@@ -1414,19 +1372,23 @@ void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_in
 	}
 
 	vga.memory			= auto_alloc_array(machine, UINT8, vga.svga_intf.vram_size);
-	vga.fontdirty		= auto_alloc_array(machine, UINT8, 0x800);
 	vga.sequencer.data	= auto_alloc_array(machine, UINT8, vga.svga_intf.seq_regcount);
 	vga.crtc.data		= auto_alloc_array(machine, UINT8, vga.svga_intf.crtc_regcount);
 	vga.gc.data			= auto_alloc_array(machine, UINT8, vga.svga_intf.gc_regcount);
 	memset(vga.memory, '\0', vga.svga_intf.vram_size);
-	memset(vga.fontdirty, '\0', 0x800);
 	memset(vga.sequencer.data, '\0', vga.svga_intf.seq_regcount);
 	memset(vga.crtc.data, '\0', vga.svga_intf.crtc_regcount);
 	memset(vga.gc.data, '\0', vga.svga_intf.gc_regcount);
 
-	buswidth = downcast<legacy_cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-//  mem_space = machine.firstcpu->memory().space(vga.vga_intf.mem_addressspace);
-	io_space = machine.firstcpu->memory().space(vga.vga_intf.port_addressspace);
+	pc_vga_reset(machine);
+}
+
+void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t mem_offset, address_space *io_space, offs_t port_offset)
+{
+	int buswidth;
+	UINT64 mask = 0;
+
+	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -1449,15 +1411,11 @@ void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_in
 			fatalerror("VGA: Bus width %d not supported", buswidth);
 			break;
 	}
-	io_space->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port_03b0_r), mask);
-	io_space->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port_03c0_r), mask);
-	io_space->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port_03d0_r), mask);
+	io_space->install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
+	io_space->install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(vga_port_03c0_r), FUNC(vga_port_03c0_w), mask);
+	io_space->install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w), mask);
 
-	io_space->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port_03b0_w), mask);
-	io_space->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port_03c0_w), mask);
-	io_space->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port_03d0_w), mask);
-
-	pc_vga_reset(machine);
+	mem_space->install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_mem_r), FUNC(vga_mem_w), mask);
 }
 
 static VIDEO_START( vga )

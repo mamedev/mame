@@ -215,15 +215,6 @@ static void streetg2_set_keyb_int(running_machine &machine, int state)
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static const struct pc_vga_interface vga_interface =
-{
-	vga_setting,
-	AS_PROGRAM,
-	0xa0000,
-	AS_IO,
-	0x0000
-};
-
 static MACHINE_START( streetg2 )
 {
 	device_set_irq_callback(machine.device("maincpu"), pcat_irq_callback);
@@ -422,7 +413,8 @@ static DRIVER_INIT(pcat_nit)
 	state->m_banked_nvram = auto_alloc_array(machine, UINT8, 0x2000);
 	machine.device<nvram_device>("nvram")->set_base(state->m_banked_nvram, 0x2000);
 
-	pc_vga_init(machine, &vga_interface, NULL);
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 1993, bonanza,    0,		   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )

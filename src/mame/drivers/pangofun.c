@@ -164,15 +164,6 @@ static void pangofun_set_keyb_int(running_machine &machine, int state)
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static const struct pc_vga_interface vga_interface =
-{
-	vga_setting,
-	AS_PROGRAM,
-	0xa0000,
-	AS_IO,
-	0x0000
-};
-
 static void set_gate_a20(running_machine &machine, int a20)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
@@ -251,7 +242,8 @@ ROM_END
 
 static DRIVER_INIT(pangofun)
 {
-	pc_vga_init(machine, &vga_interface, NULL);
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )

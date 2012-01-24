@@ -593,17 +593,6 @@ static IRQ_CALLBACK(irq_callback)
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static const struct pc_vga_interface vga_interface =
-{
-	vga_setting,
-	AS_PROGRAM,
-	0xa0000,
-	AS_IO,
-	0x0000
-};
-
-
-
 static MACHINE_START(calchase)
 {
 	calchase_state *state = machine.driver_data<calchase_state>();
@@ -749,7 +738,9 @@ static DRIVER_INIT( calchase )
 	calchase_state *state = machine.driver_data<calchase_state>();
 	state->m_bios_ram = auto_alloc_array(machine, UINT32, 0x20000/4);
 
-	pc_vga_init(machine, &vga_interface, NULL);
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
+
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, calchase_set_keyb_int);
 
 	intel82439tx_init(machine);

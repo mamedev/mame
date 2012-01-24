@@ -653,15 +653,6 @@ static void ide_interrupt(device_t *device, int state)
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static const struct pc_vga_interface vga_interface =
-{
-	vga_setting,
-	AS_PROGRAM,
-	0xa0000,
-	AS_IO,
-	0x0000
-};
-
 static MACHINE_START( xtom3d )
 {
 	xtom3d_state *state = machine.driver_data<xtom3d_state>();
@@ -680,7 +671,8 @@ static MACHINE_START( xtom3d )
 	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);
-	pc_vga_init(machine, &vga_interface, NULL);
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 static MACHINE_RESET( xtom3d )

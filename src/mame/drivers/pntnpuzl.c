@@ -354,15 +354,6 @@ INPUT_PORTS_END
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static const struct pc_vga_interface vga_interface =
-{
-	vga_setting,
-	AS_PROGRAM,
-	0x3a0000,
-	AS_PROGRAM,
-	0x3c0000
-};
-
 static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
@@ -389,7 +380,9 @@ static DRIVER_INIT(pip)
 //  UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
-	pc_vga_init(machine, &vga_interface, NULL);
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x3a0000, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x3c0000);	
+	
 }
 
 GAME( 199?, pntnpuzl,    0, pntnpuzl,    pntnpuzl,    pip, ROT90,  "Century?", "Paint & Puzzle",GAME_NO_SOUND|GAME_NOT_WORKING )

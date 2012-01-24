@@ -182,15 +182,6 @@ static void magtouch_set_keyb_int(running_machine &machine, int state)
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static const struct pc_vga_interface vga_interface =
-{
-	vga_setting,
-	AS_PROGRAM,
-	0xa0000,
-	AS_IO,
-	0x0000
-};
-
 static MACHINE_START( magtouch )
 {
 	device_set_irq_callback(machine.device("maincpu"), pcat_irq_callback);
@@ -242,7 +233,8 @@ ROM_END
 
 static DRIVER_INIT(magtouch)
 {
-	pc_vga_init(machine, &vga_interface, NULL);
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch, ROT0, "Micro Manufacturing",     "Magical Touch", GAME_NOT_WORKING | GAME_NO_SOUND )

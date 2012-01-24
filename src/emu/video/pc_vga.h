@@ -11,20 +11,6 @@
 
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
 
-struct pc_vga_interface
-{
-	/* VGA dipswitch (???) */
-	read8_space_func read_dipswitch;
-
-	/* where the RAM go */
-	int mem_addressspace;
-	offs_t mem_offset;
-
-	/* where the ports go */
-	int port_addressspace;
-	offs_t port_offset;
-};
-
 struct pc_svga_interface
 {
 	size_t vram_size;
@@ -34,7 +20,8 @@ struct pc_svga_interface
 	void (*choosevideomode)(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *sequencer, const UINT8 *crtc, const UINT8 *gc, int *width, int *height);
 };
 
-void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf);
+void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, const struct pc_svga_interface *svga_intf);
+void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t mem_offset, address_space *io_space, offs_t port_offset);
 void pc_vga_reset(running_machine &machine);
 void *pc_vga_memory(void);
 size_t pc_vga_memory_size(void);

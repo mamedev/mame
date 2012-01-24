@@ -330,17 +330,6 @@ GFXDECODE_END
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static const struct pc_vga_interface vga_interface =
-{
-	vga_setting,
-	AS_PROGRAM,
-	0xa0000,
-	AS_IO,
-	0x0000
-};
-
-
-
 static MACHINE_CONFIG_START( photoply, photoply_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 75000000)	/* I486DX4, 75 or 100 Mhz */
@@ -382,7 +371,8 @@ ROM_END
 
 static DRIVER_INIT( photoply )
 {
-	pc_vga_init(machine, &vga_interface, NULL);
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 199?, photoply,  0,   photoply, photoply, photoply, ROT0, "Funworld", "PhotoPlay", GAME_NOT_WORKING|GAME_NO_SOUND )

@@ -699,15 +699,6 @@ static void taitowlf_set_keyb_int(running_machine &machine, int state)
 
 #if ENABLE_VGA
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
-
-static const struct pc_vga_interface vga_interface =
-{
-	vga_setting,
-	AS_PROGRAM,
-	0xa0000,
-	AS_IO,
-	0x0000
-};
 #endif
 
 static DRIVER_INIT( taitowlf )
@@ -721,7 +712,8 @@ static DRIVER_INIT( taitowlf )
 
 	kbdc8042_init(machine, &at8042);
 	#if ENABLE_VGA
-	pc_vga_init(machine, &vga_interface, NULL);
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);	
 	#endif
 }
 

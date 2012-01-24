@@ -109,15 +109,6 @@ static void pcat_dyn_set_keyb_int(running_machine &machine, int state)
 
 static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
-static const struct pc_vga_interface vga_interface =
-{
-	vga_setting,
-	AS_PROGRAM,
-	0xa0000,
-	AS_IO,
-	0x0000
-};
-
 static void set_gate_a20(running_machine &machine, int a20)
 {
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
@@ -204,7 +195,8 @@ ROM_END
 
 static DRIVER_INIT(pcat_dyn)
 {
-	pc_vga_init(machine, &vga_interface, NULL);
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, pcat_dyn, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", GAME_NOT_WORKING|GAME_NO_SOUND )
