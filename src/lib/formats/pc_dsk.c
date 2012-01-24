@@ -31,6 +31,7 @@ static const struct pc_disk_sizes disk_sizes[] =
 	{ 9*2*80*512,  9, 2},	/* 3 1/2 inch double density */
 	{15*2*80*512, 15, 2},	/* 5 1/4 inch high density (or japanese 3 1/2 inch high density) */
 	{18*2*80*512, 18, 2},	/* 3 1/2 inch high density */
+	{21*2*80*512, 21, 2},	/* 3 1/2 inch high density DMF */
 	{36*2*80*512, 36, 2}	/* 3 1/2 inch enhanced density */
 };
 
