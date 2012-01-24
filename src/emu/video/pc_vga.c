@@ -197,7 +197,6 @@ static int pc_current_width;
 #define LOG_ACCESSES	0
 #define LOG_REGISTERS	0
 
-static VIDEO_START( vga );
 static VIDEO_RESET( vga );
 
 /***************************************************************************
@@ -1410,7 +1409,7 @@ void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t m
 	mem_space->install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_mem_r), FUNC(vga_mem_w), mask);
 }
 
-static VIDEO_START( vga )
+VIDEO_START( vga )
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -1446,4 +1445,13 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 
 	MCFG_VIDEO_START(vga)
 	MCFG_VIDEO_RESET(vga)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_FRAGMENT( pcvideo_vga_isa )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_STATIC(pc_video)
+
+	MCFG_PALETTE_LENGTH(0x100)
 MACHINE_CONFIG_END

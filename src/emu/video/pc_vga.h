@@ -10,6 +10,9 @@
 #define PC_VGA_H
 
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
+MACHINE_CONFIG_EXTERN( pcvideo_vga_isa );
+
+VIDEO_START( vga );
 
 struct pc_svga_interface
 {
