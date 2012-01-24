@@ -390,8 +390,7 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 
-//  UINT16 *spritelist  =   (UINT16 *)(state->m_spriteram + 0x1800/4);
-	UINT16 *spritelist = (UINT16 *)(state->m_spritebuf2 + 0x1800 / 4);
+	UINT16 *spritelist = (UINT16 *)(state->m_spriteram + 0x1800 / 4);
 
 	UINT8 *TILES = machine.region("spritelut")->base();	// Sprites LUT
 	int TILES_LEN = machine.region("spritelut")->bytes();
@@ -427,7 +426,7 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 
 		sprite %= 0x300;
 //      source = &state->m_bootleg_spritebuffer[sprite * 8 / 4];
-		source = &state->m_spritebuf2[sprite * 8 / 4];
+		source = &state->m_spriteram[sprite * 8 / 4];
 
 		/* Draw this sprite */
 
@@ -709,7 +708,7 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 	UINT32 layer1_scrollx, layer1_scrolly;
 	UINT32 layer0_ctrl = state->m_vregs[0x412 / 4];
 	UINT32 layer1_ctrl = state->m_vregs[0x416 / 4];
-	UINT32 spr_ctrl = state->m_spritebuf2[0x1ffe / 4];
+	UINT32 spr_ctrl = state->m_spriteram[0x1ffe / 4];
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
