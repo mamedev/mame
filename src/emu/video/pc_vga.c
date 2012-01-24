@@ -197,7 +197,6 @@ static int pc_current_width;
 #define LOG_ACCESSES	0
 #define LOG_REGISTERS	0
 
-static PALETTE_INIT( vga );
 static VIDEO_START( vga );
 static VIDEO_RESET( vga );
 
@@ -600,13 +599,6 @@ SCREEN_UPDATE_RGB32( pc_video )
 	return 0;
 }
 /***************************************************************************/
-
-static PALETTE_INIT( vga )
-{
-	int i;
-	for (i = 0; i < 0x100; i++)
-		palette_set_color_rgb(machine, i, 0, 0, 0);
-}
 
 INLINE UINT8 rotate_right(UINT8 val, UINT8 rot)
 {
@@ -1420,6 +1412,9 @@ void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t m
 
 static VIDEO_START( vga )
 {
+	int i;
+	for (i = 0; i < 0x100; i++)
+		palette_set_color_rgb(machine, i, 0, 0, 0);	
 	pc_video_start(machine);
 }
 
@@ -1448,7 +1443,6 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 	MCFG_SCREEN_UPDATE_STATIC(pc_video)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(vga)
 
 	MCFG_VIDEO_START(vga)
 	MCFG_VIDEO_RESET(vga)
