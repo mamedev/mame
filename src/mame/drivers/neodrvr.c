@@ -8875,8 +8875,12 @@ ROM_START( sbp ) /* Unlicensed, no official game ID # */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "2a.bin", 0x000000, 0x080000, CRC(d054d264) SHA1(d1b4bc626d000e0679def0545940fa75035921ab) )
 
-	ROM_REGION( 0x80000, "fixed", 0 )
-	ROM_LOAD( "2b.bin",       0x000000, 0x80000, CRC(2fd04b2a) SHA1(1acb446704ab56d0a33df7c48855aa8d00fd5a3c) )
+	ROM_REGION( 0x20000, "fixed", 0 )
+	ROM_LOAD( "2b.bin",       0x000000, 0x20000, CRC(2fd04b2a) SHA1(1acb446704ab56d0a33df7c48855aa8d00fd5a3c) )
+	ROM_IGNORE(0x20000)
+	ROM_IGNORE(0x20000)
+	ROM_IGNORE(0x20000)
+
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )																												
 	ROM_Y_ZOOM
@@ -9811,6 +9815,55 @@ static DRIVER_INIT( mvs )
 	DRIVER_INIT_CALL(neogeo);
 }
 
+static READ16_HANDLER( sbp_lowerrom_r )
+{
+	UINT16* rom = (UINT16*)space->machine().region("maincpu")->base();
+	UINT16 origdata = rom[(offset+(0x200/2))];
+	UINT16 data =  BITSWAP16(origdata, 11,10,9,8,15,14,13,12,3,2,1,0,7,6,5,4);
+	int realoffset = 0x200+(offset*2);
+	logerror("sbp_lowerrom_r offset %08x data %04x\n", realoffset, data );
+
+	// there is actually data in the rom here already, maybe we should just return it 'as is'
+	if (realoffset==0xd5e) return origdata;
+
+	return data;
+}
+
+static WRITE16_HANDLER( sbp_lowerrom_w )
+{
+	int realoffset = 0x200+(offset*2);
+
+	// the actual data written is just pulled from the end of the rom, and unused space
+	// maybe this is just some kind of watchdog for the protection device and it doesn't
+	// matter?
+	if (realoffset == 0x1080)
+	{
+		if (data==0x4e75)
+		{
+			return;
+		}
+		else if (data==0xffff)
+		{
+			return;
+		}
+	}
+
+	printf("sbp_lowerrom_w offset %08x data %04x\n", realoffset, data );
+}
+
+static DRIVER_INIT(sbp )
+{
+	// there seems to be a protection device living around here..
+	// if you nibble swap the data in the rom the game will boot
+	// there are also writes to 0x1080..
+	//
+	// other stuff going on as well tho, the main overlay is still missing, and p1 inputs don't work
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00200, 0x001fff, FUNC(sbp_lowerrom_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00200, 0x001fff, FUNC(sbp_lowerrom_w));
+
+
+}
+
 
 // handle protected carts
 void mvs_install_protection(device_image_interface& image)
@@ -10201,7 +10254,7 @@ GAME( 2001, vlinero,   vliner,   neogeo,   vliner,   vliner,   ROT0, "Dyna / Bre
 GAME( 2000, diggerma,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Kyle Hodgetts", "Digger Man (prototype)", GAME_SUPPORTS_SAVE )
 
 /* Vektorlogic */
-GAME( 2004, sbp,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Vektorlogic", "Super Bubble Pop", GAME_NOT_WORKING )
+GAME( 2004, sbp,  neogeo,   neogeo,   neogeo,   sbp,   ROT0, "Vektorlogic", "Super Bubble Pop", GAME_NOT_WORKING )
 
 /* NG.DEV.TEAM */
 // Last Hope (c)2006 - AES / NEOCD (has no MVS mode)
