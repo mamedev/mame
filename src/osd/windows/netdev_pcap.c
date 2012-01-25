@@ -123,13 +123,10 @@ void init_pcap()
 		return;
 	}
 
-	if (devs)
+	while(devs)
 	{
-		while(devs->next)
-		{
-			add_netdev(devs->name, devs->description, create_pcap);
-			devs = devs->next;
-		}
+		add_netdev(devs->name, devs->description, create_pcap);
+		devs = devs->next;
 	}
 }
 
