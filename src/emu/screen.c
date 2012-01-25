@@ -785,15 +785,15 @@ void screen_device::vblank_begin()
 	m_vblank_start_time = machine().time();
 	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
+	// if this is the primary screen and we need to update now
+	if (this == machine().primary_screen && !(machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+		machine().video().frame_update();
+
 	// call the screen specific callbacks
 	for (callback_item *item = m_callback_list.first(); item != NULL; item = item->next())
 		item->m_callback(*this, true);
 	if (!m_screen_vblank.isnull())
 		m_screen_vblank(*this, true);
-
-	// if this is the primary screen and we need to update now
-	if (this == machine().primary_screen && !(machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
-		machine().video().frame_update();
 
 	// reset the VBLANK start timer for the next frame
 	m_vblank_begin_timer->adjust(time_until_vblank_start());
