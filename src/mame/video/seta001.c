@@ -36,6 +36,15 @@ seta001_device::seta001_device(const machine_config &mconfig, const char *tag, d
 
 void seta001_device::device_start()
 {
+	// chukatai draws a column on the left from uninitialized RAM which causes garbage in a debug build
+	// if we initialize ram this is a single line in the top left instead.
+	// maybe there is less RAM actually present and it should mirror, or there is another flaw?
+	memset(m_spritectrl,0xff,4);
+	memset(m_spriteylow,0xff,0x300);
+	memset(m_spritecodelow,0xff,0x2000);
+	memset(m_spritecodehigh,0xff,0x2000);
+
+
 	m_fg_flipxoffs = 0;
 	m_fg_noflipxoffs = 0;
 
