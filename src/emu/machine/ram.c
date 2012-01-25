@@ -47,7 +47,7 @@ void ram_device::device_start()
 {
 	/* the device named 'ram' can get ram options from command line */
 	m_size = 0;
-	if (strcmp(tag(), RAM_TAG) == 0)
+	if (strcmp(tag(), ":" RAM_TAG) == 0)
 	{
 		const char *ramsize_string = machine().options().ram_size();
 		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
