@@ -101,7 +101,7 @@ TIMER_DEVICE_CALLBACK( eolith_speedup )
 CUSTOM_INPUT( eolith_speedup_getvblank )
 {
 
-	printf("%s:eolith speedup_read data %02x\n",field.machine().describe_context(), eolith_vblank);
+//	printf("%s:eolith speedup_read data %02x\n",field.machine().describe_context(), eolith_vblank);
 	
 
 	return (field.machine().primary_screen->vpos() >= 240);
