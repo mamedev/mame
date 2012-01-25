@@ -83,8 +83,8 @@ SCREEN_UPDATE_IND16( djboy )
 
 SCREEN_VBLANK( djboy )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		djboy_state *state = screen.machine().driver_data<djboy_state>();
 		pandora_eof(state->m_pandora);

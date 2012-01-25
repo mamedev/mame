@@ -876,7 +876,8 @@ static MACHINE_RESET( asuka )
 
 static SCREEN_VBLANK( asuka )
 {
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		asuka_state *state = screen.machine().driver_data<asuka_state>();
 		pc090oj_eof_callback(state->m_pc090oj);

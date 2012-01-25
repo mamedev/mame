@@ -383,8 +383,8 @@ static const ym2151_interface ym2151_config =
 
 static SCREEN_VBLANK( wwfwfest )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 

@@ -431,8 +431,8 @@ state->m_scrc_videoregs[2]);// 08 - 0b
 
 SCREEN_VBLANK( macrossp )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		macrossp_state *state = screen.machine().driver_data<macrossp_state>();
 

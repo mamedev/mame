@@ -517,8 +517,8 @@ static TILE_GET_INFO( get_tile_info_pixel )
 
 SCREEN_VBLANK( f3 )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		taito_f3_state *state = screen.machine().driver_data<taito_f3_state>();
 		if (state->m_sprite_lag==2)

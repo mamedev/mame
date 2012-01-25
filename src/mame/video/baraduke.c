@@ -342,8 +342,8 @@ SCREEN_UPDATE_IND16( baraduke )
 
 SCREEN_VBLANK( baraduke )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		baraduke_state *state = screen.machine().driver_data<baraduke_state>();
 		if (state->m_copy_sprites)

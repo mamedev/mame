@@ -368,8 +368,8 @@ SCREEN_UPDATE_IND16( sidearms )
 
 SCREEN_VBLANK( sidearms )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 

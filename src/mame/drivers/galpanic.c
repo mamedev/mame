@@ -127,8 +127,8 @@ The current set of Super Model is an example of type C
 
 static SCREEN_VBLANK( galpanic )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		device_t *pandora = screen.machine().device("pandora");
 		pandora_eof(pandora);

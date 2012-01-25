@@ -505,8 +505,8 @@ SCREEN_UPDATE_RGB32( realpunc )
 
 SCREEN_VBLANK( taitob )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		taitob_state *state = screen.machine().driver_data<taitob_state>();
 		UINT8 video_control = tc0180vcu_get_videoctrl(state->m_tc0180vcu, 0);

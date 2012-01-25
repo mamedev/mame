@@ -171,8 +171,8 @@ static SCREEN_UPDATE_IND16( hvyunit )
 
 static SCREEN_VBLANK( hvyunit )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		hvyunit_state *state = screen.machine().driver_data<hvyunit_state>();
 		pandora_eof(state->m_pandora);

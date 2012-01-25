@@ -1310,8 +1310,8 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 
 SCREEN_VBLANK( psikyosh )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 		buffer_spriteram32_w(space, 0, 0, 0xffffffff);

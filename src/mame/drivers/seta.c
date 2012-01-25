@@ -1547,8 +1547,8 @@ static READ8_DEVICE_HANDLER( dsw2_r )
 */
 static SCREEN_VBLANK( seta_buffer_sprites )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		//seta_state *state = machine.driver_data<seta_state>();
 		screen.machine().device<seta001_device>("spritegen")->setac_eof();

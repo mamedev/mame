@@ -893,8 +893,8 @@ static void taitof2_update_sprites_active_area( running_machine &machine )
 
 SCREEN_VBLANK( taitof2_no_buffer )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 
@@ -906,8 +906,8 @@ SCREEN_VBLANK( taitof2_no_buffer )
 
 SCREEN_VBLANK( taitof2_full_buffer_delayed )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 		UINT16 *spriteram = state->m_spriteram;
@@ -925,8 +925,8 @@ SCREEN_VBLANK( taitof2_full_buffer_delayed )
 
 SCREEN_VBLANK( taitof2_partial_buffer_delayed )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 		UINT16 *spriteram = state->m_spriteram;
@@ -944,8 +944,8 @@ SCREEN_VBLANK( taitof2_partial_buffer_delayed )
 
 SCREEN_VBLANK( taitof2_partial_buffer_delayed_thundfox )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		taitof2_state *state = screen.machine().driver_data<taitof2_state>();
 		UINT16 *spriteram = state->m_spriteram;
@@ -967,8 +967,8 @@ SCREEN_VBLANK( taitof2_partial_buffer_delayed_thundfox )
 
 SCREEN_VBLANK( taitof2_partial_buffer_delayed_qzchikyu )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		/* spriteram[2] and [3] are 1 frame behind...
            probably thundfox_eof_callback would work fine */

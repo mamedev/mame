@@ -1126,8 +1126,8 @@ VIDEO_START( tx1 )
 
 SCREEN_VBLANK( tx1 )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		tx1_state *state = screen.machine().driver_data<tx1_state>();
 
@@ -3034,8 +3034,8 @@ VIDEO_START( buggybjr )
 
 SCREEN_VBLANK( buggyboy )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		tx1_state *state = screen.machine().driver_data<tx1_state>();
 

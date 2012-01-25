@@ -271,8 +271,8 @@ VIDEO_START( mcatadv )
 
 SCREEN_VBLANK( mcatadv )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		mcatadv_state *state = screen.machine().driver_data<mcatadv_state>();
 		memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram_size);

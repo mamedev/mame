@@ -518,8 +518,8 @@ SCREEN_UPDATE_IND16( toaplan0 )
 
 SCREEN_VBLANK( toaplan0 )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 

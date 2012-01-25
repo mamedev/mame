@@ -253,8 +253,8 @@ SCREEN_UPDATE_IND16( blktiger )
 
 SCREEN_VBLANK( blktiger )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 

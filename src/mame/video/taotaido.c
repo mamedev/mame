@@ -226,8 +226,8 @@ SCREEN_UPDATE_IND16(taotaido)
 
 SCREEN_VBLANK( taotaido )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		taotaido_state *state = screen.machine().driver_data<taotaido_state>();
 		/* sprites need to be delayed by 2 frames? */

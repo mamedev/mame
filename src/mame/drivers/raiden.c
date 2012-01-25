@@ -244,8 +244,8 @@ static INTERRUPT_GEN( raiden_interrupt )
 
 static SCREEN_VBLANK( raiden )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 		buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */

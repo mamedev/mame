@@ -226,8 +226,8 @@ SCREEN_UPDATE_IND16( othldrby )
 
 SCREEN_VBLANK( othldrby )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		othldrby_state *state = screen.machine().driver_data<othldrby_state>();
 

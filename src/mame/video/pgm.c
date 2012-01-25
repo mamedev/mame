@@ -675,8 +675,8 @@ SCREEN_UPDATE_IND16( pgm )
 
 SCREEN_VBLANK( pgm )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		pgm_state *state = screen.machine().driver_data<pgm_state>();
 

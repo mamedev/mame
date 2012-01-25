@@ -172,8 +172,8 @@ SCREEN_UPDATE_IND16( srumbler )
 
 SCREEN_VBLANK( srumbler )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 

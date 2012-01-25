@@ -173,8 +173,8 @@ SCREEN_UPDATE_IND16( tigeroad )
 
 SCREEN_VBLANK( tigeroad )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
 

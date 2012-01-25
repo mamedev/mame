@@ -462,8 +462,8 @@ SCREEN_UPDATE_IND16( champbwl )
 
 SCREEN_VBLANK( champbwl )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 		screen.machine().device<seta001_device>("spritegen")->tnzs_eof();
 }
 
@@ -521,8 +521,8 @@ static SCREEN_UPDATE_IND16( doraemon )
 
 static SCREEN_VBLANK( doraemon )
 {
-	// falling edge
-	if (!vblank_on)
+	// rising edge
+	if (vblank_on)
 		screen.machine().device<seta001_device>("spritegen")->setac_eof();
 }
 
