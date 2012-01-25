@@ -386,7 +386,8 @@ protected:
 	//! Normalize the times in a cell buffer to sum up to 200000000
 	void normalize_times(UINT32 *buffer, int bitlen);
 
-	// Some conversion tables for gcr6
+	// Some conversion tables for gcr
+	static const UINT8 gcr5fw_tb[0x20], gcr5bw_tb[0x100];
 	static const UINT8 gcr6fw_tb[0x40], gcr6bw_tb[0x100];
 
 	// Some useful descriptions shared by multiple formats
@@ -506,6 +507,10 @@ protected:
 	void mfm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
 	//! MFM-encode every two bits and write
 	void mfm_half_w(UINT32 *buffer, int &offset, int start_bit, UINT32 val, UINT32 size = 1000);
+	//! GCR4 encode (Apple II sector header)
+	UINT16 gcr4_encode(UINT8 va);
+	//! GCR4 decode
+	UINT8 gcr4_decode(UINT8 e0, UINT8 e1);
 	//! GCR6 encode (Apple II 16-sector and Mac-style GCR)
 	UINT32 gcr6_encode(UINT8 va, UINT8 vb, UINT8 vc);
 	//! GCR6 decode

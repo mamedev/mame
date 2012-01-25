@@ -1068,9 +1068,17 @@ void device_image_interface::unload()
 void device_image_interface::update_names()
 {
 	image_interface_iterator iter(device().mconfig().root_device());
-	int count = iter.count();
-	int index = iter.indexof(*this);
-	if (count > 1) {
+	int count = 0;
+	int index = -1;
+	for (const device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+	{
+		if (this == image)
+			index = count;
+		if (image->image_type() == image_type())
+			count++;
+	}
+	if (count > 1)
+	{
 		m_instance_name.printf("%s%d", device_typename(image_type()), index + 1);
 		m_brief_instance_name.printf("%s%d", device_brieftypename(image_type()), index + 1);
 	}
