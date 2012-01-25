@@ -1538,7 +1538,7 @@ SCREEN_UPDATE_RGB32( hng64 )
 		// Blit the color buffer into the primary bitmap
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			UINT32 *src = &state->m_colorBuffer3d[y * cliprect.width()];
+			UINT32 *src = &state->m_colorBuffer3d[y * cliprect.max_x];
 			UINT32 *dst = &bitmap.pix32(y, cliprect.min_x);
 
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
