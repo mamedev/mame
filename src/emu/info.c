@@ -1203,7 +1203,7 @@ void info_xml_creator::output_slots()
 	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
 		// print m_output device type
-		fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(slot->device().tag()));
+		fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(slot->device().tag()+1));
 
 		/*
         if (slot->slot_interface()[0])

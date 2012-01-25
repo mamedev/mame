@@ -355,7 +355,7 @@ void ui_menu_keyboard_mode::handle()
 -------------------------------------------------*/
 int ui_menu_slot_devices::slot_get_current_index(device_slot_interface *slot)
 {
-	const char *current = machine().options().value(slot->device().tag());
+	const char *current = machine().options().value(slot->device().tag()+1);
 	const slot_interface* intf = slot->get_slot_interfaces();
 	int val = -1;
 	for (int i = 0; intf[i].name != NULL; i++) {
@@ -402,7 +402,7 @@ const char *ui_menu_slot_devices::slot_get_prev(device_slot_interface *slot)
 -------------------------------------------------*/
 const char *ui_menu_slot_devices::get_slot_device(device_slot_interface *slot)
 {
-	return machine().options().value(slot->device().tag());
+	return machine().options().value(slot->device().tag()+1);
 }
 
 
@@ -414,7 +414,7 @@ const char *ui_menu_slot_devices::get_slot_device(device_slot_interface *slot)
 void ui_menu_slot_devices::set_slot_device(device_slot_interface *slot, const char *val)
 {
 	astring error;
-	machine().options().set_value(slot->device().tag(), val, OPTION_PRIORITY_CMDLINE, error);
+	machine().options().set_value(slot->device().tag()+1, val, OPTION_PRIORITY_CMDLINE, error);
 	assert(!error);
 }
 
@@ -435,7 +435,7 @@ void ui_menu_slot_devices::populate()
 	{
 		/* record the menu item */
 		const char *title = get_slot_device(slot);
-		item_append(slot->device().tag(), strcmp(title,"")==0 ? "------" : title, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)slot);
+		item_append(slot->device().tag()+1, strcmp(title,"")==0 ? "------" : title, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)slot);
 	}
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Reset",  NULL, 0, NULL);

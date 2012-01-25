@@ -644,7 +644,7 @@ void cli_frontend::listslots(const char *gamename)
 		for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 		{
 			// output the line, up to the list of extensions
-			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot->device().tag());
+			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot->device().tag()+1);
 
 			// get the options and print them
 			const slot_interface* intf = slot->get_slot_interfaces();

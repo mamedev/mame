@@ -76,8 +76,8 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		if (intf != NULL)
 		{
 			device_t &owner = slot->device();
-			const char *selval = options.value(owner.tag());
-			if (!options.exists(owner.tag()))
+			const char *selval = options.value(owner.tag()+1);
+			if (!options.exists(owner.tag()+1))
 				selval = slot->get_default_card(*this, options);
 
 			if (selval != NULL && strlen(selval) != 0) 
@@ -95,7 +95,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 					}
 				}
 				if (!found)
-					throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag());
+					throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);
 			}
 		}
 	}

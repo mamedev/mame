@@ -244,13 +244,10 @@ bool emu_options::add_slot_options(bool isfirst)
 		first = false;
 
 		// retrieve info about the device instance
-		astring option_name;
-		option_name.printf("%s;%s", slot->device().tag(), slot->device().tag());
-
-		if (!exists(slot->device().tag())) {
+		if (!exists(slot->device().tag() + 1)) {
 
 			// add the option
-			entry[0].name = slot->device().tag();
+			entry[0].name = slot->device().tag() + 1;
 			entry[0].description = NULL;
 			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
 			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card(config,*this) : NULL;
@@ -281,13 +278,10 @@ void emu_options::update_slot_options()
 	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
 		// retrieve info about the device instance
-		astring option_name;
-		option_name.printf("%s;%s", slot->device().tag(), slot->device().tag());
-
-		if (exists(slot->device().tag())) {
+		if (exists(slot->device().tag()+1)) {
 			if (slot->get_slot_interfaces() != NULL) {
 				const char *def = slot->get_default_card_software(config,*this);
-				if (def) set_default_value(slot->device().tag(),def);
+				if (def) set_default_value(slot->device().tag()+1,def);
 			}
 		}
 	}

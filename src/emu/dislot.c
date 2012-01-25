@@ -32,10 +32,10 @@ device_t* device_slot_interface::get_card_device()
 {
 	const char *subtag;
 	device_t *dev = NULL;
-	if (!device().mconfig().options().exists(device().tag())) {
+	if (!device().mconfig().options().exists(device().tag()+1)) {
 		subtag = m_default_card;
 	} else {
-		subtag = device().mconfig().options().value(device().tag());
+		subtag = device().mconfig().options().value(device().tag()+1);
 	}
 	if (subtag && strlen(subtag)>0) {
 		device_slot_card_interface *intf = NULL;
