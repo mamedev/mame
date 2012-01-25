@@ -22,13 +22,13 @@
    cbuster.c (could probably use pdrawgfx, not m_sprite_bitmap)
    mirage.c (could probably use pdrawgfx, not m_sprite_bitmap)
    cninja.c
+   lemmings.c
+   deco32.c
 
    partially converted:
-   deco32.c - video mixing
-
+ 
    difficult to convert:
    rohga.c - complex video mixing, 6bpp gfx..
-   lemmings.c - priority stuff (plus sprites seem somewhat different anyway??)
    dassault.c - complex video mixing
    boogwing.c - complex video mixing
 

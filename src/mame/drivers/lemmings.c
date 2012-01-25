@@ -21,6 +21,7 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/lemmings.h"
+#include "video/decospr.h"
 
 static WRITE16_HANDLER( lemmings_control_w )
 {
@@ -230,15 +231,15 @@ static const gfx_layout sprite_layout =
 	4,
 	{ 0x30000*8, 0x20000*8, 0x10000*8, 0x00000*8 },
 	{
-		7, 6, 5, 4, 3, 2, 1, 0, 16*8+7, 16*8+6, 16*8+5, 16*8+4, 16*8+3, 16*8+2, 16*8+1, 16*8+0
+		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,0, 1, 2, 3, 4, 5, 6, 7
 	},
-	{ 15*8, 14*8, 13*8, 12*8, 11*8, 10*8, 9*8, 8*8, 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	32*8
 };
 
 static GFXDECODE_START( lemmings )
-	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  32*16, 16 )	/* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,  48*16, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  0, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,  0, 16 )	/* Sprites 16x16 */
 	GFXDECODE_ENTRY( NULL,           0, charlayout,         0, 16 ) /* Dynamically modified */
 GFXDECODE_END
 
@@ -289,6 +290,13 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(lemmings)
+
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 1);
+
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 0);
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

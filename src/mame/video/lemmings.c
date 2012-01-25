@@ -14,61 +14,7 @@
 
 #include "emu.h"
 #include "includes/lemmings.h"
-
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri )
-{
-	int offs;
-
-	for (offs = 0; offs < 0x400; offs += 4)
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
-
-		sprite = spritedata[offs + 1] & 0x3fff;
-
-		if ((spritedata[offs + 2] & 0x2000) != pri)
-			continue;
-
-		y = spritedata[offs];
-		flash = y & 0x1000;
-		if (flash && (machine.primary_screen->frame_number() & 1))
-			continue;
-
-		x = spritedata[offs + 2];
-		colour = (x >>9) & 0xf;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-
-		if (x > 320 || x < -16) continue;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = 1;
-		else
-		{
-			sprite += multi;
-			inc = -1;
-		}
-		mult = -16;
-
-		while (multi >= 0)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[gfxbank],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,0);
-
-			multi--;
-		}
-	}
-}
+#include "video/decospr.h"
 
 /******************************************************************************/
 
@@ -99,6 +45,9 @@ VIDEO_START( lemmings )
 
 	gfx_element_set_source(machine.gfx[2], state->m_vram_buffer);
 
+	machine.device<decospr_device>("spritegen")->alloc_sprite_bitmap();
+	machine.device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+
 	state->save_item(NAME(*state->m_bitmap0));
 	state->save_pointer(NAME(state->m_vram_buffer), 2048 * 64);
 	state->save_pointer(NAME(state->m_sprite_triple_buffer_0), 0x800 / 2);
@@ -119,8 +68,10 @@ SCREEN_VBLANK( lemmings )
 
 /******************************************************************************/
 
+// RAM based
 WRITE16_HANDLER( lemmings_pixel_0_w )
 {
+
 	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	int sx, sy, src, old;
 
@@ -140,16 +91,14 @@ WRITE16_HANDLER( lemmings_pixel_0_w )
 	state->m_bitmap0->pix16(sy, sx + 1) = ((src >> 0) & 0xf) | 0x100;
 }
 
+// RAM based tiles for the FG tilemap
 WRITE16_HANDLER( lemmings_pixel_1_w )
 {
 	lemmings_state *state = space->machine().driver_data<lemmings_state>();
-	int sx, sy, src, /*old,*/ tile;
+	int sx, sy, src, tile;
 
-//  old = state->m_pixel_1_data[offset];
 	COMBINE_DATA(&state->m_pixel_1_data[offset]);
 	src = state->m_pixel_1_data[offset];
-//  if (old == src)
-//      return;
 
 	sy = ((offset << 1) / 0x200);
 	sx = ((offset << 1) & 0x1ff);
@@ -170,7 +119,27 @@ WRITE16_HANDLER( lemmings_vram_w )
 	state->m_vram_tilemap->mark_tile_dirty(offset);
 }
 
-SCREEN_UPDATE_IND16( lemmings )
+
+void lemmings_copy_bitmap(running_machine &machine, bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect)
+{
+	int y,x;
+	const pen_t *paldata = machine.pens;
+
+	for (y=cliprect.min_y; y<cliprect.max_y;y++)
+	{
+		UINT32* dst = &bitmap.pix32(y,0);
+
+		for (x=cliprect.min_x; x<cliprect.max_x;x++)
+		{
+			UINT16 src = srcbitmap.pix16((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
+
+			if (src!=0x100)
+				dst[x] = paldata[src];
+		}
+	}
+}
+
+SCREEN_UPDATE_RGB32( lemmings )
 {
 	lemmings_state *state = screen.machine().driver_data<lemmings_state>();
 	int x1 = -state->m_control_data[0];
@@ -180,24 +149,31 @@ SCREEN_UPDATE_IND16( lemmings )
 	rect.max_y = cliprect.max_y;
 	rect.min_y = cliprect.min_y;
 
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_sprite_triple_buffer_1, 0x400, true);
+	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_sprite_triple_buffer_0, 0x400, true);
+
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x0000);
+	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x300, 0xff);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((state->m_control_data[6] & 2) == 0)
-		copyscrollbitmap_trans(bitmap, *state->m_bitmap0, 1, &x1, 1, &y, cliprect, 0x100);
+	{
+		lemmings_copy_bitmap(screen.machine(), bitmap, *state->m_bitmap0, &x1, &y, cliprect);
+	}
 	else
 	{
 		rect.max_x = 159;
 		rect.min_x = 0;
-		copyscrollbitmap_trans(bitmap, *state->m_bitmap0, 1, &x0, 1, &y, rect, 0x100);
+		lemmings_copy_bitmap(screen.machine(), bitmap, *state->m_bitmap0, &x0, &y, rect);
+
 		rect.max_x = 319;
 		rect.min_x = 160;
-		copyscrollbitmap_trans(bitmap, *state->m_bitmap0, 1, &x1, 1, &y, rect, 0x100);
+		lemmings_copy_bitmap(screen.machine(), bitmap, *state->m_bitmap0, &x1, &y, rect);
 	}
-	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_0, 0, 0x0000);
-	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_1, 1, 0x2000);
+
+	screen.machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0xff);
+	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x300, 0xff);
 	state->m_vram_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, cliprect, state->m_sprite_triple_buffer_0, 0, 0x2000);
+	screen.machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0xff);
 	return 0;
 }
