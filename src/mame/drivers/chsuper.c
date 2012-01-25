@@ -51,7 +51,7 @@ protected:
 
 void chsuper_state::video_start()
 {
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 13);
+	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 14);
 }
 
 UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
