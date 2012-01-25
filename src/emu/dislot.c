@@ -41,7 +41,7 @@ device_t* device_slot_interface::get_card_device()
 		device_slot_card_interface *intf = NULL;
 		dev = device().subdevice(subtag);
 		if (dev!=NULL && !dev->interface(intf))
-			throw emu_fatalerror("get_card_device called for device '%s' with no slot card interface tag %s", dev->tag(),subtag);
+			throw emu_fatalerror("get_card_device called for device '%s' with no slot card interface", dev->tag());
 	}
 	return dev;
 }
