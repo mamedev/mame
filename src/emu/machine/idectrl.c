@@ -2018,16 +2018,9 @@ static DEVICE_RESET( ide_controller )
 
 	ide->cur_drive = 0;
 	LOG(("IDE controller reset performed\n"));
-	astring hardtag_master;
-	astring hardtag_slave;
 	if (config->master) {
+		astring hardtag_master;
 		device->siblingtag(hardtag_master, config->master);
-	}
-	if (config->slave) {
-		device->siblingtag(hardtag_slave, config->slave);
-	}
-
-	if (config->master && device->machine().device( hardtag_master.cstr() )) {
 		if (!ide->drive[0].disk)
 		{
 			ide->drive[0].handle = device->machine().device<harddisk_image_device>(hardtag_master.cstr())->get_chd_file();	// should be config->master
@@ -2056,7 +2049,9 @@ static DEVICE_RESET( ide_controller )
 			}
 		}
 	}
-	if (config->slave && device->machine().device( hardtag_slave.cstr() )) {
+	if (config->slave) {
+		astring hardtag_slave;
+		device->siblingtag(hardtag_slave, config->slave);
 		if (!ide->drive[1].disk)
 		{
 			ide->drive[1].handle = device->machine().device<harddisk_image_device>(hardtag_slave.cstr())->get_chd_file();	// should be config->master
