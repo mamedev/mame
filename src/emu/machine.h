@@ -682,7 +682,7 @@ protected:
 	virtual const rom_entry *device_rom_region() const;
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_reset_after_children();
 
 	// internal helpers
 	inline UINT16 paletteram16_le(offs_t offset) const { return m_generic_paletteram[offset & ~1] | (m_generic_paletteram[offset |  1] << 8); }

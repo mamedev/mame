@@ -262,6 +262,13 @@ void device_t::reset()
 
 	// reset the device
 	device_reset();
+	
+	// reset all child devices
+	for (device_t *child = m_subdevice_list.first(); child != NULL; child = child->next())
+		child->reset();
+	
+	// now allow for some post-child reset action
+	device_reset_after_children();
 
 	// let the interfaces do their post-work
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
@@ -574,6 +581,19 @@ ioport_constructor device_t::device_input_ports() const
 //-------------------------------------------------
 
 void device_t::device_reset()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_reset_after_children - hook to do
+//  reset logic that must happen after the children
+//  are reset; designed to be overriden by the
+//  actual device implementation
+//-------------------------------------------------
+
+void device_t::device_reset_after_children()
 {
 	// do nothing by default
 }

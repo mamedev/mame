@@ -186,7 +186,7 @@ public:
 	astring &siblingtag(astring &dest, const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(dest, tag) : dest.cpy(tag); }
 	const memory_region *subregion(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
-	device_t *siblingdevice(const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subdevice(tag) : NULL; }
+	device_t *siblingdevice(const char *tag) const;
 	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) const { return downcast<_DeviceClass *>(subdevice(tag)); }
 	template<class _DeviceClass> inline _DeviceClass *siblingdevice(const char *tag) const { return downcast<_DeviceClass *>(siblingdevice(tag)); }
 	const memory_region *region() const { return m_region; }
@@ -248,6 +248,7 @@ protected:
 	virtual void device_start() ATTR_COLD = 0;
 	virtual void device_stop() ATTR_COLD;
 	virtual void device_reset() ATTR_COLD;
+	virtual void device_reset_after_children() ATTR_COLD;
 	virtual void device_pre_save() ATTR_COLD;
 	virtual void device_post_load() ATTR_COLD;
 	virtual void device_clock_changed();
@@ -750,6 +751,26 @@ inline device_t *device_t::subdevice(const char *tag) const
 	// do a quick lookup and return that if possible
 	device_t *quick = m_device_map.find(tag);
 	return (quick != NULL) ? quick : subdevice_slow(tag);
+}
+
+
+//-------------------------------------------------
+//  siblingdevice - given a tag, find the device 
+//  by name relative to this device's parent
+//-------------------------------------------------
+
+inline device_t *device_t::siblingdevice(const char *tag) const
+{
+	// safety first
+	if (this == NULL)
+		return NULL;
+
+	// empty string or NULL means this device
+	if (tag == NULL || *tag == 0)
+		return const_cast<device_t *>(this);
+
+	// query relative to the parent
+	return (m_owner != NULL) ? m_owner->subdevice(tag) : NULL;
 }
 
 

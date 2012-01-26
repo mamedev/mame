@@ -932,10 +932,8 @@ void running_machine::start_all_devices()
 
 void running_machine::reset_all_devices()
 {
-	// iterate over devices and reset them
-	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
-		device->reset();
+	// reset the root and it will reset children
+	root_device().reset();
 }
 
 
@@ -1268,11 +1266,12 @@ void driver_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device override which calls
-//  the various helpers
+//  device_reset_after_children - device override 
+//  which calls the various helpers; must happen
+//  after all child devices are reset
 //-------------------------------------------------
 
-void driver_device::device_reset()
+void driver_device::device_reset_after_children()
 {
 	// reset each piece
 	driver_reset();
