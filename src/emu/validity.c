@@ -296,7 +296,10 @@ void validity_checker::validate_one(const game_driver &driver)
 	// wrap in try/except to catch fatalerrors
 	try
 	{
-		machine_config config(driver, m_drivlist.options());
+		emu_options validation_options(m_drivlist.options());
+		validation_options.remove_device_options();
+
+		machine_config config(driver, validation_options);
 		m_current_config = &config;
 		validate_driver();
 		validate_roms();
