@@ -2027,7 +2027,7 @@ static DEVICE_RESET( ide_controller )
 		device->siblingtag(hardtag_slave, config->slave);
 	}
 
-	if (device->machine().device( hardtag_master.cstr() )) {
+	if (config->master && device->machine().device( hardtag_master.cstr() )) {
 		if (!ide->drive[0].disk)
 		{
 			ide->drive[0].handle = device->machine().device<harddisk_image_device>(hardtag_master.cstr())->get_chd_file();	// should be config->master
@@ -2056,7 +2056,7 @@ static DEVICE_RESET( ide_controller )
 			}
 		}
 	}
-	if (device->machine().device( hardtag_slave.cstr() )) {
+	if (config->slave && device->machine().device( hardtag_slave.cstr() )) {
 		if (!ide->drive[1].disk)
 		{
 			ide->drive[1].handle = device->machine().device<harddisk_image_device>(hardtag_slave.cstr())->get_chd_file();	// should be config->master
