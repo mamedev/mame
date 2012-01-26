@@ -3501,6 +3501,8 @@ static CPU_RESET( i486 )
 	cpustate->eflags_mask = 0x00077fd7;
 	cpustate->eip = 0xfff0;
 
+	x87_reset(cpustate);
+
 	// [11:8] Family
 	// [ 7:4] Model
 	// [ 3:0] Stepping ID
@@ -3509,6 +3511,7 @@ static CPU_RESET( i486 )
 	REG32(EDX) = (4 << 8) | (0 << 4) | (3);
 
 	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486);
+	build_x87_opcode_table(get_safe_token(device));
 	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_I486];
 	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_I486];
 
@@ -3524,18 +3527,11 @@ static CPU_SET_INFO( i486 )
 	i386_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
-		case CPUINFO_INT_REGISTER + X87_CTRL:			cpustate->fpu_control_word = info->i;			break;
-		case CPUINFO_INT_REGISTER + X87_STATUS:			cpustate->fpu_status_word = info->i;			break;
-		case CPUINFO_INT_REGISTER + X87_ST0:			ST(0).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST1:			ST(1).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST2:			ST(2).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST3:			ST(3).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST4:			ST(4).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST5:			ST(5).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST6:			ST(6).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST7:			ST(7).f = info->i;						break;
+		case CPUINFO_INT_REGISTER + X87_CTRL:			cpustate->x87_cw = info->i;		break;
+		case CPUINFO_INT_REGISTER + X87_STATUS:			cpustate->x87_sw = info->i;		break;
+		case CPUINFO_INT_REGISTER + X87_TAG:			cpustate->x87_tw = info->i;		break;
 
-		default:										CPU_SET_INFO_CALL(i386);				break;
+		default:										CPU_SET_INFO_CALL(i386);		break;
 	}
 }
 
@@ -3549,29 +3545,23 @@ CPU_GET_INFO( i486 )
 		case CPUINFO_FCT_RESET:		    				info->reset = CPU_RESET_NAME(i486);		break;
 		case CPUINFO_FCT_EXIT:		    				info->exit = CPU_EXIT_NAME(i486);		break;
 
-		case CPUINFO_INT_REGISTER + X87_CTRL:			info->i = cpustate->fpu_control_word;			break;
-		case CPUINFO_INT_REGISTER + X87_STATUS:			info->i = cpustate->fpu_status_word;			break;
-		case CPUINFO_INT_REGISTER + X87_ST0:			info->i = ST(0).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST1:			info->i = ST(1).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST2:			info->i = ST(2).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST3:			info->i = ST(3).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST4:			info->i = ST(4).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST5:			info->i = ST(5).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST6:			info->i = ST(6).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST7:			info->i = ST(7).f;						break;
+		case CPUINFO_INT_REGISTER + X87_CTRL:			info->i = cpustate->x87_cw;				break;
+		case CPUINFO_INT_REGISTER + X87_STATUS:			info->i = cpustate->x87_sw;				break;
+		case CPUINFO_INT_REGISTER + X87_TAG:			info->i = cpustate->x87_tw;				break;
 
 		case DEVINFO_STR_NAME:							strcpy(info->s, "I486");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel 486");			break;
-		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "FPU_CW: %04X", cpustate->fpu_control_word); break;
-		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "FPU_SW: %04X", cpustate->fpu_status_word); break;
-		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", ST(0).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST1:			sprintf(info->s, "ST1: %f", ST(1).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST2:			sprintf(info->s, "ST2: %f", ST(2).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST3:			sprintf(info->s, "ST3: %f", ST(3).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST4:			sprintf(info->s, "ST4: %f", ST(4).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST5:			sprintf(info->s, "ST5: %f", ST(5).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST6:			sprintf(info->s, "ST6: %f", ST(6).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST7:			sprintf(info->s, "ST7: %f", ST(7).f);	break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel 486");			break;
+		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "x87_CW: %04X", cpustate->x87_cw); break;
+		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "x87_SW: %04X", cpustate->x87_sw); break;
+		case CPUINFO_STR_REGISTER + X87_TAG:			sprintf(info->s, "x87_TAG:%04X", cpustate->x87_tw); break;
+		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", fx80_to_double(ST(0)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST1:			sprintf(info->s, "ST1: %f", fx80_to_double(ST(1)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST2:			sprintf(info->s, "ST2: %f", fx80_to_double(ST(2)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST3:			sprintf(info->s, "ST3: %f", fx80_to_double(ST(3)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST4:			sprintf(info->s, "ST4: %f", fx80_to_double(ST(4)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST5:			sprintf(info->s, "ST5: %f", fx80_to_double(ST(5)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST6:			sprintf(info->s, "ST6: %f", fx80_to_double(ST(6)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST7:			sprintf(info->s, "ST7: %f", fx80_to_double(ST(7)));	break;
 
 		default:										CPU_GET_INFO_CALL(i386);				break;
 	}
@@ -3618,6 +3608,8 @@ static CPU_RESET( pentium )
 	cpustate->eflags_mask = 0x003f7fd7;
 	cpustate->eip = 0xfff0;
 
+	x87_reset(cpustate);
+
 	// [11:8] Family
 	// [ 7:4] Model
 	// [ 3:0] Stepping ID
@@ -3626,6 +3618,7 @@ static CPU_RESET( pentium )
 	REG32(EDX) = (5 << 8) | (2 << 4) | (5);
 
 	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM);
+	build_x87_opcode_table(get_safe_token(device));
 	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM];
 	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM];
 
@@ -3656,18 +3649,11 @@ static CPU_SET_INFO( pentium )
 	i386_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
-		case CPUINFO_INT_REGISTER + X87_CTRL:			cpustate->fpu_control_word = info->i;			break;
-		case CPUINFO_INT_REGISTER + X87_STATUS:			cpustate->fpu_status_word = info->i;			break;
-		case CPUINFO_INT_REGISTER + X87_ST0:			ST(0).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST1:			ST(1).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST2:			ST(2).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST3:			ST(3).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST4:			ST(4).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST5:			ST(5).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST6:			ST(6).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST7:			ST(7).f = info->i;						break;
+		case CPUINFO_INT_REGISTER + X87_CTRL:			cpustate->x87_cw = info->i;		break;
+		case CPUINFO_INT_REGISTER + X87_STATUS:			cpustate->x87_sw = info->i;		break;
+		case CPUINFO_INT_REGISTER + X87_TAG:			cpustate->x87_tw = info->i;		break;
 
-		default:										CPU_SET_INFO_CALL(i386);				break;
+		default:										CPU_SET_INFO_CALL(i386);		break;
 	}
 }
 
@@ -3681,29 +3667,23 @@ CPU_GET_INFO( pentium )
 		case CPUINFO_FCT_RESET:		    				info->reset = CPU_RESET_NAME(pentium);	break;
 		case CPUINFO_FCT_EXIT:		    				info->exit = CPU_EXIT_NAME(pentium);	break;
 
-		case CPUINFO_INT_REGISTER + X87_CTRL:			info->i = cpustate->fpu_control_word;			break;
-		case CPUINFO_INT_REGISTER + X87_STATUS:			info->i = cpustate->fpu_status_word;			break;
-		case CPUINFO_INT_REGISTER + X87_ST0:			info->i = ST(0).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST1:			info->i = ST(1).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST2:			info->i = ST(2).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST3:			info->i = ST(3).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST4:			info->i = ST(4).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST5:			info->i = ST(5).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST6:			info->i = ST(6).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST7:			info->i = ST(7).f;						break;
+		case CPUINFO_INT_REGISTER + X87_CTRL:			info->i = cpustate->x87_cw;				break;
+		case CPUINFO_INT_REGISTER + X87_STATUS:			info->i = cpustate->x87_sw;				break;
+		case CPUINFO_INT_REGISTER + X87_TAG:			info->i = cpustate->x87_tw;				break;
 
 		case DEVINFO_STR_NAME:							strcpy(info->s, "PENTIUM");				break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel Pentium");		break;
-		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "FPU_CW: %04X", cpustate->fpu_control_word); break;
-		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "FPU_SW: %04X", cpustate->fpu_status_word); break;
-		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", ST(0).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST1:			sprintf(info->s, "ST1: %f", ST(1).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST2:			sprintf(info->s, "ST2: %f", ST(2).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST3:			sprintf(info->s, "ST3: %f", ST(3).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST4:			sprintf(info->s, "ST4: %f", ST(4).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST5:			sprintf(info->s, "ST5: %f", ST(5).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST6:			sprintf(info->s, "ST6: %f", ST(6).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST7:			sprintf(info->s, "ST7: %f", ST(7).f);	break;
+		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "x87_CW: %04X", cpustate->x87_cw); break;
+		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "x87_SW: %04X", cpustate->x87_sw); break;
+		case CPUINFO_STR_REGISTER + X87_TAG:			sprintf(info->s, "x87_TAG:%04X", cpustate->x87_tw); break;
+		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", fx80_to_double(ST(0)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST1:			sprintf(info->s, "ST1: %f", fx80_to_double(ST(1)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST2:			sprintf(info->s, "ST2: %f", fx80_to_double(ST(2)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST3:			sprintf(info->s, "ST3: %f", fx80_to_double(ST(3)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST4:			sprintf(info->s, "ST4: %f", fx80_to_double(ST(4)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST5:			sprintf(info->s, "ST5: %f", fx80_to_double(ST(5)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST6:			sprintf(info->s, "ST6: %f", fx80_to_double(ST(6)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST7:			sprintf(info->s, "ST7: %f", fx80_to_double(ST(7)));	break;
 
 		default:										CPU_GET_INFO_CALL(i386);				break;
 	}
@@ -3750,6 +3730,8 @@ static CPU_RESET( mediagx )
 	cpustate->eflags_mask = 0x00277fd7; /* TODO: is this correct? */
 	cpustate->eip = 0xfff0;
 
+	x87_reset(cpustate);
+
 	// [11:8] Family
 	// [ 7:4] Model
 	// [ 3:0] Stepping ID
@@ -3757,6 +3739,7 @@ static CPU_RESET( mediagx )
 	REG32(EAX) = 0;
 	REG32(EDX) = (4 << 8) | (4 << 4) | (1);	/* TODO: is this correct? */
 
+	build_x87_opcode_table(get_safe_token(device));
 	build_opcode_table(cpustate, OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_CYRIX);
 	cpustate->cycle_table_rm = cycle_table_rm[CPU_CYCLES_MEDIAGX];
 	cpustate->cycle_table_pm = cycle_table_pm[CPU_CYCLES_MEDIAGX];
@@ -3783,18 +3766,10 @@ static CPU_SET_INFO( mediagx )
 	i386_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
-		case CPUINFO_INT_REGISTER + X87_CTRL:			cpustate->fpu_control_word = info->i;			break;
-		case CPUINFO_INT_REGISTER + X87_STATUS:			cpustate->fpu_status_word = info->i;			break;
-		case CPUINFO_INT_REGISTER + X87_ST0:			ST(0).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST1:			ST(1).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST2:			ST(2).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST3:			ST(3).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST4:			ST(4).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST5:			ST(5).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST6:			ST(6).f = info->i;						break;
-		case CPUINFO_INT_REGISTER + X87_ST7:			ST(7).f = info->i;						break;
+		case CPUINFO_INT_REGISTER + X87_CTRL:			cpustate->x87_cw = info->i;			break;
+		case CPUINFO_INT_REGISTER + X87_STATUS:			cpustate->x87_sw = info->i;			break;
 
-		default:										CPU_SET_INFO_CALL(i386);				break;
+		default:										CPU_SET_INFO_CALL(i386);			break;
 	}
 }
 
@@ -3808,29 +3783,23 @@ CPU_GET_INFO( mediagx )
 		case CPUINFO_FCT_RESET:		    				info->reset = CPU_RESET_NAME(mediagx);	break;
 		case CPUINFO_FCT_EXIT:		    				info->exit = CPU_EXIT_NAME(mediagx);	break;
 
-		case CPUINFO_INT_REGISTER + X87_CTRL:			info->i = cpustate->fpu_control_word;			break;
-		case CPUINFO_INT_REGISTER + X87_STATUS:			info->i = cpustate->fpu_status_word;			break;
-		case CPUINFO_INT_REGISTER + X87_ST0:			info->i = ST(0).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST1:			info->i = ST(1).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST2:			info->i = ST(2).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST3:			info->i = ST(3).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST4:			info->i = ST(4).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST5:			info->i = ST(5).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST6:			info->i = ST(6).f;						break;
-		case CPUINFO_INT_REGISTER + X87_ST7:			info->i = ST(7).f;						break;
+		case CPUINFO_INT_REGISTER + X87_CTRL:			info->i = cpustate->x87_cw;				break;
+		case CPUINFO_INT_REGISTER + X87_STATUS:			info->i = cpustate->x87_sw;				break;
+		case CPUINFO_INT_REGISTER + X87_TAG:			info->i = cpustate->x87_tw;				break;
 
 		case DEVINFO_STR_NAME:							strcpy(info->s, "MEDIAGX");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cyrix MediaGX");		break;
-		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "FPU_CW: %04X", cpustate->fpu_control_word); break;
-		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "FPU_SW: %04X", cpustate->fpu_status_word); break;
-		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", ST(0).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST1:			sprintf(info->s, "ST1: %f", ST(1).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST2:			sprintf(info->s, "ST2: %f", ST(2).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST3:			sprintf(info->s, "ST3: %f", ST(3).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST4:			sprintf(info->s, "ST4: %f", ST(4).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST5:			sprintf(info->s, "ST5: %f", ST(5).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST6:			sprintf(info->s, "ST6: %f", ST(6).f);	break;
-		case CPUINFO_STR_REGISTER + X87_ST7:			sprintf(info->s, "ST7: %f", ST(7).f);	break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Cyrix MediaGX");		break;
+		case CPUINFO_STR_REGISTER + X87_CTRL:			sprintf(info->s, "x87_CW: %04X", cpustate->x87_cw); break;
+		case CPUINFO_STR_REGISTER + X87_STATUS:			sprintf(info->s, "x87_SW: %04X", cpustate->x87_sw); break;
+		case CPUINFO_STR_REGISTER + X87_TAG:			sprintf(info->s, "x87_TAG: %04X", cpustate->x87_tw); break;
+		case CPUINFO_STR_REGISTER + X87_ST0:			sprintf(info->s, "ST0: %f", fx80_to_double(ST(0)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST1:			sprintf(info->s, "ST1: %f", fx80_to_double(ST(1)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST2:			sprintf(info->s, "ST2: %f", fx80_to_double(ST(2)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST3:			sprintf(info->s, "ST3: %f", fx80_to_double(ST(3)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST4:			sprintf(info->s, "ST4: %f", fx80_to_double(ST(4)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST5:			sprintf(info->s, "ST5: %f", fx80_to_double(ST(5)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST6:			sprintf(info->s, "ST6: %f", fx80_to_double(ST(6)));	break;
+		case CPUINFO_STR_REGISTER + X87_ST7:			sprintf(info->s, "ST7: %f", fx80_to_double(ST(7)));	break;
 
 		default:										CPU_GET_INFO_CALL(i386);				break;
 	}

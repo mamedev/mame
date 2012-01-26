@@ -4,6 +4,8 @@
 #define __I386_H__
 
 #include "i386.h"
+#include "../../../lib/softfloat/milieu.h"
+#include "../../../lib/softfloat/softfloat.h"
 
 #define I386OP(XX)		i386_##XX
 #define I486OP(XX)		i486_##XX
@@ -140,6 +142,7 @@ enum
 
 	X87_CTRL,
 	X87_STATUS,
+	X87_TAG,
 	X87_ST0,
 	X87_ST1,
 	X87_ST2,
@@ -276,15 +279,26 @@ struct _i386_state
 	UINT32 feature_flags;
 	UINT64 tsc;
 
+
 	// FPU
-	X87_REG fpu_reg[8];
-	UINT16 fpu_control_word;
-	UINT16 fpu_status_word;
-	UINT16 fpu_tag_word;
-	UINT64 fpu_data_ptr;
-	UINT64 fpu_inst_ptr;
-	UINT16 fpu_opcode;
-	int fpu_top;
+	floatx80 x87_reg[8];
+
+	UINT16 x87_cw;
+	UINT16 x87_sw;
+	UINT16 x87_tw;
+	UINT64 x87_data_ptr;
+	UINT64 x87_inst_ptr;
+	UINT16 x87_opcode;
+
+	void (*opcode_table_x87_d8[256])(i386_state *cpustate, UINT8 modrm);
+	void (*opcode_table_x87_d9[256])(i386_state *cpustate, UINT8 modrm);
+	void (*opcode_table_x87_da[256])(i386_state *cpustate, UINT8 modrm);
+	void (*opcode_table_x87_db[256])(i386_state *cpustate, UINT8 modrm);
+	void (*opcode_table_x87_dc[256])(i386_state *cpustate, UINT8 modrm);
+	void (*opcode_table_x87_dd[256])(i386_state *cpustate, UINT8 modrm);
+	void (*opcode_table_x87_de[256])(i386_state *cpustate, UINT8 modrm);
+	void (*opcode_table_x87_df[256])(i386_state *cpustate, UINT8 modrm);
+
 
 	void (*opcode_table1_16[256])(i386_state *cpustate);
 	void (*opcode_table1_32[256])(i386_state *cpustate);
