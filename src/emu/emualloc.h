@@ -74,11 +74,11 @@
 #define pool_free(_pool, v)							(_pool).remove(v)
 
 // global allocation helpers
-#define global_alloc(_type)							pool_alloc(global_resource_pool, _type)
-#define global_alloc_clear(_type)					pool_alloc_clear(global_resource_pool, _type)
-#define global_alloc_array(_type, _num)				pool_alloc_array(global_resource_pool, _type, _num)
-#define global_alloc_array_clear(_type, _num)		pool_alloc_array_clear(global_resource_pool, _type, _num)
-#define global_free(v)								pool_free(global_resource_pool, v)
+#define global_alloc(_type)							pool_alloc(global_resource_pool(), _type)
+#define global_alloc_clear(_type)					pool_alloc_clear(global_resource_pool(), _type)
+#define global_alloc_array(_type, _num)				pool_alloc_array(global_resource_pool(), _type, _num)
+#define global_alloc_array_clear(_type, _num)		pool_alloc_array_clear(global_resource_pool(), _type, _num)
+#define global_free(v)								pool_free(global_resource_pool(), v)
 
 
 
@@ -281,7 +281,7 @@ private:
 
 public:
 	resource_pool(int hash_size = 193);
-	~resource_pool();
+	virtual ~resource_pool();
 
 	void add(resource_pool_item &item);
 	void remove(resource_pool_item &item) { remove(item.m_ptr); }
@@ -308,11 +308,11 @@ private:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// global resource pool
-extern resource_pool global_resource_pool;
-
 // dummy objects to pass to the specialized new variants
 extern const zeromem_t zeromem;
+
+
+resource_pool &global_resource_pool();
 
 
 

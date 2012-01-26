@@ -112,9 +112,6 @@ private:
 //  GLOBALS
 //**************************************************************************
 
-// global resource pool to handle allocations outside of the emulator context
-resource_pool global_resource_pool(6151);
-
 // dummy zeromem object
 const zeromem_t zeromem = { };
 
@@ -126,6 +123,12 @@ bool memory_entry::s_tracking = false;
 memory_entry *memory_entry::s_hash[memory_entry::k_hash_prime] = { NULL };
 memory_entry *memory_entry::s_freehead = NULL;
 
+// wrapper for the global resource pool to help ensure construction order
+resource_pool &global_resource_pool()
+{
+	static resource_pool s_pool(6151);
+	return s_pool;
+};
 
 
 //**************************************************************************

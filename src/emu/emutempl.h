@@ -59,11 +59,11 @@ class simple_list
 
 public:
 	// construction/destruction
-	simple_list(resource_pool &pool = global_resource_pool) :
-		m_head(NULL),
-		m_tail(NULL),
-		m_pool(pool),
-		m_count(0) { }
+	simple_list(resource_pool &pool = global_resource_pool()) 
+		: m_head(NULL),
+		  m_tail(NULL),
+		  m_pool(pool),
+		  m_count(0) { }
 
 	virtual ~simple_list() { reset(); }
 
@@ -307,7 +307,7 @@ class fixed_allocator
 
 public:
 	// construction/destruction
-	fixed_allocator(resource_pool &pool = global_resource_pool)
+	fixed_allocator(resource_pool &pool = global_resource_pool())
 		: m_freelist(pool) { }
 
 	// allocate a new item, either by recycling an old one, or by allocating a new one
@@ -343,8 +343,8 @@ class tagged_list
 
 public:
 	// construction/destruction
-	tagged_list(resource_pool &pool = global_resource_pool) :
-		m_list(pool) { }
+	tagged_list(resource_pool &pool = global_resource_pool())
+		: m_list(pool) { }
 
 	// simple getters
 	resource_pool &pool() const { return m_list.pool(); }

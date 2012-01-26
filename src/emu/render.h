@@ -260,7 +260,7 @@ class render_screen_list
 
 public:
 	// construction/destruction
-	render_screen_list(resource_pool &pool = global_resource_pool)
+	render_screen_list(resource_pool &pool = global_resource_pool())
 		: m_list(pool) { }
 
 	// getters
