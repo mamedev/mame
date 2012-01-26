@@ -18,12 +18,9 @@
 
     TODO:
     - modernize
-    - convert to an ISA device.
     - add emulated mc6845 hook-up
     - fix video update.
 	- rewrite video drawing functions (they are horrible)
-	- fix RAM read/writes, CGA and Mono has video bugs due of corrupted vga.memory
-	- fix emulated CGA and Mono modes
 	- add VESA etc.
     - (and many more ...)
 
@@ -69,6 +66,10 @@ static struct
 		UINT8 index;
 		UINT8 *data;
 		UINT8 map_mask;
+		struct
+		{
+			UINT8 A, B;
+		}char_sel;
 	} sequencer;
 
 	/* An empty comment at the start of the line indicates that register is currently unused */
@@ -135,8 +136,7 @@ static struct
 	} dac;
 
 	struct {
-		int time;
-		int visible;
+		UINT8 visible;
 	} cursor;
 
 	/* oak vga */
@@ -168,11 +168,11 @@ static struct
 #define GRAPHIC_MODE (vga.gc.data[6]&1) /* else textmodus */
 
 #define EGA_COLUMNS (vga.crtc.data[1]+1)
-#define EGA_START_ADDRESS ((vga.crtc.data[0xd]|(vga.crtc.data[0xc]<<8)))
+#define EGA_START_ADDRESS (vga.crtc.start_addr)
 #define EGA_LINE_LENGTH (vga.crtc.offset<<1)
 
 #define VGA_COLUMNS (vga.crtc.data[1]+1)
-#define VGA_START_ADDRESS (vga.crtc.start_addr<<3)
+#define VGA_START_ADDRESS (vga.crtc.start_addr)
 #define VGA_LINE_LENGTH (vga.crtc.offset<<3)
 
 #define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
@@ -222,14 +222,10 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 	int pos, line, column, mask, w, h, addr;
 	pen_t pen;
 
-	if (CRTC_CURSOR_MODE!=CRTC_CURSOR_OFF)
-	{
-		if (++vga.cursor.time>=0x10)
-		{
-			vga.cursor.visible^=1;
-			vga.cursor.time=0;
-		}
-	}
+	if(vga.crtc.cursor_enable)
+		vga.cursor.visible = machine.primary_screen->frame_number() & 0x10;
+	else
+		vga.cursor.visible = 0;
 
 	for (addr = vga.crtc.start_addr, line = -CRTC_SKEW; line < TEXT_LINES;
 		 line += height, addr += TEXT_LINE_LENGTH)
@@ -238,21 +234,20 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 		{
 			ch   = vga.memory[(pos<<1) + 0];
 			attr = vga.memory[(pos<<1) + 1];
-			font_base = 0x40000+(ch<<5); // TODO: character select
+			font_base = 0x40000+(ch<<5);
+			font_base += ((attr & 8) ? vga.sequencer.char_sel.B : vga.sequencer.char_sel.A)*0x2000;
 
 			for (h = MAX(-line, 0); (h < height) && (line+h < MIN(TEXT_LINES, bitmap.height())); h++)
 			{
 				bitmapline = &bitmap.pix32(line+h);
 				bits = vga.memory[font_base+(h<<0)];
 
-				//assert(bitmapline);
-
 				for (mask=0x80, w=0; (w<width)&&(w<8); w++, mask>>=1)
 				{
 					if (bits&mask)
 						pen = vga.pens[attr & 0x0f];
 					else
-						pen = vga.pens[attr >> 4];
+						pen = vga.pens[(attr & 0xf0) >> 4];
 
 					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
 						continue;
@@ -265,7 +260,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 					if (TEXT_COPY_9COLUMN(ch)&&(bits&1))
 						pen = vga.pens[attr & 0x0f];
 					else
-						pen = vga.pens[attr >> 4];
+						pen = vga.pens[(attr & 0xf0) >> 4];
 
 					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
 						continue;
@@ -336,16 +331,15 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	UINT16 mask_comp;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int yi;
-	int xi,xi_h;
+	int xi;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x0ff | (LINES & 0x300);
 
 	curr_addr = 0;
-	#if 0
-	if(vga.sequencer.data[4] & 0x08)
+	if(!(vga.sequencer.data[4] & 0x08))
 	{
-		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=VGA_LINE_LENGTH, curr_addr+=VGA_LINE_LENGTH)
+		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=VGA_LINE_LENGTH/4, curr_addr+=VGA_LINE_LENGTH/4)
 		{
 			for(yi = 0;yi < height; yi++)
 			{
@@ -355,24 +349,22 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					curr_addr = 0;
 				bitmapline = &bitmap.pix32(line + yi);
 				addr %= vga.svga_intf.vram_size;
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=0x10, pos+=0x20)
+				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos++)
 				{
-					if(pos + 0x20 > vga.svga_intf.vram_size)
+					if(pos > vga.svga_intf.vram_size/4)
 						return;
 
-					for(xi=0;xi<0x10;xi++)
+					for(xi=0;xi<8;xi++)
 					{
-						xi_h = ((xi & 6) >> 1) | ((xi & 8) << 1);
 						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 							continue;
-						bitmapline[c+xi] = machine.pens[vga.memory[pos+xi_h]];
+						bitmapline[c+xi] = machine.pens[vga.memory[pos+((xi >> 1)*0x20000)]];
 					}
 				}
 			}
 		}
 	}
 	else
-	#endif
 	{
 		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=VGA_LINE_LENGTH, curr_addr+=VGA_LINE_LENGTH)
 		{
@@ -384,17 +376,16 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					curr_addr = 0;
 				bitmapline = &bitmap.pix32(line + yi);
 				addr %= vga.svga_intf.vram_size;
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=0x10, pos+=0x08)
+				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=0x10, pos+=0x8)
 				{
 					if(pos + 0x08 > vga.svga_intf.vram_size)
 						return;
 
 					for(xi=0;xi<0x10;xi++)
 					{
-						xi_h = (xi & 0xe) >> 1;
 						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 							continue;
-						bitmapline[c+xi] = machine.pens[vga.memory[pos+xi_h]];
+						bitmapline[c+xi] = machine.pens[vga.memory[pos+(xi >> 1)]];
 					}
 				}
 			}
@@ -823,7 +814,12 @@ static void seq_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 			vga.sequencer.map_mask = data & 0xf;
 			break;
 		case 0x03:
-			//vga.sequencer.char_map_sel = data & 0x03;
+			/* --2- 84-- character select A
+			   ---2 --84 character select B */
+			vga.sequencer.char_sel.A = (((data & 0xc) >> 2)<<1) | ((data & 0x20) >> 5);
+			vga.sequencer.char_sel.B = (((data & 0x3) >> 0)<<1) | ((data & 0x10) >> 4);
+			if(data)
+				popmessage("Char SEL checker, contact MAMEdev (%02x %02x)\n",vga.sequencer.char_sel.A,vga.sequencer.char_sel.B);
 			break;
 	}
 }
