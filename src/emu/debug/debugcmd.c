@@ -390,11 +390,6 @@ void debug_command_init(running_machine &machine)
 
 static void debug_command_exit(running_machine &machine)
 {
-	/* turn off all traces */
-	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
-		device->debug()->trace(NULL, 0, NULL);
-
 	if (cheat.length)
 		auto_free(machine, cheat.cheatmap);
 }

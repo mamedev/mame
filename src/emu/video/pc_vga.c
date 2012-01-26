@@ -206,6 +206,9 @@ static VIDEO_RESET( vga );
 void pc_video_start(running_machine &machine)
 {
 	// ...
+
+	// Avoid an infinite loop when displaying.  0 is not possible anyway.
+	vga.crtc.maximum_scan_line = 1;
 }
 
 static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)

@@ -1674,6 +1674,8 @@ device_debug::device_debug(device_t &device)
 	memset(m_pc_history, 0, sizeof(m_pc_history));
 	memset(m_wplist, 0, sizeof(m_wplist));
 
+	m_comment_change = 0;
+
 	// find out which interfaces we have to work with
 	device.interface(m_exec);
 	device.interface(m_memory);
@@ -1726,6 +1728,8 @@ device_debug::device_debug(device_t &device)
 
 device_debug::~device_debug()
 {
+	auto_free(m_device.machine(), m_trace);
+
 	// free breakpoints and watchpoints
 	breakpoint_clear_all();
 	watchpoint_clear_all();
