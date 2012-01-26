@@ -230,7 +230,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 		}
 	}
 
-	for (addr = TEXT_START_ADDRESS, line = -CRTC_SKEW; line < TEXT_LINES;
+	for (addr = vga.crtc.start_addr, line = -CRTC_SKEW; line < TEXT_LINES;
 		 line += height, addr += TEXT_LINE_LENGTH)
 	{
 		for (pos = addr, column=0; column<TEXT_COLUMNS; column++, pos++)
