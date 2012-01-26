@@ -466,8 +466,8 @@ static WRITE8_DEVICE_HANDLER( n8080_status_callback )
 
 static I8085_CONFIG( n8080_cpu_config )
 {
-	DEVCB_HANDLER(n8080_status_callback),	/* STATUS changed callback */
-	DEVCB_LINE(n8080_inte_callback),		/* INTE changed callback */
+	DEVCB_DEVICE_HANDLER("maincpu",n8080_status_callback),	/* STATUS changed callback */
+	DEVCB_DEVICE_LINE("maincpu",n8080_inte_callback),		/* INTE changed callback */
 	DEVCB_NULL,								/* SID changed callback (8085A only) */
 	DEVCB_NULL								/* SOD changed callback (8085A only) */
 };
