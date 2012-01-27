@@ -31,8 +31,8 @@ They can be divided in three "families":
    sprites are 4bpp instead of 2bpp, so the final stage of video generation is
    a little different as well, though the custom ICs are still the same.
    Dig Dig II and Motos are almost the same, apart from larger ROMs.
-   Tower of Druaga also has 4x the amount of sprite color combinations so it's
-   the most different of the four.
+   The Tower of Druaga also has 4x the amount of sprite color combinations so
+   it's the most different of the four.
 
 
 Custom ICs (Super Pacman and Mappy):
@@ -117,7 +117,7 @@ Address          Dir Data     Name      Description
 
 Mappy memory map
 ----------------
-Tower of Druaga, Dig Dug 2, Motos are the same, with minor differences.
+The Tower of Druaga, Dig Dug 2, Motos are the same, with minor differences.
 The main difference with Super Pac-Man is the increased video RAM, needed to
 implement a scrolling tilemap.
 
@@ -154,7 +154,7 @@ Address          Dir Data     Name      Description
 111xxxxxxxxxxxxx R   xxxxxxxx ROM 1B    program ROM [2]
 
 [1] only half of that space is actually used, because only 2 of the possible 4 I/O chips are present
-[2] Tower of Druaga, Dig Dug 2, Motos have 2 128k ROMs instead of 3 64k:
+[2] The Tower of Druaga, Dig Dug 2, Motos have 2 128k ROMs instead of 3 64k:
 10xxxxxxxxxxxxxx R   xxxxxxxx ROM 1D    program ROM
 11xxxxxxxxxxxxxx R   xxxxxxxx ROM 1B    program ROM
 [3] Overlaps the ROM region. Dig Dug 2 reads it.
@@ -446,7 +446,7 @@ S: service switch (the one that adds a credit, not the one to enter service mode
     (c) 1983 NAMCO
     ALL RIGHTS RESERVED
 
-- Tower of Druaga
+- The Tower of Druaga
   - enter service mode
   - select sound 19
   - press S to display the grid
@@ -518,7 +518,7 @@ Notes:
   99.99.999.9999.9999.9999
   99.99.999.9999.9999.0000
 
-- Tower of Druaga: keep button 1 pressed while pressing the start button to
+- The Tower of Druaga: keep button 1 pressed while pressing the start button to
   continue the previous game; you can choose which level to start from.
 
 - Grobda: when the Level Select dip switch is On, after inserting a coin press
@@ -2297,9 +2297,9 @@ GAME( 1983, phozon,   0,        phozon,   phozon,   0,        ROT90, "Namco", "P
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
 GAME( 1983, mappy,    0,        mappy,    mappy,    0,        ROT90, "Namco", "Mappy (US)", GAME_SUPPORTS_SAVE )
 GAME( 1983, mappyj,   mappy,    mappy,    mappy,    0,        ROT90, "Namco", "Mappy (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruaga, 0,        todruaga, todruaga, 0,        ROT90, "Namco", "Tower of Druaga (New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruagao,todruaga, todruaga, todruaga, 0,        ROT90, "Namco", "Tower of Druaga (Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, todruagas,todruaga, todruaga, todruaga, 0,        ROT90, "bootleg? (Sidam)", "Tower of Druaga (Sidam)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruaga, 0,        todruaga, todruaga, 0,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruagao,todruaga, todruaga, todruaga, 0,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruagas,todruaga, todruaga, todruaga, 0,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2,  0,        digdug2,  digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2o, digdug2,  digdug2,  digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, motos,    0,        motos,    motos,    0,        ROT90, "Namco", "Motos", GAME_SUPPORTS_SAVE )
