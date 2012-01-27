@@ -27,6 +27,7 @@
 	per-game issues:
 	- The Incredible Machine: fix partial updates
 	- MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
+	- Bio Menace: jerky H scrolling (uses EGA mode)
 
     ROM declarations:
 
@@ -297,14 +298,14 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 		{
 			bitmapline = &bitmap.pix32(line + yi);
 
-			for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+1)&0x3ffff)
+			for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+1)&0xffff)
 			{
 				int data[4];
 
-				data[0]=vga.memory[(pos & 0x1ffff)];
-				data[1]=vga.memory[(pos & 0x1ffff)+0x20000]<<1;
-				data[2]=vga.memory[(pos & 0x1ffff)+0x40000]<<2;
-				data[3]=vga.memory[(pos & 0x1ffff)+0x60000]<<3;
+				data[0]=vga.memory[(pos & 0xffff)];
+				data[1]=vga.memory[(pos & 0xffff)+0x20000]<<1;
+				data[2]=vga.memory[(pos & 0xffff)+0x40000]<<2;
+				data[3]=vga.memory[(pos & 0xffff)+0x60000]<<3;
 
 				for (i = 7; i >= 0; i--)
 				{
@@ -901,7 +902,10 @@ static WRITE8_HANDLER(vga_crtc_w)
 
 			crtc_reg_write(space->machine(),vga.crtc.index,data);
 			//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-			//printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
+			#if 0
+			if((vga.crtc.index & 0xfe) != 0x0e)
+				printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
+			#endif
 			break;
 	}
 }
