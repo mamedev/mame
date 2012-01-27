@@ -12,7 +12,7 @@ VIDEO_START( skyraid )
 {
 	skyraid_state *state = machine.driver_data<skyraid_state>();
 
-	state->m_helper = auto_bitmap_ind16_alloc(machine, 128, 240);
+	state->m_helper.allocate(128, 240);
 }
 
 
@@ -139,10 +139,13 @@ SCREEN_UPDATE_IND16( skyraid )
 
 	bitmap.fill(0, cliprect);
 
-	draw_terrain(screen.machine(), *state->m_helper, cliprect);
-	draw_sprites(screen.machine(), *state->m_helper, cliprect);
-	draw_missiles(screen.machine(), *state->m_helper, cliprect);
-	draw_trapezoid(screen.machine(), bitmap, *state->m_helper);
+	rectangle helper_clip = cliprect;
+	helper_clip &= state->m_helper.cliprect();
+	
+	draw_terrain(screen.machine(), state->m_helper, helper_clip);
+	draw_sprites(screen.machine(), state->m_helper, helper_clip);
+	draw_missiles(screen.machine(), state->m_helper, helper_clip);
+	draw_trapezoid(screen.machine(), bitmap, state->m_helper);
 	draw_text(screen.machine(), bitmap, cliprect);
 	return 0;
 }

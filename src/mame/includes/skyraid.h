@@ -15,7 +15,7 @@ public:
 	UINT8* m_pos_ram;
 	UINT8* m_obj_ram;
 
-	bitmap_ind16 *m_helper;
+	bitmap_ind16 m_helper;
 };
 
 
