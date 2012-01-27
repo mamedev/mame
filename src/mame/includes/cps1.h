@@ -131,8 +131,7 @@ public:
 	int          m_palette_align;
 	int          m_palette_size;
 	int          m_stars_rom_size;
-	UINT8        m_empty_tile8x8[8*8];
-	UINT8        m_empty_tile[32*32/2];
+	UINT8        m_empty_tile[32*32];
 	int          m_cps_version;
 
 	/* devices */

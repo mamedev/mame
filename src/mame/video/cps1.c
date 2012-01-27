@@ -2009,7 +2009,7 @@ static TILE_GET_INFO( get_tile0_info )
 	// for out of range tiles, switch to fully transparent data
 	// (but still call SET_TILE_INFO, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
-		tileinfo.pen_data = state->m_empty_tile8x8;
+		tileinfo.pen_data = state->m_empty_tile;
 }
 
 static TILE_GET_INFO( get_tile1_info )
@@ -2098,8 +2098,7 @@ static VIDEO_START( cps )
 	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile2_info, tilemap2_scan, 32, 32, 64, 64);
 
 	/* create empty tiles */
-	memset(state->m_empty_tile8x8, 0x0f, sizeof(state->m_empty_tile8x8));
-	memset(state->m_empty_tile, 0xff, sizeof(state->m_empty_tile));	// 16x16 and 32x32 use packed graphics, 8x8 does not
+	memset(state->m_empty_tile, 0x0f, sizeof(state->m_empty_tile));
 
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks(machine);
