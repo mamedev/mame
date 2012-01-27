@@ -1461,6 +1461,7 @@ INLINE void draw_scanlines(running_machine &machine,
 	UINT8 *dstp0,*dstp;
 
 	int yadv = bitmap.rowpixels();
+	int yadvp = state->m_pri_alp_bitmap.rowpixels();
 	int i=0,y=draw_line_num[0];
 	int ty = y;
 
@@ -1468,6 +1469,7 @@ INLINE void draw_scanlines(running_machine &machine,
 	{
 		ty = bitmap.height() - 1 - ty;
 		yadv = -yadv;
+		yadvp = -yadvp;
 	}
 
 	dstp0 = &state->m_pri_alp_bitmap.pix8(ty, x);
@@ -1546,15 +1548,14 @@ INLINE void draw_scanlines(running_machine &machine,
 			if(draw_line_num[i]==y+1)
 			{
 				dsti0 += yadv;
-				dstp0 += yadv;
+				dstp0 += yadvp;
 				y++;
 				continue;
 			}
 			else
 			{
-				int dy=(draw_line_num[i]-y)*yadv;
-				dsti0 += dy;
-				dstp0 += dy;
+				dsti0 += (draw_line_num[i]-y)*yadv;
+				dstp0 += (draw_line_num[i]-y)*yadvp;
 				y=draw_line_num[i];
 			}
 		}
@@ -2681,6 +2682,7 @@ INLINE void f3_drawgfx(
 					UINT32 *dest0 = &dest_bmp.pix32(sy, sx);
 					UINT8 *pri0 = &state->m_pri_alp_bitmap.pix8(sy, sx);
 					int yadv = dest_bmp.rowpixels();
+					int yadvp = state->m_pri_alp_bitmap.rowpixels();
 					dy=dy*16;
 					while(1)
 					{
@@ -2730,7 +2732,7 @@ INLINE void f3_drawgfx(
 						if(!(--y)) break;
 						source0 += dy;
 						dest0+=yadv;
-						pri0+=yadv;
+						pri0+=yadvp;
 					}
 				}
 			}
