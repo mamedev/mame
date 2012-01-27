@@ -100,7 +100,8 @@ TODO:
 
 DIP locations verified for:
 --------------------------
-- metrocrs (manual)
+- baraduke (manual JP)
+- metrocrs (manual US, JP)
 
 ***************************************************************************/
 
@@ -231,15 +232,15 @@ static INPUT_PORTS_START( baraduke )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SWB:1,2")
-	PORT_DIPSETTING(    0x80, "Every 10k" )
-	PORT_DIPSETTING(    0xc0, "10k And Every 20k" )
-	PORT_DIPSETTING(    0x40, "Every 20k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x80, "Every 10k" )				// "B"
+	PORT_DIPSETTING(    0xc0, "10k And Every 20k" )		// "A" (default)
+	PORT_DIPSETTING(    0x40, "Every 20k" )				// "C"
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )			// "D"
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SWB:3,4")
-	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )			// "B"
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )		// "A" (default)
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )			// "C"
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )	// "D"
 	/*  To advance rounds: set SWB:5 to ON, coin up game and push 1P start.
         Use joystick to select round 1 - 48. Set SWB:5 to OFF to play selected round. */
 	PORT_DIPNAME( 0x08, 0x08, "Round Select" )			PORT_DIPLOCATION("SWB:5")
@@ -297,11 +298,11 @@ static INPUT_PORTS_START( metrocrs )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SWA:4,5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )			// "B"
+	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )		// "A" (default)
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )			// "C"
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )	// "D"
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWA:6") // metrocrs: after round 8, metrocrsa: after round 4
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 
