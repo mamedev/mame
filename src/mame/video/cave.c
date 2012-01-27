@@ -744,8 +744,6 @@ static void sprite_init_cave( running_machine &machine )
 
 	state->m_sprite_zbuf_baseval = 0x10000 - MAX_SPRITE_NUM;
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_zbuf);
-	state->m_blit.baseaddr_zbuf = &state->m_sprite_zbuf.pix8(0);
-	state->m_blit.line_offset_zbuf = state->m_sprite_zbuf.rowpixels() * state->m_sprite_zbuf.bpp() / 8;
 
 	state->m_num_sprites = state->m_spriteram_size / 0x10 / 2;
 	state->m_sprite = auto_alloc_array_clear(machine, struct sprite_cave, state->m_num_sprites);
@@ -1547,7 +1545,9 @@ SCREEN_UPDATE_IND16( cave )
 	set_pens(screen.machine());
 
 	state->m_blit.baseaddr = reinterpret_cast<UINT8 *>(bitmap.raw_pixptr(0));
-	state->m_blit.line_offset = bitmap.rowpixels() * bitmap.bpp() / 8;
+	state->m_blit.line_offset = bitmap.rowbytes();
+	state->m_blit.baseaddr_zbuf = reinterpret_cast<UINT8 *>(state->m_sprite_zbuf.raw_pixptr(0));
+	state->m_blit.line_offset_zbuf = state->m_sprite_zbuf.rowbytes();
 
 	/* Choose the tilemap to display (8x8 tiles or 16x16 tiles) */
 	for (GFX = 0; GFX < 4; GFX++)

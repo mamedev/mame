@@ -58,7 +58,7 @@ public:
 	int          m_tiledim[4];
 	int          m_old_tiledim[4];
 
-	bitmap_ind8 m_sprite_zbuf;
+	bitmap_ind16 m_sprite_zbuf;
 	UINT16       m_sprite_zbuf_baseval;
 
 	int          m_num_sprites;
