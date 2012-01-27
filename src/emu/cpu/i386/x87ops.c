@@ -4,6 +4,7 @@
 
 	TODO:
 	 - 80-bit precision for F2XM1, FYL2X, FPATAN
+	 - Figure out why SoftFloat trig extensions produce bad values
 	 - Cycle counts for all processors (currently using 486 counts)
 	 - Precision-dependent cycle counts for divide instructions
 	 - Last instruction, operand pointers etc.
@@ -2157,10 +2158,18 @@ void x87_fptan(i386_state *cpustate, UINT8 modrm)
 		result1 = ST(0);
 		result2 = fx80_one;
 
+#if 0 // TODO: Function produces bad values
 		if (floatx80_ftan(result1) != -1)
 			cpustate->x87_sw &= ~X87_SW_C2;
 		else
 			cpustate->x87_sw |= X87_SW_C2;
+#else
+		double x = fx80_to_double(result1);
+		x = tan(x);
+		result1 = double_to_fx80(x);
+		
+		cpustate->x87_sw &= ~X87_SW_C2;
+#endif
 	}
 
 	if (x87_check_exceptions(cpustate))
@@ -2211,10 +2220,18 @@ void x87_fsin(i386_state *cpustate, UINT8 modrm)
 	{
 		result = ST(0);
 
+#if 0 // TODO: Function produces bad values
 		if (floatx80_fsin(result) != -1)
 			cpustate->x87_sw &= ~X87_SW_C2;
 		else
 			cpustate->x87_sw |= X87_SW_C2;
+#else
+		double x = fx80_to_double(result);
+		x = sin(x);
+		result = double_to_fx80(x);
+		
+		cpustate->x87_sw &= ~X87_SW_C2;
+#endif
 	}
 
 	if (x87_check_exceptions(cpustate))
@@ -2236,10 +2253,18 @@ void x87_fcos(i386_state *cpustate, UINT8 modrm)
 	{
 		result = ST(0);
 
+#if 0 // TODO: Function produces bad values
 		if (floatx80_fcos(result) != -1)
 			cpustate->x87_sw &= ~X87_SW_C2;
 		else
 			cpustate->x87_sw |= X87_SW_C2;
+#else
+		double x = fx80_to_double(result);
+		x = cos(x);
+		result = double_to_fx80(x);
+		
+		cpustate->x87_sw &= ~X87_SW_C2;
+#endif
 	}
 
 	if (x87_check_exceptions(cpustate))
@@ -2268,10 +2293,22 @@ void x87_fsincos(i386_state *cpustate, UINT8 modrm)
 
 		s_result = c_result = ST(0);
 
+#if 0 // TODO: Function produces bad values
 		if (sf_fsincos(s_result, &s_result, &c_result) != -1)
 			cpustate->x87_sw &= ~X87_SW_C2;
 		else
 			cpustate->x87_sw |= X87_SW_C2;
+#else
+		double s = fx80_to_double(s_result);
+		double c = fx80_to_double(c_result);		
+		s = sin(s);
+		c = cos(c);
+		
+		s_result = double_to_fx80(s);
+		c_result = double_to_fx80(c);
+		
+		cpustate->x87_sw &= ~X87_SW_C2;
+#endif
 	}
 
 	if (x87_check_exceptions(cpustate))
@@ -4277,7 +4314,7 @@ void build_x87_opcode_table_d8(i386_state *cpustate)
 {
 	int modrm = 0;
 
-	for (modrm = 0; modrm < 0xff; ++modrm)
+	for (modrm = 0; modrm < 0x100; ++modrm)
 	{
 		void (*ptr)(i386_state *cpustate, UINT8 modrm) = x87_invalid;
 
@@ -4319,7 +4356,7 @@ void build_x87_opcode_table_d9(i386_state *cpustate)
 {
 	int modrm = 0;
 
-	for (modrm = 0; modrm < 0xff; ++modrm)
+	for (modrm = 0; modrm < 0x100; ++modrm)
 	{
 		void (*ptr)(i386_state *cpustate, UINT8 modrm) = x87_invalid;
 
@@ -4397,7 +4434,7 @@ void build_x87_opcode_table_da(i386_state *cpustate)
 {
 	int modrm = 0;
 
-	for (modrm = 0; modrm < 0xff; ++modrm)
+	for (modrm = 0; modrm < 0x100; ++modrm)
 	{
 		void (*ptr)(i386_state *cpustate, UINT8 modrm) = x87_invalid;
 
@@ -4432,7 +4469,7 @@ void build_x87_opcode_table_db(i386_state *cpustate)
 {
 	int modrm = 0;
 
-	for (modrm = 0; modrm < 0xff; ++modrm)
+	for (modrm = 0; modrm < 0x100; ++modrm)
 	{
 		void (*ptr)(i386_state *cpustate, UINT8 modrm) = x87_invalid;
 
@@ -4468,7 +4505,7 @@ void build_x87_opcode_table_dc(i386_state *cpustate)
 {
 	int modrm = 0;
 
-	for (modrm = 0; modrm < 0xff; ++modrm)
+	for (modrm = 0; modrm < 0x100; ++modrm)
 	{
 		void (*ptr)(i386_state *cpustate, UINT8 modrm) = x87_invalid;
 
@@ -4508,7 +4545,7 @@ void build_x87_opcode_table_dd(i386_state *cpustate)
 {
 	int modrm = 0;
 
-	for (modrm = 0; modrm < 0xff; ++modrm)
+	for (modrm = 0; modrm < 0x100; ++modrm)
 	{
 		void (*ptr)(i386_state *cpustate, UINT8 modrm) = x87_invalid;
 
@@ -4545,7 +4582,7 @@ void build_x87_opcode_table_de(i386_state *cpustate)
 {
 	int modrm = 0;
 
-	for (modrm = 0; modrm < 0xff; ++modrm)
+	for (modrm = 0; modrm < 0x100; ++modrm)
 	{
 		void (*ptr)(i386_state *cpustate, UINT8 modrm) = x87_invalid;
 
@@ -4586,7 +4623,7 @@ void build_x87_opcode_table_df(i386_state *cpustate)
 {
 	int modrm = 0;
 
-	for (modrm = 0; modrm < 0xff; ++modrm)
+	for (modrm = 0; modrm < 0x100; ++modrm)
 	{
 		void (*ptr)(i386_state *cpustate, UINT8 modrm) = x87_invalid;
 
