@@ -211,7 +211,7 @@ VIDEO_START( screwloo )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	UINT8 *spriteram = state->m_spriteram;
@@ -249,14 +249,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
  *
  *************************************/
 
-SCREEN_UPDATE_IND16( gottlieb )
+SCREEN_UPDATE_RGB32( gottlieb )
 {
 	gottlieb_state *state = screen.machine().driver_data<gottlieb_state>();
 	/* if the background has lower priority, render it first, else clear the screen */
 	if (!state->m_background_priority)
 		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	else
-		bitmap.fill(0, cliprect);
+		bitmap.fill(screen.machine().pens[0], cliprect);
 
 	/* draw the sprites */
 	draw_sprites(screen.machine(), bitmap, cliprect);

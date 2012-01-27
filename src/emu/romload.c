@@ -34,15 +34,38 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _open_chd open_chd;
-struct _open_chd
+class open_chd
 {
-	open_chd *			next;					/* pointer to next in the list */
-	const char *		region;					/* disk region we came from */
-	chd_file *			origchd;				/* handle to the original CHD */
-	emu_file *			origfile;				/* file handle to the original CHD file */
-	chd_file *			diffchd;				/* handle to the diff CHD */
-	emu_file *			difffile;				/* file handle to the diff CHD file */
+	friend class simple_list<open_chd>;
+
+public:
+	open_chd(const char *region, emu_file &file, chd_file &chdfile, emu_file *difffile = NULL, chd_file *diffchd = NULL)
+		: m_next(NULL),
+		  m_region(region),
+		  m_origchd(&chdfile),
+		  m_origfile(&file),
+		  m_diffchd(diffchd),
+		  m_difffile(difffile) { }
+
+	~open_chd()
+	{
+		if (m_diffchd != NULL) chd_close(m_diffchd);
+		global_free(m_difffile);
+		chd_close(m_origchd);
+		global_free(m_origfile);
+	}
+
+	open_chd *next() const { return m_next; }
+	const char *region() const { return m_region; }
+	chd_file *chd() const { return (m_diffchd != NULL) ? m_diffchd : m_origchd; }
+
+private:
+	open_chd *			m_next;					/* pointer to next in the list */
+	astring				m_region;				/* disk region we came from */
+	chd_file *			m_origchd;				/* handle to the original CHD */
+	emu_file *			m_origfile;				/* file handle to the original CHD file */
+	chd_file *			m_diffchd;				/* handle to the diff CHD */
+	emu_file *			m_difffile;				/* file handle to the diff CHD file */
 };
 
 
@@ -65,8 +88,7 @@ struct _romload_private
 	UINT32			romstotalsize;		/* total size of ROMs to read */
 
 	emu_file *		file;				/* current file */
-	open_chd *		chd_list;			/* disks */
-	open_chd **		chd_list_tailptr;
+	simple_list<open_chd> chd_list;		/* disks */
 
 	memory_region *	region;				/* info about current region */
 
@@ -132,27 +154,10 @@ file_error common_process_file(emu_options &options, const char *location, bool 
 
 chd_file *get_disk_handle(running_machine &machine, const char *region)
 {
-	open_chd *curdisk;
-
-	for (curdisk = machine.romload_data->chd_list; curdisk != NULL; curdisk = curdisk->next)
-		if (strcmp(curdisk->region, region) == 0)
-			return (curdisk->diffchd != NULL) ? curdisk->diffchd : curdisk->origchd;
+ 	for (open_chd *curdisk = machine.romload_data->chd_list.first(); curdisk != NULL; curdisk = curdisk->next())
+		if (strcmp(curdisk->region(), region) == 0)
+			return curdisk->chd();
 	return NULL;
-}
-
-
-/*-------------------------------------------------
-    add_disk_handle - add a disk to the to the
-    list of CHD files
--------------------------------------------------*/
-
-static void add_disk_handle(running_machine &machine, open_chd *chd)
-{
-	romload_private *romload_data = machine.romload_data;
-
-	*romload_data->chd_list_tailptr = auto_alloc(machine, open_chd);
-	**romload_data->chd_list_tailptr = *chd;
-	romload_data->chd_list_tailptr = &(*romload_data->chd_list_tailptr)->next;
 }
 
 
@@ -163,15 +168,7 @@ static void add_disk_handle(running_machine &machine, open_chd *chd)
 
 void set_disk_handle(running_machine &machine, const char *region, emu_file &file, chd_file &chdfile)
 {
-	open_chd chd = { 0 };
-
-	/* note the region we are in */
-	chd.region = region;
-	chd.origchd = &chdfile;
-	chd.origfile = &file;
-
-	/* we're okay, add to the list of disks */
-	add_disk_handle(machine, &chd);
+	machine.romload_data->chd_list.append(*global_alloc(open_chd(region, file, chdfile)));
 }
 
 
@@ -1224,19 +1221,17 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 		if (ROMENTRY_ISFILE(romp))
 		{
 			hash_collection hashes(ROM_GETHASHDATA(romp));
-			open_chd chd = { 0 };
 			chd_header header;
 			chd_error err;
-
-			/* note the region we are in */
-			chd.region = regiontag;
 
 			/* make the filename of the source */
 			astring filename(ROM_GETNAME(romp), ".chd");
 
 			/* first open the source drive */
+			chd_file *origchd;
+			emu_file *origfile;
 			LOG(("Opening disk image: %s\n", filename.cstr()));
-			err = open_disk_image(romdata->machine().options(), &romdata->machine().system(), romp, &chd.origfile, &chd.origchd, locationtag);
+			err = open_disk_image(romdata->machine().options(), &romdata->machine().system(), romp, &origfile, &origchd, locationtag);
 			if (err != CHDERR_NONE)
 			{
 				if (err == CHDERR_FILE_NOT_FOUND)
@@ -1255,7 +1250,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 			}
 
 			/* get the header and extract the SHA1 */
-			header = *chd_get_header(chd.origchd);
+			header = *chd_get_header(origchd);
 			hash_collection acthashes;
 			acthashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
 
@@ -1273,10 +1268,12 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 			}
 
 			/* if not read-only, make the diff file */
+			chd_file *diffchd = NULL;
+			emu_file *difffile = NULL;
 			if (!DISK_ISREADONLY(romp))
 			{
 				/* try to open or create the diff */
-				err = open_disk_diff(romdata->machine().options(), romp, chd.origchd, &chd.difffile, &chd.diffchd);
+				err = open_disk_diff(romdata->machine().options(), romp, origchd, &difffile, &diffchd);
 				if (err != CHDERR_NONE)
 				{
 					romdata->errorstring.catprintf("%s DIFF CHD ERROR: %s\n", filename.cstr(), chd_error_string(err));
@@ -1287,7 +1284,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 			/* we're okay, add to the list of disks */
 			LOG(("Assigning to handle %d\n", DISK_GETINDEX(romp)));
-			add_disk_handle(romdata->machine(), &chd);
+			romdata->machine().romload_data->chd_list.append(*global_alloc(open_chd(regiontag, *origfile, *origchd, difffile, diffchd)));
 		}
 	}
 }
@@ -1502,7 +1499,7 @@ static void process_region_list(rom_load_data *romdata)
 				process_rom_entries(romdata, (source->shortname()!=NULL) ? source->shortname() : NULL, region, region + 1);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
-				process_disk_entries(romdata, ROMREGION_GETTAG(region), region, region + 1, NULL);
+				process_disk_entries(romdata, regiontag, region, region + 1, NULL);
 		}
 
 	/* now go back and post-process all the regions */
@@ -1539,8 +1536,7 @@ void rom_init(running_machine &machine)
 	count_roms(romdata);
 
 	/* reset the disk list */
-	romdata->chd_list = NULL;
-	romdata->chd_list_tailptr = &machine.romload_data->chd_list;
+	romdata->chd_list.reset();
 
 	/* process the ROM entries we were passed */
 	process_region_list(romdata);
@@ -1556,20 +1552,6 @@ void rom_init(running_machine &machine)
 
 static void rom_exit(running_machine &machine)
 {
-	open_chd *curchd;
-
-	/* close all hard drives */
-	for (curchd = machine.romload_data->chd_list; curchd != NULL; curchd = curchd->next)
-	{
-		if (curchd->diffchd != NULL)
-			chd_close(curchd->diffchd);
-		if (curchd->difffile != NULL)
-			global_free(curchd->difffile);
-		if (curchd->origchd != NULL)
-			chd_close(curchd->origchd);
-		if (curchd->origfile != NULL)
-			global_free(curchd->origfile);
-	}
 }
 
 

@@ -204,7 +204,7 @@ private:
 // ----- debugging helpers -----
 
 // assert if any pixels in the given bitmap contain an invalid palette index
-void video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bitmap);
+bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bitmap);
 
 
 #endif	/* __VIDEO_H__ */

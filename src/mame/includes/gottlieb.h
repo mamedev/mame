@@ -86,4 +86,4 @@ extern WRITE8_HANDLER( gottlieb_paletteram_w );
 
 VIDEO_START( gottlieb );
 VIDEO_START( screwloo );
-SCREEN_UPDATE_IND16( gottlieb );
+SCREEN_UPDATE_RGB32( gottlieb );

@@ -1281,20 +1281,23 @@ void video_manager::record_frame()
     invalid palette index
 -------------------------------------------------*/
 
-void video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bitmap)
+bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bitmap)
 {
 #ifdef MAME_DEBUG
-	int maxindex = palette_get_max_index(machine.palette);
-	int x, y;
-
 	// iterate over rows
-	for (y = 0; y < bitmap.height(); y++)
+	int maxindex = palette_get_max_index(machine.palette);
+	for (int y = 0; y < bitmap.height(); y++)
 	{
 		UINT16 *rowbase = &bitmap.pix16(y);
-		for (x = 0; x < bitmap.width(); x++)
-			assert(rowbase[x] < maxindex);
+		for (int x = 0; x < bitmap.width(); x++)
+			if (rowbase[x] > maxindex)
+			{
+				osd_break_into_debugger("Out of range pixel");
+				return true;
+			}
 	}
 #endif
+	return false;
 }
 
 

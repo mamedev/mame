@@ -1884,13 +1884,11 @@ static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(laserdisc_audio_process), device))
 	MCFG_LASERDISC_OVERLAY_STATIC(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	/* right channel is processed as data */
 
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-
-	MCFG_SOUND_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	/* right channel is processed as data */
 MACHINE_CONFIG_END
 
 
@@ -1936,13 +1934,11 @@ static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(laserdisc_audio_process), device))
 	MCFG_LASERDISC_OVERLAY_STATIC(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	/* right channel is processed as data */
 
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-
-	MCFG_SOUND_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	/* right channel is processed as data */
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("dac1")
