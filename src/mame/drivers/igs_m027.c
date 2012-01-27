@@ -30,7 +30,7 @@ public:
 	UINT32 *m_igs_cg_videoram;
 	UINT32 *m_igs_tx_videoram;
 	UINT32 *m_igs_bg_videoram;
-	UINT32 *m_igs_pallete32;
+	UINT32 *m_igs_palette32;
 	tilemap_t *m_igs_tx_tilemap;
 	tilemap_t *m_igs_bg_tilemap;
 };
@@ -42,7 +42,7 @@ public:
     Video
 
     0x38001000, 0x380017ff          CG_CONTROL,8 byte per object, 0x100 in total
-    0x38001800, 0x380019ff      PALLETE RAM,2 byte per color, 0x100 in total
+    0x38001800, 0x380019ff      PALETTE RAM,2 byte per color, 0x100 in total
     0x38004000, 0x38005FFF      TX Video RAM????????1E00??????512x240??????
     0x38006000, 0x38007FFF      BG Video RAM????????1E00??????512x240??????
 
@@ -138,16 +138,16 @@ static TILE_GET_INFO( get_bg_tilemap_tile_info )
 }
 
 
-/* Pallete Layer */
-static WRITE32_HANDLER( igs_pallete32_w )
+/* Palette Layer */
+static WRITE32_HANDLER( igs_palette32_w )
 {
 	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
-	space->machine().generic.paletteram.u16=(UINT16 *)state->m_igs_pallete32;
-	COMBINE_DATA(&state->m_igs_pallete32[offset]);
+	space->machine().generic.paletteram.u16=(UINT16 *)state->m_igs_palette32;
+	COMBINE_DATA(&state->m_igs_palette32[offset]);
 	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2,space->machine().generic.paletteram.u16[offset*2],0);
 	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2+1,space->machine().generic.paletteram.u16[offset*2+1],0);
 	//if(data!=0)
-	//fprintf(stdout,"PALLETE RAM OFFSET %x ,data %x!\n",offset ,state->m_igs_pallete32[offset]);
+	//fprintf(stdout,"PALETTE RAM OFFSET %x ,data %x!\n",offset ,state->m_igs_palette32[offset]);
 }
 
 
@@ -197,8 +197,8 @@ static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_BASE_MEMBER(igs_m027_state, m_igs_mainram)// main ram for asic?
 	AM_RANGE(0x18000000, 0x18007fff) AM_RAM
 
-	AM_RANGE(0x38001000, 0x380017ff) AM_RAM_WRITE(igs_cg_videoram_w) AM_BASE_MEMBER(igs_m027_state, m_igs_cg_videoram)		//0x200 * 1   CG PALLETE?
-	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_WRITE(igs_pallete32_w) AM_BASE_MEMBER(igs_m027_state, m_igs_pallete32)		//0x200 * 1
+	AM_RANGE(0x38001000, 0x380017ff) AM_RAM_WRITE(igs_cg_videoram_w) AM_BASE_MEMBER(igs_m027_state, m_igs_cg_videoram)		//0x200 * 1   CG PALETTE?
+	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_WRITE(igs_palette32_w) AM_BASE_MEMBER(igs_m027_state, m_igs_palette32)		//0x200 * 1
 
 	AM_RANGE(0x38004000, 0x38005FFF) AM_RAM_WRITE(igs_tx_videoram_w) AM_BASE_MEMBER(igs_m027_state, m_igs_tx_videoram) /* Text Layer */
 	AM_RANGE(0x38006000, 0x38007FFF) AM_RAM_WRITE(igs_bg_videoram_w) AM_BASE_MEMBER(igs_m027_state, m_igs_bg_videoram) /* CG Layer */

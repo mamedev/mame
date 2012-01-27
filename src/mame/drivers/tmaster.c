@@ -81,7 +81,7 @@ Chips:
  Video: XC3042A (Sigma Xilinx FPGA gate array)
  Sound: OKI M6295
    OSC: 32MHz, 24MHz & 8.664MHz
- Other: SCN68681C1N40 (Serial controler chip)
+ Other: SCN68681C1N40 (Serial controller chip)
         DALLAS DS1225AB-85 Nonvolatile SRAM
         DALLAS DS1204V (used for security)
         DALLAS DS1232 (MicroMonitor Chip)

@@ -196,7 +196,7 @@ Notes:
                                    including video output. For example, if the harness is connected backwards, this chip blows and kills
                                    the PCB. Even manually resetting the 68000's cannot restart the PCB, and it just shows a wavey pattern
                                    on screen.
-                       TC0110PCR - Pallete Generator
+                       TC0110PCR - Palette Generator
                        TC0100SCN - Tilemap Generator
                        TC0150ROD - Road Generator
                        TC0050VDZ - \ Motion Object Generator Combo?

@@ -399,7 +399,7 @@ static WRITE8_HANDLER( pacman_interrupt_vector_w )
 
 
 /*
-   The piranha board has a sync bus controler card similar to Midway's pacman. It
+   The piranha board has a sync bus controller card similar to Midway's pacman. It
    stores the LSB of the interrupt vector using port 00 but it alters the byte to prevent
    it from running on normal pacman hardware and vice versa. I wrote a program to print
    out the even numbers and the vectors they convert to.  Thanks to Dave France for

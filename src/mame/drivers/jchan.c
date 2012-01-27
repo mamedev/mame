@@ -17,7 +17,7 @@ jchan  : "1995/05/24 The kung-Fu Master Jackie Chan   "
 jchan2 : "1995/10/24 Fists Of Fire"
 
 
- main2sub comunication is done within $400000-$403fff (mainsub_shared_ram):
+ main2sub communication is done within $400000-$403fff (mainsub_shared_ram):
  - $403C02(W) : ]
  - $403C04(W) : ] main68k sets parameters before calling subcpu routine, when required
  - $403C06(W) : ]

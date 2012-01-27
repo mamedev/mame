@@ -84,7 +84,7 @@ Graphics: HM86171
    Sound: OKI M6295
    Other: XILINX XC9536XL (used for programable protection, connected to H2)
 
-HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC
+HM86171-120 - HMC 28 pin DIP Color Palette RAMDAC
  FM1608-120 - RAMTRON 64Kb bytewide Ferroelectric Nonvolatile RAM
    ULN2003A - 16 pin DIP Seven Darlington Arrays
        386D - JRC 386D low voltage AMP
@@ -140,7 +140,7 @@ Graphics: HM86171
    Sound: OKI M6295
    Other: XILINX XC9536XL (socketted)
 
-HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC
+HM86171-120 - HMC 28 pin DIP Color Palette RAMDAC
    ULN2003A - 16 pin DIP Seven Darlington Arrays
       51864 - V62C51864L-35P 64Kb SRAM
       75176 - SN75176BP Differential BUS Transceiver (Bidirectional data communication on multipoint bus transmission line)
@@ -234,7 +234,7 @@ Graphics: HM86171
    Sound: OKI M6295
    Other: XILINX XC9536XL (used for programable protection, connected to H2)
 
-HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC
+HM86171-120 - HMC 28 pin DIP Color Palette RAMDAC
  FM1608-120 - RAMTRON 64Kb bytewide Ferroelectric Nonvolatile RAM
    ULN2003A - 16 pin DIP Seven Darlington Arrays
       75176 - SN75176BP Differential BUS Transceiver (Bidirectional data communication on multipoint bus transmission line)
@@ -252,7 +252,7 @@ ROM  2 is a AMIC 290021T
 
 --------------------------------------------------------------------
 
-MH86171 Color Pallete RAMDAC
+MH86171 Color Palette RAMDAC
  Hardware & software compatible with VGA, MCGA & 8514/A graphics
  Compatible with the RS170 video stadard
  Single monolithic, high performance CMOS

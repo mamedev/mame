@@ -72,7 +72,7 @@ TODO :  This is a partially working driver.  Most of the memory maps for
                Might this be a HW blank bit so things look clean when
                the i860's do their updates?
                The two other times I see it read are just before
-               and after one of the pallette setups is done.
+               and after one of the palette setups is done.
          0x600018: ? No info yet.
          0x704000: (VC only) Likely analog axis for VR headset
          0x703000: (VC only) Likely analog axis for VR headset

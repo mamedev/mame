@@ -44,7 +44,7 @@ RP2C04-0003:
 - Goonies
 - Soccer
 - T.K.O. Boxing *
-  (Manual states this is an RP2C04-0004 - though the pallete doesn't agree)
+  (Manual states this is an RP2C04-0004 - though the palette doesn't agree)
 
 RP2C04-0004:
 - Clu Clu Land

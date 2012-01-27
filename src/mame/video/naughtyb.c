@@ -119,7 +119,7 @@ WRITE8_HANDLER( naughtyb_videoreg_w )
 	state->m_cocktail =
 		( ( input_port_read(space->machine(), "DSW0") & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
-	state->m_palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
+	state->m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
 	state->m_bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
 }
 
@@ -132,7 +132,7 @@ WRITE8_HANDLER( popflame_videoreg_w )
 	state->m_cocktail =
 		( ( input_port_read(space->machine(), "DSW0") & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
-	state->m_palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
+	state->m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
 	state->m_bankreg = (data >> 3) & 0x01;			// banksel is just bit 3
 }
 

@@ -216,6 +216,6 @@ SCREEN_UPDATE_IND16( daikaiju )
 	bitmap.fill(511, cliprect);
 	drawbg(screen.machine(), bitmap, cliprect, 0); // bottom
 	draw_sprites(screen.machine(), bitmap, cliprect);
-	drawbg(screen.machine(), bitmap, cliprect, 1);	// top = pallete $d ?
+	drawbg(screen.machine(), bitmap, cliprect, 1);	// top = palette $d ?
 	return 0;
 }

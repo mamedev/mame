@@ -4,7 +4,7 @@
 
  TODO:
  Needs to be tilemapped. The background layer and sprite layer are identical to spdodgeb, except for the
-  back-switched graphics roms and the size of the pallete banks.
+  back-switched graphics roms and the size of the palette banks.
 
  03/28/03 - Additions by Steve Ellenoff
  ---------------------------------------
