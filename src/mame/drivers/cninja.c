@@ -153,16 +153,16 @@ static READ16_HANDLER( robocop2_prot_r )
 static WRITE16_HANDLER( cninja_pf12_control_w )
 {
 	cninja_state *state = space->machine().driver_data<cninja_state>();
-	deco16ic_pf_control_w(state->m_deco_tilegen1, offset, data, mem_mask);
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+	deco16ic_pf_control_w(state->m_deco_tilegen1, offset, data, mem_mask);
 }
 
 
 static WRITE16_HANDLER( cninja_pf34_control_w )
 {
 	cninja_state *state = space->machine().driver_data<cninja_state>();
-	deco16ic_pf_control_w(state->m_deco_tilegen2, offset, data, mem_mask);
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+	deco16ic_pf_control_w(state->m_deco_tilegen2, offset, data, mem_mask);
 }
 
 
