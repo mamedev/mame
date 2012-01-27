@@ -768,6 +768,9 @@ inline device_t *device_t::siblingdevice(const char *tag) const
 	// empty string or NULL means this device
 	if (tag == NULL || *tag == 0)
 		return const_cast<device_t *>(this);
+	
+	// leading caret implies the owner, just skip it
+	if (tag[0] == '^') tag++;
 
 	// query relative to the parent
 	return (m_owner != NULL) ? m_owner->subdevice(tag) : NULL;
