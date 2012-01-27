@@ -1236,11 +1236,11 @@ static INPUT_PORTS_START( cuebrick )
 	PORT_DIPNAME( 0x18, 0x08, "Machine Name" ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "Lewis" )
-	PORT_DIPSETTING(    0x08, "Johnson" ) // Japan factory default = "Johnson"
+	PORT_DIPSETTING(    0x08, "Johnson" )
 	PORT_DIPSETTING(    0x00, "George" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
@@ -1282,19 +1282,19 @@ static INPUT_PORTS_START( mia )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" ) // US and Japan factory default = "3"
+	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
 	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "30K, Every 80K" ) // Japan factory default = "30K, Every 80K"
+	PORT_DIPSETTING(    0x18, "30K, Every 80K" )	// Japan factory default
 	PORT_DIPSETTING(    0x10, "50K, Every 100K" )
-	PORT_DIPSETTING(    0x08, "50K Only" ) // US factory default = "50K Only" (struck off "50K, Every 100K")
+	PORT_DIPSETTING(    0x08, "50K Only" )			// US factory default
 	PORT_DIPSETTING(    0x00, "100K Only" )
 	PORT_DIPNAME( 0x60, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
-	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) ) // US factory default = "Difficult" (struck off "Normal")
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )		// Japan factory default
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )	// US factory default
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -1304,9 +1304,9 @@ static INPUT_PORTS_START( mia )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "VRAM Character Check" ) PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) ) // US manual says "VRAM Character Check"
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )  // Japanese manual says "not used"
+	PORT_DIPNAME( 0x02, 0x02, "VRAM Character Check" ) PORT_DIPLOCATION("SW3:2") // JP manual says "not used"
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW3:4" )
 INPUT_PORTS_END
@@ -1423,7 +1423,7 @@ static INPUT_PORTS_START( tmnt2p )
 	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" ) // ditto
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // US and Japan factory default = "Normal"
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
@@ -1447,13 +1447,13 @@ static INPUT_PORTS_START( punkshtj ) // Japan 2 Players
 	PORT_DIPUNUSED_DIPLOC( 0x0200, IP_ACTIVE_LOW, "SW2:2" ) // manual says "not used", but doesn't "should be kept OFF"
 	PORT_DIPNAME( 0x0c00, 0x0800, "Period Length" ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0c00, "1 Minutes" )
-	PORT_DIPSETTING(      0x0800, "2 Minutes" ) // Japan factory default = "2 Minutes"
+	PORT_DIPSETTING(      0x0800, "2 Minutes" )
 	PORT_DIPSETTING(      0x0400, "3 Minutes" )
 	PORT_DIPSETTING(      0x0000, "4 Minutes" )
 	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW2:5" ) // manual says "not used", but doesn't "should be kept OFF"
 	PORT_DIPNAME( 0x6000, 0x4000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) ) // Japan factory default = "Normal"
+	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
@@ -1544,72 +1544,21 @@ static INPUT_PORTS_START( punkshot ) // US 4 Players set1
 
 	PORT_MODIFY("DSW1/DSW2")
 	PORT_DIPNAME( 0x0300, 0x0300, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0300, "30" ) // US set1 factory default = "30"
+	PORT_DIPSETTING(      0x0300, "30" )
 	PORT_DIPSETTING(      0x0200, "40" )
 	PORT_DIPSETTING(      0x0100, "50" )
 	PORT_DIPSETTING(      0x0000, "60" )
 	PORT_DIPNAME( 0x0c00, 0x0800, "Period Length" ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0c00, "2 Minutes" )
-	PORT_DIPSETTING(      0x0800, "3 Minutes" ) // US set1 factory default = "3 Minutes"
+	PORT_DIPSETTING(      0x0800, "3 Minutes" )
 	PORT_DIPSETTING(      0x0400, "4 Minutes" )
 	PORT_DIPSETTING(      0x0000, "5 Minutes" )
 	PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
-	PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) ) // US factory default = "Easy"
+	PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
 INPUT_PORTS_END
-
-/*
-static INPUT_PORTS_START( punkshot2o ) // US 2 Players set1
-    PORT_INCLUDE( punkshtj )
-    PORT_INCLUDE( punksht_us_coinage )
-
-    PORT_MODIFY("DSW1/DSW2")
-    PORT_DIPNAME( 0x0300, 0x0300, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
-    PORT_DIPSETTING(      0x0300, "30" ) // US set1 factory default = "30"
-    PORT_DIPSETTING(      0x0200, "40" )
-    PORT_DIPSETTING(      0x0100, "50" )
-    PORT_DIPSETTING(      0x0000, "60" )
-    PORT_DIPNAME( 0x0c00, 0x0800, "Period Length" ) PORT_DIPLOCATION("SW2:3,4")
-    PORT_DIPSETTING(      0x0c00, "2 Minutes" )
-    PORT_DIPSETTING(      0x0800, "3 Minutes" ) // US set1 factory default = "3 Minutes"
-    PORT_DIPSETTING(      0x0400, "4 Minutes" )
-    PORT_DIPSETTING(      0x0000, "5 Minutes" )
-    PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
-    PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) ) // US set1 factory default = "Easy"
-    PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Difficult ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
-INPUT_PORTS_END
-*/
-
-/*
-static INPUT_PORTS_START( punksht4n ) // US 4 Players set2
-    PORT_INCLUDE( punkshtj4 )
-    PORT_INCLUDE( punksht_us_coinage )
-
-    PORT_MODIFY("DSW1/DSW2")
-    PORT_DIPNAME( 0x0300, 0x0300, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
-    PORT_DIPSETTING(      0x0300, "40" )
-    PORT_DIPSETTING(      0x0200, "50" )
-    PORT_DIPSETTING(      0x0100, "60" )
-    PORT_DIPSETTING(      0x0000, "70" )
-    PORT_DIPNAME( 0x0c00, 0x0c00, "Period Length" ) PORT_DIPLOCATION("SW2:3,4")
-    PORT_DIPSETTING(      0x0c00, "3 Minutes" )
-    PORT_DIPSETTING(      0x0800, "4 Minutes" )
-    PORT_DIPSETTING(      0x0400, "5 Minutes" )
-    PORT_DIPSETTING(      0x0000, "6 Minutes" )
-    PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
-    PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Difficult ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
-    PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
-*/
 
 static INPUT_PORTS_START( punksht2 ) // US 2 Players set2
 	PORT_INCLUDE( punkshtj )
@@ -1660,18 +1609,18 @@ static INPUT_PORTS_START( lgtnfght )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" ) // US and Japan factory default = "3"
+	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" ) // manual says "not used"
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "100K, 400K" ) // US factory default = "100K, 400K"
-	PORT_DIPSETTING(    0x10, "150K, 500K" ) // Japan factory default = "150K, 500K"
+	PORT_DIPSETTING(    0x18, "100K, 400K" )
+	PORT_DIPSETTING(    0x10, "150K, 500K" )
 	PORT_DIPSETTING(    0x08, "200K Only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // US and Japan factory default = "Normal"
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
@@ -1695,8 +1644,8 @@ static INPUT_PORTS_START( trigon )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "100K, 400K" ) // US factory default = "100K, 400K"
-	PORT_DIPSETTING(    0x10, "150K, 500K" ) // Japan factory default = "150K, 500K"
+	PORT_DIPSETTING(    0x18, "100K, 400K" ) // US factory default
+	PORT_DIPSETTING(    0x10, "150K, 500K" ) // JP factory default
 	PORT_DIPSETTING(    0x08, "200K Only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
@@ -1748,7 +1697,7 @@ static INPUT_PORTS_START( glfgreat )
 	PORT_DIPSETTING(      0x0000, "3/5" )
 	PORT_DIPNAME( 0x6000, 0x4000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(      0x6000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) ) // Japan factory default = "Normal"
+	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
@@ -1797,7 +1746,7 @@ static INPUT_PORTS_START( glfgreatj )
 	PORT_DIPSETTING(      0x0000, "4/4" ) // Cocktail (P1&P2 <-> P3&P4)
 	PORT_DIPNAME( 0x1800, 0x1000, "Initial/Maximum Credit" ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(      0x1800, "2/2" )
-	PORT_DIPSETTING(      0x1000, "2/3" ) // Japan factory default = "Maximum 3"
+	PORT_DIPSETTING(      0x1000, "2/3" )
 	PORT_DIPSETTING(      0x0800, "2/4" )
 	PORT_DIPSETTING(      0x0000, "2/5" )
 
