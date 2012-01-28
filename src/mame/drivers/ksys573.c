@@ -461,7 +461,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 	}
 }
 
-static const char *const diskregions[] = { "cdrom0", "cdrom1" };
+static const char *const diskregions[] = { ":cdrom0", ":cdrom1" };
 
 static WRITE32_HANDLER( mb89371_w )
 {
