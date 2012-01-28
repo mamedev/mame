@@ -1174,6 +1174,8 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 	int nobj, i, j, k, l, temp, temp1, temp2, temp3, temp4, count;
 	int order, offs, code, color, zcode, pri = 0, spri, spri_min, shdprisel, shadow, alpha, drawmode;
 
+    // buffer can move when it's resized, so refresh the pointer
+	gx_objzbuf = &machine.priority_bitmap.pix8(0);
 
 	// abort if object database failed to initialize
 	objpool = gx_objpool;
