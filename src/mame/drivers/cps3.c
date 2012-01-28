@@ -2317,7 +2317,7 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 static const SCSIConfigTable dev_table =
 {
 	1,                                      /* 1 SCSI device */
-	{ { SCSI_ID_1, "cdrom", SCSI_DEVICE_CDROM } } /* SCSI ID 2, using CD 0, and it's a CD-ROM */
+	{ { SCSI_ID_1, ":cdrom", SCSI_DEVICE_CDROM } } /* SCSI ID 2, using CD 0, and it's a CD-ROM */
 };
 
 static const struct WD33C93interface scsi_intf =
