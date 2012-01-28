@@ -1,11 +1,17 @@
 /* Data East Sprite Chip
    DECO 52
 
-   note, we have pri callbacks and checks to drop back to plain drawgfx because not all drivers are using pdrawgfx yet, they probably should be...
-   some games have different visible areas, but are confirmed as the same sprite chip.
+   This is a flexible implementation of the Data East Spite chip 52 emulation, used in a large number of drivers.
 
-   games with alpha aren't supported here yet, in most cases they need better mixing anyway, probably rendering to screen buffers and manual mixing.
-   see m_sprite_bitmap... (note, if using that you must also use BITMAP_FORMAT_RGB32 in the machine config)
+   Both list formats are supported (how is this selected on HW, external pin?)
+
+   Support for rendering to a raw indexed 16-bitmap is available allowing you to do complex mixing, which is required
+   if a game uses alpha blending at the mixing stage.
+
+   Basic callbacks priority and colour are supported for use with pdrawgfx if render-to-bitmap mode isn't being used.
+
+   There is also a very simply 'drawgfx' path for games where the sprites are only of one priority level.
+
 
    used by:
 
@@ -24,17 +30,19 @@
    cninja.c
    lemmings.c
    deco32.c
+   rohga.c
 
-   partially converted:
- 
-   difficult to convert:
-   rohga.c - complex video mixing, 6bpp gfx..
+
+   to convert:
+
    dassault.c - complex video mixing
    boogwing.c - complex video mixing
 
    notes:
    does the chip natively support 5bpp (tattass / nslasher) in hw, or is it done with doubled up chips?
    the information in deco_tilegen1 lists 3x sprite chips on those games, but there are only 2 spritelists.
+
+   likewise Rohga appears to have 2x DECO52 for 1 list of 6bpp gfx.
 
 */
 
@@ -116,6 +124,10 @@ todo: basic blend mixing
 #include "emu.h"
 #include "decospr.h"
 
+UINT16 decospr_default_colour_callback(UINT16 col)
+{
+	return (col >> 9) & 0x1f;
+}
 
 void decospr_device::set_gfx_region(device_t &device, int gfxregion)
 {
@@ -128,7 +140,12 @@ void decospr_device::set_pri_callback(device_t &device, decospr_priority_callbac
 {
 	decospr_device &dev = downcast<decospr_device &>(device);
 	dev.m_pricallback = callback;
-//  printf("decospr_device::set_pri_callback()\n");
+}
+
+void decospr_device::set_col_callback(device_t &device, decospr_colour_callback_func callback)
+{
+	decospr_device &dev = downcast<decospr_device &>(device);
+	dev.m_colcallback = callback;
 }
 
 
@@ -137,7 +154,8 @@ const device_type DECO_SPRITE = &device_creator<decospr_device>;
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_SPRITE, "decospr_device", tag, owner, clock),
 	  m_gfxregion(0),
-	  m_pricallback(NULL)
+	  m_pricallback(NULL),
+	  m_colcallback(decospr_default_colour_callback)
 {
 }
 
@@ -173,6 +191,10 @@ void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
 	m_pricallback = callback;
 }
 
+void decospr_device::set_col_callback(decospr_priority_callback_func callback)
+{
+	m_colcallback = callback;
+}
 
 
 template<class _BitmapClass>
@@ -227,7 +249,9 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 				x = spriteram[offs + 2];
 
 				if (!m_sprite_bitmap.valid())
-					colour = (x >> 9) & 0x1f;
+				{
+					colour = m_colcallback(x);
+				}
 				else
 				{
 					colour = (x >> 9) & 0x7f;

@@ -1,5 +1,6 @@
 
 typedef UINT16 (*decospr_priority_callback_func)(UINT16 pri);
+typedef UINT16 (*decospr_colour_callback_func)(UINT16 col);
 
 class decospr_device : public device_t
 {
@@ -7,10 +8,12 @@ public:
 	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	static void set_gfx_region(device_t &device, int gfxregion);
 	static void set_pri_callback(device_t &device, decospr_priority_callback_func callback);
+	static void set_col_callback(device_t &device, decospr_colour_callback_func callback);
 	//void decospr_sprite_kludge(int x, int y);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip = false );
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip = false );
 	void set_pri_callback(decospr_priority_callback_func callback);
+	void set_col_callback(decospr_colour_callback_func callback);
 	void set_gfxregion(int region) { m_gfxregion = region; };
 	void set_alt_format(bool alt) { m_alt_format = alt; };
 	void set_pix_mix_mask(UINT16 mask) { m_pixmask = mask; };
@@ -24,6 +27,7 @@ protected:
 	virtual void device_reset();
 	UINT8						m_gfxregion;
 	decospr_priority_callback_func m_pricallback;
+	decospr_colour_callback_func m_colcallback;
 	bitmap_ind16 m_sprite_bitmap;// optional sprite bitmap (should be INDEXED16)
 	bool m_alt_format;
 	UINT16 m_pixmask;

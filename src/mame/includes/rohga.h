@@ -45,9 +45,14 @@ public:
 WRITE16_HANDLER( rohga_buffer_spriteram16_w );
 
 VIDEO_START( rohga );
+VIDEO_START( schmeisr );
 VIDEO_START( wizdfire );
 
+
 SCREEN_UPDATE_IND16( rohga );
-SCREEN_UPDATE_IND16( schmeisr );
 SCREEN_UPDATE_RGB32( wizdfire );
 SCREEN_UPDATE_RGB32( nitrobal );
+
+UINT16 rohga_pri_callback(UINT16 x);
+UINT16 schmeisr_col_callback(UINT16 x);
+UINT16 rohga_col_callback(UINT16 x);

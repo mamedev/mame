@@ -664,10 +664,9 @@ static const gfx_layout spritelayout_6bpp =
 	4096*8,
 	6,
 	{ 0x400000*8+8, 0x400000*8, 0x200000*8+8, 0x200000*8, 8, 0 },
-	{ 7,6,5,4,3,2,1,0,
-	32*8+7, 32*8+6, 32*8+5, 32*8+4, 32*8+3, 32*8+2, 32*8+1, 32*8+0 },
-	{ 15*16, 14*16, 13*16, 12*16, 11*16, 10*16, 9*16, 8*16,
-			7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 },
+	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7, 0,1,2,3,4,5,6,7 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
 	64*8
 };
 
@@ -677,10 +676,9 @@ static const gfx_layout spritelayout2 =
 	4096*8,
 	4,
 	{ 0x200000*8+8, 0x200000*8, 8, 0 },
-	{ 7,6,5,4,3,2,1,0,
-	32*8+7, 32*8+6, 32*8+5, 32*8+4, 32*8+3, 32*8+2, 32*8+1, 32*8+0 },
-	{ 15*16, 14*16, 13*16, 12*16, 11*16, 10*16, 9*16, 8*16,
-			7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 },
+	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7, 0,1,2,3,4,5,6,7 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
 	64*8
 };
 
@@ -830,6 +828,9 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -971,17 +972,21 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(schmeisr)
+	MCFG_SCREEN_UPDATE_STATIC(rohga)
 
 	MCFG_GFXDECODE(schmeisr)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_START(rohga)
+	MCFG_VIDEO_START(schmeisr)
 
 	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
 
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
+
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -23,95 +23,50 @@ VIDEO_START( rohga )
 	rohga_state *state = machine.driver_data<rohga_state>();
 	state->m_spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
 	state->save_pointer(NAME(state->m_spriteram), 0x800/2);
+	machine.device<decospr_device>("spritegen1")->set_col_callback(rohga_col_callback);
+	machine.device<decospr_device>("spritegen1")->set_pri_callback(rohga_pri_callback);
 }
 
-/******************************************************************************/
-
-static void rohga_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT16 *spriteptr, int is_schmeisr )
+VIDEO_START( schmeisr )
 {
-	int offs;
-
-	for (offs = 0x400 - 4; offs >= 0; offs -= 4)
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult, pri = 0;
-		sprite = spriteptr[offs + 1];
-		if (!sprite)
-			continue;
-
-		x = spriteptr[offs + 2];
-
-		/* Sprite/playfield priority */
-		switch (x & 0x6000)
-		{
-		case 0x0000: pri = 0; break;
-		case 0x4000: pri = 0xf0; break;
-		case 0x6000: pri = 0xf0 | 0xcc; break;
-		case 0x2000: pri = 0;//0xf0|0xcc; break; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
-		}
-
-		y = spriteptr[offs];
-		flash = y & 0x1000;
-		if (flash && (machine.primary_screen->frame_number() & 1))
-			continue;
-
-		// Sprite colour is different between Rohga (6bpp) and Schmeisr (4bpp plus wire mods on pcb)
-		if (is_schmeisr)
-		{
-			colour = ((x >> 9) & 0xf) << 2;
-			if (x & 0x8000)
-				colour++;
-		}
-		else
-		{
-			colour = (x >> 9) & 0xf;
-		}
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (flip_screen_get(machine))
-		{
-			x = 304 - x;
-			y = 240 - y;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = -16;
-		}
-		else
-			mult = +16;
-
-		while (multi >= 0)
-		{
-			pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					machine.priority_bitmap,pri,0);
-
-			multi--;
-		}
-	}
+	VIDEO_START_CALL( rohga );
+	// wire mods on pcb..
+	machine.device<decospr_device>("spritegen1")->set_col_callback(schmeisr_col_callback);
 }
+
+
+UINT16 rohga_pri_callback(UINT16 x)
+{
+	switch (x & 0x6000)
+	{
+		case 0x0000: return 0;
+		case 0x4000: return 0xf0;
+		case 0x6000: return 0xf0 | 0xcc;
+		case 0x2000: return 0;//0xf0|0xcc; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
+	}
+
+	return 0;
+}
+
+UINT16 schmeisr_col_callback(UINT16 x)
+{
+	UINT16 colour = ((x >> 9) & 0xf) << 2;
+	if (x & 0x8000)
+		colour++;
+
+	return colour;
+}
+
+UINT16 rohga_col_callback(UINT16 x)
+{
+	return (x >> 9) & 0xf;
+}
+
+
 
 /******************************************************************************/
 
-static void update_rohga( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int is_schmeisr )
+SCREEN_UPDATE_IND16( rohga )
 {
 	rohga_state *state = screen.machine().driver_data<rohga_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
@@ -154,23 +109,13 @@ static void update_rohga( screen_device &screen, bitmap_ind16 &bitmap, const rec
 		break;
 	}
 
-	rohga_draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram, is_schmeisr);
+	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400, true);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
-}
 
-SCREEN_UPDATE_IND16( rohga )
-{
-	update_rohga(screen, bitmap, cliprect, 0);
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( schmeisr )
-{
-	// The Schmeisr pcb has wire mods which seem to remap sprite palette indices.
-	// Otherwise video update is the same as Rohga.
-	update_rohga(screen, bitmap, cliprect, 1);
-	return 0;
-}
+
 
 VIDEO_START(wizdfire)
 {
@@ -179,7 +124,7 @@ VIDEO_START(wizdfire)
 }
 
 // not amazingly efficient, called multiple times to pull a layer out of the sprite bitmaps, but keeps correct sprite<->sprite priorities
-static void mixwizdfirelayer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mode, int gfxregion)
+static void mixwizdfirelayer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask)
 {
 	int y, x;
 	const pen_t *paldata = machine.pens;
@@ -209,27 +154,9 @@ static void mixwizdfirelayer(running_machine &machine, bitmap_rgb32 &bitmap, con
 		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			UINT16 pix = srcline[x];
-			switch (mode)
-			{
-			case 4:
-				if ((pix & 0x600) != 0x600)
-					continue;
-				break;
-			case 3:
-				if ((pix & 0x600) != 0x400)
-					continue;
-				break;
-			case 2:
-				if ((pix & 0x400) != 0x400)
-					continue;
-				break;
-			case 1:
-			case 0:
-			default:
-				if ((pix & 0x400) != 0x000)
-					continue;
-				break;
-			}
+
+			if ((pix & primask) != pri)
+				continue;
 
 			if (pix&0xf)
 			{
@@ -278,18 +205,18 @@ SCREEN_UPDATE_RGB32( wizdfire )
 	bitmap.fill(screen.machine().pens[512], cliprect);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 4,3);
+	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 3, 0x600,0x600); 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 3,3);
+	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 3, 0x400,0x600);
 
 	if ((priority & 0x1f) == 0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 0);
 	else
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
 
-	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 0,3);
-	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 2,4);
-	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 1,4);
+	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 3, 0x000,0x400); // 0x000 and 0x200 of 0x600
+
+	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 4, 0x000, 0x000);
 
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
