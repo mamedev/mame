@@ -86,7 +86,7 @@ public:
 	static void static_set_pin7(device_t &device, int pin7);
 
 	// runtime configuration
-	void set_bank_base(offs_t base);
+	void set_bank_base(offs_t base, bool bDontUpdateStream = false);
 	void set_pin7(int pin7);
 
 	UINT8 read_status();

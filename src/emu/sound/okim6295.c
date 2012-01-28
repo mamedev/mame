@@ -165,7 +165,7 @@ void okim6295_device::device_reset()
 
 void okim6295_device::device_post_load()
 {
-	set_bank_base(m_bank_offs);
+	set_bank_base(m_bank_offs, true);
 	device_clock_changed();
 }
 
@@ -214,10 +214,13 @@ void okim6295_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 //  assumes multiple 256k banks
 //-------------------------------------------------
 
-void okim6295_device::set_bank_base(offs_t base)
+void okim6295_device::set_bank_base(offs_t base, bool bDontUpdateStream)
 {
-	// flush out anything pending
-	m_stream->update();
+	// flush out anything pending (but not on e.g. a state load)
+    if (!bDontUpdateStream)
+    {
+        m_stream->update();
+    }
 
 	// if we are setting a non-zero base, and we have no bank, allocate one
 	if (!m_bank_installed && base != 0)
