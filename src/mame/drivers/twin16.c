@@ -311,7 +311,7 @@ static INPUT_PORTS_START( devilw )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")	/* 0xa0003 */
-	KONAMI8_B123_UNK(1)				// button1 = start/powerup, button2 = attack, button3 = jump
+	KONAMI8_B123_UNK(1)	// button1 = start/powerup, button2 = attack, button3 = jump
 
 	PORT_START("P2")	/* 0xa0005 */
 	KONAMI8_B123_UNK(2)
@@ -326,7 +326,7 @@ static INPUT_PORTS_START( devilw )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" ) // Japan factory default = "3"
+	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
@@ -334,7 +334,7 @@ static INPUT_PORTS_START( devilw )
 	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
@@ -363,7 +363,7 @@ static INPUT_PORTS_START( darkadv )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )
 
 	PORT_START("P1")	/* 0xa0003 */
-	KONAMI8_B123(1)					// button1 = start/jump, button2 = attack, button3 = dynamite
+	KONAMI8_B123(1)		// button1 = start/jump, button2 = attack, button3 = dynamite
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE3 )
 
 	PORT_START("P2")	/* 0xa0005 */
@@ -435,7 +435,7 @@ static INPUT_PORTS_START( vulcan )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")	/* 0xa0003 */
-	KONAMI8_B123_UNK(1)				// button1 = powerup, button2 = shoot, button3 = missile
+	KONAMI8_B123_UNK(1)	// button1 = powerup, button2 = shoot, button3 = missile
 
 	PORT_START("P2")	/* 0xa0005 */
 	KONAMI8_B123_UNK(2)
@@ -450,20 +450,20 @@ static INPUT_PORTS_START( vulcan )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" ) // Japan factory default = "3"
+	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "20K, Every 70K" ) // Japan factory default = "20K, Every 70K"
+	PORT_DIPSETTING(    0x18, "20K, Every 70K" )
 	PORT_DIPSETTING(    0x10, "30K, Every 80K" )
 	PORT_DIPSETTING(    0x08, "20K Only" )
 	PORT_DIPSETTING(    0x00, "70K Only" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
@@ -488,7 +488,7 @@ static INPUT_PORTS_START( gradius2 )	// same as vulcan, different bonus
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR (Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "20K, Every 150K" ) // Japan factory default = "20K, Every 150K"
+	PORT_DIPSETTING(    0x18, "20K, Every 150K" )
 	PORT_DIPSETTING(    0x10, "30K, Every 200K" )
 	PORT_DIPSETTING(    0x08, "20K Only" )
 	PORT_DIPSETTING(    0x00, "70K Only" )
@@ -506,7 +506,7 @@ static INPUT_PORTS_START( fround )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")	/* 0xa0003 */
-	KONAMI8_B123_UNK(1)				// button1 = face punch, button2 = body punch, button3 = defend
+	KONAMI8_B123_UNK(1)	// button1 = face punch, button2 = body punch, button3 = defend
 
 	PORT_START("P2")	/* 0xa0005 */
 	KONAMI8_B123_UNK(2)
@@ -529,7 +529,7 @@ static INPUT_PORTS_START( fround )
 	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" ) // ditto
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // US and Japan factory default = "Normal"
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
@@ -558,7 +558,7 @@ static INPUT_PORTS_START( miaj )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")	/* 0xa0003 */
-	KONAMI8_B123_UNK(1)				// button1 = knife, button2 = weapon, button3 = choice
+	KONAMI8_B123_UNK(1)	// button1 = knife, button2 = weapon, button3 = choice
 
 	PORT_START("P2")	/* 0xa0005 */
 	KONAMI8_B123_UNK(2)
@@ -571,21 +571,21 @@ static INPUT_PORTS_START( miaj )
 	/* "Invalid" = both coin slots disabled */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" ) // US and Japan factory default = "3"
+	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "30K, Every 80K" ) // Japan factory default = "30K, Every 80K"
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "30K, Every 80K" )		// JP default
 	PORT_DIPSETTING(    0x10, "50K, Every 100K" )
-	PORT_DIPSETTING(    0x08, "50K Only" ) // US factory default = "50K Only" (struck off "50K, Every 100K")
+	PORT_DIPSETTING(    0x08, "50K Only" )				// US default
 	PORT_DIPSETTING(    0x00, "100K Only" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
-	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) ) // US factory default = "Difficult" (struck off "Normal")
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )		// JP default
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )	// US default
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -613,7 +613,7 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")	/* 0xa0003 */
-	KONAMI8_B123_UNK(1)				// button1 = move, button2 = warp, button3 = stop
+	KONAMI8_B123_UNK(1)	// button1 = move, button2 = warp, button3 = stop
 
 	PORT_START("P2")	/* 0xa0005 */
 	KONAMI8_B123_UNK(2)
@@ -634,11 +634,11 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_DIPNAME( 0x18, 0x08, "Machine Name" ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "Lewis" )
-	PORT_DIPSETTING(    0x08, "Johnson" ) // Japan factory default = "Johnson"
+	PORT_DIPSETTING(    0x08, "Johnson" )
 	PORT_DIPSETTING(    0x00, "George" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) ) // Japan factory default = "Normal"
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
@@ -654,7 +654,7 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
 	PORT_DIPNAME( 0x08, 0x08, "Stop Time" ) PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(    0x08, "200" ) // Japan factory default = "200"
+	PORT_DIPSETTING(    0x08, "200" )
 	PORT_DIPSETTING(    0x00, "150" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
