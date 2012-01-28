@@ -49,9 +49,9 @@ static void i386_load_protected_mode_segment(i386_state *cpustate, I386_SREG *se
 		limit = cpustate->gdtr.limit;
 	}
 
-	if (limit == 0 || seg->selector + 7 > limit)
-		return;
 	entry = seg->selector & ~0x7;
+	if (limit == 0 || entry + 7 > limit)
+		return;
 
 	v1 = READ32(cpustate, base + entry );
 	v2 = READ32(cpustate, base + entry + 4 );
@@ -79,10 +79,9 @@ static void i386_load_call_gate(i386_state* cpustate, I386_CALL_GATE *gate)
 		limit = cpustate->gdtr.limit;
 	}
 
-	if (limit == 0 || gate->segment + 7 > limit)
-		return;
-
 	entry = gate->segment & ~0x7;
+	if (limit == 0 || entry + 7 > limit)
+		return;
 
 	v1 = READ32(cpustate, base + entry );
 	v2 = READ32(cpustate, base + entry + 4 );
@@ -618,7 +617,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		/* segment must be interrupt gate, trap gate, or task gate */
 		if(type != 0x05 && type != 0x06 && type != 0x07 && type != 0x0e && type != 0x0f)
 		{
-			logerror("IRQ (%08x): Vector segment %04x is not an interrupt, trap or task gate.\n",cpustate->pc,segment);
+			logerror("IRQ#%i (%08x): Vector segment %04x is not an interrupt, trap or task gate.\n",irq,cpustate->pc,segment);
 			FAULT_EXP(FAULT_GP,entry+2)
 		}
 
@@ -1238,7 +1237,6 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 		if((desc.flags & 0x0004) == 0)
 		{
 			/* non-conforming */
-			SetRPL = 1;
 			if(RPL > CPL)
 			{
 				logerror("JMP: RPL %i is less than CPL %i\n",RPL,CPL);
@@ -1259,6 +1257,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				FAULT(FAULT_GP,segment & 0xfffc)
 			}
 		}
+		SetRPL = 1;
 		if((desc.flags & 0x0080) == 0)
 		{
 			logerror("JMP: Segment is not present\n");
@@ -1530,8 +1529,8 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				logerror("CALL: Code segment DPL %i is not equal to CPL %i\n",DPL,CPL);
 				FAULT(FAULT_GP,selector & ~0x03)  // #GP(selector)
 			}
-			SetRPL = 1;
 		}
+		SetRPL = 1;
 		if((desc.flags & 0x0080) == 0)
 		{
 			logerror("CALL (%08x): Code segment is not present.\n",cpustate->pc);
@@ -1660,6 +1659,11 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					logerror("CALL: Call gate: Segment DPL %i is greater than CPL %i.\n",DPL,CPL);
 					FAULT(FAULT_GP,desc.selector & ~0x03)  // #GP(selector)
 				}
+				if((desc.flags & 0x0080) == 0)
+				{
+					logerror("CALL (%08x): Code segment is not present.\n",cpustate->pc);
+					FAULT(FAULT_NP,desc.selector & ~0x03)  // #NP(selector)
+				}
 				if(DPL < CPL && (desc.flags & 0x0004) == 0)
 				{
 					I386_SREG stack;
@@ -1711,7 +1715,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					}
 					if((stack.flags & 0x0080) == 0)
 					{
-						logerror("CALL: Call gate: Stack segment is not a writable data segment\n");
+						logerror("CALL: Call gate: Stack segment is not present\n");
 						FAULT(FAULT_SS,stack.selector)  // #SS(SS selector)
 					}
 					if(operand32 != 0)
@@ -2142,16 +2146,11 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 		}
 		cpustate->CPL = newCS & 0x03;
 
-		if(operand32 == 0)
-			REG16(SP) += (8+count);
-		else
-			REG32(ESP) += (16+count);
-
 		/* Load new SS:(E)SP */
 		if(operand32 == 0)
-			REG16(SP) = newESP & 0xffff;
+			REG16(SP) = (newESP+count) & 0xffff;
 		else
-			REG32(ESP) = newESP;
+			REG32(ESP) = newESP+count;
 		cpustate->sreg[SS].selector = newSS;
 		i386_load_segment_descriptor(cpustate, SS );
 
