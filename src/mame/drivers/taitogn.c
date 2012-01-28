@@ -373,9 +373,9 @@ static void rf5c296_reg_w(ATTR_UNUSED running_machine &machine, UINT8 reg, UINT8
 			// Check for card reset
 			if (!(data & 0x40))
 			{
-				devtag_reset(machine, "card");
+				devtag_reset(machine, ":card");
 				state->m_locked = 0x1ff;
-				ide_set_gnet_readlock (machine.device("card"), 1);
+				ide_set_gnet_readlock (machine.device(":card"), 1);
 			}
 		break;
 
@@ -395,7 +395,7 @@ static WRITE32_HANDLER(rf5c296_io_w)
 	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	if(offset < 2) {
-		ide_controller32_pcmcia_w(space->machine().device("card"), offset, data, mem_mask);
+		ide_controller32_pcmcia_w(space->machine().device(":card"), offset, data, mem_mask);
 		return;
 	}
 
@@ -412,7 +412,7 @@ static READ32_HANDLER(rf5c296_io_r)
 	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	if(offset < 2)
-		return ide_controller32_pcmcia_r(space->machine().device("card"), offset, mem_mask);
+		return ide_controller32_pcmcia_r(space->machine().device(":card"), offset, mem_mask);
 
 	offset *= 4;
 
@@ -459,14 +459,14 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 			pos++;
 		} else
 			v = data;
-		chd_get_metadata(get_disk_handle(space->machine(), "card"), HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);
+		chd_get_metadata(get_disk_handle(space->machine(), ":card"), HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);
 		k = pos < 5 ? key[pos] : 0;
 		if(v == k)
 			state->m_locked &= ~(1 << pos);
 		else
 			state->m_locked |= 1 << pos;
 		if (!state->m_locked) {
-			ide_set_gnet_readlock (space->machine().device("card"), 0);
+			ide_set_gnet_readlock (space->machine().device(":card"), 0);
 		}
 	}
 }
@@ -890,8 +890,8 @@ static DRIVER_INIT( coh3002t )
 	state->m_dip_timer = machine.scheduler().timer_alloc( FUNC(dip_timer_fired), NULL );
 
 	memset(state->m_cis, 0xff, 512);
-	if (get_disk_handle(machine, "card") != NULL)
-		chd_get_metadata(get_disk_handle(machine, "card"), PCMCIA_CIS_METADATA_TAG, 0, state->m_cis, 512, 0, 0, 0);
+	if (get_disk_handle(machine, ":card") != NULL)
+		chd_get_metadata(get_disk_handle(machine, ":card"), PCMCIA_CIS_METADATA_TAG, 0, state->m_cis, 512, 0, 0, 0);
 }
 
 static DRIVER_INIT( coh3002t_mp )
@@ -908,8 +908,8 @@ static MACHINE_RESET( coh3002t )
 	state->m_locked = 0x1ff;
 	install_handlers(machine, 0);
 	state->m_control = 0;
-	devtag_reset(machine, "card");
-	ide_set_gnet_readlock(machine.device("card"), 1);
+	devtag_reset(machine, ":card");
+	ide_set_gnet_readlock(machine.device(":card"), 1);
 
 	// halt sound CPU since it has no valid program at start
 	cputag_set_input_line(machine, "mn10200",INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
