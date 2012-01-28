@@ -345,12 +345,6 @@ static TILE_GET_INFO_DEVICE( get_pf1_tile_info_b )
 			flags);
 }
 
-TIMER_DEVICE_CALLBACK( deco16_scantimer )
-{
-	int scanline = param;
-	timer.machine().primary_screen->update_partial(scanline);
-}
-
 
 /*****************************************************************************************/
 

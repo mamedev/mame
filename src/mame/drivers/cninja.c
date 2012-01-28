@@ -1076,9 +1076,6 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 
 	MCFG_TIMER_ADD("raster_timer", interrupt_gen)
 
-	// to force a partial update every line, fixes clouds in 2nd attract demo
-	MCFG_TIMER_ADD_SCANLINE("scantimer", deco16_scantimer, "screen", 0, 1)
-
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
