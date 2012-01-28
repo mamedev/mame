@@ -1596,8 +1596,8 @@ ROM_END
 
 /**************************************************************************************************************************
     Turbo Outrun (Upright version?? According to service mode dipswitch screen it's a Cockpit)
-    CPU: FD1094 (317-????)
-    GAME BD   834-6919
+    CPU: FD1094 (317-0107)
+    GAME BD   834-6919-02
      CPU BD   837-6905
      VIDEO BD 837-6906
 
@@ -1614,7 +1614,7 @@ ROM_START( toutrun3 )
 	ROM_LOAD16_BYTE( "epr-12292.116", 0x040001, 0x10000, CRC(51d98af0) SHA1(6e7115706bfafb687faa23d55d4a8c8e498a4df2) )
 
 	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(33e632ae) SHA1(9fd8bd11d0a87ec4dfc4dc386012ab7992cb2bd7) )
+	ROM_LOAD( "317-0107.key", 0x0000, 0x2000, CRC(33e632ae) SHA1(9fd8bd11d0a87ec4dfc4dc386012ab7992cb2bd7) )
 
 	ROM_REGION( 0x60000, "sub", 0 ) /* second 68000 CPU */
 	ROM_LOAD16_BYTE( "opr-12295.76", 0x000000, 0x10000, CRC(d43a3a84) SHA1(362c98f62c205b6b40b7e8a4ba107745b547b984) )
@@ -1681,7 +1681,7 @@ ROM_START( toutrun2 )
 	ROM_LOAD16_BYTE( "epr-12292.116", 0x040001, 0x10000, CRC(51d98af0) SHA1(6e7115706bfafb687faa23d55d4a8c8e498a4df2) )
 
 	ROM_REGION( 0x2000, "user1", 0 )	/* decryption key */
-	ROM_LOAD( "317-unknown-toutrun1.key", 0x0000, 0x2000, NO_DUMP )	/* FD1094 number unknown and not dumped */
+	ROM_LOAD( "317-unknown-toutrun2.key", 0x0000, 0x2000, NO_DUMP )	/* FD1094 number unknown and not dumped */
 
 	ROM_REGION( 0x60000, "sub", 0 ) /* second 68000 CPU */
 	ROM_LOAD16_BYTE( "opr-12295.76", 0x000000, 0x10000, CRC(d43a3a84) SHA1(362c98f62c205b6b40b7e8a4ba107745b547b984) )
@@ -2188,6 +2188,6 @@ GAME( 1987, shangon2, shangon, shangon,  shangon,  shangon3, ROT0,   "Sega", "Su
 GAME( 1987, shangon1, shangon, shangon,  shangon,  shangon3, ROT0,   "Sega", "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) /* bad program rom */
 GAME( 1991, shangonle,shangon, shangon,  shangon,  shangon,  ROT0,   "Sega", "Limited Edition Hang-On", 0 )
 GAMEL(1989, toutrun,  0,       outrun,   toutrun,  outrun,   ROT0,   "Sega", "Turbo Out Run (Out Run upgrade, FD1094 317-0118)", 0,           layout_outrun ) /* Cabinet determined by dipswitch settings */
-GAMEL(1989, toutrun3, toutrun, outrun,   toutrunc, outrun,   ROT0,   "Sega", "Turbo Out Run (upright, FD1094 317-unknown)", 0,                layout_outrun )
+GAMEL(1989, toutrun3, toutrun, outrun,   toutrunc, outrun,   ROT0,   "Sega", "Turbo Out Run (upright, FD1094 317-0107)", 0,                   layout_outrun )
 GAMEL(1989, toutrun2, toutrun, outrun,   toutrun,  outrun,   ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING, layout_outrun ) /* FD1094 CPU not decrypted */
 GAMEL(1989, toutrun1, toutrun, outrun,   toutrunm, outrun,   ROT0,   "Sega", "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0,            layout_outrun )
