@@ -113,6 +113,7 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/decocomn.h"
+#include "video/decospr.h"
 
 static READ16_HANDLER( rohga_irq_ack_r )
 {
@@ -707,8 +708,8 @@ static GFXDECODE_START( wizdfire )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )	/* Gfx chip 1 as 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        0, 32 )	/* Gfx chip 1 as 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,      512, 32 )  /* Gfx chip 2 as 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,   1024, 32 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,   1536, 32 )
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,   0, 32 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,   0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( schmeisr )
@@ -874,6 +875,14 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 4);
+
+	MCFG_VIDEO_START(wizdfire)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -918,6 +927,14 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", nitrobal_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", nitrobal_deco16ic_tilegen2_intf)
+
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 4);
+
+	MCFG_VIDEO_START(wizdfire)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -45,6 +45,7 @@ public:
 WRITE16_HANDLER( rohga_buffer_spriteram16_w );
 
 VIDEO_START( rohga );
+VIDEO_START( wizdfire );
 
 SCREEN_UPDATE_IND16( rohga );
 SCREEN_UPDATE_IND16( schmeisr );

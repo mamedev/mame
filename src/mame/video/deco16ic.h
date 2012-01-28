@@ -96,4 +96,6 @@ void deco16ic_set_scrolldx(device_t *device, int tmap, int size, int dx, int dx_
 /* used by cninjabl */
 void deco16ic_set_enable( device_t *device, int tmap, int enable );
 
+TIMER_DEVICE_CALLBACK( deco16_scantimer );
+
 #endif
