@@ -403,6 +403,10 @@ void via6522_device::shift()
 
 	if (SI_O2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 	{
+		/* this should be one cycle wide */
+		m_out_cb1_func(0);
+		m_out_cb1_func(1);
+
 		if (!m_in_cb2_func.isnull())
 		{
 			m_in_cb2 = m_in_cb2_func();
