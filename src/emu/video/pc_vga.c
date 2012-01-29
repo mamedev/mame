@@ -1266,7 +1266,7 @@ void pc_vga_reset(running_machine &machine)
 
 READ8_HANDLER(vga_mem_r)
 {
-	#if 0
+	/* TODO: check me */
 	switch((vga.gc.data[6] >> 2) & 0x03)
 	{
 		case 0: break;
@@ -1274,7 +1274,6 @@ READ8_HANDLER(vga_mem_r)
 		case 2: offset -= 0x10000; offset &= 0x07fff; break;
 		case 3: offset -= 0x18000; offset &= 0x07fff; break;
 	}
-	#endif
 
 	if(vga.sequencer.data[4] & 4)
 	{
