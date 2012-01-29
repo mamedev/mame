@@ -336,12 +336,12 @@ static UINT32 GetNonTranslatedEA(i386_state *cpustate,UINT8 modrm)
 	return ea;
 }
 
-static UINT32 GetEA(i386_state *cpustate,UINT8 modrm)
+static UINT32 GetEA(i386_state *cpustate,UINT8 modrm, int rwn)
 {
 	UINT8 segment;
 	UINT32 ea;
 	modrm_to_EA(cpustate, modrm, &ea, &segment );
-	return i386_translate(cpustate, segment, ea );
+	return i386_translate(cpustate, segment, ea, rwn );
 }
 
 /* Check segment register for validity when changing privilege level after an RETF */
@@ -362,12 +362,12 @@ static void i386_check_sreg_validity(i386_state* cpustate, int reg)
 	/* Must be within the relevant descriptor table limits */
 	if(selector & 0x04)
 	{
-		if((selector & ~0x07) >= cpustate->ldtr.limit)
+		if((selector & ~0x07) > cpustate->ldtr.limit)
 			invalid = 1;
 	}
 	else
 	{
-		if((selector & ~0x07) >= cpustate->gdtr.limit)
+		if((selector & ~0x07) > cpustate->gdtr.limit)
 			invalid = 1;
 	}
 
@@ -440,7 +440,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 		}
 		if(selector & 0x0004)  // LDT
 		{
-			if((selector & ~0x0007) >= cpustate->ldtr.limit)
+			if((selector & ~0x0007) > cpustate->ldtr.limit)
 			{
 				logerror("SReg Load (%08x): Selector is out of LDT bounds.\n",cpustate->pc);
 				FAULT(FAULT_GP,selector & ~0x03)
@@ -448,7 +448,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 		}
 		else  // GDT
 		{
-			if((selector & ~0x0007) >= cpustate->gdtr.limit)
+			if((selector & ~0x0007) > cpustate->gdtr.limit)
 			{
 				logerror("SReg Load (%08x): Selector is out of GDT bounds.\n",cpustate->pc);
 				FAULT(FAULT_GP,selector & ~0x03)
@@ -494,7 +494,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 
 		if(selector & 0x0004)  // LDT
 		{
-			if((selector & ~0x0007) >= cpustate->ldtr.limit)
+			if((selector & ~0x0007) > cpustate->ldtr.limit)
 			{
 				logerror("SReg Load (%08x): Selector is out of LDT bounds.\n",cpustate->pc);
 				FAULT(FAULT_GP,selector & ~0x03)
@@ -502,7 +502,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 		}
 		else  // GDT
 		{
-			if((selector & ~0x0007) >= cpustate->gdtr.limit)
+			if((selector & ~0x0007) > cpustate->gdtr.limit)
 			{
 				logerror("SReg Load (%08x): Selector is out of GDT bounds.\n",cpustate->pc);
 				FAULT(FAULT_GP,selector & ~0x03)
@@ -702,7 +702,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			}
 			else
 			{
-				if(segment >= cpustate->gdtr.limit)
+				if(segment > cpustate->gdtr.limit)
 				{
 					logerror("IRQ: Task gate: TSS is past GDT limit.\n");
 					FAULT_EXP(FAULT_TS,segment & ~0x07);
@@ -741,7 +741,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			}
 			if(segment & 0x04)
 			{
-				if((segment & ~0x07) >= cpustate->ldtr.limit)
+				if((segment & ~0x07) > cpustate->ldtr.limit)
 				{
 					logerror("IRQ: Gate segment is past LDT limit.\n");
 					FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
@@ -749,7 +749,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			}
 			else
 			{
-				if((segment & ~0x07) >= cpustate->gdtr.limit)
+				if((segment & ~0x07) > cpustate->gdtr.limit)
 				{
 					logerror("IRQ: Gate segment is past GDT limit.\n");
 					FAULT_EXP(FAULT_GP,(segment & 0x07)+cpustate->ext)
@@ -790,7 +790,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 				if(stack.selector & 0x04)
 				{
-					if((stack.selector & ~0x07) >= cpustate->ldtr.base)
+					if((stack.selector & ~0x07) > cpustate->ldtr.base)
 					{
 						logerror("IRQ: New stack selector is past LDT limit.\n");
 						FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
@@ -798,7 +798,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 				else
 				{
-					if((stack.selector & ~0x07) >= cpustate->gdtr.base)
+					if((stack.selector & ~0x07) > cpustate->gdtr.base)
 					{
 						logerror("IRQ: New stack selector is past GDT limit.\n");
 						FAULT_EXP(FAULT_TS,(stack.selector & ~0x07)+cpustate->ext)
@@ -1209,7 +1209,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 	if((segment & 0x04) == 0)
 	{
 		/* check GDT limit */
-		if((segment & ~0x07) >= (cpustate->gdtr.limit))
+		if((segment & ~0x07) > (cpustate->gdtr.limit))
 		{
 			logerror("JMP: Segment is past GDT limit.\n");
 			FAULT(FAULT_GP,segment & 0xfffc)
@@ -1218,7 +1218,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 	else
 	{
 		/* check LDT limit */
-		if((segment & ~0x07) >= (cpustate->ldtr.limit))
+		if((segment & ~0x07) > (cpustate->ldtr.limit))
 		{
 			logerror("JMP: Segment is past LDT limit.\n");
 			FAULT(FAULT_GP,segment & 0xfffc)
@@ -1913,24 +1913,23 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 	I386_SREG desc;
 	UINT8 CPL, RPL, DPL;
 
-
 	if(operand32 == 0)
 	{
-		newEIP = POP16(cpustate) & 0xffff;
-		newCS = POP16(cpustate) & 0xffff;
-		REG16(SP) += count;
-		newESP = POP16(cpustate) & 0xffff;
-		newSS = POP16(cpustate) & 0xffff;
-		REG16(SP) -= (8+count);  // re-adjust stack pointer
+		UINT32 ea = i386_translate(cpustate, SS, REG16(SP), 0);
+		newEIP = READ16(cpustate, ea) & 0xffff;
+		newCS = READ16(cpustate, ea+2) & 0xffff;
+		ea += count+4;
+		newESP = READ16(cpustate, ea) & 0xffff;
+		newSS = READ16(cpustate, ea+2) & 0xffff;
 	}
 	else
 	{
-		newEIP = POP32(cpustate);
-		newCS = POP32(cpustate) & 0xffff;
-		REG32(ESP) += count;
-		newESP = POP32(cpustate);
-		newSS = POP32(cpustate) & 0xffff;
-		REG32(ESP) -= (16+count);  // re-adjust stack pointer
+		UINT32 ea = i386_translate(cpustate, SS, REG32(ESP), 0);
+		newEIP = READ32(cpustate, ea);
+		newCS = READ32(cpustate, ea+4) & 0xffff;
+		ea += count+8;
+		newESP = READ32(cpustate, ea);
+		newSS = READ32(cpustate, ea+4) & 0xffff;
 	}
 
 	memset(&desc, 0, sizeof(desc));
@@ -2182,21 +2181,21 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 	CPL = cpustate->CPL;
 	if(operand32 == 0)
 	{
-		newEIP = POP16(cpustate) & 0xffff;
-		newCS = POP16(cpustate) & 0xffff;
-		newflags = POP16(cpustate) & 0xffff;
-		newESP = POP16(cpustate) & 0xffff;
-		newSS = POP16(cpustate) & 0xffff;
-		REG16(SP) -= 10;
+		UINT32 ea = i386_translate(cpustate, SS, REG16(SP), 0);
+		newEIP = READ16(cpustate, ea) & 0xffff;
+		newCS = READ16(cpustate, ea+2) & 0xffff;
+		newflags = READ16(cpustate, ea+4) & 0xffff;
+		newESP = READ16(cpustate, ea+6) & 0xffff;
+		newSS = READ16(cpustate, ea+8) & 0xffff;
 	}
 	else
 	{
-		newEIP = POP32(cpustate);
-		newCS = POP32(cpustate) & 0xffff;
-		newflags = POP32(cpustate);
-		newESP = POP32(cpustate);
-		newSS = POP32(cpustate) & 0xffff;
-		REG32(ESP) -= 20;
+		UINT32 ea = i386_translate(cpustate, SS, REG32(ESP), 0);
+		newEIP = READ32(cpustate, ea);
+		newCS = READ32(cpustate, ea+4) & 0xffff;
+		newflags = READ32(cpustate, ea+8);
+		newESP = READ32(cpustate, ea+12);
+		newSS = READ32(cpustate, ea+16) & 0xffff;
 	}
 
 	if(V8086_MODE)
@@ -3808,3 +3807,4 @@ DEFINE_LEGACY_CPU_DEVICE(I386, i386);
 DEFINE_LEGACY_CPU_DEVICE(I486, i486);
 DEFINE_LEGACY_CPU_DEVICE(PENTIUM, pentium);
 DEFINE_LEGACY_CPU_DEVICE(MEDIAGX, mediagx);
+

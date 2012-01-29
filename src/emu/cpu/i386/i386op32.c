@@ -126,7 +126,7 @@ static void I386OP(adc_rm32_r32)(i386_state *cpustate)		// Opcode 0x11
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
 		dst = ADC32(cpustate, dst, src, cpustate->CF);
@@ -146,7 +146,7 @@ static void I386OP(adc_r32_rm32)(i386_state *cpustate)		// Opcode 0x13
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
 		dst = ADC32(cpustate, dst, src, cpustate->CF);
@@ -176,7 +176,7 @@ static void I386OP(add_rm32_r32)(i386_state *cpustate)		// Opcode 0x01
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
 		dst = ADD32(cpustate,dst, src);
@@ -196,7 +196,7 @@ static void I386OP(add_r32_rm32)(i386_state *cpustate)		// Opcode 0x03
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
 		dst = ADD32(cpustate,dst, src);
@@ -226,7 +226,7 @@ static void I386OP(and_rm32_r32)(i386_state *cpustate)		// Opcode 0x21
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
 		dst = AND32(cpustate,dst, src);
@@ -246,7 +246,7 @@ static void I386OP(and_r32_rm32)(i386_state *cpustate)		// Opcode 0x23
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
 		dst = AND32(cpustate,dst, src);
@@ -273,7 +273,7 @@ static void I386OP(bsf_r32_rm32)(i386_state *cpustate)		// Opcode 0x0f bc
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 	}
 
@@ -302,7 +302,7 @@ static void I386OP(bsr_r32_rm32)(i386_state *cpustate)		// Opcode 0x0f bd
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM32(modrm);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 	}
 
@@ -337,7 +337,7 @@ static void I386OP(bt_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f a3
 
 		CYCLES(cpustate,CYCLES_BT_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		UINT32 bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
 		bit %= 32;
@@ -368,7 +368,7 @@ static void I386OP(btc_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f bb
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_BTC_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT32 bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
 		bit %= 32;
@@ -401,7 +401,7 @@ static void I386OP(btr_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f b3
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_BTR_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT32 bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
 		bit %= 32;
@@ -434,7 +434,7 @@ static void I386OP(bts_rm32_r32)(i386_state *cpustate)		// Opcode 0x0f ab
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_BTS_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT32 bit = LOAD_REG32(modrm);
 		ea += 4*(bit/32);
 		bit %= 32;
@@ -502,7 +502,7 @@ static void I386OP(cmp_rm32_r32)(i386_state *cpustate)		// Opcode 0x39
 		SUB32(cpustate,dst, src);
 		CYCLES(cpustate,CYCLES_CMP_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
 		SUB32(cpustate,dst, src);
@@ -520,7 +520,7 @@ static void I386OP(cmp_r32_rm32)(i386_state *cpustate)		// Opcode 0x3b
 		SUB32(cpustate,dst, src);
 		CYCLES(cpustate,CYCLES_CMP_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
 		SUB32(cpustate,dst, src);
@@ -541,11 +541,11 @@ static void I386OP(cmpsd)(i386_state *cpustate)				// Opcode 0xa7
 {
 	UINT32 eas, ead, src, dst;
 	if( cpustate->segment_prefix ) {
-		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->address_size ? REG32(ESI) : REG16(SI) );
+		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->address_size ? REG32(ESI) : REG16(SI), 0 );
 	} else {
-		eas = i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI) );
+		eas = i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI), 0 );
 	}
-	ead = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI) );
+	ead = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI), 0 );
 	src = READ32(cpustate,eas);
 	dst = READ32(cpustate,ead);
 	SUB32(cpustate,src,dst);
@@ -617,7 +617,7 @@ static void I386OP(imul_r32_rm32)(i386_state *cpustate)		// Opcode 0x0f af
 		src = (INT64)(INT32)LOAD_RM32(modrm);
 		CYCLES(cpustate,CYCLES_IMUL32_REG_REG);		/* TODO: Correct multiply timing */
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = (INT64)(INT32)READ32(cpustate,ea);
 		CYCLES(cpustate,CYCLES_IMUL32_REG_REG);		/* TODO: Correct multiply timing */
 	}
@@ -639,7 +639,7 @@ static void I386OP(imul_r32_rm32_i32)(i386_state *cpustate)	// Opcode 0x69
 		dst = (INT64)(INT32)LOAD_RM32(modrm);
 		CYCLES(cpustate,CYCLES_IMUL32_REG_IMM_REG);		/* TODO: Correct multiply timing */
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		dst = (INT64)(INT32)READ32(cpustate,ea);
 		CYCLES(cpustate,CYCLES_IMUL32_MEM_IMM_REG);		/* TODO: Correct multiply timing */
 	}
@@ -661,7 +661,7 @@ static void I386OP(imul_r32_rm32_i8)(i386_state *cpustate)	// Opcode 0x6b
 		dst = (INT64)(INT32)LOAD_RM32(modrm);
 		CYCLES(cpustate,CYCLES_IMUL32_REG_IMM_REG);		/* TODO: Correct multiply timing */
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		dst = (INT64)(INT32)READ32(cpustate,ea);
 		CYCLES(cpustate,CYCLES_IMUL32_MEM_IMM_REG);		/* TODO: Correct multiply timing */
 	}
@@ -1046,9 +1046,9 @@ static void I386OP(lodsd)(i386_state *cpustate)				// Opcode 0xad
 {
 	UINT32 eas;
 	if( cpustate->segment_prefix ) {
-		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->address_size ? REG32(ESI) : REG16(SI) );
+		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->address_size ? REG32(ESI) : REG16(SI), 0 );
 	} else {
-		eas = i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI) );
+		eas = i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI), 0 );
 	}
 	REG32(EAX) = READ32(cpustate,eas);
 	BUMP_SI(cpustate,4);
@@ -1097,7 +1097,7 @@ static void I386OP(mov_rm32_r32)(i386_state *cpustate)		// Opcode 0x89
 		STORE_RM32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOV_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		src = LOAD_REG32(modrm);
 		WRITE32(cpustate,ea, src);
 		CYCLES(cpustate,CYCLES_MOV_REG_MEM);
@@ -1113,7 +1113,7 @@ static void I386OP(mov_r32_rm32)(i386_state *cpustate)		// Opcode 0x8b
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOV_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOV_MEM_REG);
@@ -1128,7 +1128,7 @@ static void I386OP(mov_rm32_i32)(i386_state *cpustate)		// Opcode 0xc7
 		STORE_RM32(modrm, value);
 		CYCLES(cpustate,CYCLES_MOV_IMM_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT32 value = FETCH32(cpustate);
 		WRITE32(cpustate,ea, value);
 		CYCLES(cpustate,CYCLES_MOV_IMM_MEM);
@@ -1144,9 +1144,9 @@ static void I386OP(mov_eax_m32)(i386_state *cpustate)		// Opcode 0xa1
 		offset = FETCH16(cpustate);
 	}
 	if( cpustate->segment_prefix ) {
-		ea = i386_translate(cpustate, cpustate->segment_override, offset );
+		ea = i386_translate(cpustate, cpustate->segment_override, offset, 0 );
 	} else {
-		ea = i386_translate(cpustate, DS, offset );
+		ea = i386_translate(cpustate, DS, offset, 0 );
 	}
 	REG32(EAX) = READ32(cpustate,ea);
 	CYCLES(cpustate,CYCLES_MOV_MEM_ACC);
@@ -1161,9 +1161,9 @@ static void I386OP(mov_m32_eax)(i386_state *cpustate)		// Opcode 0xa3
 		offset = FETCH16(cpustate);
 	}
 	if( cpustate->segment_prefix ) {
-		ea = i386_translate(cpustate, cpustate->segment_override, offset );
+		ea = i386_translate(cpustate, cpustate->segment_override, offset, 1 );
 	} else {
-		ea = i386_translate(cpustate, DS, offset );
+		ea = i386_translate(cpustate, DS, offset, 1 );
 	}
 	WRITE32(cpustate, ea, REG32(EAX) );
 	CYCLES(cpustate,CYCLES_MOV_ACC_MEM);
@@ -1221,11 +1221,11 @@ static void I386OP(movsd)(i386_state *cpustate)				// Opcode 0xa5
 {
 	UINT32 eas, ead, v;
 	if( cpustate->segment_prefix ) {
-		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->address_size ? REG32(ESI) : REG16(SI) );
+		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->address_size ? REG32(ESI) : REG16(SI), 0 );
 	} else {
-		eas = i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI) );
+		eas = i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI), 0 );
 	}
-	ead = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI) );
+	ead = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI), 1 );
 	v = READ32(cpustate,eas);
 	WRITE32(cpustate,ead, v);
 	BUMP_SI(cpustate,4);
@@ -1241,7 +1241,7 @@ static void I386OP(movsx_r32_rm8)(i386_state *cpustate)		// Opcode 0x0f be
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOVSX_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		INT32 src = (INT8)READ8(cpustate,ea);
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOVSX_MEM_REG);
@@ -1256,7 +1256,7 @@ static void I386OP(movsx_r32_rm16)(i386_state *cpustate)	// Opcode 0x0f bf
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOVSX_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		INT32 src = (INT16)READ16(cpustate,ea);
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOVSX_MEM_REG);
@@ -1271,7 +1271,7 @@ static void I386OP(movzx_r32_rm8)(i386_state *cpustate)		// Opcode 0x0f b6
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOVZX_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		UINT32 src = (UINT8)READ8(cpustate,ea);
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOVZX_MEM_REG);
@@ -1286,7 +1286,7 @@ static void I386OP(movzx_r32_rm16)(i386_state *cpustate)	// Opcode 0x0f b7
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOVZX_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		UINT32 src = (UINT16)READ16(cpustate,ea);
 		STORE_REG32(modrm, src);
 		CYCLES(cpustate,CYCLES_MOVZX_MEM_REG);
@@ -1304,7 +1304,7 @@ static void I386OP(or_rm32_r32)(i386_state *cpustate)		// Opcode 0x09
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
 		dst = OR32(cpustate,dst, src);
@@ -1324,7 +1324,7 @@ static void I386OP(or_r32_rm32)(i386_state *cpustate)		// Opcode 0x0b
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
 		dst = OR32(cpustate,dst, src);
@@ -1542,7 +1542,7 @@ static void I386OP(pop_rm32)(i386_state *cpustate)			// Opcode 0x8f
 		if( modrm >= 0xc0 ) {
 			STORE_RM32(modrm, value);
 		} else {
-			UINT32 ea = GetEA(cpustate,modrm);
+			UINT32 ea = GetEA(cpustate,modrm,1);
 			WRITE32(cpustate,ea, value);
 		}
 	}
@@ -1815,7 +1815,7 @@ static void I386OP(sbb_rm32_r32)(i386_state *cpustate)		// Opcode 0x19
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
 		dst = SBB32(cpustate, dst, src, cpustate->CF);
@@ -1835,7 +1835,7 @@ static void I386OP(sbb_r32_rm32)(i386_state *cpustate)		// Opcode 0x1b
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
 		dst = SBB32(cpustate, dst, src, cpustate->CF);
@@ -1857,7 +1857,7 @@ static void I386OP(sbb_eax_i32)(i386_state *cpustate)		// Opcode 0x1d
 static void I386OP(scasd)(i386_state *cpustate)				// Opcode 0xaf
 {
 	UINT32 eas, src, dst;
-	eas = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI) );
+	eas = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI), 0 );
 	src = READ32(cpustate,eas);
 	dst = REG32(EAX);
 	SUB32(cpustate,dst, src);
@@ -1883,7 +1883,7 @@ static void I386OP(shld32_i8)(i386_state *cpustate)			// Opcode 0x0f a4
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_SHLD_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT32 dst = READ32(cpustate,ea);
 		UINT32 upper = LOAD_REG32(modrm);
 		UINT8 shift = FETCH(cpustate);
@@ -1917,7 +1917,7 @@ static void I386OP(shld32_cl)(i386_state *cpustate)			// Opcode 0x0f a5
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_SHLD_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT32 dst = READ32(cpustate,ea);
 		UINT32 upper = LOAD_REG32(modrm);
 		UINT8 shift = REG8(CL);
@@ -1951,7 +1951,7 @@ static void I386OP(shrd32_i8)(i386_state *cpustate)			// Opcode 0x0f ac
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_SHRD_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT32 dst = READ32(cpustate,ea);
 		UINT32 upper = LOAD_REG32(modrm);
 		UINT8 shift = FETCH(cpustate);
@@ -1985,7 +1985,7 @@ static void I386OP(shrd32_cl)(i386_state *cpustate)			// Opcode 0x0f ad
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_SHRD_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT32 dst = READ32(cpustate,ea);
 		UINT32 upper = LOAD_REG32(modrm);
 		UINT8 shift = REG8(CL);
@@ -2003,7 +2003,7 @@ static void I386OP(shrd32_cl)(i386_state *cpustate)			// Opcode 0x0f ad
 
 static void I386OP(stosd)(i386_state *cpustate)				// Opcode 0xab
 {
-	UINT32 eas = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI) );
+	UINT32 eas = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI), 1 );
 	WRITE32(cpustate,eas, REG32(EAX));
 	BUMP_DI(cpustate,4);
 	CYCLES(cpustate,CYCLES_STOS);
@@ -2020,7 +2020,7 @@ static void I386OP(sub_rm32_r32)(i386_state *cpustate)		// Opcode 0x29
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
 		dst = SUB32(cpustate,dst, src);
@@ -2040,7 +2040,7 @@ static void I386OP(sub_r32_rm32)(i386_state *cpustate)		// Opcode 0x2b
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
 		dst = SUB32(cpustate,dst, src);
@@ -2083,7 +2083,7 @@ static void I386OP(test_rm32_r32)(i386_state *cpustate)		// Opcode 0x85
 		cpustate->OF = 0;
 		CYCLES(cpustate,CYCLES_TEST_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
 		dst = src & dst;
@@ -2167,7 +2167,7 @@ static void I386OP(xchg_r32_rm32)(i386_state *cpustate)		// Opcode 0x87
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_XCHG_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT32 src = READ32(cpustate,ea);
 		UINT32 dst = LOAD_REG32(modrm);
 		WRITE32(cpustate,ea, dst);
@@ -2187,7 +2187,7 @@ static void I386OP(xor_rm32_r32)(i386_state *cpustate)		// Opcode 0x31
 		STORE_RM32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		src = LOAD_REG32(modrm);
 		dst = READ32(cpustate,ea);
 		dst = XOR32(cpustate,dst, src);
@@ -2207,7 +2207,7 @@ static void I386OP(xor_r32_rm32)(i386_state *cpustate)		// Opcode 0x33
 		STORE_REG32(modrm, dst);
 		CYCLES(cpustate,CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		src = READ32(cpustate,ea);
 		dst = LOAD_REG32(modrm);
 		dst = XOR32(cpustate,dst, src);
@@ -2244,7 +2244,7 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = FETCH32(cpustate);
 				dst = ADD32(cpustate,dst, src);
@@ -2260,7 +2260,7 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = FETCH32(cpustate);
 				dst = OR32(cpustate,dst, src);
@@ -2276,7 +2276,7 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = FETCH32(cpustate);
 				dst = ADC32(cpustate, dst, src, cpustate->CF);
@@ -2292,7 +2292,7 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = FETCH32(cpustate);
 				dst = SBB32(cpustate, dst, src, cpustate->CF);
@@ -2308,7 +2308,7 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = FETCH32(cpustate);
 				dst = AND32(cpustate,dst, src);
@@ -2324,7 +2324,7 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = FETCH32(cpustate);
 				dst = SUB32(cpustate,dst, src);
@@ -2340,7 +2340,7 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = FETCH32(cpustate);
 				dst = XOR32(cpustate,dst, src);
@@ -2355,7 +2355,7 @@ static void I386OP(group81_32)(i386_state *cpustate)		// Opcode 0x81
 				SUB32(cpustate,dst, src);
 				CYCLES(cpustate,CYCLES_CMP_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,0);
 				dst = READ32(cpustate,ea);
 				src = FETCH32(cpustate);
 				SUB32(cpustate,dst, src);
@@ -2381,7 +2381,7 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = (UINT32)(INT32)(INT8)FETCH(cpustate);
 				dst = ADD32(cpustate,dst, src);
@@ -2397,7 +2397,7 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = (UINT32)(INT32)(INT8)FETCH(cpustate);
 				dst = OR32(cpustate,dst, src);
@@ -2413,7 +2413,7 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = (UINT32)(INT32)(INT8)FETCH(cpustate);
 				dst = ADC32(cpustate, dst, src, cpustate->CF);
@@ -2429,7 +2429,7 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = ((UINT32)(INT32)(INT8)FETCH(cpustate));
 				dst = SBB32(cpustate, dst, src, cpustate->CF);
@@ -2445,7 +2445,7 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = (UINT32)(INT32)(INT8)FETCH(cpustate);
 				dst = AND32(cpustate,dst, src);
@@ -2461,7 +2461,7 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = (UINT32)(INT32)(INT8)FETCH(cpustate);
 				dst = SUB32(cpustate,dst, src);
@@ -2477,7 +2477,7 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_ALU_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,1);
 				dst = READ32(cpustate,ea);
 				src = (UINT32)(INT32)(INT8)FETCH(cpustate);
 				dst = XOR32(cpustate,dst, src);
@@ -2492,7 +2492,7 @@ static void I386OP(group83_32)(i386_state *cpustate)		// Opcode 0x83
 				SUB32(cpustate,dst, src);
 				CYCLES(cpustate,CYCLES_CMP_REG_REG);
 			} else {
-				ea = GetEA(cpustate,modrm);
+				ea = GetEA(cpustate,modrm,0);
 				dst = READ32(cpustate,ea);
 				src = (UINT32)(INT32)(INT8)FETCH(cpustate);
 				SUB32(cpustate,dst, src);
@@ -2514,7 +2514,7 @@ static void I386OP(groupC1_32)(i386_state *cpustate)		// Opcode 0xc1
 		dst = i386_shift_rotate32(cpustate, modrm, dst, shift);
 		STORE_RM32(modrm, dst);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		dst = READ32(cpustate,ea);
 		shift = FETCH(cpustate) & 0x1f;
 		dst = i386_shift_rotate32(cpustate, modrm, dst, shift);
@@ -2532,7 +2532,7 @@ static void I386OP(groupD1_32)(i386_state *cpustate)		// Opcode 0xd1
 		dst = i386_shift_rotate32(cpustate, modrm, dst, 1);
 		STORE_RM32(modrm, dst);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		dst = READ32(cpustate,ea);
 		dst = i386_shift_rotate32(cpustate, modrm, dst, 1);
 		WRITE32(cpustate,ea, dst);
@@ -2549,7 +2549,7 @@ static void I386OP(groupD3_32)(i386_state *cpustate)		// Opcode 0xd3
 		dst = i386_shift_rotate32(cpustate, modrm, dst, REG8(CL));
 		STORE_RM32(modrm, dst);
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,1);
 		dst = READ32(cpustate,ea);
 		dst = i386_shift_rotate32(cpustate, modrm, dst, REG8(CL));
 		WRITE32(cpustate,ea, dst);
@@ -2571,7 +2571,7 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 				SetSZPF32(dst);
 				CYCLES(cpustate,CYCLES_TEST_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(cpustate,modrm);
+				UINT32 ea = GetEA(cpustate,modrm,0);
 				UINT32 dst = READ32(cpustate,ea);
 				UINT32 src = FETCH32(cpustate);
 				dst &= src;
@@ -2587,7 +2587,7 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_NOT_REG);
 			} else {
-				UINT32 ea = GetEA(cpustate,modrm);
+				UINT32 ea = GetEA(cpustate,modrm,1);
 				UINT32 dst = READ32(cpustate,ea);
 				dst = ~dst;
 				WRITE32(cpustate,ea, dst);
@@ -2601,7 +2601,7 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_NEG_REG);
 			} else {
-				UINT32 ea = GetEA(cpustate,modrm);
+				UINT32 ea = GetEA(cpustate,modrm,1);
 				UINT32 dst = READ32(cpustate,ea);
 				dst = SUB32(cpustate, 0, dst );
 				WRITE32(cpustate,ea, dst);
@@ -2616,7 +2616,7 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 					src = LOAD_RM32(modrm);
 					CYCLES(cpustate,CYCLES_MUL32_ACC_REG);		/* TODO: Correct multiply timing */
 				} else {
-					UINT32 ea = GetEA(cpustate,modrm);
+					UINT32 ea = GetEA(cpustate,modrm,0);
 					src = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_MUL32_ACC_MEM);		/* TODO: Correct multiply timing */
 				}
@@ -2637,7 +2637,7 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 					src = (INT64)(INT32)LOAD_RM32(modrm);
 					CYCLES(cpustate,CYCLES_IMUL32_ACC_REG);		/* TODO: Correct multiply timing */
 				} else {
-					UINT32 ea = GetEA(cpustate,modrm);
+					UINT32 ea = GetEA(cpustate,modrm,0);
 					src = (INT64)(INT32)READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_IMUL32_ACC_MEM);		/* TODO: Correct multiply timing */
 				}
@@ -2659,7 +2659,7 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 					src = LOAD_RM32(modrm);
 					CYCLES(cpustate,CYCLES_DIV32_ACC_REG);
 				} else {
-					UINT32 ea = GetEA(cpustate,modrm);
+					UINT32 ea = GetEA(cpustate,modrm,0);
 					src = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_DIV32_ACC_MEM);
 				}
@@ -2689,7 +2689,7 @@ static void I386OP(groupF7_32)(i386_state *cpustate)		// Opcode 0xf7
 					src = LOAD_RM32(modrm);
 					CYCLES(cpustate,CYCLES_IDIV32_ACC_REG);
 				} else {
-					UINT32 ea = GetEA(cpustate,modrm);
+					UINT32 ea = GetEA(cpustate,modrm,0);
 					src = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_IDIV32_ACC_MEM);
 				}
@@ -2727,7 +2727,7 @@ static void I386OP(groupFF_32)(i386_state *cpustate)		// Opcode 0xff
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_INC_REG);
 			} else {
-				UINT32 ea = GetEA(cpustate,modrm);
+				UINT32 ea = GetEA(cpustate,modrm,1);
 				UINT32 dst = READ32(cpustate,ea);
 				dst = INC32(cpustate,dst);
 				WRITE32(cpustate,ea, dst);
@@ -2741,7 +2741,7 @@ static void I386OP(groupFF_32)(i386_state *cpustate)		// Opcode 0xff
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_DEC_REG);
 			} else {
-				UINT32 ea = GetEA(cpustate,modrm);
+				UINT32 ea = GetEA(cpustate,modrm,1);
 				UINT32 dst = READ32(cpustate,ea);
 				dst = DEC32(cpustate,dst);
 				WRITE32(cpustate,ea, dst);
@@ -2755,7 +2755,7 @@ static void I386OP(groupFF_32)(i386_state *cpustate)		// Opcode 0xff
 					address = LOAD_RM32(modrm);
 					CYCLES(cpustate,CYCLES_CALL_REG);		/* TODO: Timing = 7 + m */
 				} else {
-					UINT32 ea = GetEA(cpustate,modrm);
+					UINT32 ea = GetEA(cpustate,modrm,0);
 					address = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_CALL_MEM);		/* TODO: Timing = 10 + m */
 				}
@@ -2775,7 +2775,7 @@ static void I386OP(groupFF_32)(i386_state *cpustate)		// Opcode 0xff
 				}
 				else
 				{
-					UINT32 ea = GetEA(cpustate,modrm);
+					UINT32 ea = GetEA(cpustate,modrm,0);
 					address = READ32(cpustate,ea + 0);
 					selector = READ16(cpustate,ea + 4);
 					CYCLES(cpustate,CYCLES_CALL_MEM_INTERSEG);		/* TODO: Timing = 10 + m */
@@ -2803,7 +2803,7 @@ static void I386OP(groupFF_32)(i386_state *cpustate)		// Opcode 0xff
 					address = LOAD_RM32(modrm);
 					CYCLES(cpustate,CYCLES_JMP_REG);		/* TODO: Timing = 7 + m */
 				} else {
-					UINT32 ea = GetEA(cpustate,modrm);
+					UINT32 ea = GetEA(cpustate,modrm,0);
 					address = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_JMP_MEM);		/* TODO: Timing = 10 + m */
 				}
@@ -2822,7 +2822,7 @@ static void I386OP(groupFF_32)(i386_state *cpustate)		// Opcode 0xff
 				}
 				else
 				{
-					UINT32 ea = GetEA(cpustate,modrm);
+					UINT32 ea = GetEA(cpustate,modrm,0);
 					address = READ32(cpustate,ea + 0);
 					selector = READ16(cpustate,ea + 4);
 					CYCLES(cpustate,CYCLES_JMP_MEM_INTERSEG);		/* TODO: Timing = 10 + m */
@@ -2847,7 +2847,7 @@ static void I386OP(groupFF_32)(i386_state *cpustate)		// Opcode 0xff
 				if( modrm >= 0xc0 ) {
 					value = LOAD_RM32(modrm);
 				} else {
-					UINT32 ea = GetEA(cpustate,modrm);
+					UINT32 ea = GetEA(cpustate,modrm,0);
 					value = READ32(cpustate,ea);
 				}
 				PUSH32(cpustate,value);
@@ -2876,7 +2876,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 					STORE_RM32(modrm, cpustate->ldtr.segment);
 					CYCLES(cpustate,CYCLES_SLDT_REG);
 				} else {
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,1);
 					WRITE32(cpustate, ea, cpustate->ldtr.segment);
 					CYCLES(cpustate,CYCLES_SLDT_MEM);
 				}
@@ -2893,7 +2893,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 					STORE_RM32(modrm, cpustate->task.segment);
 					CYCLES(cpustate,CYCLES_STR_REG);
 				} else {
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,1);
 					WRITE32(cpustate, ea, cpustate->task.segment);
 					CYCLES(cpustate,CYCLES_STR_MEM);
 				}
@@ -2913,7 +2913,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 					cpustate->ldtr.segment = address;
 					CYCLES(cpustate,CYCLES_LLDT_REG);
 				} else {
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,0);
 					cpustate->ldtr.segment = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_LLDT_MEM);
 				}
@@ -2940,7 +2940,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 					cpustate->task.segment = address;
 					CYCLES(cpustate,CYCLES_LTR_REG);
 				} else {
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,0);
 					cpustate->task.segment = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_LTR_MEM);
 				}
@@ -2965,7 +2965,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 					address = LOAD_RM32(modrm);
 					CYCLES(cpustate,CYCLES_VERR_REG);
 				} else {
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,0);
 					address = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_VERR_MEM);
 				}
@@ -3028,7 +3028,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 					address = LOAD_RM16(modrm);
 					CYCLES(cpustate,CYCLES_VERW_REG);
 				} else {
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,0);
 					address = READ16(cpustate,ea);
 					CYCLES(cpustate,CYCLES_VERW_MEM);
 				}
@@ -3095,9 +3095,9 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 			{
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
-					ea = i386_translate(cpustate, CS, address );
+					ea = i386_translate(cpustate, CS, address, 1 );
 				} else {
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,1);
 				}
 				WRITE16(cpustate,ea, cpustate->gdtr.limit);
 				WRITE32(cpustate,ea + 2, cpustate->gdtr.base);
@@ -3109,11 +3109,11 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 				if (modrm >= 0xc0)
 				{
 					address = LOAD_RM32(modrm);
-					ea = i386_translate(cpustate, CS, address );
+					ea = i386_translate(cpustate, CS, address, 1 );
 				}
 				else
 				{
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,1);
 				}
 				WRITE16(cpustate,ea, cpustate->idtr.limit);
 				WRITE32(cpustate,ea + 2, cpustate->idtr.base);
@@ -3126,9 +3126,9 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 					FAULT(FAULT_GP,0) 
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
-					ea = i386_translate(cpustate, CS, address );
+					ea = i386_translate(cpustate, CS, address, 0 );
 				} else {
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,0);
 				}
 				cpustate->gdtr.limit = READ16(cpustate,ea);
 				cpustate->gdtr.base = READ32(cpustate,ea + 2);
@@ -3141,9 +3141,9 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 					FAULT(FAULT_GP,0) 
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
-					ea = i386_translate(cpustate, CS, address );
+					ea = i386_translate(cpustate, CS, address, 0 );
 				} else {
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,0);
 				}
 				cpustate->idtr.limit = READ16(cpustate,ea);
 				cpustate->idtr.base = READ32(cpustate,ea + 2);
@@ -3157,7 +3157,7 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 					CYCLES(cpustate,CYCLES_SMSW_REG);
 				} else {
 					/* always 16-bit memory operand */
-					ea = GetEA(cpustate,modrm);
+					ea = GetEA(cpustate,modrm,1);
 					WRITE16(cpustate,ea, cpustate->cr[0]);
 					CYCLES(cpustate,CYCLES_SMSW_MEM);
 				}
@@ -3187,7 +3187,7 @@ static void I386OP(group0FBA_32)(i386_state *cpustate)		// Opcode 0x0f ba
 
 				CYCLES(cpustate,CYCLES_BT_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(cpustate,modrm);
+				UINT32 ea = GetEA(cpustate,modrm,0);
 				UINT32 dst = READ32(cpustate,ea);
 				UINT8 bit = FETCH(cpustate);
 
@@ -3213,7 +3213,7 @@ static void I386OP(group0FBA_32)(i386_state *cpustate)		// Opcode 0x0f ba
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_BTS_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(cpustate,modrm);
+				UINT32 ea = GetEA(cpustate,modrm,1);
 				UINT32 dst = READ32(cpustate,ea);
 				UINT8 bit = FETCH(cpustate);
 
@@ -3241,7 +3241,7 @@ static void I386OP(group0FBA_32)(i386_state *cpustate)		// Opcode 0x0f ba
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_BTR_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(cpustate,modrm);
+				UINT32 ea = GetEA(cpustate,modrm,1);
 				UINT32 dst = READ32(cpustate,ea);
 				UINT8 bit = FETCH(cpustate);
 
@@ -3269,7 +3269,7 @@ static void I386OP(group0FBA_32)(i386_state *cpustate)		// Opcode 0x0f ba
 				STORE_RM32(modrm, dst);
 				CYCLES(cpustate,CYCLES_BTC_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(cpustate,modrm);
+				UINT32 ea = GetEA(cpustate,modrm,1);
 				UINT32 dst = READ32(cpustate,ea);
 				UINT8 bit = FETCH(cpustate);
 
@@ -3305,7 +3305,7 @@ static void I386OP(lar_r32_rm32)(i386_state *cpustate)  // Opcode 0x0f 0x02
 		}
 		else
 		{
-			UINT32 ea = GetEA(cpustate,modrm);
+			UINT32 ea = GetEA(cpustate,modrm,0);
 			seg.selector = READ32(cpustate,ea);
 			CYCLES(cpustate,CYCLES_LAR_MEM);
 		}
@@ -3362,7 +3362,7 @@ static void I386OP(lsl_r32_rm32)(i386_state *cpustate)  // Opcode 0x0f 0x03
 		}
 		else
 		{
-			UINT32 ea = GetEA(cpustate,modrm);
+			UINT32 ea = GetEA(cpustate,modrm,0);
 			seg.selector = READ32(cpustate,ea);
 		}
 		if(seg.selector == 0)
@@ -3395,7 +3395,7 @@ static void I386OP(bound_r32_m32_m32)(i386_state *cpustate)	// Opcode 0x62
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		low = READ32(cpustate,ea + 0);
 		high = READ32(cpustate,ea + 4);
 	}
@@ -3453,9 +3453,9 @@ static void I386OP(xlat32)(i386_state *cpustate)			// Opcode 0xd7
 {
 	UINT32 ea;
 	if( cpustate->segment_prefix ) {
-		ea = i386_translate(cpustate, cpustate->segment_override, REG32(EBX) + REG8(AL) );
+		ea = i386_translate(cpustate, cpustate->segment_override, REG32(EBX) + REG8(AL), 0 );
 	} else {
-		ea = i386_translate(cpustate, DS, REG32(EBX) + REG8(AL) );
+		ea = i386_translate(cpustate, DS, REG32(EBX) + REG8(AL), 0 );
 	}
 	REG8(AL) = READ8(cpustate,ea);
 	CYCLES(cpustate,CYCLES_XLAT);
@@ -3469,7 +3469,7 @@ static void I386OP(load_far_pointer32)(i386_state *cpustate, int s)
 	if( modrm >= 0xc0 ) {
 		fatalerror("i386: load_far_pointer32 NYI");
 	} else {
-		UINT32 ea = GetEA(cpustate,modrm);
+		UINT32 ea = GetEA(cpustate,modrm,0);
 		STORE_REG32(modrm, READ32(cpustate,ea + 0));
 		selector = READ16(cpustate,ea + 4);
 		if(PROTECTED_MODE && !(V8086_MODE))

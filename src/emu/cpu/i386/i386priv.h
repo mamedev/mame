@@ -320,6 +320,7 @@ INLINE i386_state *get_safe_token(device_t *device)
 }
 
 extern int i386_parity_table[256];
+static int i386_limit_check(i386_state *cpustate, int seg, UINT32 offset);
 
 #define FAULT_THROW(fault,error) { throw (UINT64)(fault | (UINT64)error << 32); }
 #define PF_THROW(error) { cpustate->cr[2] = address; FAULT_THROW(FAULT_PF,error); }
@@ -389,9 +390,20 @@ extern MODRM_TABLE i386_MODRM_table[256];
 
 /***********************************************************************************/
 
-INLINE UINT32 i386_translate(i386_state *cpustate, int segment, UINT32 ip)
+INLINE UINT32 i386_translate(i386_state *cpustate, int segment, UINT32 ip, int rwn)
 {
-	// TODO: segment limit
+	// TODO: segment limit access size, execution permission, handle exception thrown from exception handler
+	if(PROTECTED_MODE && !V8086_MODE && (rwn != -1))
+	{
+		if(!(cpustate->sreg[segment].selector & ~3))
+			FAULT_THROW(FAULT_GP, 0);
+		if(i386_limit_check(cpustate, segment, ip))
+			FAULT_THROW(FAULT_GP, 0);
+		if((rwn == 0) && ((cpustate->sreg[segment].flags & 8) && !(cpustate->sreg[segment].flags & 2)))
+			FAULT_THROW(FAULT_GP, 0);
+		if((rwn == 1) && ((cpustate->sreg[segment].flags & 8) || !(cpustate->sreg[segment].flags & 2)))
+			FAULT_THROW(FAULT_GP, 0);
+	}
 	return cpustate->sreg[segment].base + ip;
 }
 
@@ -487,7 +499,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 INLINE void CHANGE_PC(i386_state *cpustate, UINT32 pc)
 {
 	UINT32 address, error;
-	cpustate->pc = i386_translate(cpustate, CS, pc );
+	cpustate->pc = i386_translate(cpustate, CS, pc, -1 );
 
 	address = cpustate->pc;
 
@@ -927,12 +939,12 @@ INLINE void PUSH16(i386_state *cpustate,UINT16 value)
 	UINT32 ea, new_esp;
 	if( STACK_32BIT ) {
 		new_esp = REG32(ESP) - 2;
-		ea = i386_translate(cpustate, SS, new_esp);
+		ea = i386_translate(cpustate, SS, new_esp, 1);
 		WRITE16(cpustate, ea, value );
 		REG32(ESP) = new_esp;
 	} else {
 		new_esp = (REG16(SP) - 2) & 0xffff;
-		ea = i386_translate(cpustate, SS, new_esp);
+		ea = i386_translate(cpustate, SS, new_esp, 1);
 		WRITE16(cpustate, ea, value );
 		REG16(SP) = new_esp;
 	}
@@ -942,12 +954,12 @@ INLINE void PUSH32(i386_state *cpustate,UINT32 value)
 	UINT32 ea, new_esp;
 	if( STACK_32BIT ) {
 		new_esp = REG32(ESP) - 4;
-		ea = i386_translate(cpustate, SS, new_esp);
+		ea = i386_translate(cpustate, SS, new_esp, 1);
 		WRITE32(cpustate, ea, value );
 		REG32(ESP) = new_esp;
 	} else {
 		new_esp = (REG16(SP) - 4) & 0xffff;
-		ea = i386_translate(cpustate, SS, new_esp);
+		ea = i386_translate(cpustate, SS, new_esp, 1);
 		WRITE32(cpustate, ea, value );
 		REG16(SP) = new_esp;
 	}
@@ -967,12 +979,12 @@ INLINE UINT8 POP8(i386_state *cpustate)
 	UINT32 ea, new_esp;
 	if( STACK_32BIT ) {
 		new_esp = REG32(ESP) + 1;
-		ea = i386_translate(cpustate, SS, new_esp - 1);
+		ea = i386_translate(cpustate, SS, new_esp - 1, 0);
 		value = READ8(cpustate, ea );
 		REG32(ESP) = new_esp;
 	} else {
 		new_esp = REG16(SP) + 1;
-		ea = i386_translate(cpustate, SS, (new_esp - 1) & 0xffff);
+		ea = i386_translate(cpustate, SS, (new_esp - 1) & 0xffff, 0);
 		value = READ8(cpustate, ea );
 		REG16(SP) = new_esp;
 	}
@@ -984,12 +996,12 @@ INLINE UINT16 POP16(i386_state *cpustate)
 	UINT32 ea, new_esp;
 	if( STACK_32BIT ) {
 		new_esp = REG32(ESP) + 2;
-		ea = i386_translate(cpustate, SS, new_esp - 2);
+		ea = i386_translate(cpustate, SS, new_esp - 2, 0);
 		value = READ16(cpustate, ea );
 		REG32(ESP) = new_esp;
 	} else {
 		new_esp = REG16(SP) + 2;
-		ea = i386_translate(cpustate, SS, (new_esp - 2) & 0xffff);
+		ea = i386_translate(cpustate, SS, (new_esp - 2) & 0xffff, 0);
 		value = READ16(cpustate, ea );
 		REG16(SP) = new_esp;
 	}
@@ -1001,12 +1013,12 @@ INLINE UINT32 POP32(i386_state *cpustate)
 	UINT32 ea, new_esp;
 	if( STACK_32BIT ) {
 		new_esp = REG32(ESP) + 4;
-		ea = i386_translate(cpustate, SS, new_esp - 4);
+		ea = i386_translate(cpustate, SS, new_esp - 4, 0);
 		value = READ32(cpustate, ea );
 		REG32(ESP) = new_esp;
 	} else {
 		new_esp = REG16(SP) + 4;
-		ea = i386_translate(cpustate, SS, (new_esp - 4) & 0xffff);
+		ea = i386_translate(cpustate, SS, (new_esp - 4) & 0xffff, 0);
 		value = READ32(cpustate, ea );
 		REG16(SP) = new_esp;
 	}
