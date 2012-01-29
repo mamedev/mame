@@ -851,6 +851,22 @@ static TTF_Font * TTF_OpenFont_Magic(astring name, int fsize)
 	return TTF_OpenFont(name.cstr(), POINT_SIZE);
 }
 
+static bool BDF_Check_Magic(astring name)
+{
+    emu_file file(OPEN_FLAG_READ);
+    if (file.open(name) == FILERR_NONE)
+    {
+		unsigned char buffer[9];
+		unsigned char magic[9] = { 'S', 'T', 'A', 'R', 'T', 'F', 'O', 'N', 'T' };
+		file.read(buffer, 9);
+        file.close();
+		if (!memcmp(buffer, magic, 9))
+			return true;
+    }
+
+    return false;
+}
+
 static TTF_Font *search_font_config(astring name, bool bold, bool italic, bool underline, bool &bakedstyles)
 {
 	TTF_Font *font = (TTF_Font *)NULL;
@@ -1009,7 +1025,10 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 	if (!font)
 	{
-		printf("WARNING: Couldn't find/open TrueType font %s, using MAME default\n", name.cstr());
+        if (!BDF_Check_Magic(name))
+        {
+            printf("WARNING: font %s, is not TrueType or BDF, using MAME default\n", name.cstr());
+        }
 		return NULL;
 	}
 
