@@ -1266,6 +1266,7 @@ void pc_vga_reset(running_machine &machine)
 
 READ8_HANDLER(vga_mem_r)
 {
+	#if 0
 	switch((vga.gc.data[6] >> 2) & 0x03)
 	{
 		case 0: break;
@@ -1273,6 +1274,7 @@ READ8_HANDLER(vga_mem_r)
 		case 2: offset -= 0x10000; offset &= 0x07fff; break;
 		case 3: offset -= 0x18000; offset &= 0x07fff; break;
 	}
+	#endif
 
 	if(vga.sequencer.data[4] & 4)
 	{
@@ -1319,12 +1321,28 @@ READ8_HANDLER(vga_mem_r)
 
 WRITE8_HANDLER(vga_mem_w)
 {
+	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask	the offset.
 	switch((vga.gc.data[6] >> 2) & 0x03)
 	{
 		case 0: break;
-		case 1: offset &= 0x0ffff; break;
-		case 2: offset -= 0x10000; offset &= 0x07fff; break;
-		case 3: offset -= 0x18000; offset &= 0x07fff; break;
+		case 1:
+			if(offset & 0x10000)
+				return;
+
+			offset &= 0x0ffff;
+			break;
+		case 2:
+			if((offset & 0x18000) != 0x10000)
+				return;
+
+			offset &= 0x07fff;
+			break;
+		case 3:
+			if((offset & 0x18000) != 0x18000)
+				return;
+
+			offset &= 0x07fff;
+			break;
 	}
 
 	{
