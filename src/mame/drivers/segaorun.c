@@ -1795,6 +1795,7 @@ ROM_END
  **************************************************************************************************************************
     Super Hangon
     CPU: 68000 (317-????)
+     GAME BD SUPER HANG-ON  834-6277-07
      CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
      VIDEO BD SUPER HANG-ON 837-6279-01
 */
@@ -1848,8 +1849,15 @@ ROM_END
 /**************************************************************************************************************************
     Super Hangon
     CPU: FD1089B (317-0034)
+     GAME BD SUPER HANG-ON  834-6277-02
      CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
      VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, roms would be "OPR")
+
+Manual states for this set:
+  834-6277-01 (Object data (sprits) EPR type AKA EP-ROM type)
+  834-6277-03 (Object data (sprits) MPR type AKA Mask-ROM type)
+  834-6277-05 (Object data (sprits) OPR type AKA One Time ROM type)
+
 */
 ROM_START( shangon3 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code - protected */
