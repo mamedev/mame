@@ -207,7 +207,7 @@ CPU_DISASSEMBLE( unsp )
 
 		// Far Jump
 		case 0x2f: case 0x3f: case 0x6f: case 0x7f:
-			if (OPA == 7 && OPA == 2)
+			if (OPA == 7 && OP1 == 2)
 			{
 				print("goto %06x", ((OPIMM << 16) | imm16) << 1);
 			}
