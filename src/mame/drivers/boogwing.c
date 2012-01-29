@@ -88,6 +88,7 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
+#include "video/decospr.h"
 
 static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
@@ -361,10 +362,18 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_PALETTE_LENGTH(2048)
 	MCFG_GFXDECODE(boogwing)
 
+	MCFG_VIDEO_START(boogwing)
+
 	MCFG_DECOCOMN_ADD("deco_common", boogwing_decocomn_intf)
 
 	MCFG_DECO16IC_ADD("tilegen1", boogwing_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", boogwing_deco16ic_tilegen2_intf)
+
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 4);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

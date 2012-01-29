@@ -131,16 +131,8 @@ static void mixwizdfirelayer(running_machine &machine, bitmap_rgb32 &bitmap, con
 	bitmap_ind16* sprite_bitmap;
 	int penbase;
 
-	if (gfxregion==3)
-	{
-		sprite_bitmap = &machine.device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
-		penbase = 0x400;
-	}
-	else
-	{
-		sprite_bitmap = &machine.device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
-		penbase = 0x600;
-	}
+	sprite_bitmap = &machine.device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
+	penbase = 0x600;
 
 	UINT16* srcline;
 	UINT32* dstline;
@@ -161,25 +153,16 @@ static void mixwizdfirelayer(running_machine &machine, bitmap_rgb32 &bitmap, con
 			if (pix&0xf)
 			{
 				UINT16 pen = pix&0x1ff;
-				if (gfxregion==3)
-				{
-					dstline[x] = paldata[pen+penbase];
+			
+				if (pen&0x100)
+				{		
+					UINT32 base = dstline[x];
+					pen &=0xff;
+					dstline[x] = alpha_blend_r32(base, paldata[pen+penbase], 0x80);	
 				}
 				else
 				{
-					
-					if (pen&0x100)
-					{
-						
-						UINT32 base = dstline[x];
-						pen &=0xff;
-						dstline[x] = alpha_blend_r32(base, paldata[pen+penbase], 0x80);
-						
-					}
-					else
-					{
-						dstline[x] = paldata[pen+penbase];
-					}
+					dstline[x] = paldata[pen+penbase];
 				}
 			}
 		}
@@ -205,16 +188,16 @@ SCREEN_UPDATE_RGB32( wizdfire )
 	bitmap.fill(screen.machine().pens[512], cliprect);
 
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 3, 0x600,0x600); 
+	screen.machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0600, 0x0600, 0x400, 0x1ff);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 3, 0x400,0x600);
+	screen.machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0400, 0x0600, 0x400, 0x1ff);
 
 	if ((priority & 0x1f) == 0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 0);
 	else
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
 
-	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 3, 0x000,0x400); // 0x000 and 0x200 of 0x600
+	screen.machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0400, 0x400, 0x1ff); // 0x000 and 0x200 of 0x600
 
 	mixwizdfirelayer(screen.machine(), bitmap, cliprect, 4, 0x000, 0x000);
 

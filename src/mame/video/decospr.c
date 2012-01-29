@@ -31,11 +31,10 @@
    lemmings.c
    deco32.c
    rohga.c
-
+   dassault.c
 
    to convert:
-
-   dassault.c - complex video mixing
+  
    boogwing.c - complex video mixing
 
    notes:

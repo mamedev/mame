@@ -2,182 +2,88 @@
 
    Desert Assault Video emulation - Bryan McPhail, mish@tendril.co.uk
 
+  I'm not sure if one of the alpha blending effects is correct (mode 0x8000,
+  the usual mode 0x4000 should be correct).  It may be some kind of orthogonal
+  priority effect where it should cut a hole in other higher priority sprites
+  to reveal a non-alpha'd hole, or alpha against a further back tilemap.
+  (is this the helicopter shadow at the end of lv.1 ?)
+
+  Also, some priorities are still a little questionable.
+
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "video/deco16ic.h"
 #include "includes/dassault.h"
 #include "video/decocomn.h"
+#include "video/decospr.h"
 
 /******************************************************************************/
 
-static void draw_sprites( running_machine& machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pf_priority )
+VIDEO_START(dassault)
 {
-	dassault_state *state = machine.driver_data<dassault_state>();
-	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
-	int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
-	int offs, bank, gfxbank;
-	const UINT16 *spritebase;
+	machine.device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
+	machine.device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+}
 
-	/* Have to loop over the two sprite sources */
-	for (bank = 0; bank < 2; bank++)
+static void mixdassaultlayer(running_machine &machine, bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, UINT16 pri, UINT16 primask, UINT16 penbase, UINT8 alpha)
+{
+	int y, x;
+	const pen_t *paldata = machine.pens;
+
+	UINT16* srcline;
+	UINT32* dstline;
+
+	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		for (offs = 0x800 - 4; offs >= 0; offs -= 4)
+		srcline=&sprite_bitmap->pix16(y,0);
+		dstline=&bitmap.pix32(y,0);
+
+		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
-			int alpha = 0xff, pmask = 0;
+			UINT16 pix = srcline[x];
 
-			/* Draw the main spritebank after the other one */
-			if (bank == 0)
-			{
-				spritebase = buffered_spriteram;
-				gfxbank = 3;
-			}
-			else
-			{
-				spritebase = machine.generic.buffered_spriteram2.u16;
-				gfxbank = 4;
-			}
-
-			sprite = spritebase[offs + 1] & 0x7fff;
-			if (!sprite)
+			if ((pix & primask) != pri)
 				continue;
 
-			x = spritebase[offs + 2];
-
-			/* Alpha on chip 2 only */
-			if (bank == 1 && x & 0xc000)
-				alpha = 0x80;
-
-			y = spritebase[offs];
-			flash = y & 0x1000;
-			if (flash && (machine.primary_screen->frame_number() & 1))
-				continue;
-			colour = (x >> 9) & 0x1f;
-			if (y & 0x8000)
-				colour += 32;
-
-			fx = y & 0x2000;
-			fy = y & 0x4000;
-			multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-			x = x & 0x01ff;
-			y = y & 0x01ff;
-			if (x >= 320) x -= 512;
-			if (y >= 256) y -= 512;
-			x = 304 - x;
-			y = 240 - y;
-
-			if (x > 320)
-				continue; /* Speedup */
-
-			sprite &= ~multi;
-			if (fy)
-				inc = -1;
-			else
+			if (pix&0xf)
 			{
-				sprite += multi;
-				inc = 1;
-			}
-
-			if (flip_screen_get(machine))
-			{
-				y = 240 - y;
-				x = 304 - x;
-				if (fx) fx = 0; else fx = 1;
-				if (fy) fy = 0; else fy = 1;
-				mult = 16;
-			}
-			else mult = -16;
-
-			/* Priority */
-			switch (pf_priority & 3)
-			{
-			case 0:
-				if (bank == 0)
-				{
-					switch (spritebase[offs+2]&0xc000)
+				UINT16 pen = pix&0x1ff;		
+				if (pix & 0x800) pen += 0x200;
+				
+				if (alpha!=0xff)
+				{		
+					if (pix&0x600)
 					{
-					case 0xc000: pmask = 1; break;
-					case 0x8000: pmask = 8; break;
-					case 0x4000: pmask = 32; break;
-					case 0x0000: pmask = 128; break;
+						UINT32 base = dstline[x];
+						dstline[x] = alpha_blend_r32(base, paldata[pen+penbase], alpha);
+					}
+					else
+					{
+						dstline[x] = paldata[pen+penbase];
 					}
 				}
 				else
 				{
-					if (spritebase[offs + 2] & 0x8000)
-						pmask = 64; /* Check */
-					else
-						pmask = 64;
+					dstline[x] = paldata[pen+penbase];
 				}
-				break;
-
-			case 1:
-				if (bank == 0)
-				{
-					switch (spritebase[offs + 2] & 0xc000)
-					{
-					case 0xc000: pmask = 1; break;
-					case 0x8000: pmask = 8; break;
-					case 0x4000: pmask = 32; break;
-					case 0x0000: pmask = 128; break;
-					}
-				}
-				else
-				{
-					if (spritebase[offs + 2] & 0x8000)
-						pmask = 16; /* Check */
-					else
-						pmask = 16;
-				}
-				break;
-
-			case 2: /* Unused */
-			case 3:
-				if (bank == 0)
-				{
-					switch (spritebase[offs + 2] & 0xc000)
-					{
-					case 0xc000: pmask = 1; break;
-					case 0x8000: pmask = 8; break;
-					case 0x4000: pmask = 32; break;
-					case 0x0000: pmask = 128; break;
-					}
-				}
-				else
-				{
-					if (spritebase[offs + 2] & 0x8000)
-						pmask = 64; /* Check */
-					else
-						pmask = 64;
-				}
-				break;
-			}
-
-			while (multi >= 0)
-			{
-				decocomn_pdrawgfx(
-						state->m_decocomn,
-						bitmap,cliprect,machine.gfx[gfxbank],
-						sprite - multi * inc,
-						colour,
-						fx, fy,
-						x, y + mult * multi,
-						0, pmask, 1 << bank, 1, alpha);
-
-				multi--;
 			}
 		}
 	}
 }
 
-/******************************************************************************/
-
+/* are the priorities 100% correct? they're the same as they were before conversion to DECO52 sprite device, but if (for example) you walk to the side of the crates in the first part of the game you appear over them... */
 SCREEN_UPDATE_RGB32( dassault )
 {
 	dassault_state *state = screen.machine().driver_data<dassault_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
+
+	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u16, 0x400, false);
+	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400, false);
+	bitmap_ind16* sprite_bitmap1 = &screen.machine().device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
+	bitmap_ind16* sprite_bitmap2 = &screen.machine().device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
 
 	/* Update tilemaps */
 	flip_screen_set(screen.machine(), BIT(flip, 7));
@@ -185,7 +91,6 @@ SCREEN_UPDATE_RGB32( dassault )
 	deco16ic_pf_update(state->m_deco_tilegen2, 0, state->m_pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
-	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
 	screen.machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(screen.machine().pens[3072], cliprect);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
@@ -193,26 +98,40 @@ SCREEN_UPDATE_RGB32( dassault )
 	/* The middle playfields can be swapped priority-wise */
 	if ((priority & 3) == 0)
 	{
-		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
-		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 16);
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2); // 2
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
+		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 16); // 16
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 64?
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
+
 	}
 	else if ((priority & 3) == 1)
 	{
-		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
-		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 64);
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
+		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2); // 2
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 16?
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 64); // 64
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
 	}
 	else if ((priority & 3) == 3)
 	{
-		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
-		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 16);
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
+		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2); // 2
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 16); // 16
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 64?
+		mixdassaultlayer(screen.machine(), bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
 	}
 	else
 	{
 		/* Unused */
 	}
-
-	/* Draw sprites - two sprite generators, with selectable priority */
-	draw_sprites(screen.machine(), bitmap, cliprect, priority);
+	 
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

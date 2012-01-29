@@ -4,11 +4,6 @@
   Desert Assault     (c) 1991 Data East Corporation (USA 4 players)
   Desert Assault     (c) 1991 Data East Corporation (USA 2 players)
 
-  I'm not sure if one of the alpha blending effects is correct (mode 0x8000,
-  the usual mode 0x4000 should be correct).  It may be some kind of orthogonal
-  priority effect where it should cut a hole in other higher priority sprites
-  to reveal a non-alpha'd hole, or alpha against a further back tilemap.
-
   Emulation by Bryan McPhail, mish@tendril.co.uk
 
 
@@ -130,6 +125,7 @@ Dip locations verified with US conversion kit manual.
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
+#include "video/decospr.h"
 
 /**********************************************************************************/
 
@@ -505,8 +501,8 @@ static GFXDECODE_START( dassault )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0,  32 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0,  32 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   512,  32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,  1024,  64 )	/* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,  2048,  64 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,  0/*1024*/,  64 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,  0/*2048*/,  64 )	/* Sprites 16x16 */
 GFXDECODE_END
 
 /**********************************************************************************/
@@ -582,7 +578,8 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
+//	MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
+	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -594,6 +591,8 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(dassault)
 
+	MCFG_VIDEO_START(dassault)
+
 	MCFG_GFXDECODE(dassault)
 	MCFG_PALETTE_LENGTH(4096)
 
@@ -601,6 +600,13 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", dassault_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", dassault_deco16ic_tilegen2_intf)
+
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 4);
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -825,27 +831,6 @@ ROM_END
 
 /**********************************************************************************/
 
-static READ16_HANDLER( dassault_main_skip )
-{
-	dassault_state *state = space->machine().driver_data<dassault_state>();
-	int ret = state->m_ram[0];
-
-	if (cpu_get_previouspc(&space->device()) == 0x1170 && ret & 0x8000)
-		device_spin_until_interrupt(&space->device());
-
-	return ret;
-}
-
-static READ16_HANDLER( thndzone_main_skip )
-{
-	dassault_state *state = space->machine().driver_data<dassault_state>();
-	int ret = state->m_ram[0];
-
-	if (cpu_get_pc(&space->device()) == 0x114c && ret & 0x8000)
-		device_spin_until_interrupt(&space->device());
-
-	return ret;
-}
 
 static DRIVER_INIT( dassault )
 {
@@ -862,9 +847,6 @@ static DRIVER_INIT( dassault )
 	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
 
 	auto_free(machine, tmp);
-
-	/* Save time waiting on vblank bit */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3f8000, 0x3f8001, FUNC(dassault_main_skip));
 }
 
 static DRIVER_INIT( thndzone )
@@ -882,9 +864,6 @@ static DRIVER_INIT( thndzone )
 	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
 
 	auto_free(machine, tmp);
-
-	/* Save time waiting on vblank bit */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3f8000, 0x3f8001, FUNC(thndzone_main_skip));
 }
 
 /**********************************************************************************/
