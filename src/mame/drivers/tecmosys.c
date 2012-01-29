@@ -4,6 +4,7 @@
 
  ToDo:
   - Dump / Decap MCUs to allow for proper protection emulation.
+  - tkdenshoa pcb shows some garbage sprites at the top during y-scroll
 
 
 T.Slanina 20040530 :
