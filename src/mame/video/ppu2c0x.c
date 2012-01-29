@@ -87,7 +87,7 @@ const device_type PPU_2C05_04 = &device_creator<ppu2c05_04_device>;
 static ADDRESS_MAP_START( ppu2c0x, AS_0, 8, ppu2c0x_device )
 	AM_RANGE(0x0000, 0x3eff) AM_RAM
 	AM_RANGE(0x3f00, 0x3fff) AM_READWRITE(palette_read, palette_write)
-//	AM_RANGE(0x0000, 0x3fff) AM_RAM
+//  AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -109,7 +109,7 @@ void ppu2c0x_device::device_config_complete()
 {
 	const ppu2c0x_interface *config = reinterpret_cast<const ppu2c0x_interface *>(static_config());
 	assert(config);
-	
+
 	/* reset the callbacks */
 	m_latch = NULL;
 	m_scanline_callback_proc = NULL;
@@ -143,11 +143,11 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 {
 	for (int i = 0; i < PPU_MAX_REG; i++)
 		m_regs[i] = 0;
-	
+
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
-	
+
 	m_scanlines_per_frame = PPU_NTSC_SCANLINES_PER_FRAME;
-	
+
 	/* usually, no security value... */
 	m_security_value = 0;
 }
@@ -207,12 +207,12 @@ void ppu2c0x_device::device_start()
 	m_cpu = machine().device<cpu_device>( m_cpu_tag );
 
 	assert(m_screen && m_cpu);
-	
+
 	// allocate timers
 	m_hblank_timer = timer_alloc(TIMER_HBLANK);
 	m_nmi_timer = timer_alloc(TIMER_NMI);
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	
+
 	/* initialize the scanline handling portion */
 	m_scanline_timer->adjust(m_screen->time_until_pos(1));
 	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
@@ -229,7 +229,7 @@ void ppu2c0x_device::device_start()
 	{
 		/* monochromatic table */
 		m_colortable_mono[i] = default_colortable_mono[i] + m_color_base;
-		
+
 		/* color table */
 		m_colortable[i] = default_colortable[i] + m_color_base;
 	}
@@ -468,47 +468,47 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		case TIMER_HBLANK:
 			blanked = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
 			vblank = ((m_scanline >= PPU_VBLANK_FIRST_SCANLINE - 1) && (m_scanline < m_scanlines_per_frame - 1)) ? 1 : 0;
-			
+
 			//update_scanline();
-			
+
 			if (m_hblank_callback_proc)
 				(*m_hblank_callback_proc) (this, m_scanline, vblank, blanked);
-			
+
 			m_hblank_timer->adjust(attotime::never);
 			break;
-			
-		case TIMER_NMI:			
+
+		case TIMER_NMI:
 			// Actually fire the VMI
 			if (m_nmi_callback_proc)
 				(*m_nmi_callback_proc) (this, regs);
-			
+
 			m_nmi_timer->adjust(attotime::never);
 			break;
-			
+
 		case TIMER_SCANLINE:
 			blanked = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
 			vblank = ((m_scanline >= PPU_VBLANK_FIRST_SCANLINE - 1) && (m_scanline < m_scanlines_per_frame - 1)) ? 1 : 0;
 			int next_scanline;
-			
+
 			/* if a callback is available, call it */
 			if (m_scanline_callback_proc)
 				(*m_scanline_callback_proc)(this, m_scanline, vblank, blanked);
-			
+
 			/* update the scanline that just went by */
 			update_scanline();
-			
+
 			/* increment our scanline count */
 			m_scanline++;
-			
+
 			//  logerror("starting scanline %d (MAME %d, beam %d)\n", m_scanline, device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos());
-			
+
 			/* Note: this is called at the _end_ of each scanline */
 			if (m_scanline == PPU_VBLANK_FIRST_SCANLINE)
 			{
 				// logerror("vblank starting\n");
 				/* We just entered VBLANK */
 				m_regs[PPU_STATUS] |= PPU_STATUS_VBLANK;
-				
+
 				/* If NMI's are set to be triggered, go for it */
 				if (m_regs[PPU_CONTROL0] & PPU_CONTROL0_NMI)
 				{
@@ -519,33 +519,33 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					m_nmi_timer->adjust(m_cpu->cycles_to_attotime(4));
 				}
 			}
-			
+
 			if (m_scanline == m_scanlines_per_frame - 1)
 			{
 				// logerror("vblank ending\n");
 				/* clear the vblank & sprite hit flag */
 				m_regs[PPU_STATUS] &= ~(PPU_STATUS_VBLANK | PPU_STATUS_SPRITE0_HIT | PPU_STATUS_8SPRITES);
 			}
-			
+
 			/* see if we rolled */
 			else if (m_scanline == m_scanlines_per_frame)
 			{
 				/* if background or sprites are enabled, copy the ppu address latch */
 				if (!blanked)
 					m_refresh_data = m_refresh_latch;
-				
+
 				/* reset the scanline count */
 				m_scanline = 0;
 				//logerror("sprite 0 x: %d y: %d num: %d\n", m_spriteram[3], m_spriteram[0] + 1, m_spriteram[1]);
 			}
-			
+
 			next_scanline = m_scanline + 1;
 			if (next_scanline == m_scanlines_per_frame)
 				next_scanline = 0;
-			
+
 			// Call us back when the hblank starts for this scanline
 			m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
-			
+
 			// trigger again at the start of the next scanline
 			m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline * m_scan_scale));
 			break;
@@ -1043,7 +1043,7 @@ READ8_MEMBER( ppu2c0x_device::palette_read )
 {
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 		return (m_palette_ram[offset & 0x1f] & 0x30);
-	
+
 	else
 		return (m_palette_ram[offset & 0x1f]);
 }

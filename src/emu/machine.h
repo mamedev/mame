@@ -444,7 +444,7 @@ private:
 	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
 	void soft_reset(void *ptr = NULL, INT32 param = 0);
-	
+
 	// internal callbacks
 	static void logfile_callback(running_machine &machine, const char *buffer);
 

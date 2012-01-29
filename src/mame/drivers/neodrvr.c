@@ -8882,7 +8882,7 @@ ROM_START( sbp ) /* Unlicensed, no official game ID # */
 	ROM_IGNORE(0x20000)
 
 	ROM_REGION( 0x20000, "fixedbios", 0 )
-	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )																												
+	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 	ROM_Y_ZOOM
 
 	NEO_BIOS_AUDIO_512K( "1b.bin", CRC(7b1f86f7) SHA1(15b6af7f9fbd0f1f6a1ecd912200ca8d0af2da2a) )

@@ -3123,7 +3123,7 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 		case 2:			/* LGDT */
 			{
 				if(PROTECTED_MODE && cpustate->CPL)
-					FAULT(FAULT_GP,0) 
+					FAULT(FAULT_GP,0)
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
 					ea = i386_translate(cpustate, CS, address, 0 );
@@ -3138,7 +3138,7 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 		case 3:			/* LIDT */
 			{
 				if(PROTECTED_MODE && cpustate->CPL)
-					FAULT(FAULT_GP,0) 
+					FAULT(FAULT_GP,0)
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
 					ea = i386_translate(cpustate, CS, address, 0 );

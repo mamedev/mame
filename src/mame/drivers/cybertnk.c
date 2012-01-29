@@ -851,7 +851,7 @@ static const gfx_layout roadlayout =
 	{ 0 },
 	1024*4,
 	xoffsets
-}; 
+};
 
 static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8x4,     0x1400, 16 ) /*Pal offset???*/

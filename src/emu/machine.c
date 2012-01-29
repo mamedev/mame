@@ -915,7 +915,7 @@ void running_machine::start_all_devices()
 					failed_starts++;
 				}
 			}
-		
+
 		// each iteration should reduce the number of failed starts; error if
 		// this doesn't happen
 		if (failed_starts == last_failed_starts)
@@ -954,12 +954,12 @@ void running_machine::stop_all_devices()
 		device->stop();
 
 	// then nuke the device tree
-//	global_free(m_root_device);
+//  global_free(m_root_device);
 }
 
 
 //-------------------------------------------------
-//  presave_all_devices - tell all the devices we 
+//  presave_all_devices - tell all the devices we
 //  are about to save
 //-------------------------------------------------
 
@@ -972,7 +972,7 @@ void running_machine::presave_all_devices()
 
 
 //-------------------------------------------------
-//  postload_all_devices - tell all the devices we 
+//  postload_all_devices - tell all the devices we
 //  just completed a load
 //-------------------------------------------------
 
@@ -1266,7 +1266,7 @@ void driver_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset_after_children - device override 
+//  device_reset_after_children - device override
 //  which calls the various helpers; must happen
 //  after all child devices are reset
 //-------------------------------------------------

@@ -42,13 +42,13 @@
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
 
 /*
- *	FLAC__window_*()
- *	--------------------------------------------------------------------
- *	Calculates window coefficients according to different apodization
- *	functions.
+ *  FLAC__window_*()
+ *  --------------------------------------------------------------------
+ *  Calculates window coefficients according to different apodization
+ *  functions.
  *
- *	OUT window[0,L-1]
- *	IN L (number of points in window)
+ *  OUT window[0,L-1]
+ *  IN L (number of points in window)
  */
 void FLAC__window_bartlett(FLAC__real *window, const FLAC__int32 L);
 void FLAC__window_bartlett_hann(FLAC__real *window, const FLAC__int32 L);

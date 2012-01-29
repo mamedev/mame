@@ -144,7 +144,7 @@ class ppu2c0x_device :	public device_t,
 public:
     // construction/destruction
 	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( palette_read );
@@ -157,12 +157,12 @@ public:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	// address space configurations
 	const address_space_config		m_space_config;
-	
-	
+
+
 	/* routines */
 	void init_palette( running_machine &machine, int first_entry );
 	void init_palette_rgb( running_machine &machine, int first_entry );
-	
+
 	void draw_background( UINT8 *line_priority );
 	void draw_sprites( UINT8 *line_priority );
 	void render_scanline();
@@ -179,15 +179,15 @@ public:
 	void set_hblank_callback( ppu2c0x_scanline_cb cb ) { if (cb != NULL) m_hblank_callback_proc = cb; };
 	void set_vidaccess_callback( ppu2c0x_vidaccess_cb cb ) { if (cb != NULL) m_vidaccess_callback_proc = cb; };
 	void set_scanlines_per_frame( int scanlines ) { m_scanlines_per_frame = scanlines; };
-	
+
 	//27/12/2002 (HACK!)
 	void set_latch( void (*ppu_latch_t)( device_t *device, offs_t offset ) );
-	
-	//	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
-	
+
+	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+
 	cpu_device					*m_cpu;
 	screen_device				*m_screen;
-	bitmap_ind16 				*m_bitmap;			/* target bitmap */
+	bitmap_ind16				*m_bitmap;			/* target bitmap */
 	UINT8                       *m_spriteram;			/* sprite ram */
 	pen_t                       *m_colortable;			/* color table modified at run time */
 	pen_t                       *m_colortable_mono;		/* monochromatic color table modified at run time */
@@ -214,7 +214,7 @@ public:
 	int                         m_scanlines_per_frame;	/* number of scanlines per frame */
 	int                         m_security_value;		/* 2C05 protection */
 	void (*m_latch)( device_t *device, offs_t offset );
-	
+
 	// timers
 	emu_timer                   *m_hblank_timer;		/* hblank period at end of each scanline */
 	emu_timer                   *m_nmi_timer;			/* NMI timer */

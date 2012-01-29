@@ -208,11 +208,11 @@ process_data_buffer_main (j_compress_ptr cinfo,
     if (main->pass_mode != JBUF_SAVE_SOURCE) {
       if (! (*cinfo->coef->compress_data) (cinfo, main->buffer)) {
 	/* If compressor did not consume the whole row, then we must need to
-	 * suspend processing and return to the application.  In this situation
-	 * we pretend we didn't yet consume the last input row; otherwise, if
-	 * it happened to be the last row of the image, the application would
-	 * think we were done.
-	 */
+     * suspend processing and return to the application.  In this situation
+     * we pretend we didn't yet consume the last input row; otherwise, if
+     * it happened to be the last row of the image, the application would
+     * think we were done.
+     */
 	if (! main->suspended) {
 	  (*in_row_ctr)--;
 	  main->suspended = TRUE;

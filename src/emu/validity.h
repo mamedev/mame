@@ -63,18 +63,18 @@ class validity_checker
 public:
 	validity_checker(emu_options &options);
 
-	// getters	
+	// getters
 	int errors() const { return m_errors; }
 	int warnings() const { return m_warnings; }
 
-	// operations	
+	// operations
 	void check_driver(const game_driver &driver);
 	void check_shared_source(const game_driver &driver);
 	void check_all();
 
 	// helpers for devices
 	void validate_tag(const char *tag);
-	
+
 private:
 	// internal helpers
 	const char *ioport_string_from_index(UINT32 index);
@@ -84,7 +84,7 @@ private:
 	void validate_begin();
 	void validate_end();
 	void validate_one(const game_driver &driver);
-	
+
 	// internal sub-checks
 	void validate_core();
 	void validate_inlines();
@@ -106,8 +106,8 @@ private:
 	void output_via_delegate(output_delegate &delegate, const char *format, ...);
 
 	// internal driver list
-	driver_enumerator 		m_drivlist;
-	
+	driver_enumerator		m_drivlist;
+
 	// error tracking
 	int						m_errors;
 	int						m_warnings;
@@ -128,8 +128,8 @@ private:
 	int_map 				m_region_map;
 
 	// callbacks
-	output_delegate			m_saved_error_output; 
-	output_delegate			m_saved_warning_output; 
+	output_delegate			m_saved_error_output;
+	output_delegate			m_saved_warning_output;
 };
 
 #endif

@@ -110,7 +110,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	  m_clock(clock),
 	  m_clock_scale(1.0),
 	  m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
-	  
+
 	  m_debug(NULL),
 	  m_region(NULL),
 	  m_machine_config(mconfig),
@@ -148,7 +148,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	  m_clock(clock),
 	  m_clock_scale(1.0),
 	  m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
-	  
+
 	  m_debug(NULL),
 	  m_region(NULL),
 	  m_machine_config(mconfig),
@@ -262,11 +262,11 @@ void device_t::reset()
 
 	// reset the device
 	device_reset();
-	
+
 	// reset all child devices
 	for (device_t *child = m_subdevice_list.first(); child != NULL; child = child->next())
 		child->reset();
-	
+
 	// now allow for some post-child reset action
 	device_reset_after_children();
 
@@ -695,7 +695,7 @@ device_t *device_t::subdevice_slow(const char *tag) const
 				if (part == curdevice->m_basetag)
 					break;
 		}
-	
+
 	// if we got a match, add to the fast map
 	if (curdevice != NULL)
 	{
@@ -719,7 +719,7 @@ astring &device_t::subtag(astring &result, const char *tag) const
 		tag++;
 		result.cpy(":");
 	}
-	
+
 	// otherwise, start with our path
 	else
 	{
@@ -735,12 +735,12 @@ astring &device_t::subtag(astring &result, const char *tag) const
 		// copy everything up to there
 		result.cat(tag, caret - tag);
 		tag = caret + 1;
-		
+
 		// strip trailing colons
 		int len = result.len();
 		while (result[--len] == ':')
 			result.substr(0, len);
-	
+
 		// remove the last path part, leaving the last colon
 		if (result != ":")
 		{
@@ -792,7 +792,7 @@ device_t *device_t::replace_subdevice(device_t &old, device_type type, const cha
 	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
 		scan->m_device_map.remove(&old);
 
-	// create a new device, and substitute it for the old one	
+	// create a new device, and substitute it for the old one
 	device_t *device = (*type)(mconfig(), tag, this, clock);
 	m_subdevice_list.replace_and_remove(*device, old);
 

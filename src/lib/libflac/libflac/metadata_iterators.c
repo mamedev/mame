@@ -264,9 +264,9 @@ void metadata_callback_(const FLAC__StreamDecoder *decoder, const FLAC__StreamMe
 	(void)decoder;
 
 	/*
-	 * we assume we only get here when the one metadata block we were
-	 * looking for was passed to us
-	 */
+     * we assume we only get here when the one metadata block we were
+     * looking for was passed to us
+     */
 	if(!cd->got_error && 0 == cd->object) {
 		if(0 == (cd->object = FLAC__metadata_object_clone(metadata)))
 			cd->got_error = true;
@@ -906,10 +906,10 @@ struct FLAC__Metadata_Chain {
 	FLAC__Metadata_ChainStatus status;
 	off_t first_offset, last_offset;
 	/*
-	 * This is the length of the chain initially read from the FLAC file.
-	 * it is used to compare against the current length to decide whether
-	 * or not the whole file has to be rewritten.
-	 */
+     * This is the length of the chain initially read from the FLAC file.
+     * it is used to compare against the current length to decide whether
+     * or not the whole file has to be rewritten.
+     */
 	off_t initial_length;
 	/* @@@ hacky, these are currently only needed by ogg reader */
 	FLAC__IOHandle handle;
@@ -1613,9 +1613,9 @@ FLAC_API FLAC__bool FLAC__metadata_chain_read_ogg_with_callbacks(FLAC__Metadata_
 FLAC_API FLAC__bool FLAC__metadata_chain_check_if_tempfile_needed(FLAC__Metadata_Chain *chain, FLAC__bool use_padding)
 {
 	/* This does all the same checks that are in chain_prepare_for_write_()
-	 * but doesn't actually alter the chain.  Make sure to update the logic
-	 * here if chain_prepare_for_write_() changes.
-	 */
+     * but doesn't actually alter the chain.  Make sure to update the logic
+     * here if chain_prepare_for_write_() changes.
+     */
 	const off_t current_length = chain_calculate_length_(chain);
 
 	FLAC__ASSERT(0 != chain);
@@ -1811,9 +1811,9 @@ FLAC_API void FLAC__metadata_chain_sort_padding(FLAC__Metadata_Chain *chain)
 	FLAC__ASSERT(0 != chain);
 
 	/*
-	 * Don't try and be too smart... this simple algo is good enough for
-	 * the small number of nodes that we deal with.
-	 */
+     * Don't try and be too smart... this simple algo is good enough for
+     * the small number of nodes that we deal with.
+     */
 	for(i = 0, node = chain->head; i < chain->nodes; i++) {
 		if(node->data->type == FLAC__METADATA_TYPE_PADDING) {
 			save = node->next;
@@ -1835,9 +1835,9 @@ FLAC_API FLAC__Metadata_Iterator *FLAC__metadata_iterator_new(void)
 	FLAC__Metadata_Iterator *iterator = (FLAC__Metadata_Iterator*)calloc(1, sizeof(FLAC__Metadata_Iterator));
 
 	/* calloc() implies:
-		iterator->current = 0;
-		iterator->chain = 0;
-	*/
+        iterator->current = 0;
+        iterator->chain = 0;
+    */
 
 	return iterator;
 }
@@ -2087,9 +2087,9 @@ FLAC__bool read_metadata_block_header_cb_(FLAC__IOHandle handle, FLAC__IOCallbac
 	*length = unpack_uint32_(raw_header + 1, 3);
 
 	/* Note that we don't check:
-	 *    if(iterator->type >= FLAC__METADATA_TYPE_UNDEFINED)
-	 * we just will read in an opaque block
-	 */
+     *    if(iterator->type >= FLAC__METADATA_TYPE_UNDEFINED)
+     * we just will read in an opaque block
+     */
 
 	return true;
 }
@@ -2126,9 +2126,9 @@ FLAC__Metadata_SimpleIteratorStatus read_metadata_block_data_streaminfo_cb_(FLAC
 	b = buffer;
 
 	/* we are using hardcoded numbers for simplicity but we should
-	 * probably eventually write a bit-level unpacker and use the
-	 * _STREAMINFO_ constants.
-	 */
+     * probably eventually write a bit-level unpacker and use the
+     * _STREAMINFO_ constants.
+     */
 	block->min_blocksize = unpack_uint32_(b, 2); b += 2;
 	block->max_blocksize = unpack_uint32_(b, 2); b += 2;
 	block->min_framesize = unpack_uint32_(b, 3); b += 3;
@@ -2555,9 +2555,9 @@ FLAC__bool write_metadata_block_data_streaminfo_cb_(FLAC__IOHandle handle, FLAC_
 	const unsigned bps1 = block->bits_per_sample - 1;
 
 	/* we are using hardcoded numbers for simplicity but we should
-	 * probably eventually write a bit-level packer and use the
-	 * _STREAMINFO_ constants.
-	 */
+     * probably eventually write a bit-level packer and use the
+     * _STREAMINFO_ constants.
+     */
 	pack_uint32_(block->min_blocksize, buffer, 2);
 	pack_uint32_(block->max_blocksize, buffer+2, 2);
 	pack_uint32_(block->min_framesize, buffer+4, 3);
@@ -3066,11 +3066,11 @@ FLAC__bool simple_iterator_copy_file_postfix_(FLAC__Metadata_SimpleIterator *ite
 
 	if(fixup_is_last_code != 0) {
 		/*
-		 * if code == 1, it means a block was appended to the end so
-		 *   we have to clear the is_last flag of the previous block
-		 * if code == -1, it means the last block was deleted so
-		 *   we have to set the is_last flag of the previous block
-		 */
+         * if code == 1, it means a block was appended to the end so
+         *   we have to clear the is_last flag of the previous block
+         * if code == -1, it means the last block was deleted so
+         *   we have to set the is_last flag of the previous block
+         */
 		/* MAGIC NUMBERs here; we know the is_last flag is the high bit of the byte at this location */
 		FLAC__byte x;
 		if(0 != fseeko(*tempfile, fixup_is_last_flag_offset, SEEK_SET)) {

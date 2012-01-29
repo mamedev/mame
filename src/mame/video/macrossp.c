@@ -358,7 +358,7 @@ static void draw_layer( running_machine &machine, bitmap_rgb32 &bitmap, const re
 		startx -= (368/2) * inc;
 		starty -= (240/2) * inc;
 
-		tm->draw_roz(bitmap, cliprect, 
+		tm->draw_roz(bitmap, cliprect,
 				startx,starty,inc,0,0,inc,
 				1,	/* wraparound */
 				0,0);

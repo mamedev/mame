@@ -217,21 +217,21 @@ FLAC__bool bitreader_read_from_client_(FLAC__BitReader *br)
 	}
 
 	/*
-	 * set the target for reading, taking into account word alignment and endianness
-	 */
+     * set the target for reading, taking into account word alignment and endianness
+     */
 	bytes = (br->capacity - br->words) * FLAC__BYTES_PER_WORD - br->bytes;
 	if(bytes == 0)
 		return false; /* no space left, buffer is too small; see note for FLAC__BITREADER_DEFAULT_CAPACITY  */
 	target = ((FLAC__byte*)(br->buffer+br->words)) + br->bytes;
 
 	/* before reading, if the existing reader looks like this (say brword is 32 bits wide)
-	 *   bitstream :  11 22 33 44 55            br->words=1 br->bytes=1 (partial tail word is left-justified)
-	 *   buffer[BE]:  11 22 33 44 55 ?? ?? ??   (shown layed out as bytes sequentially in memory)
-	 *   buffer[LE]:  44 33 22 11 ?? ?? ?? 55   (?? being don't-care)
-	 *                               ^^-------target, bytes=3
-	 * on LE machines, have to byteswap the odd tail word so nothing is
-	 * overwritten:
-	 */
+     *   bitstream :  11 22 33 44 55            br->words=1 br->bytes=1 (partial tail word is left-justified)
+     *   buffer[BE]:  11 22 33 44 55 ?? ?? ??   (shown layed out as bytes sequentially in memory)
+     *   buffer[LE]:  44 33 22 11 ?? ?? ?? 55   (?? being don't-care)
+     *                               ^^-------target, bytes=3
+     * on LE machines, have to byteswap the odd tail word so nothing is
+     * overwritten:
+     */
 #if WORDS_BIGENDIAN
 #else
 	if(br->bytes)
@@ -239,22 +239,22 @@ FLAC__bool bitreader_read_from_client_(FLAC__BitReader *br)
 #endif
 
 	/* now it looks like:
-	 *   bitstream :  11 22 33 44 55            br->words=1 br->bytes=1
-	 *   buffer[BE]:  11 22 33 44 55 ?? ?? ??
-	 *   buffer[LE]:  44 33 22 11 55 ?? ?? ??
-	 *                               ^^-------target, bytes=3
-	 */
+     *   bitstream :  11 22 33 44 55            br->words=1 br->bytes=1
+     *   buffer[BE]:  11 22 33 44 55 ?? ?? ??
+     *   buffer[LE]:  44 33 22 11 55 ?? ?? ??
+     *                               ^^-------target, bytes=3
+     */
 
 	/* read in the data; note that the callback may return a smaller number of bytes */
 	if(!br->read_callback(target, &bytes, br->client_data))
 		return false;
 
 	/* after reading bytes 66 77 88 99 AA BB CC DD EE FF from the client:
-	 *   bitstream :  11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF
-	 *   buffer[BE]:  11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF ??
-	 *   buffer[LE]:  44 33 22 11 55 66 77 88 99 AA BB CC DD EE FF ??
-	 * now have to byteswap on LE machines:
-	 */
+     *   bitstream :  11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF
+     *   buffer[BE]:  11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF ??
+     *   buffer[LE]:  44 33 22 11 55 66 77 88 99 AA BB CC DD EE FF ??
+     * now have to byteswap on LE machines:
+     */
 #if WORDS_BIGENDIAN
 #else
 	end = (br->words*FLAC__BYTES_PER_WORD + br->bytes + bytes + (FLAC__BYTES_PER_WORD-1)) / FLAC__BYTES_PER_WORD;
@@ -270,11 +270,11 @@ FLAC__bool bitreader_read_from_client_(FLAC__BitReader *br)
 #endif
 
 	/* now it looks like:
-	 *   bitstream :  11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF
-	 *   buffer[BE]:  11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF ??
-	 *   buffer[LE]:  44 33 22 11 88 77 66 55 CC BB AA 99 ?? FF EE DD
-	 * finally we'll update the reader values:
-	 */
+     *   bitstream :  11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF
+     *   buffer[BE]:  11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF ??
+     *   buffer[LE]:  44 33 22 11 88 77 66 55 CC BB AA 99 ?? FF EE DD
+     * finally we'll update the reader values:
+     */
 	end = br->words*FLAC__BYTES_PER_WORD + br->bytes + bytes;
 	br->words = end / FLAC__BYTES_PER_WORD;
 	br->bytes = end % FLAC__BYTES_PER_WORD;
@@ -293,14 +293,14 @@ FLAC__BitReader *FLAC__bitreader_new(void)
 	FLAC__BitReader *br = (FLAC__BitReader*)calloc(1, sizeof(FLAC__BitReader));
 
 	/* calloc() implies:
-		memset(br, 0, sizeof(FLAC__BitReader));
-		br->buffer = 0;
-		br->capacity = 0;
-		br->words = br->bytes = 0;
-		br->consumed_words = br->consumed_bits = 0;
-		br->read_callback = 0;
-		br->client_data = 0;
-	*/
+        memset(br, 0, sizeof(FLAC__BitReader));
+        br->buffer = 0;
+        br->capacity = 0;
+        br->words = br->bytes = 0;
+        br->consumed_words = br->consumed_bits = 0;
+        br->read_callback = 0;
+        br->client_data = 0;
+    */
 	return br;
 }
 
@@ -487,9 +487,9 @@ FLaC__INLINE FLAC__bool FLAC__bitreader_read_raw_uint32(FLAC__BitReader *br, FLA
 	}
 	else {
 		/* in this case we're starting our read at a partial tail word;
-		 * the reader has guaranteed that we have at least 'bits' bits
-		 * available to read, which makes this case simpler.
-		 */
+         * the reader has guaranteed that we have at least 'bits' bits
+         * available to read, which makes this case simpler.
+         */
 		/* OPT: taking out the consumed_bits==0 "else" case below might make things faster if less code allows the compiler to inline this function */
 		if(br->consumed_bits) {
 			/* this also works when consumed_bits==0, it's just a little slower than necessary for that case */
@@ -566,9 +566,9 @@ FLaC__INLINE FLAC__bool FLAC__bitreader_read_uint32_little_endian(FLAC__BitReade
 FLAC__bool FLAC__bitreader_skip_bits_no_crc(FLAC__BitReader *br, unsigned bits)
 {
 	/*
-	 * OPT: a faster implementation is possible but probably not that useful
-	 * since this is only called a couple of times in the metadata readers.
-	 */
+     * OPT: a faster implementation is possible but probably not that useful
+     * since this is only called a couple of times in the metadata readers.
+     */
 	FLAC__ASSERT(0 != br);
 	FLAC__ASSERT(0 != br->buffer);
 
@@ -740,12 +740,12 @@ FLaC__INLINE FLAC__bool FLAC__bitreader_read_unary_unsigned(FLAC__BitReader *br,
 			}
 		}
 		/* at this point we've eaten up all the whole words; have to try
-		 * reading through any tail bytes before calling the read callback.
-		 * this is a repeat of the above logic adjusted for the fact we
-		 * don't have a whole word.  note though if the client is feeding
-		 * us data a byte at a time (unlikely), br->consumed_bits may not
-		 * be zero.
-		 */
+         * reading through any tail bytes before calling the read callback.
+         * this is a repeat of the above logic adjusted for the fact we
+         * don't have a whole word.  note though if the client is feeding
+         * us data a byte at a time (unlikely), br->consumed_bits may not
+         * be zero.
+         */
 		if(br->bytes) {
 			const unsigned end = br->bytes * 8;
 			brword b = (br->buffer[br->consumed_words] & (FLAC__WORD_ALL_ONES << (FLAC__BITS_PER_WORD-end))) << br->consumed_bits;
@@ -808,8 +808,8 @@ FLAC__bool FLAC__bitreader_read_rice_signed_block(FLAC__BitReader *br, int vals[
 	unsigned bits; /* the # of binary LSBs left to read to finish a rice codeword */
 
 	/* try and get br->consumed_words and br->consumed_bits into register;
-	 * must remember to flush them back to *br before calling other
-	 * bitwriter functions that use them, and before returning */
+     * must remember to flush them back to *br before calling other
+     * bitwriter functions that use them, and before returning */
 	register unsigned cwords;
 	register unsigned cbits;
 
@@ -863,12 +863,12 @@ FLAC__bool FLAC__bitreader_read_rice_signed_block(FLAC__BitReader *br, int vals[
 				}
 			}
 			/* at this point we've eaten up all the whole words; have to try
-			 * reading through any tail bytes before calling the read callback.
-			 * this is a repeat of the above logic adjusted for the fact we
-			 * don't have a whole word.  note though if the client is feeding
-			 * us data a byte at a time (unlikely), br->consumed_bits may not
-			 * be zero.
-			 */
+             * reading through any tail bytes before calling the read callback.
+             * this is a repeat of the above logic adjusted for the fact we
+             * don't have a whole word.  note though if the client is feeding
+             * us data a byte at a time (unlikely), br->consumed_bits may not
+             * be zero.
+             */
 			if(br->bytes) {
 				const unsigned end = br->bytes * 8;
 				brword b = (br->buffer[cwords] & (FLAC__WORD_ALL_ONES << (FLAC__BITS_PER_WORD-end))) << cbits;
@@ -889,9 +889,9 @@ FLAC__bool FLAC__bitreader_read_rice_signed_block(FLAC__BitReader *br, int vals[
 				}
 			}
 			/* flush registers and read; bitreader_read_from_client_() does
-			 * not touch br->consumed_bits at all but we still need to set
-			 * it in case it fails and we have to return false.
-			 */
+             * not touch br->consumed_bits at all but we still need to set
+             * it in case it fails and we have to return false.
+             */
 			br->consumed_bits = cbits;
 			br->consumed_words = cwords;
 			if(!bitreader_read_from_client_(br))
@@ -905,9 +905,9 @@ break1:
 		if(bits) {
 			while((br->words-cwords)*FLAC__BITS_PER_WORD + br->bytes*8 - cbits < bits) {
 				/* flush registers and read; bitreader_read_from_client_() does
-				 * not touch br->consumed_bits at all but we still need to set
-				 * it in case it fails and we have to return false.
-				 */
+                 * not touch br->consumed_bits at all but we still need to set
+                 * it in case it fails and we have to return false.
+                 */
 				br->consumed_bits = cbits;
 				br->consumed_words = cwords;
 				if(!bitreader_read_from_client_(br))
@@ -948,9 +948,9 @@ break1:
 			}
 			else {
 				/* in this case we're starting our read at a partial tail word;
-				 * the reader has guaranteed that we have at least 'bits' bits
-				 * available to read, which makes this case simpler.
-				 */
+                 * the reader has guaranteed that we have at least 'bits' bits
+                 * available to read, which makes this case simpler.
+                 */
 				uval <<= bits;
 				if(cbits) {
 					/* this also works when consumed_bits==0, it's just a little slower than necessary for that case */
@@ -989,8 +989,8 @@ break2:
 	unsigned uval = 0;
 
 	/* try and get br->consumed_words and br->consumed_bits into register;
-	 * must remember to flush them back to *br before calling other
-	 * bitwriter functions that use them, and before returning */
+     * must remember to flush them back to *br before calling other
+     * bitwriter functions that use them, and before returning */
 	register unsigned cwords;
 	register unsigned cbits;
 	unsigned ucbits; /* keep track of the number of unconsumed bits in the buffer */
@@ -1046,12 +1046,12 @@ break2:
 				}
 			}
 			/* at this point we've eaten up all the whole words; have to try
-			 * reading through any tail bytes before calling the read callback.
-			 * this is a repeat of the above logic adjusted for the fact we
-			 * don't have a whole word.  note though if the client is feeding
-			 * us data a byte at a time (unlikely), br->consumed_bits may not
-			 * be zero.
-			 */
+             * reading through any tail bytes before calling the read callback.
+             * this is a repeat of the above logic adjusted for the fact we
+             * don't have a whole word.  note though if the client is feeding
+             * us data a byte at a time (unlikely), br->consumed_bits may not
+             * be zero.
+             */
 			if(br->bytes) {
 				const unsigned end = br->bytes * 8;
 				brword b = (br->buffer[cwords] & ~(FLAC__WORD_ALL_ONES >> end)) << cbits;
@@ -1071,9 +1071,9 @@ break2:
 				}
 			}
 			/* flush registers and read; bitreader_read_from_client_() does
-			 * not touch br->consumed_bits at all but we still need to set
-			 * it in case it fails and we have to return false.
-			 */
+             * not touch br->consumed_bits at all but we still need to set
+             * it in case it fails and we have to return false.
+             */
 			br->consumed_bits = cbits;
 			br->consumed_words = cwords;
 			if(!bitreader_read_from_client_(br))
@@ -1081,9 +1081,9 @@ break2:
 			cwords = br->consumed_words;
 			ucbits = (br->words-cwords)*FLAC__BITS_PER_WORD + br->bytes*8 - cbits + uval;
 			/* + uval to offset our count by the # of unary bits already
-			 * consumed before the read, because we will add these back
-			 * in all at once at break1
-			 */
+             * consumed before the read, because we will add these back
+             * in all at once at break1
+             */
 		}
 break1:
 		ucbits -= uval;
@@ -1095,9 +1095,9 @@ break1:
 		if(parameter) {
 			while(ucbits < parameter) {
 				/* flush registers and read; bitreader_read_from_client_() does
-				 * not touch br->consumed_bits at all but we still need to set
-				 * it in case it fails and we have to return false.
-				 */
+                 * not touch br->consumed_bits at all but we still need to set
+                 * it in case it fails and we have to return false.
+                 */
 				br->consumed_bits = cbits;
 				br->consumed_words = cwords;
 				if(!bitreader_read_from_client_(br))
@@ -1135,9 +1135,9 @@ break1:
 			}
 			else {
 				/* in this case we're starting our read at a partial tail word;
-				 * the reader has guaranteed that we have at least 'parameter'
-				 * bits available to read, which makes this case simpler.
-				 */
+                 * the reader has guaranteed that we have at least 'parameter'
+                 * bits available to read, which makes this case simpler.
+                 */
 				uval <<= parameter;
 				if(cbits) {
 					/* this also works when consumed_bits==0, it's just a little slower than necessary for that case */

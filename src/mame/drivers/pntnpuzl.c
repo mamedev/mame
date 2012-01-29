@@ -381,8 +381,8 @@ static DRIVER_INIT(pip)
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
 	pc_vga_init(machine, vga_setting, NULL);
-	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x3a0000, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x3c0000);	
-	
+	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x3a0000, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x3c0000);
+
 }
 
 GAME( 199?, pntnpuzl,    0, pntnpuzl,    pntnpuzl,    pip, ROT90,  "Century?", "Paint & Puzzle",GAME_NO_SOUND|GAME_NOT_WORKING )

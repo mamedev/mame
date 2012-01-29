@@ -419,7 +419,7 @@ typedef tilemap_memory_index (*tilemap_mapper_func)(running_machine &machine, UI
 class tilemap_t
 {
 	DISABLE_COPYING(tilemap_t);
-	
+
 	friend class tilemap_manager;
 	friend class simple_list<tilemap_t>;
     friend resource_pool_object<tilemap_t>::~resource_pool_object();
@@ -455,7 +455,7 @@ public:
 	bitmap_ind8 &flagsmap() { pixmap_update(); return m_flagsmap; }
 	UINT8 *tile_flags() { pixmap_update(); return m_tileflags; }
 	tilemap_memory_index memory_index(UINT32 col, UINT32 row) { return m_mapper(col, row, m_cols, m_rows); }
-	
+
 	// setters
 	void enable(bool enable = true) { m_enable = enable; }
 	void set_user_data(void *user_data) { m_user_data = user_data; }
@@ -505,12 +505,12 @@ private:
 		UINT8				value;
 		UINT8				alpha;
 	};
-	
+
 	// inline helpers
 	INT32 effective_rowscroll(int index, UINT32 screen_width);
 	INT32 effective_colscroll(int index, UINT32 screen_height);
 	bool gfx_elements_changed();
-	
+
 	// inline scanline rasterizers
 	void scanline_draw_opaque_null(int count, UINT8 *pri, UINT32 pcode);
 	void scanline_draw_masked_null(const UINT8 *maskptr, int mask, int value, int count, UINT8 *pri, UINT32 pcode);
@@ -600,10 +600,10 @@ class tilemap_manager
 public:
 	// construction/destuction
 	tilemap_manager(running_machine &machine);
-	
+
 	// getters
 	running_machine &machine() const { return m_machine; }
-	
+
 	// tilemap creation
 	tilemap_t &create(tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows);
 	tilemap_t &create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
@@ -622,7 +622,7 @@ private:
 
 	// internal state
 	running_machine &		m_machine;
-	simple_list<tilemap_t> 	m_tilemap_list;
+	simple_list<tilemap_t>	m_tilemap_list;
 	int						m_instance;
 };
 
@@ -643,7 +643,7 @@ private:
 // function definition for a logical-to-memory mapper
 #define TILEMAP_MAPPER(_name)			tilemap_memory_index _name(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 
-// useful macro inside of a TILE_GET_INFO callback to set tile information 
+// useful macro inside of a TILE_GET_INFO callback to set tile information
 #define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS)         tileinfo.set(machine, GFX, CODE, COLOR, FLAGS)
 #define SET_TILE_INFO_DEVICE(GFX,CODE,COLOR,FLAGS)  tileinfo.set(device->machine(), GFX, CODE, COLOR, FLAGS)
 

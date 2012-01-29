@@ -49,11 +49,11 @@ static void mixdassaultlayer(running_machine &machine, bitmap_rgb32 &bitmap, bit
 
 			if (pix&0xf)
 			{
-				UINT16 pen = pix&0x1ff;		
+				UINT16 pen = pix&0x1ff;
 				if (pix & 0x800) pen += 0x200;
-				
+
 				if (alpha!=0xff)
-				{		
+				{
 					if (pix&0x600)
 					{
 						UINT32 base = dstline[x];
@@ -131,7 +131,7 @@ SCREEN_UPDATE_RGB32( dassault )
 	{
 		/* Unused */
 	}
-	 
+
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

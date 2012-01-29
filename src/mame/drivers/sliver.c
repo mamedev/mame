@@ -107,7 +107,7 @@ public:
 
 static void plot_pixel_rgb(sliver_state *state, int x, int y, UINT32 r, UINT32 g, UINT32 b)
 {
-//	printf("plot %d %d %d\n", r,g,b);
+//  printf("plot %d %d %d\n", r,g,b);
 
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
@@ -228,7 +228,7 @@ static void render_jpeg(running_machine &machine)
 
 		struct jpeg_decompress_struct cinfo;
 		struct jpeg_error_mgr jerr;
-		JSAMPARRAY buffer;	
+		JSAMPARRAY buffer;
 
 		cinfo.err = jpeg_std_error(&jerr);
 		jpeg_create_decompress(&cinfo);
@@ -239,7 +239,7 @@ static void render_jpeg(running_machine &machine)
 		jpeg_start_decompress(&cinfo);
 
 		int row_stride = cinfo.output_width * cinfo.output_components;
- 
+
 		buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
 		while (cinfo.output_scanline < cinfo.output_height)
@@ -253,7 +253,7 @@ static void render_jpeg(running_machine &machine)
 				UINT8 g = buffer[0][(x*3)+1];
 				UINT8 r = buffer[0][(x*3)+2];
 				plot_pixel_rgb(state, x - x_offset + state->m_jpeg_x, y - y_offset - state->m_jpeg_y, r, g, b);
-			
+
 			}
 
 		}

@@ -9738,7 +9738,7 @@ void k001604_draw_back_layer( device_t *device, bitmap_rgb32 &bitmap, const rect
 
 		if ((k001604->reg[0x6c / 4] & (0x08 >> layer)) != 0)
 		{
-			k001604->layer_roz[layer]->draw_roz(bitmap, cliprect, 
+			k001604->layer_roz[layer]->draw_roz(bitmap, cliprect,
 							 x << 5, y << 5, xx << 5, xy << 5, yx << 5, yy << 5, 1, 0, 0);
 		}
 	}

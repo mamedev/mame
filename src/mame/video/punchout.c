@@ -240,7 +240,7 @@ static void draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 		state->m_spr1_tilemap->set_palette_offset(0x100 * palette);
 
-		state->m_spr1_tilemap->draw_roz(bitmap, cliprect, 
+		state->m_spr1_tilemap->draw_roz(bitmap, cliprect,
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,	/* zoom, no rotation */
 			0,	/* no wraparound */
@@ -288,7 +288,7 @@ static void armwrest_draw_big_sprite(running_machine &machine, bitmap_ind16 &bit
 
 		_tilemap->set_palette_offset(0x100 * palette);
 
-		_tilemap->draw_roz(bitmap, cliprect, 
+		_tilemap->draw_roz(bitmap, cliprect,
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,	/* zoom, no rotation */
 			0,	/* no wraparound */
@@ -321,7 +321,7 @@ static void drawbs2(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 		incxx = 1;
 
 	// this tilemap doesn't actually zoom, but draw_roz is the only way to draw it without wraparound
-	state->m_spr2_tilemap->draw_roz(bitmap, cliprect, 
+	state->m_spr2_tilemap->draw_roz(bitmap, cliprect,
 		sx, sy, incxx << 16, 0, 0, 1 << 16,
 		0, 0, 0);
 }

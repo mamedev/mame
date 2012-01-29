@@ -91,7 +91,7 @@ static TIMER_DEVICE_CALLBACK( gberet_interrupt_tick )
 	// NMI on d0
 	if (ticks_mask & state->m_interrupt_mask & 1)
 		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-	
+
 	// IRQ on d3 (used by mrgoemon)
 	if (ticks_mask & state->m_interrupt_mask<<2 & 8)
 		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);

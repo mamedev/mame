@@ -203,7 +203,7 @@ floppy_image_format_t *floppy_image_device::identify(astring filename) const
 	fd = fopen(filename.cstr(), "r");
 	if(!fd)
 		return 0;
-	
+
 	io_generic io;
 	io.file = fd;
 	io.procs = &stdio_ioprocs_noclose;
@@ -610,12 +610,12 @@ ui_menu *floppy_image_device::get_selection_menu(running_machine &machine, rende
 
 ui_menu_control_floppy_image::ui_menu_control_floppy_image(running_machine &machine, render_container *container, device_image_interface *_image) : ui_menu_control_device_image(machine, container, _image)
 {
-	floppy_image_device *fd = static_cast<floppy_image_device *>(image);	
+	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	const floppy_image_format_t *fif_list = fd->get_formats();
 	int fcnt = 0;
 	for(const floppy_image_format_t *i = fif_list; i; i = i->next)
 		fcnt++;
-	
+
 	format_array = global_alloc_array(floppy_image_format_t *, fcnt);
 	input_format = output_format = 0;
 	input_filename = output_filename = "";
@@ -628,7 +628,7 @@ ui_menu_control_floppy_image::~ui_menu_control_floppy_image()
 
 void ui_menu_control_floppy_image::do_load_create()
 {
-	floppy_image_device *fd = static_cast<floppy_image_device *>(image);	
+	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	if(input_filename == "") {
 		int err = fd->create(output_filename, 0, NULL);
 		if (err != 0) {
@@ -678,7 +678,7 @@ void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 
 void ui_menu_control_floppy_image::handle()
 {
-	floppy_image_device *fd = static_cast<floppy_image_device *>(image);	
+	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	switch(state) {
 	case DO_CREATE: {
 		floppy_image_format_t *fif_list = fd->get_formats();

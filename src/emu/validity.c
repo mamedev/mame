@@ -72,7 +72,7 @@ extern int m_device_count;
 //**************************************************************************
 
 //-------------------------------------------------
-//  ioport_string_from_index - return an indexed 
+//  ioport_string_from_index - return an indexed
 //  string from the I/O port system
 //-------------------------------------------------
 
@@ -200,13 +200,13 @@ void validity_checker::check_shared_source(const game_driver &driver)
 {
 	// initialize
 	validate_begin();
-	
+
 	// then iterate over all drivers and check the ones that share the same source file
 	m_drivlist.reset();
 	while (m_drivlist.next())
 		if (strcmp(driver.source_file, m_drivlist.driver().source_file) == 0)
 			validate_one(m_drivlist.driver());
-	
+
 	// cleanup
 	validate_end();
 }
@@ -222,20 +222,20 @@ void validity_checker::check_all()
 	validate_begin();
 	validate_core();
 	validate_inlines();
-	
+
 	// then iterate over all drivers and check them
 	m_drivlist.reset();
 	while (m_drivlist.next())
 		validate_one(m_drivlist.driver());
-	
+
 	// cleanup
 	validate_end();
 }
 
 
 //-------------------------------------------------
-//  validate_begin - prepare for validation by 
-//  taking over the output callbacks and resetting 
+//  validate_begin - prepare for validation by
+//  taking over the output callbacks and resetting
 //  our internal state
 //-------------------------------------------------
 
@@ -244,25 +244,25 @@ void validity_checker::validate_begin()
 	// take over error and warning outputs
 	m_saved_error_output = mame_set_output_channel(OUTPUT_CHANNEL_ERROR, output_delegate(FUNC(validity_checker::error_output), this));
 	m_saved_warning_output = mame_set_output_channel(OUTPUT_CHANNEL_WARNING, output_delegate(FUNC(validity_checker::warning_output), this));
-	
+
 	// reset all our maps
 	m_names_map.reset();
 	m_descriptions_map.reset();
 	m_roms_map.reset();
 	m_defstr_map.reset();
 	m_region_map.reset();
-	
+
 	// reset internal state
 	m_errors = 0;
 	m_warnings = 0;
-	
+
 	// reset some special case state
 	software_list_device::reset_checked_lists();
 }
 
 
 //-------------------------------------------------
-//  validate_end - restore output callbacks and 
+//  validate_end - restore output callbacks and
 //  clean up
 //-------------------------------------------------
 
@@ -286,7 +286,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	m_current_device = NULL;
 	m_current_ioport = NULL;
 	m_region_map.reset();
-	
+
 	// reset error/warning state
 	int start_errors = m_errors;
 	int start_warnings = m_warnings;
@@ -314,7 +314,7 @@ void validity_checker::validate_one(const game_driver &driver)
 		mame_printf_error("Fatal error %s", err.string());
 	}
 	m_current_config = NULL;
-	
+
 	// if we had warnings or errors, output
 	if (m_errors > start_errors || m_warnings > start_warnings)
 	{
@@ -625,7 +625,7 @@ void validity_checker::validate_roms()
 	{
 		// for non-root devices, track the current device
 		m_current_device = (source == &m_current_config->root_device()) ? NULL : source;
-	
+
 		// scan the ROM entries for this device
 		const char *last_region_name = "???";
 		const char *last_name = "???";
@@ -660,7 +660,7 @@ void validity_checker::validate_roms()
 				// generate the full tag
 				astring fulltag;
 				rom_region_name(fulltag, m_current_driver, source, romp);
-				
+
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
 				if (m_region_map.add(fulltag, current_length, false) == TMERR_DUPLICATE)
@@ -807,7 +807,7 @@ void validity_checker::validate_gfx()
 
 		int xscale = (m_current_config->m_gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : m_current_config->m_gfxdecodeinfo[gfxnum].xscale;
 		int yscale = (m_current_config->m_gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : m_current_config->m_gfxdecodeinfo[gfxnum].yscale;
-		
+
 		// verify raw decode, which can only be full-region and have no scaling
 		if (layout.planeoffset[0] == GFX_RAW)
 		{
@@ -816,7 +816,7 @@ void validity_checker::validate_gfx()
 			if (xscale != 1 || yscale != 1)
 				mame_printf_error("gfx[%d] with unsupported xscale/yscale\n", gfxnum);
 		}
-		
+
 		// verify traditional decode doesn't have too many planes or is not too large
 		else
 		{
@@ -989,7 +989,7 @@ void validity_checker::validate_condition(input_condition &condition, device_t &
 	// resolve the tag
 	astring porttag;
 	device.subtag(porttag, condition.tag);
-	
+
 	// then find a matching port
 	if (port_map.find(porttag) == 0)
 		mame_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag);
@@ -1019,7 +1019,7 @@ void validity_checker::validate_inputs()
 		ioport_list portlist;
 		astring errorbuf;
 		input_port_list_init(*device, portlist, errorbuf);
-		
+
 		// report any errors during construction
 		if (errorbuf)
 			mame_printf_error("I/O port error during construction:\n%s\n", errorbuf.cstr());
@@ -1084,7 +1084,7 @@ void validity_checker::validate_inputs()
 					if (setting->condition.tag != NULL)
 						validate_condition(setting->condition, *device, port_map);
 			}
-	
+
 			// done with this port
 			m_current_ioport = NULL;
 		}
@@ -1149,7 +1149,7 @@ void validity_checker::validate_slots()
 			// instantiate the device
 			device_t *dev = (*intf[j].devtype)(*m_current_config, "dummy", &m_current_config->root_device(), 0);
 			dev->config_complete();
-			
+
 			// if a ROM region is present
 			if (dev->rom_region() != NULL)
 			{
@@ -1161,7 +1161,7 @@ void validity_checker::validate_slots()
 						break;
 					}
 
-				if (has_romfiles) 
+				if (has_romfiles)
 				{
 					// scan the list of devices for this device type
 					bool found = false;
@@ -1184,7 +1184,7 @@ void validity_checker::validate_slots()
 
 
 //-------------------------------------------------
-//  build_output_prefix - create a prefix 
+//  build_output_prefix - create a prefix
 //  indicating the current source file, driver,
 //  and device
 //-------------------------------------------------
@@ -1193,11 +1193,11 @@ void validity_checker::build_output_prefix(astring &string)
 {
 	// start empty
 	string.reset();
-		
+
 	// if we have a current device, indicate that
 	if (m_current_device != NULL)
 		string.cat(m_current_device->name()).cat(" device '").cat(m_current_device->tag()).cat("': ");
-	
+
 	// if we have a current port, indicate that as well
 	if (m_current_ioport != NULL)
 		string.cat("ioport '").cat(m_current_ioport).cat("': ");
@@ -1212,7 +1212,7 @@ void validity_checker::error_output(const char *format, va_list argptr)
 {
 	// count the error
 	m_errors++;
-	
+
 	// output the source(driver) device 'tag'
 	astring output;
 	build_output_prefix(output);
@@ -1224,7 +1224,7 @@ void validity_checker::error_output(const char *format, va_list argptr)
 
 
 //-------------------------------------------------
-//  warning_output - warning message output 
+//  warning_output - warning message output
 //  override
 //-------------------------------------------------
 
@@ -1232,7 +1232,7 @@ void validity_checker::warning_output(const char *format, va_list argptr)
 {
 	// count the error
 	m_warnings++;
-	
+
 	// output the source(driver) device 'tag'
 	astring output;
 	build_output_prefix(output);

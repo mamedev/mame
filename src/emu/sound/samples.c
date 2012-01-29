@@ -124,7 +124,7 @@ FLAC__StreamDecoderReadStatus my_read_callback(const FLAC__StreamDecoder *decode
 
 }
 
-FLAC__StreamDecoderWriteStatus my_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data) 
+FLAC__StreamDecoderWriteStatus my_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data)
 {
 	//printf("my_write_callback\n");
 	//printf("array size %d\n",frame->header.blocksize);
@@ -140,7 +140,7 @@ FLAC__StreamDecoderWriteStatus my_write_callback(const FLAC__StreamDecoder *deco
 	}
 
 	flacrd->write_position +=  frame->header.blocksize;
-	
+
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
@@ -328,7 +328,7 @@ static int read_wav_sample(running_machine &machine, emu_file &file, loaded_samp
 			return 0;
 
 		int size = flacread.total_samples * (flacread.bits_per_sample/8);
-	
+
 		sample->data = auto_alloc_array(machine, INT16, size);
 		flacread.write_position = 0;
 		flacread.write_data = sample->data;
@@ -342,7 +342,7 @@ static int read_wav_sample(running_machine &machine, emu_file &file, loaded_samp
 		FLAC__stream_decoder_delete(decoder);
 
 		/* fill in the sample data */
-		
+
 		sample->frequency = flacread.sample_rate;
 		sample->length = size;
 

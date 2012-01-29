@@ -79,29 +79,29 @@ namespace FLAC {
 	namespace Encoder {
 
 		/** \ingroup flacpp_encoder
-		 *  \brief
-		 *  This class wraps the ::FLAC__StreamEncoder.  If you are
-		 *  encoding to a file, FLAC::Encoder::File may be more
-		 *  convenient.
-		 *
-		 * The usage of this class is similar to FLAC__StreamEncoder,
-		 * except instead of providing callbacks to
-		 * FLAC__stream_encoder_init*_stream(), you will inherit from this
-		 * class and override the virtual callback functions with your
-		 * own implementations, then call init() or init_ogg().  The rest of
-		 * the calls work the same as in the C layer.
-		 *
-		 * Only the write callback is mandatory.  The others are
-		 * optional; this class provides default implementations that do
-		 * nothing.  In order for some STREAMINFO and SEEKTABLE data to
-		 * be written properly, you must overide seek_callback() and
-		 * tell_callback(); see FLAC__stream_encoder_init_stream() as to
-		 * why.
-		 */
+         *  \brief
+         *  This class wraps the ::FLAC__StreamEncoder.  If you are
+         *  encoding to a file, FLAC::Encoder::File may be more
+         *  convenient.
+         *
+         * The usage of this class is similar to FLAC__StreamEncoder,
+         * except instead of providing callbacks to
+         * FLAC__stream_encoder_init*_stream(), you will inherit from this
+         * class and override the virtual callback functions with your
+         * own implementations, then call init() or init_ogg().  The rest of
+         * the calls work the same as in the C layer.
+         *
+         * Only the write callback is mandatory.  The others are
+         * optional; this class provides default implementations that do
+         * nothing.  In order for some STREAMINFO and SEEKTABLE data to
+         * be written properly, you must overide seek_callback() and
+         * tell_callback(); see FLAC__stream_encoder_init_stream() as to
+         * why.
+         */
 		class FLACPP_API Stream {
 		public:
 			/** This class is a wrapper around FLAC__StreamEncoderState.
-			 */
+             */
 			class FLACPP_API State {
 			public:
 				inline State(::FLAC__StreamEncoderState state): state_(state) { }
@@ -117,9 +117,9 @@ namespace FLAC {
 
 			//@{
 			/** Call after construction to check the that the object was created
-			 *  successfully.  If not, use get_state() to find out why not.
-			 *
-			 */
+             *  successfully.  If not, use get_state() to find out why not.
+             *
+             */
 			virtual bool is_valid() const;
 			inline operator bool() const { return is_valid(); } ///< See is_valid()
 			//@}
@@ -210,25 +210,25 @@ namespace FLAC {
 		};
 
 		/** \ingroup flacpp_encoder
-		 *  \brief
-		 *  This class wraps the ::FLAC__StreamEncoder.  If you are
-		 *  not encoding to a file, you may need to use
-		 *  FLAC::Encoder::Stream.
-		 *
-		 * The usage of this class is similar to FLAC__StreamEncoder,
-		 * except instead of providing callbacks to
-		 * FLAC__stream_encoder_init*_FILE() or
-		 * FLAC__stream_encoder_init*_file(), you will inherit from this
-		 * class and override the virtual callback functions with your
-		 * own implementations, then call init() or init_ogg().  The rest
-		 * of the calls work the same as in the C layer.
-		 *
-		 * There are no mandatory callbacks; all the callbacks from
-		 * FLAC::Encoder::Stream are implemented here fully and support
-		 * full post-encode STREAMINFO and SEEKTABLE updating.  There is
-		 * only an optional progress callback which you may override to
-		 * get periodic reports on the progress of the encode.
-		 */
+         *  \brief
+         *  This class wraps the ::FLAC__StreamEncoder.  If you are
+         *  not encoding to a file, you may need to use
+         *  FLAC::Encoder::Stream.
+         *
+         * The usage of this class is similar to FLAC__StreamEncoder,
+         * except instead of providing callbacks to
+         * FLAC__stream_encoder_init*_FILE() or
+         * FLAC__stream_encoder_init*_file(), you will inherit from this
+         * class and override the virtual callback functions with your
+         * own implementations, then call init() or init_ogg().  The rest
+         * of the calls work the same as in the C layer.
+         *
+         * There are no mandatory callbacks; all the callbacks from
+         * FLAC::Encoder::Stream are implemented here fully and support
+         * full post-encode STREAMINFO and SEEKTABLE updating.  There is
+         * only an optional progress callback which you may override to
+         * get periodic reports on the progress of the encode.
+         */
 		class FLACPP_API File: public Stream {
 		public:
 			File();

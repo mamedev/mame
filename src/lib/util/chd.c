@@ -2142,7 +2142,7 @@ static chd_error hunk_write_from_memory(chd_file *chd, UINT32 hunknum, const UIN
 					offset++;
 				}
 				for (secoff=0;secoff<CD_MAX_SUBCODE_DATA;secoff++)
-				{		
+				{
 					if (src[offset]!=0x00)
 						is_likely_cd = false;
 
@@ -2171,13 +2171,13 @@ static chd_error hunk_write_from_memory(chd_file *chd, UINT32 hunknum, const UIN
 			tempbytes = bytes;
 			temperror = err;
 			tempstrategy = 0;
-		}		 
+		}
 
 		/* try strategy 1 - flac */
 		if (chd->codecintf->secondary_compress != NULL)
 		{
 			strategy = 1;
-			
+
 			err = (*chd->codecintf->secondary_compress)(chd, src, &bytes);
 
 			/* check against previous compression attempt if that was successful */
@@ -2217,7 +2217,7 @@ static chd_error hunk_write_from_memory(chd_file *chd, UINT32 hunknum, const UIN
 	{
 		data = chd->compressed;
 		newentry.length = bytes;
-		
+
 		if (strategy == 0)
 		{
 			newentry.flags = MAP_ENTRY_TYPE_COMPRESSED;
@@ -3085,7 +3085,7 @@ static chd_error flac_codec_compress(chd_file *chd, const void *src, UINT32 *len
 		printf("ERROR: allocating encoder\n");
 		return CHDERR_COMPRESSION_ERROR;
 	}
-	
+
 	ok &= FLAC__stream_encoder_set_verify(encoder, false); // we trust libFLAC ;-)
 	ok &= FLAC__stream_encoder_set_compression_level(encoder, 8);
 	ok &= FLAC__stream_encoder_set_channels(encoder, 2);
@@ -3094,7 +3094,7 @@ static chd_error flac_codec_compress(chd_file *chd, const void *src, UINT32 *len
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, 0);
 	ok &= FLAC__stream_encoder_set_streamable_subset(encoder, false);
 	ok &= FLAC__stream_encoder_set_blocksize(encoder, ((CD_MAX_SECTOR_DATA)*CD_FRAMES_PER_HUNK) );
-	
+
 	if (!ok)
 	{
 		printf("error setting up stream encoder\n");
@@ -3121,7 +3121,7 @@ static chd_error flac_codec_compress(chd_file *chd, const void *src, UINT32 *len
 				if (!swap) flac_encoder_client_ptr->pcm[i] = (FLAC__int32)(((FLAC__int16)(FLAC__int8)flac_encoder_client_ptr->tempbuffer[2*i] << 8) | (FLAC__int16)flac_encoder_client_ptr->tempbuffer[2*i+1]);
 				else       flac_encoder_client_ptr->pcm[i] = (FLAC__int32)(((FLAC__int16)(FLAC__int8)flac_encoder_client_ptr->tempbuffer[2*i+1] << 8) | (FLAC__int16)flac_encoder_client_ptr->tempbuffer[2*i]);
 			}
-		
+
 			ok = FLAC__stream_encoder_process_interleaved(encoder, flac_encoder_client_ptr->pcm, FLAC_ENCODER_READSIZE);
 		}
 
@@ -3142,10 +3142,10 @@ static chd_error flac_codec_compress(chd_file *chd, const void *src, UINT32 *len
 		printf("error finishing!\n");
 		return CHDERR_COMPRESSION_ERROR;
 	}
-	
+
 	int totalout = flac_encoder_client_ptr->flac_output_buffer_total-FLAC_HEADER_SIZE;
 
-	
+
 
 	FLAC__stream_encoder_delete(encoder);
 
@@ -3197,9 +3197,9 @@ struct flac_decoder_data
 	UINT64 amount_to_decode;
 };
 
-FLAC__StreamDecoderWriteStatus flac_decoder_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data) 
+FLAC__StreamDecoderWriteStatus flac_decoder_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data)
 {
-	
+
 	int blocksize = frame->header.blocksize;
 	int i = 0;
 	while (blocksize && ((flac_decoder_data*)client_data)->amount_to_decode)
@@ -3212,7 +3212,7 @@ FLAC__StreamDecoderWriteStatus flac_decoder_write_callback(const FLAC__StreamDec
 		((flac_decoder_data*)client_data)->amount_to_decode-=4;
 		((flac_decoder_data*)client_data)->writeoffset++;
 	}
-	
+
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
@@ -3237,12 +3237,12 @@ FLAC__StreamDecoderReadStatus flac_decoder_read_callback(const FLAC__StreamDecod
 
 
 
-void flac_decoder_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data) 
+void flac_decoder_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
 {
 
 }
 
-void flac_decoder_error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data) 
+void flac_decoder_error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
 {
 
 }
@@ -3259,7 +3259,7 @@ static chd_error flac_codec_decompress(chd_file *chd, UINT32 srclength, void *de
 	flac_decoder_client_ptr->readbuffer = (UINT8*)malloc(flac_decoder_client_ptr->readbuffersize);
 	flac_decoder_client_ptr->amount_to_decode =  (CD_MAX_SECTOR_DATA*CD_FRAMES_PER_HUNK);
 	int frames_to_decode = flac_decoder_client_ptr->amount_to_decode / CD_MAX_SECTOR_DATA;
-				
+
 	flac_decoder_client_ptr->writeoffset = 0;
 
 	memcpy(flac_decoder_client_ptr->readbuffer, flacHeader, FLAC_HEADER_SIZE);
@@ -3274,7 +3274,7 @@ static chd_error flac_codec_decompress(chd_file *chd, UINT32 srclength, void *de
 	if(FLAC__stream_decoder_init_stream(
 		decoder,
 		flac_decoder_read_callback,
-		NULL, 
+		NULL,
 		NULL,
 		NULL,
 		NULL,
@@ -3300,13 +3300,13 @@ static chd_error flac_codec_decompress(chd_file *chd, UINT32 srclength, void *de
 		return CHDERR_READ_ERROR;
 	}
 
-	
+
 	int srcoffset = 0;
 	UINT8* dest2 = (UINT8*)dest;
 	for (int frame = 0; frame<frames_to_decode;frame++)
 	{
 		int destoffset = frame * (CD_FRAME_SIZE);
-					
+
 
 		int index;
 
@@ -3314,11 +3314,11 @@ static chd_error flac_codec_decompress(chd_file *chd, UINT32 srclength, void *de
 		{
 			dest2[ destoffset + index +1 ] = flac_decoder_client_ptr->tempbuffer[srcoffset] & 0xff;
 			dest2[ destoffset + index ] = flac_decoder_client_ptr->tempbuffer[srcoffset] >> 8;
-					
+
 			srcoffset++;
 		}
 	}
-	
+
 
 	if (FLAC__stream_decoder_finish (decoder) != true)
 	{

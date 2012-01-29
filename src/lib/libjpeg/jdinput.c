@@ -391,16 +391,16 @@ per_scan_setup (j_decompress_ptr cinfo)
 {
   int ci, mcublks, tmp;
   jpeg_component_info *compptr;
-  
+
   if (cinfo->comps_in_scan == 1) {
-    
+
     /* Noninterleaved (single-component) scan */
     compptr = cinfo->cur_comp_info[0];
-    
+
     /* Overall image size in MCUs */
     cinfo->MCUs_per_row = compptr->width_in_blocks;
     cinfo->MCU_rows_in_scan = compptr->height_in_blocks;
-    
+
     /* For noninterleaved scan, always one block per MCU */
     compptr->MCU_width = 1;
     compptr->MCU_height = 1;
@@ -413,18 +413,18 @@ per_scan_setup (j_decompress_ptr cinfo)
     tmp = (int) (compptr->height_in_blocks % compptr->v_samp_factor);
     if (tmp == 0) tmp = compptr->v_samp_factor;
     compptr->last_row_height = tmp;
-    
+
     /* Prepare array describing MCU composition */
     cinfo->blocks_in_MCU = 1;
     cinfo->MCU_membership[0] = 0;
-    
+
   } else {
-    
+
     /* Interleaved (multi-component) scan */
     if (cinfo->comps_in_scan <= 0 || cinfo->comps_in_scan > MAX_COMPS_IN_SCAN)
       ERREXIT2(cinfo, JERR_COMPONENT_COUNT, cinfo->comps_in_scan,
 	       MAX_COMPS_IN_SCAN);
-    
+
     /* Overall image size in MCUs */
     cinfo->MCUs_per_row = (JDIMENSION)
       jdiv_round_up((long) cinfo->image_width,
@@ -432,9 +432,9 @@ per_scan_setup (j_decompress_ptr cinfo)
     cinfo->MCU_rows_in_scan = (JDIMENSION)
       jdiv_round_up((long) cinfo->image_height,
 		    (long) (cinfo->max_v_samp_factor * cinfo->block_size));
-    
+
     cinfo->blocks_in_MCU = 0;
-    
+
     for (ci = 0; ci < cinfo->comps_in_scan; ci++) {
       compptr = cinfo->cur_comp_info[ci];
       /* Sampling factors give # of blocks of component in each MCU */
@@ -457,7 +457,7 @@ per_scan_setup (j_decompress_ptr cinfo)
 	cinfo->MCU_membership[cinfo->blocks_in_MCU++] = ci;
       }
     }
-    
+
   }
 }
 
@@ -578,9 +578,9 @@ consume_markers (j_decompress_ptr cinfo)
 	}
 	inputctl->inheaders = 0;
 	/* Note: start_input_pass must be called by jdmaster.c
-	 * before any more input can be consumed.  jdapimin.c is
-	 * responsible for enforcing this sequencing.
-	 */
+     * before any more input can be consumed.  jdapimin.c is
+     * responsible for enforcing this sequencing.
+     */
       } else {			/* 2nd or later SOS marker */
 	if (! inputctl->pub.has_multiple_scans)
 	  ERREXIT(cinfo, JERR_EOI_EXPECTED); /* Oops, I wasn't expecting this! */
@@ -596,8 +596,8 @@ consume_markers (j_decompress_ptr cinfo)
 	  ERREXIT(cinfo, JERR_SOF_NO_SOS);
       } else {
 	/* Prevent infinite loop in coef ctlr's decompress_data routine
-	 * if user set output_scan_number larger than number of scans.
-	 */
+     * if user set output_scan_number larger than number of scans.
+     */
 	if (cinfo->output_scan_number > cinfo->input_scan_number)
 	  cinfo->output_scan_number = cinfo->input_scan_number;
       }

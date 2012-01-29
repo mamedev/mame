@@ -446,7 +446,7 @@ tilemap_t::~tilemap_t()
 
 
 //-------------------------------------------------
-//  mark_tile_dirty - mark a single tile dirty 
+//  mark_tile_dirty - mark a single tile dirty
 //  based on its memory index
 //-------------------------------------------------
 
@@ -467,8 +467,8 @@ void tilemap_t::mark_tile_dirty(tilemap_memory_index memindex)
 
 
 //-------------------------------------------------
-//  map_pens_to_layer - specify the mapping of one 
-//  or more pens (where (<pen> & mask) == pen) to 
+//  map_pens_to_layer - specify the mapping of one
+//  or more pens (where (<pen> & mask) == pen) to
 //  a layer
 //-------------------------------------------------
 
@@ -503,8 +503,8 @@ void tilemap_t::map_pens_to_layer(int group, pen_t pen, pen_t mask, UINT8 layerm
 
 
 //-------------------------------------------------
-//  set_transparent_pen - set a single transparent 
-//  pen into the tilemap, mapping all other pens 
+//  set_transparent_pen - set a single transparent
+//  pen into the tilemap, mapping all other pens
 //  to layer 0
 //-------------------------------------------------
 
@@ -519,8 +519,8 @@ void tilemap_t::set_transparent_pen(pen_t pen)
 
 
 //-------------------------------------------------
-//  set_transmask - set up the first 32 pens using 
-//  a foreground mask (mapping to layer 0) and a 
+//  set_transmask - set up the first 32 pens using
+//  a foreground mask (mapping to layer 0) and a
 //  background mask (mapping to layer 1)
 //-------------------------------------------------
 
@@ -601,7 +601,7 @@ TILEMAP_MAPPER( tilemap_scan_cols_flip_xy )
 
 
 //-------------------------------------------------
-//  postload - after loading a save state 
+//  postload - after loading a save state
 //  invalidate everything
 //-------------------------------------------------
 
@@ -918,7 +918,7 @@ void tilemap_t::configure_blit_parameters(blit_parameters &blit, const rectangle
 
 
 //-------------------------------------------------
-//  draw_common - draw a tilemap to the 
+//  draw_common - draw a tilemap to the
 //  destination with clipping; pixels apply
 //  priority/priority_mask to the priority bitmap
 //-------------------------------------------------
@@ -1037,9 +1037,9 @@ void tilemap_t::draw(bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 flags
 
 
 //-------------------------------------------------
-//  draw_roz - draw a tilemap to the destination 
-//  with clipping and arbitrary rotate/zoom; pixels 
-//  apply priority/priority_mask to the priority 
+//  draw_roz - draw a tilemap to the destination
+//  with clipping and arbitrary rotate/zoom; pixels
+//  apply priority/priority_mask to the priority
 //  bitmap
 //-------------------------------------------------
 
@@ -1090,8 +1090,8 @@ void tilemap_t::draw_roz(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 
 //-------------------------------------------------
-//  draw_instance - draw a single instance of the 
-//  tilemap to the internal pixmap at the given 
+//  draw_instance - draw a single instance of the
+//  tilemap to the internal pixmap at the given
 //  xpos,ypos
 //-------------------------------------------------
 
@@ -1481,7 +1481,7 @@ tilemap_manager::tilemap_manager(running_machine &machine)
 
 
 //-------------------------------------------------
-//  set_flip_all - set a global flip for all the 
+//  set_flip_all - set a global flip for all the
 //  tilemaps
 //-------------------------------------------------
 
@@ -1497,7 +1497,7 @@ tilemap_t &tilemap_manager::create(tile_get_info_func tile_get_info, tilemap_map
 
 
 //-------------------------------------------------
-//  set_flip_all - set a global flip for all the 
+//  set_flip_all - set a global flip for all the
 //  tilemaps
 //-------------------------------------------------
 
@@ -1509,7 +1509,7 @@ void tilemap_manager::set_flip_all(UINT32 attributes)
 
 
 //-------------------------------------------------
-//  mark_all_dirty - mark all the tiles in all the 
+//  mark_all_dirty - mark all the tiles in all the
 //  tilemaps dirty
 //-------------------------------------------------
 

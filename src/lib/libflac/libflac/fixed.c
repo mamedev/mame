@@ -75,10 +75,10 @@ static FLAC__fixedpoint local__compute_rbps_integerized(FLAC__uint32 err, FLAC__
 	if(err <= n)
 		return 0;
 	/*
-	 * The above two things tell us 1) n fits in 16 bits; 2) err/n > 1.
-	 * These allow us later to know we won't lose too much precision in the
-	 * fixed-point division (err<<fracbits)/n.
-	 */
+     * The above two things tell us 1) n fits in 16 bits; 2) err/n > 1.
+     * These allow us later to know we won't lose too much precision in the
+     * fixed-point division (err<<fracbits)/n.
+     */
 
 	fracbits = (8*sizeof(err)) - (FLAC__bitmath_ilog2(err)+1);
 
@@ -87,9 +87,9 @@ static FLAC__fixedpoint local__compute_rbps_integerized(FLAC__uint32 err, FLAC__
 	/* err now holds err/n with fracbits fractional bits */
 
 	/*
-	 * Whittle err down to 16 bits max.  16 significant bits is enough for
-	 * our purposes.
-	 */
+     * Whittle err down to 16 bits max.  16 significant bits is enough for
+     * our purposes.
+     */
 	FLAC__ASSERT(err > 0);
 	bits = FLAC__bitmath_ilog2(err)+1;
 	if(bits > 16) {
@@ -118,16 +118,16 @@ static FLAC__fixedpoint local__compute_rbps_integerized(FLAC__uint32 err, FLAC__
 		return 0;
 
 	/*
-	 * The return value must have 16 fractional bits.  Since the whole part
-	 * of the base-2 log of a 32 bit number must fit in 5 bits, and fracbits
-	 * must be >= -3, these assertion allows us to be able to shift rbps
-	 * left if necessary to get 16 fracbits without losing any bits of the
-	 * whole part of rbps.
-	 *
-	 * There is a slight chance due to accumulated error that the whole part
-	 * will require 6 bits, so we use 6 in the assertion.  Really though as
-	 * long as it fits in 13 bits (32 - (16 - (-3))) we are fine.
-	 */
+     * The return value must have 16 fractional bits.  Since the whole part
+     * of the base-2 log of a 32 bit number must fit in 5 bits, and fracbits
+     * must be >= -3, these assertion allows us to be able to shift rbps
+     * left if necessary to get 16 fracbits without losing any bits of the
+     * whole part of rbps.
+     *
+     * There is a slight chance due to accumulated error that the whole part
+     * will require 6 bits, so we use 6 in the assertion.  Really though as
+     * long as it fits in 13 bits (32 - (16 - (-3))) we are fine.
+     */
 	FLAC__ASSERT((int)FLAC__bitmath_ilog2(rbps)+1 <= fracbits + 6);
 	FLAC__ASSERT(fracbits >= -3);
 
@@ -154,10 +154,10 @@ static FLAC__fixedpoint local__compute_rbps_wide_integerized(FLAC__uint64 err, F
 	if(err <= n)
 		return 0;
 	/*
-	 * The above two things tell us 1) n fits in 16 bits; 2) err/n > 1.
-	 * These allow us later to know we won't lose too much precision in the
-	 * fixed-point division (err<<fracbits)/n.
-	 */
+     * The above two things tell us 1) n fits in 16 bits; 2) err/n > 1.
+     * These allow us later to know we won't lose too much precision in the
+     * fixed-point division (err<<fracbits)/n.
+     */
 
 	fracbits = (8*sizeof(err)) - (FLAC__bitmath_ilog2_wide(err)+1);
 
@@ -166,9 +166,9 @@ static FLAC__fixedpoint local__compute_rbps_wide_integerized(FLAC__uint64 err, F
 	/* err now holds err/n with fracbits fractional bits */
 
 	/*
-	 * Whittle err down to 16 bits max.  16 significant bits is enough for
-	 * our purposes.
-	 */
+     * Whittle err down to 16 bits max.  16 significant bits is enough for
+     * our purposes.
+     */
 	FLAC__ASSERT(err > 0);
 	bits = FLAC__bitmath_ilog2_wide(err)+1;
 	if(bits > 16) {
@@ -197,16 +197,16 @@ static FLAC__fixedpoint local__compute_rbps_wide_integerized(FLAC__uint64 err, F
 		return 0;
 
 	/*
-	 * The return value must have 16 fractional bits.  Since the whole part
-	 * of the base-2 log of a 32 bit number must fit in 5 bits, and fracbits
-	 * must be >= -3, these assertion allows us to be able to shift rbps
-	 * left if necessary to get 16 fracbits without losing any bits of the
-	 * whole part of rbps.
-	 *
-	 * There is a slight chance due to accumulated error that the whole part
-	 * will require 6 bits, so we use 6 in the assertion.  Really though as
-	 * long as it fits in 13 bits (32 - (16 - (-3))) we are fine.
-	 */
+     * The return value must have 16 fractional bits.  Since the whole part
+     * of the base-2 log of a 32 bit number must fit in 5 bits, and fracbits
+     * must be >= -3, these assertion allows us to be able to shift rbps
+     * left if necessary to get 16 fracbits without losing any bits of the
+     * whole part of rbps.
+     *
+     * There is a slight chance due to accumulated error that the whole part
+     * will require 6 bits, so we use 6 in the assertion.  Really though as
+     * long as it fits in 13 bits (32 - (16 - (-3))) we are fine.
+     */
 	FLAC__ASSERT((int)FLAC__bitmath_ilog2(rbps)+1 <= fracbits + 6);
 	FLAC__ASSERT(fracbits >= -3);
 
@@ -290,9 +290,9 @@ unsigned FLAC__fixed_compute_best_predictor_wide(const FLAC__int32 data[], unsig
 	FLAC__int32 last_error_3 = last_error_2 - (data[-2] - 2*data[-3] + data[-4]);
 	FLAC__int32 error, save;
 	/* total_error_* are 64-bits to avoid overflow when encoding
-	 * erratic signals when the bits-per-sample and blocksize are
-	 * large.
-	 */
+     * erratic signals when the bits-per-sample and blocksize are
+     * large.
+     */
 	FLAC__uint64 total_error_0 = 0, total_error_1 = 0, total_error_2 = 0, total_error_3 = 0, total_error_4 = 0;
 	unsigned i, order;
 

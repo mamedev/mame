@@ -143,7 +143,7 @@ static void byteSwap(FLAC__uint32 *buf, unsigned words)
 {
 	register FLAC__uint32 x;
 	do {
-		x = *buf; 
+		x = *buf;
 		x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff);
 		*buf++ = (x >> 16) | (x << 16);
 	} while (--words);

@@ -333,7 +333,7 @@ public:
 	virtual ~ui_menu_control_device_image();
 	virtual void populate();
 	virtual void handle();
-		
+
 protected:
 	enum {
 		START_FILE, START_OTHER_PART, START_SOFTLIST, SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, DO_CREATE, SELECT_SOFTLIST,

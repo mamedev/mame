@@ -430,8 +430,8 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	assert(height > 0);
 	assert(visarea.min_x >= 0);
 	assert(visarea.min_y >= 0);
-//	assert(visarea.max_x < width);
-//	assert(visarea.max_y < height);
+//  assert(visarea.max_x < width);
+//  assert(visarea.max_y < height);
 	assert(m_type == SCREEN_TYPE_VECTOR || visarea.min_x < width);
 	assert(m_type == SCREEN_TYPE_VECTOR || visarea.min_y < height);
 	assert(frame_period > 0);
@@ -509,7 +509,7 @@ void screen_device::realloc_screen_bitmaps()
 	// doesn't apply for vector games
 	if (m_type == SCREEN_TYPE_VECTOR)
 		return;
-	
+
 	// determine effective size to allocate
 	INT32 effwidth = MAX(m_width, m_visarea.max_x + 1);
 	INT32 effheight = MAX(m_height, m_visarea.max_y + 1);

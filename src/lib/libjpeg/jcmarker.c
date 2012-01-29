@@ -19,24 +19,24 @@ typedef enum {			/* JPEG marker codes */
   M_SOF1  = 0xc1,
   M_SOF2  = 0xc2,
   M_SOF3  = 0xc3,
-  
+
   M_SOF5  = 0xc5,
   M_SOF6  = 0xc6,
   M_SOF7  = 0xc7,
-  
+
   M_JPG   = 0xc8,
   M_SOF9  = 0xc9,
   M_SOF10 = 0xca,
   M_SOF11 = 0xcb,
-  
+
   M_SOF13 = 0xcd,
   M_SOF14 = 0xce,
   M_SOF15 = 0xcf,
-  
+
   M_DHT   = 0xc4,
-  
+
   M_DAC   = 0xcc,
-  
+
   M_RST0  = 0xd0,
   M_RST1  = 0xd1,
   M_RST2  = 0xd2,
@@ -45,7 +45,7 @@ typedef enum {			/* JPEG marker codes */
   M_RST5  = 0xd5,
   M_RST6  = 0xd6,
   M_RST7  = 0xd7,
-  
+
   M_SOI   = 0xd8,
   M_EOI   = 0xd9,
   M_SOS   = 0xda,
@@ -54,7 +54,7 @@ typedef enum {			/* JPEG marker codes */
   M_DRI   = 0xdd,
   M_DHP   = 0xde,
   M_EXP   = 0xdf,
-  
+
   M_APP0  = 0xe0,
   M_APP1  = 0xe1,
   M_APP2  = 0xe2,
@@ -71,13 +71,13 @@ typedef enum {			/* JPEG marker codes */
   M_APP13 = 0xed,
   M_APP14 = 0xee,
   M_APP15 = 0xef,
-  
+
   M_JPG0  = 0xf0,
   M_JPG13 = 0xfd,
   M_COM   = 0xfe,
-  
+
   M_TEM   = 0x01,
-  
+
   M_ERROR = 0x100
 } JPEG_MARKER;
 
@@ -188,7 +188,7 @@ emit_dht (j_compress_ptr cinfo, int index, boolean is_ac)
 {
   JHUFF_TBL * htbl;
   int length, i;
-  
+
   if (is_ac) {
     htbl = cinfo->ac_huff_tbl_ptrs[index];
     index += 0x10;		/* output index has AC bit set */
@@ -198,23 +198,23 @@ emit_dht (j_compress_ptr cinfo, int index, boolean is_ac)
 
   if (htbl == NULL)
     ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, index);
-  
+
   if (! htbl->sent_table) {
     emit_marker(cinfo, M_DHT);
-    
+
     length = 0;
     for (i = 1; i <= 16; i++)
       length += htbl->bits[i];
-    
+
     emit_2bytes(cinfo, length + 2 + 1 + 16);
     emit_byte(cinfo, index);
-    
+
     for (i = 1; i <= 16; i++)
       emit_byte(cinfo, htbl->bits[i]);
-    
+
     for (i = 0; i < length; i++)
       emit_byte(cinfo, htbl->huffval[i]);
-    
+
     htbl->sent_table = TRUE;
   }
 }
@@ -274,7 +274,7 @@ emit_dri (j_compress_ptr cinfo)
 /* Emit a DRI marker */
 {
   emit_marker(cinfo, M_DRI);
-  
+
   emit_2bytes(cinfo, 4);	/* fixed length */
 
   emit_2bytes(cinfo, (int) cinfo->restart_interval);
@@ -287,9 +287,9 @@ emit_sof (j_compress_ptr cinfo, JPEG_MARKER code)
 {
   int ci;
   jpeg_component_info *compptr;
-  
+
   emit_marker(cinfo, code);
-  
+
   emit_2bytes(cinfo, 3 * cinfo->num_components + 2 + 5 + 1); /* length */
 
   /* Make sure image isn't bigger than SOF field can handle */
@@ -318,13 +318,13 @@ emit_sos (j_compress_ptr cinfo)
 {
   int i, td, ta;
   jpeg_component_info *compptr;
-  
+
   emit_marker(cinfo, M_SOS);
-  
+
   emit_2bytes(cinfo, 2 * cinfo->comps_in_scan + 2 + 1 + 3); /* length */
-  
+
   emit_byte(cinfo, cinfo->comps_in_scan);
-  
+
   for (i = 0; i < cinfo->comps_in_scan; i++) {
     compptr = cinfo->cur_comp_info[i];
     emit_byte(cinfo, compptr->component_id);
@@ -352,9 +352,9 @@ emit_pseudo_sos (j_compress_ptr cinfo)
 /* Emit a pseudo SOS marker */
 {
   emit_marker(cinfo, M_SOS);
-  
+
   emit_2bytes(cinfo, 2 + 1 + 3); /* length */
-  
+
   emit_byte(cinfo, 0); /* Ns */
 
   emit_byte(cinfo, 0); /* Ss */
@@ -368,19 +368,19 @@ emit_jfif_app0 (j_compress_ptr cinfo)
 /* Emit a JFIF-compliant APP0 marker */
 {
   /*
-   * Length of APP0 block	(2 bytes)
-   * Block ID			(4 bytes - ASCII "JFIF")
-   * Zero byte			(1 byte to terminate the ID string)
-   * Version Major, Minor	(2 bytes - major first)
-   * Units			(1 byte - 0x00 = none, 0x01 = inch, 0x02 = cm)
-   * Xdpu			(2 bytes - dots per unit horizontal)
-   * Ydpu			(2 bytes - dots per unit vertical)
-   * Thumbnail X size		(1 byte)
-   * Thumbnail Y size		(1 byte)
+   * Length of APP0 block   (2 bytes)
+   * Block ID           (4 bytes - ASCII "JFIF")
+   * Zero byte          (1 byte to terminate the ID string)
+   * Version Major, Minor   (2 bytes - major first)
+   * Units          (1 byte - 0x00 = none, 0x01 = inch, 0x02 = cm)
+   * Xdpu           (2 bytes - dots per unit horizontal)
+   * Ydpu           (2 bytes - dots per unit vertical)
+   * Thumbnail X size       (1 byte)
+   * Thumbnail Y size       (1 byte)
    */
-  
+
   emit_marker(cinfo, M_APP0);
-  
+
   emit_2bytes(cinfo, 2 + 4 + 1 + 2 + 1 + 2 + 2 + 1 + 1); /* length */
 
   emit_byte(cinfo, 0x4A);	/* Identifier: ASCII "JFIF" */
@@ -403,12 +403,12 @@ emit_adobe_app14 (j_compress_ptr cinfo)
 /* Emit an Adobe APP14 marker */
 {
   /*
-   * Length of APP14 block	(2 bytes)
-   * Block ID			(5 bytes - ASCII "Adobe")
-   * Version Number		(2 bytes - currently 100)
-   * Flags0			(2 bytes - currently 0)
-   * Flags1			(2 bytes - currently 0)
-   * Color transform		(1 byte)
+   * Length of APP14 block  (2 bytes)
+   * Block ID           (5 bytes - ASCII "Adobe")
+   * Version Number     (2 bytes - currently 100)
+   * Flags0         (2 bytes - currently 0)
+   * Flags1         (2 bytes - currently 0)
+   * Color transform        (1 byte)
    *
    * Although Adobe TN 5116 mentions Version = 101, all the Adobe files
    * now in circulation seem to use Version = 100, so that's what we write.
@@ -417,9 +417,9 @@ emit_adobe_app14 (j_compress_ptr cinfo)
    * YCbCr, 2 if it's YCCK, 0 otherwise.  Adobe's definition has to do with
    * whether the encoder performed a transformation, which is pretty useless.
    */
-  
+
   emit_marker(cinfo, M_APP14);
-  
+
   emit_2bytes(cinfo, 2 + 5 + 2 + 2 + 2 + 1); /* length */
 
   emit_byte(cinfo, 0x41);	/* Identifier: ASCII "Adobe" */
@@ -514,7 +514,7 @@ write_frame_header (j_compress_ptr cinfo)
   int ci, prec;
   boolean is_baseline;
   jpeg_component_info *compptr;
-  
+
   /* Emit DQT for each quantization table.
    * Note that emit_dqt() suppresses any duplicate tables.
    */

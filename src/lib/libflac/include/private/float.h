@@ -74,21 +74,21 @@ extern const FLAC__fixedpoint FLAC__FP_E;
 #define FLAC__fixedpoint_div(x, y) ( (FLAC__fixedpoint) ( ( ((FLAC__int64)(x)<<32) / (FLAC__int64)(y) ) >> 16 ) )
 
 /*
- *	FLAC__fixedpoint_log2()
- *	--------------------------------------------------------------------
- *	Returns the base-2 logarithm of the fixed-point number 'x' using an
- *	algorithm by Knuth for x >= 1.0
+ *  FLAC__fixedpoint_log2()
+ *  --------------------------------------------------------------------
+ *  Returns the base-2 logarithm of the fixed-point number 'x' using an
+ *  algorithm by Knuth for x >= 1.0
  *
- *	'fracbits' is the number of fractional bits of 'x'.  'fracbits' must
- *	be < 32 and evenly divisible by 4 (0 is OK but not very precise).
+ *  'fracbits' is the number of fractional bits of 'x'.  'fracbits' must
+ *  be < 32 and evenly divisible by 4 (0 is OK but not very precise).
  *
- *	'precision' roughly limits the number of iterations that are done;
- *	use (unsigned)(-1) for maximum precision.
+ *  'precision' roughly limits the number of iterations that are done;
+ *  use (unsigned)(-1) for maximum precision.
  *
- *	If 'x' is less than one -- that is, x < (1<<fracbits) -- then this
- *	function will punt and return 0.
+ *  If 'x' is less than one -- that is, x < (1<<fracbits) -- then this
+ *  function will punt and return 0.
  *
- *	The return value will also have 'fracbits' fractional bits.
+ *  The return value will also have 'fracbits' fractional bits.
  */
 FLAC__uint32 FLAC__fixedpoint_log2(FLAC__uint32 x, unsigned fracbits, unsigned precision);
 

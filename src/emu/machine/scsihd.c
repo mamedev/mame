@@ -257,17 +257,17 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	// Attempt to register save state entry after state registration is closed!
 	state_save_register_item( machine, "scsihd", diskregion, 0, our_this->lba );
 	state_save_register_item( machine, "scsihd", diskregion, 0, our_this->blocks );
-	
+
 	// try to locate the CHD from a DISK_REGION
 	our_this->handle = get_disk_handle(machine, diskregion);
 	our_this->disk = hard_disk_open(our_this->handle);
 	our_this->is_image_device = false;
-	
+
 	if (our_this->disk == NULL)
 	{
 		// try to locate the CHD from an image device
 		harddisk_image_device *image_device = machine.device<harddisk_image_device>(diskregion);
-		
+
 		if (image_device != NULL)
 		{
 			our_this->handle = image_device->get_chd_file();
@@ -275,7 +275,7 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 			our_this->is_image_device = true;
 		}
 	}
-	
+
 	if (our_this->disk == NULL)
 	{
 		// try to locate the CHD from an image subdevice
@@ -290,7 +290,7 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 			}
 		}
 	}
-	
+
 	if (our_this->disk != NULL)
 	{
 		// get hard disk sector size from CHD metadata

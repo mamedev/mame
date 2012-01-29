@@ -220,10 +220,10 @@ reset_error_mgr (j_common_ptr cinfo)
 /*
  * Fill in the standard error-handling methods in a jpeg_error_mgr object.
  * Typical call is:
- *	struct jpeg_compress_struct cinfo;
- *	struct jpeg_error_mgr err;
+ *  struct jpeg_compress_struct cinfo;
+ *  struct jpeg_error_mgr err;
  *
- *	cinfo.err = jpeg_std_error(&err);
+ *  cinfo.err = jpeg_std_error(&err);
  * after which the application may override some of the methods.
  */
 

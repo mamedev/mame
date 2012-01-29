@@ -1062,7 +1062,7 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	CHANGE_PC(cpustate,cpustate->eip);
 
 	cpustate->CPL = cpustate->sreg[CS].selector & 0x03;
-//	printf("286 Task Switch from selector %04x to %04x\n",old_task,selector);
+//  printf("286 Task Switch from selector %04x to %04x\n",old_task,selector);
 }
 
 static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested)
@@ -1177,7 +1177,7 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	CHANGE_PC(cpustate,cpustate->eip);
 
 	cpustate->CPL = cpustate->sreg[CS].selector & 0x03;
-//	printf("386 Task Switch from selector %04x to %04x\n",old_task,selector);
+//  printf("386 Task Switch from selector %04x to %04x\n",old_task,selector);
 }
 
 static void i386_check_irq_line(i386_state *cpustate)

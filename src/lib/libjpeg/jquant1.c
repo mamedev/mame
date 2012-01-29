@@ -105,8 +105,8 @@ static const UINT8 base_dither_matrix[ODITHER_SIZE][ODITHER_SIZE] = {
  * Errors are accumulated into the array fserrors[], at a resolution of
  * 1/16th of a pixel count.  The error at a given pixel is propagated
  * to its not-yet-processed neighbors using the standard F-S fractions,
- *		...	(here)	7/16
- *		3/16	5/16	1/16
+ *      ... (here)  7/16
+ *      3/16    5/16    1/16
  * We work left-to-right on even rows, right-to-left on odd rows.
  *
  * We can get away with a single array (holding one row's worth of errors)
@@ -424,7 +424,7 @@ make_odither_array (j_decompress_ptr cinfo, int ncolors)
 
 /*
  * Create the ordered-dither tables.
- * Components having the same number of representative colors may 
+ * Components having the same number of representative colors may
  * share a dither table.
  */
 
@@ -542,12 +542,12 @@ quantize_ord_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
 
       for (col = width; col > 0; col--) {
 	/* Form pixel value + dither, range-limit to 0..MAXJSAMPLE,
-	 * select output value, accumulate into output code for this pixel.
-	 * Range-limiting need not be done explicitly, as we have extended
-	 * the colorindex table to produce the right answers for out-of-range
-	 * inputs.  The maximum dither is +- MAXJSAMPLE; this sets the
-	 * required amount of padding.
-	 */
+     * select output value, accumulate into output code for this pixel.
+     * Range-limiting need not be done explicitly, as we have extended
+     * the colorindex table to produce the right answers for out-of-range
+     * inputs.  The maximum dither is +- MAXJSAMPLE; this sets the
+     * required amount of padding.
+     */
 	*output_ptr += colorindex_ci[GETJSAMPLE(*input_ptr)+dither[col_index]];
 	input_ptr += nc;
 	output_ptr++;
@@ -662,18 +662,18 @@ quantize_fs_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
 
       for (col = width; col > 0; col--) {
 	/* cur holds the error propagated from the previous pixel on the
-	 * current line.  Add the error propagated from the previous line
-	 * to form the complete error correction term for this pixel, and
-	 * round the error term (which is expressed * 16) to an integer.
-	 * RIGHT_SHIFT rounds towards minus infinity, so adding 8 is correct
-	 * for either sign of the error value.
-	 * Note: errorptr points to *previous* column's array entry.
-	 */
+     * current line.  Add the error propagated from the previous line
+     * to form the complete error correction term for this pixel, and
+     * round the error term (which is expressed * 16) to an integer.
+     * RIGHT_SHIFT rounds towards minus infinity, so adding 8 is correct
+     * for either sign of the error value.
+     * Note: errorptr points to *previous* column's array entry.
+     */
 	cur = RIGHT_SHIFT(cur + errorptr[dir] + 8, 4);
 	/* Form pixel value + error, and range-limit to 0..MAXJSAMPLE.
-	 * The maximum error is +- MAXJSAMPLE; this sets the required size
-	 * of the range_limit array.
-	 */
+     * The maximum error is +- MAXJSAMPLE; this sets the required size
+     * of the range_limit array.
+     */
 	cur += GETJSAMPLE(*input_ptr);
 	cur = GETJSAMPLE(range_limit[cur]);
 	/* Select output value, accumulate into output code for this pixel */
@@ -684,9 +684,9 @@ quantize_fs_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
 	/* pixel code, because the colormap is orthogonal. */
 	cur -= GETJSAMPLE(colormap_ci[pixcode]);
 	/* Compute error fractions to be propagated to adjacent pixels.
-	 * Add these into the running sums, and simultaneously shift the
-	 * next-line error sums left by 1 column.
-	 */
+     * Add these into the running sums, and simultaneously shift the
+     * next-line error sums left by 1 column.
+     */
 	bnexterr = cur;
 	delta = cur * 2;
 	cur += delta;		/* form error * 3 */
@@ -696,9 +696,9 @@ quantize_fs_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
 	belowerr = bnexterr;
 	cur += delta;		/* form error * 7 */
 	/* At this point cur contains the 7/16 error value to be propagated
-	 * to the next pixel on the current line, and all the errors for the
-	 * next line have been shifted over. We are therefore ready to move on.
-	 */
+     * to the next pixel on the current line, and all the errors for the
+     * next line have been shifted over. We are therefore ready to move on.
+     */
 	input_ptr += dirnc;	/* advance input ptr to next column */
 	output_ptr += dir;	/* advance output ptr to next column */
 	errorptr += dir;	/* advance errorptr to current column */

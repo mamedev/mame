@@ -59,7 +59,7 @@ class simple_list
 
 public:
 	// construction/destruction
-	simple_list(resource_pool &pool = global_resource_pool()) 
+	simple_list(resource_pool &pool = global_resource_pool())
 		: m_head(NULL),
 		  m_tail(NULL),
 		  m_pool(pool),

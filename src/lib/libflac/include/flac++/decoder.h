@@ -78,28 +78,28 @@ namespace FLAC {
 	namespace Decoder {
 
 		/** \ingroup flacpp_decoder
-		 *  \brief
-		 *  This class wraps the ::FLAC__StreamDecoder.  If you are
-		 *  decoding from a file, FLAC::Decoder::File may be more
-		 *  convenient.
-		 *
-		 * The usage of this class is similar to FLAC__StreamDecoder,
-		 * except instead of providing callbacks to
-		 * FLAC__stream_decoder_init*_stream(), you will inherit from this
-		 * class and override the virtual callback functions with your
-		 * own implementations, then call init() or init_ogg().  The rest
-		 * of the calls work the same as in the C layer.
-		 *
-		 * Only the read, write, and error callbacks are mandatory.  The
-		 * others are optional; this class provides default
-		 * implementations that do nothing.  In order for seeking to work
-		 * you must overide seek_callback(), tell_callback(),
-		 * length_callback(), and eof_callback().
-		 */
+         *  \brief
+         *  This class wraps the ::FLAC__StreamDecoder.  If you are
+         *  decoding from a file, FLAC::Decoder::File may be more
+         *  convenient.
+         *
+         * The usage of this class is similar to FLAC__StreamDecoder,
+         * except instead of providing callbacks to
+         * FLAC__stream_decoder_init*_stream(), you will inherit from this
+         * class and override the virtual callback functions with your
+         * own implementations, then call init() or init_ogg().  The rest
+         * of the calls work the same as in the C layer.
+         *
+         * Only the read, write, and error callbacks are mandatory.  The
+         * others are optional; this class provides default
+         * implementations that do nothing.  In order for seeking to work
+         * you must overide seek_callback(), tell_callback(),
+         * length_callback(), and eof_callback().
+         */
 		class FLACPP_API Stream {
 		public:
 			/** This class is a wrapper around FLAC__StreamDecoderState.
-			 */
+             */
 			class FLACPP_API State {
 			public:
 				inline State(::FLAC__StreamDecoderState state): state_(state) { }
@@ -115,8 +115,8 @@ namespace FLAC {
 
 			//@{
 			/** Call after construction to check the that the object was created
-			 *  successfully.  If not, use get_state() to find out why not.
-			 */
+             *  successfully.  If not, use get_state() to find out why not.
+             */
 			virtual bool is_valid() const;
 			inline operator bool() const { return is_valid(); } ///< See is_valid()
 			//@}
@@ -201,24 +201,24 @@ namespace FLAC {
 		};
 
 		/** \ingroup flacpp_decoder
-		 *  \brief
-		 *  This class wraps the ::FLAC__StreamDecoder.  If you are
-		 *  not decoding from a file, you may need to use
-		 *  FLAC::Decoder::Stream.
-		 *
-		 * The usage of this class is similar to FLAC__StreamDecoder,
-		 * except instead of providing callbacks to
-		 * FLAC__stream_decoder_init*_FILE() or
-		 * FLAC__stream_decoder_init*_file(), you will inherit from this
-		 * class and override the virtual callback functions with your
-		 * own implementations, then call init() or init_off().  The rest
-		 * of the calls work the same as in the C layer.
-		 *
-		 * Only the write, and error callbacks from FLAC::Decoder::Stream
-		 * are mandatory.  The others are optional; this class provides
-		 * full working implementations for all other callbacks and
-		 * supports seeking.
-		 */
+         *  \brief
+         *  This class wraps the ::FLAC__StreamDecoder.  If you are
+         *  not decoding from a file, you may need to use
+         *  FLAC::Decoder::Stream.
+         *
+         * The usage of this class is similar to FLAC__StreamDecoder,
+         * except instead of providing callbacks to
+         * FLAC__stream_decoder_init*_FILE() or
+         * FLAC__stream_decoder_init*_file(), you will inherit from this
+         * class and override the virtual callback functions with your
+         * own implementations, then call init() or init_off().  The rest
+         * of the calls work the same as in the C layer.
+         *
+         * Only the write, and error callbacks from FLAC::Decoder::Stream
+         * are mandatory.  The others are optional; this class provides
+         * full working implementations for all other callbacks and
+         * supports seeking.
+         */
 		class FLACPP_API File: public Stream {
 		public:
 			File();

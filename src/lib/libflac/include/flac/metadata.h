@@ -762,22 +762,22 @@ typedef enum {
 
 	FLAC__METADATA_CHAIN_STATUS_READ_WRITE_MISMATCH,
 	/**< FLAC__metadata_chain_write() was called on a chain read by
-	 *   FLAC__metadata_chain_read_with_callbacks()/FLAC__metadata_chain_read_ogg_with_callbacks(),
-	 *   or 
-	 *   FLAC__metadata_chain_write_with_callbacks()/FLAC__metadata_chain_write_with_callbacks_and_tempfile()
-	 *   was called on a chain read by
-	 *   FLAC__metadata_chain_read()/FLAC__metadata_chain_read_ogg().
-	 *   Matching read/write methods must always be used. */
+     *   FLAC__metadata_chain_read_with_callbacks()/FLAC__metadata_chain_read_ogg_with_callbacks(),
+     *   or
+     *   FLAC__metadata_chain_write_with_callbacks()/FLAC__metadata_chain_write_with_callbacks_and_tempfile()
+     *   was called on a chain read by
+     *   FLAC__metadata_chain_read()/FLAC__metadata_chain_read_ogg().
+     *   Matching read/write methods must always be used. */
 
 	FLAC__METADATA_CHAIN_STATUS_WRONG_WRITE_CALL
 	/**< FLAC__metadata_chain_write_with_callbacks() was called when the
-	 *   chain write requires a tempfile; use
-	 *   FLAC__metadata_chain_write_with_callbacks_and_tempfile() instead.
-	 *   Or, FLAC__metadata_chain_write_with_callbacks_and_tempfile() was
-	 *   called when the chain write does not require a tempfile; use
-	 *   FLAC__metadata_chain_write_with_callbacks() instead.
-	 *   Always check FLAC__metadata_chain_check_if_tempfile_needed()
-	 *   before writing via callbacks. */
+     *   chain write requires a tempfile; use
+     *   FLAC__metadata_chain_write_with_callbacks_and_tempfile() instead.
+     *   Or, FLAC__metadata_chain_write_with_callbacks_and_tempfile() was
+     *   called when the chain write does not require a tempfile; use
+     *   FLAC__metadata_chain_write_with_callbacks() instead.
+     *   Always check FLAC__metadata_chain_check_if_tempfile_needed()
+     *   before writing via callbacks. */
 
 } FLAC__Metadata_ChainStatus;
 

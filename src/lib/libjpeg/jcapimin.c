@@ -37,7 +37,7 @@ jpeg_CreateCompress (j_compress_ptr cinfo, int version, size_t structsize)
   if (version != JPEG_LIB_VERSION)
     ERREXIT2(cinfo, JERR_BAD_LIB_VERSION, JPEG_LIB_VERSION, version);
   if (structsize != SIZEOF(struct jpeg_compress_struct))
-    ERREXIT2(cinfo, JERR_BAD_STRUCT_SIZE, 
+    ERREXIT2(cinfo, JERR_BAD_STRUCT_SIZE,
 	     (int) SIZEOF(struct jpeg_compress_struct), (int) structsize);
 
   /* For debugging purposes, we zero the whole master structure.
@@ -244,14 +244,14 @@ jpeg_write_m_byte (j_compress_ptr cinfo, int val)
  * To produce a pair of files containing abbreviated tables and abbreviated
  * image data, one would proceed as follows:
  *
- *		initialize JPEG object
- *		set JPEG parameters
- *		set destination to table file
- *		jpeg_write_tables(cinfo);
- *		set destination to image file
- *		jpeg_start_compress(cinfo, FALSE);
- *		write data...
- *		jpeg_finish_compress(cinfo);
+ *      initialize JPEG object
+ *      set JPEG parameters
+ *      set destination to table file
+ *      jpeg_write_tables(cinfo);
+ *      set destination to image file
+ *      jpeg_start_compress(cinfo, FALSE);
+ *      write data...
+ *      jpeg_finish_compress(cinfo);
  *
  * jpeg_write_tables has the side effect of marking all tables written
  * (same as jpeg_suppress_tables(..., TRUE)).  Thus a subsequent start_compress

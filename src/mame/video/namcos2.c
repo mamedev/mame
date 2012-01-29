@@ -236,7 +236,7 @@ DrawRozHelper(
 	else
 	{
 		tmap->draw_roz(
-			bitmap, clip, 
+			bitmap, clip,
 			rozInfo->startx, rozInfo->starty,
 			rozInfo->incxx, rozInfo->incxy,
 			rozInfo->incyx, rozInfo->incyy,

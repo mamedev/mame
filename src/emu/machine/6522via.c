@@ -27,14 +27,14 @@
 #include "devhelpr.h"
 
 /***************************************************************************
-	PARAMETERS
+    PARAMETERS
 ***************************************************************************/
 
 #define TRACE_VIA		0
 
 
 /***************************************************************************
-	MACROS
+    MACROS
 ***************************************************************************/
 
 /* Macros for PCR */
@@ -106,7 +106,7 @@
 
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 inline void via6522_device::set_irq_line(int state)
@@ -578,7 +578,7 @@ READ8_MEMBER( via6522_device::read )
 		CLR_PA_INT();
 
 		/* If CA2 is configured as output and in pulse or handshake mode,
-		   CA2 is set now */
+           CA2 is set now */
 		if (CA2_PULSE_OUTPUT(m_pcr))
 		{
 			/* call the CA2 output function */
@@ -742,7 +742,7 @@ WRITE8_MEMBER( via6522_device::write )
 		CLR_PB_INT();
 
 		/* If CB2 is configured as output and in pulse or handshake mode,
-		   CB2 is set now */
+           CB2 is set now */
 		if (CB2_AUTO_HS(m_pcr))
 		{
 			if (m_out_cb2)
@@ -1015,7 +1015,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 			set_int(INT_CA1);
 
 			/* CA2 is configured as output and in pulse or handshake mode,
-			   CA2 is cleared now */
+               CA2 is cleared now */
 			if (CA2_AUTO_HS(m_pcr))
 			{
 				if (!m_out_ca2)
@@ -1089,7 +1089,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 			set_int(INT_CB1);
 
 			/* CB2 is configured as output and in pulse or handshake mode,
-			   CB2 is cleared now */
+               CB2 is cleared now */
 			if (CB2_AUTO_HS(m_pcr))
 			{
 				if (!m_out_cb2)

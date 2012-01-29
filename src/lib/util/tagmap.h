@@ -78,7 +78,7 @@ public:
 	class entry_t
 	{
 		friend class tagmap_t<_ElementType, _HashSize>;
-		
+
 	public:
 		// construction/destruction
 		entry_t(const char *tag, UINT32 fullhash, _ElementType object)
@@ -86,11 +86,11 @@ public:
 			  m_fullhash(fullhash),
 			  m_tag(tag),
 			  m_object(object) { }
-	
+
 		// accessors
 		const astring &tag() const { return m_tag; }
 		_ElementType object() const { return m_object; }
-		
+
 		// setters
 		void set_object(_ElementType object) { m_object = object; }
 
@@ -151,7 +151,7 @@ public:
 
 	// find by tag
 	_ElementType find(const char *tag) const { return find(tag, hash(tag)); }
-	
+
 	// find by tag with precomputed hash
 	_ElementType find(const char *tag, UINT32 fullhash) const
 	{
@@ -170,10 +170,10 @@ public:
 				return entry->object();
 		return NULL;
 	}
-	
+
 	// return first object in the table
 	entry_t *first() const { return next(NULL); }
-	
+
 	// return next object in the table
 	entry_t *next(entry_t *after) const
 	{
@@ -186,7 +186,7 @@ public:
 		for (UINT32 hashindex = firstindex; hashindex < ARRAY_LENGTH(m_table); hashindex++)
 			if (m_table[hashindex] != NULL)
 				return m_table[hashindex];
-		
+
 		// all out
 		return NULL;
 	}
@@ -194,7 +194,7 @@ public:
 private:
 	// internal helpers
 	tagmap_error add_common(const char *tag, _ElementType object, bool replace_if_duplicate, bool unique_hash);
-	
+
 	// remove an entry given a pointer to its pointer
 	void remove_common(entry_t **entryptr)
 	{
@@ -214,7 +214,7 @@ private:
 //**************************************************************************
 
 //-------------------------------------------------
-//  add_common - core implementation of a tagmap 
+//  add_common - core implementation of a tagmap
 //  addition
 //-------------------------------------------------
 

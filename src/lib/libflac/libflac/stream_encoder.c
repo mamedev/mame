@@ -88,7 +88,7 @@
  * parameter estimation in this encoder is very good, almost always
  * yielding compression within 0.1% of the optimal parameters.
  */
-#undef ENABLE_RICE_PARAMETER_SEARCH 
+#undef ENABLE_RICE_PARAMETER_SEARCH
 
 
 typedef struct {
@@ -224,7 +224,7 @@ static unsigned evaluate_lpc_subframe_(
 #endif
 
 static unsigned evaluate_verbatim_subframe_(
-	FLAC__StreamEncoder *encoder, 
+	FLAC__StreamEncoder *encoder,
 	const FLAC__int32 signal[],
 	unsigned blocksize,
 	unsigned subframe_bps,
@@ -406,16 +406,16 @@ typedef struct FLAC__StreamEncoderPrivate {
 	FLAC__uint64 *abs_residual_partition_sums_unaligned;
 	unsigned *raw_bits_per_partition_unaligned;
 	/*
-	 * These fields have been moved here from private function local
-	 * declarations merely to save stack space during encoding.
-	 */
+     * These fields have been moved here from private function local
+     * declarations merely to save stack space during encoding.
+     */
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
 	FLAC__real lp_coeff[FLAC__MAX_LPC_ORDER][FLAC__MAX_LPC_ORDER]; /* from process_subframe_() */
 #endif
 	FLAC__EntropyCodingMethod_PartitionedRiceContents partitioned_rice_contents_extra[2]; /* from find_best_partition_order_() */
 	/*
-	 * The data for the verify section
-	 */
+     * The data for the verify section
+     */
 	struct {
 		FLAC__StreamDecoder *decoder;
 		EncoderStateHint state_hint;
@@ -825,7 +825,7 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 				metadata_picture_has_type1 = true;
 				/* standard icon must be 32x32 pixel PNG */
 				if(
-					m->data.picture.type == FLAC__STREAM_METADATA_PICTURE_TYPE_FILE_ICON_STANDARD && 
+					m->data.picture.type == FLAC__STREAM_METADATA_PICTURE_TYPE_FILE_ICON_STANDARD &&
 					(
 						(strcmp(m->data.picture.mime_type, "image/png") && strcmp(m->data.picture.mime_type, "-->")) ||
 						m->data.picture.width != 32 ||
@@ -894,8 +894,8 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	encoder->private_->use_wide_by_partition = (false); /*@@@ need to set this */
 
 	/*
-	 * get the CPU info and set the function pointers
-	 */
+     * get the CPU info and set the function pointers
+     */
 	FLAC__cpu_info(&encoder->private_->cpuinfo);
 	/* first default to the non-asm routines */
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
@@ -977,13 +977,13 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	}
 
 	/*
-	 * Set up the verify stuff if necessary
-	 */
+     * Set up the verify stuff if necessary
+     */
 	if(encoder->protected_->verify) {
 		/*
-		 * First, set up the fifo which will hold the
-		 * original signal to compare against
-		 */
+         * First, set up the fifo which will hold the
+         * original signal to compare against
+         */
 		encoder->private_->verify.input_fifo.size = encoder->protected_->blocksize+OVERREAD_;
 		for(i = 0; i < encoder->protected_->channels; i++) {
 			if(0 == (encoder->private_->verify.input_fifo.data[i] = (FLAC__int32*)safe_malloc_mul_2op_(sizeof(FLAC__int32), /*times*/encoder->private_->verify.input_fifo.size))) {
@@ -994,8 +994,8 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 		encoder->private_->verify.input_fifo.tail = 0;
 
 		/*
-		 * Now set up a stream decoder for verification
-		 */
+         * Now set up a stream decoder for verification
+         */
 		encoder->private_->verify.decoder = FLAC__stream_decoder_new();
 		if(0 == encoder->private_->verify.decoder) {
 			encoder->protected_->state = FLAC__STREAM_ENCODER_VERIFY_DECODER_ERROR;
@@ -1015,9 +1015,9 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	encoder->private_->verify.error_stats.got = 0;
 
 	/*
-	 * These must be done before we write any metadata, because that
-	 * calls the write_callback, which uses these values.
-	 */
+     * These must be done before we write any metadata, because that
+     * calls the write_callback, which uses these values.
+     */
 	encoder->private_->first_seekpoint_to_check = 0;
 	encoder->private_->samples_written = 0;
 	encoder->protected_->streaminfo_offset = 0;
@@ -1025,8 +1025,8 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	encoder->protected_->audio_offset = 0;
 
 	/*
-	 * write the stream header
-	 */
+     * write the stream header
+     */
 	if(encoder->protected_->verify)
 		encoder->private_->verify.state_hint = ENCODER_IN_MAGIC;
 	if(!FLAC__bitwriter_write_raw_uint32(encoder->private_->frame, FLAC__STREAM_SYNC, FLAC__STREAM_SYNC_LEN)) {
@@ -1039,8 +1039,8 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	}
 
 	/*
-	 * write the STREAMINFO metadata block
-	 */
+     * write the STREAMINFO metadata block
+     */
 	if(encoder->protected_->verify)
 		encoder->private_->verify.state_hint = ENCODER_IN_METADATA;
 	encoder->private_->streaminfo.type = FLAC__METADATA_TYPE_STREAMINFO;
@@ -1067,23 +1067,23 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	}
 
 	/*
-	 * Now that the STREAMINFO block is written, we can init this to an
-	 * absurdly-high value...
-	 */
+     * Now that the STREAMINFO block is written, we can init this to an
+     * absurdly-high value...
+     */
 	encoder->private_->streaminfo.data.stream_info.min_framesize = (1u << FLAC__STREAM_METADATA_STREAMINFO_MIN_FRAME_SIZE_LEN) - 1;
 	/* ... and clear this to 0 */
 	encoder->private_->streaminfo.data.stream_info.total_samples = 0;
 
 	/*
-	 * Check to see if the supplied metadata contains a VORBIS_COMMENT;
-	 * if not, we will write an empty one (FLAC__add_metadata_block()
-	 * automatically supplies the vendor string).
-	 *
-	 * WATCHOUT: the Ogg FLAC mapping requires us to write this block after
-	 * the STREAMINFO.  (In the case that metadata_has_vorbis_comment is
-	 * true it will have already insured that the metadata list is properly
-	 * ordered.)
-	 */
+     * Check to see if the supplied metadata contains a VORBIS_COMMENT;
+     * if not, we will write an empty one (FLAC__add_metadata_block()
+     * automatically supplies the vendor string).
+     *
+     * WATCHOUT: the Ogg FLAC mapping requires us to write this block after
+     * the STREAMINFO.  (In the case that metadata_has_vorbis_comment is
+     * true it will have already insured that the metadata list is properly
+     * ordered.)
+     */
 	if(!metadata_has_vorbis_comment) {
 		FLAC__StreamMetadata vorbis_comment;
 		vorbis_comment.type = FLAC__METADATA_TYPE_VORBIS_COMMENT;
@@ -1104,8 +1104,8 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	}
 
 	/*
-	 * write the user's metadata blocks
-	 */
+     * write the user's metadata blocks
+     */
 	for(i = 0; i < encoder->protected_->num_metadata_blocks; i++) {
 		encoder->protected_->metadata[i]->is_last = (i == encoder->protected_->num_metadata_blocks - 1);
 		if(!FLAC__add_metadata_block(encoder->protected_->metadata[i], encoder->private_->frame)) {
@@ -1172,7 +1172,7 @@ FLAC_API FLAC__StreamEncoderInitStatus FLAC__stream_encoder_init_ogg_stream(
 		/*is_ogg=*/true
 	);
 }
- 
+
 static FLAC__StreamEncoderInitStatus init_FILE_internal_(
 	FLAC__StreamEncoder *encoder,
 	FILE *file,
@@ -1196,10 +1196,10 @@ static FLAC__StreamEncoderInitStatus init_FILE_internal_(
 	}
 
 	/*
-	 * To make sure that our file does not go unclosed after an error, we
-	 * must assign the FILE pointer before any further error can occur in
-	 * this routine.
-	 */
+     * To make sure that our file does not go unclosed after an error, we
+     * must assign the FILE pointer before any further error can occur in
+     * this routine.
+     */
 	if(file == stdout)
 		file = get_binary_stdout_(); /* just to be safe */
 
@@ -1234,7 +1234,7 @@ static FLAC__StreamEncoderInitStatus init_FILE_internal_(
 
 	return init_status;
 }
- 
+
 FLAC_API FLAC__StreamEncoderInitStatus FLAC__stream_encoder_init_FILE(
 	FLAC__StreamEncoder *encoder,
 	FILE *file,
@@ -1244,7 +1244,7 @@ FLAC_API FLAC__StreamEncoderInitStatus FLAC__stream_encoder_init_FILE(
 {
 	return init_FILE_internal_(encoder, file, progress_callback, client_data, /*is_ogg=*/false);
 }
- 
+
 FLAC_API FLAC__StreamEncoderInitStatus FLAC__stream_encoder_init_ogg_FILE(
 	FLAC__StreamEncoder *encoder,
 	FILE *file,
@@ -1268,10 +1268,10 @@ static FLAC__StreamEncoderInitStatus init_file_internal_(
 	FLAC__ASSERT(0 != encoder);
 
 	/*
-	 * To make sure that our file does not go unclosed after an error, we
-	 * have to do the same entrance checks here that are later performed
-	 * in FLAC__stream_encoder_init_FILE() before the FILE* is assigned.
-	 */
+     * To make sure that our file does not go unclosed after an error, we
+     * have to do the same entrance checks here that are later performed
+     * in FLAC__stream_encoder_init_FILE() before the FILE* is assigned.
+     */
 	if(encoder->protected_->state != FLAC__STREAM_ENCODER_UNINITIALIZED)
 		return FLAC__STREAM_ENCODER_INIT_STATUS_ALREADY_INITIALIZED;
 
@@ -2033,13 +2033,13 @@ FLAC_API FLAC__bool FLAC__stream_encoder_process_interleaved(FLAC__StreamEncoder
 
 	j = k = 0;
 	/*
-	 * we have several flavors of the same basic loop, optimized for
-	 * different conditions:
-	 */
+     * we have several flavors of the same basic loop, optimized for
+     * different conditions:
+     */
 	if(encoder->protected_->do_mid_side_stereo && channels == 2) {
 		/*
-		 * stereo coding: unroll channel loop
-		 */
+         * stereo coding: unroll channel loop
+         */
 		do {
 			if(encoder->protected_->verify)
 				append_to_verify_fifo_interleaved_(&encoder->private_->verify.input_fifo, buffer, j, channels, min(blocksize+OVERREAD_-encoder->private_->current_sample_number, samples-j));
@@ -2073,8 +2073,8 @@ FLAC_API FLAC__bool FLAC__stream_encoder_process_interleaved(FLAC__StreamEncoder
 	}
 	else {
 		/*
-		 * independent channel coding: buffer each channel in inner loop
-		 */
+         * independent channel coding: buffer each channel in inner loop
+         */
 		do {
 			if(encoder->protected_->verify)
 				append_to_verify_fifo_interleaved_(&encoder->private_->verify.input_fifo, buffer, j, channels, min(blocksize+OVERREAD_-encoder->private_->current_sample_number, samples-j));
@@ -2259,10 +2259,10 @@ FLAC__bool resize_buffers_(FLAC__StreamEncoder *encoder, unsigned new_blocksize)
 	ok = true;
 
 	/* WATCHOUT: FLAC__lpc_compute_residual_from_qlp_coefficients_asm_ia32_mmx()
-	 * requires that the input arrays (in our case the integer signals)
-	 * have a buffer of up to 3 zeroes in front (at negative indices) for
-	 * alignment purposes; we use 4 in front to keep the data well-aligned.
-	 */
+     * requires that the input arrays (in our case the integer signals)
+     * have a buffer of up to 3 zeroes in front (at negative indices) for
+     * alignment purposes; we use 4 in front to keep the data well-aligned.
+     */
 
 	for(i = 0; ok && i < encoder->protected_->channels; i++) {
 		ok = ok && FLAC__memory_alloc_aligned_int32_array(new_blocksize+4+OVERREAD_, &encoder->private_->integer_signal_unaligned[i], &encoder->private_->integer_signal[i]);
@@ -2436,8 +2436,8 @@ FLAC__StreamEncoderWriteStatus write_frame_(FLAC__StreamEncoder *encoder, const 
 	}
 
 	/*
-	 * Watch for the STREAMINFO block and first SEEKTABLE block to go by and store their offsets.
-	 */
+     * Watch for the STREAMINFO block and first SEEKTABLE block to go by and store their offsets.
+     */
 	if(samples == 0) {
 		FLAC__MetadataType type = (buffer[0] & 0x7f);
 		if(type == FLAC__METADATA_TYPE_STREAMINFO)
@@ -2447,10 +2447,10 @@ FLAC__StreamEncoderWriteStatus write_frame_(FLAC__StreamEncoder *encoder, const 
 	}
 
 	/*
-	 * Mark the current seek point if hit (if audio_offset == 0 that
-	 * means we're still writing metadata and haven't hit the first
-	 * frame yet)
-	 */
+     * Mark the current seek point if hit (if audio_offset == 0 that
+     * means we're still writing metadata and haven't hit the first
+     * frame yet)
+     */
 	if(0 != encoder->private_->seek_table && encoder->protected_->audio_offset > 0 && encoder->private_->seek_table->num_points > 0) {
 		const unsigned blocksize = FLAC__stream_encoder_get_blocksize(encoder);
 		const FLAC__uint64 frame_first_sample = encoder->private_->samples_written;
@@ -2468,11 +2468,11 @@ FLAC__StreamEncoderWriteStatus write_frame_(FLAC__StreamEncoder *encoder, const 
 				encoder->private_->seek_table->points[i].frame_samples = blocksize;
 				encoder->private_->first_seekpoint_to_check++;
 				/* DO NOT: "break;" and here's why:
-				 * The seektable template may contain more than one target
-				 * sample for any given frame; we will keep looping, generating
-				 * duplicate seekpoints for them, and we'll clean it up later,
-				 * just before writing the seektable back to the metadata.
-				 */
+                 * The seektable template may contain more than one target
+                 * sample for any given frame; we will keep looping, generating
+                 * duplicate seekpoints for them, and we'll clean it up later,
+                 * just before writing the seektable back to the metadata.
+                 */
 			}
 			else {
 				encoder->private_->first_seekpoint_to_check++;
@@ -2502,9 +2502,9 @@ FLAC__StreamEncoderWriteStatus write_frame_(FLAC__StreamEncoder *encoder, const 
 		encoder->private_->bytes_written += bytes;
 		encoder->private_->samples_written += samples;
 		/* we keep a high watermark on the number of frames written because
-		 * when the encoder goes back to write metadata, 'current_frame'
-		 * will drop back to 0.
-		 */
+         * when the encoder goes back to write metadata, 'current_frame'
+         * will drop back to 0.
+         */
 		encoder->private_->frames_written = max(encoder->private_->frames_written, encoder->private_->current_frame_number+1);
 	}
 	else
@@ -2527,13 +2527,13 @@ void update_metadata_(const FLAC__StreamEncoder *encoder)
 	FLAC__ASSERT(metadata->type == FLAC__METADATA_TYPE_STREAMINFO);
 
 	/* All this is based on intimate knowledge of the stream header
-	 * layout, but a change to the header format that would break this
-	 * would also break all streams encoded in the previous format.
-	 */
+     * layout, but a change to the header format that would break this
+     * would also break all streams encoded in the previous format.
+     */
 
 	/*
-	 * Write MD5 signature
-	 */
+     * Write MD5 signature
+     */
 	{
 		const unsigned md5_offset =
 			FLAC__STREAM_METADATA_HEADER_LENGTH +
@@ -2560,8 +2560,8 @@ void update_metadata_(const FLAC__StreamEncoder *encoder)
 	}
 
 	/*
-	 * Write total samples
-	 */
+     * Write total samples
+     */
 	{
 		const unsigned total_samples_byte_offset =
 			FLAC__STREAM_METADATA_HEADER_LENGTH +
@@ -2593,8 +2593,8 @@ void update_metadata_(const FLAC__StreamEncoder *encoder)
 	}
 
 	/*
-	 * Write min/max framesize
-	 */
+     * Write min/max framesize
+     */
 	{
 		const unsigned min_framesize_offset =
 			FLAC__STREAM_METADATA_HEADER_LENGTH +
@@ -2621,8 +2621,8 @@ void update_metadata_(const FLAC__StreamEncoder *encoder)
 	}
 
 	/*
-	 * Write seektable
-	 */
+     * Write seektable
+     */
 	if(0 != encoder->private_->seek_table && encoder->private_->seek_table->num_points > 0 && encoder->protected_->seektable_offset > 0) {
 		unsigned i;
 
@@ -2692,19 +2692,19 @@ void update_ogg_metadata_(FLAC__StreamEncoder *encoder)
 	FLAC__ASSERT(0 != encoder->private_->seek_callback);
 
 	/* Pre-check that client supports seeking, since we don't want the
-	 * ogg_helper code to ever have to deal with this condition.
-	 */
+     * ogg_helper code to ever have to deal with this condition.
+     */
 	if(encoder->private_->seek_callback(encoder, 0, encoder->private_->client_data) == FLAC__STREAM_ENCODER_SEEK_STATUS_UNSUPPORTED)
 		return;
 
 	/* All this is based on intimate knowledge of the stream header
-	 * layout, but a change to the header format that would break this
-	 * would also break all streams encoded in the previous format.
-	 */
+     * layout, but a change to the header format that would break this
+     * would also break all streams encoded in the previous format.
+     */
 
 	/**
-	 ** Write STREAMINFO stats
-	 **/
+     ** Write STREAMINFO stats
+     **/
 	simple_ogg_page__init(&page);
 	if(!simple_ogg_page__get_at(encoder, encoder->protected_->streaminfo_offset, &page, encoder->private_->seek_callback, encoder->private_->read_callback, encoder->private_->client_data)) {
 		simple_ogg_page__clear(&page);
@@ -2712,8 +2712,8 @@ void update_ogg_metadata_(FLAC__StreamEncoder *encoder)
 	}
 
 	/*
-	 * Write MD5 signature
-	 */
+     * Write MD5 signature
+     */
 	{
 		const unsigned md5_offset =
 			FIRST_OGG_PACKET_STREAMINFO_PREFIX_LENGTH +
@@ -2738,8 +2738,8 @@ void update_ogg_metadata_(FLAC__StreamEncoder *encoder)
 	}
 
 	/*
-	 * Write total samples
-	 */
+     * Write total samples
+     */
 	{
 		const unsigned total_samples_byte_offset =
 			FIRST_OGG_PACKET_STREAMINFO_PREFIX_LENGTH +
@@ -2770,8 +2770,8 @@ void update_ogg_metadata_(FLAC__StreamEncoder *encoder)
 	}
 
 	/*
-	 * Write min/max framesize
-	 */
+     * Write min/max framesize
+     */
 	{
 		const unsigned min_framesize_offset =
 			FIRST_OGG_PACKET_STREAMINFO_PREFIX_LENGTH +
@@ -2801,8 +2801,8 @@ void update_ogg_metadata_(FLAC__StreamEncoder *encoder)
 	simple_ogg_page__clear(&page);
 
 	/*
-	 * Write seektable
-	 */
+     * Write seektable
+     */
 	if(0 != encoder->private_->seek_table && encoder->private_->seek_table->num_points > 0 && encoder->protected_->seektable_offset > 0) {
 		unsigned i;
 		FLAC__byte *p;
@@ -2865,32 +2865,32 @@ FLAC__bool process_frame_(FLAC__StreamEncoder *encoder, FLAC__bool is_fractional
 	FLAC__ASSERT(encoder->protected_->state == FLAC__STREAM_ENCODER_OK);
 
 	/*
-	 * Accumulate raw signal to the MD5 signature
-	 */
+     * Accumulate raw signal to the MD5 signature
+     */
 	if(encoder->protected_->do_md5 && !FLAC__MD5Accumulate(&encoder->private_->md5context, (const FLAC__int32 * const *)encoder->private_->integer_signal, encoder->protected_->channels, encoder->protected_->blocksize, (encoder->protected_->bits_per_sample+7) / 8)) {
 		encoder->protected_->state = FLAC__STREAM_ENCODER_MEMORY_ALLOCATION_ERROR;
 		return false;
 	}
 
 	/*
-	 * Process the frame header and subframes into the frame bitbuffer
-	 */
+     * Process the frame header and subframes into the frame bitbuffer
+     */
 	if(!process_subframes_(encoder, is_fractional_block)) {
 		/* the above function sets the state for us in case of an error */
 		return false;
 	}
 
 	/*
-	 * Zero-pad the frame to a byte_boundary
-	 */
+     * Zero-pad the frame to a byte_boundary
+     */
 	if(!FLAC__bitwriter_zero_pad_to_byte_boundary(encoder->private_->frame)) {
 		encoder->protected_->state = FLAC__STREAM_ENCODER_MEMORY_ALLOCATION_ERROR;
 		return false;
 	}
 
 	/*
-	 * CRC-16 the whole thing
-	 */
+     * CRC-16 the whole thing
+     */
 	FLAC__ASSERT(FLAC__bitwriter_is_byte_aligned(encoder->private_->frame));
 	if(
 		!FLAC__bitwriter_get_write_crc16(encoder->private_->frame, &crc) ||
@@ -2901,16 +2901,16 @@ FLAC__bool process_frame_(FLAC__StreamEncoder *encoder, FLAC__bool is_fractional
 	}
 
 	/*
-	 * Write it
-	 */
+     * Write it
+     */
 	if(!write_bitbuffer_(encoder, encoder->protected_->blocksize, is_last_block)) {
 		/* the above function sets the state for us in case of an error */
 		return false;
 	}
 
 	/*
-	 * Get ready for the next frame
-	 */
+     * Get ready for the next frame
+     */
 	encoder->private_->current_sample_number = 0;
 	encoder->private_->current_frame_number++;
 	encoder->private_->streaminfo.data.stream_info.total_samples += (FLAC__uint64)encoder->protected_->blocksize;
@@ -2925,8 +2925,8 @@ FLAC__bool process_subframes_(FLAC__StreamEncoder *encoder, FLAC__bool is_fracti
 	FLAC__bool do_independent, do_mid_side;
 
 	/*
-	 * Calculate the min,max Rice partition orders
-	 */
+     * Calculate the min,max Rice partition orders
+     */
 	if(is_fractional_block) {
 		max_partition_order = 0;
 	}
@@ -2937,8 +2937,8 @@ FLAC__bool process_subframes_(FLAC__StreamEncoder *encoder, FLAC__bool is_fracti
 	min_partition_order = min(min_partition_order, max_partition_order);
 
 	/*
-	 * Setup the frame
-	 */
+     * Setup the frame
+     */
 	frame_header.blocksize = encoder->protected_->blocksize;
 	frame_header.sample_rate = encoder->protected_->sample_rate;
 	frame_header.channels = encoder->protected_->channels;
@@ -2948,8 +2948,8 @@ FLAC__bool process_subframes_(FLAC__StreamEncoder *encoder, FLAC__bool is_fracti
 	frame_header.number.frame_number = encoder->private_->current_frame_number;
 
 	/*
-	 * Figure out what channel assignments to try
-	 */
+     * Figure out what channel assignments to try
+     */
 	if(encoder->protected_->do_mid_side_stereo) {
 		if(encoder->protected_->loose_mid_side_stereo) {
 			if(encoder->private_->loose_mid_side_stereo_frame_count == 0) {
@@ -2974,8 +2974,8 @@ FLAC__bool process_subframes_(FLAC__StreamEncoder *encoder, FLAC__bool is_fracti
 	FLAC__ASSERT(do_independent || do_mid_side);
 
 	/*
-	 * Check for wasted bits; set effective bps for each subframe
-	 */
+     * Check for wasted bits; set effective bps for each subframe
+     */
 	if(do_independent) {
 		for(channel = 0; channel < encoder->protected_->channels; channel++) {
 			const unsigned w = get_wasted_bits_(encoder->private_->integer_signal[channel], encoder->protected_->blocksize);
@@ -2993,8 +2993,8 @@ FLAC__bool process_subframes_(FLAC__StreamEncoder *encoder, FLAC__bool is_fracti
 	}
 
 	/*
-	 * First do a normal encoding pass of each independent channel
-	 */
+     * First do a normal encoding pass of each independent channel
+     */
 	if(do_independent) {
 		for(channel = 0; channel < encoder->protected_->channels; channel++) {
 			if(!
@@ -3017,8 +3017,8 @@ FLAC__bool process_subframes_(FLAC__StreamEncoder *encoder, FLAC__bool is_fracti
 	}
 
 	/*
-	 * Now do mid and side channels if requested
-	 */
+     * Now do mid and side channels if requested
+     */
 	if(do_mid_side) {
 		FLAC__ASSERT(encoder->protected_->channels == 2);
 
@@ -3043,8 +3043,8 @@ FLAC__bool process_subframes_(FLAC__StreamEncoder *encoder, FLAC__bool is_fracti
 	}
 
 	/*
-	 * Compose the frame bitbuffer
-	 */
+     * Compose the frame bitbuffer
+     */
 	if(do_mid_side) {
 		unsigned left_bps = 0, right_bps = 0; /* initialized only to prevent superfluous compiler warning */
 		FLAC__Subframe *left_subframe = 0, *right_subframe = 0; /* initialized only to prevent superfluous compiler warning */
@@ -3734,9 +3734,9 @@ unsigned find_best_partition_order_(
 
 	{
 		/*
-		 * We are allowed to de-const the pointer based on our special
-		 * knowledge; it is const to the outside world.
-		 */
+         * We are allowed to de-const the pointer based on our special
+         * knowledge; it is const to the outside world.
+         */
 		FLAC__EntropyCodingMethod_PartitionedRiceContents* prc = (FLAC__EntropyCodingMethod_PartitionedRiceContents*)best_ecm->data.partitioned_rice.contents;
 		unsigned partition;
 
@@ -3746,10 +3746,10 @@ unsigned find_best_partition_order_(
 		if(do_escape_coding)
 			memcpy(prc->raw_bits, private_->partitioned_rice_contents_extra[best_parameters_index].raw_bits, sizeof(unsigned)*(1<<(best_partition_order)));
 		/*
-		 * Now need to check if the type should be changed to
-		 * FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2 based on the
-		 * size of the rice parameters.
-		 */
+         * Now need to check if the type should be changed to
+         * FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2 based on the
+         * size of the rice parameters.
+         */
 		for(partition = 0; partition < (1u<<best_partition_order); partition++) {
 			if(prc->parameters[partition] >= FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ESCAPE_PARAMETER) {
 				best_ecm->type = FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2;
@@ -3932,11 +3932,11 @@ static FLaC__INLINE unsigned count_rice_bits_in_partition_(
 		)
 		- (partition_samples >> 1)
 		/* -(partition_samples>>1) to subtract out extra contributions to the abs_residual_partition_sum.
-		 * The actual number of bits used is closer to the sum(for all i in the partition) of  abs(residual[i])>>(rice_parameter-1)
-		 * By using the abs_residual_partition sum, we also add in bits in the LSBs that would normally be shifted out.
-		 * So the subtraction term tries to guess how many extra bits were contributed.
-		 * If the LSBs are randomly distributed, this should average to 0.5 extra bits per sample.
-		 */
+         * The actual number of bits used is closer to the sum(for all i in the partition) of  abs(residual[i])>>(rice_parameter-1)
+         * By using the abs_residual_partition sum, we also add in bits in the LSBs that would normally be shifted out.
+         * So the subtraction term tries to guess how many extra bits were contributed.
+         * If the LSBs are randomly distributed, this should average to 0.5 extra bits per sample.
+         */
 	;
 }
 #endif
@@ -4038,13 +4038,13 @@ FLAC__bool set_partitioned_rice_(
 			}
 			mean = abs_residual_partition_sums[partition];
 			/* we are basically calculating the size in bits of the
-			 * average residual magnitude in the partition:
-			 *   rice_parameter = floor(log2(mean/partition_samples))
-			 * 'mean' is not a good name for the variable, it is
-			 * actually the sum of magnitudes of all residual values
-			 * in the partition, so the actual mean is
-			 * mean/partition_samples
-			 */
+             * average residual magnitude in the partition:
+             *   rice_parameter = floor(log2(mean/partition_samples))
+             * 'mean' is not a good name for the variable, it is
+             * actually the sum of magnitudes of all residual values
+             * in the partition, so the actual mean is
+             * mean/partition_samples
+             */
 			for(rice_parameter = 0, k = partition_samples; k < mean; rice_parameter++, k <<= 1)
 				;
 			if(rice_parameter >= rice_parameter_limit) {
@@ -4174,9 +4174,9 @@ FLAC__StreamDecoderReadStatus verify_read_callback_(const FLAC__StreamDecoder *d
 	else {
 		if(encoded_bytes == 0) {
 			/*
-			 * If we get here, a FIFO underflow has occurred,
-			 * which means there is a bug somewhere.
-			 */
+             * If we get here, a FIFO underflow has occurred,
+             * which means there is a bug somewhere.
+             */
 			FLAC__ASSERT(0);
 			return FLAC__STREAM_DECODER_READ_STATUS_ABORT;
 		}
@@ -4306,21 +4306,21 @@ FLAC__StreamEncoderWriteStatus file_write_callback_(const FLAC__StreamEncoder *e
 		FLAC__bool call_it = 0 != encoder->private_->progress_callback && (
 #if FLAC__HAS_OGG
 			/* We would like to be able to use 'samples > 0' in the
-			 * clause here but currently because of the nature of our
-			 * Ogg writing implementation, 'samples' is always 0 (see
-			 * ogg_encoder_aspect.c).  The downside is extra progress
-			 * callbacks.
-			 */
+             * clause here but currently because of the nature of our
+             * Ogg writing implementation, 'samples' is always 0 (see
+             * ogg_encoder_aspect.c).  The downside is extra progress
+             * callbacks.
+             */
 			encoder->private_->is_ogg? true :
 #endif
 			samples > 0
 		);
 		if(call_it) {
 			/* NOTE: We have to add +bytes, +samples, and +1 to the stats
-			 * because at this point in the callback chain, the stats
-			 * have not been updated.  Only after we return and control
-			 * gets back to write_frame_() are the stats updated
-			 */
+             * because at this point in the callback chain, the stats
+             * have not been updated.  Only after we return and control
+             * gets back to write_frame_() are the stats updated
+             */
 			encoder->private_->progress_callback(encoder, encoder->private_->bytes_written+bytes, encoder->private_->samples_written+samples, encoder->private_->frames_written+(samples?1:0), encoder->private_->total_frames_estimate, encoder->private_->client_data);
 		}
 		return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
@@ -4336,9 +4336,9 @@ FILE *get_binary_stdout_(void)
 {
 #if 0
     /* if something breaks here it is probably due to the presence or
-	 * absence of an underscore before the identifiers 'setmode',
-	 * 'fileno', and/or 'O_BINARY'; check your system header files.
-	 */
+     * absence of an underscore before the identifiers 'setmode',
+     * 'fileno', and/or 'O_BINARY'; check your system header files.
+     */
 #if defined _MSC_VER || defined __MINGW32__
 	_setmode(_fileno(stdout), _O_BINARY);
 #elif defined __CYGWIN__

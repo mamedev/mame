@@ -31,9 +31,9 @@ typedef my_color_converter * my_cconvert_ptr;
  * YCbCr is defined per CCIR 601-1, except that Cb and Cr are
  * normalized to the range 0..MAXJSAMPLE rather than -0.5 .. 0.5.
  * The conversion equations to be implemented are therefore
- *	Y  =  0.29900 * R + 0.58700 * G + 0.11400 * B
- *	Cb = -0.16874 * R - 0.33126 * G + 0.50000 * B  + CENTERJSAMPLE
- *	Cr =  0.50000 * R - 0.41869 * G - 0.08131 * B  + CENTERJSAMPLE
+ *  Y  =  0.29900 * R + 0.58700 * G + 0.11400 * B
+ *  Cb = -0.16874 * R - 0.33126 * G + 0.50000 * B  + CENTERJSAMPLE
+ *  Cr =  0.50000 * R - 0.41869 * G - 0.08131 * B  + CENTERJSAMPLE
  * (These numbers are derived from TIFF 6.0 section 21, dated 3-June-92.)
  * Note: older versions of the IJG code used a zero offset of MAXJSAMPLE/2,
  * rather than CENTERJSAMPLE, for Cb and Cr.  This gave equal positive and

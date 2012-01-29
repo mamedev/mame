@@ -501,7 +501,7 @@ SCREEN_VBLANK( mermaid )
 			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
 
 			rect &= visarea;
-			
+
 			// check collision sprite - sprite
 
 			state->m_helper.fill(0, rect);

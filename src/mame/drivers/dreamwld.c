@@ -340,7 +340,7 @@ static SCREEN_UPDATE_IND16( dreamwld )
 				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + ((i + layer0_scrolly)&0xff))]; // different handling to psikyo.c? ( + scrolly )
 		}
 
-		
+
 			tmptilemap0->set_scrollx(
 			(i + layer0_scrolly) % 256 /*tilemap_width(tm0size) */,
 			layer0_scrollx + x0 );
@@ -357,7 +357,7 @@ static SCREEN_UPDATE_IND16( dreamwld )
 				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + ((i + layer1_scrolly)&0xff))];  // different handling to psikyo.c? ( + scrolly )
 		}
 
-		
+
 			tmptilemap1->set_scrollx(
 			(i + layer1_scrolly) % 256 /* tilemap_width(tm1size) */,
 			layer1_scrollx + x1 );

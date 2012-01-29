@@ -458,7 +458,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 					if(!(page_dir & 0x40) && (rwn == 1))
 						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x60);
 					else if(!(page_dir & 0x20) && (rwn != -1))
-						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);						
+						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);
 					*address = (page_dir & 0xffc00000) | (a & 0x003fffff);
 				}
 			}

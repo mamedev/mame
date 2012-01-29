@@ -191,20 +191,20 @@ jpeg_calc_output_dimensions (j_decompress_ptr cinfo)
  * processes are inner loops and need to be as fast as possible.  On most
  * machines, particularly CPUs with pipelines or instruction prefetch,
  * a (subscript-check-less) C table lookup
- *		x = sample_range_limit[x];
+ *      x = sample_range_limit[x];
  * is faster than explicit tests
- *		if (x < 0)  x = 0;
- *		else if (x > MAXJSAMPLE)  x = MAXJSAMPLE;
+ *      if (x < 0)  x = 0;
+ *      else if (x > MAXJSAMPLE)  x = MAXJSAMPLE;
  * These processes all use a common table prepared by the routine below.
  *
  * For most steps we can mathematically guarantee that the initial value
  * of x is within MAXJSAMPLE+1 of the legal range, so a table running from
  * -(MAXJSAMPLE+1) to 2*MAXJSAMPLE+1 is sufficient.  But for the initial
- * limiting step (just after the IDCT), a wildly out-of-range value is 
+ * limiting step (just after the IDCT), a wildly out-of-range value is
  * possible if the input data is corrupt.  To avoid any chance of indexing
  * off the end of memory and getting a bad-pointer trap, we perform the
  * post-IDCT limiting thus:
- *		x = range_limit[x & MASK];
+ *      x = range_limit[x & MASK];
  * where MASK is 2 bits wider than legal sample data, ie 10 bits for 8-bit
  * samples.  Under normal circumstances this is more than enough range and
  * a correct output will be generated; with bogus input data the mask will

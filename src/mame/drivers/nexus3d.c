@@ -127,12 +127,12 @@ static READ32_HANDLER( nexus3d_unk_r )
 
 //static READ32_HANDLER( nexus3d_unk2_r )
 //{
-//	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
+//  return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
 //}
 //
 //static READ32_HANDLER( nexus3d_unk3_r )
 //{
-//	return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
+//  return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
 //}
 //
 //static WRITE32_HANDLER( nexus3d_unk2_w )
@@ -156,8 +156,8 @@ static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x9C000018, 0x9C00001b) AM_WRITE8( n3d_flash_addr_w, 0xffffffff)
 
 	// lots of accesses in this range
-//	AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE( nexus3d_unk2_r, nexus3d_unk2_w ) // often
-//	AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE( nexus3d_unk3_r, nexus3d_unk3_w ) // often
+//  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE( nexus3d_unk2_r, nexus3d_unk2_w ) // often
+//  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE( nexus3d_unk3_r, nexus3d_unk3_w ) // often
 
 	AM_RANGE(0xE0000014, 0xE0000017) AM_READ( nexus3d_unk_r ) // sits waiting for this
 

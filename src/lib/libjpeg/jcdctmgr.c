@@ -90,17 +90,17 @@ forward_DCT (j_compress_ptr cinfo, jpeg_component_info * compptr,
 	qval = divisors[i];
 	temp = workspace[i];
 	/* Divide the coefficient value by qval, ensuring proper rounding.
-	 * Since C does not specify the direction of rounding for negative
-	 * quotients, we have to force the dividend positive for portability.
-	 *
-	 * In most files, at least half of the output values will be zero
-	 * (at default quantization settings, more like three-quarters...)
-	 * so we should ensure that this case is fast.  On many machines,
-	 * a comparison is enough cheaper than a divide to make a special test
-	 * a win.  Since both inputs will be nonnegative, we need only test
-	 * for a < b to discover whether a/b is 0.
-	 * If your machine's division is fast enough, define FAST_DIVIDE.
-	 */
+     * Since C does not specify the direction of rounding for negative
+     * quotients, we have to force the dividend positive for portability.
+     *
+     * In most files, at least half of the output values will be zero
+     * (at default quantization settings, more like three-quarters...)
+     * so we should ensure that this case is fast.  On many machines,
+     * a comparison is enough cheaper than a divide to make a special test
+     * a win.  Since both inputs will be nonnegative, we need only test
+     * for a < b to discover whether a/b is 0.
+     * If your machine's division is fast enough, define FAST_DIVIDE.
+     */
 #ifdef FAST_DIVIDE
 #define DIVIDE_BY(a,b)	a /= b
 #else
@@ -153,11 +153,11 @@ forward_DCT_float (j_compress_ptr cinfo, jpeg_component_info * compptr,
 	/* Apply the quantization and scaling factor */
 	temp = workspace[i] * divisors[i];
 	/* Round to nearest integer.
-	 * Since C does not specify the direction of rounding for negative
-	 * quotients, we have to force the dividend positive for portability.
-	 * The maximum coefficient size is +-16K (for 12-bit data), so this
-	 * code should work for either 16-bit or 32-bit ints.
-	 */
+     * Since C does not specify the direction of rounding for negative
+     * quotients, we have to force the dividend positive for portability.
+     * The maximum coefficient size is +-16K (for 12-bit data), so this
+     * code should work for either 16-bit or 32-bit ints.
+     */
 	output_ptr[i] = (JCOEF) ((int) (temp + (FAST_FLOAT) 16384.5) - 16384);
       }
     }
@@ -376,11 +376,11 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
     case JDCT_IFAST:
       {
 	/* For AA&N IDCT method, divisors are equal to quantization
-	 * coefficients scaled by scalefactor[row]*scalefactor[col], where
-	 *   scalefactor[0] = 1
-	 *   scalefactor[k] = cos(k*PI/16) * sqrt(2)    for k=1..7
-	 * We apply a further scale factor of 8.
-	 */
+     * coefficients scaled by scalefactor[row]*scalefactor[col], where
+     *   scalefactor[0] = 1
+     *   scalefactor[k] = cos(k*PI/16) * sqrt(2)    for k=1..7
+     * We apply a further scale factor of 8.
+     */
 #define CONST_BITS 14
 	static const INT16 aanscales[DCTSIZE2] = {
 	  /* precomputed values scaled up by 14 bits */
@@ -415,13 +415,13 @@ start_pass_fdctmgr (j_compress_ptr cinfo)
     case JDCT_FLOAT:
       {
 	/* For float AA&N IDCT method, divisors are equal to quantization
-	 * coefficients scaled by scalefactor[row]*scalefactor[col], where
-	 *   scalefactor[0] = 1
-	 *   scalefactor[k] = cos(k*PI/16) * sqrt(2)    for k=1..7
-	 * We apply a further scale factor of 8.
-	 * What's actually stored is 1/divisor so that the inner loop can
-	 * use a multiplication rather than a division.
-	 */
+     * coefficients scaled by scalefactor[row]*scalefactor[col], where
+     *   scalefactor[0] = 1
+     *   scalefactor[k] = cos(k*PI/16) * sqrt(2)    for k=1..7
+     * We apply a further scale factor of 8.
+     * What's actually stored is 1/divisor so that the inner loop can
+     * use a multiplication rather than a division.
+     */
 	FAST_FLOAT * fdtbl;
 	int row, col;
 	static const double aanscalefactor[DCTSIZE] = {

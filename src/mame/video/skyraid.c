@@ -141,7 +141,7 @@ SCREEN_UPDATE_IND16( skyraid )
 
 	rectangle helper_clip = cliprect;
 	helper_clip &= state->m_helper.cliprect();
-	
+
 	draw_terrain(screen.machine(), state->m_helper, helper_clip);
 	draw_sprites(screen.machine(), state->m_helper, helper_clip);
 	draw_missiles(screen.machine(), state->m_helper, helper_clip);

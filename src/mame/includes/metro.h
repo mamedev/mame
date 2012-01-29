@@ -54,7 +54,7 @@ public:
 	int         m_has_zoom;
 	int         m_sprite_xoffs;
 	int         m_sprite_yoffs;
-	
+
 	UINT8 *		m_expanded_gfx1;
 
 	/* blitter */

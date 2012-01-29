@@ -20,15 +20,15 @@
     - modernize
     - add emulated mc6845 hook-up
     - fix video update.
-	- rewrite video drawing functions (they are horrible)
-	- add VESA etc.
-	- "System Information" UI currently crashes the emulation
+    - rewrite video drawing functions (they are horrible)
+    - add VESA etc.
+    - "System Information" UI currently crashes the emulation
     - (and many more ...)
 
-	per-game issues:
-	- The Incredible Machine: fix partial updates
-	- MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
-	- Bio Menace: jerky H scrolling (uses EGA mode)
+    per-game issues:
+    - The Incredible Machine: fix partial updates
+    - MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
+    - Bio Menace: jerky H scrolling (uses EGA mode)
     - Virtual Pool: ET4k unrecognized;
     - California Chase (calchase): init bug causes messed up chars at POST
       (gfxs works if you soft reset).
@@ -728,19 +728,19 @@ static void recompute_params(running_machine &machine)
 
 	/* TODO: 10b and 11b settings aren't known */
 	pixel_clock  = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
-	pixel_clock /= 	(((vga.sequencer.data[1]&8) >> 3) + 1);
+	pixel_clock /=	(((vga.sequencer.data[1]&8) >> 3) + 1);
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
 
 	machine.primary_screen->configure((hblank_period), (vblank_period), visarea, refresh );
-//	popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
+//  popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
 }
 
 static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 {
 	/* Doom does this */
-//	if(vga.crtc.protect_enable && index <= 0x07)
-//		printf("write to protected address %02x\n",index);
+//  if(vga.crtc.protect_enable && index <= 0x07)
+//      printf("write to protected address %02x\n",index);
 
 	switch(index)
 	{
@@ -878,7 +878,7 @@ static void seq_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 			break;
 		case 0x03:
 			/* --2- 84-- character select A
-			   ---2 --84 character select B */
+               ---2 --84 character select B */
 			vga.sequencer.char_sel.A = (((data & 0xc) >> 2)<<1) | ((data & 0x20) >> 5);
 			vga.sequencer.char_sel.B = (((data & 0x3) >> 0)<<1) | ((data & 0x10) >> 4);
 			if(data)
@@ -1321,7 +1321,7 @@ READ8_HANDLER(vga_mem_r)
 
 WRITE8_HANDLER(vga_mem_w)
 {
-	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask	the offset.
+	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask  the offset.
 	switch((vga.gc.data[6] >> 2) & 0x03)
 	{
 		case 0: break;

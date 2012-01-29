@@ -17,7 +17,7 @@ VIDEO_START( simpl156 )
 	state->m_pf2_rowscroll = auto_alloc_array_clear(machine, UINT16, 0x800/2);
 	state->m_spriteram = auto_alloc_array_clear(machine, UINT16, 0x2000/2);
 	machine.generic.paletteram.u16 =  auto_alloc_array_clear(machine, UINT16, 0x1000/2);
-	
+
 	memset(state->m_spriteram, 0xff, 0x2000);
 
 	/* and register the allocated ram so that save states still work */

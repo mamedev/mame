@@ -234,7 +234,7 @@ media_auditor::summary media_auditor::audit_samples()
 	int found = 0;
 
 	// iterate over sample entries
-	samples_device_iterator iter(m_enumerator.config().root_device()); 
+	samples_device_iterator iter(m_enumerator.config().root_device());
 	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
 	{
 		const samples_interface *intf = reinterpret_cast<const samples_interface *>(device->static_config());

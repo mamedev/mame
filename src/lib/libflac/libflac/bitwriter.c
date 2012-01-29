@@ -123,8 +123,8 @@ static FLAC__bool bitwriter_grow_(FLAC__BitWriter *bw, unsigned bits_to_add)
 	new_capacity = bw->words + ((bw->bits + bits_to_add + FLAC__BITS_PER_WORD - 1) / FLAC__BITS_PER_WORD);
 
 	/* it's possible (due to pessimism in the growth estimation that
-	 * leads to this call) that we don't actually need to grow
-	 */
+     * leads to this call) that we don't actually need to grow
+     */
 	if(bw->capacity >= new_capacity)
 		return true;
 
@@ -288,8 +288,8 @@ FLAC__bool FLAC__bitwriter_get_buffer(FLAC__BitWriter *bw, const FLAC__byte **bu
 void FLAC__bitwriter_release_buffer(FLAC__BitWriter *bw)
 {
 	/* nothing to do.  in the future, strict checking of a 'writer-is-in-
-	 * get-mode' flag could be added everywhere and then cleared here
-	 */
+     * get-mode' flag could be added everywhere and then cleared here
+     */
 	(void)bw;
 }
 
@@ -629,9 +629,9 @@ break1:
 			}
 			else {
 				/* if bw->bits == 0, left==FLAC__BITS_PER_WORD which will always
-				 * be > lsbits (because of previous assertions) so it would have
-				 * triggered the (lsbits<left) case above.
-				 */
+                 * be > lsbits (because of previous assertions) so it would have
+                 * triggered the (lsbits<left) case above.
+                 */
 				FLAC__ASSERT(bw->bits);
 				FLAC__ASSERT(left < FLAC__BITS_PER_WORD);
 				bw->accum <<= left;

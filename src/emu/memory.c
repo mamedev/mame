@@ -2233,7 +2233,7 @@ void address_space::prepare_map()
 			// determine full tag
 			astring fulltag;
 			device().siblingtag(fulltag, entry->m_region);
-			
+
 			// set the memory address
 			entry->m_memory = machine().region(fulltag.cstr())->base() + entry->m_rgnoffs;
 		}

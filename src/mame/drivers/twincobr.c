@@ -6,8 +6,8 @@
         Flying Shark details: Carl-Henrik Skarstedt  &  Magnus Danielsson
         Flying Shark bootleg info: Ruben Panossian
 
-		Both bootlegs, while sharing a lot of code with the original sets
-		are probably based off undumped versions.
+        Both bootlegs, while sharing a lot of code with the original sets
+        are probably based off undumped versions.
 
 
 Supported games:

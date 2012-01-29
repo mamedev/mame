@@ -621,7 +621,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 					int dy = -8; /* vertical adjust */
 					UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
 					UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
-					state->m_roz_tilemap->draw_roz(bitmap, clip, 
+					state->m_roz_tilemap->draw_roz(bitmap, clip,
 						startx, starty, incxx, incxy, incyx, incyy, 0, 0, primask, 0);
 				}
 				else

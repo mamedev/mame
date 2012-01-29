@@ -245,7 +245,7 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
             if (incxx & 0x10000) incxx |= ~0x1ffff;
             if (incxy & 0x10000) incxy |= ~0x1ffff;
 
-            state->m_ms32_roz_tilemap->draw_roz(bitmap, &my_clip, 
+            state->m_ms32_roz_tilemap->draw_roz(bitmap, &my_clip,
                     (start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
                     incxx<<8, incxy<<8, 0, 0,
                     1, // Wrap
@@ -277,7 +277,7 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 		if (incyy & 0x10000) incyy |= ~0x1ffff;
 		if (incyx & 0x10000) incyx |= ~0x1ffff;
 
-		state->m_ms32_roz_tilemap[chip]->draw_roz(bitmap, cliprect, 
+		state->m_ms32_roz_tilemap[chip]->draw_roz(bitmap, cliprect,
 				(startx+offsx)<<16, (starty+offsy)<<16,
 				incxx<<8, incxy<<8, incyx<<8, incyy<<8,
 				1, // Wrap

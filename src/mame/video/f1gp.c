@@ -359,7 +359,7 @@ SCREEN_UPDATE_IND16( f1gpb )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	state->m_roz_tilemap->draw_roz(bitmap, cliprect, 
+	state->m_roz_tilemap->draw_roz(bitmap, cliprect,
 		startx << 13, starty << 13,
 		incxx << 5, incxy << 5, incyx << 5, incyy << 5,
 		1, 0, 0);

@@ -290,7 +290,7 @@ static SCREEN_UPDATE_IND16( zerotrgt )
 		x = -256 - (state->m_scrollx | state->m_scrollx_hi);
 		y = 256 + (state->m_scrolly | state->m_scrolly_hi);
 
-		state->m_bg_tilemap->draw_roz(bitmap, cliprect, 
+		state->m_bg_tilemap->draw_roz(bitmap, cliprect,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -339,7 +339,7 @@ static SCREEN_UPDATE_IND16( cntsteer )
 		x = 256 + (state->m_scrollx | state->m_scrollx_hi);
 		y = 256 - (state->m_scrolly | state->m_scrolly_hi);
 
-		state->m_bg_tilemap->draw_roz(bitmap, cliprect, 
+		state->m_bg_tilemap->draw_roz(bitmap, cliprect,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,

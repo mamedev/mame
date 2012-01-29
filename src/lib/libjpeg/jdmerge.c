@@ -14,19 +14,19 @@
  * (ie, box filtering), we can save some work in color conversion by
  * calculating all the output pixels corresponding to a pair of chroma
  * samples at one time.  In the conversion equations
- *	R = Y           + K1 * Cr
- *	G = Y + K2 * Cb + K3 * Cr
- *	B = Y + K4 * Cb
+ *  R = Y           + K1 * Cr
+ *  G = Y + K2 * Cb + K3 * Cr
+ *  B = Y + K4 * Cb
  * only the Y term varies among the group of pixels corresponding to a pair
  * of chroma samples, so the rest of the terms can be calculated just once.
  * At typical sampling ratios, this eliminates half or three-quarters of the
  * multiplications needed for color conversion.
  *
  * This file currently provides implementations for the following cases:
- *	YCbCr => RGB color conversion only.
- *	Sampling ratios of 2h1v or 2h2v.
- *	No scaling needed at upsample time.
- *	Corner-aligned (non-CCIR601) sampling alignment.
+ *  YCbCr => RGB color conversion only.
+ *  Sampling ratios of 2h1v or 2h2v.
+ *  No scaling needed at upsample time.
+ *  Corner-aligned (non-CCIR601) sampling alignment.
  * Other special cases could be added, but in most applications these are
  * the only common cases.  (For uncommon cases we fall back on the more
  * general code in jdsample.c and jdcolor.c.)

@@ -154,7 +154,7 @@ file_error common_process_file(emu_options &options, const char *location, bool 
 
 chd_file *get_disk_handle(running_machine &machine, const char *region)
 {
- 	for (open_chd *curdisk = machine.romload_data->chd_list.first(); curdisk != NULL; curdisk = curdisk->next())
+	for (open_chd *curdisk = machine.romload_data->chd_list.first(); curdisk != NULL; curdisk = curdisk->next())
 		if (strcmp(curdisk->region(), region) == 0)
 			return curdisk->chd();
 	return NULL;

@@ -29,12 +29,12 @@
                    RRI  20 |_____________| 21  MR
 
 
-				NOTE:	PIN		IM6402		IM6403
-						---------------------------
-						2		N/C			CONTROL
-						17		RRC			OSC IN
-						40		TRC			OSC OUT
-				   
+                NOTE:   PIN     IM6402      IM6403
+                        ---------------------------
+                        2       N/C         CONTROL
+                        17      RRC         OSC IN
+                        40      TRC         OSC OUT
+
 ***************************************************************************/
 
 #pragma once
@@ -70,7 +70,7 @@ struct im6402_interface
 {
 	int m_rrc;
 	int m_trc;
-	
+
 	devcb_read_line		m_in_rri_cb;
 	devcb_write_line	m_out_tro_cb;
 	devcb_write_line	m_out_dr_cb;
@@ -81,7 +81,7 @@ struct im6402_interface
 
 // ======================> im6402_device
 
-class im6402_device :  public device_t, 
+class im6402_device :  public device_t,
 					   public device_serial_interface,
 					   public im6402_interface
 {
@@ -91,7 +91,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	DECLARE_READ_LINE_MEMBER( dr_r );
 	DECLARE_READ_LINE_MEMBER( tbre_r );
 	DECLARE_READ_LINE_MEMBER( tre_r );
@@ -118,7 +118,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 	// device_serial_interface overrides
 	virtual void input_callback(UINT8 state);
 
@@ -128,7 +128,7 @@ private:
 	inline void set_tre(int state);
 	inline void receive();
 	inline void transmit();
-	
+
 	static const device_timer_id TIMER_RX = 0;
 	static const device_timer_id TIMER_TX = 1;
 
@@ -145,7 +145,7 @@ private:
 	int m_pe;
 	int m_fe;
 	int m_oe;
-	
+
 	// control
 	int m_cls1;
 	int m_cls2;
@@ -153,15 +153,15 @@ private:
 	int m_sfd;
 	int m_epe;
 	int m_pi;
-	
+
 	// receiver
 	UINT8 m_rbr;
 	int	m_rrc_count;
-	
+
 	// transmitter
 	UINT8 m_tbr;
 	int	m_trc_count;
-	
+
 	// timers
 	emu_timer *m_rx_timer;
 	emu_timer *m_tx_timer;

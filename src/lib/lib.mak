@@ -274,7 +274,7 @@ $(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c | $(OSPREBUILD)
 #-------------------------------------------------
 
 FLACOPTS=-DFLAC__NO_ASM -DHAVE_INTTYPES_H -DHAVE_ICONV -DHAVE_LANGINFO_CODESET -DHAVE_SOCKLEN_T -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
- 
+
 LIBFLACOBJS = \
 	$(LIBOBJ)/libflac/bitmath.o \
 	$(LIBOBJ)/libflac/bitreader.o \

@@ -568,9 +568,9 @@ decompress_smooth_data (j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
 	  DC9 = (int) next_block_row[1][0];
 	}
 	/* Compute coefficient estimates per K.8.
-	 * An estimate is applied only if coefficient is still zero,
-	 * and is not known to be fully accurate.
-	 */
+     * An estimate is applied only if coefficient is still zero,
+     * and is not known to be fully accurate.
+     */
 	/* AC01 */
 	if ((Al=coef_bits[1]) != 0 && workspace[1] == 0) {
 	  num = 36 * Q00 * (DC4 - DC6);

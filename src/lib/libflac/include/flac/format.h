@@ -84,8 +84,8 @@ extern "C" {
 
 
 /*
-	Most of the values described in this file are defined by the FLAC
-	format specification.  There is nothing to tune here.
+    Most of the values described in this file are defined by the FLAC
+    format specification.  There is nothing to tune here.
 */
 
 /** The largest legal metadata type code. */
@@ -193,11 +193,11 @@ extern FLAC_API const unsigned FLAC__STREAM_SYNC_LEN; /* = 32 bits */
 typedef enum {
 	FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE = 0,
 	/**< Residual is coded by partitioning into contexts, each with it's own
-	 * 4-bit Rice parameter. */
+     * 4-bit Rice parameter. */
 
 	FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2 = 1
 	/**< Residual is coded by partitioning into contexts, each with it's own
-	 * 5-bit Rice parameter. */
+     * 5-bit Rice parameter. */
 } FLAC__EntropyCodingMethodType;
 
 /** Maps a FLAC__EntropyCodingMethodType to a C string.
@@ -217,14 +217,14 @@ typedef struct {
 
 	unsigned *raw_bits;
 	/**< Widths for escape-coded partitions.  Will be non-zero for escaped
-	 * partitions and zero for unescaped partitions.
-	 */
+     * partitions and zero for unescaped partitions.
+     */
 
 	unsigned capacity_by_order;
 	/**< The capacity of the \a parameters and \a raw_bits arrays
-	 * specified as an order, i.e. the number of array elements
-	 * allocated is 2 ^ \a capacity_by_order.
-	 */
+     * specified as an order, i.e. the number of array elements
+     * allocated is 2 ^ \a capacity_by_order.
+     */
 } FLAC__EntropyCodingMethod_PartitionedRiceContents;
 
 /** Header for a Rice partitioned residual.  (c.f. <A HREF="../format.html#partitioned_rice">format specification</A>)
@@ -425,21 +425,21 @@ typedef struct {
 
 	FLAC__FrameNumberType number_type;
 	/**< The numbering scheme used for the frame.  As a convenience, the
-	 * decoder will always convert a frame number to a sample number because
-	 * the rules are complex. */
+     * decoder will always convert a frame number to a sample number because
+     * the rules are complex. */
 
 	union {
 		FLAC__uint32 frame_number;
 		FLAC__uint64 sample_number;
 	} number;
 	/**< The frame number or sample number of first sample in frame;
-	 * use the \a number_type value to determine which to use. */
+     * use the \a number_type value to determine which to use. */
 
 	FLAC__uint8 crc;
 	/**< CRC-8 (polynomial = x^8 + x^2 + x^1 + x^0, initialized with 0)
-	 * of the raw frame header bytes, meaning everything before the CRC byte
-	 * including the sync code.
-	 */
+     * of the raw frame header bytes, meaning everything before the CRC byte
+     * including the sync code.
+     */
 } FLAC__FrameHeader;
 
 extern FLAC_API const unsigned FLAC__FRAME_HEADER_SYNC; /**< == 0x3ffe; the frame header sync code */
@@ -459,9 +459,9 @@ extern FLAC_API const unsigned FLAC__FRAME_HEADER_CRC_LEN; /**< == 8 (bits) */
 typedef struct {
 	FLAC__uint16 crc;
 	/**< CRC-16 (polynomial = x^16 + x^15 + x^2 + x^0, initialized with
-	 * 0) of the bytes before the crc, back to and including the frame header
-	 * sync code.
-	 */
+     * 0) of the bytes before the crc, back to and including the frame header
+     * sync code.
+     */
 } FLAC__FrameFooter;
 
 extern FLAC_API const unsigned FLAC__FRAME_FOOTER_CRC_LEN; /**< == 16 (bits) */
@@ -551,9 +551,9 @@ extern FLAC_API const unsigned FLAC__STREAM_METADATA_STREAMINFO_MD5SUM_LEN; /**<
 typedef struct {
 	int dummy;
 	/**< Conceptually this is an empty struct since we don't store the
-	 * padding bytes.  Empty structs are not allowed by some C compilers,
-	 * hence the dummy.
-	 */
+     * padding bytes.  Empty structs are not allowed by some C compilers,
+     * hence the dummy.
+     */
 } FLAC__StreamMetadata_Padding;
 
 
@@ -574,7 +574,7 @@ typedef struct {
 
 	FLAC__uint64 stream_offset;
 	/**< The offset, in bytes, of the target frame with respect to
-	 * beginning of the first frame. */
+     * beginning of the first frame. */
 
 	unsigned frame_samples;
 	/**< The number of samples in the target frame. */
@@ -644,8 +644,8 @@ extern FLAC_API const unsigned FLAC__STREAM_METADATA_VORBIS_COMMENT_NUM_COMMENTS
 typedef struct {
 	FLAC__uint64 offset;
 	/**< Offset in samples, relative to the track offset, of the index
-	 * point.
-	 */
+     * point.
+     */
 
 	FLAC__byte number;
 	/**< The index point number. */
@@ -700,9 +700,9 @@ extern FLAC_API const unsigned FLAC__STREAM_METADATA_CUESHEET_TRACK_NUM_INDICES_
 typedef struct {
 	char media_catalog_number[129];
 	/**< Media catalog number, in ASCII printable characters 0x20-0x7e.  In
-	 * general, the media catalog number may be 0 to 128 bytes long; any
-	 * unused characters should be right-padded with NUL characters.
-	 */
+     * general, the media catalog number may be 0 to 128 bytes long; any
+     * unused characters should be right-padded with NUL characters.
+     */
 
 	FLAC__uint64 lead_in;
 	/**< The number of lead-in samples. */
@@ -769,21 +769,21 @@ typedef struct {
 
 	char *mime_type;
 	/**< Picture data's MIME type, in ASCII printable characters
-	 * 0x20-0x7e, NUL terminated.  For best compatibility with players,
-	 * use picture data of MIME type \c image/jpeg or \c image/png.  A
-	 * MIME type of '-->' is also allowed, in which case the picture
-	 * data should be a complete URL.  In file storage, the MIME type is
-	 * stored as a 32-bit length followed by the ASCII string with no NUL
-	 * terminator, but is converted to a plain C string in this structure
-	 * for convenience.
-	 */
+     * 0x20-0x7e, NUL terminated.  For best compatibility with players,
+     * use picture data of MIME type \c image/jpeg or \c image/png.  A
+     * MIME type of '-->' is also allowed, in which case the picture
+     * data should be a complete URL.  In file storage, the MIME type is
+     * stored as a 32-bit length followed by the ASCII string with no NUL
+     * terminator, but is converted to a plain C string in this structure
+     * for convenience.
+     */
 
 	FLAC__byte *description;
 	/**< Picture's description in UTF-8, NUL terminated.  In file storage,
-	 * the description is stored as a 32-bit length followed by the UTF-8
-	 * string with no NUL terminator, but is converted to a plain C string
-	 * in this structure for convenience.
-	 */
+     * the description is stored as a 32-bit length followed by the UTF-8
+     * string with no NUL terminator, but is converted to a plain C string
+     * in this structure for convenience.
+     */
 
 	FLAC__uint32 width;
 	/**< Picture's width in pixels. */
@@ -796,8 +796,8 @@ typedef struct {
 
 	FLAC__uint32 colors;
 	/**< For indexed palettes (like GIF), picture's number of colors (the
-	 * number of palette entries), or \c 0 for non-indexed (i.e. 2^depth).
-	 */
+     * number of palette entries), or \c 0 for non-indexed (i.e. 2^depth).
+     */
 
 	FLAC__uint32 data_length;
 	/**< Length of binary picture data in bytes. */
@@ -831,8 +831,8 @@ typedef struct {
 typedef struct {
 	FLAC__MetadataType type;
 	/**< The type of the metadata block; used determine which member of the
-	 * \a data union to dereference.  If type >= FLAC__METADATA_TYPE_UNDEFINED
-	 * then \a data.unknown must be used. */
+     * \a data union to dereference.  If type >= FLAC__METADATA_TYPE_UNDEFINED
+     * then \a data.unknown must be used. */
 
 	FLAC__bool is_last;
 	/**< \c true if this metadata block is the last, else \a false */
@@ -851,7 +851,7 @@ typedef struct {
 		FLAC__StreamMetadata_Unknown unknown;
 	} data;
 	/**< Polymorphic block data; use the \a type value to determine which
-	 * to use. */
+     * to use. */
 } FLAC__StreamMetadata;
 
 extern FLAC_API const unsigned FLAC__STREAM_METADATA_IS_LAST_LEN; /**< == 1 (bit) */

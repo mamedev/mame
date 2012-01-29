@@ -315,11 +315,11 @@ compress_output (j_compress_ptr cinfo, JSAMPIMAGE input_buf)
 	    xindex = 0;
 	  }
 	  /* Fill in any dummy blocks needed in this row.
-	   * Dummy blocks are filled in the same way as in jccoefct.c:
-	   * all zeroes in the AC entries, DC entries equal to previous
-	   * block's DC value.  The init routine has already zeroed the
-	   * AC entries, so we need only set the DC entries correctly.
-	   */
+       * Dummy blocks are filled in the same way as in jccoefct.c:
+       * all zeroes in the AC entries, DC entries equal to previous
+       * block's DC value.  The init routine has already zeroed the
+       * AC entries, so we need only set the DC entries correctly.
+       */
 	  for (; xindex < compptr->MCU_width; xindex++) {
 	    MCU_buffer[blkn] = coef->dummy_buffer[blkn];
 	    MCU_buffer[blkn][0][0] = MCU_buffer[blkn-1][0][0];

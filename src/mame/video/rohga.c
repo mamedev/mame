@@ -153,12 +153,12 @@ static void mixwizdfirelayer(running_machine &machine, bitmap_rgb32 &bitmap, con
 			if (pix&0xf)
 			{
 				UINT16 pen = pix&0x1ff;
-			
+
 				if (pen&0x100)
-				{		
+				{
 					UINT32 base = dstline[x];
 					pen &=0xff;
-					dstline[x] = alpha_blend_r32(base, paldata[pen+penbase], 0x80);	
+					dstline[x] = alpha_blend_r32(base, paldata[pen+penbase], 0x80);
 				}
 				else
 				{

@@ -2,17 +2,17 @@
 
     x87 FPU emulation
 
-	TODO:
-	 - 80-bit precision for F2XM1, FYL2X, FPATAN
-	 - Figure out why SoftFloat trig extensions produce bad values
-	 - Cycle counts for all processors (currently using 486 counts)
-	 - Precision-dependent cycle counts for divide instructions
-	 - Last instruction, operand pointers etc.
-	 - Fix FLDENV, FSTENV, FSAVE, FRSTOR and FPREM
-	 - Status word C2 updates to reflect round up/down
-	 - Handling of invalid and denormal numbers
-	 - Remove redundant operand checks
-	 - Exceptions
+    TODO:
+     - 80-bit precision for F2XM1, FYL2X, FPATAN
+     - Figure out why SoftFloat trig extensions produce bad values
+     - Cycle counts for all processors (currently using 486 counts)
+     - Precision-dependent cycle counts for divide instructions
+     - Last instruction, operand pointers etc.
+     - Fix FLDENV, FSTENV, FSAVE, FRSTOR and FPREM
+     - Status word C2 updates to reflect round up/down
+     - Handling of invalid and denormal numbers
+     - Remove redundant operand checks
+     - Exceptions
 
 ***************************************************************************/
 
@@ -2167,7 +2167,7 @@ void x87_fptan(i386_state *cpustate, UINT8 modrm)
 		double x = fx80_to_double(result1);
 		x = tan(x);
 		result1 = double_to_fx80(x);
-		
+
 		cpustate->x87_sw &= ~X87_SW_C2;
 #endif
 	}
@@ -2229,7 +2229,7 @@ void x87_fsin(i386_state *cpustate, UINT8 modrm)
 		double x = fx80_to_double(result);
 		x = sin(x);
 		result = double_to_fx80(x);
-		
+
 		cpustate->x87_sw &= ~X87_SW_C2;
 #endif
 	}
@@ -2262,7 +2262,7 @@ void x87_fcos(i386_state *cpustate, UINT8 modrm)
 		double x = fx80_to_double(result);
 		x = cos(x);
 		result = double_to_fx80(x);
-		
+
 		cpustate->x87_sw &= ~X87_SW_C2;
 #endif
 	}
@@ -2300,13 +2300,13 @@ void x87_fsincos(i386_state *cpustate, UINT8 modrm)
 			cpustate->x87_sw |= X87_SW_C2;
 #else
 		double s = fx80_to_double(s_result);
-		double c = fx80_to_double(c_result);		
+		double c = fx80_to_double(c_result);
 		s = sin(s);
 		c = cos(c);
-		
+
 		s_result = double_to_fx80(s);
 		c_result = double_to_fx80(c);
-		
+
 		cpustate->x87_sw &= ~X87_SW_C2;
 #endif
 	}
@@ -4023,38 +4023,38 @@ void x87_fstenv(i386_state *cpustate, UINT8 modrm)
 			WRITE16(cpustate, ea + 0, cpustate->x87_cw);
 			WRITE16(cpustate, ea + 2, cpustate->x87_sw);
 			WRITE16(cpustate, ea + 4, cpustate->x87_tw);
-//			WRITE16(cpustate, ea + 6, cpustate->fpu_inst_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE16(cpustate, ea + 10, cpustate->fpu_data_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
+//          WRITE16(cpustate, ea + 6, cpustate->fpu_inst_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE16(cpustate, ea + 10, cpustate->fpu_data_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
 			break;
 		case 1: // 16-bit protected mode
 			WRITE16(cpustate,ea + 0, cpustate->x87_cw);
 			WRITE16(cpustate,ea + 2, cpustate->x87_sw);
 			WRITE16(cpustate,ea + 4, cpustate->x87_tw);
-//			WRITE16(cpustate,ea + 6, cpustate->fpu_inst_ptr & 0xffff);
-//			WRITE16(cpustate,ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE16(cpustate,ea + 10, cpustate->fpu_data_ptr & 0xffff);
-//			WRITE16(cpustate,ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
+//          WRITE16(cpustate,ea + 6, cpustate->fpu_inst_ptr & 0xffff);
+//          WRITE16(cpustate,ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE16(cpustate,ea + 10, cpustate->fpu_data_ptr & 0xffff);
+//          WRITE16(cpustate,ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
 			break;
 		case 2: // 32-bit real mode
 			WRITE16(cpustate, ea + 0, cpustate->x87_cw);
 			WRITE16(cpustate, ea + 4, cpustate->x87_sw);
 			WRITE16(cpustate, ea + 8, cpustate->x87_tw);
-//			WRITE16(cpustate, ea + 12, cpustate->fpu_inst_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE16(cpustate, ea + 20, cpustate->fpu_data_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE32(cpustate, ea + 24, (cpustate->fpu_data_ptr >> 16) << 12);
+//          WRITE16(cpustate, ea + 12, cpustate->fpu_inst_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE16(cpustate, ea + 20, cpustate->fpu_data_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE32(cpustate, ea + 24, (cpustate->fpu_data_ptr >> 16) << 12);
 			break;
 		case 3: // 32-bit protected mode
 			WRITE16(cpustate, ea + 0,  cpustate->x87_cw);
 			WRITE16(cpustate, ea + 4,  cpustate->x87_sw);
 			WRITE16(cpustate, ea + 8,  cpustate->x87_tw);
-//			WRITE32(cpustate, ea + 12, cpustate->fpu_inst_ptr);
-//			WRITE32(cpustate, ea + 16, cpustate->fpu_opcode);
-//			WRITE32(cpustate, ea + 20, cpustate->fpu_data_ptr);
-//			WRITE32(cpustate, ea + 24, cpustate->fpu_inst_ptr);
+//          WRITE32(cpustate, ea + 12, cpustate->fpu_inst_ptr);
+//          WRITE32(cpustate, ea + 16, cpustate->fpu_opcode);
+//          WRITE32(cpustate, ea + 20, cpustate->fpu_data_ptr);
+//          WRITE32(cpustate, ea + 24, cpustate->fpu_inst_ptr);
 			break;
 	}
 
@@ -4072,41 +4072,41 @@ void x87_fsave(i386_state *cpustate, UINT8 modrm)
 			WRITE16(cpustate, ea + 0, cpustate->x87_cw);
 			WRITE16(cpustate, ea + 2, cpustate->x87_sw);
 			WRITE16(cpustate, ea + 4, cpustate->x87_tw);
-//			WRITE16(cpustate, ea + 6, cpustate->fpu_inst_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE16(cpustate, ea + 10, cpustate->fpu_data_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
+//          WRITE16(cpustate, ea + 6, cpustate->fpu_inst_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE16(cpustate, ea + 10, cpustate->fpu_data_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
 			ea += 14;
 			break;
 		case 1: // 16-bit protected mode
 			WRITE16(cpustate,ea + 0, cpustate->x87_cw);
 			WRITE16(cpustate,ea + 2, cpustate->x87_sw);
 			WRITE16(cpustate,ea + 4, cpustate->x87_tw);
-//			WRITE16(cpustate,ea + 6, cpustate->fpu_inst_ptr & 0xffff);
-//			WRITE16(cpustate,ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE16(cpustate,ea + 10, cpustate->fpu_data_ptr & 0xffff);
-//			WRITE16(cpustate,ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
+//          WRITE16(cpustate,ea + 6, cpustate->fpu_inst_ptr & 0xffff);
+//          WRITE16(cpustate,ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE16(cpustate,ea + 10, cpustate->fpu_data_ptr & 0xffff);
+//          WRITE16(cpustate,ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
 			ea += 14;
 			break;
 		case 2: // 32-bit real mode
 			WRITE16(cpustate, ea + 0, cpustate->x87_cw);
 			WRITE16(cpustate, ea + 4, cpustate->x87_sw);
 			WRITE16(cpustate, ea + 8, cpustate->x87_tw);
-//			WRITE16(cpustate, ea + 12, cpustate->fpu_inst_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE16(cpustate, ea + 20, cpustate->fpu_data_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE32(cpustate, ea + 24, (cpustate->fpu_data_ptr >> 16) << 12);
+//          WRITE16(cpustate, ea + 12, cpustate->fpu_inst_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE16(cpustate, ea + 20, cpustate->fpu_data_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE32(cpustate, ea + 24, (cpustate->fpu_data_ptr >> 16) << 12);
 			ea += 28;
 			break;
 		case 3: // 32-bit protected mode
 			WRITE16(cpustate, ea + 0,  cpustate->x87_cw);
 			WRITE16(cpustate, ea + 4,  cpustate->x87_sw);
 			WRITE16(cpustate, ea + 8,  cpustate->x87_tw);
-//			WRITE32(cpustate, ea + 12, cpustate->fpu_inst_ptr);
-//			WRITE32(cpustate, ea + 16, cpustate->fpu_opcode);
-//			WRITE32(cpustate, ea + 20, cpustate->fpu_data_ptr);
-//			WRITE32(cpustate, ea + 24, cpustate->fpu_inst_ptr);
+//          WRITE32(cpustate, ea + 12, cpustate->fpu_inst_ptr);
+//          WRITE32(cpustate, ea + 16, cpustate->fpu_opcode);
+//          WRITE32(cpustate, ea + 20, cpustate->fpu_data_ptr);
+//          WRITE32(cpustate, ea + 24, cpustate->fpu_inst_ptr);
 			ea += 28;
 			break;
 	}
@@ -4128,41 +4128,41 @@ void x87_frstor(i386_state *cpustate, UINT8 modrm)
 			x87_write_cw(cpustate, READ16(cpustate, ea));
 			cpustate->x87_sw = READ16(cpustate, ea + 2);
 			cpustate->x87_tw = READ16(cpustate, ea + 4);
-//			WRITE16(cpustate, ea + 6, cpustate->fpu_inst_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE16(cpustate, ea + 10, cpustate->fpu_data_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
+//          WRITE16(cpustate, ea + 6, cpustate->fpu_inst_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE16(cpustate, ea + 10, cpustate->fpu_data_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
 			ea += 14;
 			break;
 		case 1: // 16-bit protected mode
 			x87_write_cw(cpustate, READ16(cpustate, ea));
 			cpustate->x87_sw = READ16(cpustate, ea + 2);
 			cpustate->x87_tw = READ16(cpustate, ea + 4);
-//			WRITE16(cpustate,ea + 6, cpustate->fpu_inst_ptr & 0xffff);
-//			WRITE16(cpustate,ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE16(cpustate,ea + 10, cpustate->fpu_data_ptr & 0xffff);
-//			WRITE16(cpustate,ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
+//          WRITE16(cpustate,ea + 6, cpustate->fpu_inst_ptr & 0xffff);
+//          WRITE16(cpustate,ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE16(cpustate,ea + 10, cpustate->fpu_data_ptr & 0xffff);
+//          WRITE16(cpustate,ea + 12, (cpustate->fpu_inst_ptr & 0x0f0000) >> 4);
 			ea += 14;
 			break;
 		case 2: // 32-bit real mode
 			x87_write_cw(cpustate, READ16(cpustate, ea));
 			cpustate->x87_sw = READ16(cpustate, ea + 4);
 			cpustate->x87_tw = READ16(cpustate, ea + 8);
-//			WRITE16(cpustate, ea + 12, cpustate->fpu_inst_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE16(cpustate, ea + 20, cpustate->fpu_data_ptr & 0xffff);
-//			WRITE16(cpustate, ea + 12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
-//			WRITE32(cpustate, ea + 24, (cpustate->fpu_data_ptr >> 16) << 12);
+//          WRITE16(cpustate, ea + 12, cpustate->fpu_inst_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 8, (cpustate->fpu_opcode & 0x07ff) | ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE16(cpustate, ea + 20, cpustate->fpu_data_ptr & 0xffff);
+//          WRITE16(cpustate, ea + 12, ((cpustate->fpu_inst_ptr & 0x0f0000) >> 4));
+//          WRITE32(cpustate, ea + 24, (cpustate->fpu_data_ptr >> 16) << 12);
 			ea += 28;
 			break;
 		case 3: // 32-bit protected mode
 			x87_write_cw(cpustate, READ16(cpustate, ea));
 			cpustate->x87_sw = READ16(cpustate, ea + 4);
 			cpustate->x87_tw = READ16(cpustate, ea + 8);
-//			WRITE32(cpustate, ea + 12, cpustate->fpu_inst_ptr);
-//			WRITE32(cpustate, ea + 16, cpustate->fpu_opcode);
-//			WRITE32(cpustate, ea + 20, cpustate->fpu_data_ptr);
-//			WRITE32(cpustate, ea + 24, cpustate->fpu_inst_ptr);
+//          WRITE32(cpustate, ea + 12, cpustate->fpu_inst_ptr);
+//          WRITE32(cpustate, ea + 16, cpustate->fpu_opcode);
+//          WRITE32(cpustate, ea + 20, cpustate->fpu_data_ptr);
+//          WRITE32(cpustate, ea + 24, cpustate->fpu_inst_ptr);
 			ea += 28;
 			break;
 	}

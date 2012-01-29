@@ -120,14 +120,14 @@ typedef struct {		/* Bitreading working state within an MCU */
  * before using GET_BITS, PEEK_BITS, or DROP_BITS.
  * The variables get_buffer and bits_left are assumed to be locals,
  * but the state struct might not be (jpeg_huff_decode needs this).
- *	CHECK_BIT_BUFFER(state,n,action);
- *		Ensure there are N bits in get_buffer; if suspend, take action.
+ *  CHECK_BIT_BUFFER(state,n,action);
+ *      Ensure there are N bits in get_buffer; if suspend, take action.
  *      val = GET_BITS(n);
- *		Fetch next N bits.
+ *      Fetch next N bits.
  *      val = PEEK_BITS(n);
- *		Fetch next N bits without removing them from the buffer.
- *	DROP_BITS(n);
- *		Discard next N bits.
+ *      Fetch next N bits without removing them from the buffer.
+ *  DROP_BITS(n);
+ *      Discard next N bits.
  * The value N should be a simple variable, not an expression, because it
  * is evaluated multiple times.
  */
@@ -350,7 +350,7 @@ jpeg_make_d_derived_tbl (j_decompress_ptr cinfo, boolean isDC, int tblno,
 				  SIZEOF(d_derived_tbl));
   dtbl = *pdtbl;
   dtbl->pub = htbl;		/* fill in back link */
-  
+
   /* Figure C.1: make table of Huffman code length for each symbol */
 
   p = 0;
@@ -363,10 +363,10 @@ jpeg_make_d_derived_tbl (j_decompress_ptr cinfo, boolean isDC, int tblno,
   }
   huffsize[p] = 0;
   numsymbols = p;
-  
+
   /* Figure C.2: generate the codes themselves */
   /* We also validate that the counts represent a legal Huffman code tree. */
-  
+
   code = 0;
   si = huffsize[0];
   p = 0;
@@ -493,10 +493,10 @@ jpeg_fill_bit_buffer (bitread_working_state * state,
       /* If it's 0xFF, check and discard stuffed zero byte */
       if (c == 0xFF) {
 	/* Loop here to discard any padding FF's on terminating marker,
-	 * so that we can save a valid unread_marker value.  NOTE: we will
-	 * accept multiple FF's followed by a 0 as meaning a single FF data
-	 * byte.  This data pattern is not valid according to the standard.
-	 */
+     * so that we can save a valid unread_marker value.  NOTE: we will
+     * accept multiple FF's followed by a 0 as meaning a single FF data
+     * byte.  This data pattern is not valid according to the standard.
+     */
 	do {
 	  if (bytes_in_buffer == 0) {
 	    if (! (*cinfo->src->fill_input_buffer) (cinfo))
@@ -513,13 +513,13 @@ jpeg_fill_bit_buffer (bitread_working_state * state,
 	  c = 0xFF;
 	} else {
 	  /* Oops, it's actually a marker indicating end of compressed data.
-	   * Save the marker code for later use.
-	   * Fine point: it might appear that we should save the marker into
-	   * bitread working state, not straight into permanent state.  But
-	   * once we have hit a marker, we cannot need to suspend within the
-	   * current MCU, because we will read no more bytes from the data
-	   * source.  So it is OK to update permanent state right away.
-	   */
+       * Save the marker code for later use.
+       * Fine point: it might appear that we should save the marker into
+       * bitread working state, not straight into permanent state.  But
+       * once we have hit a marker, we cannot need to suspend within the
+       * current MCU, because we will read no more bytes from the data
+       * source.  So it is OK to update permanent state right away.
+       */
 	  cinfo->unread_marker = c;
 	  /* See if we need to insert some fake zero bits. */
 	  goto no_more_bytes;
@@ -671,7 +671,7 @@ process_restart (j_decompress_ptr cinfo)
 /*
  * Huffman MCU decoding.
  * Each of these routines decodes and returns one MCU's worth of
- * Huffman-compressed coefficients. 
+ * Huffman-compressed coefficients.
  * The coefficients are reordered from zigzag order into natural array order,
  * but are not dequantized.
  *
@@ -693,7 +693,7 @@ process_restart (j_decompress_ptr cinfo)
 
 METHODDEF(boolean)
 decode_mcu_DC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
-{   
+{
   huff_entropy_ptr entropy = (huff_entropy_ptr) cinfo->entropy;
   int Al = cinfo->Al;
   register int s, r;
@@ -764,7 +764,7 @@ decode_mcu_DC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 
 METHODDEF(boolean)
 decode_mcu_AC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
-{   
+{
   huff_entropy_ptr entropy = (huff_entropy_ptr) cinfo->entropy;
   register int s, k, r;
   unsigned int EOBRUN;
@@ -853,7 +853,7 @@ decode_mcu_AC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 
 METHODDEF(boolean)
 decode_mcu_DC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
-{   
+{
   huff_entropy_ptr entropy = (huff_entropy_ptr) cinfo->entropy;
   int p1 = 1 << cinfo->Al;	/* 1 in the bit position being coded */
   int blkn;
@@ -902,7 +902,7 @@ decode_mcu_DC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 
 METHODDEF(boolean)
 decode_mcu_AC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
-{   
+{
   huff_entropy_ptr entropy = (huff_entropy_ptr) cinfo->entropy;
   register int s, k, r;
   unsigned int EOBRUN;
@@ -976,9 +976,9 @@ decode_mcu_AC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	  /* note s = 0 for processing ZRL */
 	}
 	/* Advance over already-nonzero coefs and r still-zero coefs,
-	 * appending correction bits to the nonzeroes.  A correction bit is 1
-	 * if the absolute value of the coefficient must be increased.
-	 */
+     * appending correction bits to the nonzeroes.  A correction bit is 1
+     * if the absolute value of the coefficient must be increased.
+     */
 	do {
 	  thiscoef = *block + natural_order[k];
 	  if (*thiscoef != 0) {
@@ -1127,9 +1127,9 @@ decode_mcu_sub (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	    r = GET_BITS(s);
 	    s = HUFF_EXTEND(r, s);
 	    /* Output coefficient in natural (dezigzagged) order.
-	     * Note: the extra entries in natural_order[] will save us
-	     * if k > Se, which could happen if the data is corrupted.
-	     */
+         * Note: the extra entries in natural_order[] will save us
+         * if k > Se, which could happen if the data is corrupted.
+         */
 	    (*block)[natural_order[k]] = (JCOEF) s;
 	  } else {
 	    if (r != 15)
@@ -1251,9 +1251,9 @@ decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	    r = GET_BITS(s);
 	    s = HUFF_EXTEND(r, s);
 	    /* Output coefficient in natural (dezigzagged) order.
-	     * Note: the extra entries in jpeg_natural_order[] will save us
-	     * if k >= DCTSIZE2, which could happen if the data is corrupted.
-	     */
+         * Note: the extra entries in jpeg_natural_order[] will save us
+         * if k >= DCTSIZE2, which could happen if the data is corrupted.
+         */
 	    (*block)[jpeg_natural_order[k]] = (JCOEF) s;
 	  } else {
 	    if (r != 15)

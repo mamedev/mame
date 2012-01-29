@@ -194,8 +194,8 @@ SCREEN_UPDATE_RGB32( boogwing )
 
 	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 3);
 	draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u16, 4);
-//	screen.machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x500, 0x1ff);
-//	screen.machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x700, 0xff);
+//  screen.machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x500, 0x1ff);
+//  screen.machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x700, 0xff);
 
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;

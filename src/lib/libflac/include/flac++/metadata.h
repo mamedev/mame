@@ -81,51 +81,51 @@ namespace FLAC {
 		// ============================================================
 
 		/** \defgroup flacpp_metadata_object FLAC++/metadata.h: metadata object classes
-		 *  \ingroup flacpp_metadata
-		 *
-		 * This module contains classes representing FLAC metadata
-		 * blocks in memory.
-		 *
-		 * The behavior closely mimics the C layer interface; be
-		 * sure to read the detailed description of the
-		 * \link flac_metadata_object C metadata object module \endlink.
-		 *
-		 * Any time a metadata object is constructed or assigned, you
-		 * should check is_valid() to make sure the underlying
-		 * ::FLAC__StreamMetadata object was able to be created.
-		 *
-		 * \warning
-		 * When the get_*() methods of any metadata object method
-		 * return you a const pointer, DO NOT disobey and write into it.
-		 * Always use the set_*() methods.
-		 *
-		 * \{
-		 */
+         *  \ingroup flacpp_metadata
+         *
+         * This module contains classes representing FLAC metadata
+         * blocks in memory.
+         *
+         * The behavior closely mimics the C layer interface; be
+         * sure to read the detailed description of the
+         * \link flac_metadata_object C metadata object module \endlink.
+         *
+         * Any time a metadata object is constructed or assigned, you
+         * should check is_valid() to make sure the underlying
+         * ::FLAC__StreamMetadata object was able to be created.
+         *
+         * \warning
+         * When the get_*() methods of any metadata object method
+         * return you a const pointer, DO NOT disobey and write into it.
+         * Always use the set_*() methods.
+         *
+         * \{
+         */
 
 		/** Base class for all metadata block types.
-		 *  See the \link flacpp_metadata_object overview \endlink for more.
-		 */
+         *  See the \link flacpp_metadata_object overview \endlink for more.
+         */
 		class FLACPP_API Prototype {
 		protected:
 			//@{
 			/** Constructs a copy of the given object.  This form
-			 *  always performs a deep copy.
-			 */
+             *  always performs a deep copy.
+             */
 			Prototype(const Prototype &);
 			Prototype(const ::FLAC__StreamMetadata &);
 			Prototype(const ::FLAC__StreamMetadata *);
 			//@}
 
 			/** Constructs an object with copy control.  When \a copy
-			 *  is \c true, behaves identically to
-			 *  FLAC::Metadata::Prototype::Prototype(const ::FLAC__StreamMetadata *object).
-			 *  When \a copy is \c false, the instance takes ownership of
-			 *  the pointer and the ::FLAC__StreamMetadata object will
-			 *  be freed by the destructor.
-			 *
-			 *  \assert
-			 *    \code object != NULL \endcode
-			 */
+             *  is \c true, behaves identically to
+             *  FLAC::Metadata::Prototype::Prototype(const ::FLAC__StreamMetadata *object).
+             *  When \a copy is \c false, the instance takes ownership of
+             *  the pointer and the ::FLAC__StreamMetadata object will
+             *  be freed by the destructor.
+             *
+             *  \assert
+             *    \code object != NULL \endcode
+             */
 			Prototype(::FLAC__StreamMetadata *object, bool copy);
 
 			//@{
@@ -136,23 +136,23 @@ namespace FLAC {
 			//@}
 
 			/** Assigns an object with copy control.  See
-			 *  Prototype(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype(::FLAC__StreamMetadata *object, bool copy).
+             */
 			Prototype &assign_object(::FLAC__StreamMetadata *object, bool copy);
 
 			/** Deletes the underlying ::FLAC__StreamMetadata object.
-			 */
+             */
 			virtual void clear();
 
 			::FLAC__StreamMetadata *object_;
 		public:
 			/** Deletes the underlying ::FLAC__StreamMetadata object.
-			 */
+             */
 			virtual ~Prototype();
 
 			//@{
 			/** Check for equality, performing a deep compare by following pointers.
-			 */
+             */
 			inline bool operator==(const Prototype &) const;
 			inline bool operator==(const ::FLAC__StreamMetadata &) const;
 			inline bool operator==(const ::FLAC__StreamMetadata *) const;
@@ -169,52 +169,52 @@ namespace FLAC {
 			friend class Iterator;
 
 			/** Returns \c true if the object was correctly constructed
-			 *  (i.e. the underlying ::FLAC__StreamMetadata object was
-			 *  properly allocated), else \c false.
-			 */
+             *  (i.e. the underlying ::FLAC__StreamMetadata object was
+             *  properly allocated), else \c false.
+             */
 			inline bool is_valid() const;
 
 			/** Returns \c true if this block is the last block in a
-			 *  stream, else \c false.
-			 *
-			 * \assert
-			 *   \code is_valid() \endcode
-			 */
+             *  stream, else \c false.
+             *
+             * \assert
+             *   \code is_valid() \endcode
+             */
 			bool get_is_last() const;
 
 			/** Returns the type of the block.
-			 *
-			 * \assert
-			 *   \code is_valid() \endcode
-			 */
+             *
+             * \assert
+             *   \code is_valid() \endcode
+             */
 			::FLAC__MetadataType get_type() const;
 
 			/** Returns the stream length of the metadata block.
-			 *
-			 * \note
-			 *   The length does not include the metadata block header,
-			 *   per spec.
-			 *
-			 * \assert
-			 *   \code is_valid() \endcode
-			 */
+             *
+             * \note
+             *   The length does not include the metadata block header,
+             *   per spec.
+             *
+             * \assert
+             *   \code is_valid() \endcode
+             */
 			unsigned get_length() const;
 
 			/** Sets the "is_last" flag for the block.  When using the iterators
-			 *  it is not necessary to set this flag; they will do it for you.
-			 *
-			 * \assert
-			 *   \code is_valid() \endcode
-			 */
+             *  it is not necessary to set this flag; they will do it for you.
+             *
+             * \assert
+             *   \code is_valid() \endcode
+             */
 			void set_is_last(bool);
 
 			/** Returns a pointer to the underlying ::FLAC__StreamMetadata
-			 *  object.  This can be useful for plugging any holes between
-			 *  the C++ and C interfaces.
-			 *
-			 * \assert
-			 *   \code is_valid() \endcode
-			 */
+             *  object.  This can be useful for plugging any holes between
+             *  the C++ and C interfaces.
+             *
+             * \assert
+             *   \code is_valid() \endcode
+             */
 			inline operator const ::FLAC__StreamMetadata *() const;
 		private:
 			/** Private and undefined so you can't use it. */
@@ -264,25 +264,25 @@ namespace FLAC {
 
 
 		/** STREAMINFO metadata block.
-		 *  See the \link flacpp_metadata_object overview \endlink for more,
-		 *  and the <A HREF="../format.html#metadata_block_streaminfo">format specification</A>.
-		 */
+         *  See the \link flacpp_metadata_object overview \endlink for more,
+         *  and the <A HREF="../format.html#metadata_block_streaminfo">format specification</A>.
+         */
 		class FLACPP_API StreamInfo : public Prototype {
 		public:
 			StreamInfo();
 
 			//@{
 			/** Constructs a copy of the given object.  This form
-			 *  always performs a deep copy.
-			 */
+             *  always performs a deep copy.
+             */
 			inline StreamInfo(const StreamInfo &object): Prototype(object) { }
 			inline StreamInfo(const ::FLAC__StreamMetadata &object): Prototype(object) { }
 			inline StreamInfo(const ::FLAC__StreamMetadata *object): Prototype(object) { }
 			//@}
 
 			/** Constructs an object with copy control.  See
-			 *  Prototype(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline StreamInfo(::FLAC__StreamMetadata *object, bool copy): Prototype(object, copy) { }
 
 			~StreamInfo();
@@ -295,8 +295,8 @@ namespace FLAC {
 			//@}
 
 			/** Assigns an object with copy control.  See
-			 *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline StreamInfo &assign(::FLAC__StreamMetadata *object, bool copy) { Prototype::assign_object(object, copy); return *this; }
 
 			//@{
@@ -338,25 +338,25 @@ namespace FLAC {
 		};
 
 		/** PADDING metadata block.
-		 *  See the \link flacpp_metadata_object overview \endlink for more,
-		 *  and the <A HREF="../format.html#metadata_block_padding">format specification</A>.
-		 */
+         *  See the \link flacpp_metadata_object overview \endlink for more,
+         *  and the <A HREF="../format.html#metadata_block_padding">format specification</A>.
+         */
 		class FLACPP_API Padding : public Prototype {
 		public:
 			Padding();
 
 			//@{
 			/** Constructs a copy of the given object.  This form
-			 *  always performs a deep copy.
-			 */
+             *  always performs a deep copy.
+             */
 			inline Padding(const Padding &object): Prototype(object) { }
 			inline Padding(const ::FLAC__StreamMetadata &object): Prototype(object) { }
 			inline Padding(const ::FLAC__StreamMetadata *object): Prototype(object) { }
 			//@}
 
 			/** Constructs an object with copy control.  See
-			 *  Prototype(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline Padding(::FLAC__StreamMetadata *object, bool copy): Prototype(object, copy) { }
 
 			~Padding();
@@ -369,8 +369,8 @@ namespace FLAC {
 			//@}
 
 			/** Assigns an object with copy control.  See
-			 *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline Padding &assign(::FLAC__StreamMetadata *object, bool copy) { Prototype::assign_object(object, copy); return *this; }
 
 			//@{
@@ -391,25 +391,25 @@ namespace FLAC {
 		};
 
 		/** APPLICATION metadata block.
-		 *  See the \link flacpp_metadata_object overview \endlink for more,
-		 *  and the <A HREF="../format.html#metadata_block_application">format specification</A>.
-		 */
+         *  See the \link flacpp_metadata_object overview \endlink for more,
+         *  and the <A HREF="../format.html#metadata_block_application">format specification</A>.
+         */
 		class FLACPP_API Application : public Prototype {
 		public:
 			Application();
 			//
 			//@{
 			/** Constructs a copy of the given object.  This form
-			 *  always performs a deep copy.
-			 */
+             *  always performs a deep copy.
+             */
 			inline Application(const Application &object): Prototype(object) { }
 			inline Application(const ::FLAC__StreamMetadata &object): Prototype(object) { }
 			inline Application(const ::FLAC__StreamMetadata *object): Prototype(object) { }
 			//@}
 
 			/** Constructs an object with copy control.  See
-			 *  Prototype(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline Application(::FLAC__StreamMetadata *object, bool copy): Prototype(object, copy) { }
 
 			~Application();
@@ -422,8 +422,8 @@ namespace FLAC {
 			//@}
 
 			/** Assigns an object with copy control.  See
-			 *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline Application &assign(::FLAC__StreamMetadata *object, bool copy) { Prototype::assign_object(object, copy); return *this; }
 
 			//@{
@@ -450,25 +450,25 @@ namespace FLAC {
 		};
 
 		/** SEEKTABLE metadata block.
-		 *  See the \link flacpp_metadata_object overview \endlink for more,
-		 *  and the <A HREF="../format.html#metadata_block_seektable">format specification</A>.
-		 */
+         *  See the \link flacpp_metadata_object overview \endlink for more,
+         *  and the <A HREF="../format.html#metadata_block_seektable">format specification</A>.
+         */
 		class FLACPP_API SeekTable : public Prototype {
 		public:
 			SeekTable();
 
 			//@{
 			/** Constructs a copy of the given object.  This form
-			 *  always performs a deep copy.
-			 */
+             *  always performs a deep copy.
+             */
 			inline SeekTable(const SeekTable &object): Prototype(object) { }
 			inline SeekTable(const ::FLAC__StreamMetadata &object): Prototype(object) { }
 			inline SeekTable(const ::FLAC__StreamMetadata *object): Prototype(object) { }
 			//@}
 
 			/** Constructs an object with copy control.  See
-			 *  Prototype(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline SeekTable(::FLAC__StreamMetadata *object, bool copy): Prototype(object, copy) { }
 
 			~SeekTable();
@@ -481,8 +481,8 @@ namespace FLAC {
 			//@}
 
 			/** Assigns an object with copy control.  See
-			 *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline SeekTable &assign(::FLAC__StreamMetadata *object, bool copy) { Prototype::assign_object(object, copy); return *this; }
 
 			//@{
@@ -516,40 +516,40 @@ namespace FLAC {
 		};
 
 		/** VORBIS_COMMENT metadata block.
-		 *  See the \link flacpp_metadata_object overview \endlink for more,
-		 *  and the <A HREF="../format.html#metadata_block_vorbis_comment">format specification</A>.
-		 */
+         *  See the \link flacpp_metadata_object overview \endlink for more,
+         *  and the <A HREF="../format.html#metadata_block_vorbis_comment">format specification</A>.
+         */
 		class FLACPP_API VorbisComment : public Prototype {
 		public:
 			/** Convenience class for encapsulating Vorbis comment
-			 *  entries.  An entry is a vendor string or a comment
-			 *  field.  In the case of a vendor string, the field
-			 *  name is undefined; only the field value is relevant.
-			 *
-			 *  A \a field as used in the methods refers to an
-			 *  entire 'NAME=VALUE' string; for convenience the
-			 *  string is NUL-terminated.  A length field is
-			 *  required in the unlikely event that the value
-			 *  contains contain embedded NULs.
-			 *
-			 *  A \a field_name is what is on the left side of the
-			 *  first '=' in the \a field.  By definition it is ASCII
-			 *  and so is NUL-terminated and does not require a
-			 *  length to describe it.  \a field_name is undefined
-			 *  for a vendor string entry.
-			 *
-			 *  A \a field_value is what is on the right side of the
-			 *  first '=' in the \a field.  By definition, this may
-			 *  contain embedded NULs and so a \a field_value_length
-			 *  is required to describe it.  However in practice,
-			 *  embedded NULs are not known to be used, so it is
-			 *  generally safe to treat field values as NUL-
-			 *  terminated UTF-8 strings.
-			 *
-			 *  Always check is_valid() after the constructor or operator=
-			 *  to make sure memory was properly allocated and that the
-			 *  Entry conforms to the Vorbis comment specification.
-			 */
+             *  entries.  An entry is a vendor string or a comment
+             *  field.  In the case of a vendor string, the field
+             *  name is undefined; only the field value is relevant.
+             *
+             *  A \a field as used in the methods refers to an
+             *  entire 'NAME=VALUE' string; for convenience the
+             *  string is NUL-terminated.  A length field is
+             *  required in the unlikely event that the value
+             *  contains contain embedded NULs.
+             *
+             *  A \a field_name is what is on the left side of the
+             *  first '=' in the \a field.  By definition it is ASCII
+             *  and so is NUL-terminated and does not require a
+             *  length to describe it.  \a field_name is undefined
+             *  for a vendor string entry.
+             *
+             *  A \a field_value is what is on the right side of the
+             *  first '=' in the \a field.  By definition, this may
+             *  contain embedded NULs and so a \a field_value_length
+             *  is required to describe it.  However in practice,
+             *  embedded NULs are not known to be used, so it is
+             *  generally safe to treat field values as NUL-
+             *  terminated UTF-8 strings.
+             *
+             *  Always check is_valid() after the constructor or operator=
+             *  to make sure memory was properly allocated and that the
+             *  Entry conforms to the Vorbis comment specification.
+             */
 			class FLACPP_API Entry {
 			public:
 				Entry();
@@ -607,16 +607,16 @@ namespace FLAC {
 
 			//@{
 			/** Constructs a copy of the given object.  This form
-			 *  always performs a deep copy.
-			 */
+             *  always performs a deep copy.
+             */
 			inline VorbisComment(const VorbisComment &object): Prototype(object) { }
 			inline VorbisComment(const ::FLAC__StreamMetadata &object): Prototype(object) { }
 			inline VorbisComment(const ::FLAC__StreamMetadata *object): Prototype(object) { }
 			//@}
 
 			/** Constructs an object with copy control.  See
-			 *  Prototype(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline VorbisComment(::FLAC__StreamMetadata *object, bool copy): Prototype(object, copy) { }
 
 			~VorbisComment();
@@ -629,8 +629,8 @@ namespace FLAC {
 			//@}
 
 			/** Assigns an object with copy control.  See
-			 *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline VorbisComment &assign(::FLAC__StreamMetadata *object, bool copy) { Prototype::assign_object(object, copy); return *this; }
 
 			//@{
@@ -668,17 +668,17 @@ namespace FLAC {
 		};
 
 		/** CUESHEET metadata block.
-		 *  See the \link flacpp_metadata_object overview \endlink for more,
-		 *  and the <A HREF="../format.html#metadata_block_cuesheet">format specification</A>.
-		 */
+         *  See the \link flacpp_metadata_object overview \endlink for more,
+         *  and the <A HREF="../format.html#metadata_block_cuesheet">format specification</A>.
+         */
 		class FLACPP_API CueSheet : public Prototype {
 		public:
 			/** Convenience class for encapsulating a cue sheet
-			 *  track.
-			 *
-			 *  Always check is_valid() after the constructor or operator=
-			 *  to make sure memory was properly allocated.
-			 */
+             *  track.
+             *
+             *  Always check is_valid() after the constructor or operator=
+             *  to make sure memory was properly allocated.
+             */
 			class FLACPP_API Track {
 			protected:
 				::FLAC__StreamMetadata_CueSheet_Track *object_;
@@ -710,7 +710,7 @@ namespace FLAC {
 				void set_type(unsigned value);
 				inline void set_pre_emphasis(bool value) { object_->pre_emphasis = value? 1 : 0; }
 
- 				void set_index(unsigned i, const ::FLAC__StreamMetadata_CueSheet_Index &index);
+				void set_index(unsigned i, const ::FLAC__StreamMetadata_CueSheet_Index &index);
 				//@@@ It's awkward but to insert/delete index points
 				//@@@ you must use the routines in the CueSheet class.
 			};
@@ -719,16 +719,16 @@ namespace FLAC {
 
 			//@{
 			/** Constructs a copy of the given object.  This form
-			 *  always performs a deep copy.
-			 */
+             *  always performs a deep copy.
+             */
 			inline CueSheet(const CueSheet &object): Prototype(object) { }
 			inline CueSheet(const ::FLAC__StreamMetadata &object): Prototype(object) { }
 			inline CueSheet(const ::FLAC__StreamMetadata *object): Prototype(object) { }
 			//@}
 
 			/** Constructs an object with copy control.  See
-			 *  Prototype(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline CueSheet(::FLAC__StreamMetadata *object, bool copy): Prototype(object, copy) { }
 
 			~CueSheet();
@@ -741,8 +741,8 @@ namespace FLAC {
 			//@}
 
 			/** Assigns an object with copy control.  See
-			 *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline CueSheet &assign(::FLAC__StreamMetadata *object, bool copy) { Prototype::assign_object(object, copy); return *this; }
 
 			//@{
@@ -795,25 +795,25 @@ namespace FLAC {
 		};
 
 		/** PICTURE metadata block.
-		 *  See the \link flacpp_metadata_object overview \endlink for more,
-		 *  and the <A HREF="../format.html#metadata_block_picture">format specification</A>.
-		 */
+         *  See the \link flacpp_metadata_object overview \endlink for more,
+         *  and the <A HREF="../format.html#metadata_block_picture">format specification</A>.
+         */
 		class FLACPP_API Picture : public Prototype {
 		public:
 			Picture();
 
 			//@{
 			/** Constructs a copy of the given object.  This form
-			 *  always performs a deep copy.
-			 */
+             *  always performs a deep copy.
+             */
 			inline Picture(const Picture &object): Prototype(object) { }
 			inline Picture(const ::FLAC__StreamMetadata &object): Prototype(object) { }
 			inline Picture(const ::FLAC__StreamMetadata *object): Prototype(object) { }
 			//@}
 
 			/** Constructs an object with copy control.  See
-			 *  Prototype(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline Picture(::FLAC__StreamMetadata *object, bool copy): Prototype(object, copy) { }
 
 			~Picture();
@@ -826,8 +826,8 @@ namespace FLAC {
 			//@}
 
 			/** Assigns an object with copy control.  See
-			 *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline Picture &assign(::FLAC__StreamMetadata *object, bool copy) { Prototype::assign_object(object, copy); return *this; }
 
 			//@{
@@ -872,27 +872,27 @@ namespace FLAC {
 		};
 
 		/** Opaque metadata block for storing unknown types.
-		 *  This should not be used unless you know what you are doing;
-		 *  it is currently used only internally to support forward
-		 *  compatibility of metadata blocks.
-		 *  See the \link flacpp_metadata_object overview \endlink for more,
-		 */
+         *  This should not be used unless you know what you are doing;
+         *  it is currently used only internally to support forward
+         *  compatibility of metadata blocks.
+         *  See the \link flacpp_metadata_object overview \endlink for more,
+         */
 		class FLACPP_API Unknown : public Prototype {
 		public:
 			Unknown();
 			//
 			//@{
 			/** Constructs a copy of the given object.  This form
-			 *  always performs a deep copy.
-			 */
+             *  always performs a deep copy.
+             */
 			inline Unknown(const Unknown &object): Prototype(object) { }
 			inline Unknown(const ::FLAC__StreamMetadata &object): Prototype(object) { }
 			inline Unknown(const ::FLAC__StreamMetadata *object): Prototype(object) { }
 			//@}
 
 			/** Constructs an object with copy control.  See
-			 *  Prototype(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline Unknown(::FLAC__StreamMetadata *object, bool copy): Prototype(object, copy) { }
 
 			~Unknown();
@@ -905,8 +905,8 @@ namespace FLAC {
 			//@}
 
 			/** Assigns an object with copy control.  See
-			 *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
-			 */
+             *  Prototype::assign_object(::FLAC__StreamMetadata *object, bool copy).
+             */
 			inline Unknown &assign(::FLAC__StreamMetadata *object, bool copy) { Prototype::assign_object(object, copy); return *this; }
 
 			//@{
@@ -934,16 +934,16 @@ namespace FLAC {
 
 
 		/** \defgroup flacpp_metadata_level0 FLAC++/metadata.h: metadata level 0 interface
-		 *  \ingroup flacpp_metadata
-		 *
-		 *  \brief
-		 *  Level 0 metadata iterators.
-		 *
-		 *  See the \link flac_metadata_level0 C layer equivalent \endlink
-		 *  for more.
-		 *
-		 * \{
-		 */
+         *  \ingroup flacpp_metadata
+         *
+         *  \brief
+         *  Level 0 metadata iterators.
+         *
+         *  See the \link flac_metadata_level0 C layer equivalent \endlink
+         *  for more.
+         *
+         * \{
+         */
 
 		FLACPP_API bool get_streaminfo(const char *filename, StreamInfo &streaminfo); ///< See FLAC__metadata_get_streaminfo().
 
@@ -960,43 +960,43 @@ namespace FLAC {
 
 
 		/** \defgroup flacpp_metadata_level1 FLAC++/metadata.h: metadata level 1 interface
-		 *  \ingroup flacpp_metadata
-		 *
-		 *  \brief
-		 *  Level 1 metadata iterator.
-		 *
-		 *  The flow through the iterator in the C++ layer is similar
-		 *  to the C layer:
-		 *    - Create a SimpleIterator instance
-		 *    - Check SimpleIterator::is_valid()
-		 *    - Call SimpleIterator::init() and check the return
-		 *    - Traverse and/or edit.  Edits are written to file
-		 *      immediately.
-		 *    - Destroy the SimpleIterator instance
-		 *
-		 *  The ownership of pointers in the C++ layer follows that in
-		 *  the C layer, i.e.
-		 *    - The objects returned by get_block() are yours to
-		 *      modify, but changes are not reflected in the FLAC file
-		 *      until you call set_block().  The objects are also
-		 *      yours to delete; they are not automatically deleted
-		 *      when passed to set_block() or insert_block_after().
-		 *
-		 *  See the \link flac_metadata_level1 C layer equivalent \endlink
-		 *  for more.
-		 *
-		 * \{
-		 */
+         *  \ingroup flacpp_metadata
+         *
+         *  \brief
+         *  Level 1 metadata iterator.
+         *
+         *  The flow through the iterator in the C++ layer is similar
+         *  to the C layer:
+         *    - Create a SimpleIterator instance
+         *    - Check SimpleIterator::is_valid()
+         *    - Call SimpleIterator::init() and check the return
+         *    - Traverse and/or edit.  Edits are written to file
+         *      immediately.
+         *    - Destroy the SimpleIterator instance
+         *
+         *  The ownership of pointers in the C++ layer follows that in
+         *  the C layer, i.e.
+         *    - The objects returned by get_block() are yours to
+         *      modify, but changes are not reflected in the FLAC file
+         *      until you call set_block().  The objects are also
+         *      yours to delete; they are not automatically deleted
+         *      when passed to set_block() or insert_block_after().
+         *
+         *  See the \link flac_metadata_level1 C layer equivalent \endlink
+         *  for more.
+         *
+         * \{
+         */
 
 		/** This class is a wrapper around the FLAC__metadata_simple_iterator
-		 *  structures and methods; see the
-		 * \link flacpp_metadata_level1 usage guide \endlink and
-		 * ::FLAC__Metadata_SimpleIterator.
-		 */
+         *  structures and methods; see the
+         * \link flacpp_metadata_level1 usage guide \endlink and
+         * ::FLAC__Metadata_SimpleIterator.
+         */
 		class FLACPP_API SimpleIterator {
 		public:
 			/** This class is a wrapper around FLAC__Metadata_SimpleIteratorStatus.
-			 */
+             */
 			class FLACPP_API Status {
 			public:
 				inline Status(::FLAC__Metadata_SimpleIteratorStatus status): status_(status) { }
@@ -1038,51 +1038,51 @@ namespace FLAC {
 
 
 		/** \defgroup flacpp_metadata_level2 FLAC++/metadata.h: metadata level 2 interface
-		 *  \ingroup flacpp_metadata
-		 *
-		 *  \brief
-		 *  Level 2 metadata iterator.
-		 *
-		 *  The flow through the iterator in the C++ layer is similar
-		 *  to the C layer:
-		 *    - Create a Chain instance
-		 *    - Check Chain::is_valid()
-		 *    - Call Chain::read() and check the return
-		 *    - Traverse and/or edit with an Iterator or with
-		 *      Chain::merge_padding() or Chain::sort_padding()
-		 *    - Write changes back to FLAC file with Chain::write()
-		 *    - Destroy the Chain instance
-		 *
-		 *  The ownership of pointers in the C++ layer is slightly
-		 *  different than in the C layer, i.e.
-		 *    - The objects returned by Iterator::get_block() are NOT
-		 *      owned by the iterator and should be deleted by the
-		 *      caller when finished, BUT, when you modify the block,
-		 *      it will directly edit what's in the chain and you do
-		 *      not need to call Iterator::set_block().  However the
-		 *      changes will not be reflected in the FLAC file until
-		 *      the chain is written with Chain::write().
-		 *    - When you pass an object to Iterator::set_block(),
-		 *      Iterator::insert_block_before(), or
-		 *      Iterator::insert_block_after(), the iterator takes
-		 *      ownership of the block and it will be deleted by the
-		 *      chain.
-		 *
-		 *  See the \link flac_metadata_level2 C layer equivalent \endlink
-		 *  for more.
-		 *
-		 * \{
-		 */
+         *  \ingroup flacpp_metadata
+         *
+         *  \brief
+         *  Level 2 metadata iterator.
+         *
+         *  The flow through the iterator in the C++ layer is similar
+         *  to the C layer:
+         *    - Create a Chain instance
+         *    - Check Chain::is_valid()
+         *    - Call Chain::read() and check the return
+         *    - Traverse and/or edit with an Iterator or with
+         *      Chain::merge_padding() or Chain::sort_padding()
+         *    - Write changes back to FLAC file with Chain::write()
+         *    - Destroy the Chain instance
+         *
+         *  The ownership of pointers in the C++ layer is slightly
+         *  different than in the C layer, i.e.
+         *    - The objects returned by Iterator::get_block() are NOT
+         *      owned by the iterator and should be deleted by the
+         *      caller when finished, BUT, when you modify the block,
+         *      it will directly edit what's in the chain and you do
+         *      not need to call Iterator::set_block().  However the
+         *      changes will not be reflected in the FLAC file until
+         *      the chain is written with Chain::write().
+         *    - When you pass an object to Iterator::set_block(),
+         *      Iterator::insert_block_before(), or
+         *      Iterator::insert_block_after(), the iterator takes
+         *      ownership of the block and it will be deleted by the
+         *      chain.
+         *
+         *  See the \link flac_metadata_level2 C layer equivalent \endlink
+         *  for more.
+         *
+         * \{
+         */
 
 		/** This class is a wrapper around the FLAC__metadata_chain
-		 *  structures and methods; see the
-		 * \link flacpp_metadata_level2 usage guide \endlink and
-		 * ::FLAC__Metadata_Chain.
-		 */
+         *  structures and methods; see the
+         * \link flacpp_metadata_level2 usage guide \endlink and
+         * ::FLAC__Metadata_Chain.
+         */
 		class FLACPP_API Chain {
 		public:
 			/** This class is a wrapper around FLAC__Metadata_ChainStatus.
-			 */
+             */
 			class FLACPP_API Status {
 			public:
 				inline Status(::FLAC__Metadata_ChainStatus status): status_(status) { }
@@ -1119,10 +1119,10 @@ namespace FLAC {
 		};
 
 		/** This class is a wrapper around the FLAC__metadata_iterator
-		 *  structures and methods; see the
-		 * \link flacpp_metadata_level2 usage guide \endlink and
-		 * ::FLAC__Metadata_Iterator.
-		 */
+         *  structures and methods; see the
+         * \link flacpp_metadata_level2 usage guide \endlink and
+         * ::FLAC__Metadata_Iterator.
+         */
 		class FLACPP_API Iterator {
 		public:
 			Iterator();

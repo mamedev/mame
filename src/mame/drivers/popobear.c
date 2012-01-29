@@ -2,19 +2,19 @@
 (c) 2000 - Bao Ma Technology Co., LTD
 
 |-----------------------------------------|
-| DIP2 DIP4  UM3567(YM2413)               |J  
-| DIP1 DIP3                               |A 
+| DIP2 DIP4  UM3567(YM2413)               |J
+| DIP1 DIP3                               |A
 |           TA-A-901                      |M
-| EN-A-701  EN-A-801  U6295(OKI)          |M 
+| EN-A-701  EN-A-801  U6295(OKI)          |M
 | EN-A-501  EN-A-601                      |A
 | EN-A-301  EN-A-401                      |
 |                                         |C
 |                   AIA90610              |O
 |                   BMC-68pin  AIA90423   |N
-|                   plcc (68k) BMC-160pin |N 
-|                                         |E 
+|                   plcc (68k) BMC-160pin |N
+|                                         |E
 |                                    OSC  |C
-|                                 42.000  |T 
+|                                 42.000  |T
 |-----------------------------------------|
 
 1 - BMC AIA90423 - 160-Pin ASIC, FGPA, Video?
@@ -111,7 +111,7 @@ static WRITE16_HANDLER( popo_620000_w ) { }
 static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
-	AM_RANGE(0x3E0000, 0x3EFFFF) AM_RAM  AM_BASE_MEMBER(popobear_state, popobear_vram) 
+	AM_RANGE(0x3E0000, 0x3EFFFF) AM_RAM  AM_BASE_MEMBER(popobear_state, popobear_vram)
 
 	/* Blitter stuff? */
 	AM_RANGE(0x480000, 0x480001) AM_READ(popo_480001_r) AM_WRITE(popo_480001_w)
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x48003a, 0x48003b) AM_READ(popo_48003a_r) AM_WRITE(popo_48003a_w)
 
 	AM_RANGE(0x480400, 0x48041f) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram) // looks palette like at least
-	
+
 	/* I/O maybe? */
 	AM_RANGE(0x500000, 0x500001) AM_READ(popo_500000_r)
 	AM_RANGE(0x520000, 0x520001) AM_READ(popo_520000_r)
@@ -315,7 +315,7 @@ static TIMER_DEVICE_CALLBACK( popobear_irq )
 
 static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)  // XTAL CORRECT, DIVISOR GUESSED
-	MCFG_CPU_PROGRAM_MAP(popobear_mem) 
+	MCFG_CPU_PROGRAM_MAP(popobear_mem)
 	// levels 2,3,5 look interesting
 	//MCFG_CPU_VBLANK_INT("screen",irq3_line_hold)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", popobear_irq, "screen", 0, 1)

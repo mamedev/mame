@@ -38,7 +38,7 @@ const device_type IM6402 = &device_creator<im6402_device>;
 inline void im6402_device::set_dr(int state)
 {
 	m_dr = state;
-	
+
 	m_out_dr_func(state);
 }
 
@@ -50,7 +50,7 @@ inline void im6402_device::set_dr(int state)
 inline void im6402_device::set_tbre(int state)
 {
 	m_tbre = state;
-	
+
 	m_out_tbre_func(state);
 }
 
@@ -62,7 +62,7 @@ inline void im6402_device::set_tbre(int state)
 inline void im6402_device::set_tre(int state)
 {
 	m_tre = state;
-	
+
 	m_out_tre_func(state);
 }
 
@@ -86,12 +86,12 @@ inline void im6402_device::receive()
 	{
 		receive_register_extract();
 		m_rbr = get_received_char();
-		
+
 		if (m_dr)
 		{
 			m_oe = 1;
 		}
-		
+
 		set_dr(ASSERT_LINE);
 	}
 }
@@ -106,18 +106,18 @@ inline void im6402_device::transmit()
 	if (is_transmit_register_empty() && !m_tbre)
 	{
 		transmit_register_setup(m_tbr);
-		
+
 		set_tbre(ASSERT_LINE);
 		set_tre(CLEAR_LINE);
 	}
-	
+
 	if (!is_transmit_register_empty())
 	{
 		int bit = transmit_register_get_data_bit();
-				
+
 		m_out_tro_func(bit);
 		serial_connection_out();
-		
+
 		if (is_transmit_register_empty())
 		{
 			set_tre(ASSERT_LINE);
@@ -226,7 +226,7 @@ void im6402_device::device_reset()
 	m_pe = 0;
 	m_fe = 0;
 	m_oe = 0;
-	
+
 	set_dr(CLEAR_LINE);
 	set_tbre(ASSERT_LINE);
 	set_tre(ASSERT_LINE);
@@ -292,7 +292,7 @@ WRITE_LINE_MEMBER( im6402_device::rrc_w )
 	if (state)
 	{
 		m_rrc_count++;
-		
+
 		if (m_rrc_count == 16)
 		{
 			receive();
@@ -311,13 +311,13 @@ WRITE_LINE_MEMBER( im6402_device::trc_w )
 	if (state)
 	{
 		m_trc_count++;
-		
+
 		if (m_trc_count == 16)
 		{
 			transmit();
 			m_trc_count = 0;
 		}
-	}		
+	}
 }
 
 
@@ -436,11 +436,11 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 		int word_length = 5 + ((m_cls2 << 1) | m_cls1);
 		int stop_bits = 1 + m_sbs ? ((word_length == 5) ? 0.5 : 1) : 0;
 		int parity_code;
-		
-		if (m_pi) parity_code = SERIAL_PARITY_NONE; 
-		else if (m_epe) parity_code = SERIAL_PARITY_EVEN; 
+
+		if (m_pi) parity_code = SERIAL_PARITY_NONE;
+		else if (m_epe) parity_code = SERIAL_PARITY_EVEN;
 		else parity_code = SERIAL_PARITY_ODD;
-		
+
 		set_data_frame(word_length, stop_bits, parity_code);
 	}
 }

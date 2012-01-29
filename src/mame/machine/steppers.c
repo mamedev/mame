@@ -62,7 +62,7 @@ const stepper_interface starpoint_interface_48step =
 	STARPOINT_48STEP_REEL,
 	16,
 	24,
-	0x09,//Starpoint tech specs say that the only coil pattern guaranteed to line up the opto is this one 
+	0x09,//Starpoint tech specs say that the only coil pattern guaranteed to line up the opto is this one
 	0
 };
 
@@ -90,7 +90,7 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 	step[which].index_patt	= intf->index_patt; /* hex value of coil pattern (0 if not needed)*/
 	step[which].reverse     = intf->reverse;
 
-	
+
 	step[which].phase       = 0;
 	step[which].pattern     = 0;
 	step[which].old_pattern = 0;
@@ -108,7 +108,7 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 		//Dice reels are 48 step motors, but complete three full cycles between opto updates
 		step[which].max_steps = ((48*3)*2);
 		break;
-		
+
 	}
 
 	state_save_register_item(machine, "stepper", NULL, which, step[which].index_start);
@@ -209,21 +209,21 @@ int stepper_update(int which, UINT8 pattern)
 	int changed = 0;
 
 	/* This code probably makes more sense if you visualise what is being emulated, namely
-	a spinning drum with two electromagnets inside. Essentially, the CPU
-	activates a pair of windings on these magnets leads as necessary to attract and repel the drum to pull it round and 
-	display as appropriate. To attempt to visualise the rotation effect, take a look at the compass rose below, representing a side on view of the reel,
-	the numbers indicate the phase information as used
+    a spinning drum with two electromagnets inside. Essentially, the CPU
+    activates a pair of windings on these magnets leads as necessary to attract and repel the drum to pull it round and
+    display as appropriate. To attempt to visualise the rotation effect, take a look at the compass rose below, representing a side on view of the reel,
+    the numbers indicate the phase information as used
 
-	    7
-	    N
-	1 W   E 5
-		S
-		3
+        7
+        N
+    1 W   E 5
+        S
+        3
 
-	For sake of accuracy, we're representing all possible phases of the motor, effectively moving the motor one half step at a time, so a 48 step motor becomes
-	96 half steps. This is necessary because of some programs running the wiring in series with a distinct delay between the pair being completed. This causes
-	a small movement that may trigger the optic tab.
-	*/
+    For sake of accuracy, we're representing all possible phases of the motor, effectively moving the motor one half step at a time, so a 48 step motor becomes
+    96 half steps. This is necessary because of some programs running the wiring in series with a distinct delay between the pair being completed. This causes
+    a small movement that may trigger the optic tab.
+    */
 
 	int pos,steps=0;
 	step[which].pattern = pattern;
@@ -288,7 +288,7 @@ int stepper_update(int which, UINT8 pattern)
 			break;
 		}
 		break;
-						
+
 		case BARCREST_48STEP_REEL :
 		//Standard drive table is 1,3,2,6,4,C,8,9
 		//this runs through the stator patterns in such a way as to drive the reel forward (downwards from the player's view)
@@ -321,7 +321,7 @@ int stepper_update(int which, UINT8 pattern)
 			break;
 
 			// The below values should not be used by anything sane, as they effectively ignore one stator side entirely
-  		    //          Yellow   Black  Orange Brown
+		    //          Yellow   Black  Orange Brown
 			case 0x05://   0       1       0     1
 			{
 				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
@@ -334,7 +334,7 @@ int stepper_update(int which, UINT8 pattern)
 				}
 			}
 			break;
-				
+
 			case 0x0A://   1       0       1     0
 			{
 				if ((step[which].old_phase ==6)||(step[which].old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
@@ -347,14 +347,14 @@ int stepper_update(int which, UINT8 pattern)
 				}
 			}
 			break;
-		}	
+		}
 		break;
-			
+
 		case MPU3_48STEP_REEL :
 		/* The MPU3 interface is actually the same as the MPU4 setup, but with two active lines instead of four
-		   Inverters are used so if a pin is low, the higher bit of the pair is activated, and if high the lower bit is activated.
-		   TODO:Check this, 2 and 1 could be switched over. 
-		 */
+           Inverters are used so if a pin is low, the higher bit of the pair is activated, and if high the lower bit is activated.
+           TODO:Check this, 2 and 1 could be switched over.
+         */
 		switch (pattern)
 		{
 		//             Yellow(2)   Black(1)  Orange(!2) Brown(!1)
@@ -375,7 +375,7 @@ int stepper_update(int which, UINT8 pattern)
 	}
 
 	steps = step[which].old_phase - step[which].phase;
-		
+
 	if (steps < -4)
 	{
 		steps = steps +8;
@@ -384,7 +384,7 @@ int stepper_update(int which, UINT8 pattern)
 	{
 		steps = steps -8;
 	}
-	
+
 	step[which].old_phase = step[which].phase;
 	step[which].old_pattern = step[which].pattern;
 

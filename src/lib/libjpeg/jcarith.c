@@ -216,7 +216,7 @@ finish_pass (j_compress_ptr cinfo)
  */
 
 LOCAL(void)
-arith_encode (j_compress_ptr cinfo, unsigned char *st, int val) 
+arith_encode (j_compress_ptr cinfo, unsigned char *st, int val)
 {
   register arith_entropy_ptr e = (arith_entropy_ptr) cinfo->entropy;
   register unsigned char nl, nm;
@@ -278,8 +278,8 @@ arith_encode (j_compress_ptr cinfo, unsigned char *st, int val)
 	e->zc += e->sc;  /* carry-over converts stacked 0xFF bytes to 0x00 */
 	e->sc = 0;
 	/* Note: The 3 spacer bits in the C register guarantee
-	 * that the new buffer byte can't be 0xFF here
-	 * (see page 160 in the P&M JPEG book). */
+     * that the new buffer byte can't be 0xFF here
+     * (see page 160 in the P&M JPEG book). */
 	e->buffer = temp & 0xFF;  /* new output byte, might overflow later */
       } else if (temp == 0xFF) {
 	++e->sc;  /* stack 0xFF byte (which might overflow later) */

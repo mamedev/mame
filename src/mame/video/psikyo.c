@@ -637,7 +637,7 @@ SCREEN_UPDATE_IND16( psikyo )
 				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i)];
 		}
 
-		
+
 			tmptilemap0->set_scrollx(
 			(i + layer0_scrolly) % tilemap_width(tm0size),
 			layer0_scrollx + x0 );
@@ -654,7 +654,7 @@ SCREEN_UPDATE_IND16( psikyo )
 				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i)];
 		}
 
-		
+
 			tmptilemap1->set_scrollx(
 			(i + layer1_scrolly) % tilemap_width(tm1size),
 			layer1_scrollx + x1 );
@@ -811,7 +811,7 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i)];
 		}
 
-		
+
 			tmptilemap0->set_scrollx(
 			(i + layer0_scrolly) % tilemap_width(tm0size),
 			layer0_scrollx + x0 );
@@ -828,7 +828,7 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i)];
 		}
 
-		
+
 			tmptilemap1->set_scrollx(
 			(i + layer1_scrolly) % tilemap_width(tm1size),
 			layer1_scrollx + x1 );
