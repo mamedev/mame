@@ -182,7 +182,7 @@ void debug_view_memory::enumerate_sources()
 			break;
 
 		// if this is a single-entry global, add it
-		if (valcount > 1 && strstr(itemname, "globals/"))
+        if (strstr(itemname, "state->"))
 		{
 			name.cpy(strrchr(itemname, '/') + 1);
 			m_source_list.append(*auto_alloc(machine(), debug_view_memory_source(name, base, valsize, valcount)));
