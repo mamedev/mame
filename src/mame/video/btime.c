@@ -318,7 +318,7 @@ static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const re
 
 		if (flip_screen_get(machine))
 		{
-			x = 31 - x;
+			x = 31 + 16 - x;
 			y = 33 - y;
 		}
 
@@ -354,7 +354,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		if (flip_screen_get(machine))
 		{
-			x = 240 - x;
+			x = 240 + 128 - x;
 			y = 256 - y + sprite_y_adjust_flip_screen;
 
 			flipx = !flipx;
@@ -407,7 +407,7 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 
 			if (flip_screen_get(machine))
 			{
-				x = 240 - x;
+				x = 240 + 128 - x;
 				y = 256 - y;
 			}
 
