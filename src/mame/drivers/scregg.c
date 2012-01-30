@@ -55,12 +55,25 @@ it as ASCII text.
 #include "includes/btime.h"
 
 
+static TIMER_DEVICE_CALLBACK( scregg_interrupt )
+{
+	btime_state *state = timer.machine().driver_data<btime_state>();
+	device_set_input_line(state->m_maincpu, 0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static WRITE8_HANDLER( scregg_irqack_w )
+{
+	btime_state *state = space->machine().driver_data<btime_state>();
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+}
+
+
 static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITENOP
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE(scregg_irqack_w)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
 /*  AM_RANGE(0x4004, 0x4004)  */ /* this is read */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("P1")
@@ -78,7 +91,7 @@ static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITENOP
+	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITE(scregg_irqack_w)
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P1")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P2")
 	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE("ay1", ay8910_address_data_w)
@@ -229,19 +242,16 @@ static MACHINE_RESET( scregg )
 static MACHINE_CONFIG_START( dommy, btime_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(dommy_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,16*60) //???
+	MCFG_TIMER_ADD_SCANLINE("irq", scregg_interrupt, "screen", 0, 8)
 
 	MCFG_MACHINE_START(scregg)
 	MCFG_MACHINE_RESET(scregg)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)        /* frames per second, vblank duration taken from Burger Time */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_STATIC(eggs)
 
 	MCFG_GFXDECODE(scregg)
@@ -253,10 +263,10 @@ static MACHINE_CONFIG_START( dommy, btime_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
@@ -264,19 +274,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( scregg, btime_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(eggs_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,16*60) //???
+	MCFG_TIMER_ADD_SCANLINE("irq", scregg_interrupt, "screen", 0, 8)
 
 	MCFG_MACHINE_START(scregg)
 	MCFG_MACHINE_RESET(scregg)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)        /* frames per second, vblank duration taken from Burger Time */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_STATIC(eggs)
 
 	MCFG_GFXDECODE(scregg)
@@ -288,10 +295,10 @@ static MACHINE_CONFIG_START( scregg, btime_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
