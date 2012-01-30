@@ -1675,7 +1675,7 @@ static void find_software_item(const machine_config &config, emu_options &option
     sw_info and sw_part are also set.
 -------------------------------------------------*/
 
-bool load_software_part(emu_options &options, device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name)
+bool load_software_part(emu_options &options, device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name, char**list_name)
 {
 	software_list *software_list_ptr = NULL;
 	software_info *software_info_ptr = NULL;
@@ -1685,6 +1685,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 	bool result = false;
 	*sw_info = NULL;
 	*sw_part = NULL;
+	*list_name = NULL;
 
 	find_software_item(image->device().machine().config(), options, image, path, &software_list_ptr, &software_info_ptr, &software_part_ptr, &swlist_name);
 
@@ -1751,6 +1752,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 			}
 			new_part++;
 		}
+		*list_name = auto_strdup( image->device().machine(), swlist_name );
 
 		/* Tell the world which part we actually loaded */
 		*full_sw_name = auto_alloc_array( image->device().machine(), char, strlen(swlist_name) + strlen(software_info_ptr->shortname) + strlen(software_part_ptr->name) + 3 );

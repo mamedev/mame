@@ -221,6 +221,7 @@ public:
 
 	const software_info *software_entry() { return m_software_info_ptr; }
 	const software_part *part_entry() { return m_software_part_ptr; }
+	const char *software_list_name() { return m_software_list_name; }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
@@ -296,6 +297,7 @@ protected:
 	char *m_full_software_name;
 	software_info *m_software_info_ptr;
 	software_part *m_software_part_ptr;
+	char *m_software_list_name;
 
     /* info read from the hash file/software list */
 	astring m_longname;

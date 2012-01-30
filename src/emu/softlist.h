@@ -192,7 +192,7 @@ const char *software_get_clone(emu_options &options, char *swlist, const char *s
 UINT32 software_get_support(emu_options &options, char *swlist, const char *swname);
 const char *software_part_get_feature(const software_part *part, const char *feature_name);
 
-bool load_software_part(emu_options &options, device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
+bool load_software_part(emu_options &options, device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name, char**list_name);
 
 void software_display_matches(const machine_config &config, emu_options &options,const char *interface,const char *swname_bckp);
 

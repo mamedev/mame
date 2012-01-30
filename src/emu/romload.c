@@ -539,7 +539,7 @@ static void display_loading_rom_message(rom_load_data *romdata, const char *name
 	else
 		sprintf(buffer, "Loading Complete");
 
-	ui_set_startup_text(romdata->machine(), buffer, FALSE);
+	if (!ui_is_menu_active()) ui_set_startup_text(romdata->machine(), buffer, FALSE);
 }
 
 

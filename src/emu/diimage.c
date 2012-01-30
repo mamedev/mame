@@ -82,6 +82,7 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 	  m_full_software_name(NULL),
 	  m_software_info_ptr(NULL),
 	  m_software_part_ptr(NULL),
+	  m_software_list_name(NULL),
       m_readonly(false),
       m_created(false),
 	  m_formatlist(NULL),
@@ -865,11 +866,11 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
 	if (!filename_has_period)
 	{
-		softload = load_software_part( device().machine().options(), this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name );
+		softload = load_software_part( device().machine().options(), this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name, &m_software_list_name );
 		// if we had launched from softlist with a specified part, e.g. "shortname:part"
 		// we would have recorded the wrong name, so record it again based on software_info
-		if (m_software_info_ptr && m_software_info_ptr->shortname)
-			m_err = set_image_filename(m_software_info_ptr->shortname);
+		if (m_software_info_ptr && m_full_software_name)
+			m_err = set_image_filename(m_full_software_name);
 
 		m_from_swlist = TRUE;
 	}
@@ -1045,6 +1046,7 @@ void device_image_interface::clear()
 	m_full_software_name = NULL;
 	m_software_info_ptr = NULL;
 	m_software_part_ptr = NULL;
+	m_software_list_name = NULL;
 }
 
 /*-------------------------------------------------
@@ -1104,6 +1106,13 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 	image = _image;
 
 	sld = 0;
+	if (image->software_list_name()) {
+		software_list_device_iterator iter(machine.config().root_device());	
+		for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
+		{
+			if (strcmp(swlist->list_name(),image->software_list_name())==0) sld = swlist;
+		}
+	}
 	swi = image->software_entry();
 	swp = image->part_entry();
 
@@ -1185,7 +1194,9 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 
 void ui_menu_control_device_image::load_software_part()
 {
-	astring temp_name(swi->shortname);
+	astring temp_name(sld->list_name());
+	temp_name.cat(":");
+	temp_name.cat(swi->shortname);
 	temp_name.cat(":");
 	temp_name.cat(swp->name);
 	hook_load(temp_name, true);
@@ -1251,7 +1262,8 @@ void ui_menu_control_device_image::handle()
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
 			state = SELECT_ONE_PART;
 		} else {
-			image->load(software_info_name);
+			swp = software_find_part(swi, NULL, NULL);
+			load_software_part();
 			software_list_close(swl);
 			ui_menu::stack_pop(machine());
 		}
