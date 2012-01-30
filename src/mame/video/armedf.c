@@ -136,6 +136,7 @@ VIDEO_START( terraf )
 		state->m_tx_tilemap->set_scrollx(0, -128);
 
 	state->m_text_videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	memset(state->m_text_videoram, 0x00, 0x1000);
 }
 
 VIDEO_START( armedf )
@@ -157,6 +158,7 @@ VIDEO_START( armedf )
 		state->m_tx_tilemap->set_scrollx(0, -128);
 
 	state->m_text_videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	memset(state->m_text_videoram, 0x00, 0x1000);
 }
 
 /***************************************************************************

@@ -912,7 +912,7 @@ READ16_HANDLER( oldsplus_protram_r )
 
 READ16_HANDLER( oldsplus_r )
 {
-	oldsplus_state *state = space->machine().driver_data<oldsplus_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (offset == 0)
 	{
@@ -936,7 +936,7 @@ READ16_HANDLER( oldsplus_r )
 
 WRITE16_HANDLER( oldsplus_w )
 {
-	oldsplus_state *state = space->machine().driver_data<oldsplus_state>();
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (offset == 0)
 	{

@@ -47,19 +47,21 @@
 			<color red="0.85" green="0.4" blue="0.3" />
 		</disk>
 	</element>
+	
+	<!-- Super Chase used a widescreen monitor, see http://flyers.arcade-museum.com/?page=thumbs&db=videodb&id=1118 -->
 
 	<view name="Shifter-R">
 		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
+			<bounds left="0" top="0" right="864" bottom="486" />
 		</screen>
 		<bezel element="shifter" inputtag="INPUTS" inputmask="0x00002000">
-			<bounds x="606" y="414" width="32" height="64" />
+			<bounds x="830" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</bezel>
 	</view>
 	<view name="Shifter-L">
 		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
+			<bounds left="0" top="0" right="864" bottom="486" />
 		</screen>
 		<bezel element="shifter" inputtag="INPUTS" inputmask="0x00002000">
 			<bounds x="2" y="414" width="32" height="64" />

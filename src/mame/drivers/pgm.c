@@ -5476,7 +5476,7 @@ static DRIVER_INIT( olds )
 static void pgm_decode_kovlsqh2_tiles( running_machine &machine )
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)(machine.region("tiles")->base() + 0x400000);
+	UINT16 *src = (UINT16 *)(machine.region("tiles")->base() + 0x180000);
 	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x800000);
 
 	for (i = 0; i < 0x800000 / 2; i++)
@@ -5771,7 +5771,7 @@ static DRIVER_INIT( puzzli2 )
 
 static void oldsplus_latch_init( running_machine &machine )
 {
-	oldsplus_state *state = machine.driver_data<oldsplus_state>();
+	pgm_state *state = machine.driver_data<pgm_state>();
 
 	state->m_oldsplus_key = 0;
 	state->m_oldsplus_int[0] = 0;

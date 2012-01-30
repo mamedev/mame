@@ -30,7 +30,29 @@ public:
 	UINT16        *m_sprite_temp_render;
 	bitmap_rgb32      m_tmppgmbitmap;
 
-	/* misc */
+	/* devices */
+	cpu_device *m_maincpu;
+	cpu_device *m_soundcpu;
+	cpu_device *m_prot;
+	device_t *m_ics;
+
+	/* used by rendering */
+	UINT8 *m_bdata;
+	size_t  m_bdatasize;
+	int m_aoffset;
+	int m_boffset;
+
+	/* hack */
+	int m_irq4_disabled;
+
+	/* calendar */
+	UINT8        m_cal_val;
+	UINT8        m_cal_mask;
+	UINT8        m_cal_com;
+	UINT8        m_cal_cnt;
+	system_time  m_systime;
+
+	/* protection handling */
 	// kov2
 	UINT32        m_kov2_latchdata_68k_w;
 	UINT32        m_kov2_latchdata_arm_w;
@@ -74,43 +96,16 @@ public:
 	UINT16        m_asic_params[256];
 	UINT16        m_asic28_rcnt;
 	UINT32        m_eoregs[16];
-
-	/* calendar */
-	UINT8        m_cal_val;
-	UINT8        m_cal_mask;
-	UINT8        m_cal_com;
-	UINT8        m_cal_cnt;
-	system_time  m_systime;
-
-	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_soundcpu;
-	cpu_device *m_prot;
-	device_t *m_ics;
-
-	/* used by rendering */
-	UINT8 *m_bdata;
-	size_t  m_bdatasize;
-	int m_aoffset;
-	int m_boffset;
-
-	/* hack */
-	int m_irq4_disabled;
-};
-
-class oldsplus_state : public pgm_state
-{
-public:
-	oldsplus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag) { }
-
-public:
+	// Oldsplus simulation
 	UINT16        m_oldsplus_key;
 	UINT16        m_oldsplus_int[2];
 	UINT32        m_oldsplus_val;
 	UINT16        m_oldsplus_ram[0x100];
 	UINT32        m_oldsplus_regs[0x100];
+
+
 };
+
 
 
 
