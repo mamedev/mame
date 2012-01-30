@@ -564,7 +564,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int offs;
 	int scanline_vf;	/* buffering scanline including flip */
-	int scanline_vfc;		/* line buffering scanline including flip - this is the cached scanline_vf*/
+	int scanline_vfc;	/* line buffering scanline including flip - this is the cached scanline_vf */
 	int scanline;		/* current scanline */
 	int add_y;
 	int add_x;
@@ -637,34 +637,29 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			/* has similar hardware, uses a memory mapped port to change */
 			/* palette bank, so it's limited to 16 color codes) */
 
-			int x = state->m_sprite_ram[offs + 3];
+			int code = (state->m_sprite_ram[offs + 1] & 0x7f) + ((state->m_sprite_ram[offs + 2] & mask_bank) << shift_bits);
+			int color = (state->m_sprite_ram[offs + 2] & 0x0f) + 16 * state->m_palette_bank;
+			int flipx = state->m_sprite_ram[offs + 2] & 0x80;
+			int flipy = state->m_sprite_ram[offs + 1] & 0x80;
 
 			/* On the real board, the x and y are read inverted after the first
              * buffer stage. This due to the fact that the 82S09 delivers complements
              * of stored data on read!
              */
 
-			x = (x + add_x + 1) & 0xFF;
+			int x = (state->m_sprite_ram[offs + 3] + add_x + 1) & 0xFF;
 			if (state->m_flip)
-				x ^= 0xFF;
-			y = (y + add_y + 1 + scanline_vfc) & 0x0F;
+			{
+				x = (x ^ 0xFF) - 15;
+				flipx = !flipx;
+			}
+			y = scanline - ((y + add_y + 1 + scanline_vfc) & 0x0F);
 
-			if (state->m_flip)
-			{
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-						(state->m_sprite_ram[offs + 1] & 0x7f) + ((state->m_sprite_ram[offs + 2] & mask_bank) << shift_bits),
-						(state->m_sprite_ram[offs + 2] & 0x0f) + 16 * state->m_palette_bank,
-						!(state->m_sprite_ram[offs + 2] & 0x80),(state->m_sprite_ram[offs + 1] & 0x80),
-						x-15, scanline-y,0);
-			}
-			else
-			{
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-						(state->m_sprite_ram[offs + 1] & 0x7f) + ((state->m_sprite_ram[offs + 2] & mask_bank) << shift_bits),
-						(state->m_sprite_ram[offs + 2] & 0x0f) + 16 * state->m_palette_bank,
-						(state->m_sprite_ram[offs + 2] & 0x80),(state->m_sprite_ram[offs + 1] & 0x80),
-						x, scanline-y,0);
-			}
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, x, y, 0);
+
+			// wraparound
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, state->m_flip ? x + 256 : x - 256, y, 0);
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, x, y - 256, 0);
 
 			num_sprt++;
 		}
