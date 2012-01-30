@@ -1,7 +1,7 @@
 /****************************************************************************
 
     TourVision
-    Driver by Mariusz Wojcieszek
+    Driver by Mariusz Wojcieszek and Stephh
 
     Bootleg PC-Engine based arcade board from the Spanish company TourVision.
     Two known hardware revisions, one with a sub-board with the PC-Engine chipset
@@ -155,6 +155,27 @@ Games are dumped directly from the cartridge edge connector using the following 
                     GND |16     17| D3
                         +---------+
 
+
+Stephh notes for 8085 code:
+0xe01d : game slot number (range 0-3) - sometimes inc'ed/dec'ed/zeroed, but also filled based on games slot status (code at 0x01e8) :
+0x8009 and 0x800a : main timer (BCD, LSB first)
+
+0xe054 to 0xe057 : display timer (main, LSdigit first, stored in 4 lower bits)
+0xe058 to 0xe05b : display timer (game slot 1, LSdigit first, stored in 4 upper bits)
+0xe05c to 0xe05f : display timer (game slot 2, LSdigit first, stored in 4 lower bits)
+0xe060 to 0xe063 : display timer (game slot 3, LSdigit first, stored in 4 upper bits)
+0xe064 to 0xe067 : display timer (game slot 4, LSdigit first, stored in 4 lower bits)
+
+display timer (main) "filled" with code at 0x054e
+display timer (game slot n) "filled" with code at 0x04e3
+
+coin insertion routine at 0x0273 
+coin 1 triggers code at 0x02d7
+coin 2 triggers code at 0x028f
+
+in each coin insertion routine, you need to insert n coins (based on DSW settings) then you are awarded u units of time (also based on DSW settings)
+I can't tell ATM if units are seconds (even if values in tables seem very related to them)
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -185,6 +206,70 @@ static INPUT_PORTS_START( tourvision )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+
+	PORT_START( "DSW1" )
+	PORT_DIPNAME( 0x07, 0x07, "Coins needed 1" )
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0x78, 0x78, "Time units 1" )
+	PORT_DIPSETTING(    0x78, "900" )
+	PORT_DIPSETTING(    0x70, "720" )
+	PORT_DIPSETTING(    0x68, "600" )
+	PORT_DIPSETTING(    0x60, "540" )
+	PORT_DIPSETTING(    0x58, "480" )
+	PORT_DIPSETTING(    0x50, "420" )
+	PORT_DIPSETTING(    0x48, "360" )
+	PORT_DIPSETTING(    0x40, "300" )
+	PORT_DIPSETTING(    0x38, "270" )
+	PORT_DIPSETTING(    0x30, "240" )
+	PORT_DIPSETTING(    0x28, "210" )
+	PORT_DIPSETTING(    0x20, "180" )
+	PORT_DIPSETTING(    0x18, "150" )
+	PORT_DIPSETTING(    0x10, "120" )
+	PORT_DIPSETTING(    0x08, "90" )
+	PORT_DIPSETTING(    0x00, "60" )
+	PORT_DIPUNKNOWN( 0x80, 0x00 )
+// I can't tell what DSW1 bit 7 is really supposed to do, but it has an effect only when no "Free Play" and [0x8005] = [0x8006] = 0 (code at 0x0a58) :
+// Since these conditions seem to be true only in "attract mode" when there is no time left, this bit could enable/disable sounds.
+
+	PORT_START( "DSW2" )
+	PORT_DIPNAME( 0x03, 0x03, "Coins needed 2" )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x78, 0x78, "Time units 2" )
+	PORT_DIPSETTING(    0x78, "1500" )
+	PORT_DIPSETTING(    0x70, "1200" )
+	PORT_DIPSETTING(    0x68, "1080" )
+	PORT_DIPSETTING(    0x60, "960" )
+	PORT_DIPSETTING(    0x58, "900" )
+	PORT_DIPSETTING(    0x50, "840" )
+	PORT_DIPSETTING(    0x48, "780" )
+	PORT_DIPSETTING(    0x40, "720" )
+	PORT_DIPSETTING(    0x38, "660" )
+	PORT_DIPSETTING(    0x30, "600" )
+	PORT_DIPSETTING(    0x28, "540" )
+	PORT_DIPSETTING(    0x20, "480" )
+	PORT_DIPSETTING(    0x18, "420" )
+	PORT_DIPSETTING(    0x10, "360" )
+	PORT_DIPSETTING(    0x08, "300" )
+	PORT_DIPSETTING(    0x00, "240" )
+	PORT_DIPUNKNOWN( 0x80, 0x00 )
+// SW2 bit 7 might be "free play" HIGH and when "Coins needed 2" is set to "1" (multiple comparisons with 0x83) in BIOS0 and BIOS1.
+// In BIOS2, "Coins needed 2" can be set to anything (multiple comparisons with 0x80) instead.
+// Of course, it can also be sort of "Test mode" or "Debug mode" ...
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) // games slot status in bits 3 to 7
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
@@ -211,8 +296,13 @@ static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x80ff) AM_DEVREADWRITE_MODERN("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE(0x8100, 0x8107) AM_DEVREADWRITE_MODERN("i8155", i8155_device, io_r, io_w)
+	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("DSW1")
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW2")
+	AM_RANGE(0xb000, 0xb000) AM_READNOP // unknown (must NOT be == 0x03 ? code at 0x1154)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd000, 0xd000) AM_WRITE( tourvision_8085_d000_w )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
+	AM_RANGE(0xf000, 0xf000) AM_READNOP // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER(tourvision_i8155_a_w)
@@ -222,6 +312,7 @@ static WRITE8_DEVICE_HANDLER(tourvision_i8155_a_w)
 
 static WRITE8_DEVICE_HANDLER(tourvision_i8155_b_w)
 {
+	// Selects game slot in bits 0 - 1
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
