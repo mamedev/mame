@@ -1027,21 +1027,23 @@ astring &game_info_astring(running_machine &machine, astring &string)
 
 	/* loop over all CPUs */
 	execute_interface_iterator execiter(machine.root_device());
+	tagmap_t<UINT8> exectags;
 	for (device_execute_interface *exec = execiter.first(); exec != NULL; exec = execiter.next())
 	{
+		if (exectags.add(exec->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+			continue;
 		/* get cpu specific clock that takes internal multiplier/dividers into account */
 		int clock = exec->device().clock();
 
 		/* count how many identical CPUs we have */
 		int count = 1;
-		for (device_execute_interface *scan = execiter.next(); scan != NULL; scan = execiter.next())
+		execute_interface_iterator execinneriter(machine.root_device());
+		for (device_execute_interface *scan = execinneriter.first(); scan != NULL; scan = execinneriter.next())
 		{
-			if (exec->device().type() != scan->device().type() || exec->device().clock() != scan->device().clock())
-				break;
-			count++;
-			exec = scan;
+			if (exec->device().type() == scan->device().type() && exec->device().clock() == scan->device().clock())
+				if (exectags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+					count++;
 		}
-		execiter.set_current(*exec);
 
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
@@ -1057,8 +1059,12 @@ astring &game_info_astring(running_machine &machine, astring &string)
 
 	/* loop over all sound chips */
 	sound_interface_iterator snditer(machine.root_device());
+	tagmap_t<UINT8> soundtags;
 	for (device_sound_interface *sound = snditer.first(); sound != NULL; sound = snditer.next())
 	{
+		if (soundtags.add(sound->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+			continue;
+
 		/* append the Sound: string */
 		if (!found_sound)
 			string.cat("\nSound:\n");
@@ -1066,15 +1072,13 @@ astring &game_info_astring(running_machine &machine, astring &string)
 
 		/* count how many identical sound chips we have */
 		int count = 1;
-		for (device_sound_interface *scan = snditer.next(); scan != NULL; scan = snditer.next())
+		sound_interface_iterator sndinneriter(machine.root_device());
+		for (device_sound_interface *scan = sndinneriter.first(); scan != NULL; scan = sndinneriter.next())
 		{
-			if (sound->device().type() != scan->device().type() || sound->device().clock() != scan->device().clock())
-				break;
-			count++;
-			sound = scan;
+			if (sound->device().type() == scan->device().type() && sound->device().clock() == scan->device().clock())
+				if (soundtags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+					count++;
 		}
-		snditer.set_current(*sound);
-
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
 			string.catprintf("%d" UTF8_MULTIPLY, count);
