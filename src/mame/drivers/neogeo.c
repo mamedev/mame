@@ -1285,8 +1285,8 @@ DEVICE_IMAGE_LOAD( neo_cartridge )
 	{
 		// create memory regions
 		size = image.get_software_region_length("maincpu");
-		image.device().machine().region_free("maincpu");
-		image.device().machine().region_alloc("maincpu",size, 2, ENDIANNESS_BIG);
+		image.device().machine().region_free(":maincpu");
+		image.device().machine().region_alloc(":maincpu",size, 2, ENDIANNESS_BIG);
 		memcpy(image.device().machine().region("maincpu")->base(),image.get_software_region("maincpu"),size);
 
 		// for whatever reason (intentional, or design flaw) software loaded via software lists is swapped in endianess vs. the standard ROM loading, regardless of the above.  Swap it to keep consistency
@@ -1297,46 +1297,46 @@ DEVICE_IMAGE_LOAD( neo_cartridge )
 		}
 
 		size = image.get_software_region_length("fixed");
-		image.device().machine().region_free("fixed");
-		image.device().machine().region_alloc("fixed",size,1, ENDIANNESS_LITTLE);
+		image.device().machine().region_free(":fixed");
+		image.device().machine().region_alloc(":fixed",size,1, ENDIANNESS_LITTLE);
 		memcpy(image.device().machine().region("fixed")->base(),image.get_software_region("fixed"),size);
 
 		if(image.get_software_region("audiocpu") != NULL)
 		{
 			size = image.get_software_region_length("audiocpu");
-			image.device().machine().region_free("audiocpu");
-			image.device().machine().region_alloc("audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
+			image.device().machine().region_free(":audiocpu");
+			image.device().machine().region_alloc(":audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
 			memcpy(image.device().machine().region("audiocpu")->base(),image.get_software_region("audiocpu"),size);
 			memcpy(image.device().machine().region("audiocpu")->base()+0x10000,image.get_software_region("audiocpu"),size); // avoid reloading in XML, should just improve banking instead tho?
 		}
 
 
 		size = image.get_software_region_length("ymsnd");
-		image.device().machine().region_free("ymsnd");
-		image.device().machine().region_alloc("ymsnd",size,1, ENDIANNESS_LITTLE);
+		image.device().machine().region_free(":ymsnd");
+		image.device().machine().region_alloc(":ymsnd",size,1, ENDIANNESS_LITTLE);
 		memcpy(image.device().machine().region("ymsnd")->base(),image.get_software_region("ymsnd"),size);
 		if(image.get_software_region("ymsnd.deltat") != NULL)
 		{
 			size = image.get_software_region_length("ymsnd.deltat");
-			image.device().machine().region_free("ymsnd.deltat");
-			image.device().machine().region_alloc("ymsnd.deltat",size,1, ENDIANNESS_LITTLE);
+			image.device().machine().region_free(":ymsnd.deltat");
+			image.device().machine().region_alloc(":ymsnd.deltat",size,1, ENDIANNESS_LITTLE);
 			memcpy(image.device().machine().region("ymsnd.deltat")->base(),image.get_software_region("ymsnd.deltat"),size);
 		}
 		else
-			image.device().machine().region_free("ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
+			image.device().machine().region_free(":ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
 		ym->reset();
 		size = image.get_software_region_length("sprites");
-		image.device().machine().region_free("sprites");
-		image.device().machine().region_alloc("sprites",size,1, ENDIANNESS_LITTLE);
+		image.device().machine().region_free(":sprites");
+		image.device().machine().region_alloc(":sprites",size,1, ENDIANNESS_LITTLE);
 		memcpy(image.device().machine().region("sprites")->base(),image.get_software_region("sprites"),size);
 		if(image.get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
 		{
 			size = image.get_software_region_length("audiocrypt");
-			image.device().machine().region_alloc("audiocrypt",size,1, ENDIANNESS_LITTLE);
+			image.device().machine().region_alloc(":audiocrypt",size,1, ENDIANNESS_LITTLE);
 			memcpy(image.device().machine().region("audiocrypt")->base(),image.get_software_region("audiocrypt"),size);
 			// allocate the audiocpu region to decrypt data into
-			image.device().machine().region_free("audiocpu");
-			image.device().machine().region_alloc("audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
+			image.device().machine().region_free(":audiocpu");
+			image.device().machine().region_alloc(":audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
 		}
 
 		// setup cartridge ROM area
