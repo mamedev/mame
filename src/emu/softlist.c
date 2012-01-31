@@ -1576,7 +1576,7 @@ static void find_software_item(const machine_config &config, emu_options &option
 		software_list_device_iterator deviter(config.root_device());
 		for (software_list_device *swlist = deviter.first(); swlist != NULL; swlist = deviter.next())
 		{
-			const char *swlist_name = swlist->list_name();
+			swlist_name = (char *)swlist->list_name();
 
 			if (swlist->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
 			{
