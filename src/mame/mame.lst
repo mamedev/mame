@@ -2415,10 +2415,13 @@ snowbrosc		// MIN16-02 (c) 1990 Toaplan + Romstar license
 snowbrosj		// MIN16-02 (c) 1990 Toaplan
 snowbrosd		// MIN16-02 (c) 1990 Toaplan + Dooyong license
 wintbob			// bootleg
+// modifeid snowbros 'clone' hardware
 honeydol		// (c) 1995 Barko Corp
 twinadv			// (c) 1995 Barko Corp
 twinadvk		// (c) 1995 Barko Corp
-				// SemiCom games on snowbros like hardware
+snowbros3		// (c) 2002 Syrmex
+// SemiCom games on "SnowBros"-like hardware
+finalttr		// (c) 1993 Jeil Computer System
 hyperpac		// (c) 1995 SemiCom
 hyperpacb		// bootleg
 toppyrap		// (c) 1996 SemiCom
@@ -2429,9 +2432,8 @@ pzlbreak		// (c) 1997 SemiCom
 3in1semi		// (c) 1998 SemiCom
 moremore		// (c) 1999 SemiCom + Exit
 moremorp		// (c) 1999 SemiCom + Exit
-4in1boot		// (c) 2002 but bootleg of 1999 release?
-snowbros3		// (c) 2002 but hack / bootleg of snowbros?
-finalttr		// (c) 1993 Jeil Computer System
+4in1boot		// (c) 2002 KISoft (includes hacks of Semicom games + Snowbros)
+
 
 // More Toaplan Games
 tekipaki		// TP-020 (c) 1991 Toaplan
@@ -2892,6 +2894,7 @@ wofu			// 31/10/1992 (c) 1992 (USA) (CPS1 + QSound)
 wofa			// 05/10/1992 (c) 1992 (Asia)  (CPS1 + QSound)
 wofj			// 31/10/1992 (c) 1992 (Japan) (CPS1 + QSound)
 wofhfh			// bootleg
+sgyxz			// bootleg (All-In Electronics)
 sf2hf			// 09/12/1992 (c) 1992 (World)
 sf2hfu			// 09/12/1992 (c) 1992 (USA)
 sf2hfj			// 09/12/1992 (c) 1992 (Japan)
@@ -4027,6 +4030,9 @@ ridleofp		// (c) 1986 Sega / Nasco
 fantzn2			// (c) 1988
 opaopa
 tetrisse		// (c) 1988
+
+// Shooting Zone (SMS Gun Games on a timer)
+shtzone			// (c) 1987
 
 // other Sega 8-bit games
 turbo			// (c) 1981 Sega
@@ -5420,18 +5426,7 @@ tumbleb2		// bootleg
 jumpkids		// (c) 1993 Comad
 jumppop			// (c) 2001 ESD
 pangpang		// (c) 1994 Dong Gue La Mi Ltd.
-sdfight			// (c) 1996 SemiCom
-wlstar			// (c) 1995 Mijin
-wondl96			// (c) 1996 SemiCom
 fncywld			// (c) 1996 Unico
-htchctch		// (c) 1995 SemiCom
-cookbib			// (c) 1995 SemiCom
-chokchok		// (c) 1995 SemiCom
-metlsavr		// (c) 1994
-bcstry			// (c) 1997 SemiCom
-bcstrya			// (c) 1997 SemiCom
-semibase		// (c) 1997 SemiCom
-dquizgo			// (c) 1998 SemiCom
 suprtrio		// (c) 1994 GameAce
 lemmings		// prototype (c) 1991 Data East USA (US)
 				// MAQ ??
@@ -5519,6 +5514,19 @@ skullfng		// MCH (c) 1996 Data East Corporation (World)
 skullfngj		// MCH (c) 1996 Data East Corporation (Japan)
 stadhr96		// MCM (c) 1996 Data East
 stadhr96j		// MCM (c) 1996 Data East
+
+// SemiCom games on "tumblpop"-like hardware
+metlsavr		// (c) 1994 First Amusements
+wlstar			// (c) 1995 Mijin
+sdfight			// (c) 1996 SemiCom
+wondl96			// (c) 1996 SemiCom
+htchctch		// (c) 1995 SemiCom
+cookbib			// (c) 1995 SemiCom
+chokchok		// (c) 1995 SemiCom
+bcstry			// (c) 1997 SemiCom
+bcstrya			// (c) 1997 SemiCom
+semibase		// (c) 1997 SemiCom
+dquizgo			// (c) 1998 SemiCom
 
 // Tehkan / Tecmo games (Tehkan became Tecmo in 1986)
 senjyo			// (c) 1983 Tehkan
@@ -7924,6 +7932,7 @@ fromanc4		// (c) 1998 Video System Co. (Japan)
 inufuku			// (c) 1998 Video System Co. (Japan)
 
 // Psikyo games
+// 68020 board
 samuraia		// (c) 1993 (World)
 sngkace			// (c) 1993 (Japan)
 gunbird			// (c) 1994
@@ -7938,6 +7947,11 @@ s1945bl			// (c) 1995 (Hong Kong bootleg)
 s1945k			// (c) 1995
 tengai			// (c) 1996
 tengaij			// (c) 1996
+// Semicom games on "Psikyo 68020"-like hardware
+baryon			// (c) 1997 SemiCom
+dreamwld		// (c) 2000 SemiCom
+
+// SH2 board
 s1945ii			// (c) 1997
 soldivid		// (c) 1997
 sbomber			// (c) 1998
@@ -7958,6 +7972,8 @@ hotgmcki		// (c) 2001
 loderndf		// (c) 2000
 loderndfa		// (c) 2000
 hotdebut		// (c) 2000
+
+
 
 // Orca games
 marineb			// (c) 1982 Orca
@@ -8846,6 +8862,8 @@ lhzb3			// (c) 200?
 lhzb4			// (c) 200?
 klxyj			// (c) 200?
 mgfx			// (c) 200?
+gonefsh2		// (c) 200?
+chessc2			// (c) 200?
 
 // IGS PGM System Games
 pgm
@@ -8928,6 +8946,7 @@ kov2nlo			//
 
 // IGS PC based HW
 speeddrv		// (c) 2004
+eztouch			// (c) 200?
 
 // Spirit Tech. Corp.
 dunhuang		// (c) 1995
@@ -10163,15 +10182,15 @@ cultname		// (c) 1995 I'Max
 yuka			// (c) 1999 Yubis
 yujan			// (C) 1999 Yubis
 
-onetwo			// (c) 1997 Barko
-onetwoe			// (c) 1997 Barko
-1945kiii		// (c) 2000 Oriental
-witch			// (c) 1992 Sega / Vic Tokai / Excellent Systems
-pbchmp95		// (c) 1995 Veltmeijer Automaten
-cardline		// (c) 199? Veltmeijer
+// BMC
+
 bmcbowl			// (c) 1994 BMC
 koftball		// (c) 1995 BMC
+bmcpokr			// (c) 1999 BMC
 popobear		// (c) 2000 BMC
+
+// Merit 
+
 mpoker			// (c) 1983 Merit
 pitboss			// (c) 1983 Merit
 pitbossa		// (c) 1983 Merit
@@ -10235,6 +10254,13 @@ megat5nj		// (c) 1997 Merit
 megat5tg		// (c) 1997 Merit
 megat6			// (c) 1998 Merit
 suprgolf		// (c) 1989 Nasco
+
+onetwo			// (c) 1997 Barko
+onetwoe			// (c) 1997 Barko
+1945kiii		// (c) 2000 Oriental
+witch			// (c) 1992 Sega / Vic Tokai / Excellent Systems
+pbchmp95		// (c) 1995 Veltmeijer Automaten
+cardline		// (c) 199? Veltmeijer
 albatross
 hotblock		// (c) 1993 Nics? / Nix?
 pntnpuzl		// Century?
@@ -10263,12 +10289,11 @@ turbosub6		// (c) 1985 Entertainment Sciences
 pipeline		// (c) 1990 Daehyun Electronics
 ttchamp
 ttchampa
-baryon			// (c) 1997 SemiCom
-dreamwld		// (c) 2000 SemiCom
 cybertnk		// (c) 1990 Coreland
 cubeqst			// (c) 1983 Simutrek Inc.
 cubeqsta		// (c) 1983 Simutrek Inc.
 pkscram			// (c) 1993 Cosmo Electronics Corporation
+
 
 // Funworld
 jollycrd		// (c) 1985 TAB-Austria

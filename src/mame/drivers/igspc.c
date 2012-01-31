@@ -2,6 +2,10 @@
 
  IGS PC based hardware
 
+
+ Speed Driver
+ -------------
+
 TODO:
 can't be emulated without proper mb bios
 
@@ -15,6 +19,24 @@ can't be emulated without proper mb bios
  or provided by the IGS027A.  If you disconnect the protection card the bios will hang
  when detecting the HDDs which further backs up the theory that it is provided or
  decrypted by the 027A
+
+ EZTouch
+ --------------
+
+ Custom board
+ 
+ AMD Geode Processor (MediaGX derived?)
+  marked
+ AGXD533AAXFDCC
+	0452EQA
+	(c)2001 2.1
+	TAIWAN
+
+ IGS027 security chip (ARM with internal ROM) (dumped!)
+
+ IGS035? (maybe..)
+
+ CF card
 
 */
 
@@ -69,9 +91,25 @@ ROM_START( speeddrv )
 	DISK_IMAGE( "speeddrv", 0, SHA1(88712a37b75d84cf9b5a4bee9386285d1b3760b3) )
 ROM_END
 
+ROM_START( eztouch )
+	ROM_REGION32_LE(0x40000, "bios", 0)	/* motherboard bios */
+	ROM_LOAD( "szz_bios.rom", 0x0000, 0x040000, CRC(9b09f094) SHA1(a9c533afa29218339bbd4f12075f34f9574e3bf6) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "szz_027a.rom", 0x000000, 0x04000, CRC(f05dae69) SHA1(fa64e73cf045cda64aa0b702de3bd032a44d2c5c) )
+
+	ROM_REGION( 0x80000, "extarm", 0 ) /* external ROM for ARM? (encrypted) */
+	ROM_LOAD( "szz_v116cn.rom", 0x000000, 0x80000, CRC(8c443a89) SHA1(efdbaa832def812e0786cab95ebf60cdc226d3c4))
+
+	DISK_REGION( "disks" )
+	DISK_IMAGE( "szz_cf", 0, SHA1(2f19b68b1db8a0b5e85ad43dc3b5bf651d465bd9) )
+ROM_END
+
+
 static DRIVER_INIT(speeddrv)
 {
 
 }
 
 GAME( 2004,  speeddrv,  0,  speeddrv,  speeddrv,  speeddrv,  ROT0,  "IGS",    "Speed Driver",    GAME_IS_SKELETON )
+GAME( 200?,  eztouch,   0,  speeddrv,  speeddrv,  speeddrv,  ROT0,  "IGS",    "EZ Touch (v116 China)",    GAME_IS_SKELETON )

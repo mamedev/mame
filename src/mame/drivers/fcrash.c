@@ -930,8 +930,60 @@ ROM_START( cawingbl )
 	ROM_RELOAD(          0x10000, 0x20000 )
 ROM_END
 
+// 24mhz crystal (maincpu), 28.322 crystal (video), 3.579545 crystal (sound)
+// sound cpu is (239 V 249521 VC5006 KABUKI DL-030P-110V) - recycled Kabuki Z80 from genuine Capcom HW?
+// 3x8 dsws
+
+static MACHINE_CONFIG_START( sgyxz, cps_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(kodb_map)
+	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
+
+//  MCFG_CPU_ADD("soundcpu", Z80, 3579545)
+//  MCFG_CPU_PROGRAM_MAP(sub_map)
+
+	MCFG_MACHINE_START(kodb)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_STATIC(kodb)
+	MCFG_SCREEN_VBLANK_STATIC(cps1)
+
+	MCFG_GFXDECODE(cps1)
+	MCFG_PALETTE_LENGTH(0xc00)
+
+	MCFG_VIDEO_START(cps1)
+MACHINE_CONFIG_END
+
+
+
+ROM_START( sgyxz )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "sgyxz_prg1.bin", 0x000001, 0x80000, CRC(d8511929) SHA1(4de9263778f327693f4d1e21b48e43806f673487) )
+	ROM_LOAD16_BYTE( "sgyxz_prg2.bin", 0x000000, 0x80000, CRC(95429c83) SHA1(e981624d018132e5625a66113b6ac4fc44e55cf7) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD16_BYTE("sgyxz_gfx1.bin", 0x000000, 0x200000, CRC(a60be9f6) SHA1(2298a4b6a2c83b76dc106a1efa19606b298d378a) ) // 'picture 1'
+	ROM_LOAD16_BYTE("sgyxz_gfx2.bin", 0x000001, 0x200000, CRC(6ad9d048) SHA1(d47212d28d0a1ce349e4c59e5d0d99c541b3458e) ) // 'picture 2'
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 code */
+	ROM_LOAD( "sgyxz_snd2.bin", 0x00000, 0x10000,  CRC(210c376f) SHA1(0d937c86078d0a106f5636b7daf5fc0266c2c2ec) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "sgyxz_snd1.bin", 0x00000, 0x40000,  CRC(c15ac0f2) SHA1(8d9e5519d9820e4ac4f70555088c80e64d052c9d) )
+ROM_END
+
+
+
+
 
 
 GAME( 1990, fcrash,   ffight,  fcrash,     fcrash,   cps1,     ROT0,   "bootleg (Playmark)", "Final Crash (bootleg of Final Fight)", GAME_SUPPORTS_SAVE )
 GAME( 1991, kodb,     kod,     kodb,       kodb,     cps1,     ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )	// 910731  "ETC"
 GAME( 1990, cawingbl, cawing,  fcrash,     fcrash,   cps1,     ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203)", GAME_NOT_WORKING )
+GAME( 199?, sgyxz,    wof,     sgyxz,     fcrash,    cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )

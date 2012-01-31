@@ -1,4 +1,4 @@
-/* IGS ARM7 (IGS027A) based Mahjong platform
+/* IGS ARM7 (IGS027A) based Mahjong / Gambling platform
  Driver by Xing Xing
 
  These games use the IGS027A processor.
@@ -10,7 +10,7 @@
  games make use of that feature.
 
  To emulate these games the Internal ROM will need dumping
- There are at least 5 other games on the platform.
+ There are at least 20 other games on this and similar platforms.
 
 */
 
@@ -612,6 +612,170 @@ ROM_START( bigd2 )
 	ROM_LOAD( "s2602.u14", 0x00000, 0x100000, CRC(f137028c) SHA1(0e4114222820bca2f7026fa653e2b96a489a0183) )
 ROM_END
 
+/*
+
+
+Gone Fishing II
+IGS PCB-0388-05-FW
+
+   +--------------------------------------------+
++--+               8-Liner Connecter            +---+
+|                                                   |
+|    +---------------+                            +-+
+|    |   IGS 0027A   |     +------+               |
++-+  |    Plug-in    |     | IGS  |               +-+
+  |  |   Daughter    |     | 025  |                P|
++-+  |     Card      |     +------+                r|
+|    +---------------+ +---+                       i|
+|J                     |   |                       n|
+|A   +---+ +---+ +---+ |   |                       t|
+|M   |   | |   | |   | | U |                      +-+
+|M   |   | |   | |   | | 1 |                +---+ |
+|A   | U | | U | | U | | 2 |                |   | +-+
+|    | 1 | | 1 | | 1 | |   |         +----+ | U |   |
+|C   | 5 | | 7 | | 4 | |   |         |Oki | | 1 |   |
+|o   |   | |   | | * | |   |         |6295| | 3 |   |
+|n   |   | |   | |   | +---+         +----+ |   |   |
+|n   |   | |   | |   |                      +---+   |
+|e   +---+ |   | +---+                              |
+|c         +---+                                    |
+|t                        62257                     |
+|e                                                  |
+|r       +-------+                                  |
+|        |       |                                  |
+|        |  IGS  |                                  |
+|        |  031  |     61256                        |
++-+      |       |          PAL     V3021           |
+  |      +-------+                                  |
++-+                                      X1    SW4  |
+|                                                   |
+| JP11                        SW3 SW2 SW1      BT1  |
+|                                                   |
++---------------------------------------------------+
+
+
+U12 - Program rom   - 27C4096
+U15 - Text graphics - 27C4096
+U17 - Char graphics - 27C160
+U23 - Sound samples - 27C040
+
+SW1-SW3 are unpopulated
+U14* Not used (27C4096) or else it's U16 and 27C160 type EPROM
+
+   X1 - 32.768kHZ OSC
+V3021 - Micro Electronic Ultra Low Power 1-Bit 32kHz RTC (Real Time Clock)
+  PAL - ATF22V10C at U26 labeled FW U26
+  BT1 - 3.6V battery
+  SW4 - Toggle switch
+ JP11 - 4 Pin header (HD4-156)
+
+IGS 025  - Custom programmed A8B1723(?)
+IGS 0027 - Custom programmed ARM9
+
+*/
+
+
+
+ROM_START( gonefsh2 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	/* Internal rom of IGS027A ARM based MCU */
+	ROM_LOAD( "gonefsh2_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "gfii_v-904uso.u12", 0x000000, 0x80000, CRC(ef0f6735) SHA1(0add92599b0989f3e50dc64e32ce234b4bd87d33) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "gfii_text.u15", 0x000000, 0x80000, CRC(b48118fd) SHA1(e718d23ce5f7f41ab94df2d05cdd3adbf27eef89) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD( "gfii_cg.u17", 0x000000, 0x200000, CRC(2568359c) SHA1(f1f240246e53496bf624c84f7cae3edb9675579f) )
+
+	ROM_REGION( 0x200000, "unknown", 0 )
+	ROM_LOAD( "gfii_sp.u13", 0x00000, 0x080000, CRC(61da1d58) SHA1(0a79578f0daf15f0efe2b0eeac59a60d8372a644) )
+ROM_END
+
+/*
+
+
+Chess Challenge II
+
+IGS PCB-0388-04-FW
+
+   +--------------------------------------------+
++--+               8-Liner Connecter            +---+
+|                                                   |
+|    +---------------+                            +-+
+|    |   IGS 0027A   |     +------+               |
++-+  |    Plug-in    |     | IGS  |               +-+
+  |  |   Daughter    |     | 025  |                P|
++-+  |     Card      |     +------+                r|
+|    +---------------+ +---+                       i|
+|J                     |   |                       n|
+|A   +---+ +---+ +---+ |   |                       t|
+|M   |   | |   | |   | | U |                      +-+
+|M   |   | |   | |   | | 1 |                +---+ |
+|A   | U | | U | | U | | 2 |                |   | +-+
+|    | 1 | | 1 | | 1 | |   |         +----+ | U |   |
+|C   | 5 | | 7 | | 4 | |   |         |Oki | | 1 |   |
+|o   |   | |   | | * | |   |         |6295| | 3 |   |
+|n   |   | |   | |   | +---+         +----+ |   |   |
+|n   |   | |   | |   |                      +---+   |
+|e   +---+ |   | +---+                              |
+|c         +---+                                    |
+|t                        62257                     |
+|e                                                  |
+|r       +-------+                                  |
+|        |       |                                  |
+|        |  IGS  |                                  |
+|        |  031  |     61256                        |
++-+      |       |          PAL     V3021           |
+  |      +-------+                                  |
++-+                                      X1    SW4  |
+|                                                   |
+| JP11                        SW3 SW2 SW1      BT1  |
+|                                                   |
++---------------------------------------------------+
+
+
+U12 - Program rom   - 27C4096
+U15 - Text graphics - 27C4096
+U17 - Char graphics - 27C160
+U23 - Sound samples - 27C040
+
+SW1-SW3 are unpopulated
+U14* Not used (27C4096) or else it's U16 and 27C160 type EPROM
+
+   X1 - 32.768K OSC
+V3021 - Micro Electronic Ultra Low Power 1-Bit 32kHz RTC (Real Time Clock)
+  PAL - ATF22V10C at U26 labeled FW U26
+  BT1 - 3.6V battery
+  SW4 - Toggle switch
+ JP11 - 4 Pin header (HD4-156)
+
+IGS 025  - Custom programmed A8B1723(?)
+IGS 0027 - Custom programmed ARM9
+
+*/
+
+ROM_START( chessc2 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	/* Internal rom of IGS027A ARM based MCU */
+	ROM_LOAD( "gonefsh2_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "ccii_v-707uso.u12", 0x000000, 0x80000, CRC(5937b67b) SHA1(967b3adf6f5bf92d63ec460d595e473898a78372) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "ccii_text.u15", 0x000000, 0x80000, CRC(25fed033) SHA1(b321c4994f609906597c3f7d5cdfc2dca63cd340) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD( "ccii_cg.u17", 0x000000, 0x200000, CRC(47e45157) SHA1(4459799a4a6c30a2d0a3ad9ac54e92b62221e10b) )
+
+	ROM_REGION( 0x200000, "unknown", 0 )
+	ROM_LOAD( "ccii_sp.u13", 0x00000, 0x080000,  CRC(220a7b71) SHA1(7dab7baa97c20b83763cf46ef0a6e5e8c4d6a348) )
+ROM_END
+
+
 
 /***************************************************************************
 
@@ -619,10 +783,12 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 2002,  sdwx, 0, igs_majhong, sdwx, sdwx, ROT0, "IGS", "Sheng Dan Wu Xian", GAME_NO_SOUND | GAME_NOT_WORKING ) // aka Christmas 5 Line?
-GAME( 200?,  sddz, 0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Super Dou Di Zhu",  GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000,  bigd2,0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Big D2",  GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?,  lhzb3,0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Long Hu Zheng Ba 3", GAME_NO_SOUND | GAME_NOT_WORKING ) // ????????3
-GAME( 200?,  lhzb4,0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Long Hu Zheng Ba 4", GAME_NO_SOUND | GAME_NOT_WORKING ) // ????????4
-GAME( 200?,  klxyj,0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Kuai Le Xi You Ji",  GAME_NO_SOUND | GAME_NOT_WORKING ) // ??????????
-GAME( 2000,  mgfx, 0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Man Guan Fu Xing",   GAME_NO_SOUND | GAME_NOT_WORKING ) // ????????
+GAME( 2002,  sdwx,		0, igs_majhong, sdwx, sdwx, ROT0, "IGS", "Sheng Dan Wu Xian", GAME_NO_SOUND | GAME_NOT_WORKING ) // aka Christmas 5 Line?
+GAME( 200?,  sddz,		0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Super Dou Di Zhu",  GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000,  bigd2,		0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Big D2",  GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  lhzb3,		0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Long Hu Zheng Ba 3", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  lhzb4,		0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Long Hu Zheng Ba 4", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  klxyj,		0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Kuai Le Xi You Ji",  GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000,  mgfx,		0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Man Guan Fu Xing",   GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  gonefsh2,	0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Gone Fishing 2",   GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?,  chessc2,	0, igs_majhong, sdwx, 0,    ROT0, "IGS", "Chess Challenge 2",   GAME_NO_SOUND | GAME_NOT_WORKING )

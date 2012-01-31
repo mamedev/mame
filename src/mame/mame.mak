@@ -525,6 +525,7 @@ $(MAMEOBJ)/bmc.a: \
 	$(DRIVERS)/bmcbowl.o \
 	$(DRIVERS)/koftball.o \
 	$(DRIVERS)/popobear.o \
+	$(DRIVERS)/bmcpokr.o \
 
 $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/1942.o $(VIDEO)/1942.o \
@@ -1206,6 +1207,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/puckpkmn.o \
 	$(DRIVERS)/segac2.o \
 	$(DRIVERS)/segae.o $(MACHINE)/segamsys.o \
+	$(DRIVERS)/shtzone.o \
 	$(DRIVERS)/segag80r.o $(MACHINE)/segag80.o $(AUDIO)/segag80r.o $(VIDEO)/segag80r.o \
 	$(DRIVERS)/segag80v.o $(AUDIO)/segag80v.o $(VIDEO)/segag80v.o \
 	$(DRIVERS)/segahang.o $(VIDEO)/segahang.o \
