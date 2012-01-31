@@ -907,7 +907,7 @@ static floperr_t ti99_sdf_get_indexed_sector_info(floppy_image_legacy *floppy, i
 		*sector = sector_index;
 	if (flags)
 		*flags = 0;
-	if (sector_index > tag->sectors)
+	if (sector_index >= tag->sectors)
 	{
 		return FLOPPY_ERROR_SEEKERROR;
 	}
