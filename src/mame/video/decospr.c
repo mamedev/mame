@@ -12,6 +12,8 @@
 
    There is also a very simply 'drawgfx' path for games where the sprites are only of one priority level.
 
+   Several features are included to support the various clone / bootleg chips derived from this device, it appears
+   to have been a popular base for Korean developers (much as the Tumble Pop code was)
 
    used by:
 
@@ -32,10 +34,16 @@
    deco32.c
    rohga.c
    dassault.c
+   boogwing.c
+
+   (bootleg) esd16.c
+   (bootleg) nmg5.c
+   (bootleg) tumbleb.c
+   (bootleg) crospang.c
 
    to convert:
 
-   boogwing.c - complex video mixing
+   (any other bootleg / clone chips?)
 
    notes:
    does the chip natively support 5bpp (tattass / nslasher) in hw, or is it done with doubled up chips?
@@ -105,7 +113,7 @@ offs +2
 ssssSSSS pppccccc
 
 s = size (height)
-S = size (width) (double wings)
+S = size (width)
 
 offs +3
 -------- --------
@@ -115,8 +123,6 @@ t = sprite tile
 
 todo: the priotity callback for using pdrawgfx should really pack those 8 bits, and pass them instead of currently just
 passing offs+2 which lacks the extra priority bit
-
-todo: basic blend mixing
 
 */
 
@@ -148,19 +154,24 @@ void decospr_device::set_col_callback(device_t &device, decospr_colour_callback_
 }
 
 
+
 const device_type DECO_SPRITE = &device_creator<decospr_device>;
 
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_SPRITE, "decospr_device", tag, owner, clock),
 	  m_gfxregion(0),
 	  m_pricallback(NULL),
-	  m_colcallback(decospr_default_colour_callback)
+	  m_colcallback(decospr_default_colour_callback),
+	  m_is_bootleg(false),
+	  m_x_offset(0),
+	  m_y_offset(0),
+	  m_flipallx(0),
+	  m_transpen(0)
 {
 }
 
 void decospr_device::device_start()
 {
-//  sprite_kludge_x = sprite_kludge_y = 0;
 //  printf("decospr_device::device_start()\n");
 	m_alt_format = 0;
 	m_pixmask = 0xf;
@@ -171,14 +182,6 @@ void decospr_device::device_reset()
 {
 	//printf("decospr_device::device_reset()\n");
 }
-
-/*
-void decospr_device::decospr_sprite_kludge(int x, int y)
-{
-    sprite_kludge_x = x;
-    sprite_kludge_y = y;
-}
-*/
 
 void decospr_device::alloc_sprite_bitmap()
 {
@@ -267,6 +270,12 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 				fy = y & 0x4000;
 				multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
 
+				/* bootleg support (esd16.c) */
+				if (flipscreen) x = ((x&0x1ff) - m_x_offset)&0x1ff;
+				else x = ((x&0x1ff) + m_x_offset)&0x1ff;
+				y = ((y&0x1ff) + m_y_offset)&0x1ff;
+
+
 				if (cliprect.max_x>256)
 				{
 					x = x & 0x01ff;
@@ -287,10 +296,12 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 					x = 240 - x;
 				}
 
+	
 				//if (x <= 320)
 				{
-
-					sprite &= ~multi;
+					if (!m_is_bootleg) // several of the clone / bootleg chips don't do this, see jumpkids
+						sprite &= ~multi;
+					
 					if (fy)
 						inc = -1;
 					else
@@ -302,19 +313,24 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 					if (flipscreen)
 					{
 						y = 240 - y;
-
-						if (cliprect.max_x>256)
-							x = 304 - x;
-						else
-							x = 240 - x;
-
-						if (fx) fx = 0; else fx = 1;
 						if (fy) fy = 0; else fy = 1;
 						mult = 16;
 					}
 					else
 						mult = -16;
 
+					if (flipscreen || m_flipallx)
+					{
+						if (cliprect.max_x>256)
+							x = 304 - x;
+						else
+							x = 240 - x;
+
+						if (fx) fx = 0; else fx = 1;
+					}
+
+					
+					
 					mult2 = multi + 1;
 
 					while (multi >= 0)
@@ -333,14 +349,14 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x,ypos,
-											machine().priority_bitmap,pri,0);
+											machine().priority_bitmap,pri,m_transpen);
 									else
 										drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
 											sprite - multi * inc,
 											colour,
 											fx,fy,
 											x,ypos,
-											0);
+											m_transpen);
 								}
 
 								// double wing uses this flag
@@ -352,14 +368,14 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 												colour,
 												fx,fy,
 												x-16,ypos,
-												machine().priority_bitmap,pri,0);
+												machine().priority_bitmap,pri,m_transpen);
 									else
 										drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
 												(sprite - multi * inc)-mult2,
 												colour,
 												fx,fy,
 												x-16,ypos,
-												0);
+												m_transpen);
 								}
 							}
 							else
@@ -370,7 +386,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 									colour<<m_raw_shift,
 									fx,fy,
 									x,ypos,
-									0);
+									m_transpen);
 								if (w)
 								{
 									drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine().gfx[m_gfxregion],
@@ -378,7 +394,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 										colour<<m_raw_shift,
 										fx,fy,
 										x-16,ypos,
-										0);
+										m_transpen);
 								}
 
 							}
@@ -457,8 +473,8 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											sprite + yy + h * xx,
 											colour,
 											fx,fy,
-											x + mult * (w-xx),ypos,
-											machine().priority_bitmap,pri,0);
+											 x + mult * (w-xx),ypos,
+											machine().priority_bitmap,pri,m_transpen);
 								}
 
 								ypos -= 512; // wrap-around y
@@ -470,7 +486,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x + mult * (w-xx),ypos,
-											machine().priority_bitmap,pri,0);
+											machine().priority_bitmap,pri,m_transpen);
 								}
 
 							}
@@ -485,7 +501,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x + mult * (w-xx),ypos,
-											0);
+											m_transpen);
 								}
 
 								ypos -= 512; // wrap-around y
@@ -497,7 +513,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x + mult * (w-xx),ypos,
-											0);
+											m_transpen);
 								}
 							}
 						}
@@ -512,7 +528,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 										colour<<m_raw_shift,
 										fx,fy,
 										x + mult * (w-xx),ypos,
-										0);
+										m_transpen);
 							}
 
 							ypos -= 512; // wrap-around y
@@ -524,7 +540,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 										colour<<m_raw_shift,
 										fx,fy,
 										x + mult * (w-xx),ypos,
-										0);
+										m_transpen);
 							}
 						}
 					}

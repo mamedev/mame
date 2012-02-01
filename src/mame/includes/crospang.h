@@ -20,8 +20,6 @@ public:
 	/* video-related */
 	tilemap_t   *m_bg_layer;
 	tilemap_t   *m_fg_layer;
-	int       m_xsproff;
-	int       m_ysproff;
 	int       m_bestri_tilebank;
 
 	/* devices */

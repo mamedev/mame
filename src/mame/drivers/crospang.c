@@ -22,6 +22,10 @@
   Bestri:
     Bestri includes Heuk San Baek Sa as one of it's three sub games.
 
+  Note:
+  Bestri tile banking / enable wrong (corrupt gfx in some modes?)
+   - check and merge with other Tumble Pop based implementations?
+
   2008-08
   Added Service dipswitch and dip locations based on Service Mode.
 */
@@ -32,7 +36,7 @@
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "includes/crospang.h"
-
+#include "video/decospr.h"
 
 static WRITE16_HANDLER ( crospang_soundlatch_w )
 {
@@ -330,8 +334,7 @@ static MACHINE_START( crospang )
 	state->m_audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->m_bestri_tilebank));
-	state->save_item(NAME(state->m_xsproff));
-	state->save_item(NAME(state->m_ysproff));
+
 }
 
 static MACHINE_RESET( crospang )
@@ -339,17 +342,14 @@ static MACHINE_RESET( crospang )
 	crospang_state *state = machine.driver_data<crospang_state>();
 
 	state->m_bestri_tilebank = 0;
-//  state->m_xsproff = 4;
-//  state->m_ysproff = 7;
-	state->m_xsproff = 5;
-	state->m_ysproff = 7;
+
 }
 
 
 static MACHINE_CONFIG_START( crospang, crospang_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14318180/2)
+	MCFG_CPU_ADD("maincpu", M68000, 14318180)
 	MCFG_CPU_PROGRAM_MAP(crospang_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
@@ -373,6 +373,12 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 
 	MCFG_VIDEO_START(crospang)
 
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 0);
+	decospr_device::set_is_bootleg(*device, true);
+	decospr_device::set_offsets(*device, 5,7);
+
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -384,42 +390,12 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bestri, crospang_state )
+static MACHINE_CONFIG_DERIVED( bestri, crospang )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14318180/2)
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bestri_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_CPU_PROGRAM_MAP(crospang_sound_map)
-	MCFG_CPU_IO_MAP(crospang_sound_io_map)
-
-	MCFG_MACHINE_START(crospang)
-	MCFG_MACHINE_RESET(crospang)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(crospang)
-
-	MCFG_PALETTE_LENGTH(0x300)
-	MCFG_GFXDECODE(crospang)
-
-	MCFG_VIDEO_START(crospang)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_SOUND_CONFIG(ym3812_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

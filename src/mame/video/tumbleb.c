@@ -16,206 +16,10 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 #include "emu.h"
 #include "includes/tumbleb.h"
+#include "video/decospr.h"
 
 /******************************************************************************/
 
-static void tumblepb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int offs;
-
-	for (offs = 0; offs < 0x400; offs += 4)
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
-
-		sprite = spriteram[offs + 1] & 0x3fff;
-		if (!sprite)
-			continue;
-
-		y = spriteram[offs];
-		flash = y & 0x1000;
-		if (flash && (machine.primary_screen->frame_number() & 1))
-			continue;
-
-		x = spriteram[offs + 2];
-		colour = (x >> 9) & 0xf;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-		y = 240 - y;
-		x = 304 - x;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (state->m_flipscreen)
-		{
-			y = 240 - y;
-			x = 304 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else
-			mult = -16;
-
-		while (multi >= 0)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					state->m_sprite_xoffset + x, state->m_sprite_yoffset + y + mult * multi, 0);
-
-			multi--;
-		}
-	}
-}
-
-static void jumpkids_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int offs;
-
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
-
-		sprite = spriteram[offs + 1] & 0x7fff;
-		if (!sprite)
-			continue;
-
-		y = spriteram[offs];
-		flash = y & 0x1000;
-		if (flash && (machine.primary_screen->frame_number() & 1))
-			continue;
-
-		x = spriteram[offs+2];
-		colour = (x >> 9) & 0xf;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-		y = 240 - y;
-		x = 304 - x;
-
-		//  sprite &= ~multi; /* Todo:  I bet TumblePop bootleg doesn't do this either */
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (state->m_flipscreen)
-		{
-			y = 240 - y;
-			x = 304 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else
-			mult = -16;
-
-		while (multi >= 0)
-		{
-			drawgfx_transpen(bitmap,// x-1 for bcstory .. realign other layers?
-					cliprect,machine.gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					state->m_sprite_xoffset + x, state->m_sprite_yoffset + y + mult * multi, 0);
-
-			multi--;
-		}
-	}
-}
-
-static void fncywld_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int offs;
-
-	for (offs = 0; offs < 0x400; offs += 4)
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
-
-		sprite = spriteram[offs + 1] & 0x3fff;
-		if (!sprite)
-			continue;
-
-		y = spriteram[offs];
-		flash = y & 0x1000;
-		if (flash && (machine.primary_screen->frame_number() & 1))
-			continue;
-
-		x = spriteram[offs + 2];
-		colour = (x >> 9) & 0x3f;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-		y = 240 - y;
-		x = 304 - x;
-
-		//  sprite &= ~multi; /* Todo:  I bet TumblePop bootleg doesn't do this either */
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (state->m_flipscreen)
-		{
-			y = 240 - y;
-			x = 304 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else mult = -16;
-
-		while (multi >= 0)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					state->m_sprite_xoffset + x, state->m_sprite_yoffset + y + mult * multi, 15);
-
-			multi--;
-		}
-	}
-}
 
 /******************************************************************************/
 
@@ -504,9 +308,6 @@ VIDEO_START( pangpang )
 	state->m_pf1_tilemap->set_transparent_pen(0);
 	state->m_pf1_alt_tilemap->set_transparent_pen(0);
 
-	state->m_sprite_xoffset = -1;
-	state->m_sprite_yoffset = 0;
-
 	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
 }
 
@@ -522,9 +323,6 @@ VIDEO_START( tumblepb )
 	state->m_pf1_tilemap->set_transparent_pen(0);
 	state->m_pf1_alt_tilemap->set_transparent_pen(0);
 
-	state->m_sprite_xoffset = -1;
-	state->m_sprite_yoffset = 0;
-
 	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
 }
 
@@ -539,10 +337,6 @@ VIDEO_START( sdfight )
 	state->m_pf1_tilemap->set_transparent_pen(0);
 	state->m_pf1_alt_tilemap->set_transparent_pen(0);
 
-	/* aligned to monitor test */
-	state->m_sprite_xoffset = 0;
-	state->m_sprite_yoffset = 1;
-
 	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
 }
 
@@ -556,9 +350,6 @@ VIDEO_START( fncywld )
 
 	state->m_pf1_tilemap->set_transparent_pen(15);
 	state->m_pf1_alt_tilemap->set_transparent_pen(15);
-
-	state->m_sprite_xoffset = -1;
-	state->m_sprite_yoffset = 0;
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
 }
@@ -580,9 +371,6 @@ VIDEO_START( jumppop )
 	state->m_pf2_tilemap->set_flip(TILEMAP_FLIPX);
 	state->m_pf2_alt_tilemap->set_flip(TILEMAP_FLIPX);
 
-	state->m_sprite_xoffset = -1;
-	state->m_sprite_yoffset = 0;
-
 	machine.save().register_postload(save_prepost_delegate(FUNC(tumbleb_tilemap_redraw), &machine));
 }
 
@@ -602,6 +390,26 @@ VIDEO_START( suprtrio )
 
 /******************************************************************************/
 
+void tumbleb_draw_common(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pf1x_offs, int pf1y_offs, int pf2x_offs, int pf2y_offs)
+{
+	tumbleb_state *state = machine.driver_data<tumbleb_state>();
+
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + pf1x_offs);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2] + pf1y_offs);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + pf1x_offs);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2] + pf1y_offs);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + pf2x_offs);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4] + pf2y_offs);
+
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+
+	if (state->m_control_0[6] & 0x80)
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
+	else
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
+
+	machine.device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+}
 
 SCREEN_UPDATE_IND16( tumblepb )
 {
@@ -621,21 +429,8 @@ SCREEN_UPDATE_IND16( tumblepb )
 	else
 		offs2 = -5;
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, 0, offs, 0);
 
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	tumblepb_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -657,21 +452,7 @@ SCREEN_UPDATE_IND16( jumpkids )
 	else
 		offs2 = -5;
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
-
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -693,21 +474,7 @@ SCREEN_UPDATE_IND16( semicom )
 	else
 		offs2 = -5;
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
-
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -722,21 +489,8 @@ SCREEN_UPDATE_IND16( semicom_altoffsets )
 	offsy = 2;
 	offsx2 = -5;
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offsx2);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offsx2);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offsx);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4] + offsy);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offsx2, 0, offsx, offsy);
 
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -760,21 +514,7 @@ SCREEN_UPDATE_IND16( bcstory )
 	else
 		offs2 = 8;
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
-
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -788,22 +528,8 @@ SCREEN_UPDATE_IND16( semibase )
 	offs = -1;
 	offs2 = -2;
 
-	/* sprites need an offset too */
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, 0, offs, 0);
 
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
@@ -817,25 +543,11 @@ SCREEN_UPDATE_IND16( sdfight )
 	offs = -1;
 	offs2 = -5; // foreground scroll..
 
-	/* sprites need an offset too */
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2] - 16); // needed for the ground ...
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2] - 16);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, -16, offs, 0);
 
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
 	return 0;
 }
-
-
 
 SCREEN_UPDATE_IND16( fncywld )
 {
@@ -855,81 +567,7 @@ SCREEN_UPDATE_IND16( fncywld )
 	else
 		offs2 = -5;
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
-
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	fncywld_draw_sprites(screen.machine(), bitmap, cliprect);
-	return 0;
-}
-
-
-SCREEN_UPDATE_IND16( jumppop )
-{
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
-
-	//  bitmap.fill(get_black_pen(screen.machine()), cliprect);
-
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control[2] - 0x3a0);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control[3]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control[2] - 0x3a0);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control[3]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control[0] - 0x3a2);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control[1]);
-	state->m_pf2_alt_tilemap->set_scrollx(0, state->m_control[0] - 0x3a2);
-	state->m_pf2_alt_tilemap->set_scrolly(0, state->m_control[1]);
-
-	if (state->m_control[7] & 1)
-		state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf2_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control[7] & 2)
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-
-//popmessage("%04x %04x %04x %04x %04x %04x %04x %04x", state->m_control[0],state->m_control[1],state->m_control[2],state->m_control[3],state->m_control[4],state->m_control[5],state->m_control[6],state->m_control[7]);
-
-	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
-	return 0;
-}
-
-
-SCREEN_UPDATE_IND16( suprtrio )
-{
-	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
-
-	state->m_pf1_alt_tilemap->set_scrollx(0, -state->m_control[1] - 6);
-	state->m_pf1_alt_tilemap->set_scrolly(0, -state->m_control[2]);
-	state->m_pf2_tilemap->set_scrollx(0, -state->m_control[3] - 2);
-	state->m_pf2_tilemap->set_scrolly(0, -state->m_control[4]);
-
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
-#if 0
-popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
- state->m_control[0],
- state->m_control[1],
- state->m_control[2],
- state->m_control[3],
- state->m_control[4],
- state->m_control[5],
- state->m_control[6],
- state->m_control[7]);
-#endif
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, -16, offs, 0);
 
 	return 0;
 }
@@ -952,20 +590,54 @@ SCREEN_UPDATE_IND16( pangpang )
 	else
 		offs2 = -5;
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + offs2);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2]);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + offs);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4]);
-
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
-
-	jumpkids_draw_sprites(screen.machine(), bitmap, cliprect);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, -16, offs, 0);
 	return 0;
 }
+
+
+
+SCREEN_UPDATE_IND16( jumppop )
+{
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
+
+	state->m_pf1_tilemap->set_scrollx(0, state->m_control[2] - 0x3a0);
+	state->m_pf1_tilemap->set_scrolly(0, state->m_control[3]);
+	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control[2] - 0x3a0);
+	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control[3]);
+	state->m_pf2_tilemap->set_scrollx(0, state->m_control[0] - 0x3a2);
+	state->m_pf2_tilemap->set_scrolly(0, state->m_control[1]);
+	state->m_pf2_alt_tilemap->set_scrollx(0, state->m_control[0] - 0x3a2);
+	state->m_pf2_alt_tilemap->set_scrolly(0, state->m_control[1]);
+
+	if (state->m_control[7] & 1)
+		state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	else
+		state->m_pf2_alt_tilemap->draw(bitmap, cliprect, 0, 0);
+
+	if (state->m_control[7] & 2)
+		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
+	else
+		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
+
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+
+	return 0;
+}
+
+
+SCREEN_UPDATE_IND16( suprtrio )
+{
+	tumbleb_state *state = screen.machine().driver_data<tumbleb_state>();
+
+	state->m_pf1_alt_tilemap->set_scrollx(0, -state->m_control[1] - 6);
+	state->m_pf1_alt_tilemap->set_scrolly(0, -state->m_control[2]);
+	state->m_pf2_tilemap->set_scrollx(0, -state->m_control[3] - 2);
+	state->m_pf2_tilemap->set_scrolly(0, -state->m_control[4]);
+
+	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
+
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+	return 0;
+}
+

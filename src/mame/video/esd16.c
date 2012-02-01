@@ -35,7 +35,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 #include "emu.h"
 #include "includes/esd16.h"
-
+#include "video/decospr.h"
 
 /***************************************************************************
 
@@ -153,168 +153,6 @@ VIDEO_START( esd16 )
 }
 
 
-
-
-/***************************************************************************
-
-                                Sprites Drawing
-
-    Offset:     Bits:                   Value:
-
-        0.w     fedc b--- ---- ----
-                ---- -a9- ---- ----     Y Size: (1 << N) Tiles
-                ---- ---8 7654 3210     Y (Signed, Bottom-Up)
-
-        2.w                             Code
-
-        4.w     f--- ---- ---- ----     Sprite priority
-                -ed- ---- ---- ----
-                ---c ---- ---- ----     Color?
-                ---- ba9- ---- ----     Color
-                ---- ---8 7654 3210     X (Signed)
-
-        6.w     fedc ba9- ---- ----
-                ---- ---8 ---- ----     ? 1 (Display Sprite?)
-                ---- ---- 7654 3210
-
-- To Do: Flip X&Y ? They seem unused.
-
-  these are clearly the same as the tumble pop (bootleg?) sprites
-
-***************************************************************************/
-
-static void esd16_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	esd16_state *state = machine.driver_data<esd16_state>();
-	int offs;
-
-	int max_x = machine.primary_screen->width();
-	int max_y = machine.primary_screen->height();
-
-	for (offs = state->m_spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
-	{
-		int y, starty, endy, incy;
-
-		int sy = state->m_spriteram[offs + 0];
-		int code = state->m_spriteram[offs + 1];
-		int sx = state->m_spriteram[offs + 2];
-		int attr = state->m_spriteram[offs + 3];
-
-		int dimy = 1 << ((sy >> 9) & 3);
-
-		int flipx = sy & 0x2000;
-		int flipy = attr & 0x0000;
-		int flash = sy & 0x1000;
-
-		int color = (sx >> 9) & 0xf;
-
-		int pri_mask;
-
-		if (flash && (machine.primary_screen->frame_number() & 1))
-			continue;
-
-		if (sx & 0x8000)
-			pri_mask = 0xfffe; // under "tilemap 1"
-		else
-			pri_mask = 0; // above everything
-
-		sx = sx & 0x1ff;
-		if (sx >= 0x180)
-			sx -= 0x200;
-
-		sy = 0x100 - ((sy & 0xff)  - (sy & 0x100));
-		sy -= dimy * 16;
-
-		if (flip_screen_get(machine))
-		{
-			flipx = !flipx;		sx = max_x - sx -    1 * 16 + 2;	// small offset
-			flipy = !flipy;		sy = max_y - sy - dimy * 16;
-		}
-
-		if (flipy)	{	starty = sy + (dimy - 1) * 16;	endy = sy-16;		incy = -16;	}
-		else		{	starty = sy;				endy = sy + dimy * 16;	incy = +16;	}
-
-		for (y = starty ; y != endy ; y += incy)
-		{
-			pdrawgfx_transpen(bitmap, cliprect, machine.gfx[0],
-						code++,
-						color,
-						flipx, flipy,
-						sx, y,
-						machine.priority_bitmap, pri_mask, 0);
-		}
-	}
-}
-
-/* note, check if i can re-merge this with the other or if its really different */
-static void hedpanic_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	esd16_state *state = machine.driver_data<esd16_state>();
-	int offs;
-
-	int max_x = machine.primary_screen->width();
-	int max_y = machine.primary_screen->height();
-
-	for (offs = state->m_spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
-	{
-		int y, starty, endy, incy;
-
-		int sy = state->m_spriteram[offs + 0];
-		int code = state->m_spriteram[offs + 1];
-		int sx = state->m_spriteram[offs + 2];
-//      int attr = state->m_spriteram[offs + 3];
-
-		int dimy = 1 << ((sy >> 9) & 3);
-
-		int flipx = sy & 0x2000;
-		int flipy = sy & 0x0000;
-		int flash = sy & 0x1000;
-
-		int color = (sx >> 9) & 0xf;
-
-		int pri_mask;
-
-		if (flash && (machine.primary_screen->frame_number() & 1))
-			continue;
-
-		if (sx & 0x8000)
-			pri_mask = 0xfffe; // under "tilemap 1"
-		else
-			pri_mask = 0; // above everything
-
-		sx = sx & 0x1ff;
-		if (sx >= 0x180)
-			sx -= 0x200;
-
-		sy &= 0x1ff;
-
-		sx -= 24;
-
-		sy = 0x1ff - sy;
-
-		if (flip_screen_get(machine))
-		{
-			flipx = !flipx;		sx = max_x - sx -    1 * 16 + 2;	// small offset
-			flipy = !flipy;		sy = max_y - sy - dimy * 16;
-		}
-
-		if (flipy)	{	starty = sy + (dimy - 1) * 16;	endy = sy - 16;		incy = -16;	}
-		else		{	starty = sy - dimy * 16;		endy = sy;			incy = +16;	}
-
-		for (y = starty ; y != endy ; y += incy)
-		{
-			pdrawgfx_transpen(bitmap, cliprect, machine.gfx[0],
-						code++,
-						color,
-						flipx, flipy,
-						sx, y,
-						machine.priority_bitmap, pri_mask, 0);
-		}
-	}
-}
-
-
-
 /***************************************************************************
 
 
@@ -322,40 +160,6 @@ static void hedpanic_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 
 ***************************************************************************/
-
-SCREEN_UPDATE_IND16( esd16 )
-{
-	esd16_state *state = screen.machine().driver_data<esd16_state>();
-	int layers_ctrl = -1;
-
-	screen.machine().priority_bitmap.fill(0, cliprect);
-
-	state->m_tilemap_0->set_scrollx(0, state->m_scroll_0[0]);
-	state->m_tilemap_0->set_scrolly(0, state->m_scroll_0[1]);
-
-	state->m_tilemap_1->set_scrollx(0, state->m_scroll_1[0]);
-	state->m_tilemap_1->set_scrolly(0, state->m_scroll_1[1]);
-
-#ifdef MAME_DEBUG
-if (screen.machine().input().code_pressed(KEYCODE_Z))
-{
-	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 4;
-	if (msk != 0) layers_ctrl &= msk;
-}
-#endif
-
-	if (layers_ctrl & 1)	state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-	else					bitmap.fill(0, cliprect);
-
-	if (layers_ctrl & 2)	state->m_tilemap_1->draw(bitmap, cliprect, 0, 1);
-
-	if (layers_ctrl & 4)	esd16_draw_sprites(screen.machine(), bitmap, cliprect);
-	return 0;
-}
-
 
 SCREEN_UPDATE_IND16( hedpanic )
 {
@@ -413,70 +217,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	}
 
-	if (layers_ctrl & 4)	hedpanic_draw_sprites(screen.machine(),bitmap,cliprect);
-
-//  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
-	return 0;
-}
-
-// uses older style sprites
-SCREEN_UPDATE_IND16( hedpanio )
-{
-	esd16_state *state = screen.machine().driver_data<esd16_state>();
-	int layers_ctrl = -1;
-
-	screen.machine().priority_bitmap.fill(0, cliprect);
-
-#ifdef MAME_DEBUG
-if ( screen.machine().input().code_pressed(KEYCODE_Z) )
-{
-	int msk = 0;
-	if (screen.machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
-	if (screen.machine().input().code_pressed(KEYCODE_W))	msk |= 2;
-	if (screen.machine().input().code_pressed(KEYCODE_A))	msk |= 4;
-	if (msk != 0) layers_ctrl &= msk;
-}
-#endif
-
-	if (layers_ctrl & 1)
-	{
-		if (state->m_head_layersize[0] & 0x0001)
-		{
-			state->m_tilemap_0_16x16->set_scrollx(0, state->m_scroll_0[0]);
-			state->m_tilemap_0_16x16->set_scrolly(0, state->m_scroll_0[1]);
-			state->m_tilemap_0_16x16->draw(bitmap, cliprect, 0, 0);
-		}
-		else
-		{
-			state->m_tilemap_0->set_scrollx(0, state->m_scroll_0[0]);
-			state->m_tilemap_0->set_scrolly(0, state->m_scroll_0[1]);
-			state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-		}
-	}
-	else
-	{
-		bitmap.fill(0, cliprect);
-	}
-
-
-	if (layers_ctrl & 2)
-	{
-		if (state->m_head_layersize[0] & 0x0002)
-		{
-			state->m_tilemap_1_16x16->set_scrollx(0, state->m_scroll_1[0]);
-			state->m_tilemap_1_16x16->set_scrolly(0, state->m_scroll_1[1]);
-			state->m_tilemap_1_16x16->draw(bitmap, cliprect, 0, 1);
-		}
-		else
-		{
-			state->m_tilemap_1->set_scrollx(0, state->m_scroll_1[0]);
-			state->m_tilemap_1->set_scrolly(0, state->m_scroll_1[1]);
-			state->m_tilemap_1->draw(bitmap, cliprect, 0, 1);
-		}
-
-	}
-
-	if (layers_ctrl & 4)	esd16_draw_sprites(screen.machine(),bitmap,cliprect);
+	if (layers_ctrl & 4) screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400);
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
 	return 0;

@@ -224,7 +224,6 @@ SCREEN_UPDATE_RGB32( nitrobal )
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
 	bitmap.fill(screen.machine().pens[512], cliprect);
 	screen.machine().priority_bitmap.fill(0);
-	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
 
 	/* pf3 and pf4 are combined into a single 8bpp bitmap */
 	deco16ic_tilemap_12_combine_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);

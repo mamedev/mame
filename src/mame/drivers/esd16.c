@@ -48,7 +48,7 @@ Head Panic
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "includes/esd16.h"
-
+#include "video/decospr.h"
 
 /***************************************************************************
 
@@ -91,9 +91,10 @@ static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16 )
 /**/AM_RANGE(0x420000, 0x423fff) AM_RAM_WRITE(esd16_vram_1_w) AM_BASE_MEMBER(esd16_state, m_vram_1)						//
 /**/AM_RANGE(0x500000, 0x500003) AM_RAM AM_BASE_MEMBER(esd16_state, m_scroll_0)											// Scroll
 /**/AM_RANGE(0x500004, 0x500007) AM_RAM AM_BASE_MEMBER(esd16_state, m_scroll_1)											//
-/**/AM_RANGE(0x500008, 0x50000b) AM_RAM																		//
-/**/AM_RANGE(0x50000c, 0x50000f) AM_RAM																		//
-	AM_RANGE(0x600000, 0x600001) AM_WRITENOP															// IRQ Ack
+	AM_RANGE(0x500008, 0x500009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_x)
+	AM_RANGE(0x50000a, 0x50000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_y)
+	AM_RANGE(0x50000c, 0x50000d) AM_WRITENOP																// ??
+	AM_RANGE(0x50000e, 0x50000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_head_layersize)								// ??
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("DSW")
@@ -434,10 +435,23 @@ static const gfx_layout layout_16x16x5 =
 	RGN_FRAC(1,5),
 	5,
 	{ RGN_FRAC(4,5),RGN_FRAC(3,5),RGN_FRAC(2,5),RGN_FRAC(1,5), RGN_FRAC(0,5) },
-	{ STEP8(0+7,-1), STEP8(8*16+7,-1) },
+	{ STEP8(8*16,1), STEP8(0,1) },
 	{ STEP16(0,8) },
 	16*16
 };
+
+
+static const gfx_layout hedpanic_sprite_16x16x5 =
+{
+	16,16,
+	RGN_FRAC(1,3),
+	5,
+	{   RGN_FRAC(2,3), RGN_FRAC(0,3), RGN_FRAC(0,3)+8, RGN_FRAC(1,3),RGN_FRAC(1,3)+8 },
+	{ 256+0,256+1,256+2,256+3,256+4,256+5,256+6,256+7,0,1,2,3,4,5,6,7 },
+	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+	16*32,
+};
+
 
 /* 8x8x8 */
 static const gfx_layout layout_8x8x8 =
@@ -451,12 +465,6 @@ static const gfx_layout layout_8x8x8 =
 	{ STEP8(0,2*8) },
 	8*8*2,
 };
-
-static GFXDECODE_START( esd16 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x8,   0x000, 2 ) // [1] Layers
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
-GFXDECODE_END
 
 static const gfx_layout hedpanic_layout_8x8x8 =
 {
@@ -484,16 +492,12 @@ static const gfx_layout hedpanic_layout_16x16x8 =
 };
 
 
-static const gfx_layout hedpanic_sprite_16x16x5 =
-{
-	16,16,
-	RGN_FRAC(1,3),
-	5,
-	{   RGN_FRAC(2,3), RGN_FRAC(0,3), RGN_FRAC(0,3)+8, RGN_FRAC(1,3),RGN_FRAC(1,3)+8 },
-	{ 7,6,5,4,3,2,1,0, 256+7,256+6,256+5,256+4,256+3,256+2,256+1,256+0 },
-	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
-	16*32,
-};
+
+static GFXDECODE_START( esd16 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x8,   0x000, 2 ) // [1] Layers
+	GFXDECODE_ENTRY( "gfx2", 0, hedpanic_layout_16x16x8,   0x000, 2 ) // [1] Layers
+GFXDECODE_END
 
 
 static GFXDECODE_START( hedpanic )
@@ -536,7 +540,15 @@ static MACHINE_RESET( esd16 )
 	state->m_tilemap0_color = 0;
 }
 
-static MACHINE_CONFIG_START( multchmp, esd16_state )
+static UINT16 hedpanic_pri_callback(UINT16 x)
+{
+	if (x & 0x8000)
+		return 0xfffe; // under "tilemap 1"
+	else
+		return 0; // above everything
+}
+
+static MACHINE_CONFIG_START( esd16, esd16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, 16000000)
@@ -557,8 +569,14 @@ static MACHINE_CONFIG_START( multchmp, esd16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0+8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE_STATIC(esd16)
+	MCFG_SCREEN_UPDATE_STATIC(hedpanic)
 
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 0);
+	decospr_device::set_is_bootleg(*device, true);
+	decospr_device::set_pri_callback(*device, hedpanic_pri_callback);
+	decospr_device::set_flipallx(*device, 1);
+	
 	MCFG_GFXDECODE(esd16)
 	MCFG_PALETTE_LENGTH(768)
 
@@ -574,7 +592,7 @@ static MACHINE_CONFIG_START( multchmp, esd16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hedpanic, multchmp )
+static MACHINE_CONFIG_DERIVED( hedpanic, esd16 )
 
 	/* basic machine hardware */
 
@@ -582,14 +600,17 @@ static MACHINE_CONFIG_DERIVED( hedpanic, multchmp )
 	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-
+	
 	MCFG_PALETTE_LENGTH(0x1000/2)
 
 	MCFG_GFXDECODE(hedpanic)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(hedpanic)
 
+	MCFG_DEVICE_MODIFY("spritegen")
+	decospr_device::set_offsets(*device, -0x18,-0x100);
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( mchampdx, hedpanic )
 
@@ -616,11 +637,16 @@ static MACHINE_CONFIG_DERIVED( swatpolc, hedpanic )
 	MCFG_GFXDECODE(tangtang)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hedpanio, hedpanic )
-
+static MACHINE_CONFIG_DERIVED( hedpanio, esd16 )
 	/* basic machine hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(hedpanio)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
+
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	
+	MCFG_PALETTE_LENGTH(0x1000/2)
+
+	MCFG_GFXDECODE(hedpanic)
 MACHINE_CONFIG_END
 
 
@@ -1278,8 +1304,8 @@ ROM_END
 ***************************************************************************/
 
 /* ESD 11-09-98 */
-GAME( 1999, multchmp, 0,        multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)", GAME_SUPPORTS_SAVE )
-GAME( 1998, multchmpk,multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1999, multchmp, 0,        esd16,    multchmp, 0, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)", GAME_SUPPORTS_SAVE )
+GAME( 1998, multchmpk,multchmp, esd16,    multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", GAME_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
 GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", GAME_SUPPORTS_SAVE )

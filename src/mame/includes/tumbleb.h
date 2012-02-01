@@ -27,8 +27,6 @@ public:
 	UINT16      m_control_0[8];
 	int         m_flipscreen;
 	UINT16      m_tilebank;
-	int         m_sprite_xoffset;
-	int         m_sprite_yoffset;
 
 	/* devices */
 	device_t *m_maincpu;

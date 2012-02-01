@@ -224,7 +224,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-
+#include "video/decospr.h"
 
 class nmg5_state : public driver_device
 {
@@ -845,41 +845,7 @@ static VIDEO_START( nmg5 )
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	nmg5_state *state = machine.driver_data<nmg5_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
-	{
-		int sx, sy, code, color, flipx, flipy, height, y;
-
-		sx = spriteram[offs + 2];
-		sy = spriteram[offs + 0];
-		code = spriteram[offs + 1];
-		color = (spriteram[offs + 2] >> 9) & 0xf;
-		height = 1 << ((spriteram[offs + 0] & 0x0600) >> 9);
-		flipx = spriteram[offs + 0] & 0x2000;
-		flipy = spriteram[offs + 0] & 0x4000;
-
-		for (y = 0; y < height; y++)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-					code + (flipy ? height-1 - y : y),
-					color,
-					flipx,flipy,
-					sx & 0x1ff,248 - ((sy + 0x10 * (height - y)) & 0x1ff),0);
-
-			/* wrap around */
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-					code + (flipy ? height-1 - y : y),
-					color,
-					flipx,flipy,
-					(sx & 0x1ff) - 512,248 - ((sy + 0x10 * (height - y)) & 0x1ff),0);
-		}
-	}
-}
 
 static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 {
@@ -924,33 +890,33 @@ static SCREEN_UPDATE_IND16( nmg5 )
 
 	if (state->m_priority_reg == 0)
 	{
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400);
 		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_bitmap(screen.machine(), bitmap);
 	}
 	else if (state->m_priority_reg == 1)
 	{
 		draw_bitmap(screen.machine(), bitmap);
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400);
 		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else if (state->m_priority_reg == 2)
 	{
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400);
 		draw_bitmap(screen.machine(), bitmap);
 		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else if (state->m_priority_reg == 3)
 	{
 		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400);
 		draw_bitmap(screen.machine(), bitmap);
 	}
 	else if (state->m_priority_reg == 7)
 	{
 		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_bitmap(screen.machine(), bitmap);
-		draw_sprites(screen.machine(), bitmap, cliprect);
+		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x400);
 	}
 	return 0;
 }
@@ -984,7 +950,7 @@ static const gfx_layout layout_16x16x5 =
 	RGN_FRAC(1,5),
 	5,
 	{ RGN_FRAC(2,5),RGN_FRAC(3,5),RGN_FRAC(1,5),RGN_FRAC(4,5),RGN_FRAC(0,5) },
-	{ 7,6,5,4,3,2,1,0,135,134,133,132,131,130,129,128 },
+	{ 128,129,130,131,132,133,134,135, 0,1,2,3,4,5,6,7, },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
 	32*8
 };
@@ -1060,6 +1026,13 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(nmg5)
+
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 1);
+	decospr_device::set_is_bootleg(*device, true);
+	decospr_device::set_flipallx(*device, 1);
+	decospr_device::set_offsets(*device, 0,8);
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
