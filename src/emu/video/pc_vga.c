@@ -129,7 +129,12 @@ static struct
 		UINT8 *data;
 		UINT8 latch[4];
 	} gc;
-	struct { UINT8 index, data[0x15]; int state; } attribute;
+
+	struct
+	{
+		UINT8 index, data[0x15]; int state;
+		UINT8 prot_bit;
+	} attribute;
 
 
 	struct {
@@ -166,33 +171,27 @@ static struct
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
-#define LINES_HELPER ( (vga.crtc.data[0x12] \
-				|((vga.crtc.data[7]&2)<<7) \
-				|((vga.crtc.data[7]&0x40)<<3))+1 )
 //#define TEXT_LINES (LINES_HELPER)
-#define LINES (LINES_HELPER)
-#define TEXT_LINES (LINES_HELPER >> ((vga.crtc.data[9]&0x80) ? 1 : 0))
+#define LINES (vga.crtc.vert_disp_end+1)
+#define TEXT_LINES (vga.crtc.vert_disp_end+1)
 
-#define GRAPHIC_MODE (vga.gc.data[6]&1) /* else textmodus */
+#define GRAPHIC_MODE (vga.gc.data[6]&1) /* else text mode */
 
-#define EGA_COLUMNS (vga.crtc.data[1]+1)
+#define EGA_COLUMNS (vga.crtc.horz_disp_end+1)
 #define EGA_START_ADDRESS (vga.crtc.start_addr)
 #define EGA_LINE_LENGTH (vga.crtc.offset<<1)
 
-#define VGA_COLUMNS (vga.crtc.data[1]+1)
+#define VGA_COLUMNS (vga.crtc.horz_disp_end+1)
 #define VGA_START_ADDRESS (vga.crtc.start_addr)
 #define VGA_LINE_LENGTH (vga.crtc.offset<<3)
 
 #define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
 
-#define TEXT_COLUMNS (vga.crtc.data[1]+1)
+#define TEXT_COLUMNS (vga.crtc.horz_disp_end+1)
 #define TEXT_START_ADDRESS (vga.crtc.start_addr<<3)
 #define TEXT_LINE_LENGTH (vga.crtc.offset<<1)
 
-#define TEXT_COPY_9COLUMN(ch) ((ch>=192)&&(ch<=223)&&(vga.attribute.data[0x10]&4))
-
-#define FONT1 (  ((vga.sequencer.data[3]&0x3)    |((vga.sequencer.data[3]&0x10)<<2))*0x2000 )
-#define FONT2 ( (((vga.sequencer.data[3]&0xc)>>2)|((vga.sequencer.data[3]&0x20)<<3))*0x2000 )
+#define TEXT_COPY_9COLUMN(ch) (((ch & 0xe0) == 0xc0)&&(vga.attribute.data[0x10]&4))
 
 
 /***************************************************************************
@@ -226,8 +225,9 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 	UINT8 bits;
 	UINT32 font_base;
 	UINT32 *bitmapline;
-	int width=CHAR_WIDTH, height=CRTC_CHAR_HEIGHT;
+	int width=CHAR_WIDTH, height=CRTC_CHAR_HEIGHT * (vga.crtc.scan_doubling + 1);
 	int pos, line, column, mask, w, h, addr;
+	UINT8 blink_en,fore_col,back_col;
 	pen_t pen;
 
 	if(vga.crtc.cursor_enable)
@@ -244,18 +244,23 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 			attr = vga.memory[(pos<<1) + 1];
 			font_base = 0x40000+(ch<<5);
 			font_base += ((attr & 8) ? vga.sequencer.char_sel.B : vga.sequencer.char_sel.A)*0x2000;
+			blink_en = (vga.attribute.data[0x10]&8&&machine.primary_screen->frame_number() & 0x20) ? attr & 0x80 : 0;
+
+			fore_col = attr & 0xf;
+			back_col = (attr & 0x70) >> 4;
+			back_col |= (vga.attribute.data[0x10]&8) ? 0 : ((attr & 0x80) >> 4);
 
 			for (h = MAX(-line, 0); (h < height) && (line+h < MIN(TEXT_LINES, bitmap.height())); h++)
 			{
 				bitmapline = &bitmap.pix32(line+h);
-				bits = vga.memory[font_base+(h<<0)];
+				bits = vga.memory[font_base+(h>>(vga.crtc.scan_doubling))];
 
 				for (mask=0x80, w=0; (w<width)&&(w<8); w++, mask>>=1)
 				{
 					if (bits&mask)
-						pen = vga.pens[attr & 0x0f];
+						pen = vga.pens[blink_en ? back_col : fore_col];
 					else
-						pen = vga.pens[(attr & 0xf0) >> 4];
+						pen = vga.pens[back_col];
 
 					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
 						continue;
@@ -266,9 +271,9 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 				{
 					/* 9 column */
 					if (TEXT_COPY_9COLUMN(ch)&&(bits&1))
-						pen = vga.pens[attr & 0x0f];
+						pen = vga.pens[blink_en ? back_col : fore_col];
 					else
-						pen = vga.pens[(attr & 0xf0) >> 4];
+						pen = vga.pens[back_col];
 
 					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
 						continue;
@@ -498,14 +503,14 @@ static void svga_vh_rgb8(running_machine &machine, bitmap_rgb32 &bitmap, const r
 			addr %= vga.svga_intf.vram_size;
 			for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x8)
 			{
-				if(pos + 0x08 > 0x80000)
+				if(pos + 0x08 > 0x100000)
 					return;
 
 				for(xi=0;xi<8;xi++)
 				{
 					if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 						continue;
-					bitmapline[c+xi] = machine.pens[vga.memory[(pos+(xi))|0x80000]];
+					bitmapline[c+xi] = machine.pens[vga.memory[(pos+(xi))]];
 				}
 			}
 		}
@@ -572,8 +577,6 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 			//proc = vga_vh_text;
 			//*height = TEXT_LINES;
 			//*width = TEXT_COLUMNS * CHAR_WIDTH;
-			if(vga.crtc.scan_doubling)
-				popmessage("Text mode with double scan enabled, contact MAMEdev");
 
 			return TEXT_MODE;
 		}
@@ -867,8 +870,6 @@ static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 	}
 }
 
-#include "debugger.h"
-
 static void seq_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 {
 	switch(index)
@@ -993,13 +994,14 @@ READ8_HANDLER( vga_port_03c0_r )
 			break;
 		case 1:
 			if( vga.attribute.index & 0x20) // protection bit
-				data = 0xff; // TODO: actually undefined
+				data = 0xff;
 			else if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
 				data=vga.attribute.data[vga.attribute.index&0x1f];
 			break;
 
 		case 2:
-			data = 0;
+			// TODO: in VGA bit 4 is actually always on?
+			data = 0x60; // is VGA
 			switch ((vga.miscellaneous_output>>2)&3)
 			{
 				case 3:
@@ -1039,10 +1041,7 @@ READ8_HANDLER( vga_port_03c0_r )
 			break;
 
 		case 7:
-			if (vga.dac.read)
-				data = 0;
-			else
-				data = 3;
+			data = (vga.dac.read) ? 3 : 0;
 			break;
 
 		case 8:
@@ -1116,6 +1115,26 @@ WRITE8_HANDLER( vga_port_03b0_w )
 		vga_crtc_w(space, offset, data);
 }
 
+static void attribute_reg_write(UINT8 index, UINT8 data)
+{
+	if((index & 0x30) == 0)
+	{
+		vga.attribute.data[index & 0x1f] = data & 0x3f;
+	}
+	else
+	{
+		switch(index & 0x1f)
+		{
+			/* TODO: intentional dirtiness, variable names to be properly changed */
+			case 0x10: vga.attribute.data[0x10] = data; break;
+			case 0x11: vga.attribute.data[0x11] = data; break;
+			case 0x12: vga.attribute.data[0x12] = data; break;
+			case 0x13: vga.attribute.data[0x13] = data; break;
+			case 0x14: vga.attribute.data[0x14] = data; break;
+		}
+	}
+}
+
 WRITE8_HANDLER(vga_port_03c0_w)
 {
 	if (LOG_ACCESSES)
@@ -1129,9 +1148,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		}
 		else
 		{
-			if(!(vga.attribute.index & 0x20)) // protection bit
-				if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
-					vga.attribute.data[vga.attribute.index&0x1f]=data;
+			attribute_reg_write(vga.attribute.index,data);
 		}
 		vga.attribute.state=!vga.attribute.state;
 		break;
@@ -1191,18 +1208,6 @@ WRITE8_HANDLER(vga_port_03c0_w)
 			vga.dac.dirty=1;
 			if (vga.dac.state==3) {
 				vga.dac.state=0; vga.dac.write_index++;
-#if 0
-				if (vga.dac.write_index==64) {
-					int i;
-					mame_printf_debug("start palette\n");
-					for (i=0;i<64;i++) {
-						mame_printf_debug(" 0x%.2x, 0x%.2x, 0x%.2x,\n",
-							   vga.dac.color[i].red*4,
-							   vga.dac.color[i].green*4,
-							   vga.dac.color[i].blue*4);
-					}
-				}
-#endif
 			}
 		}
 		break;
@@ -1282,6 +1287,7 @@ READ8_HANDLER(vga_mem_r)
 		vga.gc.latch[1]=vga.memory[(offset)+0x20000];
 		vga.gc.latch[2]=vga.memory[(offset)+0x40000];
 		vga.gc.latch[3]=vga.memory[(offset)+0x60000];
+
 		if (vga.gc.data[5]&8) {
 			data=0;
 			if (!(ega_bitplane_to_packed(vga.gc.latch, 0)^(vga.gc.data[2]&0xf&~vga.gc.data[7]))) data|=1;
@@ -1320,7 +1326,7 @@ READ8_HANDLER(vga_mem_r)
 
 WRITE8_HANDLER(vga_mem_w)
 {
-	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask  the offset.
+	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask the offset.
 	switch((vga.gc.data[6] >> 2) & 0x03)
 	{
 		case 0: break;
@@ -1652,7 +1658,7 @@ READ8_HANDLER( tseng_mem_r )
 	if(svga.rgb8_en)
 	{
 		offset &= 0xffff;
-		return vga.memory[(offset+svga.bank_r*0x10000) | 0x80000];
+		return vga.memory[(offset+svga.bank_r*0x10000)];
 	}
 
 	return vga_mem_r(space,offset);
@@ -1663,7 +1669,7 @@ WRITE8_HANDLER( tseng_mem_w )
 	if(svga.rgb8_en)
 	{
 		offset &= 0xffff;
-		vga.memory[(offset+svga.bank_w*0x10000) | 0x80000] = data;
+		vga.memory[(offset+svga.bank_w*0x10000)] = data;
 	}
 	else
 		vga_mem_w(space,offset,data);
