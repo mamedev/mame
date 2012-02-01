@@ -474,9 +474,6 @@ public:
 	// getters
 	device_t *current() const { return m_current; }
 
-	// setters
-	void set_current(device_t &current) { m_current = &current; }
-
 	// reset and return first item
 	device_t *first()
 	{
@@ -571,9 +568,6 @@ public:
 	// getters
 	_DeviceClass *current() const { return downcast<_DeviceClass *>(m_iterator.current()); }
 
-	// setters
-	void set_current(_DeviceClass &current) { m_iterator.set_current(current); }
-
 	// reset and return first item
 	_DeviceClass *first()
 	{
@@ -641,9 +635,6 @@ public:
 
 	// getters
 	_InterfaceClass *current() const { return m_current; }
-
-	// setters
-	void set_current(_InterfaceClass &current) { m_current = &current; m_iterator.set_current(current.device()); }
 
 	// reset and return first item
 	_InterfaceClass *first()
