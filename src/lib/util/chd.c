@@ -3093,7 +3093,7 @@ static chd_error flac_codec_compress(chd_file *chd, const void *src, UINT32 *len
 	ok &= FLAC__stream_encoder_set_sample_rate(encoder, 44100);
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, 0);
 	ok &= FLAC__stream_encoder_set_streamable_subset(encoder, false);
-	ok &= FLAC__stream_encoder_set_blocksize(encoder, ((CD_MAX_SECTOR_DATA)*CD_FRAMES_PER_HUNK) );
+	ok &= FLAC__stream_encoder_set_blocksize(encoder, ((CD_MAX_SECTOR_DATA)*CD_FRAMES_PER_HUNK)/4 ); // /4 because this is in SAMPLES, not bytes
 
 	if (!ok)
 	{
