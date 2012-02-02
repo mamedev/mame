@@ -1392,6 +1392,7 @@ src/ldplayer/layout/pr8210.lay svneol=native#text/plain
 src/ldplayer/ldplayer.c svneol=native#text/plain
 src/ldplayer/ldplayer.lst svneol=native#text/plain
 src/ldplayer/ldplayer.mak svneol=native#text/plain
+src/ldplayer/ldplayer_dev.lst svneol=native#text/plain
 src/lib/cothread/amd64.c svneol=native#text/plain
 src/lib/cothread/doc/amd64.asm svneol=native#text/plain
 src/lib/cothread/doc/style.css svneol=native#text/plain
