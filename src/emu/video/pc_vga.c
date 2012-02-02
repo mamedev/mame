@@ -162,6 +162,8 @@ static struct
 {
 	UINT8 bank_r,bank_w;
 	UINT8 rgb8_en;
+	UINT8 rgb15_en;
+	UINT8 id;
 }svga;
 
 #define REG(x) vga.crtc.data[x]
@@ -197,6 +199,12 @@ static struct
 #define TEXT_LINE_LENGTH (vga.crtc.offset<<1)
 
 #define TEXT_COPY_9COLUMN(ch) (((ch & 0xe0) == 0xc0)&&(vga.attribute.data[0x10]&4))
+
+// Special values for SVGA Trident - Mode Vesa 110h
+#define TLINES (LINES)
+#define TGA_COLUMNS (EGA_COLUMNS)
+#define TGA_START_ADDRESS (vga.crtc.start_addr<<2)
+#define TGA_LINE_LENGTH (vga.crtc.offset<<3)
 
 
 /***************************************************************************
@@ -522,6 +530,43 @@ static void svga_vh_rgb8(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	}
 }
 
+static void svga_vh_rgb15(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+ 	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
+ 	#define IV 0xff000000
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int xi;
+	int yi;
+	int xm;
+
+ 	int pos, line, column, c, addr, curr_addr;
+
+ 	UINT32 *bitmapline;
+ 	UINT16 mask_comp;
+
+ 	/* line compare is screen sensitive */
+ 	mask_comp = 0xff | (TLINES & 0x300);
+ 	curr_addr = 0;
+ 	yi=0;
+ 	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
+ 	{
+ 		if(line>500) return;
+ 		bitmapline = &bitmap.pix32(line);
+ 		addr %= vga.svga_intf.vram_size;
+ 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
+ 		{
+ 			if(pos + 0x10 > vga.svga_intf.vram_size)
+ 				return;
+ 			for(xi=0,xm=0;xi<8;xi++,xm+=2)
+			{
+				if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+					continue;
+				bitmapline[c+xi] = IV|(MV(pos+xm)&0x7c00)<<9 |(MV(pos+xm)&0x3e0)<<6|(MV(pos+xm)&0x1f)<<3;
+			}
+ 		}
+ 	}
+}
+
 enum
 {
 	SCREEN_OFF = 0,
@@ -531,6 +576,7 @@ enum
 	CGA_MODE,
 	MONO_MODE,
 	RGB8_MODE,
+	RGB15_MODE,
 	SVGA_HACK
 };
 
@@ -577,6 +623,10 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 		{
 			return RGB8_MODE;
 		}
+		else if (svga.rgb15_en&0x30)
+		{
+			return RGB15_MODE;
+ 		}
 		else if (!GRAPHIC_MODE)
 		{
 			//proc = vga_vh_text;
@@ -632,6 +682,7 @@ SCREEN_UPDATE_RGB32( pc_video )
 		case CGA_MODE:     vga_vh_cga (screen.machine(), bitmap, cliprect); break;
 		case MONO_MODE:    vga_vh_mono(screen.machine(), bitmap, cliprect); break;
 		case RGB8_MODE:    svga_vh_rgb8(screen.machine(), bitmap, cliprect); break;
+		case RGB15_MODE:   svga_vh_rgb15(screen.machine(), bitmap, cliprect); break;
 		case SVGA_HACK:    vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
 	}
 
@@ -1718,4 +1769,181 @@ WRITE8_HANDLER( tseng_mem_w )
 	}
 	else
 		vga_mem_w(space,offset,data);
+}
+
+/******************************************
+
+Trident implementation
+
+******************************************/
+
+void pc_svga_trident_io_init(running_machine &machine, address_space *mem_space, offs_t mem_offset, address_space *io_space, offs_t port_offset)
+{
+	int buswidth;
+	UINT64 mask = 0;
+
+	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			mask = 0;
+			break;
+
+		case 16:
+			mask = 0xffff;
+			break;
+
+		case 32:
+			mask = 0xffffffff;
+			break;
+
+		case 64:
+			mask = -1;
+			break;
+
+		default:
+			fatalerror("VGA: Bus width %d not supported", buswidth);
+			break;
+	}
+	io_space->install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
+	io_space->install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(trident_03c0_r), FUNC(trident_03c0_w), mask);
+	io_space->install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(trident_03d0_r), FUNC(trident_03d0_w), mask);
+
+	mem_space->install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(trident_mem_r), FUNC(trident_mem_w), mask);
+
+ 	// D3h = TGUI9660XGi
+	svga.id = 0xd3; // TODO: hardcoded for California Chase
+}
+
+static UINT8 trident_seq_reg_read(running_machine &machine, UINT8 index)
+{
+	UINT8 res;
+
+	res = 0xff;
+
+	if(index <= 0x04)
+		res = vga.sequencer.data[index];
+	else
+	{
+		switch(index)
+		{
+			case 0x0d:
+				res = svga.rgb15_en;
+				break;
+		}
+	}
+
+	return res;
+}
+
+static void trident_seq_reg_write(running_machine &machine, UINT8 index, UINT8 data)
+{
+	if(index <= 0x04)
+	{
+		vga.sequencer.data[vga.sequencer.index] = data;
+		seq_reg_write(machine,vga.sequencer.index,data);
+		recompute_params(machine);
+	}
+	else
+	{
+		switch(index)
+		{
+			case 0x0d:
+	 			svga.rgb15_en = data & 0x30; // TODO: doesn't match documentation
+				break;
+		}
+	}
+}
+
+
+READ8_HANDLER(trident_03c0_r)
+{
+	UINT8 res;
+
+	switch(offset)
+	{
+		case 0x05:
+			res = trident_seq_reg_read(space->machine(),vga.sequencer.index);
+			break;
+		default:
+			res = vga_port_03c0_r(space,offset);
+			break;
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(trident_03c0_w)
+{
+	switch(offset)
+	{
+		case 0x05:
+			trident_seq_reg_write(space->machine(),vga.sequencer.index,data);
+			break;
+		default:
+			vga_port_03c0_w(space,offset,data);
+			break;
+	}
+}
+
+
+READ8_HANDLER(trident_03d0_r)
+{
+	UINT8 res = 0xff;
+
+	if (CRTC_PORT_ADDR == 0x3d0)
+	{
+		switch(offset)
+		{
+			case 8:
+				res = svga.bank_w & 0x1f; // TODO: a lot more complex than this
+				break;
+			default:
+				res = vga_port_03d0_r(space,offset);
+				break;
+		}
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(trident_03d0_w)
+{
+	if (CRTC_PORT_ADDR == 0x3d0)
+	{
+		switch(offset)
+		{
+			case 8:
+				svga.bank_w = data & 0x1f; // TODO: a lot more complex than this
+				break;
+			default:
+				vga_port_03d0_w(space,offset,data);
+				break;
+		}
+	}
+}
+
+READ8_HANDLER( trident_mem_r )
+{
+	if (svga.rgb15_en & 0x30)
+	{
+		int data;
+		if(svga.bank_w>0x09) return 0;
+		data=vga.memory[offset + (svga.bank_w*0x10000)];
+		return data;
+	}
+
+	return vga_mem_r(space,offset);
+}
+
+WRITE8_HANDLER( trident_mem_w )
+{
+	if (svga.rgb15_en & 0x30)
+	{
+		if (svga.bank_w>0x09)return;
+		vga.memory[offset + (svga.bank_w*0x10000)]= data;
+		return;
+ 	}
+
+	vga_mem_w(space,offset,data);
 }
