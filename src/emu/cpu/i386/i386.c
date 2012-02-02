@@ -62,6 +62,7 @@ static void i386_load_protected_mode_segment(i386_state *cpustate, I386_SREG *se
 	if (seg->flags & 0x8000)
 		seg->limit = (seg->limit << 12) | 0xfff;
 	seg->d = (seg->flags & 0x4000) ? 1 : 0;
+	seg->valid = (seg->selector & ~3)?(true):(false);
 }
 
 static void i386_load_call_gate(i386_state* cpustate, I386_CALL_GATE *gate)
@@ -107,12 +108,14 @@ static void i386_load_segment_descriptor(i386_state *cpustate, int segment )
 			cpustate->sreg[segment].limit = 0xffff;
 			cpustate->sreg[segment].flags = (segment == CS) ? 0x009a : 0x0092;
 			cpustate->sreg[segment].d = 0;
+			cpustate->sreg[segment].valid = true;
 		}
 	}
 	else
 	{
 		cpustate->sreg[segment].base = cpustate->sreg[segment].selector << 4;
 		cpustate->sreg[segment].d = 0;
+		cpustate->sreg[segment].valid = true;
 
 		if( segment == CS && !cpustate->performed_intersegment_jump )
 			cpustate->sreg[segment].base |= 0xfff00000;
@@ -483,7 +486,6 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 		{
 			cpustate->sreg[reg].selector = selector;
 			i386_load_segment_descriptor(cpustate, reg );
-			// TODO: mark segment as invalid
 			return;
 		}
 
@@ -1483,7 +1485,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 	}
 	if(selector & 0x04)
 	{
-		if((selector & ~0x07) >= cpustate->ldtr.limit)
+		if((selector & ~0x07) > cpustate->ldtr.limit)
 		{
 			logerror("CALL: Selector is past LDT limit.\n");
 			FAULT(FAULT_GP,selector & ~0x03)  // #GP(selector)
@@ -1491,7 +1493,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 	}
 	else
 	{
-		if((selector & ~0x07) >= cpustate->gdtr.limit)
+		if((selector & ~0x07) > cpustate->gdtr.limit)
 		{
 			logerror("CALL: Selector is past GDT limit.\n");
 			FAULT(FAULT_GP,selector & ~0x03)  // #GP(selector)
@@ -3006,10 +3008,12 @@ static CPU_RESET( i386 )
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
 	cpustate->sreg[CS].limit	= 0xffff;
+	cpustate->sreg[CS].valid	= true;
 
 	cpustate->sreg[DS].base = cpustate->sreg[ES].base = cpustate->sreg[FS].base = cpustate->sreg[GS].base = cpustate->sreg[SS].base = 0x00000000;
 	cpustate->sreg[DS].limit = cpustate->sreg[ES].limit = cpustate->sreg[FS].limit = cpustate->sreg[GS].limit = cpustate->sreg[SS].limit = 0xffff;
 	cpustate->sreg[DS].flags = cpustate->sreg[ES].flags = cpustate->sreg[FS].flags = cpustate->sreg[GS].flags = cpustate->sreg[SS].flags = 0x0092;
+	cpustate->sreg[DS].valid = cpustate->sreg[ES].valid = cpustate->sreg[FS].valid = cpustate->sreg[GS].valid = cpustate->sreg[SS].valid =true;
 
 	cpustate->idtr.base = 0;
 	cpustate->idtr.limit = 0x3ff;

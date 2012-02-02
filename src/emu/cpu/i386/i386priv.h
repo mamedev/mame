@@ -170,6 +170,7 @@ typedef struct {
 	UINT32 base;
 	UINT32 limit;
 	int d;		// Operand size
+	bool valid;
 } I386_SREG;
 
 typedef struct
@@ -395,14 +396,14 @@ INLINE UINT32 i386_translate(i386_state *cpustate, int segment, UINT32 ip, int r
 	// TODO: segment limit access size, execution permission, handle exception thrown from exception handler
 	if(PROTECTED_MODE && !V8086_MODE && (rwn != -1))
 	{
-		if(!(cpustate->sreg[segment].selector & ~3))
-			FAULT_THROW(FAULT_GP, 0);
+		if(!(cpustate->sreg[segment].valid))
+			FAULT_THROW((segment==SS)?FAULT_SS:FAULT_GP, 0);
 		if(i386_limit_check(cpustate, segment, ip))
-			FAULT_THROW(FAULT_GP, 0);
+			FAULT_THROW((segment==SS)?FAULT_SS:FAULT_GP, 0);
 		if((rwn == 0) && ((cpustate->sreg[segment].flags & 8) && !(cpustate->sreg[segment].flags & 2)))
-			FAULT_THROW(FAULT_GP, 0);
+			FAULT_THROW((segment==SS)?FAULT_SS:FAULT_GP, 0);
 		if((rwn == 1) && ((cpustate->sreg[segment].flags & 8) || !(cpustate->sreg[segment].flags & 2)))
-			FAULT_THROW(FAULT_GP, 0);
+			FAULT_THROW((segment==SS)?FAULT_SS:FAULT_GP, 0);
 	}
 	return cpustate->sreg[segment].base + ip;
 }
