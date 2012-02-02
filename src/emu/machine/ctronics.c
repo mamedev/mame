@@ -7,6 +7,9 @@
 #include "emu.h"
 #include "ctronics.h"
 
+//**************************************************************************
+//  CENTRONICS SLOT DEVICE
+//**************************************************************************
 
 // device type definition
 const device_type CENTRONICS = &device_creator<centronics_device>;
@@ -16,7 +19,9 @@ const device_type CENTRONICS = &device_creator<centronics_device>;
 //-------------------------------------------------
 
 centronics_device::centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CENTRONICS, "Centronics", tag, owner, clock)
+    : device_t(mconfig, CENTRONICS, "Centronics", tag, owner, clock),
+	  device_slot_interface(mconfig, *this),
+	  m_dev(NULL)
 {
 
 }
@@ -49,6 +54,8 @@ void centronics_device::device_config_complete()
 		memset(&m_out_busy_func, 0, sizeof(m_out_busy_func));
 		memset(&m_out_not_busy_func, 0, sizeof(m_out_not_busy_func));
 	}
+
+	m_dev = dynamic_cast<device_centronics_peripheral_interface *>(get_card_device());
 }
 
 //-------------------------------------------------
@@ -57,27 +64,10 @@ void centronics_device::device_config_complete()
 
 void centronics_device::device_start()
 {
-	/* set some initial values */
-	m_pe = FALSE;
-	m_fault = FALSE;
-	m_busy = TRUE;
-	m_strobe = TRUE;
-
-	/* get printer device */
-	m_printer = subdevice<printer_image_device>("printer");
-
 	/* resolve callbacks */
 	m_out_ack_func.resolve(m_out_ack_cb, *this);
 	m_out_busy_func.resolve(m_out_busy_cb, *this);
 	m_out_not_busy_func.resolve(m_out_not_busy_cb, *this);
-
-	/* register for state saving */
-	save_item(NAME(m_auto_fd));
-	save_item(NAME(m_strobe));
-	save_item(NAME(m_busy));
-	save_item(NAME(m_ack));
-	save_item(NAME(m_data));
-
 }
 
 /*****************************************************************************
@@ -91,16 +81,50 @@ const centronics_interface standard_centronics =
 	DEVCB_NULL
 };
 
+//**************************************************************************
+//  DEVICE CENTRONICS PERIPHERAL INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_centronics_peripheral_interface - constructor
+//-------------------------------------------------
+
+device_centronics_peripheral_interface::device_centronics_peripheral_interface(const machine_config &mconfig, device_t &device)
+	: device_slot_card_interface(mconfig, device)
+{
+	/* set some initial values */
+	m_pe = FALSE;
+	m_fault = FALSE;
+	m_busy = TRUE;
+	m_strobe = TRUE;
+	m_data = 0x00;
+}
+
+
+//-------------------------------------------------
+//  ~device_centronics_peripheral_interface - destructor
+//-------------------------------------------------
+
+device_centronics_peripheral_interface::~device_centronics_peripheral_interface()
+{
+}
+
+//**************************************************************************
+//  CENTRONICS PRINTER DEVICE
+//**************************************************************************
+
+// device type definition
+const device_type CENTRONICS_PRINTER = &device_creator<centronics_printer_device>;
 
 /*****************************************************************************
     PRINTER INTERFACE
 *****************************************************************************/
 const struct printer_interface centronics_printer_config =
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, centronics_device, printer_online)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, centronics_printer_device, printer_online)
 };
 
-static MACHINE_CONFIG_FRAGMENT( centronics )
+static MACHINE_CONFIG_FRAGMENT( centronics_printer )
 	MCFG_PRINTER_ADD("printer")
 	MCFG_DEVICE_CONFIG(centronics_printer_config)
 MACHINE_CONFIG_END
@@ -109,15 +133,23 @@ MACHINE_CONFIG_END
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
+//-------------------------------------------------
+//  centronics_printer_device - constructor
+//-------------------------------------------------
 
+centronics_printer_device::centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, CENTRONICS_PRINTER, "Centronics Printer", tag, owner, clock),
+	  device_centronics_peripheral_interface( mconfig, *this )
+{
+}
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor centronics_device::device_mconfig_additions() const
+machine_config_constructor centronics_printer_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( centronics );
+	return MACHINE_CONFIG_NAME( centronics_printer );
 }
 
 
@@ -126,7 +158,7 @@ machine_config_constructor centronics_device::device_mconfig_additions() const
     sets us busy when the printer goes offline
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(centronics_device::printer_online)
+WRITE_LINE_MEMBER(centronics_printer_device::printer_online)
 {
 	/* when going online, set PE and FAULT high and BUSY low */
 	m_pe = state;
@@ -136,20 +168,20 @@ WRITE_LINE_MEMBER(centronics_device::printer_online)
 
 static TIMER_CALLBACK( timer_ack_callback )
 {
-    centronics_device *cent = reinterpret_cast<centronics_device *>(ptr);
-	cent->ack_callback(param);
+    centronics_printer_device *printer = reinterpret_cast<centronics_printer_device *>(ptr);
+	printer->ack_callback(param);
 }
 
 static TIMER_CALLBACK( timer_busy_callback )
 {
-    centronics_device *cent = reinterpret_cast<centronics_device *>(ptr);
-	cent->busy_callback(param);
+    centronics_printer_device *printer = reinterpret_cast<centronics_printer_device *>(ptr);
+	printer->busy_callback(param);
 }
 
-void centronics_device::ack_callback(UINT8 param)
+void centronics_printer_device::ack_callback(UINT8 param)
 {
 	/* signal change */
-	m_out_ack_func(param);
+	m_owner->out_ack(param);
 	m_ack = param;
 
 	if (param == FALSE)
@@ -163,11 +195,11 @@ void centronics_device::ack_callback(UINT8 param)
 }
 
 
-void centronics_device::busy_callback(UINT8 param)
+void centronics_printer_device::busy_callback(UINT8 param)
 {
 	/* signal change */
-	m_out_busy_func(param);
-	m_out_not_busy_func(!param);
+	m_owner->out_busy(param);
+	m_owner->out_not_busy(!param);
 	m_busy = param;
 
 	if (param == TRUE)
@@ -182,26 +214,32 @@ void centronics_device::busy_callback(UINT8 param)
 	}
 }
 
-
-/*-------------------------------------------------
-    set_line - helper to set individual bits
--------------------------------------------------*/
-
-void centronics_device::set_line(int line, int state)
+void centronics_printer_device::device_start()
 {
-	if (state)
-		m_data |= 1 << line;
-	else
-		m_data &= ~(1 << line);
+	m_owner = dynamic_cast<centronics_device *>(owner());
+
+	/* get printer device */
+	m_printer = subdevice<printer_image_device>("printer");
+	
+	/* register for state saving */
+	save_item(NAME(m_auto_fd));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_ack));
+	save_item(NAME(m_data));	
 }
 
+void centronics_printer_device::device_reset()
+{
+
+}
 
 /*-------------------------------------------------
     centronics_strobe_w - signal that data is
     ready
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( centronics_device::strobe_w )
+void centronics_printer_device::strobe_w(UINT8 state)
 {
 	/* look for a high -> low transition */
 	if (m_strobe == TRUE && state == FALSE && m_busy == FALSE)
@@ -219,9 +257,14 @@ WRITE_LINE_MEMBER( centronics_device::strobe_w )
     printer (centronics mode)
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( centronics_device::init_prime_w )
+void centronics_printer_device::init_prime_w(UINT8 state)
 {
 	/* reset printer if line is low */
 	if (state == FALSE)
 		device_reset();
 }
+
+
+SLOT_INTERFACE_START(centronics_printer)
+	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
+SLOT_INTERFACE_END
