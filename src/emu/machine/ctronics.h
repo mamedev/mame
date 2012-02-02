@@ -7,58 +7,89 @@
 #ifndef __CTRONICS_H__
 #define __CTRONICS_H__
 
-#include "devcb.h"
-
+#include "imagedev/printer.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _centronics_interface centronics_interface;
-struct _centronics_interface
+// ======================> centronics_interface
+struct centronics_interface
 {
-	int is_ibmpc;
-
-	devcb_write_line out_ack_func;
-	devcb_write_line out_busy_func;
-	devcb_write_line out_not_busy_func;
+	devcb_write_line m_out_ack_cb;
+	devcb_write_line m_out_busy_cb;
+	devcb_write_line m_out_not_busy_cb;
 };
 
+// ======================> centronics_device
+class centronics_device :	public device_t,
+								public centronics_interface
+{
+public:
+	// construction/destruction
+	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~centronics_device();
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+		
+	DECLARE_WRITE8_MEMBER( write ) { m_data = data; }
+	DECLARE_READ8_MEMBER( read ) { return m_data; }
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-WRITE8_DEVICE_HANDLER( centronics_data_w );
-READ8_DEVICE_HANDLER( centronics_data_r );
+	/* access to the individual bits */
+	DECLARE_WRITE_LINE_MEMBER( d0_w ) { set_line(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( d1_w ) { set_line(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( d2_w ) { set_line(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( d3_w ) { set_line(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( d4_w ) { set_line(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( d5_w ) { set_line(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( d6_w ) { set_line(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( d7_w ) { set_line(7, state); }
 
-/* access to the individual bits */
-WRITE_LINE_DEVICE_HANDLER( centronics_d0_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_d1_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_d2_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_d3_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_d4_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_d5_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_d6_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_d7_w );
+	DECLARE_WRITE_LINE_MEMBER( strobe_w );
+	DECLARE_WRITE_LINE_MEMBER( init_prime_w );
+	DECLARE_WRITE_LINE_MEMBER( autofeed_w ) { m_auto_fd = state; }
+	
+	DECLARE_READ_LINE_MEMBER( ack_r ) { return m_ack; }
+	DECLARE_READ_LINE_MEMBER( busy_r ){ return m_busy; }
+	DECLARE_READ_LINE_MEMBER( pe_r )  { return m_pe;  }
+	DECLARE_READ_LINE_MEMBER( not_busy_r ) { return !m_busy; }
+	DECLARE_READ_LINE_MEMBER( vcc_r ) { return TRUE; }
+	DECLARE_READ_LINE_MEMBER( fault_r ) { return m_fault; }	
+	
+	// for printer
+	DECLARE_WRITE_LINE_MEMBER(printer_online);
 
-WRITE_LINE_DEVICE_HANDLER( centronics_strobe_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_prime_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_init_w );
-WRITE_LINE_DEVICE_HANDLER( centronics_autofeed_w );
+	void ack_callback(UINT8 param);
+	void busy_callback(UINT8 param);
+protected:
+	// device-level overrides
+    virtual void device_config_complete();
+	virtual void device_start();
 
-READ_LINE_DEVICE_HANDLER( centronics_ack_r );
-READ_LINE_DEVICE_HANDLER( centronics_busy_r );
-READ_LINE_DEVICE_HANDLER( centronics_pe_r );
-READ_LINE_DEVICE_HANDLER( centronics_not_busy_r );
-READ_LINE_DEVICE_HANDLER( centronics_vcc_r );
-READ_LINE_DEVICE_HANDLER( centronics_fault_r );
+	void set_line(int line, int state);
+private:
+	printer_image_device *m_printer;
 
+	devcb_resolved_write_line m_out_ack_func;
+	devcb_resolved_write_line m_out_busy_func;
+	devcb_resolved_write_line m_out_not_busy_func;
+
+	UINT8 m_strobe;
+	UINT8 m_busy;
+	UINT8 m_ack;
+	UINT8 m_auto_fd;
+	UINT8 m_pe;
+	UINT8 m_fault;
+
+	UINT8 m_data;
+};
+
+// device type definition
+extern const device_type CENTRONICS;
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-DECLARE_LEGACY_DEVICE(CENTRONICS, centronics);
 
 #define MCFG_CENTRONICS_ADD(_tag, _intf) \
 	MCFG_DEVICE_ADD(_tag, CENTRONICS, 0) \
