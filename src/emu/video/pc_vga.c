@@ -1827,6 +1827,10 @@ static UINT8 trident_seq_reg_read(running_machine &machine, UINT8 index)
 	{
 		switch(index)
 		{
+			case 0x0b:
+				res = svga.id;
+				// TODO: new mode registers selected
+				break;
 			case 0x0d:
 				res = svga.rgb15_en;
 				break;
@@ -1848,6 +1852,9 @@ static void trident_seq_reg_write(running_machine &machine, UINT8 index, UINT8 d
 	{
 		switch(index)
 		{
+			case 0x0b:
+				// TODO: old mode registers selected
+				break;
 			case 0x0d:
 	 			svga.rgb15_en = data & 0x30; // TODO: doesn't match documentation
 				break;
@@ -1928,7 +1935,8 @@ READ8_HANDLER( trident_mem_r )
 	if (svga.rgb15_en & 0x30)
 	{
 		int data;
-		if(svga.bank_w>0x09) return 0;
+		if(offset & 0x10000)  // TODO: old reg mode actually CAN read to the upper bank
+			return 0;
 		data=vga.memory[offset + (svga.bank_w*0x10000)];
 		return data;
 	}
@@ -1940,7 +1948,8 @@ WRITE8_HANDLER( trident_mem_w )
 {
 	if (svga.rgb15_en & 0x30)
 	{
-		if (svga.bank_w>0x09)return;
+		if(offset & 0x10000) // TODO: old reg mode actually CAN write to the upper bank
+			return;
 		vga.memory[offset + (svga.bank_w*0x10000)]= data;
 		return;
  	}
