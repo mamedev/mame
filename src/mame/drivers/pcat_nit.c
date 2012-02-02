@@ -421,5 +421,5 @@ GAME( 1993, bonanza,    0,		   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image T
 GAME( 1993, bonanzar2,  bonanza,   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Bonanza (Revision 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1993, streetg,    0,		   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, streetg2,   0,		   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, streetg2,   0,		   pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", GAME_NO_SOUND )
+GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", GAME_NO_SOUND )
