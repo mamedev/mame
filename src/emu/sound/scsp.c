@@ -535,7 +535,7 @@ static void SCSP_Init(device_t *device, scsp_state *scsp, const scsp_interface *
 	scsp->MidiOutR=scsp->MidiOutW=0;
 
 	// get SCSP RAM
-	if (strcmp(device->tag(), "scsp") == 0 || strcmp(device->tag(), "scsp1") == 0)
+	if (strcmp(device->tag(), ":scsp") == 0 || strcmp(device->tag(), ":scsp1") == 0)
 	{
 		scsp->Master=1;
 	}
