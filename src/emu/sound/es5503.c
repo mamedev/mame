@@ -266,9 +266,16 @@ void es5503_device::device_reset()
 
 	for (int osc = 0; osc < 32; osc++)
 	{
+		oscillators[osc].freq = 0;
+		oscillators[osc].wtsize = 0;
+		oscillators[osc].control = 0;
+		oscillators[osc].vol = 0;
 		oscillators[osc].data = 0x80;
-		oscillators[osc].irqpend = 0;
+		oscillators[osc].wavetblpointer = 0;
+		oscillators[osc].wavetblsize = 0;
+		oscillators[osc].resolution = 0;
 		oscillators[osc].accumulator = 0;
+		oscillators[osc].irqpend = 0;
 	}
 
 	oscsenabled = 1;
