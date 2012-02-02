@@ -128,6 +128,11 @@ static struct
 		UINT8 index;
 		UINT8 *data;
 		UINT8 latch[4];
+		UINT8 color_compare;
+		UINT8 read_map_sel;
+		UINT8 read_mode;
+		UINT8 write_mode;
+		UINT8 color_dont_care;
 	} gc;
 
 	struct
@@ -1135,6 +1140,26 @@ static void attribute_reg_write(UINT8 index, UINT8 data)
 	}
 }
 
+static void gc_reg_write(running_machine &machine,UINT8 index,UINT8 data)
+{
+	switch(index)
+	{
+		case 0x02:
+			vga.gc.color_compare = data & 0xf;
+			break;
+		case 0x04:
+			vga.gc.read_map_sel = data & 3;
+			break;
+		case 0x05:
+			vga.gc.read_mode = (data & 8) >> 3;
+			vga.gc.write_mode = data & 3;
+			break;
+		case 0x07:
+			vga.gc.color_dont_care = data & 0xf;
+			break;
+	}
+}
+
 WRITE8_HANDLER(vga_port_03c0_w)
 {
 	if (LOG_ACCESSES)
@@ -1226,6 +1251,8 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		{
 			vga.gc.data[vga.gc.index] = data;
 		}
+
+		gc_reg_write(space->machine(),vga.gc.index,data);
 		break;
 	}
 }
@@ -1288,19 +1315,37 @@ READ8_HANDLER(vga_mem_r)
 		vga.gc.latch[2]=vga.memory[(offset)+0x40000];
 		vga.gc.latch[3]=vga.memory[(offset)+0x60000];
 
-		if (vga.gc.data[5]&8) {
+		if (vga.gc.read_mode)
+		{
+			UINT8 byte,layer;
+			UINT8 fill_latch;
 			data=0;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 0)^(vga.gc.data[2]&0xf&~vga.gc.data[7]))) data|=1;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 1)^(vga.gc.data[2]&0xf&~vga.gc.data[7]))) data|=2;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 2)^(vga.gc.data[2]&0xf&~vga.gc.data[7]))) data|=4;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 3)^(vga.gc.data[2]&0xf&~vga.gc.data[7]))) data|=8;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 4)^(vga.gc.data[2]&0xf&~vga.gc.data[7]))) data|=0x10;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 5)^(vga.gc.data[2]&0xf&~vga.gc.data[7]))) data|=0x20;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 6)^(vga.gc.data[2]&0xf&~vga.gc.data[7]))) data|=0x40;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 7)^(vga.gc.data[2]&0xf&~vga.gc.data[7]))) data|=0x80;
-		} else {
-			data=vga.gc.latch[vga.gc.data[4]&3];
+			#if 0
+			if (!(ega_bitplane_to_packed(vga.gc.latch, 0)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=1;
+			if (!(ega_bitplane_to_packed(vga.gc.latch, 1)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=2;
+			if (!(ega_bitplane_to_packed(vga.gc.latch, 2)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=4;
+			if (!(ega_bitplane_to_packed(vga.gc.latch, 3)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=8;
+			if (!(ega_bitplane_to_packed(vga.gc.latch, 4)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=0x10;
+			if (!(ega_bitplane_to_packed(vga.gc.latch, 5)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=0x20;
+			if (!(ega_bitplane_to_packed(vga.gc.latch, 6)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=0x40;
+			if (!(ega_bitplane_to_packed(vga.gc.latch, 7)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=0x80;
+			#endif
+
+			for(byte=0;byte<8;byte++)
+			{
+				fill_latch = 0;
+				for(layer=0;layer<4;layer++)
+				{
+					if(vga.gc.latch[layer] & 1 << byte)
+						fill_latch |= 1 << layer;
+				}
+				fill_latch &= vga.gc.color_dont_care;
+				if(fill_latch == vga.gc.color_compare)
+					data |= 1 << byte;
+			}
 		}
+		else
+			data=vga.gc.latch[vga.gc.read_map_sel];
 
 		return data;
 	}
