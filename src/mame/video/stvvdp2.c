@@ -6588,7 +6588,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 					{
 						if ( pix & ~sprite_shadow )
 						{
-							bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
+							bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
 						}
 					}
 					else
@@ -6599,7 +6599,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 							/*shadow - in reality, we should check from what layer pixel beneath comes...*/
 							if ( STV_VDP2_SDCTL & 0x3f )
 							{
-								bitmap_line[x] = (bitmap_line[x] & ~0x421) >> 1;
+								bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
 							}
 							/* note that when shadows are disabled, "shadow" palette entries are not drawn */
 						} else if ( pix )
