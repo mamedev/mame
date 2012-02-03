@@ -2647,8 +2647,8 @@ ROM_END
 
 ROM_START( tektagtac )
 	ROM_REGION32_LE( 0x00400000, "user1", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "teg2verc.2e",  0x0000000, 0x200000, CRC(c6da0717) SHA1(9e01ae64710d85eb9899d6fa6fd0a2152aee8c11) ) /* Modified to work with alt romboard? */
-	ROM_LOAD16_BYTE( "teg2verc.2j",  0x0000001, 0x200000, CRC(25a1d2ff) SHA1(529a11a1bbb8655534d7ec371f1c09e9e387ed11) )
+	ROM_LOAD16_BYTE( "teg2verc1.2e",  0x0000000, 0x200000, CRC(c6da0717) SHA1(9e01ae64710d85eb9899d6fa6fd0a2152aee8c11) ) /* Modified to work with alt romboard? */
+	ROM_LOAD16_BYTE( "teg2verc1.2j",  0x0000001, 0x200000, CRC(25a1d2ff) SHA1(529a11a1bbb8655534d7ec371f1c09e9e387ed11) )
 
 	ROM_REGION32_LE( 0x3800000, "user2", 0 ) /* main data */
 	ROM_LOAD32_WORD( "teg1rom0e.9",  0x0000000, 0x800000, CRC(c962a373) SHA1(d662dbd89ef62c5ac3150a018fc2d35ef2ee94ac) )
