@@ -1820,7 +1820,7 @@ void copybitmap_trans(bitmap_rgb32 &dest, bitmap_rgb32 &src, int flipx, int flip
 /*-------------------------------------------------
     copyscrollbitmap - copy from one bitmap to
     another, copying all unclipped pixels, and
-    applying scrolling to one or more rows/colums
+    applying scrolling to one or more rows/columns
 -------------------------------------------------*/
 
 void copyscrollbitmap(bitmap_ind16 &dest, bitmap_ind16 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect)
@@ -1842,7 +1842,7 @@ void copyscrollbitmap(bitmap_rgb32 &dest, bitmap_rgb32 &src, UINT32 numrows, con
     copyscrollbitmap_trans - copy from one bitmap
     to another, copying all unclipped pixels
     except those that match transpen, and applying
-    scrolling to one or more rows/colums
+    scrolling to one or more rows/columns
 -------------------------------------------------*/
 
 template<class _BitmapClass>

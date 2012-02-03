@@ -359,7 +359,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 			srcy = vf + ((state->m_bg_position << 1) ^ 0xfff) + 1;
 			src = &pixmap.pix16(srcy & ymask);
 
-			/* loop over visible colums */
+			/* loop over visible columns */
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				/* start with HF = flipped H signals */

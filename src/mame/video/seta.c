@@ -69,7 +69,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
                             [ Floating Tilemap ]
 
-    There's a floating tilemap made of vertical colums composed of 2x16
+    There's a floating tilemap made of vertical columns composed of 2x16
     "sprites". Each 32 consecutive "sprites" define a column.
 
     For column I:

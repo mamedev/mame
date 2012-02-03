@@ -571,7 +571,7 @@ private:
 
 	// scroll information
 	UINT32						m_scrollrows;			// number of independently scrolled rows
-	UINT32						m_scrollcols;			// number of independently scrolled colums
+	UINT32						m_scrollcols;			// number of independently scrolled columns
 	INT32 *						m_rowscroll;			// array of rowscroll values
 	INT32 *						m_colscroll;			// array of colscroll values
 	INT32						m_dx;					// global horizontal scroll offset
