@@ -1763,8 +1763,8 @@ static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE(flashram_r, flashram_w)
 	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE(soundflash_r, soundflash_w)
 	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_READWRITE(comm_uart_r, comm_uart_w)
-	AM_RANGE(0x7e000000, 0x7e00003f) AM_DEVREADWRITE8("rtc", rtc65271_rtc_r, rtc65271_rtc_w, 0xffffffff)
-	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8("rtc", rtc65271_xram_r, rtc65271_xram_w, 0xffffffff)
+	AM_RANGE(0x7e000000, 0x7e00003f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, rtc_r, rtc_w, 0xffffffff)
+	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, xram_r, xram_w, 0xffffffff)
 	AM_RANGE(0x7e800000, 0x7e8000ff) AM_READWRITE(gcu0_r, gcu0_w)
 	AM_RANGE(0x7e800100, 0x7e8001ff) AM_READWRITE(gcu1_r, gcu1_w)
 	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE(atapi_command_r, atapi_command_w)
@@ -1967,6 +1967,11 @@ static MACHINE_RESET( firebeat )
 	cdda_set_cdrom(machine.device("cdda"), cd);
 }
 
+const rtc65271_interface firebeat_rtc =
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( firebeat, firebeat_state )
 
 	/* basic machine hardware */
@@ -1977,7 +1982,7 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_MACHINE_START(firebeat)
 	MCFG_MACHINE_RESET(firebeat)
 
-	MCFG_RTC65271_ADD("rtc", NULL)
+	MCFG_RTC65271_ADD("rtc", firebeat_rtc)
 
 	MCFG_FUJITSU_29F016A_ADD("flash0")
 	MCFG_FUJITSU_29F016A_ADD("flash1")
@@ -2020,7 +2025,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_MACHINE_START(firebeat)
 	MCFG_MACHINE_RESET(firebeat)
 
-	MCFG_RTC65271_ADD("rtc", NULL)
+	MCFG_RTC65271_ADD("rtc", firebeat_rtc)
 
 	MCFG_FUJITSU_29F016A_ADD("flash0")
 	MCFG_FUJITSU_29F016A_ADD("flash1")

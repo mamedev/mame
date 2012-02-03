@@ -332,9 +332,9 @@ static ADDRESS_MAP_START( redbaron_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1806, 0x1806) AM_DEVREAD("mathbox", mathbox_hi_r)
 	AM_RANGE(0x1808, 0x1808) AM_DEVWRITE("custom", redbaron_joysound_w)	/* and select joystick pot also */
 	AM_RANGE(0x180a, 0x180a) AM_WRITENOP				/* sound reset, yet todo */
-	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
+	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE("earom", atari_vg_earom_r, atari_vg_earom_w)
+	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE_MODERN("earom", atari_vg_earom_device, read, write)
 	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_go_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM

@@ -624,8 +624,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE(serial_w)
 	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE_PORT("OUTSEC")
 	AM_RANGE(0x1f280000, 0x1f280003) AM_READ_PORT("INSEC")
-	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_rtc_r, rtc65271_rtc_w, 0x00ff00ff)
-	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_xram_r, rtc65271_xram_w, 0x00ff00ff)
+	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, rtc_r, rtc_w, 0x00ff00ff)
+	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, xram_r, xram_w, 0x00ff00ff)
 	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
@@ -876,6 +876,11 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, 0, 0x100
 };
 
+static const rtc65271_interface twinkle_rtc =
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
@@ -893,7 +898,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_I2CMEM_ADD("security",i2cmem_interface)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
-	MCFG_RTC65271_ADD("rtc", NULL)
+	MCFG_RTC65271_ADD("rtc", twinkle_rtc)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
