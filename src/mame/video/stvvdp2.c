@@ -4094,7 +4094,7 @@ static void stv_vdp2_draw_line(running_machine &machine, bitmap_rgb32 &bitmap, c
 	int x,y;
 	UINT8* gfxdata = state->m_vdp2.gfx_decode;
 	UINT32 base_offs,base_mask;
-	UINT16 pix;
+	UINT32 pix;
 	UINT8 interlace;
 
 	interlace = (STV_VDP2_LSMD == 3)+1;
