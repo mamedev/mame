@@ -124,7 +124,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
-
+#include "sound/dac.h"
 
 
 class calchase_state : public driver_device
@@ -485,18 +485,57 @@ static WRITE32_HANDLER(bios_ram_w)
 	}
 }
 
+static WRITE8_HANDLER(iosound_w)
+{
+	switch(offset)
+	{
+		case 0x00:
+			dac_signed_data_w(space->machine().device("dac"), data);
+		case 0x20:
+			break;//dac_signed_data_w(space->machine().device("dac"), data);
+	}
+}
+
+
+
+static READ8_HANDLER(iocard_r)
+{
+	int data;
+	data = 0;
+	switch(offset)
+	{
+		case 0x04:
+			data = input_port_read(space->machine(), "IOCARD1"); break;
+		case 0x0c:
+			data = input_port_read(space->machine(), "IOCARD2"); break;
+		case 0x33:
+			data = input_port_read(space->machine(), "IOCARD3"); break;
+
+	}
+	return data;
+}
+
+
+
+
 static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000c8000, 0x000dffff) AM_NOP
+	AM_RANGE(0x000c8000, 0x000cffff) AM_NOP
+	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
+	AM_RANGE(0x000d0000, 0x000d003f) AM_READ8(iocard_r,0xffffffff)
+	AM_RANGE(0x000d0040, 0x000d004f) AM_WRITE8(iosound_w,0xffffffff)
+	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
+	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	//GRULL AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM
-	AM_RANGE(0x04000000, 0x28ffffff) AM_NOP
+	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
+	AM_RANGE(0x02000000, 0x28ffffff) AM_NOP
 	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
 	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
 	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
@@ -552,19 +591,24 @@ ADDRESS_MAP_END
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
 
-#if 0
+
+
+#if 1
 static INPUT_PORTS_START( calchase )
 	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
 	PORT_START("pc_keyboard_1")
+	AT_KEYB_HELPER( 0x0010, "T",            KEYCODE_T           ) /* T                           14  94 */
 	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
+	AT_KEYB_HELPER( 0x0100, "O",            KEYCODE_O           ) /* O                           18  98 */
 	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
 
 	PORT_START("pc_keyboard_2")
 
 	PORT_START("pc_keyboard_3")
+	AT_KEYB_HELPER( 0x0001, "B",            KEYCODE_B           ) /* B                           30  B0 */
 	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
 	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
 
@@ -576,12 +620,41 @@ static INPUT_PORTS_START( calchase )
 	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
 	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
 	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",	KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",		KEYCODE_RIGHT       ) /* Right                       6a  ea */
 	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
 	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",      		    KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x4000, "Del",      		    	KEYCODE_A           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
+
+	PORT_START("IOCARD1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IOCARD2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IOCARD3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 #endif
 
@@ -619,8 +692,7 @@ static WRITE_LINE_DEVICE_HANDLER( calchase_pic8259_1_set_int_line )
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
 	calchase_state *state = device->machine().driver_data<calchase_state>();
-	if (offset==2) { // IRQ = 2
-		logerror("pic8259_slave_ACK!\n");
+	if (offset==2) {
 		return pic8259_acknowledge(state->m_pic8259_2);
 	}
 	return 0x00;
@@ -708,7 +780,6 @@ static void calchase_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-
 static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
@@ -731,6 +802,12 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 static DRIVER_INIT( calchase )
@@ -740,14 +817,12 @@ static DRIVER_INIT( calchase )
 
 	pc_vga_init(machine, vga_setting, NULL);
 	pc_svga_trident_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
-
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, calchase_set_keyb_int);
 
 	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);
 }
-
 
 ROM_START( calchase )
 	ROM_REGION( 0x40000, "bios", 0 )
@@ -764,5 +839,4 @@ ROM_START( calchase )
 	DISK_IMAGE_READONLY( "calchase", 0,SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
-
-GAME( 1999, calchase,  0,    calchase, pc_keyboard,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, calchase,  0,    calchase, calchase,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_NO_SOUND )
