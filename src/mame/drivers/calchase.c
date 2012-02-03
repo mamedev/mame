@@ -131,7 +131,9 @@ class calchase_state : public driver_device
 {
 public:
 	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+		  { }
 
 	UINT32 *m_bios_ram;
 	int m_dma_channel;
@@ -145,6 +147,9 @@ public:
 	device_t	*m_pic8259_2;
 	device_t	*m_dma8237_1;
 	device_t	*m_dma8237_2;
+
+	UINT32 m_idle_skip_ram;
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -810,6 +815,24 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 
 MACHINE_CONFIG_END
 
+
+static READ32_HANDLER( calchase_idle_skip_r )
+{
+	calchase_state *state = space->machine().driver_data<calchase_state>();
+
+	if(cpu_get_pc(&space->device())==0x1406f48)
+		device_spin_until_interrupt(state->m_maincpu);
+
+	return state->m_idle_skip_ram;
+}
+
+static WRITE32_HANDLER( calchase_idle_skip_w )
+{
+	calchase_state *state = space->machine().driver_data<calchase_state>();
+
+	COMBINE_DATA(&state->m_idle_skip_ram);
+}
+
 static DRIVER_INIT( calchase )
 {
 	calchase_state *state = machine.driver_data<calchase_state>();
@@ -822,6 +845,8 @@ static DRIVER_INIT( calchase )
 	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x3f0b160, 0x3f0b163, FUNC(calchase_idle_skip_r), FUNC(calchase_idle_skip_w));
 }
 
 ROM_START( calchase )
