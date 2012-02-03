@@ -23,14 +23,14 @@
 static const char *const invinco_sample_names[] =
 {
 	"*invinco",
-	"saucer.wav",
-	"move1.wav",
-	"move2.wav",
-	"fire.wav",
-	"invhit.wav",
-	"shiphit.wav",
-	"move3.wav",	/* currently not used */
-	"move4.wav",	/* currently not used */
+	"saucer",
+	"move1",
+	"move2",
+	"fire",
+	"invhit",
+	"shiphit",
+	"move3",	/* currently not used */
+	"move4",	/* currently not used */
 	0
 };
 

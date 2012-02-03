@@ -107,15 +107,15 @@ WRITE8_HANDLER( spcewars_sh_port_w )
 static const char *const lrescue_sample_names[] =
 {
 	"*lrescue",
-	"alienexplosion.wav",
-	"rescueshipexplosion.wav",
-	"beamgun.wav",
-	"thrust.wav",
-	"bonus2.wav",
-	"bonus3.wav",
-	"shootingstar.wav",
-	"stepl.wav",
-	"steph.wav",
+	"alienexplosion",
+	"rescueshipexplosion",
+	"beamgun",
+	"thrust",
+	"bonus2",
+	"bonus3",
+	"shootingstar",
+	"stepl",
+	"steph",
 	0
 };
 

@@ -1628,8 +1628,8 @@ static const namco_interface namco_config =
 static const char *const battles_sample_names[] =
 {
 	"*battles",
-	"explo1.wav",	/* ground target explosion */
-	"explo2.wav",	/* Solvalou explosion */
+	"explo1",	/* ground target explosion */
+	"explo2",	/* Solvalou explosion */
 	0	/* end of array */
 };
 

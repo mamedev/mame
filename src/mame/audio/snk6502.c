@@ -65,10 +65,10 @@ static const char *const sasuke_sample_names[] =
 	"*sasuke",
 
 	// SN76477 and discrete
-	"hit.wav",
-	"boss_start.wav",
-	"shot.wav",
-	"boss_attack.wav",
+	"hit",
+	"boss_start",
+	"shot",
+	"boss_attack",
 
 	0
 };
@@ -84,26 +84,26 @@ static const char *const vanguard_sample_names[] =
 	"*vanguard",
 
 	// SN76477 and discrete
-	"fire.wav",
-	"explsion.wav",
+	"fire",
+	"explsion",
 
 	// HD38880 speech
-	"vg_voi-0.wav",
-	"vg_voi-1.wav",
-	"vg_voi-2.wav",
-	"vg_voi-3.wav",
-	"vg_voi-4.wav",
-	"vg_voi-5.wav",
-	"vg_voi-6.wav",
-	"vg_voi-7.wav",
-	"vg_voi-8.wav",
-	"vg_voi-9.wav",
-	"vg_voi-a.wav",
-	"vg_voi-b.wav",
-	"vg_voi-c.wav",
-	"vg_voi-d.wav",
-	"vg_voi-e.wav",
-	"vg_voi-f.wav",
+	"vg_voi-0",
+	"vg_voi-1",
+	"vg_voi-2",
+	"vg_voi-3",
+	"vg_voi-4",
+	"vg_voi-5",
+	"vg_voi-6",
+	"vg_voi-7",
+	"vg_voi-8",
+	"vg_voi-9",
+	"vg_voi-a",
+	"vg_voi-b",
+	"vg_voi-c",
+	"vg_voi-d",
+	"vg_voi-e",
+	"vg_voi-f",
 
 	0
 };
@@ -119,18 +119,18 @@ static const char *const fantasy_sample_names[] =
 	"*fantasy",
 
 	// HD38880 speech
-	"ft_voi-0.wav",
-	"ft_voi-1.wav",
-	"ft_voi-2.wav",
-	"ft_voi-3.wav",
-	"ft_voi-4.wav",
-	"ft_voi-5.wav",
-	"ft_voi-6.wav",
-	"ft_voi-7.wav",
-	"ft_voi-8.wav",
-	"ft_voi-9.wav",
-	"ft_voi-a.wav",
-	"ft_voi-b.wav",
+	"ft_voi-0",
+	"ft_voi-1",
+	"ft_voi-2",
+	"ft_voi-3",
+	"ft_voi-4",
+	"ft_voi-5",
+	"ft_voi-6",
+	"ft_voi-7",
+	"ft_voi-8",
+	"ft_voi-9",
+	"ft_voi-a",
+	"ft_voi-b",
 
 	0
 };

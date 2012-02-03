@@ -558,15 +558,15 @@ INPUT_PORTS_END
 static const char *const astinvad_sample_names[] =
 {
 	"*invaders",
-	"0.wav",
-	"1.wav",
-	"2.wav",
-	"3.wav",
-	"4.wav",
-	"5.wav",
-	"6.wav",
-	"7.wav",
-	"8.wav",
+	"0",
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
 	0
 };
 

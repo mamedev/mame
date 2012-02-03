@@ -262,14 +262,14 @@ static WRITE8_HANDLER( dai3wksi_audio_3_w )
 static const char *const dai3wksi_sample_names[] =
 {
 	"*dai3wksi",
-	"1.wav",
-	"2.wav",
-	"3.wav",
-	"3-2.wav",
-	"4.wav",
-	"5.wav",
-	"6.wav",
-	"6-2.wav",
+	"1",
+	"2",
+	"3",
+	"3-2",
+	"4",
+	"5",
+	"6",
+	"6-2",
 	0
 };
 

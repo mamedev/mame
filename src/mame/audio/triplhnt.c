@@ -11,8 +11,8 @@
 static const char *const triplhnt_sample_names[] =
 {
 	"*triplhnt",
-	"bear_rac.wav",
-	"witch.wav",
+	"bear_rac",
+	"witch",
 	0
 };
 

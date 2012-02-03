@@ -1746,77 +1746,77 @@ GFXDECODE_END
 static const char *const reactor_sample_names[] =
 {
 	"*reactor",
-	"fx_53.wav", /* "8 left" */
-	"fx_54.wav", /* "16 left" */
-	"fx_55.wav", /* "24 left" */
-	"fx_56.wav", /* "32 left" */
-	"fx_57.wav", /* "40 left" */
-	"fx_58.wav", /* "warning, core unstable" */
-	"fx_59.wav", /* "bonus" */
-	"fx_31.wav", /* "chamber activated" */
-	"fx_39a.wav", /* "2000" */
-	"fx_39b.wav", /* "5000" */
-	"fx_39c.wav", /* "10000" */
-	"fx_39d.wav", /* "15000" */
-	"fx_39e.wav", /* "20000" */
-	"fx_39f.wav", /* "25000" */
-	"fx_39g.wav", /* "30000" */
-	"fx_39h.wav", /* "35000" */
-	"fx_39i.wav", /* "40000" */
-	"fx_39j.wav", /* "45000" */
-	"fx_39k.wav", /* "50000" */
-	"fx_39l.wav", /* "55000" */
+	"fx_53", /* "8 left" */
+	"fx_54", /* "16 left" */
+	"fx_55", /* "24 left" */
+	"fx_56", /* "32 left" */
+	"fx_57", /* "40 left" */
+	"fx_58", /* "warning, core unstable" */
+	"fx_59", /* "bonus" */
+	"fx_31", /* "chamber activated" */
+	"fx_39a", /* "2000" */
+	"fx_39b", /* "5000" */
+	"fx_39c", /* "10000" */
+	"fx_39d", /* "15000" */
+	"fx_39e", /* "20000" */
+	"fx_39f", /* "25000" */
+	"fx_39g", /* "30000" */
+	"fx_39h", /* "35000" */
+	"fx_39i", /* "40000" */
+	"fx_39j", /* "45000" */
+	"fx_39k", /* "50000" */
+	"fx_39l", /* "55000" */
      0	/* end of array */
 };
 
 static const char *const qbert_sample_names[] =
 {
 	"*qbert",
-	"fx_17a.wav", /* random speech, voice clock 255 */
-	"fx_17b.wav", /* random speech, voice clock 255 */
-	"fx_17c.wav", /* random speech, voice clock 255 */
-	"fx_17d.wav", /* random speech, voice clock 255 */
-	"fx_17e.wav", /* random speech, voice clock 255 */
-	"fx_17f.wav", /* random speech, voice clock 255 */
-	"fx_17g.wav", /* random speech, voice clock 255 */
-	"fx_17h.wav", /* random speech, voice clock 255 */
-	"fx_18a.wav", /* random speech, voice clock 176 */
-	"fx_18b.wav", /* random speech, voice clock 176 */
-	"fx_18c.wav", /* random speech, voice clock 176 */
-	"fx_18d.wav", /* random speech, voice clock 176 */
-	"fx_18e.wav", /* random speech, voice clock 176 */
-	"fx_18f.wav", /* random speech, voice clock 176 */
-	"fx_18g.wav", /* random speech, voice clock 176 */
-	"fx_18h.wav", /* random speech, voice clock 176 */
-	"fx_19a.wav", /* random speech, voice clock 128 */
-	"fx_19b.wav", /* random speech, voice clock 128 */
-	"fx_19c.wav", /* random speech, voice clock 128 */
-	"fx_19d.wav", /* random speech, voice clock 128 */
-	"fx_19e.wav", /* random speech, voice clock 128 */
-	"fx_19f.wav", /* random speech, voice clock 128 */
-	"fx_19g.wav", /* random speech, voice clock 128 */
-	"fx_19h.wav", /* random speech, voice clock 128 */
-	"fx_20a.wav", /* random speech, voice clock 96 */
-	"fx_20b.wav", /* random speech, voice clock 96 */
-	"fx_20c.wav", /* random speech, voice clock 96 */
-	"fx_20d.wav", /* random speech, voice clock 96 */
-	"fx_20e.wav", /* random speech, voice clock 96 */
-	"fx_20f.wav", /* random speech, voice clock 96 */
-	"fx_20g.wav", /* random speech, voice clock 96 */
-	"fx_20h.wav", /* random speech, voice clock 96 */
-	"fx_21a.wav", /* random speech, voice clock 62 */
-	"fx_21b.wav", /* random speech, voice clock 62 */
-	"fx_21c.wav", /* random speech, voice clock 62 */
-	"fx_21d.wav", /* random speech, voice clock 62 */
-	"fx_21e.wav", /* random speech, voice clock 62 */
-	"fx_21f.wav", /* random speech, voice clock 62 */
-	"fx_21g.wav", /* random speech, voice clock 62 */
-	"fx_21h.wav", /* random speech, voice clock 62 */
-	"fx_22.wav", /* EH2 with decreasing voice clock */
-	"fx_23.wav", /* O1 with varying voice clock */
-	"fx_28.wav",
-	"fx_36.wav",
-	"knocker.wav",
+	"fx_17a", /* random speech, voice clock 255 */
+	"fx_17b", /* random speech, voice clock 255 */
+	"fx_17c", /* random speech, voice clock 255 */
+	"fx_17d", /* random speech, voice clock 255 */
+	"fx_17e", /* random speech, voice clock 255 */
+	"fx_17f", /* random speech, voice clock 255 */
+	"fx_17g", /* random speech, voice clock 255 */
+	"fx_17h", /* random speech, voice clock 255 */
+	"fx_18a", /* random speech, voice clock 176 */
+	"fx_18b", /* random speech, voice clock 176 */
+	"fx_18c", /* random speech, voice clock 176 */
+	"fx_18d", /* random speech, voice clock 176 */
+	"fx_18e", /* random speech, voice clock 176 */
+	"fx_18f", /* random speech, voice clock 176 */
+	"fx_18g", /* random speech, voice clock 176 */
+	"fx_18h", /* random speech, voice clock 176 */
+	"fx_19a", /* random speech, voice clock 128 */
+	"fx_19b", /* random speech, voice clock 128 */
+	"fx_19c", /* random speech, voice clock 128 */
+	"fx_19d", /* random speech, voice clock 128 */
+	"fx_19e", /* random speech, voice clock 128 */
+	"fx_19f", /* random speech, voice clock 128 */
+	"fx_19g", /* random speech, voice clock 128 */
+	"fx_19h", /* random speech, voice clock 128 */
+	"fx_20a", /* random speech, voice clock 96 */
+	"fx_20b", /* random speech, voice clock 96 */
+	"fx_20c", /* random speech, voice clock 96 */
+	"fx_20d", /* random speech, voice clock 96 */
+	"fx_20e", /* random speech, voice clock 96 */
+	"fx_20f", /* random speech, voice clock 96 */
+	"fx_20g", /* random speech, voice clock 96 */
+	"fx_20h", /* random speech, voice clock 96 */
+	"fx_21a", /* random speech, voice clock 62 */
+	"fx_21b", /* random speech, voice clock 62 */
+	"fx_21c", /* random speech, voice clock 62 */
+	"fx_21d", /* random speech, voice clock 62 */
+	"fx_21e", /* random speech, voice clock 62 */
+	"fx_21f", /* random speech, voice clock 62 */
+	"fx_21g", /* random speech, voice clock 62 */
+	"fx_21h", /* random speech, voice clock 62 */
+	"fx_22", /* EH2 with decreasing voice clock */
+	"fx_23", /* O1 with varying voice clock */
+	"fx_28",
+	"fx_36",
+	"knocker",
 	0	/* end of array */
 };
 

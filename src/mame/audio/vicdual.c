@@ -103,12 +103,12 @@ DISCRETE_SOUND_END
 static const char *const frogs_sample_names[] =
 {
 	"*frogs",
-	"boing.wav",
-	"buzzz.wav",
-	"croak.wav",
-	"hop.wav",
-	"splash.wav",
-	"zip.wav",
+	"boing",
+	"buzzz",
+	"croak",
+	"hop",
+	"splash",
+	"zip",
 	0
 };
 

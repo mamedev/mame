@@ -134,36 +134,36 @@ GFXDECODE_END
 static const char *const sample_names[] =
 {												// Address triggered at
 	"*thehand",
-	"01.wav",	/* game start tune */			// 075f
-	"02.wav",	/* coin in */					// 0074
-	"03.wav",	/* eat dot */					// 0e45
-	"05.wav",	/* eat dollar sign */			// 0e45
+	"01",	/* game start tune */			// 075f
+	"02",	/* coin in */					// 0074
+	"03",	/* eat dot */					// 0e45
+	"05",	/* eat dollar sign */			// 0e45
 
-	"06.wav",	/* door open */					// 19e1
-	"07.wav",	/* door close */				// 1965
+	"06",	/* door open */					// 19e1
+	"07",	/* door close */				// 1965
 
-	"08.wav",	/* theme song */				// 0821
-	//"09.wav"                                  // 1569
+	"08",	/* theme song */				// 0821
+	//"09"                                  // 1569
 
 	/* one of these two is played after eating the last dot */
-	"0a.wav",	/* piccolo */					// 17af
-	"0b.wav",	/* tune */						// 17af
+	"0a",	/* piccolo */					// 17af
+	"0b",	/* tune */						// 17af
 
-	//"0f.wav"                                  // 08ee
-	"10.wav",	/* 'We're even. Bye Bye!' */	// 162a
-	"11.wav",	/* 'You got me!' */				// 1657
-	"12.wav",	/* 'You have lost out' */		// 085e
+	//"0f"                                  // 08ee
+	"10",	/* 'We're even. Bye Bye!' */	// 162a
+	"11",	/* 'You got me!' */				// 1657
+	"12",	/* 'You have lost out' */		// 085e
 
-	"13.wav",	/* 'Rock' */					// 14de
-	"14.wav",	/* 'Scissors' */				// 14f3
-	"15.wav",	/* 'Paper' */					// 1508
+	"13",	/* 'Rock' */					// 14de
+	"14",	/* 'Scissors' */				// 14f3
+	"15",	/* 'Paper' */					// 1508
 
 	/* one of these is played when going by the girl between levels */
-	"16.wav",	/* 'Very good!' */				// 194a
-	"17.wav",	/* 'Wonderful!' */				// 194a
-	"18.wav",	/* 'Come on!' */				// 194a
-	"19.wav",	/* 'I love you!' */				// 194a
-	"1a.wav",	/* 'See you again!' */			// 194a
+	"16",	/* 'Very good!' */				// 194a
+	"17",	/* 'Wonderful!' */				// 194a
+	"18",	/* 'Come on!' */				// 194a
+	"19",	/* 'I love you!' */				// 194a
+	"1a",	/* 'See you again!' */			// 194a
 	0
 };
 

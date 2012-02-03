@@ -1573,7 +1573,7 @@ GFXDECODE_END
 static const char *const journey_sample_names[] =
 {
 	"*journey",
-	"sepways.wav",
+	"sepways",
 	0
 };
 
@@ -1587,8 +1587,8 @@ static const samples_interface journey_samples_interface =
 static const char *const twotiger_sample_names[] =
 {
 	"*twotiger",
-	"left.wav",
-	"right.wav",
+	"left",
+	"right",
 	0
 };
 

@@ -120,10 +120,10 @@ GFXDECODE_END
 static const char *const starcrus_sample_names[] =
 {
     "*starcrus",
-    "engine.wav",	/* engine sound, channel 0 */
-    "explos1.wav",	/* explosion sound, first part, channel 1 */
-    "explos2.wav",	/* explosion sound, second part, channel 1 */
-    "launch.wav",	/* launch sound, channels 2 and 3 */
+    "engine",	/* engine sound, channel 0 */
+    "explos1",	/* explosion sound, first part, channel 1 */
+    "explos2",	/* explosion sound, second part, channel 1 */
+    "launch",	/* launch sound, channels 2 and 3 */
     0
 };
 

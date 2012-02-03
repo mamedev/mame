@@ -857,7 +857,7 @@ static const namco_interface namco_config =
 static const char *const rallyx_sample_names[] =
 {
 	"*rallyx",
-	"bang.wav",
+	"bang",
 	0	/* end of array */
 };
 

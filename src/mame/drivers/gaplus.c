@@ -504,7 +504,7 @@ static const namco_interface namco_config =
 static const char *const gaplus_sample_names[] =
 {
 	"*gaplus",
-	"bang.wav",
+	"bang",
 	0
 };
 

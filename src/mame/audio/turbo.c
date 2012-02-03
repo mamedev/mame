@@ -172,15 +172,15 @@ WRITE8_DEVICE_HANDLER( turbo_sound_c_w )
 static const char *const turbo_sample_names[] =
 {
 	"*turbo",
-	"01.wav",		/* 0: Trig1 */
-	"02.wav",		/* 1: Trig2 */
-	"03.wav",		/* 2: Trig3 */
-	"04.wav",		/* 3: Trig4 */
-	"05.wav",		/* 4: Screech */
-	"06.wav",		/* 5: Crash */
-	"skidding.wav",	/* 6: Spin */
-	"idle.wav",		/* 7: Idle */
-	"ambulanc.wav",	/* 8: Ambulance */
+	"01",		/* 0: Trig1 */
+	"02",		/* 1: Trig2 */
+	"03",		/* 2: Trig3 */
+	"04",		/* 3: Trig4 */
+	"05",		/* 4: Screech */
+	"06",		/* 5: Crash */
+	"skidding",	/* 6: Spin */
+	"idle",		/* 7: Idle */
+	"ambulanc",	/* 8: Ambulance */
 	0
 };
 
@@ -428,17 +428,17 @@ WRITE8_DEVICE_HANDLER( subroc3d_sound_c_w )
 static const char *const subroc3d_sample_names[] =
 {
 	"*subroc3d",
-	"01.wav",   /*  0: enemy missile */
-	"02.wav",   /*  1: enemy torpedo */
-	"03.wav",   /*  2: enemy fighter */
-	"04.wav",   /*  3: explosion in sky */
-	"05.wav",   /*  4: explosion on sea */
-	"06.wav",   /*  5: missile shoot */
-	"07.wav",   /*  6: torpedo shoot */
-	"08.wav",   /*  7: my ship expl */
-	"09.wav",   /*  8: prolog sound */
-	"11.wav",   /*  9: alarm 0 */
-	"12.wav",   /* 10: alarm 1 */
+	"01",   /*  0: enemy missile */
+	"02",   /*  1: enemy torpedo */
+	"03",   /*  2: enemy fighter */
+	"04",   /*  3: explosion in sky */
+	"05",   /*  4: explosion on sea */
+	"06",   /*  5: missile shoot */
+	"07",   /*  6: torpedo shoot */
+	"08",   /*  7: my ship expl */
+	"09",   /*  8: prolog sound */
+	"11",   /*  9: alarm 0 */
+	"12",   /* 10: alarm 1 */
 	0
 };
 
@@ -583,17 +583,17 @@ WRITE8_DEVICE_HANDLER( buckrog_sound_b_w )
 static const char *const buckrog_sample_names[]=
 {
 	"*buckrog",
-	"alarm0.wav",	/* 0 */
-	"alarm1.wav",	/* 1 */
-	"alarm2.wav",	/* 2 */
-	"alarm3.wav",	/* 3 */
-	"exp.wav",		/* 4 */
-	"fire.wav",		/* 5 */
-	"rebound.wav",	/* 6 */
-	"hit.wav",		/* 7 */
-	"shipsnd1.wav",	/* 8 */
-	"shipsnd2.wav",	/* 9 */
-	"shipsnd3.wav",	/* 10 */
+	"alarm0",	/* 0 */
+	"alarm1",	/* 1 */
+	"alarm2",	/* 2 */
+	"alarm3",	/* 3 */
+	"exp",		/* 4 */
+	"fire",		/* 5 */
+	"rebound",	/* 6 */
+	"hit",		/* 7 */
+	"shipsnd1",	/* 8 */
+	"shipsnd2",	/* 9 */
+	"shipsnd3",	/* 10 */
 	0
 };
 

@@ -74,18 +74,18 @@
 static const char *const zaxxon_sample_names[] =
 {
 	"*zaxxon",
-	"03.wav",   /* 0 - Homing Missile */
-	"02.wav",   /* 1 - Base Missile */
-	"01.wav",   /* 2 - Laser (force field) */
-	"00.wav",   /* 3 - Battleship (end of level boss) */
-	"11.wav",   /* 4 - S-Exp (enemy explosion) */
-	"10.wav",   /* 5 - M-Exp (ship explosion) */
-	"08.wav",   /* 6 - Cannon (ship fire) */
-	"23.wav",   /* 7 - Shot (enemy fire) */
-	"21.wav",   /* 8 - Alarm 2 (target lock) */
-	"20.wav",   /* 9 - Alarm 3 (low fuel) */
-	"05.wav",   /* 10 - initial background noise */
-	"04.wav",   /* 11 - looped asteroid noise */
+	"03",   /* 0 - Homing Missile */
+	"02",   /* 1 - Base Missile */
+	"01",   /* 2 - Laser (force field) */
+	"00",   /* 3 - Battleship (end of level boss) */
+	"11",   /* 4 - S-Exp (enemy explosion) */
+	"10",   /* 5 - M-Exp (ship explosion) */
+	"08",   /* 6 - Cannon (ship fire) */
+	"23",   /* 7 - Shot (enemy fire) */
+	"21",   /* 8 - Alarm 2 (target lock) */
+	"20",   /* 9 - Alarm 3 (low fuel) */
+	"05",   /* 10 - initial background noise */
+	"04",   /* 11 - looped asteroid noise */
 	0
 };
 
@@ -193,11 +193,11 @@ WRITE8_DEVICE_HANDLER( zaxxon_sound_c_w )
 static const char *const congo_sample_names[] =
 {
 	"*congo",
-	"gorilla.wav",	/* 0 */
-	"bass.wav",		/* 1 */
-	"congal.wav",	/* 2 */
-	"congah.wav",	/* 3 */
-	"rim.wav",		/* 4 */
+	"gorilla",	/* 0 */
+	"bass",		/* 1 */
+	"congal",	/* 2 */
+	"congah",	/* 3 */
+	"rim",		/* 4 */
 	0
 };
 

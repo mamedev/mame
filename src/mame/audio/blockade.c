@@ -59,7 +59,7 @@ WRITE8_HANDLER( blockade_env_off_w )
 static const char *const blockade_sample_names[] =
 {
 	"*blockade",
-	"boom.wav",
+	"boom",
 	0
 };
 

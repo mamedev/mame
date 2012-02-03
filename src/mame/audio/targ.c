@@ -136,11 +136,11 @@ WRITE8_HANDLER( spectar_audio_2_w )
 static const char *const sample_names[] =
 {
 	"*targ",
-	"expl.wav",
-	"shot.wav",
-	"sexpl.wav",
-	"spslow.wav",
-	"spfast.wav",
+	"expl",
+	"shot",
+	"sexpl",
+	"spslow",
+	"spfast",
 	0
 };
 

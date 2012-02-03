@@ -36,18 +36,18 @@
 static const char *const pulsar_sample_names[] =
 {
 	"*pulsar",
-	"clang.wav",
-	"key.wav",
-	"alienhit.wav",
-	"phit.wav",
-	"ashoot.wav",
-	"pshoot.wav",
-	"bonus.wav",
-	"sizzle.wav",
-	"gate.wav",
-	"birth.wav",
-	"hbeat.wav",
-	"movmaze.wav",
+	"clang",
+	"key",
+	"alienhit",
+	"phit",
+	"ashoot",
+	"pshoot",
+	"bonus",
+	"sizzle",
+	"gate",
+	"birth",
+	"hbeat",
+	"movmaze",
 	0
 };
 

@@ -41,10 +41,10 @@ static const char *const PhonemeTable[65] =
  0
 };
 
-/* Missing samples : ready.wav from.wav one.wav bite.wav youl.wav explode.wav if.wav myself.wav back.wav
-   cant.wav do.wav wait.wav worlings.wav very.wav babies.wav breath.wav fire.wav beat.wav rest.wav
-   then.wav never.wav worlock.wav escape.wav door.wav try.wav any.wav harder.wav only.wav meet.wav with.wav
-   doom.wav pop.wav
+/* Missing samples : ready,  from,  one,  bite,  youl,  explode,  if,  myself,  back, 
+   cant,  do,  wait,  worlings,  very,  babies,  breath,  fire,  beat,  rest, 
+   then,  never,  worlock,  escape,  door,  try,  any,  harder,  only,  meet,  with, 
+   doom,  pop, 
    Problems with YOU and YOU'LL and YOU'DD */
 
 static const char *const wowWordTable[] =
@@ -77,26 +77,26 @@ static const char *const wowWordTable[] =
 const char *const wow_sample_names[] =
 {
 	"*wow",
-	"a.wav", "again.wav", "ahh.wav", "am.wav", "and.wav",
-	"anew.wav", "another.wav", "any.wav", "anyone.wav", "appear.wav", "are.wav", "are.wav", "babies.wav", "back.wav",
-	"beat.wav", "become.wav", "best.wav", "better.wav", "bite.wav", "bones.wav", "breath.wav", "but.wav", "can.wav", "cant.wav",
-	"chance.wav", "chest.wav", "coin.wav", "dance.wav", "destroy.wav",
-	"develop.wav", "do.wav", "dont.wav", "doom.wav", "door.wav", "draw.wav", "dungeon.wav", "dungeons.wav",
-	"each.wav", "eaten.wav", "escape.wav", "explode.wav", "fear.wav", "find.wav", "find.wav", "fire.wav", "for.wav", "from.wav",
-	"garwor.wav", "get.wav", "get.wav", "get.wav", "getting.wav", "good.wav", "hahahaha.wav", "harder.wav",
-	"hasnt.wav", "have.wav", "heavyw.wav", "hey.wav", "hope.wav",
-	"hungry.wav", "hungry.wav", "hurry.wav", "i.wav", "i.wav", "if.wav", "if.wav", "im.wav", "i1.wav", "ill.wav", "in.wav",
-	"insert.wav", "invisibl.wav", "it.wav", "lie.wav", "magic.wav",
-	"magical.wav", "me.wav", "meet.wav", "months.wav",
-	"my.wav", "my.wav", "my.wav", "my.wav", "my.wav", "myself.wav", "near.wav", "never.wav",
-	"now.wav", "of.wav", "off.wav", "one.wav", "only.wav", "oven.wav", "pause.wav", "pets.wav", "powerful.wav", "pop.wav",
-	"radar.wav", "ready.wav",
-	"rest.wav", "say.wav", "science.wav", "see.wav", "spause.wav", "start.wav", "the.wav", "the.wav", "the.wav", "the.wav", "then.wav",
-	"through.wav", "thurwor.wav", "time.wav", "to.wav", "to.wav", "to.wav", "treasure.wav", "try.wav", "very.wav", "wait.wav",
-	"war.wav", "warrior.wav", "watch.wav", "we.wav", "welcome.wav",
-	"were.wav", "while.wav", "will.wav", "with.wav", "wizard.wav", "wont.wav",
-	"wor.wav", "world.wav", "worlings.wav", "worlock.wav",
-	"you.wav", "you.wav", "you.wav", "you.wav", "you.wav", "youl.wav", "youl.wav", "youd.wav", "your.wav",0
+	"a", "again", "ahh", "am", "and",
+	"anew", "another", "any", "anyone", "appear", "are", "are", "babies", "back",
+	"beat", "become", "best", "better", "bite", "bones", "breath", "but", "can", "cant",
+	"chance", "chest", "coin", "dance", "destroy",
+	"develop", "do", "dont", "doom", "door", "draw", "dungeon", "dungeons",
+	"each", "eaten", "escape", "explode", "fear", "find", "find", "fire", "for", "from",
+	"garwor", "get", "get", "get", "getting", "good", "hahahaha", "harder",
+	"hasnt", "have", "heavyw", "hey", "hope",
+	"hungry", "hungry", "hurry", "i", "i", "if", "if", "im", "i1", "ill", "in",
+	"insert", "invisibl", "it", "lie", "magic",
+	"magical", "me", "meet", "months",
+	"my", "my", "my", "my", "my", "myself", "near", "never",
+	"now", "of", "off", "one", "only", "oven", "pause", "pets", "powerful", "pop",
+	"radar", "ready",
+	"rest", "say", "science", "see", "spause", "start", "the", "the", "the", "the", "then",
+	"through", "thurwor", "time", "to", "to", "to", "treasure", "try", "very", "wait",
+	"war", "warrior", "watch", "we", "welcome",
+	"were", "while", "will", "with", "wizard", "wont",
+	"wor", "world", "worlings", "worlock",
+	"you", "you", "you", "you", "you", "youl", "youl", "youd", "your",0
 };
 
 

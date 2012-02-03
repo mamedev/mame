@@ -808,18 +808,18 @@ INPUT_PORTS_END
 static const char *const elim_sample_names[] =
 {
 	"*elim2",
-	"elim1.wav",
-	"elim2.wav",
-	"elim3.wav",
-	"elim4.wav",
-	"elim5.wav",
-	"elim6.wav",
-	"elim7.wav",
-	"elim8.wav",
-	"elim9.wav",
-	"elim10.wav",
-	"elim11.wav",
-	"elim12.wav",
+	"elim1",
+	"elim2",
+	"elim3",
+	"elim4",
+	"elim5",
+	"elim6",
+	"elim7",
+	"elim8",
+	"elim9",
+	"elim10",
+	"elim11",
+	"elim12",
 	0	/* end of array */
 };
 
@@ -841,16 +841,16 @@ static const char *const spacfury_sample_names[] =
 {
 	"*spacfury",
 	/* Sound samples */
-	"sfury1.wav",
-	"sfury2.wav",
-	"sfury3.wav",
-	"sfury4.wav",
-	"sfury5.wav",
-	"sfury6.wav",
-	"sfury7.wav",
-	"sfury8.wav",
-	"sfury9.wav",
-	"sfury10.wav",
+	"sfury1",
+	"sfury2",
+	"sfury3",
+	"sfury4",
+	"sfury5",
+	"sfury6",
+	"sfury7",
+	"sfury8",
+	"sfury9",
+	"sfury10",
 	0	/* end of array */
 };
 
@@ -871,17 +871,17 @@ static const samples_interface spacfury_samples_interface =
 static const char *const zektor_sample_names[] =
 {
 	"*zektor",
-	"elim1.wav",  /*  0 fireball */
-	"elim2.wav",  /*  1 bounce */
-	"elim3.wav",  /*  2 Skitter */
-	"elim4.wav",  /*  3 Eliminator */
-	"elim5.wav",  /*  4 Electron */
-	"elim6.wav",  /*  5 fire */
-	"elim7.wav",  /*  6 thrust */
-	"elim8.wav",  /*  7 Electron */
-	"elim9.wav",  /*  8 small explosion */
-	"elim10.wav", /*  9 med explosion */
-	"elim11.wav", /* 10 big explosion */
+	"elim1",  /*  0 fireball */
+	"elim2",  /*  1 bounce */
+	"elim3",  /*  2 Skitter */
+	"elim4",  /*  3 Eliminator */
+	"elim5",  /*  4 Electron */
+	"elim6",  /*  5 fire */
+	"elim7",  /*  6 thrust */
+	"elim8",  /*  7 Electron */
+	"elim9",  /*  8 small explosion */
+	"elim10", /*  9 med explosion */
+	"elim11", /* 10 big explosion */
 	0
 };
 

@@ -137,11 +137,11 @@ static const discrete_lfsr_desc midway_lfsr =
 static const char *const seawolf_sample_names[] =
 {
 	"*seawolf",
-	"shiphit.wav",
-	"torpedo.wav",
-	"dive.wav",
-	"sonar.wav",
-	"minehit.wav",
+	"shiphit",
+	"torpedo",
+	"dive",
+	"sonar",
+	"minehit",
 	0
 };
 
@@ -201,8 +201,8 @@ WRITE8_HANDLER( seawolf_audio_w )
 static const char *const gunfight_sample_names[] =
 {
 	"*gunfight",
-	"gunshot.wav",
-	"killed.wav",
+	"gunshot",
+	"killed",
 	0
 };
 
@@ -1559,8 +1559,8 @@ WRITE8_DEVICE_HANDLER( dplay_audio_w )
 static const char *const gmissile_sample_names[] =
 {
 	"*gmissile",
-	"1.wav",	/* missle */
-	"2.wav",	/* explosion */
+	"1",	/* missle */
+	"2",	/* explosion */
 	0
 };
 
@@ -1658,8 +1658,8 @@ WRITE8_HANDLER( gmissile_audio_3_w )
 static const char *const m4_sample_names[] =
 {
 	"*m4",
-	"1.wav",	/* missle */
-	"2.wav",	/* explosion */
+	"1",	/* missle */
+	"2",	/* explosion */
 	0
 };
 
@@ -1922,7 +1922,7 @@ DISCRETE_SOUND_END
 static const char *const clowns_sample_names[] =
 {
 	"*clowns",
-	"miss.wav",
+	"miss",
 	0
 };
 
@@ -3324,8 +3324,8 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w )
 static const char *const phantom2_sample_names[] =
 {
 	"*phantom2",
-	"1.wav",	/* shot */
-	"2.wav",	/* explosion */
+	"1",	/* shot */
+	"2",	/* explosion */
 	0
 };
 
@@ -3598,15 +3598,15 @@ static const sn76477_interface invaders_sn76477_interface =
 static const char *const invaders_sample_names[] =
 {
 	"*invaders",
-	"1.wav",		/* shot/missle */
-	"2.wav",		/* base hit/explosion */
-	"3.wav",		/* invader hit */
-	"4.wav",		/* fleet move 1 */
-	"5.wav",		/* fleet move 2 */
-	"6.wav",		/* fleet move 3 */
-	"7.wav",		/* fleet move 4 */
-	"8.wav",		/* UFO/saucer hit */
-	"9.wav",		/* bonus base */
+	"1",		/* shot/missle */
+	"2",		/* base hit/explosion */
+	"3",		/* invader hit */
+	"4",		/* fleet move 1 */
+	"5",		/* fleet move 2 */
+	"6",		/* fleet move 3 */
+	"7",		/* fleet move 4 */
+	"8",		/* UFO/saucer hit */
+	"9",		/* bonus base */
 	0
 };
 

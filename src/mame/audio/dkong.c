@@ -1192,15 +1192,15 @@ Addresses found at @0x510, cpu2
     static const char *const radarscp1_sample_names[] =
     {
         "*radarscp1",
-        "10.wav",
-        "12.wav",
-        "14.wav",
-        "16.wav",
-        "18.wav",
-        "1A.wav",
-        "1C.wav",
-        "1E.wav",
-        "20.wav",
+        "10",
+        "12",
+        "14",
+        "16",
+        "18",
+        "1A",
+        "1C",
+        "1E",
+        "20",
         0
     };
 

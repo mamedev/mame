@@ -83,16 +83,16 @@
 static const char *const carnival_sample_names[] =
 {
 	"*carnival",
-	"bear.wav",
-	"bonus1.wav",
-	"bonus2.wav",
-	"clang.wav",
-	"duck1.wav",
-	"duck2.wav",
-	"duck3.wav",
-	"pipehit.wav",
-	"ranking.wav",
-	"rifle.wav",
+	"bear",
+	"bonus1",
+	"bonus2",
+	"clang",
+	"duck1",
+	"duck2",
+	"duck3",
+	"pipehit",
+	"ranking",
+	"rifle",
 	0
 };
 

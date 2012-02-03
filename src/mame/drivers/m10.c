@@ -807,16 +807,16 @@ GFXDECODE_END
 static const char *const m10_sample_names[] =
 {
 	"*ipminvad",
-	"1.wav",		/* shot/missle */
-	"2.wav",		/* base hit/explosion */
-	"3.wav",		/* invader hit */
-	"4.wav",		/* fleet move 1 */
-	"5.wav",		/* fleet move 2 */
-	"6.wav",		/* fleet move 3 */
-	"7.wav",		/* fleet move 4 */
-	"8.wav",		/* UFO/saucer hit */
-	"9.wav",		/* bonus base */
-	"0.wav",		/* UFO sound */
+	"1",		/* shot/missle */
+	"2",		/* base hit/explosion */
+	"3",		/* invader hit */
+	"4",		/* fleet move 1 */
+	"5",		/* fleet move 2 */
+	"6",		/* fleet move 3 */
+	"7",		/* fleet move 4 */
+	"8",		/* UFO/saucer hit */
+	"9",		/* bonus base */
+	"0",		/* UFO sound */
 	0
 };
 

@@ -1,3 +1,18 @@
+/* samples.c
+ 
+ Playback of pre-recorded samples. Used for high-level simulation of discrete sound circuits
+ where proper low-level simulation isn't available.  Also used for tape loops and similar.
+
+ Current limitations
+  - Only supports single channel samples!
+
+ Considerations
+  - Maybe this should be part of the presentation layer (artwork etc.) with samples specified
+    in .lay files instead of in drivers?
+
+*/
+
+
 #include "emu.h"
 #include "emuopts.h"
 #include "samples.h"
@@ -68,14 +83,10 @@ void my_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__Stream
 {
 
 	flac_reader* flacrd =  ((flac_reader*)client_data);
-	//printf("Metadata callback\n");
-	//printf("metadata->type == %d\n", metadata->type);
 
 	if (metadata->type==0)
 	{
 		const FLAC__StreamMetadata_StreamInfo *streaminfo = &(metadata->data.stream_info);
-
-		//printf("streaminfo channels %d, sample_rate %d total %d\n", streaminfo->channels, streaminfo->sample_rate, streaminfo->total_samples);
 
 		flacrd->sample_rate = streaminfo->sample_rate;
 		flacrd->channels = streaminfo->channels;
@@ -91,7 +102,6 @@ FLAC__StreamDecoderReadStatus my_read_callback(const FLAC__StreamDecoder *decode
 {
 	flac_reader* flacrd =  ((flac_reader*)client_data);
 
-	//printf("read in length %d\n", flacrd->length);
 	if(*bytes > 0)
 	{
 		if (*bytes <=  flacrd->length)
@@ -126,13 +136,9 @@ FLAC__StreamDecoderReadStatus my_read_callback(const FLAC__StreamDecoder *decode
 
 FLAC__StreamDecoderWriteStatus my_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data)
 {
-	//printf("my_write_callback\n");
-	//printf("array size %d\n",frame->header.blocksize);
-
 	flac_reader* flacrd =  ((flac_reader*)client_data);
 
 	flacrd->decoded_size += frame->header.blocksize;
-	//printf("total array size %d\n",flacrd->decoded_size);
 
 	for (int i=0;i<frame->header.blocksize;i++)
 	{
@@ -153,7 +159,7 @@ FLAC__StreamDecoderWriteStatus my_write_callback(const FLAC__StreamDecoder *deco
     read_wav_sample - read a WAV file as a sample
 -------------------------------------------------*/
 
-static int read_wav_sample(running_machine &machine, emu_file &file, loaded_sample *sample)
+static int read_wav_sample(running_machine &machine, emu_file &file, loaded_sample *sample, char* filename)
 {
 	unsigned long offset = 0;
 	UINT32 length, rate, filesize;
@@ -165,13 +171,19 @@ static int read_wav_sample(running_machine &machine, emu_file &file, loaded_samp
 	/* read the core header and make sure it's a WAVE file */
 	offset += file.read(buf, 4);
 	if (offset < 4)
+	{
+		mame_printf_warning("unable to read %s, 0-byte file?\n", filename);
 		return 0;
+	}
 	if (memcmp(&buf[0], "RIFF", 4) == 0)
 		type = 1;
 	else if (memcmp(&buf[0], "fLaC", 4) == 0)
 		type = 2;
 	else
+	{
+		mame_printf_warning("unable to read %s, corrupt file?\n", filename);
 		return 0;
+	}
 
 	if (type==1)
 	{
@@ -322,19 +334,18 @@ static int read_wav_sample(running_machine &machine, emu_file &file, loaded_samp
 		if (FLAC__stream_decoder_process_until_end_of_metadata(decoder) != FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM)
 			fatalerror("Fail FLAC__stream_decoder_process_until_end_of_metadata\n");
 
-		//printf("got metadata?\n");
-
 		if (flacread.channels != 1) // only Mono supported
-			return 0;
+			fatalerror("Only MONO samples are supported\n");
 
-		int size = flacread.total_samples * (flacread.bits_per_sample/8);
 
-		sample->data = auto_alloc_array(machine, INT16, size);
+		sample->data = auto_alloc_array(machine, INT16, flacread.total_samples*2);
 		flacread.write_position = 0;
 		flacread.write_data = sample->data;
 
 		if (FLAC__stream_decoder_process_until_end_of_stream (decoder) != FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM)
+		{
 			fatalerror("Fail FLAC__stream_decoder_process_until_end_of_stream\n");
+		}
 
 		if (FLAC__stream_decoder_finish (decoder) != true)
 			fatalerror("Fail FLAC__stream_decoder_finish\n");
@@ -344,7 +355,7 @@ static int read_wav_sample(running_machine &machine, emu_file &file, loaded_samp
 		/* fill in the sample data */
 
 		sample->frequency = flacread.sample_rate;
-		sample->length = size;
+		sample->length = flacread.total_samples * (flacread.bits_per_sample/8);
 
 		if (flacread.bits_per_sample == 8)
 		{
@@ -395,13 +406,43 @@ loaded_samples *readsamples(running_machine &machine, const char *const *samplen
 		if (samplenames[i+skipfirst][0])
 		{
 			emu_file file(machine.options().sample_path(), OPEN_FLAG_READ);
+			file_error filerr = FILERR_NOT_FOUND;
 
-			file_error filerr = file.open(basename, PATH_SEPARATOR, samplenames[i+skipfirst]);
-			if (filerr != FILERR_NONE && skipfirst)
-				filerr = file.open(samplenames[0] + 1, PATH_SEPARATOR, samplenames[i+skipfirst]);
+			char filename[512];
+
+			if (filerr != FILERR_NONE)
+			{
+				// first try opening samples as .flac
+				sprintf(filename, "%s.flac", samplenames[i+skipfirst]);
+
+				filerr = file.open(basename, PATH_SEPARATOR, filename);
+				// try parent sample set
+				if (filerr != FILERR_NONE && skipfirst)
+					filerr = file.open(samplenames[0] + 1, PATH_SEPARATOR, filename);
+			}
+
+			if (filerr != FILERR_NONE)
+			{
+				// .wav fallback
+				sprintf(filename, "%s.wav", samplenames[i+skipfirst]);
+
+				filerr = file.open(basename, PATH_SEPARATOR, filename);
+				// try parent sample set
+				if (filerr != FILERR_NONE && skipfirst)
+					filerr = file.open(samplenames[0] + 1, PATH_SEPARATOR, filename);
+
+				// no real benefit to having non-flacs, so issue a warning
+				if (filerr == FILERR_NONE)
+					mame_printf_warning("%s will be loaded but should be re-encoded as FLAC\n", filename);
+			}
+
 
 			if (filerr == FILERR_NONE)
-				read_wav_sample(machine, file, &samples->sample[i]);
+				read_wav_sample(machine, file, &samples->sample[i], filename);
+
+			if (filerr == FILERR_NOT_FOUND)
+				mame_printf_warning("sample '%s' NOT FOUND\n", samplenames[i+skipfirst]);
+
 		}
 
 	return samples;

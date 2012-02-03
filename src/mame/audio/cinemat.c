@@ -124,14 +124,14 @@ static void generic_init(running_machine &machine, void (*callback)(running_mach
 static const char *const spacewar_sample_names[] =
 {
 	"*spacewar",
-	"explode1.wav",
-	"fire1.wav",
-	"idle.wav",
-	"thrust1.wav",
-	"thrust2.wav",
-	"pop.wav",
-	"explode2.wav",
-	"fire2.wav",
+	"explode1",
+	"fire1",
+	"idle",
+	"thrust1",
+	"thrust2",
+	"pop",
+	"explode2",
+	"fire2",
     0
 };
 
@@ -209,9 +209,9 @@ MACHINE_CONFIG_END
 static const char *const barrier_sample_names[] =
 {
 	"*barrier",
-	"playrdie.wav",
-	"playmove.wav",
-	"enemmove.wav",
+	"playrdie",
+	"playmove",
+	"enemmove",
     0
 };
 
@@ -265,7 +265,7 @@ MACHINE_CONFIG_END
 static const char *const speedfrk_sample_names[] =
 {
 	"*speedfrk",
-	"offroad.wav",
+	"offroad",
     NULL
 };
 
@@ -327,12 +327,12 @@ MACHINE_CONFIG_END
 static const char *const starhawk_sample_names[] =
 {
 	"*starhawk",
-	"explode.wav",
-	"rlaser.wav",
-	"llaser.wav",
-	"k.wav",
-	"master.wav",
-	"kexit.wav",
+	"explode",
+	"rlaser",
+	"llaser",
+	"k",
+	"master",
+	"kexit",
     NULL
 };
 
@@ -404,12 +404,12 @@ MACHINE_CONFIG_END
 static const char *const sundance_sample_names[] =
 {
 	"*sundance",
-	"bong.wav",
-	"whoosh.wav",
-	"explsion.wav",
-	"ping1.wav",
-	"ping2.wav",
-	"hatch.wav",
+	"bong",
+	"whoosh",
+	"explsion",
+	"ping1",
+	"ping2",
+	"hatch",
     0
 };
 
@@ -475,12 +475,12 @@ MACHINE_CONFIG_END
 static const char *const tailg_sample_names[] =
 {
 	"*tailg",
-	"sexplode.wav",
-	"thrust1.wav",
-	"slaser.wav",
-	"shield.wav",
-	"bounce.wav",
-	"hypersp.wav",
+	"sexplode",
+	"thrust1",
+	"slaser",
+	"shield",
+	"bounce",
+	"hypersp",
     NULL
 };
 
@@ -566,11 +566,11 @@ MACHINE_CONFIG_END
 static const char *const warrior_sample_names[] =
 {
 	"*warrior",
-	"bgmhum1.wav",
-	"bgmhum2.wav",
-	"killed.wav",
-	"fall.wav",
-	"appear.wav",
+	"bgmhum1",
+	"bgmhum2",
+	"killed",
+	"fall",
+	"appear",
     NULL
 };
 
@@ -636,13 +636,13 @@ MACHINE_CONFIG_END
 static const char *const armora_sample_names[] =
 {
 	"*armora",
-    "loexp.wav",
-    "jeepfire.wav",
-	"hiexp.wav",
-	"tankfire.wav",
-	"tankeng.wav",
-	"beep.wav",
-	"chopper.wav",
+    "loexp",
+    "jeepfire",
+	"hiexp",
+	"tankfire",
+	"tankeng",
+	"beep",
+	"chopper",
     NULL
 };
 
@@ -733,19 +733,19 @@ MACHINE_CONFIG_END
 static const char *const ripoff_sample_names[] =
 {
 	"*ripoff",
-	"bonuslvl.wav",
-	"eattack.wav",
-	"shipfire.wav",
-    "efire.wav",
-	"explosn.wav",
-	"bg1.wav",
-	"bg2.wav",
-	"bg3.wav",
-	"bg4.wav",
-	"bg5.wav",
-	"bg6.wav",
-	"bg7.wav",
-	"bg8.wav",
+	"bonuslvl",
+	"eattack",
+	"shipfire",
+    "efire",
+	"explosn",
+	"bg1",
+	"bg2",
+	"bg3",
+	"bg4",
+	"bg5",
+	"bg6",
+	"bg7",
+	"bg8",
     NULL
 };
 
@@ -827,14 +827,14 @@ MACHINE_CONFIG_END
 static const char *const starcas_sample_names[] =
 {
 	"*starcas",
-	"cfire.wav",
-	"shield.wav",
-	"star.wav",
-	"thrust.wav",
-	"drone.wav",
-	"lexplode.wav",
-	"sexplode.wav",
-	"pfire.wav",
+	"cfire",
+	"shield",
+	"star",
+	"thrust",
+	"drone",
+	"lexplode",
+	"sexplode",
+	"pfire",
     0
 };
 
@@ -942,14 +942,14 @@ MACHINE_CONFIG_END
 static const char *const solarq_sample_names[] =
 {
 	"*solarq",
-    "bigexpl.wav",
-	"smexpl.wav",
-	"lthrust.wav",
-	"slaser.wav",
-	"pickup.wav",
-	"nuke2.wav",
-	"nuke1.wav",
-    "music.wav",
+    "bigexpl",
+	"smexpl",
+	"lthrust",
+	"slaser",
+	"pickup",
+	"nuke2",
+	"nuke1",
+    "music",
     NULL
 };
 
@@ -1079,18 +1079,18 @@ MACHINE_CONFIG_END
 static const char *const boxingb_sample_names[] =
 {
 	"*boxingb",
-    "softexpl.wav",
-	"loudexpl.wav",
-	"chirp.wav",
-	"eggcrack.wav",
-	"bugpusha.wav",
-	"bugpushb.wav",
-	"bugdie.wav",
-    "beetle.wav",
-    "music.wav",
-    "cannon.wav",
-    "bounce.wav",
-    "bell.wav",
+    "softexpl",
+	"loudexpl",
+	"chirp",
+	"eggcrack",
+	"bugpusha",
+	"bugpushb",
+	"bugdie",
+    "beetle",
+    "music",
+    "cannon",
+    "bounce",
+    "bell",
     NULL
 };
 
@@ -1216,14 +1216,14 @@ MACHINE_CONFIG_END
 static const char *const wotw_sample_names[] =
 {
 	"*wotw",
-	"cfire.wav",
-	"shield.wav",
-	"star.wav",
-	"thrust.wav",
-	"drone.wav",
-	"lexplode.wav",
-	"sexplode.wav",
-	"pfire.wav",
+	"cfire",
+	"shield",
+	"star",
+	"thrust",
+	"drone",
+	"lexplode",
+	"sexplode",
+	"pfire",
     0
 };
 
@@ -1331,14 +1331,14 @@ MACHINE_CONFIG_END
 static const char *const wotwc_sample_names[] =
 {
 	"*wotwc",
-	"cfire.wav",
-	"shield.wav",
-	"star.wav",
-	"thrust.wav",
-	"drone.wav",
-	"lexplode.wav",
-	"sexplode.wav",
-	"pfire.wav",
+	"cfire",
+	"shield",
+	"star",
+	"thrust",
+	"drone",
+	"lexplode",
+	"sexplode",
+	"pfire",
     0
 };
 

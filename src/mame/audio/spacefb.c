@@ -70,10 +70,10 @@ WRITE8_HANDLER( spacefb_port_1_w )
 static const char *const spacefb_sample_names[] =
 {
 	"*spacefb",
-	"ekilled.wav",
-	"shipfire.wav",
-	"explode1.wav",
-	"explode2.wav",
+	"ekilled",
+	"shipfire",
+	"explode1",
+	"explode2",
 	0
 };
 

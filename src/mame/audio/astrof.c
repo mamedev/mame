@@ -126,17 +126,17 @@ WRITE8_HANDLER( astrof_audio_2_w )
 static const char *const astrof_sample_names[] =
 {
 	"*astrof",
-	"fire.wav",
-	"ekilled.wav",
-	"wave1.wav",
-	"wave2.wav",
-	"wave3.wav",
-	"wave4.wav",
-	"bossfire.wav",
-	"fuel.wav",
-	"death.wav",
-	"bosshit.wav",
-	"bosskill.wav",
+	"fire",
+	"ekilled",
+	"wave1",
+	"wave2",
+	"wave3",
+	"wave4",
+	"bossfire",
+	"fuel",
+	"death",
+	"bosshit",
+	"bosskill",
 	0
 };
 

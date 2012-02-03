@@ -21,10 +21,10 @@
 static const char *const depthch_sample_names[] =
 {
 	"*depthch",
-	"longex.wav",
-	"shortex.wav",
-	"spray.wav",
-	"sonar.wav",
+	"longex",
+	"shortex",
+	"spray",
+	"sonar",
 	0
 };
 

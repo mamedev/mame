@@ -355,7 +355,7 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device, 2,2,1);
+	deco_bac06_device::set_gfx_region_wide(*device, 2,2,2);
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
 

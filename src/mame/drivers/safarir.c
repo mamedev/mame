@@ -274,17 +274,17 @@ static WRITE8_HANDLER( safarir_audio_w )
 static const char *const safarir_sample_names[] =
 {
 	"*safarir",
-	"sound1-1.wav",
-	"sound1-2.wav",
-	"sound2.wav",
-	"sound3.wav",
-	"sound4-1.wav",
-	"sound4-2.wav",
-	"sound5-1.wav",
-	"sound5-2.wav",
-	"sound6.wav",
-	"sound7.wav",
-	"sound8.wav",
+	"sound1-1",
+	"sound1-2",
+	"sound2",
+	"sound3",
+	"sound4-1",
+	"sound4-2",
+	"sound5-1",
+	"sound5-2",
+	"sound6",
+	"sound7",
+	"sound8",
 	0
 };
 

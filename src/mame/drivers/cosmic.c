@@ -886,19 +886,19 @@ GFXDECODE_END
 static const char *const cosmica_sample_names[] =
 {
 	"*cosmica",
-	"backgr.wav",
-	"extend.wav",
-	"divea.wav",
-	"diveb1.wav",
-	"diveb2.wav",
-	"diveb3.wav",
-	"diveb4.wav",
-	"diveb5.wav",
-	"diveb6.wav",
-	"fire.wav",
-	"loudexp.wav",
-	"smallexp.wav",
-	"coin.wav",
+	"backgr",
+	"extend",
+	"divea",
+	"diveb1",
+	"diveb2",
+	"diveb3",
+	"diveb4",
+	"diveb5",
+	"diveb6",
+	"fire",
+	"loudexp",
+	"smallexp",
+	"coin",
 	0       /* end of array */
 };
 
@@ -913,17 +913,17 @@ static const samples_interface cosmica_samples_interface =
 static const char *const panic_sample_names[] =
 {
 	"*panic",
-	"walk.wav",
-	"upordown.wav",
-	"trapped.wav",
-	"falling.wav",
-	"escaping.wav",
-	"ekilled.wav",
-	"death.wav",
-	"elaugh.wav",
-	"extral.wav",
-	"oxygen.wav",
-	"coin.wav",
+	"walk",
+	"upordown",
+	"trapped",
+	"falling",
+	"escaping",
+	"ekilled",
+	"death",
+	"elaugh",
+	"extral",
+	"oxygen",
+	"coin",
 	0
 };
 
@@ -936,21 +936,21 @@ static const samples_interface panic_samples_interface =
 static const char *const cosmicg_sample_names[] =
 {
 	"*cosmicg",
-	"cg_m0.wav",	/* 8 Different pitches of March Sound */
-	"cg_m1.wav",
-	"cg_m2.wav",
-	"cg_m3.wav",
-	"cg_m4.wav",
-	"cg_m5.wav",
-	"cg_m6.wav",
-	"cg_m7.wav",
-	"cg_att.wav",	/* Killer Attack */
-	"cg_chnc.wav",	/* Bonus Chance  */
-	"cg_gotb.wav",	/* Got Bonus - have not got correct sound for */
-	"cg_dest.wav",	/* Gun Destroy */
-	"cg_gun.wav",	/* Gun Shot */
-	"cg_gotm.wav",	/* Got Monster */
-	"cg_ext.wav",	/* Coin Extend */
+	"cg_m0",	/* 8 Different pitches of March Sound */
+	"cg_m1",
+	"cg_m2",
+	"cg_m3",
+	"cg_m4",
+	"cg_m5",
+	"cg_m6",
+	"cg_m7",
+	"cg_att",	/* Killer Attack */
+	"cg_chnc",	/* Bonus Chance  */
+	"cg_gotb",	/* Got Bonus - have not got correct sound for */
+	"cg_dest",	/* Gun Destroy */
+	"cg_gun",	/* Gun Shot */
+	"cg_gotm",	/* Got Monster */
+	"cg_ext",	/* Coin Extend */
 	0
 };
 

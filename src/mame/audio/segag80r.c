@@ -158,22 +158,22 @@ static SOUND_START( astrob );
 static const char *const astrob_sample_names[] =
 {
 	"*astrob",
-	"invadr1.wav",		/* 0 */
-	"winvadr1.wav",		/* 1 */
-	"invadr2.wav",		/* 2 */
-	"winvadr2.wav",		/* 3 */
-	"invadr3.wav",		/* 4 */
-	"winvadr3.wav",		/* 5 */
-	"invadr4.wav",		/* 6 */
-	"winvadr4.wav",		/* 7 */
-	"asteroid.wav",		/* 8 */
-	"refuel.wav",		/* 9 */
-	"pbullet.wav",		/* 10 */
-	"ebullet.wav",		/* 11 */
-	"eexplode.wav",		/* 12 */
-	"pexplode.wav",		/* 13 */
-	"deedle.wav",		/* 14 */
-	"sonar.wav",		/* 15 */
+	"invadr1",		/* 0 */
+	"winvadr1",		/* 1 */
+	"invadr2",		/* 2 */
+	"winvadr2",		/* 3 */
+	"invadr3",		/* 4 */
+	"winvadr3",		/* 5 */
+	"invadr4",		/* 6 */
+	"winvadr4",		/* 7 */
+	"asteroid",		/* 8 */
+	"refuel",		/* 9 */
+	"pbullet",		/* 10 */
+	"ebullet",		/* 11 */
+	"eexplode",		/* 12 */
+	"pexplode",		/* 13 */
+	"deedle",		/* 14 */
+	"sonar",		/* 15 */
 	0
 };
 
@@ -386,13 +386,13 @@ static WRITE8_DEVICE_HANDLER( sega005_sound_b_w );
 static const char *const sega005_sample_names[] =
 {
 	"*005",
-	"lexplode.wav",		/* 0 */
-	"sexplode.wav",		/* 1 */
-	"dropbomb.wav",		/* 2 */
-	"shoot.wav",		/* 3 */
-	"missile.wav",		/* 4 */
-	"helicopt.wav",		/* 5 */
-	"whistle.wav",		/* 6 */
+	"lexplode",		/* 0 */
+	"sexplode",		/* 1 */
+	"dropbomb",		/* 2 */
+	"shoot",		/* 3 */
+	"missile",		/* 4 */
+	"helicopt",		/* 5 */
+	"whistle",		/* 6 */
 	0
 };
 
@@ -637,17 +637,17 @@ static SOUND_START( spaceod );
 static const char *const spaceod_sample_names[] =
 {
 	"*spaceod",
-	"fire.wav",			/* 0 */
-	"bomb.wav",			/* 1 */
-	"eexplode.wav", 	/* 2 */
-	"pexplode.wav",		/* 3 */
-	"warp.wav", 		/* 4 */
-	"birth.wav",		/* 5 */
-	"scoreup.wav",		/* 6 */
-	"ssound.wav",		/* 7 */
-	"accel.wav",		/* 8 */
-	"damaged.wav",		/* 9 */
-	"erocket.wav",		/* 10 */
+	"fire",			/* 0 */
+	"bomb",			/* 1 */
+	"eexplode", 	/* 2 */
+	"pexplode",		/* 3 */
+	"warp", 		/* 4 */
+	"birth",		/* 5 */
+	"scoreup",		/* 6 */
+	"ssound",		/* 7 */
+	"accel",		/* 8 */
+	"damaged",		/* 9 */
+	"erocket",		/* 10 */
 	0
 };
 
@@ -773,8 +773,8 @@ static READ8_HANDLER( n7751_t1_r );
 static const char *const monsterb_sample_names[] =
 {
 	"*monsterb",
-	"zap.wav",
-	"jumpdown.wav",
+	"zap",
+	"jumpdown",
 	0
 };
 

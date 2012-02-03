@@ -5,9 +5,9 @@
 static const char *const circus_sample_names[] =
 {
 	"*circus",
-	"pop.wav",
-	"miss.wav",
-	"bounce.wav",
+	"pop",
+	"miss",
+	"bounce",
 	0
 };
 
@@ -20,7 +20,7 @@ const samples_interface circus_samples_interface =
 static const char *const crash_sample_names[] =
 {
 	"*crash",
-	"crash.wav",
+	"crash",
 	0
 };
 
@@ -33,10 +33,10 @@ const samples_interface crash_samples_interface =
 static const char *const ripcord_sample_names[] =
 {
 	"*ripcord",
-	"splash.wav",
-	"scream.wav",
-	"chute.wav",
-	"whistle.wav",
+	"splash",
+	"scream",
+	"chute",
+	"whistle",
 	0
 };
 
@@ -49,11 +49,11 @@ const samples_interface ripcord_samples_interface =
 static const char *const robotbwl_sample_names[] =
 {
 	"*robotbwl",
-	"hit.wav",
-	"roll.wav",
-	"balldrop.wav",
-	"demerit.wav",
-	"reward.wav",
+	"hit",
+	"roll",
+	"balldrop",
+	"demerit",
+	"reward",
 	0
 };
 

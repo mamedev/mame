@@ -611,12 +611,12 @@ GFXDECODE_END
 static const char *const bowl3d_sample_names[] =
 {
 	"*bowl3d",
-	"roll.wav",     /* "roll" */
-	"rollback.wav", /* "roll back" */
-	"sweep.wav",    /* "sweep" */
-	"footstep.wav", /* "foot sweep" */
-	"crash.wav",    /* "crash" */
-	"cheering.wav", /* "cheering" */
+	"roll",     /* "roll" */
+	"rollback", /* "roll back" */
+	"sweep",    /* "sweep" */
+	"footstep", /* "foot sweep" */
+	"crash",    /* "crash" */
+	"cheering", /* "cheering" */
     0
 };
 

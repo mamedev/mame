@@ -1245,11 +1245,11 @@ INPUT_PORTS_END
 static const char *const seawolf_sample_names[] =
 {
 	"*seawolf",
-	"shiphit.wav",
-	"torpedo.wav",
-	"dive.wav",
-	"sonar.wav",
-	"minehit.wav",
+	"shiphit",
+	"torpedo",
+	"dive",
+	"sonar",
+	"minehit",
 	0
 };
 

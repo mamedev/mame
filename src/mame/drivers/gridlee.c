@@ -406,8 +406,8 @@ INPUT_PORTS_END
 static const char *const sample_names[] =
 {
 	"*gridlee",
-	"bounce1.wav",
-	"bounce2.wav",
+	"bounce1",
+	"bounce2",
 	0	/* end of array */
 };
 

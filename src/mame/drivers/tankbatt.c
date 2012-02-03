@@ -272,10 +272,10 @@ GFXDECODE_END
 static const char *const tankbatt_sample_names[] =
 {
 	"*tankbatt",
-	"fire.wav",
-	"engine1.wav",
-	"engine2.wav",
-	"explode1.wav",
+	"fire",
+	"engine1",
+	"engine2",
+	"explode1",
     0	/* end of array */
 };
 
