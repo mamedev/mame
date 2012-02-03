@@ -5,8 +5,10 @@ California Chase (c) 1999 The Game Room
 preliminary driver by Angelo Salese & Grull Osgo
 
 TODO:
-- Fix CPU core bugs;
 - get Win 98 to boot;
+- Various graphics bugs (title screen uses ROZ?);
+- fix 129 Hz refresh rate bug;
+- inputs (is there a service mode?)
 
 I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
 46E8    ----    8514/A and compatible video cards (e.g. ATI Graphics Ultra)
@@ -16,11 +18,6 @@ I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
 83C6-83C9 ----  Compaq Qvision EISA - DAC color registers
 
 43c4 is a 83c4 mirror?
-
-04D0-04D1 ---- EISA IRQ control
-00F0-00F5 ----  PCjr Disk Controller
-(or)
-00F0-00FF ----  coprocessor (8087..80387)
 
 =====================================================================================
 
@@ -382,6 +379,10 @@ static void intel82439tx_init(running_machine &machine)
 static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
+
+	if(reg == 0)
+		return 0x05851106; // VT82C585VPX, VIA
+
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= mxtc_config_r(busdevice, device, function, reg + 3) << 24;
@@ -441,6 +442,10 @@ static void piix4_config_w(device_t *busdevice, device_t *device, int function, 
 static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
+
+	if(reg == 0)
+		return 0x30401106; // VT82C586B, VIA
+
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
@@ -490,19 +495,6 @@ static WRITE32_HANDLER(bios_ram_w)
 	}
 }
 
-static WRITE8_HANDLER(iosound_w)
-{
-	switch(offset)
-	{
-		case 0x00:
-			dac_signed_data_w(space->machine().device("dac"), data);
-		case 0x20:
-			break;//dac_signed_data_w(space->machine().device("dac"), data);
-	}
-}
-
-
-
 static READ8_HANDLER(iocard_r)
 {
 	int data;
@@ -520,8 +512,10 @@ static READ8_HANDLER(iocard_r)
 	return data;
 }
 
-
-
+static WRITE16_DEVICE_HANDLER( calchase_dac_w )
+{
+	dac_data_16_w(device, ((data & 0xfff) << 4));
+}
 
 static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
@@ -530,7 +524,8 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000c8000, 0x000cffff) AM_NOP
 	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
 	AM_RANGE(0x000d0000, 0x000d003f) AM_READ8(iocard_r,0xffffffff)
-	AM_RANGE(0x000d0040, 0x000d004f) AM_WRITE8(iosound_w,0xffffffff)
+	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16("dac_l",calchase_dac_w,0x0000ffff)
+	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16("dac_r",calchase_dac_w,0x0000ffff)
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
 
@@ -809,9 +804,12 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	MCFG_SOUND_ADD("dac_l", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
+
+	MCFG_SOUND_ADD("dac_r", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
 MACHINE_CONFIG_END
 
@@ -864,4 +862,4 @@ ROM_START( calchase )
 	DISK_IMAGE_READONLY( "calchase", 0,SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
-GAME( 1999, calchase,  0,    calchase, calchase,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, calchase,  0,    calchase, calchase,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
