@@ -542,10 +542,10 @@ static void svga_vh_rgb15(running_machine &machine, bitmap_rgb32 &bitmap, const 
  	int pos, line, column, c, addr, curr_addr;
 
  	UINT32 *bitmapline;
- 	UINT16 mask_comp;
+// 	UINT16 mask_comp;
 
  	/* line compare is screen sensitive */
- 	mask_comp = 0xff | (TLINES & 0x300);
+// 	mask_comp = 0xff | (TLINES & 0x300);
  	curr_addr = 0;
  	yi=0;
  	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
