@@ -88,8 +88,8 @@ struct _rsp_config
 
 void rspdrc_flush_drc_cache(device_t *device);
 void rspdrc_set_options(device_t *device, UINT32 options);
-void rspdrc_add_imem(device_t *device, void *base);
-void rspdrc_add_dmem(device_t *device, void *base);
+void rspdrc_add_dmem(device_t *device, UINT32 *base);
+void rspdrc_add_imem(device_t *device, UINT32 *base);
 
 /***************************************************************************
     HELPER MACROS
@@ -183,6 +183,14 @@ struct _rsp_state
 	address_space *program;
 	direct_read_data *direct;
 	int icount;
+
+	UINT32 *dmem32;
+	UINT16 *dmem16;
+	UINT8 *dmem8;
+
+	UINT32 *imem32;
+	UINT16 *imem16;
+	UINT8 *imem8;
 
 	rspimp_state* impstate;
 };

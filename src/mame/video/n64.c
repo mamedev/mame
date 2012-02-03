@@ -45,17 +45,17 @@ namespace RDP
 void Processor::GetAlphaCvg(UINT8 *comb_alpha)
 {
 	INT32 temp = *comb_alpha;
-	INT32 temp2 = m_misc_state.m_curpixel_cvg;
+	INT32 temp2 = MiscState.CurrentPixCvg;
 	INT32 temp3 = 0;
 
-	if (m_other_modes.cvg_times_alpha)
+	if (OtherModes.cvg_times_alpha)
 	{
 		temp3 = (temp * temp2) + 4;
-		m_misc_state.m_curpixel_cvg = (temp3 >> 8) & 0xf;
+		MiscState.CurrentPixCvg = (temp3 >> 8) & 0xf;
 	}
-	if (m_other_modes.alpha_cvg_select)
+	if (OtherModes.alpha_cvg_select)
 	{
-		temp = (m_other_modes.cvg_times_alpha) ? (temp3 >> 3) : (temp2 << 5);
+		temp = (OtherModes.cvg_times_alpha) ? (temp3 >> 3) : (temp2 << 5);
 	}
 	if (temp > 0xff)
 	{
@@ -79,24 +79,24 @@ void Processor::VideoUpdate(n64_periphs *n64, bitmap_rgb32 &bitmap)
 			break;
 
 		default:
-			//fatalerror("Unsupported framebuffer depth: m_fb_size=%d\n", m_misc_state.m_fb_size);
+			//fatalerror("Unsupported framebuffer depth: m_fb_size=%d\n", MiscState.FBSize);
 			break;
 	}
 }
 
 void Processor::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 {
-    int fsaa = (((n64->vi_control >> 8) & 3) < 2);
-    int divot = (n64->vi_control >> 4) & 1;
+    //int fsaa = (((n64->vi_control >> 8) & 3) < 2);
+    //int divot = (n64->vi_control >> 4) & 1;
 
-	UINT32 prev_cvg = 0;
-	UINT32 next_cvg = 0;
+	//UINT32 prev_cvg = 0;
+	//UINT32 next_cvg = 0;
     //int dither_filter = (n64->vi_control >> 16) & 1;
     //int vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
 	UINT16 *frame_buffer = (UINT16*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
 	UINT32 hb = ((n64->vi_origin & 0xffffff) >> 2) >> 1;
-	UINT8* hidden_buffer = &m_hidden_bits[hb];
+	UINT8* hidden_buffer = &HiddenBits[hb];
 
 	INT32 hdiff = (n64->vi_hstart & 0x3ff) - ((n64->vi_hstart >> 16) & 0x3ff);
 	float hcoeff = ((float)(n64->vi_xscale & 0xfff) / (1 << 10));
@@ -132,28 +132,28 @@ void Processor::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 				//int r, g, b;
 
 				UINT16 pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
-				m_misc_state.m_curpixel_cvg = ((pix & 1) << 2) | (hidden_buffer[pixels ^ BYTE_ADDR_XOR] & 3);
+				MiscState.CurrentPixCvg = ((pix & 1) << 2) | (hidden_buffer[pixels ^ BYTE_ADDR_XOR] & 3);
 
-				if(divot)
-				{
-					if(i > 0 && i < (hres - 1))
-					{
-						prev_cvg = ((frame_buffer[(pixels - 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels - 1)^BYTE_ADDR_XOR] & 3);
-						next_cvg = ((frame_buffer[(pixels + 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels + 1)^BYTE_ADDR_XOR] & 3);
-					}
-				}
+				//if(divot)
+				//{
+				//	if(i > 0 && i < (hres - 1))
+				//	{
+				//		prev_cvg = ((frame_buffer[(pixels - 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels - 1)^BYTE_ADDR_XOR] & 3);
+				//		next_cvg = ((frame_buffer[(pixels + 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels + 1)^BYTE_ADDR_XOR] & 3);
+				//	}
+				//}
 				c.i.r = ((pix >> 8) & 0xf8) | (pix >> 13);
 				c.i.g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
 				c.i.b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
 
-				if(fsaa)
-				{
-					//if (/*!vibuffering &&*/ state->m_rdp.GetMiscState()->m_curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2))
+				//if(fsaa)
+				//{
+					//if (/*!vibuffering &&*/ state->m_rdp.MiscState.CurrentPixCvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2))
 					//{
 						//video_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR],&hidden_buffer[pixels ^ BYTE_ADDR_XOR], n64->vi_width);
 					//}
-				}
-				//else if (dither_filter && state->m_rdp.GetMiscState()->m_curpixel_cvg == 7 && i > 0 && j > 0 && i < (hres - 1) && j < (vres - 1))
+				//}
+				//else if (dither_filter && state->m_rdp.MiscState.CurrentPixCvg == 7 && i > 0 && j > 0 && i < (hres - 1) && j < (vres - 1))
 				//{
 					//if (vibuffering)
 					//{
@@ -164,10 +164,10 @@ void Processor::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 						//restore_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR, n64->vi_width);
 					//}
 				//}
-				if(divot)
-				{
-					if (i > 0 && i < (hres - 1) && (m_misc_state.m_curpixel_cvg != 7 || prev_cvg != 7 || next_cvg != 7))
-					{
+				//if(divot)
+				//{
+					//if (i > 0 && i < (hres - 1) && (MiscState.CurrentPixCvg != 7 || prev_cvg != 7 || next_cvg != 7))
+					//{
 						//if (vibuffering)
 						//{
 						//  divot_filter16_buffer(&r, &g, &b, &ViBuffer[i][j]);
@@ -176,8 +176,8 @@ void Processor::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 						//{
 							//divot_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR);
 						//}
-					}
-				}
+					//}
+				//}
 
 				/*
                 if (gamma_dither)
@@ -412,56 +412,56 @@ void Processor::ColorCombiner1Cycle(bool noisecompute)
 {
 	if (noisecompute)
 	{
-		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = machine().rand() & 0xff; // Not accurate...
+		NoiseColor.i.r = NoiseColor.i.g = NoiseColor.i.b = machine().rand() & 0xff; // Not accurate...
 	}
 
-	m_pixel_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[1],*m_color_inputs.combiner_rgbsub_b_r[1],*m_color_inputs.combiner_rgbmul_r[1],*m_color_inputs.combiner_rgbadd_r[1]);
-	m_pixel_color.i.g = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_g[1],*m_color_inputs.combiner_rgbsub_b_g[1],*m_color_inputs.combiner_rgbmul_g[1],*m_color_inputs.combiner_rgbadd_g[1]);
-	m_pixel_color.i.b = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_b[1],*m_color_inputs.combiner_rgbsub_b_b[1],*m_color_inputs.combiner_rgbmul_b[1],*m_color_inputs.combiner_rgbadd_b[1]);
-	m_pixel_color.i.a = AlphaCombinerEquation(*m_color_inputs.combiner_alphasub_a[1],*m_color_inputs.combiner_alphasub_b[1],*m_color_inputs.combiner_alphamul[1],*m_color_inputs.combiner_alphaadd[1]);
+	PixelColor.i.r = ColorCombinerEquation(*ColorInputs.combiner_rgbsub_a_r[1],*ColorInputs.combiner_rgbsub_b_r[1],*ColorInputs.combiner_rgbmul_r[1],*ColorInputs.combiner_rgbadd_r[1]);
+	PixelColor.i.g = ColorCombinerEquation(*ColorInputs.combiner_rgbsub_a_g[1],*ColorInputs.combiner_rgbsub_b_g[1],*ColorInputs.combiner_rgbmul_g[1],*ColorInputs.combiner_rgbadd_g[1]);
+	PixelColor.i.b = ColorCombinerEquation(*ColorInputs.combiner_rgbsub_a_b[1],*ColorInputs.combiner_rgbsub_b_b[1],*ColorInputs.combiner_rgbmul_b[1],*ColorInputs.combiner_rgbadd_b[1]);
+	PixelColor.i.a = AlphaCombinerEquation(*ColorInputs.combiner_alphasub_a[1],*ColorInputs.combiner_alphasub_b[1],*ColorInputs.combiner_alphamul[1],*ColorInputs.combiner_alphaadd[1]);
 
 	//Alpha coverage combiner
-	GetAlphaCvg(&m_pixel_color.i.a);
+	GetAlphaCvg(&PixelColor.i.a);
 }
 
 void Processor::ColorCombiner2Cycle(bool noisecompute)
 {
 	if (noisecompute)
 	{
-		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = machine().rand() & 0xff; // HACK
+		NoiseColor.i.r = NoiseColor.i.g = NoiseColor.i.b = machine().rand() & 0xff; // HACK
 	}
 
-	m_combined_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[0],*m_color_inputs.combiner_rgbsub_b_r[0],*m_color_inputs.combiner_rgbmul_r[0],*m_color_inputs.combiner_rgbadd_r[0]);
-	m_combined_color.i.g = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_g[0],*m_color_inputs.combiner_rgbsub_b_g[0],*m_color_inputs.combiner_rgbmul_g[0],*m_color_inputs.combiner_rgbadd_g[0]);
-	m_combined_color.i.b = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_b[0],*m_color_inputs.combiner_rgbsub_b_b[0],*m_color_inputs.combiner_rgbmul_b[0],*m_color_inputs.combiner_rgbadd_b[0]);
-	m_combined_color.i.a = AlphaCombinerEquation(*m_color_inputs.combiner_alphasub_a[0],*m_color_inputs.combiner_alphasub_b[0],*m_color_inputs.combiner_alphamul[0],*m_color_inputs.combiner_alphaadd[0]);
+	CombinedColor.i.r = ColorCombinerEquation(*ColorInputs.combiner_rgbsub_a_r[0],*ColorInputs.combiner_rgbsub_b_r[0],*ColorInputs.combiner_rgbmul_r[0],*ColorInputs.combiner_rgbadd_r[0]);
+	CombinedColor.i.g = ColorCombinerEquation(*ColorInputs.combiner_rgbsub_a_g[0],*ColorInputs.combiner_rgbsub_b_g[0],*ColorInputs.combiner_rgbmul_g[0],*ColorInputs.combiner_rgbadd_g[0]);
+	CombinedColor.i.b = ColorCombinerEquation(*ColorInputs.combiner_rgbsub_a_b[0],*ColorInputs.combiner_rgbsub_b_b[0],*ColorInputs.combiner_rgbmul_b[0],*ColorInputs.combiner_rgbadd_b[0]);
+	CombinedColor.i.a = AlphaCombinerEquation(*ColorInputs.combiner_alphasub_a[0],*ColorInputs.combiner_alphasub_b[0],*ColorInputs.combiner_alphamul[0],*ColorInputs.combiner_alphaadd[0]);
 
-	m_texel0_color = m_texel1_color;
-	m_texel1_color = m_next_texel_color;
+	Texel0Color = Texel1Color;
+	Texel1Color = NextTexelColor;
 
-	m_pixel_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[1],*m_color_inputs.combiner_rgbsub_b_r[1],*m_color_inputs.combiner_rgbmul_r[1],*m_color_inputs.combiner_rgbadd_r[1]);
-	m_pixel_color.i.g = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_g[1],*m_color_inputs.combiner_rgbsub_b_g[1],*m_color_inputs.combiner_rgbmul_g[1],*m_color_inputs.combiner_rgbadd_g[1]);
-	m_pixel_color.i.b = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_b[1],*m_color_inputs.combiner_rgbsub_b_b[1],*m_color_inputs.combiner_rgbmul_b[1],*m_color_inputs.combiner_rgbadd_b[1]);
-	m_pixel_color.i.a = AlphaCombinerEquation(*m_color_inputs.combiner_alphasub_a[1],*m_color_inputs.combiner_alphasub_b[1],*m_color_inputs.combiner_alphamul[1],*m_color_inputs.combiner_alphaadd[1]);
+	PixelColor.i.r = ColorCombinerEquation(*ColorInputs.combiner_rgbsub_a_r[1],*ColorInputs.combiner_rgbsub_b_r[1],*ColorInputs.combiner_rgbmul_r[1],*ColorInputs.combiner_rgbadd_r[1]);
+	PixelColor.i.g = ColorCombinerEquation(*ColorInputs.combiner_rgbsub_a_g[1],*ColorInputs.combiner_rgbsub_b_g[1],*ColorInputs.combiner_rgbmul_g[1],*ColorInputs.combiner_rgbadd_g[1]);
+	PixelColor.i.b = ColorCombinerEquation(*ColorInputs.combiner_rgbsub_a_b[1],*ColorInputs.combiner_rgbsub_b_b[1],*ColorInputs.combiner_rgbmul_b[1],*ColorInputs.combiner_rgbadd_b[1]);
+	PixelColor.i.a = AlphaCombinerEquation(*ColorInputs.combiner_alphasub_a[1],*ColorInputs.combiner_alphasub_b[1],*ColorInputs.combiner_alphamul[1],*ColorInputs.combiner_alphaadd[1]);
 
-	GetAlphaCvg(&m_pixel_color.i.a);
+	GetAlphaCvg(&PixelColor.i.a);
 }
 
 void Processor::SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0xf)
 	{
-		case 0:		*input_r = &m_combined_color.i.r;	*input_g = &m_combined_color.i.g;	*input_b = &m_combined_color.i.b;	break;
-		case 1:		*input_r = &m_texel0_color.i.r;		*input_g = &m_texel0_color.i.g;		*input_b = &m_texel0_color.i.b;		break;
-		case 2:		*input_r = &m_texel1_color.i.r;		*input_g = &m_texel1_color.i.g;		*input_b = &m_texel1_color.i.b;		break;
-		case 3:		*input_r = &m_prim_color.i.r;		*input_g = &m_prim_color.i.g;		*input_b = &m_prim_color.i.b;		break;
-		case 4:		*input_r = &m_shade_color.i.r;		*input_g = &m_shade_color.i.g;		*input_b = &m_shade_color.i.b;		break;
-		case 5:		*input_r = &m_env_color.i.r;		*input_g = &m_env_color.i.g;		*input_b = &m_env_color.i.b;		break;
-		case 6:		*input_r = &m_one_color.i.r;		*input_g = &m_one_color.i.g;		*input_b = &m_one_color.i.b;		break;
-		case 7:		*input_r = &m_noise_color.i.r;		*input_g = &m_noise_color.i.g;		*input_b = &m_noise_color.i.b;		break;
+		case 0:		*input_r = &CombinedColor.i.r;	*input_g = &CombinedColor.i.g;	*input_b = &CombinedColor.i.b;	break;
+		case 1:		*input_r = &Texel0Color.i.r;	*input_g = &Texel0Color.i.g;	*input_b = &Texel0Color.i.b;	break;
+		case 2:		*input_r = &Texel1Color.i.r;	*input_g = &Texel1Color.i.g;	*input_b = &Texel1Color.i.b;	break;
+		case 3:		*input_r = &PrimColor.i.r;		*input_g = &PrimColor.i.g;		*input_b = &PrimColor.i.b;		break;
+		case 4:		*input_r = &ShadeColor.i.r;		*input_g = &ShadeColor.i.g;		*input_b = &ShadeColor.i.b;		break;
+		case 5:		*input_r = &EnvColor.i.r;		*input_g = &EnvColor.i.g;		*input_b = &EnvColor.i.b;		break;
+		case 6:		*input_r = &OneColor.i.r;		*input_g = &OneColor.i.g;		*input_b = &OneColor.i.b;		break;
+		case 7:		*input_r = &NoiseColor.i.r;		*input_g = &NoiseColor.i.g;		*input_b = &NoiseColor.i.b;		break;
 		case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 		{
-					*input_r = &m_zero_color.i.r;		*input_g = &m_zero_color.i.g;		*input_b = &m_zero_color.i.b;		break;
+					*input_r = &ZeroColor.i.r;		*input_g = &ZeroColor.i.g;		*input_b = &ZeroColor.i.b;		break;
 		}
 	}
 }
@@ -470,17 +470,17 @@ void Processor::SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_
 {
 	switch (code & 0xf)
 	{
-		case 0:		*input_r = &m_combined_color.i.r;	*input_g = &m_combined_color.i.g;	*input_b = &m_combined_color.i.b;	break;
-		case 1:		*input_r = &m_texel0_color.i.r;		*input_g = &m_texel0_color.i.g;		*input_b = &m_texel0_color.i.b;		break;
-		case 2:		*input_r = &m_texel1_color.i.r;		*input_g = &m_texel1_color.i.g;		*input_b = &m_texel1_color.i.b;		break;
-		case 3:		*input_r = &m_prim_color.i.r;		*input_g = &m_prim_color.i.g;		*input_b = &m_prim_color.i.b;		break;
-		case 4:		*input_r = &m_shade_color.i.r;		*input_g = &m_shade_color.i.g;		*input_b = &m_shade_color.i.b;		break;
-		case 5:		*input_r = &m_env_color.i.r;		*input_g = &m_env_color.i.g;		*input_b = &m_env_color.i.b;		break;
+		case 0:		*input_r = &CombinedColor.i.r;	*input_g = &CombinedColor.i.g;	*input_b = &CombinedColor.i.b;	break;
+		case 1:		*input_r = &Texel0Color.i.r;	*input_g = &Texel0Color.i.g;	*input_b = &Texel0Color.i.b;	break;
+		case 2:		*input_r = &Texel1Color.i.r;	*input_g = &Texel1Color.i.g;	*input_b = &Texel1Color.i.b;	break;
+		case 3:		*input_r = &PrimColor.i.r;		*input_g = &PrimColor.i.g;		*input_b = &PrimColor.i.b;		break;
+		case 4:		*input_r = &ShadeColor.i.r;		*input_g = &ShadeColor.i.g;		*input_b = &ShadeColor.i.b;		break;
+		case 5:		*input_r = &EnvColor.i.r;		*input_g = &EnvColor.i.g;		*input_b = &EnvColor.i.b;		break;
 		case 6:		fatalerror("SET_SUBB_RGB_INPUT: key_center\n");	break;
-		case 7:		*input_r = (UINT8*)&m_k4;			*input_g = (UINT8*)&m_k4;			*input_b = (UINT8*)&m_k4;			break;
+		case 7:		*input_r = (UINT8*)&m_k4;		*input_g = (UINT8*)&m_k4;		*input_b = (UINT8*)&m_k4;		break;
 		case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 		{
-					*input_r = &m_zero_color.i.r;		*input_g = &m_zero_color.i.g;		*input_b = &m_zero_color.i.b;		break;
+					*input_r = &ZeroColor.i.r;		*input_g = &ZeroColor.i.g;		*input_b = &ZeroColor.i.b;		break;
 		}
 	}
 }
@@ -489,26 +489,26 @@ void Processor::SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b
 {
 	switch (code & 0x1f)
 	{
-		case 0:		*input_r = &m_combined_color.i.r;	*input_g = &m_combined_color.i.g;	*input_b = &m_combined_color.i.b;	break;
-		case 1:		*input_r = &m_texel0_color.i.r;		*input_g = &m_texel0_color.i.g;		*input_b = &m_texel0_color.i.b;		break;
-		case 2:		*input_r = &m_texel1_color.i.r;		*input_g = &m_texel1_color.i.g;		*input_b = &m_texel1_color.i.b;		break;
-		case 3:		*input_r = &m_prim_color.i.r;		*input_g = &m_prim_color.i.g;		*input_b = &m_prim_color.i.b;		break;
-		case 4:		*input_r = &m_shade_color.i.r;		*input_g = &m_shade_color.i.g;		*input_b = &m_shade_color.i.b;		break;
-		case 5:		*input_r = &m_env_color.i.r;		*input_g = &m_env_color.i.g;		*input_b = &m_env_color.i.b;		break;
-		case 6:		*input_r = &m_key_scale.i.r;		*input_g = &m_key_scale.i.g;		*input_b = &m_key_scale.i.b;		break;
-		case 7:		*input_r = &m_combined_color.i.a;	*input_g = &m_combined_color.i.a;	*input_b = &m_combined_color.i.a;	break;
-		case 8:		*input_r = &m_texel0_color.i.a;		*input_g = &m_texel0_color.i.a;		*input_b = &m_texel0_color.i.a;		break;
-		case 9:		*input_r = &m_texel1_color.i.a;		*input_g = &m_texel1_color.i.a;		*input_b = &m_texel1_color.i.a;		break;
-		case 10:	*input_r = &m_prim_color.i.a;		*input_g = &m_prim_color.i.a;		*input_b = &m_prim_color.i.a;		break;
-		case 11:	*input_r = &m_shade_color.i.a;		*input_g = &m_shade_color.i.a;		*input_b = &m_shade_color.i.a;		break;
-		case 12:	*input_r = &m_env_color.i.a;		*input_g = &m_env_color.i.a;		*input_b = &m_env_color.i.a;		break;
-		case 13:	*input_r = &m_lod_frac;				*input_g = &m_lod_frac;				*input_b = &m_lod_frac;				break;
-		case 14:	*input_r = &m_prim_lod_frac;		*input_g = &m_prim_lod_frac;		*input_b = &m_prim_lod_frac;		break;
+		case 0:		*input_r = &CombinedColor.i.r;	*input_g = &CombinedColor.i.g;	*input_b = &CombinedColor.i.b;	break;
+		case 1:		*input_r = &Texel0Color.i.r;	*input_g = &Texel0Color.i.g;	*input_b = &Texel0Color.i.b;	break;
+		case 2:		*input_r = &Texel1Color.i.r;	*input_g = &Texel1Color.i.g;	*input_b = &Texel1Color.i.b;	break;
+		case 3:		*input_r = &PrimColor.i.r;		*input_g = &PrimColor.i.g;		*input_b = &PrimColor.i.b;		break;
+		case 4:		*input_r = &ShadeColor.i.r;		*input_g = &ShadeColor.i.g;		*input_b = &ShadeColor.i.b;		break;
+		case 5:		*input_r = &EnvColor.i.r;		*input_g = &EnvColor.i.g;		*input_b = &EnvColor.i.b;		break;
+		case 6:		*input_r = &KeyScale.i.r;		*input_g = &KeyScale.i.g;		*input_b = &KeyScale.i.b;		break;
+		case 7:		*input_r = &CombinedColor.i.a;	*input_g = &CombinedColor.i.a;	*input_b = &CombinedColor.i.a;	break;
+		case 8:		*input_r = &Texel0Color.i.a;	*input_g = &Texel0Color.i.a;		*input_b = &Texel0Color.i.a;	break;
+		case 9:		*input_r = &Texel1Color.i.a;	*input_g = &Texel1Color.i.a;		*input_b = &Texel1Color.i.a;	break;
+		case 10:	*input_r = &PrimColor.i.a;		*input_g = &PrimColor.i.a;		*input_b = &PrimColor.i.a;		break;
+		case 11:	*input_r = &ShadeColor.i.a;		*input_g = &ShadeColor.i.a;		*input_b = &ShadeColor.i.a;		break;
+		case 12:	*input_r = &EnvColor.i.a;		*input_g = &EnvColor.i.a;		*input_b = &EnvColor.i.a;		break;
+		case 13:	*input_r = &LODFraction;				*input_g = &LODFraction;				*input_b = &LODFraction;				break;
+		case 14:	*input_r = &PrimLODFraction;		*input_g = &PrimLODFraction;		*input_b = &PrimLODFraction;		break;
 		case 15:	*input_r = (UINT8*)&m_k5;			*input_g = (UINT8*)&m_k5;			*input_b = (UINT8*)&m_k5;			break;
 		case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23:
 		case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 31:
 		{
-					*input_r = &m_zero_color.i.r;		*input_g = &m_zero_color.i.g;		*input_b = &m_zero_color.i.b;		break;
+					*input_r = &ZeroColor.i.r;		*input_g = &ZeroColor.i.g;		*input_b = &ZeroColor.i.b;		break;
 		}
 	}
 }
@@ -517,14 +517,14 @@ void Processor::SetAddInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b
 {
 	switch (code & 0x7)
 	{
-		case 0:		*input_r = &m_combined_color.i.r;	*input_g = &m_combined_color.i.g;	*input_b = &m_combined_color.i.b;	break;
-		case 1:		*input_r = &m_texel0_color.i.r;		*input_g = &m_texel0_color.i.g;		*input_b = &m_texel0_color.i.b;		break;
-		case 2:		*input_r = &m_texel1_color.i.r;		*input_g = &m_texel1_color.i.g;		*input_b = &m_texel1_color.i.b;		break;
-		case 3:		*input_r = &m_prim_color.i.r;		*input_g = &m_prim_color.i.g;		*input_b = &m_prim_color.i.b;		break;
-		case 4:		*input_r = &m_shade_color.i.r;		*input_g = &m_shade_color.i.g;		*input_b = &m_shade_color.i.b;		break;
-		case 5:		*input_r = &m_env_color.i.r;		*input_g = &m_env_color.i.g;		*input_b = &m_env_color.i.b;		break;
-		case 6:		*input_r = &m_one_color.i.r;		*input_g = &m_one_color.i.g;		*input_b = &m_one_color.i.b;		break;
-		case 7:		*input_r = &m_zero_color.i.r;		*input_g = &m_zero_color.i.g;		*input_b = &m_zero_color.i.b;		break;
+		case 0:		*input_r = &CombinedColor.i.r;	*input_g = &CombinedColor.i.g;	*input_b = &CombinedColor.i.b;	break;
+		case 1:		*input_r = &Texel0Color.i.r;		*input_g = &Texel0Color.i.g;		*input_b = &Texel0Color.i.b;		break;
+		case 2:		*input_r = &Texel1Color.i.r;		*input_g = &Texel1Color.i.g;		*input_b = &Texel1Color.i.b;		break;
+		case 3:		*input_r = &PrimColor.i.r;		*input_g = &PrimColor.i.g;		*input_b = &PrimColor.i.b;		break;
+		case 4:		*input_r = &ShadeColor.i.r;		*input_g = &ShadeColor.i.g;		*input_b = &ShadeColor.i.b;		break;
+		case 5:		*input_r = &EnvColor.i.r;		*input_g = &EnvColor.i.g;		*input_b = &EnvColor.i.b;		break;
+		case 6:		*input_r = &OneColor.i.r;		*input_g = &OneColor.i.g;		*input_b = &OneColor.i.b;		break;
+		case 7:		*input_r = &ZeroColor.i.r;		*input_g = &ZeroColor.i.g;		*input_b = &ZeroColor.i.b;		break;
 	}
 }
 
@@ -532,14 +532,14 @@ void Processor::SetSubInputAlpha(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
-		case 0:		*input = &m_combined_color.i.a; break;
-		case 1:		*input = &m_texel0_color.i.a; break;
-		case 2:		*input = &m_texel1_color.i.a; break;
-		case 3:		*input = &m_prim_color.i.a; break;
-		case 4:		*input = &m_shade_color.i.a; break;
-		case 5:		*input = &m_env_color.i.a; break;
-		case 6:		*input = &m_one_color.i.a; break;
-		case 7:		*input = &m_zero_color.i.a; break;
+		case 0:		*input = &CombinedColor.i.a; break;
+		case 1:		*input = &Texel0Color.i.a; break;
+		case 2:		*input = &Texel1Color.i.a; break;
+		case 3:		*input = &PrimColor.i.a; break;
+		case 4:		*input = &ShadeColor.i.a; break;
+		case 5:		*input = &EnvColor.i.a; break;
+		case 6:		*input = &OneColor.i.a; break;
+		case 7:		*input = &ZeroColor.i.a; break;
 	}
 }
 
@@ -547,14 +547,14 @@ void Processor::SetMulInputAlpha(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
-		case 0:		*input = &m_lod_frac; break;
-		case 1:		*input = &m_texel0_color.i.a; break;
-		case 2:		*input = &m_texel1_color.i.a; break;
-		case 3:		*input = &m_prim_color.i.a; break;
-		case 4:		*input = &m_shade_color.i.a; break;
-		case 5:		*input = &m_env_color.i.a; break;
-		case 6:		*input = &m_prim_lod_frac; break;
-		case 7:		*input = &m_zero_color.i.a; break;
+		case 0:		*input = &LODFraction; break;
+		case 1:		*input = &Texel0Color.i.a; break;
+		case 2:		*input = &Texel1Color.i.a; break;
+		case 3:		*input = &PrimColor.i.a; break;
+		case 4:		*input = &ShadeColor.i.a; break;
+		case 5:		*input = &EnvColor.i.a; break;
+		case 6:		*input = &PrimLODFraction; break;
+		case 7:		*input = &ZeroColor.i.a; break;
 	}
 }
 
@@ -566,40 +566,40 @@ void Processor::SetBlenderInput(int cycle, int which, UINT8 **input_r, UINT8 **i
 		{
 			if (cycle == 0)
 			{
-				*input_r = &m_pixel_color.i.r;
-				*input_g = &m_pixel_color.i.g;
-				*input_b = &m_pixel_color.i.b;
+				*input_r = &PixelColor.i.r;
+				*input_g = &PixelColor.i.g;
+				*input_b = &PixelColor.i.b;
 			}
 			else
 			{
-				*input_r = &m_blended_pixel_color.i.r;
-				*input_g = &m_blended_pixel_color.i.g;
-				*input_b = &m_blended_pixel_color.i.b;
+				*input_r = &BlendedPixelColor.i.r;
+				*input_g = &BlendedPixelColor.i.g;
+				*input_b = &BlendedPixelColor.i.b;
 			}
 			break;
 		}
 
 		case 1:
 		{
-			*input_r = &m_memory_color.i.r;
-			*input_g = &m_memory_color.i.g;
-			*input_b = &m_memory_color.i.b;
+			*input_r = &MemoryColor.i.r;
+			*input_g = &MemoryColor.i.g;
+			*input_b = &MemoryColor.i.b;
 			break;
 		}
 
 		case 2:
 		{
-			*input_r = &m_blend_color.i.r;
-			*input_g = &m_blend_color.i.g;
-			*input_b = &m_blend_color.i.b;
+			*input_r = &BlendColor.i.r;
+			*input_g = &BlendColor.i.g;
+			*input_b = &BlendColor.i.b;
 			break;
 		}
 
 		case 3:
 		{
-			*input_r = &m_fog_color.i.r;
-			*input_g = &m_fog_color.i.g;
-			*input_b = &m_fog_color.i.b;
+			*input_r = &FogColor.i.r;
+			*input_g = &FogColor.i.g;
+			*input_b = &FogColor.i.b;
 			break;
 		}
 	}
@@ -608,20 +608,20 @@ void Processor::SetBlenderInput(int cycle, int which, UINT8 **input_r, UINT8 **i
 	{
 		switch (b & 0x3)
 		{
-			case 0:		*input_a = &m_pixel_color.i.a; break;
-			case 1:		*input_a = &m_fog_color.i.a; break;
-			case 2:		*input_a = &m_shade_color.i.a; break;
-			case 3:		*input_a = &m_zero_color.i.a; break;
+			case 0:		*input_a = &PixelColor.i.a; break;
+			case 1:		*input_a = &FogColor.i.a; break;
+			case 2:		*input_a = &ShadeColor.i.a; break;
+			case 3:		*input_a = &ZeroColor.i.a; break;
 		}
 	}
 	else
 	{
 		switch (b & 0x3)
 		{
-			case 0:		*input_a = &m_inv_pixel_color.i.a; break;
-			case 1:		*input_a = &m_memory_color.i.a; break;
-			case 2:		*input_a = &m_one_color.i.a; break;
-			case 3:		*input_a = &m_zero_color.i.a; break;
+			case 0:		*input_a = &InvPixelColor.i.a; break;
+			case 1:		*input_a = &MemoryColor.i.a; break;
+			case 2:		*input_a = &OneColor.i.a; break;
+			case 3:		*input_a = &ZeroColor.i.a; break;
 		}
 	}
 }
@@ -859,14 +859,9 @@ UINT16 Processor::decompress_cvmask_frombyte(UINT8 x)
 
 void Processor::lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy)
 {
-	UINT32 index;
-	/*
-    if (mask != (mask & 0xa5a5))//never happens
-        stricterror("wrong cvmask computed: %x", mask);
-    */
-	index = compressed_cvmasks[mask];//???????? VTune, ???-?? ?? 50% ???????, ??? ?????? ?? 8 ??? ?? ????? ? ???? ?-??
-	m_misc_state.m_curpixel_cvg = cvarray[index].cvg;
-	m_misc_state.m_curpixel_cvbit = cvarray[index].cvbit;//??? mask15b: cv.c, bl.c
+	UINT32 index = compressed_cvmasks[mask];
+	MiscState.CurrentPixCvg = cvarray[index].cvg;
+	MiscState.CurrentCvgBit = cvarray[index].cvbit;
 	*offx = cvarray[index].xoff;
 	*offy = cvarray[index].yoff;
 }
@@ -880,7 +875,7 @@ void Processor::ZStore(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z)
 	}
 	if(dzcurpixel <= MEM8_LIMIT)
 	{
-		m_hidden_bits[dzcurpixel ^ BYTE_ADDR_XOR] = m_dzpix_enc & 3;
+		HiddenBits[dzcurpixel ^ BYTE_ADDR_XOR] = m_dzpix_enc & 3;
 	}
 }
 
@@ -913,7 +908,7 @@ UINT32 Processor::ZDecompress(UINT32 zcurpixel)
 UINT32 Processor::DZDecompress(UINT32 zcurpixel, UINT32 dzcurpixel)
 {
 	UINT16 zval = RREADIDX16(zcurpixel);
-	UINT8 dzval = (((dzcurpixel) <= 0x7fffff) ? (GetHiddenBits()[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0);
+	UINT8 dzval = (((dzcurpixel) <= 0x7fffff) ? (HiddenBits[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0);
 	UINT32 dz_compressed = ((zval & 3) << 2) | (dzval & 3);
 	return (1 << dz_compressed);
 }
@@ -928,7 +923,7 @@ UINT32 Processor::DZCompress(UINT32 value)
 void Processor::GetDitherValues(int x, int y, int* cdith, int* adith)
 {
 	int dithindex = ((y & 3) << 2) | (x & 3);
-	switch((m_other_modes.rgb_dither_sel << 2) | m_other_modes.alpha_dither_sel)
+	switch((OtherModes.rgb_dither_sel << 2) | OtherModes.alpha_dither_sel)
 	{
 	case 0:
 		*adith = *cdith = s_magic_matrix[dithindex];
@@ -1011,12 +1006,12 @@ bool Processor::ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 
 	UINT32 zval;
 	INT32 rawdzmem;
 
-	if (m_other_modes.z_compare_en)
+	if (OtherModes.z_compare_en)
 	{
 		oz = ZDecompress(zcurpixel);
 		dzmem = DZDecompress(zcurpixel, dzcurpixel);
 		zval = RREADIDX16(zcurpixel);
-		rawdzmem = ((zval & 3) << 2) | ((((dzcurpixel) <= 0x3fffff) ? (GetHiddenBits()[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0) & 3);
+		rawdzmem = ((zval & 3) << 2) | ((((dzcurpixel) <= 0x3fffff) ? (HiddenBits[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0) & 3);
 	}
 	else
 	{
@@ -1027,16 +1022,13 @@ bool Processor::ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 
 	}
 
 	m_dzpix_enc = DZCompress(dzpix & 0xffff);
-	m_blender.SetShiftA(CLAMP(m_dzpix_enc - rawdzmem, 0, 4));
-	m_blender.SetShiftB(CLAMP(rawdzmem - m_dzpix_enc, 0, 4));
+	Blender.ShiftA = CLAMP(m_dzpix_enc - rawdzmem, 0, 4);
+	Blender.ShiftB = CLAMP(rawdzmem - m_dzpix_enc, 0, 4);
 
 	int precision_factor = (zval >> 13) & 0xf;
-
-	bool precision_important = precision_factor < 3;
-	int dzmemmodifier;
-	if (precision_important)
+	if (precision_factor < 3)
 	{
-		dzmemmodifier = 16 >> precision_factor;
+		int dzmemmodifier = 16 >> precision_factor;
 		if (dzmem == 0x8000)
 		{
 			force_coplanar = true;
@@ -1068,21 +1060,21 @@ bool Processor::ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 
 		farther = true;
 	}
 
-	bool overflow = ((m_misc_state.m_curpixel_memcvg + m_misc_state.m_curpixel_cvg) & 8) > 0;
-	m_blender.SetBlendEnable(m_other_modes.force_blend || (!overflow && m_other_modes.antialias_en && farther));
-	m_framebuffer.SetPreWrap(overflow);
+	bool overflow = ((MiscState.CurrentMemCvg + MiscState.CurrentPixCvg) & 8) > 0;
+	Blender.BlendEnable = OtherModes.force_blend || (!overflow && OtherModes.antialias_en && farther);
+	Framebuffer.SetPreWrap(overflow);
 
 	int cvgcoeff = 0;
 	UINT32 dzenc = 0;
 
-	if (m_other_modes.z_mode == 1 && infront && farther && overflow)
+	if (OtherModes.z_mode == 1 && infront && farther && overflow)
 	{
 		dzenc = DZCompress(dznotshift & 0xffff);
 		cvgcoeff = ((oz >> dzenc) - (sz >> dzenc)) & 0xf;
-		m_misc_state.m_curpixel_cvg = ((cvgcoeff * m_misc_state.m_curpixel_cvg) >> 3) & 0xf;
+		MiscState.CurrentPixCvg = ((cvgcoeff * MiscState.CurrentPixCvg) >> 3) & 0xf;
 	}
 
-	if (!m_other_modes.z_compare_en)
+	if (!OtherModes.z_compare_en)
 	{
 		return true;
 	}
@@ -1095,7 +1087,7 @@ bool Processor::ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 
 		nearer = true;
 	}
 
-	switch(m_other_modes.z_mode)
+	switch(OtherModes.z_mode)
 	{
 	case 0:
 		return (max || (overflow ? infront : nearer));
@@ -1743,7 +1735,6 @@ void N64::RDP::Triangle::InitFromData(running_machine &machine, bool shade, bool
 	m_machine = &machine;
 	m_rdp = &(machine.driver_data<_n64_state>())->m_rdp;
 	m_cmd_data = rect ? m_rdp->GetTempRectData() : m_rdp->GetCommandData();
-	m_misc_state = m_rdp->GetMiscState();
 	m_shade = shade;
 	m_texture = texture;
 	m_zbuffer = zbuffer;
@@ -1809,7 +1800,7 @@ void N64::RDP::Triangle::compute_cvg_noflip(INT32* majorx, INT32* minorx, INT32*
 
 	if (length < 0) return;
 
-	memset(&m_rdp->GetSpans()[scanline].m_cvg[purgestart], 0, (length + 1) << 2);
+	memset(&m_rdp->Spans[scanline].m_cvg[purgestart], 0, (length + 1) << 2);
 
 	for(int i = 0; i < 4; i++)
 	{
@@ -1831,11 +1822,11 @@ void N64::RDP::Triangle::compute_cvg_noflip(INT32* majorx, INT32* minorx, INT32*
 			{
 				if (!(minorcurint & ~0x3ff))
 				{
-					m_rdp->GetSpans()[scanline].m_cvg[minorcurint] |= (leftcvghex(minorcur, fmask) << maskshift);
+					m_rdp->Spans[scanline].m_cvg[minorcurint] |= (leftcvghex(minorcur, fmask) << maskshift);
 				}
 				if (!(majorcurint & ~0x3ff))
 				{
-					m_rdp->GetSpans()[scanline].m_cvg[majorcurint] |= (rightcvghex(majorcur, fmask) << maskshift);
+					m_rdp->Spans[scanline].m_cvg[majorcurint] |= (rightcvghex(majorcur, fmask) << maskshift);
 				}
 			}
 			else
@@ -1843,12 +1834,12 @@ void N64::RDP::Triangle::compute_cvg_noflip(INT32* majorx, INT32* minorx, INT32*
 				if (!(majorcurint & ~0x3ff))
 				{
 					INT32 samecvg = leftcvghex(minorcur, fmask) & rightcvghex(majorcur, fmask);
-					m_rdp->GetSpans()[scanline].m_cvg[majorcurint] |= (samecvg << maskshift);
+					m_rdp->Spans[scanline].m_cvg[majorcurint] |= (samecvg << maskshift);
 				}
 			}
 			for (; fleft <= fright; fleft++)
 			{
-				m_rdp->GetSpans()[scanline].m_cvg[fleft] |= fmaskshifted;
+				m_rdp->Spans[scanline].m_cvg[fleft] |= fmaskshifted;
 			}
 		}
 	}
@@ -1882,7 +1873,7 @@ void N64::RDP::Triangle::compute_cvg_flip(INT32* majorx, INT32* minorx, INT32* m
 
 	if (length < 0) return;
 
-	memset(&m_rdp->GetSpans()[scanline].m_cvg[purgestart], 0, (length + 1) << 2);
+	memset(&m_rdp->Spans[scanline].m_cvg[purgestart], 0, (length + 1) << 2);
 
 	for(int i = 0; i < 4; i++)
 	{
@@ -1904,11 +1895,11 @@ void N64::RDP::Triangle::compute_cvg_flip(INT32* majorx, INT32* minorx, INT32* m
 			{
 				if (!(minorcurint & ~0x3ff))
 				{
-					m_rdp->GetSpans()[scanline].m_cvg[minorcurint] |= (rightcvghex(minorcur, fmask) << maskshift);
+					m_rdp->Spans[scanline].m_cvg[minorcurint] |= (rightcvghex(minorcur, fmask) << maskshift);
 				}
 				if (!(majorcurint & ~0x3ff))
 				{
-					m_rdp->GetSpans()[scanline].m_cvg[majorcurint] |= (leftcvghex(majorcur, fmask) << maskshift);
+					m_rdp->Spans[scanline].m_cvg[majorcurint] |= (leftcvghex(majorcur, fmask) << maskshift);
 				}
 			}
 			else
@@ -1916,12 +1907,12 @@ void N64::RDP::Triangle::compute_cvg_flip(INT32* majorx, INT32* minorx, INT32* m
 				if (!(majorcurint & ~0x3ff))
 				{
 					INT32 samecvg = rightcvghex(minorcur, fmask) & leftcvghex(majorcur, fmask);
-					m_rdp->GetSpans()[scanline].m_cvg[majorcurint] |= (samecvg << maskshift);
+					m_rdp->Spans[scanline].m_cvg[majorcurint] |= (samecvg << maskshift);
 				}
 			}
 			for (; fleft <= fright; fleft++)
 			{
-				m_rdp->GetSpans()[scanline].m_cvg[fleft] |= fmaskshifted;
+				m_rdp->Spans[scanline].m_cvg[fleft] |= fmaskshifted;
 			}
 		}
 	}
@@ -1934,7 +1925,7 @@ void N64::RDP::Triangle::Draw()
 	UINT32 w2 = m_cmd_data[fifo_index + 1];
 
 	int flip = (w1 & 0x800000) ? 1 : 0;
-	m_misc_state->m_max_level = ((w1 >> 19) & 7);
+	m_rdp->MiscState.MaxLevel = ((w1 >> 19) & 7);
 	int tilenum = (w1 >> 16) & 0x7;
 
 	int dsdiff = 0, dtdiff = 0, dwdiff = 0, drdiff = 0, dgdiff = 0, dbdiff = 0, dadiff = 0, dzdiff = 0;
@@ -2140,24 +2131,24 @@ void N64::RDP::Triangle::Draw()
 
 				if (spix == 3)
 				{
-					m_rdp->GetSpans()[j].m_lx = maxxmx;
-					m_rdp->GetSpans()[j].m_rx = minxhx;
+					m_rdp->Spans[j].m_lx = maxxmx;
+					m_rdp->Spans[j].m_rx = minxhx;
 					compute_cvg_flip(majorx, minorx, majorxint, minorxint, j, yh, yl);
 				}
 
 				if (spix == ldflag)
 				{
-					m_rdp->GetSpans()[j].m_unscissored_rx = xend;
+					m_rdp->Spans[j].m_unscissored_rx = xend;
 					xfrac = ((xright >> 8) & 0xff);
-					m_rdp->GetSpans()[j].m_r.w = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
-					m_rdp->GetSpans()[j].m_g.w = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
-					m_rdp->GetSpans()[j].m_b.w = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
-					m_rdp->GetSpans()[j].m_a.w = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
-					m_rdp->GetSpans()[j].m_s.w = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_t.w = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_w.w = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_z.w = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
-					//printf("%d - %08x\n", j, m_rdp->GetSpans()[j].m_z.w);
+					m_rdp->Spans[j].m_r.w = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
+					m_rdp->Spans[j].m_g.w = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
+					m_rdp->Spans[j].m_b.w = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
+					m_rdp->Spans[j].m_a.w = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
+					m_rdp->Spans[j].m_s.w = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
+					m_rdp->Spans[j].m_t.w = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
+					m_rdp->Spans[j].m_w.w = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
+					m_rdp->Spans[j].m_z.w = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
+					//printf("%d - %08x\n", j, m_rdp->Spans[j].m_z.w);
 				}
 			}
 
@@ -2214,23 +2205,23 @@ void N64::RDP::Triangle::Draw()
 
 				if (spix == 3)
 				{
-					m_rdp->GetSpans()[j].m_lx = minxmx;
-					m_rdp->GetSpans()[j].m_rx = maxxhx;
+					m_rdp->Spans[j].m_lx = minxmx;
+					m_rdp->Spans[j].m_rx = maxxhx;
 					compute_cvg_noflip(majorx, minorx, majorxint, minorxint, j, yh, yl);
 				}
 
 				if (spix == ldflag)
 				{
-					m_rdp->GetSpans()[j].m_unscissored_rx = xend;
+					m_rdp->Spans[j].m_unscissored_rx = xend;
 					xfrac = ((xright >> 8) & 0xff);
-					m_rdp->GetSpans()[j].m_r.w = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
-					m_rdp->GetSpans()[j].m_g.w = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
-					m_rdp->GetSpans()[j].m_b.w = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
-					m_rdp->GetSpans()[j].m_a.w = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
-					m_rdp->GetSpans()[j].m_s.w = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_t.w = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_w.w = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_z.w = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
+					m_rdp->Spans[j].m_r.w = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
+					m_rdp->Spans[j].m_g.w = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
+					m_rdp->Spans[j].m_b.w = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
+					m_rdp->Spans[j].m_a.w = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
+					m_rdp->Spans[j].m_s.w = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
+					m_rdp->Spans[j].m_t.w = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
+					m_rdp->Spans[j].m_w.w = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
+					m_rdp->Spans[j].m_z.w = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
 				}
 			}
 
@@ -2325,7 +2316,7 @@ void N64::RDP::Processor::CmdTexRect(UINT32 w1, UINT32 w2)
 	dsdx = SIGN16(dsdx);
 	dtdy = SIGN16(dtdy);
 
-	if (m_other_modes.cycle_type == CYCLE_TYPE_FILL || m_other_modes.cycle_type == CYCLE_TYPE_COPY)
+	if (OtherModes.cycle_type == CYCLE_TYPE_FILL || OtherModes.cycle_type == CYCLE_TYPE_COPY)
 	{
 		yl |= 3;
 	}
@@ -2385,7 +2376,7 @@ void N64::RDP::Processor::CmdTexRectFlip(UINT32 w1, UINT32 w2)
 	dsdx = SIGN16(dsdx);
 	dtdy = SIGN16(dtdy);
 
-	if (m_other_modes.cycle_type == CYCLE_TYPE_FILL || m_other_modes.cycle_type == CYCLE_TYPE_COPY)
+	if (OtherModes.cycle_type == CYCLE_TYPE_FILL || OtherModes.cycle_type == CYCLE_TYPE_COPY)
 	{
 		yl |= 3;
 	}
@@ -2447,18 +2438,18 @@ void N64::RDP::Processor::CmdSyncFull(UINT32 w1, UINT32 w2)
 
 void N64::RDP::Processor::CmdSetKeyGB(UINT32 w1, UINT32 w2)
 {
-	m_key_scale.i.b = w2 & 0xff;
-	m_key_scale.i.g = (w2 >> 16) & 0xff;
+	KeyScale.i.b = w2 & 0xff;
+	KeyScale.i.g = (w2 >> 16) & 0xff;
 }
 
 void N64::RDP::Processor::CmdSetKeyR(UINT32 w1, UINT32 w2)
 {
-	m_key_scale.i.r = w2 & 0xff;
+	KeyScale.i.r = w2 & 0xff;
 }
 
 void N64::RDP::Processor::CmdSetFillColor32(UINT32 w1, UINT32 w2)
 {
-	m_fill_color = w2;
+	FillColor = w2;
 }
 
 void N64::RDP::Processor::CmdSetConvert(UINT32 w1, UINT32 w2)
@@ -2490,55 +2481,55 @@ void N64::RDP::Processor::CmdSetScissor(UINT32 w1, UINT32 w2)
 
 void N64::RDP::Processor::CmdSetPrimDepth(UINT32 w1, UINT32 w2)
 {
-	m_misc_state.m_primitive_z = (UINT16)(w2 >> 16) & 0x7fff;
-	m_misc_state.m_primitive_delta_z = (UINT16)(w1);
+	MiscState.PrimitiveZ = (UINT16)(w2 >> 16) & 0x7fff;
+	MiscState.PrimitiveDZ = (UINT16)(w1);
 
 }
 
 void N64::RDP::Processor::CmdSetOtherModes(UINT32 w1, UINT32 w2)
 {
-	m_other_modes.cycle_type		= (w1 >> 20) & 0x3; // 01
-	m_other_modes.persp_tex_en		= (w1 & 0x80000) ? 1 : 0; // 1
-	m_other_modes.detail_tex_en		= (w1 & 0x40000) ? 1 : 0; // 0
-	m_other_modes.sharpen_tex_en	= (w1 & 0x20000) ? 1 : 0; // 0
-	m_other_modes.tex_lod_en		= (w1 & 0x10000) ? 1 : 0; // 0
-	m_other_modes.en_tlut			= (w1 & 0x08000) ? 1 : 0; // 0
-	m_other_modes.tlut_type			= (w1 & 0x04000) ? 1 : 0; // 0
-	m_other_modes.sample_type		= (w1 & 0x02000) ? 1 : 0; // 1
-	m_other_modes.mid_texel			= (w1 & 0x01000) ? 1 : 0; // 0
-	m_other_modes.bi_lerp0			= (w1 & 0x00800) ? 1 : 0; // 1
-	m_other_modes.bi_lerp1			= (w1 & 0x00400) ? 1 : 0; // 1
-	m_other_modes.convert_one		= (w1 & 0x00200) ? 1 : 0; // 0
-	m_other_modes.key_en			= (w1 & 0x00100) ? 1 : 0; // 0
-	m_other_modes.rgb_dither_sel	= (w1 >> 6) & 0x3; // 00
-	m_other_modes.alpha_dither_sel	= (w1 >> 4) & 0x3; // 01
-	m_other_modes.blend_m1a_0		= (w2 >> 30) & 0x3; // 11
-	m_other_modes.blend_m1a_1		= (w2 >> 28) & 0x3; // 00
-	m_other_modes.blend_m1b_0		= (w2 >> 26) & 0x3; // 10
-	m_other_modes.blend_m1b_1		= (w2 >> 24) & 0x3; // 00
-	m_other_modes.blend_m2a_0		= (w2 >> 22) & 0x3; // 00
-	m_other_modes.blend_m2a_1		= (w2 >> 20) & 0x3; // 01
-	m_other_modes.blend_m2b_0		= (w2 >> 18) & 0x3; // 00
-	m_other_modes.blend_m2b_1		= (w2 >> 16) & 0x3; // 01
-	m_other_modes.force_blend		= (w2 >> 14) & 1; // 0
-	m_other_modes.alpha_cvg_select	= (w2 >> 13) & 1; // 1
-	m_other_modes.cvg_times_alpha	= (w2 >> 12) & 1; // 0
-	m_other_modes.z_mode			= (w2 >> 10) & 0x3; // 00
-	m_other_modes.cvg_dest			= (w2 >> 8) & 0x3; // 00
-	m_other_modes.color_on_cvg		= (w2 >> 7) & 1; // 0
-	m_other_modes.image_read_en		= (w2 >> 6) & 1; // 1
-	m_other_modes.z_update_en		= (w2 >> 5) & 1; // 1
-	m_other_modes.z_compare_en		= (w2 >> 4) & 1; // 1
-	m_other_modes.antialias_en		= (w2 >> 3) & 1; // 1
-	m_other_modes.z_source_sel		= (w2 >> 2) & 1; // 0
-	m_other_modes.dither_alpha_en	= (w2 >> 1) & 1; // 0
-	m_other_modes.alpha_compare_en	= (w2) & 1; // 0
+	OtherModes.cycle_type		= (w1 >> 20) & 0x3; // 01
+	OtherModes.persp_tex_en		= (w1 & 0x80000) ? 1 : 0; // 1
+	OtherModes.detail_tex_en		= (w1 & 0x40000) ? 1 : 0; // 0
+	OtherModes.sharpen_tex_en	= (w1 & 0x20000) ? 1 : 0; // 0
+	OtherModes.tex_lod_en		= (w1 & 0x10000) ? 1 : 0; // 0
+	OtherModes.en_tlut			= (w1 & 0x08000) ? 1 : 0; // 0
+	OtherModes.tlut_type			= (w1 & 0x04000) ? 1 : 0; // 0
+	OtherModes.sample_type		= (w1 & 0x02000) ? 1 : 0; // 1
+	OtherModes.mid_texel			= (w1 & 0x01000) ? 1 : 0; // 0
+	OtherModes.bi_lerp0			= (w1 & 0x00800) ? 1 : 0; // 1
+	OtherModes.bi_lerp1			= (w1 & 0x00400) ? 1 : 0; // 1
+	OtherModes.convert_one		= (w1 & 0x00200) ? 1 : 0; // 0
+	OtherModes.key_en			= (w1 & 0x00100) ? 1 : 0; // 0
+	OtherModes.rgb_dither_sel	= (w1 >> 6) & 0x3; // 00
+	OtherModes.alpha_dither_sel	= (w1 >> 4) & 0x3; // 01
+	OtherModes.blend_m1a_0		= (w2 >> 30) & 0x3; // 11
+	OtherModes.blend_m1a_1		= (w2 >> 28) & 0x3; // 00
+	OtherModes.blend_m1b_0		= (w2 >> 26) & 0x3; // 10
+	OtherModes.blend_m1b_1		= (w2 >> 24) & 0x3; // 00
+	OtherModes.blend_m2a_0		= (w2 >> 22) & 0x3; // 00
+	OtherModes.blend_m2a_1		= (w2 >> 20) & 0x3; // 01
+	OtherModes.blend_m2b_0		= (w2 >> 18) & 0x3; // 00
+	OtherModes.blend_m2b_1		= (w2 >> 16) & 0x3; // 01
+	OtherModes.force_blend		= (w2 >> 14) & 1; // 0
+	OtherModes.alpha_cvg_select	= (w2 >> 13) & 1; // 1
+	OtherModes.cvg_times_alpha	= (w2 >> 12) & 1; // 0
+	OtherModes.z_mode			= (w2 >> 10) & 0x3; // 00
+	OtherModes.cvg_dest			= (w2 >> 8) & 0x3; // 00
+	OtherModes.color_on_cvg		= (w2 >> 7) & 1; // 0
+	OtherModes.image_read_en		= (w2 >> 6) & 1; // 1
+	OtherModes.z_update_en		= (w2 >> 5) & 1; // 1
+	OtherModes.z_compare_en		= (w2 >> 4) & 1; // 1
+	OtherModes.antialias_en		= (w2 >> 3) & 1; // 1
+	OtherModes.z_source_sel		= (w2 >> 2) & 1; // 0
+	OtherModes.dither_alpha_en	= (w2 >> 1) & 1; // 0
+	OtherModes.alpha_compare_en	= (w2) & 1; // 0
 
 	// These should belong to the Blender class
-	SetBlenderInput(0, 0, &m_color_inputs.blender1a_r[0], &m_color_inputs.blender1a_g[0], &m_color_inputs.blender1a_b[0], &m_color_inputs.blender1b_a[0], m_other_modes.blend_m1a_0, m_other_modes.blend_m1b_0);
-	SetBlenderInput(0, 1, &m_color_inputs.blender2a_r[0], &m_color_inputs.blender2a_g[0], &m_color_inputs.blender2a_b[0], &m_color_inputs.blender2b_a[0], m_other_modes.blend_m2a_0, m_other_modes.blend_m2b_0);
-	SetBlenderInput(1, 0, &m_color_inputs.blender1a_r[1], &m_color_inputs.blender1a_g[1], &m_color_inputs.blender1a_b[1], &m_color_inputs.blender1b_a[1], m_other_modes.blend_m1a_1, m_other_modes.blend_m1b_1);
-	SetBlenderInput(1, 1, &m_color_inputs.blender2a_r[1], &m_color_inputs.blender2a_g[1], &m_color_inputs.blender2a_b[1], &m_color_inputs.blender2b_a[1], m_other_modes.blend_m2a_1, m_other_modes.blend_m2b_1);
+	SetBlenderInput(0, 0, &ColorInputs.blender1a_r[0], &ColorInputs.blender1a_g[0], &ColorInputs.blender1a_b[0], &ColorInputs.blender1b_a[0], OtherModes.blend_m1a_0, OtherModes.blend_m1b_0);
+	SetBlenderInput(0, 1, &ColorInputs.blender2a_r[0], &ColorInputs.blender2a_g[0], &ColorInputs.blender2a_b[0], &ColorInputs.blender2b_a[0], OtherModes.blend_m2a_0, OtherModes.blend_m2b_0);
+	SetBlenderInput(1, 0, &ColorInputs.blender1a_r[1], &ColorInputs.blender1a_g[1], &ColorInputs.blender1a_b[1], &ColorInputs.blender1b_a[1], OtherModes.blend_m1a_1, OtherModes.blend_m1b_1);
+	SetBlenderInput(1, 1, &ColorInputs.blender2a_r[1], &ColorInputs.blender2a_g[1], &ColorInputs.blender2a_b[1], &ColorInputs.blender2b_a[1], OtherModes.blend_m2a_1, OtherModes.blend_m2b_1);
 }
 
 void N64::RDP::Processor::CmdLoadTLUT(UINT32 w1, UINT32 w2)
@@ -2559,7 +2550,7 @@ void N64::RDP::Processor::CmdLoadTLUT(UINT32 w1, UINT32 w2)
 	int count = (sh >> 2) - (sl >> 2) + 1;
 	count <<= 2;
 
-	switch (m_misc_state.m_ti_size)
+	switch (MiscState.TISize)
 	{
 		case PIXEL_SIZE_16BIT:
 		{
@@ -2567,7 +2558,7 @@ void N64::RDP::Processor::CmdLoadTLUT(UINT32 w1, UINT32 w2)
 			{
 				fatalerror("rdp_load_tlut: loading tlut into low half at %d qwords",tile[tilenum].tmem);
 			}
-			UINT32 srcstart = (m_misc_state.m_ti_address + (tl >> 2) * (m_misc_state.m_ti_width << 1) + (sl >> 1)) >> 1;
+			UINT32 srcstart = (MiscState.TIAddress + (tl >> 2) * (MiscState.TIWidth << 1) + (sl >> 1)) >> 1;
 			UINT16 *dst = GetTMEM16();
 			UINT32 dststart = tile[tilenum].tmem << 2;
 
@@ -2585,7 +2576,7 @@ void N64::RDP::Processor::CmdLoadTLUT(UINT32 w1, UINT32 w2)
 			}
 			break;
 		}
-		default:	fatalerror("RDP: load_tlut: size = %d\n", m_misc_state.m_ti_size);
+		default:	fatalerror("RDP: load_tlut: size = %d\n", MiscState.TISize);
 	}
 }
 
@@ -2619,7 +2610,7 @@ void N64::RDP::Processor::CmdLoadBlock(UINT32 w1, UINT32 w2)
 
 	INT32 width = (sh - sl) + 1;
 
-	width = (width << m_misc_state.m_ti_size) >> 1;
+	width = (width << MiscState.TISize) >> 1;
 	if (width & 7)
 	{
 		width = (width & ~7) + 8;
@@ -2628,15 +2619,15 @@ void N64::RDP::Processor::CmdLoadBlock(UINT32 w1, UINT32 w2)
 
 	UINT32 tb = tile[tilenum].tmem << 2;
 
-	int tiwinwords = m_misc_state.m_ti_width;
+	int tiwinwords = MiscState.TIWidth;
 	UINT32 slinwords = sl;
 
-	tiwinwords = (tiwinwords << m_misc_state.m_ti_size) >> 2;
-	slinwords = (slinwords << m_misc_state.m_ti_size) >> 2;
+	tiwinwords = (tiwinwords << MiscState.TISize) >> 2;
+	slinwords = (slinwords << MiscState.TISize) >> 2;
 
 	int ptr = 0, srcptr = 0;
 	UINT16 first, sec;
-	UINT32 src = (m_misc_state.m_ti_address >> 1) + (tl * tiwinwords) + slinwords;
+	UINT32 src = (MiscState.TIAddress >> 1) + (tl * tiwinwords) + slinwords;
 
 	if (dxt != 0)
 	{
@@ -2785,9 +2776,9 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 	INT32 height = (th - tl) + 1;
 /*
     int topad;
-    if (m_misc_state.m_ti_size < 3)
+    if (MiscState.TISize < 3)
     {
-        topad = (width * m_misc_state.m_ti_size) & 0x7;
+        topad = (width * MiscState.TISize) & 0x7;
     }
     else
     {
@@ -2795,20 +2786,20 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
     }
     topad = 0; // ????
 */
-	switch (m_misc_state.m_ti_size)
+	switch (MiscState.TISize)
 	{
 		case PIXEL_SIZE_8BIT:
 		{
-			UINT32 src = m_misc_state.m_ti_address;
+			UINT32 src = MiscState.TIAddress;
 			UINT8 *tc = GetTMEM();
 			int tb = tile[tilenum].tmem << 3;
 
 			for (int j = 0; j < height; j++)
 			{
 				int tline = tb + ((tile[tilenum].line << 3) * j);
-				int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+				int s = ((j + tl) * MiscState.TIWidth) + sl;
 
-				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);//???????,??? ? Ziggy
+				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);
 				for (int i = 0; i < width; i++)
 				{
 					tc[((tline + i) ^ xorval8) & 0xfff] = RREADADDR8(src + s + i);
@@ -2818,7 +2809,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 		}
 		case PIXEL_SIZE_16BIT:
 		{
-			UINT32 src = m_misc_state.m_ti_address >> 1;
+			UINT32 src = MiscState.TIAddress >> 1;
 			UINT16 *tc = GetTMEM16();
 			UINT16 yuvword;
 
@@ -2828,7 +2819,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 				{
 					int tb = tile[tilenum].tmem << 2;
 					int tline = tb + ((tile[tilenum].line << 2) * j);
-					int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+					int s = ((j + tl) * MiscState.TIWidth) + sl;
 					int xorval16 = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
 
 					for (int i = 0; i < width; i++)
@@ -2844,7 +2835,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 				{
 					int tb = tile[tilenum].tmem << 3;
 					int tline = tb + ((tile[tilenum].line << 3) * j);
-					int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+					int s = ((j + tl) * MiscState.TIWidth) + sl;
 					int xorval8 = (j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR;
 
 					for (int i = 0; i < width; i++)
@@ -2860,7 +2851,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 		}
 		case PIXEL_SIZE_32BIT:
 		{
-			UINT32 src = m_misc_state.m_ti_address >> 2;
+			UINT32 src = MiscState.TIAddress >> 2;
 			UINT16 *tc16 = GetTMEM16();
 			int tb = (tile[tilenum].tmem << 2);
 
@@ -2868,7 +2859,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 			{
 				int tline = tb + ((tile[tilenum].line << 2) * j);
 
-				int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+				int s = ((j + tl) * MiscState.TIWidth) + sl;
 				int xorval32cur = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
 				for (int i = 0; i < width; i++)
 				{
@@ -2881,7 +2872,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 			break;
 		}
 
-		default:	fatalerror("RDP: load_tile: size = %d\n", m_misc_state.m_ti_size);
+		default:	fatalerror("RDP: load_tile: size = %d\n", MiscState.TISize);
 	}
 }
 
@@ -2903,6 +2894,20 @@ void N64::RDP::Processor::CmdSetTile(UINT32 w1, UINT32 w2)
 	tex_tile->ms		= (w2 >>  8) & 0x1;
 	tex_tile->mask_s	= (w2 >>  4) & 0xf;
 	tex_tile->shift_s	= (w2 >>  0) & 0xf;
+
+	if (tex_tile->format == FORMAT_I && tex_tile->size > PIXEL_SIZE_8BIT)
+	{
+		tex_tile->format = FORMAT_RGBA; // Used by Supercross 2000 (in-game)
+	}
+	if (tex_tile->format == FORMAT_CI && tex_tile->size > PIXEL_SIZE_8BIT)
+	{
+		tex_tile->format = FORMAT_RGBA; // Used by Clay Fighter - Sculptor's Cut
+	}
+
+	if (tex_tile->format == FORMAT_RGBA && tex_tile->size < PIXEL_SIZE_16BIT)
+	{
+		tex_tile->format = FORMAT_CI; // Used by Exterem-G2, Madden Football 64, and Rat Attack
+	}
 }
 
 void N64::RDP::Processor::CmdFillRect(UINT32 w1, UINT32 w2)
@@ -2912,7 +2917,7 @@ void N64::RDP::Processor::CmdFillRect(UINT32 w1, UINT32 w2)
 	UINT32 xh = (w2 >> 12) & 0xfff;
 	UINT32 yh = (w2 >>  0) & 0xfff;
 
-	if (m_other_modes.cycle_type == CYCLE_TYPE_FILL || m_other_modes.cycle_type == CYCLE_TYPE_COPY)
+	if (OtherModes.cycle_type == CYCLE_TYPE_FILL || OtherModes.cycle_type == CYCLE_TYPE_COPY)
 	{
 		yl |= 3;
 	}
@@ -2937,24 +2942,24 @@ void N64::RDP::Processor::CmdFillRect(UINT32 w1, UINT32 w2)
 
 void N64::RDP::Processor::CmdSetFogColor(UINT32 w1, UINT32 w2)
 {
-	m_fog_color.c = w2;
+	FogColor.c = w2;
 }
 
 void N64::RDP::Processor::CmdSetBlendColor(UINT32 w1, UINT32 w2)
 {
-	m_blend_color.c = w2;
+	BlendColor.c = w2;
 }
 
 void N64::RDP::Processor::CmdSetPrimColor(UINT32 w1, UINT32 w2)
 {
-	m_misc_state.m_min_level = (w1 >> 8) & 0x1f;
-	m_prim_lod_frac = w1 & 0xff;
-	m_prim_color.c = w2;
+	MiscState.MinLevel = (w1 >> 8) & 0x1f;
+	PrimLODFraction = w1 & 0xff;
+	PrimColor.c = w2;
 }
 
 void N64::RDP::Processor::CmdSetEnvColor(UINT32 w1, UINT32 w2)
 {
-	m_env_color.c = w2;
+	EnvColor.c = w2;
 }
 
 void N64::RDP::Processor::CmdSetCombine(UINT32 w1, UINT32 w2)
@@ -2977,60 +2982,60 @@ void N64::RDP::Processor::CmdSetCombine(UINT32 w1, UINT32 w2)
 	m_combine.sub_b_a1		= (w2 >>  3) & 0x7;
 	m_combine.add_a1		= (w2 >>  0) & 0x7;
 
-	SetSubAInputRGB(&m_color_inputs.combiner_rgbsub_a_r[0], &m_color_inputs.combiner_rgbsub_a_g[0], &m_color_inputs.combiner_rgbsub_a_b[0], m_combine.sub_a_rgb0);
-	SetSubBInputRGB(&m_color_inputs.combiner_rgbsub_b_r[0], &m_color_inputs.combiner_rgbsub_b_g[0], &m_color_inputs.combiner_rgbsub_b_b[0], m_combine.sub_b_rgb0);
-	SetMulInputRGB(&m_color_inputs.combiner_rgbmul_r[0], &m_color_inputs.combiner_rgbmul_g[0], &m_color_inputs.combiner_rgbmul_b[0], m_combine.mul_rgb0);
-	SetAddInputRGB(&m_color_inputs.combiner_rgbadd_r[0], &m_color_inputs.combiner_rgbadd_g[0], &m_color_inputs.combiner_rgbadd_b[0], m_combine.add_rgb0);
-	SetSubInputAlpha(&m_color_inputs.combiner_alphasub_a[0], m_combine.sub_a_a0);
-	SetSubInputAlpha(&m_color_inputs.combiner_alphasub_b[0], m_combine.sub_b_a0);
-	SetMulInputAlpha(&m_color_inputs.combiner_alphamul[0], m_combine.mul_a0);
-	SetSubInputAlpha(&m_color_inputs.combiner_alphaadd[0], m_combine.add_a0);
+	SetSubAInputRGB(&ColorInputs.combiner_rgbsub_a_r[0], &ColorInputs.combiner_rgbsub_a_g[0], &ColorInputs.combiner_rgbsub_a_b[0], m_combine.sub_a_rgb0);
+	SetSubBInputRGB(&ColorInputs.combiner_rgbsub_b_r[0], &ColorInputs.combiner_rgbsub_b_g[0], &ColorInputs.combiner_rgbsub_b_b[0], m_combine.sub_b_rgb0);
+	SetMulInputRGB(&ColorInputs.combiner_rgbmul_r[0], &ColorInputs.combiner_rgbmul_g[0], &ColorInputs.combiner_rgbmul_b[0], m_combine.mul_rgb0);
+	SetAddInputRGB(&ColorInputs.combiner_rgbadd_r[0], &ColorInputs.combiner_rgbadd_g[0], &ColorInputs.combiner_rgbadd_b[0], m_combine.add_rgb0);
+	SetSubInputAlpha(&ColorInputs.combiner_alphasub_a[0], m_combine.sub_a_a0);
+	SetSubInputAlpha(&ColorInputs.combiner_alphasub_b[0], m_combine.sub_b_a0);
+	SetMulInputAlpha(&ColorInputs.combiner_alphamul[0], m_combine.mul_a0);
+	SetSubInputAlpha(&ColorInputs.combiner_alphaadd[0], m_combine.add_a0);
 
-	SetSubAInputRGB(&m_color_inputs.combiner_rgbsub_a_r[1], &m_color_inputs.combiner_rgbsub_a_g[1], &m_color_inputs.combiner_rgbsub_a_b[1], m_combine.sub_a_rgb1);
-	SetSubBInputRGB(&m_color_inputs.combiner_rgbsub_b_r[1], &m_color_inputs.combiner_rgbsub_b_g[1], &m_color_inputs.combiner_rgbsub_b_b[1], m_combine.sub_b_rgb1);
-	SetMulInputRGB(&m_color_inputs.combiner_rgbmul_r[1], &m_color_inputs.combiner_rgbmul_g[1], &m_color_inputs.combiner_rgbmul_b[1], m_combine.mul_rgb1);
-	SetAddInputRGB(&m_color_inputs.combiner_rgbadd_r[1], &m_color_inputs.combiner_rgbadd_g[1], &m_color_inputs.combiner_rgbadd_b[1], m_combine.add_rgb1);
-	SetSubInputAlpha(&m_color_inputs.combiner_alphasub_a[1], m_combine.sub_a_a1);
-	SetSubInputAlpha(&m_color_inputs.combiner_alphasub_b[1], m_combine.sub_b_a1);
-	SetMulInputAlpha(&m_color_inputs.combiner_alphamul[1], m_combine.mul_a1);
-	SetSubInputAlpha(&m_color_inputs.combiner_alphaadd[1], m_combine.add_a1);
+	SetSubAInputRGB(&ColorInputs.combiner_rgbsub_a_r[1], &ColorInputs.combiner_rgbsub_a_g[1], &ColorInputs.combiner_rgbsub_a_b[1], m_combine.sub_a_rgb1);
+	SetSubBInputRGB(&ColorInputs.combiner_rgbsub_b_r[1], &ColorInputs.combiner_rgbsub_b_g[1], &ColorInputs.combiner_rgbsub_b_b[1], m_combine.sub_b_rgb1);
+	SetMulInputRGB(&ColorInputs.combiner_rgbmul_r[1], &ColorInputs.combiner_rgbmul_g[1], &ColorInputs.combiner_rgbmul_b[1], m_combine.mul_rgb1);
+	SetAddInputRGB(&ColorInputs.combiner_rgbadd_r[1], &ColorInputs.combiner_rgbadd_g[1], &ColorInputs.combiner_rgbadd_b[1], m_combine.add_rgb1);
+	SetSubInputAlpha(&ColorInputs.combiner_alphasub_a[1], m_combine.sub_a_a1);
+	SetSubInputAlpha(&ColorInputs.combiner_alphasub_b[1], m_combine.sub_b_a1);
+	SetMulInputAlpha(&ColorInputs.combiner_alphamul[1], m_combine.mul_a1);
+	SetSubInputAlpha(&ColorInputs.combiner_alphaadd[1], m_combine.add_a1);
 }
 
 void N64::RDP::Processor::CmdSetTextureImage(UINT32 w1, UINT32 w2)
 {
-	m_misc_state.m_ti_format	= (w1 >> 21) & 0x7;
-	m_misc_state.m_ti_size		= (w1 >> 19) & 0x3;
-	m_misc_state.m_ti_width	= (w1 & 0x3ff) + 1;
-	m_misc_state.m_ti_address	= w2 & 0x01ffffff;
+	MiscState.TIFormat	= (w1 >> 21) & 0x7;
+	MiscState.TISize	= (w1 >> 19) & 0x3;
+	MiscState.TIWidth	= (w1 & 0x3ff) + 1;
+	MiscState.TIAddress	= w2 & 0x01ffffff;
 }
 
 void N64::RDP::Processor::CmdSetMaskImage(UINT32 w1, UINT32 w2)
 {
-	m_misc_state.m_zb_address = w2 & 0x01ffffff;
+	MiscState.ZBAddress = w2 & 0x01ffffff;
 }
 
 void N64::RDP::Processor::CmdSetColorImage(UINT32 w1, UINT32 w2)
 {
-	m_misc_state.m_fb_format	= (w1 >> 21) & 0x7;
-	m_misc_state.m_fb_size		= (w1 >> 19) & 0x3;
-	m_misc_state.m_fb_width		= (w1 & 0x3ff) + 1;
-	m_misc_state.m_fb_address	= w2 & 0x01ffffff;
+	MiscState.FBFormat	= (w1 >> 21) & 0x7;
+	MiscState.FBSize	= (w1 >> 19) & 0x3;
+	MiscState.FBWidth		= (w1 & 0x3ff) + 1;
+	MiscState.FBAddress	= w2 & 0x01ffffff;
 
-	if (m_misc_state.m_fb_format && m_misc_state.m_fb_format != 2) // Jet Force Gemini sets the format to 4, Intensity.  Protection?
+	if (MiscState.FBFormat && MiscState.FBFormat != 2) // Jet Force Gemini sets the format to 4, Intensity.  Protection?
 	{
-		if (m_misc_state.m_fb_size == 1)
+		if (MiscState.FBSize == 1)
 		{
-			m_misc_state.m_fb_format = 2;
+			MiscState.FBFormat = 2;
 		}
 		else
 		{
-			m_misc_state.m_fb_format = 0;
+			MiscState.FBFormat = 0;
 		}
 	}
 
-	if (m_misc_state.m_fb_format != 0)
+	if (MiscState.FBFormat != 0)
 	{
-		m_misc_state.m_fb_format = 0;
+		MiscState.FBFormat = 0;
 	}
 }
 
@@ -3137,12 +3142,18 @@ void N64::RDP::Processor::ProcessList()
 {
 	UINT32 length = m_end - m_current;
 
+	//printf("length %08x\n", length);
+	//printf("end %08x\n", m_end);
+	//printf("current %08x\n", m_current);
+
 	// load command data
 	for(int i = 0; i < length; i += 4)
 	{
+		//printf("%08x\n", m_current);
 		m_cmd_data[m_cmd_ptr++] = ReadData((m_current & 0x1fffffff) + i);
 	}
 
+	//printf("Queued\n");
 	m_current = m_end;
 
 	UINT32 cmd = (m_cmd_data[0] >> 24) & 0x3f;
@@ -3153,11 +3164,13 @@ void N64::RDP::Processor::ProcessList()
 	// check if more data is needed
 	if (cmd_length < rdp_command_length[cmd])
 	{
+		//printf("Early-out\n");
 		return;
 	}
 
 	while (m_cmd_cur < m_cmd_ptr)
 	{
+		//printf("Command\n");
 		cmd = (m_cmd_data[m_cmd_cur] >> 24) & 0x3f;
 
 		if (((m_cmd_ptr - m_cmd_cur) * 4) < rdp_command_length[cmd])
@@ -3235,6 +3248,7 @@ void N64::RDP::Processor::ProcessList()
 	m_cmd_cur = 0;
 
 	m_start = m_current = m_end;
+	//printf("Done RDP\n");
 }
 
 } // namespace RDP
@@ -3250,21 +3264,24 @@ VIDEO_START(n64)
 	state->m_rdp.SetMachine(machine);
 	state->m_rdp.InitInternalState();
 
-	state->m_rdp.GetBlender()->SetOtherModes(state->m_rdp.GetOtherModes());
-	state->m_rdp.GetBlender()->SetMiscState(state->m_rdp.GetMiscState());
-	state->m_rdp.GetBlender()->SetMachine(machine);
-	state->m_rdp.GetBlender()->SetProcessor(&state->m_rdp);
+	state->m_rdp.Blender.SetMachine(machine);
+	state->m_rdp.Blender.SetProcessor(&state->m_rdp);
 
-	state->m_rdp.GetFramebuffer()->SetOtherModes(state->m_rdp.GetOtherModes());
-	state->m_rdp.GetFramebuffer()->SetMiscState(state->m_rdp.GetMiscState());
-	state->m_rdp.GetFramebuffer()->SetProcessor(&state->m_rdp);
+	state->m_rdp.Framebuffer.SetProcessor(&state->m_rdp);
 
-	state->m_rdp.GetTexPipe()->SetMachine(machine);
+	state->m_rdp.TexPipe.SetMachine(machine);
 
 	if (LOG_RDP_EXECUTION)
 	{
 		rdp_exec = fopen("rdp_execute.txt", "wt");
 	}
+
+	printf("A");
+	for (int i = 0; i < 4096; i++)
+	{
+		state->m_rdp.Spans[i].SetMachine(machine);
+	}
+	printf("B");
 }
 
 SCREEN_UPDATE_RGB32(n64)
@@ -3272,9 +3289,9 @@ SCREEN_UPDATE_RGB32(n64)
 	_n64_state *state = screen.machine().driver_data<_n64_state>();
 	n64_periphs *n64 = screen.machine().device<n64_periphs>("rcp");
 
-    int height = state->m_rdp.GetMiscState()->m_fb_height;
+    int height = state->m_rdp.MiscState.FBHeight;
 	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
-	//UINT8  *cvg_buffer = &state->m_rdp.GetHiddenBits()[((n64->vi_origin & 0xffffff) >> 2) >> 1];
+	//UINT8  *cvg_buffer = &state->m_rdp.HiddenBits[((n64->vi_origin & 0xffffff) >> 2) >> 1];
     //int vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
 	//vibuffering = 0; // Disabled for now
@@ -3316,7 +3333,7 @@ SCREEN_UPDATE_RGB32(n64)
         for (int j = 0; j <height; j++)
         {
             UINT32 *d = &bitmap.pix32(j);
-            for (int i = 0; i < state->m_rdp.GetMiscState()->m_fb_width; i++)
+            for (int i = 0; i < state->m_rdp.MiscState.FBWidth; i++)
             {
                 d[BYTE_XOR_BE(i)] = 0;
             }

@@ -303,13 +303,25 @@ INLINE void save_fast_iregs(rsp_state *rsp, drcuml_block *block)
     CORE CALLBACKS
 ***************************************************************************/
 
+void rspdrc_add_imem(device_t *device, UINT32 *base)
+{
+	rsp_state *rsp = get_safe_token(device);
+	rsp->imem32 = base;
+	rsp->imem16 = (UINT16*)base;
+	rsp->imem8 = (UINT8*)base;
+}
+
+void rspdrc_add_dmem(device_t *device, UINT32 *base)
+{
+	rsp_state *rsp = get_safe_token(device);
+	rsp->dmem32 = base;
+	rsp->dmem16 = (UINT16*)base;
+	rsp->dmem8 = (UINT8*)base;
+}
+
 INLINE UINT8 READ8(rsp_state *rsp, UINT32 address)
 {
-	UINT8 ret;
-	address = 0x04000000 | (address & 0xfff);
-	ret = rsp->program->read_byte(address);
-	//printf("%04xr%02x\n",address & 0x1fff, ret);
-	return ret;
+	return rsp->dmem8[BYTE4_XOR_BE(address & 0xfff)];
 }
 
 static void cfunc_read8(void *param)
@@ -321,10 +333,10 @@ static void cfunc_read8(void *param)
 INLINE UINT16 READ16(rsp_state *rsp, UINT32 address)
 {
 	UINT16 ret;
-	address = 0x04000000 | (address & 0xfff);
-	ret = rsp->program->read_byte(address+0) << 8;
-	ret |= rsp->program->read_byte(address+1) << 0;
-	//printf("%04xr%04x\n",address & 0x1fff, ret);
+	address &= 0xfff;
+	ret = rsp->dmem8[BYTE4_XOR_BE(address)] << 8;
+	ret |= rsp->dmem8[BYTE4_XOR_BE(address + 1)];
+	//printf("%04xr%04x\n",address, ret);
 	return ret;
 }
 
@@ -337,12 +349,12 @@ static void cfunc_read16(void *param)
 INLINE UINT32 READ32(rsp_state *rsp, UINT32 address)
 {
 	UINT32 ret;
-	address = 0x04000000 | (address & 0xfff);
-	ret = rsp->program->read_byte(address+0) << 24;
-	ret |= rsp->program->read_byte(address+1) << 16;
-	ret |= rsp->program->read_byte(address+2) << 8;
-	ret |= rsp->program->read_byte(address+3) << 0;
-	//printf("%04xr%08x\n",address & 0x1fff, ret);
+	address &= 0xfff;
+	ret = rsp->dmem8[BYTE4_XOR_BE(address)] << 24;
+	ret |= rsp->dmem8[BYTE4_XOR_BE(address + 1)] << 16;
+	ret |= rsp->dmem8[BYTE4_XOR_BE(address + 2)] << 8;
+	ret |= rsp->dmem8[BYTE4_XOR_BE(address + 3)];
+	//printf("%04xr%08x\n",address, ret);
 	return ret;
 }
 
@@ -354,9 +366,9 @@ static void cfunc_read32(void *param)
 
 INLINE void WRITE8(rsp_state *rsp, UINT32 address, UINT8 data)
 {
-	address = 0x04000000 | (address & 0xfff);
-	//printf("%04x:%02x\n",address & 0x1fff, data);
-	rsp->program->write_byte(address, data);
+	address &= 0xfff;
+	rsp->dmem8[BYTE4_XOR_BE(address)] = data;
+	//printf("%04xw%02x\n",address, data);
 }
 
 static void cfunc_write8(void *param)
@@ -367,11 +379,10 @@ static void cfunc_write8(void *param)
 
 INLINE void WRITE16(rsp_state *rsp, UINT32 address, UINT16 data)
 {
-	address = 0x04000000 | (address & 0xfff);
-
-	//printf("%04x:%04x\n",address & 0x1fff, data);
-	rsp->program->write_byte(address + 0, (data >> 8) & 0xff);
-	rsp->program->write_byte(address + 1, (data >> 0) & 0xff);
+	address &= 0xfff;
+	rsp->dmem8[BYTE4_XOR_BE(address)] = data >> 8;
+	rsp->dmem8[BYTE4_XOR_BE(address + 1)] = data & 0xff;
+	//printf("%04xw%04x\n",address, data);
 }
 
 static void cfunc_write16(void *param)
@@ -382,13 +393,12 @@ static void cfunc_write16(void *param)
 
 INLINE void WRITE32(rsp_state *rsp, UINT32 address, UINT32 data)
 {
-	address = 0x04000000 | (address & 0xfff);
-
-	//printf("%04x:%08x\n",address & 0x1fff, data);
-	rsp->program->write_byte(address + 0, (data >> 24) & 0xff);
-	rsp->program->write_byte(address + 1, (data >> 16) & 0xff);
-	rsp->program->write_byte(address + 2, (data >> 8) & 0xff);
-	rsp->program->write_byte(address + 3, (data >> 0) & 0xff);
+	address &= 0xfff;
+	rsp->dmem8[BYTE4_XOR_BE(address)] = data >> 24;
+	rsp->dmem8[BYTE4_XOR_BE(address + 1)] = (data >> 16) & 0xff;
+	rsp->dmem8[BYTE4_XOR_BE(address + 2)] = (data >> 8) & 0xff;
+	rsp->dmem8[BYTE4_XOR_BE(address + 3)] = data & 0xff;
+	//printf("%04xw%08x\n",address, data);
 }
 
 static void cfunc_write32(void *param)

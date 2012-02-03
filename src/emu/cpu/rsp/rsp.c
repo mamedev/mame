@@ -3123,19 +3123,19 @@ CPU_GET_INFO( rsp )
 	}
 }
 
+void rspdrc_flush_drc_cache(device_t *device)
+{
+}
+
 void rspdrc_set_options(device_t *device, UINT32 options)
 {
 }
 
-void rspdrc_add_imem(device_t *device, void *base)
+void rspdrc_add_imem(device_t *device, UINT32 *base)
 {
 }
 
-void rspdrc_add_dmem(device_t *device, void *base)
-{
-}
-
-void rspdrc_flush_drc_cache(device_t *device)
+void rspdrc_add_dmem(device_t *device, UINT32 *base)
 {
 }
 

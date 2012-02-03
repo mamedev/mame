@@ -49,9 +49,9 @@
 #endif
 #define DWORD_XOR_DWORD_SWAP 1
 
-#define GET_LOW_RGBA16_TMEM(x)	(m_rdp->ReplicatedRGBA()[((x) >> 1) & 0x1f])
-#define GET_MED_RGBA16_TMEM(x)	(m_rdp->ReplicatedRGBA()[((x) >> 6) & 0x1f])
-#define GET_HI_RGBA16_TMEM(x)	(m_rdp->ReplicatedRGBA()[((x) >> 11) & 0x1f])
+#define GET_LOW_RGBA16_TMEM(x)	(m_rdp->ReplicatedRGBA[((x) >> 1) & 0x1f])
+#define GET_MED_RGBA16_TMEM(x)	(m_rdp->ReplicatedRGBA[((x) >> 6) & 0x1f])
+#define GET_HI_RGBA16_TMEM(x)	(m_rdp->ReplicatedRGBA[((x) >> 11) & 0x1f])
 
 #define MEM8_LIMIT  0x7fffff
 #define MEM16_LIMIT 0x3fffff
@@ -69,8 +69,8 @@
 #define GETMEDCOL(x)	(((x) & 0x7c0) >> 3)
 #define GETHICOL(x)		(((x) & 0xf800) >> 8)
 
-#define HREADADDR8(in)			(((in) <= MEM8_LIMIT) ? (m_rdp->GetHiddenBits()[(in) ^ BYTE_ADDR_XOR]) : 0)
-#define HWRITEADDR8(in, val)	{if ((in) <= MEM8_LIMIT) m_rdp->GetHiddenBits()[(in) ^ BYTE_ADDR_XOR] = val;}
+#define HREADADDR8(in)			(((in) <= MEM8_LIMIT) ? (m_rdp->HiddenBits[(in) ^ BYTE_ADDR_XOR]) : 0)
+#define HWRITEADDR8(in, val)	{if ((in) <= MEM8_LIMIT) m_rdp->HiddenBits[(in) ^ BYTE_ADDR_XOR] = val;}
 
 //sign-extension macros
 #define SIGN22(x)	(((x) & 0x200000) ? ((x) | ~0x3fffff) : ((x) & 0x3fffff))
@@ -94,8 +94,8 @@ namespace RDP
 {
 
 class Processor;
-class MiscState;
-class OtherModes;
+class MiscStateT;
+class OtherModesT;
 
 class Color
 {
@@ -138,48 +138,48 @@ class Tile
 		int num;
 };
 
-class MiscState
+class MiscStateT
 {
 	public:
-		MiscState()
+		MiscStateT()
 		{
-			m_curpixel_cvg = 0;
-			m_curpixel_memcvg = 0;
-			m_curpixel_cvbit = 0;
-			m_curpixel_overlap = 0;
+			CurrentPixCvg = 0;
+			CurrentMemCvg = 0;
+			CurrentCvgBit = 0;
+			CurrentPixOverlap = 0;
 
-			m_max_level = 0;
-			m_min_level = 0;
+			MaxLevel = 0;
+			MinLevel = 0;
 		}
 
-		int m_fb_format;
-		int m_fb_size;
-		int m_fb_width;
-		int m_fb_height;
-		UINT32 m_fb_address;
+		int FBFormat;				// Framebuffer pixel format index (0 - I, 1 - IA, 2 - CI, 3 - RGBA)
+		int FBSize;					// Framebuffer pixel size index (0 - 4bpp, 1 - 8bpp, 2 - 16bpp, 3 - 32bpp)
+		int FBWidth;				// Framebuffer width, in pixels
+		int FBHeight;				// Framebuffer height, in scanlines
+		UINT32 FBAddress;			// Framebuffer source address offset (in bytes) from start of RDRAM
 
-		UINT32 m_zb_address;
+		UINT32 ZBAddress;			// Z-buffer source address offset (in bytes) from start of RDRAM
 
-		int m_ti_format;
-		int m_ti_size;
-		int m_ti_width;
-		UINT32 m_ti_address;
+		int TIFormat;				// Format for Texture Interface (TI) transfers
+		int TISize;					// Size (in bytes) of TI transfers
+		int TIWidth;				// Width (in pixels) of TI transfers
+		UINT32 TIAddress;			// Destination address for TI transfers
 
-		UINT32 m_curpixel_cvg;
-		UINT32 m_curpixel_memcvg;
-		UINT32 m_curpixel_cvbit;
-		UINT32 m_curpixel_overlap;
+		UINT32 CurrentPixCvg;		// Coverage for the current pixel
+		UINT32 CurrentMemCvg;		// Incoming coverage, in memory, for the current pixel
+		UINT32 CurrentCvgBit;		// Bitfield representation of current coverage value
+		UINT32 CurrentPixOverlap;	// Current overlap value, in coverage indices, for the current pixel
 
-		UINT8 m_random_seed;
+		UINT8 RandomSeed;			// %HACK%, adds 19 each time it's read and is more or less random
 
-		int m_special_bsel0;
-		int m_special_bsel1;
+		int SpecialBlendSelect0;	// Special blend-mode select for cycle 0
+		int SpecialBlendSelect1;	// Special blend-mode select for cycle 1
 
-		UINT32 m_max_level;
-		UINT32 m_min_level;
+		UINT32 MaxLevel;			// Maximum LOD level for texture filtering
+		UINT32 MinLevel;			// Minimum LOD level for texture filtering
 
-		UINT16 m_primitive_z;
-		UINT16 m_primitive_delta_z;
+		UINT16 PrimitiveZ;			// Forced Z value for current primitive, if applicable
+		UINT16 PrimitiveDZ;			// Forced Delta-Z value for current primitive, if applicable
 };
 
 class CombineModes
@@ -204,7 +204,7 @@ class CombineModes
 		int add_a1;
 };
 
-class OtherModes
+class OtherModesT
 {
 	public:
 		int cycle_type;
@@ -246,7 +246,7 @@ class OtherModes
 		bool alpha_compare_en;
 };
 
-class ColorInputs
+class ColorInputsT
 {
 	public:
 		// combiner inputs
@@ -305,35 +305,35 @@ class Processor
 				m_tiles[i].num = i;
 			}
 
-			m_one_color.c = 0xffffffff;
-			m_zero_color.c = 0x00000000;
+			OneColor.c = 0xffffffff;
+			ZeroColor.c = 0x00000000;
 
-			m_color_inputs.combiner_rgbsub_a_r[0] = m_color_inputs.combiner_rgbsub_a_r[1] = &m_one_color.i.r;
-			m_color_inputs.combiner_rgbsub_a_g[0] = m_color_inputs.combiner_rgbsub_a_g[1] = &m_one_color.i.g;
-			m_color_inputs.combiner_rgbsub_a_b[0] = m_color_inputs.combiner_rgbsub_a_b[1] = &m_one_color.i.b;
-			m_color_inputs.combiner_rgbsub_b_r[0] = m_color_inputs.combiner_rgbsub_b_r[1] = &m_one_color.i.r;
-			m_color_inputs.combiner_rgbsub_b_g[0] = m_color_inputs.combiner_rgbsub_b_g[1] = &m_one_color.i.g;
-			m_color_inputs.combiner_rgbsub_b_b[0] = m_color_inputs.combiner_rgbsub_b_b[1] = &m_one_color.i.b;
-			m_color_inputs.combiner_rgbmul_r[0] = m_color_inputs.combiner_rgbmul_r[1] = &m_one_color.i.r;
-			m_color_inputs.combiner_rgbmul_g[0] = m_color_inputs.combiner_rgbmul_g[1] = &m_one_color.i.g;
-			m_color_inputs.combiner_rgbmul_b[0] = m_color_inputs.combiner_rgbmul_b[1] = &m_one_color.i.b;
-			m_color_inputs.combiner_rgbadd_r[0] = m_color_inputs.combiner_rgbadd_r[1] = &m_one_color.i.r;
-			m_color_inputs.combiner_rgbadd_g[0] = m_color_inputs.combiner_rgbadd_g[1] = &m_one_color.i.g;
-			m_color_inputs.combiner_rgbadd_b[0] = m_color_inputs.combiner_rgbadd_b[1] = &m_one_color.i.b;
+			ColorInputs.combiner_rgbsub_a_r[0] = ColorInputs.combiner_rgbsub_a_r[1] = &OneColor.i.r;
+			ColorInputs.combiner_rgbsub_a_g[0] = ColorInputs.combiner_rgbsub_a_g[1] = &OneColor.i.g;
+			ColorInputs.combiner_rgbsub_a_b[0] = ColorInputs.combiner_rgbsub_a_b[1] = &OneColor.i.b;
+			ColorInputs.combiner_rgbsub_b_r[0] = ColorInputs.combiner_rgbsub_b_r[1] = &OneColor.i.r;
+			ColorInputs.combiner_rgbsub_b_g[0] = ColorInputs.combiner_rgbsub_b_g[1] = &OneColor.i.g;
+			ColorInputs.combiner_rgbsub_b_b[0] = ColorInputs.combiner_rgbsub_b_b[1] = &OneColor.i.b;
+			ColorInputs.combiner_rgbmul_r[0] = ColorInputs.combiner_rgbmul_r[1] = &OneColor.i.r;
+			ColorInputs.combiner_rgbmul_g[0] = ColorInputs.combiner_rgbmul_g[1] = &OneColor.i.g;
+			ColorInputs.combiner_rgbmul_b[0] = ColorInputs.combiner_rgbmul_b[1] = &OneColor.i.b;
+			ColorInputs.combiner_rgbadd_r[0] = ColorInputs.combiner_rgbadd_r[1] = &OneColor.i.r;
+			ColorInputs.combiner_rgbadd_g[0] = ColorInputs.combiner_rgbadd_g[1] = &OneColor.i.g;
+			ColorInputs.combiner_rgbadd_b[0] = ColorInputs.combiner_rgbadd_b[1] = &OneColor.i.b;
 
-			m_color_inputs.combiner_alphasub_a[0] = m_color_inputs.combiner_alphasub_a[1] = &m_one_color.i.a;
-			m_color_inputs.combiner_alphasub_b[0] = m_color_inputs.combiner_alphasub_b[1] = &m_one_color.i.a;
-			m_color_inputs.combiner_alphamul[0] = m_color_inputs.combiner_alphamul[1] = &m_one_color.i.a;
-			m_color_inputs.combiner_alphaadd[0] = m_color_inputs.combiner_alphaadd[1] = &m_one_color.i.a;
+			ColorInputs.combiner_alphasub_a[0] = ColorInputs.combiner_alphasub_a[1] = &OneColor.i.a;
+			ColorInputs.combiner_alphasub_b[0] = ColorInputs.combiner_alphasub_b[1] = &OneColor.i.a;
+			ColorInputs.combiner_alphamul[0] = ColorInputs.combiner_alphamul[1] = &OneColor.i.a;
+			ColorInputs.combiner_alphaadd[0] = ColorInputs.combiner_alphaadd[1] = &OneColor.i.a;
 
-			m_color_inputs.blender1a_r[0] = m_color_inputs.blender1a_r[1] = &m_pixel_color.i.r;
-			m_color_inputs.blender1a_g[0] = m_color_inputs.blender1a_g[1] = &m_pixel_color.i.r;
-			m_color_inputs.blender1a_b[0] = m_color_inputs.blender1a_b[1] = &m_pixel_color.i.r;
-			m_color_inputs.blender1b_a[0] = m_color_inputs.blender1b_a[1] = &m_pixel_color.i.r;
-			m_color_inputs.blender2a_r[0] = m_color_inputs.blender2a_r[1] = &m_pixel_color.i.r;
-			m_color_inputs.blender2a_g[0] = m_color_inputs.blender2a_g[1] = &m_pixel_color.i.r;
-			m_color_inputs.blender2a_b[0] = m_color_inputs.blender2a_b[1] = &m_pixel_color.i.r;
-			m_color_inputs.blender2b_a[0] = m_color_inputs.blender2b_a[1] = &m_pixel_color.i.r;
+			ColorInputs.blender1a_r[0] = ColorInputs.blender1a_r[1] = &PixelColor.i.r;
+			ColorInputs.blender1a_g[0] = ColorInputs.blender1a_g[1] = &PixelColor.i.r;
+			ColorInputs.blender1a_b[0] = ColorInputs.blender1a_b[1] = &PixelColor.i.r;
+			ColorInputs.blender1b_a[0] = ColorInputs.blender1b_a[1] = &PixelColor.i.r;
+			ColorInputs.blender2a_r[0] = ColorInputs.blender2a_r[1] = &PixelColor.i.r;
+			ColorInputs.blender2a_g[0] = ColorInputs.blender2a_g[1] = &PixelColor.i.r;
+			ColorInputs.blender2a_b[0] = ColorInputs.blender2a_b[1] = &PixelColor.i.r;
+			ColorInputs.blender2b_a[0] = ColorInputs.blender2b_a[1] = &PixelColor.i.r;
 
 			m_tmem = NULL;
 
@@ -341,8 +341,8 @@ class Processor
 
 			//memset(m_hidden_bits, 3, 8388608);
 
-			m_prim_lod_frac = 0;
-			m_lod_frac = 0;
+			PrimLODFraction = 0;
+			LODFraction = 0;
 
 			for (int i = 0; i < 256; i++)
 			{
@@ -386,13 +386,11 @@ class Processor
 
 			for(int i = 0; i < 32; i++)
 			{
-				m_replicated_rgba[i] = (i << 3) | ((i >> 2) & 7);
+				ReplicatedRGBA[i] = (i << 3) | ((i >> 2) & 7);
 			}
 		}
 
 		~Processor() { }
-
-		UINT8*	ReplicatedRGBA() { return m_replicated_rgba; }
 
 		void	Dasm(char *buffer);
 
@@ -454,71 +452,8 @@ class Processor
 		void		SetStatusReg(UINT32 val) { m_status = val; }
 		UINT32		GetStatusReg() const { return m_status; }
 
-		// Functional blocks
-		Blender*		GetBlender() { return &m_blender; }
-		Framebuffer*	GetFramebuffer() { return &m_framebuffer; }
-		TexturePipe*	GetTexPipe() { return &m_tex_pipe; }
-
 		// Internal state
-		OtherModes*		GetOtherModes() { return &m_other_modes; }
-		ColorInputs*	GetColorInputs() { return &m_color_inputs; }
 		CombineModes*	GetCombine() { return &m_combine; }
-		MiscState*		GetMiscState() { return &m_misc_state; }
-
-		// Color constants
-		Color*		GetBlendColor() { return &m_blend_color; }
-		void		SetBlendColor(UINT32 color) { m_blend_color.c = color; }
-
-		Color*		GetPixelColor() { return &m_pixel_color; }
-		void		SetPixelColor(UINT32 color) { m_pixel_color.c = color; }
-
-		Color*		GetInvPixelColor() { return &m_inv_pixel_color; }
-		void		SetInvPixelColor(UINT32 color) { m_inv_pixel_color.c = color; }
-
-		Color*		GetBlendedColor() { return &m_blended_pixel_color; }
-		void		SetBlendedColor(UINT32 color) { m_blended_pixel_color.c = color; }
-
-		Color*		GetMemoryColor() { return &m_memory_color; }
-		void		SetMemoryColor(UINT32 color) { m_memory_color.c = color; }
-
-		Color*		GetPrimColor() { return &m_prim_color; }
-		void		SetPrimColor(UINT32 color) { m_prim_color.c = color; }
-
-		Color*		GetEnvColor() { return &m_env_color; }
-		void		SetEnvColor(UINT32 color) { m_env_color.c = color; }
-
-		Color*		GetFogColor() { return &m_fog_color; }
-		void		SetFogColor(UINT32 color) { m_fog_color.c = color; }
-
-		Color*		GetCombinedColor() { return &m_combined_color; }
-		void		SetCombinedColor(UINT32 color) { m_combined_color.c = color; }
-
-		Color*		GetTexel0Color() { return &m_texel0_color; }
-		void		SetTexel0Color(UINT32 color) { m_texel0_color.c = color; }
-
-		Color*		GetTexel1Color() { return &m_texel1_color; }
-		void		SetTexel1Color(UINT32 color) { m_texel1_color.c = color; }
-
-		Color*		GetNextTexelColor() { return &m_next_texel_color; }
-		void		SetNextTexelColor(UINT32 color) { m_next_texel_color.c = color; }
-
-		Color*		GetShadeColor() { return &m_shade_color; }
-		void		SetShadeColor(UINT32 color) { m_shade_color.c = color; }
-
-		Color*		GetKeyScale() { return &m_key_scale; }
-		void		SetKeyScale(UINT32 scale) { m_key_scale.c = scale; }
-
-		Color*		GetNoiseColor() { return &m_noise_color; }
-		void		SetNoiseColor(UINT32 color) { m_noise_color.c = color; }
-
-		Color*		GetOne() { return &m_one_color; }
-		Color*		GetZero() { return &m_zero_color; }
-
-		UINT8		GetLODFrac() { return m_lod_frac; }
-		void		SetLODFrac(UINT8 lod_frac) { m_lod_frac = lod_frac; }
-
-		UINT8		GetPrimLODFrac() { return m_prim_lod_frac; }
-		void		SetPrimLODFrac(UINT8 prim_lod_frac) { m_prim_lod_frac = prim_lod_frac; }
 
 		// Color Combiner
 		INT32		ColorCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d);
@@ -540,7 +475,7 @@ class Processor
 		Tile*		GetTiles(){ return m_tiles; }
 
 		// Emulation Accelerators
-		UINT8		GetRandom() { return m_misc_state.m_random_seed += 0x13; }
+		UINT8		GetRandom() { return MiscState.RandomSeed += 0x13; }
 
 		// YUV Factors
 		void		SetYUVFactors(INT32 k0, INT32 k1, INT32 k2, INT32 k3, INT32 k4, INT32 k5) { m_k0 = k0; m_k1 = k1; m_k2 = k2; m_k3 = k3; m_k4 = k4; m_k5 = k5; }
@@ -560,13 +495,10 @@ class Processor
 		void			TCDivNoPersp(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
 		UINT32			GetLog2(UINT32 lod_clamp);
 		void			RenderSpans(int start, int end, int tilenum, bool flip);
-		UINT8*			GetHiddenBits() { return m_hidden_bits; }
 		void			GetAlphaCvg(UINT8 *comb_alpha);
 		const UINT8*	GetBayerMatrix() const { return s_bayer_matrix; }
 		const UINT8*	GetMagicMatrix() const { return s_magic_matrix; }
-		Span*			GetSpans() { return m_span; }
 		int				GetCurrFIFOIndex() const { return m_cmd_cur; }
-		UINT32			GetFillColor32() const { return m_fill_color; }
 
 		void			ZStore(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z);
 		UINT32			ZDecompress(UINT32 zcurpixel);
@@ -648,39 +580,50 @@ class Processor
 		UINT16 decompress_cvmask_frombyte(UINT8 x);
 		void lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy);
 
+		MiscStateT		MiscState;
+
+		// Color constants
+		Color			MemoryColor;
+		Color			PixelColor;
+		Color			InvPixelColor;
+		Color			BlendedPixelColor;
+		Color			BlendColor;
+
+		Color			PrimColor;
+		Color			EnvColor;
+		Color			FogColor;
+		Color			CombinedColor;
+		Color			Texel0Color;
+		Color			Texel1Color;
+		Color			NextTexelColor;
+		Color			ShadeColor;
+		Color			KeyScale;
+		Color			NoiseColor;
+
+		Color			OneColor;
+		Color			ZeroColor;
+
+		UINT8			LODFraction;
+		UINT8			PrimLODFraction;
+
+		UINT32			FillColor;
+
+		OtherModesT		OtherModes;
+		ColorInputsT	ColorInputs;
+
+		BlenderT		Blender;
+
+		Span Spans[4096];
+
+		FramebufferT	Framebuffer;
+		TexturePipeT	TexPipe;
+
+		UINT8 HiddenBits[0x800000];
+
+		UINT8 ReplicatedRGBA[32];
+
 	protected:
-		Blender			m_blender;
-		Framebuffer		m_framebuffer;
-		TexturePipe		m_tex_pipe;
-
-		OtherModes		m_other_modes;
-		MiscState		m_misc_state;
-		ColorInputs		m_color_inputs;
 		CombineModes	m_combine;
-
-		Color		m_pixel_color;
-		Color		m_inv_pixel_color;
-		Color		m_blended_pixel_color;
-		Color		m_memory_color;
-		Color		m_blend_color;
-
-		Color		m_prim_color;
-		Color		m_env_color;
-		Color		m_fog_color;
-		Color		m_combined_color;
-		Color		m_texel0_color;
-		Color		m_texel1_color;
-		Color		m_next_texel_color;
-		Color		m_shade_color;
-		Color		m_key_scale;
-		Color		m_noise_color;
-		UINT8		m_lod_frac;
-		UINT8		m_prim_lod_frac;
-
-		Color		m_one_color;
-		Color		m_zero_color;
-
-		UINT32		m_fill_color;
 
 		typedef struct
 		{
@@ -727,10 +670,6 @@ class Processor
 		INT32 m_norm_point_rom[64];
 		INT32 m_norm_slope_rom[64];
 
-		UINT8 m_hidden_bits[0x800000];
-
-		Span m_span[4096];
-
 		static const UINT8 s_bayer_matrix[16];
 		static const UINT8 s_magic_matrix[16];
 
@@ -738,8 +677,6 @@ class Processor
 		INT32 m_gamma_dither_table[0x4000];
 
 		UINT32 m_special_9bit_clamptable[512];
-
-		UINT8 m_replicated_rgba[32];
 
 		INT32 m_dzpix_enc;
 		INT32 m_dz_enc;

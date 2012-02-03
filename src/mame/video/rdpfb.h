@@ -12,10 +12,10 @@ namespace RDP
 class OtherModes;
 class MiscState;
 
-class Framebuffer
+class FramebufferT
 {
 	public:
-		Framebuffer()
+		FramebufferT()
 		{
 			m_pre_wrap = false;
 		}

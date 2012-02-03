@@ -27,7 +27,6 @@ class Triangle
 
 		running_machine*	m_machine;
 		UINT32*				m_cmd_data;
-		MiscState*			m_misc_state;
 		Processor*			m_rdp;
 		bool				m_shade;
 		bool				m_texture;
