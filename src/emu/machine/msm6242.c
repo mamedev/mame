@@ -2,12 +2,10 @@
 
     MSM6242 Real Time Clock
 
-    Note:
-    - this RTC has a y2k bug
-
     TODO:
     - HOLD mechanism
     - IRQ ACK
+	- why skns tries to read uninitialized registers?
 
 ***************************************************************************/
 
@@ -150,9 +148,10 @@ void msm6242_device::device_start()
 	m_irq_flag = 0;
 	m_irq_type = 0;
 
+	/* TODO: skns writes 0x4 to D then expects E == 6 and F == 4, perhaps those are actually saved in the RTC CMOS? */
 	m_reg[0] = 0;
-	m_reg[1] = 0;
-	m_reg[2] = 0;
+	m_reg[1] = 0x6;
+	m_reg[2] = 0x4;
 }
 
 
