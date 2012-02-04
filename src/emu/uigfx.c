@@ -1039,6 +1039,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state,
 
 		/* allocate new stuff */
 		state->bitmap = global_alloc(bitmap_rgb32(width, height));
+		state->bitmap->set_palette(machine.palette);
 		state->texture = machine.render().texture_alloc();
 		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_RGB32);
 
