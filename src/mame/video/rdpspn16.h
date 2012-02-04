@@ -58,7 +58,7 @@ class Span
 		SpanParam m_a;
 		SpanParam m_z;
 
-		UINT16 m_cvg[RDP_CVG_SPAN_MAX];
+		UINT16 m_cvg[RDP_CVG_SPAN_MAX+32];
 
 	private:
 		void RGBAZClip(int sr, int sg, int sb, int sa, int *sz);

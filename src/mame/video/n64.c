@@ -1800,7 +1800,7 @@ void N64::RDP::Triangle::compute_cvg_noflip(INT32* majorx, INT32* minorx, INT32*
 
 	if (length < 0) return;
 
-	memset(&m_rdp->Spans[scanline].m_cvg[purgestart], 0, (length + 1) << 2);
+	memset(&m_rdp->Spans[scanline].m_cvg[purgestart], 0, (length + 1) << 1);
 
 	for(int i = 0; i < 4; i++)
 	{
@@ -1873,7 +1873,7 @@ void N64::RDP::Triangle::compute_cvg_flip(INT32* majorx, INT32* minorx, INT32* m
 
 	if (length < 0) return;
 
-	memset(&m_rdp->Spans[scanline].m_cvg[purgestart], 0, (length + 1) << 2);
+	memset(&m_rdp->Spans[scanline].m_cvg[purgestart], 0, (length + 1) << 1);
 
 	for(int i = 0; i < 4; i++)
 	{
