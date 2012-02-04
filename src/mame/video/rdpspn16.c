@@ -15,6 +15,11 @@ void Processor::RenderSpans(int start, int end, int tilenum, bool flip)
 	int clipy1 = GetScissor()->m_yh;
 	int clipy2 = GetScissor()->m_yl;
 
+	if (clipy2 <= 0)
+	{
+		return;
+	}
+
 	if (start < clipy1)
 	{
 		start = clipy1;
@@ -41,7 +46,6 @@ void Processor::RenderSpans(int start, int end, int tilenum, bool flip)
 			case CYCLE_TYPE_COPY: Spans[i].DrawCopy(i, tilenum, flip); break;
 			case CYCLE_TYPE_FILL: Spans[i].DrawFill(i, tilenum, flip); break;
 		}
-
 	}
 }
 
