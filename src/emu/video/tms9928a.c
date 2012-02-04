@@ -274,7 +274,8 @@ WRITE8_MEMBER( tms9928a_device::register_write )
 
 void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int vpos = m_screen->vpos();
+	int raw_vpos = m_screen->vpos();
+	int vpos = raw_vpos * m_vertical_size / m_screen->height();
 	UINT16 BackColour = m_Regs[7] & 15;
 	UINT16 *p = &m_tmpbmp.pix16(vpos);
 
@@ -567,7 +568,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 
 	/* Schedule next callback */
-	m_line_timer->adjust( m_screen->time_until_pos( ( vpos + 1 ) % m_screen->height() , 0 ) );
+	m_line_timer->adjust( m_screen->time_until_pos( ( raw_vpos + 1 ) % m_screen->height() , 0 ) );
 }
 
 
@@ -602,6 +603,7 @@ void tms9928a_device::device_start()
 	assert( m_screen != NULL );
 
 	m_top_border = m_50hz ? TMS9928A_VERT_DISPLAY_START_PAL : TMS9928A_VERT_DISPLAY_START_NTSC;
+	m_vertical_size = m_50hz ? TMS9928A_TOTAL_VERT_PAL : TMS9928A_TOTAL_VERT_NTSC;
 
 	m_irq_changed.resolve( m_out_int_line, *this );
 

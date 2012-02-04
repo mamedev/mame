@@ -153,6 +153,7 @@ private:
 
 	/* emulation settings */
 	int			m_top_border;
+	int			m_vertical_size;
 };
 
 

@@ -671,14 +671,6 @@ static TMS9928A_INTERFACE(cliffhgr_tms9928a_interface)
 	DEVCB_LINE(vdp_interrupt)
 };
 
-static SCREEN_UPDATE_IND16( cliffhgr )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-
-	tms9928a->screen_update( screen, bitmap, cliprect );
-	return 0;
-}
-
 DISCRETE_SOUND_EXTERN( cliffhgr );
 
 
@@ -701,7 +693,7 @@ static MACHINE_CONFIG_START( cliffhgr, cliffhgr_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_STATIC(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_NTSC, cliffhgr)
+	MCFG_LASERDISC_OVERLAY_DEVICE(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_NTSC, "tms9928a", tms9928a_device, screen_update)
 	MCFG_LASERDISC_OVERLAY_CLIP(TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START+32*8+12-1, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC+24*8+12-1)
 
 	/* start with the TMS9928a video configuration */
