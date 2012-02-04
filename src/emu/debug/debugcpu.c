@@ -1287,6 +1287,11 @@ static UINT64 expression_read_program_direct(address_space *_space, int opcode, 
 
 static UINT64 expression_read_memory_region(running_machine &machine, const char *rgntag, offs_t address, int size)
 {
+	// permit regions to not specify the leading ':'
+	astring fulltag;
+	if (rgntag[0] != ':')
+		rgntag = fulltag.cpy(":").cat(rgntag);
+
 	const memory_region *region = machine.region(rgntag);
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 
@@ -1463,6 +1468,11 @@ static void expression_write_program_direct(address_space *_space, int opcode, o
 
 static void expression_write_memory_region(running_machine &machine, const char *rgntag, offs_t address, int size, UINT64 data)
 {
+	// permit regions to not specify the leading ':'
+	astring fulltag;
+	if (rgntag[0] != ':')
+		rgntag = fulltag.cpy(":").cat(rgntag);
+
 	debugcpu_private *global = machine.debugcpu_data;
 	const memory_region *region = machine.region(rgntag);
 
