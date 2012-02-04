@@ -430,10 +430,6 @@ loaded_samples *readsamples(running_machine &machine, const char *const *samplen
 				// try parent sample set
 				if (filerr != FILERR_NONE && skipfirst)
 					filerr = file.open(samplenames[0] + 1, PATH_SEPARATOR, filename);
-
-				// no real benefit to having non-flacs, so issue a warning
-				if (filerr == FILERR_NONE)
-					mame_printf_warning("%s will be loaded but should be re-encoded as FLAC\n", filename);
 			}
 
 
