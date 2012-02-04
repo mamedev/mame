@@ -1147,12 +1147,10 @@ static void process_source_file(running_machine &machine)
 
 static device_t *expression_get_device(running_machine &machine, const char *tag)
 {
-	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
-		if (mame_stricmp(device->tag(), tag) == 0)
-			return device;
-
-	return NULL;
+	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
+	astring fullname(tag);
+	fullname.makelower();
+	return machine.device(fullname);
 }
 
 
