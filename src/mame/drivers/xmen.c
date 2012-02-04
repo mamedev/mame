@@ -616,6 +616,35 @@ ROM_START( xmene )
 	ROM_LOAD( "xmen_eba.nv", 0x0000, 0x0080, CRC(37f8e77a) SHA1(0b92caba33486c6fd104806aa96f735743bb2221) )
 ROM_END
 
+
+ROM_START( xmena )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "065-ada.10d",  0x00000, 0x20000, CRC(b8276624) SHA1(5b601393faa4bf578d84b590eb2360ad400368a5) ) /* Asia 4 Player version */
+	ROM_LOAD16_BYTE( "065-ada.10f",  0x00001, 0x20000, CRC(c68582ad) SHA1(d2ca23cc0ad08e7f3d5c533f6fe43d4c215c114e) )
+	ROM_LOAD16_BYTE( "065-a02.9d",     0x80000, 0x40000, CRC(b31dc44c) SHA1(4bdac05826b4d6d4fe46686ede5190e2f73eefc5) )
+	ROM_LOAD16_BYTE( "065-a03.9f",     0x80001, 0x40000, CRC(13842fe6) SHA1(b61f094eb94336edb8708d3437ead9b853b2d6e6) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 )		/* 64k+128k for sound cpu */
+	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
+	ROM_RELOAD(               0x10000, 0x20000 )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_LOAD( "065-a08.15l",   0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )	/* tiles */
+	ROM_LOAD( "065-a07.16l",   0x100000, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_LOAD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) )	/* sprites */
+	ROM_LOAD( "065-a10.2l",  0x100000, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
+	ROM_LOAD( "065-a12.1h",  0x200000, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
+	ROM_LOAD( "065-a11.1l",  0x300000, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )	/* samples for the 054539 */
+	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_ada.nv", 0x0000, 0x0080, CRC(a77a3891) SHA1(84ec257790d5c1859ffcbc9371a72ea99d7f8928) )
+ROM_END
+
 ROM_START( xmen2pe )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "065-eaa04.10d",  0x00000, 0x20000, CRC(502861e7) SHA1(f96aab2d2006703065de5bd7e341f929d04f5f60) ) /* Europe 2 Player version */
@@ -811,9 +840,10 @@ ROM_START( xmen6pu )
 	ROM_LOAD( "xmen_ucb.nv", 0x0000, 0x0080, CRC(f3d0f682) SHA1(b0d4655c651238ae028ffb59a704acba798f93f8) )
 ROM_END
 
-GAME( 1992, xmen,    0,    xmen,   xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", GAME_SUPPORTS_SAVE ) /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? */
+GAME( 1992, xmen,    0,    xmen,   xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", GAME_SUPPORTS_SAVE ) /* Second "version" letter denotes players, A=2 players, D/B=4 players, C=6 players ??? */
 GAME( 1992, xmenj,   xmen, xmen,   xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver JBA)", GAME_SUPPORTS_SAVE )
 GAME( 1992, xmene,   xmen, xmen,   xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver EBA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, xmena,   xmen, xmen,   xmen,    0,   ROT0, "Konami", "X-Men (4 Players ver ADA)", GAME_SUPPORTS_SAVE )
 GAME( 1992, xmen2pe, xmen, xmen,   xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver EAA)", GAME_SUPPORTS_SAVE )
 GAME( 1992, xmen2pa, xmen, xmen,   xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver AAA)", GAME_SUPPORTS_SAVE )
 GAME( 1992, xmen2pj, xmen, xmen,   xmen2p,  0,   ROT0, "Konami", "X-Men (2 Players ver JAA)", GAME_SUPPORTS_SAVE )
