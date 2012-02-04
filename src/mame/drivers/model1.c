@@ -634,8 +634,6 @@ Notes:
 #include "machine/nvram.h"
 #include "includes/model1.h"
 
-
-
 static READ16_HANDLER( io_r )
 {
 	static const char *const analognames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
@@ -859,6 +857,11 @@ static WRITE16_HANDLER( snd_latch_to_68k_w )
 	state->m_to_68k[state->m_fifo_wptr] = data;
 	state->m_fifo_wptr++;
 	if (state->m_fifo_wptr >= ARRAY_LENGTH(state->m_to_68k)) state->m_fifo_wptr = 0;
+
+    if (state->m_dsbz80 != NULL)
+    {
+        state->m_dsbz80->latch_w(*space, 0, data);
+    }
 
 	// signal the 68000 that there's data waiting
 	cputag_set_input_line(space->machine(), "audiocpu", 2, HOLD_LINE);
@@ -1334,12 +1337,12 @@ ROM_START( swa )
         ROM_LOAD( "mpr-16484.bin", 0x000000, 0x200000, CRC(9d4c334d) SHA1(8b4d903f14559fed425d225bb23ccfe8da23cbd3) )
         ROM_LOAD( "mpr-16485.bin", 0x200000, 0x200000, CRC(95aadcad) SHA1(4276db655db9834692c3843eb96a3e3a89cb7252) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 ) /* Z80 DSB code */
-        ROM_LOAD( "epr-16471.bin", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
+    ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 DSB code */
+    ROM_LOAD( "epr-16471.bin", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
 
-	ROM_REGION( 0x400000, "mpeg", 0 ) /* DSB MPEG data */
-        ROM_LOAD( "mpr-16514.bin", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
-        ROM_LOAD( "mpr-16515.bin", 0x000000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
+    ROM_REGION( 0x400000, "ymz770", 0 ) /* DSB MPEG data */
+    ROM_LOAD( "mpr-16514.bin", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
+    ROM_LOAD( "mpr-16515.bin", 0x000000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
 
 	ROM_REGION32_LE( 0xc00000, "user1", 0 ) /* TGP model roms */
 	ROM_LOAD32_WORD( "mpr-16476.26", 0x000000, 0x200000, CRC(d48609ae) SHA1(8c8686a5c9ca4837447a7f70ed194e2f1882b66d) )
@@ -1543,6 +1546,10 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED(swa, model1)
+    MCFG_DSBZ80_ADD(DSBZ80_TAG)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
@@ -1591,7 +1598,7 @@ MACHINE_CONFIG_END
 GAME( 1993, vf,       0,       model1,    vf,       0, ROT0, "Sega", "Virtua Fighter", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, vr,       0,       model1_vr, vr,       0, ROT0, "Sega", "Virtua Racing", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, vformula, vr,      model1_vr, vr,       0, ROT0, "Sega", "Virtua Formula", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,      0,       model1,    swa,      0, ROT0, "Sega", "Star Wars Arcade", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1993, swa,      0,       swa,       swa,      0, ROT0, "Sega", "Star Wars Arcade", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1994, wingwar,  0,       model1,    wingwar,  0, ROT0, "Sega", "Wing War (World)", GAME_NOT_WORKING )
 GAME( 1994, wingwaru, wingwar, model1,    wingwar,  0, ROT0, "Sega", "Wing War (US)", GAME_NOT_WORKING )
 GAME( 1994, wingwarj, wingwar, model1,    wingwar,  0, ROT0, "Sega", "Wing War (Japan)", GAME_NOT_WORKING )

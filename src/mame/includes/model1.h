@@ -1,3 +1,5 @@
+#include "audio/dsbz80.h"
+
 typedef void (*tgp_func)(running_machine &machine);
 
 enum {FIFO_SIZE = 256};
@@ -7,7 +9,15 @@ class model1_state : public driver_device
 {
 public:
 	model1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+        m_maincpu(*this, "maincpu"),
+        m_audiocpu(*this, "maincpu"),
+        m_dsbz80(*this, DSBZ80_TAG)
+        { }
+
+    required_device<cpu_device> m_maincpu;      // V60
+    required_device<cpu_device> m_audiocpu;     // sound 68000
+    optional_device<dsbz80_device> m_dsbz80;    // Digital Sound Board
 
 	struct view *m_view;
 	struct point *m_pointdb;
