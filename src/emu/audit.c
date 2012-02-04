@@ -264,8 +264,19 @@ media_auditor::summary media_auditor::audit_samples()
 				astring curpath;
 				while (path.next(curpath, intf->samplenames[sampnum]))
 				{
-					// attempt to access the file
-					file_error filerr = file.open(curpath);
+					astring wholepath;
+					wholepath = curpath + ".flac";
+
+					// attempt to access the file (.flac)
+					file_error filerr = file.open(wholepath);
+
+					if (filerr != FILERR_NONE)
+					{
+						wholepath = curpath + ".wav";
+						// try again with .wav
+						filerr = file.open(wholepath);
+					}
+
 					if (filerr == FILERR_NONE)
 					{
 						record.set_status(audit_record::STATUS_GOOD, audit_record::SUBSTATUS_GOOD);
