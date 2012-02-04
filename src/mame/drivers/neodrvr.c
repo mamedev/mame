@@ -9861,6 +9861,15 @@ static DRIVER_INIT(sbp )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00200, 0x001fff, FUNC(sbp_lowerrom_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00200, 0x001fff, FUNC(sbp_lowerrom_w));
 
+	/* the game code clears the text overlay used ingame immediately after writing it.. why? protection? sloppy code that the hw ignores? imperfect emulation? */
+	{
+		UINT16* rom = (UINT16*)machine.region("maincpu")->base();
+
+		rom[0x2a6f8/2] = 0x4e71;
+		rom[0x2a6fa/2] = 0x4e71;
+		rom[0x2a6fc/2] = 0x4e71;
+	}
+
 
 }
 
