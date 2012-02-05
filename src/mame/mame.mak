@@ -1689,6 +1689,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/coinmstr.o \
 	$(DRIVERS)/coinmvga.o \
 	$(DRIVERS)/comebaby.o \
+	$(DRIVERS)/bntyhunt.o \
 	$(DRIVERS)/coolpool.o \
 	$(DRIVERS)/corona.o \
 	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
