@@ -1,0 +1,186 @@
+<mamelayout version="2">
+	<element name="overlay">
+		<rect>
+			<bounds left="0" top="0" right="512" bottom="35" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="0" top="35" right="256" bottom="96" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="256" top="35" right="450" bottom="96" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="450" top="35" right="512" bottom="96" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="0" top="96" right="256" bottom="128" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="256" top="96" right="322" bottom="128" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="322" top="96" right="416" bottom="128" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="416" top="96" right="450" bottom="128" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="450" top="96" right="512" bottom="128" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="0" top="128" right="224" bottom="160" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="224" top="128" right="322" bottom="160" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="322" top="128" right="416" bottom="160" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="416" top="128" right="450" bottom="160" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="450" top="128" right="512" bottom="160" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="0" top="160" right="192" bottom="192" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="192" top="160" right="322" bottom="192" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="322" top="160" right="384" bottom="192" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="384" top="160" right="512" bottom="192" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+
+		<rect>
+			<bounds left="0" top="192" right="35" bottom="226" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="35" top="192" right="450" bottom="226" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="450" top="192" right="512" bottom="226" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="0" top="226" right="35" bottom="257" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="35" top="226" right="416" bottom="257" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="416" top="226" right="512" bottom="257" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="0" top="257" right="35" bottom="318" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="35" top="257" right="99" bottom="318" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="99" top="257" right="288" bottom="318" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="288" top="257" right="384" bottom="318" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="384" top="257" right="512" bottom="318" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+
+		<rect>
+			<bounds left="0" top="318" right="35" bottom="351" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="35" top="318" right="224" bottom="351" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+		<rect>
+			<bounds left="224" top="318" right="288" bottom="351" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="288" top="318" right="512" bottom="351" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+
+		<rect>
+			<bounds left="0" top="351" right="160" bottom="384" />
+			<color red="0.60" green="0.60" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds left="160" top="351" right="512" bottom="384" />
+			<color red="0" green="0.235" blue="0.11" />
+		</rect>
+	</element>
+	<view name="Color_Overlay">
+		<overlay element="overlay">
+			<bounds x="0" y="0" width="512" height="384" />
+		</overlay>
+		<backdrop element="overlay">
+			<bounds x="0" y="0" width="512" height="384" />
+			<color alpha=".8" />
+		</backdrop>
+		<overlay element="overlay">
+			<bounds x="512" y="384" width="512" height="384" />
+			<orientation rotate="180" />
+		</overlay>
+		<backdrop element="overlay">
+			<bounds x="512" y="384" width="512" height="384" />
+			<color alpha=".8" />
+			<orientation rotate="180" />
+		</backdrop>
+		<overlay element="overlay">
+			<bounds x="512" y="0" width="512" height="384" />
+			<orientation flipx="yes" />
+		</overlay>
+		<backdrop element="overlay">
+			<bounds x="512" y="0" width="512" height="384" />
+			<color alpha=".8" />
+			<orientation flipx="yes" />
+		</backdrop>
+		<overlay element="overlay">
+			<bounds x="0" y="384" width="512" height="384" />
+			<orientation flipy="yes" />
+		</overlay>
+		<backdrop element="overlay">
+			<bounds x="0" y="384" width="512" height="384" />
+			<color alpha=".8" />
+			<orientation flipy="yes" />
+		</backdrop>
+		<screen index="0">
+        		<bounds x="0" y="0" width="1024" height="768" />
+		</screen>
+	</view>
+</mamelayout>

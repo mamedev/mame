@@ -1,0 +1,89 @@
+HLSL-Related Enable Switches
+----------------------------
+
+Name                    Values		Description
+hlsl_enable             0/1             Enables HLSL post-processing in Direct3D 9 modes.
+yiq_enable              0/1             Enables YIQ-colorspace post-processing. Causes a
+                                        performance drop but gives a much more authentic
+                                        NTSC TV appearance on TV-based systems when configured
+                                        properly.
+hlslpath                [path]          Path to the .fx files that are in use. (default: hlsl)
+hlsl_ini_read           0/1             Enable HLSL INI reading.
+hlsl_ini_write          0/1             Enable HLSL INI writing.
+hlslini             	%g              HLSL INI file name for running game. (default: %g)
+hlsl_prescale_x         [horizontal]    HLSL pre-scale override factor for X (0 for auto).
+hlsl_prescale_y         [vertical]      HLSL pre-scale override factor for Y (0 for auto).
+hlsl_preset             0-3             HLSL preset to use.
+hlsl_write              0/1		Enable HLSL AVI writing (huge disk bandwidth suggested).
+hlsl_snap_width         [width]         HLSL upscaled-snapshot width. (default: 2048)
+hlsl_snap_height    	[height]        HLSL upscaled-snapshot height. (default: 1536)
+
+
+Surface/Color Processing Parameters
+-----------------------------------
+
+Name                    Values		Description
+shadow_mask_alpha       0.0 to 1.0      The ovearll darkness of each shadow mask pixel.
+shadow_mask_texture     [filename]      A PNG that defines the shadow mask for each pixel.
+shadow_mask_x_count     1+              The count of shadow mask elements, X (usually 640-ish)
+shadow_mask_y_count     1+              The count of shadow mask elements, X (usually 480-ish)
+shadow_mask_usize       0.0 to 1.0      These parameters define the *in-use* pixel count on the
+shadow_mask_vsize       0.0 to 1.0      X and Y axes of the shadow mask texture.
+curvature               0.0 to 1.0      Screen curvature. Affects borders and shadow mask.
+pincushion              0.0 to 1.0      Image curvature. Affects the source image only.
+scanline_alpha          0.0 to 1.0      The overall darkness of each scanline furrow.
+scanline_size           0.0 to 4.0      The overall height of each scanline.
+scanline_height         [height]        Individual height scaling value for scanlines.
+scanline_bright_scale   0.0 to 2.0      The overall brightness multiplier for each scanline.
+scanline_bright_offset  0.0 to 1.0      The overall brightness additive value for each scanline.
+scanline_jitter         0.0 to 2.0      The relative scanline movement per field.
+defocus                 [xval,yval]     This defines the overall defocus radius for the three
+                                        post-converged beams.  Values allowed range from 0.0 to
+                                        32.0.
+converge_x              [r,g,b]         Convergence in screen-relative X direction.
+converge_y              [r,g,b]         Convergence in screen-relative Y direction.
+radial_converge_x   	[r,g,b]         Radial convergence in screen-relative X direction.
+radial_converge_y   	[r,g,b]         Radial convergence in screen-relative Y direction.
+                                        Allowed values for convergence: -150 to 150 for each color.
+red_ratio               [r,g,b]         These parameters define a 3x3 matrix which is multiplied 
+grn_ratio               [r,g,b]         by the incoming RGB signal. This can be used for any
+blu_ratio               [r,g,b]         standard matrix convolution, including H/S/V or simply
+                                        affecting the TV-style tint.
+saturation              0.0 to 4.0      This parameter defines the amount each color channel is
+                                        raised above said channel's baseline grayscale value.
+                                        A value of 0.0 gives a gamma-correct grayscale image,
+                                        whereas 1.0 is full saturation, with each channel being
+                                        oversaturated equally beyond that.
+offset                  [r,g,b]         These parameters define a value for each color channel
+                                        that is added to said channel after scaling and after
+                                        matrix convolution. (-2.0 to 2.0)
+scale                   [r,g,b]         These parameters define a value for each color channel
+                                        that is multiplied with said channel after matrix
+                                        convolution.  (-2.0 to 2.0)
+power                   [r,g,b]         These parameters define the exponent for each color
+                                        channel that is applied after scaling, offsetting,
+                                        saturation and matrix convolution. (-4.0 to 4.0)
+floor                   [r,g,b]         These parameters define the lower limit of each final
+                                        color channel value; 0.05, for example, raises the
+                                        minimum to 0.05 but re-scales to leave the max at 1.0.
+phosphor_life           [r,g,b]         These parameters define the phosphor lifetime for each
+                                        channel, with 0.0 representing no phosphorescence and
+                                        1.0 leaving the channel on indefinitely. Values allowed
+                                        range from 0.0 to 1.0.
+
+
+NTSC Processing Parameters
+--------------------------
+
+Name                    Default Values  Description
+yiq_cc                  3.59754545      Color Carrier frequency for NTSC signal processing
+yiq_a                   0.5             A value for NTSC signal processing
+yiq_b                   0.5             B value for NTSC signal processing
+yiq_o                   0.0             Outgoing Color Carrier phase offset for NTSC signal processing
+yiq_p                   1.0             Incoming Pixel Clock scaling value for NTSC signal processing
+yiq_n                   1.0             Y filter notch width for NTSC signal processing
+yiq_y                   6.0             Y filter cutoff frequency for NTSC signal processing
+yiq_i                   1.2             I filter cutoff frequency for NTSC signal processing
+yiq_q                   0.6             Q filter cutoff frequency for NTSC signal processing
+yiq_scan_time           52.6            Horizontal scanline duration for NTSC signal processing (in usec)
+yiq_phase_count         2               Phase Count value for NTSC signal processing (3 for NES, else 2)

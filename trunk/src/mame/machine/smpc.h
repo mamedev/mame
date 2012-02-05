@@ -1,0 +1,4 @@
+WRITE8_HANDLER( stv_SMPC_w );
+READ8_HANDLER( stv_SMPC_r );
+WRITE8_HANDLER( saturn_SMPC_w );
+READ8_HANDLER( saturn_SMPC_r );

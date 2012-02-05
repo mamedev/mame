@@ -1,0 +1,1077 @@
+<?xml version="1.0"?>
+<glade-interface>
+  <!-- interface-requires gtk+ 2.16 -->
+  <!-- interface-naming-policy toplevel-contextual -->
+  <widget class="GtkWindow" id="debugmain">
+    <property name="visible">True</property>
+    <property name="title" translatable="yes">Debug main window</property>
+    <property name="default_width">350</property>
+    <property name="default_height">300</property>
+    <child>
+      <widget class="GtkVBox" id="vbox1">
+        <property name="visible">True</property>
+        <child>
+          <widget class="GtkMenuBar" id="menu">
+            <property name="visible">True</property>
+            <child>
+              <widget class="GtkMenuItem" id="menuitem4">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Debug</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <widget class="GtkMenu" id="menuitem4_menu">
+                    <child>
+                      <widget class="GtkMenuItem" id="new_mem">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Memory Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_mem_activate" object="debugmain"/>
+                        <accelerator key="m" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="new_disasm">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Disassembly Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_disasm_activate" object="debugmain"/>
+                        <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="new_errorlog">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Error Log Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_errorlog_activate" object="debugmain"/>
+                        <accelerator key="l" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator2">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_activate" object="debugmain"/>
+                        <accelerator key="F5" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_h">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run and Hide Debugger</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_h_activate" object="debugmain"/>
+                        <accelerator key="F12" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_cpu">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run to Next CPU</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_cpu_activate" object="debugmain"/>
+                        <accelerator key="F6" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_irq">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run until Next Interrupt on This CPU</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_irq_activate" object="debugmain"/>
+                        <accelerator key="F7" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_vbl">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run until Next VBLANK</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_vbl_activate" object="debugmain"/>
+                        <accelerator key="F8" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator3">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="step_into">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Into</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_into_activate" object="debugmain"/>
+                        <accelerator key="F11" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="step_over">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Over</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_over_activate" object="debugmain"/>
+                        <accelerator key="F9" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="step_out">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Out</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_out_activate" object="debugmain"/>
+                        <accelerator key="F11" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator4">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="soft_reset">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Soft Reset</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_soft_reset_activate" object="debugmain"/>
+                        <accelerator key="F3" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="hard_reset">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Hard Reset</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_hard_reset_activate" object="debugmain"/>
+                        <accelerator key="F3" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="exit">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Exit</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_exit_activate" object="debugmain"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkMenuItem" id="item1">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Options</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <widget class="GtkMenu" id="item1_menu">
+                    <child>
+                      <widget class="GtkMenuItem" id="set_breakpoint_at_cursor">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Set breakpoint at cursor</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_set_breakpoint_at_cursor_activate" object="debugmain"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_to_cursor">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run to cursor</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_to_cursor_activate" object="debugmain"/>
+                        <accelerator key="F4" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator7">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="raw_opcodes">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Raw Opcodes</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <signal name="activate" handler="on_raw_opcodes_activate" object="debugmain"/>
+                        <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="enc_opcodes">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Encryped Opcodes</property>
+                        <property name="use_underline">True</property>
+                        <property name="group">raw_opcodes</property>
+                        <signal name="activate" handler="on_enc_opcodes_activate" object="debugmain"/>
+                        <accelerator key="e" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="comments">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Comments</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <property name="group">raw_opcodes</property>
+                        <signal name="activate" handler="on_comments_activate" object="debugmain"/>
+                        <accelerator key="c" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkHBox" id="hbox1">
+            <property name="visible">True</property>
+            <child>
+              <widget class="Custom" id="registers">
+                <property name="visible">True</property>
+                <property name="creation_function">dview_new</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkVBox" id="vbox2">
+                <property name="visible">True</property>
+                <child>
+                  <widget class="GtkVPaned" id="vpaned1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <widget class="Custom" id="disasm">
+                        <property name="visible">True</property>
+                        <property name="creation_function">dview_new</property>
+                        <signal name="button_press_event" handler="on_disasm_button_press_event"/>
+                      </widget>
+                      <packing>
+                        <property name="resize">False</property>
+                        <property name="shrink">True</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Custom" id="console">
+                        <property name="visible">True</property>
+                        <property name="creation_function">dview_new</property>
+                      </widget>
+                      <packing>
+                        <property name="resize">True</property>
+                        <property name="shrink">True</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkEntry" id="edit">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="has_focus">True</property>
+                    <property name="invisible_char">&#x25CF;</property>
+                    <property name="activates_default">True</property>
+                    <property name="width_chars">30</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">2</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkWindow" id="memorywin">
+    <property name="visible">True</property>
+    <property name="title" translatable="yes">Memory View</property>
+    <child>
+      <widget class="GtkVBox" id="vbox3">
+        <property name="visible">True</property>
+        <child>
+          <widget class="GtkMenuBar" id="menu">
+            <property name="visible">True</property>
+            <child>
+              <widget class="GtkMenuItem" id="debug">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Debug</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <widget class="GtkMenu" id="debug_menu">
+                    <child>
+                      <widget class="GtkMenuItem" id="new_mem">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Memory Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_mem_activate" object="memorywin"/>
+                        <accelerator key="m" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="new_disasm">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Disassembly Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_disasm_activate" object="memorywin"/>
+                        <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="new_errorlog">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Error Log Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_errorlog_activate" object="memorywin"/>
+                        <accelerator key="l" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator2">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_activate" object="memorywin"/>
+                        <accelerator key="F5" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_h">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run and Hide Debugger</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_h_activate" object="memorywin"/>
+                        <accelerator key="F12" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_cpu">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run to Next CPU</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_cpu_activate" object="memorywin"/>
+                        <accelerator key="F6" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_irq">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run until Next Interrupt on This CPU</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_irq_activate" object="memorywin"/>
+                        <accelerator key="F7" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_vbl">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run until Next VBLANK</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_vbl_activate" object="memorywin"/>
+                        <accelerator key="F8" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator3">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="step_into">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Into</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_into_activate" object="memorywin"/>
+                        <accelerator key="F11" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="step_over">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Over</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_over_activate" object="memorywin"/>
+                        <accelerator key="F10" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="step_out">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Out</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_out_activate" object="memorywin"/>
+                        <accelerator key="F11" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator4">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="soft_reset">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Soft Reset</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_soft_reset_activate" object="memorywin"/>
+                        <accelerator key="F3" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="hard_reset">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Hard Reset</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_hard_reset_activate" object="memorywin"/>
+                        <accelerator key="F3" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="exit">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Exit</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_exit_activate" object="memorywin"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkMenuItem" id="options">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Options</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <widget class="GtkMenu" id="options_menu">
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="chunks_1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">1-byte chunks</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <signal name="activate" handler="on_chunks_1_activate" object="memorywin"/>
+                        <accelerator key="1" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="chunks_2">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">2-bytes chunks</property>
+                        <property name="use_underline">True</property>
+                        <property name="group">chunks_1</property>
+                        <signal name="activate" handler="on_chunks_2_activate" object="memorywin"/>
+                        <accelerator key="2" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="chunks_4">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">4-bytes chunks</property>
+                        <property name="use_underline">True</property>
+                        <property name="group">chunks_1</property>
+                        <signal name="activate" handler="on_chunks_4_activate" object="memorywin"/>
+                        <accelerator key="4" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator5">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="logical_addresses">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Logical Addresses</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <signal name="group_changed" handler="on_logical_addresses_group_changed" object="memorywin"/>
+                        <accelerator key="l" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="physical_addresses">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Physical Addresses</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <property name="group">logical_addresses</property>
+                        <signal name="group_changed" handler="on_physical_addresses_group_changed" object="memorywin"/>
+                        <accelerator key="y" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem1">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkCheckMenuItem" id="reverse">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Reverse View</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_reverse_activate" object="memorywin"/>
+                        <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separator6">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="ibpl">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Increase bytes per line</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_ibpl_activate" object="memorywin"/>
+                        <accelerator key="p" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="dbpl">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Decrease bytes per line</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_dbpl_activate" object="memorywin"/>
+                        <accelerator key="o" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkHBox" id="hbox2">
+            <property name="visible">True</property>
+            <child>
+              <widget class="GtkEntry" id="edit">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="invisible_char">&#x25CF;</property>
+              </widget>
+              <packing>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkComboBox" id="zone">
+                <property name="visible">True</property>
+              </widget>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Custom" id="memoryview">
+            <property name="visible">True</property>
+            <property name="creation_function">dview_new</property>
+            <signal name="button_press_event" handler="on_memoryview_button_press_event"/>
+            <signal name="key_press_event" handler="on_memoryview_key_press_event"/>
+          </widget>
+          <packing>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkWindow" id="disasmwin">
+    <property name="visible">True</property>
+    <property name="title" translatable="yes">Disassembly</property>
+    <child>
+      <widget class="GtkVBox" id="vbox4">
+        <property name="visible">True</property>
+        <child>
+          <widget class="GtkMenuBar" id="menubar1">
+            <property name="visible">True</property>
+            <child>
+              <widget class="GtkMenuItem" id="menuitem5">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Debug</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <widget class="GtkMenu" id="menuitem5_menu">
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem6">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Memory Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_mem_activate" object="disasmwin"/>
+                        <accelerator key="m" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem7">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Disassembly Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_disasm_activate" object="disasmwin"/>
+                        <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem8">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Error Log Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_errorlog_activate" object="disasmwin"/>
+                        <accelerator key="l" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem1">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem9">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_activate" object="disasmwin"/>
+                        <accelerator key="F5" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem10">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run and Hide Debugger</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_h_activate" object="disasmwin"/>
+                        <accelerator key="F12" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem11">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run to Next CPU</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_cpu_activate" object="disasmwin"/>
+                        <accelerator key="F6" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem12">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run until Next Interrupt on This CPU</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_irq_activate" object="disasmwin"/>
+                        <accelerator key="F7" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem13">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run until Next VBLANK</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_vbl_activate" object="disasmwin"/>
+                        <accelerator key="F8" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem2">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem14">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Into</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_into_activate" object="disasmwin"/>
+                        <accelerator key="F11" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem15">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Over</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_over_activate" object="disasmwin"/>
+                        <accelerator key="F10" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem16">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Out</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_out_activate" object="disasmwin"/>
+                        <accelerator key="F11" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem3">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem17">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Soft Reset</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_soft_reset_activate" object="disasmwin"/>
+                        <accelerator key="F3" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem18">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Hard Reset</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_hard_reset_activate" object="disasmwin"/>
+                        <accelerator key="F3" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem19">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Exit</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_exit_activate" object="disasmwin"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkMenuItem" id="menuitem20">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Options</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <widget class="GtkMenu" id="menuitem20_menu">
+                    <child>
+                      <widget class="GtkMenuItem" id="set_breakpoint_at_cursor">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Set breakpoint at cursor</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_set_breakpoint_at_cursor_activate" object="disasmwin"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="run_to_cursor1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run to cursor</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_to_cursor_activate" object="disasmwin"/>
+                        <accelerator key="F4" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem4">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="raw_opcodes">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Raw Opcodes</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <signal name="activate" handler="on_raw_opcodes_activate" object="disasmwin"/>
+                        <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="enc_opcodes">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Encrypted Opcodes</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <property name="group">raw_opcodes</property>
+                        <signal name="activate" handler="on_enc_opcodes_activate" object="disasmwin"/>
+                        <accelerator key="e" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkRadioMenuItem" id="comments">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Comments</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <property name="group">raw_opcodes</property>
+                        <signal name="activate" handler="on_comments_activate" object="disasmwin"/>
+                        <accelerator key="c" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkHBox" id="hbox3">
+            <property name="visible">True</property>
+            <child>
+              <widget class="GtkEntry" id="edit">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="invisible_char">&#x25CF;</property>
+              </widget>
+              <packing>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkComboBox" id="cpu">
+                <property name="visible">True</property>
+              </widget>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Custom" id="disasmview">
+            <property name="visible">True</property>
+            <property name="creation_function">dview_new</property>
+            <signal name="button_press_event" handler="on_disasm_button_press_event"/>
+          </widget>
+          <packing>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkWindow" id="logwin">
+    <property name="visible">True</property>
+    <property name="title" translatable="yes">Log Viewer</property>
+    <child>
+      <widget class="GtkVBox" id="vbox5">
+        <property name="visible">True</property>
+        <child>
+          <widget class="GtkMenuBar" id="menubar2">
+            <property name="visible">True</property>
+            <child>
+              <widget class="GtkMenuItem" id="menuitem26">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Debug</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <widget class="GtkMenu" id="menuitem26_menu">
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem27">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Memory Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_mem_activate" object="logwin"/>
+                        <accelerator key="m" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem28">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Disassembly Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_disasm_activate" object="logwin"/>
+                        <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem29">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Error Log Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_new_errorlog_activate" object="logwin"/>
+                        <accelerator key="l" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem5">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem30">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_activate" object="logwin"/>
+                        <accelerator key="F5" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem31">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run and Hide Debugger</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_h_activate" object="logwin"/>
+                        <accelerator key="F12" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem32">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run to Next CPU</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_cpu_activate" object="logwin"/>
+                        <accelerator key="F6" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem33">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run until Next Interrupt on This CPU</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_irq_activate" object="logwin"/>
+                        <accelerator key="F7" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem34">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Run until Next VBLANK</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_run_vbl_activate" object="logwin"/>
+                        <accelerator key="F8" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem6">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem35">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Into</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_into_activate" object="logwin"/>
+                        <accelerator key="F11" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem36">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Over</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_over_activate" object="logwin"/>
+                        <accelerator key="F10" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem37">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Step Out</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_step_out_activate" object="logwin"/>
+                        <accelerator key="F11" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem7">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem38">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Soft Reset</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_soft_reset_activate" object="logwin"/>
+                        <accelerator key="F3" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem39">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Hard Reset</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_hard_reset_activate" object="logwin"/>
+                        <accelerator key="F3" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="menuitem40">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Exit</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_exit_activate" object="logwin"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Custom" id="logview">
+            <property name="visible">True</property>
+            <property name="creation_function">dview_new</property>
+          </widget>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+</glade-interface>
