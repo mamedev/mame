@@ -299,13 +299,13 @@ $(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libflac/%.c | $(OSPREBUILD)
 	$(CC) $(CDEFS) $(FLACOPTS) $(CONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
 
 
-LIBFLACPPOBJS = \
-	$(LIBOBJ)/libflacpp/metadata.o \
-	$(LIBOBJ)/libflacpp/stream_decoder.o \
-	$(LIBOBJ)/libflacpp/stream_encoder.o
+# LIBFLACPPOBJS = \
+#	$(LIBOBJ)/libflacpp/metadata.o \
+#	$(LIBOBJ)/libflacpp/stream_decoder.o \
+#	$(LIBOBJ)/libflacpp/stream_encoder.o
 
-$(OBJ)/libflac++.a: $(LIBFLACPPOBJS)
+# $(OBJ)/libflac++.a: $(LIBFLACPPOBJS)
 
-$(LIBOBJ)/libflacpp/%.o: $(LIBSRC)/libflac/libflac++/%.cpp | $(OSPREBUILD)
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(FLACOPTS) $(CPPONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
+# $(LIBOBJ)/libflacpp/%.o: $(LIBSRC)/libflac/libflac++/%.cpp | $(OSPREBUILD)
+# 	@echo Compiling $<...
+#	$(CC) $(CDEFS) $(FLACOPTS) $(CPPONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
