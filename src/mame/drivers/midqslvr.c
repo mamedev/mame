@@ -759,8 +759,23 @@ ROM_START( arctthnd )
 	DISK_IMAGE( "arctthnd", 0,  SHA1(f4373e57c3f453ac09c735b5d8d99ff811416a23) )
 ROM_END
 
+// this also required a dongle to work
+ROM_START( arctthndult )
+	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
+	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
+
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	DISK_REGION( "disk" )
+	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
+ROM_END
+
+
 
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
-GAME(1999, hydrthnd, 0, midqslvr, at_keyboard, 0, ROT0, "Midway Games", "Hydro Thunder", GAME_IS_SKELETON)
-GAME(2000, offrthnd, 0, midqslvr, at_keyboard, 0, ROT0, "Midway Games", "Offroad Thunder", GAME_IS_SKELETON)
-GAME(2001, arctthnd, 0, midqslvr, at_keyboard, 0, ROT0, "Midway Games", "Arctic Thunder (v1.002)", GAME_IS_SKELETON)
+GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, 0, ROT0, "Midway Games", "Hydro Thunder", GAME_IS_SKELETON)
+GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, 0, ROT0, "Midway Games", "Offroad Thunder", GAME_IS_SKELETON)
+GAME(2001, arctthnd,    0,        midqslvr, at_keyboard, 0, ROT0, "Midway Games", "Arctic Thunder (v1.002)", GAME_IS_SKELETON)
+GAME(2001, arctthndult, arctthnd, midqslvr, at_keyboard, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder", GAME_IS_SKELETON)

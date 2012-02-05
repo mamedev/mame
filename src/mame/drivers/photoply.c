@@ -251,6 +251,7 @@ static ADDRESS_MAP_START( photoply_io, AS_IO, 32 )
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //parallel port 3
@@ -366,7 +367,7 @@ ROM_START(photoply)
 	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "photoply", 0,NO_DUMP )
+	DISK_IMAGE( "pp201", 0, SHA1(23e1940d485d19401e7d0ad912ddad2cf2ea10b4) )
 ROM_END
 
 static DRIVER_INIT( photoply )
@@ -375,4 +376,4 @@ static DRIVER_INIT( photoply )
 	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
-GAME( 199?, photoply,  0,   photoply, photoply, photoply, ROT0, "Funworld", "PhotoPlay", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, photoply,  0,   photoply, photoply, photoply, ROT0, "Funworld", "Photo Play 2000 (v2.01)", GAME_NOT_WORKING|GAME_NO_SOUND )
