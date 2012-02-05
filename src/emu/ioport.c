@@ -973,9 +973,9 @@ void input_port_list_init(device_t &device, ioport_list &portlist, astring &erro
     mask on the tagged port
 -------------------------------------------------*/
 
-const input_field_config *input_field_by_tag_and_mask(const ioport_list &portlist, const char *tag, input_port_value mask)
+const input_field_config *input_field_by_tag_and_mask(running_machine &machine, const char *tag, input_port_value mask)
 {
-	const input_port_config *port = portlist.find(tag);
+	const input_port_config *port = machine.port(tag);
 
 	/* if we got the port, look for the field */
 	if (port != NULL)
@@ -2432,7 +2432,7 @@ g_profiler.start(PROFILER_INPUT);
 		input_port_value mask;
 		float x, y;
 		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, tag, mask, x, y))
-			mouse_field = input_field_by_tag_and_mask(machine.m_portlist, tag, mask);
+			mouse_field = input_field_by_tag_and_mask(machine, tag, mask);
 	}
 
 	/* loop over all input ports */

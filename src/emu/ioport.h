@@ -1253,7 +1253,7 @@ time_t input_port_init(running_machine &machine);
 void input_port_list_init(device_t &device, ioport_list &portlist, astring &errorbuf);
 
 /* return the field that matches the given tag and mask */
-const input_field_config *input_field_by_tag_and_mask(const ioport_list &portlist, const char *tag, input_port_value mask);
+const input_field_config *input_field_by_tag_and_mask(running_machine &machine, const char *tag, input_port_value mask);
 
 
 
