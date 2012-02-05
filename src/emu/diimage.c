@@ -193,7 +193,15 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 	int loc3 = m_image_name.rchr(0,':');
 	int loc = MAX(loc1,MAX(loc2,loc3));
 	if (loc!=-1) {
-		m_basename = m_basename.substr(loc + 1,m_basename.len()-loc);
+		if (loc == loc3)
+		{
+			// temp workaround for softlists now that m_image_name contains the part name too (e.g. list:gamename:cart)
+			astring tmpstr = astring(m_basename.substr(0,loc));
+			int tmploc = tmpstr.rchr(0,':');
+			m_basename = m_basename.substr(tmploc + 1,loc-tmploc);
+		}
+		else
+			m_basename = m_basename.substr(loc + 1,m_basename.len()-loc);
 	}
 	m_basename_noext = m_basename.cpy(m_basename);
 	m_filetype = "";
