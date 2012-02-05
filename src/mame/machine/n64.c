@@ -1215,6 +1215,8 @@ void n64_periphs::pi_dma_tick()
 	UINT32 cart_addr = (pi_cart_addr & 0x0fffffff) >> 1;
 	UINT32 dram_addr = (pi_dram_addr & 0x007fffff) >> 1;
 
+    cart_addr &= ((machine().region("user2")->bytes() >> 1) - 1);
+
 	if(pi_dma_dir == 1)
 	{
 		UINT32 dma_length = pi_wr_len + 1;

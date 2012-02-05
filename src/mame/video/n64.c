@@ -118,6 +118,11 @@ void Processor::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 		hres = 640;
 	}
 
+    if (vres > bitmap.height()) // makes Perfect Dark boot w/o crashing
+    {
+        vres = bitmap.height();
+    }
+
 	UINT32 pixels = 0;
 
 	if (frame_buffer)
