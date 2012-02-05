@@ -34,29 +34,29 @@ inline void pls100_device::parse_fusemap()
 	jedbin_parse(machine().region(tag())->base(), machine().region(tag())->bytes(), &jed);
 	UINT32 fusenum = 0;
 	m_xor = 0;
-	
+
 	for (int term = 0; term < PAL_TERMS; term++)
 	{
 		m_and_comp[term] = 0;
 		m_and_true[term] = 0;
 		m_or[term] = 0;
-		
+
 		for (int i = 0; i < PAL_INPUTS; i++)
 		{
 			m_and_comp[term] |= jed_get_fuse(&jed, fusenum++) << i;
 			m_and_true[term] |= jed_get_fuse(&jed, fusenum++) << i;
 		}
-		
+
 		for (int f = 0; f < PAL_OUTPUTS; f++)
 		{
 			m_or[term] |= !jed_get_fuse(&jed, fusenum++) << f;
 		}
 	}
-	
+
 	for (int f = 0; f < PAL_OUTPUTS; f++)
 	{
 		m_xor |= jed_get_fuse(&jed, fusenum++) << f;
-	}	
+	}
 }
 
 
@@ -68,7 +68,7 @@ inline int pls100_device::get_product(int term)
 {
 	UINT16 input_true = m_and_true[term] | m_i;
 	UINT16 input_comp = m_and_comp[term] | (m_i ^ 0xffff);
-	
+
 	return (input_true & input_comp) == 0xffff;
 }
 
@@ -80,7 +80,7 @@ inline int pls100_device::get_product(int term)
 inline void pls100_device::update_outputs()
 {
 	m_s = 0;
-	
+
 	for (int term = 0; term < PAL_TERMS; term++)
 	{
 		if (get_product(term))
@@ -123,13 +123,13 @@ void pls100_device::device_start()
 
 
 //-------------------------------------------------
-//  read - 
+//  read -
 //-------------------------------------------------
 
 UINT8 pls100_device::read(UINT16 input)
 {
 	m_i = input;
-	
+
 	update_outputs();
 
 	return m_s ^ m_xor;

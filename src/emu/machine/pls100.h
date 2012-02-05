@@ -76,7 +76,7 @@ private:
 	inline void parse_fusemap();
 	inline int get_product(int term);
 	inline void update_outputs();
-	
+
 	UINT16 m_i;
 	UINT8 m_s;
 	UINT16 m_and_true[PAL_TERMS];
