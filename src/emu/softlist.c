@@ -12,6 +12,7 @@
 #include "emuopts.h"
 #include "hash.h"
 #include "softlist.h"
+#include "clifront.h"
 
 #include <ctype.h>
 
@@ -1921,6 +1922,9 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 	// it in the future
 	if (s_checked_lists.add(m_list_name, 1, false) == TMERR_DUPLICATE)
 		return;
+
+	// do device validation only in case of validate command
+	if (strcmp(mconfig().options().command(), CLICOMMAND_VALIDATE) != 0) return;
 
 	softlist_map names;
 	softlist_map descriptions;
