@@ -222,11 +222,12 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/nmc9306.o		\
 	$(EMUMACHINE)/nvram.o		\
 	$(EMUMACHINE)/pc16552d.o	\
-	$(EMUMACHINE)/pci.o		\
+	$(EMUMACHINE)/pci.o			\
 	$(EMUMACHINE)/pd4990a.o		\
 	$(EMUMACHINE)/pic8259.o		\
 	$(EMUMACHINE)/pit8253.o		\
-	$(EMUMACHINE)/ram.o		\
+	$(EMUMACHINE)/pls100.o		\
+	$(EMUMACHINE)/ram.o			\
 	$(EMUMACHINE)/roc10937.o	\
 	$(EMUMACHINE)/rp5c01.o		\
 	$(EMUMACHINE)/rp5c15.o		\
@@ -275,19 +276,19 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/hd44102.o		\
 	$(EMUVIDEO)/hd61830.o		\
 	$(EMUVIDEO)/hd63484.o		\
-	$(EMUVIDEO)/i8275.o		\
+	$(EMUVIDEO)/i8275.o			\
 	$(EMUVIDEO)/k053250.o		\
 	$(EMUVIDEO)/mc6845.o		\
 	$(EMUVIDEO)/msm6255.o		\
 	$(EMUVIDEO)/pc_cga.o		\
 	$(EMUVIDEO)/cgapal.o		\
 	$(EMUVIDEO)/pc_vga.o		\
-	$(EMUVIDEO)/poly.o		\
-	$(EMUVIDEO)/psx.o		\
+	$(EMUVIDEO)/poly.o			\
+	$(EMUVIDEO)/psx.o			\
 	$(EMUVIDEO)/ramdac.o		\
 	$(EMUVIDEO)/resnet.o		\
 	$(EMUVIDEO)/rgbutil.o		\
-	$(EMUVIDEO)/s2636.o		\
+	$(EMUVIDEO)/s2636.o			\
 	$(EMUVIDEO)/saa5050.o		\
 	$(EMUVIDEO)/sed1330.o		\
 	$(EMUVIDEO)/tlc34076.o		\
@@ -295,7 +296,7 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/tms9927.o		\
 	$(EMUVIDEO)/tms9928a.o		\
 	$(EMUVIDEO)/upd3301.o		\
-	$(EMUVIDEO)/v9938.o		\
+	$(EMUVIDEO)/v9938.o			\
 	$(EMUVIDEO)/vector.o		\
 	$(EMUVIDEO)/voodoo.o		\
 
