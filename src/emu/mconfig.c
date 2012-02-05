@@ -68,6 +68,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	// construct the config
 	(*gamedrv.machine_config)(*this, NULL);
 
+	bool is_selected_driver = strcmp(gamedrv.name,options.system_name())==0;
 	// intialize slot devices - make sure that any required devices have been allocated
 	slot_interface_iterator slotiter(root_device());
     for (device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
@@ -77,7 +78,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		{
 			device_t &owner = slot->device();
 			const char *selval = options.value(owner.tag()+1);
-			if (!options.exists(owner.tag()+1))
+			if (!is_selected_driver || !options.exists(owner.tag()+1))
 				selval = slot->get_default_card(*this, options);
 
 			if (selval != NULL && strlen(selval) != 0)
