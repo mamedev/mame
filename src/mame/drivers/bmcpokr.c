@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bmcpokr_mem)
 	//MCFG_CPU_VBLANK_INT("screen",irq3_line_hold)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

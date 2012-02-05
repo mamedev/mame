@@ -115,25 +115,25 @@ WRITE8_MEMBER(dsbz80_device::mpeg_trigger_w)
 
 	if (data == 0)	// stop
 	{
-//		MPEG_Stop_Playing();
+//      MPEG_Stop_Playing();
 //        printf("MPEG stop\n");
 	}
 	else if (data == 1)	// play without loop
 	{
-//		MPEG_Set_Loop(NULL, 0);
-//		MPEG_Play_Memory(ROM + mp_start, mp_end-mp_start);
+//      MPEG_Set_Loop(NULL, 0);
+//      MPEG_Play_Memory(ROM + mp_start, mp_end-mp_start);
 //        printf("MPEG start, one-shot from %x\n", mp_start);
 	}
 	else if (data == 2)	// play with loop
 	{
-//		MPEG_Play_Memory(ROM + mp_start, mp_end-mp_start);
+//      MPEG_Play_Memory(ROM + mp_start, mp_end-mp_start);
 //        printf("MPEG start, loop from %x\n", mp_start);
 	}
 }
 
 READ8_MEMBER(dsbz80_device::mpeg_pos_r)
 {
-	int mp_prg = 0; //MPEG_Get_Progress();	// returns the byte offset currently playing
+	int mp_prg = 0; //MPEG_Get_Progress();  // returns the byte offset currently playing
 
 	mp_prg += mp_start;
 
@@ -157,7 +157,7 @@ READ8_MEMBER(dsbz80_device::mpeg_pos_r)
    get latched.  When the current stream ends, the MPEG hardware starts playing
    immediately from the latched start and end position.  In this way, the Z80
    enforces looping where appropriate and multi-part songs in other cases
-   (song #16 is a good example) 
+   (song #16 is a good example)
 */
 
 WRITE8_MEMBER(dsbz80_device::mpeg_start_w)
@@ -186,11 +186,11 @@ WRITE8_MEMBER(dsbz80_device::mpeg_start_w)
 				// SWA: if loop end is zero, it means "keep previous end marker"
 				if (lp_end == 0)
 				{
-//					MPEG_Set_Loop(ROM + lp_start, mp_end-lp_start);
+//                  MPEG_Set_Loop(ROM + lp_start, mp_end-lp_start);
 				}
 				else
 				{
-//					MPEG_Set_Loop(ROM + lp_start, lp_end-lp_start);
+//                  MPEG_Set_Loop(ROM + lp_start, lp_end-lp_start);
 				}
 			}
 			break;
@@ -220,7 +220,7 @@ WRITE8_MEMBER(dsbz80_device::mpeg_end_w)
 			else
 			{
 				lp_end = end;
-//				MPEG_Set_Loop(ROM + lp_start, lp_end-lp_start);
+//              MPEG_Set_Loop(ROM + lp_start, lp_end-lp_start);
 			}
 			break;
 	}

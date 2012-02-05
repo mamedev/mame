@@ -96,7 +96,7 @@ class TexturePipeT
 		INT32				m_precomp_t;
 
 	private:
-		UINT32 				Expand16To32Table[0x10000];
+		UINT32				Expand16To32Table[0x10000];
 
 		void				Mask(INT32* S, INT32* T, INT32 num);
 		void				MaskCoupled(INT32* S, INT32* S1, INT32* T, INT32* T1, INT32 num);

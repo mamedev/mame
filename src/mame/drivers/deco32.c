@@ -3275,20 +3275,20 @@ static DRIVER_INIT( dragngun )
 	ROM[0x1b32c/4]=0xe1a00000;//  NOP test switch lock
 
 	/*
-	{
-		UINT8 *ROM = machine.region("dvi")->base();
+    {
+        UINT8 *ROM = machine.region("dvi")->base();
 
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"video.dvi");
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(ROM, 0xc00000, 1, fp);
-			fclose(fp);
-		}
-	}
-	*/
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"video.dvi");
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(ROM, 0xc00000, 1, fp);
+            fclose(fp);
+        }
+    }
+    */
 }
 
 static DRIVER_INIT( fghthist )

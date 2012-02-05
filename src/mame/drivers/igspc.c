@@ -24,13 +24,13 @@ can't be emulated without proper mb bios
  --------------
 
  Custom board
- 
+
  AMD Geode Processor (MediaGX derived?)
   marked
  AGXD533AAXFDCC
-	0452EQA
-	(c)2001 2.1
-	TAIWAN
+    0452EQA
+    (c)2001 2.1
+    TAIWAN
 
  IGS027 security chip (ARM with internal ROM) (dumped!)
 

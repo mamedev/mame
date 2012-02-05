@@ -5,7 +5,7 @@
     TODO:
     - HOLD mechanism
     - IRQ ACK
-	- why skns tries to read uninitialized registers?
+    - why skns tries to read uninitialized registers?
 
 ***************************************************************************/
 

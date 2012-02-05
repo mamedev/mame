@@ -8,22 +8,22 @@
  Games Supported:
 
 
-    Minigame Cool Collection   		(c) 1999 SemiCom
-    Jumping Break              		(c) 1999 F2 System
-    Lup Lup Puzzle             		(c) 1999 Omega System       (version 3.0 and 2.9)
-    Puzzle Bang Bang           		(c) 1999 Omega System       (version 2.8)
-    Super Lup Lup Puzzle       		(c) 1999 Omega System       (version 4.0)
-    Vamf 1/2                   		(c) 1999 Danbi & F2 System  (Europe version)
-    Vamp 1/2                   		(c) 1999 Danbi & F2 System  (Korea version)
-    Date Quiz Go Go Episode 2  		(c) 2000 SemiCom
-    Mission Craft              		(c) 2000 Sun                (version 2.4)
-    Mr. Dig                    		(c) 2000 Sun
-    Final Godori               		(c) 2001 SemiCom            (version 2.20.5915)
-    Wyvern Wings               		(c) 2001 SemiCom
-    Mr. Kicker                 		(c) 2001 SemiCom [1]
-    Toy Land Adventure         		(c) 2001 SemiCom
-    Age Of Heroes - Silkroad 2 		(c) 2001 Unico              (v0.63 - 2001/02/07)
-	Boong-Ga Boong-Ga (Spank 'em) 	(c) 2001 Taff System
+    Minigame Cool Collection        (c) 1999 SemiCom
+    Jumping Break                   (c) 1999 F2 System
+    Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0 and 2.9)
+    Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8)
+    Super Lup Lup Puzzle            (c) 1999 Omega System       (version 4.0)
+    Vamf 1/2                        (c) 1999 Danbi & F2 System  (Europe version)
+    Vamp 1/2                        (c) 1999 Danbi & F2 System  (Korea version)
+    Date Quiz Go Go Episode 2       (c) 2000 SemiCom
+    Mission Craft                   (c) 2000 Sun                (version 2.4)
+    Mr. Dig                         (c) 2000 Sun
+    Final Godori                    (c) 2001 SemiCom            (version 2.20.5915)
+    Wyvern Wings                    (c) 2001 SemiCom
+    Mr. Kicker                      (c) 2001 SemiCom [1]
+    Toy Land Adventure              (c) 2001 SemiCom
+    Age Of Heroes - Silkroad 2      (c) 2001 Unico              (v0.63 - 2001/02/07)
+    Boong-Ga Boong-Ga (Spank 'em)   (c) 2001 Taff System
 
  Real games bugs:
  - dquizgo2: bugged video test
@@ -37,7 +37,7 @@
    Semicom also used for Toy Land Adventure & SemiComDate Quiz Go Go Episode 2 game.
 
  Boong-Ga Boong-Ga: the test mode is usable with a standard input configuration like the "common" one
-   
+
  Undumped Semicom games on similar hardware:
    Wivern Wings - Semicom's orginal release with alt spelling of title
    Red Wyvern - A semi-sequel or update?
@@ -45,7 +45,7 @@
    Gaia The last Choice of the Earth (c) 1998 (might be Byron Future Assault type hardware)
    Diet Family (c) 2001
    Choice III: Joker's Dream (c) 2001
-   
+
 TODO:
 - boonggab: simulate photo sensors with a "stroke strength"
 - boonggab: what are sensors bit used for? are they used in the japanese version?
@@ -65,7 +65,7 @@ class vamphalf_state : public driver_device
 {
 public:
 	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) 
+		: driver_device(mconfig, type, tag)
 		{
 			m_has_extra_gfx = 0;
 		}
@@ -505,7 +505,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 
 				code  = state->m_tiles[offs+1];
 				color = (state->m_tiles[offs+2] >> state->m_palshift) & 0x7f;
-				
+
 				// boonggab
 				if(state->m_has_extra_gfx)
 				{
@@ -622,31 +622,31 @@ static CUSTOM_INPUT( boonggab_photo_sensors_r )
 {
 	static const UINT16 photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
 	UINT8 res = input_port_read(field.machine(), "PHOTO_SENSORS");
-	
+
 	switch(res)
 	{
 		case 0x01:
 			return photo_sensors_table[1]; // 5 - 7 points
-			
+
 		case 0x02:
 			return photo_sensors_table[2]; // 8 - 10 points
-			
+
 		case 0x04:
 			return photo_sensors_table[3]; // 11 - 13 points
-			
+
 		case 0x08:
 			return photo_sensors_table[4]; // 14 - 16 points
-			
+
 		case 0x10:
 			return photo_sensors_table[5]; // 17 - 19 points
-			
+
 		case 0x20:
 			return photo_sensors_table[6]; // 20 - 22 points
-			
+
 		case 0x40:
 			return photo_sensors_table[7]; // 23 - 25 points
 	}
-	
+
 	return photo_sensors_table[0];
 }
 
@@ -780,8 +780,8 @@ static INPUT_PORTS_START( boonggab )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )	
-	
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("PHOTO_SENSORS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -789,7 +789,7 @@ static INPUT_PORTS_START( boonggab )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)	
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static const gfx_layout sprites_layout =
@@ -1919,7 +1919,7 @@ ROM_START( boonggab )
 	/* romu04 empty */
 	/* roml09 empty */
 	/* romu09 empty */
-	
+
 	ROM_REGION( 0x100000, "user2", 0 ) /* Oki Samples */
 	ROM_LOAD( "3.vrom1",      0x00000, 0x80000, CRC(0696bfcb) SHA1(bba61f3cae23271215bbbf8214ce3b73459d5da5) )
 	ROM_LOAD( "4.vrom2",      0x80000, 0x80000, CRC(305c2b16) SHA1(fa199c4cd4ebb952d934e3863fca8740eeba9294) )
@@ -2381,4 +2381,4 @@ GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",
 GAME( 2001, toyland,  0,        coolmini, common,   toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", 0 )
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings", GAME_NO_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
-GAME( 2001, boonggab, 0,        boonggab, boonggab, boonggab, ROT270, "Taff System", 	   "Boong-Ga Boong-Ga (Spank'em!)", 0 )
+GAME( 2001, boonggab, 0,        boonggab, boonggab, boonggab, ROT270, "Taff System",	   "Boong-Ga Boong-Ga (Spank'em!)", 0 )

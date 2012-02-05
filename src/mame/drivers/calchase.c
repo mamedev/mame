@@ -626,10 +626,10 @@ static INPUT_PORTS_START( calchase )
 	AT_KEYB_HELPER( 0x0001, "B",            KEYCODE_B           ) /* B                           30  B0 */
 	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
 	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
-//	AT_KEYB_HELPER( 0x8000, "F5",           KEYCODE_F5          )
+//  AT_KEYB_HELPER( 0x8000, "F5",           KEYCODE_F5          )
 
 	PORT_START("pc_keyboard_4")
-//	AT_KEYB_HELPER( 0x0004, "F8",           KEYCODE_F8          )
+//  AT_KEYB_HELPER( 0x0004, "F8",           KEYCODE_F8          )
 
 	PORT_START("pc_keyboard_5")
 

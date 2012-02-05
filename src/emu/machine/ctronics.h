@@ -26,15 +26,15 @@ public:
 	virtual void strobe_w(UINT8 state) { m_strobe = state; }
 	virtual void init_prime_w(UINT8 state) { m_init = state; }
 	virtual void autofeed_w(UINT8 state) { m_auto_fd = state; }
-	
+
 	virtual UINT8 ack_r() { return m_ack;}
 	virtual UINT8 busy_r(){ return m_busy; }
 	virtual UINT8 pe_r()  { return m_pe;}
 	virtual UINT8 not_busy_r() { return !m_busy; }
 	virtual UINT8 vcc_r() { return TRUE; }
-	virtual UINT8 fault_r() { return m_fault; }	
+	virtual UINT8 fault_r() { return m_fault; }
 	virtual void set_line(int line, int state) { if (state) m_data |= 1 << line; else m_data &= ~(1 << line); }
-protected:	
+protected:
 	UINT8 m_strobe;
 	UINT8 m_busy;
 	UINT8 m_ack;
@@ -55,14 +55,14 @@ struct centronics_interface
 
 // ======================> centronics_device
 class centronics_device :	public device_t,
-							public centronics_interface,							
+							public centronics_interface,
 							public device_slot_interface
 {
 public:
 	// construction/destruction
 	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~centronics_device();
-		
+
 	DECLARE_WRITE8_MEMBER( write ) { if (m_dev) m_dev->write(data); }
 	DECLARE_READ8_MEMBER( read ) {  return (m_dev) ? m_dev->read() : 0x00; }
 
@@ -79,14 +79,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( strobe_w ) { if (m_dev) m_dev->strobe_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( init_prime_w ) { if (m_dev) m_dev->init_prime_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( autofeed_w ) { if (m_dev) m_dev->autofeed_w(state); }
-	
+
 	DECLARE_READ_LINE_MEMBER( ack_r ) { return (m_dev) ? m_dev->ack_r() : 0;}
 	DECLARE_READ_LINE_MEMBER( busy_r ){ return (m_dev) ? m_dev->busy_r() : 1; }
 	DECLARE_READ_LINE_MEMBER( pe_r )  { return (m_dev) ? m_dev->pe_r() : 0;}
 	DECLARE_READ_LINE_MEMBER( not_busy_r ) { return (m_dev) ? m_dev->not_busy_r() : 0; }
 	DECLARE_READ_LINE_MEMBER( vcc_r ) { return (m_dev) ? m_dev->vcc_r() : 0; }
-	DECLARE_READ_LINE_MEMBER( fault_r ) { return (m_dev) ? m_dev->fault_r() : 0; }	
-	
+	DECLARE_READ_LINE_MEMBER( fault_r ) { return (m_dev) ? m_dev->fault_r() : 0; }
+
 	void out_ack(UINT8 param) { m_out_ack_func(param); }
 	void out_busy(UINT8 param) { m_out_busy_func(param); }
 	void out_not_busy(UINT8 param) { m_out_not_busy_func(param); }
@@ -126,7 +126,7 @@ public:
 
 	// optional centronics overrides
 	virtual void strobe_w(UINT8 state);
-	virtual void init_prime_w(UINT8 state);	
+	virtual void init_prime_w(UINT8 state);
 	virtual UINT8 read() {  return 0x00; }
 protected:
     // device-level overrides
@@ -153,7 +153,7 @@ SLOT_INTERFACE_EXTERN(centronics_printer);
 #define MCFG_CENTRONICS_PRINTER_ADD(_tag, _intf) \
 	MCFG_CENTRONICS_ADD(_tag, _intf, centronics_printer, "printer", NULL) \
 
-	
+
 /***************************************************************************
     DEFAULT INTERFACES
 ***************************************************************************/

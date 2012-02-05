@@ -296,12 +296,12 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 					x = 240 - x;
 				}
 
-	
+
 				//if (x <= 320)
 				{
 					if (!m_is_bootleg) // several of the clone / bootleg chips don't do this, see jumpkids
 						sprite &= ~multi;
-					
+
 					if (fy)
 						inc = -1;
 					else
@@ -329,8 +329,8 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 						if (fx) fx = 0; else fx = 1;
 					}
 
-					
-					
+
+
 					mult2 = multi + 1;
 
 					while (multi >= 0)

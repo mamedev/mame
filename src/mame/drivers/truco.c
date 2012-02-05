@@ -65,8 +65,8 @@
   IC's Reverse Engineering....
 
   MARKED   PINS     ID    TYPE        DETAILS
-  
-  - U1 : 40-pin IC  YES   CPU         MOTOROLA M6809 
+
+  - U1 : 40-pin IC  YES   CPU         MOTOROLA M6809
   - U2 : 28-pin IC  YES   ROM U2      M27128A
   - U3 : 28-pin IC  YES   ROM U3      M27128A
   - U4 : 40-pin IC  YES   PIA         ST EF6821P
@@ -133,7 +133,7 @@
             U20(07) - PB7 |17      24| CS1
         PIA CA1 (*) - CB1 |18      23| /CS2
             U20(06) - CB2 |19      22| CS0
-                      VCC |20      21| R/W 
+                      VCC |20      21| R/W
                           +----------+
 
     (*) Lines CA1 and CB1 are tied together, being both IN.
@@ -142,20 +142,20 @@
 
   U19:   *** MAX691 ***  Maxim MAX691 Microprocessor Supervisory Circuit.
                          (for battery backup power switching and watchdog).
-  leg 01 [VBATT] ----> 
-  leg 02 [VOUT] -----> 
+  leg 01 [VBATT] ---->
+  leg 02 [VOUT] ----->
   leg 03 [VCC] ------> VCC
   leg 04 [GND] ------> GND
-  leg 05 [BATT ON] --> 
-  leg 06 [/LOWLINE] -> 
-  leg 07 [OSC IN] ---> N/C \  Set 1.6 seconds as WD timeout. 
+  leg 05 [BATT ON] -->
+  leg 06 [/LOWLINE] ->
+  leg 07 [OSC IN] ---> N/C \  Set 1.6 seconds as WD timeout.
   leg 08 [OSC SEL] --> N/C /
-  leg 09 [PFI] ------> 
-  leg 10 [/PFO] -----> 
+  leg 09 [PFI] ------>
+  leg 10 [/PFO] ----->
   leg 11 [WDI] ------> PIA CA2
-  leg 12 [/CE OUT] --> 
+  leg 12 [/CE OUT] -->
   leg 13 [/CE IN] ---> GND
-  leg 14 [/WDO] -----> 
+  leg 14 [/WDO] ----->
   leg 15 [/RESET] ---> CPU /RES (37)
   leg 16 [RESET] ---->
 
@@ -308,11 +308,11 @@ static INPUT_PORTS_START( truco )
 	PORT_DIPNAME( 0x10, 0x10, "IN0-5 (TILT SW)" )
 	PORT_DIPSETTING (	0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
-//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Connected to JAMMA S17 (P2 START) */
-//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Connected to JAMMA S14 (SERVICE SW) */
-//	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Connected to JAMMA C26 (P2 SELECT) */
-//	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Connected to JAMMA S16 (COIN2) */
-//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Connected to JAMMA S15 (TILT SW) */
+//  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S17 (P2 START) */
+//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S14 (SERVICE SW) */
+//  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA C26 (P2 SELECT) */
+//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S16 (COIN2) */
+//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Connected to JAMMA S15 (TILT SW) */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* Connected to JAMMA C22 (P1 BUTTON1) */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	/* Connected to JAMMA C18/21 (JOY UP & JOY RIGHT) */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	/* Connected to JAMMA C19/20 (JOY DOWN & JOY LEFT) */

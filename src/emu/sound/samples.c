@@ -1,5 +1,5 @@
 /* samples.c
- 
+
  Playback of pre-recorded samples. Used for high-level simulation of discrete sound circuits
  where proper low-level simulation isn't available.  Also used for tape loops and similar.
 

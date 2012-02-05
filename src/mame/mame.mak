@@ -2177,8 +2177,8 @@ $(MACHINE)/nes_mmc.o:	$(MAMESRC)/machine/nes_ines.c \
 $(VIDEO)/jaguar.o:	$(MAMESRC)/video/jagobj.c \
 			$(MAMESRC)/video/jagblit.c
 $(DRIVERS)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h
-$(VIDEO)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h 
-$(MACHINE)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h 
+$(VIDEO)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h
+$(MACHINE)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h
 $(VIDEO)/model2.o:	$(MAMESRC)/video/model2rd.c
 $(VIDEO)/model3.o:	$(MAMESRC)/video/m3raster.c
 $(VIDEO)/n64.o:		$(MAMESRC)/video/rdpfiltr.c

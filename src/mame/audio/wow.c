@@ -41,10 +41,10 @@ static const char *const PhonemeTable[65] =
  0
 };
 
-/* Missing samples : ready,  from,  one,  bite,  youl,  explode,  if,  myself,  back, 
-   cant,  do,  wait,  worlings,  very,  babies,  breath,  fire,  beat,  rest, 
-   then,  never,  worlock,  escape,  door,  try,  any,  harder,  only,  meet,  with, 
-   doom,  pop, 
+/* Missing samples : ready,  from,  one,  bite,  youl,  explode,  if,  myself,  back,
+   cant,  do,  wait,  worlings,  very,  babies,  breath,  fire,  beat,  rest,
+   then,  never,  worlock,  escape,  door,  try,  any,  harder,  only,  meet,  with,
+   doom,  pop,
    Problems with YOU and YOU'LL and YOU'DD */
 
 static const char *const wowWordTable[] =

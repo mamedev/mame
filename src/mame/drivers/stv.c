@@ -2261,7 +2261,7 @@ ROM_START( pclubpok ) // set to 1p / runs with the USA bios
 	ROM_LOAD( "pclubpok.nv", 0x0000, 0x0080, CRC(4ba3f21a) SHA1(898a393fb2fc1961b68b7d4f383d5447e6c010e8) )
 ROM_END
 
-ROM_START( pclub2kc ) // set to 1p 
+ROM_START( pclub2kc ) // set to 1p
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "game0", ROMREGION_ERASE00 ) /* SH2 code */

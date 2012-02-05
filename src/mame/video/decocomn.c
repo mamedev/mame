@@ -118,11 +118,11 @@ static DEVICE_START( decocomn )
 {
 	decocomn_state *decocomn = get_safe_token(device);
 	const decocomn_interface *intf = get_interface(device);
-//	int width, height;
+//  int width, height;
 
 	decocomn->screen = device->machine().device<screen_device>(intf->screen);
-//	width = decocomn->screen->width();
-//	height = decocomn->screen->height();
+//  width = decocomn->screen->width();
+//  height = decocomn->screen->height();
 
 	decocomn->dirty_palette = auto_alloc_array_clear(device->machine(), UINT8, 4096);
 

@@ -532,39 +532,39 @@ static void svga_vh_rgb8(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 static void svga_vh_rgb15(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
- 	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
- 	#define IV 0xff000000
+	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
+	#define IV 0xff000000
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int xi;
 	int yi;
 	int xm;
 
- 	int pos, line, column, c, addr, curr_addr;
+	int pos, line, column, c, addr, curr_addr;
 
- 	UINT32 *bitmapline;
-// 	UINT16 mask_comp;
+	UINT32 *bitmapline;
+//  UINT16 mask_comp;
 
- 	/* line compare is screen sensitive */
-// 	mask_comp = 0xff | (TLINES & 0x300);
- 	curr_addr = 0;
- 	yi=0;
- 	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
- 	{
- 		if(line>500) return;
- 		bitmapline = &bitmap.pix32(line);
- 		addr %= vga.svga_intf.vram_size;
- 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
- 		{
- 			if(pos + 0x10 > vga.svga_intf.vram_size)
- 				return;
- 			for(xi=0,xm=0;xi<8;xi++,xm+=2)
+	/* line compare is screen sensitive */
+//  mask_comp = 0xff | (TLINES & 0x300);
+	curr_addr = 0;
+	yi=0;
+	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
+	{
+		if(line>500) return;
+		bitmapline = &bitmap.pix32(line);
+		addr %= vga.svga_intf.vram_size;
+		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
+		{
+			if(pos + 0x10 > vga.svga_intf.vram_size)
+				return;
+			for(xi=0,xm=0;xi<8;xi++,xm+=2)
 			{
 				if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 					continue;
 				bitmapline[c+xi] = IV|(MV(pos+xm)&0x7c00)<<9 |(MV(pos+xm)&0x3e0)<<6|(MV(pos+xm)&0x1f)<<3;
 			}
- 		}
- 	}
+		}
+	}
 }
 
 enum
@@ -626,7 +626,7 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 		else if (svga.rgb15_en&0x30)
 		{
 			return RGB15_MODE;
- 		}
+		}
 		else if (!GRAPHIC_MODE)
 		{
 			//proc = vga_vh_text;
@@ -1811,7 +1811,7 @@ void pc_svga_trident_io_init(running_machine &machine, address_space *mem_space,
 
 	mem_space->install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(trident_mem_r), FUNC(trident_mem_w), mask);
 
- 	// D3h = TGUI9660XGi
+	// D3h = TGUI9660XGi
 	svga.id = 0xd3; // TODO: hardcoded for California Chase
 }
 
@@ -1856,7 +1856,7 @@ static void trident_seq_reg_write(running_machine &machine, UINT8 index, UINT8 d
 				// TODO: old mode registers selected
 				break;
 			case 0x0d:
-	 			svga.rgb15_en = data & 0x30; // TODO: doesn't match documentation
+				svga.rgb15_en = data & 0x30; // TODO: doesn't match documentation
 				break;
 		}
 	}
@@ -1952,7 +1952,7 @@ WRITE8_HANDLER( trident_mem_w )
 			return;
 		vga.memory[offset + (svga.bank_w*0x10000)]= data;
 		return;
- 	}
+	}
 
 	vga_mem_w(space,offset,data);
 }

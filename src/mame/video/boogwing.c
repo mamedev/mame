@@ -33,11 +33,11 @@ static void mix_boogwing(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	sprite_bitmap1 = &machine.device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
 	sprite_bitmap2 = &machine.device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
 	priority_bitmap = &machine.priority_bitmap;
-	
+
 	UINT32* dstline;
 	UINT16 *srcline1, *srcline2;
 	UINT8 *srcpriline;
-	
+
 	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
 		srcline1=&sprite_bitmap1->pix16(y,0);
@@ -52,9 +52,9 @@ static void mix_boogwing(running_machine &machine, bitmap_rgb32 &bitmap, const r
 			UINT16 pix2 = srcline2[x];
 
 			/* Here we have
-			 pix1 - raw pixel / colour / priority data from first 1sdt chip
-			 pix2 - raw pixel / colour / priority data from first 2nd chip
-			*/
+             pix1 - raw pixel / colour / priority data from first 1sdt chip
+             pix2 - raw pixel / colour / priority data from first 2nd chip
+            */
 
 			int pri1, pri2;
 			int spri1, spri2, alpha2;
@@ -133,17 +133,17 @@ static void mix_boogwing(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 			UINT8 bgpri = srcpriline[x];
 			/* once we get here we have
-			
-			pri1 - 4/16/64 (sprite chip 1 pixel priority relative to bg)
-			pri2 - 4/16/64 (sprite chip 2 pixel priority relative to bg)
-			spri1 - 8/32 (priority of sprite chip 1 relative to other sprite chip)
-			spri2 - 4/16/64 (priority of sprite chip 2 relative to other sprite chip)
-			alpha2 - 0x80/0xff alpha level of sprite chip 2 pixels (0x80 if enabled, 0xff if not)
-			
-			bgpri - 0 / 8 / 32 (from drawing tilemaps earlier, to compare above pri1/pri2 priorities against)
-			pix1 - same as before (ready to extract just colour data from)
-			pix2 - same as before  ^^
-			*/
+
+            pri1 - 4/16/64 (sprite chip 1 pixel priority relative to bg)
+            pri2 - 4/16/64 (sprite chip 2 pixel priority relative to bg)
+            spri1 - 8/32 (priority of sprite chip 1 relative to other sprite chip)
+            spri2 - 4/16/64 (priority of sprite chip 2 relative to other sprite chip)
+            alpha2 - 0x80/0xff alpha level of sprite chip 2 pixels (0x80 if enabled, 0xff if not)
+
+            bgpri - 0 / 8 / 32 (from drawing tilemaps earlier, to compare above pri1/pri2 priorities against)
+            pix1 - same as before (ready to extract just colour data from)
+            pix2 - same as before  ^^
+            */
 
 			int drawnpixe1 = 0;
 			if (pix1 & 0xf)

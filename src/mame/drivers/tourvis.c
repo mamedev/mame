@@ -169,7 +169,7 @@ Stephh notes for 8085 code:
 display timer (main) "filled" with code at 0x054e
 display timer (game slot n) "filled" with code at 0x04e3
 
-coin insertion routine at 0x0273 
+coin insertion routine at 0x0273
 coin 1 triggers code at 0x02d7
 coin 2 triggers code at 0x028f
 

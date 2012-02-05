@@ -42,7 +42,7 @@ public:
 	DECLARE_READ8_MEMBER( xram_r );
 	DECLARE_WRITE8_MEMBER( rtc_w );
 	DECLARE_WRITE8_MEMBER( xram_w );
-private:	
+private:
 	UINT8 read(int xramsel, offs_t offset);
 	void write(int xramsel, offs_t offset, UINT8 data);
 	void field_interrupts();
@@ -50,10 +50,10 @@ private:
 	static TIMER_CALLBACK( rtc_SQW_callback );
 	static TIMER_CALLBACK( rtc_begin_update_callback );
 	static TIMER_CALLBACK( rtc_end_update_callback );
-	
+
 	void rtc_SQW_cb();
 	void rtc_begin_update_cb();
-	void rtc_end_update_cb();	
+	void rtc_end_update_cb();
 	/* 64 8-bit registers (10 clock registers, 4 control/status registers, and
     50 bytes of user RAM) */
 	UINT8 m_regs[64];

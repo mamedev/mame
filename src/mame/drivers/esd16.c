@@ -576,7 +576,7 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_pri_callback(*device, hedpanic_pri_callback);
 	decospr_device::set_flipallx(*device, 1);
-	
+
 	MCFG_GFXDECODE(esd16)
 	MCFG_PALETTE_LENGTH(768)
 
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_DERIVED( hedpanic, esd16 )
 	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	
+
 	MCFG_PALETTE_LENGTH(0x1000/2)
 
 	MCFG_GFXDECODE(hedpanic)
@@ -643,7 +643,7 @@ static MACHINE_CONFIG_DERIVED( hedpanio, esd16 )
 	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	
+
 	MCFG_PALETTE_LENGTH(0x1000/2)
 
 	MCFG_GFXDECODE(hedpanic)

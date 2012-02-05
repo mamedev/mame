@@ -220,13 +220,13 @@ void centronics_printer_device::device_start()
 
 	/* get printer device */
 	m_printer = subdevice<printer_image_device>("printer");
-	
+
 	/* register for state saving */
 	save_item(NAME(m_auto_fd));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_busy));
 	save_item(NAME(m_ack));
-	save_item(NAME(m_data));	
+	save_item(NAME(m_data));
 }
 
 void centronics_printer_device::device_reset()

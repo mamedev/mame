@@ -1,6 +1,6 @@
 /*
 
-"Sega Shooting Zone" aka "Sega Sharp Shooter" 
+"Sega Shooting Zone" aka "Sega Sharp Shooter"
 
 This is an SMS with a timer system, official Sega product.  Cabinet has a lightgun, it runs the SMS light gun games.
 
@@ -17,15 +17,15 @@ CPU(s) : D780C (x2)
 Xtal : 10.7380 Mhz
 
 RAMS(s) : D4168C (x3)
-	: MB8464-12L
+    : MB8464-12L
 
 Eprom : Epr10894A.20
 
 PAL : 315-5287
 
-Customs IC's : 	315-5216 (x2)
-		
-		315-5124
+Customs IC's :  315-5216 (x2)
+
+        315-5124
 
 GAMES for this system :
 
