@@ -4472,7 +4472,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 				switch( stv2_current_tilemap.transparency )
 				{
 					case STV_TRANSPARENCY_PEN:
-						if ( pix != 0x0000 )
+						if (pix & 0xffffff)
 						{
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
@@ -4487,7 +4487,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 						line[hcnt] = pix;
 						break;
 					case STV_TRANSPARENCY_ALPHA:
-						if ( pix != 0x000 )
+						if (pix & 0xffffff)
 						{
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
@@ -4496,7 +4496,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 						}
 						break;
 					case STV_TRANSPARENCY_ADD_BLEND:
-						if ( pix != 0x0000 )
+						if (pix & 0xffffff)
 						{
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
@@ -4583,7 +4583,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 				switch( stv2_current_tilemap.transparency )
 				{
 					case STV_TRANSPARENCY_PEN:
-						if ( pix != 0x0000 )
+						if (pix & 0xffffff)
 						{
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
@@ -4598,7 +4598,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 						line[hcnt] = pix;
 						break;
 					case STV_TRANSPARENCY_ALPHA:
-						if ( pix != 0x000 )
+						if (pix & 0xffffff)
 						{
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
@@ -4607,7 +4607,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 						}
 						break;
 					case STV_TRANSPARENCY_ADD_BLEND:
-						if ( pix != 0x0000 )
+						if (pix & 0xffffff)
 						{
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset_UINT32(machine,&pix,stv2_current_tilemap.fade_control & 2);
