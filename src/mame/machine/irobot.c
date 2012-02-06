@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "profiler.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/irobot.h"
 

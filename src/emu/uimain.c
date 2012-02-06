@@ -17,7 +17,6 @@
 #include "cheat.h"
 #include "uiimage.h"
 #include "uiinput.h"
-#include "uimenu.h"
 #include "uimain.h"
 #include "audit.h"
 #include "crsshair.h"

@@ -59,7 +59,6 @@ Word | Bit(s)           | Use
 ***************************************************************************/
 
 #include "emu.h"
-#include "profiler.h"
 #include "includes/shangha3.h"
 
 

@@ -136,7 +136,6 @@
 
 #include "emu.h"
 #include "memconv.h"
-#include "profiler.h"
 #include "machine/atarigen.h"
 #include "cpu/mips/r3000.h"
 #include "cpu/m68000/m68000.h"

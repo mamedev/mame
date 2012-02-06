@@ -38,7 +38,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "hash.h"
 #include "unzip.h"
 #include "fileio.h"
 

@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "uiinput.h"
-#include "profiler.h"
 #include "render.h"
 
 

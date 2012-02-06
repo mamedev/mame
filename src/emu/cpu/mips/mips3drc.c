@@ -54,7 +54,6 @@
 
 #include "emu.h"
 #include "debugger.h"
-#include "profiler.h"
 #include "mips3com.h"
 #include "mips3fe.h"
 #include "cpu/drcfe.h"

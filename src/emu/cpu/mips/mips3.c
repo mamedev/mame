@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "debugger.h"
-#include "profiler.h"
 #include "mips3.h"
 #include "mips3com.h"
 

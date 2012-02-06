@@ -13,13 +13,11 @@
 #include "emuopts.h"
 #include "video/vector.h"
 #include "machine/laserdsc.h"
-#include "profiler.h"
 #include "render.h"
 #include "cheat.h"
 #include "rendfont.h"
 #include "ui.h"
 #include "uiinput.h"
-#include "uimenu.h"
 #include "uimain.h"
 #include "uigfx.h"
 #include <ctype.h>

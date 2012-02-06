@@ -39,7 +39,6 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "hash.h"
 #include "jedparse.h"
 #include "audit.h"
 #include "info.h"

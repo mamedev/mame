@@ -95,7 +95,6 @@
 #include "emuopts.h"
 #include "config.h"
 #include "xmlfile.h"
-#include "profiler.h"
 #include "ui.h"
 #include "uiinput.h"
 #include "debug/debugcon.h"

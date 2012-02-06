@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "uimenu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/ldpr8210.h"
 #include "machine/ldv1000.h"

@@ -71,7 +71,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "profiler.h"
 #include "includes/snes.h"
 
 #define SNES_MAINSCREEN    0

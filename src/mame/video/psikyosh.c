@@ -63,7 +63,6 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 */
 
 #include "emu.h"
-#include "profiler.h"
 #include "drawgfxm.h"
 #include "includes/psikyosh.h"
 #include "ui.h"

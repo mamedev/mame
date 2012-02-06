@@ -19,7 +19,6 @@
 #include "debugger.h"
 #include "sh2.h"
 #include "sh2comn.h"
-#include "profiler.h"
 
 CPU_DISASSEMBLE( sh2 );
 extern unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode);

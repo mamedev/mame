@@ -12,9 +12,7 @@
 #include "emu.h"
 #include "ui.h"
 #include "rendfont.h"
-#include "uimenu.h"
 #include "uiinput.h"
-#include "video.h"
 #include "osdepend.h"
 
 #include "debug/debugvw.h"

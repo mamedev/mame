@@ -105,7 +105,6 @@
 #include "emuopts.h"
 #include "xmlfile.h"
 #include "ui.h"
-#include "uimenu.h"
 #include "cheat.h"
 #include "debug/debugcpu.h"
 

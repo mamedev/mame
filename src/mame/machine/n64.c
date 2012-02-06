@@ -5,7 +5,6 @@
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips3com.h"
 #include "includes/n64.h"
-#include "profiler.h"
 
 UINT32 *rdram;
 UINT32 *rsp_imem;

@@ -20,7 +20,6 @@
 
 #include "emu.h"
 #include "debugger.h"
-#include "profiler.h"
 #include "rsp.h"
 #include "rspdiv.h"
 #include "rspfe.h"

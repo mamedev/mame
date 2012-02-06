@@ -8,7 +8,6 @@
 #include "cpu/sh4/sh4.h"
 #include "render.h"
 #include "rendutil.h"
-#include "profiler.h"
 #include "video/rgbutil.h"
 
 #define DEBUG_FIFO_POLY (0)

@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "profiler.h"
 #include "video/hd63484.h"
 #include "video/taitoic.h"
 #include "includes/taito_b.h"

@@ -102,7 +102,6 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 #include "machine/msm6242.h"
-#include "profiler.h"
 #include "includes/dynax.h"
 
 

@@ -18,13 +18,10 @@
 #include <stdlib.h>
 
 #include "emu.h"
-#include "image.h"
 #include "ui.h"
-#include "uimenu.h"
 #include "uiswlist.h"
 #include "uiimage.h"
 #include "zippath.h"
-#include "unicode.h"
 #include "imagedev/floppy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"

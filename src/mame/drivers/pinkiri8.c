@@ -33,7 +33,6 @@ Dumped by Chackn
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/okim6295.h"
-#include "video/generic.h"
 
 
 class pinkiri8_state : public driver_device

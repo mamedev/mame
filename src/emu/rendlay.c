@@ -81,7 +81,6 @@
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
-#include "output.h"
 #include "xmlfile.h"
 #include "png.h"
 

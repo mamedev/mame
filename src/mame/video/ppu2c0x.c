@@ -25,7 +25,6 @@
 
 #define ADDRESS_MAP_MODERN
 #include "emu.h"
-#include "profiler.h"
 #include "video/ppu2c0x.h"
 
 

@@ -11,9 +11,7 @@
 
 #include "emu.h"
 #include "ui.h"
-#include "uimenu.h"
 #include "uiswlist.h"
-#include "softlist.h"
 
 
 /***************************************************************************

@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "debugger.h"
-#include "profiler.h"
 #include "ppccom.h"
 #include "ppcfe.h"
 #include "cpu/drcfe.h"

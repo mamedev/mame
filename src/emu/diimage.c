@@ -40,7 +40,6 @@
 #include "emu.h"
 #include "ui.h"
 #include "zippath.h"
-#include "uimenu.h"
 #include "uiimage.h"
 #include "uiswlist.h"
 

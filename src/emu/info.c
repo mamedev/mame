@@ -43,7 +43,6 @@
 #include "sound/samples.h"
 #include "info.h"
 #include "xmlfile.h"
-#include "hash.h"
 #include "config.h"
 
 #include <ctype.h>

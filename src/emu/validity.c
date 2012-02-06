@@ -38,10 +38,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "hash.h"
 #include "validity.h"
 #include "emuopts.h"
-#include "softlist.h"
 #include <ctype.h>
 
 

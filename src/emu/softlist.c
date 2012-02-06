@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "pool.h"
 #include "emuopts.h"
-#include "hash.h"
 #include "softlist.h"
 #include "clifront.h"
 

@@ -204,7 +204,6 @@
 #include <map>
 
 #include "emu.h"
-#include "profiler.h"
 #include "debug/debugcpu.h"
 
 

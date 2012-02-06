@@ -39,7 +39,6 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "hash.h"
 #include "audit.h"
 #include "harddisk.h"
 #include "sound/samples.h"

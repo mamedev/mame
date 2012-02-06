@@ -41,7 +41,6 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "config.h"
-#include "profiler.h"
 #include "sound/wavwrite.h"
 
 
