@@ -103,7 +103,6 @@ In other words,the first three types uses the offset and not the color allocated
 
 #include "emu.h"
 #include "includes/stv.h"
-#include "drawgfxm.h"
 
 static UINT8 get_vblank(running_machine &machine);
 static UINT8 get_hblank(running_machine &machine);
@@ -2924,7 +2923,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_rgb32 &b
 	int xlinesize = 0/*, xpixelsize = 0*/;
 	int xcnt,ycnt;
 	UINT8* gfxdata = state->m_vdp2.gfx_decode;
-	static UINT32 *destline;
+	UINT32 *destline;
 	UINT16 pal_color_offset = 0;
 	UINT8* gfxdatalow, *gfxdatahigh;
 	/*Window effect 1=no draw*/
@@ -3084,7 +3083,6 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_rgb32 &b
 					gfxdata += xlinesize*(yy>>16);
 					yy &= 0xffff;
 
-					destline = &bitmap.pix32(ycnt);
 					xx = 0;
 					for (xcnt = cliprect.min_x; xcnt <= cliprect.max_x; xx+=stv2_current_tilemap.incx, xcnt++)
 					{
@@ -5733,9 +5731,8 @@ static int get_pixel_clock(running_machine &machine)
 
 static UINT8 get_hblank(running_machine &machine)
 {
-	static int cur_h;
 	const rectangle &visarea = machine.primary_screen->visible_area();
-	cur_h = machine.primary_screen->hpos();
+	int cur_h = machine.primary_screen->hpos();
 
 	if (cur_h > visarea.max_x) //TODO
 		return 1;
@@ -6667,7 +6664,6 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 SCREEN_UPDATE_RGB32( stv_vdp2 )
 {
 	saturn_state *state = screen.machine().driver_data<saturn_state>();
-	static UINT8 pri;
 
 	stv_vdp2_fade_effects(screen.machine());
 
@@ -6708,6 +6704,8 @@ SCREEN_UPDATE_RGB32( stv_vdp2 )
 
 	if(STV_VDP2_DISP)
 	{
+		UINT8 pri;
+
 		stv_sprite_priorities_usage_valid = 0;
 		memset(stv_sprite_priorities_used, 0, sizeof(stv_sprite_priorities_used));
 		memset(stv_sprite_priorities_in_fb_line, 0, sizeof(stv_sprite_priorities_in_fb_line));
