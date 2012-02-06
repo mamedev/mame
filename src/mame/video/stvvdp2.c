@@ -2773,9 +2773,9 @@ static void stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &cl
 					t_pen = (data & 0x8000) || ( transparency == STV_TRANSPARENCY_NONE );
 					if (t_pen)
 					{
-						b = (data & 0x7c00) >> 7;
-						g = (data & 0x03e0) >> 2;
-						r = (data & 0x001f) << 3;
+						b = pal5bit((data & 0x7c00) >> 10);
+						g = pal5bit((data & 0x03e0) >> 5);
+						r = pal5bit( data & 0x001f);
 						if(stv2_current_tilemap.fade_control & 1)
 							stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
@@ -3163,11 +3163,12 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_rgb32 &b
 
 						if(t_pen)
 						{
-							b = ((gfxdata[2*xs] & 0x7c) << 1);
-							g = ((gfxdata[2*xs] & 0x03) << 6) | ((gfxdata[2*xs+1] & 0xe0) >> 2);
-							r = ((gfxdata[2*xs+1] & 0x1f) << 3);
+							b = pal5bit(((gfxdata[2*xs] & 0x7c) >> 2));
+							g = pal5bit(((gfxdata[2*xs] & 0x03) << 3) | ((gfxdata[2*xs+1] & 0xe0) >> 5));
+							r = pal5bit(gfxdata[2*xs+1] & 0x1f);
 							if(stv2_current_tilemap.fade_control & 1)
 								stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+
 							tw = stv_vdp2_window_process(machine,xcnt,ycnt);
 							if(tw == 0)
 							{
@@ -3207,11 +3208,12 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_rgb32 &b
 						xs = xx >> 16;
 						t_pen = ((gfxdata[2*xs] & 0x80) >> 7);
 						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
-						b = ((gfxdata[2*xs] & 0x7c) << 1);
-						g = ((gfxdata[2*xs] & 0x03) << 6) | ((gfxdata[2*xs+1] & 0xe0) >> 2);
-						r = ((gfxdata[2*xs+1] & 0x1f) << 3);
+						b = pal5bit(((gfxdata[2*xs] & 0x7c) >> 2));
+						g = pal5bit(((gfxdata[2*xs] & 0x03) << 3) | ((gfxdata[2*xs+1] & 0xe0) >> 5));
+						r = pal5bit(gfxdata[2*xs+1] & 0x1f);
 						if(stv2_current_tilemap.fade_control & 1)
 							stv_vdp2_compute_color_offset(machine, &r,&g,&b,stv2_current_tilemap.fade_control & 2);
+
 						tw = stv_vdp2_window_process(machine,xcnt,ycnt);
 						if(tw == 0)
 						{
@@ -5377,9 +5379,9 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_rgb32 &bitmap, c
 				UINT16 dot;
 
 				dot = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
-				b = (dot & 0x7c00) >> 7;
-				g = (dot & 0x03e0) >> 2;
-				r = (dot & 0x001f) << 3;
+				b = pal5bit((dot & 0x7c00) >> 10);
+				g = pal5bit((dot & 0x03e0) >> 5);
+				r = pal5bit( dot & 0x001f);
 				if(STV_VDP2_BKCOEN)
 					stv_vdp2_compute_color_offset( machine, &r, &g, &b, STV_VDP2_BKCOSL );
 
@@ -5581,6 +5583,7 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 			palette_set_color_rgb(space->machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			if(cmode0)
 				palette_set_color_rgb(space->machine(),((offset*2)+1)^0x400,pal5bit(r),pal5bit(g),pal5bit(b));
+
 			b = ((state->m_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((state->m_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((state->m_vdp2_cram[offset] & 0x001f0000) >> 16);
@@ -6317,10 +6320,9 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 						if(STV_VDP2_SPWINEN && pix == 0x8000) /* Pukunpa */
 							continue;
 
-						b = (pix & 0x7c00) >> 7;
-						g = (pix & 0x03e0) >> 2;
-						r = (pix & 0x1f) << 3;
-
+						b = pal5bit((pix & 0x7c00) >> 10);
+						g = pal5bit((pix & 0x03e0) >> 5);
+						r = pal5bit( pix & 0x001f);
 						if ( color_offset_pal )
 						{
 							stv_vdp2_compute_color_offset( machine, &r, &g, &b, STV_VDP2_SPCOSL );
@@ -6394,9 +6396,9 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 							continue;
 						};
 
-						b = (pix & 0x7c00) >> 7;
-						g = (pix & 0x03e0) >> 2;
-						r = (pix & 0x1f) << 3;
+						b = pal5bit((pix & 0x7c00) >> 10);
+						g = pal5bit((pix & 0x03e0) >> 5);
+						r = pal5bit( pix & 0x001f);
 						if ( color_offset_pal )
 						{
 							stv_vdp2_compute_color_offset( machine, &r, &g, &b, STV_VDP2_SPCOSL );
@@ -6505,9 +6507,10 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 						stv_sprite_priorities_in_fb_line[y][sprite_priorities[0]] = 1;
 						continue;
 					};
-					b = (pix & 0x7c00) >> 7;
-					g = (pix & 0x03e0) >> 2;
-					r = (pix & 0x1f) << 3;
+
+					b = pal5bit((pix & 0x7c00) >> 10);
+					g = pal5bit((pix & 0x03e0) >> 5);
+					r = pal5bit( pix & 0x001f);
 					if ( color_offset_pal )
 					{
 						stv_vdp2_compute_color_offset( machine, &r, &g, &b, STV_VDP2_SPCOSL );
