@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    PLS100 16xPAL_TERMSx8 Programmable Logic Array emulation
+    PLS100 16x48x8 Programmable Logic Array emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
