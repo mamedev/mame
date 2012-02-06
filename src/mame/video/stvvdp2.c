@@ -2436,10 +2436,10 @@ INLINE UINT32 stv_add_blend(UINT32 a, UINT32 b)
 {
 	UINT32 rb = (a & 0xff00ff) + (b & 0xff00ff);
 	UINT32 g = (a & 0x00ff00) + (b & 0x00ff00);
-	if (rb & 0x1000000) rb |= 0xff0000;
-	if (g & 0x10000) g = 0xff00;
-	if (rb & 0x100) rb |= 0xff;
-	return (rb & 0xff00ff) | g;
+	return MAKE_RGB((rb & 0x1000000) ? 0xff : RGB_RED(rb),
+		(g & 0x0010000) ? 0xff : RGB_GREEN(g),
+		(rb & 0x0000100) ? 0xff : RGB_BLUE(rb)
+	);
 }
 
 static void stv_vdp2_drawgfxzoom(
@@ -6342,7 +6342,8 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 						{
 							if ( pix & ~sprite_shadow )
 							{
-								bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
+								UINT32 p = bitmap_line[x];
+								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 							}
 						}
 						else
@@ -6353,7 +6354,8 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 								/*shadow - in reality, we should check from what layer pixel beneath comes...*/
 								if ( STV_VDP2_SDCTL & 0x3f )
 								{
-									bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
+									UINT32 p = bitmap_line[x];
+									bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 								}
 								/* note that when shadows are disabled, "shadow" palette entries are not drawn */
 							}
@@ -6432,7 +6434,8 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 						{
 							if ( pix & ~sprite_shadow )
 							{
-								bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
+								UINT32 p = bitmap_line[x];
+								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 							}
 						}
 						else
@@ -6443,7 +6446,8 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 								/*shadow - in reality, we should check from what layer pixel beneath comes...*/
 								if ( STV_VDP2_SDCTL & 0x3f )
 								{
-									bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
+									UINT32 p = bitmap_line[x];
+									bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 								}
 								/* note that when shadows are disabled, "shadow" palette entries are not drawn */
 							} else if ( pix )
@@ -6584,7 +6588,8 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 					{
 						if ( pix & ~sprite_shadow )
 						{
-							bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
+							UINT32 p = bitmap_line[x];
+							bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 						}
 					}
 					else
@@ -6595,7 +6600,8 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 							/*shadow - in reality, we should check from what layer pixel beneath comes...*/
 							if ( STV_VDP2_SDCTL & 0x3f )
 							{
-								bitmap_line[x] = (bitmap_line[x] & ~0x010101) >> 1;
+								UINT32 p = bitmap_line[x];
+								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 							}
 							/* note that when shadows are disabled, "shadow" palette entries are not drawn */
 						} else if ( pix )
