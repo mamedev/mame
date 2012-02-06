@@ -1,6 +1,6 @@
 /* Bounty Hunter
 
- PC hardware.. no dumps of the bios roms tho
+ PC hardware.. no dumps of the bios roms are currently available
 
 */
 
@@ -49,7 +49,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( bntyhunt, bntyhunt_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Probably a Pentium or higher .. ?? Mhz*/
+	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000) /* Probably a Pentium or higher .. ?? Mhz*/
 	MCFG_CPU_PROGRAM_MAP(bntyhunt_map)
 
 	/* video hardware */
@@ -69,7 +69,7 @@ ROM_START(bntyhunt)
 	ROM_LOAD("bntyhunt.pcbios", 0x000000, 0x10000, NO_DUMP )
 
 	DISK_REGION( "disks" )
-	DISK_IMAGE( "bntyhunt", 0, SHA1(f5c737aaf3da5b57de3fb6bb5dfb85f8f3d4b1b1) )
+	DISK_IMAGE( "bntyhunt", 0, SHA1(e50937d14d5c6adfb5e0012db5a7df090eebc2e1) )
 ROM_END
 
 

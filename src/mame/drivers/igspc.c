@@ -102,7 +102,7 @@ ROM_START( eztouch )
 	ROM_LOAD( "szz_v116cn.rom", 0x000000, 0x80000, CRC(8c443a89) SHA1(efdbaa832def812e0786cab95ebf60cdc226d3c4))
 
 	DISK_REGION( "disks" )
-	DISK_IMAGE( "szz_cf", 0, SHA1(2f19b68b1db8a0b5e85ad43dc3b5bf651d465bd9) )
+	DISK_IMAGE( "szz_cf", 0, SHA1(d02cb1af0f03ce83719870d8a66244dde9795b2e) )
 ROM_END
 
 
