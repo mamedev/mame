@@ -95,6 +95,7 @@
 #include "emuopts.h"
 #include "config.h"
 #include "xmlfile.h"
+#include "profiler.h"
 #include "ui.h"
 #include "uiinput.h"
 #include "debug/debugcon.h"
@@ -241,13 +242,16 @@ struct _inputx_code
 	const input_field_config * field[NUM_SIMUL_KEYS];
 };
 
+#define KEY_BUFFER_SIZE	4096
+
 typedef struct _key_buffer key_buffer;
 struct _key_buffer
 {
 	int begin_pos;
 	int end_pos;
 	unsigned int status_keydown : 1;
-	unicode_char buffer[4096];
+	int size;
+	unicode_char *buffer;
 };
 
 typedef struct _char_info char_info;
@@ -284,7 +288,7 @@ struct _input_port_private
 
 	/* inputx */
 	inputx_code *codes;
-	key_buffer *keybuffer;
+	key_buffer keybuffer;
 	emu_timer *inputx_timer;
 	int (*queue_chars)(running_machine &machine, const unicode_char *text, size_t text_len);
 	int (*accept_char)(running_machine &machine, unicode_char ch);
@@ -2330,7 +2334,7 @@ static key_buffer *get_buffer(running_machine &machine)
 {
 	input_port_private *portdata = machine.input_port_data;
 	assert(inputx_can_post(machine));
-	return (key_buffer *)portdata->keybuffer;
+	return (key_buffer *)&portdata->keybuffer;
 }
 
 
@@ -4175,7 +4179,7 @@ int validate_natural_keyboard_statics(void)
 static void clear_keybuffer(running_machine &machine)
 {
 	input_port_private *portdata = machine.input_port_data;
-	portdata->keybuffer = NULL;
+	portdata->keybuffer.buffer = NULL;
 	portdata->queue_chars = NULL;
 	portdata->codes = NULL;
 }
@@ -4186,7 +4190,11 @@ static void setup_keybuffer(running_machine &machine)
 {
 	input_port_private *portdata = machine.input_port_data;
 	portdata->inputx_timer = machine.scheduler().timer_alloc(FUNC(inputx_timerproc));
-	portdata->keybuffer = auto_alloc_clear(machine, key_buffer);
+	portdata->keybuffer.begin_pos = 0;
+	portdata->keybuffer.end_pos = 0;
+	portdata->keybuffer.status_keydown = 0;
+	portdata->keybuffer.size = KEY_BUFFER_SIZE;
+	portdata->keybuffer.buffer = auto_alloc_array(machine, unicode_char, portdata->keybuffer.size);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(clear_keybuffer), &machine));
 }
 
@@ -4195,12 +4203,10 @@ static void setup_keybuffer(running_machine &machine)
 void inputx_init(running_machine &machine)
 {
 	input_port_private *portdata = machine.input_port_data;
-	portdata->codes = NULL;
 	portdata->inputx_timer = NULL;
-	portdata->queue_chars = NULL;
 	portdata->accept_char = NULL;
 	portdata->charqueue_empty = NULL;
-	portdata->keybuffer = NULL;
+	clear_keybuffer(machine);
 
 	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -4325,7 +4331,19 @@ static void internal_post_key(running_machine &machine, unicode_char ch)
 	}
 
 	keybuf->buffer[keybuf->end_pos++] = ch;
-	keybuf->end_pos %= ARRAY_LENGTH(keybuf->buffer);
+	if ((keybuf->end_pos+1) % keybuf->size == keybuf->begin_pos)
+	{
+		// Buffer full
+		unicode_char *old_buffer = keybuf->buffer;
+		keybuf->size = keybuf->size + KEY_BUFFER_SIZE;
+		keybuf->buffer = auto_alloc_array(machine, unicode_char, keybuf->size);
+		for( int i = keybuf->begin_pos; i <= keybuf->end_pos; i++ )
+		{
+			keybuf->buffer[i] = old_buffer[i];
+		}
+		auto_free(machine, old_buffer);
+	}
+	keybuf->end_pos %= keybuf->size;
 }
 
 
@@ -4334,7 +4352,7 @@ static int buffer_full(running_machine &machine)
 {
 	key_buffer *keybuf;
 	keybuf = get_buffer(machine);
-	return ((keybuf->end_pos + 1) % ARRAY_LENGTH(keybuf->buffer)) == keybuf->begin_pos;
+	return ((keybuf->end_pos + 1) % keybuf->size) == keybuf->begin_pos;
 }
 
 
@@ -4413,7 +4431,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 		while((keybuf->begin_pos != keybuf->end_pos) && (*portdata->queue_chars)(machine, &keybuf->buffer[keybuf->begin_pos], 1))
 		{
 			keybuf->begin_pos++;
-			keybuf->begin_pos %= ARRAY_LENGTH(keybuf->buffer);
+			keybuf->begin_pos %= keybuf->size;
 
 			if (portdata->current_rate != attotime::zero)
 				break;
@@ -4426,7 +4444,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 		{
 			keybuf->status_keydown = FALSE;
 			keybuf->begin_pos++;
-			keybuf->begin_pos %= ARRAY_LENGTH(keybuf->buffer);
+			keybuf->begin_pos %= keybuf->size;
 		}
 		else
 		{
