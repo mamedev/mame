@@ -53,8 +53,6 @@
 
 ***************************************************************************/
 
-static UINT8 color_bitplane_to_packed[4/*plane*/][8/*pixel*/][256];
-
 static struct
 {
 	read8_space_func read_dipswitch;
@@ -126,13 +124,23 @@ static struct
 	struct
 	{
 		UINT8 index;
-		UINT8 *data;
 		UINT8 latch[4];
+		UINT8 set_reset;
+		UINT8 enable_set_reset;
 		UINT8 color_compare;
+		UINT8 logical_op;
+		UINT8 rotate_count;
+		UINT8 shift256;
+		UINT8 shift_reg;
 		UINT8 read_map_sel;
 		UINT8 read_mode;
 		UINT8 write_mode;
 		UINT8 color_dont_care;
+		UINT8 bit_mask;
+		UINT8 alpha_dis;
+		UINT8 memory_map_sel;
+		UINT8 host_oe;
+		UINT8 chain_oe;
 	} gc;
 
 	struct
@@ -182,7 +190,7 @@ static struct
 #define LINES (vga.crtc.vert_disp_end+1)
 #define TEXT_LINES (vga.crtc.vert_disp_end+1)
 
-#define GRAPHIC_MODE (vga.gc.data[6]&1) /* else text mode */
+#define GRAPHIC_MODE (vga.gc.alpha_dis) /* else text mode */
 
 #define EGA_COLUMNS (vga.crtc.horz_disp_end+1)
 #define EGA_START_ADDRESS (vga.crtc.start_addr)
@@ -635,19 +643,19 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 
 			return TEXT_MODE;
 		}
-		else if (vga.gc.data[5]&0x40)
+		else if (vga.gc.shift256)
 		{
 			//proc = vga_vh_vga;
 			//*height = LINES;
 			//*width = VGA_COLUMNS * 8;
 			return VGA_MODE;
 		}
-		else if (vga.gc.data[5]&0x20)
+		else if (vga.gc.shift_reg)
 		{
 			// cga
 			return CGA_MODE;
 		}
-		else if ((vga.gc.data[6]&0x0c) == 0x0c)
+		else if (vga.gc.memory_map_sel == 0x03)
 		{
 			// mono
 			return MONO_MODE;
@@ -683,71 +691,66 @@ SCREEN_UPDATE_RGB32( pc_video )
 		case MONO_MODE:    vga_vh_mono(screen.machine(), bitmap, cliprect); break;
 		case RGB8_MODE:    svga_vh_rgb8(screen.machine(), bitmap, cliprect); break;
 		case RGB15_MODE:   svga_vh_rgb15(screen.machine(), bitmap, cliprect); break;
-		case SVGA_HACK:    vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
+		case SVGA_HACK:    vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, &w, &h); break;
 	}
 
 	return 0;
 }
 /***************************************************************************/
 
-INLINE UINT8 rotate_right(UINT8 val, UINT8 rot)
+INLINE UINT8 rotate_right(UINT8 val)
 {
-	return (val >> rot) | (val << (8 - rot));
+	return (val >> vga.gc.rotate_count) | (val << (8 - vga.gc.rotate_count));
 }
 
-INLINE UINT8 ega_bitplane_to_packed(UINT8 *latch, int number)
+INLINE UINT8 vga_logical_op(UINT8 data, UINT8 plane, UINT8 mask)
 {
-	return color_bitplane_to_packed[0][number][latch[0]]
-		|color_bitplane_to_packed[1][number][latch[1]]
-		|color_bitplane_to_packed[2][number][latch[2]]
-		|color_bitplane_to_packed[3][number][latch[3]];
-}
+	UINT8 res;
 
-INLINE UINT8 vga_latch_helper(UINT8 cpu, UINT8 latch, UINT8 mask)
-{
-	switch (vga.gc.data[3] & 0x18)
+	switch(vga.gc.logical_op & 3)
 	{
-		case 0x00:
-			return rotate_right((cpu&mask)|(latch&~mask), vga.gc.data[3] & 0x07);
-		case 0x08:
-			return rotate_right(((cpu&latch)&mask)|(latch&~mask), vga.gc.data[3] & 0x07);
-		case 0x10:
-			return rotate_right(((cpu|latch)&mask)|(latch&~mask), vga.gc.data[3] & 0x07);
-		case 0x18:
-			return rotate_right(((cpu^latch)&mask)|(latch&~mask), vga.gc.data[3] & 0x07);
+		case 0: /* NONE */
+			res = (data & mask) | (vga.gc.latch[plane] & ~mask);
+			break;
+		case 1: /* AND */
+			res = (data | ~mask) & (vga.gc.latch[plane]);
+			break;
+		case 2: /* OR */
+			res = (data & mask) | (vga.gc.latch[plane]);
+			break;
+		case 3: /* XOR */
+			res = (data & mask) ^ (vga.gc.latch[plane]);
+			break;
 	}
-	return 0; /* must not be reached, suppress compiler warning */
+
+	return res;
 }
 
 INLINE UINT8 vga_latch_write(int offs, UINT8 data)
 {
-	switch (vga.gc.data[5]&3) {
+	UINT8 res;
+
+	switch (vga.gc.write_mode & 3) {
 	case 0:
-		if (vga.gc.data[1]&(1<<offs)) {
-			return vga_latch_helper( (vga.gc.data[0]&(1<<offs))?vga.gc.data[8]:0,
-									  vga.gc.latch[offs],vga.gc.data[8] );
-		} else {
-			return vga_latch_helper(data, vga.gc.latch[offs], vga.gc.data[8]);
-		}
+		data = rotate_right(data);
+		if(vga.gc.enable_set_reset & 1<<offs)
+			res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? vga.gc.bit_mask : 0, offs,vga.gc.bit_mask);
+		else
+			res = vga_logical_op(data, offs, vga.gc.bit_mask);
 		break;
 	case 1:
-		return vga.gc.latch[offs];
+		res = vga.gc.latch[offs];
+		break;
 	case 2:
-		if (data&(1<<offs)) {
-			return vga_latch_helper(0xff, vga.gc.latch[offs], vga.gc.data[8]);
-		} else {
-			return vga_latch_helper(0, vga.gc.latch[offs], vga.gc.data[8]);
-		}
+		res = vga_logical_op((data & 1<<offs) ? 0xff : 0x00,offs,vga.gc.bit_mask);
 		break;
 	case 3:
-		if (vga.gc.data[0]&(1<<offs)) {
-			return vga_latch_helper(0xff, vga.gc.latch[offs], data&vga.gc.data[8]);
-		} else {
-			return vga_latch_helper(0, vga.gc.latch[offs], data&vga.gc.data[8]);
-		}
+		data = rotate_right(data);
+		res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? 0xff : 0x00,offs,data&vga.gc.bit_mask);
 		break;
 	}
-	return 0; /* must not be reached, suppress compiler warning */
+
+	return res;
 }
 
 #if 0
@@ -999,10 +1002,6 @@ static WRITE8_HANDLER(vga_crtc_w)
 {
 	switch (offset)
 	{
-		case 0xa:
-			vga.feature_control = data;
-			break;
-
 		case 4:
 			vga.crtc.index = data;
 			break;
@@ -1026,6 +1025,10 @@ static WRITE8_HANDLER(vga_crtc_w)
 				printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
 			#endif
 			break;
+
+		case 0xa:
+			vga.feature_control = data;
+			break;
 	}
 }
 
@@ -1039,6 +1042,54 @@ READ8_HANDLER( vga_port_03b0_r )
 	return data;
 }
 
+static UINT8 gc_reg_read(running_machine &machine,UINT8 index)
+{
+	UINT8 res;
+
+	switch(index)
+	{
+		case 0x00:
+			res = vga.gc.set_reset & 0xf;
+			break;
+		case 0x01:
+			res = vga.gc.enable_set_reset & 0xf;
+			break;
+		case 0x02:
+			res = vga.gc.color_compare & 0xf;
+			break;
+		case 0x03:
+			res  = (vga.gc.logical_op & 3) << 3;
+			res |= (vga.gc.rotate_count & 7);
+			break;
+		case 0x04:
+			res = vga.gc.read_map_sel & 3;
+			break;
+		case 0x05:
+			res  = (vga.gc.shift256 & 1) << 6;
+			res |= (vga.gc.shift_reg & 1) << 5;;
+			res |= (vga.gc.host_oe & 1) << 4;
+			res |= (vga.gc.read_mode & 1) << 3;
+			res |= (vga.gc.write_mode & 3);
+			break;
+		case 0x06:
+			res  = (vga.gc.memory_map_sel & 3) << 2;
+			res |= (vga.gc.chain_oe & 1) << 1;
+			res |= (vga.gc.alpha_dis & 1);
+			break;
+		case 0x07:
+			res = vga.gc.color_dont_care & 0xf;
+			break;
+		case 0x08:
+			res = vga.gc.bit_mask & 0xff;
+			break;
+		default:
+			res = 0xff;
+			break;
+	}
+
+	return res;
+}
+
 READ8_HANDLER( vga_port_03c0_r )
 {
 	UINT8 data = 0xff;
@@ -1050,7 +1101,7 @@ READ8_HANDLER( vga_port_03c0_r )
 			break;
 		case 1:
 			if( vga.attribute.index & 0x20) // protection bit
-				data = 0xff;
+				data = vga.attribute.index;
 			else if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
 				data=vga.attribute.data[vga.attribute.index&0x1f];
 			break;
@@ -1141,8 +1192,7 @@ READ8_HANDLER( vga_port_03c0_r )
 			break;
 
 		case 0xf:
-			if (vga.gc.index < vga.svga_intf.gc_regcount)
-				data = vga.gc.data[vga.gc.index];
+			data = gc_reg_read(space->machine(),vga.gc.index);
 			break;
 	}
 	return data;
@@ -1195,18 +1245,43 @@ static void gc_reg_write(running_machine &machine,UINT8 index,UINT8 data)
 {
 	switch(index)
 	{
+		case 0x00:
+			vga.gc.set_reset = data & 0xf;
+			break;
+		case 0x01:
+			vga.gc.enable_set_reset = data & 0xf;
+			break;
 		case 0x02:
 			vga.gc.color_compare = data & 0xf;
+			break;
+		case 0x03:
+			vga.gc.logical_op = (data & 0x18) >> 3;
+			vga.gc.rotate_count = data & 7;
 			break;
 		case 0x04:
 			vga.gc.read_map_sel = data & 3;
 			break;
 		case 0x05:
+			vga.gc.shift256 = (data & 0x40) >> 6;
+			vga.gc.shift_reg = (data & 0x20) >> 5;
+			vga.gc.host_oe = (data & 0x10) >> 4;
 			vga.gc.read_mode = (data & 8) >> 3;
 			vga.gc.write_mode = data & 3;
+			//if(data & 0x10 && vga.gc.alpha_dis)
+			//  popmessage("Host O/E enabled, contact MAMEdev");
+			break;
+		case 0x06:
+			vga.gc.memory_map_sel = (data & 0xc) >> 2;
+			vga.gc.chain_oe = (data & 2) >> 1;
+			vga.gc.alpha_dis = (data & 1);
+			//if(data & 2 && vga.gc.alpha_dis)
+			//  popmessage("Chain O/E enabled, contact MAMEdev");
 			break;
 		case 0x07:
 			vga.gc.color_dont_care = data & 0xf;
+			break;
+		case 0x08:
+			vga.gc.bit_mask = data & 0xff;
 			break;
 	}
 }
@@ -1291,18 +1366,6 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		vga.gc.index=data;
 		break;
 	case 0xf:
-		if (LOG_REGISTERS)
-		{
-			logerror("vga_port_03c0_w(): GC[0x%02X%s] = 0x%02X\n",
-				vga.gc.index,
-				(vga.gc.index < vga.svga_intf.gc_regcount) ? "" : "?",
-				data);
-		}
-		if (vga.gc.index < vga.svga_intf.gc_regcount)
-		{
-			vga.gc.data[vga.gc.index] = data;
-		}
-
 		gc_reg_write(space->machine(),vga.gc.index,data);
 		break;
 	}
@@ -1330,14 +1393,13 @@ void pc_vga_reset(running_machine &machine)
 	vga.crtc.index = 0;
 	memset(vga.crtc.data, 0, vga.svga_intf.crtc_regcount * sizeof(*vga.crtc.data));
 	vga.gc.index = 0;
-	memset(vga.gc.data, 0, vga.svga_intf.gc_regcount * sizeof(*vga.gc.data));
 	memset(vga.gc.latch, 0, sizeof(vga.gc.latch));
 	memset(&vga.attribute, 0, sizeof(vga.attribute));
 	memset(&vga.dac, 0, sizeof(vga.dac));
 	memset(&vga.cursor, 0, sizeof(vga.cursor));
 	memset(&vga.oak, 0, sizeof(vga.oak));
 
-	vga.gc.data[6] = 0xc; /* prevent xtbios excepting vga ram as system ram */
+	vga.gc.memory_map_sel = 0x3; /* prevent xtbios excepting vga ram as system ram */
 /* amstrad pc1640 bios relies on the position of
    the video memory area,
    so I introduced the reset to switch to b8000 area */
@@ -1350,7 +1412,7 @@ void pc_vga_reset(running_machine &machine)
 READ8_HANDLER(vga_mem_r)
 {
 	/* TODO: check me */
-	switch((vga.gc.data[6] >> 2) & 0x03)
+	switch(vga.gc.memory_map_sel & 0x03)
 	{
 		case 0: break;
 		case 1: offset &= 0x0ffff; break;
@@ -1361,26 +1423,19 @@ READ8_HANDLER(vga_mem_r)
 	if(vga.sequencer.data[4] & 4)
 	{
 		int data;
-		vga.gc.latch[0]=vga.memory[(offset)];
-		vga.gc.latch[1]=vga.memory[(offset)+0x20000];
-		vga.gc.latch[2]=vga.memory[(offset)+0x40000];
-		vga.gc.latch[3]=vga.memory[(offset)+0x60000];
+		if (!space->debugger_access())
+		{
+			vga.gc.latch[0]=vga.memory[(offset)];
+			vga.gc.latch[1]=vga.memory[(offset)+0x20000];
+			vga.gc.latch[2]=vga.memory[(offset)+0x40000];
+			vga.gc.latch[3]=vga.memory[(offset)+0x60000];
+		}
 
 		if (vga.gc.read_mode)
 		{
 			UINT8 byte,layer;
 			UINT8 fill_latch;
 			data=0;
-			#if 0
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 0)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=1;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 1)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=2;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 2)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=4;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 3)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=8;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 4)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=0x10;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 5)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=0x20;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 6)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=0x40;
-			if (!(ega_bitplane_to_packed(vga.gc.latch, 7)^(vga.gc.color_compare&vga.gc.color_dont_care))) data|=0x80;
-			#endif
 
 			for(byte=0;byte<8;byte++)
 			{
@@ -1423,7 +1478,7 @@ READ8_HANDLER(vga_mem_r)
 WRITE8_HANDLER(vga_mem_w)
 {
 	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask the offset.
-	switch((vga.gc.data[6] >> 2) & 0x03)
+	switch(vga.gc.memory_map_sel & 0x03)
 	{
 		case 0: break;
 		case 1:
@@ -1460,18 +1515,8 @@ WRITE8_HANDLER(vga_mem_w)
 
 void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, const struct pc_svga_interface *svga_intf)
 {
-	int i, j, k, mask1;
-
 	memset(&vga, 0, sizeof(vga));
 
-	for (k=0;k<4;k++)
-	{
-		for (mask1=0x80, j=0; j<8; j++, mask1>>=1)
-		{
-			for  (i=0; i<256; i++)
-				color_bitplane_to_packed[k][j][i]=(i&mask1)?(1<<k):0;
-		}
-	}
 	/* copy over interfaces */
 	vga.read_dipswitch = read_dipswitch;
 	if (svga_intf)
@@ -1480,8 +1525,6 @@ void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, cons
 
 		if (vga.svga_intf.seq_regcount < 0x05)
 			fatalerror("Invalid SVGA sequencer register count");
-		if (vga.svga_intf.gc_regcount < 0x09)
-			fatalerror("Invalid SVGA GC register count");
 		if (vga.svga_intf.crtc_regcount < 0x19)
 			fatalerror("Invalid SVGA CRTC register count");
 	}
@@ -1489,18 +1532,15 @@ void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, cons
 	{
 		vga.svga_intf.vram_size = 0x100000;
 		vga.svga_intf.seq_regcount = 0x05;
-		vga.svga_intf.gc_regcount = 0x09;
 		vga.svga_intf.crtc_regcount = 0x19;
 	}
 
 	vga.memory			= auto_alloc_array(machine, UINT8, vga.svga_intf.vram_size);
 	vga.sequencer.data	= auto_alloc_array(machine, UINT8, vga.svga_intf.seq_regcount);
 	vga.crtc.data		= auto_alloc_array(machine, UINT8, 0x100);
-	vga.gc.data			= auto_alloc_array(machine, UINT8, vga.svga_intf.gc_regcount);
 	memset(vga.memory, '\0', vga.svga_intf.vram_size);
 	memset(vga.sequencer.data, '\0', vga.svga_intf.seq_regcount);
 	memset(vga.crtc.data, '\0', 0x100);
-	memset(vga.gc.data, '\0', vga.svga_intf.gc_regcount);
 
 	pc_vga_reset(machine);
 

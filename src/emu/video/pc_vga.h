@@ -20,7 +20,7 @@ struct pc_svga_interface
 	int seq_regcount;
 	int gc_regcount;
 	int crtc_regcount;
-	void (*choosevideomode)(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *sequencer, const UINT8 *crtc, const UINT8 *gc, int *width, int *height);
+	void (*choosevideomode)(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *sequencer, const UINT8 *crtc, int *width, int *height);
 };
 
 void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, const struct pc_svga_interface *svga_intf);
