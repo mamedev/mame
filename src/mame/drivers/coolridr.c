@@ -257,6 +257,15 @@ class coolridr_state : public driver_device
 public:
 	coolridr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+        m_textBytesToWrite(0x00),
+		m_blitterSerialCount(0x00),
+		m_blitterMode(0x00),
+		m_textOffset(0x0000),
+		m_colorNumber(0x00000000),
+		m_vCellCount(0x0000),
+		m_hCellCount(0x0000),
+		m_vPosition(0x0000),
+		m_hPosition(0x0000),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this,"sub"),
 		m_soundcpu(*this,"soundcpu")
@@ -273,13 +282,17 @@ public:
 	UINT32 m_test_offs;
 	int m_color;
 	UINT8 m_vblank;
-	UINT16 m_cmd;
-	UINT16 m_param;
-	UINT32 m_dst_addr;
-	UINT32 m_txt_buff[0x10];
-	UINT32 m_attr_buff[0x10];
-	UINT8 m_txt_index;
-	UINT8 m_attr_index;
+
+	// Blitter state
+	UINT16 m_textBytesToWrite;
+	INT16  m_blitterSerialCount;
+	UINT8  m_blitterMode;
+	UINT16 m_textOffset;
+	UINT32 m_colorNumber;
+	UINT16 m_vCellCount;
+	UINT16 m_hCellCount;
+	UINT16 m_vPosition;
+	UINT16 m_hPosition;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -402,36 +415,9 @@ static WRITE32_HANDLER(sysh1_ioga_w)
 	COMBINE_DATA(&h1_ioga[offset]);
 }
 #endif
-/*
-CMD = 03f4 PARAM = 0230 | ?
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 00000059
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 07000000
-CMD = ac90 PARAM = 0001 DATA = 00010000
-CMD = ac90 PARAM = 0001 DATA = 00010001
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 00400040
-CMD = ac90 PARAM = 0001 DATA = 01200050
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 03f40230
 
-CMD = 03f4 PARAM = 0170 | ?
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 00000059
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 07000000
-CMD = ac90 PARAM = 0001 DATA = 00010000
-CMD = ac90 PARAM = 0001 DATA = 00010001
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 00400040
-CMD = ac90 PARAM = 0001 DATA = 00800050
-CMD = ac90 PARAM = 0001 DATA = 00000000
-CMD = ac90 PARAM = 0001 DATA = 03f40170
-*/
-/* this looks like an exotic I/O-based tilemap / sprite blitter, very unusual from Sega... */
+
+/* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 static WRITE32_HANDLER( sysh1_txt_blit_w )
 {
 	coolridr_state *state = space->machine().driver_data<coolridr_state>();
@@ -440,66 +426,134 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 
 	switch(offset)
 	{
-		case 0x10/4: //state->m_cmd + state->m_param?
-			state->m_cmd = (state->m_sysh1_txt_blit[offset] & 0xffff0000) >> 16;
-			state->m_param = (state->m_sysh1_txt_blit[offset] & 0x0000ffff) >> 0;
-			state->m_dst_addr = 0x3f40000;
-			state->m_txt_index = 0;
-			state->m_attr_index = 0;
-			break;
-		case 0x14/4: //data
-			/*  "THIS MACHINE IS STAND-ALONE." / disclaimer written with this CMD */
-			if((state->m_cmd & 0xff) == 0xf4)
+		// The mode register
+		case 0x04:
+		{
+			state->m_blitterMode = (data & 0x00ff0000) >> 16;
+			
+			if (state->m_blitterMode == 0xf4)
 			{
-				state->m_txt_buff[state->m_txt_index++] = data;
-
-				//printf("CMD = %04x PARAM = %04x | %c%c%c%c\n",state->m_cmd,state->m_param,(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
+				// Some sort of addressing state.
+				// In the case of text, simply writes 4 characters per 32-bit word.
+				// These values may be loaded into RAM somewhere as they are written.
+				// The number of characters is determined by the upper-most 8 bits.
+				state->m_textBytesToWrite = (data & 0xff000000) >> 24;
+				state->m_textOffset = (data & 0x0000ffff);
+				state->m_blitterSerialCount = 0;
 			}
-			else if((state->m_cmd & 0xff) == 0x90 || (state->m_cmd & 0xff) == 0x30)
+			else if (state->m_blitterMode == 0x30 || state->m_blitterMode == 0x90)
 			{
-				state->m_attr_buff[state->m_attr_index++] = data;
+				// The blitter function(s).
+				// After this is set a fixed count of 11 32-bit words are sent to the data register.
+				// The lower word always seems to be 0x0001 and the upper byte always 0xac.
+				state->m_blitterSerialCount = 0;
+			}
+			else if (state->m_blitterMode == 0x10)
+			{
+				// Could be a full clear of VRAM?
+				for(UINT32 vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
+					space->write_dword(vramAddr, 0x00000000);
+			}
+			break;
+		}
+			
+		// The data register
+		case 0x05:
+		{
+			if (state->m_blitterMode == 0xf4)
+			{
+				// Uploads a series of bytes that index into the encoded sprite table
+				const size_t memOffset = 0x03f40000 + state->m_textOffset + state->m_blitterSerialCount;
+				space->write_dword(memOffset, data);
+				state->m_blitterSerialCount += 0x04;
 
-				if(state->m_attr_index == 0xa)
+				// DEBUG: Uncomment to see the ASCII strings as they are being blitted
+				//if (state->m_blitterSerialCount >= state->m_textBytesToWrite)
+				//{
+				//	for (int i = 0; i < state->m_textBytesToWrite+1; i++)
+				//		printf("%c", space->read_byte(0x03f40000 + state->m_textOffset + i));
+				//	printf("\n");
+				//}
+			}
+			else if (state->m_blitterMode == 0x30 || state->m_blitterMode == 0x90)
+			{
+				// Serialized 32-bit words in order of appearance:
+				//  0: 00000000 - totally unknown : always seems to be zero
+				//  1: xxxxxxxx - "Color Number" (all bits or just lower 16/8?)
+				//  2: 00000000 - unknown : OT flag?  (transparency)
+				//  3: 00000000 - unknown : RF flag?  (90 degree rotation)
+				//  4: 07000000 - unknown : VF flag?  (vertically flipped)
+				//  5: 00010000 - unknown : HF flag?  (horizontally flipped)
+				//  6: vvvv---- - "Vertical Cell Count"
+				//  6: ----hhhh - "Horizontal Cell Count"
+				//  7: 00000000 - unknown : "Vertical|Horizontal Zoom Centers"?
+				//  8: 00400040 - unknown : "Vertical|Horizontal Zoom Ratios"?
+				//  9: xxxx---- - "Display Vertical Position"
+				//  9: ----yyyy - "Display Horizontal Position"
+				// 10: 00000000 - unknown : always seems to be zero
+				// 11: ........ - complex - likely an address into bytes uploaded by mode 0xf4
+				//                (See ifdef'ed out code below for a closer examination)
+
+				// Serialized counts
+				if (state->m_blitterSerialCount == 1)
 				{
-					UINT16 x,y;
-
-					y = (state->m_attr_buff[9] & 0x01f00000) >> 20;
-					x = (state->m_attr_buff[9] & 0x1f0) >> 4;
-					state->m_dst_addr = 0x3f40000 | y*0x40 | x;
-
+					state->m_colorNumber = (data & 0x000000ff);	// Probably more bits
+				}
+				else if (state->m_blitterSerialCount == 6)
+				{
+					state->m_vCellCount = (data & 0xffff0000) >> 16;
+					state->m_hCellCount = (data & 0x0000ffff);
+				}
+				else if (state->m_blitterSerialCount == 9)
+				{
+					state->m_vPosition = (data & 0xffff0000) >> 16;
+					state->m_hPosition = (data & 0x0000ffff);
+				}
+				else if (state->m_blitterSerialCount == 11)
+				{
+					const UINT32 memOffset = data; 
+					
+					// Splat some sprites
+					for (int h = 0; h < state->m_hCellCount; h++)
 					{
-						int x2,y2;
-						const gfx_element *gfx = space->machine().gfx[1];
-						rectangle clip;
+						for (int v = 0; v < state->m_vCellCount; v++)
+						{
+							const int pixelOffsetX = state->m_hPosition + (h*16);
+							const int pixelOffsetY = state->m_vPosition + (v*16);
+							
+							// It's unknown if it's row-major or column-major
+							// TODO: Study the CRT test and "Cool Riders" logo for clues.
+							UINT8 spriteNumber = space->read_byte(memOffset + h + (v*h));
+							
+							// DEBUG: For demo purposes, skip spaces and NULL characters
+							if (spriteNumber == 0x20 || spriteNumber == 0x00)
+								continue;
 
-						y2 = (state->m_attr_buff[9] & 0x01ff0000) >> 16;
-						x2 = (state->m_attr_buff[9] & 0x000001ff);
-						clip = state->m_temp_bitmap_sprites.cliprect();
-
-						drawgfx_opaque(state->m_temp_bitmap_sprites,clip,gfx,1,1,0,0,x2,y2);
+							// DEBUG: Draw 16x16 block
+							for (int x = 1; x < 15; x++)
+							{
+								for (int y = 1; y < 15; y++)
+								{
+									UINT32 color;
+									if (state->m_colorNumber == 0x5b)
+										color = 0xffff0000;
+									else if (state->m_colorNumber == 0x5d)
+										color = 0xff00ff00;
+									else if (state->m_colorNumber == 0x5e)
+										color = 0xff0000ff;
+									else 
+										color = 0xff00ffff;
+									state->m_temp_bitmap_sprites.pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
+								}
+							}
+						}
 					}
 				}
-				if(state->m_attr_index == 0xc)
-				{
-					UINT8 size;
-
-					size = (state->m_attr_buff[6] / 4)+1;
-					for(state->m_txt_index = 0;state->m_txt_index < size; state->m_txt_index++)
-					{
-						space->write_dword((state->m_dst_addr),state->m_txt_buff[state->m_txt_index]);
-						state->m_dst_addr+=4;
-					}
-				}
+				
+				state->m_blitterSerialCount++;
 			}
-			else if((state->m_cmd & 0xff) == 0x10)
-			{
-				UINT32 clear_vram;
-				for(clear_vram=0x3f40000;clear_vram < 0x3f4ffff;clear_vram+=4)
-					space->write_dword((clear_vram),0x00000000);
-			}
-			//else
-			//  printf("CMD = %04x PARAM = %04x DATA = %08x\n",state->m_cmd,state->m_param,data);
 			break;
+		}
 	}
 }
 
