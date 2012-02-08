@@ -60,16 +60,6 @@ public:
 };
 
 
-static VIDEO_START( 30test )
-{
-
-}
-
-static SCREEN_UPDATE_IND16( 30test )
-{
-	return 0;
-}
-
 static READ8_HANDLER(hc11_mux_r)
 {
 	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
@@ -272,19 +262,7 @@ static MACHINE_CONFIG_START( 30test, namco_30test_state )
 	MCFG_MACHINE_START(30test)
 	MCFG_MACHINE_RESET(30test)
 
-	/* video hardware */
-	/* TODO: NOT raster! */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(30test)
-
-//  MCFG_PALETTE_INIT(30test)
-	MCFG_PALETTE_LENGTH(2)
-
-	MCFG_VIDEO_START(30test)
+	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
