@@ -588,7 +588,6 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		UINT16 flags;
 		I386_SREG desc;
 		UINT8 CPL = cpustate->CPL, DPL = 0; //, RPL = 0;
-		I386_CALL_GATE gate;
 
 		/* 32-bit */
 		v1 = READ32(cpustate, cpustate->idtr.base + entry );
@@ -691,11 +690,8 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		if(type == 0x05)
 		{
 			/* Task gate */
-			memset(&gate, 0, sizeof(gate));
-			gate.segment = segment;
-			i386_load_call_gate(cpustate,&gate);
 			memset(&desc, 0, sizeof(desc));
-			desc.selector = gate.selector;
+			desc.selector = segment;
 			i386_load_protected_mode_segment(cpustate,&desc);
 			if(segment & 0x04)
 			{
@@ -720,10 +716,12 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				logerror("IRQ: Task gate: TSS is not present.\n");
 				FAULT_EXP(FAULT_NP,segment & ~0x07);
 			}
+			if(!(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1))
+				cpustate->eip = cpustate->prev_eip;
 			if(desc.flags & 0x08)
-				i386_task_switch(cpustate,desc.selector,0);
+				i386_task_switch(cpustate,desc.selector,1);
 			else
-				i286_task_switch(cpustate,desc.selector,0);
+				i286_task_switch(cpustate,desc.selector,1);
 			return;
 		}
 		else
@@ -949,6 +947,12 @@ static void i386_trap_with_error(i386_state *cpustate,int irq, int irq_gate, int
 			UINT32 v2,type;
 			v2 = READ32(cpustate, cpustate->idtr.base + entry + 4 );
 			type = (v2>>8) & 0x1F;
+			if(type == 5)
+			{
+				v2 = READ32(cpustate, cpustate->idtr.base + entry);
+				v2 = READ32(cpustate, cpustate->gdtr.base + ((v2 >> 16) & 0xfff8) + 4);
+				type = (v2>>8) & 0x1F;
+			}
 			if(type >= 9)
 				PUSH32(cpustate,error);
 			else
@@ -1915,9 +1919,10 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 	I386_SREG desc;
 	UINT8 CPL, RPL, DPL;
 
+	UINT32 ea = i386_translate(cpustate, SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
+
 	if(operand32 == 0)
 	{
-		UINT32 ea = i386_translate(cpustate, SS, REG16(SP), 0);
 		newEIP = READ16(cpustate, ea) & 0xffff;
 		newCS = READ16(cpustate, ea+2) & 0xffff;
 		ea += count+4;
@@ -1926,7 +1931,6 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 	}
 	else
 	{
-		UINT32 ea = i386_translate(cpustate, SS, REG32(ESP), 0);
 		newEIP = READ32(cpustate, ea);
 		newCS = READ32(cpustate, ea+4) & 0xffff;
 		ea += count+8;
@@ -2181,9 +2185,9 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 	UINT32 newflags;
 
 	CPL = cpustate->CPL;
+	UINT32 ea = i386_translate(cpustate, SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
 	if(operand32 == 0)
 	{
-		UINT32 ea = i386_translate(cpustate, SS, REG16(SP), 0);
 		newEIP = READ16(cpustate, ea) & 0xffff;
 		newCS = READ16(cpustate, ea+2) & 0xffff;
 		newflags = READ16(cpustate, ea+4) & 0xffff;
@@ -2192,7 +2196,6 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 	}
 	else
 	{
-		UINT32 ea = i386_translate(cpustate, SS, REG32(ESP), 0);
 		newEIP = READ32(cpustate, ea);
 		newCS = READ32(cpustate, ea+4) & 0xffff;
 		newflags = READ32(cpustate, ea+8);
