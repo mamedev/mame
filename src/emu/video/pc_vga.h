@@ -55,6 +55,15 @@ WRITE8_HANDLER(trident_03d0_w);
 READ8_HANDLER(trident_mem_r);
 WRITE8_HANDLER(trident_mem_w);
 
+READ8_HANDLER(s3_port_03c0_r);
+WRITE8_HANDLER(s3_port_03c0_w);
+READ8_HANDLER(s3_port_03d0_r);
+WRITE8_HANDLER(s3_port_03d0_w);
+READ8_HANDLER(s3_port_9ae8_r);
+WRITE8_HANDLER(s3_port_9ae8_w);
+READ8_HANDLER(s3_mem_r);
+WRITE8_HANDLER(s3_mem_w);
+
 /*
   pega notes (paradise)
   build in amstrad pc1640
