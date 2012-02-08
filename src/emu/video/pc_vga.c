@@ -176,6 +176,12 @@ static struct
 
 static struct
 {
+	UINT8 reg_3d8;
+	bool ext_reg_ena;
+}et4k;
+
+static struct
+{
 	UINT8 memory_config;
 	UINT8 ext_misc_ctrl_2;
 	UINT8 crt_reg_lock;
@@ -997,7 +1003,7 @@ static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 			vga.crtc.line_compare |= data & 0xff;
 			break;
 		default:
-			//printf("Unhandled CRTC reg w %02x %02x\n",index,data);
+			logerror("Unhandled CRTC reg w %02x %02x\n",index,data);
 			break;
 	}
 }
@@ -1781,6 +1787,8 @@ static void tseng_seq_reg_write(running_machine &machine, UINT8 index, UINT8 dat
 				break;
 		}
 	}
+
+	svga.rgb8_en = (!(vga.sequencer.data[1] & 8) && (vga.sequencer.data[4] & 8) && vga.gc.shift256 && vga.crtc.div2 && GRAPHIC_MODE);
 }
 
 READ8_HANDLER(tseng_et4k_03c0_r)
@@ -1832,6 +1840,9 @@ READ8_HANDLER(tseng_et4k_03d0_r)
 			case 5:
 				res = tseng_crtc_reg_read(space->machine(),vga.crtc.index);
 				break;
+			case 8:
+				res = et4k.reg_3d8;
+				break;
 			default:
 				res = vga_port_03d0_r(space,offset);
 				break;
@@ -1851,9 +1862,12 @@ WRITE8_HANDLER(tseng_et4k_03d0_w)
 				vga.crtc.data[vga.crtc.index] = data;
 				tseng_crtc_reg_write(space->machine(),vga.crtc.index,data);
 				break;
-			/* TODO: investigate about this */
 			case 8:
-				svga.rgb8_en = data & 0x80;
+				et4k.reg_3d8 = data;
+				if(data == 0xa0)
+					et4k.ext_reg_ena = true;
+				else if(data == 0x29)
+					et4k.ext_reg_ena = false;
 				break;
 			default:
 				vga_port_03d0_w(space,offset,data);
