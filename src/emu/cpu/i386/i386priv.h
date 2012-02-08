@@ -240,6 +240,7 @@ struct _i386_state
 
 	UINT8 performed_intersegment_jump;
 	UINT8 delayed_interrupt_enable;
+	UINT8 old_tf;
 
 	UINT32 cr[5];		// Control registers
 	UINT32 dr[8];		// Debug registers

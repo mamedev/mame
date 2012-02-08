@@ -3099,6 +3099,7 @@ static CPU_EXECUTE( i386 )
 		cpustate->address_prefix = 0;
 
 		cpustate->ext = 1;
+		cpustate->old_tf = cpustate->TF;
 
 		cpustate->segment_prefix = 0;
 		cpustate->prev_eip = cpustate->eip;
@@ -3113,6 +3114,13 @@ static CPU_EXECUTE( i386 )
 		try
 		{
 			I386OP(decode_opcode)(cpustate);
+			if(cpustate->TF && cpustate->old_tf)
+			{
+				cpustate->prev_eip = cpustate->eip;
+				cpustate->ext = 0;
+				i386_trap(cpustate,1,0,0);
+			}
+
 		}
 		catch(UINT64 e)
 		{
