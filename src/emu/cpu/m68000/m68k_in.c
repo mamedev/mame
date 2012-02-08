@@ -760,6 +760,7 @@ pack      16  mm    axy7  1000111101001111  ..........  . . U U U U U   .   .  1
 pack      16  mm    .     1000...101001...  ..........  . . U U U U U   .   .  13  13  13  13  13
 pea       32  .     .     0100100001......  A..DXWLdx.  U U U U U U U   6   6   5   5   5   5   5
 pflush    32  .     .     1111010100011000  ..........  . . . . S S .   .   .   .   .   4   4   4 TODO: correct timing
+pflushan  32  .     .     1111010100010000  ..........  . . . . S S .   .   .   .   .   4   4   4 TODO: correct timing
 pmmu      32  .     .     1111000.........  ..........  . . S S S S S   .   .   8   8   8   8   8
 ptest     32  .     .     1111010101.01...  ..........  . . . . S . .   .   .   .   .   8   .   .
 reset      0  .     .     0100111001110000  ..........  S S S S S S S   0   0   0   0   0   0   0
@@ -8214,6 +8215,16 @@ M68KMAKE_OP(pflush, 32, ., .)
 	m68ki_exception_1111(mc68kcpu);
 }
 
+M68KMAKE_OP(pflushan, 32, ., .)
+{
+	if ((CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type)) && ((mc68kcpu)->has_pmmu))
+	{
+		logerror("68040: unhandled PFLUSHAN\n");
+		return;
+	}
+	m68ki_exception_1111(mc68kcpu);
+}
+
 M68KMAKE_OP(pmmu, 32, ., .)
 {
 	if ((CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type)) && ((mc68kcpu)->has_pmmu))
@@ -9017,6 +9028,31 @@ rte_loop:
 				(mc68kcpu)->instr_mode = INSTRUCTION_YES;
 				(mc68kcpu)->run_mode = RUN_MODE_NORMAL;
 				return;
+			case 7: /* 68040 access error */
+				new_sr = m68ki_pull_16(mc68kcpu);
+				new_pc = m68ki_pull_32(mc68kcpu);
+				m68ki_fake_pull_16(mc68kcpu);	/* $06: format word */
+				m68ki_fake_pull_32(mc68kcpu);	/* $08: effective address */
+				m68ki_fake_pull_16(mc68kcpu);	/* $0c: special status word */
+				m68ki_fake_pull_16(mc68kcpu);	/* $0e: wb3s */
+				m68ki_fake_pull_16(mc68kcpu);	/* $10: wb2s */
+				m68ki_fake_pull_16(mc68kcpu);	/* $12: wb1s */
+				m68ki_fake_pull_32(mc68kcpu);	/* $14: data fault address */
+				m68ki_fake_pull_32(mc68kcpu);	/* $18: wb3a */
+				m68ki_fake_pull_32(mc68kcpu);	/* $1c: wb3d */
+				m68ki_fake_pull_32(mc68kcpu);	/* $20: wb2a */
+				m68ki_fake_pull_32(mc68kcpu);	/* $24: wb2d */
+				m68ki_fake_pull_32(mc68kcpu);	/* $28: wb1a */
+				m68ki_fake_pull_32(mc68kcpu);	/* $2c: wb1d/pd0 */
+				m68ki_fake_pull_32(mc68kcpu);	/* $30: pd1 */
+				m68ki_fake_pull_32(mc68kcpu);	/* $34: pd2 */
+				m68ki_fake_pull_32(mc68kcpu);	/* $38: pd3 */
+				m68ki_jump((mc68kcpu), new_pc);
+				m68ki_set_sr((mc68kcpu), new_sr);
+				(mc68kcpu)->instr_mode = INSTRUCTION_YES;
+				(mc68kcpu)->run_mode = RUN_MODE_NORMAL;
+				return;
+
 			case 0x0a: /* Bus Error at instruction boundary */
 				new_sr = m68ki_pull_16(mc68kcpu);
 				new_pc = m68ki_pull_32(mc68kcpu);

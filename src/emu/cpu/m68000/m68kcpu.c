@@ -801,7 +801,7 @@ static CPU_EXECUTE( m68k )
 	/* Make sure we're not stopped */
 	if(!m68k->stopped)
 	{
-		/* Return point if we had an address error */
+        /* Return point if we had an address error */
 		m68ki_set_address_error_trap(m68k); /* auto-disable (see m68kcpu.h) */
 
 		/* Main loop.  Keep going until we run out of clock cycles */
@@ -877,13 +877,19 @@ static CPU_EXECUTE( m68k )
 						/* Note: This is implemented for 68000 only! */
 						m68ki_stack_frame_buserr(m68k, sr);
 					}
-					else if (m68k->mmu_tmp_buserror_address == REG_PPC(m68k))
-					{
-						m68ki_stack_frame_1010(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC(m68k), m68k->mmu_tmp_buserror_address);
+					else if(!CPU_TYPE_IS_040_PLUS(m68k->cpu_type)) {
+						if (m68k->mmu_tmp_buserror_address == REG_PPC(m68k))
+						{
+							m68ki_stack_frame_1010(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC(m68k), m68k->mmu_tmp_buserror_address);
+						}
+						else
+						{
+							m68ki_stack_frame_1011(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC(m68k), m68k->mmu_tmp_buserror_address);
+						}
 					}
 					else
 					{
-						m68ki_stack_frame_1011(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC(m68k), m68k->mmu_tmp_buserror_address);
+						m68ki_stack_frame_0111(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC(m68k), m68k->mmu_tmp_buserror_address, true);
 					}
 
 					m68ki_jump_vector(m68k, EXCEPTION_BUS_ERROR);
