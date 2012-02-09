@@ -1210,17 +1210,18 @@ void info_xml_creator::output_slots()
          */
 
 		const slot_interface* intf = slot->get_slot_interfaces();
-		for (int i = 0; intf[i].name != NULL; i++)
-		{
-			fprintf(m_output, "\t\t\t<slotoption");
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
-			if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()))
+		if (intf)
+			for (int i = 0; intf[i].name != NULL; i++)
 			{
-				if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()) == intf[i].name)
-					fprintf(m_output, " default=\"yes\"");
+				fprintf(m_output, "\t\t\t<slotoption");
+				fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
+				if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()))
+				{
+					if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()) == intf[i].name)
+						fprintf(m_output, " default=\"yes\"");
+				}
+				fprintf(m_output, "/>\n");
 			}
-			fprintf(m_output, "/>\n");
-		}
 
 		fprintf(m_output, "\t\t</slot>\n");
 	}
