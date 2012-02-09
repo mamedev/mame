@@ -131,8 +131,6 @@ typedef struct _ide_config ide_config;
 struct _ide_config
 {
 	void	(*interrupt)(device_t *device, int state);
-	const char *master;		/* name of master region (defaults to device tag) */
-	const char *slave;		/* name of slave region (defaults to NULL) */
 	const char *bmcpu;		/* name of bus master CPU */
 	UINT32 bmspace;			/* address space of bus master transfer */
 };

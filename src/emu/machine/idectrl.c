@@ -2117,11 +2117,11 @@ void ide_hdd_image_device::device_start()
 
 void ide_hdd_image_device::device_reset()
 {
-	m_handle = subdevice<harddisk_image_device>("harddisk")->get_chd_file();	// should be config->master
+	m_handle = subdevice<harddisk_image_device>("harddisk")->get_chd_file();
 
 	if (m_handle)
 	{
-		m_disk = subdevice<harddisk_image_device>("harddisk")->get_hard_disk_file();	// should be config->master
+		m_disk = subdevice<harddisk_image_device>("harddisk")->get_hard_disk_file();
 
 		if (m_disk != NULL)
 		{
