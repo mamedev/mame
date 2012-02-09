@@ -2336,10 +2336,10 @@ struct stv_cart_region
 
 static const struct stv_cart_region stv_cart_table[] =
 {
-	{ "cart1", 0, "game0" },
-	{ "cart2", 1, "game1" },
-	{ "cart3", 2, "game2" },
-	{ "cart4", 3, "game3" },
+	{ ":cart1", 0, "game0" },
+	{ ":cart2", 1, "game1" },
+	{ ":cart3", 2, "game2" },
+	{ ":cart4", 3, "game3" },
 	{ 0 }
 };
 

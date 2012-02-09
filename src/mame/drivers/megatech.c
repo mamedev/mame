@@ -517,14 +517,14 @@ struct megatech_cart_region
 // we keep old region tags for compatibility with older macros... this might be changed at a later stage
 static const struct megatech_cart_region megatech_cart_table[] =
 {
-	{ "cart1", 0, "game0" },
-	{ "cart2", 1, "game1" },
-	{ "cart3", 2, "game2" },
-	{ "cart4", 3, "game3" },
-	{ "cart5", 4, "game4" },
-	{ "cart6", 5, "game5" },
-	{ "cart7", 6, "game6" },
-	{ "cart8", 7, "game7" },
+	{ ":cart1", 0, "game0" },
+	{ ":cart2", 1, "game1" },
+	{ ":cart3", 2, "game2" },
+	{ ":cart4", 3, "game3" },
+	{ ":cart5", 4, "game4" },
+	{ ":cart6", 5, "game5" },
+	{ ":cart7", 6, "game6" },
+	{ ":cart8", 7, "game7" },
 	{ 0 }
 };
 
