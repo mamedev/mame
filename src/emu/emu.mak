@@ -220,6 +220,9 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/msm6242.o		\
 	$(EMUMACHINE)/ncr539x.o 	\
 	$(EMUMACHINE)/nmc9306.o		\
+    $(EMUMACHINE)/nscsi_bus.o   \
+    $(EMUMACHINE)/nscsi_cd.o    \
+    $(EMUMACHINE)/nscsi_hd.o    \
 	$(EMUMACHINE)/nvram.o		\
 	$(EMUMACHINE)/pc16552d.o	\
 	$(EMUMACHINE)/pci.o			\
