@@ -16,7 +16,7 @@
 	</element>
 
 	<view name="Simple LEDs">
-		<bounds left="0" top="0" right="3.2" bottom="4.3" />
+		<bounds left="0" top="0" right="3.4" bottom="4.3" />
 
 
 		<bezel name="digit0" element="digit">
