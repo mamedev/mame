@@ -495,7 +495,14 @@ ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 
 	if( bWrite )
 	{
-		pC148Reg[(addr>>13)&0x1f] = data&0x0007;
+		int reg = (addr >> 13) & 0x1f;
+
+		// If writing an IRQ priority register, clear any pending IRQs.
+		// Dirt Fox and Winning Run require this behaviour
+		if (reg < 8)
+			device_set_input_line(&space->device(), pC148Reg[reg], CLEAR_LINE);
+
+		pC148Reg[reg] = data & 0x0007;
 	}
 
 	switch(addr)

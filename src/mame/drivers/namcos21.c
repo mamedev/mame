@@ -1523,6 +1523,7 @@ static MACHINE_START( namcos21 )
 	namcos2_kickstart = namcos21_kickstart;
 }
 
+
 static MACHINE_CONFIG_START( s21base, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(namcos21_68k_master)
@@ -1571,6 +1572,7 @@ static MACHINE_CONFIG_START( s21base, namcos21_state )
 	MCFG_VIDEO_START(namcos21)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_DERIVED( poly_c140_typeA, s21base )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1585,6 +1587,7 @@ static MACHINE_CONFIG_DERIVED( poly_c140_typeA, s21base )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_DERIVED( poly_c140_typeB, s21base )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1598,6 +1601,7 @@ static MACHINE_CONFIG_DERIVED( poly_c140_typeB, s21base )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
@@ -1653,7 +1657,8 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( winrun_c140_typeB, namcos21_state )
+
+static MACHINE_CONFIG_START( winrun_c140_typeA, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(am_master_winrun)
 	MCFG_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1701,7 +1706,7 @@ static MACHINE_CONFIG_START( winrun_c140_typeB, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("c140", C140, 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface_typeB)
+	MCFG_SOUND_CONFIG(C140_interface_typeA)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1709,6 +1714,15 @@ static MACHINE_CONFIG_START( winrun_c140_typeB, namcos21_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( winrun_c140_typeB, winrun_c140_typeA )
+	MCFG_SOUND_REPLACE("c140", C140, 8000000/374)
+	MCFG_SOUND_CONFIG(C140_interface_typeB)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+MACHINE_CONFIG_END
+
 
 ROM_START( aircomb )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
@@ -2096,6 +2110,72 @@ ROM_END
 
 ROM_START( winrun )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "wr2mpub.3k",  0x000000, 0x20000, CRC(3bb0ea17) SHA1(201cedf5865224c1c4a0c9b017982e36ec9b8243) )
+	ROM_LOAD16_BYTE( "wr2mplb.1k",  0x000001, 0x20000, CRC(95465062) SHA1(7d010ff92e87949b7b9109f8320ab61de7d0400a) )
+
+	ROM_REGION( 0x40000, "slave", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "wr1spu.6b",  0x000000, 0x20000, CRC(d4915d44) SHA1(57056051138b259d021b3e7cc1c43a9f951b5cc1) )
+	ROM_LOAD16_BYTE( "wr1spl.4b",  0x000001, 0x20000, CRC(0c336505) SHA1(edee073bf6fabe45c577b0b9375295183eb30c62) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "wr1snd0.7c",  0x00c000, 0x004000, CRC(698bae12) SHA1(86d22c1c639a9489e3c95820e4e3f04c30407e41) )
+	ROM_CONTINUE(            0x010000, 0x01c000 )
+	ROM_RELOAD(              0x010000, 0x020000 )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O MCU */
+	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
+	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+
+	ROM_REGION( 0x20000, "dsp", ROMREGION_ERASEFF ) /* DSP */
+
+	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
+	ROM_LOAD16_BYTE( "wr1gp0u.1k",  0x00000, 0x20000, CRC(c66a43be) SHA1(88ec02c5c18c8bb91a95934c14e9ae530ae09880) )
+	ROM_LOAD16_BYTE( "wr1gp0l.3k",  0x00001, 0x20000, CRC(91a70e6f) SHA1(e613e2544f63cd386588445a2a199ae6b84d741e) )
+	ROM_LOAD16_BYTE( "wr1gp1u.1l",  0x40000, 0x20000, CRC(8ff51a3d) SHA1(81fbcd4e8c51742f35607537e1b1a86fd7782827) )
+	ROM_LOAD16_BYTE( "wr1gp1l.3l",  0x40001, 0x20000, CRC(9360d34e) SHA1(e558eb540c02acfe84f2dfe2d65afd609b7f3207) )
+
+	ROM_REGION16_BE( 0x80000, "user1", 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "wr1d0u.3a", 0x00000, 0x20000, CRC(84ea1492) SHA1(56274b39bd5be076c9904d9ed9ce3f6e29d9f038) )
+	ROM_LOAD16_BYTE( "wr1d0l.1a", 0x00001, 0x20000, CRC(b81508f9) SHA1(51c03c3dff86cece9790667b1557de940ebccbe9) )
+	ROM_LOAD16_BYTE( "wr1d1u.3b", 0x40000, 0x20000, CRC(bbd1fdd7) SHA1(026e9410525fa0e93f155949bbc1d3b8a2785bd1) )
+	ROM_LOAD16_BYTE( "wr1d1l.1b", 0x40001, 0x20000, CRC(8ddd7eac) SHA1(b873b253b0a095e66a9f68d45a2cb41fa025ba16) )
+
+	ROM_REGION16_BE( 0x80000, "user2", 0 ) /* 3d objects */
+	ROM_LOAD16_BYTE( "wr1pt0u.8j", 0x00000, 0x20000, CRC(7ec4cf6b) SHA1(92ec92567b9f7321efb4a3724cbcdba216eb22f9) )
+	ROM_LOAD16_BYTE( "wr1pt0l.8d", 0x00001, 0x20000, CRC(58c14b73) SHA1(e34a26866cd870743e166669f7fa5915a82104e9) )
+
+	ROM_REGION16_BE( 0x100000, "user3", 0 ) /* bitmapped graphics */
+	ROM_LOAD16_BYTE( "wr1gd0u-2.1p",  0x00000, 0x40000, CRC(9752eef5) SHA1(d6df0faf9c2696247bdf463f53c1e474ec595dd0) )
+	ROM_LOAD16_BYTE( "wr1gd0l-2.3p",  0x00001, 0x40000, CRC(349c95cc) SHA1(8898eecf5918485ec683900520f123483077df28) )
+
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("wrvoi-0.11b", 0x040000, 0x40000, CRC(8040b645) SHA1(7ccafb3073fa79910e26cf9b8b6e8e9ae22e55fc) )
+	ROM_LOAD("wrvoi-1.11c", 0x0c0000, 0x40000, CRC(d347e904) SHA1(620cd07e6230322c306283e45a43fa1e217028d4) )
+	ROM_LOAD("wrvoi-2.11d", 0x140000, 0x40000, CRC(b34747af) SHA1(7e0b55631bffa0583bf4f7f5368db9f09e411ba1) )
+	ROM_LOAD("wrvoi-3.11e", 0x1c0000, 0x40000, CRC(43085303) SHA1(9f743055c20df3548879118194244e37a0b91f7e) )	
+
+	ROM_REGION( 0x1000, "pals", 0 )
+	/* Main PCB (2252960101) */
+	ROM_LOAD("sys87b-2.3w", 0x000, 0x104, CRC(18f43c22) SHA1(72849c5b842678bb9037541d26d4c99cdf879982) ) /* PAL16L8ACN */
+	ROM_LOAD("wr-c1.6p",    0x000, 0x040, CRC(d6c33258) SHA1(5baf71fae1ad73a75d91ee2dededca2254b4f414) ) /* PAL12L10CNS */
+	ROM_LOAD("wr-c2.8k",    0x000, 0x040, CRC(a3e77ade) SHA1(b4282fc4d21ce7813aba7772a85d721fb25144b6) ) /* PAL12L10CNS */
+
+	/* Framebuffer PCB (2252960900) */
+	ROM_LOAD("wr-g1.3a",    0x000, 0x104, CRC(d6b4373d) SHA1(b4db4526a37b7d6862cec1d223f2281e5120f225) ) /* PAL16L8ACN */
+	ROM_LOAD("wr-g2b.4p",   0x000, 0x104, NO_DUMP ) /* PAL16L8ACN */
+	ROM_LOAD("wr-g3.4s",    0x000, 0x104, NO_DUMP ) /* GAL20V8 */
+	ROM_LOAD("wr-g4.7f",    0x000, 0x104, CRC(f858b32b) SHA1(59af496e4416c9becb116315542858ac917cbe46) ) /* PAL16L8ACN */
+
+	/* 3D PCB (2252960701) */
+	ROM_LOAD("wr-p1.1b",    0x000, 0x104, CRC(5856cc43) SHA1(4578c7a7d731c61d678d594dd071370db46cc3f7) ) /* PAL16L8ACN */
+
+	/* DSP PCB (2252960601) */
+	ROM_LOAD("wr-d1.3b",    0x000, 0x104, CRC(7a072b71) SHA1(45b8d9405a2c1a40f2cd9c6a33d105565136c538) ) /* PAL16L8ACN */
+	ROM_LOAD("wr-d2.4j",    0x000, 0x104, CRC(614de474) SHA1(80c3ab287896e07073a70dd42e7b47f515dd3931) ) /* PAL16L8ACN */
+ROM_END
+
+ROM_START( winrungp )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_BYTE( "sg1-mp-ub.3k",  0x000000, 0x20000, CRC(7f9b855a) SHA1(6d39a3a9959dbcd0047dbaab0fcd68adc81f5508) )
 	ROM_LOAD16_BYTE( "sg1-mp-lb.1k",  0x000001, 0x20000, CRC(a45e8543) SHA1(f9e583a988e4661026ee7873a48d078225778df3) )
 
@@ -2450,15 +2530,15 @@ static INPUT_PORTS_START( aircombt )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/*    YEAR, NAME,     PARENT,  MACHINE,           INPUT,        INIT,     MONITOR,  COMPANY,   FULLNAME,                       FLAGS */
-GAME( 1992, aircomb,  0,       poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (US)",	             GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, aircombj, aircomb, poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (Japan)",            GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsled,  0,       poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (US)",               GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsledj, cybsled, poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",            GAME_IMPERFECT_GRAPHICS )
-/* 1992, ShimDrive */
-GAME( 1991, solvalou, 0,       poly_c140_typeA,   s21default,   solvalou, ROT0,    "Namco", "Solvalou (Japan)",              GAME_IMPERFECT_GRAPHICS )
+/*    YEAR, NAME,     PARENT,  MACHINE,           INPUT,        INIT,     MONITOR,  COMPANY,   FULLNAME,                             FLAGS */
+GAME( 1988, winrun,   0,       winrun_c140_typeA, winrun,       winrun,   ROT0,    "Namco", "Winning Run",                           GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, winrungp, 0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, winrun91, 0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run 91 (Japan)",                GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, driveyes, 0,       driveyes,          winrun,       driveyes, ROT0,    "Namco", "Driver's Eyes (US)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, solvalou, 0,       poly_c140_typeA,   s21default,   solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, starblad, 0,       poly_c140_typeA,   s21default,   starblad, ROT0,    "Namco", "Starblade (Japan)",                     GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, winrun91, 0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run 91 (Japan)",                GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, winrun,   0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-/* 1988, Winning Run */
-GAME( 1991, driveyes, 0,       driveyes,          winrun,       driveyes, ROT0,    "Namco", "Driver's Eyes (US)",                 GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+/* 1992, ShimDrive */
+GAME( 1992, aircomb,  0,       poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (US)",	                     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, aircombj, aircomb, poly_c140_typeB,   aircombt,     aircombt, ROT0,    "Namco", "Air Combat (Japan)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, cybsled,  0,       poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (US)",                       GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, cybsledj, cybsled, poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    GAME_IMPERFECT_GRAPHICS )
