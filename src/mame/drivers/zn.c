@@ -1476,7 +1476,7 @@ static MACHINE_RESET( coh1000w )
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 	MCFG_MACHINE_RESET( coh1000w )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", atpsx_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", atpsx_interrupt, ide_devices, "hdd", NULL)
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( atpsx_dma_read ), (zn_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( atpsx_dma_write ), (zn_state *) owner ) )
 MACHINE_CONFIG_END
@@ -2160,7 +2160,7 @@ static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 
 	MCFG_MACHINE_RESET( coh1000a )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", jdredd_ide_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", jdredd_ide_interrupt, ide_devices, "hdd", NULL)
 MACHINE_CONFIG_END
 
 /*
@@ -4478,7 +4478,7 @@ ROM_START( bam2 )
 
 	ROM_REGION32_LE( 0x0400000, "user3", ROMREGION_ERASE00 )
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE("bam2", 0, SHA1(634d9a745a82c567fc4d7ce48e3570d88326c5f9) )
 ROM_END
 
@@ -4502,7 +4502,7 @@ ROM_START( primrag2 )
 	ROM_LOAD16_BYTE( "pr2_036.u17",  0x100001, 0x080000, CRC(3681516c) SHA1(714f73ea4ac190c36a6eb2308616a4aecabc4e69) )
 	ROM_LOAD16_BYTE( "pr2_036.u15",  0x100000, 0x080000, CRC(4b24bd54) SHA1(7f27cd524d10e5869aab6d4dc6a4217d049c475d) )
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "primrag2", 0, SHA1(bc615068ddf4fd967f770ee01c02f285c052c4c5) )
 ROM_END
 
@@ -4554,7 +4554,7 @@ ROM_START( jdredd )
 	ROM_LOAD16_BYTE( "j-dread.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) )
 	ROM_LOAD16_BYTE( "j-dread.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) )
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "jdreddc", 0, SHA1(eee205f83e5f590f8baf36452c873d7063156bd0) )
 ROM_END
 
@@ -4565,7 +4565,7 @@ ROM_START( jdreddb )
 	ROM_LOAD16_BYTE( "j-dread.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) )
 	ROM_LOAD16_BYTE( "j-dread.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) )
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "jdreddb", 0, SHA1(20f696fa6e1fbf97793bac2a794631c5dd4fb39a) )
 ROM_END
 

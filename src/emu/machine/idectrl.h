@@ -17,18 +17,115 @@
 #include "devlegcy.h"
 
 #include "harddisk.h"
+#include "imagedev/harddriv.h"
 
+#define IDE_DISK_SECTOR_SIZE			512
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-typedef struct _ide_hardware ide_hardware;
-struct _ide_hardware
+// ======================> ide_device_interface
+
+class ide_device_interface : public device_slot_card_interface
 {
-	void	(*get_info)(device_t *device, UINT8 *buffer, UINT16 &cylinders, UINT8 &sectors, UINT8 &heads);
-	int		(*read_sector)(device_t *device, UINT32 lba, void *buffer);
-	int		(*write_sector)(device_t *device, UINT32 lba, const void *buffer);
+public:
+	ide_device_interface(const machine_config &mconfig, device_t &device);
+public:
+	virtual int	 read_sector(UINT32 lba, void *buffer) = 0;
+	virtual int	 write_sector(UINT32 lba, const void *buffer) = 0;
+	
+	UINT8 *get_features() { return m_features;} 
+
+	UINT16 get_cylinders() { return m_num_cylinders; }
+	UINT16 get_sectors() { return m_num_sectors; }
+	UINT16 get_heads() { return m_num_heads; }
+	void set_geometry(UINT8 sectors, UINT8 heads) { m_num_sectors= sectors; m_num_heads=heads; }
+	virtual bool is_ready() { return true; }
+	virtual void read_key(UINT8 key[]) { }
+protected:
+	UINT8			m_features[IDE_DISK_SECTOR_SIZE];
+	UINT16			m_num_cylinders;
+	UINT8			m_num_sectors;
+	UINT8			m_num_heads;
 };
+
+// ======================> ide_slot_device
+
+class ide_slot_device :	public device_t,
+						public device_slot_interface
+{
+public:
+	// construction/destruction
+	ide_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	int	 read_sector(UINT32 lba, void *buffer) { return (m_dev) ? m_dev->read_sector(lba,buffer) : 0; }
+	int	 write_sector(UINT32 lba, const void *buffer) { return (m_dev) ? m_dev->write_sector(lba,buffer) : 0; }	
+	UINT8 *get_features() { return (m_dev) ? m_dev->get_features() : NULL;} 
+
+	UINT16 get_cylinders() { return (m_dev) ? m_dev->get_cylinders() : 0; }
+	UINT16 get_sectors() { return (m_dev) ? m_dev->get_sectors() : 0; }
+	UINT16 get_heads() { return (m_dev) ? m_dev->get_heads() : 0; }	
+	void set_geometry(UINT8 sectors, UINT8 heads) { if (m_dev) m_dev->set_geometry(sectors,heads); }
+	bool is_ready() { return (m_dev) ? m_dev->is_ready() : false; }
+	void read_key(UINT8 key[]) { if (m_dev) m_dev->read_key(key); }
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete();
+private:
+	ide_device_interface *m_dev;
+};
+
+// device type definition
+extern const device_type IDE_SLOT;
+
+// ======================> ide_hdd_device
+
+class ide_hdd_device : public device_t,
+					   public ide_device_interface
+{
+public:
+    // construction/destruction
+    ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual int	 read_sector(UINT32 lba, void *buffer) { return hard_disk_read(m_disk, lba, buffer); }
+	virtual int	 write_sector(UINT32 lba, const void *buffer) { return hard_disk_write(m_disk, lba, buffer); }
+	virtual void read_key(UINT8 key[]);
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+	
+	void ide_build_features();
+	virtual bool is_ready() { return (m_disk != NULL); }
+protected:
+	chd_file       *m_handle;
+	hard_disk_file *m_disk;
+};
+// device type definition
+extern const device_type IDE_HARDDISK;
+
+// ======================> ide_hdd_image_device
+
+class ide_hdd_image_device : public ide_hdd_device
+{
+public:
+    // construction/destruction
+    ide_hdd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+// device type definition
+extern const device_type IDE_HARDDISK_IMAGE;
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef struct _ide_config ide_config;
 struct _ide_config
@@ -38,30 +135,30 @@ struct _ide_config
 	const char *slave;		/* name of slave region (defaults to NULL) */
 	const char *bmcpu;		/* name of bus master CPU */
 	UINT32 bmspace;			/* address space of bus master transfer */
-	const ide_hardware *hardware;	/* connected to hardware that is not an hard disk */
 };
 
 
+SLOT_INTERFACE_EXTERN(ide_devices);
+SLOT_INTERFACE_EXTERN(ide_image_devices);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_IDE_CONTROLLER_ADD(_tag, _callback) \
+#define MCFG_IDE_CONTROLLER_ADD(_tag, _callback, _slotintf, _master, _slave) \
 	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, interrupt, _callback)
+	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, interrupt, _callback) \
+	MCFG_IDE_SLOT_ADD("drive_0", _slotintf, _master, NULL) \
+	MCFG_IDE_SLOT_ADD("drive_1", _slotintf, _slave, NULL) \
 
-#define MCFG_IDE_CONTROLLER_REGIONS(_master, _slave) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, master, _master) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, slave,  _slave)
-
-#define MCFG_IDE_BUS_MASTER_SPACE(_cpu, _space) \
+#define MCFG_IDE_BUS_MASTER_SPACE(_tag, _cpu, _space) \
+	MCFG_DEVICE_MODIFY(_tag) \
 	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, bmcpu, _cpu) \
 	MCFG_DEVICE_CONFIG_DATA32(ide_config, bmspace, AS_##_space)
 
-#define MCFG_IDE_CONNECTED_TO(_hardware) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, hardware, _hardware) \
-
+#define MCFG_IDE_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
+	MCFG_DEVICE_ADD(_tag, IDE_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
 
 /***************************************************************************
     FUNCTION PROTOTYPES

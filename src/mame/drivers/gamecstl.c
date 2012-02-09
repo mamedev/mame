@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 
 	MCFG_PIC8259_ADD( "pic8259_2", gamecstl_pic8259_2_config )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
@@ -786,7 +786,7 @@ ROM_START(gamecstl)
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "gamecstl", 0, SHA1(b431af3c42c48ba07972d77a3d24e60ee1e4359e) )
 ROM_END
 
@@ -797,7 +797,7 @@ ROM_START(gamecst2)
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "gamecst2", 0, SHA1(14e1b311cb474801c7bdda3164a0c220fb102159) )
 ROM_END
 

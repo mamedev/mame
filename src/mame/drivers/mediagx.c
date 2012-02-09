@@ -1147,7 +1147,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
 
 	MCFG_TIMER_ADD("sound_timer", sound_timer_callback)
 
@@ -1326,7 +1326,7 @@ ROM_START( a51site4 )
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "a51site4", 0, SHA1(48496666d1613700ae9274f9a5361ea5bbaebea0) )
 ROM_END
 

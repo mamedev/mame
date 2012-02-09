@@ -716,7 +716,7 @@ static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_PCI_BUS_DEVICE( 0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_DEVICE(31, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
@@ -731,7 +731,7 @@ ROM_START( offrthnd )
 //  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 //  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
-	DISK_REGION( "disk" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "offrthnd", 0, SHA1(d88f1c5b75361a1e310565a8a5a09c674a4a1a22) )
 ROM_END
 
@@ -743,7 +743,7 @@ ROM_START( hydrthnd )
 //  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 //  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
-	DISK_REGION( "disk" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "hydro", 0,  SHA1(d481d178782943c066b41764628a419cd55f676d) )
 ROM_END
 
@@ -755,7 +755,7 @@ ROM_START( arctthnd )
 //  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 //  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
-	DISK_REGION( "disk" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "arctthnd", 0,  SHA1(f4373e57c3f453ac09c735b5d8d99ff811416a23) )
 ROM_END
 
@@ -768,7 +768,7 @@ ROM_START( arctthndult )
 //  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 //  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
-	DISK_REGION( "disk" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
 ROM_END
 

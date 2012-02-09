@@ -897,7 +897,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_MACHINE_RESET( twinkle )
 	MCFG_I2CMEM_ADD("security",i2cmem_interface)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL)
 	MCFG_RTC65271_ADD("rtc", twinkle_rtc)
 
 	/* video hardware */
@@ -995,7 +995,7 @@ ROM_START( bmiidx )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY("863jaa04", 0, SHA1(8f6a0d2e191153032c9388b5298d8ee531b22a41) )
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE_READONLY("c44jaa03", 0, SHA1(53e9bd25d1674a04aeec81c0224b4e4e44af802a) )	// was part of a 1st mix machine, but "c44" indicates 8th mix?
 ROM_END
 

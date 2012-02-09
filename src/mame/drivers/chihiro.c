@@ -822,32 +822,76 @@ static void ide_interrupt(device_t *device, int state)
 	pic8259_ir6_w(chihiro_devices.pic8259_2, state); // IRQ 14
 }
 
-void get_info(device_t *device, UINT8 *buffer, UINT16 &cylinders, UINT8 &sectors, UINT8 &heads)
+// ======================> ide_baseboard_device
+
+class ide_baseboard_device : public ide_hdd_device
 {
-	cylinders=65535;
-	sectors=255;
-	heads=255;
+public:
+    // construction/destruction
+    ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	virtual int	 read_sector(UINT32 lba, void *buffer);
+	virtual int	 write_sector(UINT32 lba, const void *buffer);
+	virtual bool is_ready() { return true; }
+	virtual void read_key(UINT8 key[]) { }
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+};
+
+//**************************************************************************
+//  IDE HARD DISK IMAGE DEVICE
+//**************************************************************************
+
+// device type definition
+const device_type IDE_BASEBOARD = &device_creator<ide_baseboard_device>;
+
+//-------------------------------------------------
+//  ide_baseboard_device - constructor
+//-------------------------------------------------
+
+ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : ide_hdd_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock)
+{
 }
 
-int read_sector(device_t *device, UINT32 lba, void *buffer)
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ide_baseboard_device::device_start()
+{
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ide_baseboard_device::device_reset()
+{
+	m_num_cylinders=65535;
+	m_num_sectors=255;
+	m_num_heads=255;
+	ide_build_features();
+}
+
+int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 {
 	int off;
 	UINT8 *data;
 
 	logerror("baseboard: read sector lba %08x\n",lba);
 	off=(lba&0x7ff)*512;
-	data=device->machine().region("others")->base();
+	data=machine().region("others")->base();
 	memcpy(buffer,data+off,512);
 	return 1;
 }
-
-int write_sector(device_t *device, UINT32 lba, const void *buffer)
+int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
 {
 	logerror("baseboard: write sector lba %08x\n",lba);
 	return 1;
 }
-
-ide_hardware baseboard={get_info,read_sector,write_sector};
 
 /*
  * PIC & PIT
@@ -1107,6 +1151,10 @@ static MACHINE_START( chihiro )
 		debug_console_register_command(machine,"chihiro",CMDFLAG_NONE,0,1,4,chihiro_debug_commands);
 }
 
+static SLOT_INTERFACE_START(ide_baseboard)
+	SLOT_INTERFACE("bb", IDE_BASEBOARD)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( chihiro_base, driver_device )
 
 	/* basic machine hardware */
@@ -1128,9 +1176,8 @@ static MACHINE_CONFIG_START( chihiro_base, driver_device )
 	MCFG_PIC8259_ADD( "pic8259_1", chihiro_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", chihiro_pic8259_2_config )
 	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt )
-	MCFG_IDE_BUS_MASTER_SPACE( "maincpu", PROGRAM )
-	MCFG_IDE_CONNECTED_TO( &baseboard )
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt , ide_baseboard, "bb", NULL)
+	MCFG_IDE_BUS_MASTER_SPACE( "ide", "maincpu", PROGRAM )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

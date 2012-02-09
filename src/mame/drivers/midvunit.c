@@ -1057,7 +1057,7 @@ static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 	MCFG_DEVICE_REMOVE("nvram")
 	MCFG_NVRAM_HANDLER(midway_serial_pic2)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", NULL, ide_devices, "hdd", NULL)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
@@ -1618,7 +1618,7 @@ ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "wargods", 0, SHA1(141063f95867fdcc4b15c844e510696604a70c6a) )
 ROM_END
 
