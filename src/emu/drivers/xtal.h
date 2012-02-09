@@ -177,7 +177,7 @@ enum
 	XTAL_36MHz  		= 36000000,		/* Sega Model 1 video board */
 	XTAL_38_76922MHz	= 38769220,		/* Namco System 21 video board */
 	XTAL_40MHz  		= 40000000,
-        XTAL_42MHz  		= 42000000,		/* BMC A-00211 - Popo Bear */
+	XTAL_42MHz			= 42000000,		/* BMC A-00211 - Popo Bear */
 	XTAL_42_9545MHz 	= 42954545,		/* CPS3 */
 	XTAL_44_1MHz		= 44100000,		/* Subsino's Bishou Jan */
 	XTAL_45MHz  		= 45000000,		/* Eolith with Hyperstone CPUs */
@@ -198,9 +198,9 @@ enum
 	XTAL_67_7376MHz 	= 67737600,		/* PSX-based h/w, Sony ZN1-2-based */
 	XTAL_72_576MHz  	= 72576000,		/* Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede" */
 	XTAL_73_728MHz  	= 73728000,		/* Ms. Pac-Man/Galaga 20th Anniversary */
-	XTAL_100MHz 		= 100000000,		/* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
-	XTAL_101_4912MHz	= 101491200,		/* PSX-based Namco System 10 */
-	XTAL_200MHz			= 200000000,		/* Base SH4 CPU (Naomi, Hikaru etc.) */
+	XTAL_100MHz 		= 100000000,	/* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
+	XTAL_101_4912MHz	= 101491200,	/* PSX-based Namco System 10 */
+	XTAL_200MHz			= 200000000,	/* Base SH4 CPU (Naomi, Hikaru etc.) */
 
 /* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 
