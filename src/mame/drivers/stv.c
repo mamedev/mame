@@ -2276,7 +2276,20 @@ ROM_START( pclub2kc ) // set to 1p
 	ROM_LOAD( "pclub2kc.nv", 0x0000, 0x0080, CRC(064366fe) SHA1(b85489ae19ddc0fbd67b441a6967f10a6cd22d45) )
 ROM_END
 
+ROM_START( pclb2elk ) // set to 1p
+	STV_BIOS
 
+	ROM_REGION32_BE( 0x3000000, "game0", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "pclb2elk_ic22",    0x0200000, 0x0200000, CRC(2faed82a) SHA1(035ef25dd974679e46a79e408ee284eca0310557) ) // OK (tested as IC7)
+	ROM_LOAD16_WORD_SWAP( "pclb2elk_ic24",    0x0400000, 0x0200000, CRC(9cacfb7b) SHA1(1c68e1ba077e02ded0f388b4e9ad24998a5d8a48) ) // OK (tested as IC2)
+	ROM_LOAD16_WORD_SWAP( "pclb2elk_ic26",    0x0600000, 0x0200000, CRC(533a189e) SHA1(23a08a9ab02b21d6c75c770f4adc33c6dfe98a4e) ) // OK (tested as IC2)
+	ROM_LOAD16_WORD_SWAP( "pclb2elk_ic28",    0x0800000, 0x0200000, CRC(1f0c9113) SHA1(b65fc9012cb159c374674cde1fd2fb2cf192e7c5) ) // OK (tested as IC3)
+	ROM_LOAD16_WORD_SWAP( "pclb2elk_ic30",    0x0a00000, 0x0200000, CRC(0e188b8c) SHA1(8574f884fbeb2f428913c24e147ee8753305ce86) ) // OK (tested as IC3)
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "pclb2elk.nv", 0x0000, 0x0080, CRC(54c7564f) SHA1(574dcc5e8fe4aac091fee1476347485ed660eddd) )
+ROM_END
 
 
 GAME( 1996, stvbios,   0,       stv_slot, stv,      stv,        ROT0,   "Sega",                         "ST-V Bios", GAME_IS_BIOS_ROOT )
@@ -2344,8 +2357,7 @@ GAME( 1999, pclubol,   stvbios, stv,      stv,      stv,        ROT0,   "Atlus",
 GAME( 1999, pclub2v3,  pclub2,  stv,      stv,		stv,    	ROT0,   "Atlus",	    				"Print Club 2 Vol. 3 (U 990310 V1.000)", GAME_NOT_WORKING )
 GAME( 1999, pclubpok,  stvbios, stv,      stv,      stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", GAME_NOT_WORKING )
 GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", GAME_NOT_WORKING )
-
-
+GAME( 1997, pclb2elk,  stvbios, stv,      stv,      stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", GAME_NOT_WORKING )
 
 
 /* Doing something.. but not enough yet */

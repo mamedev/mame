@@ -8887,8 +8887,9 @@ ROM_START( sbp ) /* Unlicensed, no official game ID # */
 
 	NEO_BIOS_AUDIO_512K( "1b.bin", CRC(7b1f86f7) SHA1(15b6af7f9fbd0f1f6a1ecd912200ca8d0af2da2a) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
-	ROM_LOAD( "sbp.snd", 0x000000, 0x080000, NO_DUMP )
+	ROM_REGION( 0x800000, "ymsnd", 0 )
+	ROM_LOAD( "12a.bin", 0x000000, 0x400000, CRC(c96723b9) SHA1(52eec88550781d45f84efbf9b905d7e7912e96fa) )
+	ROM_LOAD( "13a.bin", 0x400000, 0x400000, CRC(08c339a5) SHA1(badc9510ae243ef2a7877977eb36efa81b1489fe) ) 
 
 	NO_DELTAT_REGION
 
