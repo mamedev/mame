@@ -25,6 +25,7 @@ KR2-KR6 : VOICE
 Information:
 http://www.wshin.com/games/review/ka/kung-fu-roushi.htm
 http://www.youtube.com/watch?v=ssEfw-RbSjs
+http://www.youtube.com/watch?v=1YacVjpUG8g
 
 
 ----------------------------------------------------------------
@@ -35,6 +36,8 @@ http://www.youtube.com/watch?v=ssEfw-RbSjs
 #include "cpu/m6809/m6809.h"
 #include "sound/msm5205.h"
 #include "machine/8255ppi.h"
+
+#include "kungfur.lh"
 
 
 class kungfur_state : public driver_device
@@ -406,4 +409,4 @@ ROM_START( kungfur )
 	ROM_LOAD( "kr6.bin",   0x00000, 0x10000, CRC(9ea75d4a) SHA1(57445ccb961acb11a25cdac81f2e543d92bcb7f9) )
 ROM_END
 
-GAME( 1987, kungfur,  0,       kungfur,  kungfur,  0, ROT0, "Namco", "Kung Fu Roushi", GAME_NOT_WORKING | GAME_MECHANICAL)
+GAMEL(1987, kungfur,  0,       kungfur,  kungfur,  0, ROT0, "Namco", "Kung-Fu Roshi", GAME_NOT_WORKING, layout_kungfur)

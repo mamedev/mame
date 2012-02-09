@@ -1997,6 +1997,8 @@ $(DRIVERS)/kas89.o:	$(LAYOUT)/kas89.lh
 
 $(DRIVERS)/kingdrby.o:	$(LAYOUT)/kingdrby.lh
 
+$(DRIVERS)/kungfur.o:	$(LAYOUT)/kungfur.lh
+
 $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
 
 $(DRIVERS)/luckgrln.o:	$(LAYOUT)/luckgrln.lh
