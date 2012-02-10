@@ -330,11 +330,11 @@ static MACHINE_CONFIG_START( kungfur, kungfur_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("adpcm1", MSM5205, XTAL_384kHz)	// clock verified with recording
 	MCFG_SOUND_CONFIG(msm5205_config_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("adpcm2", MSM5205, XTAL_384kHz)	// clock verified with recording
+	MCFG_SOUND_ADD("adpcm2", MSM5205, XTAL_384kHz)	// "
 	MCFG_SOUND_CONFIG(msm5205_config_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
