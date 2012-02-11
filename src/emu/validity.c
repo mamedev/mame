@@ -1139,7 +1139,7 @@ void validity_checker::validate_slots()
 	{
 		// iterate over interfaces
 		const slot_interface *intf = slot->get_slot_interfaces();
-		for (int j = 0; intf[j].name != NULL; j++)
+		for (int j = 0; intf && intf[j].name != NULL; j++)
 		{
 			// instantiate the device
 			device_t *dev = (*intf[j].devtype)(*m_current_config, "dummy", &m_current_config->root_device(), 0);

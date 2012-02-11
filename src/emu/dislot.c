@@ -10,6 +10,9 @@
 device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device)
 {
+	m_default_card = 0;
+	m_input_defaults = 0;
+	m_slot_interfaces = 0;
 }
 
 device_slot_interface::~device_slot_interface()

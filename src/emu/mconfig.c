@@ -141,6 +141,33 @@ screen_device *machine_config::first_screen() const
 
 device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, UINT32 clock)
 {
+	const char *orig_tag = tag;
+
+	// if the device path is absolute, start from the root
+	if (tag[0] == ':')
+	{
+		tag++;
+		owner = m_root_device;
+	}
+
+	// go down the path until we're done with it
+	while (strchr(tag, ':'))
+	{
+		const char *next = strchr(tag, ':');
+		assert(next != tag);
+		astring part(tag, next-tag);
+		device_t *curdevice;
+		for (curdevice = owner->m_subdevice_list.first(); curdevice != NULL; curdevice = curdevice->next())
+			if (part == curdevice->m_basetag)
+				break;
+		if (!curdevice)
+			throw emu_fatalerror("Could not find %s when looking up path for device %s\n",
+								 part.cstr(), orig_tag);
+		owner = curdevice;
+		tag = next+1;
+	}
+	assert(tag[0]);
+
 	// if there's an owner, let the owner do the work
 	if (owner != NULL)
 		return owner->add_subdevice(type, tag, clock);
