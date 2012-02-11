@@ -171,6 +171,7 @@ static struct
 	UINT8 rgb8_en;
 	UINT8 rgb15_en;
 	UINT8 rgb16_en;
+	UINT8 rgb24_en;
 	UINT8 rgb32_en;
 	UINT8 id;
 }svga;
@@ -178,6 +179,10 @@ static struct
 static struct
 {
 	UINT8 reg_3d8;
+	UINT8 dac_ctrl;
+	UINT8 dac_state;
+	UINT8 horz_overflow;
+	UINT8 aux_ctrl;
 	bool ext_reg_ena;
 }et4k;
 
@@ -647,6 +652,47 @@ static void svga_vh_rgb16(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	}
 }
 
+static void svga_vh_rgb24(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	#define MD(x) (vga.memory[x]+(vga.memory[x+1]<<8)+(vga.memory[x+2]<<16))
+	#define ID 0xff000000
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int xi;
+	int yi;
+	int xm;
+	int pos, line, column, c, addr, curr_addr;
+	UINT32 *bitmapline;
+
+//  UINT16 mask_comp;
+
+	/* line compare is screen sensitive */
+//  mask_comp = 0xff | (TLINES & 0x300);
+	curr_addr = 0;
+	yi=0;
+	for (addr = TGA_START_ADDRESS<<1, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
+	{
+		bitmapline = &bitmap.pix32(line);
+		addr %= vga.svga_intf.vram_size;
+		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=24)
+		{
+			if(pos + 24 > 0x100000)
+				return;
+			for(xi=0,xm=0;xi<8;xi++,xm+=3)
+			{
+				int r,g,b;
+
+				if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+					continue;
+
+				r = (MD(pos+xm)&0xff0000)>>16;
+				g = (MD(pos+xm)&0x00ff00)>>8;
+				b = (MD(pos+xm)&0x0000ff)>>0;
+				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
+			}
+		}
+	}
+}
+
 static void svga_vh_rgb32(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	#define MD(x) (vga.memory[x]+(vga.memory[x+1]<<8)+(vga.memory[x+2]<<16))
@@ -699,6 +745,7 @@ enum
 	RGB8_MODE,
 	RGB15_MODE,
 	RGB16_MODE,
+	RGB24_MODE,
 	RGB32_MODE,
 	SVGA_HACK
 };
@@ -745,6 +792,10 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 		else if (svga.rgb32_en)
 		{
 			return RGB32_MODE;
+		}
+		else if (svga.rgb24_en)
+		{
+			return RGB24_MODE;
 		}
 		else if (svga.rgb16_en)
 		{
@@ -816,6 +867,7 @@ SCREEN_UPDATE_RGB32( pc_video )
 		case RGB8_MODE:    svga_vh_rgb8 (screen.machine(), bitmap, cliprect); break;
 		case RGB15_MODE:   svga_vh_rgb15(screen.machine(), bitmap, cliprect); break;
 		case RGB16_MODE:   svga_vh_rgb16(screen.machine(), bitmap, cliprect); break;
+		case RGB24_MODE:   svga_vh_rgb24(screen.machine(), bitmap, cliprect); break;
 		case RGB32_MODE:   svga_vh_rgb32(screen.machine(), bitmap, cliprect); break;
 		case SVGA_HACK:    vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, &w, &h); break;
 	}
@@ -896,32 +948,34 @@ static UINT8 crtc_reg_read(UINT8 index)
 }
 #endif
 
-static void recompute_params(running_machine &machine)
+static void recompute_params_clock(running_machine &machine, int divisor, int xtal)
 {
 	int vblank_period,hblank_period;
 	attoseconds_t refresh;
-	UINT8 hclock_m;
+	UINT8 hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
 	int pixel_clock;
-
-	hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
 
 	/* safety check */
 	if(!vga.crtc.horz_disp_end || !vga.crtc.vert_disp_end || !vga.crtc.horz_total || !vga.crtc.vert_total)
 		return;
 
-	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * hclock_m)-1, 0, vga.crtc.vert_disp_end);
+	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * ((float)(hclock_m)/divisor))-1, 0, vga.crtc.vert_disp_end);
 
 	vblank_period = (vga.crtc.vert_total + 2);
-	hblank_period = ((vga.crtc.horz_total + 5) * hclock_m);
+	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
 
 	/* TODO: 10b and 11b settings aren't known */
-	pixel_clock  = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
-	pixel_clock /=	(((vga.sequencer.data[1]&8) >> 3) + 1);
+	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
 
 	machine.primary_screen->configure((hblank_period), (vblank_period), visarea, refresh );
 //  popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
+}
+
+static void recompute_params(running_machine &machine)
+{
+	recompute_params_clock(machine, 1, (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz);
 }
 
 static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
@@ -933,7 +987,7 @@ static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 	switch(index)
 	{
 		case 0x00:
-			vga.crtc.horz_total = (data & 0xff);
+			vga.crtc.horz_total = (vga.crtc.horz_total & ~0xff) | (data & 0xff);
 			recompute_params(machine);
 			break;
 		case 0x01:
@@ -1758,6 +1812,64 @@ Tseng ET4000k implementation
 
 ******************************************/
 
+static void tseng_define_video_mode(running_machine &machine)
+{
+	int divisor;
+	int xtal; 
+	svga.rgb8_en = 0;
+	svga.rgb15_en = 0;
+	svga.rgb16_en = 0;
+	svga.rgb24_en = 0;
+	switch(((et4k.aux_ctrl << 1) & 4)|(vga.miscellaneous_output & 0xc)>>2)
+	{
+		case 0:
+			xtal = XTAL_25_1748MHz;
+			break;
+		case 1:
+			xtal = XTAL_28_63636MHz;
+			break;
+		case 2:
+			xtal = 16257000*2; //2xEGA clock
+			break;
+		case 3:
+			xtal = XTAL_40MHz;
+			break;
+		case 4:
+			xtal = XTAL_36MHz;
+			break;
+		case 5:
+			xtal = XTAL_45MHz;
+			break;
+		case 6:
+			xtal = 31000000;
+			break;
+		case 7:
+			xtal = 38000000;
+			break;
+	}
+	switch(et4k.dac_ctrl & 0xe0)
+	{
+		case 0xa0:
+			svga.rgb15_en = 1;
+			divisor = 2;
+			break;
+		case 0xe0:
+			svga.rgb16_en = 1;
+			divisor = 2;
+			break;
+		case 0x60:
+			svga.rgb24_en = 1;
+			divisor = 3;
+			xtal *= 2.0f/3.0f;
+			break;
+		default:
+			svga.rgb8_en = (!(vga.sequencer.data[1] & 8) && (vga.sequencer.data[4] & 8) && vga.gc.shift256 && vga.crtc.div2 && GRAPHIC_MODE);
+			divisor = 1;
+			break;
+	}
+	recompute_params_clock(machine, divisor, xtal);
+}	
+
 static UINT8 tseng_crtc_reg_read(running_machine &machine, UINT8 index)
 {
 	UINT8 res;
@@ -1769,6 +1881,12 @@ static UINT8 tseng_crtc_reg_read(running_machine &machine, UINT8 index)
 	{
 		switch(index)
 		{
+			case 0x34:
+				res = et4k.aux_ctrl;
+				break;
+			case 0x3f:
+				res = et4k.horz_overflow;
+				break;
 			default:
 				res = vga.crtc.data[index];
 				//printf("%02x\n",index);
@@ -1788,6 +1906,13 @@ static void tseng_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 da
 	{
 		switch(index)
 		{
+			case 0x34:
+				et4k.aux_ctrl = data;
+				break;
+			case 0x3f:
+				et4k.horz_overflow = data;
+				vga.crtc.horz_total = (vga.crtc.horz_total & 0xff) | ((data & 1) << 8);
+				break;
 			default:
 				//printf("%02x %02x\n",index,data);
 				break;
@@ -1823,7 +1948,6 @@ static void tseng_seq_reg_write(running_machine &machine, UINT8 index, UINT8 dat
 	{
 		vga.sequencer.data[vga.sequencer.index] = data;
 		seq_reg_write(machine,vga.sequencer.index,data);
-		recompute_params(machine);
 	}
 	else
 	{
@@ -1835,8 +1959,6 @@ static void tseng_seq_reg_write(running_machine &machine, UINT8 index, UINT8 dat
 				break;
 		}
 	}
-
-	svga.rgb8_en = (!(vga.sequencer.data[1] & 8) && (vga.sequencer.data[4] & 8) && vga.gc.shift256 && vga.crtc.div2 && GRAPHIC_MODE);
 }
 
 READ8_HANDLER(tseng_et4k_03c0_r)
@@ -1852,6 +1974,19 @@ READ8_HANDLER(tseng_et4k_03c0_r)
 			res = svga.bank_w & 0xf;
 			res |= (svga.bank_r & 0xf) << 4;
 			break;
+		case 0x06:
+			if(et4k.dac_state == 4)
+			{
+				if(!et4k.dac_ctrl)
+					et4k.dac_ctrl = 0x80;
+				res = et4k.dac_ctrl;
+				break;
+			}
+			et4k.dac_state++;
+			res = vga_port_03c0_r(space,offset);
+			break;
+		case 0x08:
+			et4k.dac_state = 0;
 		default:
 			res = vga_port_03c0_r(space,offset);
 			break;
@@ -1871,10 +2006,17 @@ WRITE8_HANDLER(tseng_et4k_03c0_w)
 			svga.bank_w = data & 0xf;
 			svga.bank_r = (data & 0xf0) >> 4;
 			break;
+		case 0x06:
+			if(et4k.dac_state == 4)
+			{
+				et4k.dac_ctrl = data;
+				break;
+			}
 		default:
 			vga_port_03c0_w(space,offset,data);
 			break;
 	}
+	tseng_define_video_mode(space->machine());
 }
 
 READ8_HANDLER(tseng_et4k_03d0_r)
@@ -1922,11 +2064,13 @@ WRITE8_HANDLER(tseng_et4k_03d0_w)
 				break;
 		}
 	}
+	tseng_define_video_mode(space->machine());
 }
 
 READ8_HANDLER( tseng_mem_r )
 {
-	if(svga.rgb8_en)
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+
 	{
 		offset &= 0xffff;
 		return vga.memory[(offset+svga.bank_r*0x10000)];
@@ -1937,7 +2081,7 @@ READ8_HANDLER( tseng_mem_r )
 
 WRITE8_HANDLER( tseng_mem_w )
 {
-	if(svga.rgb8_en)
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
 		offset &= 0xffff;
 		vga.memory[(offset+svga.bank_w*0x10000)] = data;
