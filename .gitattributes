@@ -4771,7 +4771,6 @@ src/mame/video/rdpblend.c svneol=native#text/plain
 src/mame/video/rdpblend.h svneol=native#text/plain
 src/mame/video/rdpfiltr.c svneol=native#text/plain
 src/mame/video/rdpspn16.c svneol=native#text/plain
-src/mame/video/rdpspn16.h svneol=native#text/plain
 src/mame/video/rdptpipe.c svneol=native#text/plain
 src/mame/video/rdptpipe.h svneol=native#text/plain
 src/mame/video/realbrk.c svneol=native#text/plain
