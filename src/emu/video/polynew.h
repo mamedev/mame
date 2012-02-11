@@ -44,7 +44,7 @@
 #define KEEP_STATISTICS					0
 
 // turn this on to log the reasons for any long waits
-#define LOG_WAITS						1
+#define LOG_WAITS						0
 
 // number of profiling ticks before we consider a wait "long"
 #define LOG_WAIT_THRESHOLD				1000
