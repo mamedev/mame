@@ -625,6 +625,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	{
 		m_type = CTYPE_TEXT;
 		m_string = xml_get_attribute_string_with_subst(machine, compnode, "string", "");
+		m_textalign = xml_get_attribute_int_with_subst(machine, compnode, "align", 0);
 	}
 
 	// dotmatrix nodes
@@ -846,7 +847,26 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 			break;
 		aspect *= 0.9f;
 	}
-	INT32 curx = bounds.min_x + (bounds.width() - width) / 2;
+
+	// get alignment
+	INT32 curx;
+	switch (m_textalign)
+	{
+		// left
+		case 1:
+			curx = bounds.min_x;
+			break;
+
+		// right
+		case 2:
+			curx = bounds.max_x - width;
+			break;
+
+		// default to center
+		default:
+			curx = bounds.min_x + (bounds.width() - width) / 2;
+			break;
+	}
 
 	// allocate a temporary bitmap
 	bitmap_argb32 tempbitmap(dest.width(), dest.height());

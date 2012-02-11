@@ -152,6 +152,7 @@ private:
 		render_bounds		m_bounds;		// bounds of the element
 		render_color		m_color;		// color of the element
 		astring				m_string;		// string for text components
+		int					m_textalign;	// text alignment to box
 		bitmap_argb32		m_bitmap;		// source bitmap for images
 		astring				m_dirname;		// directory name of image file (for lazy loading)
 		emu_file *			m_file;			// file object for reading image/alpha files
