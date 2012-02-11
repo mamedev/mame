@@ -1401,7 +1401,7 @@ static WRITE8_HANDLER( mcu_data_w )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	state->m_mcu_data = data;
-	generic_pulse_irq_line(state->m_mcu, 1);
+	generic_pulse_irq_line(state->m_mcu, 1, 1);
 }
 #endif
 

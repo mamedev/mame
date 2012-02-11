@@ -178,7 +178,7 @@ static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
 		if ( (state->m_tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			generic_pulse_irq_line(timer.machine().device("mcu"), M68705_INT_TIMER);
+			generic_pulse_irq_line(timer.machine().device("mcu"), M68705_INT_TIMER, 1);
 		}
 	}
 }

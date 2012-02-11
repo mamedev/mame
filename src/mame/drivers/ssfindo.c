@@ -279,7 +279,7 @@ static TIMER_CALLBACK( PS7500_Timer0_callback )
 	state->m_PS7500_IO[IRQSTA]|=0x20;
 	if(state->m_PS7500_IO[IRQMSKA]&0x20)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE, 1);
 	}
 }
 
@@ -300,7 +300,7 @@ static TIMER_CALLBACK( PS7500_Timer1_callback )
 	state->m_PS7500_IO[IRQSTA]|=0x40;
 	if(state->m_PS7500_IO[IRQMSKA]&0x40)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE, 1);
 	}
 }
 
@@ -320,7 +320,7 @@ static INTERRUPT_GEN( ssfindo_interrupt )
 	state->m_PS7500_IO[IRQSTA]|=0x08;
 		if(state->m_PS7500_IO[IRQMSKA]&0x08)
 		{
-			generic_pulse_irq_line(device, ARM7_IRQ_LINE);
+			generic_pulse_irq_line(device, ARM7_IRQ_LINE, 1);
 		}
 }
 

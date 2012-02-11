@@ -638,9 +638,9 @@ static const adc12138_interface nwktr_adc_interface = {
 static void sound_irq_callback(running_machine &machine, int irq)
 {
 	if (irq == 0)
-		generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ1);
+		generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ1, 1);
 	else
-		generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ2);
+		generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ2, 1);
 }
 
 static const k056800_interface nwktr_k056800_interface =

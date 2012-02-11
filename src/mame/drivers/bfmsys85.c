@@ -172,7 +172,7 @@ static INTERRUPT_GEN( timer_irq )
 	if ( state->m_is_timer_enabled )
 	{
 		state->m_irq_status = 0x01 |0x02; //0xff;
-		generic_pulse_irq_line(device, M6809_IRQ_LINE);
+		generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
 	}
 }
 
@@ -235,7 +235,7 @@ static WRITE8_HANDLER( mmtr_w )
 	for (i=0; i<8; i++)
 	if ( changed & (1 << i) )	MechMtr_update(i, data & (1 << i) );
 
-	if ( data ) generic_pulse_irq_line(space->machine().device("maincpu"), M6809_FIRQ_LINE);
+	if ( data ) generic_pulse_irq_line(space->machine().device("maincpu"), M6809_FIRQ_LINE, 1);
 }
 ///////////////////////////////////////////////////////////////////////////
 

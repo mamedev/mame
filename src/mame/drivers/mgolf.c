@@ -112,7 +112,7 @@ static TIMER_CALLBACK( interrupt_callback )
 
 	update_plunger(machine);
 
-	generic_pulse_irq_line(state->m_maincpu, 0);
+	generic_pulse_irq_line(state->m_maincpu, 0, 1);
 
 	scanline = scanline + 32;
 

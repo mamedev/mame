@@ -872,7 +872,7 @@ static void gboard_scanline_cb( device_t *device, int scanline, int vblank, int 
 		if (--state->m_gboard_scanline_counter == -1)
 		{
 			state->m_gboard_scanline_counter = state->m_gboard_scanline_latch;
-			generic_pulse_irq_line(device->machine().device("cart"), 0);
+			generic_pulse_irq_line(device->machine().device("cart"), 0, 1);
 		}
 	}
 }

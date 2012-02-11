@@ -319,7 +319,7 @@ static INPUT_CHANGED( coin_inserted )
 
 	/* TODO: change this! */
 	if(newval)
-		generic_pulse_irq_line(state->m_maincpu, (UINT8)(FPTR)param);
+		generic_pulse_irq_line(state->m_maincpu, (UINT8)(FPTR)param, 1);
 }
 
 static INPUT_PORTS_START( pntnpuzl )

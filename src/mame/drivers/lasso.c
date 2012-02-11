@@ -51,7 +51,7 @@ static WRITE8_HANDLER( sound_command_w )
 {
 	lasso_state *state = space->machine().driver_data<lasso_state>();
 	soundlatch_w(space, offset, data);
-	generic_pulse_irq_line(state->m_audiocpu, 0);
+	generic_pulse_irq_line(state->m_audiocpu, 0, 1);
 }
 
 static WRITE8_HANDLER( pinbo_sound_command_w )

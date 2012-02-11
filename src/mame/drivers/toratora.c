@@ -149,7 +149,7 @@ static INTERRUPT_GEN( toratora_timer )
 	if (state->m_last != (input_port_read(device->machine(), "INPUT") & 0x0f))
 	{
 		state->m_last = input_port_read(device->machine(), "INPUT") & 0x0f;
-		generic_pulse_irq_line(device, 0);
+		generic_pulse_irq_line(device, 0, 1);
 	}
 	state->m_pia_u1->set_a_input(input_port_read(device->machine(), "INPUT") & 0x0f, 0);
 	state->m_pia_u1->ca1_w(input_port_read(device->machine(), "INPUT") & 0x10);

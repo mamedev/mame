@@ -239,7 +239,7 @@ WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 {
 	device_set_input_line_vector(device, 0, 0x03);
-	generic_pulse_irq_line(device, 0);
+	generic_pulse_irq_line(device, 0, 1);
 
 	cvs_scroll_stars(device->machine());
 }

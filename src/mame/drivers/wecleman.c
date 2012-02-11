@@ -1084,7 +1084,7 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( hotchase_sound_timer )
 {
-	generic_pulse_irq_line(device, M6809_FIRQ_LINE);
+	generic_pulse_irq_line(device, M6809_FIRQ_LINE, 1);
 }
 
 static const k051316_interface hotchase_k051316_intf_0 =

@@ -774,7 +774,7 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 		/* If the interrupt enable bit is set trigger an A/D IRQ */
 		if(data & 0x20)
 		{
-			generic_pulse_irq_line(space->machine().device("mcu"), HD63705_INT_ADCONV);
+			generic_pulse_irq_line(space->machine().device("mcu"), HD63705_INT_ADCONV, 1);
 		}
 	}
 }

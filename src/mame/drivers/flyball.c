@@ -119,7 +119,7 @@ static TIMER_CALLBACK( flyball_joystick_callback )
 	int potsense = param;
 
 	if (potsense & ~state->m_potmask)
-		generic_pulse_irq_line(state->m_maincpu, 0);
+		generic_pulse_irq_line(state->m_maincpu, 0, 1);
 
 	state->m_potsense |= potsense;
 }

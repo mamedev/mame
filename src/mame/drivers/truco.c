@@ -399,7 +399,7 @@ static INTERRUPT_GEN( truco_interrupt )
 	{
 		if ( state->m_trigger == 0 )
 		{
-			generic_pulse_irq_line(device, M6809_IRQ_LINE);
+			generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
 			state->m_trigger++;
 		}
 	} else

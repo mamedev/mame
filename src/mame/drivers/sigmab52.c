@@ -528,7 +528,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( timer_irq )
 {
-	generic_pulse_irq_line(device, M6809_IRQ_LINE);
+	generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
 }
 
 

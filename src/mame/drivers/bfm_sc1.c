@@ -176,7 +176,7 @@ static INTERRUPT_GEN( timer_irq )
 
 	    state->m_sc1_Inputs[2] = input_port_read(device->machine(),"STROBE0");
 
-		generic_pulse_irq_line(device->machine().device("maincpu"), M6809_IRQ_LINE);
+		generic_pulse_irq_line(device->machine().device("maincpu"), M6809_IRQ_LINE, 1);
 	}
 }
 
@@ -277,7 +277,7 @@ static WRITE8_HANDLER( mmtr_w )
 			if ( changed & (1 << i) )
 			{
 				MechMtr_update(i, data & (1 << i) );
-				generic_pulse_irq_line(space->machine().device("maincpu"), M6809_FIRQ_LINE);
+				generic_pulse_irq_line(space->machine().device("maincpu"), M6809_FIRQ_LINE, 1);
 			}
 		}
 	}

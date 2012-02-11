@@ -2727,7 +2727,7 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 				int i;
 				for (i = 0; i < 16; i++)
 				{
-					generic_pulse_irq_line(space->machine().device("mcu"), M37710_LINE_TIMERA3TICK);
+					generic_pulse_irq_line(space->machine().device("mcu"), M37710_LINE_TIMERA3TICK, 1);
 				}
 			}
 

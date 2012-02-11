@@ -17,7 +17,7 @@ Atari Starship 1 driver
 static INTERRUPT_GEN( starshp1_interrupt )
 {
 	if ((input_port_read(device->machine(), "SYSTEM") & 0x90) != 0x90)
-		generic_pulse_irq_line(device, 0);
+		generic_pulse_irq_line(device, 0, 1);
 }
 
 

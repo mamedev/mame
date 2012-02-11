@@ -696,7 +696,7 @@ static INTERRUPT_GEN( bomblord_fake_nmi )
 
 static INTERRUPT_GEN( m90_interrupt )
 {
-	generic_pulse_irq_line(device, NEC_INPUT_LINE_INTP0);
+	generic_pulse_irq_line(device, NEC_INPUT_LINE_INTP0, 1);
 }
 
 static INTERRUPT_GEN( dynablsb_interrupt )

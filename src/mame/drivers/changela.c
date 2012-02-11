@@ -433,7 +433,7 @@ static INTERRUPT_GEN( chl_mcu_irq )
 {
 	changela_state *state = device->machine().driver_data<changela_state>();
 
-	generic_pulse_irq_line(state->m_mcu, 0);
+	generic_pulse_irq_line(state->m_mcu, 0, 1);
 }
 
 static MACHINE_START(changela)

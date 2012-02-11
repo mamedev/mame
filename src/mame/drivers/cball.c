@@ -73,7 +73,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	cball_state *state = machine.driver_data<cball_state>();
 	int scanline = param;
 
-	generic_pulse_irq_line(state->m_maincpu, 0);
+	generic_pulse_irq_line(state->m_maincpu, 0, 1);
 
 	scanline = scanline + 32;
 

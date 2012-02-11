@@ -74,7 +74,7 @@ void archimedes_request_irq_b(running_machine &machine, int mask)
 
 	if (ioc_regs[IRQ_MASK_B] & mask)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM_IRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM_IRQ_LINE, 1);
 	}
 }
 
@@ -84,7 +84,7 @@ void archimedes_request_fiq(running_machine &machine, int mask)
 
 	if (ioc_regs[FIQ_MASK] & mask)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM_FIRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM_FIRQ_LINE, 1);
 	}
 }
 

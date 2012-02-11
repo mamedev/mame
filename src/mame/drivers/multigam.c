@@ -377,7 +377,7 @@ static void multigam3_mmc3_scanline_cb( device_t *device, int scanline, int vbla
 		if (--state->m_multigam3_mmc3_scanline_counter == -1)
 		{
 			state->m_multigam3_mmc3_scanline_counter = state->m_multigam3_mmc3_scanline_latch;
-			generic_pulse_irq_line(device->machine().device("maincpu"), 0);
+			generic_pulse_irq_line(device->machine().device("maincpu"), 0, 1);
 		}
 	}
 }

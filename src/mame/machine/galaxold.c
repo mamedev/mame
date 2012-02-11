@@ -418,7 +418,7 @@ DRIVER_INIT( 4in1 )
 
 INTERRUPT_GEN( hunchbks_vh_interrupt )
 {
-	generic_pulse_irq_line_and_vector(device,0,0x03);
+	generic_pulse_irq_line_and_vector(device,0,0x03,1);
 }
 
 DRIVER_INIT( ladybugg )

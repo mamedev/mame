@@ -736,7 +736,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-	generic_pulse_irq_line(device, NEC_INPUT_LINE_INTP0);
+	generic_pulse_irq_line(device, NEC_INPUT_LINE_INTP0, 1);
 }
 
 static const gfx_layout cb2001_layout =

@@ -444,7 +444,7 @@ static INTERRUPT_GEN( timer_irq )
 		state->m_irq_timer_stat = 0x01;
 		state->m_irq_status     = 0x02;
 
-		generic_pulse_irq_line(device, M6809_IRQ_LINE);
+		generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
 	}
 }
 

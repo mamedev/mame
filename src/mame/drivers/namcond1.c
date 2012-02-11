@@ -273,7 +273,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 	namcond1_state *state = device->machine().driver_data<namcond1_state>();
 	if( state->m_h8_irq5_enabled )
 	{
-		generic_pulse_irq_line(device, H8_IRQ5);
+		generic_pulse_irq_line(device, H8_IRQ5, 1);
 	}
 }
 

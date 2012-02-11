@@ -657,7 +657,7 @@ static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 		reg = state->m_adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(adsp, ADSP2105_IRQ1);
+		generic_pulse_irq_line(adsp, ADSP2105_IRQ1, 1);
 	}
 
 	/* store it */

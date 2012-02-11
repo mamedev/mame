@@ -202,7 +202,7 @@ static INTERRUPT_GEN( ultrsprt_vblank )
 static void sound_irq_callback(running_machine &machine, int irq)
 {
 	if (irq == 0)
-		/*generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ5)*/;
+		/*generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ5, 1)*/;
 	else
 		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ6, HOLD_LINE);
 }

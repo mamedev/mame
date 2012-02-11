@@ -313,7 +313,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
 	COMBINE_DATA(&state->m_kov2_latchdata_68k_w);
 
-	generic_pulse_irq_line(state->m_prot, ARM7_FIRQ_LINE);
+	generic_pulse_irq_line(state->m_prot, ARM7_FIRQ_LINE, 1);
 	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 	device_spin_until_time(&space->device(), state->m_prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
@@ -562,7 +562,7 @@ static READ16_HANDLER( svg_68k_nmi_r )
 static WRITE16_HANDLER( svg_68k_nmi_w )
 {
 	pgm_state *state = space->machine().driver_data<pgm_state>();
-	generic_pulse_irq_line(state->m_prot, ARM7_FIRQ_LINE);
+	generic_pulse_irq_line(state->m_prot, ARM7_FIRQ_LINE, 1);
 	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 	device_spin_until_time(&space->device(), state->m_prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }

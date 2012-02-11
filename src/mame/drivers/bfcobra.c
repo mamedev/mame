@@ -1398,7 +1398,7 @@ static WRITE8_HANDLER( meter_w )
 		if (changed & (1 << i))
 		{
 			MechMtr_update(i, data & (1 << i) );
-			generic_pulse_irq_line(&space->device(), M6809_FIRQ_LINE);
+			generic_pulse_irq_line(&space->device(), M6809_FIRQ_LINE, 1);
 		}
 	}
 }
@@ -1756,7 +1756,7 @@ static DRIVER_INIT( bfcobra )
 /* TODO */
 static INTERRUPT_GEN( timer_irq )
 {
-	generic_pulse_irq_line(device, M6809_IRQ_LINE);
+	generic_pulse_irq_line(device, M6809_IRQ_LINE, 1);
 }
 
 /* TODO */
