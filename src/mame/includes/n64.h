@@ -2,22 +2,22 @@
 #define _INCLUDES_N64_H_
 
 #include "cpu/rsp/rsp.h"
-#include "video/n64.h"
 #include "sound/dmadac.h"
-#include "includes/n64.h"
 
 /*----------- forward decls -----------*/
 
 /*----------- driver state -----------*/
 
-class _n64_state : public driver_device
+class n64_rdp;
+
+class n64_state : public driver_device
 {
 public:
-	_n64_state(const machine_config &mconfig, device_type type, const char *tag)
+	n64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
 	/* video-related */
-	N64::RDP::Processor m_rdp;
+	n64_rdp *m_rdp;
 };
 
 /*----------- devices -----------*/

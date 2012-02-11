@@ -44,7 +44,7 @@
 #define KEEP_STATISTICS					0
 
 // turn this on to log the reasons for any long waits
-#define LOG_WAITS						0
+#define LOG_WAITS						1
 
 // number of profiling ticks before we consider a wait "long"
 #define LOG_WAIT_THRESHOLD				1000
@@ -112,6 +112,7 @@ public:
 			_BaseType start;					// parameter value at start
 			_BaseType dpdx;						// dp/dx relative to start
 		} param[_MaxParams];
+		void *userdata;							// custom per-span data
 	};
 
 	// delegate type for scanline callbacks
@@ -568,6 +569,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 			extent_t &extent = unit.extent[extnum];
 			extent.startx = istartx;
 			extent.stopx = istopx;
+			extent.userdata = NULL;
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent
@@ -749,6 +751,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 			extent_t &extent = unit.extent[extnum];
 			extent.startx = istartx;
 			extent.stopx = istopx;
+			extent.userdata = NULL;
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent
@@ -847,17 +850,13 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 			const extent_t &srcextent = extents[(curscan + extnum) - startscanline];
 			INT32 istartx = srcextent.startx, istopx = srcextent.stopx;
 
-			// force start < stop
-			if (istartx > istopx)
-			{
-				INT32 temp = istartx;
-				istartx = istopx;
-				istopx = temp;
-			}
-
 			// apply left/right clipping
 			if (istartx < cliprect.min_x)
 				istartx = cliprect.min_x;
+			if (istartx > cliprect.max_x)
+				istartx = cliprect.max_x + 1;
+			if (istopx < cliprect.min_x)
+				istopx = cliprect.min_x;
 			if (istopx > cliprect.max_x)
 				istopx = cliprect.max_x + 1;
 
@@ -865,8 +864,19 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 			extent_t &extent = unit.extent[extnum];
 			extent.startx = istartx;
 			extent.stopx = istopx;
+
+			// fill in the parameters for the extent
+			for (int paramnum = 0; paramnum < _MaxParams; paramnum++)
+			{
+				extent.param[paramnum].start = srcextent.param[paramnum].start;
+				extent.param[paramnum].dpdx = srcextent.param[paramnum].dpdx;
+			}
+
+			extent.userdata = srcextent.userdata;
 			if (istartx < istopx)
 				pixels += istopx - istartx;
+			else if(istopx < istartx)
+				pixels += istartx - istopx;
 		}
 	}
 
@@ -1064,6 +1074,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 				istartx = istopx = 0;
 			extent.startx = istartx;
 			extent.stopx = istopx;
+			extent.userdata = NULL;
 			pixels += istopx - istartx;
 		}
 	}

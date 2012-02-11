@@ -805,7 +805,7 @@ static INTERRUPT_GEN( n64_vblank )
 	signal_rcp_interrupt(device->machine(), VI_INTERRUPT);
 }
 
-static MACHINE_CONFIG_START( aleck64, _n64_state )
+static MACHINE_CONFIG_START( aleck64, n64_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)

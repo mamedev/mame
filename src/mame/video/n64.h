@@ -2,11 +2,10 @@
 #define _VIDEO_N64_H_
 
 #include "emu.h"
+#include "includes/n64.h"
+#include "video/polynew.h"
 #include "video/rdpblend.h"
-#include "video/rdptri.h"
-#include "video/rdpfb.h"
 #include "video/rdptpipe.h"
-#include "video/rdpspn16.h"
 
 /*****************************************************************************/
 
@@ -57,20 +56,20 @@
 #define MEM16_LIMIT 0x3fffff
 #define MEM32_LIMIT 0x1fffff
 
-#define RREADADDR8(in) (((in) <= MEM8_LIMIT) ? (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR]) : 0)
-#define RREADIDX16(in) (((in) <= MEM16_LIMIT) ? (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR]) : 0)
-#define RREADIDX32(in) (((in) <= MEM32_LIMIT) ? (rdram[(in)]) : 0)
+#define RREADADDR8(in) /*(((in) <= MEM8_LIMIT) ?  */(((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR]) /*: 0)*/
+#define RREADIDX16(in) /*(((in) <= MEM16_LIMIT) ? */(((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR]) /*: 0)*/
+#define RREADIDX32(in) /*(((in) <= MEM32_LIMIT) ? */(rdram[(in)]) /*: 0)*/
 
-#define RWRITEADDR8(in, val)	{if ((in) <= MEM8_LIMIT) ((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
-#define RWRITEIDX16(in, val)	{if ((in) <= MEM16_LIMIT) ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;}
-#define RWRITEIDX32(in, val)	{if ((in) <= MEM32_LIMIT) rdram[(in)] = val;}
+#define RWRITEADDR8(in, val)	{/*if ((in) <= MEM8_LIMIT) */((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
+#define RWRITEIDX16(in, val)	{/*if ((in) <= MEM16_LIMIT)*/ ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;}
+#define RWRITEIDX32(in, val)	{/*if ((in) <= MEM32_LIMIT)*/ rdram[(in)] = val;}
 
 #define GETLOWCOL(x)	(((x) & 0x3e) << 2)
 #define GETMEDCOL(x)	(((x) & 0x7c0) >> 3)
 #define GETHICOL(x)		(((x) & 0xf800) >> 8)
 
-#define HREADADDR8(in)			(((in) <= MEM8_LIMIT) ? (m_rdp->HiddenBits[(in) ^ BYTE_ADDR_XOR]) : 0)
-#define HWRITEADDR8(in, val)	{if ((in) <= MEM8_LIMIT) m_rdp->HiddenBits[(in) ^ BYTE_ADDR_XOR] = val;}
+#define HREADADDR8(in)			/*(((in) <= MEM8_LIMIT) ? */(HiddenBits[(in) ^ BYTE_ADDR_XOR])/* : 0)*/
+#define HWRITEADDR8(in, val)	/*{if ((in) <= MEM8_LIMIT) */HiddenBits[(in) ^ BYTE_ADDR_XOR] = val;/*}*/
 
 //sign-extension macros
 #define SIGN22(x)	(((x) & 0x200000) ? ((x) | ~0x3fffff) : ((x) & 0x3fffff))
@@ -83,19 +82,30 @@
 
 #define KURT_AKELEY_SIGN9(x)	((((x) & 0x180) == 0x180) ? ((x) | ~0x1ff) : ((x) & 0x1ff))
 
+#define SPAN_R		(0)
+#define SPAN_G		(1)
+#define SPAN_B		(2)
+#define SPAN_A		(3)
+#define SPAN_S		(4)
+#define SPAN_T		(5)
+#define SPAN_W		(6)
+#define SPAN_Z		(7)
+
+#define RDP_CVG_SPAN_MAX			(1024)
+
+#define EXTENT_AUX_COUNT			(sizeof(rdp_span_aux)*(480*128)) // Screen coverage *128, more or less
+
 /*****************************************************************************/
 
 class n64_periphs;
+class n64_rdp;
 
-namespace N64
-{
-
-namespace RDP
-{
-
-class Processor;
-class MiscStateT;
-class OtherModesT;
+struct MiscStateT;
+struct OtherModesT;
+struct CombineModesT;
+struct ColorInputsT;
+struct SpanBaseT;
+struct Rectangle;
 
 class Color
 {
@@ -124,159 +134,216 @@ enum
 	BIT_DEPTH_COUNT
 };
 
-class Tile
+class SpanParam
 {
 	public:
-		int format;	// Image data format: RGBA, YUV, CI, IA, I
-		int size; // Size of texel element: 4b, 8b, 16b, 32b
-		int line; // Size of tile line in bytes
-		int tmem; // Starting tmem address for this tile in bytes
-		int palette; // Palette number for 4b CI texels
-		int ct, mt, cs, ms; // Clamp / mirror enable bits for S / T direction
-		int mask_t, shift_t, mask_s, shift_s; // Mask values / LOD shifts
-		UINT16 sl, tl, sh, th;		// 10.2 fixed-point, starting and ending texel row / column
-		int num;
-};
-
-class MiscStateT
-{
-	public:
-		MiscStateT()
+		union
 		{
-			CurrentPixCvg = 0;
-			CurrentMemCvg = 0;
-			CurrentCvgBit = 0;
-			CurrentPixOverlap = 0;
-
-			MaxLevel = 0;
-			MinLevel = 0;
-		}
-
-		int FBFormat;				// Framebuffer pixel format index (0 - I, 1 - IA, 2 - CI, 3 - RGBA)
-		int FBSize;					// Framebuffer pixel size index (0 - 4bpp, 1 - 8bpp, 2 - 16bpp, 3 - 32bpp)
-		int FBWidth;				// Framebuffer width, in pixels
-		int FBHeight;				// Framebuffer height, in scanlines
-		UINT32 FBAddress;			// Framebuffer source address offset (in bytes) from start of RDRAM
-
-		UINT32 ZBAddress;			// Z-buffer source address offset (in bytes) from start of RDRAM
-
-		int TIFormat;				// Format for Texture Interface (TI) transfers
-		int TISize;					// Size (in bytes) of TI transfers
-		int TIWidth;				// Width (in pixels) of TI transfers
-		UINT32 TIAddress;			// Destination address for TI transfers
-
-		UINT32 CurrentPixCvg;		// Coverage for the current pixel
-		UINT32 CurrentMemCvg;		// Incoming coverage, in memory, for the current pixel
-		UINT32 CurrentCvgBit;		// Bitfield representation of current coverage value
-		UINT32 CurrentPixOverlap;	// Current overlap value, in coverage indices, for the current pixel
-
-		UINT8 RandomSeed;			// %HACK%, adds 19 each time it's read and is more or less random
-
-		int SpecialBlendSelect0;	// Special blend-mode select for cycle 0
-		int SpecialBlendSelect1;	// Special blend-mode select for cycle 1
-
-		UINT32 MaxLevel;			// Maximum LOD level for texture filtering
-		UINT32 MinLevel;			// Minimum LOD level for texture filtering
-
-		UINT16 PrimitiveZ;			// Forced Z value for current primitive, if applicable
-		UINT16 PrimitiveDZ;			// Forced Delta-Z value for current primitive, if applicable
+			UINT32 w;
+#ifdef LSB_FIRST
+			struct { UINT16 l; INT16 h; } h;
+#else
+			struct { INT16 h; UINT16 l; } h;
+#endif
+		};
 };
 
-class CombineModes
+struct N64Tile
 {
-	public:
-		int sub_a_rgb0;
-		int sub_b_rgb0;
-		int mul_rgb0;
-		int add_rgb0;
-		int sub_a_a0;
-		int sub_b_a0;
-		int mul_a0;
-		int add_a0;
-
-		int sub_a_rgb1;
-		int sub_b_rgb1;
-		int mul_rgb1;
-		int add_rgb1;
-		int sub_a_a1;
-		int sub_b_a1;
-		int mul_a1;
-		int add_a1;
+	int format;	// Image data format: RGBA, YUV, CI, IA, I
+	int size; // Size of texel element: 4b, 8b, 16b, 32b
+	int line; // Size of tile line in bytes
+	int tmem; // Starting tmem address for this tile in bytes
+	int palette; // Palette number for 4b CI texels
+	int ct, mt, cs, ms; // Clamp / mirror enable bits for S / T direction
+	int mask_t, shift_t, mask_s, shift_s; // Mask values / LOD shifts
+	UINT16 sl, tl, sh, th;		// 10.2 fixed-point, starting and ending texel row / column
+	int num;
 };
 
-class OtherModesT
+struct SpanBaseT
 {
-	public:
-		int cycle_type;
-		bool persp_tex_en;
-		bool detail_tex_en;
-		bool sharpen_tex_en;
-		bool tex_lod_en;
-		bool en_tlut;
-		bool tlut_type;
-		bool sample_type;
-		bool mid_texel;
-		bool bi_lerp0;
-		bool bi_lerp1;
-		bool convert_one;
-		bool key_en;
-		int rgb_dither_sel;
-		int alpha_dither_sel;
-		int blend_m1a_0;
-		int blend_m1a_1;
-		int blend_m1b_0;
-		int blend_m1b_1;
-		int blend_m2a_0;
-		int blend_m2a_1;
-		int blend_m2b_0;
-		int blend_m2b_1;
-		int tex_edge;
-		bool force_blend;
-		bool alpha_cvg_select;
-		bool cvg_times_alpha;
-		int z_mode;
-		int cvg_dest;
-		bool color_on_cvg;
-		bool image_read_en;
-		bool z_update_en;
-		bool z_compare_en;
-		bool antialias_en;
-		bool z_source_sel;
-		bool dither_alpha_en;
-		bool alpha_compare_en;
+	int m_span_dr;
+	int m_span_dg;
+	int m_span_db;
+	int m_span_da;
+	int m_span_ds;
+	int m_span_dt;
+	int m_span_dw;
+	int m_span_dz;
+	int m_span_dymax;
+	int m_span_dzpix;
+	int m_span_drdy;
+	int m_span_dgdy;
+	int m_span_dbdy;
+	int m_span_dady;
+	int m_span_dzdy;
 };
 
-class ColorInputsT
+struct MiscStateT
 {
-	public:
-		// combiner inputs
-		UINT8 *combiner_rgbsub_a_r[2];
-		UINT8 *combiner_rgbsub_a_g[2];
-		UINT8 *combiner_rgbsub_a_b[2];
-		UINT8 *combiner_rgbsub_b_r[2];
-		UINT8 *combiner_rgbsub_b_g[2];
-		UINT8 *combiner_rgbsub_b_b[2];
-		UINT8 *combiner_rgbmul_r[2];
-		UINT8 *combiner_rgbmul_g[2];
-		UINT8 *combiner_rgbmul_b[2];
-		UINT8 *combiner_rgbadd_r[2];
-		UINT8 *combiner_rgbadd_g[2];
-		UINT8 *combiner_rgbadd_b[2];
+	MiscStateT()
+	{
+		MaxLevel = 0;
+		MinLevel = 0;
+	}
 
-		UINT8 *combiner_alphasub_a[2];
-		UINT8 *combiner_alphasub_b[2];
-		UINT8 *combiner_alphamul[2];
-		UINT8 *combiner_alphaadd[2];
+	int FBFormat;				// Framebuffer pixel format index (0 - I, 1 - IA, 2 - CI, 3 - RGBA)
+	int FBSize;					// Framebuffer pixel size index (0 - 4bpp, 1 - 8bpp, 2 - 16bpp, 3 - 32bpp)
+	int FBWidth;				// Framebuffer width, in pixels
+	int FBHeight;				// Framebuffer height, in scanlines
+	UINT32 FBAddress;			// Framebuffer source address offset (in bytes) from start of RDRAM
 
-		// blender input
-		UINT8 *blender1a_r[2];
-		UINT8 *blender1a_g[2];
-		UINT8 *blender1a_b[2];
-		UINT8 *blender1b_a[2];
-		UINT8 *blender2a_r[2];
-		UINT8 *blender2a_g[2];
-		UINT8 *blender2a_b[2];
-		UINT8 *blender2b_a[2];
+	UINT32 ZBAddress;			// Z-buffer source address offset (in bytes) from start of RDRAM
+
+	int TIFormat;				// Format for Texture Interface (TI) transfers
+	int TISize;					// Size (in bytes) of TI transfers
+	int TIWidth;				// Width (in pixels) of TI transfers
+	UINT32 TIAddress;			// Destination address for TI transfers
+
+	UINT8 RandomSeed;			// %HACK%, adds 19 each time it's read and is more or less random
+
+	int SpecialBlendSelect0;	// Special blend-mode select for cycle 0
+	int SpecialBlendSelect1;	// Special blend-mode select for cycle 1
+
+	UINT32 MaxLevel;			// Maximum LOD level for texture filtering
+	UINT32 MinLevel;			// Minimum LOD level for texture filtering
+
+	UINT16 PrimitiveZ;			// Forced Z value for current primitive, if applicable
+	UINT16 PrimitiveDZ;			// Forced Delta-Z value for current primitive, if applicable
+};
+
+struct CombineModesT
+{
+	int sub_a_rgb0;
+	int sub_b_rgb0;
+	int mul_rgb0;
+	int add_rgb0;
+	int sub_a_a0;
+	int sub_b_a0;
+	int mul_a0;
+	int add_a0;
+
+	int sub_a_rgb1;
+	int sub_b_rgb1;
+	int mul_rgb1;
+	int add_rgb1;
+	int sub_a_a1;
+	int sub_b_a1;
+	int mul_a1;
+	int add_a1;
+};
+
+struct OtherModesT
+{
+	int cycle_type;
+	bool persp_tex_en;
+	bool detail_tex_en;
+	bool sharpen_tex_en;
+	bool tex_lod_en;
+	bool en_tlut;
+	bool tlut_type;
+	bool sample_type;
+	bool mid_texel;
+	bool bi_lerp0;
+	bool bi_lerp1;
+	bool convert_one;
+	bool key_en;
+	int rgb_dither_sel;
+	int alpha_dither_sel;
+	int blend_m1a_0;
+	int blend_m1a_1;
+	int blend_m1b_0;
+	int blend_m1b_1;
+	int blend_m2a_0;
+	int blend_m2a_1;
+	int blend_m2b_0;
+	int blend_m2b_1;
+	int tex_edge;
+	bool force_blend;
+	bool alpha_cvg_select;
+	bool cvg_times_alpha;
+	int z_mode;
+	int cvg_dest;
+	bool color_on_cvg;
+	UINT8 image_read_en;
+	bool z_update_en;
+	bool z_compare_en;
+	bool antialias_en;
+	bool z_source_sel;
+	bool dither_alpha_en;
+	bool alpha_compare_en;
+};
+
+struct ColorInputsT
+{
+	// combiner inputs
+	UINT8 *combiner_rgbsub_a_r[2];
+	UINT8 *combiner_rgbsub_a_g[2];
+	UINT8 *combiner_rgbsub_a_b[2];
+	UINT8 *combiner_rgbsub_b_r[2];
+	UINT8 *combiner_rgbsub_b_g[2];
+	UINT8 *combiner_rgbsub_b_b[2];
+	UINT8 *combiner_rgbmul_r[2];
+	UINT8 *combiner_rgbmul_g[2];
+	UINT8 *combiner_rgbmul_b[2];
+	UINT8 *combiner_rgbadd_r[2];
+	UINT8 *combiner_rgbadd_g[2];
+	UINT8 *combiner_rgbadd_b[2];
+
+	UINT8 *combiner_alphasub_a[2];
+	UINT8 *combiner_alphasub_b[2];
+	UINT8 *combiner_alphamul[2];
+	UINT8 *combiner_alphaadd[2];
+
+	// blender input
+	UINT8 *blender1a_r[2];
+	UINT8 *blender1a_g[2];
+	UINT8 *blender1a_b[2];
+	UINT8 *blender1b_a[2];
+	UINT8 *blender2a_r[2];
+	UINT8 *blender2a_g[2];
+	UINT8 *blender2a_b[2];
+	UINT8 *blender2b_a[2];
+};
+
+struct rdp_span_aux
+{
+	UINT32				m_unscissored_rx;
+	UINT16				m_cvg[RDP_CVG_SPAN_MAX];
+	Color				MemoryColor;
+	Color				PixelColor;
+	Color				InvPixelColor;
+	Color				BlendedPixelColor;
+	Color				CombinedColor;
+	Color				Texel0Color;
+	Color				Texel1Color;
+	Color				NextTexelColor;
+	Color				BlendColor;				/* constant blend color */
+	Color				PrimColor;				/* flat primitive color */
+	Color				EnvColor;				/* generic color constant ('environment') */
+	Color				FogColor;				/* generic color constant ('fog') */
+	Color				ShadeColor;				/* gouraud-shaded color */
+	Color				KeyScale;				/* color-keying constant */
+	Color				NoiseColor;				/* noise */
+	UINT8				LODFraction;			/* Z-based LOD fraction for this poly */
+	UINT8				PrimLODFraction;		/* fixed LOD fraction for this poly */
+	ColorInputsT		ColorInputs;
+	UINT32				CurrentPixCvg;
+	UINT32				CurrentMemCvg;
+	UINT32				CurrentCvgBit;
+	UINT32				CurrentPixOverlap;
+	INT32				ShiftA;
+	INT32				ShiftB;
+	INT32				m_precomp_s;
+	INT32				m_precomp_t;
+	INT32				m_clamp_s_diff[8];
+	INT32				m_clamp_t_diff[8];
+	UINT8				BlendEnable;
+	bool				PreWrap;
+	INT32 				m_dzpix_enc;
+	UINT8				*m_tmem;				/* pointer to texture cache for this polygon */
+	bool				m_start_span;
 };
 
 struct Rectangle
@@ -287,138 +354,33 @@ struct Rectangle
 	UINT16 m_yh;	// 10.2 fixed-point
 };
 
-class Processor
+struct rdp_poly_state
+{
+	n64_rdp *			m_rdp;					/* pointer back to the RDP state */
+
+	MiscStateT			MiscState;				/* miscellaneous rasterizer bits */
+	OtherModesT			OtherModes;				/* miscellaneous rasterizer bits (2) */
+	SpanBaseT			SpanBase;				/* span initial values for triangle rasterization */
+	Rectangle			Scissor;				/* screen-space scissor bounds */
+	UINT32				FillColor;				/* poly fill color */
+	N64Tile				m_tiles[8];				/* texture tile state */
+	UINT8				m_tmem[0x1000];			/* texture cache */
+	int					tilenum;				/* texture tile index */
+	bool				flip;					/* left-major / right-major flip */
+	bool				rect;					/* primitive is rectangle (vs. triangle) */
+};
+
+//class n64_state;
+
+class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 {
 	public:
-		Processor()
-		{
-			m_cmd_ptr = 0;
-			m_cmd_cur = 0;
+		typedef void (n64_rdp::*Writer) (UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		typedef void (n64_rdp::*Reader) (UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
+		typedef void (n64_rdp::*Copier) (UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int CurrentPixCvg, const rdp_poly_state &object);
+		typedef void (n64_rdp::*Filler) (UINT32 curpixel, const rdp_poly_state &object);
 
-			m_start = 0;
-			m_end = 0;
-			m_current = 0;
-			m_status = 0x88;
-
-			for (int i = 0; i < 8; i++)
-			{
-				m_tiles[i].num = i;
-			}
-
-			OneColor.c = 0xffffffff;
-			ZeroColor.c = 0x00000000;
-
-			ColorInputs.combiner_rgbsub_a_r[0] = ColorInputs.combiner_rgbsub_a_r[1] = &OneColor.i.r;
-			ColorInputs.combiner_rgbsub_a_g[0] = ColorInputs.combiner_rgbsub_a_g[1] = &OneColor.i.g;
-			ColorInputs.combiner_rgbsub_a_b[0] = ColorInputs.combiner_rgbsub_a_b[1] = &OneColor.i.b;
-			ColorInputs.combiner_rgbsub_b_r[0] = ColorInputs.combiner_rgbsub_b_r[1] = &OneColor.i.r;
-			ColorInputs.combiner_rgbsub_b_g[0] = ColorInputs.combiner_rgbsub_b_g[1] = &OneColor.i.g;
-			ColorInputs.combiner_rgbsub_b_b[0] = ColorInputs.combiner_rgbsub_b_b[1] = &OneColor.i.b;
-			ColorInputs.combiner_rgbmul_r[0] = ColorInputs.combiner_rgbmul_r[1] = &OneColor.i.r;
-			ColorInputs.combiner_rgbmul_g[0] = ColorInputs.combiner_rgbmul_g[1] = &OneColor.i.g;
-			ColorInputs.combiner_rgbmul_b[0] = ColorInputs.combiner_rgbmul_b[1] = &OneColor.i.b;
-			ColorInputs.combiner_rgbadd_r[0] = ColorInputs.combiner_rgbadd_r[1] = &OneColor.i.r;
-			ColorInputs.combiner_rgbadd_g[0] = ColorInputs.combiner_rgbadd_g[1] = &OneColor.i.g;
-			ColorInputs.combiner_rgbadd_b[0] = ColorInputs.combiner_rgbadd_b[1] = &OneColor.i.b;
-
-			ColorInputs.combiner_alphasub_a[0] = ColorInputs.combiner_alphasub_a[1] = &OneColor.i.a;
-			ColorInputs.combiner_alphasub_b[0] = ColorInputs.combiner_alphasub_b[1] = &OneColor.i.a;
-			ColorInputs.combiner_alphamul[0] = ColorInputs.combiner_alphamul[1] = &OneColor.i.a;
-			ColorInputs.combiner_alphaadd[0] = ColorInputs.combiner_alphaadd[1] = &OneColor.i.a;
-
-			ColorInputs.blender1a_r[0] = ColorInputs.blender1a_r[1] = &PixelColor.i.r;
-			ColorInputs.blender1a_g[0] = ColorInputs.blender1a_g[1] = &PixelColor.i.r;
-			ColorInputs.blender1a_b[0] = ColorInputs.blender1a_b[1] = &PixelColor.i.r;
-			ColorInputs.blender1b_a[0] = ColorInputs.blender1b_a[1] = &PixelColor.i.r;
-			ColorInputs.blender2a_r[0] = ColorInputs.blender2a_r[1] = &PixelColor.i.r;
-			ColorInputs.blender2a_g[0] = ColorInputs.blender2a_g[1] = &PixelColor.i.r;
-			ColorInputs.blender2a_b[0] = ColorInputs.blender2a_b[1] = &PixelColor.i.r;
-			ColorInputs.blender2b_a[0] = ColorInputs.blender2b_a[1] = &PixelColor.i.r;
-
-			m_tmem = NULL;
-
-			m_machine = NULL;
-
-			//memset(m_hidden_bits, 3, 8388608);
-
-			PrimLODFraction = 0;
-			LODFraction = 0;
-
-			for (int i = 0; i < 256; i++)
-			{
-				m_gamma_table[i] = sqrt((float)(i << 6));
-				m_gamma_table[i] <<= 1;
-			}
-
-			for (int i = 0; i < 0x4000; i++)
-			{
-				m_gamma_dither_table[i] = sqrt((float)i);
-				m_gamma_dither_table[i] <<= 1;
-			}
-
-			z_build_com_table();
-
-			for (int i = 0; i < 0x4000; i++)
-			{
-				UINT32 exponent = (i >> 11) & 7;
-				UINT32 mantissa = i & 0x7ff;
-				z_complete_dec_table[i] = ((mantissa << z_dec_table[exponent].shift) + z_dec_table[exponent].add) & 0x3fffff;
-			}
-
-			precalc_cvmask_derivatives();
-
-			for(int i = 0; i < 0x200; i++)
-			{
-				switch((i >> 7) & 3)
-				{
-				case 0:
-				case 1:
-					m_special_9bit_clamptable[i] = i & 0xff;
-					break;
-				case 2:
-					m_special_9bit_clamptable[i] = 0xff;
-					break;
-				case 3:
-					m_special_9bit_clamptable[i] = 0;
-					break;
-				}
-			}
-
-			for(int i = 0; i < 32; i++)
-			{
-				ReplicatedRGBA[i] = (i << 3) | ((i >> 2) & 7);
-			}
-		}
-
-		~Processor() { }
-
-		void	Dasm(char *buffer);
-
-		void	ProcessList();
-		UINT32	ReadData(UINT32 address);
-
-		void set_span_base(int dr, int dg, int db, int da, int ds, int dt, int dw, int dz, int dymax, int dzpix)
-		{
-			m_span_dr = dr;
-			m_span_dg = dg;
-			m_span_db = db;
-			m_span_da = da;
-			m_span_ds = ds;
-			m_span_dt = dt;
-			m_span_dw = dw;
-			m_span_dz = dz;
-			m_span_dymax = dymax;
-			m_span_dzpix = dzpix;
-		}
-
-		void set_span_base_y(int dr, int dg, int db, int da, int dz)
-		{
-			m_span_drdy = dr;
-			m_span_dgdy = dg;
-			m_span_dbdy = db;
-			m_span_dady = da;
-			m_span_dzdy = dz;
-		}
+		n64_rdp(n64_state &state);
 
 		running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
@@ -437,6 +399,10 @@ class Processor
 			}
 		}
 
+		void		ProcessList();
+		UINT32		ReadData(UINT32 address);
+		void		Dasm(char *buffer);
+
 		void		SetMachine(running_machine& machine) { m_machine = &machine; }
 
 		// CPU-visible registers
@@ -453,26 +419,25 @@ class Processor
 		UINT32		GetStatusReg() const { return m_status; }
 
 		// Internal state
-		CombineModes*	GetCombine() { return &m_combine; }
+		CombineModesT*	GetCombine() { return &m_combine; }
 
 		// Color Combiner
 		INT32		ColorCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d);
 		INT32		AlphaCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d);
-		void		ColorCombiner2Cycle(bool noisecompute);
-		void		ColorCombiner1Cycle(bool noisecompute);
-		void		SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
-		void		SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
-		void		SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
-		void		SetAddInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
-		void		SetSubInputAlpha(UINT8 **input, int code);
-		void		SetMulInputAlpha(UINT8 **input, int code);
+		void		ColorCombiner2Cycle(rdp_span_aux *userdata);
+		void		ColorCombiner1Cycle(rdp_span_aux *userdata);
+		void		SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code, rdp_span_aux *userdata);
+		void		SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code, rdp_span_aux *userdata);
+		void		SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code, rdp_span_aux *userdata);
+		void		SetAddInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code, rdp_span_aux *userdata);
+		void		SetSubInputAlpha(UINT8 **input, int code, rdp_span_aux *userdata);
+		void		SetMulInputAlpha(UINT8 **input, int code, rdp_span_aux *userdata);
 
 		// Texture memory
 		UINT8*		GetTMEM() { return m_tmem; }
 		UINT16*		GetTMEM16() { return (UINT16*)m_tmem; }
 		UINT32*		GetTMEM32() { return (UINT32*)m_tmem; }
 		UINT16*		GetTLUT() { return (UINT16*)(m_tmem + 0x800); }
-		Tile*		GetTiles(){ return m_tiles; }
 
 		// Emulation Accelerators
 		UINT8		GetRandom() { return MiscState.RandomSeed += 0x13; }
@@ -487,25 +452,30 @@ class Processor
 		INT32*		GetK5() { return &m_k5; }
 
 		// Blender-related (move into RDP::Blender)
-		void		SetBlenderInput(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b);
+		void		SetBlenderInput(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b, rdp_span_aux *userdata);
+
+		// Span rasterization
+		void	SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, int threadid);
+		void	SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, int threadid);
+		void	SpanDrawCopy(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, int threadid);
+		void	SpanDrawFill(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, int threadid);
 
 		// Render-related (move into eventual drawing-related classes?)
-		Rectangle*		GetScissor() { return &m_scissor; }
 		void			TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
 		void			TCDivNoPersp(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
 		UINT32			GetLog2(UINT32 lod_clamp);
-		void			RenderSpans(int start, int end, int tilenum, bool flip);
-		void			GetAlphaCvg(UINT8 *comb_alpha);
+		void			RenderSpans(int start, int end, int tilenum, bool flip, extent_t *Spans, bool rect, rdp_poly_state &object);
+		void			GetAlphaCvg(UINT8 *comb_alpha, rdp_span_aux *userdata, const rdp_poly_state &object);
 		const UINT8*	GetBayerMatrix() const { return s_bayer_matrix; }
 		const UINT8*	GetMagicMatrix() const { return s_magic_matrix; }
 		int				GetCurrFIFOIndex() const { return m_cmd_cur; }
 
-		void			ZStore(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z);
+		void			ZStore(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc);
 		UINT32			ZDecompress(UINT32 zcurpixel);
 		UINT32			DZDecompress(UINT32 zcurpixel, UINT32 dzcurpixel);
 		UINT32			DZCompress(UINT32 value);
 		INT32			NormalizeDZPix(INT32 sum);
-		bool			ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dzpix);
+		bool			ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dzpix, rdp_span_aux *userdata, const rdp_poly_state &object);
 
 		// Fullscreen update-related
 		void			VideoUpdate(n64_periphs *n64, bitmap_rgb32 &bitmap);
@@ -549,81 +519,67 @@ class Processor
 		void		CmdSetMaskImage(UINT32 w1, UINT32 w2);
 		void		CmdSetColorImage(UINT32 w1, UINT32 w2);
 
+		void		RGBAZClip(int sr, int sg, int sb, int sa, int *sz, rdp_span_aux *userdata);
+		void		RGBAZCorrectTriangle(INT32 offx, INT32 offy, INT32* r, INT32* g, INT32* b, INT32* a, INT32* z, rdp_span_aux *userdata, const rdp_poly_state &object);
+
 		void		Triangle(bool shade, bool texture, bool zbuffer);
 		UINT32		AddRightCvg(UINT32 x, UINT32 k);
 		UINT32		AddLeftCvg(UINT32 x, UINT32 k);
 
-		UINT32*		GetCommandData() { return m_cmd_data; }
-		UINT32*		GetTempRectData() { return m_temp_rect_data; }
-
-		void		GetDitherValues(int x, int y, int* cdith, int* adith);
-
-
-		int 			m_span_dr;
-		int 			m_span_drdy;
-		int 			m_span_dg;
-		int 			m_span_dgdy;
-		int 			m_span_db;
-		int 			m_span_dbdy;
-		int 			m_span_da;
-		int 			m_span_dady;
-		int 			m_span_ds;
-		int 			m_span_dt;
-		int 			m_span_dw;
-		int 			m_span_dz;
-		int 			m_span_dzdy;
-		int 			m_span_dymax;
-		int 			m_span_dzpix;
+		void		GetDitherValues(int x, int y, int* cdith, int* adith, const rdp_poly_state &object);
 
 		UINT32*			GetSpecial9BitClampTable() { return m_special_9bit_clamptable; }
 
 		UINT16 decompress_cvmask_frombyte(UINT8 x);
-		void lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy);
+		void lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy, rdp_span_aux *userdata);
 
 		MiscStateT		MiscState;
 
 		// Color constants
-		Color			MemoryColor;
-		Color			PixelColor;
-		Color			InvPixelColor;
-		Color			BlendedPixelColor;
-		Color			BlendColor;
-
-		Color			PrimColor;
-		Color			EnvColor;
-		Color			FogColor;
-		Color			CombinedColor;
-		Color			Texel0Color;
-		Color			Texel1Color;
-		Color			NextTexelColor;
-		Color			ShadeColor;
-		Color			KeyScale;
-		Color			NoiseColor;
+		Color			BlendColor;				/* constant blend color */
+		Color			PrimColor;				/* flat primitive color */
+		Color			EnvColor;				/* generic color constant ('environment') */
+		Color			FogColor;				/* generic color constant ('fog') */
+		Color			KeyScale;				/* color-keying constant */
+		UINT8			LODFraction;			/* Z-based LOD fraction for this poly */
+		UINT8			PrimLODFraction;		/* fixed LOD fraction for this poly */
 
 		Color			OneColor;
 		Color			ZeroColor;
 
-		UINT8			LODFraction;
-		UINT8			PrimLODFraction;
-
 		UINT32			FillColor;
 
 		OtherModesT		OtherModes;
-		ColorInputsT	ColorInputs;
 
-		BlenderT		Blender;
+		N64BlenderT		Blender;
 
-		Span Spans[4096];
-
-		FramebufferT	Framebuffer;
-		TexturePipeT	TexPipe;
+		N64TexturePipeT	TexPipe;
 
 		UINT8 HiddenBits[0x800000];
 
 		UINT8 ReplicatedRGBA[32];
 
+		Rectangle 		Scissor;
+		SpanBaseT		SpanBase;
+
+		rectangle 		visarea;
+
+		void			DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect);
+		void 			compute_cvg_noflip(extent_t *Spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
+		void 			compute_cvg_flip(extent_t *Spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
+
+		void*			AuxBuf[2];
+		UINT32			AuxBufPtr[2];
+		UINT32			AuxBufIndex;
+
+		void*			ExtentBuf[2];
+		UINT32			ExtentBufPtr[2];
+		UINT32			ExtentBufIndex;
+
 	protected:
-		CombineModes	m_combine;
+		CombineModesT	m_combine;
+		bool			m_pending_mode_block;
+		bool			m_pipe_clean;
 
 		typedef struct
 		{
@@ -651,7 +607,7 @@ class Processor
 
 		UINT8*		m_tmem;
 
-		Tile		m_tiles[8];
+		N64Tile		m_tiles[8];
 
 		running_machine* m_machine;
 
@@ -662,9 +618,6 @@ class Processor
 		INT32 m_k3;
 		INT32 m_k4;
 		INT32 m_k5;
-
-		// Render-related (move into eventual drawing-related classes?)
-		Rectangle m_scissor;
 
 		// Texture perspective division
 		INT32 m_norm_point_rom[64];
@@ -678,8 +631,29 @@ class Processor
 
 		UINT32 m_special_9bit_clamptable[512];
 
-		INT32 m_dzpix_enc;
-		INT32 m_dz_enc;
+		Writer				_Write[16];
+		Reader				_Read[4];
+		Copier				_Copy[2];
+		Filler				_Fill[2];
+
+		void				_Write16Bit_Cvg0_Blend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Write16Bit_Cvg0_NoBlend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Write16Bit_Cvg1(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Write16Bit_Cvg2(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Write16Bit_Cvg3(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Write32Bit_Cvg0_Blend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Write32Bit_Cvg0_NoBlend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Write32Bit_Cvg1(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Write32Bit_Cvg2(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Write32Bit_Cvg3(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Read16Bit_ImgRead0(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Read16Bit_ImgRead1(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Read32Bit_ImgRead0(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Read32Bit_ImgRead1(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				_Copy16Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int CurrentPixCvg, const rdp_poly_state &object);
+		void				_Copy32Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int CurrentPixCvg, const rdp_poly_state &object);
+		void				_Fill16Bit(UINT32 curpixel, const rdp_poly_state &object);
+		void				_Fill32Bit(UINT32 curpixel, const rdp_poly_state &object);
 
 		class ZDecompressEntry
 		{
@@ -700,9 +674,5 @@ class Processor
 
 		static const Command m_commands[0x40];
 };
-
-} // namespace RDP
-
-} // namespace N64
 
 #endif // _VIDEO_N64_H_

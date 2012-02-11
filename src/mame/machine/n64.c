@@ -5,6 +5,8 @@
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips3com.h"
 #include "includes/n64.h"
+#include "video/n64.h"
+#include "profiler.h"
 
 UINT32 *rdram;
 UINT32 *rsp_imem;
@@ -758,22 +760,22 @@ void dp_full_sync(running_machine &machine)
 
 READ32_DEVICE_HANDLER( n64_dp_reg_r )
 {
-	_n64_state *state = device->machine().driver_data<_n64_state>();
+	n64_state *state = device->machine().driver_data<n64_state>();
 
-	//printf("%08x\n", offset);
+	//printf("dp_reg_r %08x\n", offset);
 	switch (offset)
 	{
 		case 0x00/4:		// DP_START_REG
-			return state->m_rdp.GetStartReg();
+			return state->m_rdp->GetStartReg();
 
 		case 0x04/4:		// DP_END_REG
-			return state->m_rdp.GetEndReg();
+			return state->m_rdp->GetEndReg();
 
 		case 0x08/4:		// DP_CURRENT_REG
-			return state->m_rdp.GetCurrentReg();
+			return state->m_rdp->GetCurrentReg();
 
 		case 0x0c/4:		// DP_STATUS_REG
-			return state->m_rdp.GetStatusReg();
+			return state->m_rdp->GetStatusReg();
 
 		default:
 			logerror("dp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(device));
@@ -785,33 +787,33 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 
 WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 {
-	_n64_state *state = device->machine().driver_data<_n64_state>();
+	n64_state *state = device->machine().driver_data<n64_state>();
 
-	//printf("%08x: %08x\n", offset, data);
+	//printf("dp_reg_w %08x %08x %08x\n", offset, data, mem_mask);
 	switch (offset)
 	{
 		case 0x00/4:		// DP_START_REG
-			state->m_rdp.SetStartReg(data);
-			state->m_rdp.SetCurrentReg(state->m_rdp.GetStartReg());
+			state->m_rdp->SetStartReg(data);
+			state->m_rdp->SetCurrentReg(state->m_rdp->GetStartReg());
 			break;
 
 		case 0x04/4:		// DP_END_REG
-			state->m_rdp.SetEndReg(data);
+			state->m_rdp->SetEndReg(data);
 			g_profiler.start(PROFILER_USER1);
-			state->m_rdp.ProcessList();
+			state->m_rdp->ProcessList();
 			g_profiler.stop();
 			break;
 
 		case 0x0c/4:		// DP_STATUS_REG
 		{
-			UINT32 current_status = state->m_rdp.GetStatusReg();
+			UINT32 current_status = state->m_rdp->GetStatusReg();
 			if (data & 0x00000001)	current_status &= ~DP_STATUS_XBUS_DMA;
 			if (data & 0x00000002)	current_status |= DP_STATUS_XBUS_DMA;
 			if (data & 0x00000004)	current_status &= ~DP_STATUS_FREEZE;
 			if (data & 0x00000008)	current_status |= DP_STATUS_FREEZE;
 			if (data & 0x00000010)	current_status &= ~DP_STATUS_FLUSH;
 			if (data & 0x00000020)	current_status |= DP_STATUS_FLUSH;
-			state->m_rdp.SetStatusReg(current_status);
+			state->m_rdp->SetStatusReg(current_status);
 			break;
 		}
 
@@ -835,7 +837,7 @@ const rsp_config n64_rsp_config =
 // Video Interface
 void n64_periphs::vi_recalculate_resolution()
 {
-	_n64_state *state = machine().driver_data<_n64_state>();
+	n64_state *state = machine().driver_data<n64_state>();
 
     int x_start = (vi_hstart & 0x03ff0000) >> 16;
     int x_end = vi_hstart & 0x000003ff;
@@ -866,7 +868,7 @@ void n64_periphs::vi_recalculate_resolution()
     if (height > 480)
         height = 480;
 
-	state->m_rdp.MiscState.FBHeight = height;
+	state->m_rdp->MiscState.FBHeight = height;
 
     visarea.max_x = width - 1;
     visarea.max_y = height - 1;
@@ -930,7 +932,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 WRITE32_MEMBER( n64_periphs::vi_reg_w )
 {
 	//printf("vi_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
-	_n64_state *state = machine().driver_data<_n64_state>();
+	n64_state *state = machine().driver_data<n64_state>();
 
 	switch (offset)
 	{
@@ -949,7 +951,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
                 vi_recalculate_resolution();
 			}
             vi_width = data;
-		    state->m_rdp.MiscState.FBWidth = data;
+		    state->m_rdp->MiscState.FBWidth = data;
 			break;
 
 		case 0x0c/4:		// VI_INTR_REG

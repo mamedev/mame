@@ -2,18 +2,13 @@
 #include "includes/n64.h"
 #include "video/n64.h"
 
-namespace N64
-{
-
-namespace RDP
-{
-
 #define LookUpCC(A, B, C, D) m_rdp->GetCCLUT2()[(m_rdp->GetCCLUT1()[(A << 16) | (B << 8) | C] << 8) | D]
 
-void Processor::RenderSpans(int start, int end, int tilenum, bool flip)
+void n64_rdp::RenderSpans(int start, int end, int tilenum, bool flip, extent_t *Spans, bool rect, rdp_poly_state &object)
 {
-	int clipy1 = GetScissor()->m_yh;
-	int clipy2 = GetScissor()->m_yl;
+	int clipy1 = Scissor.m_yh;
+	int clipy2 = Scissor.m_yl;
+	int offset = 0;
 
 	if (clipy2 <= 0)
 	{
@@ -22,68 +17,59 @@ void Processor::RenderSpans(int start, int end, int tilenum, bool flip)
 
 	if (start < clipy1)
 	{
+		offset = clipy1 - start;
 		start = clipy1;
 	}
 	if (start >= clipy2)
 	{
+		offset = start - (clipy2 - 1);
 		start = clipy2 - 1;
 	}
 	if (end < clipy1)
 	{
 		end = clipy1;
 	}
-	if (end >= clipy2) // Needed by 40 Winks
+	if (end >= clipy2)
 	{
 		end = clipy2 - 1;
 	}
 
-	for(int i = start; i <= end; i++)
+	object.m_rdp = this;
+	memcpy(&object.MiscState, &MiscState, sizeof(MiscStateT));
+	memcpy(&object.OtherModes, &OtherModes, sizeof(OtherModesT));
+	memcpy(&object.SpanBase, &SpanBase, sizeof(SpanBaseT));
+	memcpy(&object.Scissor, &Scissor, sizeof(Rectangle));
+	memcpy(&object.m_tiles, &m_tiles, 8 * sizeof(N64Tile));
+	object.tilenum = tilenum;
+	object.flip = flip;
+	object.FillColor = FillColor;
+	object.rect = rect;
+
+	switch(OtherModes.cycle_type)
 	{
-		switch(OtherModes.cycle_type)
-		{
-			case CYCLE_TYPE_1: Spans[i].Draw1Cycle(i, tilenum, flip); break;
-			case CYCLE_TYPE_2: Spans[i].Draw2Cycle(i, tilenum, flip); break;
-			case CYCLE_TYPE_COPY: Spans[i].DrawCopy(i, tilenum, flip); break;
-			case CYCLE_TYPE_FILL: Spans[i].DrawFill(i, tilenum, flip); break;
-		}
+		case CYCLE_TYPE_1:
+			render_triangle_custom(visarea, render_delegate(FUNC(n64_rdp::SpanDraw1Cycle), this), start, (end - start) + 1, Spans + offset);
+			break;
+		case CYCLE_TYPE_2:
+			render_triangle_custom(visarea, render_delegate(FUNC(n64_rdp::SpanDraw2Cycle), this), start, (end - start) + 1, Spans + offset);
+			break;
+
+		case CYCLE_TYPE_COPY:
+			render_triangle_custom(visarea, render_delegate(FUNC(n64_rdp::SpanDrawCopy), this), start, (end - start) + 1, Spans + offset);
+			break;
+
+		case CYCLE_TYPE_FILL:
+			render_triangle_custom(visarea, render_delegate(FUNC(n64_rdp::SpanDrawFill), this), start, (end - start) + 1, Spans + offset);
+			break;
 	}
 }
 
-void Span::Dump()
+void n64_rdp::RGBAZClip(int sr, int sg, int sb, int sa, int *sz, rdp_span_aux *userdata)
 {
-	printf("    m_lx = %d\n", m_lx);
-	printf("    m_rx = %d\n",  m_rx);
-	printf("    m_s.w = %08x\n", m_s.w);
-	printf("    m_t.w = %08x\n", m_t.w);
-	printf("    m_w.w = %08x\n", m_w.w);
-	printf("    m_r.w = %08x\n", m_r.w);
-	printf("    m_g.w = %08x\n", m_g.w);
-	printf("    m_b.w = %08x\n", m_b.w);
-	printf("    m_a.w = %08x\n", m_a.w);
-	printf("    m_z.w = %08x\n", m_z.w);
-
-	printf("    CVG: ");
-	for(int index = 0; index < RDP_CVG_SPAN_MAX; index++)
-	{
-		printf("%d", m_cvg[index]);
-	}
-	printf("\n");
-}
-
-void Span::SetMachine(running_machine &machine)
-{
-	_n64_state *state = machine.driver_data<_n64_state>();
-
-	m_machine = &machine;
-	m_rdp = &state->m_rdp;
-}
-
-void Span::RGBAZClip(int sr, int sg, int sb, int sa, int *sz)
-{
-	m_rdp->ShadeColor.i.r = m_rdp->GetSpecial9BitClampTable()[sr & 0x1ff];
-	m_rdp->ShadeColor.i.g = m_rdp->GetSpecial9BitClampTable()[sg & 0x1ff];
-	m_rdp->ShadeColor.i.b = m_rdp->GetSpecial9BitClampTable()[sb & 0x1ff];
-	m_rdp->ShadeColor.i.a = m_rdp->GetSpecial9BitClampTable()[sa & 0x1ff];
+	userdata->ShadeColor.i.r = m_special_9bit_clamptable[sr & 0x1ff];
+	userdata->ShadeColor.i.g = m_special_9bit_clamptable[sg & 0x1ff];
+	userdata->ShadeColor.i.b = m_special_9bit_clamptable[sb & 0x1ff];
+	userdata->ShadeColor.i.a = m_special_9bit_clamptable[sa & 0x1ff];
 
 	INT32 zanded = (*sz) & 0x60000;
 
@@ -97,9 +83,9 @@ void Span::RGBAZClip(int sr, int sg, int sb, int sa, int *sz)
 	}
 }
 
-void Span::RGBAZCorrectTriangle(INT32 offx, INT32 offy, INT32* r, INT32* g, INT32* b, INT32* a, INT32* z)
+void n64_rdp::RGBAZCorrectTriangle(INT32 offx, INT32 offy, INT32* r, INT32* g, INT32* b, INT32* a, INT32* z, rdp_span_aux *userdata, const rdp_poly_state &object)
 {
-	if (m_rdp->MiscState.CurrentPixCvg == 8)
+	if (userdata->CurrentPixCvg == 8)
 	{
 		*r >>= 2;
 		*g >>= 2;
@@ -109,17 +95,17 @@ void Span::RGBAZCorrectTriangle(INT32 offx, INT32 offy, INT32* r, INT32* g, INT3
 	}
 	else
 	{
-		INT32 summand_xr = offx * SIGN13(m_rdp->m_span_dr >> 14);
-		INT32 summand_yr = offy * SIGN13(m_rdp->m_span_drdy >> 14);
-		INT32 summand_xb = offx * SIGN13(m_rdp->m_span_db >> 14);
-		INT32 summand_yb = offy * SIGN13(m_rdp->m_span_dbdy >> 14);
-		INT32 summand_xg = offx * SIGN13(m_rdp->m_span_dg >> 14);
-		INT32 summand_yg = offy * SIGN13(m_rdp->m_span_dgdy >> 14);
-		INT32 summand_xa = offx * SIGN13(m_rdp->m_span_da >> 14);
-		INT32 summand_ya = offy * SIGN13(m_rdp->m_span_dady >> 14);
+		INT32 summand_xr = offx * SIGN13(object.SpanBase.m_span_dr >> 14);
+		INT32 summand_yr = offy * SIGN13(object.SpanBase.m_span_drdy >> 14);
+		INT32 summand_xb = offx * SIGN13(object.SpanBase.m_span_db >> 14);
+		INT32 summand_yb = offy * SIGN13(object.SpanBase.m_span_dbdy >> 14);
+		INT32 summand_xg = offx * SIGN13(object.SpanBase.m_span_dg >> 14);
+		INT32 summand_yg = offy * SIGN13(object.SpanBase.m_span_dgdy >> 14);
+		INT32 summand_xa = offx * SIGN13(object.SpanBase.m_span_da >> 14);
+		INT32 summand_ya = offy * SIGN13(object.SpanBase.m_span_dady >> 14);
 
-		INT32 summand_xz = offx * SIGN22(m_rdp->m_span_dz >> 10);
-		INT32 summand_yz = offy * SIGN22(m_rdp->m_span_dzdy >> 10);
+		INT32 summand_xz = offx * SIGN22(object.SpanBase.m_span_dz >> 10);
+		INT32 summand_yz = offy * SIGN22(object.SpanBase.m_span_dzdy >> 10);
 
 		*r = ((*r << 2) + summand_xr + summand_yr) >> 4;
 		*g = ((*g << 2) + summand_xg + summand_yg) >> 4;
@@ -129,58 +115,71 @@ void Span::RGBAZCorrectTriangle(INT32 offx, INT32 offy, INT32* r, INT32* g, INT3
 	}
 }
 
-void Span::Draw1Cycle(int index, int tilenum, bool flip)
+void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, int threadid)
 {
-	int clipx1 = m_rdp->GetScissor()->m_xh;
-	int clipx2 = m_rdp->GetScissor()->m_xl;
+	int clipx1 = object.Scissor.m_xh;
+	int clipx2 = object.Scissor.m_xl;
+	n64_rdp *m_rdp = object.m_rdp;
+	int tilenum = object.tilenum;
+	bool flip = object.flip;
 
-	SpanParam r = m_r;
-	SpanParam g = m_g;
-	SpanParam b = m_b;
-	SpanParam a = m_a;
-	SpanParam z = m_z;
-	SpanParam s = m_s;
-	SpanParam t = m_t;
-	SpanParam w = m_w;
+	SpanParam r; r.w = extent.param[SPAN_R].start;
+	SpanParam g; g.w = extent.param[SPAN_G].start;
+	SpanParam b; b.w = extent.param[SPAN_B].start;
+	SpanParam a; a.w = extent.param[SPAN_A].start;
+	SpanParam z; z.w = extent.param[SPAN_Z].start;
+	SpanParam s; s.w = extent.param[SPAN_S].start;
+	SpanParam t; t.w = extent.param[SPAN_T].start;
+	SpanParam w; w.w = extent.param[SPAN_W].start;
 
-	UINT32 zb = m_rdp->MiscState.ZBAddress >> 1;
+	UINT32 zb = object.MiscState.ZBAddress >> 1;
 	UINT32 zhb = zb;
 	UINT8 offx = 0, offy = 0;
 
 	INT32 tile1 = tilenum;
 
-	m_rdp->TexPipe.CalculateClampDiffs(tile1);
+	rdp_span_aux *userdata = (rdp_span_aux*)extent.userdata;
 
-	bool noisecompute = m_rdp->ColorInputs.combiner_rgbsub_a_r[1] == &m_rdp->NoiseColor.i.r;
-	bool partialreject = (m_rdp->ColorInputs.blender2b_a[0] == &m_rdp->InvPixelColor.i.a && m_rdp->ColorInputs.blender1b_a[0] == &m_rdp->PixelColor.i.a);
-	bool bsel0 = (m_rdp->ColorInputs.blender2b_a[0] == &m_rdp->MemoryColor.i.a);
+	m_rdp->TexPipe.CalculateClampDiffs(tile1, userdata, object);
 
-	int drinc = flip ? (m_rdp->m_span_dr) : -m_rdp->m_span_dr;
-	int dginc = flip ? (m_rdp->m_span_dg) : -m_rdp->m_span_dg;
-	int dbinc = flip ? (m_rdp->m_span_db) : -m_rdp->m_span_db;
-	int dainc = flip ? (m_rdp->m_span_da) : -m_rdp->m_span_da;
-	int dzinc = flip ? (m_rdp->m_span_dz) : -m_rdp->m_span_dz;
-	int dsinc = flip ? (m_rdp->m_span_ds) : -m_rdp->m_span_ds;
-	int dtinc = flip ? (m_rdp->m_span_dt) : -m_rdp->m_span_dt;
-	int dwinc = flip ? (m_rdp->m_span_dw) : -m_rdp->m_span_dw;
-	int dzpix = m_rdp->m_span_dzpix;
+	bool partialreject = (userdata->ColorInputs.blender2b_a[0] == &userdata->InvPixelColor.i.a && userdata->ColorInputs.blender1b_a[0] == &userdata->PixelColor.i.a);
+	bool bsel0 = (userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a);
+
+	int drinc = flip ? (object.SpanBase.m_span_dr) : -object.SpanBase.m_span_dr;
+	int dginc = flip ? (object.SpanBase.m_span_dg) : -object.SpanBase.m_span_dg;
+	int dbinc = flip ? (object.SpanBase.m_span_db) : -object.SpanBase.m_span_db;
+	int dainc = flip ? (object.SpanBase.m_span_da) : -object.SpanBase.m_span_da;
+	int dzinc = flip ? (object.SpanBase.m_span_dz) : -object.SpanBase.m_span_dz;
+	int dsinc = flip ? (object.SpanBase.m_span_ds) : -object.SpanBase.m_span_ds;
+	int dtinc = flip ? (object.SpanBase.m_span_dt) : -object.SpanBase.m_span_dt;
+	int dwinc = flip ? (object.SpanBase.m_span_dw) : -object.SpanBase.m_span_dw;
+	int dzpix = object.SpanBase.m_span_dzpix;
 	int xinc = flip ? 1 : -1;
 
-	int fb_index = m_rdp->MiscState.FBWidth * index;
+	int fb_index = object.MiscState.FBWidth * scanline;
 
 	int cdith = 0;
 	int adith = 0;
 
-	int xstart = m_lx;
-	int xend = m_unscissored_rx;
-	int xend_scissored = m_rx;
+	int xstart = extent.startx;
+	int xend = userdata->m_unscissored_rx;
+	int xend_scissored = extent.stopx;
 
 	int x = xend;
 
 	int length = flip ? (xstart - xend) : (xend - xstart);
-	m_rdp->TexPipe.m_start_span = true;
 	UINT32 fir, fig, fib;
 
+	//if(object.rect) printf("(%s) Scan %d Span %d to %d %d, length %d\n", flip ? "Flip" : "NoFlip", scanline, xstart, xend_scissored, xend, length); fflush(stdout);
+
+	if(object.OtherModes.z_source_sel)
+	{
+		z.w = ((UINT32)object.MiscState.PrimitiveZ) << 16;
+		dzpix = object.MiscState.PrimitiveDZ;
+		dzinc = 0;
+	}
+
+	userdata->m_start_span = true;
 	for (int j = 0; j <= length; j++)
 	{
 		int sr = r.w >> 14;
@@ -194,22 +193,15 @@ void Span::Draw1Cycle(int index, int tilenum, bool flip)
 		INT32 sss = 0;
 		INT32 sst = 0;
 
-		if (m_rdp->OtherModes.z_source_sel)
-		{
-			sz = (((UINT32)m_rdp->MiscState.PrimitiveZ) << 6) & 0x3fffff;
-			dzpix = m_rdp->MiscState.PrimitiveDZ;
-			dzinc = m_rdp->m_span_dz = m_rdp->m_span_dzdy = 0;
-		}
-
 		bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
 
 		if (x >= clipx1 && x < clipx2 && valid_x)
 		{
-			m_rdp->lookup_cvmask_derivatives(m_cvg[x], &offx, &offy);
+			m_rdp->lookup_cvmask_derivatives(userdata->m_cvg[x], &offx, &offy, userdata);
 
-			if (m_rdp->TexPipe.m_start_span)
+			if (userdata->m_start_span)
 			{
-				if (m_rdp->OtherModes.persp_tex_en)
+				if (object.OtherModes.persp_tex_en)
 				{
 					m_rdp->TCDiv(ss, st, sw, &sss, &sst);
 				}
@@ -220,37 +212,40 @@ void Span::Draw1Cycle(int index, int tilenum, bool flip)
 			}
 			else
 			{
-				sss = m_rdp->TexPipe.m_precomp_s;
-				sst = m_rdp->TexPipe.m_precomp_t;
+				sss = userdata->m_precomp_s;
+				sst = userdata->m_precomp_t;
 			}
 
-			m_rdp->TexPipe.LOD1Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc);
+			m_rdp->TexPipe.LOD1Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, userdata, object);
 
-			RGBAZCorrectTriangle(offx, offy, &sr, &sg, &sb, &sa, &sz);
-			RGBAZClip(sr, sg, sb, sa, &sz);
+			RGBAZCorrectTriangle(offx, offy, &sr, &sg, &sb, &sa, &sz, userdata, object);
+			RGBAZClip(sr, sg, sb, sa, &sz, userdata);
 
-			m_rdp->TexPipe.Cycle(&m_rdp->Texel0Color, &m_rdp->Texel0Color, sss, sst, tilenum, 0);
+			m_rdp->TexPipe.Cycle(&userdata->Texel0Color, &userdata->Texel0Color, sss, sst, tilenum, 0, userdata, object);
 
-			m_rdp->ColorCombiner1Cycle(noisecompute);
+			m_rdp->ColorCombiner1Cycle(userdata);
+
+			//Alpha coverage combiner
+			GetAlphaCvg(&userdata->PixelColor.i.a, userdata, object);
 
 			UINT32 curpixel = fb_index + x;
 			UINT32 zbcur = zb + curpixel;
 			UINT32 zhbcur = zhb + curpixel;
 
-			m_rdp->Framebuffer.Read(curpixel);
+			((this)->*(_Read[((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en]))(curpixel, userdata, object);
 
-			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix))
+			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
-				m_rdp->GetDitherValues(index, j, &cdith, &adith);
+				m_rdp->GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = m_rdp->Blender.Blend1Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0);
+				bool rendered = m_rdp->Blender.Blend1Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, userdata, object);
 
                 if (rendered)
 				{
-					m_rdp->Framebuffer.Write(curpixel, fir, fig, fib);
-					if (m_rdp->OtherModes.z_update_en)
+					((this)->*(_Write[((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1) | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
+					if (object.OtherModes.z_update_en)
 					{
-						m_rdp->ZStore(zbcur, zhbcur, sz);
+						m_rdp->ZStore(zbcur, zhbcur, sz, userdata->m_dzpix_enc);
 					}
 				}
 			}
@@ -267,23 +262,28 @@ void Span::Draw1Cycle(int index, int tilenum, bool flip)
 
 		x += xinc;
 	}
+
+	//printf("\n");
 }
 
-void Span::Draw2Cycle(int index, int tilenum, bool flip)
+void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, int threadid)
 {
-	int clipx1 = m_rdp->GetScissor()->m_xh;
-	int clipx2 = m_rdp->GetScissor()->m_xl;
+	int clipx1 = object.Scissor.m_xh;
+	int clipx2 = object.Scissor.m_xl;
+	n64_rdp *m_rdp = object.m_rdp;
+	int tilenum = object.tilenum;
+	bool flip = object.flip;
 
-	SpanParam r = m_r;
-	SpanParam g = m_g;
-	SpanParam b = m_b;
-	SpanParam a = m_a;
-	SpanParam z = m_z;
-	SpanParam s = m_s;
-	SpanParam t = m_t;
-	SpanParam w = m_w;
+	SpanParam r; r.w = extent.param[SPAN_R].start;
+	SpanParam g; g.w = extent.param[SPAN_G].start;
+	SpanParam b; b.w = extent.param[SPAN_B].start;
+	SpanParam a; a.w = extent.param[SPAN_A].start;
+	SpanParam z; z.w = extent.param[SPAN_Z].start;
+	SpanParam s; s.w = extent.param[SPAN_S].start;
+	SpanParam t; t.w = extent.param[SPAN_T].start;
+	SpanParam w; w.w = extent.param[SPAN_W].start;
 
-	UINT32 zb = m_rdp->MiscState.ZBAddress >> 1;
+	UINT32 zb = object.MiscState.ZBAddress >> 1;
 	UINT32 zhb = zb;
 	UINT8 offx = 0, offy = 0;
 
@@ -295,41 +295,47 @@ void Span::Draw2Cycle(int index, int tilenum, bool flip)
 	INT32 news = 0;
 	INT32 newt = 0;
 
-	m_rdp->TexPipe.CalculateClampDiffs(tile1);
+	rdp_span_aux *userdata = (rdp_span_aux*)extent.userdata;
 
-	bool noisecompute = (m_rdp->ColorInputs.combiner_rgbsub_a_r[0] == &m_rdp->NoiseColor.i.r || m_rdp->ColorInputs.combiner_rgbsub_a_r[1] == &m_rdp->PixelColor.i.r);
-	bool partialreject = (m_rdp->ColorInputs.blender2b_a[1] == &m_rdp->InvPixelColor.i.a && m_rdp->ColorInputs.blender1b_a[1] == &m_rdp->PixelColor.i.a);
-	bool bsel0 = (m_rdp->ColorInputs.blender2b_a[0] == &m_rdp->MemoryColor.i.a);
-	bool bsel1 = (m_rdp->ColorInputs.blender2b_a[1] == &m_rdp->MemoryColor.i.a);
+	m_rdp->TexPipe.CalculateClampDiffs(tile1, userdata, object);
 
-	int dzpix = m_rdp->m_span_dzpix;
-	int drinc = flip ? (m_rdp->m_span_dr) : -m_rdp->m_span_dr;
-	int dginc = flip ? (m_rdp->m_span_dg) : -m_rdp->m_span_dg;
-	int dbinc = flip ? (m_rdp->m_span_db) : -m_rdp->m_span_db;
-	int dainc = flip ? (m_rdp->m_span_da) : -m_rdp->m_span_da;
-	int dzinc = flip ? (m_rdp->m_span_dz) : -m_rdp->m_span_dz;
-	int dsinc = flip ? (m_rdp->m_span_ds) : -m_rdp->m_span_ds;
-	int dtinc = flip ? (m_rdp->m_span_dt) : -m_rdp->m_span_dt;
-	int dwinc = flip ? (m_rdp->m_span_dw) : -m_rdp->m_span_dw;
+	bool partialreject = (userdata->ColorInputs.blender2b_a[1] == &userdata->InvPixelColor.i.a && userdata->ColorInputs.blender1b_a[1] == &userdata->PixelColor.i.a);
+	bool bsel0 = (userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a);
+	bool bsel1 = (userdata->ColorInputs.blender2b_a[1] == &userdata->MemoryColor.i.a);
+
+	int dzpix = object.SpanBase.m_span_dzpix;
+	int drinc = flip ? (object.SpanBase.m_span_dr) : -object.SpanBase.m_span_dr;
+	int dginc = flip ? (object.SpanBase.m_span_dg) : -object.SpanBase.m_span_dg;
+	int dbinc = flip ? (object.SpanBase.m_span_db) : -object.SpanBase.m_span_db;
+	int dainc = flip ? (object.SpanBase.m_span_da) : -object.SpanBase.m_span_da;
+	int dzinc = flip ? (object.SpanBase.m_span_dz) : -object.SpanBase.m_span_dz;
+	int dsinc = flip ? (object.SpanBase.m_span_ds) : -object.SpanBase.m_span_ds;
+	int dtinc = flip ? (object.SpanBase.m_span_dt) : -object.SpanBase.m_span_dt;
+	int dwinc = flip ? (object.SpanBase.m_span_dw) : -object.SpanBase.m_span_dw;
 	int xinc = flip ? 1 : -1;
 
-	int fb_index = m_rdp->MiscState.FBWidth * index;
+	int fb_index = object.MiscState.FBWidth * scanline;
 
 	int cdith = 0;
 	int adith = 0;
 
-	int xstart = m_lx;
-	int xend = m_unscissored_rx;
-	int xend_scissored = m_rx;
+	int xstart = extent.startx;
+	int xend = userdata->m_unscissored_rx;
+	int xend_scissored = extent.stopx;
 
 	int x = xend;
 
 	int length = flip ? (xstart - xend) : (xend - xstart);
-	m_rdp->TexPipe.m_start_span = true;
 	UINT32 fir, fig, fib;
 
-	//printf( "Span length: %d\n", length);
+	if(object.OtherModes.z_source_sel)
+	{
+		z.w = ((UINT32)object.MiscState.PrimitiveZ) << 16;
+		dzpix = object.MiscState.PrimitiveDZ;
+		dzinc = 0;
+	}
 
+	userdata->m_start_span = true;
 	for (int j = 0; j <= length; j++)
 	{
 		int sr = r.w >> 14;
@@ -345,22 +351,15 @@ void Span::Draw2Cycle(int index, int tilenum, bool flip)
 		Color c1;
 		Color c2;
 
-		if (m_rdp->OtherModes.z_source_sel)
-		{
-			sz = (((UINT32)m_rdp->MiscState.PrimitiveZ) << 6) & 0x3fffff;
-			dzpix = m_rdp->MiscState.PrimitiveDZ;
-			dzinc = m_rdp->m_span_dz = m_rdp->m_span_dzdy = 0;
-		}
-
 		bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
 
 		if (x >= clipx1 && x < clipx2 && valid_x)
 		{
-			m_rdp->lookup_cvmask_derivatives(m_cvg[x], &offx, &offy);
+			m_rdp->lookup_cvmask_derivatives(userdata->m_cvg[x], &offx, &offy, userdata);
 
-			if (m_rdp->TexPipe.m_start_span)
+			if (userdata->m_start_span)
 			{
-				if (m_rdp->OtherModes.persp_tex_en)
+				if (object.OtherModes.persp_tex_en)
 				{
 					m_rdp->TCDiv(ss, st, sw, &sss, &sst);
 				}
@@ -371,44 +370,47 @@ void Span::Draw2Cycle(int index, int tilenum, bool flip)
 			}
 			else
 			{
-				sss = m_rdp->TexPipe.m_precomp_s;
-				sst = m_rdp->TexPipe.m_precomp_t;
+				sss = userdata->m_precomp_s;
+				sst = userdata->m_precomp_t;
 			}
 
-			m_rdp->TexPipe.LOD2Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, prim_tile, &tile1, &tile2);
+			m_rdp->TexPipe.LOD2Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, prim_tile, &tile1, &tile2, userdata, object);
 
-			news = m_rdp->TexPipe.m_precomp_s;
-			newt = m_rdp->TexPipe.m_precomp_t;
-			m_rdp->TexPipe.LOD2CycleLimited(&news, &newt, s.w + dsinc, t.w + dtinc, w.w + dwinc, dsinc, dtinc, dwinc, prim_tile, &newtile1);
+			news = userdata->m_precomp_s;
+			newt = userdata->m_precomp_t;
+			m_rdp->TexPipe.LOD2CycleLimited(&news, &newt, s.w + dsinc, t.w + dtinc, w.w + dwinc, dsinc, dtinc, dwinc, prim_tile, &newtile1, object);
 
-			RGBAZCorrectTriangle(offx, offy, &sr, &sg, &sb, &sa, &sz);
-			RGBAZClip(sr, sg, sb, sa, &sz);
+			RGBAZCorrectTriangle(offx, offy, &sr, &sg, &sb, &sa, &sz, userdata, object);
+			RGBAZClip(sr, sg, sb, sa, &sz, userdata);
 
-			m_rdp->TexPipe.Cycle(&m_rdp->Texel0Color, &m_rdp->Texel0Color, sss, sst, tile1, 0);
-			m_rdp->TexPipe.Cycle(&m_rdp->Texel1Color, &m_rdp->Texel0Color, sss, sst, tile2, 1);
+			m_rdp->TexPipe.Cycle(&userdata->Texel0Color, &userdata->Texel0Color, sss, sst, tile1, 0, userdata, object);
+			m_rdp->TexPipe.Cycle(&userdata->Texel1Color, &userdata->Texel0Color, sss, sst, tile2, 1, userdata, object);
 
-			m_rdp->TexPipe.Cycle(&m_rdp->NextTexelColor, &m_rdp->NextTexelColor, sss, sst, tile2, 1);
+			m_rdp->TexPipe.Cycle(&userdata->NextTexelColor, &userdata->NextTexelColor, sss, sst, tile2, 1, userdata, object);
 
-			m_rdp->ColorCombiner2Cycle(noisecompute);
+			m_rdp->ColorCombiner2Cycle(userdata);
+
+			//Alpha coverage combiner
+			GetAlphaCvg(&userdata->PixelColor.i.a, userdata, object);
 
 			UINT32 curpixel = fb_index + x;
 			UINT32 zbcur = zb + curpixel;
 			UINT32 zhbcur = zhb + curpixel;
 
-			m_rdp->Framebuffer.Read(curpixel);
+			((this)->*(_Read[((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en]))(curpixel, userdata, object);
 
-			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix))
+			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
-				m_rdp->GetDitherValues(index, j, &cdith, &adith);
+				m_rdp->GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = m_rdp->Blender.Blend2Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, bsel1);
+				bool rendered = m_rdp->Blender.Blend2Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, bsel1, userdata, object);
 
                 if (rendered)
 				{
-					m_rdp->Framebuffer.Write(curpixel, fir, fig, fib);
-					if (m_rdp->OtherModes.z_update_en)
+					((this)->*(_Write[((object.MiscState.FBSize - 2) << 3) | (object.OtherModes.cvg_dest << 1) | userdata->BlendEnable]))(curpixel, fir, fig, fib, userdata, object);
+					if (object.OtherModes.z_update_en)
 					{
-						m_rdp->ZStore(zbcur, zhbcur, sz);
+						m_rdp->ZStore(zbcur, zhbcur, sz, userdata->m_dzpix_enc);
 					}
 				}
 			}
@@ -427,25 +429,29 @@ void Span::Draw2Cycle(int index, int tilenum, bool flip)
 	}
 }
 
-void Span::DrawCopy(int index, int tilenum, bool flip)
+void n64_rdp::SpanDrawCopy(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, int threadid)
 {
-	int clipx1 = m_rdp->GetScissor()->m_xh;
-	int clipx2 = m_rdp->GetScissor()->m_xl;
+	int clipx1 = object.Scissor.m_xh;
+	int clipx2 = object.Scissor.m_xl;
+	n64_rdp *m_rdp = object.m_rdp;
+	int tilenum = object.tilenum;
+	bool flip = object.flip;
 
-	SpanParam s = m_s;
-	SpanParam t = m_t;
+	SpanParam s; s.w = extent.param[SPAN_S].start;
+	SpanParam t; t.w = extent.param[SPAN_T].start;
 
-	int ds = m_rdp->m_span_ds / 4;
-	int dt = m_rdp->m_span_dt / 4;
+	int ds = object.SpanBase.m_span_ds / 4;
+	int dt = object.SpanBase.m_span_dt / 4;
 	int dsinc = flip ? (ds) : -ds;
 	int dtinc = flip ? (dt) : -dt;
 	int xinc = flip ? 1 : -1;
 
-	int fb_index = m_rdp->MiscState.FBWidth * index;
+	int fb_index = object.MiscState.FBWidth * scanline;
 
-	int xstart = m_lx;
-	int xend = m_unscissored_rx;
-	int xend_scissored = m_rx;
+	rdp_span_aux *userdata = (rdp_span_aux*)extent.userdata;
+	int xstart = extent.startx;
+	int xend = userdata->m_unscissored_rx;
+	int xend_scissored = extent.stopx;
 
 	int x = xend;
 
@@ -459,13 +465,12 @@ void Span::DrawCopy(int index, int tilenum, bool flip)
 		{
 			INT32 sss = s.h.h;
 			INT32 sst = t.h.h;
-			m_rdp->TexPipe.Copy(&m_rdp->Texel0Color, sss, sst, tilenum);
+			m_rdp->TexPipe.Copy(&userdata->Texel0Color, sss, sst, tilenum, object, userdata);
 
 			UINT32 curpixel = fb_index + x;
-			m_rdp->MiscState.CurrentPixCvg = m_rdp->Texel0Color.i.a ? 7 : 0;
-			if ((m_rdp->Texel0Color.i.a != 0) || (!m_rdp->OtherModes.alpha_compare_en))
+			if ((userdata->Texel0Color.i.a != 0) || (!object.OtherModes.alpha_compare_en))
 			{
-				m_rdp->Framebuffer.Copy(curpixel, m_rdp->Texel0Color.i.r, m_rdp->Texel0Color.i.g, m_rdp->Texel0Color.i.b);
+				((this)->*(_Copy[object.MiscState.FBSize - 2]))(curpixel, userdata->Texel0Color.i.r, userdata->Texel0Color.i.g, userdata->Texel0Color.i.b, userdata->Texel0Color.i.a ? 7 : 0, object);
 			}
 		}
 
@@ -475,17 +480,19 @@ void Span::DrawCopy(int index, int tilenum, bool flip)
 	}
 }
 
-void Span::DrawFill(int index, int tilenum, bool flip)
+void n64_rdp::SpanDrawFill(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, int threadid)
 {
-	int clipx1 = m_rdp->GetScissor()->m_xh;
-	int clipx2 = m_rdp->GetScissor()->m_xl;
+	bool flip = object.flip;
+
+	int clipx1 = object.Scissor.m_xh;
+	int clipx2 = object.Scissor.m_xl;
 
 	int xinc = flip ? 1 : -1;
 
-	int fb_index = m_rdp->MiscState.FBWidth * index;
+	int fb_index = object.MiscState.FBWidth * scanline;
 
-	int xstart = m_lx;
-	int xend_scissored = m_rx;
+	int xstart = extent.startx;
+	int xend_scissored = extent.stopx;
 
 	int x = xend_scissored;
 
@@ -495,14 +502,9 @@ void Span::DrawFill(int index, int tilenum, bool flip)
 	{
 		if (x >= clipx1 && x < clipx2)
 		{
-			UINT32 curpixel = fb_index + x;
-			m_rdp->Framebuffer.Fill(curpixel);
+			((this)->*(_Fill[object.MiscState.FBSize - 2]))(fb_index + x, object);
 		}
 
 		x += xinc;
 	}
-}
-
-}
-
 }

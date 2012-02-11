@@ -2,100 +2,41 @@
 #include "includes/n64.h"
 #include "video/n64.h"
 
-namespace N64
-{
-
-namespace RDP
-{
-
-bool BlenderT::Blend1Cycle(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel)
+bool N64BlenderT::Blend1Cycle(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 r, g, b;
 
-	if (!m_rdp->OtherModes.alpha_cvg_select)
+	if (!object.OtherModes.alpha_cvg_select)
 	{
-		DitherA(&m_rdp->PixelColor.i.a, adseed);
+		DitherA(&userdata->PixelColor.i.a, adseed);
 	}
 
-	DitherA(&m_rdp->ShadeColor.i.a, adseed);
+	DitherA(&userdata->ShadeColor.i.a, adseed);
 
-	if (!AlphaCompare(m_rdp->PixelColor.i.a))
+	if (!AlphaCompare(userdata->PixelColor.i.a, userdata, object))
 	{
 		return false;
 	}
 
-	if (m_rdp->OtherModes.antialias_en ? (!m_rdp->MiscState.CurrentPixCvg) : (!m_rdp->MiscState.CurrentCvgBit))
+	if (object.OtherModes.antialias_en ? (!userdata->CurrentPixCvg) : (!userdata->CurrentCvgBit))
 	{
 		return false;
 	}
 
-	bool dontblend = (partialreject && m_rdp->PixelColor.i.a >= 0xff);
-	if (!BlendEnable || dontblend)
+	bool dontblend = (partialreject && userdata->PixelColor.i.a >= 0xff);
+	if (!userdata->BlendEnable || dontblend)
 	{
-		r = *m_rdp->ColorInputs.blender1a_r[0];
-		g = *m_rdp->ColorInputs.blender1a_g[0];
-		b = *m_rdp->ColorInputs.blender1a_b[0];
+		r = *userdata->ColorInputs.blender1a_r[0];
+		g = *userdata->ColorInputs.blender1a_g[0];
+		b = *userdata->ColorInputs.blender1a_b[0];
 	}
 	else
 	{
-		m_rdp->InvPixelColor.i.a = 0xff - *m_rdp->ColorInputs.blender1b_a[0];
-		BlendEquationCycle0(&r, &g, &b, special_bsel);
+		userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
+		BlendEquationCycle0(&r, &g, &b, special_bsel, userdata, object);
 	}
 
-	if (m_rdp->OtherModes.rgb_dither_sel < 3)
-	{
-		DitherRGB(&r, &g, &b, dith);
-	}
-	*fr = r;
-	*fg = g;
-	*fb = b;
-
-	return true;
-}
-
-bool BlenderT::Blend2Cycle(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1)
-{
-	if (!m_rdp->OtherModes.alpha_cvg_select)
-	{
-		DitherA(&m_rdp->PixelColor.i.a, adseed);
-	}
-
-	DitherA(&m_rdp->ShadeColor.i.a, adseed);
-
-	if (!AlphaCompare(m_rdp->PixelColor.i.a))
-	{
-		return false;
-	}
-
-	if (m_rdp->OtherModes.antialias_en ? (!m_rdp->MiscState.CurrentPixCvg) : (!m_rdp->MiscState.CurrentCvgBit))
-	{
-		return false;
-	}
-
-	m_rdp->InvPixelColor.i.a = 0xff - *m_rdp->ColorInputs.blender1b_a[0];
-
-	INT32 r, g, b;
-	BlendEquationCycle0(&r, &g, &b, special_bsel0);
-
-	m_rdp->BlendedPixelColor.i.r = r;
-	m_rdp->BlendedPixelColor.i.g = g;
-	m_rdp->BlendedPixelColor.i.b = b;
-	m_rdp->BlendedPixelColor.i.a = m_rdp->PixelColor.i.a;
-
-	bool dontblend = (partialreject && m_rdp->PixelColor.i.a >= 0xff);
-	if (!BlendEnable || dontblend)
-	{
-		r = *m_rdp->ColorInputs.blender1a_r[1];
-		g = *m_rdp->ColorInputs.blender1a_g[1];
-		b = *m_rdp->ColorInputs.blender1a_b[1];
-	}
-	else
-	{
-		m_rdp->InvPixelColor.i.a = 0xff - *m_rdp->ColorInputs.blender1b_a[1];
-		BlendEquationCycle1(&r, &g, &b, special_bsel1);
-	}
-
-	if (m_rdp->OtherModes.rgb_dither_sel < 3)
+	if (object.OtherModes.rgb_dither_sel < 3)
 	{
 		DitherRGB(&r, &g, &b, dith);
 	}
@@ -107,46 +48,100 @@ bool BlenderT::Blend2Cycle(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int ads
 	return true;
 }
 
-void BlenderT::BlendEquationCycle0(int* r, int* g, int* b, int bsel_special)
+bool N64BlenderT::Blend2Cycle(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int special_bsel0, int special_bsel1, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	UINT8 blend1a = *m_rdp->ColorInputs.blender1b_a[0] >> 3;
-	UINT8 blend2a = *m_rdp->ColorInputs.blender2b_a[0] >> 3;
+	if (!object.OtherModes.alpha_cvg_select)
+	{
+		DitherA(&userdata->PixelColor.i.a, adseed);
+	}
+
+	DitherA(&userdata->ShadeColor.i.a, adseed);
+
+	if (!AlphaCompare(userdata->PixelColor.i.a, userdata, object))
+	{
+		return false;
+	}
+
+	if (object.OtherModes.antialias_en ? (!userdata->CurrentPixCvg) : (!userdata->CurrentCvgBit))
+	{
+		return false;
+	}
+
+	userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[0];
+
+	INT32 r, g, b;
+	BlendEquationCycle0(&r, &g, &b, special_bsel0, userdata, object);
+
+	userdata->BlendedPixelColor.i.r = r;
+	userdata->BlendedPixelColor.i.g = g;
+	userdata->BlendedPixelColor.i.b = b;
+	userdata->BlendedPixelColor.i.a = userdata->PixelColor.i.a;
+
+	bool dontblend = (partialreject && userdata->PixelColor.i.a >= 0xff);
+	if (!userdata->BlendEnable || dontblend)
+	{
+		r = *userdata->ColorInputs.blender1a_r[1];
+		g = *userdata->ColorInputs.blender1a_g[1];
+		b = *userdata->ColorInputs.blender1a_b[1];
+	}
+	else
+	{
+		userdata->InvPixelColor.i.a = 0xff - *userdata->ColorInputs.blender1b_a[1];
+		BlendEquationCycle1(&r, &g, &b, special_bsel1, userdata, object);
+	}
+
+	if (object.OtherModes.rgb_dither_sel < 3)
+	{
+		DitherRGB(&r, &g, &b, dith);
+	}
+
+	*fr = r;
+	*fg = g;
+	*fb = b;
+
+	return true;
+}
+
+void N64BlenderT::BlendEquationCycle0(int* r, int* g, int* b, int bsel_special, rdp_span_aux *userdata, const rdp_poly_state& object)
+{
+	UINT8 blend1a = *userdata->ColorInputs.blender1b_a[0] >> 3;
+	UINT8 blend2a = *userdata->ColorInputs.blender2b_a[0] >> 3;
 
 	if (bsel_special)
 	{
-		blend1a = (blend1a >> ShiftA) & 0x1C;
-		blend2a = (blend2a >> ShiftB) & 0x1C;
+		blend1a = (blend1a >> userdata->ShiftA) & 0x1C;
+		blend2a = (blend2a >> userdata->ShiftB) & 0x1C;
 	}
 
 	UINT32 sum = ((blend1a >> 2) + (blend2a >> 2) + 1) & 0xf;
 
-	*r = (((int)(*m_rdp->ColorInputs.blender1a_r[0]) * (int)(blend1a))) +
-		(((int)(*m_rdp->ColorInputs.blender2a_r[0]) * (int)(blend2a)));
+	*r = (((int)(*userdata->ColorInputs.blender1a_r[0]) * (int)(blend1a))) +
+		(((int)(*userdata->ColorInputs.blender2a_r[0]) * (int)(blend2a)));
 
-	*g = (((int)(*m_rdp->ColorInputs.blender1a_g[0]) * (int)(blend1a))) +
-		(((int)(*m_rdp->ColorInputs.blender2a_g[0]) * (int)(blend2a)));
+	*g = (((int)(*userdata->ColorInputs.blender1a_g[0]) * (int)(blend1a))) +
+		(((int)(*userdata->ColorInputs.blender2a_g[0]) * (int)(blend2a)));
 
-	*b = (((int)(*m_rdp->ColorInputs.blender1a_b[0]) * (int)(blend1a))) +
-		(((int)(*m_rdp->ColorInputs.blender2a_b[0]) * (int)(blend2a)));
+	*b = (((int)(*userdata->ColorInputs.blender1a_b[0]) * (int)(blend1a))) +
+		(((int)(*userdata->ColorInputs.blender2a_b[0]) * (int)(blend2a)));
 
 	if (bsel_special)
 	{
-		*r += (((int)*m_rdp->ColorInputs.blender2a_r[0]) << 2);
-		*g += (((int)*m_rdp->ColorInputs.blender2a_g[0]) << 2);
-		*b += (((int)*m_rdp->ColorInputs.blender2a_b[0]) << 2);
+		*r += (((int)*userdata->ColorInputs.blender2a_r[0]) << 2);
+		*g += (((int)*userdata->ColorInputs.blender2a_g[0]) << 2);
+		*b += (((int)*userdata->ColorInputs.blender2a_b[0]) << 2);
 	}
 	else
 	{
-		*r += (int)*m_rdp->ColorInputs.blender2a_r[0];
-		*g += (int)*m_rdp->ColorInputs.blender2a_g[0];
-		*b += (int)*m_rdp->ColorInputs.blender2a_b[0];
+		*r += (int)*userdata->ColorInputs.blender2a_r[0];
+		*g += (int)*userdata->ColorInputs.blender2a_g[0];
+		*b += (int)*userdata->ColorInputs.blender2a_b[0];
 	}
 
 	*r >>= 2;
 	*g >>= 2;
 	*b >>= 2;
 
-	if (m_rdp->OtherModes.force_blend)
+	if (object.OtherModes.force_blend)
 	{
 		*r >>= 3;
 		*g >>= 3;
@@ -171,46 +166,46 @@ void BlenderT::BlendEquationCycle0(int* r, int* g, int* b, int bsel_special)
 	if (*b > 255) *b = 255;
 }
 
-void BlenderT::BlendEquationCycle1(INT32* r, INT32* g, INT32* b, int bsel_special)
+void N64BlenderT::BlendEquationCycle1(INT32* r, INT32* g, INT32* b, int bsel_special, rdp_span_aux *userdata, const rdp_poly_state& object)
 {
-	UINT8 blend1a = *m_rdp->ColorInputs.blender1b_a[1] >> 3;
-	UINT8 blend2a = *m_rdp->ColorInputs.blender2b_a[1] >> 3;
+	UINT8 blend1a = *userdata->ColorInputs.blender1b_a[1] >> 3;
+	UINT8 blend2a = *userdata->ColorInputs.blender2b_a[1] >> 3;
 
 	if (bsel_special)
 	{
-		blend1a = (blend1a >> ShiftA) & 0x1C;
-		blend2a = (blend2a >> ShiftB) & 0x1C;
+		blend1a = (blend1a >> userdata->ShiftA) & 0x1C;
+		blend2a = (blend2a >> userdata->ShiftB) & 0x1C;
 	}
 
 	UINT32 sum = ((blend1a >> 2) + (blend2a >> 2) + 1) & 0xf;
 
-	*r = (((int)(*m_rdp->ColorInputs.blender1a_r[1]) * (int)(blend1a))) +
-		(((int)(*m_rdp->ColorInputs.blender2a_r[1]) * (int)(blend2a)));
+	*r = (((int)(*userdata->ColorInputs.blender1a_r[1]) * (int)(blend1a))) +
+		(((int)(*userdata->ColorInputs.blender2a_r[1]) * (int)(blend2a)));
 
-	*g = (((int)(*m_rdp->ColorInputs.blender1a_g[1]) * (int)(blend1a))) +
-		(((int)(*m_rdp->ColorInputs.blender2a_g[1]) * (int)(blend2a)));
+	*g = (((int)(*userdata->ColorInputs.blender1a_g[1]) * (int)(blend1a))) +
+		(((int)(*userdata->ColorInputs.blender2a_g[1]) * (int)(blend2a)));
 
-	*b = (((int)(*m_rdp->ColorInputs.blender1a_b[1]) * (int)(blend1a))) +
-		(((int)(*m_rdp->ColorInputs.blender2a_b[1]) * (int)(blend2a)));
+	*b = (((int)(*userdata->ColorInputs.blender1a_b[1]) * (int)(blend1a))) +
+		(((int)(*userdata->ColorInputs.blender2a_b[1]) * (int)(blend2a)));
 
 	if (bsel_special)
 	{
-		*r += (((int)*m_rdp->ColorInputs.blender2a_r[1]) << 2);
-		*g += (((int)*m_rdp->ColorInputs.blender2a_g[1]) << 2);
-		*b += (((int)*m_rdp->ColorInputs.blender2a_b[1]) << 2);
+		*r += (((int)*userdata->ColorInputs.blender2a_r[1]) << 2);
+		*g += (((int)*userdata->ColorInputs.blender2a_g[1]) << 2);
+		*b += (((int)*userdata->ColorInputs.blender2a_b[1]) << 2);
 	}
 	else
 	{
-		*r += (int)*m_rdp->ColorInputs.blender2a_r[1];
-		*g += (int)*m_rdp->ColorInputs.blender2a_g[1];
-		*b += (int)*m_rdp->ColorInputs.blender2a_b[1];
+		*r += (int)*userdata->ColorInputs.blender2a_r[1];
+		*g += (int)*userdata->ColorInputs.blender2a_g[1];
+		*b += (int)*userdata->ColorInputs.blender2a_b[1];
 	}
 
 	*r >>= 2;
 	*g >>= 2;
 	*b >>= 2;
 
-	if (m_rdp->OtherModes.force_blend)
+	if (object.OtherModes.force_blend)
 	{
 		*r >>= 3;
 		*g >>= 3;
@@ -235,12 +230,12 @@ void BlenderT::BlendEquationCycle1(INT32* r, INT32* g, INT32* b, int bsel_specia
 	if (*b > 255) *b = 255;
 }
 
-bool BlenderT::AlphaCompare(UINT8 alpha)
+bool N64BlenderT::AlphaCompare(UINT8 alpha, const rdp_span_aux *userdata, const rdp_poly_state& object)
 {
 	INT32 threshold;
-	if (m_rdp->OtherModes.alpha_compare_en)
+	if (object.OtherModes.alpha_compare_en)
 	{
-		threshold = (m_rdp->OtherModes.dither_alpha_en) ? m_rdp->GetRandom() : m_rdp->BlendColor.i.a;
+		threshold = (object.OtherModes.dither_alpha_en) ? m_rdp->GetRandom() : userdata->BlendColor.i.a;
 		if (alpha < threshold)
 		{
 			return false;
@@ -250,7 +245,7 @@ bool BlenderT::AlphaCompare(UINT8 alpha)
 	return true;
 }
 
-void BlenderT::DitherA(UINT8 *a, int dith)
+void N64BlenderT::DitherA(UINT8 *a, int dith)
 {
 	INT32 new_a = *a + dith;
 	if(new_a & 0x100)
@@ -260,7 +255,7 @@ void BlenderT::DitherA(UINT8 *a, int dith)
 	*a = (UINT8)new_a;
 }
 
-void BlenderT::DitherRGB(INT32 *r, INT32 *g, INT32 *b, int dith)
+void N64BlenderT::DitherRGB(INT32 *r, INT32 *g, INT32 *b, int dith)
 {
 	if ((*r & 7) > dith)
 	{
@@ -287,7 +282,3 @@ void BlenderT::DitherRGB(INT32 *r, INT32 *g, INT32 *b, int dith)
 		}
 	}
 }
-
-} // namespace RDP
-
-} // namespace N64
