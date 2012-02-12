@@ -4547,6 +4547,33 @@ ROM_START( eyes2 )
 ROM_END
 
 
+ROM_START( eyesb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",           0x0000, 0x0800, CRC(339d279a) SHA1(bc2a7801b9f94782f260346255f84a0e84729f01) )
+	ROM_LOAD( "5.bin",           0x0800, 0x0800, CRC(1b68a61d) SHA1(348ef7b19934b000b03c74bec4796f1089dfc5eb) )
+	ROM_LOAD( "2.bin",           0x1000, 0x0800, CRC(d4f9aaf8) SHA1(1e450a7ecf42f9bc2d58823907930dd7aa454215) )
+	ROM_LOAD( "6.bin",           0x1800, 0x0800, CRC(6b41bb80) SHA1(aa3555833a2e8e596e126a749fe12853e4aa05b1) )
+	ROM_LOAD( "3.bin",           0x2000, 0x0800, CRC(748e0e48) SHA1(857de6f7fe79a2613a93fb3efd981edb64c0190e) )
+	ROM_LOAD( "7.bin",           0x2800, 0x0800, CRC(7b7f4a74) SHA1(373229de4ed25d577fe15deb3b6bc36786988284) )
+	ROM_LOAD( "4.bin",           0x3000, 0x0800, CRC(367a3884) SHA1(d55d7eca56412661adac1849a398298670e86d15) )
+	ROM_LOAD( "8.bin",           0x3800, 0x0800, CRC(2baaadae) SHA1(7b20ed5935e9a4f793f690bab2a6bc0db44d12af) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "9.bin",           0x0000, 0x0800, CRC(342c0653) SHA1(d07e3d4528b72e54a1b5dbed009cce765a5a086f) )
+	ROM_LOAD( "11.bin",          0x0800, 0x0800, CRC(aaa7a537) SHA1(571d981ed2aad62d7c7f2798e9084228d45523d4) )
+	ROM_LOAD( "10.bin",          0x1000, 0x0800, CRC(b247b82c) SHA1(8c10a8ef5e79b0b5fefad6eb77bfa68a0ca18035) )
+	ROM_LOAD( "12.bin",          0x1800, 0x0800, CRC(99af4b30) SHA1(6a0939ff2fa7ae39a960dd4d9f9b7c01f57647c5) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "7051.bin",        0x0000, 0x0020, CRC(0dad2ccb) SHA1(f42c5ee7084e5702b5b0c8c1d86b0a41a6e1821d) )
+	ROM_LOAD( "7051-3.bin",      0x0020, 0x0100, CRC(d8d78829) SHA1(19820d1651423210083a087fb70ebea73ad34951) )
+
+	ROM_REGION( 0x0200, "namco", 0 )	/* sound PROMs */
+	ROM_LOAD( "82s126.1m",       0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )	// not dumped, taken from parent
+	ROM_LOAD( "7051-2.bin",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	// two of these?
+ROM_END
+
+
 ROM_START( eyeszac )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.7d",         0x0000, 0x1000, BAD_DUMP CRC(568851aa) SHA1(a97963556a6d77400afaafd73bcc32cb7f3a54d2) ) // 2532 vs 2732 problem, (near)identical halves
@@ -5898,8 +5925,9 @@ GAME( 1982, joyman,   puckman,  pacman,   pacman,   0,        ROT90,  "hack", "J
 GAME( 1982, ctrpllrp, puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Caterpillar Pacman Hack", GAME_SUPPORTS_SAVE )
 GAME( 1982, eyes,     0,        pacman,   eyes,     eyes,     ROT90,  "Digitrex Techstar (Rock-Ola license)", "Eyes (US set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, eyes2,    eyes,     pacman,   eyes,     eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, eyesb,    eyes,     pacman,   eyes,     eyes,     ROT90,  "bootleg", "Eyes (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, eyeszac,  eyes,     pacman,   eyes,     eyes,     ROT90,  "Techstar (Zaccaria license)", "Eyes (Italy)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // bad dump
-GAME( 1982, eyeszacb, eyes,     pacman,   eyes,     0,        ROT90,  "bootleg", "Eyes (bootleg)", GAME_SUPPORTS_SAVE ) // based on Zaccaria version
+GAME( 1982, eyeszacb, eyes,     pacman,   eyes,     0,        ROT90,  "bootleg", "Eyes (bootleg set 2, decrypted)", GAME_SUPPORTS_SAVE ) // based on Zaccaria version
 GAME( 1983, birdiy,   0,        birdiy,   pacman,   0,        ROT270, "Mama Top", "Birdiy", GAME_SUPPORTS_SAVE )
 GAME( 1983, mrtnt,    0,        pacman,   mrtnt,    eyes,     ROT90,  "Techstar (Telko license)", "Mr. TNT", GAME_SUPPORTS_SAVE )
 GAME( 1983, gorkans,  mrtnt,    pacman,   mrtnt,    0,        ROT90,  "Techstar", "Gorkans", GAME_SUPPORTS_SAVE )
