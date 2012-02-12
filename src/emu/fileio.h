@@ -58,6 +58,8 @@
 typedef struct _zip_file_header zip_file_header;
 typedef struct _zip_file zip_file;
 
+typedef struct __7z_file_header _7z_file_header;
+typedef struct __7z_file _7z_file;
 
 // ======================> path_iterator
 
@@ -162,11 +164,16 @@ public:
 	int printf(const char *fmt, ...);
 
 private:
+	bool compressed_file_ready(void);
+
 	// internal helpers
 	file_error attempt_zipped();
 	file_error load_zipped_file();
 	bool zip_filename_match(const zip_file_header &header, const astring &filename);
 	bool zip_header_is_path(const zip_file_header &header);
+
+	file_error attempt__7zped();
+	file_error load__7zped_file();
 
 	// internal state
 	astring			m_filename;						// original filename provided
@@ -176,9 +183,15 @@ private:
 	UINT32			m_crc;							// iterator for paths
 	UINT32			m_openflags;					// flags we used for the open
 	hash_collection m_hashes;						// collection of hashes
+
 	zip_file *		m_zipfile;						// ZIP file pointer
 	UINT8 *			m_zipdata;						// ZIP file data
 	UINT64			m_ziplength;					// ZIP file length
+
+	_7z_file *		m__7zfile;						// 7Z file pointer
+	UINT8 *			m__7zdata;						// 7Z file data
+	UINT64			m__7zlength;					// 7Z file length
+
 	bool			m_remove_on_close;				// flag: remove the file when closing
 };
 

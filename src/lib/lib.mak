@@ -22,6 +22,7 @@ OBJDIRS += \
 	$(LIBOBJ)/libjpeg \
 	$(LIBOBJ)/libflac \
 	$(LIBOBJ)/libflacpp \
+	$(LIBOBJ)/lib7z \
 
 
 
@@ -52,6 +53,7 @@ UTILOBJS = \
 	$(LIBOBJ)/util/sha1.o \
 	$(LIBOBJ)/util/unicode.o \
 	$(LIBOBJ)/util/unzip.o \
+	$(LIBOBJ)/util/un7z.o \
 	$(LIBOBJ)/util/vbiparse.o \
 	$(LIBOBJ)/util/xmlfile.o \
 	$(LIBOBJ)/util/zippath.o \
@@ -184,6 +186,8 @@ ZLIBOBJS = \
 	$(LIBOBJ)/zlib/uncompr.o \
 	$(LIBOBJ)/zlib/zutil.o
 
+
+
 $(OBJ)/libz.a: $(ZLIBOBJS)
 
 $(LIBOBJ)/zlib/%.o: $(LIBSRC)/zlib/%.c | $(OSPREBUILD)
@@ -309,3 +313,36 @@ $(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libflac/%.c | $(OSPREBUILD)
 # $(LIBOBJ)/libflacpp/%.o: $(LIBSRC)/libflac/libflac++/%.cpp | $(OSPREBUILD)
 # 	@echo Compiling $<...
 #	$(CC) $(CDEFS) $(FLACOPTS) $(CPPONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
+
+
+#-------------------------------------------------
+# lib7z library objects
+#-------------------------------------------------
+
+7ZOPTS=-D_7ZIP_PPMD_SUPPPORT
+
+LIB7ZOBJS = \
+	$(LIBOBJ)/lib7z/7zBuf.o \
+	$(LIBOBJ)/lib7z/7zBuf2.o \
+	$(LIBOBJ)/lib7z/7zCrc.o \
+	$(LIBOBJ)/lib7z/7zCrcOpt.o \
+	$(LIBOBJ)/lib7z/7zDec.o \
+	$(LIBOBJ)/lib7z/7zIn.o \
+	$(LIBOBJ)/lib7z/CpuArch.o \
+	$(LIBOBJ)/lib7z/LzmaDec.o \
+	$(LIBOBJ)/lib7z/Lzma2Dec.o \
+	$(LIBOBJ)/lib7z/Bra.o \
+	$(LIBOBJ)/lib7z/Bra86.o \
+	$(LIBOBJ)/lib7z/Bcj2.o \
+	$(LIBOBJ)/lib7z/Ppmd7.o \
+	$(LIBOBJ)/lib7z/Ppmd7Dec.o \
+	$(LIBOBJ)/lib7z/7zStream.o \
+
+$(OBJ)/lib7z.a: $(LIB7ZOBJS)
+
+$(LIBOBJ)/lib7z/%.o: $(LIBSRC)/lib7z/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(7ZOPTS) $(CONLYFLAGS) -I$(LIBSRC)/lib7z/ -c $< -o $@
+
+
+

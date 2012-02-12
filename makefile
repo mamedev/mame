@@ -643,6 +643,8 @@ FLAC_LIB = $(OBJ)/libflac.a
 # $(OBJ)/libflac++.a
 
 
+7Z_LIB = $(OBJ)/lib7z.a 
+
 #-------------------------------------------------
 # defines needed by multiple make files 
 #-------------------------------------------------
@@ -732,9 +734,9 @@ $(sort $(OBJDIRS)):
 ifndef EXECUTABLE_DEFINED
 
 # always recompile the version string
-$(VERSIONOBJ): $(DRVLIBS) $(LIBOSD) $(LIBCPU) $(LIBEMU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(SOFTFLOAT) $(FORMATS_LIB) $(LIBOCORE) $(RESFILE)
+$(VERSIONOBJ): $(DRVLIBS) $(LIBOSD) $(LIBCPU) $(LIBEMU) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(7Z_LIB) $(SOFTFLOAT) $(FORMATS_LIB) $(LIBOCORE) $(RESFILE)
 
-$(EMULATOR): $(VERSIONOBJ) $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DEVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBCPU) $(LIBEMU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(FORMATS_LIB) $(ZLIB) $(LIBOCORE) $(RESFILE)
+$(EMULATOR): $(VERSIONOBJ) $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DEVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBCPU) $(LIBEMU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(ZLIB) $(LIBOCORE) $(RESFILE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
 ifeq ($(TARGETOS),win32)

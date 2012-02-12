@@ -37,8 +37,12 @@
 
 ***************************************************************************/
 
+
+
+
 #include "emu.h"
 #include "unzip.h"
+#include "un7z.h"
 #include "fileio.h"
 
 
@@ -174,6 +178,9 @@ emu_file::emu_file(UINT32 openflags)
 	  m_zipfile(NULL),
 	  m_zipdata(NULL),
 	  m_ziplength(0),
+	  m__7zfile(NULL),
+	  m__7zdata(NULL),
+	  m__7zlength(0),
 	  m_remove_on_close(false)
 {
 	// sanity check the open flags
@@ -189,6 +196,9 @@ emu_file::emu_file(const char *searchpath, UINT32 openflags)
 	  m_zipfile(NULL),
 	  m_zipdata(NULL),
 	  m_ziplength(0),
+	  m__7zfile(NULL),
+	  m__7zdata(NULL),
+	  m__7zlength(0),
 	  m_remove_on_close(false)
 {
 	// sanity check the open flags
@@ -216,7 +226,7 @@ emu_file::~emu_file()
 emu_file::operator core_file *()
 {
 	// load the ZIP file now if we haven't yet
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		return NULL;
 
 	// return the core file
@@ -226,7 +236,7 @@ emu_file::operator core_file *()
 emu_file::operator core_file &()
 {
 	// load the ZIP file now if we haven't yet
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		throw emu_fatalerror("operator core_file & used on invalid file");
 
 	// return the core file
@@ -251,12 +261,18 @@ hash_collection &emu_file::hashes(const char *types)
 		return m_hashes;
 
 	// load the ZIP file if needed
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		return m_hashes;
 	if (m_file == NULL)
 		return m_hashes;
 
 	// if we have ZIP data, just hash that directly
+	if (m__7zdata != NULL)
+	{
+		m_hashes.compute(m__7zdata, m__7zlength, needed);
+		return m_hashes;
+	}
+
 	if (m_zipdata != NULL)
 	{
 		m_hashes.compute(m_zipdata, m_ziplength, needed);
@@ -368,9 +384,19 @@ file_error emu_file::open_next()
 		// if we're opening for read-only we have other options
 		if ((m_openflags & (OPEN_FLAG_READ | OPEN_FLAG_WRITE)) == OPEN_FLAG_READ)
 		{
+			astring tempfullpath = m_fullpath;
+
+			filerr = attempt__7zped();
+			if (filerr == FILERR_NONE)
+				break;
+
+			m_fullpath = tempfullpath;
+
 			filerr = attempt_zipped();
 			if (filerr == FILERR_NONE)
 				break;
+
+
 		}
 	}
 	return filerr;
@@ -401,6 +427,10 @@ file_error emu_file::open_ram(const void *data, UINT32 length)
 void emu_file::close()
 {
 	// close files and free memory
+	if (m__7zfile != NULL)
+		_7z_file_close(m__7zfile);
+	m__7zfile = NULL;
+
 	if (m_zipfile != NULL)
 		zip_file_close(m_zipfile);
 	m_zipfile = NULL;
@@ -408,6 +438,10 @@ void emu_file::close()
 	if (m_file != NULL)
 		core_fclose(m_file);
 	m_file = NULL;
+
+	if (m__7zdata != NULL)
+		global_free(m__7zdata);
+	m__7zdata = NULL;
 
 	if (m_zipdata != NULL)
 		global_free(m_zipdata);
@@ -436,13 +470,30 @@ file_error emu_file::compress(int level)
 
 
 //-------------------------------------------------
+//  compressed_file_ready - ensure our zip is ready
+//   loading if needed
+//-------------------------------------------------
+
+bool emu_file::compressed_file_ready(void)
+{
+	// load the ZIP file now if we haven't yet
+	if (m__7zfile != NULL && load__7zped_file() != FILERR_NONE)
+		return true;
+
+	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+		return true;
+
+	return false;
+}
+
+//-------------------------------------------------
 //  seek - seek within a file
 //-------------------------------------------------
 
 int emu_file::seek(INT64 offset, int whence)
 {
 	// load the ZIP file now if we haven't yet
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		return 1;
 
 	// seek if we can
@@ -460,7 +511,7 @@ int emu_file::seek(INT64 offset, int whence)
 UINT64 emu_file::tell()
 {
 	// load the ZIP file now if we haven't yet
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		return 0;
 
 	// tell if we can
@@ -478,7 +529,7 @@ UINT64 emu_file::tell()
 bool emu_file::eof()
 {
 	// load the ZIP file now if we haven't yet
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		return 0;
 
 	// return EOF if we can
@@ -496,6 +547,9 @@ bool emu_file::eof()
 UINT64 emu_file::size()
 {
 	// use the ZIP length if present
+	if (m__7zfile != NULL)
+		return m__7zlength;
+
 	if (m_zipfile != NULL)
 		return m_ziplength;
 
@@ -514,7 +568,7 @@ UINT64 emu_file::size()
 UINT32 emu_file::read(void *buffer, UINT32 length)
 {
 	// load the ZIP file now if we haven't yet
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		return 0;
 
 	// read the data if we can
@@ -532,7 +586,7 @@ UINT32 emu_file::read(void *buffer, UINT32 length)
 int emu_file::getc()
 {
 	// load the ZIP file now if we haven't yet
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		return EOF;
 
 	// read the data if we can
@@ -550,7 +604,7 @@ int emu_file::getc()
 int emu_file::ungetc(int c)
 {
 	// load the ZIP file now if we haven't yet
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		return 1;
 
 	// read the data if we can
@@ -568,7 +622,7 @@ int emu_file::ungetc(int c)
 char *emu_file::gets(char *s, int n)
 {
 	// load the ZIP file now if we haven't yet
-	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+	if (compressed_file_ready())
 		return NULL;
 
 	// read the data if we can
@@ -765,4 +819,107 @@ bool emu_file::zip_header_is_path(const zip_file_header &header)
 {
 	const char *zipfile = header.filename + header.filename_length - 1;
 	return (zipfile >= header.filename && zipfile[0] == '/');
+}
+
+//-------------------------------------------------
+//  attempt__7zped - attempt to open a .7z file
+//-------------------------------------------------
+
+file_error emu_file::attempt__7zped()
+{
+	astring filename;
+
+	// loop over directory parts up to the start of filename
+	while (1)
+	{
+		// find the final path separator
+		int dirsep = m_fullpath.rchr(0, PATH_SEPARATOR[0]);
+		if (dirsep == -1)
+			return FILERR_NOT_FOUND;
+
+		// insert the part from the right of the separator into the head of the filename
+		if (filename.len() > 0)
+			filename.ins(0, "/");
+		filename.inssubstr(0, m_fullpath, dirsep + 1, -1);
+
+		// remove this part of the filename and append a .7z extension
+		m_fullpath.substr(0, dirsep).cat(".7z");
+
+		// attempt to open the _7Z file
+		_7z_file *_7z;
+		_7z_error _7zerr = _7z_file_open(m_fullpath, &_7z);
+
+		// chop the ._7z back off the filename before continuing
+		m_fullpath.substr(0, dirsep);
+
+		// if we failed to open this file, continue scanning
+		if (_7zerr != _7ZERR_NONE)
+			continue;
+
+		int fileno = -1;
+
+		// see if we can find a file with the right name and (if available) crc
+		if (m_openflags & OPEN_FLAG_HAS_CRC) fileno = _7z_search_crc_match(_7z, m_crc, filename.cstr(), filename.len(), true, true);
+
+		// if that failed, look for a file with the right crc, but the wrong filename
+		if (fileno==-1)
+			if (m_openflags & OPEN_FLAG_HAS_CRC) fileno = _7z_search_crc_match(_7z, m_crc, filename.cstr(), filename.len(), true, false);
+
+		// if that failed, look for a file with the right name; reporting a bad checksum
+		// is more helpful and less confusing than reporting "rom not found"
+		if (fileno==-1)
+			fileno = _7z_search_crc_match(_7z, m_crc, filename.cstr(), filename.len(), false, true);
+
+		if (fileno != -1)
+		{
+			m__7zfile = _7z;
+			m__7zlength = _7z->uncompressed_length;
+
+			// build a hash with just the CRC
+			m_hashes.reset();
+			m_hashes.add_crc(_7z->crc);
+			return (m_openflags & OPEN_FLAG_NO_PRELOAD) ? FILERR_NONE : load__7zped_file();
+		}
+
+		// close up the _7Z file and try the next level
+		_7z_file_close(_7z);
+	}
+}
+
+
+//-------------------------------------------------
+//  load__7zped_file - load a _7Zped file
+//-------------------------------------------------
+
+file_error emu_file::load__7zped_file()
+{
+	assert(m_file == NULL);
+	assert(m__7zdata == NULL);
+	assert(m__7zfile != NULL);
+
+	// allocate some memory
+	m__7zdata = global_alloc_array(UINT8, m__7zlength);
+
+	// read the data into our buffer and return
+	_7z_error _7zerr = _7z_file_decompress(m__7zfile, m__7zdata, m__7zlength);
+	if (_7zerr != _7ZERR_NONE)
+	{
+		global_free(m__7zdata);
+		m__7zdata = NULL;
+		return FILERR_FAILURE;
+	}
+
+	// convert to RAM file
+	file_error filerr = core_fopen_ram(m__7zdata, m__7zlength, m_openflags, &m_file);
+	if (filerr != FILERR_NONE)
+	{
+		global_free(m__7zdata);
+		m__7zdata = NULL;
+		return FILERR_FAILURE;
+	}
+
+	// close out the _7Z file
+	_7z_file_close(m__7zfile);
+	m__7zfile = NULL;
+	return FILERR_NONE;
 }
