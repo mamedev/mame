@@ -10,7 +10,7 @@
 //============================================================
 
 // standard sdl header
-#include <SDL/SDL.h>
+#include "sdlinc.h"
 
 // MAME headers
 #include "emu.h"
@@ -432,7 +432,7 @@ static int sdl_init(running_machine &machine)
 	}
 
 	mame_printf_verbose("Audio: Start initialization\n");
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
 #else
 	SDL_AudioDriverName(audio_driver, sizeof(audio_driver));

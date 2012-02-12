@@ -10,7 +10,7 @@
 //============================================================
 
 // standard sdl header
-#include <SDL/SDL.h>
+#include "sdlinc.h"
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <signal.h>

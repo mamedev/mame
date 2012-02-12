@@ -16,8 +16,7 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
+#include "sdlinc.h"
 
 // MAME headers
 #include "osdcore.h"
@@ -138,7 +137,27 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 	return setenv(name, value, overwrite);
 }
 
-#if defined(SDL_VIDEO_DRIVER_X11) && defined(SDLMAME_X11)
+#if (SDLMAME_SDL2)
+
+//============================================================
+//  osd_get_clipboard_text
+//============================================================
+
+char *osd_get_clipboard_text(void)
+{
+	char *result = NULL;
+
+	if (SDL_HasClipboardText())
+	{
+		char *temp = SDL_GetClipboardText();
+		result = (char *) osd_malloc_array(strlen(temp) + 1);
+		strcpy(result, temp);
+		SDL_free(temp);
+	}
+	return result;
+}
+
+#elif defined(SDL_VIDEO_DRIVER_X11) && defined(SDLMAME_X11)
 
 //============================================================
 //  osd_get_clipboard_text
@@ -167,17 +186,11 @@ char *osd_get_clipboard_text(void)
 		return NULL;
 	if ( info.subsystem != SDL_SYSWM_X11 )
 		return NULL;
-#if (SDL_VERSION_ATLEAST(1,3,0))
 	if ( (display = info.info.x11.display) == NULL )
 		return NULL;
 	if ( (our_win = info.info.x11.window) == None )
 		return NULL;
-#else
-	if ( (display = info.info.x11.display) == NULL )
-		return NULL;
-	if ( (our_win = info.info.x11.window) == None )
-		return NULL;
-#endif
+
 	/* request data to owner */
 	selection_win = XGetSelectionOwner( display, XA_PRIMARY );
 	if ( selection_win == None )

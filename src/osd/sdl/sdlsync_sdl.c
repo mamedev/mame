@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#include "SDL/SDL.h"
+#include "sdlinc.h"
 
 // standard C headers
 #include <unistd.h>

@@ -10,9 +10,13 @@
 //============================================================
 
 // standard SDL headers
-#include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
+#include "sdlinc.h"
+
+#if (SDLMAME_SDL2)
+#include <SDL2/SDL_thread.h>
+#else
 #include <SDL/SDL_thread.h>
+#endif
 
 // standard C headers
 #include <math.h>
@@ -84,7 +88,7 @@ static sdl_window_info **last_window_ptr;
 static int multithreading_enabled;
 static osd_work_queue *work_queue;
 
-#if !(SDL_VERSION_ATLEAST(1,3,0))
+#if !(SDLMAME_SDL2)
 typedef int SDL_threadID;
 #endif
 
@@ -184,7 +188,7 @@ static OSDWORK_CALLBACK(sdlwindow_thread_id)
 
 	if (SDLMAME_INIT_IN_WORKER_THREAD)
 	{
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 		if (SDL_InitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE))
 #else
 		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE))
@@ -239,7 +243,7 @@ int sdlwindow_init(running_machine &machine)
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
-#if	SDL_VERSION_ATLEAST(1,3,0)
+#if	SDLMAME_SDL2
 	if (video_config.mode == VIDEO_MODE_SDL13)
 	{
 		if (draw13_init(machine, &draw))
@@ -408,7 +412,7 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 
     //FIXME: really necessary to distinguish for yuv_modes ?
 	if (window->target->zoom_to_screen()
-		&& (window->scale_mode == VIDEO_SCALE_MODE_NONE ))
+		&& (video_config.scale_mode == VIDEO_SCALE_MODE_NONE ))
 		newwidth = window_width;
 
 	if ((window->blitwidth != newwidth) || (window->blitheight != newheight))
@@ -595,7 +599,7 @@ void sdlwindow_modify_prescale(running_machine &machine, sdl_window_info *window
 
 static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_info *window)
 {
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
 	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
@@ -672,7 +676,6 @@ int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monit
 	//FIXME: these should be per_window in config-> or even better a bit set
 	window->fullscreen = !video_config.windowed;
 	window->prescale = video_config.prescale;
-	window->scale_mode = video_config.scale_mode;
 
 	// set the initial maximized state
 	// FIXME: Does not belong here
@@ -798,7 +801,7 @@ static void sdlwindow_video_window_destroy(running_machine &machine, sdl_window_
 //  pick_best_mode
 //============================================================
 
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDLMAME_SDL2
 static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 {
 	int minimum_width, minimum_height, target_width, target_height;

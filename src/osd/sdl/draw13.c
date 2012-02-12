@@ -18,7 +18,7 @@
 #include "options.h"
 
 // standard SDL headers
-#include <SDL/SDL.h>
+#include "sdlinc.h"
 
 // OSD headers
 #include "osdsdl.h"
@@ -379,11 +379,11 @@ INLINE void render_quad(sdl_info *sdl, texture_info *texture, render_primitive *
 #if 0
 		if ((PRIMFLAG_GET_SCREENTEX(prim->flags)) && video_config.filter)
 		{
-			SDL_SetTextureScaleMode(texture->texture_id,  SDL_SCALEMODE_BEST);
+			SDL_SetTextureScaleMode(texture->texture_id,  DRAW2_SCALEMODE_BEST);
 		}
 		else
 		{
-			SDL_SetTextureScaleMode(texture->texture_id,  SDL_SCALEMODE_NONE);
+			SDL_SetTextureScaleMode(texture->texture_id,  DRAW2_SCALEMODE_NEAREST);
 		}
 #endif
 		SDL_SetTextureBlendMode(texture_id, texture->sdl_blendmode);
@@ -497,7 +497,7 @@ int draw13_init(running_machine &machine, sdl_draw_info *callbacks)
 	callbacks->exit = draw13_exit;
 	callbacks->attach = draw13_attach;
 
-	mame_printf_verbose("Using SDL native texturing driver (SDL 1.3+)\n");
+	mame_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
 
 	expand_copy_info(blit_info_default);
 	//FIXME: -opengl16 should be -opengl -prefer16bpp
@@ -577,6 +577,9 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
 	// create the SDL window
+	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED_DISPLAY(window->monitor->handle), SDL_WINDOWPOS_UNDEFINED,
+			width, height, sdl->extra_flags);
+
 	if (window->fullscreen && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
@@ -610,15 +613,12 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 	else
 		SDL_SetWindowDisplayMode(window->sdl_window, NULL);	// Use desktop
 
-	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED_DISPLAY(window->monitor->handle), SDL_WINDOWPOS_UNDEFINED,
-			width, height, sdl->extra_flags);
-
 	// create renderer
 
 	if (video_config.waitvsync)
-		sdl->sdl_renderer = SDL_CreateRenderer(window->sdl_window, -1, /*SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD | */SDL_RENDERER_PRESENTVSYNC);
+		sdl->sdl_renderer = SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		sdl->sdl_renderer = SDL_CreateRenderer(window->sdl_window, -1, /*SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD*/ 0);
+		sdl->sdl_renderer = SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_ACCELERATED);
 
 	if (!sdl->sdl_renderer)
 	{
@@ -721,6 +721,7 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		SDL_SetWindowSize(window->sdl_window, sdl->resize_width, sdl->resize_height);
 		SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 		sdl->resize_pending = 0;
+		SDL_RenderSetViewport(sdl->sdl_renderer, NULL);
 	}
 
     //SDL_SelectRenderer(window->sdl_window);

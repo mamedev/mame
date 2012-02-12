@@ -1,5 +1,5 @@
 
-#include <SDL/SDL.h>
+#include "sdlinc.h"
 
 #include "osd_opengl.h"
 

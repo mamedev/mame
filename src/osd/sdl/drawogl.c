@@ -24,7 +24,7 @@
 #include "emuopts.h"
 
 // standard SDL headers
-#include <SDL/SDL.h>
+#include "sdlinc.h"
 
 // OpenGL headers
 #include "osd_opengl.h"
@@ -219,7 +219,7 @@ struct _sdl_info
 	INT32			blittimer;
 	UINT32			extra_flags;
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	SDL_GLContext	gl_context_id;
 #else
 	// SDL surface
@@ -437,14 +437,13 @@ int drawogl_init(running_machine &machine, sdl_draw_info *callbacks)
 
 	dll_loaded = 0;
 
-	if (SDL_VERSION_ATLEAST(1,3,0))
-		mame_printf_verbose("Using SDL multi-window OpenGL driver (SDL 1.3+)\n");
+	if (SDLMAME_SDL2)
+	{
+		mame_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
+		load_gl_lib(machine);
+	}
 	else
 		mame_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
-
-#if (SDL_VERSION_ATLEAST(1,3,0))
-	load_gl_lib(machine);
-#endif
 
 	return 0;
 }
@@ -546,7 +545,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 
 	window->dxdata = sdl;
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	sdl->extra_flags = (window->fullscreen ?
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 	sdl->extra_flags |= SDL_WINDOW_OPENGL;
@@ -556,6 +555,14 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	//load_gl_lib(window->machine());
 
 	// create the SDL window
+	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED_DISPLAY(window->monitor->handle), SDL_WINDOWPOS_UNDEFINED,
+			width, height, sdl->extra_flags);
+
+	if  (!window->sdl_window )
+	{
+		mame_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		return 1;
+	}
 
 	if (window->fullscreen && video_config.switchres)
 	{
@@ -569,15 +576,6 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	}
 	else
 		SDL_SetWindowDisplayMode(window->sdl_window, NULL);	// Use desktop
-
-	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED_DISPLAY(window->monitor->handle), SDL_WINDOWPOS_UNDEFINED,
-			width, height, sdl->extra_flags);
-
-	if  (!window->sdl_window )
-	{
-		mame_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
-		return 1;
-	}
 
 	SDL_ShowWindow(window->sdl_window);
 	//SDL_SetWindowFullscreen(window->sdl_window, window->fullscreen);
@@ -798,7 +796,7 @@ static void drawogl_window_resize(sdl_window_info *window, int width, int height
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	//SDL_GL_MakeCurrent(window->sdl_window, sdl->gl_context_id);
 	SDL_SetWindowSize(window->sdl_window, width, height);
 	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
@@ -1190,7 +1188,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		return 0;
 	}
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	SDL_GL_MakeCurrent(window->sdl_window, sdl->gl_context_id);
 #endif
 	if (sdl->init_context)
@@ -1546,7 +1544,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	window->primlist->release_lock();
 	sdl->init_context = 0;
 
-#if (!SDL_VERSION_ATLEAST(1,3,0))
+#if (!SDLMAME_SDL2)
 	SDL_GL_SwapBuffers();
 #else
 	SDL_GL_SwapWindow(window->sdl_window);
@@ -1721,7 +1719,7 @@ static void drawogl_window_destroy(sdl_window_info *window)
 
 	drawogl_destroy_all_textures(window);
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	SDL_GL_DeleteContext(sdl->gl_context_id);
 	SDL_DestroyWindow(window->sdl_window);
 #else
@@ -3135,7 +3133,7 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 	if ( !sdl->initialized )
 		return;
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	SDL_GL_MakeCurrent(window->sdl_window, sdl->gl_context_id);
 #endif
 

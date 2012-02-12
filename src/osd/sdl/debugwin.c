@@ -1276,8 +1276,7 @@ on_memoryview_key_press_event(GtkWidget   *widget,
 
 #else
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_version.h>
+#include "sdlinc.h"
 
 #include "emu.h"
 #include "osdepend.h"

@@ -10,12 +10,15 @@
 //============================================================
 
 // standard sdl header
-#include <SDL/SDL.h>
-#include <SDL/SDL_version.h>
+#include "sdlinc.h"
 
 #ifdef SDLMAME_UNIX
 #ifndef SDLMAME_MACOSX
+#if (SDLMAME_SDL2)
+#include <SDL2/SDL_ttf.h>
+#else
 #include <SDL/SDL_ttf.h>
+#endif
 #include <fontconfig/fontconfig.h>
 #endif
 #ifdef SDLMAME_MACOSX
@@ -112,7 +115,7 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_WAITVSYNC ";vs",              "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	{ SDLOPTION_SYNCREFRESH ";sr",            "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
 	#endif
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 #else
 	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
@@ -211,7 +214,7 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_JOYINDEX "8",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #8" },
 	{ SDLOPTION_SIXAXIS,			         "0",	 OPTION_BOOLEAN,    "Use special handling for PS3 Sixaxis controllers" },
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL MOUSE MAPPING" },
 	{ SDLOPTION_MOUSEINDEX "1",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #1" },
 	{ SDLOPTION_MOUSEINDEX "2",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #2" },
@@ -235,7 +238,7 @@ const options_entry sdl_options::s_option_entries[] =
 	// SDL low level driver options
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL LOWLEVEL DRIVER OPTIONS" },
 	{ SDLOPTION_VIDEODRIVER ";vd",           SDLOPTVAL_AUTO,  OPTION_STRING,        "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	{ SDLOPTION_RENDERDRIVER ";rd",          SDLOPTVAL_AUTO,  OPTION_STRING,        "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
 #endif
 	{ SDLOPTION_AUDIODRIVER ";ad",           SDLOPTVAL_AUTO,  OPTION_STRING,        "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
@@ -298,7 +301,7 @@ int main(int argc, char *argv[])
 {
 	int res = 0;
 
-#if	!(SDL_VERSION_ATLEAST(1,3,0))
+#if	!(SDLMAME_SDL2)
 	/* Load SDL dynamic link library */
 	if ( SDL_Init(SDL_INIT_NOPARACHUTE) < 0 ) {
 		fprintf(stderr, "WinMain() error: %s", SDL_GetError());
@@ -416,7 +419,14 @@ void sdl_osd_interface::osd_exit(running_machine &machine)
 	#endif
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
+	{
+		/* FixMe: Bug in SDL2.0, Quitting joystick will cause SIGSEGV */
+#if SDLMAME_SDL2
+		SDL_QuitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO /*| SDL_INIT_JOYSTICK */);
+#else
 		SDL_Quit();
+#endif
+	}
 }
 
 //============================================================
@@ -492,7 +502,7 @@ static void defines_verbose(void)
 
 static void osd_sdl_info(void)
 {
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDLMAME_SDL2
 	int i, num = SDL_GetNumVideoDrivers();
 
 	mame_printf_verbose("Available videodrivers: ");
@@ -572,15 +582,15 @@ void sdl_osd_interface::init(running_machine &machine)
 		osd_setenv(SDLENV_VIDEODRIVER, stemp, 1);
 	}
 
-	if (SDL_VERSION_ATLEAST(1,3,0))
-	{
+#if (SDLMAME_SDL2)
 		stemp = options.render_driver();
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 		{
 			mame_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
-			osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
+			//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
+			SDL_SetHint(SDL_HINT_RENDER_DRIVER, stemp);
 		}
-	}
+#endif
 
 	/* Set the SDL environment variable for drivers wanting to load the
      * lib at startup.
@@ -615,7 +625,7 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 		if (SDL_InitSubSystem(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 #else
 		if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
@@ -670,7 +680,7 @@ void sdl_osd_interface::init(running_machine &machine)
 		m_watchdog->setTimeout(watchdog_timeout);
 	}
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	SDL_EventState(SDL_TEXTINPUT, SDL_TRUE);
 #else
 	SDL_EnableUNICODE(SDL_TRUE);

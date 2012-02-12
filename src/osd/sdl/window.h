@@ -12,7 +12,7 @@
 #ifndef __SDLWINDOW__
 #define __SDLWINDOW__
 
-#include <SDL/SDL.h>
+#include "sdlinc.h"
 #include "video.h"
 #include "render.h"
 #include "sdlsync.h"
@@ -88,16 +88,12 @@ struct _sdl_window_info
 	int					totalColors;		// total colors from machine/sdl_window_config
 	int					start_viewscreen;
 
-	// per window modes ...
-	int					scale_mode;
-
 	// GL specific
 	int					prescale;
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	// Needs to be here as well so we can identify window
 	SDL_Window			*sdl_window;
-	SDL_Renderer		*sdl_renderer;
 	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
 	int 				resize_width;
 	int					resize_height;

@@ -1,25 +1,12 @@
 ======================================================================================
-SDLMAME only supports SDL hg revisions up to 4464 
-
-Every revision after 4464 has multi-mice/multi-keyboard ripped out. 
-Revisions >= 4465 will not work with SDLMAME.
-
-To build a version suitable for SDLMAME, use ...
-
-hg clone http://hg.libsdl.org/SDL
-hg update 4464
-sh autogen.sh
-./configure --prefix=/usr/local/sdl13 --enable-maintainer-mode --disable-video-directfb --disable-fusionsound
-
-Know caveats: DirectFB is broken (will not compile)
-
+SDLMAME now supports SDL from version 2.0 on upwards.
 =======================================================================================
 
 
 Warning
 =======
 
-- SDL1.3 still is still under development, the following may or may not
+- SDL2.0 still is still under development, the following may or may not
   work.
 - if you are using wine on unix be sure to disable wintab32.dll
 
@@ -27,14 +14,14 @@ Known bugs:
 ===========
 
 * SDL1.3/X11: Some compound keys, e.g. "'" are not supported by SDL driver
-* SDL1.3: sdlvideofps does not take -numscreens>1 into account.
+* SDL2.0: sdlvideofps does not take -numscreens>1 into account.
 * SDL1.3/WIN32: crashes with -rd d3d
 * SDL1.3/WIN32: resizing does not work
       
-Build SDL 1.3 from SVN
+Build SDL 2.0 from HG
 ======================
 
-Pull 1.3 from svn. Than 
+Pull 2.0 from hg. Than 
 
 sh autogen.sh
 ./configure --prefix=/usr/local/sdl13/ --disable-video-svga --enable-video-directfb --enable-fusionsound
@@ -53,6 +40,7 @@ Replace /usr/local/sdl13 above with a safe location, this may as well be a direc
 
 Edit sdl.mak to have
 
+SDL_LIBVER = sdl2
 SDL_INSTALL_ROOT = /usr/local/sdl13
 
 That's it.
@@ -86,8 +74,7 @@ the same time performs any necessary rotation.
 Basic usage examples:
 
 X11/opengl: ./mamed -video sdl13 -rd opengl mario 
-DFB/DFB:    ./mamed -video sdl13 -rd directfb mario 
-WIN32/opengl ./mamed -video sdl13 -rd opengl mario
+DFB/DFB:    ./mamed -video sdl13 -vd directfb -rd directfb mario 
 
 The performance of the directfb driver depends on the combined
 support of the kernel framebuffer driver and the directfb driver.
@@ -101,24 +88,20 @@ X11,DFB,WIN32 ./mamed -video sdl13 -rd software
 Soft:
 =====
 
-./mamed -mt -video soft  -ym none -numscreens 2 mario
+./mamed -mt -video soft  -sm none -numscreens 2 mario
 
 OpenGL:
 =======
 
 Plain opengl does work. Anything more advanced like pbo, fbo or glsl will 
-most probably not.
+most probably not work with more than one screen.
 
-	./mamed -mt -video opengl mario -ym none -nogl_pbo -numscreens 2
+	./mamed -mt -video opengl mario -nogl_pbo -nogl_vbo -nogl_glsl -numscreens 2
 
 YUV - modes:
 ============
 
-	./mamed -mt -video soft -rd software -ym yuy2 -numscreens 2 mario
-
-The "-rd" overwrites the default which is built-in opengl. This renderer
-does not support yuv modes. The software driver does support them non-accelarated.
-This has been left in for the time Xv is once again implemented in SDL.
+	./mamed -mt -video soft -sm yuy2 mario
 
 Using DirectFB, the following should get you going
 
@@ -142,10 +125,8 @@ yv12, yv12x2, yuy2, yuy2x2:
 Rendering in software / scaling with hardware (if supported)
 
 Whether these are actually hardware accelerated depends on the SDL driver
-and the hardware. The current SDL X11 driver needs opengl for rendering but
-does not support yuv textures. The "to-be-submitted" SDL directfb driver 
-supports all above if the hardware supports it. However, only one YUV-texture
-per display is supported. The second window consequently will get "software" 
-YUV blitting.
+and the hardware. The SDL directfb driver supports all above if the hardware 
+supports it. However, only one YUV-texture per display is supported. 
+The second window consequently will get "software" YUV blitting.
 
 	  

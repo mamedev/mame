@@ -1,33 +1,24 @@
 #ifndef _osdsdl_h_
 #define _osdsdl_h_
 
-#include <SDL/SDL.h>
+#include "sdlinc.h"
 
 #include "watchdog.h"
 #include "clifront.h"
-
-//============================================================
-//  Temporary SDL 1.3 defines
-//============================================================
-
-// set this to 0 if compiling against a "hg update 4464"
-// checkout of SDL 1.3
-
-#define SDL13_POST_HG4464	(1)
 
 //============================================================
 //  System dependent defines
 //============================================================
 
 // Process events in worker thread
-#if defined(SDLMAME_WIN32) || (SDL_VERSION_ATLEAST(1,3,0))
+#if defined(SDLMAME_WIN32) || (SDLMAME_SDL2)
 #define SDLMAME_EVENTS_IN_WORKER_THREAD	(1)
 #else
 #define SDLMAME_EVENTS_IN_WORKER_THREAD	(0)
 #endif
 
 #if defined(SDLMAME_WIN32)
-	#if (SDL_VERSION_ATLEAST(1,3,0))
+	#if (SDLMAME_SDL2)
 		#define SDLMAME_INIT_IN_WORKER_THREAD	(0) //FIXME: breaks mt
 		#define SDL13_COMBINE_RESIZE (1)
 	#else
@@ -215,7 +206,7 @@ public:
 	const char *joy_index(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_JOYINDEX, index)); }
 	bool sixaxis() const { return bool_value(SDLOPTION_SIXAXIS); }
 
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 	const char *mouse_index(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_MOUSEINDEX, index)); }
 	const char *keyboard_index(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_KEYBINDEX, index)); }
 #endif

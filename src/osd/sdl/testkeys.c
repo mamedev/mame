@@ -15,12 +15,12 @@
 #include <string.h>
 #include <wchar.h>
 
-#include <SDL/SDL.h>
+#include "sdlinc.h"
 
 #include "unicode.h"
 
 // Check whether SDL has compat interface
-#if defined(SDL_AllocSurface) || (!SDL_VERSION_ATLEAST(1,3,0))
+#if defined(SDL_AllocSurface) || (!SDLMAME_SDL2)
 #define SDL_HAS_COMPAT		1
 #else
 #define SDL_HAS_COMPAT		0
@@ -35,7 +35,7 @@ struct _key_lookup_table
 };
 
 #if SDL_HAS_COMPAT
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 #define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
 #define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H)
 #define KE7(A, B, C, D, E, F, G) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G)
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 				memset(buf, 0, ARRAY_LENGTH(buf));
 				utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
 				printf("ITEM_ID_XY %s 0x%x 0x%x %s \n",
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 						lookup_key_name(sdl_lookup, event.key.keysym.scancode),
 #else
 						lookup_key_name(sdl_lookup, event.key.keysym.sym),
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 			memset(buf, 0, 19);
 			utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
 			printf("ITEM_ID_XY %s 0x%x 0x%x %s \n",
-#if (SDL_VERSION_ATLEAST(1,3,0))
+#if (SDLMAME_SDL2)
 					lookup_key_name(sdl_lookup, event.key.keysym.scancode),
 #else
 					lookup_key_name(sdl_lookup, event.key.keysym.sym),
