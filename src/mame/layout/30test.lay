@@ -140,7 +140,7 @@
 
 
 
-	<view name="Simple LEDs">
+	<view name="Internal Layout">
 		<bounds left="0" top="0" right="246" bottom="246" />
 		<bezel element="static_blue">
 			<bounds left="0" right="246" top="0" bottom="246" />

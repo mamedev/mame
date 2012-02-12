@@ -2,11 +2,11 @@
 <mamelayout version="2">
 	<element name="overlay">
 		<rect>
-			<bounds left="0" top="0" right="224" bottom="29" />
+			<bounds left="0" top="0" right="224" bottom="27.5" />
 			<color red="1" green="1" blue="0.125" />
 		</rect>
 		<rect>
-			<bounds left="0" top="29" right="224" bottom="52" />
+			<bounds left="0" top="27.5" right="224" bottom="52" />
 			<color red="0.5" green="1" blue="0" />
 		</rect>
 		<rect>

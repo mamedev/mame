@@ -141,17 +141,17 @@
 	</element>
 
 	<element name="text_1">
-		<text string="1ST">
+		<text string="1ST" align="2">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text_2">
-		<text string="2ND">
+		<text string="2ND" align="2">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
 	<element name="text_3">
-		<text string="3RD">
+		<text string="3RD" align="2">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
@@ -169,7 +169,7 @@
 
 
 
-	<view name="Simple LEDs">
+	<view name="Internal Layout">
 		<bounds left="0" right="147" top="0" bottom="100" />
 		<bezel element="static_green">
 			<bounds left="0" right="147" top="0" bottom="100" />
@@ -190,7 +190,7 @@
 		</bezel>
 
 		<bezel element="text_1">
-			<bounds x="98.8" y="21" width="10" height="5" />
+			<bounds x="97.5" y="21" width="10" height="5" />
 		</bezel>
 		<bezel element="static_black">
 			<bounds x="109" y="9" width="22" height="17" />
@@ -204,7 +204,7 @@
 		</bezel>
 
 		<bezel element="text_2">
-			<bounds x="99" y="46" width="10" height="5" />
+			<bounds x="97.5" y="46" width="10" height="5" />
 		</bezel>
 		<bezel element="static_black">
 			<bounds x="109" y="34" width="22" height="17" />
@@ -218,7 +218,7 @@
 		</bezel>
 
 		<bezel element="text_3">
-			<bounds x="99" y="71" width="10" height="5" />
+			<bounds x="97.5" y="71" width="10" height="5" />
 		</bezel>
 		<bezel element="static_black">
 			<bounds x="109" y="59" width="22" height="17" />

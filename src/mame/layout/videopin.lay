@@ -4,7 +4,7 @@
 			<color red="1.0" green="0.125" blue="0.125" />
 		</disk>
 	</element>
-	<view name="LEDs">
+	<view name="Simple LEDs">
 		<screen index="0">
 			<bounds x="0" y="0" width="300" height="400" />
 		</screen>
