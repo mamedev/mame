@@ -5,7 +5,6 @@
     driver by Angelo Salese
 
     TODO:
-    - clickable artwork;
     - portd meaning is a mystery
     - inputs are annoying to map;
     - EEPROM
@@ -77,7 +76,7 @@ static WRITE8_HANDLER( namco_30test_led_rank_w )
 
 static WRITE8_HANDLER( namco_30test_lamps_w )
 {
-	// (assume that bit 7 is marquee lamp)
+	// d0-d5: ranking, d6: game over, d7: assume marquee lamp
 	for (int i = 0; i < 8; i++)
 		output_set_lamp_value(i, data >> i & 1);
 }
