@@ -294,7 +294,7 @@ mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-void mccs1850_device::set_cb(cb_t _int_cb, cb_t _pse_cb, cb_t _nuc_cb)
+void mccs1850_device::set_cb(line_cb_t _int_cb, line_cb_t _pse_cb, line_cb_t _nuc_cb)
 {
 	int_cb = _int_cb;
 	pse_cb = _pse_cb;
