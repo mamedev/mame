@@ -10,14 +10,14 @@
 //============================================================
 
 // standard sdl header
-#include "sdlinc.h"
-
 #include <sys/stat.h>
 #include <unistd.h>
 
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <Carbon/Carbon.h>
+
+#include "sdlinc.h"
 
 // MAME headers
 #include "osdcore.h"
