@@ -17,13 +17,13 @@
     Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset)
     One RMS-3 pcb with a 6502 processor, two ay-3-8910s, and one 2716 eprom holding the audio bios. (audio)
     One DSP-3 pcb with a 6502 processor, two 2716 eproms (main processor and bios, graphics, dipswitches?)
-    One BIO-3 pcb with an 8041 MCU (cassette control)
+    One BIO-3 pcb with an 8041 MCU (DECO Cassette control)
     TODO: get more info about this older boardset: D. Widel has some info about it on his page at http://www.widel.com/stuff/decopin.htm
 
     Later boardset: (1984 onward, schematic is dated 10/83)
     One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732) plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM. (audio processor and RAM, Main processor's dram, dipswitches)
     One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor and graphics)
-    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it (cassette control, inputs)
+    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it (DECO Cassette control, inputs)
 
 
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
@@ -1284,7 +1284,7 @@ ROM_START( cppicf2 )
 ROM_END
 
 /* The Following use Dongle Type 4 (unknown part number?)
-    (dongle data probably differs for each game, but only one is known using it atm) */
+    (dongle data is used for most of the graphics) */
 
 ROM_START( cscrtry )
 	DECOCASS_BIOS_B_ROMS
@@ -1304,6 +1304,16 @@ ROM_START( cscrtry2 )
 
 	ROM_REGION( 0x10000, "cassette", 0 )   /* (max) 64k for cassette image */
 	ROM_LOAD( "cscrtry2.cas",  0x0000, 0x8000, CRC(04597842) SHA1(7f1fc3e06b61df880debe9056bdfbbb8600af739) )
+ROM_END
+
+ROM_START( cgsumo )
+	DECOCASS_BIOS_A_ROMS
+
+	ROM_REGION( 0x08000, "dongle", 0 )	  /* dongle data */
+	ROM_LOAD( "dp-141a.pro",  0x0000, 0x8000, CRC(bc379d2c) SHA1(bab19dcb6d68fdbd547ebab1598353f436321157) )
+
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-141[1a]ext.bin",  0x0000, 0x10000, CRC(20c2e86a) SHA1(a18248ba00b847a09df0bea7752a21162af8af76) )
 ROM_END
 
 /* The Following use Dongle Type 5 (unknown part number?)
@@ -1400,43 +1410,65 @@ static DRIVER_INIT( decocrom )
 	state->save_pointer(NAME(state->m_decrypted2), romlength);
 }
 
+/* -- */ GAME( 1981, decocass, 0,        decocass, decocass, decocass, ROT270, "Data East Corporation", "DECO Cassette System", GAME_IS_BIOS_ROOT )
+/* -- */ GAME( 1981, ctsttape, decocass, ctsttape, decocass, decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette)", 0 )
+/* 01 */ GAME( 1980, chwy,     decocass, chwy,     decocass, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette)", 0 )
+/* 02 */ // 1980.12 Sengoku Ninjatai
+/* 03 */ // 1981.01 Manhattan
+/* 04 */ GAME( 1981, cterrani, decocass, cterrani, cterrani, decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette)", 0 )
+/* 05 */ // 1981.?? Missile Sprinter
+/* 06 */ // 1980.12 Nebula
+/* 07 */ GAME( 1981, castfant, decocass, castfant, decocass, decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette)", 0 )
+/* 08 */ // 1981.03 The Tower
+/* 09 */ GAME( 1981, csuperas, decocass, csuperas, csuperas, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette)", 0 )
+/* 10 */ // 1981.?? Ocean to Ocean (medal)
+/* 11 */ GAME( 1981, clocknch, decocass, clocknch, clocknch, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette)", 0 )
+/* 12 */ // 1981.08 Flash Boy/DECO Kid
+/* 13 */ GAME( 1981, cprogolf, decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )
+/* 14 */ // 1981.06 DS Telejan
+/* 15 */ GAME( 1981, cluckypo, decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette)", 0 )
+/* 16 */ GAME( 1981, ctisland, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 1)", 0 )
+		 GAME( 1981, ctisland2,ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )
+		 GAME( 1981, ctisland3,ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 3)", GAME_NOT_WORKING ) /* Different Bitswap? */
+/* 17 */ // 1981.10 Bobbitto
+/* 18 */ GAME( 1982, cexplore, decocass, cexplore, cexplore, decocass, ROT270, "Data East Corporation", "Explorer (DECO Cassette)", GAME_NOT_WORKING )
+/* 19 */ GAME( 1982, cdiscon1, decocass, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette)", 0 )
+		 GAME( 1982, csweetht, cdiscon1, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette)", 0 )
+/* 20 */ GAME( 1982, ctornado, decocass, ctornado, ctornado, decocass, ROT270, "Data East Corporation", "Tornado (DECO Cassette)", 0 )
+/* 21 */ GAME( 1982, cmissnx,  decocass, cmissnx,  cmissnx,  decocass, ROT270, "Data East Corporation", "Mission-X (DECO Cassette)", 0 )
+/* 22 */ GAME( 1982, cptennis, decocass, cptennis, decocass, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette)", 0 )
+/* 23 */ // 1982.?? 18 Hole Pro Golf
+/* 24 */ // 1982.07 Tsumego Kaisyou
+/* 25 */ // 1982.10 Angler Dangler? (fishing)
+/* 26 */ GAME( 1983, cbtime,   decocass, cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette)", 0 )
+/* 27 */ GAME( 1982, cburnrub, decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 1)", 0 )
+		 GAME( 1982, cburnrub2,cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 2)", 0 )
+		 GAME( 1982, cbnj,     cburnrub, cbnj,     decocass, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette)", 0 )
+/* 28 */ GAME( 1983, cgraplop, decocass, cgraplop, cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (DECO Cassette, set 1)", 0 )
+		 GAME( 1983, cgraplop2,cgraplop, cgraplop2,cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (DECO Cassette, set 2)", GAME_NOT_WORKING )
+/* 29 */ GAME( 1983, clapapa,  decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette)" , 0) /* Displays 'La-Pa-Pa during attract */
+	     GAME( 1983, clapapa2, clapapa,  clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette)" , 0) /* Displays 'Rootin' Tootin' during attract */
+/* 30 */ // 1983.03 Skater
+/* 31 */ GAME( 1983, cprobowl, decocass, cprobowl, decocass, decocass, ROT270, "Data East Corporation", "Pro Bowling (DECO Cassette)", 0 )
+/* 32 */ GAME( 1983, cnightst, decocass, cnightst, cnightst, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette, set 1)", 0 )
+		 GAME( 1983, cnightst2,cnightst, cnightst, cnightst, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette, set 2)", 0 )
+/* 33 */ GAME( 1983, cpsoccer, decocass, cpsoccer, cpsoccer, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette)", 0 )
+		 GAME( 1983, cpsoccerj,cpsoccer, cpsoccer, cpsoccer, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette, Japan)", 0 )
+/* 34 */ // 1983.09 Super Doubles Tennis
+/* 35 */ GAME( 1985, cflyball, decocass, cflyball, decocass, decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette)", 0 )
+/* 36 */ // 1984.04 Genesis/Boomer Rang'r
+/* 37 */ GAME( 1983, czeroize, decocass, czeroize, decocass, decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette)", 0 )
+/* 38 */ GAME( 1984, cscrtry,  decocass, cscrtry,  cscrtry,  decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette, set 1)", 0 )
+		 GAME( 1984, cscrtry2, cscrtry,  cscrtry,  cscrtry,  decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette, set 2)", 0 )
+/* 39 */ GAME( 1984, cppicf,   decocass, cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette, set 1)", 0 )
+		 GAME( 1984, cppicf2,  cppicf,   cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette, set 2)", 0 )
+/* 40 */ GAME( 1984, cfghtice, decocass, cfghtice, cfghtice, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (DECO Cassette)", 0 )
+/* 41 */ GAME( 1984, cgsumo,   decocass, cscrtry,  cscrtry,  decocass, ROT270, "Data East Corporation", "Oozumou - The Grand Sumo (DECO Cassette)", 0 )
+/* 42 */ // 1984.08 Hellow Gateball // not a typo, this is official spelling
+/* 43 */ // 1984.08 Yellow Cab
+/* 44 */ GAME( 1985, cbdash,   decocass, cbdash,   cbdash,   decocass, ROT270, "Data East Corporation", "Boulder Dash (DECO Cassette)", 0 )
 
-         GAME( 1981, decocass, 0, decocass, decocass, decocass, ROT270, "Data East Corporation", "DECO Cassette System", GAME_IS_BIOS_ROOT )
-         GAME( 1981, ctsttape, decocass, ctsttape, decocass, decocass, ROT270, "Data East Corporation", "Test Tape (Cassette)", 0 )
-/* 01 */ GAME( 1980, chwy,     decocass, chwy,     decocass, decocass, ROT270, "Data East Corporation", "Highway Chase (Cassette)", 0 )
-/* 04 */ GAME( 1981, cterrani, decocass, cterrani, cterrani, decocass, ROT270, "Data East Corporation", "Terranean (Cassette)", 0 )
-/* 07 */ GAME( 1981, castfant, decocass, castfant, decocass, decocass, ROT270, "Data East Corporation", "Astro Fantasia (Cassette)", 0 )
-/* 09 */ GAME( 1981, csuperas, decocass, csuperas, csuperas, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (Cassette)", 0 )
-/* 11 */ GAME( 1981, clocknch, decocass, clocknch, clocknch, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (Cassette)", 0 )
-/* 13 */ GAME( 1981, cprogolf, decocass, cprogolf, cprogolf, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (Cassette)", 0 )
-/* 15 */ GAME( 1981, cluckypo, decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (Cassette)", 0 )
-/* 16 */ GAME( 1981, ctisland, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 1)", 0 )
-/* 16 */ GAME( 1981, ctisland2,ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 2)", 0 )
-/* 16 */ GAME( 1981, ctisland3,ctisland, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 3)", GAME_NOT_WORKING ) /* Different Bitswap? */
-/* 18 */ GAME( 1982, cexplore, decocass, cexplore, cexplore, decocass, ROT270, "Data East Corporation", "Explorer (Cassette)", GAME_NOT_WORKING )
-/* 19 */ GAME( 1982, cdiscon1, decocass, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Disco No.1 (Cassette)", 0 )
-/* 19 */ GAME( 1982, csweetht, cdiscon1, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Sweet Heart (Cassette)", 0 )
-/* 20 */ GAME( 1982, ctornado, decocass, ctornado, ctornado, decocass, ROT270, "Data East Corporation", "Tornado (Cassette)", 0 )
-/* 21 */ GAME( 1982, cmissnx,  decocass, cmissnx,  cmissnx,  decocass, ROT270, "Data East Corporation", "Mission-X (Cassette)", 0 )
-/* 22 */ GAME( 1982, cptennis, decocass, cptennis, decocass, decocass, ROT270, "Data East Corporation", "Pro Tennis (Cassette)", 0 )
-/* 26 */ GAME( 1983, cbtime,   decocass, cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Burger Time (Cassette)", 0 )
-/* 27 */ GAME( 1982, cburnrub, decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 1)", 0 )
-/* 27 */ GAME( 1982, cburnrub2,cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 2)", 0 )
-/* 27 */ GAME( 1982, cbnj,     cburnrub, cbnj,     decocass, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (Cassette)", 0 )
-/* 28 */ GAME( 1983, cgraplop, decocass, cgraplop, cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 1)", 0 )
-/* 28 */ GAME( 1983, cgraplop2,cgraplop, cgraplop2,cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 2)", GAME_NOT_WORKING )
-/* 29 */ GAME( 1983, clapapa,  decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (Cassette)" , 0) /* Displays 'La-Pa-Pa during attract */
-/* 29 */ GAME( 1983, clapapa2, clapapa,  clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (Cassette)" , 0) /* Displays 'Rootin' Tootin' during attract */
-/* 31 */ GAME( 1983, cprobowl, decocass, cprobowl, decocass, decocass, ROT270, "Data East Corporation", "Pro Bowling (Cassette)", 0 )
-/* 32 */ GAME( 1983, cnightst, decocass, cnightst, cnightst, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 1)", 0 )
-/* 32 */ GAME( 1983, cnightst2,cnightst, cnightst, cnightst, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 2)", 0 )
-/* 33 */ GAME( 1983, cpsoccer, decocass, cpsoccer, cpsoccer, decocass, ROT270, "Data East Corporation", "Pro Soccer (Cassette)", 0 )
-/* 33 */ GAME( 1983, cpsoccerj,cpsoccer, cpsoccer, cpsoccer, decocass, ROT270, "Data East Corporation", "Pro Soccer (Cassette, Japan)", 0 )
-/* 35 */ GAME( 1985, cflyball, decocass, cflyball, decocass, decocass, ROT270, "Data East Corporation", "Flying Ball (Cassette)", 0 )
-/* 37 */ GAME( 1983, czeroize, decocass, czeroize, decocass, decocass, ROT270, "Data East Corporation", "Zeroize (Cassette)", 0 )
-/* 38 */ GAME( 1984, cscrtry,  decocass, cscrtry,  cscrtry,  decocass, ROT270, "Data East Corporation", "Scrum Try (Cassette, set 1)", 0 )
-/* 38 */ GAME( 1984, cscrtry2, cscrtry,  cscrtry,  cscrtry,  decocass, ROT270, "Data East Corporation", "Scrum Try (Cassette, set 2)", 0 )
-/* 39 */ GAME( 1984, cppicf,   decocass, cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (Cassette, set 1)", 0 )
-/* 39 */ GAME( 1984, cppicf2,  cppicf,   cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (Cassette, set 2)", 0 )
-/* 40 */ GAME( 1984, cfghtice, decocass, cfghtice, cfghtice, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (Cassette)", 0 )
-/* 44 */ GAME( 1985, cbdash,   decocass, cbdash,   cbdash,   decocass, ROT270, "Data East Corporation", "Boulder Dash (Cassette)", 0 )
+/* UX7 */ // 1984.12 Tokyo MIE Clinic/Tokyo MIE Shinryoujo
+/* UX8 */ // 1985.01 Tokyo MIE Clinic/Tokyo MIE Shinryoujo Part 2
+/* UX9 */ // 1985.05 Geinoujin Shikaku Shiken
+

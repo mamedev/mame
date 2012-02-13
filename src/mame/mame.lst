@@ -3229,7 +3229,8 @@ sfiii3			// 08/06/1999 (c) 1999 (Euro)
 sfiii3a			// 12/05/1999 (c) 1999 (Euro)
 sfiii3u			// 08/06/1999 (c) 1999 (USA)
 sfiii3au		// 12/05/1999 (c) 1999 (USA)
-jojoba			// 13/09/1999 (c) 1999 (Japan)
+jojoba			// 27/09/1999 (c) 1999 (Japan)
+jojobaa			// 13/09/1999 (c) 1999 (Japan)
 
 sfiiin			// 04/02/1997 (c) 1997 (Asia)
 sfiii2n			// 30/09/1997 (c) 1997 (Asia)
@@ -3237,8 +3238,10 @@ jojon			// 08/01/1999 (c) 1998 (Asia)
 jojoan			// 02/12/1998 (c) 1998 (Asia)
 sfiii3n			// 08/06/1999 (c) 1999 (Japan)
 sfiii3an		// 12/05/1999 (c) 1999 (Japan)
-jojoban			// 13/09/1999 (c) 1999 (Japan)
-jojobane		// 13/09/1999 (c) 1999 (Euro)
+jojoban			// 27/09/1999 (c) 1999 (Japan)
+jojobaan		// 13/09/1999 (c) 1999 (Japan)
+jojobane		// 27/09/1999 (c) 1999 (Euro)
+jojobaane		// 13/09/1999 (c) 1999 (Euro)
 
 // Capcom ZN1
 cpzn1
@@ -5219,7 +5222,7 @@ cscrtry2		// 38
 cppicf			// 39 1984.02 Peter Pepper's Ice Cream Factory
 cppicf2			// 39
 cfghtice		// 40 1984.04 Fighting Ice Hockey
-				// 41 1984.05 Oozumou/The Grand Sumo
+cgsumo			// 41 1984.05 Oozumou/The Grand Sumo
 				// 42 1984.08 Hellow Gateball // not a typo, this is official spelling
 				// 43 1984.08 Yellow Cab
 cbdash			// 44 1985.08 Boulder Dash
