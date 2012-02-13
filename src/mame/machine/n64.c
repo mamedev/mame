@@ -8,6 +8,7 @@
 #include "video/n64.h"
 #include "profiler.h"
 
+UINT32 *n64_sram;
 UINT32 *rdram;
 UINT32 *rsp_imem;
 UINT32 *rsp_dmem;
@@ -17,6 +18,7 @@ const device_type N64PERIPH = &device_creator<n64_periphs>;
 
 static TIMER_CALLBACK(ai_timer_callback);
 static TIMER_CALLBACK(pi_dma_callback);
+static TIMER_CALLBACK(vi_scanline_callback);
 
 n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, N64PERIPH, "N64 Periphal Chips", tag, owner, clock)
@@ -28,6 +30,7 @@ void n64_periphs::device_start()
 {
 	ai_timer = machine().scheduler().timer_alloc(FUNC(ai_timer_callback));
 	pi_dma_timer = machine().scheduler().timer_alloc(FUNC(pi_dma_callback));
+	vi_scanline_timer = machine().scheduler().timer_alloc(FUNC(vi_scanline_callback));
 }
 
 void n64_periphs::device_reset()
@@ -309,7 +312,7 @@ void n64_periphs::clear_rcp_interrupt(int interrupt)
 {
 	mi_interrupt &= ~interrupt;
 
-	//if (!mi_interrupt)
+	if (!mi_interrupt)
 	{
 		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
@@ -486,6 +489,7 @@ static void sp_set_status(device_t *device, UINT32 status)
 
 void n64_periphs::sp_set_status(UINT32 status)
 {
+	//printf("sp_set_status: %08x\n", status);
 	if (status & 0x1)
 	{
 		device_set_input_line(rspcpu, INPUT_LINE_HALT, ASSERT_LINE);
@@ -798,6 +802,7 @@ WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 			break;
 
 		case 0x04/4:		// DP_END_REG
+			//printf("dp_end_reg %08x\n", data);
 			state->m_rdp->SetEndReg(data);
 			g_profiler.start(PROFILER_USER1);
 			state->m_rdp->ProcessList();
@@ -833,6 +838,16 @@ const rsp_config n64_rsp_config =
 	sp_set_status
 };
 
+static TIMER_CALLBACK(vi_scanline_callback)
+{
+	machine.device<n64_periphs>("rcp")->vi_scanline_tick();
+}
+
+void n64_periphs::vi_scanline_tick()
+{
+	signal_rcp_interrupt(VI_INTERRUPT);
+	vi_scanline_timer->adjust(machine().primary_screen->time_until_pos(vi_intr >> 1));
+}
 
 // Video Interface
 void n64_periphs::vi_recalculate_resolution()
@@ -845,6 +860,7 @@ void n64_periphs::vi_recalculate_resolution()
     int y_end = (vi_vstart & 0x000003ff) / 2;
     int width = ((vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
     int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
+	//printf("%04x | %02x | ", vi_xscale >> 16, vi_burst & 0x000000ff);
     rectangle visarea = machine().primary_screen->visible_area();
     attoseconds_t period = machine().primary_screen->frame_period().attoseconds;
 
@@ -872,6 +888,7 @@ void n64_periphs::vi_recalculate_resolution()
 
     visarea.max_x = width - 1;
     visarea.max_y = height - 1;
+    //printf("Reconfig %d, %d (%d - %d), %08x, %08x, %08x, %08x, %08x\n", width, height, x_start, x_end, vi_width, vi_xscale, vi_hsync, vi_hstart, vi_burst);
     machine().primary_screen->configure(width, 525, visarea, period);
 }
 
@@ -893,7 +910,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
             return vi_intr;
 
 		case 0x10/4:		// VI_CURRENT_REG
-			return machine().primary_screen->vpos();
+			return machine().primary_screen->vpos() << 1;
 
 		case 0x14/4:		// VI_BURST_REG
             return vi_burst;
@@ -956,6 +973,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x0c/4:		// VI_INTR_REG
             vi_intr = data;
+			vi_scanline_timer->adjust(machine().primary_screen->time_until_pos(vi_intr >> 1));
 			break;
 
 		case 0x10/4:		// VI_CURRENT_REG
@@ -1098,7 +1116,7 @@ void n64_periphs::ai_dma()
 
     ram = &ram[current->address/2];
 
-//  mame_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
+	//mame_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
 
     dmadac_transfer(&ai_dac[0], 2, 1, 2, current->length/4, ram);
 
@@ -1213,17 +1231,25 @@ void n64_periphs::pi_dma_tick()
 	UINT16 *cart16 = (UINT16*)machine().region("user2")->base();
 	UINT16 *dram16 = (UINT16*)rdram;
 
+	//printf("%08x Cart, %08x Dram\n", pi_cart_addr, pi_dram_addr);
+
 	UINT32 cart_addr = (pi_cart_addr & 0x0fffffff) >> 1;
 	UINT32 dram_addr = (pi_dram_addr & 0x007fffff) >> 1;
+
+	if(cart_addr & 0x04000000)
+	{
+		cart16 = (UINT16*)n64_sram;
+		cart_addr = (pi_cart_addr & 0x00007fff) >> 1;
+	}
 
     cart_addr &= ((machine().region("user2")->bytes() >> 1) - 1);
 
 	if(pi_dma_dir == 1)
 	{
 		UINT32 dma_length = pi_wr_len + 1;
-		if (dma_length & 3)
+		if (dma_length & 7)
 		{
-			dma_length = (dma_length + 3) & ~3;
+			dma_length = (dma_length + 7) & ~7;
 		}
 
 		if (pi_dram_addr != 0xffffffff)
@@ -1248,9 +1274,9 @@ void n64_periphs::pi_dma_tick()
 	else
 	{
 		UINT32 dma_length = pi_rd_len + 1;
-		if (dma_length & 3)
+		if (dma_length & 7)
 		{
-			dma_length = (dma_length + 3) & ~3;
+			dma_length = (dma_length + 7) & ~7;
 		}
 
 		if (pi_dram_addr != 0xffffffff)
@@ -1344,6 +1370,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			attotime dma_period = attotime::from_hz(93750000) * (pi_rd_len + 1) * 3;
 			//printf("want read dma in %d\n", (pi_rd_len + 1));
 			pi_dma_timer->adjust(dma_period);
+			//pi_dma_tick();
 			break;
 		}
 
@@ -1356,6 +1383,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			attotime dma_period = attotime::from_hz(93750000) * (pi_wr_len + 1) * 3;
 			//printf("want write dma in %d\n", (pi_wr_len + 1));
 			pi_dma_timer->adjust(dma_period);
+			//pi_dma_tick();
 			break;
 		}
 

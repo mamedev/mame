@@ -93,7 +93,7 @@
 
 #define RDP_CVG_SPAN_MAX			(1024)
 
-#define EXTENT_AUX_COUNT			(sizeof(rdp_span_aux)*(480*128)) // Screen coverage *128, more or less
+#define EXTENT_AUX_COUNT			(sizeof(rdp_span_aux)*(480*256)) // Screen coverage *128, more or less
 
 /*****************************************************************************/
 

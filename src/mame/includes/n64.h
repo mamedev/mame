@@ -69,6 +69,7 @@ public:
 
 	void ai_timer_tick();
 	void pi_dma_tick();
+	void vi_scanline_tick();
 
 	// Video Interface (VI) registers
 	UINT32 vi_width;
@@ -99,6 +100,9 @@ private:
 	void clear_rcp_interrupt(int interrupt);
 
 	UINT8 is64_buffer[0x10000];
+
+	// Video interface (VI) registers and functions
+	emu_timer *vi_scanline_timer;
 
 	// Audio Interface (AI) registers and functions
 	void ai_dma();
@@ -224,6 +228,7 @@ extern SCREEN_UPDATE_RGB32( n64 );
 
 extern const rsp_config n64_rsp_config;
 
+extern UINT32 *n64_sram;
 extern UINT32 *rdram;
 extern UINT32 *rsp_imem;
 extern UINT32 *rsp_dmem;

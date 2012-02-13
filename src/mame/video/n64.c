@@ -97,6 +97,7 @@ void n64_rdp::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 	UINT32 hres = ((float)hdiff * hcoeff);
 	INT32 invisiblewidth = n64->vi_width - hres;
 
+	//printf("%d, %f, %d, %d\n", hdiff, hcoeff, hres, invisiblewidth);
 	INT32 vdiff = ((n64->vi_vstart & 0x3ff) - ((n64->vi_vstart >> 16) & 0x3ff)) >> 1;
 	float vcoeff = ((float)(n64->vi_yscale & 0xfff) / (1 << 10));
 	UINT32 vres = ((float)vdiff * vcoeff);
@@ -2006,7 +2007,7 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 	int dzdy_dz = (dzdy >> 16) & 0xffff;
 	int dzdx_dz = (dzdx >> 16) & 0xffff;
 
-	extent_t Spans[512];
+	extent_t Spans[1024];
 
 	SpanBase.m_span_drdy = drdy;
 	SpanBase.m_span_dgdy = dgdy;
@@ -3528,6 +3529,7 @@ void n64_rdp::ProcessList()
 {
 	UINT32 length = m_end - m_current;
 
+	//printf("%08x %d\n", m_end, length);
 	// load command data
 	for(int i = 0; i < length; i += 4)
 	{
@@ -3805,6 +3807,7 @@ SCREEN_UPDATE_RGB32(n64)
     }
     */
 
+	state->m_rdp->wait();
 	state->m_rdp->AuxBufPtr[state->m_rdp->AuxBufIndex] = 0;
 	state->m_rdp->AuxBufIndex ^= 1;
 
@@ -3821,7 +3824,6 @@ SCREEN_UPDATE_RGB32(n64)
         return 0;
     }
 
-	state->m_rdp->wait();
 	state->m_rdp->VideoUpdate(n64, bitmap);
 
 	return 0;
