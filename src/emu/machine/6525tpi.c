@@ -535,37 +535,36 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 	{
 	case 0:
 		tpi6525->port_a = data;
-		tpi6525->out_pa_func(0, tpi6525->port_a & tpi6525->ddr_a);
+		tpi6525->out_pa_func(0, (tpi6525->port_a & tpi6525->ddr_a) | (tpi6525->ddr_a ^ 0xff));
 		break;
 
 	case 1:
 		tpi6525->port_b = data;
-		tpi6525->out_pb_func(0, tpi6525->port_b & tpi6525->ddr_b);
+		tpi6525->out_pb_func(0, (tpi6525->port_b & tpi6525->ddr_b) | (tpi6525->ddr_b ^ 0xff));
 		break;
 
 	case 2:
 		tpi6525->port_c = data;
 
 		if (!INTERRUPT_MODE)
-			tpi6525->out_pc_func(0, tpi6525->port_c & tpi6525->ddr_c);
+			tpi6525->out_pc_func(0, (tpi6525->port_c & tpi6525->ddr_c) | (tpi6525->ddr_c ^ 0xff));
 		break;
 
 	case 3:
 		tpi6525->ddr_a = data;
-		tpi6525->out_pa_func(0, tpi6525->port_a & tpi6525->ddr_a);
-
+		tpi6525->out_pa_func(0, (tpi6525->port_a & tpi6525->ddr_a) | (tpi6525->ddr_a ^ 0xff));
 		break;
 
 	case 4:
 		tpi6525->ddr_b = data;
-		tpi6525->out_pb_func(0, tpi6525->port_b & tpi6525->ddr_b);
+		tpi6525->out_pb_func(0, (tpi6525->port_b & tpi6525->ddr_b) | (tpi6525->ddr_b ^ 0xff));
 		break;
 
 	case 5:
 		tpi6525->ddr_c = data;
 
 		if (!INTERRUPT_MODE)
-			tpi6525->out_pc_func(0, tpi6525->port_c & tpi6525->ddr_c);
+			tpi6525->out_pc_func(0, (tpi6525->port_c & tpi6525->ddr_c) | (tpi6525->ddr_c ^ 0xff));
 		break;
 
 	case 6:

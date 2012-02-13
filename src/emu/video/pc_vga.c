@@ -26,7 +26,7 @@
     per-game issues:
     - The Incredible Machine: fix partial updates
     - MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
-    - Bio Menace: jerky H scrolling (uses EGA mode)
+    - Alien Breed, Bio Menace: jerky H scrolling (uses VGA/EGA mode with pel shift)
     - Virtual Pool: ET4k unrecognized;
     - California Chase (calchase): various gfx bugs, CPU related?
 
@@ -388,6 +388,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int yi;
 	int xi;
+	int pel_shift = vga.attribute.pel_shift;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x3ff; //| (LINES & 0x300);
@@ -411,9 +412,9 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 
 					for(xi=0;xi<8;xi++)
 					{
-						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+						if(!machine.primary_screen->visible_area().contains(c+xi-pel_shift, line + yi))
 							continue;
-						bitmapline[c+xi] = machine.pens[vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]];
+						bitmapline[c+xi-pel_shift] = machine.pens[vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]];
 					}
 				}
 			}
@@ -438,9 +439,9 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 
 					for(xi=0;xi<0x10;xi++)
 					{
-						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+						if(!machine.primary_screen->visible_area().contains(c+xi-pel_shift, line + yi))
 							continue;
-						bitmapline[c+xi] = machine.pens[vga.memory[(pos+(xi >> 1)) & 0xffff]];
+						bitmapline[c+xi-pel_shift] = machine.pens[vga.memory[(pos+(xi >> 1)) & 0xffff]];
 					}
 				}
 			}
@@ -883,7 +884,7 @@ INLINE UINT8 rotate_right(UINT8 val)
 
 INLINE UINT8 vga_logical_op(UINT8 data, UINT8 plane, UINT8 mask)
 {
-	UINT8 res;
+	UINT8 res = 0;
 
 	switch(vga.gc.logical_op & 3)
 	{
@@ -906,7 +907,7 @@ INLINE UINT8 vga_logical_op(UINT8 data, UINT8 plane, UINT8 mask)
 
 INLINE UINT8 vga_latch_write(int offs, UINT8 data)
 {
-	UINT8 res;
+	UINT8 res = 0;
 
 	switch (vga.gc.write_mode & 3) {
 	case 0:
@@ -1815,7 +1816,7 @@ Tseng ET4000k implementation
 static void tseng_define_video_mode(running_machine &machine)
 {
 	int divisor;
-	int xtal; 
+	int xtal = 0;
 	svga.rgb8_en = 0;
 	svga.rgb15_en = 0;
 	svga.rgb16_en = 0;
@@ -1868,7 +1869,7 @@ static void tseng_define_video_mode(running_machine &machine)
 			break;
 	}
 	recompute_params_clock(machine, divisor, xtal);
-}	
+}
 
 static UINT8 tseng_crtc_reg_read(running_machine &machine, UINT8 index)
 {
@@ -2070,7 +2071,6 @@ WRITE8_HANDLER(tseng_et4k_03d0_w)
 READ8_HANDLER( tseng_mem_r )
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
-
 	{
 		offset &= 0xffff;
 		return vga.memory[(offset+svga.bank_r*0x10000)];
