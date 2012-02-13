@@ -308,7 +308,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 								if (pic8259->isr & mask)
 								{
 									pic8259->isr &= ~mask;
-									pic8259->irr = pic8259->irq_lines & ~mask;
+									pic8259->irr &= ~mask;
 									break;
 								}
 							}
