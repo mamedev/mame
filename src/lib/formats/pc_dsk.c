@@ -138,7 +138,39 @@ LEGACY_FLOPPY_OPTIONS_START( pc )
 LEGACY_FLOPPY_OPTIONS_END
 
 
-const floppy_image_format_t::desc_e pc_format::pc_desc[] = {
+const floppy_image_format_t::desc_e pc_format::pc_9_desc[] = {
+	{ MFM, 0x4e, 80 },
+	{ MFM, 0x00, 12 },
+	{ RAW, 0x5224, 3 },
+	{ MFM, 0xfc, 1 },
+	{ MFM, 0x4e, 50 },
+	{ MFM, 0x00, 12 },
+	{ SECTOR_LOOP_START, 0, 8 },
+	{   CRC_CCITT_START, 1 },
+	{     RAW, 0x4489, 3 },
+	{     MFM, 0xfe, 1 },
+	{     TRACK_ID },
+	{     HEAD_ID },
+	{     SECTOR_ID },
+	{     SIZE_ID },
+	{   CRC_END, 1 },
+	{   CRC, 1 },
+	{   MFM, 0x4e, 22 },
+	{   MFM, 0x00, 12 },
+	{   CRC_CCITT_START, 2 },
+	{     RAW, 0x4489, 3 },
+	{     MFM, 0xfb, 1 },
+	{     SECTOR_DATA, -1 },
+	{   CRC_END, 2 },
+	{   CRC, 2 },
+	{   MFM, 0x4e, 84 },
+	{   MFM, 0x00, 12 },
+	{ SECTOR_LOOP_END },
+	{ MFM, 0x4e, 170 },
+	{ END }
+};
+
+const floppy_image_format_t::desc_e pc_format::pc_18_desc[] = {
 	{ MFM, 0x4e, 80 },
 	{ MFM, 0x00, 12 },
 	{ RAW, 0x5224, 3 },
@@ -170,6 +202,53 @@ const floppy_image_format_t::desc_e pc_format::pc_desc[] = {
 	{ END }
 };
 
+const floppy_image_format_t::desc_e pc_format::pc_36_desc[] = {
+	{ MFM, 0x4e, 80 },
+	{ MFM, 0x00, 12 },
+	{ RAW, 0x5224, 3 },
+	{ MFM, 0xfc, 1 },
+	{ MFM, 0x4e, 50 },
+	{ MFM, 0x00, 12 },
+	{ SECTOR_LOOP_START, 0, 35 },
+	{   CRC_CCITT_START, 1 },
+	{     RAW, 0x4489, 3 },
+	{     MFM, 0xfe, 1 },
+	{     TRACK_ID },
+	{     HEAD_ID },
+	{     SECTOR_ID },
+	{     SIZE_ID },
+	{   CRC_END, 1 },
+	{   CRC, 1 },
+	{   MFM, 0x4e, 22 },
+	{   MFM, 0x00, 12 },
+	{   CRC_CCITT_START, 2 },
+	{     RAW, 0x4489, 3 },
+	{     MFM, 0xfb, 1 },
+	{     SECTOR_DATA, -1 },
+	{   CRC_END, 2 },
+	{   CRC, 2 },
+	{   MFM, 0x4e, 84 },
+	{   MFM, 0x00, 12 },
+	{ SECTOR_LOOP_END },
+	{ MFM, 0x4e, 1154 },
+	{ END }
+};
+
+const pc_format::format pc_format::formats[] = {
+	{  8*1*40*512, floppy_image::FF_525, floppy_image::SSDD, 40, 1,  8, 0,          000000 },	/* 5 1/4 inch double density single sided */
+	{  8*2*40*512, floppy_image::FF_525, floppy_image::DSDD, 40, 2,  8, 0,          000000 },	/* 5 1/4 inch double density */
+	{  9*1*40*512, floppy_image::FF_525, floppy_image::SSDD, 40, 1,  9, 0,          000000 },	/* 5 1/4 inch double density single sided */
+	{  9*2*40*512, floppy_image::FF_525, floppy_image::DSDD, 40, 2,  9, 0,          000000 },	/* 5 1/4 inch double density */
+	{ 10*2*40*512, floppy_image::FF_525, floppy_image::DSDD, 40, 2, 10, 0,          000000 },	/* 5 1/4 inch double density 10spt */
+	{  9*2*80*512, floppy_image::FF_525, floppy_image::DSDD, 80, 2,  9, 0,          000000 },	/* 80 tracks 5 1/4 inch drives rare in PCs */
+	{  9*2*80*512, floppy_image::FF_35,  floppy_image::DSDD, 80, 2,  9, pc_9_desc,  100000 },	/* 3 1/2 inch double density */
+	{ 15*2*80*512, floppy_image::FF_525, floppy_image::DSHD, 80, 2, 15, 0,          000000 },	/* 5 1/4 inch high density (or japanese 3 1/2 inch high density) */
+	{ 18*2*80*512, floppy_image::FF_35,  floppy_image::DSHD, 80, 2, 18, pc_18_desc, 200000 },	/* 3 1/2 inch high density */
+	{ 21*2*80*512, floppy_image::FF_35,  floppy_image::DSHD, 80, 2, 21, 0,          000000 },	/* 3 1/2 inch high density DMF */
+	{ 36*2*80*512, floppy_image::FF_35,  floppy_image::DSED, 80, 2, 36, pc_36_desc, 400000 },	/* 3 1/2 inch enhanced density */
+	{ 0 },
+};
+
 pc_format::pc_format()
 {
 }
@@ -194,58 +273,75 @@ bool pc_format::supports_save() const
 	return true;
 }
 
-void pc_format::find_size(io_generic *io, UINT32 form_factor, int &track_count, int &head_count, int &sector_count)
+int pc_format::find_size(io_generic *io, UINT32 form_factor)
 {
 	int size = io_generic_size(io);
-	if(size == 512*18*2*80) {
-		track_count = 80;
-		head_count = 2;
-		sector_count = 18;
-	} else
-		track_count = head_count = sector_count = 0;
+	for(int type = 0; formats[type].size; type++)
+		if(formats[type].size == size && (formats[type].form_factor == form_factor || form_factor == floppy_image::FF_UNKNOWN))
+			return type;
+	return -1;
 }
 
 int pc_format::identify(io_generic *io, UINT32 form_factor)
 {
-	int track_count, head_count, sector_count;
-	find_size(io, form_factor, track_count, head_count, sector_count);
+	int type = find_size(io, form_factor);
 
-	if(track_count)
+	if(type != -1)
 		return 50;
 	return 0;
 }
 
 bool pc_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	int track_count, head_count, sector_count;
-	find_size(io, form_factor, track_count, head_count, sector_count);
+	int type = find_size(io, form_factor);
+	if(type == -1)
+		return false;
 
+	const format &f = formats[type];
+	if(!f.desc)
+		return false;
+	
 	UINT8 sectdata[36*512];
 	desc_s sectors[36];
-	for(int i=0; i<sector_count; i++) {
+	for(int i=0; i<f.sector_count; i++) {
 		sectors[i].data = sectdata + 512*i;
 		sectors[i].size = 512;
 		sectors[i].sector_id = i + 1;
 	}
 
-	int track_size = sector_count*512;
-	for(int track=0; track < track_count; track++) {
-		for(int head=0; head < head_count; head++) {
-			io_generic_read(io, sectdata, (track*head_count + head)*track_size, track_size);
-			generate_track(pc_desc,
-						   track, head, sectors, sector_count, 200000, image);
+	int track_size = f.sector_count*512;
+	for(int track=0; track < f.track_count; track++)
+		for(int head=0; head < f.head_count; head++) {
+			io_generic_read(io, sectdata, (track*f.head_count + head)*track_size, track_size);
+			generate_track(f.desc, track, head, sectors, f.sector_count, f.cell_count, image);
 		}
-	}
 
-	image->set_variant(floppy_image::DSHD);
+	image->set_variant(f.variant);
 
 	return true;
 }
 
 bool pc_format::save(io_generic *io, floppy_image *image)
 {
+	int cell_time = 1000;
+	switch(image->get_variant()) {
+	case floppy_image::SSSD:
+		cell_time = 4000; // fm too, actually
+		break;
+	case floppy_image::SSDD:
+	case floppy_image::DSDD:
+		cell_time = 2000;
+		break;
+	case floppy_image::DSHD:
+		cell_time = 1000;
+		break;
+	case floppy_image::DSED:
+		cell_time = 500;
+		break;
+	}
+
 	int track_count, head_count, sector_count;
-	get_geometry_mfm_pc(image, 1000, track_count, head_count, sector_count);
+	get_geometry_mfm_pc(image, cell_time, track_count, head_count, sector_count);
 
 	if(track_count < 80)
 		track_count = 80;
@@ -258,15 +354,15 @@ bool pc_format::save(io_generic *io, floppy_image *image)
 
 	if(sector_count > 36)
 		sector_count = 36;
-	else if(sector_count < 9)
-		sector_count = 9;
+	else if(sector_count < 8)
+		sector_count = 8;
 
 	UINT8 sectdata[36*512];
 	int track_size = sector_count*512;
 
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
-			get_track_data_mfm_pc(track, head, image, 1000, 512, sector_count, sectdata);
+			get_track_data_mfm_pc(track, head, image, cell_time, 512, sector_count, sectdata);
 			io_generic_write(io, sectdata, (track*head_count + head)*track_size, track_size);
 		}
 	}

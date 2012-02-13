@@ -603,6 +603,16 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 	}
 }
 
+UINT32 floppy_image_device::get_form_factor() const
+{
+	return form_factor;
+}
+
+UINT32 floppy_image_device::get_variant() const
+{
+	return image ? image->get_variant() : 0;
+}
+
 ui_menu *floppy_image_device::get_selection_menu(running_machine &machine, render_container *container)
 {
 	return auto_alloc_clear(machine, ui_menu_control_floppy_image(machine, container, this));

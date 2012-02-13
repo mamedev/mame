@@ -32,9 +32,21 @@ public:
 	virtual bool supports_save() const;
 
 private:
-	static const desc_e pc_desc[];
+	struct format {
+		int size;
+		UINT32 form_factor;
+		UINT32 variant;
+		int track_count;
+		int head_count;
+		int sector_count;
+		const desc_e *desc;
+		int cell_count;
+	};
 
-	void find_size(io_generic *io, UINT32 form_factor, int &track_count, int &head_count, int &sector_count);
+	static const format formats[];
+	static const desc_e pc_9_desc[], pc_18_desc[], pc_36_desc[];
+
+	int find_size(io_generic *io, UINT32 form_factor);
 };
 
 extern const floppy_format_type FLOPPY_PC_FORMAT;
