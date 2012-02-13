@@ -743,9 +743,9 @@ ROM_START( springer )
 	ROM_LOAD( "springer.7",    0x1000, 0x1000, CRC(95ab8fc0) SHA1(74dad6fe1edd38b22656cf6cd9e4a57012bf0d60) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "springer.8",    0x0000, 0x1000, CRC(a54bafdc) SHA1(70f1a9ab116dc2a195aa9026ed1004101897d274) )
+	ROM_LOAD( "springer.9",    0x0000, 0x1000, CRC(fa302775) SHA1(412afdc620be95e70b3b782d1a08e4a46777e710) )
 							/* 0x1000-0x1fff empty for my convinience */
-	ROM_LOAD( "springer.9",    0x2000, 0x1000, CRC(fa302775) SHA1(412afdc620be95e70b3b782d1a08e4a46777e710) )
+	ROM_LOAD( "springer.8",    0x2000, 0x1000, CRC(a54bafdc) SHA1(70f1a9ab116dc2a195aa9026ed1004101897d274) )
 							/* 0x3000-0x3fff empty for my convinience */
 
 	ROM_REGION( 0x0200, "proms", 0 )
