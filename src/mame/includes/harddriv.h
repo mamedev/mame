@@ -53,7 +53,6 @@ public:
 	UINT32 *				m_adsp_pgm_memory;
 
 	UINT16 *				m_gsp_protection;
-	UINT16 *				m_stmsp_sync[3];
 
 	UINT16 *				m_gsp_speedup_addr[2];
 	offs_t					m_gsp_speedup_pc;
@@ -215,9 +214,6 @@ WRITE16_HANDLER( hdgsp_io_w );
 
 WRITE16_HANDLER( hdgsp_protection_w );
 
-WRITE16_HANDLER( stmsp_sync0_w );
-WRITE16_HANDLER( stmsp_sync1_w );
-WRITE16_HANDLER( stmsp_sync2_w );
 
 /* ADSP board */
 READ16_HANDLER( hd68k_adsp_program_r );
@@ -290,7 +286,6 @@ WRITE16_HANDLER( rdgsp_speedup1_w );
 /* MSP optimizations */
 READ16_HANDLER( hdmsp_speedup_r );
 WRITE16_HANDLER( hdmsp_speedup_w );
-READ16_HANDLER( stmsp_speedup_r );
 
 /* ADSP optimizations */
 READ16_HANDLER( hdadsp_speedup_r );

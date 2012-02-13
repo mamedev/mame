@@ -671,59 +671,6 @@ WRITE16_HANDLER( hdgsp_protection_w )
 }
 
 
-
-/*************************************
- *
- *  MSP synchronization helpers
- *
- *************************************/
-
-static TIMER_CALLBACK( stmsp_sync_update )
-{
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	int which = param >> 28;
-	offs_t offset = (param >> 16) & 0xfff;
-	UINT16 data = param;
-	state->m_stmsp_sync[which][offset] = data;
-	device_triggerint(state->m_msp);
-}
-
-
-INLINE void stmsp_sync_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
-{
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
-	UINT16 newdata = state->m_stmsp_sync[which][offset];
-	COMBINE_DATA(&newdata);
-
-	/* if being written from the 68000, synchronize on it */
-	if (state->m_hd34010_host_access)
-		space->machine().scheduler().synchronize(FUNC(stmsp_sync_update), newdata | (offset << 16) | (which << 28));
-
-	/* otherwise, just update */
-	else
-		state->m_stmsp_sync[which][offset] = newdata;
-}
-
-
-WRITE16_HANDLER( stmsp_sync0_w )
-{
-	stmsp_sync_w(space, offset, data, mem_mask, 0);
-}
-
-
-WRITE16_HANDLER( stmsp_sync1_w )
-{
-	stmsp_sync_w(space, offset, data, mem_mask, 1);
-}
-
-
-WRITE16_HANDLER( stmsp_sync2_w )
-{
-	stmsp_sync_w(space, offset, data, mem_mask, 2);
-}
-
-
-
 #if 0
 #pragma mark -
 #pragma mark * ADSP BOARD
@@ -1841,32 +1788,6 @@ WRITE16_HANDLER( hdmsp_speedup_w )
 	if (offset == 0 && state->m_msp_speedup_addr[offset] != 0)
 		device_triggerint(state->m_msp);
 }
-
-
-READ16_HANDLER( stmsp_speedup_r )
-{
-	harddriv_state *state = space->machine().driver_data<harddriv_state>();
-
-	/* assumes: stmsp_sync[0] -> $80010, stmsp_sync[1] -> $99680, stmsp_sync[2] -> $99d30 */
-	if (state->m_stmsp_sync[0][0] == 0 &&		/* 80010 */
-		state->m_stmsp_sync[0][1] == 0 &&		/* 80020 */
-		state->m_stmsp_sync[0][2] == 0 &&		/* 80030 */
-		state->m_stmsp_sync[0][3] == 0 &&		/* 80040 */
-		state->m_stmsp_sync[0][4] == 0 &&		/* 80050 */
-		state->m_stmsp_sync[0][5] == 0 &&		/* 80060 */
-		state->m_stmsp_sync[0][6] == 0 &&		/* 80070 */
-		state->m_stmsp_sync[1][0] == 0 &&		/* 99680 */
-		state->m_stmsp_sync[2][0] == 0xffff &&	/* 99d30 */
-		state->m_stmsp_sync[2][1] == 0xffff &&	/* 99d40 */
-		state->m_stmsp_sync[2][2] == 0 &&		/* 99d50 */
-		cpu_get_pc(&space->device()) == 0x3c0)
-	{
-		state->m_msp_speedup_count[0]++;
-		device_spin_until_interrupt(&space->device());
-	}
-	return state->m_stmsp_sync[0][1];
-}
-
 
 
 #if 0

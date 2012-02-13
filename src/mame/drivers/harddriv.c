@@ -968,10 +968,10 @@ static INPUT_PORTS_START( steeltal )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)	/* up/down */
 
 	PORT_START("12BADC2")		/* b80000 - 12 bit ADC 2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Collective") PORT_REVERSE	/* collective */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Collective") PORT_REVERSE	/* collective */
 
 	PORT_START("12BADC3")		/* b80000 - 12 bit ADC 3 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Rudder")	/* rudder */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Rudder") PORT_PLAYER(2)	/* rudder */
 
 	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 	/* steeltal has its own coins */
@@ -4180,19 +4180,8 @@ static void steeltal_init_common(running_machine &machine, offs_t ds3_transfer_p
 	else
 		state->m_m68k_slapstic_base = state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe0000, 0xfffff, FUNC(st68k_protosloop_r), FUNC(st68k_protosloop_w));
 
-	/* synchronization */
-	state->m_stmsp_sync[0] = &state->m_msp_ram[TOWORD(0x80010)];
-	state->m_msp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x80010, 0x8007f, FUNC(stmsp_sync0_w));
-	state->m_stmsp_sync[1] = &state->m_msp_ram[TOWORD(0x99680)];
-	state->m_msp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x99680, 0x9968f, FUNC(stmsp_sync1_w));
-	state->m_stmsp_sync[2] = &state->m_msp_ram[TOWORD(0x99d30)];
-	state->m_msp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x99d30, 0x99d4f, FUNC(stmsp_sync2_w));
-
 	/* set up protection hacks */
 	state->m_gsp_protection = state->m_gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff965d0, 0xfff965df, FUNC(hdgsp_protection_w));
-
-	/* set up msp speedup handlers */
-	state->m_msp->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80020, 0x8002f, FUNC(stmsp_speedup_r));
 
 	/* set up adsp speedup handlers */
 	state->m_adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
