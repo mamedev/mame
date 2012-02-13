@@ -9,8 +9,6 @@
 //
 //============================================================
 
-#include "sdlinc.h"
-
 #ifdef SDLMAME_X11
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -36,6 +34,8 @@
 #define INCL_WIN
 #include <os2.h>
 #endif
+
+#include "sdlinc.h"
 
 // MAME headers
 #include "emu.h"

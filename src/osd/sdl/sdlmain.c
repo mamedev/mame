@@ -9,8 +9,6 @@
 //
 //============================================================
 
-// standard sdl header
-#include "sdlinc.h"
 
 #ifdef SDLMAME_UNIX
 #ifndef SDLMAME_MACOSX
@@ -35,6 +33,8 @@
 #define INCL_DOS
 #include <os2.h>
 #endif
+
+#include "sdlinc.h"
 
 // MAME headers
 #include "osdepend.h"
