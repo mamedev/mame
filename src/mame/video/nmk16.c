@@ -425,6 +425,142 @@ WRITE16_HANDLER( bioship_bank_w )
 
 // manybloc uses extra flip bits on the sprites, but these break other games
 
+static inline void nmk16_draw_sprite(nmk16_state *state, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16 *spr)
+{
+  if ((spr[0] & 0x0001))
+  {
+    int sx    = (spr[4] & 0x1FF) + state->m_videoshift;
+    int sy    =  spr[6] & 0x1FF;
+    int code  =  spr[3];
+    int color =  spr[7];
+    int w     =  spr[1] & 0x00F;
+    int h     = (spr[1] & 0x0F0) >> 4;
+    int pri   = (spr[0] & 0x0C0) >> 6;
+    int xx,yy,x;
+    int delta = 16;
+
+    if(pri != priority)
+      return;
+
+    if (flip_screen_get(machine))
+    {
+      sx = 368 - sx;
+      sy = 240 - sy;
+      delta = -16;
+    }
+
+    yy = h;
+    do
+    {
+      x = sx;
+      xx = w;
+      do
+      {
+        drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+            code,
+            color,
+            flip_screen_get(machine), flip_screen_get(machine),
+            ((x + 16) & 0x1FF) - 16,sy & 0x1FF,15);
+        code++;
+        x += delta;
+      } while (--xx >= 0);
+
+      sy += delta;
+    } while (--yy >= 0);
+  }
+}
+
+static inline void nmk16_draw_sprite_flipsupported(nmk16_state *state, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16 *spr)
+{
+  if ((spr[0] & 0x0001))
+  {
+    int sx    = (spr[4] & 0x1FF) + state->m_videoshift;
+    int sy    =  spr[6] & 0x1FF;
+    int code  =  spr[3];
+    int color =  spr[7];
+    int w     =  spr[1] & 0x00F;
+    int h     = (spr[1] & 0x0F0) >> 4;
+    int pri   = (spr[0] & 0x0C0) >> 6;
+    int flipy = (spr[1] & 0x200) >> 9;
+    int flipx = (spr[1] & 0x100) >> 8;
+
+    int xx,yy,x;
+    int delta = 16;
+
+    if(pri != priority)
+      return;
+
+    flipx ^= flip_screen_get(machine);
+    flipy ^= flip_screen_get(machine);
+
+    if (flip_screen_get(machine))
+    {
+      sx = 368 - sx;
+      sy = 240 - sy;
+      delta = -16;
+    }
+
+    yy = h;
+    sy += flipy ? (delta*h) : 0;
+    do
+    {
+      x = sx + (flipx ? (delta*w) : 0);
+      xx = w;
+      do
+      {
+        drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+            code,
+            color,
+            flipx, flipy,
+            ((x + 16) & 0x1FF) - 16,sy & 0x1FF,15);
+        code++;
+        x += delta * (flipx ? -1 : 1);
+      } while (--xx >= 0);
+      sy += delta * (flipy ? -1 : 1);
+    } while (--yy >= 0);
+  }
+}
+
+static void nmk16_draw_sprites2(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int *swaptbl)
+{
+	nmk16_state *state = machine.driver_data<nmk16_state>();
+	int i, l, prio;
+
+  // Priority level (0x10 levels, 4 sub-levels, 0x10 sprites each)
+	for ( i = 0; i < 0x10; i++ )
+	{
+    // Sub-priority level (4 levels)
+    for ( prio = 3; prio >= 0; prio-- )
+    {
+      // Sprite
+      for ( l = 0; l < 0x10; l++ )
+      {
+        nmk16_draw_sprite(state, machine, bitmap, cliprect, prio, state->m_spriteram_old2 + ((swaptbl[i] + l) * 8));
+      }
+    }
+	}
+}
+
+static void nmk16_draw_sprites2_flipsupported(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int *swaptbl)
+{
+	nmk16_state *state = machine.driver_data<nmk16_state>();
+	int i, l, prio;
+
+  // Priority level (0x10 levels, 4 sub-levels, 0x10 sprites each)
+	for ( i = 0; i < 0x10; i++ )
+	{
+    // Sub-priority level (4 levels)
+    for ( prio = 3; prio >= 0; prio-- )
+    {
+      // Sprite
+      for ( l = 0; l < 0x10; l++ )
+      {
+        nmk16_draw_sprite_flipsupported(state, machine, bitmap, cliprect, prio, state->m_spriteram_old2 + ((swaptbl[i] + l) * 8));
+      }
+    }
+	}
+}
+
 static void nmk16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
@@ -432,47 +568,7 @@ static void nmk16_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 
 	for (offs = 0;offs < 0x1000/2;offs += 8)
 	{
-		if ((state->m_spriteram_old2[offs] & 0x0001))
-		{
-			int sx = (state->m_spriteram_old2[offs+4] & 0x1ff) + state->m_videoshift;
-			int sy = (state->m_spriteram_old2[offs+6] & 0x1ff);
-			int code = state->m_spriteram_old2[offs+3];
-			int color = state->m_spriteram_old2[offs+7];
-			int w = (state->m_spriteram_old2[offs+1] & 0x0f);
-			int h = ((state->m_spriteram_old2[offs+1] & 0xf0) >> 4);
-			int pri = (state->m_spriteram_old2[offs] & 0xc0) >> 6;
-			int xx,yy,x;
-			int delta = 16;
-
-			if(pri != priority)
-				continue;
-
-			if (flip_screen_get(machine))
-			{
-				sx = 368 - sx;
-				sy = 240 - sy;
-				delta = -16;
-			}
-
-			yy = h;
-			do
-			{
-				x = sx;
-				xx = w;
-				do
-				{
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
-							code,
-							color,
-							flip_screen_get(machine), flip_screen_get(machine),
-							((x + 16) & 0x1ff) - 16,sy & 0x1ff,15);
-					code++;
-					x += delta;
-				} while (--xx >= 0);
-
-				sy += delta;
-			} while (--yy >= 0);
-		}
+		nmk16_draw_sprite(state, machine, bitmap, cliprect, priority, state->m_spriteram_old2 + offs);
 	}
 }
 
@@ -485,60 +581,10 @@ static void nmk16_draw_sprites_flipsupported(running_machine &machine, bitmap_in
 	{
 		if (state->m_spriteram_old2[offs] & 0x0001)
 		{
-			int sx = (state->m_spriteram_old2[offs+4] & 0x1ff) + state->m_videoshift;
-			int sy = (state->m_spriteram_old2[offs+6] & 0x1ff);
-			int code = state->m_spriteram_old2[offs+3];
-			int color = state->m_spriteram_old2[offs+7];
-			int w = (state->m_spriteram_old2[offs+1] & 0x0f);
-			int h = ((state->m_spriteram_old2[offs+1] & 0xf0) >> 4);
-			int pri = (state->m_spriteram_old2[offs] & 0xc0) >> 6;
-			int flipy= ((state->m_spriteram_old2[offs+1] & 0x0200) >> 9);
-			int flipx = ((state->m_spriteram_old2[offs+1] & 0x0100) >> 8);
-
-			int xx,yy,x;
-			int delta = 16;
-
-			if(pri != priority)
-				continue;
-
-			flipx ^= flip_screen_get(machine);
-			flipy ^= flip_screen_get(machine);
-
-			if (flip_screen_get(machine))
-			{
-				sx = 368 - sx;
-				sy = 240 - sy;
-				delta = -16;
-			}
-
-			yy = h;
-			sy+=flipy?(delta*h):0;
-			do
-			{
-				x = sx+(flipx?(delta*w):0);
-
-
-				xx = w;
-				do
-				{
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
-							code,
-							color,
-							flipx, flipy,
-							((x + 16) & 0x1ff) - 16,sy & 0x1ff,15);
-
-					code++;
-					x +=delta * ( flipx?-1:1 );
-
-
-				} while (--xx >= 0);
-				sy += delta * ( flipy?-1:1);
-
-			} while (--yy >= 0);
+			nmk16_draw_sprite_flipsupported(state, machine, bitmap, cliprect, priority, state->m_spriteram_old2 + offs);
 		}
 	}
 }
-
 
 SCREEN_UPDATE_IND16( macross )
 {
@@ -547,10 +593,11 @@ SCREEN_UPDATE_IND16( macross )
 
 	state->m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
+	static int macross_swaptbl[0x10] = {
+	0x00, 0x80, 0x20, 0xA0, 0x40, 0xC0, 0x60, 0xE0,
+	0x10, 0x90, 0x30, 0xB0, 0x50, 0xD0, 0x70, 0xF0,
+	};
+	nmk16_draw_sprites2(screen.machine(), bitmap,cliprect, macross_swaptbl);
 
 	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
@@ -565,10 +612,12 @@ SCREEN_UPDATE_IND16( tdragon )
 
 	state->m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
+	// TODO: Fix this swap table; it's currently incorrect
+	static int tdragon_swaptbl[0x10] = {
+	0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
+	0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
+	};
+	nmk16_draw_sprites2(screen.machine(), bitmap,cliprect, tdragon_swaptbl);
 
 	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
@@ -583,10 +632,16 @@ SCREEN_UPDATE_IND16( hachamf )
 
 	state->m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
+	// TODO: Fix this swap table; it's currently incorrect
+	static int hachamf_swaptbl[0x10] = {
+	0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
+	0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
+	};
+	nmk16_draw_sprites2(screen.machine(), bitmap,cliprect, hachamf_swaptbl);
+/*	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
 	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
 	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
+	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);*/
 
 	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
@@ -618,10 +673,12 @@ SCREEN_UPDATE_IND16( tharrier )
 	state->m_bg_tilemap0->set_scrollx(0,tharrier_scroll);
 	state->m_bg_tilemap0->draw(bitmap, cliprect, 0,0);
 
-	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(screen.machine(), bitmap,cliprect,0);
+	// TODO: Fix this swap table; it's currently incorrect
+	static int tharrier_swaptbl[0x10] = {
+	0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
+	0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
+	};
+	nmk16_draw_sprites2_flipsupported(screen.machine(), bitmap,cliprect, tharrier_swaptbl);
 
 	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
@@ -696,10 +753,11 @@ SCREEN_UPDATE_IND16( gunnail )
 		bg_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);
+	static int gunnail_swaptbl[0x10] = {
+	0x00, 0x80, 0x20, 0xA0, 0x40, 0xC0, 0x60, 0xE0,
+	0x10, 0x90, 0x30, 0xB0, 0x50, 0xD0, 0x70, 0xF0,
+	};
+	nmk16_draw_sprites2(screen.machine(), bitmap,cliprect, gunnail_swaptbl);
 
 	state->m_tx_tilemap->set_scrollx(0,-state->m_videoshift);
 	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
