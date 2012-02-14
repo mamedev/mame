@@ -4523,7 +4523,7 @@ srallyc			// 1995.02 Sega Rally Championship - Rev C
 srallycb		// 1995.02 Sega Rally Championship - Rev B
 vcop2			// 1995.09 Virtua Cop 2
 vf2			// 1995.09 Virtua Fighter 2.1
-				// 1995.10 Sky Target
+skytargt		// 1995.10 Sky Target
 manxtt			// 1995.11 Manx T.T.
 				// 1996.08 Dynamite Baseball
 doaa			// 1996.11 Dead or Alive
@@ -4536,8 +4536,8 @@ dynamcop		// 1998.09 Dynamic Cop
 pltkidsa		// 1999.03 Pilot Kids
 
 // Model 2B-CRX (SHARC, SCSP sound board)
-vstriker		// 1995.05 virtua Striker
-vstrikero		// 1995.05 virtua Striker
+vstriker		// 1995.05 Virtua Striker
+vstrikero		// 1995.05 Virtua Striker
 rchase2			// 1995.06 Rail Chase 2 (Arcade TV Game List - P.104, Left, 12 from top)
 indy500			// 1995.07 Indy 500
 indy500d		// 1995.07 Indy 500
@@ -4555,7 +4555,7 @@ lastbrnxj		// 1996.06 Last Bronx (Japan)
 sgt24h			// 1996.07 Super GT 24h
 dynabb			// 1996.08 Dynamite Baseball
 doa			// 1996.11 Dead or Alive
-				// 1997.04 Dynamite Baseball '97
+dynabb97		// 1997.04 Dynamite Baseball 97
 zerogun			// 1997.12 Zero Gunner
 zerogunj		// 1997.12 Zero Gunner (Japan)
 dyndeka2b		// 1998.05 Dynamite Deka 2
@@ -4572,7 +4572,7 @@ hotd			// 1997.03 The House of the Dead
 topskatr		// 1997.05 Top Skater
 topskatru		// 1997.05 Top Skater (USA)
 topskatrj		// 1997.05 Top Skater (Japan)
-overrev			// 1997.09 Overrev
+overrev			// 1997.09 Over Rev
 segawski		// 1997.09 Sega Water Ski
 dynamcopc		// 1998.09 Dynamite Cop
 bel			// 1998.12 Behind Enemy Lines
