@@ -1572,6 +1572,7 @@ void m68ki_stack_frame_1000(m68ki_cpu_core *m68k, UINT32 pc, UINT32 sr, UINT32 v
 void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
 {
 	int orig_rw = m68k->mmu_tmp_rw;	// this gets splatted by the following pushes, so save it now
+	int orig_fc = m68k->mmu_tmp_fc;
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(m68k, 0);
@@ -1600,7 +1601,7 @@ void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 	/* SPECIAL STATUS REGISTER */
 	// set bit for: Rerun Faulted bus Cycle, or run pending prefetch
 	// set FC
-	m68ki_push_16(m68k, 0x0100 | m68k->mmu_tmp_fc | orig_rw<<6);
+	m68ki_push_16(m68k, 0x0100 | orig_fc | orig_rw<<6);
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(m68k, 0);
@@ -1623,6 +1624,7 @@ void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
 {
 	int orig_rw = m68k->mmu_tmp_rw;	// this gets splatted by the following pushes, so save it now
+	int orig_fc = m68k->mmu_tmp_fc;
 
 	/* INTERNAL REGISTERS (18 words) */
 	m68ki_push_32(m68k, 0);
@@ -1674,7 +1676,7 @@ void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 	m68ki_push_16(m68k, 0);
 
 	/* SPECIAL STATUS REGISTER */
-	m68ki_push_16(m68k, 0x0100 | m68k->mmu_tmp_fc | orig_rw<<6);
+	m68ki_push_16(m68k, 0x0100 | orig_fc | orig_rw<<6);
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(m68k, 0);
@@ -1696,6 +1698,7 @@ void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 void m68ki_stack_frame_0111(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address, bool in_mmu)
 {
 	int orig_rw = m68k->mmu_tmp_rw;	// this gets splatted by the following pushes, so save it now
+	int orig_fc = m68k->mmu_tmp_fc;
 
 	/* INTERNAL REGISTERS (18 words) */
 	m68ki_push_32(m68k, 0);
@@ -1716,7 +1719,7 @@ void m68ki_stack_frame_0111(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 	m68ki_push_16(m68k, 0);
 
 	/* SPECIAL STATUS REGISTER (1 word) */
-	m68ki_push_16(m68k, (in_mmu ? 0x400 : 0) | m68k->mmu_tmp_fc | (orig_rw<<8));
+	m68ki_push_16(m68k, (in_mmu ? 0x400 : 0) | orig_fc | (orig_rw<<8));
 
 	/* EFFECTIVE ADDRESS (2 words) */
 	m68ki_push_32(m68k, fault_address);
