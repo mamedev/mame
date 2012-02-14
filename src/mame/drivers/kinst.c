@@ -166,6 +166,26 @@ public:
 static MACHINE_START( kinst )
 {
 	kinst_state *state = machine.driver_data<kinst_state>();
+	/* set the fastest DRC options */
+	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
+
+	/* configure fast RAM regions for DRC */
+	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->m_rambase2);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->m_rambase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase);
+}
+
+
+
+/*************************************
+ *
+ *  Machine init
+ *
+ *************************************/
+
+static MACHINE_RESET( kinst )
+{
+	kinst_state *state = machine.driver_data<kinst_state>();
 	device_t *ide = machine.device("ide");
 	UINT8 *features = ide_get_features(ide,0);
 
@@ -198,26 +218,6 @@ static MACHINE_START( kinst )
 		features[14*2+1] = 0x41;
 	}
 
-	/* set the fastest DRC options */
-	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
-
-	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->m_rambase2);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->m_rambase);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase);
-}
-
-
-
-/*************************************
- *
- *  Machine init
- *
- *************************************/
-
-static MACHINE_RESET( kinst )
-{
-	kinst_state *state = machine.driver_data<kinst_state>();
 	/* set a safe base location for video */
 	state->m_video_base = &state->m_rambase[0x30000/4];
 }
