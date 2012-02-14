@@ -308,6 +308,8 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 								if (pic8259->isr & mask)
 								{
 									pic8259->isr &= ~mask;
+									if (pic8259->level_trig_mode)
+										pic8259->irr = pic8259->irq_lines;
 									pic8259->irr &= ~mask;
 									break;
 								}
@@ -342,6 +344,8 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 							if( pic8259->isr & mask )
 							{
 								pic8259->isr &= ~mask;
+								if (pic8259->level_trig_mode)
+									pic8259->irr = pic8259->irq_lines;
 								pic8259->irr &= ~mask;
 								pic8259->prio = (pic8259->prio + 1) & 7;
 							}
