@@ -4930,6 +4930,9 @@ ROM_START( sc2prom )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "alongtheprom.bin", 0x0000, 0x010000, CRC(0f212ba9) SHA1(34dfe67f8cbdf1cba806dcc7a3e872a8b59747d3) )
 
+	ROM_REGION( 0x20000, "matrix", 0 )
+	ROM_LOAD("alongthepromdot.bin",  0x00000, 0x10000, CRC(b5a96f4d) SHA1(716dda738e8437b13cb72a6b071e0898abceb647))
+
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "alongthepromsnd.bin", 0x0000, 0x040000, CRC(380f56af) SHA1(9125c09e6585e6f4a2de9ea8715371662245aa9a) )
 ROM_END
@@ -5477,7 +5480,6 @@ GAME( 199?, sc2pick		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "P
 GAME( 199?, sc2rock		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "How Big's Your Rock (Global) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2call		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "It's Your Call (Global) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2prom		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",   "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2payr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM/Mazooma",   "Pay Roll Casino (Bellfruit/Mazooma) (Scorpion 2/3)", GAME_FLAGS)
 
 GAME( 199?, sc2bar7		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Concept",   "Bar 7 (Concept)", GAME_FLAGS)
@@ -5525,5 +5527,6 @@ GAME( 199?, sc2ptytm	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",    
 GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2copcl	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2copdc	, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2prom		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, drwho		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
 

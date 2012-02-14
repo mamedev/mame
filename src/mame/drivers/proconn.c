@@ -361,6 +361,7 @@ ROM_START( pr_ftwhl )
 	ROM_LOAD( "943a20pn.250", 0x0000, 0x010000, CRC(a6f86f67) SHA1(43b96e2866099af6693aaf03313e119474180934) )
 	ROM_LOAD( "f-wheel.bin", 0x0000, 0x010000, CRC(ecce8953) SHA1(d90a203e3009be73d456a1f028ffe88754175514) )
 	ROM_LOAD( "fortunewheel6.bin", 0x0000, 0x010000, CRC(fa95bf1b) SHA1(e22b6979f01ff545c47fdc58600a42b78ecea731) )
+	ROM_LOAD( "943a206n.258", 0x0000, 0x010000, CRC(3ef23263) SHA1(40fb4399e4ac34fcb52aaca6ec19a38723bc8031) )//6GBP
 
 	ROM_REGION( 0x80000, "snd", 0 )
 	ROM_LOAD( "943snd1.000", 0x000000, 0x020000, CRC(6b4223a7) SHA1(7af5779ef0309fef40b930f522e962708bd25930) )
@@ -604,6 +605,7 @@ ROM_START( pr_ttrai )
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "treasuretrail.bin", 0x0000, 0x010000, CRC(2be4e149) SHA1(d8cd8f9196b7f2131c78e3e00384872d3ecc0f5f) )
 	ROM_LOAD( "ttrail 10_93.bin", 0x0000, 0x010000, CRC(88f97fff) SHA1(e6954030e13cc069e561f3a4729eca077ca8df20) )
+	ROM_LOAD( "bifi-projectcoin.bin", 0x0000, 0x010000, CRC(463dd269) SHA1(da647f5942491f574aec17e6fdd99f75641ff332) )
 ROM_END
 
 ROM_START( pr_trpx )
@@ -653,6 +655,10 @@ ROM_START( pr_upnun )
 	ROM_LOAD( "up&underprojectcoin.bin", 0x0000, 0x010000, CRC(053a394f) SHA1(8d7e55092dfba2ce49ee009ed388be027be2ff28) )
 ROM_END
 
+ROM_START( pr_qksht )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "quickshot27256.bin", 0x0000, 0x008000, CRC(44188ee9) SHA1(a48807252a3fe3aeacbf2e6d2691bdeafc90e249) ) // Should be 10000?
+ROM_END
 
 
 DRIVER_INIT( proconn )
@@ -699,6 +705,7 @@ GAME( 199?, pr_jumpj		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jumping
 GAME( 199?, pr_medl			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Medalist (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_megmn		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Mega Money (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_nudxs		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Nudge XS (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_qksht		,0			,proconn	,proconn	,proconn	,ROT0	,"Maygay", "Quickshot (Maygay) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_rags			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Rags To Riches (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_reflx		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Reflex (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_roadr		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Road Riot (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )

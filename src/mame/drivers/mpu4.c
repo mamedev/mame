@@ -10887,9 +10887,12 @@ ROM_START( m4sinbd )
 	ROM_LOAD( "sv_20a__.4_1", 0x0000, 0x020000, CRC(0e790ae8) SHA1(48f055f3f1f5d3392b7fba1c5c30624c1f230327) )
 	ROM_LOAD( "sv_20sb_.4_1", 0x0000, 0x020000, CRC(e88c1c29) SHA1(49d180068e4ae9cb65a58e65b4e1ac4d6657ae1d) )
 	ROM_LOAD( "svi20___.4_1", 0x0000, 0x020000, CRC(643037ed) SHA1(d4063faba3069625474dd761f9ad2dcf2f710a19) )
+	ROM_LOAD( "sinbadbwb1_1game.bin", 0x0000, 0x020000, CRC(cfe152a7) SHA1(b8ecfa8b763d04515b65eb902c18dba7198191c3) )
 
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	//These were with the last listed set, though I have no reason to believe they aren't valid for all BwB Sinbad games
+	ROM_LOAD( "sinbadbwb1_2snd.bin", 0x000000, 0x080000, CRC(2ee60ce6) SHA1(865860639e8471f97ace0beac2f4c7fddb8ca97c) )
+	ROM_LOAD( "sinbadbwb1_3snd.bin", 0x000000, 0x080000, CRC(7701e5cc) SHA1(4f9ff91f2b6b15a9c08396b52fc8509ba476ed8d) )
 ROM_END
 
 
