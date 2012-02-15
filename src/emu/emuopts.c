@@ -320,7 +320,9 @@ void emu_options::add_device_options(bool isfirst)
 		// retrieve info about the device instance
 		astring option_name;
 		option_name.printf("%s;%s", image->instance_name(), image->brief_instance_name());
-
+		if (strcmp(image->device_typename(image->image_type()),image->instance_name())==0){
+			option_name.printf("%s;%s;%s1;%s1", image->instance_name(), image->brief_instance_name(), image->instance_name(), image->brief_instance_name());
+		}
 		// add the option
 		if (!exists(image->instance_name())) {
 			entry[0].name = option_name;
