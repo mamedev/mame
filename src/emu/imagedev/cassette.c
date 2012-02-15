@@ -384,4 +384,17 @@ void cassette_image_device::call_display()
 
 	/* draw the cassette */
 	ui_draw_text_box(&device().machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+
+	// make sure tape stops at end when playing
+	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+	{
+		if ( m_cassette )
+		{
+			if (position > length)
+			{
+				m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+				position = length;
+			}
+		}
+	}
 }
