@@ -1901,7 +1901,7 @@ void m68040_fpu_op1(m68ki_cpu_core *m68k)
 
 			case 5: // (D16, An)
 				addr = EA_AY_DI_16(m68k);
-				m68040_do_fsave(m68k, addr, -1, 0);
+				m68040_do_fsave(m68k, addr, -1, 1);
 				break;
 
 			case 7: //
