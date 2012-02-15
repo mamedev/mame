@@ -27,6 +27,13 @@ public:
 
 #define AUDIO_DMA_DEPTH     2
 
+struct n64_savable_data_t
+{
+	UINT8 sram[0x20000];
+	UINT8 eeprom[2048];
+	UINT8 mempak[2][0x8000];
+};
+
 class n64_periphs : public device_t
 {
 private:
@@ -86,6 +93,11 @@ public:
 	UINT32 vi_leap;
 	UINT32 vi_intr;
 	UINT32 vi_vburst;
+
+	/* nvram-specific for MESS */
+	device_t *m_nvram_image;
+
+	n64_savable_data_t m_save_data;
 
 protected:
     // device-level overrides
@@ -169,7 +181,7 @@ private:
 	void pif_dma(int direction);
 	void handle_pif();
 	int pif_channel_handle_command(int channel, int slength, UINT8 *sdata, int rlength, UINT8 *rdata);
-	UINT8 calc_mempack_crc(UINT8 *buffer, int length);
+	UINT8 calc_mempak_crc(UINT8 *buffer, int length);
 	UINT8 pif_ram[0x40];
 	UINT8 pif_cmd[0x40];
 	UINT32 si_dram_addr;
@@ -177,9 +189,9 @@ private:
 	UINT32 si_pif_addr_rd64b;
 	UINT32 si_pif_addr_wr64b;
 	UINT32 si_status;
-	UINT8 eeprom[512];
-	UINT8 mempack[0x8000];
 	UINT32 cic_status;
+
+	n64_savable_data_t savable_data;
 
 	// Video Interface (VI) functions
 	void vi_recalculate_resolution();

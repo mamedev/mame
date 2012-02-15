@@ -102,8 +102,7 @@ void n64_periphs::device_reset()
 	si_pif_addr = 0;
 	si_status = 0;
 
-	memset(eeprom, 0, sizeof(eeprom));
-	memset(mempack, 0, sizeof(mempack));
+	memset(m_save_data.eeprom, 0, 2048);
 
 	dp_clock = 0;
 
@@ -1239,7 +1238,7 @@ void n64_periphs::pi_dma_tick()
 	if(cart_addr & 0x04000000)
 	{
 		cart16 = (UINT16*)n64_sram;
-		cart_addr = (pi_cart_addr & 0x00007fff) >> 1;
+		cart_addr = (pi_cart_addr & 0x0001ffff) >> 1;
 	}
 
     cart_addr &= ((machine().region("user2")->bytes() >> 1) - 1);
@@ -1460,7 +1459,7 @@ WRITE32_MEMBER( n64_periphs::ri_reg_w )
 }
 
 // Serial Interface
-UINT8 n64_periphs::calc_mempack_crc(UINT8 *buffer, int length)
+UINT8 n64_periphs::calc_mempak_crc(UINT8 *buffer, int length)
 {
 	UINT32 crc = 0;
 	UINT32 temp2 = 0;
@@ -1499,6 +1498,11 @@ UINT8 n64_periphs::calc_mempack_crc(UINT8 *buffer, int length)
 	return crc;
 }
 
+INLINE UINT8 convert_to_bcd(int val)
+{
+	return ((val / 10) << 4) | (val % 10);
+}
+
 int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sdata, int rlength, UINT8 *rdata)
 {
 	UINT8 command = sdata[0];
@@ -1512,21 +1516,24 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 0:
 				case 1:
 				{
+					//printf("Read controller %d status\n", channel + 1);
 					rdata[0] = 0x05;
 					rdata[1] = 0x00;
-					rdata[2] = 0x02;
+					rdata[2] = 0x01;
 					return 0;
 				}
 				case 2:
 				case 3:
 				{
+					//printf("Read controller %d status (NC)\n", channel + 1);
 					// not connected
 					return 1;
 				}
 				case 4:
 				{
+					//printf("Read EEPROM status\n");
 					rdata[0] = 0x00;
-					rdata[1] = 0x80;
+					rdata[1] = 0xc0;
 					rdata[2] = 0x00;
 
 					return 1;
@@ -1558,6 +1565,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 0: //p1 inputs
 				case 1: //p2 inputs
 				{
+					//printf("Read p%d inputs\n", channel + 1);
                     buttons = input_port_read(machine(), portnames[(channel*3) + 0]);
                     x = input_port_read(machine(), portnames[(channel*3) + 1]) - 128;
                     y = input_port_read(machine(), portnames[(channel*3) + 2]) - 128;
@@ -1571,6 +1579,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 2:
 				case 3:
 				{
+					//printf("Controller %d not connected\n", channel + 1);
 					// not connected
 					return 1;
 				}
@@ -1579,39 +1588,45 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			break;
 		}
 
-		case 0x02:
+		case 0x02: // Read mempak
 		{
 			UINT32 address;
 
 			address = (sdata[1] << 8) | (sdata[2]);
 			address &= ~0x1f;
 
-			if(address == 0x400)
+			//printf("Read mempak at %04x\n", address);
+
+			if(address == 0x8000)
 			{
 				for(int i = 0; i < rlength-1; i++)
 				{
 					rdata[i] = 0x00;
 				}
 
-				rdata[rlength-1] = calc_mempack_crc(rdata, rlength-1);
+				rdata[rlength-1] = calc_mempak_crc(rdata, rlength-1);
+				return 0;
 			}
 			else if(address < 0x7fe0)
 			{
 				for(int i = 0; i < rlength-1; i++)
 				{
-					rdata[i] = mempack[address+i];
+					rdata[i] = m_save_data.mempak[channel & 1][address+i];
 				}
 
-				rdata[rlength-1] = calc_mempack_crc(rdata, rlength-1);
+				rdata[rlength-1] = calc_mempak_crc(rdata, rlength-1);
+				return 0;
 			}
+
 			return 1;
 		}
-		case 0x03:
+		case 0x03: // Write mempak
 		{
 			UINT32 address = (sdata[1] << 8) | (sdata[2]);
 			address &= ~0x1f;
 
-			if (address == 0x8000)
+			//printf("Write mempak at %04x\n", address);
+			if (address >= 0x8000)
 			{
 
 			}
@@ -1619,13 +1634,13 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			{
 				for(int i = 3; i < slength; i++)
 				{
-					mempack[address++] = sdata[i];
+					m_save_data.mempak[channel & 1][address++] = sdata[i];
 				}
 			}
 
-			rdata[0] = calc_mempack_crc(&sdata[3], slength-3);
+			rdata[0] = calc_mempak_crc(&sdata[3], slength-3);
 
-			return 1;
+			return 0;
 		}
 
 		case 0x04:		// Read from EEPROM
@@ -1640,14 +1655,16 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				fatalerror("handle_pif: write EEPROM (bytes to send %d, bytes to receive %d)\n", slength, rlength);
 			}
 
-			UINT8 block_offset = sdata[1] * 8;
+			UINT16 block_offset = sdata[1] * 8;
+
+			//printf("Read EEPROM at %04x\n", block_offset);
 
 			for(int i=0; i < 8; i++)
 			{
-				rdata[i] = eeprom[block_offset+i];
+				rdata[i] = m_save_data.eeprom[block_offset+i];
 			}
 
-			return 1;
+			return 0;
 		}
 
 		case 0x05:		// Write to EEPROM
@@ -1662,17 +1679,62 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				fatalerror("handle_pif: write EEPROM (bytes to send %d, bytes to receive %d)\n", slength, rlength);
 			}
 
-			UINT8 block_offset = sdata[1] * 8;
+			UINT16 block_offset = sdata[1] * 8;
+
+			//printf("Write EEPROM at %04x\n", block_offset);
+
 			for(int i = 0; i < 8; i++)
 			{
-				eeprom[block_offset+i] = sdata[2+i];
+				m_save_data.eeprom[block_offset+i] = sdata[2+i];
 			}
 
+			return 0;
+		}
+
+		case 0x06:		// Read RTC Status
+		{
+			//printf("Read RTC Status\n");
+			rdata[0] = 0x00;
+			rdata[1] = 0x10;
+			rdata[2] = 0x00;
+			return 0;
+		}
+
+		case 0x07:		// Read RTC Block
+		{
+			switch(sdata[1])
+			{
+				case 0:
+					//printf("Read RTC Block Header\n");
+					rdata[0] = 0x00;
+					rdata[1] = 0x02;
+					rdata[8] = 0x00;
+					return 0;
+
+				case 1:
+					return 0;
+
+				case 2:
+					system_time systime;
+					machine().base_datetime(systime);
+					rdata[0] = convert_to_bcd(systime.local_time.second); // Seconds
+					rdata[1] = convert_to_bcd(systime.local_time.minute); // Minutes
+					rdata[2] = 0x80 | convert_to_bcd(systime.local_time.hour); // Hours
+					rdata[3] = convert_to_bcd(systime.local_time.mday); // Day of month
+					rdata[4] = convert_to_bcd(systime.local_time.weekday); // Day of week
+					rdata[5] = convert_to_bcd(systime.local_time.month + 1); // Month
+					rdata[6] = convert_to_bcd(systime.local_time.year % 100); // Year
+					rdata[7] = convert_to_bcd(systime.local_time.year / 100); // Century
+					rdata[8] = 0x00;
+					//printf("Read RTC Time\n");
+					return 0;
+			}
 			return 1;
 		}
 
 		case 0xff:		// reset
 		{
+			//printf("Reset\n");
 			rdata[0] = 0xff;
 			rdata[1] = 0xff;
 			rdata[2] = 0xff;
@@ -1691,6 +1753,15 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 void n64_periphs::handle_pif()
 {
+	//printf("Before:\n");
+	/*for(int i = 0; i < 0x40; i++)
+	{
+		printf("%02x ", pif_cmd[i]);
+		if((i & 0xf) == 0xf)
+		{
+			printf("\n");
+		}
+	}*/
 	if(pif_cmd[0x3f] == 0x1)		// only handle the command if the last byte is 1
 	{
 		int channel = 0;
@@ -1699,14 +1770,17 @@ void n64_periphs::handle_pif()
 
 		while(cmd_ptr < 0x3f && !end)
 		{
-			UINT8 bytes_to_send = pif_cmd[cmd_ptr++];
+			INT8 bytes_to_send = (INT8)pif_cmd[cmd_ptr++];
+			//printf("bytes to send: 0x%02x\n", bytes_to_send);
 
-			if (bytes_to_send == 0xfe)
+			if (bytes_to_send == -2)
 			{
 				end = 1;
+				//printf("end\n");
 			}
-			else if (bytes_to_send == 0xff)
+			else if (bytes_to_send < 0)
 			{
+				//printf("do nothing\n");
 				// do nothing
 			}
 			else
@@ -1716,7 +1790,13 @@ void n64_periphs::handle_pif()
 					UINT8 recv_buffer[0x40];
 					UINT8 send_buffer[0x40];
 
-					UINT8 bytes_to_recv = pif_cmd[cmd_ptr++];
+					INT8 bytes_to_recv = pif_cmd[cmd_ptr++];
+					//printf("bytes to receive: 0x%02x\n", bytes_to_recv);
+
+					if (bytes_to_recv == -2)
+					{
+						break; // Hack, shouldn't need to do this
+					}
 
 					for(int j = 0; j < bytes_to_send; j++)
 					{
@@ -1724,9 +1804,11 @@ void n64_periphs::handle_pif()
 					}
 
                     int res = pif_channel_handle_command(channel, bytes_to_send, send_buffer, bytes_to_recv, recv_buffer);
+					//printf("result: %d\n", res);
 
 					if (res == 0)
 					{
+						//printf("cmd_ptr (%d) + bytes_to_recv (%d) = %d\n", cmd_ptr, bytes_to_recv, cmd_ptr + bytes_to_recv);
 						if (cmd_ptr + bytes_to_recv > 0x3f)
 						{
 							fatalerror("cmd_ptr overflow\n");
@@ -1749,6 +1831,16 @@ void n64_periphs::handle_pif()
 
 		pif_ram[0x3f] = 0;
 	}
+
+	/*printf("After:\n");
+	for(int i = 0; i < 0x40; i++)
+	{
+		printf("%02x ", pif_ram[i]);
+		if((i & 0xf) == 0xf)
+		{
+			printf("\n");
+		}
+	}*/
 }
 
 void n64_periphs::pif_dma(int direction)
@@ -1883,11 +1975,23 @@ WRITE32_MEMBER( n64_periphs::pif_ram_w )
     signal_rcp_interrupt(SI_INTERRUPT);
 }
 
-//static UINT16 crc_seed = 0x3f;
+static void n64_machine_stop(running_machine &machine)
+{
+	n64_periphs *periphs = machine.device<n64_periphs>("rcp");
+
+	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
+	//printf("Saving\n");
+	UINT8 data[0x30800];
+	memcpy(data, n64_sram, 0x20000);
+	memcpy(data + 0x20000, periphs->m_save_data.eeprom, 0x800);
+	memcpy(data + 0x20800, periphs->m_save_data.mempak[0], 0x8000);
+	memcpy(data + 0x28800, periphs->m_save_data.mempak[1], 0x8000);
+	image->battery_save(data, 0x30800);
+}
 
 MACHINE_START( n64 )
 {
-	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_STRICT_COP1);
+	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
 	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
@@ -1896,6 +2000,9 @@ MACHINE_START( n64 )
 	rspdrc_flush_drc_cache(machine.device("rsp"));
 	rspdrc_add_dmem(machine.device("rsp"), rsp_dmem);
 	rspdrc_add_imem(machine.device("rsp"), rsp_imem);
+
+	/* add a hook for battery save */
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(n64_machine_stop),&machine));
 }
 
 MACHINE_RESET( n64 )
