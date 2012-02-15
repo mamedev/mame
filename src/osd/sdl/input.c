@@ -95,6 +95,7 @@ struct _joystick_state
 	INT32 axes[MAX_AXES];
 	INT32 buttons[MAX_BUTTONS];
 	INT32 hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
+	INT32 balls[MAX_AXES];
 };
 
 // generic device information
@@ -681,7 +682,7 @@ static device_info *devmap_class_register(running_machine &machine, device_map_t
 static void sdlinput_register_joysticks(running_machine &machine)
 {
 	device_info *devinfo;
-	int physical_stick, axis, button, hat, stick;
+	int physical_stick, axis, button, hat, stick, ball;
 	char tempname[512];
 	SDL_Joystick *joy;
 
@@ -709,7 +710,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 		devinfo->joystick.device = joy;
 
 		mame_printf_verbose("Joystick: %s\n", devinfo->name);
-		mame_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy));
+		mame_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
 		mame_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick);
 
 		// loop over all axes
@@ -763,6 +764,22 @@ static void sdlinput_register_joysticks(running_machine &machine)
 			sprintf(tempname, "hat %d Right", hat);
 			itemid = (input_item_id) ((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + 4 * hat : ITEM_ID_OTHER_SWITCH);
 	    	devinfo->device->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.hatsR[hat]);
+		}
+
+		// loop over all (track)balls
+		for (ball = 0; ball < SDL_JoystickNumBalls(joy); ball++)
+		{
+			int itemid;
+
+			if (ball * 2 < INPUT_MAX_ADD_RELATIVE)
+				itemid = ITEM_ID_ADD_RELATIVE1 + ball * 2;
+			else
+				itemid = ITEM_ID_OTHER_AXIS_RELATIVE;
+
+			sprintf(tempname, "R%d %s", ball * 2, devinfo->name);
+			devinfo->device->add_item(tempname, (input_item_id) itemid, generic_axis_get_state, &devinfo->joystick.balls[ball * 2]);
+			sprintf(tempname, "R%d %s", ball * 2 + 1, devinfo->name);
+			devinfo->device->add_item(tempname, (input_item_id) (itemid + 1), generic_axis_get_state, &devinfo->joystick.balls[ball * 2 + 1]);
 		}
 	}
 	mame_printf_verbose("Joystick: End initialization\n");
@@ -1476,6 +1493,12 @@ void sdlinput_poll(running_machine &machine)
 				if (window != NULL && window->xy_to_render_target(window, event.motion.x, event.motion.y, &cx, &cy) )
 					ui_input_push_mouse_move_event(machine, window->target, cx, cy);
 			}
+			break;
+		case SDL_JOYBALLMOTION:
+			devinfo = generic_device_find_index(joystick_list, joy_map.logical[event.jball.which]);
+			//printf("Ball %d %d\n", event.jball.xrel, event.jball.yrel);
+			devinfo->joystick.balls[event.jball.ball * 2] = event.jball.xrel * INPUT_RELATIVE_PER_PIXEL;
+			devinfo->joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * INPUT_RELATIVE_PER_PIXEL;
 			break;
 #if (!SDLMAME_SDL2)
 		case SDL_APPMOUSEFOCUS:
