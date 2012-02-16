@@ -56,13 +56,43 @@
 #define MEM16_LIMIT 0x3fffff
 #define MEM32_LIMIT 0x1fffff
 
-#define RREADADDR8(in) /*(((in) <= MEM8_LIMIT) ?  */(((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR]) /*: 0)*/
-#define RREADIDX16(in) /*(((in) <= MEM16_LIMIT) ? */(((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR]) /*: 0)*/
-#define RREADIDX32(in) /*(((in) <= MEM32_LIMIT) ? */(rdram[(in)]) /*: 0)*/
+#define RDP_RANGE_CHECK	(0)
 
-#define RWRITEADDR8(in, val)	{/*if ((in) <= MEM8_LIMIT) */((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
-#define RWRITEIDX16(in, val)	{/*if ((in) <= MEM16_LIMIT)*/ ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;}
-#define RWRITEIDX32(in, val)	{/*if ((in) <= MEM32_LIMIT)*/ rdram[(in)] = val;}
+#if RDP_RANGE_CHECK
+#define CHECK8(in) if(rdp_range_check((in))) { printf("Check8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); }
+#define CHECK16(in) if(rdp_range_check((in) << 1)) { printf("Check16: Address %08x out of range!\n", (in) << 1); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 1); }
+#define CHECK32(in) if(rdp_range_check((in) << 2)) { printf("Check32: Address %08x out of range!\n", (in) << 2); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 2); }
+#else
+#define CHECK8(in) { }
+#define CHECK16(in) { }
+#define CHECK32(in) { }
+#endif
+
+#if RDP_RANGE_CHECK
+#define RREADADDR8(in) ((rdp_range_check((in))) ? 0 : (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR]))
+#define RREADIDX16(in) ((rdp_range_check((in) << 1)) ? 0 : (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR]))
+#define RREADIDX32(in) ((rdp_range_check((in) << 2)) ? 0 : rdram[(in)])
+
+#define RWRITEADDR8(in, val)	if(rdp_range_check((in))) { printf("Write8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); } else { ((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
+#define RWRITEIDX16(in, val)	if(rdp_range_check((in) << 1)) { printf("Write16: Address %08x out of range!\n", (in) << 1); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 1); } else { ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;}
+#define RWRITEIDX32(in, val)	if(rdp_range_check((in) << 2)) { printf("Write32: Address %08x out of range!\n", (in) << 2); fflush(stdout); fatalerror("Address %08x out of range!\n", (in) << 2); } else { rdram[(in)] = val;}
+#else
+#define RREADADDR8(in) (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR])
+#define RREADIDX16(in) (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR])
+#define RREADIDX32(in) (rdram[(in)])
+
+#define RWRITEADDR8(in, val)	((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;
+#define RWRITEIDX16(in, val)	((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;
+#define RWRITEIDX32(in, val)	rdram[(in)] = val
+#endif
+
+#define U_RREADADDR8(in) (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR])
+#define U_RREADIDX16(in) (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR])
+#define U_RREADIDX32(in) (rdram[(in)])
+
+#define U_RWRITEADDR8(in, val)	((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;
+#define U_RWRITEIDX16(in, val)	((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;
+#define U_RWRITEIDX32(in, val)	rdram[(in)] = val
 
 #define GETLOWCOL(x)	(((x) & 0x3e) << 2)
 #define GETMEDCOL(x)	(((x) & 0x7c0) >> 3)
@@ -93,7 +123,7 @@
 
 #define RDP_CVG_SPAN_MAX			(1024)
 
-#define EXTENT_AUX_COUNT			(sizeof(rdp_span_aux)*(480*256)) // Screen coverage *128, more or less
+#define EXTENT_AUX_COUNT			(sizeof(rdp_span_aux)*(480*192)) // Screen coverage *192, more or less
 
 /*****************************************************************************/
 
@@ -307,6 +337,7 @@ struct ColorInputsT
 	UINT8 *blender2b_a[2];
 };
 
+// This is enormous and horrible
 struct rdp_span_aux
 {
 	UINT32				m_unscissored_rx;
@@ -568,14 +599,15 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		void 			compute_cvg_noflip(extent_t *Spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
 		void 			compute_cvg_flip(extent_t *Spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
 
-		void*			AuxBuf[2];
-		UINT32			AuxBufPtr[2];
+		void*			AuxBuf;
+		UINT32			AuxBufPtr;
 		UINT32			AuxBufIndex;
 
 		void*			ExtentBuf[2];
 		UINT32			ExtentBufPtr[2];
 		UINT32			ExtentBufIndex;
 
+		bool 			rdp_range_check(UINT32 addr);
 	protected:
 		CombineModesT	m_combine;
 		bool			m_pending_mode_block;

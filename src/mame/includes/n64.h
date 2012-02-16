@@ -65,6 +65,8 @@ public:
 	DECLARE_WRITE32_MEMBER( ri_reg_w );
 	DECLARE_READ32_MEMBER( si_reg_r );
 	DECLARE_WRITE32_MEMBER( si_reg_w );
+	DECLARE_READ32_MEMBER( dd_reg_r );
+	DECLARE_WRITE32_MEMBER( dd_reg_w );
 	DECLARE_READ32_MEMBER( pif_ram_r );
 	DECLARE_WRITE32_MEMBER( pif_ram_w );
 
@@ -73,6 +75,7 @@ public:
 
 	void sp_set_status(UINT32 status);
 	void signal_rcp_interrupt(int interrupt);
+	void check_interrupts();
 
 	void ai_timer_tick();
 	void pi_dma_tick();
@@ -98,6 +101,10 @@ public:
 	device_t *m_nvram_image;
 
 	n64_savable_data_t m_save_data;
+
+	UINT32 cart_length;
+
+	bool dd_present;
 
 protected:
     // device-level overrides

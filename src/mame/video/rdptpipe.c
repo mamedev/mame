@@ -1122,7 +1122,7 @@ UINT32 N64TexturePipeT::_FetchIA_4_RAW(INT32 s, INT32 t, INT32 tbase, INT32 tpal
 	color.i.r = i;
 	color.i.g = i;
 	color.i.b = i;
-	color.i.a = (p & 1) & 0xff;
+	color.i.a = (p & 1) * 0xff;
 
 	return color.c;
 }

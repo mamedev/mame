@@ -31,6 +31,28 @@ TODO:
 
 static FILE *rdp_exec;
 
+bool n64_rdp::rdp_range_check(UINT32 addr)
+{
+	if(MiscState.FBSize == 0) return false;
+
+	int fbcount = ((MiscState.FBWidth * Scissor.m_yl) << (MiscState.FBSize - 1)) * 3;
+	int zbcount = MiscState.FBWidth * Scissor.m_yl * 2;
+	int fbaddr = MiscState.FBAddress & 0x007fffff;
+	int zbaddr = MiscState.ZBAddress & 0x007fffff;
+	if ((addr >= fbaddr) && (addr < (fbaddr + fbcount)))
+	{
+		return false;
+	}
+	if ((addr >= zbaddr) && (addr < (zbaddr + zbcount)))
+	{
+		return false;
+	}
+
+	printf("Check failed: %08x vs. %08x-%08x, %08x-%08x (%d, %d)\n", addr, fbaddr, fbaddr + fbcount, zbaddr, zbaddr + zbcount, MiscState.FBWidth, Scissor.m_yl);
+	fflush(stdout);
+	return true;
+}
+
 /*****************************************************************************/
 
 // The functions in this file should be moved into the parent Processor class.
@@ -113,7 +135,12 @@ void n64_rdp::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 		hres = 640;
 	}
 
-	UINT32 pixels = 0;
+    if (vres > bitmap.height()) // makes Perfect Dark boot w/o crashing
+    {
+        vres = bitmap.height();
+    }
+
+    UINT32 pixels = 0;
 
 	if (frame_buffer)
 	{
@@ -909,12 +936,14 @@ INT32 n64_rdp::NormalizeDZPix(INT32 sum)
 UINT32 n64_rdp::ZDecompress(UINT32 zcurpixel)
 {
 	UINT32 zb = RREADIDX16(zcurpixel);
+	CHECK16(zcurpixel);
 	return z_complete_dec_table[(zb >> 2) & 0x3fff];
 }
 
 UINT32 n64_rdp::DZDecompress(UINT32 zcurpixel, UINT32 dzcurpixel)
 {
 	UINT16 zval = RREADIDX16(zcurpixel);
+	CHECK16(zcurpixel);
 	UINT8 dzval = (((dzcurpixel) <= 0x7fffff) ? (HiddenBits[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0);
 	UINT32 dz_compressed = ((zval & 3) << 2) | (dzval & 3);
 	return (1 << dz_compressed);
@@ -1018,6 +1047,7 @@ bool n64_rdp::ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dz
 		oz = ZDecompress(zcurpixel);
 		dzmem = DZDecompress(zcurpixel, dzcurpixel);
 		zval = RREADIDX16(zcurpixel);
+		CHECK16(zcurpixel);
 		rawdzmem = ((zval & 3) << 2) | ((((dzcurpixel) <= 0x3fffff) ? (HiddenBits[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0) & 3);
 	}
 	else
@@ -2121,8 +2151,14 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 
 				if (spix == 0)
 				{
-					Spans[j - (ycur >> 2)].userdata = (void*)((UINT8*)AuxBuf[AuxBufIndex] + AuxBufPtr[AuxBufIndex]);
-					AuxBufPtr[AuxBufIndex] += sizeof(rdp_span_aux);
+					Spans[j - (ycur >> 2)].userdata = (void*)((UINT8*)AuxBuf + AuxBufPtr);
+					AuxBufPtr += sizeof(rdp_span_aux);
+
+					if(AuxBufPtr >= EXTENT_AUX_COUNT)
+					{
+						fatalerror("n64_rdp::DrawTriangle: span aux buffer overflow\n");
+					}
+
 					rdp_span_aux *userdata = (rdp_span_aux*)Spans[j - (ycur >> 2)].userdata;
 					userdata->m_tmem = object.m_tmem;
 
@@ -2273,8 +2309,13 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 
 				if (spix == 0)
 				{
-					Spans[j - (ycur >> 2)].userdata = (void*)((UINT8*)AuxBuf[AuxBufIndex] + AuxBufPtr[AuxBufIndex]);
-					AuxBufPtr[AuxBufIndex] += sizeof(rdp_span_aux);
+					Spans[j - (ycur >> 2)].userdata = (void*)((UINT8*)AuxBuf + AuxBufPtr);
+					AuxBufPtr += sizeof(rdp_span_aux);
+
+					if(AuxBufPtr >= EXTENT_AUX_COUNT)
+					{
+						fatalerror("n64_rdp::DrawTriangle: span aux buffer overflow\n");
+					}
 
 					rdp_span_aux *userdata = (rdp_span_aux*)Spans[j - (ycur >> 2)].userdata;
 					userdata->m_tmem = object.m_tmem;
@@ -2409,6 +2450,7 @@ void n64_rdp::_Write16Bit_Cvg0_Blend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX16(fb) & 0xfffe;
+		CHECK16(fb);
 	}
 
 	finalcvg = userdata->CurrentPixCvg + userdata->CurrentMemCvg;
@@ -2431,6 +2473,7 @@ void n64_rdp::_Write16Bit_Cvg0_NoBlend(UINT32 curpixel, UINT32 r, UINT32 g, UINT
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX16(fb) & 0xfffe;
+		CHECK16(fb);
 	}
 
 	finalcvg = (userdata->CurrentPixCvg - 1) & 7;
@@ -2449,6 +2492,7 @@ void n64_rdp::_Write16Bit_Cvg1(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rd
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX16(fb) & 0xfffe;
+		CHECK16(fb);
 	}
 
 	finalcvg = (userdata->CurrentPixCvg + userdata->CurrentMemCvg) & 7;
@@ -2466,6 +2510,7 @@ void n64_rdp::_Write16Bit_Cvg2(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rd
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX16(fb) & 0xfffe;
+		CHECK16(fb);
 	}
 
 	RWRITEIDX16(fb, finalcolor | 1);
@@ -2482,6 +2527,7 @@ void n64_rdp::_Write16Bit_Cvg3(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rd
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX16(fb) & 0xfffe;
+		CHECK16(fb);
 	}
 
 	RWRITEIDX16(fb, finalcolor | ((userdata->CurrentMemCvg >> 2) & 1));
@@ -2497,6 +2543,7 @@ void n64_rdp::_Write32Bit_Cvg0_Blend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX32(fb) & 0xffffff00;
+		CHECK32(fb);
 	}
 
 	finalcvg = userdata->CurrentPixCvg + userdata->CurrentMemCvg;
@@ -2516,6 +2563,7 @@ void n64_rdp::_Write32Bit_Cvg0_NoBlend(UINT32 curpixel, UINT32 r, UINT32 g, UINT
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX32(fb) & 0xffffff00;
+		CHECK32(fb);
 	}
 
 	finalcvg = (userdata->CurrentPixCvg - 1) & 7;
@@ -2531,6 +2579,7 @@ void n64_rdp::_Write32Bit_Cvg1(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rd
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX32(fb) & 0xffffff00;
+		CHECK32(fb);
 	}
 
 	finalcvg = (userdata->CurrentPixCvg + userdata->CurrentMemCvg) & 7;
@@ -2546,6 +2595,7 @@ void n64_rdp::_Write32Bit_Cvg2(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rd
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX32(fb) & 0xffffff00;
+		CHECK32(fb);
 	}
 
 	RWRITEIDX32(fb, finalcolor | 0xE0);
@@ -2559,6 +2609,7 @@ void n64_rdp::_Write32Bit_Cvg3(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rd
 	if (object.OtherModes.color_on_cvg && !userdata->PreWrap)
 	{
 		finalcolor = RREADIDX32(fb) & 0xffffff00;
+		CHECK32(fb);
 	}
 
 	RWRITEIDX32(fb, finalcolor | (userdata->CurrentMemCvg << 5));
@@ -2568,6 +2619,7 @@ void n64_rdp::_Write32Bit_Cvg3(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rd
 void n64_rdp::_Read16Bit_ImgRead0(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object)
 {
 	UINT16 fword = RREADIDX16((object.MiscState.FBAddress >> 1) + curpixel);
+	CHECK16((object.MiscState.FBAddress >> 1) + curpixel);
 	userdata->MemoryColor.i.r = GETHICOL(fword);
 	userdata->MemoryColor.i.g = GETMEDCOL(fword);
 	userdata->MemoryColor.i.b = GETLOWCOL(fword);
@@ -2578,6 +2630,7 @@ void n64_rdp::_Read16Bit_ImgRead0(UINT32 curpixel, rdp_span_aux *userdata, const
 void n64_rdp::_Read16Bit_ImgRead1(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object)
 {
 	UINT16 fword = RREADIDX16((object.MiscState.FBAddress >> 1) + curpixel);
+	CHECK16((object.MiscState.FBAddress >> 1) + curpixel);
 	UINT8 hbyte = HREADADDR8((object.MiscState.FBAddress >> 1) + curpixel);
 	userdata->MemoryColor.i.r = GETHICOL(fword);
 	userdata->MemoryColor.i.g = GETMEDCOL(fword);
@@ -2589,6 +2642,7 @@ void n64_rdp::_Read16Bit_ImgRead1(UINT32 curpixel, rdp_span_aux *userdata, const
 void n64_rdp::_Read32Bit_ImgRead0(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object)
 {
 	UINT32 mem = RREADIDX32((object.MiscState.FBAddress >> 2) + curpixel);
+	CHECK32((object.MiscState.FBAddress >> 2) + curpixel);
 	userdata->MemoryColor.i.r = (mem >> 24) & 0xff;
 	userdata->MemoryColor.i.g = (mem >> 16) & 0xff;
 	userdata->MemoryColor.i.b = (mem >> 8) & 0xff;
@@ -2599,6 +2653,7 @@ void n64_rdp::_Read32Bit_ImgRead0(UINT32 curpixel, rdp_span_aux *userdata, const
 void n64_rdp::_Read32Bit_ImgRead1(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object)
 {
 	UINT32 mem = RREADIDX32((object.MiscState.FBAddress >> 2) + curpixel);
+	CHECK32((object.MiscState.FBAddress >> 2) + curpixel);
 	userdata->MemoryColor.i.r = (mem >> 24) & 0xff;
 	userdata->MemoryColor.i.g = (mem >> 16) & 0xff;
 	userdata->MemoryColor.i.b = (mem >> 8) & 0xff;
@@ -2611,12 +2666,14 @@ void n64_rdp::_Copy16Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int Curr
 	UINT16 val = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | ((CurrentPixCvg >> 2) & 1);
 	RWRITEIDX16((object.MiscState.FBAddress >> 1) + curpixel, val);
 	HWRITEADDR8((object.MiscState.FBAddress >> 1) + curpixel, CurrentPixCvg & 3);
+	CHECK16((object.MiscState.FBAddress >> 1) + curpixel);
 }
 
 void n64_rdp::_Copy32Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int CurrentPixCvg, const rdp_poly_state &object)
 {
 	UINT32 val = (r << 24) | (g << 16) | (b << 8) | (CurrentPixCvg << 5);
 	RWRITEIDX32((object.MiscState.FBAddress >> 2) + curpixel, val);
+	CHECK32((object.MiscState.FBAddress >> 2) + curpixel);
 }
 
 
@@ -2632,6 +2689,7 @@ void n64_rdp::_Fill16Bit(UINT32 curpixel, const rdp_poly_state &object)
 		val = (object.FillColor >> 16) & 0xffff;
 	}
 	RWRITEIDX16((object.MiscState.FBAddress >> 1) + curpixel, val);
+	CHECK16((object.MiscState.FBAddress >> 1) + curpixel);
 	HWRITEADDR8((object.MiscState.FBAddress >> 1) + curpixel, ((val & 1) << 1) | (val & 1));
 }
 
@@ -2639,6 +2697,7 @@ void n64_rdp::_Fill32Bit(UINT32 curpixel, const rdp_poly_state &object)
 {
 	UINT32 FillColor = object.FillColor;
 	RWRITEIDX32((object.MiscState.FBAddress >> 2) + curpixel, FillColor);
+	CHECK32((object.MiscState.FBAddress >> 2) + curpixel);
 	HWRITEADDR8((object.MiscState.FBAddress >> 1) + (curpixel << 1), (FillColor & 0x10000) ? 3 : 0);
 	HWRITEADDR8((object.MiscState.FBAddress >> 1) + (curpixel << 1) + 1, (FillColor & 0x1) ? 3 : 0);
 }
@@ -2650,6 +2709,7 @@ void n64_rdp::Triangle(bool shade, bool texture, bool zbuffer)
 {
 	DrawTriangle(shade, texture, zbuffer, false);
 	m_pipe_clean = false;
+	//wait();
 }
 
 void n64_rdp::CmdTriangle(UINT32 w1, UINT32 w2)
@@ -2831,7 +2891,7 @@ void n64_rdp::CmdSyncTile(UINT32 w1, UINT32 w2)
 
 void n64_rdp::CmdSyncFull(UINT32 w1, UINT32 w2)
 {
-	//wait("SyncFull");
+	wait("SyncFull");
 	dp_full_sync(*m_machine);
 }
 
@@ -2962,7 +3022,7 @@ void n64_rdp::CmdLoadTLUT(UINT32 w1, UINT32 w2)
 			{
 				if (dststart < 2048)
 				{
-					dst[dststart] = RREADIDX16(srcstart);
+					dst[dststart] = U_RREADIDX16(srcstart);
 					dst[dststart + 1] = dst[dststart];
 					dst[dststart + 2] = dst[dststart];
 					dst[dststart + 3] = dst[dststart];
@@ -3048,10 +3108,10 @@ void n64_rdp::CmdLoadBlock(UINT32 w1, UINT32 w2)
 				ptr = tb + (i << 2);
 				srcptr = src + (i << 2);
 
-				tc[(ptr ^ t) & 0x7ff] = RREADIDX16(srcptr);
-				tc[((ptr + 1) ^ t) & 0x7ff] = RREADIDX16(srcptr + 1);
-				tc[((ptr + 2) ^ t) & 0x7ff] = RREADIDX16(srcptr + 2);
-				tc[((ptr + 3) ^ t) & 0x7ff] = RREADIDX16(srcptr + 3);
+				tc[(ptr ^ t) & 0x7ff] = U_RREADIDX16(srcptr);
+				tc[((ptr + 1) ^ t) & 0x7ff] = U_RREADIDX16(srcptr + 1);
+				tc[((ptr + 2) ^ t) & 0x7ff] = U_RREADIDX16(srcptr + 2);
+				tc[((ptr + 3) ^ t) & 0x7ff] = U_RREADIDX16(srcptr + 3);
 				j += dxt;
 			}
 		}
@@ -3069,14 +3129,14 @@ void n64_rdp::CmdLoadBlock(UINT32 w1, UINT32 w2)
 				ptr = ((tb + (i << 1)) ^ t) & 0x3ff;
 				srcptr = src + (i << 2);
 
-				first = RREADIDX16(srcptr);
-				sec = RREADIDX16(srcptr + 1);
+				first = U_RREADIDX16(srcptr);
+				sec = U_RREADIDX16(srcptr + 1);
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
 
 				ptr = ((tb + (i << 1) + 1) ^ t) & 0x3ff;
-				first = RREADIDX16(srcptr + 2);
-				sec = RREADIDX16(srcptr + 3);
+				first = U_RREADIDX16(srcptr + 2);
+				sec = U_RREADIDX16(srcptr + 3);
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
 
@@ -3094,12 +3154,12 @@ void n64_rdp::CmdLoadBlock(UINT32 w1, UINT32 w2)
 
 				ptr = ((tb + (i << 1)) ^ t) & 0x3ff;
 				srcptr = src + (i << 2);
-				tc[ptr] = RREADIDX16(srcptr);
-				tc[ptr | 0x400] = RREADIDX16(srcptr + 1);
+				tc[ptr] = U_RREADIDX16(srcptr);
+				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 1);
 
 				ptr = ((tb + (i << 1) + 1) ^ t) & 0x3ff;
-				tc[ptr] = RREADIDX16(srcptr + 2);
-				tc[ptr | 0x400] = RREADIDX16(srcptr + 3);
+				tc[ptr] = U_RREADIDX16(srcptr + 2);
+				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 3);
 
 				j += dxt;
 			}
@@ -3114,10 +3174,10 @@ void n64_rdp::CmdLoadBlock(UINT32 w1, UINT32 w2)
 			{
 				ptr = tb + (i << 2);
 				srcptr = src + (i << 2);
-				tc[(ptr ^ WORD_ADDR_XOR) & 0x7ff] = RREADIDX16(srcptr);
-				tc[((ptr + 1) ^ WORD_ADDR_XOR) & 0x7ff] = RREADIDX16(srcptr + 1);
-				tc[((ptr + 2) ^ WORD_ADDR_XOR) & 0x7ff] = RREADIDX16(srcptr + 2);
-				tc[((ptr + 3) ^ WORD_ADDR_XOR) & 0x7ff] = RREADIDX16(srcptr + 3);
+				tc[(ptr ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr);
+				tc[((ptr + 1) ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr + 1);
+				tc[((ptr + 2) ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr + 2);
+				tc[((ptr + 3) ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr + 3);
 			}
 		}
 		else if (tile[tilenum].format == FORMAT_YUV)
@@ -3126,14 +3186,14 @@ void n64_rdp::CmdLoadBlock(UINT32 w1, UINT32 w2)
 			{
 				ptr = ((tb + (i << 1)) ^ WORD_ADDR_XOR) & 0x3ff;
 				srcptr = src + (i << 2);
-				first = RREADIDX16(srcptr);
-				sec = RREADIDX16(srcptr + 1);
+				first = U_RREADIDX16(srcptr);
+				sec = U_RREADIDX16(srcptr + 1);
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);//UV pair
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
 
 				ptr = ((tb + (i << 1) + 1) ^ WORD_ADDR_XOR) & 0x3ff;
-				first = RREADIDX16(srcptr + 2);
-				sec = RREADIDX16(srcptr + 3);
+				first = U_RREADIDX16(srcptr + 2);
+				sec = U_RREADIDX16(srcptr + 3);
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
 			}
@@ -3144,12 +3204,12 @@ void n64_rdp::CmdLoadBlock(UINT32 w1, UINT32 w2)
 			{
 				ptr = ((tb + (i << 1)) ^ WORD_ADDR_XOR) & 0x3ff;
 				srcptr = src + (i << 2);
-				tc[ptr] = RREADIDX16(srcptr);
-				tc[ptr | 0x400] = RREADIDX16(srcptr + 1);
+				tc[ptr] = U_RREADIDX16(srcptr);
+				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 1);
 
 				ptr = ((tb + (i << 1) + 1) ^ WORD_ADDR_XOR) & 0x3ff;
-				tc[ptr] = RREADIDX16(srcptr + 2);
-				tc[ptr | 0x400] = RREADIDX16(srcptr + 3);
+				tc[ptr] = U_RREADIDX16(srcptr + 2);
+				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 3);
 			}
 		}
 		tile[tilenum].th = tl;
@@ -3202,7 +3262,7 @@ void n64_rdp::CmdLoadTile(UINT32 w1, UINT32 w2)
 				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);
 				for (int i = 0; i < width; i++)
 				{
-					tc[((tline + i) ^ xorval8) & 0xfff] = RREADADDR8(src + s + i);
+					tc[((tline + i) ^ xorval8) & 0xfff] = U_RREADADDR8(src + s + i);
 				}
 			}
 			break;
@@ -3225,7 +3285,7 @@ void n64_rdp::CmdLoadTile(UINT32 w1, UINT32 w2)
 					for (int i = 0; i < width; i++)
 					{
 						UINT32 taddr = (tline + i) ^ xorval16;
-						tc[taddr & 0x7ff] = RREADIDX16(src + s + i);
+						tc[taddr & 0x7ff] = U_RREADIDX16(src + s + i);
 					}
 				}
 			}
@@ -3241,7 +3301,7 @@ void n64_rdp::CmdLoadTile(UINT32 w1, UINT32 w2)
 					for (int i = 0; i < width; i++)
 					{
 						UINT32 taddr = ((tline + i) ^ xorval8) & 0x7ff;
-						yuvword = RREADIDX16(src + s + i);
+						yuvword = U_RREADIDX16(src + s + i);
 						GetTMEM()[taddr] = yuvword >> 8;
 						GetTMEM()[taddr | 0x800] = yuvword & 0xff;
 					}
@@ -3263,7 +3323,7 @@ void n64_rdp::CmdLoadTile(UINT32 w1, UINT32 w2)
 				int xorval32cur = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
 				for (int i = 0; i < width; i++)
 				{
-					UINT32 c = RREADIDX32(src + s + i);
+					UINT32 c = U_RREADIDX32(src + s + i);
 					UINT32 ptr = ((tline + i) ^ xorval32cur) & 0x3ff;
 					tc16[ptr] = c >> 16;
 					tc16[ptr | 0x400] = c & 0xffff;
@@ -3398,31 +3458,23 @@ void n64_rdp::CmdSetTextureImage(UINT32 w1, UINT32 w2)
 
 void n64_rdp::CmdSetMaskImage(UINT32 w1, UINT32 w2)
 {
+	wait("SetMaskImage");
+
 	MiscState.ZBAddress = w2 & 0x01ffffff;
 }
 
 void n64_rdp::CmdSetColorImage(UINT32 w1, UINT32 w2)
 {
+	wait("SetColorImage");
+
 	MiscState.FBFormat	= (w1 >> 21) & 0x7;
 	MiscState.FBSize	= (w1 >> 19) & 0x3;
 	MiscState.FBWidth		= (w1 & 0x3ff) + 1;
 	MiscState.FBAddress	= w2 & 0x01ffffff;
 
-	if (MiscState.FBFormat && MiscState.FBFormat != 2) // Jet Force Gemini sets the format to 4, Intensity.  Protection?
+	if (MiscState.FBFormat < 2 || MiscState.FBFormat > 32) // Jet Force Gemini sets the format to 4, Intensity.  Protection?
 	{
-		if (MiscState.FBSize == 1)
-		{
-			MiscState.FBFormat = 2;
-		}
-		else
-		{
-			MiscState.FBFormat = 0;
-		}
-	}
-
-	if (MiscState.FBFormat != 0)
-	{
-		MiscState.FBFormat = 0;
+		MiscState.FBFormat = 2;
 	}
 }
 
@@ -3634,9 +3686,8 @@ void n64_rdp::ProcessList()
 
 n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 32000>(state.machine())
 {
-	AuxBufIndex = 0;
-	AuxBufPtr[0] = AuxBufPtr[1] = 0;
-	AuxBuf[0] = AuxBuf[1] = NULL;
+	AuxBufPtr = 0;
+	AuxBuf = NULL;
 	m_pipe_clean = true;
 
 	m_pending_mode_block = false;
@@ -3753,8 +3804,7 @@ VIDEO_START(n64)
 
 	state->m_rdp->TexPipe.SetMachine(machine);
 
-	state->m_rdp->AuxBuf[0] = auto_alloc_array_clear(machine, UINT8, EXTENT_AUX_COUNT);
-	state->m_rdp->AuxBuf[1] = auto_alloc_array_clear(machine, UINT8, EXTENT_AUX_COUNT);
+	state->m_rdp->AuxBuf = auto_alloc_array_clear(machine, UINT8, EXTENT_AUX_COUNT);
 
 	if (LOG_RDP_EXECUTION)
 	{
@@ -3768,7 +3818,6 @@ SCREEN_UPDATE_RGB32(n64)
 	n64_periphs *n64 = screen.machine().device<n64_periphs>("rcp");
     state->m_rdp->visarea = screen.visible_area();
 
-    int height = state->m_rdp->MiscState.FBHeight;
 	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
 	//UINT8  *cvg_buffer = &state->m_rdp.HiddenBits[((n64->vi_origin & 0xffffff) >> 2) >> 1];
     //int vibuffering = ((n64->vi_control & 2) && fsaa && divot);
@@ -3808,12 +3857,11 @@ SCREEN_UPDATE_RGB32(n64)
     */
 
 	state->m_rdp->wait();
-	state->m_rdp->AuxBufPtr[state->m_rdp->AuxBufIndex] = 0;
-	state->m_rdp->AuxBufIndex ^= 1;
+	state->m_rdp->AuxBufPtr = 0;
 
     if (n64->vi_blank)
     {
-        for (int j = 0; j <height; j++)
+        for (int j = 0; j < state->m_rdp->visarea.max_y; j++)
         {
             UINT32 *d = &bitmap.pix32(j);
             for (int i = 0; i < state->m_rdp->MiscState.FBWidth; i++)
