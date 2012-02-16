@@ -42,8 +42,8 @@
 #include "avhuff.h"
 #include "flac.h"
 #include <zlib.h>
-#include "lib7z/lzmaenc.h"
-#include "lib7z/lzmadec.h"
+#include "lib7z/LzmaEnc.h"
+#include "lib7z/LzmaDec.h"
 #include <new>
 
 // function that should exist but doesn't in the official release
