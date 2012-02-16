@@ -1123,7 +1123,7 @@ chd_flac_compressor::chd_flac_compressor(chd_file &chd, bool lossy, bool bigendi
 	// configure the encoder
 	m_encoder.set_sample_rate(44100);
 	m_encoder.set_num_channels(2);
-	m_encoder.set_block_size(chd.hunk_bytes());
+	m_encoder.set_block_size(chd.hunk_bytes() / 4);
 	m_encoder.set_strip_metadata(true);
 }
 

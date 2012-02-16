@@ -255,7 +255,7 @@ inline UINT64 chd_file::file_append(const void *source, UINT32 length, UINT32 al
 			{
 				UINT32 bytes_to_write = MIN(sizeof(buffer), delta);
 				UINT32 count = core_fwrite(m_file, buffer, bytes_to_write);
-				if (count != length)
+				if (count != bytes_to_write)
 					throw CHDERR_WRITE_ERROR;
 				delta -= bytes_to_write;
 			}
