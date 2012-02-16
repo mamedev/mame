@@ -2093,8 +2093,10 @@ static READ16_HANDLER( puzlbang_speedup_r )
 
 static READ32_HANDLER( wyvernwg_speedup_r )
 {
+	int pc = cpu_get_pc(&space->device());
+
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
-	if(cpu_get_pc(&space->device()) == 0x10758 )
+	if(pc == 0x10758)
 	{
 		if(irq_active(space))
 			device_spin_until_interrupt(&space->device());
@@ -2104,6 +2106,24 @@ static READ32_HANDLER( wyvernwg_speedup_r )
 
 	return state->m_wram32[0x00b56fc/4];
 }
+
+static READ32_HANDLER( wyvernwga_speedup_r )
+{
+	int pc = cpu_get_pc(&space->device());
+
+	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
+	if(pc == 0x10758)
+	{
+		if(irq_active(space))
+			device_spin_until_interrupt(&space->device());
+		else
+			device_eat_cycles(&space->device(), 50);
+	}
+
+	return state->m_wram32[0x00b74f8/4];
+}
+
+
 
 static READ32_HANDLER( finalgdr_speedup_r )
 {
@@ -2292,6 +2312,7 @@ static DRIVER_INIT( wyvernwg )
 {
 	vamphalf_state *state = machine.driver_data<vamphalf_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00b56fc, 0x00b56ff, FUNC(wyvernwg_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00b74f8, 0x00b74fb, FUNC(wyvernwga_speedup_r) );
 
 	state->m_palshift = 0;
 	state->m_flip_bit = 1;
@@ -2404,7 +2425,7 @@ GAME( 2000, mrdig,    0,        mrdig,    common,   mrdig,    ROT0,   "Sun",    
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
 GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_NOT_WORKING ) // game stops booting / working properly after you get a high score, or if you don't have a default eeprom with 'valid data.  It's never worked properly, CPU core issue?
 GAME( 2001, toyland,  0,        coolmini, common,   toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", 0 )
-GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings", GAME_NO_SOUND )
-GAME( 2001, wyvernwga,wyvernwg, wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (alt)", GAME_NO_SOUND )
+GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", GAME_NO_SOUND )
+GAME( 2001, wyvernwga,wyvernwg, wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", GAME_NO_SOUND )
 GAME( 2001, aoh,      0,        aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
 GAME( 2001, boonggab, 0,        boonggab, boonggab, boonggab, ROT270, "Taff System",	   "Boong-Ga Boong-Ga (Spank'em!)", 0 )
