@@ -496,8 +496,7 @@ static key_lookup_table sdl_lookup_table[] =
 	KE8(F6,			F7,			F8,				F9,			F10,		F11,		F12,		F13			)
 	KE8(F14,		F15,		NUMLOCKCLEAR,	CAPSLOCK,	SCROLLLOCK,	RSHIFT,		LSHIFT,		RCTRL		)
 	KE5(LCTRL,		RALT,		LALT,			LGUI,		RGUI)
-	KE(PRINTSCREEN)
-	KE(MENU)
+	KE8(GRAVE,		LEFTBRACKET,RIGHTBRACKET,	SEMICOLON,	APOSTROPHE,	BACKSLASH,	PRINTSCREEN,MENU		)
 	KE(UNDO)
 	{-1, ""}
 };
@@ -541,7 +540,6 @@ static key_lookup_table sdl_lookup_table[] =
 	{-1, ""}
 };
 #endif
-
 
 //============================================================
 //  INLINE FUNCTIONS
@@ -955,9 +953,10 @@ static kt_table * sdlinput_read_keymap(running_machine &machine)
 	int line = 1;
 	int index,i, sk, vk, ak;
 	char buf[256];
-	char mks[21];
-	char sks[21];
-	char kns[21];
+	char mks[41];
+	char sks[41];
+	char kns[41];
+	int  sdl2section=0;
 
 	if (!machine.options().bool_value(SDLOPTION_KEYMAP))
 		return sdl_key_trans_table;
@@ -977,34 +976,41 @@ static kt_table * sdlinput_read_keymap(running_machine &machine)
 
 	while (!feof(keymap_file))
 	{
-		fgets(buf, 255, keymap_file);
-		if (*buf && buf[0] && buf[0] != '#')
+		char *ret = fgets(buf, 255, keymap_file);
+		if (ret && buf[0] != '\n' && buf[0] != '#')
 		{
 			buf[255]=0;
 			i=strlen(buf);
 			if (i && buf[i-1] == '\n')
 				buf[i-1] = 0;
-			mks[0]=0;
-			sks[0]=0;
-			memset(kns, 0, ARRAY_LENGTH(kns));
-			sscanf(buf, "%20s %20s %x %x %20c\n",
-					mks, sks, &vk, &ak, kns);
-
-			index=lookup_mame_index(mks);
-			sk = lookup_sdl_code(sks);
-
-			if ( sk >= 0 && index >=0)
+			if (strncmp(buf,"[SDL2]",6) == 0)
 			{
-				key_trans_table[index].sdl_key = sk;
-				// vk and ak are not really needed
-				//key_trans_table[index][VIRTUAL_KEY] = vk;
-				//key_trans_table[index][ASCII_KEY] = ak;
-				key_trans_table[index].ui_name = auto_alloc_array(machine, char, strlen(kns)+1);
-				strcpy(key_trans_table[index].ui_name, kns);
-				mame_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
+				sdl2section = 1;
 			}
-			else
-				mame_printf_warning("Keymap: Error on line %d - %s key not found: %s\n", line, (sk<0) ? "sdl" : "mame", buf);
+			else if (((SDLMAME_SDL2) ^ sdl2section) == 0)
+			{
+				mks[0]=0;
+				sks[0]=0;
+				memset(kns, 0, ARRAY_LENGTH(kns));
+				sscanf(buf, "%40s %40s %x %x %40c\n",
+						mks, sks, &vk, &ak, kns);
+
+				index=lookup_mame_index(mks);
+				sk = lookup_sdl_code(sks);
+
+				if ( sk >= 0 && index >=0)
+				{
+					key_trans_table[index].sdl_key = sk;
+					// vk and ak are not really needed
+					//key_trans_table[index][VIRTUAL_KEY] = vk;
+					//key_trans_table[index][ASCII_KEY] = ak;
+					key_trans_table[index].ui_name = auto_alloc_array(machine, char, strlen(kns)+1);
+					strcpy(key_trans_table[index].ui_name, kns);
+					mame_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
+				}
+				else
+					mame_printf_warning("Keymap: Error on line %d - %s key not found: %s\n", line, (sk<0) ? "sdl" : "mame", buf);
+			}
 		}
 		line++;
 	}

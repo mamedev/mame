@@ -19,13 +19,6 @@
 
 #include "unicode.h"
 
-// Check whether SDL has compat interface
-#if defined(SDL_AllocSurface) || (!SDLMAME_SDL2)
-#define SDL_HAS_COMPAT		1
-#else
-#define SDL_HAS_COMPAT		0
-#endif
-
 typedef struct _key_lookup_table key_lookup_table;
 
 struct _key_lookup_table
@@ -34,7 +27,6 @@ struct _key_lookup_table
 	const char *name;
 };
 
-#if SDL_HAS_COMPAT
 #if (SDLMAME_SDL2)
 #define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
 #define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H)
@@ -116,7 +108,6 @@ static const char * lookup_key_name(const key_lookup_table *kt, int kc)
 	}
 	return NULL;
 }
-#endif // SDL_HAS_COMPAT
 
 #ifdef SDLMAME_WIN32
 int utf8_main(int argc, char *argv[])
@@ -124,18 +115,25 @@ int utf8_main(int argc, char *argv[])
 int main(int argc, char *argv[])
 #endif
 {
-#if SDL_HAS_COMPAT
 	SDL_Event event;
 	int quit = 0;
+#if (SDLMAME_SDL2)
+	char lasttext[20] = "";
+#else
 	char buf[20];
+#endif
 
 	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
 		fprintf(stderr, "Couldn't initialize SDL: %s\n",
 							SDL_GetError());
 		exit(1);
 	}
+#if (SDLMAME_SDL2)
+	SDL_CreateWindow("Input Test", 0, 0, 100, 100,0 );
+#else
 	SDL_SetVideoMode(100, 50, 16, SDL_ANYFORMAT);
 	SDL_EnableUNICODE(1);
+#endif
 	while(SDL_PollEvent(&event) || !quit) {
 		switch(event.type) {
 		case SDL_QUIT:
@@ -146,32 +144,46 @@ int main(int argc, char *argv[])
 				quit=1;
 			else
 			{
-				memset(buf, 0, ARRAY_LENGTH(buf));
-				utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
-				printf("ITEM_ID_XY %s 0x%x 0x%x %s \n",
 #if (SDLMAME_SDL2)
-						lookup_key_name(sdl_lookup, event.key.keysym.scancode),
-#else
-						lookup_key_name(sdl_lookup, event.key.keysym.sym),
-#endif
-						(int) event.key.keysym.scancode,
-						(int) event.key.keysym.unicode,
-						buf);
-			}
-			break;
-		case SDL_KEYUP:
-			memset(buf, 0, 19);
-			utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
-			printf("ITEM_ID_XY %s 0x%x 0x%x %s \n",
-#if (SDLMAME_SDL2)
+				printf("ITEM_ID_XY %s 0x%x 0x%x %s\n",
 					lookup_key_name(sdl_lookup, event.key.keysym.scancode),
+					(int) event.key.keysym.scancode,
+					(int) event.key.keysym.unicode,
+					"");
+				lasttext[0] = 0;
 #else
+				memset(buf, 0, 19);
+				utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
+				printf("ITEM_ID_XY %s 0x%x 0x%x %s\n",
 					lookup_key_name(sdl_lookup, event.key.keysym.sym),
-#endif
 					(int) event.key.keysym.scancode,
 					(int) event.key.keysym.unicode,
 					buf);
+#endif
+			}
 			break;
+		case SDL_KEYUP:
+#if (SDLMAME_SDL2)
+			printf("ITEM_ID_XY %s 0x%x 0x%x %s\n",
+					lookup_key_name(sdl_lookup, event.key.keysym.scancode),
+					(int) event.key.keysym.scancode,
+					(int) event.key.keysym.unicode,
+					lasttext);
+#else
+			memset(buf, 0, 19);
+			utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
+			printf("ITEM_ID_XY %s 0x%x 0x%x %s\n",
+					lookup_key_name(sdl_lookup, event.key.keysym.sym),
+					(int) event.key.keysym.scancode,
+					(int) event.key.keysym.unicode,
+					buf);
+#endif
+			break;
+#if (SDLMAME_SDL2)
+		case SDL_TEXTINPUT:
+			strcpy(lasttext, event.text.text);
+			break;
+#endif
 		}
 		event.type = 0;
 
@@ -181,9 +193,5 @@ int main(int argc, char *argv[])
 	}
 	SDL_Quit();
 	return(0);
-#else
-	printf("This SDL Version does not support 1.2 compatibility interface.\n");
-	return(1);
-#endif
 }
 
