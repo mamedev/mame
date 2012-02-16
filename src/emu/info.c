@@ -524,18 +524,13 @@ void info_xml_creator::output_rom(const rom_source *source)
 					{
 						// iterate over hash function types and print m_output their values
 						astring tempstr;
-						for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
-							fprintf(m_output, " %s=\"%s\"", hash->name(), hash->string(tempstr));
+						fprintf(m_output, " %s", hashes.attribute_string(tempstr));
 					}
+					else
+						fprintf(m_output, " status=\"nodump\"");
 
 					// append a region name
 					fprintf(m_output, " region=\"%s\"", ROMREGION_GETTAG(region));
-
-					// add nodump/baddump flags
-					if (hashes.flag(hash_collection::FLAG_NO_DUMP))
-						fprintf(m_output, " status=\"nodump\"");
-					if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
-						fprintf(m_output, " status=\"baddump\"");
 
 					// for non-disk entries, print offset
 					if (!is_disk)

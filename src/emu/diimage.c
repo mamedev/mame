@@ -497,7 +497,8 @@ void device_image_interface::image_checkhash()
     device_image_partialhash_func partialhash;
 
     /* only calculate CRC if it hasn't been calculated, and the open_mode is read only */
-    if (m_hash.first() == NULL && m_readonly && !m_created)
+    UINT32 crcval;
+    if (!m_hash.crc(crcval) && m_readonly && !m_created)
     {
         /* do not cause a linear read of 600 megs please */
         /* TODO: use SHA1 in the CHD header as the hash */

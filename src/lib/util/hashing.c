@@ -38,6 +38,7 @@
 ***************************************************************************/
 
 #include "hashing.h"
+#include "zlib.h"
 
 
 //**************************************************************************
@@ -81,10 +82,12 @@ inline int char_to_hex(char c)
 //  from_string - convert from a string
 //-------------------------------------------------
 
-bool sha1_t::from_string(const char *string)
+bool sha1_t::from_string(const char *string, int length)
 {
 	// must be at least long enough to hold everything
-	if (strlen(string) < 2 * sizeof(m_raw))
+	if (length == -1)
+		length = strlen(string);
+	if (length < 2 * sizeof(m_raw))
 		return false;
 	
 	// iterate through our raw buffer
@@ -104,7 +107,7 @@ bool sha1_t::from_string(const char *string)
 //  as_string - convert to a string
 //-------------------------------------------------
 
-const char *sha1_t::as_string(astring &buffer)
+const char *sha1_t::as_string(astring &buffer) const
 {
 	buffer.reset();
 	for (int i = 0; i < ARRAY_LENGTH(m_raw); i++)
@@ -121,10 +124,12 @@ const char *sha1_t::as_string(astring &buffer)
 //  from_string - convert from a string
 //-------------------------------------------------
 
-bool md5_t::from_string(const char *string)
+bool md5_t::from_string(const char *string, int length)
 {
 	// must be at least long enough to hold everything
-	if (strlen(string) < 2 * sizeof(m_raw))
+	if (length == -1)
+		length = strlen(string);
+	if (length < 2 * sizeof(m_raw))
 		return false;
 	
 	// iterate through our raw buffer
@@ -144,7 +149,7 @@ bool md5_t::from_string(const char *string)
 //  as_string - convert to a string
 //-------------------------------------------------
 
-const char *md5_t::as_string(astring &buffer)
+const char *md5_t::as_string(astring &buffer) const
 {
 	buffer.reset();
 	for (int i = 0; i < ARRAY_LENGTH(m_raw); i++)
@@ -162,10 +167,12 @@ const char *md5_t::as_string(astring &buffer)
 //  from_string - convert from a string
 //-------------------------------------------------
 
-bool crc32_t::from_string(const char *string)
+bool crc32_t::from_string(const char *string, int length)
 {
 	// must be at least long enough to hold everything
-	if (strlen(string) < 2 * sizeof(m_raw))
+	if (length == -1)
+		length = strlen(string);
+	if (length < 2 * sizeof(m_raw))
 		return false;
 	
 	// iterate through our raw buffer
@@ -185,9 +192,20 @@ bool crc32_t::from_string(const char *string)
 //  as_string - convert to a string
 //-------------------------------------------------
 
-const char *crc32_t::as_string(astring &buffer)
+const char *crc32_t::as_string(astring &buffer) const
 {
 	return buffer.format("%08x", m_raw);
+}
+
+
+//-------------------------------------------------
+//  append - hash a block of data, appending to 
+//  the currently-accumulated value
+//-------------------------------------------------
+
+void crc32_creator::append(const void *data, UINT32 length)
+{
+	m_accum.m_raw = crc32(m_accum, reinterpret_cast<const Bytef *>(data), length);
 }
 
 
@@ -200,10 +218,12 @@ const char *crc32_t::as_string(astring &buffer)
 //  from_string - convert from a string
 //-------------------------------------------------
 
-bool crc16_t::from_string(const char *string)
+bool crc16_t::from_string(const char *string, int length)
 {
 	// must be at least long enough to hold everything
-	if (strlen(string) < 2 * sizeof(m_raw))
+	if (length == -1)
+		length = strlen(string);
+	if (length < 2 * sizeof(m_raw))
 		return false;
 	
 	// iterate through our raw buffer
@@ -223,7 +243,7 @@ bool crc16_t::from_string(const char *string)
 //  as_string - convert to a string
 //-------------------------------------------------
 
-const char *crc16_t::as_string(astring &buffer)
+const char *crc16_t::as_string(astring &buffer) const
 {
 	return buffer.format("%04x", m_raw);
 }

@@ -44,6 +44,8 @@
 #ifndef __HASH_H__
 #define __HASH_H__
 
+#include "hashing.h"
+
 
 //**************************************************************************
 //  MACROS
@@ -60,59 +62,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-
-// ======================> hash_base
-
-// base class for all hash types, which does most of the heavy lifting
-class hash_base
-{
-	friend class simple_list<hash_base>;
-
-public:
-    // construction/destruction
-    hash_base(char id, const char *name, UINT8 length, UINT8 *bufptr);
-    virtual ~hash_base() { }
-
-    // operators
-    bool operator==(const hash_base &rhs) const { return (m_length == rhs.m_length && memcmp(m_bufptr, rhs.m_bufptr, m_length) == 0); }
-    bool operator!=(const hash_base &rhs) const { return (m_length != rhs.m_length || memcmp(m_bufptr, rhs.m_bufptr, m_length) != 0); }
-
-    // getters
-    hash_base *next() const { return m_next; }
-    char id() const { return m_id; }
-    const char *name() const { return m_name; }
-    int length() const { return m_length; }
-    bool in_progress() const { return m_in_progress; }
-    bool parse_error() const { return m_parse_error; }
-    UINT8 byte(int index) const { return (index >= 0 && index < m_length) ? m_bufptr[index] : 0; }
-
-    // buffer conversion
-    const UINT8 *buffer() { return m_bufptr; }
-    bool from_buffer(const UINT8 *buffer, int buflen);
-
-    // string conversion
-    const char *string(astring &buffer);
-    bool from_string(const char *&string,  int length);
-
-    // creation
-    virtual void begin() = 0;
-    virtual void buffer(const UINT8 *data, UINT32 length) = 0;
-    virtual void end() = 0;
-
-protected:
-	// internal helpers
-    int fromhex(char c);
-
-    // internal state
-    hash_base *		m_next;
-    const char *	m_name;
-    bool			m_in_progress;
-    bool			m_parse_error;
-    char			m_id;
-    UINT8			m_length;
-    UINT8 *     	m_bufptr;
-};
 
 
 // ======================> hash_collection
@@ -147,24 +96,25 @@ public:
 
 	// getters
     bool flag(char flag) const { return (m_flags.chr(0, flag) != -1); }
-    hash_base *hash(char type) const;
-    hash_base *first() const { return m_hashlist.first(); }
     const char *hash_types(astring &buffer) const;
-    bool parse_errors() const;
 
 	// hash manipulators
 	void reset();
-	hash_base *add_from_buffer(char type, const UINT8 *buffer, int bufflen);
-	hash_base *add_from_string(char type, const char *buffer, int length);
+	bool add_from_string(char type, const char *buffer, int length = -1);
 	bool remove(char type);
 
 	// CRC-specific helpers
-	bool crc(UINT32 &result) const;
-	hash_base *add_crc(UINT32 crc);
+	bool crc(UINT32 &result) const { result = m_crc32; return m_has_crc32; }
+	void add_crc(UINT32 crc) { m_crc32 = crc; m_has_crc32 = true; }
+
+	// SHA1-specific helpers
+	bool sha1(sha1_t &result) const { result = m_sha1; return m_has_sha1; }
+	void add_sha1(sha1_t sha1) { m_has_sha1 = true; m_sha1 = sha1; }
 
 	// string conversion
     const char *internal_string(astring &buffer) const;
     const char *macro_string(astring &buffer) const;
+    const char *attribute_string(astring &buffer) const;
     bool from_internal_string(const char *string);
 
 	// creation
@@ -175,12 +125,24 @@ public:
 
 private:
 	// internal helpers
-    static hash_base *alloc_by_id(char id);
     void copyfrom(const hash_collection &src);
 
 	// internal state
 	astring					m_flags;
-    simple_list<hash_base>	m_hashlist;
+	bool					m_has_crc32;
+	crc32_t					m_crc32;
+	bool					m_has_sha1;
+	sha1_t					m_sha1;
+
+	// creators
+	struct hash_creator
+	{
+		bool					m_doing_crc32;
+		crc32_creator			m_crc32_creator;
+		bool					m_doing_sha1;
+		sha1_creator			m_sha1_creator;
+	};
+	hash_creator *			m_creator;
 };
 
 

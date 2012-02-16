@@ -455,7 +455,7 @@ static void dump_wrong_and_correct_checksums(rom_load_data *romdata, const hash_
 	astring tempstr;
 	romdata->errorstring.catprintf("    EXPECTED: %s\n", hashes.macro_string(tempstr));
 	romdata->errorstring.catprintf("       FOUND: %s\n", acthashes.macro_string(tempstr));
-
+/*
 	// warn about any ill-formed hashes
 	for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
 		if (hash->parse_error())
@@ -463,6 +463,7 @@ static void dump_wrong_and_correct_checksums(rom_load_data *romdata, const hash_
 			romdata->errorstring.catprintf("\tInvalid %s checksum treated as 0 (check leading zeros)\n", hash->name());
 			romdata->warnings++;
 		}
+*/
 }
 
 
@@ -1228,7 +1229,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 			/* get the header and extract the SHA1 */
 			hash_collection acthashes;
-			acthashes.add_from_buffer(hash_collection::HASH_SHA1, chd->orig_chd().sha1().m_raw, sizeof(chd->orig_chd().sha1().m_raw));
+			acthashes.add_sha1(chd->orig_chd().sha1());
 
 			/* verify the hash */
 			if (hashes != acthashes)

@@ -250,10 +250,14 @@ emu_file::operator core_file &()
 
 hash_collection &emu_file::hashes(const char *types)
 {
+	// determine the hashes we already have
+	astring already_have;
+	m_hashes.hash_types(already_have);
+
 	// determine which hashes we need
 	astring needed;
 	for (const char *scan = types; *scan != 0; scan++)
-		if (m_hashes.hash(*scan) == NULL)
+		if (already_have.chr(0, *scan) == -1)
 			needed.cat(*scan);
 
 	// if we need nothing, skip it

@@ -446,7 +446,7 @@ audit_record *media_auditor::audit_one_disk(const rom_entry *rom)
 
 		// if there's a SHA1 hash, add them to the output hash
 		if (source.sha1() != sha1_t::null)
-			hashes.add_from_buffer(hash_collection::HASH_SHA1, source.sha1().m_raw, sizeof(source.sha1().m_raw));
+			hashes.add_sha1(source.sha1());
 
 		// update the actual values
 		record.set_actual(hashes);

@@ -1080,6 +1080,7 @@ void cli_frontend::listsoftware(const char *gamename)
 
 	drivlist.reset();
 	list_count = 0;
+	astring tempstr;
 	while (drivlist.next())
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
@@ -1158,19 +1159,9 @@ void cli_frontend::listsoftware(const char *gamename)
 
 											/* dump checksum information only if there is a known dump */
 											hash_collection hashes(ROM_GETHASHDATA(rom));
-											if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
-											{
-												astring tempstr;
-												for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
-													fprintf(out, " %s=\"%s\"", hash->name(), hash->string(tempstr));
-											}
-
-											if (!is_disk)
-												fprintf( out, " offset=\"0x%x\"", ROM_GETOFFSET(rom) );
-
-											if ( hashes.flag(hash_collection::FLAG_BAD_DUMP) )
-												fprintf( out, " status=\"baddump\"" );
-											if ( hashes.flag(hash_collection::FLAG_NO_DUMP) )
+											if ( !hashes.flag(hash_collection::FLAG_NO_DUMP) )
+												fprintf( out, " %s", hashes.attribute_string(tempstr) );
+											else
 												fprintf( out, " status=\"nodump\"" );
 
 											if (is_disk)
@@ -1517,7 +1508,7 @@ void media_identifier::identify_file(const char *name)
 		// otherwise, get the hash collection for this CHD
 		hash_collection hashes;
 		if (chd.sha1() != sha1_t::null)
-			hashes.add_from_buffer(hash_collection::HASH_SHA1, chd.sha1().m_raw, sizeof(chd.sha1().m_raw));
+			hashes.add_sha1(chd.sha1());
 
 		// determine whether this file exists
 		int found = find_by_hash(hashes, chd.logical_bytes());
