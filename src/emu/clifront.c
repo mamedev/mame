@@ -150,8 +150,76 @@ int cli_frontend::execute(int argc, char **argv)
 	m_result = MAMERR_NONE;
 	try
 	{
-		// parse the command line, adding any system-specific options
+		// first parse options to be able to get software from it
 		astring option_errors;
+		m_options.parse_command_line(argc, argv, option_errors);
+		if (strlen(m_options.software_name()) > 0)
+		{
+			const game_driver *system = m_options.system();
+			if (system == NULL && strlen(m_options.system_name()) > 0)
+				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
+
+			machine_config config(*system, m_options);
+			software_list_device_iterator iter(config.root_device());
+			if (iter.first() == NULL)
+				throw emu_fatalerror(MAMERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
+
+			bool found = FALSE;
+			for (software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
+			{
+				software_list *list = software_list_open(m_options, swlist->list_name(), FALSE, NULL);
+				if (list)
+				{
+					software_info *swinfo = software_list_find(list, m_options.software_name(), NULL);
+					if (swinfo != NULL)
+					{
+						// loop through all parts
+						for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
+						{
+							const char *mount = software_part_get_feature(swpart, "automount");
+							if (is_software_compatible(swpart, swlist))
+							{
+								if (mount == NULL || strcmp(mount,"no") != 0)
+								{
+									// search for an image device with the right interface
+									image_interface_iterator imgiter(config.root_device());
+									for (device_image_interface *image = imgiter.first(); image != NULL; image = imgiter.next())
+									{
+										const char *interface = image->image_interface();
+										if (interface != NULL)
+										{
+											if (!strcmp(interface, swpart->interface_))
+											{
+												const char *option = m_options.value(image->brief_instance_name());
+												// mount only if not already mounted
+												if (strlen(option) == 0)
+												{
+													astring val;
+													val.printf("%s:%s:%s",swlist->list_name(),m_options.software_name(),swpart->name);
+													// call this in order to set slot devices according to mounting
+													m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.cstr());
+													break;
+												}
+											}
+										}
+									}
+								}
+								found = TRUE;
+							}
+						}
+					}
+					software_list_close(list);
+				}
+
+				if (found) break;
+			}
+			if (!found)
+			{
+				software_display_matches(config,m_options, NULL,m_options.software_name());
+				throw emu_fatalerror(MAMERR_FATALERROR, "");
+			}
+		}
+		// parse the command line, adding any system-specific options
 		if (!m_options.parse_command_line(argc, argv, option_errors))
 		{
 			// if we failed, check for no command and a system name first; in that case error on the name
@@ -179,69 +247,6 @@ int cli_frontend::execute(int argc, char **argv)
 			const game_driver *system = m_options.system();
 			if (system == NULL && strlen(m_options.system_name()) > 0)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
-
-			if (strlen(m_options.software_name()) > 0)
-			{
-				machine_config config(*system, m_options);
-				software_list_device_iterator iter(config.root_device());
-				if (iter.first() == NULL)
-					throw emu_fatalerror(MAMERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
-
-				bool found = FALSE;
-				for (software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
-				{
-					software_list *list = software_list_open(m_options, swlist->list_name(), FALSE, NULL);
-					if (list)
-					{
-						software_info *swinfo = software_list_find(list, m_options.software_name(), NULL);
-						if (swinfo != NULL)
-						{
-							// loop through all parts
-							for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
-							{
-								const char *mount = software_part_get_feature(swpart, "automount");
-								if (is_software_compatible(swpart, swlist))
-								{
-									if (mount == NULL || strcmp(mount,"no") != 0)
-									{
-										// search for an image device with the right interface
-										image_interface_iterator imgiter(config.root_device());
-										for (device_image_interface *image = imgiter.first(); image != NULL; image = imgiter.next())
-										{
-											const char *interface = image->image_interface();
-											if (interface != NULL)
-											{
-												if (!strcmp(interface, swpart->interface_))
-												{
-													const char *option = m_options.value(image->brief_instance_name());
-													// mount only if not already mounted
-													if (strlen(option) == 0)
-													{
-														astring val;
-														val.printf("%s:%s:%s",swlist->list_name(),m_options.software_name(),swpart->name);
-														// call this in order to set slot devices according to mounting
-														m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.cstr());
-														break;
-													}
-												}
-											}
-										}
-									}
-									found = TRUE;
-								}
-							}
-						}
-						software_list_close(list);
-					}
-
-					if (found) break;
-				}
-				if (!found)
-				{
-					software_display_matches(config,m_options, NULL,m_options.software_name());
-					throw emu_fatalerror(MAMERR_FATALERROR, "");
-				}
-			}
 			// otherwise just run the game
 			m_result = mame_execute(m_options, m_osd);
 		}
