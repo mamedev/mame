@@ -451,7 +451,7 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	if(offset >= 0x140 && offset <= 0x144) {
-		UINT8 key[5];
+		dynamic_buffer key;
 		int pos = (offset - 0x140)*2;
 		UINT8 v, k;
 		if(ACCESSING_BITS_16_23) {
@@ -459,8 +459,8 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 			pos++;
 		} else
 			v = data;
-		chd_get_metadata(get_disk_handle(space->machine(), ":card"), HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);
-		k = pos < 5 ? key[pos] : 0;
+		get_disk_handle(space->machine(), ":card")->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key);
+		k = pos < key.count() ? key[pos] : 0;
 		if(v == k)
 			state->m_locked &= ~(1 << pos);
 		else
@@ -889,9 +889,10 @@ static DRIVER_INIT( coh3002t )
 	psx_sio_install_handler(machine, 0, sio_pad_handler);
 	state->m_dip_timer = machine.scheduler().timer_alloc( FUNC(dip_timer_fired), NULL );
 
+	UINT32 metalength;
 	memset(state->m_cis, 0xff, 512);
 	if (get_disk_handle(machine, ":card") != NULL)
-		chd_get_metadata(get_disk_handle(machine, ":card"), PCMCIA_CIS_METADATA_TAG, 0, state->m_cis, 512, 0, 0, 0);
+		get_disk_handle(machine, ":card")->read_metadata(PCMCIA_CIS_METADATA_TAG, 0, state->m_cis, 512, metalength);
 }
 
 static DRIVER_INIT( coh3002t_mp )

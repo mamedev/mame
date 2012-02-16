@@ -32,16 +32,19 @@ OBJDIRS += \
 
 UTILOBJS = \
 	$(LIBOBJ)/util/astring.o \
-	$(LIBOBJ)/util/avcomp.o \
+	$(LIBOBJ)/util/avhuff.o \
 	$(LIBOBJ)/util/aviio.o \
 	$(LIBOBJ)/util/bitmap.o \
 	$(LIBOBJ)/util/cdrom.o \
 	$(LIBOBJ)/util/chd.o \
 	$(LIBOBJ)/util/chdcd.o \
+	$(LIBOBJ)/util/chdcodec.o \
 	$(LIBOBJ)/util/corefile.o \
 	$(LIBOBJ)/util/corestr.o \
 	$(LIBOBJ)/util/coreutil.o \
+	$(LIBOBJ)/util/flac.o \
 	$(LIBOBJ)/util/harddisk.o \
+	$(LIBOBJ)/util/hashing.o \
 	$(LIBOBJ)/util/huffman.o \
 	$(LIBOBJ)/util/jedparse.o \
 	$(LIBOBJ)/util/md5.o \
@@ -73,7 +76,7 @@ EXPATOBJS = \
 
 $(OBJ)/libexpat.a: $(EXPATOBJS)
 
-$(LIBOBJ)/expat/%.o: $(LIBSRC)/explat/%.c | $(OSPREBUILD)
+$(LIBOBJ)/expat/%.o: $(LIBSRC)/expat/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
 
@@ -273,6 +276,7 @@ $(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c | $(OSPREBUILD)
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/libjpeg -c $< -o $@
 
 
+
 #-------------------------------------------------
 # libflac library objects
 #-------------------------------------------------
@@ -303,23 +307,12 @@ $(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libflac/%.c | $(OSPREBUILD)
 	$(CC) $(CDEFS) $(FLACOPTS) $(CONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
 
 
-# LIBFLACPPOBJS = \
-#	$(LIBOBJ)/libflacpp/metadata.o \
-#	$(LIBOBJ)/libflacpp/stream_decoder.o \
-#	$(LIBOBJ)/libflacpp/stream_encoder.o
-
-# $(OBJ)/libflac++.a: $(LIBFLACPPOBJS)
-
-# $(LIBOBJ)/libflacpp/%.o: $(LIBSRC)/libflac/libflac++/%.cpp | $(OSPREBUILD)
-# 	@echo Compiling $<...
-#	$(CC) $(CDEFS) $(FLACOPTS) $(CPPONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@
-
 
 #-------------------------------------------------
 # lib7z library objects
 #-------------------------------------------------
 
-7ZOPTS=-D_7ZIP_PPMD_SUPPPORT
+7ZOPTS=-D_7ZIP_PPMD_SUPPPORT -D_7ZIP_ST
 
 LIB7ZOBJS = \
 	$(LIBOBJ)/lib7z/7zBuf.o \
@@ -331,6 +324,9 @@ LIB7ZOBJS = \
 	$(LIBOBJ)/lib7z/CpuArch.o \
 	$(LIBOBJ)/lib7z/LzmaDec.o \
 	$(LIBOBJ)/lib7z/Lzma2Dec.o \
+	$(LIBOBJ)/lib7z/LzmaEnc.o \
+	$(LIBOBJ)/lib7z/Lzma2Enc.o \
+	$(LIBOBJ)/lib7z/LzFind.o \
 	$(LIBOBJ)/lib7z/Bra.o \
 	$(LIBOBJ)/lib7z/Bra86.o \
 	$(LIBOBJ)/lib7z/Bcj2.o \
@@ -343,6 +339,3 @@ $(OBJ)/lib7z.a: $(LIB7ZOBJS)
 $(LIBOBJ)/lib7z/%.o: $(LIBSRC)/lib7z/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(7ZOPTS) $(CONLYFLAGS) -I$(LIBSRC)/lib7z/ -c $< -o $@
-
-
-

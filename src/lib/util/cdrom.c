@@ -40,7 +40,7 @@
     IMPORTANT:
     "physical" block addresses are the actual addresses on the emulated CD.
     "chd" block addresses are the block addresses in the CHD file.
-    Because we pad each track to a hunk boundry, these addressing
+    Because we pad each track to a 4-frame boundry, these addressing
     schemes will differ after track 1!
 
 ***************************************************************************/
@@ -75,19 +75,8 @@ struct _cdrom_file
 	chd_file *			chd;				/* CHD file */
 	cdrom_toc			cdtoc;				/* TOC for the CD */
 	chdcd_track_input_info track_info;		/* track info */
-	UINT32				hunksectors;		/* sectors per hunk */
-	UINT32				cachehunk;			/* which hunk is cached */
-	UINT8 *				cache;				/* cache of the current hunk */
 	core_file *			fhandle[CD_MAX_TRACKS];/* file handle */
 };
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static chd_error read_sector_into_cache(cdrom_file *file, UINT32 lbasector, UINT32 *sectoroffs, UINT32 *tracknum);
 
 
 
@@ -100,7 +89,7 @@ static chd_error read_sector_into_cache(cdrom_file *file, UINT32 lbasector, UINT
     and the track number
 -------------------------------------------------*/
 
-INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 *tracknum)
+INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
 {
 	UINT32 chdlba;
 	int track;
@@ -110,8 +99,7 @@ INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 *trac
 		if (physlba < file->cdtoc.tracks[track + 1].physframeofs)
 		{
 			chdlba = physlba - file->cdtoc.tracks[track].physframeofs + file->cdtoc.tracks[track].chdframeofs;
-			if (tracknum != NULL)
-				*tracknum = track;
+			tracknum = track;
 			return chdlba;
 		}
 
@@ -136,31 +124,29 @@ cdrom_file *cdrom_open(const char *inputfile)
 		return NULL;
 
 	/* setup the CDROM module and get the disc info */
-	chd_error err = chdcd_parse_toc(inputfile, &file->cdtoc, &file->track_info);
+	chd_error err = chdcd_parse_toc(inputfile, file->cdtoc, file->track_info);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error reading input file: %s\n", chd_error_string(err));
+		fprintf(stderr, "Error reading input file: %s\n", chd_file::error_string(err));
 		return NULL;
 	}
 
 	/* fill in the data */
 	file->chd = NULL;
-	file->hunksectors = 1;
-	file->cachehunk = -1;
 
 	LOG(("CD has %d tracks\n", file->cdtoc.numtrks));
 
 	for (i = 0; i < file->cdtoc.numtrks; i++)
 	{
-		file_error filerr = core_fopen(file->track_info.fname[i], OPEN_FLAG_READ, &file->fhandle[i]);
+		file_error filerr = core_fopen(file->track_info.track[i].fname, OPEN_FLAG_READ, &file->fhandle[i]);
 		if (filerr != FILERR_NONE)
 		{
-			fprintf(stderr, "Unable to open file: %s\n", file->track_info.fname[i]);
+			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname.cstr());
 			return NULL;
 		}
 	}
 	/* calculate the starting frame for each track, keeping in mind that CHDMAN
-       pads tracks out with extra frames to fit hunk size boundries
+       pads tracks out with extra frames to fit 4-frame size boundries
     */
 	physofs = 0;
 	for (i = 0; i < file->cdtoc.numtrks; i++)
@@ -185,14 +171,6 @@ cdrom_file *cdrom_open(const char *inputfile)
 	file->cdtoc.tracks[i].physframeofs = physofs;
 	file->cdtoc.tracks[i].chdframeofs = 0;
 
-	/* allocate a cache */
-	file->cache = (UINT8 *)malloc(CD_FRAME_SIZE);
-	if (file->cache == NULL)
-	{
-		free(file);
-		return NULL;
-	}
-
 	return file;
 }
 
@@ -203,7 +181,6 @@ cdrom_file *cdrom_open(const char *inputfile)
 
 cdrom_file *cdrom_open(chd_file *chd)
 {
-	const chd_header *header = chd_get_header(chd);
 	int i;
 	cdrom_file *file;
 	UINT32 physofs, chdofs;
@@ -214,7 +191,9 @@ cdrom_file *cdrom_open(chd_file *chd)
 		return NULL;
 
 	/* validate the CHD information */
-	if (header->hunkbytes % CD_FRAME_SIZE != 0)
+	if (chd->hunk_bytes() % CD_FRAME_SIZE != 0)
+		return NULL;
+	if (chd->unit_bytes() != CD_FRAME_SIZE)
 		return NULL;
 
 	/* allocate memory for the CD-ROM file */
@@ -224,8 +203,6 @@ cdrom_file *cdrom_open(chd_file *chd)
 
 	/* fill in the data */
 	file->chd = chd;
-	file->hunksectors = header->hunkbytes / CD_FRAME_SIZE;
-	file->cachehunk = -1;
 
 	/* read the CD-ROM metadata */
 	err = cdrom_parse_metadata(chd, &file->cdtoc);
@@ -238,7 +215,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 	LOG(("CD has %d tracks\n", file->cdtoc.numtrks));
 
 	/* calculate the starting frame for each track, keeping in mind that CHDMAN
-       pads tracks out with extra frames to fit hunk size boundries
+       pads tracks out with extra frames to fit 4-frame size boundries
     */
 	physofs = chdofs = 0;
 	for (i = 0; i < file->cdtoc.numtrks; i++)
@@ -265,14 +242,6 @@ cdrom_file *cdrom_open(chd_file *chd)
 	file->cdtoc.tracks[i].physframeofs = physofs;
 	file->cdtoc.tracks[i].chdframeofs = chdofs;
 
-	/* allocate a cache */
-	file->cache = (UINT8 *)malloc(chd_get_header(chd)->hunkbytes);
-	if (file->cache == NULL)
-	{
-		free(file);
-		return NULL;
-	}
-
 	return file;
 }
 
@@ -285,10 +254,6 @@ void cdrom_close(cdrom_file *file)
 {
 	if (file == NULL)
 		return;
-
-	/* free the cache */
-	if (file->cache)
-		free(file->cache);
 
 	if (file->chd == NULL)
 	{
@@ -307,6 +272,37 @@ void cdrom_close(cdrom_file *file)
     CORE READ ACCESS
 ***************************************************************************/
 
+chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 chdsector, UINT32 tracknum, UINT32 startoffs, UINT32 length)
+{
+	// if a CHD, just read
+	if (file->chd != NULL)
+		return file->chd->read_bytes(UINT64(chdsector) * UINT64(CD_FRAME_SIZE) + startoffs, dest, length);
+
+	// else read from the appropriate file
+	core_file *srcfile = file->fhandle[tracknum];
+
+	UINT64 sourcefileoffset = file->track_info.track[tracknum].offset;
+	int bytespersector = file->cdtoc.tracks[tracknum].datasize + file->cdtoc.tracks[tracknum].subsize;
+
+	sourcefileoffset += chdsector * bytespersector + startoffs;
+
+	core_fseek(srcfile, sourcefileoffset, SEEK_SET);
+	core_fread(srcfile, dest, length);
+
+	if (file->track_info.track[tracknum].swap)
+	{
+		UINT8 *buffer = (UINT8 *)dest - startoffs;
+		for (int swapindex = startoffs; swapindex < 2352; swapindex += 2 )
+		{
+			int swaptemp = buffer[ swapindex ];
+			buffer[ swapindex ] = buffer[ swapindex + 1 ];
+			buffer[ swapindex + 1 ] = swaptemp;
+		}
+	}
+	return CHDERR_NONE;
+}
+
+
 /*-------------------------------------------------
     cdrom_read_data - read one or more sectors
     from a CD-ROM
@@ -314,31 +310,25 @@ void cdrom_close(cdrom_file *file)
 
 UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype)
 {
-	UINT32 tracktype, tracknum, sectoroffs;
-	chd_error err;
-	static const UINT8 syncbytes[12] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
-
 	if (file == NULL)
 		return 0;
 
-	/* cache in the sector */
-	err = read_sector_into_cache(file, lbasector, &sectoroffs, &tracknum);
-	if (err != CHDERR_NONE)
-		return 0;
+	// compute CHD sector and tracknumber
+	UINT32 tracknum = 0;
+	UINT32 chdsector = physical_to_chd_lba(file, lbasector, tracknum);
 
 	/* copy out the requested sector */
-	tracktype = file->cdtoc.tracks[tracknum].trktype;
+	UINT32 tracktype = file->cdtoc.tracks[tracknum].trktype;
 	if ((datatype == tracktype) || (datatype == CD_TRACK_RAW_DONTCARE))
 	{
-		memcpy(buffer, &file->cache[sectoroffs * CD_FRAME_SIZE], file->cdtoc.tracks[tracknum].datasize);
+		return (read_partial_sector(file, buffer, chdsector, tracknum, 0, file->cdtoc.tracks[tracknum].datasize) == CHDERR_NONE);
 	}
 	else
 	{
 		/* return 2048 bytes of mode 1 data from a 2352 byte mode 1 raw sector */
 		if ((datatype == CD_TRACK_MODE1) && (tracktype == CD_TRACK_MODE1_RAW))
 		{
-			memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + 16], 2048);
-			return 1;
+			return (read_partial_sector(file, buffer, chdsector, tracknum, 16, 2048) == CHDERR_NONE);
 		}
 
 		/* return 2352 byte mode 1 raw sector from 2048 bytes of mode 1 data */
@@ -347,34 +337,31 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 			UINT8 *bufptr = (UINT8 *)buffer;
 			UINT32 msf = lba_to_msf(lbasector);
 
+			static const UINT8 syncbytes[12] = {0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00};
 			memcpy(bufptr, syncbytes, 12);
 			bufptr[12] = msf>>16;
 			bufptr[13] = msf>>8;
 			bufptr[14] = msf&0xff;
 			bufptr[15] = 1;	// mode 1
-			memcpy(bufptr+16, &file->cache[(sectoroffs * CD_FRAME_SIZE)], 2048);
 			LOG(("CDROM: promotion of mode1/form1 sector to mode1 raw is not complete!\n"));
-			return 1;
+			return (read_partial_sector(file, bufptr+16, chdsector, tracknum, 0, 2048) == CHDERR_NONE);
 		}
 
 		/* return 2048 bytes of mode 1 data from a mode2 form1 or raw sector */
 		if ((datatype == CD_TRACK_MODE1) && ((tracktype == CD_TRACK_MODE2_FORM1)||(tracktype == CD_TRACK_MODE2_RAW)))
 		{
-			memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + 24], 2048);
-			return 1;
+			return (read_partial_sector(file, buffer, chdsector, tracknum, 24, 2048) == CHDERR_NONE);
 		}
 
 		/* return mode 2 2336 byte data from a 2352 byte mode 1 or 2 raw sector (skip the header) */
 		if ((datatype == CD_TRACK_MODE2) && ((tracktype == CD_TRACK_MODE1_RAW) || (tracktype == CD_TRACK_MODE2_RAW)))
 		{
-			memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + 16], 2336);
-			return 1;
+			return (read_partial_sector(file, buffer, chdsector, tracknum, 16, 2336) == CHDERR_NONE);
 		}
 
 		LOG(("CDROM: Conversion from type %d to type %d not supported!\n", tracktype, datatype));
 		return 0;
 	}
-	return 1;
 }
 
 
@@ -385,20 +372,18 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 
 UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer)
 {
-	UINT32 sectoroffs, tracknum;
-	chd_error err;
-
 	if (file == NULL)
 		return ~0;
 
-	/* cache in the sector */
-	err = read_sector_into_cache(file, lbasector, &sectoroffs, &tracknum);
-	if (err != CHDERR_NONE)
-		return 0;
-
-	/* copy out the requested data */
-	memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + file->cdtoc.tracks[tracknum].datasize], file->cdtoc.tracks[tracknum].subsize);
-	return 1;
+	// compute CHD sector and tracknumber
+	UINT32 tracknum = 0;
+	UINT32 chdsector = physical_to_chd_lba(file, lbasector, tracknum);
+	if (file->cdtoc.tracks[tracknum].subsize == 0)
+		return 1;
+	
+	// read the data
+	chd_error err = read_partial_sector(file, buffer, chdsector, tracknum, file->cdtoc.tracks[tracknum].datasize, file->cdtoc.tracks[tracknum].subsize);
+	return (err == CHDERR_NONE);
 }
 
 
@@ -420,7 +405,7 @@ UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
 		return ~0;
 
 	/* convert to a CHD sector offset and get track information */
-	physical_to_chd_lba(file, frame, &track);
+	physical_to_chd_lba(file, frame, track);
 	return track;
 }
 
@@ -704,81 +689,27 @@ const char *cdrom_get_subtype_string(UINT32 subtype)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    read_sector_into_cache - cache a sector at
-    the given physical LBA
--------------------------------------------------*/
-
-static chd_error read_sector_into_cache(cdrom_file *file, UINT32 lbasector, UINT32 *sectoroffs, UINT32 *tracknum)
-{
-	UINT32 chdsector, hunknum;
-	chd_error err;
-
-	/* convert to a CHD sector offset and get track information */
-	*tracknum = 0;
-	chdsector = physical_to_chd_lba(file, lbasector, tracknum);
-	hunknum = chdsector / file->hunksectors;
-	*sectoroffs = chdsector % file->hunksectors;
-
-	/* if we haven't cached this hunk, read it now */
-	if (file->cachehunk != hunknum)
-	{
-		if (file->chd) {
-			err = chd_read(file->chd, hunknum, file->cache);
-			if (err != CHDERR_NONE)
-				return err;
-		} else {
-			core_file *srcfile = file->fhandle[*tracknum];
-
-			UINT64 sourcefileoffset = file->track_info.offset[*tracknum];
-			int bytespersector = file->cdtoc.tracks[*tracknum].datasize + file->cdtoc.tracks[*tracknum].subsize;
-
-			sourcefileoffset += chdsector * bytespersector;
-
-			core_fseek(srcfile, sourcefileoffset, SEEK_SET);
-			core_fread(srcfile, file->cache, bytespersector);
-
-			if (file->track_info.swap[*tracknum])
-			{
-				for (int swapindex = 0; swapindex < 2352; swapindex += 2 )
-				{
-					int swaptemp = file->cache[ swapindex ];
-					file->cache[ swapindex ] = file->cache[ swapindex + 1 ];
-					file->cache[ swapindex + 1 ] = swaptemp;
-				}
-			}
-		}
-
-		file->cachehunk = hunknum;
-	}
-	return CHDERR_NONE;
-}
-
-
-/*-------------------------------------------------
     cdrom_parse_metadata - parse metadata into the
     TOC structure
 -------------------------------------------------*/
 
 chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 {
-	static UINT32 oldmetadata[CD_METADATA_WORDS], *mrp;
-	const chd_header *header = chd_get_header(chd);
-	UINT32 hunksectors = header->hunkbytes / CD_FRAME_SIZE;
-	char metadata[512];
+	astring metadata;
 	chd_error err;
 	int i;
 
 	/* start with no tracks */
 	for (toc->numtrks = 0; toc->numtrks < CD_MAX_TRACKS; toc->numtrks++)
 	{
-		int tracknum = -1, frames = 0, hunks, pregap, postgap;
+		int tracknum = -1, frames = 0, pregap, postgap;
 		char type[16], subtype[16], pgtype[16], pgsub[16];
 		cdrom_track_info *track;
 
 		pregap = postgap = 0;
 
 		/* fetch the metadata for this track */
-		err = chd_get_metadata(chd, CDROM_TRACK_METADATA_TAG, toc->numtrks, metadata, sizeof(metadata), NULL, NULL, NULL);
+		err = chd->read_metadata(CDROM_TRACK_METADATA_TAG, toc->numtrks, metadata);
 		if (err == CHDERR_NONE)
 		{
 			/* parse the metadata */
@@ -791,7 +722,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 		}
 		else
 		{
-			err = chd_get_metadata(chd, CDROM_TRACK_METADATA2_TAG, toc->numtrks, metadata, sizeof(metadata), NULL, NULL, NULL);
+			err = chd->read_metadata(CDROM_TRACK_METADATA2_TAG, toc->numtrks, metadata);
 			if (err != CHDERR_NONE)
 				break;
 			/* parse the metadata */
@@ -818,8 +749,8 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 
 		/* set the frames and extra frames data */
 		track->frames = frames;
-		hunks = (frames + hunksectors - 1) / hunksectors;
-		track->extraframes = hunks * hunksectors - frames;
+		int padded = (frames + CD_TRACK_PADDING - 1) / CD_TRACK_PADDING;
+		track->extraframes = padded * CD_TRACK_PADDING - frames;
 
 		/* set the pregap info */
 		track->pregap = pregap;
@@ -839,12 +770,13 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 		return CHDERR_NONE;
 
 	/* look for old-style metadata */
-	err = chd_get_metadata(chd, CDROM_OLD_METADATA_TAG, 0, oldmetadata, sizeof(oldmetadata), NULL, NULL, NULL);
+	dynamic_buffer oldmetadata;
+	err = chd->read_metadata(CDROM_OLD_METADATA_TAG, 0, oldmetadata);
 	if (err != CHDERR_NONE)
 		return err;
 
 	/* reconstruct the TOC from it */
-	mrp = &oldmetadata[0];
+	UINT32 *mrp = reinterpret_cast<UINT32 *>(&oldmetadata[0]);
 	toc->numtrks = *mrp++;
 
 	for (i = 0; i < CD_MAX_TRACKS; i++)
@@ -855,6 +787,12 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 		toc->tracks[i].subsize = *mrp++;
 		toc->tracks[i].frames = *mrp++;
 		toc->tracks[i].extraframes = *mrp++;
+		toc->tracks[i].pregap = 0;
+		toc->tracks[i].postgap = 0;
+		toc->tracks[i].pgtype = 0;
+		toc->tracks[i].pgsub = 0;
+		toc->tracks[i].pgdatasize = 0;
+		toc->tracks[i].pgsubsize = 0;
 	}
 
 	/* TODO: I don't know why sometimes the data is one endian and sometimes another */
@@ -888,13 +826,13 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 	/* write the metadata */
 	for (i = 0; i < toc->numtrks; i++)
 	{
-		char metadata[512];
-		sprintf(metadata, CDROM_TRACK_METADATA2_FORMAT, i + 1, cdrom_get_type_string(toc->tracks[i].trktype),
+		astring metadata;
+		metadata.format(CDROM_TRACK_METADATA2_FORMAT, i + 1, cdrom_get_type_string(toc->tracks[i].trktype),
 				cdrom_get_subtype_string(toc->tracks[i].subtype), toc->tracks[i].frames, toc->tracks[i].pregap,
 				cdrom_get_type_string(toc->tracks[i].pgtype), cdrom_get_subtype_string(toc->tracks[i].pgsub),
 				toc->tracks[i].postgap);
 
-		err = chd_set_metadata(chd, CDROM_TRACK_METADATA2_TAG, i, metadata, strlen(metadata) + 1, CHD_MDFLAGS_CHECKSUM);
+		err = chd->write_metadata(CDROM_TRACK_METADATA2_TAG, i, metadata);
 		if (err != CHDERR_NONE)
 			return err;
 	}

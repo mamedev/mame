@@ -436,27 +436,20 @@ audit_record *media_auditor::audit_one_disk(const rom_entry *rom)
 	audit_record &record = m_record_list.append(*global_alloc(audit_record(*rom, audit_record::MEDIA_DISK)));
 
 	// open the disk
-	emu_file *source_file;
-	chd_file *source;
-	chd_error err = open_disk_image(m_enumerator.options(), &m_enumerator.driver(), rom, &source_file, &source, NULL);
+	chd_file source;
+	chd_error err = chd_error(open_disk_image(m_enumerator.options(), &m_enumerator.driver(), rom, source, NULL));
 
 	// if we succeeded, get the hashes
 	if (err == CHDERR_NONE)
 	{
-		static const UINT8 nullhash[20] = { 0 };
-		chd_header header = *chd_get_header(source);
 		hash_collection hashes;
 
 		// if there's a SHA1 hash, add them to the output hash
-		if (memcmp(nullhash, header.sha1, sizeof(header.sha1)) != 0)
-			hashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
+		if (source.sha1() != sha1_t::null)
+			hashes.add_from_buffer(hash_collection::HASH_SHA1, source.sha1().m_raw, sizeof(source.sha1().m_raw));
 
 		// update the actual values
 		record.set_actual(hashes);
-
-		// close the file and release the source
-		chd_close(source);
-		global_free(source_file);
 	}
 
 	// compute the final status

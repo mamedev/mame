@@ -14,17 +14,26 @@
 
 #include "cdrom.h"
 
-typedef struct _chdcd_track_input_info chdcd_track_input_info;
-struct _chdcd_track_input_info	/* used only at compression time */
+struct chdcd_track_input_entry
 {
-	char fname[CD_MAX_TRACKS][256];	/* filename for each track */
-	UINT32 offset[CD_MAX_TRACKS];	/* offset in the data file for each track */
-	int swap[CD_MAX_TRACKS];	/* data needs to be byte swapped */
-	UINT32 idx0offs[CD_MAX_TRACKS];
-	UINT32 idx1offs[CD_MAX_TRACKS];
+	chdcd_track_input_entry() { reset(); }
+	void reset() { fname.reset(); offset = idx0offs = idx1offs = 0; swap = false; }
+
+	astring fname;		// filename for each track
+	UINT32 offset;		// offset in the data file for each track
+	bool swap;			// data needs to be byte swapped
+	UINT32 idx0offs;
+	UINT32 idx1offs;
+};
+
+struct chdcd_track_input_info
+{
+	void reset() { for (int i = 0; i < CD_MAX_TRACKS; i++) track[i].reset(); }
+
+	chdcd_track_input_entry track[CD_MAX_TRACKS];
 };
 
 
-chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo);
+chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo);
 
 #endif	/* __CHDCD_H__ */

@@ -1573,7 +1573,7 @@ static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk 
 		{
 			const UINT8 *base = &chunkdata[24 + entry * 4 * longs_per_entry];
 			UINT32 offset = fetch_32bits(&base[0]);
-			UINT32 size = fetch_32bits(&base[4]);
+			UINT32 size = fetch_32bits(&base[4]) & 0x7fffffff;	// bit 31 == NOT a keyframe
 
 			/* set the info for this chunk and advance */
 			avierr = set_stream_chunk_info(stream, stream->chunks++, baseoffset + offset - 8, size + 8);

@@ -146,7 +146,7 @@ bool harddisk_image_device::call_load()
 {
 	int our_result;
 
-	our_result = internal_load_hd(NULL);
+	our_result = internal_load_hd();
 
 	/* Check if there is an image_load callback defined */
 	if ( m_device_image_load )
@@ -161,9 +161,9 @@ bool harddisk_image_device::call_load()
 bool harddisk_image_device::call_create(int create_format, option_resolution *create_args)
 {
 	int err;
-	char metadata[256];
 	UINT32 sectorsize, hunksize;
 	UINT32 cylinders, heads, sectors, totalsectors;
+	astring metadata;
 
 	cylinders	= option_resolution_lookup_int(create_args, 'C');
 	heads		= option_resolution_lookup_int(create_args, 'H');
@@ -174,12 +174,20 @@ bool harddisk_image_device::call_create(int create_format, option_resolution *cr
 	totalsectors = cylinders * heads * sectors;
 
 	/* create the CHD file */
-	err = chd_create_file(image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_NONE, NULL);
+	chd_codec_type compression[4] = { CHD_CODEC_NONE };
+	err = m_self_chd.create(*image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, sectorsize, compression);
 	if (err != CHDERR_NONE)
 		goto error;
 
-	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
-	return internal_load_hd(metadata);
+	/* if we created the image and hence, have metadata to set, set the metadata */
+	metadata.format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
+	err = m_self_chd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
+	m_self_chd.close();
+
+	if (err != CHDERR_NONE)
+		goto error;
+
+	return internal_load_hd();
 
 error:
 	return IMAGE_INIT_FAIL;
@@ -201,12 +209,13 @@ void harddisk_image_device::call_unload()
 
 	if (m_chd != NULL)
 	{
-		chd_close(m_chd);
+		if (m_self_chd.opened())
+			m_self_chd.close();
 		m_chd = NULL;
 	}
 }
 
-int harddisk_image_device::internal_load_hd(const char *metadata)
+int harddisk_image_device::internal_load_hd()
 {
 	chd_error		err = (chd_error)0;
 	int				is_writeable;
@@ -220,8 +229,9 @@ int harddisk_image_device::internal_load_hd(const char *metadata)
 		do
 		{
 			is_writeable = !is_readonly();
-			m_chd = NULL;
-			err = chd_open_file(image_core_file(), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &m_chd);
+			err = m_self_chd.open(*image_core_file(), is_writeable);
+			if (err == CHDERR_NONE)
+				m_chd = &m_self_chd;
 
 			/* special case; if we get CHDERR_FILE_NOT_WRITEABLE, make the
              * image read only and repeat */
@@ -232,14 +242,6 @@ int harddisk_image_device::internal_load_hd(const char *metadata)
 	}
 	if (!m_chd)
 		goto done;
-
-	/* if we created the image and hence, have metadata to set, set the metadata */
-	if (metadata)
-	{
-		err = chd_set_metadata(m_chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
-		if (err != CHDERR_NONE)
-			goto done;
-	}
 
 	/* open the hard disk file */
 	m_hard_disk_handle = hard_disk_open(m_chd);
@@ -252,7 +254,8 @@ done:
 		/* if we had an error, close out the CHD */
 		if (m_chd != NULL)
 		{
-			chd_close(m_chd);
+			if (m_self_chd.opened())
+				m_self_chd.close();
 			m_chd = NULL;
 		}
 

@@ -45,6 +45,7 @@
 #include <stdarg.h>
 #include "osdcore.h"
 #include "astring.h"
+#include "coretmpl.h"
 
 
 
@@ -129,6 +130,7 @@ const void *core_fbuffer(core_file *file);
 
 /* open a file with the specified filename, read it into memory, and return a pointer */
 file_error core_fload(const char *filename, void **data, UINT32 *length);
+file_error core_fload(const char *filename, dynamic_buffer &data);
 
 
 

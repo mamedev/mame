@@ -1476,7 +1476,7 @@ static void ide_controller_write(device_t *device, int bank, offs_t offset, int 
 					}
 					else if (ide->command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
 					{
-						UINT8 key[5] = { 0, 0, 0, 0, 0 };
+						UINT8 key[5] = { 0 };
 						int i, bad = 0;
 						ide->drive[ide->cur_drive].slot->read_key(key);
 
@@ -2073,7 +2073,8 @@ void ide_hdd_device::device_reset()
 			mame_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
 		}
 		// build the features page 
-		if (chd_get_metadata (m_handle, HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, 0, 0, 0) != CHDERR_NONE)
+		UINT32 metalength;
+		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
 			ide_build_features();
 	}	
 }
@@ -2084,7 +2085,8 @@ void ide_hdd_device::device_reset()
 
 void ide_hdd_device::read_key(UINT8 key[])
 {
-	chd_get_metadata(m_handle, HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);
+	UINT32 metalength;
+	m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key, 5, metalength);
 }
 
 //**************************************************************************
@@ -2136,7 +2138,8 @@ void ide_hdd_image_device::device_reset()
 				if (PRINTF_IDE_COMMANDS) printf("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
 			}
 			// build the features page 
-			if (chd_get_metadata (m_handle, HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, 0, 0, 0) != CHDERR_NONE)
+			UINT32 metalength;
+			if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
 				ide_build_features();
 		}
 	}

@@ -50,10 +50,9 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _hard_disk_file hard_disk_file;
+struct hard_disk_file;
 
-typedef struct _hard_disk_info hard_disk_info;
-struct _hard_disk_info
+struct hard_disk_info
 {
 	UINT32			cylinders;
 	UINT32			heads;

@@ -321,9 +321,14 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	if (numprocs == 1)
 		queue->threads = (flags & WORK_QUEUE_FLAG_IO) ? 1 : 0;
 
-	// on an n-CPU system, create (n-1) threads for multi queues, and 1 thread for everything else
+	// on an n-CPU system, create n threads for multi queues, and 1 thread for everything else
 	else
-		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? (numprocs - 1) : 1;
+		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? numprocs : 1;
+		
+	// multi-queues with high frequency items should top out at 4 for now
+	// since we have scaling problems above that
+	if ((flags & WORK_QUEUE_FLAG_HIGH_FREQ) && queue->threads > 1)
+		queue->threads = MIN(queue->threads - 1, 4);
 
 	// clamp to the maximum
 	queue->threads = MIN(queue->threads, WORK_MAX_THREADS);
@@ -706,13 +711,12 @@ static int effective_num_processors(void)
 		int numprocs = 0;
 
 		// if the OSDPROCESSORS environment variable is set, use that value if valid
+		// note that we permit more than the real number of processors for testing
 		procsoverride = _tgetenv(_T("OSDPROCESSORS"));
 		if (procsoverride != NULL && _stscanf(procsoverride, _T("%d"), &numprocs) == 1 && numprocs > 0)
-			// Be well behaved ...
 			return MIN(info.dwNumberOfProcessors * 4, numprocs);
 
-		// max out at 4 for now since scaling above that seems to do poorly
-		return MIN(info.dwNumberOfProcessors, 4);
+		return info.dwNumberOfProcessors;
 	}
 }
 

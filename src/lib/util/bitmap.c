@@ -271,7 +271,7 @@ void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
 //  bitmap does not own the memory
 //-------------------------------------------------
 
-void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect)
+void bitmap_t::wrap(const bitmap_t &source, const rectangle &subrect)
 {
 	assert(m_format == source.m_format);
 	assert(m_bpp == source.m_bpp);

@@ -52,7 +52,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// derived class for C++
+// basic allocated string class
 class astring
 {
 public:

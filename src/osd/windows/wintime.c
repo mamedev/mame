@@ -104,6 +104,8 @@ osd_ticks_t osd_ticks(void)
 
 osd_ticks_t osd_ticks_per_second(void)
 {
+	if (ticks_per_second == 0)
+		osd_ticks();
 	return ticks_per_second;
 }
 

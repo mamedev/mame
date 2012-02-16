@@ -43,16 +43,20 @@
 #define __CHD_H__
 
 #include "osdcore.h"
+#include "coretmpl.h"
+#include "astring.h"
 #include "bitmap.h"
 #include "corefile.h"
-#include "avcomp.h"
+#include "hashing.h"
+#include "chdcodec.h"
 
 
 /***************************************************************************
 
     Compressed Hunks of Data header format. All numbers are stored in
-    Motorola (big-endian) byte ordering. The header is 76 (V1) or 80 (V2)
-    bytes long.
+    Motorola (big-endian) byte ordering.
+    
+    =========================================================================
 
     V1 header:
 
@@ -70,6 +74,21 @@
     [ 60] UINT8  parentmd5[16]; // MD5 checksum of parent file
     [ 76] (V1 header length)
 
+    Flags:
+        0x00000001 - set if this drive has a parent
+        0x00000002 - set if this drive allows writes
+
+	Compression types:
+		CHDCOMPRESSION_NONE = 0
+		CHDCOMPRESSION_ZLIB = 1
+    
+    V1 map format:
+    
+    [  0] UINT64 offset : 44;	// starting offset within the file
+    [  0] UINT64 length : 20;	// length of data; if == hunksize, data is uncompressed
+    
+    =========================================================================
+
     V2 header:
 
     [  0] char   tag[8];        // 'MComprHD'
@@ -86,6 +105,10 @@
     [ 60] UINT8  parentmd5[16]; // MD5 checksum of parent file
     [ 76] UINT32 seclen;        // number of bytes per sector
     [ 80] (V2 header length)
+    
+    Flags and map format are same as V1
+    
+    =========================================================================
 
     V3 header:
 
@@ -103,6 +126,23 @@
     [ 80] UINT8  sha1[20];      // SHA1 checksum of raw data
     [100] UINT8  parentsha1[20];// SHA1 checksum of parent file
     [120] (V3 header length)
+    
+    Flags are the same as V1
+
+	Compression types:
+		CHDCOMPRESSION_NONE = 0
+		CHDCOMPRESSION_ZLIB = 1
+		CHDCOMPRESSION_ZLIB_PLUS = 2
+    
+    V3 map format:
+
+    [  0] UINT64 offset;        // starting offset within the file
+    [  8] UINT32 crc32;			// 32-bit CRC of the uncompressed data
+    [ 12] UINT16 length_lo;		// lower 16 bits of length
+    [ 14] UINT8 length_hi;		// upper 8 bits of length
+    [ 15] UINT8 flags;			// flags, indicating compression info
+
+    =========================================================================
 
     V4 header:
 
@@ -119,90 +159,117 @@
     [ 68] UINT8  parentsha1[20];// combined raw+meta SHA1 of parent
     [ 88] UINT8  rawsha1[20];   // raw data SHA1
     [108] (V4 header length)
+    
+    Flags are the same as V1
+    
+	Compression types:
+		CHDCOMPRESSION_NONE = 0
+		CHDCOMPRESSION_ZLIB = 1
+		CHDCOMPRESSION_ZLIB_PLUS = 2
+		CHDCOMPRESSION_AV = 3
+    
+    Map format is the same as V3
+    
+    =========================================================================
 
-    Flags:
-        0x00000001 - set if this drive has a parent
-        0x00000002 - set if this drive allows writes
+    V5 header:
+    
+    [  0] char   tag[8];        // 'MComprHD'
+    [  8] UINT32 length;        // length of header (including tag and length fields)
+    [ 12] UINT32 version;       // drive format version
+    [ 16] UINT32 compressors[4];// which custom compressors are used?
+    [ 32] UINT64 logicalbytes;  // logical size of the data (in bytes)
+    [ 40] UINT64 mapoffset;     // offset to the map
+    [ 48] UINT64 metaoffset;    // offset to the first blob of metadata
+    [ 56] UINT32 hunkbytes;     // number of bytes per hunk (512k maximum)
+    [ 60] UINT32 unitbytes;     // number of bytes per unit within each hunk
+    [ 64] UINT8  rawsha1[20];   // raw data SHA1
+    [ 84] UINT8  sha1[20];      // combined raw+meta SHA1
+    [104] UINT8  parentsha1[20];// combined raw+meta SHA1 of parent
+    [124] (V5 header length)
+
+	If parentsha1 != 0, we have a parent (no need for flags)
+	If compressors[0] == 0, we are uncompressed (including maps)
+    
+    V5 uncompressed map format:
+    
+    [  0] UINT32 offset;   		// starting offset / hunk size
+    
+    V5 compressed map format header:
+    
+    [  0] UINT32 length;		// length of compressed map
+    [  4] UINT48 datastart;		// offset of first block
+    [ 10] UINT16 crc;			// crc-16 of the map
+    [ 12] UINT8 lengthbits;		// bits used to encode complength
+    [ 13] UINT8 hunkbits;		// bits used to encode self-refs
+    [ 14] UINT8 parentunitbits;	// bits used to encode parent unit refs
+    [ 15] UINT8 reserved;		// future use
+    [ 16] (compressed header length)
+    
+    Each compressed map entry, once expanded, looks like:
+    
+    [  0] UINT8 compression;	// compression type
+    [  1] UINT24 complength;	// compressed length
+    [  4] UINT48 offset;		// offset
+    [ 10] UINT16 crc;			// crc-16 of the data
 
 ***************************************************************************/
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-/* header information */
-#define CHD_HEADER_VERSION			4
-#define CHD_V1_HEADER_SIZE			76
-#define CHD_V2_HEADER_SIZE			80
-#define CHD_V3_HEADER_SIZE			120
-#define CHD_V4_HEADER_SIZE			108
-#define CHD_MAX_HEADER_SIZE			CHD_V4_HEADER_SIZE
+// pseudo-codecs returned by hunk_info
+const chd_codec_type CHD_CODEC_SELF 		= 1;	// copy of another hunk
+const chd_codec_type CHD_CODEC_PARENT 		= 2;	// copy of a parent's hunk
+const chd_codec_type CHD_CODEC_MINI 		= 3;	// legacy "mini" 8-byte repeat
 
-/* checksumming information */
-#define CHD_MD5_BYTES				16
-#define CHD_SHA1_BYTES				20
+// core types
+typedef UINT32 chd_metadata_tag;
 
-/* CHD global flags */
-#define CHDFLAGS_HAS_PARENT			0x00000001
-#define CHDFLAGS_IS_WRITEABLE		0x00000002
-#define CHDFLAGS_UNDEFINED			0xfffffffc
+// metadata parameters
+const chd_metadata_tag CHDMETATAG_WILDCARD = 0;
+const UINT32 CHDMETAINDEX_APPEND = ~0;
 
-/* compression types */
-#define CHDCOMPRESSION_NONE			        0
-#define CHDCOMPRESSION_ZLIB			        1
-#define CHDCOMPRESSION_ZLIB_PLUS	        2
-#define CHDCOMPRESSION_AV			        3
-#define CHDCOMPRESSION_ZLIB_PLUS_WITH_FLAC  4
+// metadata flags
+const UINT8 CHD_MDFLAGS_CHECKSUM = 0x01;		// indicates data is checksummed
 
-/* A/V codec configuration parameters */
-#define AV_CODEC_COMPRESS_CONFIG	1
-#define AV_CODEC_DECOMPRESS_CONFIG	2
+// standard hard disk metadata
+const chd_metadata_tag HARD_DISK_METADATA_TAG = CHD_MAKE_TAG('G','D','D','D');
+extern const char *HARD_DISK_METADATA_FORMAT;
 
-/* metadata parameters */
-#define CHDMETATAG_WILDCARD			0
-#define CHD_METAINDEX_APPEND		((UINT32)-1)
+// hard disk identify information
+const chd_metadata_tag HARD_DISK_IDENT_METADATA_TAG = CHD_MAKE_TAG('I','D','N','T');
 
-/* metadata flags */
-#define CHD_MDFLAGS_CHECKSUM		0x01		/* indicates data is checksummed */
+// hard disk key information
+const chd_metadata_tag HARD_DISK_KEY_METADATA_TAG = CHD_MAKE_TAG('K','E','Y',' ');
 
-/* standard hard disk metadata */
-#define HARD_DISK_METADATA_TAG		0x47444444	/* 'GDDD' */
-#define HARD_DISK_METADATA_FORMAT	"CYLS:%d,HEADS:%d,SECS:%d,BPS:%d"
+// pcmcia CIS information
+const chd_metadata_tag PCMCIA_CIS_METADATA_TAG = CHD_MAKE_TAG('C','I','S',' ');
 
-/* hard disk identify information */
-#define HARD_DISK_IDENT_METADATA_TAG 0x49444e54 /* 'IDNT' */
+// standard CD-ROM metadata
+const chd_metadata_tag CDROM_OLD_METADATA_TAG = CHD_MAKE_TAG('C','H','C','D');
+const chd_metadata_tag CDROM_TRACK_METADATA_TAG = CHD_MAKE_TAG('C','H','T','R');
+extern const char *CDROM_TRACK_METADATA_FORMAT;
+const chd_metadata_tag CDROM_TRACK_METADATA2_TAG = CHD_MAKE_TAG('C','H','T','2');
+extern const char *CDROM_TRACK_METADATA2_FORMAT;
 
-/* hard disk key information */
-#define HARD_DISK_KEY_METADATA_TAG	0x4b455920  /* 'KEY '  */
+// standard A/V metadata
+const chd_metadata_tag AV_METADATA_TAG = CHD_MAKE_TAG('A','V','A','V');
+extern const char *AV_METADATA_FORMAT;
 
-/* pcmcia CIS information */
-#define PCMCIA_CIS_METADATA_TAG		0x43495320  /* 'CIS '  */
+// A/V laserdisc frame metadata
+const chd_metadata_tag AV_LD_METADATA_TAG = CHD_MAKE_TAG('A','V','L','D');
 
-/* standard CD-ROM metadata */
-#define CDROM_OLD_METADATA_TAG		0x43484344	/* 'CHCD' */
-#define CDROM_TRACK_METADATA_TAG	0x43485452	/* 'CHTR' */
-#define CDROM_TRACK_METADATA_FORMAT	"TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d"
-#define CDROM_TRACK_METADATA2_TAG	0x43485432	/* 'CHT2' */
-#define CDROM_TRACK_METADATA2_FORMAT	"TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d PREGAP:%d PGTYPE:%s PGSUB:%s POSTGAP:%d"
-
-/* standard A/V metadata */
-#define AV_METADATA_TAG				0x41564156	/* 'AVAV' */
-#define AV_METADATA_FORMAT			"FPS:%d.%06d WIDTH:%d HEIGHT:%d INTERLACED:%d CHANNELS:%d SAMPLERATE:%d"
-
-/* A/V laserdisc frame metadata */
-#define AV_LD_METADATA_TAG			0x41564C44	/* 'AVLD' */
-
-/* CHD open values */
-#define CHD_OPEN_READ				1
-#define CHD_OPEN_READWRITE			2
-
-/* error types */
-enum _chd_error
+// error types
+enum chd_error
 {
 	CHDERR_NONE,
 	CHDERR_NO_INTERFACE,
 	CHDERR_OUT_OF_MEMORY,
+	CHDERR_NOT_OPEN,
+	CHDERR_ALREADY_OPEN,
 	CHDERR_INVALID_FILE,
 	CHDERR_INVALID_PARAMETER,
 	CHDERR_INVALID_DATA,
@@ -226,166 +293,303 @@ enum _chd_error
 	CHDERR_INVALID_METADATA,
 	CHDERR_INVALID_STATE,
 	CHDERR_OPERATION_PENDING,
-	CHDERR_NO_ASYNC_OPERATION,
-	CHDERR_UNSUPPORTED_FORMAT
+	CHDERR_UNSUPPORTED_FORMAT,
+	CHDERR_UNKNOWN_COMPRESSION,
+	CHDERR_WALKING_PARENT,
+	CHDERR_COMPRESSING
 };
-typedef enum _chd_error chd_error;
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/* opaque types */
-typedef struct _chd_file chd_file;
+class chd_codec;
 
 
-/* extract header structure (NOT the on-disk header structure) */
-typedef struct _chd_header chd_header;
-struct _chd_header
+// ======================> chd_file
+
+// core file class
+class chd_file
 {
-	UINT32		length;						/* length of header data */
-	UINT32		version;					/* drive format version */
-	UINT32		flags;						/* flags field */
-	UINT32		compression;				/* compression type */
-	UINT32		hunkbytes;					/* number of bytes per hunk */
-	UINT32		totalhunks;					/* total # of hunks represented */
-	UINT64		logicalbytes;				/* logical size of the data */
-	UINT64		metaoffset;					/* offset in file of first metadata */
-	UINT8		md5[CHD_MD5_BYTES];			/* overall MD5 checksum */
-	UINT8		parentmd5[CHD_MD5_BYTES];	/* overall MD5 checksum of parent */
-	UINT8		sha1[CHD_SHA1_BYTES];		/* overall SHA1 checksum */
-	UINT8		rawsha1[CHD_SHA1_BYTES];	/* SHA1 checksum of raw data */
-	UINT8		parentsha1[CHD_SHA1_BYTES];	/* overall SHA1 checksum of parent */
+	friend class chd_file_compressor;
+	friend class chd_verifier;
 
-	UINT32		obsolete_cylinders;			/* obsolete field -- do not use! */
-	UINT32		obsolete_sectors;			/* obsolete field -- do not use! */
-	UINT32		obsolete_heads;				/* obsolete field -- do not use! */
-	UINT32		obsolete_hunksize;			/* obsolete field -- do not use! */
+	// constants
+	static const UINT32 HEADER_VERSION = 5;
+	static const UINT32 V3_HEADER_SIZE = 120;
+	static const UINT32 V4_HEADER_SIZE = 108;
+	static const UINT32 V5_HEADER_SIZE = 124;
+	static const UINT32 MAX_HEADER_SIZE = V5_HEADER_SIZE;
+	
+public:
+	// construction/destruction
+	chd_file();
+	virtual ~chd_file();
+
+	// operators
+	operator core_file *() { return m_file; }
+
+	// getters
+	bool opened() const { return (m_file != NULL); }
+	UINT32 version() const { return m_version; }
+	UINT64 logical_bytes() const { return m_logicalbytes; }
+	UINT32 hunk_bytes() const { return m_hunkbytes; }
+	UINT32 hunk_count() const { return m_hunkcount; }
+	UINT32 unit_bytes() const { return m_unitbytes; }
+	UINT64 unit_count() const { return m_unitcount; }
+	bool compressed() const { return (m_compression[0] != CHD_CODEC_NONE); }
+	chd_codec_type compression(int index) const { return m_compression[index]; }
+	chd_file *parent() const { return m_parent; }
+	sha1_t sha1();
+	sha1_t raw_sha1();
+	sha1_t parent_sha1();
+	chd_error hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32 &compbytes);
+
+	// setters
+	void set_raw_sha1(sha1_t rawdata);
+	void set_parent_sha1(sha1_t parent);
+
+	// file create
+	chd_error create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4]);
+	chd_error create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4]);
+	chd_error create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent);
+	chd_error create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent);
+
+	// file open
+	chd_error open(const char *filename, bool writeable = false, chd_file *parent = NULL);
+	chd_error open(core_file &file, bool writeable = false, chd_file *parent = NULL);
+	
+	// file close
+	void close();
+
+	// read/write
+	chd_error read_hunk(UINT32 hunknum, void *buffer);
+	chd_error write_hunk(UINT32 hunknum, const void *buffer);
+	chd_error read_units(UINT64 unitnum, void *buffer, UINT32 count = 1);
+	chd_error write_units(UINT64 unitnum, const void *buffer, UINT32 count = 1);
+	chd_error read_bytes(UINT64 offset, void *buffer, UINT32 bytes);
+	chd_error write_bytes(UINT64 offset, const void *buffer, UINT32 bytes);
+
+	// metadata management
+	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, astring &output);
+	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output);
+	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 &resultlen);
+	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output, chd_metadata_tag &resulttag, UINT8 &resultflags);
+	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen, UINT8 flags = CHD_MDFLAGS_CHECKSUM);
+	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const astring &input, UINT8 flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input.cstr(), input.len() + 1, flags = CHD_MDFLAGS_CHECKSUM); }
+	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const dynamic_buffer &input, UINT8 flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input, input.count(), flags = CHD_MDFLAGS_CHECKSUM); }
+	chd_error delete_metadata(chd_metadata_tag metatag, UINT32 metaindex);
+	chd_error clone_all_metadata(chd_file &source);
+	
+	// hashing helper
+	sha1_t compute_overall_sha1(sha1_t rawsha1);
+
+	// codec interfaces
+	chd_error codec_configure(chd_codec_type codec, int param, void *config);
+	
+	// static helpers
+	static const char *error_string(chd_error err);
+
+private:
+	struct metadata_entry;
+	struct metadata_hash;
+	
+	// inline helpers
+	UINT64 be_read(const UINT8 *base, int numbytes);
+	void be_write(UINT8 *base, UINT64 value, int numbytes);
+	sha1_t be_read_sha1(const UINT8 *base);
+	void be_write_sha1(UINT8 *base, sha1_t value);
+	void file_read(UINT64 offset, void *dest, UINT32 length);
+	void file_write(UINT64 offset, const void *source, UINT32 length);
+	UINT64 file_append(const void *source, UINT32 length, UINT32 alignment = 0);
+	UINT8 bits_for_value(UINT64 value);
+
+	// internal helpers
+	UINT32 guess_unitbytes();
+	void parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1);
+	void parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1);
+	void parse_v5_header(UINT8 *rawheader, sha1_t &parentsha1);
+	chd_error compress_v5_map();
+	void decompress_v5_map();
+	chd_error create_common();
+	chd_error open_common(bool writeable);
+	void create_open_common();
+	void verify_proper_compression_append(UINT32 hunknum);
+	void hunk_write_compressed(UINT32 hunknum, INT8 compression, const UINT8 *compressed, UINT32 complength, crc16_t crc16);
+	void hunk_copy_from_self(UINT32 hunknum, UINT32 otherhunk);
+	void hunk_copy_from_parent(UINT32 hunknum, UINT64 parentunit);
+	bool metadata_find(chd_metadata_tag metatag, INT32 metaindex, metadata_entry &metaentry, bool resume = false);
+	void metadata_set_previous_next(UINT64 prevoffset, UINT64 nextoffset);
+	void metadata_update_hash();
+	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
+
+	// file characteristics
+	core_file *				m_file;				// handle to the open core file
+	bool					m_owns_file;		// flag indicating if this file should be closed on chd_close()
+	bool					m_allow_reads;		// permit reads from this CHD?
+	bool					m_allow_writes;		// permit writes to this CHD?
+	
+	// core parameters from the header
+	UINT32					m_version;			// version of the header
+	UINT64					m_logicalbytes;		// logical size of the raw CHD data in bytes
+	UINT64					m_mapoffset;		// offset of map
+	UINT64					m_metaoffset;		// offset to first metadata bit
+	UINT32					m_hunkbytes;		// size of each raw hunk in bytes
+	UINT32					m_hunkcount;		// number of hunks represented
+	UINT32					m_unitbytes;		// size of each unit in bytes
+	UINT64					m_unitcount;		// number of units represented
+	chd_codec_type			m_compression[4];	// array of compression types used
+	chd_file *				m_parent;			// pointer to parent file, or NULL if none
+	bool					m_parent_missing;	// are we missing our parent?
+	
+	// key offsets within the header
+	UINT64					m_mapoffset_offset;	// offset of map offset field
+	UINT64					m_metaoffset_offset;// offset of metaoffset field
+	UINT64					m_sha1_offset;		// offset of SHA1 field
+	UINT64					m_rawsha1_offset;	// offset of raw SHA1 field
+	UINT64					m_parentsha1_offset;// offset of paren SHA1 field
+	
+	// map information
+	UINT32					m_mapentrybytes;	// length of each entry in a map
+	dynamic_buffer			m_rawmap;			// raw map data
+
+	// compression management
+	chd_decompressor *		m_decompressor[4];	// array of decompression codecs
+	dynamic_buffer			m_compressed;		// temporary buffer for compressed data
+	
+	// caching
+	dynamic_buffer			m_cache;			// single-hunk cache for partial reads/writes
+	UINT32					m_cachehunk;		// which hunk is in the cache?
 };
 
 
-/* structure for returning information about a verification pass */
-typedef struct _chd_verify_result chd_verify_result;
-struct _chd_verify_result
+// ======================> chd_file_compressor
+
+// class for creating a new compressed CHD
+class chd_file_compressor : public chd_file
 {
-	UINT8		md5[CHD_MD5_BYTES];			/* overall MD5 checksum */
-	UINT8		sha1[CHD_SHA1_BYTES];		/* overall SHA1 checksum */
-	UINT8		rawsha1[CHD_SHA1_BYTES];	/* SHA1 checksum of raw data */
-	UINT8		metasha1[CHD_SHA1_BYTES];	/* SHA1 checksum of metadata */
+public:
+	// construction/destruction
+	chd_file_compressor();
+	virtual ~chd_file_compressor();
+	
+	// compression management
+	void compress_begin();
+	chd_error compress_continue(double &progress, double &ratio);
+
+protected:
+	// required override: read more data
+	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length) = 0;
+	
+private:
+	// hash map for looking up values
+	class hashmap
+	{
+	public:
+		// construction/destruction
+		hashmap();
+		~hashmap();
+		
+		// operations
+		void reset();
+		UINT64 find(crc16_t crc16, sha1_t sha1);
+		void add(UINT64 itemnum, crc16_t crc16, sha1_t sha1);
+	
+		// constants
+		static const UINT64 NOT_FOUND = ~UINT64(0);
+	private:
+		// internal entry
+		struct entry_t
+		{
+			entry_t *			m_next;				// next entry in list
+			UINT64				m_itemnum;			// item number
+			sha1_t				m_sha1;				// SHA-1 of the block
+		};
+		
+		// block of entries
+		struct entry_block
+		{
+			entry_block(entry_block *prev)
+				: m_next(prev), m_nextalloc(0) { }
+		
+			entry_block *		m_next;				// next block in list
+			UINT32				m_nextalloc;		// next to be allocated
+			entry_t				m_array[16384];		// array of entries
+		};
+
+		// internal state
+		entry_t *			m_map[65536];			// map, hashed by CRC-16
+		entry_block *		m_block_list;			// list of allocated blocks
+	};
+
+	// status of a given work item
+	enum work_status
+	{
+		WS_READY = 0,
+		WS_READING,
+		WS_QUEUED,
+		WS_COMPLETE
+	};
+	
+	// a CRC-16/SHA-1 pair
+	struct hash_pair
+	{
+		crc16_t				m_crc16;			// calculated CRC-16
+		sha1_t				m_sha1;				// calculated SHA-1
+	};
+
+	// a single work item	
+	struct work_item
+	{
+		osd_work_item *		m_osd;				// OSD work item running on this block
+		chd_file_compressor *m_compressor;		// pointer back to the compressor
+		volatile work_status m_status;			// current status of this item
+		UINT32				m_hunknum;			// number of the hunk we're working on
+		UINT8 *				m_data;				// pointer to the data we are working on
+		UINT8 *				m_compressed;		// pointer to the compressed data
+		UINT32				m_complen;			// compressed data length
+		INT8				m_compression;		// type of compression used
+		chd_compressor_group *m_codecs;			// codec instance
+		dynamic_array<hash_pair> m_hash;		// array of hashes
+	};
+	
+	// internal helpers
+	static void *async_walk_parent_static(void *param, int threadid);
+	void async_walk_parent(work_item &item);
+	static void *async_compress_hunk_static(void *param, int threadid);
+	void async_compress_hunk(work_item &item, int threadid);
+	static void *async_read_static(void *param, int threadid);
+	void async_read();
+
+	// current compression status	
+	bool					m_walking_parent;	// are we building the parent map?	
+	UINT64					m_total_in;			// total bytes in
+	UINT64					m_total_out;		// total bytes out
+	sha1_creator			m_compsha1;			// running SHA-1 on raw data
+
+	// hash lookup maps
+	hashmap		 			m_parent_map;		// hash map for parent
+	hashmap		 			m_current_map;		// hash map for current
+
+	// read I/O thread
+	osd_work_queue *		m_read_queue;		// work queue for reading
+	UINT64					m_read_queue_offset;// next offset to enqueue
+	UINT64					m_read_done_offset;	// next offset that will complete
+	bool					m_read_error;		// error during reading?
+
+	// work item thread
+	static const int WORK_BUFFER_HUNKS = 256;
+	osd_work_queue *		m_work_queue;		// queue for doing work on other threads
+	dynamic_buffer			m_work_buffer;		// buffer containing hunk data to work on
+	dynamic_buffer			m_compressed_buffer;// buffer containing compressed data
+	work_item				m_work_item[WORK_BUFFER_HUNKS]; // status of each hunk
+	chd_compressor_group *	m_codecs[WORK_MAX_THREADS]; // codecs to use
+
+	// output state
+	UINT32					m_write_hunk;		// next hunk to write
 };
 
 
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
-/* ----- CHD file management ----- */
-
-/* create a new CHD file fitting the given description */
-chd_error chd_create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 compression, chd_file *parent);
-
-/* same as chd_create(), but accepts an already-opened core_file object */
-chd_error chd_create_file(core_file *file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 compression, chd_file *parent);
-
-/* open an existing CHD file */
-chd_error chd_open(const char *filename, int mode, chd_file *parent, chd_file **chd);
-
-/* same as chd_open(), but accepts an already-opened core_file object */
-chd_error chd_open_file(core_file *file, int mode, chd_file *parent, chd_file **chd);
-
-/* close a CHD file */
-void chd_close(chd_file *chd);
-
-/* return the associated core_file */
-core_file *chd_core_file(chd_file *chd);
-
-/* return an error string for the given CHD error */
-const char *chd_error_string(chd_error err);
-
-
-
-/* ----- CHD header management ----- */
-
-/* return a pointer to the extracted CHD header data */
-const chd_header *chd_get_header(chd_file *chd);
-
-/* set a modified header */
-chd_error chd_set_header(const char *filename, const chd_header *header);
-
-/* same as chd_set_header(), but accepts an already-opened core_file object */
-chd_error chd_set_header_file(core_file *file, const chd_header *header);
-
-
-
-/* ----- core data read/write ----- */
-
-/* read one hunk from the CHD file */
-chd_error chd_read(chd_file *chd, UINT32 hunknum, void *buffer);
-
-/* read one hunk from the CHD file asynchronously */
-chd_error chd_read_async(chd_file *chd, UINT32 hunknum, void *buffer);
-
-/* write one hunk to a CHD file */
-chd_error chd_write(chd_file *chd, UINT32 hunknum, const void *buffer);
-
-/* write one hunk to a CHD file asynchronously */
-chd_error chd_write_async(chd_file *chd, UINT32 hunknum, const void *buffer);
-
-/* wait for a previously issued async read/write to complete and return the error */
-chd_error chd_async_complete(chd_file *chd);
-
-
-
-/* ----- metadata management ----- */
-
-/* get indexed metadata of a particular sort */
-chd_error chd_get_metadata(chd_file *chd, UINT32 searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 *resultlen, UINT32 *resulttag, UINT8 *resultflags);
-
-/* set indexed metadata of a particular sort */
-chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen, UINT8 flags);
-
-/* clone all of the metadata from one CHD to another */
-chd_error chd_clone_metadata(chd_file *source, chd_file *dest);
-
-
-
-/* ----- compression management ----- */
-
-/* begin compressing data to a CHD */
-chd_error chd_compress_begin(chd_file *chd);
-
-/* compress the next hunk of data */
-chd_error chd_compress_hunk(chd_file *chd, const void *data, double *curratio, int is_half_hunk = 0);
-
-/* finish compressing data to a CHD */
-chd_error chd_compress_finish(chd_file *chd, int write_protect);
-
-
-
-/* ----- verification management ----- */
-
-/* begin verifying a CHD */
-chd_error chd_verify_begin(chd_file *chd);
-
-/* verify a single hunk of data */
-chd_error chd_verify_hunk(chd_file *chd);
-
-/* finish verifying a CHD, returning the computed MD5 and SHA1 */
-chd_error chd_verify_finish(chd_file *chd, chd_verify_result *result);
-
-
-
-/* ----- codec interfaces ----- */
-
-/* set internal codec parameters */
-chd_error chd_codec_config(chd_file *chd, int param, void *config);
-
-/* return a string description of a codec */
-const char *chd_get_codec_name(UINT32 codec);
-
-
-#endif /* __CHD_H__ */
+#endif // __CHD_H__

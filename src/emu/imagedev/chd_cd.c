@@ -129,10 +129,11 @@ bool cdrom_image_device::call_load()
 
 	if (software_entry() == NULL)
 	{
-		if (strstr(m_image_name,".chd")) {
-			err = chd_open_file( image_core_file(), CHD_OPEN_READ, NULL, &chd );	/* CDs are never writeable */
+		if (strstr(m_image_name,".chd") && is_loaded()) {
+			err = m_self_chd.open( *image_core_file() );	/* CDs are never writeable */
 			if ( err )
 				goto error;
+			chd = &m_self_chd;
 		}
 	} else {
 		chd  = get_disk_handle(device().machine(), device().subtag(tempstring,"cdrom"));
@@ -150,8 +151,8 @@ bool cdrom_image_device::call_load()
 	return IMAGE_INIT_PASS;
 
 error:
-	if ( chd )
-		chd_close( chd );
+	if ( chd && chd == &m_self_chd )
+		m_self_chd.close( );
 	if ( err )
 		seterror( IMAGE_ERROR_UNSPECIFIED, chd_get_error_string( err ) );
 	return IMAGE_INIT_FAIL;

@@ -43,6 +43,7 @@
 #define __LASERDSC_H__
 
 #include "vbiparse.h"
+#include "avhuff.h"
 
 
 //**************************************************************************
@@ -315,6 +316,7 @@ private:
 	void vblank_state_changed(screen_device &screen, bool vblank_state);
 	frame_data &current_frame();
 	void read_track_data();
+	static void *read_async_static(void *param, int threadid);
 	void process_track_data();
 	void config_load(int config_type, xml_data_node *parentnode);
 	void config_save(int config_type, xml_data_node *parentnode);
@@ -332,14 +334,18 @@ private:
 
 	// disc parameters
 	chd_file *			m_disc;					// handle to the disc itself
-	UINT8 *				m_vbidata;				// pointer to precomputed VBI data
+	dynamic_buffer		m_vbidata;				// pointer to precomputed VBI data
 	int					m_width;				// width of video
 	int					m_height;				// height of video
 	UINT32				m_fps_times_1million;	// frame rate of video
 	int					m_samplerate;			// audio samplerate
-	chd_error			m_readresult;			// result of the most recent read
+	int					m_readresult;			// result of the most recent read
 	UINT32				m_chdtracks;			// number of tracks in the CHD
-	av_codec_decompress_config m_avconfig;		// decompression configuration
+	avhuff_decompress_config m_avhuff_config;	// decompression configuration
+
+	// async operations
+	osd_work_queue *	m_work_queue;			// work queue
+	UINT32				m_queued_hunknum;		// queued hunk
 
 	// core states
 	UINT8				m_audiosquelch;			// audio squelch state: bit 0 = audio 1, bit 1 = audio 2

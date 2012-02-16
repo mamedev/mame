@@ -39,10 +39,11 @@
 
 #include "emu.h"
 #include "laserdsc.h"
-#include "avcomp.h"
+#include "avhuff.h"
 #include "vbiparse.h"
 #include "config.h"
 #include "render.h"
+#include "chd.h"
 
 
 
@@ -93,13 +94,13 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 	  m_overheight(0),
 	  m_overclip(0, -1, 0, -1),
 	  m_disc(NULL),
-	  m_vbidata(NULL),
 	  m_width(0),
 	  m_height(0),
 	  m_fps_times_1million(0),
 	  m_samplerate(0),
 	  m_readresult(CHDERR_NONE),
 	  m_chdtracks(0),
+	  m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO)),
 	  m_audiosquelch(0),
 	  m_videosquelch(0),
 	  m_fieldnum(0),
@@ -134,6 +135,7 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 
 laserdisc_device::~laserdisc_device()
 {
+	osd_work_queue_free(m_work_queue);
 }
 
 
@@ -362,7 +364,7 @@ void laserdisc_device::device_stop()
 {
 	// make sure all async operations have completed
 	if (m_disc != NULL)
-		chd_async_complete(m_disc);
+		osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10);
 
 	// free any textures and palettes
 	if (m_videotex != NULL)
@@ -767,13 +769,13 @@ void laserdisc_device::init_disc()
 	m_maxtrack = VIRTUAL_LEAD_IN_TRACKS + MAX_TOTAL_TRACKS + VIRTUAL_LEAD_OUT_TRACKS;
 	if (m_disc != NULL)
 	{
-		// require the A/V codec
-		if (chd_get_header(m_disc)->compression != CHDCOMPRESSION_AV)
+		// require the A/V codec and nothing else
+		if (m_disc->compression(0) != CHD_CODEC_AVHUFF || m_disc->compression(1) != CHD_CODEC_NONE)
 			throw emu_fatalerror("Laserdisc video must be compressed with the A/V codec!");
 
 		// read the metadata
-		char metadata[256];
-		chd_error err = chd_get_metadata(m_disc, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL, NULL);
+		astring metadata;
+		chd_error err = m_disc->read_metadata(AV_METADATA_TAG, 0, metadata);
 		if (err != CHDERR_NONE)
 			throw emu_fatalerror("Non-A/V CHD file specified");
 
@@ -789,14 +791,12 @@ void laserdisc_device::init_disc()
 			throw emu_fatalerror("Laserdisc video must be interlaced!");
 
 		// determine the maximum track and allocate a frame buffer
-		UINT32 totalhunks = chd_get_header(m_disc)->totalhunks;
+		UINT32 totalhunks = m_disc->hunk_count();
 		m_chdtracks = totalhunks / 2;
 
 		// allocate memory for the precomputed per-frame metadata
-		m_vbidata = auto_alloc_array(machine(), UINT8, totalhunks * VBI_PACKED_BYTES);
-		UINT32 vbilength;
-		err = chd_get_metadata(m_disc, AV_LD_METADATA_TAG, 0, m_vbidata, totalhunks * VBI_PACKED_BYTES, &vbilength, NULL, NULL);
-		if (err != CHDERR_NONE || vbilength != totalhunks * VBI_PACKED_BYTES)
+		err = m_disc->read_metadata(AV_LD_METADATA_TAG, 0, m_vbidata);
+		if (err != CHDERR_NONE || m_vbidata.count() != totalhunks * VBI_PACKED_BYTES)
 			throw emu_fatalerror("Precomputed VBI metadata missing or incorrect size");
 	}
 	m_maxtrack = MAX(m_maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + m_chdtracks);
@@ -1011,7 +1011,7 @@ void laserdisc_device::read_track_data()
 
 	// cheat and look up the metadata we are about to retrieve
 	vbi_metadata vbidata = { 0 };
-	if (m_vbidata != NULL)
+	if (m_vbidata.count() != 0)
 		vbi_metadata_unpack(&vbidata, NULL, &m_vbidata[readhunk * VBI_PACKED_BYTES]);
 
 	// if we're in the lead-in area, force the VBI data to be standard lead-in
@@ -1040,29 +1040,29 @@ void laserdisc_device::read_track_data()
 	frame->m_lastfield = m_curtrack * 2 + m_fieldnum;
 
 	// set the video target information
-	m_avconfig.video.wrap(&frame->m_bitmap.pix16(m_fieldnum), frame->m_bitmap.width(), frame->m_bitmap.height() / 2, frame->m_bitmap.rowpixels() * 2);
+	m_avhuff_config.video.wrap(&frame->m_bitmap.pix16(m_fieldnum), frame->m_bitmap.width(), frame->m_bitmap.height() / 2, frame->m_bitmap.rowpixels() * 2);
 
 	// set the audio target information
 	if (m_audiobufin + m_audiomaxsamples <= m_audiobufsize)
 	{
 		// if we can fit without wrapping, just read the data directly
-		m_avconfig.audio[0] = &m_audiobuffer[0][m_audiobufin];
-		m_avconfig.audio[1] = &m_audiobuffer[1][m_audiobufin];
+		m_avhuff_config.audio[0] = &m_audiobuffer[0][m_audiobufin];
+		m_avhuff_config.audio[1] = &m_audiobuffer[1][m_audiobufin];
 	}
 	else
 	{
 		// otherwise, read to the beginning of the buffer
-		m_avconfig.audio[0] = &m_audiobuffer[0][0];
-		m_avconfig.audio[1] = &m_audiobuffer[1][0];
+		m_avhuff_config.audio[0] = &m_audiobuffer[0][0];
+		m_avhuff_config.audio[1] = &m_audiobuffer[1][0];
 	}
 
 	// override if we're not decoding
-	m_avconfig.maxsamples = m_audiomaxsamples;
-	m_avconfig.actsamples = &m_audiocursamples;
+	m_avhuff_config.maxsamples = m_audiomaxsamples;
+	m_avhuff_config.actsamples = &m_audiocursamples;
 	m_audiocursamples = 0;
 
 	// set the VBI data for the new field from our precomputed data
-	if (m_vbidata != NULL)
+	if (m_vbidata.count() != 0)
 	{
 		UINT32 vbiframe;
 		vbi_metadata_unpack(&m_metadata[m_fieldnum], &vbiframe, &m_vbidata[readhunk * VBI_PACKED_BYTES]);
@@ -1079,10 +1079,27 @@ void laserdisc_device::read_track_data()
 	m_readresult = CHDERR_FILE_NOT_FOUND;
 	if (m_disc != NULL && !m_videosquelch)
 	{
-		m_readresult = chd_codec_config(m_disc, AV_CODEC_DECOMPRESS_CONFIG, &m_avconfig);
+		m_readresult = m_disc->codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &m_avhuff_config);
 		if (m_readresult == CHDERR_NONE)
-			m_readresult = chd_read_async(m_disc, readhunk, NULL);
+		{
+			m_queued_hunknum = readhunk;
+			m_readresult = CHDERR_OPERATION_PENDING;
+			osd_work_item_queue(m_work_queue, read_async_static, this, WORK_ITEM_FLAG_AUTO_RELEASE);
+		}
 	}
+}
+
+
+//-------------------------------------------------
+//  read_async_static - work item callback for
+//  asynchronous reads
+//-------------------------------------------------
+
+void *laserdisc_device::read_async_static(void *param, int threadid)
+{
+	laserdisc_device &ld = *reinterpret_cast<laserdisc_device *>(param);
+	ld.m_readresult = ld.m_disc->read_hunk(ld.m_queued_hunknum, NULL);
+	return NULL;
 }
 
 
@@ -1095,27 +1112,28 @@ void laserdisc_device::process_track_data()
 {
 	// wait for the async operation to complete
 	if (m_readresult == CHDERR_OPERATION_PENDING)
-		m_readresult = chd_async_complete(m_disc);
+		osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10);
+	assert(m_readresult != CHDERR_OPERATION_PENDING);
 
 	// remove the video if we had an error
 	if (m_readresult != CHDERR_NONE)
-		m_avconfig.video.reset();
+		m_avhuff_config.video.reset();
 
 	// count the field as read if we are successful
-	if (m_avconfig.video.valid())
+	if (m_avhuff_config.video.valid())
 	{
 		m_frame[m_videoindex].m_numfields++;
-		player_overlay(m_avconfig.video);
+		player_overlay(m_avhuff_config.video);
 	}
 
 	// pass the audio to the callback
 	if (!m_audio_callback.isnull())
-		m_audio_callback(*this, m_samplerate, m_audiocursamples, m_avconfig.audio[0], m_avconfig.audio[1]);
+		m_audio_callback(*this, m_samplerate, m_audiocursamples, m_avhuff_config.audio[0], m_avhuff_config.audio[1]);
 
 	// shift audio data if we read it into the beginning of the buffer
 	if (m_audiocursamples != 0 && m_audiobufin != 0)
 		for (int chnum = 0; chnum < 2; chnum++)
-			if (m_avconfig.audio[chnum] == &m_audiobuffer[chnum][0])
+			if (m_avhuff_config.audio[chnum] == &m_audiobuffer[chnum][0])
 			{
 				// move data to the end
 				int samplesleft = m_audiobufsize - m_audiobufin;

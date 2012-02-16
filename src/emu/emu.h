@@ -59,7 +59,6 @@
 #include "profiler.h"
 
 // commonly-referenecd utilities imported from lib/util
-#include "chd.h"
 #include "palette.h"
 #include "unicode.h"
 

@@ -757,6 +757,41 @@ file_error core_fload(const char *filename, void **data, UINT32 *length)
 	return FILERR_NONE;
 }
 
+file_error core_fload(const char *filename, dynamic_buffer &data)
+{
+	core_file *file = NULL;
+	file_error err;
+	UINT64 size;
+
+	/* attempt to open the file */
+	err = core_fopen(filename, OPEN_FLAG_READ, &file);
+	if (err != FILERR_NONE)
+		return err;
+
+	/* get the size */
+	size = core_fsize(file);
+	if ((UINT32)size != size)
+	{
+		core_fclose(file);
+		return FILERR_OUT_OF_MEMORY;
+	}
+
+	/* allocate memory */
+	data.resize(size);
+
+	/* read the data */
+	if (core_fread(file, data, size) != size)
+	{
+		core_fclose(file);
+		data.reset();
+		return FILERR_FAILURE;
+	}
+
+	/* close the file and return data */
+	core_fclose(file);
+	return FILERR_NONE;
+}
+
 
 
 /***************************************************************************

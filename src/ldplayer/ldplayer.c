@@ -166,8 +166,6 @@ chd_file *ldplayer_state::get_disc()
 
 	// iterate while we get new objects
 	const osd_directory_entry *dir;
-	emu_file *image_file = NULL;
-	chd_file *image_chd = NULL;
 	while ((dir = path.next()) != NULL)
 	{
 		int length = strlen(dir->name);
@@ -180,15 +178,17 @@ chd_file *ldplayer_state::get_disc()
 			tolower(dir->name[length - 1]) == 'd')
 		{
 			// open the file itself via our search path
-			image_file = auto_alloc(machine(), emu_file(machine().options().media_path(), OPEN_FLAG_READ));
-			file_error filerr = image_file->open(dir->name);
+			emu_file image_file(machine().options().media_path(), OPEN_FLAG_READ);
+			file_error filerr = image_file.open(dir->name);
 			if (filerr == FILERR_NONE)
 			{
+				astring fullpath(image_file->fullpath();
+				image_file.close();
+				
 				// try to open the CHD
-				chd_error chderr = chd_open_file(*image_file, CHD_OPEN_READ, NULL, &image_chd);
-				if (chderr == CHDERR_NONE)
+				
+				if (set_disk_handle(machine(), "laserdisc", fullpath) == CHDERR_NONE)
 				{
-					set_disk_handle(machine(), "laserdisc", *image_file, *image_chd);
 					m_filename.cpy(dir->name);
 					break;
 				}

@@ -57,6 +57,7 @@ protected:
     virtual void device_config_complete();
 	virtual void device_start();
 
+	chd_file	m_self_chd;
 	cdrom_file	*m_cdrom_handle;
 	image_device_format m_format;
 };

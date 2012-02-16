@@ -51,6 +51,9 @@
     CONSTANTS
 ***************************************************************************/
 
+// tracks are padded to a multiple of this many frames
+const UINT32 CD_TRACK_PADDING = 4;
+
 #define CD_MAX_TRACKS			(99)	/* AFAIK the theoretical limit */
 #define CD_MAX_SECTOR_DATA		(2352)
 #define CD_MAX_SUBCODE_DATA		(96)
@@ -90,8 +93,7 @@ enum
 typedef struct _cdrom_file cdrom_file;
 
 
-typedef struct _cdrom_track_info cdrom_track_info;
-struct _cdrom_track_info
+struct cdrom_track_info
 {
 	/* fields used by CHDMAN and in MAME */
 	UINT32 trktype;		/* track type */
@@ -113,8 +115,7 @@ struct _cdrom_track_info
 };
 
 
-typedef struct _cdrom_toc cdrom_toc;
-struct _cdrom_toc
+struct cdrom_toc
 {
 	UINT32 numtrks;		/* number of tracks */
 	cdrom_track_info tracks[CD_MAX_TRACKS];

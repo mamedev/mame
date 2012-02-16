@@ -64,9 +64,10 @@ protected:
     virtual void device_config_complete();
 	virtual void device_start();
 
-	int internal_load_hd(const char *metadata);
+	int internal_load_hd();
 
 	chd_file		*m_chd;
+	chd_file		m_self_chd;
 	hard_disk_file	*m_hard_disk_handle;
 
 	image_device_format m_format;

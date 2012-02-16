@@ -38,6 +38,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "chd.h"
 #include "emuopts.h"
 #include "jedparse.h"
 #include "audit.h"
@@ -1492,8 +1493,8 @@ void media_identifier::identify_file(const char *name)
 		m_total++;
 
 		// attempt to open as a CHD; fail if not
-		chd_file *chd;
-		chd_error err = chd_open(name, CHD_OPEN_READ, NULL, &chd);
+		chd_file chd;
+		chd_error err = chd.open(name);
 		if (err != CHDERR_NONE)
 		{
 			mame_printf_info("NOT A CHD\n");
@@ -1501,26 +1502,20 @@ void media_identifier::identify_file(const char *name)
 			return;
 		}
 
-		// fetch the header and close the file
-		chd_header header = *chd_get_header(chd);
-		chd_close(chd);
-
 		// error on writable CHDs
-		if (header.flags & CHDFLAGS_IS_WRITEABLE)
+		if (!chd.compressed())
 		{
 			mame_printf_info("is a writeable CHD\n");
 			return;
 		}
 
 		// otherwise, get the hash collection for this CHD
-		static const UINT8 nullhash[20] = { 0 };
 		hash_collection hashes;
-
-		if (memcmp(nullhash, header.sha1, sizeof(header.sha1)) != 0)
-			hashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
+		if (chd.sha1() != sha1_t::null)
+			hashes.add_from_buffer(hash_collection::HASH_SHA1, chd.sha1().m_raw, sizeof(chd.sha1().m_raw));
 
 		// determine whether this file exists
-		int found = find_by_hash(hashes, header.logicalbytes);
+		int found = find_by_hash(hashes, chd.logical_bytes());
 		if (found == 0)
 			mame_printf_info("NO MATCH\n");
 		else

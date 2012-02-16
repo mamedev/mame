@@ -967,6 +967,27 @@ SRes LzmaDec_Allocate(CLzmaDec *p, const Byte *props, unsigned propsSize, ISzAll
   return SZ_OK;
 }
 
+// why isn't there an interface to pass in the properties directly????
+SRes LzmaDec_Allocate_MAME(CLzmaDec *p, const CLzmaProps *propNew, ISzAlloc *alloc)
+{
+  SizeT dicBufSize;
+  RINOK(LzmaDec_AllocateProbs2(p, propNew, alloc));
+  dicBufSize = propNew->dicSize;
+  if (p->dic == 0 || dicBufSize != p->dicBufSize)
+  {
+    LzmaDec_FreeDict(p, alloc);
+    p->dic = (Byte *)alloc->Alloc(alloc, dicBufSize);
+    if (p->dic == 0)
+    {
+      LzmaDec_FreeProbs(p, alloc);
+      return SZ_ERROR_MEM;
+    }
+  }
+  p->dicBufSize = dicBufSize;
+  p->prop = *propNew;
+  return SZ_OK;
+}
+
 SRes LzmaDecode(Byte *dest, SizeT *destLen, const Byte *src, SizeT *srcLen,
     const Byte *propData, unsigned propSize, ELzmaFinishMode finishMode,
     ELzmaStatus *status, ISzAlloc *alloc)

@@ -304,7 +304,7 @@ UINT64 read_uint64(FILE *infile)
     chdcd_parse_toc - parse a CDRWin format CUE file
 -------------------------------------------------*/
 
-chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
+chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
 	FILE *infile;
 	unsigned char buffer[12];
@@ -322,8 +322,8 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
 	}
 
 	/* clear structures */
-	memset(outtoc, 0, sizeof(cdrom_toc));
-	memset(outinfo, 0, sizeof(chdcd_track_input_info));
+	memset(&outtoc, 0, sizeof(outtoc));
+	outinfo.reset();
 
 	// seek to 12 bytes before the end
 	fseek(infile, -12, SEEK_END);
@@ -372,7 +372,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
 
 //          printf("TOC type: %08x.  Start track %d  End track: %d\n", toc_type, start, end);
 
-			outtoc->numtrks = (end-start) + 1;
+			outtoc.numtrks = (end-start) + 1;
 
 			offset = 0;
 			for (track = start; track <= end; track++)
@@ -388,27 +388,26 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
 				index2 = read_uint64(infile);
 
 //              printf("Track %d: sector size %d mode %x index0 %llx index1 %llx index2 %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, index2, (UINT32)(index1-index0)/size, (UINT32)(index2-index1)/size);
-				strncpy(outinfo->fname[track-1], path.cstr(), 256);
-				strncat(outinfo->fname[track-1], tocfname, 256);
-				outinfo->offset[track-1] = offset + (UINT32)(index1-index0);
-				outinfo->idx0offs[track-1] = 0;
-				outinfo->idx1offs[track-1] = 0;
+				outinfo.track[track-1].fname.cpy(path.cstr()).cat(tocfname);
+				outinfo.track[track-1].offset = offset + (UINT32)(index1-index0);
+				outinfo.track[track-1].idx0offs = 0;
+				outinfo.track[track-1].idx1offs = 0;
 
 				switch (mode>>24)
 				{
 					case 0x00:	// 2048 byte data
-						outtoc->tracks[track-1].trktype = CD_TRACK_MODE1;
-						outinfo->swap[track-1] = 0;
+						outtoc.tracks[track-1].trktype = CD_TRACK_MODE1;
+						outinfo.track[track-1].swap = false;
 						break;
 
 					case 0x06:	// 2352 byte mode 2 raw
-						outtoc->tracks[track-1].trktype = CD_TRACK_MODE2_RAW;
-						outinfo->swap[track-1] = 0;
+						outtoc.tracks[track-1].trktype = CD_TRACK_MODE2_RAW;
+						outinfo.track[track-1].swap = false;
 						break;
 
 					case 0x07:	// 2352 byte audio
-						outtoc->tracks[track-1].trktype = CD_TRACK_AUDIO;
-						outinfo->swap[track-1] = 1;
+						outtoc.tracks[track-1].trktype = CD_TRACK_AUDIO;
+						outinfo.track[track-1].swap = true;
 						break;
 
 					default:
@@ -416,18 +415,18 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
 						break;
 				}
 
-				outtoc->tracks[track-1].datasize = size;
+				outtoc.tracks[track-1].datasize = size;
 
-				outtoc->tracks[track-1].subtype = CD_SUB_NONE;
-				outtoc->tracks[track-1].subsize = 0;
+				outtoc.tracks[track-1].subtype = CD_SUB_NONE;
+				outtoc.tracks[track-1].subsize = 0;
 
-				outtoc->tracks[track-1].pregap = (UINT32)(index1-index0)/size;
-				outtoc->tracks[track-1].frames = (UINT32)(index2-index1)/size;
-				outtoc->tracks[track-1].postgap = 0;
-				outtoc->tracks[track-1].pgtype = 0;
-				outtoc->tracks[track-1].pgsub = CD_SUB_NONE;
-				outtoc->tracks[track-1].pgdatasize = 0;
-				outtoc->tracks[track-1].pgsubsize = 0;
+				outtoc.tracks[track-1].pregap = (UINT32)(index1-index0)/size;
+				outtoc.tracks[track-1].frames = (UINT32)(index2-index1)/size;
+				outtoc.tracks[track-1].postgap = 0;
+				outtoc.tracks[track-1].pgtype = 0;
+				outtoc.tracks[track-1].pgsub = CD_SUB_NONE;
+				outtoc.tracks[track-1].pgdatasize = 0;
+				outtoc.tracks[track-1].pgsubsize = 0;
 
 				offset += (UINT32)index2-index1;
 			}
@@ -452,7 +451,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
     chdcd_parse_gdi - parse a Sega GD-ROM rip
 -------------------------------------------------*/
 
-static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
+static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
 	FILE *infile;
 	int i, numtracks;
@@ -469,8 +468,8 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 	}
 
 	/* clear structures */
-	memset(outtoc, 0, sizeof(cdrom_toc));
-	memset(outinfo, 0, sizeof(chdcd_track_input_info));
+	memset(&outtoc, 0, sizeof(outtoc));
+	outinfo.reset();
 
 
 	fgets(linebuffer,511,infile);
@@ -491,16 +490,16 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 
 		trknum=atoi(tok)-1;
 
-		outinfo->swap[trknum]=0;
-		outinfo->offset[trknum]=0;
+		outinfo.track[trknum].swap=false;
+		outinfo.track[trknum].offset=0;
 
-		//outtoc->tracks[trknum].trktype = CD_TRACK_MODE1;
-		outtoc->tracks[trknum].datasize = 0;
-		outtoc->tracks[trknum].subtype = CD_SUB_NONE;
-		outtoc->tracks[trknum].subsize = 0;
+		//outtoc.tracks[trknum].trktype = CD_TRACK_MODE1;
+		outtoc.tracks[trknum].datasize = 0;
+		outtoc.tracks[trknum].subtype = CD_SUB_NONE;
+		outtoc.tracks[trknum].subsize = 0;
 
 		tok=strtok(NULL," ");
-		outtoc->tracks[trknum].physframeofs=atoi(tok);
+		outtoc.tracks[trknum].physframeofs=atoi(tok);
 
 		tok=strtok(NULL," ");
 		trktype=atoi(tok);
@@ -510,19 +509,19 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 
 		if(trktype==4 && trksize==2352)
 		{
-			outtoc->tracks[trknum].trktype=CD_TRACK_MODE1_RAW;
-			outtoc->tracks[trknum].datasize=2352;
+			outtoc.tracks[trknum].trktype=CD_TRACK_MODE1_RAW;
+			outtoc.tracks[trknum].datasize=2352;
 		}
 		if(trktype==4 && trksize==2048)
 		{
-			outtoc->tracks[trknum].trktype=CD_TRACK_MODE1;
-			outtoc->tracks[trknum].datasize=2048;
+			outtoc.tracks[trknum].trktype=CD_TRACK_MODE1;
+			outtoc.tracks[trknum].datasize=2048;
 		}
 		if(trktype==0)
 		{
 			//assert(trksize==2352);
-			outtoc->tracks[trknum].trktype=CD_TRACK_AUDIO;
-			outtoc->tracks[trknum].datasize=2352;
+			outtoc.tracks[trknum].trktype=CD_TRACK_AUDIO;
+			outtoc.tracks[trknum].datasize=2352;
 		}
 
 		astring name;
@@ -539,43 +538,42 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 			} while(tok!=NULL && (strrchr(tok,'"')-tok !=(strlen(tok)-1)));
 			name = name.delchr('"');
 		}
-		strncpy(outinfo->fname[trknum], path.cstr(), 256);
-		strncat(outinfo->fname[trknum], name, 256);
+		outinfo.track[trknum].fname.cpy(path.cstr()).cat(name);
 
-		sz=get_file_size(outinfo->fname[trknum]);
+		sz=get_file_size(outinfo.track[trknum].fname);
 
-		outtoc->tracks[trknum].frames=sz/trksize;
-		outtoc->tracks[trknum].extraframes=0;
+		outtoc.tracks[trknum].frames=sz/trksize;
+		outtoc.tracks[trknum].extraframes=0;
 
 		if(trknum!=0)
 		{
-			int dif=outtoc->tracks[trknum].physframeofs-(outtoc->tracks[trknum-1].frames+outtoc->tracks[trknum-1].physframeofs);
-			outtoc->tracks[trknum-1].frames+=dif;
+			int dif=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
+			outtoc.tracks[trknum-1].frames+=dif;
 		}
 
 /*
         if(trknum!=0)
         {
-            outtoc->tracks[trknum-1].extraframes=outtoc->tracks[trknum].physframeofs-(outtoc->tracks[trknum-1].frames+outtoc->tracks[trknum-1].physframeofs);
+            outtoc.tracks[trknum-1].extraframes=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
         }
 */
-		hunks = (outtoc->tracks[trknum].frames+CD_FRAMES_PER_HUNK - 1) / CD_FRAMES_PER_HUNK;
-		outtoc->tracks[trknum].extraframes = hunks * CD_FRAMES_PER_HUNK - outtoc->tracks[trknum].frames;
+		hunks = (outtoc.tracks[trknum].frames+CD_FRAMES_PER_HUNK - 1) / CD_FRAMES_PER_HUNK;
+		outtoc.tracks[trknum].extraframes = hunks * CD_FRAMES_PER_HUNK - outtoc.tracks[trknum].frames;
 
-		//chdpos+=outtoc->tracks[trknum].frames+outtoc->tracks[trknum].extraframes;
+		//chdpos+=outtoc.tracks[trknum].frames+outtoc.tracks[trknum].extraframes;
 
 	}
 	/*
     for(i=0;i<numtracks;++i)
     {
-        printf("%s %d %d %d\n",outinfo->fname[i],outtoc->tracks[i].frames,outtoc->tracks[i].extraframes,outtoc->tracks[i].physframeofs);
+        printf("%s %d %d %d\n",outinfo.track[i].fname,outtoc.tracks[i].frames,outtoc.tracks[i].extraframes,outtoc.tracks[i].physframeofs);
     }
     */
 	/* close the input TOC */
 	fclose(infile);
 
 	/* store the number of tracks found */
-	outtoc->numtrks = numtracks;
+	outtoc.numtrks = numtracks;
 
 	return CHDERR_NONE;
 }
@@ -584,7 +582,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
     chdcd_parse_toc - parse a CDRWin format CUE file
 -------------------------------------------------*/
 
-chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
+chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
 	FILE *infile;
 	int i, trknum;
@@ -601,8 +599,8 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	}
 
 	/* clear structures */
-	memset(outtoc, 0, sizeof(cdrom_toc));
-	memset(outinfo, 0, sizeof(chdcd_track_input_info));
+	memset(&outtoc, 0, sizeof(outtoc));
+	outinfo.reset();
 
 	trknum = -1;
 	wavoffs = wavlen = 0;
@@ -633,11 +631,11 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 				if (!strcmp(token, "BINARY"))
 				{
-					outinfo->swap[trknum] = 0;
+					outinfo.track[trknum].swap = false;
 				}
 				else if (!strcmp(token, "MOTOROLA"))
 				{
-					outinfo->swap[trknum] = 1;
+					outinfo.track[trknum].swap = true;
 				}
 				else if (!strcmp(token, "WAVE"))
 				{
@@ -672,28 +670,28 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 				if (wavlen != 0)
 				{
-					outtoc->tracks[trknum].trktype = CD_TRACK_AUDIO;
-					outtoc->tracks[trknum].frames = wavlen/2352;
-					outinfo->offset[trknum] = wavoffs;
+					outtoc.tracks[trknum].trktype = CD_TRACK_AUDIO;
+					outtoc.tracks[trknum].frames = wavlen/2352;
+					outinfo.track[trknum].offset = wavoffs;
 					wavoffs = wavlen = 0;
 				}
 				else
 				{
-					outtoc->tracks[trknum].trktype = CD_TRACK_MODE1;
-					outtoc->tracks[trknum].datasize = 0;
-					outinfo->offset[trknum] = 0;
+					outtoc.tracks[trknum].trktype = CD_TRACK_MODE1;
+					outtoc.tracks[trknum].datasize = 0;
+					outinfo.track[trknum].offset = 0;
 				}
-				outtoc->tracks[trknum].subtype = CD_SUB_NONE;
-				outtoc->tracks[trknum].subsize = 0;
-				outtoc->tracks[trknum].pregap = 0;
-				outinfo->idx0offs[trknum] = -1;
-				outinfo->idx1offs[trknum] = 0;
+				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
+				outtoc.tracks[trknum].subsize = 0;
+				outtoc.tracks[trknum].pregap = 0;
+				outinfo.track[trknum].idx0offs = -1;
+				outinfo.track[trknum].idx1offs = 0;
 
-				strncpy(outinfo->fname[trknum], lastfname, 256); // default filename to the last one
-//              printf("trk %d: fname %s offset %d\n", trknum, &outinfo->fname[trknum][0], outinfo->offset[trknum]);
+				outinfo.track[trknum].fname.cpy(lastfname); // default filename to the last one
+//              printf("trk %d: fname %s offset %d\n", trknum, outinfo.track[trknum].fname.cstr(), outinfo.track[trknum].offset);
 
-				cdrom_convert_type_string_to_track_info(token, &outtoc->tracks[trknum]);
-				if (outtoc->tracks[trknum].datasize == 0)
+				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
+				if (outtoc.tracks[trknum].datasize == 0)
 				{
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return CHDERR_FILE_NOT_FOUND;
@@ -702,7 +700,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				/* next (optional) token on the line is the subcode type */
 				TOKENIZE
 
-				cdrom_convert_subtype_string_to_track_info(token, &outtoc->tracks[trknum]);
+				cdrom_convert_subtype_string_to_track_info(token, &outtoc.tracks[trknum]);
 			}
 			else if (!strcmp(token, "INDEX"))	/* only in bin/cue files */
 			{
@@ -718,14 +716,14 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 				if (idx == 0)
 				{
-					outinfo->idx0offs[trknum] = frames;
+					outinfo.track[trknum].idx0offs = frames;
 				}
 				else if (idx == 1)
 				{
-					outinfo->idx1offs[trknum] = frames;
-					if ((outtoc->tracks[trknum].pregap == 0) && (outinfo->idx0offs[trknum] != -1))
+					outinfo.track[trknum].idx1offs = frames;
+					if ((outtoc.tracks[trknum].pregap == 0) && (outinfo.track[trknum].idx0offs != -1))
 					{
-						outtoc->tracks[trknum].pregap = frames - outinfo->idx0offs[trknum];
+						outtoc.tracks[trknum].pregap = frames - outinfo.track[trknum].idx0offs;
 					}
 				}
 			}
@@ -737,7 +735,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				TOKENIZE
 				frames = msf_to_frames( token );
 
-				outtoc->tracks[trknum].pregap = frames;
+				outtoc.tracks[trknum].pregap = frames;
 			}
 			else if (!strcmp(token, "POSTGAP"))
 			{
@@ -747,7 +745,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				TOKENIZE
 				frames = msf_to_frames( token );
 
-				outtoc->tracks[trknum].postgap = frames;
+				outtoc.tracks[trknum].postgap = frames;
 			}
 		}
 	}
@@ -756,67 +754,67 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	fclose(infile);
 
 	/* store the number of tracks found */
-	outtoc->numtrks = trknum + 1;
+	outtoc.numtrks = trknum + 1;
 
 	/* now go over the files again and set the lengths */
-	for (trknum = 0; trknum < outtoc->numtrks; trknum++)
+	for (trknum = 0; trknum < outtoc.numtrks; trknum++)
 	{
 		UINT64 tlen = 0;
 
 		// this is true for cue/bin and cue/iso, and we need it for cue/wav since .WAV is little-endian
-		if (outtoc->tracks[trknum].trktype == CD_TRACK_AUDIO)
+		if (outtoc.tracks[trknum].trktype == CD_TRACK_AUDIO)
 		{
-			outinfo->swap[trknum] = 1;
+			outinfo.track[trknum].swap = true;
 		}
 
 		// don't do this for .WAV tracks, we already have their length and offset filled out
-		if (outinfo->offset[trknum] == 0)
+		if (outinfo.track[trknum].offset == 0)
 		{
 			// is this the last track?
-			if (trknum == (outtoc->numtrks-1))
+			if (trknum == (outtoc.numtrks-1))
 			{
 				/* if we have the same filename as the last track, do it that way */
-				if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum-1][0]))
+				if (outinfo.track[trknum].fname == outinfo.track[trknum-1].fname)
 				{
-					tlen = get_file_size(outinfo->fname[trknum]);
+					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
 					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.cstr());
 						return CHDERR_FILE_NOT_FOUND;
 					}
-					outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize);
-					outtoc->tracks[trknum].frames = (tlen - outinfo->offset[trknum]) / (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+					outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
+					outtoc.tracks[trknum].frames = (tlen - outinfo.track[trknum].offset) / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 				}
 				else	/* data files are different */
 				{
-					tlen = get_file_size(outinfo->fname[trknum]);
+					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
 					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.cstr());
 						return CHDERR_FILE_NOT_FOUND;
 					}
-					tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
-					outtoc->tracks[trknum].frames = tlen;
-					outinfo->offset[trknum] = 0;
+					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+					outtoc.tracks[trknum].frames = tlen;
+					outinfo.track[trknum].offset = 0;
 				}
 			}
 			else
 			{
 				/* if we have the same filename as the next track, do it that way */
-				if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum+1][0]))
+				if (outinfo.track[trknum].fname == outinfo.track[trknum+1].fname)
 				{
-					outtoc->tracks[trknum].frames = outinfo->idx1offs[trknum+1] - outinfo->idx1offs[trknum];
+					outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx1offs - outinfo.track[trknum].idx1offs;
 
 					if (trknum == 0)	// track 0 offset is 0
 					{
-						outinfo->offset[trknum] = 0;
+						outinfo.track[trknum].offset = 0;
 					}
 					else
 					{
-						outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize);
+						outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
 					}
 
-					if (!outtoc->tracks[trknum].frames)
+					if (!outtoc.tracks[trknum].frames)
 					{
 						printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
 						return CHDERR_FILE_NOT_FOUND;
@@ -824,19 +822,19 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				}
 				else	/* data files are different */
 				{
-					tlen = get_file_size(outinfo->fname[trknum]);
+					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
 					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum]);
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname.cstr());
 						return CHDERR_FILE_NOT_FOUND;
 					}
-					tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
-					outtoc->tracks[trknum].frames = tlen;
-					outinfo->offset[trknum] = 0;
+					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+					outtoc.tracks[trknum].frames = tlen;
+					outinfo.track[trknum].offset = 0;
 				}
 			}
 		}
-		printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc->tracks[trknum].frames, outinfo->offset[trknum]);
+		printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc.tracks[trknum].frames, outinfo.track[trknum].offset);
 	}
 
 	return CHDERR_NONE;
@@ -846,7 +844,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
     chdcd_parse_toc - parse a CDRDAO format TOC file
 -------------------------------------------------*/
 
-chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
+chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
 	FILE *infile;
 	int i, trknum;
@@ -885,8 +883,8 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	}
 
 	/* clear structures */
-	memset(outtoc, 0, sizeof(cdrom_toc));
-	memset(outinfo, 0, sizeof(chdcd_track_input_info));
+	memset(&outtoc, 0, sizeof(outtoc));
+	outinfo.reset();
 
 	trknum = -1;
 
@@ -910,8 +908,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				TOKENIZE
 
 				/* keep the filename */
-				strncpy(outinfo->fname[trknum], path.cstr(), 256);
-				strncat(outinfo->fname[trknum], token, 256);
+				outinfo.track[trknum].fname.cpy(path.cstr()).cat(token);
 
 				/* get either the offset or the length */
 				TOKENIZE
@@ -920,11 +917,11 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				{
 					TOKENIZE
 
-					outinfo->swap[trknum] = 1;
+					outinfo.track[trknum].swap = true;
 				}
 				else
 				{
-					outinfo->swap[trknum] = 0;
+					outinfo.track[trknum].swap = false;
 				}
 
 				if (token[0] == '#')
@@ -937,14 +934,14 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 					/* convert the time to an offset */
 					f = msf_to_frames( token );
 
-					f *= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+					f *= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 				}
 				else
 				{
 					f = 0;
 				}
 
-				outinfo->offset[trknum] = f;
+				outinfo.track[trknum].offset = f;
 
 				TOKENIZE
 
@@ -958,19 +955,19 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 					if (isdigit((UINT8)token[0]))
 					{
 						// it was an offset.
-						f *= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+						f *= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 
-						outinfo->offset[trknum] += f;
+						outinfo.track[trknum].offset += f;
 
 						// this is the length.
 						f = msf_to_frames( token );
 					}
 				}
-				else if( trknum == 0 && outinfo->offset[trknum] != 0 )
+				else if( trknum == 0 && outinfo.track[trknum].offset != 0 )
 				{
 					/* the 1st track might have a length with no offset */
-					f = outinfo->offset[trknum] / (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
-					outinfo->offset[trknum] = 0;
+					f = outinfo.track[trknum].offset / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
+					outinfo.track[trknum].offset = 0;
 				}
 				else
 				{
@@ -978,7 +975,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 					f = 0;
 				}
 
-				outtoc->tracks[trknum].frames = f;
+				outtoc.tracks[trknum].frames = f;
 			}
 			else if (!strcmp(token, "TRACK"))
 			{
@@ -987,13 +984,13 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				/* next token on the line is the track type */
 				TOKENIZE
 
-				outtoc->tracks[trknum].trktype = CD_TRACK_MODE1;
-				outtoc->tracks[trknum].datasize = 0;
-				outtoc->tracks[trknum].subtype = CD_SUB_NONE;
-				outtoc->tracks[trknum].subsize = 0;
+				outtoc.tracks[trknum].trktype = CD_TRACK_MODE1;
+				outtoc.tracks[trknum].datasize = 0;
+				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
+				outtoc.tracks[trknum].subsize = 0;
 
-				cdrom_convert_type_string_to_track_info(token, &outtoc->tracks[trknum]);
-				if (outtoc->tracks[trknum].datasize == 0)
+				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
+				if (outtoc.tracks[trknum].datasize == 0)
 				{
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return CHDERR_FILE_NOT_FOUND;
@@ -1002,7 +999,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				/* next (optional) token on the line is the subcode type */
 				TOKENIZE
 
-				cdrom_convert_subtype_string_to_track_info(token, &outtoc->tracks[trknum]);
+				cdrom_convert_subtype_string_to_track_info(token, &outtoc.tracks[trknum]);
 			}
 			else if (!strcmp(token, "START"))
 			{
@@ -1012,7 +1009,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				TOKENIZE
 				frames = msf_to_frames( token );
 
-				outtoc->tracks[trknum].pregap = frames;
+				outtoc.tracks[trknum].pregap = frames;
 			}
 		}
 	}
@@ -1021,7 +1018,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	fclose(infile);
 
 	/* store the number of tracks found */
-	outtoc->numtrks = trknum + 1;
+	outtoc.numtrks = trknum + 1;
 
 	return CHDERR_NONE;
 }
