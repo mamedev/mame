@@ -110,7 +110,7 @@ private:
 //-------------------------------------------------
 
 inline bitstream_in::bitstream_in(const void *src, UINT32 srclength)
-	: m_buffer(NULL),
+	: m_buffer(0),
 	  m_bits(0),
 	  m_read(reinterpret_cast<const UINT8 *>(src)),
 	  m_doffset(0),

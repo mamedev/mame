@@ -948,7 +948,7 @@ UINT32 chd_lzma_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *des
 			throw CHDERR_COMPRESSION_ERROR;
 		
 		// run it
-		UINT32 complen = srclen;
+		SizeT complen = srclen;
 		res = LzmaEnc_MemEncode(encoder, dest, &complen, src, srclen, 0, NULL, &m_allocator, &m_allocator);
 		if (res != SZ_OK)
 			throw CHDERR_COMPRESSION_ERROR;
@@ -1035,8 +1035,8 @@ void chd_lzma_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *
 	LzmaDec_Init(&m_decoder);
 	
 	// decode
-	UINT32 consumedlen = complen;
-	UINT32 decodedlen = destlen;
+	SizeT consumedlen = complen;
+	SizeT decodedlen = destlen;
 	ELzmaStatus status;
 	SRes res = LzmaDec_DecodeToBuf(&m_decoder, dest, &decodedlen, src, &consumedlen, LZMA_FINISH_END, &status);
 	if ((res != SZ_OK && res != LZMA_STATUS_MAYBE_FINISHED_WITHOUT_MARK) || consumedlen != complen || decodedlen != destlen)
