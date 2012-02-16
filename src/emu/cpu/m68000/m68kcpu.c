@@ -741,15 +741,16 @@ static CPU_TRANSLATE( m68k )
 		{
 			// FIXME: mmu_tmp_sr will be overwritten in pmmu_translate_addr_with_fc
 			UINT16 mmu_tmp_sr = m68k->mmu_tmp_sr;
+			int mode = m68k->s_flag ? FUNCTION_CODE_SUPERVISOR_PROGRAM : FUNCTION_CODE_USER_PROGRAM;
 //          UINT32 va=*address;
 
 			if (CPU_TYPE_IS_040_PLUS(m68k->cpu_type))
 			{
-				*address = pmmu_translate_addr_with_fc_040(m68k, *address, FUNCTION_CODE_SUPERVISOR_PROGRAM, 1);
+				*address = pmmu_translate_addr_with_fc_040(m68k, *address, mode, 1);
 			}
 			else
 			{
-				*address = pmmu_translate_addr_with_fc(m68k, *address, FUNCTION_CODE_SUPERVISOR_PROGRAM, 1);
+				*address = pmmu_translate_addr_with_fc(m68k, *address, mode, 1);
 			}
 
 			if ((m68k->mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {

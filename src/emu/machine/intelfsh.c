@@ -47,6 +47,7 @@ enum
 // device type definition
 const device_type INTEL_28F016S5 = &device_creator<intel_28f016s5_device>;
 const device_type SHARP_LH28F016S = &device_creator<sharp_lh28f016s_device>;
+const device_type AMD_29F040 = &device_creator<amd_29f040_device>;
 const device_type AMD_29F080 = &device_creator<amd_29f080_device>;
 const device_type FUJITSU_29F016A = &device_creator<fujitsu_29f016a_device>;
 const device_type FUJITSU_29DL16X = &device_creator<fujitsu_29dl16x_device>;
@@ -66,6 +67,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( memory_map8_1Mb, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x01ffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( memory_map8_4Mb, AS_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x07ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( memory_map8_8Mb, AS_PROGRAM, 8 )
@@ -127,6 +132,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = 0x89;
 		m_device_id = 0xaa;
 		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
+		break;
+	case FLASH_AMD_29F040:
+		m_bits = 8;
+		m_size = 0x80000;
+		m_maker_id = 0x01;
+		m_device_id = 0xa4;
+		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
 		break;
 	case FLASH_AMD_29F080:
 		m_bits = 8;
@@ -229,6 +241,9 @@ fujitsu_29dl16x_device::fujitsu_29dl16x_device(const machine_config &mconfig, co
 
 sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SHARP_LH28F016S, "Sharp LH28F016S Flash", tag, owner, clock, FLASH_SHARP_LH28F016S) { }
+
+amd_29f040_device::amd_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, AMD_29F040, "AMD 29F040 Flash", tag, owner, clock, FLASH_AMD_29F040) { }
 
 amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F080 Flash", tag, owner, clock, FLASH_AMD_29F080) { }
