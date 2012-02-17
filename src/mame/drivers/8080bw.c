@@ -1624,7 +1624,7 @@ static INPUT_PORTS_START( yosakdon )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	//PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in1_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in1_control_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -1644,9 +1644,6 @@ static INPUT_PORTS_START( yosakdon )
 
 	/* Dummy controls port, P1 */
 	INVADERS_CONTROL_PORT_P1
-
-	/* Dummy controls port, P2 */
-	INVADERS_CONTROL_PORT_P2
 
 	/* Dummy port for cocktail mode (not used) */
 	PORT_START(CABINET_PORT_TAG)
