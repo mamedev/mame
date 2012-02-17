@@ -44,6 +44,7 @@
 #include "audit.h"
 #include "info.h"
 #include "unzip.h"
+#include "un7z.h"
 #include "validity.h"
 #include "sound/samples.h"
 #include "clifront.h"
@@ -1438,6 +1439,54 @@ void media_identifier::identify(const char *filename)
 	}
 
 	// if that failed, and the filename ends with .zip, identify as a ZIP file
+	if (core_filename_ends_with(filename, ".7z"))
+	{
+		// first attempt to examine it as a valid _7Z file
+		_7z_file *_7z = NULL;
+		_7z_error _7zerr = _7z_file_open(filename, &_7z);
+		if (_7zerr == _7ZERR_NONE && _7z != NULL)
+		{
+			// loop over entries in the .7z, skipping empty files and directories
+			for (int i = 0; i < _7z->db.db.NumFiles; i++)
+			{
+				const CSzFileItem *f = _7z->db.db.Files + i;
+				_7z->curr_file_idx = i;
+				int namelen = SzArEx_GetFileNameUtf16(&_7z->db, i, NULL);
+				UINT16* temp = (UINT16 *)malloc(namelen * sizeof(UINT16));
+				void* temp2 = malloc((namelen+1) * sizeof(UINT8));
+				UINT8* temp3 = (UINT8*)temp2;
+				memset(temp3, 0x00, namelen);
+				SzArEx_GetFileNameUtf16(&_7z->db, i, temp);
+				// crude, need real UTF16->UTF8 conversion ideally
+				for (int j=0;j<namelen;j++)
+				{
+					temp3[j] = (UINT8)temp[j];				
+				}
+						
+				if (!(f->IsDir) && (f->Size != 0))
+				{
+					UINT8 *data = global_alloc_array(UINT8, f->Size);
+					if (data != NULL)
+					{
+						// decompress data into RAM and identify it
+						_7zerr = _7z_file_decompress(_7z, data, f->Size);
+						if (_7zerr == _7ZERR_NONE)
+							identify_data((const char*)temp2, data, f->Size);
+						global_free(data);
+					}
+				}
+
+				free(temp);
+				free(temp2);
+			}
+
+			// close up
+			_7z_file_close(_7z);
+		}
+
+		// clear out any cached files
+		_7z_file_cache_clear();
+	}
 	else if (core_filename_ends_with(filename, ".zip"))
 	{
 		// first attempt to examine it as a valid ZIP file
