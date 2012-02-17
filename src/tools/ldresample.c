@@ -82,9 +82,9 @@ struct _movie_info
 	int			samplerate;
 	int			channels;
 	int			interlaced;
-	bitmap_yuy16 *bitmap;
-	INT16 *		lsound;
-	INT16 *		rsound;
+	bitmap_yuy16 bitmap;
+	dynamic_array<INT16> lsound;
+	dynamic_array<INT16> rsound;
 	UINT32		samples;
 };
 
@@ -144,99 +144,52 @@ INLINE UINT32 sample_number_to_field(const movie_info *info, UINT32 samplenum, U
 ***************************************************************************/
 
 /*-------------------------------------------------
-    chd_allocate_buffers - allocate buffers for
-    CHD I/O
--------------------------------------------------*/
-
-static int chd_allocate_buffers(movie_info *info)
-{
-	/* allocate a bitmap */
-	info->bitmap = new(std::nothrow) bitmap_yuy16(info->width, info->height);
-	if (info->bitmap == NULL)
-	{
-		fprintf(stderr, "Out of memory creating %dx%d bitmap\n", info->width, info->height);
-		return FALSE;
-	}
-
-	/* allocate sound buffers */
-	info->lsound = (INT16 *)malloc(info->samplerate * sizeof(*info->lsound));
-	info->rsound = (INT16 *)malloc(info->samplerate * sizeof(*info->rsound));
-	if (info->lsound == NULL || info->rsound == NULL)
-	{
-		fprintf(stderr, "Out of memory allocating sound buffers of %d bytes\n", (INT32)(info->samplerate * sizeof(*info->rsound)));
-		return FALSE;
-	}
-	return TRUE;
-}
-
-
-/*-------------------------------------------------
-    chd_free_buffers - release buffers for
-    CHD I/O
--------------------------------------------------*/
-
-static void chd_free_buffers(movie_info *info)
-{
-	delete info->bitmap;
-	if (info->lsound != NULL)
-		free(info->lsound);
-	if (info->rsound != NULL)
-		free(info->rsound);
-}
-
-
-/*-------------------------------------------------
     open_chd - open a CHD file and return
     information about it
 -------------------------------------------------*/
 
-static chd_file *open_chd(const char *filename, movie_info *info)
+static chd_error open_chd(chd_file &file, const char *filename, movie_info &info)
 {
-	int fps, fpsfrac, width, height, interlaced, channels, rate;
-	char metadata[256];
-	chd_error chderr;
-	chd_file *chd;
-
 	/* open the file */
-	chderr = chd_open(filename, CHD_OPEN_READ, NULL, &chd);
+	chd_error chderr = file.open(filename);
 	if (chderr != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error opening CHD file: %s\n", chd_error_string(chderr));
-		return NULL;
+		return chderr;
 	}
 
 	/* get the metadata */
-	chderr = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL, NULL);
+	astring metadata;
+	chderr = chd.read_metadata(chd, AV_METADATA_TAG, 0, metadata);
 	if (chderr != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_error_string(chderr));
-		chd_close(chd);
-		return NULL;
+		return chderr;
 	}
 
 	/* extract the info */
+	int fps, fpsfrac, width, height, interlaced, channels, rate;
 	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 	{
 		fprintf(stderr, "Improperly formatted metadata\n");
-		chd_close(chd);
-		return NULL;
+		return CHDERR_INVALID_DATA;
 	}
 
 	/* extract movie info */
-	info->iframerate = fps * 1000000 + fpsfrac;
-	info->framerate = info->iframerate / 1000000.0;
-	info->numfields = chd_get_header(chd)->totalhunks;
-	info->width = width;
-	info->height = height;
-	info->interlaced = interlaced;
-	info->samplerate = rate;
-	info->channels = channels;
+	info.iframerate = fps * 1000000 + fpsfrac;
+	info.framerate = info.iframerate / 1000000.0;
+	info.numfields = file->hunk_count();
+	info.width = width;
+	info.height = height;
+	info.interlaced = interlaced;
+	info.samplerate = rate;
+	info.channels = channels;
 
 	/* allocate buffers */
-	if (!chd_allocate_buffers(info))
-		return NULL;
-
-	return chd;
+	info.bitmap.resize(info.width, info.height);
+	info.lsound.resize(info.samplerate);
+	info.rsound.resize(info.samplerate);
+	return CHDERR_NONE;
 }
 
 
@@ -244,46 +197,34 @@ static chd_file *open_chd(const char *filename, movie_info *info)
     create_chd - create a new CHD file
 -------------------------------------------------*/
 
-static chd_file *create_chd(const char *filename, chd_file *source, const movie_info *info)
+static chd_error create_chd(chd_compressor &file, const char *filename, chd_file &source, const movie_info &info)
 {
-	const chd_header *srcheader = chd_get_header(source);
-	chd_error chderr;
-	chd_file *chd;
-
 	/* create the file */
-	chderr = chd_create(filename, srcheader->logicalbytes, srcheader->hunkbytes, CHDCOMPRESSION_AV, NULL);
+	chd_codec_type compression = { CHD_CODEC_AVHUFF };
+	chd_error chderr = file.create(filename, source.logical_bytes(), source.hunk_bytes(), source.unit_bytes(), compression);
 	if (chderr != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error creating new CHD file: %s\n", chd_error_string(chderr));
-		return NULL;
-	}
-
-	/* open the file */
-	chderr = chd_open(filename, CHD_OPEN_READWRITE, NULL, &chd);
-	if (chderr != CHDERR_NONE)
-	{
-		fprintf(stderr, "Error opening new CHD file: %s\n", chd_error_string(chderr));
-		return NULL;
+		return chderr;
 	}
 
 	/* clone the metadata */
-	chderr = chd_clone_metadata(source, chd);
+	chderr = file.clone_all_metadata(source);
 	if (chderr != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error cloning metadata: %s\n", chd_error_string(chderr));
-		chd_close(chd);
-		return NULL;
+		return chderr;
 	}
 
 	/* begin compressing */
-	chderr = chd_compress_begin(chd);
+	chderr = file.compress_begin();
 	if (chderr != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error beginning compression: %s\n", chd_error_string(chderr));
-		return NULL;
+		return chderr;
 	}
 
-	return chd;
+	return CHDERR_NONE;
 }
 
 
@@ -549,7 +490,6 @@ int main(int argc, char *argv[])
 	const char *srcfilename;
 	const char *dstfilename;
 	double offset, slope;
-	chd_file *srcfile;
 	chd_file *dstfile;
 
 	/* verify arguments */
@@ -570,8 +510,9 @@ int main(int argc, char *argv[])
 	}
 
 	/* open the source file */
-	srcfile = open_chd(srcfilename, &info);
-	if (srcfile == NULL)
+	chd_file srcfile;
+	chd_error err = open_chd(srcfile, srcfilename, info);
+	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Unable to open file '%s'\n", srcfilename);
 		return 1;
@@ -604,7 +545,7 @@ int main(int argc, char *argv[])
 		UINT32 fieldnum;
 
 		/* open the destination file */
-		dstfile = create_chd(dstfilename, srcfile, &info);
+		err = create_chd(dstfile, dstfilename, srcfile, info);
 		if (dstfile == NULL)
 		{
 			fprintf(stderr, "Unable to create file '%s'\n", dstfilename);

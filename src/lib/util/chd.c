@@ -910,6 +910,20 @@ chd_error chd_file::write_hunk(UINT32 hunknum, const void *buffer)
 		// if not, allocate one now
 		if (rawentry == 0)
 		{
+			// first make sure we need to allocate it
+			bool all_zeros = true;
+			const UINT32 *scan = reinterpret_cast<const UINT32 *>(buffer);
+			for (UINT32 index = 0; index < m_hunkbytes / 4; index++)
+				if (scan[index] != 0)
+				{
+					all_zeros = false;
+					break;
+				}
+			
+			// if it's all zeros, do nothing more
+			if (all_zeros)
+				return CHDERR_NONE;
+		
 			// append new data to the end of the file, aligning the first chunk
 			rawentry = file_append(buffer, m_hunkbytes, m_hunkbytes) / m_hunkbytes;
 			
@@ -2451,25 +2465,16 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 		// if we're uncompressed, use regular writes
 		else if (!compressed())
 		{
-			bool skip = true;
-			
-			// see if it's all 0
-			for (UINT32 offs = 0; offs < m_hunkbytes && skip; offs++)
-				if (item.m_data[offs] != 0)
-					skip = false;
-			
-			// see if it's in the parent map
-			if (!skip && m_parent != NULL && m_parent_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1) != hashmap::NOT_FOUND)
-				skip = true;
-			
-			// write the block
-			if (!skip)
-			{
-				chd_error err = write_hunk(item.m_hunknum, item.m_data);
-				if (err != CHDERR_NONE)
-					return err;
+			chd_error err = write_hunk(item.m_hunknum, item.m_data);
+			if (err != CHDERR_NONE)
+				return err;
+	
+			// writes of all-0 data don't actually take space, so see if we count this		
+			chd_codec_type codec = CHD_CODEC_NONE;
+			UINT32 complen;
+			hunk_info(item.m_hunknum, codec, complen);
+			if (codec == CHD_CODEC_NONE)
 				m_total_out += m_hunkbytes;
-			}
 		}
 		
 		// for compressing, process the result
