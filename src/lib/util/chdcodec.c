@@ -1248,6 +1248,10 @@ chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, bool lossy)
 	: chd_compressor(chd, lossy),
 	  m_buffer(chd.hunk_bytes())
 {
+	// make sure the CHD's hunk size is an even multiple of the frame size
+	if (chd.hunk_bytes() % CD_FRAME_SIZE != 0)
+		throw CHDERR_CODEC_ERROR;
+
 	// determine whether we want native or swapped samples
 	UINT16 native_endian = 0;
 	*reinterpret_cast<UINT8 *>(&native_endian) = 1;
@@ -1342,6 +1346,10 @@ chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, bool lossy)
 	: chd_decompressor(chd, lossy),
 	  m_buffer(chd.hunk_bytes())
 {
+	// make sure the CHD's hunk size is an even multiple of the frame size
+	if (chd.hunk_bytes() % CD_FRAME_SIZE != 0)
+		throw CHDERR_CODEC_ERROR;
+
 	// determine whether we want native or swapped samples
 	UINT16 native_endian = 0;
 	*reinterpret_cast<UINT8 *>(&native_endian) = 1;

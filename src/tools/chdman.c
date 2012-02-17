@@ -980,6 +980,27 @@ static void parse_input_start_end(const parameters_t &params, UINT64 logical_siz
 
 
 //-------------------------------------------------
+//  check_existing_output_file - see if an output
+//  file already exists, and error if it does,
+//  unless --force is specified
+//-------------------------------------------------
+
+static void check_existing_output_file(const parameters_t &params, const char *filename)
+{
+	if (params.find(OPTION_OUTPUT_FORCE) == NULL)
+	{
+		core_file *file;
+		file_error filerr = core_fopen(filename, OPEN_FLAG_READ, &file);
+		if (filerr == FILERR_NONE)
+		{
+			core_fclose(file);
+			report_error(1, "Error: file already exists (%s)\nUse --force (or -f) to force overwriting", filename);
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  parse_output_chd_parameters - parse the 
 //  standard set of output CHD parameters
 //-------------------------------------------------
@@ -997,16 +1018,8 @@ static astring *parse_output_chd_parameters(const parameters_t &params, chd_file
 
 	// process output file
 	astring *output_chd_str = params.find(OPTION_OUTPUT);
-	if (output_chd_str != NULL && params.find(OPTION_OUTPUT_FORCE) == NULL)
-	{
-		core_file *file;
-		file_error filerr = core_fopen(*output_chd_str, OPEN_FLAG_READ, &file);
-		if (filerr == FILERR_NONE)
-		{
-			core_fclose(file);
-			report_error(1, "Error: file already exists (%s)\nUse --force (or -f) to force overwriting", output_chd_str->cstr());
-		}
-	}
+	if (output_chd_str != NULL)
+		check_existing_output_file(params, *output_chd_str);
 	return output_chd_str;
 }
 
@@ -1472,65 +1485,65 @@ static void do_verify(parameters_t &params)
 
 static void do_create_raw(parameters_t &params)
 {
+	// process input file
+	core_file *input_file = NULL;
+	astring *input_file_str = params.find(OPTION_INPUT);
+	if (input_file_str != NULL)
+	{
+		file_error filerr = core_fopen(*input_file_str, OPEN_FLAG_READ, &input_file);
+		if (filerr != FILERR_NONE)
+			report_error(1, "Unable to open file (%s)", input_file_str->cstr());
+	}
+
+	// process output CHD
+	chd_file output_parent;
+	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+	
+	// process hunk size
+	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : 0;
+	parse_hunk_size(params, 1, hunk_size);
+
+	// process unit size
+	UINT32 unit_size = output_parent.opened() ? output_parent.unit_bytes() : 0;
+	astring *unit_size_str = params.find(OPTION_UNIT_SIZE);
+	if (unit_size_str != NULL)
+	{
+		unit_size = parse_number(*unit_size_str);
+		if (hunk_size % unit_size != 0)
+			report_error(1, "Unit size is not an even divisor of the hunk size");
+	}
+
+	// process input start/end (needs to know hunk_size)
+	UINT64 input_start;
+	UINT64 input_end;
+	parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
+	
+	// process compression
+	chd_codec_type compression[4];
+	memcpy(compression, s_default_raw_compression, sizeof(compression));
+	parse_compression(params, compression);
+	
+	// process numprocessors
+	parse_numprocessors(params);
+
+	// print some info
+	astring tempstr;
+	printf("Output CHD:   %s\n", output_chd_str->cstr());
+	if (output_parent.opened())
+		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
+	printf("Input file:   %s\n", input_file_str->cstr());
+	if (input_start != 0 || input_end != core_fsize(input_file))
+	{
+		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
+		printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+	}
+	printf("Compression:  %s\n", compression_string(tempstr, compression));
+	printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
+	printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
+
 	// catch errors so we can close & delete the output file
 	try
 	{
-		// process input file
-		core_file *input_file = NULL;
-		astring *input_file_str = params.find(OPTION_INPUT);
-		if (input_file_str != NULL)
-		{
-			file_error filerr = core_fopen(*input_file_str, OPEN_FLAG_READ, &input_file);
-			if (filerr != FILERR_NONE)
-				report_error(1, "Unable to open file (%s)", input_file_str->cstr());
-		}
-
-		// process output CHD
-		chd_file output_parent;
-		astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
-		
-		// process hunk size
-		UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : 0;
-		parse_hunk_size(params, 1, hunk_size);
-
-		// process unit size
-		UINT32 unit_size = output_parent.opened() ? output_parent.unit_bytes() : 0;
-		astring *unit_size_str = params.find(OPTION_UNIT_SIZE);
-		if (unit_size_str != NULL)
-		{
-			unit_size = parse_number(*unit_size_str);
-			if (hunk_size % unit_size != 0)
-				report_error(1, "Unit size is not an even divisor of the hunk size");
-		}
-
-		// process input start/end (needs to know hunk_size)
-		UINT64 input_start;
-		UINT64 input_end;
-		parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
-		
-		// process compression
-		chd_codec_type compression[4];
-		memcpy(compression, s_default_raw_compression, sizeof(compression));
-		parse_compression(params, compression);
-		
-		// process numprocessors
-		parse_numprocessors(params);
-
-		// print some info
-		astring tempstr;
-		printf("Output CHD:   %s\n", output_chd_str->cstr());
-		if (output_parent.opened())
-			printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
-		printf("Input file:   %s\n", input_file_str->cstr());
-		if (input_start != 0 || input_end != core_fsize(input_file))
-		{
-			printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-			printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
-		}
-		printf("Compression:  %s\n", compression_string(tempstr, compression));
-		printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
-		printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
-
 		// create the new CHD
 		chd_rawfile_compressor chd(input_file, input_start, input_end);
 		chd_error err;
@@ -1566,128 +1579,128 @@ static void do_create_raw(parameters_t &params)
 
 static void do_create_hd(parameters_t &params)
 {
+	// process input file
+	core_file *input_file = NULL;
+	astring *input_file_str = params.find(OPTION_INPUT);
+	if (input_file_str != NULL)
+	{
+		file_error filerr = core_fopen(*input_file_str, OPEN_FLAG_READ, &input_file);
+		if (filerr != FILERR_NONE)
+			report_error(1, "Unable to open file (%s)", input_file_str->cstr());
+	}
+	
+	// process output CHD
+	chd_file output_parent;
+	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+	
+	// process sectorsize
+	UINT32 sector_size = output_parent.opened() ? output_parent.unit_bytes() : IDE_SECTOR_SIZE;
+	astring *sectorsize_str = params.find(OPTION_SECTOR_SIZE);
+	if (sectorsize_str != NULL)
+	{
+		if (output_parent.opened())
+			report_error(1, "Sector size does not apply when creating a diff from the parent");
+		sector_size = parse_number(*sectorsize_str);
+	}
+	
+	// process hunk size (needs to know sector_size)
+	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : MAX((4096 / sector_size) * sector_size, sector_size);
+	parse_hunk_size(params, sector_size, hunk_size);
+	
+	// process input start/end (needs to know hunk_size)
+	UINT64 input_start;
+	UINT64 input_end;
+	parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
+	
+	// process compression
+	chd_codec_type compression[4];
+	memcpy(compression, s_default_hd_compression, sizeof(compression));
+	if (input_file == NULL)
+		compression[0] = compression[1] = compression[2] = compression[3] = CHD_CODEC_NONE;
+	parse_compression(params, compression);
+	if (input_file == NULL && compression[0] != CHD_CODEC_NONE)
+		report_error(1, "Blank hard disks must be uncompressed");
+
+	// process numprocessors
+	parse_numprocessors(params);
+
+	// process chs
+	UINT32 cylinders = 0;
+	UINT32 heads = 0;
+	UINT32 sectors = 0;
+	astring *chs_str = params.find(OPTION_CHS);
+	if (chs_str != NULL)
+	{
+		if (output_parent.opened())
+			report_error(1, "CHS does not apply when creating a diff from the parent");
+		if (sscanf(*chs_str, "%d,%d,%d", &cylinders, &heads, &sectors) != 3)
+			report_error(1, "Invalid CHS string; must be of the form <cylinders>,<heads>,<sectors>");
+	}
+
+	// process ident
+	dynamic_buffer identdata;
+	if (output_parent.opened())
+		output_parent.read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, identdata);
+	astring *ident_str = params.find(OPTION_IDENT);
+	if (ident_str != NULL)
+	{
+		// load the file
+		file_error filerr = core_fload(*ident_str, identdata);
+		if (filerr != FILERR_NONE)
+			report_error(1, "Error reading ident file (%s)", ident_str->cstr());
+
+		// must be at least 14 bytes; extract CHS data from there
+		if (identdata.count() < 14)
+			report_error(1, "Ident file '%s' is invalid (too short)", ident_str->cstr());
+		cylinders = (identdata[3] << 8) | identdata[2];
+		heads = (identdata[7] << 8) | identdata[6];
+		sectors = (identdata[13] << 8) | identdata[12];
+	}
+	
+	// extract geometry from the parent if we have one
+	if (output_parent.opened() && cylinders == 0)
+	{
+		astring metadata;
+		if (output_parent.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) != CHDERR_NONE)
+			report_error(1, "Unable to find hard disk metadata in parent CHD");
+		if (sscanf(metadata, HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sector_size) != 4)
+			report_error(1, "Error parsing hard disk metadata in parent CHD");
+	}
+	
+	// if no CHS values, try to guess them
+	if (cylinders == 0)
+	{
+		if (input_file == NULL && input_end - input_start == 0)
+			report_error(1, "Blank hard drives must specify either a length or a set of CHS values");
+		guess_chs(input_file_str, input_end - input_start, sector_size, cylinders, heads, sectors, sector_size);
+	}
+	UINT32 totalsectors = cylinders * heads * sectors;
+	
+	// print some info
+	astring tempstr;
+	printf("Output CHD:   %s\n", output_chd_str->cstr());
+	if (output_parent.opened())
+		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
+	if (input_file != NULL)
+	{
+		printf("Input file:   %s\n", input_file_str->cstr());
+		if (input_start != 0 || input_end != core_fsize(input_file))
+		{
+			printf("Input start:  %s\n", big_int_string(tempstr, input_start));
+			printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+		}
+	}
+	printf("Compression:  %s\n", compression_string(tempstr, compression));
+	printf("Cylinders:    %d\n", cylinders);
+	printf("Heads:        %d\n", heads);
+	printf("Sectors:      %d\n", sectors);
+	printf("Bytes/sector: %d\n", sector_size);
+	printf("Sectors/hunk: %d\n", hunk_size / sector_size);
+	printf("Logical size: %s\n", big_int_string(tempstr, UINT64(totalsectors) * UINT64(sector_size)));
+
 	// catch errors so we can close & delete the output file
 	try
 	{
-		// process input file
-		core_file *input_file = NULL;
-		astring *input_file_str = params.find(OPTION_INPUT);
-		if (input_file_str != NULL)
-		{
-			file_error filerr = core_fopen(*input_file_str, OPEN_FLAG_READ, &input_file);
-			if (filerr != FILERR_NONE)
-				report_error(1, "Unable to open file (%s)", input_file_str->cstr());
-		}
-		
-		// process output CHD
-		chd_file output_parent;
-		astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
-		
-		// process sectorsize
-		UINT32 sector_size = output_parent.opened() ? output_parent.unit_bytes() : IDE_SECTOR_SIZE;
-		astring *sectorsize_str = params.find(OPTION_SECTOR_SIZE);
-		if (sectorsize_str != NULL)
-		{
-			if (output_parent.opened())
-				report_error(1, "Sector size does not apply when creating a diff from the parent");
-			sector_size = parse_number(*sectorsize_str);
-		}
-		
-		// process hunk size (needs to know sector_size)
-		UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : MAX((4096 / sector_size) * sector_size, sector_size);
-		parse_hunk_size(params, sector_size, hunk_size);
-		
-		// process input start/end (needs to know hunk_size)
-		UINT64 input_start;
-		UINT64 input_end;
-		parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
-		
-		// process compression
-		chd_codec_type compression[4];
-		memcpy(compression, s_default_hd_compression, sizeof(compression));
-		if (input_file == NULL)
-			compression[0] = compression[1] = compression[2] = compression[3] = CHD_CODEC_NONE;
-		parse_compression(params, compression);
-		if (input_file == NULL && compression[0] != CHD_CODEC_NONE)
-			report_error(1, "Blank hard disks must be uncompressed");
-
-		// process numprocessors
-		parse_numprocessors(params);
-
-		// process chs
-		UINT32 cylinders = 0;
-		UINT32 heads = 0;
-		UINT32 sectors = 0;
-		astring *chs_str = params.find(OPTION_CHS);
-		if (chs_str != NULL)
-		{
-			if (output_parent.opened())
-				report_error(1, "CHS does not apply when creating a diff from the parent");
-			if (sscanf(*chs_str, "%d,%d,%d", &cylinders, &heads, &sectors) != 3)
-				report_error(1, "Invalid CHS string; must be of the form <cylinders>,<heads>,<sectors>");
-		}
-
-		// process ident
-		dynamic_buffer identdata;
-		if (output_parent.opened())
-			output_parent.read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, identdata);
-		astring *ident_str = params.find(OPTION_IDENT);
-		if (ident_str != NULL)
-		{
-			// load the file
-			file_error filerr = core_fload(*ident_str, identdata);
-			if (filerr != FILERR_NONE)
-				report_error(1, "Error reading ident file (%s)", ident_str->cstr());
-
-			// must be at least 14 bytes; extract CHS data from there
-			if (identdata.count() < 14)
-				report_error(1, "Ident file '%s' is invalid (too short)", ident_str->cstr());
-			cylinders = (identdata[3] << 8) | identdata[2];
-			heads = (identdata[7] << 8) | identdata[6];
-			sectors = (identdata[13] << 8) | identdata[12];
-		}
-		
-		// extract geometry from the parent if we have one
-		if (output_parent.opened() && cylinders == 0)
-		{
-			astring metadata;
-			if (output_parent.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) != CHDERR_NONE)
-				report_error(1, "Unable to find hard disk metadata in parent CHD");
-			if (sscanf(metadata, HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sector_size) != 4)
-				report_error(1, "Error parsing hard disk metadata in parent CHD");
-		}
-		
-		// if no CHS values, try to guess them
-		if (cylinders == 0)
-		{
-			if (input_file == NULL && input_end - input_start == 0)
-				report_error(1, "Blank hard drives must specify either a length or a set of CHS values");
-			guess_chs(input_file_str, input_end - input_start, sector_size, cylinders, heads, sectors, sector_size);
-		}
-		UINT32 totalsectors = cylinders * heads * sectors;
-		
-		// print some info
-		astring tempstr;
-		printf("Output CHD:   %s\n", output_chd_str->cstr());
-		if (output_parent.opened())
-			printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
-		if (input_file != NULL)
-		{
-			printf("Input file:   %s\n", input_file_str->cstr());
-			if (input_start != 0 || input_end != core_fsize(input_file))
-			{
-				printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-				printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
-			}
-		}
-		printf("Compression:  %s\n", compression_string(tempstr, compression));
-		printf("Cylinders:    %d\n", cylinders);
-		printf("Heads:        %d\n", heads);
-		printf("Sectors:      %d\n", sectors);
-		printf("Bytes/sector: %d\n", sector_size);
-		printf("Sectors/hunk: %d\n", hunk_size / sector_size);
-		printf("Logical size: %s\n", big_int_string(tempstr, UINT64(totalsectors) * UINT64(sector_size)));
-
 		// create the new hard drive
 		chd_rawfile_compressor chd(input_file, input_start, input_end);
 		chd_error err;
@@ -1735,59 +1748,59 @@ static void do_create_hd(parameters_t &params)
 
 static void do_create_cd(parameters_t &params)
 {
+	// process input file
+	chdcd_track_input_info track_info;
+	cdrom_toc toc = { 0 };
+	astring *input_file_str = params.find(OPTION_INPUT);
+	if (input_file_str != NULL)
+	{
+		chd_error err = chdcd_parse_toc(*input_file_str, toc, track_info);
+		if (err != CHDERR_NONE)
+			report_error(1, "Error parsing input file (%s: %s\n", input_file_str->cstr(), chd_file::error_string(err));
+	}
+	
+	// process output CHD
+	chd_file output_parent;
+	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+
+	// process hunk size
+	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : CD_FRAMES_PER_HUNK * CD_FRAME_SIZE;
+	parse_hunk_size(params, CD_FRAME_SIZE, hunk_size);
+	
+	// process compression
+	chd_codec_type compression[4];
+	memcpy(compression, s_default_cd_compression, sizeof(compression));
+	parse_compression(params, compression);
+
+	// process numprocessors
+	parse_numprocessors(params);
+
+	// pad each track to a 4-frame boundry. cdrom.c will deal with this on the read side
+	UINT32 origtotalsectors = 0;
+	UINT32 totalsectors = 0;
+	for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
+	{
+		cdrom_track_info &trackinfo = toc.tracks[tracknum];
+		int padded = (trackinfo.frames + CD_TRACK_PADDING - 1) / CD_TRACK_PADDING;
+		trackinfo.extraframes = padded * CD_TRACK_PADDING - trackinfo.frames;
+		origtotalsectors += trackinfo.frames;
+		totalsectors += trackinfo.frames + trackinfo.extraframes;
+	}
+
+	// print some info
+	astring tempstr;
+	printf("Output CHD:   %s\n", output_chd_str->cstr());
+	if (output_parent.opened())
+		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
+	printf("Input file:   %s\n", input_file_str->cstr());
+	printf("Input tracks: %d\n", toc.numtrks);
+	printf("Input length: %s\n", msf_string_from_frames(tempstr, origtotalsectors));
+	printf("Compression:  %s\n", compression_string(tempstr, compression));
+	printf("Logical size: %s\n", big_int_string(tempstr, UINT64(totalsectors) * CD_FRAME_SIZE));
+
 	// catch errors so we can close & delete the output file
 	try
 	{
-		// process input file
-		chdcd_track_input_info track_info;
-		cdrom_toc toc = { 0 };
-		astring *input_file_str = params.find(OPTION_INPUT);
-		if (input_file_str != NULL)
-		{
-			chd_error err = chdcd_parse_toc(*input_file_str, toc, track_info);
-			if (err != CHDERR_NONE)
-				report_error(1, "Error parsing input file (%s: %s\n", input_file_str->cstr(), chd_file::error_string(err));
-		}
-		
-		// process output CHD
-		chd_file output_parent;
-		astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
-
-		// process hunk size
-		UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : CD_FRAMES_PER_HUNK * CD_FRAME_SIZE;
-		parse_hunk_size(params, CD_FRAME_SIZE, hunk_size);
-		
-		// process compression
-		chd_codec_type compression[4];
-		memcpy(compression, s_default_cd_compression, sizeof(compression));
-		parse_compression(params, compression);
-
-		// process numprocessors
-		parse_numprocessors(params);
-
-		// pad each track to a 4-frame boundry. cdrom.c will deal with this on the read side
-		UINT32 origtotalsectors = 0;
-		UINT32 totalsectors = 0;
-		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
-		{
-			cdrom_track_info &trackinfo = toc.tracks[tracknum];
-			int padded = (trackinfo.frames + CD_TRACK_PADDING - 1) / CD_TRACK_PADDING;
-			trackinfo.extraframes = padded * CD_TRACK_PADDING - trackinfo.frames;
-			origtotalsectors += trackinfo.frames;
-			totalsectors += trackinfo.frames + trackinfo.extraframes;
-		}
-
-		// print some info
-		astring tempstr;
-		printf("Output CHD:   %s\n", output_chd_str->cstr());
-		if (output_parent.opened())
-			printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
-		printf("Input file:   %s\n", input_file_str->cstr());
-		printf("Input tracks: %d\n", toc.numtrks);
-		printf("Input length: %s\n", msf_string_from_frames(tempstr, origtotalsectors));
-		printf("Compression:  %s\n", compression_string(tempstr, compression));
-		printf("Logical size: %s\n", big_int_string(tempstr, UINT64(totalsectors) * CD_FRAME_SIZE));
-
 		// create the new hard drive
 		chd_cd_compressor chd(toc, track_info);
 		chd_error err;
@@ -1824,82 +1837,82 @@ static void do_create_cd(parameters_t &params)
 
 static void do_create_ld(parameters_t &params)
 {
+	// process input file
+	avi_file *input_file = NULL;
+	astring *input_file_str = params.find(OPTION_INPUT);
+	if (input_file_str != NULL)
+	{
+		avi_error avierr = avi_open(*input_file_str, &input_file);
+		if (avierr != AVIERR_NONE)
+			report_error(1, "Error opening AVI file (%s): %s\n", input_file_str->cstr(), avi_error_string(avierr));
+	}
+	const avi_movie_info *aviinfo = avi_get_movie_info(input_file);
+	
+	// process output CHD
+	chd_file output_parent;
+	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+	
+	// process input start/end
+	UINT64 input_start;
+	UINT64 input_end;
+	parse_input_start_end(params, aviinfo->video_numsamples, 0, 1, input_start, input_end);
+	
+	// determine parameters of the incoming video stream
+	avi_info info;
+	info.fps_times_1million = UINT64(aviinfo->video_timescale) * 1000000 / aviinfo->video_sampletime;
+	info.width = aviinfo->video_width;
+	info.height = aviinfo->video_height;
+	info.interlaced = ((info.fps_times_1million / 1000000) <= 30) && (info.height % 2 == 0) && (info.height > 288);
+	info.channels = aviinfo->audio_channels;
+	info.rate = aviinfo->audio_samplerate;
+
+	// adjust for interlacing
+	if (info.interlaced)
+	{
+		info.fps_times_1million *= 2;
+		info.height /= 2;
+		input_start *= 2;
+		input_end *= 2;
+	}
+
+	// determine the number of bytes per frame
+	info.max_samples_per_frame = (UINT64(info.rate) * 1000000 + info.fps_times_1million - 1) / info.fps_times_1million;
+	info.bytes_per_frame = avhuff_encoder::raw_data_size(info.width, info.height, info.channels, info.max_samples_per_frame);
+	
+	// process hunk size
+	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : info.bytes_per_frame;
+	parse_hunk_size(params, info.bytes_per_frame, hunk_size);
+	
+	// process compression
+	chd_codec_type compression[4];
+	memcpy(compression, s_default_ld_compression, sizeof(compression));
+	parse_compression(params, compression);
+
+	// process numprocessors
+	parse_numprocessors(params);
+
+	// print some info
+	astring tempstr;
+	printf("Output CHD:   %s\n", output_chd_str->cstr());
+	if (output_parent.opened())
+		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
+	printf("Input file:   %s\n", input_file_str->cstr());
+	if (input_start != 0 && input_end != aviinfo->video_numsamples)
+		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
+	printf("Input length: %s (%02d:%02d:%02d)\n", big_int_string(tempstr, input_end - input_start),
+			UINT32((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million / 60 / 60)),
+			UINT32(((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million / 60) % 60)),
+			UINT32(((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million) % 60)));
+	printf("Frame rate:   %d.%06d\n", info.fps_times_1million / 1000000, info.fps_times_1million % 1000000);
+	printf("Frame size:   %d x %d %s\n", info.width, info.height * (info.interlaced ? 2 : 1), info.interlaced ? "interlaced" : "non-interlaced");
+	printf("Audio:        %d channels at %d Hz\n", info.channels, info.rate);
+	printf("Compression:  %s\n", compression_string(tempstr, compression));
+	printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
+	printf("Logical size: %s\n", big_int_string(tempstr, UINT64(input_end - input_start) * hunk_size));
+
 	// catch errors so we can close & delete the output file
 	try
 	{
-		// process input file
-		avi_file *input_file = NULL;
-		astring *input_file_str = params.find(OPTION_INPUT);
-		if (input_file_str != NULL)
-		{
-			avi_error avierr = avi_open(*input_file_str, &input_file);
-			if (avierr != AVIERR_NONE)
-				report_error(1, "Error opening AVI file (%s): %s\n", input_file_str->cstr(), avi_error_string(avierr));
-		}
-		const avi_movie_info *aviinfo = avi_get_movie_info(input_file);
-		
-		// process output CHD
-		chd_file output_parent;
-		astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
-		
-		// process input start/end
-		UINT64 input_start;
-		UINT64 input_end;
-		parse_input_start_end(params, aviinfo->video_numsamples, 0, 1, input_start, input_end);
-		
-		// determine parameters of the incoming video stream
-		avi_info info;
-		info.fps_times_1million = UINT64(aviinfo->video_timescale) * 1000000 / aviinfo->video_sampletime;
-		info.width = aviinfo->video_width;
-		info.height = aviinfo->video_height;
-		info.interlaced = ((info.fps_times_1million / 1000000) <= 30) && (info.height % 2 == 0) && (info.height > 288);
-		info.channels = aviinfo->audio_channels;
-		info.rate = aviinfo->audio_samplerate;
-
-		// adjust for interlacing
-		if (info.interlaced)
-		{
-			info.fps_times_1million *= 2;
-			info.height /= 2;
-			input_start *= 2;
-			input_end *= 2;
-		}
-
-		// determine the number of bytes per frame
-		info.max_samples_per_frame = (UINT64(info.rate) * 1000000 + info.fps_times_1million - 1) / info.fps_times_1million;
-		info.bytes_per_frame = avhuff_encoder::raw_data_size(info.width, info.height, info.channels, info.max_samples_per_frame);
-		
-		// process hunk size
-		UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : info.bytes_per_frame;
-		parse_hunk_size(params, info.bytes_per_frame, hunk_size);
-		
-		// process compression
-		chd_codec_type compression[4];
-		memcpy(compression, s_default_ld_compression, sizeof(compression));
-		parse_compression(params, compression);
-
-		// process numprocessors
-		parse_numprocessors(params);
-
-		// print some info
-		astring tempstr;
-		printf("Output CHD:   %s\n", output_chd_str->cstr());
-		if (output_parent.opened())
-			printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
-		printf("Input file:   %s\n", input_file_str->cstr());
-		if (input_start != 0 && input_end != aviinfo->video_numsamples)
-			printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-		printf("Input length: %s (%02d:%02d:%02d)\n", big_int_string(tempstr, input_end - input_start),
-				UINT32((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million / 60 / 60)),
-				UINT32(((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million / 60) % 60)),
-				UINT32(((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million) % 60)));
-		printf("Frame rate:   %d.%06d\n", info.fps_times_1million / 1000000, info.fps_times_1million % 1000000);
-		printf("Frame size:   %d x %d %s\n", info.width, info.height * (info.interlaced ? 2 : 1), info.interlaced ? "interlaced" : "non-interlaced");
-		printf("Audio:        %d channels at %d Hz\n", info.channels, info.rate);
-		printf("Compression:  %s\n", compression_string(tempstr, compression));
-		printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
-		printf("Logical size: %s\n", big_int_string(tempstr, UINT64(input_end - input_start) * hunk_size));
-
 		// create the new CHD
 		chd_avi_compressor chd(*input_file, info, input_start, input_end);
 		chd_error err;
@@ -1946,64 +1959,64 @@ static void do_create_ld(parameters_t &params)
 
 static void do_copy(parameters_t &params)
 {
+	// parse out input files
+	chd_file input_parent_chd;
+	chd_file input_chd;
+	parse_input_chd_parameters(params, input_chd, input_parent_chd);
+
+	// parse out input start/end
+	UINT64 input_start;
+	UINT64 input_end;
+	parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
+
+	// process output CHD
+	chd_file output_parent;
+	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+	
+	// process hunk size
+	UINT32 hunk_size = input_chd.hunk_bytes();
+	parse_hunk_size(params, 1, hunk_size);
+	if (hunk_size % input_chd.hunk_bytes() != 0 && input_chd.hunk_bytes() % hunk_size != 0)
+		report_error(1, "Hunk size is not an even multiple or divisor of input hunk size");
+	
+	// process compression; we default to our current preferences using metadata to pick the type
+	chd_codec_type compression[4];
+	{
+		dynamic_buffer metadata;
+		if (input_chd.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
+			memcpy(compression, s_default_hd_compression, sizeof(compression));
+		else if (input_chd.read_metadata(AV_METADATA_TAG, 0, metadata) == CHDERR_NONE)
+			memcpy(compression, s_default_ld_compression, sizeof(compression));
+		else if (input_chd.read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
+				 input_chd.read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
+				 input_chd.read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE)
+			memcpy(compression, s_default_cd_compression, sizeof(compression));
+		else
+			memcpy(compression, s_default_raw_compression, sizeof(compression));
+	}
+	parse_compression(params, compression);
+
+	// process numprocessors
+	parse_numprocessors(params);
+
+	// print some info
+	astring tempstr;
+	printf("Output CHD:   %s\n", output_chd_str->cstr());
+	if (output_parent.opened())
+		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
+	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->cstr());
+	if (input_start != 0 || input_end != input_chd.logical_bytes())
+	{
+		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
+		printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+	}
+	printf("Compression:  %s\n", compression_string(tempstr, compression));
+	printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
+	printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
+
 	// catch errors so we can close & delete the output file
 	try
 	{
-		// parse out input files
-		chd_file input_parent_chd;
-		chd_file input_chd;
-		parse_input_chd_parameters(params, input_chd, input_parent_chd);
-
-		// parse out input start/end
-		UINT64 input_start;
-		UINT64 input_end;
-		parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
-
-		// process output CHD
-		chd_file output_parent;
-		astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
-		
-		// process hunk size
-		UINT32 hunk_size = input_chd.hunk_bytes();
-		parse_hunk_size(params, 1, hunk_size);
-		if (hunk_size % input_chd.hunk_bytes() != 0 && input_chd.hunk_bytes() % hunk_size != 0)
-			report_error(1, "Hunk size is not an even multiple or divisor of input hunk size");
-		
-		// process compression; we default to our current preferences using metadata to pick the type
-		chd_codec_type compression[4];
-		{
-			dynamic_buffer metadata;
-			if (input_chd.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
-				memcpy(compression, s_default_hd_compression, sizeof(compression));
-			else if (input_chd.read_metadata(AV_METADATA_TAG, 0, metadata) == CHDERR_NONE)
-				memcpy(compression, s_default_ld_compression, sizeof(compression));
-			else if (input_chd.read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-					 input_chd.read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-					 input_chd.read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE)
-				memcpy(compression, s_default_cd_compression, sizeof(compression));
-			else
-				memcpy(compression, s_default_raw_compression, sizeof(compression));
-		}
-		parse_compression(params, compression);
-
-		// process numprocessors
-		parse_numprocessors(params);
-
-		// print some info
-		astring tempstr;
-		printf("Output CHD:   %s\n", output_chd_str->cstr());
-		if (output_parent.opened())
-			printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->cstr());
-		printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->cstr());
-		if (input_start != 0 || input_end != input_chd.logical_bytes())
-		{
-			printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-			printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
-		}
-		printf("Compression:  %s\n", compression_string(tempstr, compression));
-		printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
-		printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
-
 		// create the new CHD
 		chd_chdfile_compressor chd(input_chd, input_start, input_end);
 		chd_error err;
@@ -2068,38 +2081,39 @@ static void do_copy(parameters_t &params)
 
 static void do_extract_raw(parameters_t &params)
 {
-	// catch errors so we can close & delete the output file
+	// parse out input files
+	chd_file input_parent_chd;
+	chd_file input_chd;
+	parse_input_chd_parameters(params, input_chd, input_parent_chd);
+
+	// parse out input start/end
+	UINT64 input_start;
+	UINT64 input_end;
+	parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
+	
+	// verify output file doesn't exist
 	astring *output_file_str = params.find(OPTION_OUTPUT);
+	if (output_file_str != NULL)
+		check_existing_output_file(params, *output_file_str);
+	
+	// print some info
+	astring tempstr;
+	printf("Output File:  %s\n", output_file_str->cstr());
+	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->cstr());
+	if (input_start != 0 || input_end != input_chd.logical_bytes())
+	{
+		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
+		printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+	}
+
+	// catch errors so we can close & delete the output file
 	core_file *output_file = NULL;
 	try
 	{
-		// parse out input files
-		chd_file input_parent_chd;
-		chd_file input_chd;
-		parse_input_chd_parameters(params, input_chd, input_parent_chd);
-
-		// parse out input start/end
-		UINT64 input_start;
-		UINT64 input_end;
-		parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
-		
 		// process output file
-		if (output_file_str != NULL)
-		{
-			file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
-			if (filerr != FILERR_NONE)
-				report_error(1, "Unable to open file (%s)", output_file_str->cstr());
-		}
-
-		// print some info
-		astring tempstr;
-		printf("Output File:  %s\n", output_file_str->cstr());
-		printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->cstr());
-		if (input_start != 0 || input_end != input_chd.logical_bytes())
-		{
-			printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-			printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
-		}
+		file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
+		if (filerr != FILERR_NONE)
+			report_error(1, "Unable to open file (%s)", output_file_str->cstr());
 
 		// copy all data
 		dynamic_buffer buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
@@ -2130,8 +2144,10 @@ static void do_extract_raw(parameters_t &params)
 	{
 		// delete the output file
 		if (output_file != NULL)
+		{
 			core_fclose(output_file);
-		osd_rmfile(*output_file_str);
+			osd_rmfile(*output_file_str);
+		}
 		throw;
 	}
 }
@@ -2144,52 +2160,54 @@ static void do_extract_raw(parameters_t &params)
 
 static void do_extract_cd(parameters_t &params)
 {
-	// catch errors so we can close & delete the output file
+	// parse out input files
+	chd_file input_parent_chd;
+	chd_file input_chd;
+	parse_input_chd_parameters(params, input_chd, input_parent_chd);
+
+	// further process input file
+	cdrom_file *cdrom = cdrom_open(&input_chd);
+	if (cdrom == NULL)
+		report_error(1, "Unable to recognize CHD file as a CD");
+	const cdrom_toc *toc = cdrom_get_toc(cdrom);
+	
+	// verify output file doesn't exist
 	astring *output_file_str = params.find(OPTION_OUTPUT);
+	if (output_file_str != NULL)
+		check_existing_output_file(params, *output_file_str);
+
+	// verify output BIN file doesn't exist
 	astring *output_bin_file_str = params.find(OPTION_OUTPUT_BIN);
+	astring default_name(*output_file_str);
+	int chop = default_name.rchr(0, '.');
+	if (chop != -1)
+		default_name.substr(0, chop);
+	default_name.cat(".bin");
+	if (output_bin_file_str == NULL)
+		output_bin_file_str = &default_name;
+	check_existing_output_file(params, *output_bin_file_str);
+	
+	// print some info
+	astring tempstr;
+	printf("Output TOC:   %s\n", output_file_str->cstr());
+	printf("Output Data:  %s\n", output_bin_file_str->cstr());
+	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->cstr());
+
+	// catch errors so we can close & delete the output file
 	core_file *output_bin_file = NULL;
 	core_file *output_toc_file = NULL;
 	try
 	{
-		// parse out input files
-		chd_file input_parent_chd;
-		chd_file input_chd;
-		parse_input_chd_parameters(params, input_chd, input_parent_chd);
-
-		// further process input file
-		cdrom_file *cdrom = cdrom_open(&input_chd);
-		if (cdrom == NULL)
-			report_error(1, "Unable to recognize CHD file as a CD");
-		const cdrom_toc *toc = cdrom_get_toc(cdrom);
-		
 		// process output file
-		if (output_file_str != NULL)
-		{
-			file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &output_toc_file);
-			if (filerr != FILERR_NONE)
-				report_error(1, "Unable to open file (%s)", output_file_str->cstr());
-		}
+		file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &output_toc_file);
+		if (filerr != FILERR_NONE)
+			report_error(1, "Unable to open file (%s)", output_file_str->cstr());
 		bool cuemode = (output_file_str->find(".cue") != -1);
 
 		// process output BIN file
-		astring default_name(*output_file_str);
-		int chop = default_name.rchr(0, '.');
-		if (chop != -1)
-			default_name.substr(0, chop);
-		default_name.cat(".bin");
-		if (output_bin_file_str == NULL)
-			output_bin_file_str = &default_name;
-		{
-			file_error filerr = core_fopen(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
-			if (filerr != FILERR_NONE)
-				report_error(1, "Unable to open file (%s)", output_bin_file_str->cstr());
-		}
-
-		// print some info
-		astring tempstr;
-		printf("Output TOC:   %s\n", output_file_str->cstr());
-		printf("Output Data:  %s\n", output_bin_file_str->cstr());
-		printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->cstr());
+		filerr = core_fopen(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
+		if (filerr != FILERR_NONE)
+			report_error(1, "Unable to open file (%s)", output_bin_file_str->cstr());
 
 		// determine total frames
 		UINT64 total_bytes = 0;
@@ -2276,85 +2294,86 @@ static void do_extract_cd(parameters_t &params)
 
 static void do_extract_ld(parameters_t &params)
 {
-	// catch errors so we can close & delete the output file
+	// parse out input files
+	chd_file input_parent_chd;
+	chd_file input_chd;
+	parse_input_chd_parameters(params, input_chd, input_parent_chd);
+
+	// read core metadata
+	astring metadata;
+	chd_error err = input_chd.read_metadata(AV_METADATA_TAG, 0, metadata);
+	if (err != CHDERR_NONE)
+		report_error(1, "Unable to find A/V metadata in the input CHD");
+
+	// parse the metadata
+	UINT32 fps_times_1million;
+	UINT32 max_samples_per_frame;
+	UINT32 frame_bytes;
+	int width;
+	int height;
+	int interlaced;
+	int channels;
+	int rate;
+	{
+		int fps;
+		int fpsfrac;
+		if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
+			report_error(1, "Improperly formatted A/V metadata found");
+		fps_times_1million = fps * 1000000 + fpsfrac;
+	}
+	int interlace_factor = interlaced ? 2 : 1;
+
+	// determine key parameters and validate
+	max_samples_per_frame = (UINT64(rate) * 1000000 + fps_times_1million - 1) / fps_times_1million;
+	frame_bytes = avhuff_encoder::raw_data_size(width, height, channels, max_samples_per_frame);
+	if (frame_bytes != input_chd.hunk_bytes())
+		report_error(1, "Frame size does not match hunk size for this CHD");
+	
+	// parse out input start/end
+	UINT64 input_start;
+	UINT64 input_end;
+	parse_input_start_end(params, input_chd.hunk_count() / interlace_factor, 0, 1, input_start, input_end);
+	input_start *= interlace_factor;
+	input_end *= interlace_factor;
+
+	// build up the movie info
+	avi_movie_info info;
+	info.video_format = FORMAT_YUY2;
+	info.video_timescale = fps_times_1million / interlace_factor;
+	info.video_sampletime = 1000000;
+	info.video_width = width;
+	info.video_height = height * interlace_factor;
+	info.video_depth = 16;
+	info.audio_format = 0;
+	info.audio_timescale = rate;
+	info.audio_sampletime = 1;
+	info.audio_channels = channels;
+	info.audio_samplebits = 16;
+	info.audio_samplerate = rate;
+
+	// verify output file doesn't exist
 	astring *output_file_str = params.find(OPTION_OUTPUT);
+	if (output_file_str != NULL)
+		check_existing_output_file(params, *output_file_str);
+
+	// print some info
+	astring tempstr;
+	printf("Output File:  %s\n", output_file_str->cstr());
+	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->cstr());
+	if (input_start != 0 || input_end != input_chd.hunk_count())
+	{
+		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
+		printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+	}
+
+	// catch errors so we can close & delete the output file
 	avi_file *output_file = NULL;
 	try
 	{
-		// parse out input files
-		chd_file input_parent_chd;
-		chd_file input_chd;
-		parse_input_chd_parameters(params, input_chd, input_parent_chd);
-
-		// read core metadata
-		astring metadata;
-		chd_error err = input_chd.read_metadata(AV_METADATA_TAG, 0, metadata);
-		if (err != CHDERR_NONE)
-			report_error(1, "Unable to find A/V metadata in the input CHD");
-
-		// parse the metadata
-		UINT32 fps_times_1million;
-		UINT32 max_samples_per_frame;
-		UINT32 frame_bytes;
-		int width;
-		int height;
-		int interlaced;
-		int channels;
-		int rate;
-		{
-			int fps;
-			int fpsfrac;
-			if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
-				report_error(1, "Improperly formatted A/V metadata found");
-			fps_times_1million = fps * 1000000 + fpsfrac;
-		}
-		int interlace_factor = interlaced ? 2 : 1;
-
-		// determine key parameters and validate
-		max_samples_per_frame = (UINT64(rate) * 1000000 + fps_times_1million - 1) / fps_times_1million;
-		frame_bytes = avhuff_encoder::raw_data_size(width, height, channels, max_samples_per_frame);
-		if (frame_bytes != input_chd.hunk_bytes())
-			report_error(1, "Frame size does not match hunk size for this CHD");
-		
-		// parse out input start/end
-		UINT64 input_start;
-		UINT64 input_end;
-		parse_input_start_end(params, input_chd.hunk_count() / interlace_factor, 0, 1, input_start, input_end);
-		input_start *= interlace_factor;
-		input_end *= interlace_factor;
-
-		// build up the movie info
-		avi_movie_info info;
-		info.video_format = FORMAT_YUY2;
-		info.video_timescale = fps_times_1million / interlace_factor;
-		info.video_sampletime = 1000000;
-		info.video_width = width;
-		info.video_height = height * interlace_factor;
-		info.video_depth = 16;
-		info.audio_format = 0;
-		info.audio_timescale = rate;
-		info.audio_sampletime = 1;
-		info.audio_channels = channels;
-		info.audio_samplebits = 16;
-		info.audio_samplerate = rate;
-
 		// process output file
-		if (output_file_str != NULL)
-		{
-			avi_error avierr = avi_create(*output_file_str, &info, &output_file);
-			if (avierr != AVIERR_NONE)
-				report_error(1, "Unable to open file (%s)", output_file_str->cstr());
-		}
-
-		// print some info
-		astring tempstr;
-		printf("Output File:  %s\n", output_file_str->cstr());
-		printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->cstr());
-		if (input_start != 0 || input_end != input_chd.hunk_count())
-		{
-			printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-			printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
-		}
+		avi_error avierr = avi_create(*output_file_str, &info, &output_file);
+		if (avierr != AVIERR_NONE)
+			report_error(1, "Unable to open file (%s)", output_file_str->cstr());
 
 		// create the codec configuration
 		avhuff_decompress_config avconfig;
