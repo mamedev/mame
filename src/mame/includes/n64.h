@@ -165,6 +165,19 @@ private:
 	UINT32 sp_semaphore;
 	UINT32 dp_clock;
 
+	// Disk Drive (DD) registers and functions
+	UINT32 dd_buffer[256];
+	UINT32 dd_sector_data[32]; // ?
+	UINT32 dd_ram_seq_data[32]; // ?
+	UINT32 dd_data_reg;
+	UINT32 dd_status_reg;
+	UINT32 dd_track_reg;
+	UINT32 dd_buf_status_reg;
+	UINT32 dd_sector_err_reg;
+	UINT32 dd_seq_status_reg;
+	UINT32 dd_seq_ctrl_reg;
+	UINT8 dd_int;
+
 	// Peripheral Interface (PI) registers and functions
 	void pi_dma();
 	emu_timer *pi_dma_timer;

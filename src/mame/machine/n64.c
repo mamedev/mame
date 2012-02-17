@@ -96,6 +96,19 @@ void n64_periphs::device_reset()
 	pi_bsd_dom2_rls = 0;
 	pi_dma_dir = 0;
 
+	dd_int = 0;
+	memset(dd_buffer, 0, sizeof(dd_buffer));
+	memset(dd_sector_data, 0, sizeof(dd_sector_data));
+	memset(dd_ram_seq_data, 0, sizeof(dd_ram_seq_data));
+	dd_data_reg = 0;
+	dd_status_reg = 0;
+	dd_track_reg = 0;
+	dd_buf_status_reg = 0;
+	dd_sector_err_reg = 0;
+	dd_seq_status_reg = 0;
+	dd_seq_ctrl_reg = 0;
+	dd_int = 0;
+
 	memset(pif_ram, 0, sizeof(pif_ram));
 	memset(pif_cmd, 0, sizeof(pif_cmd));
 	si_dram_addr = 0;
@@ -2017,15 +2030,206 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 	}
 }
 
+#define DD_STATUS_INTR		(1 << 25)
+
 READ32_MEMBER( n64_periphs::dd_reg_r )
 {
-	logerror("dd_reg_r: %08X\n", offset << 2);
-	return 0;
+	if(offset < 0x400/4)
+	{
+		return dd_buffer[offset];
+	}
+
+	if(offset < 0x480/4)
+	{
+		return dd_sector_data[(offset - 0x400/4) / 4];
+	}
+
+	if(offset < 0x500/4)
+	{
+		return dd_ram_seq_data[(offset - 0x480/4) / 4];
+	}
+
+	offset -= 0x500/4;
+
+	UINT32 ret = 0;
+	switch(offset)
+	{
+		case 0x00/4: // DD Data
+			ret = dd_data_reg;
+			break;
+
+		case 0x04/4: // ??
+			break;
+
+		case 0x08/4: // DD Status
+			ret = dd_status_reg;
+			break;
+
+		case 0x0c/4: // Current Track
+			ret = dd_track_reg;
+			break;
+
+		case 0x10/4: // Transfer Buffer Status
+			ret = dd_buf_status_reg;
+			break;
+
+		case 0x14/4: // Sector Error
+			ret = dd_sector_err_reg;
+			break;
+
+		case 0x18/4: // Sequence Status
+			ret = dd_seq_status_reg;
+			break;
+
+		case 0x1c/4: // Sequence Control
+			ret = dd_seq_ctrl_reg;
+			break;
+	}
+
+	//logerror("dd_reg_r: %08x (%08x)\n", offset << 2, ret);
+	return ret;
 }
 
 WRITE32_MEMBER( n64_periphs::dd_reg_w )
 {
 	logerror("dd_reg_w: %08X, %08X, %08X\n", data, offset << 2, mem_mask);
+
+	if(offset < 0x400/4)
+	{
+		COMBINE_DATA(&dd_buffer[offset]);
+		return;
+	}
+
+	if(offset < 0x480/4)
+	{
+		COMBINE_DATA(&dd_sector_data[(offset - 0x400/4) / 4]);
+		return;
+	}
+
+	if(offset < 0x500/4)
+	{
+		COMBINE_DATA(&dd_ram_seq_data[(offset - 0x480/4) / 4]);
+		return;
+	}
+
+	offset -= 0x500/4;
+
+	switch(offset)
+	{
+		case 0x00/4: // DD Data
+			dd_data_reg = data;
+			break;
+
+		case 0x08/4: // DD Command
+			switch((data >> 16) & 0xff)
+			{
+				case 0x01: // Seek Read
+					logerror("dd command: Seek Read\n");
+					break;
+				case 0x02: // Seek Write
+					logerror("dd command: Seek Write\n");
+					break;
+				case 0x03: // Re-Zero / Recalibrate
+					logerror("dd command: Re-Zero\n");
+					break;
+				case 0x04: // Engage Brake
+					logerror("dd command: Engage Brake\n");
+					break;
+				case 0x05: // Start Motor
+					logerror("dd command: Start Motor\n");
+					break;
+				case 0x06: // Standby
+					logerror("dd command: Standby\n");
+					break;
+				case 0x07: // Set Sleep Mode
+					logerror("dd command: Set Sleep Mode\n");
+					break;
+				case 0x08: // Unknown
+					logerror("dd command: Unknown\n");
+					break;
+				case 0x09: // Initialize Drive(?)
+					logerror("dd command: Initialize Drive\n");
+					break;
+				case 0x0B: // Select Disk Type
+					logerror("dd command: Select Disk Type\n");
+					break;
+				case 0x0C: // ASIC Command Inquiry
+					logerror("dd command: ASIC Commadn Inquiry\n");
+					break;
+				case 0x0D: // Standby Mode (?)
+					logerror("dd command: Standby Mode(?)\n");
+					break;
+				case 0x0E: // Detect Disk Index
+					logerror("dd command: Detect Disk Index\n");
+					break;
+				case 0x0F: // Set RTC Year / Month
+					logerror("dd command: Set RTC Year / Month\n");
+					break;
+				case 0x10: // Set RTC Day / Hour
+					logerror("dd command: Set RTC Day / Hour\n");
+					break;
+				case 0x11: // Set RTC Minute / Second
+					logerror("dd command: Set RTC Minute / Second\n");
+					break;
+				case 0x12: // Read RTC Month / Year
+				{
+					logerror("dd command: Read RTC Month / Year\n");
+
+					system_time systime;
+					machine().base_datetime(systime);
+
+					dd_data_reg = (convert_to_bcd(systime.local_time.year % 100) << 24) | (convert_to_bcd(systime.local_time.month + 1) << 16);
+
+					cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+					dd_status_reg |= DD_STATUS_INTR;
+					break;
+				}
+
+				case 0x13: // Read RTC Hour / Day
+				{
+					logerror("dd command: Read RTC Hour / Day\n");
+
+					system_time systime;
+					machine().base_datetime(systime);
+
+					dd_data_reg = (convert_to_bcd(systime.local_time.mday) << 24) | (convert_to_bcd(systime.local_time.hour) << 16);
+
+					cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+					dd_status_reg |= DD_STATUS_INTR;
+					break;
+				}
+
+				case 0x14: // Read RTC Minute / Second
+				{
+					logerror("dd command: Read RTC Minute / Second\n");
+
+					system_time systime;
+					machine().base_datetime(systime);
+
+					dd_data_reg = (convert_to_bcd(systime.local_time.minute) << 24) | (convert_to_bcd(systime.local_time.second) << 16);
+
+					cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+					dd_status_reg |= DD_STATUS_INTR;
+					break;
+				}
+
+				case 0x1B: // Disk Inquiry
+					logerror("dd command: Disk Inquiry\n");
+					break;
+			}
+			// Do something here
+			break;
+
+		case 0x10/4: // Interrupt Clear
+			logerror("dd interrupt clear\n");
+			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+			dd_status_reg &= ~DD_STATUS_INTR;
+			break;
+
+		case 0x1c/4: // Sequence Control
+			dd_seq_ctrl_reg = data;
+			break;
+	}
 }
 
 READ32_MEMBER( n64_periphs::pif_ram_r )
