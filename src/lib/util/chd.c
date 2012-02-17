@@ -1259,6 +1259,10 @@ chd_error chd_file::clone_all_metadata(chd_file &source)
 		// iterate over metadata entries in the source
 		dynamic_buffer filedata;
 		metadata_entry metaentry;
+		metaentry.metatag = 0;
+		metaentry.length = 0;
+		metaentry.next = 0;
+		metaentry.flags = 0;
 		for (bool has_data = source.metadata_find(CHDMETATAG_WILDCARD, 0, metaentry); has_data; has_data = source.metadata_find(CHDMETATAG_WILDCARD, 0, metaentry, true))
 		{
 			// read the metadata item
