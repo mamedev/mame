@@ -41,6 +41,7 @@
 #include "hashing.h"
 #include "avhuff.h"
 #include "flac.h"
+#include "cdrom.h"
 #include <zlib.h>
 #include "lib7z/LzmaEnc.h"
 #include "lib7z/LzmaDec.h"
@@ -291,6 +292,52 @@ public:
 };
 
 
+// ======================> chd_cd_flac_compressor
+
+// CD/FLAC compressor
+class chd_cd_flac_compressor : public chd_compressor
+{
+public:
+	// construction/destruction
+	chd_cd_flac_compressor(chd_file &chd, bool lossy);
+	~chd_cd_flac_compressor();
+
+	// core functionality
+	virtual UINT32 compress(const UINT8 *src, UINT32 srclen, UINT8 *dest);
+
+private:
+	// internal state
+	bool				m_swap_endian;
+	flac_encoder		m_encoder;
+	z_stream			m_deflater;
+	chd_zlib_allocator	m_allocator;
+	dynamic_buffer		m_buffer;
+};
+
+
+// ======================> chd_cd_flac_decompressor
+
+// FLAC decompressor
+class chd_cd_flac_decompressor : public chd_decompressor
+{
+public:
+	// construction/destruction
+	chd_cd_flac_decompressor(chd_file &chd, bool lossy);
+	~chd_cd_flac_decompressor();
+
+	// core functionality
+	virtual void decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen);
+
+private:
+	// internal state
+	bool				m_swap_endian;
+	flac_decoder		m_decoder;
+	z_stream			m_inflater;
+	chd_zlib_allocator	m_allocator;
+	dynamic_buffer		m_buffer;
+};
+
+
 // ======================> chd_avhuff_compressor
 
 // A/V compressor
@@ -345,6 +392,7 @@ const chd_codec_list::codec_entry chd_codec_list::s_codec_list[] =
 	{ CHD_CODEC_HUFFMAN,	false,	"Huffman",				&chd_codec_list::construct_compressor<chd_huffman_compressor>,	&chd_codec_list::construct_decompressor<chd_huffman_decompressor> },
 	{ CHD_CODEC_FLAC_BE,	false,	"FLAC, big-endian",		&chd_codec_list::construct_compressor<chd_flac_compressor_be>,	&chd_codec_list::construct_decompressor<chd_flac_decompressor_be> },
 	{ CHD_CODEC_FLAC_LE,	false,	"FLAC, little-endian",	&chd_codec_list::construct_compressor<chd_flac_compressor_le>,	&chd_codec_list::construct_decompressor<chd_flac_decompressor_le> },
+	{ CHD_CODEC_CD_FLAC,	false,	"CD FLAC",				&chd_codec_list::construct_compressor<chd_cd_flac_compressor>,	&chd_codec_list::construct_decompressor<chd_cd_flac_decompressor> },
 	{ CHD_CODEC_AVHUFF,		false,	"A/V Huffman",			&chd_codec_list::construct_compressor<chd_avhuff_compressor>,	&chd_codec_list::construct_decompressor<chd_avhuff_decompressor> },
 };
 
@@ -759,7 +807,7 @@ UINT32 chd_zlib_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *des
 chd_zlib_decompressor::chd_zlib_decompressor(chd_file &chd, bool lossy)
 	: chd_decompressor(chd, lossy)
 {
-	// init the inflater first
+	// init the inflater
 	m_inflater.next_in = (Bytef *)this;	// bogus, but that's ok
 	m_inflater.avail_in = 0;
 	m_allocator.install(m_inflater);
@@ -1149,7 +1197,7 @@ UINT32 chd_flac_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *des
 
 
 //**************************************************************************
-//  FLAC COMPRESSOR
+//  FLAC DECOMPRESSOR
 //**************************************************************************
 
 //-------------------------------------------------
@@ -1184,6 +1232,183 @@ void chd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *
 
 	// finish up
 	m_decoder.finish();
+}
+
+
+
+//**************************************************************************
+//  CD FLAC COMPRESSOR
+//**************************************************************************
+
+//-------------------------------------------------
+//  chd_cd_flac_compressor - constructor
+//-------------------------------------------------
+
+chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, bool lossy)
+	: chd_compressor(chd, lossy),
+	  m_buffer(chd.hunk_bytes())
+{
+	// determine whether we want native or swapped samples
+	UINT16 native_endian = 0;
+	*reinterpret_cast<UINT8 *>(&native_endian) = 1;
+	m_swap_endian = (native_endian == 1);
+	
+	// configure the encoder
+	m_encoder.set_sample_rate(44100);
+	m_encoder.set_num_channels(2);
+	m_encoder.set_block_size((chd.hunk_bytes() / CD_FRAME_SIZE) * (CD_MAX_SECTOR_DATA/4));
+	m_encoder.set_strip_metadata(true);
+
+	// initialize the deflater
+	m_deflater.next_in = (Bytef *)this;	// bogus, but that's ok
+	m_deflater.avail_in = 0;
+	m_allocator.install(m_deflater);
+	int zerr = deflateInit2(&m_deflater, Z_BEST_COMPRESSION, Z_DEFLATED, -MAX_WBITS, 8, Z_DEFAULT_STRATEGY);
+
+	// convert errors
+	if (zerr == Z_MEM_ERROR)
+		throw std::bad_alloc();
+	else if (zerr != Z_OK)
+		throw CHDERR_CODEC_ERROR;
+}
+
+
+//-------------------------------------------------
+//  ~chd_cd_flac_compressor - destructor
+//-------------------------------------------------
+
+chd_cd_flac_compressor::~chd_cd_flac_compressor()
+{
+	deflateEnd(&m_deflater);
+}
+
+
+//-------------------------------------------------
+//  compress - compress data using the FLAC codec,
+//  and use zlib on the subcode data
+//-------------------------------------------------
+
+UINT32 chd_cd_flac_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *dest)
+{
+	// copy audio data followed by subcode data
+	UINT32 frames = chd().hunk_bytes() / CD_FRAME_SIZE;
+	for (UINT32 framenum = 0; framenum < frames; framenum++)
+	{
+		memcpy(&m_buffer[framenum * CD_MAX_SECTOR_DATA], &src[framenum * CD_FRAME_SIZE], CD_MAX_SECTOR_DATA);
+		memcpy(&m_buffer[frames * CD_MAX_SECTOR_DATA + framenum * CD_MAX_SUBCODE_DATA], &src[framenum * CD_FRAME_SIZE + CD_MAX_SECTOR_DATA], CD_MAX_SUBCODE_DATA);
+	}
+
+	// reset and encode the audio portion
+	m_encoder.reset(dest, chd().hunk_bytes());
+	UINT8 *buffer = m_buffer;
+	if (!m_encoder.encode_interleaved(reinterpret_cast<INT16 *>(buffer), frames * CD_MAX_SECTOR_DATA/4, m_swap_endian))
+		throw CHDERR_COMPRESSION_ERROR;
+
+	// finish up
+	UINT32 complen = m_encoder.finish();
+	
+	// deflate the subcode data
+	m_deflater.next_in = const_cast<Bytef *>(&m_buffer[frames * CD_MAX_SECTOR_DATA]);
+	m_deflater.avail_in = frames * CD_MAX_SUBCODE_DATA;
+	m_deflater.total_in = 0;
+	m_deflater.next_out = &dest[complen];
+	m_deflater.avail_out = chd().hunk_bytes() - complen;
+	m_deflater.total_out = 0;
+	int zerr = deflateReset(&m_deflater);
+	if (zerr != Z_OK)
+		throw CHDERR_COMPRESSION_ERROR;
+
+	// do it
+	zerr = deflate(&m_deflater, Z_FINISH);
+
+	// if we ended up with more data than we started with, return an error
+	complen += m_deflater.total_out;
+	if (zerr != Z_STREAM_END || complen >= srclen)
+		throw CHDERR_COMPRESSION_ERROR;
+	return complen;
+}
+
+
+
+//**************************************************************************
+//  CD FLAC DECOMPRESSOR
+//**************************************************************************
+
+//-------------------------------------------------
+//  chd_cd_flac_decompressor - constructor
+//-------------------------------------------------
+
+chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, bool lossy)
+	: chd_decompressor(chd, lossy),
+	  m_buffer(chd.hunk_bytes())
+{
+	// determine whether we want native or swapped samples
+	UINT16 native_endian = 0;
+	*reinterpret_cast<UINT8 *>(&native_endian) = 1;
+	m_swap_endian = (native_endian == 1);
+
+	// init the inflater
+	m_inflater.next_in = (Bytef *)this;	// bogus, but that's ok
+	m_inflater.avail_in = 0;
+	m_allocator.install(m_inflater);
+	int zerr = inflateInit2(&m_inflater, -MAX_WBITS);
+
+	// convert errors
+	if (zerr == Z_MEM_ERROR)
+		throw std::bad_alloc();
+	else if (zerr != Z_OK)
+		throw CHDERR_CODEC_ERROR;
+}
+
+
+//-------------------------------------------------
+//  ~chd_cd_flac_decompressor - destructor
+//-------------------------------------------------
+
+chd_cd_flac_decompressor::~chd_cd_flac_decompressor()
+{
+	inflateEnd(&m_inflater);
+}
+
+
+//-------------------------------------------------
+//  decompress - decompress data using the FLAC 
+//  codec
+//-------------------------------------------------
+
+void chd_cd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen)
+{
+	// reset and decode
+	UINT32 frames = chd().hunk_bytes() / CD_FRAME_SIZE;
+	if (!m_decoder.reset(44100, 2, frames * CD_MAX_SECTOR_DATA/4, src, complen))
+		throw CHDERR_DECOMPRESSION_ERROR;
+	UINT8 *buffer = m_buffer;
+	if (!m_decoder.decode_interleaved(reinterpret_cast<INT16 *>(buffer), frames * CD_MAX_SECTOR_DATA/4, m_swap_endian))
+		throw CHDERR_DECOMPRESSION_ERROR;
+
+	// inflate the subcode data
+	UINT32 offset = m_decoder.finish();
+	m_inflater.next_in = const_cast<Bytef *>(src + offset);
+	m_inflater.avail_in = complen - offset;
+	m_inflater.total_in = 0;
+	m_inflater.next_out = &m_buffer[frames * CD_MAX_SECTOR_DATA];
+	m_inflater.avail_out = frames * CD_MAX_SUBCODE_DATA;
+	m_inflater.total_out = 0;
+	int zerr = inflateReset(&m_inflater);
+	if (zerr != Z_OK)
+		throw CHDERR_DECOMPRESSION_ERROR;
+
+	// do it
+	zerr = inflate(&m_inflater, Z_FINISH);
+	if (m_inflater.total_out != frames * CD_MAX_SUBCODE_DATA)
+		throw CHDERR_DECOMPRESSION_ERROR;
+	
+	// reassemble the data
+	for (UINT32 framenum = 0; framenum < frames; framenum++)
+	{
+		memcpy(&dest[framenum * CD_FRAME_SIZE], &m_buffer[framenum * CD_MAX_SECTOR_DATA], CD_MAX_SECTOR_DATA);
+		memcpy(&dest[framenum * CD_FRAME_SIZE + CD_MAX_SECTOR_DATA], &m_buffer[frames * CD_MAX_SECTOR_DATA + framenum * CD_MAX_SUBCODE_DATA], CD_MAX_SUBCODE_DATA);
+	}
 }
 
 

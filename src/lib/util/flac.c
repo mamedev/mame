@@ -367,7 +367,7 @@ flac_decoder::~flac_decoder()
 bool flac_decoder::reset()
 {
 	m_compressed_offset = 0;
-	if (FLAC__stream_decoder_init_stream(m_decoder, &flac_decoder::read_callback_static, NULL, NULL, NULL, NULL, &flac_decoder::write_callback_static, NULL, &flac_decoder::error_callback_static, this) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
+	if (FLAC__stream_decoder_init_stream(m_decoder, &flac_decoder::read_callback_static, NULL, &flac_decoder::tell_callback_static, NULL, NULL, &flac_decoder::write_callback_static, NULL, &flac_decoder::error_callback_static, this) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
 		return false;
 	return FLAC__stream_decoder_process_until_end_of_metadata(m_decoder);
 }
@@ -499,9 +499,19 @@ bool flac_decoder::decode(INT16 **samples, UINT32 num_samples, bool swap_endian)
 //  finish - finish up the decode
 //-------------------------------------------------
 
-void flac_decoder::finish()
+UINT32 flac_decoder::finish()
 {
+	// get the final decoding position and move forward
+	FLAC__uint64 position = 0;
+	FLAC__stream_decoder_get_decode_position(m_decoder, &position);
 	FLAC__stream_decoder_finish(m_decoder);
+	
+	// adjust position if we provided the header
+	if (position == 0)
+		return 0;
+	if (m_compressed_start == reinterpret_cast<const FLAC__byte *>(m_custom_header))
+		position -= m_compressed_length;
+	return position;
 }
 
 
@@ -549,6 +559,18 @@ FLAC__StreamDecoderReadStatus flac_decoder::read_callback(FLAC__byte buffer[], s
 
 	// return based on whether we ran out of data
 	return (*bytes < expected) ? FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM : FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
+}
+
+
+//-------------------------------------------------
+//  tell_callback - handle requests to find out
+//  where in the input stream we are
+//-------------------------------------------------
+
+FLAC__StreamDecoderTellStatus flac_decoder::tell_callback_static(const FLAC__StreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data)
+{
+	*absolute_byte_offset = reinterpret_cast<flac_decoder *>(client_data)->m_compressed_offset;
+	return FLAC__STREAM_DECODER_TELL_STATUS_OK;
 }
 
 

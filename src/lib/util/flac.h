@@ -138,12 +138,13 @@ public:
 	bool decode(INT16 **samples, UINT32 num_samples, bool swap_endian = false);
 
 	// finish up
-	void finish();
+	UINT32 finish();
 
 private:
 	// internal helpers
 	static FLAC__StreamDecoderReadStatus read_callback_static(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data);
 	FLAC__StreamDecoderReadStatus read_callback(FLAC__byte buffer[], size_t *bytes);
+	static FLAC__StreamDecoderTellStatus tell_callback_static(const FLAC__StreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data);
 	static FLAC__StreamDecoderWriteStatus write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data);
 	FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[]);
 	static void error_callback_static(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data);
