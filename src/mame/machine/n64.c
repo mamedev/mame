@@ -25,12 +25,47 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 {
 }
 
+static TIMER_CALLBACK(reset_timer_callback)
+{
+	n64_periphs *periphs = machine.device<n64_periphs>("rcp");
+	periphs->reset_tick();
+}
+
+void n64_periphs::reset_tick()
+{
+	reset_timer->adjust(attotime::never);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ2, CLEAR_LINE);
+	machine().device("maincpu")->reset();
+	machine().device("rsp")->reset();
+	machine().device("rcp")->reset();
+	cputag_set_input_line(machine(), "rsp", INPUT_LINE_HALT, ASSERT_LINE);
+	reset_held = false;
+}
+
+void n64_periphs::poll_reset_button(bool button)
+{
+	bool old_held = reset_held;
+	reset_held = button;
+	if(!old_held && reset_held)
+	{
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ2, ASSERT_LINE);
+	}
+	else if(old_held && reset_held)
+	{
+		reset_timer->adjust(attotime::never);
+	}
+	else if(old_held && !reset_held)
+	{
+		reset_timer->adjust(attotime::from_hz(1));
+	}
+}
 
 void n64_periphs::device_start()
 {
 	ai_timer = machine().scheduler().timer_alloc(FUNC(ai_timer_callback));
 	pi_dma_timer = machine().scheduler().timer_alloc(FUNC(pi_dma_callback));
 	vi_scanline_timer = machine().scheduler().timer_alloc(FUNC(vi_scanline_callback));
+	reset_timer = machine().scheduler().timer_alloc(FUNC(reset_timer_callback));
 }
 
 void n64_periphs::device_reset()
@@ -120,6 +155,9 @@ void n64_periphs::device_reset()
 	dp_clock = 0;
 
 	cic_status = 0;
+
+	reset_held = false;
+	reset_timer->adjust(attotime::never);
 
     // bootcode differs between CIC-chips, so we can use its checksum to detect the CIC-chip
     UINT64 boot_checksum = 0;
@@ -2092,7 +2130,7 @@ READ32_MEMBER( n64_periphs::dd_reg_r )
 
 WRITE32_MEMBER( n64_periphs::dd_reg_w )
 {
-	logerror("dd_reg_w: %08X, %08X, %08X\n", data, offset << 2, mem_mask);
+	//logerror("dd_reg_w: %08X, %08X, %08X\n", data, offset << 2, mem_mask);
 
 	if(offset < 0x400/4)
 	{

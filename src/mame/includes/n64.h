@@ -80,6 +80,7 @@ public:
 	void ai_timer_tick();
 	void pi_dma_tick();
 	void vi_scanline_tick();
+	void reset_tick();
 
 	// Video Interface (VI) registers
 	UINT32 vi_width;
@@ -106,6 +107,8 @@ public:
 
 	bool dd_present;
 
+	void poll_reset_button(bool button);
+
 protected:
     // device-level overrides
     virtual void device_start();
@@ -117,6 +120,9 @@ private:
 	device_t *rspcpu;
 
 	void clear_rcp_interrupt(int interrupt);
+
+	bool reset_held;
+	emu_timer *reset_timer;
 
 	UINT8 is64_buffer[0x10000];
 
