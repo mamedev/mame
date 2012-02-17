@@ -4905,7 +4905,6 @@ GAMEL( 198?, potnpkrb, pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "bootleg"
 GAMEL( 198?, potnpkrc, pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 4)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrd, pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 5)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkre, pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
-GAMEL( 1991, goodluck, pottnpkr, witchcrd, goodluck, 0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
 GAMEL( 198?, superdbl, pottnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAMEL( 198?, ngold,    pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",      0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,   pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
@@ -4948,6 +4947,7 @@ GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown
 GAMEL( 1991, bsuertes, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuertet, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuerteu, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",          0,                layout_goldnpkr )
+GAMEL( 1991, goodluck, bsuerte,  witchcrd, goodluck, 0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
 
 GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, 0,       ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",     0,                layout_goldnpkr )
 GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, 0,       ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein)",     GAME_UNEMULATED_PROTECTION, layout_goldnpkr )
