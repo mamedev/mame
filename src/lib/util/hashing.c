@@ -68,7 +68,7 @@ inline int char_to_hex(char c)
 	if (c >= 'a' && c <= 'f')
 		return 10 + c - 'a';
 	if (c >= 'A' && c <= 'F')
-		return 10 + c - 'a';
+		return 10 + c - 'A';
 	return -1;
 }
 
