@@ -357,8 +357,6 @@ public:
 
 	UINT32 m_coin_info;
 	UINT32 m_mux_data;
-
-	dynamic_buffer m_key;
 };
 
 
@@ -453,6 +451,8 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	if(offset >= 0x140 && offset <= 0x144) {
+		dynamic_buffer key;	
+
 		int pos = (offset - 0x140)*2;
 		UINT8 v, k;
 		if(ACCESSING_BITS_16_23) {
@@ -460,8 +460,8 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 			pos++;
 		} else
 			v = data;
-		get_disk_handle(space->machine(), ":drive_0")->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, state->m_key);
-		k = pos < state->m_key.count() ? state->m_key[pos] : 0;
+		get_disk_handle(space->machine(), ":drive_0")->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key);
+		k = pos < key.count() ? key[pos] : 0;
 		if(v == k)
 			state->m_locked &= ~(1 << pos);
 		else
