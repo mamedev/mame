@@ -1351,7 +1351,6 @@ ROM_START( coolmini )
 	ROM_LOAD( "cm-vrom1.020", 0x00000, 0x40000, CRC(fcc28081) SHA1(44031df0ee28ca49df12bcb73c83299fac205e21) )
 ROM_END
 
-
 /*
 
 Date Quiz Go Go Episode 2
@@ -1422,6 +1421,78 @@ ROM_START( dquizgo2 )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(24d5b55f) SHA1(cb4d3a22440831e37df0a7fe5433bea708d60f31) )
+ROM_END
+
+/*
+
+Diet Family
+SemiCom, 2001
+
+PCB Layout
+----------
+
+F-E1-16-010
++-----------------------------------------------+
+|     VR1          YM3012  VROM1                |
+|                  YM2151  M6295   ROML03 ROMU03|
+|               CRAM2              ROML02 ROMU02|
+|               CRAM1              ROML01 ROMU01|
+|               MEM1L              ROML00 ROMU00|
+|J              MEM1U                           |
+|A              MEM2  +----------++----------+  |
+|M                    |          ||          |  |
+|M              MEM3  |Quicklogic||Quicklogic| 2|
+|A                    | QL2003-  || QL2003-  | 8|
+|               MEM6  | XPL84C   || XPL84C   | M|
+|                     |          ||          | H|
+|               MEM7  +----------++----------+ z|
+|                      GAL                      |
+|    93C46                       ROM1           |
+|P1 P2   50MHz E1-16T   DRAM1    ROM2           |
++-----------------------------------------------+
+
+Notes:
+CPU - Hyperstone E1-16T @ 50.000MHz
+
+DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
+CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
+MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
+
+Oki M6295 rebaged as AD-65
+YM3012/YM2151 rebaged as BS902/KA51
+
+ P1 - Reset push button
+ P2 - Setup push button
+VR1 - Volume adjust pot
+
+ROMs:
+    ROML00 & ROMH00 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML01 & ROMH01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML02 & ROMH02 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML03 & ROMH03 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+    VROM1           - 27C040 2MBit DIP32 EPROM
+    ROM1            - 27C040 4MBit DIP32 EPROM
+    ROM2            - 27C040 4MBit DIP32 EPROM
+
+*/
+
+ROM_START( dtfamily )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "rom1",         0x00000, 0x080000, CRC(738636d2) SHA1(ba7906df99764ee7e1f505c319d364c64c605ff0) )
+	ROM_LOAD( "rom2",         0x80000, 0x080000, CRC(0953f5e4) SHA1(ee8b3c4f9c9301c9815747eab5435e006ec84ca1) )
+
+	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(7e2a7520) SHA1(0ff157fe34ff31cd8636af821fe14c12242d757f) )
+	ROM_LOAD32_WORD( "romu00", 0x000002, 0x200000, CRC(c170755f) SHA1(019d24979071f0ab2b3c93a5ec9327e6a0b2afa2) )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(3d487ffe) SHA1(c5608423d608922c0e1ac8bdfaa0de062b2c9821) )
+	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, CRC(716efedb) SHA1(fb468d93817a49173698872c49a289c257f77a92) )
+	ROM_LOAD32_WORD( "roml02", 0x800000, 0x200000, CRC(c3dd3c96) SHA1(2707f690b5850685f782fc04a7dbd1d91f443223) )
+	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(80830961) SHA1(b318e9e3a4d1d7dca61d7d4c9ee01f605e2b2f4a) )
+	/* roml03 empty */
+	/* romu03 empty */
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1", 0x00000, 0x80000, CRC(4aacaef3) SHA1(c079170dc0ba0b91b1780cd175dc38151d640ff0) )
 ROM_END
 
 /*
@@ -2213,6 +2284,17 @@ static READ16_HANDLER( mrdig_speedup_r )
 	return state->m_wram[(0x00a99c / 2)+offset];
 }
 
+static READ16_HANDLER( dtfamily_speedup_r ) /* WRONG!! Speed up */
+{
+	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
+
+	if (cpu_get_pc(&space->device()) == 0x130c2)
+		device_spin_until_interrupt(&space->device());
+
+	return state->m_wram[0x780d8 / 2];
+
+}
+
 static READ16_HANDLER( toyland_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
@@ -2364,6 +2446,16 @@ static DRIVER_INIT( dquizgo2 )
 	state->m_flip_bit = 1;
 }
 
+static DRIVER_INIT( dtfamily )
+{
+	vamphalf_state *state = machine.driver_data<vamphalf_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x780d8, 0x780d9, FUNC(dtfamily_speedup_r) ); /* WRONG!! */
+
+	state->m_palshift = 0;
+	state->m_flip_bit = 1;
+}
+
+
 static DRIVER_INIT( toyland )
 {
 	vamphalf_state *state = machine.driver_data<vamphalf_state>();
@@ -2422,6 +2514,7 @@ GAME( 1999, vamphalfk,vamphalf, vamphalf, common,   vamphafk, ROT0,   "Danbi / F
 GAME( 2000, dquizgo2, 0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
 GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
 GAME( 2000, mrdig,    0,        mrdig,    common,   mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
+GAME( 2001, dtfamily, 0,        coolmini, common,   dtfamily, ROT0,   "SemiCom",           "Diet Family", 0 )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
 GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_NOT_WORKING ) // game stops booting / working properly after you get a high score, or if you don't have a default eeprom with 'valid data.  It's never worked properly, CPU core issue?
 GAME( 2001, toyland,  0,        coolmini, common,   toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", 0 )
