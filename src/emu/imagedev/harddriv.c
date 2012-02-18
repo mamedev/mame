@@ -25,6 +25,8 @@ static const char *const error_strings[] =
 	"no error",
 	"no drive interface",
 	"out of memory",
+	"file not open",
+	"file already open",
 	"invalid file",
 	"invalid parameter",
 	"invalid data",
@@ -39,11 +41,19 @@ static const char *const error_strings[] =
 	"decompression error",
 	"compression error",
 	"can't create file",
-	"can't verify file"
+	"can't verify file",
 	"operation not supported",
 	"can't find metadata",
 	"invalid metadata size",
-	"unsupported CHD version"
+	"unsupported CHD version",
+	"verify incomplete",
+	"invalid metadata",
+	"invalid state",
+	"operation pending",
+	"unsupported format",
+	"unknown compression",
+	"error walking_parent",
+	"error compressing"
 };
 
 static const char *chd_get_error_string(int chderr)
@@ -230,6 +240,7 @@ int harddisk_image_device::internal_load_hd()
 		{
 			is_writeable = !is_readonly();
 			err = m_self_chd.open(*image_core_file(), is_writeable);
+			printf("%d\n",err);
 			if (err == CHDERR_NONE)
 				m_chd = &m_self_chd;
 
@@ -258,8 +269,9 @@ done:
 				m_self_chd.close();
 			m_chd = NULL;
 		}
-
+		printf("%d\n",err);
 		seterror(IMAGE_ERROR_UNSPECIFIED, chd_get_error_string(err));
+		printf("%s\n",chd_get_error_string(err));
 	}
 	return err ? IMAGE_INIT_FAIL : IMAGE_INIT_PASS;
 }

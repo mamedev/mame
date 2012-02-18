@@ -16,6 +16,8 @@ static const char *const error_strings[] =
 	"no error",
 	"no drive interface",
 	"out of memory",
+	"file not open",
+	"file already open",
 	"invalid file",
 	"invalid parameter",
 	"invalid data",
@@ -30,11 +32,19 @@ static const char *const error_strings[] =
 	"decompression error",
 	"compression error",
 	"can't create file",
-	"can't verify file"
+	"can't verify file",
 	"operation not supported",
 	"can't find metadata",
 	"invalid metadata size",
-	"unsupported CHD version"
+	"unsupported CHD version",
+	"verify incomplete",
+	"invalid metadata",
+	"invalid state",
+	"operation pending",
+	"unsupported format",
+	"unknown compression",
+	"error walking_parent",
+	"error compressing"
 };
 
 static const char *chd_get_error_string(int chderr)
