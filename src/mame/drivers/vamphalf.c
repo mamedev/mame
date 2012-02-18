@@ -18,6 +18,7 @@
     Date Quiz Go Go Episode 2       (c) 2000 SemiCom
     Mission Craft                   (c) 2000 Sun                (version 2.4)
     Mr. Dig                         (c) 2000 Sun
+    Diet Family                     (c) 2001 SemiCom
     Final Godori                    (c) 2001 SemiCom            (version 2.20.5915)
     Wyvern Wings                    (c) 2001 SemiCom
     Mr. Kicker                      (c) 2001 SemiCom [1]
@@ -43,7 +44,6 @@
    Red Wyvern - A semi-sequel or update?
  Same time era, but unknown hardware:
    Gaia The last Choice of the Earth (c) 1998 (might be Byron Future Assault type hardware)
-   Diet Family (c) 2001
    Choice III: Joker's Dream (c) 2001
 
 TODO:
@@ -2284,14 +2284,16 @@ static READ16_HANDLER( mrdig_speedup_r )
 	return state->m_wram[(0x00a99c / 2)+offset];
 }
 
-static READ16_HANDLER( dtfamily_speedup_r ) /* WRONG!! Speed up */
+static READ16_HANDLER( dtfamily_speedup_r )
 {
 	vamphalf_state *state = space->machine().driver_data<vamphalf_state>();
 
-	if (cpu_get_pc(&space->device()) == 0x130c2)
+	int pc = cpu_get_pc(&space->device());
+
+	if (pc == 0x12fa6)
 		device_spin_until_interrupt(&space->device());
 
-	return state->m_wram[0x780d8 / 2];
+	return state->m_wram[0xcc2a8 / 2];
 
 }
 
@@ -2449,7 +2451,7 @@ static DRIVER_INIT( dquizgo2 )
 static DRIVER_INIT( dtfamily )
 {
 	vamphalf_state *state = machine.driver_data<vamphalf_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x780d8, 0x780d9, FUNC(dtfamily_speedup_r) ); /* WRONG!! */
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xcc2a8, 0xcc2a9, FUNC(dtfamily_speedup_r) );
 
 	state->m_palshift = 0;
 	state->m_flip_bit = 1;
