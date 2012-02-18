@@ -147,12 +147,7 @@ void mc146818_device::device_start()
 
 	memset(m_data, 0, sizeof(m_data));
 
-	if (m_type == MC146818_UTC) {
-		// hack: for apollo we increase the update frequency to stay in sync with real time
-		m_clock_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
-	} else {
-		m_clock_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
-	}
+	m_clock_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 
 	m_periodic_timer->adjust(attotime::never);
 	m_period = attotime::never;
@@ -422,7 +417,8 @@ READ8_MEMBER( mc146818_device::read )
 		switch (m_index % MC146818_DATA_SIZE) {
 		case 0xa:
 			data = m_data[m_index  % MC146818_DATA_SIZE];
-			if ((space.machine().time() - m_last_refresh) < attotime::from_hz(32768))
+			// Update In Progress (UIP) time for 32768 Hz is 244+1984usec
+			if ((space.machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
 				data |= 0x80;
 #if 0
 			/* for pc1512 bios realtime clock test */

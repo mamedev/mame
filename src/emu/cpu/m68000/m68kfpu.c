@@ -5,6 +5,9 @@
 #define FPCC_I			0x02000000
 #define FPCC_NAN		0x01000000
 
+#define FPES_OE			0x00002000
+#define FPAE_IOP		0x00000080
+
 #define DOUBLE_INFINITY					U64(0x7ff0000000000000)
 #define DOUBLE_EXPONENT					U64(0x7ff0000000000000)
 #define DOUBLE_MANTISSA					U64(0x000fffffffffffff)
@@ -1390,7 +1393,9 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 		case 0x24:		// FSGLDIV
 		{
-			REG_FP(m68k)[dst] = floatx80_div(REG_FP(m68k)[dst], source);
+			float32 a = floatx80_to_float32( REG_FP(m68k)[dst] );
+			float32 b = floatx80_to_float32( source );
+			REG_FP(m68k)[dst] = float32_to_floatx80( float32_div(a, b) );
 			m68k->remaining_cycles -= 43; //  // ? (value is from FDIV)
 			break;
 		}
@@ -1403,7 +1408,9 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 		case 0x27:		// FSGLMUL
 		{
-			REG_FP(m68k)[dst] = floatx80_mul(REG_FP(m68k)[dst], source);
+			float32 a = floatx80_to_float32( REG_FP(m68k)[dst] );
+			float32 b = floatx80_to_float32( source );
+			REG_FP(m68k)[dst] = float32_to_floatx80( float32_mul(a, b) );
 			SET_CONDITION_CODES(m68k, REG_FP(m68k)[dst]);
 			m68k->remaining_cycles -= 11; // ? (value is from FMUL)
 			break;
@@ -1471,7 +1478,12 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 		case 4:		// Word Integer
 		{
-			WRITE_EA_16(m68k, ea, (INT16)floatx80_to_int32(REG_FP(m68k)[src]));
+			int32 value = floatx80_to_int32(REG_FP(m68k)[src]);
+			if (value > 0x7fff || value < -0x8000 )
+			{
+				REG_FPSR(m68k) |= FPES_OE | FPAE_IOP;
+			}
+			WRITE_EA_16(m68k, ea, (INT16)value);
 			break;
 		}
 		case 5:		// Double-precision Real
@@ -1485,7 +1497,12 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 		case 6:		// Byte Integer
 		{
-			WRITE_EA_8(m68k, ea, (INT8)floatx80_to_int32(REG_FP(m68k)[src]));
+			int32 value = floatx80_to_int32(REG_FP(m68k)[src]);
+			if (value > 127 || value < -128)
+			{
+				REG_FPSR(m68k) |= FPES_OE | FPAE_IOP;
+			}
+			WRITE_EA_8(m68k, ea, (INT8) value);
 			break;
 		}
 		case 7:		// Packed-decimal Real with Dynamic K-factor
@@ -1546,6 +1563,56 @@ static void fmove_fpcr(m68ki_cpu_core *m68k, UINT16 w2)
 			if (regsel & 1) REG_FPIAR(m68k) = READ_EA_32(m68k, ea);
 		}
 	}
+
+#if 0
+	// FIXME: (2011-12-18 ost)
+	// rounding_mode and rounding_precision of softfloat.c should be set according to current fpcr
+	// but:  with this code on Apollo the following programs in /systest/fptest will fail:
+	// 1. Single Precision Whetstone will return wrong results never the less
+	// 2. Vector Test will fault with 00040004: reference to illegal address
+
+	if ((regsel & 4) && dir == 0)
+	{
+		int rnd = (REG_FPCR(m68k) >> 4) & 3;
+		int prec = (REG_FPCR(m68k) >> 6) & 3;
+
+		logerror("m68k_fpsp:fmove_fpcr fpcr=%04x prec=%d rnd=%d\n", REG_FPCR(m68k), prec, rnd);
+
+#ifdef FLOATX80
+		switch (prec)
+		{
+		case 0: // Extend (X)
+			floatx80_rounding_precision = 80;
+			break;
+		case 1: // Single (S)
+			floatx80_rounding_precision = 32;
+			break;
+		case 2: // Double (D)
+			floatx80_rounding_precision = 64;
+			break;
+		case 3: // Undefined
+			floatx80_rounding_precision = 80;
+			break;
+		}
+#endif
+
+		switch (rnd)
+		{
+		case 0: // To Nearest (RN)
+			float_rounding_mode = float_round_nearest_even;
+			break;
+		case 1: // To Zero (RZ)
+			float_rounding_mode = float_round_to_zero;
+			break;
+		case 2: // To Minus Infinitiy (RM)
+			float_rounding_mode = float_round_down;
+			break;
+		case 3: // To Plus Infinitiy (RP)
+			float_rounding_mode = float_round_up;
+			break;
+		}
+	}
+#endif
 
 	m68k->remaining_cycles -= 10;
 }

@@ -10483,8 +10483,17 @@ M68KMAKE_OP(cinv, 32, ., .)
 {
 	if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 	{
-		logerror("%s at %08x: called unimplemented instruction %04x (cinv)\n",
-					 (mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+		UINT16 ir = mc68kcpu->ir;
+		UINT8 cache = (ir >> 6) & 3;
+//		UINT8 scope = (ir >> 3) & 3;
+//		logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", REG_PPC(mc68kcpu), ir, cache, scope, ir & 7);
+		switch (cache)
+		{
+		case 2:
+		case 3:
+			// we invalidate/push the whole instruction cache
+			m68ki_ic_clear(mc68kcpu);
+		}
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);

@@ -260,6 +260,18 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		}
 	}
 
+	if (m68k->mmu_tt1 & 0x8000)
+	{
+		// transparent translation register 1 enabled
+		UINT32 address_base = m68k->mmu_tt1 & 0xff000000;
+		UINT32 address_mask = ((m68k->mmu_tt1 << 8) & 0xff000000) ^ 0xff000000;
+		if ((addr_in & address_mask) == address_base)
+		{
+//          printf("PMMU: pc=%x TT1 fc=%x addr_in=%08x address_mask=%08x address_base=%08x\n", m68k->ppc, fc, addr_in, address_mask, address_base);
+			return addr_in;
+		}
+	}
+
 //  if ((++pmmu_access_count % 10000000) == 0) {
 //      printf("pmmu_translate_addr_with_fc: atc usage = %d%%\n", pmmu_atc_count*100/pmmu_access_count);
 //      pmmu_atc_count = pmmu_access_count = 0;
@@ -777,6 +789,11 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 		printf("680x0: unhandled PBcc\n");
 		return;
 	}
+	else if ((m68k->ir & 0xffe0) == 0xf500)
+	{
+//		logerror("68040 pflush: pc=%08x ir=%04x opmode=%d register=%d\n", REG_PPC(m68k), m68k->ir, (m68k->ir >> 3) & 3, m68k->ir & 7);
+		pmmu_atc_flush(m68k);
+	}
 	else	// the rest are 1111000xxxXXXXXX where xxx is the instruction family
 	{
 		switch ((m68k->ir>>9) & 0x7)
@@ -971,6 +988,20 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 													pmmu_atc_flush(m68k);
 												}
 												break;
+
+												case 7: // MC68851 Access Control Register
+													if (m68k->cpu_type == CPU_TYPE_020)
+													{
+														// DomainOS on Apollo DN3000 will only reset this to 0
+														UINT16 mmu_ac = READ_EA_16(m68k, ea);
+														if (mmu_ac != 0)
+														{
+															printf("680x0 PMMU: pc=%x PMOVE to mmu_ac=%08x\n",
+																	m68k->ppc, mmu_ac);
+														}
+														break;
+													}
+													// fall through; unknown PMOVE mode unless MC68020 with MC68851
 
 											default:
 												printf("680x0: PMOVE to unknown MMU register %x, PC %x\n", (modes>>10) & 7, m68k->pc);
