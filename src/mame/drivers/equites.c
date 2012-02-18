@@ -1141,7 +1141,7 @@ static const ay8910_interface equites_8910intf =
 
 static const char *const alphamc07_sample_names[] =
 {
-	"*alphamc07",
+	"*equites",
 	"bongo1",
 	"bongo2",
 	"bongo3",

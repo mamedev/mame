@@ -586,7 +586,7 @@ static WRITE8_DEVICE_HANDLER(mkiv_pia_outb)
 
 static const char *const meter_sample_names[] =
 {
-	"*aristmk4",
+	"*3bagflvt",
 	"tick",
 	0
 };
