@@ -249,11 +249,11 @@ const char *hash_collection::macro_string(astring &buffer) const
 	// handle CRCs
 	astring temp;
 	if (m_has_crc32)
-		buffer.cat("CRC(").cat(m_crc32.as_string(temp)).cat(" )");
+		buffer.cat("CRC(").cat(m_crc32.as_string(temp)).cat(") ");
 		
 	// handle SHA1s
 	if (m_has_sha1)
-		buffer.cat("SHA1(").cat(m_sha1.as_string(temp)).cat(" )");
+		buffer.cat("SHA1(").cat(m_sha1.as_string(temp)).cat(") ");
 
 	// append flags
 	if (flag(FLAG_NO_DUMP))
