@@ -119,7 +119,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 	UINT32 physofs;
 
 	/* allocate memory for the CD-ROM file */
-	file = (cdrom_file *)malloc(sizeof(cdrom_file));
+	file = new cdrom_file();
 	if (file == NULL)
 		return NULL;
 
@@ -208,7 +208,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 	err = cdrom_parse_metadata(chd, &file->cdtoc);
 	if (err != CHDERR_NONE)
 	{
-		free(file);
+		delete(file);
 		return NULL;
 	}
 
@@ -263,7 +263,7 @@ void cdrom_close(cdrom_file *file)
 		}
 	}
 
-	free(file);
+	delete(file);
 }
 
 
