@@ -3698,7 +3698,7 @@ ROM_END
 
 ROM_START( witchgme )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* Video Klein */
-	ROM_LOAD( "hn58c256p.box",	0x0000, 0x8000, CRC(26c334cb) SHA1(d8368835c88668f09560f6096148a6e528806f65) )
+	ROM_LOAD( "hn58c256p.box12t1",	0x0000, 0x8000, CRC(26c334cb) SHA1(d8368835c88668f09560f6096148a6e528806f65) )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
 	ROM_LOAD( "1.2a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  /* cards deck gfx, bitplane1 */
@@ -4184,10 +4184,10 @@ ROM_START( falcnwlda )
 	ROM_LOAD( "fw4.7a",	0x1000, 0x0800, CRC(f0517b0d) SHA1(474bcf429f2539ff1f3d7d32d259c5973ccb0234) )  /* text layer */
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "fw1.2a",	0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "fw1.2a_bad",	0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */
 	ROM_IGNORE(                 0x0800)
-	ROM_LOAD( "fw2.4a",	0x0800, 0x0800, BAD_DUMP CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )  /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "fw3.5a",	0x1000, 0x0800, BAD_DUMP CRC(87abebe5) SHA1(5950082b563718476576dbc9f45439019209493e) )  /* cards deck gfx, bitplane3 */
+	ROM_LOAD( "fw2.4a_bad",	0x0800, 0x0800, BAD_DUMP CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )  /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "fw3.5a_bad",	0x1000, 0x0800, BAD_DUMP CRC(87abebe5) SHA1(5950082b563718476576dbc9f45439019209493e) )  /* cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "n82s137f.box",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
@@ -4656,7 +4656,7 @@ ROM_END
 
 ROM_START( wldwitch )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* Video Klein */
-	ROM_LOAD( "hn58c256p.box",	0x8000, 0x8000, CRC(1de736a7) SHA1(e714a97999555fe0107390c8c9c2c3c1e822809a) )
+	ROM_LOAD( "hn58c256p.box163",	0x8000, 0x8000, CRC(1de736a7) SHA1(e714a97999555fe0107390c8c9c2c3c1e822809a) )
 
 	ROM_REGION( 0x18000, "temp", 0 )
 	ROM_LOAD( "03.a3",	0x00000, 0x8000, CRC(ae474414) SHA1(6dee760cee18e125791c17b562ca8aabe1f4593e) )

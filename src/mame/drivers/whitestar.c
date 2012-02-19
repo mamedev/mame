@@ -2975,8 +2975,8 @@ ROM_START(ctchzdlx)
 	ROM_REGION(0x010000, "soundcpu", 0)
 	ROM_LOAD("ctcu7d.bin", 0x0000, 0x10000, CRC(92bfe454) SHA1(8182f7ac84addf8bdb7976a85c801edf3424d16b))
 	ROM_REGION(0x1000000, "bsmt", 0)
-	ROM_LOAD("ctcu17.bin", 0x000000, 0x80000, CRC(7ee35d17) SHA1(f2c9b70285926fc782a2e1289532395cd8dbf999))
-	ROM_LOAD("ctcu21.bin", 0x080000, 0x80000, CRC(84dd40ac) SHA1(c9327b95f1730a3aa741540c28078f214af214b8))
+	ROM_LOAD("ctcdxu17.bin", 0x000000, 0x80000, CRC(7ee35d17) SHA1(f2c9b70285926fc782a2e1289532395cd8dbf999))
+	ROM_LOAD("ctcdxu21.bin", 0x080000, 0x80000, CRC(84dd40ac) SHA1(c9327b95f1730a3aa741540c28078f214af214b8))
 ROM_END
 
 /*-------------------------------------------------------------------

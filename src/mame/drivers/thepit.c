@@ -834,11 +834,11 @@ ROM_START( fitterbl )
 	ROM_LOAD( "bl-ic33.bin",  0x4000, 0x1000, CRC(1f3c78ee) SHA1(961b6ba8d08ddcbeda52b98a2f181f37beed5fb1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ic30.bin",     0x0000, 0x0800, CRC(1b18faee) SHA1(b4002e2fdaa6bb966da4faa46ac56751a3841f5f) )
-	ROM_LOAD( "ic31.bin",     0x0800, 0x0800, CRC(76cf4394) SHA1(5dc13bd5fc92ce4ce12bab60576292a6028891c3) )
+	ROM_LOAD( "bl-ic30.bin",  0x0000, 0x0800, CRC(1b18faee) SHA1(b4002e2fdaa6bb966da4faa46ac56751a3841f5f) )
+	ROM_LOAD( "bl-ic31.bin",  0x0800, 0x0800, CRC(76cf4394) SHA1(5dc13bd5fc92ce4ce12bab60576292a6028891c3) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
-	ROM_LOAD( "ic9.bin",      0x0000, 0x0800, CRC(394676a2) SHA1(5bd26d717e25b7c192af8173db9ae18371dbcfbe) )
+	ROM_LOAD( "bl-ic9.bin",   0x0000, 0x0800, CRC(394676a2) SHA1(5bd26d717e25b7c192af8173db9ae18371dbcfbe) )
 	ROM_LOAD( "ic10.bin",     0x1000, 0x0800, CRC(a38d708d) SHA1(6632392cece34332a2a4427ec14d95f201319c67) )
 
 	ROM_REGION( 0x0020, "proms", 0 )

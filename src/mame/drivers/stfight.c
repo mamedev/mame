@@ -599,8 +599,8 @@ ROM_END
 
 ROM_START( empcityj )
 	ROM_REGION( 2*0x18000, "maincpu", 0 )	/* 96k for code + 96k for decrypted opcodes */
-	ROM_LOAD( "1.bin",      0x00000, 0x8000, CRC(8162331c) SHA1(f2fdf5fbc52d4ea692fb87fa049c48935a73d67b) )
-	ROM_LOAD( "2.bin",      0x10000, 0x8000, CRC(960edea6) SHA1(fd19475e841defe42625a94c40c6390b7e6e7682) )	/* bank switched */
+	ROM_LOAD( "ec_1.bin",   0x00000, 0x8000, CRC(8162331c) SHA1(f2fdf5fbc52d4ea692fb87fa049c48935a73d67b) )
+	ROM_LOAD( "ec_2.bin",   0x10000, 0x8000, CRC(960edea6) SHA1(fd19475e841defe42625a94c40c6390b7e6e7682) )	/* bank switched */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )

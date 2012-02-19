@@ -6684,7 +6684,7 @@ ROM_START( tenkai2b )
 	ROM_LOAD( "mc0.u11",          0x00000, 0x40000, CRC(8488a3ab) SHA1(f367a2dcc65410929db595b3c442d310d50a4940) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	// tenkai internal rom is incompatible with the code of this set
-	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "tenkai2b_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "mc1.u8",  0x000000, 0x100000, CRC(786698e3) SHA1(9ddf4e31f454fb3c7969b1433771e95a976de741) )
@@ -6899,7 +6899,7 @@ ROM_START( tenkaid )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	ROM_RELOAD(                   0x50000, 0x40000 )
 	// tenkai internal rom is incompatible with the code of this set
-	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "tenkaid_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "tydg002.u8",  0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )

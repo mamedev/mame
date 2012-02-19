@@ -692,7 +692,7 @@ ROM_START( moomesaua ) /* Version UA - USA Ver A */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD16_BYTE( "151_b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) ) /* Version UAB? */
-	ROM_LOAD16_BYTE( "151_ua_b02", 0x000001,  0x40000, CRC(3d9f4d59) SHA1(db47044bd4935fce94ec659242c9819c30eb6d0f) )
+	ROM_LOAD16_BYTE( "151_uaa_b02", 0x000001,  0x40000, CRC(3d9f4d59) SHA1(db47044bd4935fce94ec659242c9819c30eb6d0f) )
 
 	/* data */
 	ROM_LOAD16_BYTE( "151a03", 0x100000,  0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
