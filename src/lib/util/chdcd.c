@@ -387,8 +387,10 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 				index1 = read_uint64(infile);
 				index2 = read_uint64(infile);
 
-//              printf("Track %d: sector size %d mode %x index0 %llx index1 %llx index2 %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, index2, (UINT32)(index1-index0)/size, (UINT32)(index2-index1)/size);
-				outinfo.track[track-1].fname.cpy(path.cstr()).cat(tocfname);
+                printf("Track %d: sector size %d mode %x index0 %llx index1 %llx index2 %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, index2, (UINT32)(index1-index0)/size, (UINT32)(index2-index1)/size);
+//				outinfo.track[track-1].fname.cpy(path.cstr()).cat(tocfname);
+                strncpy(outinfo.track[track-1].fname, path.cstr(), 256);
+                strncat(outinfo.track[track-1].fname, tocfname, 256);
 				outinfo.track[track-1].offset = offset + (UINT32)(index1-index0);
 				outinfo.track[track-1].idx0offs = 0;
 				outinfo.track[track-1].idx1offs = 0;
@@ -538,7 +540,8 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 			} while(tok!=NULL && (strrchr(tok,'"')-tok !=(strlen(tok)-1)));
 			name = name.delchr('"');
 		}
-		outinfo.track[trknum].fname.cpy(path.cstr()).cat(name);
+        strncpy(outinfo.track[trknum].fname, path.cstr(), 256);
+        strncat(outinfo.track[trknum].fname, name, 256);
 
 		sz=get_file_size(outinfo.track[trknum].fname);
 
@@ -687,7 +690,8 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				outinfo.track[trknum].idx0offs = -1;
 				outinfo.track[trknum].idx1offs = 0;
 
-				outinfo.track[trknum].fname.cpy(lastfname); // default filename to the last one
+				strncpy(outinfo.track[trknum].fname, lastfname, 256); // default filename to the last one
+
 //              printf("trk %d: fname %s offset %d\n", trknum, outinfo.track[trknum].fname.cstr(), outinfo.track[trknum].offset);
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
@@ -779,7 +783,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
 					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.cstr());
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname);
 						return CHDERR_FILE_NOT_FOUND;
 					}
 					outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
@@ -790,7 +794,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
 					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.cstr());
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname);
 						return CHDERR_FILE_NOT_FOUND;
 					}
 					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
@@ -825,7 +829,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
 					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname.cstr());
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname);
 						return CHDERR_FILE_NOT_FOUND;
 					}
 					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
@@ -908,7 +912,8 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				TOKENIZE
 
 				/* keep the filename */
-				outinfo.track[trknum].fname.cpy(path.cstr()).cat(token);
+                strncpy(outinfo.track[trknum].fname, path.cstr(), 256);
+                strncat(outinfo.track[trknum].fname, token, 256);
 
 				/* get either the offset or the length */
 				TOKENIZE
