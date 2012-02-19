@@ -148,7 +148,7 @@ void N64TexturePipeT::ShiftCopy(INT32* S, INT32* T, UINT32 num, const rdp_poly_s
 	*T = SIGN16(*T);
 }
 
-void N64TexturePipeT::ClampCycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, INT32 num, rdp_span_aux *userdata, const rdp_poly_state& object)
+void N64TexturePipeT::ClampCycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, INT32 num, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
 {
 	const N64Tile* tile = object.m_tiles;
 	int dos = tile[num].cs || !tile[num].mask_s;
@@ -163,7 +163,7 @@ void N64TexturePipeT::ClampCycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC,
 		}
 		else if (maxs)
 		{
-			*S = userdata->m_clamp_s_diff[num];
+			*S = m_clamp_s_diff[num];
 			*SFRAC = 0;
 		}
 		else
@@ -185,7 +185,7 @@ void N64TexturePipeT::ClampCycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC,
 		}
 		else if (maxt)
 		{
-			*T = userdata->m_clamp_t_diff[num];
+			*T = m_clamp_t_diff[num];
 			*TFRAC = 0;
 		}
 		else
@@ -199,7 +199,7 @@ void N64TexturePipeT::ClampCycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC,
 	}
 }
 
-void N64TexturePipeT::ClampCycleLight(INT32* S, INT32* T, bool maxs, bool maxt, INT32 num, rdp_span_aux *userdata, const rdp_poly_state& object)
+void N64TexturePipeT::ClampCycleLight(INT32* S, INT32* T, bool maxs, bool maxt, INT32 num, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
 {
 	const N64Tile* tile = object.m_tiles;
 	int dos = tile[num].cs || !tile[num].mask_s;
@@ -213,7 +213,7 @@ void N64TexturePipeT::ClampCycleLight(INT32* S, INT32* T, bool maxs, bool maxt, 
 		}
 		else if (maxs)
 		{
-			*S = userdata->m_clamp_s_diff[num];
+			*S = m_clamp_s_diff[num];
 		}
 		else
 		{
@@ -233,7 +233,7 @@ void N64TexturePipeT::ClampCycleLight(INT32* S, INT32* T, bool maxs, bool maxt, 
 		}
 		else if (maxt)
 		{
-			*T = userdata->m_clamp_t_diff[num];
+			*T = m_clamp_t_diff[num];
 		}
 		else
 		{
@@ -246,7 +246,7 @@ void N64TexturePipeT::ClampCycleLight(INT32* S, INT32* T, bool maxs, bool maxt, 
 	}
 }
 
-void N64TexturePipeT::Cycle(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object)
+void N64TexturePipeT::Cycle(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
 {
 	const N64Tile* tile = object.m_tiles;
 
@@ -279,7 +279,7 @@ void N64TexturePipeT::Cycle(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT3
 		INT32 sfrac = sss1 & 0x1f;
 		INT32 tfrac = sst1 & 0x1f;
 
-		ClampCycle(&sss1, &sst1, &sfrac, &tfrac, maxs, maxt, tilenum, userdata, object);
+		ClampCycle(&sss1, &sst1, &sfrac, &tfrac, maxs, maxt, tilenum, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
 		sss2 = sss1 + 1;
 		sst2 = sst1 + 1;
@@ -374,7 +374,7 @@ void N64TexturePipeT::Cycle(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT3
 		sss1 = TRELATIVE(sss1, tile[tilenum].sl);
 		sst1 = TRELATIVE(sst1, tile[tilenum].tl);
 
-		ClampCycleLight(&sss1, &sst1, maxs, maxt, tilenum, userdata, object);
+		ClampCycleLight(&sss1, &sst1, maxs, maxt, tilenum, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
         Mask(&sss1, &sst1, tilenum, object);
 
@@ -774,7 +774,7 @@ void N64TexturePipeT::LOD2CycleLimited(INT32* sss, INT32* sst, INT32 s, INT32 t,
 	}
 }
 
-void N64TexturePipeT::CalculateClampDiffs(UINT32 prim_tile, rdp_span_aux *userdata, const rdp_poly_state& object)
+void N64TexturePipeT::CalculateClampDiffs(UINT32 prim_tile, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)
 {
 	const N64Tile* tile = object.m_tiles;
 	if (object.OtherModes.cycle_type == CYCLE_TYPE_2)
@@ -785,24 +785,24 @@ void N64TexturePipeT::CalculateClampDiffs(UINT32 prim_tile, rdp_span_aux *userda
 			int end = 7;
 			for (; start <= end; start++)
 			{
-				userdata->m_clamp_s_diff[start] = (tile[start].sh >> 2) - (tile[start].sl >> 2);
-				userdata->m_clamp_t_diff[start] = (tile[start].th >> 2) - (tile[start].tl >> 2);
+				m_clamp_s_diff[start] = (tile[start].sh >> 2) - (tile[start].sl >> 2);
+				m_clamp_t_diff[start] = (tile[start].th >> 2) - (tile[start].tl >> 2);
 			}
 		}
 		else
 		{
 			int start = prim_tile;
 			int end = (prim_tile + 1) & 7;
-			userdata->m_clamp_s_diff[start] = (tile[start].sh >> 2) - (tile[start].sl >> 2);
-			userdata->m_clamp_t_diff[start] = (tile[start].th >> 2) - (tile[start].tl >> 2);
-			userdata->m_clamp_s_diff[end] = (tile[end].sh >> 2) - (tile[end].sl >> 2);
-			userdata->m_clamp_t_diff[end] = (tile[end].th >> 2) - (tile[end].tl >> 2);
+			m_clamp_s_diff[start] = (tile[start].sh >> 2) - (tile[start].sl >> 2);
+			m_clamp_t_diff[start] = (tile[start].th >> 2) - (tile[start].tl >> 2);
+			m_clamp_s_diff[end] = (tile[end].sh >> 2) - (tile[end].sl >> 2);
+			m_clamp_t_diff[end] = (tile[end].th >> 2) - (tile[end].tl >> 2);
 		}
 	}
 	else//1-cycle or copy
 	{
-		userdata->m_clamp_s_diff[prim_tile] = (tile[prim_tile].sh >> 2) - (tile[prim_tile].sl >> 2);
-		userdata->m_clamp_t_diff[prim_tile] = (tile[prim_tile].th >> 2) - (tile[prim_tile].tl >> 2);
+		m_clamp_s_diff[prim_tile] = (tile[prim_tile].sh >> 2) - (tile[prim_tile].sl >> 2);
+		m_clamp_t_diff[prim_tile] = (tile[prim_tile].th >> 2) - (tile[prim_tile].tl >> 2);
 	}
 }
 

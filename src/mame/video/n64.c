@@ -119,7 +119,6 @@ void n64_rdp::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 	UINT32 hres = ((float)hdiff * hcoeff);
 	INT32 invisiblewidth = n64->vi_width - hres;
 
-	//printf("%d, %f, %d, %d\n", hdiff, hcoeff, hres, invisiblewidth);
 	INT32 vdiff = ((n64->vi_vstart & 0x3ff) - ((n64->vi_vstart >> 16) & 0x3ff)) >> 1;
 	float vcoeff = ((float)(n64->vi_yscale & 0xfff) / (1 << 10));
 	UINT32 vres = ((float)vdiff * vcoeff);
@@ -1169,7 +1168,6 @@ UINT32 n64_rdp::ReadData(UINT32 address)
 {
 	if (m_status & 0x1)		// XBUS_DMEM_DMA enabled
 	{
-		//printf("%08x\n", rsp_dmem[(address & 0xfff) / 4]);
 		return rsp_dmem[(address & 0xfff) / 4];
 	}
 	else
@@ -2112,8 +2110,8 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 
 	int xfrac = ((xright >> 8) & 0xff);
 
-	rdp_poly_state &object = object_data_alloc();
-	memcpy(&object.m_tmem, m_tmem, 0x1000);
+	bool new_object = true;
+	rdp_poly_state *object = NULL;
 
 	if(flip)
 	{
@@ -2152,6 +2150,13 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 
 				if (spix == 0)
 				{
+					if(new_object)
+					{
+						object = &object_data_alloc();
+						memcpy(object->m_tmem, m_tmem, 0x1000);
+						new_object = false;
+					}
+
 					Spans[j - (ycur >> 2)].userdata = (void*)((UINT8*)AuxBuf + AuxBufPtr);
 					AuxBufPtr += sizeof(rdp_span_aux);
 
@@ -2161,7 +2166,8 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 					}
 
 					rdp_span_aux *userdata = (rdp_span_aux*)Spans[j - (ycur >> 2)].userdata;
-					userdata->m_tmem = object.m_tmem;
+
+					userdata->m_tmem = object->m_tmem;
 
 					userdata->BlendColor = BlendColor;
 					userdata->PrimColor = PrimColor;
@@ -2310,6 +2316,13 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 
 				if (spix == 0)
 				{
+					if(new_object)
+					{
+						object = &object_data_alloc();
+						memcpy(object->m_tmem, m_tmem, 0x1000);
+						new_object = false;
+					}
+
 					Spans[j - (ycur >> 2)].userdata = (void*)((UINT8*)AuxBuf + AuxBufPtr);
 					AuxBufPtr += sizeof(rdp_span_aux);
 
@@ -2319,7 +2332,7 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 					}
 
 					rdp_span_aux *userdata = (rdp_span_aux*)Spans[j - (ycur >> 2)].userdata;
-					userdata->m_tmem = object.m_tmem;
+					userdata->m_tmem = object->m_tmem;
 
 					userdata->BlendColor = BlendColor;
 					userdata->PrimColor = PrimColor;
@@ -2431,7 +2444,11 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 		}
 	}
 
-	RenderSpans(yh >> 2, yl >> 2, tilenum, flip ? true : false, Spans, rect, object);
+	if(!new_object)
+	{
+		RenderSpans(yh >> 2, yl >> 2, tilenum, flip ? true : false, Spans, rect, object);
+	}
+
 	//wait("DrawTriangle");
 }
 
@@ -2892,7 +2909,7 @@ void n64_rdp::CmdSyncTile(UINT32 w1, UINT32 w2)
 
 void n64_rdp::CmdSyncFull(UINT32 w1, UINT32 w2)
 {
-	wait("SyncFull");
+	//wait("SyncFull");
 	dp_full_sync(*m_machine);
 }
 
@@ -3459,14 +3476,14 @@ void n64_rdp::CmdSetTextureImage(UINT32 w1, UINT32 w2)
 
 void n64_rdp::CmdSetMaskImage(UINT32 w1, UINT32 w2)
 {
-	wait("SetMaskImage");
+	//wait("SetMaskImage");
 
 	MiscState.ZBAddress = w2 & 0x01ffffff;
 }
 
 void n64_rdp::CmdSetColorImage(UINT32 w1, UINT32 w2)
 {
-	wait("SetColorImage");
+	//wait("SetColorImage");
 
 	MiscState.FBFormat	= (w1 >> 21) & 0x7;
 	MiscState.FBSize	= (w1 >> 19) & 0x3;

@@ -368,8 +368,6 @@ struct rdp_span_aux
 	INT32				ShiftB;
 	INT32				m_precomp_s;
 	INT32				m_precomp_t;
-	INT32				m_clamp_s_diff[8];
-	INT32				m_clamp_t_diff[8];
 	UINT8				BlendEnable;
 	bool				PreWrap;
 	INT32 				m_dzpix_enc;
@@ -501,7 +499,7 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		void			TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
 		void			TCDivNoPersp(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
 		UINT32			GetLog2(UINT32 lod_clamp);
-		void			RenderSpans(int start, int end, int tilenum, bool flip, extent_t *Spans, bool rect, rdp_poly_state &object);
+		void			RenderSpans(int start, int end, int tilenum, bool flip, extent_t *Spans, bool rect, rdp_poly_state *object);
 		void			GetAlphaCvg(UINT8 *comb_alpha, rdp_span_aux *userdata, const rdp_poly_state &object);
 		const UINT8*	GetBayerMatrix() const { return s_bayer_matrix; }
 		const UINT8*	GetMagicMatrix() const { return s_magic_matrix; }
@@ -614,6 +612,9 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		UINT32			ExtentBufIndex;
 
 		bool 			rdp_range_check(UINT32 addr);
+
+		N64Tile		m_tiles[8];
+
 	protected:
 		CombineModesT	m_combine;
 		bool			m_pending_mode_block;
@@ -644,8 +645,6 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		UINT32		m_status;
 
 		UINT8*		m_tmem;
-
-		N64Tile		m_tiles[8];
 
 		running_machine* m_machine;
 
