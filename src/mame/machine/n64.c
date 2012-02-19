@@ -204,7 +204,6 @@ void n64_periphs::device_reset()
     {
         // CIC-NUS-6105
         //printf("CIC-NUS-6105 detected\n");
-
         pif_ram[0x24] = 0x00;
         pif_ram[0x25] = 0x02;
         pif_ram[0x26] = 0x91;
@@ -361,10 +360,12 @@ void n64_periphs::check_interrupts()
 {
 	if (mi_intr_mask & mi_interrupt)
 	{
+		//printf("Asserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt);
 		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
+		//printf("Deasserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt);
 		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
@@ -485,12 +486,14 @@ WRITE32_MEMBER( n64_periphs::rdram_reg_w )
 
 void n64_periphs::sp_dma(int direction)
 {
-	sp_dma_length++;
-	if ((sp_dma_length & 7) != 0)
+	UINT32 length = sp_dma_length + 1;
+
+	if ((length & 7) != 0)
 	{
-        sp_dma_length = (sp_dma_length + 7) & ~7;
+        length = (length + 7) & ~7;
 	}
 
+	//printf("Length %08x Skip %08x Count %08x\n", length, sp_dma_skip, sp_dma_count);
 	if (sp_mem_addr & 0x3)
 	{
         sp_mem_addr = sp_mem_addr & ~3;
@@ -500,11 +503,11 @@ void n64_periphs::sp_dma(int direction)
         sp_dram_addr = sp_dram_addr & ~7;
 	}
 
-	if ((sp_mem_addr & 0xfff) + (sp_dma_length) > 0x1000)
+	if ((sp_mem_addr & 0xfff) + (length) > 0x1000)
 	{
-		//printf("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
-		//fatalerror("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
-		sp_dma_length = 0x1000 - (sp_mem_addr & 0xfff);
+		//printf("sp_dma: dma out of memory area: %08X, %08X, %08X\n", sp_mem_addr, sp_dram_addr, length);
+		//fatalerror("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, length);
+		length = 0x1000 - (sp_mem_addr & 0xfff);
 	}
 
 	UINT32 *sp_mem[2] = { rsp_dmem, rsp_imem };
@@ -516,13 +519,13 @@ void n64_periphs::sp_dma(int direction)
             UINT32 src = (sp_dram_addr & 0x007fffff) >> 2;
             UINT32 dst = (sp_mem_addr & 0x1fff) >> 2;
 
-            for(int i = 0; i < sp_dma_length / 4; i++)
+            for(int i = 0; i < length / 4; i++)
             {
 				sp_mem[(dst + i) >> 10][(dst + i) & 0x3ff] = rdram[src + i];
             }
 
-            sp_mem_addr += sp_dma_length;
-            sp_dram_addr += sp_dma_length;
+            sp_mem_addr += length;
+            sp_dram_addr += length;
 
             sp_mem_addr += sp_dma_skip;
         }
@@ -534,13 +537,13 @@ void n64_periphs::sp_dma(int direction)
             UINT32 src = (sp_mem_addr & 0x1fff) >> 2;
             UINT32 dst = (sp_dram_addr & 0x007fffff) >> 2;
 
-            for(int i = 0; i < sp_dma_length / 4; i++)
+            for(int i = 0; i < length / 4; i++)
             {
 				rdram[dst + i] = sp_mem[(src + i) >> 10][(src + i) & 0x3ff];
             }
 
-            sp_mem_addr += sp_dma_length;
-            sp_dram_addr += sp_dma_length;
+            sp_mem_addr += length;
+            sp_dram_addr += length;
 
             sp_dram_addr += sp_dma_skip;
         }
@@ -617,20 +620,47 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
 			break;
 
         case 0x20/4:        // DP_CMD_START
+        {
+        	n64_state *state = machine().driver_data<n64_state>();
+        	ret = state->m_rdp->GetStartReg();
+        	break;
+		}
+
         case 0x24/4:        // DP_CMD_END
+        {
+        	n64_state *state = machine().driver_data<n64_state>();
+        	ret = state->m_rdp->GetEndReg();
+        	break;
+		}
+
         case 0x28/4:        // DP_CMD_CURRENT
+        {
+        	n64_state *state = machine().driver_data<n64_state>();
+        	ret = state->m_rdp->GetCurrentReg();
+        	break;
+		}
+
         case 0x34/4:        // DP_CMD_BUSY
         case 0x38/4:        // DP_CMD_PIPE_BUSY
         case 0x3c/4:        // DP_CMD_TMEM_BUSY
 			break;
 
         case 0x2c/4:        // DP_CMD_STATUS
-        	ret = 0x88;
+        {
+        	n64_state *state = machine().driver_data<n64_state>();
+        	ret = state->m_rdp->GetStatusReg();
 			break;
+		}
 
         case 0x30/4:        // DP_CMD_CLOCK
-        	ret = ++dp_clock;
+        {
+        	if(!(machine().driver_data<n64_state>()->m_rdp->GetStatusReg() & DP_STATUS_FREEZE))
+        	{
+				dp_clock += 13;
+				ret = dp_clock;
+			}
 			break;
+		}
 
         case 0x40000/4:     // PC
             ret = cpu_get_reg(rspcpu, RSP_PC) & 0x00000fff;
@@ -641,7 +671,7 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
             break;
 	}
 
-	//printf("sp_reg_r %08x = %08x\n", offset * 4, ret);
+	//printf("%08x sp_reg_r %08x = %08x\n", (UINT32)cpu_get_reg(maincpu, MIPS3_PC), offset * 4, ret);
 	return ret;
 }
 
@@ -652,8 +682,7 @@ READ32_DEVICE_HANDLER( n64_sp_reg_r )
 
 void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
-	//printf("sp_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
-	//device_yield(machine().device("maincpu"));
+	//printf("%08x sp_reg_w %08x %08x %08x\n", (UINT32)cpu_get_reg(maincpu, MIPS3_PC), offset * 4, data, mem_mask);
 
 	if ((offset & 0x10000) == 0)
 	{
@@ -719,6 +748,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
                     if(!(oldstatus & (RSP_STATUS_BROKE | RSP_STATUS_HALT)))
                     {
                         cpu_set_reg(rspcpu, RSP_STEPCNT, 1 );
+                        device_yield(machine().device("maincpu"));
                     }
                 }
                 if (data & 0x00000080)
@@ -847,6 +877,7 @@ void dp_full_sync(running_machine &machine)
 READ32_DEVICE_HANDLER( n64_dp_reg_r )
 {
 	n64_state *state = device->machine().driver_data<n64_state>();
+	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
 	UINT32 ret = 0;
 	switch (offset)
 	{
@@ -866,20 +897,31 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 			ret = state->m_rdp->GetStatusReg();
 			break;
 
+		case 0x10/4:		// DP_CLOCK_REG
+        {
+        	if(!(state->m_rdp->GetStatusReg() & DP_STATUS_FREEZE))
+        	{
+				periphs->dp_clock += 13;
+				ret = periphs->dp_clock;
+			}
+			break;
+		}
+
 		default:
 			logerror("dp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(device));
 			break;
 	}
 
-	//printf("dp_reg_r %08x = %08x\n", offset, ret);
+	//printf("%08x dp_reg_r %08x = %08x\n", (UINT32)cpu_get_reg(device->machine().device("rsp"), RSP_PC), offset, ret);
 	return ret;
 }
 
 WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 {
 	n64_state *state = device->machine().driver_data<n64_state>();
+	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
 
-	//printf("dp_reg_w %08x %08x %08x\n", offset, data, mem_mask);
+	//printf("%08x dp_reg_w %08x %08x %08x\n", (UINT32)cpu_get_reg(device->machine().device("rsp"), RSP_PC), offset, data, mem_mask);
 	switch (offset)
 	{
 		case 0x00/4:		// DP_START_REG
@@ -903,7 +945,8 @@ WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 			if (data & 0x00000004)	current_status &= ~DP_STATUS_FREEZE;
 			if (data & 0x00000008)	current_status |= DP_STATUS_FREEZE;
 			if (data & 0x00000010)	current_status &= ~DP_STATUS_FLUSH;
-			if (data & 0x00000020)	current_status |= DP_STATUS_FLUSH;
+			if (data & 0x00000020)  current_status |= DP_STATUS_FLUSH;
+			if (data & 0x00000200)  periphs->dp_clock = 0;
 			state->m_rdp->SetStatusReg(current_status);
 			break;
 		}

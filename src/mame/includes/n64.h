@@ -109,6 +109,8 @@ public:
 
 	void poll_reset_button(bool button);
 
+	UINT32 dp_clock;
+
 protected:
     // device-level overrides
     virtual void device_start();
@@ -169,7 +171,6 @@ private:
 	int sp_dma_count;
 	int sp_dma_skip;
 	UINT32 sp_semaphore;
-	UINT32 dp_clock;
 
 	// Disk Drive (DD) registers and functions
 	UINT32 dd_buffer[256];

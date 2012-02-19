@@ -1169,6 +1169,7 @@ UINT32 n64_rdp::ReadData(UINT32 address)
 {
 	if (m_status & 0x1)		// XBUS_DMEM_DMA enabled
 	{
+		//printf("%08x\n", rsp_dmem[(address & 0xfff) / 4]);
 		return rsp_dmem[(address & 0xfff) / 4];
 	}
 	else
@@ -3579,9 +3580,14 @@ void n64_rdp::CmdNoOp(UINT32 w1, UINT32 w2)
 
 void n64_rdp::ProcessList()
 {
-	UINT32 length = m_end - m_current;
+	INT32 length = m_end - m_current;
 
-	//printf("%08x %d\n", m_end, length);
+	if(length < 0)
+	{
+		m_current = m_end;
+		return;
+	}
+
 	// load command data
 	for(int i = 0; i < length; i += 4)
 	{
@@ -3861,14 +3867,7 @@ SCREEN_UPDATE_RGB32(n64)
 
     if (n64->vi_blank)
     {
-        for (int j = 0; j < state->m_rdp->visarea.max_y; j++)
-        {
-            UINT32 *d = &bitmap.pix32(j);
-            for (int i = 0; i < state->m_rdp->MiscState.FBWidth; i++)
-            {
-                d[BYTE_XOR_BE(i)] = 0;
-            }
-        }
+		bitmap.fill(0, state->m_rdp->visarea);
         return 0;
     }
 

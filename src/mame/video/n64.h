@@ -437,10 +437,16 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		void		SetMachine(running_machine& machine) { m_machine = &machine; }
 
 		// CPU-visible registers
-		void		SetStartReg(UINT32 val) { m_start = val; }
+		void		SetStartReg(UINT32 val)
+		{
+			m_start = val;
+		}
 		UINT32		GetStartReg() const { return m_start; }
 
-		void		SetEndReg(UINT32 val) { m_end = val; }
+		void		SetEndReg(UINT32 val)
+		{
+			m_end = val;
+		}
 		UINT32		GetEndReg() const { return m_end; }
 
 		void		SetCurrentReg(UINT32 val) { m_current = val; }
