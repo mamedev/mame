@@ -1284,7 +1284,7 @@ chd_error chd_file::clone_all_metadata(chd_file &source)
 			source.file_read(metaentry.offset + METADATA_HEADER_SIZE, filedata, metaentry.length);
 			
 			// write it to the destination
-			chd_error err = write_metadata(metaentry.metatag, -1, filedata, metaentry.length, metaentry.flags);
+			chd_error err = write_metadata(metaentry.metatag, (UINT32)-1, filedata, metaentry.length, metaentry.flags);
 			if (err != CHDERR_NONE)
 				throw err;
 		}
