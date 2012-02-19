@@ -1657,7 +1657,7 @@ chd_error chd_file::compress_v5_map()
 			}
 			
 			// track maximum compressed length
-			else if (curcomp >= COMPRESSION_TYPE_0 && curcomp <= COMPRESSION_TYPE_3)
+			else //if (curcomp >= COMPRESSION_TYPE_0 && curcomp <= COMPRESSION_TYPE_3)
 				max_complen = MAX(max_complen, be_read(&m_rawmap[hunknum * 12 + 1], 3));
 			
 			// track repeats
