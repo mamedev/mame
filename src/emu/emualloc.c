@@ -191,6 +191,10 @@ void *malloc_array_file_line(size_t size, const char *file, int line)
 
 void free_file_line(void *memory, const char *file, int line)
 {
+	// ignore NULL frees/deletes
+	if (memory == NULL)
+		return;
+
 	// find the memory entry
 	memory_entry *entry = memory_entry::find(memory);
 

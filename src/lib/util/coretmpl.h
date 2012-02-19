@@ -76,7 +76,7 @@ public:
 	
 	// helpers
 	void append(const _ElementType &element) { if (m_count == m_allocated) expand_internal((m_allocated == 0) ? 16 : (m_allocated << 1), true); m_array[m_count++] = element; }
-	void reset() { if (m_array) delete[] m_array; m_array = NULL; m_count = m_allocated = 0; }
+	void reset() { delete[] m_array; m_array = NULL; m_count = m_allocated = 0; }
 	void resize(int count, bool keepdata = false) { if (count > m_allocated) expand_internal(count, keepdata); m_count = count; }
 
 private:
@@ -89,7 +89,7 @@ private:
 		if (keepdata)
 			for (int index = 0; index < m_count; index++)
 				newarray[index] = m_array[index];
-		if (m_array) delete[] m_array;
+		delete[] m_array;
 		m_array = newarray;
 	}
 
