@@ -1384,6 +1384,8 @@ const char *chd_file::error_string(chd_error err)
 		case CHDERR_NONE:						return "no error";
 		case CHDERR_NO_INTERFACE:				return "no drive interface";
 		case CHDERR_OUT_OF_MEMORY:				return "out of memory";
+		case CHDERR_NOT_OPEN:					return "file not open";
+		case CHDERR_ALREADY_OPEN:				return "file already open";
 		case CHDERR_INVALID_FILE:				return "invalid file";
 		case CHDERR_INVALID_PARAMETER:			return "invalid parameter";
 		case CHDERR_INVALID_DATA:				return "invalid data";
@@ -1408,7 +1410,9 @@ const char *chd_file::error_string(chd_error err)
 		case CHDERR_INVALID_STATE:				return "invalid state";
 		case CHDERR_OPERATION_PENDING:			return "operation pending";
 		case CHDERR_UNSUPPORTED_FORMAT:			return "unsupported format";
-		default:								return "undocumented error";
+		case CHDERR_UNKNOWN_COMPRESSION:		return "unknown compression type";
+		case CHDERR_WALKING_PARENT:				return "currently examining parent";
+		case CHDERR_COMPRESSING:				return "currently compressing";
 	}
 }
 

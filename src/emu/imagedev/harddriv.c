@@ -20,51 +20,6 @@
 #include "harddriv.h"
 
 
-static const char *const error_strings[] =
-{
-	"no error",
-	"no drive interface",
-	"out of memory",
-	"file not open",
-	"file already open",
-	"invalid file",
-	"invalid parameter",
-	"invalid data",
-	"file not found",
-	"requires parent",
-	"file not writeable",
-	"read error",
-	"write error",
-	"codec error",
-	"invalid parent",
-	"hunk out of range",
-	"decompression error",
-	"compression error",
-	"can't create file",
-	"can't verify file",
-	"operation not supported",
-	"can't find metadata",
-	"invalid metadata size",
-	"unsupported CHD version",
-	"verify incomplete",
-	"invalid metadata",
-	"invalid state",
-	"operation pending",
-	"unsupported format",
-	"unknown compression",
-	"error walking_parent",
-	"error compressing"
-};
-
-static const char *chd_get_error_string(int chderr)
-{
-	if ((chderr < 0 ) || (chderr >= ARRAY_LENGTH(error_strings)))
-		return NULL;
-	return error_strings[chderr];
-}
-
-
-
 static OPTION_GUIDE_START(hd_option_guide)
 	OPTION_INT('C', "cylinders",		"Cylinders")
 	OPTION_INT('H', "heads",			"Heads")
@@ -270,8 +225,8 @@ done:
 			m_chd = NULL;
 		}
 		printf("%d\n",err);
-		seterror(IMAGE_ERROR_UNSPECIFIED, chd_get_error_string(err));
-		printf("%s\n",chd_get_error_string(err));
+		seterror(IMAGE_ERROR_UNSPECIFIED, chd_file::error_string(err));
+		printf("%s\n",chd_file::error_string(err));
 	}
 	return err ? IMAGE_INIT_FAIL : IMAGE_INIT_PASS;
 }
