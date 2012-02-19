@@ -141,7 +141,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 		file_error filerr = core_fopen(file->track_info.track[i].fname, OPEN_FLAG_READ, &file->fhandle[i]);
 		if (filerr != FILERR_NONE)
 		{
-			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname.cstr());
+			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname);
 			return NULL;
 		}
 	}
