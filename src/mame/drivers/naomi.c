@@ -7524,7 +7524,7 @@ ROM_START( kofnw )
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax2201p01.ic18", 0x0000000, 0x0800000, CRC(27aab918) SHA1(41c5ddd8bd4c91481750606ab44aa115b5fe01d0) )
+	ROM_LOAD( "ax2201en_p01.ic18", 0x0000000, 0x0800000, CRC(27aab918) SHA1(41c5ddd8bd4c91481750606ab44aa115b5fe01d0) )
 	ROM_LOAD( "ax2201m01.ic11", 0x1000000, 0x1000000, CRC(22ea665b) SHA1(292c92c9ae43eea2d1c27cedfb89c3956b8dea32) )
 	ROM_LOAD( "ax2202m01.ic12", 0x2000000, 0x1000000, CRC(7fad1bea) SHA1(89f3f88af48973a4685955d86ef97a1487b8e7a8) )
 	ROM_LOAD( "ax2203m01.ic13", 0x3000000, 0x1000000, CRC(78986ca4) SHA1(5a6c8c12955573f33361d2c6f20f85de35ac7bae) )
@@ -7540,9 +7540,7 @@ ROM_START( kofnwj )
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
-        /* EEPROM label matched world set "ax2201p01.ic18", but contents are for japan region.  Actual part number is unknown? */
-
-	ROM_LOAD( "ax2201p01.ic18", 0x0000000, 0x0800000, CRC(ecc4a5c7) SHA1(97c2ef2be95b39bc978474a8243740df50255a8b) )
+	ROM_LOAD( "ax2201jp_p01.ic18", 0x0000000, 0x0800000, CRC(ecc4a5c7) SHA1(97c2ef2be95b39bc978474a8243740df50255a8b) )
 
 	/* these are taken from the above set, game *seems* to work fine with these ... */
 	ROM_LOAD( "ax2201m01.ic11", 0x1000000, 0x1000000, CRC(22ea665b) SHA1(292c92c9ae43eea2d1c27cedfb89c3956b8dea32) )
