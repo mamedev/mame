@@ -15,7 +15,8 @@
 enum
 {
 	WINFILE_FILE = 0,
-	WINFILE_SOCKET
+	WINFILE_SOCKET,
+	WINFILE_PTTY
 };
 
 //============================================================
@@ -42,6 +43,11 @@ file_error win_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual);
 file_error win_write_socket(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual);
 file_error win_close_socket(osd_file *file);
+
+file_error win_open_ptty(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize);
+file_error win_read_ptty(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual);
+file_error win_write_ptty(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual);
+file_error win_close_ptty(osd_file *file);
 
 file_error win_error_to_mame_file_error(DWORD error);
 

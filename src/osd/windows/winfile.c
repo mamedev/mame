@@ -72,6 +72,7 @@ INLINE int is_path_to_physical_drive(const char *path)
 	return (_strnicmp(path, "\\\\.\\physicaldrive", 17) == 0);
 }
 
+extern const char *winfile_ptty_identifier;
 
 
 //============================================================
@@ -107,6 +108,13 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	{
 		(*file)->type = WINFILE_SOCKET;
 		filerr = win_open_socket(path, openflags, file, filesize);
+		goto error;
+	}
+
+	if (strncmp(path, winfile_ptty_identifier, strlen(winfile_ptty_identifier)) == 0)
+	{
+		(*file)->type = WINFILE_PTTY;
+		filerr = win_open_ptty(path, openflags, file, filesize);
 		goto error;
 	}
 
@@ -214,6 +222,9 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, 
 		case WINFILE_SOCKET:
 			return win_read_socket(file, buffer, offset, length, actual);
 			break;
+		case WINFILE_PTTY:
+			return win_read_ptty(file, buffer, offset, length, actual);
+			break;
 
 	}
 	return FILERR_NONE;
@@ -250,6 +261,9 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 		case WINFILE_SOCKET:
 			return win_write_socket(file, buffer, offset, length, actual);
 			break;
+		case WINFILE_PTTY:
+			return win_write_ptty(file, buffer, offset, length, actual);
+			break;
 
 	}
 	return FILERR_NONE;
@@ -272,6 +286,8 @@ file_error osd_close(osd_file *file)
 		case WINFILE_SOCKET:
 			return win_close_socket(file);
 			break;
+		case WINFILE_PTTY:
+			return win_close_ptty(file);
 	}
 	return FILERR_NONE;
 }

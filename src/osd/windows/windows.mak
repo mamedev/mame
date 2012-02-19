@@ -281,7 +281,8 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winutil.o \
 	$(WINOBJ)/winclip.o \
 	$(WINOBJ)/winsocket.o \
-	$(WINOBJ)/winwork.o
+	$(WINOBJ)/winwork.o \
+	$(WINOBJ)/winptty.o
 
 
 

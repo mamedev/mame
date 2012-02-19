@@ -5281,6 +5281,7 @@ src/osd/windows/winmain.h svneol=native#text/plain
 src/osd/windows/winmenu.c svneol=native#text/plain
 src/osd/windows/winmisc.c svneol=native#text/plain
 src/osd/windows/winprefix.h svneol=native#text/plain
+src/osd/windows/winptty.c svneol=native#text/plain
 src/osd/windows/winsocket.c svneol=native#text/plain
 src/osd/windows/winsync.c svneol=native#text/plain
 src/osd/windows/wintime.c svneol=native#text/plain
