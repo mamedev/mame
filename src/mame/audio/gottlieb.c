@@ -31,7 +31,7 @@
 
 static void gottlieb1_sh_w(device_t *riot, UINT8 data);
 static void gottlieb2_sh_w(address_space *space, UINT8 data);
-static void trigger_sample(device_t *samples, UINT8 data);
+static void trigger_sample(samples_device *samples, UINT8 data);
 
 
 
@@ -62,7 +62,7 @@ WRITE8_HANDLER( gottlieb_sh_w )
 
 static void gottlieb1_sh_w(device_t *riot, UINT8 data)
 {
-	device_t *samples = riot->machine().device("samples");
+	samples_device *samples = riot->machine().device<samples_device>("samples");
 	int pa7 = (data & 0x0f) != 0xf;
 	int pa0_5 = ~data & 0x3f;
 
@@ -112,24 +112,24 @@ static const riot6532_interface gottlieb_riot6532_intf =
  *
  *************************************/
 
-static void play_sample(device_t *samples, const char *phonemes)
+static void play_sample(samples_device *samples, const char *phonemes)
 {
 	if (strcmp(phonemes, "[0] HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert - Hello, I am turned on */
-		sample_start(samples, 0, 42, 0);
+		samples->start(0, 42);
 	else if (strcmp(phonemes, "[0]BAH1EH1Y") == 0)							  /* Q-Bert - Bye, bye */
-		sample_start(samples, 0, 43, 0);
+		samples->start(0, 43);
 	else if (strcmp(phonemes, "[0]A2YHT LEH2FTTH") == 0)					  /* Reactor - Eight left */
-		sample_start(samples, 0, 0, 0);
+		samples->start(0, 0);
 	else if (strcmp(phonemes, "[0]SI3KS DTYN LEH2FTTH") == 0)				  /* Reactor - Sixteen left */
-		sample_start(samples, 0, 1, 0);
+		samples->start(0, 1);
 	else if (strcmp(phonemes, "[0]WO2RNYNG KO2R UH1NSDTABUH1L") == 0)		  /* Reactor - Warning core unstable */
-		sample_start(samples, 0, 5, 0);
+		samples->start(0, 5);
 	else if (strcmp(phonemes, "[0]CHAMBERR   AE1EH2KTI1VA1I3DTEH1DT ") == 0) /* Reactor - Chamber activated */
-		sample_start(samples, 0, 7, 0);
+		samples->start(0, 7);
 }
 
 
-static void trigger_sample(device_t *samples, UINT8 data)
+static void trigger_sample(samples_device *samples, UINT8 data)
 {
 	gottlieb_state *state = samples->machine().driver_data<gottlieb_state>();
 	/* Reactor samples */
@@ -141,7 +141,7 @@ static void trigger_sample(device_t *samples, UINT8 data)
 			case 56:
 			case 57:
 			case 59:
-				sample_start(samples, 0, data - 53, 0);
+				samples->start(0, data - 53);
 				break;
 
 			case 31:
@@ -151,7 +151,7 @@ static void trigger_sample(device_t *samples, UINT8 data)
 			case 39:
 				state->m_score_sample++;
 				if (state->m_score_sample < 20)
-					sample_start(samples, 0, state->m_score_sample, 0);
+					samples->start(0, state->m_score_sample);
 				break;
 		}
 	}
@@ -166,16 +166,16 @@ static void trigger_sample(device_t *samples, UINT8 data)
 			case 19:
 			case 20:
 			case 21:
-				sample_start(samples, 0, (data - 17) * 8 + state->m_random_offset, 0);
+				samples->start(0, (data - 17) * 8 + state->m_random_offset);
 				state->m_random_offset = (state->m_random_offset + 1) & 7;
 				break;
 
 			case 22:
-				sample_start(samples, 0,40,0);
+				samples->start(0,40);
 				break;
 
 			case 23:
-				sample_start(samples, 0,41,0);
+				samples->start(0,41);
 				break;
 		}
 	}
@@ -185,12 +185,12 @@ static void trigger_sample(device_t *samples, UINT8 data)
 #ifdef UNUSED_FUNCTION
 void gottlieb_knocker(running_machine &machine)
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	if (!strcmp(machine.system().name,"reactor"))	/* reactor */
 	{
 	}
 	else if (samples != NULL)	/* qbert */
-		sample_start(samples, 0,44,0);
+		samples->start(0,44);
 }
 #endif
 
@@ -234,7 +234,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 	{
 		if (state->m_votrax_queuepos > 1)
 		{
-			device_t *samples = space->machine().device("samples");
+			samples_device *samples = space->machine().device<samples_device>("samples");
 			int last = -1;
 			int i;
 			char phonemes[200];

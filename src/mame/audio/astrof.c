@@ -38,10 +38,10 @@ WRITE8_HANDLER( astrof_audio_1_w )
 	UINT8 rising_bits = data & ~state->m_port_1_last;
 
 	if (state->m_astrof_death_playing)
-		state->m_astrof_death_playing = sample_playing(state->m_samples, CHANNEL_EXPLOSION);
+		state->m_astrof_death_playing = state->m_samples->playing(CHANNEL_EXPLOSION);
 
 	if (state->m_astrof_bosskill_playing)
-		state->m_astrof_bosskill_playing = sample_playing(state->m_samples, CHANNEL_EXPLOSION);
+		state->m_astrof_bosskill_playing = state->m_samples->playing(CHANNEL_EXPLOSION);
 
 	/* D2 - explosion */
 	if (rising_bits & 0x04)
@@ -55,19 +55,19 @@ WRITE8_HANDLER( astrof_audio_1_w )
 	if ((data & 0x08) && (~state->m_port_1_last & 0x08))
 	{
 		int sample = SAMPLE_WAVE + (data & 3);
-		sample_start(state->m_samples, CHANNEL_WAVE, sample, 1);
+		state->m_samples->start(CHANNEL_WAVE, sample, 1);
 	}
 
 	if ((~data & 0x08) && (state->m_port_1_last & 0x08))
-		sample_stop(state->m_samples, CHANNEL_WAVE);
+		state->m_samples->stop(CHANNEL_WAVE);
 
 	/* D4 - boss laser */
 	if ((rising_bits & 0x10) && !state->m_astrof_bosskill_playing)
-		sample_start(state->m_samples, CHANNEL_BOSSFIRE, SAMPLE_BOSSFIRE, 0);
+		state->m_samples->start(CHANNEL_BOSSFIRE, SAMPLE_BOSSFIRE, 0);
 
 	/* D5 - fire */
 	if ((rising_bits & 0x20) && !state->m_astrof_bosskill_playing)
-		sample_start(state->m_samples, CHANNEL_FIRE, SAMPLE_FIRE, 0);
+		state->m_samples->start(CHANNEL_FIRE, SAMPLE_FIRE, 0);
 
 	/* D6 - don't know. Probably something to do with the explosion sounds */
 
@@ -95,19 +95,19 @@ WRITE8_HANDLER( astrof_audio_2_w )
 		{
 			if (!state->m_astrof_bosskill_playing)
 			{
-				sample_start(state->m_samples, CHANNEL_EXPLOSION, SAMPLE_BOSSKILL, 0);
+				state->m_samples->start(CHANNEL_EXPLOSION, SAMPLE_BOSSKILL, 0);
 				state->m_astrof_bosskill_playing = 1;
 			}
 		}
 		else if (data & 0x02)
-			sample_start(state->m_samples, CHANNEL_EXPLOSION, SAMPLE_BOSSHIT, 0);
+			state->m_samples->start(CHANNEL_EXPLOSION, SAMPLE_BOSSHIT, 0);
 		else if (data & 0x01)
-			sample_start(state->m_samples, CHANNEL_EXPLOSION, SAMPLE_EKILLED, 0);
+			state->m_samples->start(CHANNEL_EXPLOSION, SAMPLE_EKILLED, 0);
 		else
 		{
 			if (!state->m_astrof_death_playing)
 			{
-				sample_start(state->m_samples, CHANNEL_EXPLOSION, SAMPLE_DEATH, 0);
+				state->m_samples->start(CHANNEL_EXPLOSION, SAMPLE_DEATH, 0);
 				state->m_astrof_death_playing = 1;
 			}
 		}
@@ -117,7 +117,7 @@ WRITE8_HANDLER( astrof_audio_2_w )
 
 	/* D3 - low fuel warning */
 	if (rising_bits & 0x08)
-		sample_start(state->m_samples, CHANNEL_FUEL, SAMPLE_FUEL, 0);
+		state->m_samples->start(CHANNEL_FUEL, SAMPLE_FUEL, 0);
 
 	state->m_port_2_last = data;
 }
@@ -151,8 +151,7 @@ static const samples_interface astrof_samples_interface =
 
 MACHINE_CONFIG_FRAGMENT( astrof_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(astrof_samples_interface)
+	MCFG_SAMPLES_ADD("samples", astrof_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

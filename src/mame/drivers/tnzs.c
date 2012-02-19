@@ -632,7 +632,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 static SAMPLES_START( kageki_init_samples )
 {
-	running_machine &machine = device->machine();
+	running_machine &machine = device.machine();
 	tnzs_state *state = machine.driver_data<tnzs_state>();
 	UINT8 *scan, *src;
 	INT16 *dest;
@@ -717,16 +717,17 @@ static WRITE8_DEVICE_HANDLER( kageki_csport_w )
 	}
 	else
 	{
+		samples_device *samples = downcast<samples_device *>(device);
 		if (data > MAX_SAMPLES)
 		{
 			// stop samples
-			sample_stop(device, 0);
+			samples->stop(0);
 			sprintf(mess, "VOICE:%02X STOP", data);
 		}
 		else
 		{
 			// play samples
-			sample_start_raw(device, 0, state->m_sampledata[data], state->m_samplesize[data], 7000, 0);
+			samples->start_raw(0, state->m_sampledata[data], state->m_samplesize[data], 7000);
 			sprintf(mess, "VOICE:%02X PLAY", data);
 		}
 	//  popmessage(mess);
@@ -1818,8 +1819,7 @@ static MACHINE_CONFIG_START( kageki, tnzs_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(tnzs_samples_interface)
+	MCFG_SAMPLES_ADD("samples", tnzs_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

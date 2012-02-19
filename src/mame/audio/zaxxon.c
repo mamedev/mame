@@ -98,8 +98,7 @@ static const samples_interface zaxxon_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( zaxxon_samples )
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(zaxxon_samples_interface)
+	MCFG_SAMPLES_ADD("samples", zaxxon_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -114,72 +113,72 @@ MACHINE_CONFIG_END
 WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w )
 {
 	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
-	device_t *samples = device->machine().device("samples");
+	samples_device *samples = device->machine().device<samples_device>("samples");
 	UINT8 diff = data ^ state->m_sound_state[0];
 	state->m_sound_state[0] = data;
 
 	/* PLAYER SHIP A/B: volume */
-	sample_set_volume(samples, 10, 0.5 + 0.157 * (data & 0x03));
-	sample_set_volume(samples, 11, 0.5 + 0.157 * (data & 0x03));
+	samples->set_volume(10, 0.5 + 0.157 * (data & 0x03));
+	samples->set_volume(11, 0.5 + 0.157 * (data & 0x03));
 
 	/* PLAYER SHIP C: channel 10 */
-	if ((diff & 0x04) && !(data & 0x04)) sample_start(samples, 10, 10, TRUE);
-	if ((diff & 0x04) &&  (data & 0x04)) sample_stop(samples, 10);
+	if ((diff & 0x04) && !(data & 0x04)) samples->start(10, 10, true);
+	if ((diff & 0x04) &&  (data & 0x04)) samples->stop(10);
 
 	/* PLAYER SHIP D: channel 11 */
-	if ((diff & 0x08) && !(data & 0x08)) sample_start(samples, 11, 11, TRUE);
-	if ((diff & 0x08) &&  (data & 0x08)) sample_stop(samples, 11);
+	if ((diff & 0x08) && !(data & 0x08)) samples->start(11, 11, true);
+	if ((diff & 0x08) &&  (data & 0x08)) samples->stop(11);
 
 	/* HOMING MISSILE: channel 0 */
-	if ((diff & 0x10) && !(data & 0x10)) sample_start(samples, 0, 0, TRUE);
-	if ((diff & 0x10) &&  (data & 0x10)) sample_stop(samples, 0);
+	if ((diff & 0x10) && !(data & 0x10)) samples->start(0, 0, true);
+	if ((diff & 0x10) &&  (data & 0x10)) samples->stop(0);
 
 	/* BASE MISSILE: channel 1 */
-	if ((diff & 0x20) && !(data & 0x20)) sample_start(samples, 1, 1, FALSE);
+	if ((diff & 0x20) && !(data & 0x20)) samples->start(1, 1);
 
 	/* LASER: channel 2 */
-	if ((diff & 0x40) && !(data & 0x40)) sample_start(samples, 2, 2, TRUE);
-	if ((diff & 0x40) &&  (data & 0x40)) sample_stop(samples, 2);
+	if ((diff & 0x40) && !(data & 0x40)) samples->start(2, 2, true);
+	if ((diff & 0x40) &&  (data & 0x40)) samples->stop(2);
 
 	/* BATTLESHIP: channel 3 */
-	if ((diff & 0x80) && !(data & 0x80)) sample_start(samples, 3, 3, TRUE);
-	if ((diff & 0x80) &&  (data & 0x80)) sample_stop(samples, 3);
+	if ((diff & 0x80) && !(data & 0x80)) samples->start(3, 3, true);
+	if ((diff & 0x80) &&  (data & 0x80)) samples->stop(3);
 }
 
 
 WRITE8_DEVICE_HANDLER( zaxxon_sound_b_w )
 {
 	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
-	device_t *samples = device->machine().device("samples");
+	samples_device *samples = device->machine().device<samples_device>("samples");
 	UINT8 diff = data ^ state->m_sound_state[1];
 	state->m_sound_state[1] = data;
 
 	/* S-EXP: channel 4 */
-	if ((diff & 0x10) && !(data & 0x10)) sample_start(samples, 4, 4, FALSE);
+	if ((diff & 0x10) && !(data & 0x10)) samples->start(4, 4);
 
 	/* M-EXP: channel 5 */
-	if ((diff & 0x20) && !(data & 0x20) && !sample_playing(samples, 5)) sample_start(samples, 5, 5, FALSE);
+	if ((diff & 0x20) && !(data & 0x20) && !samples->playing(5)) samples->start(5, 5);
 
 	/* CANNON: channel 6 */
-	if ((diff & 0x80) && !(data & 0x80)) sample_start(samples, 6, 6, FALSE);
+	if ((diff & 0x80) && !(data & 0x80)) samples->start(6, 6);
 }
 
 
 WRITE8_DEVICE_HANDLER( zaxxon_sound_c_w )
 {
 	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
-	device_t *samples = device->machine().device("samples");
+	samples_device *samples = device->machine().device<samples_device>("samples");
 	UINT8 diff = data ^ state->m_sound_state[2];
 	state->m_sound_state[2] = data;
 
 	/* SHOT: channel 7 */
-	if ((diff & 0x01) && !(data & 0x01)) sample_start(samples, 7, 7, FALSE);
+	if ((diff & 0x01) && !(data & 0x01)) samples->start(7, 7);
 
 	/* ALARM2: channel 8 */
-	if ((diff & 0x04) && !(data & 0x04)) sample_start(samples, 8, 8, FALSE);
+	if ((diff & 0x04) && !(data & 0x04)) samples->start(8, 8);
 
 	/* ALARM3: channel 9 */
-	if ((diff & 0x08) && !(data & 0x08) && !sample_playing(samples, 9)) sample_start(samples, 9, 9, FALSE);
+	if ((diff & 0x08) && !(data & 0x08) && !samples->playing(9)) samples->start(9, 9);
 }
 
 
@@ -210,8 +209,7 @@ static const samples_interface congo_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( congo_samples )
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(congo_samples_interface)
+	MCFG_SAMPLES_ADD("samples", congo_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -226,37 +224,37 @@ MACHINE_CONFIG_END
 WRITE8_DEVICE_HANDLER( congo_sound_b_w )
 {
 	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
-	device_t *samples = device->machine().device("samples");
+	samples_device *samples = device->machine().device<samples_device>("samples");
 	UINT8 diff = data ^ state->m_sound_state[1];
 	state->m_sound_state[1] = data;
 
 	/* bit 7 = mute */
 
 	/* GORILLA: channel 0 */
-	if ((diff & 0x02) && !(data & 0x02) && !sample_playing(samples, 0)) sample_start(samples, 0, 0, FALSE);
+	if ((diff & 0x02) && !(data & 0x02) && !samples->playing(0)) samples->start(0, 0);
 }
 
 
 WRITE8_DEVICE_HANDLER( congo_sound_c_w )
 {
 	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
-	device_t *samples = device->machine().device("samples");
+	samples_device *samples = device->machine().device<samples_device>("samples");
 	UINT8 diff = data ^ state->m_sound_state[2];
 	state->m_sound_state[2] = data;
 
 	/* BASS DRUM: channel 1 */
-	if ((diff & 0x01) && !(data & 0x01)) sample_start(samples, 1, 1, FALSE);
-	if ((diff & 0x01) &&  (data & 0x01)) sample_stop(samples, 1);
+	if ((diff & 0x01) && !(data & 0x01)) samples->start(1, 1);
+	if ((diff & 0x01) &&  (data & 0x01)) samples->stop(1);
 
 	/* CONGA (LOW): channel 2 */
-	if ((diff & 0x02) && !(data & 0x02)) sample_start(samples, 2, 2, FALSE);
-	if ((diff & 0x02) &&  (data & 0x02)) sample_stop(samples, 2);
+	if ((diff & 0x02) && !(data & 0x02)) samples->start(2, 2);
+	if ((diff & 0x02) &&  (data & 0x02)) samples->stop(2);
 
 	/* CONGA (HIGH): channel 3 */
-	if ((diff & 0x04) && !(data & 0x04)) sample_start(samples, 3, 3, FALSE);
-	if ((diff & 0x04) &&  (data & 0x04)) sample_stop(samples, 3);
+	if ((diff & 0x04) && !(data & 0x04)) samples->start(3, 3);
+	if ((diff & 0x04) &&  (data & 0x04)) samples->stop(3);
 
 	/* RIM: channel 4 */
-	if ((diff & 0x08) && !(data & 0x08)) sample_start(samples, 4, 4, FALSE);
-	if ((diff & 0x08) &&  (data & 0x08)) sample_stop(samples, 4);
+	if ((diff & 0x08) && !(data & 0x08)) samples->start(4, 4);
+	if ((diff & 0x08) &&  (data & 0x08)) samples->stop(4);
 }

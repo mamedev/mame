@@ -218,7 +218,7 @@ static WRITE8_HANDLER( rallyx_bang_w )
 	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 
 	if (data == 0 && state->m_last_bang != 0)
-		sample_start(state->m_samples, 0, 0, 0);
+		state->m_samples->start(0, 0);
 
 	state->m_last_bang = data;
 }
@@ -880,7 +880,7 @@ static MACHINE_START( rallyx )
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
 	state->m_maincpu = machine.device<cpu_device>("maincpu");
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 
 	state->save_item(NAME(state->m_last_bang));
 	state->save_item(NAME(state->m_stars_enable));
@@ -944,8 +944,7 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_SOUND_CONFIG(namco_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(rallyx_samples_interface)
+	MCFG_SAMPLES_ADD("samples", rallyx_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

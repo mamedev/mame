@@ -120,8 +120,7 @@ static const samples_interface frogs_samples_interface =
 
 
 MACHINE_CONFIG_FRAGMENT( frogs_audio )
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(frogs_samples_interface)
+	MCFG_SAMPLES_ADD("samples", frogs_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -132,8 +131,8 @@ MACHINE_CONFIG_END
 
 static TIMER_CALLBACK( frogs_croak_callback )
 {
-	device_t *samples = machine.device("samples");
-	sample_stop(samples, 2);
+	samples_device *samples = machine.device<samples_device>("samples");
+	samples->stop(2);
 }
 
 
@@ -145,7 +144,7 @@ MACHINE_START( frogs_audio )
 
 WRITE8_HANDLER( frogs_audio_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	device_t *discrete = space->machine().device("discrete");
 	static int last_croak = 0;
 	static int last_buzzz = 0;
@@ -160,11 +159,11 @@ WRITE8_HANDLER( frogs_audio_w )
 //  discrete_sound_w(discrete, FROGS_SPLASH_EN, data & 0x80);
 
 	if (data & 0x01)
-		sample_start (samples, 3, 3, 0);	// Hop
+		samples->start(3, 3);	// Hop
 	if (data & 0x02)
-		sample_start (samples, 0, 0, 0);	// Boing
+		samples->start(0, 0);	// Boing
 	if (new_croak)
-		sample_start (samples, 2, 2, 0);	// Croak
+		samples->start(2, 2);	// Croak
 	else
 	{
 		if (last_croak)
@@ -187,12 +186,12 @@ WRITE8_HANDLER( frogs_audio_w )
          * 12 seconds.
          */
 		if (!last_buzzz)
-			sample_start (samples, 1, 1, 1);	// Buzzz
+			samples->start(1, 1, true);	// Buzzz
 	}
 	else
-		sample_stop(samples, 1);
+		samples->stop(1);
 	if (data & 0x80)
-		sample_start (samples, 4, 4, 0);	// Splash
+		samples->start(4, 4);	// Splash
 
 	last_croak = new_croak;
 	last_buzzz = new_buzzz;

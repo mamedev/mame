@@ -856,8 +856,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	MCFG_SOUND_ADD("snk6502", SNK6502, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(sasuke_samples_interface)
+	MCFG_SAMPLES_ADD("samples", sasuke_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
 	MCFG_SOUND_ADD("sn76477.1", SN76477, 0)
@@ -884,8 +883,7 @@ static MACHINE_CONFIG_DERIVED( satansat, sasuke )
 	MCFG_GFXDECODE(satansat)
 
 	// sound hardware
-	MCFG_SOUND_REPLACE("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(vanguard_samples_interface)
+	MCFG_SAMPLES_REPLACE("samples", vanguard_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_REPLACE("sn76477.1", SN76477, 0)
@@ -929,8 +927,7 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	MCFG_SOUND_ADD("snk6502", SNK6502, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(vanguard_samples_interface)
+	MCFG_SAMPLES_ADD("samples", vanguard_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("sn76477.1", SN76477, 0)
@@ -948,8 +945,7 @@ static MACHINE_CONFIG_DERIVED( fantasy, vanguard )
 	MCFG_CPU_PROGRAM_MAP(fantasy_map)
 
 	// sound hardware
-	MCFG_SOUND_REPLACE("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(fantasy_samples_interface)
+	MCFG_SAMPLES_REPLACE("samples", fantasy_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_SOUND_REPLACE("sn76477.1", SN76477, 0)

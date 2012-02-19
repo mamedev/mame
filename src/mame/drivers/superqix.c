@@ -110,8 +110,8 @@ DSW2 stored @ $f237
 
 static SAMPLES_START( pbillian_sh_start )
 {
-	superqix_state *state = device->machine().driver_data<superqix_state>();
-	running_machine &machine = device->machine();
+	superqix_state *state = device.machine().driver_data<superqix_state>();
+	running_machine &machine = device.machine();
 	UINT8 *src = machine.region("samples")->base();
 	int i, len = machine.region("samples")->bytes();
 
@@ -124,7 +124,7 @@ static SAMPLES_START( pbillian_sh_start )
 static WRITE8_HANDLER( pbillian_sample_trigger_w )
 {
 	superqix_state *state = space->machine().driver_data<superqix_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	UINT8 *src = space->machine().region("samples")->base();
 	int len = space->machine().region("samples")->bytes();
 	int start,end;
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( pbillian_sample_trigger_w )
 	while (end < len && src[end] != 0xff)
 		end++;
 
-	sample_start_raw(samples, 0, state->m_samplebuf + start, end - start, 5000, 0); // 5khz ?
+	samples->start_raw(0, state->m_samplebuf + start, end - start, 5000); // 5khz ?
 }
 
 
@@ -1070,8 +1070,7 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_SOUND_CONFIG(pbillian_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(pbillian_samples_interface)
+	MCFG_SAMPLES_ADD("samples", pbillian_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1105,8 +1104,7 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_SOUND_CONFIG(hotsmash_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(pbillian_samples_interface)
+	MCFG_SAMPLES_ADD("samples", pbillian_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

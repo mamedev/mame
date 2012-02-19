@@ -48,7 +48,7 @@ static WRITE8_HANDLER( panic_sound_output_w )
 		int count;
 		if (data == 0)
 			for (count = 0; count < 9; count++)
-				sample_stop(state->m_samples, count);
+				state->m_samples->stop(count);
 
 		state->m_sound_enabled = data;
 	}
@@ -57,50 +57,50 @@ static WRITE8_HANDLER( panic_sound_output_w )
 	{
 		switch (offset)
 		{
-		case 0:	if (data) sample_start(state->m_samples, 0, 0, 0); break;	/* Walk */
-		case 1:	if (data) sample_start(state->m_samples, 0, 5, 0); break;	/* Enemy Die 1 */
+		case 0:	if (data) state->m_samples->start(0, 0); break;	/* Walk */
+		case 1:	if (data) state->m_samples->start(0, 5); break;	/* Enemy Die 1 */
 		case 2:	if (data)									/* Drop 1 */
 				{
-					if (!sample_playing(state->m_samples, 1))
+					if (!state->m_samples->playing(1))
 					{
-						sample_stop(state->m_samples, 2);
-						sample_start(state->m_samples, 1, 3, 0);
+						state->m_samples->stop(2);
+						state->m_samples->start(1, 3);
 					}
 				}
 				else
-					sample_stop(state->m_samples, 1);
+					state->m_samples->stop(1);
 				break;
 
-		case 3:	if (data && !sample_playing(state->m_samples, 6))			/* Oxygen */
-					sample_start(state->m_samples, 6, 9, 1);
+		case 3:	if (data && !state->m_samples->playing(6))			/* Oxygen */
+					state->m_samples->start(6, 9, true);
 				break;
 
 		case 4:	break;										/* Drop 2 */
-		case 5:	if (data) sample_start(state->m_samples, 0, 5, 0); break;	/* Enemy Die 2 (use same sample as 1) */
-		case 6:	if (data && !sample_playing(state->m_samples, 1) && !sample_playing(state->m_samples, 3))   /* Hang */
-					sample_start(state->m_samples, 2, 2, 0);
+		case 5:	if (data) state->m_samples->start(0, 5); break;	/* Enemy Die 2 (use same sample as 1) */
+		case 6:	if (data && !state->m_samples->playing(1) && !state->m_samples->playing(3))   /* Hang */
+					state->m_samples->start(2, 2);
 				break;
 
 		case 7:	if (data)									/* Escape */
 				{
-					sample_stop(state->m_samples, 2);
-					sample_start(state->m_samples, 3, 4, 0);
+					state->m_samples->stop(2);
+					state->m_samples->start(3, 4);
 				}
 				else
-					sample_stop(state->m_samples, 3);
+					state->m_samples->stop(3);
 				break;
 
-		case 8:	if (data) sample_start(state->m_samples, 0, 1, 0); break;	/* Stairs */
+		case 8:	if (data) state->m_samples->start(0, 1); break;	/* Stairs */
 		case 9:	if (data)									/* Extend */
-					sample_start(state->m_samples, 4, 8, 0);
+					state->m_samples->start(4, 8);
 				else
-					sample_stop(state->m_samples, 4);
+					state->m_samples->stop(4);
 				break;
 
 		case 10:	dac_data_w(state->m_dac, data); break;/* Bonus */
-		case 15:	if (data) sample_start(state->m_samples, 0, 6, 0); break;	/* Player Die */
-		case 16:	if (data) sample_start(state->m_samples, 5, 7, 0); break;	/* Enemy Laugh */
-		case 17:	if (data) sample_start(state->m_samples, 0, 10, 0); break;	/* Coin - Not triggered by software */
+		case 15:	if (data) state->m_samples->start(0, 6); break;	/* Player Die */
+		case 16:	if (data) state->m_samples->start(5, 7); break;	/* Enemy Laugh */
+		case 17:	if (data) state->m_samples->start(0, 10); break;	/* Coin - Not triggered by software */
 		}
 	}
 
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 		state->m_sound_enabled = data;
 		if (data == 0)
 			for (count = 0; count < 9; count++)
-				sample_stop(state->m_samples, count);
+				state->m_samples->stop(count);
 	}
 
 	if (state->m_sound_enabled)
@@ -138,37 +138,37 @@ static WRITE8_HANDLER( cosmicg_output_w )
 		/* be used for anything. It is implemented for sake of */
 		/* completness. Maybe it plays a tune if you win ?     */
 		case 1:	dac_data_w(state->m_dac, -data); break;
-		case 2:	if (data) sample_start(state->m_samples, 0, state->m_march_select, 0); break;	/* March Sound */
+		case 2:	if (data) state->m_samples->start(0, state->m_march_select); break;	/* March Sound */
 		case 3:	state->m_march_select = (state->m_march_select & 0xfe) | data; break;
 		case 4:	state->m_march_select = (state->m_march_select & 0xfd) | (data << 1); break;
 		case 5:	state->m_march_select = (state->m_march_select & 0xfb) | (data << 2); break;
 
 		case 6:	if (data)							/* Killer Attack (crawly thing at bottom of screen) */
-					sample_start(state->m_samples, 1, 8, 1);
+					state->m_samples->start(1, 8, true);
 				else
-					sample_stop(state->m_samples, 1);
+					state->m_samples->stop(1);
 				break;
 
 		case 7:	if (data)								/* Bonus Chance & Got Bonus */
 				{
-					sample_stop(state->m_samples, 4);
-					sample_start(state->m_samples, 4, 10, 0);
+					state->m_samples->stop(4);
+					state->m_samples->start(4, 10);
 				}
 				break;
 
 		case 8:	if (data)
 				{
-					if (!sample_playing(state->m_samples, 4)) sample_start(state->m_samples, 4, 9, 1);
+					if (!state->m_samples->playing(4)) state->m_samples->start(4, 9, true);
 				}
 				else
-					sample_stop(state->m_samples, 4);
+					state->m_samples->stop(4);
 				break;
 
-		case 9:	if (data) sample_start(state->m_samples, 3, 11, 0); break;	/* Got Ship */
+		case 9:	if (data) state->m_samples->start(3, 11); break;	/* Got Ship */
 //      case 11: watchdog_reset_w(0, 0); break;             /* Watchdog */
-		case 13:	if (data) sample_start(state->m_samples, 8, 13 - state->m_gun_die_select, 0); break;  /* Got Monster / Gunshot */
+		case 13:	if (data) state->m_samples->start(8, 13 - state->m_gun_die_select); break;  /* Got Monster / Gunshot */
 		case 14:	state->m_gun_die_select = data; break;
-		case 15:	if (data) sample_start(state->m_samples, 5, 14, 0); break;	/* Coin Extend (extra base) */
+		case 15:	if (data) state->m_samples->start(5, 14); break;	/* Coin Extend (extra base) */
 		}
 	}
 
@@ -188,10 +188,10 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 		int count;
 		if (data == 0)
 			for (count = 0; count < 12; count++)
-				sample_stop(state->m_samples, count);
+				state->m_samples->stop(count);
 		else
 		{
-			sample_start(state->m_samples, 0, 0, 1); /*Background Noise*/
+			state->m_samples->start(0, 0, true); /*Background Noise*/
 		}
 
 		state->m_sound_enabled = data;
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 	{
 		switch (offset)
 		{
-		case 0:	if (data) sample_start(state->m_samples, 1, 2, 0); break; /*Dive Bombing Type A*/
+		case 0:	if (data) state->m_samples->start(1, 2); break; /*Dive Bombing Type A*/
 
 		case 2:	/*Dive Bombing Type B (Main Control)*/
 			if (data)
@@ -209,58 +209,58 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 				switch (state->m_dive_bomb_b_select)
 				{
 				case 2:
-					if (sample_playing(state->m_samples, 2))
+					if (state->m_samples->playing(2))
 					{
-						sample_stop(state->m_samples, 2);
-						sample_start(state->m_samples, 2, 3, 0); break;
+						state->m_samples->stop(2);
+						state->m_samples->start(2, 3); break;
 					}
 					else
-						sample_start(state->m_samples, 2, 3, 0); break;
+						state->m_samples->start(2, 3); break;
 
 				case 3:
-					if (sample_playing(state->m_samples, 3))
+					if (state->m_samples->playing(3))
 					{
-						sample_stop(state->m_samples, 3);
-						sample_start(state->m_samples, 3, 4, 0); break;
+						state->m_samples->stop(3);
+						state->m_samples->start(3, 4); break;
 					}
 					else
-						sample_start(state->m_samples, 3, 4, 0); break;
+						state->m_samples->start(3, 4); break;
 
 				case 4:
-					if (sample_playing(state->m_samples, 4))
+					if (state->m_samples->playing(4))
 					{
-						sample_stop(state->m_samples, 4);
-						sample_start(state->m_samples, 4, 5, 0); break;
+						state->m_samples->stop(4);
+						state->m_samples->start(4, 5); break;
 					}
 					else
-						sample_start(state->m_samples, 4, 5, 0); break;
+						state->m_samples->start(4, 5); break;
 
 				case 5:
-					if (sample_playing(state->m_samples, 5))
+					if (state->m_samples->playing(5))
 					{
-						sample_stop(state->m_samples, 5);
-						sample_start(state->m_samples, 5, 6, 0); break;
+						state->m_samples->stop(5);
+						state->m_samples->start(5, 6); break;
 					}
 					else
-						sample_start(state->m_samples, 5, 6, 0); break;
+						state->m_samples->start(5, 6); break;
 
 				case 6:
-					if (sample_playing(state->m_samples, 6))
+					if (state->m_samples->playing(6))
 					{
-						sample_stop(state->m_samples, 6);
-						sample_start(state->m_samples, 6, 7, 0); break;
+						state->m_samples->stop(6);
+						state->m_samples->start(6, 7); break;
 					}
 					else
-						sample_start(state->m_samples, 6, 7, 0); break;
+						state->m_samples->start(6, 7); break;
 
 				case 7:
-					if (sample_playing(state->m_samples, 7))
+					if (state->m_samples->playing(7))
 					{
-						sample_stop(state->m_samples, 7);
-						sample_start(state->m_samples, 7, 8, 0); break;
+						state->m_samples->stop(7);
+						state->m_samples->start(7, 8); break;
 					}
 					else
-						sample_start(state->m_samples, 7, 8, 0); break;
+						state->m_samples->start(7, 8); break;
 				}
 			}
 
@@ -287,20 +287,20 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 			break;
 
 
-		case 6:	if (data) sample_start(state->m_samples, 8, 9, 0); break; /*Fire Control*/
+		case 6:	if (data) state->m_samples->start(8, 9); break; /*Fire Control*/
 
-		case 7:	if (data) sample_start(state->m_samples, 9, 10, 0); break; /*Small Explosion*/
+		case 7:	if (data) state->m_samples->start(9, 10); break; /*Small Explosion*/
 
-		case 8:	if (data) sample_start(state->m_samples, 10, 11, 0); break; /*Loud Explosion*/
+		case 8:	if (data) state->m_samples->start(10, 11); break; /*Loud Explosion*/
 
 		case 9:
 			if (data)
-				sample_start(state->m_samples, 11, 1, 1);
+				state->m_samples->start(11, 1, true);
 			else
-				sample_stop(state->m_samples, 11);
+				state->m_samples->stop(11);
 			break; /*Extend Sound control*/
 
-		case 12:	if (data) sample_start(state->m_samples, 11,12, 0); break; /*Insert Coin*/
+		case 12:	if (data) state->m_samples->start(11,12); break; /*Insert Coin*/
 		}
 	}
 
@@ -965,7 +965,7 @@ static MACHINE_START( cosmic )
 {
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 	state->m_dac = machine.device("dac");
 
 	state->save_item(NAME(state->m_sound_enabled));
@@ -1035,8 +1035,7 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(panic_samples_interface)
+	MCFG_SAMPLES_ADD("samples", panic_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1061,8 +1060,7 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(cosmica_samples_interface)
+	MCFG_SAMPLES_ADD("samples", cosmica_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -1099,8 +1097,7 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(cosmicg_samples_interface)
+	MCFG_SAMPLES_ADD("samples", cosmicg_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("dac", DAC, 0)

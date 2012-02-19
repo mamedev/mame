@@ -38,10 +38,10 @@ WRITE8_HANDLER( invadpt2_sh_port_1_w )
 
 	sn76477_enable_w(state->m_sn, !(data & 0x01));			/* SAUCER SOUND */
 
-	if (rising_bits & 0x02) sample_start(state->m_samples, 0, 0, 0);		/* MISSLE SOUND */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 1, 1, 0);		/* EXPLOSION */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 2, 2, 0);		/* INVADER HIT */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 5, 8, 0);		/* BONUS MISSILE BASE */
+	if (rising_bits & 0x02) state->m_samples->start(0, 0);		/* MISSLE SOUND */
+	if (rising_bits & 0x04) state->m_samples->start(1, 1);		/* EXPLOSION */
+	if (rising_bits & 0x08) state->m_samples->start(2, 2);		/* INVADER HIT */
+	if (rising_bits & 0x10) state->m_samples->start(5, 8);		/* BONUS MISSILE BASE */
 
 	state->m_screen_red = data & 0x04;
 
@@ -63,11 +63,11 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 4, 3, 0);		/* FLEET */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 4, 4, 0);		/* FLEET */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 4, 5, 0);		/* FLEET */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 4, 6, 0);		/* FLEET */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 3, 7, 0);		/* SAUCER HIT */
+	if (rising_bits & 0x01) state->m_samples->start(4, 3);		/* FLEET */
+	if (rising_bits & 0x02) state->m_samples->start(4, 4);		/* FLEET */
+	if (rising_bits & 0x04) state->m_samples->start(4, 5);		/* FLEET */
+	if (rising_bits & 0x08) state->m_samples->start(4, 6);		/* FLEET */
+	if (rising_bits & 0x10) state->m_samples->start(3, 7);		/* SAUCER HIT */
 
 	state->m_c8080bw_flip_screen = data & 0x20;
 
@@ -88,9 +88,9 @@ WRITE8_HANDLER( spcewars_sh_port_w )
 
 	sn76477_enable_w(state->m_sn, !(data & 0x01));			/* Saucer Sound */
 
-	if (rising_bits & 0x02) sample_start(state->m_samples, 0, 0, 0);		/* Shot Sound */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 1, 1, 0);		/* Base Hit */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 2, 2, 0);		/* Invader Hit */
+	if (rising_bits & 0x02) state->m_samples->start(0, 0);		/* Shot Sound */
+	if (rising_bits & 0x04) state->m_samples->start(1, 1);		/* Base Hit */
+	if (rising_bits & 0x08) state->m_samples->start(2, 2);		/* Invader Hit */
 
 	speaker_level_w(state->m_speaker, (data & 0x10) ? 1 : 0);		/* Various bitstream tunes */
 
@@ -130,11 +130,11 @@ WRITE8_HANDLER( lrescue_sh_port_1_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 0, 3, 0);		/* Thrust */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 1, 2, 0);		/* Shot Sound */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 0, 1, 0);		/* Death */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 1, 0, 0);		/* Alien Hit */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 2, 5, 0);		/* Bonus Ship (not confirmed) */
+	if (rising_bits & 0x01) state->m_samples->start(0, 3);		/* Thrust */
+	if (rising_bits & 0x02) state->m_samples->start(1, 2);		/* Shot Sound */
+	if (rising_bits & 0x04) state->m_samples->start(0, 1);		/* Death */
+	if (rising_bits & 0x08) state->m_samples->start(1, 0);		/* Alien Hit */
+	if (rising_bits & 0x10) state->m_samples->start(2, 5);		/* Bonus Ship (not confirmed) */
 
 	space->machine().sound().system_enable(data & 0x20);
 
@@ -148,14 +148,14 @@ WRITE8_HANDLER( lrescue_sh_port_2_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 1, 8, 0);		/* Footstep high tone */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 1, 7, 0);		/* Footstep low tone */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 1, 4, 0);		/* Bonus when counting men saved */
+	if (rising_bits & 0x01) state->m_samples->start(1, 8);		/* Footstep high tone */
+	if (rising_bits & 0x02) state->m_samples->start(1, 7);		/* Footstep low tone */
+	if (rising_bits & 0x04) state->m_samples->start(1, 4);		/* Bonus when counting men saved */
 
 	speaker_level_w(state->m_speaker, (data & 0x08) ? 1 : 0);		/* Bitstream tunes - endlevel and bonus1 */
 
-	if (rising_bits & 0x10) sample_start(state->m_samples, 3, 6, 0);		/* Shooting Star and Rescue Ship sounds */
-	if ((~data & 0x10) && (state->m_port_2_last_extra & 0x10)) sample_stop (state->m_samples, 3);	/* This makes the rescue ship sound beep on and off */
+	if (rising_bits & 0x10) state->m_samples->start(3, 6);		/* Shooting Star and Rescue Ship sounds */
+	if ((~data & 0x10) && (state->m_port_2_last_extra & 0x10)) state->m_samples->stop(3);	/* This makes the rescue ship sound beep on and off */
 
 	state->m_c8080bw_flip_screen = data & 0x20;
 
@@ -188,11 +188,11 @@ WRITE8_HANDLER( ballbomb_sh_port_1_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 1, 2, 0);		/* Hit a balloon */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 2, 0, 0);		/* Shot Sound */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 2, 1, 0);		/* Base Hit */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 1, 7, 0);		/* Hit a Bomb */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 3, 8, 0);		/* Bonus Base at 1500 points */
+	if (rising_bits & 0x01) state->m_samples->start(1, 2);		/* Hit a balloon */
+	if (rising_bits & 0x02) state->m_samples->start(2, 0);		/* Shot Sound */
+	if (rising_bits & 0x04) state->m_samples->start(2, 1);		/* Base Hit */
+	if (rising_bits & 0x08) state->m_samples->start(1, 7);		/* Hit a Bomb */
+	if (rising_bits & 0x10) state->m_samples->start(3, 8);		/* Bonus Base at 1500 points */
 
 	space->machine().sound().system_enable(data & 0x20);
 
@@ -206,9 +206,9 @@ WRITE8_HANDLER( ballbomb_sh_port_2_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
 
-	if (data & 0x01) sample_start(state->m_samples, 0, 7, 0);		/* Indicates plane will drop bombs */
-	if (data & 0x04) sample_start(state->m_samples, 0, 4, 0);		/* Plane is dropping new balloons at start of level */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 2, 2, 0);		/* Balloon hit and bomb drops */
+	if (data & 0x01) state->m_samples->start(0, 7);		/* Indicates plane will drop bombs */
+	if (data & 0x04) state->m_samples->start(0, 4);		/* Plane is dropping new balloons at start of level */
+	if (rising_bits & 0x10) state->m_samples->start(2, 2);		/* Balloon hit and bomb drops */
 
 	state->m_c8080bw_flip_screen = data & 0x20;
 
@@ -265,10 +265,10 @@ WRITE8_HANDLER( indianbt_sh_port_1_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 1, 7, 0);		/* Death */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 0, 1, 0);		/* Shot Sound */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 2, 3, 0);		/* Move */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 3, 2, 0);		/* Hit */
+	if (rising_bits & 0x01) state->m_samples->start(1, 7);		/* Death */
+	if (rising_bits & 0x02) state->m_samples->start(0, 1);		/* Shot Sound */
+	if (rising_bits & 0x04) state->m_samples->start(2, 3);		/* Move */
+	if (rising_bits & 0x08) state->m_samples->start(3, 2);		/* Hit */
 
 	space->machine().sound().system_enable(data & 0x20);
 
@@ -282,10 +282,10 @@ WRITE8_HANDLER( indianbt_sh_port_2_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 4, 0, 0);		/* Bird dropped an egg, Lasso used */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 4, 2, 0);		/* Egg hatches, egg shot */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 5, 0, 0);		/* Grabber, Lasso caught something */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 3, 7, 0);		/* Lasso sound */
+	if (rising_bits & 0x01) state->m_samples->start(4, 0);		/* Bird dropped an egg, Lasso used */
+	if (rising_bits & 0x02) state->m_samples->start(4, 2);		/* Egg hatches, egg shot */
+	if (rising_bits & 0x08) state->m_samples->start(5, 0);		/* Grabber, Lasso caught something */
+	if (rising_bits & 0x10) state->m_samples->start(3, 7);		/* Lasso sound */
 
 	state->m_port_2_last_extra = data;
 }
@@ -954,9 +954,9 @@ WRITE8_HANDLER( rollingc_sh_port_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_3_last_extra;
 
-	if (rising_bits & 0x02) sample_start(state->m_samples, 4, 0, 0);	/* Steering */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 0, 1, 0);	/* Collision */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 1, 8, 0);	/* Computer car is starting to move */
+	if (rising_bits & 0x02) state->m_samples->start(4, 0);	/* Steering */
+	if (rising_bits & 0x04) state->m_samples->start(0, 1);	/* Collision */
+	if (rising_bits & 0x10) state->m_samples->start(1, 8);	/* Computer car is starting to move */
 
 	state->m_port_3_last_extra = data;
 }
@@ -980,24 +980,24 @@ WRITE8_HANDLER( invrvnge_sh_port_w )
 	switch (data)
 	{
 		case 0x06:
-			sample_start(state->m_samples, 1, 0, 0);				/* Shoot */
+			state->m_samples->start(1, 0);				/* Shoot */
 			break;
 
 		case 0x14:
-			sample_start(state->m_samples, 2, 2, 0);				/* Hit Alien */
+			state->m_samples->start(2, 2);				/* Hit Alien */
 			break;
 
 		case 0x16:
-			sample_start(state->m_samples, 2, 5, 0);				/* Hit Asteroid */
+			state->m_samples->start(2, 5);				/* Hit Asteroid */
 			break;
 
 		case 0x1e:
-			sample_start(state->m_samples, 3, 1, 0);				/* Death (followed by 0x0a byte), also bit 4 of port 5 */
+			state->m_samples->start(3, 1);				/* Death (followed by 0x0a byte), also bit 4 of port 5 */
 			break;
 
 		case 0x18:						/* Fuel Low */
 		case 0x30:						/* Fuel bar filling up */
-			sample_start(state->m_samples, 4, 7, 0);
+			state->m_samples->start(4, 7);
 			break;
 
 		case 0x02:						/* Coin */
@@ -1007,7 +1007,7 @@ WRITE8_HANDLER( invrvnge_sh_port_w )
 			break;
 
 		case 0x3a:						/* Thrust, Docking, extra ship? */
-			sample_start(state->m_samples, 0, 8, 0);
+			state->m_samples->start(0, 8);
 			break;
 	}
 }
@@ -1023,13 +1023,13 @@ WRITE8_HANDLER( lupin3_sh_port_1_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 0, 6, 0);		/* Walking, get money */
+	if (rising_bits & 0x01) state->m_samples->start(0, 6);		/* Walking, get money */
 
 	sn76477_enable_w(state->m_sn, data & 0x02 ? 0:1);			/* Helicopter */
 
-	if (rising_bits & 0x04) sample_start(state->m_samples, 0, 7, 0);		/* Translocate */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 0, 1, 0);		/* Jail */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 3, 8, 0);		/* Bonus Man */
+	if (rising_bits & 0x04) state->m_samples->start(0, 7);		/* Translocate */
+	if (rising_bits & 0x08) state->m_samples->start(0, 1);		/* Jail */
+	if (rising_bits & 0x10) state->m_samples->start(3, 8);		/* Bonus Man */
 
 	state->m_port_1_last_extra = data;
 }
@@ -1039,11 +1039,11 @@ WRITE8_HANDLER( lupin3_sh_port_2_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 0, 3, 0);		/* Lands on top of building, wife kicks man */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 1, 2, 0);		/* deposit money, start intermission, end game */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 2, 5, 0);		/* deposit money, start intermission, Slides down rope */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 3, 0, 0);		/* start intermission, end game */
-	//if (rising_bits & 0x10) sample_start(state->m_samples, 3, 9, 0);        /* Dog barking */
+	if (rising_bits & 0x01) state->m_samples->start(0, 3);		/* Lands on top of building, wife kicks man */
+	if (rising_bits & 0x02) state->m_samples->start(1, 2);		/* deposit money, start intermission, end game */
+	if (rising_bits & 0x04) state->m_samples->start(2, 5);		/* deposit money, start intermission, Slides down rope */
+	if (rising_bits & 0x08) state->m_samples->start(3, 0);		/* start intermission, end game */
+	//if (rising_bits & 0x10) state->m_samples->start(3, 9);        /* Dog barking */
 
 	state->m_color_map = data & 0x40;
 
@@ -1068,8 +1068,8 @@ WRITE8_HANDLER( schasercv_sh_port_1_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
 
-	if (rising_bits & 0x02) sample_start(state->m_samples, 1, 6, 0);		/* Ran over a dot */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 0, 1, 0);		/* Death */
+	if (rising_bits & 0x02) state->m_samples->start(1, 6);		/* Ran over a dot */
+	if (rising_bits & 0x10) state->m_samples->start(0, 1);		/* Death */
 
 	state->m_port_1_last_extra = data;
 }
@@ -1096,11 +1096,11 @@ WRITE8_HANDLER( yosakdon_sh_port_1_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 0, 3, 0);			/* Game Over */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 2, 0, 0);			/* Bird dead */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 0, 1, 0);			/* Rifle being fired */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 1, 2, 0);			/* Man dead */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 5, 8, 0);			/* Bonus Man? */
+	if (rising_bits & 0x01) state->m_samples->start(0, 3);			/* Game Over */
+	if (rising_bits & 0x02) state->m_samples->start(2, 0);			/* Bird dead */
+	if (rising_bits & 0x04) state->m_samples->start(0, 1);			/* Rifle being fired */
+	if (rising_bits & 0x08) state->m_samples->start(1, 2);			/* Man dead */
+	if (rising_bits & 0x10) state->m_samples->start(5, 8);			/* Bonus Man? */
 
 	space->machine().sound().system_enable(data & 0x20);
 
@@ -1112,12 +1112,12 @@ WRITE8_HANDLER( yosakdon_sh_port_2_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_2_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 1, 6, 0);			/* Ready? , Game Over */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 3, 7, 0);			/* Big bird dead */
+	if (rising_bits & 0x01) state->m_samples->start(1, 6);			/* Ready? , Game Over */
+	if (rising_bits & 0x04) state->m_samples->start(3, 7);			/* Big bird dead */
 
 	sn76477_enable_w(state->m_sn, data & 0x08 ? 0:1);				/* Big bird */
 
-	if (rising_bits & 0x10) sample_start(state->m_samples, 2, 7, 0);			/* Game Over */
+	if (rising_bits & 0x10) state->m_samples->start(2, 7);			/* Game Over */
 
 	state->m_c8080bw_flip_screen = data & 0x20;
 
@@ -1136,8 +1136,8 @@ WRITE8_HANDLER( shuttlei_sh_port_1_w )
 	_8080bw_state *state = space->machine().driver_data<_8080bw_state>();
 	UINT8 rising_bits = data & ~state->m_port_1_last_extra;
 
-	if (rising_bits & 0x01) sample_start(state->m_samples, 4, 4, 0);			/* Fleet move */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 5, 8, 0);			/* Extra Tank */
+	if (rising_bits & 0x01) state->m_samples->start(4, 4);			/* Fleet move */
+	if (rising_bits & 0x02) state->m_samples->start(5, 8);			/* Extra Tank */
 
 	sn76477_enable_w(state->m_sn, data & 0x04 ? 0:1);				/* UFO */
 
@@ -1151,19 +1151,19 @@ WRITE8_HANDLER( shuttlei_sh_port_2_w )
 	switch (data)
 	{
 		case 0x23:
-			sample_start(state->m_samples, 2, 2, 0);				/* Hit */
+			state->m_samples->start(2, 2);				/* Hit */
 			break;
 
 		case 0x2b:
-			sample_start(state->m_samples, 0, 0, 0);				/* Shoot */
+			state->m_samples->start(0, 0);				/* Shoot */
 			break;
 
 		case 0xa3:
-			sample_start(state->m_samples, 3, 7, 0);				/* Hit UFO */
+			state->m_samples->start(3, 7);				/* Hit UFO */
 			break;
 
 		case 0xab:
-			sample_start(state->m_samples, 1, 1, 0);				/* Death */
+			state->m_samples->start(1, 1);				/* Death */
 			break;
 	}
 }

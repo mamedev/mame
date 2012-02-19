@@ -61,7 +61,7 @@ public:
 	device_t *m_maincpu;
 	device_t *m_ppi8255_0;
 	device_t *m_ppi8255_1;
-	device_t *m_samples;
+	samples_device *m_samples;
 };
 
 
@@ -230,7 +230,7 @@ static MACHINE_START( kamikaze )
 	state->m_maincpu = machine.device("maincpu");
 	state->m_ppi8255_0 = machine.device("ppi8255_0");
 	state->m_ppi8255_1 = machine.device("ppi8255_1");
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 
 	state->m_int_timer = machine.scheduler().timer_alloc(FUNC(kamizake_int_gen));
 	state->m_int_timer->adjust(machine.primary_screen->time_until_pos(128), 128);
@@ -256,7 +256,7 @@ static MACHINE_START( spaceint )
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 
 	state->save_item(NAME(state->m_screen_flip));
 	state->save_item(NAME(state->m_sound_state));
@@ -327,11 +327,11 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 	int bits_gone_hi = data & ~state->m_sound_state[0];
 	state->m_sound_state[0] = data;
 
-	if (bits_gone_hi & 0x01) sample_start(state->m_samples, 0, SND_UFO, 1);
-	if (!(data & 0x01))      sample_stop(state->m_samples, 0);
-	if (bits_gone_hi & 0x02) sample_start(state->m_samples, 1, SND_SHOT, 0);
-	if (bits_gone_hi & 0x04) sample_start(state->m_samples, 2, SND_BASEHIT, 0);
-	if (bits_gone_hi & 0x08) sample_start(state->m_samples, 3, SND_INVADERHIT, 0);
+	if (bits_gone_hi & 0x01) state->m_samples->start(0, SND_UFO, true);
+	if (!(data & 0x01))      state->m_samples->stop(0);
+	if (bits_gone_hi & 0x02) state->m_samples->start(1, SND_SHOT);
+	if (bits_gone_hi & 0x04) state->m_samples->start(2, SND_BASEHIT);
+	if (bits_gone_hi & 0x08) state->m_samples->start(3, SND_INVADERHIT);
 
 	device->machine().sound().system_enable(data & 0x20);
 	state->m_screen_red = data & 0x04;
@@ -344,11 +344,11 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 	int bits_gone_hi = data & ~state->m_sound_state[1];
 	state->m_sound_state[1] = data;
 
-	if (bits_gone_hi & 0x01) sample_start(state->m_samples, 5, SND_FLEET1, 0);
-	if (bits_gone_hi & 0x02) sample_start(state->m_samples, 5, SND_FLEET2, 0);
-	if (bits_gone_hi & 0x04) sample_start(state->m_samples, 5, SND_FLEET3, 0);
-	if (bits_gone_hi & 0x08) sample_start(state->m_samples, 5, SND_FLEET4, 0);
-	if (bits_gone_hi & 0x10) sample_start(state->m_samples, 4, SND_UFOHIT, 0);
+	if (bits_gone_hi & 0x01) state->m_samples->start(5, SND_FLEET1);
+	if (bits_gone_hi & 0x02) state->m_samples->start(5, SND_FLEET2);
+	if (bits_gone_hi & 0x04) state->m_samples->start(5, SND_FLEET3);
+	if (bits_gone_hi & 0x08) state->m_samples->start(5, SND_FLEET4);
+	if (bits_gone_hi & 0x10) state->m_samples->start(4, SND_UFOHIT);
 
 	state->m_screen_flip = (input_port_read(device->machine(), "CABINET") & data & 0x20) ? 0xff : 0x00;
 }
@@ -360,16 +360,16 @@ static WRITE8_HANDLER( spaceint_sound1_w )
 	int bits_gone_hi = data & ~state->m_sound_state[0];
 	state->m_sound_state[0] = data;
 
-	if (bits_gone_hi & 0x01) sample_start(state->m_samples, 1, SND_SHOT, 0);
-	if (bits_gone_hi & 0x02) sample_start(state->m_samples, 2, SND_BASEHIT, 0);
-	if (bits_gone_hi & 0x04) sample_start(state->m_samples, 4, SND_UFOHIT, 0);
-	if (bits_gone_hi & 0x08) sample_start(state->m_samples, 0, SND_UFO, 1);
-	if (!(data & 0x08))      sample_stop(state->m_samples, 0);
+	if (bits_gone_hi & 0x01) state->m_samples->start(1, SND_SHOT);
+	if (bits_gone_hi & 0x02) state->m_samples->start(2, SND_BASEHIT);
+	if (bits_gone_hi & 0x04) state->m_samples->start(4, SND_UFOHIT);
+	if (bits_gone_hi & 0x08) state->m_samples->start(0, SND_UFO, true);
+	if (!(data & 0x08))      state->m_samples->stop(0);
 
-	if (bits_gone_hi & 0x10) sample_start(state->m_samples, 5, SND_FLEET1, 0);
-	if (bits_gone_hi & 0x20) sample_start(state->m_samples, 5, SND_FLEET2, 0);
-	if (bits_gone_hi & 0x40) sample_start(state->m_samples, 5, SND_FLEET3, 0);
-	if (bits_gone_hi & 0x80) sample_start(state->m_samples, 5, SND_FLEET4, 0);
+	if (bits_gone_hi & 0x10) state->m_samples->start(5, SND_FLEET1);
+	if (bits_gone_hi & 0x20) state->m_samples->start(5, SND_FLEET2);
+	if (bits_gone_hi & 0x40) state->m_samples->start(5, SND_FLEET3);
+	if (bits_gone_hi & 0x80) state->m_samples->start(5, SND_FLEET4);
 }
 
 
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( spaceint_sound2_w )
 
 	space->machine().sound().system_enable(data & 0x02);
 
-	if (bits_gone_hi & 0x04) sample_start(state->m_samples, 3, SND_INVADERHIT, 0);
+	if (bits_gone_hi & 0x04) state->m_samples->start(3, SND_INVADERHIT);
 
 	state->m_screen_flip = (input_port_read(space->machine(), "CABINET") & data & 0x80) ? 0xff : 0x00;
 }
@@ -605,8 +605,7 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(astinvad_samples_interface)
+	MCFG_SAMPLES_ADD("samples", astinvad_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -642,8 +641,7 @@ static MACHINE_CONFIG_START( spaceint, astinvad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(astinvad_samples_interface)
+	MCFG_SAMPLES_ADD("samples", astinvad_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

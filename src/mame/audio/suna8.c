@@ -16,14 +16,15 @@ WRITE8_DEVICE_HANDLER( suna8_play_samples_w )
 	suna8_state *state = device->machine().driver_data<suna8_state>();
 	if( data )
 	{
+		samples_device *samples = downcast<samples_device *>(device);
 		if( ~data & 0x10 )
 		{
-			sample_start_raw(device, 0, &state->m_samplebuf[0x800*state->m_sample], 0x0800, 4000, 0);
+			samples->start_raw(0, &state->m_samplebuf[0x800*state->m_sample], 0x0800, 4000);
 		}
 		else if( ~data & 0x08 )
 		{
 			state->m_sample &= 3;
-			sample_start_raw(device, 0, &state->m_samplebuf[0x800*(state->m_sample+7)], 0x0800, 4000, 0);
+			samples->start_raw(0, &state->m_samplebuf[0x800*(state->m_sample+7)], 0x0800, 4000);
 		}
 	}
 }
@@ -35,7 +36,8 @@ WRITE8_DEVICE_HANDLER( rranger_play_samples_w )
 	{
 		if(( state->m_sample != 0 ) && ( ~data & 0x30 ))	// don't play state->m_sample zero when the bit is active
 		{
-			sample_start_raw(device, 0, &state->m_samplebuf[0x800*state->m_sample], 0x0800, 4000, 0);
+			samples_device *samples = downcast<samples_device *>(device);
+			samples->start_raw(0, &state->m_samplebuf[0x800*state->m_sample], 0x0800, 4000);
 		}
 	}
 }
@@ -48,8 +50,8 @@ WRITE8_DEVICE_HANDLER( suna8_samples_number_w )
 
 SAMPLES_START( suna8_sh_start )
 {
-	suna8_state *state = device->machine().driver_data<suna8_state>();
-	running_machine &machine = device->machine();
+	suna8_state *state = device.machine().driver_data<suna8_state>();
+	running_machine &machine = device.machine();
 	int i, len = machine.region("samples")->bytes();
 	UINT8 *ROM = machine.region("samples")->base();
 

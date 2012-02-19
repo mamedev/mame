@@ -1,3 +1,5 @@
+#include "sound/samples.h"
+
 struct jungler_star
 {
 	int x, y, color;
@@ -33,7 +35,7 @@ public:
 
 	/* devices */
 	cpu_device *m_maincpu;
-	device_t *m_samples;
+	samples_device *m_samples;
 
 	UINT8    m_main_irq_mask;
 };

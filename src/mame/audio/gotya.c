@@ -46,7 +46,7 @@ WRITE8_HANDLER( gotya_soundlatch_w )
 
 	if (data == 0)
 	{
-		sample_stop(state->m_samples, 0);
+		state->m_samples->stop(0);
 		state->m_theme_playing = 0;
 		return;
 	}
@@ -62,7 +62,7 @@ WRITE8_HANDLER( gotya_soundlatch_w )
 				return;
 			}
 
-			sample_start(state->m_samples, gotya_samples[sample_number].channel, sample_number, gotya_samples[sample_number].looping);
+			state->m_samples->start(gotya_samples[sample_number].channel, sample_number, gotya_samples[sample_number].looping);
 
 			if (gotya_samples[sample_number].channel == 0)
 			{

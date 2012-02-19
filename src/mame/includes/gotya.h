@@ -1,3 +1,4 @@
+#include "sound/samples.h"
 
 class gotya_state : public driver_device
 {
@@ -20,7 +21,7 @@ public:
 	int      m_theme_playing;
 
 	/* devices */
-	device_t *m_samples;
+	samples_device *m_samples;
 };
 
 

@@ -205,46 +205,46 @@ static WRITE8_HANDLER( seawolf2_lamps_w )
 static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 {
 	astrocde_state *state = space->machine().driver_data<astrocde_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	UINT8 rising_bits = data & ~state->m_port_1_last;
 	state->m_port_1_last = data;
 
-	if (rising_bits & 0x01) sample_start(samples, 1, 1, 0);  /* Left Torpedo */
-	if (rising_bits & 0x02) sample_start(samples, 0, 0, 0);  /* Left Ship Hit */
-	if (rising_bits & 0x04) sample_start(samples, 4, 4, 0);  /* Left Mine Hit */
-	if (rising_bits & 0x08) sample_start(samples, 6, 1, 0);  /* Right Torpedo */
-	if (rising_bits & 0x10) sample_start(samples, 5, 0, 0);  /* Right Ship Hit */
-	if (rising_bits & 0x20) sample_start(samples, 9, 4, 0);  /* Right Mine Hit */
+	if (rising_bits & 0x01) samples->start(1, 1);  /* Left Torpedo */
+	if (rising_bits & 0x02) samples->start(0, 0);  /* Left Ship Hit */
+	if (rising_bits & 0x04) samples->start(4, 4);  /* Left Mine Hit */
+	if (rising_bits & 0x08) samples->start(6, 1);  /* Right Torpedo */
+	if (rising_bits & 0x10) samples->start(5, 0);  /* Right Ship Hit */
+	if (rising_bits & 0x20) samples->start(9, 4);  /* Right Mine Hit */
 }
 
 
 static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 {
 	astrocde_state *state = space->machine().driver_data<astrocde_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	UINT8 rising_bits = data & ~state->m_port_2_last;
 	state->m_port_2_last = data;
 
-	sample_set_volume(samples, 0, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(samples, 1, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(samples, 3, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(samples, 4, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(samples, 5, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(samples, 6, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(samples, 8, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(samples, 9, (data & 0x80) ? 1.0 : 0.0);
+	samples->set_volume(0, (data & 0x80) ? 1.0 : 0.0);
+	samples->set_volume(1, (data & 0x80) ? 1.0 : 0.0);
+	samples->set_volume(3, (data & 0x80) ? 1.0 : 0.0);
+	samples->set_volume(4, (data & 0x80) ? 1.0 : 0.0);
+	samples->set_volume(5, (data & 0x80) ? 1.0 : 0.0);
+	samples->set_volume(6, (data & 0x80) ? 1.0 : 0.0);
+	samples->set_volume(8, (data & 0x80) ? 1.0 : 0.0);
+	samples->set_volume(9, (data & 0x80) ? 1.0 : 0.0);
 
 	/* dive panning controlled by low 3 bits */
-	sample_set_volume(samples, 2, (float)(~data & 0x07) / 7.0);
-	sample_set_volume(samples, 7, (float)(data & 0x07) / 7.0);
+	samples->set_volume(2, (float)(~data & 0x07) / 7.0);
+	samples->set_volume(7, (float)(data & 0x07) / 7.0);
 
 	if (rising_bits & 0x08)
 	{
-		sample_start(samples, 2, 2, 0);
-		sample_start(samples, 7, 2, 0);
+		samples->start(2, 2);
+		samples->start(7, 2);
 	}
-	if (rising_bits & 0x10) sample_start(samples, 8, 3, 0);  /* Right Sonar */
-	if (rising_bits & 0x20) sample_start(samples, 3, 3, 0);  /* Left Sonar */
+	if (rising_bits & 0x10) samples->start(8, 3);  /* Right Sonar */
+	if (rising_bits & 0x20) samples->start(3, 3);  /* Left Sonar */
 
 	coin_counter_w(space->machine(), 0, data & 0x40);    /* Coin Counter */
 }
@@ -1370,8 +1370,7 @@ static MACHINE_CONFIG_DERIVED( seawolf2, astrocade_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(seawolf2_samples_interface)
+	MCFG_SAMPLES_ADD("samples", seawolf2_samples_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)
@@ -1421,8 +1420,7 @@ static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(wow_samples_interface)
+	MCFG_SAMPLES_ADD("samples", wow_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
 MACHINE_CONFIG_END
 
@@ -1448,8 +1446,7 @@ static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 	MCFG_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(gorf_samples_interface)
+	MCFG_SAMPLES_ADD("samples", gorf_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
 MACHINE_CONFIG_END
 

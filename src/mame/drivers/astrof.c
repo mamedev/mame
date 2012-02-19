@@ -501,7 +501,7 @@ static MACHINE_START( astrof )
 	astrof_set_video_control_2(machine, 0xff);
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 
 	/* register for state saving */
 	state->save_item(NAME(state->m_red_on));

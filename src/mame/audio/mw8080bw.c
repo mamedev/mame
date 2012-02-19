@@ -157,8 +157,7 @@ MACHINE_CONFIG_FRAGMENT( seawolf_audio )
 	MCFG_SOUND_START(samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(seawolf_samples_interface)
+	MCFG_SAMPLES_ADD("samples", seawolf_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_CONFIG_END
 
@@ -169,19 +168,19 @@ WRITE8_HANDLER( seawolf_audio_w )
 	UINT8 rising_bits = data & ~state->m_port_1_last;
 
 	/* if (data & 0x01)  enable SHIP HIT sound */
-	if (rising_bits & 0x01) sample_start(state->m_samples, 0, 0, 0);
+	if (rising_bits & 0x01) state->m_samples->start(0, 0);
 
 	/* if (data & 0x02)  enable TORPEDO sound */
-	if (rising_bits & 0x02) sample_start(state->m_samples, 1, 1, 0);
+	if (rising_bits & 0x02) state->m_samples->start(1, 1);
 
 	/* if (data & 0x04)  enable DIVE sound */
-	if (rising_bits & 0x04) sample_start(state->m_samples, 2, 2, 0);
+	if (rising_bits & 0x04) state->m_samples->start(2, 2);
 
 	/* if (data & 0x08)  enable SONAR sound */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 3, 3, 0);
+	if (rising_bits & 0x08) state->m_samples->start(3, 3);
 
 	/* if (data & 0x10)  enable MINE HIT sound */
-	if (rising_bits & 0x10) sample_start(state->m_samples, 4, 4, 0);
+	if (rising_bits & 0x10) state->m_samples->start(4, 4);
 
 	coin_counter_w(space->machine(), 0, (data >> 5) & 0x01);
 
@@ -219,12 +218,10 @@ MACHINE_CONFIG_FRAGMENT( gunfight_audio )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("samples1", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(gunfight_samples_interface)
+	MCFG_SAMPLES_ADD("samples1", gunfight_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(gunfight_samples_interface)
+	MCFG_SAMPLES_ADD("samples2", gunfight_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -245,22 +242,22 @@ WRITE8_HANDLER( gunfight_audio_w )
 
 	case 0x01:
 		/* enable LEFT SHOOT sound (left speaker) */
-		sample_start(state->m_samples1, 0, 0, 0);
+		state->m_samples1->start(0, 0);
 		break;
 
 	case 0x02:
 		/* enable RIGHT SHOOT sound (right speaker) */
-		sample_start(state->m_samples2, 0, 0, 0);
+		state->m_samples2->start(0, 0);
 		break;
 
 	case 0x03:
 		/* enable LEFT HIT sound (left speaker) */
-		sample_start(state->m_samples1, 0, 1, 0);
+		state->m_samples1->start(0, 1);
 		break;
 
 	case 0x04:
 		/* enable RIGHT HIT sound (right speaker) */
-		sample_start(state->m_samples2, 0, 1, 0);
+		state->m_samples2->start(0, 1);
 		break;
 
 	default:
@@ -1577,12 +1574,10 @@ MACHINE_CONFIG_FRAGMENT( gmissile_audio )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("samples1", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(gmissile_samples_interface)
+	MCFG_SAMPLES_ADD("samples1", gmissile_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.9)
 
-	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(gmissile_samples_interface)
+	MCFG_SAMPLES_ADD("samples2", gmissile_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.9)
 MACHINE_CONFIG_END
 
@@ -1603,18 +1598,18 @@ WRITE8_HANDLER( gmissile_audio_1_w )
 	space->machine().sound().system_enable((data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable RIGHT MISSILE sound (goes to right speaker) */
-	if (rising_bits & 0x10) sample_start(state->m_samples2, 0, 0, 0);
+	if (rising_bits & 0x10) state->m_samples2->start(0, 0);
 
 	/* if (data & 0x20)  enable LEFT EXPLOSION sound (goes to left speaker) */
 	output_set_value("L_EXP_LIGHT", (data >> 5) & 0x01);
-	if (rising_bits & 0x20) sample_start(state->m_samples1, 0, 1, 0);
+	if (rising_bits & 0x20) state->m_samples1->start(0, 1);
 
 	/* if (data & 0x40)  enable LEFT MISSILE sound (goes to left speaker) */
-	if (rising_bits & 0x40) sample_start(state->m_samples1, 0, 0, 0);
+	if (rising_bits & 0x40) state->m_samples1->start(0, 0);
 
 	/* if (data & 0x80)  enable RIGHT EXPLOSION sound (goes to right speaker) */
 	output_set_value("R_EXP_LIGHT", (data >> 7) & 0x01);
-	if (rising_bits & 0x80) sample_start(state->m_samples2, 0, 1, 0);
+	if (rising_bits & 0x80) state->m_samples2->start(0, 1);
 
 	state->m_port_1_last = data;
 }
@@ -1676,12 +1671,10 @@ MACHINE_CONFIG_FRAGMENT( m4_audio )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("samples1", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(m4_samples_interface)
+	MCFG_SAMPLES_ADD("samples1", m4_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
 
-	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(m4_samples_interface)
+	MCFG_SAMPLES_ADD("samples2", m4_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
 MACHINE_CONFIG_END
 
@@ -1698,16 +1691,16 @@ WRITE8_HANDLER( m4_audio_1_w )
 	space->machine().sound().system_enable((data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable LEFT PLAYER SHOT sound (goes to left speaker) */
-	if (rising_bits & 0x10) sample_start(state->m_samples1, 0, 0, 0);
+	if (rising_bits & 0x10) state->m_samples1->start(0, 0);
 
 	/* if (data & 0x20)  enable RIGHT PLAYER SHOT sound (goes to right speaker) */
-	if (rising_bits & 0x20) sample_start(state->m_samples2, 0, 0, 0);
+	if (rising_bits & 0x20) state->m_samples2->start(0, 0);
 
 	/* if (data & 0x40)  enable LEFT PLAYER EXPLOSION sound via 300K res (goes to left speaker) */
-	if (rising_bits & 0x40) sample_start(state->m_samples1, 1, 1, 0);
+	if (rising_bits & 0x40) state->m_samples1->start(1, 1);
 
 	/* if (data & 0x80)  enable RIGHT PLAYER EXPLOSION sound via 300K res (goes to right speaker) */
-	if (rising_bits & 0x80) sample_start(state->m_samples2, 1, 1, 0);
+	if (rising_bits & 0x80) state->m_samples2->start(1, 1);
 
 	state->m_port_1_last = data;
 }
@@ -1719,10 +1712,10 @@ WRITE8_HANDLER( m4_audio_2_w )
 	UINT8 rising_bits = data & ~state->m_port_2_last;
 
 	/* if (data & 0x01)  enable LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker) */
-	if (rising_bits & 0x01) sample_start(state->m_samples1, 1, 1, 0);
+	if (rising_bits & 0x01) state->m_samples1->start(1, 1);
 
 	/* if (data & 0x02)  enable RIGHT PLAYER EXPLOSION sound via 510K res (goes to right speaker) */
-	if (rising_bits & 0x02) sample_start(state->m_samples2, 1, 1, 0);
+	if (rising_bits & 0x02) state->m_samples2->start(1, 1);
 
 	/* if (data & 0x04)  enable LEFT TANK MOTOR sound (goes to left speaker) */
 
@@ -1938,8 +1931,7 @@ MACHINE_CONFIG_FRAGMENT( clowns_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(clowns_samples_interface)
+	MCFG_SAMPLES_ADD("samples", clowns_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -1974,7 +1966,7 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 
 	discrete_sound_w(device, CLOWNS_SPRINGBOARD_HIT_EN, (data >> 4) & 0x01);
 
-	if (rising_bits & 0x20) sample_start(state->m_samples, 0, 0, 0);  /* springboard miss */
+	if (rising_bits & 0x20) state->m_samples->start(0, 0);  /* springboard miss */
 
 	/* D6 and D7 are not connected */
 
@@ -3341,8 +3333,7 @@ MACHINE_CONFIG_FRAGMENT( phantom2_audio )
 	MCFG_SOUND_START(samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(phantom2_samples_interface)
+	MCFG_SAMPLES_ADD("samples", phantom2_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_CONFIG_END
 
@@ -3353,7 +3344,7 @@ WRITE8_HANDLER( phantom2_audio_1_w )
 	UINT8 rising_bits = data & ~state->m_port_1_last;
 
 	/* if (data & 0x01)  enable PLAYER SHOT sound */
-	if (rising_bits & 0x01) sample_start(state->m_samples, 0, 0, 0);
+	if (rising_bits & 0x01) state->m_samples->start(0, 0);
 
 	/* if (data & 0x02)  enable ENEMY SHOT sound */
 
@@ -3378,7 +3369,7 @@ WRITE8_HANDLER( phantom2_audio_2_w )
 	/* D0-D2 are not connected */
 
 	/* if (data & 0x08)  enable EXPLOSION sound */
-	if (rising_bits & 0x08) sample_start(state->m_samples, 1, 1, 0);
+	if (rising_bits & 0x08) state->m_samples->start(1, 1);
 
 	output_set_value("EXPLAMP", (data >> 4) & 0x01);
 
@@ -3628,8 +3619,7 @@ MACHINE_CONFIG_FRAGMENT( invaders_samples_audio )
 	MCFG_SOUND_CONFIG(invaders_sn76477_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(invaders_samples_interface)
+	MCFG_SAMPLES_ADD("samples", invaders_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

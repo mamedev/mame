@@ -98,7 +98,7 @@ static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 	state->m_sound_enable = !data;
 
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
-	if (data) sample_stop (space->machine().device("samples"), 2);
+	if (data) space->machine().device<samples_device>("samples")->stop(2);
 }
 
 static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
@@ -112,23 +112,23 @@ static WRITE8_HANDLER( tankbatt_sh_expl_w )
 	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
 	if (state->m_sound_enable)
 	{
-		device_t *samples = space->machine().device("samples");
-		sample_start (samples, 1, 3, 0);
+		samples_device *samples = space->machine().device<samples_device>("samples");
+		samples->start(1, 3);
 	}
 }
 
 static WRITE8_HANDLER( tankbatt_sh_engine_w )
 {
 	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	if (state->m_sound_enable)
 	{
 		if (data)
-			sample_start (samples, 2, 2, 1);
+			samples->start(2, 2, true);
 		else
-			sample_start (samples, 2, 1, 1);
+			samples->start(2, 1, true);
 	}
-	else sample_stop (samples, 2);
+	else samples->stop(2);
 }
 
 static WRITE8_HANDLER( tankbatt_sh_fire_w )
@@ -136,8 +136,8 @@ static WRITE8_HANDLER( tankbatt_sh_fire_w )
 	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
 	if (state->m_sound_enable)
 	{
-		device_t *samples = space->machine().device("samples");
-		sample_start (samples, 0, 0, 0);
+		samples_device *samples = space->machine().device<samples_device>("samples");
+		samples->start(0, 0);
 	}
 }
 
@@ -311,8 +311,7 @@ static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(tankbatt_samples_interface)
+	MCFG_SAMPLES_ADD("samples", tankbatt_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

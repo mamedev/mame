@@ -30,7 +30,7 @@ VIDEO_START( starcrus )
 WRITE8_HANDLER( starcrus_ship_parm_1_w )
 {
 	starcrus_state *state = space->machine().driver_data<starcrus_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	state->m_s1_sprite = data&0x1f;
 	state->m_engine1_on = ((data&0x20)>>5)^0x01;
@@ -40,7 +40,7 @@ WRITE8_HANDLER( starcrus_ship_parm_1_w )
 		if (state->m_engine_sound_playing == 0)
 		{
 			state->m_engine_sound_playing = 1;
-			sample_start(samples, 0, 0, 1);	/* engine sample */
+			samples->start(0, 0, true);	/* engine sample */
 		}
 	}
 	else
@@ -48,7 +48,7 @@ WRITE8_HANDLER( starcrus_ship_parm_1_w )
 		if (state->m_engine_sound_playing == 1)
 		{
 			state->m_engine_sound_playing = 0;
-			sample_stop(samples, 0);
+			samples->stop(0);
 		}
 	}
 }
@@ -56,7 +56,7 @@ WRITE8_HANDLER( starcrus_ship_parm_1_w )
 WRITE8_HANDLER( starcrus_ship_parm_2_w )
 {
 	starcrus_state *state = space->machine().driver_data<starcrus_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	state->m_s2_sprite = data&0x1f;
 	set_led_status(space->machine(), 2,~data & 0x80);			/* game over lamp */
@@ -68,7 +68,7 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 		if (state->m_engine_sound_playing == 0)
 		{
 			state->m_engine_sound_playing = 1;
-			sample_start(samples, 0, 0, 1);	/* engine sample */
+			samples->start(0, 0, true);	/* engine sample */
 		}
 	}
 	else
@@ -76,7 +76,7 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 		if (state->m_engine_sound_playing == 1)
 		{
 			state->m_engine_sound_playing = 0;
-			sample_stop(samples, 0);
+			samples->stop(0);
 		}
 	}
 
@@ -85,7 +85,7 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 WRITE8_HANDLER( starcrus_proj_parm_1_w )
 {
 	starcrus_state *state = space->machine().driver_data<starcrus_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	state->m_p1_sprite = data&0x0f;
 	state->m_launch1_on = ((data&0x20)>>5)^0x01;
@@ -96,7 +96,7 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 		if (state->m_explode_sound_playing == 0)
 		{
 			state->m_explode_sound_playing = 1;
-			sample_start(samples, 1,1,1);	/* explosion initial sample */
+			samples->start(1,1, true);	/* explosion initial sample */
 		}
 	}
 	else
@@ -104,7 +104,7 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 		if (state->m_explode_sound_playing == 1)
 		{
 			state->m_explode_sound_playing = 0;
-			sample_start(samples, 1,2,0);	/* explosion ending sample */
+			samples->start(1,2);	/* explosion ending sample */
 		}
 	}
 
@@ -113,7 +113,7 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 		if (state->m_launch1_sound_playing == 0)
 		{
 			state->m_launch1_sound_playing = 1;
-			sample_start(samples, 2,3,0);	/* launch sample */
+			samples->start(2,3);	/* launch sample */
 		}
 	}
 	else
@@ -125,7 +125,7 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 WRITE8_HANDLER( starcrus_proj_parm_2_w )
 {
 	starcrus_state *state = space->machine().driver_data<starcrus_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	state->m_p2_sprite = data&0x0f;
 	state->m_launch2_on = ((data&0x20)>>5)^0x01;
@@ -136,7 +136,7 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w )
 		if (state->m_explode_sound_playing == 0)
 		{
 			state->m_explode_sound_playing = 1;
-			sample_start(samples, 1,1,1);	/* explosion initial sample */
+			samples->start(1,1, true);	/* explosion initial sample */
 		}
 	}
 	else
@@ -144,7 +144,7 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w )
 		if (state->m_explode_sound_playing == 1)
 		{
 			state->m_explode_sound_playing = 0;
-			sample_start(samples, 1,2,0);	/* explosion ending sample */
+			samples->start(1,2);	/* explosion ending sample */
 		}
 	}
 
@@ -153,7 +153,7 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w )
 		if (state->m_launch2_sound_playing == 0)
 		{
 			state->m_launch2_sound_playing = 1;
-			sample_start(samples, 3,3,0);	/* launch sample */
+			samples->start(3,3);	/* launch sample */
 		}
 	}
 	else

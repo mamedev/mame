@@ -199,7 +199,7 @@ static MACHINE_START( m10 )
 	state->m_maincpu = machine.device("maincpu");
 	state->m_ic8j1 = machine.device("ic8j1");
 	state->m_ic8j2 = machine.device("ic8j2");
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 
 	state->save_item(NAME(state->m_bottomline));
 	state->save_item(NAME(state->m_flip));
@@ -266,27 +266,27 @@ static WRITE8_HANDLER( m10_ctrl_w )
 			break;
 		case 0x01:
 			/* MISSILE sound */
-			sample_start(state->m_samples, 0, 0, 0);
+			state->m_samples->start(0, 0);
 			break;
 		case 0x02:
 			/* EXPLOSION sound */
-			sample_start(state->m_samples, 1, 1, 0);
+			state->m_samples->start(1, 1);
 			break;
 		case 0x03:
 			/* INVADER HIT sound */
-			sample_start(state->m_samples, 2, 2, 0);
+			state->m_samples->start(2, 2);
 			break;
 		case 0x04:
 			/* BONUS BASE sound */
-			sample_start(state->m_samples, 3, 8, 0);
+			state->m_samples->start(3, 8);
 			break;
 		case 0x05:
 			/* FLEET MOVE sound */
-			sample_start(state->m_samples, 3, 3, 0);
+			state->m_samples->start(3, 3);
 			break;
 		case 0x06:
 			/* SAUCER HIT SOUND */
-			sample_start(state->m_samples, 2, 7, 0);
+			state->m_samples->start(2, 7);
 			break;
 		default:
 			popmessage("Unknown sound M10: %02x\n", data & 0x07);
@@ -294,9 +294,9 @@ static WRITE8_HANDLER( m10_ctrl_w )
 	}
 	/* UFO SOUND */
 	if (data & 0x08)
-		sample_stop(state->m_samples, 4);
+		state->m_samples->stop(4);
 	else
-		sample_start(state->m_samples, 4, 9, 1);
+		state->m_samples->start(4, 9, true);
 
 }
 
@@ -403,21 +403,21 @@ static WRITE8_HANDLER( m11_a100_w )
 	// audio control!
 	/* MISSILE sound */
 	if (raising_bits & 0x01)
-		sample_start(state->m_samples, 0, 0, 0);
+		state->m_samples->start(0, 0);
 
 	/* EXPLOSION sound */
 	if (raising_bits & 0x02)
-		sample_start(state->m_samples, 1, 1, 0);
+		state->m_samples->start(1, 1);
 
 	/* Rapidly falling parachute */
 	if (raising_bits & 0x04)
-		sample_start(state->m_samples, 3, 8, 0);
+		state->m_samples->start(3, 8);
 
 	/* Background sound ? */
 	if (data & 0x10)
-		sample_start(state->m_samples, 4, 9, 1);
+		state->m_samples->start(4, 9, true);
 	else
-		sample_stop(state->m_samples, 4);
+		state->m_samples->stop(4);
 
 }
 
@@ -446,34 +446,34 @@ static WRITE8_HANDLER( m15_a100_w )
 #endif
 	/* DOT sound */
 	if (falling_bits & 0x40)
-		sample_start(state->m_samples, 0, 0, 0);
+		state->m_samples->start(0, 0);
 #if 0
 	if (raising_bits & 0x40)
-		sample_stop(state->m_samples, 0);
+		state->m_samples->stop(0);
 #endif
 
 	/* EXPLOSION sound */
 	if (falling_bits & 0x08)
-		sample_start(state->m_samples, 1, 1, 0);
+		state->m_samples->start(1, 1);
 #if 0
 	if (raising_bits & 0x08)
-		sample_stop(state->m_samples, 1);
+		state->m_samples->stop(1);
 #endif
 
 	/* player changes lane */
 	if (falling_bits & 0x10)
-		sample_start(state->m_samples, 3, 3, 0);
+		state->m_samples->start(3, 3);
 #if 0
 	if (raising_bits & 0x10)
-		sample_stop(state->m_samples, 3);
+		state->m_samples->stop(3);
 #endif
 
 	/* computer car changes lane */
 	if (falling_bits & 0x20)
-		sample_start(state->m_samples, 4, 4, 0);
+		state->m_samples->start(4, 4);
 #if 0
 	if (raising_bits & 0x20)
-		sample_stop(state->m_samples, 4);
+		state->m_samples->stop(4);
 #endif
 
 	state->m_last = data;
@@ -863,8 +863,7 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(m10_samples_interface)
+	MCFG_SAMPLES_ADD("samples", m10_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -903,8 +902,7 @@ static MACHINE_CONFIG_START( m15, m10_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(m10_samples_interface)
+	MCFG_SAMPLES_ADD("samples", m10_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

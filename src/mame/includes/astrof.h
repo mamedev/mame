@@ -4,6 +4,8 @@
 
 ****************************************************************************/
 
+#include "sound/samples.h"
+
 class astrof_state : public driver_device
 {
 public:
@@ -33,7 +35,7 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
-	device_t *m_samples;	// astrof & abattle
+	samples_device *m_samples;	// astrof & abattle
 	device_t *m_sn;	// tomahawk
 };
 

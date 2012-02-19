@@ -17,7 +17,7 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
-	device_t *m_samples;
+	samples_device *m_samples;
 	device_t *m_discrete;
 
 	/* game id */

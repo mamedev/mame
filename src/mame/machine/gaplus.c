@@ -21,9 +21,9 @@
 WRITE8_HANDLER( gaplus_customio_3_w )
 {
 	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	if ((offset == 0x09) && (data >= 0x0f))
-		sample_start(samples,0,0,0);
+		samples->start(0,0);
 
 	state->m_customio_3[offset] = data;
 }

@@ -44,9 +44,9 @@ WRITE8_DEVICE_HANDLER( blockade_sound_freq_w )
 
 WRITE8_HANDLER( blockade_env_on_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	if (BLOCKADE_LOG) mame_printf_debug("Boom Start\n");
-	sample_start(samples, 0,0,0);
+	samples->start(0,0);
 	return;
 }
 

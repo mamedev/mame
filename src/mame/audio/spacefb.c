@@ -35,15 +35,15 @@ READ8_HANDLER( spacefb_audio_t1_r )
 WRITE8_HANDLER( spacefb_port_1_w )
 {
 	spacefb_state *state = space->machine().driver_data<spacefb_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	cputag_set_input_line(space->machine(), "audiocpu", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* enemy killed */
-	if (!(data & 0x01) && (state->m_sound_latch & 0x01))  sample_start(samples, 0,0,0);
+	if (!(data & 0x01) && (state->m_sound_latch & 0x01))  samples->start(0,0);
 
 	/* ship fire */
-	if (!(data & 0x40) && (state->m_sound_latch & 0x40))  sample_start(samples, 1,1,0);
+	if (!(data & 0x40) && (state->m_sound_latch & 0x40))  samples->start(1,1);
 
 	/*
      *  Explosion Noise
@@ -57,10 +57,10 @@ WRITE8_HANDLER( spacefb_port_1_w )
 	{
 		if (data & 0x80)
 			/* play decaying noise */
-			sample_start(samples, 2,3,0);
+			samples->start(2,3);
 		else
 			/* start looping noise */
-			sample_start(samples, 2,2,1);
+			samples->start(2,2, true);
 	}
 
 	state->m_sound_latch = data;
@@ -91,7 +91,6 @@ MACHINE_CONFIG_FRAGMENT( spacefb_audio )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(spacefb_samples_interface)
+	MCFG_SAMPLES_ADD("samples", spacefb_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

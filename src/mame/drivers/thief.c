@@ -59,35 +59,35 @@ enum
 	kTalkTrack, kCrashTrack
 };
 
-static void tape_set_audio( device_t *samples, int track, int bOn )
+static void tape_set_audio( samples_device *samples, int track, int bOn )
 {
-	sample_set_volume(samples, track, bOn ? 1.0 : 0.0 );
+	samples->set_volume(track, bOn ? 1.0 : 0.0 );
 }
 
-static void tape_set_motor( device_t *samples, int bOn )
+static void tape_set_motor( samples_device *samples, int bOn )
 {
 	if( bOn )
 	{
 		/* If talk track is not playing, start it. */
-		if (! sample_playing(samples,  kTalkTrack ))
-			sample_start( samples, 0, kTalkTrack, 1 );
+		if (! samples->playing( kTalkTrack ))
+			samples->start( 0, kTalkTrack, true );
 
 		/* Resume playback of talk track. */
-		sample_set_pause( samples, kTalkTrack, 0);
+		samples->pause( kTalkTrack, false);
 
 
 		/* If crash track is not playing, start it. */
-		if (! sample_playing(samples,  kCrashTrack ))
-			sample_start( samples, 1, kCrashTrack, 1 );
+		if (! samples->playing( kCrashTrack ))
+			samples->start( 1, kCrashTrack, true );
 
 		/* Resume playback of crash track. */
-		sample_set_pause( samples, kCrashTrack, 0);
+		samples->pause( kCrashTrack, false);
 	}
 	else
 	{
 		/* Pause both the talk and crash tracks. */
-		sample_set_pause( samples, kTalkTrack, 1 );
-		sample_set_pause( samples, kCrashTrack, 1 );
+		samples->pause( kTalkTrack, true );
+		samples->pause( kCrashTrack, true );
 	}
 }
 
@@ -113,27 +113,27 @@ static WRITE8_DEVICE_HANDLER( tape_control_w )
 		break;
 
 	case 0x08: /* talk track on */
-		tape_set_audio( device, kTalkTrack, 1 );
+		tape_set_audio( downcast<samples_device *>(device), kTalkTrack, 1 );
 		break;
 
 	case 0x09: /* talk track off */
-		tape_set_audio( device, kTalkTrack, 0 );
+		tape_set_audio( downcast<samples_device *>(device), kTalkTrack, 0 );
 		break;
 
 	case 0x0a: /* motor on */
-		tape_set_motor( device, 1 );
+		tape_set_motor( downcast<samples_device *>(device), 1 );
 		break;
 
 	case 0x0b: /* motor off */
-		tape_set_motor( device, 0 );
+		tape_set_motor( downcast<samples_device *>(device), 0 );
 		break;
 
 	case 0x0c: /* crash track on */
-		tape_set_audio( device, kCrashTrack, 1 );
+		tape_set_audio( downcast<samples_device *>(device), kCrashTrack, 1 );
 		break;
 
 	case 0x0d: /* crash track off */
-		tape_set_audio( device, kCrashTrack, 0 );
+		tape_set_audio( downcast<samples_device *>(device), kCrashTrack, 0 );
 		break;
 	}
 }
@@ -465,8 +465,7 @@ static MACHINE_CONFIG_START( sharkatt, thief_state )
 	MCFG_SOUND_ADD("ay2", AY8910, 4000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(sharkatt_samples_interface)
+	MCFG_SAMPLES_ADD("samples", sharkatt_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -502,8 +501,7 @@ static MACHINE_CONFIG_START( thief, thief_state )
 	MCFG_SOUND_ADD("ay2", AY8910, 4000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(thief_samples_interface)
+	MCFG_SAMPLES_ADD("samples", thief_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -539,8 +537,7 @@ static MACHINE_CONFIG_START( natodef, thief_state )
 	MCFG_SOUND_ADD("ay2", AY8910, 4000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(natodef_samples_interface)
+	MCFG_SAMPLES_ADD("samples", natodef_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

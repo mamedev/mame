@@ -1907,8 +1907,7 @@ static MACHINE_CONFIG_DERIVED( reactor, gottlieb1 )
 	MCFG_DEVICE_REMOVE("nvram")
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(reactor_samples_interface)
+	MCFG_SAMPLES_ADD("samples", reactor_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1916,8 +1915,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( qbert, gottlieb1 )
 
 	/* video hardware */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(qbert_samples_interface)
+	MCFG_SAMPLES_ADD("samples", qbert_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -567,15 +567,12 @@ void cli_frontend::listsamples(const char *gamename)
 		first = false;
 		mame_printf_info("Samples required for driver \"%s\".\n", drivlist.driver().name);
 
-		// iterate over samples devices
+		// iterate over samples devices and print the samples from each one
 		for (samples_device *device = iter.first(); device != NULL; device = iter.next())
 		{
-			// if the list is legit, walk it and print the sample info
-			const char *const *samplenames = reinterpret_cast<const samples_interface *>(device->static_config())->samplenames;
-			if (samplenames != NULL)
-				for (int sampnum = 0; samplenames[sampnum] != NULL; sampnum++)
-					if (samplenames[sampnum][0] != '*')
-						mame_printf_info("%s\n", samplenames[sampnum]);
+			samples_iterator sampiter(*device);
+			for (const char *samplename = sampiter.first(); samplename != NULL; samplename = sampiter.next())
+				mame_printf_info("%s\n", samplename);
 		}
 	}
 }

@@ -1854,8 +1854,7 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("discrete")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(battles_samples_interface)
+	MCFG_SAMPLES_ADD("samples", battles_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

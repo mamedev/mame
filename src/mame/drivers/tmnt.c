@@ -264,11 +264,11 @@ static WRITE8_HANDLER( tmnt_sres_w )
 	/* bit 2 plays the title music */
 	if (data & 0x04)
 	{
-		if (!sample_playing(state->m_samples, 0))
-			sample_start_raw(state->m_samples, 0, state->m_sampledata, 0x40000, 20000, 0);
+		if (!state->m_samples->playing(0))
+			state->m_samples->start_raw(0, state->m_sampledata, 0x40000, 20000);
 	}
 	else
-		sample_stop(state->m_samples, 0);
+		state->m_samples->stop(0);
 	state->m_tmnt_soundlatch = data;
 }
 
@@ -285,7 +285,7 @@ static READ8_DEVICE_HANDLER( tmnt_upd_busy_r )
 
 static SAMPLES_START( tmnt_decode_sample )
 {
-	running_machine &machine = device->machine();
+	running_machine &machine = device.machine();
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 	int i;
 	UINT8 *source = machine.region("title")->base();
@@ -2235,7 +2235,7 @@ static MACHINE_START( common )
 	state->m_k053260 = machine.device("k053260");
 	state->m_k054539 = machine.device("k054539");
 	state->m_upd = machine.device("upd");
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k051960 = machine.device("k051960");
 	state->m_k053245 = machine.device("k053245");
@@ -2413,8 +2413,7 @@ static MACHINE_CONFIG_START( tmnt, tmnt_state )
 	MCFG_SOUND_ADD("upd", UPD7759, XTAL_640kHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(tmnt_samples_interface)
+	MCFG_SAMPLES_ADD("samples", tmnt_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

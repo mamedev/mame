@@ -197,7 +197,7 @@ static SCREEN_UPDATE_RGB32( dai3wksi )
 static WRITE8_HANDLER( dai3wksi_audio_1_w )
 {
 	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	UINT8 rising_bits = data & ~state->m_port_last1;
 
 	state->m_enabled_sound = data & 0x80;
@@ -205,12 +205,12 @@ static WRITE8_HANDLER( dai3wksi_audio_1_w )
 	if ((rising_bits & 0x20) && state->m_enabled_sound)
 	{
 		if (data & 0x04)
-			sample_start(samples, CHANNEL_SOUND5, SAMPLE_SOUND5, 0);
+			samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5);
 		else
-			sample_start(samples, CHANNEL_SOUND5, SAMPLE_SOUND5, 1);
+			samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5, true);
 	}
 	if (!(data & 0x20) && (state->m_port_last1 & 0x20))
-		sample_stop(samples, CHANNEL_SOUND5);
+		samples->stop(CHANNEL_SOUND5);
 
 	state->m_port_last1 = data;
 }
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( dai3wksi_audio_1_w )
 static WRITE8_HANDLER( dai3wksi_audio_2_w )
 {
 	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	UINT8 rising_bits = data & ~state->m_port_last2;
 
 	state->m_dai3wksi_flipscreen = data & 0x10;
@@ -227,15 +227,15 @@ static WRITE8_HANDLER( dai3wksi_audio_2_w )
 
 	if (state->m_enabled_sound)
 	{
-		if (rising_bits & 0x01) sample_start(samples, CHANNEL_SOUND1, SAMPLE_SOUND1, 0);
-		if (rising_bits & 0x02) sample_start(samples, CHANNEL_SOUND2, SAMPLE_SOUND2, 0);
-		if (rising_bits & 0x08) sample_start(samples, CHANNEL_SOUND4, SAMPLE_SOUND4, 0);
+		if (rising_bits & 0x01) samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1);
+		if (rising_bits & 0x02) samples->start(CHANNEL_SOUND2, SAMPLE_SOUND2);
+		if (rising_bits & 0x08) samples->start(CHANNEL_SOUND4, SAMPLE_SOUND4);
 		if (rising_bits & 0x04)
 		{
 			if (!state->m_sound3_counter)
-				sample_start(samples, CHANNEL_SOUND3, SAMPLE_SOUND3_1, 0);
+				samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3_1);
 			else
-				sample_start(samples, CHANNEL_SOUND3, SAMPLE_SOUND3_2, 0);
+				samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3_2);
 
 			state->m_sound3_counter ^= 1;
 		}
@@ -247,14 +247,14 @@ static WRITE8_HANDLER( dai3wksi_audio_2_w )
 static WRITE8_HANDLER( dai3wksi_audio_3_w )
 {
 	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	if (state->m_enabled_sound)
 	{
 		if (data & 0x40)
-			sample_start(samples, CHANNEL_SOUND6, SAMPLE_SOUND6_1, 0);
+			samples->start(CHANNEL_SOUND6, SAMPLE_SOUND6_1);
 		else if (data & 0x80)
-			sample_start(samples, CHANNEL_SOUND6, SAMPLE_SOUND6_2, 0);
+			samples->start(CHANNEL_SOUND6, SAMPLE_SOUND6_2);
 	}
 }
 
@@ -607,8 +607,7 @@ static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 #if (USE_SAMPLES)
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(dai3wksi_samples_interface)
+	MCFG_SAMPLES_ADD("samples", dai3wksi_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #else
 	MCFG_SOUND_ADD("ic76", SN76477, 0)

@@ -30,7 +30,7 @@ static const INT16 waveform[2] = { -120*256, 120*256 };
 /************************************/
 SAMPLES_START( meadows_sh_start )
 {
-	meadows_state *state = device->machine().driver_data<meadows_state>();
+	meadows_state *state = device.machine().driver_data<meadows_state>();
 	state->m_0c00 = state->m_0c01 = state->m_0c02 = state->m_0c03 = 0;
 	state->m_dac = 0;
 	state->m_dac_enable = 0;
@@ -38,10 +38,10 @@ SAMPLES_START( meadows_sh_start )
 	state->m_freq1 = state->m_freq2 = 1000;
 	state->m_latched_0c01 = state->m_latched_0c02 = state->m_latched_0c03 = 0;
 
-	sample_set_volume(device,0,0);
-	sample_start_raw(device,0,waveform,ARRAY_LENGTH(waveform),state->m_freq1,1);
-	sample_set_volume(device,1,0);
-	sample_start_raw(device,1,waveform,ARRAY_LENGTH(waveform),state->m_freq2,1);
+	device.set_volume(0,0);
+	device.start_raw(0,waveform,ARRAY_LENGTH(waveform),state->m_freq1,true);
+	device.set_volume(1,0);
+	device.start_raw(1,waveform,ARRAY_LENGTH(waveform),state->m_freq2,true);
 }
 
 /************************************/
@@ -50,7 +50,7 @@ SAMPLES_START( meadows_sh_start )
 void meadows_sh_update(running_machine &machine)
 {
 	meadows_state *state = machine.driver_data<meadows_state>();
-	device_t *samples = machine.device("samples");
+	samples_device *samples = machine.device<samples_device>("samples");
 	int preset, amp;
 
 	if (state->m_latched_0c01 != state->m_0c01 || state->m_latched_0c03 != state->m_0c03)
@@ -67,8 +67,8 @@ void meadows_sh_update(running_machine &machine)
 			state->m_freq1 = BASE_CTR1 / (preset + 1);
 		else amp = 0;
 		logerror("meadows ctr1 channel #%d preset:%3d freq:%5d amp:%d\n", state->m_channel, preset, state->m_freq1, amp);
-		sample_set_freq(samples, 0, state->m_freq1 * sizeof(waveform)/2);
-		sample_set_volume(samples, 0,amp/255.0);
+		samples->set_frequency(0, state->m_freq1 * sizeof(waveform)/2);
+		samples->set_volume(0,amp/255.0);
 	}
 
 	if (state->m_latched_0c02 != state->m_0c02 || state->m_latched_0c03 != state->m_0c03)
@@ -85,8 +85,8 @@ void meadows_sh_update(running_machine &machine)
 		}
 		else amp = 0;
 		logerror("meadows ctr2 channel #%d preset:%3d freq:%5d amp:%d\n", state->m_channel+1, preset, state->m_freq2, amp);
-		sample_set_freq(samples, 1, state->m_freq2 * sizeof(waveform));
-		sample_set_volume(samples, 1,amp/255.0);
+		samples->set_frequency(1, state->m_freq2 * sizeof(waveform));
+		samples->set_volume(1,amp/255.0);
 	}
 
 	if (state->m_latched_0c03 != state->m_0c03)

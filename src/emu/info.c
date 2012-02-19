@@ -410,20 +410,14 @@ void info_xml_creator::output_sampleof()
 	samples_device_iterator iter(m_drivlist.config().root_device());
 	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
 	{
-		const char *const *samplenames = ((const samples_interface *)device->static_config())->samplenames;
-		if (samplenames != NULL)
+		samples_iterator sampiter(*device);
+		if (sampiter.altbasename() != NULL)
+		{
+			fprintf(m_output, " sampleof=\"%s\"", xml_normalize_string(sampiter.altbasename()));
 
-			// iterate over sample names
-			for (int sampnum = 0; samplenames[sampnum] != NULL; sampnum++)
-			{
-				// only output sampleof if different from the game name
-				const char *cursampname = samplenames[sampnum];
-				if (cursampname[0] == '*' && strcmp(cursampname + 1, m_drivlist.driver().name) != 0)
-					fprintf(m_output, " sampleof=\"%s\"", xml_normalize_string(cursampname + 1));
-
-				// must stop here, as there can only be one attribute of the same name
-				return;
-			}
+			// must stop here, as there can only be one attribute of the same name
+			return;
+		}
 	}
 }
 
@@ -563,30 +557,19 @@ void info_xml_creator::output_sample()
 {
 	// iterate over sample devices
 	samples_device_iterator iter(m_drivlist.config().root_device());
-	for (const device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
 	{
-		const char *const *samplenames = ((const samples_interface *)device->static_config())->samplenames;
-		if (samplenames != NULL)
+		samples_iterator sampiter(*device);
+		tagmap_t<int> already_printed;
+		for (const char *samplename = sampiter.first(); samplename != NULL; samplename = sampiter.next())
+		{
+			// filter out duplicates
+			if (already_printed.add(samplename, 1) == TMERR_DUPLICATE)
+				continue;
 
-			// iterate over sample names
-			for (int sampnum = 0; samplenames[sampnum] != NULL; sampnum++)
-			{
-				// ignore the special '*' samplename
-				const char *cursampname = samplenames[sampnum];
-				if (sampnum == 0 && cursampname[0] == '*')
-					continue;
-
-				// filter m_output duplicates
-				int dupnum;
-				for (dupnum = 0; dupnum < sampnum; dupnum++)
-					if (strcmp(samplenames[dupnum], cursampname) == 0)
-						break;
-				if (dupnum < sampnum)
-					continue;
-
-				// output the sample name
-				fprintf(m_output, "\t\t<sample name=\"%s\"/>\n", xml_normalize_string(cursampname));
-			}
+			// output the sample name
+			fprintf(m_output, "\t\t<sample name=\"%s\"/>\n", xml_normalize_string(samplename));
+		}
 	}
 }
 

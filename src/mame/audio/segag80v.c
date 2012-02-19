@@ -137,197 +137,197 @@ d0      crafts joining
 
 WRITE8_HANDLER( elim1_sh_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* Play fireball sample */
 	if (data & 0x02)
-		sample_start (samples, 0, 0, 0);
+		samples->start(0, 0);
 
 	/* Play explosion samples */
 	if (data & 0x04)
-		sample_start (samples, 1, 10, 0);
+		samples->start(1, 10);
 	if (data & 0x08)
-		sample_start (samples, 1, 9, 0);
+		samples->start(1, 9);
 	if (data & 0x10)
-		sample_start (samples, 1, 8, 0);
+		samples->start(1, 8);
 
 	/* Play bounce sample */
 	if (data & 0x20)
 	{
-		if (sample_playing(samples, 2))
-			sample_stop (samples, 2);
-		sample_start (samples, 2, 1, 0);
+		if (samples->playing(2))
+			samples->stop(2);
+		samples->start(2, 1);
 	}
 
 	/* Play lazer sample */
 	if (data & 0xc0)
 	{
-		if (sample_playing(samples, 3))
-			sample_stop (samples, 3);
-		sample_start (samples, 3, 5, 0);
+		if (samples->playing(3))
+			samples->stop(3);
+		samples->start(3, 5);
 	}
 }
 
 WRITE8_HANDLER( elim2_sh_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* Play thrust sample */
 	if (data & 0x0f)
-		sample_start (samples, 4, 6, 0);
+		samples->start(4, 6);
 	else
-		sample_stop (samples, 4);
+		samples->stop(4);
 
 	/* Play skitter sample */
 	if (data & 0x10)
-		sample_start (samples, 5, 2, 0);
+		samples->start(5, 2);
 
 	/* Play eliminator sample */
 	if (data & 0x20)
-		sample_start (samples, 6, 3, 0);
+		samples->start(6, 3);
 
 	/* Play electron samples */
 	if (data & 0x40)
-		sample_start (samples, 7, 7, 0);
+		samples->start(7, 7);
 	if (data & 0x80)
-		sample_start (samples, 7, 4, 0);
+		samples->start(7, 4);
 }
 
 
 WRITE8_HANDLER( zektor1_sh_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	data ^= 0xff;
 
 	/* Play fireball sample */
 	if (data & 0x02)
-                sample_start (samples, 0, 0, 0);
+                samples->start(0, 0);
 
 	/* Play explosion samples */
 	if (data & 0x04)
-                sample_start (samples, 1, 10, 0);
+                samples->start(1, 10);
 	if (data & 0x08)
-                  sample_start (samples, 1, 9, 0);
+                  samples->start(1, 9);
 	if (data & 0x10)
-                  sample_start (samples, 1, 8, 0);
+                  samples->start(1, 8);
 
 	/* Play bounce sample */
 	if (data & 0x20)
 	{
-                if (sample_playing(samples, 2))
-                        sample_stop (samples, 2);
-                sample_start (samples, 2, 1, 0);
+                if (samples->playing(2))
+                        samples->stop(2);
+                samples->start(2, 1);
 	}
 
 	/* Play lazer sample */
 	if (data & 0xc0)
 	{
-		if (sample_playing(samples, 3))
-			sample_stop (samples, 3);
-                sample_start (samples, 3, 5, 0);
+		if (samples->playing(3))
+			samples->stop(3);
+                samples->start(3, 5);
 	}
 }
 
 WRITE8_HANDLER( zektor2_sh_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* Play thrust sample */
 	if (data & 0x0f)
-            sample_start (samples, 4, 6, 0);
+            samples->start(4, 6);
 	else
-		sample_stop (samples, 4);
+		samples->stop(4);
 
 	/* Play skitter sample */
 	if (data & 0x10)
-                sample_start (samples, 5, 2, 0);
+                samples->start(5, 2);
 
 	/* Play eliminator sample */
 	if (data & 0x20)
-                sample_start (samples, 6, 3, 0);
+                samples->start(6, 3);
 
 	/* Play electron samples */
 	if (data & 0x40)
-                sample_start (samples, 7, 40, 0);
+                samples->start(7, 40);
 	if (data & 0x80)
-                sample_start (samples, 7, 41, 0);
+                samples->start(7, 41);
 }
 
 
 
 WRITE8_HANDLER( spacfury1_sh_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* craft growing */
 	if (data & 0x01)
-		sample_start (samples, 1, 0, 0);
+		samples->start(1, 0);
 
 	/* craft moving */
 	if (data & 0x02)
 	{
-		if (!sample_playing(samples, 2))
-			sample_start (samples, 2, 1, 1);
+		if (!samples->playing(2))
+			samples->start(2, 1, true);
 	}
 	else
-		sample_stop (samples, 2);
+		samples->stop(2);
 
 	/* Thrust */
 	if (data & 0x04)
 	{
-		if (!sample_playing(samples, 3))
-			sample_start (samples, 3, 4, 1);
+		if (!samples->playing(3))
+			samples->start(3, 4, true);
 	}
 	else
-		sample_stop (samples, 3);
+		samples->stop(3);
 
 	/* star spin */
 	if (data & 0x40)
-		sample_start (samples, 4, 8, 0);
+		samples->start(4, 8);
 
 	/* partial warship? */
 	if (data & 0x80)
-		sample_start (samples, 4, 9, 0);
+		samples->start(4, 9);
 
 }
 
 WRITE8_HANDLER( spacfury2_sh_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* craft joining */
 	if (data & 0x01)
-		sample_start (samples, 5, 2, 0);
+		samples->start(5, 2);
 
 	/* ship firing */
 	if (data & 0x02)
 	{
-		if (sample_playing(samples, 6))
-			sample_stop(samples, 6);
-		sample_start(samples, 6, 3, 0);
+		if (samples->playing(6))
+			samples->stop(6);
+		samples->start(6, 3);
 
 	}
 
 	/* fireball */
 	if (data & 0x04)
-		sample_start (samples, 7, 6, 0);
+		samples->start(7, 6);
 
 	/* small explosion */
 	if (data & 0x08)
-		sample_start (samples, 7, 6, 0);
+		samples->start(7, 6);
 	/* large explosion */
 	if (data & 0x10)
-		sample_start (samples, 7, 5, 0);
+		samples->start(7, 5);
 
 	/* docking bang */
 	if (data & 0x20)
-		sample_start (samples, 0, 7, 0);
+		samples->start(0, 7);
 
 }
 

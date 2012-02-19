@@ -8,6 +8,7 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************/
+
 #include "emu.h"
 
 #define APPNAME					"MAME"

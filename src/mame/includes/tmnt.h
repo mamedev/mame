@@ -1,3 +1,4 @@
+#include "sound/samples.h"
 
 class tmnt_state : public driver_device
 {
@@ -54,7 +55,7 @@ public:
 	device_t *m_k053936;
 	device_t *m_k054000;
 	device_t *m_upd;
-	device_t *m_samples;
+	samples_device *m_samples;
 
 	/* memory buffers */
 	INT16      m_sampledata[0x40000];

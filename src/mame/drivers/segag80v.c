@@ -927,8 +927,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( elim2, g80v_base )
 
 	/* custom sound board */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(elim2_samples_interface)
+	MCFG_SAMPLES_ADD("samples", elim2_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -936,8 +935,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( spacfury, g80v_base )
 
 	/* custom sound board */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(spacfury_samples_interface)
+	MCFG_SAMPLES_ADD("samples", spacfury_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* speech board */
@@ -948,8 +946,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( zektor, g80v_base )
 
 	/* custom sound board */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(zektor_samples_interface)
+	MCFG_SAMPLES_ADD("samples", zektor_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2/2)

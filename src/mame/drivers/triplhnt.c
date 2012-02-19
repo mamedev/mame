@@ -36,7 +36,7 @@ void triplhnt_set_collision(running_machine &machine, int code)
 static void triplhnt_update_misc(running_machine &machine, int offset)
 {
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
-	device_t *samples = machine.device("samples");
+	samples_device *samples = machine.device<samples_device>("samples");
 	device_t *discrete = machine.device("discrete");
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
@@ -80,14 +80,14 @@ static void triplhnt_update_misc(running_machine &machine, int offset)
 	bit = ~state->m_misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */
-	if (!sample_playing(samples, 0))
-		sample_start(samples, 0, 0, 1);
-	if (!sample_playing(samples, 1))
-		sample_start(samples, 1, 1, 1);
+	if (!samples->playing(0))
+		samples->start(0, 0, true);
+	if (!samples->playing(1))
+		samples->start(1, 1, true);
 
 	/* bit 6 turns cassette on/off */
-	sample_set_pause(samples, 0,  is_witch_hunt || bit);
-	sample_set_pause(samples, 1, !is_witch_hunt || bit);
+	samples->pause(0,  is_witch_hunt || bit);
+	samples->pause(1, !is_witch_hunt || bit);
 }
 
 
@@ -334,8 +334,7 @@ static MACHINE_CONFIG_START( triplhnt, triplhnt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(triplhnt_samples_interface)
+	MCFG_SAMPLES_ADD("samples", triplhnt_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)

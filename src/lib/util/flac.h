@@ -121,9 +121,10 @@ public:
 	~flac_decoder();
 	
 	// getters (valid after reset)
-	UINT32 sample_rate() const { return FLAC__stream_decoder_get_sample_rate(m_decoder); }
-	UINT8 channels() const { return FLAC__stream_decoder_get_channels(m_decoder); }
-	UINT32 block_size() const { return FLAC__stream_decoder_get_blocksize(m_decoder); }
+	UINT32 sample_rate() const { return m_sample_rate; }
+	UINT8 channels() const { return m_channels; }
+	UINT8 bits_per_sample() const { return m_bits_per_sample; }
+	UINT32 total_samples() const { return FLAC__stream_decoder_get_total_samples(m_decoder); }
 	FLAC__StreamDecoderState state() const { return FLAC__stream_decoder_get_state(m_decoder); }
 	const char *state_string() const { return FLAC__stream_decoder_get_resolved_state_string(m_decoder); }
 	
@@ -144,6 +145,7 @@ private:
 	// internal helpers
 	static FLAC__StreamDecoderReadStatus read_callback_static(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data);
 	FLAC__StreamDecoderReadStatus read_callback(FLAC__byte buffer[], size_t *bytes);
+	static void metadata_callback_static(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data);
 	static FLAC__StreamDecoderTellStatus tell_callback_static(const FLAC__StreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data);
 	static FLAC__StreamDecoderWriteStatus write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data);
 	FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[]);
@@ -152,6 +154,9 @@ private:
 	// output state
 	FLAC__StreamDecoder *	m_decoder;				// actual encoder
 	core_file *				m_file;					// output file
+	UINT32					m_sample_rate;			// decoded sample rate
+	UINT8					m_channels;				// decoded number of channels
+	UINT8					m_bits_per_sample;		// decoded bits per sample
 	UINT32					m_compressed_offset;	// current offset in compressed data
 	const FLAC__byte *		m_compressed_start;		// start of compressed data
 	UINT32					m_compressed_length;	// length of compressed data

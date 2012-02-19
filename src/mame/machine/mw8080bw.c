@@ -101,9 +101,9 @@ MACHINE_START( mw8080bw )
 	mw8080bw_create_interrupt_timer(machine);
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_samples = machine.device("samples");
-	state->m_samples1 = machine.device("samples1");
-	state->m_samples2 = machine.device("samples2");
+	state->m_samples = machine.device<samples_device>("samples");
+	state->m_samples1 = machine.device<samples_device>("samples1");
+	state->m_samples2 = machine.device<samples_device>("samples2");
 	state->m_sn = machine.device("snsnd");
 	state->m_sn1 = machine.device("sn1");
 	state->m_sn2 = machine.device("sn2");

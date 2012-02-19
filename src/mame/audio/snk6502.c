@@ -49,7 +49,7 @@ struct _snk6502_sound_state
 	INT32 m_tone_clock;
 	sound_stream * m_tone_stream;
 
-	device_t *m_samples;
+	samples_device *m_samples;
 	UINT8 *m_ROM;
 	int m_Sound0StopOnRollover;
 	UINT8 m_LastPort1;
@@ -653,7 +653,7 @@ static DEVICE_START( snk6502_sound )
 {
 	snk6502_sound_state *state = get_safe_token(device);
 
-	state->m_samples = device->machine().device("samples");
+	state->m_samples = device->machine().device<samples_device>("samples");
 	state->m_ROM = device->machine().region("snk6502")->base();
 
 	// adjusted
@@ -695,7 +695,7 @@ WRITE8_HANDLER( sasuke_sound_w )
 {
 	device_t *device = space->machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
-	device_t *samples = state->m_samples;
+	samples_device *samples = state->m_samples;
 	TONE *tone_channels = state->m_tone_channels;
 
 	switch (offset)
@@ -715,13 +715,13 @@ WRITE8_HANDLER( sasuke_sound_w )
         */
 
 		if ((~data & 0x01) && (state->m_LastPort1 & 0x01))
-			sample_start(samples, 0, 0, 0);
+			samples->start(0, 0);
 		if ((~data & 0x02) && (state->m_LastPort1 & 0x02))
-			sample_start(samples, 1, 1, 0);
+			samples->start(1, 1);
 		if ((~data & 0x04) && (state->m_LastPort1 & 0x04))
-			sample_start(samples, 2, 2, 0);
+			samples->start(2, 2);
 		if ((~data & 0x08) && (state->m_LastPort1 & 0x08))
-			sample_start(samples, 3, 3, 0);
+			samples->start(3, 3);
 
 		if ((data & 0x80) && (~state->m_LastPort1 & 0x80))
 		{
@@ -765,7 +765,7 @@ WRITE8_HANDLER( satansat_sound_w )
 {
 	device_t *device = space->machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
-	device_t *samples = state->m_samples;
+	samples_device *samples = state->m_samples;
 	TONE *tone_channels = state->m_tone_channels;
 
 	switch (offset)
@@ -782,7 +782,7 @@ WRITE8_HANDLER( satansat_sound_w )
 
 		/* bit 2 = analog sound trigger */
 		if (data & 0x04 && !(state->m_LastPort1 & 0x04))
-			sample_start(samples, 0, 1, 0);
+			samples->start(0, 1);
 
 		if (data & 0x08)
 		{
@@ -832,7 +832,7 @@ WRITE8_HANDLER( vanguard_sound_w )
 {
 	device_t *device = space->machine().device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
-	device_t *samples = state->m_samples;
+	samples_device *samples = state->m_samples;
 	TONE *tone_channels = state->m_tone_channels;
 
 	switch (offset)
@@ -860,13 +860,13 @@ WRITE8_HANDLER( vanguard_sound_w )
 		/* play noise samples requested by sound command byte */
 		/* SHOT A */
 		if (data & 0x20 && !(state->m_LastPort1 & 0x20))
-			sample_start(samples, 1, 0, 0);
+			samples->start(1, 0);
 		else if (!(data & 0x20) && state->m_LastPort1 & 0x20)
-			sample_stop(samples, 1);
+			samples->stop(1);
 
 		/* BOMB */
 		if (data & 0x80 && !(state->m_LastPort1 & 0x80))
-			sample_start(samples, 2, 1, 0);
+			samples->start(2, 1);
 
 		if (data & 0x08)
 		{
@@ -1086,7 +1086,7 @@ static void snk6502_speech_w(running_machine &machine, UINT8 data, const UINT16 
 
 	device_t *device = machine.device("snk6502");
 	snk6502_sound_state *state = get_safe_token(device);
-	device_t *samples = state->m_samples;
+	samples_device *samples = state->m_samples;
 
 	if ((data & HD38880_CTP) && (data & HD38880_CMV))
 	{
@@ -1100,7 +1100,7 @@ static void snk6502_speech_w(running_machine &machine, UINT8 data, const UINT16 
 			case HD38880_START:
 				logerror("speech: START\n");
 
-				if (state->m_hd38880_data_bytes == 5 && !sample_playing(samples, 0))
+				if (state->m_hd38880_data_bytes == 5 && !samples->playing(0))
 				{
 					int i;
 
@@ -1108,7 +1108,7 @@ static void snk6502_speech_w(running_machine &machine, UINT8 data, const UINT16 
 					{
 						if (table[i] && table[i] == state->m_hd38880_addr)
 						{
-							sample_start(samples, 0, start + i, 0);
+							samples->start(0, start + i);
 							break;
 						}
 					}
@@ -1120,7 +1120,7 @@ static void snk6502_speech_w(running_machine &machine, UINT8 data, const UINT16 
 				break;
 
 			case HD38880_STOP:
-				sample_stop(samples, 0);
+				samples->stop(0);
 				logerror("speech: STOP\n");
 				break;
 

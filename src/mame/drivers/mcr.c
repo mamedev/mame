@@ -413,14 +413,14 @@ static WRITE8_HANDLER( kroozr_op4_w )
 
 static WRITE8_HANDLER( journey_op4_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	/* if we're not playing the sample yet, start it */
-	if (!sample_playing(samples, 0))
-		sample_start(samples, 0, 0, 1);
+	if (!samples->playing(0))
+		samples->start(0, 0, true);
 
 	/* bit 0 turns cassette on/off */
-	sample_set_pause(samples, 0, ~data & 1);
+	samples->pause(0, ~data & 1);
 }
 
 
@@ -433,16 +433,16 @@ static WRITE8_HANDLER( journey_op4_w )
 
 static WRITE8_HANDLER( twotiger_op4_w )
 {
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 
 	for (int i = 0; i < 2; i++)
 	{
 		/* play tape, and loop it */
-		if (!sample_playing(samples, i))
-			sample_start(samples, i, i, 1);
+		if (!samples->playing(i))
+			samples->start(i, i, true);
 
 		/* bit 1 turns cassette on/off */
-		sample_set_pause(samples, i, ~data & 2);
+		samples->pause(i, ~data & 2);
 	}
 
 	// bit 2: lamp control?
@@ -1660,8 +1660,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_90010_tt, mcr_90010 )
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(twotiger_samples_interface)
+	MCFG_SAMPLES_ADD("samples", twotiger_samples_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -1674,8 +1673,7 @@ static MACHINE_CONFIG_DERIVED( mcr_91475, mcr_90010 )
 	MCFG_PALETTE_LENGTH(128)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(journey_samples_interface)
+	MCFG_SAMPLES_ADD("samples", journey_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END

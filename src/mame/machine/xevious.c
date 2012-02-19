@@ -159,10 +159,10 @@ WRITE8_HANDLER( battles_noise_sound_w )
 	if( (battles_sound_played == 0) && (data == 0xFF) ){
 		samples_device *samples = space->machine().device<samples_device>("samples");
 		if( customio[0] == 0x40 ){
-			sample_start (samples, 0, 0, 0);
+			samples->start(0, 0);
 		}
 		else{
-			sample_start (samples, 0, 1, 0);
+			samples->start(0, 1);
 		}
 	}
 	battles_sound_played = data;

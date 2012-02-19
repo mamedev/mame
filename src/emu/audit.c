@@ -236,54 +236,40 @@ media_auditor::summary media_auditor::audit_samples()
 	samples_device_iterator iter(m_enumerator.config().root_device());
 	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
 	{
-		const samples_interface *intf = reinterpret_cast<const samples_interface *>(device->static_config());
-		if (intf->samplenames != NULL)
+		// by default we just search using the driver name
+		astring searchpath(m_enumerator.driver().name);
+
+		// add the alternate path if present
+		samples_iterator iter(*device);
+		if (iter.altbasename() != NULL)
+			searchpath.cat(";").cat(iter.altbasename());
+
+		// iterate over samples in this entry
+		for (const char *samplename = iter.first(); samplename != NULL; samplename = iter.next())
 		{
-			// by default we just search using the driver name
-			astring searchpath(m_enumerator.driver().name);
+			required++;
 
-			// iterate over samples in this entry
-			for (int sampnum = 0; intf->samplenames[sampnum] != NULL; sampnum++)
+			// create a new record
+			audit_record &record = m_record_list.append(*global_alloc(audit_record(samplename, audit_record::MEDIA_SAMPLE)));
+
+			// look for the files
+			emu_file file(m_enumerator.options().sample_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
+			path_iterator path(searchpath);
+			astring curpath;
+			while (path.next(curpath, samplename))
 			{
-				// starred entries indicate an additional searchpath
-				if (intf->samplenames[sampnum][0] == '*')
+				// attempt to access the file (.flac) or (.wav)
+				file_error filerr = file.open(curpath, ".flac");
+				if (filerr != FILERR_NONE)
+					filerr = file.open(curpath, ".wav");
+
+				if (filerr == FILERR_NONE)
 				{
-					searchpath.cat(";").cat(&intf->samplenames[sampnum][1]);
-					continue;
+					record.set_status(audit_record::STATUS_GOOD, audit_record::SUBSTATUS_GOOD);
+					found++;
 				}
-
-				required++;
-
-				// create a new record
-				audit_record &record = m_record_list.append(*global_alloc(audit_record(intf->samplenames[sampnum], audit_record::MEDIA_SAMPLE)));
-
-				// look for the files
-				emu_file file(m_enumerator.options().sample_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
-				path_iterator path(searchpath);
-				astring curpath;
-				while (path.next(curpath, intf->samplenames[sampnum]))
-				{
-					astring wholepath;
-					wholepath = curpath + ".flac";
-
-					// attempt to access the file (.flac)
-					file_error filerr = file.open(wholepath);
-
-					if (filerr != FILERR_NONE)
-					{
-						wholepath = curpath + ".wav";
-						// try again with .wav
-						filerr = file.open(wholepath);
-					}
-
-					if (filerr == FILERR_NONE)
-					{
-						record.set_status(audit_record::STATUS_GOOD, audit_record::SUBSTATUS_GOOD);
-						found++;
-					}
-					else
-						record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND);
-				}
+				else
+					record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND);
 			}
 		}
 	}

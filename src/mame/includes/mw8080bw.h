@@ -68,9 +68,9 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_mb14241;
-	device_t *m_samples;
-	device_t *m_samples1;
-	device_t *m_samples2;
+	samples_device *m_samples;
+	samples_device *m_samples1;
+	samples_device *m_samples2;
 	device_t *m_sn1;
 	device_t *m_sn2;
 	device_t *m_sn;

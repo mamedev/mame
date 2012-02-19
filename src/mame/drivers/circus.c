@@ -266,7 +266,7 @@ static MACHINE_START( circus )
 	circus_state *state = machine.driver_data<circus_state>();
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 	state->m_discrete = machine.device("discrete");
 
 	state->save_item(NAME(state->m_clown_x));
@@ -311,8 +311,7 @@ static MACHINE_CONFIG_START( circus, circus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(circus_samples_interface)
+	MCFG_SAMPLES_ADD("samples", circus_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -348,8 +347,7 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(robotbwl_samples_interface)
+	MCFG_SAMPLES_ADD("samples", robotbwl_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -392,8 +390,7 @@ static MACHINE_CONFIG_START( crash, circus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(crash_samples_interface)
+	MCFG_SAMPLES_ADD("samples", crash_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -428,8 +425,7 @@ static MACHINE_CONFIG_START( ripcord, circus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(ripcord_samples_interface)
+	MCFG_SAMPLES_ADD("samples", ripcord_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)

@@ -154,7 +154,7 @@ public:
 	device_t *m_soundcpu;
 	device_t *m_ay1;
 	device_t *m_ay2;
-	device_t *m_samples;
+	samples_device *m_samples;
 };
 
 
@@ -433,7 +433,7 @@ static WRITE8_HANDLER( fghtbskt_samples_w )
 	m63_state *state = space->machine().driver_data<m63_state>();
 
 	if (data & 1)
-		sample_start_raw(state->m_samples, 0, state->m_samplebuf + ((data & 0xf0) << 8), 0x2000, 8000, 0);
+		state->m_samples->start_raw(0, state->m_samplebuf + ((data & 0xf0) << 8), 0x2000, 8000);
 }
 
 static WRITE8_HANDLER( nmi_mask_w )
@@ -687,7 +687,7 @@ GFXDECODE_END
 
 static SAMPLES_START( fghtbskt_sh_start )
 {
-	running_machine &machine = device->machine();
+	running_machine &machine = device.machine();
 	m63_state *state = machine.driver_data<m63_state>();
 	int i, len = machine.region("samples")->bytes();
 	UINT8 *ROM = machine.region("samples")->base();
@@ -719,7 +719,7 @@ static MACHINE_START( m63 )
 	state->m_soundcpu = machine.device("soundcpu");
 	state->m_ay1 = machine.device("ay1");
 	state->m_ay2 = machine.device("ay2");
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 
 	state->save_item(NAME(state->m_pal_bank));
 	state->save_item(NAME(state->m_fg_flag));
@@ -832,8 +832,7 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(fghtbskt_samples_interface)
+	MCFG_SAMPLES_ADD("samples", fghtbskt_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

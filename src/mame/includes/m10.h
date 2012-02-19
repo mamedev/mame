@@ -4,6 +4,7 @@
 
 ****************************************************************************/
 
+#include "sound/samples.h"
 
 #define IREMM10_MASTER_CLOCK		(12500000)
 
@@ -59,7 +60,7 @@ public:
 	device_t *m_maincpu;
 	device_t *m_ic8j1;
 	device_t *m_ic8j2;
-	device_t *m_samples;
+	samples_device *m_samples;
 };
 
 

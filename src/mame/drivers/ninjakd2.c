@@ -226,8 +226,8 @@ static WRITE8_HANDLER( ninjakd2_soundreset_w )
 
 static SAMPLES_START( ninjakd2_init_samples )
 {
-	ninjakd2_state *state = device->machine().driver_data<ninjakd2_state>();
-	running_machine &machine = device->machine();
+	ninjakd2_state *state = device.machine().driver_data<ninjakd2_state>();
+	running_machine &machine = device.machine();
 	const UINT8* const rom = machine.region("pcm")->base();
 	const int length = machine.region("pcm")->bytes();
 	INT16* sampledata = auto_alloc_array(machine, INT16, length);
@@ -244,7 +244,7 @@ static SAMPLES_START( ninjakd2_init_samples )
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
 	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
-	device_t *samples = space->machine().device("pcm");
+	samples_device *samples = space->machine().device<samples_device>("pcm");
 	const UINT8* const rom = space->machine().region("pcm")->base();
 
 	// only Ninja Kid II uses this
@@ -262,9 +262,9 @@ static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 			++end;
 
 		if (end - start)
-			sample_start_raw(samples, 0, &state->m_sampledata[start], end - start, NE555_FREQUENCY, 0);
+			samples->start_raw(0, &state->m_sampledata[start], end - start, NE555_FREQUENCY);
 		else
-			sample_stop(samples, 0);
+			samples->stop(0);
 	}
 }
 
@@ -979,8 +979,7 @@ static MACHINE_CONFIG_START( ninjakd2, ninjakd2_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pcm", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(ninjakd2_samples_interface)
+	MCFG_SAMPLES_ADD("pcm", ninjakd2_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

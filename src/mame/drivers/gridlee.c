@@ -451,8 +451,7 @@ static MACHINE_CONFIG_START( gridlee, gridlee_state )
 	MCFG_SOUND_ADD("gridlee", GRIDLEE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(gridlee_samples_interface)
+	MCFG_SAMPLES_ADD("samples", gridlee_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

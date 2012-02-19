@@ -178,7 +178,7 @@ static MACHINE_START( gotya )
 {
 	gotya_state *state = machine.driver_data<gotya_state>();
 
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 
 	state->save_item(NAME(state->m_scroll_bit_8));
 	state->save_item(NAME(state->m_theme_playing));
@@ -219,8 +219,7 @@ static MACHINE_CONFIG_START( gotya, gotya_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(gotya_samples_interface)
+	MCFG_SAMPLES_ADD("samples", gotya_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

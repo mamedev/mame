@@ -1,187 +1,163 @@
-/**************************************************************************
+/***************************************************************************
 
-    Votrax SC-01 Emulator
+    votrax.c
 
-    Mike@Dissfulfils.co.uk
+    Hacked up votrax simulator that maps to samples, until a real one
+    is written.
 
-**************************************************************************
+****************************************************************************
 
-DEVICE_START(votrax)- Start emulation, load samples from Votrax subdirectory
-votrax_w         - Write data to votrax port
-votrax_status_r  - Return busy status (-1 = busy)
+    Copyright Aaron Giles
+    All rights reserved.
 
-If you need to alter the base frequency (i.e. Qbert) then just alter
-the variable VotraxBaseFrequency, this is defaulted to 8000
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
 
-**************************************************************************/
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+***************************************************************************/
 
 #include "emu.h"
-#include "samples.h"
 #include "votrax.h"
 
 
-typedef struct _votrax_state votrax_state;
-struct _votrax_state
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+const device_type VOTRAX = &device_creator<votrax_device>;
+
+const char *const votrax_device::s_phoneme_table[64] =
 {
-	device_t *device;
-	int		stream;
-	int		frequency;		/* Some games (Qbert) change this */
-	int 	volume;
-	sound_stream *	channel;
-
-	loaded_sample *sample;
-	UINT32		pos;
-	UINT32		frac;
-	UINT32		step;
-
-	loaded_samples *samples;
+	"EH3",	"EH2",	"EH1",	" "/*PA0*/"DT",	"A1", 	"A2",  	"ZH",
+	"AH2",	"I3", 	"I2", 	"I1", 	"M",  	"N",  	"B",   	"V",
+	"CH", 	"SH", 	"Z",  	"AW1",	"NG", 	"AH1",	"OO1", 	"OO",
+	"L",  	"K",  	"J",  	"H",  	"G",  	"F",  	"D",   	"S",
+	"A",  	"AY", 	"Y1", 	"UH3",	"AH", 	"P",  	"O",   	"I",
+	"U",  	"Y",  	"T",  	"R",  	"E",  	"W",  	"AE",  	"AE1",
+	"AW2",	"UH2",	"UH1",	"UH", 	"O2", 	"O1", 	"IU",  	"U1",
+	"THV",	"TH", 	"ER", 	"EH", 	"E1", 	"AW", 	" "/*PA1*/, "."/*STOP*/
 };
 
-INLINE votrax_state *get_safe_token(device_t *device)
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  votrax_device - constructor
+//-------------------------------------------------
+
+votrax_device::votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: samples_device(mconfig, VOTRAX, "VOTRAX SC-01", tag, owner, clock)
 {
-	assert(device != NULL);
-	assert(device->type() == VOTRAX);
-	return (votrax_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-#define FRAC_BITS		24
-#define FRAC_ONE		(1 << FRAC_BITS)
-#define FRAC_MASK		(FRAC_ONE - 1)
 
+//-------------------------------------------------
+//  static_set_interface - configuration helper
+//  to set the interface
+//-------------------------------------------------
 
-/****************************************************************************
- * 64 Phonemes - currently 1 sample per phoneme, will be combined sometime!
- ****************************************************************************/
-
-static const char *const VotraxTable[65] =
+void votrax_device::static_set_interface(device_t &device, const votrax_interface &interface)
 {
- "EH3","EH2","EH1","PA0","DT" ,"A1" ,"A2" ,"ZH",
- "AH2","I3" ,"I2" ,"I1" ,"M"  ,"N"  ,"B"  ,"V",
- "CH" ,"SH" ,"Z"  ,"AW1","NG" ,"AH1","OO1","OO",
- "L"  ,"K"  ,"J"  ,"H"  ,"G"  ,"F"  ,"D"  ,"S",
- "A"  ,"AY" ,"Y1" ,"UH3","AH" ,"P"  ,"O"  ,"I",
- "U"  ,"Y"  ,"T"  ,"R"  ,"E"  ,"W"  ,"AE" ,"AE1",
- "AW2","UH2","UH1","UH" ,"O2" ,"O1" ,"IU" ,"U1",
- "THV","TH" ,"ER" ,"EH" ,"E1" ,"AW" ,"PA1","STOP",
- 0
-};
+	votrax_device &samples = downcast<votrax_device &>(device);
+	static_cast<votrax_interface &>(samples) = interface;
+}
 
-static STREAM_UPDATE( votrax_update_sound )
+
+
+//**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  write - handle a write to the control register
+//-------------------------------------------------
+
+WRITE8_MEMBER( votrax_device::write )
 {
-	votrax_state *info = (votrax_state*) param;
-	stream_sample_t *buffer = outputs[0];
-
-	if (info->sample)
-	{
-		/* load some info locally */
-		UINT32 pos = info->pos;
-		UINT32 frac = info->frac;
-		UINT32 step = info->step;
-		UINT32 length = info->sample->length;
-		INT16 *sample = info->sample->data;
-
-		while (length--)
+	// append to the current string
+	m_current.cat(s_phoneme_table[data & 0x3f]);
+	
+	// look for a match in our sample table
+	for (int index = 0; m_votrax_map[index].phoneme != NULL; index++)
+		if (m_current.find(m_votrax_map[index].phoneme) != -1)
 		{
-			/* do a linear interp on the sample */
-			INT32 sample1 = sample[pos];
-			INT32 sample2 = sample[(pos + 1) % length];
-			INT32 fracmult = frac >> (FRAC_BITS - 14);
-			*buffer++ = ((0x4000 - fracmult) * sample1 + fracmult * sample2) >> 14;
-
-			/* advance */
-			frac += step;
-			pos += frac >> FRAC_BITS;
-			frac = frac & ((1 << FRAC_BITS) - 1);
-
-			/* handle looping/ending */
-			if (pos >= length)
-			{
-				info->sample = NULL;
-				break;
-			}
+			// if we found it, play the corresponding sample and flush the buffer
+			start(0, index);
+			m_current.replace(m_votrax_map[index].phoneme, "");
+			m_current.trimspace();
+			if (m_current.len() > 0)
+				mame_printf_warning("Votrax missed partial match: %s\n", m_current.cstr());
+			m_current.reset();
+			return;
 		}
-
-		/* push position back out */
-		info->pos = pos;
-		info->frac = frac;
-	}
-}
-
-
-static DEVICE_START( votrax )
-{
-	votrax_state *votrax = get_safe_token(device);
-
-	votrax->device = device;
-	votrax->samples = readsamples(device->machine(),VotraxTable,"votrax");
-	votrax->frequency = 8000;
-	votrax->volume = 230;
-
-	votrax->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), votrax, votrax_update_sound);
-
-	votrax->sample = NULL;
-	votrax->step = 0;
-}
-
-
-WRITE8_DEVICE_HANDLER( votrax_w )
-{
-	votrax_state *info = get_safe_token(device);
-	int Phoneme,Intonation;
-
-	info->channel->update();
-
-    Phoneme = data & 0x3F;
-    Intonation = data >> 6;
-
-	logerror("Speech : %s at intonation %d\n",VotraxTable[Phoneme],Intonation);
-
-    if(Phoneme==63)
-    	info->sample = NULL;
-
-    if(info->samples->sample[Phoneme].data)
+	
+	// if we got a stop and didn't find a match, print it
+	if ((data & 0x3f) == 0x3f)
 	{
-		info->sample = &info->samples->sample[Phoneme];
-		info->pos = 0;
-		info->frac = 0;
-		info->step = ((INT64)(info->sample->frequency + (256*Intonation)) << FRAC_BITS) / info->device->machine().sample_rate();
-		info->channel->set_output_gain(0, (info->volume + (8*Intonation)*100/255) / 100.0);
-	}
-}
-
-int votrax_status_r(device_t *device)
-{
-	votrax_state *info = get_safe_token(device);
-	info->channel->update();
-    return (info->sample != NULL);
-}
-
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( votrax )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(votrax_state); 			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( votrax );			break;
-		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							/* Nothing */									break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Votrax SC-01");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Votrax speech");				break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		mame_printf_warning("Votrax missed match: %s\n", m_current.cstr());
+		m_current.reset();
 	}
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(VOTRAX, votrax);
+//-------------------------------------------------
+//  status - read the status line
+//-------------------------------------------------
+
+READ_LINE_MEMBER( votrax_device::status )
+{
+	// is this correct, or is it really a ready line and should be inverted?
+	return (m_current.len() > 0 || playing(0)) ? ASSERT_LINE : CLEAR_LINE;
+}
+
+
+
+//**************************************************************************
+//  DEVICE INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_start - handle device startup
+//-------------------------------------------------
+
+void votrax_device::device_start()
+{
+	// build up a samples list
+	for (const votrax_map *curmap = m_votrax_map; curmap->phoneme != NULL; curmap++)
+		m_sample_list.append((curmap->samplename != NULL) ? curmap->samplename : "");
+
+	// create the samples interface
+	m_channels = 1;
+	m_names = m_sample_list;
+	m_start = NULL;
+	
+	// let the samples device do the rest
+	samples_device::device_start();
+}

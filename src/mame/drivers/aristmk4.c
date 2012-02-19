@@ -266,7 +266,7 @@ public:
 
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
-	device_t *m_samples;
+	samples_device *m_samples;
 	UINT8 *m_shapeRomPtr;
 	UINT8 m_shapeRom[0xc000];
 	UINT8 *m_mkiv_vram;
@@ -577,7 +577,7 @@ static WRITE8_DEVICE_HANDLER(mkiv_pia_outb)
 		if(emet[i])
 		{
 		//logerror("Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
-		sample_start(state->m_samples,i,0, FALSE); // pulse sound for mechanical meters
+		state->m_samples->start(i,0); // pulse sound for mechanical meters
 		}
 	}
 }
@@ -1617,7 +1617,7 @@ static MACHINE_START( aristmk4 )
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
-	state->m_samples = machine.device("samples");
+	state->m_samples = machine.device<samples_device>("samples");
 	state_save_register_global_pointer(machine, state->m_nvram, 0x1000); // state->m_nvram
 }
 
@@ -1701,8 +1701,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_SOUND_CONFIG(ay8910_config2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(meter_samples_interface)
+	MCFG_SAMPLES_ADD("samples", meter_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 MACHINE_CONFIG_END

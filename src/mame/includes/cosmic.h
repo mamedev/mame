@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "sound/samples.h"
+
 #define COSMICG_MASTER_CLOCK     XTAL_9_828MHz
 #define Z80_MASTER_CLOCK         XTAL_10_816MHz
 
@@ -36,7 +38,7 @@ public:
 	UINT32         m_pixel_clock;
 
 	/* devices */
-	device_t *m_samples;
+	samples_device *m_samples;
 	device_t *m_dac;
 };
 

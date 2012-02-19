@@ -112,7 +112,7 @@ const char *const gorf_sample_names[] =
 READ8_HANDLER( gorf_speech_r )
 {
 	astrocde_state *state = space->machine().driver_data<astrocde_state>();
-	device_t *samples = space->machine().device("samples");
+	samples_device *samples = space->machine().device<samples_device>("samples");
 	int Phoneme, Intonation;
 	int i = 0;
 	UINT8 data = offset >> 8;
@@ -126,7 +126,7 @@ READ8_HANDLER( gorf_speech_r )
 	logerror("Date : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
 
 	if(Phoneme==63) {
-		sample_stop(samples, 0);
+		samples->stop(0);
 		if (strlen(state->m_totalword)>2) logerror("Clearing sample %s\n",state->m_totalword);
 		state->m_totalword[0] = 0;				   /* Clear the total word stack */
 		return data;
@@ -139,8 +139,8 @@ READ8_HANDLER( gorf_speech_r )
 		if (state->m_plural != 0) {
 			logerror("found a possible plural at %d\n",state->m_plural-1);
 			if (!strcmp("S",state->m_totalword)) {		   /* Plural check */
-				sample_start(samples, 0, num_samples-2, 0);	   /* play the sample at position of word */
-				sample_set_freq(samples, 0, 11025);    /* play at correct rate */
+				samples->start(0, num_samples-2);	   /* play the sample at position of word */
+				samples->set_frequency(0, 11025);    /* play at correct rate */
 				state->m_totalword[0] = 0;				   /* Clear the total word stack */
 				state->m_oldword[0] = 0;				   /* Clear the total word stack */
 				return data;
@@ -162,8 +162,8 @@ READ8_HANDLER( gorf_speech_r )
 			} else {
 				state->m_plural=0;
 			}
-			sample_start(samples, 0, i, 0);	                   /* play the sample at position of word */
-			sample_set_freq(samples, 0, 11025);       /* play at correct rate */
+			samples->start(0, i);	                   /* play the sample at position of word */
+			samples->set_frequency(0, 11025);       /* play at correct rate */
 			logerror("Playing sample %d",i);
 			state->m_totalword[0] = 0;				   /* Clear the total word stack */
 			return data;
@@ -177,6 +177,6 @@ READ8_HANDLER( gorf_speech_r )
 
 CUSTOM_INPUT( gorf_speech_status_r )
 {
-	device_t *samples = field.machine().device("samples");
-	return !sample_playing(samples, 0);
+	samples_device *samples = field.machine().device<samples_device>("samples");
+	return !samples->playing(0);
 }

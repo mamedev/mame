@@ -300,8 +300,7 @@ static MACHINE_CONFIG_START( polyplay, polyplay_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SOUND_CONFIG(polyplay_samples_interface)
+	MCFG_SAMPLES_ADD("samples", polyplay_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

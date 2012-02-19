@@ -367,7 +367,15 @@ flac_decoder::~flac_decoder()
 bool flac_decoder::reset()
 {
 	m_compressed_offset = 0;
-	if (FLAC__stream_decoder_init_stream(m_decoder, &flac_decoder::read_callback_static, NULL, &flac_decoder::tell_callback_static, NULL, NULL, &flac_decoder::write_callback_static, NULL, &flac_decoder::error_callback_static, this) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
+	if (FLAC__stream_decoder_init_stream(m_decoder, 
+				&flac_decoder::read_callback_static, 
+				NULL, 
+				&flac_decoder::tell_callback_static, 
+				NULL, 
+				NULL, 
+				&flac_decoder::write_callback_static, 
+				&flac_decoder::metadata_callback_static, 
+				&flac_decoder::error_callback_static, this) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
 		return false;
 	return FLAC__stream_decoder_process_until_end_of_metadata(m_decoder);
 }
@@ -559,6 +567,24 @@ FLAC__StreamDecoderReadStatus flac_decoder::read_callback(FLAC__byte buffer[], s
 
 	// return based on whether we ran out of data
 	return (*bytes < expected) ? FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM : FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
+}
+
+
+//-------------------------------------------------
+//  metadata_callback - handle STREAMINFO metadata
+//-------------------------------------------------
+
+void flac_decoder::metadata_callback_static(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
+{
+	// ignore all but STREAMINFO metadata
+	if (metadata->type != FLAC__METADATA_TYPE_STREAMINFO)
+		return;
+	
+	// parse out the data we care about
+	flac_decoder *fldecoder = reinterpret_cast<flac_decoder *>(client_data);
+	fldecoder->m_sample_rate = metadata->data.stream_info.sample_rate;
+	fldecoder->m_bits_per_sample = metadata->data.stream_info.bits_per_sample;
+	fldecoder->m_channels = metadata->data.stream_info.channels;
 }
 
 
