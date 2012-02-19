@@ -4525,7 +4525,7 @@ vcop2			// 1995.09 Virtua Cop 2
 vf2			// 1995.09 Virtua Fighter 2.1
 skytargt		// 1995.10 Sky Target
 manxtt			// 1995.11 Manx T.T.
-doaa			// 1996.11 Dead or Alive
+doaa			// 1996.11 Dead or Alive (Model 2A)
 motoraid		// 1997.10 Motor Raid
 zeroguna		// 1997.12 Zero Gunner
 zerogunaj		// 1997.12 Zero Gunner (Japan)
@@ -4993,7 +4993,7 @@ vf4c			// 2002.01.31 Virtua Fighter 4 (Rev C) (cartridge)
 kingrt66		// 2002.02 The King of Route 66 (Rev A)
 initd			// 2002.03 Initial D Arcade Stage (Japan) (Rev B)
 				// 2002.06 World Club Champion Football Serie A 2001-2002
-				// 2002.07 Soul Surfer
+soulsurf		// 2002.07 Soul Surfer
 vf4evoct		// 2002.08 Virtua Fighter 4 Evolution (cartridge)
 vf4evoa			// 2002.08 Virtua Fighter 4 Evolution
 				// 2002.11 World Club Champion Football Serie A 2001-2002 Ver.1.2
@@ -5011,6 +5011,7 @@ initdexp		// 2002.?? Initial D Arcade Stage (Export)
 				// 2004.01 Initial D Arcade Stage Ver. 3 (export)
 initdv3j		// 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev C)
 initdv3jb		// 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev B)
+initdv3e		// 2004.01 Initial D Arcade Stage Ver. 3 (Export)
 				// 2004.06 World Club Champion Football Serie A 2002-2003 Ver.2
 				// 2004.07 Virtua Fighter 4 Final Tuned
 vf4tuneda		// 2004.09 Virtua Fighter 4 Final Tuned (Rev A)
