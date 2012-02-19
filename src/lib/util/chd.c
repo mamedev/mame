@@ -1413,6 +1413,7 @@ const char *chd_file::error_string(chd_error err)
 		case CHDERR_UNKNOWN_COMPRESSION:		return "unknown compression type";
 		case CHDERR_WALKING_PARENT:				return "currently examining parent";
 		case CHDERR_COMPRESSING:				return "currently compressing";
+		default:								return "undocumented error";
 	}
 }
 
