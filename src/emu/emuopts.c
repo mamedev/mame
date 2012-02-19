@@ -275,7 +275,7 @@ void emu_options::update_slot_options()
 	// create the configuration
 	machine_config config(*cursystem, *this);
 	slot_interface_iterator iter(config.root_device());
-	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
+	for (device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
 		// retrieve info about the device instance
 		if (exists(slot->device().tag()+1)) {
