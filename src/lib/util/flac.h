@@ -67,16 +67,16 @@ public:
 	void set_num_channels(UINT8 num_channels) { m_channels = num_channels; }
 	void set_block_size(UINT32 block_size) { m_block_size = block_size; }
 	void set_strip_metadata(bool strip) { m_strip_metadata = strip; }
-	
+
 	// getters (valid after reset)
 	FLAC__StreamEncoderState state() const { return FLAC__stream_encoder_get_state(m_encoder); }
 	const char *state_string() const { return FLAC__stream_encoder_get_resolved_state_string(m_encoder); }
-	
+
 	// reset
 	bool reset();
 	bool reset(void *buffer, UINT32 buflength);
 	bool reset(core_file &file);
-	
+
 	// encode a buffer
 	bool encode_interleaved(const INT16 *samples, UINT32 samples_per_channel, bool swap_endian = false);
 	bool encode(INT16 *const *samples, UINT32 samples_per_channel, bool swap_endian = false);
@@ -96,14 +96,14 @@ private:
 	UINT32					m_compressed_offset;	// current offset with the compressed stream
 	FLAC__byte *			m_compressed_start;		// start of compressed data
 	UINT32					m_compressed_length;	// length of the compressed stream
-	
+
 	// parameters
 	UINT32					m_sample_rate;			// sample rate
 	UINT8					m_channels;				// number of channels
 	UINT32					m_block_size;			// block size
 
 	// header stripping
-	bool					m_strip_metadata;		// strip the the metadata?	
+	bool					m_strip_metadata;		// strip the the metadata?
 	UINT32					m_ignore_bytes;			// how many bytes to ignore when writing
 	bool					m_found_audio;			// have we hit the audio yet?
 };
@@ -119,7 +119,7 @@ public:
 	flac_decoder(const void *buffer, UINT32 length, const void *buffer2 = NULL, UINT32 length2 = 0);
 	flac_decoder(core_file &file);
 	~flac_decoder();
-	
+
 	// getters (valid after reset)
 	UINT32 sample_rate() const { return m_sample_rate; }
 	UINT8 channels() const { return m_channels; }
@@ -127,13 +127,13 @@ public:
 	UINT32 total_samples() const { return FLAC__stream_decoder_get_total_samples(m_decoder); }
 	FLAC__StreamDecoderState state() const { return FLAC__stream_decoder_get_state(m_decoder); }
 	const char *state_string() const { return FLAC__stream_decoder_get_resolved_state_string(m_decoder); }
-	
+
 	// reset
 	bool reset();
 	bool reset(const void *buffer, UINT32 length, const void *buffer2 = NULL, UINT32 length2 = 0);
 	bool reset(UINT32 sample_rate, UINT8 num_channels, UINT32 block_size, const void *buffer, UINT32 length);
 	bool reset(core_file &file);
-	
+
 	// decode to a buffer; num_samples must be a multiple of the block size
 	bool decode_interleaved(INT16 *samples, UINT32 num_samples, bool swap_endian = false);
 	bool decode(INT16 **samples, UINT32 num_samples, bool swap_endian = false);

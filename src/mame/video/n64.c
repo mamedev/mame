@@ -68,7 +68,7 @@ void n64_rdp::GetAlphaCvg(UINT8 *comb_alpha, rdp_span_aux *userdata, const rdp_p
 	{
 		temp3 = (temp * temp2) + 4;
 		userdata->CurrentPixCvg = (temp3 >> 8) & 0xf;
- 	}
+	}
 	if (object.OtherModes.alpha_cvg_select)
 	{
 		temp = (OtherModes.cvg_times_alpha) ? (temp3 >> 3) : (temp2 << 5);
@@ -157,11 +157,11 @@ void n64_rdp::VideoUpdate16(n64_periphs *n64, bitmap_rgb32 &bitmap)
 
 				//if(divot)
 				//{
-				//	if(i > 0 && i < (hres - 1))
-				//	{
-				//		prev_cvg = ((frame_buffer[(pixels - 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels - 1)^BYTE_ADDR_XOR] & 3);
-				//		next_cvg = ((frame_buffer[(pixels + 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels + 1)^BYTE_ADDR_XOR] & 3);
-				//	}
+				//  if(i > 0 && i < (hres - 1))
+				//  {
+				//      prev_cvg = ((frame_buffer[(pixels - 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels - 1)^BYTE_ADDR_XOR] & 3);
+				//      next_cvg = ((frame_buffer[(pixels + 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels + 1)^BYTE_ADDR_XOR] & 3);
+				//  }
 				//}
 				c.i.r = ((pix >> 8) & 0xf8) | (pix >> 13);
 				c.i.g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);

@@ -58,7 +58,7 @@ USE_DISPATCH_GL = 1
 # uncomment the next line to use couriersud's multi-keyboard patch for sdl2.0
 # SDL2_MULTIAPI = 1
 
-# uncomment the next line to specify where you have installed 
+# uncomment the next line to specify where you have installed
 # SDL. Equivalent to the ./configure --prefix=<path>
 # SDL_INSTALL_ROOT = /usr/local/sdl13
 
@@ -382,7 +382,7 @@ ifdef SDL_INSTALL_ROOT
 # FIXME: remove the directfb ref. later. This is just there for now to work around an issue with SDL1.3 and SDL2.0
 INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
 endif
-endif 
+endif
 
 INCPATH += `pkg-config --cflags fontconfig`
 LIBS += `pkg-config --libs fontconfig`

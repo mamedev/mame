@@ -14,7 +14,7 @@ typedef struct
   CAutoResetEvent startEvent;
   CAutoResetEvent finishedEvent;
   int stop;
-  
+
   THREAD_FUNC_TYPE func;
   LPVOID param;
   THREAD_FUNC_RET_TYPE res;
@@ -75,7 +75,7 @@ typedef struct _CMtCoder
   size_t blockSize;
   size_t destBlockSize;
   unsigned numThreads;
-  
+
   ISeqInStream *inStream;
   ISeqOutStream *outStream;
   ICompressProgress *progress;

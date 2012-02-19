@@ -76,7 +76,7 @@ struct votrax_interface
 
 // ======================> votrax_device
 
-class votrax_device : 	public samples_device,
+class votrax_device :	public samples_device,
 						public votrax_interface
 {
 public:
@@ -89,7 +89,7 @@ public:
 	// writers
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ_LINE_MEMBER( status );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

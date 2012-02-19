@@ -160,11 +160,11 @@ int Ppmd7_DecodeSymbol(CPpmd7 *p, IPpmd7_RangeDec *rc)
       i -= k;
     }
     while (i != num);
-    
+
     see = Ppmd7_MakeEscFreq(p, numMasked, &freqSum);
     freqSum += hiCnt;
     count = rc->GetThreshold(rc, freqSum);
-    
+
     if (count < hiCnt)
     {
       Byte symbol;

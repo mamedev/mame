@@ -133,7 +133,7 @@ static void Sha256_Transform(UInt32 *state, const UInt32 *data)
   for (j = 0; j < 8; j++)
     state[j] += T[j];
   #endif
-  
+
   /* Wipe variables */
   /* memset(W, 0, sizeof(W)); */
   /* memset(T, 0, sizeof(T)); */

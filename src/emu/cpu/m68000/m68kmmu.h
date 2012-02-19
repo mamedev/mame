@@ -610,11 +610,11 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		static UINT32 psrp = 0, purp=0;
 		if(psrp != m68k->mmu_srp_aptr) {
 			psrp = m68k->mmu_srp_aptr;
-//			fprintf(stderr, "srp = %08x\n", psrp);
+//          fprintf(stderr, "srp = %08x\n", psrp);
 		}
 		if(purp != m68k->mmu_urp_aptr) {
 			purp = m68k->mmu_urp_aptr;
-//			fprintf(stderr, "urp = %08x\n", purp);
+//          fprintf(stderr, "urp = %08x\n", purp);
 		}
 
 		// is UDT marked valid?
@@ -791,7 +791,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 	}
 	else if ((m68k->ir & 0xffe0) == 0xf500)
 	{
-//		logerror("68040 pflush: pc=%08x ir=%04x opmode=%d register=%d\n", REG_PPC(m68k), m68k->ir, (m68k->ir >> 3) & 3, m68k->ir & 7);
+//      logerror("68040 pflush: pc=%08x ir=%04x opmode=%d register=%d\n", REG_PPC(m68k), m68k->ir, (m68k->ir >> 3) & 3, m68k->ir & 7);
 		pmmu_atc_flush(m68k);
 	}
 	else	// the rest are 1111000xxxXXXXXX where xxx is the instruction family

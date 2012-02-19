@@ -215,7 +215,7 @@ public:
 		: m_file(file),
 		  m_offset(offset),
 		  m_maxoffset(MIN(maxoffset, (file != NULL) ? core_fsize(file) : 0)) { }
-	
+
 	// read interface
 	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length)
 	{
@@ -247,7 +247,7 @@ public:
 		  m_offset(offset),
 		  m_maxoffset(MIN(maxoffset, file.logical_bytes())) { }
 
-	// read interface	
+	// read interface
 	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length)
 	{
 		offset += m_offset;
@@ -279,24 +279,24 @@ public:
 		: m_file(NULL),
 		  m_toc(toc),
 		  m_info(info) { }
-		 
+
 	~chd_cd_compressor()
 	{
 		if (m_file != NULL)
 			core_fclose(m_file);
 	}
 
-	// read interface	
+	// read interface
 	virtual UINT32 read_data(void *_dest, UINT64 offset, UINT32 length)
 	{
 		// verify assumptions made below
 		assert(offset % CD_FRAME_SIZE == 0);
 		assert(length % CD_FRAME_SIZE == 0);
-	
+
 		// initialize destination to 0 so that unused areas are filled
 		UINT8 *dest = reinterpret_cast<UINT8 *>(_dest);
 		memset(dest, 0, length);
-	
+
 		// find out which track we're starting in
 		UINT64 startoffs = 0;
 		UINT32 length_remaining = length;
@@ -316,7 +316,7 @@ public:
 					if (filerr != FILERR_NONE)
 						report_error(1, "Error opening input file (%s)'", m_lastfile.cstr());
 				}
-				
+
 				// iterate over frames
 				UINT32 bytesperframe = trackinfo.datasize + trackinfo.subsize;
 				UINT64 src_track_start = m_info.track[tracknum].offset;
@@ -332,7 +332,7 @@ public:
 						UINT32 count = core_fread(m_file, dest, bytesperframe);
 						if (count != bytesperframe)
 							report_error(1, "Error reading input file (%s)'", m_lastfile.cstr());
-							
+
 						// swap if appropriate
 						if (m_info.track[tracknum].swap)
 							for (UINT32 swapindex = 0; swapindex < 2352; swapindex += 2)
@@ -342,7 +342,7 @@ public:
 								dest[swapindex + 1] = temp;
 							}
 					}
-					
+
 					// advance
 					offset += CD_FRAME_SIZE;
 					dest += CD_FRAME_SIZE;
@@ -351,7 +351,7 @@ public:
 						break;
 				}
 			}
-			
+
 			// next track starts after the previous one
 			startoffs = endoffs;
 		}
@@ -381,11 +381,11 @@ public:
 		  m_frame_count(num_frames),
 		  m_ldframedata(num_frames * VBI_PACKED_BYTES),
 		  m_rawdata(info.bytes_per_frame) { }
-		
+
 	// getters
 	const dynamic_buffer &ldframedata() const { return m_ldframedata; }
-	
-	// read interface	
+
+	// read interface
 	virtual UINT32 read_data(void *_dest, UINT64 offset, UINT32 length)
 	{
 		UINT8 *dest = reinterpret_cast<UINT8 *>(_dest);
@@ -402,7 +402,7 @@ public:
 				INT32 effframe = m_start_frame + framenum;
 				UINT32 first_sample = (UINT64(m_info.rate) * UINT64(effframe) * UINT64(1000000) + m_info.fps_times_1million - 1) / UINT64(m_info.fps_times_1million);
 				UINT32 samples = (UINT64(m_info.rate) * UINT64(effframe + 1) * UINT64(1000000) + m_info.fps_times_1million - 1) / UINT64(m_info.fps_times_1million) - first_sample;
-				
+
 				// loop over channels and read the samples
 				int channels = MIN(m_info.channels, ARRAY_LENGTH(m_audio));
 				INT16 *samplesptr[ARRAY_LENGTH(m_audio)];
@@ -437,13 +437,13 @@ public:
 				UINT32 rawsize = avhuff_encoder::raw_data_size(m_rawdata);
 				if (rawsize < m_rawdata.count())
 					memset(&m_rawdata[rawsize], 0, m_rawdata.count() - rawsize);
-				
+
 				// copy to the destination
 				UINT64 start_offset = UINT64(framenum) * UINT64(m_info.bytes_per_frame);
 				UINT64 end_offset = start_offset + m_info.bytes_per_frame;
 				UINT32 bytes_to_copy = MIN(length_remaining, end_offset - offset);
 				memcpy(dest, &m_rawdata[offset - start_offset], bytes_to_copy);
-				
+
 				// advance
 				offset += bytes_to_copy;
 				dest += bytes_to_copy;
@@ -519,29 +519,29 @@ static const option_description s_options[] =
 // descriptions for each command
 static const command_description s_commands[] =
 {
-	{ COMMAND_INFO, do_info, ": displays information about a CHD", 
+	{ COMMAND_INFO, do_info, ": displays information about a CHD",
 		{
 			REQUIRED OPTION_INPUT,
 			OPTION_VERBOSE
-		} 
+		}
 	},
-	
-	{ COMMAND_VERIFY, do_verify, ": verifies a CHD's integrity", 
+
+	{ COMMAND_VERIFY, do_verify, ": verifies a CHD's integrity",
 		{
 			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_PARENT
-		} 
+		}
 	},
-	
-	{ COMMAND_CREATE_RAW, do_create_raw, ": create a raw CHD from the input file", 
+
+	{ COMMAND_CREATE_RAW, do_create_raw, ": create a raw CHD from the input file",
 		{
-			REQUIRED OPTION_OUTPUT, 
+			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_PARENT,
 			OPTION_OUTPUT_FORCE,
-			REQUIRED OPTION_INPUT, 
-			OPTION_INPUT_START_BYTE, 
-			OPTION_INPUT_START_HUNK, 
-			OPTION_INPUT_LENGTH_BYTES, 
+			REQUIRED OPTION_INPUT,
+			OPTION_INPUT_START_BYTE,
+			OPTION_INPUT_START_HUNK,
+			OPTION_INPUT_LENGTH_BYTES,
 			OPTION_INPUT_LENGTH_HUNKS,
 			REQUIRED OPTION_HUNK_SIZE,
 			REQUIRED OPTION_UNIT_SIZE,
@@ -551,16 +551,16 @@ static const command_description s_commands[] =
 #endif
 		}
 	},
-	
-	{ COMMAND_CREATE_HD, do_create_hd, ": create a hard disk CHD from the input file", 
+
+	{ COMMAND_CREATE_HD, do_create_hd, ": create a hard disk CHD from the input file",
 		{
-			REQUIRED OPTION_OUTPUT, 
+			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_PARENT,
 			OPTION_OUTPUT_FORCE,
-			OPTION_INPUT, 
-			OPTION_INPUT_START_BYTE, 
-			OPTION_INPUT_START_HUNK, 
-			OPTION_INPUT_LENGTH_BYTES, 
+			OPTION_INPUT,
+			OPTION_INPUT_START_BYTE,
+			OPTION_INPUT_START_HUNK,
+			OPTION_INPUT_LENGTH_BYTES,
 			OPTION_INPUT_LENGTH_HUNKS,
 			OPTION_HUNK_SIZE,
 			OPTION_COMPRESSION,
@@ -572,13 +572,13 @@ static const command_description s_commands[] =
 #endif
 		}
 	},
-	
-	{ COMMAND_CREATE_CD, do_create_cd, ": create a CD CHD from the input file", 
+
+	{ COMMAND_CREATE_CD, do_create_cd, ": create a CD CHD from the input file",
 		{
-			REQUIRED OPTION_OUTPUT, 
+			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_PARENT,
 			OPTION_OUTPUT_FORCE,
-			REQUIRED OPTION_INPUT, 
+			REQUIRED OPTION_INPUT,
 			OPTION_HUNK_SIZE,
 			OPTION_COMPRESSION,
 #if NUM_PROCESSORS_SUPPORTED
@@ -586,13 +586,13 @@ static const command_description s_commands[] =
 #endif
 		}
 	},
-	
-	{ COMMAND_CREATE_LD, do_create_ld, ": create a laserdisc CHD from the input file", 
+
+	{ COMMAND_CREATE_LD, do_create_ld, ": create a laserdisc CHD from the input file",
 		{
-			REQUIRED OPTION_OUTPUT, 
+			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_PARENT,
 			OPTION_OUTPUT_FORCE,
-			REQUIRED OPTION_INPUT, 
+			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_START_FRAME,
 			OPTION_INPUT_LENGTH_FRAMES,
 			OPTION_HUNK_SIZE,
@@ -602,63 +602,63 @@ static const command_description s_commands[] =
 #endif
 		}
 	},
-	
-	{ COMMAND_EXTRACT_RAW, do_extract_raw, ": extract raw file from a CHD input file", 
+
+	{ COMMAND_EXTRACT_RAW, do_extract_raw, ": extract raw file from a CHD input file",
 		{
-			REQUIRED OPTION_OUTPUT, 
-			OPTION_OUTPUT_FORCE,
-			REQUIRED OPTION_INPUT, 
-			OPTION_INPUT_PARENT, 
-			OPTION_INPUT_START_BYTE, 
-			OPTION_INPUT_START_HUNK, 
-			OPTION_INPUT_LENGTH_BYTES, 
-			OPTION_INPUT_LENGTH_HUNKS
-		}
-	},
-	
-	{ COMMAND_EXTRACT_HD, do_extract_raw, ": extract raw hard disk file from a CHD input file", 
-		{
-			REQUIRED OPTION_OUTPUT, 
-			OPTION_OUTPUT_FORCE,
-			REQUIRED OPTION_INPUT, 
-			OPTION_INPUT_PARENT, 
-			OPTION_INPUT_START_BYTE, 
-			OPTION_INPUT_START_HUNK, 
-			OPTION_INPUT_LENGTH_BYTES, 
-			OPTION_INPUT_LENGTH_HUNKS
-		}
-	},
-	
-	{ COMMAND_EXTRACT_CD, do_extract_cd, ": extract CD file from a CHD input file", 
-		{
-			REQUIRED OPTION_OUTPUT, 
-			OPTION_OUTPUT_BIN, 
+			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_FORCE,
 			REQUIRED OPTION_INPUT,
-			OPTION_INPUT_PARENT, 
+			OPTION_INPUT_PARENT,
+			OPTION_INPUT_START_BYTE,
+			OPTION_INPUT_START_HUNK,
+			OPTION_INPUT_LENGTH_BYTES,
+			OPTION_INPUT_LENGTH_HUNKS
 		}
 	},
-	
-	{ COMMAND_EXTRACT_LD, do_extract_ld, ": extract laserdisc AVI from a CHD input file", 
+
+	{ COMMAND_EXTRACT_HD, do_extract_raw, ": extract raw hard disk file from a CHD input file",
 		{
-			REQUIRED OPTION_OUTPUT, 
+			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_FORCE,
-			REQUIRED OPTION_INPUT, 
-			OPTION_INPUT_PARENT, 
-			OPTION_INPUT_START_FRAME, 
+			REQUIRED OPTION_INPUT,
+			OPTION_INPUT_PARENT,
+			OPTION_INPUT_START_BYTE,
+			OPTION_INPUT_START_HUNK,
+			OPTION_INPUT_LENGTH_BYTES,
+			OPTION_INPUT_LENGTH_HUNKS
+		}
+	},
+
+	{ COMMAND_EXTRACT_CD, do_extract_cd, ": extract CD file from a CHD input file",
+		{
+			REQUIRED OPTION_OUTPUT,
+			OPTION_OUTPUT_BIN,
+			OPTION_OUTPUT_FORCE,
+			REQUIRED OPTION_INPUT,
+			OPTION_INPUT_PARENT,
+		}
+	},
+
+	{ COMMAND_EXTRACT_LD, do_extract_ld, ": extract laserdisc AVI from a CHD input file",
+		{
+			REQUIRED OPTION_OUTPUT,
+			OPTION_OUTPUT_FORCE,
+			REQUIRED OPTION_INPUT,
+			OPTION_INPUT_PARENT,
+			OPTION_INPUT_START_FRAME,
 			OPTION_INPUT_LENGTH_FRAMES
 		}
 	},
-	
-	{ COMMAND_COPY, do_copy, ": copy data from one CHD to another of the same type", 
+
+	{ COMMAND_COPY, do_copy, ": copy data from one CHD to another of the same type",
 		{
-			REQUIRED OPTION_OUTPUT, 
+			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_PARENT,
 			OPTION_OUTPUT_FORCE,
-			REQUIRED OPTION_INPUT, 
+			REQUIRED OPTION_INPUT,
 			OPTION_INPUT_PARENT,
-			OPTION_INPUT_START_BYTE, 
-			OPTION_INPUT_START_HUNK, 
+			OPTION_INPUT_START_BYTE,
+			OPTION_INPUT_START_HUNK,
 			OPTION_INPUT_LENGTH_BYTES,
 			OPTION_INPUT_LENGTH_HUNKS,
 			OPTION_HUNK_SIZE,
@@ -668,10 +668,10 @@ static const command_description s_commands[] =
 #endif
 		}
 	},
-	
-	{ COMMAND_ADD_METADATA, do_add_metadata, ": add metadata to the CHD", 
+
+	{ COMMAND_ADD_METADATA, do_add_metadata, ": add metadata to the CHD",
 		{
-			REQUIRED OPTION_INPUT, 
+			REQUIRED OPTION_INPUT,
 			REQUIRED OPTION_TAG,
 			OPTION_INDEX,
 			OPTION_VALUE_TEXT,
@@ -679,10 +679,10 @@ static const command_description s_commands[] =
 			OPTION_NO_CHECKSUM
 		}
 	},
-	
-	{ COMMAND_DEL_METADATA, do_del_metadata, ": remove metadata from the CHD", 
+
+	{ COMMAND_DEL_METADATA, do_del_metadata, ": remove metadata from the CHD",
 		{
-			REQUIRED OPTION_INPUT, 
+			REQUIRED OPTION_INPUT,
 			REQUIRED OPTION_TAG,
 			OPTION_INDEX
 		}
@@ -708,7 +708,7 @@ static void report_error(int error, const char *format, ...)
 	fflush(stderr);
 	va_end(arg);
 	fprintf(stderr, "\n");
-	
+
 	// reset time for progress and return the error
 	lastprogress = 0;
 	throw fatal_error(error);
@@ -782,7 +782,7 @@ static int print_help(const char *argv0, const command_description &desc, const 
 		bool required = (option[0] == REQUIRED[0]);
 		if (required)
 			option++;
-		
+
 		// find the option
 		for (int optnum = 0; optnum < ARRAY_LENGTH(s_options); optnum++)
 			if (strcmp(option, s_options[optnum].name) == 0)
@@ -807,7 +807,7 @@ const char *big_int_string(astring &string, UINT64 intvalue)
 	// 0 is a special case
 	if (intvalue == 0)
 		return string.cpy("0");
-	
+
 	// loop until all chunks are done
 	string.reset();
 	bool first = true;
@@ -815,7 +815,7 @@ const char *big_int_string(astring &string, UINT64 intvalue)
 	{
 		int chunk = intvalue % 1000;
 		intvalue /= 1000;
-		
+
 		astring insert;
 		insert.format((intvalue != 0) ? "%03d" : "%d", chunk);
 
@@ -850,7 +850,7 @@ UINT64 parse_number(const char *string)
 	int length = strlen(string);
 	if (length == 0)
 		return 0;
-	
+
 	// scan forward over digits
 	UINT64 result = 0;
 	while (isdigit(*string))
@@ -858,7 +858,7 @@ UINT64 parse_number(const char *string)
 		result = (result * 10) + (*string - '0');
 		string++;
 	}
-	
+
 	// handle multipliers
 	if (*string == 'k' || *string == 'K')
 		result *= 1024;
@@ -866,7 +866,7 @@ UINT64 parse_number(const char *string)
 		result *= 1024 * 1024;
 	if (*string == 'g' || *string == 'G')
 		result *= 1024 * 1024 * 1024;
-	
+
 	return result;
 }
 
@@ -881,7 +881,7 @@ static void guess_chs(astring *filename, UINT64 filesize, int sectorsize, UINT32
 	// if this is a direct physical drive read, handle it specially
 	if (filename != NULL && osd_get_physical_drive_geometry(*filename, &cylinders, &heads, &sectors, &bps))
 		return;
-	
+
 	// if we have no length to work with, we can't guess
 	if (filesize == 0)
 		report_error(1, "Can't guess CHS values because there is no input file");
@@ -913,7 +913,7 @@ static void guess_chs(astring *filename, UINT64 filesize, int sectorsize, UINT32
 
 
 //-------------------------------------------------
-//  parse_input_chd_parameters - parse the 
+//  parse_input_chd_parameters - parse the
 //  standard set of input CHD parameters
 //-------------------------------------------------
 
@@ -962,7 +962,7 @@ static void parse_input_start_end(const parameters_t &params, UINT64 logical_siz
 		input_start = parse_number(*input_start_frame_str) * framebytes;
 	if (input_start >= input_end)
 		report_error(1, "Input start offset greater than input file size");
-	
+
 	// process input length
 	astring *input_length_bytes_str = params.find(OPTION_INPUT_LENGTH_BYTES);
 	astring *input_length_hunks_str = params.find(OPTION_INPUT_LENGTH_HUNKS);
@@ -1001,7 +1001,7 @@ static void check_existing_output_file(const parameters_t &params, const char *f
 
 
 //-------------------------------------------------
-//  parse_output_chd_parameters - parse the 
+//  parse_output_chd_parameters - parse the
 //  standard set of output CHD parameters
 //-------------------------------------------------
 
@@ -1025,7 +1025,7 @@ static astring *parse_output_chd_parameters(const parameters_t &params, chd_file
 
 
 //-------------------------------------------------
-//  parse_hunk_size - parse the hunk_size 
+//  parse_hunk_size - parse the hunk_size
 //  parameter in a standard way
 //-------------------------------------------------
 
@@ -1044,7 +1044,7 @@ static void parse_hunk_size(const parameters_t &params, UINT32 required_granular
 
 
 //-------------------------------------------------
-//  parse_compression - parse a standard 
+//  parse_compression - parse a standard
 //  compression parameter string
 //-------------------------------------------------
 
@@ -1061,7 +1061,7 @@ static void parse_compression(const parameters_t &params, chd_codec_type compres
 		compression[0] = compression[1] = compression[2] = compression[3] = CHD_CODEC_NONE;
 		return;
 	}
-	
+
 	// iterate through compressors
 	int index = 0;
 	for (int start = 0, end = compression_str->chr(0, ','); index < 4; start = end + 1, end = compression_str->chr(end + 1, ','))
@@ -1112,7 +1112,7 @@ static const char *compression_string(astring &string, chd_codec_type compressio
 	string.reset();
 	if (compression[0] == CHD_CODEC_NONE)
 		return string.cpy("none");
-	
+
 	// iterate over types
 	for (int index = 0; index < 4; index++)
 	{
@@ -1126,7 +1126,7 @@ static const char *compression_string(astring &string, chd_codec_type compressio
 	}
 	return string;
 }
-		
+
 
 //-------------------------------------------------
 //  compress_common - standard compression loop
@@ -1137,7 +1137,7 @@ static void compress_common(chd_file_compressor &chd)
 	// begin compressing
 	chd.compress_begin();
 
-	// loop until done	
+	// loop until done
 	double complete, ratio;
 	chd_error err;
 	while ((err = chd.compress_continue(complete, ratio)) == CHDERR_WALKING_PARENT || err == CHDERR_COMPRESSING)
@@ -1190,7 +1190,7 @@ void output_track_metadata(bool cuemode, core_file *file, int tracknum, const cd
 				tempstr.cpy("AUDIO");
 				break;
 		}
-		
+
 		// output TRACK entry
 		core_fprintf(file, "  TRACK %02d %s\n", tracknum + 1, tempstr.cstr());
 
@@ -1205,7 +1205,7 @@ void output_track_metadata(bool cuemode, core_file *file, int tracknum, const cd
 		if (info.postgap > 0)
 			core_fprintf(file, "    POSTGAP %s\n", msf_string_from_frames(tempstr, info.postgap));
 	}
-	
+
 	// non-CUE mode
 	else
 	{
@@ -1304,7 +1304,7 @@ static void do_info(parameters_t &params)
 		chd_error err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index, buffer, metatag, metaflags);
 		if (err != CHDERR_NONE)
 			break;
-		
+
 		// determine our index
 		UINT32 metaindex = ~0;
 		for (int cur = 0; cur < info.count(); cur++)
@@ -1313,7 +1313,7 @@ static void do_info(parameters_t &params)
 				metaindex = ++info[cur].index;
 				break;
 			}
-		
+
 		// if not found, add to our tracking
 		if (metaindex == ~0)
 		{
@@ -1335,7 +1335,7 @@ static void do_info(parameters_t &params)
 			printf("%c", isprint(UINT8(buffer[chnum])) ? buffer[chnum] : '.');
 		printf("\n");
 	}
-	
+
 	// print compression stats if verbose
 	if (params.find(OPTION_VERBOSE) != NULL)
 	{
@@ -1348,7 +1348,7 @@ static void do_info(parameters_t &params)
 			chd_error err = input_chd.hunk_info(hunknum, codec, compbytes);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error getting info on hunk %d: %s", hunknum, chd_file::error_string(err));
-			
+
 			// decode into our data
 			if (codec > CHD_CODEC_MINI)
 				for (int comptype = 0; comptype < 4; comptype++)
@@ -1359,11 +1359,11 @@ static void do_info(parameters_t &params)
 					}
 			if (codec > ARRAY_LENGTH(compression_types))
 				codec = ARRAY_LENGTH(compression_types) - 1;
-			
+
 			// count stats
 			compression_types[codec]++;
 		}
-		
+
 		// output the stats
 		printf("\n");
 		printf("     Hunks  Percent  Name\n");
@@ -1385,10 +1385,10 @@ static void do_info(parameters_t &params)
 							name = chd_codec_list::codec_name(input_chd.compression(index));
 						break;
 				}
-				
+
 				// output the stats
 				astring tempstr;
-				printf("%10s   %5.1f%%  %-40s\n", 
+				printf("%10s   %5.1f%%  %-40s\n",
 						big_int_string(tempstr, compression_types[comptype]),
 						100.0 * double(compression_types[comptype]) / double(input_chd.hunk_count()),
 						name);
@@ -1417,7 +1417,7 @@ static void do_verify(parameters_t &params)
 
 	// create an array to read into
 	dynamic_buffer buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
-	
+
 	// read all the data and build up an SHA-1
 	sha1_creator rawsha1;
 	for (UINT64 offset = 0; offset < input_chd.logical_bytes(); )
@@ -1429,13 +1429,13 @@ static void do_verify(parameters_t &params)
 		chd_error err = input_chd.read_bytes(offset, buffer, bytes_to_read);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
-		
+
 		// add to the checksum
 		rawsha1.append(buffer, bytes_to_read);
 		offset += bytes_to_read;
 	}
 	sha1_t computed_sha1 = rawsha1.finish();
-	
+
 	// finish up
 	if (raw_sha1 != computed_sha1)
 	{
@@ -1453,7 +1453,7 @@ static void do_verify(parameters_t &params)
 	else
 	{
 		printf("Raw SHA1 verification successful!\n");
-	
+
 		// now include the metadata for >= v4
 		if (input_chd.version() >= 4)
 		{
@@ -1498,7 +1498,7 @@ static void do_create_raw(parameters_t &params)
 	// process output CHD
 	chd_file output_parent;
 	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
-	
+
 	// process hunk size
 	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : 0;
 	parse_hunk_size(params, 1, hunk_size);
@@ -1517,12 +1517,12 @@ static void do_create_raw(parameters_t &params)
 	UINT64 input_start;
 	UINT64 input_end;
 	parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
-	
+
 	// process compression
 	chd_codec_type compression[4];
 	memcpy(compression, s_default_raw_compression, sizeof(compression));
 	parse_compression(params, compression);
-	
+
 	// process numprocessors
 	parse_numprocessors(params);
 
@@ -1553,7 +1553,7 @@ static void do_create_raw(parameters_t &params)
 			err = chd.create(*output_chd_str, input_end - input_start, hunk_size, unit_size, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->cstr(), chd_file::error_string(err));
-		
+
 		// if we have a parent, copy forward all the metadata
 		if (output_parent.opened())
 			chd.clone_all_metadata(output_parent);
@@ -1588,11 +1588,11 @@ static void do_create_hd(parameters_t &params)
 		if (filerr != FILERR_NONE)
 			report_error(1, "Unable to open file (%s)", input_file_str->cstr());
 	}
-	
+
 	// process output CHD
 	chd_file output_parent;
 	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
-	
+
 	// process sectorsize
 	UINT32 sector_size = output_parent.opened() ? output_parent.unit_bytes() : IDE_SECTOR_SIZE;
 	astring *sectorsize_str = params.find(OPTION_SECTOR_SIZE);
@@ -1602,16 +1602,16 @@ static void do_create_hd(parameters_t &params)
 			report_error(1, "Sector size does not apply when creating a diff from the parent");
 		sector_size = parse_number(*sectorsize_str);
 	}
-	
+
 	// process hunk size (needs to know sector_size)
 	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : MAX((4096 / sector_size) * sector_size, sector_size);
 	parse_hunk_size(params, sector_size, hunk_size);
-	
+
 	// process input start/end (needs to know hunk_size)
 	UINT64 input_start;
 	UINT64 input_end;
 	parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
-	
+
 	// process compression
 	chd_codec_type compression[4];
 	memcpy(compression, s_default_hd_compression, sizeof(compression));
@@ -1656,7 +1656,7 @@ static void do_create_hd(parameters_t &params)
 		heads = (identdata[7] << 8) | identdata[6];
 		sectors = (identdata[13] << 8) | identdata[12];
 	}
-	
+
 	// extract geometry from the parent if we have one
 	if (output_parent.opened() && cylinders == 0)
 	{
@@ -1666,7 +1666,7 @@ static void do_create_hd(parameters_t &params)
 		if (sscanf(metadata, HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sector_size) != 4)
 			report_error(1, "Error parsing hard disk metadata in parent CHD");
 	}
-	
+
 	// if no CHS values, try to guess them
 	if (cylinders == 0)
 	{
@@ -1675,7 +1675,7 @@ static void do_create_hd(parameters_t &params)
 		guess_chs(input_file_str, input_end - input_start, sector_size, cylinders, heads, sectors, sector_size);
 	}
 	UINT32 totalsectors = cylinders * heads * sectors;
-	
+
 	// print some info
 	astring tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->cstr());
@@ -1758,7 +1758,7 @@ static void do_create_cd(parameters_t &params)
 		if (err != CHDERR_NONE)
 			report_error(1, "Error parsing input file (%s: %s\n", input_file_str->cstr(), chd_file::error_string(err));
 	}
-	
+
 	// process output CHD
 	chd_file output_parent;
 	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
@@ -1766,7 +1766,7 @@ static void do_create_cd(parameters_t &params)
 	// process hunk size
 	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : CD_FRAMES_PER_HUNK * CD_FRAME_SIZE;
 	parse_hunk_size(params, CD_FRAME_SIZE, hunk_size);
-	
+
 	// process compression
 	chd_codec_type compression[4];
 	memcpy(compression, s_default_cd_compression, sizeof(compression));
@@ -1847,16 +1847,16 @@ static void do_create_ld(parameters_t &params)
 			report_error(1, "Error opening AVI file (%s): %s\n", input_file_str->cstr(), avi_error_string(avierr));
 	}
 	const avi_movie_info *aviinfo = avi_get_movie_info(input_file);
-	
+
 	// process output CHD
 	chd_file output_parent;
 	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
-	
+
 	// process input start/end
 	UINT64 input_start;
 	UINT64 input_end;
 	parse_input_start_end(params, aviinfo->video_numsamples, 0, 1, input_start, input_end);
-	
+
 	// determine parameters of the incoming video stream
 	avi_info info;
 	info.fps_times_1million = UINT64(aviinfo->video_timescale) * 1000000 / aviinfo->video_sampletime;
@@ -1878,11 +1878,11 @@ static void do_create_ld(parameters_t &params)
 	// determine the number of bytes per frame
 	info.max_samples_per_frame = (UINT64(info.rate) * 1000000 + info.fps_times_1million - 1) / info.fps_times_1million;
 	info.bytes_per_frame = avhuff_encoder::raw_data_size(info.width, info.height, info.channels, info.max_samples_per_frame);
-	
+
 	// process hunk size
 	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : info.bytes_per_frame;
 	parse_hunk_size(params, info.bytes_per_frame, hunk_size);
-	
+
 	// process compression
 	chd_codec_type compression[4];
 	memcpy(compression, s_default_ld_compression, sizeof(compression));
@@ -1932,7 +1932,7 @@ static void do_create_ld(parameters_t &params)
 
 		// create the compressor and then run it generically
 		compress_common(chd);
-		
+
 		// write the final LD metadata
 		if (info.height == 524/2 || info.height == 624/2)
 		{
@@ -1972,13 +1972,13 @@ static void do_copy(parameters_t &params)
 	// process output CHD
 	chd_file output_parent;
 	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
-	
+
 	// process hunk size
 	UINT32 hunk_size = input_chd.hunk_bytes();
 	parse_hunk_size(params, 1, hunk_size);
 	if (hunk_size % input_chd.hunk_bytes() != 0 && input_chd.hunk_bytes() % hunk_size != 0)
 		report_error(1, "Hunk size is not an even multiple or divisor of input hunk size");
-	
+
 	// process compression; we default to our current preferences using metadata to pick the type
 	chd_codec_type compression[4];
 	{
@@ -2041,13 +2041,13 @@ static void do_copy(parameters_t &params)
 				redo_cd = true;
 				continue;
 			}
-			
+
 			// otherwise, clone it
 			err = chd.write_metadata(metatag, CHDMETAINDEX_APPEND, metadata);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error writing cloned metadata: %s", chd_file::error_string(err));
 		}
-		
+
 		// if we need to re-do the CD metadata, do it now
 		if (redo_cd)
 		{
@@ -2059,7 +2059,7 @@ static void do_copy(parameters_t &params)
 			if (err != CHDERR_NONE)
 				report_error(1, "Error writing upgraded CD metadata: %s", chd_file::error_string(err));
 		}
-		
+
 		// compress it generically
 		compress_common(chd);
 	}
@@ -2090,12 +2090,12 @@ static void do_extract_raw(parameters_t &params)
 	UINT64 input_start;
 	UINT64 input_end;
 	parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
-	
+
 	// verify output file doesn't exist
 	astring *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
 		check_existing_output_file(params, *output_file_str);
-	
+
 	// print some info
 	astring tempstr;
 	printf("Output File:  %s\n", output_file_str->cstr());
@@ -2126,7 +2126,7 @@ static void do_extract_raw(parameters_t &params)
 			chd_error err = input_chd.read_bytes(offset, buffer, bytes_to_read);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
-			
+
 			// write to the output
 			UINT32 count = core_fwrite(output_file, buffer, bytes_to_read);
 			if (count != bytes_to_read)
@@ -2135,7 +2135,7 @@ static void do_extract_raw(parameters_t &params)
 			// advance
 			offset += bytes_to_read;
 		}
-		
+
 		// finish up
 		core_fclose(output_file);
 		printf("Extraction complete                                    \n");
@@ -2170,7 +2170,7 @@ static void do_extract_cd(parameters_t &params)
 	if (cdrom == NULL)
 		report_error(1, "Unable to recognize CHD file as a CD");
 	const cdrom_toc *toc = cdrom_get_toc(cdrom);
-	
+
 	// verify output file doesn't exist
 	astring *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
@@ -2186,7 +2186,7 @@ static void do_extract_cd(parameters_t &params)
 	if (output_bin_file_str == NULL)
 		output_bin_file_str = &default_name;
 	check_existing_output_file(params, *output_bin_file_str);
-	
+
 	// print some info
 	astring tempstr;
 	printf("Output TOC:   %s\n", output_file_str->cstr());
@@ -2213,7 +2213,7 @@ static void do_extract_cd(parameters_t &params)
 		UINT64 total_bytes = 0;
 		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
 			total_bytes += toc->tracks[tracknum].frames * (toc->tracks[tracknum].datasize + toc->tracks[tracknum].subsize);
-		
+
 		// iterate over tracks and copy all data
 		UINT64 outputoffs = 0;
 		UINT32 discoffs = 0;
@@ -2227,7 +2227,7 @@ static void do_extract_cd(parameters_t &params)
 			// resize the buffer for the track
 			UINT32 output_frame_size = trackinfo.datasize + ((trackinfo.subtype != CD_SUB_NONE) ? trackinfo.subsize : 0);
 			buffer.resize((TEMP_BUFFER_SIZE / output_frame_size) * output_frame_size);
-			
+
 			// now read and output the actual data
 			UINT32 bufferoffs = 0;
 			for (int frame = 0; frame < trackinfo.frames; frame++)
@@ -2267,7 +2267,7 @@ static void do_extract_cd(parameters_t &params)
 				}
 			}
 		}
-		
+
 		// finish up
 		core_fclose(output_bin_file);
 		core_fclose(output_toc_file);
@@ -2328,7 +2328,7 @@ static void do_extract_ld(parameters_t &params)
 	frame_bytes = avhuff_encoder::raw_data_size(width, height, channels, max_samples_per_frame);
 	if (frame_bytes != input_chd.hunk_bytes())
 		report_error(1, "Frame size does not match hunk size for this CHD");
-	
+
 	// parse out input start/end
 	UINT64 input_start;
 	UINT64 input_end;
@@ -2386,7 +2386,7 @@ static void do_extract_ld(parameters_t &params)
 			audio_data[chnum].resize(max_samples_per_frame);
 			avconfig.audio[chnum] = audio_data[chnum];
 		}
-		
+
 		// iterate over frames
 		bitmap_yuy16 fullbitmap(width, height * interlace_factor);
 		for (int framenum = input_start; framenum < input_end; framenum++)
@@ -2396,7 +2396,7 @@ static void do_extract_ld(parameters_t &params)
 			// set up the fake bitmap for this frame
 			avconfig.video.wrap(&fullbitmap.pix(framenum % interlace_factor), fullbitmap.width(), fullbitmap.height() / interlace_factor, fullbitmap.rowpixels() * interlace_factor);
 			input_chd.codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
-			
+
 			// read the hunk into the buffers
 			chd_error err = input_chd.read_hunk(framenum, NULL);
 			if (err != CHDERR_NONE)
@@ -2454,13 +2454,13 @@ static void do_add_metadata(parameters_t &params)
 		tag_str->cat("    ");
 		tag = CHD_MAKE_TAG((*tag_str)[0], (*tag_str)[1], (*tag_str)[2], (*tag_str)[3]);
 	}
-	
+
 	// process index
 	UINT32 index = 0;
 	astring *index_str = params.find(OPTION_INDEX);
 	if (index_str != NULL)
 		index = atoi(*index_str);
-	
+
 	// process text input
 	astring *text_str = params.find(OPTION_VALUE_TEXT);
 	astring text;
@@ -2470,7 +2470,7 @@ static void do_add_metadata(parameters_t &params)
 		if (text[0] == '"' && text[text.len() - 1] == '"')
 			text.substr(1, text.len() - 2);
 	}
-	
+
 	// process file input
 	astring *file_str = params.find(OPTION_VALUE_FILE);
 	dynamic_buffer file;
@@ -2480,18 +2480,18 @@ static void do_add_metadata(parameters_t &params)
 		if (filerr != FILERR_NONE)
 			report_error(1, "Error reading metadata file (%s)", file_str->cstr());
 	}
-	
+
 	// make sure we have one or the other
 	if (text_str == NULL && file_str == NULL)
 		report_error(1, "Error: missing either --valuetext/-vt or --valuefile/-vf parameters");
 	if (text_str != NULL && file_str != NULL)
 		report_error(1, "Error: both --valuetext/-vt or --valuefile/-vf parameters specified; only one permitted");
-	
+
 	// process no checksum
 	UINT8 flags = CHD_MDFLAGS_CHECKSUM;
 	if (params.find(OPTION_NO_CHECKSUM) != NULL)
 		flags &= ~CHD_MDFLAGS_CHECKSUM;
-	
+
 	// print some info
 	astring tempstr;
 	printf("Input file:   %s\n", params.find(OPTION_INPUT)->cstr());
@@ -2516,7 +2516,7 @@ static void do_add_metadata(parameters_t &params)
 
 
 //-------------------------------------------------
-//  do_del_metadata - remove metadata from a CHD 
+//  do_del_metadata - remove metadata from a CHD
 //-------------------------------------------------
 
 static void do_del_metadata(parameters_t &params)
@@ -2534,13 +2534,13 @@ static void do_del_metadata(parameters_t &params)
 		tag_str->cat("    ");
 		tag = CHD_MAKE_TAG((*tag_str)[0], (*tag_str)[1], (*tag_str)[2], (*tag_str)[3]);
 	}
-	
+
 	// process index
 	UINT32 index = 0;
 	astring *index_str = params.find(OPTION_INDEX);
 	if (index_str != NULL)
 		index = atoi(*index_str);
-	
+
 	// print some info
 	astring tempstr;
 	printf("Input file:   %s\n", params.find(OPTION_INPUT)->cstr());
@@ -2578,13 +2578,13 @@ int CLIB_DECL main(int argc, char *argv[])
 			return print_help(argv[0]);
 		command = argv[argnum++];
 	}
-	
+
 	// iterate over commands to find our match
 	for (int cmdnum = 0; cmdnum < ARRAY_LENGTH(s_commands); cmdnum++)
 		if (strcmp(command, s_commands[cmdnum].name) == 0)
 		{
 			const command_description &desc = s_commands[cmdnum];
-		
+
 			// print help if that was requested
 			if (help)
 				return print_help(argv[0], desc);
@@ -2629,7 +2629,7 @@ int CLIB_DECL main(int argc, char *argv[])
 								return print_help(argv[0], desc, "Option is missing parameter");
 							param = argv[argnum++];
 						}
-						
+
 						// add to the map
 						if (parameters.add(odesc.name, new astring(param)) == TMERR_DUPLICATE)
 							return print_help(argv[0], desc, "Multiple parameters of the same type specified");
@@ -2641,7 +2641,7 @@ int CLIB_DECL main(int argc, char *argv[])
 				if (valid == ARRAY_LENGTH(desc.valid_options))
 					return print_help(argv[0], desc, "Option not valid for this command");
 			}
-			
+
 			// make sure we got all our required parameters
 			for (int valid = 0; valid < ARRAY_LENGTH(desc.valid_options); valid++)
 			{
@@ -2651,7 +2651,7 @@ int CLIB_DECL main(int argc, char *argv[])
 				if (*validname == REQUIRED[0] && parameters.find(++validname) == NULL)
 					return print_help(argv[0], desc, "Required parameters missing");
 			}
-			
+
 			// all clear, run the command
 			try
 			{
@@ -2673,7 +2673,7 @@ int CLIB_DECL main(int argc, char *argv[])
 				return 1;
 			}
 		}
-	
+
 	// print generic help if nothing found
 	return print_help(argv[0]);
 }

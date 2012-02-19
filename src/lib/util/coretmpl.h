@@ -59,7 +59,7 @@ private:
 
 public:
 	// construction/destruction
-	dynamic_array(int initial = 0) 
+	dynamic_array(int initial = 0)
 		: m_array(NULL),
 		  m_count(0),
 		  m_allocated(0) { if (initial != 0) expand_internal(initial); m_count = initial; }
@@ -73,7 +73,7 @@ public:
 
 	// simple getters
 	int count() const { return m_count; }
-	
+
 	// helpers
 	void append(const _ElementType &element) { if (m_count == m_allocated) expand_internal((m_allocated == 0) ? 16 : (m_allocated << 1), true); m_array[m_count++] = element; }
 	void reset() { delete[] m_array; m_array = NULL; m_count = m_allocated = 0; }

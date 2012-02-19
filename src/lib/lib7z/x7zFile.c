@@ -120,12 +120,12 @@ WRes File_Read(CSzFile *p, void *data, size_t *size)
   return 0;
 
   #else
-  
+
   *size = fread(data, 1, originalSize, p->file);
   if (*size == originalSize)
     return 0;
   return ferror(p->file);
-  
+
   #endif
 }
 
@@ -134,7 +134,7 @@ WRes File_Write(CSzFile *p, const void *data, size_t *size)
   size_t originalSize = *size;
   if (originalSize == 0)
     return 0;
-  
+
   #ifdef USE_WINDOWS_FILE
 
   *size = 0;
@@ -160,7 +160,7 @@ WRes File_Write(CSzFile *p, const void *data, size_t *size)
   if (*size == originalSize)
     return 0;
   return ferror(p->file);
-  
+
   #endif
 }
 
@@ -190,7 +190,7 @@ WRes File_Seek(CSzFile *p, Int64 *pos, ESzSeek origin)
   return 0;
 
   #else
-  
+
   int moveMethod;
   int res;
   switch (origin)
@@ -203,14 +203,14 @@ WRes File_Seek(CSzFile *p, Int64 *pos, ESzSeek origin)
   res = fseek(p->file, (long)*pos, moveMethod);
   *pos = ftell(p->file);
   return res;
-  
+
   #endif
 }
 
 WRes File_GetLength(CSzFile *p, UInt64 *length)
 {
   #ifdef USE_WINDOWS_FILE
-  
+
   DWORD sizeHigh;
   DWORD sizeLow = GetFileSize(p->handle, &sizeHigh);
   if (sizeLow == 0xFFFFFFFF)
@@ -221,15 +221,15 @@ WRes File_GetLength(CSzFile *p, UInt64 *length)
   }
   *length = (((UInt64)sizeHigh) << 32) + sizeLow;
   return 0;
-  
+
   #else
-  
+
   long pos = ftell(p->file);
   int res = fseek(p->file, 0, SEEK_END);
   *length = ftell(p->file);
   fseek(p->file, pos, SEEK_SET);
   return res;
-  
+
   #endif
 }
 

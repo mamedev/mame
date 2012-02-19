@@ -55,11 +55,11 @@ class bitstream_in
 public:
 	// construction/destruction
 	bitstream_in(const void *src, UINT32 srclength);
-	
+
 	// getters
 	bool overflow() const { return ((m_doffset - m_bits / 8) > m_dlength); }
 	UINT32 read_offset() const;
-	
+
 	// operations
 	UINT32 read(int numbits);
 	UINT32 peek(int numbits);
@@ -82,10 +82,10 @@ class bitstream_out
 public:
 	// construction/destruction
 	bitstream_out(void *dest, UINT32 destlength);
-	
+
 	// getters
 	bool overflow() const { return (m_doffset > m_dlength); }
-	
+
 	// operations
 	void write(UINT32 newbits, int numbits);
 	UINT32 flush();

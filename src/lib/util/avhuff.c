@@ -60,8 +60,8 @@
         +02 = samples (2 bytes) - number of samples per audio stream
         +04 = width (2 bytes) - width of video data
         +06 = height (2 bytes) - height of video data
-        +08 = audio huffman size (2 bytes) - size of audio huffman tables 
-        		(0x0000 => uncompressed deltas are used)
+        +08 = audio huffman size (2 bytes) - size of audio huffman tables
+                (0x0000 => uncompressed deltas are used)
         +0A = str0size (2 bytes) - compressed size of stream 0
         +0C = str1size (2 bytes) - compressed size of stream 1
               ...
@@ -214,7 +214,7 @@ m_flac_encoder.set_strip_metadata(true);
 
 
 //-------------------------------------------------
-//  encode_data - encode a block of data into a 
+//  encode_data - encode a block of data into a
 //  compressed data stream
 //-------------------------------------------------
 
@@ -343,12 +343,12 @@ avhuff_error avhuff_encoder::assemble_data(UINT8 *dest, UINT32 dlength, bitmap_y
 	*dest++ = bitmap.width() & 0xff;
 	*dest++ = bitmap.height() >> 8;
 	*dest++ = bitmap.height() & 0xff;
-	
+
 	// copy the metadata
 	if (metadatasize > 0)
 		memcpy(dest, metadata, metadatasize);
 	dest += metadatasize;
-	
+
 	// copy the audio streams
 	for (UINT8 curchan = 0; curchan < channels; curchan++)
 		for (UINT32 cursamp = 0; cursamp < numsamples; cursamp++)
@@ -356,7 +356,7 @@ avhuff_error avhuff_encoder::assemble_data(UINT8 *dest, UINT32 dlength, bitmap_y
 			*dest++ = samples[curchan][cursamp] >> 8;
 			*dest++ = samples[curchan][cursamp] & 0xff;
 		}
-	
+
 	// copy the video data
 	for (INT32 y = 0; y < bitmap.height(); y++)
 	{
@@ -372,7 +372,7 @@ avhuff_error avhuff_encoder::assemble_data(UINT8 *dest, UINT32 dlength, bitmap_y
 
 
 //-------------------------------------------------
-//  encode_audio - encode raw audio data to the 
+//  encode_audio - encode raw audio data to the
 //  destination
 //-------------------------------------------------
 
@@ -384,20 +384,20 @@ avhuff_error avhuff_encoder::encode_audio(const UINT8 *source, int channels, int
 	UINT16 be_test = 0;
 	*(UINT8 *)&be_test = 1;
 	bool swap_endian = (be_test == 1);
-	
+
 	// set huffman tree size to 0xffff to indicate FLAC
 	sizes[0] = 0xff;
 	sizes[1] = 0xff;
-	
+
 	// set the block size for this round and iterate over channels
 	m_flac_encoder.set_block_size(samples);
-	for (int chnum = 0; chnum < channels; chnum++) 
+	for (int chnum = 0; chnum < channels; chnum++)
 	{
 		// encode the data
 		m_flac_encoder.reset(dest, samples * 2);
 		if (!m_flac_encoder.encode_interleaved(reinterpret_cast<const INT16 *>(source) + chnum * samples, samples, swap_endian))
 			return AVHERR_COMPRESSION_ERROR;
-		
+
 		// set the size for this channel
 		UINT32 cursize = m_flac_encoder.finish();
 		sizes[chnum * 2 + 2] = cursize >> 8;
@@ -495,7 +495,7 @@ avhuff_error avhuff_encoder::encode_audio(const UINT8 *source, int channels, int
 
 
 //-------------------------------------------------
-//  encode_video - encode raw video data to the 
+//  encode_video - encode raw video data to the
 //  destination
 //-------------------------------------------------
 
@@ -516,7 +516,7 @@ avhuff_error avhuff_encoder::encode_video_lossless(const UINT8 *source, int widt
 	// set up the output; first byte is 0x80 to indicate lossless encoding
 	bitstream_out bitbuf(dest, width * height * 2);
 	bitbuf.write(0x80, 8);
-	
+
 	// compute the histograms for the data
 	UINT16 *yrle = m_ycontext.rle_and_histo_bitmap(source + 0, width, 2, height);
 	UINT16 *cbrle = m_cbcontext.rle_and_histo_bitmap(source + 1, width / 2, 4, height);
@@ -563,7 +563,7 @@ avhuff_error avhuff_encoder::encode_video_lossless(const UINT8 *source, int widt
 //**************************************************************************
 
 //-------------------------------------------------
-//  rle_and_histo_bitmap - RLE compress and 
+//  rle_and_histo_bitmap - RLE compress and
 //  histogram a bitmap's worth of data
 //-------------------------------------------------
 
@@ -584,12 +584,12 @@ UINT16 *avhuff_encoder::deltarle_encoder::rle_and_histo_bitmap(const UINT8 *sour
 			// fetch current data
 			UINT8 curdelta = *source - prevdata;
 			prevdata = *source;
-			
+
 			// 0 deltas scan forward for a count
 			if (curdelta == 0)
 			{
 				int zerocount = 1;
-				
+
 				// count the number of consecutive values
 				const UINT8 *scandata;
 				for (scandata = source + item_advance; scandata < end; scandata += item_advance)
@@ -597,7 +597,7 @@ UINT16 *avhuff_encoder::deltarle_encoder::rle_and_histo_bitmap(const UINT8 *sour
 						zerocount++;
 					else
 						break;
-				
+
 				// if we hit the end of a row, maximize the count
 				if (scandata >= end && zerocount >= 8)
 					zerocount = 100000;
@@ -609,16 +609,16 @@ UINT16 *avhuff_encoder::deltarle_encoder::rle_and_histo_bitmap(const UINT8 *sour
 				// advance past the run
 				source += (code_to_rlecount(rlecode) - 1) * item_advance;
 			}
-			
+
 			// otherwise, encode the actual data
 			else
 				m_encoder.histo_one(*dest++ = curdelta);
 		}
-		
+
 		// advance to the next row
 		source = end;
 	}
-	
+
 	// compute the tree for our histogram
 	m_encoder.compute_tree_from_histo();
 	return m_rlebuffer;
@@ -787,7 +787,7 @@ avhuff_error avhuff_decoder::decode_data(const UINT8 *source, UINT32 complength,
 
 
 //-------------------------------------------------
-//  decode_audio - decode audio from a compressed 
+//  decode_audio - decode audio from a compressed
 //  data stream
 //-------------------------------------------------
 
@@ -827,7 +827,7 @@ avhuff_error avhuff_decoder::decode_audio(int channels, int samples, const UINT8
 				// finish up
 				m_flac_decoder.finish();
 			}
-		
+
 			// advance to the next channel's data
 			source += size;
 		}
@@ -881,7 +881,7 @@ avhuff_error avhuff_decoder::decode_audio(int channels, int samples, const UINT8
 					curdest += 2;
 				}
 			}
-			
+
 			// otherwise, Huffman-decode the data
 			else
 			{
@@ -902,7 +902,7 @@ avhuff_error avhuff_decoder::decode_audio(int channels, int samples, const UINT8
 					return AVHERR_INVALID_DATA;
 			}
 		}
-		
+
 		// advance to the next channel's data
 		source += size;
 	}
@@ -911,7 +911,7 @@ avhuff_error avhuff_decoder::decode_audio(int channels, int samples, const UINT8
 
 
 //-------------------------------------------------
-//  decode_video - decode video from a compressed 
+//  decode_video - decode video from a compressed
 //  data stream
 //-------------------------------------------------
 
@@ -969,7 +969,7 @@ avhuff_error avhuff_decoder::decode_video_lossless(int width, int height, const 
 		m_cbcontext.flush_rle();
 		m_crcontext.flush_rle();
 	}
-	
+
 	// check for errors if we overflowed or decoded too little data
 	if (bitbuf.overflow() || bitbuf.flush() != complength)
 		return AVHERR_INVALID_DATA;

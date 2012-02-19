@@ -129,7 +129,7 @@ private:
 		// construction/destruction
 		deltarle_encoder()
 			: m_rlecount(0) { }
-			
+
 		// histogramming
 		UINT16 *rle_and_histo_bitmap(const UINT8 *source, UINT32 items_per_row, UINT32 item_advance, UINT32 row_count);
 
@@ -150,10 +150,10 @@ private:
 	avhuff_error encode_video(const UINT8 *source, int width, int height, UINT8 *dest, UINT32 &complength);
 	avhuff_error encode_video_lossless(const UINT8 *source, int width, int height, UINT8 *dest, UINT32 &complength);
 
-	// video encoding contexts	
-	deltarle_encoder		 	m_ycontext;
-	deltarle_encoder		 	m_cbcontext;
-	deltarle_encoder		 	m_crcontext;
+	// video encoding contexts
+	deltarle_encoder			m_ycontext;
+	deltarle_encoder			m_cbcontext;
+	deltarle_encoder			m_crcontext;
 
 	// audio encoding contexts
 	dynamic_buffer				m_audiobuffer;
@@ -189,7 +189,7 @@ private:
 		// construction/destruction
 		deltarle_decoder()
 			: m_rlecount(0), m_prevdata(0) { }
-			
+
 		// general
 		void reset() { m_rlecount = m_prevdata = 0; }
 
@@ -212,12 +212,12 @@ private:
 	avhuff_error decode_video_lossless(int width, int height, const UINT8 *source, UINT32 complength, UINT8 *dest, UINT32 dstride, UINT32 dxor);
 
 	// internal state
-	avhuff_decompress_config 	m_config;
+	avhuff_decompress_config	m_config;
 
 	// video decoding contexts
-	deltarle_decoder		 	m_ycontext;
-	deltarle_decoder		 	m_cbcontext;
-	deltarle_decoder		 	m_crcontext;
+	deltarle_decoder			m_ycontext;
+	deltarle_decoder			m_cbcontext;
+	deltarle_decoder			m_crcontext;
 
 	// audio decoding contexts
 	huffman_8bit_decoder		m_audiohi_decoder;

@@ -1,39 +1,39 @@
 /***************************************************************************
 
-	hashing.h
+    hashing.h
 
-	Hashing helper classes.
+    Hashing helper classes.
 
 ****************************************************************************
 
-	Copyright Aaron Giles
-	All rights reserved.
+    Copyright Aaron Giles
+    All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are
-	met:
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
 
-		* Redistributions of source code must retain the above copyright
-		  notice, this list of conditions and the following disclaimer.
-		* Redistributions in binary form must reproduce the above copyright
-		  notice, this list of conditions and the following disclaimer in
-		  the documentation and/or other materials provided with the
-		  distribution.
-		* Neither the name 'MAME' nor the names of its contributors may be
-		  used to endorse or promote products derived from this software
-		  without specific prior written permission.
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
-	IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-	DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
-	INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-	SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-	STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-	IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -73,13 +73,13 @@ class sha1_creator
 public:
 	// construction/destruction
 	sha1_creator() { reset(); }
-	
+
 	// reset
 	void reset() { sha1_init(&m_context); }
-	
+
 	// append data
 	void append(const void *data, UINT32 length) { sha1_update(&m_context, length, reinterpret_cast<const UINT8 *>(data)); }
-	
+
 	// finalize and compute the final digest
 	sha1_t finish()
 	{
@@ -92,8 +92,8 @@ public:
 	// static wrapper to just get the digest from a block
 	static sha1_t simple(const void *data, UINT32 length)
 	{
-		sha1_creator creator; 
-		creator.append(data, length); 
+		sha1_creator creator;
+		creator.append(data, length);
 		return creator.finish();
 	}
 
@@ -124,13 +124,13 @@ class md5_creator
 public:
 	// construction/destruction
 	md5_creator() { reset(); }
-	
+
 	// reset
 	void reset() { MD5Init(&m_context); }
-	
+
 	// append data
 	void append(const void *data, UINT32 length) { MD5Update(&m_context, reinterpret_cast<const unsigned char *>(data), length); }
-	
+
 	// finalize and compute the final digest
 	md5_t finish()
 	{
@@ -142,14 +142,14 @@ public:
 	// static wrapper to just get the digest from a block
 	static md5_t simple(const void *data, UINT32 length)
 	{
-		md5_creator creator; 
-		creator.append(data, length); 
+		md5_creator creator;
+		creator.append(data, length);
 		return creator.finish();
 	}
 
 protected:
 	// internal state
-	struct MD5Context 	m_context;		// internal context
+	struct MD5Context	m_context;		// internal context
 };
 
 
@@ -175,21 +175,21 @@ class crc32_creator
 public:
 	// construction/destruction
 	crc32_creator() { reset(); }
-	
+
 	// reset
 	void reset() { m_accum.m_raw = 0; }
-	
+
 	// append data
 	void append(const void *data, UINT32 length);
-	
+
 	// finalize and compute the final digest
 	crc32_t finish() { return m_accum; }
 
 	// static wrapper to just get the digest from a block
 	static crc32_t simple(const void *data, UINT32 length)
 	{
-		crc32_creator creator; 
-		creator.append(data, length); 
+		crc32_creator creator;
+		creator.append(data, length);
 		return creator.finish();
 	}
 
@@ -221,21 +221,21 @@ class crc16_creator
 public:
 	// construction/destruction
 	crc16_creator() { reset(); }
-	
+
 	// reset
 	void reset() { m_accum.m_raw = 0xffff; }
-	
+
 	// append data
 	void append(const void *data, UINT32 length);
-	
+
 	// finalize and compute the final digest
 	crc16_t finish() { return m_accum; }
 
 	// static wrapper to just get the digest from a block
 	static crc16_t simple(const void *data, UINT32 length)
 	{
-		crc16_creator creator; 
-		creator.append(data, length); 
+		crc16_creator creator;
+		creator.append(data, length);
 		return creator.finish();
 	}
 

@@ -921,7 +921,7 @@ static void write_sector_done(ide_state *ide)
 	/* now do the write */
 	if (ide->drive[ide->cur_drive].slot) {
 		count = ide->drive[ide->cur_drive].slot->write_sector(lba, ide->buffer);
-	}	
+	}
 
 	/* by default, mark the buffer ready and the seek complete */
 	ide->status |= IDE_STATUS_BUFFER_READY;
@@ -1174,7 +1174,7 @@ static void handle_command(ide_state *ide, UINT8 command)
 			ide->status &= ~IDE_STATUS_ERROR;
 			ide->error = IDE_ERROR_NONE;
 			ide->drive[ide->cur_drive].slot->set_geometry(ide->sector_count,ide->drive[ide->cur_drive].cur_head + 1);
-			
+
 			/* signal an interrupt */
 			signal_delayed_interrupt(ide, MINIMUM_COMMAND_TIME, 0);
 			break;
@@ -1921,7 +1921,7 @@ static DEVICE_START( ide_controller )
 static DEVICE_RESET( ide_controller )
 {
 	ide_state *ide = get_safe_token(device);
-	LOG(("IDE controller reset performed\n"));	
+	LOG(("IDE controller reset performed\n"));
 	/* reset the drive state */
 	ide->cur_drive = 0;
 	ide->status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
@@ -1938,7 +1938,7 @@ SLOT_INTERFACE_START(ide_image_devices)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START(ide_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)	
+	SLOT_INTERFACE("hdd", IDE_HARDDISK)
 SLOT_INTERFACE_END
 
 /*-------------------------------------------------
@@ -2060,7 +2060,7 @@ void ide_hdd_device::device_reset()
 {
 	m_handle = get_disk_handle(machine(), owner()->tag());
 	m_disk = hard_disk_open(m_handle);
-	
+
 	if (m_disk != NULL)
 	{
 		const hard_disk_info *hdinfo = hard_disk_get_info(m_disk);
@@ -2072,11 +2072,11 @@ void ide_hdd_device::device_reset()
 			if (PRINTF_IDE_COMMANDS) mame_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
 			mame_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
 		}
-		// build the features page 
+		// build the features page
 		UINT32 metalength;
 		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
 			ide_build_features();
-	}	
+	}
 }
 
 //-------------------------------------------------
@@ -2137,7 +2137,7 @@ void ide_hdd_image_device::device_reset()
 				m_num_heads = hdinfo->heads;
 				if (PRINTF_IDE_COMMANDS) printf("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
 			}
-			// build the features page 
+			// build the features page
 			UINT32 metalength;
 			if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
 				ide_build_features();
@@ -2152,7 +2152,7 @@ void ide_hdd_image_device::device_reset()
 //-------------------------------------------------
 static MACHINE_CONFIG_FRAGMENT( hdd_image )
 	MCFG_HARDDISK_ADD( "harddisk" )
-MACHINE_CONFIG_END	
+MACHINE_CONFIG_END
 
 machine_config_constructor ide_hdd_image_device::device_mconfig_additions() const
 {

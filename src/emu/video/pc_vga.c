@@ -1072,8 +1072,8 @@ static void recompute_params(running_machine &machine)
 static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 {
 	/* Doom does this */
-// 	if(vga.crtc.protect_enable && index <= 0x07)
-// 		printf("write to protected address %02x\n",index);
+//  if(vga.crtc.protect_enable && index <= 0x07)
+//      printf("write to protected address %02x\n",index);
 
 	switch(index)
 	{
@@ -1260,7 +1260,7 @@ static UINT8 vga_vblank(running_machine &machine)
 			res = 1;
 	}
 
-//	popmessage("%d %d %d",vblank_start,vblank_end,vga.crtc.vert_total);
+//  popmessage("%d %d %d",vblank_start,vblank_end,vga.crtc.vert_total);
 
 	return res;
 }
@@ -2234,7 +2234,7 @@ WRITE8_HANDLER(tseng_et4k_03d0_w)
 				vga.crtc.data[vga.crtc.index] = data;
 				tseng_crtc_reg_write(space->machine(),vga.crtc.index,data);
 				//if((vga.crtc.index & 0xfe) != 0x0e)
-				//	printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
+				//  printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
 				break;
 			case 8:
 				et4k.reg_3d8 = data;

@@ -150,7 +150,7 @@ static WRITE8_DEVICE_HANDLER( kungfur_latch3_w )
 static WRITE8_DEVICE_HANDLER( kungfur_control_w )
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	
+
 	// d0-d3: N/C
 	// d4: irq ack
 	if (~data & 0x10)
@@ -193,7 +193,7 @@ static void kfr_adpcm1_int(device_t *device)
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 	UINT8 *ROM = device->machine().region("adpcm1")->base();
 	UINT8 data = ROM[state->m_adpcm_pos[0] & 0x1ffff];
-	
+
 	msm5205_data_w(device, state->m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
 	state->m_adpcm_pos[0] += state->m_adpcm_sel[0];
 	state->m_adpcm_sel[0] ^= 1;
@@ -204,7 +204,7 @@ static void kfr_adpcm2_int(device_t *device)
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 	UINT8 *ROM = device->machine().region("adpcm2")->base();
 	UINT8 data = ROM[state->m_adpcm_pos[1] & 0x3ffff];
-	
+
 	msm5205_data_w(device, state->m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
 	state->m_adpcm_pos[1] += state->m_adpcm_sel[1];
 	state->m_adpcm_sel[1] ^= 1;
@@ -244,10 +244,10 @@ static INPUT_PORTS_START( kungfur )
 	PORT_DIPSETTING( 0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING( 0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING( 0x03, DEF_STR( 1C_2C ) )
-//	PORT_DIPSETTING( 0x01, DEF_STR( 1C_2C ) ) // dupe
+//  PORT_DIPSETTING( 0x01, DEF_STR( 1C_2C ) ) // dupe
 	PORT_DIPSETTING( 0x02, DEF_STR( 1C_3C ) )
-//	PORT_DIPSETTING( 0x00, DEF_STR( 1C_3C ) ) // dupe
-//	PORT_DIPSETTING( 0x04, DEF_STR( 0C_0C ) ) // invalid
+//  PORT_DIPSETTING( 0x00, DEF_STR( 1C_3C ) ) // dupe
+//  PORT_DIPSETTING( 0x04, DEF_STR( 0C_0C ) ) // invalid
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END

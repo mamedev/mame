@@ -421,7 +421,7 @@ SRes MixCoder_Code(CMixCoder *p, Byte *dest, SizeT *destLen,
       const Byte *srcCur;
       int srcFinishedCur;
       int encodingWasFinished;
-      
+
       if (i == 0)
       {
         srcCur = src;
@@ -434,7 +434,7 @@ SRes MixCoder_Code(CMixCoder *p, Byte *dest, SizeT *destLen,
         srcLenCur = p->size[i - 1] - p->pos[i - 1];
         srcFinishedCur = p->finished[i - 1];
       }
-      
+
       if (i == p->numCoders - 1)
       {
         destCur = dest;
@@ -447,7 +447,7 @@ SRes MixCoder_Code(CMixCoder *p, Byte *dest, SizeT *destLen,
         destCur = p->buf + (CODER_BUF_SIZE * i);
         destLenCur = CODER_BUF_SIZE;
       }
-      
+
       res = coder->Code(coder->p, destCur, &destLenCur, srcCur, &srcLenCur, srcFinishedCur, finishMode, &encodingWasFinished);
 
       if (!encodingWasFinished)
@@ -474,7 +474,7 @@ SRes MixCoder_Code(CMixCoder *p, Byte *dest, SizeT *destLen,
         p->pos[i] = 0;
         p->finished[i] = encodingWasFinished;
       }
-      
+
       if (res != SZ_OK)
         return res;
 
@@ -637,20 +637,20 @@ SRes XzUnpacker_Code(CXzUnpacker *p, Byte *dest, SizeT *destLen,
         *status = CODER_STATUS_NOT_FINISHED;
         return SZ_OK;
       }
-      
+
       res = MixCoder_Code(&p->decoder, dest, &destLen2, src, &srcLen2, False, finishMode, status);
       XzCheck_Update(&p->check, dest, destLen2);
-      
+
       (*srcLen) += srcLen2;
       src += srcLen2;
       p->packSize += srcLen2;
-      
+
       (*destLen) += destLen2;
       dest += destLen2;
       p->unpackSize += destLen2;
-      
+
       RINOK(res);
-      
+
       if (*status == CODER_STATUS_FINISHED_WITH_MARK)
       {
         Byte temp[32];
@@ -659,14 +659,14 @@ SRes XzUnpacker_Code(CXzUnpacker *p, Byte *dest, SizeT *destLen,
         Sha256_Update(&p->sha, temp, num);
         p->indexSize += num;
         p->numBlocks++;
-        
+
         p->state = XZ_STATE_BLOCK_FOOTER;
         p->pos = 0;
         p->alignPos = 0;
       }
       else if (srcLen2 == 0 && destLen2 == 0)
         return SZ_OK;
-      
+
       continue;
     }
 
@@ -872,7 +872,7 @@ SRes XzUnpacker_Code(CXzUnpacker *p, Byte *dest, SizeT *destLen,
         }
         break;
       }
-      
+
       case XZ_STATE_BLOCK: break; /* to disable GCC warning */
     }
   }

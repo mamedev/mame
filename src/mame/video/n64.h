@@ -370,7 +370,7 @@ struct rdp_span_aux
 	INT32				m_precomp_t;
 	UINT8				BlendEnable;
 	bool				PreWrap;
-	INT32 				m_dzpix_enc;
+	INT32				m_dzpix_enc;
 	UINT8				*m_tmem;				/* pointer to texture cache for this polygon */
 	bool				m_start_span;
 };
@@ -594,14 +594,14 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 
 		UINT8 ReplicatedRGBA[32];
 
-		Rectangle 		Scissor;
+		Rectangle		Scissor;
 		SpanBaseT		SpanBase;
 
-		rectangle 		visarea;
+		rectangle		visarea;
 
 		void			DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect);
-		void 			compute_cvg_noflip(extent_t *Spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
-		void 			compute_cvg_flip(extent_t *Spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
+		void			compute_cvg_noflip(extent_t *Spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
+		void			compute_cvg_flip(extent_t *Spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
 
 		void*			AuxBuf;
 		UINT32			AuxBufPtr;
@@ -611,7 +611,7 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		UINT32			ExtentBufPtr[2];
 		UINT32			ExtentBufIndex;
 
-		bool 			rdp_range_check(UINT32 addr);
+		bool			rdp_range_check(UINT32 addr);
 
 		N64Tile		m_tiles[8];
 

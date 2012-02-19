@@ -68,7 +68,7 @@ void nscsi_bus_device::regen_ctrl(int refid)
 			}
 		logerror("\n");
 	}
-		
+
 	octrl = octrl ^ ctrl;
 	if(octrl)
 		for(int i=0; i<devcnt; i++)
@@ -357,7 +357,7 @@ void nscsi_full_device::step(bool timeout)
 		} else
 			target_recv_byte();
 		break;
-		
+
 	default:
 		logerror("%s: step() unexpected state %d.%d\n",
 				 tag(),
@@ -442,7 +442,7 @@ nscsi_full_device::control *nscsi_full_device::buf_control_pop()
 	buf_control_rpos++;
 	if(buf_control_rpos == buf_control_wpos)
 		buf_control_rpos = buf_control_wpos = 0;
-	return c;	
+	return c;
 }
 
 void nscsi_full_device::scsi_status_complete(UINT8 st)

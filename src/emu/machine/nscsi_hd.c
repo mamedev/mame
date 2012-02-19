@@ -83,7 +83,7 @@ void nscsi_harddisk_device::scsi_command()
 			bad_lun();
 			return;
 		}
-			
+
 		int page = scsi_cmdbuf[2];
 		int size = scsi_cmdbuf[4];
 		switch(page) {

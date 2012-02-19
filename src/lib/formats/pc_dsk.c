@@ -300,7 +300,7 @@ bool pc_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	const format &f = formats[type];
 	if(!f.desc)
 		return false;
-	
+
 	UINT8 sectdata[36*512];
 	desc_s sectors[36];
 	for(int i=0; i<f.sector_count; i++) {

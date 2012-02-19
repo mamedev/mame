@@ -6861,7 +6861,7 @@ ROM_START( initdv3e )
 
 	ROM_REGION( 0x4300, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0384-COM)
-    ROM_LOAD( "317-0384-com.pic", 0x000000, 0x004300, CRC(081ccd51) SHA1(598b3bd9e8b16f5954d15738c1ca55703609b690) ) 
+    ROM_LOAD( "317-0384-com.pic", 0x000000, 0x004300, CRC(081ccd51) SHA1(598b3bd9e8b16f5954d15738c1ca55703609b690) )
 ROM_END
 
 /*
@@ -7062,29 +7062,29 @@ ROM_START( soulsurf )
 
     ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
     // Cart has a Sega factory EPROM sticker stating "EPR-23838C" and a Sega factory sticker stating "Rev. A".  Seriously.
-    ROM_LOAD( "epr-23838c.ic22", 0x000000, 0x400000, CRC(5e5fb00f) SHA1(c5e81ebead9072cc08f09d1715d609cb0f7631ba) ) 
+    ROM_LOAD( "epr-23838c.ic22", 0x000000, 0x400000, CRC(5e5fb00f) SHA1(c5e81ebead9072cc08f09d1715d609cb0f7631ba) )
     ROM_RELOAD( 0x400000, 0x400000)
-    ROM_LOAD( "ssf01.ic1s",   0x0800000, 0x800000, CRC(4f12f789) SHA1(7b79b687fc61e2e981b9e5e8e0939c4ad24a98f0) ) 
-    ROM_LOAD( "ssf02.ic2s",   0x1000000, 0x800000, CRC(a255d41a) SHA1(3e932527eb68edf3e8538c1ad264a1c599f6a9d5) ) 
-    ROM_LOAD( "ssf03.ic3s",   0x1800000, 0x800000, CRC(0f8d6577) SHA1(afaf440e667bacc941c0a5418a0e3b0f2bb725b7) ) 
-    ROM_LOAD( "ssf04.ic4s",   0x2000000, 0x800000, CRC(bdf25bd0) SHA1(f79b1fdba9c48969c49617c43c1919637adb13ba) ) 
-    ROM_LOAD( "ssf05.ic5s",   0x2800000, 0x800000, CRC(a74b3bb4) SHA1(0ce7cef849061a9af7a61d69dc633f6971a3a63d) ) 
-    ROM_LOAD( "ssf06.ic6s",   0x3000000, 0x800000, CRC(3cd1f5d5) SHA1(77573c3a60af64e6e6a0eb85d5b8176ed98b0723) ) 
-    ROM_LOAD( "ssf07.ic7s",   0x3800000, 0x800000, CRC(00d240f5) SHA1(43010fc596f2cdffdff35a6122f2ab02a5251bc0) ) 
-    ROM_LOAD( "ssf08.ic8s",   0x4000000, 0x800000, CRC(d4907fa1) SHA1(79b1c771819f6e4baa048010bfb940a45370eba2) ) 
-    ROM_LOAD( "ssf09.ic9s",   0x4800000, 0x800000, CRC(6327d49e) SHA1(a10e3c27f70dbf18e63cf51962b6a79a52eba26c) ) 
-    ROM_LOAD( "ssf10.ic10s",  0x5000000, 0x800000, CRC(7975dc80) SHA1(81bda50968f0153a0c4432d8d81e817c1e82e5b2) ) 
-    ROM_LOAD( "ssf11.ic11s",  0x5800000, 0x800000, CRC(a242f682) SHA1(435ea5bb1b3667f9ef3d7de081b15f4e8e6a0d01) ) 
-    ROM_LOAD( "ssf12.ic12s",  0x6000000, 0x800000, CRC(45fa259e) SHA1(8d7e708e7a2cbc2d60b68715dd79bac28d894d4c) ) 
-    ROM_LOAD( "ssf13.ic13s",  0x6800000, 0x800000, CRC(e9578063) SHA1(618f66d01f6bdacbf2a3242774a316b130594e02) ) 
-    ROM_LOAD( "ssf14.ic14s",  0x7000000, 0x800000, CRC(2edc1311) SHA1(bceb54dd29012580e2e6f15f16c6b31195010153) ) 
-    ROM_LOAD( "ssf15.ic15s",  0x7800000, 0x800000, CRC(416db320) SHA1(34536716a35260d9457703704bb9174fb1616d60) ) 
-    ROM_LOAD( "ssf16.ic16s",  0x8000000, 0x800000, CRC(2530cc04) SHA1(6425c031e5a129a3c9451bc694b5da8553f154c2) ) 
-    ROM_LOAD( "ssf17.ic17s",  0x8800000, 0x800000, CRC(9e6afcc2) SHA1(4fb69d834ea12c82e897af47a22dcc47f3c83768) ) 
-    ROM_LOAD( "ssf18.ic18s",  0x9000000, 0x800000, CRC(854ed5e5) SHA1(e445599f6a9e9d05c279259307edc08bce5d6d1f) ) 
-    ROM_LOAD( "ssf19.ic19s",  0x9800000, 0x800000, CRC(4f8ec86a) SHA1(406ab9eeccd99fa5515d4a2c229c8db1a5cb8f83) ) 
-    ROM_LOAD( "ssf20.ic20s",  0xa000000, 0x800000, CRC(c90b960d) SHA1(66e9f09d1f7f6a991371574a2e095c0e22fb7031) ) 
-    ROM_LOAD( "ssf21.ic21s",  0xa800000, 0x800000, CRC(1477c064) SHA1(87fb8d8a91d6bed70b246a8df88fa77fbf3db443) ) 
+    ROM_LOAD( "ssf01.ic1s",   0x0800000, 0x800000, CRC(4f12f789) SHA1(7b79b687fc61e2e981b9e5e8e0939c4ad24a98f0) )
+    ROM_LOAD( "ssf02.ic2s",   0x1000000, 0x800000, CRC(a255d41a) SHA1(3e932527eb68edf3e8538c1ad264a1c599f6a9d5) )
+    ROM_LOAD( "ssf03.ic3s",   0x1800000, 0x800000, CRC(0f8d6577) SHA1(afaf440e667bacc941c0a5418a0e3b0f2bb725b7) )
+    ROM_LOAD( "ssf04.ic4s",   0x2000000, 0x800000, CRC(bdf25bd0) SHA1(f79b1fdba9c48969c49617c43c1919637adb13ba) )
+    ROM_LOAD( "ssf05.ic5s",   0x2800000, 0x800000, CRC(a74b3bb4) SHA1(0ce7cef849061a9af7a61d69dc633f6971a3a63d) )
+    ROM_LOAD( "ssf06.ic6s",   0x3000000, 0x800000, CRC(3cd1f5d5) SHA1(77573c3a60af64e6e6a0eb85d5b8176ed98b0723) )
+    ROM_LOAD( "ssf07.ic7s",   0x3800000, 0x800000, CRC(00d240f5) SHA1(43010fc596f2cdffdff35a6122f2ab02a5251bc0) )
+    ROM_LOAD( "ssf08.ic8s",   0x4000000, 0x800000, CRC(d4907fa1) SHA1(79b1c771819f6e4baa048010bfb940a45370eba2) )
+    ROM_LOAD( "ssf09.ic9s",   0x4800000, 0x800000, CRC(6327d49e) SHA1(a10e3c27f70dbf18e63cf51962b6a79a52eba26c) )
+    ROM_LOAD( "ssf10.ic10s",  0x5000000, 0x800000, CRC(7975dc80) SHA1(81bda50968f0153a0c4432d8d81e817c1e82e5b2) )
+    ROM_LOAD( "ssf11.ic11s",  0x5800000, 0x800000, CRC(a242f682) SHA1(435ea5bb1b3667f9ef3d7de081b15f4e8e6a0d01) )
+    ROM_LOAD( "ssf12.ic12s",  0x6000000, 0x800000, CRC(45fa259e) SHA1(8d7e708e7a2cbc2d60b68715dd79bac28d894d4c) )
+    ROM_LOAD( "ssf13.ic13s",  0x6800000, 0x800000, CRC(e9578063) SHA1(618f66d01f6bdacbf2a3242774a316b130594e02) )
+    ROM_LOAD( "ssf14.ic14s",  0x7000000, 0x800000, CRC(2edc1311) SHA1(bceb54dd29012580e2e6f15f16c6b31195010153) )
+    ROM_LOAD( "ssf15.ic15s",  0x7800000, 0x800000, CRC(416db320) SHA1(34536716a35260d9457703704bb9174fb1616d60) )
+    ROM_LOAD( "ssf16.ic16s",  0x8000000, 0x800000, CRC(2530cc04) SHA1(6425c031e5a129a3c9451bc694b5da8553f154c2) )
+    ROM_LOAD( "ssf17.ic17s",  0x8800000, 0x800000, CRC(9e6afcc2) SHA1(4fb69d834ea12c82e897af47a22dcc47f3c83768) )
+    ROM_LOAD( "ssf18.ic18s",  0x9000000, 0x800000, CRC(854ed5e5) SHA1(e445599f6a9e9d05c279259307edc08bce5d6d1f) )
+    ROM_LOAD( "ssf19.ic19s",  0x9800000, 0x800000, CRC(4f8ec86a) SHA1(406ab9eeccd99fa5515d4a2c229c8db1a5cb8f83) )
+    ROM_LOAD( "ssf20.ic20s",  0xa000000, 0x800000, CRC(c90b960d) SHA1(66e9f09d1f7f6a991371574a2e095c0e22fb7031) )
+    ROM_LOAD( "ssf21.ic21s",  0xa800000, 0x800000, CRC(1477c064) SHA1(87fb8d8a91d6bed70b246a8df88fa77fbf3db443) )
 ROM_END
 
 /*
@@ -7855,7 +7855,7 @@ ROM_END
 /* 0062 */ GAME( 2002, clubkrte, naomi2,   naomi2,   naomi,    naomi2,   ROT0, "Sega", "Club Kart: European Session (Rev D)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0080 */ GAME( 2002, vf4cart,  naomi2,   naomi2m2, naomi,    naomi2,   ROT0, "Sega", "Virtua Fighter 4 (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0087 */ GAME( 2002, kingrt66, naomi2,   naomi2,   naomi,    naomi2,   ROT0, "Sega", "King of Route 66 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-/* 0095 */ GAME( 2002, soulsurf, naomi2,   naomi2,   naomi,    naomi2,   ROT0, "Sega", "Soul Surfer (Rev A)", GAME_FLAGS ) 
+/* 0095 */ GAME( 2002, soulsurf, naomi2,   naomi2,   naomi,    naomi2,   ROT0, "Sega", "Soul Surfer (Rev A)", GAME_FLAGS )
 /* 0106 */ GAME( 2002, vf4evoct, naomi2,   naomi2m1, naomi,    vf4evoct, ROT0, "Sega", "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 // 0129 Club Kart Prize
 
@@ -7948,7 +7948,7 @@ ROM_END
 // 0032A Initial D Arcade Stage Ver. 3 (Japan) (Rev A)
 /* 0032B */ GAME( 2004, initdv3jb, initdv3j, naomigd, naomi,    naomi2,   ROT0, "Sega", "Initial D Arcade Stage Ver. 3 (Japan) (Rev. B) (GDS-0032B)", GAME_FLAGS )
 /* 0032C */ GAME( 2004, initdv3j,  naomi2,   naomi2gd,naomi,    naomi2,   ROT0, "Sega", "Initial D Arcade Stage Ver. 3 (Japan) (Rev. C) (GDS-0032C)", GAME_FLAGS )
-/* 0033 */  GAME( 2004, initdv3e,  naomi2,   naomi2gd,naomi,    naomi2,   ROT0, "Sega", "Initial D Arcade Stage Ver. 3 (Export) (GDS-0033)", GAME_FLAGS ) 
+/* 0033 */  GAME( 2004, initdv3e,  naomi2,   naomi2gd,naomi,    naomi2,   ROT0, "Sega", "Initial D Arcade Stage Ver. 3 (Export) (GDS-0033)", GAME_FLAGS )
 // 0034
 // 0035
 // 0036  Virtua Fighter 4 Final Tuned

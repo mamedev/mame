@@ -967,8 +967,8 @@ Notes:
       J104            - 6 pin connector joined with a cable to J6 on the V198 EMI PCB. This cable is the I/O connection to/from the main board.
       J105            - 110VAC power input
       J106            - DC variable power output to feed-back motor
- 
- 
+
+
 Namco Gorgon-based games
 ------------------------
 

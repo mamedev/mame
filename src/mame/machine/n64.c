@@ -1927,13 +1927,13 @@ void n64_periphs::handle_pif()
 {
 	//printf("Before:\n");
 	/*for(int i = 0; i < 0x40; i++)
-	{
-		printf("%02x ", pif_cmd[i]);
-		if((i & 0xf) == 0xf)
-		{
-			printf("\n");
-		}
-	}*/
+    {
+        printf("%02x ", pif_cmd[i]);
+        if((i & 0xf) == 0xf)
+        {
+            printf("\n");
+        }
+    }*/
 	if(pif_cmd[0x3f] == 0x1)		// only handle the command if the last byte is 1
 	{
 		int channel = 0;
@@ -2005,14 +2005,14 @@ void n64_periphs::handle_pif()
 	}
 
 	/*printf("After:\n");
-	for(int i = 0; i < 0x40; i++)
-	{
-		printf("%02x ", pif_ram[i]);
-		if((i & 0xf) == 0xf)
-		{
-			printf("\n");
-		}
-	}*/
+    for(int i = 0; i < 0x40; i++)
+    {
+        printf("%02x ", pif_ram[i]);
+        if((i & 0xf) == 0xf)
+        {
+            printf("\n");
+        }
+    }*/
 }
 
 void n64_periphs::pif_dma(int direction)

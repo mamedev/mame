@@ -537,12 +537,12 @@ static SRes SzGetNextFolderItem(CSzData *sd, CSzFolder *folder, ISzAlloc *alloc)
 {
   UInt32 numCoders, numBindPairs, numPackStreams, i;
   UInt32 numInStreams = 0, numOutStreams = 0;
-  
+
   RINOK(SzReadNumber32(sd, &numCoders));
   if (numCoders > NUM_FOLDER_CODERS_MAX)
     return SZ_ERROR_UNSUPPORTED;
   folder->NumCoders = numCoders;
-  
+
   MY_ALLOC(CSzCoderInfo, folder->Coders, (size_t)numCoders, alloc);
 
   for (i = 0; i < numCoders; i++)
@@ -810,7 +810,7 @@ static SRes SzReadSubStreamsInfo(
       numDigests += numSubstreams;
   }
 
- 
+
   si = 0;
   for (;;)
   {
@@ -963,8 +963,8 @@ static SRes SzReadHeader2(
     RINOK(SzReadArchiveProperties(sd));
     RINOK(SzReadID(sd, &type));
   }
- 
- 
+
+
   if (type == k7zIdMainStreamsInfo)
   {
     RINOK(SzReadStreamsInfo(sd,
@@ -982,7 +982,7 @@ static SRes SzReadHeader2(
     return SZ_OK;
   if (type != k7zIdFilesInfo)
     return SZ_ERROR_ARCHIVE;
-  
+
   RINOK(SzReadNumber32(sd, &numFiles));
   p->db.NumFiles = numFiles;
 
@@ -1165,19 +1165,19 @@ static SRes SzReadAndDecodePackedStreams2(
   RINOK(SzReadStreamsInfo(sd, &dataStartPos, p,
       &numUnpackStreams,  unpackSizes, digestsDefined, digests,
       allocTemp, allocTemp));
-  
+
   dataStartPos += baseOffset;
   if (p->NumFolders != 1)
     return SZ_ERROR_ARCHIVE;
 
   folder = p->Folders;
   unpackSize = SzFolder_GetUnpackSize(folder);
-  
+
   RINOK(LookInStream_SeekTo(inStream, dataStartPos));
 
   if (!Buf_Create(outBuffer, (size_t)unpackSize, allocTemp))
     return SZ_ERROR_MEM;
-  
+
   res = SzFolder_Decode(folder, p->PackSizes,
           inStream, dataStartPos,
           outBuffer->data, (size_t)unpackSize, allocTemp);
@@ -1240,7 +1240,7 @@ static SRes SzArEx_Open2(
   nextHeaderCRC = GetUi32(header + 28);
 
   p->startPosAfterHeader = startArcPos + k7zStartHeaderSize;
-  
+
   if (CrcCalc(header + 12, 20) != GetUi32(header + 8))
     return SZ_ERROR_CRC;
 
@@ -1356,9 +1356,9 @@ SRes SzArEx_Extract(
     *blockIndex = folderIndex;
     IAlloc_Free(allocMain, *outBuffer);
     *outBuffer = 0;
-    
+
     RINOK(LookInStream_SeekTo(inStream, startOffset));
-    
+
     if (res == SZ_OK)
     {
       *outBufferSize = unpackSize;

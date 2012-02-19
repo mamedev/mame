@@ -79,7 +79,7 @@ struct samples_interface
 
 // ======================> samples_device
 
-class samples_device : 	public device_t,
+class samples_device :	public device_t,
 						public device_sound_interface,
 						public samples_interface
 {
@@ -100,11 +100,11 @@ public:
 	void pause(UINT8 channel, bool pause = true);
 	void stop(UINT8 channel);
 	void stop_all();
-	
+
 	// dynamic control
 	void set_frequency(UINT8 channel, UINT32 frequency);
 	void set_volume(UINT8 channel, float volume);
-	
+
 protected:
 	// subclasses can do it this way
 	samples_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
@@ -123,7 +123,7 @@ private:
 	{
 		// shouldn't need a copy, but in case it happens, catch it here
 		loaded_sample &operator=(const loaded_sample &rhs) { assert(false); return *this; }
-	
+
 	    UINT32			length;			// length in samples
 	    UINT32			frequency;		// frequency of the sample
 	    dynamic_array<INT16> data;		// 16-bit signed data
@@ -142,7 +142,7 @@ private:
 		bool			loop;
 		bool			paused;
 	};
-	
+
 	// internal helpers
 	bool read_sample(emu_file &file, loaded_sample &sample);
 	bool read_wav_sample(emu_file &file, loaded_sample &sample);
@@ -172,7 +172,7 @@ public:
 	samples_iterator(samples_interface &intf)
 		: m_intf(intf),
 		  m_current(-1) { }
-		 
+
 	// getters
 	const char *altbasename() const { return (m_intf.m_names != NULL && m_intf.m_names[0] != NULL && m_intf.m_names[0][0] == '*') ? &m_intf.m_names[0][1] : NULL; }
 
@@ -181,7 +181,7 @@ public:
 	{
 		if (m_intf.m_names == NULL || m_intf.m_names[0] == NULL)
 			return NULL;
-		m_current = 0; 
+		m_current = 0;
 		if (m_intf.m_names[0][0] == '*')
 			m_current++;
 		return m_intf.m_names[m_current++];
@@ -193,7 +193,7 @@ public:
 			return NULL;
 		return m_intf.m_names[m_current++];
 	}
-	
+
 	// counting
 	int count()
 	{

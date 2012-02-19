@@ -81,7 +81,7 @@ void Ppmd8_EncodeSymbol(CPpmd8 *p, int symbol)
       sum += s->Freq;
     }
     while (--i);
-    
+
     PPMD_SetAllBitsIn256Bytes(charMask);
     MASK(s->Symbol) = 0;
     i = p->MinContext->NumStats;
@@ -125,7 +125,7 @@ void Ppmd8_EncodeSymbol(CPpmd8 *p, int symbol)
       p->MinContext = Ppmd8_GetContext(p, p->MinContext->Suffix);
     }
     while (p->MinContext->NumStats == numMasked);
-    
+
     see = Ppmd8_MakeEscFreq(p, numMasked, &escFreq);
     s = Ppmd8_GetStats(p, p->MinContext);
     sum = 0;
@@ -154,7 +154,7 @@ void Ppmd8_EncodeSymbol(CPpmd8 *p, int symbol)
       s++;
     }
     while (--i);
-    
+
     RangeEnc_Encode(p, sum, escFreq, sum + escFreq);
     see->Summ = (UInt16)(see->Summ + sum + escFreq);
   }

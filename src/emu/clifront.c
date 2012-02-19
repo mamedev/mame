@@ -1457,9 +1457,9 @@ void media_identifier::identify(const char *filename)
 				// crude, need real UTF16->UTF8 conversion ideally
 				for (int j=0;j<namelen;j++)
 				{
-					temp3[j] = (UINT8)temp[j];				
+					temp3[j] = (UINT8)temp[j];
 				}
-						
+
 				if (!(f->IsDir) && (f->Size != 0))
 				{
 					UINT8 *data = global_alloc_array(UINT8, f->Size);

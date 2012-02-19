@@ -324,7 +324,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	// on an n-CPU system, create n threads for multi queues, and 1 thread for everything else
 	else
 		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? numprocs : 1;
-		
+
 	// multi-queues with high frequency items should top out at 4 for now
 	// since we have scaling problems above that
 	if ((flags & WORK_QUEUE_FLAG_HIGH_FREQ) && queue->threads > 1)

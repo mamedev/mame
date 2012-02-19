@@ -33,8 +33,8 @@ public:
 public:
 	virtual int	 read_sector(UINT32 lba, void *buffer) = 0;
 	virtual int	 write_sector(UINT32 lba, const void *buffer) = 0;
-	
-	UINT8 *get_features() { return m_features;} 
+
+	UINT8 *get_features() { return m_features;}
 
 	UINT16 get_cylinders() { return m_num_cylinders; }
 	UINT16 get_sectors() { return m_num_sectors; }
@@ -59,12 +59,12 @@ public:
 	ide_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	int	 read_sector(UINT32 lba, void *buffer) { return (m_dev) ? m_dev->read_sector(lba,buffer) : 0; }
-	int	 write_sector(UINT32 lba, const void *buffer) { return (m_dev) ? m_dev->write_sector(lba,buffer) : 0; }	
-	UINT8 *get_features() { return (m_dev) ? m_dev->get_features() : NULL;} 
+	int	 write_sector(UINT32 lba, const void *buffer) { return (m_dev) ? m_dev->write_sector(lba,buffer) : 0; }
+	UINT8 *get_features() { return (m_dev) ? m_dev->get_features() : NULL;}
 
 	UINT16 get_cylinders() { return (m_dev) ? m_dev->get_cylinders() : 0; }
 	UINT16 get_sectors() { return (m_dev) ? m_dev->get_sectors() : 0; }
-	UINT16 get_heads() { return (m_dev) ? m_dev->get_heads() : 0; }	
+	UINT16 get_heads() { return (m_dev) ? m_dev->get_heads() : 0; }
 	void set_geometry(UINT8 sectors, UINT8 heads) { if (m_dev) m_dev->set_geometry(sectors,heads); }
 	bool is_ready() { return (m_dev) ? m_dev->is_ready() : false; }
 	void read_key(UINT8 key[]) { if (m_dev) m_dev->read_key(key); }
@@ -96,7 +96,7 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
-	
+
 	void ide_build_features();
 	virtual bool is_ready() { return (m_disk != NULL); }
 protected:

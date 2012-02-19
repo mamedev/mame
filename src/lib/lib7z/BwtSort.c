@@ -96,7 +96,7 @@ UInt32 NO_INLINE SortGroup(UInt32 BlockSize, UInt32 NumSortedBytes, UInt32 group
         gPrev = Groups[sp];
         temp[0] = (gPrev << NumRefBits);
       }
-      
+
       for (j = 1; j < groupSize; j++)
       {
         UInt32 sp = ind2[j] + NumSortedBytes;
@@ -114,11 +114,11 @@ UInt32 NO_INLINE SortGroup(UInt32 BlockSize, UInt32 NumSortedBytes, UInt32 group
         return 1;
       }
     }
-    
+
     HeapSort(temp, groupSize);
     mask = ((1 << NumRefBits) - 1);
     thereAreGroups = 0;
-    
+
     group = groupOffset;
     cg = (temp[0] >> NumRefBits);
     temp[0] = ind2[temp[0] & mask];
@@ -129,12 +129,12 @@ UInt32 NO_INLINE SortGroup(UInt32 BlockSize, UInt32 NumSortedBytes, UInt32 group
     #else
     UInt32 prevGroupStart = 0;
     #endif
-    
+
     for (j = 1; j < groupSize; j++)
     {
       UInt32 val = temp[j];
       UInt32 cgCur = (val >> NumRefBits);
-      
+
       if (cgCur != cg)
       {
         cg = cgCur;
@@ -398,7 +398,7 @@ UInt32 BlockSort(UInt32 *Indices, const Byte *data, UInt32 blockSize)
     for (i = 0; i < blockSize - 1; i++)
       Indices[counters[((UInt32)data[i] << 8) | data[i + 1]]++] = i;
     Indices[counters[((UInt32)data[i] << 8) | data[0]]++] = i;
-    
+
     #ifndef BLOCK_SORT_EXTERNAL_FLAGS
     {
     UInt32 prev = 0;
@@ -441,7 +441,7 @@ UInt32 BlockSort(UInt32 *Indices, const Byte *data, UInt32 blockSize)
       for (groupSize = 1;
         (Flags[(i + groupSize) >> kNumFlagsBits] & (1 << ((i + groupSize) & kFlagsMask))) != 0;
         groupSize++);
-      
+
       groupSize++;
 
       #else
@@ -473,7 +473,7 @@ UInt32 BlockSort(UInt32 *Indices, const Byte *data, UInt32 blockSize)
       }
 
       #endif
-      
+
       if (NumSortedBytes >= blockSize)
       {
         UInt32 j;

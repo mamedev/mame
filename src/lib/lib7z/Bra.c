@@ -48,14 +48,14 @@ SizeT ARMT_Convert(Byte *data, SizeT size, UInt32 ip, int encoding)
         ((UInt32)data[i + 0] << 11) |
         (((UInt32)data[i + 3] & 0x7) << 8) |
         (data[i + 2]);
-      
+
       src <<= 1;
       if (encoding)
         dest = ip + (UInt32)i + src;
       else
         dest = src - (ip + (UInt32)i);
       dest >>= 1;
-      
+
       data[i + 1] = (Byte)(0xF0 | ((dest >> 19) & 0x7));
       data[i + 0] = (Byte)(dest >> 11);
       data[i + 3] = (Byte)(0xF8 | ((dest >> 8) & 0x7));
@@ -80,7 +80,7 @@ SizeT PPC_Convert(Byte *data, SizeT size, UInt32 ip, int encoding)
         ((UInt32)data[i + 1] << 16) |
         ((UInt32)data[i + 2] << 8) |
         ((UInt32)data[i + 3] & (~3));
-      
+
       UInt32 dest;
       if (encoding)
         dest = ip + (UInt32)i + src;
@@ -113,14 +113,14 @@ SizeT SPARC_Convert(Byte *data, SizeT size, UInt32 ip, int encoding)
         ((UInt32)data[i + 2] << 8) |
         ((UInt32)data[i + 3]);
       UInt32 dest;
-      
+
       src <<= 2;
       if (encoding)
         dest = ip + i + src;
       else
         dest = src - (ip + i);
       dest >>= 2;
-      
+
       dest = (((0 - ((dest >> 22) & 1)) << 22) & 0x3FFFFFFF) | (dest & 0x3FFFFF) | 0x40000000;
 
       data[i + 0] = (Byte)(dest >> 24);

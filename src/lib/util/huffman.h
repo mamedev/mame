@@ -84,7 +84,7 @@ protected:
 		UINT32				m_bits;					// bits used to encode the node
 		UINT8				m_numbits;				// number of bits needed for this node
 	};
-	
+
 	// construction/destruction
 	huffman_context_base(int numcodes, int maxbits, lookup_value *lookup, UINT32 *histo, node_t *nodes);
 
@@ -133,12 +133,12 @@ public:
 	void histo_reset() { memset(m_datahisto_array, 0, sizeof(m_datahisto_array)); }
 	void histo_one(UINT32 data);
 	void encode_one(bitstream_out &bitbuf, UINT32 data);
-	
+
 	// expose tree computation and export
 	using huffman_context_base::compute_tree_from_histo;
 	using huffman_context_base::export_tree_rle;
 	using huffman_context_base::export_tree_huffman;
-	
+
 private:
 	// array versions of the info we need
 	UINT32					m_datahisto_array[_NumCodes];
@@ -159,11 +159,11 @@ public:
 
 	// single item operations
 	UINT32 decode_one(bitstream_in &bitbuf);
-	
+
 	// expose tree import
 	using huffman_context_base::import_tree_rle;
 	using huffman_context_base::import_tree_huffman;
-	
+
 private:
 	// array versions of the info we need
 	node_t					m_huffnode_array[_NumCodes];
@@ -179,12 +179,12 @@ class huffman_8bit_encoder : public huffman_encoder<>
 public:
 	// construction/destruction
 	huffman_8bit_encoder();
-	
+
 	// operations
 	huffman_error encode(const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 destlength, UINT32 &complength);
 };
 
-	
+
 // ======================> huffman_8bit_decoder
 
 // generic 8-bit encoder/decoder
@@ -193,7 +193,7 @@ class huffman_8bit_decoder : public huffman_decoder<>
 public:
 	// construction/destruction
 	huffman_8bit_decoder();
-	
+
 	// operations
 	huffman_error decode(const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 destlength);
 };

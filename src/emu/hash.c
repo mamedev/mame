@@ -179,7 +179,7 @@ bool hash_collection::add_from_string(char type, const char *buffer, int length)
 	// handle CRCs
 	if (type == HASH_CRC)
 		return m_has_crc32 = m_crc32.from_string(buffer, length);
-	
+
 	// handle SHA1s
 	else if (type == HASH_SHA1)
 		return m_has_sha1 = m_sha1.from_string(buffer, length);
@@ -195,14 +195,14 @@ bool hash_collection::add_from_string(char type, const char *buffer, int length)
 bool hash_collection::remove(char type)
 {
 	bool result = false;
-	
+
 	// handle CRCs
 	if (type == HASH_CRC)
 	{
 		result = m_has_crc32;
 		m_has_crc32 = false;
 	}
-		
+
 	// handle SHA1s
 	else if (type == HASH_SHA1)
 	{
@@ -222,12 +222,12 @@ bool hash_collection::remove(char type)
 const char *hash_collection::internal_string(astring &buffer) const
 {
 	buffer.reset();
-	
+
 	// handle CRCs
 	astring temp;
 	if (m_has_crc32)
 		buffer.cat(HASH_CRC).cat(m_crc32.as_string(temp));
-		
+
 	// handle SHA1s
 	if (m_has_sha1)
 		buffer.cat(HASH_SHA1).cat(m_sha1.as_string(temp));
@@ -250,7 +250,7 @@ const char *hash_collection::macro_string(astring &buffer) const
 	astring temp;
 	if (m_has_crc32)
 		buffer.cat("CRC(").cat(m_crc32.as_string(temp)).cat(") ");
-		
+
 	// handle SHA1s
 	if (m_has_sha1)
 		buffer.cat("SHA1(").cat(m_sha1.as_string(temp)).cat(") ");
@@ -277,7 +277,7 @@ const char *hash_collection::attribute_string(astring &buffer) const
 	astring temp;
 	if (m_has_crc32)
 		buffer.cat("crc=\"").cat(m_crc32.as_string(temp)).cat("\" ");
-		
+
 	// handle SHA1s
 	if (m_has_sha1)
 		buffer.cat("sha1=\"").cat(m_sha1.as_string(temp)).cat("\" ");
@@ -352,7 +352,7 @@ void hash_collection::begin(const char *types)
 	// by default use all types
 	if (types == NULL)
 		m_creator->m_doing_crc32 = m_creator->m_doing_sha1 = true;
-	
+
 	// otherwise, just allocate the ones that are specified
 	else
 	{
@@ -369,7 +369,7 @@ void hash_collection::begin(const char *types)
 void hash_collection::buffer(const UINT8 *data, UINT32 length)
 {
 	assert(m_creator != NULL);
-	
+
 	// append to each active hash
 	if (m_creator->m_doing_crc32)
 		m_creator->m_crc32_creator.append(data, length);
@@ -385,24 +385,24 @@ void hash_collection::buffer(const UINT8 *data, UINT32 length)
 void hash_collection::end()
 {
 	assert(m_creator != NULL);
-	
+
 	// default to getting nothing
 	m_has_crc32 = m_has_sha1 = false;
-	
+
 	// finish up the CRC32
 	if (m_creator->m_doing_crc32)
 	{
 		m_has_crc32 = true;
 		m_crc32 = m_creator->m_crc32_creator.finish();
 	}
-	
+
 	// finish up the SHA1
 	if (m_creator->m_doing_sha1)
 	{
 		m_has_sha1 = true;
 		m_sha1 = m_creator->m_sha1_creator.finish();
 	}
-	
+
 	// nuke the creator
 	delete m_creator;
 	m_creator = NULL;
@@ -418,13 +418,13 @@ void hash_collection::copyfrom(const hash_collection &src)
 {
 	// copy flags directly
 	m_flags = src.m_flags;
-	
+
 	// copy hashes
 	m_has_crc32 = src.m_has_crc32;
 	m_crc32 = src.m_crc32;
 	m_has_sha1 = src.m_has_sha1;
 	m_sha1 = src.m_sha1;
 
-	// don't copy creators	
+	// don't copy creators
 	m_creator = NULL;
 }

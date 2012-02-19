@@ -10485,8 +10485,8 @@ M68KMAKE_OP(cinv, 32, ., .)
 	{
 		UINT16 ir = mc68kcpu->ir;
 		UINT8 cache = (ir >> 6) & 3;
-//		UINT8 scope = (ir >> 3) & 3;
-//		logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", REG_PPC(mc68kcpu), ir, cache, scope, ir & 7);
+//      UINT8 scope = (ir >> 3) & 3;
+//      logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", REG_PPC(mc68kcpu), ir, cache, scope, ir & 7);
 		switch (cache)
 		{
 		case 2:

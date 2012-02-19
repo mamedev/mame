@@ -7,7 +7,7 @@
 	MCFG_DEVICE_ADD(_tag, NSCSI_BUS, 0)
 
 #define MCFG_NSCSI_DEVICE_ADD(_tag, _subtag, _type, _clock)			\
-	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0) 						\
+	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)						\
 	downcast<nscsi_connector *>(device)->set_fixed_device(_subtag);	\
 	MCFG_DEVICE_ADD(_tag ":" _subtag, _type, _clock)
 
@@ -15,7 +15,7 @@
 	MCFG_NSCSI_DEVICE_ADD(_tag, _subtag, _type, _clock)
 
 #define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _def_inp)	\
-	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0) 					\
+	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)					\
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp)
 
 class nscsi_device;
@@ -336,7 +336,7 @@ private:
 
 	control *buf_control_push();
 	control *buf_control_pop();
-	
+
 	void step(bool timeout);
 	void target_recv_byte();
 	void target_send_byte(UINT8 val);

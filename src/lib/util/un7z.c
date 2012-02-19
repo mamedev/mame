@@ -91,7 +91,7 @@ WRes File_Close(CSzFile *p)
 
 WRes File_Read(CSzFile *p, void *data, size_t *size)
 {
-//	file_error err;
+//  file_error err;
 	UINT32 read_length;
 
 	if (!p->_7z_osdfile)
@@ -104,7 +104,7 @@ WRes File_Read(CSzFile *p, void *data, size_t *size)
 	if (originalSize == 0)
 		return 0;
 
-//	err = 
+//  err =
     osd_read( p->_7z_osdfile, data, p->_7z_currfpos, originalSize, &read_length );
 	*size = read_length;
 	p->_7z_currfpos += read_length;
@@ -127,7 +127,7 @@ WRes File_Seek(CSzFile *p, Int64 *pos, ESzSeek origin)
 	if (origin==2) p->_7z_currfpos = p->_7z_length - *pos;
 
 	*pos = p->_7z_currfpos;
-	
+
 	return 0;
 }
 
@@ -263,11 +263,11 @@ int _7z_search_crc_match(_7z_file *new_7z, UINT32 search_crc, const char* search
 				if ((zn>=0x41) && (zn<=0x5a)) zn+=0x20;
 
 				if (sn != zn) break;
-			}		
+			}
 			if (j==search_filename_length) namematch = true;
 		}
 
-		
+
 		/* Check for a CRC match */
 		if (crc==search_crc) crcmatch = true;
 
@@ -289,9 +289,9 @@ int _7z_search_crc_match(_7z_file *new_7z, UINT32 search_crc, const char* search
 				found = true;
 		}
 
-		if (found) 
+		if (found)
 		{
-		//	printf("found %S %d %08x %08x %08x %s %d\n", temp, len, crc, search_crc, size, search_filename, search_filename_length);
+		//  printf("found %S %d %08x %08x %08x %s %d\n", temp, len, crc, search_crc, size, search_filename, search_filename_length);
 			new_7z->curr_file_idx = i;
 			new_7z->uncompressed_length = size;
 			new_7z->crc = crc;
@@ -364,7 +364,7 @@ _7z_error _7z_file_open(const char *filename, _7z_file **_7z)
 
 	FileInStream_CreateVTable(&new_7z->archiveStream);
 	LookToRead_CreateVTable(&new_7z->lookStream, False);
-  
+
 	new_7z->lookStream.realStream = &new_7z->archiveStream.s;
 	LookToRead_Init(&new_7z->lookStream);
 
@@ -478,7 +478,7 @@ _7z_error _7z_file_decompress(_7z_file *new_7z, void *buffer, UINT32 length)
 		&new_7z->blockIndex, &new_7z->outBuffer, &new_7z->outBufferSize,
 		&offset, &outSizeProcessed,
 		&new_7z->allocImp, &new_7z->allocTempImp);
-			
+
 	if (res != SZ_OK)
 		return _7ZERR_FILE_ERROR;
 
@@ -510,7 +510,7 @@ static void free__7z_file(_7z_file *_7z)
 
 		if (_7z->outBuffer) IAlloc_Free(&_7z->allocImp, _7z->outBuffer);
 		if (_7z->inited) SzArEx_Free(&_7z->db, &_7z->allocImp);
-	
+
 
 		free(_7z);
 	}

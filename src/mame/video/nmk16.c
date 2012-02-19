@@ -638,10 +638,10 @@ SCREEN_UPDATE_IND16( hachamf )
 	0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
 	};
 	nmk16_draw_sprites2(screen.machine(), bitmap,cliprect, hachamf_swaptbl);
-/*	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
-	nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);*/
+/*  nmk16_draw_sprites(screen.machine(), bitmap,cliprect,3);
+    nmk16_draw_sprites(screen.machine(), bitmap,cliprect,2);
+    nmk16_draw_sprites(screen.machine(), bitmap,cliprect,1);
+    nmk16_draw_sprites(screen.machine(), bitmap,cliprect,0);*/
 
 	state->m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;

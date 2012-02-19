@@ -90,7 +90,7 @@ enum
 	COMPRESSION_NONE = 4,						// no compression; implicit length = hunkbytes
 	COMPRESSION_SELF = 5,						// same as another block in this chd
 	COMPRESSION_PARENT = 6,						// same as a hunk's worth of units in the parent chd
-	
+
 	// these additional pseudo-types are used for compressed encodings:
 	COMPRESSION_RLE_SMALL,						// start of small RLE run (4-bit length)
 	COMPRESSION_RLE_LARGE,						// start of large RLE run (8-bit length)
@@ -125,8 +125,8 @@ struct chd_file::metadata_entry
 
 struct chd_file::metadata_hash
 {
-	UINT8 					tag[4];			// tag of the metadata in big-endian
-	sha1_t 					sha1;			// hash data
+	UINT8					tag[4];			// tag of the metadata in big-endian
+	sha1_t					sha1;			// hash data
 };
 
 
@@ -179,7 +179,7 @@ inline sha1_t chd_file::be_read_sha1(const UINT8 *base)
 
 
 //-------------------------------------------------
-//  be_write_sha1 - write a sha1_t to a data 
+//  be_write_sha1 - write a sha1_t to a data
 //  stream in bigendian order
 //-------------------------------------------------
 
@@ -199,7 +199,7 @@ inline void chd_file::file_read(UINT64 offset, void *dest, UINT32 length)
 	// no file = failure
 	if (m_file == NULL)
 		throw CHDERR_NOT_OPEN;
-	
+
 	// seek and read
 	core_fseek(m_file, offset, SEEK_SET);
 	UINT32 count = core_fread(m_file, dest, length);
@@ -218,7 +218,7 @@ inline void chd_file::file_write(UINT64 offset, const void *source, UINT32 lengt
 	// no file = failure
 	if (m_file == NULL)
 		throw CHDERR_NOT_OPEN;
-	
+
 	// seek and write
 	core_fseek(m_file, offset, SEEK_SET);
 	UINT32 count = core_fwrite(m_file, source, length);
@@ -229,7 +229,7 @@ inline void chd_file::file_write(UINT64 offset, const void *source, UINT32 lengt
 
 //-------------------------------------------------
 //  file_append - append to the file at the given
-//  offset, ensuring we start at the given 
+//  offset, ensuring we start at the given
 //  alignment; on failure throw an error
 //-------------------------------------------------
 
@@ -346,7 +346,7 @@ sha1_t chd_file::raw_sha1()
 		// determine offset within the file for data-only
 		if (m_rawsha1_offset == 0)
 			throw CHDERR_UNSUPPORTED_VERSION;
-		
+
 		// read the big-endian version
 		UINT8 rawbuf[sizeof(sha1_t)];
 		file_read(m_rawsha1_offset, rawbuf, sizeof(rawbuf));
@@ -371,7 +371,7 @@ sha1_t chd_file::parent_sha1()
 		// determine offset within the file
 		if (m_parentsha1_offset == 0)
 			throw CHDERR_UNSUPPORTED_VERSION;
-		
+
 		// read the big-endian version
 		UINT8 rawbuf[sizeof(sha1_t)];
 		file_read(m_parentsha1_offset, rawbuf, sizeof(rawbuf));
@@ -395,7 +395,7 @@ chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32
 	// error if invalid
 	if (hunknum >= m_hunkcount)
 		return CHDERR_HUNK_OUT_OF_RANGE;
-	
+
 	// get the map pointer
 	UINT8 *rawmap;
 	switch (m_version)
@@ -410,17 +410,17 @@ chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32
 					compressor = CHD_CODEC_ZLIB;
 					compbytes = be_read(&rawmap[12], 2) + (rawmap[14] << 16);
 					break;
-					
+
 				case V34_MAP_ENTRY_TYPE_UNCOMPRESSED:
 					compressor = CHD_CODEC_NONE;
 					compbytes = m_hunkbytes;
 					break;
-					
+
 				case V34_MAP_ENTRY_TYPE_MINI:
 					compressor = CHD_CODEC_MINI;
 					compbytes = 0;
 					break;
-				
+
 				case V34_MAP_ENTRY_TYPE_SELF_HUNK:
 					compressor = CHD_CODEC_SELF;
 					compbytes = 0;
@@ -432,7 +432,7 @@ chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32
 					break;
 			}
 			break;
-		
+
 		// v5 map entries
 		case 5:
 			rawmap = m_rawmap + m_mapentrybytes * hunknum;
@@ -452,7 +452,7 @@ chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32
 				}
 				break;
 			}
-			
+
 			// compressed case
 			switch (rawmap[0])
 			{
@@ -473,7 +473,7 @@ chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32
 					compressor = CHD_CODEC_SELF;
 					compbytes = 0;
 					break;
-					
+
 				case COMPRESSION_PARENT:
 					compressor = CHD_CODEC_PARENT;
 					compbytes = 0;
@@ -494,12 +494,12 @@ void chd_file::set_raw_sha1(sha1_t rawdata)
 	// create a big-endian version
 	UINT8 rawbuf[sizeof(sha1_t)];
 	be_write_sha1(rawbuf, rawdata);
-	
+
 	// write to the header
 	UINT64 offset = (m_rawsha1_offset != 0) ? m_rawsha1_offset : m_sha1_offset;
 	assert(offset != 0);
 	file_write(offset, rawbuf, sizeof(rawbuf));
-	
+
 	// if we have a separate rawsha1_offset, update the full sha1 as well
 	if (m_rawsha1_offset != 0)
 		metadata_update_hash();
@@ -519,7 +519,7 @@ void chd_file::set_parent_sha1(sha1_t parent)
 	// create a big-endian version
 	UINT8 rawbuf[sizeof(sha1_t)];
 	be_write_sha1(rawbuf, parent);
-	
+
 	// write to the header
 	assert(m_parentsha1_offset != 0);
 	file_write(m_parentsha1_offset, rawbuf, sizeof(rawbuf));
@@ -602,7 +602,7 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 	// create the file normally, then claim the file
 	chd_error chderr = create(*file, logicalbytes, hunkbytes, unitbytes, compression);
 	m_owns_file = true;
-	
+
 	// if an error happened, close and delete the file
 	if (chderr != CHDERR_NONE)
 	{
@@ -633,7 +633,7 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 	// create the file normally, then claim the file
 	chd_error chderr = create(*file, logicalbytes, hunkbytes, compression, parent);
 	m_owns_file = true;
-	
+
 	// if an error happened, close and delete the file
 	if (chderr != CHDERR_NONE)
 	{
@@ -669,7 +669,7 @@ chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
 		core_fclose(file);
 		return err;
 	}
-		
+
 	// we now own this file
 	m_owns_file = true;
 	return err;
@@ -708,7 +708,7 @@ void chd_file::close()
 	m_owns_file = false;
 	m_allow_reads = false;
 	m_allow_writes = false;
-	
+
 	// reset core parameters from the header
 	m_version = HEADER_VERSION;
 	m_logicalbytes = 0;
@@ -759,7 +759,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 		// punt if no file
 		if (m_file == NULL)
 			throw CHDERR_NOT_OPEN;
-		
+
 		// return an error if out of range
 		if (hunknum >= m_hunkcount)
 			throw CHDERR_HUNK_OUT_OF_RANGE;
@@ -787,13 +787,13 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && dest != NULL && crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						return CHDERR_NONE;
-						
+
 					case V34_MAP_ENTRY_TYPE_UNCOMPRESSED:
 						file_read(blockoffs, dest, m_hunkbytes);
 						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						return CHDERR_NONE;
-						
+
 					case V34_MAP_ENTRY_TYPE_MINI:
 						be_write(dest, blockoffs, 8);
 						for (UINT32 bytes = 8; bytes < m_hunkbytes; bytes++)
@@ -801,7 +801,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						return CHDERR_NONE;
-					
+
 					case V34_MAP_ENTRY_TYPE_SELF_HUNK:
 						return read_hunk(blockoffs, dest);
 
@@ -811,7 +811,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 						return m_parent->read_hunk(blockoffs, dest);
 				}
 				break;
-			
+
 			// v5 map entries
 			case 5:
 				rawmap = m_rawmap + m_mapentrybytes * hunknum;
@@ -819,7 +819,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 				// uncompressed case
 				if (!compressed())
 				{
-					blockoffs = UINT64(be_read(rawmap, 4)) * UINT64(m_hunkbytes); 
+					blockoffs = UINT64(be_read(rawmap, 4)) * UINT64(m_hunkbytes);
 					if (blockoffs != 0)
 						file_read(blockoffs, dest, m_hunkbytes);
 					else if (m_parent_missing)
@@ -830,7 +830,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 						memset(dest, 0, m_hunkbytes);
 					return CHDERR_NONE;
 				}
-				
+
 				// compressed case
 				blocklen = be_read(&rawmap[1], 3);
 				blockoffs = be_read(&rawmap[4], 6);
@@ -857,7 +857,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 
 					case COMPRESSION_SELF:
 						return read_hunk(blockoffs, dest);
-						
+
 					case COMPRESSION_PARENT:
 						if (m_parent_missing)
 							throw CHDERR_REQUIRES_PARENT;
@@ -865,11 +865,11 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 				}
 				break;
 		}
-		
+
 		// if we get here, something was wrong
 		throw CHDERR_READ_ERROR;
 	}
-	
+
 	// just return errors
 	catch (chd_error &err)
 	{
@@ -902,7 +902,7 @@ chd_error chd_file::write_hunk(UINT32 hunknum, const void *buffer)
 		// uncompressed writes only via this interface
 		if (compressed())
 			throw CHDERR_FILE_NOT_WRITEABLE;
-		
+
 		// see if we have allocated the space on disk for this hunk
 		UINT8 *rawmap = m_rawmap + hunknum * 4;
 		UINT32 rawentry = be_read(rawmap, 4);
@@ -919,29 +919,29 @@ chd_error chd_file::write_hunk(UINT32 hunknum, const void *buffer)
 					all_zeros = false;
 					break;
 				}
-			
+
 			// if it's all zeros, do nothing more
 			if (all_zeros)
 				return CHDERR_NONE;
-		
+
 			// append new data to the end of the file, aligning the first chunk
 			rawentry = file_append(buffer, m_hunkbytes, m_hunkbytes) / m_hunkbytes;
-			
+
 			// write the map entry back
 			be_write(rawmap, rawentry, 4);
 			file_write(m_mapoffset + hunknum * 4, rawmap, 4);
-			
+
 			// update the cached hunk if we just wrote it
 			if (hunknum == m_cachehunk && buffer != m_cache)
 				memcpy(m_cache, buffer, m_hunkbytes);
 		}
-		
+
 		// otherwise, just overwrite
 		else
 			file_write(UINT64(rawentry) * UINT64(m_hunkbytes), buffer, m_hunkbytes);
 		return CHDERR_NONE;
 	}
-	
+
 	// just return errors
 	catch (chd_error &err)
 	{
@@ -973,7 +973,7 @@ chd_error chd_file::write_units(UINT64 unitnum, const void *buffer, UINT32 count
 
 
 //-------------------------------------------------
-//  read_bytes - read from the CHD at a byte level, 
+//  read_bytes - read from the CHD at a byte level,
 //  using the cache to handle partial hunks
 //-------------------------------------------------
 
@@ -988,12 +988,12 @@ chd_error chd_file::read_bytes(UINT64 offset, void *buffer, UINT32 bytes)
 		// determine start/end boundaries
 		UINT32 startoffs = (curhunk == first_hunk) ? (offset % m_hunkbytes) : 0;
 		UINT32 endoffs = (curhunk == last_hunk) ? ((offset + bytes - 1) % m_hunkbytes) : (m_hunkbytes - 1);
-		
+
 		// if it's a full block, just read directly from disk unless it's the cached hunk
 		chd_error err = CHDERR_NONE;
 		if (startoffs == 0 && endoffs == m_hunkbytes - 1 && curhunk != m_cachehunk)
 			err = read_hunk(curhunk, dest);
-		
+
 		// otherwise, read from the cache
 		else
 		{
@@ -1032,12 +1032,12 @@ chd_error chd_file::write_bytes(UINT64 offset, const void *buffer, UINT32 bytes)
 		// determine start/end boundaries
 		UINT32 startoffs = (curhunk == first_hunk) ? (offset % m_hunkbytes) : 0;
 		UINT32 endoffs = (curhunk == last_hunk) ? ((offset + bytes - 1) % m_hunkbytes) : (m_hunkbytes - 1);
-		
+
 		// if it's a full block, just write directly to disk unless it's the cached hunk
 		chd_error err = CHDERR_NONE;
 		if (startoffs == 0 && endoffs == m_hunkbytes - 1 && curhunk != m_cachehunk)
 			err = write_hunk(curhunk, source);
-		
+
 		// otherwise, write from the cache
 		else
 		{
@@ -1080,7 +1080,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, output.stringbuffer(metaentry.length), metaentry.length);
 		return CHDERR_NONE;
 	}
-	
+
 	// just return errors
 	catch (chd_error &err)
 	{
@@ -1103,7 +1103,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, output, metaentry.length);
 		return CHDERR_NONE;
 	}
-	
+
 	// just return errors
 	catch (chd_error &err)
 	{
@@ -1126,7 +1126,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, output, MIN(outputlen, resultlen));
 		return CHDERR_NONE;
 	}
-	
+
 	// just return errors
 	catch (chd_error &err)
 	{
@@ -1151,7 +1151,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 		resultflags = metaentry.flags;
 		return CHDERR_NONE;
 	}
-	
+
 	// just return errors
 	catch (chd_error &err)
 	{
@@ -1191,16 +1191,16 @@ chd_error chd_file::write_metadata(chd_metadata_tag metatag, UINT32 metaindex, c
 					be_write(length, inputlen, 3);
 					file_write(metaentry.offset + 5, length, sizeof(length));
 				}
-				
+
 				// indicate we did everything
 				finished = true;
 			}
-			
+
 			// if it doesn't fit, unlink the current entry
 			else
 				metadata_set_previous_next(metaentry.prev, metaentry.next);
 		}
-	
+
 		// if not yet done, create a new entry and append
 		if (!finished)
 		{
@@ -1210,7 +1210,7 @@ chd_error chd_file::write_metadata(chd_metadata_tag metatag, UINT32 metaindex, c
 			raw_meta_header[4] = flags;
 			be_write(&raw_meta_header[5], (inputlen & 0x00ffffff) | (flags << 24), 3);
 			be_write(&raw_meta_header[8], 0, 8);
-			
+
 			// append the new header, then the data
 			UINT64 offset = file_append(raw_meta_header, sizeof(raw_meta_header));
 			file_append(inputbuf, inputlen);
@@ -1223,7 +1223,7 @@ chd_error chd_file::write_metadata(chd_metadata_tag metatag, UINT32 metaindex, c
 		metadata_update_hash();
 		return CHDERR_NONE;
 	}
-	
+
 	// return any errors
 	catch (chd_error &err)
 	{
@@ -1246,12 +1246,12 @@ chd_error chd_file::delete_metadata(chd_metadata_tag metatag, UINT32 metaindex)
 		metadata_entry metaentry;
 		if (!metadata_find(metatag, metaindex, metaentry))
 			throw CHDERR_METADATA_NOT_FOUND;
-		
+
 		// point the previous to the next, unlinking us
 		metadata_set_previous_next(metaentry.prev, metaentry.next);
 		return CHDERR_NONE;
 	}
-	
+
 	// return any errors
 	catch (chd_error &err)
 	{
@@ -1261,7 +1261,7 @@ chd_error chd_file::delete_metadata(chd_metadata_tag metatag, UINT32 metaindex)
 
 
 //-------------------------------------------------
-//  clone_all_metadata - clone the metadata from 
+//  clone_all_metadata - clone the metadata from
 //  one CHD to a second
 //-------------------------------------------------
 
@@ -1282,7 +1282,7 @@ chd_error chd_file::clone_all_metadata(chd_file &source)
 			// read the metadata item
 			filedata.resize(metaentry.length);
 			source.file_read(metaentry.offset + METADATA_HEADER_SIZE, filedata, metaentry.length);
-			
+
 			// write it to the destination
 			chd_error err = write_metadata(metaentry.metatag, (UINT32)-1, filedata, metaentry.length, metaentry.flags);
 			if (err != CHDERR_NONE)
@@ -1290,7 +1290,7 @@ chd_error chd_file::clone_all_metadata(chd_file &source)
 		}
 		return CHDERR_NONE;
 	}
-	
+
 	// return any errors
 	catch (chd_error &err)
 	{
@@ -1363,7 +1363,7 @@ chd_error chd_file::codec_configure(chd_codec_type codec, int param, void *confi
 			}
 		return CHDERR_INVALID_PARAMETER;
 	}
-	
+
 	// return any errors
 	catch (chd_error &err)
 	{
@@ -1425,7 +1425,7 @@ const char *chd_file::error_string(chd_error err)
 
 //-------------------------------------------------
 //  guess_unitbytes - for older CHD formats, take
-//	a guess at the bytes/unit based on metadata
+//  a guess at the bytes/unit based on metadata
 //-------------------------------------------------
 
 UINT32 chd_file::guess_unitbytes()
@@ -1441,7 +1441,7 @@ UINT32 chd_file::guess_unitbytes()
 		read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
 		read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE)
 		return CD_FRAME_SIZE;
-	
+
 	// otherwise, just map 1:1 with the hunk size
 	return m_hunkbytes;
 }
@@ -1464,7 +1464,7 @@ void chd_file::parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1)
 	m_metaoffset = be_read(&rawheader[36], 8);
 	m_hunkbytes = be_read(&rawheader[76], 4);
 	m_hunkcount = be_read(&rawheader[24], 4);
-	
+
 	// extract parent SHA-1
 	UINT32 flags = be_read(&rawheader[16], 4);
 	if ((flags & 2) && m_allow_writes)
@@ -1480,21 +1480,21 @@ void chd_file::parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1)
 		default: throw CHDERR_UNKNOWN_COMPRESSION;
 	}
 	m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC_NONE;
-	
+
 	// describe the format
 	m_mapoffset_offset = 0;
 	m_metaoffset_offset = 36;
 	m_sha1_offset = 80;
 	m_rawsha1_offset = 0;
 	m_parentsha1_offset = 100;
-	
+
 	// determine properties of map entries
 	m_mapentrybytes = 16;
 
 	// extract parent SHA-1
 	if (flags & 1)
 		parentsha1 = be_read_sha1(&rawheader[m_parentsha1_offset]);
-	
+
 	// guess at the units based on snooping the metadata
 	m_unitbytes = guess_unitbytes();
 	m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
@@ -1518,7 +1518,7 @@ void chd_file::parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1)
 	m_metaoffset = be_read(&rawheader[36], 8);
 	m_hunkbytes = be_read(&rawheader[44], 4);
 	m_hunkcount = be_read(&rawheader[24], 4);
-	
+
 	// extract parent SHA-1
 	UINT32 flags = be_read(&rawheader[16], 4);
 	if ((flags & 2) && m_allow_writes)
@@ -1534,21 +1534,21 @@ void chd_file::parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1)
 		default: throw CHDERR_UNKNOWN_COMPRESSION;
 	}
 	m_compression[1] = m_compression[2] = m_compression[3] = CHD_CODEC_NONE;
-	
+
 	// describe the format
 	m_mapoffset_offset = 0;
 	m_metaoffset_offset = 36;
 	m_sha1_offset = 48;
 	m_rawsha1_offset = 88;
 	m_parentsha1_offset = 68;
-	
+
 	// determine properties of map entries
 	m_mapentrybytes = 16;
 
 	// extract parent SHA-1
 	if (flags & 1)
 		parentsha1 = be_read_sha1(&rawheader[m_parentsha1_offset]);
-	
+
 	// guess at the units based on snooping the metadata
 	m_unitbytes = guess_unitbytes();
 	m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
@@ -1574,20 +1574,20 @@ void chd_file::parse_v5_header(UINT8 *rawheader, sha1_t &parentsha1)
 	m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
 	m_unitbytes = be_read(&rawheader[60], 4);
 	m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
-	
+
 	// determine compression
 	m_compression[0] = be_read(&rawheader[16], 4);
 	m_compression[1] = be_read(&rawheader[20], 4);
 	m_compression[2] = be_read(&rawheader[24], 4);
 	m_compression[3] = be_read(&rawheader[28], 4);
-	
+
 	// describe the format
 	m_mapoffset_offset = 40;
 	m_metaoffset_offset = 48;
 	m_sha1_offset = 84;
 	m_rawsha1_offset = 64;
 	m_parentsha1_offset = 104;
-	
+
 	// determine properties of map entries
 	m_mapentrybytes = compressed() ? 12 : 4;
 
@@ -1608,10 +1608,10 @@ chd_error chd_file::compress_v5_map()
 		// first get a CRC-16 of the original rawmap
 		crc16_t mapcrc = crc16_creator::simple(m_rawmap, m_hunkcount * 12);
 
-		// create a buffer to hold the RLE data	
+		// create a buffer to hold the RLE data
 		dynamic_buffer compression_rle(m_hunkcount);
 		UINT8 *dest = compression_rle;
-		
+
 		// use a huffman encoder for 16 different codes, maximum length is 8 bits
 		huffman_encoder<16, 8> encoder;
 		encoder.histo_reset();
@@ -1627,7 +1627,7 @@ chd_error chd_file::compress_v5_map()
 		for (int hunknum = 0; hunknum < m_hunkcount; hunknum++)
 		{
 			UINT8 curcomp = m_rawmap[hunknum * 12 + 0];
-			
+
 			// promote self block references to more compact forms
 			if (curcomp == COMPRESSION_SELF)
 			{
@@ -1655,15 +1655,15 @@ chd_error chd_file::compress_v5_map()
 					max_parent = MAX(max_parent, refunit);
 				last_parent = refunit;
 			}
-			
+
 			// track maximum compressed length
 			else //if (curcomp >= COMPRESSION_TYPE_0 && curcomp <= COMPRESSION_TYPE_3)
 				max_complen = MAX(max_complen, be_read(&m_rawmap[hunknum * 12 + 1], 3));
-			
+
 			// track repeats
 			if (curcomp == lastcomp)
 				count++;
-			
+
 			// if no repeat, or we're at the end, flush it
 			if (curcomp != lastcomp || hunknum == m_hunkcount - 1)
 			{
@@ -1690,7 +1690,7 @@ chd_error chd_file::compress_v5_map()
 					encoder.histo_one(*dest++ = lastcomp = curcomp);
 			}
 		}
-		
+
 		// compute a tree and export it to the buffer
 		dynamic_buffer compressed(m_hunkcount * 6);
 		bitstream_out bitbuf(&compressed[16], compressed.count() - 16);
@@ -1704,7 +1704,7 @@ chd_error chd_file::compress_v5_map()
 		// encode the data
 		for (UINT8 *src = compression_rle; src < dest; src++)
 			encoder.encode_one(bitbuf, *src);
-		
+
 		// determine the number of bits we need to hold the a length
 		// and a hunk index
 		UINT8 lengthbits = bits_for_value(max_complen);
@@ -1722,7 +1722,7 @@ chd_error chd_file::compress_v5_map()
 			UINT32 length = be_read(&rawmap[1], 3);
 			UINT64 offset = be_read(&rawmap[4], 6);
 			UINT16 crc = be_read(&rawmap[10], 2);
-			
+
 			// if no count remaining, fetch the next entry
 			if (count == 0)
 			{
@@ -1736,7 +1736,7 @@ chd_error chd_file::compress_v5_map()
 			}
 			else
 				count--;
-			
+
 			// output additional data needed for this entry
 			switch (lastcomp)
 			{
@@ -1750,23 +1750,23 @@ chd_error chd_file::compress_v5_map()
 					if (firstoffs == 0)
 						firstoffs = offset;
 					break;
-				
+
 				case COMPRESSION_NONE:
 					bitbuf.write(crc, 16);
 					if (firstoffs == 0)
 						firstoffs = offset;
 					break;
-				
+
 				case COMPRESSION_SELF:
 					assert(offset < (UINT64(1) << selfbits));
 					bitbuf.write(offset, selfbits);
 					break;
-				
+
 				case COMPRESSION_PARENT:
 					assert(offset < (UINT64(1) << parentbits));
 					bitbuf.write(offset, parentbits);
 					break;
-				
+
 				case COMPRESSION_SELF_0:
 				case COMPRESSION_SELF_1:
 				case COMPRESSION_PARENT_SELF:
@@ -1775,7 +1775,7 @@ chd_error chd_file::compress_v5_map()
 					break;
 			}
 		}
-		
+
 		// write the map header
 		UINT32 complen = bitbuf.flush();
 		assert(!bitbuf.overflow());
@@ -1785,10 +1785,10 @@ chd_error chd_file::compress_v5_map()
 		compressed[12] = lengthbits;
 		compressed[13] = selfbits;
 		compressed[14] = parentbits;
-		
+
 		// write the result
 		m_mapoffset = file_append(compressed, complen + 16);
-		
+
 		// then write the map offset
 		UINT8 rawbuf[sizeof(UINT64)];
 		be_write(rawbuf, m_mapoffset, 8);
@@ -1824,12 +1824,12 @@ void chd_file::decompress_v5_map()
 	UINT8 lengthbits = rawbuf[12];
 	UINT8 selfbits = rawbuf[13];
 	UINT8 parentbits = rawbuf[14];
-	
+
 	// now read the map
 	dynamic_buffer compressed(mapbytes);
 	file_read(m_mapoffset + 16, compressed, mapbytes);
 	bitstream_in bitbuf(compressed, compressed.count());
-	
+
 	// first decode the compression types
 	huffman_decoder<16, 8> decoder;
 	huffman_error err = decoder.import_tree_rle(bitbuf);
@@ -1853,7 +1853,7 @@ void chd_file::decompress_v5_map()
 				rawmap[0] = lastcomp = val;
 		}
 	}
-	
+
 	// then iterate through the hunks and extract the needed data
 	UINT64 curoffset = firstoffs;
 	UINT32 last_self = 0;
@@ -1874,21 +1874,21 @@ void chd_file::decompress_v5_map()
 				curoffset += length = bitbuf.read(lengthbits);
 				crc = bitbuf.read(16);
 				break;
-			
+
 			case COMPRESSION_NONE:
 				curoffset += length = m_hunkbytes;
 				crc = bitbuf.read(16);
 				break;
-			
+
 			case COMPRESSION_SELF:
 				last_self = offset = bitbuf.read(selfbits);
 				break;
-			
+
 			case COMPRESSION_PARENT:
 				offset = bitbuf.read(parentbits);
 				last_parent = offset;
 				break;
-			
+
 			// pseudo-types; convert into base types
 			case COMPRESSION_SELF_1:
 				last_self++;
@@ -1896,12 +1896,12 @@ void chd_file::decompress_v5_map()
 				rawmap[0] = COMPRESSION_SELF;
 				offset = last_self;
 				break;
-				
+
 			case COMPRESSION_PARENT_SELF:
 				rawmap[0] = COMPRESSION_PARENT;
 				last_parent = offset = (UINT64(hunknum) * UINT64(m_hunkbytes)) / m_unitbytes;
 				break;
-				
+
 			case COMPRESSION_PARENT_1:
 				last_parent += m_hunkbytes / m_unitbytes;
 			case COMPRESSION_PARENT_0:
@@ -1913,12 +1913,12 @@ void chd_file::decompress_v5_map()
 		be_write(&rawmap[4], offset, 6);
 		be_write(&rawmap[10], crc, 2);
 	}
-	
+
 	// verify the final CRC
 	if (crc16_creator::simple(m_rawmap, m_hunkcount * 12) != mapcrc)
 		throw CHDERR_DECOMPRESSION_ERROR;
 }
-	
+
 
 //-------------------------------------------------
 //  create_common - command path when creating a
@@ -1933,17 +1933,17 @@ chd_error chd_file::create_common()
 		// if we have a parent, it must be V3 or later
 		if (m_parent != NULL && m_parent->version() < 3)
 			throw CHDERR_UNSUPPORTED_VERSION;
-		
+
 		// must be an even number of units per hunk
 		if (m_hunkbytes % m_unitbytes != 0)
 			throw CHDERR_INVALID_PARAMETER;
 		if (m_parent != NULL && m_unitbytes != m_parent->unit_bytes())
 			throw CHDERR_INVALID_PARAMETER;
-		
+
 		// writes are obviously permitted; reads only if uncompressed
 		m_allow_writes = true;
 		m_allow_reads = !compressed();
-	
+
 		// verify the compression types
 		bool found_zero = false;
 		for (int codecnum = 0; codecnum < ARRAY_LENGTH(m_compression); codecnum++)
@@ -1978,11 +1978,11 @@ chd_error chd_file::create_common()
 
 		// write the resulting header
 		file_write(0, rawheader, sizeof(rawheader));
-		
+
 		// parse it back out to set up fields appropriately
 		sha1_t parentsha1;
 		parse_v5_header(rawheader, parentsha1);
-		
+
 		// write out the map (if not compressed)
 		if (!compressed())
 		{
@@ -2001,7 +2001,7 @@ chd_error chd_file::create_common()
 		// finish opening the file
 		create_open_common();
 	}
-	
+
 	// handle errors by closing ourself
 	catch (chd_error &err)
 	{
@@ -2030,20 +2030,20 @@ chd_error chd_file::open_common(bool writeable)
 		// reads are always permitted; writes possibly as well
 		m_allow_reads = true;
 		m_allow_writes = writeable;
-		
+
 		// read the raw header
 		UINT8 rawheader[MAX_HEADER_SIZE];
 		file_read(0, rawheader, sizeof(rawheader));
-		
+
 		// verify the signature
 		if (memcmp(rawheader, "MComprHD", 8) != 0)
 			throw CHDERR_INVALID_FILE;
-		
+
 		// only allow writes to the most recent version
 		m_version = be_read(&rawheader[12], 4);
 		if (m_allow_writes && m_version < HEADER_VERSION)
 			throw CHDERR_UNSUPPORTED_VERSION;
-		
+
 		// read the header if we support it
 		sha1_t parentsha1 = sha1_t::null;
 		switch (m_version)
@@ -2051,9 +2051,9 @@ chd_error chd_file::open_common(bool writeable)
 			case 3:		parse_v3_header(rawheader, parentsha1);	break;
 			case 4:		parse_v4_header(rawheader, parentsha1);	break;
 			case 5:		parse_v5_header(rawheader, parentsha1);	break;
-			default: 	throw CHDERR_UNSUPPORTED_VERSION;
+			default:	throw CHDERR_UNSUPPORTED_VERSION;
 		}
-		
+
 		// make sure we have a parent if we need one (and don't if we don't)
 		if (parentsha1 != sha1_t::null)
 		{
@@ -2064,12 +2064,12 @@ chd_error chd_file::open_common(bool writeable)
 		}
 		else if (parentsha1 == sha1_t::null && m_parent != NULL)
 			throw CHDERR_INVALID_PARAMETER;
-		
+
 		// finish opening the file
 		create_open_common();
 		return CHDERR_NONE;
 	}
-	
+
 	// handle errors by closing ourself
 	catch (chd_error &err)
 	{
@@ -2093,7 +2093,7 @@ void chd_file::create_open_common()
 		if (m_decompressor[decompnum] == NULL && m_compression[decompnum] != 0)
 			throw CHDERR_UNKNOWN_COMPRESSION;
 	}
-	
+
 	// read the map; v5+ compressed drives need to read and decompress their map
 	m_rawmap.resize(m_hunkcount * m_mapentrybytes);
 	if (m_version >= 5 && compressed())
@@ -2135,16 +2135,16 @@ void chd_file::verify_proper_compression_append(UINT32 hunknum)
 	UINT8 *rawmap = &m_rawmap[hunknum * 12];
 	if (rawmap[0] != 0xff)
 		throw CHDERR_COMPRESSION_ERROR;
-	
+
 	// if this isn't the first block, only permitted to write immediately
 	// after the previous one
 	if (hunknum != 0 && rawmap[-12] == 0xff)
 		throw CHDERR_COMPRESSION_ERROR;
 }
-	
+
 
 //-------------------------------------------------
-//  hunk_write_compressed - write a hunk to a 
+//  hunk_write_compressed - write a hunk to a
 //  compressed CHD, discovering the best
 //  technique
 //-------------------------------------------------
@@ -2153,10 +2153,10 @@ void chd_file::hunk_write_compressed(UINT32 hunknum, INT8 compression, const UIN
 {
 	// verify that we are appending properly to a compressed file
 	verify_proper_compression_append(hunknum);
-	
+
 	// write the final result
 	UINT64 offset = file_append(compressed, complength);
-	
+
 	// update the map entry
 	UINT8 *rawmap = &m_rawmap[hunknum * 12];
 	rawmap[0] = (compression == -1) ? COMPRESSION_NONE : compression;
@@ -2175,10 +2175,10 @@ void chd_file::hunk_copy_from_self(UINT32 hunknum, UINT32 otherhunk)
 {
 	// verify that we are appending properly to a compressed file
 	verify_proper_compression_append(hunknum);
-	
+
 	// only permitted to reference prior hunks
 	if (otherhunk >= hunknum)
-		throw CHDERR_INVALID_PARAMETER; 
+		throw CHDERR_INVALID_PARAMETER;
 
 	// update the map entry
 	UINT8 *rawmap = &m_rawmap[hunknum * 12];
@@ -2273,11 +2273,11 @@ void chd_file::metadata_set_previous_next(UINT64 prevoffset, UINT64 nextoffset)
 	// otherwise, update the link in the previous header
 	else
 		offset = prevoffset + 8;
-	
+
 	// create a big-endian version
 	UINT8 rawbuf[sizeof(UINT64)];
 	be_write(rawbuf, nextoffset, 8);
-	
+
 	// write to the header and update our local copy
 	file_write(offset, rawbuf, sizeof(rawbuf));
 }
@@ -2296,11 +2296,11 @@ void chd_file::metadata_update_hash()
 
 	// compute the new overall hash
 	sha1_t fullsha1 = compute_overall_sha1(raw_sha1());
-		
+
 	// create a big-endian version
 	UINT8 rawbuf[sizeof(sha1_t)];
 	be_write_sha1(&rawbuf[0], fullsha1);
-	
+
 	// write to the header
 	file_write(m_sha1_offset, rawbuf, sizeof(rawbuf));
 }
@@ -2356,7 +2356,7 @@ chd_file_compressor::~chd_file_compressor()
 	// free the work queues
 	osd_work_queue_free(m_read_queue);
 	osd_work_queue_free(m_work_queue);
-	
+
 	// delete allocated arrays
 	for (int codecnum = 0; codecnum < ARRAY_LENGTH(m_codecs); codecnum++)
 		delete m_codecs[codecnum];
@@ -2374,16 +2374,16 @@ void chd_file_compressor::compress_begin()
 	m_total_in = 0;
 	m_total_out = 0;
 	m_compsha1.reset();
-	
+
 	// reset our maps
 	m_parent_map.reset();
 	m_current_map.reset();
-	
+
 	// reset read state
 	m_read_queue_offset = 0;
 	m_read_done_offset = 0;
 	m_read_error = false;
-	
+
 	// reset work item state
 	m_work_buffer.resize(hunk_bytes() * (WORK_BUFFER_HUNKS + 1));
 	m_compressed_buffer.resize(hunk_bytes() * WORK_BUFFER_HUNKS);
@@ -2395,14 +2395,14 @@ void chd_file_compressor::compress_begin()
 		item.m_compressed = m_compressed_buffer + hunk_bytes() * itemnum;
 		item.m_hash.resize(hunk_bytes() / unit_bytes());
 	}
-	
+
 	// initialize codec instances
 	for (int instance = 0; instance < ARRAY_LENGTH(m_codecs); instance++)
 	{
 		delete m_codecs[instance];
 		m_codecs[instance] = new chd_compressor_group(*this, m_compression);
 	}
-	
+
 	// reset write state
 	m_write_hunk = 0;
 }
@@ -2429,10 +2429,10 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 			if (m_work_item[curitem % WORK_BUFFER_HUNKS].m_status != WS_READY)
 				break;
 
-		// if it's not all clear, defer		
+		// if it's not all clear, defer
 		if (curitem != enditem)
 			break;
-		
+
 		// if we're walking the parent, we want one more item to have cleared so we
 		// can read an extra hunk there
 		if (m_walking_parent && m_work_item[curitem % WORK_BUFFER_HUNKS].m_status != WS_READY)
@@ -2444,12 +2444,12 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 		osd_work_item_queue(m_read_queue, async_read_static, this, WORK_ITEM_FLAG_AUTO_RELEASE);
 		m_read_queue_offset += WORK_BUFFER_HUNKS * hunk_bytes() / 2;
 	}
-	
+
 	// flush out any finished items
 	while (m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_status == WS_COMPLETE)
 	{
 		work_item &item = m_work_item[m_write_hunk % WORK_BUFFER_HUNKS];
-		
+
 		// free any OSD work item
 		if (item.m_osd != NULL)
 			osd_work_item_release(item.m_osd);
@@ -2466,22 +2466,22 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 				if (m_parent_map.find(item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1) == hashmap::NOT_FOUND)
 					m_parent_map.add(item.m_hunknum * uph + unit, item.m_hash[unit].m_crc16, item.m_hash[unit].m_sha1);
 		}
-		
+
 		// if we're uncompressed, use regular writes
 		else if (!compressed())
 		{
 			chd_error err = write_hunk(item.m_hunknum, item.m_data);
 			if (err != CHDERR_NONE)
 				return err;
-	
-			// writes of all-0 data don't actually take space, so see if we count this		
+
+			// writes of all-0 data don't actually take space, so see if we count this
 			chd_codec_type codec = CHD_CODEC_NONE;
 			UINT32 complen;
 			hunk_info(item.m_hunknum, codec, complen);
 			if (codec == CHD_CODEC_NONE)
 				m_total_out += m_hunkbytes;
 		}
-		
+
 		// for compressing, process the result
 		else do
 		{
@@ -2492,7 +2492,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 				hunk_copy_from_self(item.m_hunknum, selfhunk);
 				break;
 			}
-			
+
 			// if not, see if it's in the parent map
 			if (m_parent != NULL)
 			{
@@ -2503,17 +2503,17 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 					break;
 				}
 			}
-			
+
 			// otherwise, append it compressed and add to the self map
 			hunk_write_compressed(item.m_hunknum, item.m_compression, item.m_compressed, item.m_complen, item.m_hash[0].m_crc16);
 			m_total_out += item.m_complen;
 			m_current_map.add(item.m_hunknum, item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
 		} while (0);
-		
+
 		// reset the item and advance
 		item.m_status = WS_READY;
 		m_write_hunk++;
-		
+
 		// if we hit the end, finalize
 		if (m_write_hunk == m_hunkcount)
 		{
@@ -2526,7 +2526,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 				for (int itemnum = 0; itemnum < WORK_BUFFER_HUNKS; itemnum++)
 					m_work_item[itemnum].m_status = WS_READY;
 			}
-			
+
 			// wait for all reads to finish and if we're compressed, write the final SHA1 and map
 			else
 			{
@@ -2538,7 +2538,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 			}
 		}
 	}
-	
+
 	// update progress and ratio
 	if (m_walking_parent)
 		progress = double(m_read_done_offset) / double(logical_bytes());
@@ -2582,7 +2582,7 @@ void chd_file_compressor::async_walk_parent(work_item &item)
 
 
 //-------------------------------------------------
-//  async_compress_hunk - handle asynchronous 
+//  async_compress_hunk - handle asynchronous
 //  hunk compression
 //-------------------------------------------------
 
@@ -2615,7 +2615,7 @@ void chd_file_compressor::async_compress_hunk(work_item &item, int threadid)
 
 
 //-------------------------------------------------
-//  async_read - handle asynchronous source file 
+//  async_read - handle asynchronous source file
 //  reading
 //-------------------------------------------------
 
@@ -2655,11 +2655,11 @@ void chd_file_compressor::async_read()
 				curdest += hunk_bytes();
 			}
 		}
-		
+
 		// otherwise, call the virtual function
 		else
 			read_data(dest, m_read_done_offset, numbytes);
-		
+
 		// spawn off work for each hunk
 		for (UINT64 curoffs = m_read_done_offset; curoffs < end_offset; curoffs += hunk_bytes())
 		{
@@ -2678,7 +2678,7 @@ void chd_file_compressor::async_read()
 				m_compsha1.append(dest, numbytes);
 			m_total_in += numbytes;
 		}
-		
+
 		// advance the read pointer
 		m_read_done_offset += numbytes;
 	}
@@ -2730,7 +2730,7 @@ void chd_file_compressor::hashmap::reset()
 		delete block;
 	}
 	m_block_list->m_nextalloc = 0;
-	
+
 	// reset the hash
 	memset(m_map, 0, sizeof(m_map));
 }

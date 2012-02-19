@@ -52,14 +52,14 @@ const device_type VOTRAX = &device_creator<votrax_device>;
 
 const char *const votrax_device::s_phoneme_table[64] =
 {
-	"EH3",	"EH2",	"EH1",	" "/*PA0*/"DT",	"A1", 	"A2",  	"ZH",
-	"AH2",	"I3", 	"I2", 	"I1", 	"M",  	"N",  	"B",   	"V",
-	"CH", 	"SH", 	"Z",  	"AW1",	"NG", 	"AH1",	"OO1", 	"OO",
-	"L",  	"K",  	"J",  	"H",  	"G",  	"F",  	"D",   	"S",
-	"A",  	"AY", 	"Y1", 	"UH3",	"AH", 	"P",  	"O",   	"I",
-	"U",  	"Y",  	"T",  	"R",  	"E",  	"W",  	"AE",  	"AE1",
-	"AW2",	"UH2",	"UH1",	"UH", 	"O2", 	"O1", 	"IU",  	"U1",
-	"THV",	"TH", 	"ER", 	"EH", 	"E1", 	"AW", 	" "/*PA1*/, "."/*STOP*/
+	"EH3",	"EH2",	"EH1",	" "/*PA0*/"DT",	"A1",	"A2",	"ZH",
+	"AH2",	"I3",	"I2",	"I1",	"M",	"N",	"B",	"V",
+	"CH",	"SH",	"Z",	"AW1",	"NG",	"AH1",	"OO1",	"OO",
+	"L",	"K",	"J",	"H",	"G",	"F",	"D",	"S",
+	"A",	"AY",	"Y1",	"UH3",	"AH",	"P",	"O",	"I",
+	"U",	"Y",	"T",	"R",	"E",	"W",	"AE",	"AE1",
+	"AW2",	"UH2",	"UH1",	"UH",	"O2",	"O1",	"IU",	"U1",
+	"THV",	"TH",	"ER",	"EH",	"E1",	"AW",	" "/*PA1*/, "."/*STOP*/
 };
 
 
@@ -103,7 +103,7 @@ WRITE8_MEMBER( votrax_device::write )
 {
 	// append to the current string
 	m_current.cat(s_phoneme_table[data & 0x3f]);
-	
+
 	// look for a match in our sample table
 	for (int index = 0; m_votrax_map[index].phoneme != NULL; index++)
 		if (m_current.find(m_votrax_map[index].phoneme) != -1)
@@ -117,7 +117,7 @@ WRITE8_MEMBER( votrax_device::write )
 			m_current.reset();
 			return;
 		}
-	
+
 	// if we got a stop and didn't find a match, print it
 	if ((data & 0x3f) == 0x3f)
 	{
@@ -157,7 +157,7 @@ void votrax_device::device_start()
 	m_channels = 1;
 	m_names = m_sample_list;
 	m_start = NULL;
-	
+
 	// let the samples device do the rest
 	samples_device::device_start();
 }

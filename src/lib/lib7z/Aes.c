@@ -228,9 +228,9 @@ void MY_FAST_CALL AesCbc_Encode(UInt32 *p, Byte *data, size_t numBlocks)
     p[1] ^= GetUi32(data + 4);
     p[2] ^= GetUi32(data + 8);
     p[3] ^= GetUi32(data + 12);
-    
+
     Aes_Encode(p + 4, p, p);
-    
+
     SetUi32(data,      p[0]);
     SetUi32(data + 4,  p[1]);
     SetUi32(data + 8,  p[2]);
@@ -254,7 +254,7 @@ void MY_FAST_CALL AesCbc_Decode(UInt32 *p, Byte *data, size_t numBlocks)
     SetUi32(data + 4,  p[1] ^ out[1]);
     SetUi32(data + 8,  p[2] ^ out[2]);
     SetUi32(data + 12, p[3] ^ out[3]);
-    
+
     p[0] = in[0];
     p[1] = in[1];
     p[2] = in[2];

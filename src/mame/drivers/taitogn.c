@@ -451,7 +451,7 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 	taitogn_state *state = space->machine().driver_data<taitogn_state>();
 
 	if(offset >= 0x140 && offset <= 0x144) {
-		dynamic_buffer key;	
+		dynamic_buffer key;
 
 		int pos = (offset - 0x140)*2;
 		UINT8 v, k;

@@ -829,7 +829,7 @@ class ide_baseboard_device : public ide_hdd_device
 public:
     // construction/destruction
     ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual int	 read_sector(UINT32 lba, void *buffer);
 	virtual int	 write_sector(UINT32 lba, const void *buffer);
 	virtual bool is_ready() { return true; }

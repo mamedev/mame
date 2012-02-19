@@ -409,10 +409,10 @@ static SRes Xz_Compress(CXzStream *xz, CLzma2WithFilters *lzmaf,
     int filterIndex = 0;
     CXzFilter *filter = NULL;
     const CXzFilterProps *fp = props->filterProps;
-    
+
     XzBlock_ClearFlags(&block);
     XzBlock_SetNumFilters(&block, 1 + (fp ? 1 : 0));
-    
+
     if (fp)
     {
       filter = &block.filters[filterIndex++];
@@ -440,13 +440,13 @@ static SRes Xz_Compress(CXzStream *xz, CLzma2WithFilters *lzmaf,
     seqSizeOutStream.p.Write = MyWrite;
     seqSizeOutStream.realStream = outStream;
     seqSizeOutStream.processed = 0;
-    
+
     RINOK(XzBlock_WriteHeader(&block, &seqSizeOutStream.p));
-    
+
     checkInStream.p.Read = SeqCheckInStream_Read;
     checkInStream.realStream = inStream;
     SeqCheckInStream_Init(&checkInStream, XzFlags_GetCheckType(xz->flags));
-    
+
     if (fp)
     {
       #ifdef USE_SUBBLOCK

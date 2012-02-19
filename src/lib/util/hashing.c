@@ -1,39 +1,39 @@
 /***************************************************************************
 
-	hashing.c
+    hashing.c
 
-	Hashing helper classes.
+    Hashing helper classes.
 
 ****************************************************************************
 
-	Copyright Aaron Giles
-	All rights reserved.
+    Copyright Aaron Giles
+    All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are
-	met:
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
 
-		* Redistributions of source code must retain the above copyright
-		  notice, this list of conditions and the following disclaimer.
-		* Redistributions in binary form must reproduce the above copyright
-		  notice, this list of conditions and the following disclaimer in
-		  the documentation and/or other materials provided with the
-		  distribution.
-		* Neither the name 'MAME' nor the names of its contributors may be
-		  used to endorse or promote products derived from this software
-		  without specific prior written permission.
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
-	IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-	DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
-	INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-	SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-	STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-	IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -57,7 +57,7 @@ const sha1_t sha1_t::null = { { 0 } };
 //**************************************************************************
 
 //-------------------------------------------------
-//  char_to_hex - return the hex value of a 
+//  char_to_hex - return the hex value of a
 //  character
 //-------------------------------------------------
 
@@ -89,7 +89,7 @@ bool sha1_t::from_string(const char *string, int length)
 		length = strlen(string);
 	if (length < 2 * sizeof(m_raw))
 		return false;
-	
+
 	// iterate through our raw buffer
 	for (int bytenum = 0; bytenum < sizeof(m_raw); bytenum++)
 	{
@@ -111,7 +111,7 @@ const char *sha1_t::as_string(astring &buffer) const
 {
 	buffer.reset();
 	for (int i = 0; i < ARRAY_LENGTH(m_raw); i++)
-		buffer.catformat("%02x", m_raw[i]); 
+		buffer.catformat("%02x", m_raw[i]);
 	return buffer;
 }
 
@@ -131,7 +131,7 @@ bool md5_t::from_string(const char *string, int length)
 		length = strlen(string);
 	if (length < 2 * sizeof(m_raw))
 		return false;
-	
+
 	// iterate through our raw buffer
 	for (int bytenum = 0; bytenum < sizeof(m_raw); bytenum++)
 	{
@@ -153,7 +153,7 @@ const char *md5_t::as_string(astring &buffer) const
 {
 	buffer.reset();
 	for (int i = 0; i < ARRAY_LENGTH(m_raw); i++)
-		buffer.catformat("%02x", m_raw[i]); 
+		buffer.catformat("%02x", m_raw[i]);
 	return buffer;
 }
 
@@ -174,7 +174,7 @@ bool crc32_t::from_string(const char *string, int length)
 		length = strlen(string);
 	if (length < 2 * sizeof(m_raw))
 		return false;
-	
+
 	// iterate through our raw buffer
 	m_raw = 0;
 	for (int bytenum = 0; bytenum < sizeof(m_raw) * 2; bytenum++)
@@ -199,7 +199,7 @@ const char *crc32_t::as_string(astring &buffer) const
 
 
 //-------------------------------------------------
-//  append - hash a block of data, appending to 
+//  append - hash a block of data, appending to
 //  the currently-accumulated value
 //-------------------------------------------------
 
@@ -225,7 +225,7 @@ bool crc16_t::from_string(const char *string, int length)
 		length = strlen(string);
 	if (length < 2 * sizeof(m_raw))
 		return false;
-	
+
 	// iterate through our raw buffer
 	m_raw = 0;
 	for (int bytenum = 0; bytenum < sizeof(m_raw) * 2; bytenum++)
@@ -250,13 +250,13 @@ const char *crc16_t::as_string(astring &buffer) const
 
 
 //-------------------------------------------------
-//  append - hash a block of data, appending to 
+//  append - hash a block of data, appending to
 //  the currently-accumulated value
 //-------------------------------------------------
 
 void crc16_creator::append(const void *data, UINT32 length)
 {
-	static const UINT16 s_table[256] = 
+	static const UINT16 s_table[256] =
 	{
 	    0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
 	    0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
@@ -293,7 +293,7 @@ void crc16_creator::append(const void *data, UINT32 length)
     };
 
 	const UINT8 *src = reinterpret_cast<const UINT8 *>(data);
-	
+
 	// fetch the current value into a local and rip through the source data
 	UINT16 crc = m_accum.m_raw;
 	while (length-- != 0)

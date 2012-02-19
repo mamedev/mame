@@ -55,7 +55,7 @@
 
     Compressed Hunks of Data header format. All numbers are stored in
     Motorola (big-endian) byte ordering.
-    
+
     =========================================================================
 
     V1 header:
@@ -78,15 +78,15 @@
         0x00000001 - set if this drive has a parent
         0x00000002 - set if this drive allows writes
 
-	Compression types:
-		CHDCOMPRESSION_NONE = 0
-		CHDCOMPRESSION_ZLIB = 1
-    
+    Compression types:
+        CHDCOMPRESSION_NONE = 0
+        CHDCOMPRESSION_ZLIB = 1
+
     V1 map format:
-    
-    [  0] UINT64 offset : 44;	// starting offset within the file
-    [  0] UINT64 length : 20;	// length of data; if == hunksize, data is uncompressed
-    
+
+    [  0] UINT64 offset : 44;   // starting offset within the file
+    [  0] UINT64 length : 20;   // length of data; if == hunksize, data is uncompressed
+
     =========================================================================
 
     V2 header:
@@ -105,9 +105,9 @@
     [ 60] UINT8  parentmd5[16]; // MD5 checksum of parent file
     [ 76] UINT32 seclen;        // number of bytes per sector
     [ 80] (V2 header length)
-    
+
     Flags and map format are same as V1
-    
+
     =========================================================================
 
     V3 header:
@@ -126,21 +126,21 @@
     [ 80] UINT8  sha1[20];      // SHA1 checksum of raw data
     [100] UINT8  parentsha1[20];// SHA1 checksum of parent file
     [120] (V3 header length)
-    
+
     Flags are the same as V1
 
-	Compression types:
-		CHDCOMPRESSION_NONE = 0
-		CHDCOMPRESSION_ZLIB = 1
-		CHDCOMPRESSION_ZLIB_PLUS = 2
-    
+    Compression types:
+        CHDCOMPRESSION_NONE = 0
+        CHDCOMPRESSION_ZLIB = 1
+        CHDCOMPRESSION_ZLIB_PLUS = 2
+
     V3 map format:
 
     [  0] UINT64 offset;        // starting offset within the file
-    [  8] UINT32 crc32;			// 32-bit CRC of the uncompressed data
-    [ 12] UINT16 length_lo;		// lower 16 bits of length
-    [ 14] UINT8 length_hi;		// upper 8 bits of length
-    [ 15] UINT8 flags;			// flags, indicating compression info
+    [  8] UINT32 crc32;         // 32-bit CRC of the uncompressed data
+    [ 12] UINT16 length_lo;     // lower 16 bits of length
+    [ 14] UINT8 length_hi;      // upper 8 bits of length
+    [ 15] UINT8 flags;          // flags, indicating compression info
 
     =========================================================================
 
@@ -159,21 +159,21 @@
     [ 68] UINT8  parentsha1[20];// combined raw+meta SHA1 of parent
     [ 88] UINT8  rawsha1[20];   // raw data SHA1
     [108] (V4 header length)
-    
+
     Flags are the same as V1
-    
-	Compression types:
-		CHDCOMPRESSION_NONE = 0
-		CHDCOMPRESSION_ZLIB = 1
-		CHDCOMPRESSION_ZLIB_PLUS = 2
-		CHDCOMPRESSION_AV = 3
-    
+
+    Compression types:
+        CHDCOMPRESSION_NONE = 0
+        CHDCOMPRESSION_ZLIB = 1
+        CHDCOMPRESSION_ZLIB_PLUS = 2
+        CHDCOMPRESSION_AV = 3
+
     Map format is the same as V3
-    
+
     =========================================================================
 
     V5 header:
-    
+
     [  0] char   tag[8];        // 'MComprHD'
     [  8] UINT32 length;        // length of header (including tag and length fields)
     [ 12] UINT32 version;       // drive format version
@@ -188,30 +188,30 @@
     [104] UINT8  parentsha1[20];// combined raw+meta SHA1 of parent
     [124] (V5 header length)
 
-	If parentsha1 != 0, we have a parent (no need for flags)
-	If compressors[0] == 0, we are uncompressed (including maps)
-    
+    If parentsha1 != 0, we have a parent (no need for flags)
+    If compressors[0] == 0, we are uncompressed (including maps)
+
     V5 uncompressed map format:
-    
-    [  0] UINT32 offset;   		// starting offset / hunk size
-    
+
+    [  0] UINT32 offset;        // starting offset / hunk size
+
     V5 compressed map format header:
-    
-    [  0] UINT32 length;		// length of compressed map
-    [  4] UINT48 datastart;		// offset of first block
-    [ 10] UINT16 crc;			// crc-16 of the map
-    [ 12] UINT8 lengthbits;		// bits used to encode complength
-    [ 13] UINT8 hunkbits;		// bits used to encode self-refs
-    [ 14] UINT8 parentunitbits;	// bits used to encode parent unit refs
-    [ 15] UINT8 reserved;		// future use
+
+    [  0] UINT32 length;        // length of compressed map
+    [  4] UINT48 datastart;     // offset of first block
+    [ 10] UINT16 crc;           // crc-16 of the map
+    [ 12] UINT8 lengthbits;     // bits used to encode complength
+    [ 13] UINT8 hunkbits;       // bits used to encode self-refs
+    [ 14] UINT8 parentunitbits; // bits used to encode parent unit refs
+    [ 15] UINT8 reserved;       // future use
     [ 16] (compressed header length)
-    
+
     Each compressed map entry, once expanded, looks like:
-    
-    [  0] UINT8 compression;	// compression type
-    [  1] UINT24 complength;	// compressed length
-    [  4] UINT48 offset;		// offset
-    [ 10] UINT16 crc;			// crc-16 of the data
+
+    [  0] UINT8 compression;    // compression type
+    [  1] UINT24 complength;    // compressed length
+    [  4] UINT48 offset;        // offset
+    [ 10] UINT16 crc;           // crc-16 of the data
 
 ***************************************************************************/
 
@@ -222,7 +222,7 @@
 
 // pseudo-codecs returned by hunk_info
 const chd_codec_type CHD_CODEC_SELF 		= 1;	// copy of another hunk
-const chd_codec_type CHD_CODEC_PARENT 		= 2;	// copy of a parent's hunk
+const chd_codec_type CHD_CODEC_PARENT		= 2;	// copy of a parent's hunk
 const chd_codec_type CHD_CODEC_MINI 		= 3;	// legacy "mini" 8-byte repeat
 
 // core types
@@ -322,7 +322,7 @@ class chd_file
 	static const UINT32 V4_HEADER_SIZE = 108;
 	static const UINT32 V5_HEADER_SIZE = 124;
 	static const UINT32 MAX_HEADER_SIZE = V5_HEADER_SIZE;
-	
+
 public:
 	// construction/destruction
 	chd_file();
@@ -360,7 +360,7 @@ public:
 	// file open
 	chd_error open(const char *filename, bool writeable = false, chd_file *parent = NULL);
 	chd_error open(core_file &file, bool writeable = false, chd_file *parent = NULL);
-	
+
 	// file close
 	void close();
 
@@ -382,20 +382,20 @@ public:
 	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const dynamic_buffer &input, UINT8 flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input, input.count(), flags = CHD_MDFLAGS_CHECKSUM); }
 	chd_error delete_metadata(chd_metadata_tag metatag, UINT32 metaindex);
 	chd_error clone_all_metadata(chd_file &source);
-	
+
 	// hashing helper
 	sha1_t compute_overall_sha1(sha1_t rawsha1);
 
 	// codec interfaces
 	chd_error codec_configure(chd_codec_type codec, int param, void *config);
-	
+
 	// static helpers
 	static const char *error_string(chd_error err);
 
 private:
 	struct metadata_entry;
 	struct metadata_hash;
-	
+
 	// inline helpers
 	UINT64 be_read(const UINT8 *base, int numbytes);
 	void be_write(UINT8 *base, UINT64 value, int numbytes);
@@ -430,7 +430,7 @@ private:
 	bool					m_owns_file;		// flag indicating if this file should be closed on chd_close()
 	bool					m_allow_reads;		// permit reads from this CHD?
 	bool					m_allow_writes;		// permit writes to this CHD?
-	
+
 	// core parameters from the header
 	UINT32					m_version;			// version of the header
 	UINT64					m_logicalbytes;		// logical size of the raw CHD data in bytes
@@ -443,14 +443,14 @@ private:
 	chd_codec_type			m_compression[4];	// array of compression types used
 	chd_file *				m_parent;			// pointer to parent file, or NULL if none
 	bool					m_parent_missing;	// are we missing our parent?
-	
+
 	// key offsets within the header
 	UINT64					m_mapoffset_offset;	// offset of map offset field
 	UINT64					m_metaoffset_offset;// offset of metaoffset field
 	UINT64					m_sha1_offset;		// offset of SHA1 field
 	UINT64					m_rawsha1_offset;	// offset of raw SHA1 field
 	UINT64					m_parentsha1_offset;// offset of paren SHA1 field
-	
+
 	// map information
 	UINT32					m_mapentrybytes;	// length of each entry in a map
 	dynamic_buffer			m_rawmap;			// raw map data
@@ -458,7 +458,7 @@ private:
 	// compression management
 	chd_decompressor *		m_decompressor[4];	// array of decompression codecs
 	dynamic_buffer			m_compressed;		// temporary buffer for compressed data
-	
+
 	// caching
 	dynamic_buffer			m_cache;			// single-hunk cache for partial reads/writes
 	UINT32					m_cachehunk;		// which hunk is in the cache?
@@ -474,7 +474,7 @@ public:
 	// construction/destruction
 	chd_file_compressor();
 	virtual ~chd_file_compressor();
-	
+
 	// compression management
 	void compress_begin();
 	chd_error compress_continue(double &progress, double &ratio);
@@ -482,7 +482,7 @@ public:
 protected:
 	// required override: read more data
 	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length) = 0;
-	
+
 private:
 	// hash map for looking up values
 	class hashmap
@@ -491,12 +491,12 @@ private:
 		// construction/destruction
 		hashmap();
 		~hashmap();
-		
+
 		// operations
 		void reset();
 		UINT64 find(crc16_t crc16, sha1_t sha1);
 		void add(UINT64 itemnum, crc16_t crc16, sha1_t sha1);
-	
+
 		// constants
 		static const UINT64 NOT_FOUND = ~UINT64(0);
 	private:
@@ -507,13 +507,13 @@ private:
 			UINT64				m_itemnum;			// item number
 			sha1_t				m_sha1;				// SHA-1 of the block
 		};
-		
+
 		// block of entries
 		struct entry_block
 		{
 			entry_block(entry_block *prev)
 				: m_next(prev), m_nextalloc(0) { }
-		
+
 			entry_block *		m_next;				// next block in list
 			UINT32				m_nextalloc;		// next to be allocated
 			entry_t				m_array[16384];		// array of entries
@@ -532,7 +532,7 @@ private:
 		WS_QUEUED,
 		WS_COMPLETE
 	};
-	
+
 	// a CRC-16/SHA-1 pair
 	struct hash_pair
 	{
@@ -540,7 +540,7 @@ private:
 		sha1_t				m_sha1;				// calculated SHA-1
 	};
 
-	// a single work item	
+	// a single work item
 	struct work_item
 	{
 		osd_work_item *		m_osd;				// OSD work item running on this block
@@ -554,7 +554,7 @@ private:
 		chd_compressor_group *m_codecs;			// codec instance
 		dynamic_array<hash_pair> m_hash;		// array of hashes
 	};
-	
+
 	// internal helpers
 	static void *async_walk_parent_static(void *param, int threadid);
 	void async_walk_parent(work_item &item);
@@ -563,15 +563,15 @@ private:
 	static void *async_read_static(void *param, int threadid);
 	void async_read();
 
-	// current compression status	
-	bool					m_walking_parent;	// are we building the parent map?	
+	// current compression status
+	bool					m_walking_parent;	// are we building the parent map?
 	UINT64					m_total_in;			// total bytes in
 	UINT64					m_total_out;		// total bytes out
 	sha1_creator			m_compsha1;			// running SHA-1 on raw data
 
 	// hash lookup maps
-	hashmap		 			m_parent_map;		// hash map for parent
-	hashmap		 			m_current_map;		// hash map for current
+	hashmap					m_parent_map;		// hash map for parent
+	hashmap					m_current_map;		// hash map for current
 
 	// read I/O thread
 	osd_work_queue *		m_read_queue;		// work queue for reading

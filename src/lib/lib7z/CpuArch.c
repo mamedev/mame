@@ -81,7 +81,7 @@ static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
     : "0" (function)) ;
 
   #endif
-  
+
   #else
 
   int CPUInfo[4];

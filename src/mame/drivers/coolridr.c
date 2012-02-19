@@ -430,7 +430,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 		case 0x04:
 		{
 			state->m_blitterMode = (data & 0x00ff0000) >> 16;
-			
+
 			if (state->m_blitterMode == 0xf4)
 			{
 				// Some sort of addressing state.
@@ -456,7 +456,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 			}
 			break;
 		}
-			
+
 		// The data register
 		case 0x05:
 		{
@@ -470,9 +470,9 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 				// DEBUG: Uncomment to see the ASCII strings as they are being blitted
 				//if (state->m_blitterSerialCount >= state->m_textBytesToWrite)
 				//{
-				//	for (int i = 0; i < state->m_textBytesToWrite+1; i++)
-				//		printf("%c", space->read_byte(0x03f40000 + state->m_textOffset + i));
-				//	printf("\n");
+				//  for (int i = 0; i < state->m_textBytesToWrite+1; i++)
+				//      printf("%c", space->read_byte(0x03f40000 + state->m_textOffset + i));
+				//  printf("\n");
 				//}
 			}
 			else if (state->m_blitterMode == 0x30 || state->m_blitterMode == 0x90)
@@ -511,8 +511,8 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 				}
 				else if (state->m_blitterSerialCount == 11)
 				{
-					const UINT32 memOffset = data; 
-					
+					const UINT32 memOffset = data;
+
 					// Splat some sprites
 					for (int h = 0; h < state->m_hCellCount; h++)
 					{
@@ -520,11 +520,11 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 						{
 							const int pixelOffsetX = state->m_hPosition + (h*16);
 							const int pixelOffsetY = state->m_vPosition + (v*16);
-							
+
 							// It's unknown if it's row-major or column-major
 							// TODO: Study the CRT test and "Cool Riders" logo for clues.
 							UINT8 spriteNumber = space->read_byte(memOffset + h + (v*h));
-							
+
 							// DEBUG: For demo purposes, skip spaces and NULL characters
 							if (spriteNumber == 0x20 || spriteNumber == 0x00)
 								continue;
@@ -541,7 +541,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 										color = 0xff00ff00;
 									else if (state->m_colorNumber == 0x5e)
 										color = 0xff0000ff;
-									else 
+									else
 										color = 0xff00ffff;
 									state->m_temp_bitmap_sprites.pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
 								}
@@ -549,7 +549,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 						}
 					}
 				}
-				
+
 				state->m_blitterSerialCount++;
 			}
 			break;

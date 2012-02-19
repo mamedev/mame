@@ -128,11 +128,11 @@ int Ppmd8_DecodeSymbol(CPpmd8 *p)
       i -= k;
     }
     while (i != num);
-    
+
     see = Ppmd8_MakeEscFreq(p, numMasked, &freqSum);
     freqSum += hiCnt;
     count = RangeDec_GetThreshold(p, freqSum);
-    
+
     if (count < hiCnt)
     {
       Byte symbol;

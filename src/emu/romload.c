@@ -456,13 +456,13 @@ static void dump_wrong_and_correct_checksums(rom_load_data *romdata, const hash_
 	romdata->errorstring.catprintf("    EXPECTED: %s\n", hashes.macro_string(tempstr));
 	romdata->errorstring.catprintf("       FOUND: %s\n", acthashes.macro_string(tempstr));
 /*
-	// warn about any ill-formed hashes
-	for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
-		if (hash->parse_error())
-		{
-			romdata->errorstring.catprintf("\tInvalid %s checksum treated as 0 (check leading zeros)\n", hash->name());
-			romdata->warnings++;
-		}
+    // warn about any ill-formed hashes
+    for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
+        if (hash->parse_error())
+        {
+            romdata->errorstring.catprintf("\tInvalid %s checksum treated as 0 (check leading zeros)\n", hash->name());
+            romdata->warnings++;
+        }
 */
 }
 
@@ -1157,11 +1157,11 @@ static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd
 	{
 		astring fullpath(diff_file.fullpath());
 		diff_file.close();
-	
+
 		LOG(("Opening differencing image file: %s\n", fullpath.cstr()));
 		return diff_chd.open(fullpath, true, &source);
 	}
-		
+
 	/* didn't work; try creating it instead */
 	LOG(("Creating differencing image: %s\n", fname.cstr()));
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -1177,7 +1177,7 @@ static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd
 		chd_error err = diff_chd.create(fullpath, source.logical_bytes(), source.hunk_bytes(), compression, source);
 		if (err != CHDERR_NONE)
 			return err;
-		
+
 		return diff_chd.clone_all_metadata(source);
 	}
 
@@ -1199,7 +1199,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 		if (ROMENTRY_ISFILE(romp))
 		{
 			open_chd *chd = global_alloc(open_chd(regiontag));
-			
+
 			hash_collection hashes(ROM_GETHASHDATA(romp));
 			chd_error err;
 

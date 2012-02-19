@@ -136,5 +136,5 @@ void Ppmd7z_RangeEnc_FlushData(CPpmd7z_RangeEnc *p);
 void Ppmd7_EncodeSymbol(CPpmd7 *p, CPpmd7z_RangeEnc *rc, int symbol);
 
 EXTERN_C_END
- 
+
 #endif

@@ -6,17 +6,17 @@
 
 ****************************************************************************
 
-	Playback of pre-recorded samples. Used for high-level simulation of 
-	discrete sound circuits where proper low-level simulation isn't 
-	available.  Also used for tape loops and similar.
+    Playback of pre-recorded samples. Used for high-level simulation of
+    discrete sound circuits where proper low-level simulation isn't
+    available.  Also used for tape loops and similar.
 
-	Current limitations
-	  - Only supports single channel samples!
+    Current limitations
+      - Only supports single channel samples!
 
-	Considerations
-	  - Maybe this should be part of the presentation layer 
-	    (artwork etc.) with samples specified in .lay files instead of 
-	    in drivers?
+    Considerations
+      - Maybe this should be part of the presentation layer
+        (artwork etc.) with samples specified in .lay files instead of
+        in drivers?
 
 ****************************************************************************
 
@@ -135,7 +135,7 @@ void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
 
 
 //-------------------------------------------------
-//  start_raw - start playing an externally 
+//  start_raw - start playing an externally
 //  provided sample
 //-------------------------------------------------
 
@@ -249,7 +249,7 @@ UINT32 samples_device::base_frequency(UINT8 channel) const
 
 //-------------------------------------------------
 //  playing - return true if a sample is still
-//	playing on the given channel
+//  playing on the given channel
 //-------------------------------------------------
 
 bool samples_device::playing(UINT8 channel) const
@@ -318,7 +318,7 @@ void samples_device::device_reset()
 
 //-------------------------------------------------
 //  device_post_load - handle updating after a
-//	restore
+//  restore
 //-------------------------------------------------
 
 void samples_device::device_post_load()
@@ -422,7 +422,7 @@ void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //**************************************************************************
 
 //-------------------------------------------------
-//  read_sample - read a WAV or FLAC file as a 
+//  read_sample - read a WAV or FLAC file as a
 //  sample
 //-------------------------------------------------
 
@@ -436,7 +436,7 @@ bool samples_device::read_sample(emu_file &file, loaded_sample &sample)
 		mame_printf_warning("Unable to read %s, 0-byte file?\n", file.filename());
 		return false;
 	}
-	
+
 	// look for the appropriate RIFF tag
 	if (memcmp(&buf[0], "RIFF", 4) == 0)
 		return read_wav_sample(file, sample);
@@ -458,7 +458,7 @@ bool samples_device::read_wav_sample(emu_file &file, loaded_sample &sample)
 printf("Reading %s as WAV\n", file.filename());
 	// we already read the opening 'WAVE' header
 	UINT32 offset = 4;
-	
+
 	// get the total size
 	UINT32 filesize;
 	offset += file.read(&filesize, 4);
@@ -593,12 +593,12 @@ printf("Reading %s as FLAC\n", file.filename());
 		return false;
 	if (decoder.bits_per_sample() != 16)
 		return false;
-	
+
 	// resize the array and read
 	sample.data.resize(sample.length);
 	if (!decoder.decode_interleaved(sample.data, sample.length))
 		return false;
-	
+
 	// finish up and clean up
 	decoder.finish();
 	return true;
@@ -615,7 +615,7 @@ void samples_device::load_samples()
 	// if the user doesn't want to use samples, bail
 	if (!machine().options().samples())
 		return;
-	
+
 	// iterate over ourself
 	const char *basename = machine().basename();
 	samples_iterator iter(*this);
@@ -634,7 +634,7 @@ printf("Sample %d = %s\n", index, samplename);
 		file_error filerr = file.open(basename, PATH_SEPARATOR, samplename, ".flac");
 		if (filerr != FILERR_NONE && altbasename != NULL)
 			filerr = file.open(altbasename, PATH_SEPARATOR, samplename, ".flac");
-		
+
 		// if not, try as WAV
 		if (filerr != FILERR_NONE)
 			filerr = file.open(basename, PATH_SEPARATOR, samplename, ".wav");

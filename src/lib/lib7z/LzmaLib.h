@@ -38,7 +38,7 @@ outPropsSize -
   LZMA Encoder will use defult values for any parameter, if it is
   -1  for any from: level, loc, lp, pb, fb, numThreads
    0  for dictSize
-  
+
 level - compression level: 0 <= level <= 9;
 
   level dictSize algo  fb
@@ -50,7 +50,7 @@ level - compression level: 0 <= level <= 9;
     5:    16 MB   1    32
     6:    32 MB   1    32
     7+:   64 MB   1    64
- 
+
   The default value for "level" is 5.
 
   algo = 0 means fast method

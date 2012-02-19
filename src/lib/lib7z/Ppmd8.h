@@ -133,5 +133,5 @@ void Ppmd8_RangeEnc_FlushData(CPpmd8 *p);
 void Ppmd8_EncodeSymbol(CPpmd8 *p, int symbol); /* symbol = -1 means EndMarker */
 
 EXTERN_C_END
- 
+
 #endif

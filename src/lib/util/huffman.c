@@ -165,7 +165,7 @@ huffman_context_base::huffman_context_base(int numcodes, int maxbits, lookup_val
 
 
 //-------------------------------------------------
-//  import_tree_rle - import an RLE-encoded 
+//  import_tree_rle - import an RLE-encoded
 //  huffman tree from a source data stream
 //-------------------------------------------------
 
@@ -215,7 +215,7 @@ huffman_error huffman_context_base::import_tree_rle(bitstream_in &bitbuf)
 	huffman_error error = assign_canonical_codes();
 	if (error != HUFFERR_NONE)
 		return error;
-	
+
 	// build the lookup table
 	build_lookup_table();
 
@@ -267,7 +267,7 @@ huffman_error huffman_context_base::export_tree_rle(bitstream_out &bitbuf)
 
 
 //-------------------------------------------------
-//  import_tree_huffman - import a huffman-encoded 
+//  import_tree_huffman - import a huffman-encoded
 //  huffman tree from a source data stream
 //-------------------------------------------------
 
@@ -288,13 +288,13 @@ huffman_error huffman_context_base::import_tree_huffman(bitstream_in &bitbuf)
 			smallhuff.m_huffnode[index].m_numbits = (count == 7) ? 0 : count;
 		}
 	}
-	
+
 	// then regenerate the tree
 	huffman_error error = smallhuff.assign_canonical_codes();
 	if (error != HUFFERR_NONE)
 		return error;
 	smallhuff.build_lookup_table();
-	
+
 	// determine the maximum length of an RLE count
 	UINT32 temp = m_numcodes - 9;
 	UINT8 rlefullbits = 0;
@@ -337,7 +337,7 @@ huffman_error huffman_context_base::import_tree_huffman(bitstream_in &bitbuf)
 
 
 //-------------------------------------------------
-//  export_tree_huffman - export a huffman tree to 
+//  export_tree_huffman - export a huffman tree to
 //  a huffman target data stream
 //-------------------------------------------------
 
@@ -350,7 +350,7 @@ huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 	UINT16 *lengths = rle_lengths;
 	int last = ~0;
 	int repcount = 0;
-	
+
 	// use a small huffman context to create a tree (ignoring RLE lengths)
 	huffman_encoder<24, 6> smallhuff;
 
@@ -363,14 +363,14 @@ huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 		{
 			if (repcount == 1)
 				smallhuff.histo_one(*dest++ = last + 1);
-			else 
+			else
 				smallhuff.histo_one(*dest++ = 0), *lengths++ = repcount - 2;
 		}
-		
+
 		// if same as last, just track repeats
 		if (newval == last)
 			repcount++;
-		
+
 		// otherwise, write it and start a new run
 		else
 		{
@@ -385,7 +385,7 @@ huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 	{
 		if (repcount == 1)
 			smallhuff.histo_one(*dest++ = last + 1);
-		else 
+		else
 			smallhuff.histo_one(*dest++ = 0), *lengths++ = repcount - 2;
 	}
 
@@ -413,7 +413,7 @@ huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 	for (int index = first_non_zero; index <= last_non_zero; index++)
 		bitbuf.write(smallhuff.m_huffnode[index].m_numbits, 3);
 	bitbuf.write(7, 3);
-	
+
 	// determine the maximum length of an RLE count
 	UINT32 temp = m_numcodes - 9;
 	UINT8 rlefullbits = 0;
@@ -427,7 +427,7 @@ huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 		// encode the data
 		UINT8 data = *src;
 		smallhuff.encode_one(bitbuf, data);
-		
+
 		// if this is an RLE token, encode the length following
 		if (data == 0)
 		{
@@ -438,7 +438,7 @@ huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 				bitbuf.write(7, 3), bitbuf.write(count - 7, rlefullbits);
 		}
 	}
-	
+
 	// flush the final buffer
 	return bitbuf.overflow() ? HUFFERR_OUTPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
 }
@@ -540,7 +540,7 @@ int CLIB_DECL huffman_context_base::tree_node_compare(const void *item1, const v
 
 
 //-------------------------------------------------
-//  build_tree - build a huffman tree based on the 
+//  build_tree - build a huffman tree based on the
 //  data distribution
 //-------------------------------------------------
 
@@ -616,8 +616,8 @@ int huffman_context_base::build_tree(UINT32 totaldata, UINT32 totalweight)
 
 
 //-------------------------------------------------
-//  assign_canonical_codes - assign canonical codes 
-//  to all the nodes based on the number of bits 
+//  assign_canonical_codes - assign canonical codes
+//  to all the nodes based on the number of bits
 //  in each
 //-------------------------------------------------
 
@@ -696,7 +696,7 @@ void huffman_context_base::build_lookup_table()
 huffman_8bit_encoder::huffman_8bit_encoder()
 {
 }
-	
+
 
 //-------------------------------------------------
 //  encode - encode a full buffer
@@ -713,13 +713,13 @@ huffman_error huffman_8bit_encoder::encode(const UINT8 *source, UINT32 slength, 
 	huffman_error err = compute_tree_from_histo();
 	if (err != HUFFERR_NONE)
 		return err;
-	
+
 	// export the tree
 	bitstream_out bitbuf(dest, dlength);
 	err = export_tree_huffman(bitbuf);
 	if (err != HUFFERR_NONE)
 		return err;
-	
+
 	// then encode the data
 	for (UINT32 cur = 0; cur < slength; cur++)
 		encode_one(bitbuf, source[cur]);
@@ -727,7 +727,7 @@ huffman_error huffman_8bit_encoder::encode(const UINT8 *source, UINT32 slength, 
 	return bitbuf.overflow() ? HUFFERR_OUTPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
 }
 
-	
+
 
 //**************************************************************************
 //  8-BIT DECODER
@@ -740,7 +740,7 @@ huffman_error huffman_8bit_encoder::encode(const UINT8 *source, UINT32 slength, 
 huffman_8bit_decoder::huffman_8bit_decoder()
 {
 }
-	
+
 
 //-------------------------------------------------
 //  decode - decode a full buffer
@@ -753,7 +753,7 @@ huffman_error huffman_8bit_decoder::decode(const UINT8 *source, UINT32 slength, 
 	huffman_error err = import_tree_huffman(bitbuf);
 	if (err != HUFFERR_NONE)
 		return err;
-	
+
 	// then decode the data
 	for (UINT32 cur = 0; cur < dlength; cur++)
 		dest[cur] = decode_one(bitbuf);

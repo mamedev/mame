@@ -18,9 +18,9 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
   /* if (maxLen > 10) maxLen = 10; */
   {
     UInt32 i;
-    
+
     #ifdef HUFFMAN_SPEED_OPT
-    
+
     UInt32 counters[NUM_COUNTERS];
     for (i = 0; i < NUM_COUNTERS; i++)
       counters[i] = 0;
@@ -29,7 +29,7 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
       UInt32 freq = freqs[i];
       counters[(freq < NUM_COUNTERS - 1) ? freq : NUM_COUNTERS - 1]++;
     }
- 
+
     for (i = 1; i < NUM_COUNTERS; i++)
     {
       UInt32 temp = counters[i];
@@ -47,7 +47,7 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
     }
     counters[0] = 0;
     HeapSort(p + counters[NUM_COUNTERS - 2], counters[NUM_COUNTERS - 1] - counters[NUM_COUNTERS - 2]);
-    
+
     #else
 
     for (i = 0; i < numSymbols; i++)
@@ -78,10 +78,10 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
     lens[minCode] = lens[maxCode] = 1;
     return;
   }
-  
+
   {
     UInt32 b, e, i;
-  
+
     i = b = e = 0;
     do
     {
@@ -96,12 +96,12 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
       e++;
     }
     while (num - e > 1);
-    
+
     {
       UInt32 lenCounters[kMaxLen + 1];
       for (i = 0; i <= kMaxLen; i++)
         lenCounters[i] = 0;
-      
+
       p[--e] &= MASK;
       lenCounters[1] = 2;
       while (e > 0)
@@ -113,7 +113,7 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
         lenCounters[len]--;
         lenCounters[len + 1] += 2;
       }
-      
+
       {
         UInt32 len;
         i = 0;
@@ -124,7 +124,7 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
             lens[p[i++] & MASK] = (Byte)len;
         }
       }
-      
+
       {
         UInt32 nextCodes[kMaxLen + 1];
         {

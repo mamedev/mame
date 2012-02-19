@@ -75,7 +75,7 @@ class chd_codec
 protected:
 	// can't create these directly
 	chd_codec(chd_file &file, bool lossy);
-	
+
 public:
 	// allow public deletion
 	virtual ~chd_codec();
@@ -133,7 +133,7 @@ public:
 	// create compressors or decompressors
 	static chd_compressor *new_compressor(chd_codec_type type, chd_file &file);
 	static chd_decompressor *new_decompressor(chd_codec_type type, chd_file &file);
-	
+
 	// utilities
 	static bool codec_exists(chd_codec_type type) { return (find_in_list(type) != NULL); }
 	static const char *codec_name(chd_codec_type type);
@@ -151,7 +151,7 @@ private:
 
 	// internal helper functions
 	static const codec_entry *find_in_list(chd_codec_type type);
-	
+
 	template<class _CompressorClass>
 	static chd_compressor *construct_compressor(chd_file &chd, bool lossy) { return new _CompressorClass(chd, lossy); }
 
@@ -172,10 +172,10 @@ public:
 	// construction/destruction
 	chd_compressor_group(chd_file &file, chd_codec_type compressor_list[4]);
 	~chd_compressor_group();
-	
+
 	// find the best compressor
 	INT8 find_best_compressor(const UINT8 *src, UINT8 *compressed, UINT32 &complen);
-	
+
 private:
 	// internal state
 	UINT32					m_hunkbytes;		// number of bytes in a hunk
@@ -197,10 +197,10 @@ private:
 const chd_codec_type CHD_CODEC_NONE 	= 0;
 const chd_codec_type CHD_CODEC_ZLIB 	= CHD_MAKE_TAG('z','l','i','b');
 const chd_codec_type CHD_CODEC_LZMA 	= CHD_MAKE_TAG('l','z','m','a');
-const chd_codec_type CHD_CODEC_HUFFMAN 	= CHD_MAKE_TAG('h','u','f','f');
-const chd_codec_type CHD_CODEC_FLAC_BE 	= CHD_MAKE_TAG('f','l','c','b');
-const chd_codec_type CHD_CODEC_FLAC_LE 	= CHD_MAKE_TAG('f','l','c','l');
-const chd_codec_type CHD_CODEC_CD_FLAC 	= CHD_MAKE_TAG('c','d','f','l');
+const chd_codec_type CHD_CODEC_HUFFMAN	= CHD_MAKE_TAG('h','u','f','f');
+const chd_codec_type CHD_CODEC_FLAC_BE	= CHD_MAKE_TAG('f','l','c','b');
+const chd_codec_type CHD_CODEC_FLAC_LE	= CHD_MAKE_TAG('f','l','c','l');
+const chd_codec_type CHD_CODEC_CD_FLAC	= CHD_MAKE_TAG('c','d','f','l');
 const chd_codec_type CHD_CODEC_AVHUFF	= CHD_MAKE_TAG('a','v','h','u');
 
 // A/V codec configuration parameters

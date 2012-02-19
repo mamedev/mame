@@ -83,11 +83,11 @@ static SRes Lzma2EncInt_EncodeSubblock(CLzma2EncInt *p, Byte *outBuf,
   if (packSize < lzHeaderSize)
     return SZ_ERROR_OUTPUT_EOF;
   packSize -= lzHeaderSize;
-  
+
   LzmaEnc_SaveState(p->enc);
   res = LzmaEnc_CodeOneMemBlock(p->enc, p->needInitState,
       outBuf + lzHeaderSize, &packSize, LZMA2_PACK_SIZE_MAX, &unpackSize);
-  
+
   PRF(printf("\npackSize = %7d unpackSize = %7d  ", packSize, unpackSize));
 
   if (unpackSize == 0)
@@ -146,10 +146,10 @@ static SRes Lzma2EncInt_EncodeSubblock(CLzma2EncInt *p, Byte *outBuf,
     outBuf[destPos++] = (Byte)u;
     outBuf[destPos++] = (Byte)(pm >> 8);
     outBuf[destPos++] = (Byte)pm;
-    
+
     if (p->needInitProp)
       outBuf[destPos++] = p->props;
-    
+
     p->needInitProp = False;
     p->needInitState = False;
     destPos += packSize;
@@ -244,7 +244,7 @@ typedef struct
 {
   Byte propEncoded;
   CLzma2EncProps props;
-  
+
   Byte *outBuf;
 
   ISzAlloc *alloc;
@@ -322,10 +322,10 @@ static SRes MtCallbackImp_Code(void *pp, unsigned index, Byte *dest, size_t *des
     if (srcSize != 0)
     {
       RINOK(Lzma2EncInt_Init(p, &mainEncoder->props));
-     
+
       RINOK(LzmaEnc_MemPrepare(p->enc, src, srcSize, LZMA2_KEEP_WINDOW_SIZE,
           mainEncoder->alloc, mainEncoder->allocBig));
-     
+
       while (p->srcPos < srcSize)
       {
         size_t packSize = destLim - *destSize;
@@ -460,7 +460,7 @@ SRes Lzma2Enc_Encode(CLzma2EncHandle pp,
 
     mtCallback.funcTable.Code = MtCallbackImp_Code;
     mtCallback.lzma2Enc = p;
-    
+
     p->mtCoder.progress = progress;
     p->mtCoder.inStream = inStream;
     p->mtCoder.outStream = outStream;
@@ -470,7 +470,7 @@ SRes Lzma2Enc_Encode(CLzma2EncHandle pp,
     p->mtCoder.blockSize = p->props.blockSize;
     p->mtCoder.destBlockSize = p->props.blockSize + (p->props.blockSize >> 10) + 16;
     p->mtCoder.numThreads = p->props.numBlockThreads;
-    
+
     return MtCoder_Code(&p->mtCoder);
   }
   #endif

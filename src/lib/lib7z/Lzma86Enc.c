@@ -26,7 +26,7 @@ int Lzma86_Encode(Byte *dest, size_t *destLen, const Byte *src, size_t srcLen,
   LzmaEncProps_Init(&props);
   props.level = level;
   props.dictSize = dictSize;
-  
+
   *destLen = 0;
   if (outSize2 < LZMA86_HEADER_SIZE)
     return SZ_ERROR_OUTPUT_EOF;
@@ -78,12 +78,12 @@ int Lzma86_Encode(Byte *dest, size_t *destLen, const Byte *src, size_t srcLen,
         break;
       if (useFilter && i == 0)
         curModeIsFiltered = True;
-      
+
       curRes = LzmaEncode(dest + LZMA86_HEADER_SIZE, &outSizeProcessed,
           curModeIsFiltered ? filteredStream : src, srcLen,
           &props, dest + 1, &outPropsSize, 0,
           NULL, &g_Alloc, &g_Alloc);
-      
+
       if (curRes != SZ_ERROR_OUTPUT_EOF)
       {
         if (curRes != SZ_OK)
