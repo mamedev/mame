@@ -7,77 +7,120 @@
 #ifndef __INS8250_H_
 #define __INS8250_H_
 
-#include "devlegcy.h"
-
-DECLARE_LEGACY_DEVICE(INS8250, ins8250);
-DECLARE_LEGACY_DEVICE(INS8250A, ins8250a);
-DECLARE_LEGACY_DEVICE(NS16450, ns16450);
-DECLARE_LEGACY_DEVICE(NS16550, ns16550);
-DECLARE_LEGACY_DEVICE(NS16550A, ns16550a);
-DECLARE_LEGACY_DEVICE(PC16550D, pc16550d);
-
-#define UART8250_HANDSHAKE_OUT_DTR				0x01
-#define UART8250_HANDSHAKE_OUT_RTS				0x02
-
-#define UART8250_HANDSHAKE_IN_DSR				0x020
-#define UART8250_HANDSHAKE_IN_CTS				0x010
-#define UART8250_INPUTS_RING_INDICATOR			0x0040
-#define UART8250_INPUTS_DATA_CARRIER_DETECT		0x0080
-
+#include "emu.h"
 
 /***************************************************************************
-    TYPE DEFINITIONS
+    CLASS DEFINITIONS
 ***************************************************************************/
-
-typedef void (*ins8250_transmit_func)(device_t *device, int data);
-typedef void (*ins8250_handshake_out_func)(device_t *device, int data);
-typedef void (*ins8250_refresh_connect_func)(device_t *device);
-
-#define INS8250_TRANSMIT(name)			void name(device_t *device, int data)
-#define INS8250_HANDSHAKE_OUT(name)		void name(device_t *device, int data)
-#define INS8250_REFRESH_CONNECT(name)	void name(device_t *device)
-
-typedef struct
+struct ins8250_interface
 {
-	long clockin;
-	devcb_write_line				out_intr_cb;
+	devcb_write_line	m_out_tx_cb;
+	devcb_write_line	m_out_dtr_cb;
+	devcb_write_line	m_out_rts_cb;
+	devcb_write_line	m_out_int_cb;
+	devcb_write_line	m_out_out1_cb;
+	devcb_write_line	m_out_out2_cb;
+};
 
-	ins8250_transmit_func			transmit;
-	ins8250_handshake_out_func		handshake_out;
+class ins8250_uart_device : public device_t,
+							public device_serial_interface,
+							public ins8250_interface
+{
+public:
+	ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock);
+	DECLARE_WRITE8_MEMBER( ins8250_w );
+	DECLARE_READ8_MEMBER( ins8250_r );
+	DECLARE_WRITE_LINE_MEMBER( dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( dsr_w );
+	DECLARE_WRITE_LINE_MEMBER( ri_w );
+	DECLARE_WRITE_LINE_MEMBER( cts_w );
+	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx_line = state; }
+	void input_callback(UINT8 state) { m_input_state = state; }
 
-	// refresh object connected to this port
-	ins8250_refresh_connect_func	refresh_connected;
-} ins8250_interface;
+protected:
+	virtual void device_start();
+	virtual void device_config_complete();
+	virtual void device_reset();
+	enum {
+			TYPE_INS8250 = 0,
+			TYPE_INS8250A,
+			TYPE_NS16450,
+			TYPE_NS16550,
+			TYPE_NS16550A,
+			TYPE_PC16550D,
+	};
+	int	m_device_type;
+private:
+	struct {
+		UINT8 thr;  /* 0 -W transmitter holding register */
+		UINT8 rbr;  /* 0 R- receiver buffer register */
+		UINT8 ier;  /* 1 RW interrupt enable register */
+		UINT16 dl;  /* 0/1 RW divisor latch (if DLAB = 1) */
+		UINT8 iir;  /* 2 R- interrupt identification register */
+		UINT8 lcr;  /* 3 RW line control register (bit 7: DLAB) */
+		UINT8 mcr;  /* 4 RW modem control register */
+		UINT8 lsr;  /* 5 R- line status register */
+		UINT8 msr;  /* 6 R- modem status register */
+		UINT8 scr;  /* 7 RW scratch register */
+	} m_regs;
+	UINT8 m_int_pending;
+	UINT8 m_rx_line;
 
+	devcb_resolved_write_line	m_out_tx_func;
+	devcb_resolved_write_line	m_out_dtr_func;
+	devcb_resolved_write_line	m_out_rts_func;
+	devcb_resolved_write_line	m_out_int_func;
+	devcb_resolved_write_line	m_out_out1_func;
+	devcb_resolved_write_line	m_out_out2_func;
+
+	void update_interrupt();
+	void update_clock();
+	void trigger_int(int flag);
+	void clear_int(int flag);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void update_msr(int bit, UINT8 state);
+
+	emu_timer *m_timer;
+};
+
+class ins8250_device : public ins8250_uart_device
+{
+public:
+	ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class ns16450_device : public ins8250_uart_device
+{
+public:
+	ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class ns16550_device : public ins8250_uart_device
+{
+public:
+	ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type INS8250;
+extern const device_type NS16450;
+extern const device_type NS16550;
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_INS8250_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, INS8250, 0) \
+#define MCFG_INS8250_ADD(_tag, _intrf, _clock) \
+	MCFG_DEVICE_ADD(_tag, INS8250, _clock) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
 
-#define MCFG_NS16450_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, NS16450, 0) \
+#define MCFG_NS16450_ADD(_tag, _intrf, _clock) \
+	MCFG_DEVICE_ADD(_tag, NS16450, _clock) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
 
-#define MCFG_NS16550_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, NS16550, 0) \
+#define MCFG_NS16550_ADD(_tag, _intrf, _clock) \
+	MCFG_DEVICE_ADD(_tag, NS16550, _clock) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-void ins8250_receive(device_t *device, int data);
-void ins8250_handshake_in(device_t *device, int new_msr);
-
-READ8_DEVICE_HANDLER( ins8250_r );
-WRITE8_DEVICE_HANDLER( ins8250_w );
-
-
-#endif /* __INS8250_H_ */
+#endif

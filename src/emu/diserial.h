@@ -19,7 +19,9 @@ enum
 {
 	SERIAL_PARITY_NONE,		/* no parity. a parity bit will not be in the transmitted/received data */
 	SERIAL_PARITY_ODD,		/* odd parity */
-	SERIAL_PARITY_EVEN		/* even parity */
+	SERIAL_PARITY_EVEN,		/* even parity */
+	SERIAL_PARITY_MARK,		/* one parity */
+	SERIAL_PARITY_SPACE		/* zero parity */
 };
 
 /*

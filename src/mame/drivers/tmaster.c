@@ -121,8 +121,11 @@ class tmaster_state : public driver_device
 public:
 	tmaster_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this,"maincpu"),
+		m_microtouch(*this,"microtouch")
 		{ }
+
+	DECLARE_WRITE8_MEMBER(microtouch_tx);
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];
@@ -141,6 +144,7 @@ public:
 	device_t *m_duart68681;
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<microtouch_device> m_microtouch;
 };
 
 
@@ -179,18 +183,23 @@ static void duart_irq_handler(device_t *device, UINT8 vector)
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
+	tmaster_state *state = device->machine().driver_data<tmaster_state>();
 	if ( channel == 0 )
 	{
-		microtouch_rx(1, &data);
+		state->m_microtouch->rx(*memory_nonspecific_space(device->machine()), 0, data);
 	}
 };
 
-static void microtouch_tx(running_machine &machine, UINT8 data)
+WRITE8_MEMBER( tmaster_state::microtouch_tx )
 {
-	tmaster_state *state = machine.driver_data<tmaster_state>();
-	duart68681_rx_data(state->m_duart68681, 0, data);
+	duart68681_rx_data(m_duart68681, 0, data);
 }
 
+static const microtouch_interface tmaster_microtouch_config =
+{
+	DEVCB_DRIVER_MEMBER(tmaster_state, microtouch_tx),
+	NULL
+};
 
 /***************************************************************************
 
@@ -766,8 +775,6 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 static INPUT_PORTS_START( tm )
-	PORT_INCLUDE( microtouch )
-
 	PORT_START("COIN")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN5 )	// "M. Coin 1 Input"
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN6 )	// "M. Coin 2 Input"
@@ -788,8 +795,6 @@ static INPUT_PORTS_START( tm )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tmaster )
-	PORT_INCLUDE( microtouch )
-
 	PORT_START("COIN")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )	// "M. Coin 1 Input"
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )	// "M. Coin 2 Input"
@@ -863,11 +868,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_START( tmaster )
-{
-	microtouch_init(machine, microtouch_tx, 0);
-}
-
 static MACHINE_RESET( tmaster )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
@@ -904,10 +904,10 @@ static MACHINE_CONFIG_START( tm3k, tmaster_state )
 	MCFG_CPU_PROGRAM_MAP(tmaster_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", tm3k_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START(tmaster)
 	MCFG_MACHINE_RESET(tmaster)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/, tmaster_duart68681_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", tmaster_microtouch_config )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

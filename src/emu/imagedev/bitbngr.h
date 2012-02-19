@@ -84,7 +84,8 @@ struct _bitbanger_config
 
 
 class bitbanger_device :	public device_t,
-							public device_image_interface
+							public device_image_interface,
+							public _bitbanger_config
 {
 public:
 	// construction/destruction
@@ -145,7 +146,7 @@ private:
 	// variables
 	emu_timer *					m_output_timer;
 	emu_timer *					m_input_timer;
-	devcb_resolved_write_line	m_input_callback;
+	devcb_resolved_write_line	m_input_func;
 	int							m_output_value;
 	int							m_build_count;
 	int							m_build_byte;

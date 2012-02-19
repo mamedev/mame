@@ -73,68 +73,35 @@ History:
 
 **********************************************************************/
 
-#include "emu.h"
 #include "machine/ins8250.h"
 
+const device_type INS8250 = &device_creator<ins8250_device>;
+const device_type NS16450 = &device_creator<ns16450_device>;
+const device_type NS16550 = &device_creator<ns16550_device>;
 
-#define LOG(LEVEL,N,M,A)  \
-	do { \
-		if(LEVEL>=N) \
-		{ \
-			if( M ) \
-				logerror("%-24s",(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
+		: device_t(mconfig, type, name, tag, owner, clock),
+		  device_serial_interface(mconfig, *this)
+{
+}
 
+ins8250_device::ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: ins8250_uart_device(mconfig, INS8250, "ins8250", tag, owner, clock)
+{
+	m_device_type = TYPE_INS8250;
+}
 
-/* device types */
-enum {
-	TYPE_INS8250 = 0,
-	TYPE_INS8250A,
-	TYPE_NS16450,
-	TYPE_NS16550,
-	TYPE_NS16550A,
-	TYPE_PC16550D,
+ns16450_device::ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: ins8250_uart_device(mconfig, NS16450, "ns16450", tag, owner, clock)
+{
+	m_device_type = TYPE_NS16450;
+}
 
-	NUM_TYPES
-};
-
-
-/* device tags */
-static const char * const device_tags[NUM_TYPES] = { "ins8250", "ins8250a", "ns16450", "ns16550", "ns16550a", "pc16550d" };
-
-
-#define VERBOSE_COM 0
-#define COM_LOG(n,m,a) LOG(VERBOSE_COM,n,m,a)
-
-typedef struct {
-	devcb_resolved_write_line	out_intr_func;
-	const ins8250_interface *interface;
-	int	device_type;
-
-	UINT8 thr;  /* 0 -W transmitter holding register */
-	UINT8 rbr; /* 0 R- receiver buffer register */
-	UINT8 ier;  /* 1 RW interrupt enable register */
-	UINT8 dll;  /* 0 RW divisor latch lsb (if DLAB = 1) */
-	UINT8 dlm;  /* 1 RW divisor latch msb (if DLAB = 1) */
-	UINT8 iir;  /* 2 R- interrupt identification register */
-	UINT8 lcr;  /* 3 RW line control register (bit 7: DLAB) */
-	UINT8 mcr;  /* 4 RW modem control register */
-	UINT8 lsr;  /* 5 R- line status register */
-	UINT8 msr;  /* 6 R- modem status register */
-	UINT8 scr;  /* 7 RW scratch register */
-
-/* holds int pending state for com */
-	UINT8 int_pending;
-
-	// sending circuit
-	struct {
-		int active;
-		UINT8 data;
-		double time;
-	} send;
-} ins8250_t;
+ns16550_device::ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: ins8250_uart_device(mconfig, NS16550, "ns16550", tag, owner, clock)
+{
+	m_device_type = TYPE_NS16550;
+}
 
 /* int's pending */
 #define COM_INT_PENDING_RECEIVED_DATA_AVAILABLE	0x0001
@@ -142,67 +109,30 @@ typedef struct {
 #define COM_INT_PENDING_RECEIVER_LINE_STATUS 0x0004
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
 
-
-INLINE ins8250_t *get_safe_token(device_t *device)
-{
-	assert( device != NULL );
-	assert( ( device->type() == INS8250 ) ||
-			( device->type() == INS8250A ) ||
-			( device->type() == NS16450 ) ||
-			( device->type() == NS16550 ) ||
-			( device->type() == NS16550A ) ||
-			( device->type() == PC16550D ) );
-	return (ins8250_t *)downcast<legacy_device_base *>(device)->token();
-}
-
-
-/* setup iir with the priority id */
-static void ins8250_setup_iir(device_t *device)
-{
-	ins8250_t	*ins8250 = get_safe_token(device);
-
-	ins8250->iir &= ~(0x04|0x02);
-
-	/* highest to lowest */
-	if (ins8250->ier & ins8250->int_pending & COM_INT_PENDING_RECEIVER_LINE_STATUS)
-	{
-		ins8250->iir |=0x04|0x02;
-		return;
-	}
-
-	if (ins8250->ier & ins8250->int_pending & COM_INT_PENDING_RECEIVED_DATA_AVAILABLE)
-	{
-		ins8250->iir |=0x04;
-		return;
-	}
-
-	if (ins8250->ier & ins8250->int_pending & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY)
-	{
-		ins8250->iir |=0x02;
-		return;
-	}
-
-	/* modem status has both bits clear */
-}
-
-
 /* ints will continue to be set for as long as there are ints pending */
-static void ins8250_update_interrupt(device_t *device)
+void ins8250_uart_device::update_interrupt()
 {
-	ins8250_t	*ins8250 = get_safe_token(device);
 	int state;
 
 	/* if any bits are set and are enabled */
-	if (((ins8250->int_pending&ins8250->ier) & 0x0f) != 0)
+	if (((m_int_pending & m_regs.ier) & 0x0f) != 0)
 	{
 		/* trigger next highest priority int */
 
 		/* set int */
 		state = 1;
-		ins8250_setup_iir(device);
+		m_regs.iir &= ~(0x04|0x02);
+
+		/* highest to lowest */
+		if (m_regs.ier & m_int_pending & COM_INT_PENDING_RECEIVER_LINE_STATUS)
+			m_regs.iir |=0x04|0x02;
+		else if (m_regs.ier & m_int_pending & COM_INT_PENDING_RECEIVED_DATA_AVAILABLE)
+			m_regs.iir |=0x04;
+		else if (m_regs.ier & m_int_pending & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY)
+			m_regs.iir |=0x02;
 
 		/* int pending */
-		ins8250->iir &= ~0x01;
+		m_regs.iir &= ~0x01;
 	}
 	else
 	{
@@ -210,128 +140,127 @@ static void ins8250_update_interrupt(device_t *device)
 		state = 0;
 
 		/* no ints pending */
-		ins8250->iir |= 0x01;
+		m_regs.iir |= 0x01;
 		/* priority level */
-		ins8250->iir &= ~(0x04|0x02);
+		m_regs.iir &= ~(0x04|0x02);
 	}
 
 	/* set or clear the int */
-	ins8250->out_intr_func(state);
+	m_out_int_func(state);
 }
-
-
 
 /* set pending bit and trigger int */
-static void ins8250_trigger_int(device_t *device, int flag)
+void ins8250_uart_device::trigger_int(int flag)
 {
-	ins8250_t	*ins8250 = get_safe_token(device);
-
-	ins8250->int_pending |= flag;
-	ins8250_update_interrupt(device);
+	m_int_pending |= flag;
+	update_interrupt();
 }
-
-
 
 /* clear pending bit, if any ints are pending, then int will be triggered, otherwise it
 will be cleared */
-static void ins8250_clear_int(device_t *device, int flag)
+void ins8250_uart_device::clear_int(int flag)
 {
-	ins8250_t	*ins8250 = get_safe_token(device);
-
-	ins8250->int_pending &= ~flag;
-	ins8250_update_interrupt(device);
+	m_int_pending &= ~flag;
+	update_interrupt();
 }
 
-
-WRITE8_DEVICE_HANDLER( ins8250_w )
+void ins8250_uart_device::update_clock()
 {
-    static const char P[] = "NONENHNL";  /* names for parity select */
-	ins8250_t	*ins8250 = get_safe_token(device);
-    int tmp;
+	int baud;
+	if(m_regs.dl == 0)
+	{
+		m_timer->adjust(attotime::never);
+		return;
+	}
+	baud = clock()/(m_regs.dl*16);
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(baud));
+}
+
+WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
+{
+	int tmp;
 
 	switch (offset)
 	{
 		case 0:
-			if (ins8250->lcr & 0x80)
+			if (m_regs.lcr & 0x80)
 			{
-				ins8250->dll = data;
-				tmp = ins8250->dlm * 256 + ins8250->dll;
-				COM_LOG(1,"COM_dll_w",("COM \"%s\" $%02x: [$%04x = %d baud]\n", device->tag(),
-					 data, tmp, (tmp)?(int)(ins8250->interface->clockin/16/tmp):0));
+				m_regs.dl = (m_regs.dl & 0xff00) | data;
+				update_clock();
 			}
 			else
 			{
-				ins8250->thr = data;
-				COM_LOG(2,"COM_thr_w",("COM $%02x\n", data));
-
-				if ( ins8250->mcr & 0x10 )
+				m_regs.thr = data;
+				m_regs.lsr &= ~0x60;
+				if ( m_regs.mcr & 0x10 )
 				{
-					ins8250->lsr |= 1;
-					ins8250->rbr = data;
-					ins8250_trigger_int( device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE );
+					m_regs.lsr |= 1;
+					m_regs.rbr = data;
+					trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 				}
-
-				if ( ins8250->interface->transmit )
-					ins8250->interface->transmit(device, ins8250->thr);
-
-				/* writing to thr will clear the int */
-				ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 			}
 			break;
 		case 1:
-			if (ins8250->lcr & 0x80)
+			if (m_regs.lcr & 0x80)
 			{
-				ins8250->dlm = data;
-				tmp = ins8250->dlm * 256 + ins8250->dll;
-                COM_LOG(1,"COM_dlm_w",("COM \"%s\" $%02x: [$%04x = %d baud]\n", device->tag(),
-					data, tmp, (tmp)?(int)(ins8250->interface->clockin/16/tmp):0));
+				m_regs.dl = (m_regs.dl & 0xff) | (data << 8);
+				update_clock();
 			}
 			else
 			{
-				ins8250->ier = data;
-				COM_LOG(2,"COM_ier_w",("COM \"%s\" $%02x: enable int on RX %d, THRE %d, RLS %d, MS %d\n", device->tag(),
-					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1));
-				COM_LOG(2,"COM_ier_w",("COM \"%s\" lsr = $%02x, int_pending = $%02x\n", device->tag(), ins8250->lsr, ins8250->int_pending ));
-				ins8250_update_interrupt(device);
+				m_regs.ier = data;
+				update_interrupt();
 			}
             break;
 		case 2:
-			COM_LOG(1,"COM_fcr_w",("COM \"%s\" $%02x (16550 only)\n", device->tag(), data));
             break;
 		case 3:
-			ins8250->lcr = data;
-			COM_LOG(1,"COM_lcr_w",("COM \"%s\" $%02x word length %d, stop bits %d, parity %c, break %d, DLAB %d\n", device->tag(),
-				data, 5+(data&3), 1+((data>>2)&1), P[(data>>3)&7], (data>>6)&1, (data>>7)&1));
-            break;
-		case 4:
-			if ( ( ins8250->mcr & 0x1f ) != ( data & 0x1f ) )
+			m_regs.lcr = data;
+			switch ((m_regs.lcr>>3) & 7)
 			{
-				ins8250->mcr = data & 0x1f;
-				COM_LOG(1,"COM_mcr_w",("COM \"%s\" $%02x DTR %d, RTS %d, OUT1 %d, OUT2 %d, loopback %d\n", device->tag(),
-					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1));
-				if (ins8250->interface->handshake_out)
-					ins8250->interface->handshake_out(device,data);
+			case 1:
+				tmp = SERIAL_PARITY_ODD;
+				break;
+			case 3:
+				tmp = SERIAL_PARITY_EVEN;
+				break;
+			case 5:
+				tmp = SERIAL_PARITY_MARK;
+				break;
+			case 7:
+				tmp = SERIAL_PARITY_SPACE;
+				break;
+			default:
+				tmp = SERIAL_PARITY_NONE;
+				break;
+			}
+			// if 5 data bits and stb = 1, stop bits is supposed to be 1.5
+			set_data_frame((m_regs.lcr & 3) + 5, (m_regs.lcr & 4)?2:1, tmp);
+			break;
+		case 4:
+			if ( ( m_regs.mcr & 0x1f ) != ( data & 0x1f ) )
+			{
+				m_regs.mcr = data & 0x1f;
 
-				if ( ins8250->mcr & 0x10 )		/* loopback test */
+				if ( m_regs.mcr & 0x10 )		/* loopback test */
 				{
-					data = ( ( ins8250->mcr & 0x0c ) << 4 ) | ( ( ins8250->mcr & 0x01 ) << 5 ) | ( ( ins8250->mcr & 0x02 ) << 3 );
-					if ( ( ins8250->msr & 0x20 ) != ( data & 0x20 ) )
-					{
+					data = ( ( m_regs.mcr & 0x0c ) << 4 ) | ( ( m_regs.mcr & 0x01 ) << 5 ) | ( ( m_regs.mcr & 0x02 ) << 3 );
+					if ( ( m_regs.msr & 0x20 ) != ( data & 0x20 ) )
 						data |= 0x02;
-					}
-					if ( ( ins8250->msr & 0x10 ) != ( data & 0x10 ) )
-					{
+					if ( ( m_regs.msr & 0x10 ) != ( data & 0x10 ) )
 						data |= 0x01;
-					}
-					if ( ( ins8250->msr & 0x40 ) && ! ( data & 0x40 ) )
-					{
+					if ( ( m_regs.msr & 0x40 ) && ! ( data & 0x40 ) )
 						data |= 0x04;
-					}
-					if ( ( ins8250->msr & 0x80 ) != ( data & 0x80 ) )
-					{
+					if ( ( m_regs.msr & 0x80 ) != ( data & 0x80 ) )
 						data |= 0x08;
-					}
-					ins8250->msr = data;
+					m_regs.msr = data;
+				}
+				else
+				{
+					m_out_dtr_func(m_regs.mcr & 1);
+					m_out_rts_func((m_regs.mcr & 2) && 1);
+					m_out_out1_func((m_regs.mcr & 4) && 1);
+					m_out_out2_func((m_regs.mcr & 8) && 1);
 				}
 			}
             break;
@@ -341,15 +270,13 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
               bits 5 - 0, you could cause an interrupt if the appropriate IER bit
               is set.
             */
-			COM_LOG(1,"COM_lsr_w",("COM \"%s\" $%02x\n", device->tag(), data ));
-
-			ins8250->lsr = data;
+			m_regs.lsr = data;
 
 			tmp = 0;
-			tmp |= ( ins8250->lsr & 0x01 ) ? COM_INT_PENDING_RECEIVED_DATA_AVAILABLE : 0;
-			tmp |= ( ins8250->lsr & 0x1e ) ? COM_INT_PENDING_RECEIVER_LINE_STATUS : 0;
-			tmp |= ( ins8250->lsr & 0x20 ) ? COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY : 0;
-			ins8250_trigger_int( device, tmp );
+			tmp |= ( m_regs.lsr & 0x01 ) ? COM_INT_PENDING_RECEIVED_DATA_AVAILABLE : 0;
+			tmp |= ( m_regs.lsr & 0x1e ) ? COM_INT_PENDING_RECEIVER_LINE_STATUS : 0;
+			tmp |= ( m_regs.lsr & 0x20 ) ? COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY : 0;
+			trigger_int(tmp);
 
 			break;
 		case 6:
@@ -358,358 +285,188 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
               bits 3 - 0, you could cause an interrupt if the appropriate IER bit
               is set.
              */
-			COM_LOG(1,"COM_msr_w",("COM \"%s\" $%02x\n", device->tag(), data ));
+			m_regs.msr = data;
 
-			ins8250->msr = data;
-
-			if ( ins8250->msr & 0x0f )
-			{
-				ins8250_trigger_int( device, COM_INT_PENDING_MODEM_STATUS_REGISTER );
-			}
+			if ( m_regs.msr & 0x0f )
+				trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 			break;
 		case 7:
-			ins8250->scr = data;
-			COM_LOG(2,"COM_scr_w",("COM \"%s\" $%02x\n", device->tag(), data));
+			m_regs.scr = data;
             break;
 	}
-
-	if (ins8250->interface->refresh_connected)
-		ins8250->interface->refresh_connected(device);
 }
 
-
-
-READ8_DEVICE_HANDLER( ins8250_r )
+READ8_MEMBER( ins8250_uart_device::ins8250_r )
 {
-	ins8250_t	*ins8250 = get_safe_token(device);
 	int data = 0x0ff;
 
 	switch (offset)
 	{
 		case 0:
-			if (ins8250->lcr & 0x80)
-			{
-				data = ins8250->dll;
-				COM_LOG(1,"COM_dll_r",("COM \"%s\" $%02x\n", device->tag(), data));
-			}
+			if (m_regs.lcr & 0x80)
+				data = (m_regs.dl & 0xff);
 			else
 			{
-				data = ins8250->rbr;
-				if( ins8250->lsr & 0x01 )
-				{
-					ins8250->lsr &= ~0x01;		/* clear data ready status */
-					COM_LOG(2,"COM_rbr_r",("COM \"%s\" $%02x\n", device->tag(), data));
-				}
+				data = m_regs.rbr;
+				if( m_regs.lsr & 0x01 )
+					m_regs.lsr &= ~0x01;		/* clear data ready status */
 
-				ins8250_clear_int(device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+				clear_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 			}
 			break;
 		case 1:
-			if (ins8250->lcr & 0x80)
-			{
-				data = ins8250->dlm;
-				COM_LOG(1,"COM_dlm_r",("COM \"%s\" $%02x\n", device->tag(), data));
-			}
+			if (m_regs.lcr & 0x80)
+				data = (m_regs.dl >> 8);
 			else
-			{
-				data = ins8250->ier & 0x0f;
-				COM_LOG(2,"COM_ier_r",("COM \"%s\" $%02x\n", device->tag(), data));
-            }
+				data = m_regs.ier & 0x0f;
             break;
 		case 2:
-			data = ins8250->iir;
-			COM_LOG(2,"COM_iir_r",("COM \"%s\" $%02x\n", device->tag(), data));
+			data = m_regs.iir;
 			/* The documentation says that reading this register will
             clear the int if this is the source of the int */
-			if ( ins8250->ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY )
-			{
-				ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
-			}
+			if ( m_regs.ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY )
+				clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
             break;
 		case 3:
-			data = ins8250->lcr;
-			COM_LOG(2,"COM_lcr_r",("COM \"%s\" $%02x\n", device->tag(), data));
+			data = m_regs.lcr;
             break;
 		case 4:
-			data = ins8250->mcr;
-			COM_LOG(2,"COM_mcr_r",("COM \"%s\" $%02x\n", device->tag(), data));
+			data = m_regs.mcr;
             break;
 		case 5:
-
-#if 0
-			if (ins8250->send.active && (machine.time()-ins8250->send.time>uart_byte_time(n)))
-			{
-				// currently polling is enough for pc1512
-				ins8250->lsr |= 0x40; /* set TSRE */
-				ins8250->send.active = 0;
-				if ( ins8250->mcr & 0x10 )
-				{
-					ins8250->lsr |= 1;
-					ins8250->rbr = ins8250->send.data;
-				}
-			}
-#endif
-			ins8250->lsr |= 0x60; /* set THRE */
-			data = ins8250->lsr;
-			if( ins8250->lsr & 0x1f )
-			{
-				ins8250->lsr &= 0xe1; /* clear FE, PE and OE and BREAK bits */
-				COM_LOG(2,"COM_lsr_r",("COM \"%s\" $%02x, DR %d, OE %d, PE %d, FE %d, BREAK %d, THRE %d, TSRE %d\n", device->tag(),
-					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1, (data>>5)&1, (data>>6)&1));
-			}
+			data = m_regs.lsr;
+			if( m_regs.lsr & 0x1f )
+				m_regs.lsr &= 0xe1; /* clear FE, PE and OE and BREAK bits */
 
 			/* reading line status register clears int */
-			ins8250_clear_int(device, COM_INT_PENDING_RECEIVER_LINE_STATUS);
+			clear_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
             break;
 		case 6:
-			data = ins8250->msr;
-			ins8250->msr &= 0xf0; /* reset delta values */
-			COM_LOG(2,"COM_msr_r",("COM \"%s\" $%02x\n", device->tag(), data));
+			data = m_regs.msr;
+			m_regs.msr &= 0xf0; /* reset delta values */
 
 			/* reading msr clears int */
-			ins8250_clear_int(device, COM_INT_PENDING_MODEM_STATUS_REGISTER);
+			clear_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 
 			break;
 		case 7:
-			data = ins8250->scr;
-			COM_LOG(2,"COM_scr_r",("COM \"%s\" $%02x\n", device->tag(), data));
+			data = m_regs.scr;
             break;
 	}
-
-	if (ins8250->interface->refresh_connected)
-		ins8250->interface->refresh_connected(device);
-
     return data;
 }
 
-
-
-void ins8250_receive(device_t *device, int data)
+void ins8250_uart_device::update_msr(int bit, UINT8 state)
 {
-	ins8250_t	*ins8250 = get_safe_token(device);
-
-    /* check if data rate 1200 baud is set */
-	if( ins8250->dlm != 0x00 || ins8250->dll != 0x60 )
-        ins8250->lsr |= 0x08; /* set framing error */
-
-    /* if data not yet serviced */
-	if( ins8250->lsr & 0x01 )
-		ins8250->lsr |= 0x02; /* set overrun error */
-
-    /* put data into receiver buffer register */
-    ins8250->rbr = data;
-
-    /* set data ready status */
-    ins8250->lsr |= 0x01;
-
-	/* set pending state for this interrupt. */
-	ins8250_trigger_int(device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
-
-
-//  /* OUT2 + received line data avail interrupt enabled? */
-//  if( (COM_mcr[n] & 0x08) && (COM_ier[n] & 0x01) )
-//  {
-//      if (com_interface.interrupt)
-//          com_interface.interrupt(4-(n&1), 1);
-//
-//  }
-}
-
-/**************************************************************************
- *  change the modem status register
- **************************************************************************/
-void ins8250_handshake_in(device_t *device, int new_msr)
-{
-	ins8250_t	*ins8250 = get_safe_token(device);
-
-	/* no change in modem status bits? */
-	if( ((ins8250->msr ^ new_msr) & 0xf0) == 0 )
+	UINT8 mask = (1<<bit);
+	if((m_regs.msr & mask) == (state<<bit))
 		return;
-
-	/* set delta status bits 0..3 and new modem status bits 4..7 */
-    ins8250->msr = (((ins8250->msr ^ new_msr) >> 4) & 0x0f) | (new_msr & 0xf0);
-
-	ins8250_trigger_int(device, COM_INT_PENDING_MODEM_STATUS_REGISTER);
-
-//  /* set up interrupt information register */
-  //  COM_iir[n] &= ~(0x06 | 0x01);
-
-//    /* OUT2 + modem status interrupt enabled? */
-//  if( (COM_mcr[n] & 0x08) && (COM_ier[n] & 0x08) )
-//  {
-//      if (com_interface.interrupt)
-//          com_interface.interrupt(4-(n&1), 1);
-//  }
+	m_regs.msr = (m_regs.msr & ~mask) | (mask & (state<<bit));
+	m_regs.msr = (m_regs.msr & ~(mask << 4)) | (1<<(bit+4));
+	trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 }
 
-
-static void common_start( device_t *device, int device_type )
+WRITE_LINE_MEMBER(ins8250_uart_device::dcd_w)
 {
-	ins8250_t	*ins8250 = get_safe_token(device);
-
-	ins8250->interface = (const ins8250_interface*)device->static_config();
-	ins8250->device_type = device_type;
-
-	ins8250->out_intr_func.resolve(ins8250->interface->out_intr_cb, *device);
+	update_msr(3, (state&&1));
 }
 
-
-static DEVICE_START( ins8250 )
+WRITE_LINE_MEMBER(ins8250_uart_device::dsr_w)
 {
-	common_start( device, TYPE_INS8250 );
+	update_msr(1, (state&&1));
 }
 
-
-static DEVICE_START( ins8250a )
+WRITE_LINE_MEMBER(ins8250_uart_device::ri_w)
 {
-	common_start( device, TYPE_INS8250A );
+	update_msr(2, (state&&1));
 }
 
-
-static DEVICE_START( ns16450 )
+WRITE_LINE_MEMBER(ins8250_uart_device::cts_w)
 {
-	common_start( device, TYPE_NS16450 );
+	update_msr(0, (state&&1));
 }
 
-
-static DEVICE_START( ns16550 )
+void ins8250_uart_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	common_start( device, TYPE_NS16550 );
-}
-
-
-static DEVICE_START( ns16550a )
-{
-	common_start( device, TYPE_NS16550A );
-}
-
-
-static DEVICE_START( pc16550d )
-{
-	common_start( device, TYPE_PC16550D );
-}
-
-
-static DEVICE_RESET( ins8250 )
-{
-	ins8250_t	*ins8250 = get_safe_token(device);
-
-	ins8250->ier = 0;
-	ins8250->iir = 1;
-	ins8250->lcr = 0;
-	ins8250->mcr = 0;
-	ins8250->lsr = (1<<5) | (1<<6);
-
-	ins8250->send.active=0;
-
-	/* refresh with reset state of register */
-	if (ins8250->interface->refresh_connected)
-		ins8250->interface->refresh_connected(device);
-}
-
-
-DEVICE_GET_INFO( ins8250 )
-{
-	switch ( state )
+	receive_register_update_bit(m_rx_line);
+	if(is_receive_register_full())
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(ins8250_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
+		if(m_regs.lsr & 0x01)
+		{
+			m_regs.lsr |= 0x02; //overrun
+			trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
+		}
+		else
+		{
+			m_regs.lsr |= 0x01;
+			receive_register_extract();
+			m_regs.rbr = get_received_char();
+			trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+		}
+		receive_register_reset();
+	}
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ins8250);	break;
-		case DEVINFO_FCT_STOP:						/* nothing */								break;
-		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(ins8250);	break;
+	if(is_transmit_register_empty())
+	{
+		if(!(m_regs.lsr & 0x20))
+		{
+			transmit_register_setup(m_regs.thr);
+			m_regs.lsr &= ~0x40;
+			m_regs.lsr |= 0x20;
+			trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+		}
+		else
+			m_regs.lsr |= 0x40;
+	}
+	else
+		m_out_tx_func(transmit_register_get_data_bit());
+}
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "National Semiconductor INS8250/INS8250B");	break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "INS8250");					break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.00");					break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MESS Team");	break;
+void ins8250_uart_device::device_start()
+{
+	m_out_tx_func.resolve(m_out_tx_cb, *this);
+	m_out_dtr_func.resolve(m_out_dtr_cb, *this);
+	m_out_rts_func.resolve(m_out_rts_cb, *this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_out1_func.resolve(m_out_out1_cb, *this);
+	m_out_out2_func.resolve(m_out_out2_cb, *this);
+
+	m_timer = timer_alloc();
+}
+
+void ins8250_uart_device::device_reset()
+{
+	memset(&m_regs, '\0', sizeof(m_regs));
+	m_regs.ier = 0;
+	m_regs.iir = 1;
+	m_regs.lcr = 0;
+	m_regs.mcr = 0;
+	m_regs.lsr = (1<<5) | (1<<6);
+	m_int_pending = 0;
+	m_rx_line = 0;
+	m_timer->adjust(attotime::never);
+	receive_register_reset();
+	transmit_register_reset();
+	m_out_rts_func(0);
+	m_out_dtr_func(0);
+	m_out_out1_func(0);
+	m_out_out2_func(0);
+}
+
+void ins8250_uart_device::device_config_complete()
+{
+	const ins8250_interface *intf = reinterpret_cast<const ins8250_interface *>(static_config());
+	if(intf != NULL)
+	{
+		*static_cast<ins8250_interface *>(this) = *intf;
+	}
+	else
+	{
+		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
+		memset(&m_out_dtr_cb, 0, sizeof(m_out_dtr_cb));
+		memset(&m_out_rts_cb, 0, sizeof(m_out_rts_cb));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_out1_cb, 0, sizeof(m_out_out1_cb));
+		memset(&m_out_out2_cb, 0, sizeof(m_out_out2_cb));
 	}
 }
-
-
-DEVICE_GET_INFO( ins8250a )
-{
-	switch ( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "National Semiconductor INS8250A/INS82C50A");	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ins8250a);	break;
-
-		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
-	}
-}
-
-
-DEVICE_GET_INFO( ns16450 )
-{
-	switch ( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "National Semiconductor NS16450/PC16450");	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ns16450);	break;
-
-		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
-	}
-}
-
-
-DEVICE_GET_INFO( ns16550 )
-{
-	switch ( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "National Semiconductor NS16550/PC16550");	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ns16550);	break;
-
-		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
-	}
-}
-
-
-DEVICE_GET_INFO( ns16550a )
-{
-	switch ( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "National Semiconductor NS16550A/PC16550A");	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ns16550a);	break;
-
-		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
-	}
-}
-
-
-DEVICE_GET_INFO( pc16550d )
-{
-	switch ( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "National Semiconductor PC16550D");	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(pc16550d);	break;
-
-		default:									DEVICE_GET_INFO_CALL(ins8250);				break;
-	}
-}
-
-
-
-DEFINE_LEGACY_DEVICE(INS8250, ins8250);
-DEFINE_LEGACY_DEVICE(INS8250A, ins8250a);
-DEFINE_LEGACY_DEVICE(NS16450, ns16450);
-DEFINE_LEGACY_DEVICE(NS16550, ns16550);
-DEFINE_LEGACY_DEVICE(NS16550A, ns16550a);
-DEFINE_LEGACY_DEVICE(PC16550D, pc16550d);

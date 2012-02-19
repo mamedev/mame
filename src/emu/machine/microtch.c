@@ -9,49 +9,23 @@
 
 */
 
-#include "emu.h"
 #include "microtch.h"
 
 #define LOG 0
 
-enum MICROTOUCH_FORMAT
+const device_type MICROTOUCH = &device_creator<microtouch_device>;
+
+microtouch_device::microtouch_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	FORMAT_UNKNOWN,
-	FORMAT_TABLET,
-	FORMAT_DECIMAL
-};
+}
 
-ALLOW_SAVE_TYPE(MICROTOUCH_FORMAT);
-
-enum MICROTOUCH_MODE
+microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock)
 {
-	MODE_INACTIVE,
-	MODE_STREAM,
-	MODE_POINT
-};
+}
 
-ALLOW_SAVE_TYPE(MICROTOUCH_MODE);
-
-static struct
-{
-	UINT8		rx_buffer[16];
-	int			rx_buffer_ptr;
-	emu_timer*	timer;
-	UINT8		tx_buffer[16];
-	UINT8		tx_buffer_num;
-	UINT8		tx_buffer_ptr;
-	int			reset_done;
-	MICROTOUCH_FORMAT	format;
-	MICROTOUCH_MODE		mode;
-	int			last_touch_state;
-	int			last_x;
-	int			last_y;
-	microtouch_tx_func	tx_callback;
-	microtouch_touch_func	touch_callback;
-} microtouch;
-
-
-static int microtouch_check_command( const char* commandtocheck, int command_len, UINT8* command_data )
+int microtouch_device::check_command( const char* commandtocheck, int command_len, UINT8* command_data )
 {
 	if ( (command_len == (strlen(commandtocheck) + 2)) &&
 		 (command_data[0] == 0x01) &&
@@ -66,20 +40,20 @@ static int microtouch_check_command( const char* commandtocheck, int command_len
 	}
 }
 
-static void microtouch_send_format_table_packet(UINT8 flag, int x, int y)
+void microtouch_device::send_format_table_packet(UINT8 flag, int x, int y)
 {
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = flag;
+	m_tx_buffer[m_tx_buffer_num++] = flag;
 	// lower byte (7bits) of x coordinate
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = x & 0x7f;
+	m_tx_buffer[m_tx_buffer_num++] = x & 0x7f;
 	// higher byte (7bits) of x coordinate
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (x >> 7) & 0x7f;
+	m_tx_buffer[m_tx_buffer_num++] = (x >> 7) & 0x7f;
 	// lower byte (7bits) of y coordinate
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = y & 0x7f;
+	m_tx_buffer[m_tx_buffer_num++] = y & 0x7f;
 	// higher byte (7bits) of y coordinate
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (y >> 7) & 0x7f;
-};
+	m_tx_buffer[m_tx_buffer_num++] = (y >> 7) & 0x7f;
+}
 
-static void microtouch_send_format_decimal_packet(int x, int y)
+void microtouch_device::send_format_decimal_packet(int x, int y)
 {
 	int decx, decy;
 
@@ -91,201 +65,284 @@ static void microtouch_send_format_decimal_packet(int x, int y)
 		decy = 999;
 
 	// header byte
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x01;
+	m_tx_buffer[m_tx_buffer_num++] = 0x01;
 	// x coordinate in decimal mode
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (decx / 100) + '0';
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = ((decx / 10) % 10) + '0';
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (decx % 10) + '0';
+	m_tx_buffer[m_tx_buffer_num++] = (decx / 100) + '0';
+	m_tx_buffer[m_tx_buffer_num++] = ((decx / 10) % 10) + '0';
+	m_tx_buffer[m_tx_buffer_num++] = (decx % 10) + '0';
 	// comma (separator)
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = ',';
+	m_tx_buffer[m_tx_buffer_num++] = ',';
 	// y coordinate in decimal mode
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (decy / 100) + '0';
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = ((decy / 10) % 10) + '0';
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (decy % 10) + '0';
+	m_tx_buffer[m_tx_buffer_num++] = (decy / 100) + '0';
+	m_tx_buffer[m_tx_buffer_num++] = ((decy / 10) % 10) + '0';
+	m_tx_buffer[m_tx_buffer_num++] = (decy % 10) + '0';
 	// terminator
-	microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x0d;
+	m_tx_buffer[m_tx_buffer_num++] = 0x0d;
 }
 
-static void microtouch_send_touch_packet(running_machine &machine)
+void microtouch_device::send_touch_packet()
 {
-	int tx = input_port_read(machine, "TOUCH_X");
-	int ty = input_port_read(machine, "TOUCH_Y");
+	int tx = input_port_read(*this, "TOUCH_X");
+	int ty = input_port_read(*this, "TOUCH_Y");
 
-	if ( microtouch.touch_callback == NULL ||
-		 microtouch.touch_callback( machine, &tx, &ty ) != 0 )
+	if ( m_out_touch_cb == NULL ||
+		 m_out_touch_cb( &tx, &ty ) != 0 )
 	{
 		ty = 0x4000 - ty;
 
-		switch( microtouch.format )
+		switch( m_format )
 		{
 			case FORMAT_TABLET:
-				microtouch_send_format_table_packet(0xc8, tx, ty);
+				send_format_table_packet(0xc8, tx, ty);
 				break;
 			case FORMAT_DECIMAL:
-				microtouch_send_format_decimal_packet(tx, ty);
+				send_format_decimal_packet(tx, ty);
 				break;
 			case FORMAT_UNKNOWN:
 				break;
 		}
-		microtouch.last_touch_state = 1;
-		microtouch.last_x = tx;
-		microtouch.last_y = ty;
+		m_last_touch_state = 1;
+		m_last_x = tx;
+		m_last_y = ty;
 	}
 }
 
-static TIMER_CALLBACK(microtouch_timer_callback)
+void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if ( microtouch.tx_buffer_ptr < microtouch.tx_buffer_num )
+	if ( m_tx_buffer_ptr < m_tx_buffer_num )
 	{
-		microtouch.tx_callback( machine, microtouch.tx_buffer[microtouch.tx_buffer_ptr++] );
-		if ( microtouch.tx_buffer_ptr == microtouch.tx_buffer_num )
+		tx( m_tx_buffer[m_tx_buffer_ptr++] );
+		if ( m_tx_buffer_ptr == m_tx_buffer_num )
 		{
-			microtouch.tx_buffer_ptr = microtouch.tx_buffer_num = 0;
+			m_tx_buffer_ptr = m_tx_buffer_num = 0;
 		}
 		return;
 	}
 
-	if ( (microtouch.reset_done == 0) ||
-		 (microtouch.format == FORMAT_UNKNOWN) ||
-		 (microtouch.mode != MODE_STREAM))
+	if ( (m_reset_done == 0) ||
+		 (m_format == FORMAT_UNKNOWN) ||
+		 (m_mode != MODE_STREAM))
 	{
 		return;
 	}
 
 	// send format tablet packet
-	if ( input_port_read(machine, "TOUCH") & 0x01 )
+	if ( input_port_read(*this, "TOUCH") & 0x01 )
 	{
-		microtouch_send_touch_packet(machine);
+		send_touch_packet();
 	}
 	else
 	{
-		if ( microtouch.last_touch_state == 1 )
+		if ( m_last_touch_state == 1 )
 		{
-			microtouch.last_touch_state = 0;
-			switch( microtouch.format )
+			m_last_touch_state = 0;
+			switch( m_format )
 			{
 				case FORMAT_TABLET:
-					microtouch_send_format_table_packet(0x88, microtouch.last_x, microtouch.last_y);
+					send_format_table_packet(0x88, m_last_x, m_last_y);
 					break;
 				case FORMAT_DECIMAL:
-					microtouch_send_format_decimal_packet(microtouch.last_x, microtouch.last_y);
+					send_format_decimal_packet(m_last_x, m_last_y);
 					break;
 				case FORMAT_UNKNOWN:
 					break;
 			}
 		}
 	}
-};
+}
 
-void microtouch_init(running_machine &machine, microtouch_tx_func tx_cb, microtouch_touch_func touch_cb)
+void microtouch_device::device_config_complete()
 {
-	memset(&microtouch, 0, sizeof(microtouch));
-
-	microtouch.last_touch_state = -1;
-	microtouch.tx_callback = tx_cb;
-	microtouch.touch_callback = touch_cb;
-
-	microtouch.timer = machine.scheduler().timer_alloc(FUNC(microtouch_timer_callback));
-	microtouch.timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
-
-	microtouch.format = FORMAT_UNKNOWN;
-	microtouch.mode = MODE_INACTIVE;
-
-	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.reset_done);
-	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.last_touch_state);
-	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.last_x);
-	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.last_y);
-	state_save_register_item_array(machine, "microtouch", NULL, 0, microtouch.rx_buffer);
-	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.rx_buffer_ptr);
-	state_save_register_item_array(machine, "microtouch", NULL, 0, microtouch.tx_buffer);
-	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.tx_buffer_num);
-	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.tx_buffer_ptr);
-	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.format);
-	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.mode);
-};
-
-
-void microtouch_rx(int count, UINT8* data)
-{
-	int i;
-
-	for ( i = 0; (i < count) && ((microtouch.rx_buffer_ptr + i) < 16); i++ )
+	const microtouch_interface *intf = reinterpret_cast<const microtouch_interface *>(static_config());
+	if(intf != NULL)
+		*static_cast<microtouch_interface *>(this) = *intf;
+	else
 	{
-		microtouch.rx_buffer[i+microtouch.rx_buffer_ptr] = data[i];
-		microtouch.rx_buffer_ptr++;
+		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
+		memset(&m_out_touch_cb, 0, sizeof(m_out_touch_cb));
 	}
+}
 
-	if (microtouch.rx_buffer_ptr > 0 && (microtouch.rx_buffer[microtouch.rx_buffer_ptr-1] == 0x0d))
+void microtouch_device::device_start()
+{
+	memset(m_rx_buffer, 0, sizeof(m_rx_buffer));
+	memset(m_tx_buffer, 0, sizeof(m_tx_buffer));
+	m_rx_buffer_ptr = 0;
+	m_tx_buffer_ptr = 0;
+	m_tx_buffer_num = 0;
+	m_reset_done = 0;
+	m_format = 0;
+	m_mode = 0;
+	m_last_x = 0;
+	m_last_y = 0;
+	m_last_touch_state = -1;
+
+	m_timer = timer_alloc();
+	m_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
+
+	m_format = FORMAT_UNKNOWN;
+	m_mode = MODE_INACTIVE;
+
+	save_item(NAME(m_reset_done));
+	save_item(NAME(m_last_touch_state));
+	save_item(NAME(m_last_x));
+	save_item(NAME(m_last_y));
+	save_item(NAME(m_rx_buffer));
+	save_item(NAME(m_rx_buffer_ptr));
+	save_item(NAME(m_tx_buffer));
+	save_item(NAME(m_tx_buffer_num));
+	save_item(NAME(m_tx_buffer_ptr));
+	save_item(NAME(m_format));
+	save_item(NAME(m_mode));
+	m_out_tx_func.resolve(m_out_tx_cb, *this);
+}
+
+
+WRITE8_MEMBER(microtouch_device::rx)
+{
+	m_rx_buffer[m_rx_buffer_ptr] = data;
+	m_rx_buffer_ptr++;
+	if(m_rx_buffer_ptr == 16)
+		return;
+
+	if (m_rx_buffer_ptr > 0 && (m_rx_buffer[m_rx_buffer_ptr-1] == 0x0d))
 	{
 		if (LOG)
 		{
 			char command[16];
 			memset(command, 0, sizeof(command));
-			strncpy( command, (const char*)microtouch.rx_buffer + 1, microtouch.rx_buffer_ptr - 2 );
+			strncpy( command, (const char*)m_rx_buffer + 1, m_rx_buffer_ptr - 2 );
 			logerror("Microtouch: received command %s\n", command);
 		}
 		// check command
-		if ( microtouch_check_command( "MS", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
+		if ( check_command( "MS", m_rx_buffer_ptr, m_rx_buffer ) )
 		{
-			microtouch.mode = MODE_STREAM;
+			m_mode = MODE_STREAM;
 		}
-		else if ( microtouch_check_command( "MI", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
+		else if ( check_command( "MI", m_rx_buffer_ptr, m_rx_buffer ) )
 		{
-			microtouch.mode = MODE_INACTIVE;
+			m_mode = MODE_INACTIVE;
 		}
-		else if ( microtouch_check_command( "MP", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
+		else if ( check_command( "MP", m_rx_buffer_ptr, m_rx_buffer ) )
 		{
-			microtouch.mode = MODE_POINT;
+			m_mode = MODE_POINT;
 		}
-		else if ( microtouch_check_command( "R", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
+		else if ( check_command( "R", m_rx_buffer_ptr, m_rx_buffer ) )
 		{
-			microtouch.tx_buffer_num = 0;
-			microtouch.reset_done = 1;
+			m_tx_buffer_num = 0;
+			m_reset_done = 1;
 		}
-		else if ( microtouch_check_command( "FT", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
+		else if ( check_command( "FT", m_rx_buffer_ptr, m_rx_buffer ) )
 		{
-			microtouch.format = FORMAT_TABLET;
+			m_format = FORMAT_TABLET;
 		}
-		else if ( microtouch_check_command( "FD", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
+		else if ( check_command( "FD", m_rx_buffer_ptr, m_rx_buffer ) )
 		{
-			microtouch.format = FORMAT_DECIMAL;
+			m_format = FORMAT_DECIMAL;
 		}
-		else if ( microtouch_check_command("OI", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
+		else if ( check_command("OI", m_rx_buffer_ptr, m_rx_buffer ) )
 		{
 			// output identity - SMT3, ver 01.00
-			microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x01;
-			microtouch.tx_buffer[microtouch.tx_buffer_num++] = 'Q';
-			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '1';
-			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '0';
-			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '1';
-			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '0';
-			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '0';
-			microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x0d;
-			microtouch.rx_buffer_ptr = 0;
+			m_tx_buffer[m_tx_buffer_num++] = 0x01;
+			m_tx_buffer[m_tx_buffer_num++] = 'Q';
+			m_tx_buffer[m_tx_buffer_num++] = '1';
+			m_tx_buffer[m_tx_buffer_num++] = '0';
+			m_tx_buffer[m_tx_buffer_num++] = '1';
+			m_tx_buffer[m_tx_buffer_num++] = '0';
+			m_tx_buffer[m_tx_buffer_num++] = '0';
+			m_tx_buffer[m_tx_buffer_num++] = 0x0d;
+			m_rx_buffer_ptr = 0;
 			return;
 		}
 		// send response
-		microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x01;
-		microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x30;
-		microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x0d;
-		microtouch.rx_buffer_ptr = 0;
+		m_tx_buffer[m_tx_buffer_num++] = 0x01;
+		m_tx_buffer[m_tx_buffer_num++] = 0x30;
+		m_tx_buffer[m_tx_buffer_num++] = 0x0d;
+		m_rx_buffer_ptr = 0;
 	}
 };
 
-static INPUT_CHANGED( microtouch_touch )
+INPUT_CHANGED_MEMBER( microtouch_device::touch )
 {
-	if ( newval && ( microtouch.mode == MODE_POINT ) )
+	if ( newval && ( m_mode == MODE_POINT ) )
 	{
-		microtouch_send_touch_packet( field.machine() );
+		send_touch_packet();
 	}
 }
 
-INPUT_PORTS_START(microtouch)
+static INPUT_PORTS_START(microtouch)
 	PORT_START("TOUCH")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "Touch screen" ) PORT_CHANGED( microtouch_touch, 0 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "Touch screen" ) PORT_CHANGED_MEMBER( DEVICE_SELF,microtouch_device, touch, 0 )
 	PORT_START("TOUCH_X")
 	PORT_BIT( 0x3fff, 0x2000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 	PORT_START("TOUCH_Y")
 	PORT_BIT( 0x3fff, 0x2000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 INPUT_PORTS_END
 
+ioport_constructor microtouch_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(microtouch);
+}
+
+const device_type MICROTOUCH_SERIAL = &device_creator<microtouch_serial_device>;
+
+microtouch_serial_device::microtouch_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: microtouch_device(mconfig, MICROTOUCH_SERIAL, "Microtouch Serial Touchscreen", tag, owner, clock),
+	  device_serial_interface(mconfig, *this)
+{
+}
+
+void microtouch_serial_device::device_config_complete()
+{
+	const microtouch_serial_interface *intf = reinterpret_cast<const microtouch_serial_interface *>(static_config());
+	if(intf != NULL)
+		*static_cast<microtouch_serial_interface *>(this) = *intf;
+	else
+	{
+		memset(&m_out_stx_cb, 0, sizeof(m_out_stx_cb));
+	}
+	memset(&(microtouch_interface::m_out_tx_cb), 0, sizeof(microtouch_interface::m_out_tx_cb));
+	memset(&m_out_touch_cb, 0, sizeof(m_out_touch_cb));
+}
+
+void microtouch_serial_device::device_start()
+{
+	microtouch_device::device_start();
+	m_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	set_data_frame(8, 1, SERIAL_PARITY_NONE); //8N1?
+	m_out_stx_func.resolve(m_out_stx_cb, *this);
+	m_count = 0;
+	m_output_valid = false;
+
+	save_item(NAME(m_count));
+	save_item(NAME(m_output_valid));
+	save_item(NAME(m_output));
+	save_item(NAME(m_rx_line));
+}
+
+void microtouch_serial_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if(is_transmit_register_empty())
+	{
+		if(m_output_valid)
+		{
+			transmit_register_setup(m_output);
+			m_output_valid = false;
+		}
+	}
+	else
+		m_out_stx_func(transmit_register_get_data_bit());
+
+	receive_register_update_bit(m_rx_line);
+	if(is_receive_register_full())
+	{
+		receive_register_extract();
+		microtouch_device::rx(*memory_nonspecific_space(machine()), 0, get_received_char());
+		receive_register_reset();
+	}
+
+	if((m_count == 0) && (m_output_valid == false))
+		microtouch_device::device_timer(timer, id, param, ptr);
+
+	++m_count %= 8;
+}

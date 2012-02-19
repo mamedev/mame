@@ -35,7 +35,6 @@
 #include "includes/cd32.h"
 #include "sound/cdda.h"
 #include "imagedev/chd_cd.h"
-#include "machine/microtch.h"
 #include "machine/amigafdc.h"
 
 #define CD32PAL_XTAL_X1   XTAL_28_37516MHz
@@ -760,6 +759,12 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
 };
 
+static const microtouch_interface cd32_microtouch_config =
+{
+	DEVCB_DRIVER_MEMBER(cd32_state, microtouch_tx),
+	NULL
+};
+
 static MACHINE_CONFIG_START( cd32base, cd32_state )
 
 	/* basic machine hardware */
@@ -799,6 +804,8 @@ static MACHINE_CONFIG_START( cd32base, cd32_state )
 	/* cia */
 	MCFG_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cia_0_intf)
 	MCFG_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cia_1_intf)
+
+	MCFG_MICROTOUCH_ADD( "microtouch", cd32_microtouch_config )
 
 	/* fdc */
 	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
@@ -1375,8 +1382,6 @@ static DRIVER_INIT(mgprem11)
 
 static INPUT_PORTS_START( odeontw2 )
 //  PORT_INCLUDE( cd32 )
-	PORT_INCLUDE( microtouch )
-
 	PORT_START("CIA0PORTA")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1440,14 +1445,15 @@ INPUT_PORTS_END
 
 static void serial_w(running_machine &machine, UINT16 data)
 {
+	cd32_state *state = machine.driver_data<cd32_state>();
 	UINT8 data8 = data & 0xff;
 	if ( data8 != 0x00 )
-		microtouch_rx(1, &data8);
+		state->m_microtouch->rx(*memory_nonspecific_space(machine), 0, data8);
 }
 
-static void microtouch_tx(running_machine &machine, UINT8 data)
+WRITE8_MEMBER (cd32_state::microtouch_tx)
 {
-	amiga_serial_in_w(machine, data);
+	amiga_serial_in_w(machine(), data);
 }
 
 static DRIVER_INIT( odeontw2 )
@@ -1472,9 +1478,6 @@ static DRIVER_INIT( odeontw2 )
 
 	/* input hack */
 	state->m_input_hack = NULL;
-
-	/* touch screen */
-	microtouch_init(machine, microtouch_tx, NULL);
 }
 
 /***************************************************************************************************/

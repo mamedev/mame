@@ -157,11 +157,14 @@ class adp_state : public driver_device
 public:
 	adp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_h63484(*this, "h63484")
+		  m_h63484(*this, "h63484"),
+		  m_microtouch(*this, "microtouch")
 		{ }
 
 	required_device<h63484_device> m_h63484;
-
+	required_device<microtouch_device> m_microtouch;
+	
+	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	/* misc */
@@ -262,20 +265,20 @@ static void duart_irq_handler( device_t *device, UINT8 vector )
 {
 	adp_state *state = device->machine().driver_data<adp_state>();
 	device_set_input_line_and_vector(state->m_maincpu, 4, HOLD_LINE, vector);
-};
+}
 
 static void duart_tx( device_t *device, int channel, UINT8 data )
 {
+	adp_state *state = device->machine().driver_data<adp_state>();
 	if (channel == 0)
 	{
-		microtouch_rx(1, &data);
+		state->m_microtouch->rx(*memory_nonspecific_space(device->machine()), 0, data);
 	}
-};
+}
 
-static void microtouch_tx( running_machine &machine, UINT8 data )
+WRITE8_MEMBER( adp_state::microtouch_tx )
 {
-	adp_state *state = machine.driver_data<adp_state>();
-	duart68681_rx_data(state->m_duart, 0, data);
+	duart68681_rx_data(m_duart, 0, data);
 }
 
 static UINT8 duart_input( device_t *device )
@@ -283,10 +286,15 @@ static UINT8 duart_input( device_t *device )
 	return input_port_read(device->machine(), "DSW1");
 }
 
+static const microtouch_interface adb_microtouch_config =
+{
+	DEVCB_DRIVER_MEMBER(adp_state, microtouch_tx),
+	NULL
+};
+
 static MACHINE_START( skattv )
 {
 	adp_state *state = machine.driver_data<adp_state>();
-	microtouch_init(machine, microtouch_tx, 0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_duart = machine.device("duart68681");
@@ -530,8 +538,6 @@ INPUT_PORTS_END
 #endif
 
 static INPUT_PORTS_START( skattv )
-	PORT_INCLUDE(microtouch)
-
 	PORT_START("DSW1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH,  IPT_COIN5    )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )
@@ -661,6 +667,7 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_MACHINE_RESET(skattv)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", adb_microtouch_config )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -692,6 +699,7 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_MACHINE_RESET(skattv)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", adb_microtouch_config )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -719,6 +727,7 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_CPU_PROGRAM_MAP(backgamn_mem)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", adb_microtouch_config )
 
 	MCFG_MACHINE_START(skattv)
 	MCFG_MACHINE_RESET(skattv)

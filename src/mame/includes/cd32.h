@@ -8,13 +8,19 @@ CuboCD32 definitions
 #define __CUBOCD32_H__
 
 #include "includes/amiga.h"
+#include "machine/microtch.h"
 
 class cd32_state : public amiga_state
 {
 public:
 	cd32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag) { }
+		: amiga_state(mconfig, type, tag),
+		  m_microtouch(*this, "microtouch")
+		{ }
 
+	required_device<microtouch_device> m_microtouch;
+	
+	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT16 m_potgo_value;
 	int m_cd32_shifter[2];
 	void (*m_input_hack)(running_machine &machine);

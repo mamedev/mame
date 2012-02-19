@@ -55,7 +55,7 @@ typedef struct
 	PC16552D_CHANNEL ch[2];
 	int frequency;
 	void (* irq_handler)(running_machine &machine, int channel, int value);
-	void (* tx_callback)(int channel, int count, UINT8* data);
+	void (* tx_callback)(running_machine &machine, int channel, int count, UINT8* data);
 } PC16552D_REGS;
 
 #define MAX_PC16552D_CHIPS		4
@@ -151,7 +151,7 @@ static TIMER_CALLBACK( tx_fifo_timer_callback )
 	ch = &duart[chip].ch[channel];
 
 	if (duart[chip].tx_callback)
-		duart[chip].tx_callback(channel, ch->tx_fifo_num, ch->tx_fifo);
+		duart[chip].tx_callback(machine, channel, ch->tx_fifo_num, ch->tx_fifo);
 
 	ch->tx_fifo_num = 0;
 
@@ -387,7 +387,7 @@ static void duart_w(running_machine &machine, int chip, int reg, UINT8 data)
 
 /*****************************************************************************/
 
-void pc16552d_init(running_machine &machine, int chip, int frequency, void (* irq_handler)(running_machine &machine, int channel, int value), void (* tx_callback)(int channel, int count, UINT8* data))
+void pc16552d_init(running_machine &machine, int chip, int frequency, void (* irq_handler)(running_machine &machine, int channel, int value), void (* tx_callback)(running_machine &machine, int channel, int count, UINT8* data))
 {
 	memset(&duart[chip], 0, sizeof(PC16552D_REGS));
 

@@ -85,8 +85,16 @@ class magtouch_state : public driver_device
 {
 public:
 	magtouch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_uart(*this, "ns16450_0"),
+		  m_microtouch(*this, "microtouch")
+	{ }
 
+	required_device<ns16450_device> m_uart;
+	required_device<microtouch_serial_device> m_microtouch;
+
+	DECLARE_WRITE_LINE_MEMBER(microtouch_out);
+	DECLARE_WRITE_LINE_MEMBER(microtouch_in);
 };
 
 
@@ -96,15 +104,14 @@ public:
  *
  *************************************/
 
-static void magtouch_microtouch_tx_callback(running_machine &machine, UINT8 data)
+WRITE_LINE_MEMBER(magtouch_state::microtouch_out)
 {
-	ins8250_receive(machine.device("ns16450_0"), data);
-};
+	m_microtouch->rx(state);
+}
 
-static INS8250_TRANSMIT( magtouch_com_transmit )
+WRITE_LINE_MEMBER(magtouch_state::microtouch_in)
 {
-	UINT8 data8 = data;
-	microtouch_rx(1, &data8);
+	m_uart->rx_w(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( at_com_interrupt_1 )
@@ -114,11 +121,17 @@ static WRITE_LINE_DEVICE_HANDLER( at_com_interrupt_1 )
 
 static const ins8250_interface magtouch_com0_interface =
 {
-	1843200,
+	DEVCB_DRIVER_LINE_MEMBER(magtouch_state, microtouch_out),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_LINE(at_com_interrupt_1),
-	magtouch_com_transmit,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const microtouch_serial_interface magtouch_microtouch_interface =
+{
+	DEVCB_DRIVER_LINE_MEMBER(magtouch_state, microtouch_in)
 };
 
 /*************************************
@@ -161,12 +174,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magtouch_io, AS_IO, 32 )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x02e0, 0x02e7) AM_READWRITE8(magtouch_io_r, magtouch_io_w, 0xffffffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( magtouch )
-	PORT_INCLUDE(microtouch)
-
 	PORT_START("IN0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Clear") PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE)
@@ -191,7 +202,7 @@ static MACHINE_START( magtouch )
 	memory_configure_bank(machine, "rombank", 0, 0x80, machine.region("game_prg")->base(), 0x8000 );
 	memory_set_bank(machine, "rombank", 0);
 
-	microtouch_init(machine, magtouch_microtouch_tx_callback, NULL);
+//	microtouch_init(machine, magtouch_microtouch_tx_callback, NULL);
 }
 
 static MACHINE_CONFIG_START( magtouch, magtouch_state )
@@ -212,8 +223,8 @@ static MACHINE_CONFIG_START( magtouch, magtouch_state )
 
 //  MCFG_FRAGMENT_ADD( at_kbdc8042 )
 	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_NS16450_ADD( "ns16450_0", magtouch_com0_interface )
-
+	MCFG_NS16450_ADD( "ns16450_0", magtouch_com0_interface, XTAL_1_8432MHz )
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", magtouch_microtouch_interface, 9600 ) // rate?
 MACHINE_CONFIG_END
 
 

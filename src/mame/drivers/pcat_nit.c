@@ -96,21 +96,27 @@ class pcat_nit_state : public driver_device
 {
 public:
 	pcat_nit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_uart(*this, "ns16450_0"),
+		  m_microtouch(*this, "microtouch")
+		{ }
 
 	UINT8 *m_banked_nvram;
+	required_device<ns16450_device> m_uart;
+	required_device<microtouch_serial_device> m_microtouch;
+
+	DECLARE_WRITE_LINE_MEMBER(microtouch_out);
+	DECLARE_WRITE_LINE_MEMBER(microtouch_in);
 };
 
-
-static void pcat_nit_microtouch_tx_callback(running_machine &machine, UINT8 data)
+WRITE_LINE_MEMBER(pcat_nit_state::microtouch_out)
 {
-	ins8250_receive(machine.device("ns16450_0"), data);
-};
+	m_microtouch->rx(state);
+}
 
-static INS8250_TRANSMIT( pcat_nit_com_transmit )
+WRITE_LINE_MEMBER(pcat_nit_state::microtouch_in)
 {
-	UINT8 data8 = data;
-	microtouch_rx(1, &data8);
+	m_uart->rx_w(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( at_com_interrupt_1 )
@@ -120,11 +126,17 @@ static WRITE_LINE_DEVICE_HANDLER( at_com_interrupt_1 )
 
 static const ins8250_interface pcat_nit_com0_interface =
 {
-	1843200,
+	DEVCB_DRIVER_LINE_MEMBER(pcat_nit_state, microtouch_out),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_LINE(at_com_interrupt_1),
-	pcat_nit_com_transmit,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const microtouch_serial_interface pcat_nit_microtouch_interface =
+{
+	DEVCB_DRIVER_LINE_MEMBER(pcat_nit_state, microtouch_in)
 };
 
 /*************************************
@@ -194,12 +206,10 @@ static ADDRESS_MAP_START( pcat_nit_io, AS_IO, 32 )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
 	AM_RANGE(0x0280, 0x0283) AM_READNOP
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pcat_nit )
-	PORT_INCLUDE(microtouch)
-
 	PORT_START("IN0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Clear") PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE)
@@ -224,7 +234,7 @@ static MACHINE_START( streetg2 )
 	memory_configure_bank(machine, "rombank", 0, 0x80, machine.region("game_prg")->base(), 0x8000 );
 	memory_set_bank(machine, "rombank", 0);
 
-	microtouch_init(machine, pcat_nit_microtouch_tx_callback, NULL);
+	//microtouch_init(machine, pcat_nit_microtouch_tx_callback, NULL);
 }
 
 static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
@@ -245,7 +255,8 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 
 //  MCFG_FRAGMENT_ADD( at_kbdc8042 )
 	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface )
+	MCFG_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface, XTAL_1_8432MHz )
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", pcat_nit_microtouch_interface, 9600 ) // rate?
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

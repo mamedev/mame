@@ -76,12 +76,12 @@ void device_serial_interface::receive_register_update_bit(int bit)
 	int previous_bit;
 
 	//LOG(("receive register receive bit: %1x\n",bit));
-	previous_bit = m_rcv_register_data & 1;
+	previous_bit = (m_rcv_register_data & 0x8000) && 1;
 
 	/* shift previous bit 7 out */
-	m_rcv_register_data = m_rcv_register_data<<1;
+	m_rcv_register_data = m_rcv_register_data>>1;
 	/* shift new bit in */
-	m_rcv_register_data = (m_rcv_register_data & 0xfffe) | bit;
+	m_rcv_register_data = (m_rcv_register_data & 0x7fff) | (bit<<15);
 	/* update bit count received */
 	m_rcv_bit_count_received++;
 
@@ -123,47 +123,34 @@ void device_serial_interface::receive_register_update_bit(int bit)
 
 void device_serial_interface::receive_register_extract()
 {
-	unsigned long data_shift;
 	UINT8 data;
 
 	receive_register_reset();
 
-	data_shift = 0;
-
-	/* if parity is even or odd, there should be a parity bit in the stream! */
-	if (m_df_parity!=SERIAL_PARITY_NONE)
-	{
-		data_shift++;
-	}
-
-	data_shift+=m_df_stop_bit_count;
-
 	/* strip off stop bits and parity */
-	data = m_rcv_register_data>>data_shift;
+	data = m_rcv_register_data>>(16-m_rcv_bit_count);
 
 	/* mask off other bits so data byte has 0's in unused bits */
-	data = data & (0x0ff
-		>>
-		(8-(m_df_word_length)));
+	data &= ~(0xff<<m_df_word_length);
 
 	m_rcv_byte_received  = data;
+
+	if(m_df_parity == SERIAL_PARITY_NONE)
+		return;
+
+	//unsigned char computed_parity;
+	//unsigned char parity_received;
+
+	/* get state of parity bit received */
+	//parity_received = (m_rcv_register_data>>m_df_word length) & 0x01;
 
 	/* parity enable? */
 	switch (m_df_parity)
 	{
-		case SERIAL_PARITY_NONE:
-			break;
-
 		/* check parity */
 		case SERIAL_PARITY_ODD:
 		case SERIAL_PARITY_EVEN:
 		{
-			//unsigned char computed_parity;
-			//unsigned char parity_received;
-
-			/* get state of parity bit received */
-			//parity_received = (m_rcv_register_data>>m_df_stop_bit_count) & 0x01;
-
 			/* compute parity for received bits */
 			//computed_parity = serial_helper_get_parity(data);
 
@@ -182,6 +169,10 @@ void device_serial_interface::receive_register_extract()
 
 		}
 		break;
+		case SERIAL_PARITY_MARK:
+		case SERIAL_PARITY_SPACE:
+			//computed_parity = parity_received;
+			break;
 	}
 }
 
@@ -225,23 +216,34 @@ void device_serial_interface::transmit_register_setup(UINT8 data_byte)
 		int databit;
 
 		/* get bit from data */
-		databit = (transmit_data>>(m_df_word_length-1)) & 0x01;
+		databit = transmit_data & 0x01;
 		/* add bit to formatted byte */
 		transmit_register_add_bit(databit);
-		transmit_data = transmit_data<<1;
+		transmit_data = transmit_data>>1;
 	}
 
 	/* parity */
 	if (m_df_parity!=SERIAL_PARITY_NONE)
 	{
 		/* odd or even parity */
-		unsigned char parity;
+		unsigned char parity = 0;
+		switch(m_df_parity)
+		{
+		case SERIAL_PARITY_EVEN:
+		case SERIAL_PARITY_ODD:
 
-		/* get parity */
-		/* if parity = 0, data has even parity - i.e. there is an even number of one bits in the data */
-		/* if parity = 1, data has odd parity - i.e. there is an odd number of one bits in the data */
-		parity = serial_helper_get_parity(data_byte);
-
+			/* get parity */
+			/* if parity = 0, data has even parity - i.e. there is an even number of one bits in the data */
+			/* if parity = 1, data has odd parity - i.e. there is an odd number of one bits in the data */
+			parity = serial_helper_get_parity(data_byte);
+			break;
+		case SERIAL_PARITY_MARK:
+			parity = 1;
+			break;
+		case SERIAL_PARITY_SPACE:
+			parity = 0;
+			break;
+		}
 		transmit_register_add_bit(parity);
 	}
 
@@ -258,9 +260,7 @@ UINT8 device_serial_interface::transmit_register_get_data_bit()
 {
 	int bit;
 
-	bit = (m_tra_register_data>>
-		(m_tra_bit_count - 1 -
-		m_tra_bit_count_transmitted)) & 0x01;
+	bit = (m_tra_register_data>>(m_tra_bit_count-1-m_tra_bit_count_transmitted))&1;
 
 	m_tra_bit_count_transmitted++;
 

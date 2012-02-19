@@ -129,8 +129,10 @@ public:
 	meritm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_v9938_0(*this, "v9938_0"),
-		  m_v9938_1(*this, "v9938_1") { }
+		  m_v9938_1(*this, "v9938_1"),
+		  m_microtouch(*this, "microtouch") { }
 
+	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT8* m_ram;
 	device_t *m_z80pio[2];
 	int m_vint;
@@ -144,6 +146,7 @@ public:
 	ds1204_t m_ds1204;
 	required_device<v9938_device> m_v9938_0;
 	required_device<v9938_device> m_v9938_1;
+	required_device<microtouch_device> m_microtouch;
 };
 
 
@@ -271,22 +274,24 @@ static void ds1204_init(running_machine &machine, const UINT8* key, const UINT8*
  *
  *************************************/
 
-static void pc16650d_tx_callback(int channel, int count, UINT8* data)
+static void pc16650d_tx_callback(running_machine &machine, int channel, int count, UINT8* data)
 {
-	microtouch_rx(count, data);
-};
+	meritm_state *state = machine.driver_data<meritm_state>();
+	for(int i = 0; i < count; i++)
+		state->m_microtouch->rx(*memory_nonspecific_space(machine), 0, data[i]);
+}
 
-static void meritm_microtouch_tx_callback(running_machine &machine, UINT8 data)
+WRITE8_MEMBER(meritm_state::microtouch_tx)
 {
-	pc16552d_rx_data(machine, 0, 0, data);
-};
+	pc16552d_rx_data(space.machine(), 0, 0, data);
+}
 
 /*************************************
  *
  *  Microtouch touch coordinate transformation
  *
  *************************************/
-static int meritm_touch_coord_transform(running_machine &machine, int *touch_x, int *touch_y)
+MICROTOUCH_TOUCH(meritm_touch_coord_transform)
 {
 	int xscr = (int)((double)(*touch_x)/0x4000*544);
 	int yscr = (int)((double)(*touch_y)/0x4000*480);
@@ -310,6 +315,12 @@ static int meritm_touch_coord_transform(running_machine &machine, int *touch_x, 
 
 	return 1;
 }
+
+static const microtouch_interface meritm_microtouch_config =
+{
+	DEVCB_DRIVER_MEMBER(meritm_state, microtouch_tx),
+	meritm_touch_coord_transform
+};
 
 /*************************************
  *
@@ -627,8 +638,6 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START(meritm_crt260)
-	PORT_INCLUDE(microtouch)
-
 	PORT_START("PIO1_PORTA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -997,7 +1006,6 @@ static MACHINE_START(meritm_crt250_crt252_crt258)
 {
 	MACHINE_START_CALL(meritm_crt250_questions);
 	pc16552d_init(machine, 0, UART_CLK, NULL, pc16650d_tx_callback);
-	microtouch_init(machine, meritm_microtouch_tx_callback, meritm_touch_coord_transform);
 }
 
 static MACHINE_START(meritm_crt260)
@@ -1014,7 +1022,6 @@ static MACHINE_START(meritm_crt260)
 	meritm_switch_banks(machine);
 	MACHINE_START_CALL(merit_common);
 	pc16552d_init(machine, 0, UART_CLK, NULL, pc16650d_tx_callback);
-	microtouch_init(machine, meritm_microtouch_tx_callback, meritm_touch_coord_transform);
 	state_save_register_global(machine, state->m_bank);
 	state_save_register_global(machine, state->m_psd_a15);
 	state_save_register_global_pointer(machine, state->m_ram, 0x8000);
@@ -1089,6 +1096,8 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, SYSTEM_CLK/12)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_MICROTOUCH_ADD("microtouch", meritm_microtouch_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( meritm_crt250_questions, meritm_crt250 )
