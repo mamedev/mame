@@ -49,7 +49,7 @@ public:
 	static void static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card,const input_device_default *default_input);
 	const slot_interface* get_slot_interfaces() const { return m_slot_interfaces; };
 	const char * get_default_card(const machine_config &config, emu_options &options) const { return m_default_card; };
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) const { return NULL; };
+	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) { return NULL; };
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
 	device_t* get_card_device();
 protected:
