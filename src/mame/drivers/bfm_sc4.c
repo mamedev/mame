@@ -24728,10 +24728,10 @@ GAME( 200?, sc4quartm	,sc4quart,	sc4, sc4, sc4, ROT0, "Mazooma","Quaterback (PR2
 
 // QUAZZI MO' DOUGH..........QUAZZSND.......  (no standard header)
 GAME( 200?, sc4qmodo	,0,			sc4, sc4, sc4, ROT0, "Qps","Quazzi Mo Dough (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4qmodoa	,sc4qmodo,	sc4, sc4, sc4, ROT0, "Qps","Quazzi Mo Dough (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4qmodob	,sc4qmodo,	sc4, sc4, sc4, ROT0, "Qps","Quazzi Mo Dough (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4qmodoc	,sc4qmodo,	sc4, sc4, sc4, ROT0, "Qps","Quazzi Mo Dough (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4qmodod	,sc4qmodo,	sc4, sc4, sc4, ROT0, "Qps","Quazzi Mo Dough (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4qmodoa	,sc4qmodo,	sc4, sc4, sc4, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4qmodob	,sc4qmodo,	sc4, sc4, sc4, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4qmodoc	,sc4qmodo,	sc4, sc4, sc4, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4qmodod	,sc4qmodo,	sc4, sc4, sc4, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 
 
 GAME( 200?, sc4quidr	,0,			sc4, sc4, sc4, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )

@@ -12064,7 +12064,7 @@ sc2pe1g		// Public Enemy No1 (Bellfruit) [German]
 sc2wwcl		// Wild West Club (Bellfruit)
 sc2dick		// Spotted Dick (Global)
 sc2pick		// Pick Of The Bunch (Global)
-sc2rock		// How Bigs Your Rock (Global)
+sc2rock		// How Big's Your Rock? (Global)
 sc2call		// It's Your Call (Glonal)
 sc2prom		// Along The Prom
 sc2payr		// Pay Roll (Mazooma)
@@ -13533,7 +13533,7 @@ sc4quartj	//
 sc4quartk	//
 sc4quartl	//
 sc4quartm	//
-sc4qmodo	// Quazzi Mo Dough (Qps)
+sc4qmodo	// Quazzi Mo' Dough (Qps)
 sc4qmodoa	//
 sc4qmodob	//
 sc4qmodoc	//
@@ -17168,7 +17168,7 @@ ep_wildf	// Wildfire (Maygay - Impulse)
 ep_xspot	// X Marks The Spot (Maygay)
 ep_braid	// Bank Raid (Unk)
 ep_bathl	// Bat Outa Hell (Global)
-ep_beavr	// Beaver Las Vegas (Global)
+ep_beavr	// Casino Beaver Las Vegas (Global)
 ep_beavra	//
 ep_bvrcl	// Beaver Las Vegas Club (Global)
 ep_bvruc	// Beaver Uncovered (Global)
@@ -17204,7 +17204,7 @@ ep_ll		// Lucky Ladders (Unk)
 ep_monrt	// Money Returns Club, The (Global)
 ep_monsh	// Moonshine Club, The (Unk)
 ep_mummy	// Mummy Talks (Impulse)
-ep_pkni		// Phoenix Knights (Global)
+ep_pkni		// The Phoenix Knights (Global)
 ep_redl		// Red Line (Unk)
 ep_rchik	// Rich Chics Club (Unk)
 ep_royrc	// Royal Roulette Club (Unk)
@@ -17221,7 +17221,7 @@ ep_utnut	// Utter Nutter (Global)
 ep_utncl	// Utter Nutter Club (Global)
 ep_wleek	// Weakest Leek Club (Global)
 ep_wud		// What's Up Doc (Global)
-ep_milhr	// Who Wants To Be A Millionhare (Global)
+ep_milhr	// Who Wants To Be A Millionhare? (Global)
 ep_mlhrc	// Who Whats To Be A Millionhare Club (Global)
 ep_wf		// Wildfire (Global)
 ep_bbars	// Balloon Bars (Maygay)
@@ -19005,11 +19005,11 @@ hb_gldpl	// Golden Palace (Mazooma)
 hb_gldwn	// Golden Winner (Fairgames)
 hb_jailb	// Jail Break (Qps)
 hb_jkrwl	// Jokers Wild (Fairgames)
-hb_mrmon	// Mr Money (Qps)
+hb_mrmon	// Mr. Money (Qps)
 hb_rhv		// Red Hot Voucher (Qps)
 hb_ringb	// Ring A Bell (Jpm)
 hb_rckrl	// Rock 'n' Roll (Qps)
-hb_ydd		// Yabba Dabba Dough (Qps)
+hb_ydd		// Yabba-Dabba-Dough (Qps)
 
 /* Summit Coin */
 

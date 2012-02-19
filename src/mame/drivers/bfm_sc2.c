@@ -5477,7 +5477,7 @@ GAME( 199?, sc2scc		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Mdm",      "Sa
 // custom Global sound system?
 GAME( 199?, sc2dick		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "Spotted Dick (Global) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2pick		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "Pick Of The Bunch (Global) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2rock		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "How Big's Your Rock (Global) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2rock		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "How Big's Your Rock? (Global) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2call		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "Global",   "It's Your Call (Global) (Scorpion 2/3)", GAME_FLAGS)
 
 GAME( 199?, sc2payr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM/Mazooma",   "Pay Roll Casino (Bellfruit/Mazooma) (Scorpion 2/3)", GAME_FLAGS)
