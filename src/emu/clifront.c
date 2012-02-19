@@ -651,7 +651,7 @@ void cli_frontend::listslots(const char *gamename)
 
 			// get the options and print them
 			const slot_interface* intf = slot->get_slot_interfaces();
-			for (int i = 0; intf[i].name != NULL; i++)
+			for (int i = 0; intf && intf[i].name != NULL; i++)
 			{
 				device_t *dev = (*intf[i].devtype)(drivlist.config(), "dummy", &drivlist.config().root_device(), 0);
 				dev->config_complete();
