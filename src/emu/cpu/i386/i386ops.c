@@ -351,7 +351,7 @@ static void I386OP(cmpsb)(i386_state *cpustate)				// Opcode 0xa6
 	ead = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI), 0 );
 	src = READ8(cpustate,eas);
 	dst = READ8(cpustate,ead);
-	SUB8(cpustate,dst, src);
+	SUB8(cpustate,src, dst);
 	BUMP_SI(cpustate,1);
 	BUMP_DI(cpustate,1);
 	CYCLES(cpustate,CYCLES_CMPS);

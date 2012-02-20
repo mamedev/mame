@@ -90,7 +90,6 @@ protected:
 	virtual void tra_complete();
 	virtual void rcv_complete();
 private:
-	int m_count;
 	bool m_output_valid;
 	UINT8 m_output;
 	devcb_resolved_write_line m_out_stx_func;

@@ -312,10 +312,8 @@ void microtouch_serial_device::device_start()
 	set_tra_rate(clock());
 	set_rcv_rate(clock());
 	m_out_stx_func.resolve(m_out_stx_cb, *this);
-	m_count = 0;
 	m_output_valid = false;
 
-	save_item(NAME(m_count));
 	save_item(NAME(m_output_valid));
 	save_item(NAME(m_output));
 }
