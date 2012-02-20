@@ -124,7 +124,7 @@ struct _rspimp_state
 	UINT32				vres[8];					/* used for temporary vector results */
 
 	/* register mappings */
-	parameter	regmap[32];					/* parameter to register mappings for all 32 integer registers */
+	parameter	regmap[34];					/* parameter to register mappings for all 32 integer registers */
 
 	/* subroutines */
 	code_handle *	entry;						/* entry point */
@@ -210,8 +210,9 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
 #define VS2REG						((op >> 16) & 0x1f)
 #define EL							((op >> 21) & 0xf)
 
-#define VREG_B(reg, offset)		rsp->v[(reg)].b[BYTE4_XOR_BE(offset)]
-#define VREG_S(reg, offset)		rsp->v[(reg)].s[(offset)^1]
+#define VREG_B(reg, offset)		rsp->v[(reg)].b[(offset)^1]
+#define W_VREG_S(reg, offset)		rsp->v[(reg)].s[(offset)]
+#define VREG_S(reg, offset)		(INT16)rsp->v[(reg)].s[(offset)]
 
 #define VEC_EL_2(x,z)				(vector_elements_2[(x)][(z)])
 
@@ -320,7 +321,9 @@ void rspdrc_add_dmem(device_t *device, UINT32 *base)
 
 INLINE UINT8 READ8(rsp_state *rsp, UINT32 address)
 {
-	return rsp->dmem8[BYTE4_XOR_BE(address & 0xfff)];
+	UINT8 ret = rsp->dmem8[BYTE4_XOR_BE(address & 0xfff)];
+	//printf("%04xr%02x\n",address, ret);
+	return ret;
 }
 
 static void cfunc_read8(void *param)
@@ -367,7 +370,7 @@ INLINE void WRITE8(rsp_state *rsp, UINT32 address, UINT8 data)
 {
 	address &= 0xfff;
 	rsp->dmem8[BYTE4_XOR_BE(address)] = data;
-	//printf("%04xw%02x\n",address, data);
+	//printf("%04x:%02x\n",address, data);
 }
 
 static void cfunc_write8(void *param)
@@ -381,7 +384,7 @@ INLINE void WRITE16(rsp_state *rsp, UINT32 address, UINT16 data)
 	address &= 0xfff;
 	rsp->dmem8[BYTE4_XOR_BE(address)] = data >> 8;
 	rsp->dmem8[BYTE4_XOR_BE(address + 1)] = data & 0xff;
-	//printf("%04xw%04x\n",address, data);
+	//printf("%04x:%04x\n",address, data);
 }
 
 static void cfunc_write16(void *param)
@@ -397,7 +400,7 @@ INLINE void WRITE32(rsp_state *rsp, UINT32 address, UINT32 data)
 	rsp->dmem8[BYTE4_XOR_BE(address + 1)] = (data >> 16) & 0xff;
 	rsp->dmem8[BYTE4_XOR_BE(address + 2)] = (data >> 8) & 0xff;
 	rsp->dmem8[BYTE4_XOR_BE(address + 3)] = data & 0xff;
-	//printf("%04xw%08x\n",address, data);
+	//printf("%04x:%08x\n",address, data);
 }
 
 static void cfunc_write32(void *param)
@@ -431,25 +434,31 @@ static void cfunc_printf_debug(void *param)
 	switch(rsp->impstate->arg2)
 	{
 		case 0: // WRITE8
-			printf("%04x:%02x\n", rsp->impstate->arg0 & 0x0fff, (UINT8)rsp->impstate->arg1);
+			printf("%04x:%02x\n", rsp->impstate->arg0 & 0xffff, (UINT8)rsp->impstate->arg1);
 			break;
 		case 1: // WRITE16
-			printf("%04x:%04x\n", rsp->impstate->arg0 & 0x0fff, (UINT16)rsp->impstate->arg1);
+			printf("%04x:%04x\n", rsp->impstate->arg0 & 0xffff, (UINT16)rsp->impstate->arg1);
 			break;
 		case 2: // WRITE32
-			printf("%04x:%08x\n", rsp->impstate->arg0 & 0x0fff, rsp->impstate->arg1);
+			printf("%04x:%08x\n", rsp->impstate->arg0 & 0xffff, rsp->impstate->arg1);
 			break;
 		case 3: // READ8
-			printf("%04xr%02x\n", rsp->impstate->arg0 & 0x0fff, (UINT8)rsp->impstate->arg1);
+			printf("%04xr%02x\n", rsp->impstate->arg0 & 0xffff, (UINT8)rsp->impstate->arg1);
 			break;
 		case 4: // READ16
-			printf("%04xr%04x\n", rsp->impstate->arg0 & 0x0fff, (UINT16)rsp->impstate->arg1);
+			printf("%04xr%04x\n", rsp->impstate->arg0 & 0xffff, (UINT16)rsp->impstate->arg1);
 			break;
 		case 5: // READ32
-			printf("%04xr%08x\n", rsp->impstate->arg0 & 0x0fff, rsp->impstate->arg1);
+			printf("%04xr%08x\n", rsp->impstate->arg0 & 0xffff, rsp->impstate->arg1);
+			break;
+		case 6: // Checksum
+			printf("Sum: %08x\n", rsp->impstate->arg0);
+			break;
+		case 7: // Checksum
+			printf("Correct Sum: %08x\n", rsp->impstate->arg0);
 			break;
 		default: // ???
-			printf("%08x %08x\n", rsp->impstate->arg0 & 0x0fff, rsp->impstate->arg1);
+			printf("%08x %08x\n", rsp->impstate->arg0 & 0xffff, rsp->impstate->arg1);
 			break;
 	}
 }
@@ -860,6 +869,7 @@ static void cfunc_rsp_lqv(void *param)
 
 	end = index + (16 - (ea & 0xf));
 	if (end > 16) end = 16;
+
 	for (i=index; i < end; i++)
 	{
 		VREG_B(dest, i) = READ8(rsp, ea);
@@ -927,7 +937,7 @@ static void cfunc_rsp_lpv(void *param)
 
 	for (i=0; i < 8; i++)
 	{
-		VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8;
+		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8;
 	}
 }
 
@@ -956,7 +966,7 @@ static void cfunc_rsp_luv(void *param)
 
 	for (i=0; i < 8; i++)
 	{
-		VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7;
+		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7;
 	}
 }
 
@@ -985,7 +995,7 @@ static void cfunc_rsp_lhv(void *param)
 
 	for (i=0; i < 8; i++)
 	{
-		VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7;
+		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7;
 	}
 }
 
@@ -1020,7 +1030,7 @@ static void cfunc_rsp_lfv(void *param)
 
 	for (i=index >> 1; i < end; i++)
 	{
-		VREG_S(dest, i) = READ8(rsp, ea) << 7;
+		W_VREG_S(dest, i) = READ8(rsp, ea) << 7;
 		ea += 4;
 	}
 }
@@ -1761,14 +1771,14 @@ INLINE UINT16 SATURATE_ACCUM1(rsp_state *rsp, int accum, UINT16 negative, UINT16
 }
 
 #define WRITEBACK_RESULT() { \
-		VREG_S(VDREG, 0) = vres[0];	\
-		VREG_S(VDREG, 1) = vres[1];	\
-		VREG_S(VDREG, 2) = vres[2];	\
-		VREG_S(VDREG, 3) = vres[3];	\
-		VREG_S(VDREG, 4) = vres[4];	\
-		VREG_S(VDREG, 5) = vres[5];	\
-		VREG_S(VDREG, 6) = vres[6];	\
-		VREG_S(VDREG, 7) = vres[7];	\
+		W_VREG_S(VDREG, 0) = vres[0];	\
+		W_VREG_S(VDREG, 1) = vres[1];	\
+		W_VREG_S(VDREG, 2) = vres[2];	\
+		W_VREG_S(VDREG, 3) = vres[3];	\
+		W_VREG_S(VDREG, 4) = vres[4];	\
+		W_VREG_S(VDREG, 5) = vres[5];	\
+		W_VREG_S(VDREG, 6) = vres[6];	\
+		W_VREG_S(VDREG, 7) = vres[7];	\
 }
 
 INLINE void cfunc_rsp_vmulf(void *param)
@@ -2415,7 +2425,7 @@ INLINE void cfunc_rsp_vsaw(void *param)
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				VREG_S(VDREG, i) = ACCUM_H(i);
+				W_VREG_S(VDREG, i) = ACCUM_H(i);
 			}
 			break;
 		}
@@ -2423,7 +2433,7 @@ INLINE void cfunc_rsp_vsaw(void *param)
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				VREG_S(VDREG, i) = ACCUM_M(i);
+				W_VREG_S(VDREG, i) = ACCUM_M(i);
 			}
 			break;
 		}
@@ -2431,7 +2441,7 @@ INLINE void cfunc_rsp_vsaw(void *param)
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				VREG_S(VDREG, i) = ACCUM_L(i);
+				W_VREG_S(VDREG, i) = ACCUM_L(i);
 			}
 			break;
 		}
@@ -3091,7 +3101,7 @@ INLINE void cfunc_rsp_vrcp(void *param)
 	rsp->reciprocal_res = rec;
 	rsp->dp_allowed = 0;
 
-	VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
+	W_VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
 
 	for (i = 0; i < 8; i++)
 	{
@@ -3183,7 +3193,7 @@ INLINE void cfunc_rsp_vrcpl(void *param)
 	rsp->reciprocal_res = rec;
 	rsp->dp_allowed = 0;
 
-	VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
+	W_VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
 
 	for (i = 0; i < 8; i++)
 	{
@@ -3215,7 +3225,7 @@ INLINE void cfunc_rsp_vrcph(void *param)
 		ACCUM_L(i) = VREG_S(VS2REG, sel);
 	}
 
-	VREG_S(VDREG, del) = (INT16)(rsp->reciprocal_res >> 16);
+	W_VREG_S(VDREG, del) = (INT16)(rsp->reciprocal_res >> 16);
 }
 
 INLINE void cfunc_rsp_vmov(void *param)
@@ -3232,7 +3242,7 @@ INLINE void cfunc_rsp_vmov(void *param)
 	int del = VS1REG & 7;
 	int sel = EL & 7;
 
-	VREG_S(VDREG, del) = VREG_S(VS2REG, sel);
+	W_VREG_S(VDREG, del) = VREG_S(VS2REG, sel);
 	for (int i = 0; i < 8; i++)
 	{
 		sel = VEC_EL_2(EL, i);
@@ -3324,7 +3334,7 @@ INLINE void cfunc_rsp_vrsql(void *param)
 	rsp->reciprocal_res = rec;
 	rsp->dp_allowed = 0;
 
-	VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
+	W_VREG_S(VDREG, del) = (UINT16)(rec & 0xffff);
 
 	for (i = 0; i < 8; i++)
 	{
@@ -3357,7 +3367,7 @@ INLINE void cfunc_rsp_vrsqh(void *param)
 		ACCUM_L(i) = VREG_S(VS2REG, sel);
 	}
 
-	VREG_S(VDREG, del) = (INT16)(rsp->reciprocal_res >> 16);	// store high part
+	W_VREG_S(VDREG, del) = (INT16)(rsp->reciprocal_res >> 16);	// store high part
 }
 
 static void cfunc_sp_set_status_cb(void *param)
@@ -3477,7 +3487,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 		try
 		{
 			/* start the block */
-			block = drcuml->begin_block(8192);
+			block = drcuml->begin_block(4096);
 
 			/* loop until we get through all instruction sequences */
 			for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
@@ -3774,9 +3784,20 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
+			UINT32 sum = seqhead->opptr.l[0];
 			void *base = rsp->direct->read_decrypted_ptr(seqhead->physpc | 0x1000);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);							// load    i0,base,0,dword
-			UML_CMP(block, I0, seqhead->opptr.l[0]);						// cmp     i0,opptr[0]
+
+			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
+			{
+				base = rsp->direct->read_decrypted_ptr(seqhead->delay.first()->physpc | 0x1000);
+				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);					// load    i1,base,dword
+				UML_ADD(block, I0, I0, I1);						// add     i0,i0,i1
+
+				sum += seqhead->delay.first()->opptr.l[0];
+			}
+
+			UML_CMP(block, I0, sum);									// cmp     i0,opptr[0]
 			UML_EXHc(block, COND_NE, *rsp->impstate->nocode, epc(seqhead));		// exne    nocode,seqhead->pc
 		}
 	}
@@ -3795,6 +3816,15 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);						// load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);							// add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
+
+				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+				{
+					base = rsp->direct->read_decrypted_ptr(curdesc->delay.first()->physpc | 0x1000);
+					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);					// load    i1,base,dword
+					UML_ADD(block, I0, I0, I1);						// add     i0,i0,i1
+
+					sum += curdesc->delay.first()->opptr.l[0];
+				}
 			}
 		UML_CMP(block, I0, sum);											// cmp     i0,sum
 		UML_EXHc(block, COND_NE, *rsp->impstate->nocode, epc(seqhead));			// exne    nocode,seqhead->pc
@@ -3887,14 +3917,10 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 	{
 		generate_update_cycles(rsp, block, &compiler_temp, desc->targetpc, TRUE);	// <subtract cycles>
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
-		{
 			UML_JMP(block, desc->targetpc | 0x80000000);							// jmp     desc->targetpc
-		}
 		else
-		{
 			UML_HASHJMP(block, 0, desc->targetpc, *rsp->impstate->nocode);
 																					// hashjmp <mode>,desc->targetpc,nocode
-		}
 	}
 	else
 	{
@@ -4751,10 +4777,10 @@ CPU_GET_INFO( rsp )
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = rsp->ppc;						break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = rsp->ppc | 0x04000000;						break;
 
 		case CPUINFO_INT_PC:	/* intentional fallthrough */
-		case CPUINFO_INT_REGISTER + RSP_PC:				info->i = rsp->pc;						break;
+		case CPUINFO_INT_REGISTER + RSP_PC:				info->i = rsp->pc | 0x04000000;						break;
 
 		case CPUINFO_INT_REGISTER + RSP_R0:				info->i = rsp->r[0];						break;
 		case CPUINFO_INT_REGISTER + RSP_R1:				info->i = rsp->r[1];						break;
@@ -4788,9 +4814,9 @@ CPU_GET_INFO( rsp )
 		case CPUINFO_INT_REGISTER + RSP_R29:			info->i = rsp->r[29];					break;
 		case CPUINFO_INT_REGISTER + RSP_R30:			info->i = rsp->r[30];					break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + RSP_R31:			info->i = rsp->r[31];					break;
+		case CPUINFO_INT_REGISTER + RSP_R31:			info->i = rsp->r[31];					 break;
 		case CPUINFO_INT_REGISTER + RSP_SR:             info->i = rsp->sr;                       break;
-		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         info->i = rsp->nextpc;                   break;
+		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         info->i = rsp->nextpc | 0x04000000;      break;
 		case CPUINFO_INT_REGISTER + RSP_STEPCNT:        info->i = rsp->step_count;               break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -4812,7 +4838,7 @@ CPU_GET_INFO( rsp )
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 
-		case CPUINFO_STR_REGISTER + RSP_PC:				sprintf(info->s, "PC: %08X", rsp->pc);	break;
+		case CPUINFO_STR_REGISTER + RSP_PC:				sprintf(info->s, "PC: %08X", rsp->pc | 0x04000000);	break;
 
 		case CPUINFO_STR_REGISTER + RSP_R0:				sprintf(info->s, "R0: %08X", rsp->r[0]); break;
 		case CPUINFO_STR_REGISTER + RSP_R1:				sprintf(info->s, "R1: %08X", rsp->r[1]); break;
