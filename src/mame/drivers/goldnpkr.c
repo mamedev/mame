@@ -1,701 +1,815 @@
-/******************************************************************************
-
-    GOLDEN POKER DOUBLE UP (BONANZA ENTERPRISES, LTD)
-    -------------------------------------------------
-
-    Driver by Roberto Fresca.
-
-
-    Games running on this hardware:
-
-    * Golden Poker Double Up (Big Boy).         1981, Bonanza Enterprises, Ltd.
-    * Golden Poker Double Up (Mini Boy).        1981, Bonanza Enterprises, Ltd.
-    * Jack Potten's Poker (set 1).              198?, Bootleg.
-    * Jack Potten's Poker (set 2).              198?, Bootleg in Coinmaster H/W.
-    * Jack Potten's Poker (set 3).              198?, Bootleg.
-    * Jack Potten's Poker (set 4).              198?, Bootleg.
-    * Jack Potten's Poker (set 5).              198?, Bootleg.
-    * Jack Potten's Poker (set 6).              198?, Bootleg.
-    * Good Luck.                                198?, Unknown.
-    * Super Double (french).                    198?, Karateco.
-    * Jack Potten's Poker (NGold, set 1).       198?, Unknown.
-    * Jack Potten's Poker (NGold, set 2).       198?, Unknown.
-    * Jack Potten's Poker (NGold, set 3).       198?, Unknown.
-    * Witch Card (Video Klein CPU box, set 1).  1991, Video Klein.
-    * Witch Card (Video Klein CPU box, set 2).  1991, Video Klein.
-    * Witch Card (Spanish, witch game, set 1).  1991, Unknown.
-    * Witch Card (Spanish, witch game, set 2).  1991, Unknown.
-    * Witch Card (English, no witch game).      1991, Unknown.
-    * Witch Card (German, WC3050, set 1 ).      1994, Proma.
-    * Witch Card (English, witch game, lamps).  1985, PlayMan.
-    * Witch Card (Falcon, enhanced sound).      199?, Falcon.
-    * Witch Card (German, WC3050, set 2 ).      1994, Proma.
-    * Witch Card (German, WC3050, 27-4-94),     1994, Proma.
-    * Witch Game (Video Klein, set 1).          1991, Video Klein.
-    * Witch Game (Video Klein, set 2).          1991, Video Klein.
-    * Jolli Witch (Export, 6T/12T ver 1.57D).   1994, Video Klein?.
-    * Wild Witch (Export, 6T/12T ver 1.74A).    1994, Video Klein.
-    * Buena Suerte (Spanish, set 1).            1990, Unknown.
-    * Buena Suerte (Spanish, set 2).            1991, Unknown.
-    * Buena Suerte (Spanish, set 3).            1991, Unknown.
-    * Buena Suerte (Spanish, set 4).            1991, Unknown.
-    * Buena Suerte (Spanish, set 5).            1991, Unknown.
-    * Buena Suerte (Spanish, set 6).            1991, Unknown.
-    * Buena Suerte (Spanish, set 7).            1991, Unknown.
-    * Buena Suerte (Spanish, set 8).            1991, Unknown.
-    * Buena Suerte (Spanish, set 9).            1991, Unknown.
-    * Buena Suerte (Spanish, set 10).           1991, Unknown.
-    * Buena Suerte (Spanish, set 11).           1991, Unknown.
-    * Buena Suerte (Spanish, set 12).           1991, Unknown.
-    * Buena Suerte (Spanish, set 13).           1991, Unknown.
-    * Buena Suerte (Spanish, set 14).           1991, Unknown.
-    * Buena Suerte (Spanish, set 15).           1991, Unknown.
-    * Buena Suerte (Spanish, set 16).           1991, Unknown.
-    * Buena Suerte (Spanish, set 17).           1991, Unknown.
-    * Buena Suerte (Spanish, set 18).           1991, Unknown.
-    * Buena Suerte (Spanish, set 19).           1991, Unknown.
-    * Buena Suerte (Spanish, set 20).           1991, Unknown.
-    * Buena Suerte (Spanish, set 21).           1991, Unknown.
-    * Buena Suerte (Spanish, set 22).           1991, Unknown.
-    * Falcons Wild - World Wide Poker.          1983, Falcon.
-    * Falcons Wild - World Wide Poker.          1990, Video Klein.
-    * Falcons Wild - Wild Card 1991.            1991, TVG.
-    * PlayMan Poker (german).                   1981, PlayMan.
-    * Super Loco 93 (Spanish, set 1).           1993, Unknown.
-    * Super Loco 93 (Spanish, set 2).           1993, Unknown.
-    * Royale (set 1).                           198?, Unknown.
-    * Royale (set 2).                           198?, Unknown.
-    * Maverik.                                  198?, Unknown.
-    * Brasil 86.                                1986, Unknown.
-    * Brasil 87.                                1987, Unknown.
-    * Brasil 89 (set 1).                        1989, Unknown.
-    * Brasil 89 (set 2).                        1989, Unknown.
-    * Brasil 93.                                1993, Unknown.
-    * Poker 91.                                 1991, Unknown.
-    * Genie.                                    198?, Video Fun Games Ltd.
-    * Silver Game.                              1983, Unknown.
-    * "Unknown french poker game".              198?, Unknown.
-    * "Unknown encrypted poker game".           198?, Unknown.
-
-
-*******************************************************************************
-
-
-    I think "Diamond Poker Double Up" from Bonanza Enterprises should run on this hardware too.
-    http://www.arcadeflyers.com/?page=thumbs&id=4539
-
-    Big-Boy and Mini-Boy are different sized cabinets for Bonanza Enterprises games.
-    http://www.arcadeflyers.com/?page=thumbs&id=4616
-    http://www.arcadeflyers.com/?page=thumbs&id=4274
-
-
-    Preliminary Notes (pmpoker):
-
-    - This set was found as "unknown playman-poker".
-    - The ROMs didn't match any currently supported set (0.108u2 romident switch).
-    - All this driver was made using reverse engineering in the program roms.
-
-
-    Game Notes:
-    ==========
-
-    * goldnpkr & goldnpkb:
+/***********************************************************************************
+
+  GOLDEN POKER DOUBLE UP (BONANZA ENTERPRISES, LTD)
+  -------------------------------------------------
+
+  Driver by Roberto Fresca.
+
+
+  Games running on this hardware:
+
+  * Golden Poker Double Up (Big Boy).         1981, Bonanza Enterprises, Ltd.
+  * Golden Poker Double Up (Mini Boy).        1981, Bonanza Enterprises, Ltd.
+  * Jack Potten's Poker (set 1).              198?, Bootleg.
+  * Jack Potten's Poker (set 2).              198?, Bootleg in Coinmaster H/W.
+  * Jack Potten's Poker (set 3).              198?, Bootleg.
+  * Jack Potten's Poker (set 4).              198?, Bootleg.
+  * Jack Potten's Poker (set 5).              198?, Bootleg.
+  * Jack Potten's Poker (set 6).              198?, Bootleg.
+  * Good Luck.                                198?, Unknown.
+  * Super Double (french).                    198?, Karateco.
+  * Jack Potten's Poker (NGold, set 1).       198?, Unknown.
+  * Jack Potten's Poker (NGold, set 2).       198?, Unknown.
+  * Jack Potten's Poker (NGold, set 3).       198?, Unknown.
+  * Witch Card (Video Klein CPU box, set 1).  1991, Video Klein.
+  * Witch Card (Video Klein CPU box, set 2).  1991, Video Klein.
+  * Witch Card (Spanish, witch game, set 1).  1991, Unknown.
+  * Witch Card (Spanish, witch game, set 2).  1991, Unknown.
+  * Witch Card (English, no witch game).      1991, Unknown.
+  * Witch Card (German, WC3050, set 1 ).      1994, Proma.
+  * Witch Card (English, witch game, lamps).  1985, PM / Beck Elektronik.
+  * Witch Card (Falcon, enhanced sound).      199?, Falcon.
+  * Witch Card (German, WC3050, set 2 ).      1994, Proma.
+  * Witch Card (German, WC3050, 27-4-94),     1994, Proma.
+  * Witch Game (Video Klein, set 1).          1991, Video Klein.
+  * Witch Game (Video Klein, set 2).          1991, Video Klein.
+  * Jolli Witch (Export, 6T/12T ver 1.57D).   1994, Video Klein?.
+  * Wild Witch (Export, 6T/12T ver 1.74A).    1994, Video Klein.
+  * Buena Suerte (Spanish, set 1).            1990, Unknown.
+  * Buena Suerte (Spanish, set 2).            1991, Unknown.
+  * Buena Suerte (Spanish, set 3).            1991, Unknown.
+  * Buena Suerte (Spanish, set 4).            1991, Unknown.
+  * Buena Suerte (Spanish, set 5).            1991, Unknown.
+  * Buena Suerte (Spanish, set 6).            1991, Unknown.
+  * Buena Suerte (Spanish, set 7).            1991, Unknown.
+  * Buena Suerte (Spanish, set 8).            1991, Unknown.
+  * Buena Suerte (Spanish, set 9).            1991, Unknown.
+  * Buena Suerte (Spanish, set 10).           1991, Unknown.
+  * Buena Suerte (Spanish, set 11).           1991, Unknown.
+  * Buena Suerte (Spanish, set 12).           1991, Unknown.
+  * Buena Suerte (Spanish, set 13).           1991, Unknown.
+  * Buena Suerte (Spanish, set 14).           1991, Unknown.
+  * Buena Suerte (Spanish, set 15).           1991, Unknown.
+  * Buena Suerte (Spanish, set 16).           1991, Unknown.
+  * Buena Suerte (Spanish, set 17).           1991, Unknown.
+  * Buena Suerte (Spanish, set 18).           1991, Unknown.
+  * Buena Suerte (Spanish, set 19).           1991, Unknown.
+  * Buena Suerte (Spanish, set 20).           1991, Unknown.
+  * Buena Suerte (Spanish, set 21).           1991, Unknown.
+  * Buena Suerte (Spanish, set 22).           1991, Unknown.
+  * Falcons Wild - World Wide Poker.          1983, Falcon.
+  * Falcons Wild - World Wide Poker.          1990, Video Klein.
+  * Falcons Wild - Wild Card 1991.            1991, TVG.
+  * PlayMan Poker (german).                   1981, PM / Beck Elektronik.
+  * Super Loco 93 (Spanish, set 1).           1993, Unknown.
+  * Super Loco 93 (Spanish, set 2).           1993, Unknown.
+  * Royale (set 1).                           198?, Unknown.
+  * Royale (set 2).                           198?, Unknown.
+  * Maverik.                                  198?, Unknown.
+  * Brasil 86.                                1986, Unknown.
+  * Brasil 87.                                1987, Unknown.
+  * Brasil 89 (set 1).                        1989, Unknown.
+  * Brasil 89 (set 2).                        1989, Unknown.
+  * Brasil 93.                                1993, Unknown.
+  * Poker 91.                                 1991, Unknown.
+  * Genie.                                    198?, Video Fun Games Ltd.
+  * Silver Game.                              1983, Unknown.
+  * Casino Poker (Ver PM86LO-35-5, German).   1987, PM / Beck Elektronik.
+  * "Unknown french poker game".              198?, Unknown.
+  * "Unknown encrypted poker game".           198?, Unknown.
+
+
+************************************************************************************
+
+
+  I think "Diamond Poker Double Up" from Bonanza Enterprises should run on this hardware too.
+  http://www.arcadeflyers.com/?page=thumbs&id=4539
+
+  Big-Boy and Mini-Boy are different sized cabinets for Bonanza Enterprises games.
+  http://www.arcadeflyers.com/?page=thumbs&id=4616
+  http://www.arcadeflyers.com/?page=thumbs&id=4274
+
+
+  Preliminary Notes (pmpoker):
+
+  - This set was found as "unknown playman-poker".
+  - The ROMs didn't match any currently supported set (0.108u2 romident switch).
+  - All this driver was made using reverse engineering in the program roms.
+
+
+  Game Notes:
+  ==========
 
-    "How to play"... (from "Golden Poker Double Up" instruction card)
+  * goldnpkr & goldnpkb:
 
-    1st GAME
-    - Insert coin / bank note.
-    - Push BET button, 1-10 credits multiple play.
-    - Push DEAL/DRAW button.
-    - Push HOLD buttons to hold cards you need.
-    - Cards held can be cancelled by pushing CANCEL button.
-    - Push DEAL/DRAW button to draw cards.
+  "How to play"... (from "Golden Poker Double Up" instruction card)
 
-    2nd GAME - Double Up game
-    - When you win, choose TAKE SCORE or DOUBLE UP game.
-    - Bet winnings on
-        "BIG (8 or more number)" or
-        "SMALL (6 and less number)" of next one card dealt.
-    - Over 5,000 winnings will be storaged automatically.
+  1st GAME
+  - Insert coin / bank note.
+  - Push BET button, 1-10 credits multiple play.
+  - Push DEAL/DRAW button.
+  - Push HOLD buttons to hold cards you need.
+  - Cards held can be cancelled by pushing CANCEL button.
+  - Push DEAL/DRAW button to draw cards.
 
+  2nd GAME - Double Up game
+  - When you win, choose TAKE SCORE or DOUBLE UP game.
+  - Bet winnings on
+      "BIG (8 or more number)" or
+      "SMALL (6 and less number)" of next one card dealt.
+  - Over 5,000 winnings will be storaged automatically.
 
-    ----- Learn Mode (settings) -----
-    Press LEARN (F2) to enter the learn mode for settings.
-    This is a timed function and after 30-40 seconds switch back to the game.
 
-    Press DOUBLE UP to change Double Up 7 settings between 'Even' and 'Lose'.
-    Press BET to adjust the maximum bet (20-200).
-    Press HOLD4 for Meter Over (5000-50000).
-    Press BIG to change Double Up settings (Normal-Hard).
-    Press TAKE SCORE to set Half Gamble (Yes/No).
-    Press SMALL to set win sound (Yes/No).
-    Press HOLD1 to set coinage 1.
-    Press HOLD2 to set coinage 2.
-    Press HOLD3 to set coinage 3.
-    Press HOLD5 to exit.
+  ----- Learn Mode (settings) -----
+  Press LEARN (F2) to enter the learn mode for settings.
+  This is a timed function and after 30-40 seconds switch back to the game.
 
-    ----- Meters Mode -----
-    Press METER SW (9) to enter the Meters mode. You also can switch between interim
-    and permanent meters using METER SW (only for goldnpkr).
-    This is a timed function and after 30-40 seconds switch back to the game.
+  Press DOUBLE UP to change Double Up 7 settings between 'Even' and 'Lose'.
+  Press BET to adjust the maximum bet (20-200).
+  Press HOLD4 for Meter Over (5000-50000).
+  Press BIG to change Double Up settings (Normal-Hard).
+  Press TAKE SCORE to set Half Gamble (Yes/No).
+  Press SMALL to set win sound (Yes/No).
+  Press HOLD1 to set coinage 1.
+  Press HOLD2 to set coinage 2.
+  Press HOLD3 to set coinage 3.
+  Press HOLD5 to exit.
 
-    To reset meters push CANCEL + SMALL buttons. HOLD5 to exit.
-    In goldnpkr you can switch between Permanent/Interim Meters.
-    In goldnpkb & pmpoker you can see only Permanent Meters.
+  ----- Meters Mode -----
+  Press METER SW (9) to enter the Meters mode. You also can switch between interim
+  and permanent meters using METER SW (only for goldnpkr).
+  This is a timed function and after 30-40 seconds switch back to the game.
 
-    ----- Percentage Mode -----
-    Press Meter SW (9), then DEAL/DRAW, to enter the percentage mode.
-    Press HOLD4 to change the value following the table below (from manual). HOLD1 to exit.
+  To reset meters push CANCEL + SMALL buttons. HOLD5 to exit.
+  In goldnpkr you can switch between Permanent/Interim Meters.
+  In goldnpkb & pmpoker you can see only Permanent Meters.
 
-    Number    Overall scoring percentage in the LONG RUN
-    - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      0         about 85%
-      1         about 30%
-      2         about 40%
-      3         about 50%
+  ----- Percentage Mode -----
+  Press Meter SW (9), then DEAL/DRAW, to enter the percentage mode.
+  Press HOLD4 to change the value following the table below (from manual). HOLD1 to exit.
 
-    ----- Test Mode -----
-    Press Meter SW (9), then DEAL/DRAW, then HOLD5 to enter the test mode.
-    After a RAM test, you can see an input test matrix. Press HOLD1+HOLD2+HOLD3 to exit
-    entering into a video grid test. Press HOLD5 to exit.
+  Number    Overall scoring percentage in the LONG RUN
+  - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    0         about 85%
+    1         about 30%
+    2         about 40%
+    3         about 50%
 
+  ----- Test Mode -----
+  Press Meter SW (9), then DEAL/DRAW, then HOLD5 to enter the test mode.
+  After a RAM test, you can see an input test matrix. Press HOLD1+HOLD2+HOLD3 to exit
+  entering into a video grid test. Press HOLD5 to exit.
 
-    * Good Luck
 
-    This hybrid runs on Witch Card hardware.
-    Even when is shown on screen "Bet 1 to 10", you can bet up to 50.
-    There are extra graphics for a couple of jokers, but they never are shown.
-    Maybe some settings can enable the use of them...
+  * Good Luck
 
+  This hybrid runs on Witch Card hardware.
+  Even when is shown on screen "Bet 1 to 10", you can bet up to 50.
+  There are extra graphics for a couple of jokers, but they never are shown.
+  Maybe some settings can enable the use of them...
 
-    * Witch Card (spanish sets)
 
-    This game is derivated from Golden Poker.
+  * Witch Card (spanish sets)
 
-    The hardware has a feature called BLUE KILLER.
-    Using the original intensity line, the PCB has a bridge
-    that allow (as default) turn the background black.
+  This game is derivated from Golden Poker.
 
-    Except goodluck, all other games running in this hardware
-    were designed to wear black background.
+  The hardware has a feature called BLUE KILLER.
+  Using the original intensity line, the PCB has a bridge
+  that allow (as default) turn the background black.
 
-    - Settings:
+  Except goodluck, all other games running in this hardware
+  were designed to wear black background.
 
-    There are 12 parameters to program. All of them are unknown.
-    To program them, enter the settings mode with F2 and use the HOLD keys,
-    CANCEL key, DEAL + HOLD keys, and DEAL + CANCEL. To exit the mode press BET.
+  - Settings:
 
-    Settings are still unknown, but put the max value for each parameter to allow
-    all the game features.
+  There are 12 parameters to program. All of them are unknown.
+  To program them, enter the settings mode with F2 and use the HOLD keys,
+  CANCEL key, DEAL + HOLD keys, and DEAL + CANCEL. To exit the mode press BET.
 
-    First Line:  32 32 32 32 32 64
-    Second Line: 40 40 40 40 50 16
+  Settings are still unknown, but put the max value for each parameter to allow
+  all the game features.
 
-    - Play:
+  First Line:  32 32 32 32 32 64
+  Second Line: 40 40 40 40 50 16
 
-    The game is like other poker games, but with 2 jokers.
-    Each time you win a hand, a double up game appear...
+  - Play:
 
-    - Double Up:
+  The game is like other poker games, but with 2 jokers.
+  Each time you win a hand, a double up game appear...
 
-    You must to choose High or Low to guess the card. If you win,
-    you can take the credits or continue into double up.
-    Each time you win a double up hand, the card is indicated on the screen.
-    The first 3 consecutive winning hands will add a witch with a running number.
-    Further winning hands only add the card/kind indication. When you lose, or
-    take your credits, the 3 witches start to roll their own numbers like a
-    slot machine. There is an attempt for each winning hand. the bonus ends when
-    you win a prize, or when all attempts are done.
+  - Double Up:
 
+  You must to choose High or Low to guess the card. If you win,
+  you can take the credits or continue into double up.
+  Each time you win a double up hand, the card is indicated on the screen.
+  The first 3 consecutive winning hands will add a witch with a running number.
+  Further winning hands only add the card/kind indication. When you lose, or
+  take your credits, the 3 witches start to roll their own numbers like a
+  slot machine. There is an attempt for each winning hand. the bonus ends when
+  you win a prize, or when all attempts are done.
 
-    * Super Loco 93
 
-    I like this game!... This one has nothing to do with poker games.
-    The objective is to get the higher sum with 2 or 3 cards. Is clearly
-    based on a passage (Envido) of the famous argentine's game called "Truco".
+  * Super Loco 93
 
-    - How to play?...
-
-    Like in Truco's envido, You must add 20 to the sum of your cards.
-    If you have 7 and 5 of the same kind, you have 7 + 5 + 20 = 32 points.
-
-    "Flor", is 3 cards of the same kind.
-    "Simple", is 2 cards of the same kind.
-
-    HAND             WIN    DESCRIPTION
-    ----------------------------------------------
-    38  Corazones   1000    7, 6 and 5 of hearts.
-    777 Loco Loco    200    3x sevens.
-    38  Flor          80    7, 6 and 5 of the same kind (except hearts).
-    37  Flor          20    7, 6 and 4 of the same kind.
-    36  Flor          14    7, 5 and 4 of the same kind.
-    35  Flor          10    6, 5 and 4 of the same kind.
-    32-33-34 Flor      6    3 of the same kind that sum 32, 33 or 34.
-    33  Simple         4    7 and 6 of the same kind.
-    32  Simple         2    7 and 5 of the same kind.
-
-    After bet (apuesta) some credits, Press deal (reparte) button.
-    The game will deals 3 cards. You can discard up to all your 3 cards.
-    Pressing the deal button again, new cards will appear in the place
-    of the previously selected cards.
-
-    - Double Up:
-
-    You must to choose Red or Black to guess the card.
-    If you win, you can take the credits or continue into double up.
-    The rest is similar to Witch Card, but with 3 big numbers instead of
-    witches. Once you lose or take your credits, the big numbers start to
-    run 'alla' slot game, giving 1 attempt by each time you won a double-up
-    hand.
-
-    - Settings:
-
-    There are 12 parameters to program.
-    To program them, use the HOLD keys, CANCEL key, DEAL + HOLD keys,
-    and DEAL + CANCEL.
-
-
-    * Wild Witch / Jolli Witch
-
-    These sets have a switch to change the game. Wild Witch comes with a complete
-    Witch Game as switchable alternative, and Jolli Witch has Witch Card in the same
-    package. Both are based in the 6T/12T program made by Video Klein, However, Jolli
-    Witch seems to be a bootleg CPU box on an original Bonanza mainboard.
-
-    The first time the game boots, will show a black & red screen with some options
-    due to the lack or corrupt NVRAM. You must choose HOLD1 to create a new default
-    NVRAM. In case you have corrupt NVRAM (not first boot), you can choose HOLD5 to
-    attempt recover the old settings.
-
-
-    * Witch Card (Proma)
-
-    For the first time: You must coin-up and play at least one hand, then Payout
-    to get the proper coinage settings.
-
-
-*******************************************************************************
-
-
-    Hardware Notes (pmpoker):
-
-    - CPU:            1x M6502.
-    - Video:          1x MC6845.
-    - RAM:            4x uPD2114LC
-    - I/O             2x 6821 PIAs.
-    - prg ROMs:       3x 2732 (32Kb) or similar.
-    - gfx ROMs:       4x 2716 (16Kb) or similar.
-    - sound:          (discrete).
-    - battery backup: 2x S8423
-
-
-    PCB Layout (pmpoker): (XX) = unreadable.
-     _______________________________________________________________________________
-    |   _________                                                                   |
-    |  |         |               -- DIP SW x8 --                                    |
-    |  | Battery |   _________   _______________   _________  _________   ________  |
-    |  |   055   |  | 74LS32  | |1|2|3|4|5|6|7|8| | HCF4011 || HCF4096 | | LM339N | |
-    |  |_________|  |_________| |_|_|_|_|_|_|_|_| |_________||_________| |________| |
-    |       _________     _________   _________   _________                         |
-    |      | 74LS138 |   | S-8423  | | 74LS08N | | 74LS(XX)|                        |
-    |      |_________|   |_________| |_________| |_________|                        |
-    |  _______________    _________   ____________________                      ____|
-    | |               |  | S-8423  | |                    |                    |
-    | |     2732      |  |_________| |       6502P        |                    |
-    | |_______________|   _________  |____________________|                    |
-    |  _______________   |  7432   |  ____________________                     |____
-    | |               |  |_________| |                    |                     ____|
-    | |     2732      |   _________  |       6821P        |                     ____|
-    | |_______________|  | 74LS157 | |____________________|                     ____|
-    |  _______________   |_________|  ____________________                      ____|
-    | |               |   _________  |                    |                     ____|
-    | |     2732      |  | 74LS157 | |       6821P        |                     ____|
-    | |_______________|  |_________| |____________________|                     ____|
-    |  _______________    _________   ____________________                      ____|
-    | |               |  | 74LS157 | |                    |                     ____|
-    | |     2732      |  |_________| |       6845SP       |                     ____|
-    | |_______________|   _________  |____________________|                     ____|
-    |                    | 2114-LC |                                            ____| 28x2
-    |                    |_________|                                            ____| connector
-    |       _________     _________                                             ____|
-    |      | 74LS245 |   | 2114-LC |                                            ____|
-    |      |_________|   |_________|                                            ____|
-    |       _________     _________               _________                     ____|
-    |      | 74LS245 |   | 2114-LC |             | 74LS174 |                    ____|
-    |      |_________|   |_________|             |_________|                    ____|
-    |  ________________   _________   _________   _________                     ____|
-    | |                | | 2114-LC | | 74LS08H | | TI (XX) | <-- socketed.      ____|
-    | |      2716      | |_________| |_________| |_________|       PROM         ____|
-    | |________________|              _________   _________                     ____|
-    |  ________________              | 74LS04P | | 74LS174 |                    ____|
-    | |                |             |_________| |_________|                    ____|
-    | |      2716      |              _________   _________                     ____|
-    | |________________|             | 74166P  | | 74LS86C |                    ____|
-    |  ________________              |_________| |_________|                    ____|
-    | |                |              _________    _______                     |
-    | |      2716      |             | 74166P  |  | 555TC |                    |
-    | |________________|             |_________|  |_______|                    |
-    |  ________________                                                        |____
-    | |                |                                                        ____|
-    | |      2716      |              _________   _________      ________       ____| 5x2
-    | |________________|             | 74166P  | |  7407N  |    | LM380N |      ____| connector
-    |                                |_________| |_________|    |________|      ____|
-    |  ________  ______               _________   _________      ___            ____|
-    | | 74LS04 || osc. |             | 74LS193 | |  7407N  |    /   \          |
-    | |________||10 MHz|             |_________| |_________|   | POT |         |
-    |           |______|                                        \___/          |
-    |__________________________________________________________________________|
-
-
-
-    Some odds:
-
-    - There are unused pieces of code like the following sub:
-
-    78DE: 18         clc
-    78DF: 69 07      adc  #$07
-    78E1: 9D 20 10   sta  $1020,x
-    78E4: A9 00      lda  #$00
-    78E6: 9D 20 18   sta  $1820,x
-    78E9: E8         inx
-
-    78EA: 82         DOP        ; use of DOP (double NOP)
-    78EB: A2 0A      dummy (ldx #$0A)
-
-    78ED: AD 82 08   lda  $0882
-
-    78F0: 82         DOP        ; use of DOP (double NOP)
-    78F1: 48 08      dummy
-    78F3: D0 F6      bne  $78EB ; branch to the 1st DOP dummy arguments (now ldx #$0A).
-    78F5: CA         dex
-    78F6: D0 F8      bne  $78F0
-    78F8: 29 10      and  #$10
-    78FA: 60         rts
-
-    Offset $78EA and $78F0 contains an undocumented 6502 opcode (0x82).
-
-    At beginning, I thought that the main processor was a 65sc816, since 0x82 is a documented opcode (BRL) for this CPU.
-    Even the vector $FFF8 contain 0x09 (used to indicate "Emulation Mode" for the 65sc816).
-    I dropped the idea following the code. Impossible to use BRL (branch relative long) in this structure.
-
-    Some 6502 sources list the 0x82 mnemonic as DOP (double NOP), with 2 dummy bytes as argument.
-    The above routine dynamically change the X register value using the DOP undocumented opcode.
-    Since the opcode DOP in fact has only 1 dummy byte as argument, they apparently dropped this
-    piece of code due to it didn't work as expected. Now all have sense.
-
-
-*******************************************************************************
-
-
-    -----------------------------------------------
-    ***  Memory Map (pmpoker/goldnpkr hardware) ***
-    -----------------------------------------------
-
-    $0000 - $00FF   RAM     ; Zero Page (pointers and registers)
-
-                            ; $45 to $47 - Coin settings.
-                            ; $50 - Input port register.
-                            ; $5C - Input port register.
-                            ; $5D - Input port register.
-                            ; $5E - Input port register.
-                            ; $5F - Input port register.
-
-    $0100 - $01FF   RAM     ; 6502 Stack Pointer.
-
-    $0200 - $02FF   RAM     ; R/W. (settings)
-    $0300 - $03FF   RAM     ; R/W (mainly to $0383). $0340 - $035f (settings).
-
-    $0800 - $0801   MC6845  ; MC6845 use $0800 for register addressing and $0801 for register values.
-
-                            *** pmpoker mc6845 init at $65B9 ***
-                            *** goldnpkr mc6845 init at $5E75 ***
-                            *** sloco93 mc6845 init at $D765 ***
-                            register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
-                            value:     0x27  0x20  0x22  0x02  0x1F  0x04  0x1D  0x1E  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
-
-                            *** goodluck mc6845 init at $527B ***
-                            register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
-                            value:     0x27  0x20  0x23  0x03  0x1F  0x04  0x1D  0x1F  0x00  0x00  0x26  0x00  0x20  0x22  0x58  0xA5  0x4F  0xC9.
-
-                            *** witchcrd mc6845 init at $D765 ***
-                            register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
-                            value:     0x27  0x20  0x23  0x03  0x1F  0x04  0x1D  0x1F  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
-
-                            *** witchcrd (Video Klein) mc6845 init at $627B ***
-                            register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
-                            value:     0x27  0x20  0x23  0x33  0x1F  0x04  0x1D  0x1F  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
-
-                            *** witchcrd (Video Klein) mc6845 mod at $6293 ($2000 and #$20) ***
-                            register:   04    05    06    07
-                            value:     0x26  0x00  0x20  0x22
-
-                            *** royale mc6845 init at $6581 ***
-                            register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
-                            value:     0x27  0x20  0x23  0x03  0x1F  0x04  0x1D  0x1E  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
-
-    $0844 - $0847   PIA0    ; Muxed inputs and lamps. Initialized at $5000.
-    $0848 - $084B   PIA1    ; Sound writes and muxed inputs selector. Initialized at $5000.
-
-    $1000 - $13FF   Video RAM   ; Initialized in subroutine starting at $5042.
-    $1800 - $1BFF   Color RAM   ; Initialized in subroutine starting at $5042.
-
-    $4000 - $7FFF   ROM
-
-    $8000 - $FFFF           ; Mirrored from $0000 - $7FFF due to lack of A15 line connection.
-
-
-
-    ---------------------------------------
-    ***  Memory Map (pottnpkr hardware) ***
-    ---------------------------------------
-
-    $0000 - $00FF   RAM     ; Zero Page (pointers and registers)
-    $0100 - $01FF   RAM     ; 6502 Stack Pointer.
-    $0200 - $02FF   RAM     ; R/W. (settings)
-    $0300 - $03FF   RAM     ; R/W (mainly to $0383). $0340 - $035f (settings).
-
-    $0800 - $0801   MC6845  ; MC6845 use $0800 for register addressing and $0801 for register values.
-
-    $0844 - $0847   PIA0    ; Muxed inputs and lamps.
-    $0848 - $084B   PIA1    ; Sound writes and muxed inputs selector.
-
-    $1000 - $13FF   Video RAM
-    $1800 - $1BFF   Color RAM
-
-    $2000 - $3FFF   ROM space
-
-    $4000 - $7FFF           ; Mirrored from $0000 - $3FFF due to lack of A14 & A15 lines connection.
-    $8000 - $BFFF           ; Mirrored from $0000 - $3FFF due to lack of A14 & A15 lines connection.
-    $C000 - $FFFF           ; Mirrored from $0000 - $3FFF due to lack of A14 & A15 lines connection.
-
-
-
-*******************************************************************************
-
-
-    Buttons/Inputs   goldnpkr goldnpkb  pmpoker  bsuerte goodluck pottnpkr potnpkra potnpkrc potnpkrb
-    -------------------------------------------------------------------------------------------------
-
-    HOLD (5 buttons)  mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    CANCEL            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    BIG               mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    SMALL             mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    DOUBLE UP         mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    TAKE SCORE        mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    DEAL/DRAW         mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    BET               mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-
-    Coin 1 (coins)    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    Coin 2 (notes)    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   fixed 1c-1c
-    Coin 3 (coupons)  mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    Payout            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    Manual Collect    mapped   mapped   mapped    ----    mapped   mapped   mapped   mapped   mapped
-
-    LEARN/SETTINGS    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    METERS            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-
-
-    Inputs are different for some games. Normally each button has only one function.
-    In pmpoker some buttons have different functions.
-
-
-*******************************************************************************
-
-
-    DRIVER UPDATES:
-
-
-    [2006-09-02]
-
-    - Initial release.
-
-
-    [2006-09-06]
-
-    - Understood the GFX banks:
-        - 1 bank (1bpp) for text layer and minor graphics.
-        - 1 bank (3bpp) for the undumped cards deck graphics.
-
-    - Partially added inputs through 6821 PIAs.
-        ("Bitte techniker rufen" error messages. Press 'W' to reset the machine)
-
-    - Confirmed the CPU as 6502. (was in doubt due to use of illegal opcodes)
-
-
-    [2006-09-15]
-
-    - Confirmed the GFX banks (a complete dump appeared!).
-    - Improved technical notes and added a PCB layout based on PCB picture.
-    - Found and fixed the 3rd bitplane of BigBoy gfx.
-    - Renamed Big-Boy to Golden Poker Double Up. (Big-Boy and Mini-Boy are names of cabinet models).
-    - Added 'Joker Poker' (Golden Poker version without the 'double-up' feature).
-    - Added 'Jack Potten's Poker' (same as Joker Poker, but with 'Aces or better' instead of jacks).
-    - Simulated colors for all sets till color PROMs appear.
-    - Fixed bit corruption in goldnpkr rom u40_4a.bin.
-    - Completed inputs in all sets (except DIP switches).
-    - Removed flags GAME_WRONG_COLORS and GAME_IMPERFECT_GRAPHICS in all sets.
-    - Removed flag GAME_NOT_WORKING. All sets are now playable. :)
-
-
-    [2006-10-09]
-
-    - Added service/settings mode to pmpoker.
-    - Added PORT_IMPULSE to manage correct timings for most inputs in all games.
-      (jokerpkr still trigger more than 1 credit for coin pulse).
-
-
-    [2007-02-01]
-
-    - Crystal documented via #define.
-    - CPU clock derived from #defined crystal value.
-    - Replaced simulated colors with proper color prom decode.
-    - Renamed "Golden Poker Double Up" to "Golden Poker Double Up (Big Boy)".
-    - Added set Golden Poker Double Up (Mini Boy).
-    - Cleaned up the driver a bit.
-    - Updated technical notes.
-
-
-    [2007-05-05]
-
-    - Removed all inputs hacks.
-    - Connected both PIAs properly.
-    - Demuxed all inputs for each game.
-    - Documented all outputs.
-    - Added lamps support.
-    - Created different layout files to cover each game.
-    - Add NVRAM support to all games.
-    - Corrected the color PROM status for each set.
-    - Figured out most of the DIP switches.
-    - Added diplocations to goldnpkb.
-    - Replaced the remaining IPT_SERVICE with IPT_BUTTON for regular buttons.
-    - Updated technical notes.
-    - Cleaned up the driver. Now is better organized and documented.
-
-
-    [2007-07-07]
-
-    - Added set goldnpkc (Golden Poker without the double up feature).
-    - Updated technical notes.
-
-
-    [2008-10-12] *** REWRITE ***
-
-    - Added discrete sound support to Golden Poker hardware games based on schematics.
-    - Added discrete sound support to Potten's Poker hardware games based on PCB analysis.
-    - Added discrete circuitry diagrams for both hardware types.
-    - Adjusted the CPU addressing to 15 bits for pmpoker/goldenpkr hardware.
-    - Adjusted the CPU addressing to 14 bits for pottnpkr hardware.
-    - Rewrote all the ROM loads based on these changes.
-    - Defined MASTER Xtal & CPU clock.
-    - Fixed the visible area based on M6845 registers.
-    - Improved the lamps layouts to be more realistic.
-    - Added Good Luck (potten's poker hybrid running in goldnpkr hardware).
-    - Added Buena Suerte (spanish) x 2 sets.
-    - Added set Royale.
-    - Added Witch Card and spanish variants.
-    - Added Super Loco 93 (spanish) x 2 sets.
-    - Renamed set goldnpkc to pottnpkr (parent Jack Potten's Poker set).
-    - Renamed set jokerpkr to potnpkra, since is another Jack Potten's Poker set.
-    - Added other 2 clones of Jack Potten's Poker.
-    - Renamed/cleaned all sets based on code/hardware analysis.
-    - Added intensity bit to the color system.
-    - Implemented the blue killer bit for Witch Card hardware.
-    - Implemented the extended graphics addressing bit for Witch Card hardware.
-    - Added proper visible area to sloco93.
-    - Rewrote the graphics & color decode system based on schematics. No more patched codes.
-    - Changed the char gfx bank structure and rom load according to the new routines.
-    - Adjusted the amount of color codes and PROM region size accordingly.
-    - Updated all notes.
-
-
-    [2008-11-29] *** REWRITE (part II) ***
-
-    - Changed the driver name to goldnpkr.c (Golden Poker is the most representative hardware).
-    - Splitted the PIA interfases to cover witchcrd/pottenpkr connections.
-    - Fixed the witchcrd/pottnpkr/sloco93 double up mode.
-    - Replaced the pottenpkr layout with goldnpkr one in all Jack Potten's Poker sets.
-    - Updated game notes for Witch Card and Super Loco 93 sets.
-    - Fixed al inputs & lamps to allow double up mode to the above games.
-    - Added Witch Card (Video Klein) but still not working.
-    - Added several Buena Suerte! sets.
-    - Added new games: Maverik, Brasil 89 & Poker'91.
-    - Reworked the sets parent-clone relationship (still in progress).
-
-
-    [2008-12-26]
-
-    - Correctly setup the MC6845 device for all systems.
-    - Added common MC6845 device interface.
-    - Merged witchcrd and sloco93 machine drivers.
-    - Added/corrected the 50/60 Hz. DIP switches to all games.
-      The 50hz mode needs to be corrected. Some games as most bsuerte sets have
-      the 50/60 Hz. DIP switch connection patched.
-
-
-    [2009-09-05]
-
-    - Added 2 new Witch Card sets.
-    - Reworked inputs for Witch Card (german set 1).
-    - Created new inputs for Witch Card (english, witch game, lamps).
-    - Added and connected lamps for both sets.
-    - Added minimal bet and 50/60 Hz. switches to both sets.
-    - Added DIP switches info for Witch Card (german, set 2).
-
-
-    - Added Genius, running in a modified Golden Poker board.
-
-
-    [2010-09-28]
-
-    - Added 3 new Witch Card sets.
-    - Added 3 new Falcons Wild sets (from 3 different hardwares).
-    - Hooked the second CPU (still encrypted) to the Falcon hardware.
-    - Partially decrypted the second CPU program from Falcon hardware.
-    - Figured out the Falcons Wild (Video Klein) memory map and machine.
-    - Defeated the evil Video Klein's Witch Card hardware.
-    - Reworked inputs for some sets.
-    - Added lamps layouts/connections to the new sets.
-    - Figured out the multiplexed data/address from Falcon's boards sound.
-    - Added full sound support to Falcon hardware.
-    - Reorganized and partially cleaned-up the driver.
-    - Added more technical notes.
-
-
-    [2010-11-18]
-
-    - Added Karateco Super Double (french)
-    - Extended ROM space for goldnpkr game to include the 0x2000..0x3fff range
-
-
-    [2011-01-20]
-
-    - Lots of changes to get working the Video Klein games.
-    - Renamed witchcde to witchjol --> Jolly Witch (Export, 6T/12T ver 1.57D).
-    - Added Wild Witch (Export, 6T/12T ver 1.74A).
-    - New video hardware and machine driver for Video Klein's extended tiles games.
-    - Added Dallas DS1210 + battery backed RAM support to the Video Klein CPU boxed games.
-    - Improved inputs for Jolli Witch and Wild Witch. Added the game selector switch.
-    - Cleaned up some witch card sets.
-    - Added technical and game notes.
-
-
-    [2011-10-19]
-
-    - Mapped the Dallas DS1210 for Video Klein sets that have one.
-    - Mapped the 2800-2fff range as RAM for the non-Dallas Video Klein sets.
-    - Added Witch Card (Video Klein CPU box, set 2)
-    - Added Witch Game (Video Klein, set 2)
-    - Some minor fixes.
-
-
-    TODO:
-
-    - Missing PIA connections.
-    - Code analysis, Inputs & lamps for Royale.
-    - Final cleanup and split the driver.
-
-
-*******************************************************************************/
+  I like this game!... This one has nothing to do with poker games.
+  The objective is to get the higher sum with 2 or 3 cards. Is clearly
+  based on a passage (Envido) of the famous argentine's game called "Truco".
+
+  - How to play?...
+
+  Like in Truco's envido, You must add 20 to the sum of your cards.
+  If you have 7 and 5 of the same kind, you have 7 + 5 + 20 = 32 points.
+
+  "Flor", is 3 cards of the same kind.
+  "Simple", is 2 cards of the same kind.
+
+  HAND             WIN    DESCRIPTION
+  ----------------------------------------------
+  38  Corazones   1000    7, 6 and 5 of hearts.
+  777 Loco Loco    200    3x sevens.
+  38  Flor          80    7, 6 and 5 of the same kind (except hearts).
+  37  Flor          20    7, 6 and 4 of the same kind.
+  36  Flor          14    7, 5 and 4 of the same kind.
+  35  Flor          10    6, 5 and 4 of the same kind.
+  32-33-34 Flor      6    3 of the same kind that sum 32, 33 or 34.
+  33  Simple         4    7 and 6 of the same kind.
+  32  Simple         2    7 and 5 of the same kind.
+
+  After bet (apuesta) some credits, Press deal (reparte) button.
+  The game will deals 3 cards. You can discard up to all your 3 cards.
+  Pressing the deal button again, new cards will appear in the place
+  of the previously selected cards.
+
+  - Double Up:
+
+  You must to choose Red or Black to guess the card.
+  If you win, you can take the credits or continue into double up.
+  The rest is similar to Witch Card, but with 3 big numbers instead of
+  witches. Once you lose or take your credits, the big numbers start to
+  run 'alla' slot game, giving 1 attempt by each time you won a double-up
+  hand.
+
+  - Settings:
+
+  There are 12 parameters to program.
+  To program them, use the HOLD keys, CANCEL key, DEAL + HOLD keys,
+  and DEAL + CANCEL.
+
+
+  * Wild Witch / Jolli Witch
+
+  These sets have a switch to change the game. Wild Witch comes with a complete
+  Witch Game as switchable alternative, and Jolli Witch has Witch Card in the same
+  package. Both are based in the 6T/12T program made by Video Klein, However, Jolli
+  Witch seems to be a bootleg CPU box on an original Bonanza mainboard.
+
+  The first time the game boots, will show a black & red screen with some options
+  due to the lack or corrupt NVRAM. You must choose HOLD1 to create a new default
+  NVRAM. In case you have corrupt NVRAM (not first boot), you can choose HOLD5 to
+  attempt recover the old settings.
+
+
+  * Witch Card (Proma)
+
+  For the first time: You must coin-up and play at least one hand, then Payout
+  to get the proper coinage settings.
+
+
+  * Casino Poker
+  
+  Bipolar PROM 24sa10 is filled with 0x09, so has at least
+  fixed bits 0 and 3 along the whole data. Needs a redump using a supported
+  EEPROM programmer.
+
+  Discrete sound circuitry was traced, being identical to the Golden Poker one.
+  Only difference is the PC617 replaced by one PC817.
+
+  The sound is ugly and seems that was programmed that way.
+  Also the lamps work in test mode, but seems to be avoided in the game code.
+
+  The game has 2 service switches/buttons:
+  One for settings, and other just for bookkeeping.
+
+  Here the original Service Card (in german), and the english translation:
+   _____________________________________     _____________________________________
+  |                                     |   |                                     |
+  |          SERVICE ANLEITUNG          |   |           SERVICE MANUAL            |
+  |   _____________   _____________     |   |   _____________   _____________     |
+  |  |  +-------+  | |  +-------+  |    |   |  |  +-------+  | |  +-------+  |    |
+  |  |  |0000000|  | |  |0000000|  |    |   |  |  |0000000|  | |  |0000000|  |    |
+  |  |  +-------+  | |  +-------+  |    |   |  |  +-------+  | |  +-------+  |    |
+  |  |             | |             |    |   |  |             | |             |    |
+  |  |             | |             |    |   |  |             | |             |    |
+  |  |             | |             |    |   |  |             | |             |    |
+  |  | +---------+ | |+-----------+|    |   |  | +---------+ | |+-----------+|    |
+  |  | |Einnahmen| | ||Kredit Off ||    |   |  | |Earnings | | ||Credit Off ||    |
+  |  | +---------+ | |+-----------+|    |   |  | +---------+ | |+-----------+|    |
+  |  |             | |             |    |   |  |             | |             |    |
+  |  |_____________| |_____________|    |   |  |_____________| |_____________|    |
+  |                                     |   |                                     |
+  |  Zaehler zeigen volle DM-Betraege   |   |     METER SHOW FULL DM-AMOUNTS      |
+  |                                     |   |                                     |
+  |       _____            _____        |   |       _____            _____        |
+  |      |     |     |    |     |       |   |      |     |     |    |     |       |
+  |      | SW  |     |    | RT  |       |   |      | SW  |     |    | RT  |       |
+  |      |_____|     |    |_____|       |   |      |_____|     |    |_____|       |
+  |                  |                  |   |                  |                  |
+  |      SERVICE     |     METER        |   |      SERVICE     |     METER        |
+  |                  |                  |   |                  |                  |
+  |    +---------+   | ZEIGT DIE        |   |    +---------+   | SHOWS THE        |
+  |    |  LEARN  |   | ELEKT. ZAEHLER-  |   |    |  LEARN  |   | ELECTRONIC METER-|
+  |    +---------+   | STAENDE UND      |   |    +---------+   | READING AND      |
+  |                  | STATISTIK AN     |   |                  | STATISTIC        |
+  |   PROGRAMMIER.   |                  |   |   PROGRAMMING    |                  |
+  |   DER KREDIT-    |                  |   |   THE CREDIT-    |                  |
+  |   EINGAENGE UND  +------------------|   |   INPUT AND      +------------------|
+  |   GEWINNQUOTE    |                  |   |   PROFIT SHARE   |                  |
+  |                  |    < POT >       |   |                  |    < POT >       |
+  |    +---------+   |  +         -     |   |    +---------+   |  +         -     |
+  |    |   NEU   |   |  LAUTSTAERKE     |   |    |   NEW   |   |  SOUND VOLUME    |
+  |    +---------+   |                  |   |    +---------+   |                  |
+  |                  |                  |   |                  |                  |
+  |   SETZT DIE      |                  |   |   RESET THE      |                  |
+  |   ELEKT. ZAEHLER |    < POT >       |   |   ELECTRONIC     |    < POT >       |
+  |   ZURUECK        |                  |   |   COUNTER        |                  |
+  |                  | BLAU<->SCHWARZ   |   |                  | BLUE <-> BLACK   |
+  |    +---------+   | HINTERGRUND      |   |    +---------+   | BACKGROUND       |
+  |    |  TEST   |   |                  |   |    |  TEST   |   |                  |
+  |    +---------+   |                  |   |    +---------+   |                  |
+  |                  |                  |   |                  |                  |
+  |   CPU, TASTATUR  |                  |   |   CPU, KEYBOARD  |                  |
+  |   UND LAMPEN     |                  |   |   AND LAMPS      |                  |
+  |   TEST           |                  |   |   TEST           |                  |
+  |   GITTERMUSTER   |                  |   |   LATTICE DESIGN |                  |
+  |                  |                  |   |                  |                  |
+  |    +---------+   |                  |   |    +---------+   |                  |
+  |    |  RESET  |   |                  |   |    |  RESET  |   |                  |
+  |    +---------+   |                  |   |    +---------+   |                  |
+  |                  |                  |   |                  |                  |
+  |   LOESCHT ALLES  |                  |   |    DELETE ALL    |                  |
+  |                  |                  |   |                  |                  |
+  |------------------+------------------|   |------------------+------------------|
+  |        DIPSWITCHEINSTELLUNG         |   |        DIPSWITCH SETTINGS           |
+  |                                     |   |                                     |
+  |            ON      OFF              |   |            ON      OFF              |
+  |           +-----------+             |   |           +-----------+             |
+  |           | +-------+ |             |   |           | +-------+ |             |
+  |       ON  | |###|   |8|             |   |       ON  | |###|   |8|             |
+  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |       ON  | |###|   | |             |   |       ON  | |###|   | |             |
+  |           | +-------+ |             |   |           | +-------+ |             |
+  |           | |   |###| |             |   |           | |   |###| |             |
+  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |   |###| |             |   |           | |   |###| |             |
+  |           | +-------+ |             |   |           | +-------+ |             |
+  |R-FLUSH EIN| |###|   | |R-FLUSH AUS  |   | R-FLUSH ON| |###|   | |R-FLUSH OFF  |
+  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |###|   | |             |   |           | |###|   | |             |
+  |           | +-------+ |             |   |           | +-------+ |             |
+  |           | |   |###| |AUSZAHLUNG   |   |           | |   |###| |PAYOUT       |
+  |           | +---+---+ |             |   |           | +---+---+ |             |
+  |           | |###|   |1|AUSZAHLUNG   |   |           | |###|   |1|PAYOUT       |
+  |           | +-------+ |             |   |           | +-------+ |             |
+  |           +-----------+             |   |           +-----------+             |
+  |                                     |   |                                     |
+  |  0=WENIG GEWINNE    1=STANDARD      |   |  0=LITTLE GAININGS   1=DEFAULT      |
+  |  2=MEHR GEWINNE     3=VIELE GEWIN.  |   |  2=MORE GAININGS    3=MANY GAININGS |
+  |                                     |   |                                     |
+  |                                     |   |                                     |
+  |   PM 1987 - BECK D-6330 WETZLAR     |   |   PM 1987 - BECK D-6330 WETZLAR     |
+  |_____________________________________|   |_____________________________________|
+
+
+************************************************************************************
+
+
+  Hardware Notes (pmpoker):
+
+  - CPU:            1x M6502.
+  - Video:          1x MC6845.
+  - RAM:            4x uPD2114LC
+  - I/O             2x 6821 PIAs.
+  - prg ROMs:       3x 2732 (32Kb) or similar.
+  - gfx ROMs:       4x 2716 (16Kb) or similar.
+  - sound:          (discrete).
+  - battery backup: 2x S8423
+
+
+  PCB Layout (pmpoker): (XX) = unreadable.
+   _______________________________________________________________________________
+  |   _________                                                                   |
+  |  |         |               -- DIP SW x8 --                                    |
+  |  | Battery |   _________   _______________   _________  _________   ________  |
+  |  |   055   |  | 74LS32  | |1|2|3|4|5|6|7|8| | HCF4011 || HCF4096 | | LM339N | |
+  |  |_________|  |_________| |_|_|_|_|_|_|_|_| |_________||_________| |________| |
+  |       _________     _________   _________   _________                         |
+  |      | 74LS138 |   | S-8423  | | 74LS08N | | 74LS(XX)|                        |
+  |      |_________|   |_________| |_________| |_________|                        |
+  |  _______________    _________   ____________________                      ____|
+  | |               |  | S-8423  | |                    |                    |
+  | |     2732      |  |_________| |       6502P        |                    |
+  | |_______________|   _________  |____________________|                    |
+  |  _______________   |  7432   |  ____________________                     |____
+  | |               |  |_________| |                    |                     ____|
+  | |     2732      |   _________  |       6821P        |                     ____|
+  | |_______________|  | 74LS157 | |____________________|                     ____|
+  |  _______________   |_________|  ____________________                      ____|
+  | |               |   _________  |                    |                     ____|
+  | |     2732      |  | 74LS157 | |       6821P        |                     ____|
+  | |_______________|  |_________| |____________________|                     ____|
+  |  _______________    _________   ____________________                      ____|
+  | |               |  | 74LS157 | |                    |                     ____|
+  | |     2732      |  |_________| |       6845SP       |                     ____|
+  | |_______________|   _________  |____________________|                     ____|
+  |                    | 2114-LC |                                            ____| 28x2
+  |                    |_________|                                            ____| connector
+  |       _________     _________                                             ____|
+  |      | 74LS245 |   | 2114-LC |                                            ____|
+  |      |_________|   |_________|                                            ____|
+  |       _________     _________               _________                     ____|
+  |      | 74LS245 |   | 2114-LC |             | 74LS174 |                    ____|
+  |      |_________|   |_________|             |_________|                    ____|
+  |  ________________   _________   _________   _________                     ____|
+  | |                | | 2114-LC | | 74LS08H | | TI (XX) | <-- socketed.      ____|
+  | |      2716      | |_________| |_________| |_________|       PROM         ____|
+  | |________________|              _________   _________                     ____|
+  |  ________________              | 74LS04P | | 74LS174 |                    ____|
+  | |                |             |_________| |_________|                    ____|
+  | |      2716      |              _________   _________                     ____|
+  | |________________|             | 74166P  | | 74LS86C |                    ____|
+  |  ________________              |_________| |_________|                    ____|
+  | |                |              _________    _______                     |
+  | |      2716      |             | 74166P  |  | 555TC |                    |
+  | |________________|             |_________|  |_______|                    |
+  |  ________________                                                        |____
+  | |                |                                                        ____|
+  | |      2716      |              _________   _________      ________       ____| 5x2
+  | |________________|             | 74166P  | |  7407N  |    | LM380N |      ____| connector
+  |                                |_________| |_________|    |________|      ____|
+  |  ________  ______               _________   _________      ___            ____|
+  | | 74LS04 || osc. |             | 74LS193 | |  7407N  |    /   \          |
+  | |________||10 MHz|             |_________| |_________|   | POT |         |
+  |           |______|                                        \___/          |
+  |__________________________________________________________________________|
+
+
+
+  Some odds:
+
+  - There are unused pieces of code like the following sub:
+
+  78DE: 18         clc
+  78DF: 69 07      adc  #$07
+  78E1: 9D 20 10   sta  $1020,x
+  78E4: A9 00      lda  #$00
+  78E6: 9D 20 18   sta  $1820,x
+  78E9: E8         inx
+
+  78EA: 82         DOP        ; use of DOP (double NOP)
+  78EB: A2 0A      dummy (ldx #$0A)
+
+  78ED: AD 82 08   lda  $0882
+
+  78F0: 82         DOP        ; use of DOP (double NOP)
+  78F1: 48 08      dummy
+  78F3: D0 F6      bne  $78EB ; branch to the 1st DOP dummy arguments (now ldx #$0A).
+  78F5: CA         dex
+  78F6: D0 F8      bne  $78F0
+  78F8: 29 10      and  #$10
+  78FA: 60         rts
+
+  Offset $78EA and $78F0 contains an undocumented 6502 opcode (0x82).
+
+  At beginning, I thought that the main processor was a 65sc816, since 0x82 is a documented opcode (BRL) for this CPU.
+  Even the vector $FFF8 contain 0x09 (used to indicate "Emulation Mode" for the 65sc816).
+  I dropped the idea following the code. Impossible to use BRL (branch relative long) in this structure.
+
+  Some 6502 sources list the 0x82 mnemonic as DOP (double NOP), with 2 dummy bytes as argument.
+  The above routine dynamically change the X register value using the DOP undocumented opcode.
+  Since the opcode DOP in fact has only 1 dummy byte as argument, they apparently dropped this
+  piece of code due to it didn't work as expected. Now all have sense.
+
+
+************************************************************************************
+
+
+  -----------------------------------------------
+  ***  Memory Map (pmpoker/goldnpkr hardware) ***
+  -----------------------------------------------
+
+  $0000 - $00FF   RAM     ; Zero Page (pointers and registers)
+
+                          ; $45 to $47 - Coin settings.
+                          ; $50 - Input port register.
+                          ; $5C - Input port register.
+                          ; $5D - Input port register.
+                          ; $5E - Input port register.
+                          ; $5F - Input port register.
+
+  $0100 - $01FF   RAM     ; 6502 Stack Pointer.
+
+  $0200 - $02FF   RAM     ; R/W. (settings)
+  $0300 - $03FF   RAM     ; R/W (mainly to $0383). $0340 - $035f (settings).
+
+  $0800 - $0801   MC6845  ; MC6845 use $0800 for register addressing and $0801 for register values.
+
+                          *** pmpoker mc6845 init at $65B9 ***
+                          *** goldnpkr mc6845 init at $5E75 ***
+                          *** sloco93 mc6845 init at $D765 ***
+                          register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
+                          value:     0x27  0x20  0x22  0x02  0x1F  0x04  0x1D  0x1E  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
+
+                          *** goodluck mc6845 init at $527B ***
+                          register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
+                          value:     0x27  0x20  0x23  0x03  0x1F  0x04  0x1D  0x1F  0x00  0x00  0x26  0x00  0x20  0x22  0x58  0xA5  0x4F  0xC9.
+
+                          *** witchcrd mc6845 init at $D765 ***
+                          register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
+                          value:     0x27  0x20  0x23  0x03  0x1F  0x04  0x1D  0x1F  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
+
+                          *** witchcrd (Video Klein) mc6845 init at $627B ***
+                          register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
+                          value:     0x27  0x20  0x23  0x33  0x1F  0x04  0x1D  0x1F  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
+
+                          *** witchcrd (Video Klein) mc6845 mod at $6293 ($2000 and #$20) ***
+                          register:   04    05    06    07
+                          value:     0x26  0x00  0x20  0x22
+
+                          *** royale mc6845 init at $6581 ***
+                          register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
+                          value:     0x27  0x20  0x23  0x03  0x1F  0x04  0x1D  0x1E  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
+
+  $0844 - $0847   PIA0    ; Muxed inputs and lamps. Initialized at $5000.
+  $0848 - $084B   PIA1    ; Sound writes and muxed inputs selector. Initialized at $5000.
+
+  $1000 - $13FF   Video RAM   ; Initialized in subroutine starting at $5042.
+  $1800 - $1BFF   Color RAM   ; Initialized in subroutine starting at $5042.
+
+  $4000 - $7FFF   ROM
+
+  $8000 - $FFFF           ; Mirrored from $0000 - $7FFF due to lack of A15 line connection.
+
+
+
+  ---------------------------------------
+  ***  Memory Map (pottnpkr hardware) ***
+  ---------------------------------------
+
+  $0000 - $00FF   RAM     ; Zero Page (pointers and registers)
+  $0100 - $01FF   RAM     ; 6502 Stack Pointer.
+  $0200 - $02FF   RAM     ; R/W. (settings)
+  $0300 - $03FF   RAM     ; R/W (mainly to $0383). $0340 - $035f (settings).
+
+  $0800 - $0801   MC6845  ; MC6845 use $0800 for register addressing and $0801 for register values.
+
+  $0844 - $0847   PIA0    ; Muxed inputs and lamps.
+  $0848 - $084B   PIA1    ; Sound writes and muxed inputs selector.
+
+  $1000 - $13FF   Video RAM
+  $1800 - $1BFF   Color RAM
+
+  $2000 - $3FFF   ROM space
+
+  $4000 - $7FFF           ; Mirrored from $0000 - $3FFF due to lack of A14 & A15 lines connection.
+  $8000 - $BFFF           ; Mirrored from $0000 - $3FFF due to lack of A14 & A15 lines connection.
+  $C000 - $FFFF           ; Mirrored from $0000 - $3FFF due to lack of A14 & A15 lines connection.
+
+
+************************************************************************************
+
+
+  Buttons/Inputs   goldnpkr goldnpkb  pmpoker  bsuerte goodluck pottnpkr potnpkra potnpkrc potnpkrb
+  -------------------------------------------------------------------------------------------------
+
+  HOLD (5 buttons)  mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+  CANCEL            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+  BIG               mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
+  SMALL             mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
+  DOUBLE UP         mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
+  TAKE SCORE        mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
+  DEAL/DRAW         mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+  BET               mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+
+  Coin 1 (coins)    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+  Coin 2 (notes)    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   fixed 1c-1c
+  Coin 3 (coupons)  mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
+  Payout            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+  Manual Collect    mapped   mapped   mapped    ----    mapped   mapped   mapped   mapped   mapped
+
+  LEARN/SETTINGS    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+  METERS            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+
+
+  Inputs are different for some games. Normally each button has only one function.
+  In pmpoker some buttons have different functions.
+
+
+************************************************************************************
+
+
+  DRIVER UPDATES:
+
+
+  [2006-09-02]
+
+  - Initial release.
+
+
+  [2006-09-06]
+
+  - Understood the GFX banks:
+      - 1 bank (1bpp) for text layer and minor graphics.
+      - 1 bank (3bpp) for the undumped cards deck graphics.
+
+  - Partially added inputs through 6821 PIAs.
+      ("Bitte techniker rufen" error messages. Press 'W' to reset the machine)
+
+  - Confirmed the CPU as 6502. (was in doubt due to use of illegal opcodes)
+
+
+  [2006-09-15]
+
+  - Confirmed the GFX banks (a complete dump appeared!).
+  - Improved technical notes and added a PCB layout based on PCB picture.
+  - Found and fixed the 3rd bitplane of BigBoy gfx.
+  - Renamed Big-Boy to Golden Poker Double Up. (Big-Boy and Mini-Boy are names of cabinet models).
+  - Added 'Joker Poker' (Golden Poker version without the 'double-up' feature).
+  - Added 'Jack Potten's Poker' (same as Joker Poker, but with 'Aces or better' instead of jacks).
+  - Simulated colors for all sets till color PROMs appear.
+  - Fixed bit corruption in goldnpkr rom u40_4a.bin.
+  - Completed inputs in all sets (except DIP switches).
+  - Removed flags GAME_WRONG_COLORS and GAME_IMPERFECT_GRAPHICS in all sets.
+  - Removed flag GAME_NOT_WORKING. All sets are now playable. :)
+
+
+  [2006-10-09]
+
+  - Added service/settings mode to pmpoker.
+  - Added PORT_IMPULSE to manage correct timings for most inputs in all games.
+    (jokerpkr still trigger more than 1 credit for coin pulse).
+
+
+  [2007-02-01]
+
+  - Crystal documented via #define.
+  - CPU clock derived from #defined crystal value.
+  - Replaced simulated colors with proper color prom decode.
+  - Renamed "Golden Poker Double Up" to "Golden Poker Double Up (Big Boy)".
+  - Added set Golden Poker Double Up (Mini Boy).
+  - Cleaned up the driver a bit.
+  - Updated technical notes.
+
+
+  [2007-05-05]
+
+  - Removed all inputs hacks.
+  - Connected both PIAs properly.
+  - Demuxed all inputs for each game.
+  - Documented all outputs.
+  - Added lamps support.
+  - Created different layout files to cover each game.
+  - Add NVRAM support to all games.
+  - Corrected the color PROM status for each set.
+  - Figured out most of the DIP switches.
+  - Added diplocations to goldnpkb.
+  - Replaced the remaining IPT_SERVICE with IPT_BUTTON for regular buttons.
+  - Updated technical notes.
+  - Cleaned up the driver. Now is better organized and documented.
+
+
+  [2007-07-07]
+
+  - Added set goldnpkc (Golden Poker without the double up feature).
+  - Updated technical notes.
+
+
+  [2008-10-12] *** REWRITE ***
+
+  - Added discrete sound support to Golden Poker hardware games based on schematics.
+  - Added discrete sound support to Potten's Poker hardware games based on PCB analysis.
+  - Added discrete circuitry diagrams for both hardware types.
+  - Adjusted the CPU addressing to 15 bits for pmpoker/goldenpkr hardware.
+  - Adjusted the CPU addressing to 14 bits for pottnpkr hardware.
+  - Rewrote all the ROM loads based on these changes.
+  - Defined MASTER Xtal & CPU clock.
+  - Fixed the visible area based on M6845 registers.
+  - Improved the lamps layouts to be more realistic.
+  - Added Good Luck (potten's poker hybrid running in goldnpkr hardware).
+  - Added Buena Suerte (spanish) x 2 sets.
+  - Added set Royale.
+  - Added Witch Card and spanish variants.
+  - Added Super Loco 93 (spanish) x 2 sets.
+  - Renamed set goldnpkc to pottnpkr (parent Jack Potten's Poker set).
+  - Renamed set jokerpkr to potnpkra, since is another Jack Potten's Poker set.
+  - Added other 2 clones of Jack Potten's Poker.
+  - Renamed/cleaned all sets based on code/hardware analysis.
+  - Added intensity bit to the color system.
+  - Implemented the blue killer bit for Witch Card hardware.
+  - Implemented the extended graphics addressing bit for Witch Card hardware.
+  - Added proper visible area to sloco93.
+  - Rewrote the graphics & color decode system based on schematics. No more patched codes.
+  - Changed the char gfx bank structure and rom load according to the new routines.
+  - Adjusted the amount of color codes and PROM region size accordingly.
+  - Updated all notes.
+
+
+  [2008-11-29] *** REWRITE (part II) ***
+
+  - Changed the driver name to goldnpkr.c (Golden Poker is the most representative hardware).
+  - Splitted the PIA interfases to cover witchcrd/pottenpkr connections.
+  - Fixed the witchcrd/pottnpkr/sloco93 double up mode.
+  - Replaced the pottenpkr layout with goldnpkr one in all Jack Potten's Poker sets.
+  - Updated game notes for Witch Card and Super Loco 93 sets.
+  - Fixed al inputs & lamps to allow double up mode to the above games.
+  - Added Witch Card (Video Klein) but still not working.
+  - Added several Buena Suerte! sets.
+  - Added new games: Maverik, Brasil 89 & Poker'91.
+  - Reworked the sets parent-clone relationship (still in progress).
+
+
+  [2008-12-26]
+
+  - Correctly setup the MC6845 device for all systems.
+  - Added common MC6845 device interface.
+  - Merged witchcrd and sloco93 machine drivers.
+  - Added/corrected the 50/60 Hz. DIP switches to all games.
+    The 50hz mode needs to be corrected. Some games as most bsuerte sets have
+    the 50/60 Hz. DIP switch connection patched.
+
+
+  [2009-09-05]
+
+  - Added 2 new Witch Card sets.
+  - Reworked inputs for Witch Card (german set 1).
+  - Created new inputs for Witch Card (english, witch game, lamps).
+  - Added and connected lamps for both sets.
+  - Added minimal bet and 50/60 Hz. switches to both sets.
+  - Added DIP switches info for Witch Card (german, set 2).
+
+  - Added Genius, running in a modified Golden Poker board.
+
+
+  [2010-09-28]
+
+  - Added 3 new Witch Card sets.
+  - Added 3 new Falcons Wild sets (from 3 different hardwares).
+  - Hooked the second CPU (still encrypted) to the Falcon hardware.
+  - Partially decrypted the second CPU program from Falcon hardware.
+  - Figured out the Falcons Wild (Video Klein) memory map and machine.
+  - Defeated the evil Video Klein's Witch Card hardware.
+  - Reworked inputs for some sets.
+  - Added lamps layouts/connections to the new sets.
+  - Figured out the multiplexed data/address from Falcon's boards sound.
+  - Added full sound support to Falcon hardware.
+  - Reorganized and partially cleaned-up the driver.
+  - Added more technical notes.
+
+
+  [2010-11-18]
+
+  - Added Karateco Super Double (french)
+  - Extended ROM space for goldnpkr game to include the 0x2000..0x3fff range
+
+
+  [2011-01-20]
+
+  - Lots of changes to get working the Video Klein games.
+  - Renamed witchcde to witchjol --> Jolly Witch (Export, 6T/12T ver 1.57D).
+  - Added Wild Witch (Export, 6T/12T ver 1.74A).
+  - New video hardware and machine driver for Video Klein's extended tiles games.
+  - Added Dallas DS1210 + battery backed RAM support to the Video Klein CPU boxed games.
+  - Improved inputs for Jolli Witch and Wild Witch. Added the game selector switch.
+  - Cleaned up some witch card sets.
+  - Added technical and game notes.
+
+
+  [2011-10-19]
+
+  - Mapped the Dallas DS1210 for Video Klein sets that have one.
+  - Mapped the 2800-2fff range as RAM for the non-Dallas Video Klein sets.
+  - Added Witch Card (Video Klein CPU box, set 2)
+  - Added Witch Game (Video Klein, set 2)
+  - Some minor fixes.
+
+
+  [2012-02-19]
+
+  - Added Casino Poker (Ver PM86LO-35-5, German).
+  - Inputs from the scratch.
+  - Switched manufacturer 'Playman' to PM / Beck Elektronik, since
+     it's PM and Beck Elektronik/Computer/etc... 
+  - Added technical and game notes.
+
+
+
+  TODO:
+
+  - Missing PIA connections.
+  - Code analysis, Inputs & lamps for Royale.
+  - Final cleanup and split the driver.
+
+
+************************************************************************************/
 
 
 #define MASTER_CLOCK	XTAL_10MHz
@@ -708,7 +822,7 @@
 #include "sound/discrete.h"
 #include "machine/nvram.h"
 
-/* Extra CPUs, MCUs, etc... */
+/* Extra CPUs, MCUs, devices, etc... */
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
@@ -1016,35 +1130,35 @@ static WRITE8_DEVICE_HANDLER( wcfalcon_snd_w )
 
 /***** Lamps wiring *****
 
-    -------------------
-    pmpoker
-    -------------------
-    L0 = Deal
-    L1 = Hold3
-    L2 = Hold1
-    L3 = Hold5
-    L4 = Hold2 & Hold4
+  -------------------
+  pmpoker
+  -------------------
+  L0 = Deal
+  L1 = Hold3
+  L2 = Hold1
+  L3 = Hold5
+  L4 = Hold2 & Hold4
 
-    -----------------------
-    goldnpkr sets & bsuerte
-    -----------------------
-    L0 = Bet
-    L1 = Deal
-    L2 = Holds (all)
-    L3 = Double Up & Take
-    L4 = Big & Small
+  -----------------------
+  goldnpkr sets & bsuerte
+  -----------------------
+  L0 = Bet
+  L1 = Deal
+  L2 = Holds (all)
+  L3 = Double Up & Take
+  L4 = Big & Small
 
-    ----------------------------------
-    pottnpkr sets, jokerpkr & goodluck
-    ----------------------------------
-    L0 = Bet
-    L1 = Deal
-    L2 = Holds (all)
+  ----------------------------------
+  pottnpkr sets, jokerpkr & goodluck
+  ----------------------------------
+  L0 = Bet
+  L1 = Deal
+  L2 = Holds (all)
 
-    ------------------
-    witchcrd & sloco93
-    ------------------
-    NONE. Just they lack of lamps...
+  ------------------
+  witchcrd & sloco93
+  ------------------
+  NONE. Just they lack of lamps...
 
 */
 
@@ -2617,6 +2731,75 @@ static INPUT_PORTS_START( genie )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( caspoker )
+	/* Multiplexed - 4x5bits */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Bookkeeping")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Take Score (Kasse)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Small (Tief)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Bet (Setzen)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Big (Hoch)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Double Up (Doppeln)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4686,45 +4869,96 @@ ROM_START( wldwitch )
 ROM_END
 
 
+/***************************************************************
+
+  Casino Poker
+  1987, PM / Beck Elektronik
+
+  1x Xtal 10.000 MHz.
+  1x UM6502A
+  2x UM6521A
+  1x UM6845
+
+  GFX ROMS 051, 052, 053 and 054 have duplicated halves.
+
+  Bipolar PROM 24sa10 is filled with 0x09, so has at least
+  fixed bits 0 and 3 along the whole data. Needs a redump
+  using a supported EEPROM programmer.
+
+  Discrete sound circuitry was traced, being identical to the Golden Poker one.
+  Only difference is the PC617 replaced by one PC817.
+
+  The sound is ugly and seems that was programmed that way.
+
+***************************************************************/
+
+ROM_START( caspoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "234.bin",	0x4000, 0x1000, CRC(174bc526) SHA1(faef01484f0e0ea769d7bd2c5ad03369a6fdf037) )
+	ROM_LOAD( "235.bin",	0x5000, 0x1000, CRC(2e43552f) SHA1(5fbe0e62dec960850ef5f937254858fcd4da9e64) )
+	ROM_LOAD( "236.bin",	0x6000, 0x1000, CRC(3f4cfa39) SHA1(e2750a9c5d12c668e599181ee3972c5d78bd0006) )
+	ROM_LOAD( "237.bin",	0x7000, 0x1000, CRC(b411d0c4) SHA1(0617cd312026da78a171fc23f4788393d70371cf) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(				0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "054.bin",	0x1000, 0x0800, CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )    /* text chars */
+	ROM_IGNORE(                     0x0800)	/* identical halves, discarding the 2nd half */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "051.bin",	0x0000, 0x0800, CRC(82d823e5) SHA1(75bdf427a6204ef87444be0d8b06a07c5a2fc38f) )    /* cards deck gfx, bitplane1 */
+	ROM_IGNORE(                     0x0800)	/* identical halves, discarding the 2nd half */
+	ROM_LOAD( "052.bin",	0x0800, 0x0800, CRC(eda12738) SHA1(ec7806c2bf1a238f489459c3c3653f43febaa464) )    /* cards deck gfx, bitplane2 */
+	ROM_IGNORE(                     0x0800)	/* identical halves, discarding the 2nd half */
+	ROM_LOAD( "053.bin",	0x1000, 0x0800, CRC(d147ae0a) SHA1(dfdf0a42eb0a6f2afc9f301b0cf01411085247bd) )    /* cards deck gfx, bitplane3 */
+	ROM_IGNORE(                     0x0800)	/* identical halves, discarding the 2nd half */
+
+	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM, otherwise settings parameters are incorrect */
+	ROM_LOAD( "caspoker_nvram.bin", 0x0000, 0x0800, CRC(be6e2671) SHA1(aef1b09d09e07eb39480a7901ed8535f74e461fa) )
+
+	ROM_REGION( 0x0100, "proms", 0 )	/* from other games */
+	ROM_LOAD( "24sa10.bin",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+
 /*********************************************
 *                Driver Init                 *
 *********************************************/
 
 /*
-    Golden Poker H/W sets:
+  Golden Poker H/W sets:
 
-    newname    oldname    gameplay  music      settings    testmode
-    ===================================================================
-    pmpoker    pmpoker    fast      minimal    hack        matrix/grill
-    goldnpkr   goldnpkr   fast      y.doodle   excellent   matrix/grill
-    goldnpkb   goldnpkb   normal    minimal    normal      matrix/grill
-
-
-    Potten's Poker H/W sets:
-
-    newname    oldname    gameplay  music      settings    testmode
-    ===================================================================
-    pottnpkr   goldnpkc   fast      y.doodle   normal      only grid
-    potnpkra   jokerpkr   normal    normal     normal      only skill
-    potnpkrb   pottnpkb   slow      y.doodle   normal      only grid
-    potnpkrc   pottnpkr   normal    minimal    hack        only skill
-    potnpkrd   --------   normal    minimal    hack        only skill
-    potnpkre   --------   slow      y.doodle   normal      matrix/grill
+  newname    oldname    gameplay  music      settings    testmode
+  ===================================================================
+  pmpoker    pmpoker    fast      minimal    hack        matrix/grill
+  goldnpkr   goldnpkr   fast      y.doodle   excellent   matrix/grill
+  goldnpkb   goldnpkb   normal    minimal    normal      matrix/grill
 
 
-    Witch Card H/W sets:
+  Potten's Poker H/W sets:
 
-    newname    oldname    gameplay  music      settings    testmode
-    ===================================================================
-    bsuerte    --------   normal    minimal    only 1-10   matrix/grill
-    bsuertea   --------   normal    minimal    only 1-10   matrix/grill
-    goodluck   --------   fast      y.doodle   normal      matrix/grill
-    royale     --------
-    witchcrd   --------   normal    y.doodle   12-param    only grid
-    witchcda   --------   fast      y.doodle   12-param    only grid
-    witchcdb   --------   normal    y.doodle   12-param    only grid
-    sloco93    --------   fast      custom     complete    only grid
-    sloco93a   --------   fast      custom     complete    only grid
+  newname    oldname    gameplay  music      settings    testmode
+  ===================================================================
+  pottnpkr   goldnpkc   fast      y.doodle   normal      only grid
+  potnpkra   jokerpkr   normal    normal     normal      only skill
+  potnpkrb   pottnpkb   slow      y.doodle   normal      only grid
+  potnpkrc   pottnpkr   normal    minimal    hack        only skill
+  potnpkrd   --------   normal    minimal    hack        only skill
+  potnpkre   --------   slow      y.doodle   normal      matrix/grill
+
+
+  Witch Card H/W sets:
+
+  newname    oldname    gameplay  music      settings    testmode
+  ===================================================================
+  bsuerte    --------   normal    minimal    only 1-10   matrix/grill
+  bsuertea   --------   normal    minimal    only 1-10   matrix/grill
+  goodluck   --------   fast      y.doodle   normal      matrix/grill
+  royale     --------
+  witchcrd   --------   normal    y.doodle   12-param    only grid
+  witchcda   --------   fast      y.doodle   12-param    only grid
+  witchcdb   --------   normal    y.doodle   12-param    only grid
+  sloco93    --------   fast      custom     complete    only grid
+  sloco93a   --------   fast      custom     complete    only grid
 
 */
 static DRIVER_INIT( royale )
@@ -4916,7 +5150,7 @@ GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown
 GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, 0,        ROT0,   "<unknown>",                "Witch Card (English, no witch game)",     0 )
 GAMEL( 1994, witchcdd, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",     0,                layout_goldnpkr )
 GAMEL( 1991, witchcde, witchcrd, witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)", 0,                layout_goldnpkr )
-GAMEL( 1985, witchcdf, witchcrd, witchcrd, witchcdf, 0,        ROT0,   "PlayMan",                  "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
+GAMEL( 1985, witchcdf, witchcrd, witchcrd, witchcdf, 0,        ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
 GAMEL( 199?, witchcdg, witchcrd, wcfalcon, witchcrd, 0,        ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",     0,                layout_goldnpkr )
 GAMEL( 1994, witchcdh, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",     0,                layout_goldnpkr )
 GAMEL( 1994, witchcdi, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",    0,                layout_goldnpkr )
@@ -4956,7 +5190,7 @@ GAME(  1983, falcnwldb, falcnwld, wildcrdb, wildcard, flcnw,   ROT0,   "Falcon",
 /*************************************** OTHER SETS ***************************************/
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
-GAMEL( 1981, pmpoker,  0,        goldnpkr, pmpoker,  0,        ROT0,   "PlayMan",                  "PlayMan Poker (German)",                  0,                layout_pmpoker  )
+GAMEL( 1981, pmpoker,  0,        goldnpkr, pmpoker,  0,        ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                layout_pmpoker  )
 GAMEL( 198?, royale,   0,        goldnpkr, royale,   royale,   ROT0,   "<unknown>",                "Royale (set 1)",                          GAME_NOT_WORKING, layout_goldnpkr )
 GAMEL( 198?, royalea,  royale,   goldnpkr, royale,   royale,   ROT0,   "<unknown>",                "Royale (set 2)",                          GAME_NOT_WORKING, layout_goldnpkr )
 GAME(  1993, sloco93,  0,        witchcrd, sloco93,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
@@ -4969,9 +5203,11 @@ GAMEL( 1989, brasil89a,brasil89, witchcrd, bsuerte,  0,        ROT0,   "<unknown
 GAME(  1993, brasil93, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 93",                               0 )				// no lamps
 GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
 GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
-
 GAMEL( 1983, silverga, 0,        goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
+GAME(  1987, caspoker, 0,        goldnpkr, caspoker, 0,        ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  GAME_IMPERFECT_COLORS )
+
 GAME(  198?, pokerdub, 0,        pottnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
 GAME(  198?, pokerduc, 0,        goldnpkr, goldnpkr, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
+
 
 
