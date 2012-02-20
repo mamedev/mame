@@ -963,7 +963,7 @@ static void parse_input_start_end(const parameters_t &params, UINT64 logical_siz
 		input_start = parse_number(*input_start_hunk_str) * hunkbytes;
 	if (input_start_frame_str != NULL)
 		input_start = parse_number(*input_start_frame_str) * framebytes;
-	if (input_start >= input_end)
+	if (input_start > input_end)
 		report_error(1, "Input start offset greater than input file size");
 
 	// process input length
@@ -1613,7 +1613,7 @@ static void do_create_hd(parameters_t &params)
 	// process input start/end (needs to know hunk_size)
 	UINT64 input_start;
 	UINT64 input_end;
-	parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
+	parse_input_start_end(params, input_file ? core_fsize(input_file) : 0, hunk_size, hunk_size, input_start, input_end);
 
 	// process compression
 	chd_codec_type compression[4];
