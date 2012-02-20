@@ -616,10 +616,11 @@ void validity_checker::validate_driver()
 void validity_checker::validate_roms()
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
-	for (const rom_source *source = rom_first_source(*m_current_config); source != NULL; source = rom_next_source(*source))
+	device_iterator deviter(m_current_config->root_device());
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 	{
 		// for non-root devices, track the current device
-		m_current_device = (source == &m_current_config->root_device()) ? NULL : source;
+		m_current_device = (device->owner() == NULL) ? NULL : device;
 
 		// scan the ROM entries for this device
 		const char *last_region_name = "???";
@@ -628,7 +629,7 @@ void validity_checker::validate_roms()
 		int items_since_region = 1;
 		int last_bios = 0;
 		int total_files = 0;
-		for (const rom_entry *romp = rom_first_region(*source); !ROMENTRY_ISEND(romp); romp++)
+		for (const rom_entry *romp = rom_first_region(*device); romp != NULL && !ROMENTRY_ISEND(romp); romp++)
 		{
 			// if this is a region, make sure it's valid, and record the length
 			if (ROMENTRY_ISREGION(romp))
@@ -654,7 +655,7 @@ void validity_checker::validate_roms()
 
 				// generate the full tag
 				astring fulltag;
-				rom_region_name(fulltag, m_current_driver, source, romp);
+				rom_region_name(fulltag, *device, romp);
 
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);

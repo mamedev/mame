@@ -165,53 +165,13 @@ int set_disk_handle(running_machine &machine, const char *region, const char *fu
 ***************************************************************************/
 
 /*-------------------------------------------------
-    rom_first_source - return pointer to first ROM
-    source
--------------------------------------------------*/
-
-const rom_source *rom_first_source(const machine_config &config)
-{
-	/* look through devices */
-	device_iterator iter(config.root_device());
-	for (const device_t *device = iter.first(); device != NULL; device = iter.next())
-		if (device->rom_region() != NULL)
-			return device;
-
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    rom_next_source - return pointer to next ROM
-    source
--------------------------------------------------*/
-
-const rom_source *rom_next_source(const rom_source &previous)
-{
-	/* look for further devices with ROM definitions */
-// fixme: this is awful
-	device_iterator iter(previous.mconfig().root_device());
-	const device_t *device;
-	for (device = iter.first(); device != NULL; device = iter.next())
-		if (device == &previous)
-			break;
-
-	for (device = iter.next(); device != NULL; device = iter.next())
-		if (device->rom_region() != NULL)
-			return device;
-
-	return NULL;
-}
-
-
-/*-------------------------------------------------
     rom_first_region - return pointer to first ROM
     region
 -------------------------------------------------*/
 
-const rom_entry *rom_first_region(const rom_source &source)
+const rom_entry *rom_first_region(const device_t &device)
 {
-	const rom_entry *romp = source.rom_region();
+	const rom_entry *romp = device.rom_region();
 	return (romp != NULL && !ROMENTRY_ISEND(romp)) ? romp : NULL;
 }
 
@@ -263,9 +223,9 @@ const rom_entry *rom_next_file(const rom_entry *romp)
     for a rom region
 -------------------------------------------------*/
 
-astring &rom_region_name(astring &result, const game_driver *drv, const rom_source *source, const rom_entry *romp)
+astring &rom_region_name(astring &result, const device_t &device, const rom_entry *romp)
 {
-	return source->subtag(result, ROM_GETNAME(romp));
+	return device.subtag(result, ROM_GETNAME(romp));
 }
 
 
@@ -333,46 +293,45 @@ static void determine_bios_rom(rom_load_data *romdata)
 
 	romdata->system_bios = 0;
 
-	for (const rom_source *source = rom_first_source(romdata->machine().config()); source != NULL; source = rom_next_source(*source))
-	{
-		/* first determine the default BIOS name */
-		for (rom = source->rom_region(); !ROMENTRY_ISEND(rom); rom++)
-			if (ROMENTRY_ISDEFAULT_BIOS(rom))
-				defaultname = ROM_GETNAME(rom);
+	device_t &rootdevice = romdata->machine().config().root_device();
 
-		/* look for a BIOS with a matching name */
-		for (rom = source->rom_region(); !ROMENTRY_ISEND(rom); rom++)
-			if (ROMENTRY_ISSYSTEM_BIOS(rom))
-			{
-				const char *biosname = ROM_GETNAME(rom);
-				int bios_flags = ROM_GETBIOSFLAGS(rom);
-				char bios_number[20];
+	/* first determine the default BIOS name */
+	for (rom = rootdevice.rom_region(); !ROMENTRY_ISEND(rom); rom++)
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			defaultname = ROM_GETNAME(rom);
 
-				/* Allow '-bios n' to still be used */
-				sprintf(bios_number, "%d", bios_flags - 1);
-				if (mame_stricmp(bios_number, specbios) == 0 || mame_stricmp(biosname, specbios) == 0)
-					romdata->system_bios = bios_flags;
-				if (defaultname != NULL && mame_stricmp(biosname, defaultname) == 0)
-					default_no = bios_flags;
-				bios_count++;
-			}
-
-		/* if none found, use the default */
-		if (romdata->system_bios == 0 && bios_count > 0)
+	/* look for a BIOS with a matching name */
+	for (rom = rootdevice.rom_region(); !ROMENTRY_ISEND(rom); rom++)
+		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{
-			/* if we got neither an empty string nor 'default' then warn the user */
-			if (specbios[0] != 0 && strcmp(specbios, "default") != 0 && romdata != NULL)
-			{
-				romdata->errorstring.catprintf("%s: invalid bios\n", specbios);
-				romdata->warnings++;
-			}
+			const char *biosname = ROM_GETNAME(rom);
+			int bios_flags = ROM_GETBIOSFLAGS(rom);
+			char bios_number[20];
 
-			/* set to default */
-			romdata->system_bios = default_no;
+			/* Allow '-bios n' to still be used */
+			sprintf(bios_number, "%d", bios_flags - 1);
+			if (mame_stricmp(bios_number, specbios) == 0 || mame_stricmp(biosname, specbios) == 0)
+				romdata->system_bios = bios_flags;
+			if (defaultname != NULL && mame_stricmp(biosname, defaultname) == 0)
+				default_no = bios_flags;
+			bios_count++;
 		}
-		romdata->default_bios = default_no;
-		LOG(("Using System BIOS: %d\n", romdata->system_bios));
+
+	/* if none found, use the default */
+	if (romdata->system_bios == 0 && bios_count > 0)
+	{
+		/* if we got neither an empty string nor 'default' then warn the user */
+		if (specbios[0] != 0 && strcmp(specbios, "default") != 0 && romdata != NULL)
+		{
+			romdata->errorstring.catprintf("%s: invalid bios\n", specbios);
+			romdata->warnings++;
+		}
+
+		/* set to default */
+		romdata->system_bios = default_no;
 	}
+	romdata->default_bios = default_no;
+	LOG(("Using System BIOS: %d\n", romdata->system_bios));
 }
 
 
@@ -384,15 +343,15 @@ static void determine_bios_rom(rom_load_data *romdata)
 static void count_roms(rom_load_data *romdata)
 {
 	const rom_entry *region, *rom;
-	const rom_source *source;
 
 	/* start with 0 */
 	romdata->romstotal = 0;
 	romdata->romstotalsize = 0;
 
 	/* loop over regions, then over files */
-	for (source = rom_first_source(romdata->machine().config()); source != NULL; source = rom_next_source(*source))
-		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
+	device_iterator deviter(romdata->machine().config().root_device());
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+		for (region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 				if (ROM_GETBIOSFLAGS(rom) == 0 || ROM_GETBIOSFLAGS(rom) == romdata->system_bios)
 				{
@@ -1003,7 +962,6 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 {
 	emu_file image_file(options.media_path(), OPEN_FLAG_READ);
 	const rom_entry *region, *rom;
-	const rom_source *source;
 	file_error filerr;
 	chd_error err;
 
@@ -1107,8 +1065,9 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 	for (int drv = driver_list::find(*gamedrv); drv != -1; drv = driver_list::clone(drv))
 	{
 		machine_config config(driver_list::driver(drv), options);
-		for (source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
-			for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
+		device_iterator deviter(config.root_device());
+		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+			for (region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 				if (ROMREGION_ISDISKDATA(region))
 					for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 
@@ -1430,16 +1389,15 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 static void process_region_list(rom_load_data *romdata)
 {
 	astring regiontag;
-	const rom_source *source;
-	const rom_entry *region;
 
 	/* loop until we hit the end */
-	for (source = rom_first_source(romdata->machine().config()); source != NULL; source = rom_next_source(*source))
-		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
+	device_iterator deviter(romdata->machine().root_device());
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+		for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 		{
 			UINT32 regionlength = ROMREGION_GETLENGTH(region);
 
-			rom_region_name(regiontag, &romdata->machine().system(), source, region);
+			rom_region_name(regiontag, *device, region);
 			LOG(("Processing region \"%s\" (length=%X)\n", regiontag.cstr(), regionlength));
 
 			/* the first entry must be a region */
@@ -1472,16 +1430,17 @@ static void process_region_list(rom_load_data *romdata)
 #endif
 
 				/* now process the entries in the region */
-				process_rom_entries(romdata, (source->shortname()!=NULL) ? source->shortname() : NULL, region, region + 1);
+				process_rom_entries(romdata, device->shortname(), region, region + 1);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 				process_disk_entries(romdata, regiontag, region, region + 1, NULL);
 		}
 
 	/* now go back and post-process all the regions */
-	for (source = rom_first_source(romdata->machine().config()); source != NULL; source = rom_next_source(*source))
-		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region)) {
-			rom_region_name(regiontag, &romdata->machine().system(), source, region);
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+		for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
+		{
+			rom_region_name(regiontag, *device, region);
 			region_post_process(romdata, regiontag, ROMREGION_ISINVERTED(region));
 		}
 }

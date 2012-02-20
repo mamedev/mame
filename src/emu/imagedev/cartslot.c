@@ -171,13 +171,12 @@ int cartslot_image_device::load_cartridge(const rom_entry *romrgn, const rom_ent
 
 int cartslot_image_device::process_cartridge(bool load)
 {
-	const rom_source *source;
 	const rom_entry *romrgn, *roment;
 	int result = 0;
 
-	for (source = rom_first_source(device().machine().config()); source != NULL; source = rom_next_source(*source))
-	{
-		for (romrgn = rom_first_region(*source); romrgn != NULL; romrgn = rom_next_region(romrgn))
+	device_iterator deviter(device().mconfig().root_device());
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+		for (romrgn = rom_first_region(*device); romrgn != NULL; romrgn = rom_next_region(romrgn))
 		{
 			roment = romrgn + 1;
 			while(!ROMENTRY_ISREGIONEND(roment))
@@ -185,9 +184,9 @@ int cartslot_image_device::process_cartridge(bool load)
 				if (ROMENTRY_GETTYPE(roment) == ROMENTRYTYPE_CARTRIDGE)
 				{
 					astring regiontag;
-					device().siblingtag(regiontag, roment->_hashdata);
+					this->device().siblingtag(regiontag, roment->_hashdata);
 
-					if (strcmp(regiontag.cstr(),device().tag())==0)
+					if (strcmp(regiontag.cstr(),this->device().tag())==0)
 					{
 						result |= load_cartridge(romrgn, roment, load);
 
@@ -199,7 +198,6 @@ int cartslot_image_device::process_cartridge(bool load)
 				roment++;
 			}
 		}
-	}
 
 	return IMAGE_INIT_PASS;
 }

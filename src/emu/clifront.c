@@ -463,18 +463,18 @@ void cli_frontend::listcrc(const char *gamename)
 
 	// iterate through matches, and then through ROMs
 	while (drivlist.next())
-		for (const rom_source *source = rom_first_source(drivlist.config()); source != NULL; source = rom_next_source(*source))
-		{
-			bool isdriver = (source == rom_first_source(drivlist.config()));
-			for (const rom_entry *region = rom_first_region(*source); region; region = rom_next_region(region))
+	{
+		device_iterator deviter(drivlist.config().root_device());
+		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+			for (const rom_entry *region = rom_first_region(*device); region; region = rom_next_region(region))
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					// if we have a CRC, display it
 					UINT32 crc;
 					if (hash_collection(ROM_GETHASHDATA(rom)).crc(crc))
-						mame_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), source->shortname(), isdriver ? drivlist.driver().description : source->name());
+						mame_printf_info("%08x %-16s \t %-8s \t %s\n", crc, ROM_GETNAME(rom), device->shortname(), device->name());
 				}
-		}
+	}
 }
 
 
@@ -503,8 +503,9 @@ void cli_frontend::listroms(const char *gamename)
 				"Name                    Size Checksum\n", drivlist.driver().name);
 
 		// iterate through roms
-		for (const rom_source *source = rom_first_source(drivlist.config()); source != NULL; source = rom_next_source(*source))
-			for (const rom_entry *region = rom_first_region(*source); region; region = rom_next_region(region))
+		device_iterator deviter(drivlist.config().root_device());
+		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+			for (const rom_entry *region = rom_first_region(*device); region; region = rom_next_region(region))
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					// accumulate the total length of all chunks
@@ -1649,9 +1650,10 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 	m_drivlist.reset();
 	while (m_drivlist.next())
 	{
-		// iterate over sources, regions and files within the region */
-		for (const rom_source *source = rom_first_source(m_drivlist.config()); source != NULL; source = rom_next_source(*source))
-			for (const rom_entry *region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
+		// iterate over devices, regions and files within the region */
+		device_iterator deviter(m_drivlist.config().root_device());
+		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+			for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 				for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 				{
 					hash_collection romhashes(ROM_GETHASHDATA(rom));

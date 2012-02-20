@@ -301,11 +301,12 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 					device().siblingtag(entry_region, entry->m_region);
 
 					// look for the region
-					for (const rom_source *source = rom_first_source(device().mconfig()); source != NULL && !found; source = rom_next_source(*source))
-						for (const rom_entry *romp = rom_first_region(*source); romp != NULL && !found; romp = rom_next_region(romp))
+					device_iterator deviter(device().mconfig().root_device());
+					for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+						for (const rom_entry *romp = rom_first_region(*device); romp != NULL && !found; romp = rom_next_region(romp))
 						{
 							astring fulltag;
-							rom_region_name(fulltag, &device().mconfig().gamedrv(), source, romp);
+							rom_region_name(fulltag, *device, romp);
 							if (fulltag == entry_region)
 							{
 								// verify the address range is within the region's bounds

@@ -114,7 +114,7 @@ public:
 	UINT64 actual_length() const { return m_length; }
 	const hash_collection &expected_hashes() const { return m_exphashes; }
 	const hash_collection &actual_hashes() const { return m_hashes; }
-	const rom_source *shared_source() const { return m_shared_source; }
+	device_t *shared_device() const { return m_shared_device; }
 
 	// setters
 	void set_status(audit_status status, audit_substatus substatus)
@@ -129,9 +129,9 @@ public:
 		m_length = length;
 	}
 
-	void set_shared_source(const rom_source *shared_source)
+	void set_shared_device(device_t *shared_device)
 	{
-		m_shared_source = shared_source;
+		m_shared_device = shared_device;
 	}
 
 private:
@@ -145,7 +145,7 @@ private:
 	UINT64				m_length;				/* actual length of item */
 	hash_collection		m_exphashes;    		/* expected hash data */
 	hash_collection		m_hashes;				/* actual hash information */
-	const rom_source *	m_shared_source;		/* rom_source that shares the rom */
+	device_t *			m_shared_device;		/* device that shares the rom */
 };
 
 
@@ -183,7 +183,7 @@ private:
 	audit_record *audit_one_rom(const rom_entry *rom);
 	audit_record *audit_one_disk(const rom_entry *rom);
 	void compute_status(audit_record &record, const rom_entry *rom, bool found);
-	const rom_source *find_shared_source(const rom_source *source, const hash_collection &romhashes, UINT64 romlength);
+	device_t *find_shared_device(device_t &device, const hash_collection &romhashes, UINT64 romlength);
 
 	// internal state
 	simple_list<audit_record>	m_record_list;

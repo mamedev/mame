@@ -123,8 +123,6 @@ class machine_config;
 class emu_options;
 class chd_file;
 
-typedef device_t rom_source;
-
 
 struct rom_entry
 {
@@ -284,14 +282,8 @@ file_error common_process_file(emu_options &options, const char *location, bool 
 
 /* ----- ROM iteration ----- */
 
-/* return pointer to first ROM source */
-const rom_source *rom_first_source(const machine_config &config);
-
-/* return pointer to next ROM source */
-const rom_source *rom_next_source(const rom_source &previous);
-
 /* return pointer to the first ROM region within a source */
-const rom_entry *rom_first_region(const rom_source &romp);
+const rom_entry *rom_first_region(const device_t &romp);
 
 /* return pointer to the next ROM region within a source */
 const rom_entry *rom_next_region(const rom_entry *romp);
@@ -302,14 +294,11 @@ const rom_entry *rom_first_file(const rom_entry *romp);
 /* return pointer to the next ROM file within a region */
 const rom_entry *rom_next_file(const rom_entry *romp);
 
-/* return TRUE if the given rom_source refers to the game driver itself */
-int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source);
-
 /* return the expected size of a file given the ROM description */
 UINT32 rom_file_size(const rom_entry *romp);
 
 /* return the appropriate name for a rom region */
-astring &rom_region_name(astring &result, const game_driver *drv, const rom_source *source, const rom_entry *romp);
+astring &rom_region_name(astring &result, const device_t &device, const rom_entry *romp);
 
 
 
