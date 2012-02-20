@@ -431,12 +431,15 @@ public:
 				}
 
 				// assemble the data into final form
-				avhuff_error averr = avhuff_encoder::assemble_data(m_rawdata, m_rawdata.count(), subbitmap, channels, samples, samplesptr);
+				avhuff_error averr = avhuff_encoder::assemble_data(m_rawdata, subbitmap, channels, samples, samplesptr);
 				if (averr != AVHERR_NONE)
 					report_error(1, "Error assembling data for frame %d", framenum);
-				UINT32 rawsize = avhuff_encoder::raw_data_size(m_rawdata);
-				if (rawsize < m_rawdata.count())
-					memset(&m_rawdata[rawsize], 0, m_rawdata.count() - rawsize);
+				if (m_rawdata.count() < m_info.bytes_per_frame)
+				{
+					UINT32 delta = m_info.bytes_per_frame - m_rawdata.count();
+					m_rawdata.resize(m_info.bytes_per_frame, true);
+					memset(&m_rawdata[m_info.bytes_per_frame - delta], 0, delta);
+				}
 
 				// copy to the destination
 				UINT64 start_offset = UINT64(framenum) * UINT64(m_info.bytes_per_frame);

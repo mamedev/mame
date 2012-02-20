@@ -318,7 +318,7 @@ UINT32 avhuff_encoder::raw_data_size(const UINT8 *data)
 //  bits
 //-------------------------------------------------
 
-avhuff_error avhuff_encoder::assemble_data(UINT8 *dest, UINT32 dlength, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata, UINT32 metadatasize)
+avhuff_error avhuff_encoder::assemble_data(dynamic_buffer &buffer, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata, UINT32 metadatasize)
 {
 	// sanity check the inputs
 	if (metadatasize > 255)
@@ -327,10 +327,10 @@ avhuff_error avhuff_encoder::assemble_data(UINT8 *dest, UINT32 dlength, bitmap_y
 		return AVHERR_AUDIO_TOO_LARGE;
 	if (bitmap.width() > 65535 || bitmap.height() > 65535)
 		return AVHERR_VIDEO_TOO_LARGE;
-	if (dlength < 12 + metadatasize + numsamples * channels * 2 + bitmap.width() * bitmap.height() * 2)
-		return AVHERR_BUFFER_TOO_SMALL;
 
 	// fill in the header
+	buffer.resize(12 + metadatasize + numsamples * channels * 2 + bitmap.width() * bitmap.height() * 2);
+	UINT8 *dest = buffer;
 	*dest++ = 'c';
 	*dest++ = 'h';
 	*dest++ = 'a';
