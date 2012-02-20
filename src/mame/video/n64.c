@@ -2110,6 +2110,19 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 
 	int xfrac = ((xright >> 8) & 0xff);
 
+	int clipy1 = Scissor.m_yh;
+	int clipy2 = Scissor.m_yl;
+
+	// Trivial reject
+	if((ycur >> 2) >= clipy2 && (ylfar >> 2) >= clipy2)
+	{
+		return;
+	}
+	if((ycur >> 2) < clipy1 && (ylfar >> 2) < clipy1)
+	{
+		return;
+	}
+
 	bool new_object = true;
 	rdp_poly_state *object = NULL;
 
