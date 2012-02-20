@@ -542,7 +542,7 @@ WRITE8_HANDLER( williams_blitter_w )
 
 	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
 	/* this is just a guess */
-	estimated_clocks_at_4MHz = 20 + 2 * accesses;
+	estimated_clocks_at_4MHz = 20 + ((data & 4) ? 4 : 2) * accesses;
 	device_adjust_icount(&space->device(), -((estimated_clocks_at_4MHz + 3) / 4));
 
 	/* Log blits */
