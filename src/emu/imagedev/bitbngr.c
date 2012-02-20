@@ -154,7 +154,7 @@ float bitbanger_device::tune_value(void)
 UINT32 bitbanger_device::baud_value(void)
 {
 	static const float bauds[] = { 150.0f, 300.0f, 600.0f, 1200.0f, 2400.0f, 4800.0f, 9600.0f,
-            14400.0f, 28800.0f, 38400.0f, 57600.0f, 115200.0f};
+            14400.0f, 19200.0f, 28800.0f, 38400.0f, 57600.0f, 115200.0f};
 	float result = tune_value() * bauds[m_baud];
 	return (UINT32)result;
 }
@@ -167,7 +167,7 @@ UINT32 bitbanger_device::baud_value(void)
 const char *bitbanger_device::baud_string(void)
 {
 	static const char *const bauds[] = { "150", "300", "600", "1200", "2400", "4800",
-                     "9600", "14400", "28800", "38400", "57600", "115200"};
+                     "9600", "14400", "19200", "28800", "38400", "57600", "115200"};
 
 	return(bauds[m_baud]);
 }

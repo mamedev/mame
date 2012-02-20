@@ -169,11 +169,13 @@ void ins8250_uart_device::update_clock()
 	int baud;
 	if(m_regs.dl == 0)
 	{
-		m_timer->adjust(attotime::never);
+		set_tra_rate(0);
+		set_rcv_rate(0);
 		return;
 	}
 	baud = clock()/(m_regs.dl*16);
-	m_timer->adjust(attotime::zero, 0, attotime::from_hz(baud));
+	set_tra_rate(baud);
+	set_rcv_rate(baud);
 }
 
 WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
@@ -191,13 +193,17 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			else
 			{
 				m_regs.thr = data;
-				m_regs.lsr &= ~0x60;
+				m_regs.lsr &= ~0x20;
 				if ( m_regs.mcr & 0x10 )
 				{
+					m_regs.lsr &= ~0x40;
 					m_regs.lsr |= 1;
 					m_regs.rbr = data;
 					trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 				}
+				else
+					if(m_regs.lsr & 0x40)
+						tra_complete();
 			}
 			break;
 		case 1:
@@ -356,13 +362,48 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
     return data;
 }
 
+void ins8250_uart_device::rcv_complete()
+{
+	if(m_regs.lsr & 0x01)
+	{
+		m_regs.lsr |= 0x02; //overrun
+		trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
+		receive_register_reset();
+	}
+	else
+	{
+		m_regs.lsr |= 0x01;
+		receive_register_extract();
+		m_regs.rbr = get_received_char();
+		trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+	}
+}
+
+void ins8250_uart_device::tra_complete()
+{
+	if(!(m_regs.lsr & 0x20))
+	{
+		transmit_register_setup(m_regs.thr);
+		m_regs.lsr &= ~0x40;
+		m_regs.lsr |= 0x20;
+		trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+	}
+	else
+		m_regs.lsr |= 0x40;
+}
+
+void ins8250_uart_device::tra_callback()
+{
+	m_out_tx_func(transmit_register_get_data_bit());
+}	
+
 void ins8250_uart_device::update_msr(int bit, UINT8 state)
 {
 	UINT8 mask = (1<<bit);
 	if((m_regs.msr & mask) == (state<<bit))
 		return;
-	m_regs.msr = (m_regs.msr & ~mask) | (mask & (state<<bit));
-	m_regs.msr = (m_regs.msr & ~(mask << 4)) | (1<<(bit+4));
+	m_regs.msr |= mask;
+	m_regs.msr = (m_regs.msr & ~(mask << 4)) | (state<<(bit+4));
 	trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 }
 
@@ -386,42 +427,6 @@ WRITE_LINE_MEMBER(ins8250_uart_device::cts_w)
 	update_msr(0, (state&&1));
 }
 
-void ins8250_uart_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	receive_register_update_bit(m_rx_line);
-	if(is_receive_register_full())
-	{
-		if(m_regs.lsr & 0x01)
-		{
-			m_regs.lsr |= 0x02; //overrun
-			trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
-		}
-		else
-		{
-			m_regs.lsr |= 0x01;
-			receive_register_extract();
-			m_regs.rbr = get_received_char();
-			trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
-		}
-		receive_register_reset();
-	}
-
-	if(is_transmit_register_empty())
-	{
-		if(!(m_regs.lsr & 0x20))
-		{
-			transmit_register_setup(m_regs.thr);
-			m_regs.lsr &= ~0x40;
-			m_regs.lsr |= 0x20;
-			trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
-		}
-		else
-			m_regs.lsr |= 0x40;
-	}
-	else
-		m_out_tx_func(transmit_register_get_data_bit());
-}
-
 void ins8250_uart_device::device_start()
 {
 	m_out_tx_func.resolve(m_out_tx_cb, *this);
@@ -431,7 +436,6 @@ void ins8250_uart_device::device_start()
 	m_out_out1_func.resolve(m_out_out1_cb, *this);
 	m_out_out2_func.resolve(m_out_out2_cb, *this);
 
-	m_timer = timer_alloc();
 }
 
 void ins8250_uart_device::device_reset()
@@ -443,14 +447,13 @@ void ins8250_uart_device::device_reset()
 	m_regs.mcr = 0;
 	m_regs.lsr = (1<<5) | (1<<6);
 	m_int_pending = 0;
-	m_rx_line = 0;
-	m_timer->adjust(attotime::never);
 	receive_register_reset();
 	transmit_register_reset();
 	m_out_rts_func(0);
 	m_out_dtr_func(0);
 	m_out_out1_func(0);
 	m_out_out2_func(0);
+	m_out_tx_func(1);
 }
 
 void ins8250_uart_device::device_config_complete()

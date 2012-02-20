@@ -80,18 +80,19 @@ class microtouch_serial_device
 public:
 	microtouch_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE_LINE_MEMBER(rx) {m_rx_line = state;}
+	DECLARE_WRITE_LINE_MEMBER(rx) { check_for_start(state); }
 protected:
 	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
-	virtual void tx(UINT8 data) {m_output = data; m_output_valid = true;}
+	virtual void tx(UINT8 data);
 	virtual void input_callback(UINT8 state) { m_input_state = state; }
+	virtual void tra_callback();
+	virtual void tra_complete();
+	virtual void rcv_complete();
 private:
 	int m_count;
 	bool m_output_valid;
 	UINT8 m_output;
-	UINT8 m_rx_line;
 	devcb_resolved_write_line m_out_stx_func;
 };
 

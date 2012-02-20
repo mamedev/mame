@@ -476,14 +476,16 @@ WRITE8_MEMBER( mc146818_device::write )
 		case 0x0a:
 			// fixme: allow different time base
 			data &= 0x0f;
-			if (m_data[0x0b] & 0x40) {
-				if (data > 2)
-					m_period = attotime::from_hz(32768 >> (data - 1));
-				else if (data > 0)
-					m_period = attotime::from_hz(32768 >> (data + 6));
-				else m_period = attotime::never;
-				rate = attotime::zero;
-			} else rate = attotime::never;
+			if (data > 2)
+				m_period = attotime::from_hz(32768 >> (data - 1));
+			else if (data > 0)
+				m_period = attotime::from_hz(32768 >> (data + 6));
+			else m_period = attotime::never;
+
+			if(m_data[0x0b] & 0x40)
+				 rate = attotime::zero;
+			else rate = attotime::never;
+
 			m_periodic_timer->adjust(rate, 0, m_period);
 			data |= m_data[m_index % MC146818_DATA_SIZE] & 0xf0;
 			m_data[m_index % MC146818_DATA_SIZE] = data;

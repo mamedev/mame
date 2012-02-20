@@ -308,8 +308,9 @@ void microtouch_serial_device::device_config_complete()
 void microtouch_serial_device::device_start()
 {
 	microtouch_device::device_start();
-	m_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 	set_data_frame(8, 1, SERIAL_PARITY_NONE); //8N1?
+	set_tra_rate(clock());
+	set_rcv_rate(clock());
 	m_out_stx_func.resolve(m_out_stx_cb, *this);
 	m_count = 0;
 	m_output_valid = false;
@@ -317,32 +318,32 @@ void microtouch_serial_device::device_start()
 	save_item(NAME(m_count));
 	save_item(NAME(m_output_valid));
 	save_item(NAME(m_output));
-	save_item(NAME(m_rx_line));
 }
 
-void microtouch_serial_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void microtouch_serial_device::tx(UINT8 data)
 {
+	m_output = data;
+	m_output_valid = true;
 	if(is_transmit_register_empty())
+		tra_complete();
+}
+
+void microtouch_serial_device::tra_callback()
+{
+	m_out_stx_func(transmit_register_get_data_bit());
+}
+
+void microtouch_serial_device::tra_complete()
+{
+	if(m_output_valid)
 	{
-		if(m_output_valid)
-		{
-			transmit_register_setup(m_output);
-			m_output_valid = false;
-		}
+		transmit_register_setup(m_output);
+		m_output_valid = false;
 	}
-	else
-		m_out_stx_func(transmit_register_get_data_bit());
+}
 
-	receive_register_update_bit(m_rx_line);
-	if(is_receive_register_full())
-	{
-		receive_register_extract();
-		microtouch_device::rx(*memory_nonspecific_space(machine()), 0, get_received_char());
-		receive_register_reset();
-	}
-
-	if((m_count == 0) && (m_output_valid == false))
-		microtouch_device::device_timer(timer, id, param, ptr);
-
-	++m_count %= 8;
+void microtouch_serial_device::rcv_complete()
+{
+	receive_register_extract();
+	microtouch_device::rx(*memory_nonspecific_space(machine()), 0, get_received_char());
 }

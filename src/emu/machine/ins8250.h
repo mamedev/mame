@@ -34,13 +34,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dsr_w );
 	DECLARE_WRITE_LINE_MEMBER( ri_w );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx_line = state; }
+	DECLARE_WRITE_LINE_MEMBER( rx_w ) { check_for_start(state); }
 	void input_callback(UINT8 state) { m_input_state = state; }
 
 protected:
 	virtual void device_start();
 	virtual void device_config_complete();
 	virtual void device_reset();
+	virtual void rcv_complete();
+	virtual void tra_complete();
+	virtual void tra_callback();
+
 	enum {
 			TYPE_INS8250 = 0,
 			TYPE_INS8250A,
@@ -64,7 +68,6 @@ private:
 		UINT8 scr;  /* 7 RW scratch register */
 	} m_regs;
 	UINT8 m_int_pending;
-	UINT8 m_rx_line;
 
 	devcb_resolved_write_line	m_out_tx_func;
 	devcb_resolved_write_line	m_out_dtr_func;
@@ -77,10 +80,7 @@ private:
 	void update_clock();
 	void trigger_int(int flag);
 	void clear_int(int flag);
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	void update_msr(int bit, UINT8 state);
-
-	emu_timer *m_timer;
 };
 
 class ins8250_device : public ins8250_uart_device

@@ -37,12 +37,53 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 
 		m_serial_parity_table[i] = sum & 0x01;
 	}
+	m_rcv_clock = NULL;
+	m_tra_clock = NULL;
 }
 
 device_serial_interface::~device_serial_interface()
 {
 }
 
+void device_serial_interface::set_rcv_rate(int baud)
+{
+	if(!m_rcv_clock)
+		m_rcv_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::rcv_timer), this));
+
+	m_rcv_baud = baud;
+	receive_register_reset();
+	m_rcv_clock->adjust(attotime::never);
+}
+
+void device_serial_interface::set_tra_rate(int baud)
+{
+	if(!m_tra_clock)
+		m_tra_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::tra_timer), this));
+
+	m_tra_baud = baud;
+	transmit_register_reset();
+	m_tra_clock->adjust(attotime::never);
+}
+
+void device_serial_interface::tra_timer(void *ptr, int param)
+{
+	tra_callback();
+	if(is_transmit_register_empty())
+	{
+		m_tra_clock->adjust(attotime::never);
+		tra_complete();
+	}
+}
+
+void device_serial_interface::rcv_timer(void *ptr, int param)
+{
+	rcv_callback();
+	if(is_receive_register_full())
+	{
+		m_rcv_clock->adjust(attotime::never);
+		rcv_complete();
+	}
+}
 
 void device_serial_interface::set_data_frame(int num_data_bits, int stop_bit_count, int parity_code)
 {
@@ -64,6 +105,22 @@ void device_serial_interface::receive_register_reset()
 	m_rcv_flags &=~RECEIVE_REGISTER_FULL;
 	m_rcv_flags &=~RECEIVE_REGISTER_SYNCHRONISED;
 	m_rcv_flags |= RECEIVE_REGISTER_WAITING_FOR_START_BIT;
+}
+
+UINT8 device_serial_interface::check_for_start(UINT8 bit)
+{
+	m_rcv_line = bit;
+	if(m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
+		return 0;
+	receive_register_update_bit(bit);
+	if(m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
+	{
+		if(m_rcv_clock && m_rcv_baud)
+			// make start delay just a bit longer to make sure we are called after the sender
+			m_rcv_clock->adjust(attotime::from_hz((m_rcv_baud*2)/3), 0, attotime::from_hz(m_rcv_baud));
+		return 1;
+	}
+	return 0;
 }
 
 /* this is generic code to be used in serial chip implementations */
@@ -201,6 +258,8 @@ void device_serial_interface::transmit_register_setup(UINT8 data_byte)
 	int i;
 	unsigned char transmit_data;
 
+	if(m_tra_clock && m_tra_baud)
+		m_tra_clock->adjust(attotime::from_hz(m_tra_baud), 0, attotime::from_hz(m_tra_baud));
 
 	m_tra_bit_count_transmitted = 0;
 	m_tra_bit_count = 0;

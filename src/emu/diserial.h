@@ -75,7 +75,6 @@ enum
 /* TX = Transmit data. (OUTPUT) */
 #define SERIAL_STATE_TX_DATA	0x00020
 
-
 // ======================> device_serial_interface
 class device_serial_interface : public device_interface
 {
@@ -92,6 +91,8 @@ public:
 	void receive_register_update_bit(int bit);
 	void receive_register_extract();
 
+	void set_rcv_rate(int baud);
+	void set_tra_rate(int baud);
 
 	void transmit_register_reset();
 	void transmit_register_add_bit(int bit);
@@ -114,10 +115,18 @@ public:
 	void set_other_connection(device_serial_interface *other_connection);
 
 	void connect(device_serial_interface *other_connection);
+	UINT8 check_for_start(UINT8 bit);
 protected:
 	UINT8 m_input_state;
 	UINT8 m_connection_state;
+	virtual void tra_callback() { }
+	virtual void rcv_callback() { receive_register_update_bit(m_rcv_line); }
+	virtual void tra_complete() { }
+	virtual void rcv_complete() { }
 private:
+	void tra_timer(void *ptr, int param);
+	void rcv_timer(void *ptr, int param);
+
 	UINT8 m_serial_parity_table[256];
 
 	// Data frame
@@ -149,6 +158,12 @@ private:
 	UINT8 m_tra_bit_count_transmitted;
 	/* length of data to send */
 	UINT8 m_tra_bit_count;
+
+	emu_timer *m_rcv_clock;
+	emu_timer *m_tra_clock;
+	int m_rcv_baud;
+	int m_tra_baud;
+	UINT8 m_rcv_line;
 
 	device_serial_interface *m_other_connection;
 };
