@@ -1140,6 +1140,8 @@ endif
 $(CPUOBJ)/m68000/m68kcpu.o: 	$(CPUOBJ)/m68000/m68kops.c \
 								$(CPUSRC)/m68000/m68kcpu.h $(CPUSRC)/m68000/m68kfpu.c $(CPUSRC)/m68000/m68kmmu.h
 
+# m68kcpu.h now includes m68kops.h; m68kops.h won't exist until m68kops.c has been made
+$(CPUSRC)/m68000/m68kcpu.h: $(CPUOBJ)/m68000/m68kops.c
 
 
 #-------------------------------------------------

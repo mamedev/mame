@@ -5,7 +5,7 @@
 #if 0
 static const char copyright_notice[] =
 "MUSASHI\n"
-"Version 4.90 (2011-09-22)\n"
+"Version 4.95 (2012-02-19)\n"
 "A portable Motorola M68xxx/CPU32/ColdFire processor emulation engine.\n"
 "Copyright Karl Stenerud.  All rights reserved.\n"
 "\n"
@@ -17,7 +17,7 @@ static const char copyright_notice[] =
 "(Karl Stenerud).\n"
 "\n"
 "The latest version of this code can be obtained at:\n"
-"http://kstenerud.cjb.net or http://mamedev.org\n"
+"http://kstenerud.cjb.net or http://mamedev.org/\n"
 ;
 #endif
 
@@ -1242,9 +1242,9 @@ static CPU_GET_INFO( m68k )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							/* set per-core */						break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.90");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.95");				break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB+HO)"); break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB+HO+OG)"); break;
 	}
 }
 
@@ -1263,6 +1263,13 @@ void m68k_set_hmmu_enable(device_t *device, int enable)
 	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	m68k->hmmu_enabled = enable;
+}
+
+void m68k_set_instruction_hook(device_t *device, instruction_hook_t ihook)
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+    m68k->instruction_hook = ihook;
 }
 
 /****************************************************************************

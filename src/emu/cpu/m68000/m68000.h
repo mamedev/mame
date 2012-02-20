@@ -122,4 +122,9 @@ void m68k_set_rte_callback(device_t *device, m68k_rte_func callback);
 void m68k_set_tas_callback(device_t *device, m68k_tas_func callback);
 UINT16 m68k_get_fc(device_t *device);
 
+
+typedef int (*instruction_hook_t)(device_t *device, offs_t curpc);
+void m68k_set_instruction_hook(device_t *device, instruction_hook_t ihook);
+
+
 #endif /* __M68000_H__ */
