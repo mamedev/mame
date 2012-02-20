@@ -195,7 +195,6 @@ int harddisk_image_device::internal_load_hd()
 		{
 			is_writeable = !is_readonly();
 			err = m_self_chd.open(*image_core_file(), is_writeable);
-			printf("%d\n",err);
 			if (err == CHDERR_NONE)
 				m_chd = &m_self_chd;
 
@@ -224,9 +223,7 @@ done:
 				m_self_chd.close();
 			m_chd = NULL;
 		}
-		printf("%d\n",err);
 		seterror(IMAGE_ERROR_UNSPECIFIED, chd_file::error_string(err));
-		printf("%s\n",chd_file::error_string(err));
 	}
 	return err ? IMAGE_INIT_FAIL : IMAGE_INIT_PASS;
 }
