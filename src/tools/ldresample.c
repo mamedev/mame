@@ -491,8 +491,8 @@ printf("%5d: start=%10d (%5d.%03d) end=%10d (%5d.%03d)\n",
 	INT64 dststep = (dstend - dstbegin) / INT64(srcend - srcbegin);
 	for (UINT32 srcoffset = 0; srcoffset < srcend - srcbegin; srcoffset++)
 	{
-		m_info.lsound[srcoffset] = m_info.lsound[dstoffset + dstbeginoffset + (dstpos >> 24) - (dstbegin >> 24)];
-		m_info.rsound[srcoffset] = m_info.rsound[dstoffset + dstbeginoffset + (dstpos >> 24) - (dstbegin >> 24)];
+		m_info.lsound[srcoffset] = m_info.lsound[(int)(dstoffset + dstbeginoffset + (dstpos >> 24) - (dstbegin >> 24))];
+		m_info.rsound[srcoffset] = m_info.rsound[(int)(dstoffset + dstbeginoffset + (dstpos >> 24) - (dstbegin >> 24))];
 		dstpos += dststep;
 	}
 
