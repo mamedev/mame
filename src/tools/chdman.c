@@ -1759,7 +1759,7 @@ static void do_create_cd(parameters_t &params)
 	{
 		chd_error err = chdcd_parse_toc(*input_file_str, toc, track_info);
 		if (err != CHDERR_NONE)
-			report_error(1, "Error parsing input file (%s: %s\n", input_file_str->cstr(), chd_file::error_string(err));
+			report_error(1, "Error parsing input file (%s: %s)\n", input_file_str->cstr(), chd_file::error_string(err));
 	}
 
 	// process output CHD
