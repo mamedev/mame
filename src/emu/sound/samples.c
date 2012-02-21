@@ -455,7 +455,6 @@ bool samples_device::read_sample(emu_file &file, loaded_sample &sample)
 
 bool samples_device::read_wav_sample(emu_file &file, loaded_sample &sample)
 {
-printf("Reading %s as WAV\n", file.filename());
 	// we already read the opening 'WAVE' header
 	UINT32 offset = 4;
 
@@ -544,23 +543,24 @@ printf("Reading %s as WAV\n", file.filename());
 		return false;
 
 	// fill in the sample data
-	sample.length = length / 2;
 	sample.frequency = rate;
 
 	// read the data in
 	if (bits == 8)
 	{
+		sample.length = length;
 		sample.data.resize(length);
 		file.read(sample.data, length);
 
 		// convert 8-bit data to signed samples
 		UINT8 *tempptr = reinterpret_cast<UINT8 *>(&sample.data[0]);
-		for (UINT32 sindex = length - 1; sindex >= 0; sindex--)
+		for (INT32 sindex = length - 1; sindex >= 0; sindex--)
 			sample.data[sindex] = INT8(tempptr[sindex] ^ 0x80) * 256;
 	}
 	else
 	{
 		// 16-bit data is fine as-is
+		sample.length = length / 2;
 		sample.data.resize(length / 2);
 		file.read(sample.data, length);
 
@@ -579,7 +579,6 @@ printf("Reading %s as WAV\n", file.filename());
 
 bool samples_device::read_flac_sample(emu_file &file, loaded_sample &sample)
 {
-printf("Reading %s as FLAC\n", file.filename());
 	// seek back to the start of the file
 	file.seek(0, SEEK_SET);
 
@@ -628,7 +627,6 @@ void samples_device::load_samples()
 	int index = 0;
 	for (const char *samplename = iter.first(); samplename != NULL; index++, samplename = iter.next())
 	{
-printf("Sample %d = %s\n", index, samplename);
 		// attempt to open as FLAC first
 		emu_file file(machine().options().sample_path(), OPEN_FLAG_READ);
 		file_error filerr = file.open(basename, PATH_SEPARATOR, samplename, ".flac");
