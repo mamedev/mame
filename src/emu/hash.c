@@ -307,7 +307,7 @@ bool hash_collection::from_internal_string(const char *string)
 
 	// loop until we hit it
 	bool errors = false;
-	bool skip_digits = false;
+	int skip_digits = 0;
 	while (ptr < stringend)
 	{
 		char c = *ptr++;
@@ -316,10 +316,21 @@ bool hash_collection::from_internal_string(const char *string)
 		// non-hex alpha values specify a hash type
 		if (uc >= 'G' && uc <= 'Z')
 		{
+			if (skip_digits != 0)
+				errors = true;
+			skip_digits = 0;
 			if (uc == HASH_CRC)
-				skip_digits = m_has_crc32 = m_crc32.from_string(ptr, stringend - ptr);
+			{
+				m_has_crc32 = true;
+				errors = !m_crc32.from_string(ptr, stringend - ptr);
+				skip_digits = 2 * sizeof(crc32_t);
+			}
 			else if (uc == HASH_SHA1)
-				skip_digits = m_has_sha1 = m_sha1.from_string(ptr, stringend - ptr);
+			{
+				m_has_sha1 = true;
+				errors = !m_sha1.from_string(ptr, stringend - ptr);
+				skip_digits = 2 * sizeof(sha1_t);
+			}
 			else
 				errors = true;
 		}
@@ -327,11 +338,15 @@ bool hash_collection::from_internal_string(const char *string)
 		// hex values are ignored, though unexpected
 		else if ((uc >= '0' && uc <= '9') || (uc >= 'A' && uc <= 'F'))
 		{
-			if (!skip_digits)
+			if (skip_digits != 0)
+				skip_digits--;
+			else
 				errors = true;
 		}
 
 		// anything else is a flag
+		else if (skip_digits != 0)
+			errors = true;
 		else
 			m_flags.cat(c);
 	}
@@ -385,9 +400,6 @@ void hash_collection::buffer(const UINT8 *data, UINT32 length)
 void hash_collection::end()
 {
 	assert(m_creator != NULL);
-
-	// default to getting nothing
-	m_has_crc32 = m_has_sha1 = false;
 
 	// finish up the CRC32
 	if (m_creator->m_doing_crc32)

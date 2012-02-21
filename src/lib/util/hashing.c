@@ -85,6 +85,7 @@ inline int char_to_hex(char c)
 bool sha1_t::from_string(const char *string, int length)
 {
 	// must be at least long enough to hold everything
+	memset(m_raw, 0, sizeof(m_raw));
 	if (length == -1)
 		length = strlen(string);
 	if (length < 2 * sizeof(m_raw))
@@ -127,6 +128,7 @@ const char *sha1_t::as_string(astring &buffer) const
 bool md5_t::from_string(const char *string, int length)
 {
 	// must be at least long enough to hold everything
+	memset(m_raw, 0, sizeof(m_raw));
 	if (length == -1)
 		length = strlen(string);
 	if (length < 2 * sizeof(m_raw))
@@ -170,6 +172,7 @@ const char *md5_t::as_string(astring &buffer) const
 bool crc32_t::from_string(const char *string, int length)
 {
 	// must be at least long enough to hold everything
+	m_raw = 0;
 	if (length == -1)
 		length = strlen(string);
 	if (length < 2 * sizeof(m_raw))
@@ -221,6 +224,7 @@ void crc32_creator::append(const void *data, UINT32 length)
 bool crc16_t::from_string(const char *string, int length)
 {
 	// must be at least long enough to hold everything
+	m_raw = 0;
 	if (length == -1)
 		length = strlen(string);
 	if (length < 2 * sizeof(m_raw))
