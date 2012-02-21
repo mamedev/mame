@@ -391,8 +391,9 @@ void info_xml_creator::output_one()
 void info_xml_creator::output_device_roms()
 {
 	device_iterator deviter(m_drivlist.config().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-		if (device->owner() != NULL)
+	deviter.first();
+	for (device_t *device = deviter.next(); device != NULL; device = deviter.next())
+		if (device->rom_region() != NULL && device->shortname()!=NULL)
 		{
 			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname()));
 			for (int devnum = 0; devnum < m_device_count; devnum++)
