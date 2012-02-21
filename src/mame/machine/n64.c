@@ -1682,6 +1682,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 	switch (command)
 	{
 		case 0x00:		// Read status
+		case 0xff:		// Reset
 		{
 			switch (channel)
 			{
@@ -1705,10 +1706,10 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				{
 					//printf("Read EEPROM status\n");
 					rdata[0] = 0x00;
-					rdata[1] = 0xc0;
+					rdata[1] = 0x80;
 					rdata[2] = 0x00;
 
-					return 1;
+					return 0;
 				}
 				case 5:
 				{
@@ -1904,15 +1905,6 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			return 1;
 		}
 
-		case 0xff:		// reset
-		{
-			//printf("Reset\n");
-			rdata[0] = 0xff;
-			rdata[1] = 0xff;
-			rdata[2] = 0xff;
-			return 0;
-		}
-
 		default:
 		{
 			mame_printf_debug("handle_pif: unknown/unimplemented command %02X\n", command);
@@ -1925,8 +1917,8 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 void n64_periphs::handle_pif()
 {
-	//printf("Before:\n");
-	/*for(int i = 0; i < 0x40; i++)
+	/*printf("Before:\n");
+	for(int i = 0; i < 0x40; i++)
     {
         printf("%02x ", pif_cmd[i]);
         if((i & 0xf) == 0xf)
@@ -2001,7 +1993,7 @@ void n64_periphs::handle_pif()
 			}
 		}
 
-		pif_ram[0x3f] = 0;
+		//pif_ram[0x3f] = 0;
 	}
 
 	/*printf("After:\n");
