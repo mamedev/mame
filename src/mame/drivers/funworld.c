@@ -3461,8 +3461,8 @@ ROM_START( royalcrdd )
 	ROM_LOAD( "r2.bin", 0x8000, 0x8000, CRC(25dfe0dc) SHA1(1a857a910d0c34b6b5bfc2b6ea2e08ed8ed0cae0) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "rcd_2.bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
-	ROM_LOAD( "rcd_1.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
+	ROM_LOAD( "2(__royalcrdd).bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
+	ROM_LOAD( "1(__royalcrdd).bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
 	ROM_LOAD( "royalcrdd_nvram.bin", 0x0000, 0x0800, CRC(335bfa5a) SHA1(7e9cbb502f450c515ea03ffcf4b7fbae60af4e73) )

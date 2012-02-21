@@ -1079,33 +1079,33 @@ ROM_END
 ROM_START( punchita )
 	/* Unique to this set */
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code */
-	ROM_LOAD( "ita_chp1-c.8l",    0x0000, 0x2000, CRC(1d595ce2) SHA1(affd43bef96c68f953e66cfa14ad4e9c304dc022) )
-	ROM_LOAD( "ita_chp1-c.8k",    0x2000, 0x2000, CRC(c062fa5c) SHA1(8ebd6fd76f1fd1b85216a4e21d8a13be8317b9e2) )
-	ROM_LOAD( "ita_chp1-c.8j",    0x4000, 0x2000, CRC(48d453ef) SHA1(145f3ace8bec87e83b64c6472e2b71f1ebea13ea) )
-	ROM_LOAD( "ita_chp1-c.8h",    0x6000, 0x2000, CRC(67f5aedc) SHA1(c63a8b0696eec87bb147d435c18ee7e26d19e2a4) )
-	ROM_LOAD( "ita_chp1-c.8f",    0x8000, 0x4000, CRC(761de4f3) SHA1(66754bc762c14fea620fabf408f85e6e3acb89ad) )
+	ROM_LOAD( "chp1-c(__ita).8l",    0x0000, 0x2000, CRC(1d595ce2) SHA1(affd43bef96c68f953e66cfa14ad4e9c304dc022) )
+	ROM_LOAD( "chp1-c(__ita).8k",    0x2000, 0x2000, CRC(c062fa5c) SHA1(8ebd6fd76f1fd1b85216a4e21d8a13be8317b9e2) )
+	ROM_LOAD( "chp1-c(__ita).8j",    0x4000, 0x2000, CRC(48d453ef) SHA1(145f3ace8bec87e83b64c6472e2b71f1ebea13ea) )
+	ROM_LOAD( "chp1-c(__ita).8h",    0x6000, 0x2000, CRC(67f5aedc) SHA1(c63a8b0696eec87bb147d435c18ee7e26d19e2a4) )
+	ROM_LOAD( "chp1-c(__ita).8f",    0x8000, 0x4000, CRC(761de4f3) SHA1(66754bc762c14fea620fabf408f85e6e3acb89ad) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the sound CPU */
 	ROM_LOAD( "chp1-c.4k",    0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )
 
 	/* Unique to this set */
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD( "ita_chp1-b.4c",    0x00000, 0x0800, CRC(9a9ff1d3) SHA1(d91adf69acb717f238cd5954909701a8748f2185) )	/* chars #1 */
+	ROM_LOAD( "chp1-b(__ita).4c",    0x00000, 0x0800, CRC(9a9ff1d3) SHA1(d91adf69acb717f238cd5954909701a8748f2185) )	/* chars #1 */
 	ROM_CONTINUE(             0x01000, 0x0800 )
 	ROM_CONTINUE(             0x00800, 0x0800 )
 	ROM_CONTINUE(             0x01800, 0x0800 )
-	ROM_LOAD( "ita_chp1-b.4d",    0x02000, 0x0800, CRC(4c23350f) SHA1(70a76002db9209699cdf1f092b2b5ef32d0b7b75) )
+	ROM_LOAD( "chp1-b(__ita).4d",    0x02000, 0x0800, CRC(4c23350f) SHA1(70a76002db9209699cdf1f092b2b5ef32d0b7b75) )
 	ROM_CONTINUE(             0x03000, 0x0800 )
 	ROM_CONTINUE(             0x02800, 0x0800 )
 	ROM_CONTINUE(             0x03800, 0x0800 )
 
 	/* These match SUPER PunchOut */
 	ROM_REGION( 0x04000, "gfx2", ROMREGION_ERASEFF )
-	ROM_LOAD( "ita_chp1-b.4a",    0x00000, 0x0800, CRC(c075f831) SHA1(f22d9e415637599420c443ce08e7e70d1eb1c6f5) )	/* chars #2 */
+	ROM_LOAD( "chp1-b(__ita).4a",    0x00000, 0x0800, CRC(c075f831) SHA1(f22d9e415637599420c443ce08e7e70d1eb1c6f5) )	/* chars #2 */
 	ROM_CONTINUE(             0x01000, 0x0800 )
 	ROM_CONTINUE(             0x00800, 0x0800 )
 	ROM_CONTINUE(             0x01800, 0x0800 )
-	ROM_LOAD( "ita_chp1-b.4b",    0x02000, 0x0800, CRC(c4cc2b5a) SHA1(7b9d4dcecc67271980c3c44561fc25a6f6c93ee3) )
+	ROM_LOAD( "chp1-b(__ita).4b",    0x02000, 0x0800, CRC(c4cc2b5a) SHA1(7b9d4dcecc67271980c3c44561fc25a6f6c93ee3) )
 	ROM_CONTINUE(             0x03000, 0x0800 )
 	ROM_CONTINUE(             0x02800, 0x0800 )
 	ROM_CONTINUE(             0x03800, 0x0800 )
@@ -1131,20 +1131,20 @@ ROM_START( punchita )
 
 	/* These match SUPER PunchOut */
 	ROM_REGION( 0x10000, "gfx4", ROMREGION_ERASEFF )
-	ROM_LOAD( "ita_chp1-v.6p",    0x00000, 0x0800, CRC(75be7aae) SHA1(396bc1d301b99e064de4dad699882618b1b9c958) )	/* chars #4 */
+	ROM_LOAD( "chp1-v(__ita).6p",    0x00000, 0x0800, CRC(75be7aae) SHA1(396bc1d301b99e064de4dad699882618b1b9c958) )	/* chars #4 */
 	ROM_CONTINUE(             0x01000, 0x0800 )
 	ROM_CONTINUE(             0x00800, 0x0800 )
 	ROM_CONTINUE(             0x01800, 0x0800 )
-	ROM_LOAD( "ita_chp1-v.6n",    0x02000, 0x0800, CRC(daf74de0) SHA1(9373d4527b675b3128a5a830f42e1dc5dcb85307) )
+	ROM_LOAD( "chp1-v(__ita).6n",    0x02000, 0x0800, CRC(daf74de0) SHA1(9373d4527b675b3128a5a830f42e1dc5dcb85307) )
 	ROM_CONTINUE(             0x03000, 0x0800 )
 	ROM_CONTINUE(             0x02800, 0x0800 )
 	ROM_CONTINUE(             0x03800, 0x0800 )
 	/* 04000-07fff empty (space for 6l and 6k) */
-	ROM_LOAD( "ita_chp1-v.8p",    0x08000, 0x0800, CRC(4cb7ea82) SHA1(213b7c1431f4c92e5519a8771035bda28b3bab8a) )
+	ROM_LOAD( "chp1-v(__ita).8p",    0x08000, 0x0800, CRC(4cb7ea82) SHA1(213b7c1431f4c92e5519a8771035bda28b3bab8a) )
 	ROM_CONTINUE(             0x09000, 0x0800 )
 	ROM_CONTINUE(             0x08800, 0x0800 )
 	ROM_CONTINUE(             0x09800, 0x0800 )
-	ROM_LOAD( "ita_chp1-v.8n",    0x0a000, 0x0800, CRC(1c0d09aa) SHA1(3276bae7400453f3612f53d7b47fb199cbe53e6d) )
+	ROM_LOAD( "chp1-v(__ita).8n",    0x0a000, 0x0800, CRC(1c0d09aa) SHA1(3276bae7400453f3612f53d7b47fb199cbe53e6d) )
 	ROM_CONTINUE(             0x0b000, 0x0800 )
 	ROM_CONTINUE(             0x0a800, 0x0800 )
 	ROM_CONTINUE(             0x0b800, 0x0800 )

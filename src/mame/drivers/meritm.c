@@ -1587,8 +1587,8 @@ ROM_START( megat4s ) /* Dallas DS1204V security key at U5 labeled 9255-40-01 U5-
 	ROM_RELOAD(                     0x380000, 0x80000)
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
-	ROM_LOAD( "super_sc3943.u20",     0x000, 0x117, CRC(f31864ff) SHA1(ff44820379a350e7bd788ffb6926612b3483e114) )
-	ROM_LOAD( "super_sc3944-0a.u19",  0x000, 0x2dd, CRC(ad4fddaa) SHA1(10c1575dcaa5ca4af5dc630d84f43a9ed1cb3ace) )
+	ROM_LOAD( "sc3943(__megat4s).u20",     0x000, 0x117, CRC(f31864ff) SHA1(ff44820379a350e7bd788ffb6926612b3483e114) )
+	ROM_LOAD( "sc3944-0a(__megat4s).u19",  0x000, 0x2dd, CRC(ad4fddaa) SHA1(10c1575dcaa5ca4af5dc630d84f43a9ed1cb3ace) )
 	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END

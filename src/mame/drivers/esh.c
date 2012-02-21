@@ -346,7 +346,7 @@ ROM_START( esha )
 	/* Main program CPU */
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "is1.h8", 0x0000, 0x2000, CRC(114c912b) SHA1(7c033a102d046199f3e2c6787579dac5b5295d50) )
-	ROM_LOAD( "esha_is2.f8", 0x2000, 0x2000, CRC(7a562f49) SHA1(acfa49b3b3d96b001a5dbdee39cbb0ca80be1763) )
+	ROM_LOAD( "is2(__esha).f8", 0x2000, 0x2000, CRC(7a562f49) SHA1(acfa49b3b3d96b001a5dbdee39cbb0ca80be1763) )
 
 	/* Tiles */
 	ROM_REGION( 0x3000, "gfx1", 0 )

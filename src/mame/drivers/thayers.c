@@ -821,7 +821,7 @@ ROM_END
 ROM_START( thayersa )
 	ROM_REGION( 0xe000, "maincpu", 0 )
 	ROM_LOAD( "tq_u33.bin", 0x0000, 0x8000, CRC(82df5d89) SHA1(58dfd62bf8c5a55d1eba397d2c284e99a4685a3f) )
-	ROM_LOAD( "tq_u1_alt.bin",  0xc000, 0x2000, CRC(33817e25) SHA1(f9750da863dd57fe2f5b6e8fce9c6695dc5c9adc) )
+	ROM_LOAD( "tq_u1(__alt).bin",  0xc000, 0x2000, CRC(33817e25) SHA1(f9750da863dd57fe2f5b6e8fce9c6695dc5c9adc) )
 
 	ROM_REGION( 0x400, "mcu", 0 )
 	ROM_LOAD( "tq_cop.bin", 0x000, 0x400, CRC(6748e6b3) SHA1(5d7d1ecb57c1501ef6a2d9691eecc9970586606b) )

@@ -3812,8 +3812,8 @@ ROM_START( witchcdh )
 	ROM_LOAD( "wc3050.a5",	0x4000, 0x2000, CRC(6f35b9c4) SHA1(df86687164f18f2bfe71e73cccd28fe4117e748c) )    /* text layer, alt gfx */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "wch1.a2",	0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "wch2.a4",	0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "wc1(__witchcdh).a2",	0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "wc1(__witchcdh).a4",	0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
 	ROM_COPY( "gfx1",	0x4800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -3911,11 +3911,11 @@ ROM_END
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(			 0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "wc4.7a_bad",	 0x2000, 0x1000, BAD_DUMP CRC(3bf07c44) SHA1(f6e859b142b7d4585b89ca609d8bc85c84fe2b09) )    /* text chars, corrupt */
+	ROM_LOAD( "wc4(__baddump).7a",	 0x2000, 0x1000, BAD_DUMP CRC(3bf07c44) SHA1(f6e859b142b7d4585b89ca609d8bc85c84fe2b09) )    /* text chars, corrupt */
 	ROM_COPY( "gfx1",    0x2800, 0x2000, 0x0800 )	/* srctag, srcoffs, offset, length */
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "wck1.2a",	0x0000, 0x1000, CRC(f59c6fd2) SHA1(bea4b6043728311ca9fff36e2d7e24254af5b97a) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "wc1(__witchcdk).2a",	0x0000, 0x1000, CRC(f59c6fd2) SHA1(bea4b6043728311ca9fff36e2d7e24254af5b97a) )    /* cards deck gfx, bitplane1 */
 	ROM_LOAD( "wc2.4a",	0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "wc3.5a",	0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
 
@@ -4367,10 +4367,10 @@ ROM_START( falcnwlda )
 	ROM_LOAD( "fw4.7a",	0x1000, 0x0800, CRC(f0517b0d) SHA1(474bcf429f2539ff1f3d7d32d259c5973ccb0234) )  /* text layer */
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "fw1.2a_bad",	0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "fw1.2a(__baddump)",	0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */
 	ROM_IGNORE(                 0x0800)
-	ROM_LOAD( "fw2.4a_bad",	0x0800, 0x0800, BAD_DUMP CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )  /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "fw3.5a_bad",	0x1000, 0x0800, BAD_DUMP CRC(87abebe5) SHA1(5950082b563718476576dbc9f45439019209493e) )  /* cards deck gfx, bitplane3 */
+	ROM_LOAD( "fw2.4a(__baddump)",	0x0800, 0x0800, BAD_DUMP CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )  /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "fw3.5a(__baddump)",	0x1000, 0x0800, BAD_DUMP CRC(87abebe5) SHA1(5950082b563718476576dbc9f45439019209493e) )  /* cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "n82s137f.box",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )

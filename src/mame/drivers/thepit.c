@@ -827,18 +827,18 @@ ROM_END
 
 ROM_START( fitterbl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bl-ic38.bin",  0x0000, 0x1000, CRC(805c6974) SHA1(b1a41df746a347df6f47578fc59a7393e5195ada) )
-	ROM_LOAD( "bl-ic39.bin",  0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) )
-	ROM_LOAD( "bl-ic40.bin",  0x2000, 0x1000, CRC(c5f7156e) SHA1(3702a0eb4c395217a8f761133dba7871a96b7f38) )
-	ROM_LOAD( "bl-ic41.bin",  0x3000, 0x1000, CRC(a67d5bda) SHA1(86d1628d4f0bcd3c3099f99ab92b3ac758ffec71) )
-	ROM_LOAD( "bl-ic33.bin",  0x4000, 0x1000, CRC(1f3c78ee) SHA1(961b6ba8d08ddcbeda52b98a2f181f37beed5fb1) )
+	ROM_LOAD( "ic38(__bootleg).bin",  0x0000, 0x1000, CRC(805c6974) SHA1(b1a41df746a347df6f47578fc59a7393e5195ada) )
+	ROM_LOAD( "ic39(__bootleg).bin",  0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) )
+	ROM_LOAD( "ic40(__bootleg).bin",  0x2000, 0x1000, CRC(c5f7156e) SHA1(3702a0eb4c395217a8f761133dba7871a96b7f38) )
+	ROM_LOAD( "ic41(__bootleg).bin",  0x3000, 0x1000, CRC(a67d5bda) SHA1(86d1628d4f0bcd3c3099f99ab92b3ac758ffec71) )
+	ROM_LOAD( "ic33(__bootleg).bin",  0x4000, 0x1000, CRC(1f3c78ee) SHA1(961b6ba8d08ddcbeda52b98a2f181f37beed5fb1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bl-ic30.bin",  0x0000, 0x0800, CRC(1b18faee) SHA1(b4002e2fdaa6bb966da4faa46ac56751a3841f5f) )
-	ROM_LOAD( "bl-ic31.bin",  0x0800, 0x0800, CRC(76cf4394) SHA1(5dc13bd5fc92ce4ce12bab60576292a6028891c3) )
+	ROM_LOAD( "ic30(__bootleg).bin",  0x0000, 0x0800, CRC(1b18faee) SHA1(b4002e2fdaa6bb966da4faa46ac56751a3841f5f) )
+	ROM_LOAD( "ic31(__bootleg).bin",  0x0800, 0x0800, CRC(76cf4394) SHA1(5dc13bd5fc92ce4ce12bab60576292a6028891c3) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
-	ROM_LOAD( "bl-ic9.bin",   0x0000, 0x0800, CRC(394676a2) SHA1(5bd26d717e25b7c192af8173db9ae18371dbcfbe) )
+	ROM_LOAD( "ic9(__bootleg).bin",   0x0000, 0x0800, CRC(394676a2) SHA1(5bd26d717e25b7c192af8173db9ae18371dbcfbe) )
 	ROM_LOAD( "ic10.bin",     0x1000, 0x0800, CRC(a38d708d) SHA1(6632392cece34332a2a4427ec14d95f201319c67) )
 
 	ROM_REGION( 0x0020, "proms", 0 )

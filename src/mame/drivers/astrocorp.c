@@ -907,15 +907,15 @@ ROM_END
 
 ROM_START( winbingoa )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "f29c51001t_alt.u31", 0x00000, 0x20000, CRC(c33676c3) SHA1(9f5b7d05d187cf59948a572f80c55cb8fa1f656f) )
-	ROM_LOAD16_BYTE( "f29c51001t_alt.u25", 0x00001, 0x20000, CRC(43c7b2d8) SHA1(16ee79c34b7c485dfccecdf3e0ae9f18f8a20150) )
+	ROM_LOAD16_BYTE( "f29c51001t(__alt).u31", 0x00000, 0x20000, CRC(c33676c3) SHA1(9f5b7d05d187cf59948a572f80c55cb8fa1f656f) )
+	ROM_LOAD16_BYTE( "f29c51001t(__alt).u25", 0x00001, 0x20000, CRC(43c7b2d8) SHA1(16ee79c34b7c485dfccecdf3e0ae9f18f8a20150) )
 
 	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(ad1f61e7) SHA1(845aa01d49c50bcadaed16d76c0dd9131a425b46) )
 	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(31613d99) SHA1(1c720f8d981c3e9cb9d9b3b27eb95e7f72ccfc93) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "mx27c4000pc_alt.u35", 0x00000, 0x80000, CRC(e48ed57d) SHA1(11995b90e70e010b292ba9db2da0af4ebf795c1a) )
+	ROM_LOAD( "mx27c4000pc(__alt).u35", 0x00000, 0x80000, CRC(e48ed57d) SHA1(11995b90e70e010b292ba9db2da0af4ebf795c1a) )
 ROM_END
 
 /***************************************************************************
