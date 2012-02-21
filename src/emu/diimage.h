@@ -246,7 +246,7 @@ public:
 	image_device_format *formatlist() const { return m_formatlist; }
 
 	bool load(const char *path);
-	bool load_for_slot(emu_options &options);
+	bool open_image_file(emu_options &options);
 	bool finish_load();
 	void unload();
 	bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);

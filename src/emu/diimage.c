@@ -873,7 +873,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
         goto done;
 
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
-	if (!filename_has_period)
+	if (!filename_has_period && !just_load)
 	{
 		softload = load_software_part( device().machine().options(), this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name, &m_software_list_name );
 		// if we had launched from softlist with a specified part, e.g. "shortname:part"
@@ -971,10 +971,10 @@ bool device_image_interface::load(const char *path)
 }
 
 /*-------------------------------------------------
-    load_for_slot - load an image for slot device
+    open_image_file - opening plain image file
 -------------------------------------------------*/
 
-bool device_image_interface::load_for_slot(emu_options &options)
+bool device_image_interface::open_image_file(emu_options &options)
 {
 	const char* path = options.value(instance_name());
 	if (strlen(path)>0) 
