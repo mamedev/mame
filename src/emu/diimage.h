@@ -246,6 +246,7 @@ public:
 	image_device_format *formatlist() const { return m_formatlist; }
 
 	bool load(const char *path);
+	bool load_for_slot(emu_options &options);
 	bool finish_load();
 	void unload();
 	bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
@@ -253,7 +254,7 @@ public:
 	int reopen_for_write(const char *path);
 
 protected:
-	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args);
+	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args, bool just_load);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
 	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
 	void clear();
