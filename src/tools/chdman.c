@@ -87,6 +87,7 @@ const UINT32 TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
 #define COMMAND_COPY "copy"
 #define COMMAND_ADD_METADATA "addmeta"
 #define COMMAND_DEL_METADATA "delmeta"
+#define COMMAND_DUMP_METADATA "dumpmeta"
 
 // option strings
 #define OPTION_INPUT "input"
@@ -137,6 +138,7 @@ static void do_extract_cd(parameters_t &params);
 static void do_extract_ld(parameters_t &params);
 static void do_add_metadata(parameters_t &params);
 static void do_del_metadata(parameters_t &params);
+static void do_dump_metadata(parameters_t &params);
 
 
 
@@ -686,6 +688,16 @@ static const command_description s_commands[] =
 	{ COMMAND_DEL_METADATA, do_del_metadata, ": remove metadata from the CHD",
 		{
 			REQUIRED OPTION_INPUT,
+			REQUIRED OPTION_TAG,
+			OPTION_INDEX
+		}
+	},
+
+	{ COMMAND_DUMP_METADATA, do_dump_metadata, ": dump metadata from the CHD to stdout or to a file",
+		{
+			REQUIRED OPTION_INPUT,
+			OPTION_OUTPUT,
+			OPTION_OUTPUT_FORCE,
 			REQUIRED OPTION_TAG,
 			OPTION_INDEX
 		}
@@ -2557,6 +2569,83 @@ static void do_del_metadata(parameters_t &params)
 		report_error(1, "Error removing metadata: %s", chd_file::error_string(err));
 	else
 		printf("Metadata removed\n");
+}
+
+
+//-------------------------------------------------
+//  do_dump_metadata - dump metadata from a CHD
+//-------------------------------------------------
+
+static void do_dump_metadata(parameters_t &params)
+{
+	// parse out input files
+	chd_file input_parent_chd;
+	chd_file input_chd;
+	parse_input_chd_parameters(params, input_chd, input_parent_chd);
+
+	// verify output file doesn't exist
+	astring *output_file_str = params.find(OPTION_OUTPUT);
+	if (output_file_str != NULL)
+		check_existing_output_file(params, *output_file_str);
+
+	// process tag
+	chd_metadata_tag tag = CHD_MAKE_TAG('?','?','?','?');
+	astring *tag_str = params.find(OPTION_TAG);
+	if (tag_str != NULL)
+	{
+		tag_str->cat("    ");
+		tag = CHD_MAKE_TAG((*tag_str)[0], (*tag_str)[1], (*tag_str)[2], (*tag_str)[3]);
+	}
+
+	// process index
+	UINT32 index = 0;
+	astring *index_str = params.find(OPTION_INDEX);
+	if (index_str != NULL)
+		index = atoi(*index_str);
+
+	// write the metadata
+	dynamic_buffer buffer;
+	chd_error err = input_chd.read_metadata(tag, index, buffer);
+	if (err != CHDERR_NONE)
+		report_error(1, "Error reading metadata: %s", chd_file::error_string(err));
+
+	// catch errors so we can close & delete the output file
+	core_file *output_file = NULL;
+	try
+	{
+		// create the file
+		if (output_file_str != NULL)
+		{
+			file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
+			if (filerr != FILERR_NONE)
+				report_error(1, "Unable to open file (%s)", output_file_str->cstr());
+	
+			// output the metadata
+			UINT32 count = core_fwrite(output_file, buffer, buffer.count());
+			if (count != buffer.count())
+				report_error(1, "Error writing file (%s)", output_file_str->cstr());
+			core_fclose(output_file);
+			
+			// provide some feedback
+			astring tempstr;
+			printf("File (%s) written, %s bytes\n", output_file_str->cstr(), big_int_string(tempstr, buffer.count()));
+		}
+		
+		// flush to stdout
+		else
+		{
+			fwrite(buffer, 1, buffer.count(), stdout);
+			fflush(stdout);
+		}
+	}
+	catch (...)
+	{
+		// delete the output file
+		if (output_file != NULL)
+			core_fclose(output_file);
+		osd_rmfile(*output_file_str);
+		throw;
+	}
 }
 
 
