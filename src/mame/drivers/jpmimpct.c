@@ -5697,9 +5697,9 @@ GAME( 199?, j6bbankr	, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Big Banker (
 GAME( 199?, j6bmc		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Big Money Club (Crystal) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6bno		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Big Nite Out (Crystal) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6btbw		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Born To Be Wild Club (Crystal) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6cpal		, 0			, impctawp, tbirds, 0, ROT0, "Whitbread / Crystal", "Caesar's Palace (Whitbread / Crystal) (IMPACT, set 1)", GAME_FLAGS )
-GAME( 199?, j6cpala		, 0			, impctawp, tbirds, 0, ROT0, "Whitbread / Crystal", "Caesar's Palace (Whitbread / Crystal) (IMPACT, set 2)", GAME_FLAGS ) // marked as ACE
-GAME( 1998, j6cpalb		, 0			, impctawp, tbirds, 0, ROT0, "Whitbread / Ace", "Caesar's Palace (Whitbread / Ace) (IMPACT)", GAME_FLAGS )
+GAME( 199?, j6cpal		, 0			, impctawp, tbirds, 0, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT, set 1)", GAME_FLAGS )
+GAME( 199?, j6cpala		, 0			, impctawp, tbirds, 0, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT, set 2)", GAME_FLAGS ) // marked as ACE
+GAME( 1998, j6cpalb		, 0			, impctawp, tbirds, 0, ROT0, "Whitbread / Ace", "Caesars Palace (Whitbread / Ace) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6cdivr		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Cash Diver (Crystal) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6ccc		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Casino Crazy Club (Crystal) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6colic		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Coliseum (Crystal) (IMPACT)", GAME_FLAGS )
@@ -5710,7 +5710,7 @@ GAME( 199?, j6ffc		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Frame & Fortun
 GAME( 199?, j6grc		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Gold Rush Club (Crystal) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6hdc		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Hot Dogs Club (Crystal) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6impls		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Impulse (Crystal) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6kapang	, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Kapang (Crystal) (IMPACT)", GAME_FLAGS )
+GAME( 199?, j6kapang	, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Kapang! (Crystal) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6kfc		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Kung Fu Club (Crystal) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6lucklo	, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Lucky Lottery Club (Crystal) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6monst		, 0			, impctawp, tbirds, 0, ROT0, "Crystal", "Monster Cash Club (Crystal) (IMPACT)", GAME_FLAGS )
