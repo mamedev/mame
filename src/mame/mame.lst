@@ -2865,6 +2865,7 @@ sf2ceua			// 13/03/1992 (c) 1992 (USA)
 sf2ceub			// 13/05/1992 (c) 1992 (USA)
 sf2ceuc			// 03/08/1992 (c) 1992 (USA)
 sf2cej			// 13/05/1992 (c) 1992 (Japan)
+sf2ceja			// 22/03/1992 (c) 1992 (Japan)
 sf2rb			// hack
 sf2rb2			// hack
 sf2rb3			// hack
@@ -3161,7 +3162,8 @@ progear			// 17/01/2001 (c) 2001 Cave (USA)
 progearj		// 17/01/2001 (c) 2001 Cave (Japan)
 progeara		// 17/01/2001 (c) 2001 Cave (Asia)
 pzloop2			// 02/03/2001 (c) 2001 Mitchell (Euro)
-pzloop2j		// 05/02/2001 (c) 2001 Mitchell (Japan)
+pzloop2j		// 26/02/2001 (c) 2001 Mitchell (Japan)
+pzloop2jr1		// 05/02/2001 (c) 2001 Mitchell (Japan)
 choko			// 20/08/2001 (c) 2001 Mitchell (Japan)
 hsf2			// 02/02/2004 (c) 2003, 2004 (USA)
 hsf2j			// 22/12/2003 (c) 2003, 2004 (Japan)
