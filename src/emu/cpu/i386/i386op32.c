@@ -3163,6 +3163,25 @@ static void I386OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 				}
 				break;
 			}
+		case 6:			/* LMSW */
+			{
+				if(PROTECTED_MODE && cpustate->CPL)
+					FAULT(FAULT_GP,0)
+				UINT16 b;
+				if( modrm >= 0xc0 ) {
+					b = LOAD_RM16(modrm);
+					CYCLES(cpustate,CYCLES_LMSW_REG);
+				} else {
+					ea = GetEA(cpustate,modrm,0);
+					CYCLES(cpustate,CYCLES_LMSW_MEM);
+				b = READ16(cpustate,ea);
+				}
+				if(PROTECTED_MODE)
+					b |= 0x0001;  // cannot return to real mode using this instruction.
+				cpustate->cr[0] &= ~0x0000000f;
+				cpustate->cr[0] |= b & 0x0000000f;
+				break;
+			}
 		default:
 			fatalerror("i386: unimplemented opcode 0x0f 01 /%d at %08X", (modrm >> 3) & 0x7, cpustate->eip - 2);
 			break;

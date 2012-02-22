@@ -3331,8 +3331,8 @@ static void I386OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 				}
 				if(PROTECTED_MODE)
 					b |= 0x0001;  // cannot return to real mode using this instruction.
-				cpustate->cr[0] &= ~0x0000ffff;
-				cpustate->cr[0] |= b & 0x0000ffff;
+				cpustate->cr[0] &= ~0x0000000f;
+				cpustate->cr[0] |= b & 0x0000000f;
 				break;
 			}
 		default:

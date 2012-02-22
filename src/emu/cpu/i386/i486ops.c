@@ -282,19 +282,21 @@ static void I486OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 			}
 		case 6:			/* LMSW */
 			{
-				UINT8 b;
+				UINT16 b;
 				if(PROTECTED_MODE && cpustate->CPL)
 					FAULT(FAULT_GP,0)
 				if( modrm >= 0xc0 ) {
-					b = LOAD_RM8(modrm);
+					b = LOAD_RM16(modrm);
 					CYCLES(cpustate,CYCLES_LMSW_REG);
 				} else {
 					ea = GetEA(cpustate,modrm,0);
 					CYCLES(cpustate,CYCLES_LMSW_MEM);
-					b = READ8(cpustate,ea);
+					b = READ16(cpustate,ea);
 				}
-				cpustate->cr[0] &= ~0x03;
-				cpustate->cr[0] |= b & 0x03;
+				if(PROTECTED_MODE)
+					b |= 0x0001;  // cannot return to real mode using this instruction.
+				cpustate->cr[0] &= ~0x0000000f;
+				cpustate->cr[0] |= b & 0x0000000f;
 				break;
 			}
 		case 7:			/* INVLPG */
@@ -385,6 +387,25 @@ static void I486OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 					WRITE16(cpustate,ea, cpustate->cr[0]);
 					CYCLES(cpustate,CYCLES_SMSW_MEM);
 				}
+				break;
+			}
+		case 6:			/* LMSW */
+			{
+				if(PROTECTED_MODE && cpustate->CPL)
+					FAULT(FAULT_GP,0)
+				UINT16 b;
+				if( modrm >= 0xc0 ) {
+					b = LOAD_RM16(modrm);
+					CYCLES(cpustate,CYCLES_LMSW_REG);
+				} else {
+					ea = GetEA(cpustate,modrm,0);
+					CYCLES(cpustate,CYCLES_LMSW_MEM);
+				b = READ16(cpustate,ea);
+				}
+				if(PROTECTED_MODE)
+					b |= 0x0001;  // cannot return to real mode using this instruction.
+				cpustate->cr[0] &= ~0x0000000f;
+				cpustate->cr[0] |= b & 0x0000000f;
 				break;
 			}
 		case 7:			/* INVLPG */
