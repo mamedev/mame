@@ -179,6 +179,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST slot name CDATA #REQUIRED>\n"
 "\t\t\t<!ELEMENT slotoption EMPTY>\n"
 "\t\t\t\t<!ATTLIST slotoption name CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST slotoption description CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST slotoption default (yes|no) \"no\">\n"
 "\t\t<!ELEMENT softwarelist EMPTY>\n"
 "\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
@@ -186,11 +187,94 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST softwarelist filter CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT ramoption (#PCDATA)>\n"
 "\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
+"\t<!ELEMENT device (description, rom*, chip*, display*, sound?, input?, dipswitch*, configuration*, adjuster*, device*, slot*)>\n"
+"\t\t<!ATTLIST device name CDATA #IMPLIED>\n"
+"\t\t<!ELEMENT description (#PCDATA)>\n"
+"\t\t<!ELEMENT rom EMPTY>\n"
+"\t\t\t<!ATTLIST rom name CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST rom bios CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST rom size CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST rom crc CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST rom merge CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST rom region CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
+"\t\t\t<!ATTLIST rom optional (yes|no) \"no\">\n"
+"\t\t<!ELEMENT chip EMPTY>\n"
+"\t\t\t<!ATTLIST chip name CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST chip tag CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST chip type (cpu|audio) #REQUIRED>\n"
+"\t\t\t<!ATTLIST chip clock CDATA #IMPLIED>\n"
+"\t\t<!ELEMENT display EMPTY>\n"
+"\t\t\t<!ATTLIST display type (raster|vector|lcd|unknown) #REQUIRED>\n"
+"\t\t\t<!ATTLIST display rotate (0|90|180|270) #REQUIRED>\n"
+"\t\t\t<!ATTLIST display flipx (yes|no) \"no\">\n"
+"\t\t\t<!ATTLIST display width CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST display height CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST display refresh CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST display pixclock CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST display htotal CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST display hbend CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST display hbstart CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST display vtotal CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST display vbend CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST display vbstart CDATA #IMPLIED>\n"
+"\t\t<!ELEMENT sound EMPTY>\n"
+"\t\t\t<!ATTLIST sound channels CDATA #REQUIRED>\n"
+"\t\t<!ELEMENT input (control*)>\n"
+"\t\t\t<!ATTLIST input service (yes|no) \"no\">\n"
+"\t\t\t<!ATTLIST input tilt (yes|no) \"no\">\n"
+"\t\t\t<!ATTLIST input players CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST input buttons CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST input coins CDATA #IMPLIED>\n"
+"\t\t\t<!ELEMENT control EMPTY>\n"
+"\t\t\t\t<!ATTLIST control type CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST control minimum CDATA #IMPLIED>\n"
+"\t\t\t\t<!ATTLIST control maximum CDATA #IMPLIED>\n"
+"\t\t\t\t<!ATTLIST control sensitivity CDATA #IMPLIED>\n"
+"\t\t\t\t<!ATTLIST control keydelta CDATA #IMPLIED>\n"
+"\t\t\t\t<!ATTLIST control reverse (yes|no) \"no\">\n"
+"\t\t\t\t<!ATTLIST control ways CDATA #IMPLIED>\n"
+"\t\t\t\t<!ATTLIST control ways2 CDATA #IMPLIED>\n"
+"\t\t\t\t<!ATTLIST control ways3 CDATA #IMPLIED>\n"
+"\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
+"\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n"
+"\t\t\t<!ELEMENT dipvalue EMPTY>\n"
+"\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
+"\t\t<!ELEMENT configuration (confsetting*)>\n"
+"\t\t\t<!ATTLIST configuration name CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST configuration tag CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST configuration mask CDATA #REQUIRED>\n"
+"\t\t\t<!ELEMENT confsetting EMPTY>\n"
+"\t\t\t\t<!ATTLIST confsetting name CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST confsetting value CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST confsetting default (yes|no) \"no\">\n"
+"\t\t<!ELEMENT adjuster EMPTY>\n"
+"\t\t\t<!ATTLIST adjuster name CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST adjuster default CDATA #REQUIRED>\n"
+"\t\t<!ELEMENT device (instance*, extension*)>\n"
+"\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST device mandatory CDATA #IMPLIED>\n"
+"\t\t\t<!ATTLIST device interface CDATA #IMPLIED>\n"
+"\t\t\t<!ELEMENT instance EMPTY>\n"
+"\t\t\t\t<!ATTLIST instance name CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST instance briefname CDATA #REQUIRED>\n"
+"\t\t\t<!ELEMENT extension EMPTY>\n"
+"\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
+"\t\t<!ELEMENT slot (slotoption*)>\n"
+"\t\t\t<!ATTLIST slot name CDATA #REQUIRED>\n"
+"\t\t\t<!ELEMENT slotoption EMPTY>\n"
+"\t\t\t\t<!ATTLIST slotoption name CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST slotoption description CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST slotoption default (yes|no) \"no\">\n"
 "]>";
 
-
-extern const device_type *s_devices_sorted[];
-extern int m_device_count;
 
 //**************************************************************************
 //  INFO XML CREATOR
@@ -239,61 +323,15 @@ void info_xml_creator::output(FILE *out)
 		CONFIG_VERSION
 	);
 
-	m_device_used.resize(m_device_count);
-	memset(m_device_used, 0, m_device_count);
-
 	// iterate through the drivers, outputting one at a time
 	while (m_drivlist.next())
 		output_one();
 
-	// iterate through the devices, and output their roms
+	// output devices (both devices with roms and slot devices)
 	output_devices();
 
 	// close the top level tag
 	fprintf(m_output, "</%s>\n",emulator_info::get_xml_root());
-}
-
-
-//-------------------------------------------------
-//  output_devices - print the XML information
-//  for one particular game driver
-//-------------------------------------------------
-
-void info_xml_creator::output_devices()
-{
-	m_drivlist.reset();
-	m_drivlist.next();
-	machine_config &config = m_drivlist.config();
-	device_t &owner = config.root_device();
-
-	// check if all are listed, note that empty one is included
-	bool display_all = (driver_list::total() == m_drivlist.count() + 1);
-	for (int devnum = 0; devnum < m_device_count; devnum++)
-	{
-		if (display_all || m_device_used[devnum]) 
-		{
-			device_type type = *s_devices_sorted[devnum];
-			device_t *dev = (*type)(config, "dummy", &owner, 0);
-			dev->config_complete();
-
-			// print the header and the game name
-			fprintf(m_output, "\t<%s", emulator_info::get_xml_top());
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(dev->shortname()));
-			fprintf(m_output, " isdevice=\"yes\"");
-			fprintf(m_output, " runnable=\"no\"");
-			fprintf(m_output, ">\n");
-
-			// output device description
-			if (dev->name() != NULL)
-				fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(dev->name()));
-
-			output_rom(*dev);
-
-			// close the topmost tag
-			fprintf(m_output, "\t</%s>\n", emulator_info::get_xml_top());
-			global_free(dev);
-		}
-	}
 }
 
 
@@ -365,16 +403,16 @@ void info_xml_creator::output_one()
 	output_rom(m_drivlist.config().root_device());
 	output_device_roms();
 	output_sample();
-	output_chips();
-	output_display();
-	output_sound();
+	output_chips(m_drivlist.config().root_device(), "");
+	output_display(m_drivlist.config().root_device());
+	output_sound(m_drivlist.config().root_device());
 	output_input(portlist);
-	output_switches(portlist, IPT_DIPSWITCH, "dipswitch", "dipvalue");
-	output_switches(portlist, IPT_CONFIG, "configuration", "confsetting");
+	output_switches(portlist, "", IPT_DIPSWITCH, "dipswitch", "dipvalue");
+	output_switches(portlist, "", IPT_CONFIG, "configuration", "confsetting");
 	output_adjusters(portlist);
 	output_driver();
-	output_images();
-	output_slots();
+	output_images(m_drivlist.config().root_device(), "");
+	output_slots(m_drivlist.config().root_device(), "");
 	output_software_list();
 	output_ramoptions();
 
@@ -383,9 +421,129 @@ void info_xml_creator::output_one()
 }
 
 
+//-------------------------------------------------
+//  output_one_device - print the XML info for
+//  a single device
+//-------------------------------------------------
+
+void info_xml_creator::output_one_device(device_t &device, const char *innertag, const char *outertag)
+{
+	bool has_speaker = FALSE, has_input = FALSE;
+	// check if the device adds speakers to the system
+	sound_interface_iterator snditer(device);
+	if (snditer.first() != NULL)
+		has_speaker = TRUE;
+	// generate input list
+	ioport_list portlist;
+	astring errors;
+	device_iterator iptiter(device);
+	for (device_t *dev = iptiter.first(); dev != NULL; dev = iptiter.next())
+		input_port_list_init(*dev, portlist, errors);
+	// check if the device adds player inputs (other than dsw and configs) to the system
+	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
+		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
+			if (field->type >= IPT_START1 && field->type < __ipt_ui_start)
+			{
+				has_input = TRUE;
+				break;
+			}
+
+	// start to output info
+	fprintf(m_output, "\t<%s", outertag);
+	// TODO: merge handling for devices with roms and other devices
+	if (outertag == emulator_info::get_xml_top())
+	{
+		// it's a device with roms necessary for this configuration
+		fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
+		fprintf(m_output, " isdevice=\"yes\"");
+		fprintf(m_output, " runnable=\"no\"");
+	}
+	else
+	{
+		// it's a generic device
+		astring shrtnm(device.shortname());
+		if (shrtnm.cmp(""))
+			fprintf(m_output, " shortname=\"%s\"", shrtnm.cstr());
+	}
+	fprintf(m_output, ">\n");
+	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name()));
+
+	output_rom(device);
+	output_chips(device, innertag);
+	output_display(device);
+	if (has_speaker)
+		output_sound(device);
+	if (has_input)
+		output_input(portlist);
+	output_switches(portlist, innertag, IPT_DIPSWITCH, "dipswitch", "dipvalue");
+	output_switches(portlist, innertag, IPT_CONFIG, "configuration", "confsetting");
+	output_adjusters(portlist);
+	output_images(device, innertag);
+	output_slots(device, innertag);
+	fprintf(m_output, "\t</%s>\n", outertag);
+}
+
+
+//-------------------------------------------------
+//  output_devices - print the XML info for devices
+//  with roms and for devices that can be mounted
+//  in slots
+//-------------------------------------------------
+
+typedef tagmap_t<const game_driver *> slot_map;
+
+void info_xml_creator::output_devices()
+{
+	m_drivlist.reset();
+	slot_map desc;
+	const game_driver &driver = m_drivlist.driver();
+
+	bool display_all = (driver_list::total() == m_drivlist.count() + 1);
+	// first, run through slot devices
+	while (m_drivlist.next())
+	{
+		device_iterator deviter(m_drivlist.config().root_device());
+		deviter.first();
+		for (device_t *device = deviter.next(); device != NULL; device = deviter.next())
+			if (device->rom_region() != NULL && device->shortname()!= NULL)
+			{
+				if (desc.add(device->name(), &driver, FALSE) != TMERR_DUPLICATE)
+					output_one_device(*device, device->tag(), emulator_info::get_xml_top());
+			}
+
+		if (display_all)
+		{
+			slot_interface_iterator iter(m_drivlist.config().root_device());
+			for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
+			{
+				const slot_interface* intf = slot->get_slot_interfaces();
+				for (int i = 0; intf && intf[i].name != NULL; i++)
+				{
+					astring temptag("_");
+					temptag.cat(intf[i].name);
+					device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), intf[i].devtype, 0);
+
+					// notify this device and all its subdevices that they are now configured
+					device_iterator subiter(*dev);
+					for (device_t *device = subiter.first(); device != NULL; device = subiter.next())
+						if (!device->configured())
+							device->config_complete();
+
+					if (desc.add(dev->name(), &driver, FALSE) != TMERR_DUPLICATE)
+						output_one_device(*dev, temptag.cstr(), "device");
+
+					const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.cstr());
+					global_free(dev);
+				}
+			}
+		}
+	}
+}
+
+
 //------------------------------------------------
-//  output_device_roms - print the device
-//  with roms, if appropriate
+//  output_device_roms - when a driver uses roms
+//  included in a device set, print a reference
 //-------------------------------------------------
 
 void info_xml_creator::output_device_roms()
@@ -393,13 +551,8 @@ void info_xml_creator::output_device_roms()
 	device_iterator deviter(m_drivlist.config().root_device());
 	deviter.first();
 	for (device_t *device = deviter.next(); device != NULL; device = deviter.next())
-		if (device->rom_region() != NULL && device->shortname()!=NULL)
-		{
+		if (device->owner() != NULL && device->rom_region() != NULL && device->shortname()!= NULL)
 			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname()));
-			for (int devnum = 0; devnum < m_device_count; devnum++)
-				if (device->type() == *s_devices_sorted[devnum])
-					m_device_used[devnum] = 1;
-		}
 }
 
 
@@ -581,31 +734,43 @@ void info_xml_creator::output_sample()
     sound chips used by a game
 -------------------------------------------------*/
 
-void info_xml_creator::output_chips()
+void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 {
 	// iterate over executable devices
-	execute_interface_iterator execiter(m_drivlist.config().root_device());
+	execute_interface_iterator execiter(device);
 	for (device_execute_interface *exec = execiter.first(); exec != NULL; exec = execiter.next())
 	{
-		fprintf(m_output, "\t\t<chip");
-		fprintf(m_output, " type=\"cpu\"");
-		fprintf(m_output, " tag=\"%s\"", xml_normalize_string(exec->device().tag()));
-		fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name()));
-		fprintf(m_output, " clock=\"%d\"", exec->device().clock());
-		fprintf(m_output, "/>\n");
+		if (strcmp(exec->device().tag(), device.tag()))
+		{
+			astring newtag(exec->device().tag()), oldtag(":");
+			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+
+			fprintf(m_output, "\t\t<chip");
+			fprintf(m_output, " type=\"cpu\"");
+			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name()));
+			fprintf(m_output, " clock=\"%d\"", exec->device().clock());
+			fprintf(m_output, "/>\n");
+		}
 	}
 
 	// iterate over sound devices
-	sound_interface_iterator sounditer(m_drivlist.config().root_device());
+	sound_interface_iterator sounditer(device);
 	for (device_sound_interface *sound = sounditer.first(); sound != NULL; sound = sounditer.next())
 	{
-		fprintf(m_output, "\t\t<chip");
-		fprintf(m_output, " type=\"audio\"");
-		fprintf(m_output, " tag=\"%s\"", xml_normalize_string(sound->device().tag()));
-		fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name()));
-		if (sound->device().clock() != 0)
-			fprintf(m_output, " clock=\"%d\"", sound->device().clock());
-		fprintf(m_output, "/>\n");
+		if (strcmp(sound->device().tag(), device.tag()))
+		{
+			astring newtag(sound->device().tag()), oldtag(":");
+			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+
+			fprintf(m_output, "\t\t<chip");
+			fprintf(m_output, " type=\"audio\"");
+			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name()));
+			if (sound->device().clock() != 0)
+				fprintf(m_output, " clock=\"%d\"", sound->device().clock());
+			fprintf(m_output, "/>\n");
+		}
 	}
 }
 
@@ -615,15 +780,15 @@ void info_xml_creator::output_chips()
 //  displays
 //-------------------------------------------------
 
-void info_xml_creator::output_display()
+void info_xml_creator::output_display(device_t &device)
 {
 	// iterate over screens
-	screen_device_iterator iter(m_drivlist.config().root_device());
-	for (const screen_device *device = iter.first(); device != NULL; device = iter.next())
+	screen_device_iterator iter(device);
+	for (const screen_device *screendev = iter.first(); screendev != NULL; screendev = iter.next())
 	{
 		fprintf(m_output, "\t\t<display");
 
-		switch (device->screen_type())
+		switch (screendev->screen_type())
 		{
 			case SCREEN_TYPE_RASTER:	fprintf(m_output, " type=\"raster\"");	break;
 			case SCREEN_TYPE_VECTOR:	fprintf(m_output, " type=\"vector\"");	break;
@@ -661,29 +826,29 @@ void info_xml_creator::output_display()
 		}
 
 		// output width and height only for games that are not vector
-		if (device->screen_type() != SCREEN_TYPE_VECTOR)
+		if (screendev->screen_type() != SCREEN_TYPE_VECTOR)
 		{
-			const rectangle &visarea = device->visible_area();
+			const rectangle &visarea = screendev->visible_area();
 			fprintf(m_output, " width=\"%d\"", visarea.width());
 			fprintf(m_output, " height=\"%d\"", visarea.height());
 		}
 
 		// output refresh rate
-		fprintf(m_output, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(device->refresh_attoseconds()));
+		fprintf(m_output, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds()));
 
 		// output raw video parameters only for games that are not vector
 		// and had raw parameters specified
-		if (device->screen_type() != SCREEN_TYPE_VECTOR && !device->oldstyle_vblank_supplied())
+		if (screendev->screen_type() != SCREEN_TYPE_VECTOR && !screendev->oldstyle_vblank_supplied())
 		{
-			int pixclock = device->width() * device->height() * ATTOSECONDS_TO_HZ(device->refresh_attoseconds());
+			int pixclock = screendev->width() * screendev->height() * ATTOSECONDS_TO_HZ(screendev->refresh_attoseconds());
 
 			fprintf(m_output, " pixclock=\"%d\"", pixclock);
-			fprintf(m_output, " htotal=\"%d\"", device->width());
-			fprintf(m_output, " hbend=\"%d\"", device->visible_area().min_x);
-			fprintf(m_output, " hbstart=\"%d\"", device->visible_area().max_x+1);
-			fprintf(m_output, " vtotal=\"%d\"", device->height());
-			fprintf(m_output, " vbend=\"%d\"", device->visible_area().min_y);
-			fprintf(m_output, " vbstart=\"%d\"", device->visible_area().max_y+1);
+			fprintf(m_output, " htotal=\"%d\"", screendev->width());
+			fprintf(m_output, " hbend=\"%d\"", screendev->visible_area().min_x);
+			fprintf(m_output, " hbstart=\"%d\"", screendev->visible_area().max_x+1);
+			fprintf(m_output, " vtotal=\"%d\"", screendev->height());
+			fprintf(m_output, " vbend=\"%d\"", screendev->visible_area().min_y);
+			fprintf(m_output, " vbstart=\"%d\"", screendev->visible_area().max_y+1);
 		}
 		fprintf(m_output, " />\n");
 	}
@@ -692,16 +857,16 @@ void info_xml_creator::output_display()
 
 //-------------------------------------------------
 //  output_sound - print a list of all the
-//  displays
+//  speakers
 //------------------------------------------------
 
-void info_xml_creator::output_sound()
+void info_xml_creator::output_sound(device_t &device)
 {
-	speaker_device_iterator spkiter(m_drivlist.config().root_device());
+	speaker_device_iterator spkiter(device);
 	int speakers = spkiter.count();
 
 	// if we have no sound, zero m_output the speaker count
-	sound_interface_iterator snditer(m_drivlist.config().root_device());
+	sound_interface_iterator snditer(device);
 	if (snditer.first() == NULL)
 		speakers = 0;
 
@@ -1013,16 +1178,19 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 //  DIP switch settings
 //-------------------------------------------------
 
-void info_xml_creator::output_switches(const ioport_list &portlist, int type, const char *outertag, const char *innertag)
+void info_xml_creator::output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *innertag)
 {
 	// iterate looking for DIP switches
 	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
 		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->type == type)
 			{
+				astring newtag(field->port().tag()), oldtag(":");
+				newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+
 				// output the switch name information
 				fprintf(m_output, "\t\t<%s name=\"%s\"", outertag, xml_normalize_string(input_field_name(field)));
-				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(field->port().tag()));
+				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
 				fprintf(m_output, " mask=\"%u\"", field->mask);
 				fprintf(m_output, ">\n");
 
@@ -1126,48 +1294,54 @@ void info_xml_creator::output_driver()
 //  image devices
 //-------------------------------------------------
 
-void info_xml_creator::output_images()
+void info_xml_creator::output_images(device_t &device, const char *root_tag)
 {
-	image_interface_iterator iter(m_drivlist.config().root_device());
-	for (const device_image_interface *dev = iter.first(); dev != NULL; dev = iter.next())
+	image_interface_iterator iter(device);
+	for (const device_image_interface *imagedev = iter.first(); imagedev != NULL; imagedev = iter.next())
 	{
-		// print m_output device type
-		fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(dev->image_type_name()));
-
-		// does this device have a tag?
-		if (dev->device().tag())
-			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(dev->device().tag()));
-
-		// is this device mandatory?
-		if (dev->must_be_loaded())
-			fprintf(m_output, " mandatory=\"1\"");
-
-		if (dev->image_interface() && dev->image_interface()[0])
-			fprintf(m_output, " interface=\"%s\"", xml_normalize_string(dev->image_interface()));
-
-		// close the XML tag
-		fprintf(m_output, ">\n");
-
-		const char *name = dev->instance_name();
-		const char *shortname = dev->brief_instance_name();
-
-		fprintf(m_output, "\t\t\t<instance");
-		fprintf(m_output, " name=\"%s\"", xml_normalize_string(name));
-		fprintf(m_output, " briefname=\"%s\"", xml_normalize_string(shortname));
-		fprintf(m_output, "/>\n");
-
-		astring extensions(dev->file_extensions());
-
-		char *ext = strtok((char *)extensions.cstr(), ",");
-		while (ext != NULL)
+		if (strcmp(imagedev->device().tag(), device.tag()))
 		{
-			fprintf(m_output, "\t\t\t<extension");
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(ext));
-			fprintf(m_output, "/>\n");
-			ext = strtok(NULL, ",");
-		}
+			astring newtag(imagedev->device().tag()), oldtag(":");
+			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
 
-		fprintf(m_output, "\t\t</device>\n");
+			// print m_output device type
+			fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(imagedev->image_type_name()));
+
+			// does this device have a tag?
+			if (imagedev->device().tag())
+				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
+
+			// is this device mandatory?
+			if (imagedev->must_be_loaded())
+				fprintf(m_output, " mandatory=\"1\"");
+
+			if (imagedev->image_interface() && imagedev->image_interface()[0])
+				fprintf(m_output, " interface=\"%s\"", xml_normalize_string(imagedev->image_interface()));
+
+			// close the XML tag
+			fprintf(m_output, ">\n");
+
+			const char *name = imagedev->instance_name();
+			const char *shortname = imagedev->brief_instance_name();
+
+			fprintf(m_output, "\t\t\t<instance");
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(name));
+			fprintf(m_output, " briefname=\"%s\"", xml_normalize_string(shortname));
+			fprintf(m_output, "/>\n");
+
+			astring extensions(imagedev->file_extensions());
+
+			char *ext = strtok((char *)extensions.cstr(), ",");
+			while (ext != NULL)
+			{
+				fprintf(m_output, "\t\t\t<extension");
+				fprintf(m_output, " name=\"%s\"", xml_normalize_string(ext));
+				fprintf(m_output, "/>\n");
+				ext = strtok(NULL, ",");
+			}
+
+			fprintf(m_output, "\t\t</device>\n");
+		}
 	}
 }
 
@@ -1176,34 +1350,42 @@ void info_xml_creator::output_images()
 //  output_images - prints all info about slots
 //-------------------------------------------------
 
-void info_xml_creator::output_slots()
+void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 {
-	slot_interface_iterator iter(m_drivlist.config().root_device());
+	slot_interface_iterator iter(device);
 	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
-		// print m_output device type
-		fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(slot->device().tag()+1));
+		if (strcmp(slot->device().tag(), device.tag()))
+		{
+			astring newtag(slot->device().tag()), oldtag(":");
+			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
 
-		/*
-        if (slot->slot_interface()[0])
-            fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
-         */
+			// print m_output device type
+			fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(newtag));
 
-		const slot_interface* intf = slot->get_slot_interfaces();
-		if (intf)
-			for (int i = 0; intf[i].name != NULL; i++)
+			/*
+             if (slot->slot_interface()[0])
+             fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
+             */
+
+			const slot_interface* intf = slot->get_slot_interfaces();
+			for (int i = 0; intf && intf[i].name != NULL; i++)
 			{
+				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", intf[i].devtype, 0);
 				fprintf(m_output, "\t\t\t<slotoption");
 				fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
+				fprintf(m_output, " description=\"%s\"", xml_normalize_string(dev->name()));
 				if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()))
 				{
 					if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()) == intf[i].name)
 						fprintf(m_output, " default=\"yes\"");
 				}
 				fprintf(m_output, "/>\n");
+				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), "dummy");
 			}
 
-		fprintf(m_output, "\t\t</slot>\n");
+			fprintf(m_output, "\t\t</slot>\n");
+		}
 	}
 }
 
