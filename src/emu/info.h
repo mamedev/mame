@@ -86,7 +86,6 @@ private:
 	FILE *					m_output;
 	driver_enumerator &		m_drivlist;
 	dynamic_array<UINT8>	m_device_used;
-	UINT32 *			m_device_driver_owner;
 	emu_options 			m_lookup_options;
 
 	static const char s_dtd_string[];
