@@ -516,7 +516,7 @@ device_t *media_auditor::find_shared_device(device_t &device, const hash_collect
 		// iterate up the parent chain
 		for (int drvindex = m_enumerator.find(m_enumerator.driver().parent); drvindex != -1; drvindex = m_enumerator.find(m_enumerator.driver(drvindex).parent))
 		{
-			device_iterator deviter(m_enumerator.config().root_device());
+			device_iterator deviter(m_enumerator.config(drvindex).root_device());
 			for (device_t *scandevice = deviter.first(); scandevice != NULL; scandevice = deviter.next())
 				for (const rom_entry *region = rom_first_region(*scandevice); region; region = rom_next_region(region))
 					for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
