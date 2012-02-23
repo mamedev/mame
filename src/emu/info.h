@@ -77,7 +77,7 @@ private:
 	void output_software_list();
 	void output_ramoptions();
 
-	void output_one_device(device_t &device, const char *innertag, const char *outertag);
+	void output_one_device(device_t &device, const char *devtag);
 	void output_devices();
 
 	const char *get_merge_name(const hash_collection &romhashes);
@@ -85,7 +85,6 @@ private:
 	// internal state
 	FILE *					m_output;
 	driver_enumerator &		m_drivlist;
-	dynamic_array<UINT8>	m_device_used;
 	emu_options 			m_lookup_options;
 
 	static const char s_dtd_string[];

@@ -179,7 +179,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST slot name CDATA #REQUIRED>\n"
 "\t\t\t<!ELEMENT slotoption EMPTY>\n"
 "\t\t\t\t<!ATTLIST slotoption name CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST slotoption shortname CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST slotoption devname CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST slotoption default (yes|no) \"no\">\n"
 "\t\t<!ELEMENT softwarelist EMPTY>\n"
 "\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
@@ -340,7 +340,7 @@ void info_xml_creator::output_one()
 //  a single device
 //-------------------------------------------------
 
-void info_xml_creator::output_one_device(device_t &device, const char *innertag, const char *outertag)
+void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 {
 	bool has_speaker = FALSE, has_input = FALSE;
 	// check if the device adds speakers to the system
@@ -363,38 +363,26 @@ void info_xml_creator::output_one_device(device_t &device, const char *innertag,
 			}
 
 	// start to output info
-	fprintf(m_output, "\t<%s", outertag);
-	// TODO: merge handling for devices with roms and other devices
-	if (outertag == emulator_info::get_xml_top())
-	{
-		// it's a device with roms necessary for this configuration
-		fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
-		fprintf(m_output, " isdevice=\"yes\"");
-		fprintf(m_output, " runnable=\"no\"");
-	}
-	else
-	{
-		// it's a generic device
-		astring shrtnm(device.shortname());
-		if (shrtnm.cmp(""))
-			fprintf(m_output, " shortname=\"%s\"", shrtnm.cstr());
-	}
+	fprintf(m_output, "\t<%s", emulator_info::get_xml_top());
+	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
+	fprintf(m_output, " isdevice=\"yes\"");
+	fprintf(m_output, " runnable=\"no\"");
 	fprintf(m_output, ">\n");
 	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name()));
 
 	output_rom(device);
-	output_chips(device, innertag);
+	output_chips(device, devtag);
 	output_display(device);
 	if (has_speaker)
 		output_sound(device);
 	if (has_input)
 		output_input(portlist);
-	output_switches(portlist, innertag, IPT_DIPSWITCH, "dipswitch", "dipvalue");
-	output_switches(portlist, innertag, IPT_CONFIG, "configuration", "confsetting");
+	output_switches(portlist, devtag, IPT_DIPSWITCH, "dipswitch", "dipvalue");
+	output_switches(portlist, devtag, IPT_CONFIG, "configuration", "confsetting");
 	output_adjusters(portlist);
-	output_images(device, innertag);
-	output_slots(device, innertag);
-	fprintf(m_output, "\t</%s>\n", outertag);
+	output_images(device, devtag);
+	output_slots(device, devtag);
+	fprintf(m_output, "\t</%s>\n", emulator_info::get_xml_top());
 }
 
 
@@ -409,20 +397,23 @@ typedef tagmap_t<FPTR> slot_map;
 void info_xml_creator::output_devices()
 {
 	m_drivlist.reset();
-	slot_map desc;
+	slot_map shortnames;
 
-	// first, run through slot devices
 	while (m_drivlist.next())
 	{
+		// first, run through devices with roms which belongs to the default configuration
 		device_iterator deviter(m_drivlist.config().root_device());
 		deviter.first();
-		for (device_t *device = deviter.next(); device != NULL; device = deviter.next()) {
+		for (device_t *device = deviter.next(); device != NULL; device = deviter.next()) 
+		{
 			if (device->rom_region() != NULL && device->shortname()!= NULL)
 			{
-				if (desc.add(device->name(), 0, FALSE) != TMERR_DUPLICATE)
-					output_one_device(*device, device->tag(), emulator_info::get_xml_top());
+				if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
+					output_one_device(*device, device->tag());
 			}
 		}
+
+		// then, run through slot devices
 		slot_interface_iterator iter(m_drivlist.config().root_device());
 		for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 		{
@@ -439,8 +430,8 @@ void info_xml_creator::output_devices()
 					if (!device->configured())
 						device->config_complete();
 
-				if (desc.add(dev->name(), 0, FALSE) != TMERR_DUPLICATE)
-					output_one_device(*dev, temptag.cstr(), emulator_info::get_xml_top());
+				if (shortnames.add(dev->shortname(), 0, FALSE) != TMERR_DUPLICATE)
+					output_one_device(*dev, temptag.cstr());
 
 				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.cstr());
 				global_free(dev);
@@ -1286,7 +1277,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 
 				fprintf(m_output, "\t\t\t<slotoption");
 				fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
-				fprintf(m_output, " shortname=\"%s\"", xml_normalize_string(dev->shortname()));
+				fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
 				if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()))
 				{
 					if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()) == intf[i].name)
