@@ -253,7 +253,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		// transparent translation register 0 enabled
 		UINT32 address_base = m68k->mmu_tt0 & 0xff000000;
 		UINT32 address_mask = ((m68k->mmu_tt0 << 8) & 0xff000000) ^ 0xff000000;
-		if ((addr_in & address_mask) == address_base)
+		if ((addr_in & address_mask) == address_base && (fc & ~m68k->mmu_tt0) == ((m68k->mmu_tt0 >> 4) & 7))
 		{
 //          printf("PMMU: pc=%x TT0 fc=%x addr_in=%08x address_mask=%08x address_base=%08x\n", m68k->ppc, fc, addr_in, address_mask, address_base);
 			return addr_in;
@@ -265,7 +265,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		// transparent translation register 1 enabled
 		UINT32 address_base = m68k->mmu_tt1 & 0xff000000;
 		UINT32 address_mask = ((m68k->mmu_tt1 << 8) & 0xff000000) ^ 0xff000000;
-		if ((addr_in & address_mask) == address_base)
+		if ((addr_in & address_mask) == address_base && (fc & ~m68k->mmu_tt1) == ((m68k->mmu_tt1 >> 4) & 7))
 		{
 //          printf("PMMU: pc=%x TT1 fc=%x addr_in=%08x address_mask=%08x address_base=%08x\n", m68k->ppc, fc, addr_in, address_mask, address_base);
 			return addr_in;
@@ -335,7 +335,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 	bbits = (m68k->mmu_tc >> 8) & 0xf;
 	cbits = (m68k->mmu_tc >> 4) & 0xf;
 
-//  printf("PMMU: tcr %08x limit %08x aptr %08x is %x abits %d bbits %d cbits %d\n", m68k->mmu_tc, root_limit, root_aptr, is, abits, bbits, cbits);
+	//  printf("PMMU: tcr %08x limit %08x aptr %08x is %x abits %d bbits %d cbits %d\n", m68k->mmu_tc, root_limit, root_aptr, is, abits, bbits, cbits);
 
 	// get table A offset
 	tofs = (addr_in<<is)>>(32-abits);
@@ -488,6 +488,8 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 			if (++m68k->mmu_tmp_buserror_occurred == 1)
 			{
 				m68k->mmu_tmp_buserror_address = addr_in;
+				m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+				m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 			}
 		}
 		else if (m68k->mmu_tmp_sr & M68K_MMU_SR_SUPERVISOR_ONLY)
@@ -495,6 +497,8 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 			if (++m68k->mmu_tmp_buserror_occurred == 1)
 			{
 				m68k->mmu_tmp_buserror_address = addr_in;
+				m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+				m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 			}
 		}
 		else if ((m68k->mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !m68k->mmu_tmp_rw)
@@ -502,6 +506,8 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 			if (++m68k->mmu_tmp_buserror_occurred == 1)
 			{
 				m68k->mmu_tmp_buserror_address = addr_in;
+				m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+				m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 			}
 		}
 
@@ -547,11 +553,13 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 
 	if (tt0 & 0x8000)
 	{
+		static int fcmask[4] = { 4, 4, 0, 0 };
+		static int fcmatch[4] = { 0, 4, 0, 0 };
 		UINT32 mask = (tt0>>16) & 0xff;
 		mask ^= 0xff;
 		mask <<= 24;
 
-		if ((addr_in & mask) == (tt0 & mask))
+		if ((addr_in & mask) == (tt0 & mask) && (fc & fcmask[(tt0 >> 13) & 3]) == fcmatch[(tt0 >> 13) & 3])
 		{
 			//          fprintf(stderr, "TT0 match on address %08x (TT0 = %08x, mask = %08x)\n", addr_in, tt0, mask);
 			if ((tt0 & 4) && !m68k->mmu_tmp_rw && !ptest)	// write protect?
@@ -559,6 +567,8 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 				if (++m68k->mmu_tmp_buserror_occurred == 1)
 				{
 					m68k->mmu_tmp_buserror_address = addr_in;
+					m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+					m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 				}
 			}
 
@@ -568,11 +578,13 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 
 	if (tt1 & 0x8000)
 	{
+		static int fcmask[4] = { 4, 4, 0, 0 };
+		static int fcmatch[4] = { 0, 4, 0, 0 };
 		UINT32 mask = (tt1>>16) & 0xff;
 		mask ^= 0xff;
 		mask <<= 24;
 
-		if ((addr_in & mask) == (tt1 & mask))
+		if ((addr_in & mask) == (tt1 & mask) && (fc & fcmask[(tt1 >> 13) & 3]) == fcmatch[(tt1 >> 13) & 3])
 		{
 			//          fprintf(stderr, "TT1 match on address %08x (TT0 = %08x, mask = %08x)\n", addr_in, tt1, mask);
 			if ((tt1 & 4) && !m68k->mmu_tmp_rw && !ptest)	// write protect?
@@ -580,6 +592,8 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 				if (++m68k->mmu_tmp_buserror_occurred == 1)
 				{
 					m68k->mmu_tmp_buserror_address = addr_in;
+					m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+					m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 				}
 			}
 
@@ -607,15 +621,6 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 
 		// get the root entry
 		root_entry = m68k->program->read_dword(root_ptr);
-		static UINT32 psrp = 0, purp=0;
-		if(psrp != m68k->mmu_srp_aptr) {
-			psrp = m68k->mmu_srp_aptr;
-//          fprintf(stderr, "srp = %08x\n", psrp);
-		}
-		if(purp != m68k->mmu_urp_aptr) {
-			purp = m68k->mmu_urp_aptr;
-//          fprintf(stderr, "urp = %08x\n", purp);
-		}
 
 		// is UDT marked valid?
 		if (root_entry & 2)
@@ -623,7 +628,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 			pointer_ptr = (root_entry & ~0x1ff) + (ptr_idx<<2);
 			pointer_entry = m68k->program->read_dword(pointer_ptr);
 
-			//          fprintf(stderr, "pointer entry = %08x\n", pointer_entry);
+			//          logerror("pointer entry = %08x\n", pointer_entry);
 
 			// write protected by the root or pointer entries?
 			if ((((root_entry & 4) && !m68k->mmu_tmp_rw) || ((pointer_entry & 4) && !m68k->mmu_tmp_rw)) && !ptest)
@@ -631,6 +636,8 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 				if (++m68k->mmu_tmp_buserror_occurred == 1)
 				{
 					m68k->mmu_tmp_buserror_address = addr_in;
+					m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+					m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 				}
 
 				return addr_in;
@@ -639,10 +646,12 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 			// is UDT valid on the pointer entry?
 			if (!(pointer_entry & 2) && !ptest)
 			{
-              fprintf(stderr, "Invalid pointer entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
+//				fprintf(stderr, "Invalid pointer entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
 				if (++m68k->mmu_tmp_buserror_occurred == 1)
 				{
 					m68k->mmu_tmp_buserror_address = addr_in;
+					m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+					m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 				}
 
 				return addr_in;
@@ -652,12 +661,15 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		}
 		else // throw an error
 		{
-          fprintf(stderr, "Invalid root entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
+//			fprintf(stderr, "Invalid root entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
+
 			if (!ptest)
 			{
 				if (++m68k->mmu_tmp_buserror_occurred == 1)
 				{
 					m68k->mmu_tmp_buserror_address = addr_in;
+					m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+					m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 				}
 			}
 
@@ -671,7 +683,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 			page = addr_in & 0x1fff;
 			pointer_entry &= ~0x7f;
 
-			//          fprintf(stderr, "8k pages: index %x page %x\n", page_idx, page);
+			//          logerror("8k pages: index %x page %x\n", page_idx, page);
 		}
 		else	// 4k pages
 		{
@@ -679,13 +691,13 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 			page = addr_in & 0xfff;
 			pointer_entry &= ~0xff;
 
-			//          fprintf(stderr, "4k pages: index %x page %x\n", page_idx, page);
+			//          logerror("4k pages: index %x page %x\n", page_idx, page);
 		}
 
 		page_ptr = pointer_entry + (page_idx<<2);
 		page_entry = m68k->program->read_dword(page_ptr);
 
-		//      fprintf(stderr, "page_entry = %08x\n", page_entry);
+		//      logerror("page_entry = %08x\n", page_entry);
 
 		// resolve indirect page pointers
 		while ((page_entry & 3) == 2)
@@ -699,6 +711,8 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 			if (++m68k->mmu_tmp_buserror_occurred == 1)
 			{
 				m68k->mmu_tmp_buserror_address = addr_in;
+				m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+				m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 			}
 
 			return addr_in;
@@ -707,12 +721,14 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		switch (page_entry & 3)
 		{
 			case 0:	// invalid
-              fprintf(stderr, "Invalid page entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
+//				fprintf(stderr, "Invalid page entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
 				if (!ptest)
 				{
 					if (++m68k->mmu_tmp_buserror_occurred == 1)
 					{
 						m68k->mmu_tmp_buserror_address = addr_in;
+						m68k->mmu_tmp_buserror_rw = m68k->mmu_tmp_rw;
+						m68k->mmu_tmp_buserror_fc = m68k->mmu_tmp_fc;
 					}
 				}
 

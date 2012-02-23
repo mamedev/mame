@@ -707,6 +707,8 @@ public:
 	UINT16 mmu_tmp_rw;      /* temporary hack: read/write (1/0) for the mmu */
 	UINT32 mmu_tmp_buserror_address;   /* temporary hack: (first) bus error address */
 	UINT16 mmu_tmp_buserror_occurred;  /* temporary hack: flag that bus error has occurred from mmu */
+	UINT16 mmu_tmp_buserror_fc;   /* temporary hack: (first) bus error fc */
+	UINT16 mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
 
 	UINT32 ic_address[M68K_IC_SIZE];   /* instruction cache address data */
 	UINT16 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
@@ -1571,8 +1573,8 @@ void m68ki_stack_frame_1000(m68ki_cpu_core *m68k, UINT32 pc, UINT32 sr, UINT32 v
  */
 void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
 {
-	int orig_rw = m68k->mmu_tmp_rw;	// this gets splatted by the following pushes, so save it now
-	int orig_fc = m68k->mmu_tmp_fc;
+	int orig_rw = m68k->mmu_tmp_buserror_rw;	// this gets splatted by the following pushes, so save it now
+	int orig_fc = m68k->mmu_tmp_buserror_fc;
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(m68k, 0);
@@ -1623,8 +1625,8 @@ void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
  */
 void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address)
 {
-	int orig_rw = m68k->mmu_tmp_rw;	// this gets splatted by the following pushes, so save it now
-	int orig_fc = m68k->mmu_tmp_fc;
+	int orig_rw = m68k->mmu_tmp_buserror_rw;	// this gets splatted by the following pushes, so save it now
+	int orig_fc = m68k->mmu_tmp_buserror_fc;
 
 	/* INTERNAL REGISTERS (18 words) */
 	m68ki_push_32(m68k, 0);
@@ -1697,8 +1699,8 @@ void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
  */
 void m68ki_stack_frame_0111(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT32 pc, UINT32 fault_address, bool in_mmu)
 {
-	int orig_rw = m68k->mmu_tmp_rw;	// this gets splatted by the following pushes, so save it now
-	int orig_fc = m68k->mmu_tmp_fc;
+	int orig_rw = m68k->mmu_tmp_buserror_rw;	// this gets splatted by the following pushes, so save it now
+	int orig_fc = m68k->mmu_tmp_buserror_fc;
 
 	/* INTERNAL REGISTERS (18 words) */
 	m68ki_push_32(m68k, 0);
