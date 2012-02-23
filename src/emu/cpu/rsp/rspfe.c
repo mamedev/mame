@@ -274,6 +274,10 @@ bool rsp_frontend::describe_cop0(UINT32 op, opcode_desc &desc)
 
 		case 0x04:	// MTCz
 			desc.regin[0] |= REGFLAG_R(RTREG);
+			if(RDREG == 2) // SP_RD_LEN, initiating DMA
+			{
+				desc.flags |= OPFLAG_END_SEQUENCE;
+			}
 			return true;
 	}
 

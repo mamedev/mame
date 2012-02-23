@@ -3622,8 +3622,7 @@ static void static_generate_entry_point(rsp_state *rsp)
 	load_fast_iregs(rsp, block);
 
 	/* generate a hash jump via the current mode and PC */
-	UML_HASHJMP(block, 0, mem(&rsp->pc), *rsp->impstate->nocode);
-																					// hashjmp <mode>,<pc>,nocode
+	UML_HASHJMP(block, 0, mem(&rsp->pc), *rsp->impstate->nocode);					// hashjmp <mode>,<pc>,nocode
 	block->end();
 }
 
@@ -4622,6 +4621,11 @@ static int generate_cop0(rsp_state *rsp, drcuml_block *block, compiler_state *co
 				UML_MOV(block, mem(&rsp->impstate->arg0), RDREG);				// mov     [arg0],<rdreg>
 				UML_MOV(block, mem(&rsp->impstate->arg1), RTREG);				// mov     [arg1],<rtreg>
 				UML_CALLC(block, cfunc_get_cop0_reg, rsp);							// callc   cfunc_get_cop0_reg
+				if(RDREG == 2)
+				{
+					generate_update_cycles(rsp, block, compiler, mem(&rsp->pc), TRUE);
+					UML_HASHJMP(block, 0, mem(&rsp->pc), *rsp->impstate->nocode);
+				}
 			}
 			return TRUE;
 
