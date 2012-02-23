@@ -535,7 +535,7 @@ private:
 	input_class &			m_class;				// reference to our class
 	astring					m_name;					// string name of device
 	int						m_devindex;				// device index of this device
-	input_device_item *		m_item[ITEM_ID_ABSOLUTE_MAXIMUM];	// array of pointers to items
+	input_device_item *		m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1];	// array of pointers to items
 	input_item_id			m_maxitem;				// maximum item index
 	void *					m_internal;				// internal callback pointer
 

@@ -404,13 +404,12 @@ void info_xml_creator::output_one_device(device_t &device, const char *innertag,
 //  in slots
 //-------------------------------------------------
 
-typedef tagmap_t<const game_driver *> slot_map;
+typedef tagmap_t<FPTR> slot_map;
 
 void info_xml_creator::output_devices()
 {
 	m_drivlist.reset();
 	slot_map desc;
-	const game_driver &driver = m_drivlist.driver();
 
 	// first, run through slot devices
 	while (m_drivlist.next())
@@ -420,7 +419,7 @@ void info_xml_creator::output_devices()
 		for (device_t *device = deviter.next(); device != NULL; device = deviter.next()) {
 			if (device->rom_region() != NULL && device->shortname()!= NULL)
 			{
-				if (desc.add(device->name(), &driver, FALSE) != TMERR_DUPLICATE)
+				if (desc.add(device->name(), 0, FALSE) != TMERR_DUPLICATE)
 					output_one_device(*device, device->tag(), emulator_info::get_xml_top());
 			}
 		}
@@ -440,7 +439,7 @@ void info_xml_creator::output_devices()
 					if (!device->configured())
 						device->config_complete();
 
-				if (desc.add(dev->name(), &driver, FALSE) != TMERR_DUPLICATE)
+				if (desc.add(dev->name(), 0, FALSE) != TMERR_DUPLICATE)
 					output_one_device(*dev, temptag.cstr(), emulator_info::get_xml_top());
 
 				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.cstr());
