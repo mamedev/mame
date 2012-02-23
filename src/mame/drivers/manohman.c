@@ -20,6 +20,15 @@
   It's all a challenge. Even once emulated, the game will need a lot of
   artwork and lamps work...
 
+  Currently sits in a loop between 0x100000 and 0x600006 addresses r/w,
+  the snippet is there:
+
+  001BB8: move.b  (A2), D0
+  001BBA: jsr     $6dc0.l
+  001BC0: tst.b   D0
+  001BC2: bne     $1bb8
+
+  Passing this loop it checks the i/o stuff, including the sound addresses
 
 ****************************************************************************
 
@@ -144,10 +153,10 @@ public:
 static ADDRESS_MAP_START( manohman_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP		// smell to MAX696 watchdog...
+	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 	AM_RANGE(0x600006, 0x600007) AM_RAM		// write bitpatterns to compare with the 500000-503ff8 RAM testing.
-//	AM_RANGE(0xXXXXX0, 0xXXXXX1) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
-//	AM_RANGE(0xXXXXX2, 0xXXXXX3) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
 //	AM_RANGE(0xYYYYYY, 0xYYYYYY) AM_RAM
 ADDRESS_MAP_END
 
