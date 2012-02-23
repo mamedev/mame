@@ -2615,6 +2615,7 @@ src/mame/drivers/mainevt.c svneol=native#text/plain
 src/mame/drivers/mainsnk.c svneol=native#text/plain
 src/mame/drivers/majorpkr.c svneol=native#text/plain
 src/mame/drivers/malzak.c svneol=native#text/plain
+src/mame/drivers/manohman.c svneol=native#text/plain
 src/mame/drivers/mappy.c svneol=native#text/plain
 src/mame/drivers/marineb.c svneol=native#text/plain
 src/mame/drivers/marinedt.c svneol=native#text/plain
