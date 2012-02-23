@@ -21,7 +21,6 @@ OBJDIRS += \
 FILE2STR_TARGET = $(BUILDOUT)/file2str$(BUILD_EXE)
 MAKEDEP_TARGET = $(BUILDOUT)/makedep$(BUILD_EXE)
 MAKELIST_TARGET = $(BUILDOUT)/makelist$(BUILD_EXE)
-MAKEDEV_TARGET = $(BUILDOUT)/makedev$(BUILD_EXE)
 PNG2BDC_TARGET = $(BUILDOUT)/png2bdc$(BUILD_EXE)
 VERINFO_TARGET = $(BUILDOUT)/verinfo$(BUILD_EXE)
 
@@ -29,14 +28,12 @@ ifeq ($(TARGETOS),win32)
 FILE2STR = $(subst /,\,$(FILE2STR_TARGET))
 MAKEDEP = $(subst /,\,$(MAKEDEP_TARGET))
 MAKELIST = $(subst /,\,$(MAKELIST_TARGET))
-MAKEDEV = $(subst /,\,$(MAKEDEV_TARGET))
 PNG2BDC = $(subst /,\,$(PNG2BDC_TARGET))
 VERINFO = $(subst /,\,$(VERINFO_TARGET))
 else
 FILE2STR = $(FILE2STR_TARGET)
 MAKEDEP = $(MAKEDEP_TARGET)
 MAKELIST = $(MAKELIST_TARGET)
-MAKEDEV = $(MAKEDEV_TARGET)
 PNG2BDC = $(PNG2BDC_TARGET)
 VERINFO = $(VERINFO_TARGET)
 endif
@@ -46,7 +43,6 @@ BUILD += \
 	$(FILE2STR_TARGET) \
 	$(MAKEDEP_TARGET) \
 	$(MAKELIST_TARGET) \
-	$(MAKEDEV_TARGET) \
 	$(PNG2BDC_TARGET) \
 	$(VERINFO_TARGET) \
 
@@ -86,19 +82,6 @@ MAKELISTOBJS = \
 	$(BUILDOBJ)/makelist.o \
 
 $(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
-
-
-#-------------------------------------------------
-# makedev
-#-------------------------------------------------
-
-MAKEDEVOBJS = \
-	$(BUILDOBJ)/makedev.o \
-
-$(MAKEDEV_TARGET): $(MAKEDEVOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 

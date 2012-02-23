@@ -732,9 +732,6 @@ void cli_frontend::listmedia(const char *gamename)
 //  verifyroms - verify the ROM sets of one or
 //  more games
 //-------------------------------------------------
-extern int m_device_count;
-extern const device_type *s_devices_sorted[];
-
 void cli_frontend::verifyroms(const char *gamename)
 {
 	// determine which drivers to output;
@@ -797,63 +794,131 @@ void cli_frontend::verifyroms(const char *gamename)
 	}
 
 	driver_enumerator dummy_drivlist(m_options);
-	dummy_drivlist.next();
-	machine_config &config = dummy_drivlist.config();
-	device_t *owner = &config.root_device();
-	// check if all are listed, note that empty one is included
-	for (int i = 0; i < m_device_count; i++)
+	typedef tagmap_t<FPTR> int_map;
+	int_map device_map;
+	while (dummy_drivlist.next())
 	{
-		device_type type = *s_devices_sorted[i];
-		device_t *dev = (*type)(config, "dummy", owner, 0);
-		dev->config_complete();
-
-		if (mame_strwildcmp(gamename, dev->shortname()) == 0)
-		{
-			matched++;
-
-			// audit the ROMs in this set
-			media_auditor::summary summary = auditor.audit_device(dev, AUDIT_VALIDATE_FAST);
-
-			// if not found, count that and leave it at that
-			if (summary == media_auditor::NOTFOUND)
-				notfound++;
-
-			// else display information about what we discovered
-			else
-			{
-				// output the summary of the audit
-				astring summary_string;
-				auditor.summarize(dev->shortname(),&summary_string);
-				mame_printf_info("%s", summary_string.cstr());
-
-				// display information about what we discovered
-				mame_printf_info("romset %s ", dev->shortname());
-
-				// switch off of the result
-				switch (summary)
+		machine_config &config = dummy_drivlist.config();
+		device_iterator iter(config.root_device());
+		for (device_t *dev = iter.first(); dev != NULL; dev = iter.next())
+		{			
+			if ((strlen(dev->shortname())>0) && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE)) {
+				if (mame_strwildcmp(gamename, dev->shortname()) == 0)
 				{
-					case media_auditor::INCORRECT:
-						mame_printf_info("is bad\n");
-						incorrect++;
-						break;
+					matched++;
 
-					case media_auditor::CORRECT:
-						mame_printf_info("is good\n");
-						correct++;
-						break;
+					// audit the ROMs in this set
+					media_auditor::summary summary = auditor.audit_device(dev, AUDIT_VALIDATE_FAST);
 
-					case media_auditor::BEST_AVAILABLE:
-						mame_printf_info("is best available\n");
-						correct++;
-						break;
+					// if not found, count that and leave it at that
+					if (summary == media_auditor::NOTFOUND) {
+						notfound++;
+					}
+					// else display information about what we discovered
+					else
+					{
+						// output the summary of the audit
+						astring summary_string;
+						auditor.summarize(dev->shortname(),&summary_string);
+						mame_printf_info("%s", summary_string.cstr());
 
-					default:
-						break;
+						// display information about what we discovered
+						mame_printf_info("romset %s ", dev->shortname());
+
+						// switch off of the result
+						switch (summary)
+						{
+							case media_auditor::INCORRECT:
+								mame_printf_info("is bad\n");
+								incorrect++;
+								break;
+
+							case media_auditor::CORRECT:
+								mame_printf_info("is good\n");
+								correct++;
+								break;
+
+							case media_auditor::BEST_AVAILABLE:
+								mame_printf_info("is best available\n");
+								correct++;
+								break;
+
+							default:
+								break;
+						}
+					}						
 				}
 			}
-		}
+		}		
+		
+		slot_interface_iterator slotiter(config.root_device());
+		for (const device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
+		{
+			const slot_interface* intf = slot->get_slot_interfaces();
+			for (int i = 0; intf && intf[i].name != NULL; i++)
+			{
+				astring temptag("_");
+				temptag.cat(intf[i].name);
+				device_t *dev = const_cast<machine_config &>(config).device_add(&config.root_device(), temptag.cstr(), intf[i].devtype, 0);
 
-		global_free(dev);
+				// notify this device and all its subdevices that they are now configured
+				device_iterator subiter(*dev);
+				for (device_t *device = subiter.first(); device != NULL; device = subiter.next())
+					if (!device->configured())
+						device->config_complete();
+				
+				if (dev->rom_region() != NULL && device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE) {
+					if (mame_strwildcmp(gamename, dev->shortname()) == 0)
+					{
+						matched++;
+
+						// audit the ROMs in this set
+						media_auditor::summary summary = auditor.audit_device(dev, AUDIT_VALIDATE_FAST);
+
+						// if not found, count that and leave it at that
+						if (summary == media_auditor::NOTFOUND)
+							notfound++;
+
+						// else display information about what we discovered
+						else
+						{
+							// output the summary of the audit
+							astring summary_string;
+							auditor.summarize(dev->shortname(),&summary_string);
+							mame_printf_info("%s", summary_string.cstr());
+
+							// display information about what we discovered
+							mame_printf_info("romset %s ", dev->shortname());
+
+							// switch off of the result
+							switch (summary)
+							{
+								case media_auditor::INCORRECT:
+									mame_printf_info("is bad\n");
+									incorrect++;
+									break;
+
+								case media_auditor::CORRECT:
+									mame_printf_info("is good\n");
+									correct++;
+									break;
+
+								case media_auditor::BEST_AVAILABLE:
+									mame_printf_info("is best available\n");
+									correct++;
+									break;
+
+								default:
+									break;
+							}
+						}
+					}
+				}
+
+				const_cast<machine_config &>(config).device_remove(&config.root_device(), temptag.cstr());
+				global_free(dev);
+			}
+		}	
 	}
 
 	// clear out any cached files

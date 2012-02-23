@@ -96,6 +96,7 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "hdd"; }
 
 	void ide_build_features();
 	virtual bool is_ready() { return (m_disk != NULL); }
@@ -117,6 +118,7 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "hdd_image"; }
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 };

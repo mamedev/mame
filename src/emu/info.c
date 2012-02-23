@@ -180,6 +180,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ELEMENT slotoption EMPTY>\n"
 "\t\t\t\t<!ATTLIST slotoption name CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST slotoption description CDATA #REQUIRED>\n"
+"\t\t\t\t<!ATTLIST slotoption shortname CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST slotoption default (yes|no) \"no\">\n"
 "\t\t<!ELEMENT softwarelist EMPTY>\n"
 "\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
@@ -187,92 +188,6 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST softwarelist filter CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT ramoption (#PCDATA)>\n"
 "\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
-"\t<!ELEMENT device (description, rom*, chip*, display*, sound?, input?, dipswitch*, configuration*, adjuster*, device*, slot*)>\n"
-"\t\t<!ATTLIST device name CDATA #IMPLIED>\n"
-"\t\t<!ELEMENT description (#PCDATA)>\n"
-"\t\t<!ELEMENT rom EMPTY>\n"
-"\t\t\t<!ATTLIST rom name CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST rom bios CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST rom size CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST rom crc CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST rom merge CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST rom region CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
-"\t\t\t<!ATTLIST rom optional (yes|no) \"no\">\n"
-"\t\t<!ELEMENT chip EMPTY>\n"
-"\t\t\t<!ATTLIST chip name CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST chip tag CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST chip type (cpu|audio) #REQUIRED>\n"
-"\t\t\t<!ATTLIST chip clock CDATA #IMPLIED>\n"
-"\t\t<!ELEMENT display EMPTY>\n"
-"\t\t\t<!ATTLIST display type (raster|vector|lcd|unknown) #REQUIRED>\n"
-"\t\t\t<!ATTLIST display rotate (0|90|180|270) #REQUIRED>\n"
-"\t\t\t<!ATTLIST display flipx (yes|no) \"no\">\n"
-"\t\t\t<!ATTLIST display width CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST display height CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST display refresh CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST display pixclock CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST display htotal CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST display hbend CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST display hbstart CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST display vtotal CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST display vbend CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST display vbstart CDATA #IMPLIED>\n"
-"\t\t<!ELEMENT sound EMPTY>\n"
-"\t\t\t<!ATTLIST sound channels CDATA #REQUIRED>\n"
-"\t\t<!ELEMENT input (control*)>\n"
-"\t\t\t<!ATTLIST input service (yes|no) \"no\">\n"
-"\t\t\t<!ATTLIST input tilt (yes|no) \"no\">\n"
-"\t\t\t<!ATTLIST input players CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST input buttons CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST input coins CDATA #IMPLIED>\n"
-"\t\t\t<!ELEMENT control EMPTY>\n"
-"\t\t\t\t<!ATTLIST control type CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST control minimum CDATA #IMPLIED>\n"
-"\t\t\t\t<!ATTLIST control maximum CDATA #IMPLIED>\n"
-"\t\t\t\t<!ATTLIST control sensitivity CDATA #IMPLIED>\n"
-"\t\t\t\t<!ATTLIST control keydelta CDATA #IMPLIED>\n"
-"\t\t\t\t<!ATTLIST control reverse (yes|no) \"no\">\n"
-"\t\t\t\t<!ATTLIST control ways CDATA #IMPLIED>\n"
-"\t\t\t\t<!ATTLIST control ways2 CDATA #IMPLIED>\n"
-"\t\t\t\t<!ATTLIST control ways3 CDATA #IMPLIED>\n"
-"\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
-"\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n"
-"\t\t\t<!ELEMENT dipvalue EMPTY>\n"
-"\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
-"\t\t<!ELEMENT configuration (confsetting*)>\n"
-"\t\t\t<!ATTLIST configuration name CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST configuration tag CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST configuration mask CDATA #REQUIRED>\n"
-"\t\t\t<!ELEMENT confsetting EMPTY>\n"
-"\t\t\t\t<!ATTLIST confsetting name CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST confsetting value CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST confsetting default (yes|no) \"no\">\n"
-"\t\t<!ELEMENT adjuster EMPTY>\n"
-"\t\t\t<!ATTLIST adjuster name CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST adjuster default CDATA #REQUIRED>\n"
-"\t\t<!ELEMENT device (instance*, extension*)>\n"
-"\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
-"\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST device mandatory CDATA #IMPLIED>\n"
-"\t\t\t<!ATTLIST device interface CDATA #IMPLIED>\n"
-"\t\t\t<!ELEMENT instance EMPTY>\n"
-"\t\t\t\t<!ATTLIST instance name CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST instance briefname CDATA #REQUIRED>\n"
-"\t\t\t<!ELEMENT extension EMPTY>\n"
-"\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
-"\t\t<!ELEMENT slot (slotoption*)>\n"
-"\t\t\t<!ATTLIST slot name CDATA #REQUIRED>\n"
-"\t\t\t<!ELEMENT slotoption EMPTY>\n"
-"\t\t\t\t<!ATTLIST slotoption name CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST slotoption description CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST slotoption default (yes|no) \"no\">\n"
 "]>";
 
 
@@ -498,43 +413,39 @@ void info_xml_creator::output_devices()
 	slot_map desc;
 	const game_driver &driver = m_drivlist.driver();
 
-	bool display_all = (driver_list::total() == m_drivlist.count() + 1);
 	// first, run through slot devices
 	while (m_drivlist.next())
 	{
 		device_iterator deviter(m_drivlist.config().root_device());
 		deviter.first();
-		for (device_t *device = deviter.next(); device != NULL; device = deviter.next())
+		for (device_t *device = deviter.next(); device != NULL; device = deviter.next()) {
 			if (device->rom_region() != NULL && device->shortname()!= NULL)
 			{
 				if (desc.add(device->name(), &driver, FALSE) != TMERR_DUPLICATE)
 					output_one_device(*device, device->tag(), emulator_info::get_xml_top());
 			}
-
-		if (display_all)
+		}
+		slot_interface_iterator iter(m_drivlist.config().root_device());
+		for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 		{
-			slot_interface_iterator iter(m_drivlist.config().root_device());
-			for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
+			const slot_interface* intf = slot->get_slot_interfaces();
+			for (int i = 0; intf && intf[i].name != NULL; i++)
 			{
-				const slot_interface* intf = slot->get_slot_interfaces();
-				for (int i = 0; intf && intf[i].name != NULL; i++)
-				{
-					astring temptag("_");
-					temptag.cat(intf[i].name);
-					device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), intf[i].devtype, 0);
+				astring temptag("_");
+				temptag.cat(intf[i].name);
+				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), intf[i].devtype, 0);
 
-					// notify this device and all its subdevices that they are now configured
-					device_iterator subiter(*dev);
-					for (device_t *device = subiter.first(); device != NULL; device = subiter.next())
-						if (!device->configured())
-							device->config_complete();
+				// notify this device and all its subdevices that they are now configured
+				device_iterator subiter(*dev);
+				for (device_t *device = subiter.first(); device != NULL; device = subiter.next())
+					if (!device->configured())
+						device->config_complete();
 
-					if (desc.add(dev->name(), &driver, FALSE) != TMERR_DUPLICATE)
-						output_one_device(*dev, temptag.cstr(), "device");
+				if (desc.add(dev->name(), &driver, FALSE) != TMERR_DUPLICATE)
+					output_one_device(*dev, temptag.cstr(), emulator_info::get_xml_top());
 
-					const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.cstr());
-					global_free(dev);
-				}
+				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.cstr());
+				global_free(dev);
 			}
 		}
 	}
@@ -1372,9 +1283,13 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 			for (int i = 0; intf && intf[i].name != NULL; i++)
 			{
 				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", intf[i].devtype, 0);
+				if (!dev->configured())
+					dev->config_complete();
+
 				fprintf(m_output, "\t\t\t<slotoption");
 				fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
 				fprintf(m_output, " description=\"%s\"", xml_normalize_string(dev->name()));
+				fprintf(m_output, " shortname=\"%s\"", xml_normalize_string(dev->shortname()));
 				if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()))
 				{
 					if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()) == intf[i].name)

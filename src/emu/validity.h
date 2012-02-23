@@ -97,7 +97,6 @@ private:
 	void validate_condition(input_condition &condition, device_t &device, int_map &port_map);
 	void validate_inputs();
 	void validate_devices();
-	void validate_slots();
 
 	// output helpers
 	void build_output_prefix(astring &string);

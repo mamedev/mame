@@ -165,7 +165,7 @@ public:
 	floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_35_dd();
 	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-
+	virtual void device_config_complete() { m_shortname = "floppy_35_dd"; }
 protected:
 	virtual void setup_characteristics();
 };
@@ -175,7 +175,7 @@ public:
 	floppy_35_dd_nosd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_35_dd_nosd();
 	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-
+	virtual void device_config_complete() { m_shortname = "floppy_35_dd_nosd"; }
 protected:
 	virtual void setup_characteristics();
 };
@@ -185,7 +185,7 @@ public:
 	floppy_35_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_35_hd();
 	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-
+	virtual void device_config_complete() { m_shortname = "floppy_35_hd"; }
 protected:
 	virtual void setup_characteristics();
 };
@@ -195,7 +195,7 @@ public:
 	floppy_35_ed(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_35_ed();
 	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-
+	virtual void device_config_complete() { m_shortname = "floppy_35_ed"; }
 protected:
 	virtual void setup_characteristics();
 };
@@ -205,7 +205,7 @@ public:
 	floppy_525_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~floppy_525_dd();
 	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-
+	virtual void device_config_complete() { m_shortname = "floppy_525_dd"; }
 protected:
 	virtual void setup_characteristics();
 };
