@@ -802,7 +802,7 @@ void cli_frontend::verifyroms(const char *gamename)
 		device_iterator iter(config.root_device());
 		for (device_t *dev = iter.first(); dev != NULL; dev = iter.next())
 		{			
-			if ((strlen(dev->shortname())>0) && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE)) {
+			if (dev->owner() != NULL && (strlen(dev->shortname())>0) && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE)) {
 				if (mame_strwildcmp(gamename, dev->shortname()) == 0)
 				{
 					matched++;
