@@ -61,6 +61,34 @@
     LS14 (SOIC14)
     74F244 (x2, SOIC20)
     ST ULN2064B (DIP16)
+
+Notes related to Area 51: Site 4 from:
+http://www.mameworld.info/ubbthreads/showthreaded.php?Cat=&Number=276606
+
+Regarding the (a51site4a.chd)
+
+I own a dedicated cab and have sold HD replacements that use an SD card and
+IDE adapter.  So I have done some research and have purchased enough board sets
+and HD's that I have some idea what I'm talking about.  Anyhoo, The currently
+supported image is Rev. 2.01 as is still sold by happ.  The only difference
+between the current MAME chd and a fresh Happ HD is that the MAME chd has had
+it's serial # cleared, but it STILL has statistical data saved. IE. credits
+inserted, games played, play times, etc...  I know it's that version by the size
+of the CHD. I have compressed several STOCK HD's including my own and they all are
+the same size.  The only HD that I have compressed that was the same as the currently
+supported chd was a happ replacement HD.  So in conclusion, There are two different
+versions of the Area 51 Site 4 HD one that was shipped in dedicated cabs dated
+Sep. 11 1998 and another Rev. 2.01 dated Sep. 7 1998 for whatever reason I cannot say.
+
+I do have clean copies of both in chd format, stripped of ALL statistical info. but
+they still retain their serial #'s.  BTW: I did use chdman to copy the currently
+supported chd to a card and put it in my cab just to clear all the stats and make a clean
+copy as it should be.  Also, Just to be clear the size of the chd is not determined by
+the original HD as I'm talking about their size after using chdman to put them onto a
+SD card and then using chdman to make a chd from the SD card. They are different sizes!
+
+-ninjakid
+
 */
 
 #include "emu.h"
@@ -1330,6 +1358,23 @@ ROM_START( a51site4 )
 	DISK_IMAGE( "a51site4", 0, SHA1(48496666d1613700ae9274f9a5361ea5bbaebea0) )
 ROM_END
 
+ROM_START( a51site4a )
+	ROM_REGION32_LE(0x40000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "new", "v1.0h" )
+	ROMX_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778), ROM_BIOS(1)) /* Build date 09/15/98 string stored at 0x3fff5 */
+	ROM_SYSTEM_BIOS(1, "old", "v1.0f" )
+	ROMX_LOAD("a51s4_bios_07-11-98.u1", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe), ROM_BIOS(2)) /* Build date 07/11/98 string stored at 0x3fff5 */
+
+	ROM_REGION(0x08100, "gfx1", 0)
+	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+
+	DISK_REGION( "drive_0" )
+// Not sure why this does not boot.  Information (at the top of the driver) might indicate this as an SD Card bootleg of the original HD.
+	DISK_IMAGE( "a51site4a", 0, SHA1(a0962b35c265154e571f973a819efdd06109e543) )
+ROM_END
+
+
 /*****************************************************************************/
 
-GAME( 1998, a51site4, 0,	mediagx, mediagx, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4", GAME_NOT_WORKING )
+GAME( 1998, a51site4, 0       , mediagx, mediagx, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4", GAME_NOT_WORKING )
+GAME( 1998, a51site4a,a51site4,	mediagx, mediagx, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4 (September 11, 1998)", GAME_NOT_WORKING )

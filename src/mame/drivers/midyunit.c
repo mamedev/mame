@@ -2424,6 +2424,35 @@ ROM_START( mkyawdim )
 	ROM_LOAD ( "mkg-u109.rom",  0x580000, 0x80000, CRC(cafc47bb) SHA1(8610af6e52f7089ff4acd850c53ab8b4119e4445) )
 ROM_END
 
+ROM_START( mkyawdim2 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound CPU */
+        // Differs from other yawdim set - sound doesn't want to work
+	ROM_LOAD ( "yawdim.u167", 0x00000, 0x10000, CRC(16da7efb) SHA1(ac1db81a55aca36136b94977a91a1fc778b7b164) )
+
+	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM */
+        // Half size as other yawdim set
+	ROM_LOAD( "yawdim.u159",  0x00000, 0x20000, CRC(95b120af) SHA1(41b6fb384e5048926b87959a2c58d96b95698aba) )
+	ROM_CONTINUE(       0x40000, 0x20000 )
+	ROM_LOAD( "mw-15.u160",  0x20000, 0x20000, CRC(6e68e0b0) SHA1(edb7aa6507452ffa5ce7097e3b1855a69542971c) )
+	ROM_CONTINUE(       0x60000, 0x20000 )
+	ROM_CONTINUE(       0xa0000, 0x20000 )
+	ROM_CONTINUE(       0xe0000, 0x20000 )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "4.u25",  0x00000, 0x80000, CRC(b12b3bf2) SHA1(deb7755e8407d9de25124b3fdbc4c834a25d8252) )
+	ROM_LOAD16_BYTE( "5.u26",  0x00001, 0x80000, CRC(7a37dc5c) SHA1(c4fc6933d8b990c5c56c65282b1f72b90b5d5435) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* 8mbit dumps */
+	ROM_LOAD ( "b-1.bin",  0x000000, 0x100000, CRC(f41e61c6) SHA1(7dad38839d5c9aa0cfa7b2f7199f14e0f2c4494b) )
+	ROM_LOAD ( "b-2.bin",  0x100000, 0x100000, CRC(8052740b) SHA1(f1b7fd536966d9d0ce690cdec635069c340d678e) )
+
+	ROM_LOAD ( "a-1.bin",  0x200000, 0x100000, CRC(7da3cb93) SHA1(23b9053b3241b69988f7f2e6a9d1353dac4fc8ab) )
+	ROM_LOAD ( "a-2.bin",  0x300000, 0x100000, CRC(1eedb0f8) SHA1(27c056c469c17bb176325b91cf92296c89681ac6) )
+
+	ROM_LOAD ( "c-1.bin",  0x400000, 0x100000, CRC(de27c4c3) SHA1(a7760d239749c7463808adec72795f9785f553ec) )
+	ROM_LOAD ( "c-2.bin",  0x500000, 0x100000, CRC(d99203f3) SHA1(46ea21cbedfd42838562594b9bdc5d80360b7e5e) )
+ROM_END
+
 
 ROM_START( term2 )
 	ROM_REGION( 0x50000, "adpcm", 0 )	/* sound CPU */
@@ -2676,6 +2705,7 @@ GAME( 1992, mkyturbo, mk,       yunit_adpcm_6bit_fast,   mkla4,    mkyturbo, ROT
 GAME( 1992, mknifty,  mk,       yunit_adpcm_6bit_fast,   mkla4,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mknifty666, mk,     yunit_adpcm_6bit_fast,   mkla4,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mkyawdim, mk,       mkyawdim,                mkla4,    mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mkyawdim2,mk,       mkyawdim,                mkla4,    mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg - Set 2)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 
 GAME( 1992, totcarn,  0,        yunit_adpcm_6bit_fast,   totcarn,  totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", GAME_SUPPORTS_SAVE )
 GAME( 1992, totcarnp, totcarn,  yunit_adpcm_6bit_fast,   totcarn,  totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", GAME_SUPPORTS_SAVE )

@@ -1343,6 +1343,13 @@ ROM_START( fax )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "fxl1-11d.32",  0x0000, 0x0800, CRC(62083db2) SHA1(0c6e90b73419bff53f991e66d4faa9495c7d8e09) )
+
+// loaded, but not hooked up
+	ROM_REGION( 0x0240, "proms", 0 )
+	ROM_LOAD( "fxl-6b",   0x0000, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) )
+	ROM_LOAD( "fxl-8b",   0x0100, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) )
+	ROM_LOAD( "fxl-11b",  0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "fxl-12b",  0x0140, 0x0100, CRC(6b5aa3d7) SHA1(bfc4a6d01b977d55ad4dadc0123339343f1aa975) )
 ROM_END
 
 
@@ -1389,6 +1396,13 @@ ROM_START( fax2 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "fxl1-11d.32",   0x0000, 0x0800, CRC(62083db2) SHA1(0c6e90b73419bff53f991e66d4faa9495c7d8e09) )
+
+// loaded, but not hooked up
+	ROM_REGION( 0x0240, "proms", 0 )
+	ROM_LOAD( "fxl-6b",   0x0000, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) )
+	ROM_LOAD( "fxl-8b",   0x0100, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) )
+	ROM_LOAD( "fxl-11b",  0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "fxl-12b",  0x0140, 0x0100, CRC(6b5aa3d7) SHA1(bfc4a6d01b977d55ad4dadc0123339343f1aa975) )
 ROM_END
 
 

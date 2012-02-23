@@ -6661,6 +6661,8 @@ maxf_102		//     ??           (c) 1996
 maxf_ng			//     ??           (c) 1996
 vcircle			// (proto)          (c) 1996
 a51site4		//     ??           (c) 1998
+a51site4a		// Sept.11,1998     (c) 1998
+
 
 // SNK / Rock-ola games
 sasuke			// [1980] Shin Nihon Kikaku (SNK)
@@ -7371,6 +7373,7 @@ mkla2			// (c) 1992 Midway
 mkla3			// (c) 1992 Midway
 mkla4			// (c) 1992 Midway
 mkyawdim		// bootleg
+mkyawdim2		// bootleg
 term2			// (c) 1992 Midway
 term2la3		// (c) 1992 Midway
 term2la2		// (c) 1992 Midway
