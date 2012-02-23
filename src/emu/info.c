@@ -179,7 +179,6 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST slot name CDATA #REQUIRED>\n"
 "\t\t\t<!ELEMENT slotoption EMPTY>\n"
 "\t\t\t\t<!ATTLIST slotoption name CDATA #REQUIRED>\n"
-"\t\t\t\t<!ATTLIST slotoption description CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST slotoption shortname CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST slotoption default (yes|no) \"no\">\n"
 "\t\t<!ELEMENT softwarelist EMPTY>\n"
@@ -1288,7 +1287,6 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 
 				fprintf(m_output, "\t\t\t<slotoption");
 				fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
-				fprintf(m_output, " description=\"%s\"", xml_normalize_string(dev->name()));
 				fprintf(m_output, " shortname=\"%s\"", xml_normalize_string(dev->shortname()));
 				if (slot->get_default_card(m_drivlist.config(), m_drivlist.options()))
 				{
