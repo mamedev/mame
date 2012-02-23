@@ -403,10 +403,9 @@ void info_xml_creator::output_devices()
 	{
 		// first, run through devices with roms which belongs to the default configuration
 		device_iterator deviter(m_drivlist.config().root_device());
-		deviter.first();
-		for (device_t *device = deviter.next(); device != NULL; device = deviter.next()) 
+		for (device_t *device = deviter.first(); device != NULL; device = deviter.next()) 
 		{
-			if (device->rom_region() != NULL && device->shortname()!= NULL)
+			if (device->owner() != NULL && device->rom_region() != NULL && device->shortname()!= NULL)
 			{
 				if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
 					output_one_device(*device, device->tag());
@@ -449,8 +448,7 @@ void info_xml_creator::output_devices()
 void info_xml_creator::output_device_roms()
 {
 	device_iterator deviter(m_drivlist.config().root_device());
-	deviter.first();
-	for (device_t *device = deviter.next(); device != NULL; device = deviter.next())
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 		if (device->owner() != NULL && device->rom_region() != NULL && device->shortname()!= NULL)
 			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname()));
 }
