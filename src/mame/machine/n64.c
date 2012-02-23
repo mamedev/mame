@@ -76,7 +76,7 @@ void n64_periphs::device_reset()
 	rspcpu = machine().device("rsp");
 	mem_map = maincpu->memory().space(AS_PROGRAM);
 
-	mi_version = 0x02020102;
+	mi_version = 0x01010101;
 	mi_interrupt = 0;
 	mi_intr_mask = 0;
 	mi_mode = 0;
@@ -144,6 +144,9 @@ void n64_periphs::device_reset()
 	dd_seq_ctrl_reg = 0;
 	dd_int = 0;
 
+	memset(ri_regs, 0, sizeof(ri_regs));
+
+	//ri_regs[3] = 1;
 	memset(pif_ram, 0, sizeof(pif_ram));
 	memset(pif_cmd, 0, sizeof(pif_cmd));
 	si_dram_addr = 0;
@@ -263,13 +266,13 @@ READ32_MEMBER( n64_periphs::mi_reg_r )
 			break;
 	}
 
-	//printf("mi_reg_r %08x = %08x\n", offset * 4, ret);
+	//printf("mi_reg_r %08x = %08x\n", offset * 4, ret); fflush(stdout);
 	return ret;
 }
 
 WRITE32_MEMBER( n64_periphs::mi_reg_w )
 {
-	//printf("mi_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
+	//printf("mi_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:		// MI_INIT_MODE_REG
@@ -360,12 +363,12 @@ void n64_periphs::check_interrupts()
 {
 	if (mi_intr_mask & mi_interrupt)
 	{
-		//printf("Asserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt);
+		//printf("Asserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt); fflush(stdout);
 		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
-		//printf("Deasserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt);
+		//printf("Deasserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt); fflush(stdout);
 		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
@@ -462,7 +465,7 @@ WRITE32_MEMBER( n64_periphs::open_w )
 
 READ32_MEMBER( n64_periphs::rdram_reg_r )
 {
-	//printf("rdram_reg_r %08x = %08x\n", offset * 4, rdram_regs[offset]);
+	//printf("rdram_reg_r %08x = %08x\n", offset * 4, rdram_regs[offset]); fflush(stdout);
 	if(offset > 0x24/4)
 	{
 		logerror("rdram_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(maincpu));
@@ -473,7 +476,7 @@ READ32_MEMBER( n64_periphs::rdram_reg_r )
 
 WRITE32_MEMBER( n64_periphs::rdram_reg_w )
 {
-	//printf("rdram_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
+	//printf("rdram_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask); fflush(stdout);
 	if(offset > 0x24/4)
 	{
 		logerror("rdram_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(maincpu));
@@ -493,7 +496,7 @@ void n64_periphs::sp_dma(int direction)
         length = (length + 7) & ~7;
 	}
 
-	//printf("Length %08x Skip %08x Count %08x\n", length, sp_dma_skip, sp_dma_count);
+	//printf("Length %08x Skip %08x Count %08x\n", length, sp_dma_skip, sp_dma_count); fflush(stdout);
 	if (sp_mem_addr & 0x3)
 	{
         sp_mem_addr = sp_mem_addr & ~3;
@@ -608,12 +611,14 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
 
 		case 0x1c/4:		// SP_SEMAPHORE_REG
 			//machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(1));
+			device_yield(machine().device("maincpu"));
             if( sp_semaphore )
             {
                 ret = 1;
             }
             else
             {
+				//printf("Semaphore is now acquired, returning 0\n");
                 sp_semaphore = 1;
                 ret = 0;
             }
@@ -671,7 +676,7 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
             break;
 	}
 
-	//printf("%08x sp_reg_r %08x = %08x\n", (UINT32)cpu_get_reg(maincpu, MIPS3_PC), offset * 4, ret);
+	//printf("%08x sp_reg_r %08x = %08x\n", (UINT32)cpu_get_reg(maincpu, MIPS3_PC), offset * 4, ret); fflush(stdout);
 	return ret;
 }
 
@@ -682,7 +687,7 @@ READ32_DEVICE_HANDLER( n64_sp_reg_r )
 
 void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
-	//printf("%08x sp_reg_w %08x %08x %08x\n", (UINT32)cpu_get_reg(maincpu, MIPS3_PC), offset * 4, data, mem_mask);
+	//printf("%08x sp_reg_w %08x %08x %08x\n", (UINT32)cpu_get_reg(maincpu, MIPS3_PC), offset * 4, data, mem_mask); fflush(stdout);
 
 	if ((offset & 0x10000) == 0)
 	{
@@ -720,108 +725,133 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
                 {
 					device_set_input_line(rspcpu, INPUT_LINE_HALT, CLEAR_LINE);
 					newstatus &= ~RSP_STATUS_HALT;
+					//printf("***SP HALT CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000002)      // set halt
                 {
                     device_set_input_line(rspcpu, INPUT_LINE_HALT, ASSERT_LINE);
                     newstatus |= RSP_STATUS_HALT;
+					//printf("***SP HALT SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00000004)
                 {
                     newstatus &= ~RSP_STATUS_BROKE;
+					//printf("***SP BROKE CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000008)      // clear interrupt
                 {
+					//printf("***SP INT CLR***\n"); fflush(stdout);
                     clear_rcp_interrupt(SP_INTERRUPT);
                 }
                 if (data & 0x00000010)      // set interrupt
                 {
+					//printf("***SP INT SET***\n"); fflush(stdout);
                     signal_rcp_interrupt(SP_INTERRUPT);
                 }
                 if (data & 0x00000020)
                 {
                     newstatus &= ~RSP_STATUS_SSTEP;
+					//printf("***SP SSTEP CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000040)
                 {
                     newstatus |= RSP_STATUS_SSTEP;	// set single step
+					//printf("***SP SSTEP SET***\n"); fflush(stdout);
                     if(!(oldstatus & (RSP_STATUS_BROKE | RSP_STATUS_HALT)))
                     {
                         cpu_set_reg(rspcpu, RSP_STEPCNT, 1 );
-                        device_yield(machine().device("maincpu"));
+                        device_yield(machine().device("rsp"));
                     }
                 }
                 if (data & 0x00000080)
                 {
                     newstatus &= ~RSP_STATUS_INTR_BREAK;	// clear interrupt on break
+					//printf("***SP INTRBRK CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000100)
                 {
                     newstatus |= RSP_STATUS_INTR_BREAK;		// set interrupt on break
+					//printf("***SP INTRBRK SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00000200)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL0;		// clear signal 0
+					//printf("***SP YIELD CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000400)
                 {
                     newstatus |= RSP_STATUS_SIGNAL0;		// set signal 0
+					//printf("***SP YIELD SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00000800)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL1;		// clear signal 1
+					//printf("***SP YIELDED CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00001000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL1;		// set signal 1
+					//printf("***SP YIELDED SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00002000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL2 ;		// clear signal 2
+					//printf("***SP TASKDONE CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00004000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL2;		// set signal 2
+					//printf("***SP TASKDONE SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00008000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL3;		// clear signal 3
+					//printf("***SP SIG3 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00010000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL3;		// set signal 3
+					//printf("***SP SIG3 SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00020000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL4;		// clear signal 4
+					//printf("***SP SIG4 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00040000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL4;		// set signal 4
+					//printf("***SP SIG4 SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00080000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL5;		// clear signal 5
+					//printf("***SP SIG5 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00100000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL5;		// set signal 5
+					//printf("***SP SIG5 SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00200000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL6;		// clear signal 6
+					//printf("***SP SIG6 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00400000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL6;		// set signal 6
+					//printf("***SP SIG6 SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00800000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL7;		// clear signal 7
+					//printf("***SP SIG7 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x01000000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL7;		// set signal 7
+					//printf("***SP SIG7 SET***\n"); fflush(stdout);
                 }
                 cpu_set_reg(rspcpu, RSP_SR, newstatus);
                 break;
@@ -829,6 +859,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
 
 			case 0x1c/4:		// SP_SEMAPHORE_REG
 				//machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(1));
+				//printf("Semaphore is being released\n");
 				if(data == 0)
 				{
                 	sp_semaphore = 0;
@@ -912,7 +943,7 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 			break;
 	}
 
-	//printf("%08x dp_reg_r %08x = %08x\n", (UINT32)cpu_get_reg(device->machine().device("rsp"), RSP_PC), offset, ret);
+	//printf("%08x dp_reg_r %08x = %08x\n", (UINT32)cpu_get_reg(device->machine().device("rsp"), RSP_PC), offset, ret); fflush(stdout);
 	return ret;
 }
 
@@ -921,7 +952,7 @@ WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 	n64_state *state = device->machine().driver_data<n64_state>();
 	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
 
-	//printf("%08x dp_reg_w %08x %08x %08x\n", (UINT32)cpu_get_reg(device->machine().device("rsp"), RSP_PC), offset, data, mem_mask);
+	//printf("%08x dp_reg_w %08x %08x %08x\n", (UINT32)cpu_get_reg(device->machine().device("rsp"), RSP_PC), offset, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:		// DP_START_REG
@@ -1336,7 +1367,7 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
     switch (offset)
     {
         case 0x00/4:        // AI_DRAM_ADDR_REG
-            ai_dram_addr = data & 0xffffff;
+            ai_dram_addr = data & 0xfffff8;
             break;
 
         case 0x04/4:        // AI_LEN_REG
@@ -1375,6 +1406,7 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 static TIMER_CALLBACK(pi_dma_callback)
 {
 	machine.device<n64_periphs>("rcp")->pi_dma_tick();
+	device_yield(machine.device("rsp"));
 }
 
 void n64_periphs::pi_dma_tick()
@@ -1400,7 +1432,7 @@ void n64_periphs::pi_dma_tick()
     	cart_addr &= ((machine().region("user2")->bytes() >> 1) - 1);
 	}
 
-	//printf("%08x Cart, %08x Dram\n", cart_addr << 1, dram_addr << 1);
+	//printf("%08x Cart, %08x Dram\n", cart_addr << 1, dram_addr << 1); fflush(stdout);
 
 	if(pi_dma_dir == 1)
 	{
@@ -1419,14 +1451,6 @@ void n64_periphs::pi_dma_tick()
 
 			pi_cart_addr += dma_length;
 			pi_dram_addr += dma_length;
-		}
-
-		if (pi_first_dma)
-		{
-			// TODO: CIC-6105 has different address...
-			mem_map->write_dword(0x00000318, 0x400000);
-			mem_map->write_dword(0x000003f0, 0x800000);
-			pi_first_dma = 0;
 		}
 	}
 	else
@@ -1517,7 +1541,7 @@ READ32_MEMBER( n64_periphs::pi_reg_r )
 
 WRITE32_MEMBER( n64_periphs::pi_reg_w )
 {
-	//printf("pi_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
+	//printf("pi_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:		// PI_DRAM_ADDR_REG
@@ -1538,7 +1562,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 0;
 			pi_status |= 1;
 
-			attotime dma_period = attotime::from_hz(93750000) * (pi_rd_len + 1) * 3;
+			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 10.2f);
 			//printf("want read dma in %d\n", (pi_rd_len + 1));
 			pi_dma_timer->adjust(dma_period);
 			//pi_dma_tick();
@@ -1551,9 +1575,18 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 1;
 			pi_status |= 1;
 
-			attotime dma_period = attotime::from_hz(93750000) * (pi_wr_len + 1) * 3;
+			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 10.2f);
 			//printf("want write dma in %d\n", (pi_wr_len + 1));
 			pi_dma_timer->adjust(dma_period);
+
+			if (pi_first_dma)
+			{
+				// TODO: CIC-6105 has different address...
+				mem_map->write_dword(0x00000318, 0x800000);
+				mem_map->write_dword(0x000003f0, 0x800000);
+				pi_first_dma = 0;
+			}
+
 			//pi_dma_tick();
 			break;
 		}
@@ -1917,13 +1950,13 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 void n64_periphs::handle_pif()
 {
-	/*printf("Before:\n");
+	/*printf("Before:\n"); fflush(stdout);
 	for(int i = 0; i < 0x40; i++)
     {
         printf("%02x ", pif_cmd[i]);
         if((i & 0xf) == 0xf)
         {
-            printf("\n");
+            printf("\n"); fflush(stdout);
         }
     }*/
 	if(pif_cmd[0x3f] == 0x1)		// only handle the command if the last byte is 1
@@ -1996,13 +2029,13 @@ void n64_periphs::handle_pif()
 		//pif_ram[0x3f] = 0;
 	}
 
-	/*printf("After:\n");
+	/*printf("After:\n"); fflush(stdout);
     for(int i = 0; i < 0x40; i++)
     {
-        printf("%02x ", pif_ram[i]);
+        printf("%02x ", pif_ram[i]); fflush(stdout);
         if((i & 0xf) == 0xf)
         {
-            printf("\n");
+            printf("\n"); fflush(stdout);
         }
     }*/
 }
@@ -2065,13 +2098,13 @@ READ32_MEMBER( n64_periphs::si_reg_r )
 			ret = si_status;
 	}
 
-	//printf("si_reg_r %08x = %08x\n", offset * 4, ret);
+	//printf("si_reg_r %08x = %08x\n", offset * 4, ret); fflush(stdout);
 	return ret;
 }
 
 WRITE32_MEMBER( n64_periphs::si_reg_w )
 {
-	//printf("si_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
+	//printf("si_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:		// SI_DRAM_ADDR_REG
