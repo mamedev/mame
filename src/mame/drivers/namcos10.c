@@ -28,7 +28,7 @@ Kotoba no Puzzle Mojipittan (KPM1 Ver.A)         (C) Namco, 2001
 Mr Driller 2 (DR21 Ver.A)                        (C) Namco, 2000
 Mr Driller 2 (DR22 Ver.A)                        (C) Namco, 2000
 Mr Driller G (DRG1 Ver.A)                        (C) Namco, 2001
-*NFL Classic Football                            (C) Namco, 2003
+NFL Classic Football (NCF3 Ver.A)                (C) Namco, 2003 - Has a noticable red dot the right right of the version printed on PCB.  Something to determine region?
 Panicuru Panekuru (PPA1 Ver.A)                   (C) Namco, 2001
 *Photo Battole                                   (C) Namco, 2001
 Point Blank 3 / Gunbalina (GNN2 Ver. A)          (C) Namco, 2000
@@ -469,6 +469,14 @@ static DRIVER_INIT( panikuru )
 }
 
 
+//  This is not the actual decrpyt for NFL Classic Football.  This still needs to be divined.
+static DRIVER_INIT( nflclsfb )
+{
+	memn_driver_init(machine);
+	decrypt_bios( machine, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa );
+}
+
+
 static MACHINE_RESET( namcos10 )
 {
 }
@@ -647,6 +655,17 @@ ROM_START( panikuru )
 	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(cd3b25e0) SHA1(39dfebc59e71b8f1c28e718ee71032620f11440c) )
 ROM_END
 
+ROM_START( nflclsfb )
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION( 0x4200000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(b08d4270) SHA1(5f5dc1c2862292a9e597f6a21c0f9db2e5796ded) )
+	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(d3f519d8) SHA1(60d5f2fafd700e39245bed17e3cc6d608cc2c088) )
+	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(0c65fdc2) SHA1(fa5d41a7b10ae8f8d312b61cc6d34408123bda97) )
+	ROM_LOAD( "3.7d",         0x3180000, 0x1080000, CRC(0a4e601d) SHA1(9c302a0b5aaf7046390982e62092b867c3a534a5) )
+ROM_END
+
 
 GAME( 2000, mrdrilr2,  0,        namcos10, namcos10, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10, namcos10, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR22 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
@@ -658,4 +677,5 @@ GAME( 2001, knpuzzle,  0,        namcos10, namcos10, knpuzzle, ROT0, "Namco", "K
 GAME( 2002, chocovdr,  0,        namcos10, namcos10, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, startrgn,  0,        namcos10, namcos10, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, panikuru,  0,        namcos10, namcos10, panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2003, nflclsfb,  0,        namcos10, namcos10, nflclsfb, ROT0, "Namco", "NFL Classic Football (NCF3 Ver.A.)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, gamshara,  0,        namcos10, namcos10, gamshara, ROT0, "Mitchell", "Gamshara (10021 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
