@@ -1915,7 +1915,6 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 operand32)
 {
 	UINT32 newCS, newEIP;
-	UINT32 newSS, newESP;  // when changing privilege
 	I386_SREG desc;
 	UINT8 CPL, RPL, DPL;
 
@@ -1925,17 +1924,11 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 	{
 		newEIP = READ16(cpustate, ea) & 0xffff;
 		newCS = READ16(cpustate, ea+2) & 0xffff;
-		ea += count+4;
-		newESP = READ16(cpustate, ea) & 0xffff;
-		newSS = READ16(cpustate, ea+2) & 0xffff;
 	}
 	else
 	{
 		newEIP = READ32(cpustate, ea);
 		newCS = READ32(cpustate, ea+4) & 0xffff;
-		ea += count+8;
-		newESP = READ32(cpustate, ea);
-		newSS = READ32(cpustate, ea+4) & 0xffff;
 	}
 
 	memset(&desc, 0, sizeof(desc));
@@ -2031,6 +2024,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 	}
 	else if(RPL > CPL)
 	{
+		UINT32 newSS, newESP;  // when changing privilege
 		/* outer privilege level */
 		if(operand32 == 0)
 		{
@@ -2050,7 +2044,6 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 				FAULT(FAULT_SS,0)
 			}
 		}
-
 		/* Check CS selector and descriptor */
 		if((newCS & ~0x03) == 0)
 		{
@@ -2104,6 +2097,20 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			logerror("RETF: EIP is past return CS segment limit.\n");
 			FAULT(FAULT_GP,0)
 		}
+		
+		if(operand32 == 0)
+		{
+			ea += count+4;
+			newESP = READ16(cpustate, ea) & 0xffff;
+			newSS = READ16(cpustate, ea+2) & 0xffff;
+		}
+		else
+		{
+			ea += count+8;
+			newESP = READ32(cpustate, ea);
+			newSS = READ32(cpustate, ea+4) & 0xffff;
+		}
+		
 		/* Check SS selector and descriptor */
 		desc.selector = newSS;
 		i386_load_protected_mode_segment(cpustate,&desc);
@@ -2191,16 +2198,12 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		newEIP = READ16(cpustate, ea) & 0xffff;
 		newCS = READ16(cpustate, ea+2) & 0xffff;
 		newflags = READ16(cpustate, ea+4) & 0xffff;
-		newESP = READ16(cpustate, ea+6) & 0xffff;
-		newSS = READ16(cpustate, ea+8) & 0xffff;
 	}
 	else
 	{
 		newEIP = READ32(cpustate, ea);
 		newCS = READ32(cpustate, ea+4) & 0xffff;
 		newflags = READ32(cpustate, ea+8);
-		newESP = READ32(cpustate, ea+12);
-		newSS = READ32(cpustate, ea+16) & 0xffff;
 	}
 
 	if(V8086_MODE)
@@ -2271,6 +2274,16 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		if(newflags & 0x00020000) // if returning to virtual 8086 mode
 		{
 //          UINT8 SSRPL,SSDPL;
+			if(operand32 == 0)
+			{
+				newESP = READ16(cpustate, ea+6) & 0xffff;
+				newSS = READ16(cpustate, ea+8) & 0xffff;
+			}
+			else
+			{
+				newESP = READ32(cpustate, ea+12);
+				newSS = READ32(cpustate, ea+16) & 0xffff;
+			}
 			memset(&desc, 0, sizeof(desc));
 			desc.selector = newCS;
 			i386_load_protected_mode_segment(cpustate,&desc);
@@ -2547,16 +2560,12 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			}
 			else if(RPL > CPL)
 			{
-				I386_SREG stack;
 				/* return to outer privilege level */
 				memset(&desc, 0, sizeof(desc));
 				desc.selector = newCS;
 				i386_load_protected_mode_segment(cpustate,&desc);
 				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				RPL = newCS & 0x03;
-				memset(&stack, 0, sizeof(stack));
-				stack.selector = newSS;
-				i386_load_protected_mode_segment(cpustate,&stack);
 				if(operand32 == 0)
 				{
 					UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
@@ -2625,6 +2634,19 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 
 				/* Check SS selector and descriptor */
+				if(operand32 == 0)
+				{
+					newESP = READ16(cpustate, ea+6) & 0xffff;
+					newSS = READ16(cpustate, ea+8) & 0xffff;
+				}
+				else
+				{
+					newESP = READ32(cpustate, ea+12);
+					newSS = READ32(cpustate, ea+16) & 0xffff;
+				}
+				memset(&stack, 0, sizeof(stack));
+				stack.selector = newSS;
+				i386_load_protected_mode_segment(cpustate,&stack);
 				DPL = (stack.flags >> 5) & 0x03;
 				if((newSS & ~0x03) == 0)
 				{
