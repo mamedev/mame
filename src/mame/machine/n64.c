@@ -1299,7 +1299,7 @@ void n64_periphs::ai_dma()
     ai_status |= 0x40000000;
 
    // adjust the timer
-   period = attotime::from_hz(DACRATE_NTSC) * ((ai_dacrate + 1) * (current->length / 4));
+   period = attotime::from_hz(DACRATE_NTSC) * ((ai_dacrate + 1) * (current->length / 8));
    ai_timer->adjust(period);
 }
 
@@ -1338,8 +1338,8 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
             else if (ai_status & 0x40000000)
             {
                 double secs_left = (ai_timer->expire() - machine().time()).as_double();
-                unsigned int samples_left = secs_left * DACRATE_NTSC / (ai_dacrate + 1);
-                ret = samples_left * 4;
+                unsigned int samples_left = (UINT32)(secs_left * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
+                ret = samples_left * 8;
             }
             else
             {
@@ -1562,7 +1562,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 0;
 			pi_status |= 1;
 
-			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 10.2f);
+			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			//printf("want read dma in %d\n", (pi_rd_len + 1));
 			pi_dma_timer->adjust(dma_period);
 			//pi_dma_tick();
@@ -1575,7 +1575,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 1;
 			pi_status |= 1;
 
-			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 10.2f);
+			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			//printf("want write dma in %d\n", (pi_wr_len + 1));
 			pi_dma_timer->adjust(dma_period);
 
@@ -1717,6 +1717,14 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 		case 0x00:		// Read status
 		case 0xff:		// Reset
 		{
+			if(command == 0)
+			{
+				//printf("Read status\n");
+			}
+			else
+			{
+				//printf("Reset\n");
+			}
 			switch (channel)
 			{
 				case 0:
@@ -1801,7 +1809,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			address = (sdata[1] << 8) | (sdata[2]);
 			address &= ~0x1f;
 
-			//printf("Read mempak at %04x\n", address);
+			////printf("Read mempak at %04x\n", address);
 
 			if(address == 0x8000)
 			{
@@ -1831,7 +1839,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			UINT32 address = (sdata[1] << 8) | (sdata[2]);
 			address &= ~0x1f;
 
-			//printf("Write mempak at %04x\n", address);
+			////printf("Write mempak at %04x\n", address);
 			if (address >= 0x8000)
 			{
 
@@ -2026,7 +2034,7 @@ void n64_periphs::handle_pif()
 			}
 		}
 
-		//pif_ram[0x3f] = 0;
+		pif_ram[0x3f] = 0;
 	}
 
 	/*printf("After:\n"); fflush(stdout);
