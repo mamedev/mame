@@ -802,11 +802,11 @@ void cli_frontend::verifyroms(const char *gamename)
 		device_iterator iter(config.root_device());
 		for (device_t *dev = iter.first(); dev != NULL; dev = iter.next())
 		{
-			if (mame_strwildcmp(gamename, dev->shortname()) == 0)
+			if ((strlen(dev->shortname()) > 0) && (mame_strwildcmp(gamename, dev->shortname()) == 0))
 			{
 				matched++;
 
-				if (dev->owner() != NULL && (strlen(dev->shortname()) > 0) && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE))
+				if (dev->owner() != NULL && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE))
 				{
 					// audit the ROMs in this set
 					media_auditor::summary summary = auditor.audit_device(dev, AUDIT_VALIDATE_FAST);
@@ -867,7 +867,7 @@ void cli_frontend::verifyroms(const char *gamename)
 					if (!device->configured())
 						device->config_complete();
 
-				if (mame_strwildcmp(gamename, dev->shortname()) == 0)
+				if ((strlen(dev->shortname()) > 0) && (mame_strwildcmp(gamename, dev->shortname()) == 0))
 				{
 					matched++;
 
@@ -910,6 +910,7 @@ void cli_frontend::verifyroms(const char *gamename)
 									break;
 
 								default:
+									mame_printf_info("has no roms!\n");
 									break;
 							}
 						}
