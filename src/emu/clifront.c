@@ -801,19 +801,19 @@ void cli_frontend::verifyroms(const char *gamename)
 		machine_config &config = dummy_drivlist.config();
 		device_iterator iter(config.root_device());
 		for (device_t *dev = iter.first(); dev != NULL; dev = iter.next())
-		{			
-			if (dev->owner() != NULL && (strlen(dev->shortname())>0) && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE)) {
-				if (mame_strwildcmp(gamename, dev->shortname()) == 0)
-				{
-					matched++;
+		{
+			if (mame_strwildcmp(gamename, dev->shortname()) == 0)
+			{
+				matched++;
 
+				if (dev->owner() != NULL && (strlen(dev->shortname()) > 0) && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE))
+				{
 					// audit the ROMs in this set
 					media_auditor::summary summary = auditor.audit_device(dev, AUDIT_VALIDATE_FAST);
 
 					// if not found, count that and leave it at that
-					if (summary == media_auditor::NOTFOUND) {
+					if (summary == media_auditor::NOTFOUND)
 						notfound++;
-					}
 					// else display information about what we discovered
 					else
 					{
@@ -846,11 +846,11 @@ void cli_frontend::verifyroms(const char *gamename)
 							default:
 								break;
 						}
-					}						
+					}
 				}
 			}
-		}		
-		
+		}
+
 		slot_interface_iterator slotiter(config.root_device());
 		for (const device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
 		{
@@ -866,12 +866,13 @@ void cli_frontend::verifyroms(const char *gamename)
 				for (device_t *device = subiter.first(); device != NULL; device = subiter.next())
 					if (!device->configured())
 						device->config_complete();
-				
-				if (dev->rom_region() != NULL && device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE) {
-					if (mame_strwildcmp(gamename, dev->shortname()) == 0)
-					{
-						matched++;
 
+				if (mame_strwildcmp(gamename, dev->shortname()) == 0)
+				{
+					matched++;
+
+					if (dev->rom_region() != NULL && device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE)
+					{
 						// audit the ROMs in this set
 						media_auditor::summary summary = auditor.audit_device(dev, AUDIT_VALIDATE_FAST);
 
@@ -918,7 +919,7 @@ void cli_frontend::verifyroms(const char *gamename)
 				const_cast<machine_config &>(config).device_remove(&config.root_device(), temptag.cstr());
 				global_free(dev);
 			}
-		}	
+		}
 	}
 
 	// clear out any cached files
@@ -929,7 +930,7 @@ void cli_frontend::verifyroms(const char *gamename)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
-	if (matched == 1 && correct == 0 && incorrect == 0)
+	if (matched > 0 && correct == 0 && incorrect == 0)
 	{
 		if (notfound > 0)
 			throw emu_fatalerror(MAMERR_MISSING_FILES, "romset \"%s\" not found!\n", gamename);
