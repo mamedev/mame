@@ -88,7 +88,7 @@ const options_entry cli_options::s_option_entries[] =
 	{ CLICOMMAND_LISTSLOTS ";lslot",    "0",       OPTION_COMMAND,    "list available slots and slot devices" },
 	{ CLICOMMAND_LISTMEDIA ";lm",       "0",       OPTION_COMMAND,    "list available media for the system" },
 	{ CLICOMMAND_LISTSOFTWARE ";lsoft", "0",       OPTION_COMMAND,    "list known software for the system" },
-
+	{ CLICOMMAND_GETSOFTLIST ";glist",  "0",       OPTION_COMMAND,    "retrieve software list by name" },
 	{ NULL }
 };
 
@@ -795,7 +795,6 @@ void cli_frontend::verifyroms(const char *gamename)
 	}
 
 	driver_enumerator dummy_drivlist(m_options);
-	typedef tagmap_t<FPTR> int_map;
 	int_map device_map;
 	while (dummy_drivlist.next())
 	{
@@ -1039,8 +1038,192 @@ void cli_frontend::verifysamples(const char *gamename)
 		mame_printf_info("%d samplesets found, %d were OK.\n", correct, correct);
 	}
 }
+#define SOFTLIST_XML_BEGIN "<?xml version=\"1.0\"?>\n" \
+				"<!DOCTYPE softwarelist [\n" \
+				"<!ELEMENT softwarelists (softwarelist*)>\n" \
+				"\t<!ELEMENT softwarelist (software+)>\n" \
+				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n" \
+				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n" \
+				"\t\t<!ELEMENT software (description, year?, publisher, info*, sharedfeat*, part*)>\n" \
+				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n" \
+				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n" \
+				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n" \
+				"\t\t\t<!ELEMENT description (#PCDATA)>\n" \
+				"\t\t\t<!ELEMENT year (#PCDATA)>\n" \
+				"\t\t\t<!ELEMENT publisher (#PCDATA)>\n" \
+				"\t\t\t<!ELEMENT info EMPTY>\n" \
+				"\t\t\t\t<!ATTLIST info name CDATA #REQUIRED>\n" \
+				"\t\t\t\t<!ATTLIST info value CDATA #IMPLIED>\n" \
+				"\t\t\t<!ELEMENT sharedfeat EMPTY>\n" \
+				"\t\t\t\t<!ATTLIST sharedfeat name CDATA #REQUIRED>\n" \
+				"\t\t\t\t<!ATTLIST sharedfeat value CDATA #IMPLIED>\n" \
+				"\t\t\t<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>\n" \
+				"\t\t\t\t<!ATTLIST part name CDATA #REQUIRED>\n" \
+				"\t\t\t\t<!ATTLIST part interface CDATA #REQUIRED>\n" \
+				"\t\t\t\t<!ELEMENT feature EMPTY>\n" \
+				"\t\t\t\t\t<!ATTLIST feature name CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t<!ATTLIST feature value CDATA #IMPLIED>\n" \
+				"\t\t\t\t<!ELEMENT dataarea (rom*)>\n" \
+				"\t\t\t\t\t<!ATTLIST dataarea name CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t<!ATTLIST dataarea size CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t<!ATTLIST dataarea databits (8|16|32|64) \"8\">\n" \
+				"\t\t\t\t\t<!ATTLIST dataarea endian (big|little) \"little\">\n" \
+				"\t\t\t\t\t<!ELEMENT rom EMPTY>\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom name CDATA #IMPLIED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom size CDATA #IMPLIED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom length CDATA #IMPLIED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom crc CDATA #IMPLIED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom value CDATA #IMPLIED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue) #IMPLIED>\n" \
+				"\t\t\t\t<!ELEMENT diskarea (disk*)>\n" \
+				"\t\t\t\t\t<!ATTLIST diskarea name CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t<!ELEMENT disk EMPTY>\n" \
+				"\t\t\t\t\t\t<!ATTLIST disk name CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n" \
+				"\t\t\t\t\t\t<!ATTLIST disk writeable (yes|no) \"no\">\n" \
+				"\t\t\t\t<!ELEMENT dipswitch (dipvalue*)>\n" \
+				"\t\t\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t<!ELEMENT dipvalue EMPTY>\n" \
+				"\t\t\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n" \
+				"]>\n\n" \
+				"<softwarelists>\n"
 
+void cli_frontend::output_single_softlist(FILE *out,software_list *list, const char *listname)
+{
+	astring tempstr;
+	software_list_parse( list, NULL, NULL );
 
+	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", listname, xml_normalize_string(software_list_get_description(list)) );
+
+	for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
+	{
+		fprintf( out, "\t\t<software name=\"%s\"", swinfo->shortname );
+		if ( swinfo->parentname != NULL )
+			fprintf( out, " cloneof=\"%s\"", swinfo->parentname );
+		if ( swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL )
+			fprintf( out, " supported=\"partial\"" );
+		if ( swinfo->supported == SOFTWARE_SUPPORTED_NO )
+			fprintf( out, " supported=\"no\"" );
+		fprintf( out, ">\n" );
+		fprintf( out, "\t\t\t<description>%s</description>\n", xml_normalize_string(swinfo->longname) );
+		fprintf( out, "\t\t\t<year>%s</year>\n", xml_normalize_string( swinfo->year ) );
+		fprintf( out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string( swinfo->publisher ) );
+
+		for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
+		{
+			fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
+			if ( part->interface_ )
+				fprintf( out, " interface=\"%s\"", part->interface_ );
+
+			fprintf( out, ">\n");
+
+			if ( part->featurelist )
+			{
+				feature_list *flist = part->featurelist;
+
+				while( flist )
+				{
+					fprintf( out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist->name, flist->value );
+					flist = flist->next;
+				}
+			}
+
+			/* TODO: display rom region information */
+			for ( const rom_entry *region = part->romdata; region; region = rom_next_region( region ) )
+			{
+				int is_disk = ROMREGION_ISDISKDATA(region);
+
+				if (!is_disk)
+					fprintf( out, "\t\t\t\t<dataarea name=\"%s\" size=\"%d\">\n", ROMREGION_GETTAG(region), ROMREGION_GETLENGTH(region) );
+				else
+					fprintf( out, "\t\t\t\t<diskarea name=\"%s\">\n", ROMREGION_GETTAG(region) );
+
+				for ( const rom_entry *rom = rom_first_file( region ); rom && !ROMENTRY_ISREGIONEND(rom); rom++ )
+				{
+					if ( ROMENTRY_ISFILE(rom) )
+					{
+						if (!is_disk)
+							fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", xml_normalize_string(ROM_GETNAME(rom)), rom_file_size(rom) );
+						else
+							fprintf( out, "\t\t\t\t\t<disk name=\"%s\"", xml_normalize_string(ROM_GETNAME(rom)) );
+
+						/* dump checksum information only if there is a known dump */
+						hash_collection hashes(ROM_GETHASHDATA(rom));
+						if ( !hashes.flag(hash_collection::FLAG_NO_DUMP) )
+							fprintf( out, " %s", hashes.attribute_string(tempstr) );
+						else
+							fprintf( out, " status=\"nodump\"" );
+
+						if (is_disk)
+							fprintf( out, " writeable=\"%s\"", (ROM_GETFLAGS(rom) & DISK_READONLYMASK) ? "no" : "yes");
+
+						if ((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(1))
+							fprintf( out, " loadflag=\"load16_byte\"" );
+
+						if ((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(3))
+							fprintf( out, " loadflag=\"load32_byte\"" );
+
+						if (((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(2)) && ((ROM_GETFLAGS(rom) & ROM_GROUPMASK) == ROM_GROUPWORD))
+						{
+							if (!(ROM_GETFLAGS(rom) & ROM_REVERSEMASK))
+								fprintf( out, " loadflag=\"load32_word\"" );
+							else
+								fprintf( out, " loadflag=\"load32_word_swap\"" );
+						}
+
+						if (((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(6)) && ((ROM_GETFLAGS(rom) & ROM_GROUPMASK) == ROM_GROUPWORD))
+						{
+							if (!(ROM_GETFLAGS(rom) & ROM_REVERSEMASK))
+								fprintf( out, " loadflag=\"load64_word\"" );
+							else
+								fprintf( out, " loadflag=\"load64_word_swap\"" );
+						}
+
+						if (((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_NOSKIP) && ((ROM_GETFLAGS(rom) & ROM_GROUPMASK) == ROM_GROUPWORD))
+						{
+							if (!(ROM_GETFLAGS(rom) & ROM_REVERSEMASK))
+								fprintf( out, " loadflag=\"load32_dword\"" );
+							else
+								fprintf( out, " loadflag=\"load16_word_swap\"" );
+						}
+
+						fprintf( out, "/>\n" );
+					}
+					else if ( ROMENTRY_ISRELOAD(rom) )
+					{
+						fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"reload\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
+					}
+					else if ( ROMENTRY_ISCONTINUE(rom) )
+					{
+						fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"continue\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
+					}
+					else if ( ROMENTRY_ISFILL(rom) )
+					{
+						fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"fill\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
+					}
+				}
+
+				if (!is_disk)
+					fprintf( out, "\t\t\t\t</dataarea>\n" );
+				else
+					fprintf( out, "\t\t\t\t</diskarea>\n" );
+			}
+
+			fprintf( out, "\t\t\t</part>\n" );
+		}
+
+		fprintf( out, "\t\t</software>\n" );
+	}
+	fprintf(out, "\t</softwarelist>\n" );
+}
 /*-------------------------------------------------
     info_listsoftware - output the list of
     software supported by a given game or set of
@@ -1053,100 +1236,14 @@ void cli_frontend::verifysamples(const char *gamename)
 void cli_frontend::listsoftware(const char *gamename)
 {
 	FILE *out = stdout;
+	int_map list_map;
+	bool isfirst = TRUE;
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
-
-	// first determine the maximum number of lists we might encounter
-	int list_count = 0;
-	while (drivlist.next())
-	{
-		software_list_device_iterator iter(drivlist.config().root_device());
-		for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
-			if (swlist->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-				list_count++;
-	}
-
-	// allocate a list
-	astring *lists = global_alloc_array(astring, list_count);
-
-	if (list_count)
-	{
-		fprintf( out,
-				"<?xml version=\"1.0\"?>\n"
-				"<!DOCTYPE softwarelist [\n"
-				"<!ELEMENT softwarelists (softwarelist*)>\n"
-				"\t<!ELEMENT softwarelist (software+)>\n"
-				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
-				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n"
-				"\t\t<!ELEMENT software (description, year?, publisher, info*, sharedfeat*, part*)>\n"
-				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n"
-				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n"
-				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n"
-				"\t\t\t<!ELEMENT description (#PCDATA)>\n"
-				"\t\t\t<!ELEMENT year (#PCDATA)>\n"
-				"\t\t\t<!ELEMENT publisher (#PCDATA)>\n"
-				// we still do not store the info strings internally, so there is no output here
-				// TODO: add parsing info in softlist.c and then add output here!
-				"\t\t\t<!ELEMENT info EMPTY>\n"
-				"\t\t\t\t<!ATTLIST info name CDATA #REQUIRED>\n"
-				"\t\t\t\t<!ATTLIST info value CDATA #IMPLIED>\n"
-				// shared features get stored in the part->feature below and are output there
-				// this means that we don't output any <sharedfeat> and that -lsoft output will
-				// be different from the list in hash/ when the list uses sharedfeat. But this
-				// is by design: sharedfeat is only available to simplify the life to list creators,
-				// to e.g. avoid manually adding the same feature to each disk of a 9 floppies game!
-				"\t\t\t<!ELEMENT sharedfeat EMPTY>\n"
-				"\t\t\t\t<!ATTLIST sharedfeat name CDATA #REQUIRED>\n"
-				"\t\t\t\t<!ATTLIST sharedfeat value CDATA #IMPLIED>\n"
-				"\t\t\t<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>\n"
-				"\t\t\t\t<!ATTLIST part name CDATA #REQUIRED>\n"
-				"\t\t\t\t<!ATTLIST part interface CDATA #REQUIRED>\n"
-				"\t\t\t\t<!ELEMENT feature EMPTY>\n"
-				"\t\t\t\t\t<!ATTLIST feature name CDATA #REQUIRED>\n"
-				"\t\t\t\t\t<!ATTLIST feature value CDATA #IMPLIED>\n"
-				"\t\t\t\t<!ELEMENT dataarea (rom*)>\n"
-				"\t\t\t\t\t<!ATTLIST dataarea name CDATA #REQUIRED>\n"
-				"\t\t\t\t\t<!ATTLIST dataarea size CDATA #REQUIRED>\n"
-				"\t\t\t\t\t<!ATTLIST dataarea databits (8|16|32|64) \"8\">\n"
-				"\t\t\t\t\t<!ATTLIST dataarea endian (big|little) \"little\">\n"
-				"\t\t\t\t\t<!ELEMENT rom EMPTY>\n"
-				"\t\t\t\t\t\t<!ATTLIST rom name CDATA #IMPLIED>\n"
-				"\t\t\t\t\t\t<!ATTLIST rom size CDATA #IMPLIED>\n"
-				"\t\t\t\t\t\t<!ATTLIST rom length CDATA #IMPLIED>\n"
-				"\t\t\t\t\t\t<!ATTLIST rom crc CDATA #IMPLIED>\n"
-				"\t\t\t\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
-				"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
-				"\t\t\t\t\t\t<!ATTLIST rom value CDATA #IMPLIED>\n"
-				"\t\t\t\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
-				"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue) #IMPLIED>\n"
-				"\t\t\t\t<!ELEMENT diskarea (disk*)>\n"
-				"\t\t\t\t\t<!ATTLIST diskarea name CDATA #REQUIRED>\n"
-				"\t\t\t\t\t<!ELEMENT disk EMPTY>\n"
-				"\t\t\t\t\t\t<!ATTLIST disk name CDATA #REQUIRED>\n"
-				"\t\t\t\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n"
-				"\t\t\t\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
-				"\t\t\t\t\t\t<!ATTLIST disk writeable (yes|no) \"no\">\n"
-				// we still do not store the dipswitch values internally, so there is no output here
-				// TODO: add parsing dipsw in softlist.c and then add output here!
-				"\t\t\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
-				"\t\t\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"
-				"\t\t\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n"
-				"\t\t\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n"
-				"\t\t\t\t\t<!ELEMENT dipvalue EMPTY>\n"
-				"\t\t\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
-				"\t\t\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n"
-				"\t\t\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
-				"]>\n\n"
-				"<softwarelists>\n"
-				);
-	}
-
-	drivlist.reset();
-	list_count = 0;
-	astring tempstr;
+	
 	while (drivlist.next())
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
@@ -1159,139 +1256,10 @@ void cli_frontend::listsoftware(const char *gamename)
 				if ( list )
 				{
 					/* Verify if we have encountered this list before */
-					bool seen_before = false;
-					for (int seen_index = 0; seen_index < list_count && !seen_before; seen_index++)
-						if (lists[seen_index] == swlist->list_name())
-							seen_before = true;
-
-					if (!seen_before)
-					{
-						lists[list_count++] = swlist->list_name();
-						software_list_parse( list, NULL, NULL );
-
-						fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlist->list_name(), xml_normalize_string(software_list_get_description(list)) );
-
-						for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
-						{
-							fprintf( out, "\t\t<software name=\"%s\"", swinfo->shortname );
-							if ( swinfo->parentname != NULL )
-								fprintf( out, " cloneof=\"%s\"", swinfo->parentname );
-							if ( swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL )
-								fprintf( out, " supported=\"partial\"" );
-							if ( swinfo->supported == SOFTWARE_SUPPORTED_NO )
-								fprintf( out, " supported=\"no\"" );
-							fprintf( out, ">\n" );
-							fprintf( out, "\t\t\t<description>%s</description>\n", xml_normalize_string(swinfo->longname) );
-							fprintf( out, "\t\t\t<year>%s</year>\n", xml_normalize_string( swinfo->year ) );
-							fprintf( out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string( swinfo->publisher ) );
-
-							for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
-							{
-								fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
-								if ( part->interface_ )
-									fprintf( out, " interface=\"%s\"", part->interface_ );
-
-								fprintf( out, ">\n");
-
-								if ( part->featurelist )
-								{
-									feature_list *flist = part->featurelist;
-
-									while( flist )
-									{
-										fprintf( out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist->name, flist->value );
-										flist = flist->next;
-									}
-								}
-
-								/* TODO: display rom region information */
-								for ( const rom_entry *region = part->romdata; region; region = rom_next_region( region ) )
-								{
-									int is_disk = ROMREGION_ISDISKDATA(region);
-
-									if (!is_disk)
-										fprintf( out, "\t\t\t\t<dataarea name=\"%s\" size=\"%d\">\n", ROMREGION_GETTAG(region), ROMREGION_GETLENGTH(region) );
-									else
-										fprintf( out, "\t\t\t\t<diskarea name=\"%s\">\n", ROMREGION_GETTAG(region) );
-
-									for ( const rom_entry *rom = rom_first_file( region ); rom && !ROMENTRY_ISREGIONEND(rom); rom++ )
-									{
-										if ( ROMENTRY_ISFILE(rom) )
-										{
-											if (!is_disk)
-												fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", xml_normalize_string(ROM_GETNAME(rom)), rom_file_size(rom) );
-											else
-												fprintf( out, "\t\t\t\t\t<disk name=\"%s\"", xml_normalize_string(ROM_GETNAME(rom)) );
-
-											/* dump checksum information only if there is a known dump */
-											hash_collection hashes(ROM_GETHASHDATA(rom));
-											if ( !hashes.flag(hash_collection::FLAG_NO_DUMP) )
-												fprintf( out, " %s", hashes.attribute_string(tempstr) );
-											else
-												fprintf( out, " status=\"nodump\"" );
-
-											if (is_disk)
-												fprintf( out, " writeable=\"%s\"", (ROM_GETFLAGS(rom) & DISK_READONLYMASK) ? "no" : "yes");
-
-											if ((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(1))
-												fprintf( out, " loadflag=\"load16_byte\"" );
-
-											if ((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(3))
-												fprintf( out, " loadflag=\"load32_byte\"" );
-
-											if (((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(2)) && ((ROM_GETFLAGS(rom) & ROM_GROUPMASK) == ROM_GROUPWORD))
-											{
-												if (!(ROM_GETFLAGS(rom) & ROM_REVERSEMASK))
-													fprintf( out, " loadflag=\"load32_word\"" );
-												else
-													fprintf( out, " loadflag=\"load32_word_swap\"" );
-											}
-
-											if (((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(6)) && ((ROM_GETFLAGS(rom) & ROM_GROUPMASK) == ROM_GROUPWORD))
-											{
-												if (!(ROM_GETFLAGS(rom) & ROM_REVERSEMASK))
-													fprintf( out, " loadflag=\"load64_word\"" );
-												else
-													fprintf( out, " loadflag=\"load64_word_swap\"" );
-											}
-
-											if (((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_NOSKIP) && ((ROM_GETFLAGS(rom) & ROM_GROUPMASK) == ROM_GROUPWORD))
-											{
-												if (!(ROM_GETFLAGS(rom) & ROM_REVERSEMASK))
-													fprintf( out, " loadflag=\"load32_dword\"" );
-												else
-													fprintf( out, " loadflag=\"load16_word_swap\"" );
-											}
-
-											fprintf( out, "/>\n" );
-										}
-										else if ( ROMENTRY_ISRELOAD(rom) )
-										{
-											fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"reload\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
-										}
-										else if ( ROMENTRY_ISCONTINUE(rom) )
-										{
-											fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"continue\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
-										}
-										else if ( ROMENTRY_ISFILL(rom) )
-										{
-											fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"fill\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
-										}
-									}
-
-									if (!is_disk)
-										fprintf( out, "\t\t\t\t</dataarea>\n" );
-									else
-										fprintf( out, "\t\t\t\t</diskarea>\n" );
-								}
-
-								fprintf( out, "\t\t\t</part>\n" );
-							}
-
-							fprintf( out, "\t\t</software>\n" );
-						}
-
-						fprintf(out, "\t</softwarelist>\n" );
+					if (list_map.add(swlist->list_name(), 0, false) != TMERR_DUPLICATE)
+					{					
+						if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = FALSE; }
+						output_single_softlist(out, list, swlist->list_name());
 					}
 
 					software_list_close( list );
@@ -1300,12 +1268,46 @@ void cli_frontend::listsoftware(const char *gamename)
 		}
 	}
 
-	if (list_count > 0)
+	if (!isfirst)
 		fprintf( out, "</softwarelists>\n" );
 	else
 		fprintf( out, "No software lists found for this system\n" );
+}
 
-	global_free( lists );
+
+/*-------------------------------------------------
+    getsoftlist - retrieve software list by name
+-------------------------------------------------*/
+
+void cli_frontend::getsoftlist(const char *gamename)
+{
+	FILE *out = stdout;
+	int_map list_map;
+	bool isfirst = TRUE;
+	
+	driver_enumerator drivlist(m_options);
+	while (drivlist.next())
+	{
+		software_list_device_iterator iter(drivlist.config().root_device());
+		for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
+		{
+			software_list *list = software_list_open(m_options, swlist->list_name(), FALSE, NULL);
+			if ( list )
+			{
+				if ((mame_strwildcmp(swlist->list_name(),gamename)==0) && list_map.add(swlist->list_name(), 0, false) != TMERR_DUPLICATE)
+				{
+					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = FALSE; }
+					output_single_softlist(out, list, swlist->list_name());
+				}
+				software_list_close( list );
+			}
+		}
+	}
+
+	if (!isfirst)
+		fprintf( out, "</softwarelists>\n" );
+	else
+		fprintf( out, "No such software lists found\n" );
 }
 
 
@@ -1414,8 +1416,9 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_VERIFYROMS,	&cli_frontend::verifyroms },
 		{ CLICOMMAND_VERIFYSAMPLES,	&cli_frontend::verifysamples },
 		{ CLICOMMAND_LISTMEDIA,		&cli_frontend::listmedia },
-		{ CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },
-		{ CLICOMMAND_ROMIDENT,		&cli_frontend::romident }
+		{ CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },		
+		{ CLICOMMAND_ROMIDENT,		&cli_frontend::romident },
+		{ CLICOMMAND_GETSOFTLIST,   &cli_frontend::getsoftlist },
 	};
 
 	// find the command
