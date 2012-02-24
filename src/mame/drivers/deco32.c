@@ -2613,7 +2613,7 @@ ROM_START( dragngun )
 
 	// this is standard DVI data, see http://www.fileformat.info/format/dvi/egff.htm
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-	ROM_REGION( 0xc00000, "dvi", 0 ) /* Video data - unused for now */
+	ROM_REGION( 0x1000000, "dvi", 0 ) /* Video data - unused for now */
 	ROM_LOAD32_BYTE( "mar-17.bin",  0x000000,  0x100000,  CRC(7799ed23) SHA1(ae28ad4fa6033a3695fa83356701b3774b26e6b0) ) // 56 V / 41 A
 	ROM_LOAD32_BYTE( "mar-20.bin",  0x000001,  0x100000,  CRC(fa0462f0) SHA1(1a52617ad4d7abebc0f273dd979f4cf2d6a0306b) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-28.bin",  0x000002,  0x100000,  CRC(5a2ec71d) SHA1(447c404e6bb696f7eb7c61992a99b9be56f5d6b0) ) // 56 V / 53 S
@@ -2835,7 +2835,7 @@ ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly d
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000003, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
 	ROM_LOAD32_BYTE( "mbm-15.a25",  0x400003, 0x100000,  CRC(789ce7b1) SHA1(3fb390ce0620ce7a63f7f46eac1ff0eb8ed76d26) )
 
-	ROM_REGION( 0xc00000, "dvi", ROMREGION_ERASE00 ) /* Video data - unique PCB and this region is not used? */
+	ROM_REGION( 0x1000000, "dvi", ROMREGION_ERASE00 ) /* Video data - unique PCB and this region is not used? */
 
 	ROM_REGION(0x100000, "oki1", 0 )
 	ROM_LOAD( "mbm-06.n17",  0x00000, 0x100000,  CRC(f34d5999) SHA1(265b5f4e8598bcf9183bf9bd95db69b01536acb2) )
@@ -2908,7 +2908,7 @@ ROM_START( gunhard ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly di
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000003, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
 	ROM_LOAD32_BYTE( "mbm-15.a25",  0x400003, 0x100000,  CRC(789ce7b1) SHA1(3fb390ce0620ce7a63f7f46eac1ff0eb8ed76d26) )
 
-	ROM_REGION( 0xc00000, "dvi", ROMREGION_ERASE00 ) /* Video data - unique PCB and this region is not used? */
+	ROM_REGION( 0x1000000, "dvi", ROMREGION_ERASE00 ) /* Video data - unique PCB and this region is not used? */
 
 	ROM_REGION(0x100000, "oki1", 0 )
 	ROM_LOAD( "mbm-06.n17",  0x00000, 0x100000,  CRC(f34d5999) SHA1(265b5f4e8598bcf9183bf9bd95db69b01536acb2) )
@@ -2981,7 +2981,7 @@ ROM_START( lockloadu ) /* Board No. DE-0359-2 + Bottom board DE-0360-4, a Dragon
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000003, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
 	ROM_LOAD32_BYTE( "mbm-15.a25",  0x400003, 0x100000,  CRC(789ce7b1) SHA1(3fb390ce0620ce7a63f7f46eac1ff0eb8ed76d26) )
 
-	ROM_REGION( 0xc00000, "dvi", ROMREGION_ERASE00 ) /* Video data - same as Dragongun, probably leftover from a conversion */
+	ROM_REGION( 0x1000000, "dvi", ROMREGION_ERASE00 ) /* Video data - same as Dragongun, probably leftover from a conversion */
 //  ROM_LOAD( "mar-17.bin",  0x00000,  0x100000,  CRC(7799ed23) SHA1(ae28ad4fa6033a3695fa83356701b3774b26e6b0) )
 //  ROM_LOAD( "mar-18.bin",  0x00000,  0x100000,  CRC(ded66da9) SHA1(5134cb47043cc190a35ebdbf1912166669f9c055) )
 //  ROM_LOAD( "mar-19.bin",  0x00000,  0x100000,  CRC(bdd1ed20) SHA1(2435b23210b8fee4d39c30d4d3c6ea40afaa3b93) )
@@ -3259,6 +3259,7 @@ static DRIVER_INIT( captaven )
 	deco56_decrypt_gfx(machine, "gfx2");
 }
 
+extern void process_dvi_data(UINT8* dvi_data, int offset, int regionsize);
 static DRIVER_INIT( dragngun )
 {
 	UINT32 *ROM = (UINT32 *)machine.region("maincpu")->base();
@@ -3274,21 +3275,29 @@ static DRIVER_INIT( dragngun )
 
 	ROM[0x1b32c/4]=0xe1a00000;//  NOP test switch lock
 
-	/*
-    {
-        UINT8 *ROM = machine.region("dvi")->base();
+#if 0
+	{
+		UINT8 *ROM = machine.region("dvi")->base();
 
-        FILE *fp;
-        char filename[256];
-        sprintf(filename,"video.dvi");
-        fp=fopen(filename, "w+b");
-        if (fp)
-        {
-            fwrite(ROM, 0xc00000, 1, fp);
-            fclose(fp);
-        }
-    }
-    */
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"video.dvi");
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(ROM, 0xc00000, 1, fp);
+			fclose(fp);
+		}
+	}
+#endif
+
+	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
+	process_dvi_data(machine.region("dvi")->base(),0x000000, 0x1000000);
+	process_dvi_data(machine.region("dvi")->base(),0x580000, 0x1000000);
+	process_dvi_data(machine.region("dvi")->base(),0x800000, 0x1000000);
+	process_dvi_data(machine.region("dvi")->base(),0xB10000, 0x1000000);
+	process_dvi_data(machine.region("dvi")->base(),0xB80000, 0x1000000);
+	
 }
 
 static DRIVER_INIT( fghthist )
