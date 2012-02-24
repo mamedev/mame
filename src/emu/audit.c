@@ -142,8 +142,6 @@ m_searchpath = combinedpath;
 		m_record_list.reset();
 		return NOTFOUND;
 	}
-	else if (found == 0 && m_record_list.count() == 0)
-		return NONE_NEEDED;
 
 	// return a summary
 	return summarize(m_enumerator.driver().name);
@@ -200,10 +198,6 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 	{
 		m_record_list.reset();
 		return NOTFOUND;
-	}
-	else if (found == 0 && m_record_list.count() == 0)
-	{
-		return NONE_NEEDED;
 	}
 
 	// return a summary
@@ -271,10 +265,6 @@ media_auditor::summary media_auditor::audit_samples()
 		m_record_list.reset();
 		return NOTFOUND;
 	}
-	else if (found == 0 && m_record_list.count() == 0)
-	{
-		return NONE_NEEDED;
-	}
 
 	// return a summary
 	return summarize(m_enumerator.driver().name);
@@ -288,6 +278,11 @@ media_auditor::summary media_auditor::audit_samples()
 
 media_auditor::summary media_auditor::summarize(const char *name, astring *string)
 {
+	if (m_record_list.count() == 0)
+	{
+		return NONE_NEEDED;
+	}
+
 	// loop over records
 	summary overall_status = CORRECT;
 	for (audit_record *record = m_record_list.first(); record != NULL; record = record->next())
