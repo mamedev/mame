@@ -892,7 +892,7 @@ static void render_polygons(running_machine &machine)
 			extra->texture_mirror_x = ((cmd & 0x10) ? 0x1 : 0);
 			extra->texture_mirror_y = ((cmd & 0x10) ? 0x1 : 0);
 			extra->color = color;
-			extra->light_r = light_r;		extra->light_g = light_r;		extra->light_b = light_b;
+			extra->light_r = light_r;		extra->light_g = light_g;		extra->light_b = light_b;
 			extra->ambient_r = ambient_r;	extra->ambient_g = ambient_g;	extra->ambient_b = ambient_b;
 			extra->fog_r = fog_r;			extra->fog_g = fog_g;			extra->fog_b = fog_b;
 			extra->flags = cmd;
@@ -1036,7 +1036,7 @@ static void render_polygons(running_machine &machine)
 				extra->texture_mirror_y = ((cmd & 0x10) ? 0x1 : 0);// & ((header & 0x00400000) ? 0x1 : 0);
 
 				extra->color = color;
-				extra->light_r = light_r;		extra->light_g = light_r;		extra->light_b = light_b;
+				extra->light_r = light_r;		extra->light_g = light_g;		extra->light_b = light_b;
 				extra->ambient_r = ambient_r;	extra->ambient_g = ambient_g;	extra->ambient_b = ambient_b;
 				extra->fog_r = fog_r;			extra->fog_g = fog_g;			extra->fog_b = fog_b;
 				extra->flags = cmd;
@@ -1114,7 +1114,7 @@ static void render_polygons(running_machine &machine)
 			index++;
 
 			extra->color = color;
-			extra->light_r = light_r;		extra->light_g = light_r;		extra->light_b = light_b;
+			extra->light_r = light_r;		extra->light_g = light_g;		extra->light_b = light_b;
 			extra->ambient_r = ambient_r;	extra->ambient_g = ambient_g;	extra->ambient_b = ambient_b;
 			extra->fog_r = fog_r;			extra->fog_g = fog_g;			extra->fog_b = fog_b;
 			extra->flags = cmd;
@@ -1239,7 +1239,7 @@ static void render_polygons(running_machine &machine)
 				index++;
 
 				extra->color = color;
-				extra->light_r = light_r;		extra->light_g = light_r;		extra->light_b = light_b;
+				extra->light_r = light_r;		extra->light_g = light_g;		extra->light_b = light_b;
 				extra->ambient_r = ambient_r;	extra->ambient_g = ambient_g;	extra->ambient_b = ambient_b;
 				extra->fog_r = fog_r;			extra->fog_g = fog_g;			extra->fog_b = fog_b;
 				extra->flags = cmd;
