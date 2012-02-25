@@ -50,6 +50,9 @@ public:
     // construction/destruction
     riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
     UINT8 reg_r(UINT8 offset);
     void reg_w(UINT8 offset, UINT8 data);
 

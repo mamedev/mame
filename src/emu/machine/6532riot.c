@@ -162,6 +162,11 @@ WRITE8_DEVICE_HANDLER( riot6532_w )
 	via->reg_w(offset, data);
 }
 
+WRITE8_MEMBER( riot6532_device::write )
+{
+	reg_w(offset, data);
+}
+
 void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 {
 	/* if A4 == 1 and A2 == 1, we are writing to the timer */
@@ -246,6 +251,11 @@ READ8_DEVICE_HANDLER( riot6532_r )
 {
 	riot6532_device *via = downcast<riot6532_device *>(device);
 	return via->reg_r(offset);
+}
+
+READ8_MEMBER( riot6532_device::read )
+{
+	return reg_r(offset);
 }
 
 UINT8 riot6532_device::reg_r(UINT8 offset)
