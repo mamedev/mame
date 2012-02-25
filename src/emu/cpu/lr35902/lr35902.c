@@ -129,12 +129,13 @@ typedef int (*OpcodeEmulator) (lr35902_state *cpustate);
 /* Memory functions                                                         */
 /****************************************************************************/
 
-#define mem_ReadByte(cs,A)		((UINT8)(cs)->w.program->read_byte(A))
-#define mem_WriteByte(cs,A,V)	((cs)->w.program->write_byte(A,V))
+#define mem_ReadByte(cs,A)		((UINT8)(cs)->w.program->read_byte(A)); CYCLES_PASSED(4);
+#define mem_WriteByte(cs,A,V)	((cs)->w.program->write_byte(A,V)); CYCLES_PASSED(4);
 
 INLINE UINT16 mem_ReadWord (lr35902_state *cpustate, UINT32 address)
 {
-	UINT16 value = (UINT16) mem_ReadByte (cpustate, (address + 1) & 0xffff) << 8;
+	UINT16 value = mem_ReadByte (cpustate, (address + 1) & 0xffff);
+	value <<= 8;
 	value |= mem_ReadByte (cpustate, address);
 	return value;
 }
@@ -144,46 +145,6 @@ INLINE void mem_WriteWord (lr35902_state *cpustate, UINT32 address, UINT16 value
 	mem_WriteByte (cpustate, address, value & 0xFF);
 	mem_WriteByte (cpustate, (address + 1) & 0xffff, value >> 8);
 }
-
-static const int Cycles[256] =
-{
-	 4,12, 8, 8, 4, 4, 8, 4,20, 8, 8, 8, 4, 4, 8, 4,
-	 4,12, 8, 8, 4, 4, 8, 4,12, 8, 8, 8, 4, 4, 8, 4,
-	 8,12, 8, 8, 4, 4, 8, 4, 8, 8, 8, 8, 4, 4, 8, 4,
-	 8,12, 8, 8,12,12,12, 4, 8, 8, 8, 8, 4, 4, 8, 4,
-	 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	 8, 8, 8, 8, 8, 8, 4, 8, 4, 4, 4, 4, 4, 4, 8, 4,
-	 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	 4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4,
-	 8,12,12,16,12,16, 8,16, 8,16,12, 0,12,24, 8,16,
-	 8,12,12, 4,12,16, 8,16, 8,16,12, 4,12, 4, 8,16,
-	12,12, 8, 4, 4,16, 8,16,16, 4,16, 4, 4, 4, 8,16,
-	12,12, 8, 4, 4,16, 8,16,12, 8,16, 4, 4, 4, 8,16
-};
-
-static const int CyclesCB[256] =
-{
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
-	 8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
-	 8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
-	 8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
-	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8
-};
 
 static CPU_INIT( lr35902 )
 {
@@ -285,7 +246,7 @@ INLINE void lr35902_ProcessInterrupts (lr35902_state *cpustate)
 						(*cpustate->w.irq_callback)(cpustate->w.device, irqline);
 					cpustate->w.enable &= ~IME;
 					cpustate->w.IF &= ~(1 << irqline);
-					CYCLES_PASSED( 20 );
+					CYCLES_PASSED( 12 );
 					cpustate->w.SP -= 2;
 					mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
 					cpustate->w.PC = 0x40 + irqline * 8;
@@ -318,7 +279,7 @@ static CPU_EXECUTE( lr35902 )
 			lr35902_ProcessInterrupts (cpustate);
 			debugger_instruction_hook(device, cpustate->w.PC);
 			if ( cpustate->w.enable & HALTED ) {
-				CYCLES_PASSED( Cycles[0x76] );
+				CYCLES_PASSED( 4 );
 				cpustate->w.execution_state = 1;
 			} else {
 				cpustate->w.op = mem_ReadByte (cpustate, cpustate->w.PC++);
@@ -326,7 +287,6 @@ static CPU_EXECUTE( lr35902 )
 					cpustate->w.PC--;
 					cpustate->w.doHALTbug = 0;
 				}
-				CYCLES_PASSED( Cycles[cpustate->w.op] );
 			}
 		}
 		cpustate->w.execution_state ^= 1;

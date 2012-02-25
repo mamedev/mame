@@ -147,15 +147,15 @@ case 0x02: /*      LD (BC),A */
   mem_WriteByte (cpustate, cpustate->w.BC, cpustate->b.A);
   break;
 case 0x03: /*      INC BC */
-
 #if 0				/* FIXME ?? do we want to support this? (bug emulation) */
   if (cpustate->b.B == 0xFE)
   {
     trash_sprites (state);
   }
 #endif
-  cpustate->w.BC += 1;
-  break;
+	cpustate->w.BC += 1;
+	CYCLES_PASSED( 4 );
+	break;
 case 0x04: /*      INC B */
 
   INC_8BIT (cpustate->b.B)
@@ -186,9 +186,9 @@ case 0x08: /*      LD (n16),SP */
   cpustate->w.PC += 2;
   break;
 case 0x09: /*      ADD HL,BC */
-
-  ADD_HL_RR (cpustate->w.BC)
-  break;
+	ADD_HL_RR (cpustate->w.BC)
+	CYCLES_PASSED( 4 );
+	break;
 case 0x0A: /*      LD A,(BC) */
 
   cpustate->b.A = mem_ReadByte (cpustate, cpustate->w.BC);
@@ -201,9 +201,9 @@ case 0x0B: /*      DEC BC */
     trash_sprites (state);
   }
 #endif
-
-  cpustate->w.BC -= 1;
-  break;
+	cpustate->w.BC -= 1;
+	CYCLES_PASSED( 4 );
+	break;
 case 0x0C: /*      INC C */
 
   INC_8BIT (cpustate->b.C)
@@ -248,8 +248,9 @@ case 0x13: /*      INC DE */
   }
 #endif
 
-  cpustate->w.DE += 1;
-  break;
+	cpustate->w.DE += 1;
+	CYCLES_PASSED( 4 );
+	break;
 case 0x14: /*      INC D */
 
   INC_8BIT (cpustate->b.D)
@@ -275,12 +276,13 @@ case 0x18: /*      JR      n8 */
 
     offset = mem_ReadByte (cpustate, cpustate->w.PC++);
     cpustate->w.PC += offset;
+	CYCLES_PASSED( 4 );
   }
   break;
 case 0x19: /*      ADD HL,DE */
-
-  ADD_HL_RR (cpustate->w.DE)
-  break;
+	ADD_HL_RR (cpustate->w.DE)
+	CYCLES_PASSED( 4 );
+	break;
 case 0x1A: /*      LD A,(DE) */
 
   cpustate->b.A = mem_ReadByte (cpustate, cpustate->w.DE);
@@ -293,9 +295,9 @@ case 0x1B: /*      DEC DE */
     trash_sprites (state);
   }
 #endif
-
-  cpustate->w.DE -= 1;
-  break;
+	cpustate->w.DE -= 1;
+	CYCLES_PASSED( 4 );
+	break;
 case 0x1C: /*      INC E */
 
   INC_8BIT (cpustate->b.E)
@@ -316,20 +318,15 @@ case 0x1F: /*      RRA */
   cpustate->b.F = x;
   break;
 case 0x20: /*      JR NZ,n8 */
-
-  if (cpustate->b.F & FLAG_Z)
-  {
-    cpustate->w.PC++;
-  }
-  else
-  {
-	INT8 offset;
-
-    offset = mem_ReadByte (cpustate, cpustate->w.PC++);
-    cpustate->w.PC += offset;
-    CYCLES_PASSED( 4 );
-  }
-  break;
+	{
+		INT8 offset = mem_ReadByte (cpustate, cpustate->w.PC++);
+		if (! (cpustate->b.F & FLAG_Z) )
+		{
+			cpustate->w.PC += offset;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0x21: /*      LD HL,n16 */
 
   cpustate->w.HL = mem_ReadWord (cpustate, cpustate->w.PC);
@@ -356,8 +353,9 @@ case 0x23: /*      INC HL */
   }
 #endif
 
-  cpustate->w.HL += 1;
-  break;
+	cpustate->w.HL += 1;
+	CYCLES_PASSED( 4 );
+	break;
 case 0x24: /*      INC H */
 
   INC_8BIT (cpustate->b.H);
@@ -397,25 +395,20 @@ case 0x27: /*      DAA */
 	}
   break;
 case 0x28: /*      JR Z,n8 */
+	{
+		INT8 offset = mem_ReadByte (cpustate, cpustate->w.PC++);;
 
-  if (cpustate->b.F & FLAG_Z)
-  {
-	INT8 offset;
-
-    offset = mem_ReadByte (cpustate, cpustate->w.PC++);
-    cpustate->w.PC += offset;
-
-    CYCLES_PASSED( 4 );
-  }
-  else
-  {
-    cpustate->w.PC += 1;
-  }
-  break;
+		if (cpustate->b.F & FLAG_Z)
+		{
+			cpustate->w.PC += offset;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0x29: /*      ADD HL,HL */
-
-  ADD_HL_RR (cpustate->w.HL)
-  break;
+	ADD_HL_RR (cpustate->w.HL)
+	CYCLES_PASSED( 4 );
+	break;
 case 0x2A: /*      LD A,(HL+) */
 #if 0				/* FIXME ?? do we want to support this? (bug emulation) */
   if (cpustate->b.H == 0xFE)
@@ -435,9 +428,9 @@ case 0x2B: /*      DEC HL */
     trash_sprites (state);
   }
 #endif
-
-  cpustate->w.HL -= 1;
-  break;
+	cpustate->w.HL -= 1;
+	CYCLES_PASSED( 4 );
+	break;
 case 0x2C: /*      INC L */
 
   INC_8BIT (cpustate->b.L);
@@ -456,20 +449,16 @@ case 0x2F: /*      CPL */
   cpustate->b.F |= FLAG_N | FLAG_H;
   break;
 case 0x30: /*      JR NC,n8 */
+	{
+		INT8 offset = mem_ReadByte (cpustate, cpustate->w.PC++);
 
-  if (cpustate->b.F & FLAG_C)
-  {
-    cpustate->w.PC += 1;
-  }
-  else
-  {
-	INT8 offset;
-
-    offset = mem_ReadByte (cpustate, cpustate->w.PC++);
-    cpustate->w.PC += offset;
-    CYCLES_PASSED( 4 );
-  }
-  break;
+		if ( ! (cpustate->b.F & FLAG_C) )
+		{
+			cpustate->w.PC += offset;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0x31: /*      LD SP,n16 */
 
   cpustate->w.SP = mem_ReadWord (cpustate, cpustate->w.PC);
@@ -488,16 +477,17 @@ case 0x32: /*      LD (HL-),A */
   cpustate->w.HL -= 1;
   break;
 case 0x33: /*      INC SP */
-
-  cpustate->w.SP += 1;
-  break;
+	cpustate->w.SP += 1;
+	CYCLES_PASSED( 4 );
+	break;
 case 0x34: /*      INC (HL) */
 
   {
 	register UINT8 r, f;
 
 	f = (UINT8) (cpustate->b.F & FLAG_C);
-	r = (UINT8) (mem_ReadByte (cpustate, cpustate->w.HL) + 1);
+	r = mem_ReadByte (cpustate, cpustate->w.HL);
+	r += 1;
     mem_WriteByte (cpustate, cpustate->w.HL, r);
 
     if (r == 0)
@@ -515,7 +505,8 @@ case 0x35: /*      DEC (HL) */
 	register UINT8 r, f;
 
 	f = (UINT8) ((cpustate->b.F & FLAG_C) | FLAG_N);
-	r = (UINT8) (mem_ReadByte (cpustate, cpustate->w.HL) - 1);
+	r = mem_ReadByte (cpustate, cpustate->w.HL);
+	r -= 1;
     mem_WriteByte (cpustate, cpustate->w.HL, r);
 
     if (r == 0)
@@ -529,31 +520,30 @@ case 0x35: /*      DEC (HL) */
   break;
 case 0x36: /*      LD (HL),n8 */
   /* FIXED / broken ? */
-  mem_WriteByte (cpustate, cpustate->w.HL, mem_ReadByte (cpustate, cpustate->w.PC++));
+  {
+	UINT8 v = mem_ReadByte (cpustate, cpustate->w.PC++);
+	mem_WriteByte (cpustate, cpustate->w.HL, v);
+  }
   break;
 case 0x37: /*      SCF */
 
   cpustate->b.F = (UINT8) ((cpustate->b.F & FLAG_Z) | FLAG_C);
   break;
 case 0x38: /*      JR C,n8 */
+	{
+		INT8 offset = mem_ReadByte (cpustate, cpustate->w.PC++);
 
-  if (cpustate->b.F & FLAG_C)
-  {
-	INT8 offset;
-
-    offset = mem_ReadByte (cpustate, cpustate->w.PC++);
-    cpustate->w.PC += offset;
-
-    CYCLES_PASSED( 4 );
-  }
-  else
-  {
-    cpustate->w.PC += 1;
-  }
-  break;
+		if (cpustate->b.F & FLAG_C)
+		{
+			cpustate->w.PC += offset;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0x39: /*      ADD HL,SP */
-  ADD_HL_RR (cpustate->w.SP)
-  break;
+	ADD_HL_RR (cpustate->w.SP)
+	CYCLES_PASSED( 4 );
+	break;
 case 0x3A: /*      LD A,(HL-) */
 #if 0				/* FIXME ?? do we want to support this? (bug emulation) */
   if (cpustate->b.H == 0xFE)
@@ -566,9 +556,9 @@ case 0x3A: /*      LD A,(HL-) */
   cpustate->w.HL -= 1;
   break;
 case 0x3B: /*      DEC SP */
-
-  cpustate->w.SP -= 1;
-  break;
+	cpustate->w.SP -= 1;
+	CYCLES_PASSED( 4 );
+	break;
 case 0x3C: /*      INC     A */
 
   INC_8BIT (cpustate->b.A);
@@ -1100,257 +1090,235 @@ case 0xBF: /*      CP A,A */
   CP_A_X (cpustate->b.A)
   break;
 case 0xC0: /*      RET NZ */
-
-  if (!(cpustate->b.F & FLAG_Z))
-  {
-    cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
-    cpustate->w.SP += 2;
-    CYCLES_PASSED( 12 );
-  }
-  break;
+	CYCLES_PASSED( 4 );
+	if (!(cpustate->b.F & FLAG_Z))
+	{
+		cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
+		cpustate->w.SP += 2;
+		CYCLES_PASSED( 4 );
+	}
+	break;
 case 0xC1: /*      POP BC */
 
   cpustate->w.BC = mem_ReadWord (cpustate, cpustate->w.SP);
   cpustate->w.SP += 2;
   break;
 case 0xC2: /*      JP NZ,n16 */
+	{
+		UINT16 addr = mem_ReadWord (cpustate, cpustate->w.PC);
+		cpustate->w.PC += 2;
 
-  if (cpustate->b.F & FLAG_Z)
-  {
-    cpustate->w.PC += 2;
-  }
-  else
-  {
-    cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.PC);
-    CYCLES_PASSED( 4 );
-  }
-  break;
+		if ( ! (cpustate->b.F & FLAG_Z) )
+		{
+			cpustate->w.PC = addr;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0xC3: /*      JP n16 */
-
-  cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.PC);
-  break;
+	cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.PC);
+	CYCLES_PASSED( 4 );
+	break;
 case 0xC4: /*      CALL NZ,n16 */
+	{
+		UINT16 addr = mem_ReadWord (cpustate, cpustate->w.PC);
+		cpustate->w.PC += 2;
 
-  if (cpustate->b.F & FLAG_Z)
-  {
-    cpustate->w.PC += 2;
-  }
-  else
-  {
-	register UINT16 PC;
-    PC = mem_ReadWord (cpustate, cpustate->w.PC);
-    cpustate->w.PC += 2;
-
-    cpustate->w.SP -= 2;
-    mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-    cpustate->w.PC = PC;
-    CYCLES_PASSED( 12 );
-  }
-  break;
+		if ( ! (cpustate->b.F & FLAG_Z) )
+		{
+			cpustate->w.SP -= 2;
+			mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+			cpustate->w.PC = addr;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0xC5: /*      PUSH BC */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.BC);
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.BC);
+	CYCLES_PASSED( 4 );
+	break;
 case 0xC6: /*      ADD A,n8 */
 
   x = mem_ReadByte (cpustate, cpustate->w.PC++);
   ADD_A_X (x)
   break;
 case 0xC7: /*      RST 0 */
-
-  {
-	register UINT16 PC;
-    PC = cpustate->w.PC;
-    cpustate->w.PC = 0;
-
-    cpustate->w.SP -= 2;
-    mem_WriteWord (cpustate, cpustate->w.SP, PC);
-  }
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+	cpustate->w.PC = 0;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xC8: /*      RET Z */
-
-  if (cpustate->b.F & FLAG_Z)
-  {
-    cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
-    cpustate->w.SP += 2;
-    CYCLES_PASSED( 12 );
-  }
-  break;
+	CYCLES_PASSED( 4 );
+	if (cpustate->b.F & FLAG_Z)
+	{
+		cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
+		cpustate->w.SP += 2;
+		CYCLES_PASSED( 4 );
+	}
+	break;
 case 0xC9: /*      RET */
-
-  cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
-  cpustate->w.SP += 2;
-  break;
+	cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
+	cpustate->w.SP += 2;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xCA: /*      JP Z,n16 */
+	{
+		UINT16 addr = mem_ReadWord (cpustate, cpustate->w.PC);
+		cpustate->w.PC += 2;
 
-  if (cpustate->b.F & FLAG_Z)
-  {
-    cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.PC);
-    CYCLES_PASSED( 4 );
-  }
-  else
-  {
-    cpustate->w.PC += 2;
-  }
-  break;
+		if (cpustate->b.F & FLAG_Z)
+		{
+			cpustate->w.PC = addr;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0xCB: /*      PREFIX! */
   x = mem_ReadByte (cpustate, cpustate->w.PC++);
-  CYCLES_PASSED( CyclesCB[x] );
   switch (x)
   {
     #include "opc_cb.h"
   }
   break;
 case 0xCC: /*      CALL Z,n16 */
+	{
+		UINT16 addr = mem_ReadWord (cpustate, cpustate->w.PC);
+		cpustate->w.PC += 2;
 
-  if (cpustate->b.F & FLAG_Z)
-  {
-	register UINT16 PC;
-    PC = mem_ReadWord (cpustate, cpustate->w.PC);
-    cpustate->w.PC += 2;
-
-    cpustate->w.SP -= 2;
-    mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-    cpustate->w.PC = PC;
-    CYCLES_PASSED( 12 );
-  }
-  else
-  {
-    cpustate->w.PC += 2;
-  }
-  break;
+		if (cpustate->b.F & FLAG_Z)
+		{
+			cpustate->w.SP -= 2;
+			mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+			cpustate->w.PC = addr;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0xCD: /*      CALL n16 */
-  {
-	register UINT16 PC;
-    PC = mem_ReadWord (cpustate, cpustate->w.PC);
-    cpustate->w.PC += 2;
+	{
+		UINT16 addr = mem_ReadWord (cpustate, cpustate->w.PC);
+		cpustate->w.PC += 2;
 
-    cpustate->w.SP -= 2;
-    mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-    cpustate->w.PC = PC;
-  }
-  break;
+		cpustate->w.SP -= 2;
+		mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+		cpustate->w.PC = addr;
+		CYCLES_PASSED( 4 );
+	}
+	break;
 case 0xCE: /*      ADC A,n8 */
 
   x = mem_ReadByte (cpustate, cpustate->w.PC++);
   ADC_A_X (x)
   break;
 case 0xCF: /*      RST 8 */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-  cpustate->w.PC = 8;
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+	cpustate->w.PC = 8;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xD0: /*      RET NC */
-
-  if (!(cpustate->b.F & FLAG_C))
-  {
-    cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
-    cpustate->w.SP += 2;
-    CYCLES_PASSED( 12 );
-  }
-  break;
+	CYCLES_PASSED( 4 );
+	if (!(cpustate->b.F & FLAG_C))
+	{
+		cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
+		cpustate->w.SP += 2;
+		CYCLES_PASSED( 4 );
+	}
+	break;
 case 0xD1: /*      POP DE */
 
   cpustate->w.DE = mem_ReadWord (cpustate, cpustate->w.SP);
   cpustate->w.SP += 2;
   break;
 case 0xD2: /*      JP NC,n16 */
+	{
+		UINT16 addr = mem_ReadWord (cpustate, cpustate->w.PC);
+		cpustate->w.PC += 2;
 
-  if (cpustate->b.F & FLAG_C)
-  {
-    cpustate->w.PC += 2;
-  }
-  else
-  {
-    cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.PC);
-    CYCLES_PASSED( 4 );
-  }
-  break;
+		if ( ! (cpustate->b.F & FLAG_C) )
+		{
+			cpustate->w.PC = addr;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0xD3: /*      EH? */
   break;
 case 0xD4: /*      CALL NC,n16 */
+	{
+		UINT16 addr = mem_ReadWord (cpustate, cpustate->w.PC);
+		cpustate->w.PC += 2;
 
-  if (cpustate->b.F & FLAG_C)
-  {
-    cpustate->w.PC += 2;
-  }
-  else
-  {
-	register UINT16 PC;
-    PC = mem_ReadWord (cpustate, cpustate->w.PC);
-    cpustate->w.PC += 2;
-
-    cpustate->w.SP -= 2;
-    mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-    cpustate->w.PC = PC;
-    CYCLES_PASSED( 12 );
-  }
-  break;
+		if ( ! (cpustate->b.F & FLAG_C) )
+		{
+			cpustate->w.SP -= 2;
+			mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+			cpustate->w.PC = addr;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0xD5: /*      PUSH DE */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.DE);
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.DE);
+	CYCLES_PASSED( 4 );
+	break;
 case 0xD6: /*      SUB A,n8 */
 
   x = mem_ReadByte (cpustate, cpustate->w.PC++);
   SUB_A_X (x)
   break;
 case 0xD7: /*      RST     $10 */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-  cpustate->w.PC = 0x10;
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+	cpustate->w.PC = 0x10;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xD8: /*      RET C */
-
-  if (cpustate->b.F & FLAG_C)
-  {
-    cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
-    cpustate->w.SP += 2;
-    CYCLES_PASSED( 12 );
-  }
-  break;
+	CYCLES_PASSED( 4 );
+	if (cpustate->b.F & FLAG_C)
+	{
+		cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
+		cpustate->w.SP += 2;
+		CYCLES_PASSED( 4 );
+	}
+	break;
 case 0xD9: /*      RETI */
-
-  cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
-  cpustate->w.SP += 2;
-  cpustate->w.enable |= IME;
-  break;
+	cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.SP);
+	cpustate->w.SP += 2;
+	cpustate->w.enable |= IME;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xDA: /*      JP C,n16 */
+	{
+		UINT16 addr = mem_ReadWord (cpustate, cpustate->w.PC);
+		cpustate->w.PC += 2;
 
-  if (cpustate->b.F & FLAG_C)
-  {
-    cpustate->w.PC = mem_ReadWord (cpustate, cpustate->w.PC);
-    CYCLES_PASSED( 4 );
-  }
-  else
-  {
-    cpustate->w.PC += 2;
-  }
-  break;
+		if (cpustate->b.F & FLAG_C)
+		{
+			cpustate->w.PC = addr;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0xDB: /*      EH? */
   break;
 case 0xDC: /*      CALL C,n16 */
+	{
+		UINT16 addr = mem_ReadWord (cpustate, cpustate->w.PC);
+		cpustate->w.PC += 2;
 
-  if (cpustate->b.F & FLAG_C)
-  {
-	register UINT16 PC;
-    PC = mem_ReadWord (cpustate, cpustate->w.PC);
-    cpustate->w.PC += 2;
-
-    cpustate->w.SP -= 2;
-    mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-    cpustate->w.PC = PC;
-    CYCLES_PASSED( 12 );
-  }
-  else
-  {
-    cpustate->w.PC += 2;
-  }
-  break;
+		if (cpustate->b.F & FLAG_C)
+		{
+			cpustate->w.SP -= 2;
+			mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+			cpustate->w.PC = addr;
+			CYCLES_PASSED( 4 );
+		}
+	}
+	break;
 case 0xDD: /*      EH? */
   break;
 case 0xDE: /*      SBC A,n8 */
@@ -1359,13 +1327,16 @@ case 0xDE: /*      SBC A,n8 */
   SBC_A_X (x)
   break;
 case 0xDF: /*      RST     $18 */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-  cpustate->w.PC = 0x18;
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+	cpustate->w.PC = 0x18;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xE0: /*      LD      ($FF00+n8),A */
-  mem_WriteByte (cpustate, mem_ReadByte (cpustate, cpustate->w.PC++) + 0xFF00, cpustate->b.A);
+  {
+	UINT8 v = mem_ReadByte (cpustate, cpustate->w.PC++);
+	mem_WriteByte (cpustate, 0xFF00 + v, cpustate->b.A);
+  }
   break;
 case 0xE1: /*      POP HL */
 
@@ -1381,21 +1352,21 @@ case 0xE3: /*      EH? */
 case 0xE4: /*      EH? */
   break;
 case 0xE5: /*      PUSH HL */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.HL);
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.HL);
+	CYCLES_PASSED( 4 );
+	break;
 case 0xE6: /*      AND A,n8 */
 
   x = mem_ReadByte (cpustate, cpustate->w.PC++);
   AND_A_X (x)
   break;
 case 0xE7: /*      RST $20 */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-  cpustate->w.PC = 0x20;
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+	cpustate->w.PC = 0x20;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xE8: /*      ADD SP,n8 */
 /*
  *   Z - Reset.
@@ -1407,7 +1378,7 @@ case 0xE8: /*      ADD SP,n8 */
   {
 	register INT32 n;
 
-	n = (INT32) ((INT8) mem_ReadByte (cpustate, cpustate->w.PC++));
+	n = (INT8) mem_ReadByte (cpustate, cpustate->w.PC++);
 
 	if ( ( cpustate->w.SP & 0xFF ) + (UINT8)(n & 0xFF) > 0xFF )
     {
@@ -1425,6 +1396,7 @@ case 0xE8: /*      ADD SP,n8 */
 
 	cpustate->w.SP = (UINT16) ( cpustate->w.SP + n );
   }
+  CYCLES_PASSED( 8 );
   break;
 case 0xE9: /*      JP (HL) */
 
@@ -1447,14 +1419,16 @@ case 0xEE: /*      XOR A,n8 */
   XOR_A_X (x)
   break;
 case 0xEF: /*      RST $28 */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-  cpustate->w.PC = 0x28;
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+	cpustate->w.PC = 0x28;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xF0: /*      LD A,($FF00+n8) */
-
-  cpustate->b.A = mem_ReadByte (cpustate, 0xFF00 + mem_ReadByte (cpustate, cpustate->w.PC++));
+  {
+	UINT8 v = mem_ReadByte (cpustate, cpustate->w.PC++);
+	cpustate->b.A = mem_ReadByte (cpustate, 0xFF00 + v);
+  }
   break;
 case 0xF1: /*      POP AF */
 
@@ -1472,21 +1446,21 @@ case 0xF3: /*      DI */
 case 0xF4: /*      EH? */
   break;
 case 0xF5: /*      PUSH AF */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, (UINT16) (cpustate->w.AF & 0xFFF0));
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, (UINT16) (cpustate->w.AF & 0xFFF0));
+	CYCLES_PASSED( 4 );
+	break;
 case 0xF6: /*      OR A,n8 */
 
   x = mem_ReadByte (cpustate, cpustate->w.PC++);
   OR_A_X (x)
   break;
 case 0xF7: /*      RST $30 */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-  cpustate->w.PC = 0x30;
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+	cpustate->w.PC = 0x30;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xF8: /*      LD HL,SP+n8 */
 /*
  *   n = one UINT8 signed immediate value.
@@ -1501,7 +1475,7 @@ case 0xF8: /*      LD HL,SP+n8 */
   {
 	register INT32 n;
 
-	n = (INT32) ((INT8) mem_ReadByte (cpustate, cpustate->w.PC++));
+	n = (INT8) mem_ReadByte (cpustate, cpustate->w.PC++);
 
 	if ( ( cpustate->w.SP & 0xFF ) + (UINT8)(n & 0xFF) > 0xFF )
     {
@@ -1519,33 +1493,31 @@ case 0xF8: /*      LD HL,SP+n8 */
 
 	cpustate->w.HL = (UINT16) ( cpustate->w.SP + n );
   }
+  CYCLES_PASSED( 4 );
   break;
 case 0xF9: /*      LD SP,HL */
-
-  cpustate->w.SP = cpustate->w.HL;
-  break;
+	cpustate->w.SP = cpustate->w.HL;
+	CYCLES_PASSED( 4 );
+	break;
 case 0xFA: /*      LD A,(n16) */
-
-  cpustate->b.A = mem_ReadByte (cpustate, mem_ReadWord (cpustate, cpustate->w.PC));
-  cpustate->w.PC += 2;
-  break;
+	cpustate->b.A = mem_ReadByte (cpustate, mem_ReadWord (cpustate, cpustate->w.PC));
+	cpustate->w.PC += 2;
+	break;
 case 0xFB: /*      EI */
-
-  cpustate->w.enable |= IME;
-  cpustate->w.ei_delay = 1;
-  break;
+	cpustate->w.enable |= IME;
+	cpustate->w.ei_delay = 1;
+	break;
 case 0xFC: /*      EH? */
-  break;
+	break;
 case 0xFD: /*      EH? */
-  break;
+	break;
 case 0xFE: /*      CP A,n8 */
-
-  x = mem_ReadByte (cpustate, cpustate->w.PC++);
-  CP_A_X (x)
-  break;
+	x = mem_ReadByte (cpustate, cpustate->w.PC++);
+	CP_A_X (x)
+	break;
 case 0xFF: /*      RST $38 */
-
-  cpustate->w.SP -= 2;
-  mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
-  cpustate->w.PC = 0x38;
-  break;
+	cpustate->w.SP -= 2;
+	mem_WriteWord (cpustate, cpustate->w.SP, cpustate->w.PC);
+	cpustate->w.PC = 0x38;
+	CYCLES_PASSED( 4 );
+	break;
