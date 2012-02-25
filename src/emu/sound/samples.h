@@ -105,6 +105,17 @@ public:
 	void set_frequency(UINT8 channel, UINT32 frequency);
 	void set_volume(UINT8 channel, float volume);
 
+	// helpers
+	struct sample_t
+	{
+		// shouldn't need a copy, but in case it happens, catch it here
+		sample_t &operator=(const sample_t &rhs) { assert(false); return *this; }
+
+	    UINT32			frequency;		// frequency of the sample
+	    dynamic_array<INT16> data;		// 16-bit signed data
+	};
+	static bool read_sample(emu_file &file, sample_t &sample);
+
 protected:
 	// subclasses can do it this way
 	samples_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
@@ -119,16 +130,6 @@ protected:
 
 private:
 	// internal classes
-	struct loaded_sample
-	{
-		// shouldn't need a copy, but in case it happens, catch it here
-		loaded_sample &operator=(const loaded_sample &rhs) { assert(false); return *this; }
-
-	    UINT32			length;			// length in samples
-	    UINT32			frequency;		// frequency of the sample
-	    dynamic_array<INT16> data;		// 16-bit signed data
-	};
-
 	struct channel_t
 	{
 		sound_stream *	stream;
@@ -144,14 +145,13 @@ private:
 	};
 
 	// internal helpers
-	bool read_sample(emu_file &file, loaded_sample &sample);
-	bool read_wav_sample(emu_file &file, loaded_sample &sample);
-	bool read_flac_sample(emu_file &file, loaded_sample &sample);
+	static bool read_wav_sample(emu_file &file, sample_t &sample);
+	static bool read_flac_sample(emu_file &file, sample_t &sample);
 	void load_samples();
 
 	// internal state
-	dynamic_array<channel_t>		m_channel;
-	dynamic_array<loaded_sample>	m_sample;
+	dynamic_array<channel_t>	m_channel;
+	dynamic_array<sample_t>		m_sample;
 
 	// internal constants
 	static const UINT8 FRAC_BITS = 24;

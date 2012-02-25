@@ -122,10 +122,10 @@ void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
 	chan.stream->update();
 
 	// update the parameters
-	loaded_sample &sample = m_sample[samplenum];
+	sample_t &sample = m_sample[samplenum];
 	chan.source = sample.data;
-	chan.source_length = sample.length;
-	chan.source_num = (sample.data.count() > 0) ? samplenum : -1;
+	chan.source_length = sample.data.count();
+	chan.source_num = (chan.source_length > 0) ? samplenum : -1;
 	chan.pos = 0;
 	chan.frac = 0;
 	chan.basefreq = sample.frequency;
@@ -330,9 +330,9 @@ void samples_device::device_post_load()
 		channel_t &chan = m_channel[channel];
 		if (chan.source_num >= 0 && chan.source_num < m_sample.count())
 		{
-			loaded_sample &sample = m_sample[chan.source_num];
+			sample_t &sample = m_sample[chan.source_num];
 			chan.source = sample.data;
-			chan.source_length = sample.length;
+			chan.source_length = sample.data.count();
 			if (sample.data == NULL)
 				chan.source_num = -1;
 		}
@@ -426,7 +426,7 @@ void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  sample
 //-------------------------------------------------
 
-bool samples_device::read_sample(emu_file &file, loaded_sample &sample)
+bool samples_device::read_sample(emu_file &file, sample_t &sample)
 {
 	// read the core header and make sure it's a proper file
 	UINT8 buf[4];
@@ -453,7 +453,7 @@ bool samples_device::read_sample(emu_file &file, loaded_sample &sample)
 //  read_wav_sample - read a WAV file as a sample
 //-------------------------------------------------
 
-bool samples_device::read_wav_sample(emu_file &file, loaded_sample &sample)
+bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 {
 	// we already read the opening 'WAVE' header
 	UINT32 offset = 4;
@@ -548,7 +548,6 @@ bool samples_device::read_wav_sample(emu_file &file, loaded_sample &sample)
 	// read the data in
 	if (bits == 8)
 	{
-		sample.length = length;
 		sample.data.resize(length);
 		file.read(sample.data, length);
 
@@ -560,13 +559,12 @@ bool samples_device::read_wav_sample(emu_file &file, loaded_sample &sample)
 	else
 	{
 		// 16-bit data is fine as-is
-		sample.length = length / 2;
 		sample.data.resize(length / 2);
 		file.read(sample.data, length);
 
 		// swap high/low on big-endian systems
 		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
-			for (UINT32 sindex = 0; sindex < sample.length; sindex++)
+			for (UINT32 sindex = 0; sindex < length / 2; sindex++)
 				sample.data[sindex] = LITTLE_ENDIANIZE_INT16(sample.data[sindex]);
 	}
 	return true;
@@ -577,14 +575,13 @@ bool samples_device::read_wav_sample(emu_file &file, loaded_sample &sample)
 //  read_flac_sample - read a FLAC file as a sample
 //-------------------------------------------------
 
-bool samples_device::read_flac_sample(emu_file &file, loaded_sample &sample)
+bool samples_device::read_flac_sample(emu_file &file, sample_t &sample)
 {
 	// seek back to the start of the file
 	file.seek(0, SEEK_SET);
 
 	// create the FLAC decoder and fill in the sample data
 	flac_decoder decoder(file);
-	sample.length = decoder.total_samples();
 	sample.frequency = decoder.sample_rate();
 
 	// error if more than 1 channel or not 16bpp
@@ -594,8 +591,8 @@ bool samples_device::read_flac_sample(emu_file &file, loaded_sample &sample)
 		return false;
 
 	// resize the array and read
-	sample.data.resize(sample.length);
-	if (!decoder.decode_interleaved(sample.data, sample.length))
+	sample.data.resize(decoder.total_samples());
+	if (!decoder.decode_interleaved(sample.data, sample.data.count()))
 		return false;
 
 	// finish up and clean up
