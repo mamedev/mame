@@ -45,9 +45,9 @@
 
 
 
-/***************************************************************************
-    DEBUGGING
-***************************************************************************/
+//**************************************************************************
+//  DEBUGGING
+//**************************************************************************
 
 #define VERBOSE			(0)
 
@@ -56,11 +56,17 @@
 
 
 //**************************************************************************
-//  LIVE SPEAKER DEVICE
+//  GLOBAL VARIABLES
 //**************************************************************************
 
 // device type definition
 const device_type SPEAKER = &device_creator<speaker_device>;
+
+
+
+//**************************************************************************
+//  LIVE SPEAKER DEVICE
+//**************************************************************************
 
 //-------------------------------------------------
 //  speaker_device - constructor
@@ -68,11 +74,10 @@ const device_type SPEAKER = &device_creator<speaker_device>;
 
 speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SPEAKER, "Speaker", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
+	  device_mixer_interface(mconfig, *this),
 	  m_x(0.0),
 	  m_y(0.0),
-	  m_z(0.0),
-	  m_mixer_stream(NULL)
+	  m_z(0.0)
 #ifdef MAME_DEBUG
 	,
 	  m_max_sample(0),
@@ -108,57 +113,6 @@ void speaker_device::static_set_position(device_t &device, double x, double y, d
 	speaker.m_x = x;
 	speaker.m_y = y;
 	speaker.m_z = z;
-}
-
-
-//-------------------------------------------------
-//  device_start - perform device-specific
-//  startup
-//-------------------------------------------------
-
-void speaker_device::device_start()
-{
-	// no inputs? that's weird
-	if (m_auto_allocated_inputs == 0)
-	{
-		logerror("Warning: speaker \"%s\" has no inputs\n", tag());
-		return;
-	}
-
-	// allocate the mixer stream
-	m_mixer_stream = machine().sound().stream_alloc(*this, m_auto_allocated_inputs, 1, machine().sample_rate());
-}
-
-
-//-------------------------------------------------
-//  device_post_load - after we load a save state
-//  be sure to update the mixer stream's output
-//  sample rate
-//-------------------------------------------------
-
-void speaker_device::device_post_load()
-{
-	m_mixer_stream->set_sample_rate(machine().sample_rate());
-}
-
-
-//-------------------------------------------------
-//  mixer_update - mix all inputs to one output
-//-------------------------------------------------
-
-void speaker_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	VPRINTF(("Mixer_update(%d)\n", samples));
-
-	// loop over samples
-	for (int pos = 0; pos < samples; pos++)
-	{
-		// add up all the inputs
-		INT32 sample = inputs[0][pos];
-		for (int inp = 1; inp < m_auto_allocated_inputs; inp++)
-			sample += inputs[inp][pos];
-		outputs[0][pos] = sample;
-	}
 }
 
 
@@ -222,4 +176,14 @@ void speaker_device::mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_upda
 			for (int sample = 0; sample < samples_this_update; sample++)
 				rightmix[sample] += stream_buf[sample];
 	}
+}
+
+
+//-------------------------------------------------
+//  device_start - handle device startup
+//-------------------------------------------------
+
+void speaker_device::device_start()
+{
+	// dummy save to make device.c happy
 }

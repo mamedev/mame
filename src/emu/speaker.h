@@ -48,6 +48,15 @@
 
 
 //**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+extern const device_type SPEAKER;
+
+
+
+//**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
@@ -72,7 +81,7 @@
 // ======================> speaker_device
 
 class speaker_device : public device_t,
-					   public device_sound_interface
+					   public device_mixer_interface
 {
 	friend resource_pool_object<speaker_device>::~resource_pool_object();
 
@@ -89,11 +98,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_post_load();
-
-	// sound interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_start() ATTR_COLD;
 
 	// inline configuration state
 	double				m_x;
@@ -101,17 +106,12 @@ protected:
 	double				m_z;
 
 	// internal state
-	sound_stream *		m_mixer_stream;			// mixing stream
 #ifdef MAME_DEBUG
 	INT32				m_max_sample;			// largest sample value we've seen
 	INT32				m_clipped_samples;		// total number of clipped samples
 	INT32				m_total_samples;		// total number of samples
 #endif
 };
-
-
-// device type definition
-extern const device_type SPEAKER;
 
 
 // speaker device iterator
