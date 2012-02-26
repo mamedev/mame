@@ -269,6 +269,6 @@ void sdlaudio_init(running_machine &machine);
 //  sdlwork.c
 //============================================================
 
-extern int sdl_num_processors;
+extern int osd_num_processors;
 
 #endif

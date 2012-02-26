@@ -52,12 +52,7 @@
 #include <ctype.h>
 #include <new>
 
-#ifdef _WIN32
 #define NUM_PROCESSORS_SUPPORTED 1
-#else
-#define NUM_PROCESSORS_SUPPORTED 0
-#endif
-
 
 //**************************************************************************
 //  CONSTANTS & DEFINES

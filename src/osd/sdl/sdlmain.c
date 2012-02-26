@@ -609,15 +609,15 @@ void sdl_osd_interface::init(running_machine &machine)
 	/* get number of processors */
 	stemp = options.numprocessors();
 
-	sdl_num_processors = 0;
+    osd_num_processors = 0;
 
 	if (strcmp(stemp, "auto") != 0)
 	{
-		sdl_num_processors = atoi(stemp);
-		if (sdl_num_processors < 1)
+		osd_num_processors = atoi(stemp);
+		if (osd_num_processors < 1)
 		{
 			mame_printf_warning("Warning: numprocessors < 1 doesn't make much sense. Assuming auto ...\n");
-			sdl_num_processors = 0;
+			osd_num_processors = 0;
 		}
 	}
 

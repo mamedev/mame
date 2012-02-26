@@ -16,7 +16,7 @@
  *        This is not really a sound solution.
  */
 
-int sdl_num_processors = 0;
+int osd_num_processors = 0;
 
 #include "../osdmini/miniwork.c"
 
@@ -131,7 +131,7 @@ typedef void *PVOID;
 //  GLOBAL VARIABLES
 //============================================================
 
-int sdl_num_processors = 0;
+int osd_num_processors = 0;
 
 //============================================================
 //  FUNCTION PROTOTYPES
@@ -567,10 +567,11 @@ static int effective_num_processors(void)
 {
 	char *procsoverride;
 	int numprocs = 0;
-	int physprocs = osd_num_processors();
+	int physprocs = osd_get_num_processors();
 
-	if (sdl_num_processors > 0)
-		return MIN(4 * physprocs, sdl_num_processors);
+    // osd_num_processors == 0 for 'auto'
+	if (osd_num_processors > 0)
+		return MIN(4 * physprocs, osd_num_processors);
 	else
 	{
 		// if the OSDPROCESSORS environment variable is set, use that value if valid
@@ -601,7 +602,7 @@ static UINT32 effective_cpu_mask(int index)
 			if (index<2)
 				mask = 0x01; /* main thread and io threads on cpu #0 */
 			else
-				mask = (1 << (((index - 1) % (osd_num_processors() - 1)) + 1));
+				mask = (1 << (((index - 1) % (osd_get_num_processors() - 1)) + 1));
 		}
 		else
 		{
