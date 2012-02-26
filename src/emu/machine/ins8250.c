@@ -435,7 +435,8 @@ void ins8250_uart_device::device_start()
 	m_out_int_func.resolve(m_out_int_cb, *this);
 	m_out_out1_func.resolve(m_out_out1_cb, *this);
 	m_out_out2_func.resolve(m_out_out2_cb, *this);
-
+	set_tra_rate(0);
+	set_rcv_rate(0);
 }
 
 void ins8250_uart_device::device_reset()
