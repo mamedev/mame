@@ -589,7 +589,7 @@ static INPUT_PORTS_START( starsldr )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
- static INPUT_PORTS_START( kurufev )
+ static INPUT_PORTS_START( doncdoon )
 	PORT_START("P1")
 	PORT_START("P1_ANALOG_X")
 	PORT_START("P1_ANALOG_Y")
@@ -630,8 +630,8 @@ INPUT_PORTS_END
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( doncdoon )
-	PORT_INCLUDE( kurufev )
+static INPUT_PORTS_START( kurufev )
+	PORT_INCLUDE( doncdoon )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x00004040, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1009,7 +1009,7 @@ ROM_START( hipai )
 ROM_END
 
 
-ROM_START( doncdoon )
+ROM_START( kurufev )
 	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
 	PIF_BOOTROM
 
@@ -1027,7 +1027,7 @@ ROM_START( doncdoon )
     ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
-ROM_START( kurufev )
+ROM_START( doncdoon )
 	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
 	PIF_BOOTROM
 
@@ -1075,7 +1075,7 @@ GAME( 1998, vivdolls, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Visco", "Vivi
 GAME( 1999, srmvs,    aleck64,  aleck64, srmvs,    aleck64, ROT0, "Seta", "Super Real Mahjong VS", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 2003, twrshaft, aleck64,  aleck64, twrshaft, aleck64, ROT0, "Aruze", "Tower & Shaft", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 2003, hipai,    aleck64,  aleck64, hipai,    aleck64, ROT0, "Aruze / Seta", "Hi Pai Paradise", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 2003, doncdoon, aleck64,  aleck64, doncdoon, aleck64, ROT0, "Aruze / Takumi", "Donchan no Hanabi de Doon", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 2003, doncdoon, aleck64,  aleck64, doncdoon, aleck64, ROT0, "Aruze", "Hanabi de Doon! - Don-chan Puzzle", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 2003, kurufev,  aleck64,  aleck64, kurufev,  aleck64, ROT0, "Aruze / Takumi", "Kurukuru Fever", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64,  aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", GAME_NOT_WORKING|GAME_NO_SOUND )
 
