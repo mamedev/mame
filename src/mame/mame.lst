@@ -16896,13 +16896,88 @@ m1coro30h
 m1coro21v
 m1coro21vp
 m1cororr	// Coronation Street - Rovers Return (Maygay)
+m1cororrp
+m1cororra
+m1cororrb
+m1cororrbh
+m1cororrb1
+m1cororrbp
+m1cororrc
+m1cororrc1
+m1cororrc2
+m1cororrd
+m1cororrdp
+m1cororre
+m1cororrf
+m1cororrfp
+m1cororrg
+m1cororrgp
+m1cororrh
+m1cororri
+m1cororrip
+m1cororrj
+m1cororrjp
+m1cororrk
+m1cororrl
+m1cororrlp
 m1corocb	// Coronation Street Club (Maygay)
+m1corocbp
+m1corocb1
+m1corocb1p
 m1corosh	// Coronation Street Showcase (Maygay)
-m1criss		// Criss Cross Club (Maygay)
+m1coroshp
+m1criss		// Criss Cross Club (Maygay) (Dutch)
 m1dxmono	// Deluxe Monopoly (Maygay)
+m1dxmonop
+m1dxmono12n
+m1dxmono31b
+m1dxmono31p
+m1dxmono31h
+m1dxmono31h2
+m1dxmono51
+m1dxmono12
+m1dxmono12p
+m1dxmono12a
+m1dxmono21p
+m1dxmono11p
+m1dxmono11
+m1dxmono51o
+m1dxmono51p
+m1dxmono30h
+m1dxmono11o
+m1dxmono11m
+m1dxmono11mb
 m1dmnhrt	// Diamond Hearts (Maygay)
 m1dm4ev		// Diamonds Are Forever Club (Maygay)
+m1dm4evp
+m1dm4ev11
 m1dkong		// Donkey Kong (Maygay)
+m1dkongp
+m1dkonga
+m1dkong91n
+m1dkong91np
+m1dkong91na
+m1dkong81n
+m1dkong81na
+m1dkong81np
+m1dkong21n
+m1dkong91
+m1dkong91p
+m1dkong91a
+m1dkong91h1
+m1dkong91h2
+m1dkong81
+m1dkong81p
+m1dkong51
+m1dkong51p
+m1dkong41
+m1dkong41p
+m1dkong31
+m1dkong31p
+m1dkong21
+m1dkong21p
+m1dkong11
+m1dkong11p
 m1ee		// Eastenders (Bwb)
 m1eea		//
 m1eeb		//
@@ -16932,6 +17007,8 @@ m1jpmult	// Jackpot Multiplier (Maygay)
 m1jbond		// James Bond (Maygay)
 m1jdwins	// Jim Davison's Winning Streak (Maygay)
 m1liveam	// Living In America (Maygay)
+m1liveamp
+m1liveama
 m1lotmil	// Lottery Millionaire Club (Maygay)
 m1luckno	// Lucky Numbers (Maygay)
 m1magic		// Magic Squares (Maygay)
@@ -17007,6 +17084,9 @@ m1topstr	// Top Strike (Maygay - Bwb)
 m1sirich	// Strike It Rich
 m1gskill	// Greek Skill
 m1luxor		// Luxor Casino
+m1luxor33
+m1luxor32
+m1luxor21
 m1atunk
 
 // Maygay MV1 hardware
