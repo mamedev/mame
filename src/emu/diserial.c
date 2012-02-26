@@ -45,11 +45,19 @@ device_serial_interface::~device_serial_interface()
 {
 }
 
+//-------------------------------------------------
+//  interface_pre_start - work to be done prior to
+//  actually starting a device
+//-------------------------------------------------
+
+void device_serial_interface::interface_pre_start()
+{
+	m_rcv_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::rcv_timer), this));
+	m_tra_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::tra_timer), this));
+}
+
 void device_serial_interface::set_rcv_rate(int baud)
 {
-	if(!m_rcv_clock)
-		m_rcv_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::rcv_timer), this));
-
 	m_rcv_baud = baud;
 	receive_register_reset();
 	m_rcv_clock->adjust(attotime::never);
@@ -57,9 +65,6 @@ void device_serial_interface::set_rcv_rate(int baud)
 
 void device_serial_interface::set_tra_rate(int baud)
 {
-	if(!m_tra_clock)
-		m_tra_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::tra_timer), this));
-
 	m_tra_baud = baud;
 	transmit_register_reset();
 	m_tra_clock->adjust(attotime::never);
