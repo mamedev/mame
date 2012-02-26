@@ -4633,7 +4633,7 @@ GAME( 1993, m1coro30h	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Ma
 GAME( 1993, m1coro21v	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Multivend) (M1A/B)",GAME_FLAGS )
 GAME( 1993, m1coro21vp	,m1coro		,m1,m1,m1, ROT0, "Maygay", "Coronation Street (Maygay) v2.1 (Multivend) (Protocol)(M1A/B)",GAME_FLAGS )
 
-GAME( 1995, m1cororr	,m1cororr	,m1,m1,m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1cororr	,0			,m1,m1,m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (M1A/B)",GAME_FLAGS )
 GAME( 1995, m1cororrp	,m1cororr	,m1,m1,m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (Protocol) (M1A/B)",GAME_FLAGS )
 GAME( 1995, m1cororra	,m1cororr	,m1,m1,m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 1) (Alternate) (M1A/B)",GAME_FLAGS )
 GAME( 1995, m1cororrb	,m1cororr	,m1,m1,m1, ROT0, "Maygay", "Coronation Street - Rovers Return (Maygay) (set 2) (M1A/B)",GAME_FLAGS )
@@ -4682,7 +4682,7 @@ GAME( 1992, m1dxmono12a	,m1dxmono	,m1,m1,m1, ROT0, "Maygay", "Deluxe Monopoly (M
 GAME( 1992, m1dxmono21p	,m1dxmono	,m1,m1,m1, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS )
 GAME( 1992, m1dxmono11p	,m1dxmono	,m1,m1,m1, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS )
 GAME( 1992, m1dxmono11	,m1dxmono	,m1,m1,m1, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
-GAME( 1992, m1dxmono51o	,m1dxmono	,m1,m1,m1, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Older) (M1A/B)",GAME_FLAGS )
+GAME( 1992, m1dxmono51o	,m1dxmono	,m1,m1,m1, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Older) (M1A/B) (alt?)",GAME_FLAGS )
 GAME( 1992, m1dxmono51p	,m1dxmono	,m1,m1,m1, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v5.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS )
 GAME( 1992, m1dxmono30h	,m1dxmono	,m1,m1,m1, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v3.0 (Hack) (M1A/B)",GAME_FLAGS )
 GAME( 1992, m1dxmono11o	,m1dxmono	,m1,m1,m1, ROT0, "Maygay", "Deluxe Monopoly (Maygay) v1.1 (Older) (M1A/B)",GAME_FLAGS )
@@ -4720,7 +4720,7 @@ GAME( 1996, m1dkong31p	,m1dkong	,m1,m1,m1, ROT0, "Maygay", "Donkey Kong (Maygay)
 GAME( 1996, m1dkong21	,m1dkong	,m1,m1,m1, ROT0, "Maygay", "Donkey Kong (Maygay) v2.1 (Older) (M1A/B)",GAME_FLAGS )
 GAME( 1996, m1dkong21p	,m1dkong	,m1,m1,m1, ROT0, "Maygay", "Donkey Kong (Maygay) v2.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS )
 GAME( 1996, m1dkong11	,m1dkong	,m1,m1,m1, ROT0, "Maygay", "Donkey Kong (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1dkong11p	,m1dkong	,m1,m1,m1, ROT0, "Maygay", "Donkey Kong (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1dkong11p	,m1dkong	,m1,m1,m1, ROT0, "Maygay", "Donkey Kong (Maygay) v1.1 (M1A/B) (Protocol?)",GAME_FLAGS )
 
 GAME( 199?, m1ee		,0			,m1,m1,m1, ROT0, "Maygay", "Eastenders (Bwb) (M1A/B)",GAME_FLAGS )
 GAME( 199?, m1eea		,m1ee		,m1,m1,m1, ROT0, "Maygay", "Eastenders (Maygay - Bwb) (M1A/B)",GAME_FLAGS )
@@ -4750,7 +4750,7 @@ GAME( 199?, m1itjob		,0			,m1,m1,m1, ROT0, "Maygay", "Italian Job (Maygay) (M1A/
 GAME( 199?, m1jpmult	,0			,m1,m1,m1, ROT0, "Maygay", "Jackpot Multiplier (Maygay) (M1A/B)",GAME_FLAGS )
 GAME( 199?, m1jbond		,0			,m1,m1,m1, ROT0, "Maygay", "James Bond (Maygay) (M1A/B)",GAME_FLAGS )
 GAME( 199?, m1jdwins	,0			,m1,m1,m1, ROT0, "Maygay", "Jim Davison's Winning Streak (Maygay) (M1A/B)",GAME_FLAGS )
-GAME( 1993, m1liveam	,m1liveam	,m1,m1,m1, ROT0, "Maygay", "Living In America (Maygay) (Alternate 1) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1liveam	,0			,m1,m1,m1, ROT0, "Maygay", "Living In America (Maygay) (Alternate 1) (M1A/B)",GAME_FLAGS )
 GAME( 1993, m1liveamp	,m1liveam	,m1,m1,m1, ROT0, "Maygay", "Living In America (Maygay) (Protocol) (M1A/B)",GAME_FLAGS )
 GAME( 1993, m1liveama	,m1liveam	,m1,m1,m1, ROT0, "Maygay", "Living In America (Maygay) (Alternate 2)(M1A/B)",GAME_FLAGS )
 GAME( 199?, m1lotmil	,0			,m1,m1,m1, ROT0, "Maygay", "Lottery Millionaire Club (Maygay) (M1A/B)",GAME_FLAGS )
@@ -4834,4 +4834,3 @@ GAME( 199?, m1sirich	,0			,m1,m1,m1, ROT0, "Maygay", "Strike It Rich (Maygay) (M
 GAME( 199?, m1gskill	,0			,m1,m1,m1, ROT0, "Hitech Amusement", "Greek Skill (Hitech Amusement)",GAME_FLAGS ) // no idea if this is m1ab but the code starts at 2800
 
 GAME( 19??, m1atunk		,0			,m1,m1,m1, ROT0, "Avantime?", "Random Runner (Avantime?)",GAME_FLAGS )
-

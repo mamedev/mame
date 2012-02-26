@@ -97,7 +97,7 @@ static MACHINE_CONFIG_START( potgold, potgold_state )
 MACHINE_CONFIG_END
 
 ROM_START( potgoldu )
-	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* 34010 code */
 
 	// these two are definitely a pair
 	ROM_LOAD16_BYTE( "400x.u5",  0x180000, 0x20000, BAD_DUMP CRC(4949300b) SHA1(edf5e3de8561258ceb8fc0ab0291859d2cf7c21b) )
