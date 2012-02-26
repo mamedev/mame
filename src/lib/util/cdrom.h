@@ -59,7 +59,7 @@ const UINT32 CD_TRACK_PADDING = 4;
 #define CD_MAX_SUBCODE_DATA		(96)
 
 #define CD_FRAME_SIZE			(CD_MAX_SECTOR_DATA + CD_MAX_SUBCODE_DATA)
-#define CD_FRAMES_PER_HUNK		(4) // should be 8 for v5 CDs, with a 4-frame pad at the end to maintain SHA1 compatibility
+#define CD_FRAMES_PER_HUNK		(8)
 
 #define CD_METADATA_WORDS		(1+(CD_MAX_TRACKS * 6))
 

@@ -225,33 +225,18 @@ class chd_flac_compressor : public chd_compressor
 {
 public:
 	// construction/destruction
-	chd_flac_compressor(chd_file &chd, bool lossy, bool bigendian);
+	chd_flac_compressor(chd_file &chd, bool lossy);
 
 	// core functionality
 	virtual UINT32 compress(const UINT8 *src, UINT32 srclen, UINT8 *dest);
 
+	// static helpers
+	static UINT32 blocksize(UINT32 bytes);
+
 private:
 	// internal state
-	bool			m_swap_endian;
+	bool			m_big_endian;
 	flac_encoder	m_encoder;
-};
-
-// big-endian variant
-class chd_flac_compressor_be : public chd_flac_compressor
-{
-public:
-	// construction/destruction
-	chd_flac_compressor_be(chd_file &chd, bool lossy)
-		: chd_flac_compressor(chd, lossy, true) { }
-};
-
-// little-endian variant
-class chd_flac_compressor_le : public chd_flac_compressor
-{
-public:
-	// construction/destruction
-	chd_flac_compressor_le(chd_file &chd, bool lossy)
-		: chd_flac_compressor(chd, lossy, false) { }
 };
 
 
@@ -262,33 +247,15 @@ class chd_flac_decompressor : public chd_decompressor
 {
 public:
 	// construction/destruction
-	chd_flac_decompressor(chd_file &chd, bool lossy, bool bigendian);
+	chd_flac_decompressor(chd_file &chd, bool lossy);
 
 	// core functionality
 	virtual void decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen);
 
 private:
 	// internal state
-	bool			m_swap_endian;
+	bool			m_big_endian;
 	flac_decoder	m_decoder;
-};
-
-// big-endian variant
-class chd_flac_decompressor_be : public chd_flac_decompressor
-{
-public:
-	// construction/destruction
-	chd_flac_decompressor_be(chd_file &chd, bool lossy)
-		: chd_flac_decompressor(chd, lossy, true) { }
-};
-
-// little-endian variant
-class chd_flac_decompressor_le : public chd_flac_decompressor
-{
-public:
-	// construction/destruction
-	chd_flac_decompressor_le(chd_file &chd, bool lossy)
-		: chd_flac_decompressor(chd, lossy, false) { }
 };
 
 
@@ -304,6 +271,9 @@ public:
 
 	// core functionality
 	virtual UINT32 compress(const UINT8 *src, UINT32 srclen, UINT8 *dest);
+
+	// static helpers
+	static UINT32 blocksize(UINT32 bytes);
 
 private:
 	// internal state
@@ -390,8 +360,7 @@ const chd_codec_list::codec_entry chd_codec_list::s_codec_list[] =
 	{ CHD_CODEC_ZLIB,		false,	"Deflate",				&chd_codec_list::construct_compressor<chd_zlib_compressor>,		&chd_codec_list::construct_decompressor<chd_zlib_decompressor> },
 	{ CHD_CODEC_LZMA,		false,	"LZMA",					&chd_codec_list::construct_compressor<chd_lzma_compressor>,		&chd_codec_list::construct_decompressor<chd_lzma_decompressor> },
 	{ CHD_CODEC_HUFFMAN,	false,	"Huffman",				&chd_codec_list::construct_compressor<chd_huffman_compressor>,	&chd_codec_list::construct_decompressor<chd_huffman_decompressor> },
-	{ CHD_CODEC_FLAC_BE,	false,	"FLAC, big-endian",		&chd_codec_list::construct_compressor<chd_flac_compressor_be>,	&chd_codec_list::construct_decompressor<chd_flac_decompressor_be> },
-	{ CHD_CODEC_FLAC_LE,	false,	"FLAC, little-endian",	&chd_codec_list::construct_compressor<chd_flac_compressor_le>,	&chd_codec_list::construct_decompressor<chd_flac_decompressor_le> },
+	{ CHD_CODEC_FLAC,		false,	"FLAC",					&chd_codec_list::construct_compressor<chd_flac_compressor>,		&chd_codec_list::construct_decompressor<chd_flac_decompressor> },
 	{ CHD_CODEC_CD_FLAC,	false,	"CD FLAC",				&chd_codec_list::construct_compressor<chd_cd_flac_compressor>,	&chd_codec_list::construct_decompressor<chd_cd_flac_decompressor> },
 	{ CHD_CODEC_AVHUFF,		false,	"A/V Huffman",			&chd_codec_list::construct_compressor<chd_avhuff_compressor>,	&chd_codec_list::construct_decompressor<chd_avhuff_decompressor> },
 };
@@ -1157,21 +1126,18 @@ void chd_huffman_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT
 //  chd_flac_compressor - constructor
 //-------------------------------------------------
 
-chd_flac_compressor::chd_flac_compressor(chd_file &chd, bool lossy, bool bigendian)
+chd_flac_compressor::chd_flac_compressor(chd_file &chd, bool lossy)
 	: chd_compressor(chd, lossy)
 {
 	// determine whether we want native or swapped samples
 	UINT16 native_endian = 0;
 	*reinterpret_cast<UINT8 *>(&native_endian) = 1;
-	if (native_endian == 1)
-		m_swap_endian = bigendian;
-	else
-		m_swap_endian = !bigendian;
-
+	m_big_endian = (native_endian == 0x100);
+		
 	// configure the encoder
 	m_encoder.set_sample_rate(44100);
 	m_encoder.set_num_channels(2);
-	m_encoder.set_block_size(chd.hunk_bytes() / 4);
+	m_encoder.set_block_size(blocksize(chd.hunk_bytes()));
 	m_encoder.set_strip_metadata(true);
 }
 
@@ -1182,16 +1148,49 @@ chd_flac_compressor::chd_flac_compressor(chd_file &chd, bool lossy, bool bigendi
 
 UINT32 chd_flac_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *dest)
 {
-	// reset and encode
-	m_encoder.reset(dest, chd().hunk_bytes());
-	if (!m_encoder.encode_interleaved(reinterpret_cast<const INT16 *>(src), srclen / 4, m_swap_endian))
+	// reset and encode big-endian
+	m_encoder.reset(dest + 1, chd().hunk_bytes() - 1);
+	if (!m_encoder.encode_interleaved(reinterpret_cast<const INT16 *>(src), srclen / 4, !m_big_endian))
 		throw CHDERR_COMPRESSION_ERROR;
+	UINT32 complen_be = m_encoder.finish();
+	
+	// reset and encode little-endian
+	m_encoder.reset(dest + 1, chd().hunk_bytes() - 1);
+	if (!m_encoder.encode_interleaved(reinterpret_cast<const INT16 *>(src), srclen / 4, m_big_endian))
+		throw CHDERR_COMPRESSION_ERROR;
+	UINT32 complen_le = m_encoder.finish();
+	
+	// pick the best one and add a byte
+	UINT32 complen = MIN(complen_le, complen_be);
+	if (complen + 1 >= chd().hunk_bytes())
+		throw CHDERR_COMPRESSION_ERROR;
+	
+	// if big-endian was better, re-do it
+	dest[0] = 'L';
+	if (complen != complen_le)
+	{
+		dest[0] = 'B';
+		m_encoder.reset(dest + 1, chd().hunk_bytes() - 1);
+		if (!m_encoder.encode_interleaved(reinterpret_cast<const INT16 *>(src), srclen / 4, !m_big_endian))
+			throw CHDERR_COMPRESSION_ERROR;
+		m_encoder.finish();
+	}
+	return complen + 1;
+}
 
-	// finish up
-	UINT32 complen = m_encoder.finish();
-	if (complen >= chd().hunk_bytes())
-		throw CHDERR_COMPRESSION_ERROR;
-	return complen;
+
+//-------------------------------------------------
+//  blocksize - return the optimal block size
+//-------------------------------------------------
+
+UINT32 chd_flac_compressor::blocksize(UINT32 bytes)
+{
+	// determine FLAC block size, which must be 16-65535
+	// clamp to 2k since that's supposed to be the sweet spot
+	UINT32 blocksize = bytes / 4;
+	while (blocksize > 2048)
+		blocksize /= 2;
+	return blocksize;
 }
 
 
@@ -1204,16 +1203,13 @@ UINT32 chd_flac_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *des
 //  chd_flac_decompressor - constructor
 //-------------------------------------------------
 
-chd_flac_decompressor::chd_flac_decompressor(chd_file &chd, bool lossy, bool bigendian)
+chd_flac_decompressor::chd_flac_decompressor(chd_file &chd, bool lossy)
 	: chd_decompressor(chd, lossy)
 {
 	// determine whether we want native or swapped samples
 	UINT16 native_endian = 0;
 	*reinterpret_cast<UINT8 *>(&native_endian) = 1;
-	if (native_endian == 1)
-		m_swap_endian = bigendian;
-	else
-		m_swap_endian = !bigendian;
+	m_big_endian = (native_endian == 0x100);
 }
 
 
@@ -1224,10 +1220,19 @@ chd_flac_decompressor::chd_flac_decompressor(chd_file &chd, bool lossy, bool big
 
 void chd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen)
 {
-	// reset and decode
-	if (!m_decoder.reset(44100, 2, chd().hunk_bytes() / 4, src, complen))
+	// determine the endianness
+	bool swap_endian;
+	if (src[0] == 'L')
+		swap_endian = m_big_endian;
+	else if (src[0] == 'B')
+		swap_endian = !m_big_endian;
+	else
 		throw CHDERR_DECOMPRESSION_ERROR;
-	if (!m_decoder.decode_interleaved(reinterpret_cast<INT16 *>(dest), destlen / 4, m_swap_endian))
+
+	// reset and decode
+	if (!m_decoder.reset(44100, 2, chd_flac_compressor::blocksize(destlen), src + 1, complen - 1))
+		throw CHDERR_DECOMPRESSION_ERROR;
+	if (!m_decoder.decode_interleaved(reinterpret_cast<INT16 *>(dest), destlen / 4, swap_endian))
 		throw CHDERR_DECOMPRESSION_ERROR;
 
 	// finish up
@@ -1260,7 +1265,7 @@ chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, bool lossy)
 	// configure the encoder
 	m_encoder.set_sample_rate(44100);
 	m_encoder.set_num_channels(2);
-	m_encoder.set_block_size((chd.hunk_bytes() / CD_FRAME_SIZE) * (CD_MAX_SECTOR_DATA/4));
+	m_encoder.set_block_size(blocksize((chd.hunk_bytes() / CD_FRAME_SIZE) * CD_MAX_SECTOR_DATA));
 	m_encoder.set_strip_metadata(true);
 
 	// initialize the deflater
@@ -1333,6 +1338,20 @@ UINT32 chd_cd_flac_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *
 }
 
 
+//-------------------------------------------------
+//  blocksize - return the optimal block size
+//-------------------------------------------------
+
+UINT32 chd_cd_flac_compressor::blocksize(UINT32 bytes)
+{
+	// for CDs it seems that CD_MAX_SECTOR_DATA is the right target
+	UINT32 blocksize = bytes / 4;
+	while (blocksize > CD_MAX_SECTOR_DATA)
+		blocksize /= 2;
+	return blocksize;
+}
+
+
 
 //**************************************************************************
 //  CD FLAC DECOMPRESSOR
@@ -1387,8 +1406,8 @@ chd_cd_flac_decompressor::~chd_cd_flac_decompressor()
 void chd_cd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen)
 {
 	// reset and decode
-	UINT32 frames = chd().hunk_bytes() / CD_FRAME_SIZE;
-	if (!m_decoder.reset(44100, 2, frames * CD_MAX_SECTOR_DATA/4, src, complen))
+	UINT32 frames = destlen / CD_FRAME_SIZE;
+	if (!m_decoder.reset(44100, 2, chd_cd_flac_compressor::blocksize(frames * CD_MAX_SECTOR_DATA), src, complen))
 		throw CHDERR_DECOMPRESSION_ERROR;
 	UINT8 *buffer = m_buffer;
 	if (!m_decoder.decode_interleaved(reinterpret_cast<INT16 *>(buffer), frames * CD_MAX_SECTOR_DATA/4, m_swap_endian))

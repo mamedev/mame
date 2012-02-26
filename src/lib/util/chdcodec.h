@@ -198,8 +198,7 @@ const chd_codec_type CHD_CODEC_NONE 	= 0;
 const chd_codec_type CHD_CODEC_ZLIB 	= CHD_MAKE_TAG('z','l','i','b');
 const chd_codec_type CHD_CODEC_LZMA 	= CHD_MAKE_TAG('l','z','m','a');
 const chd_codec_type CHD_CODEC_HUFFMAN	= CHD_MAKE_TAG('h','u','f','f');
-const chd_codec_type CHD_CODEC_FLAC_BE	= CHD_MAKE_TAG('f','l','c','b');
-const chd_codec_type CHD_CODEC_FLAC_LE	= CHD_MAKE_TAG('f','l','c','l');
+const chd_codec_type CHD_CODEC_FLAC		= CHD_MAKE_TAG('f','l','a','c');
 const chd_codec_type CHD_CODEC_CD_FLAC	= CHD_MAKE_TAG('c','d','f','l');
 const chd_codec_type CHD_CODEC_AVHUFF	= CHD_MAKE_TAG('a','v','h','u');
 
