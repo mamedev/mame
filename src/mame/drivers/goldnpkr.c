@@ -276,7 +276,7 @@
 
 
   * Casino Poker
-  
+
   Bipolar PROM 24sa10 is filled with 0x09, so has at least
   fixed bits 0 and 3 along the whole data. Needs a redump using a supported
   EEPROM programmer.
@@ -797,7 +797,7 @@
   - Added Casino Poker (Ver PM86LO-35-5, German).
   - Inputs from the scratch.
   - Switched manufacturer 'Playman' to PM / Beck Elektronik, since
-     it's PM and Beck Elektronik/Computer/etc... 
+     it's PM and Beck Elektronik/Computer/etc...
   - Added technical and game notes.
 
 

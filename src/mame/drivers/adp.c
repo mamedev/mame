@@ -163,7 +163,7 @@ public:
 
 	required_device<h63484_device> m_h63484;
 	required_device<microtouch_device> m_microtouch;
-	
+
 	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

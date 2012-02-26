@@ -2097,7 +2097,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			logerror("RETF: EIP is past return CS segment limit.\n");
 			FAULT(FAULT_GP,0)
 		}
-		
+
 		if(operand32 == 0)
 		{
 			ea += count+4;
@@ -2110,7 +2110,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			newESP = READ32(cpustate, ea);
 			newSS = READ32(cpustate, ea+4) & 0xffff;
 		}
-		
+
 		/* Check SS selector and descriptor */
 		desc.selector = newSS;
 		i386_load_protected_mode_segment(cpustate,&desc);

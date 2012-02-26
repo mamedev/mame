@@ -849,7 +849,7 @@ void cli_frontend::verifyroms(const char *gamename)
 				}
 			}
 		}
-		
+
 		slot_interface_iterator slotiter(config.root_device());
 		for (const device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
 		{
@@ -865,7 +865,7 @@ void cli_frontend::verifyroms(const char *gamename)
 				for (device_t *device = subiter.first(); device != NULL; device = subiter.next())
 					if (!device->configured())
 						device->config_complete();
-				
+
 				if (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE) {
 					if (mame_strwildcmp(gamename, dev->shortname()) == 0)
 					{
@@ -1243,7 +1243,7 @@ void cli_frontend::listsoftware(const char *gamename)
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
-	
+
 	while (drivlist.next())
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
@@ -1257,7 +1257,7 @@ void cli_frontend::listsoftware(const char *gamename)
 				{
 					/* Verify if we have encountered this list before */
 					if (list_map.add(swlist->list_name(), 0, false) != TMERR_DUPLICATE)
-					{					
+					{
 						if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = FALSE; }
 						output_single_softlist(out, list, swlist->list_name());
 					}
@@ -1284,7 +1284,7 @@ void cli_frontend::getsoftlist(const char *gamename)
 	FILE *out = stdout;
 	int_map list_map;
 	bool isfirst = TRUE;
-	
+
 	driver_enumerator drivlist(m_options);
 	while (drivlist.next())
 	{
@@ -1416,7 +1416,7 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_VERIFYROMS,	&cli_frontend::verifyroms },
 		{ CLICOMMAND_VERIFYSAMPLES,	&cli_frontend::verifysamples },
 		{ CLICOMMAND_LISTMEDIA,		&cli_frontend::listmedia },
-		{ CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },		
+		{ CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },
 		{ CLICOMMAND_ROMIDENT,		&cli_frontend::romident },
 		{ CLICOMMAND_GETSOFTLIST,   &cli_frontend::getsoftlist },
 	};

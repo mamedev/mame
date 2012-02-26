@@ -82,7 +82,7 @@ struct movie_info
 	int				samplerate;
 	int				channels;
 	int				interlaced;
-	bitmap_yuy16 	bitmap;
+	bitmap_yuy16	bitmap;
 	dynamic_array<INT16> lsound;
 	dynamic_array<INT16> rsound;
 	UINT32			samples;
@@ -106,7 +106,7 @@ public:
 	{
 		assert(offset % m_source.hunk_bytes() == 0);
 		assert(length % m_source.hunk_bytes() == 0);
-		
+
 		UINT32 startfield = offset / m_source.hunk_bytes();
 		UINT32 endfield = startfield + length / m_source.hunk_bytes();
 		UINT8 *dest = reinterpret_cast<UINT8 *>(_dest);
@@ -451,7 +451,7 @@ void chd_resample_compressor::generate_one_frame(UINT8 *dest, UINT32 datasize, U
 		dstbeginfield = -1 - sample_number_to_field(m_info, -dstbegin >> 24, dstbeginoffset);
 		dstbeginoffset = (field_to_sample_number(m_info, -dstbeginfield) - field_to_sample_number(m_info, -dstbeginfield - 1)) - dstbeginoffset;
 	}
-	
+
 	// determine the last field needed to cover this range of samples
 	UINT32 srcend = field_to_sample_number(m_info, fieldnum + 1);
 	INT64 dstend = (INT64(srcend) << 24) + m_ioffset + m_islope * (fieldnum + 1);
@@ -498,7 +498,7 @@ printf("%5d: start=%10d (%5d.%03d) end=%10d (%5d.%03d)\n",
 
 	// read the original frame, pointing the sound buffer past where we've calculated
 	read_chd(m_source, fieldnum, m_info, srcend - srcbegin);
-	
+
 	// assemble the final frame
 	dynamic_buffer buffer;
 	INT16 *sampledata[2] = { m_info.lsound, m_info.rsound };

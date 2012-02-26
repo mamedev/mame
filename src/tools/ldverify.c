@@ -256,7 +256,7 @@ static void *open_chd(const char *filename, movie_info &info)
 static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, INT16 *lsound, INT16 *rsound, int &samples)
 {
 	chd_file *chdfile = reinterpret_cast<chd_file *>(file);
-	
+
 	// loop over fields
 	int interlace_factor = chdinterlaced ? 2 : 1;
 	samples = 0;

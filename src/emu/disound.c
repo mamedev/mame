@@ -394,7 +394,7 @@ device_mixer_interface::~device_mixer_interface()
 
 //-------------------------------------------------
 //  interface_pre_start - perform startup prior
-//	to the device startup
+//  to the device startup
 //-------------------------------------------------
 
 void device_mixer_interface::interface_pre_start()
@@ -415,15 +415,15 @@ void device_mixer_interface::interface_pre_start()
 
 
 //-------------------------------------------------
-//  interface_post_load - after we load a save 
-//  state be sure to update the mixer stream's 
+//  interface_post_load - after we load a save
+//  state be sure to update the mixer stream's
 //  output sample rate
 //-------------------------------------------------
 
 void device_mixer_interface::interface_post_load()
 {
 	m_mixer_stream->set_sample_rate(device().machine().sample_rate());
-	
+
 	// call our parent
 	device_sound_interface::interface_post_load();
 }

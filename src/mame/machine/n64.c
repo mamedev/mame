@@ -1959,7 +1959,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 void n64_periphs::handle_pif()
 {
 	/*printf("Before:\n"); fflush(stdout);
-	for(int i = 0; i < 0x40; i++)
+    for(int i = 0; i < 0x40; i++)
     {
         printf("%02x ", pif_cmd[i]);
         if((i & 0xf) == 0xf)

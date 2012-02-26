@@ -1133,7 +1133,7 @@ chd_flac_compressor::chd_flac_compressor(chd_file &chd, bool lossy)
 	UINT16 native_endian = 0;
 	*reinterpret_cast<UINT8 *>(&native_endian) = 1;
 	m_big_endian = (native_endian == 0x100);
-		
+
 	// configure the encoder
 	m_encoder.set_sample_rate(44100);
 	m_encoder.set_num_channels(2);
@@ -1153,18 +1153,18 @@ UINT32 chd_flac_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *des
 	if (!m_encoder.encode_interleaved(reinterpret_cast<const INT16 *>(src), srclen / 4, !m_big_endian))
 		throw CHDERR_COMPRESSION_ERROR;
 	UINT32 complen_be = m_encoder.finish();
-	
+
 	// reset and encode little-endian
 	m_encoder.reset(dest + 1, chd().hunk_bytes() - 1);
 	if (!m_encoder.encode_interleaved(reinterpret_cast<const INT16 *>(src), srclen / 4, m_big_endian))
 		throw CHDERR_COMPRESSION_ERROR;
 	UINT32 complen_le = m_encoder.finish();
-	
+
 	// pick the best one and add a byte
 	UINT32 complen = MIN(complen_le, complen_be);
 	if (complen + 1 >= chd().hunk_bytes())
 		throw CHDERR_COMPRESSION_ERROR;
-	
+
 	// if big-endian was better, re-do it
 	dest[0] = 'L';
 	if (complen != complen_le)

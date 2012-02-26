@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( manohman_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 	AM_RANGE(0x600006, 0x600007) AM_RAM		// write bitpatterns to compare with the 500000-503ff8 RAM testing.
-//	AM_RANGE(0xYYYYYY, 0xYYYYYY) AM_RAM
+//  AM_RANGE(0xYYYYYY, 0xYYYYYY) AM_RAM
 ADDRESS_MAP_END
 
 /*

@@ -3297,7 +3297,7 @@ static DRIVER_INIT( dragngun )
 	process_dvi_data(machine.region("dvi")->base(),0x800000, 0x1000000);
 	process_dvi_data(machine.region("dvi")->base(),0xB10000, 0x1000000);
 	process_dvi_data(machine.region("dvi")->base(),0xB80000, 0x1000000);
-	
+
 }
 
 static DRIVER_INIT( fghthist )

@@ -1083,7 +1083,7 @@ void driver_device::static_set_game(device_t &device, const game_driver &game)
 
 	// set the short name to the game's name
 	driver.m_shortname = game.name;
-	
+
 	// set the full name to the game's description
 	driver.m_name = game.description;
 

@@ -4,9 +4,9 @@
  it appears this is just the name of a series of machines with different
  software themes?
 
- board has the followng etched 
-    
-	 US GAMES 
+ board has the followng etched
+
+     US GAMES
    MADE IN USA
  P/N: 34010  REV C-1
 

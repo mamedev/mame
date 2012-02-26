@@ -7,11 +7,11 @@
 #include "video/gticlub.h"
 
 /*
-	TODO:
-		- Fog equation and parameters are probably not accurate.
-		- Winding Heat (and maybe others) have slight Z-fighting problems.
-		- 3D isn't always turned off properly (during title screens for example).
-		  Figure out what controls this. Video mixer, layer priority or some 3D register?
+    TODO:
+        - Fog equation and parameters are probably not accurate.
+        - Winding Heat (and maybe others) have slight Z-fighting problems.
+        - 3D isn't always turned off properly (during title screens for example).
+          Figure out what controls this. Video mixer, layer priority or some 3D register?
 
 */
 
@@ -434,7 +434,7 @@ WRITE32_HANDLER( K001005_w )
 
 			K001005_3d_fifo[K001005_3d_fifo_ptr++] = data;
 
-#if LOG_POLY_FIFO			
+#if LOG_POLY_FIFO
 			printf("0x%08X, ", data);
 			count++;
 			if (count >= 8)
@@ -595,7 +595,7 @@ static void draw_scanline_2d_tex(void *dest, INT32 scanline, const poly_extent *
 	int *y_mirror_table = tex_mirror_table[texture_mirror_y][texture_height];
 
 	for (x = extent->startx; x < extent->stopx; x++)
-	{		
+	{
 		int iu = (int)(u);
 		int iv = (int)(v);
 		int iiv, iiu, texel;
@@ -774,7 +774,7 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 static void render_polygons(running_machine &machine)
 {
 	const rectangle visarea = machine.primary_screen->visible_area();
-	poly_vertex v[4];	
+	poly_vertex v[4];
 	int poly_type;
 	int brightness;
 
@@ -810,9 +810,9 @@ static void render_polygons(running_machine &machine)
 			// 0x00: xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx    Command
 			//
 			// 0x01: xxxx---- -------- -------- --------    Texture palette
-			// 0x01: ----xx-- -------- -------- --------	Unknown flags, set by commands 0x7b...0x7e
-			// 0x01: ------xx x------- -------- --------	Texture width / 8 - 1
-			// 0x01: -------- -xxx---- -------- --------	Texture height / 8 - 1
+			// 0x01: ----xx-- -------- -------- --------    Unknown flags, set by commands 0x7b...0x7e
+			// 0x01: ------xx x------- -------- --------    Texture width / 8 - 1
+			// 0x01: -------- -xxx---- -------- --------    Texture height / 8 - 1
 			// 0x01: -------- -------x xxxx---- --------    Texture page
 			// 0x01: -------- -------- ----x-x- x-x-x-x-    Texture X / 8
 			// 0x01: -------- -------- -----x-x -x-x-x-x    Texture Y / 8
@@ -981,7 +981,7 @@ static void render_polygons(running_machine &machine)
 				last_vertex = 0;
 				vert_num = 2;
 				do
-				{					
+				{
 					int x, y, z;
 					INT16 tu, tv;
 
@@ -997,7 +997,7 @@ static void render_polygons(running_machine &machine)
 					z = fifo[index] & 0xffffff00;
 					brightness = fifo[index] & 0xff;
 					index++;
-					
+
 					if (last_vertex)
 					{
 						color = fifo[index++];
@@ -1050,7 +1050,7 @@ static void render_polygons(running_machine &machine)
 				if (new_verts == 1)
 				{
 					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_tex, 6, &v[0], &v[1], &v[2]);
-					
+
 					memcpy(&prev_v[1], &v[0], sizeof(poly_vertex));
 					memcpy(&prev_v[2], &v[1], sizeof(poly_vertex));
 					memcpy(&prev_v[3], &v[2], sizeof(poly_vertex));
@@ -1109,7 +1109,7 @@ static void render_polygons(running_machine &machine)
 			r = (fifo[index] >>  0) & 0xff;
 			g = (fifo[index] >>  8) & 0xff;
 			b = (fifo[index] >> 16) & 0xff;
-			a = (fifo[index] >> 24) & 0xff;	
+			a = (fifo[index] >> 24) & 0xff;
 			color = (a << 24) | (r << 16) | (g << 8) | (b);
 			index++;
 
@@ -1183,7 +1183,7 @@ static void render_polygons(running_machine &machine)
 					vertex4 = &v[3];
 				}
 
-				poly_render_quad(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 3, vertex1, vertex2, vertex3, vertex4);				
+				poly_render_quad(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 3, vertex1, vertex2, vertex3, vertex4);
 
 				memcpy(&prev_v[0], vertex1, sizeof(poly_vertex));
 				memcpy(&prev_v[1], vertex2, sizeof(poly_vertex));
@@ -1253,7 +1253,7 @@ static void render_polygons(running_machine &machine)
 				if (new_verts == 1)
 				{
 					poly_render_triangle(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline, 3, &v[0], &v[1], &v[2]);
-					
+
 					memcpy(&prev_v[1], &v[0], sizeof(poly_vertex));
 					memcpy(&prev_v[2], &v[1], sizeof(poly_vertex));
 					memcpy(&prev_v[3], &v[2], sizeof(poly_vertex));
@@ -1419,13 +1419,13 @@ static void render_polygons(running_machine &machine)
 		else if ((cmd & 0xffffff00) == 0x80000000)
 		{
 			/*
-			mame_printf_debug("Unknown polygon type %08X:\n", fifo[index-1]);
-			for (int i=0; i < 0x20; i++)
-			{
-				mame_printf_debug("  %02X: %08X\n", i, fifo[index+i]);
-			}
-			mame_printf_debug("\n");
-			*/
+            mame_printf_debug("Unknown polygon type %08X:\n", fifo[index-1]);
+            for (int i=0; i < 0x20; i++)
+            {
+                mame_printf_debug("  %02X: %08X\n", i, fifo[index+i]);
+            }
+            mame_printf_debug("\n");
+            */
 
 			printf("Unknown polygon type %08X:\n", fifo[index-1]);
 			for (int i=0; i < 0x20; i++)
@@ -1486,10 +1486,10 @@ VIDEO_START( gticlub )
 {
 	gticlub_led_reg[0] = gticlub_led_reg[1] = 0x7f;
 	/*
-	tick = 0;
-	debug_tex_page = 0;
-	debug_tex_palette = 0;
-	*/
+    tick = 0;
+    debug_tex_page = 0;
+    debug_tex_palette = 0;
+    */
 
 	K001006_init(machine);
 	K001005_init(machine);

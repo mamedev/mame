@@ -2619,18 +2619,18 @@ static void do_dump_metadata(parameters_t &params)
 			file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
 			if (filerr != FILERR_NONE)
 				report_error(1, "Unable to open file (%s)", output_file_str->cstr());
-	
+
 			// output the metadata
 			UINT32 count = core_fwrite(output_file, buffer, buffer.count());
 			if (count != buffer.count())
 				report_error(1, "Error writing file (%s)", output_file_str->cstr());
 			core_fclose(output_file);
-			
+
 			// provide some feedback
 			astring tempstr;
 			printf("File (%s) written, %s bytes\n", output_file_str->cstr(), big_int_string(tempstr, buffer.count()));
 		}
-		
+
 		// flush to stdout
 		else
 		{

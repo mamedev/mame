@@ -646,7 +646,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 			// is UDT valid on the pointer entry?
 			if (!(pointer_entry & 2) && !ptest)
 			{
-//				fprintf(stderr, "Invalid pointer entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
+//              fprintf(stderr, "Invalid pointer entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
 				if (++m68k->mmu_tmp_buserror_occurred == 1)
 				{
 					m68k->mmu_tmp_buserror_address = addr_in;
@@ -661,7 +661,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		}
 		else // throw an error
 		{
-//			fprintf(stderr, "Invalid root entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
+//          fprintf(stderr, "Invalid root entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
 
 			if (!ptest)
 			{
@@ -721,7 +721,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 		switch (page_entry & 3)
 		{
 			case 0:	// invalid
-//				fprintf(stderr, "Invalid page entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
+//              fprintf(stderr, "Invalid page entry!  PC=%x, addr=%x\n", m68k->ppc, addr_in);
 				if (!ptest)
 				{
 					if (++m68k->mmu_tmp_buserror_occurred == 1)

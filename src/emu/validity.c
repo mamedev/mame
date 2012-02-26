@@ -1102,7 +1102,7 @@ void validity_checker::validate_devices()
 		// done with this device
 		m_current_device = NULL;
 	}
-	
+
 	// if device is slot cart device, we must have a shortname
 	int_map slot_device_map;
 	slot_interface_iterator slotiter(m_current_config->root_device());
@@ -1130,7 +1130,7 @@ void validity_checker::validate_devices()
 			global_free(dev);
 		}
 	}
-	
+
 }
 
 

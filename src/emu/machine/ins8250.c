@@ -395,7 +395,7 @@ void ins8250_uart_device::tra_complete()
 void ins8250_uart_device::tra_callback()
 {
 	m_out_tx_func(transmit_register_get_data_bit());
-}	
+}
 
 void ins8250_uart_device::update_msr(int bit, UINT8 state)
 {

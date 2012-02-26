@@ -202,7 +202,7 @@ static MACHINE_START( magtouch )
 	memory_configure_bank(machine, "rombank", 0, 0x80, machine.region("game_prg")->base(), 0x8000 );
 	memory_set_bank(machine, "rombank", 0);
 
-//	microtouch_init(machine, magtouch_microtouch_tx_callback, NULL);
+//  microtouch_init(machine, magtouch_microtouch_tx_callback, NULL);
 }
 
 static MACHINE_CONFIG_START( magtouch, magtouch_state )

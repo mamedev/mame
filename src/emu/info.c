@@ -403,7 +403,7 @@ void info_xml_creator::output_devices()
 	{
 		// first, run through devices with roms which belongs to the default configuration
 		device_iterator deviter(m_drivlist.config().root_device());
-		for (device_t *device = deviter.first(); device != NULL; device = deviter.next()) 
+		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 		{
 			if (device->owner() != NULL && device->rom_region() != NULL && device->shortname()!= NULL)
 			{

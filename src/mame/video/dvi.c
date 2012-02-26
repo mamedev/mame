@@ -293,9 +293,9 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 			// I believe in these can be either CIMG or AUDI blocks, but we don't have any of the latter
 			CIMG_Header CIMG;
 
-			
+
 			CIMG.ci1 = R32(&subptr);
-     		CIMG.ci2 = R16(&subptr);
+    		CIMG.ci2 = R16(&subptr);
 			CIMG.ci3 = R16(&subptr);
 			for (int i=0;i<80;i++) { CIMG.ci4[i] = R8(&subptr); }
 			CIMG.ci5 = R32(&subptr);
@@ -344,7 +344,7 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 			dviprintf("			DCFID              %08x\n", CIMG.ci23);
 			dviprintf("\n");
 
-			subptr = dvi_data+CIMG.ci9+baseoffset; 
+			subptr = dvi_data+CIMG.ci9+baseoffset;
 		}
 
 	}
@@ -355,15 +355,15 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 	dviprintf("Frame Dictionaries\n\n");
 
 	UINT8* frameptr = dvi_data + AVSS.av26 + 2 + baseoffset; // +2 ??
-//	UINT8* frameptr = dvi_data + AVSS.av26 + baseoffset;
+//  UINT8* frameptr = dvi_data + AVSS.av26 + baseoffset;
 
 	for (int f=0;f<AVSS.av20;f++)
 	{
 		FDICT_Header FDICT;
 		FDICT.fd1 = R32(&frameptr);
-		
+
 		FDICT.fd1 = ((FDICT.fd1 & 0xffff0000)>>16) |  ((FDICT.fd1 & 0x0000ffff)<<16);
-	
+
 		dviprintf("	%04d Frame Offset %08x\n", f, FDICT.fd1);
 
 			UINT8* frameptr2 = dvi_data + ((FDICT.fd1 + baseoffset)&(regionsize-1)) ;
@@ -371,7 +371,7 @@ void process_dvi_data(UINT8* dvi_data, int baseoffset, int regionsize)
 		FHEAD.fh1 = R32(&frameptr2);
 		FHEAD.fh2 = R32(&frameptr2);
 		FHEAD.fh3 = R32(&frameptr2);
-	
+
 		dviprintf("		Frame Num         %08x\n", FHEAD.fh1);
 		dviprintf("		Previous Offset   %08x\n", FHEAD.fh2);
 		dviprintf("		Frame Checksum    %08x\n", FHEAD.fh3);

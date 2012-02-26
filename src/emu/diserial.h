@@ -123,7 +123,7 @@ protected:
 	virtual void rcv_callback() { receive_register_update_bit(m_rcv_line); }
 	virtual void tra_complete() { }
 	virtual void rcv_complete() { }
-	
+
 	// interface-level overrides
 	virtual void interface_pre_start();
 private:

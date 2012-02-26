@@ -19,7 +19,7 @@ public:
 		{ }
 
 	required_device<microtouch_device> m_microtouch;
-	
+
 	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT16 m_potgo_value;
 	int m_cd32_shifter[2];
