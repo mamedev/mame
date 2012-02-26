@@ -2240,8 +2240,23 @@ static void do_extract_cd(parameters_t &params)
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
 			output_track_metadata(cuemode, output_toc_file, tracknum, trackinfo, *output_bin_file_str, discoffs, outputoffs);
 
+			UINT32 output_frame_size;
+
+            // If this is bin/cue output and the CHD contains subdata, warn the user and don't include
+            // the subdata size in the buffer calculation.
+            if ((trackinfo.subtype != CD_SUB_NONE) && (cuemode))
+            {
+                printf("Warning: Track %d has subcode data.  bin/cue format cannot contain subcode data and it will be omitted.\n", tracknum+1);
+                printf("       : This may affect usage of the output image.  Use bin/toc output to keep all data.\n");
+
+                output_frame_size = trackinfo.datasize;
+            }
+            else
+            {
+                output_frame_size = trackinfo.datasize + ((trackinfo.subtype != CD_SUB_NONE) ? trackinfo.subsize : 0);
+            }
+
 			// resize the buffer for the track
-			UINT32 output_frame_size = trackinfo.datasize + ((trackinfo.subtype != CD_SUB_NONE) ? trackinfo.subsize : 0);
 			buffer.resize((TEMP_BUFFER_SIZE / output_frame_size) * output_frame_size);
 
 			// now read and output the actual data
@@ -2265,10 +2280,10 @@ static void do_extract_cd(parameters_t &params)
 				discoffs++;
 
 				// read the subcode data
-				if (trackinfo.subtype != CD_SUB_NONE)
+				if ((trackinfo.subtype != CD_SUB_NONE) && (!cuemode))
 				{
-					cdrom_read_subcode(cdrom, cdrom_get_track_start(cdrom, tracknum) + frame, &buffer[bufferoffs]);
-					bufferoffs += trackinfo.subsize;
+                    cdrom_read_subcode(cdrom, cdrom_get_track_start(cdrom, tracknum) + frame, &buffer[bufferoffs]);
+                    bufferoffs += trackinfo.subsize;
 				}
 
 				// write it out if we need to
