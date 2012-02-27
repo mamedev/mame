@@ -5930,16 +5930,10 @@ ROM_START( starseek )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0005", 0, SHA1(f5513c88528741798ee49f936b9b69480360f103) )
 
-	/*
-    Note:
-    There was no sticker or silk screen markings on this PIC.
-    I have used the product number as a label instead.
-
-    PIC16C621A-20 (317-0005-JPN)
-    Sticker: 253-5509-0005J
-    */
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	ROM_LOAD("317-0005-jpn.pic", 0x00, 0x4000, CRC(19f8d4d0) SHA1(d256f26f757d7019cab7950d81992902cdb65e07) )
+    //PIC16C621A-20 (317-5077-JPN)
+    //(sticker: 253-5509-5077J)
+	ROM_LOAD("317-5077-jpn.pic", 0x00, 0x4000, CRC(19f8d4d0) SHA1(d256f26f757d7019cab7950d81992902cdb65e07) )
 ROM_END
 
 
