@@ -2018,7 +2018,7 @@ static const x1_010_interface x1_010_sound_intf =
 };
 
 static MACHINE_CONFIG_START( seta2, seta2_state )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_50MHz/3)	// !! TMP68301 !!
+	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)	// !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
 	MCFG_CPU_VBLANK_INT("screen", seta2_interrupt)
 
@@ -2250,7 +2250,7 @@ static MACHINE_CONFIG_DERIVED( funcube3, funcube )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( namcostr, seta2_state )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_50MHz/3)	// !! TMP68301 !!
+	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)	// !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(namcostr_map)
 	MCFG_CPU_VBLANK_INT("screen", seta2_interrupt)
 

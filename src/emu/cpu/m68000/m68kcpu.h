@@ -552,6 +552,7 @@ class m68k_memory_interface
 public:
 	void init8(address_space &space);
 	void init16(address_space &space);
+	void init16_68307(address_space &space);
 	void init32(address_space &space);
 	void init32mmu(address_space &space);
 	void init32hmmu(address_space &space);
@@ -569,6 +570,14 @@ private:
 	UINT16 m68008_read_immediate_16(offs_t address);
 	UINT16 read_immediate_16(offs_t address);
 	UINT16 simple_read_immediate_16(offs_t address);
+
+	UINT16 simple_read_immediate_16_68307(offs_t address);
+	UINT8 read_byte_68307(offs_t address);
+	UINT16 read_word_68307(offs_t address);
+	UINT32 read_dword_68307(offs_t address);
+	void write_byte_68307(offs_t address, UINT8 data);
+	void write_word_68307(offs_t address, UINT16 data);
+	void write_dword_68307(offs_t address, UINT32 data);
 
 	UINT8 read_byte_32_mmu(offs_t address);
 	void write_byte_32_mmu(offs_t address, UINT8 data);

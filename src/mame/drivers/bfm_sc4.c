@@ -95,7 +95,7 @@ static INPUT_PORTS_START(  sc4 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( sc4, sc4_state )
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)	 // 68307! (EC000 core)
+	MCFG_CPU_ADD("maincpu", M68307, 16000000)	 // 68307! (EC000 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

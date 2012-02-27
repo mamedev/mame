@@ -643,6 +643,8 @@ INLINE m68ki_cpu_core *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M68000 ||
+		   device->type() == M68301 ||
+		   device->type() == M68307 ||
 		   device->type() == M68008 ||
 		   device->type() == M68008PLCC ||
 		   device->type() == M68010 ||
@@ -1327,6 +1329,83 @@ void m68k_memory_interface::init16(address_space &space)
 	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
 }
 
+
+
+
+UINT16 m68k_memory_interface::simple_read_immediate_16_68307(offs_t address)
+{
+    if ( address >= 0xf0 && address < 0x100 )
+	{
+		return 0;
+	}
+
+	return m_direct->read_decrypted_word(address);
+}
+
+UINT8 m68k_memory_interface::read_byte_68307(offs_t address)
+{
+    if ( address >= 0xf0 && address < 0x100 )
+	{
+		return 0;
+	}
+
+	return m_space->read_byte(address);
+}
+
+UINT16 m68k_memory_interface::read_word_68307(offs_t address)
+{
+    if ( address >= 0xf0 && address < 0x100 )
+	{
+		return 0;
+	}
+
+	return m_space->read_word(address);
+}
+
+UINT32 m68k_memory_interface::read_dword_68307(offs_t address)
+{
+    if ( address >= 0xf0 && address < 0x100 )
+	{
+		return 0;
+	}
+
+	return m_space->read_dword(address);
+}
+
+void m68k_memory_interface::write_byte_68307(offs_t address, UINT8 data)
+{
+	m_space->write_byte(address, data);
+}
+
+void m68k_memory_interface::write_word_68307(offs_t address, UINT16 data)
+{
+	m_space->write_word(address, data);
+}
+
+void m68k_memory_interface::write_dword_68307(offs_t address, UINT32 data)
+{
+	m_space->write_dword(address, data);
+}
+
+
+
+
+void m68k_memory_interface::init16_68307(address_space &space)
+{
+	m_space = &space;
+	m_direct = &space.direct();
+	m_cpustate = get_safe_token(&space.device());
+	opcode_xor = 0;
+
+	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::simple_read_immediate_16_68307), this);
+	read8 = m68k_read8_delegate(FUNC(m68k_memory_interface::read_byte_68307), this);
+	read16 = m68k_read16_delegate(FUNC(m68k_memory_interface::read_word_68307), this);
+	read32 = m68k_read32_delegate(FUNC(m68k_memory_interface::read_dword_68307), this);
+	write8 = m68k_write8_delegate(FUNC(m68k_memory_interface::write_byte_68307), this);
+	write16 = m68k_write16_delegate(FUNC(m68k_memory_interface::write_word_68307), this);
+	write32 = m68k_write32_delegate(FUNC(m68k_memory_interface::write_dword_68307), this);
+}
+
 /****************************************************************************
  * 32-bit data memory interface
  ****************************************************************************/
@@ -1825,6 +1904,59 @@ CPU_GET_INFO( m68000 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "68000");						break;
+
+		default:									CPU_GET_INFO_CALL(m68k);						break;
+	}
+}
+
+static CPU_INIT( m68301 )
+{
+//	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	CPU_INIT_CALL(m68000);
+
+	/* there is a basic implementation of this in emu/machine/tmp68301.c but it should be moved here */
+
+}
+
+CPU_GET_INFO( m68301 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68301);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:						strcpy(info->s, "68301");						break;
+
+		default:									CPU_GET_INFO_CALL(m68k);						break;
+	}
+}
+
+
+static CPU_INIT( m68307 )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	CPU_INIT_CALL(m68000);
+
+	/* basic CS logic, timers, mbus, serial logic
+	   set via remappable register
+	*/
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init16_68307(*m68k->program);
+
+}
+
+CPU_GET_INFO( m68307 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68307);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:						strcpy(info->s, "68307");						break;
 
 		default:									CPU_GET_INFO_CALL(m68k);						break;
 	}
@@ -2538,6 +2670,8 @@ CPU_GET_INFO( mcf5206e )
 }
 
 DEFINE_LEGACY_CPU_DEVICE(M68000, m68000);
+DEFINE_LEGACY_CPU_DEVICE(M68301, m68301);
+DEFINE_LEGACY_CPU_DEVICE(M68307, m68307);
 DEFINE_LEGACY_CPU_DEVICE(M68008, m68008);
 DEFINE_LEGACY_CPU_DEVICE(M68008PLCC, m68008plcc);
 DEFINE_LEGACY_CPU_DEVICE(M68010, m68010);
