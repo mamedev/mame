@@ -434,6 +434,14 @@ static WRITE32_HANDLER( motor_control_w )
     ........ .x......   P1 gun vibration
     ........ x.......   P2 gun vibration
 */
+
+	if (ACCESSING_BITS_8_15)
+	{
+		output_set_value("P1_lamp_start", (data >> 12) & 1 ); //p1 start
+		output_set_value("P2_lamp_start", (data >> 13) & 1 ); //p2 start
+		output_set_value("P1_gun_recoil", (data >> 14) & 1 ); //p1 recoil
+		output_set_value("P2_gun_recoil", (data >> 15) & 1 ); //p2 recoil
+	}
 }
 
 static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
@@ -442,7 +450,14 @@ static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
     ........ ..xxxxxx   Lamp 1-6 enables
     ........ .x......   Vibration
 */
-
+	output_set_value("Lamp_1", data & 1 );
+	output_set_value("Lamp_2", (data >> 1) & 1 );
+	output_set_value("Lamp_3", (data >> 2) & 1 );
+	output_set_value("Lamp_4", (data >> 3) & 1 );
+	output_set_value("Lamp_5", (data >> 4) & 1 );
+	output_set_value("Lamp_6", (data >> 5) & 1 );
+	output_set_value("Wheel_vibration", (data >> 6) & 1 );
+	
 	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 

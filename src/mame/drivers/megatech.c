@@ -314,10 +314,17 @@ static READ8_HANDLER( bios_ctrl_r )
 static WRITE8_HANDLER( bios_ctrl_w )
 {
 	mtech_state *state = space->machine().driver_data<mtech_state>();
+	
 	if (offset == 1)
 	{
+		output_set_value("Alarm_sound", data>>7 & 0x01);
 		state->m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 	}
+	else if (offset == 2)
+	{
+		output_set_value("Flash_screen", data>>1 & 0x01);
+	}
+	
 	state->m_bios_ctrl[offset] = data;
 }
 
