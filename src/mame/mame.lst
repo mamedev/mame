@@ -4513,71 +4513,72 @@ danchiq			// 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron)
 // Sega Model 2 Games
 
 // Model 2 (TGPs, Model 1 sound board)
-daytona			// 1994.03 Daytona USA
+daytona			// 1994.03 Daytona USA (Japan, Revision A)
 daytona93
 daytonas
 daytonat		// 1993, hack
 daytonam		// 1993, hack
 desert			// 1994.07 Desert Tank
-vcop			// 1994.09 Virtua Cop
+vcop			// 1994.09 Virtua Cop (Revision B)
+vcopa			// 1994.09 Virtua Cop (Revision A)
 
 // Model 2A-CRX (TGPs, SCSP sound board)
 vf2o			// 1994.11 Virtua Fighter 2
-vf2a			// 1995.??
-vf2b			// 1995.??
-srallyc			// 1995.02 Sega Rally Championship - Rev C
-srallycb		// 1995.02 Sega Rally Championship - Rev B
+vf2a			// 1995.?? Virtua Fighter 2 (Revision A)
+vf2b			// 1995.?? Virtua Fighter 2 (Revision B)
+srallyc			// 1995.02 Sega Rally Championship (Revision C)
+srallycb		// 1995.02 Sega Rally Championship (Revision B)
 vcop2			// 1995.09 Virtua Cop 2
-vf2			// 1995.09 Virtua Fighter 2.1
+vf2			// 1995.09 Virtua Fighter (Version 2.1)
 skytargt		// 1995.10 Sky Target
-manxtt			// 1995.11 Manx T.T.
-doaa			// 1996.11 Dead or Alive
+manxtt			// 1995.11 Manx T.T. (Revision C)
+doaa			// 1996.11 Dead or Alive (Revision A)
 motoraid		// 1997.10 Motor Raid
-zeroguna		// 1997.12 Zero Gunner
+zeroguna		// 1997.12 Zero Gunner (Export)
 zerogunaj		// 1997.12 Zero Gunner (Japan)
-dyndeka2		// 1998.05 Dynamite Deka 2
-dynamcop		// 1998.09 Dynamic Cop
+dyndeka2		// 1998.05 Dynamite Deka 2 (Japan)
+dynamcop		// 1998.09 Dynamic Cop (Export)
 pltkidsa		// 1999.03 Pilot Kids
 
 // Model 2B-CRX (SHARC, SCSP sound board)
-vstriker		// 1995.05 Virtua Striker
+vstriker		// 1995.05 Virtua Striker (Revision A)
 vstrikero		// 1995.05 Virtua Striker
-rchase2			// 1995.06 Rail Chase 2 (Arcade TV Game List - P.104, Left, 12 from top)
-indy500			// 1995.07 Indy 500
-indy500d		// 1995.07 Indy 500
-indy500to		// 1995.07 Indy 500
-fvipers			// 1995.11 Fighting Vipers
-von			// 1996.01 Dennou Senki Virtual-On (USA)
-vonj			// 1996.01 Dennou Senki Virtual-On (Japan)
-gunblade		// 1996.04 Gunblade N.Y.
-schamp			// 1996.05 Sonic Championship
-sfight			// 1996.05 Sonic the Fighters
-lastbrnx		// 1996.06 Last Bronx
-lastbrnxu		// 1996.06 Last Bronx (USA)
-lastbrnxj		// 1996.06 Last Bronx (Japan)
+rchase2			// 1995.06 Rail Chase 2 (Revision A)
+indy500			// 1995.07 Indy 500 (Revision A, Newer)
+indy500d		// 1995.07 Indy 500 Deluxe (Revision A)
+indy500to		// 1995.07 Indy 500 Twin (Revision A)
+fvipers			// 1995.11 Fighting Vipers (Revision D)
+von			// 1996.01 Cyber Troopers Virtual-On (USA, Revision B)
+vonj			// 1996.01 Cyber Troopers Virtual-On (Japan, Revision B)
+gunblade		// 1996.04 Gunblade N.Y. (Revision A)
+schamp			// 1996.05 Sonic Championship (USA)
+sfight			// 1996.05 Sonic the Fighters (Japan)
+lastbrnx		// 1996.06 Last Bronx (Export, Revision A)
+lastbrnxu		// 1996.06 Last Bronx (USA, Revision A)
+lastbrnxj		// 1996.06 Last Bronx (Japan, Revision A)
 sgt24h			// 1996.07 Super GT 24h
 dynabb			// 1996.08 Dynamite Baseball
-doa			// 1996.11 Dead or Alive
-dynabb97		// 1997.04 Dynamite Baseball 97
-zerogun			// 1997.12 Zero Gunner
+doa			// 1996.11 Dead or Alive (Revision B)
+dynabb97		// 1997.04 Dynamite Baseball 97 (Revision A)
+zerogun			// 1997.12 Zero Gunner (Export)
 zerogunj		// 1997.12 Zero Gunner (Japan)
-dyndeka2b		// 1998.05 Dynamite Deka 2
-dynamcopb		// 1998.09 Dynamite Cop
-pltkids			// 1999.03 Pilot Kids
+dyndeka2b		// 1998.05 Dynamite Deka 2 (Japan)
+dynamcopb		// 1998.09 Dynamite Cop (Export)
+pltkids			// 1999.03 Pilot Kids (Revision A)
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 skisuprg		// 1996.12 Sega Ski Super G
 stcc			// 1996.09 Sega Touring Car Championship
-stcca			// 1996.09 Sega Touring Car Championship
+stcca			// 1996.09 Sega Touring Car Championship (Revision A)
 stccb			// 1996.09 Sega Touring Car Championship
-waverunr		// 1996.10 Wave Runner
+waverunr		// 1996.10 Wave Runner (Japan, Revision A)
 hotd			// 1997.03 The House of the Dead
-topskatr		// 1997.05 Top Skater
-topskatru		// 1997.05 Top Skater (USA)
+topskatr		// 1997.05 Top Skater (Export, Revision A)
+topskatru		// 1997.05 Top Skater (USA, Revision A)
 topskatrj		// 1997.05 Top Skater (Japan)
-overrev			// 1997.09 Over Rev
-segawski		// 1997.09 Sega Water Ski
-dynamcopc		// 1998.09 Dynamite Cop
+overrev			// 1997.09 Over Rev (Revision A)
+segawski		// 1997.09 Sega Water Ski (Japan, Revision A)
+dynamcopc		// 1998.09 Dynamite Cop (USA)
 bel			// 1998.12 Behind Enemy Lines
 
 // Sega Model 3 Games
