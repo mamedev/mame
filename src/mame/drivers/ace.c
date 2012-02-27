@@ -42,11 +42,11 @@ A1                   2101            2101
 
 #define MASTER_CLOCK XTAL_18MHz
 
-
-class ace_state : public driver_device
+// ace_state was also defined in mess/drivers/ace.c
+class aceal_state : public driver_device
 {
 public:
-	ace_state(const machine_config &mconfig, device_type type, const char *tag)
+	aceal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
 	/* video-related */
@@ -61,21 +61,21 @@ public:
 
 static WRITE8_HANDLER( ace_objpos_w )
 {
-	ace_state *state = space->machine().driver_data<ace_state>();
+	aceal_state *state = space->machine().driver_data<aceal_state>();
 	state->m_objpos[offset] = data;
 }
 
 #if 0
 static READ8_HANDLER( ace_objpos_r )
 {
-	ace_state *state = space->machine().driver_data<ace_state>();
+	aceal_state *state = space->machine().driver_data<aceal_state>();
 	return state->m_objpos[offset];
 }
 #endif
 
 static VIDEO_START( ace )
 {
-	ace_state *state = machine.driver_data<ace_state>();
+	aceal_state *state = machine.driver_data<aceal_state>();
 	gfx_element_set_source(machine.gfx[1], state->m_characterram);
 	gfx_element_set_source(machine.gfx[2], state->m_characterram);
 	gfx_element_set_source(machine.gfx[3], state->m_characterram);
@@ -84,7 +84,7 @@ static VIDEO_START( ace )
 
 static SCREEN_UPDATE_IND16( ace )
 {
-	ace_state *state = screen.machine().driver_data<ace_state>();
+	aceal_state *state = screen.machine().driver_data<aceal_state>();
 	int offs;
 
 	/* first of all, fill the screen with the background color */
@@ -130,7 +130,7 @@ static PALETTE_INIT( ace )
 
 static WRITE8_HANDLER( ace_characterram_w )
 {
-	ace_state *state = space->machine().driver_data<ace_state>();
+	aceal_state *state = space->machine().driver_data<aceal_state>();
 	if (state->m_characterram[offset] != data)
 	{
 		if (data & ~0x07)
@@ -147,7 +147,7 @@ static WRITE8_HANDLER( ace_characterram_w )
 
 static WRITE8_HANDLER( ace_scoreram_w )
 {
-	ace_state *state = space->machine().driver_data<ace_state>();
+	aceal_state *state = space->machine().driver_data<aceal_state>();
 	state->m_scoreram[offset] = data;
 	gfx_element_mark_dirty(space->machine().gfx[4], offset / 32);
 }
@@ -166,9 +166,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_BASE_MEMBER(ace_state, m_scoreram)	/* 2x2101 */
-	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE_MEMBER(ace_state, m_ram2)	/* 2x2101 */
-	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_BASE_MEMBER(ace_state, m_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_BASE_MEMBER(aceal_state, m_scoreram)	/* 2x2101 */
+	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE_MEMBER(aceal_state, m_ram2)	/* 2x2101 */
+	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_BASE_MEMBER(aceal_state, m_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
 
 	AM_RANGE(0xc000, 0xc005) AM_WRITE(ace_objpos_w)
 
@@ -327,21 +327,21 @@ static void ace_postload(running_machine &machine)
 
 static MACHINE_START( ace )
 {
-	ace_state *state = machine.driver_data<ace_state>();
+	aceal_state *state = machine.driver_data<aceal_state>();
 	state->save_item(NAME(state->m_objpos));
 	machine.save().register_postload(save_prepost_delegate(FUNC(ace_postload), &machine));
 }
 
 static MACHINE_RESET( ace )
 {
-	ace_state *state = machine.driver_data<ace_state>();
+	aceal_state *state = machine.driver_data<aceal_state>();
 	int i;
 
 	for (i = 0; i < 8; i++)
 		state->m_objpos[i] = 0;
 }
 
-static MACHINE_CONFIG_START( ace, ace_state )
+static MACHINE_CONFIG_START( ace, aceal_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)	/* 2 MHz ? */

@@ -3,10 +3,11 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
-class mephisto_state : public driver_device
+// mephisto_state was also defined in mess/drivers/mephisto.c
+class mephisto_pinball_state : public driver_device
 {
 public:
-	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
+	mephisto_pinball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
 	{ }
@@ -21,7 +22,7 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8, mephisto_state )
+static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8, mephisto_pinball_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
@@ -31,7 +32,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mephisto )
 INPUT_PORTS_END
 
-void mephisto_state::machine_reset()
+void mephisto_pinball_state::machine_reset()
 {
 }
 
@@ -39,7 +40,7 @@ static DRIVER_INIT( mephisto )
 {
 }
 
-static MACHINE_CONFIG_START( mephisto, mephisto_state )
+static MACHINE_CONFIG_START( mephisto, mephisto_pinball_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)
