@@ -5,7 +5,8 @@ Senjyo / Star Force / Baluba-louk
 driver by Mirko Buffoni
 
 TODO:
-- wrong background colors in baluba, intermissions after round 13
+- wrong background colors in baluba, intermissions after round 13 (btanb or
+  fixed at some point)
 
 
 This board was obviously born to run Senjyo. Four scrolling layers, gradient
@@ -68,6 +69,8 @@ I/O read/write
 
 ***************************************************************************/
 
+/* 26.February 2012 Tsuyoshi Hasegawa fixed palette intensity */
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
@@ -109,13 +112,28 @@ static WRITE8_DEVICE_HANDLER( sound_cmd_w )
 	z80pio_astb_w(device, 1);
 }
 
+static WRITE8_HANDLER( senjyo_paletteram_w )
+{
+	int r = (data << 2) & 0xC;
+	int g = (data     ) & 0xC;
+	int b = (data >> 2) & 0xC;
+	int i = (data >> 6) & 0x3;
+
+	int rr = r|((r!=0)?i:0);
+	int gg = g|((g!=0)?i:0);
+	int bb = b|((b!=0)?i:0);
+
+	space->machine().generic.paletteram.u8[offset] = data;
+	palette_set_color_rgb(space->machine(), offset, pal4bit(rr), pal4bit(gg), pal4bit(bb) );
+}
+
 static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(senjyo_fgvideoram_w) AM_BASE_MEMBER(senjyo_state, m_fgvideoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(senjyo_fgcolorram_w) AM_BASE_MEMBER(senjyo_state, m_fgcolorram)
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_BASE_SIZE_MEMBER(senjyo_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(paletteram_IIBBGGRR_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(senjyo_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x9e00, 0x9e1f) AM_RAM AM_BASE_MEMBER(senjyo_state, m_fgscroll)
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_BASE_MEMBER(senjyo_state, m_scrolly3)
 /*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
@@ -185,7 +203,7 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(senjyo_fgvideoram_w) AM_BASE_MEMBER(senjyo_state, m_fgvideoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(senjyo_fgcolorram_w) AM_BASE_MEMBER(senjyo_state, m_fgcolorram)
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_BASE_SIZE_MEMBER(senjyo_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(paletteram_IIBBGGRR_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(senjyo_paletteram_w) AM_BASE_GENERIC(paletteram)
 	/* The format / use of the ram here is different on the bootleg */
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_BASE_MEMBER(senjyo_state, m_scrolly3)
 	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_BASE_MEMBER(senjyo_state, m_scrollx3)
@@ -930,5 +948,5 @@ GAME( 1984, starforce,starforc, senjyo,  starforc, starfore, ROT90, "Tehkan", "S
 GAME( 1984, starforcb,starforc, starforb,starforc, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", 0 )
 GAME( 1984, starforca,starforc, senjyo,  starforc, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", 0 )
 GAME( 1985, megaforc, starforc, senjyo,  starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
-GAME( 1986, baluba,   0,        senjyo,  baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu", GAME_IMPERFECT_COLORS )
+GAME( 1986, baluba,   0,        senjyo,  baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", 0 )
 
