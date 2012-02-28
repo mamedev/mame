@@ -19,6 +19,11 @@ original IBM BIOS includes code to work around these flaws, but this made
 the BIOS dependent on the flaws being present, so subsequent parts like the
 8250A, 16450 or 16550 could not be used in the original IBM PC or IBM PC/XT.
 
+The original 8250 pulses the interrupt line if a higher priority interrupt is
+cleared but a lower priority one is still active.  It also clears the tsre bit
+for a moment before loading the tsr from the thr.  These may be the bugs the 
+PC and XT depend on as the 8250A and up fix them.
+
 INS8250-B
 This is the slower speed of the INS8250 made from NMOS technology. It contains
 the same problems as the original INS8250.
@@ -44,6 +49,10 @@ This is a CMOS version (low power consumption) of the NS16450.
 NS16550
 Same as NS16450 with a 16-byte send and receive buffer but the buffer design
 was flawed and could not be reliably be used.
+
+The 16550 sometimes will send more then one character over the bus from the fifo
+when the rbr is read making the rx fifo useless.  It's unlikely anything depends
+on this behavior.
 
 NS16550A
 Same as NS16550 with the buffer flaws corrected. The 16550A and its successors
@@ -108,6 +117,7 @@ ns16550_device::ns16550_device(const machine_config &mconfig, const char *tag, d
 #define COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY 0x0002
 #define COM_INT_PENDING_RECEIVER_LINE_STATUS 0x0004
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
+#define COM_INT_PENDING_CHAR_TIMEOUT 0x0011
 
 /* ints will continue to be set for as long as there are ints pending */
 void ins8250_uart_device::update_interrupt()
@@ -121,13 +131,17 @@ void ins8250_uart_device::update_interrupt()
 
 		/* set int */
 		state = 1;
-		m_regs.iir &= ~(0x04|0x02);
+		m_regs.iir &= ~(0x08|0x04|0x02);
 
 		/* highest to lowest */
 		if (m_regs.ier & m_int_pending & COM_INT_PENDING_RECEIVER_LINE_STATUS)
 			m_regs.iir |=0x04|0x02;
 		else if (m_regs.ier & m_int_pending & COM_INT_PENDING_RECEIVED_DATA_AVAILABLE)
+		{
 			m_regs.iir |=0x04;
+			if ((m_int_pending & COM_INT_PENDING_CHAR_TIMEOUT) == 0x11)
+				m_regs.iir |= 0x08; 
+		}
 		else if (m_regs.ier & m_int_pending & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY)
 			m_regs.iir |=0x02;
 
@@ -142,7 +156,7 @@ void ins8250_uart_device::update_interrupt()
 		/* no ints pending */
 		m_regs.iir |= 0x01;
 		/* priority level */
-		m_regs.iir &= ~(0x04|0x02);
+		m_regs.iir &= ~(0x08|0x04|0x02);
 	}
 
 	/* set or clear the int */
@@ -202,8 +216,13 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 					trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 				}
 				else
+				{
+					if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1))
+						push_tx(data);
+					clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 					if(m_regs.lsr & 0x40)
 						tra_complete();
+				}
 			}
 			break;
 		case 1:
@@ -217,9 +236,10 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 				m_regs.ier = data;
 				update_interrupt();
 			}
-            break;
+			break;
 		case 2:
-            break;
+			set_fcr(data);
+			break;
 		case 3:
 			m_regs.lcr = data;
 			switch ((m_regs.lcr>>3) & 7)
@@ -313,11 +333,15 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 				data = (m_regs.dl & 0xff);
 			else
 			{
+				if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1) && !(m_regs.mcr & 0x10))
+					m_regs.rbr = pop_rx();
+				else
+				{
+					clear_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+					if( m_regs.lsr & 0x01 )
+						m_regs.lsr &= ~0x01;
+				}
 				data = m_regs.rbr;
-				if( m_regs.lsr & 0x01 )
-					m_regs.lsr &= ~0x01;		/* clear data ready status */
-
-				clear_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 			}
 			break;
 		case 1:
@@ -357,9 +381,52 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 			break;
 		case 7:
 			data = m_regs.scr;
-            break;
+			break;
 	}
     return data;
+}
+
+void ns16550_device::rcv_complete()
+{
+	if(!(m_regs.fcr & 1))
+		return ins8250_uart_device::rcv_complete();
+	
+	receive_register_extract();
+	
+	if(m_rnum == 16)
+	{
+		m_regs.lsr |= 0x02; //overrun
+		trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
+		return;
+	}
+		
+	m_regs.lsr |= 0x01;
+	m_rfifo[m_rhead] = get_received_char();
+	++m_rhead &= 0x0f;
+	m_rnum++;
+	if(m_rnum >= m_rintlvl)
+		trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+	set_timer();
+}
+
+void ns16550_device::tra_complete()
+{
+	if(!(m_regs.fcr & 1))
+		return ins8250_uart_device::tra_complete();
+
+	if(m_ttail != m_thead)
+	{
+		transmit_register_setup(m_tfifo[m_ttail]);
+		++m_ttail &= 0x0f;
+		m_regs.lsr &= ~0x40;
+		if(m_ttail == m_thead)
+		{
+			m_regs.lsr |= 0x20;
+			trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+		}
+	}
+	else
+		m_regs.lsr |= 0x40;
 }
 
 void ins8250_uart_device::rcv_complete()
@@ -473,4 +540,81 @@ void ins8250_uart_device::device_config_complete()
 		memset(&m_out_out1_cb, 0, sizeof(m_out_out1_cb));
 		memset(&m_out_out2_cb, 0, sizeof(m_out_out2_cb));
 	}
+}
+
+void ns16550_device::device_reset()
+{
+	memset(&m_rfifo, '\0', sizeof(m_rfifo));
+	memset(&m_tfifo, '\0', sizeof(m_tfifo));
+	m_rhead = m_rtail = m_rnum = 0;
+	m_thead = m_ttail = 0;
+	m_timeout->adjust(attotime::never);
+	ins8250_uart_device::device_reset();
+}
+
+void ns16550_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	trigger_int(COM_INT_PENDING_CHAR_TIMEOUT);
+	m_timeout->adjust(attotime::never);
+}
+
+void ns16550_device::push_tx(UINT8 data)
+{
+	m_tfifo[m_thead] = data;
+	++m_thead &= 0x0f;
+}
+
+UINT8 ns16550_device::pop_rx()
+{
+	UINT8 data = m_rfifo[m_rtail];
+	clear_int(COM_INT_PENDING_CHAR_TIMEOUT & ~1); // don't clear bit 1 yet
+	
+	if(m_rnum)
+	{
+		++m_rtail &= 0x0f;
+		m_rnum--;
+	}
+	else
+		data = 0;
+	
+	if(m_rnum < m_rintlvl)
+		clear_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+
+	if(m_rnum)
+		set_timer();
+	else 
+	{
+		m_timeout->adjust(attotime::never);
+		m_regs.lsr &= ~1;
+	}
+
+	return data;
+}
+
+void ns16550_device::set_fcr(UINT8 data)
+{
+	const int bytes_per_int[] = {1, 4, 8, 14};
+	if(!(data & 1))
+	{
+		m_regs.fcr = 0;
+		m_regs.iir &= ~0xc8;
+		return;
+	}
+	if(!(m_regs.fcr & 1) && (data & 1))
+		data |= 0x06;
+	if(data & 2)
+	{
+		memset(&m_rfifo, '\0', sizeof(m_rfifo));
+		m_rhead = m_rtail = m_rnum = 0;
+	}
+	if(data & 4)
+	{
+		memset(&m_tfifo, '\0', sizeof(m_tfifo));
+		m_thead = m_ttail = 0;
+	}
+	m_rintlvl = bytes_per_int[(data>>6)&3];
+	m_regs.iir |= 0xc0;
+	m_regs.fcr = data & ~0xc9;
+	m_regs.lsr |= 0x20;
+	trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 }

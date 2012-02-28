@@ -45,6 +45,13 @@ protected:
 	virtual void tra_complete();
 	virtual void tra_callback();
 
+	virtual void set_fcr(UINT8 data) {}
+	virtual void push_tx(UINT8 data) {}
+	virtual UINT8 pop_rx() { return 0; }
+
+	void trigger_int(int flag);
+	void clear_int(int flag);
+
 	enum {
 			TYPE_INS8250 = 0,
 			TYPE_INS8250A,
@@ -53,20 +60,21 @@ protected:
 			TYPE_NS16550A,
 			TYPE_PC16550D,
 	};
-	int	m_device_type;
-private:
+	int m_device_type;
 	struct {
 		UINT8 thr;  /* 0 -W transmitter holding register */
 		UINT8 rbr;  /* 0 R- receiver buffer register */
 		UINT8 ier;  /* 1 RW interrupt enable register */
 		UINT16 dl;  /* 0/1 RW divisor latch (if DLAB = 1) */
 		UINT8 iir;  /* 2 R- interrupt identification register */
+		UINT8 fcr;
 		UINT8 lcr;  /* 3 RW line control register (bit 7: DLAB) */
 		UINT8 mcr;  /* 4 RW modem control register */
 		UINT8 lsr;  /* 5 R- line status register */
 		UINT8 msr;  /* 6 R- modem status register */
 		UINT8 scr;  /* 7 RW scratch register */
 	} m_regs;
+private:
 	UINT8 m_int_pending;
 
 	devcb_resolved_write_line	m_out_tx_func;
@@ -78,8 +86,6 @@ private:
 
 	void update_interrupt();
 	void update_clock();
-	void trigger_int(int flag);
-	void clear_int(int flag);
 	void update_msr(int bit, UINT8 state);
 };
 
@@ -99,6 +105,23 @@ class ns16550_device : public ins8250_uart_device
 {
 public:
 	ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	virtual void device_start() { m_timeout = timer_alloc(); ins8250_uart_device::device_start(); }
+	virtual void device_reset();
+	virtual void rcv_complete();
+	virtual void tra_complete();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void set_fcr(UINT8 data);
+	virtual void push_tx(UINT8 data);
+	virtual UINT8 pop_rx();
+private:
+	void set_timer() { m_timeout->adjust(attotime::from_hz((clock()*4*8)/(m_regs.dl*16))); }
+	int m_rintlvl;
+	UINT8 m_rfifo[16];
+	UINT8 m_tfifo[16];
+	int m_rhead, m_rtail, m_rnum;
+	int m_thead, m_ttail;
+	emu_timer *m_timeout;
 };
 
 extern const device_type INS8250;
