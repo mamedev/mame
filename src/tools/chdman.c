@@ -1552,24 +1552,26 @@ static void do_create_raw(parameters_t &params)
 	printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
 
 	// catch errors so we can close & delete the output file
+	chd_rawfile_compressor* chd = NULL;
 	try
 	{
 		// create the new CHD
-		chd_rawfile_compressor chd(input_file, input_start, input_end);
+		chd = new chd_rawfile_compressor(input_file, input_start, input_end);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd.create(*output_chd_str, input_end - input_start, hunk_size, compression, output_parent);
+			err = chd->create(*output_chd_str, input_end - input_start, hunk_size, compression, output_parent);
 		else
-			err = chd.create(*output_chd_str, input_end - input_start, hunk_size, unit_size, compression);
+			err = chd->create(*output_chd_str, input_end - input_start, hunk_size, unit_size, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->cstr(), chd_file::error_string(err));
 
 		// if we have a parent, copy forward all the metadata
 		if (output_parent.opened())
-			chd.clone_all_metadata(output_parent);
+			chd->clone_all_metadata(output_parent);
 
 		// compress it generically
-		compress_common(chd);
+		compress_common(*chd);
+		delete chd;
 	}
 	catch (...)
 	{
@@ -1577,6 +1579,8 @@ static void do_create_raw(parameters_t &params)
 		astring *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
 			osd_rmfile(*output_chd_str);
+		if (chd != NULL)
+			delete chd;
 		throw;
 	}
 }
@@ -1810,25 +1814,27 @@ static void do_create_cd(parameters_t &params)
 	printf("Logical size: %s\n", big_int_string(tempstr, UINT64(totalsectors) * CD_FRAME_SIZE));
 
 	// catch errors so we can close & delete the output file
+	chd_cd_compressor* chd = NULL;
 	try
 	{
-		// create the new hard drive
-		chd_cd_compressor chd(toc, track_info);
+		// create the new CD
+		chd = new chd_cd_compressor(toc, track_info);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd.create(*output_chd_str, UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, compression, output_parent);
+			err = chd->create(*output_chd_str, UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, compression, output_parent);
 		else
-			err = chd.create(*output_chd_str, UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, CD_FRAME_SIZE, compression);
+			err = chd->create(*output_chd_str, UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, CD_FRAME_SIZE, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->cstr(), chd_file::error_string(err));
 
 		// add the standard CD metadata; we do this even if we have a parent because it might be different
-		err = cdrom_write_metadata(&chd, &toc);
+		err = cdrom_write_metadata(chd, &toc);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error adding CD metadata: %s", chd_file::error_string(err));
 
 		// compress it generically
-		compress_common(chd);
+		compress_common(*chd);
+		delete chd;
 	}
 	catch (...)
 	{
@@ -1836,6 +1842,8 @@ static void do_create_cd(parameters_t &params)
 		astring *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
 			osd_rmfile(*output_chd_str);
+		if (chd != NULL)
+			delete chd;
 		throw;
 	}
 }
@@ -1922,35 +1930,37 @@ static void do_create_ld(parameters_t &params)
 	printf("Logical size: %s\n", big_int_string(tempstr, UINT64(input_end - input_start) * hunk_size));
 
 	// catch errors so we can close & delete the output file
+	chd_avi_compressor* chd = NULL;
 	try
 	{
 		// create the new CHD
-		chd_avi_compressor chd(*input_file, info, input_start, input_end);
+		chd = new chd_avi_compressor(*input_file, info, input_start, input_end);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd.create(*output_chd_str, UINT64(input_end - input_start) * hunk_size, hunk_size, compression, output_parent);
+			err = chd->create(*output_chd_str, UINT64(input_end - input_start) * hunk_size, hunk_size, compression, output_parent);
 		else
-			err = chd.create(*output_chd_str, UINT64(input_end - input_start) * hunk_size, hunk_size, info.bytes_per_frame, compression);
+			err = chd->create(*output_chd_str, UINT64(input_end - input_start) * hunk_size, hunk_size, info.bytes_per_frame, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->cstr(), chd_file::error_string(err));
 
 		// write the core A/V metadata
 		astring metadata;
 		metadata.format(AV_METADATA_FORMAT, info.fps_times_1million / 1000000, info.fps_times_1million % 1000000, info.width, info.height, info.interlaced, info.channels, info.rate);
-		err = chd.write_metadata(AV_METADATA_TAG, 0, metadata);
+		err = chd->write_metadata(AV_METADATA_TAG, 0, metadata);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error adding AV metadata: %s\n", chd_file::error_string(err));
 
 		// create the compressor and then run it generically
-		compress_common(chd);
+		compress_common(*chd);
 
 		// write the final LD metadata
 		if (info.height == 524/2 || info.height == 624/2)
 		{
-			err = chd.write_metadata(AV_LD_METADATA_TAG, 0, chd.ldframedata());
+			err = chd->write_metadata(AV_LD_METADATA_TAG, 0, chd->ldframedata());
 			if (err != CHDERR_NONE)
 				report_error(1, "Error adding AVLD metadata: %s\n", chd_file::error_string(err));
 		}
+		delete chd;
 	}
 	catch (...)
 	{
@@ -1958,6 +1968,8 @@ static void do_create_ld(parameters_t &params)
 		astring *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
 			osd_rmfile(*output_chd_str);
+		if (chd != NULL)
+			delete chd;
 		throw;
 	}
 }
@@ -2026,15 +2038,16 @@ static void do_copy(parameters_t &params)
 	printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
 
 	// catch errors so we can close & delete the output file
+	chd_chdfile_compressor* chd = NULL;
 	try
 	{
 		// create the new CHD
-		chd_chdfile_compressor chd(input_chd, input_start, input_end);
+		chd = new chd_chdfile_compressor(input_chd, input_start, input_end);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd.create(*output_chd_str, input_end - input_start, hunk_size, compression, output_parent);
+			err = chd->create(*output_chd_str, input_end - input_start, hunk_size, compression, output_parent);
 		else
-			err = chd.create(*output_chd_str, input_end - input_start, hunk_size, input_chd.unit_bytes(), compression);
+			err = chd->create(*output_chd_str, input_end - input_start, hunk_size, input_chd.unit_bytes(), compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->cstr(), chd_file::error_string(err));
 
@@ -2054,7 +2067,7 @@ static void do_copy(parameters_t &params)
 			}
 
 			// otherwise, clone it
-			err = chd.write_metadata(metatag, CHDMETAINDEX_APPEND, metadata);
+			err = chd->write_metadata(metatag, CHDMETAINDEX_APPEND, metadata);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error writing cloned metadata: %s", chd_file::error_string(err));
 		}
@@ -2066,13 +2079,14 @@ static void do_copy(parameters_t &params)
 			if (cdrom == NULL)
 				report_error(1, "Error upgrading CD metadata");
 			const cdrom_toc *toc = cdrom_get_toc(cdrom);
-			err = cdrom_write_metadata(&chd, toc);
+			err = cdrom_write_metadata(chd, toc);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error writing upgraded CD metadata: %s", chd_file::error_string(err));
 		}
 
 		// compress it generically
-		compress_common(chd);
+		compress_common(*chd);
+		delete chd;
 	}
 	catch (...)
 	{
@@ -2080,6 +2094,8 @@ static void do_copy(parameters_t &params)
 		astring *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
 			osd_rmfile(*output_chd_str);
+		if (chd != NULL)
+			delete chd;
 		throw;
 	}
 }
