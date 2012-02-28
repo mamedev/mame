@@ -1654,8 +1654,8 @@ static slider_state *slider_init(running_machine &machine)
 	tailptr = &(*tailptr)->next;
 
 	/* add per-channel volume */
-	speaker_input info;
-	for (item = 0; machine.sound().indexed_speaker_input(item, info); item++)
+	mixer_input info;
+	for (item = 0; machine.sound().indexed_mixer_input(item, info); item++)
 	{
 		INT32 maxval = 2000;
 		INT32 defval = info.stream->initial_input_gain(info.inputnum) * 1000.0f + 0.5f;
@@ -1815,8 +1815,8 @@ static INT32 slider_volume(running_machine &machine, void *arg, astring *string,
 
 static INT32 slider_mixervol(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
-	speaker_input info;
-	if (!machine.sound().indexed_speaker_input((FPTR)arg, info))
+	mixer_input info;
+	if (!machine.sound().indexed_mixer_input((FPTR)arg, info))
 		return 0;
 	if (newval != SLIDER_NOCHANGE)
 	{

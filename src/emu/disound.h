@@ -176,5 +176,8 @@ protected:
 	sound_stream *		m_mixer_stream;			// mixing stream
 };
 
+// iterator
+typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
+
 
 #endif	/* __DISOUND_H__ */

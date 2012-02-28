@@ -786,10 +786,10 @@ sound_manager::sound_manager(running_machine &machine)
 	if (m_nosound_mode && wavfile[0] == 0 && avifile[0] == 0)
 		machine.m_sample_rate = 11025;
 
-	// count the speakers
+	// count the mixers
 #if VERBOSE
-	speaker_device_iterator iter(machine.root_device());
-	VPRINTF(("total speakers = %d\n", iter.count()));
+	mixer_interface_iterator iter(machine.root_device());
+	VPRINTF(("total mixers = %d\n", iter.count()));
 #endif
 
 	// allocate memory for mix buffers
@@ -856,24 +856,24 @@ void sound_manager::set_attenuation(int attenuation)
 
 
 //-------------------------------------------------
-//  indexed_speaker_input - return the speaker
-//  device and input index of the global speaker
+//  indexed_mixer_input - return the mixer
+//  device and input index of the global mixer
 //  input
 //-------------------------------------------------
 
-bool sound_manager::indexed_speaker_input(int index, speaker_input &info) const
+bool sound_manager::indexed_mixer_input(int index, mixer_input &info) const
 {
-	// scan through the speakers until we find the indexed input
-	speaker_device_iterator iter(machine().root_device());
-	for (info.speaker = iter.first(); info.speaker != NULL; info.speaker = iter.next())
+	// scan through the mixers until we find the indexed input
+	mixer_interface_iterator iter(machine().root_device());
+	for (info.mixer = iter.first(); info.mixer != NULL; info.mixer = iter.next())
 	{
-		if (index < info.speaker->inputs())
+		if (index < info.mixer->inputs())
 		{
-			info.stream = info.speaker->input_to_stream_input(index, info.inputnum);
+			info.stream = info.mixer->input_to_stream_input(index, info.inputnum);
 			assert(info.stream != NULL);
 			return true;
 		}
-		index -= info.speaker->inputs();
+		index -= info.mixer->inputs();
 	}
 
 	// didn't locate
@@ -946,8 +946,8 @@ void sound_manager::config_load(int config_type, xml_data_node *parentnode)
 	// iterate over channel nodes
 	for (xml_data_node *channelnode = xml_get_sibling(parentnode->child, "channel"); channelnode != NULL; channelnode = xml_get_sibling(channelnode->next, "channel"))
 	{
-		speaker_input info;
-		if (indexed_speaker_input(xml_get_attribute_int(channelnode, "index", -1), info))
+		mixer_input info;
+		if (indexed_mixer_input(xml_get_attribute_int(channelnode, "index", -1), info))
 		{
 			float defvol = xml_get_attribute_float(channelnode, "defvol", -1000.0);
 			float newvol = xml_get_attribute_float(channelnode, "newvol", -1000.0);
@@ -973,8 +973,8 @@ void sound_manager::config_save(int config_type, xml_data_node *parentnode)
 	if (parentnode != NULL)
 		for (int mixernum = 0; ; mixernum++)
 		{
-			speaker_input info;
-			if (!indexed_speaker_input(mixernum, info))
+			mixer_input info;
+			if (!indexed_mixer_input(mixernum, info))
 				break;
 			float defvol = info.stream->initial_input_gain(info.inputnum);
 			float newvol = info.stream->input_gain(info.inputnum);

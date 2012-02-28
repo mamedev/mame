@@ -60,16 +60,15 @@
 //**************************************************************************
 
 // forward references
-class speaker_device;
 typedef struct _wav_file wav_file;
 
 
-// structure describing an indexed speaker
-struct speaker_input
+// structure describing an indexed mixer
+struct mixer_input
 {
-	speaker_device *	speaker;					// owning device
-	sound_stream *		stream;						// stream within the device
-	int					inputnum;					// input on the stream
+	device_mixer_interface *mixer;			// owning device interface
+	sound_stream *			stream;			// stream within the device
+	int						inputnum;		// input on the stream
 };
 
 
@@ -237,7 +236,7 @@ public:
 	void system_enable(bool turn_on = true) { mute(!turn_on, MUTE_REASON_SYSTEM); }
 
 	// user gain controls
-	bool indexed_speaker_input(int index, speaker_input &info) const;
+	bool indexed_mixer_input(int index, mixer_input &info) const;
 
 private:
 	// internal helpers
