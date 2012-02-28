@@ -620,7 +620,7 @@ MACHINE_CONFIG_END
 ROM_START( moomesa ) /* Version EA */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151b01.q5",    0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )	/* B */
+	ROM_LOAD16_BYTE( "151b01.q5",   0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )	/* B */
 	ROM_LOAD16_BYTE( "151eab02.q6", 0x000001, 0x40000, CRC(37b30c01) SHA1(cb91739097a4a36f8f8d92998d822ffc851e1279) )	/* EAB */
 
 	/* data */
@@ -629,7 +629,7 @@ ROM_START( moomesa ) /* Version EA */
 
 	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "151a07.f5", 0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
+	ROM_LOAD( "151a07.f5",  0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
 	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -655,7 +655,7 @@ ROM_END
 ROM_START( moomesauac ) /* Version UA */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151c01.q5",    0x000000, 0x40000, CRC(10555732) SHA1(b67cb756c250ddd6f3291683b3f3449e13a2ee83) )	/* C */
+	ROM_LOAD16_BYTE( "151c01.q5",   0x000000, 0x40000, CRC(10555732) SHA1(b67cb756c250ddd6f3291683b3f3449e13a2ee83) )	/* C */
 	ROM_LOAD16_BYTE( "151uac02.q6", 0x000001, 0x40000, CRC(52ae87b0) SHA1(552d41a2ddd040f92c6a3cfdc07f9d6e751ac9c1) )	/* UAC */
 
 	/* data */
@@ -664,7 +664,7 @@ ROM_START( moomesauac ) /* Version UA */
 
 	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "151a07.f5", 0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
+	ROM_LOAD( "151a07.f5",  0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
 	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -690,7 +690,7 @@ ROM_END
 ROM_START( moomesauab ) /* Version UA */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151b01.q5",    0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )	/* B */
+	ROM_LOAD16_BYTE( "151b01.q5",   0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )	/* B */
 	ROM_LOAD16_BYTE( "151uab02.q6", 0x000001, 0x40000, CRC(3d9f4d59) SHA1(db47044bd4935fce94ec659242c9819c30eb6d0f) )	/* UAB */
 
 	/* data */
@@ -699,7 +699,7 @@ ROM_START( moomesauab ) /* Version UA */
 
 	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "151a07.f5", 0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
+	ROM_LOAD( "151a07.f5",  0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
 	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -725,7 +725,7 @@ ROM_END
 ROM_START( moomesaaab ) /* Version AA */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151b01.q5",    0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )	/* B */
+	ROM_LOAD16_BYTE( "151b01.q5",   0x000000, 0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )	/* B */
 	ROM_LOAD16_BYTE( "151aab02.q6", 0x000001, 0x40000, CRC(2162d593) SHA1(a6cfe4a57b3f22b2aa0f04f91acefe3b7bea9e76) )	/* AAB */
 
 	/* data */
@@ -734,7 +734,7 @@ ROM_START( moomesaaab ) /* Version AA */
 
 	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "151a07.f5", 0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
+	ROM_LOAD( "151a07.f5",  0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
 	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -769,7 +769,7 @@ ROM_START( bucky ) /* Version EA */
 
 	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "173a07.f5", 0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
+	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
 	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -805,7 +805,7 @@ ROM_START( buckyuab ) /* Version UA */
 
 	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "173a07.f5", 0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
+	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
 	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -841,7 +841,7 @@ ROM_START( buckyaab ) /* Version AA */
 
 	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "173a07.f5", 0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
+	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
 	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
