@@ -251,7 +251,10 @@ attotime emu_timer::elapsed() const
 
 attotime emu_timer::remaining() const
 {
-	return m_expire - machine().time();
+	attotime curtime = machine().time();
+	if (curtime >= m_expire)
+		return attotime::zero;
+	return m_expire - curtime;
 }
 
 
