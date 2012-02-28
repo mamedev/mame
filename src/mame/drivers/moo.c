@@ -805,7 +805,7 @@ ROM_START( buckyuab ) /* Version UA */
 
 	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "173_a07.f5", 0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
+	ROM_LOAD( "173a07.f5", 0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
 	ROM_RELOAD(             0x010000, 0x040000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
