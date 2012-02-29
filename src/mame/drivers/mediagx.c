@@ -62,33 +62,6 @@
     74F244 (x2, SOIC20)
     ST ULN2064B (DIP16)
 
-Notes related to Area 51: Site 4 from:
-http://www.mameworld.info/ubbthreads/showthreaded.php?Cat=&Number=276606
-
-Regarding the (a51site4a.chd)
-
-I own a dedicated cab and have sold HD replacements that use an SD card and
-IDE adapter.  So I have done some research and have purchased enough board sets
-and HD's that I have some idea what I'm talking about.  Anyhoo, The currently
-supported image is Rev. 2.01 as is still sold by happ.  The only difference
-between the current MAME chd and a fresh Happ HD is that the MAME chd has had
-it's serial # cleared, but it STILL has statistical data saved. IE. credits
-inserted, games played, play times, etc...  I know it's that version by the size
-of the CHD. I have compressed several STOCK HD's including my own and they all are
-the same size.  The only HD that I have compressed that was the same as the currently
-supported chd was a happ replacement HD.  So in conclusion, There are two different
-versions of the Area 51 Site 4 HD one that was shipped in dedicated cabs dated
-Sep. 11 1998 and another Rev. 2.01 dated Sep. 7 1998 for whatever reason I cannot say.
-
-I do have clean copies of both in chd format, stripped of ALL statistical info. but
-they still retain their serial #'s.  BTW: I did use chdman to copy the currently
-supported chd to a card and put it in my cab just to clear all the stats and make a clean
-copy as it should be.  Also, Just to be clear the size of the chd is not determined by
-the original HD as I'm talking about their size after using chdman to put them onto a
-SD card and then using chdman to make a chd from the SD card. They are different sizes!
-
--ninjakid
-
 */
 
 #include "emu.h"
