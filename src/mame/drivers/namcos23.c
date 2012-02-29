@@ -2380,7 +2380,7 @@ static VIDEO_START( ss23 )
 	{
 		state->m_bgtilemap->set_scrolldx(860, 860);
 	}
-	state->m_render.polymgr = poly_alloc(machine, 10000, sizeof(namcos23_render_data), POLYFLAG_NO_WORK_QUEUE);
+	state->m_render.polymgr = poly_alloc(machine, 10000, sizeof(namcos23_render_data), 0);
 }
 
 static SCREEN_UPDATE_RGB32( ss23 )
