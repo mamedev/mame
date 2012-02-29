@@ -77,64 +77,127 @@ public:
 	required_device<cpu_device> m_maincpu;
 };
 
-/* stub read handlers */
+VIDEO_START(popobear)
+{
 
-static READ16_HANDLER( popo_480001_r ) { static int i = 0x00;i ^=0xff;return i;}
-static READ16_HANDLER( popo_48001c_r ) { static int i = 0x00;i ^=0xff;return i;}
-static READ16_HANDLER( popo_480020_r ) { static int i = 0x00;i ^=0xff;return i;}
-static READ16_HANDLER( popo_48003a_r ) { static int i = 0x00;i ^=0xff;return i;}
+}
 
-static READ16_HANDLER( popo_500000_r ) { static int i = 0x00;i ^=0xff;return i;}
-static READ16_HANDLER( popo_520000_r ) { static int i = 0x00;i ^=0xff;return i;}
+SCREEN_UPDATE_IND16( popobear )
+{
+	popobear_state *state = screen.machine().driver_data<popobear_state>();
+	UINT16* popobear_vram = state->popobear_vram;
+	int count = 0;
+	static int m_test_x = 512,m_test_y = 256,m_start_offs;
 
-static READ16_HANDLER( popo_620000_r ) { static int i = 0x00;i ^=0xff;return i;}
+	bitmap.fill(0, cliprect);
 
-/* stub write handlers */
+	if(screen.machine().input().code_pressed(KEYCODE_Z))
+		m_test_x++;
 
-static WRITE16_HANDLER( popo_480001_w ) { }
-static WRITE16_HANDLER( popo_480018_w ) { }
-static WRITE16_HANDLER( popo_48001a_w ) { }
-static WRITE16_HANDLER( popo_48001c_w ) { }
-static WRITE16_HANDLER( popo_480020_w ) { }
-static WRITE16_HANDLER( popo_480028_w ) { }
-static WRITE16_HANDLER( popo_48002c_w ) { }
-static WRITE16_HANDLER( popo_480030_w ) { }
-static WRITE16_HANDLER( popo_48003a_w ) { }
+	if(screen.machine().input().code_pressed(KEYCODE_X))
+		m_test_x--;
 
-static WRITE16_HANDLER( popo_550000_w ) { }
-static WRITE16_HANDLER( popo_550002_w ) { }
+	if(screen.machine().input().code_pressed(KEYCODE_A))
+		m_test_y++;
 
-static WRITE16_HANDLER( popo_600000_w ) { }
-static WRITE16_HANDLER( popo_620000_w ) { }
+	if(screen.machine().input().code_pressed(KEYCODE_S))
+		m_test_y--;
 
+	if(screen.machine().input().code_pressed(KEYCODE_Q))
+		m_start_offs+=0x200;
+
+	if(screen.machine().input().code_pressed(KEYCODE_W))
+		m_start_offs-=0x200;
+
+	if(screen.machine().input().code_pressed(KEYCODE_E))
+		m_start_offs++;
+
+	if(screen.machine().input().code_pressed(KEYCODE_R))
+		m_start_offs--;
+
+	popmessage("%d %d %04x",m_test_x,m_test_y,m_start_offs);
+
+	count = (m_start_offs);
+
+	for(int y=0;y<m_test_y;y++)
+	{
+		for(int x=0;x<m_test_x;x++)
+		{
+			UINT16 color;
+
+			color = (popobear_vram[count] & 0xff)>>0;
+
+			if(cliprect.contains(x, y))
+				bitmap.pix16(y, x) = screen.machine().pens[color];
+
+			count++;
+		}
+	}
+
+
+	#if 0
+	for (int y=0;y<256;y++)
+	{
+		for (int x=0;x<128;x++)
+		{
+			UINT8 dat;
+			dat = (popobear_vram[count]&0xf000)>>12;
+			bitmap.pix16(y, (x*4)+0) =dat;
+
+			dat = (popobear_vram[count]&0x0f00)>>8;
+			bitmap.pix16(y, (x*4)+1) =dat;
+
+			dat = (popobear_vram[count]&0x00f0)>>4;
+			bitmap.pix16(y, (x*4)+2) =dat;
+
+			dat = (popobear_vram[count]&0x000f)>>0;
+			bitmap.pix16(y, (x*4)+3) =dat;
+
+			count++;
+		}
+	}
+	#endif
+
+	return 0;
+}
+
+/* ??? */
+static READ8_HANDLER( popo_620000_r )
+{
+	return 9;
+}
 
 static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
-	AM_RANGE(0x3E0000, 0x3EFFFF) AM_RAM  AM_BASE_MEMBER(popobear_state, popobear_vram)
+	AM_RANGE(0x280000, 0x280fff) AM_RAM
+	AM_RANGE(0x2b0000, 0x2dffff) AM_RAM // unknown boundaries
+	AM_RANGE(0x2ff800, 0x2fffff) AM_RAM // sprite list
+	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_BASE_MEMBER(popobear_state, popobear_vram) // actually RAM based tiles
 
 	/* Blitter stuff? */
-	AM_RANGE(0x480000, 0x480001) AM_READ(popo_480001_r) AM_WRITE(popo_480001_w)
-	AM_RANGE(0x480018, 0x480019) AM_WRITE(popo_480018_w)
-	AM_RANGE(0x48001a, 0x48001b) AM_WRITE(popo_48001a_w)
-	AM_RANGE(0x48001c, 0x48001d) AM_READ(popo_48001c_r) AM_WRITE(popo_48001c_w)
-	AM_RANGE(0x480020, 0x480021) AM_READ(popo_480020_r) AM_WRITE(popo_480020_w)
-	AM_RANGE(0x480028, 0x480029) AM_WRITE(popo_480028_w)
-	AM_RANGE(0x48002c, 0x48002d) AM_WRITE(popo_48002c_w)
-	AM_RANGE(0x480030, 0x480031) AM_WRITE(popo_480030_w)
-	AM_RANGE(0x48003a, 0x48003b) AM_READ(popo_48003a_r) AM_WRITE(popo_48003a_w)
+	AM_RANGE(0x480000, 0x480001) AM_NOP //AM_READ(popo_480001_r) AM_WRITE(popo_480001_w)
+	AM_RANGE(0x480018, 0x480019) AM_NOP //AM_WRITE(popo_480018_w)
+	AM_RANGE(0x48001a, 0x48001b) AM_NOP //AM_WRITE(popo_48001a_w)
+	AM_RANGE(0x48001c, 0x48001d) AM_NOP //AM_READ(popo_48001c_r) AM_WRITE(popo_48001c_w)
+	AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(popo_480020_r) AM_WRITE(popo_480020_w)
+	AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(popo_480028_w)
+	AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(popo_48002c_w)
+	AM_RANGE(0x480030, 0x480031) AM_NOP // irq ack, bit wise
+	AM_RANGE(0x48003a, 0x48003b) AM_NOP //AM_READ(popo_48003a_r) AM_WRITE(popo_48003a_w)
 
-	AM_RANGE(0x480400, 0x48041f) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram) // looks palette like at least
+	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
-	/* I/O maybe? */
-	AM_RANGE(0x500000, 0x500001) AM_READ(popo_500000_r)
-	AM_RANGE(0x520000, 0x520001) AM_READ(popo_520000_r)
-	AM_RANGE(0x550000, 0x550001) AM_WRITE(popo_550000_w)
-	AM_RANGE(0x550002, 0x550003) AM_WRITE(popo_550002_w)
+//	AM_RANGE(0x500000, 0x500001) AM_NOP //AM_READ(popo_500000_r) // watchdog?
+//	AM_RANGE(0x520000, 0x520001) AM_NOP //AM_READ(popo_520000_r)
+	AM_RANGE(0x540000, 0x540001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x550000, 0x550003) AM_DEVWRITE8( "ymsnd", ym2413_w, 0x00ff )
 
-	/* these could be where the OKI hooks up? */
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(popo_600000_w)
-	AM_RANGE(0x620000, 0x620001) AM_READ(popo_620000_r) AM_WRITE(popo_620000_w)
+//	AM_RANGE(0x600000, 0x600001) AM_WRITE(popo_600000_w)
+	AM_RANGE(0x620000, 0x620001) AM_READ8(popo_620000_r,0xff00) //AM_WRITE(popo_620000_w)
+	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("gfx1", 0)
+	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("gfx2", 0) // correct?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( popobear )
@@ -262,41 +325,6 @@ static GFXDECODE_START( popobear )
 GFXDECODE_END
 
 
-SCREEN_UPDATE_IND16( popobear )
-{
-	popobear_state *state = screen.machine().driver_data<popobear_state>();
-	bitmap.fill(0, cliprect);
-
-	UINT16* popobear_vram = state->popobear_vram;
-	int count = 0;
-	for (int y=0;y<256;y++)
-	{
-		for (int x=0;x<128;x++)
-		{
-			UINT8 dat;
-			dat = (popobear_vram[count]&0xf000)>>12;
-			bitmap.pix16(y, (x*4)+0) =dat;
-
-			dat = (popobear_vram[count]&0x0f00)>>8;
-			bitmap.pix16(y, (x*4)+1) =dat;
-
-			dat = (popobear_vram[count]&0x00f0)>>4;
-			bitmap.pix16(y, (x*4)+2) =dat;
-
-			dat = (popobear_vram[count]&0x000f)>>0;
-			bitmap.pix16(y, (x*4)+3) =dat;
-
-			count++;
-		}
-	}
-
-	return 0;
-}
-
-VIDEO_START(popobear)
-{
-
-}
 
 static TIMER_DEVICE_CALLBACK( popobear_irq )
 {
@@ -329,19 +357,17 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256*2)
 
 	MCFG_VIDEO_START(popobear)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_42MHz/10)  // XTAL CORRECT, DIVISOR GUESSED
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/10)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_42MHz/10/4, OKIM6295_PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", XTAL_42MHz/32, OKIM6295_PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -351,15 +377,15 @@ ROM_START( popobear )
 	ROM_LOAD16_BYTE( "popobear_en-a-401_1.6.u4", 0x000000, 0x20000, CRC(0568af9c) SHA1(920531dbc4bbde2d1db062bd5c48b97dd50b7185) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD16_BYTE(	"popobear_en-a-501.u5", 0x000000, 0x100000, CRC(185901a9) SHA1(7ff82b5751645df53435eaa66edce589684cc5c7) )
-	ROM_LOAD16_BYTE(	"popobear_en-a-601.u6", 0x000001, 0x100000, CRC(84fa9f3f) SHA1(34dd7873f88b0dae5fb81fe84e82d2b6b49f7332) )
+	ROM_LOAD16_BYTE( "popobear_en-a-501.u5", 0x000000, 0x100000, CRC(185901a9) SHA1(7ff82b5751645df53435eaa66edce589684cc5c7) )
+	ROM_LOAD16_BYTE( "popobear_en-a-601.u6", 0x000001, 0x100000, CRC(84fa9f3f) SHA1(34dd7873f88b0dae5fb81fe84e82d2b6b49f7332) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE(	"popobear_en-a-701.u7", 0x000000, 0x100000, CRC(45eba6d0) SHA1(0278602ed57ac45040619d590e6cc85e2cfeed31) )
-	ROM_LOAD16_BYTE(	"popobear_en-a-801.u8", 0x000001, 0x100000, CRC(2760f2e6) SHA1(58af59f486c9df930f7c124f89154f8f389a5bd7) )
+	ROM_LOAD16_BYTE( "popobear_en-a-701.u7", 0x000000, 0x100000, CRC(45eba6d0) SHA1(0278602ed57ac45040619d590e6cc85e2cfeed31) )
+	ROM_LOAD16_BYTE( "popobear_en-a-801.u8", 0x000001, 0x100000, CRC(2760f2e6) SHA1(58af59f486c9df930f7c124f89154f8f389a5bd7) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
 ROM_END
 
-GAME( 2000, popobear,    0, popobear,    popobear,    0, ROT0,  "BMC", "PoPo Bear", GAME_NOT_WORKING | GAME_IS_SKELETON )
+GAME( 2000, popobear,    0, popobear,    popobear,    0, ROT0,  "BMC", "PoPo Bear", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
