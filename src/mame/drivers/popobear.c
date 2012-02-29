@@ -1,4 +1,17 @@
-/* Popo Bear - BMC-A00211
+/*******************************************************************************************
+
+	Popo Bear (c) 2000 BMC
+
+	preliminary driver by Angelo Salese
+
+	TODO:
+	- sprites;
+	- I/Os;
+	- IRQ generation;
+	- Port 0x620000 is quite a mystery, some silly protection?
+
+============================================================================================
+Popo Bear - BMC-A00211
 (c) 2000 - Bao Ma Technology Co., LTD
 
 |-----------------------------------------|
@@ -54,10 +67,8 @@ Component Side   A   B   Solder Side
                 26   26
            GND  27   27  GND
            GND  28   28  GND
-*/
+*******************************************************************************************/
 
-// looks like some kind of blitter
-// IGS-like?
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -92,11 +103,13 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	{
 		for(int x=0;x<128;x++)
 		{
-			int tile;
+			int tile,xtile,ytile;
 
-			/* TODO: undeerstand why code bigger than 0x80 makes this to not work properly */
 			tile = popobear_vram[count+1] | (popobear_vram[count+0]<<8);
-			tile *= 8;
+			xtile = tile & 0x7f;
+			xtile *= 8;
+			ytile = tile >> 7;
+			ytile *= 1024*8;
 
 			for(int xi=0;xi<8;xi++)
 			{
@@ -104,7 +117,7 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 				{
 					UINT8 color;
 
-					color = (popobear_vram[(xi+yi*1024)+tile] & 0xff)>>0;
+					color = (popobear_vram[(xi+yi*1024)+xtile+ytile] & 0xff)>>0;
 
 					if(cliprect.contains(x*8+xi, y*8+yi) && color)
 						bitmap.pix16(y*8+yi, x*8+xi) = machine.pens[color];
@@ -126,29 +139,6 @@ SCREEN_UPDATE_IND16( popobear )
 	draw_layer(screen.machine(),bitmap,cliprect,2);
 	draw_layer(screen.machine(),bitmap,cliprect,1);
 	draw_layer(screen.machine(),bitmap,cliprect,0);
-
-	#if 0
-	for (int y=0;y<256;y++)
-	{
-		for (int x=0;x<128;x++)
-		{
-			UINT8 dat;
-			dat = (popobear_vram[count]&0xf000)>>12;
-			bitmap.pix16(y, (x*4)+0) =dat;
-
-			dat = (popobear_vram[count]&0x0f00)>>8;
-			bitmap.pix16(y, (x*4)+1) =dat;
-
-			dat = (popobear_vram[count]&0x00f0)>>4;
-			bitmap.pix16(y, (x*4)+2) =dat;
-
-			dat = (popobear_vram[count]&0x000f)>>0;
-			bitmap.pix16(y, (x*4)+3) =dat;
-
-			count++;
-		}
-	}
-	#endif
 
 	return 0;
 }
@@ -181,11 +171,10 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM
-	AM_RANGE(0x2b0000, 0x2dffff) AM_RAM // unknown boundaries
-	AM_RANGE(0x2ff800, 0x2fffff) AM_RAM // sprite list
+	AM_RANGE(0x2b0000, 0x2fffff) AM_RAM // unknown boundaries, 0x2ff800 contains a sprite list
 	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE8(popobear_vram_r,popobear_vram_w,0xffff)
 
-	/* Blitter stuff? */
+	/* These are vregs */
 	AM_RANGE(0x480000, 0x480001) AM_NOP //AM_READ(popo_480001_r) AM_WRITE(popo_480001_w)
 	AM_RANGE(0x480018, 0x480019) AM_NOP //AM_WRITE(popo_480018_w)
 	AM_RANGE(0x48001a, 0x48001b) AM_NOP //AM_WRITE(popo_48001a_w)
@@ -198,8 +187,8 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
-//	AM_RANGE(0x500000, 0x500001) AM_NOP //AM_READ(popo_500000_r) // watchdog?
-//	AM_RANGE(0x520000, 0x520001) AM_NOP //AM_READ(popo_520000_r)
+	AM_RANGE(0x500000, 0x500001) AM_NOP //AM_READ(popo_500000_r) // watchdog?
+	AM_RANGE(0x520000, 0x520001) AM_READ_PORT("DSW4")
 	AM_RANGE(0x540000, 0x540001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x550000, 0x550003) AM_DEVWRITE8( "ymsnd", ym2413_w, 0x00ff )
 
@@ -288,33 +277,55 @@ static INPUT_PORTS_START( popobear )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x00, "DSW4:1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW4:2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW4:3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DSW4:4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DSW4:5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DSW4:6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DSW4:7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DSW4:8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
-
 
 
 
@@ -323,6 +334,7 @@ static TIMER_DEVICE_CALLBACK( popobear_irq )
 	popobear_state *state = timer.machine().driver_data<popobear_state>();
 	int scanline = param;
 
+	/* TODO: one of those is a timer irq, tied with YM2413 */
 	if(scanline == 240)
 		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 
@@ -348,7 +360,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 //	MCFG_GFXDECODE(popobear)
 
 	MCFG_SCREEN_SIZE(128*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_PALETTE_LENGTH(256*2)
 
 	MCFG_VIDEO_START(popobear)
@@ -382,4 +394,4 @@ ROM_START( popobear )
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
 ROM_END
 
-GAME( 2000, popobear,    0, popobear,    popobear,    0, ROT0,  "BMC", "PoPo Bear", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 2000, popobear,    0, popobear,    popobear,    0, ROT0,  "BMC", "PoPo Bear", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
