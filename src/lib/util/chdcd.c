@@ -301,7 +301,7 @@ UINT64 read_uint64(FILE *infile)
 }
 
 /*-------------------------------------------------
-    chdcd_parse_toc - parse a CDRWin format CUE file
+    chdcd_parse_nero - parse a Nero format image file
 -------------------------------------------------*/
 
 chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
@@ -579,7 +579,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 }
 
 /*-------------------------------------------------
-    chdcd_parse_toc - parse a CDRWin format CUE file
+    chdcd_parse_cue - parse a CDRWin format CUE file
 -------------------------------------------------*/
 
 chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)

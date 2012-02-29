@@ -2143,6 +2143,8 @@ void ide_hdd_image_device::device_reset()
 				ide_build_features();
 		}
 	}
+	else
+		m_disk = NULL;
 
 }
 

@@ -98,6 +98,7 @@ Stop_Compiling_Bad_Endian
 #endif
 
 #if defined(MY_CPU_LE_UNALIGN) && defined(_WIN64) && (_MSC_VER >= 1300)
+#include <stdlib.h>
 
 #pragma intrinsic(_byteswap_ulong)
 #pragma intrinsic(_byteswap_uint64)

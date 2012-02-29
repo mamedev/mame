@@ -3,10 +3,10 @@
 
 #include "emu.h"
 
-class OtherModesT;
-class MiscStateT;
+struct OtherModesT;
+struct MiscStateT;
 class Color;
-class rdp_span_aux;
+struct rdp_span_aux;
 struct rdp_poly_state;
 
 class N64TexturePipeT

@@ -585,6 +585,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &
 		bool last_token_was_include = false;
 		bool last_was_token = false;
 		bool quotes_are_linked = false;
+		UINT8 curquote = 0;
 		int curcol = 0;
 		for (char *srcptr = srcline; *srcptr != 0; )
 		{
@@ -673,7 +674,8 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &
 						dstline.catprintf("<span class=\"string\">%c", ch);
 					else
 						dstline.cat(ch);
-					in_quotes = ch;
+					in_quotes = true;
+					curquote = ch;
 
 					// handle includes
 					if (last_token_was_include)
@@ -693,7 +695,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &
 				}
 
 				// track closing quotes
-				else if (!in_comment && !in_inline_comment && in_quotes && ch == in_quotes && !escape)
+				else if (!in_comment && !in_inline_comment && in_quotes && (ch == curquote) && !escape)
 				{
 					if (quotes_are_linked)
 						dstline.catprintf("</a>");
@@ -701,7 +703,8 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &
 						dstline.catprintf("%c</span>", ch);
 					else
 						dstline.cat(ch);
-					in_quotes = 0;
+					in_quotes = false;
+					curquote = 0;
 					quotes_are_linked = false;
 				}
 
@@ -719,7 +722,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &
 
 			// Update escape state
 			if (in_quotes)
-				escape = (ch == '\\' && type == FILE_TYPE_C) ? !escape : 0;
+				escape = (ch == '\\' && type == FILE_TYPE_C) ? !escape : false;
 		}
 
 		// finish inline comments

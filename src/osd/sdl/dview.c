@@ -356,8 +356,7 @@ static void dview_class_init(DViewClass *dvc)
 		dvc->fixedfont = pango_font_description_from_string("Monospace 10");
 
     if(!dvc->fixedfont) {
-		mame_printf_error("Couldn't find a monospace font, aborting\n");
-		abort();
+		fatalerror("Couldn't find a monospace font, aborting");
     }
 
 	GTK_CONTAINER_CLASS(dvc)->forall = dview_forall;
