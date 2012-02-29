@@ -1358,7 +1358,7 @@ ROM_START( a51site4 )
 	DISK_IMAGE( "a51site4", 0, SHA1(48496666d1613700ae9274f9a5361ea5bbaebea0) )
 ROM_END
 
-ROM_START( a51site4a )
+ROM_START( a51site4a ) /* When dumped connected straight to IDE the cylinders were 4968 and heads were 16 */
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "new", "v1.0h" )
 	ROMX_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778), ROM_BIOS(1)) /* Build date 09/15/98 string stored at 0x3fff5 */
@@ -1369,8 +1369,7 @@ ROM_START( a51site4a )
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "drive_0" )
-// Not sure why this does not boot.  Information (at the top of the driver) might indicate this as an SD Card bootleg of the original HD.
-	DISK_IMAGE( "a51site4a", 0, SHA1(a0962b35c265154e571f973a819efdd06109e543) )
+	DISK_IMAGE( "a51site4a", 0, SHA1(4de421e4d1708ecbdfb50730000814a1ea36a044) )
 ROM_END
 
 
