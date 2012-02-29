@@ -191,18 +191,8 @@ An additional control PCB is used for Mocap Golf for the golf club sensor. It co
 
     Driver by Ville Linde
 
-    DASM code snippets:
 
-    00FE0B8C: addi      r31,r3,0x0000
-    00FE0B90: lwz       r3,0x0040(r1)
-    00FE0B94: cmpi      r31,0x0000 ;offending check, understand where r3 comes from!
-    00FE0B98: lwz       r4,0x0044(r1)
-    00FE0B9C: addic     r5,r1,0x0058
-    00FE0BA0: bne       0x00FE0C00
 
-*/
-
-/*
     Software notes (as per Police 911)
     -- VL - 01.06.2011
 
@@ -266,63 +256,6 @@ An additional control PCB is used for Mocap Golf for the golf club sensor. It co
     0x0000f7b4:     SwitchTask()
     0x0000c130:     ScheduleTask()
     0x00009d00:     LoadProgram(): R3 = ptr to filename
-
-
-    Inf loop at 0x00071014 -> 0x00093e14 -> 0x00093f6c
-
-    0x24dcc(): (R3=0x21, R4=0xffffff, R5=0xff, R6=0x10, R7=0x10, R8=0xab50c, R9=0xab520)
-               0xab50c = "G*%s BOOT SYSTEM"
-               0xab520 = "A00"
-
-               (R3=0x21, R4=0xffffff, R5=0xff, R6=0x10, R7=0x20, R8=0xab524, R9=0x7d0)
-               0xab524 = "(C) %d KONAMI ALL RIGHTS RESERVED."
-
-               (R3=0x30021, R4=0xffffff, R5=0xff, R6=0xc0, R7=0x60, R8=0xab610, R9=0xa8)
-               0xab610 = "DEVICE CHECK"
-
-               (R3=0x30021, R4=0xffffff, R5=0xff, R6=0xc0, R7=0x100, R8=0xab620, R9=0x10)
-               0xab620 = "U13    ";
-
-               (R3=0x30021, R4=0xff0000, R5=0xff, R6=0xc0, R7=0x100, R8=0xab628, R9=0xab4dc)
-               0xab628 = "    %s";
-               0xab4dc = "BAD";
-
-    VOODOO.0.REG:fbzColorPath(3) write = 1C482405
-        RGB = TREX color output
-        Alpha = TREX alpha output
-
-    VOODOO.0.REG:textureMode(3) write = 102414C0
-        No perspective correction, point-sampling, clamp S/T.
-        Texture format AI44
-        tc_add_local
-        tca_add_alocal
-
-    VOODOO.0.REG:tLOD(3) write = 01B821C6
-
-    VOODOO.0.REG:texBaseAddr(3) write = 00000000
-    VOODOO.0.REG:texBaseAddr_1(3) write = 000C3100
-    VOODOO.0.REG:texBaseAddr_2(3) write = FFFF8000
-    VOODOO.0.REG:texBaseAddr_3_8(3) write = FFFFE000
-
-    VOODOO.0.REG:textureMode(2) write = 000004C0
-        No perspective correction, point-sampling, clamp S/T.
-        Texture format AI44
-
-    VOODOO.0.REG:tLOD(0) write = 01BC21C6
-
-    VOODOO.0.REG:texBaseAddr_3_8(2) write = FFFF7800
-
-    VOODOO.0.REG:fbzMode(3) write = 0002166B
-
-
-
-    PPP2nd requires the following in idectrl.c:
-    //ide->features[51*2+0] = 0;
-    //ide->features[51*2+1] = 2;
-    //ide->features[67*2+0] = 0xf0;
-    //ide->features[67*2+1] = 0x00;
-
-    MPC8240 requires: 603MMU
 
 
 
@@ -1609,9 +1542,7 @@ static int ds2430_data_count = 0;
 static int ds2430_reset = 0;
 static int ds2430_state;
 static UINT8 ds2430_cmd;
-//static UINT8 ds2430_rom[8] = { 0x14, 0x5c, 0xaa, 0xee, 0x00, 0x00, 0x00, 0x8e };
-//static UINT8 ds2430_rom[8] = { 0x14, 0x41, 0x31, 0x34, 0x41, 0x41, 0x41, 0x9f };
-static UINT8 ds2430_rom[8] = { 0x14, 0x41, 0x41, 0x41, 0x41, 0x31, 0x34, 0xaa};
+static UINT8 *ds2430_rom;
 static UINT8 ds2430_addr;
 
 
@@ -1756,7 +1687,7 @@ static void DS2430_w(int bit)
 
 		case DS2430_STATE_READ_ROM:
 		{
-			int rombit = (ds2430_rom[(ds2430_data_count/8)] >> (ds2430_data_count%8)) & 1;
+			int rombit = (ds2430_rom[0x20 + (ds2430_data_count/8)] >> (ds2430_data_count%8)) & 1;
 			ds2430_data_count++;
 			printf("DS2430_w: read rom %d, bit = %d\n", ds2430_data_count, rombit);
 
@@ -1981,12 +1912,22 @@ static MACHINE_START(viper)
 
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x00ffffff, FALSE, workram);
+
+	ds2430_rom = (UINT8*)machine.region("ds2430")->base();
 }
 
 static MACHINE_RESET(viper)
 {
 	devtag_reset(machine, "ide");
 	mpc8240_epic_reset();
+
+	UINT8 *ide_features = ide_get_features(machine.device("ide"), 0);
+
+	// Viper expects these settings or the BIOS fails
+	ide_features[51*2+0] = 0;			/* 51: PIO data transfer cycle timing mode */
+	ide_features[51*2+1] = 2;
+	ide_features[67*2+0] = 0xf0;		/* 67: minimum PIO transfer cycle time without flow control */
+	ide_features[67*2+1] = 0x00;
 }
 
 static MACHINE_CONFIG_START( viper, viper_state )
@@ -2061,6 +2002,9 @@ static DRIVER_INIT(vipercf)
 ROM_START(kviper)
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 ROM_END
 
@@ -2068,6 +2012,9 @@ ROM_END
 /* Viper games with hard disk */
 ROM_START(ppp2nd)
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
@@ -2079,6 +2026,9 @@ ROM_END
 ROM_START(boxingm) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a45jaa_nvram.u39", 0x00000, 0x2000, CRC(c24e29fc) SHA1(efb6ecaf25cbdf9d8dfcafa85e38a195fa5ff6c4))
 
@@ -2088,6 +2038,9 @@ ROM_END
 
 ROM_START(code1d) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
@@ -2099,6 +2052,9 @@ ROM_END
 ROM_START(code1db) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
@@ -2108,6 +2064,9 @@ ROM_END
 
 ROM_START(gticlub2) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(d0604e84) SHA1(18d1183f1331af3e655a56692eb7ab877b4bc239)) //old dump, probably has non-default settings.
@@ -2130,6 +2089,9 @@ ROM_END
 ROM_START(jpark3) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b41ebc_nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
 
@@ -2141,6 +2103,9 @@ ROM_END
 ROM_START(mocapglf) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b33uaa_nvram.u39", 0x00000, 0x1ff8, BAD_DUMP CRC(0f0ba988) SHA1(5618c03b21fc2ba14b2e159cee3aab7f53c2c34d)) //data looks plain bad (compared to the other games)
 
@@ -2150,6 +2115,9 @@ ROM_END
 
 ROM_START(mocapb) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a29aaa_nvram.u39", 0x000000, 0x2000, CRC(14b9fe68) SHA1(3c59e6df1bb46bc1835c13fd182b1bb092c08759)) //supposed to be aab version?
@@ -2161,6 +2129,9 @@ ROM_END
 ROM_START(mocapbj) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a29jaa_nvram.u39", 0x000000, 0x2000, CRC(2f7cdf27) SHA1(0b69d8728be12909e235268268a312982f81d46a))
 
@@ -2170,6 +2141,9 @@ ROM_END
 
 ROM_START(p911) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00uad_nvram.u39", 0x000000, 0x2000, CRC(cca056ca) SHA1(de1a00d84c1311d48bbe6d24f5b36e22ecf5e85a))
@@ -2181,6 +2155,9 @@ ROM_END
 ROM_START(p911uc) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00uac_nvram.u39", 0x000000, 0x2000,  NO_DUMP )
 
@@ -2190,6 +2167,9 @@ ROM_END
 
 ROM_START(p911kc) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00kac_nvram.u39", 0x000000, 0x2000,  CRC(8ddc921c) SHA1(901538da237679fc74966a301278b36d1335671f) )
@@ -2201,6 +2181,9 @@ ROM_END
 ROM_START(p911e) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  CRC(4f3497b6) SHA1(3045c54f98dff92cdf3a1fc0cd4c76ba82d632d7) )
 
@@ -2210,6 +2193,9 @@ ROM_END
 
 ROM_START(p911j) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00jaa_nvram.u39", 0x000000, 0x2000, CRC(9ecf70dc) SHA1(4769a99b0cc28563e219860b8d480f32d1e21f60))
@@ -2221,6 +2207,9 @@ ROM_END
 ROM_START(p9112) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
 
@@ -2231,6 +2220,9 @@ ROM_END
 ROM_START(popn9) //Note: this is actually a Konami Pyson HW! (PlayStation 2-based) move out of here.
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
 
@@ -2240,6 +2232,9 @@ ROM_END
 
 ROM_START(sscopex)
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a13uaa_nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
@@ -2253,6 +2248,9 @@ ROM_END
 ROM_START(sogeki) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(2f325c55) SHA1(0bc44f40f981a815c8ce64eae95ae55db510c565))
 
@@ -2262,6 +2260,9 @@ ROM_END
 
 ROM_START(thrild2) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a41ebb_nvram.u39", 0x00000, 0x2000, CRC(22f59ac0) SHA1(e14ea2ba95b72edf0a3331ab82c192760bfdbce3))
@@ -2274,6 +2275,9 @@ ROM_END
 ROM_START(thrild2a) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
 
@@ -2285,6 +2289,9 @@ ROM_END
 ROM_START(thrild2c) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
@@ -2294,6 +2301,9 @@ ROM_END
 
 ROM_START(tsurugi) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a30eab_nvram.u39", 0x00000, 0x2000, CRC(c123342c) SHA1(55416767608fe0311a362854a16b214b04435a31))
@@ -2305,6 +2315,9 @@ ROM_END
 ROM_START(tsurugij) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a30jac_nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
@@ -2315,6 +2328,9 @@ ROM_END
 /* This CF card has sticker C22D02 */
 ROM_START(wcombat) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombat_nvram.u39", 0x00000, 0x2000, CRC(4f8b5858) SHA1(68066241c6f9db7f45e55b3c5da101987f4ce53c))
@@ -2336,6 +2352,9 @@ ROM_END
 ROM_START(wcombatj) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombatj_nvram.u39", 0x00000, 0x2000, CRC(bd8a6640) SHA1(2d409197ef3fb07d984d27fa943f29c7a711d715))
 
@@ -2345,6 +2364,9 @@ ROM_END
 
 ROM_START(xtrial) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b4xjab_nvram.u39", 0x00000, 0x2000, CRC(33708a93) SHA1(715968e3c9c15edf628fa6ac655dc0864e336c6c))
@@ -2404,6 +2426,9 @@ CF card and NVRAM are swapped....
 ROM_START(mfightc) //*
 	VIPER_BIOS
 
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(9fb551a5) SHA1(a33d185e186d404c3bf62277d7e34e5ad0000b09)) //likely non-default settings
 	ROM_LOAD("c09jad_nvram.u39", 0x00000, 0x2000, CRC(33e960b7) SHA1(a9a249e68c89b18d4685f1859fe35dc21df18e14))
@@ -2415,6 +2440,9 @@ ROM_END
 /* This CF card has sticker C09JAC04 */
 ROM_START(mfightcc) //*
 	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)		/* DS2430 */
+		ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("c09jac_nvram.u39", 0x00000, 0x2000, NO_DUMP )
