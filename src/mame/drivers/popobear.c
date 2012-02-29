@@ -73,7 +73,6 @@ public:
 		{ }
 
 
-	UINT16 *popobear_vram;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -82,58 +81,51 @@ VIDEO_START(popobear)
 
 }
 
+static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n)
+{
+	UINT8* popobear_vram = machine.region("ram_gfx")->base();
+	int count;
+
+	count = 0xf0000+layer_n*0x4000;
+
+	for(int y=0;y<32;y++)
+	{
+		for(int x=0;x<128;x++)
+		{
+			int tile;
+
+			/* TODO: undeerstand why code bigger than 0x80 makes this to not work properly */
+			tile = popobear_vram[count+1] | (popobear_vram[count+0]<<8);
+			tile *= 8;
+
+			for(int xi=0;xi<8;xi++)
+			{
+				for(int yi=0;yi<8;yi++)
+				{
+					UINT8 color;
+
+					color = (popobear_vram[(xi+yi*1024)+tile] & 0xff)>>0;
+
+					if(cliprect.contains(x*8+xi, y*8+yi) && color)
+						bitmap.pix16(y*8+yi, x*8+xi) = machine.pens[color];
+				}
+			}
+
+			count+=2;
+		}
+	}
+}
+
 SCREEN_UPDATE_IND16( popobear )
 {
-	popobear_state *state = screen.machine().driver_data<popobear_state>();
-	UINT16* popobear_vram = state->popobear_vram;
-	int count = 0;
-	static int m_test_x = 512,m_test_y = 256,m_start_offs;
+	//popobear_state *state = screen.machine().driver_data<popobear_state>();
 
 	bitmap.fill(0, cliprect);
 
-	if(screen.machine().input().code_pressed(KEYCODE_Z))
-		m_test_x++;
-
-	if(screen.machine().input().code_pressed(KEYCODE_X))
-		m_test_x--;
-
-	if(screen.machine().input().code_pressed(KEYCODE_A))
-		m_test_y++;
-
-	if(screen.machine().input().code_pressed(KEYCODE_S))
-		m_test_y--;
-
-	if(screen.machine().input().code_pressed(KEYCODE_Q))
-		m_start_offs+=0x200;
-
-	if(screen.machine().input().code_pressed(KEYCODE_W))
-		m_start_offs-=0x200;
-
-	if(screen.machine().input().code_pressed(KEYCODE_E))
-		m_start_offs++;
-
-	if(screen.machine().input().code_pressed(KEYCODE_R))
-		m_start_offs--;
-
-	popmessage("%d %d %04x",m_test_x,m_test_y,m_start_offs);
-
-	count = (m_start_offs);
-
-	for(int y=0;y<m_test_y;y++)
-	{
-		for(int x=0;x<m_test_x;x++)
-		{
-			UINT16 color;
-
-			color = (popobear_vram[count] & 0xff)>>0;
-
-			if(cliprect.contains(x, y))
-				bitmap.pix16(y, x) = screen.machine().pens[color];
-
-			count++;
-		}
-	}
-
+	draw_layer(screen.machine(),bitmap,cliprect,3);
+	draw_layer(screen.machine(),bitmap,cliprect,2);
+	draw_layer(screen.machine(),bitmap,cliprect,1);
+	draw_layer(screen.machine(),bitmap,cliprect,0);
 
 	#if 0
 	for (int y=0;y<256;y++)
@@ -167,6 +159,23 @@ static READ8_HANDLER( popo_620000_r )
 	return 9;
 }
 
+static READ8_HANDLER( popobear_vram_r )
+{
+	UINT8 *ram_gfx = space->machine().region("ram_gfx")->base();
+
+	return ram_gfx[offset];
+}
+
+
+static WRITE8_HANDLER( popobear_vram_w )
+{
+	UINT8 *ram_gfx = space->machine().region("ram_gfx")->base();
+
+	ram_gfx[offset] = data;
+
+//	gfx_element_mark_dirty(space->machine().gfx[0], offset >> 6);
+}
+
 static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -174,7 +183,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x280000, 0x280fff) AM_RAM
 	AM_RANGE(0x2b0000, 0x2dffff) AM_RAM // unknown boundaries
 	AM_RANGE(0x2ff800, 0x2fffff) AM_RAM // sprite list
-	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_BASE_MEMBER(popobear_state, popobear_vram) // actually RAM based tiles
+	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE8(popobear_vram_r,popobear_vram_w,0xffff)
 
 	/* Blitter stuff? */
 	AM_RANGE(0x480000, 0x480001) AM_NOP //AM_READ(popo_480001_r) AM_WRITE(popo_480001_w)
@@ -307,23 +316,6 @@ static INPUT_PORTS_START( popobear )
 INPUT_PORTS_END
 
 
-static const gfx_layout tilelayout =
-{
-	4,8,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 24, 16, 8, 0 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
-};
-
-// gfx don't seem to be tiles..
-static GFXDECODE_START( popobear )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 1 )
-GFXDECODE_END
-
 
 
 static TIMER_DEVICE_CALLBACK( popobear_irq )
@@ -353,10 +345,10 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_STATIC(popobear)
 
-	MCFG_GFXDECODE(popobear)
+//	MCFG_GFXDECODE(popobear)
 
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_SIZE(128*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 32*8-1)
 	MCFG_PALETTE_LENGTH(256*2)
 
 	MCFG_VIDEO_START(popobear)
@@ -383,6 +375,8 @@ ROM_START( popobear )
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "popobear_en-a-701.u7", 0x000000, 0x100000, CRC(45eba6d0) SHA1(0278602ed57ac45040619d590e6cc85e2cfeed31) )
 	ROM_LOAD16_BYTE( "popobear_en-a-801.u8", 0x000001, 0x100000, CRC(2760f2e6) SHA1(58af59f486c9df930f7c124f89154f8f389a5bd7) )
+
+	ROM_REGION( 0x100000, "ram_gfx", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
