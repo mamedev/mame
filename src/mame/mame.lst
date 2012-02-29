@@ -11874,7 +11874,8 @@ b85koca
 
 // Scorpion 1 games
 
-sc1lotus		// (c) 198? BFM Dutch ROMS, prelim
+sc1lotus		// (c) 198? BFM Dutch ROMS
+sc1lotusa
 sc1roul		// (c) 198? BFM Dutch ROMS, prelim
 sc1clatt		// (c) 1990 BFM,     Game Card 39-370-196
 sc1clatta
@@ -11882,51 +11883,88 @@ sc1actv8
 sc1armad
 sc1bartk
 sc1barcd
+sc1barcda
 sc1bigmt
 sc1calyp
 sc1carro
 sc1cshat
+sc1cshata
+sc1cshatb
+sc1cshatc
 sc1cshcd
 sc1cshcda
 sc1cshcdb
 sc1ccoin
-sc1cexpd	// Cash Explosion (Bellfruit) [Dutch]
+sc1cexpd	// Cash Explosion (Bellfruit) (Dutch)
 sc1cexpl	// Cash Explosion (Bellfruit)
+sc1cexpla
+sc1cexplb
+sc1cexplc
+sc1cexpld
 sc1cshwz	// Cash Wise (Bellfruit)
-sc1cshin	// Cashino (Bellfruit) [Dutch]
+sc1cshwza
+sc1cshwzb
+sc1cshwzc
+sc1cshin	// Cashino (Bellfruit) (Dutch)
 sc1china	// China Town Club (Bellfruit)
+sc1chinap
+sc1chinaa
+sc1chinaap
+sc1chinab
+sc1chinabp
 sc1class	// Classic (Bellfruit)
 sc1cwcl		// Clockwise Club (Bellfruit)
 sc1clown	// Clown Around (Bellfruit)
 sc1cl2k		// Club 2000 (Bellfruit)
 sc1cl2k1	// Club 2001 (Bellfruit)
 sc1cl65		// Club 65 Special (Bellfruit)
+sc1cl65a
+sc1cl65ap
+sc1cl65b
+sc1cl65bp
+sc1cl65c
+sc1cl65d
+sc1cl65dp
 sc1clbdm	// Club Diamond (Bellfruit)
 sc1clbxp	// Club Explosion (Bellfruit)
 sc1clbrn	// Club Runner (Bellfruit)
 sc1clbsp	// Club Spinner (Bellfruit)
 sc1clbtm	// Club Temptation (Bellfruit)
+sc1clbtma
 sc1clbw		// Club Wise (Bellfruit)
+sc1clbwa
+sc1clbwb
 sc1copdd	// Cops 'n' Robbers Deluxe (Bellfruit) [Dutch]
 sc1copdx	// Cops 'n' Robbers Deluxe (Bellfruit)
 sc1count	// Count Cash Club (Bellfruit)
+sc1countp
+sc1counta
+sc1countap
+sc1countb
 sc1dago		// Dagobert's Vault (Bellfruit)
 sc1disc		// Discovey (Bellfruit)
+sc1disca
 sc1dblch	// Double Chance (Bellfruit)
+sc1dblcha
 sc1dream	// Dream Machine (Bellfruit)
 sc1final	// Final Touch (Bellfruit)
 sc1flash	// Flash (Bellfruit)
 sc1fruit	// Fruit Lines (Bellfruit)
 sc1frtln	// Fruitlines (Bellfruit)
 sc1funh		// Fun House Club (Bellfruit)
+sc1funhp
+sc1funha
+sc1funhb
 sc1gtime	// Good Times (Bellfruit)
 sc1tiara	// Tiara (Elam)
 sc1gprix	// Grand Prix (Bellfruit)
-sc1gslam	// Grand Slam (Bellfruit) [Dutch]
+sc1gslam	// Grand Slam (Bellfruit) (Dutch)
 sc1happy	// Happy Hour (Bellfruit - Elam)
 sc1impc		// Impact (Bellfruit)
 sc1kings	// Kings Club (Bellfruit)
 sc1linx		// Linx (Bellfruit)
+sc1linxa
+sc1linxp
 sc1magc		// Magic Circle (Bellfruit)
 sc1manha	// Manhattan (Bellfruit)
 sc1mast		// Master Club (Bellfruit)
@@ -11935,36 +11973,67 @@ sc1mist		// Mistral (Bellfruit)
 sc1olym		// Olympia (Bellfruit)
 sc1orac		// Oracle (Bellfruit)
 sc1pwrl		// Power Lines (Bellfruit)
+sc1pwrla
 sc1rain		// Rainbow (Bellfruit)
 sc1re		// Reel Cash (Bellfruit)
 sc1rese		// Reel Cash SE (Bellfruit)
-sc1revo		// Revolution (Bellfruit) [Dutch]
+sc1revo		// Revolution (Bellfruit) (Dutch)
 sc1rose		// Rose 'n' Crown (Bellfruit)
 sc1sant		// Santana (Bellfruit)
 sc1sat		// Satellite (Bellfruit)
 sc1shan		// Shanghai (Bellfruit)
 sc1spct		// Spectre (Bellfruit)
+sc1spcta
 sc1spit		// Spitfire (Elam)
 sc1ster		// Sterling (Bellfruit)
 sc1str4		// Strike 4 (Bellfruit)
 sc1str4a	//
 sc1sir		// Strike It Rich (Bellfruit)
-sc1sups		// Superstar (Bellfruit) [Dutch]
+sc1sira
+sc1sirb
+sc1sirc
+sc1sups		// Superstar (Bellfruit) (Dutch)
 sc1torn		// Tornado (Bellfruit)
+sc1torna
 sc1tri		// Tri Star (Bellfruit)
+sc1tria
+sc1triap
+sc1trib
+sc1tribp
 sc1typ		// Typhoon Club (Bellfruit)
+sc1typp
 sc1ult		// Ultimate (Bellfruit)
 sc1vent		// Ventura (Bellfruit)
 sc1vict		// Victory (Bellfruit)
 sc1voy		// Voyager (Bellfruit)
-sc1voya		//
+sc1voya
 sc1winfl	// Winfalls (Bellfruit)
 sc1winst	// Winning Streak (Bellfruit)
+sc1winstp
+sc1winsta
+sc1winstb
+sc1winstbp
+sc1winstc
+sc1winstcp
+sc1winstd
+sc1winstdp
+sc1winste
+sc1winstep
+sc1winstf
+sc1winstfp
+sc1winstg
 sc1zep		// Zeppelin (Bellfruit)
 sc1wthn		// Wild Thing (Eurocoin)
 sc1days		// All In A Days Work (Global)
+sc1daysa
 sc1cscl		// Cash Classic (Global)
+sc1cscla
+sc1csclb	//Maygay?
+sc1csclc	//Maygay?
 sc1driv		// Driving School (Global)
+sc1driva
+sc1drivb
+sc1drivc
 sc1vsd		// Vegas Super Deal (Global)
 sc1moonl	// Moon Lite (Bwb)
 sc1ltdv		// Little Devil (Pcp)
@@ -11972,10 +12041,14 @@ sc1t1k		// Top 1000 (Eurocoin)
 sc1dip		// Diplomat (Eurocoin)
 sc1lamb		// Lambada (Eurocoin)
 sc1reply	// Replay (Eurocoin)
-sc1smoke	//
-sc1ccroc	//
-sc1crocr	//
-sc1btclk	//
+sc1smoke	// Smokey Vs The Bandit (Mdm)
+sc1smokea
+sc1ccroc	// Crazy Crocs (Mdm)
+sc1ccroca
+sc1ccrocb
+sc1ccrocc
+sc1crocr	// Croc And Roll (Mdm)
+sc1btclk	// Beat The Clock (Mdm)
 sc1btbc		// Beat The Bank Club (Bellfruit)
 sc1boncl	// Bonanza Club (Bellfruit)
 sc1clins	// Cash Lines (Bellfruit)
@@ -11994,21 +12067,23 @@ sc1strk		// Strike (Bellfruit)
 sc1supfl	// Super Flush (Bellfruit)
 sc1ofs56	// zzz_unk ofs56cp (Bellfruit)
 sc1frpus	// Fruit Pursuit (Bellfruit)
-sc1wof		//
+sc1wof		// Wheel Of Fortune (Global)
 sc1wofa		//
 sc1wofb		//
-sc1crzyc	//
+sc1crzyc	// Crazy Cash (Global)
 sc1crzyca	//
-sc1clbdy	//
+sc1clbdy	// Club Dynamite (Global)
 sc1clbdya	//
-sc1chqfl	//
-sc1s1000	//
+sc1chqfl	// Chequered Flag (Global)
+sc1s1000	// Super 1000 (Deltasoft)
 sc1cdm		// Club Diamond (Crystal)
 sc1hfcc		// Hi-Flyer Club (Crystal)
-sc1twice	//
-sc1chain	//
-sc1potp		//
-sc1potpa	//
+sc1twice	// Twice As Nice (Associated Leisure)
+sc1chain	// Chain Reaction (Bellfruit)
+sc1chainp
+sc1chaina
+sc1potp		// Pick Of The Pack (Bellfruit)
+sc1potpa	// Double Dealer (Bellfruit)?
 sc1scunk	//
 
 // Scorpion 1 + Adder Video board
