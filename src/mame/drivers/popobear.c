@@ -6,6 +6,8 @@
 
 	TODO:
 	- sprites;
+	- tilemap effects (scrolling, colscroll, linescroll);
+	- BGM seems quite off, YM2413 core bug?
 	- I/Os;
 	- IRQ generation;
 	- Port 0x620000 is quite a mystery, some silly protection?
@@ -83,6 +85,7 @@ public:
 		m_maincpu(*this,"maincpu")
 		{ }
 
+	UINT16 *m_vregs;
 	UINT16 *m_vram;
 	UINT16 *m_spr;
 	required_device<cpu_device> m_maincpu;
@@ -98,7 +101,10 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	popobear_state *state = machine.driver_data<popobear_state>();
 	UINT8* vram = (UINT8 *)state->m_vram;
 	int count;
+//	const UINT8 vreg_base[] = { 0x6/2, 0xa/2, 0x10/2, 0x14/2 };
 
+//	count = (state->m_vregs[vreg_base[layer_n]]<<5);
+//	count &= 0xfc000;
 	count = (0xf0000+layer_n*0x4000);
 
 	for(int y=0;y<32;y++)
@@ -119,12 +125,12 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 				{
 					UINT8 color;
 
-					color = (vram[(xi+yi*1024)+xtile+ytile] & 0xff);
+					color = (vram[((xi+yi*1024)+xtile+ytile) & 0xfffff] & 0xff);
 
 					if(cliprect.contains(x*8+xi+1, y*8+yi) && color)
 						bitmap.pix16(y*8+yi, x*8+xi+1) = machine.pens[color];
 
-					color = (vram[(xi+1+yi*1024)+xtile+ytile] & 0xff);
+					color = (vram[((xi+1+yi*1024)+xtile+ytile) & 0xfffff] & 0xff);
 
 					if(cliprect.contains(x*8+xi, y*8+yi) && color)
 						bitmap.pix16(y*8+yi, x*8+xi) = machine.pens[color];
@@ -136,77 +142,95 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	}
 }
 
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	popobear_state *state = machine.driver_data<popobear_state>();
+	UINT8* vram = (UINT8 *)state->m_spr;
+	int i;
+	#if 0
+	static int bank_test = 1;
+
+	if(machine.input().code_pressed_once(KEYCODE_Z))
+		bank_test<<=1;
+
+	if(machine.input().code_pressed_once(KEYCODE_X))
+		bank_test>>=1;
+
+	popmessage("%02x",bank_test);
+	#endif
+
+	/*
+	???? ---- ---- ---- unused?
+	---- xxxx ---- ---- priority?
+	---- ---- x--- ---- Y direction
+	---- ---- -x-- ---- X direction
+	---- ---- --xx ---- width
+	---- ---- ---- xx-- color bank
+	---- ---- ---- --xx height?
+	*/
+
+	/* 0x106 = 8 x 8 */
+	/* 0x*29 = 32 x 32 */
+	for(i = 0x800-8;i >= 0; i-=8)
+	{
+		int y = vram[i+0x7f800+2]|(vram[i+0x7f800+3]<<8);
+		int x = vram[i+0x7f800+4]|(vram[i+0x7f800+5]<<8);
+		int spr_num = vram[i+0x7f800+6]|(vram[i+0x7f800+7]<<8);
+		int param = vram[i+0x7f800+0]|(vram[i+0x7f800+1]<<8);
+		int width = 8 << ((param & 0x30)>>4);
+		int height = 32;
+		int color_bank = (param & 0xc)<<4;
+		int x_dir = param & 0x40;
+		int y_dir = param & 0x80;
+
+		if(param == 0)
+			continue;
+
+		//if(param & bank_test)
+		//	continue;
+
+		spr_num <<= 3;
+
+		for(int yi=0;yi<height;yi++)
+		{
+			for(int xi=0;xi<width;xi+=2)
+			{
+				UINT8 color;
+				int x_res,y_res;
+
+				color = (vram[spr_num] & 0xff);
+				x_res = (x_dir) ? x+0+(width - xi) : x+1+xi;
+				y_res = (y_dir) ? y+(height - yi) : y+yi;
+
+				if(cliprect.contains(x_res, y_res) && color)
+					bitmap.pix16(y_res, x_res) = machine.pens[color+0x100+color_bank];
+
+				color = (vram[spr_num+1] & 0xff);
+				x_res = (x_dir) ? x+1+(width - xi) : x+0+xi;
+				y_res = (y_dir) ? y+(height - yi) : y+yi;
+
+				if(cliprect.contains(x_res, y_res) && color)
+					bitmap.pix16(y_res, x_res) = machine.pens[color+0x100+color_bank];
+
+				spr_num+=2;
+			}
+		}
+	}
+}
+
 SCREEN_UPDATE_IND16( popobear )
 {
-	//popobear_state *state = screen.machine().driver_data<popobear_state>();
+	popobear_state *state = screen.machine().driver_data<popobear_state>();
 
 	bitmap.fill(0, cliprect);
 
-	if(1)
-	{
-		draw_layer(screen.machine(),bitmap,cliprect,3);
-		draw_layer(screen.machine(),bitmap,cliprect,2);
-		draw_layer(screen.machine(),bitmap,cliprect,1);
-		draw_layer(screen.machine(),bitmap,cliprect,0);
-	}
+	//popmessage("%04x",state->m_vregs[0/2]);
 
-	if(0)
-	{
-		popobear_state *state = screen.machine().driver_data<popobear_state>();
-	int x,y,count;
-		UINT8* spr = (UINT8 *)state->m_spr;
-		static int m_test_x,m_test_y,m_start_offs;
-
-	if(screen.machine().input().code_pressed(KEYCODE_Z))
-		m_test_x++;
-
-	if(screen.machine().input().code_pressed(KEYCODE_X))
-		m_test_x--;
-
-	if(screen.machine().input().code_pressed(KEYCODE_A))
-		m_test_y++;
-
-	if(screen.machine().input().code_pressed(KEYCODE_S))
-		m_test_y--;
-
-	if(screen.machine().input().code_pressed(KEYCODE_Q))
-		m_start_offs+=0x200;
-
-	if(screen.machine().input().code_pressed(KEYCODE_W))
-		m_start_offs-=0x200;
-
-	if(screen.machine().input().code_pressed(KEYCODE_E))
-		m_start_offs++;
-
-	if(screen.machine().input().code_pressed(KEYCODE_R))
-		m_start_offs--;
-
-	popmessage("%d %d %04x",m_test_x,m_test_y,m_start_offs);
-
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-
-	count = (m_start_offs);
-
-	for(y=0;y<m_test_y;y++)
-	{
-		for(x=0;x<m_test_x;x+=2)
-		{
-			UINT32 color;
-
-			color = (spr[count] & 0xff)>>0;
-
-			if(cliprect.contains(x+1, y))
-				bitmap.pix16(y, x+1) = screen.machine().pens[color+0x100];
-
-			color = (spr[count+1] & 0xff)>>0;
-
-			if(cliprect.contains(x, y))
-				bitmap.pix16(y, x) = screen.machine().pens[color+0x100];
-
-			count+=2;
-		}
-	}
-	}
+	draw_layer(screen.machine(),bitmap,cliprect,3);
+	draw_layer(screen.machine(),bitmap,cliprect,2);
+	draw_layer(screen.machine(),bitmap,cliprect,1);
+	draw_layer(screen.machine(),bitmap,cliprect,0);
+	draw_sprites(screen.machine(),bitmap,cliprect);
 
 	return 0;
 }
@@ -237,27 +261,27 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_BASE_MEMBER(popobear_state, m_vram)
 
 	/* Most if not all of these are vregs */
-	AM_RANGE(0x480000, 0x480001) AM_NOP //AM_READ(popo_480001_r) AM_WRITE(popo_480001_w)
-	AM_RANGE(0x480018, 0x480019) AM_NOP //AM_WRITE(popo_480018_w)
-	AM_RANGE(0x48001a, 0x48001b) AM_NOP //AM_WRITE(popo_48001a_w)
-	AM_RANGE(0x48001c, 0x48001d) AM_NOP //AM_READ(popo_48001c_r) AM_WRITE(popo_48001c_w)
-	AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(popo_480020_r) AM_WRITE(popo_480020_w)
-	AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(popo_480028_w)
-	AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(popo_48002c_w)
+	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_BASE_MEMBER(popobear_state, m_vregs)
+	AM_RANGE(0x480020, 0x480023) AM_RAM
+	AM_RANGE(0x480028, 0x48002d) AM_RAM
+//	AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(popo_480020_r) AM_WRITE(popo_480020_w)
+//	AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(popo_480028_w)
+//	AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(popo_48002c_w)
 	AM_RANGE(0x480030, 0x480031) AM_WRITE8(popobear_irq_ack_w, 0x00ff)
-	AM_RANGE(0x48003a, 0x48003b) AM_NOP //AM_READ(popo_48003a_r) AM_WRITE(popo_48003a_w)
+	AM_RANGE(0x480034, 0x480035) AM_RAM // coin counter or coin lockout
+	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ(popo_48003a_r) AM_WRITE(popo_48003a_w)
 
 	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x500000, 0x500001) AM_NOP //AM_READ(popo_500000_r) // watchdog?
-	AM_RANGE(0x520000, 0x520001) AM_READ_PORT("DSW4")
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")
+	AM_RANGE(0x520000, 0x520001) AM_READ_PORT("IN1")
 	AM_RANGE(0x540000, 0x540001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x550000, 0x550003) AM_DEVWRITE8( "ymsnd", ym2413_w, 0x00ff )
 
-//	AM_RANGE(0x600000, 0x600001) AM_WRITE(popo_600000_w)
-	AM_RANGE(0x620000, 0x620001) AM_READ8(popo_620000_r,0xff00) //AM_WRITE(popo_620000_w)
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("gfx2", 0) // correct?
+	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
+	AM_RANGE(0x620000, 0x620001) AM_READ8(popo_620000_r,0xff00) AM_WRITENOP
+	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("gfx1", 0) // u5 & u6
+	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("gfx2", 0) // u7 & u8
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( popobear )
@@ -312,33 +336,25 @@ static INPUT_PORTS_START( popobear )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, "DSW3:1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW3:2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW3:3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DSW3:4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DSW3:5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DSW3:6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DSW3:7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DSW3:8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW4")
+	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -363,9 +379,7 @@ static INPUT_PORTS_START( popobear )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -381,14 +395,9 @@ static INPUT_PORTS_START( popobear )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 INPUT_PORTS_END
-
 
 
 static TIMER_DEVICE_CALLBACK( popobear_irq )
@@ -398,20 +407,21 @@ static TIMER_DEVICE_CALLBACK( popobear_irq )
 
 	/* TODO: one of those is a timer irq, tied with YM2413 */
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 2, ASSERT_LINE);
+		device_set_input_line(state->m_maincpu, 5, ASSERT_LINE);
 
-	if(scanline == 128)
+	if(scanline == 0)
 		device_set_input_line(state->m_maincpu, 3, ASSERT_LINE);
 
-	if(scanline == 32)
-		device_set_input_line(state->m_maincpu, 5, ASSERT_LINE);
+	if(scanline == 64 || scanline == 192)
+		device_set_input_line(state->m_maincpu, 2, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_CPU_PROGRAM_MAP(popobear_mem)
 	// levels 2,3,5 look interesting
-	//MCFG_CPU_VBLANK_INT("screen",irq3_line_hold)
+	//MCFG_CPU_VBLANK_INT("screen",irq5_line_assert)
+	//MCFG_CPU_PERIODIC_INT(irq2_line_assert,120)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", popobear_irq, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -429,7 +439,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/10)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_42MHz/32, OKIM6295_PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
