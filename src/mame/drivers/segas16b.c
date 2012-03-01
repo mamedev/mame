@@ -3546,7 +3546,10 @@ ROM_END
 /**************************************************************************************************************************
     Alien Syndrome, Sega System 16B
     CPU: FD1089A (317-0033)
-    ROM Board: 171-5358?
+    ROM Board: 171-5358
+    Sega game ID: 833-6308-03
+      Main board: 837-6312
+       Rom board: 834-6311-03
 */
 ROM_START( aliensyn3 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
