@@ -194,7 +194,6 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
 #include "machine/6532riot.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -693,6 +692,15 @@ static INTERRUPT_GEN( gottlieb_interrupt )
  *  Main CPU memory handlers
  *
  *************************************/
+ 
+static WRITE8_HANDLER( gottlieb_sh_w )
+{
+	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
+	if (state->m_r1_sound != NULL)
+		state->m_r1_sound->write(*space, offset, data);
+	if (state->m_r2_sound != NULL)
+		state->m_r2_sound->write(*space, offset, data);
+}
 
 static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
@@ -791,8 +799,6 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_INCLUDE(gottlieb1_sound)
-
 	PORT_START("TRACKX")	/* trackball H */
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
 
@@ -848,8 +854,6 @@ static INPUT_PORTS_START( qbert )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-
-	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
 
@@ -904,8 +908,6 @@ static INPUT_PORTS_START( insector )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-
-	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
 
@@ -957,8 +959,6 @@ static INPUT_PORTS_START( tylz )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
 
@@ -1014,8 +1014,6 @@ static INPUT_PORTS_START( argusg )
 
 	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
-
-	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
 
@@ -1069,8 +1067,6 @@ static INPUT_PORTS_START( mplanets )
 
 	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-
-	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
 
@@ -1124,8 +1120,6 @@ static INPUT_PORTS_START( krull )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
-
-	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
 
@@ -1170,8 +1164,6 @@ static INPUT_PORTS_START( kngtmare )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
-
-	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
 
@@ -1232,8 +1224,6 @@ static INPUT_PORTS_START( qbertqub )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
 
@@ -1293,8 +1283,6 @@ static INPUT_PORTS_START( curvebal )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bunt") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
 
@@ -1349,8 +1337,6 @@ static INPUT_PORTS_START( screwloo )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start 1P") PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
 
@@ -1405,8 +1391,6 @@ static INPUT_PORTS_START( mach3 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cobram3 )
@@ -1460,8 +1444,6 @@ static INPUT_PORTS_START( cobram3 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
 
@@ -1507,8 +1489,6 @@ static INPUT_PORTS_START( usvsthem )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
 
@@ -1575,8 +1555,6 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-
-	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
 
@@ -1628,8 +1606,6 @@ static INPUT_PORTS_START( vidvince )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
 
@@ -1682,8 +1658,6 @@ static INPUT_PORTS_START( wizwarz )
 
 	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-
-	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
 
@@ -1739,103 +1713,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound interfaces
- *
- *************************************/
-
-static const char *const reactor_sample_names[] =
-{
-	"*reactor",
-	"fx_53", /* "8 left" */
-	"fx_54", /* "16 left" */
-	"fx_55", /* "24 left" */
-	"fx_56", /* "32 left" */
-	"fx_57", /* "40 left" */
-	"fx_58", /* "warning, core unstable" */
-	"fx_59", /* "bonus" */
-	"fx_31", /* "chamber activated" */
-	"fx_39a", /* "2000" */
-	"fx_39b", /* "5000" */
-	"fx_39c", /* "10000" */
-	"fx_39d", /* "15000" */
-	"fx_39e", /* "20000" */
-	"fx_39f", /* "25000" */
-	"fx_39g", /* "30000" */
-	"fx_39h", /* "35000" */
-	"fx_39i", /* "40000" */
-	"fx_39j", /* "45000" */
-	"fx_39k", /* "50000" */
-	"fx_39l", /* "55000" */
-     0	/* end of array */
-};
-
-static const char *const qbert_sample_names[] =
-{
-	"*qbert",
-	"fx_17a", /* random speech, voice clock 255 */
-	"fx_17b", /* random speech, voice clock 255 */
-	"fx_17c", /* random speech, voice clock 255 */
-	"fx_17d", /* random speech, voice clock 255 */
-	"fx_17e", /* random speech, voice clock 255 */
-	"fx_17f", /* random speech, voice clock 255 */
-	"fx_17g", /* random speech, voice clock 255 */
-	"fx_17h", /* random speech, voice clock 255 */
-	"fx_18a", /* random speech, voice clock 176 */
-	"fx_18b", /* random speech, voice clock 176 */
-	"fx_18c", /* random speech, voice clock 176 */
-	"fx_18d", /* random speech, voice clock 176 */
-	"fx_18e", /* random speech, voice clock 176 */
-	"fx_18f", /* random speech, voice clock 176 */
-	"fx_18g", /* random speech, voice clock 176 */
-	"fx_18h", /* random speech, voice clock 176 */
-	"fx_19a", /* random speech, voice clock 128 */
-	"fx_19b", /* random speech, voice clock 128 */
-	"fx_19c", /* random speech, voice clock 128 */
-	"fx_19d", /* random speech, voice clock 128 */
-	"fx_19e", /* random speech, voice clock 128 */
-	"fx_19f", /* random speech, voice clock 128 */
-	"fx_19g", /* random speech, voice clock 128 */
-	"fx_19h", /* random speech, voice clock 128 */
-	"fx_20a", /* random speech, voice clock 96 */
-	"fx_20b", /* random speech, voice clock 96 */
-	"fx_20c", /* random speech, voice clock 96 */
-	"fx_20d", /* random speech, voice clock 96 */
-	"fx_20e", /* random speech, voice clock 96 */
-	"fx_20f", /* random speech, voice clock 96 */
-	"fx_20g", /* random speech, voice clock 96 */
-	"fx_20h", /* random speech, voice clock 96 */
-	"fx_21a", /* random speech, voice clock 62 */
-	"fx_21b", /* random speech, voice clock 62 */
-	"fx_21c", /* random speech, voice clock 62 */
-	"fx_21d", /* random speech, voice clock 62 */
-	"fx_21e", /* random speech, voice clock 62 */
-	"fx_21f", /* random speech, voice clock 62 */
-	"fx_21g", /* random speech, voice clock 62 */
-	"fx_21h", /* random speech, voice clock 62 */
-	"fx_22", /* EH2 with decreasing voice clock */
-	"fx_23", /* O1 with varying voice clock */
-	"fx_28",
-	"fx_36",
-	"knocker",
-	0	/* end of array */
-};
-
-static const samples_interface qbert_samples_interface =
-{
-	1,	/* one channel */
-	qbert_sample_names
-};
-
-static const samples_interface reactor_samples_interface =
-{
-	1,	/* one channel */
-	reactor_sample_names
-};
-
-
-
-/*************************************
- *
  *  Core machine drivers
  *
  *************************************/
@@ -1862,23 +1739,32 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 
 	MCFG_VIDEO_START(gottlieb)
 
-	/* sound hardware */
+	// basic speaker configuration
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gottlieb1, gottlieb_core )
-	MCFG_FRAGMENT_ADD(gottlieb_soundrev1)
+	MCFG_GOTTLIEB_SOUND_R1_ADD("r1sound")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( gottlieb1_votrax, gottlieb_core )
+	MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX("r1sound")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gottlieb2, gottlieb_core )
-	MCFG_FRAGMENT_ADD(gottlieb_soundrev2)
+	MCFG_GOTTLIEB_SOUND_R2_ADD("r2sound")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
-	MCFG_FRAGMENT_ADD(gottlieb_soundrev2)
+	MCFG_GOTTLIEB_SOUND_R2_ADD("r2sound")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(laserdisc_audio_process), device))
@@ -1890,6 +1776,7 @@ static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 MACHINE_CONFIG_END
+
 
 
 /*************************************
@@ -1898,6 +1785,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
+#if USE_FAKE_VOTRAX
+
 static MACHINE_CONFIG_DERIVED( reactor, gottlieb1 )
 
 	/* basic machine hardware */
@@ -1905,19 +1794,30 @@ static MACHINE_CONFIG_DERIVED( reactor, gottlieb1 )
 	MCFG_CPU_PROGRAM_MAP(reactor_map)
 
 	MCFG_DEVICE_REMOVE("nvram")
-
-	/* sound hardware */
-	MCFG_SAMPLES_ADD("samples", reactor_samples_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FRAGMENT_ADD(reactor_samples)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( qbert, gottlieb1 )
-
-	/* video hardware */
-	MCFG_SAMPLES_ADD("samples", qbert_samples_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FRAGMENT_ADD(qbert_samples)
 MACHINE_CONFIG_END
+
+#else
+
+static MACHINE_CONFIG_DERIVED( reactor, gottlieb1_votrax )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(reactor_map)
+
+	MCFG_DEVICE_REMOVE("nvram")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( qbert, gottlieb1_votrax )
+MACHINE_CONFIG_END
+
+#endif
 
 
 static MACHINE_CONFIG_DERIVED( screwloo, gottlieb2 )
@@ -1926,7 +1826,8 @@ static MACHINE_CONFIG_DERIVED( screwloo, gottlieb2 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
-	MCFG_FRAGMENT_ADD(gottlieb_cobram3_soundrev2)
+	MCFG_GOTTLIEB_SOUND_R2_ADD_COBRAM3("r2sound")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(laserdisc_audio_process), device))
@@ -1939,9 +1840,9 @@ static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("dac1")
+	MCFG_SOUND_MODIFY("r2sound:dac")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1962,7 +1863,7 @@ ROM_START( reactor )
 	ROM_LOAD( "rom1",         0xe000, 0x1000, CRC(944e1ddf) SHA1(6b487f1cb405e2ba9345190e8ab6022c790882c1) )
 	ROM_LOAD( "rom0",         0xf000, 0x1000, CRC(55930aed) SHA1(37ed60386935741e8cc0b8750bfcdf6f54c1bf9e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "snd1",         0x7000, 0x800, CRC(d958a0fd) SHA1(3c383076c68a929f96d844e89b09f3075f331906) )
 	ROM_LOAD( "snd2",         0x7800, 0x800, CRC(5dc86942) SHA1(a449fcfb25521a0e7523184518b5204dac56e5f8) )
 
@@ -1983,7 +1884,7 @@ ROM_START( qbert )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(55635447) SHA1(ca6acdef1c9e06b33efe1f0a2df2dfb03723cfbe) )
 	ROM_LOAD( "qb-rom0.bin",  0xe000, 0x2000, CRC(8e318641) SHA1(7f8f66d1e6a7905e93cce07fc92e8801370b7194) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
 	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
@@ -2004,7 +1905,7 @@ ROM_START( qberta )
 	ROM_LOAD( "qrom_1.bin",  0xc000, 0x2000, CRC(19d924e3) SHA1(af55ecb5b650e7b069d8be67eb9a9d0f3e69e3f1) )
 	ROM_LOAD( "qrom_0.bin",  0xe000, 0x2000, CRC(2e7fad1b) SHA1(5c1feafe00c21ddddde67ab0093e847a5fc9ec2d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
 	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
@@ -2025,7 +1926,7 @@ ROM_START( qbertj )
 	ROM_LOAD( "qbj-rom1.bin", 0xc000, 0x2000, CRC(c61216e7) SHA1(e727b85dddc2963e33af6c02b675243f6fbe2710) )
 	ROM_LOAD( "qbj-rom0.bin", 0xe000, 0x2000, CRC(69679d5c) SHA1(996d45517d0c01a1952fead05dbe201dbb7dca35) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
 	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
@@ -2046,7 +1947,7 @@ ROM_START( myqbert )
 	ROM_LOAD( "mqb-rom1.bin",  0xc000, 0x2000, CRC(11f0a4e4) SHA1(a805e51c40042fae209ace277abd9b35a990905b) )
 	ROM_LOAD( "mqb-rom0.bin",  0xe000, 0x2000, CRC(12a90cb2) SHA1(a33203aea79fe43d1233a16e3fdddaceac6e4a20) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "mqb-snd1.bin",  0x7000, 0x800, CRC(495ffcd2) SHA1(b2c16fffbd6af1c17fdb1a99844819e6ee0550ee) )
 	ROM_LOAD( "mqb-snd2.bin",  0x7800, 0x800, CRC(9bbaa945) SHA1(13791b69cd6f426ad77a7d0537b10012feb0bc87) )
 
@@ -2067,7 +1968,7 @@ ROM_START( qberttst )
 	ROM_LOAD( "qbtst1.bin",   0xc000, 0x2000, CRC(e97fdd78) SHA1(98dd07043a72273240c593650aa9947199347870) )
 	ROM_LOAD( "qbtst0.bin",   0xe000, 0x2000, CRC(94c9f588) SHA1(f586bcd8e6762614bed634a007508abea071754c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
 	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
@@ -2089,7 +1990,7 @@ ROM_START( qbtrktst )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(55635447) SHA1(ca6acdef1c9e06b33efe1f0a2df2dfb03723cfbe) )
 	ROM_LOAD( "gv103_t-ball-test_rom0_2764.c11c12",  0xe000, 0x2000, CRC(5d390cd2) SHA1(9031926a6f6179e340b67c3a7949062b4a75e3cf) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
 	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
@@ -2112,7 +2013,7 @@ ROM_START( insector )
 	ROM_LOAD( "rom1",         0xc000, 0x2000, CRC(706962af) SHA1(e40b567fdf6a3f7c6485808b4db45cea322c7724) )
 	ROM_LOAD( "rom0",         0xe000, 0x2000, CRC(31cee24b) SHA1(3d21f5d530cc022f9633ad487e13a664848dd3e6) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "gv106s.bin",   0x7000, 0x1000, CRC(25bcc8bc) SHA1(adf401901f1479a5bffaed85135669b1133334b4) )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
@@ -2134,7 +2035,7 @@ ROM_START( tylz )
 	ROM_LOAD( "tylz.r4",         0xc000, 0x2000, CRC(657c3d2e) SHA1(9908a2dd5109e632dff38b8b4b56160615355200) )
 	ROM_LOAD( "tylz.n4",         0xe000, 0x2000, CRC(b2a15510) SHA1(15db4d1a2fb70d8111940246cd7a8ae06403cac5) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "tylz.f2",   0x7000, 0x1000, CRC(ebcedba9) SHA1(94aee8e32bdc80bbc5dc1423ca97597bdb9d808c) )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
@@ -2159,7 +2060,7 @@ ROM_START( argusg )
 	ROM_LOAD( "arg_rom1_2764.c12c13",     0xc000, 0x2000, CRC(733d3d44) SHA1(03c11e89ed6906c0383dc19c0db2d21ebe69b128) )
 	ROM_LOAD( "arg_rom0_2764.c11c12",     0xe000, 0x2000, CRC(e1906355) SHA1(4735370ff0dfe381358dfa41d82fab455ec3c016) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "arg_snd1_2716.u5",  0x7000, 0x800, CRC(3a6cf455) SHA1(0c701aa4d956947a101212b494b030cd2df5a2d6) )
 	ROM_LOAD( "arg_snd2_2716.u6",  0x7800, 0x800, CRC(ddf32040) SHA1(61ae22faa013b29a5fbd9520073f172a98ca38ec) )
 
@@ -2184,7 +2085,7 @@ ROM_START( mplanets )
 
 	/* note from f205v: my original Gottlieb PCB only sports one 2732 sound EPROM labeled "snd.3h"
     It contains the two joint roms you can find herefollowing, therefore the sound is identical */
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "snd1",         0x7000, 0x0800, CRC(453193a1) SHA1(317ec81f71661eaa92624c0304a52b635dcd5613) )
 	ROM_LOAD( "snd2",         0x7800, 0x0800, CRC(f5ffc98f) SHA1(516e895df94942fc51f1b51eb9316d4296df82e7) )
 
@@ -2207,7 +2108,7 @@ ROM_START( mplanetsuk )
 	ROM_LOAD( "mpt_rom1.bin", 0xc000, 0x2000, CRC(94d67b87) SHA1(2cbf09f0ba3b6769de90d8f61913fec3010553e2) )
 	ROM_LOAD( "mpt_rom0.bin", 0xe000, 0x2000, CRC(a9e30ad2) SHA1(39d830dda92ab5a6dbb44943be92bca0464e64e0) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "mpt_snd1.bin", 0x7000, 0x800, CRC(453193a1) SHA1(317ec81f71661eaa92624c0304a52b635dcd5613) )
 	ROM_LOAD( "mpt_snd2.bin", 0x7800, 0x800, CRC(f5ffc98f) SHA1(516e895df94942fc51f1b51eb9316d4296df82e7) )
 
@@ -2233,7 +2134,7 @@ ROM_START( krull )
 	ROM_LOAD( "rom1.bin",     0xc000, 0x2000, CRC(1ad956a3) SHA1(f5b74b196fe1bd9ab48336e0051cbf29c650cfc1) )
 	ROM_LOAD( "rom0.bin",     0xe000, 0x2000, CRC(a466afae) SHA1(d691cbb46e8c3b71f9b1688d7fcef36df82aa854) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "snd1.bin",     0x6000, 0x1000, CRC(dd2b30b4) SHA1(f01cb64932493bf69d4fc75a7fa809ff6f6e4263) )
 	ROM_LOAD( "snd2.bin",     0x7000, 0x1000, CRC(8cab901b) SHA1(b886532828efc8cf442e2ee4ebbfe37acd489f62) )
 
@@ -2255,7 +2156,7 @@ ROM_START( kngtmare )
 	ROM_LOAD( "gv112_rom1_2764.c12c13", 0xc000, 0x2000, CRC(5b340640) SHA1(8ccad017d5b9b748327baf22ff51d30ee96cb25e) )
 	ROM_LOAD( "gv112_rom0_2764.c11c12", 0xe000, 0x2000, CRC(620dc629) SHA1(0d94b7c50ef499eb9bb3f4986a8d29547181f7ea) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "gv112_snd",              0x7000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
@@ -2276,7 +2177,7 @@ ROM_START( sqbert )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(eaf3076c) SHA1(749a87b3c40ba0a2ecd2ca962786e066daf63e30) )
 	ROM_LOAD( "qb-rom0.bin",  0xe000, 0x2000, CRC(61260a7e) SHA1(e2028a453aa34aaffa2c465f64a963504315df3c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
 	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
@@ -2299,7 +2200,7 @@ ROM_START( qbertqub )
 	ROM_LOAD( "qq-rom1.bin",  0xc000, 0x2000, CRC(63e6c43d) SHA1(9435eb06dc069e5bf1c439f0c772fef3183745b0) )
 	ROM_LOAD( "qq-rom0.bin",  0xe000, 0x2000, CRC(8ddbe438) SHA1(31112d711af5d4039491e99a0be0c088b3272482) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "qq-snd1.bin",  0x7000, 0x800, CRC(e704b450) SHA1(d509f54658e9f0264b9ab865a6f36e5423a28904) )
 	ROM_LOAD( "qq-snd2.bin",  0x7800, 0x800, CRC(c6a98bf8) SHA1(cc5b5bb5966f5d79226f1f665a3f9fc934f4ef7f) )
 
@@ -2322,7 +2223,7 @@ ROM_START( curvebal )
 	ROM_LOAD( "cb-rom-1.chp", 0xc000, 0x2000, CRC(eb1e08bd) SHA1(f558664df12e4e15ef2779a0bdf99538f8c43ca3) )
 	ROM_LOAD( "cb-rom-0.chp", 0xe000, 0x2000, CRC(401fc7e3) SHA1(86ca53cb6f1d88d5a95baa9524c6b42a1f7fc9c2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "yrom.sbd",     0x6000, 0x1000, CRC(4c313d9b) SHA1(c61a8c827f4b199fdfb6ffc0bc6cca396c73625e) )
 	ROM_LOAD( "drom.sbd",     0x7000, 0x1000, CRC(cecece88) SHA1(4c6639f6f89f80b04b6ffbb5004ea2121e71f504) )
 
@@ -2346,10 +2247,10 @@ ROM_START( screwloo )
 	ROM_LOAD( "rom1",         0xc000, 0x2000, CRC(571b65ca) SHA1(75077f4fab296b3802271fa77af588003570cde6) )
 	ROM_LOAD( "rom0",         0xe000, 0x2000, CRC(6447fe54) SHA1(6391c841cafd35dd315d9fac99ed5d8304018747) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
 	ROM_LOAD( "drom1",        0xc000, 0x2000, CRC(ae965ade) SHA1(84a690cba8990fe6406b7cfbd6ea643a48446567) )
 
-	ROM_REGION( 0x10000, "speech", 0 )
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
 	ROM_LOAD( "yrom1",        0xe000, 0x2000, CRC(3719b0b5) SHA1(4f215ca2f15956374c4cd9484b6798f1c4d60fc7) )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
@@ -2372,10 +2273,10 @@ ROM_START( mach3 )
 	ROM_LOAD( "m3rom1.bin",   0xc000, 0x2000, CRC(3b0ba80b) SHA1(bc7e961311b40f05f2998f10f0a68f2e515c8e66) )
 	ROM_LOAD( "m3rom0.bin",   0xe000, 0x2000, CRC(70c12bf4) SHA1(c26127b6e2a16791b3be8abac93be6af4f30fb3b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
 	ROM_LOAD( "m3drom1.bin",  0xd000, 0x1000, CRC(a6e29212) SHA1(a73aafc2efa99e9ae0aecbb6075a10f7178ac938) )
 
-	ROM_REGION( 0x10000, "speech", 0 )
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
 	ROM_LOAD( "m3yrom1.bin",  0xf000, 0x1000, CRC(eddf8872) SHA1(29ed0d1828639849bab826b3e2ab4eefac45fd85) )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
@@ -2400,10 +2301,10 @@ ROM_START( cobram3 )
 	ROM_LOAD( "bh01",   0xc000, 0x2000, CRC(7d86ab08) SHA1(26b7eb089ca3fe3f8b1531316ce8f95e33b380e5) )
 	ROM_LOAD( "bh00",   0xe000, 0x2000, CRC(c19ad038) SHA1(4d20ae70d8ad1eaa61cb91d7a0cff6932fce30d2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
 	ROM_LOAD( "m3drom1.bin",  0xd000, 0x1000, CRC(a6e29212) SHA1(a73aafc2efa99e9ae0aecbb6075a10f7178ac938) )
 
-	ROM_REGION( 0x10000, "speech", 0 )
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
 	ROM_LOAD( "bh04",   0xe000, 0x2000, CRC(c3f61bc9) SHA1(d02374e6e29238def0cfb01c96c78b206f24d77e) )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
@@ -2429,10 +2330,10 @@ ROM_START( usvsthem )
 	ROM_LOAD( "usvs.rm1",     0xc000, 0x2000, CRC(697bc989) SHA1(ebfc0868f949e5aba1efb8fbce06f795888d8e00) )
 	ROM_LOAD( "usvs.rm0",     0xe000, 0x2000, CRC(30cf6bd9) SHA1(527ad3b96ea4a77f6d6f8a89a9215da490292297) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
 	ROM_LOAD( "usvsdrom.1",   0xc000, 0x2000, CRC(c0b5cab0) SHA1(b18e8fd9837bb52d6b3d86f2b652f6573c7cd3b3) )
 
-	ROM_REGION( 0x10000, "speech", 0 )
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
 	ROM_LOAD( "usvsyrom.1",   0xe000, 0x2000, CRC(c3d245ca) SHA1(d281b139ae6c58e855b2914a24ca4bc5f8800681) )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
@@ -2459,10 +2360,10 @@ ROM_START( 3stooges )
 	ROM_LOAD( "gv113rom.1",   0xc000, 0x2000, CRC(34ab051e) SHA1(df416aaf34d6bbbdd79ae633842355a292ed935d) )
 	ROM_LOAD( "gv113rom.0",   0xe000, 0x2000, CRC(ab124329) SHA1(de1bc721eea74426035eec10a389f77b435aa9b9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
 	ROM_LOAD( "drom1",        0xc000, 0x2000, CRC(87a9fa10) SHA1(9c07837dce1384d6b51b716aa8ceeb5bc247a911) )
 
-	ROM_REGION( 0x10000, "speech", 0 )
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
 	ROM_LOAD( "yrom2",        0xc000, 0x2000, CRC(90f9c940) SHA1(646dacc902cf235948ac9c064c92390e2764370b) )
 	ROM_LOAD( "yrom1",        0xe000, 0x2000, CRC(55f8ab30) SHA1(a6b6318f12fd4a1fab61b82cde33759da615d5b2) )
 
@@ -2486,10 +2387,10 @@ ROM_START( vidvince )
 	ROM_LOAD( "gv132_rom1_2764.c12c13",  0xc000, 0x2000, CRC(a5bf40b7) SHA1(a5a193173fa7b764706bf8d3eaaaf18c6812e436) )
 	ROM_LOAD( "gv132_rom0_2764.c11c12",  0xe000, 0x2000, CRC(2c02b598) SHA1(0c214f6625d6ef88bf89d96776683e15cf4a85c4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
 	ROM_LOAD( "gv132_drom_snd_2764.k2",        0xc000, 0x2000, CRC(18d9d72f) SHA1(985007f49885621eb96e86dc51812983bd113550) )
 
-	ROM_REGION( 0x10000, "speech", 0 )
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
 	ROM_LOAD( "gv132_yrom2_snd_2764.k3",        0xc000, 0x2000, CRC(ff59f618) SHA1(c8b2cb1ab3b69f94dd6be87da8bdfc85c6ed8707) )
 	ROM_LOAD( "gv132_yrom1_snd_2764.n3",        0xe000, 0x2000, CRC(befa4b97) SHA1(424b40844629631a3f31cc12c61ac7000b5f3eb9) )
 
@@ -2513,10 +2414,10 @@ ROM_START( wizwarz )
 	ROM_LOAD( "gv110_rom1_2764.c12c13", 0xc000, 0x2000, CRC(358895b5) SHA1(38a4a27849ab491a6e3dd3415fe684d1c71c392d) )
 	ROM_LOAD( "gv110_rom0_2764.c11c12", 0xe000, 0x2000, CRC(f7157e17) SHA1(1b155602557ad173d74d4d5cf953b206b262987b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
 	ROM_LOAD( "gv110_drom1_snd_2732.k2",0xd000, 0x1000, CRC(05ca79da) SHA1(f9e9b0de02d618aeb73f7218a49b41d7b94c24a4) )
 
-	ROM_REGION( 0x10000, "speech", 0 )
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
 	ROM_LOAD( "gv110_yrom1_snd_2732.n3",0xf000, 0x1000, CRC(1e3de643) SHA1(7717547c6c5b1ff178595c67f19265dc59130d90) )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
@@ -2583,23 +2484,23 @@ static DRIVER_INIT( vidvince )
  *************************************/
 
 /* games using rev 1 sound board */
-GAME( 1982, reactor,   0,        reactor,   reactor,  ramtiles, ROT0,   "Gottlieb", "Reactor", GAME_IMPERFECT_SOUND )
-GAME( 1982, qbert,     0,        qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1982, qberta,    qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1982, qbertj,    qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1982, myqbert,   qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Mello Yello Q*bert", GAME_IMPERFECT_SOUND )
-GAME( 1982, qberttst,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", GAME_IMPERFECT_SOUND )
-GAME( 1982, qbtrktst,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", GAME_IMPERFECT_SOUND )
-GAME( 1982, insector,  0,        gottlieb1, insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
-GAME( 1982, tylz,      0,        qbert,     tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
-GAME( 1984, argusg,    0,        gottlieb1, argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
-GAME( 1983, mplanets,  0,        gottlieb1, mplanets, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
-GAME( 1983, mplanetsuk,mplanets, gottlieb1, mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
-GAME( 1983, krull,     0,        gottlieb1, krull,    ramtiles, ROT270, "Gottlieb", "Krull", 0 )
-GAME( 1983, kngtmare,  0,        gottlieb1, kngtmare, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
-GAME( 1983, sqbert,    0,        qbert,     qbert,    romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", GAME_IMPERFECT_SOUND )
-GAME( 1983, qbertqub,  0,        qbert,     qbertqub, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
-GAME( 1984, curvebal,  0,        gottlieb1, curvebal, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
+GAME( 1982, reactor,   0,        reactor,   		reactor,  ramtiles, ROT0,   "Gottlieb", "Reactor", GAME_IMPERFECT_SOUND )
+GAME( 1982, qbert,     0,        qbert,  			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1982, qberta,    qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1982, qbertj,    qbert,    qbert,  			qbert,    romtiles, ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1982, myqbert,   qbert,    qbert,  			qbert,    romtiles, ROT270, "Gottlieb", "Mello Yello Q*bert", GAME_IMPERFECT_SOUND )
+GAME( 1982, qberttst,  qbert,    qbert,  			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", GAME_IMPERFECT_SOUND )
+GAME( 1982, qbtrktst,  qbert,    qbert,  			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", GAME_IMPERFECT_SOUND )
+GAME( 1982, insector,  0,        gottlieb1, 		insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
+GAME( 1982, tylz,      0,        gottlieb1_votrax,	tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1984, argusg,    0,        gottlieb1, 		argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
+GAME( 1983, mplanets,  0,        gottlieb1, 		mplanets, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
+GAME( 1983, mplanetsuk,mplanets, gottlieb1, 		mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
+GAME( 1983, krull,     0,        gottlieb1, 		krull,    ramtiles, ROT270, "Gottlieb", "Krull", 0 )
+GAME( 1983, kngtmare,  0,        gottlieb1, 		kngtmare, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
+GAME( 1983, sqbert,    0,        qbert,   			qbert,    romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", GAME_IMPERFECT_SOUND )
+GAME( 1983, qbertqub,  0,        qbert,  			qbertqub, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
+GAME( 1984, curvebal,  0,        gottlieb1, 		curvebal, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
 
 /* games using rev 2 sound board */
 GAME( 1983, screwloo, 0,        screwloo,  screwloo, screwloo, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
