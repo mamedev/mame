@@ -11,6 +11,8 @@
 #define AC_STARS			(0x04)
 #define AC_MONITOR_BW		(0x08)
 
+#define USE_FAKE_VOTRAX		(1)
+
 
 class astrocde_state : public driver_device
 {

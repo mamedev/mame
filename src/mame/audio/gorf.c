@@ -20,6 +20,7 @@ gorf_sh_ update- Null
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
+#include "sound/votrax.h"
 #include "includes/astrocde.h"
 
 
@@ -111,11 +112,12 @@ const char *const gorf_sample_names[] =
 
 READ8_HANDLER( gorf_speech_r )
 {
+	UINT8 data = offset >> 8;
+#if USE_FAKE_VOTRAX
 	astrocde_state *state = space->machine().driver_data<astrocde_state>();
 	samples_device *samples = space->machine().device<samples_device>("samples");
 	int Phoneme, Intonation;
 	int i = 0;
-	UINT8 data = offset >> 8;
 	offset &= 0xff;
 
 	state->m_totalword_ptr = state->m_totalword;
@@ -169,6 +171,11 @@ READ8_HANDLER( gorf_speech_r )
 			return data;
 		}
 	}
+#else
+	votrax_sc01_device *votrax = space->machine().device<votrax_sc01_device>("votrax");
+	votrax->inflection_w(*space, 0, data >> 6);
+	votrax->write(*space, 0, data);
+#endif
 
 	/* Note : We should really also use volume in this as well as frequency */
 	return data;				                   /* Return nicely */
@@ -177,6 +184,11 @@ READ8_HANDLER( gorf_speech_r )
 
 CUSTOM_INPUT( gorf_speech_status_r )
 {
+#if USE_FAKE_VOTRAX
 	samples_device *samples = field.machine().device<samples_device>("samples");
 	return !samples->playing(0);
+#else
+	votrax_sc01_device *votrax = field.machine().device<votrax_sc01_device>("votrax");
+	return votrax->request();
+#endif
 }

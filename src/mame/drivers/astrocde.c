@@ -118,6 +118,7 @@
 #include "machine/z80ctc.h"
 #include "machine/nvram.h"
 #include "sound/samples.h"
+#include "sound/votrax.h"
 #include "sound/astrocde.h"
 #include "sound/ay8910.h"
 
@@ -341,7 +342,11 @@ static READ8_HANDLER( gorf_io_1_r )
 		case 5: state->m_sparkle[3] = data;	break;
 		case 6:
 			space->machine().device<astrocade_device>("astrocade1")->set_output_gain(0, data ? 0.0 : 1.0);
+#if USE_FAKE_VOTRAX
 			space->machine().device<samples_device>("samples")->set_output_gain(0, data ? 1.0 : 0.0);
+#else
+			space->machine().device<votrax_sc01_device>("votrax")->set_output_gain(0, data ? 1.0 : 0.0);
+#endif
 			break;
 		case 7:	mame_printf_debug("io_1:%d\n", data); break;
 	}
@@ -1404,6 +1409,13 @@ static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
 MACHINE_CONFIG_END
 
 
+#if !USE_FAKE_VOTRAX
+static votrax_sc01_interface votrax_interface =
+{
+	DEVCB_NULL
+};
+#endif
+
 static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
 	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
@@ -1420,7 +1432,11 @@ static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
 
+#if USE_FAKE_VOTRAX
 	MCFG_SAMPLES_ADD("samples", wow_samples_interface)
+#else
+	MCFG_VOTRAX_SC01_ADD("votrax", 720000, votrax_interface)
+#endif
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
 MACHINE_CONFIG_END
 
@@ -1446,7 +1462,11 @@ static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 	MCFG_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
+#if USE_FAKE_VOTRAX
 	MCFG_SAMPLES_ADD("samples", gorf_samples_interface)
+#else
+	MCFG_VOTRAX_SC01_ADD("votrax", 720000, votrax_interface)
+#endif
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
 MACHINE_CONFIG_END
 
