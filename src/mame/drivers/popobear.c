@@ -220,7 +220,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 SCREEN_UPDATE_IND16( popobear )
 {
-	popobear_state *state = screen.machine().driver_data<popobear_state>();
+//	popobear_state *state = screen.machine().driver_data<popobear_state>();
 
 	bitmap.fill(0, cliprect);
 
