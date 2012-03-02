@@ -1201,10 +1201,6 @@ void cli_frontend::output_single_softlist(FILE *out,software_list *list, const c
 					{
 						fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"reload\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
 					}
-					else if ( ROMENTRY_ISCONTINUE(rom) )
-					{
-						fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"continue\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
-					}
 					else if ( ROMENTRY_ISFILL(rom) )
 					{
 						fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"fill\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
