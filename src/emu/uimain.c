@@ -2631,7 +2631,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	const game_driver *driver;
 	float width, maxwidth;
 	float x1, y1, x2, y2;
-	char tempbuf[4][256];
+	char tempbuf[5][256];
 	rgb_t color;
 	int line;
 
@@ -2678,13 +2678,16 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		/* next line is year, manufacturer */
 		sprintf(&tempbuf[1][0], "%s, %-.100s", driver->year, driver->manufacturer);
 
+		/* next line source path */
+		sprintf(&tempbuf[2][0], "Driver: %-.100s", strrchr(driver->source_file, '/')+1);
+
 		/* next line is overall driver status */
 		if (driver->flags & GAME_NOT_WORKING)
-			strcpy(&tempbuf[2][0], "Overall: NOT WORKING");
+			strcpy(&tempbuf[3][0], "Overall: NOT WORKING");
 		else if (driver->flags & GAME_UNEMULATED_PROTECTION)
-			strcpy(&tempbuf[2][0], "Overall: Unemulated Protection");
+			strcpy(&tempbuf[3][0], "Overall: Unemulated Protection");
 		else
-			strcpy(&tempbuf[2][0], "Overall: Working");
+			strcpy(&tempbuf[3][0], "Overall: Working");
 
 		/* next line is graphics, sound status */
 		if (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS))
@@ -2699,7 +2702,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		else
 			soundstat = "OK";
 
-		sprintf(&tempbuf[3][0], "Gfx: %s, Sound: %s", gfxstat, soundstat);
+		sprintf(&tempbuf[4][0], "Gfx: %s, Sound: %s", gfxstat, soundstat);
 	}
 	else
 	{

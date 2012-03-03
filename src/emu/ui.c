@@ -23,7 +23,6 @@
 #include <ctype.h>
 
 
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -1021,7 +1020,7 @@ astring &game_info_astring(running_machine &machine, astring &string)
 	int found_sound = FALSE;
 
 	/* print description, manufacturer, and CPU: */
-	string.printf("%s\n%s %s\n\nCPU:\n", machine.system().description, machine.system().year, machine.system().manufacturer);
+	string.printf("%s\n%s %s\nDriver: %s\n\nCPU:\n", machine.system().description, machine.system().year, machine.system().manufacturer, strrchr(machine.system().source_file, '/')+1);
 
 	/* loop over all CPUs */
 	execute_interface_iterator execiter(machine.root_device());
