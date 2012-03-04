@@ -191,34 +191,6 @@ ADDRESS_MAP_END
 
 /* SOUND CPU */
 
-static READ16_HANDLER( dual539_r )
-{
-	UINT16 data;
-
-	data = 0;
-	if( ACCESSING_BITS_0_7 )
-	{
-		data |= k054539_r( space->machine().device("konami2"), offset );
-	}
-	if( ACCESSING_BITS_8_15 )
-	{
-		data |= k054539_r( space->machine().device("konami1"), offset ) << 8;
-	}
-	return data;
-}
-
-static WRITE16_HANDLER( dual539_w )
-{
-	if( ACCESSING_BITS_0_7 )
-	{
-		k054539_w( space->machine().device("konami2"), offset, data );
-	}
-	if( ACCESSING_BITS_8_15 )
-	{
-		k054539_w( space->machine().device("konami1"), offset, data >> 8 );
-	}
-}
-
 static READ16_HANDLER( sndcomm68k_r )
 {
 	konamigq_state *state = space->machine().driver_data<konamigq_state>();
@@ -255,7 +227,8 @@ static WRITE16_HANDLER(tms57002_control_word_w)
 static ADDRESS_MAP_START( konamigq_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x2004ff) AM_READWRITE(dual539_r,dual539_w)
+	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8_MODERN("konami1", k054539_device, read, write, 0xff00)
+	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8_MODERN("konami2", k054539_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r,tms57002_data_word_w)
 	AM_RANGE(0x400000, 0x40000f) AM_WRITE(sndcomm68k_w)
 	AM_RANGE(0x400010, 0x40001f) AM_READ(sndcomm68k_r)
@@ -384,13 +357,11 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("konami1", K054539, 48000)
-	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_K054539_ADD("konami1", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("konami2", K054539, 48000)
-	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_K054539_ADD("konami2", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

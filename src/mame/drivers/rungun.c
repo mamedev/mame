@@ -248,9 +248,9 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539_1", k054539_r, k054539_w)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE_MODERN("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_r, k054539_w)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE_MODERN("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
@@ -394,7 +394,7 @@ static MACHINE_RESET( rng )
 {
 	rungun_state *state = machine.driver_data<rungun_state>();
 
-	k054539_init_flags(machine.device("k054539_1"), K054539_REVERSE_STEREO);
+	machine.device<k054539_device>("k054539_1")->init_flags(k054539_device::REVERSE_STEREO);
 
 	memset(state->m_sysreg, 0, 0x20);
 	memset(state->m_ttl_vram, 0, 0x1000);
@@ -444,13 +444,11 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("k054539_1", K054539, 48000)
-	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k054539_2", K054539, 48000)
-	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

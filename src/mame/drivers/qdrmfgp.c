@@ -77,12 +77,12 @@ static WRITE16_HANDLER( gp_control_w )
 		int vol = state->m_nvram[0x10] & 0xff;
 		if (vol)
 		{
-			device_t *k054539 = space->machine().device("konami");
+			k054539_device *k054539 = space->machine().device<k054539_device>("konami");
 			int i;
 			double gain = vol / 90.0;
 
 			for (i=0; i<8; i++)
-				k054539_set_gain(k054539, i, gain);
+				k054539->set_gain(i, gain);
 		}
 	}
 }
@@ -110,12 +110,12 @@ static WRITE16_HANDLER( gp2_control_w )
 		int vol = state->m_nvram[0x8] & 0xff;
 		if (vol)
 		{
-			device_t *k054539 = space->machine().device("konami");
+			k054539_device *k054539 = space->machine().device<k054539_device>("konami");
 			int i;
 			double gain = vol / 90.0;
 
 			for (i=0; i<8; i++)
-				k054539_set_gain(k054539, i, gain);
+				k054539->set_gain(i, gain);
 		}
 	}
 }
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x360001) AM_WRITENOP													/* unknown */
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp_control_w)											/* control reg */
 	AM_RANGE(0x380000, 0x380001) AM_WRITENOP													/* Watchdog */
-	AM_RANGE(0x800000, 0x80045f) AM_DEVREADWRITE8("konami", k054539_r, k054539_w, 0x00ff)		/* sound regs */
+	AM_RANGE(0x800000, 0x80045f) AM_DEVREADWRITE8_MODERN("konami", k054539_device, read, write, 0x00ff)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)			/* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)			/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)												/* gfxrom through */
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x360001) AM_WRITENOP													/* unknown */
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp2_control_w)										/* control reg */
 	AM_RANGE(0x380000, 0x380001) AM_WRITENOP													/* Watchdog */
-	AM_RANGE(0x800000, 0x80045f) AM_DEVREADWRITE8("konami", k054539_r,k054539_w, 0x00ff)		/* sound regs */
+	AM_RANGE(0x800000, 0x80045f) AM_DEVREADWRITE8_MODERN("konami", k054539_device, read, write, 0x00ff)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_READWRITE(gp2_vram_r, gp2_vram_w)							/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_READWRITE(gp2_vram_mirror_r, gp2_vram_mirror_w)				/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)												/* gfxrom through */
@@ -704,8 +704,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("konami", K054539, 18432000/384)
-	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_K054539_ADD("konami", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -741,7 +740,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("konami", K054539, 18432000/384)
+	MCFG_K054539_ADD("konami", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

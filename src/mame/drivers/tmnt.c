@@ -1183,22 +1183,22 @@ static ADDRESS_MAP_START( thndrx2_audio_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static READ8_DEVICE_HANDLER( k054539_ctrl_r )
+static READ8_HANDLER( k054539_ctrl_r )
 {
-	return k054539_r(device, 0x200 + offset);
+	return space->machine().device<k054539_device>("k054539")->read(*space, 0x200 + offset, 0xff);
 }
 
-static WRITE8_DEVICE_HANDLER( k054539_ctrl_w )
+static WRITE8_HANDLER( k054539_ctrl_w )
 {
-	k054539_w(device, 0x200 + offset, data);
+	space->machine().device<k054539_device>("k054539")->write(*space, 0x200 + offset, data, 0xff);
 }
 
 static ADDRESS_MAP_START( prmrsocr_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("k054539", k054539_r, k054539_w)
-	AM_RANGE(0xe100, 0xe12f) AM_DEVREADWRITE("k054539", k054539_ctrl_r, k054539_ctrl_w)
+	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE_MODERN("k054539", k054539_device, read, write)
+	AM_RANGE(0xe100, 0xe12f) AM_READWRITE(k054539_ctrl_r, k054539_ctrl_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
@@ -2672,8 +2672,7 @@ static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("k054539", K054539, 48000)
-	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_K054539_ADD("k054539", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

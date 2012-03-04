@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_r, k054539_w)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE_MODERN("k054539", k054539_device, read, write)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
@@ -518,7 +518,7 @@ static MACHINE_RESET( xexex )
 	state->m_suspension_active = 0;
 	state->m_resume_trigger = 1000;
 	state->m_frame = -1;
-	k054539_init_flags(machine.device("k054539"), K054539_REVERSE_STEREO);
+	machine.device<k054539_device>("k054539")->init_flags(k054539_device::REVERSE_STEREO);
 }
 
 static MACHINE_CONFIG_START( xexex, xexex_state )
@@ -571,8 +571,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_SOUND_ROUTE(1, "filter2l", 0.50)
 	MCFG_SOUND_ROUTE(1, "filter2r", 0.50)
 
-	MCFG_SOUND_ADD("k054539", K054539, 48000)
-	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_K054539_ADD("k054539", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)

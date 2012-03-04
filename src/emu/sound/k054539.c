@@ -20,9 +20,29 @@ CHANNEL_DEBUG enables the following keys:
 #include "emu.h"
 #include "k054539.h"
 
+const device_type K054539 = &device_creator<k054539_device>;
+
 #define CHANNEL_DEBUG 0
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
+k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K054539, "K054539", "k054539", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_set_interface - configuration helper
+//  to set the interface
+//-------------------------------------------------
+
+void k054539_device::static_set_interface(device_t &device, const k054539_interface &interface)
+{
+	k054539_device &k = downcast<k054539_device &>(device);
+	static_cast<k054539_interface &>(k) = interface;
+}
 
 /* Registers:
    00..ff: 20 bytes/channel, 8 channels
@@ -56,82 +76,37 @@ CHANNEL_DEBUG enables the following keys:
    rendering instead of sample-based.
 */
 
-typedef struct _k054539_channel k054539_channel;
-struct _k054539_channel {
-	UINT32 pos;
-	UINT32 pfrac;
-	INT32 val;
-	INT32 pval;
-};
-
-typedef struct _k054539_state k054539_state;
-struct _k054539_state {
-	const k054539_interface *intf;
-	device_t *device;
-	double voltab[256];
-	double pantab[0xf];
-
-	double k054539_gain[8];
-	UINT8 k054539_posreg_latch[8][3];
-	int k054539_flags;
-
-	unsigned char regs[0x230];
-	unsigned char *ram;
-	int reverb_pos;
-
-	INT32 cur_ptr;
-	int cur_limit;
-	unsigned char *cur_zone;
-	unsigned char *rom;
-	UINT32 rom_size;
-	UINT32 rom_mask;
-	sound_stream * stream;
-
-	k054539_channel channels[8];
-};
-
-INLINE k054539_state *get_safe_token(device_t *device)
+void k054539_device::init_flags(int _flags)
 {
-	assert(device != NULL);
-	assert(device->type() == K054539);
-	return (k054539_state *)downcast<legacy_device_base *>(device)->token();
+	flags = _flags;
 }
 
-//*
-
-void k054539_init_flags(device_t *device, int flags)
+void k054539_device::set_gain(int channel, double _gain)
 {
-	k054539_state *info = get_safe_token(device);
-	info->k054539_flags = flags;
-}
-
-void k054539_set_gain(device_t *device, int channel, double gain)
-{
-	k054539_state *info = get_safe_token(device);
-	if (gain >= 0) info->k054539_gain[channel] = gain;
+	if(_gain >= 0)
+		gain[channel] = _gain;
 }
 //*
 
-static int k054539_regupdate(k054539_state *info)
+bool k054539_device::regupdate()
 {
-	return !(info->regs[0x22f] & 0x80);
+	return !(regs[0x22f] & 0x80);
 }
 
-static void k054539_keyon(k054539_state *info, int channel)
+void k054539_device::keyon(int channel)
 {
-	if(k054539_regupdate(info))
-		info->regs[0x22c] |= 1 << channel;
+	if(regupdate())
+		regs[0x22c] |= 1 << channel;
 }
 
-static void k054539_keyoff(k054539_state *info, int channel)
+void k054539_device::keyoff(int channel)
 {
-	if(k054539_regupdate(info))
-		info->regs[0x22c] &= ~(1 << channel);
+	if(regupdate())
+		regs[0x22c] &= ~(1 << channel);
 }
 
-static STREAM_UPDATE( k054539_update )
+void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	k054539_state *info = (k054539_state *)param;
 #define VOL_CAP 1.80
 
 	static const INT16 dpcm[16] = {
@@ -139,80 +114,57 @@ static STREAM_UPDATE( k054539_update )
 		-64<<8, -49<<8, -36<<8, -25<<8, -16<<8, -9<<8, -4<<8, -1<<8
 	};
 
-	int ch, reverb_pos;
-	short *rbase;
-	unsigned char *rom;
-	UINT32 rom_mask;
 
-	unsigned char *base1, *base2;
-	k054539_channel *chan;
-	stream_sample_t *bufl, *bufr;
-	int cur_pos, cur_pfrac, cur_val, cur_pval;
-	int delta, rdelta, fdelta, pdelta;
-	int vol, bval, pan, i;
-
-	double gain, lvol, rvol, rbvol;
-
-	reverb_pos = info->reverb_pos;
-	rbase = (short *)(info->ram);
+	int cur_reverb_pos = reverb_pos;
+	INT16 *rbase = (INT16 *)ram;
 
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
 
-	rom = info->rom;
-	rom_mask = info->rom_mask;
+	if(!(regs[0x22f] & 1)) return;
 
-	if(!(info->regs[0x22f] & 1)) return;
+	reverb_pos = (reverb_pos + samples) & 0x3fff;
 
-	info->reverb_pos = (reverb_pos + samples) & 0x3fff;
+	for(int ch=0; ch<8; ch++)
+		if(regs[0x22c] & (1<<ch)) {
+			unsigned char *base1 = regs + 0x20*ch;
+			unsigned char *base2 = regs + 0x200 + 0x2*ch;
+			channel *chan = channels + ch;
 
+			int delta = base1[0x00] | (base1[0x01] << 8) | (base1[0x02] << 16);
 
-	for(ch=0; ch<8; ch++)
-		if(info->regs[0x22c] & (1<<ch)) {
-			base1 = info->regs + 0x20*ch;
-			base2 = info->regs + 0x200 + 0x2*ch;
-			chan = info->channels + ch;
-//*
-			delta = base1[0x00] | (base1[0x01] << 8) | (base1[0x02] << 16);
+			int vol = base1[0x03];
 
-			vol = base1[0x03];
-
-			bval = vol + base1[0x04];
+			int bval = vol + base1[0x04];
 			if (bval > 255) bval = 255;
 
-			pan = base1[0x05];
-// DJ Main: 81-87 right, 88 middle, 89-8f left
-if (pan >= 0x81 && pan <= 0x8f)
-pan -= 0x81;
-else
-			if (pan >= 0x11 && pan <= 0x1f) pan -= 0x11; else pan = 0x18 - 0x11;
+			int pan = base1[0x05];
+			// DJ Main: 81-87 right, 88 middle, 89-8f left
+			if (pan >= 0x81 && pan <= 0x8f)
+				pan -= 0x81;
+			else
+				if (pan >= 0x11 && pan <= 0x1f) pan -= 0x11; else pan = 0x18 - 0x11;
 
-			gain = info->k054539_gain[ch];
+			double cur_gain = gain[ch];
 
-			lvol = info->voltab[vol] * info->pantab[pan] * gain;
+			double lvol = voltab[vol] * pantab[pan] * cur_gain;
 			if (lvol > VOL_CAP) lvol = VOL_CAP;
 
-			rvol = info->voltab[vol] * info->pantab[0xe - pan] * gain;
+			double rvol = voltab[vol] * pantab[0xe - pan] * cur_gain;
 			if (rvol > VOL_CAP) rvol = VOL_CAP;
 
-			rbvol= info->voltab[bval] * gain / 2;
+			double rbvol= voltab[bval] * cur_gain / 2;
 			if (rbvol > VOL_CAP) rbvol = VOL_CAP;
 
-/*
-    INT x FLOAT could be interpreted as INT x (int)FLOAT instead of (float)INT x FLOAT on some compilers
-    causing precision loss. (rdelta - 0x2000) wraps around on zero reverb and the scale factor should
-    actually be 1/freq_ratio because the target is an offset to the reverb buffer not sample source.
-*/
-			rdelta = (base1[6] | (base1[7] << 8)) >> 3;
-//          rdelta = (reverb_pos + (int)((rdelta - 0x2000) * info->freq_ratio)) & 0x3fff;
-			rdelta = (int)(rdelta + reverb_pos) & 0x3fff;
+			int rdelta = (base1[6] | (base1[7] << 8)) >> 3;
+			rdelta = (rdelta + cur_reverb_pos) & 0x3fff;
 
-			cur_pos = (base1[0x0c] | (base1[0x0d] << 8) | (base1[0x0e] << 16)) & rom_mask;
+			int cur_pos = (base1[0x0c] | (base1[0x0d] << 8) | (base1[0x0e] << 16)) & rom_mask;
+			
+			stream_sample_t *bufl = outputs[0];
+			stream_sample_t *bufr = outputs[1];
 
-			bufl = outputs[0];
-			bufr = outputs[1];
-//*
-
+			int fdelta, pdelta;
 			if(base2[0] & 0x20) {
 				delta = -delta;
 				fdelta = +0x10000;
@@ -222,6 +174,7 @@ else
 				pdelta = +1;
 			}
 
+			int cur_pfrac, cur_val, cur_pval;
 			if(cur_pos != chan->pos) {
 				chan->pos = cur_pos;
 				cur_pfrac = 0;
@@ -237,13 +190,13 @@ else
 			do {																		\
 				*bufl++ += (INT16)(cur_val*lvol);										\
 				*bufr++ += (INT16)(cur_val*rvol);										\
-				rbase[rdelta++] += (INT16)(cur_val*rbvol);										\
-				rdelta &= 0x3fff;										\
+				rbase[rdelta++] += (INT16)(cur_val*rbvol);								\
+				rdelta &= 0x3fff;														\
 			} while(0)
 
 			switch(base2[0] & 0xc) {
 			case 0x0: { // 8bit pcm
-				for(i=0; i<samples; i++) {
+				for(int i=0; i<samples; i++) {
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
 						cur_pfrac += fdelta;
@@ -258,7 +211,7 @@ else
 								if(cur_val != (INT16)0x8000)
 									continue;
 							}
-							k054539_keyoff(info, ch);
+							keyoff(ch);
 							goto end_channel_0;
 						}
 					}
@@ -271,7 +224,7 @@ else
 			case 0x4: { // 16bit pcm lsb first
 				pdelta <<= 1;
 
-				for(i=0; i<samples; i++) {
+				for(int i=0; i<samples; i++) {
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
 						cur_pfrac += fdelta;
@@ -286,7 +239,7 @@ else
 								if(cur_val != (INT16)0x8000)
 									continue;
 							}
-							k054539_keyoff(info, ch);
+							keyoff(ch);
 							goto end_channel_4;
 						}
 					}
@@ -304,7 +257,7 @@ else
 					cur_pos |= 1;
 				}
 
-				for(i=0; i<samples; i++) {
+				for(int i=0; i<samples; i++) {
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
 						cur_pfrac += fdelta;
@@ -319,7 +272,7 @@ else
 								if(cur_val != 0x88)
 									goto next_iter;
 							}
-							k054539_keyoff(info, ch);
+							keyoff(ch);
 							goto end_channel_8;
 						}
 					next_iter:
@@ -351,7 +304,7 @@ else
 			chan->pfrac = cur_pfrac;
 			chan->pval = cur_pval;
 			chan->val = cur_val;
-			if(k054539_regupdate(info)) {
+			if(regupdate()) {
 				base1[0x0c] = cur_pos     & 0xff;
 				base1[0x0d] = cur_pos>> 8 & 0xff;
 				base1[0x0e] = cur_pos>>16 & 0xff;
@@ -359,233 +312,166 @@ else
 		}
 
 	//* drivers should be given the option to disable reverb when things go terribly wrong
-	if(!(info->k054539_flags & K054539_DISABLE_REVERB))
+	if(!(flags & DISABLE_REVERB))
 	{
-		for(i=0; i<samples; i++) {
-			short val = rbase[(i+reverb_pos) & 0x3fff];
+		for(int i=0; i<samples; i++) {
+			INT16 val = rbase[(i+reverb_pos) & 0x3fff];
 			outputs[0][i] += val;
 			outputs[1][i] += val;
 		}
 	}
 
-	if(reverb_pos + samples > 0x4000) {
-		i = 0x4000 - reverb_pos;
-		memset(rbase + reverb_pos, 0, i*2);
+	if(cur_reverb_pos + samples > 0x4000) {
+		int i = 0x4000 - cur_reverb_pos;
+		memset(rbase + cur_reverb_pos, 0, i*2);
 		memset(rbase, 0, (samples-i)*2);
 	} else
-		memset(rbase + reverb_pos, 0, samples*2);
-
-	#if CHANNEL_DEBUG
-	{
-		static const char gc_msg[32] = "chip :                         ";
-		static int gc_active=0, gc_chip=0, gc_pos[2]={0,0};
-		double *gc_fptr;
-		char *gc_cptr;
-		double gc_f0;
-		int gc_i, gc_j, gc_k, gc_l;
-
-		if (device->machine().input().code_pressed_once(KEYCODE_DEL_PAD))
-		{
-			gc_active ^= 1;
-			if (!gc_active) popmessage(NULL);
-		}
-
-		if (gc_active)
-		{
-			if (device->machine().input().code_pressed_once(KEYCODE_0_PAD)) gc_chip ^= 1;
-
-			gc_i = gc_pos[gc_chip];
-			gc_j = 0;
-			if (device->machine().input().code_pressed_once(KEYCODE_4_PAD)) { gc_i--; gc_j = 1; }
-			if (device->machine().input().code_pressed_once(KEYCODE_6_PAD)) { gc_i++; gc_j = 1; }
-			if (gc_j) { gc_i &= 7; gc_pos[gc_chip] = gc_i; }
-
-			if (device->machine().input().code_pressed_once(KEYCODE_5_PAD))
-				info->k054539_gain[gc_i] = 1.0;
-			else
-			{
-				gc_fptr = &info->k054539_gain[gc_i];
-				gc_f0 = *gc_fptr;
-				gc_j = 0;
-				if (device->machine().input().code_pressed_once(KEYCODE_2_PAD)) { gc_f0 -= 0.1; gc_j = 1; }
-				if (device->machine().input().code_pressed_once(KEYCODE_8_PAD)) { gc_f0 += 0.1; gc_j = 1; }
-				if (gc_j) { if (gc_f0 < 0) gc_f0 = 0; *gc_fptr = gc_f0; }
-			}
-
-			gc_fptr = &info->k054539_gain[0] + 8;
-			gc_cptr = gc_msg + 7;
-			for (gc_j=-8; gc_j; gc_j++)
-			{
-				gc_k = (int)(gc_fptr[gc_j] * 10);
-				gc_l = gc_k / 10;
-				gc_k = gc_k % 10;
-				gc_cptr[0] = gc_l + '0';
-				gc_cptr[1] = gc_k + '0';
-				gc_cptr += 3;
-			}
-			gc_i = (gc_i + gc_i*2 + 6);
-			gc_msg[4] = gc_chip + '0';
-			gc_msg[gc_i  ] = '[';
-			gc_msg[gc_i+3] = ']';
-			popmessage("%s", gc_msg);
-			gc_msg[gc_i+3] = gc_msg[gc_i] = ' ';
-		}
-	}
-	#endif
+		memset(rbase + cur_reverb_pos, 0, samples*2);
 }
 
 
-static TIMER_CALLBACK( k054539_irq )
+void k054539_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	k054539_state *info = (k054539_state *)ptr;
-	if(info->regs[0x22f] & 0x20)
-		info->intf->irq(info->device);
+	if(regs[0x22f] & 0x20)
+		irq(this);
 }
 
-static void k054539_init_chip(device_t *device, k054539_state *info)
+void k054539_device::init_chip()
 {
-	int i;
-
-	memset(info->regs, 0, sizeof(info->regs));
-	memset(info->k054539_posreg_latch, 0, sizeof(info->k054539_posreg_latch)); //*
-	info->k054539_flags |= K054539_UPDATE_AT_KEYON; //* make it default until proven otherwise
+	memset(regs, 0, sizeof(regs));
+	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
+	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
 	// Real size of 0x4000, the addon is to simplify the reverb buffer computations
-	info->ram = auto_alloc_array(device->machine(), unsigned char, 0x4000*2+device->clock()/50*2);
-	info->reverb_pos = 0;
-	info->cur_ptr = 0;
-	memset(info->ram, 0, 0x4000*2+device->clock()/50*2);
+	ram = auto_alloc_array(machine(), unsigned char, 0x4000*2+clock()/50*2);
+	reverb_pos = 0;
+	cur_ptr = 0;
+	memset(ram, 0, 0x4000*2+clock()/50*2);
 
-	const memory_region *region = (info->intf->rgnoverride != NULL) ? device->machine().region(info->intf->rgnoverride) : device->region();
-	info->rom = *region;
-	info->rom_size = region->bytes();
-	info->rom_mask = 0xffffffffU;
-	for(i=0; i<32; i++)
-		if((1U<<i) >= info->rom_size) {
-			info->rom_mask = (1U<<i) - 1;
+	const memory_region *reg = (rgnoverride != NULL) ? machine().region(rgnoverride) : region();
+	rom = *reg;
+	rom_size = reg->bytes();
+	rom_mask = 0xffffffffU;
+	for(int i=0; i<32; i++)
+		if((1U<<i) >= rom_size) {
+			rom_mask = (1U<<i) - 1;
 			break;
 		}
 
-	if(info->intf->irq)
+	if(irq) {
 		// One or more of the registers must be the timer period
 		// And anyway, this particular frequency is probably wrong
 		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
-		device->machine().scheduler().timer_pulse(attotime::from_hz(480), FUNC(k054539_irq), 0, info);
+		emu_timer *tm = timer_alloc();
+		tm->adjust(attotime::from_hz(480), 0, attotime::from_hz(480));
+	}
 
-	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock(), info, k054539_update);
+	// If the clock is anything else than 48000, things are going to go wrong.
+	stream = stream_alloc(0, 2, clock());
 
-	device->save_item(NAME(info->regs));
-	device->save_pointer(NAME(info->ram), 0x4000);
-	device->save_item(NAME(info->cur_ptr));
+	save_item(NAME(regs));
+	save_pointer(NAME(ram), 0x4000);
+	save_item(NAME(cur_ptr));
 }
 
-WRITE8_DEVICE_HANDLER( k054539_w )
+WRITE8_MEMBER(k054539_device::write)
 {
-	k054539_state *info = get_safe_token(device);
+	if(0) {
+		int voice, reg;
 
-#if 0
-	int voice, reg;
+		/* The K054539 has behavior like many other wavetable chips including
+		   the Ensoniq 550x and Gravis GF-1: if a voice is active, writing
+		   to it's current position is silently ignored.
 
-	/* The K054539 has behavior like many other wavetable chips including
-       the Ensoniq 550x and Gravis GF-1: if a voice is active, writing
-       to it's current position is silently ignored.
-
-       Dadandaan depends on this or the vocals go wrong.
-       */
-	if (offset < 8*0x20)
-	{
-		voice = offset / 0x20;
-		reg = offset & ~0x20;
-
-		if(info->regs[0x22c] & (1<<voice))
+		   Dadandaan depends on this or the vocals go wrong.
+		*/
+		if (offset < 8*0x20)
 		{
-			if (reg >= 0xc && reg <= 0xe)
-			{
-				return;
-			}
+			voice = offset / 0x20;
+			reg = offset & ~0x20;
+
+			if(regs[0x22c] & (1<<voice))
+				if (reg >= 0xc && reg <= 0xe)
+					return;
 		}
 	}
-#endif
 
-	int latch, offs, ch, pan;
-	UINT8 *regbase, *regptr, *posptr;
-
-	regbase = info->regs;
-	latch = (info->k054539_flags & K054539_UPDATE_AT_KEYON) && (regbase[0x22f] & 1);
+	bool latch = (flags & UPDATE_AT_KEYON) && (regs[0x22f] & 1);
 
 	if (latch && offset < 0x100)
 	{
-		offs = (offset & 0x1f) - 0xc;
-		ch = offset >> 5;
+		int offs = (offset & 0x1f) - 0xc;
+		int ch = offset >> 5;
 
 		if (offs >= 0 && offs <= 2)
 		{
 			// latch writes to the position index registers
-			info->k054539_posreg_latch[ch][offs] = data;
+			posreg_latch[ch][offs] = data;
 			return;
 		}
 	}
 
-	else switch(offset)
-	{
-		case 0x13f:
-			pan = data >= 0x11 && data <= 0x1f ? data - 0x11 : 0x18 - 0x11;
-			if(info->intf->apan)
-				info->intf->apan(info->device, info->pantab[pan], info->pantab[0xe - pan]);
-		break;
+	else
+		switch(offset) {
+		case 0x13f: {
+			int pan = data >= 0x11 && data <= 0x1f ? data - 0x11 : 0x18 - 0x11;
+			if(apan)
+				apan(this, pantab[pan], pantab[0xe - pan]);
+			break;
+		}
 
 		case 0x214:
 			if (latch)
 			{
-				for(ch=0; ch<8; ch++)
+				for(int ch=0; ch<8; ch++)
 				{
 					if(data & (1<<ch))
 					{
-						posptr = &info->k054539_posreg_latch[ch][0];
-						regptr = regbase + (ch<<5) + 0xc;
+						UINT8 *posptr = &posreg_latch[ch][0];
+						UINT8 *regptr = regs + (ch<<5) + 0xc;
 
 						// update the chip at key-on
 						regptr[0] = posptr[0];
 						regptr[1] = posptr[1];
 						regptr[2] = posptr[2];
 
-						k054539_keyon(info, ch);
+						keyon(ch);
 					}
 				}
 			}
 			else
 			{
-				for(ch=0; ch<8; ch++)
+				for(int ch=0; ch<8; ch++)
 					if(data & (1<<ch))
-						k054539_keyon(info, ch);
+						keyon(ch);
 			}
 		break;
 
 		case 0x215:
-			for(ch=0; ch<8; ch++)
+			for(int ch=0; ch<8; ch++)
 				if(data & (1<<ch))
-					k054539_keyoff(info, ch);
+					keyoff(ch);
 		break;
 
 		case 0x22d:
-			if(regbase[0x22e] == 0x80)
-				info->cur_zone[info->cur_ptr] = data;
-			info->cur_ptr++;
-			if(info->cur_ptr == info->cur_limit)
-				info->cur_ptr = 0;
+			if(regs[0x22e] == 0x80)
+				cur_zone[cur_ptr] = data;
+			cur_ptr++;
+			if(cur_ptr == cur_limit)
+				cur_ptr = 0;
 		break;
 
 		case 0x22e:
-			info->cur_zone =
-				data == 0x80 ? info->ram :
-				info->rom + 0x20000*data;
-			info->cur_limit = data == 0x80 ? 0x4000 : 0x20000;
-			info->cur_ptr = 0;
+			cur_zone =
+				data == 0x80 ? ram :
+				rom + 0x20000*data;
+			cur_limit = data == 0x80 ? 0x4000 : 0x20000;
+			cur_ptr = 0;
 		break;
 
 		default:
 #if 0
-			if(regbase[offset] != data) {
+			if(regs[offset] != data) {
 				if((offset & 0xff00) == 0) {
 					chanoff = offset & 0x1f;
 					if(chanoff < 4 || chanoff == 5 ||
@@ -601,28 +487,25 @@ WRITE8_DEVICE_HANDLER( k054539_w )
 		break;
 	}
 
-	regbase[offset] = data;
+	regs[offset] = data;
 }
 
-static void reset_zones(k054539_state *info)
+void k054539_device::reset_zones()
 {
-	int data = info->regs[0x22e];
-	info->cur_zone =
-		data == 0x80 ? info->ram :
-		info->rom + 0x20000*data;
-	info->cur_limit = data == 0x80 ? 0x4000 : 0x20000;
+	int data = regs[0x22e];
+	cur_zone = data == 0x80 ? ram : rom + 0x20000*data;
+	cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 }
 
-READ8_DEVICE_HANDLER( k054539_r )
+READ8_MEMBER(k054539_device::read)
 {
-	k054539_state *info = get_safe_token(device);
 	switch(offset) {
 	case 0x22d:
-		if(info->regs[0x22f] & 0x10) {
-			UINT8 res = info->cur_zone[info->cur_ptr];
-			info->cur_ptr++;
-			if(info->cur_ptr == info->cur_limit)
-				info->cur_ptr = 0;
+		if(regs[0x22f] & 0x10) {
+			UINT8 res = cur_zone[cur_ptr];
+			cur_ptr++;
+			if(cur_ptr == cur_limit)
+				cur_ptr = 0;
 			return res;
 		} else
 			return 0;
@@ -632,22 +515,14 @@ READ8_DEVICE_HANDLER( k054539_r )
 		LOG(("K054539 read %03x\n", offset));
 		break;
 	}
-	return info->regs[offset];
+	return regs[offset];
 }
 
-static DEVICE_START( k054539 )
+void k054539_device::device_start()
 {
-	static const k054539_interface defintrf = { 0 };
-	int i;
-	k054539_state *info = get_safe_token(device);
-
-	info->device = device;
-
-	for (i = 0; i < 8; i++)
-		info->k054539_gain[i] = 1.0;
-	info->k054539_flags = K054539_RESET_FLAGS;
-
-	info->intf = (device->static_config() != NULL) ? (const k054539_interface *)device->static_config() : &defintrf;
+	for (int i = 0; i < 8; i++)
+		gain[i] = 1.0;
+	flags = RESET_FLAGS;
 
 	/*
         I've tried various equations on volume control but none worked consistently.
@@ -661,48 +536,21 @@ static DEVICE_START( k054539 )
     */
 	// Factor the 1/4 for the number of channels in the volume (1/8 is too harsh, 1/2 gives clipping)
 	// vol=0 -> no attenuation, vol=0x40 -> -36dB
-	for(i=0; i<256; i++)
-		info->voltab[i] = pow(10.0, (-36.0 * (double)i / (double)0x40) / 20.0) / 4.0;
+	for(int i=0; i<256; i++)
+		voltab[i] = pow(10.0, (-36.0 * (double)i / (double)0x40) / 20.0) / 4.0;
 
 	// Pan table for the left channel
 	// Right channel is identical with inverted index
 	// Formula is such that pan[i]**2+pan[0xe-i]**2 = 1 (constant output power)
 	// and pan[0xe] = 1 (full panning)
-	for(i=0; i<0xf; i++)
-		info->pantab[i] = sqrt((double)i) / sqrt((double)0xe);
+	for(int i=0; i<0xf; i++)
+		pantab[i] = sqrt((double)i) / sqrt((double)0xe);
 
-	k054539_init_chip(device, info);
+	init_chip();
 
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(reset_zones), info));
+	machine().save().register_postload(save_prepost_delegate(FUNC(k054539_device::reset_zones), this));
 }
 
-
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( k054539 )
+void k054539_device::device_reset()
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(k054539_state);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( k054539 );		break;
-		case DEVINFO_FCT_STOP:							/* nothing */									break;
-		case DEVINFO_FCT_RESET:							/* nothing */									break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "K054539");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Konami custom");				break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
 }
-
-
-DEFINE_LEGACY_SOUND_DEVICE(K054539, k054539);

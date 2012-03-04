@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00100000, 0x00101fff) AM_RAM
 	AM_RANGE(0x00200000, 0x00200007) AM_WRITE(K056800_68k_w)
 	AM_RANGE(0x00200008, 0x0020000f) AM_READ(K056800_68k_r)
-	AM_RANGE(0x00400000, 0x004002ff) AM_DEVREADWRITE8("konami", k054539_r, k054539_w, 0xffff)
+	AM_RANGE(0x00400000, 0x004002ff) AM_DEVREADWRITE8_MODERN("konami", k054539_device, read, write, 0xffff)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -212,6 +212,7 @@ static const k056800_interface ultrsprt_k056800_interface =
 	sound_irq_callback
 };
 
+static k054539_interface k054539_config;
 
 static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	/* basic machine hardware */
@@ -243,7 +244,7 @@ static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("konami", K054539, 48000)
+	MCFG_K054539_ADD("konami", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
