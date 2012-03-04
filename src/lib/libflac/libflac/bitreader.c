@@ -143,11 +143,13 @@ struct FLAC__BitReader {
 };
 
 
+#ifdef LSB_FIRST
 static FLAC__uint32 local_swap32_(FLAC__uint32 x)
 {
 	x = ((x<<8)&0xFF00FF00) | ((x>>8)&0x00FF00FF);
 	return (x>>16) | (x<<16);
 }
+#endif
 
 #if defined(_MSC_VER) && defined(_M_IX86)
 /* OPT: an MSVC built-in would be better */
