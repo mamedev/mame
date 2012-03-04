@@ -29,11 +29,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #  include <config.h>
 #endif
-
-#define FLAC__HAS_OGG 0
 
 #include <stdio.h>
 #include <string.h> /* for strlen() */

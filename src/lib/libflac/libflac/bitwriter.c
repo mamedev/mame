@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -54,7 +54,7 @@ typedef FLAC__uint32 bwword;
 #define FLAC__BITS_PER_WORD 32
 #define FLAC__WORD_ALL_ONES ((FLAC__uint32)0xffffffff)
 /* SWAP_BE_WORD_TO_HOST swaps bytes in a bwword (which is always big-endian) if necessary to match host byte order */
-#ifndef LSB_FIRST
+#if WORDS_BIGENDIAN
 #define SWAP_BE_WORD_TO_HOST(x) (x)
 #else
 #ifdef _MSC_VER
@@ -63,15 +63,6 @@ typedef FLAC__uint32 bwword;
 #define SWAP_BE_WORD_TO_HOST(x) local_swap32_(x)
 #endif
 #endif
-
-static FLaC__INLINE void *safe_realloc_mul_2op_(void *ptr, size_t size1, size_t size2)
-{
-	if(!size1 || !size2)
-		return realloc(ptr, 0); /* preserve POSIX realloc(ptr, 0) semantics */
-	if(size1 > SIZE_MAX / size2)
-		return 0;
-	return realloc(ptr, size1*size2);
-}
 
 /*
  * The default capacity here doesn't matter too much.  The buffer always grows
@@ -112,7 +103,7 @@ struct FLAC__BitWriter {
 
 
 /* OPT: an MSVC built-in would be better */
-#ifdef LSB_FIRST
+#if !WORDS_BIGENDIAN
 static FLAC__uint32 local_swap32_(FLAC__uint32 x)
 {
 	x = ((x<<8)&0xFF00FF00) | ((x>>8)&0x00FF00FF);
