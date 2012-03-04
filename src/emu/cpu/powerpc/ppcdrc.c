@@ -2270,11 +2270,15 @@ static void generate_compute_flags(powerpc_state *ppc, drcuml_block *block, cons
 	if (xermask & XER_OV)
 	{
 		UML_ROLAND(block, I0, I0, 31, 1);								// roland  i0,i0,31,0x0001
-		UML_OR(block, XERSO32, XERSO32, I0);											// or      [xerso],i0
-		UML_OR(block, CR32(0), I1, I0);											// or      [cr0],i1,i0
+		UML_OR(block, XERSO32, XERSO32, I0);		 					// or      [xerso],i0
+        UML_AND(block, CR32(0), CR32(0), 0xfffffffe);                   // and  [cr0], [cr0], 0xfffffffe (clear SO copy in CR32)
+		UML_OR(block, CR32(0), I1, XERSO32);		 					// or      [cr0],i1,[xerso]
 	}
 	else
-		UML_OR(block, CR32(0), I1, XERSO32);											// or      [cr0],i1,[xerso]
+    {
+        UML_AND(block, CR32(0), CR32(0), 0xfffffffe);                   // and  [cr0], [cr0], 0xfffffffe (clear SO copy in CR32)
+		UML_OR(block, CR32(0), I1, XERSO32);							// or      [cr0],i1,[xerso] (OR in new value from XERSO)
+    }
 }
 
 /*-------------------------------------------------
@@ -2942,7 +2946,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));					// add     rd,ra,rb
 			generate_compute_flags(ppc, block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);
 																							// <update flags>
-			return TRUE;
+            return TRUE;
 
 		case 0x00a:	/* ADDCx */
 		case 0x20a:	/* ADDCOx */
