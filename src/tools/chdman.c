@@ -64,6 +64,11 @@ const UINT32 IDE_SECTOR_SIZE = 512;
 // temporary input buffer size
 const UINT32 TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
 
+// modes
+const int MODE_NORMAL = 0;
+const int MODE_CUEBIN = 1;
+const int MODE_GDI = 2;
+
 // command modifier
 #define REQUIRED "~"
 
@@ -111,7 +116,6 @@ const UINT32 TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
 #define OPTION_VERBOSE "verbose"
 #define OPTION_FIX "fix"
 #define OPTION_NUMPROCESSORS "numprocessors"
-
 
 
 //**************************************************************************
@@ -318,17 +322,25 @@ public:
 				UINT32 bytesperframe = trackinfo.datasize + trackinfo.subsize;
 				UINT64 src_track_start = m_info.track[tracknum].offset;
 				UINT64 src_track_end = src_track_start + bytesperframe * trackinfo.frames;
-				while (length_remaining != 0 && offset < endoffs)
+                UINT64 pad_track_start = src_track_end - (m_toc.tracks[tracknum].padframes * bytesperframe);
+                while (length_remaining != 0 && offset < endoffs)
 				{
 					// determine start of current frame
 					UINT64 src_frame_start = src_track_start + ((offset - startoffs) / CD_FRAME_SIZE) * bytesperframe;
 					if (src_frame_start < src_track_end)
 					{
-						// read it in
-						core_fseek(m_file, src_frame_start, SEEK_SET);
-						UINT32 count = core_fread(m_file, dest, bytesperframe);
-						if (count != bytesperframe)
-							report_error(1, "Error reading input file (%s)'", m_lastfile.cstr());
+						// read it in, or pad if we're into the padframes
+                        if (src_frame_start >= pad_track_start)
+                        {
+                            memset(dest, 0, bytesperframe);
+                        }
+                        else
+                        {
+                            core_fseek(m_file, src_frame_start, SEEK_SET);
+                            UINT32 count = core_fread(m_file, dest, bytesperframe);
+                            if (count != bytesperframe)
+                                report_error(1, "Error reading input file (%s)'", m_lastfile.cstr());
+                        }
 
 						// swap if appropriate
 						if (m_info.track[tracknum].swap)
@@ -1156,93 +1168,139 @@ static void compress_common(chd_file_compressor &chd)
 //  to a CUE file
 //-------------------------------------------------
 
-void output_track_metadata(bool cuemode, core_file *file, int tracknum, const cdrom_track_info &info, const char *filename, UINT32 frameoffs, UINT64 discoffs)
+void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_track_info &info, const char *filename, UINT32 frameoffs, UINT64 discoffs)
 {
-	// CUE mode?
-	if (cuemode)
+	if (mode == MODE_GDI)
 	{
-		// first track specifies the file
-		if (tracknum == 0)
-			core_fprintf(file, "FILE \"%s\" BINARY\n", filename);
+        int mode = 0, size = 2048;
 
-		// determine submode
-		astring tempstr;
-		switch (info.trktype)
-		{
-			case CD_TRACK_MODE1:
-			case CD_TRACK_MODE1_RAW:
-				tempstr.format("MODE1/%04d", info.datasize);
-				break;
+        switch (info.trktype)
+        {
+            case CD_TRACK_MODE1:
+                mode = 0;
+                size = 2048;
+                break;
 
-			case CD_TRACK_MODE2:
-			case CD_TRACK_MODE2_FORM1:
-			case CD_TRACK_MODE2_FORM2:
-			case CD_TRACK_MODE2_FORM_MIX:
-			case CD_TRACK_MODE2_RAW:
-				tempstr.format("MODE2/%04d", info.datasize);
-				break;
+            case CD_TRACK_MODE1_RAW:
+                mode = 4;
+                size = 2352;
+                break;
 
-			case CD_TRACK_AUDIO:
-				tempstr.cpy("AUDIO");
-				break;
-		}
+            case CD_TRACK_MODE2:
+                mode = 4;
+                size = 2336;
+                break;
 
-		// output TRACK entry
-		core_fprintf(file, "  TRACK %02d %s\n", tracknum + 1, tempstr.cstr());
+            case CD_TRACK_MODE2_FORM1:
+                mode = 4;
+                size = 2048;
+                break;
 
-		// output PREGAP
-		if (info.pregap > 0)
-			core_fprintf(file, "    PREGAP %s\n", msf_string_from_frames(tempstr, info.pregap));
+            case CD_TRACK_MODE2_FORM2:
+                mode = 4;
+                size = 2324;
+                break;
 
-		// output track data
-		core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
+            case CD_TRACK_MODE2_FORM_MIX:
+                mode = 4;
+                size = 2336;
+                break;
 
-		// output POSTGAP
-		if (info.postgap > 0)
-			core_fprintf(file, "    POSTGAP %s\n", msf_string_from_frames(tempstr, info.postgap));
+            case CD_TRACK_MODE2_RAW:
+                mode = 4;
+                size = 2352;
+                break;
+
+            case CD_TRACK_AUDIO:
+                mode = 0;
+                size = 2352;
+                break;
+        }
+		core_fprintf(file, "%d %d %d %d %s %lld\n", tracknum+1, frameoffs, mode, size, filename, discoffs);
 	}
+	else if (mode == MODE_CUEBIN)
+    {
+        // first track specifies the file
+        if (tracknum == 0)
+            core_fprintf(file, "FILE \"%s\" BINARY\n", filename);
 
-	// non-CUE mode
-	else
-	{
-		// header on the first track
-		if (tracknum == 0)
-			core_fprintf(file, "CD_ROM\n\n\n");
-		core_fprintf(file, "// Track %d\n", tracknum + 1);
+        // determine submode
+        astring tempstr;
+        switch (info.trktype)
+        {
+            case CD_TRACK_MODE1:
+            case CD_TRACK_MODE1_RAW:
+                tempstr.format("MODE1/%04d", info.datasize);
+                break;
 
-		// write out the track type
-		astring modesubmode;
-		if (info.subtype != CD_SUB_NONE)
-			modesubmode.format("%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
-		else
-			modesubmode.format("%s", cdrom_get_type_string(info.trktype));
-		core_fprintf(file, "TRACK %s\n", modesubmode.cstr());
+            case CD_TRACK_MODE2:
+            case CD_TRACK_MODE2_FORM1:
+            case CD_TRACK_MODE2_FORM2:
+            case CD_TRACK_MODE2_FORM_MIX:
+            case CD_TRACK_MODE2_RAW:
+                tempstr.format("MODE2/%04d", info.datasize);
+                break;
 
-		// write out the attributes
-		core_fprintf(file, "NO COPY\n");
-		if (info.trktype == CD_TRACK_AUDIO)
-		{
-			core_fprintf(file, "NO PRE_EMPHASIS\n");
-			core_fprintf(file, "TWO_CHANNEL_AUDIO\n");
-		}
+            case CD_TRACK_AUDIO:
+                tempstr.cpy("AUDIO");
+                break;
+        }
 
-		// output pregap
-		astring tempstr;
-		if (info.pregap > 0)
-			core_fprintf(file, "ZERO %s %s\n", modesubmode.cstr(), msf_string_from_frames(tempstr, info.pregap));
+        // output TRACK entry
+        core_fprintf(file, "  TRACK %02d %s\n", tracknum + 1, tempstr.cstr());
 
-		// all tracks but the first one have a file offset
-		if (tracknum > 0)
-			core_fprintf(file, "DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, UINT32(discoffs), msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
-		else
-			core_fprintf(file, "DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
+        // output PREGAP
+        if (info.pregap > 0)
+            core_fprintf(file, "    PREGAP %s\n", msf_string_from_frames(tempstr, info.pregap));
 
-		// tracks with pregaps get a START marker too
-		if (info.pregap > 0)
-			core_fprintf(file, "START %s\n", msf_string_from_frames(tempstr, info.pregap));
+        // output track data
+        core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
 
-		core_fprintf(file, "\n\n");
-	}
+        // output POSTGAP
+        if (info.postgap > 0)
+            core_fprintf(file, "    POSTGAP %s\n", msf_string_from_frames(tempstr, info.postgap));
+    }
+    // non-CUE mode
+    else if (mode == MODE_NORMAL)
+    {
+        // header on the first track
+        if (tracknum == 0)
+            core_fprintf(file, "CD_ROM\n\n\n");
+        core_fprintf(file, "// Track %d\n", tracknum + 1);
+
+        // write out the track type
+        astring modesubmode;
+        if (info.subtype != CD_SUB_NONE)
+            modesubmode.format("%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
+        else
+            modesubmode.format("%s", cdrom_get_type_string(info.trktype));
+        core_fprintf(file, "TRACK %s\n", modesubmode.cstr());
+
+        // write out the attributes
+        core_fprintf(file, "NO COPY\n");
+        if (info.trktype == CD_TRACK_AUDIO)
+        {
+            core_fprintf(file, "NO PRE_EMPHASIS\n");
+            core_fprintf(file, "TWO_CHANNEL_AUDIO\n");
+        }
+
+        // output pregap
+        astring tempstr;
+        if (info.pregap > 0)
+            core_fprintf(file, "ZERO %s %s\n", modesubmode.cstr(), msf_string_from_frames(tempstr, info.pregap));
+
+        // all tracks but the first one have a file offset
+        if (tracknum > 0)
+            core_fprintf(file, "DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, UINT32(discoffs), msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
+        else
+            core_fprintf(file, "DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
+
+        // tracks with pregaps get a START marker too
+        if (info.pregap > 0)
+            core_fprintf(file, "START %s\n", msf_string_from_frames(tempstr, info.pregap));
+
+        core_fprintf(file, "\n\n");
+    }
 }
 
 
@@ -2194,6 +2252,8 @@ static void do_extract_cd(parameters_t &params)
 	int chop = default_name.rchr(0, '.');
 	if (chop != -1)
 		default_name.substr(0, chop);
+    char basename[128];
+    strncpy(basename, default_name.cstr(), 127);
 	default_name.cat(".bin");
 	if (output_bin_file_str == NULL)
 		output_bin_file_str = &default_name;
@@ -2210,21 +2270,40 @@ static void do_extract_cd(parameters_t &params)
 	core_file *output_toc_file = NULL;
 	try
 	{
-		// process output file
-		file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &output_toc_file);
-		if (filerr != FILERR_NONE)
-			report_error(1, "Unable to open file (%s)", output_file_str->cstr());
-		bool cuemode = (output_file_str->find(".cue") != -1);
+        int mode = MODE_NORMAL;
+
+		if (output_file_str->find(".cue") != -1)
+        {
+            mode = MODE_CUEBIN;
+        }
+        else if (output_file_str->find(".gdi") != -1)
+        {
+            mode = MODE_GDI;
+        }
+
+        // process output file
+        file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &output_toc_file);
+        if (filerr != FILERR_NONE)
+            report_error(1, "Unable to open file (%s)", output_file_str->cstr());
 
 		// process output BIN file
-		filerr = core_fopen(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
-		if (filerr != FILERR_NONE)
-			report_error(1, "Unable to open file (%s)", output_bin_file_str->cstr());
+        if (mode != MODE_GDI)
+        {
+            filerr = core_fopen(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
+            if (filerr != FILERR_NONE)
+                report_error(1, "Unable to open file (%s)", output_bin_file_str->cstr());
+        }
 
 		// determine total frames
 		UINT64 total_bytes = 0;
 		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
 			total_bytes += toc->tracks[tracknum].frames * (toc->tracks[tracknum].datasize + toc->tracks[tracknum].subsize);
+
+		// GDI must start with the # of tracks
+		if (mode == MODE_GDI)
+		{
+			core_fprintf(output_toc_file, "%d\n", toc->numtrks);
+		}
 
 		// iterate over tracks and copy all data
 		UINT64 outputoffs = 0;
@@ -2232,16 +2311,45 @@ static void do_extract_cd(parameters_t &params)
 		dynamic_buffer buffer;
 		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
 		{
+            astring trackbin_name(basename);
+
+            if (mode == MODE_GDI)
+            {
+                char temp[8];
+                sprintf(temp, "%02d", tracknum+1);
+                trackbin_name.cat(temp);
+                trackbin_name.cat(".bin");
+
+                if (output_bin_file)
+                {
+                    core_fclose(output_bin_file);
+                    output_bin_file = NULL;
+                }
+
+                filerr = core_fopen(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
+                if (filerr != FILERR_NONE)
+                    report_error(1, "Unable to open file (%s)", trackbin_name.cstr());
+
+                outputoffs = 0;
+            }
+
 			// output the metadata about the track to the TOC file
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
-			output_track_metadata(cuemode, output_toc_file, tracknum, trackinfo, *output_bin_file_str, discoffs, outputoffs);
+            if (mode == MODE_GDI)
+            {
+                output_track_metadata(mode, output_toc_file, tracknum, trackinfo, trackbin_name, discoffs, outputoffs);
+            }
+            else
+            {
+                output_track_metadata(mode, output_toc_file, tracknum, trackinfo, *output_bin_file_str, discoffs, outputoffs);
+            }
 
             // If this is bin/cue output and the CHD contains subdata, warn the user and don't include
             // the subdata size in the buffer calculation.
 			UINT32 output_frame_size = trackinfo.datasize + ((trackinfo.subtype != CD_SUB_NONE) ? trackinfo.subsize : 0);
-            if (trackinfo.subtype != CD_SUB_NONE && cuemode)
+            if (trackinfo.subtype != CD_SUB_NONE && ((mode == MODE_CUEBIN) || (mode == MODE_GDI)))
             {
-                printf("Warning: Track %d has subcode data.  bin/cue format cannot contain subcode data and it will be omitted.\n", tracknum+1);
+                printf("Warning: Track %d has subcode data.  bin/cue and gdi formats cannot contain subcode data and it will be omitted.\n", tracknum+1);
                 printf("       : This may affect usage of the output image.  Use bin/toc output to keep all data.\n");
                 output_frame_size = trackinfo.datasize;
             }
@@ -2251,7 +2359,8 @@ static void do_extract_cd(parameters_t &params)
 
 			// now read and output the actual data
 			UINT32 bufferoffs = 0;
-			for (int frame = 0; frame < trackinfo.frames; frame++)
+            UINT32 actualframes = trackinfo.frames - trackinfo.padframes;
+			for (UINT32 frame = 0; frame < actualframes; frame++)
 			{
 				progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(outputoffs) / double(total_bytes));
 
@@ -2259,7 +2368,7 @@ static void do_extract_cd(parameters_t &params)
 				cdrom_read_data(cdrom, cdrom_get_track_start(cdrom, tracknum) + frame, &buffer[bufferoffs], trackinfo.trktype);
 
 				// for CDRWin, audio tracks must be reversed
-				if (cuemode && (trackinfo.trktype == CD_TRACK_AUDIO))
+				if ((mode == MODE_CUEBIN) && (trackinfo.trktype == CD_TRACK_AUDIO))
 					for (int swapindex = 0; swapindex < trackinfo.datasize; swapindex += 2)
 					{
 						UINT8 swaptemp = buffer[bufferoffs + swapindex];
@@ -2270,14 +2379,14 @@ static void do_extract_cd(parameters_t &params)
 				discoffs++;
 
 				// read the subcode data
-				if (trackinfo.subtype != CD_SUB_NONE && !cuemode)
+				if (trackinfo.subtype != CD_SUB_NONE && (mode == MODE_NORMAL))
 				{
                     cdrom_read_subcode(cdrom, cdrom_get_track_start(cdrom, tracknum) + frame, &buffer[bufferoffs]);
                     bufferoffs += trackinfo.subsize;
 				}
 
 				// write it out if we need to
-				if (bufferoffs == buffer.count() || frame == trackinfo.frames - 1)
+				if (bufferoffs == buffer.count() || frame == actualframes - 1)
 				{
 					core_fseek(output_bin_file, outputoffs, SEEK_SET);
 					UINT32 byteswritten = core_fwrite(output_bin_file, buffer, bufferoffs);
@@ -2287,10 +2396,12 @@ static void do_extract_cd(parameters_t &params)
 					bufferoffs = 0;
 				}
 			}
+
+            discoffs += trackinfo.padframes;
 		}
 
 		// finish up
-		core_fclose(output_bin_file);
+        core_fclose(output_bin_file);
 		core_fclose(output_toc_file);
 		printf("Extraction complete                                    \n");
 	}

@@ -84,7 +84,7 @@ enum
 	CD_SUB_NONE					/* no subcode data stored */
 };
 
-
+#define	CD_FLAG_GDROM	0x00000001	// disc is a GD-ROM, all tracks should be stored with GD-ROM metadata
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -109,6 +109,9 @@ struct cdrom_track_info
 	UINT32 pgdatasize;	/* size of data in each sector of the pregap */
 	UINT32 pgsubsize;	/* size of subchannel data in each sector of the pregap */
 
+	/* fields used in CHDMAN only */
+	UINT32 padframes;	/* number of frames of padding to add to the end of the track; needed for GDI */
+
 	/* fields used in MAME only */
 	UINT32 physframeofs;	/* frame number on the real CD this track starts at */
 	UINT32 chdframeofs;	/* frame number this track starts at on the CHD */
@@ -118,6 +121,7 @@ struct cdrom_track_info
 struct cdrom_toc
 {
 	UINT32 numtrks;		/* number of tracks */
+	UINT32 flags;		/* see FLAG_ above */
 	cdrom_track_info tracks[CD_MAX_TRACKS];
 };
 

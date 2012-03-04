@@ -1,7 +1,7 @@
 /***************************************************************************
 
     TOC parser for CHD compression frontend
-    Handles CDRDAO .toc, CDRWIN .cue, and Sega GDROM .gdi
+    Handles CDRDAO .toc, CDRWIN .cue, Nero .nrg, and Sega GDROM .gdi
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -301,7 +301,7 @@ UINT64 read_uint64(FILE *infile)
 }
 
 /*-------------------------------------------------
-    chdcd_parse_nero - parse a Nero format image file
+    chdcd_parse_nero - parse a Nero .NRG file
 -------------------------------------------------*/
 
 chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
@@ -427,6 +427,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 				outtoc.tracks[track-1].pgsub = CD_SUB_NONE;
 				outtoc.tracks[track-1].pgdatasize = 0;
 				outtoc.tracks[track-1].pgsubsize = 0;
+				outtoc.tracks[track-1].padframes = 0;
 
 				offset += (UINT32)index2-index1;
 			}
@@ -455,7 +456,6 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 {
 	FILE *infile;
 	int i, numtracks;
-	//int chdpos=0;
 
 	astring path = astring(tocfname);
 
@@ -471,6 +471,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 	memset(&outtoc, 0, sizeof(outtoc));
 	outinfo.reset();
 
+    outtoc.flags = CD_FLAG_GDROM;
 
 	fgets(linebuffer,511,infile);
 	numtracks=atoi(linebuffer);
@@ -481,8 +482,6 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		int trknum;
 		int trksize,trktype;
 		int sz;
-		int hunks;
-
 
 		fgets(linebuffer,511,infile);
 
@@ -493,8 +492,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		outinfo.track[trknum].swap=false;
 		outinfo.track[trknum].offset=0;
 
-		//outtoc.tracks[trknum].trktype = CD_TRACK_MODE1;
-		outtoc.tracks[trknum].datasize = 0;
+        outtoc.tracks[trknum].datasize = 0;
 		outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 		outtoc.tracks[trknum].subsize = 0;
 
@@ -519,7 +517,6 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		}
 		if(trktype==0)
 		{
-			//assert(trksize==2352);
 			outtoc.tracks[trknum].trktype=CD_TRACK_AUDIO;
 			outtoc.tracks[trknum].datasize=2352;
 		}
@@ -540,35 +537,26 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		}
 		outinfo.track[trknum].fname.cpy(path).cat(name);
 
-		sz=get_file_size(outinfo.track[trknum].fname);
+		sz = get_file_size(outinfo.track[trknum].fname);
 
-		outtoc.tracks[trknum].frames=sz/trksize;
-		outtoc.tracks[trknum].extraframes=0;
+		outtoc.tracks[trknum].frames = sz/trksize;
+		outtoc.tracks[trknum].padframes = 0;
 
-		if(trknum!=0)
+		if (trknum != 0)
 		{
 			int dif=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
-			outtoc.tracks[trknum-1].frames+=dif;
+			outtoc.tracks[trknum-1].frames += dif;
+			outtoc.tracks[trknum-1].padframes = dif;
 		}
-
-/*
-        if(trknum!=0)
-        {
-            outtoc.tracks[trknum-1].extraframes=outtoc.tracks[trknum].physframeofs-(outtoc.tracks[trknum-1].frames+outtoc.tracks[trknum-1].physframeofs);
-        }
-*/
-		hunks = (outtoc.tracks[trknum].frames+CD_FRAMES_PER_HUNK - 1) / CD_FRAMES_PER_HUNK;
-		outtoc.tracks[trknum].extraframes = hunks * CD_FRAMES_PER_HUNK - outtoc.tracks[trknum].frames;
-
-		//chdpos+=outtoc.tracks[trknum].frames+outtoc.tracks[trknum].extraframes;
-
 	}
-	/*
-    for(i=0;i<numtracks;++i)
+
+    #if 0
+	for(i=0; i < numtracks; i++)
     {
-        printf("%s %d %d %d\n",outinfo.track[i].fname,outtoc.tracks[i].frames,outtoc.tracks[i].extraframes,outtoc.tracks[i].physframeofs);
+        printf("%s %d %d %d (true %d)\n", outinfo.track[i].fname.cstr(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
     }
-    */
+    #endif
+
 	/* close the input TOC */
 	fclose(infile);
 
@@ -579,7 +567,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 }
 
 /*-------------------------------------------------
-    chdcd_parse_cue - parse a CDRWin format CUE file
+    chdcd_parse_toc - parse a CDRWin format CUE file
 -------------------------------------------------*/
 
 chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
@@ -683,6 +671,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 				outtoc.tracks[trknum].subsize = 0;
 				outtoc.tracks[trknum].pregap = 0;
+				outtoc.tracks[trknum].padframes = 0;
 				outinfo.track[trknum].idx0offs = -1;
 				outinfo.track[trknum].idx1offs = 0;
 
@@ -988,6 +977,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				outtoc.tracks[trknum].datasize = 0;
 				outtoc.tracks[trknum].subtype = CD_SUB_NONE;
 				outtoc.tracks[trknum].subsize = 0;
+				outtoc.tracks[trknum].padframes = 0;
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)

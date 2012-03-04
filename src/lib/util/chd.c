@@ -58,6 +58,7 @@
 const char *HARD_DISK_METADATA_FORMAT = "CYLS:%d,HEADS:%d,SECS:%d,BPS:%d";
 const char *CDROM_TRACK_METADATA_FORMAT = "TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d";
 const char *CDROM_TRACK_METADATA2_FORMAT = "TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d PREGAP:%d PGTYPE:%s PGSUB:%s POSTGAP:%d";
+const char *GDROM_TRACK_METADATA_FORMAT = "TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d PAD:%d PREGAP:%d PGTYPE:%s PGSUB:%s POSTGAP:%d";
 const char *AV_METADATA_FORMAT = "FPS:%d.%06d WIDTH:%d HEIGHT:%d INTERLACED:%d CHANNELS:%d SAMPLERATE:%d";
 
 static const UINT32 METADATA_HEADER_SIZE = 16;			// metadata header size
@@ -1440,7 +1441,8 @@ UINT32 chd_file::guess_unitbytes()
 	// look for CD-ROM metadata; if found, then the unit size == CD frame size
 	if (read_metadata(CDROM_OLD_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
 		read_metadata(CDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE ||
-		read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE)
+		read_metadata(CDROM_TRACK_METADATA2_TAG, 0, metadata) == CHDERR_NONE ||
+		read_metadata(GDROM_TRACK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
 		return CD_FRAME_SIZE;
 
 	// otherwise, just map 1:1 with the hunk size
