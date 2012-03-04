@@ -19,7 +19,7 @@
 #ifndef FLAC__SHARE__ALLOC_H
 #define FLAC__SHARE__ALLOC_H
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -55,6 +55,7 @@
 /* avoid malloc()ing 0 bytes, see:
  * https://www.securecoding.cert.org/confluence/display/seccode/MEM04-A.+Do+not+make+assumptions+about+the+result+of+allocating+0+bytes?focusedCommentId=5407003
 */
+#if 0
 static FLaC__INLINE void *safe_malloc_(size_t size)
 {
 	/* malloc(0) is undefined; FLAC src convention is to always allocate */
@@ -62,7 +63,8 @@ static FLaC__INLINE void *safe_malloc_(size_t size)
 		size++;
 	return malloc(size);
 }
-
+#endif
+#if 0
 static FLaC__INLINE void *safe_calloc_(size_t nmemb, size_t size)
 {
 	if(!nmemb || !size)
@@ -104,29 +106,8 @@ static FLaC__INLINE void *safe_malloc_add_4op_(size_t size1, size_t size2, size_
 		return 0;
 	return safe_malloc_(size4);
 }
-
-static FLaC__INLINE void *safe_malloc_mul_2op_(size_t size1, size_t size2)
-#if 0
-needs support for cases where sizeof(size_t) != 4
-{
-	/* could be faster #ifdef'ing off SIZEOF_SIZE_T */
-	if(sizeof(size_t) == 4) {
-		if ((double)size1 * (double)size2 < 4294967296.0)
-			return malloc(size1*size2);
-	}
-	return 0;
-}
-#else
-/* better? */
-{
-	if(!size1 || !size2)
-		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
-	if(size1 > SIZE_MAX / size2)
-		return 0;
-	return malloc(size1*size2);
-}
 #endif
-
+#if 0
 static FLaC__INLINE void *safe_malloc_mul_3op_(size_t size1, size_t size2, size_t size3)
 {
 	if(!size1 || !size2 || !size3)
@@ -138,8 +119,9 @@ static FLaC__INLINE void *safe_malloc_mul_3op_(size_t size1, size_t size2, size_
 		return 0;
 	return malloc(size1*size3);
 }
-
+#endif
 /* size1*size2 + size3 */
+#if 0
 static FLaC__INLINE void *safe_malloc_mul2add_(size_t size1, size_t size2, size_t size3)
 {
 	if(!size1 || !size2)
@@ -192,7 +174,8 @@ static FLaC__INLINE void *safe_realloc_add_4op_(void *ptr, size_t size1, size_t 
 		return 0;
 	return realloc(ptr, size4);
 }
-
+#endif
+#if 0
 static FLaC__INLINE void *safe_realloc_mul_2op_(void *ptr, size_t size1, size_t size2)
 {
 	if(!size1 || !size2)
@@ -201,8 +184,9 @@ static FLaC__INLINE void *safe_realloc_mul_2op_(void *ptr, size_t size1, size_t 
 		return 0;
 	return realloc(ptr, size1*size2);
 }
-
+#endif
 /* size1 * (size2 + size3) */
+#if 0
 static FLaC__INLINE void *safe_realloc_muladd2_(void *ptr, size_t size1, size_t size2, size_t size3)
 {
 	if(!size1 || (!size2 && !size3))
@@ -212,5 +196,5 @@ static FLaC__INLINE void *safe_realloc_muladd2_(void *ptr, size_t size1, size_t 
 		return 0;
 	return safe_realloc_mul_2op_(ptr, size1, size2);
 }
-
+#endif
 #endif

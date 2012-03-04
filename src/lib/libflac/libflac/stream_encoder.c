@@ -29,9 +29,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
+
+#define FLAC__HAS_OGG 0
 
 #include <limits.h>
 #include <stdio.h>
@@ -90,6 +92,14 @@
  */
 #undef ENABLE_RICE_PARAMETER_SEARCH
 
+static FLaC__INLINE void *safe_malloc_mul_2op_(size_t size1, size_t size2)
+{
+	if(!size1 || !size2)
+		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
+	if(size1 > SIZE_MAX / size2)
+		return 0;
+	return malloc(size1*size2);
+}
 
 typedef struct {
 	FLAC__int32 *data[FLAC__MAX_CHANNELS];

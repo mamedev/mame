@@ -1,4 +1,4 @@
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -137,7 +137,7 @@ static void FLAC__MD5Transform(FLAC__uint32 buf[4], FLAC__uint32 const in[16])
 	buf[3] += d;
 }
 
-#if WORDS_BIGENDIAN
+#ifndef LSB_FIRST
 //@@@@@@ OPT: use bswap/intrinsics
 static void byteSwap(FLAC__uint32 *buf, unsigned words)
 {
@@ -280,7 +280,7 @@ static void format_input_(FLAC__byte *buf, const FLAC__int32 * const signal[], u
 	register FLAC__int32 a_word;
 	register FLAC__byte *buf_ = buf;
 
-#if WORDS_BIGENDIAN
+#ifndef LSB_FIRST
 #else
 	if(channels == 2 && bytes_per_sample == 2) {
 		FLAC__int16 *buf1_ = ((FLAC__int16*)buf_) + 1;
@@ -395,6 +395,14 @@ static void format_input_(FLAC__byte *buf, const FLAC__int32 * const signal[], u
 /*
  * Convert the incoming audio signal to a byte stream and FLAC__MD5Update it.
  */
+static FLaC__INLINE void *safe_malloc_(size_t size)
+{
+	/* malloc(0) is undefined; FLAC src convention is to always allocate */
+	if(!size)
+		size++;
+	return malloc(size);
+}
+
 FLAC__bool FLAC__MD5Accumulate(FLAC__MD5Context *ctx, const FLAC__int32 * const signal[], unsigned channels, unsigned samples, unsigned bytes_per_sample)
 {
 	const size_t bytes_needed = (size_t)channels * (size_t)samples * (size_t)bytes_per_sample;

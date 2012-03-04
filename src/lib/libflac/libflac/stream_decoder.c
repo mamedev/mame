@@ -29,9 +29,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
+
+#define FLAC__HAS_OGG 0
 
 #include <stdio.h>
 #include <stdlib.h> /* for malloc() */
@@ -79,6 +81,56 @@ FLAC_API int FLAC_API_SUPPORTS_OGG_FLAC =
 #endif
 ;
 
+static FLaC__INLINE void *safe_malloc_(size_t size)
+{
+	/* malloc(0) is undefined; FLAC src convention is to always allocate */
+	if(!size)
+		size++;
+	return malloc(size);
+}
+
+static FLaC__INLINE void *safe_calloc_(size_t nmemb, size_t size)
+{
+	if(!nmemb || !size)
+		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
+	return calloc(nmemb, size);
+}
+
+static FLaC__INLINE void *safe_realloc_mul_2op_(void *ptr, size_t size1, size_t size2)
+{
+	if(!size1 || !size2)
+		return realloc(ptr, 0); /* preserve POSIX realloc(ptr, 0) semantics */
+	if(size1 > SIZE_MAX / size2)
+		return 0;
+	return realloc(ptr, size1*size2);
+}
+
+static FLaC__INLINE void *safe_malloc_add_2op_(size_t size1, size_t size2)
+{
+	size2 += size1;
+	if(size2 < size1)
+		return 0;
+	return safe_malloc_(size2);
+}
+
+static FLaC__INLINE void *safe_malloc_mul_2op_(size_t size1, size_t size2)
+{
+	if(!size1 || !size2)
+		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
+	if(size1 > SIZE_MAX / size2)
+		return 0;
+	return malloc(size1*size2);
+}
+
+static FLaC__INLINE void *safe_malloc_muladd2_(size_t size1, size_t size2, size_t size3)
+{
+	if(!size1 || (!size2 && !size3))
+		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
+	size2 += size3;
+	if(size2 < size3)
+		return 0;
+	return safe_malloc_mul_2op_(size1, size2);
+}
 
 /***********************************************************************
  *

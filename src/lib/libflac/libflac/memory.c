@@ -29,13 +29,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #include "private/memory.h"
 #include "flac/assert.h"
 #include "share/alloc.h"
+
+static FLaC__INLINE void *safe_malloc_(size_t size)
+{
+	/* malloc(0) is undefined; FLAC src convention is to always allocate */
+	if(!size)
+		size++;
+	return malloc(size);
+}
 
 void *FLAC__memory_alloc_aligned(size_t bytes, void **aligned_address)
 {
@@ -84,7 +92,7 @@ FLAC__bool FLAC__memory_alloc_aligned_int32_array(unsigned elements, FLAC__int32
 	FLAC__ASSERT(0 != aligned_pointer);
 	FLAC__ASSERT(unaligned_pointer != aligned_pointer);
 
-	if((size_t)elements > SIZE_MAX / sizeof(*pu)) /* overflow check */
+	if(elements > (unsigned)(SIZE_MAX / sizeof(*pu))) /* overflow check */
 		return false;
 
 	pu = (FLAC__int32*)FLAC__memory_alloc_aligned(sizeof(*pu) * (size_t)elements, &u.pv);
@@ -113,7 +121,7 @@ FLAC__bool FLAC__memory_alloc_aligned_uint32_array(unsigned elements, FLAC__uint
 	FLAC__ASSERT(0 != aligned_pointer);
 	FLAC__ASSERT(unaligned_pointer != aligned_pointer);
 
-	if((size_t)elements > SIZE_MAX / sizeof(*pu)) /* overflow check */
+	if(elements > (unsigned)(SIZE_MAX / sizeof(*pu))) /* overflow check */
 		return false;
 
 	pu = (FLAC__uint32*)FLAC__memory_alloc_aligned(sizeof(*pu) * elements, &u.pv);
@@ -142,7 +150,7 @@ FLAC__bool FLAC__memory_alloc_aligned_uint64_array(unsigned elements, FLAC__uint
 	FLAC__ASSERT(0 != aligned_pointer);
 	FLAC__ASSERT(unaligned_pointer != aligned_pointer);
 
-	if((size_t)elements > SIZE_MAX / sizeof(*pu)) /* overflow check */
+	if(elements > (unsigned)(SIZE_MAX / sizeof(*pu))) /* overflow check */
 		return false;
 
 	pu = (FLAC__uint64*)FLAC__memory_alloc_aligned(sizeof(*pu) * elements, &u.pv);
@@ -171,7 +179,7 @@ FLAC__bool FLAC__memory_alloc_aligned_unsigned_array(unsigned elements, unsigned
 	FLAC__ASSERT(0 != aligned_pointer);
 	FLAC__ASSERT(unaligned_pointer != aligned_pointer);
 
-	if((size_t)elements > SIZE_MAX / sizeof(*pu)) /* overflow check */
+	if(elements > (unsigned)(SIZE_MAX / sizeof(*pu))) /* overflow check */
 		return false;
 
 	pu = (unsigned*)FLAC__memory_alloc_aligned(sizeof(*pu) * elements, &u.pv);
@@ -202,7 +210,7 @@ FLAC__bool FLAC__memory_alloc_aligned_real_array(unsigned elements, FLAC__real *
 	FLAC__ASSERT(0 != aligned_pointer);
 	FLAC__ASSERT(unaligned_pointer != aligned_pointer);
 
-	if((size_t)elements > SIZE_MAX / sizeof(*pu)) /* overflow check */
+	if(elements > (unsigned)(SIZE_MAX / sizeof(*pu))) /* overflow check */
 		return false;
 
 	pu = (FLAC__real*)FLAC__memory_alloc_aligned(sizeof(*pu) * elements, &u.pv);
