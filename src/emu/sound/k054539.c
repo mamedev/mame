@@ -69,11 +69,7 @@ void k054539_device::static_set_interface(device_t &device, const k054539_interf
    22f: enable pcm (b0), disable register ram updating (b7)
 
    The chip has a 0x4000 bytes reverb buffer (the ram from 0x22e).
-   The reverb delay is actually an offset in this buffer.  This driver
-   uses some tricks (doubling the buffer size so that the longest
-   reverbs don't fold over the sound to output, and adding a space at
-   the end to fold back overflows in) to be able to do frame-based
-   rendering instead of sample-based.
+   The reverb delay is actually an offset in this buffer.
 */
 
 void k054539_device::init_flags(int _flags)
@@ -115,88 +111,85 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	};
 
 
-	int cur_reverb_pos = reverb_pos;
 	INT16 *rbase = (INT16 *)ram;
 
-	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
+	if(!(regs[0x22f] & 1))
+		return;
 
-	if(!(regs[0x22f] & 1)) return;
+	for(int sample = 0; sample != samples; sample++) {
+		double lval, rval;
+		if(!(flags & DISABLE_REVERB))
+			lval = rval = rbase[reverb_pos];
+		else
+			lval = rval = 0;
+		rbase[reverb_pos] = 0;
+		
+		for(int ch=0; ch<8; ch++)
+			if(regs[0x22c] & (1<<ch)) {
+				unsigned char *base1 = regs + 0x20*ch;
+				unsigned char *base2 = regs + 0x200 + 0x2*ch;
+				channel *chan = channels + ch;
 
-	reverb_pos = (reverb_pos + samples) & 0x3fff;
+				int delta = base1[0x00] | (base1[0x01] << 8) | (base1[0x02] << 16);
 
-	for(int ch=0; ch<8; ch++)
-		if(regs[0x22c] & (1<<ch)) {
-			unsigned char *base1 = regs + 0x20*ch;
-			unsigned char *base2 = regs + 0x200 + 0x2*ch;
-			channel *chan = channels + ch;
+				int vol = base1[0x03];
 
-			int delta = base1[0x00] | (base1[0x01] << 8) | (base1[0x02] << 16);
+				int bval = vol + base1[0x04];
+				if (bval > 255)
+					bval = 255;
 
-			int vol = base1[0x03];
+				int pan = base1[0x05];
+				// DJ Main: 81-87 right, 88 middle, 89-8f left
+				if (pan >= 0x81 && pan <= 0x8f)
+					pan -= 0x81;
+				else if (pan >= 0x11 && pan <= 0x1f)
+					pan -= 0x11;
+				else
+					pan = 0x18 - 0x11;
 
-			int bval = vol + base1[0x04];
-			if (bval > 255) bval = 255;
+				double cur_gain = gain[ch];
 
-			int pan = base1[0x05];
-			// DJ Main: 81-87 right, 88 middle, 89-8f left
-			if (pan >= 0x81 && pan <= 0x8f)
-				pan -= 0x81;
-			else
-				if (pan >= 0x11 && pan <= 0x1f) pan -= 0x11; else pan = 0x18 - 0x11;
+				double lvol = voltab[vol] * pantab[pan] * cur_gain;
+				if (lvol > VOL_CAP)
+					lvol = VOL_CAP;
 
-			double cur_gain = gain[ch];
+				double rvol = voltab[vol] * pantab[0xe - pan] * cur_gain;
+				if (rvol > VOL_CAP)
+					rvol = VOL_CAP;
 
-			double lvol = voltab[vol] * pantab[pan] * cur_gain;
-			if (lvol > VOL_CAP) lvol = VOL_CAP;
+				double rbvol= voltab[bval] * cur_gain / 2;
+				if (rbvol > VOL_CAP)
+					rbvol = VOL_CAP;
 
-			double rvol = voltab[vol] * pantab[0xe - pan] * cur_gain;
-			if (rvol > VOL_CAP) rvol = VOL_CAP;
+				int rdelta = (base1[6] | (base1[7] << 8)) >> 3;
+				rdelta = (rdelta + reverb_pos) & 0x3fff;
 
-			double rbvol= voltab[bval] * cur_gain / 2;
-			if (rbvol > VOL_CAP) rbvol = VOL_CAP;
-
-			int rdelta = (base1[6] | (base1[7] << 8)) >> 3;
-			rdelta = (rdelta + cur_reverb_pos) & 0x3fff;
-
-			int cur_pos = (base1[0x0c] | (base1[0x0d] << 8) | (base1[0x0e] << 16)) & rom_mask;
+				int cur_pos = (base1[0x0c] | (base1[0x0d] << 8) | (base1[0x0e] << 16)) & rom_mask;
 			
-			stream_sample_t *bufl = outputs[0];
-			stream_sample_t *bufr = outputs[1];
+				int fdelta, pdelta;
+				if(base2[0] & 0x20) {
+					delta = -delta;
+					fdelta = +0x10000;
+					pdelta = -1;
+				} else {
+					fdelta = -0x10000;
+					pdelta = +1;
+				}
 
-			int fdelta, pdelta;
-			if(base2[0] & 0x20) {
-				delta = -delta;
-				fdelta = +0x10000;
-				pdelta = -1;
-			} else {
-				fdelta = -0x10000;
-				pdelta = +1;
-			}
+				int cur_pfrac, cur_val, cur_pval;
+				if(cur_pos != chan->pos) {
+					chan->pos = cur_pos;
+					cur_pfrac = 0;
+					cur_val = 0;
+					cur_pval = 0;
+				} else {
+					cur_pfrac = chan->pfrac;
+					cur_val = chan->val;
+					cur_pval = chan->pval;
+				}
 
-			int cur_pfrac, cur_val, cur_pval;
-			if(cur_pos != chan->pos) {
-				chan->pos = cur_pos;
-				cur_pfrac = 0;
-				cur_val = 0;
-				cur_pval = 0;
-			} else {
-				cur_pfrac = chan->pfrac;
-				cur_val = chan->val;
-				cur_pval = chan->pval;
-			}
-
-#define UPDATE_CHANNELS																	\
-			do {																		\
-				*bufl++ += (INT16)(cur_val*lvol);										\
-				*bufr++ += (INT16)(cur_val*rvol);										\
-				rbase[rdelta++] += (INT16)(cur_val*rbvol);								\
-				rdelta &= 0x3fff;														\
-			} while(0)
-
-			switch(base2[0] & 0xc) {
-			case 0x0: { // 8bit pcm
-				for(int i=0; i<samples; i++) {
+				switch(base2[0] & 0xc) {
+				case 0x0: { // 8bit pcm
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
 						cur_pfrac += fdelta;
@@ -204,27 +197,22 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 						cur_pval = cur_val;
 						cur_val = (INT16)(rom[cur_pos] << 8);
+						if(cur_val == (INT16)0x8000 && (base2[1] & 1)) {
+							cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask;
+							cur_val = (INT16)(rom[cur_pos] << 8);
+						}
 						if(cur_val == (INT16)0x8000) {
-							if(base2[1] & 1) {
-								cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask;
-								cur_val = (INT16)(rom[cur_pos] << 8);
-								if(cur_val != (INT16)0x8000)
-									continue;
-							}
 							keyoff(ch);
-							goto end_channel_0;
+							cur_val = 0;
+							break;
 						}
 					}
-
-					UPDATE_CHANNELS;
+					break;
 				}
-			end_channel_0:
-				break;
-			}
-			case 0x4: { // 16bit pcm lsb first
-				pdelta <<= 1;
 
-				for(int i=0; i<samples; i++) {
+				case 0x4: { // 16bit pcm lsb first
+					pdelta <<= 1;
+
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
 						cur_pfrac += fdelta;
@@ -232,32 +220,27 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 						cur_pval = cur_val;
 						cur_val = (INT16)(rom[cur_pos] | rom[cur_pos+1]<<8);
+						if(cur_val == (INT16)0x8000 && (base2[1] & 1)) {
+							cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask;
+							cur_val = (INT16)(rom[cur_pos] | rom[cur_pos+1]<<8);
+						}
 						if(cur_val == (INT16)0x8000) {
-							if(base2[1] & 1) {
-								cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask;
-								cur_val = (INT16)(rom[cur_pos] | rom[cur_pos+1]<<8);
-								if(cur_val != (INT16)0x8000)
-									continue;
-							}
 							keyoff(ch);
-							goto end_channel_4;
+							cur_val = 0;
+							break;
 						}
 					}
-
-					UPDATE_CHANNELS;
-				}
-			end_channel_4:
-				break;
-			}
-			case 0x8: { // 4bit dpcm
-				cur_pos <<= 1;
-				cur_pfrac <<= 1;
-				if(cur_pfrac & 0x10000) {
-					cur_pfrac &= 0xffff;
-					cur_pos |= 1;
+					break;
 				}
 
-				for(int i=0; i<samples; i++) {
+				case 0x8: { // 4bit dpcm
+					cur_pos <<= 1;
+					cur_pfrac <<= 1;
+					if(cur_pfrac & 0x10000) {
+						cur_pfrac &= 0xffff;
+						cur_pos |= 1;
+					}
+
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
 						cur_pfrac += fdelta;
@@ -265,17 +248,15 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 						cur_pval = cur_val;
 						cur_val = rom[cur_pos>>1];
-						if(cur_val == 0x88) {
-							if(base2[1] & 1) {
-								cur_pos = ((base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask) << 1;
-								cur_val = rom[cur_pos>>1];
-								if(cur_val != 0x88)
-									goto next_iter;
-							}
-							keyoff(ch);
-							goto end_channel_8;
+						if(cur_val == 0x88 && (base2[1] & 1)) {
+							cur_pos = ((base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask) << 1;
+							cur_val = rom[cur_pos>>1];
 						}
-					next_iter:
+						if(cur_val == 0x88) {
+							keyoff(ch);
+							cur_val = 0;
+							break;
+						}
 						if(cur_pos & 1)
 							cur_val >>= 4;
 						else
@@ -287,46 +268,35 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 							cur_val = 32767;
 					}
 
-					UPDATE_CHANNELS;
+					cur_pfrac >>= 1;
+					if(cur_pos & 1)
+						cur_pfrac |= 0x8000;
+					cur_pos >>= 1;
+					break;
 				}
-			end_channel_8:
-				cur_pfrac >>= 1;
-				if(cur_pos & 1)
-					cur_pfrac |= 0x8000;
-				cur_pos >>= 1;
-				break;
+				default:
+					LOG(("Unknown sample type %x for channel %d\n", base2[0] & 0xc, ch));
+					break;
+				}
+				lval += cur_val * lvol;
+				rval += cur_val * rvol;
+				rbase[(rdelta + reverb_pos) & 0x1fff] += INT16(cur_val*rbvol);
+			
+				chan->pos = cur_pos;
+				chan->pfrac = cur_pfrac;
+				chan->pval = cur_pval;
+				chan->val = cur_val;
+			
+				if(regupdate()) {
+					base1[0x0c] = cur_pos     & 0xff;
+					base1[0x0d] = cur_pos>> 8 & 0xff;
+					base1[0x0e] = cur_pos>>16 & 0xff;
+				}
 			}
-			default:
-				LOG(("Unknown sample type %x for channel %d\n", base2[0] & 0xc, ch));
-				break;
-			}
-			chan->pos = cur_pos;
-			chan->pfrac = cur_pfrac;
-			chan->pval = cur_pval;
-			chan->val = cur_val;
-			if(regupdate()) {
-				base1[0x0c] = cur_pos     & 0xff;
-				base1[0x0d] = cur_pos>> 8 & 0xff;
-				base1[0x0e] = cur_pos>>16 & 0xff;
-			}
-		}
-
-	//* drivers should be given the option to disable reverb when things go terribly wrong
-	if(!(flags & DISABLE_REVERB))
-	{
-		for(int i=0; i<samples; i++) {
-			INT16 val = rbase[(i+reverb_pos) & 0x3fff];
-			outputs[0][i] += val;
-			outputs[1][i] += val;
-		}
+		reverb_pos = (reverb_pos + 1) & 0x1fff;
+		outputs[0][sample] = INT16(lval);
+		outputs[1][sample] = INT16(rval);
 	}
-
-	if(cur_reverb_pos + samples > 0x4000) {
-		int i = 0x4000 - cur_reverb_pos;
-		memset(rbase + cur_reverb_pos, 0, i*2);
-		memset(rbase, 0, (samples-i)*2);
-	} else
-		memset(rbase + cur_reverb_pos, 0, samples*2);
 }
 
 
@@ -342,11 +312,10 @@ void k054539_device::init_chip()
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
-	// Real size of 0x4000, the addon is to simplify the reverb buffer computations
-	ram = auto_alloc_array(machine(), unsigned char, 0x4000*2+clock()/50*2);
+	ram = auto_alloc_array(machine(), unsigned char, 0x4000);
 	reverb_pos = 0;
 	cur_ptr = 0;
-	memset(ram, 0, 0x4000*2+clock()/50*2);
+	memset(ram, 0, 0x4000);
 
 	const memory_region *reg = (rgnoverride != NULL) ? machine().region(rgnoverride) : region();
 	rom = *reg;
