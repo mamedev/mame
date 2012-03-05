@@ -181,12 +181,45 @@ READ_LINE_DEVICE_HANDLER( floppy_index_r );
 // drive ready
 READ_LINE_DEVICE_HANDLER( floppy_ready_r );
 
-DECLARE_LEGACY_IMAGE_DEVICE(LEGACY_FLOPPY, floppy);
+class legacy_floppy_image_device :	public device_t,
+									public device_image_interface
+{
+public:
+	// construction/destruction
+	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~legacy_floppy_image_device();
 
-extern DEVICE_START( floppy );
-extern DEVICE_IMAGE_LOAD( floppy );
-extern DEVICE_IMAGE_CREATE( floppy );
-extern DEVICE_IMAGE_UNLOAD( floppy );
+	virtual bool call_load();
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { 	return load_software(swlist, swname, start_entry); }
+	virtual bool call_create(int format_type, option_resolution *format_options);
+	virtual void call_unload();
+	virtual void call_display_info();
+
+	virtual iodevice_t image_type() const { return IO_FLOPPY; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const;
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const;
+	virtual const char *file_extensions() const { return m_extension_list; }
+	virtual const option_guide *create_option_guide() const { return floppy_option_guide; }
+	
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }	
+protected:
+	// device overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	
+	void *m_token;
+	char			m_extension_list[256];
+};
+
+// device type definition
+extern const device_type LEGACY_FLOPPY;
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
