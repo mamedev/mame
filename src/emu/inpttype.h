@@ -48,7 +48,9 @@
 #define INPUT_PORT_ANALOG_TYPE(_player,_group,_type,_name,_seq,_decseq,_incseq) \
 	typelist.append(*global_alloc(input_type_entry(IPT_##_type, IPG_##_group, (_player == 0) ? _player : (_player) - 1, (_player == 0) ? #_type : ("P" #_player "_" #_type), _name, _seq, _decseq, _incseq)));
 
-
+#ifdef __GNUC__
+__attribute__((optimize("O0")))
+#endif
 void construct_core_types(simple_list<input_type_entry> &typelist)
 {
 	INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, JOYSTICK_UP,         "P1 Up",                  input_seq(KEYCODE_UP, input_seq::or_code, JOYCODE_Y_UP_SWITCH_INDEXED(0)) )
