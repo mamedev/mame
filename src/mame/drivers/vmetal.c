@@ -403,6 +403,20 @@ static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 	SET_TILE_INFO(0, tile, color, TILE_FLIPYX(0x0));
 }
 
+static void expand_gfx1(running_machine &machine)
+{
+	metro_state *state = machine.driver_data<metro_state>();
+	UINT8 *base_gfx = machine.region("gfx1")->base();
+	UINT32 length = 2 * machine.region("gfx1")->bytes();
+	state->m_expanded_gfx1 = auto_alloc_array(machine, UINT8, length);
+	for (int i = 0; i < length; i += 2)
+	{
+		UINT8 src = base_gfx[i / 2];
+		state->m_expanded_gfx1[i+0] = src & 15;
+		state->m_expanded_gfx1[i+1] = src >> 4;
+	}
+}
+
 static VIDEO_START(varia)
 {
 	vmetal_state *state = machine.driver_data<vmetal_state>();
@@ -414,6 +428,8 @@ static VIDEO_START(varia)
 	state->m_texttilemap->set_transparent_pen(15);
 	state->m_mid1tilemap->set_transparent_pen(15);
 	state->m_mid2tilemap->set_transparent_pen(15);
+
+	expand_gfx1(machine);
 }
 
 static SCREEN_UPDATE_IND16(varia)
