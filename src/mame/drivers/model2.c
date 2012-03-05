@@ -4413,7 +4413,7 @@ ROM_START( sgt24h ) /* Super GT 24h, Model 2B */
 	ROM_LOAD("mpr-19154.32", 0x000000, 0x400000, CRC(7cd9e679) SHA1(b9812c4f3042f95febc96bcdd46e3b0724ad4b4f) )
 ROM_END
 
-ROM_START( von ) /* Virtual On Cyber Troopers Revision B (US), Model 2B */
+ROM_START( von ) /* Virtual On Cyber Troopers Revision B (US), Model 2B, Sega ID# 834-12346-01 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-18828b.15", 0x000000, 0x080000, CRC(6499cc59) SHA1(8289be295f021acbf0c903513ba97ae7de50dedb) )
 	ROM_LOAD32_WORD("epr-18829b.16", 0x000002, 0x080000, CRC(0053b10f) SHA1(b89cc814b02b4ab5e37c75ee1a9cf57b88b63053) )
