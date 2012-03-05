@@ -22,6 +22,7 @@ protected:
 
 	virtual void scsi_command();
 	virtual UINT8 scsi_get_data(int id, int pos);
+	virtual void scsi_put_data(int buf, int offset, UINT8 data);
 
 private:
 	UINT8 block[512];

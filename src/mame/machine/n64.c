@@ -1299,7 +1299,7 @@ void n64_periphs::ai_dma()
     ai_status |= 0x40000000;
 
    // adjust the timer
-   period = attotime::from_hz(DACRATE_NTSC) * ((ai_dacrate + 1) * (current->length / 8));
+   period = attotime::from_hz(DACRATE_NTSC) * ((ai_dacrate + 1) * (current->length / 4));
    ai_timer->adjust(period);
 }
 
@@ -1339,7 +1339,7 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
             {
                 double secs_left = (ai_timer->expire() - machine().time()).as_double();
                 unsigned int samples_left = (UINT32)(secs_left * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
-                ret = samples_left * 8;
+                ret = samples_left * 4;
             }
             else
             {

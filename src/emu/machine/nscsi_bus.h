@@ -218,6 +218,7 @@ protected:
 	void bad_lun();
 
 	virtual UINT8 scsi_get_data(int buf, int offset);
+	virtual void scsi_put_data(int buf, int offset, UINT8 data);
 
 	// Default delays:
 
@@ -294,6 +295,7 @@ private:
 		TARGET_WAIT_MSG_BYTE,
 		TARGET_WAIT_CMD_BYTE,
 		TARGET_WAIT_DATA_IN_BYTE,
+		TARGET_WAIT_DATA_OUT_BYTE,
 	};
 
 	enum {
@@ -340,7 +342,6 @@ private:
 	void step(bool timeout);
 	void target_recv_byte();
 	void target_send_byte(UINT8 val);
-	void received(UINT8 val);
 	void target_send_buffer_byte();
 	bool command_done();
 };

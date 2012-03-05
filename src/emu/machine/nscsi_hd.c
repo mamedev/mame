@@ -50,7 +50,24 @@ UINT8 nscsi_harddisk_device::scsi_get_data(int id, int pos)
 			memset(block, 0, sizeof(block));
 		}
 	}
-	return block[pos & (bytes_per_sector - 1)];
+	return block[pos % bytes_per_sector];
+}
+
+void nscsi_harddisk_device::scsi_put_data(int id, int pos, UINT8 data)
+{
+	if(id != 2) {
+		nscsi_full_device::scsi_put_data(id, pos, data);
+		return;
+	}
+
+	int offset = pos % bytes_per_sector;
+	block[offset] = data;
+	int clba = lba + pos / bytes_per_sector;
+	//	logerror("%s: %d.%03d %02x\n", tag(), clba, offset, data);
+	if(pos == bytes_per_sector-1) {
+		if(!hard_disk_write(harddisk, clba, block))
+			logerror("%s: HD WRITE ERROR !\n", tag());
+	}
 }
 
 void nscsi_harddisk_device::scsi_command()
@@ -76,7 +93,7 @@ void nscsi_harddisk_device::scsi_command()
 
 	case SC_INQUIRY: {
 		int lun = get_lun(scsi_cmdbuf[1] >> 5);
-		logerror("%s: INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
+		logerror("%s: command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
 				 tag(),
 				 lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
 		if(lun) {
@@ -106,6 +123,115 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 	}
 
+	case SC_MODE_SENSE_6: {
+		int lun = get_lun(scsi_cmdbuf[1] >> 5);
+		logerror("%s: command MODE SENSE 6 lun=%d page=%02x alloc=%02x link=%02x\n",
+				 tag(),
+				 lun, scsi_cmdbuf[2] & 0x3f, scsi_cmdbuf[4], scsi_cmdbuf[5]);
+		if(lun) {
+			bad_lun();
+			return;
+		}
+
+		int page = scsi_cmdbuf[2] & 0x3f;
+		int size = scsi_cmdbuf[4];
+		int pos = 1;
+		scsi_cmdbuf[pos++] = 0x00; // medium type
+		scsi_cmdbuf[pos++] = 0x00; // WP, cache
+
+		hard_disk_info *info = hard_disk_get_info(harddisk);
+		UINT32 dsize = info->cylinders * info->heads * info->sectors - 1;
+		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
+		scsi_cmdbuf[pos++] = 0x00;
+		scsi_cmdbuf[pos++] = (dsize>>16) & 0xff;
+		scsi_cmdbuf[pos++] = (dsize>>8) & 0xff;
+		scsi_cmdbuf[pos++] = (dsize & 0xff);
+		scsi_cmdbuf[pos++] = 0x00;
+		scsi_cmdbuf[pos++] = (info->sectorbytes>>16)&0xff;
+		scsi_cmdbuf[pos++] = (info->sectorbytes>>8)&0xff;
+		scsi_cmdbuf[pos++] = (info->sectorbytes & 0xff);
+
+		int pmax = page == 0x3f ? 0x3e : page;
+		int pmin = page == 0x3f ? 0x00 : page;
+		for(int page=pmax; page >= pmin; page--) {
+			switch(page) {
+			case 0x00: // Unit attention parameters page (weird)
+				scsi_cmdbuf[pos++] = 0x80; // PS, page id
+				scsi_cmdbuf[pos++] = 0x02; // Page length
+				scsi_cmdbuf[pos++] = 0x00; // Meh
+				scsi_cmdbuf[pos++] = 0x00; // Double meh
+				break;
+				
+			case 0x03:  { // Format parameters page
+				scsi_cmdbuf[pos++] = 0x83; // PS, page id
+				scsi_cmdbuf[pos++] = 0x16; // Page length
+				scsi_cmdbuf[pos++] = (info->cylinders * info->heads) >> 8; // Track/zone
+				scsi_cmdbuf[pos++] = info->cylinders * info->heads;        // Track/zone
+				scsi_cmdbuf[pos++] = 0x00; // Alt sect/zone
+				scsi_cmdbuf[pos++] = 0x00; // Alt sect/zone
+				scsi_cmdbuf[pos++] = 0x00; // Alt track/zone
+				scsi_cmdbuf[pos++] = 0x00; // Alt track/zone
+				scsi_cmdbuf[pos++] = 0x00; // Alt track/volume
+				scsi_cmdbuf[pos++] = 0x00; // Alt track/volume
+				scsi_cmdbuf[pos++] = info->sectors >> 8; // Sectors/track
+				scsi_cmdbuf[pos++] = info->sectors;      // Sectors/track
+				scsi_cmdbuf[pos++] = info->sectorbytes >> 8; // Bytes/sector
+				scsi_cmdbuf[pos++] = info->sectorbytes;      // Bytes/sector
+				scsi_cmdbuf[pos++] = 0x00; // Interleave
+				scsi_cmdbuf[pos++] = 0x00; // Interleave
+				scsi_cmdbuf[pos++] = 0x00; // Track skew
+				scsi_cmdbuf[pos++] = 0x00; // Track skew
+				scsi_cmdbuf[pos++] = 0x00; // Cylinder skew
+				scsi_cmdbuf[pos++] = 0x00; // Cylinder skew
+				scsi_cmdbuf[pos++] = 0x00; // Sectoring type
+				scsi_cmdbuf[pos++] = 0x00; // Reserved
+				scsi_cmdbuf[pos++] = 0x00; // Reserved
+				scsi_cmdbuf[pos++] = 0x00; // Reserved
+				break;
+			}
+
+			case 0x04: { // Rigid drive geometry page
+				scsi_cmdbuf[pos++] = 0x84; // PS, page id
+				scsi_cmdbuf[pos++] = 0x16; // Page length
+				scsi_cmdbuf[pos++] = info->cylinders >> 16; // Cylinders
+				scsi_cmdbuf[pos++] = info->cylinders >> 8;  // Cylinders
+				scsi_cmdbuf[pos++] = info->cylinders;       // Cylinders
+				scsi_cmdbuf[pos++] = info->heads;           // Heads
+				scsi_cmdbuf[pos++] = 0x00;                  // Starting cylinder - write precomp
+				scsi_cmdbuf[pos++] = 0x00;                  // Starting cylinder - write precomp
+				scsi_cmdbuf[pos++] = 0x00;                  // Starting cylinder - write precomp
+				scsi_cmdbuf[pos++] = 0x00;                  // Starting cylinder - reduced write current
+				scsi_cmdbuf[pos++] = 0x00;                  // Starting cylinder - reduced write current
+				scsi_cmdbuf[pos++] = 0x00;                  // Starting cylinder - reduced write current
+				scsi_cmdbuf[pos++] = 0x00;                  // Drive step rate
+				scsi_cmdbuf[pos++] = 0x00;                  // Drive step rate
+				scsi_cmdbuf[pos++] = 0x00;                  // Landing zone cylinder
+				scsi_cmdbuf[pos++] = 0x00;                  // Landing zone cylinder
+				scsi_cmdbuf[pos++] = 0x00;                  // Landing zone cylinder
+				scsi_cmdbuf[pos++] = 0x00;                  // RPL
+				scsi_cmdbuf[pos++] = 0x00;                  // Rotational offset
+				scsi_cmdbuf[pos++] = 0x00;                  // Reserved
+				scsi_cmdbuf[pos++] = UINT8(10000 >> 8);     // Medium rotation rate
+				scsi_cmdbuf[pos++] = UINT8(10000);          // Medium rotation rate
+				scsi_cmdbuf[pos++] = 0x00;                  // Reserved
+				scsi_cmdbuf[pos++] = 0x00;                  // Reserved
+				break;
+			}
+
+			default:
+				logerror("%s: mode sense page %02x unhandled\n", tag(), page);
+				break;
+			}
+		}
+		scsi_cmdbuf[0] = pos;
+		if(pos > size)
+			pos = size;
+
+		scsi_data_in(0, pos);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
+
 	case SC_START_STOP_UNIT:
 		logerror("%s: command START STOP UNIT\n", tag());
 		scsi_status_complete(SS_GOOD);
@@ -114,19 +240,13 @@ void nscsi_harddisk_device::scsi_command()
 	case SC_READ_CAPACITY: {
 		logerror("%s: command READ CAPACITY\n", tag());
 
-		hard_disk_info *info;
-		UINT32 temp;
+		hard_disk_info *info = hard_disk_get_info(harddisk);
+		UINT32 size = info->cylinders * info->heads * info->sectors - 1;
 
-		info = hard_disk_get_info(harddisk);
-
-		// get # of sectors
-		temp = info->cylinders * info->heads * info->sectors;
-		temp--;
-
-		scsi_cmdbuf[0] = (temp>>24) & 0xff;
-		scsi_cmdbuf[1] = (temp>>16) & 0xff;
-		scsi_cmdbuf[2] = (temp>>8) & 0xff;
-		scsi_cmdbuf[3] = (temp & 0xff);
+		scsi_cmdbuf[0] = (size>>24) & 0xff;
+		scsi_cmdbuf[1] = (size>>16) & 0xff;
+		scsi_cmdbuf[2] = (size>>8) & 0xff;
+		scsi_cmdbuf[3] = (size & 0xff);
 		scsi_cmdbuf[4] = (info->sectorbytes>>24)&0xff;
 		scsi_cmdbuf[5] = (info->sectorbytes>>16)&0xff;
 		scsi_cmdbuf[6] = (info->sectorbytes>>8)&0xff;
@@ -145,6 +265,17 @@ void nscsi_harddisk_device::scsi_command()
 				 tag(), lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case SC_WRITE_EXTENDED:
+		lba = (scsi_cmdbuf[2]<<24) | (scsi_cmdbuf[3]<<16) | (scsi_cmdbuf[4]<<8) | scsi_cmdbuf[5];
+		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
+
+		logerror("%s: command WRITE EXTENDED start=%08x blocks=%04x\n",
+				 tag(), lba, blocks);
+
+		scsi_data_out(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
 		break;
 

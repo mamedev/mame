@@ -248,7 +248,7 @@ void nscsi_full_device::step(bool timeout)
 
 	case RECV_BYTE_T_WAIT_ACK_1 << SUB_SHIFT:
 		if(ctrl & S_ACK) {
-			received(scsi_bus->data_r());
+			scsi_put_data(data_buffer_id, data_buffer_pos++, scsi_bus->data_r());
 			scsi_state = (scsi_state & STATE_MASK) | (RECV_BYTE_T_WAIT_ACK_0 << SUB_SHIFT);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_REQ);
 		}
@@ -282,6 +282,8 @@ void nscsi_full_device::step(bool timeout)
 		control *ctl = buf_control_pop();
 		switch(ctl->action) {
 		case BC_MSG_OR_COMMAND:
+			data_buffer_id = SBUF_MAIN;
+			data_buffer_pos = 0;
 			if(ctrl & S_ATN) {
 				scsi_state = TARGET_WAIT_MSG_BYTE;
 				scsi_bus->ctrl_w(scsi_refid, S_PHASE_MSG_OUT, S_PHASE_MASK);
@@ -289,7 +291,6 @@ void nscsi_full_device::step(bool timeout)
 				scsi_state = TARGET_WAIT_CMD_BYTE;
 				scsi_bus->ctrl_w(scsi_refid, S_PHASE_COMMAND, S_PHASE_MASK);
 			}
-			scsi_cmdsize = 0;
 			target_recv_byte();
 			break;
 
@@ -305,6 +306,15 @@ void nscsi_full_device::step(bool timeout)
 			data_buffer_pos = 0;
 			scsi_state = TARGET_WAIT_DATA_IN_BYTE;
 			target_send_buffer_byte();
+			break;
+
+		case BC_DATA_OUT:
+			scsi_bus->ctrl_w(scsi_refid, S_PHASE_DATA_OUT, S_PHASE_MASK);
+			data_buffer_id = ctl->param1;
+			data_buffer_size = ctl->param2;
+			data_buffer_pos = 0;
+			scsi_state = TARGET_WAIT_DATA_OUT_BYTE;
+			target_recv_byte();
 			break;
 
 		case BC_MESSAGE_1:
@@ -328,12 +338,20 @@ void nscsi_full_device::step(bool timeout)
 		target_send_buffer_byte();
 		break;
 
+	case TARGET_WAIT_DATA_OUT_BYTE:
+		if(data_buffer_pos == data_buffer_size-1)
+			scsi_state = TARGET_NEXT_CONTROL;
+		target_recv_byte();
+		break;
+
 	case TARGET_WAIT_MSG_BYTE:
 		if(ctrl & S_SEL)
 			return;
 		if(!(ctrl & S_ATN)) {
+			scsi_cmdsize = data_buffer_pos;
 			scsi_message();
-			scsi_cmdsize = 0;
+			data_buffer_id = SBUF_MAIN;
+			data_buffer_pos = 0;
 			scsi_state = TARGET_WAIT_CMD_BYTE;
 			scsi_bus->ctrl_w(scsi_refid, S_PHASE_COMMAND, S_PHASE_MASK);
 		}
@@ -350,6 +368,7 @@ void nscsi_full_device::step(bool timeout)
 		}
 
 		if(command_done()) {
+			scsi_cmdsize = data_buffer_pos;
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_ACK);
 			scsi_command();
 			scsi_state = TARGET_NEXT_CONTROL;
@@ -383,11 +402,6 @@ void nscsi_full_device::target_send_byte(UINT8 val)
 	step(false);
 }
 
-void nscsi_full_device::received(UINT8 val)
-{
-	scsi_cmdbuf[scsi_cmdsize++] = val;
-}
-
 UINT8 nscsi_full_device::scsi_get_data(int id, int pos)
 {
 	switch(id) {
@@ -401,6 +415,20 @@ UINT8 nscsi_full_device::scsi_get_data(int id, int pos)
 	}
 }
 
+void nscsi_full_device::scsi_put_data(int id, int pos, UINT8 data)
+{
+	switch(id) {
+	case SBUF_MAIN:
+		scsi_cmdbuf[pos] = data;
+		break;
+	case SBUF_SENSE:
+		scsi_sense_buffer[pos] = data;
+		break;
+	default:
+		fatalerror("nscsi_full_device::scsi_put_data - unknown id");
+	}
+}
+
 void nscsi_full_device::target_send_buffer_byte()
 {
 	target_send_byte(scsi_get_data(data_buffer_id, data_buffer_pos++));
@@ -408,16 +436,16 @@ void nscsi_full_device::target_send_buffer_byte()
 
 bool nscsi_full_device::command_done()
 {
-	if(!scsi_cmdsize)
+	if(!data_buffer_pos)
 		return false;
 	UINT8 h = scsi_cmdbuf[0];
 	switch(h >> 5) {
-	case 0: return scsi_cmdsize == 6;
-	case 1: return scsi_cmdsize == 10;
-	case 2: return scsi_cmdsize == 10;
+	case 0: return data_buffer_pos == 6;
+	case 1: return data_buffer_pos == 10;
+	case 2: return data_buffer_pos == 10;
 	case 3: return true;
 	case 4: return true;
-	case 5: return scsi_cmdsize == 12;
+	case 5: return data_buffer_pos == 12;
 	case 6: return true;
 	case 7: return true;
 	}
