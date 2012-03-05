@@ -446,7 +446,7 @@ static INTERRUPT_GEN( mainevt_sound_timer_irq )
 	mainevt_state *state = device->machine().driver_data<mainevt_state>();
 
 	if(state->m_sound_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( devstors_sound_timer_irq )
@@ -454,7 +454,7 @@ static INTERRUPT_GEN( devstors_sound_timer_irq )
 	mainevt_state *state = device->machine().driver_data<mainevt_state>();
 
 	if(state->m_sound_irq_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( mainevt, mainevt_state )
