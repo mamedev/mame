@@ -117,13 +117,10 @@ static const floppy_error_map errmap[] =
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
-//DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY_APPLE, apple525);
-//DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY_SONY, sonydriv);
 
 INLINE floppy_drive *get_safe_token(device_t *device)
 {
 	assert( device != NULL );
-	//assert( device->type() == LEGACY_FLOPPY || device->type() == FLOPPY_APPLE || device->type() == FLOPPY_SONY);
 	return (floppy_drive *) downcast<legacy_floppy_image_device *>(device)->token();
 }
 

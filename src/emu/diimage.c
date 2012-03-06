@@ -1097,7 +1097,7 @@ void device_image_interface::unload()
     update_names - update brief and instance names
 -------------------------------------------------*/
 
-void device_image_interface::update_names()
+void device_image_interface::update_names(const device_type device_type, const char *inst, const char *brief)
 {
 	image_interface_iterator iter(device().mconfig().root_device());
 	int count = 0;
@@ -1106,18 +1106,20 @@ void device_image_interface::update_names()
 	{
 		if (this == image)
 			index = count;
-		if (image->image_type() == image_type())
+		if ((image->image_type() == image_type() && device_type==NULL) || (device_type==image->device().type()))
 			count++;
 	}
+	const char *inst_name = (device_type!=NULL) ? inst : device_typename(image_type());
+	const char *brief_name = (device_type!=NULL) ? brief : device_brieftypename(image_type());
 	if (count > 1)
 	{
-		m_instance_name.printf("%s%d", device_typename(image_type()), index + 1);
-		m_brief_instance_name.printf("%s%d", device_brieftypename(image_type()), index + 1);
+		m_instance_name.printf("%s%d", inst_name , index + 1);
+		m_brief_instance_name.printf("%s%d", brief_name, index + 1);
 	}
 	else
 	{
-		m_instance_name = device_typename(image_type());
-		m_brief_instance_name = device_brieftypename(image_type());
+		m_instance_name = inst_name;
+		m_brief_instance_name = brief_name;
 	}
 }
 
