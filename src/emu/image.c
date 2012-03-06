@@ -251,8 +251,6 @@ void image_device_init(running_machine &machine)
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Driver requires that device \"%s\" must have an image to load", image->instance_name());
 			}
 		}
-
-		image->call_get_devices();
 	}
 }
 

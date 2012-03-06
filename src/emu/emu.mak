@@ -57,7 +57,6 @@ EMUOBJS = \
 	$(EMUOBJ)/devcb.o \
 	$(EMUOBJ)/devcpu.o \
 	$(EMUOBJ)/device.o \
-	$(EMUOBJ)/devimage.o \
 	$(EMUOBJ)/devlegcy.o \
 	$(EMUOBJ)/didisasm.o \
 	$(EMUOBJ)/diexec.o \

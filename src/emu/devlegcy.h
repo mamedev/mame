@@ -134,47 +134,7 @@ enum
 
 	DEVINFO_STR_CLASS_SPECIFIC = 0x34000,				// R/W: device-specific values start here
 	DEVINFO_STR_DEVICE_SPECIFIC = 0x38000,				// R/W: device-specific values start here
-	DEVINFO_STR_LAST = 0x3ffff,
-
-    /* --- image device related --- */
-	/* --- the following bits of info are returned as integers --- */
-    DEVINFO_INT_IMAGE_FIRST = DEVINFO_INT_FIRST + 0x7000,
-    DEVINFO_INT_IMAGE_TYPE,
-    DEVINFO_INT_IMAGE_READABLE,
-    DEVINFO_INT_IMAGE_WRITEABLE,
-    DEVINFO_INT_IMAGE_CREATABLE,
-    DEVINFO_INT_IMAGE_MUST_BE_LOADED,
-    DEVINFO_INT_IMAGE_RESET_ON_LOAD,
-    DEVINFO_INT_IMAGE_CREATE_OPTCOUNT,
-    DEVINFO_INT_IMAGE_LAST = DEVINFO_INT_IMAGE_FIRST + 0x0fff,
-
-    /* --- the following bits of info are returned as pointers --- */
-    DEVINFO_PTR_IMAGE_FIRST = DEVINFO_PTR_FIRST + 0x7000,
-    DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE,
-    DEVINFO_PTR_IMAGE_CREATE_OPTSPEC,
-
-    /* --- the following bits of info are returned as pointers to functions --- */
-    DEVINFO_FCT_IMAGE_FIRST = DEVINFO_FCT_FIRST + 0x7000,
-    DEVINFO_FCT_IMAGE_LOAD,                                     /* R/O: device_image_load_func */
-    DEVINFO_FCT_IMAGE_CREATE,                                   /* R/O: device_image_create_func */
-    DEVINFO_FCT_IMAGE_UNLOAD,                                   /* R/O: device_image_unload_func */
-    DEVINFO_FCT_IMAGE_DISPLAY,                                  /* R/O: device_image_display_func */
-    DEVINFO_FCT_IMAGE_PARTIAL_HASH,                             /* R/O: device_image_partialhash_func */
-    DEVINFO_FCT_IMAGE_DISPLAY_INFO,                             /* R/O: device_image_display_info_func */
-    DEVINFO_FCT_IMAGE_GET_DEVICES,                              /* R/O: device_image_get_devices_func */
-	DEVINFO_FCT_IMAGE_SOFTLIST_LOAD,                            /* R/O: device_image_softlist_load_func */
-    DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff,
-
-    /* --- the following bits of info are returned as NULL-terminated strings --- */
-    DEVINFO_STR_IMAGE_FIRST = DEVINFO_STR_FIRST + 0x7000,
-    DEVINFO_STR_IMAGE_FILE_EXTENSIONS,
-    DEVINFO_STR_IMAGE_INSTANCE_NAME,
-    DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME,
-    DEVINFO_STR_IMAGE_CREATE_OPTNAME,
-    DEVINFO_STR_IMAGE_CREATE_OPTDESC = DEVINFO_STR_IMAGE_CREATE_OPTNAME + DEVINFO_IMAGE_CREATE_OPTMAX,
-    DEVINFO_STR_IMAGE_CREATE_OPTEXTS = DEVINFO_STR_IMAGE_CREATE_OPTDESC + DEVINFO_IMAGE_CREATE_OPTMAX,
-	DEVINFO_STR_IMAGE_INTERFACE,
-    DEVINFO_STR_IMAGE_LAST = DEVINFO_STR_IMAGE_FIRST + 0x0fff
+	DEVINFO_STR_LAST = 0x3ffff
 };
 
 //**************************************************************************
@@ -215,11 +175,9 @@ device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, 
 // reduced macros that are easier to use, and map to the above two macros
 #define DECLARE_LEGACY_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_device_base)
 #define DECLARE_LEGACY_SOUND_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_sound_device_base)
-#define DECLARE_LEGACY_IMAGE_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_image_device_base)
 
 #define DEFINE_LEGACY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_device_base)
 #define DEFINE_LEGACY_SOUND_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_sound_device_base)
-#define DEFINE_LEGACY_IMAGE_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_image_device_base)
 
 
 // macros to wrap legacy device functions
@@ -455,42 +413,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
-
-
-// ======================> legacy_image_device
-
-// legacy_image_device is a legacy_device_base with a image interface
-class legacy_image_device_base :	public legacy_device_base,
-									public device_image_interface
-{
-public:
-	virtual bool call_load();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
-	virtual bool call_create(int format_type, option_resolution *format_options);
-	virtual void call_unload();
-	virtual void call_display();
-	virtual void call_display_info();
-	virtual device_image_partialhash_func get_partial_hash() const;
-	virtual void call_get_devices();
-
-	virtual iodevice_t image_type() const { return static_cast<iodevice_t>(get_legacy_int(DEVINFO_INT_IMAGE_TYPE)); }
-
-	virtual bool is_readable()  const { return get_legacy_int(DEVINFO_INT_IMAGE_READABLE)!=0; }
-	virtual bool is_writeable() const { return get_legacy_int(DEVINFO_INT_IMAGE_WRITEABLE)!=0; }
-	virtual bool is_creatable() const { return get_legacy_int(DEVINFO_INT_IMAGE_CREATABLE)!=0; }
-	virtual bool must_be_loaded() const { return get_legacy_int(DEVINFO_INT_IMAGE_MUST_BE_LOADED)!=0; }
-	virtual bool is_reset_on_load() const { return get_legacy_int(DEVINFO_INT_IMAGE_RESET_ON_LOAD)!=0; }
-	virtual const char *image_interface() const { return get_legacy_string(DEVINFO_STR_IMAGE_INTERFACE); }
-	virtual const char *file_extensions() const { return get_legacy_string(DEVINFO_STR_IMAGE_FILE_EXTENSIONS); }
-	virtual const option_guide *create_option_guide() const { return reinterpret_cast<const option_guide *>(get_legacy_ptr(DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE)); }
-protected:
-	// device overrides
-	virtual void device_config_complete();
-
-	// construction/destruction
-	legacy_image_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
-	~legacy_image_device_base();
-};
 
 
 #endif	/* __DEVLEGCY_H__ */

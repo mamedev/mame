@@ -656,7 +656,6 @@ src/emu/devcpu.c svneol=native#text/plain
 src/emu/devcpu.h svneol=native#text/plain
 src/emu/device.c svneol=native#text/plain
 src/emu/device.h svneol=native#text/plain
-src/emu/devimage.c svneol=native#text/plain
 src/emu/devlegcy.c svneol=native#text/plain
 src/emu/devlegcy.h svneol=native#text/plain
 src/emu/devtempl.h svneol=native#text/plain
