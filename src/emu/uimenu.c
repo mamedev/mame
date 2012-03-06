@@ -979,6 +979,7 @@ void ui_menu::stack_push(ui_menu *menu)
 {
 	menu->parent = menu_stack;
 	menu_stack = menu;
+	menu->reset(UI_MENU_RESET_SELECT_FIRST);
 	ui_input_reset(menu->machine());
 }
 
