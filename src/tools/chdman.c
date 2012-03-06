@@ -2001,7 +2001,7 @@ static void do_create_ld(parameters_t &params)
 		// write the final LD metadata
 		if (info.height == 524/2 || info.height == 624/2)
 		{
-			err = chd->write_metadata(AV_LD_METADATA_TAG, 0, chd->ldframedata());
+			err = chd->write_metadata(AV_LD_METADATA_TAG, 0, chd->ldframedata(), 0);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error adding AVLD metadata: %s\n", chd_file::error_string(err));
 		}
@@ -2111,7 +2111,7 @@ static void do_copy(parameters_t &params)
 			}
 
 			// otherwise, clone it
-			err = chd->write_metadata(metatag, CHDMETAINDEX_APPEND, metadata);
+			err = chd->write_metadata(metatag, CHDMETAINDEX_APPEND, metadata, metaflags);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error writing cloned metadata: %s", chd_file::error_string(err));
 		}
