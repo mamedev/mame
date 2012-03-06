@@ -2835,6 +2835,7 @@ src/mame/drivers/pturn.c svneol=native#text/plain
 src/mame/drivers/puckpkmn.c svneol=native#text/plain
 src/mame/drivers/punchout.c svneol=native#text/plain
 src/mame/drivers/pushman.c svneol=native#text/plain
+src/mame/drivers/pyson.c svneol=native#text/plain
 src/mame/drivers/pzletime.c svneol=native#text/plain
 src/mame/drivers/qdrmfgp.c svneol=native#text/plain
 src/mame/drivers/qix.c svneol=native#text/plain

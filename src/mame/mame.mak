@@ -892,6 +892,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/pingpong.o $(VIDEO)/pingpong.o \
 	$(DRIVERS)/plygonet.o $(VIDEO)/plygonet.o \
 	$(DRIVERS)/pooyan.o $(VIDEO)/pooyan.o \
+	$(DRIVERS)/pyson.o \
 	$(DRIVERS)/qdrmfgp.o $(VIDEO)/qdrmfgp.o \
 	$(DRIVERS)/rockrage.o $(VIDEO)/rockrage.o \
 	$(DRIVERS)/rocnrope.o $(VIDEO)/rocnrope.o \
