@@ -25,6 +25,7 @@ void nscsi_harddisk_device::device_reset()
 		const hard_disk_info *hdinfo = hard_disk_get_info(harddisk);
 		bytes_per_sector = hdinfo->sectorbytes;
 	}
+	cur_lba = -1;
 }
 
 harddisk_interface nscsi_harddisk_device::hd_intf = { 0, 0 };
@@ -63,8 +64,7 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, UINT8 data)
 	int offset = pos % bytes_per_sector;
 	block[offset] = data;
 	int clba = lba + pos / bytes_per_sector;
-	//	logerror("%s: %d.%03d %02x\n", tag(), clba, offset, data);
-	if(pos == bytes_per_sector-1) {
+	if(offset == bytes_per_sector-1) {
 		if(!hard_disk_write(harddisk, clba, block))
 			logerror("%s: HD WRITE ERROR !\n", tag());
 	}
