@@ -2095,6 +2095,10 @@ ROM_END
     Shadow Dancer, Sega System 18
     CPU: 68000
     ROM Board: 171-5873B
+
+    game No. 833-7246-01
+    pcb  No. 837-7248
+    rom  No. 834-7247-01
 */
 ROM_START( shdancer1 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
