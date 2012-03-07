@@ -66,7 +66,7 @@ static WRITE8_HANDLER( spd_adpcm_w )
 static void spd_adpcm_int(device_t *device)
 {
 	spdodgeb_state *state = device->machine().driver_data<spdodgeb_state>();
-	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
+	int chip = (strcmp(device->tag(), ":msm1") == 0) ? 0 : 1;
 	if (state->m_adpcm_pos[chip] >= state->m_adpcm_end[chip] || state->m_adpcm_pos[chip] >= 0x10000)
 	{
 		state->m_adpcm_idle[chip] = 1;

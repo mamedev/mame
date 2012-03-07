@@ -168,7 +168,7 @@ static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 static void tbowl_adpcm_int(device_t *device)
 {
 	tbowl_state *state = device->machine().driver_data<tbowl_state>();
-	int num = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
+	int num = (strcmp(device->tag(), ":msm1") == 0) ? 0 : 1;
 	if (state->m_adpcm_pos[num] >= state->m_adpcm_end[num] ||
 				state->m_adpcm_pos[num] >= device->machine().region("adpcm")->bytes()/2)
 		msm5205_reset_w(device,1);

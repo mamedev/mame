@@ -409,7 +409,7 @@ static SCREEN_UPDATE_RGB32( hornet )
 static SCREEN_UPDATE_RGB32( hornet_2board )
 {
 	hornet_state *state = screen.machine().driver_data<hornet_state>();
-	if (strcmp(screen.tag(), "lscreen") == 0)
+	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
 		device_t *k037122 = screen.machine().device("k037122_1");
 		device_t *voodoo = screen.machine().device("voodoo0");
@@ -418,7 +418,7 @@ static SCREEN_UPDATE_RGB32( hornet_2board )
 		/* TODO: tilemaps per screen */
 		k037122_tile_draw(k037122, bitmap, cliprect);
 	}
-	else if (strcmp(screen.tag(), "rscreen") == 0)
+	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
 		device_t *k037122 = screen.machine().device("k037122_2");
 		device_t *voodoo = screen.machine().device("voodoo1");

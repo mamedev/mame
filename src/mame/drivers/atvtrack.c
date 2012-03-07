@@ -257,7 +257,7 @@ static READ64_HANDLER( ioport_r )
 {
 	if (offset == SH4_IOPORT_16/8) {
 		// much simplified way
-		if (strcmp(space->device().tag(), "maincpu") == 0)
+		if (strcmp(space->device().tag(), ":maincpu") == 0)
 #ifndef SPECIALMODE
 			return -1; // normal
 #else
