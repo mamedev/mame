@@ -1047,16 +1047,9 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 MACHINE_CONFIG_END
 
 
-
-static void wheelrun_ym3526_irqhandler( device_t *device, int state )
-{
-	fantland_state *driver = device->machine().driver_data<fantland_state>();
-	device_set_input_line(driver->m_audio_cpu, INPUT_LINE_IRQ0, state);
-}
-
 static const ym3526_interface wheelrun_ym3526_interface =
 {
-	wheelrun_ym3526_irqhandler
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0)
 };
 
 static MACHINE_CONFIG_START( wheelrun, fantland_state )

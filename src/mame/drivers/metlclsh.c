@@ -259,15 +259,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void metlclsh_irqhandler(device_t *device, int linestate)
-{
-	metlclsh_state *state = device->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, linestate);
-}
-
 static const ym3526_interface ym3526_config =
 {
-	metlclsh_irqhandler
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
 

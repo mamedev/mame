@@ -256,15 +256,9 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler( device_t *device, int irq )
-{
-	battlane_state *state = device->machine().driver_data<battlane_state>();
-	device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static const ym3526_interface ym3526_config =
 {
-	irqhandler
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
 };
 
 

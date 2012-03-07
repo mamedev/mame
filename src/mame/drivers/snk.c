@@ -457,27 +457,27 @@ static TIMER_CALLBACK( sndirq_update_callback )
 
 
 
-static void ymirq_callback_1(device_t *device, int irq)
+static WRITE_LINE_DEVICE_HANDLER( ymirq_callback_1 )
 {
-	if (irq)
+	if (state)
 		device->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_ASSERT);
 }
 
-static void ymirq_callback_2(device_t *device, int irq)
+static WRITE_LINE_DEVICE_HANDLER( ymirq_callback_2 )
 {
-	if (irq)
+	if (state)
 		device->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM2IRQ_ASSERT);
 }
 
 
 static const ym3526_interface ym3526_config_1 =
 {
-	ymirq_callback_1
+	DEVCB_LINE(ymirq_callback_1)
 };
 
 static const ym3526_interface ym3526_config_2 =
 {
-	ymirq_callback_2
+	DEVCB_LINE(ymirq_callback_2)
 };
 
 static const ym3812_interface ym3812_config_1 =

@@ -910,14 +910,9 @@ MACHINE_CONFIG_END
                             Best Of Best
 ***************************************************************************/
 
-static void bestbest_ym3526_irqhandler(device_t *device, int state)
-{
-	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_IRQ0, state);
-}
-
 static const ym3526_interface bestbest_ym3526_interface =
 {
-	bestbest_ym3526_irqhandler
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0)
 };
 
 static WRITE8_DEVICE_HANDLER( bestbest_ay8910_port_a_w )

@@ -1911,7 +1911,7 @@ static void irqhandler( device_t *device, int linestate )
 
 static const ym3526_interface ym3526_config =
 {
-	irqhandler
+	DEVCB_CPU_INPUT_LINE("audiocpu", M6502_IRQ_LINE)
 };
 
 static const ym3812_interface ym3812_config =

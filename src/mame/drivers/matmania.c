@@ -350,17 +350,9 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 MACHINE_CONFIG_END
 
 
-
-/* handler called by the 3526 emulator when the internal timers cause an IRQ */
-static void irqhandler(device_t *device, int linestate)
-{
-	matmania_state *state = device->machine().driver_data<matmania_state>();
-	device_set_input_line(state->m_audiocpu, 1, linestate);
-}
-
 static const ym3526_interface ym3526_config =
 {
-	irqhandler
+	DEVCB_CPU_INPUT_LINE("audiocpu", M6809_FIRQ_LINE)
 };
 
 

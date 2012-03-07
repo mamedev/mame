@@ -8,7 +8,7 @@
 typedef struct _ym3526_interface ym3526_interface;
 struct _ym3526_interface
 {
-	void (*handler)(device_t *device, int linestate);
+	devcb_write_line out_int_func;
 };
 
 READ8_DEVICE_HANDLER( ym3526_r );

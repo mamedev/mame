@@ -756,15 +756,9 @@ static INTERRUPT_GEN( karnov_interrupt )
 	device_set_input_line(device, 7, HOLD_LINE);	/* VBL */
 }
 
-static void sound_irq( device_t *device, int linestate )
-{
-	karnov_state *state = device->machine().driver_data<karnov_state>();
-	device_set_input_line(state->m_audiocpu, 0, linestate); /* IRQ */
-}
-
 static const ym3526_interface ym3526_config =
 {
-	sound_irq
+	DEVCB_CPU_INPUT_LINE("audiocpu", M6502_IRQ_LINE)
 };
 
 /*************************************

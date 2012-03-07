@@ -890,16 +890,9 @@ static GFXDECODE_START( renegade )
 GFXDECODE_END
 
 
-
-/* handler called by the 3526 emulator when the internal timers cause an IRQ */
-static void irqhandler(device_t *device, int linestate)
-{
-	cputag_set_input_line(device->machine(), "audiocpu", M6809_FIRQ_LINE, linestate);
-}
-
 static const ym3526_interface ym3526_config =
 {
-	irqhandler
+	DEVCB_CPU_INPUT_LINE("audiocpu", M6809_FIRQ_LINE)
 };
 
 

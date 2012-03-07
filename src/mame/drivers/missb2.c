@@ -407,7 +407,7 @@ GFXDECODE_END
 /* Sound Interfaces */
 
 // Handler called by the 3526 emulator when the internal timers cause an IRQ
-static void irqhandler(device_t *device, int irq)
+static WRITE_LINE_DEVICE_HANDLER( irqhandler )
 {
 	logerror("YM3526 firing an IRQ\n");
 //  cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -415,7 +415,7 @@ static void irqhandler(device_t *device, int irq)
 
 static const ym3526_interface ym3526_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 /* Interrupt Generator */
