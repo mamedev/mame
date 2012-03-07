@@ -1781,7 +1781,7 @@ void console_create_window(running_machine &machine)
 
 
 - (IBAction)debugNewErrorLogWindow:(id)sender {
-	MAMEDisassemblyViewer *win = [[MAMEErrorLogViewer alloc] initWithMachine:*machine console:self];
+	MAMEErrorLogViewer *win = [[MAMEErrorLogViewer alloc] initWithMachine:*machine console:self];
 	[auxiliaryWindows addObject:win];
 	[win release];
 	[win activate];
