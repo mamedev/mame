@@ -306,4 +306,35 @@ inline void save_manager::save_item(const char *module, const char *tag, int ind
 }
 
 
+//-------------------------------------------------
+//  save_item - specialized save_item for 
+//  dynamic_arrays
+//-------------------------------------------------
+
+// surely there must be a syntax for doing this templated??
+template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<UINT8> &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value[0], sizeof(UINT8), value.count());
+}
+
+template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<UINT16> &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value[0], sizeof(UINT16), value.count());
+}
+
+template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<UINT32> &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value[0], sizeof(UINT32), value.count());
+}
+
+template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<UINT64> &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value[0], sizeof(UINT64), value.count());
+}
+
+
 #endif	/* __SAVE_H__ */
