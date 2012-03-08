@@ -45,6 +45,8 @@
 //  DEBUGGING
 //**************************************************************************
 
+#define TEMP_HACKS		(1)
+
 #define LOG_TIMING		(0)
 #define LOG_LOWPARAM	(0)
 #define LOG_GLOTTAL		(0)
@@ -613,7 +615,9 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 				m_counter_236 = m_counter_234 = 0;
 				
 			// derive glottal circuit output signals
+#if !TEMP_HACKS
 			UINT8 old_glottal_sync = m_glottal_sync;
+#endif
 			m_glottal_sync = (m_counter_234 == 0);
 			glottal_out = s_glottal_wave[m_counter_234];
 			
@@ -645,6 +649,10 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 							 (m_0625_clock << 2) |
 							 (BIT(m_latch_46, 2) << 3);
 
+#if TEMP_HACKS
+			m_latch_46 = 0xf;
+#endif
+
 			// determine the read/write signal
 			UINT8 ram_write = 0;
 			switch (a)
@@ -652,7 +660,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 				// write if not FF and low 2 bits of latch
 				// FF is the S/R flip-flop at 142 ANDed with !(/FA & /VA)
 				case 0:	case 1:	case 2: case 3: case 4:
-					if ((m_srff_142 & !((m_fa == 0) & (m_va == 0))) && (m_latch_46 & 0x3) == 0x3)
+					if (!(m_srff_142 & !((m_fa == 0) & (m_va == 0))) && (m_latch_46 & 0x3) == 0x3)
 						ram_write = 1;
 					break;
 				
@@ -698,9 +706,13 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 			}
 			
 			// latch remaining parameter values on rising edge of (phi2 & glottal sync)
+#if TEMP_HACKS
+			if (phi2_rising)
+#else
 			UINT8 old_phi2_glottal = (old_phi2 & old_glottal_sync);
 			UINT8 new_phi2_glottal = m_phi2 & m_glottal_sync;
 			if ((old_phi2_glottal ^ new_phi2_glottal) & new_phi2_glottal)
+#endif
 				switch (a)
 				{
 					case 0:
