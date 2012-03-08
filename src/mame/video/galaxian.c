@@ -462,11 +462,11 @@ SCREEN_UPDATE_RGB32( galaxian )
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* render the sprites next */
-	sprites_draw(screen.machine(), bitmap, cliprect, &screen.machine().generic.spriteram.u8[0x40]);
+	sprites_draw(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x40]);
 
 	/* if we have bullets to draw, render them following */
 	if (state->m_draw_bullet_ptr != NULL)
-		bullets_draw(screen.machine(), bitmap, cliprect, &screen.machine().generic.spriteram.u8[0x60]);
+		bullets_draw(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x60]);
 
 	return 0;
 }
@@ -477,7 +477,8 @@ SCREEN_UPDATE_RGB32( zigzag )
 	SCREEN_UPDATE32_CALL(galaxian);
 
 	/* zigzag has an extra sprite generator instead of bullets (note: ideally, this should be rendered in parallel) */
-	sprites_draw(screen.machine(), bitmap, cliprect, &screen.machine().generic.spriteram.u8[0x60]);
+	galaxian_state *state = screen.machine().driver_data<galaxian_state>();
+	sprites_draw(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x60]);
 
 	return 0;
 }
@@ -497,7 +498,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 	UINT8 x = tile_index & 0x1f;
 
 	UINT16 code = videoram[tile_index];
-	UINT8 attrib = machine.generic.spriteram.u8[x*2+1];
+	UINT8 attrib = state->m_spriteram[x*2+1];
 	UINT8 color = attrib & 7;
 
 	if (state->m_extend_tile_info_ptr != NULL)
@@ -527,7 +528,7 @@ WRITE8_HANDLER( galaxian_objram_w )
 	space->machine().primary_screen->update_now();
 
 	/* store the data */
-	space->machine().generic.spriteram.u8[offset] = data;
+	state->m_spriteram[offset] = data;
 
 	/* the first $40 bytes affect the tilemap */
 	if (offset < 0x40)

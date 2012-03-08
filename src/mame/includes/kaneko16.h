@@ -73,7 +73,8 @@ class kaneko16_state : public driver_device
 public:
 	kaneko16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_spriteram(*this, "spriteram")
 		{ }
 
 	UINT16 *m_mcu_ram;
@@ -108,6 +109,7 @@ public:
 	bitmap_ind16 m_sprites_bitmap;
 
 	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<UINT16> m_spriteram;
 };
 
 

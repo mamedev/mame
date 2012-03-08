@@ -20,7 +20,6 @@ public:
 	UINT16 *    m_vram;
 	UINT16 *    m_scroll1;
 	UINT16 *    m_scroll2;
-//  UINT16 *    m_spriteram;  // this currently uses generic buffered spriteram
 	UINT16 *    m_paletteram;
 
 	/* video-related */

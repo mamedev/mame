@@ -263,10 +263,6 @@ private:
 // holds generic pointers that are commonly used
 struct generic_pointers
 {
-	generic_ptr				spriteram;			// spriteram
-	UINT32					spriteram_size;
-	generic_ptr				spriteram2;			// secondary spriteram
-	UINT32					spriteram2_size;
 	generic_ptr				paletteram;			// palette RAM
 	generic_ptr				paletteram2;		// secondary palette RAM
 };

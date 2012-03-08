@@ -257,12 +257,13 @@ WRITE8_HANDLER( mcr_91490_videoram_w )
 
 static void render_sprites_91399(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = machine.generic.spriteram.u8;
+	mcr_state *state = machine.driver_data<mcr_state>();
+	UINT8 *spriteram = state->m_spriteram;
 	const gfx_element *gfx = machine.gfx[1];
 	int offs;
 
 	/* render the sprites into the bitmap, ORing together */
-	for (offs = 0; offs < machine.generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int code, x, y, sx, sy, hflip, vflip;
 
@@ -329,12 +330,13 @@ static void render_sprites_91399(running_machine &machine, bitmap_ind16 &bitmap,
 
 static void render_sprites_91464(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask)
 {
-	UINT8 *spriteram = machine.generic.spriteram.u8;
+	mcr_state *state = machine.driver_data<mcr_state>();
+	UINT8 *spriteram = state->m_spriteram;
 	const gfx_element *gfx = machine.gfx[1];
 	int offs;
 
 	/* render the sprites into the bitmap, working from topmost to bottommost */
-	for (offs = machine.generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code, color, x, y, sx, sy, hflip, vflip;
 

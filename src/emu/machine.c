@@ -253,6 +253,7 @@ void running_machine::start()
 	m_render = auto_alloc(*this, render_manager(*this));
 	generic_machine_init(*this);
 	generic_sound_init(*this);
+	generic_video_init(*this);
 
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
@@ -285,9 +286,6 @@ void running_machine::start()
 	rom_init(*this);
 	memory_init(*this);
 	watchdog_init(*this);
-
-	// must happen after memory_init because this relies on generic.spriteram
-	generic_video_init(*this);
 
 	// allocate the gfx elements prior to device initialization
 	gfx_init(*this);

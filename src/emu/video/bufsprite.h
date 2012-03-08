@@ -115,7 +115,6 @@ protected:
 	// first-time setup
 	virtual void device_start()
 	{
-		printf("tag=%s spriteram=%p size=%d\n", tag(), (void *)m_spriteram, UINT32(m_spriteram.bytes()));
 		if (m_spriteram != NULL)
 		{
 			m_buffered.resize(m_spriteram.bytes() / sizeof(_Type));

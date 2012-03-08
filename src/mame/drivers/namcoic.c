@@ -620,6 +620,7 @@ namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_ind16 &bitmap, c
 /**************************************************************************************/
 
 static UINT16 mSpritePos[4];
+static UINT16 *m_spriteram;
 
 WRITE16_HANDLER( namco_spritepos16_w )
 {
@@ -715,7 +716,7 @@ template<class _BitmapClass>
 static void
 draw_spriteC355(running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, const UINT16 *pSource, int pri, int zpos )
 {
-	UINT16 *spriteram16 = machine.generic.spriteram.u16;
+	UINT16 *spriteram16 = m_spriteram;
 	unsigned screen_height_remaining, screen_width_remaining;
 	unsigned source_height_remaining, source_width_remaining;
 	int hpos,vpos;
@@ -908,8 +909,8 @@ namco_obj_init( running_machine &machine, int gfxbank, int palXOR, int (*codeToT
 	{
 		mpCodeToTile = DefaultCodeToTile;
 	}
-	machine.generic.spriteram.u16 = auto_alloc_array(machine, UINT16, 0x20000/2);
-	memset( machine.generic.spriteram.u16, 0, 0x20000 ); /* needed for Nebulas Ray */
+	m_spriteram = auto_alloc_array(machine, UINT16, 0x20000/2);
+	memset( m_spriteram, 0, 0x20000 ); /* needed for Nebulas Ray */
 	memset( mSpritePos,0x00,sizeof(mSpritePos) );
 } /* namcosC355_init */
 
@@ -942,11 +943,11 @@ namco_obj_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &
 	}
 //  if( offs==0 )
 	{ /* boot */
-		DrawObjectList(machine, bitmap,cliprect,pri,&machine.generic.spriteram.u16[0x02000/2], &machine.generic.spriteram.u16[0x00000/2] );
+		DrawObjectList(machine, bitmap,cliprect,pri,&m_spriteram[0x02000/2], &m_spriteram[0x00000/2] );
 	}
 //  else
 	{
-		DrawObjectList(machine, bitmap,cliprect,pri,&machine.generic.spriteram.u16[0x14000/2], &machine.generic.spriteram.u16[0x10000/2] );
+		DrawObjectList(machine, bitmap,cliprect,pri,&m_spriteram[0x14000/2], &m_spriteram[0x10000/2] );
 	}
 } /* namco_obj_draw */
 
@@ -960,27 +961,27 @@ namco_obj_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &
 	}
 //  if( offs==0 )
 	{ /* boot */
-		DrawObjectList(machine, bitmap,cliprect,pri,&machine.generic.spriteram.u16[0x02000/2], &machine.generic.spriteram.u16[0x00000/2] );
+		DrawObjectList(machine, bitmap,cliprect,pri,&m_spriteram[0x02000/2], &m_spriteram[0x00000/2] );
 	}
 //  else
 	{
-		DrawObjectList(machine, bitmap,cliprect,pri,&machine.generic.spriteram.u16[0x14000/2], &machine.generic.spriteram.u16[0x10000/2] );
+		DrawObjectList(machine, bitmap,cliprect,pri,&m_spriteram[0x14000/2], &m_spriteram[0x10000/2] );
 	}
 } /* namco_obj_draw */
 
 WRITE16_HANDLER( namco_obj16_w )
 {
-	COMBINE_DATA( &space->machine().generic.spriteram.u16[offset] );
+	COMBINE_DATA( &m_spriteram[offset] );
 } /* namco_obj16_w */
 
 READ16_HANDLER( namco_obj16_r )
 {
-	return space->machine().generic.spriteram.u16[offset];
+	return m_spriteram[offset];
 } /* namco_obj16_r */
 
 WRITE32_HANDLER( namco_obj32_w )
 {
-	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
+	UINT16 *spriteram16 = m_spriteram;
 	UINT32 v;
 	offset *= 2;
 	v = (spriteram16[offset]<<16)|spriteram16[offset+1];
@@ -991,14 +992,14 @@ WRITE32_HANDLER( namco_obj32_w )
 
 READ32_HANDLER( namco_obj32_r )
 {
-	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
+	UINT16 *spriteram16 = m_spriteram;
 	offset *= 2;
 	return (spriteram16[offset]<<16)|spriteram16[offset+1];
 } /* namco_obj32_r */
 
 WRITE32_HANDLER( namco_obj32_le_w )
 {
-	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
+	UINT16 *spriteram16 = m_spriteram;
 	UINT32 v;
 	offset *= 2;
 	v = (spriteram16[offset+1]<<16)|spriteram16[offset];
@@ -1009,7 +1010,7 @@ WRITE32_HANDLER( namco_obj32_le_w )
 
 READ32_HANDLER( namco_obj32_le_r )
 {
-	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
+	UINT16 *spriteram16 = m_spriteram;
 	offset *= 2;
 	return (spriteram16[offset+1]<<16)|spriteram16[offset];
 } /* namco_obj32_r */

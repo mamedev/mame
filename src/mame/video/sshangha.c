@@ -33,11 +33,11 @@ SCREEN_UPDATE_RGB32( sshangha )
 {
 	sshangha_state *state = screen.machine().driver_data<sshangha_state>();
 
-	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, screen.machine().generic.spriteram.u16, 0x800, true);
+	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x800, true);
 
 	// I'm pretty sure only the original has the 2nd spriteram, used for the Japanese text on the 2nd scene (non-scrolling text) in the intro of the quest (3rd in JPN) mode
-	if (screen.machine().generic.spriteram2.u16)
-		screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, screen.machine().generic.spriteram2.u16, 0x800, true);
+	if (state->m_spriteram2 != NULL)
+		screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram2, 0x800, true);
 
 	screen.machine().tilemap().set_flip_all(flip_screen_x_get(screen.machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
@@ -57,7 +57,7 @@ SCREEN_UPDATE_RGB32( sshangha )
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	}
 
-	if (screen.machine().generic.spriteram2.u16)
+	if (state->m_spriteram2 != NULL)
 		screen.machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0, 0x1ff);
 
 	screen.machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0200, 0, 0x1ff);

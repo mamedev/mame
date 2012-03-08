@@ -36,7 +36,8 @@ class galaxian_state : public driver_device
 {
 public:
 	galaxian_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT8 *m_videoram;
 	int m_counter_74ls161[2];
@@ -75,6 +76,7 @@ public:
 	UINT8 m_stars_blink_state;
 	rgb_t m_bullet_color[8];
 	UINT8 m_gfxbank[5];
+	required_shared_ptr<UINT8> m_spriteram;
 };
 
 

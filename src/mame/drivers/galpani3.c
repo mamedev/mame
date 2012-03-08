@@ -72,6 +72,7 @@ class galpani3_state : public kaneko16_state
 public:
 	galpani3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kaneko16_state(mconfig, type, tag),
+		m_sprite_bitmap_1(1024, 1024),
 		m_maincpu(*this,"maincpu")
 		{ }
 
@@ -103,10 +104,9 @@ public:
 	UINT16* m_framebuffer1_bright1;
 	UINT16* m_framebuffer1_bright2;
 	UINT16 *m_sprregs;
-	UINT16 *m_spriteram;
-	UINT32 *m_spriteram32;
-	UINT32 *m_spc_regs;
-	bitmap_ind16 *m_sprite_bitmap_1;
+	UINT32 m_spriteram32[0x4000/4];
+	UINT32 m_spc_regs[0x40/4];
+	bitmap_ind16 m_sprite_bitmap_1;
 	UINT16 *m_mcu_ram;
 	UINT16 m_mcu_com[4];
 	int m_regs1_i;
@@ -151,11 +151,6 @@ static VIDEO_START(galpani3)
 {
 	galpani3_state *state = machine.driver_data<galpani3_state>();
 	/* so we can use suprnova.c */
-	state->m_spriteram32 = auto_alloc_array(machine, UINT32, 0x4000/4);
-	machine.generic.spriteram_size = 0x4000;
-	state->m_spc_regs = auto_alloc_array(machine, UINT32, 0x40/4);
-
-	state->m_sprite_bitmap_1 = auto_bitmap_ind16_alloc(machine,1024,1024);
 
 	state->m_spritegen = machine.device<sknsspr_device>("spritegen");
 	state->m_spritegen->skns_sprite_kludge(0,0);
@@ -352,14 +347,14 @@ static SCREEN_UPDATE_RGB32(galpani3)
 		}
 	}
 
-	state->m_sprite_bitmap_1->fill(0x0000, cliprect);
+	state->m_sprite_bitmap_1.fill(0x0000, cliprect);
 
-	state->m_spritegen->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_1, cliprect, state->m_spriteram32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
+	state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap_1, cliprect, &state->m_spriteram32[0], 0x4000, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)
 	{
-		src1 = &state->m_sprite_bitmap_1->pix16(y);
+		src1 = &state->m_sprite_bitmap_1.pix16(y);
 		dst =  &bitmap.pix32(y);
 
 		for (x=0;x<320;x++)
@@ -874,7 +869,7 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM
 	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w)   AM_BASE_GENERIC(paletteram) // area [A] - palette for sprites
 
-	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_BASE_MEMBER(galpani3_state, m_spriteram)
+	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_SHARE("spriteram")
 	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_BASE_MEMBER(galpani3_state, m_sprregs)
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_MEMBER(galpani3_state, m_mcu_ram) // area [C]

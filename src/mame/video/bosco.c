@@ -135,9 +135,9 @@ VIDEO_START( bosco )
 
 	state->m_bg_tilemap->set_scrolldx(3,3);
 
-	machine.generic.spriteram_size = 0x0c;
-	machine.generic.spriteram.u8 = state->m_videoram + 0x03d4;
-	machine.generic.spriteram2.u8 = machine.generic.spriteram.u8 + 0x0800;
+	state->m_spriteram = state->m_videoram + 0x03d4;
+	state->m_spriteram_size = 0x0c;
+	state->m_spriteram2 = state->m_spriteram + 0x0800;
 	state->m_bosco_radarx = state->m_videoram + 0x03f0;
 	state->m_bosco_radary = state->m_bosco_radarx + 0x0800;
 
@@ -191,11 +191,12 @@ WRITE8_HANDLER( bosco_starclr_w )
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = machine.generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine.generic.spriteram2.u8;
+	bosco_state *state =  machine.driver_data<bosco_state>();
+	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
-	for (offs = 0;offs < machine.generic.spriteram_size;offs += 2)
+	for (offs = 0;offs < state->m_spriteram_size;offs += 2)
 	{
 		int sx = spriteram[offs + 1] - 1;
 		int sy = 240 - spriteram_2[offs];

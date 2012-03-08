@@ -18,8 +18,6 @@ public:
 	UINT32 *       m_spritebuf2;
 	UINT32 *       m_bootleg_spritebuffer;
 //      UINT32 *       m_paletteram;  // currently this uses generic palette handling
-//  UINT32 *       m_spriteram;   // currently this uses generic buffered spriteram
-//  size_t         m_spriteram_size;
 
 	/* video-related */
 	tilemap_t        *m_tilemap_0_size0;

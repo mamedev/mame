@@ -19,7 +19,6 @@ public:
 	UINT8 *        m_bg_scroll;
 	UINT8 *        m_nbg_yscroll;
 	UINT8 *        m_nbg_xscroll;
-//  UINT8 *        m_spriteram;   // currently this uses generic buffered_spriteram
 
 	/* video-related */
 	tilemap_t        *m_bg_tilemap;

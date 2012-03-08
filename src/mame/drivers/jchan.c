@@ -335,7 +335,6 @@ static VIDEO_START(jchan)
 	state->m_sprite_ram32_1 = auto_alloc_array(machine, UINT32, 0x4000/4);
 	state->m_sprite_ram32_2 = auto_alloc_array(machine, UINT32, 0x4000/4);
 
-	machine.generic.spriteram_size = 0x4000;
 	state->m_sprite_regs32_1 = auto_alloc_array(machine, UINT32, 0x40/4);
 	state->m_sprite_regs32_2 = auto_alloc_array(machine, UINT32, 0x40/4);
 

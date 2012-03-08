@@ -631,7 +631,7 @@ SCREEN_UPDATE_RGB32(skns)
 	state->m_sprite_bitmap.fill(0x0000, cliprect);
 
 	if (state->m_alt_enable_sprites)
-		state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap, cliprect, screen.machine().generic.spriteram.u32, screen.machine().generic.spriteram_size, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
+		state->m_spritegen->skns_draw_sprites(screen.machine(), state->m_sprite_bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes(), screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_spc_regs );
 
 
 	return 0;

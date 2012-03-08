@@ -8,7 +8,10 @@ class pacman_state : public driver_device
 {
 public:
 	pacman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram"),
+		  m_spriteram2(*this, "spriteram2"),
+		  m_s2650_spriteram(*this, "s2650_spriteram") { }
 
 	UINT8 m_cannonb_bit_to_read;
 	int m_mystery;
@@ -18,7 +21,6 @@ public:
 	UINT8 m_rocktrv2_question_bank;
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;
-	UINT8 *m_s2650games_spriteram;
 	UINT8 *m_s2650games_tileram;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_charbank;
@@ -30,6 +32,9 @@ public:
 	int m_xoffsethack;
 	UINT8 m_inv_spr;
 	UINT8 m_irq_mask;
+	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram2;
+	optional_shared_ptr<UINT8> m_s2650_spriteram;
 };
 
 

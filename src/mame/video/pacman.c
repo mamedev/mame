@@ -221,10 +221,10 @@ SCREEN_UPDATE_IND16( pacman )
 	else
 		state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 
-	if( screen.machine().generic.spriteram_size )
+	if( state->m_spriteram != NULL )
 	{
-		UINT8 *spriteram = screen.machine().generic.spriteram.u8;
-		UINT8 *spriteram_2 = screen.machine().generic.spriteram2.u8;
+		UINT8 *spriteram = state->m_spriteram;
+		UINT8 *spriteram_2 = state->m_spriteram2;
 		int offs;
 
 		rectangle spriteclip(2*8, 34*8-1, 0*8, 28*8-1);
@@ -232,7 +232,7 @@ SCREEN_UPDATE_IND16( pacman )
 
 		/* Draw the sprites. Note that it is important to draw them exactly in this */
 		/* order, to have the correct priorities. */
-		for (offs = screen.machine().generic.spriteram_size - 2;offs > 2*2;offs -= 2)
+		for (offs = state->m_spriteram.bytes() - 2;offs > 2*2;offs -= 2)
 		{
 			int color;
 			int sx,sy;
@@ -414,13 +414,13 @@ VIDEO_START( s2650games )
 SCREEN_UPDATE_IND16( s2650games )
 {
 	pacman_state *state = screen.machine().driver_data<pacman_state>();
-	UINT8 *spriteram = screen.machine().generic.spriteram.u8;
-	UINT8 *spriteram_2 = screen.machine().generic.spriteram2.u8;
+	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
-	for (offs = screen.machine().generic.spriteram_size - 2;offs > 2*2;offs -= 2)
+	for (offs = state->m_spriteram.bytes() - 2;offs > 2*2;offs -= 2)
 	{
 		int color;
 		int sx,sy;
@@ -432,7 +432,7 @@ SCREEN_UPDATE_IND16( s2650games )
 
 		/* TODO: ?? */
 		drawgfx_transmask(bitmap,cliprect,screen.machine().gfx[1],
-				(spriteram[offs] >> 2) | ((state->m_s2650games_spriteram[offs] & 3) << 6),
+				(spriteram[offs] >> 2) | ((state->m_s2650_spriteram[offs] & 3) << 6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy,
@@ -452,7 +452,7 @@ SCREEN_UPDATE_IND16( s2650games )
 
 		/* TODO: ?? */
 		drawgfx_transmask(bitmap,cliprect,screen.machine().gfx[1],
-				(spriteram[offs] >> 2) | ((state->m_s2650games_spriteram[offs] & 3)<<6),
+				(spriteram[offs] >> 2) | ((state->m_s2650_spriteram[offs] & 3)<<6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy + state->m_xoffsethack,

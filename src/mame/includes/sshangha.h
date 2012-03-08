@@ -5,7 +5,9 @@ class sshangha_state : public driver_device
 public:
 	sshangha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		 m_deco_tilegen1(*this, "tilegen1")
+		 m_deco_tilegen1(*this, "tilegen1"),
+		 m_spriteram(*this, "spriteram"),
+		 m_spriteram2(*this, "spriteram2")
 		{ }
 
 	UINT16 *m_prot_data;
@@ -21,6 +23,8 @@ public:
 	UINT16* m_tile_paletteram2;
 
 	required_device<deco16ic_device> m_deco_tilegen1;
+	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram2;
 };
 
 

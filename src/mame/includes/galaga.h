@@ -65,6 +65,10 @@ public:
 
 	UINT8 *m_bosco_radarx;
 	UINT8 *m_bosco_radary;
+	
+	UINT8 *m_spriteram;
+	UINT8 *m_spriteram2;
+	UINT32 m_spriteram_size;
 };
 
 class digdug_state : public galaga_state

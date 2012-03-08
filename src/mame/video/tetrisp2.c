@@ -541,7 +541,7 @@ SCREEN_UPDATE_IND16( tetrisp2 )
 	else if (asc_pri == 2)
 		state->m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority, screen.machine().generic.spriteram.u16, screen.machine().generic.spriteram_size, 0, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap, cliprect, state->m_priority, state->m_spriteram, state->m_spriteram.bytes(), 0, (state->m_systemregs[0x00] & 0x02));
 	return 0;
 }
 
@@ -626,7 +626,7 @@ SCREEN_UPDATE_IND16( rockntread )
 	else if (asc_pri == 2)
 		state->m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, screen.machine().generic.spriteram.u16, screen.machine().generic.spriteram_size, 0, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, state->m_spriteram, state->m_spriteram.bytes(), 0, (state->m_systemregs[0x00] & 0x02));
 	return 0;
 }
 
@@ -688,7 +688,7 @@ SCREEN_UPDATE_RGB32( rocknms_left )
 	else if (asc_pri == 2)
 		state->m_tilemap_sub_fg->draw(bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, screen.machine().generic.spriteram2.u16, screen.machine().generic.spriteram2_size, 4, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, state->m_spriteram2, state->m_spriteram2.bytes(), 4, (state->m_systemregs[0x00] & 0x02));
 
 	return 0;
 }
@@ -749,7 +749,7 @@ SCREEN_UPDATE_RGB32( rocknms_right )
 	else if (asc_pri == 2)
 		state->m_tilemap_fg->draw(bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, screen.machine().generic.spriteram.u16, screen.machine().generic.spriteram_size, 0, (state->m_systemregs[0x00] & 0x02));
+	tetrisp2_draw_sprites(screen.machine(), bitmap, screen.machine().priority_bitmap,cliprect, state->m_priority, state->m_spriteram, state->m_spriteram.bytes(), 0, (state->m_systemregs[0x00] & 0x02));
 
 	return 0;
 }

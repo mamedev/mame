@@ -173,10 +173,10 @@ static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
 
-	AM_RANGE(0x340000, 0x340fff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x340000, 0x340fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x350000, 0x350001) AM_READ(deco_71_r)
 	AM_RANGE(0x350000, 0x350007) AM_WRITENOP
-	AM_RANGE(0x360000, 0x360fff) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x360000, 0x360fff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
 	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
 
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE_MEMBER(sshangha_state, m_tile_paletteram1)
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
-	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM AM_BASE_GENERIC(spriteram) // bootleg spriteram
+	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM AM_SHARE("spriteram") // bootleg spriteram
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
 	AM_RANGE(0xff4000, 0xff47ff) AM_RAM
 ADDRESS_MAP_END

@@ -2,7 +2,9 @@ class tetrisp2_state : public driver_device
 {
 public:
 	tetrisp2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram"),
+		  m_spriteram2(*this, "spriteram2") { }
 
 	UINT16 m_systemregs[0x10];
 	UINT16 *m_vram_bg;
@@ -37,6 +39,8 @@ public:
 	tilemap_t *m_tilemap_sub_bg;
 	tilemap_t *m_tilemap_sub_fg;
 	tilemap_t *m_tilemap_sub_rot;
+	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram2;
 };
 
 WRITE16_HANDLER( tetrisp2_systemregs_w );

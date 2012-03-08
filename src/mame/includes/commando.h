@@ -18,7 +18,6 @@ public:
 	UINT8 *  m_colorram;
 	UINT8 *  m_videoram2;
 	UINT8 *  m_colorram2;
-//  UINT8 *  m_spriteram; // currently this uses generic buffered_spriteram
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

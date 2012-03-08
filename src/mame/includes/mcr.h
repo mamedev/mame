@@ -4,6 +4,7 @@
 
 **************************************************************************/
 
+#include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -18,12 +19,13 @@ class mcr_state : public driver_device
 public:
 	mcr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		  m_maincpu(*this, "maincpu"),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT8 *m_videoram;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
+	required_shared_ptr<UINT8> m_spriteram;
 };
 
 

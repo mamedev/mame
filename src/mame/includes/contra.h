@@ -21,7 +21,6 @@ public:
 	UINT8 *        m_fg_cram;
 	UINT8 *        m_tx_vram;
 	UINT8 *        m_tx_cram;
-	// this driver also uses a large generic spriteram region...
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
