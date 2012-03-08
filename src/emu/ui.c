@@ -1015,12 +1015,9 @@ static astring &warnings_string(running_machine &machine, astring &string)
 
 astring &game_info_astring(running_machine &machine, astring &string)
 {
-	screen_device_iterator scriter(machine.root_device());
-	int scrcount = scriter.count();
-	int found_sound = FALSE;
-
 	/* print description, manufacturer, and CPU: */
-	string.printf("%s\n%s %s\nDriver: %s\n\nCPU:\n", machine.system().description, machine.system().year, machine.system().manufacturer, strrchr(machine.system().source_file, '/')+1);
+	astring tempstr;
+	string.printf("%s\n%s %s\nDriver: %s\n\nCPU:\n", machine.system().description, machine.system().year, machine.system().manufacturer, core_filename_extract_base(tempstr, machine.system().source_file).cstr());
 
 	/* loop over all CPUs */
 	execute_interface_iterator execiter(machine.root_device());
@@ -1057,6 +1054,7 @@ astring &game_info_astring(running_machine &machine, astring &string)
 	/* loop over all sound chips */
 	sound_interface_iterator snditer(machine.root_device());
 	tagmap_t<UINT8> soundtags;
+	bool found_sound = false;
 	for (device_sound_interface *sound = snditer.first(); sound != NULL; sound = snditer.next())
 	{
 		if (soundtags.add(sound->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
@@ -1065,7 +1063,7 @@ astring &game_info_astring(running_machine &machine, astring &string)
 		/* append the Sound: string */
 		if (!found_sound)
 			string.cat("\nSound:\n");
-		found_sound = TRUE;
+		found_sound = true;
 
 		/* count how many identical sound chips we have */
 		int count = 1;
@@ -1093,12 +1091,13 @@ astring &game_info_astring(running_machine &machine, astring &string)
 
 	/* display screen information */
 	string.cat("\nVideo:\n");
+	screen_device_iterator scriter(machine.root_device());
+	int scrcount = scriter.count();
 	if (scrcount == 0)
 		string.cat("None\n");
 	else
 	{
-		screen_device_iterator iter(machine.root_device());
-		for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+		for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
 		{
 			if (scrcount > 1)
 			{
