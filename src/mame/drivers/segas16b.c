@@ -3756,7 +3756,9 @@ ROM_END
     Altered Beast, Sega System 16B
     CPU: FD1094 (317-0069)
     ROM Board: 171-5521
-    Sega ID# for ROM board: 834-6661-07
+    Sega game ID: 833-6660-07
+      Main board: 837-6662-05
+       ROM board: 834-6661-07
 */
 ROM_START( altbeast5 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -5700,6 +5702,7 @@ ROM_END
     Shinobi, Sega System 16B
     CPU: FD1094 (317-0049)
     ROM Board: 171-5358
+    ROM board: 834-6499
 */
 ROM_START( shinobi2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
