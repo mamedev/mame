@@ -41,6 +41,16 @@
 #include "votrax.h"
 
 
+//**************************************************************************
+//  DEBUGGING
+//**************************************************************************
+
+#define LOG_TIMING		(0)
+#define LOG_LOWPARAM	(0)
+#define LOG_GLOTTAL		(0)
+#define LOG_TRANSITION	(0)
+
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -77,18 +87,6 @@ const char *const votrax_sc01_device::s_phoneme_table[64] =
 	"U",	"Y",	"T",	"R",	"E",	"W",	"AE",	"AE1",
 	"AW2",	"UH2",	"UH1",	"UH",	"O2",	"O1",	"IU",	"U1",
 	"THV",	"TH",	"ER",	"EH",	"E1",	"AW",	"PA1",	"STOP"
-};
-
-const UINT16 votrax_sc01_device::s_phoneme_duration[64] =
-{
-	59,		71,		121,	47,		47,		71,		103,	90,
-	71,		55,		80,		121,	103,	80,		71,		71,
-	71,		121,	71,		146,	121,	146,	103,	185,
-	103,	80,		47,		71,		71,		103,	55,		90,
-	185,	65,		80,		47,		250,	103,	185,	185,
-	185,	103,	71,		90,		185,	80,		185,	103,
-	90,		71,		103,	185,	80,		121,	59,		90,
-	80,		71,		146,	185,	121,	253,	185,	47
 };
 
 // this waveform is derived from measuring fig. 10 in the patent
@@ -160,7 +158,11 @@ WRITE8_MEMBER( votrax_sc01_device::write )
 
 	// only 6 bits matter
 	m_phoneme = data & 0x3f;
-mame_printf_debug("%s: STROBE %s\n", machine().time().as_string(3), s_phoneme_table[m_phoneme]);
+const UINT8 *rom = m_rom + (m_phoneme << 3);
+mame_printf_debug("%s: STROBE %s (F1=%X F2=%X FC=%X F3=%X F2Q=%X VA=%X FA=%X CL=%X CLD=%X VD=%X PAC=%X PH=%02X)\n", 
+		machine().time().as_string(3), s_phoneme_table[m_phoneme],
+		rom[0] >> 4, rom[1] >> 4, rom[2] >> 4, rom[3] >> 4, rom[4] >> 4, rom[5] >> 4, rom[6] >> 4,
+		rom[3] & 0xf, rom[4] & 0xf, rom[5] & 0xf, rom[6] & 0xf, rom[7]);
 	
 	// the STROBE signal resets the phoneme counter
 	m_counter_84 = 0xf;
@@ -319,6 +321,31 @@ void votrax_sc01_device::sound_stream_update(sound_stream &stream, stream_sample
 		double noise_out = 0;
 		for (int curclock = 0; curclock < clocks_per_sample; curclock++)
 		{
+if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
+{
+	if (m_counter_34 % 32 == 0 && m_master_clock == 0)
+	{
+	if (LOG_TIMING)
+		mame_printf_debug("MCLK C034 L070 L072 BET1  P1   P2  PHI1 PHI2 PH1' PH2' SUBC C088 C084 L092 IIRQ ");
+	if (LOG_LOWPARAM)
+		mame_printf_debug("F132 F114 F112 F142 L080 ");
+	if (LOG_GLOTTAL)
+		mame_printf_debug("C220 C222 C224 C234 C236 FGAT GLSY ");
+	if (LOG_TRANSITION)
+		mame_printf_debug("0625 C046 L046 A0-2 L168 L170  FC   VA   FA   F1   F2   F3   F2Q ");
+	mame_printf_debug("\n");
+	}
+	if (LOG_TIMING)
+		mame_printf_debug("%4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X ", m_master_clock, m_counter_34, m_latch_70, m_latch_72, m_beta1, m_p1, m_p2, m_phi1, m_phi2, m_phi1_20, m_phi2_20, m_subphoneme_count, m_clock_88, m_counter_84, m_latch_92, m_internal_request);
+	if (LOG_LOWPARAM)
+		mame_printf_debug("%4X %4X %4X %4X %4X ", m_srff_132, m_srff_114, m_srff_112, m_srff_142, m_latch_80);
+	if (LOG_GLOTTAL)
+		mame_printf_debug("%4X %4X %4X %4X %4X %4X %4X ", m_counter_220, m_counter_222, m_counter_224, m_counter_234, m_counter_236, m_fgate, m_glottal_sync);
+	if (LOG_TRANSITION)
+		mame_printf_debug("%4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X ", m_0625_clock, m_counter_46, m_latch_46, m_latch_72 & 7, m_latch_168, m_latch_170, m_fc, m_va, m_fa, m_f1, m_f2, m_f3, m_f2q);
+	mame_printf_debug("\n");
+}
+
 			//==============================================
 			//
 			// Timing circuit (patent figure 2a)
@@ -380,12 +407,32 @@ void votrax_sc01_device::sound_stream_update(sound_stream &stream, stream_sample
 			else if (BIT(m_counter_34, PHI_CLOCK_BIT))
 				m_phi1 = 0;
 
+			// derive alternate phi2 clock:
+			//	set if (m_counter_34.PHI_CLOCK_BIT & clock) == 1
+			//	reset if (m_counter_34.PHI_CLOCK_BIT == 0)
+			UINT8 old_phi2_20 = m_phi2_20;
+			if (BIT(m_counter_34, PHI_CLOCK_BIT + 2) & m_master_clock)
+				m_phi2_20 = 1;
+			else if (!BIT(m_counter_34, PHI_CLOCK_BIT + 2))
+				m_phi2_20 = 0;
+			
+			// derive alternate phi1 clock:
+			//	set if (!m_counter_34.PHI_CLOCK_BIT & clock) == 1
+			//	reset if (m_counter_34.PHI_CLOCK_BIT == 1)
+//			UINT8 old_phi1_20 = m_phi1_20;
+			if (BIT(~m_counter_34, PHI_CLOCK_BIT + 2) & m_master_clock)
+				m_phi1_20 = 1;
+			else if (BIT(m_counter_34, PHI_CLOCK_BIT + 2))
+				m_phi1_20 = 0;
+
 			// determine rising edges of each clock of interest
 //			UINT8 beta1_rising = (old_beta1 ^ m_beta1) & m_beta1;
 			UINT8 p2_rising = (old_p2 ^ m_p2) & m_p2;
 //			UINT8 p1_rising = (old_p1 ^ m_p1) & m_p1;
 			UINT8 phi2_rising = (old_phi2 ^ m_phi2) & m_phi2;
 			UINT8 phi1_rising = (old_phi1 ^ m_phi1) & m_phi1;
+			UINT8 phi2_20_rising = (old_phi2_20 ^ m_phi2_20) & m_phi2_20;
+//			UINT8 phi1_20_rising = (old_phi1_20 ^ m_phi1_20) & m_phi1_20;
 			UINT8 a0_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 0);
 			UINT8 a2_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 2);
 			UINT8 _125k_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 3);
@@ -518,7 +565,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 			}
 			
 			// clock remaining glottal counters (220, 222, 236) on rising edge of phi2
-			if (phi2_rising)
+			if (phi2_20_rising)
 			{
 				// counter 220 is only enabled if TC of counter 222 is 1
 				if (counter_222_tc)
@@ -562,7 +609,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 				m_fgate = 1;
 			
 			// apply asynchronous clear to counters 234/236
-			if (counter_220_tc && m_phi1)
+			if (counter_220_tc && m_phi1_20)
 				m_counter_236 = m_counter_234 = 0;
 				
 			// derive glottal circuit output signals
@@ -605,7 +652,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 				// write if not FF and low 2 bits of latch
 				// FF is the S/R flip-flop at 142 ANDed with !(/FA & /VA)
 				case 0:	case 1:	case 2: case 3: case 4:
-					if (!(m_srff_142 && ((m_fa | m_va) & 0xf0) != 0) && (m_latch_46 & 0x3) == 0x3)
+					if ((m_srff_142 & !((m_fa == 0) & (m_va == 0))) && (m_latch_46 & 0x3) == 0x3)
 						ram_write = 1;
 					break;
 				

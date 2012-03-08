@@ -125,6 +125,8 @@ private:
 	UINT8						m_p1;					// P1 clock state
 	UINT8						m_phi2;					// phi2 clock state
 	UINT8						m_phi1;					// phi1 clock state
+	UINT8						m_phi2_20;				// alternate phi2 clock state (20kHz)
+	UINT8						m_phi1_20;				// alternate phi1 clock state (20kHz)
 	UINT32						m_subphoneme_period;	// period of the subphoneme timer
 	UINT32						m_subphoneme_count;		// number of ticks executed already
 	UINT8						m_clock_88;				// subphoneme clock output @ 88
@@ -170,7 +172,6 @@ private:
 
 	// static tables
 	static const char *const s_phoneme_table[64];
-	static const UINT16 s_phoneme_duration[64];
 	static const double s_glottal_wave[16];
 };
 
