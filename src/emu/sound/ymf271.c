@@ -1452,6 +1452,8 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					{
 						chip->timerA |= (data & 0xff)<<8;
 					}
+					else
+						chip->timerA |= 0x200;
 				}
 				break;
 
