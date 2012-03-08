@@ -78,7 +78,7 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 	if (offset==4)
 	{
 		/* this implementation is not accurate: still some delayed sprites in gunforc2 (might be another issue?) */
-		buffer_spriteram16_w(space,0,0,0xffff);
+		state->m_spriteram->copy();
 		state->m_sprite_buffer_busy = 0;
 
 		/* Pixel clock is 26.6666MHz (some boards 27MHz??), we have 0x800 bytes, or 0x400 words to copy from
@@ -289,8 +289,8 @@ VIDEO_START( m92 )
 
 	machine.generic.paletteram.u16 = auto_alloc_array(machine, UINT16, 0x1000/2);
 
-	memset(machine.generic.spriteram.u16,0,0x800);
-	memset(machine.generic.buffered_spriteram.u16,0,0x800);
+	memset(state->m_spriteram->live(),0,0x800);
+	memset(state->m_spriteram->buffer(),0,0x800);
 
 	state->save_item(NAME(state->m_pf_master_control));
 	state->save_item(NAME(state->m_videocontrol));
@@ -326,7 +326,7 @@ VIDEO_START( ppan )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	UINT16 *source = machine.generic.buffered_spriteram.u16;
+	UINT16 *source = state->m_spriteram->buffer();
 	int offs, layer;
 
 	for (layer = 0; layer < 8; layer++)
@@ -400,7 +400,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static void ppan_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	UINT16 *source = machine.generic.spriteram.u16; // sprite buffer control is never triggered
+	UINT16 *source = state->m_spriteram->buffer(); // sprite buffer control is never triggered
 	int offs, layer;
 
 	for (layer = 0; layer < 8; layer++)

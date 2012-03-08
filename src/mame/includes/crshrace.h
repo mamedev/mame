@@ -1,15 +1,19 @@
+#include "cpu/z80/z80.h"
+#include "video/bufsprite.h"
 
 class crshrace_state : public driver_device
 {
 public:
 	crshrace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_audiocpu(*this, "audiocpu"),
+		  m_k053936(*this, "k053936"),
+		  m_spriteram(*this, "spriteram"),
+		  m_spriteram2(*this, "spriteram2") { }
 
 	/* memory pointers */
 	UINT16 *  m_videoram1;
 	UINT16 *  m_videoram2;
-//  UINT16 *  m_spriteram1;   // currently this uses generic buffered spriteram
-//  UINT16 *  m_spriteram2;   // currently this uses generic buffered spriteram
 //      UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
@@ -23,8 +27,10 @@ public:
 	int m_pending_command;
 
 	/* devices */
-	device_t *m_audiocpu;
-	device_t *m_k053936;
+	required_device<z80_device> m_audiocpu;
+	required_device<k053936_device> m_k053936;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram2;
 };
 
 /*----------- defined in video/crshrace.c -----------*/

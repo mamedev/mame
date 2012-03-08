@@ -140,7 +140,7 @@ WRITE16_HANDLER( dynduke_control_w )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	dynduke_state *state = machine.driver_data<dynduke_state>();
-	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
+	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
 	int offs,fx,fy,x,y,color,sprite;
 
 	if (!state->m_sprite_enable) return;
@@ -249,15 +249,4 @@ SCREEN_UPDATE_IND16( dynduke )
 	state->m_tx_layer->draw(bitmap, cliprect, 0,0);
 
 	return 0;
-}
-
-SCREEN_VBLANK( dynduke )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram16_w(space, 0, 0, 0xffff); // Could be a memory location instead
-	}
 }

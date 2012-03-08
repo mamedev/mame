@@ -127,7 +127,7 @@ SCREEN_UPDATE_IND16( karnov )
 {
 	karnov_state *state = screen.machine().driver_data<karnov_state>();
 	draw_background(screen.machine(), bitmap, cliprect);
-	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect,  screen.machine().generic.buffered_spriteram.u16, 0x800, 0);
+	screen.machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram->buffer(), 0x800, 0);
 	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

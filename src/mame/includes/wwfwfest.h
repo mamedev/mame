@@ -1,8 +1,11 @@
+#include "video/bufsprite.h"
+
 class wwfwfest_state : public driver_device
 {
 public:
 	wwfwfest_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT16 *m_fg0_videoram;
 	UINT16 *m_bg0_videoram;
@@ -18,6 +21,7 @@ public:
 	UINT16 m_sprite_xoff;
 	UINT16 m_bg0_dx;
 	UINT16 m_bg1_dx[2];
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 

@@ -4,18 +4,20 @@
 
 *************************************************************************/
 
+#include "video/bufsprite.h"
+
 class hcastle_state : public driver_device
 {
 public:
 	hcastle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram"),
+		  m_spriteram2(*this, "spriteram2") { }
 
 	/* memory pointers */
 	UINT8 *    m_pf1_videoram;
 	UINT8 *    m_pf2_videoram;
 	UINT8 *    m_paletteram;
-//  UINT8 *    m_spriteram;
-//  UINT8 *    m_spriteram2;
 
 	/* video-related */
 	tilemap_t    *m_fg_tilemap;
@@ -30,6 +32,9 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_k007121_1;
 	device_t *m_k007121_2;
+	
+	required_device<buffered_spriteram8_device> m_spriteram;
+	required_device<buffered_spriteram8_device> m_spriteram2;
 };
 
 

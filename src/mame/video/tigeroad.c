@@ -69,8 +69,9 @@ WRITE16_HANDLER( tigeroad_scroll_w )
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	UINT16 *source = &machine.generic.buffered_spriteram.u16[machine.generic.spriteram_size/2] - 4;
-	UINT16 *finish = machine.generic.buffered_spriteram.u16;
+	tigeroad_state *state = machine.driver_data<tigeroad_state>();
+	UINT16 *source = &state->m_spriteram->buffer()[state->m_spriteram->bytes()/2] - 4;
+	UINT16 *finish = state->m_spriteram->buffer();
 
 	// TODO: The Track Map should probably be drawn on top of the background tilemap...
 	//       Also convert the below into a for loop!
@@ -169,15 +170,4 @@ SCREEN_UPDATE_IND16( tigeroad )
 	//draw_sprites(screen.machine(), bitmap, cliprect, 1); draw priority sprites?
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	return 0;
-}
-
-SCREEN_VBLANK( tigeroad )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram16_w(space, 0, 0, 0xffff);
-	}
 }

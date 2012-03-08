@@ -27,7 +27,7 @@ WRITE8_MEMBER( zodiack_state::attributes_w )
 	{
 		int i;
 
-		for (i = offset / 2; i < m_videoram_size; i += 32)
+		for (i = offset / 2; i < m_videoram.bytes(); i += 32)
 		{
 			m_bg_tilemap->mark_tile_dirty(i);
 			m_fg_tilemap->mark_tile_dirty(i);
@@ -132,7 +132,7 @@ void zodiack_state::video_start()
 
 void zodiack_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	for (int offs = 0; offs < m_bulletsram_size; offs += 4)
+	for (int offs = 0; offs < m_bulletsram.bytes(); offs += 4)
 	{
 		int x, y;
 
@@ -156,7 +156,7 @@ void zodiack_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void zodiack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	for (int offs = m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int flipx, flipy, sx, sy, spritecode;
 

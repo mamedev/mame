@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(commando_videoram_w) AM_BASE_MEMBER(commando_state, m_videoram)
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(commando_colorram_w) AM_BASE_MEMBER(commando_state, m_colorram)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xff7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xfe00, 0xff7f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xff80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -259,21 +259,21 @@ static MACHINE_CONFIG_START( commando, commando_state )
 	MCFG_MACHINE_RESET(commando)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(commando)
-	MCFG_SCREEN_VBLANK_STATIC(commando)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(commando)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(commando)
+	
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

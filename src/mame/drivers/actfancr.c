@@ -68,13 +68,11 @@ static WRITE8_HANDLER( actfancr_buffer_spriteram_w)
 {
 	actfancr_state *state = space->machine().driver_data<actfancr_state>();
 
-	UINT8* buffered_spriteram = space->machine().generic.buffered_spriteram.u8;
-	// make a buffered copy
-	memcpy(buffered_spriteram, space->machine().generic.spriteram.u8, 0x800);
+	UINT8 *src = reinterpret_cast<UINT8 *>(memory_get_shared(space->machine(), "spriteram"));
 	// copy to a 16-bit region for our sprite draw code too
 	for (int i=0;i<0x800/2;i++)
 	{
-		state->m_spriteram16[i] = buffered_spriteram[i*2] | (buffered_spriteram[(i*2)+1] <<8);
+		state->m_spriteram16[i] = src[i*2] | (src[(i*2)+1] <<8);
 	}
 }
 
@@ -86,7 +84,7 @@ static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x070000, 0x070007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x070010, 0x07001f) AM_DEVWRITE("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
 	AM_RANGE(0x072000, 0x0727ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x130000, 0x130000) AM_READ_PORT("P1")
@@ -110,7 +108,7 @@ static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x130000, 0x1305ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, m_main_ram) /* Main ram */
@@ -342,8 +340,6 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_MACHINE_RESET(actfancr)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
@@ -395,8 +391,6 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_MACHINE_RESET(triothep)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))

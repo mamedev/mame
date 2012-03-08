@@ -27,9 +27,10 @@
 
 static WRITE16_HANDLER( darkseal_control_w )
 {
+	darkseal_state *state = space->machine().driver_data<darkseal_state>();
 	switch (offset<<1) {
     case 6: /* DMA flag */
-		buffer_spriteram16_w(space, 0, 0, 0xffff);
+		state->m_spriteram->copy();
 		return;
     case 8: /* Sound CPU write */
 		soundlatch_w(space, 0, data & 0xff);
@@ -62,7 +63,7 @@ static READ16_HANDLER( darkseal_control_r )
 static ADDRESS_MAP_START( darkseal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(darkseal_state, m_ram)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(darkseal_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(darkseal_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(darkseal_control_r, darkseal_control_w)
@@ -269,8 +270,6 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
@@ -280,6 +279,8 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 
 	MCFG_GFXDECODE(darkseal)
 	MCFG_PALETTE_LENGTH(2048)
+	
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_DECO16IC_ADD("tilegen1", darkseal_deco16ic_tilegen1_intf)
 

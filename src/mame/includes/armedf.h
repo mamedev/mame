@@ -1,9 +1,11 @@
+#include "video/bufsprite.h"
 
 class armedf_state : public driver_device
 {
 public:
 	armedf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers */
 	UINT8  *  m_text_videoram;
@@ -11,7 +13,6 @@ public:
 	UINT16 *  m_fg_videoram;
 	UINT16 *  m_spr_pal_clut;
 	UINT16 m_legion_cmd[4];	// legiono only!
-//  UINT16 *  m_spriteram;    // currently this uses generic buffered_spriteram
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
@@ -28,6 +29,8 @@ public:
 	int      m_sprite_offy;
 	int      m_old_mcu_mode;
 	int      m_waiting_msb;
+	
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 class bigfghtr_state : public armedf_state
@@ -47,7 +50,6 @@ public:
 /*----------- defined in video/armedf.c -----------*/
 
 SCREEN_UPDATE_IND16( armedf );
-SCREEN_VBLANK( armedf );
 VIDEO_START( armedf );
 VIDEO_START( terraf );
 

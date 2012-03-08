@@ -97,10 +97,10 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE("deco_common", decocomn_priority_w)
 	AM_RANGE(0x220002, 0x22000f) AM_NOP
 
-	AM_RANGE(0x240000, 0x240001) AM_WRITE(buffer_spriteram16_w)
-	AM_RANGE(0x242000, 0x2427ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x244000, 0x244001) AM_WRITE(buffer_spriteram16_2_w)
-	AM_RANGE(0x246000, 0x2467ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
+	AM_RANGE(0x240000, 0x240001) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram16_device, write)
+	AM_RANGE(0x242000, 0x2427ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x244000, 0x244001) AM_DEVWRITE_MODERN("spriteram2", buffered_spriteram16_device, write)
+	AM_RANGE(0x246000, 0x2467ff) AM_RAM AM_SHARE("spriteram2")
 
 	AM_RANGE(0x24e6c0, 0x24e6c1) AM_READ_PORT("DSW")
 	AM_RANGE(0x24e138, 0x24e139) AM_READ_PORT("SYSTEM")
@@ -350,8 +350,6 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -363,6 +361,9 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_GFXDECODE(boogwing)
 
 	MCFG_VIDEO_START(boogwing)
+	
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	MCFG_DECOCOMN_ADD("deco_common", boogwing_decocomn_intf)
 

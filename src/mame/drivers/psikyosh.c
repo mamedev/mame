@@ -516,7 +516,7 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 // video chip
-	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // video banks0-7 (sprites and sprite list)
+	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_SHARE("spriteram") // video banks0-7 (sprites and sprite list)
 	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_bgram) // video banks 7-0x1f (backgrounds and other effects)
 	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, m_paletteram) // palette..
 	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_zoomram) // sprite zoom lookup table
@@ -544,7 +544,7 @@ static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32 )
 // sound chip
 	AM_RANGE(0x03100000, 0x03100007) AM_DEVREADWRITE8("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
 // video chip
-	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // video banks0-7 (sprites and sprite list)
+	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("spriteram") // video banks0-7 (sprites and sprite list)
 	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_bgram) // video banks 7-0x1f (backgrounds and other effects)
 	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, m_paletteram)
 	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_zoomram) // sprite zoom lookup table
@@ -819,7 +819,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM ) /* If using alpha */
+	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram") /* If using alpha */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -827,7 +827,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(psikyosh)
-	MCFG_SCREEN_VBLANK_STATIC(psikyosh)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram32_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(psikyosh)
 	MCFG_PALETTE_LENGTH(0x5000/4)

@@ -1,3 +1,4 @@
+#include "video/bufsprite.h"
 
 #define MASTER_CLOCK 57272700	// main oscillator frequency
 
@@ -20,7 +21,8 @@ class psikyosh_state : public driver_device
 {
 public:
 	psikyosh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers */
 	UINT32 *       m_bgram;
@@ -28,8 +30,6 @@ public:
 	UINT32 *       m_vidregs;
 	UINT32 *       m_ram;
 	UINT32 *       m_paletteram;
-//  UINT32 *       m_spriteram;   // currently this uses generic buffered spriteram
-//  size_t         m_spriteram_size;
 
 	/* video-related */
 	bitmap_ind8 m_zoom_bitmap;
@@ -40,6 +40,7 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	required_device<buffered_spriteram32_device> m_spriteram;
 };
 
 /*----------- defined in video/psikyosh.c -----------*/

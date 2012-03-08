@@ -4,12 +4,14 @@
 
 *************************************************************************/
 
+#include "video/bufsprite.h"
 
 class exedexes_state : public driver_device
 {
 public:
 	exedexes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers */
 	UINT8 *        m_videoram;
@@ -27,6 +29,8 @@ public:
 	int            m_objon;
 	int            m_sc1on;
 	int            m_sc2on;
+	
+	required_device<buffered_spriteram8_device> m_spriteram;
 };
 
 
@@ -41,4 +45,3 @@ extern WRITE8_HANDLER( exedexes_gfxctrl_w );
 extern PALETTE_INIT( exedexes );
 extern VIDEO_START( exedexes );
 extern SCREEN_UPDATE_IND16( exedexes );
-extern SCREEN_VBLANK( exedexes );

@@ -1085,7 +1085,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 	const gfx_element *gfx;
-	UINT32 *src = machine.generic.buffered_spriteram.u32; /* Use buffered spriteram */
+	UINT32 *src = state->m_spriteram->buffer(); /* Use buffered spriteram */
 	UINT16 *list = (UINT16 *)src + 0x3800 / 2;
 	UINT16 listlen = 0x800/2;
 	UINT16 *zoom_table = (UINT16 *)state->m_zoomram;
@@ -1306,14 +1306,3 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 	}
 	return 0;
 }
-
-SCREEN_VBLANK( psikyosh )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		buffer_spriteram32_w(space, 0, 0, 0xffffffff);
-	}
-}
-

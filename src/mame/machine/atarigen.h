@@ -97,8 +97,7 @@ public:
 	atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_earom(*this, "earom"),
-		  m_eeprom(*this, "eeprom"),
-		  m_eeprom_size(*this, "eeprom") { }
+		  m_eeprom(*this, "eeprom") { }
 
 	// users must call through to these
 	virtual void machine_start();
@@ -115,7 +114,6 @@ public:
 	UINT8				m_earom_control;
 
 	optional_shared_ptr<UINT16> m_eeprom;
-	optional_shared_size m_eeprom_size;
 
 	UINT8				m_scanline_int_state;
 	UINT8				m_sound_int_state;

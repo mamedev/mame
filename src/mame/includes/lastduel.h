@@ -4,13 +4,16 @@
 
 *************************************************************************/
 
+#include "video/bufsprite.h"
+
 class lastduel_state : public driver_device
 {
 public:
 	lastduel_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_spriteram(*this, "spriteram")
 		{ }
 
 	/* memory pointers */
@@ -32,6 +35,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 /*----------- defined in video/lastduel.c -----------*/
@@ -49,4 +53,3 @@ VIDEO_START( lastduel );
 VIDEO_START( madgear );
 SCREEN_UPDATE_IND16( lastduel );
 SCREEN_UPDATE_IND16( madgear );
-SCREEN_VBLANK( lastduel );

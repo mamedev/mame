@@ -367,7 +367,7 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 4: /* DM (DMA to buffer spriteram) */
-			buffer_spriteram16_w(space, 0, 0, 0xffff);
+			state->m_spriteram->copy();
 			break;
 
 		case 6: /* SECREQ (Interrupt & Data to i8751) */
@@ -430,7 +430,7 @@ static READ16_HANDLER( karnov_control_r )
 static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM AM_BASE_MEMBER(karnov_state, m_ram)
-	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(karnov_videoram_w) AM_BASE_MEMBER(karnov_state, m_videoram)
 	AM_RANGE(0x0a0800, 0x0a0fff) AM_WRITE(karnov_videoram_w) /* Wndrplnt Mirror */
 	AM_RANGE(0x0a1000, 0x0a17ff) AM_WRITEONLY AM_BASE_MEMBER(karnov_state, m_pf_data)
@@ -819,7 +819,7 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_MACHINE_RESET(karnov)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -863,7 +863,7 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	MCFG_MACHINE_RESET(karnov)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

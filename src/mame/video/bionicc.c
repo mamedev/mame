@@ -209,12 +209,12 @@ WRITE16_HANDLER( bionicc_gfxctrl_w )
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
-//  bionicc_state *state = machine.driver_data<bionicc_state>();
+	bionicc_state *state = machine.driver_data<bionicc_state>();
+	UINT16 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 	const gfx_element *gfx = machine.gfx[3];
 
-	for (offs = (machine.generic.spriteram_size - 8) / 2; offs >= 0; offs -= 4)
+	for (offs = (state->m_spriteram->bytes() - 8) / 2; offs >= 0; offs -= 4)
 	{
 		int tile_number = buffered_spriteram[offs] & 0x7ff;
 		if( tile_number != 0x7ff )
@@ -258,15 +258,4 @@ SCREEN_UPDATE_IND16( bionicc )
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
 	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
-}
-
-SCREEN_VBLANK( bionicc )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram16_w(space, 0, 0, 0xffff);
-	}
 }

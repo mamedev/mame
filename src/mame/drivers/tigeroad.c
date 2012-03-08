@@ -169,7 +169,7 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM		/* still part of OBJ RAM */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE(tigeroad_videoctrl_w)	/* char bank, coin counters, + ? */
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
@@ -529,7 +529,7 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	/* IRQs are triggered by the YM2203 */
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.08)   /* verified on pcb */
@@ -537,7 +537,7 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(tigeroad)
-	MCFG_SCREEN_VBLANK_STATIC(tigeroad)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(tigeroad)
 	MCFG_PALETTE_LENGTH(576)

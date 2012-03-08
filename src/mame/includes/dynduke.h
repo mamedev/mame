@@ -1,8 +1,11 @@
+#include "video/bufsprite.h"
+
 class dynduke_state : public driver_device
 {
 public:
 	dynduke_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT16 *m_videoram;
 	UINT16 *m_back_data;
@@ -19,6 +22,7 @@ public:
 	int m_txt_enable;
 	int m_old_back;
 	int m_old_fore;
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 
@@ -32,4 +36,3 @@ WRITE16_HANDLER( dynduke_control_w );
 WRITE16_HANDLER( dynduke_paletteram_w );
 VIDEO_START( dynduke );
 SCREEN_UPDATE_IND16( dynduke );
-SCREEN_VBLANK( dynduke );

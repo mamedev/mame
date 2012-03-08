@@ -1,9 +1,13 @@
+#include "cpu/m68000/m68000.h"
+#include "video/bufsprite.h"
+
 class gaelco2_state : public driver_device
 {
 public:
 	gaelco2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this,"maincpu"),
+		m_spriteram(*this,"spriteram")
 		{ }
 
 	UINT16 *m_snowboar_protection;
@@ -14,7 +18,8 @@ public:
 	tilemap_t *m_pant[2];
 	int m_dual_monitor;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 
@@ -44,7 +49,6 @@ WRITE16_HANDLER( snowboar_protection_w );
 WRITE16_HANDLER( gaelco2_vram_w );
 WRITE16_HANDLER( gaelco2_palette_w );
 SCREEN_UPDATE_IND16( gaelco2 );
-SCREEN_VBLANK( gaelco2 );
 VIDEO_START( gaelco2 );
 SCREEN_UPDATE_IND16( gaelco2_left );
 SCREEN_UPDATE_IND16( gaelco2_right );

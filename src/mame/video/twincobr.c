@@ -364,13 +364,15 @@ WRITE8_HANDLER( wardner_videoram_w )
 
 READ8_HANDLER( wardner_sprite_r )
 {
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 	int shift = (offset & 1) * 8;
-	return space->machine().generic.spriteram.u16[offset/2] >> shift;
+	return state->m_spriteram->live()[offset/2] >> shift;
 }
 
 WRITE8_HANDLER( wardner_sprite_w )
 {
-	UINT16 *spriteram16 = space->machine().generic.spriteram.u16;
+	twincobr_state *state = space->machine().driver_data<twincobr_state>();
+	UINT16 *spriteram16 = state->m_spriteram->live();
 	if (offset & 1)
 		spriteram16[offset/2] = (spriteram16[offset/2] & 0x00ff) | (data << 8);
 	else
@@ -388,7 +390,7 @@ static void wardner_sprite_priority_hack(running_machine &machine)
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	if (state->m_fgscrollx != state->m_bgscrollx) {
-		UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
+		UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
 		if ((state->m_fgscrollx==0x1c9) || (state->m_flip_screen && (state->m_fgscrollx==0x17a))) {	/* in the shop ? */
 			int wardner_hack = buffered_spriteram16[0x0b04/2];
 		/* sprite position 0x6300 to 0x8700 -- hero on shop keeper (normal) */
@@ -465,8 +467,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	if (state->m_display_on)
 	{
-		UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
-		for (offs = 0;offs < machine.generic.spriteram_size/2;offs += 4)
+		UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
+		for (offs = 0;offs < state->m_spriteram->bytes()/2;offs += 4)
 		{
 			int attribute,sx,sy,flipx,flipy;
 			int sprite, color;
@@ -515,17 +517,6 @@ SCREEN_UPDATE_IND16( toaplan0 )
 	return 0;
 }
 
-
-SCREEN_VBLANK( toaplan0 )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		/* Spriteram is always 1 frame ahead, suggesting spriteram buffering.
-            There are no CPU output registers that control this so we
-            assume it happens automatically every frame, at the end of vblank */
-		buffer_spriteram16_w(space,0,0,0xffff);
-	}
-}
+/* Spriteram is always 1 frame ahead, suggesting spriteram buffering.
+  There are no CPU output registers that control this so we
+  assume it happens automatically every frame, at the end of vblank */

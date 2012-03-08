@@ -4,17 +4,19 @@
 
 *************************************************************************/
 
+#include "video/bufsprite.h"
+
 class karnov_state : public driver_device
 {
 public:
 	karnov_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers */
 	UINT16 *    m_videoram;
 	UINT16 *    m_ram;
 	UINT16 *    m_pf_data;
-//  UINT16 *    m_spriteram;  // currently this uses generic buffered spriteram
 
 	/* video-related */
 	bitmap_ind16    *m_bitmap_f;
@@ -35,6 +37,7 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 enum {

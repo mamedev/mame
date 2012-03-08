@@ -375,10 +375,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
        height only used by pollux, bluehawk and flytiger
        x flip and y flip only used by pollux and flytiger */
 
-	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
+	dooyong_state *state = machine.driver_data<dooyong_state>();
+	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 
-	for (offs = 0; offs < machine.generic.spriteram_size; offs += 32)
+	for (offs = 0; offs < state->m_spriteram->bytes(); offs += 32)
 	{
 		int sx, sy, code, color, pri;
 		int flipx = 0, flipy = 0, height = 0, y;
@@ -442,7 +443,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
+	dooyong_state *state = machine.driver_data<dooyong_state>();
+	UINT16 *buffered_spriteram16 = state->m_spriteram16->buffer();
 
 	/* Sprites take 8 16-bit words each in memory:
                   MSB             LSB
@@ -465,7 +467,7 @@ static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 
 	int offs;
 
-	for (offs = (machine.generic.spriteram_size / 2) - 8; offs >= 0; offs -= 8)
+	for (offs = (state->m_spriteram16->bytes() / 2) - 8; offs >= 0; offs -= 8)
 	{
 		if (buffered_spriteram16[offs] & 0x0001)	/* enable */
 		{
@@ -928,27 +930,4 @@ VIDEO_START( popbingo )
 	state_save_register_global_array(machine, state->m_fgscroll8);	// Not used atm
 	state_save_register_global_array(machine, state->m_fg2scroll8);	// Not used atm
 	state_save_register_global(machine, state->m_rshark_pri);
-}
-
-
-SCREEN_VBLANK( dooyong )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram_w(space, 0, 0);
-	}
-}
-
-SCREEN_VBLANK( rshark )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram16_w(space, 0, 0, 0xffff);
-	}
 }

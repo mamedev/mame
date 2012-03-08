@@ -1,8 +1,11 @@
+#include "video/bufsprite.h"
+
 class sidearms_state : public driver_device
 {
 public:
 	sidearms_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	int m_gameid;
 
@@ -24,6 +27,8 @@ public:
 	UINT32 m_hcount_191;
 	UINT32 m_vcount_191;
 	UINT32 m_latch_374;
+	
+	required_device<buffered_spriteram8_device> m_spriteram;
 };
 
 /*----------- defined in video/sidearms.c -----------*/
@@ -37,4 +42,3 @@ WRITE8_HANDLER( sidearms_gfxctrl_w );
 
 VIDEO_START( sidearms );
 SCREEN_UPDATE_IND16( sidearms );
-SCREEN_VBLANK( sidearms );

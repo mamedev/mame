@@ -5,13 +5,15 @@
 
 
 #include "video/mc6845.h"
+#include "video/bufsprite.h"
 
 
 class twincobr_state : public driver_device
 {
 public:
 	twincobr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	int m_toaplan_main_cpu;
 	int m_wardner_membank;
@@ -48,6 +50,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 
@@ -122,4 +125,3 @@ WRITE8_HANDLER( wardner_sprite_w );
 
 VIDEO_START( toaplan0 );
 SCREEN_UPDATE_IND16( toaplan0 );
-SCREEN_VBLANK( toaplan0 );

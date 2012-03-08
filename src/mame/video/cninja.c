@@ -28,7 +28,8 @@ VIDEO_START( stoneage )
 /* The bootleg sprites are in a different format! */
 static void cninjabl_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
+	cninja_state *state = machine.driver_data<cninja_state>();
+	UINT16 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 	int endoffs;
 
@@ -140,7 +141,7 @@ SCREEN_UPDATE_IND16( cninja )
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 2);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 4);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -184,7 +185,7 @@ SCREEN_UPDATE_IND16( edrandy )
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -235,7 +236,7 @@ SCREEN_UPDATE_IND16( robocop2 )
 			break;
 	}
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -262,8 +263,8 @@ SCREEN_UPDATE_RGB32( mutantf )
 
 	screen.machine().device<decospr_device>("spritegen1")->set_alt_format(true);
 	screen.machine().device<decospr_device>("spritegen2")->set_alt_format(true);
-	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u16, 0x400, true);
-	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400, true);
+	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram2->buffer(), 0x400, true);
+	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400, true);
 
 
 	/* There is no priority prom on this board, but there is a

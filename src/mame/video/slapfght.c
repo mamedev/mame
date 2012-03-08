@@ -142,7 +142,7 @@ static void slapfght_log_vram(running_machine &machine)
 		int i;
 		for (i=0; i<0x800; i++)
 		{
-			logerror("Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n",i, state->m_slapfight_videoram[i],state->m_slapfight_colorram[i],machine.generic.spriteram.u8[i]);
+			logerror("Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n",i, state->m_slapfight_videoram[i],state->m_slapfight_colorram[i],state->m_spriteram->live()[i]);
 		}
 	}
 #endif
@@ -156,10 +156,10 @@ static void slapfght_log_vram(running_machine &machine)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
-	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
+	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 
-	for (offs = 0;offs < machine.generic.spriteram_size;offs += 4)
+	for (offs = 0;offs < state->m_spriteram->bytes();offs += 4)
 	{
 		int sx, sy;
 
@@ -212,7 +212,7 @@ SCREEN_UPDATE_IND16( perfrman )
 SCREEN_UPDATE_IND16( slapfight )
 {
 	slapfght_state *state = screen.machine().driver_data<slapfght_state>();
-	UINT8 *buffered_spriteram = screen.machine().generic.buffered_spriteram.u8;
+	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 
 	screen.machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -232,7 +232,7 @@ SCREEN_UPDATE_IND16( slapfight )
 	state->m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
 
 	/* Draw the sprites */
-	for (offs = 0;offs < screen.machine().generic.spriteram_size;offs += 4)
+	for (offs = 0;offs < state->m_spriteram->bytes();offs += 4)
 	{
 		if (state->m_flipscreen)
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[2],

@@ -149,7 +149,7 @@ static TIMER_DEVICE_CALLBACK( bionicc_scanline )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfe0000, 0xfe07ff) AM_RAM	/* RAM? */
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0d00, 0xfe3fff) AM_RAM              /* RAM? */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(bionicc_gfxctrl_w)	/* + coin counters */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
@@ -375,20 +375,20 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_MACHINE_RESET(bionicc)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(bionicc)
-	MCFG_SCREEN_VBLANK_STATIC(bionicc)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(bionicc)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(bionicc)
+	
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8 )
@@ -337,20 +337,20 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_MACHINE_RESET(blktiger)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(blktiger)
-	MCFG_SCREEN_VBLANK_STATIC(blktiger)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(blktiger)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(blktiger)
+	
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

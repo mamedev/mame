@@ -62,8 +62,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x3009ff) AM_RAM_WRITE(vaportra_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x304000, 0x3049ff) AM_RAM_WRITE(vaportra_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x308000, 0x308001) AM_NOP
-	AM_RANGE(0x30c000, 0x30c001) AM_WRITE(buffer_spriteram16_w)
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x30c000, 0x30c001) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram16_device, write)
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -277,7 +277,7 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	MCFG_MACHINE_RESET(vaportra)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)

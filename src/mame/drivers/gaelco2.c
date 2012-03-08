@@ -20,7 +20,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "sound/gaelco.h"
 #include "rendlay.h"
@@ -58,7 +57,7 @@ GFXDECODEINFO(0x0400000, 128)
 static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM																				/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_BASE_SIZE_GENERIC(spriteram)		/* Video RAM */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")		/* Video RAM */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)								/* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE_MEMBER(gaelco2_state, m_vregs)														/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")																/* DSW #1 + Input 1P */
@@ -161,7 +160,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco2_state )
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -169,7 +168,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2)
-	MCFG_SCREEN_VBLANK_STATIC(gaelco2)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(0x0080000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
@@ -215,7 +214,7 @@ static READ16_HANDLER(p2_gun_y) {return (input_port_read(space->machine(), "LIGH
 static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16 )
     AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
     AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
-    AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_BASE_SIZE_GENERIC(spriteram)	/* Video RAM */
+    AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")	/* Video RAM */
     AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)							/* Palette */
     AM_RANGE(0x218004, 0x218009) AM_READONLY																/* Video Registers */
 	AM_RANGE(0x218004, 0x218007) AM_WRITEONLY AM_BASE_MEMBER(gaelco2_state, m_vregs)										/* Video Registers */
@@ -294,7 +293,7 @@ static MACHINE_CONFIG_START( bang, gaelco2_state )
 	MCFG_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -302,7 +301,7 @@ static MACHINE_CONFIG_START( bang, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2)
-	MCFG_SCREEN_VBLANK_STATIC(gaelco2)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(0x0200000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
@@ -433,7 +432,7 @@ ROM_END
 static ADDRESS_MAP_START( alighunt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																				/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_BASE_SIZE_GENERIC(spriteram)		/* Video RAM */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")		/* Video RAM */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)								/* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE_MEMBER(gaelco2_state, m_vregs)														/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")																/* DSW #1 + Input 1P */
@@ -535,7 +534,7 @@ static MACHINE_CONFIG_START( alighunt, gaelco2_state )
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -543,7 +542,7 @@ static MACHINE_CONFIG_START( alighunt, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2)
-	MCFG_SCREEN_VBLANK_STATIC(gaelco2)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(0x0400000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
@@ -644,7 +643,7 @@ static READ16_HANDLER ( dallas_kludge_r )
 static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																					/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)			/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_BASE_SIZE_GENERIC(spriteram)			/* Video RAM */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")			/* Video RAM */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)									/* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE_MEMBER(gaelco2_state, m_vregs)															/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")																	/* DSW #1 + Input 1P */
@@ -777,7 +776,7 @@ static MACHINE_CONFIG_START( touchgo, gaelco2_state )
 	MCFG_CPU_VBLANK_INT("lscreen", irq6_line_hold)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_GFXDECODE(0x0400000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -795,7 +794,7 @@ static MACHINE_CONFIG_START( touchgo, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2_right)
-	MCFG_SCREEN_VBLANK_STATIC(gaelco2)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_VIDEO_START(gaelco2_dual)
 
@@ -908,7 +907,7 @@ ROM_END
 static ADDRESS_MAP_START( snowboar_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																						/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)				/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_BASE_SIZE_GENERIC(spriteram)				/* Video RAM */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")				/* Video RAM */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)										/* Palette */
 	AM_RANGE(0x212000, 0x213fff) AM_RAM																						/* Extra RAM */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE_MEMBER(gaelco2_state, m_vregs)																/* Video Registers */
@@ -971,7 +970,7 @@ static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	MCFG_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -979,7 +978,7 @@ static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2)
-	MCFG_SCREEN_VBLANK_STATIC(gaelco2)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(0x0400000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
@@ -1093,7 +1092,7 @@ ROM_END
 static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_BASE_SIZE_GENERIC(spriteram)	/* Video RAM */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")	/* Video RAM */
 	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)							/* Palette */
 	AM_RANGE(0x212000, 0x213fff) AM_RAM																			/* Extra RAM */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE_MEMBER(gaelco2_state, m_vregs)													/* Video Registers */
@@ -1212,7 +1211,7 @@ static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	MCFG_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_GFXDECODE(0x0200000)
 	MCFG_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -1230,7 +1229,7 @@ static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	MCFG_SCREEN_SIZE(384, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(gaelco2_right)
-	MCFG_SCREEN_VBLANK_STATIC(gaelco2)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 
 	MCFG_VIDEO_START(gaelco2_dual)

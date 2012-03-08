@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( lethalth_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_BASE_MEMBER(m92_state, m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
-	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
 	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_BASE_MEMBER(m92_state, m_spritecontrol)
 	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
@@ -351,7 +351,7 @@ static ADDRESS_MAP_START( m92_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xcffff) AM_ROM AM_REGION("maincpu", 0x00000)	/* Mirror used by In The Hunt as protection */
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m92_vram_w) AM_BASE_MEMBER(m92_state, m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
-	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
 	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_BASE_MEMBER(m92_state, m_spritecontrol)
 	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
@@ -912,7 +912,7 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", m92_scanline_interrupt, "screen", 0, 1)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -998,7 +998,7 @@ static MACHINE_CONFIG_START( ppan, m92_state )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", m92_scanline_interrupt, "screen", 0, 1)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM) // not really...
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram") // not really...
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

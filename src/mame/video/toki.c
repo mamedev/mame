@@ -33,20 +33,6 @@ WRITE16_HANDLER( toki_control_w )
 	COMBINE_DATA(&state->m_scrollram16[offset]);
 }
 
-SCREEN_VBLANK( toki )
-{
-	// rising edge
-	if (vblank_on)
-		buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
-}
-
-SCREEN_VBLANK( tokib )
-{
-	// rising edge
-	if (vblank_on)
-		buffer_spriteram16_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
-}
-
 static TILE_GET_INFO( get_text_tile_info )
 {
 	toki_state *state = machine.driver_data<toki_state>();
@@ -187,12 +173,13 @@ WRITE16_HANDLER( toki_background2_videoram16_w )
 
 static void toki_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
+	toki_state *state = machine.driver_data<toki_state>();
 	int x,y,xoffs,yoffs,tile,flipx,flipy,color,offs;
 	UINT16 *sprite_word;
 
-	for (offs = (machine.generic.spriteram_size/2)-4;offs >= 0;offs -= 4)
+	for (offs = (state->m_spriteram->bytes()/2)-4;offs >= 0;offs -= 4)
 	{
-		sprite_word = &machine.generic.buffered_spriteram.u16[offs];
+		sprite_word = &state->m_spriteram->buffer()[offs];
 
 		if ((sprite_word[2] != 0xf000) && (sprite_word[0] != 0xffff))
 		{
@@ -230,12 +217,13 @@ static void toki_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 
 static void tokib_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
+	toki_state *state = machine.driver_data<toki_state>();
 	int x,y,tile,flipx,color,offs;
 	UINT16 *sprite_word;
 
-	for (offs = 0;offs < machine.generic.spriteram_size / 2;offs += 4)
+	for (offs = 0;offs < state->m_spriteram->bytes() / 2;offs += 4)
 	{
-		sprite_word = &machine.generic.buffered_spriteram.u16[offs];
+		sprite_word = &state->m_spriteram->buffer()[offs];
 
 		if (sprite_word[0] == 0xf100)
 			break;

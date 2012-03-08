@@ -1,8 +1,11 @@
+#include "video/bufsprite.h"
+
 class raiden_state : public driver_device
 {
 public:
 	raiden_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT16 *m_videoram;
 	UINT16 *m_shared_ram;
@@ -14,6 +17,7 @@ public:
 	tilemap_t *m_tx_layer;
 	int m_flipscreen;
 	int m_alternate;
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 

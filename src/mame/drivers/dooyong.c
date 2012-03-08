@@ -131,14 +131,14 @@ static ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA") AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(lastday_bankswitch_w)
@@ -187,14 +187,14 @@ static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc048, 0xc04f) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("P1")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(lastday_bankswitch_w)
@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)	/* super-x needs this and is similar */
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
-	AM_RANGE(0x04d000, 0x04dfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x04d000, 0x04dfff) AM_RAM AM_SHARE("spriteram16")
 	AM_RANGE(0x04e000, 0x04ffff) AM_RAM
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("P1_P2")
@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0dcfff) AM_RAM
-	AM_RANGE(0x0dd000, 0x0ddfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0dd000, 0x0ddfff) AM_RAM AM_SHARE("spriteram16")
 	AM_RANGE(0x0de000, 0x0dffff) AM_RAM
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("P1_P2")
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
-	AM_RANGE(0x04d000, 0x04dfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x04d000, 0x04dfff) AM_RAM AM_SHARE("spriteram16")
 	AM_RANGE(0x04e000, 0x04ffff) AM_RAM
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("P1_P2")
@@ -876,7 +876,7 @@ static MACHINE_CONFIG_START( lastday, dooyong_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -884,7 +884,7 @@ static MACHINE_CONFIG_START( lastday, dooyong_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(lastday)
-	MCFG_SCREEN_VBLANK_STATIC(dooyong)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(lastday)
 	MCFG_PALETTE_LENGTH(1024)
@@ -918,7 +918,7 @@ static MACHINE_CONFIG_START( gulfstrm, dooyong_state )
 	MCFG_MACHINE_RESET(sound_ym2203)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -926,7 +926,7 @@ static MACHINE_CONFIG_START( gulfstrm, dooyong_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(gulfstrm)
-	MCFG_SCREEN_VBLANK_STATIC(dooyong)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(lastday)
 	MCFG_PALETTE_LENGTH(1024)
@@ -951,7 +951,7 @@ static MACHINE_CONFIG_START( pollux, dooyong_state )
 	MCFG_MACHINE_RESET(sound_ym2203)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -959,7 +959,7 @@ static MACHINE_CONFIG_START( pollux, dooyong_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(pollux)
-	MCFG_SCREEN_VBLANK_STATIC(dooyong)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(lastday)
 	MCFG_PALETTE_LENGTH(1024)
@@ -983,7 +983,7 @@ static MACHINE_CONFIG_START( bluehawk, dooyong_state )
 	MCFG_MACHINE_START(lastday)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -991,7 +991,7 @@ static MACHINE_CONFIG_START( bluehawk, dooyong_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(bluehawk)
-	MCFG_SCREEN_VBLANK_STATIC(dooyong)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(bluehawk)
 	MCFG_PALETTE_LENGTH(1024)
@@ -1015,7 +1015,7 @@ static MACHINE_CONFIG_START( flytiger, dooyong_state )
 	MCFG_MACHINE_START(lastday)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1023,7 +1023,7 @@ static MACHINE_CONFIG_START( flytiger, dooyong_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(flytiger)
-	MCFG_SCREEN_VBLANK_STATIC(dooyong)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(flytiger)
 	MCFG_PALETTE_LENGTH(1024)
@@ -1053,7 +1053,6 @@ static MACHINE_CONFIG_START( primella, dooyong_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(primella)
-	MCFG_SCREEN_VBLANK_STATIC(dooyong)
 
 	MCFG_GFXDECODE(primella)
 	MCFG_PALETTE_LENGTH(1024)
@@ -1087,7 +1086,7 @@ static MACHINE_CONFIG_START( rshark, dooyong_state )
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram16")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1095,7 +1094,7 @@ static MACHINE_CONFIG_START( rshark, dooyong_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(rshark)
-	MCFG_SCREEN_VBLANK_STATIC(rshark)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(rshark)
 	MCFG_PALETTE_LENGTH(2048)
@@ -1117,7 +1116,7 @@ static MACHINE_CONFIG_START( superx, dooyong_state ) // dif mem map
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram16")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1125,7 +1124,7 @@ static MACHINE_CONFIG_START( superx, dooyong_state ) // dif mem map
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(rshark)
-	MCFG_SCREEN_VBLANK_STATIC(rshark)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(rshark)
 	MCFG_PALETTE_LENGTH(2048)
@@ -1147,7 +1146,7 @@ static MACHINE_CONFIG_START( popbingo, dooyong_state )
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram16")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1155,7 +1154,7 @@ static MACHINE_CONFIG_START( popbingo, dooyong_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(popbingo)
-	MCFG_SCREEN_VBLANK_STATIC(rshark)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(popbingo)
 	MCFG_PALETTE_LENGTH(2048)

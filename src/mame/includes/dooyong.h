@@ -1,8 +1,12 @@
+#include "video/bufsprite.h"
+
 class dooyong_state : public driver_device
 {
 public:
 	dooyong_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram"),
+		  m_spriteram16(*this, "spriteram16") { }
 
 	UINT8 *m_txvideoram;
 	UINT8 *m_paletteram_flytiger;
@@ -36,6 +40,8 @@ public:
 
 	int m_interrupt_line_1;
 	int m_interrupt_line_2;
+	optional_device<buffered_spriteram8_device> m_spriteram;
+	optional_device<buffered_spriteram16_device> m_spriteram16;
 };
 
 
@@ -76,6 +82,3 @@ VIDEO_START( flytiger );
 VIDEO_START( primella );
 VIDEO_START( rshark );
 VIDEO_START( popbingo );
-
-SCREEN_VBLANK( dooyong );
-SCREEN_VBLANK( rshark );

@@ -7,6 +7,7 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
+#include "video/bufsprite.h"
 
 class dassault_state : public driver_device
 {
@@ -19,7 +20,9 @@ public:
 		  m_decocomn(*this, "deco_common"),
 		  m_deco_tilegen1(*this, "tilegen1"),
 		  m_deco_tilegen2(*this, "tilegen2"),
-		  m_oki2(*this, "oki2") { }
+		  m_oki2(*this, "oki2"),
+		  m_spriteram(*this, "spriteram"),
+		  m_spriteram2(*this, "spriteram2") { }
 
 	/* memory pointers */
 	UINT16 *  m_pf2_rowscroll;
@@ -36,6 +39,8 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
 	required_device<okim6295_device> m_oki2;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram2;
 };
 
 

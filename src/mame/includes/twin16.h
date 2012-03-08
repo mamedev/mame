@@ -1,8 +1,11 @@
+#include "video/bufsprite.h"
+
 class twin16_state : public driver_device
 {
 public:
 	twin16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT16 *m_videoram;
 	UINT16 m_CPUA_register;
@@ -24,6 +27,7 @@ public:
 	UINT16 m_scrolly[3];
 	UINT16 m_video_register;
 	tilemap_t *m_text_tilemap;
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 

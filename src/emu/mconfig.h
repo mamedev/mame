@@ -72,9 +72,6 @@
 // automatically extend the palette creating a brighter copy for highlights
 #define VIDEO_HAS_HIGHLIGHTS			0x0020
 
-// Mish 181099:  See comments in video/generic.c for details
-#define VIDEO_BUFFERS_SPRITERAM			0x0040
-
 // force VIDEO_UPDATE to be called even for skipped frames
 #define VIDEO_ALWAYS_UPDATE				0x0080
 

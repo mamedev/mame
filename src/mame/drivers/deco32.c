@@ -862,7 +862,7 @@ static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x20c000, 0x20cfff) AM_RAM AM_BASE_MEMBER(dragngun_state, m_dragngun_sprite_layout_1_ram)
 	AM_RANGE(0x210000, 0x217fff) AM_RAM AM_BASE_MEMBER(dragngun_state, m_dragngun_sprite_lookup_0_ram)
 	AM_RANGE(0x218000, 0x21ffff) AM_RAM AM_BASE_MEMBER(dragngun_state, m_dragngun_sprite_lookup_1_ram)
-	AM_RANGE(0x220000, 0x221fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Main spriteram */
+	AM_RANGE(0x220000, 0x221fff) AM_RAM AM_SHARE("spriteram") /* Main spriteram */
 
 	AM_RANGE(0x228000, 0x2283ff) AM_RAM //0x10 byte increments only
 
@@ -911,7 +911,7 @@ static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x20c000, 0x20cfff) AM_RAM AM_BASE_MEMBER(dragngun_state, m_dragngun_sprite_layout_1_ram)
 	AM_RANGE(0x210000, 0x217fff) AM_RAM AM_BASE_MEMBER(dragngun_state, m_dragngun_sprite_lookup_0_ram)
 	AM_RANGE(0x218000, 0x21ffff) AM_RAM AM_BASE_MEMBER(dragngun_state, m_dragngun_sprite_lookup_1_ram)
-	AM_RANGE(0x220000, 0x221fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Main spriteram */
+	AM_RANGE(0x220000, 0x221fff) AM_RAM AM_SHARE("spriteram") /* Main spriteram */
 
 	AM_RANGE(0x228000, 0x2283ff) AM_RAM				//0x10 byte increments only
 	AM_RANGE(0x230000, 0x230003) AM_WRITE(dragngun_spriteram_dma_w)
@@ -1959,14 +1959,14 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(42*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(dragngun)
 	MCFG_SCREEN_VBLANK_STATIC(dragngun)
+	
+	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
 
 	MCFG_DECO16IC_ADD("tilegen1", dragngun_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", dragngun_deco16ic_tilegen2_intf)
@@ -2032,14 +2032,14 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(42*8, 32*8+22)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(dragngun)
 	MCFG_SCREEN_VBLANK_STATIC(dragngun)
+	
+	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
 
 	MCFG_DECO16IC_ADD("tilegen1", lockload_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", lockload_deco16ic_tilegen2_intf)

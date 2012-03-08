@@ -222,7 +222,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	lastduel_state *state = machine.driver_data<lastduel_state>();
 
-	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
+	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
 	int offs;
 
 	if (!state->m_sprite_pri_mask)
@@ -304,18 +304,4 @@ SCREEN_UPDATE_IND16( madgear )
 	}
 	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
-}
-
-SCREEN_VBLANK( lastduel )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		/* Spriteram is always 1 frame ahead, suggesting buffering.  I can't find
-            a register to control this so I assume it happens automatically
-            every frame at the end of vblank */
-		buffer_spriteram16_w(space, 0, 0, 0xffff);
-	}
 }

@@ -107,10 +107,11 @@ VIDEO_START( commando )
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
+	commando_state *state = machine.driver_data<commando_state>();
+	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 
-	for (offs = machine.generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
 	{
 		// bit 1 of attr is not used
 		int attr = buffered_spriteram[offs + 1];
@@ -143,15 +144,4 @@ SCREEN_UPDATE_IND16( commando )
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
-}
-
-SCREEN_VBLANK( commando )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram_w(space, 0, 0);
-	}
 }

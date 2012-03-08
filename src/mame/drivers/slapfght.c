@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with sound CPU */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8 )
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_lo)
 	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_hi)
 	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrolly)
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_lo)
 	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_hi)
 	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrolly)
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_hi)
 	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrolly)
 	AM_RANGE(0xe803, 0xe803) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_lo)
@@ -734,16 +734,6 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_NULL
 };
 
-static SCREEN_VBLANK( perfrman )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		buffer_spriteram_w(space, 0, 0);
-	}
-}
-
 static INTERRUPT_GEN( vblank_irq )
 {
 	slapfght_state *state = device->machine().driver_data<slapfght_state>();
@@ -770,7 +760,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 	MCFG_MACHINE_RESET(slapfight)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -778,7 +768,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 34*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(perfrman)
-	MCFG_SCREEN_VBLANK_STATIC(perfrman)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(perfrman)
 	MCFG_PALETTE_LENGTH(256)
@@ -816,7 +806,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 	MCFG_MACHINE_RESET(slapfight)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -824,7 +814,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(slapfight)
-	MCFG_SCREEN_VBLANK_STATIC(perfrman)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(slapfght)
 	MCFG_PALETTE_LENGTH(256)
@@ -864,7 +854,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_MACHINE_RESET(slapfight)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -872,7 +862,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(slapfight)
-	MCFG_SCREEN_VBLANK_STATIC(perfrman)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(slapfght)
 	MCFG_PALETTE_LENGTH(256)
@@ -913,7 +903,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_MACHINE_RESET(slapfight)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -921,7 +911,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(slapfight)
-	MCFG_SCREEN_VBLANK_STATIC(perfrman)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(slapfght)
 	MCFG_PALETTE_LENGTH(256)

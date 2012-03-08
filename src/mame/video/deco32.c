@@ -20,8 +20,9 @@ WRITE32_HANDLER( dragngun_sprite_control_w )
 WRITE32_HANDLER( dragngun_spriteram_dma_w )
 {
 	/* DMA spriteram to private sprite chip area, and clear cpu ram */
-	memcpy(space->machine().generic.buffered_spriteram.u32,space->machine().generic.spriteram.u32,space->machine().generic.spriteram_size);
-	memset(space->machine().generic.spriteram.u32,0,0x2000);
+	deco32_state *state = space->machine().driver_data<deco32_state>();
+	state->m_spriteram->copy();
+	memset(state->m_spriteram->live(),0,0x2000);
 }
 
 WRITE32_HANDLER( deco32_ace_ram_w )
@@ -649,7 +650,7 @@ SCREEN_UPDATE_RGB32( dragngun )
 	{
 		rectangle clip(cliprect.min_x, cliprect.max_x, 8, 247);
 
-		dragngun_draw_sprites(screen.machine(),bitmap,clip,screen.machine().generic.buffered_spriteram.u32);
+		dragngun_draw_sprites(screen.machine(),bitmap,clip,state->m_spriteram->buffer());
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, clip, 0, 0);
 
 	}

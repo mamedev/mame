@@ -267,8 +267,6 @@ struct generic_pointers
 	UINT32					spriteram_size;
 	generic_ptr				spriteram2;			// secondary spriteram
 	UINT32					spriteram2_size;
-	generic_ptr				buffered_spriteram;	// buffered spriteram
-	generic_ptr				buffered_spriteram2;// secondary buffered spriteram
 	generic_ptr				paletteram;			// palette RAM
 	generic_ptr				paletteram2;		// secondary palette RAM
 };

@@ -48,7 +48,7 @@
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alt_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
 	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, m_videoram)
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raidenu_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x08035) AM_WRITEONLY AM_BASE_MEMBER(raiden_state, m_scroll_ram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
@@ -242,16 +242,6 @@ static INTERRUPT_GEN( raiden_interrupt )
 	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
-static SCREEN_VBLANK( raiden )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
-	}
-}
-
 static MACHINE_CONFIG_START( raiden, raiden_state )
 
 	/* basic machine hardware */
@@ -270,7 +260,7 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.60)    /* verified on pcb */
@@ -278,7 +268,7 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(raiden)
-	MCFG_SCREEN_VBLANK_STATIC(raiden)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(raiden)
 	MCFG_PALETTE_LENGTH(2048)

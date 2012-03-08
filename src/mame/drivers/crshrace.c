@@ -127,7 +127,6 @@ Dip locations verified with Service Mode.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 #include "video/konicdev.h"
@@ -168,7 +167,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		state->m_pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -191,9 +190,9 @@ static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(extrarom1_r)
 	AM_RANGE(0x400000, 0x4fffff) AM_READ(extrarom2_r)
 	AM_RANGE(0x500000, 0x5fffff) AM_READ(extrarom2_r)	/* mirror */
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_BASE_MEMBER(crshrace_state, m_videoram1)
-	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
 	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_BASE_MEMBER(crshrace_state, m_videoram2)
@@ -428,7 +427,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	crshrace_state *state = device->machine().driver_data<crshrace_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -447,9 +446,6 @@ static MACHINE_START( crshrace )
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 
 	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
-
-	state->m_audiocpu = machine.device("audiocpu");
-	state->m_k053936 = machine.device("k053936");
 
 	state->save_item(NAME(state->m_roz_bank));
 	state->save_item(NAME(state->m_gfxctrl));
@@ -482,8 +478,6 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_MACHINE_RESET(crshrace)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -493,6 +487,9 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 
 	MCFG_GFXDECODE(crshrace)
 	MCFG_PALETTE_LENGTH(2048)
+	
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	MCFG_K053936_ADD("k053936", crshrace_k053936_intf)
 

@@ -73,7 +73,7 @@ SCREEN_UPDATE_IND16( darkseal )
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
 
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 
 	return 0;

@@ -42,22 +42,6 @@ void generic_video_init(running_machine &machine);
 
 
 
-/* ----- sprite buffering ----- */
-
-/* buffered sprite RAM write handlers */
-WRITE8_HANDLER( buffer_spriteram_w );
-WRITE16_HANDLER( buffer_spriteram16_w );
-WRITE32_HANDLER( buffer_spriteram32_w );
-WRITE8_HANDLER( buffer_spriteram_2_w );
-WRITE16_HANDLER( buffer_spriteram16_2_w );
-WRITE32_HANDLER( buffer_spriteram32_2_w );
-
-/* perform the actual buffering */
-void buffer_spriteram(running_machine &machine, UINT8 *ptr, int length);
-void buffer_spriteram_2(running_machine &machine, UINT8 *ptr, int length);
-
-
-
 /* ----- global attributes ----- */
 
 /* set global attributes */

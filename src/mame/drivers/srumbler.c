@@ -74,7 +74,7 @@ Ignore the warnings about writing to unmapped memory.
 
 static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1dff) AM_RAM  /* RAM (of 1 sort or another) */
-	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(srumbler_background_w) AM_BASE_MEMBER(srumbler_state, m_backgroundram)
 	AM_RANGE(0x4008, 0x4008) AM_READ_PORT("SYSTEM") AM_WRITE(srumbler_bankswitch_w)
 	AM_RANGE(0x4009, 0x4009) AM_READ_PORT("P1") AM_WRITE(srumbler_4009_w)
@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_MACHINE_START(srumbler)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(10*8, (64-10)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(srumbler)
-	MCFG_SCREEN_VBLANK_STATIC(srumbler)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(srumbler)
 	MCFG_PALETTE_LENGTH(512)

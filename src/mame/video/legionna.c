@@ -254,7 +254,7 @@ VIDEO_START(godzilla)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	UINT16 *spriteram16 = machine.generic.spriteram.u16;
+	UINT16 *spriteram16 = state->m_spriteram;
 	int offs,fx,fy,x,y,color,sprite,cur_pri;
 	int dx,dy,ax,ay;
 	int pri_mask;

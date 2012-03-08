@@ -331,9 +331,9 @@ static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE_MEMBER(bbusters_state, m_ram)
 	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE_MEMBER(bbusters_state, m_videoram)
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_RAM		/* service mode */
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
+	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x0a9000, 0x0affff) AM_RAM		/* service mode */
 	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(bbusters_pf1_w) AM_BASE_MEMBER(bbusters_state, m_pf1_data)
 	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_BASE_MEMBER(bbusters_state, m_pf2_data)
@@ -361,7 +361,7 @@ static ADDRESS_MAP_START( mechatt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x06ffff) AM_ROM
 	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_BASE_MEMBER(bbusters_state, m_ram)
 	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE_MEMBER(bbusters_state, m_videoram)
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_WRITENOP
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf1_w) AM_BASE_MEMBER(bbusters_state, m_pf1_data)
 	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_BASE_MEMBER(bbusters_state, m_pf1_scroll_data)
@@ -666,24 +666,9 @@ static const ym2610_interface ym2610_config =
 
 static SCREEN_VBLANK( bbuster )
 {
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram16_w(space,0,0,0xffff);
-		buffer_spriteram16_2_w(space,0,0,0xffff);
-	}
-}
-
-static SCREEN_VBLANK( mechatt )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		buffer_spriteram16_w(space,0,0,0xffff);
-	}
+	bbusters_state *state = screen.machine().driver_data<bbusters_state>();
+	state->m_spriteram->vblank_copy_rising(screen, vblank_on);
+	state->m_spriteram2->vblank_copy_rising(screen, vblank_on);
 }
 
 static MACHINE_CONFIG_START( bbusters, bbusters_state )
@@ -700,8 +685,6 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_NVRAM_ADD_0FILL("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -713,6 +696,9 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(bbuster)
+	
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -737,19 +723,19 @@ static MACHINE_CONFIG_START( mechatt, bbusters_state )
 	MCFG_CPU_IO_MAP(sounda_portmap)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(mechatt)
-	MCFG_SCREEN_VBLANK_STATIC(mechatt)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(mechatt)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(mechatt)
+
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

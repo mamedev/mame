@@ -289,10 +289,10 @@ SCREEN_UPDATE_IND16( bbuster )
 	state->m_pf2_tilemap->set_scrolly(0, state->m_pf2_scroll_data[1]);
 
 	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
-	//draw_sprites(screen.machine(), bitmap, screen.machine().generic.buffered_spriteram2.u16, 2, 0x8, 0x8);
+	//draw_sprites(screen.machine(), bitmap, state->m_spriteram2->buffer(), 2, 0x8, 0x8);
 	state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, screen.machine().generic.buffered_spriteram2.u16, 2, 0, 0);
-	draw_sprites(screen.machine(), bitmap, screen.machine().generic.buffered_spriteram.u16, 1, 0, 0);
+	draw_sprites(screen.machine(), bitmap, state->m_spriteram2->buffer(), 2, 0, 0);
+	draw_sprites(screen.machine(), bitmap, state->m_spriteram->buffer(), 1, 0, 0);
 	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -308,7 +308,7 @@ SCREEN_UPDATE_IND16( mechatt )
 
 	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 	state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(screen.machine(), bitmap, screen.machine().generic.buffered_spriteram.u16, 1, 0, 0);
+	draw_sprites(screen.machine(), bitmap, state->m_spriteram->buffer(), 1, 0, 0);
 	state->m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

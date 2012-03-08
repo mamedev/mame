@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
-	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, m_fgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, m_bg1videoram)
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
-	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, m_fgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, m_bg1videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
-	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, m_fgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, m_bg1videoram)
@@ -801,7 +801,7 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	MCFG_MACHINE_RESET(lwings)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -809,7 +809,7 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(lwings)
-	MCFG_SCREEN_VBLANK_STATIC(lwings)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(lwings)
 	MCFG_PALETTE_LENGTH(1024)

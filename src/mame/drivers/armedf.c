@@ -393,7 +393,7 @@ static WRITE16_HANDLER( irq_lv2_ack_w )
 
 static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
@@ -414,7 +414,7 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 //  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
 //  AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
@@ -424,7 +424,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
@@ -446,7 +446,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
@@ -480,7 +480,7 @@ static WRITE8_HANDLER( legiono_fg_scroll_w )
 static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x04003f) AM_WRITE8(legiono_fg_scroll_w,0x00ff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
@@ -502,7 +502,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x065fff) AM_RAM
 	AM_RANGE(0x066000, 0x066fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
 	AM_RANGE(0x067000, 0x067fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
@@ -679,7 +679,7 @@ static READ16_HANDLER(sharedram_r)
 
 static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x080600, 0x083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(bigfghtr_state, m_sharedram)
 	AM_RANGE(0x084000, 0x085fff) AM_RAM //work ram
 	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
@@ -1204,8 +1204,6 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	MCFG_MACHINE_RESET(armedf)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1214,11 +1212,13 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 
 	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE_STATIC(armedf)
-	MCFG_SCREEN_VBLANK_STATIC(armedf)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(armedf)
 
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1253,8 +1253,6 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	MCFG_MACHINE_RESET(armedf)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1263,10 +1261,12 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 
 	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE_STATIC(armedf)
-	MCFG_SCREEN_VBLANK_STATIC(armedf)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
+	
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1297,8 +1297,6 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	MCFG_MACHINE_RESET(armedf)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1307,10 +1305,12 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 
 	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE_STATIC(armedf)
-	MCFG_SCREEN_VBLANK_STATIC(armedf)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1341,8 +1341,6 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 	MCFG_MACHINE_RESET(armedf)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1351,10 +1349,12 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 
 	MCFG_VIDEO_START(armedf)
 	MCFG_SCREEN_UPDATE_STATIC(armedf)
-	MCFG_SCREEN_VBLANK_STATIC(armedf)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1385,8 +1385,6 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 	MCFG_MACHINE_RESET(armedf)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1395,10 +1393,12 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 
 	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE_STATIC(armedf)
-	MCFG_SCREEN_VBLANK_STATIC(armedf)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1429,8 +1429,6 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	MCFG_MACHINE_RESET(armedf)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1439,10 +1437,12 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 
 	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE_STATIC(armedf)
-	MCFG_SCREEN_VBLANK_STATIC(armedf)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1473,8 +1473,6 @@ static MACHINE_CONFIG_START( legiono, armedf_state )
 	MCFG_MACHINE_RESET(armedf)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1483,10 +1481,12 @@ static MACHINE_CONFIG_START( legiono, armedf_state )
 
 	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE_STATIC(armedf)
-	MCFG_SCREEN_VBLANK_STATIC(armedf)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1532,8 +1532,6 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_MACHINE_RESET(bigfghtr)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1542,10 +1540,12 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
 	MCFG_VIDEO_START(armedf)
 	MCFG_SCREEN_UPDATE_STATIC(armedf)
-	MCFG_SCREEN_VBLANK_STATIC(armedf)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

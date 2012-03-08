@@ -115,11 +115,12 @@ WRITE8_HANDLER( srumbler_scroll_w )
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
+	srumbler_state *state = machine.driver_data<srumbler_state>();
+	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 
 	/* Draw the sprites. */
-	for (offs = machine.generic.spriteram_size-4; offs>=0;offs -= 4)
+	for (offs = state->m_spriteram->bytes()-4; offs>=0;offs -= 4)
 	{
 		/* SPRITES
         =====
@@ -168,15 +169,4 @@ SCREEN_UPDATE_IND16( srumbler )
 	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
-}
-
-SCREEN_VBLANK( srumbler )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram_w(space,0,0);
-	}
 }

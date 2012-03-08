@@ -67,32 +67,32 @@ SCREEN_UPDATE_IND16( vaportra )
 	{
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
-		screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0, state->m_priority[1], 0x0f);
+		screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram->buffer(), 0, state->m_priority[1], 0x0f);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 1)
 	{
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
-		screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0, state->m_priority[1], 0x0f);
+		screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram->buffer(), 0, state->m_priority[1], 0x0f);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 2)
 	{
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
-		screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0, state->m_priority[1], 0x0f);
+		screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram->buffer(), 0, state->m_priority[1], 0x0f);
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
-		screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0, state->m_priority[1], 0x0f);
+		screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram->buffer(), 0, state->m_priority[1], 0x0f);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
 	}
 
-	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 1, state->m_priority[1], 0x0f);
+	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram->buffer(), 1, state->m_priority[1], 0x0f);
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

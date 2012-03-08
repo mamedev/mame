@@ -4,8 +4,9 @@
 
 *************************************************************************/
 
-typedef struct _pf_layer_info pf_layer_info;
-struct _pf_layer_info
+#include "video/bufsprite.h"
+
+struct pf_layer_info
 {
 	tilemap_t *		tmap;
 	tilemap_t *		wide_tmap;
@@ -17,7 +18,8 @@ class m92_state : public driver_device
 {
 public:
 	m92_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT16 m_sound_status;
 	UINT8 m_irq_vectorbase;
@@ -31,6 +33,8 @@ public:
 	UINT16 m_pf_master_control[4];
 	INT32 m_sprite_list;
 	UINT8 m_palette_bank;
+	
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 

@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
 	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE("deco_common", decocomn_priority_w)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(buffer_spriteram16_2_w)
+	AM_RANGE(0x1c000c, 0x1c000d) AM_DEVWRITE_MODERN("spriteram2", buffered_spriteram16_device, write)
 	AM_RANGE(0x1c000e, 0x1c000f) AM_WRITE(dassault_control_w)
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, m_ram) /* Main ram */
-	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2) /* Spriteram (2nd) */
+	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram2") /* Spriteram (2nd) */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(dassault_state, m_shared_ram) /* Shared ram */
 ADDRESS_MAP_END
@@ -241,12 +241,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(buffer_spriteram16_w)
+	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram16_device, write)
 	AM_RANGE(0x100002, 0x100007) AM_WRITENOP /* ? */
 	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, m_ram2) /* Sub cpu ram */
-	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprite ram */
+	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram") /* Sprite ram */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w)
 ADDRESS_MAP_END
@@ -582,8 +582,6 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
@@ -595,6 +593,9 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 
 	MCFG_GFXDECODE(dassault)
 	MCFG_PALETTE_LENGTH(4096)
+	
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	MCFG_DECOCOMN_ADD("deco_common", dassault_decocomn_intf)
 

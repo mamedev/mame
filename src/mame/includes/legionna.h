@@ -2,7 +2,8 @@ class legionna_state : public driver_device
 {
 public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT16 *m_back_data;
 	UINT16 *m_fore_data;
@@ -21,6 +22,7 @@ public:
 	UINT16 m_back_gfx_bank;
 	UINT16 m_fore_gfx_bank;
 	UINT16 m_mid_gfx_bank;
+	required_shared_ptr<UINT16> m_spriteram;
 };
 
 

@@ -1,4 +1,5 @@
 #include "cpu/z80/z80.h"
+#include "video/bufsprite.h"
 
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
@@ -15,7 +16,8 @@ class slapfght_state : public driver_device
 {
 public:
 	slapfght_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	int m_getstar_id;
 	UINT8 *m_slapfight_videoram;
@@ -53,6 +55,7 @@ public:
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_fix_tilemap;
 	UINT8 m_irq_mask;
+	required_device<buffered_spriteram8_device> m_spriteram;
 };
 
 

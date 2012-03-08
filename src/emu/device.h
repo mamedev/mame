@@ -301,8 +301,7 @@ protected:
 
 		// helpers
 		device_t *find_device(device_t &device, const char *tag);
-		void *find_shared_ptr(device_t &device, const char *tag);
-		size_t find_shared_size(device_t &device, const char *tag);
+		void *find_shared_ptr(device_t &device, const char *tag, size_t &bytes);
 
 		// internal state
 		auto_finder_base *m_next;
@@ -335,6 +334,7 @@ protected:
 				throw emu_fatalerror("Unable to find required object '%s'", this->m_tag);
 		}
 
+	protected:
 		// internal state
 		_TargetType m_target;
 	};
@@ -362,8 +362,13 @@ protected:
 	class optional_shared_ptr : public auto_finder_type<_PointerType *, false>
 	{
 	public:
-		optional_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, false>(base, tag) { }
-		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(this->find_shared_ptr(base, this->m_tag))); }
+		optional_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, false>(base, tag), m_bytes(0) { }
+		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(this->find_shared_ptr(base, this->m_tag, m_bytes))); }
+		UINT32 bytes() const { return m_bytes; }
+	
+	private:
+		// internal state
+		size_t m_bytes;
 	};
 
 	// required shared pointer finder
@@ -371,24 +376,13 @@ protected:
 	class required_shared_ptr : public auto_finder_type<_PointerType *, true>
 	{
 	public:
-		required_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, true>(base, tag) { }
-		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(this->find_shared_ptr(base, this->m_tag))); }
-	};
-
-	// optional shared pointer size finder
-	class optional_shared_size : public auto_finder_type<size_t, false>
-	{
-	public:
-		optional_shared_size(device_t &base, const char *tag) : auto_finder_type<size_t, false>(base, tag) { }
-		virtual void findit(device_t &base) { this->set_target(find_shared_size(base, this->m_tag)); }
-	};
-
-	// required shared pointer size finder
-	class required_shared_size : public auto_finder_type<size_t, true>
-	{
-	public:
-		required_shared_size(device_t &base, const char *tag) : auto_finder_type<size_t, true>(base, tag) { }
-		virtual void findit(device_t &base) { this->set_target(find_shared_size(base, this->m_tag)); }
+		required_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, true>(base, tag), m_bytes(0) { }
+		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(this->find_shared_ptr(base, this->m_tag, m_bytes))); }
+		UINT32 bytes() const { return m_bytes; }
+	
+	private:
+		// internal state
+		size_t m_bytes;
 	};
 
 	// internal helpers

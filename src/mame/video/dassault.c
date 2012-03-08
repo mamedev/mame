@@ -80,8 +80,8 @@ SCREEN_UPDATE_RGB32( dassault )
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
-	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u16, 0x400, false);
-	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400, false);
+	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram2->buffer(), 0x400, false);
+	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400, false);
 	bitmap_ind16* sprite_bitmap1 = &screen.machine().device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
 	bitmap_ind16* sprite_bitmap2 = &screen.machine().device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
 

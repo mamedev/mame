@@ -186,10 +186,11 @@ INLINE int is_sprite_on( UINT8 *buffered_spriteram, int offs )
 
 static void lwings_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
+	lwings_state *state = machine.driver_data<lwings_state>();
+	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 
-	for (offs = machine.generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
 	{
 		if (is_sprite_on(buffered_spriteram, offs))
 		{
@@ -223,10 +224,10 @@ static void lwings_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 static void trojan_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lwings_state *state = machine.driver_data<lwings_state>();
-	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
+	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 
-	for (offs = machine.generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
 	{
 		if (is_sprite_on(buffered_spriteram, offs))
 		{
@@ -289,15 +290,4 @@ SCREEN_UPDATE_IND16( trojan )
 	state->m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
-}
-
-SCREEN_VBLANK( lwings )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram_w(space, 0, 0);
-	}
 }

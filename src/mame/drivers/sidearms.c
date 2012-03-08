@@ -87,14 +87,14 @@ static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE_MEMBER(sidearms_state,m_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE_MEMBER(sidearms_state,m_colorram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xe800, 0xe807) AM_READ(turtship_ports_r)
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE_MEMBER(sidearms_state,m_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE_MEMBER(sidearms_state,m_colorram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( whizz_sound_map, AS_PROGRAM, 8 )
@@ -663,7 +663,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(sidearms)
-	MCFG_SCREEN_VBLANK_STATIC(sidearms)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(sidearms)
 	MCFG_PALETTE_LENGTH(1024)
@@ -707,14 +707,14 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_VBLANK_STATIC(sidearms)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_UPDATE_STATIC(sidearms)
 
 	MCFG_GFXDECODE(turtship)
@@ -754,7 +754,7 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -762,7 +762,7 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(sidearms)
-	MCFG_SCREEN_VBLANK_STATIC(sidearms)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(turtship)
 	MCFG_PALETTE_LENGTH(1024)

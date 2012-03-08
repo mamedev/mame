@@ -264,7 +264,7 @@ WRITE16_HANDLER( gaelco2_palette_w )
 VIDEO_START( gaelco2 )
 {
 	gaelco2_state *state = machine.driver_data<gaelco2_state>();
-	state->m_videoram = machine.generic.spriteram.u16;
+	state->m_videoram = state->m_spriteram->live();
 
 	/* create tilemaps */
 	state->m_pant[0] = tilemap_create(machine, get_tile_info_gaelco2_screen0,tilemap_scan_rows,16,16,64,32);
@@ -285,7 +285,7 @@ VIDEO_START( gaelco2 )
 VIDEO_START( gaelco2_dual )
 {
 	gaelco2_state *state = machine.driver_data<gaelco2_state>();
-	state->m_videoram = machine.generic.spriteram.u16;
+	state->m_videoram = state->m_spriteram->live();
 
 	/* create tilemaps */
 	state->m_pant[0] = tilemap_create(machine, get_tile_info_gaelco2_screen0_dual,tilemap_scan_rows,16,16,64,32);
@@ -342,7 +342,7 @@ VIDEO_START( gaelco2_dual )
 static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs)
 {
 	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
-	UINT16 *buffered_spriteram16 = screen.machine().generic.buffered_spriteram.u16;
+	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
 	int j, x, y, ex, ey, px, py;
 	const gfx_element *gfx = screen.machine().gfx[0];
 
@@ -498,17 +498,3 @@ static UINT32 dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rec
 
 SCREEN_UPDATE_IND16( gaelco2_left ) { return dual_update(screen, bitmap, cliprect, 0); }
 SCREEN_UPDATE_IND16( gaelco2_right ) { return dual_update(screen, bitmap, cliprect, 1); }
-
-
-
-SCREEN_VBLANK( gaelco2 )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		/* sprites are one frame ahead */
-		buffer_spriteram16_w(space, 0, 0, 0xffff);
-	}
-}

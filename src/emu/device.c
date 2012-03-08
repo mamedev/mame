@@ -871,21 +871,9 @@ device_t *device_t::auto_finder_base::find_device(device_t &base, const char *ta
 //  find_shared_ptr - find a shared pointer
 //-------------------------------------------------
 
-void *device_t::auto_finder_base::find_shared_ptr(device_t &base, const char *tag)
+void *device_t::auto_finder_base::find_shared_ptr(device_t &base, const char *tag, size_t &bytes)
 {
-	return memory_get_shared(base.machine(), tag);
-}
-
-
-//-------------------------------------------------
-//  find_shared_size - find a shared pointer size
-//-------------------------------------------------
-
-size_t device_t::auto_finder_base::find_shared_size(device_t &base, const char *tag)
-{
-	size_t result = 0;
-	memory_get_shared(base.machine(), tag, result);
-	return result;
+	return memory_get_shared(base.machine(), tag, bytes);
 }
 
 

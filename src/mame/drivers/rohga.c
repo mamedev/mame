@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf3_rowscroll)
 	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf4_rowscroll)
 
-	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3e0000, 0x3e1fff) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
@@ -185,10 +185,10 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
 	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x350000, 0x350001) AM_WRITE(buffer_spriteram16_w) /* Triggers DMA for spriteram */
-	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
-	AM_RANGE(0x370000, 0x370001) AM_WRITE(buffer_spriteram16_2_w) /* Triggers DMA for spriteram */
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
+	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0x370000, 0x370001) AM_DEVWRITE_MODERN("spriteram2", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
 
 	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_palette_dma_w)
@@ -217,10 +217,10 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
 	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x350000, 0x350001) AM_WRITE(buffer_spriteram16_w) /* Triggers DMA for spriteram */
-	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
-	AM_RANGE(0x370000, 0x370001) AM_WRITE(buffer_spriteram16_2_w) /* Triggers DMA for spriteram */
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
+	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0x370000, 0x370001) AM_DEVWRITE_MODERN("spriteram2", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
 
 	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_palette_dma_w)
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf3_rowscroll)
 	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf4_rowscroll)
 
-	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff7fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
@@ -809,7 +809,7 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 	MCFG_CPU_PROGRAM_MAP(rohga_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -859,7 +859,8 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_CPU_PROGRAM_MAP(rohga_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -912,7 +913,8 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	MCFG_CPU_PROGRAM_MAP(rohga_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -965,7 +967,7 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 	MCFG_CPU_PROGRAM_MAP(rohga_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)

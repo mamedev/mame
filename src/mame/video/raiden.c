@@ -122,7 +122,7 @@ WRITE16_HANDLER( raidena_control_w )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri_mask)
 {
 	raiden_state *state = machine.driver_data<raiden_state>();
-	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
+	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
 	int offs,fx,fy,x,y,color,sprite;
 
 	for (offs = 0x1000/2-4;offs >= 0;offs -= 4)

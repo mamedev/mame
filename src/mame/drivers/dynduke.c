@@ -74,7 +74,7 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x080ff) AM_RAM AM_BASE_MEMBER(dynduke_state, m_scroll_ram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
@@ -100,7 +100,7 @@ ADDRESS_MAP_END
 /* Memory map used by DlbDyn - probably an addressing PAL is different */
 static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE_MEMBER(dynduke_state, m_videoram)
 	AM_RANGE(0x09000, 0x0900d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0c000, 0x0c0ff) AM_RAM AM_BASE_MEMBER(dynduke_state, m_scroll_ram)
@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_MACHINE_RESET(seibu_sound)
 
 	// video hardware
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -295,7 +295,7 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(dynduke)
-	MCFG_SCREEN_VBLANK_STATIC(dynduke)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(dynduke)
 	MCFG_PALETTE_LENGTH(2048)

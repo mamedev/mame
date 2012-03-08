@@ -16,7 +16,7 @@
 
 
 // set to 0 to enable Votrax device and disable samples
-#define USE_FAKE_VOTRAX			(1)
+#define USE_FAKE_VOTRAX			(0)
 
 
 #define GOTTLIEB_VIDEO_HCOUNT	318

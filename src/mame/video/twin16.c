@@ -162,7 +162,7 @@ static int twin16_set_sprite_timer( running_machine &machine )
 void twin16_spriteram_process( running_machine &machine )
 {
 	twin16_state *state = machine.driver_data<twin16_state>();
-	UINT16 *spriteram16 = machine.generic.spriteram.u16;
+	UINT16 *spriteram16 = state->m_spriteram->live();
 	UINT16 dx = state->m_scrollx[0];
 	UINT16 dy = state->m_scrolly[0];
 
@@ -224,8 +224,8 @@ void twin16_spriteram_process( running_machine &machine )
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap )
 {
 	twin16_state *state = machine.driver_data<twin16_state>();
-	const UINT16 *source = 0x1800+machine.generic.buffered_spriteram.u16 + 0x800 - 4;
-	const UINT16 *finish = 0x1800+machine.generic.buffered_spriteram.u16;
+	const UINT16 *source = 0x1800+state->m_spriteram->buffer() + 0x800 - 4;
+	const UINT16 *finish = 0x1800+state->m_spriteram->buffer();
 
 	for (; source >= finish; source -= 4)
 	{
@@ -552,12 +552,11 @@ SCREEN_VBLANK( twin16 )
 			/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
             as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
             more to it than that */
-			memcpy(&screen.machine().generic.buffered_spriteram.u16[0x1800],state->m_sprite_buffer,0x800*sizeof(UINT16));
-			memcpy(state->m_sprite_buffer,&screen.machine().generic.spriteram.u16[0x1800],0x800*sizeof(UINT16));
+			memcpy(&state->m_spriteram->buffer()[0x1800],state->m_sprite_buffer,0x800*sizeof(UINT16));
+			memcpy(state->m_sprite_buffer,&state->m_spriteram->live()[0x1800],0x800*sizeof(UINT16));
 		}
 		else {
-			address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-			buffer_spriteram16_w(space,0,0,0xffff);
+			state->m_spriteram->copy();
 		}
 	}
 }

@@ -267,6 +267,7 @@ EMUMACHINEOBJS = \
 
 EMUVIDEOOBJS = \
 	$(EMUVIDEO)/315_5124.o		\
+	$(EMUVIDEO)/bufsprite.o		\
 	$(EMUVIDEO)/cdp1861.o		\
 	$(EMUVIDEO)/cdp1862.o		\
 	$(EMUVIDEO)/crt9007.o		\

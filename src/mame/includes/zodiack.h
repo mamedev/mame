@@ -13,10 +13,7 @@ public:
 		  m_videoram_2(*this, "videoram_2"),
 		  m_attributeram(*this, "attributeram"),
 		  m_spriteram(*this, "spriteram"),
-		  m_bulletsram(*this, "bulletsram"),
-		  m_videoram_size(*this, "videoram"),
-		  m_spriteram_size(*this, "spriteram"),
-		  m_bulletsram_size(*this, "bulletsram")
+		  m_bulletsram(*this, "bulletsram")
 	{ m_percuss_hardware = 0; }
 
 	// in drivers/zodiack.c
@@ -44,9 +41,6 @@ public:
 	required_shared_ptr<UINT8> m_attributeram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_bulletsram;
-	required_shared_size m_videoram_size;
-	required_shared_size m_spriteram_size;
-	required_shared_size m_bulletsram_size;
 	// currently this driver uses generic palette handling
 
 	// state

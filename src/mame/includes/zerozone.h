@@ -14,8 +14,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_audiocpu(*this, "audiocpu"),
-		  m_vram(*this, "videoram"),
-		  m_vram_size(*this, "videoram")
+		  m_vram(*this, "videoram")
 	{ }
 
 	// in drivers/zerozone.c
@@ -31,7 +30,6 @@ public:
 
 	// shared pointers
 	required_shared_ptr<UINT16> m_vram;
-	required_shared_size m_vram_size;
 	// currently this driver uses generic palette handling
 
 	// state

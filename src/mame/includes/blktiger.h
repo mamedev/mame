@@ -4,15 +4,17 @@
 
 ***************************************************************************/
 
+#include "video/bufsprite.h"
+
 class blktiger_state : public driver_device
 {
 public:
 	blktiger_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers */
 	UINT8 * m_txvideoram;
-//  UINT8 * m_spriteram;  // currently this uses generic buffer_spriteram_w
 //  UINT8 * m_paletteram; // currently this uses generic palette handling
 //  UINT8 * m_paletteram2;    // currently this uses generic palette handling
 
@@ -36,6 +38,7 @@ public:
 	/* devices */
 	device_t *m_mcu;
 	device_t *m_audiocpu;
+	required_device<buffered_spriteram8_device> m_spriteram;
 };
 
 
@@ -54,4 +57,3 @@ WRITE8_HANDLER( blktiger_scrolly_w );
 
 VIDEO_START( blktiger );
 SCREEN_UPDATE_IND16( blktiger );
-SCREEN_VBLANK( blktiger );

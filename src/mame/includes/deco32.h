@@ -1,4 +1,5 @@
 #include "audio/decobsmt.h"
+#include "video/bufsprite.h"
 
 class deco32_state : public driver_device
 {
@@ -6,11 +7,13 @@ public:
 	deco32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_decobsmt(*this, "decobsmt")
+		m_decobsmt(*this, "decobsmt"),
+		m_spriteram(*this, "spriteram")
     { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<decobsmt_device> m_decobsmt;
+	optional_device<buffered_spriteram32_device> m_spriteram;
 
 	UINT32 *m_ram;
 	int m_raster_enable;

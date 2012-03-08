@@ -1,8 +1,11 @@
+#include "video/bufsprite.h"
+
 class toki_state : public driver_device
 {
 public:
 	toki_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	UINT16 *m_videoram;
 	int m_msm5205next;
@@ -13,14 +16,13 @@ public:
 	tilemap_t *m_background_layer;
 	tilemap_t *m_foreground_layer;
 	tilemap_t *m_text_layer;
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 
 /*----------- defined in video/toki.c -----------*/
 
 VIDEO_START( toki );
-SCREEN_VBLANK( toki );
-SCREEN_VBLANK( tokib );
 SCREEN_UPDATE_IND16( toki );
 SCREEN_UPDATE_IND16( tokib );
 WRITE16_HANDLER( toki_background1_videoram16_w );

@@ -352,11 +352,11 @@ void armedf_drawgfx(running_machine &machine, bitmap_ind16 &dest_bmp,const recta
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
 	armedf_state *state = machine.driver_data<armedf_state>();
+	UINT16 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 
-	for (offs = 0; offs < machine.generic.spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram->bytes() / 2; offs += 4)
 	{
 		int code = buffered_spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;
@@ -430,16 +430,4 @@ SCREEN_UPDATE_IND16( armedf )
 	state->m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 
 	return 0;
-}
-
-
-SCREEN_VBLANK( armedf )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram16_w(space, 0, 0, 0xffff);
-	}
 }

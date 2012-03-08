@@ -1,15 +1,16 @@
+#include "video/bufsprite.h"
 
 class lwings_state : public driver_device
 {
 public:
 	lwings_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers */
 	UINT8 *  m_fgvideoram;
 	UINT8 *  m_bg1videoram;
 	UINT8 *  m_soundlatch2;
-//      UINT8 *  m_spriteram; // currently this uses generic buffered spriteram
 //      UINT8 *  m_paletteram;    // currently this uses generic palette handling
 //      UINT8 *  m_paletteram2;   // currently this uses generic palette handling
 
@@ -28,6 +29,8 @@ public:
 	UINT8    m_soundstate;
 	UINT8    m_adpcm;
 	UINT8    m_nmi_mask;
+	
+	required_device<buffered_spriteram8_device> m_spriteram;
 };
 
 
@@ -45,4 +48,3 @@ VIDEO_START( trojan );
 VIDEO_START( avengers );
 SCREEN_UPDATE_IND16( lwings );
 SCREEN_UPDATE_IND16( trojan );
-SCREEN_VBLANK( lwings );

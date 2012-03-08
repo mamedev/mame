@@ -201,12 +201,12 @@ WRITE8_HANDLER( blktiger_screen_layout_w )
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//  blktiger_state *state = machine.driver_data<blktiger_state>();
-	UINT8 *buffered_spriteram = machine.generic.buffered_spriteram.u8;
+	blktiger_state *state = machine.driver_data<blktiger_state>();
+	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
 
 	/* Draw the sprites. */
-	for (offs = machine.generic.spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram->bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int attr = buffered_spriteram[offs+1];
 		int sx = buffered_spriteram[offs + 3] - ((attr & 0x10) << 4);
@@ -249,15 +249,4 @@ SCREEN_UPDATE_IND16( blktiger )
 		state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
-}
-
-SCREEN_VBLANK( blktiger )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-
-		buffer_spriteram_w(space, 0, 0);
-	}
 }

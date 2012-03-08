@@ -56,7 +56,7 @@ To do:
 static WRITE8_HANDLER( dec8_mxc06_karn_buffer_spriteram_w)
 {
 	dec8_state *state = space->machine().driver_data<dec8_state>();
-	UINT8* spriteram = space->machine().generic.spriteram.u8;
+	UINT8* spriteram = state->m_spriteram->live();
 	// copy to a 16-bit region for the sprite chip
 	for (int i=0;i<0x800/2;i++)
 	{
@@ -498,8 +498,6 @@ static WRITE8_HANDLER( shackled_int_w )
 
 /******************************************************************************/
 
-static READ8_HANDLER( shackled_sprite_r ) { return space->machine().generic.spriteram.u8[offset]; }
-static WRITE8_HANDLER( shackled_sprite_w ) { space->machine().generic.spriteram.u8[offset] = data; }
 static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine(), data); }
 
 /******************************************************************************/
@@ -512,7 +510,7 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3200, 0x37ff) AM_WRITEONLY /* Unused */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
@@ -538,7 +536,7 @@ static ADDRESS_MAP_START( meikyuh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM // colscroll? mirror?
 	AM_RANGE(0x2c00, 0x2fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_8bit_r, deco_bac06_pf_rowscroll_8bit_w)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
@@ -557,14 +555,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(srdarwin_videoram_w) AM_BASE_MEMBER(dec8_state, m_videoram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(srdarwin_videoram_w) AM_BASE_MEMBER(dec8_state, m_videoram)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, m_bg_data)
 	AM_RANGE(0x1800, 0x1801) AM_WRITE(srdarwin_i8751_w)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(i8751_reset_w)		/* Maybe.. */
 	AM_RANGE(0x1803, 0x1803) AM_WRITENOP			/* NMI ack */
-	AM_RANGE(0x1804, 0x1804) AM_WRITE(buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x1804, 0x1804) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram8_device, write) /* DMA */
 	AM_RANGE(0x1805, 0x1806) AM_WRITE(srdarwin_control_w) /* Scroll & Bank */
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(i8751_h_r, dec8_sound_w)	/* Sound */
 	AM_RANGE(0x2001, 0x2001) AM_READWRITE(i8751_l_r, flip_screen_w)		/* Flipscreen */
@@ -584,7 +582,7 @@ static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, m_bg_data)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* Sprites */
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")	/* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")		/* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")		/* Dip 2 */
 	AM_RANGE(0x380a, 0x380b) AM_READ(gondo_player_1_r)	/* Player 1 rotary */
@@ -607,7 +605,7 @@ static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprites */
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
 	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3c00, 0x3c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x3c01, 0x3c01) AM_READ_PORT("IN1")
@@ -652,7 +650,7 @@ static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(lastmisn_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(lastmisn_i8751_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, m_bg_data)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -673,7 +671,7 @@ static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(shackled_sprite_w)
+	AM_RANGE(0x2800, 0x2fff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -696,7 +694,7 @@ static ADDRESS_MAP_START( shackled_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(shackled_sprite_r, shackled_sprite_w)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, m_bg_data)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -722,7 +720,7 @@ static ADDRESS_MAP_START( shackled_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(shackled_i8751_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -746,7 +744,7 @@ static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(i8751_h_r)
 	AM_RANGE(0x1e00, 0x1e00) AM_READ(i8751_l_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(shackled_sprite_r, shackled_sprite_w)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, m_bg_data)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -763,7 +761,7 @@ static ADDRESS_MAP_START( csilver_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -775,7 +773,7 @@ static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, m_bg_data)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprites */
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")	/* Dip 2 */
 	AM_RANGE(0x3808, 0x3808) AM_READNOP		/* ? */
@@ -2010,8 +2008,8 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
@@ -2065,8 +2063,8 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
 
@@ -2121,8 +2119,8 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
 
@@ -2171,8 +2169,8 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
@@ -2217,8 +2215,8 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
@@ -2267,8 +2265,8 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
@@ -2316,8 +2314,8 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
@@ -2366,8 +2364,8 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
@@ -2416,8 +2414,8 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_MACHINE_RESET(dec8)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 

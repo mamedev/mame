@@ -45,7 +45,7 @@ static ADDRESS_MAP_START( exedexes_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd804, 0xd805) AM_WRITEONLY AM_BASE_MEMBER(exedexes_state, m_bg_scroll)
 	AM_RANGE(0xd807, 0xd807) AM_WRITE(exedexes_gfxctrl_w)							/* layer enables */
 	AM_RANGE(0xe000, 0xefff) AM_RAM													/* Work RAM */
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* Sprite RAM */
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")	/* Sprite RAM */
 ADDRESS_MAP_END
 
 
@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( exedexes, exedexes_state )
 	MCFG_MACHINE_RESET(exedexes)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( exedexes, exedexes_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(exedexes)
-	MCFG_SCREEN_VBLANK_STATIC(exedexes)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE(exedexes)
 	MCFG_PALETTE_LENGTH(64*4+64*4+16*16+16*16)

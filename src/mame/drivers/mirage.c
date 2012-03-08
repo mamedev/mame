@@ -38,6 +38,7 @@ MR_01-.3A    [a0b758aa]
 #include "includes/decoprot.h"
 #include "video/deco16ic.h"
 #include "sound/okim6295.h"
+#include "video/bufsprite.h"
 #include "video/decospr.h"
 
 // mirage_state was also defined in mess/drivers/mirage.c
@@ -49,14 +50,13 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_deco_tilegen1(*this, "tilegen1"),
 		  m_oki_sfx(*this, "oki_sfx"),
-		  m_oki_bgm(*this, "oki_bgm") { }
+		  m_oki_bgm(*this, "oki_bgm"),
+		  m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers */
 	UINT16 *  m_pf1_rowscroll;
 	UINT16 *  m_pf2_rowscroll;
-//  UINT16 *  m_spriteram;
 //  UINT16 *  m_paletteram;    // currently this uses generic palette handling (in decocomn.c)
-//  size_t    m_spriteram_size;
 
 	/* misc */
 	UINT8 m_mux_data;
@@ -66,6 +66,7 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<okim6295_device> m_oki_sfx;
 	required_device<okim6295_device> m_oki_bgm;
+	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
 static VIDEO_START( mirage )
@@ -80,7 +81,7 @@ static SCREEN_UPDATE_RGB32( mirage )
 
 	flip_screen_set(screen.machine(), BIT(flip, 7));
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400);
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
@@ -92,16 +93,6 @@ static SCREEN_UPDATE_RGB32( mirage )
 	screen.machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
 
 	return 0;
-}
-
-static SCREEN_VBLANK( mirage )
-{
-	// rising edge
-	if (vblank_on)
-	{
-		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		buffer_spriteram16_w(space,0,0,0xffff);
-	}
 }
 
 
@@ -148,7 +139,7 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16 )
 	/* linescroll */
 	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_BASE_MEMBER(miragemi_state, m_pf1_rowscroll)
 	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE_MEMBER(miragemi_state, m_pf2_rowscroll)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x130000, 0x1307ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8_MODERN("oki_sfx", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8_MODERN("oki_bgm", okim6295_device, read, write, 0x00ff)
@@ -330,7 +321,7 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 	MCFG_MACHINE_RESET(mirage)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -338,7 +329,7 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(mirage)
-	MCFG_SCREEN_VBLANK_STATIC(mirage)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_VIDEO_START(mirage)
 

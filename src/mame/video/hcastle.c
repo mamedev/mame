@@ -179,9 +179,9 @@ WRITE8_HANDLER( hcastle_pf1_control_w )
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			buffer_spriteram(space->machine(), space->machine().generic.spriteram.u8 + 0x800, 0x800);
+			state->m_spriteram->copy(0x800, 0x800);
 		else
-			buffer_spriteram(space->machine(), space->machine().generic.spriteram.u8, 0x800);
+			state->m_spriteram->copy(0x000, 0x800);
 	}
 	else if (offset == 7)
 	{
@@ -197,9 +197,9 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			buffer_spriteram_2(space->machine(), space->machine().generic.spriteram2.u8 + 0x800, 0x800);
+			state->m_spriteram2->copy(0x800, 0x800);
 		else
-			buffer_spriteram_2(space->machine(), space->machine().generic.spriteram2.u8, 0x800);
+			state->m_spriteram2->copy(0x000, 0x800);
 	}
 	else if (offset == 7)
 	{
@@ -264,16 +264,16 @@ SCREEN_UPDATE_IND16( hcastle )
 	if ((state->m_gfx_bank & 0x04) == 0)
 	{
 		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u8, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u8, 1);
+		draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram->buffer(), 0);
+		draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram2->buffer(), 1);
 		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram.u8, 0);
-		draw_sprites(screen.machine(), bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u8, 1);
+		draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram->buffer(), 0);
+		draw_sprites(screen.machine(), bitmap, cliprect, state->m_spriteram2->buffer(), 1);
 	}
 	return 0;
 }

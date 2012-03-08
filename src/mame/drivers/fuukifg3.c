@@ -611,8 +611,6 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_MACHINE_RESET(fuuki32)
 
 	/* video hardware */
-	//MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM) // Buffered by 2 frames
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 32*8)

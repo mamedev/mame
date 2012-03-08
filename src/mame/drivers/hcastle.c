@@ -55,9 +55,9 @@ static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE_MEMBER(hcastle_state, m_paletteram)
 	AM_RANGE(0x0700, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(hcastle_pf1_video_w) AM_BASE_MEMBER(hcastle_state, m_pf1_videoram)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(hcastle_pf2_video_w) AM_BASE_MEMBER(hcastle_state, m_pf2_videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -220,7 +220,8 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_MACHINE_RESET(hcastle)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram2")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59)

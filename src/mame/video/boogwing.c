@@ -184,8 +184,8 @@ SCREEN_UPDATE_RGB32( boogwing )
 	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
 	/* Draw sprite planes to bitmaps for later mixing */
-	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram2.u16, 0x400, true);
-	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, screen.machine().generic.buffered_spriteram.u16, 0x400, true);
+	screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram2->buffer(), 0x400, true);
+	screen.machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, state->m_spriteram->buffer(), 0x400, true);
 
 	flip_screen_set(screen.machine(), BIT(flip, 7));
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);

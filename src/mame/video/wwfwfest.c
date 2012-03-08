@@ -167,7 +167,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
     **- End of Comments -*/
 
-	UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
+	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
 	const gfx_element *gfx = machine.gfx[1];
 	UINT16 *source = buffered_spriteram16;
 	UINT16 *finish = source + 0x2000/2;
