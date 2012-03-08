@@ -2,7 +2,7 @@
 
     Dark Seal (Rev 3)    (c) 1990 Data East Corporation (World version)
     Dark Seal (Rev 1)    (c) 1990 Data East Corporation (World version)
-    Dark Seal            (c) 1990 Data East Corporation (Japanese version)
+    Dark Seal (Rev 4)    (c) 1990 Data East Corporation (Japanese version)
     Gate Of Doom (Rev 4) (c) 1990 Data East Corporation (USA version)
     Gate of Doom (Rev 1) (c) 1990 Data East Corporation (USA version)
 
@@ -315,160 +315,157 @@ MACHINE_CONFIG_END
 
 ROM_START( darkseal )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "ga04-3.rom",   0x00000, 0x20000, CRC(bafad556) SHA1(5bd8a787d41a33919701ced29212bc11301e31d9) )
-	ROM_LOAD16_BYTE( "ga01-3.rom",   0x00001, 0x20000, CRC(f409050e) SHA1(4653094aeb5dd7ba1e490c04897a23ba8990df3c) )
-	ROM_LOAD16_BYTE( "ga-00.rom",    0x40000, 0x20000, CRC(fbf3ac63) SHA1(51af581ee951eedeb4aa413ecbebe8bf4d30613b) )
-	ROM_LOAD16_BYTE( "ga-05.rom",    0x40001, 0x20000, CRC(d5e3ae3f) SHA1(12f6e92af115422c6ab6ef1d33675d1e1cd58e10) )
+	ROM_LOAD16_BYTE( "ga-04-3.j12", 0x00000, 0x20000, CRC(bafad556) SHA1(5bd8a787d41a33919701ced29212bc11301e31d9) )
+	ROM_LOAD16_BYTE( "ga-01-3.h14", 0x00001, 0x20000, CRC(f409050e) SHA1(4653094aeb5dd7ba1e490c04897a23ba8990df3c) )
+	ROM_LOAD16_BYTE( "ga-00.h12",   0x40000, 0x20000, CRC(fbf3ac63) SHA1(51af581ee951eedeb4aa413ecbebe8bf4d30613b) )
+	ROM_LOAD16_BYTE( "ga-05.j14",   0x40001, 0x20000, CRC(d5e3ae3f) SHA1(12f6e92af115422c6ab6ef1d33675d1e1cd58e10) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
-	ROM_LOAD( "fz-06.rom",    0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
+	ROM_LOAD( "fz-06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz-02.rom",    0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
-	ROM_LOAD( "fz-03.rom",    0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
+	ROM_LOAD( "fz-02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz-03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
-	ROM_LOAD( "mac-03.rom",   0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
+	ROM_LOAD( "mac-03.rom", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "mac-02.rom",   0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
+	ROM_LOAD( "mac-02.e20", 0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
 
 	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
-	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
+	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
+	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
+	ROM_LOAD( "fz-08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
 	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
+	ROM_LOAD( "fz-07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
 ROM_START( darkseal1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "ga-04.rom",    0x00000, 0x20000, CRC(a1a985a9) SHA1(eac3f43ff4016dcc21fe34b6bfed36e0d4b86959) )
-	ROM_LOAD16_BYTE( "ga-01.rom",    0x00001, 0x20000, CRC(98bd2940) SHA1(88ac727c3797e646834266320a71aa159e2b2541) )
-	ROM_LOAD16_BYTE( "ga-00.rom",    0x40000, 0x20000, CRC(fbf3ac63) SHA1(51af581ee951eedeb4aa413ecbebe8bf4d30613b) )
-	ROM_LOAD16_BYTE( "ga-05.rom",    0x40001, 0x20000, CRC(d5e3ae3f) SHA1(12f6e92af115422c6ab6ef1d33675d1e1cd58e10) )
+	ROM_LOAD16_BYTE( "ga-04.j12", 0x00000, 0x20000, CRC(a1a985a9) SHA1(eac3f43ff4016dcc21fe34b6bfed36e0d4b86959) )
+	ROM_LOAD16_BYTE( "ga-01.h14", 0x00001, 0x20000, CRC(98bd2940) SHA1(88ac727c3797e646834266320a71aa159e2b2541) )
+	ROM_LOAD16_BYTE( "ga-00.h12", 0x40000, 0x20000, CRC(fbf3ac63) SHA1(51af581ee951eedeb4aa413ecbebe8bf4d30613b) )
+	ROM_LOAD16_BYTE( "ga-05.j14", 0x40001, 0x20000, CRC(d5e3ae3f) SHA1(12f6e92af115422c6ab6ef1d33675d1e1cd58e10) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
-	ROM_LOAD( "fz-06.rom",    0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
+	ROM_LOAD( "fz-06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz-02.rom",    0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
-	ROM_LOAD( "fz-03.rom",    0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
+	ROM_LOAD( "fz-02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz-03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
-	ROM_LOAD( "mac-03.rom",   0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
+	ROM_LOAD( "mac-03.rom", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "mac-02.rom",   0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
+	ROM_LOAD( "mac-02.e20", 0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
 
 	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
-	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
+	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
+	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
+	ROM_LOAD( "fz-08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
 	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
+	ROM_LOAD( "fz-07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
 ROM_START( darksealj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "fz-04-4.bin",    0x00000, 0x20000, CRC(817faa2c) SHA1(8a79703f0e3aeb2ceeb098466561ab604baef301) )
-	ROM_LOAD16_BYTE( "fz-01-4.bin",    0x00001, 0x20000, CRC(373caeee) SHA1(5cfa0c7672c439e9d011d9ec93da32c2377dce19) )
-	ROM_LOAD16_BYTE( "fz-00-2.bin",    0x40000, 0x20000, CRC(1ab99aa7) SHA1(1da51f3ee0d15094911d4090264b945090d51242) )
-	ROM_LOAD16_BYTE( "fz-05-2.bin",    0x40001, 0x20000, CRC(3374ef8c) SHA1(4144e71e452e281078bcd9b9a996db9f5dccc346) )
+	ROM_LOAD16_BYTE( "fz-04-4.j12", 0x00000, 0x20000, CRC(817faa2c) SHA1(8a79703f0e3aeb2ceeb098466561ab604baef301) )
+	ROM_LOAD16_BYTE( "fz-01-4.h14", 0x00001, 0x20000, CRC(373caeee) SHA1(5cfa0c7672c439e9d011d9ec93da32c2377dce19) )
+	ROM_LOAD16_BYTE( "fz-00-2.h12", 0x40000, 0x20000, CRC(1ab99aa7) SHA1(1da51f3ee0d15094911d4090264b945090d51242) )
+	ROM_LOAD16_BYTE( "fz-05-2.j14", 0x40001, 0x20000, CRC(3374ef8c) SHA1(4144e71e452e281078bcd9b9a996db9f5dccc346) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
-	ROM_LOAD( "fz-06-1.bin",  0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
+	ROM_LOAD( "fz-06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz-02.rom",    0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
-	ROM_LOAD( "fz-03.rom",    0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
+	ROM_LOAD( "fz-02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz-03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
-	ROM_LOAD( "mac-03.rom",   0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
+	ROM_LOAD( "mac-03.rom", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "mac-02.rom",   0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
+	ROM_LOAD( "mac-02.e20", 0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
 
 	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
-	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
+	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
+	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
+	ROM_LOAD( "fz-08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
 	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
+	ROM_LOAD( "fz-07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
 ROM_START( gatedoom )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "gb04-4",       0x00000, 0x20000, CRC(8e3a0bfd) SHA1(1d20bd678a630e2006c7f50f4d13656136db3721) )
-	ROM_LOAD16_BYTE( "gb01-4",       0x00001, 0x20000, CRC(8d0fd383) SHA1(797e3cf43c9315b4195232eb1787a2292af4901b) )
-	ROM_LOAD16_BYTE( "ga-00.rom",    0x40000, 0x20000, CRC(fbf3ac63) SHA1(51af581ee951eedeb4aa413ecbebe8bf4d30613b) )
-	ROM_LOAD16_BYTE( "ga-05.rom",    0x40001, 0x20000, CRC(d5e3ae3f) SHA1(12f6e92af115422c6ab6ef1d33675d1e1cd58e10) )
+	ROM_LOAD16_BYTE( "gb-04-4.j12", 0x00000, 0x20000, CRC(8e3a0bfd) SHA1(1d20bd678a630e2006c7f50f4d13656136db3721) )
+	ROM_LOAD16_BYTE( "gb-01-4.h14", 0x00001, 0x20000, CRC(8d0fd383) SHA1(797e3cf43c9315b4195232eb1787a2292af4901b) )
+	ROM_LOAD16_BYTE( "gb-00.h12",   0x40000, 0x20000, CRC(a88c16a1) SHA1(e02d5470692f23afa658b9bda933bb20be64602f) )
+	ROM_LOAD16_BYTE( "gb-05.j14",   0x40001, 0x20000, CRC(252d7e14) SHA1(b2f27cd9686dfc697f3faca74d20b298a59efab2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
-	ROM_LOAD( "fz-06.rom",    0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
+	ROM_LOAD( "fz-06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz-02.rom",    0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
-	ROM_LOAD( "fz-03.rom",    0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
+	ROM_LOAD( "fz-02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz-03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
-	ROM_LOAD( "mac-03.rom",   0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
+	ROM_LOAD( "mac-03.rom", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "mac-02.rom",   0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
+	ROM_LOAD( "mac-02.e20", 0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
 
 	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
-	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
+	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
+	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
+	ROM_LOAD( "fz-08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
 	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
+	ROM_LOAD( "fz-07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
 ROM_START( gatedoom1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "gb04.bin",     0x00000, 0x20000, CRC(4c3bbd2b) SHA1(e74a532edd01a559d0c388b37a2ead98c19fe5de) )
-	ROM_LOAD16_BYTE( "gb01.bin",     0x00001, 0x20000, CRC(59e367f4) SHA1(f88fa23b8e91f312103eb8a1d9a91d8171ec3ad4) )
-	ROM_LOAD16_BYTE( "gb00.bin",     0x40000, 0x20000, CRC(a88c16a1) SHA1(e02d5470692f23afa658b9bda933bb20be64602f) )
-	ROM_LOAD16_BYTE( "gb05.bin",     0x40001, 0x20000, CRC(252d7e14) SHA1(b2f27cd9686dfc697f3faca74d20b298a59efab2) )
+	ROM_LOAD16_BYTE( "gb-04.j12", 0x00000, 0x20000, CRC(4c3bbd2b) SHA1(e74a532edd01a559d0c388b37a2ead98c19fe5de) )
+	ROM_LOAD16_BYTE( "gb-01.h14", 0x00001, 0x20000, CRC(59e367f4) SHA1(f88fa23b8e91f312103eb8a1d9a91d8171ec3ad4) )
+	ROM_LOAD16_BYTE( "gb-00.h12", 0x40000, 0x20000, CRC(a88c16a1) SHA1(e02d5470692f23afa658b9bda933bb20be64602f) )
+	ROM_LOAD16_BYTE( "gb-05.j14", 0x40001, 0x20000, CRC(252d7e14) SHA1(b2f27cd9686dfc697f3faca74d20b298a59efab2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
-	ROM_LOAD( "fz-06.rom",    0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
+	ROM_LOAD( "fz-06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "fz-02.rom",    0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
-	ROM_LOAD( "fz-03.rom",    0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
-
-	/* the following four have not been verified on a real Gate of Doom */
-	/* board - might be different from Dark Seal! */
+	ROM_LOAD( "fz-02.j1", 0x000000, 0x10000, CRC(3c9c3012) SHA1(086c2123725d4aa32838c0b6c82317d9c789c465) )	/* chars */
+	ROM_LOAD( "fz-03.j2", 0x010000, 0x10000, CRC(264b90ed) SHA1(0bb1557673107c2d732a9374d5601a6eaf229473) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
-	ROM_LOAD( "mac-03.rom",   0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
+	ROM_LOAD( "mac-03.rom", 0x000000, 0x80000, CRC(9996f3dc) SHA1(fffd9ecfe142a0c7c3c9c521778ff9c55ea8b225) ) /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "mac-02.rom",   0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
+	ROM_LOAD( "mac-02.e20", 0x000000, 0x80000, CRC(49504e89) SHA1(6da4733a650b9040abb2a81a49476368b514b5ab) ) /* tiles 2 */
 
 	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "mac-00.rom",   0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
-	ROM_LOAD( "mac-01.rom",   0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
+	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
+	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-08.rom",    0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
+	ROM_LOAD( "fz-08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
 	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
-	ROM_LOAD( "fz-07.rom",    0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
+	ROM_LOAD( "fz-07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
 /******************************************************************************/
@@ -487,6 +484,6 @@ static DRIVER_INIT( darkseal )
 
 GAME( 1990, darkseal,  0,        darkseal, darkseal, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 3)", 0 )
 GAME( 1990, darkseal1, darkseal, darkseal, darkseal, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 1)", 0 )
-GAME( 1990, darksealj, darkseal, darkseal, darkseal, darkseal, ROT0, "Data East Corporation", "Dark Seal (Japan)", 0 )
+GAME( 1990, darksealj, darkseal, darkseal, darkseal, darkseal, ROT0, "Data East Corporation", "Dark Seal (Japan revision 4)", 0 )
 GAME( 1990, gatedoom,  darkseal, darkseal, darkseal, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 4)", 0 )
 GAME( 1990, gatedoom1, darkseal, darkseal, darkseal, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 1)", 0 )
