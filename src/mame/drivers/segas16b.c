@@ -3469,7 +3469,7 @@ MACHINE_CONFIG_END
  **************************************************************************************************************************
     Ace Attacker, Sega System 16B
     CPU: FD1094 (317-0059, also 317-0061 version known to be exist)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 */
 ROM_START( aceattac )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -3510,7 +3510,7 @@ ROM_END
  **************************************************************************************************************************
     Alien Syndrome, Sega System 16B
     CPU: 68000
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 */
 ROM_START( aliensyn )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -3546,7 +3546,7 @@ ROM_END
 /**************************************************************************************************************************
     Alien Syndrome, Sega System 16B
     CPU: FD1089A (317-0033)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
     Sega game ID: 833-6308-03
       Main board: 837-6312
        Rom board: 834-6311-03
@@ -3589,7 +3589,7 @@ ROM_END
 /**************************************************************************************************************************
     Alien Syndrome, Sega System 16B
     CPU: FD1089A (317-0033)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
     Sega game ID: 833-6308
       Main board: 837-6312
        Rom board: 834-6311
@@ -3634,7 +3634,7 @@ ROM_END
  **************************************************************************************************************************
     Altered Beast, Sega System 16B
     CPU: 68000 + i8751 (317-0078)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
     Sega ID# for ROM board: 834-6661-10
 */
 ROM_START( altbeast )
@@ -3669,7 +3669,7 @@ ROM_END
 /**************************************************************************************************************************
     Altered Beast, Sega System 16B
     CPU: 68000 + i8751 (317-0077)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
 */
 ROM_START( altbeastj )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
@@ -3712,7 +3712,7 @@ ROM_END
 /**************************************************************************************************************************
     Altered Beast, Sega System 16B
     CPU: 68000 + i8751 (317-0076)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
 */
 ROM_START( altbeast6 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
@@ -3755,7 +3755,7 @@ ROM_END
 /**************************************************************************************************************************
     Altered Beast, Sega System 16B
     CPU: FD1094 (317-0069)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
     Sega game ID: 833-6660-07
       Main board: 837-6662-05
        ROM board: 834-6661-07
@@ -3801,7 +3801,7 @@ ROM_END
 /**************************************************************************************************************************
     Altered Beast, Sega System 16B
     CPU: 68000 + MC-8123B 317-0066
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
     Sega ID# for ROM board: 834-6661-06
 */
 ROM_START( altbeast4 )
@@ -3845,7 +3845,7 @@ ROM_END
 /**************************************************************************************************************************
     Jyuohki (Altered Beast), Sega System 16B
     CPU: FD1094 (317-0068)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
 */
 ROM_START( altbeastj3 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -3888,7 +3888,7 @@ ROM_END
 /**************************************************************************************************************************
     Altered Beast, Sega System 16B
     CPU: 68000 + MC8123B (317-0066)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
     Sega ID# for ROM board: 834-6661-02
 */
 ROM_START( altbeast2 )
@@ -3923,7 +3923,7 @@ ROM_END
 /**************************************************************************************************************************
     Jyuohki (Altered Beast), Sega System 16B
     CPU: FD1094 (317-0065)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
 */
 ROM_START( altbeastj1 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -4006,7 +4006,7 @@ ROM_END
  **************************************************************************************************************************
     Aurail, Sega System 16B
     CPU: 68000
-    ROM Board: 171-????
+    ROM Board type: 171-????
 */
 ROM_START( aurail )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
@@ -4050,7 +4050,7 @@ ROM_END
 /**************************************************************************************************************************
     Aurail, Sega System 16B
     CPU: FD1089B (317-0168)
-    ROM Board: 171-????
+    ROM Board type: 171-????
 */
 ROM_START( aurail1 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
@@ -4098,7 +4098,7 @@ ROM_END
 /**************************************************************************************************************************
     Aurail, Sega System 16B
     CPU: FD1089A (317-0167)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 
     S1  - -
     S2  ---
@@ -4169,7 +4169,7 @@ ROM_END
  **************************************************************************************************************************
     Bay Route, Sega System 16B
     CPU: FD1094 (317-0116)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 */
 ROM_START( bayroute )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
@@ -4202,7 +4202,7 @@ ROM_END
 /**************************************************************************************************************************
     Bay Route, Sega System 16B
     CPU: FD1094 (317-0115)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 */
 ROM_START( bayroutej )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
@@ -4235,7 +4235,7 @@ ROM_END
 /**************************************************************************************************************************
     Bay Route, Sega System 16B
     CPU: 68000
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 */
 ROM_START( bayroute1 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
@@ -4325,7 +4325,7 @@ ROM_END
  **************************************************************************************************************************
     Cotton, Sega System 16B
     CPU: FD1094 (317-0181A)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 */
 ROM_START( cotton )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
@@ -4372,7 +4372,7 @@ ROM_END
 /**************************************************************************************************************************
     Cotton, Sega System 16B
     CPU: FD1094 (317-0180T) // T could be wrong, it was handwritten
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 */
 ROM_START( cottonu )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
@@ -4419,7 +4419,7 @@ ROM_END
 /**************************************************************************************************************************
     Cotton (Japan), Sega System 16B
     CPU: FD1094 (317-0179A)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 */
 ROM_START( cottonj )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
@@ -4469,7 +4469,7 @@ ROM_END
  **************************************************************************************************************************
     Dunk Shot, Sega System 16B
     CPU: FD1089A (317-0022)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 */
 ROM_START( dunkshot )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -4519,7 +4519,7 @@ ROM_END
  **************************************************************************************************************************
     Dynamite Dux, Sega System 16B
     CPU: FD1094 (317-0096, version uses 317-0094 known to be exist)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
 
     Pos.   Silk        Type        Part         Pos.   Silk        Type        Part
 
@@ -4608,7 +4608,7 @@ ROM_END
  **************************************************************************************************************************
     E-Swat (World), Sega System 16B
     CPU: FD1094 (317-0130)
-    ROM Board: 171-5797
+    ROM Board type: 171-5797
 */
 ROM_START( eswat )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
@@ -4645,7 +4645,7 @@ ROM_END
 /**************************************************************************************************************************
     E-Swat (US), Sega System 16B
     CPU: FD1094 (317-0129)
-    ROM Board: 171-5797
+    ROM Board type: 171-5797
     Sega ID# for ROM board: 834-7165-01
 */
 ROM_START( eswatu )
@@ -4682,9 +4682,11 @@ ROM_END
 
 /**************************************************************************************************************************
     E-Swat (Japan), Sega System 16B
-    Game board : 837-7166/833-7164/834-7165
     CPU: FD1094 (317-0128)
-    ROM Board: 171-5797
+    ROM Board type: 171-5797
+    Sega game ID: 833-7164
+      Main board: 837-7166
+       ROM board: 834-7165
 */
 ROM_START( eswatj )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
@@ -4724,7 +4726,7 @@ ROM_END
  **************************************************************************************************************************
     Excite League, Sega System 16B
     CPU: FD1094 (317-0079)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 */
 ROM_START( exctleag )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
@@ -4767,7 +4769,7 @@ ROM_END
  **************************************************************************************************************************
     Flash Point, Sega System 16B
     CPU: FD1094 (317-0127A)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 
     171-5358        834-6764
     ROW A       171-5358
@@ -4819,7 +4821,7 @@ ROM_END
 /**************************************************************************************************************************
     Flash Point, Sega System 16B
     CPU: FD1094 (317-0127A)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
     Sega ID# for ROM board: 834-7122-03
 
     Pos.   Silk        Type        Part         Pos.   Silk        Type        Part
@@ -4867,7 +4869,7 @@ ROM_END
  **************************************************************************************************************************
     Golden Axe, Sega System 16B
     CPU: 68000 + i8751 (317-123A)
-    ROM Board: 171-5797
+    ROM Board type: 171-5797
     Sega ID# for ROM board: 834-7002-07
 */
 ROM_START( goldnaxe )
@@ -4905,7 +4907,7 @@ ROM_END
 /**************************************************************************************************************************
     Golden Axe, Sega System 16B
     CPU: FD1094 (317-0122)
-    ROM Board: 171-5797
+    ROM Board type: 171-5797
     Sega ID# for ROM board: 834-7002-06
 */
 ROM_START( goldnaxeu )
@@ -4943,7 +4945,7 @@ ROM_END
 /**************************************************************************************************************************
     Golden Axe (Japan), Sega System 16B
     CPU: FD1094 (317-0121)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
     Sega ID# for ROM board: 834-7002-04
 */
 ROM_START( goldnaxej )
@@ -4985,7 +4987,7 @@ ROM_END
 /**************************************************************************************************************************
     Golden Axe (World), Sega System 16B
     CPU: FD1094 (317-0120)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
     Sega ID# for ROM board: 834-7002-11
 */
 ROM_START( goldnaxe3 )
@@ -5027,7 +5029,7 @@ ROM_END
 /**************************************************************************************************************************
     Golden Axe (Japan), Sega System 16B
     CPU: 68000 + i8751 (317-0112)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
     Sega ID# for ROM board: 834-7002-02
 */
 ROM_START( goldnaxe2 )
@@ -5068,7 +5070,7 @@ ROM_END
 /**************************************************************************************************************************
     Golden Axe, Sega System 16B
     CPU: FD1094 (317-0110)
-    ROM Board: 171-5797
+    ROM Board type: 171-5797
     Sega ID# for ROM board: 834-7002
 */
 ROM_START( goldnaxe1 )
@@ -5109,7 +5111,7 @@ ROM_END
  **************************************************************************************************************************
     Heavyweight Champ, Sega System 16B
     CPU: 68000
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
     Filter Board: 834-6383 (takes input from controls and routes through the CN5 connector on the mainboard)
     Sega ID# for ROM board: 834-6398-02
 */
@@ -5156,7 +5158,7 @@ ROM_END
 /**************************************************************************************************************************
     Heavyweight Champ (Japan), Sega System 16B
     CPU: FD1094 (317-0046)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
 */
 ROM_START( hwchampj )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -5207,7 +5209,7 @@ ROM_END
  **************************************************************************************************************************
     MVP, Sega System 16B
     CPU: FD1094 (317-0143)
-    ROM Board: 171-5797
+    ROM Board type: 171-5797
 */
 ROM_START( mvp )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
@@ -5419,7 +5421,7 @@ ROM_END
  **************************************************************************************************************************
     Riot City, Sega System 16B
     CPU: 68000
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 */
 ROM_START( riotcity )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
@@ -5462,7 +5464,7 @@ ROM_END
  **************************************************************************************************************************
     Ryukyu, Sega System 16B
     CPU: FD1094 8J2 (317-5023)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
 */
 ROM_START( ryukyu )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
@@ -5493,7 +5495,7 @@ ROM_END
  **************************************************************************************************************************
     Defense, Sega System 16B
     CPU: FD1089A 317-0028
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 */
 
 ROM_START( defense )
@@ -5530,7 +5532,7 @@ ROM_END
  **************************************************************************************************************************
     SDI, Sega System 16B
     CPU: FD1089A 317-0028
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 */
 
 ROM_START( sdib )
@@ -5568,7 +5570,7 @@ ROM_END
  **************************************************************************************************************************
     SDI, Sega System 16B
     CPU: 68000
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
     Note: decrypted bootleg
 */
 ROM_START( sdibl )
@@ -5604,7 +5606,7 @@ ROM_END
 
     Shinobi, Sega System 16B
     CPU: 68000
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
 */
 ROM_START( shinobi5 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -5632,7 +5634,7 @@ ROM_END
 
     Shinobi, Sega System 16B
     CPU: 68000 + MC8123B (317-0054)
-    ROM Board: 171-5521
+    ROM Board type: 171-5521
  Game Nunmber: 834-6496-04
     ROM board: 834-6499-03
 */
@@ -5663,7 +5665,7 @@ ROM_END
 /**************************************************************************************************************************
     Shinobi, Sega System 16B
     CPU: 68000 + MC8123B (317-0054)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
  Game Nunmber: 834-6496-04
     ROM board: 834-6499-02
 */
@@ -5701,7 +5703,7 @@ ROM_END
 /**************************************************************************************************************************
     Shinobi, Sega System 16B
     CPU: FD1094 (317-0049)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
     ROM board: 834-6499
 */
 ROM_START( shinobi2 )
@@ -5741,7 +5743,7 @@ ROM_END
  **************************************************************************************************************************
     Sonic Boom, Sega System 16B
     CPU: FD1094 (317-0053)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 
     Pos.   Silk        Type        Part                Pos.   Silk        Type        Part
 
@@ -5794,7 +5796,7 @@ ROM_END
  **************************************************************************************************************************
     Sukeban Jansi Ryuko (JPN Ver.)
     CPU: FD1089B 317-5021 (16A/16B) (version uses i8751(317-5019) known to be exist)
-    ROM Board: 171-???
+    ROM Board type: 171-???
 
     (c)1988 White Board
 
@@ -5844,7 +5846,7 @@ ROM_END
  **************************************************************************************************************************
     Super League, Sega System 16B
     CPU: FD1094 (317-0045)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 */
 ROM_START( suprleag )
 	ROM_REGION( 0x060000, "maincpu", 0 ) /* 68000 code */
@@ -5887,7 +5889,7 @@ ROM_END
  **************************************************************************************************************************
     Tetris, Sega System 16B
     CPU: FD1094 (317-0092)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 */
 ROM_START( tetris2 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -5913,7 +5915,7 @@ ROM_END
 /**************************************************************************************************************************
     Tetris, Sega System 16B
     CPU: FD1094 (317-0091)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 
     Pos.   Silk        Type        Part                Pos.   Silk        Type        Part
     A1     EPR-12163   27C256      68000 program       B1     EPR-12169   27C256      Sprite data
@@ -5955,7 +5957,7 @@ ROM_END
  **************************************************************************************************************************
     Time Scanner, Sega System 16B
     CPU: 68000
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
  */
 ROM_START( timescan )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -5992,7 +5994,7 @@ ROM_END
  **************************************************************************************************************************
     Toryumon, Sega System 16B
     CPU: 68000
-    ROM Board: 171-5797
+    ROM Board type: 171-5797
  */
 ROM_START( toryumon )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -6025,7 +6027,7 @@ ROM_END
  **************************************************************************************************************************
     Tough Turf, Sega System 16B
     CPU: 68000 + i8751 (317-0104, 317-0100 also known to be exist)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
  */
 ROM_START( tturf )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -6059,7 +6061,7 @@ ROM_END
 /**************************************************************************************************************************
     Tough Turf, Sega System 16B
     CPU: 68000 + i8751 (317-0099)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
     Sega ID# for ROM board: 834-6949
  */
 ROM_START( tturfu )
@@ -6101,7 +6103,7 @@ ROM_END
  **************************************************************************************************************************
     Wonder Boy III, Sega System 16B
     CPU: 68000 + i8751 (317-0098)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
  */
 ROM_START( wb3 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -6134,7 +6136,7 @@ ROM_END
 /**************************************************************************************************************************
     Wonder Boy III, Sega System 16B
     CPU: FD1094 (317-0087)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
  */
 ROM_START( wb34 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -6166,7 +6168,7 @@ ROM_END
 /**************************************************************************************************************************
     Wonder Boy III, Sega System 16B
     CPU: FD1094 (317-0089)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
  */
 ROM_START( wb33 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -6198,7 +6200,7 @@ ROM_END
 /**************************************************************************************************************************
     Wonder Boy III, Sega System 16B
     CPU: FD1094 (317-0085)
-    ROM Board: 171-5358
+    ROM Board type: 171-5358
 
     Pos.   Silk        Type        Part                Pos.   Silk        Type        Part
     A1     EPR-12198   27C512      68000 program       B1     EPR-12190   27C512      Sprite data
@@ -6248,7 +6250,7 @@ ROM_END
  **************************************************************************************************************************
     Wrestle War, Sega System 16B
     CPU: 68000 + i8751 (317-0103)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
     GAME NUMBER: 837-6889-02 (MB:833-6887-07, ROM:834-6888-07)
 
     LOC   NAME         LOC   NAME
@@ -6308,7 +6310,7 @@ ROM_END
 /**************************************************************************************************************************
     Wrestle War, Sega System 16B
     CPU: FD1094 (317-0102)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 */
 ROM_START( wrestwar2 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
@@ -6349,7 +6351,7 @@ ROM_END
 /**************************************************************************************************************************
     Wrestle War, Sega System 16B
     CPU: FD1094 (317-0090)
-    ROM Board: 171-5704
+    ROM Board type: 171-5704
 */
 ROM_START( wrestwar1 )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
