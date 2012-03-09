@@ -303,6 +303,228 @@ void votrax_sc01_device::update_subphoneme_clock_period()
 	m_subphoneme_period = UINT32(ceil(period * double(m_master_clock_freq)));
 }
 
+//-------------------------------------------------
+//  bits_to_caps - compute the final capacity from
+//  a grid of bit-selected caps
+//-------------------------------------------------
+
+double votrax_sc01_device::bits_to_caps(UINT32 value, int caps_count, const double *caps_values)
+{
+	double sum = 0;
+	for(int i=0; i<caps_count; i++)
+		if(value & (1<<i))
+			sum += caps_values[i];
+	return sum;
+}
+
+/*
+  Playing with analog filters, or where all the magic filter formulas are coming from.
+
+  First you start with an analog circuit, for instance this one:
+
+  |                     +--[R2]--+
+  |                     |        |
+  |                     +--|C2|--+<V1     +--|C3|--+
+  |                     |        |        |        |
+  |  Vi   +--[R1]--+    |  |\    |        |  |\    |
+  |  -----+        +----+--+-\   |        +--+-\   |
+  |       +--|C1|--+       |  >--+--[Rx]--+  |  >--+----- Vo
+  |                |     0-++/             0-++/   |
+  |                |       |/    +--[R0]--+  |/    |
+  |                |             |        |        |
+  |                |             |    /|  |        |
+  |                |             |   /-+--+--[R0]--+
+  |                +--[R4]-------+--<  |
+  |                            V2^   \++-0
+  |                                   \|
+
+  You need to determine the transfer function H(s) of the circuit, which is
+  defined as the ratio Vo/Vi.  To do that, you use some properties:
+
+  - The intensity through an element is equal to the voltage
+    difference through the element divided by the impedence
+
+  - The impedence of a resistance is equal to its resistance
+
+  - The impedence of a capacitor is 1/(s*C) where C is its capacitance
+
+  - The impedence of elements in series is the sum of the impedences
+
+  - The impedence of elements in parallel is the inverse of the sum of
+    the inverses
+
+  - The sum of all intensities flowing into a node is 0 (there's no
+    charge accumulation in a wire)
+
+  - An operational amplifier in looped mode is an interesting beast:
+    the intensity at its two inputs is always 0, and the voltage is
+    forced identical between the inputs.  In our case, since the '+'
+    inputs are all tied to ground, that means that the '-' inputs are at
+    voltage 0, intensity 0.
+
+  From here we can build some equations.  Noting:
+  X1 = 1/(1/R1 + s*C1)
+  X2 = 1/(1/R2 + s*C2)
+  X3 = 1/(s*C3)
+
+  Then computing the intensity flow at each '-' input we have:
+  Vi/X1 + V2/R4 + V1/X2 = 0
+  V2/R0 + Vo/R0 = 0
+  V1/Rx + Vo/X3 = 0
+
+  Wrangling the equations, one eventually gets:
+  |                            1 + s * C1*R1
+  | Vo/Vi = H(s) = (R4/R1) * -------------------------------------------
+  |                            1 + s * C3*Rx*R4/R2 + s^2 * C2*C3*Rx*R4
+
+  To check the mathematics between the 's' stuff, check "Laplace
+  transform".  In short, it's a nice way of manipulating derivatives
+  and integrals without having to manipulate derivatives and
+  integrals.
+
+  With that transfer function, we first can compute what happens to
+  every frequency in the input signal.  You just compute H(2i*pi*f)
+  where f is the frequency, which will give you a complex number
+  representing the amplitude and phase effect.  To get the usual dB
+  curves, compute 20*log10(abs(v))).
+
+  Now, once you have an analog transfer function, you can build a
+  digital filter from it using what is called the bilinear transform.
+
+  In our case, we have an analog filter with the transfer function:
+  |                 1 + k[0]*s
+  |        H(s) = -------------------------
+  |                 1 + k[1]*s + k[2]*s^2
+
+  We can always reintroduce the global multipler later, and it's 1 in
+  most of our cases anyway.
+
+  The we pose:
+  |                    z-1
+  |        s(z) = zc * ---
+  |                    z+1
+
+  where zc = 2*pi*fr/tan(pi*fr/fs)
+  with fs = sampling frequency
+  and fr = most interesting frequency
+
+  Then we rewrite H in function of negative integer powers of z.
+
+  Noting m0 = zc*k[0], m1 = zc*k[1], m2=zc*zc*k[2],
+
+  a little equation wrangling then gives:
+
+  |                 (1+m0)    + (3+m0)   *z^-1 + (3-m0)   *z^-2 +    (1-m0)*z^-3
+  |        H(z) = ----------------------------------------------------------------
+  |                 (1+m1+m2) + (3+m1-m2)*z^-1 + (3-m1-m2)*z^-2 + (1-m1+m2)*z^-3
+
+  That beast in the digital transfer function, of which you can
+  extract response curves by posing z = exp(2*i*pi*f/fs).
+
+  Note that the bilinear transform is an approximation, and H(z(f)) =
+  H(s(f)) only at frequency fr.  And the shape of the filter will be
+  better respected around fr.  If you look at the curves of the
+  filters we're interested in, the frequency:
+  fr = sqrt(abs(k[0]*k[1]-k[2]))/(2*pi*k[2])
+
+  which is a (good) approximation of the filter peak position is a
+  good choice.
+
+  Note that terminology wise, the "standard" bilinear transform is
+  with fr = fs/2, and using a different fr is called "pre-warping".
+
+  So now we have a digital transfer function of the generic form:
+
+  |                 a[0] + a[1]*z^-1 + a[2]*z^-2 + a[3]*z^-3
+  |        H(z) = --------------------------------------------
+  |                 b[0] + b[1]*z^-1 + b[2]*z^-2 + b[3]*z^-3
+
+  The magic then is that the powers of z represent time in samples.
+  Noting x the input stream and y the output stream, you have:
+  H(z) = y(z)/x(z)
+
+  or in other words:
+  y*b[0]*z^0 + y*b[1]*z^-1 + y*b[2]*z^-2 + y*b[3]*z^-3 = x*a[0]*z^0 + x*a[1]*z^-1 + x*a[2]*z^-2 + x*a[3]*z^-3
+
+  i.e.
+
+  y*z^0 = (x*a[0]*z^0 + x*a[1]*z^-1 + x*a[2]*z^-2 + x*a[3]*z^-3 - y*b[1]*z^-1 - y*b[2]*z^-2 - y*b[3]*z^-3) / b[0]
+
+  and powers of z being time in samples,
+
+  y[0] = (x[0]*a[0] + x[-1]*a[1] + x[-2]*a[2] + x[-3]*a[3] - y[-1]*b[1] - y[-2]*b[2] - y[-3]*b[3]) / b[0]
+
+  So you have a filter you can apply.  Note that this is why you want
+  negative powers of z.  Positive powers would mean looking into the
+  future (which is possible in some cases, in particular with x, and
+  has some very interesting properties, but is not very useful in
+  analog circuit simulation).
+
+  Note that if you have multiple inputs, all this stuff is linear.
+  Or, in other words, you just have to split it in multiple circuits
+  with only one input connected each time and sum the results.  It
+  will be correct.
+
+  Also, since we're in practice in a dynamic system, for an amplifying
+  filter (i.e. where things like r4/r1 is not 1), it's better to
+  proceed in two steps:
+
+  - amplify the input by the current value of the coefficient, and
+    historize it
+  - apply the now non-amplifying filter to the historized amplified
+    input
+
+  That way reduces the probability of the output boucing all over the
+  place.
+
+*/
+
+
+//-------------------------------------------------------------
+//  filter_s_to_z - analog to digital filter transformation
+//-------------------------------------------------------------
+
+void votrax_sc01_device::filter_s_to_z(const double *k, double fs, double *a, double *b)
+{
+	double fpeak = sqrt(fabs(k[0]*k[1]-k[2]))/(2*M_PI*k[2]);
+	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak/fs);
+
+ 	double m0 = zc*k[0];
+ 	double m1 = zc*k[1];
+ 	double m2 = zc*zc*k[2];
+
+	a[0] = 1+m0;
+	a[1] = 3+m0;
+	a[2] = 3-m0;
+	a[3] = 1-m0;
+	b[0] = 1+m1+m2;
+	b[1] = 3+m1-m2;
+	b[2] = 3-m1-m2;
+	b[3] = 1-m1+m2;
+}
+
+
+//-------------------------------------------------------------
+//  apply_filter - apply the digital filter (before output
+//                 shifting, so y[0] is one step in the past)
+//-------------------------------------------------------------
+double votrax_sc01_device::apply_filter(const double *x, const double *y, const double *a, const double *b)
+{
+	return (x[0]*a[0] + x[1]*a[1] + x[2]*a[2] + x[3]*a[3] - y[0]*b[1] - y[1]*b[2] - y[2]*b[3]) / b[0];
+}
+
+
+//-------------------------------------------------------------
+//  shift_hist - shift a value in an output history
+//-------------------------------------------------------------
+
+void votrax_sc01_device::shift_hist(double val, double *hist_array, int hist_size)
+{
+	for(int i = 0; i < hist_size-1; i++)
+		hist_array[hist_size-1-i] = hist_array[hist_size-2-i];
+	hist_array[0] = val;
+}
+
 
 //-------------------------------------------------
 //  sound_stream_update - handle update requests
@@ -320,7 +542,7 @@ void votrax_sc01_device::sound_stream_update(sound_stream &stream, stream_sample
 	{
 		// run the digital logic at the master clock rate
 		double glottal_out = 0;
-		double noise_out = 0;
+		UINT8 noise_out_digital = 0;
 		for (int curclock = 0; curclock < clocks_per_sample; curclock++)
 		{
 if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
@@ -784,25 +1006,137 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 			}
 			
 			// compute final noise out signal
-			UINT8 noise_out_digital = !(BIT(m_shift_252, 13) & (m_fgate | (m_va == 0)));
-			noise_out = noise_out_digital ? (double(m_fa) / 15.0f) : 0;
+			noise_out_digital = !(BIT(m_shift_252, 13) & (m_fgate | (m_va == 0)));
 		}
-			
-		// amplify the glottal pulse by the VA and cheesily mix in the noise just to
-		// help see what's going on
-		double current = 0.5 * glottal_out * (double(m_va) / 15.0f) + 0.5 * noise_out;
-		
-		// TODO: apply high pass noise shaping to noise_out (see figure 8)
-		
-		// TODO: apply resonsant filters based on m_f1, m_f2, m_f2q and
-		// inject noise based on m_fc (see figure 9)
-		
-		// TODO: apply final filter f3 and inject inverse of noise based on ~m_fc (see figure 5)
+
+		// TODO: cache the filters
+		// filter coefs
+		double k[3], a[4], b[4];
+
+		// base frequencies
+		double fc = m_master_clock_freq / 30.0; // Nominal is 20KHz
+		double fs = stream.sample_rate();
+
+		// useful temporaries
+		double rcp, rcq, rca;
+
+		// amplification stage
+		static const double va_caps[4] = { 27, 53, 107, 213 };
+		double va_out = glottal_out * bits_to_caps(m_va, 4, va_caps) / 400;
+
+		shift_hist(va_out, m_va_hist, 4);
+
+
+		// noise shaping
+		static const double fa_caps[4] = { 27, 53, 107, 213 };
+		rcp = bits_to_caps(m_fa,  4, fa_caps);
+
+		shift_hist(-noise_out_digital * 400*rcp/(358.0*100000*566*(fc*rcp*1e-12 + 1.0/100000 + 1.0/2000)), m_ni_hist, 4);
+
+		k[0] = 400/(fc*358);
+		k[1] = 400*400/(fc*358*566);
+		k[2] = 400*400/(fc*fc*358*358);
+
+		filter_s_to_z(k, fs, a, b);
+		double no_out = apply_filter(m_ni_hist, m_no_hist, a, b);
+		shift_hist(no_out, m_no_hist, 4);
+
+
+		// stage 1 filter
+
+		static const double s1_p_caps[4] = { 16.4, 33, 66, 130 };
+		rcp = 24 + bits_to_caps(m_f1, 4, s1_p_caps);
+		rcq = 20;
+
+		k[0] = 253/(fc*270);
+		k[1] = 1080*rcq/(fc*270*rcp);
+		k[2] = 1080*1080/(fc*fc*270*rcp);
+
+		filter_s_to_z(k, fs, a, b);
+		double s1_out = apply_filter(m_va_hist, m_s1_hist, a, b);
+		shift_hist(s1_out, m_s1_hist, 4);
+
+
+		// stage 2 filter, glottal half
+
+		static const double s2_p_caps[5] = { 14, 28, 56, 113, 226 };
+		static const double s2_q_caps[4] = { 23, 46, 93, 186 };
+		rcp = 46 + bits_to_caps(m_f2,  5, s2_p_caps);
+		rcq = 20 + bits_to_caps(m_f2q, 4, s2_q_caps);;
+
+		k[0] = 400/(fc*470);
+		k[1] = 620*rcq/(fc*470*rcp);
+		k[2] = 620*620/(fc*fc*470*rcp);
+
+		filter_s_to_z(k, fs, a, b);
+		double s2g_out = apply_filter(m_s1_hist, m_s2g_hist, a, b);
+		shift_hist(s2g_out, m_s2g_hist, 4);
+
+
+		// stage 2 filter, noise half (rcp and rcq kept from stage 2 glottal)
+
+		static const double s2_n_caps[5] = { 19, 38, 76, 152 };
+		rca = bits_to_caps(m_fc, 4, s2_n_caps);
+
+		shift_hist(-no_out*rcq*rca/(470*rcp), m_s2ni_hist, 4);
+
+		k[0] = 400/(fc*470);
+		k[1] = 620*rcq/(fc*470*rcp);
+		k[2] = 620*620/(fc*fc*470*rcp);
+
+		filter_s_to_z(k, fs, a, b);
+		double s2n_out = apply_filter(m_s2ni_hist, m_s2n_hist, a, b);
+		shift_hist(s2n_out, m_s2n_hist, 4);
+
+		// sum the stage 2 outputs
+		double s2_out = s2g_out + s2n_out;
+		shift_hist(s2_out, m_s2_hist, 4);
+
+
+		// stage 3 filter
+
+		static const double s3_p_caps[4] = { 21, 42, 84, 168 };
+		rcp = 76 + bits_to_caps(m_f3, 4, s3_p_caps);
+		rcq = 20;
+
+		k[0] = 0;
+		k[1] = 420*rcq/(fc*390*rcp);
+		k[2] = 420*420/(fc*fc*390*rcp);
+
+		filter_s_to_z(k, fs, a, b);
+		double s3_out = apply_filter(m_s2_hist, m_s3_hist, a, b);
+		shift_hist(s3_out, m_s3_hist, 4);
+
+
+		// stage 4 filter, noise injection
+
+		// The resulting non-amplifying filter is identical, so we
+		// inject instead of splitting
+
+		static const double s4_n_caps[4] = { 24, 48, 96, 192 };
+		rca = 115 + bits_to_caps(~m_fc, 4, s4_n_caps);
+
+		shift_hist(s3_out + no_out*470/rca, m_s4i_hist, 4);
+
+
+		// stage 4 filter
+
+		rcp = 30;
+		rcq = 20;
+
+		k[0] = 0;
+		k[1] = 338*rcq/(fc*470*rcp);
+		k[2] = 338*338/(fc*fc*470*rcp);
+
+		filter_s_to_z(k, fs, a, b);
+		double s4_out = apply_filter(m_s4i_hist, m_s4_hist, a, b);
+		shift_hist(s4_out, m_s4_hist, 4);
+
 		
 		// TODO: apply closure circuit (undocumented)
 		
 		// output the current result
-		*dest++ = INT16(current * 32767.0);
+		*dest++ = INT16(s4_out * 4000);
 	}
 }
 
@@ -905,6 +1239,19 @@ void votrax_sc01_device::device_start()
 	save_item(NAME(m_noise_clock));
 	save_item(NAME(m_shift_252));
 	save_item(NAME(m_counter_250));
+
+	// save filter histories
+	save_item(NAME(m_ni_hist));
+	save_item(NAME(m_no_hist));
+	save_item(NAME(m_va_hist));
+	save_item(NAME(m_s1_hist));
+	save_item(NAME(m_s2g_hist));
+	save_item(NAME(m_s2n_hist));
+	save_item(NAME(m_s2ni_hist));
+	save_item(NAME(m_s2_hist));
+	save_item(NAME(m_s3_hist));
+	save_item(NAME(m_s4i_hist));
+	save_item(NAME(m_s4_hist));
 }
 
 
@@ -974,6 +1321,19 @@ void votrax_sc01_device::device_reset()
 	m_noise_clock = 0;
 	m_shift_252 = 0;
 	m_counter_250 = 0;
+
+	// reset filter histories
+	memset(m_ni_hist,   0, sizeof(m_ni_hist));
+	memset(m_no_hist,   0, sizeof(m_no_hist));
+	memset(m_va_hist,   0, sizeof(m_va_hist));
+	memset(m_s1_hist,   0, sizeof(m_s1_hist));
+	memset(m_s2g_hist,  0, sizeof(m_s2g_hist));
+	memset(m_s2n_hist,  0, sizeof(m_s2n_hist));
+	memset(m_s2ni_hist, 0, sizeof(m_s2ni_hist));
+	memset(m_s2_hist,   0, sizeof(m_s2_hist));
+	memset(m_s3_hist,   0, sizeof(m_s3_hist));
+	memset(m_s4i_hist,  0, sizeof(m_s4i_hist));
+	memset(m_s4_hist,   0, sizeof(m_s4_hist));
 }
 
 

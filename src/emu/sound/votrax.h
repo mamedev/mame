@@ -99,6 +99,10 @@ protected:
 private:
 	// internal helpers
 	void update_subphoneme_clock_period();
+	static double bits_to_caps(UINT32 value, int caps_count, const double *caps_values);
+	static void shift_hist(double val, double *hist_array, int hist_size);
+	static void filter_s_to_z(const double *k, double fs, double *a, double *b);
+	static double apply_filter(const double *x, const double *y, const double *a, const double *b);
 
 	// internal state
 	sound_stream *				m_stream;				// output stream
@@ -169,6 +173,19 @@ private:
 	UINT8						m_noise_clock;			// clock input to noise generator
 	UINT32						m_shift_252;			// shift register @ 252
 	UINT8						m_counter_250;			// 4-bit counter @ 250
+
+	// stages outputs history
+	double 						m_ni_hist[4];
+	double 						m_no_hist[4];
+	double 						m_va_hist[4];
+	double 						m_s1_hist[4];
+	double 						m_s2g_hist[4];
+	double 						m_s2ni_hist[4];
+	double 						m_s2n_hist[4];
+	double 						m_s2_hist[4];
+	double 						m_s3_hist[4];
+	double 						m_s4i_hist[4];
+	double 						m_s4_hist[4];
 
 	// static tables
 	static const char *const s_phoneme_table[64];
