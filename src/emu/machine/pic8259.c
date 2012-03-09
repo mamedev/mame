@@ -277,6 +277,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 				pic8259->icw4_needed		= (data & 0x01) ? 1 : 0;
 				pic8259->vector_addr_low	= (data & 0xe0);
 				pic8259->state			= STATE_ICW2;
+				pic8259->out_int_func(0);
 			}
 			else if (pic8259->state == STATE_READY)
 			{
@@ -308,9 +309,6 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 								if (pic8259->isr & mask)
 								{
 									pic8259->isr &= ~mask;
-									if (pic8259->level_trig_mode)
-										pic8259->irr = pic8259->irq_lines;
-									pic8259->irr &= ~mask;
 									break;
 								}
 							}
@@ -344,9 +342,6 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 							if( pic8259->isr & mask )
 							{
 								pic8259->isr &= ~mask;
-								if (pic8259->level_trig_mode)
-									pic8259->irr = pic8259->irq_lines;
-								pic8259->irr &= ~mask;
 								pic8259->prio = (pic8259->prio + 1) & 7;
 							}
 							break;

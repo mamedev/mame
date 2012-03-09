@@ -292,8 +292,13 @@ int x87_check_exceptions(i386_state *cpustate)
 
 	if ((cpustate->x87_sw & ~cpustate->x87_cw) & 0x3f)
 	{
-		// TODO
-		fatalerror("Unimplemented: unmasked x87 exception (CW:%.4x, SW:%.4x)", cpustate->x87_cw, cpustate->x87_sw);
+		// device_set_input_line(cpustate->device, INPUT_LINE_FERR, RAISE_LINE);
+		logerror("Unmasked x87 exception (CW:%.4x, SW:%.4x)\n", cpustate->x87_cw, cpustate->x87_sw);
+		if (cpustate->cr[0] & 0x20) // FIXME: 486 and up only
+		{
+			cpustate->ext = 1;
+			i386_trap(cpustate, FAULT_MF, 0, 0);
+		}
 		return 0;
 	}
 
@@ -465,6 +470,7 @@ void x87_fadd_m32real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -472,7 +478,6 @@ void x87_fadd_m32real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT32 m32real = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -500,6 +505,7 @@ void x87_fadd_m64real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -507,7 +513,6 @@ void x87_fadd_m64real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64real = READ64(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -637,6 +642,7 @@ void x87_fiadd_m32int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -644,7 +650,6 @@ void x87_fiadd_m32int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT32 m32int = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -672,6 +677,7 @@ void x87_fiadd_m16int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -679,7 +685,6 @@ void x87_fiadd_m16int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT16 m16int = READ16(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -714,6 +719,7 @@ void x87_fsub_m32real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -721,7 +727,6 @@ void x87_fsub_m32real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT32 m32real = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -749,6 +754,7 @@ void x87_fsub_m64real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -756,7 +762,6 @@ void x87_fsub_m64real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64real = READ64(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -886,6 +891,7 @@ void x87_fisub_m32int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -893,7 +899,6 @@ void x87_fisub_m32int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT32 m32int = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -921,6 +926,7 @@ void x87_fisub_m16int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -928,7 +934,6 @@ void x87_fisub_m16int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT16 m16int = READ16(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -963,6 +968,7 @@ void x87_fsubr_m32real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -970,7 +976,6 @@ void x87_fsubr_m32real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT32 m32real = READ32(cpustate, ea);
 
 		floatx80 a = float32_to_floatx80(m32real);
@@ -998,6 +1003,7 @@ void x87_fsubr_m64real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1005,7 +1011,6 @@ void x87_fsubr_m64real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64real = READ64(cpustate, ea);
 
 		floatx80 a = float64_to_floatx80(m64real);
@@ -1135,6 +1140,7 @@ void x87_fisubr_m32int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1142,7 +1148,6 @@ void x87_fisubr_m32int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT32 m32int = READ32(cpustate, ea);
 
 		floatx80 a = int32_to_floatx80(m32int);
@@ -1170,6 +1175,7 @@ void x87_fisubr_m16int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1177,7 +1183,6 @@ void x87_fisubr_m16int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT16 m16int = READ16(cpustate, ea);
 
 		floatx80 a = int32_to_floatx80(m16int);
@@ -1212,6 +1217,7 @@ void x87_fdiv_m32real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1219,7 +1225,6 @@ void x87_fdiv_m32real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT32 m32real = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -1247,6 +1252,7 @@ void x87_fdiv_m64real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1254,7 +1260,6 @@ void x87_fdiv_m64real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64real = READ64(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -1388,6 +1393,7 @@ void x87_fidiv_m32int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1395,7 +1401,6 @@ void x87_fidiv_m32int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT32 m32int = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -1423,6 +1428,7 @@ void x87_fidiv_m16int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1430,7 +1436,6 @@ void x87_fidiv_m16int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT16 m16int = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -1465,6 +1470,7 @@ void x87_fdivr_m32real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1472,7 +1478,6 @@ void x87_fdivr_m32real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT32 m32real = READ32(cpustate, ea);
 
 		floatx80 a = float32_to_floatx80(m32real);
@@ -1500,6 +1505,7 @@ void x87_fdivr_m64real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1507,7 +1513,6 @@ void x87_fdivr_m64real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64real = READ64(cpustate, ea);
 
 		floatx80 a = float64_to_floatx80(m64real);
@@ -1642,6 +1647,7 @@ void x87_fidivr_m32int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1649,7 +1655,6 @@ void x87_fidivr_m32int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT32 m32int = READ32(cpustate, ea);
 
 		floatx80 a = int32_to_floatx80(m32int);
@@ -1677,6 +1682,7 @@ void x87_fidivr_m16int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1684,7 +1690,6 @@ void x87_fidivr_m16int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT16 m16int = READ32(cpustate, ea);
 
 		floatx80 a = int32_to_floatx80(m16int);
@@ -1719,6 +1724,7 @@ void x87_fmul_m32real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1726,7 +1732,6 @@ void x87_fmul_m32real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT32 m32real = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -1753,6 +1758,7 @@ void x87_fmul_m64real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1760,7 +1766,6 @@ void x87_fmul_m64real(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64real = READ64(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -1886,6 +1891,7 @@ void x87_fimul_m32int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1893,7 +1899,6 @@ void x87_fimul_m32int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT32 m32int = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -1920,6 +1925,7 @@ void x87_fimul_m16int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 result;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -1927,7 +1933,6 @@ void x87_fimul_m16int(i386_state *cpustate, UINT8 modrm)
 	}
 	else
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT16 m16int = READ16(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -2332,9 +2337,9 @@ void x87_fld_m32real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (x87_dec_stack(cpustate))
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT32 m32real = READ32(cpustate, ea);
 
 		value = float32_to_floatx80(m32real);
@@ -2362,9 +2367,9 @@ void x87_fld_m64real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (x87_dec_stack(cpustate))
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64real = READ64(cpustate, ea);
 
 		value = float64_to_floatx80(m64real);
@@ -2392,10 +2397,10 @@ void x87_fld_m80real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (x87_dec_stack(cpustate))
 	{
 		cpustate->x87_sw &= ~X87_SW_C1;
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		value = READ80(cpustate, ea);
 	}
 	else
@@ -2433,6 +2438,7 @@ void x87_fild_m16int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (!x87_dec_stack(cpustate))
 	{
 		value = fx80_inan;
@@ -2441,7 +2447,6 @@ void x87_fild_m16int(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~X87_SW_C1;
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT16 m16int = READ16(cpustate, ea);
 		value = int32_to_floatx80(m16int);
 	}
@@ -2456,6 +2461,7 @@ void x87_fild_m32int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (!x87_dec_stack(cpustate))
 	{
 		value = fx80_inan;
@@ -2464,7 +2470,6 @@ void x87_fild_m32int(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~X87_SW_C1;
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT32 m32int = READ32(cpustate, ea);
 		value = int32_to_floatx80(m32int);
 	}
@@ -2479,6 +2484,7 @@ void x87_fild_m64int(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (!x87_dec_stack(cpustate))
 	{
 		value = fx80_inan;
@@ -2487,7 +2493,6 @@ void x87_fild_m64int(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~X87_SW_C1;
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT64 m64int = READ64(cpustate, ea);
 		value = int64_to_floatx80(m64int);
 	}
@@ -2502,6 +2507,7 @@ void x87_fbld(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (!x87_dec_stack(cpustate))
 	{
 		value = fx80_inan;
@@ -2510,7 +2516,6 @@ void x87_fbld(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~X87_SW_C1;
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64val = 0;
 		UINT16 sign;
 
@@ -2547,6 +2552,7 @@ void x87_fst_m32real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -2561,7 +2567,6 @@ void x87_fst_m32real(i386_state *cpustate, UINT8 modrm)
 	if (x87_check_exceptions(cpustate))
 	{
 		UINT32 m32real = floatx80_to_float32(value);
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE32(cpustate, ea, m32real);
 	}
 
@@ -2572,6 +2577,7 @@ void x87_fst_m64real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -2586,7 +2592,6 @@ void x87_fst_m64real(i386_state *cpustate, UINT8 modrm)
 	if (x87_check_exceptions(cpustate))
 	{
 		UINT64 m64real = floatx80_to_float64(value);
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE64(cpustate, ea, m64real);
 	}
 
@@ -2619,6 +2624,7 @@ void x87_fstp_m32real(i386_state *cpustate, UINT8 modrm)
 {
 	floatx80 value;
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -2633,7 +2639,6 @@ void x87_fstp_m32real(i386_state *cpustate, UINT8 modrm)
 	if (x87_check_exceptions(cpustate))
 	{
 		UINT32 m32real = floatx80_to_float32(value);
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE32(cpustate, ea, m32real);
 		x87_inc_stack(cpustate);
 	}
@@ -2657,10 +2662,10 @@ void x87_fstp_m64real(i386_state *cpustate, UINT8 modrm)
 	}
 
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (x87_check_exceptions(cpustate))
 	{
 		UINT64 m64real = floatx80_to_float64(value);
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE64(cpustate, ea, m64real);
 		x87_inc_stack(cpustate);
 	}
@@ -2683,9 +2688,9 @@ void x87_fstp_m80real(i386_state *cpustate, UINT8 modrm)
 		value = ST(0);
 	}
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (x87_check_exceptions(cpustate))
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE80(cpustate, ea, value);
 		x87_inc_stack(cpustate);
 	}
@@ -2742,9 +2747,9 @@ void x87_fist_m16int(i386_state *cpustate, UINT8 modrm)
 			m16int = -32768;
 	}
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (x87_check_exceptions(cpustate))
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE16(cpustate, ea, m16int);
 	}
 
@@ -2775,9 +2780,9 @@ void x87_fist_m32int(i386_state *cpustate, UINT8 modrm)
 			m32int = 0x80000000;
 	}
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (x87_check_exceptions(cpustate))
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE32(cpustate, ea, m32int);
 	}
 
@@ -2808,9 +2813,9 @@ void x87_fistp_m16int(i386_state *cpustate, UINT8 modrm)
 			m16int = (UINT16)0x8000;
 	}
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (x87_check_exceptions(cpustate))
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE16(cpustate, ea, m16int);
 		x87_inc_stack(cpustate);
 	}
@@ -2842,9 +2847,9 @@ void x87_fistp_m32int(i386_state *cpustate, UINT8 modrm)
 			m32int = 0x80000000;
 	}
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (x87_check_exceptions(cpustate))
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE32(cpustate, ea, m32int);
 		x87_inc_stack(cpustate);
 	}
@@ -2876,9 +2881,9 @@ void x87_fistp_m64int(i386_state *cpustate, UINT8 modrm)
 			m64int = U64(0x8000000000000000);
 	}
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (x87_check_exceptions(cpustate))
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE64(cpustate, ea, m64int);
 		x87_inc_stack(cpustate);
 	}
@@ -2911,9 +2916,9 @@ void x87_fbstp(i386_state *cpustate, UINT8 modrm)
 		result.high |= ST(0).high & 0x8000;
 	}
 
+	UINT32 ea = GetEA(cpustate, modrm, 1);
 	if (x87_check_exceptions(cpustate))
 	{
-		UINT32 ea = GetEA(cpustate, modrm, 1);
 		WRITE80(cpustate, ea, result);
 		x87_inc_stack(cpustate);
 	}
@@ -3385,6 +3390,7 @@ void x87_fxam(i386_state *cpustate, UINT8 modrm)
 
 void x87_ficom_m16int(i386_state *cpustate, UINT8 modrm)
 {
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -3394,7 +3400,6 @@ void x87_ficom_m16int(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT16 m16int = READ16(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -3422,6 +3427,7 @@ void x87_ficom_m16int(i386_state *cpustate, UINT8 modrm)
 
 void x87_ficom_m32int(i386_state *cpustate, UINT8 modrm)
 {
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -3431,7 +3437,6 @@ void x87_ficom_m32int(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT32 m32int = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -3459,6 +3464,7 @@ void x87_ficom_m32int(i386_state *cpustate, UINT8 modrm)
 
 void x87_ficomp_m16int(i386_state *cpustate, UINT8 modrm)
 {
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -3468,7 +3474,6 @@ void x87_ficomp_m16int(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT16 m16int = READ16(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -3497,6 +3502,7 @@ void x87_ficomp_m16int(i386_state *cpustate, UINT8 modrm)
 
 void x87_ficomp_m32int(i386_state *cpustate, UINT8 modrm)
 {
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -3506,7 +3512,6 @@ void x87_ficomp_m32int(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		INT32 m32int = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -3536,6 +3541,7 @@ void x87_ficomp_m32int(i386_state *cpustate, UINT8 modrm)
 
 void x87_fcom_m32real(i386_state *cpustate, UINT8 modrm)
 {
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -3545,7 +3551,6 @@ void x87_fcom_m32real(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT32 m32real = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -3573,6 +3578,7 @@ void x87_fcom_m32real(i386_state *cpustate, UINT8 modrm)
 
 void x87_fcom_m64real(i386_state *cpustate, UINT8 modrm)
 {
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -3582,7 +3588,6 @@ void x87_fcom_m64real(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64real = READ64(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -3646,6 +3651,7 @@ void x87_fcom_sti(i386_state *cpustate, UINT8 modrm)
 
 void x87_fcomp_m32real(i386_state *cpustate, UINT8 modrm)
 {
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -3655,7 +3661,6 @@ void x87_fcomp_m32real(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT32 m32real = READ32(cpustate, ea);
 
 		floatx80 a = ST(0);
@@ -3684,6 +3689,7 @@ void x87_fcomp_m32real(i386_state *cpustate, UINT8 modrm)
 
 void x87_fcomp_m64real(i386_state *cpustate, UINT8 modrm)
 {
+	UINT32 ea = GetEA(cpustate, modrm, 0);
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow(cpustate);
@@ -3693,7 +3699,6 @@ void x87_fcomp_m64real(i386_state *cpustate, UINT8 modrm)
 	{
 		cpustate->x87_sw &= ~(X87_SW_C3 | X87_SW_C2 | X87_SW_C1 | X87_SW_C0);
 
-		UINT32 ea = GetEA(cpustate, modrm, 0);
 		UINT64 m64real = READ64(cpustate, ea);
 
 		floatx80 a = ST(0);

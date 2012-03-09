@@ -34,7 +34,7 @@ static void i386_task_switch(i386_state* cpustate, UINT16 selector, UINT8 nested
 
 #define INT_DEBUG	1
 
-static void i386_load_protected_mode_segment(i386_state *cpustate, I386_SREG *seg )
+static UINT32 i386_load_protected_mode_segment(i386_state *cpustate, I386_SREG *seg, UINT64 *desc )
 {
 	UINT32 v1,v2;
 	UINT32 base, limit;
@@ -51,7 +51,7 @@ static void i386_load_protected_mode_segment(i386_state *cpustate, I386_SREG *se
 
 	entry = seg->selector & ~0x7;
 	if (limit == 0 || entry + 7 > limit)
-		return;
+		return 0;
 
 	v1 = READ32(cpustate, base + entry );
 	v2 = READ32(cpustate, base + entry + 4 );
@@ -63,6 +63,10 @@ static void i386_load_protected_mode_segment(i386_state *cpustate, I386_SREG *se
 		seg->limit = (seg->limit << 12) | 0xfff;
 	seg->d = (seg->flags & 0x4000) ? 1 : 0;
 	seg->valid = (seg->selector & ~3)?(true):(false);
+
+	if(desc)
+		*desc = ((UINT64)v2<<32)|v1;
+	return 1;
 }
 
 static void i386_load_call_gate(i386_state* cpustate, I386_CALL_GATE *gate)
@@ -101,7 +105,7 @@ static void i386_load_segment_descriptor(i386_state *cpustate, int segment )
 	if (PROTECTED_MODE)
 	{
 		if (!V8086_MODE)
-			i386_load_protected_mode_segment(cpustate, &cpustate->sreg[segment] );
+			i386_load_protected_mode_segment(cpustate, &cpustate->sreg[segment], NULL );
 		else
 		{
 			cpustate->sreg[segment].base = cpustate->sreg[segment].selector << 4;
@@ -358,7 +362,7 @@ static void i386_check_sreg_validity(i386_state* cpustate, int reg)
 
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = selector;
-	i386_load_protected_mode_segment(cpustate,&desc);
+	i386_load_protected_mode_segment(cpustate,&desc,NULL);
 	DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 	RPL = selector & 0x03;
 
@@ -401,7 +405,8 @@ static int i386_limit_check(i386_state *cpustate, int seg, UINT32 offset)
 	{
 		if((cpustate->sreg[seg].flags & 0x0018) == 0x0010 && cpustate->sreg[seg].flags & 0x0004) // if expand-down data segment
 		{
-			if(offset <= cpustate->sreg[seg].limit)
+			// compare if greater then 0xffffffff when we're passed the access size
+			if((offset <= cpustate->sreg[seg].limit) || ((cpustate->sreg[seg].d)?0:(offset > 0xffff))) 
 			{
 				logerror("Limit check at 0x%08x failed. Segment %04x, limit %08x, offset %08x (expand-down)\n",cpustate->pc,cpustate->sreg[seg].selector,cpustate->sreg[seg].limit,offset);
 				return 1;
@@ -433,7 +438,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 
 		memset(&stack, 0, sizeof(stack));
 		stack.selector = selector;
-		i386_load_protected_mode_segment(cpustate,&stack);
+		i386_load_protected_mode_segment(cpustate,&stack,NULL);
 		DPL = (stack.flags >> 5) & 0x03;
 
 		if((selector & ~0x0003) == 0)
@@ -491,7 +496,7 @@ static void i386_protected_mode_sreg_load(i386_state *cpustate, UINT16 selector,
 
 		memset(&desc, 0, sizeof(desc));
 		desc.selector = selector;
-		i386_load_protected_mode_segment(cpustate,&desc);
+		i386_load_protected_mode_segment(cpustate,&desc,NULL);
 		DPL = (desc.flags >> 5) & 0x03;
 
 		if(selector & 0x0004)  // LDT
@@ -692,7 +697,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			/* Task gate */
 			memset(&desc, 0, sizeof(desc));
 			desc.selector = segment;
-			i386_load_protected_mode_segment(cpustate,&desc);
+			i386_load_protected_mode_segment(cpustate,&desc,NULL);
 			if(segment & 0x04)
 			{
 				logerror("IRQ: Task gate: TSS is not in the GDT.\n");
@@ -729,7 +734,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			/* Interrupt or Trap gate */
 			memset(&desc, 0, sizeof(desc));
 			desc.selector = segment;
-			i386_load_protected_mode_segment(cpustate,&desc);
+			i386_load_protected_mode_segment(cpustate,&desc,NULL);
 			CPL = cpustate->CPL;  // current privilege level
 			DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 //          RPL = segment & 0x03;  // requested privilege level
@@ -777,7 +782,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 					stack.selector = i386_get_stack_segment(cpustate,DPL);
 				else
 					stack.selector = i286_get_stack_segment(cpustate,DPL);
-				i386_load_protected_mode_segment(cpustate,&stack);
+				i386_load_protected_mode_segment(cpustate,&stack,NULL);
 				oldSS = cpustate->sreg[SS].selector;
 				if(flags & 0x0008)
 					oldESP = REG32(ESP);
@@ -1011,7 +1016,7 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	cpustate->task.segment = selector;
 	memset(&seg, 0, sizeof(seg));
 	seg.selector = cpustate->task.segment;
-	i386_load_protected_mode_segment(cpustate,&seg);
+	i386_load_protected_mode_segment(cpustate,&seg,NULL);
 	cpustate->task.limit = seg.limit;
 	cpustate->task.base = seg.base;
 	cpustate->task.flags = seg.flags;
@@ -1023,7 +1028,7 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	tss = cpustate->task.base;
 	cpustate->ldtr.segment = READ16(cpustate,tss+0x2a) & 0xffff;
 	seg.selector = cpustate->ldtr.segment;
-	i386_load_protected_mode_segment(cpustate,&seg);
+	i386_load_protected_mode_segment(cpustate,&seg,NULL);
 	cpustate->ldtr.limit = seg.limit;
 	cpustate->ldtr.base = seg.base;
 	cpustate->ldtr.flags = seg.flags;
@@ -1121,7 +1126,7 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	cpustate->task.segment = selector;
 	memset(&seg, 0, sizeof(seg));
 	seg.selector = cpustate->task.segment;
-	i386_load_protected_mode_segment(cpustate,&seg);
+	i386_load_protected_mode_segment(cpustate,&seg,NULL);
 	cpustate->task.limit = seg.limit;
 	cpustate->task.base = seg.base;
 	cpustate->task.flags = seg.flags;
@@ -1133,7 +1138,7 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	tss = cpustate->task.base;
 	cpustate->ldtr.segment = READ32(cpustate,tss+0x60) & 0xffff;
 	seg.selector = cpustate->ldtr.segment;
-	i386_load_protected_mode_segment(cpustate,&seg);
+	i386_load_protected_mode_segment(cpustate,&seg,NULL);
 	cpustate->ldtr.limit = seg.limit;
 	cpustate->ldtr.base = seg.base;
 	cpustate->ldtr.flags = seg.flags;
@@ -1233,7 +1238,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 	/* Determine segment type */
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = segment;
-	i386_load_protected_mode_segment(cpustate,&desc);
+	i386_load_protected_mode_segment(cpustate,&desc,NULL);
 	CPL = cpustate->CPL;  // current privilege level
 	DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 	RPL = segment & 0x03;  // requested privilege level
@@ -1291,7 +1296,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				logerror("JMP: Available 386 TSS at %08x\n",cpustate->pc);
 				memset(&desc, 0, sizeof(desc));
 				desc.selector = segment;
-				i386_load_protected_mode_segment(cpustate,&desc);
+				i386_load_protected_mode_segment(cpustate,&desc,NULL);
 				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				if(DPL < CPL)
 				{
@@ -1362,7 +1367,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 					}
 				}
 				desc.selector = call_gate.selector;
-				i386_load_protected_mode_segment(cpustate,&desc);
+				i386_load_protected_mode_segment(cpustate,&desc,NULL);
 				DPL = (desc.flags >> 5) & 0x03;
 				if((desc.flags & 0x0018) != 0x18)
 				{
@@ -1421,7 +1426,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				}
 				/* Check the TSS that the task gate points to */
 				desc.selector = call_gate.selector;
-				i386_load_protected_mode_segment(cpustate,&desc);
+				i386_load_protected_mode_segment(cpustate,&desc,NULL);
 				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				RPL = call_gate.selector & 0x03;  // requested privilege level
 				if(call_gate.selector & 0x04)
@@ -1507,7 +1512,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 	/* Determine segment type */
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = selector;
-	i386_load_protected_mode_segment(cpustate,&desc);
+	i386_load_protected_mode_segment(cpustate,&desc,NULL);
 	CPL = cpustate->CPL;  // current privilege level
 	DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 	RPL = selector & 0x03;  // requested privilege level
@@ -1653,7 +1658,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 						FAULT(FAULT_GP,desc.selector & ~0x03)  // #GP(selector)
 					}
 				}
-				i386_load_protected_mode_segment(cpustate,&desc);
+				i386_load_protected_mode_segment(cpustate,&desc,NULL);
 				if((desc.flags & 0x0018) != 0x18)
 				{
 					logerror("CALL: Call gate: Segment is not a code segment.\n");
@@ -1682,7 +1687,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 						stack.selector = i386_get_stack_segment(cpustate,DPL);
 					else
 						stack.selector = i286_get_stack_segment(cpustate,DPL);
-					i386_load_protected_mode_segment(cpustate,&stack);
+					i386_load_protected_mode_segment(cpustate,&stack,NULL);
 					if((stack.selector & ~0x07) == 0)
 					{
 						logerror("CALL: Call gate: TSS selector is null\n");
@@ -1786,7 +1791,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 
 					memset(&temp, 0, sizeof(temp));
 					temp.selector = oldSS;
-					i386_load_protected_mode_segment(cpustate,&temp);
+					i386_load_protected_mode_segment(cpustate,&temp,NULL);
 					/* copy parameters from old stack to new stack */
 					for(x=(gate.dword_count & 0x1f)-1;x>=0;x--)
 					{
@@ -1850,7 +1855,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				}
 				/* Check the TSS that the task gate points to */
 				desc.selector = gate.selector;
-				i386_load_protected_mode_segment(cpustate,&desc);
+				i386_load_protected_mode_segment(cpustate,&desc,NULL);
 				if(gate.selector & 0x04)
 				{
 					logerror("CALL: Task Gate: TSS is not global.\n");
@@ -1933,7 +1938,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = newCS;
-	i386_load_protected_mode_segment(cpustate,&desc);
+	i386_load_protected_mode_segment(cpustate,&desc,NULL);
 	CPL = cpustate->CPL;  // current privilege level
 	DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 	RPL = newCS & 0x03;
@@ -2113,7 +2118,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 
 		/* Check SS selector and descriptor */
 		desc.selector = newSS;
-		i386_load_protected_mode_segment(cpustate,&desc);
+		i386_load_protected_mode_segment(cpustate,&desc,NULL);
 		DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 		if((newSS & ~0x07) == 0)
 		{
@@ -2252,7 +2257,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 		}
 		memset(&desc, 0, sizeof(desc));
 		desc.selector = task;
-		i386_load_protected_mode_segment(cpustate,&desc);
+		i386_load_protected_mode_segment(cpustate,&desc,NULL);
 		if((desc.flags & 0x001f) != 0x000b)
 		{
 			logerror("IRET (%08x): Task return: Back-linked TSS is not a busy TSS.\n",cpustate->pc);
@@ -2286,12 +2291,12 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			}
 			memset(&desc, 0, sizeof(desc));
 			desc.selector = newCS;
-			i386_load_protected_mode_segment(cpustate,&desc);
+			i386_load_protected_mode_segment(cpustate,&desc,NULL);
 			DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 			RPL = newCS & 0x03;
 			memset(&stack, 0, sizeof(stack));
 			stack.selector = newSS;
-			i386_load_protected_mode_segment(cpustate,&stack);
+			i386_load_protected_mode_segment(cpustate,&stack,NULL);
 			//SSRPL = newSS & 0x03;
 			//SSDPL = (stack.flags >> 5) & 0x03;
 
@@ -2502,7 +2507,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 				memset(&desc, 0, sizeof(desc));
 				desc.selector = newCS;
-				i386_load_protected_mode_segment(cpustate,&desc);
+				i386_load_protected_mode_segment(cpustate,&desc,NULL);
 				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				RPL = newCS & 0x03;
 				if((desc.flags & 0x0018) != 0x0018)
@@ -2563,7 +2568,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				/* return to outer privilege level */
 				memset(&desc, 0, sizeof(desc));
 				desc.selector = newCS;
-				i386_load_protected_mode_segment(cpustate,&desc);
+				i386_load_protected_mode_segment(cpustate,&desc,NULL);
 				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				RPL = newCS & 0x03;
 				if(operand32 == 0)
@@ -2646,7 +2651,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 				}
 				memset(&stack, 0, sizeof(stack));
 				stack.selector = newSS;
-				i386_load_protected_mode_segment(cpustate,&stack);
+				i386_load_protected_mode_segment(cpustate,&stack,NULL);
 				DPL = (stack.flags >> 5) & 0x03;
 				if((newSS & ~0x03) == 0)
 				{
@@ -2852,7 +2857,7 @@ static UINT64 i386_debug_segbase(symbol_table &table, void *ref, int params, con
 	{
 		memset(&seg, 0, sizeof(seg));
 		seg.selector = (UINT16) param[0];
-		i386_load_protected_mode_segment(cpustate,&seg);
+		i386_load_protected_mode_segment(cpustate,&seg,NULL);
 		result = seg.base;
 	}
 	else
@@ -2873,7 +2878,7 @@ static UINT64 i386_debug_seglimit(symbol_table &table, void *ref, int params, co
 	{
 		memset(&seg, 0, sizeof(seg));
 		seg.selector = (UINT16) param[0];
-		i386_load_protected_mode_segment(cpustate,&seg);
+		i386_load_protected_mode_segment(cpustate,&seg,NULL);
 		result = seg.limit;
 	}
 	return result;
@@ -3139,7 +3144,7 @@ static CPU_EXECUTE( i386 )
 			if(cpustate->TF && cpustate->old_tf)
 			{
 				cpustate->prev_eip = cpustate->eip;
-				cpustate->ext = 0;
+				cpustate->ext = 1;
 				i386_trap(cpustate,1,0,0);
 			}
 

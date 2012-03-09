@@ -61,45 +61,74 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:			/* ROL rm16, i8 */
+				if(!(shift & 15))
+				{
+					if(shift & 16)
+					{
+						cpustate->CF = src & 1;
+						cpustate->OF = (src & 1) ^ ((src >> 15) & 1);
+					}
+					break;
+				}
+				shift &= 15;
 				dst = ((src & ((UINT16)0xffff >> shift)) << shift) |
 					  ((src & ((UINT16)0xffff << (16-shift))) >> (16-shift));
-				cpustate->CF = (src >> (16-shift)) & 0x1;
+				cpustate->CF = dst & 0x1;
+				cpustate->OF = (dst & 1) ^ (dst >> 15);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 1:			/* ROR rm16, i8 */
+				if(!(shift & 15))
+				{
+					if(shift & 16)
+					{
+						cpustate->CF = (src >> 15) & 1;
+						cpustate->OF = ((src >> 15) & 1) ^ ((src >> 14) & 1);
+					}
+					break;
+				}
+				shift &= 15;
 				dst = ((src & ((UINT16)0xffff << shift)) >> shift) |
 					  ((src & ((UINT16)0xffff >> (16-shift))) << (16-shift));
-				cpustate->CF = (src >> (shift-1)) & 0x1;
+				cpustate->CF = (dst >> 15) & 1;
+				cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 2:			/* RCL rm16, i8 */
+				shift %= 17;
 				dst = ((src & ((UINT16)0xffff >> shift)) << shift) |
 					  ((src & ((UINT16)0xffff << (17-shift))) >> (17-shift)) |
 					  (cpustate->CF << (shift-1));
-				cpustate->CF = (src >> (16-shift)) & 0x1;
+				if(shift) cpustate->CF = (src >> (16-shift)) & 0x1;
+				cpustate->OF = cpustate->CF ^ ((dst >> 15) & 1);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_CARRY_REG, CYCLES_ROTATE_CARRY_MEM);
 				break;
 			case 3:			/* RCR rm16, i8 */
+				shift %= 17;
 				dst = ((src & ((UINT16)0xffff << shift)) >> shift) |
 					  ((src & ((UINT16)0xffff >> (16-shift))) << (17-shift)) |
 					  (cpustate->CF << (16-shift));
-				cpustate->CF = (src >> (shift-1)) & 0x1;
+				if(shift) cpustate->CF = (src >> (shift-1)) & 0x1;
+				cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_CARRY_REG, CYCLES_ROTATE_CARRY_MEM);
 				break;
 			case 4:			/* SHL/SAL rm16, i8 */
 			case 6:
+				shift &= 31;
 				dst = src << shift;
 				cpustate->CF = (src & (1 << (16-shift))) ? 1 : 0;
 				SetSZPF16(dst);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 5:			/* SHR rm16, i8 */
+				shift &= 31;
 				dst = src >> shift;
 				cpustate->CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF16(dst);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 7:			/* SAR rm16, i8 */
+				shift &= 31;
 				dst = (INT16)src >> shift;
 				cpustate->CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF16(dst);
@@ -329,7 +358,7 @@ static void I386OP(bt_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f a3
 		UINT16 dst = LOAD_RM16(modrm);
 		UINT16 bit = LOAD_REG16(modrm);
 
-		if( dst & (1 << bit) )
+		if( dst & (1 << (bit & 0xf)) )
 			cpustate->CF = 1;
 		else
 			cpustate->CF = 0;
@@ -339,6 +368,7 @@ static void I386OP(bt_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f a3
 		UINT32 ea = GetEA(cpustate,modrm,0);
 		UINT16 bit = LOAD_REG16(modrm);
 		ea += 2*(bit/16);
+		ea = (cpustate->address_size)?ea:(ea&0xffff);
 		bit %= 16;
 		UINT16 dst = READ16(cpustate,ea);
 
@@ -358,11 +388,11 @@ static void I386OP(btc_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f bb
 		UINT16 dst = LOAD_RM16(modrm);
 		UINT16 bit = LOAD_REG16(modrm);
 
-		if( dst & (1 << bit) )
+		if( dst & (1 << (bit & 0xf)) )
 			cpustate->CF = 1;
 		else
 			cpustate->CF = 0;
-		dst ^= (1 << bit);
+		dst ^= (1 << (bit & 0xf));
 
 		STORE_RM16(modrm, dst);
 		CYCLES(cpustate,CYCLES_BTC_REG_REG);
@@ -370,6 +400,7 @@ static void I386OP(btc_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f bb
 		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT16 bit = LOAD_REG16(modrm);
 		ea += 2*(bit/16);
+		ea = (cpustate->address_size)?ea:(ea&0xffff);
 		bit %= 16;
 		UINT16 dst = READ16(cpustate,ea);
 
@@ -391,11 +422,11 @@ static void I386OP(btr_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f b3
 		UINT16 dst = LOAD_RM16(modrm);
 		UINT16 bit = LOAD_REG16(modrm);
 
-		if( dst & (1 << bit) )
+		if( dst & (1 << (bit & 0xf)) )
 			cpustate->CF = 1;
 		else
 			cpustate->CF = 0;
-		dst &= ~(1 << bit);
+		dst &= ~(1 << (bit & 0xf));
 
 		STORE_RM16(modrm, dst);
 		CYCLES(cpustate,CYCLES_BTR_REG_REG);
@@ -403,6 +434,7 @@ static void I386OP(btr_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f b3
 		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT16 bit = LOAD_REG16(modrm);
 		ea += 2*(bit/16);
+		ea = (cpustate->address_size)?ea:(ea&0xffff);
 		bit %= 16;
 		UINT16 dst = READ16(cpustate,ea);
 
@@ -424,11 +456,11 @@ static void I386OP(bts_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f ab
 		UINT16 dst = LOAD_RM16(modrm);
 		UINT16 bit = LOAD_REG16(modrm);
 
-		if( dst & (1 << bit) )
+		if( dst & (1 << (bit & 0xf)) )
 			cpustate->CF = 1;
 		else
 			cpustate->CF = 0;
-		dst |= (1 << bit);
+		dst |= (1 << (bit & 0xf));
 
 		STORE_RM16(modrm, dst);
 		CYCLES(cpustate,CYCLES_BTS_REG_REG);
@@ -436,6 +468,7 @@ static void I386OP(bts_rm16_r16)(i386_state *cpustate)		// Opcode 0x0f ab
 		UINT32 ea = GetEA(cpustate,modrm,1);
 		UINT16 bit = LOAD_REG16(modrm);
 		ea += 2*(bit/16);
+		ea = (cpustate->address_size)?ea:(ea&0xffff);
 		bit %= 16;
 		UINT16 dst = READ16(cpustate,ea);
 
@@ -1994,21 +2027,24 @@ static void I386OP(scasw)(i386_state *cpustate)				// Opcode 0xaf
 
 static void I386OP(shld16_i8)(i386_state *cpustate)			// Opcode 0x0f a4
 {
-	/* TODO: Correct flags */
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
 		UINT16 dst = LOAD_RM16(modrm);
 		UINT16 upper = LOAD_REG16(modrm);
 		UINT8 shift = FETCH(cpustate);
-		if( shift > 31 || shift == 0 ) {
+		shift &= 31;
+		if( shift == 0 ) {
 
 		} else if( shift > 15 ) {
-			cpustate->CF = (dst & (1 << (16-shift))) ? 1 : 0;
+			cpustate->CF = (upper & (1 << (16-shift))) ? 1 : 0;
+			// ppro and above should be (dst >> (32-shift))
 			dst = (upper << (shift-16)) | (upper >> (32-shift));
+			cpustate->OF = cpustate->CF ^ (dst >> 15);
 			SetSZPF16(dst);
 		} else {
 			cpustate->CF = (dst & (1 << (16-shift))) ? 1 : 0;
 			dst = (dst << shift) | (upper >> (16-shift));
+			cpustate->OF = cpustate->CF ^ (dst >> 15);
 			SetSZPF16(dst);
 		}
 		STORE_RM16(modrm, dst);
@@ -2018,15 +2054,18 @@ static void I386OP(shld16_i8)(i386_state *cpustate)			// Opcode 0x0f a4
 		UINT16 dst = READ16(cpustate,ea);
 		UINT16 upper = LOAD_REG16(modrm);
 		UINT8 shift = FETCH(cpustate);
-		if( shift > 31 || shift == 0 ) {
+		shift &= 31;
+		if( shift == 0 ) {
 
 		} else if( shift > 15 ) {
-			cpustate->CF = (dst & (1 << (16-shift))) ? 1 : 0;
+			cpustate->CF = (upper & (1 << (16-shift))) ? 1 : 0;
 			dst = (upper << (shift-16)) | (upper >> (32-shift));
+			cpustate->OF = cpustate->CF ^ (dst >> 15);
 			SetSZPF16(dst);
 		} else {
 			cpustate->CF = (dst & (1 << (16-shift))) ? 1 : 0;
 			dst = (dst << shift) | (upper >> (16-shift));
+			cpustate->OF = cpustate->CF ^ (dst >> 15);
 			SetSZPF16(dst);
 		}
 		WRITE16(cpustate,ea, dst);
@@ -2036,21 +2075,23 @@ static void I386OP(shld16_i8)(i386_state *cpustate)			// Opcode 0x0f a4
 
 static void I386OP(shld16_cl)(i386_state *cpustate)			// Opcode 0x0f a5
 {
-	/* TODO: Correct flags */
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
 		UINT16 dst = LOAD_RM16(modrm);
 		UINT16 upper = LOAD_REG16(modrm);
 		UINT8 shift = REG8(CL);
-		if( shift > 31 || shift == 0 ) {
+		shift &= 31;
+		if( shift == 0 ) {
 
 		} else if( shift > 15 ) {
-			cpustate->CF = (dst & (1 << (16-shift))) ? 1 : 0;
+			cpustate->CF = (upper & (1 << (16-shift))) ? 1 : 0;
 			dst = (upper << (shift-16)) | (upper >> (32-shift));
+			cpustate->OF = cpustate->CF ^ (dst >> 15);
 			SetSZPF16(dst);
 		} else {
 			cpustate->CF = (dst & (1 << (16-shift))) ? 1 : 0;
 			dst = (dst << shift) | (upper >> (16-shift));
+			cpustate->OF = cpustate->CF ^ (dst >> 15);
 			SetSZPF16(dst);
 		}
 		STORE_RM16(modrm, dst);
@@ -2060,15 +2101,18 @@ static void I386OP(shld16_cl)(i386_state *cpustate)			// Opcode 0x0f a5
 		UINT16 dst = READ16(cpustate,ea);
 		UINT16 upper = LOAD_REG16(modrm);
 		UINT8 shift = REG8(CL);
-		if( shift > 31 || shift == 0 ) {
+		shift &= 31;
+		if( shift == 0 ) {
 
 		} else if( shift > 15 ) {
-			cpustate->CF = (dst & (1 << (16-shift))) ? 1 : 0;
+			cpustate->CF = (upper & (1 << (16-shift))) ? 1 : 0;
 			dst = (upper << (shift-16)) | (upper >> (32-shift));
+			cpustate->OF = cpustate->CF ^ (dst >> 15);
 			SetSZPF16(dst);
 		} else {
 			cpustate->CF = (dst & (1 << (16-shift))) ? 1 : 0;
 			dst = (dst << shift) | (upper >> (16-shift));
+			cpustate->OF = cpustate->CF ^ (dst >> 15);
 			SetSZPF16(dst);
 		}
 		WRITE16(cpustate,ea, dst);
@@ -2078,17 +2122,23 @@ static void I386OP(shld16_cl)(i386_state *cpustate)			// Opcode 0x0f a5
 
 static void I386OP(shrd16_i8)(i386_state *cpustate)			// Opcode 0x0f ac
 {
-	/* TODO: Correct flags */
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
 		UINT16 dst = LOAD_RM16(modrm);
 		UINT16 upper = LOAD_REG16(modrm);
 		UINT8 shift = FETCH(cpustate);
-		if( shift > 15 || shift == 0) {
+		shift &= 31;
+		if( shift == 0) {
 
+		} else if( shift > 15 ) {
+			cpustate->CF = (upper & (1 << (shift-1))) ? 1 : 0;
+			dst = (upper >> (shift-16)) | (upper << (32-shift));
+			cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
+			SetSZPF16(dst);
 		} else {
 			cpustate->CF = (dst & (1 << (shift-1))) ? 1 : 0;
 			dst = (dst >> shift) | (upper << (16-shift));
+			cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
 			SetSZPF16(dst);
 		}
 		STORE_RM16(modrm, dst);
@@ -2098,11 +2148,18 @@ static void I386OP(shrd16_i8)(i386_state *cpustate)			// Opcode 0x0f ac
 		UINT16 dst = READ16(cpustate,ea);
 		UINT16 upper = LOAD_REG16(modrm);
 		UINT8 shift = FETCH(cpustate);
-		if( shift > 15 || shift == 0) {
+		shift &= 31;
+		if( shift == 0) {
 
+		} else if( shift > 15 ) {
+			cpustate->CF = (upper & (1 << (shift-1))) ? 1 : 0;
+			dst = (upper >> (shift-16)) | (upper << (32-shift));
+			cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
+			SetSZPF16(dst);
 		} else {
 			cpustate->CF = (dst & (1 << (shift-1))) ? 1 : 0;
 			dst = (dst >> shift) | (upper << (16-shift));
+			cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
 			SetSZPF16(dst);
 		}
 		WRITE16(cpustate,ea, dst);
@@ -2112,17 +2169,23 @@ static void I386OP(shrd16_i8)(i386_state *cpustate)			// Opcode 0x0f ac
 
 static void I386OP(shrd16_cl)(i386_state *cpustate)			// Opcode 0x0f ad
 {
-	/* TODO: Correct flags */
 	UINT8 modrm = FETCH(cpustate);
 	if( modrm >= 0xc0 ) {
 		UINT16 dst = LOAD_RM16(modrm);
 		UINT16 upper = LOAD_REG16(modrm);
 		UINT8 shift = REG8(CL);
-		if( shift > 15 || shift == 0) {
+		shift &= 31;
+		if( shift == 0) {
 
+		} else if( shift > 15 ) {
+			cpustate->CF = (upper & (1 << (shift-1))) ? 1 : 0;
+			dst = (upper >> (shift-16)) | (upper << (32-shift));
+			cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
+			SetSZPF16(dst);
 		} else {
 			cpustate->CF = (dst & (1 << (shift-1))) ? 1 : 0;
 			dst = (dst >> shift) | (upper << (16-shift));
+			cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
 			SetSZPF16(dst);
 		}
 		STORE_RM16(modrm, dst);
@@ -2132,11 +2195,18 @@ static void I386OP(shrd16_cl)(i386_state *cpustate)			// Opcode 0x0f ad
 		UINT16 dst = READ16(cpustate,ea);
 		UINT16 upper = LOAD_REG16(modrm);
 		UINT8 shift = REG8(CL);
-		if( shift > 15 || shift == 0) {
+		shift &= 31;
+		if( shift == 0) {
 
+		} else if( shift > 15 ) {
+			cpustate->CF = (upper & (1 << (shift-1))) ? 1 : 0;
+			dst = (upper >> (shift-16)) | (upper << (32-shift));
+			cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
+			SetSZPF16(dst);
 		} else {
 			cpustate->CF = (dst & (1 << (shift-1))) ? 1 : 0;
 			dst = (dst >> shift) | (upper << (16-shift));
+			cpustate->OF = ((dst >> 15) ^ (dst >> 14)) & 1;
 			SetSZPF16(dst);
 		}
 		WRITE16(cpustate,ea, dst);
@@ -2823,9 +2893,7 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 							cpustate->CF = 1;
 					}
 				} else {
-					cpustate->ext = 0;
 					i386_trap(cpustate, 0, 0, 0);
-					cpustate->ext = 1;
 				}
 			}
 			break;
@@ -2857,9 +2925,7 @@ static void I386OP(groupF7_16)(i386_state *cpustate)		// Opcode 0xf7
 							cpustate->CF = 1;
 					}
 				} else {
-					cpustate->ext = 0;
 					i386_trap(cpustate, 0, 0, 0);
-					cpustate->ext = 1;
 				}
 			}
 			break;
@@ -3072,7 +3138,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 				}
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = cpustate->ldtr.segment;
-				i386_load_protected_mode_segment(cpustate,&seg);
+				i386_load_protected_mode_segment(cpustate,&seg,NULL);
 				cpustate->ldtr.limit = seg.limit;
 				cpustate->ldtr.base = seg.base;
 				cpustate->ldtr.flags = seg.flags;
@@ -3099,7 +3165,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 				}
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = cpustate->task.segment;
-				i386_load_protected_mode_segment(cpustate,&seg);
+				i386_load_protected_mode_segment(cpustate,&seg,NULL);
 				cpustate->task.limit = seg.limit;
 				cpustate->task.base = seg.base;
 				cpustate->task.flags = seg.flags;
@@ -3124,22 +3190,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 				}
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = address;
-				i386_load_protected_mode_segment(cpustate,&seg);
-				// check if the segment is within the bounds of the GDT or LDT
-				if(seg.selector & 0x04)
-				{  // LDT
-					if((seg.selector & 0xf8) > cpustate->ldtr.limit)
-					{
-						result = 0;
-					}
-				}
-				else
-				{  // GDT
-					if((seg.selector & 0xf8) > cpustate->gdtr.limit)
-					{
-						result = 0;
-					}
-				}
+				result = i386_load_protected_mode_segment(cpustate,&seg,NULL);
 				// check if the segment is a code or data segment (not a special segment type, like a TSS, gate, LDT...)
 				if(!(seg.flags & 0x10))
 					result = 0;
@@ -3187,22 +3238,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 				}
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = address;
-				i386_load_protected_mode_segment(cpustate,&seg);
-				// check if the segment is within the bounds of the GDT or LDT
-				if(seg.selector & 0x04)
-				{  // LDT
-					if((seg.selector & 0xf8) > cpustate->ldtr.limit)
-					{
-						result = 0;
-					}
-				}
-				else
-				{  // GDT
-					if((seg.selector & 0xf8) > cpustate->gdtr.limit)
-					{
-						result = 0;
-					}
-				}
+				result = i386_load_protected_mode_segment(cpustate,&seg,NULL);
 				// check if the segment is a code or data segment (not a special segment type, like a TSS, gate, LDT...)
 				if(!(seg.flags & 0x10))
 					result = 0;
@@ -3488,7 +3524,16 @@ static void I386OP(lar_r16_rm16)(i386_state *cpustate)  // Opcode 0x0f 0x02
 		}
 		else
 		{
-			i386_load_protected_mode_segment(cpustate,&seg);
+			if(!i386_load_protected_mode_segment(cpustate,&seg,NULL))
+			{
+				SetZF(0);
+				return;
+			}
+			if(((seg.flags >> 5) & 3) < cpustate->CPL)
+			{
+				SetZF(0);
+				return;
+			}
 			if(!(seg.flags & 0x10))  // special segment
 			{
 				// check for invalid segment types
@@ -3499,14 +3544,12 @@ static void I386OP(lar_r16_rm16)(i386_state *cpustate)  // Opcode 0x0f 0x02
 				}
 				else
 				{
-					// TODO: check current privilege level
 					STORE_REG16(modrm,(seg.flags << 8) & 0xff00);
 					SetZF(1);
 				}
 			}
 			else
 			{  // data or code segment (both are valid for LAR)
-				// TODO: check current privilege level
 				STORE_REG16(modrm,(seg.flags << 8) & 0xff00);
 				SetZF(1);
 			}
@@ -3544,11 +3587,38 @@ static void I386OP(lsl_r16_rm16)(i386_state *cpustate)  // Opcode 0x0f 0x03
 		}
 		else
 		{
-			// TODO: check segment type
-			i386_load_protected_mode_segment(cpustate,&seg);
-			limit = seg.limit;
-			STORE_REG16(modrm,limit & 0x0000ffff);
-			SetZF(1);
+			UINT8 type;
+			if(!i386_load_protected_mode_segment(cpustate,&seg,NULL))
+			{
+				SetZF(0);
+				return;
+			}
+			if(((seg.flags >> 5) & 3) < cpustate->CPL)
+			{
+				SetZF(0);
+				return;
+			}
+			type = seg.flags & 0x1f;
+			switch(type)
+			{
+			case 0:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 10:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+				SetZF(0);
+				return;
+			default:
+				limit = seg.limit;
+				STORE_REG16(modrm,limit & 0x0000ffff);
+				SetZF(1);
+			}
 		}
 	}
 	else
