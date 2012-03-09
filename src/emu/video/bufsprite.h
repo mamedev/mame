@@ -136,7 +136,7 @@ class buffered_spriteram8_device : public buffered_spriteram_device<UINT8>
 public:
 	// construction
 	buffered_spriteram8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: buffered_spriteram_device(mconfig, BUFFERED_SPRITERAM8, tag, owner, clock) { }
+		: buffered_spriteram_device<UINT8>(mconfig, BUFFERED_SPRITERAM8, tag, owner, clock) { }
 };
 
 
@@ -147,7 +147,7 @@ class buffered_spriteram16_device : public buffered_spriteram_device<UINT16>
 public:
 	// construction
 	buffered_spriteram16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: buffered_spriteram_device(mconfig, BUFFERED_SPRITERAM16, tag, owner, clock) { }
+		: buffered_spriteram_device<UINT16>(mconfig, BUFFERED_SPRITERAM16, tag, owner, clock) { }
 };
 
 
@@ -158,7 +158,7 @@ class buffered_spriteram32_device : public buffered_spriteram_device<UINT32>
 public:
 	// construction
 	buffered_spriteram32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: buffered_spriteram_device(mconfig, BUFFERED_SPRITERAM32, tag, owner, clock) { }
+		: buffered_spriteram_device<UINT32>(mconfig, BUFFERED_SPRITERAM32, tag, owner, clock) { }
 };
 
 
@@ -169,7 +169,7 @@ class buffered_spriteram64_device : public buffered_spriteram_device<UINT64>
 public:
 	// construction
 	buffered_spriteram64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: buffered_spriteram_device(mconfig, BUFFERED_SPRITERAM64, tag, owner, clock) { }
+		: buffered_spriteram_device<UINT64>(mconfig, BUFFERED_SPRITERAM64, tag, owner, clock) { }
 };
 
 
