@@ -1257,32 +1257,32 @@ static WRITE16_HANDLER( sndcomm68k_w )
 
 static INTERRUPT_GEN(tms_sync)
 {
-	tms57002_sync(device);
+	downcast<tms57002_device *>(device)->sync();
 }
 
 static READ16_HANDLER(tms57002_data_word_r)
 {
-	return tms57002_data_r(space->machine().device("dasp"), 0);
+	return space->machine().device<tms57002_device>("dasp")->data_r(*space, 0);
 }
 
 static WRITE16_HANDLER(tms57002_data_word_w)
 {
 	if (ACCESSING_BITS_0_7)
-		tms57002_data_w(space->machine().device("dasp"), 0, data);
+		space->machine().device<tms57002_device>("dasp")->data_w(*space, 0, data);
 }
 
 static READ16_HANDLER(tms57002_status_word_r)
 {
-	return (tms57002_dready_r(space->machine().device("dasp"), 0) ? 4 : 0) |
-		(tms57002_empty_r(space->machine().device("dasp"), 0) ? 1 : 0);
+	return (space->machine().device<tms57002_device>("dasp")->dready_r(*space, 0) ? 4 : 0) |
+		(space->machine().device<tms57002_device>("dasp")->empty_r(*space, 0) ? 1 : 0);
 }
 
 static WRITE16_HANDLER(tms57002_control_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		tms57002_pload_w(space->machine().device("dasp"), 0, data & 4);
-		tms57002_cload_w(space->machine().device("dasp"), 0, data & 8);
+		space->machine().device<tms57002_device>("dasp")->pload_w(*space, 0, data & 4);
+		space->machine().device<tms57002_device>("dasp")->cload_w(*space, 0, data & 8);
 		cputag_set_input_line(space->machine(), "dasp", INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }

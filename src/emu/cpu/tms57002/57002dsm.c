@@ -2,13 +2,7 @@
 #include "debugger.h"
 #include "tms57002.h"
 
-#ifdef __GNUC__
-#define noinline __attribute__((noinline))
-#else
-#define noinline /* */
-#endif
-
-static const char *tms57002_get_memadr(UINT32 opcode, char type)
+const char *tms57002_device::get_memadr(UINT32 opcode, char type)
 {
 	static char buff[2][10];
 	static int index = 0;
@@ -31,8 +25,17 @@ static const char *tms57002_get_memadr(UINT32 opcode, char type)
 	return buf;
 }
 
+UINT32 tms57002_device::disasm_min_opcode_bytes() const
+{
+	return 4;
+}
 
-CPU_DISASSEMBLE(tms57002)
+UINT32 tms57002_device::disasm_max_opcode_bytes() const
+{
+	return 4;
+}
+
+offs_t tms57002_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	UINT32 opcode = opram[0] | (opram[1] << 8) | (opram[2] << 16);
 	UINT8 fa = opcode >> 18;

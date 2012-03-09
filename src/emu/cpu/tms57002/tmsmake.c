@@ -86,14 +86,14 @@ enum { IxCMODE, IxDMODE, IxSFAI, IxCRM, IxDBP, IxSFAO, IxSFMO, IxRND, IxMOVM, Ix
 static const vinfo vinf[] = {
   { I_CMODE, 3, "cmode", "xmode(opcode, 'c')" },
   { I_DMODE, 3, "dmode", "xmode(opcode, 'd')" },
-  { I_SFAI,  2, "sfai",  "sfai(s->st1)"       },
-  { I_CRM,   4, "crm",   "crm(s->st1)"        },
-  { I_DBP,   2, "dbp",   "dbp(s->st1)"        },
-  { I_SFAO,  2, "sfao",  "sfao(s->st1)"       },
-  { I_SFMO,  4, "sfmo",  "sfmo(s->st1)"       },
-  { I_RND,   8, "rnd",   "rnd(s->st1)"        },
-  { I_MOVM,  2, "movm",  "movm(s->st1)"       },
-  { I_SFMA,  4, "sfma",  "sfma(s->st1)"       },
+  { I_SFAI,  2, "sfai",  "sfai(st1)"       },
+  { I_CRM,   4, "crm",   "crm(st1)"        },
+  { I_DBP,   2, "dbp",   "dbp(st1)"        },
+  { I_SFAO,  2, "sfao",  "sfao(st1)"       },
+  { I_SFMO,  4, "sfmo",  "sfmo(st1)"       },
+  { I_RND,   8, "rnd",   "rnd(st1)"        },
+  { I_MOVM,  2, "movm",  "movm(st1)"       },
+  { I_SFMA,  4, "sfma",  "sfma(st1)"       },
   { 0 }
 };
 
@@ -453,10 +453,10 @@ static void save_dasm_cat(FILE *f, const char *def, instr *il, int count)
       for(j=0; j != pc; j++)
 	switch(par[j]) {
 	case PC:
-	  fprintf(f, ", tms57002_get_memadr(opcode, 'c')");
+	  fprintf(f, ", get_memadr(opcode, 'c')");
 	  break;
 	case PD:
-	  fprintf(f, ", tms57002_get_memadr(opcode, 'd')");
+	  fprintf(f, ", get_memadr(opcode, 'd')");
 	  break;
 	case PI:
 	  fprintf(f, ", opcode & 0xff");
@@ -482,15 +482,15 @@ static void intrp_expand(char **p, int s, int e)
       break;
 
     case PA:
-      scs(p, "tms57002_aacc_to_output(s)");
+      scs(p, "aacc_to_output()");
       break;
 
     case PC:
-      scs(p, "tms57002_opc_read_c(s, opcode)");
+      scs(p, "opc_read_c(opcode)");
       break;
 
     case PD:
-      scs(p, "(tms57002_opc_read_d(s, opcode) << 8)");
+      scs(p, "(opc_read_d(opcode) << 8)");
       break;
 
     case PI:
@@ -498,26 +498,26 @@ static void intrp_expand(char **p, int s, int e)
       break;
 
     case PD24:
-      scs(p, "tms57002_opc_read_d(s, opcode)");
+      scs(p, "opc_read_d(opcode)");
       break;
 
     case PML:
-      scs(p, "tms57002_macc_to_loop(s)");
+      scs(p, "macc_to_loop()");
       break;
 
     case PMO:
-      scs(p, "tms57002_macc_to_output(s)");
+      scs(p, "macc_to_output()");
       break;
 
     case PMV:
-      scs(p, "tms57002_check_macc_overflow(s)");
+      scs(p, "check_macc_overflow()");
       break;
 
     case PB:
-      scs(p, "s->pc = ");
+      scs(p, "pc = ");
       intrp_expand(p, parse_res[i].ppos[0], parse_res[i].ppos[1]);
       scs(p, ";\n");
-      scs(p, "  s->sti |= S_BRANCH");
+      scs(p, "  sti |= S_BRANCH");
       break;
 
     case PWA:
@@ -525,18 +525,18 @@ static void intrp_expand(char **p, int s, int e)
       intrp_expand(p, parse_res[i].ppos[0], parse_res[i].ppos[1]);
       scs(p, ";\n");
       scs(p, "  if(r < -0x80000000 || r > 0x7fffffff)\n");
-      scs(p, "    s->st1 |= ST1_AOV;\n");
-      scs(p, "  s->aacc = r");
+      scs(p, "    st1 |= ST1_AOV;\n");
+      scs(p, "  aacc = r");
       break;
 
     case PWC:
-      scs(p, "tms57002_opc_write_c(s, opcode, ");
+      scs(p, "opc_write_c(opcode, ");
       intrp_expand(p, parse_res[i].ppos[0], parse_res[i].ppos[1]);
       scs(p, ")");
       break;
 
     case PWD:
-      scs(p, "tms57002_opc_write_d(s, opcode, ");
+      scs(p, "opc_write_d(opcode, ");
       intrp_expand(p, parse_res[i].ppos[0], parse_res[i].ppos[1]);
       scs(p, ")");
       break;
@@ -546,7 +546,7 @@ static void intrp_expand(char **p, int s, int e)
       scs(p, " = ");
       intrp_expand(p, parse_res[i].ppos[1], parse_res[i].ppos[2]);
       scs(p, ";\n");
-      scs(p, "  if(s->st1 & ST1_SFAI)\n");
+      scs(p, "  if(st1 & ST1_SFAI)\n");
       scs(p, "    ");
       intrp_expand(p, parse_res[i].ppos[0], parse_res[i].ppos[1]);
       scs(p, " = ((INT32)");
@@ -636,19 +636,19 @@ static void cintrp_expand(char **p, int s, int e, const int *cv)
 
     case PA:
       if(cv[IxSFAO])
-	scs(p, "(s->aacc << 7)");
+	scs(p, "(aacc << 7)");
       else
-	scs(p, "s->aacc");
+	scs(p, "aacc");
       break;
 
     case PC: {
       const char *r = NULL;
       if(cv[IxCMODE] == 0)
-	r = "s->cmem[i->param]";
+	r = "cmem[i->param]";
       else if(cv[IxCMODE] == 1)
-	r = "s->cmem[s->ca]";
+	r = "cmem[ca]";
       else if(cv[IxCMODE] == 2)
-	r = "s->cmem[s->ca++]";
+	r = "cmem[ca++]";
       else
 	abort();
 
@@ -670,19 +670,19 @@ static void cintrp_expand(char **p, int s, int e, const int *cv)
     case PD:
       if(cv[IxDMODE] == 0)
 	if(cv[IxDBP])
-	  scs(p, "(s->dmem1[(i->param + s->ba1) & 0x1f] << 8)");
+	  scs(p, "(dmem1[(i->param + ba1) & 0x1f] << 8)");
 	else
-	  scs(p, "(s->dmem0[(i->param + s->ba0) & 0xff] << 8)");
+	  scs(p, "(dmem0[(i->param + ba0) & 0xff] << 8)");
       else if(cv[IxDMODE] == 1)
 	if(cv[IxDBP])
-	  scs(p, "(s->dmem1[(s->id + s->ba1) & 0x1f] << 8)");
+	  scs(p, "(dmem1[(id + ba1) & 0x1f] << 8)");
 	else
-	  scs(p, "(s->dmem0[(s->id + s->ba0) & 0xff] << 8)");
+	  scs(p, "(dmem0[(id + ba0) & 0xff] << 8)");
       else if(cv[IxDMODE] == 2)
 	if(cv[IxDBP])
-	  scs(p, "(s->dmem1[((s->id++) + s->ba1) & 0x1f] << 8)");
+	  scs(p, "(dmem1[((id++) + ba1) & 0x1f] << 8)");
 	else
-	  scs(p, "(s->dmem0[((s->id++) + s->ba0) & 0xff] << 8)");
+	  scs(p, "(dmem0[((id++) + ba0) & 0xff] << 8)");
       else
 	abort();
       break;
@@ -694,32 +694,32 @@ static void cintrp_expand(char **p, int s, int e, const int *cv)
     case PD24:
       if(cv[IxDMODE] == 0)
 	if(cv[IxDBP])
-	  scs(p, "s->dmem1[(i->param + s->ba1) & 0x1f]");
+	  scs(p, "dmem1[(i->param + ba1) & 0x1f]");
 	else
-	  scs(p, "s->dmem0[(i->param + s->ba0) & 0xff]");
+	  scs(p, "dmem0[(i->param + ba0) & 0xff]");
       else if(cv[IxDMODE] == 1)
 	if(cv[IxDBP])
-	  scs(p, "s->dmem1[(s->id + s->ba1) & 0x1f]");
+	  scs(p, "dmem1[(id + ba1) & 0x1f]");
 	else
-	  scs(p, "s->dmem0[(s->id + s->ba0) & 0xff]");
+	  scs(p, "dmem0[(id + ba0) & 0xff]");
       else if(cv[IxDMODE] == 2)
 	if(cv[IxDBP])
-	  scs(p, "s->dmem1[((s->id++) + s->ba1) & 0x1f]");
+	  scs(p, "dmem1[((id++) + ba1) & 0x1f]");
 	else
-	  scs(p, "s->dmem0[((s->id++) + s->ba0) & 0xff]");
+	  scs(p, "dmem0[((id++) + ba0) & 0xff]");
       else
 	abort();
       break;
 
     case PML:
       if(cv[IxSFMA] == 0)
-	scs(p, "s->macc");
+	scs(p, "macc");
       else if(cv[IxSFMA] == 1)
-	scs(p, "(s->macc << 2)");
+	scs(p, "(macc << 2)");
       else if(cv[IxSFMA] == 2)
-	scs(p, "(s->macc << 4)");
+	scs(p, "(macc << 4)");
       else if(cv[IxSFMA] == 3)
-	scs(p, "(s->macc >> 16)");
+	scs(p, "(macc >> 16)");
       else
 	abort();
       break;
@@ -743,23 +743,23 @@ static void cintrp_expand(char **p, int s, int e, const int *cv)
       };
 
       char r[256];
-      sprintf(r, "tms57002_macc_to_output_%d%s(s, 0x%016" I64FMT "xULL, 0x%016" I64FMT "xULL)", cv[IxSFMO], cv[IxMOVM] ? "s" : "", rounding[cv[IxRND]], rmask[cv[IxRND]]);
+      sprintf(r, "macc_to_output_%d%s(0x%016" I64FMT "xULL, 0x%016" I64FMT "xULL)", cv[IxSFMO], cv[IxMOVM] ? "s" : "", rounding[cv[IxRND]], rmask[cv[IxRND]]);
       scs(p, r);
       break;
     }
 
     case PMV: {
       char r[256];
-      sprintf(r, "tms57002_check_macc_overflow_%d%s(s)", cv[IxSFMO], cv[IxMOVM] ? "s" : "");
+      sprintf(r, "check_macc_overflow_%d%s()", cv[IxSFMO], cv[IxMOVM] ? "s" : "");
       scs(p, r);
       break;
     }
 
     case PB:
-      scs(p, "s->pc = ");
+      scs(p, "pc = ");
       cintrp_expand(p, parse_res[i].ppos[0], parse_res[i].ppos[1], cv);
       scs(p, ";\n");
-      scs(p, "  s->sti |= S_BRANCH");
+      scs(p, "  sti |= S_BRANCH");
       break;
 
     case PWA:
@@ -767,17 +767,17 @@ static void cintrp_expand(char **p, int s, int e, const int *cv)
       cintrp_expand(p, parse_res[i].ppos[0], parse_res[i].ppos[1], cv);
       scs(p, ";\n");
       scs(p, "  if(r < -0x80000000 || r > 0x7fffffff)\n");
-      scs(p, "    s->st1 |= ST1_AOV;\n");
-      scs(p, "  s->aacc = r");
+      scs(p, "    st1 |= ST1_AOV;\n");
+      scs(p, "  aacc = r");
       break;
 
     case PWC:
       if(cv[IxCMODE] == 0)
-	scs(p, "s->cmem[i->param] = ");
+	scs(p, "cmem[i->param] = ");
       else if(cv[IxCMODE] == 1)
-	scs(p, "s->cmem[s->ca] = ");
+	scs(p, "cmem[ca] = ");
       else if(cv[IxCMODE] == 2)
-	scs(p, "s->cmem[s->ca++] = ");
+	scs(p, "cmem[ca++] = ");
       else
 	abort();
 
@@ -787,19 +787,19 @@ static void cintrp_expand(char **p, int s, int e, const int *cv)
     case PWD:
       if(cv[IxDMODE] == 0)
 	if(cv[IxDBP])
-	  scs(p, "s->dmem1[(i->param + s->ba1) & 0x1f] = ");
+	  scs(p, "dmem1[(i->param + ba1) & 0x1f] = ");
 	else
-	  scs(p, "s->dmem0[(i->param + s->ba0) & 0xff] = ");
+	  scs(p, "dmem0[(i->param + ba0) & 0xff] = ");
       else if(cv[IxDMODE] == 1)
 	if(cv[IxDBP])
-	  scs(p, "s->dmem1[(s->id + s->ba1) & 0x1f] = ");
+	  scs(p, "dmem1[(id + ba1) & 0x1f] = ");
 	else
-	  scs(p, "s->dmem0[(s->id + s->ba0) & 0xff] = ");
+	  scs(p, "dmem0[(id + ba0) & 0xff] = ");
       else if(cv[IxDMODE] == 2)
 	if(cv[IxDBP])
-	  scs(p, "s->dmem1[((s->id++) + s->ba1) & 0x1f] = ");
+	  scs(p, "dmem1[((id++) + ba1) & 0x1f] = ");
 	else
-	  scs(p, "s->dmem0[((s->id++) + s->ba0) & 0xff] = ");
+	  scs(p, "dmem0[((id++) + ba0) & 0xff] = ");
       else
 	abort();
 
@@ -876,7 +876,7 @@ static void save_dasm(FILE *f)
   save_dasm_cat(f, "DASM3", cat3, 0x80);
 }
 
-static void save_intrp(FILE *f)
+void save_intrp(FILE *f)
 {
   save_intrp_cat(f, "INTRP1",  cat1, 0x40, 0,      0);
   save_intrp_cat(f, "INTRP2A", cat2, 0x80, I_POST, 0);
@@ -916,7 +916,7 @@ static void save(const char *fname)
   compute_cache_ids();
 
   save_dasm(f);
-  save_intrp(f);
+  //  save_intrp(f);
   save_cdec(f);
   save_cintrp(f);
 

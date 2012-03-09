@@ -1712,12 +1712,10 @@ endif
 
 $(CPUOBJ)/tms57002/tms57002.o:	$(CPUSRC)/tms57002/tms57002.c \
 								$(CPUSRC)/tms57002/tms57002.h \
-								$(CPUSRC)/tms57002/tms57kpr.h \
 								$(CPUOBJ)/tms57002/tms57002.inc
 
 $(CPUOBJ)/tms57002/tms57kdec.o:	$(CPUSRC)/tms57002/tms57kdec.c \
 								$(CPUSRC)/tms57002/tms57002.h \
-								$(CPUSRC)/tms57002/tms57kpr.h \
 								$(CPUOBJ)/tms57002/tms57002.inc
 
 $(CPUOBJ)/tms57002/57002dsm.o:	$(CPUSRC)/tms57002/57002dsm.c \

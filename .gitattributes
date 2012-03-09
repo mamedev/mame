@@ -532,7 +532,6 @@ src/emu/cpu/tms57002/57002dsm.c svneol=native#text/plain
 src/emu/cpu/tms57002/tms57002.c svneol=native#text/plain
 src/emu/cpu/tms57002/tms57002.h svneol=native#text/plain
 src/emu/cpu/tms57002/tms57kdec.c svneol=native#text/plain
-src/emu/cpu/tms57002/tms57kpr.h svneol=native#text/plain
 src/emu/cpu/tms57002/tmsinstr.lst svneol=native#text/plain
 src/emu/cpu/tms57002/tmsmake.c svneol=native#text/plain
 src/emu/cpu/tms7000/7000dasm.c svneol=native#text/plain
