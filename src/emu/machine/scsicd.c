@@ -607,6 +607,26 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 					// indicate max volume
 					data[9] = data[11] = data[13] = data[15] = 0xff;
 					break;
+				case 0x2a:	// Page capabilities
+					data[0] = 0x2a;
+					data[1] = 0x14;	// page length
+					data[2] = 0x00; data[3] = 0x00; // CD-R only
+					data[4] = 0x01; // can play audio
+					data[5] = 0;
+					data[6] = 0;
+					data[7] = 0;
+					data[8] = 0x02; data[9] = 0xc0; // 4x speed
+					data[10] = 0;
+					data[11] = 2; // two volumen levels
+					data[12] = 0x00; data[13] = 0x00; // buffer
+					data[14] = 0x02; data[15] = 0xc0; // 4x read speed
+					data[16] = 0;
+					data[17] = 0;
+					data[18] = 0;
+					data[19] = 0;
+					data[20] = 0;
+					data[21] = 0;
+					break;
 
 				default:
 					logerror("SCSICD: MODE SENSE unknown page %x\n", command[2] & 0x3f);
