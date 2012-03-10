@@ -192,15 +192,26 @@ ROM_START( soulcl2b )
 ROM_END
 
 ROM_START( soulclb3 )
-	ROM_REGION(0x200000, "bios", 0)
-	SYSTEM246_BIOS
+    ROM_REGION(0x200000, "bios", 0)
+    SYSTEM246_BIOS
 
-	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-        ROM_LOAD( "sc31001-na-a.ic002", 0x000000, 0x800000, CRC(ddbe9774) SHA1(6bb2d31cb669336345b5508bcca56936ea97c04a) )
-        ROM_LOAD( "sc31001-na-a_spr.ic002", 0x800000, 0x040000, CRC(18c6f56d) SHA1(13bc6a3688985c0cd9900b063824a4af691a1b31) )
+    ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+    ROM_LOAD( "sc31001-na-a.ic002", 0x000000, 0x800000, CRC(ddbe9774) SHA1(6bb2d31cb669336345b5508bcca56936ea97c04a) )
+    ROM_LOAD( "sc31001-na-a_spr.ic002", 0x800000, 0x040000, CRC(18c6f56d) SHA1(13bc6a3688985c0cd9900b063824a4af691a1b31) )
 
-	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY( "sc31001-na-dvd0-b", 0, SHA1(b46ee35083f8fcc091ce562951c55fbdbb929e4b) )
+    DISK_REGION("dvd")
+    DISK_IMAGE_READONLY( "sc31001-na-dvd0-b", 0, SHA1(b46ee35083f8fcc091ce562951c55fbdbb929e4b) )
+ROM_END
+
+ROM_START( soulclb3a )
+    ROM_REGION(0x200000, "bios", 0)
+    SYSTEM246_BIOS
+
+    ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+    ROM_LOAD( "sc31002-na-a.ic002", 0x000000, 0x840000, CRC(2ebf91ff) SHA1(01e628344b2cde2edbda9ffea53af6a63e3bddf1) ) 
+
+    DISK_REGION("dvd")
+    DISK_IMAGE_READONLY( "sc31001-na-dvd0-b", 0, SHA1(b46ee35083f8fcc091ce562951c55fbdbb929e4b) )
 ROM_END
 
 ROM_START( sukuinuf )
@@ -377,6 +388,7 @@ GAME(2004, sukuinuf,   sys246, system246, system246, 0, ROT0, "Namco", "Quiz and
 GAME(2004, zgundmdx,   sys246, system246, system246, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", GAME_IS_SKELETON)
 GAME(2005, gundzaft,   sys246, system246, system246, 0, ROT0, "Capcom / Banpresto", "Gundam Seed: Federation vs. Z.A.F.T. (SED1 Ver. A)", GAME_IS_SKELETON)
 GAME(2005, soulclb3,   sys246, system246, system246, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A)", GAME_IS_SKELETON)
+GAME(2005, soulclb3a,soulclb3, system246, system246, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A)", GAME_IS_SKELETON)
 
 GAME(2004, sys256,          0, system256, system246, 0, ROT0, "Namco", "System 256 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
 GAME(2005, tekken51,   sys256, system256, system246, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", GAME_IS_SKELETON)
