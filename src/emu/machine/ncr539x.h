@@ -15,10 +15,10 @@ struct NCR539Xinterface
     devcb_write_line m_out_drq_cb;          /* DRQ line */
 };
 
-// 539x registers
-enum
-{
-};
+//// 539x registers
+//enum
+//{
+//};
 
 // device stuff
 #define MCFG_NCR539X_ADD(_tag, _clock, _intrf) \
