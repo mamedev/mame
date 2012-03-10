@@ -39,8 +39,6 @@
 ******************************************************************************/
 
 
-
-
 // "Pacman hardware" games
 puckman			// (c) 1980 Namco
 puckmana		// (c) 1980 Namco
@@ -2350,8 +2348,10 @@ optiger			// 1998.09 E63 (c) 1998 Taito
 // Taito Type-Zero System
 taitotz
 batlgear		// E68 (c) 1999 Taito
+pwrshovl        // E74 (c) 1999 Taito
 landhigh		// E82 (c) 1999 Taito
-batlgr2			// E87 (c) 2000 Taito
+batlgr2			// E87 (c) 2000 Taito (2.04J)
+batlgr2a   		// E87 (c) 2000 Taito (2.01J)
 
 // Toaplan games
 perfrman		// (c) 1985 Data East Corporation (Japan)

@@ -500,8 +500,40 @@ ROM_START( batlgr2 )
 	DISK_IMAGE( "bg2_204j", 0, SHA1(7ac100fba39ae0b93980c0af2f0212a731106912) )
 ROM_END
 
+ROM_START( batlgr2a )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS
+
+	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_LOAD16_BYTE( "e87-03.ic14",  0x000000, 0x020000, CRC(49ae7cd0) SHA1(15f07a6bb2044a85a2139481f1dc95a44520c929) )
+	ROM_LOAD16_BYTE( "e87-04.ic15",  0x000001, 0x020000, CRC(59f8f75f) SHA1(f5595751b10c0033f460114c43f5e2c192fe61f1) )
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	DISK_REGION( "ide" )
+	DISK_IMAGE( "bg2_201j", 0, SHA1(542d12682bd0f95143368578461c6a4fcc492fcc) )
+ROM_END
+
+ROM_START( pwrshovl )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS
+
+	ROM_REGION( 0x40000, "io_cpu", 0 )
+    ROM_LOAD16_BYTE( "e74-04.ic14",   0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) 
+    ROM_LOAD16_BYTE( "e74-05.ic15",   0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) 
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	DISK_REGION( "ide" )
+	DISK_IMAGE( "pwrshovl", 0, SHA1(360f63b39f645851c513b4644fb40601b9ba1412) )
+ROM_END
+
 GAME( 1999, taitotz,  0, taitotz, taitotz, 0, ROT0, "Taito", "Type Zero BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
 GAME( 1999, landhigh, taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Landing High Japan", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, batlgear, taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Battle Gear", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1999, pwrshovl, taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Power Shovel Simulator", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, batlgr2,  taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Battle Gear 2 (v2.04J)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, batlgr2a, batlgr2, taitotz, taitotz, 0, ROT0, "Taito", "Battle Gear 2 (v2.01J)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
