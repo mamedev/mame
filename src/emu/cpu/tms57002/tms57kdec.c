@@ -99,16 +99,16 @@ inline int tms57002_device::sfma(UINT32 st1)
 void tms57002_device::decode_error(UINT32 opcode)
 {
 	char buf[256];
-//	UINT8 opr[3];
+	UINT8 opr[3];
 	if(unsupported_inst_warning)
 		return;
 
 	unsupported_inst_warning = 1;
-//	opr[0] = opcode;
-//	opr[1] = opcode >> 8;
-//	opr[2] = opcode >> 16;
+	opr[0] = opcode;
+	opr[1] = opcode >> 8;
+	opr[2] = opcode >> 16;
 
-	//	CPU_DECODEEMBLE_NAME(tms57002)(0, buf, s->pc, opr, opr, 0);
+	disasm_disassemble(buf, pc, opr, opr, 0);
 	popmessage("tms57002: %s - Contact Mamedev", buf);
 }
 
