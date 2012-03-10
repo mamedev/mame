@@ -286,6 +286,17 @@ ROM_START( tekken4b )
 	DISK_IMAGE_READONLY( "tef1dvd0", 0, SHA1(f39aa37156245f622a6e19e8a0e081418e247b36) )
 ROM_END
 
+ROM_START( tekken4c )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+    ROM_LOAD( "tef1verc.ic002", 0x000000, 0x840000, CRC(92697a2b) SHA1(e9ec254d52187f5be0d9be58b25821c1e63bba8e) ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "tef1dvd0", 0, SHA1(f39aa37156245f622a6e19e8a0e081418e247b36) )
+ROM_END
+
 ROM_START( tekken51 )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM256_BIOS
@@ -381,6 +392,7 @@ GAME(2002, soulcl2b, soulclb2, system246, system246, 0, ROT0, "Namco", "Soul Cal
 GAME(2002, tekken4,    sys246, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", GAME_IS_SKELETON)
 GAME(2002, tekken4a,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", GAME_IS_SKELETON)
 GAME(2002, tekken4b,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", GAME_IS_SKELETON)
+GAME(2002, tekken4c,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. C)", GAME_IS_SKELETON)
 GAME(2003, timecrs3,   sys246, system246, system246, 0, ROT0, "Namco", "Time Crisis 3 (TST1)", GAME_IS_SKELETON)
 GAME(2003, zgundm,     sys246, system246, system246, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A)", GAME_IS_SKELETON)
 GAME(2004, fghtjam,    sys246, system246, system246, 0, ROT0, "Capcom / Namco", "Capcom Fighting Jam (JAM1 Ver. A)", GAME_IS_SKELETON)
