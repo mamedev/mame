@@ -5220,13 +5220,13 @@ cgraplop		// 28 1982.11 Cluster Buster / Graplop
 cgraplop2		// 28
 clapapa			// 29 1982.11 La-Pa-Pa
 clapapa2		// 29         Rootin' Tootin'  // this one doesn't display lapapa anywhere
-				// 30 1983.03 Skater
+cskater			// 30 1983.03 Skater
 cprobowl		// 31 1983.03 Pro Bowling
 cnightst		// 32 1983.04 Night Star
 cnightst2		// 32
 cpsoccer		// 33 1982.08 Pro Soccer
 cpsoccerj		// 33 1982.08 Pro Soccer (Japan)
-				// 34 1983.09 Super Doubles Tennis
+csdtenis		// 34 1983.09 Super Doubles Tennis
 cflyball		// 35 1983.?? Flying Ball/Bampoline
 				// 36 1984.04 Genesis/Boomer Rang'r
 czeroize		// 37 1983.10 Zeroize
@@ -5235,7 +5235,7 @@ cscrtry2		// 38
 cppicf			// 39 1984.02 Peter Pepper's Ice Cream Factory
 cppicf2			// 39
 cfghtice		// 40 1984.04 Fighting Ice Hockey
-cgsumo			// 41 1984.05 Oozumou/The Grand Sumo
+coozumou		// 41 1984.05 Oozumou/The Grand Sumo
 				// 42 1984.08 Hellow Gateball // not a typo, this is official spelling
 				// 43 1984.08 Yellow Cab
 cbdash			// 44 1985.08 Boulder Dash
