@@ -7907,7 +7907,7 @@ ROM_END
 /* 25349801 */ GAME( 2000, toukon4,  naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 // 25469801 Ninja Assault
 /* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-/* 25869812 */ GAME( 2002, mazan,    naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "Mazan: Flash of the Blade (MAZ1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
+/* 25869812 */ GAME( 2002, mazan,    naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Mazan: Flash of the Blade (MAZ1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
 
 /* GDS-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2000, confmiss,  naomigd,  naomigd, hotd2,    naomigd,    ROT0, "Sega", "Confidential Mission (GDS-0001)", GAME_FLAGS )
