@@ -492,7 +492,7 @@ INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UIN
 	if(!ret)
 	{
 		if(rwn != -1)
-			*error |= ((rwn && 1)<<1) | ((cpustate->CPL==3)?1<<2:0);
+			*error |= ((rwn & 1)<<1) | ((cpustate->CPL==3)?1<<2:0);
 		return 0;
 	}
 	return 1;
