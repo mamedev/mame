@@ -1419,6 +1419,24 @@ static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( fantastc_map, AS_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("8910.0", ay8910_address_w)
+	AM_RANGE(0x880b, 0x880b) AM_DEVWRITE("8910.0", ay8910_data_w)
+	AM_RANGE(0x880c, 0x880c) AM_DEVWRITE("8910.1", ay8910_address_w)
+	AM_RANGE(0x880e, 0x880e) AM_DEVWRITE("8910.1", ay8910_data_w)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, m_videoram)
+	AM_RANGE(0x9800, 0x98ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
+	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xfffe, 0xfffe) AM_NOP //?
+ADDRESS_MAP_END
+
 
 /* map derived from schematics */
 #if 0
@@ -2144,6 +2162,22 @@ static MACHINE_CONFIG_DERIVED( mooncrst, galaxian_base )
 	MCFG_CPU_PROGRAM_MAP(mooncrst_map)
 
 	MCFG_FRAGMENT_ADD(mooncrst_audio)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( fantastc, galaxian_base )
+//	MCFG_WATCHDOG_VBLANK_INIT(0)
+
+	/* alternate memory map */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(fantastc_map)
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("8910.0", AY8910, 1789750)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_SOUND_ADD("8910.1", AY8910, 1789750)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -3093,6 +3127,33 @@ static DRIVER_INIT( mshuttlj )
 
 	/* decrypt the code */
 	mshuttle_decode(machine, convtable);
+}
+
+
+static DRIVER_INIT( fantastc )
+{
+	/* video extensions */
+	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
+
+	/* decode code */
+	static const UINT16 lut_am_unscramble[32] = {
+		0, 2, 4, 6,	// ok!
+		7, 3, 5, 1,	// ok!
+		6, 0, 2, 4,	// ok!
+		1, 5, 3, 0,	// ok!
+		2, 4, 6, 3,	// good, good?, guess, guess
+		5, 6, 0, 2,	// good, good?, good?, guess
+		4, 1, 1, 5,	// good, good, guess, good
+		3, 7, 7, 7	// ok!
+	};
+
+	UINT8* romdata = machine.region("maincpu")->base();
+	assert(machine.region("maincpu")->bytes() == 0x8000);
+	UINT8 buf[0x8000];
+	memcpy(buf, romdata, 0x8000);
+
+	for (int i = 0; i < 32; i++)
+		memcpy(romdata + i * 0x400, buf + lut_am_unscramble[i] * 0x1000 + (i & 3) * 0x400, 0x400);
 }
 
 

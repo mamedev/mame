@@ -1159,6 +1159,71 @@ static INPUT_PORTS_START( moonal2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( fantastc )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x40, 0x40, "Extended Bonus Life" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coinage ) ) // no effect?
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x80, "5" )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "20000 80000" )
+	PORT_DIPSETTING(    0x04, "30000 80000" )
+	PORT_DIPSETTING(    0x08, "20000 120000" )
+	PORT_DIPSETTING(    0x0c, "30000 120000" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( tdpgal )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -4363,6 +4428,25 @@ ROM_START( sstarcrs )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( fantastc )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "f1",           0x0000, 0x1000, CRC(8019f0b7) SHA1(b0a611d1cbb92874a6534fd27c6ac57141668913) )
+	ROM_LOAD( "f2",           0x1000, 0x1000, CRC(988a9bc6) SHA1(468d483f285ed587f3be81431f22fdbaa3c221cc) )
+	ROM_LOAD( "f3",           0x2000, 0x1000, CRC(a3c0cc0b) SHA1(a1b12f1c4187d8db1b267a992db6cd297aeea1bc) )
+	ROM_LOAD( "f4",           0x3000, 0x1000, CRC(c1361be8) SHA1(5c8512747927096dd75e6095deb12dfe637f9096) )
+	ROM_LOAD( "f5",           0x4000, 0x1000, CRC(6787e93f) SHA1(4ed784ce600fc88efc4865a361f5427027d3419a) )
+	ROM_LOAD( "f6",           0x5000, 0x1000, CRC(597029ae) SHA1(38ea1348ac35bd1e6190f395ccb22f16cc30133d) )
+	ROM_LOAD( "f7",           0x6000, 0x1000, CRC(8de08d9a) SHA1(ba48a23236f2b26aa17b509daddc4b3e75424d06) )
+	ROM_LOAD( "f8",           0x7000, 0x1000, CRC(489e2fb7) SHA1(f7f641c3c6874eae0c9bb3920aa916f8b99a9285) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "37",           0x0000, 0x1000, CRC(3a54f749) SHA1(41e3c479b268de21ae0fd4f7986eb666ee58ad83) )
+	ROM_LOAD( "38",           0x1000, 0x1000, CRC(88b71264) SHA1(60c2eb49f16b94b27625045c78c864e299b60d6b) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom-74g138", 0x0000, 0x0020, BAD_DUMP CRC(b7cbbc1f) SHA1(ba7c496091a3e5701a6d01423446ee89a42edcd3) ) // or different wiring?
+ROM_END
+
 ROM_START( mooncmw )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "60.1x",      0x0000, 0x0800, CRC(322859e6) SHA1(292dccb66c38c8de837ec3ac10928d092494958e) )
@@ -6260,6 +6344,9 @@ GAME( 198?, thepitm,  thepit,   mooncrst, thepitm,  thepitm,  ROT90,  "bootleg (
 
 /* other games on basic mooncrst hardware */
 GAME( 1982, skybase,  0,        mooncrst, skybase,  skybase,  ROT90,  "Omori Electric Co., Ltd.", "Sky Base", GAME_SUPPORTS_SAVE )
+
+/* larger romspace, 2*AY8910, based on Super Star Crest board? */
+GAME( 1980?,fantastc, 0,        fantastc, fantastc, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */
 GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug,  jumpbug,  ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE ) // or by Alpha Denshi Co. under contract from Hoei?
