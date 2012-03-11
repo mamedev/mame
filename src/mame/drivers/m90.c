@@ -963,7 +963,7 @@ ROM_START( dynablstb2 )
 	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
-	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 )	/* samples */
 	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
