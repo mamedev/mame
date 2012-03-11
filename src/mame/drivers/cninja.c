@@ -1354,6 +1354,47 @@ ROM_START( cninjau ) /* US ver 4 */
 	ROM_LOAD( "mb7122h.7v", 0x00000,  0x400,  CRC(a1267336) SHA1(d11ea9d78526ac3c0dc6e57a2da5914273ad1e3f) )	/* Priority  Unused */
 ROM_END
 
+ROM_START( cninjaa )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "1.1k",       0x00000, 0x20000, CRC(a6c40959) SHA1(01d223b76a7798d5bd8b542b9ce8e3ca203205be) )
+	ROM_LOAD16_BYTE( "4.3k",       0x00001, 0x20000, CRC(2e01d1fd) SHA1(14ba377c86535c409b7b01deddf6fb5681fa3397) )
+	ROM_LOAD16_BYTE( "2.2j",       0x40000, 0x20000, CRC(18f0527c) SHA1(17b7ea68909c7c8b819578e2039f5be4a640ea75) )
+	ROM_LOAD16_BYTE( "5.3j",       0x40001, 0x20000, CRC(ea4b6d53) SHA1(263319750524756319587b6e51dfead0265809cb) )
+	ROM_LOAD16_BYTE( "gn-00.rom",  0x80000, 0x20000, CRC(0b110b16) SHA1(a967c8aeae3f0cee1f354583cf26ee736636aaf8) )
+	ROM_LOAD16_BYTE( "gn-03.rom",  0x80001, 0x20000, CRC(1e28e697) SHA1(2313e97f3a34892dfdc338944c0f00538fcae800) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "gl-07.rom",  0x00000,  0x10000,  CRC(ca8bef96) SHA1(fcdbd598c85e339a3389a2ef58cf2d5b3a2779af) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "gl-08.rom",  0x00001,  0x10000,  CRC(33a2b400) SHA1(fdb8de315f33705719c0ac03a61fb56ffbfdf597) )	/* chars */
+	ROM_LOAD16_BYTE( "gl-09.rom",  0x00000,  0x10000,  CRC(5a2d4752) SHA1(617dd10a99b5b55ca64dcdd22a0f133b0d6b770d) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "mag-02.rom", 0x000000, 0x80000,  CRC(de89c69a) SHA1(b41bdf859854b5541c7eae7cd541b910cea1f839) )	/* tiles 3 */
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD( "mag-00.rom", 0x000000, 0x40000,  CRC(a8f05d33) SHA1(a1330bc9ca4648219403db087622badfc632b47d) )	/* tiles 1 */
+	ROM_CONTINUE(           0x080000, 0x40000 )
+	ROM_LOAD( "mag-01.rom", 0x040000, 0x40000,  CRC(5b399eed) SHA1(490f8f9c0c557b0ba94c6019e3fe680641a0787e) )	/* tiles 2 */
+	ROM_CONTINUE(           0x0c0000, 0x40000 )
+
+	ROM_REGION( 0x200000, "gfx4", 0 )
+	ROM_LOAD16_BYTE( "mag-03.rom", 0x000000, 0x80000,  CRC(2220eb9f) SHA1(bdf0bd6e6ba375f0770b9d08a7efa32201cbb6ef) )	/* sprites */
+	ROM_LOAD16_BYTE( "mag-05.rom", 0x000001, 0x80000,  CRC(56a53254) SHA1(10940cfdc6fbe9013865107de3394ca7f782d9c7) )
+	ROM_LOAD16_BYTE( "mag-04.rom", 0x100000, 0x80000,  CRC(144b94cc) SHA1(d982508608942a714b428a2b721bf24e1627cbb6) )
+	ROM_LOAD16_BYTE( "mag-06.rom", 0x100001, 0x80000,  CRC(82d44749) SHA1(c471fa573e00c2f8ae44068439ba6d849a124c68) )
+
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "gl-06.rom",  0x00000,  0x20000,  CRC(d92e519d) SHA1(08238f12bf7058a3965ab6348b468e3d35d4cd23) )
+
+	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_LOAD( "mag-07.rom", 0x00000,  0x80000,  CRC(08eb5264) SHA1(3e33085f00b758acfc78034dc9a75fd6921fc3fe) )	/* banked */
+
+	ROM_REGION( 1024, "proms", 0 )
+	ROM_LOAD( "mb7122h.7v", 0x00000,  0x400,  CRC(a1267336) SHA1(d11ea9d78526ac3c0dc6e57a2da5914273ad1e3f) )	/* Priority  Unused */
+ROM_END
+
 ROM_START( joemac ) /* Japan ver 1 */
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "gl-02-2.1k", 0x00000, 0x20000,  CRC(80da12e2) SHA1(1037ed56c15dbe1eb8bb8b70f0bc3affc1119782) )
@@ -2053,6 +2094,7 @@ GAME( 1990, edrandy1, edrandy, edrandy,  edrandc, 0,        ROT0, "Data East Cor
 GAME( 1990, edrandyj, edrandy, edrandy,  edrandc, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (Japan ver 3)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninja,   0,       cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 4)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninja1,  cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 1)", GAME_SUPPORTS_SAVE )
+GAME( 1991, cninjaa,  cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (alternate)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninjau,  cninja,  cninja,   cninjau, cninja,   ROT0, "Data East Corporation", "Caveman Ninja (US ver 4)", GAME_SUPPORTS_SAVE )
 GAME( 1991, joemac,   cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, stoneage, cninja,  stoneage, cninja,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", GAME_SUPPORTS_SAVE )
