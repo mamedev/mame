@@ -2237,7 +2237,7 @@ static void generate_compute_flags(powerpc_state *ppc, drcuml_block *block, cons
 	{
 		UML_GETFLGS(block, I0, FLAG_S | FLAG_Z);										// getflgs i0,sz
 		UML_LOAD(block, I0, ppc->impstate->sz_cr_table, I0, SIZE_BYTE, SCALE_x1);	// load    i0,sz_cr_table,i0,byte
-		UML_OR(block, CR32(0), I0, XERSO32);											// or      [cr0],i0,[xerso]
+        UML_OR(block, CR32(0), I0, XERSO32);											// or      [cr0],i0,[xerso]
 		return;
 	}
 
@@ -3078,10 +3078,10 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
             UML_CMP(block, R32(G_RA(op)), 0x80000000);          // cmp rb, #80000000
             UML_JMPc(block, COND_AE, compiler->labelnum);       // bae 0:
 
-            UML_MOV(block, R32(G_RD(op)), 0x0);                 // move rd, #0
+            UML_MOV(block, I0, 0x0);                 // move i0, #0 (generate_flags needs result in i0)
             if (op & M_OE)
             {
-                UML_OR(block, XERSO32, XERSO32, 0x1);           // SO = 1
+                UML_OR(block, XERSO32, XERSO32, 0x1);           // SO |= 1
             }
             UML_JMP(block, compiler->labelnum+3);               // jmp 3:
 
@@ -3097,18 +3097,19 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
             UML_LABEL(block, compiler->labelnum++);             // 1:
             // do second branch
-            UML_MOV(block, R32(G_RD(op)), 0xffffffff);          // move rd, #ffffffff
+            UML_MOV(block, I0, 0xffffffff);                 // move i0, #ffffffff (generate_flags needs result in i0)
             if (op & M_OE)
             {
-                UML_OR(block, XERSO32, XERSO32, 0x1);           // SO = 1
+                UML_OR(block, XERSO32, XERSO32, 0x1);           // SO |= 1
             }
             UML_JMP(block, compiler->labelnum+1);               // jmp 3:
 
             UML_LABEL(block, compiler->labelnum++);             // 2:
-			UML_DIVS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));	// divs    rd,rd,ra,rb
-            generate_compute_flags(ppc, block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
+			UML_DIVS(block, I0, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));	// divs    rd,rd,ra,rb
 
             UML_LABEL(block, compiler->labelnum++);             // 3:
+            UML_MOV(block, R32(G_RD(op)), I0);                  // mov rd, I0
+            generate_compute_flags(ppc, block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags> 
             return TRUE;
 
 		case 0x01c:	/* ANDx */
