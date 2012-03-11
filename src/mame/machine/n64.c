@@ -22,6 +22,7 @@ static TIMER_CALLBACK(vi_scanline_callback);
 
 n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, N64PERIPH, "N64 Periphal Chips", tag, owner, clock)
+    , m_nvram_image(NULL)
 {
 }
 
@@ -2387,6 +2388,9 @@ WRITE32_MEMBER( n64_periphs::pif_ram_w )
 static void n64_machine_stop(running_machine &machine)
 {
 	n64_periphs *periphs = machine.device<n64_periphs>("rcp");
+
+	if( periphs->m_nvram_image == NULL )
+		return;
 
 	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
 	//printf("Saving stuff\n");
