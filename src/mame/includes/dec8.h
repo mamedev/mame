@@ -33,8 +33,14 @@ public:
 	int      m_nmi_enable;
 	int      m_i8751_return;
 	int      m_i8751_value;
+	int      m_coinage_id;
 	int      m_coin1;
 	int      m_coin2;
+	int      m_need1;
+	int      m_need2;
+	int      m_cred1;
+	int      m_cred2;
+	int      m_credits;
 	int      m_latch;
 	int      m_snd;
 	int      m_msm5205next;
